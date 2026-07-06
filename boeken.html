@@ -330,7 +330,7 @@
   <div class="wrap hero-inner">
     <span class="kicker">Boeken zonder pas · via een partner</span>
     <h1>Boek via wie u <span class="accent">vertrouwt</span>.</h1>
-    <p class="deck">Geen lid? Via onze partners en creators boekt u toch tegen RTG-inkoop. U betaalt de nettoprijs plus één zichtbare service van 15% — die delen wij met de partner via wie u boekt. Geen kleine lettertjes, u ziet precies wie wat verdient.</p>
+    <p class="deck">Geen lid? Via onze partners en creators boekt u toch de reizen die RTG voor haar leden inkoopt. Eén heldere totaalprijs, alles inbegrepen — en uw partner blijft uw aanspreekpunt, van boeking tot thuiskomst.</p>
   </div>
 </section>
 
@@ -350,14 +350,14 @@
 
 <section class="split-strip on-black">
   <div class="wrap">
-    <div class="folio">N° 02 — De verdeling</div>
-    <span class="kicker">Zichtbaar verdeeld</span>
-    <h2>Eén service, eerlijk gedeeld.</h2>
-    <p class="deck">Leden betalen nettoprijs plus een vaste bijdrage. Zonder pas betaalt u nettoprijs plus 15% service — en die service verdelen we open tussen de partner die u bracht en RTG. Zo verdient uw creator aan zijn aanbeveling, zonder dat er iets verstopt zit in de prijs.</p>
+    <div class="folio">N° 02 — Waarom via een partner</div>
+    <span class="kicker">Vertrouwd, geregeld, compleet</span>
+    <h2>Boeken via een partner, geregeld door RTG.</h2>
+    <p class="deck">Uw partner kent u; wij kennen reizen. U boekt via het gezicht dat u vertrouwt, en RTG regelt daarachter alles — dezelfde inkoop, dezelfde afhandeling en dezelfde zorg als voor onze leden.</p>
     <div class="split-cards">
-      <div class="c"><b>100%</b><span>Nettoprijs → de reis</span><p>De reis zelf kost wat hij werkelijk kost: de inkoopprijs die ook onze leden betalen.</p></div>
-      <div class="c"><b>tot 40%</b><span>van de service → uw partner</span><p>De influencer of het bedrijf via wie u boekt, ontvangt een vast deel van de service. Het exacte bedrag ziet u vóór u betaalt.</p></div>
-      <div class="c"><b>de rest</b><span>van de service → RTG</span><p>Daarvan draaien wij het platform, de inkoop en de afhandeling van uw reis.</p></div>
+      <div class="c"><b>Inkoop</b><span>Dezelfde reizen als onze leden</span><p>Elke reis komt uit de inkoopkanalen waar RTG voor haar leden boekt — geen doorverkochte pakketten.</p></div>
+      <div class="c"><b>Aanspreekpunt</b><span>Uw partner blijft betrokken</span><p>Uw boeking blijft gekoppeld aan de creator of het bedrijf via wie u kwam — vertrouwd, van begin tot eind.</p></div>
+      <div class="c"><b>Afhandeling</b><span>RTG regelt alles</span><p>Bevestigingen, wijzigingen en zorg onderweg lopen via RTG, met dezelfde standaard als voor leden.</p></div>
     </div>
   </div>
 </section>
@@ -367,8 +367,8 @@
     <div>
       <div class="folio">N° 03 — Voor de volgende keer</div>
       <span class="kicker">Rekent u even mee</span>
-      <h2>Met een pas vervalt de service.</h2>
-      <p>Leden betalen nooit de 15% service — alleen de nettoprijs en een vaste, transparante bijdrage. Wie vaker reist, verdient de pas dus vanzelf terug. En u krijgt er De Salon, de persoonlijke AI en betalen met één tik bij.</p>
+      <h2>Met een pas boekt u tegen inkoop.</h2>
+      <p>Leden betalen de nettoprijs plus een vaste, transparante bijdrage — daar zit niets tussen. Wie vaker reist, verdient de pas dus vanzelf terug. En u krijgt er De Salon, de persoonlijke AI en betalen met één tik bij.</p>
       <a href="index.html#passen" class="btn" style="margin-top:2rem;">Bekijk de passen</a>
     </div>
     <div class="compare-mini" id="compareMini"></div>
@@ -403,21 +403,21 @@
   const $ = s => document.querySelector(s);
   const eur = n => '€ ' + n.toLocaleString('nl-NL');
 
-  const SERVICE_RATE = 0.15;
-
-  /* Lokale demo-data — gebruikt wanneer de backend niet bereikbaar is. */
+  /* Lokale demo-data — gebruikt wanneer de backend niet bereikbaar is.
+     De klant ziet alleen totaalprijzen; de verdeling is interne administratie. */
   const PARTNERS_LOCAL = {
-    NOVA:  {code:'NOVA',  name:'Nova van Dijk',          type:'influencer', handle:'@novatravels · 380k volgers', share:0.40},
-    ATLAS: {code:'ATLAS', name:'Atlas Executive Travel', type:'bedrijf',    handle:'zakelijk reisbureau, Amsterdam', share:0.35}
+    NOVA:  {code:'NOVA',  name:'Nova van Dijk',            type:'influencer', handle:'@novatravels · 380k volgers'},
+    ATLAS: {code:'ATLAS', name:'Atlas Executive Travel',   type:'bedrijf',    handle:'zakelijk reisbureau, Amsterdam'},
+    BLOOM: {code:'BLOOM', name:'Bloomingdale Bloemendaal', type:'bedrijf',    handle:'strandpaviljoen & events, Bloemendaal aan Zee'}
   };
   let TRIPS = [
-    {id:'kyoto-herfst', dest:'Kyoto', visual:'v-kyoto', title:'Kyoto in herfstkleur', dates:'8 dagen · oktober 2026', netto:2400,
+    {id:'kyoto-herfst', dest:'Kyoto', visual:'v-kyoto', title:'Kyoto in herfstkleur', dates:'8 dagen · oktober 2026', price:2760,
      desc:'Hoshinoya aan de rivier, privé-theeceremonie in Gion en de esdoorns van Arashiyama vóór de drukte.',
      includes:['Vlucht business class','Hoshinoya Kyoto — 4 nachten','Ryokan Tawaraya — 3 nachten','Privétransfers & theeceremonie']},
-    {id:'lissabon-palacio', dest:'Lissabon', visual:'v-lissabon', title:'Palácio-weekend Lissabon', dates:'4 dagen · doorlopend', netto:980,
+    {id:'lissabon-palacio', dest:'Lissabon', visual:'v-lissabon', title:'Palácio-weekend Lissabon', dates:'4 dagen · doorlopend', price:1127,
      desc:'Een palácio voor de prijs van een gewoon hotel — hetzelfde adres waar onze leden over posten in De Salon.',
      includes:['Vlucht & transfers','Palácio-suite — 3 nachten','Ontbijt & late check-out','Tafelreservering fado-avond']},
-    {id:'marrakech-riad', dest:'Marrakech', visual:'v-marrakech', title:'Riad & woestijn Marrakech', dates:'5 dagen · doorlopend', netto:1150,
+    {id:'marrakech-riad', dest:'Marrakech', visual:'v-marrakech', title:'Riad & woestijn Marrakech', dates:'5 dagen · doorlopend', price:1323,
      desc:'Een riad in de medina, hammam en een avond in de Agafay-woestijn — ingekocht zoals wij dat voor leden doen.',
      includes:['Vlucht & privétransfers','Riad — 4 nachten','Hammam & diner in de Agafay','Gids door de souks']}
   ];
@@ -438,12 +438,6 @@
 
   let partner = null;
 
-  function pricing(trip){
-    const service = Math.round(trip.netto * SERVICE_RATE);
-    const partnerCut = partner ? Math.round(service * partner.share) : 0;
-    return {netto: trip.netto, service, total: trip.netto + service, partnerCut, rtgCut: service - partnerCut};
-  }
-
   let toastTimer;
   function toast(msg){
     const t = $('#toast');
@@ -463,7 +457,7 @@
           '<div class="avatar">' + partner.name[0] + '</div>' +
           '<div class="who"><b>U boekt via ' + partner.name + '</b>' +
             '<span>' + (partner.type === 'influencer' ? 'Creator · ' : 'Partnerbedrijf · ') + partner.handle + '</span></div>' +
-          '<div class="share">' + partner.name.split(' ')[0] + ' ontvangt ' + Math.round(partner.share * 100) + '% van de service op uw boeking — u ziet het exacte bedrag vóór u betaalt.</div>' +
+          '<div class="share">Geverifieerde RTG-partner. Uw boeking blijft aan ' + partner.name.split(' ')[0] + ' gekoppeld — zij blijven uw aanspreekpunt, van boeking tot thuiskomst.</div>' +
         '</div>';
     } else {
       box.innerHTML =
@@ -503,9 +497,8 @@
   /* ---------- reizen ---------- */
 
   function renderTrips(){
-    $('#tripGrid').innerHTML = TRIPS.map(t => {
-      const p = pricing(t);
-      return '<div class="trip-card">' +
+    $('#tripGrid').innerHTML = TRIPS.map(t =>
+      '<div class="trip-card">' +
         '<div class="trip-visual ' + t.visual + '"><span class="place">' + t.dest + '</span></div>' +
         '<div class="trip-body">' +
           '<h3>' + t.title + '</h3>' +
@@ -513,15 +506,13 @@
           '<p>' + t.desc + '</p>' +
           '<ul>' + t.includes.map(i => '<li>' + i + '</li>').join('') + '</ul>' +
           '<div class="trip-price">' +
-            '<div class="total">' + eur(p.total) + '</div>' +
-            '<div class="split">Nettoprijs ' + eur(p.netto) + ' + 15% service ' + eur(p.service) +
-              (partner ? '<br><b>waarvan ' + eur(p.partnerCut) + ' voor ' + partner.name.split(' ')[0] + '</b>' : '') +
-            '</div>' +
+            '<div class="total">' + eur(t.price) + '</div>' +
+            '<div class="split">Totaalprijs, alles inbegrepen — geen kosten achteraf.</div>' +
           '</div>' +
           '<button class="btn-book" data-trip="' + t.id + '">' + APPLE_SVG + 'Boek nu</button>' +
         '</div>' +
-      '</div>';
-    }).join('');
+      '</div>'
+    ).join('');
     document.querySelectorAll('.btn-book').forEach(b =>
       b.addEventListener('click', () => openBooking(b.dataset.trip)));
     renderCompare();
@@ -529,11 +520,10 @@
 
   function renderCompare(){
     const t = TRIPS[0];
-    const p = pricing(t);
     $('#compareMini').innerHTML =
-      '<div class="row"><span>' + t.title + ' — zonder pas</span><b>' + eur(p.total) + '</b></div>' +
-      '<div class="row win"><span>Met RTG Pass (nettoprijs + bijdrage)</span><b>' + eur(p.netto + 190) + '</b></div>' +
-      '<div class="row"><span>Uw voordeel als lid, op één reis</span><b>' + eur(p.total - p.netto - 190) + '</b></div>';
+      '<div class="row"><span>' + t.title + ' — zonder pas</span><b>' + eur(t.price) + '</b></div>' +
+      '<div class="row win"><span>Met RTG Pass (nettoprijs + vaste bijdrage)</span><b>vanaf ' + eur(t.price - 170) + '</b></div>' +
+      '<div class="row"><span>Uw voordeel als lid, op één reis</span><b>' + eur(170) + '</b></div>';
   }
 
   /* ---------- boekingsflow ---------- */
@@ -548,40 +538,34 @@
 
   function openBooking(tripId){
     const t = TRIPS.find(x => x.id === tripId);
-    const p = pricing(t);
     const modal = $('#bookModal');
     modal.innerHTML =
       '<h3>' + t.title + '</h3>' +
       '<div class="sub">' + t.dates + (partner ? ' · via ' + partner.name : '') + '</div>' +
       '<div class="book-lines">' +
-        '<div class="rowline"><span>Nettoprijs (RTG-inkoop)</span><span>' + eur(p.netto) + '</span></div>' +
-        '<div class="rowline"><span>Service (15%)</span><span>' + eur(p.service) + '</span></div>' +
-        (partner
-          ? '<div class="rowline gold"><span>— waarvan voor ' + partner.name + '</span><span>' + eur(p.partnerCut) + '</span></div>' +
-            '<div class="rowline"><span>— waarvan voor RTG</span><span>' + eur(p.rtgCut) + '</span></div>'
-          : '<div class="rowline"><span>— volledig voor RTG (geen partnercode)</span><span>' + eur(p.rtgCut) + '</span></div>') +
-        '<div class="rowline total"><span>Totaal</span><span>' + eur(p.total) + '</span></div>' +
+        t.includes.map(i => '<div class="rowline"><span>' + i + '</span><span>inbegrepen</span></div>').join('') +
+        '<div class="rowline total"><span>Totaal — alles inbegrepen</span><span>' + eur(t.price) + '</span></div>' +
       '</div>' +
       '<div class="book-form">' +
         '<input id="bkName" placeholder="Uw naam">' +
         '<input id="bkEmail" type="email" placeholder="E-mailadres">' +
       '</div>' +
       '<div class="book-actions">' +
-        '<button class="btn-pay" id="bkPay">' + APPLE_SVG + 'Boek en betaal — ' + eur(p.total) + '</button>' +
+        '<button class="btn-pay" id="bkPay">' + APPLE_SVG + 'Boek en betaal — ' + eur(t.price) + '</button>' +
         '<button class="linkish" id="bkCancel">Annuleren</button>' +
       '</div>';
     $('#book-overlay').classList.add('open');
     $('#bkCancel').addEventListener('click', () => $('#book-overlay').classList.remove('open'));
-    $('#bkPay').addEventListener('click', () => submitBooking(t, p));
+    $('#bkPay').addEventListener('click', () => submitBooking(t));
   }
 
-  async function submitBooking(trip, p){
+  async function submitBooking(trip){
     const name = $('#bkName').value.trim();
     const email = $('#bkEmail').value.trim();
     if (!name || !email.includes('@')){ toast('Vul een naam en geldig e-mailadres in.'); return; }
 
     const pw = $('#paywait'), card = pw.querySelector('.paycard');
-    $('#payAmt').textContent = eur(p.total);
+    $('#payAmt').textContent = eur(trip.price);
     $('#payIcon').innerHTML = APPLE_SVG.replace('currentColor', '#0C0C0B').replace('currentColor', '#0C0C0B').replace('currentColor', '#0C0C0B');
     $('#payLbl').textContent = 'Betalen met Apple Pay…';
     card.classList.add('scanning'); card.classList.remove('done');
@@ -610,8 +594,8 @@
             '<h3>Geboekt.</h3>' +
             '<div class="ref">Referentie ' + ref + '</div>' +
             '<p>De bevestiging is onderweg naar ' + email + '. Wij nemen binnen 24 uur contact op voor de reisdetails.</p>' +
-            (partner ? '<p class="partner-line">' + partner.name + ' ontvangt ' + eur(p.partnerCut) + ' voor deze boeking — dank dat u via een partner boekt.</p>' : '') +
-            '<p style="margin-top:1.25rem;">Vaker zo reizen, zonder de 15% service?</p>' +
+            (partner ? '<p class="partner-line">Geboekt via ' + partner.name + ' — zij blijven uw aanspreekpunt.</p>' : '') +
+            '<p style="margin-top:1.25rem;">Vaker zo reizen, tegen ledencondities?</p>' +
             '<a href="index.html#passen" class="btn" style="margin-top:1rem;">Bekijk de passen</a>' +
             '<div style="margin-top:1rem;"><button class="linkish" id="bkClose">Sluiten</button></div>' +
           '</div>';

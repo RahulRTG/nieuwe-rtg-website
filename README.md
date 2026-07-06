@@ -45,10 +45,13 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/dm` `{postId, text}` | Privébericht — zelfde rechten als reageren |
 | `POST /api/ai` `{messages}` | Persoonlijke AI (Claude indien key aanwezig, anders demo) |
 | `POST /api/logout` | Sessie beëindigen |
-| `POST /api/partner` `{code}` | Partnercode valideren (demo-codes: `NOVA`, `ATLAS`) |
-| `POST /api/partnertrips` | Gecureerde reizen voor het partnerkanaal |
-| `POST /api/book` `{code, tripId, name, email}` | Boeking zonder pas via een partner — service (15%) wordt gedeeld tussen partner en RTG |
+| `POST /api/partner` `{code}` | Partnercode valideren (demo-codes: `NOVA`, `ATLAS`, `BLOOM`) |
+| `POST /api/staff` `{staffCode}` | Personeelscode van een partnerbedrijf valideren (demo: `BLOOM-TEAM`) |
+| `POST /api/partnertrips` `{staffCode?}` | Gecureerde reizen — alleen totaalprijzen; met geldige personeelscode ook personeelsprijzen |
+| `POST /api/book` `{code \| staffCode, tripId, name, email}` | Boeking zonder pas via een partner of personeelscode |
 
 ## Partnerkanaal
 
-Niet-leden boeken via **boeken.html** — bereikbaar via een partnerlink zoals `boeken.html?via=NOVA`. De prijs is nettoprijs + 15% service; de service wordt zichtbaar gedeeld tussen de partner (influencer of bedrijf) en RTG. Boekingen worden opgeslagen in `server/data/db.json` onder `bookings`.
+Niet-leden boeken via **boeken.html** — bereikbaar via een partnerlink zoals `boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs, service en de commissieverdeling tussen partner en RTG zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`.
+
+**Bloomingdale Bloemendaal** (`bloomingdale.html`) is de voorbeeld-pagina van de partnertool voor bedrijven: een co-branded pagina met twee kanalen — een klantenkanaal (gasten boeken onder het merk van de partner) en een personeelskanaal (medewerkers boeken met personeelsvoordeel via code `BLOOM-TEAM`, als secundaire arbeidsvoorwaarde). Beide kanalen leveren RTG én de partner omzet op; de verdeling blijft onzichtbaar voor de boeker.

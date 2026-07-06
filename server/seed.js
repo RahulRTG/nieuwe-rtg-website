@@ -77,9 +77,14 @@ module.exports = function seed() {
        Prijs = nettoprijs + service; de service wordt gedeeld tussen
        de partner (share van de service) en RTG. */
     partnerService: 0.15,
+    /* share = het deel van de service voor de partner — INTERN, wordt nooit
+       aan de klant getoond. Bedrijfspartners kunnen een personeelskanaal
+       hebben: eigen code, lager servicetarief (arbeidsvoorwaarde). */
     partners: [
       { code: 'NOVA',  name: 'Nova van Dijk',          type: 'influencer', handle: '@novatravels · 380k volgers', share: 0.40 },
-      { code: 'ATLAS', name: 'Atlas Executive Travel', type: 'bedrijf',    handle: 'zakelijk reisbureau, Amsterdam', share: 0.35 }
+      { code: 'ATLAS', name: 'Atlas Executive Travel', type: 'bedrijf',    handle: 'zakelijk reisbureau, Amsterdam', share: 0.35 },
+      { code: 'BLOOM', name: 'Bloomingdale Bloemendaal', type: 'bedrijf',  handle: 'strandpaviljoen & events, Bloemendaal aan Zee', share: 0.35,
+        staff: { code: 'BLOOM-TEAM', serviceRate: 0.08 } }
     ],
     partnerTrips: [
       {

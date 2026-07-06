@@ -4,6 +4,14 @@
 module.exports = function seed() {
   return {
     creatorCredit: { rtg: 86, lifestyle: 142, business: 64 },
+    creatorLikes: { rtg: 320, lifestyle: 680, business: 210 },
+
+    /* Wederkerigheid: spreekt een Lifestyle-/Business-lid een RTG-lid aan
+       (reactie of DM op diens post), dan mag dat RTG-lid bij die persoon
+       terugpraten. Alexander sprak Sophie al aan — zie post 3. */
+    contacts: [
+      { higher: 'Alexander de Vries', rtg: 'Sophie Janssen' }
+    ],
 
     invoices: [
       { id: 'RTG-2026-0158', desc: 'Kyoto — Hoshinoya, 4 nachten', netto: 2840, bijdrage: 190, status: 'open', date: 'Vervalt 28 juli 2026' },
@@ -30,7 +38,7 @@ module.exports = function seed() {
       {
         id: 1, author: 'Isabelle van Rhijn', tier: 'lifestyle', place: 'Kyoto', visual: 'v-kyoto',
         text: 'De theeceremonie die mijn concierge regelde — geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
-        baseLikes: 124, likedBy: {}, reward: 6,
+        baseLikes: 124, likedBy: {}, reward: 6, featured: true,
         comments: [{ who: 'Alexander de Vries', tier: 'business', text: 'Staat genoteerd voor november. Dank.' }]
       },
       {
@@ -42,8 +50,11 @@ module.exports = function seed() {
       {
         id: 3, author: 'Sophie Janssen', tier: 'rtg', place: 'Lissabon', visual: 'v-lissabon',
         text: 'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt.',
-        baseLikes: 203, likedBy: {}, reward: 8,
-        comments: [{ who: 'Nadia Karim', tier: 'rtg', text: 'Welk palácio was dit? Sta op het punt te boeken!' }]
+        baseLikes: 203, likedBy: {}, reward: 8, featured: true,
+        comments: [
+          { who: 'Nadia Karim', tier: 'rtg', text: 'Welk palácio was dit? Sta op het punt te boeken!' },
+          { who: 'Alexander de Vries', tier: 'business', text: 'Sophie, dit wil ik in november zien — welke wijk was dit?' }
+        ]
       },
       {
         id: 4, author: 'Marcus Bergwerff', tier: 'business', place: 'Singapore', visual: 'v-singapore',
@@ -54,7 +65,7 @@ module.exports = function seed() {
       {
         id: 5, author: 'Nadia Karim', tier: 'rtg', place: 'Marrakech', visual: 'v-marrakech',
         text: 'Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Reizen dat iets teruggeeft — dat deel vertel ik iedereen.',
-        baseLikes: 141, likedBy: {}, reward: 5,
+        baseLikes: 141, likedBy: {}, reward: 5, featured: true,
         comments: []
       }
     ],

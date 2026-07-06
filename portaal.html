@@ -483,6 +483,71 @@
   }
   .linkish:hover{color:var(--burgundy);}
 
+  /* ---------- één tik betalen (Face ID / Apple Pay) ---------- */
+
+  .btn-pay{
+    display:inline-flex;
+    align-items:center;
+    gap:0.5rem;
+    background:var(--black);
+    color:var(--white);
+    border:none;
+    border-radius:999px;
+    padding:0.6rem 1.3rem;
+    font-size:0.78rem;
+    font-weight:600;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    transition:transform 0.15s ease, opacity 0.2s ease;
+    white-space:nowrap;
+  }
+  .btn-pay:hover{transform:scale(1.04);}
+  .btn-pay svg{width:15px;height:15px;flex-shrink:0;}
+  .pay-all{
+    margin-top:1.5rem;
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+  .pay-all span{font-size:0.8rem;color:var(--grey-soft);}
+
+  #faceid-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(12,12,11,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:250;
+    padding:1.5rem;
+  }
+  #faceid-overlay.open{display:flex;}
+  .faceid-card{
+    background:var(--white);
+    width:290px;
+    padding:2.2rem 2rem 2rem;
+    text-align:center;
+    border-radius:20px;
+    box-shadow:0 30px 70px -20px rgba(0,0,0,0.45);
+  }
+  .fid-amount{
+    font-family:'Bodoni Moda',serif;
+    font-size:1.5rem;
+    margin-bottom:1rem;
+  }
+  .faceid-icon{width:60px;height:60px;margin:0 auto 0.9rem;}
+  .faceid-icon svg{width:100%;height:100%;}
+  .fid-label{font-size:0.85rem;color:var(--grey);}
+  @keyframes fidPulse{
+    0%{transform:scale(1);opacity:0.8;}
+    50%{transform:scale(1.08);opacity:1;}
+    100%{transform:scale(1);opacity:0.8;}
+  }
+  .faceid-card.scanning .faceid-icon{animation:fidPulse 0.9s ease-in-out infinite;}
+  .faceid-card.done .faceid-icon{animation:none;}
+  .faceid-card.done .fid-label{color:var(--green);font-weight:600;}
+
   /* ---------- trips ---------- */
 
   .trip-card{
@@ -633,6 +698,14 @@
   }
   .rules-card .yes{color:var(--green);font-weight:600;}
   .rules-card .no{color:var(--grey-soft);}
+  .rules-note{
+    margin-top:1rem;
+    padding-top:0.9rem;
+    border-top:1px solid var(--line);
+    font-size:0.74rem;
+    color:var(--grey-soft);
+    line-height:1.5;
+  }
   .creator-banner{
     margin-top:2.5rem;
     background:linear-gradient(120deg, #100A0C, #2A0A16);
@@ -720,6 +793,20 @@
     text-transform:uppercase;
     color:var(--gold);
     font-weight:600;
+  }
+  .post-flag{
+    margin-top:0.4rem;
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--burgundy);
+    font-weight:600;
+  }
+  .post-delay{
+    margin-top:0.45rem;
+    font-size:0.68rem;
+    color:var(--grey-soft);
+    letter-spacing:0.03em;
   }
   .post-actions{
     border-top:1px solid var(--line);
@@ -902,8 +989,8 @@
   <section class="panel" data-panel="betalingen">
     <div class="wrap">
       <div class="folio">Portaal — Betalingen</div>
-      <h2>Elke euro zichtbaar.</h2>
-      <p class="deck">Nettoprijs, vaste bijdrage en het deel dat naar de RTFoundation gaat — per boeking uitgesplitst. Openstaande bedragen betaalt u hier direct.</p>
+      <h2>Elke euro zichtbaar. Betalen met één tik.</h2>
+      <p class="deck">Nettoprijs, vaste bijdrage en het deel dat naar de RTFoundation gaat — per boeking uitgesplitst. Openstaande bedragen betaalt u met één tik: Face ID of Apple Pay, geen formulieren.</p>
       <div id="payStage"></div>
     </div>
   </section>
@@ -923,7 +1010,7 @@
     <div class="wrap">
       <div class="folio">Portaal — Persoonlijke AI</div>
       <h2 id="aiTitle">Uw persoonlijke AI.</h2>
-      <p class="deck" id="aiDeck">Exclusief voor leden: een AI die uw reizen kent en helpt met elke voorbereiding — van paklijst tot documenten.</p>
+      <p class="deck" id="aiDeck">Exclusief voor leden: een AI die niet wacht op uw vraag. Hij signaleert wat geregeld moet worden, denkt vooruit en komt zelf met ideeën en oplossingen — één "ja" is genoeg.</p>
       <div id="aiStage"></div>
     </div>
   </section>
@@ -935,7 +1022,7 @@
       <div class="salon-head">
         <div>
           <h2>De Salon.</h2>
-          <p class="deck">Het besloten netwerk van RTG-leden. Geen algoritme dat schreeuwt om aandacht — een salon waar reizen gedeeld worden zoals ze beleefd zijn. Wie mooie content maakt, verdient reiskorting.</p>
+          <p class="deck">Het besloten netwerk van RTG-leden. Geen algoritme dat schreeuwt om aandacht — een salon waar reizen gedeeld worden zoals ze beleefd zijn. Wie mooie content maakt, wordt beloond: met voorrang, korting en gratis diensten. Voor de veiligheid van onze leden verschijnt elke post standaard 7 dagen na het verblijf.</p>
           <p class="deck" id="salonViewerNote" style="margin-top:0.75rem;font-size:0.85rem;"></p>
         </div>
         <div class="rules-card">
@@ -947,6 +1034,7 @@
             <tr><td>Lifestyle Pass</td><td class="yes">✓</td><td class="yes">✓ Alle leden</td><td class="yes">✓ Alle leden</td></tr>
             <tr><td>Business Pass</td><td class="yes">✓</td><td class="yes">✓ Alle leden</td><td class="yes">✓ Alle leden</td></tr>
           </table>
+          <p class="rules-note">Spreekt een Lifestyle- of Business-lid u aan, dan kunt u met diegene altijd terugpraten — ook met de RTG Pass. Posts verschijnen standaard 7 dagen na het verblijf.</p>
         </div>
       </div>
       <div class="creator-banner" id="creatorBanner"></div>
@@ -956,6 +1044,14 @@
 </div>
 
 <div id="toast"></div>
+
+<div id="faceid-overlay">
+  <div class="faceid-card">
+    <div class="fid-amount" id="fidAmount"></div>
+    <div class="faceid-icon" id="fidIcon"></div>
+    <div class="fid-label" id="fidLabel">Betalen met Face ID…</div>
+  </div>
+</div>
 
 <div id="modal-overlay">
   <div class="modal">
@@ -1009,7 +1105,7 @@
   let posts = [
     {id:1, author:'Isabelle van Rhijn', tier:'lifestyle', place:'Kyoto', visual:'v-kyoto',
      text:'De theeceremonie die mijn concierge regelde — geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
-     likes:124, liked:false, reward:6,
+     likes:124, liked:false, reward:6, featured:true,
      comments:[{who:'Alexander de Vries', tier:'business', text:'Staat genoteerd voor november. Dank.'}]},
     {id:2, author:'Alexander de Vries', tier:'business', place:'Zürich', visual:'v-zurich',
      text:'Ochtendvlucht, twee vergaderingen, om 18:00 aan het meer. De Business Pass plant de dag strakker dan mijn assistent ooit deed.',
@@ -1017,15 +1113,18 @@
      comments:[]},
     {id:3, author:'Sophie Janssen', tier:'rtg', place:'Lissabon', visual:'v-lissabon',
      text:'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt.',
-     likes:203, liked:false, reward:8,
-     comments:[{who:'Nadia Karim', tier:'rtg', text:'Welk palácio was dit? Sta op het punt te boeken!'}]},
+     likes:203, liked:false, reward:8, featured:true,
+     comments:[
+       {who:'Nadia Karim', tier:'rtg', text:'Welk palácio was dit? Sta op het punt te boeken!'},
+       {who:'Alexander de Vries', tier:'business', text:'Sophie, dit wil ik in november zien — welke wijk was dit?'}
+     ]},
     {id:4, author:'Marcus Bergwerff', tier:'business', place:'Singapore', visual:'v-singapore',
      text:'Layover van 9 uur omgezet in een middag Raffles + spa. De AI stelde het voor, mijn concierge bevestigde binnen 10 minuten.',
      likes:57, liked:false, reward:2,
      comments:[]},
     {id:5, author:'Nadia Karim', tier:'rtg', place:'Marrakech', visual:'v-marrakech',
      text:'Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Reizen dat iets teruggeeft — dat deel vertel ik iedereen.',
-     likes:141, liked:false, reward:5,
+     likes:141, liked:false, reward:5, featured:true,
      comments:[]}
   ];
 
@@ -1040,6 +1139,7 @@
 
   let user = null;
   let creatorCredit = 86;
+  let creatorLikes = 320;
 
   /* ---------- backend-koppeling ----------
      Draait de site via de Node-backend (npm start), dan lopen login,
@@ -1073,6 +1173,7 @@
     if (state.trip) trip = state.trip;
     if (state.posts) posts = state.posts;
     if (typeof state.creatorCredit === 'number') creatorCredit = state.creatorCredit;
+    if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
   }
 
   /* ---------- helpers ---------- */
@@ -1102,9 +1203,17 @@
   }
   function engageHint(authorTier){
     if (user.tier === 'guest') return 'Zonder pas kunt u alleen liken. Reageren en berichten zijn voor leden.';
-    if (user.tier === 'rtg') return 'Met de RTG Pass reageert en dm’t u alleen met andere RTG-leden. Upgrade naar Lifestyle of Business voor meer.';
+    if (user.tier === 'rtg') return 'Met de RTG Pass reageert en dm’t u met andere RTG-leden. Spreekt een Lifestyle- of Business-lid u aan, dan kunt u met diegene altijd terugpraten.';
     return 'Lifestyle- en Business-leden kunnen met alle leden communiceren.';
   }
+
+  /* Beloningsladder voor creators (per kwartaal). */
+  const LADDER = [
+    {likes:250,  label:'voorrang bij gewilde boekingen'},
+    {likes:500,  label:'5% reiskorting'},
+    {likes:1000, label:'een gratis dienst — transfer, diner of spa'},
+    {likes:2500, label:'een gratis activiteit tijdens uw volgende reis'}
+  ];
 
   /* ---------- login / logout ---------- */
 
@@ -1123,6 +1232,7 @@
         API.enabled = false; /* geen backend bereikbaar — lokale demo */
       }
     }
+    if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
     $('#gate').classList.add('hidden');
     $('#portal').classList.add('active');
     renderHeader();
@@ -1269,6 +1379,79 @@
 
   /* ---------- payments ---------- */
 
+  /* Face ID-glyph en vinkje voor de betaaloverlay. */
+  const FID_SVG = '<svg viewBox="0 0 64 64" fill="none" stroke="#0C0C0B" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/>' +
+    '<path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/>' +
+    '<circle cx="23.5" cy="26.5" r="1.8" fill="#0C0C0B" stroke="none"/><circle cx="40.5" cy="26.5" r="1.8" fill="#0C0C0B" stroke="none"/>' +
+    '<path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
+  const FID_CHECK = '<svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="28" stroke="#2E6B4F" stroke-width="3.5"/>' +
+    '<path d="M20 33 l8.5 8.5 L45 23" stroke="#2E6B4F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const FID_MINI = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/>' +
+    '<path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/>' +
+    '<circle cx="23.5" cy="26.5" r="2.6" fill="currentColor" stroke="none"/><circle cx="40.5" cy="26.5" r="2.6" fill="currentColor" stroke="none"/>' +
+    '<path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
+
+  /* Betaal één factuur of alles ('all'); geeft het RTFoundation-bedrag terug. */
+  async function executePay(target){
+    let foundation = 0;
+    if (API.live){
+      const data = await API.call('/pay', target === 'all' ? {all: true} : {invoiceId: target});
+      foundation = data.foundation;
+      applyState(data.state);
+    } else {
+      const targets = target === 'all'
+        ? invoices.filter(i => i.status === 'open')
+        : invoices.filter(i => i.id === target);
+      for (const inv of targets){
+        inv.status = 'paid';
+        inv.date = 'Zojuist betaald';
+        foundation += Math.round(inv.bijdrage * 0.3);
+        for (const t of trip.items){
+          if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
+        }
+      }
+    }
+    return foundation;
+  }
+
+  /* Gesimuleerde Face ID-scan: overlay, korte scan, vinkje, klaar. */
+  let fidBusy = false;
+  function payWithFaceId(amountLabel, doPay){
+    if (fidBusy) return;
+    fidBusy = true;
+    const overlay = $('#faceid-overlay');
+    const card = overlay.querySelector('.faceid-card');
+    $('#fidAmount').textContent = amountLabel;
+    $('#fidIcon').innerHTML = FID_SVG;
+    $('#fidLabel').textContent = 'Betalen met Face ID…';
+    card.classList.add('scanning');
+    card.classList.remove('done');
+    overlay.classList.add('open');
+    setTimeout(async () => {
+      try {
+        const foundation = await doPay();
+        card.classList.remove('scanning');
+        card.classList.add('done');
+        $('#fidIcon').innerHTML = FID_CHECK;
+        $('#fidLabel').textContent = 'Bevestigd';
+        setTimeout(() => {
+          overlay.classList.remove('open');
+          fidBusy = false;
+          toast('Betaald met Face ID. ' + eur(foundation) + ' van uw bijdrage gaat naar de RTFoundation.');
+          renderPayments();
+          renderOverview();
+          renderTrip();
+        }, 750);
+      } catch (e) {
+        overlay.classList.remove('open');
+        fidBusy = false;
+        toast(e.message || 'Betaling mislukt — probeer het opnieuw.');
+      }
+    }, 1200);
+  }
+
   function renderPayments(){
     const stage = $('#payStage');
     if (user.tier === 'guest'){
@@ -1294,7 +1477,7 @@
             '<span class="amount">' + eur(total) + '</span>' +
             '<span class="status ' + (inv.status === 'paid' ? 'paid' : 'open') + '">' + (inv.status === 'paid' ? 'Betaald' : 'Open') + '</span>' +
             (inv.status === 'open'
-              ? '<button class="btn btn-small js-pay">Betaal</button>'
+              ? '<button class="btn-pay js-pay">' + FID_MINI + 'Betaal</button><button class="linkish js-detail">Details</button>'
               : '<button class="linkish js-detail">Details</button>') +
           '</div>' +
         '</div>' +
@@ -1304,42 +1487,34 @@
           '<div class="rowline foundation"><span>waarvan naar de RTFoundation (30%)</span><span>' + eur(Math.round(inv.bijdrage * 0.3)) + '</span></div>' +
           '<div class="rowline total"><span>Totaal</span><span>' + eur(total) + '</span></div>' +
           (inv.status === 'open'
-            ? '<div class="confirm"><button class="btn btn-small js-confirm">Bevestig betaling</button><span style="font-size:0.75rem;color:var(--grey-soft);">Demo — er wordt niets afgeschreven.</span></div>'
+            ? '<div class="confirm"><span style="font-size:0.75rem;color:var(--grey-soft);">Betalen gaat met één tik — Face ID of Apple Pay, zonder formulieren. (Demo: er wordt niets afgeschreven.)</span></div>'
             : '') +
         '</div>' +
       '</div>';
     }).join('') + '</div>';
 
+    if (open.length){
+      html += '<div class="pay-all">' +
+        '<button class="btn-pay js-payall">' + FID_MINI + 'Betaal alles — ' + eur(openSum) + '</button>' +
+        '<span>Eén tik, alle openstaande betalingen tegelijk.</span>' +
+      '</div>';
+    }
+
     stage.innerHTML = html;
+
+    const payAllBtn = stage.querySelector('.js-payall');
+    if (payAllBtn) payAllBtn.addEventListener('click', () => {
+      payWithFaceId(eur(openSum), () => executePay('all'));
+    });
 
     stage.querySelectorAll('.pay-item').forEach(item => {
       const bd = item.querySelector('.pay-breakdown');
-      const toggle = () => bd.classList.toggle('open');
-      const payBtn = item.querySelector('.js-pay');
       const detailBtn = item.querySelector('.js-detail');
-      if (payBtn) payBtn.addEventListener('click', toggle);
-      if (detailBtn) detailBtn.addEventListener('click', toggle);
-      const confirmBtn = item.querySelector('.js-confirm');
-      if (confirmBtn) confirmBtn.addEventListener('click', async () => {
+      if (detailBtn) detailBtn.addEventListener('click', () => bd.classList.toggle('open'));
+      const payBtn = item.querySelector('.js-pay');
+      if (payBtn) payBtn.addEventListener('click', () => {
         const inv = invoices.find(i => i.id === item.dataset.inv);
-        if (API.live){
-          try {
-            const data = await API.call('/pay', {invoiceId: inv.id});
-            applyState(data.state);
-          } catch (e) { toast(e.message || 'Betaling mislukt — probeer het opnieuw.'); return; }
-        } else {
-          inv.status = 'paid';
-          inv.date = 'Zojuist betaald';
-          for (const tlItem of trip.items){
-            if (tlItem.invoiceId === inv.id || (!tlItem.invoiceId && tlItem.status === 'open' && inv.id === 'RTG-2026-0158')){
-              tlItem.status = 'paid'; tlItem.label = 'Bevestigd'; break;
-            }
-          }
-        }
-        toast('Betaling bevestigd. ' + eur(Math.round(inv.bijdrage * 0.3)) + ' van uw bijdrage gaat naar de RTFoundation.');
-        renderPayments();
-        renderOverview();
-        renderTrip();
+        payWithFaceId(eur(inv.netto + inv.bijdrage), () => executePay(inv.id));
       });
     });
   }
@@ -1373,13 +1548,33 @@
   /* ---------- AI ---------- */
 
   const AI_NAMES = {
-    rtg:       {title:'De Butler.', deck:'Uw AI kent uw reis naar Kyoto, uw voorkeuren en uw agenda. Vraag wat u wilt — de Butler bereidt alles voor.'},
-    lifestyle: {title:'Uw AI, naast uw concierge.', deck:'Uw concierge blijft uw vaste aanspreekpunt. Deze AI staat ernaast voor directe voorbereiding: paklijsten, documenten, planning — dag en nacht.'},
-    business:  {title:'Uw uitvoerende AI.', deck:'Kort en precies. De AI bereidt uw reizen voor zoals een goede chief of staff dat doet: alles klaar vóór u erom vraagt.'}
+    rtg:       {title:'De Butler.', deck:'Uw frictieloze vriend: hij kent uw reis naar Kyoto, signaleert wat geregeld moet worden en komt zelf met voorstellen — vóór u erom vraagt.'},
+    lifestyle: {title:'Uw AI, naast uw concierge.', deck:'Uw concierge blijft uw vaste aanspreekpunt. Deze AI denkt daarnaast proactief mee: hij signaleert, stelt voor en lost op — dag en nacht, zonder dat u hoeft te vragen.'},
+    business:  {title:'Uw uitvoerende AI.', deck:'Als een goede chief of staff: alles klaar vóór u erom vraagt. Signaleert openstaande zaken, stelt de volgende stap voor — u zegt alleen ja of nee.'}
   };
 
+  /* Proactieve opening: de AI signaleert zelf wat er speelt en stelt de
+     volgende stap voor — de frictieloze vriend wacht niet op een vraag. */
+  function aiOpener(){
+    const first = user.full.split(' ')[0];
+    const lines = ['Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') +
+      ' Uw reis naar ' + trip.dest + ' begint over ' + trip.days + ' dagen. Ik heb alvast vooruitgedacht:'];
+    const open = invoices.filter(i => i.status === 'open');
+    if (open.length){
+      const sum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+      lines.push('— Er ' + (open.length === 1 ? 'staat nog 1 betaling' : 'staan nog ' + open.length + ' betalingen') +
+        ' open (' + eur(sum) + '). Met één tik — Face ID — is dat geregeld via Betalingen.');
+    }
+    const pending = trip.items.find(i => i.status === 'req');
+    if (pending) lines.push('— ' + pending.title.replace('Diner — ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging en meld me zodra die binnen is.');
+    lines.push('— Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.');
+    return lines.join('\n');
+  }
+
   function aiAnswer(q){
-    const l = q.toLowerCase();
+    const l = q.toLowerCase().trim();
+    if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
+      return 'Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00 en een avondwandeling langs Pontocho.\n\nVolgende dat ik in de gaten houd: de bevestiging van Kikunoi Honten. U hoeft niets te doen.';
     if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer'))
       return 'Voor Kyoto in oktober (14–22°C, kans op regen):\n— Lichte lagen + een regenjas\n— Nette schoenen die makkelijk uitgaan (ryokan & tempels)\n— Ingetogen kleding voor Kikunoi Honten\n— Adapter type A\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
     if (l.includes('visum') || l.includes('paspoort') || l.includes('document'))
@@ -1415,9 +1610,10 @@
           '</div>' +
         '</div>' +
         '<div class="ai-side">' +
-          '<h3>Wat de AI voor u voorbereidt</h3>' +
-          '<p>De AI is gekoppeld aan uw boekingen. Hij kent uw reis naar ' + trip.dest + ', uw betalingen en uw voorkeuren — en werkt exclusief voor u.</p>' +
+          '<h3>De frictieloze vriend</h3>' +
+          '<p>De AI is gekoppeld aan uw boekingen en betalingen. Hij wacht niet op uw vraag: hij signaleert openstaande zaken, bewaakt aanvragen en stelt zelf de volgende stap voor. U zegt alleen ja of nee.</p>' +
           '<div class="chips">' +
+            '<button class="chip">Ja, regel het</button>' +
             '<button class="chip">Wat moet ik inpakken?</button>' +
             '<button class="chip">Heb ik een visum nodig?</button>' +
             '<button class="chip">Hoe is het weer in oktober?</button>' +
@@ -1460,8 +1656,9 @@
       }
     }
 
-    const first = user.full.split(' ')[0];
-    bubble('Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Uw reis naar Kyoto begint over ' + trip.days + ' dagen. Waarmee kan ik u helpen met de voorbereiding?', 'ai');
+    const opener = aiOpener();
+    bubble(opener, 'ai');
+    chatHistory.push({role:'assistant', content:opener});
 
     $('#chatSend').addEventListener('click', () => { ask($('#chatText').value); $('#chatText').value=''; });
     $('#chatText').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value=''; } });
@@ -1474,21 +1671,26 @@
     $('#salonViewerNote').innerHTML = '<b>Uw rechten:</b> ' + engageHint();
 
     const banner = $('#creatorBanner');
+    const ladderText = LADDER.map(l => l.likes.toLocaleString('nl-NL') + ' likes → ' + l.label).join(' · ');
     if (user.tier === 'guest'){
       banner.innerHTML =
-        '<div class="txt"><h3>Maak content, verdien korting.</h3>' +
-        '<p>Leden die hun reizen delen in De Salon verdienen reiskrediet: elke 50 likes op een post is 1% korting op een volgende boeking, tot 10% per kwartaal.</p></div>' +
+        '<div class="txt"><h3>Maak content, verdien meer dan korting.</h3>' +
+        '<p>Leden die hun reizen delen, klimmen per kwartaal een ladder op: ' + ladderText + '. Uitgelichte posts verschijnen — met naamsvermelding — als beeld op de RTG-website.</p></div>' +
         '<a href="index.html#passen" class="btn btn-small" style="background:var(--white);color:var(--black);border-color:var(--white);">Word lid</a>';
     } else {
+      const level = [...LADDER].reverse().find(l => creatorLikes >= l.likes);
+      const next = LADDER.find(l => creatorLikes < l.likes);
+      const levelText = level ? 'Uw niveau: ' + level.label : 'Nog ' + (LADDER[0].likes - creatorLikes) + ' likes tot ' + LADDER[0].label;
+      const nextText = next ? ' · nog ' + (next.likes - creatorLikes) + ' tot ' + next.label : '';
       banner.innerHTML =
-        '<div class="txt"><h3>Maak content, verdien korting.</h3>' +
-        '<p>Elke 50 likes op uw posts is 1% reiskorting, tot 10% per kwartaal. Uw krediet wordt automatisch verrekend bij uw volgende betaling.</p></div>' +
-        '<div class="credit"><b>' + eur(creatorCredit) + '</b><span>Uw creator-krediet</span></div>';
+        '<div class="txt"><h3>Maak content, verdien meer dan korting.</h3>' +
+        '<p>Per kwartaal: ' + ladderText + '. Uitgelichte posts verschijnen — met naamsvermelding — als beeld op de RTG-website, zodat onze leden het verhaal vertellen.</p></div>' +
+        '<div class="credit"><b>' + creatorLikes.toLocaleString('nl-NL') + '</b><span>likes dit kwartaal<br>' + levelText + nextText + '</span></div>';
     }
 
     const feed = $('#feed');
     feed.innerHTML = posts.map(p => {
-      const engage = canEngage(p.tier);
+      const engage = (typeof p.canEngage === 'boolean') ? p.canEngage : canEngage(p.tier);
       return '<article class="post" data-post="' + p.id + '">' +
         '<div class="post-head">' +
           '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
@@ -1498,6 +1700,8 @@
         '<div class="post-visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>' +
         '<div class="post-body"><p>' + p.text + '</p>' +
           '<div class="post-reward">✦ Verdiende ' + p.reward + '% reiskorting met deze post</div>' +
+          (p.featured ? '<div class="post-flag">★ Uitgelicht als beeld op rtg.nl</div>' : '') +
+          '<div class="post-delay">Geplaatst 7 dagen na verblijf — voor de veiligheid van onze leden</div>' +
         '</div>' +
         '<div class="post-actions">' +
           '<button class="pa-btn js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +

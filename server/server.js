@@ -52,16 +52,38 @@ function auth(req, res, next) {
 
 /* ---------- Salon-rechten (server-side afgedwongen) ----------
    gast: alleen liken; RTG: reageren/dm'en met RTG-leden;
-   Lifestyle & Business: volledige interactie met alle leden. */
-function canEngage(viewerTier, authorTier) {
-  if (viewerTier === 'guest') return false;
-  if (viewerTier === 'rtg') return authorTier === 'rtg';
+   Lifestyle & Business: volledige interactie met alle leden.
+   Wederkerigheid: spreekt een hoger lid een RTG-lid aan (reactie of DM
+   op diens post), dan mag dat RTG-lid bij die persoon terugpraten. */
+function hasContact(higherFull, rtgFull) {
+  return db.data.contacts.some(c => c.higher === higherFull && c.rtg === rtgFull);
+}
+
+function addContact(higherFull, rtgFull) {
+  if (!hasContact(higherFull, rtgFull)) {
+    db.data.contacts.push({ higher: higherFull, rtg: rtgFull });
+  }
+}
+
+function canEngage(sess, post) {
+  if (sess.tier === 'guest') return false;
+  if (sess.tier === 'rtg') {
+    if (post.tier === 'rtg') return true;
+    return hasContact(post.author, PERSONAS.rtg.full);
+  }
   return true;
 }
 
 function engageError(viewerTier) {
   if (viewerTier === 'guest') return 'Zonder pas kunt u alleen liken. Reageren en berichten zijn voor leden.';
-  return 'Met de RTG Pass reageert en dm’t u alleen met andere RTG-leden.';
+  return 'Met de RTG Pass reageert en dm’t u alleen met andere RTG-leden — tenzij dit lid u eerst heeft aangesproken.';
+}
+
+/* Na een reactie/DM van een hoger lid op een RTG-post: leg het contact vast. */
+function registerContact(sess, post) {
+  if ((sess.tier === 'lifestyle' || sess.tier === 'business') && post.tier === 'rtg') {
+    addContact(PERSONAS[sess.tier].full, post.author);
+  }
 }
 
 /* ---------- state per gebruiker ---------- */
@@ -70,16 +92,18 @@ function stateFor(sess) {
   const persona = PERSONAS[sess.tier];
   const posts = db.data.posts.map(p => ({
     id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual,
-    text: p.text, reward: p.reward,
+    text: p.text, reward: p.reward, featured: !!p.featured,
     likes: p.baseLikes + Object.keys(p.likedBy).length,
     liked: !!p.likedBy[sess.key],
-    comments: p.comments
+    comments: p.comments,
+    canEngage: canEngage(sess, p)
   }));
-  const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0 };
+  const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0, creatorLikes: 0 };
   if (sess.tier !== 'guest') {
     state.invoices = db.data.invoices;
     state.trip = db.data.trip;
     state.creatorCredit = db.data.creatorCredit[sess.tier] || 0;
+    state.creatorLikes = db.data.creatorLikes[sess.tier] || 0;
   }
   return state;
 }
@@ -104,18 +128,32 @@ app.post('/api/logout', auth, (req, res) => {
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session) }));
 
+/* Eén tik betaalt: één factuur ({invoiceId}) of alles wat openstaat ({all:true}).
+   De echte Face ID-/Apple Pay-verificatie gebeurt op het toestel; de server
+   verwerkt de betaling in één aanroep. */
 app.post('/api/pay', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const inv = db.data.invoices.find(i => i.id === req.body.invoiceId);
-  if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
-  if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
-  inv.status = 'paid';
-  inv.date = 'Zojuist betaald';
-  for (const item of db.data.trip.items) {
-    if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
+  let targets;
+  if (req.body.all) {
+    targets = db.data.invoices.filter(i => i.status === 'open');
+    if (!targets.length) return res.status(409).json({ error: 'Er staat niets open.' });
+  } else {
+    const inv = db.data.invoices.find(i => i.id === req.body.invoiceId);
+    if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
+    if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
+    targets = [inv];
+  }
+  let foundation = 0;
+  for (const inv of targets) {
+    inv.status = 'paid';
+    inv.date = 'Zojuist betaald';
+    foundation += Math.round(inv.bijdrage * 0.3);
+    for (const item of db.data.trip.items) {
+      if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
+    }
   }
   save();
-  res.json({ ok: true, foundation: Math.round(inv.bijdrage * 0.3), state: stateFor(req.session) });
+  res.json({ ok: true, foundation, state: stateFor(req.session) });
 });
 
 app.post('/api/like', auth, (req, res) => {
@@ -131,7 +169,7 @@ app.post('/api/like', auth, (req, res) => {
 app.post('/api/comment', auth, (req, res) => {
   const post = db.data.posts.find(p => p.id === Number(req.body.postId));
   if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
-  if (!canEngage(req.session.tier, post.tier)) {
+  if (!canEngage(req.session, post)) {
     return res.status(403).json({ error: engageError(req.session.tier) });
   }
   const text = String(req.body.text || '').trim().slice(0, 500);
@@ -139,6 +177,7 @@ app.post('/api/comment', auth, (req, res) => {
   const persona = PERSONAS[req.session.tier];
   const comment = { who: persona.full, tier: req.session.tier, text };
   post.comments.push(comment);
+  registerContact(req.session, post);
   save();
   res.json({ ok: true, comment });
 });
@@ -146,11 +185,12 @@ app.post('/api/comment', auth, (req, res) => {
 app.post('/api/dm', auth, (req, res) => {
   const post = db.data.posts.find(p => p.id === Number(req.body.postId));
   if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
-  if (!canEngage(req.session.tier, post.tier)) {
+  if (!canEngage(req.session, post)) {
     return res.status(403).json({ error: engageError(req.session.tier) });
   }
   const text = String(req.body.text || '').trim().slice(0, 1000);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  registerContact(req.session, post);
   db.data.dms.push({
     from: PERSONAS[req.session.tier].full,
     fromTier: req.session.tier,
@@ -177,6 +217,8 @@ function aiSystemPrompt(tier) {
   return [
     'Je bent de exclusieve persoonlijke reis-AI van Rahul Travel Group (RTG), een membership-reisclub die tegen inkoopprijs boekt en 30% van elke ledenbijdrage aan de RTFoundation doneert.',
     AI_TONE[tier] || AI_TONE.rtg,
+    'Je bent de frictieloze vriend van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay) — verwijs daarnaar, vraag nooit om betaalgegevens.',
+    'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig je kort dat het geregeld is en noem je wat je vervolgens in de gaten houdt.',
     'Je helpt het lid met reisvoorbereiding: paklijsten, documenten en visa, weer, dagplanning, restaurants en wijzigingen aan geboekte diensten. Antwoord in het Nederlands, beknopt (maximaal ~120 woorden), zonder opsmuk.',
     `Het lid: ${persona.full} (${tier === 'rtg' ? 'RTG Pass' : tier === 'lifestyle' ? 'Lifestyle Pass' : 'Business Pass'}), lid sinds ${persona.since}.`,
     `Komende reis: ${trip.dest}, ${trip.dates} (over ${trip.days} dagen). Geboekte diensten: ${trip.items.map(i => `${i.title} [${i.label}]`).join('; ')}.`,
@@ -189,7 +231,9 @@ function aiSystemPrompt(tier) {
 
 /* Demo-antwoorden wanneer er geen Claude API-key is. */
 function cannedAnswer(q) {
-  const l = q.toLowerCase();
+  const l = q.toLowerCase().trim();
+  if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
+    return 'Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00 en een avondwandeling langs Pontocho.\n\nVolgende dat ik in de gaten houd: de bevestiging van Kikunoi Honten. U hoeft niets te doen.';
   if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer'))
     return 'Voor Kyoto in oktober (14–22°C, kans op regen):\n— Lichte lagen + een regenjas\n— Nette schoenen die makkelijk uitgaan (ryokan & tempels)\n— Ingetogen kleding voor Kikunoi Honten\n— Adapter type A\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
   if (l.includes('visum') || l.includes('paspoort') || l.includes('document'))
@@ -212,6 +256,9 @@ app.post('/api/ai', auth, async (req, res) => {
     .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
     .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }))
     .slice(-12);
+  // De Claude API vereist dat het gesprek met een user-beurt begint; de
+  // proactieve opener van de AI staat vooraan als assistant — knip die eraf.
+  while (history.length && history[0].role !== 'user') history.shift();
   if (!history.length || history[history.length - 1].role !== 'user') {
     return res.status(400).json({ error: 'Geen vraag ontvangen.' });
   }

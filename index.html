@@ -365,6 +365,67 @@
     .passes-grid{grid-template-columns:1fr;}
   }
 
+  /* ---------- uit de salon ---------- */
+
+  .salon-strip{background:#F7F5F1;}
+  .salon-strip h2{
+    font-size:clamp(2rem, 3.6vw, 2.9rem);
+    line-height:1.1;
+    max-width:18ch;
+  }
+  .salon-copy{
+    margin-top:1.5rem;
+    color:var(--grey);
+    max-width:52ch;
+  }
+  .salon-cards{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1.5rem;
+    margin-top:3rem;
+  }
+  .salon-card{
+    background:var(--white);
+    border:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+  }
+  .salon-visual{
+    aspect-ratio:4/3;
+    display:flex;
+    align-items:flex-end;
+    padding:1.25rem;
+    color:var(--white);
+  }
+  .salon-visual .place{
+    font-family:'Bodoni Moda',serif;
+    font-style:italic;
+    font-size:1.6rem;
+    text-shadow:0 2px 18px rgba(0,0,0,0.35);
+  }
+  .v-kyoto{background:linear-gradient(160deg,#3E1F26 0%,#7F1634 60%,#B8657B 100%);}
+  .v-lissabon{background:linear-gradient(160deg,#1F1A0C 0%,#857007 65%,#D9C36A 100%);}
+  .v-marrakech{background:linear-gradient(160deg,#2A130A 0%,#9E4A1C 60%,#E0A470 100%);}
+  .salon-card .body{padding:1.25rem 1.4rem 1.5rem;flex:1;display:flex;flex-direction:column;}
+  .salon-card .body p{font-size:0.9rem;color:var(--grey);flex:1;}
+  .salon-card .by{
+    margin-top:1rem;
+    font-size:0.7rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+  }
+  .salon-note{
+    margin-top:2rem;
+    font-size:0.8rem;
+    color:var(--grey-soft);
+    font-style:italic;
+    max-width:64ch;
+  }
+  @media (max-width:860px){
+    .salon-cards{grid-template-columns:1fr;}
+  }
+
   /* ---------- foundation ---------- */
 
   .foundation-inner{
@@ -547,6 +608,42 @@
         <a href="business-pass.html" class="go">Ontdek de Business Pass <span class="arrow">→</span></a>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="salon-strip" id="salon">
+  <div class="wrap">
+    <div class="folio">N° 03 — Uit De Salon</div>
+    <span class="kicker">Door leden gedeeld</span>
+    <h2>Onze leden zijn onze fotografen.</h2>
+    <p class="salon-copy">Al het beeld op deze site komt uit De Salon, het besloten netwerk van RTG-leden. Geen campagnes, geen stockfoto's — reizen zoals ze werkelijk beleefd zijn. Wie deelt, wordt beloond met voorrang, korting en gratis diensten.</p>
+
+    <div class="salon-cards">
+      <div class="salon-card">
+        <div class="salon-visual v-kyoto"><span class="place">Kyoto</span></div>
+        <div class="body">
+          <p>"De theeceremonie die mijn concierge regelde — geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek."</p>
+          <div class="by">Isabelle van Rhijn · Lifestyle Pass</div>
+        </div>
+      </div>
+      <div class="salon-card">
+        <div class="salon-visual v-lissabon"><span class="place">Lissabon</span></div>
+        <div class="body">
+          <p>"Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt."</p>
+          <div class="by">Sophie Janssen · RTG Pass</div>
+        </div>
+      </div>
+      <div class="salon-card">
+        <div class="salon-visual v-marrakech"><span class="place">Marrakech</span></div>
+        <div class="body">
+          <p>"Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Reizen dat iets teruggeeft — dat deel vertel ik iedereen."</p>
+          <div class="by">Nadia Karim · RTG Pass</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="salon-note">Voor de veiligheid van onze leden verschijnt elke post standaard 7 dagen na het verblijf. Uitgelichte posts fungeren — altijd met naamsvermelding — als beeld op deze site.</p>
+    <a href="portaal.html" class="btn btn-ghost" style="margin-top:1.5rem;">Bekijk De Salon in het portaal</a>
   </div>
 </section>
 

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RTFoundation — Samen sparen voor wie niet kan reizen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --white:#FFFFFF;
+    --black:#0C0C0B;
+    --burgundy:#7F1634;
+    --burgundy-bright:#9E1C40;
+    --burgundy-on-dark:#C23A5E;
+    --gold:#857007;
+    --gold-bright:#A98F1C;
+    --line:#DEDBD5;
+    --grey:#4D4A45;
+    --grey-soft:#8A8680;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--white);
+    color:var(--black);
+    font-family:'Inter',sans-serif;
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3{
+    font-family:'Bodoni Moda',serif;
+    font-weight:500;
+    letter-spacing:-0.01em;
+  }
+
+  a{color:inherit;text-decoration:none;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 clamp(1.5rem, 4vw, 3rem);
+  }
+
+  section{
+    position:relative;
+    padding:clamp(6rem, 12vw, 11rem) 0;
+    overflow:hidden;
+  }
+
+  .on-black{background:var(--black);color:var(--white);}
+  .on-white{background:var(--white);color:var(--black);}
+
+  .folio{
+    font-family:'Inter',sans-serif;
+    font-size:0.75rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+    margin-bottom:2.5rem;
+  }
+  .on-black .folio{color:rgba(255,255,255,0.45);}
+  .folio::after{content:"";flex:1;height:1px;background:var(--line);}
+  .on-black .folio::after{background:rgba(255,255,255,0.14);}
+
+  .kicker{
+    font-size:0.8rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--burgundy);
+    font-weight:600;
+    margin-bottom:1.25rem;
+    display:block;
+  }
+  .on-black .kicker{color:var(--burgundy-on-dark);}
+
+  .btn{
+    display:inline-block;
+    padding:0.95rem 2.1rem;
+    background:var(--black);
+    color:var(--white);
+    font-size:0.85rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    font-weight:600;
+    border:1px solid var(--black);
+    transition:all 0.25s ease;
+  }
+  .btn:hover{background:var(--burgundy);border-color:var(--burgundy);}
+  .btn-ghost{background:transparent;color:var(--black);}
+  .btn-ghost:hover{background:var(--black);color:var(--white);}
+  .on-black .btn{background:var(--white);color:var(--black);border-color:var(--white);}
+  .on-black .btn:hover{background:var(--burgundy-on-dark);color:var(--white);border-color:var(--burgundy-on-dark);}
+
+  /* ---------- nav ---------- */
+
+  header{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:100;
+    padding:1.1rem 0;
+    background:rgba(255,255,255,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  header .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
+  .brandmark .bm-block{
+    background:var(--burgundy);
+    color:var(--white);
+    font-family:'Bodoni Moda',serif;
+    font-weight:500;
+    font-size:1.05rem;
+    letter-spacing:0.05em;
+    padding:0.5rem 1.05rem;
+    line-height:1;
+  }
+  .brandmark .bm-tagline{
+    margin-top:0.45rem;
+    font-family:'Inter',sans-serif;
+    font-size:0.58rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--gold);
+    padding-left:0.15rem;
+  }
+  nav ul{list-style:none;display:flex;gap:2.25rem;}
+  nav a{
+    font-size:0.85rem;
+    letter-spacing:0.03em;
+    color:var(--grey);
+    transition:color 0.2s ease;
+  }
+  nav a:hover{color:var(--burgundy);}
+
+  /* ---------- hero ---------- */
+
+  .hero{
+    padding-top:clamp(9rem, 16vw, 13rem);
+    padding-bottom:clamp(7rem, 12vw, 10rem);
+  }
+  .hero-inner{text-align:center;max-width:880px;margin:0 auto;}
+  .hero h1{
+    font-size:clamp(2.6rem, 6vw, 5rem);
+    line-height:1.04;
+  }
+  .hero h1 .accent{color:var(--burgundy);font-style:italic;}
+  .hero p.deck{
+    margin-top:2rem;
+    font-size:clamp(1.05rem, 1.6vw, 1.25rem);
+    color:var(--grey);
+    max-width:56ch;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  /* ---------- manifest ---------- */
+
+  .manifesto .wrap{max-width:760px;}
+  .manifesto p.lede{
+    font-family:'Bodoni Moda',serif;
+    font-size:clamp(1.5rem, 3vw, 2.15rem);
+    line-height:1.35;
+    font-weight:400;
+  }
+  .manifesto .signature{
+    margin-top:3rem;
+    font-size:0.85rem;
+    letter-spacing:0.06em;
+    color:rgba(255,255,255,0.5);
+    text-transform:uppercase;
+  }
+
+  /* ---------- hoe het werkt ---------- */
+
+  .how h2{
+    font-size:clamp(2rem, 3.6vw, 2.9rem);
+    line-height:1.12;
+    max-width:20ch;
+  }
+  .steps-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-top:3.5rem;
+  }
+  .step{
+    background:var(--white);
+    padding:2.25rem 1.75rem;
+  }
+  .step .n{
+    font-family:'Bodoni Moda',serif;
+    font-style:italic;
+    color:var(--burgundy);
+    font-size:1.2rem;
+    display:block;
+    margin-bottom:1rem;
+  }
+  .step h3{font-size:1.08rem;font-weight:500;margin-bottom:0.5rem;}
+  .step p{color:var(--grey);font-size:0.9rem;}
+  @media (max-width:960px){.steps-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.steps-grid{grid-template-columns:1fr;}}
+
+  /* ---------- geen euro verspild ---------- */
+
+  .maths h2{
+    font-size:clamp(2rem, 3.6vw, 2.9rem);
+    line-height:1.12;
+    max-width:18ch;
+  }
+  .maths .deck{
+    margin-top:1.5rem;
+    color:rgba(255,255,255,0.6);
+    max-width:52ch;
+  }
+  .compare{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1px;
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.14);
+    margin-top:3.5rem;
+  }
+  .compare .col{
+    background:var(--black);
+    padding:2.5rem 2.25rem;
+  }
+  .compare .col.rtg{background:#160A0F;}
+  .compare .label{
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.45);
+    margin-bottom:1.25rem;
+  }
+  .compare .big{
+    font-family:'Bodoni Moda',serif;
+    font-size:clamp(2.4rem, 5vw, 3.6rem);
+    line-height:1;
+  }
+  .compare .col.rtg .big{color:var(--burgundy-on-dark);}
+  .compare p{
+    margin-top:1rem;
+    font-size:0.9rem;
+    color:rgba(255,255,255,0.6);
+  }
+  .maths .disclaimer{
+    margin-top:1.5rem;
+    font-size:0.75rem;
+    color:rgba(255,255,255,0.4);
+    font-style:italic;
+  }
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.14);
+    border-top:none;
+  }
+  .stat-row .stat{
+    background:var(--black);
+    padding:1.75rem;
+    text-align:center;
+  }
+  .stat-row b{
+    display:block;
+    font-family:'Bodoni Moda',serif;
+    font-weight:500;
+    font-size:1.9rem;
+    color:var(--gold-bright);
+  }
+  .stat-row span{
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.5);
+  }
+  @media (max-width:720px){
+    .compare{grid-template-columns:1fr;}
+    .stat-row{grid-template-columns:1fr;}
+  }
+
+  /* ---------- voordragen ---------- */
+
+  .nominate-inner{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:5rem;
+    align-items:center;
+  }
+  .nominate h2{
+    font-size:clamp(2rem, 3.6vw, 2.9rem);
+    line-height:1.12;
+  }
+  .nominate-copy{margin-top:1.5rem;color:var(--grey);max-width:50ch;}
+  .nominate-copy + .nominate-copy{margin-top:1rem;}
+  .nominate-actions{margin-top:2.5rem;display:flex;gap:1rem;flex-wrap:wrap;}
+  .quiet-card{
+    border:1px solid var(--line);
+    padding:2.5rem 2.25rem;
+    background:#F7F5F1;
+  }
+  .quiet-card h3{font-size:1.2rem;margin-bottom:0.75rem;}
+  .quiet-card p{font-size:0.9rem;color:var(--grey);}
+  @media (max-width:860px){.nominate-inner{grid-template-columns:1fr;gap:3rem;}}
+
+  footer{
+    padding:3rem 0;
+    border-top:1px solid var(--line);
+  }
+  footer .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:0.8rem;
+    color:var(--grey-soft);
+  }
+  @media (max-width:600px){
+    footer .wrap{flex-direction:column;gap:1rem;text-align:center;}
+    nav ul{gap:1.2rem;}
+    nav a{font-size:0.75rem;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="index.html" class="brandmark">
+      <span class="bm-block">Rahul Travel Group</span>
+      <span class="bm-tagline">Experience the Elite Class</span>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="index.html#passen">Passen</a></li>
+        <li><a href="#hoe">Hoe het werkt</a></li>
+        <li><a href="portaal.html">Ledenportaal</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="hero on-white">
+  <div class="wrap hero-inner">
+    <span class="kicker">RTFoundation</span>
+    <h1>Samen sparen voor wie <span class="accent">niet</span> kan reizen.</h1>
+    <p class="deck">Bij elke boeking gaat 30% van de ledenbijdrage automatisch naar de RTFoundation. Zo sparen onze leden met elkaar voor de vakanties van mensen die die zelf niet kunnen betalen — bij elke reis die een lid maakt, komt een andere reis dichterbij.</p>
+  </div>
+</section>
+
+<section class="manifesto on-black">
+  <div class="wrap">
+    <div class="folio">N° 01 — Waarom</div>
+    <p class="lede">Wij geloven niet in strooigeld. Een goed doel dat duur inkoopt, geeft het gespaarde geld van zijn donateurs weg aan marges en tussenlagen. Daarom koopt de RTFoundation elke reis in via RTG — tegen dezelfde nettoprijs die onze leden betalen. Zo wordt geen enkele euro verspild.</p>
+    <div class="signature">— Het uitgangspunt van de foundation</div>
+  </div>
+</section>
+
+<section class="how on-white" id="hoe">
+  <div class="wrap">
+    <div class="folio">N° 02 — Hoe het werkt</div>
+    <span class="kicker">Van bijdrage tot vakantie</span>
+    <h2>Vier stappen, nul strijkstok.</h2>
+
+    <div class="steps-grid">
+      <div class="step">
+        <span class="n">01</span>
+        <h3>U betaalt uw bijdrage</h3>
+        <p>Bij elke boeking betaalt u de nettoprijs plus de vaste, transparante ledenbijdrage — zoals altijd.</p>
+      </div>
+      <div class="step">
+        <span class="n">02</span>
+        <h3>30% gaat naar de foundation</h3>
+        <p>Automatisch, bij elke boeking, ongeacht welke pas u heeft. U ziet het bedrag terug in uw betaaloverzicht.</p>
+      </div>
+      <div class="step">
+        <span class="n">03</span>
+        <h3>De foundation koopt in via RTG</h3>
+        <p>Tegen dezelfde inkoopprijs als onze leden. Geen consumentenmarge, geen bemiddelingskosten, geen verspilling.</p>
+      </div>
+      <div class="step">
+        <span class="n">04</span>
+        <h3>Een gezin gaat op vakantie</h3>
+        <p>Mensen die een vakantie zelf niet kunnen betalen, reizen op het gespaarde geld van onze leden — volwaardig, zonder podium.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="maths on-black">
+  <div class="wrap">
+    <div class="folio">N° 03 — Geen euro verspild</div>
+    <span class="kicker">De rekensom</span>
+    <h2>Elke gespaarde euro wordt méér vakantie.</h2>
+    <p class="deck">Omdat de foundation inkoopt tegen nettoprijs, koopt hetzelfde gespaarde bedrag aanzienlijk meer reis dan via reguliere kanalen. Wat leden bij elkaar sparen, komt volledig aan bij het gezin dat op reis gaat.</p>
+
+    <div class="compare">
+      <div class="col">
+        <div class="label">Dezelfde gezinsvakantie — via reguliere kanalen</div>
+        <div class="big">€ 1.400</div>
+        <p>Consumentenprijs: inkoop plus marges van tussenpartijen. Van elke gespaarde euro verdwijnt een deel in de keten.</p>
+      </div>
+      <div class="col rtg">
+        <div class="label">Dezelfde gezinsvakantie — via RTG-inkoop</div>
+        <div class="big">€ 1.000</div>
+        <p>Nettoprijs. De foundation betaalt wat de reis werkelijk kost — elke gespaarde euro wordt reis.</p>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><b>30%</b><span>van elke bijdrage, automatisch</span></div>
+      <div class="stat"><b>€ 0</b><span>marge of bemiddelingskosten</span></div>
+      <div class="stat"><b>100%</b><span>van het gespaarde wordt reis</span></div>
+    </div>
+    <p class="disclaimer">Illustratief voorbeeld; werkelijke prijzen verschillen per reis en seizoen.</p>
+  </div>
+</section>
+
+<section class="nominate on-white">
+  <div class="wrap nominate-inner">
+    <div>
+      <div class="folio">N° 04 — Wie gaat er op reis</div>
+      <span class="kicker">Voordragen</span>
+      <h2>Discreet, zonder podium.</h2>
+      <p class="nominate-copy">Leden kunnen gezinnen voordragen via hun Butler of concierge — een gezin uit de buurt, een mantelzorger die al jaren niet weg is geweest, een gezin dat na een zwaar jaar even lucht nodig heeft. Ook partnerorganisaties dragen voor.</p>
+      <p class="nominate-copy">De foundation regelt alles zoals we dat voor leden doen: volwaardig en persoonlijk. Het gezin krijgt gewoon een vakantie — geen loterij, geen camera's, geen tegenprestatie.</p>
+      <div class="nominate-actions">
+        <a href="portaal.html" class="btn">Draag een gezin voor</a>
+        <a href="index.html" class="btn btn-ghost">Terug naar home</a>
+      </div>
+    </div>
+    <div class="quiet-card">
+      <h3>Reist u, dan reist er iemand mee.</h3>
+      <p>Elke boeking van elk lid draagt bij — automatisch, zichtbaar in uw betaaloverzicht, zonder dat u er iets extra's voor hoeft te doen. Zo is geven geen actie, maar een eigenschap van het lidmaatschap.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Rahul Travel Group · RTFoundation</span>
+    <span>RTG Pass · Lifestyle Pass · Business Pass</span>
+  </div>
+</footer>
+
+</body>
+</html>

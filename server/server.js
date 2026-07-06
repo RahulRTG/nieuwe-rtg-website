@@ -202,6 +202,52 @@ app.post('/api/dm', auth, (req, res) => {
   res.json({ ok: true });
 });
 
+/* ---------- partnerkanaal: boeken zonder pas ----------
+   Publieke endpoints (geen login): partner opzoeken, reizen ophalen en
+   boeken via een partnercode. De service (15% boven nettoprijs) wordt
+   gedeeld tussen partner en RTG. */
+
+function tripPricing(trip, partner) {
+  const service = Math.round(trip.netto * db.data.partnerService);
+  const partnerCut = partner ? Math.round(service * partner.share) : 0;
+  return { netto: trip.netto, service, total: trip.netto + service, partnerCut, rtgCut: service - partnerCut };
+}
+
+app.post('/api/partner', (req, res) => {
+  const code = String(req.body.code || '').trim().toUpperCase();
+  const partner = db.data.partners.find(p => p.code === code);
+  if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });
+  res.json({ partner: { code: partner.code, name: partner.name, type: partner.type, handle: partner.handle, share: partner.share } });
+});
+
+app.post('/api/partnertrips', (req, res) => {
+  res.json({ trips: db.data.partnerTrips, serviceRate: db.data.partnerService });
+});
+
+app.post('/api/book', (req, res) => {
+  const trip = db.data.partnerTrips.find(t => t.id === req.body.tripId);
+  if (!trip) return res.status(404).json({ error: 'Reis niet gevonden.' });
+  let partner = null;
+  if (req.body.code) {
+    partner = db.data.partners.find(p => p.code === String(req.body.code).trim().toUpperCase());
+    if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });
+  }
+  const name = String(req.body.name || '').trim().slice(0, 120);
+  const email = String(req.body.email || '').trim().slice(0, 200);
+  if (!name || !email.includes('@')) return res.status(400).json({ error: 'Vul een naam en geldig e-mailadres in.' });
+
+  const pricing = tripPricing(trip, partner);
+  const ref = 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+  db.data.bookings.push({
+    ref, tripId: trip.id, name, email,
+    partnerCode: partner ? partner.code : null,
+    ...pricing,
+    at: new Date().toISOString()
+  });
+  save();
+  res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, pricing });
+});
+
 /* ---------- persoonlijke AI ---------- */
 
 const AI_TONE = {

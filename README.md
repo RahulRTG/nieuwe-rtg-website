@@ -45,3 +45,10 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/dm` `{postId, text}` | Privébericht — zelfde rechten als reageren |
 | `POST /api/ai` `{messages}` | Persoonlijke AI (Claude indien key aanwezig, anders demo) |
 | `POST /api/logout` | Sessie beëindigen |
+| `POST /api/partner` `{code}` | Partnercode valideren (demo-codes: `NOVA`, `ATLAS`) |
+| `POST /api/partnertrips` | Gecureerde reizen voor het partnerkanaal |
+| `POST /api/book` `{code, tripId, name, email}` | Boeking zonder pas via een partner — service (15%) wordt gedeeld tussen partner en RTG |
+
+## Partnerkanaal
+
+Niet-leden boeken via **boeken.html** — bereikbaar via een partnerlink zoals `boeken.html?via=NOVA`. De prijs is nettoprijs + 15% service; de service wordt zichtbaar gedeeld tussen de partner (influencer of bedrijf) en RTG. Boekingen worden opgeslagen in `server/data/db.json` onder `bookings`.

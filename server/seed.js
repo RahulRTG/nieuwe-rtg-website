@@ -70,6 +70,37 @@ module.exports = function seed() {
       }
     ],
 
-    dms: []
+    dms: [],
+
+    /* ---------- partnerkanaal (boeken zonder pas) ----------
+       Niet-leden boeken via een partnerlink (boeken.html?via=CODE).
+       Prijs = nettoprijs + service; de service wordt gedeeld tussen
+       de partner (share van de service) en RTG. */
+    partnerService: 0.15,
+    partners: [
+      { code: 'NOVA',  name: 'Nova van Dijk',          type: 'influencer', handle: '@novatravels · 380k volgers', share: 0.40 },
+      { code: 'ATLAS', name: 'Atlas Executive Travel', type: 'bedrijf',    handle: 'zakelijk reisbureau, Amsterdam', share: 0.35 }
+    ],
+    partnerTrips: [
+      {
+        id: 'kyoto-herfst', dest: 'Kyoto', visual: 'v-kyoto',
+        title: 'Kyoto in herfstkleur', dates: '8 dagen · oktober 2026', netto: 2400,
+        desc: 'Hoshinoya aan de rivier, privé-theeceremonie in Gion en de esdoorns van Arashiyama vóór de drukte.',
+        includes: ['Vlucht business class', 'Hoshinoya Kyoto — 4 nachten', 'Ryokan Tawaraya — 3 nachten', 'Privétransfers & theeceremonie']
+      },
+      {
+        id: 'lissabon-palacio', dest: 'Lissabon', visual: 'v-lissabon',
+        title: 'Palácio-weekend Lissabon', dates: '4 dagen · doorlopend', netto: 980,
+        desc: 'Een palácio voor de prijs van een gewoon hotel — hetzelfde adres waar onze leden over posten in De Salon.',
+        includes: ['Vlucht & transfers', 'Palácio-suite — 3 nachten', 'Ontbijt & late check-out', 'Tafelreservering fado-avond']
+      },
+      {
+        id: 'marrakech-riad', dest: 'Marrakech', visual: 'v-marrakech',
+        title: 'Riad & woestijn Marrakech', dates: '5 dagen · doorlopend', netto: 1150,
+        desc: 'Een riad in de medina, hammam en een avond in de Agafay-woestijn — ingekocht zoals wij dat voor leden doen.',
+        includes: ['Vlucht & privétransfers', 'Riad — 4 nachten', 'Hammam & diner in de Agafay', 'Gids door de souks']
+      }
+    ],
+    bookings: []
   };
 };

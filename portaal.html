@@ -1359,6 +1359,7 @@
           '<div class="meta">' +
             '<div>' +
               '<div class="mrow">Lidnummer<b>' + user.number + '</b></div>' +
+              (user.codename ? '<div class="mrow" style="margin-top:0.6rem;">Codenaam<b>' + user.codename + '</b></div>' : '') +
               '<div class="mrow" style="margin-top:0.6rem;">Lid sinds<b>' + user.since + '</b></div>' +
             '</div>' +
             qrSvg(user.number.length * 7919) +
@@ -1369,10 +1370,10 @@
           '<h2>Deze kaart is uw sleutel tot de RTG-app.</h2>' +
           '<ul>' +
             '<li>Toon de code bij partnerhotels en lounges voor directe herkenning.</li>' +
-            '<li>Bij de lancering van de RTG-app logt u hiermee in — zonder nieuw account.</li>' +
+            '<li>Uw account draait op uw codenaam — uw echte naam ligt in een gescheiden kluis en wordt pas bij ticketing gekoppeld. Bij een hack heeft niemand de juiste naam.</li>' +
             '<li>Uw pas draagt uw Salon-identiteit: wat u hier opbouwt, reist mee.</li>' +
           '</ul>' +
-          '<div class="app-note"><b>RTG-app — in ontwikkeling.</b> Boeken, betalen, De Salon en uw AI, straks in één app op uw telefoon. Leden met een actieve pas krijgen als eerste toegang.</div>' +
+          '<div class="app-note"><b>RTG-app — preview beschikbaar.</b> Boeken, betalen met één tik, De Salon en uw AI in één app op uw telefoon. <a href="app.html" style="color:var(--burgundy);font-weight:600;text-decoration:underline;text-underline-offset:3px;">Open de app-preview →</a></div>' +
         '</div>' +
       '</div>';
   }

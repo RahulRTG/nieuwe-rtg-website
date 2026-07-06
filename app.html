@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>RTG — de app</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B;
+    --card:#151312;
+    --card2:#1B1817;
+    --line:rgba(255,255,255,0.09);
+    --txt:#F4F1EC;
+    --muted:rgba(244,241,236,0.55);
+    --soft:rgba(244,241,236,0.38);
+    --burgundy:#C23A5E;
+    --burgundy-deep:#7F1634;
+    --gold:#A98F1C;
+    --green:#4C9A75;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+  body{
+    background:#000;
+    font-family:'Inter',sans-serif;
+    color:var(--txt);
+    display:flex;
+    justify-content:center;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-0.01em;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
+  a{color:inherit;text-decoration:none;}
+
+  #shell{
+    width:100%;
+    max-width:430px;
+    min-height:100dvh;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  /* op desktop: telefoonkader, zodat het concept als app leest */
+  @media (min-width:520px){
+    body{background:#201d1c;padding:2.5rem 0;}
+    #shell{
+      min-height:860px;
+      max-height:900px;
+      border-radius:40px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.1);
+      box-shadow:0 40px 90px -30px rgba(0,0,0,0.8);
+    }
+  }
+
+  /* ---------- login ---------- */
+
+  #gate{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:2.5rem 1.75rem 3rem;
+    gap:0;
+  }
+  #gate .logo{
+    background:var(--burgundy-deep);
+    color:#fff;
+    font-family:'Bodoni Moda',serif;
+    font-size:1.05rem;
+    letter-spacing:0.05em;
+    padding:0.55rem 1.1rem;
+    align-self:flex-start;
+  }
+  #gate .tagline{
+    margin-top:0.6rem;
+    font-size:0.56rem;
+    letter-spacing:0.26em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  #gate h1{font-size:2.2rem;line-height:1.1;margin-top:2.5rem;}
+  #gate h1 em{color:var(--burgundy);font-style:italic;}
+  #gate .deck{margin-top:1rem;font-size:0.9rem;color:var(--muted);line-height:1.6;}
+  .gate-list{margin-top:2.25rem;display:flex;flex-direction:column;gap:0.75rem;}
+  .gate-btn{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:1.1rem 1.25rem;
+    text-align:left;
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    transition:background 0.2s ease;
+  }
+  .gate-btn:active{background:var(--card2);}
+  .gate-btn .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .gate-btn.t-rtg .dot{background:var(--burgundy);}
+  .gate-btn.t-lifestyle .dot{background:var(--gold);}
+  .gate-btn.t-business .dot{background:#fff;}
+  .gate-btn b{display:block;font-size:0.95rem;font-weight:600;}
+  .gate-btn span{font-size:0.74rem;color:var(--soft);}
+  #gate .note{margin-top:1.75rem;font-size:0.72rem;color:var(--soft);font-style:italic;}
+
+  /* ---------- app-chroom ---------- */
+
+  #app{display:none;flex:1;flex-direction:column;min-height:0;}
+  #app.active{display:flex;}
+
+  .topbar{
+    padding:calc(env(safe-area-inset-top, 0px) + 1rem) 1.5rem 0.9rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--line);
+    background:var(--bg);
+  }
+  .topbar .brand{
+    font-family:'Bodoni Moda',serif;
+    font-size:1rem;
+    letter-spacing:0.06em;
+  }
+  .topbar .brand small{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-size:0.5rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  .code-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:0.45rem;
+    border:1px solid var(--line);
+    background:var(--card);
+    border-radius:999px;
+    padding:0.4rem 0.85rem;
+    font-size:0.68rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .code-chip .cdot{width:7px;height:7px;border-radius:50%;background:var(--burgundy);}
+
+  .content{
+    flex:1;
+    overflow-y:auto;
+    padding:1.4rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 6rem);
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+  .view h2{font-size:1.7rem;line-height:1.15;}
+  .view .sub{margin-top:0.4rem;font-size:0.85rem;color:var(--muted);}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:1.3rem 1.35rem;
+    margin-top:1rem;
+  }
+  .card .label{
+    font-size:0.62rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--soft);
+  }
+  .card .big{font-family:'Bodoni Moda',serif;font-size:1.7rem;margin-top:0.35rem;}
+  .card .big.accent{color:var(--burgundy);}
+  .card .big.gold{color:var(--gold);}
+  .card .meta{margin-top:0.3rem;font-size:0.78rem;color:var(--muted);}
+  .card .go{
+    margin-top:0.9rem;
+    background:none;border:none;
+    font-size:0.75rem;font-weight:600;
+    color:var(--burgundy);
+    padding:0;
+  }
+
+  /* codenaam-kaart (de digitale pas in de app) */
+  .codecard{
+    margin-top:1rem;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:
+      radial-gradient(120% 140% at 85% -10%, rgba(158,28,64,0.4), transparent 60%),
+      linear-gradient(150deg, #191412 0%, #100D0C 70%);
+    padding:1.5rem 1.4rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .codecard .label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--soft);}
+  .codecard .cn{
+    font-family:'Bodoni Moda',serif;
+    font-size:2rem;
+    margin-top:0.4rem;
+    letter-spacing:0.02em;
+  }
+  .codecard .row{
+    margin-top:1.1rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:1rem;
+  }
+  .codecard .mrow{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
+  .codecard .mrow b{display:block;font-size:0.78rem;color:var(--muted);font-weight:500;margin-top:0.2rem;letter-spacing:0.08em;}
+  .codecard svg{background:#fff;padding:4px;width:58px;height:58px;border-radius:6px;display:block;}
+  .codecard .why{
+    margin-top:1.2rem;
+    border-top:1px solid var(--line);
+    padding-top:1rem;
+    font-size:0.78rem;
+    color:var(--muted);
+    line-height:1.55;
+    display:none;
+  }
+  .codecard .why.open{display:block;}
+  .codecard .why b{color:var(--txt);}
+  .codecard .whybtn{
+    margin-top:1rem;
+    background:none;border:none;padding:0;
+    font-size:0.74rem;font-weight:600;color:var(--burgundy);
+  }
+
+  /* lijsten */
+  .rowitem{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    padding:1rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .rowitem:last-child{border-bottom:none;}
+  .rowitem .t{flex:1;min-width:0;}
+  .rowitem .t b{display:block;font-size:0.88rem;font-weight:600;}
+  .rowitem .t span{font-size:0.72rem;color:var(--soft);}
+  .rowitem .amount{font-family:'Bodoni Moda',serif;font-size:1.05rem;white-space:nowrap;}
+  .pill{
+    font-size:0.6rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-weight:600;
+    padding:0.28rem 0.65rem;
+    border-radius:999px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  .pill.open{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .pill.paid{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .pill.req{color:var(--gold);border-color:rgba(169,143,28,0.4);}
+
+  .btn-pay{
+    display:inline-flex;
+    align-items:center;
+    gap:0.5rem;
+    background:#fff;
+    color:#000;
+    border:none;
+    border-radius:999px;
+    padding:0.65rem 1.2rem;
+    font-size:0.78rem;
+    font-weight:600;
+    transition:transform 0.15s ease;
+  }
+  .btn-pay:active{transform:scale(0.97);}
+  .btn-pay svg{width:14px;height:14px;}
+  .payall{margin-top:1.1rem;width:100%;justify-content:center;padding:0.9rem;}
+
+  /* AI-chat */
+  .chat{
+    margin-top:1rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.7rem;
+  }
+  .bubble{
+    max-width:88%;
+    padding:0.8rem 1rem;
+    font-size:0.86rem;
+    line-height:1.5;
+    white-space:pre-line;
+    border-radius:16px;
+  }
+  .bubble.ai{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px;}
+  .bubble.user{background:var(--burgundy-deep);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+  .chips{display:flex;gap:0.5rem;overflow-x:auto;margin-top:1rem;padding-bottom:0.3rem;scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex-shrink:0;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--muted);
+    border-radius:999px;
+    padding:0.5rem 0.95rem;
+    font-size:0.74rem;
+  }
+  .askrow{
+    margin-top:0.9rem;
+    display:flex;
+    gap:0.5rem;
+  }
+  .askrow input{
+    flex:1;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:0.8rem 1.1rem;
+    font-family:'Inter',sans-serif;
+    font-size:0.85rem;
+    color:var(--txt);
+    outline:none;
+  }
+  .askrow button{
+    background:#fff;color:#000;border:none;border-radius:999px;
+    padding:0 1.2rem;font-size:0.75rem;font-weight:600;
+  }
+
+  /* salon */
+  .post{
+    margin-top:1rem;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+  }
+  .post .head{
+    padding:0.9rem 1.15rem;
+    display:flex;align-items:center;gap:0.75rem;
+  }
+  .post .avatar{
+    width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Bodoni Moda',serif;font-size:0.9rem;color:#fff;
+    flex-shrink:0;background:#333;
+  }
+  .post .avatar.a-rtg{background:var(--burgundy-deep);}
+  .post .avatar.a-lifestyle{background:var(--gold);}
+  .post .avatar.a-business{background:#2E2B29;}
+  .post .head b{display:block;font-size:0.84rem;}
+  .post .head span{font-size:0.68rem;color:var(--soft);}
+  .post .visual{
+    aspect-ratio:16/10;
+    display:flex;align-items:flex-end;padding:1rem 1.15rem;
+  }
+  .post .visual .place{
+    font-family:'Bodoni Moda',serif;font-style:italic;font-size:1.4rem;color:#fff;
+    text-shadow:0 2px 16px rgba(0,0,0,0.4);
+  }
+  .v-kyoto{background:linear-gradient(160deg,#3E1F26 0%,#7F1634 60%,#B8657B 100%);}
+  .v-zurich{background:linear-gradient(160deg,#10151C 0%,#2C3A4D 60%,#7C93AC 100%);}
+  .v-lissabon{background:linear-gradient(160deg,#1F1A0C 0%,#857007 65%,#D9C36A 100%);}
+  .v-singapore{background:linear-gradient(160deg,#0B1F1A 0%,#2E6B4F 65%,#8FC0A9 100%);}
+  .v-marrakech{background:linear-gradient(160deg,#2A130A 0%,#9E4A1C 60%,#E0A470 100%);}
+  .post .body{padding:1rem 1.15rem;font-size:0.84rem;color:var(--muted);line-height:1.55;}
+  .post .acts{
+    display:flex;align-items:center;gap:0.3rem;
+    border-top:1px solid var(--line);
+    padding:0.4rem 0.6rem;
+  }
+  .pa{
+    background:none;border:none;
+    font-size:0.76rem;color:var(--muted);
+    padding:0.5rem 0.6rem;
+    display:inline-flex;align-items:center;gap:0.35rem;
+  }
+  .pa.liked{color:var(--burgundy);font-weight:600;}
+  .pa:disabled{color:rgba(244,241,236,0.2);}
+  .comments{border-top:1px solid var(--line);padding:0.8rem 1.15rem;display:none;}
+  .comments.open{display:block;}
+  .comment{font-size:0.78rem;color:var(--muted);padding:0.3rem 0;}
+  .comment b{color:var(--txt);font-weight:600;}
+  .cform{display:flex;gap:0.5rem;margin-top:0.6rem;}
+  .cform input{
+    flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;
+    padding:0.55rem 0.95rem;font-size:0.78rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;
+  }
+  .cform button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 0.95rem;font-size:0.68rem;font-weight:600;}
+
+  /* tabbalk */
+  .tabbar{
+    position:absolute;
+    left:0;right:0;bottom:0;
+    background:rgba(12,12,11,0.92);
+    backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);
+    display:flex;
+    padding:0.55rem 0.5rem calc(env(safe-area-inset-bottom, 0px) + 0.55rem);
+  }
+  .tabbar button{
+    flex:1;
+    background:none;border:none;
+    display:flex;flex-direction:column;align-items:center;gap:0.25rem;
+    font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--soft);
+  }
+  .tabbar button svg{width:21px;height:21px;stroke:currentColor;}
+  .tabbar button.active{color:var(--txt);}
+  .tabbar button.active svg{stroke:var(--burgundy);}
+
+  /* overlays */
+  #paywait{
+    position:absolute;inset:0;background:rgba(0,0,0,0.65);
+    display:none;align-items:center;justify-content:center;z-index:60;
+  }
+  #paywait.open{display:flex;}
+  .paycard{
+    background:#fff;color:#0C0C0B;width:260px;
+    padding:2rem 1.8rem;text-align:center;border-radius:22px;
+  }
+  .paycard .amt{font-family:'Bodoni Moda',serif;font-size:1.4rem;margin-bottom:0.9rem;}
+  .paycard .icon{width:52px;height:52px;margin:0 auto 0.8rem;}
+  .paycard .icon svg{width:100%;height:100%;}
+  .paycard .lbl{font-size:0.8rem;color:#4D4A45;}
+  @keyframes pulse{0%{transform:scale(1);opacity:0.8;}50%{transform:scale(1.08);opacity:1;}100%{transform:scale(1);opacity:0.8;}}
+  .paycard.scanning .icon{animation:pulse 0.9s ease-in-out infinite;}
+  .paycard.done .lbl{color:#2E6B4F;font-weight:600;}
+
+  #toast{
+    position:absolute;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
+    left:50%;transform:translate(-50%, 16px);
+    background:#fff;color:#000;
+    font-size:0.78rem;font-weight:500;
+    padding:0.75rem 1.25rem;border-radius:999px;
+    opacity:0;pointer-events:none;transition:all 0.3s ease;
+    z-index:70;max-width:86%;text-align:center;
+  }
+  #toast.show{opacity:1;transform:translate(-50%, 0);}
+</style>
+</head>
+<body>
+<div id="shell">
+
+  <!-- login -->
+  <div id="gate">
+    <div class="logo">Rahul Travel Group</div>
+    <div class="tagline">Experience the Elite Class</div>
+    <h1>De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
+    <p class="deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon — en uw account draait op uw codenaam, niet op uw echte naam.</p>
+    <div class="gate-list">
+      <button class="gate-btn t-rtg" data-login="rtg"><span class="dot"></span><span><b>S. Janssen</b><span>RTG Pass · codenaam Zilveren Valk</span></span></button>
+      <button class="gate-btn t-lifestyle" data-login="lifestyle"><span class="dot"></span><span><b>I. van Rhijn</b><span>Lifestyle Pass · codenaam Gouden Ibis</span></span></button>
+      <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>A. de Vries</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
+    </div>
+    <p class="note">Conceptdemo — de app is er voor leden. Kies een profiel om in te loggen.</p>
+  </div>
+
+  <!-- app -->
+  <div id="app">
+    <div class="topbar">
+      <div class="brand">RTG<small>de app</small></div>
+      <button class="code-chip" id="codeChip"><span class="cdot"></span><span id="codeChipTxt"></span></button>
+    </div>
+
+    <div class="content" id="content">
+
+      <div class="view" data-view="home">
+        <h2 id="homeGreeting">Welkom.</h2>
+        <p class="sub" id="homeSub"></p>
+        <div class="codecard" id="codecard"></div>
+        <div class="card" id="homeTrip"></div>
+        <div class="card" id="homePay"></div>
+        <div class="card" id="homeSalon"></div>
+      </div>
+
+      <div class="view" data-view="reizen">
+        <h2>Uw reis.</h2>
+        <p class="sub" id="tripSub"></p>
+        <div class="card" id="tripList"></div>
+        <p class="sub" style="margin-top:1rem;">Wijzigen of toevoegen? Vraag het de AI — één bericht is genoeg.</p>
+      </div>
+
+      <div class="view" data-view="betalen">
+        <h2>Betalen.</h2>
+        <p class="sub">Eén tik — Face ID. Uw betalingen staan op uw codenaam.</p>
+        <div class="card" id="payList"></div>
+        <div id="payAllWrap"></div>
+      </div>
+
+      <div class="view" data-view="ai">
+        <h2 id="aiTitle">Uw AI.</h2>
+        <p class="sub">De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.</p>
+        <div class="chat" id="chat"></div>
+        <div class="chips" id="chips"></div>
+        <div class="askrow">
+          <input id="askInput" placeholder="Stel een vraag…">
+          <button id="askBtn">Stuur</button>
+        </div>
+      </div>
+
+      <div class="view" data-view="salon">
+        <h2>De Salon.</h2>
+        <p class="sub">Posts verschijnen 7 dagen na verblijf — voor uw veiligheid.</p>
+        <div id="feed"></div>
+      </div>
+
+    </div>
+
+    <div class="tabbar" id="tabbar">
+      <button data-tab="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</button>
+      <button data-tab="reizen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-6-8 4-2 6-2-5-8 1z"/></svg>Reizen</button>
+      <button data-tab="betalen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg>Betalen</button>
+      <button data-tab="ai"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>AI</button>
+      <button data-tab="salon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="10.5" r="2.4"/><path d="M3.5 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><path d="M14.5 18.5c.5-2.2 1.6-3.4 3.4-3.4 1.4 0 2.6.8 3.1 2.4"/></svg>Salon</button>
+    </div>
+  </div>
+
+  <!-- betaaloverlay -->
+  <div id="paywait">
+    <div class="paycard">
+      <div class="amt" id="payAmt"></div>
+      <div class="icon" id="payIcon"></div>
+      <div class="lbl" id="payLbl">Betalen met Face ID…</div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const eur = n => '€ ' + n.toLocaleString('nl-NL');
+
+  /* ---------- lokale demo-data (fallback zonder backend) ---------- */
+
+  const PERSONAS = {
+    rtg:       {name:'S. Janssen',   full:'Sophie Janssen',     since:'Maart 2026',    number:'RTG · 2026 · 8841', codename:'Zilveren Valk',    tier:'rtg'},
+    lifestyle: {name:'I. van Rhijn', full:'Isabelle van Rhijn', since:'Augustus 2025', number:'LSP · 2025 · 0217', codename:'Gouden Ibis',      tier:'lifestyle'},
+    business:  {name:'A. de Vries',  full:'Alexander de Vries', since:'November 2025', number:'BSP · 2025 · 1104', codename:'Noordelijke Ster', tier:'business'}
+  };
+  const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass'};
+
+  let user = null;
+  let invoices = [
+    {id:'RTG-2026-0158', desc:'Kyoto — Hoshinoya, 4 nachten', netto:2840, bijdrage:190, status:'open', date:'Vervalt 28 juli 2026'},
+    {id:'RTG-2026-0141', desc:'KLM Amsterdam – Osaka, business class (2 pers.)', netto:3120, bijdrage:210, status:'open', date:'Vervalt 15 augustus 2026'},
+    {id:'RTG-2026-0093', desc:'Lissabon — Palácio weekend, incl. transfers', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
+    {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
+  ];
+  let trip = {
+    dest:'Kyoto', dates:'12 – 19 oktober 2026', days:98,
+    items:[
+      {when:'12 okt', title:'KLM KL867 — Amsterdam → Osaka Kansai', sub:'Business class · stoelen 2A/2C', status:'paid', label:'Bevestigd'},
+      {when:'12 okt', title:'Privétransfer Kansai → Hoshinoya', sub:'Chauffeur bij aankomsthal', status:'paid', label:'Bevestigd'},
+      {when:'12–16 okt', title:'Hoshinoya Kyoto — Riverside suite', sub:'4 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
+      {when:'14 okt', title:'Privé-theeceremonie, Gion', sub:'Met vertaler · 15:00 uur', status:'paid', label:'Bevestigd'},
+      {when:'15 okt', title:'Diner — Kikunoi Honten (3★)', sub:'Kaiseki · 19:30 uur', status:'req', label:'In aanvraag'},
+      {when:'16–19 okt', title:'Ryokan Tawaraya', sub:'3 nachten, kaiseki-halfpension', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
+    ]
+  };
+  let posts = [
+    {id:1, author:'Isabelle van Rhijn', tier:'lifestyle', place:'Kyoto', visual:'v-kyoto',
+     text:'De theeceremonie die mijn concierge regelde — geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
+     likes:124, liked:false, comments:[{who:'Alexander de Vries', tier:'business', text:'Staat genoteerd voor november. Dank.'}]},
+    {id:2, author:'Alexander de Vries', tier:'business', place:'Zürich', visual:'v-zurich',
+     text:'Ochtendvlucht, twee vergaderingen, om 18:00 aan het meer. De Business Pass plant strakker dan mijn assistent ooit deed.',
+     likes:89, liked:false, comments:[]},
+    {id:3, author:'Sophie Janssen', tier:'rtg', place:'Lissabon', visual:'v-lissabon',
+     text:'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen bestaan echt.',
+     likes:203, liked:false, comments:[
+       {who:'Nadia Karim', tier:'rtg', text:'Welk palácio was dit? Sta op het punt te boeken!'},
+       {who:'Alexander de Vries', tier:'business', text:'Sophie, dit wil ik in november zien — welke wijk was dit?'}
+     ]},
+    {id:4, author:'Marcus Bergwerff', tier:'business', place:'Singapore', visual:'v-singapore',
+     text:'Layover van 9 uur omgezet in een middag Raffles + spa. De AI stelde het voor, mijn concierge bevestigde binnen 10 minuten.',
+     likes:57, liked:false, comments:[]},
+    {id:5, author:'Nadia Karim', tier:'rtg', place:'Marrakech', visual:'v-marrakech',
+     text:'Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Dat deel vertel ik iedereen.',
+     likes:141, liked:false, comments:[]}
+  ];
+  let creatorLikes = 320;
+
+  /* ---------- backend-koppeling ---------- */
+
+  const API = {
+    enabled: location.protocol === 'http:' || location.protocol === 'https:',
+    token: null,
+    get live(){ return this.enabled && !!this.token; },
+    async call(path, body){
+      const res = await fetch('/api' + path, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json', ...(this.token ? {'Authorization':'Bearer '+this.token} : {})},
+        body: JSON.stringify(body || {})
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw Object.assign(new Error(data.error || 'API-fout'), {status: res.status});
+      return data;
+    }
+  };
+
+  function applyState(state){
+    if (!state) return;
+    if (state.user) user = state.user;
+    if (state.invoices) invoices = state.invoices;
+    if (state.trip) trip = state.trip;
+    if (state.posts) posts = state.posts;
+    if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
+  }
+
+  let toastTimer;
+  function toast(msg){
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function canEngage(p){
+    if (typeof p.canEngage === 'boolean') return p.canEngage;
+    if (user.tier === 'rtg') return p.tier === 'rtg';
+    return true;
+  }
+
+  /* ---------- login & tabs ---------- */
+
+  document.querySelectorAll('[data-login]').forEach(b =>
+    b.addEventListener('click', () => login(b.dataset.login)));
+
+  async function login(tier){
+    user = {...PERSONAS[tier]};
+    if (API.enabled){
+      try {
+        const data = await API.call('/login', {tier});
+        API.token = data.token;
+        applyState(data.state);
+      } catch (e) { API.enabled = false; }
+    }
+    if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
+    $('#gate').style.display = 'none';
+    $('#app').classList.add('active');
+    renderAll();
+  }
+
+  document.querySelectorAll('.tabbar button').forEach(b =>
+    b.addEventListener('click', () => openTab(b.dataset.tab)));
+  $('#codeChip').addEventListener('click', () => { openTab('home'); toggleWhy(true); });
+
+  function openTab(tab){
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $('#content').scrollTop = 0;
+  }
+
+  function renderAll(){
+    $('#codeChipTxt').textContent = user.codename;
+    renderHome();
+    renderTrip();
+    renderPay();
+    renderAI();
+    renderSalon();
+    openTab('home');
+  }
+
+  /* ---------- home + codenaam ---------- */
+
+  function qrSvg(seed){
+    let s = seed, cells = '';
+    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    for (let y = 0; y < 13; y++) for (let x = 0; x < 13; x++){
+      const corner = (x < 4 && y < 4) || (x > 8 && y < 4) || (x < 4 && y > 8);
+      const on = corner
+        ? ((x % 12 < 1 || x % 12 > 2 ? 1 : 0) || (y % 12 < 1 || y % 12 > 2 ? 1 : 0)) &&
+          !((x % 12 === 1 || x % 12 === 2) && (y % 12 === 1 || y % 12 === 2)) || (x===1&&y===1)||(x===2&&y===2)||(x===11&&y===1)||(x===1&&y===11)
+        : rnd() > 0.5;
+      if (on) cells += '<rect x="' + x + '" y="' + y + '" width="1" height="1"/>';
+    }
+    return '<svg viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg" fill="#0C0C0B">' + cells + '</svg>';
+  }
+
+  function toggleWhy(forceOpen){
+    const why = document.querySelector('.codecard .why');
+    if (!why) return;
+    why.classList.toggle('open', forceOpen === true ? true : !why.classList.contains('open'));
+  }
+
+  function renderHome(){
+    const first = user.full.split(' ')[0];
+    $('#homeGreeting').textContent = 'Welkom, ' + first + '.';
+    $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · lid sinds ' + user.since;
+
+    $('#codecard').innerHTML =
+      '<div class="label">Uw codenaam — uw identiteit in onze systemen</div>' +
+      '<div class="cn">' + user.codename + '</div>' +
+      '<div class="row">' +
+        '<div>' +
+          '<div class="mrow">Lidnummer<b>' + user.number + '</b></div>' +
+          '<div class="mrow" style="margin-top:0.55rem;">Pas<b>' + TIER_LABEL[user.tier] + '</b></div>' +
+        '</div>' + qrSvg(user.number.length * 7919) +
+      '</div>' +
+      '<button class="whybtn" id="whyBtn">Waarom een codenaam? →</button>' +
+      '<div class="why"><b>Uw echte naam staat niet in onze reisdata.</b> ' +
+        'Reserveringen, betalingen en Salon-activiteit staan op uw codenaam. Uw echte naam ligt in een gescheiden, versleutelde kluis en wordt pas bij ticketing en check-in eenmalig gekoppeld. ' +
+        'Zou reisdata ooit gestolen worden, dan heeft de aanvaller nooit de juiste naam bij uw reizen.</div>';
+    $('#whyBtn').addEventListener('click', () => toggleWhy());
+
+    const open = invoices.filter(i => i.status === 'open');
+    const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+
+    $('#homeTrip').innerHTML =
+      '<div class="label">Eerstvolgende reis</div>' +
+      '<div class="big">' + trip.dest + '</div>' +
+      '<div class="meta">' + trip.dates + ' · over ' + trip.days + ' dagen</div>' +
+      '<button class="go" data-goto="reizen">Bekijk uw reis →</button>';
+    $('#homePay').innerHTML = open.length
+      ? '<div class="label">Openstaand</div><div class="big accent">' + eur(openSum) + '</div>' +
+        '<div class="meta">' + open.length + ' betaling' + (open.length === 1 ? '' : 'en') + ' · één tik met Face ID</div>' +
+        '<button class="go" data-goto="betalen">Nu betalen →</button>'
+      : '<div class="label">Betalingen</div><div class="big" style="color:var(--green);">Alles voldaan</div>' +
+        '<div class="meta">Er staat niets open.</div>';
+    $('#homeSalon').innerHTML =
+      '<div class="label">De Salon</div>' +
+      '<div class="big gold">' + creatorLikes.toLocaleString('nl-NL') + '</div>' +
+      '<div class="meta">likes dit kwartaal — content levert voorrang, korting en gratis diensten op</div>' +
+      '<button class="go" data-goto="salon">Naar De Salon →</button>';
+    document.querySelectorAll('#content [data-goto]').forEach(b =>
+      b.addEventListener('click', () => openTab(b.dataset.goto)));
+  }
+
+  /* ---------- reizen ---------- */
+
+  function renderTrip(){
+    $('#tripSub').textContent = trip.dest + ' · ' + trip.dates + ' · over ' + trip.days + ' dagen';
+    $('#tripList').innerHTML = trip.items.map(it =>
+      '<div class="rowitem">' +
+        '<div class="t"><b>' + it.title + '</b><span>' + it.when + ' · ' + it.sub + '</span></div>' +
+        '<span class="pill ' + (it.status === 'paid' ? 'paid' : it.status === 'req' ? 'req' : 'open') + '">' + it.label + '</span>' +
+      '</div>').join('');
+  }
+
+  /* ---------- betalen (Face ID) ---------- */
+
+  const FID = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/>' +
+    '<path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/>' +
+    '<circle cx="23.5" cy="26.5" r="2.6" fill="currentColor" stroke="none"/><circle cx="40.5" cy="26.5" r="2.6" fill="currentColor" stroke="none"/>' +
+    '<path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
+  const CHECK = '<svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="28" stroke="#2E6B4F" stroke-width="3.5"/>' +
+    '<path d="M20 33 l8.5 8.5 L45 23" stroke="#2E6B4F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  async function executePay(target){
+    let foundation = 0;
+    if (API.live){
+      const data = await API.call('/pay', target === 'all' ? {all:true} : {invoiceId: target});
+      foundation = data.foundation;
+      applyState(data.state);
+    } else {
+      const targets = target === 'all' ? invoices.filter(i => i.status === 'open') : invoices.filter(i => i.id === target);
+      for (const inv of targets){
+        inv.status = 'paid'; inv.date = 'Zojuist betaald';
+        foundation += Math.round(inv.bijdrage * 0.3);
+        for (const t of trip.items) if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
+      }
+    }
+    return foundation;
+  }
+
+  let payBusy = false;
+  function payWithFaceId(amount, doPay){
+    if (payBusy) return;
+    payBusy = true;
+    const pw = $('#paywait'), card = pw.querySelector('.paycard');
+    $('#payAmt').textContent = amount;
+    $('#payIcon').innerHTML = FID.replace(/currentColor/g, '#0C0C0B');
+    $('#payLbl').textContent = 'Betalen met Face ID…';
+    card.classList.add('scanning'); card.classList.remove('done');
+    pw.classList.add('open');
+    setTimeout(async () => {
+      try {
+        const foundation = await doPay();
+        card.classList.remove('scanning'); card.classList.add('done');
+        $('#payIcon').innerHTML = CHECK;
+        $('#payLbl').textContent = 'Bevestigd';
+        setTimeout(() => {
+          pw.classList.remove('open');
+          payBusy = false;
+          toast('Betaald. ' + eur(foundation) + ' gaat naar de RTFoundation.');
+          renderPay(); renderHome(); renderTrip();
+        }, 700);
+      } catch (e) {
+        pw.classList.remove('open');
+        payBusy = false;
+        toast(e.message || 'Betaling mislukt.');
+      }
+    }, 1100);
+  }
+
+  function renderPay(){
+    const open = invoices.filter(i => i.status === 'open');
+    const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+    $('#payList').innerHTML = invoices.map(inv => {
+      const total = inv.netto + inv.bijdrage;
+      return '<div class="rowitem">' +
+        '<div class="t"><b>' + inv.desc + '</b><span>' + inv.id + ' · ' + inv.date + '</span></div>' +
+        '<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:0.45rem;">' +
+          '<span class="amount">' + eur(total) + '</span>' +
+          (inv.status === 'open'
+            ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + 'Betaal</button>'
+            : '<span class="pill paid">Betaald</span>') +
+        '</div>' +
+      '</div>';
+    }).join('');
+    $('#payAllWrap').innerHTML = open.length
+      ? '<button class="btn-pay payall" id="payAll">' + FID + 'Betaal alles — ' + eur(openSum) + '</button>'
+      : '';
+    document.querySelectorAll('.js-pay').forEach(b =>
+      b.addEventListener('click', () => payWithFaceId(eur(Number(b.dataset.amt)), () => executePay(b.dataset.inv))));
+    const pa = $('#payAll');
+    if (pa) pa.addEventListener('click', () => payWithFaceId(eur(openSum), () => executePay('all')));
+  }
+
+  /* ---------- AI ---------- */
+
+  const chatHistory = [];
+
+  function aiOpener(){
+    const first = user.full.split(' ')[0];
+    const lines = ['Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') +
+      ' Uw reis naar ' + trip.dest + ' begint over ' + trip.days + ' dagen. Ik heb alvast vooruitgedacht:'];
+    const open = invoices.filter(i => i.status === 'open');
+    if (open.length){
+      const sum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+      lines.push('— Er ' + (open.length === 1 ? 'staat nog 1 betaling' : 'staan nog ' + open.length + ' betalingen') +
+        ' open (' + eur(sum) + '). Eén tik in Betalen en het is geregeld.');
+    }
+    const pending = trip.items.find(i => i.status === 'req');
+    if (pending) lines.push('— ' + pending.title.replace('Diner — ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging.');
+    lines.push('— Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.');
+    return lines.join('\n');
+  }
+
+  function aiAnswer(q){
+    const l = q.toLowerCase().trim();
+    if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
+      return 'Geregeld. De paklijst staat klaar (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00, avondwandeling langs Pontocho.\n\nIk bewaak nu de bevestiging van Kikunoi Honten. U hoeft niets te doen.';
+    if (l.includes('inpak') || l.includes('paklijst'))
+      return 'Voor Kyoto in oktober (14–22°C, kans op regen):\n— Lichte lagen + regenjas\n— Nette schoenen die makkelijk uitgaan\n— Ingetogen kleding voor Kikunoi Honten\n— Adapter type A\n\nZal ik er een afvinklijst van maken?';
+    if (l.includes('visum') || l.includes('paspoort'))
+      return 'Voor Japan heeft u geen visum nodig tot 90 dagen. Ik zet uw boekingsbevestigingen klaar voor Visit Japan Web.';
+    if (l.includes('weer'))
+      return 'Kyoto medio oktober: 14–22°C, af en toe regen, het begin van de herfstkleuren. Zal ik een vroege wandeling door Arashiyama inplannen?';
+    if (l.includes('plan') || l.includes('dag'))
+      return 'Voorstel voor 14 oktober:\n— 08:00 Arashiyama vóór de drukte\n— 11:30 lunch in Sagano\n— 15:00 uw theeceremonie in Gion\n— 19:00 avondwandeling Pontocho\n\nZal ik de lunch reserveren?';
+    if (l.includes('restaurant') || l.includes('diner') || l.includes('eten'))
+      return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag — bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki.';
+    return 'Daar kom ik vandaag nog op terug. Ik kan alvast helpen met de paklijst, documenten, het weer of een dagplan — zeg het maar.';
+  }
+
+  function bubble(text, who){
+    const el = document.createElement('div');
+    el.className = 'bubble ' + who;
+    el.textContent = text;
+    $('#chat').appendChild(el);
+    $('#content').scrollTop = $('#content').scrollHeight;
+    return el;
+  }
+
+  function ask(q){
+    if (!q.trim()) return;
+    bubble(q, 'user');
+    chatHistory.push({role:'user', content:q});
+    if (API.live){
+      const pending = bubble('…', 'ai');
+      API.call('/ai', {messages: chatHistory})
+        .then(d => { pending.textContent = d.reply; chatHistory.push({role:'assistant', content:d.reply}); })
+        .catch(() => { const r = aiAnswer(q); pending.textContent = r; chatHistory.push({role:'assistant', content:r}); })
+        .finally(() => { $('#content').scrollTop = $('#content').scrollHeight; });
+    } else {
+      setTimeout(() => { const r = aiAnswer(q); bubble(r, 'ai'); chatHistory.push({role:'assistant', content:r}); }, 500);
+    }
+  }
+
+  function renderAI(){
+    $('#aiTitle').textContent = user.tier === 'rtg' ? 'De Butler.' : user.tier === 'lifestyle' ? 'Uw AI.' : 'Uw uitvoerende AI.';
+    $('#chat').innerHTML = '';
+    chatHistory.length = 0;
+    const opener = aiOpener();
+    bubble(opener, 'ai');
+    chatHistory.push({role:'assistant', content:opener});
+    $('#chips').innerHTML = ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant']
+      .map(c => '<button class="chip">' + c + '</button>').join('');
+    document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
+  }
+  $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
+  $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
+
+  /* ---------- salon ---------- */
+
+  function renderSalon(){
+    $('#feed').innerHTML = posts.map(p => {
+      const engage = canEngage(p);
+      return '<article class="post" data-post="' + p.id + '">' +
+        '<div class="head">' +
+          '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
+          '<div><b>' + p.author + '</b><span>' + TIER_LABEL[p.tier] + ' · ' + p.place + ' · 7 dagen na verblijf</span></div>' +
+        '</div>' +
+        '<div class="visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>' +
+        '<div class="body">' + p.text + '</div>' +
+        '<div class="acts">' +
+          '<button class="pa js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +
+          '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>Reageren (' + p.comments.length + ')</button>' +
+        '</div>' +
+        '<div class="comments">' +
+          '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b> — ' + c.text + '</div>').join('') + '</div>' +
+          '<div class="cform"><input placeholder="Schrijf een reactie…"><button>Plaats</button></div>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+
+    document.querySelectorAll('.post').forEach(el => {
+      const post = posts.find(p => p.id === Number(el.dataset.post));
+      el.querySelector('.js-like').addEventListener('click', ev => {
+        post.liked = !post.liked;
+        post.likes += post.liked ? 1 : -1;
+        ev.currentTarget.classList.toggle('liked', post.liked);
+        el.querySelector('.lc').textContent = post.likes;
+        if (API.live) API.call('/like', {postId: post.id, liked: post.liked}).catch(() => {});
+      });
+      const commBtn = el.querySelector('.js-comm');
+      commBtn.addEventListener('click', () => {
+        if (commBtn.disabled) return;
+        el.querySelector('.comments').classList.toggle('open');
+      });
+      el.querySelectorAll('.pa:disabled').forEach(b => {
+        b.style.pointerEvents = 'auto';
+        b.addEventListener('click', e => {
+          e.preventDefault();
+          toast(user.tier === 'rtg'
+            ? 'Met de RTG Pass reageert u met RTG-leden — of met wie u eerst aanspreekt.'
+            : 'Reageren is hier niet beschikbaar.');
+        });
+      });
+      el.querySelector('.cform button').addEventListener('click', async () => {
+        const inp = el.querySelector('.cform input');
+        if (!inp.value.trim()) return;
+        if (API.live){
+          try { await API.call('/comment', {postId: post.id, text: inp.value.trim()}); }
+          catch (e) { toast(e.message || 'Reageren niet toegestaan.'); return; }
+        }
+        post.comments.push({who: user.full, tier: user.tier, text: inp.value.trim()});
+        const d = document.createElement('div');
+        d.className = 'comment';
+        d.innerHTML = '<b>' + user.full + '</b> — ' + inp.value.trim().replace(/</g, '&lt;');
+        el.querySelector('.clist').appendChild(d);
+        inp.value = '';
+        commBtn.textContent = 'Reageren (' + post.comments.length + ')';
+        toast('Reactie geplaatst.');
+      });
+    });
+  }
+
+  /* ---------- PWA ---------- */
+
+  if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>

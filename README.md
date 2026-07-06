@@ -50,6 +50,12 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/partnertrips` `{staffCode?}` | Gecureerde reizen — alleen totaalprijzen; met geldige personeelscode ook personeelsprijzen |
 | `POST /api/book` `{code \| staffCode, tripId, name, email}` | Boeking zonder pas via een partner of personeelscode |
 
+## De app (PWA)
+
+**app.html** is de RTG-app als installeerbare web-app (PWA, met `manifest.webmanifest` + `sw.js`): mobiele app-schil met tabbalk — Home, Reizen, Betalen (Face ID), AI en De Salon — draaiend op dezelfde backend als de site. Open op een telefoon en kies "Zet op beginscherm" om te installeren.
+
+**Codenaam (privacy by design):** elke klant krijgt een codenaam (bijv. *Zilveren Valk*). Reserveringen, betalingen en reisdata staan in de systemen op de codenaam; de echte naam ligt in een gescheiden kluis en wordt pas bij ticketing/check-in gekoppeld. Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam.
+
 ## Partnerkanaal
 
 Niet-leden boeken via **boeken.html** — bereikbaar via een partnerlink zoals `boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs, service en de commissieverdeling tussen partner en RTG zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`.

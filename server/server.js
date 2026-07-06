@@ -31,11 +31,15 @@ if (process.env.ANTHROPIC_API_KEY) {
 
 /* ---------- personas & sessies ---------- */
 
+/* Codenaam: elke klant krijgt een pseudoniem. Reserveringen, betalingen en
+   reisdata staan in onze systemen op de codenaam; de echte naam ligt in een
+   gescheiden kluis en wordt pas bij ticketing/check-in eenmalig gekoppeld.
+   Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam. */
 const PERSONAS = {
-  guest:     { name: 'Gast',         full: 'Gast',               since: null,             number: null },
-  rtg:       { name: 'S. Janssen',   full: 'Sophie Janssen',     since: 'Maart 2026',     number: 'RTG · 2026 · 8841' },
-  lifestyle: { name: 'I. van Rhijn', full: 'Isabelle van Rhijn', since: 'Augustus 2025',  number: 'LSP · 2025 · 0217' },
-  business:  { name: 'A. de Vries',  full: 'Alexander de Vries', since: 'November 2025',  number: 'BSP · 2025 · 1104' }
+  guest:     { name: 'Gast',         full: 'Gast',               since: null,             number: null,                codename: 'GAST' },
+  rtg:       { name: 'S. Janssen',   full: 'Sophie Janssen',     since: 'Maart 2026',     number: 'RTG · 2026 · 8841', codename: 'Zilveren Valk' },
+  lifestyle: { name: 'I. van Rhijn', full: 'Isabelle van Rhijn', since: 'Augustus 2025',  number: 'LSP · 2025 · 0217', codename: 'Gouden Ibis' },
+  business:  { name: 'A. de Vries',  full: 'Alexander de Vries', since: 'November 2025',  number: 'BSP · 2025 · 1104', codename: 'Noordelijke Ster' }
 };
 
 // token -> { tier, key } (in-memory; verdwijnt bij herstart, data blijft in db.json)

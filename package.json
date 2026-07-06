@@ -1,0 +1,13 @@
+{
+  "name": "rtg-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rahul Travel Group — website, ledenportaal en backend",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "express": "^4.21.0"
+  }
+}

@@ -859,13 +859,13 @@
       <button class="gate-card" data-login="lifestyle">
         <span class="tier-chip t-lifestyle"><span class="dot"></span>Lifestyle Pass</span>
         <h3>I. van Rhijn</h3>
-        <p>Volledig portaal, persoonlijke concierge én AI-voorbereiding. In De Salon volledige interactie met Lifestyle- en Business-leden.</p>
+        <p>Volledig portaal, persoonlijke concierge én AI-voorbereiding. In De Salon volledige interactie met alle leden.</p>
         <span class="enter">Inloggen als Lifestyle-lid <span class="arrow">→</span></span>
       </button>
       <button class="gate-card" data-login="business">
         <span class="tier-chip t-business"><span class="dot"></span>Business Pass</span>
         <h3>A. de Vries</h3>
-        <p>Volledig portaal, zakelijk ingericht. In De Salon volledige interactie met Business- en Lifestyle-leden.</p>
+        <p>Volledig portaal, zakelijk ingericht. In De Salon volledige interactie met alle leden.</p>
         <span class="enter">Inloggen als Business-lid <span class="arrow">→</span></span>
       </button>
     </div>
@@ -944,8 +944,8 @@
             <tr><th></th><th>Liken</th><th>Reageren</th><th>DM</th></tr>
             <tr><td>Zonder pas</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td></tr>
             <tr><td>RTG Pass</td><td class="yes">✓</td><td class="yes">✓ RTG-leden</td><td class="yes">✓ RTG-leden</td></tr>
-            <tr><td>Lifestyle Pass</td><td class="yes">✓</td><td class="yes">✓ Lifestyle &amp; Business</td><td class="yes">✓ Lifestyle &amp; Business</td></tr>
-            <tr><td>Business Pass</td><td class="yes">✓</td><td class="yes">✓ Business &amp; Lifestyle</td><td class="yes">✓ Business &amp; Lifestyle</td></tr>
+            <tr><td>Lifestyle Pass</td><td class="yes">✓</td><td class="yes">✓ Alle leden</td><td class="yes">✓ Alle leden</td></tr>
+            <tr><td>Business Pass</td><td class="yes">✓</td><td class="yes">✓ Alle leden</td><td class="yes">✓ Alle leden</td></tr>
           </table>
         </div>
       </div>
@@ -987,26 +987,26 @@
     business:  {name:'A. de Vries',   full:'Alexander de Vries',since:'November 2025', number:'BSP · 2025 · 1104'}
   };
 
-  const invoices = [
+  let invoices = [
     {id:'RTG-2026-0158', desc:'Kyoto — Hoshinoya, 4 nachten', netto:2840, bijdrage:190, status:'open',  date:'Vervalt 28 juli 2026'},
     {id:'RTG-2026-0141', desc:'KLM Amsterdam – Osaka, business class (2 pers.)', netto:3120, bijdrage:210, status:'open', date:'Vervalt 15 augustus 2026'},
     {id:'RTG-2026-0093', desc:'Lissabon — Palácio weekend, incl. transfers', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
     {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
   ];
 
-  const trip = {
+  let trip = {
     dest:'Kyoto', dates:'12 – 19 oktober 2026', days:98,
     items:[
       {when:'12 okt', title:'KLM KL867 — Amsterdam → Osaka Kansai', sub:'Business class, 2 personen · stoelen 2A/2C', status:'paid', label:'Bevestigd'},
       {when:'12 okt', title:'Privétransfer Kansai → Hoshinoya Kyoto', sub:'Chauffeur wacht bij aankomsthal, naambord RTG', status:'paid', label:'Bevestigd'},
-      {when:'12–16 okt', title:'Hoshinoya Kyoto — Riverside suite', sub:'4 nachten, ontbijt op de kamer, late check-out', status:'open', label:'Wacht op betaling'},
+      {when:'12–16 okt', title:'Hoshinoya Kyoto — Riverside suite', sub:'4 nachten, ontbijt op de kamer, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
       {when:'14 okt', title:'Privé-theeceremonie, Gion', sub:'Met vertaler · 2 personen · 15:00 uur', status:'paid', label:'Bevestigd'},
       {when:'15 okt', title:'Diner — Kikunoi Honten (3★)', sub:'Kaiseki-menu · tafel 19:30 uur', status:'req', label:'In aanvraag'},
-      {when:'16–19 okt', title:'Ryokan Tawaraya — traditionele kamer', sub:'3 nachten, kaiseki-halfpension', status:'open', label:'Wacht op betaling'}
+      {when:'16–19 okt', title:'Ryokan Tawaraya — traditionele kamer', sub:'3 nachten, kaiseki-halfpension', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
     ]
   };
 
-  const posts = [
+  let posts = [
     {id:1, author:'Isabelle van Rhijn', tier:'lifestyle', place:'Kyoto', visual:'v-kyoto',
      text:'De theeceremonie die mijn concierge regelde — geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
      likes:124, liked:false, reward:6,
@@ -1041,6 +1041,40 @@
   let user = null;
   let creatorCredit = 86;
 
+  /* ---------- backend-koppeling ----------
+     Draait de site via de Node-backend (npm start), dan lopen login,
+     betalingen, Salon-acties en de AI via de echte API. Wordt het bestand
+     los geopend (file://) of is de API onbereikbaar, dan werkt alles
+     lokaal als demo. */
+
+  const API = {
+    enabled: location.protocol === 'http:' || location.protocol === 'https:',
+    token: null,
+    get live(){ return this.enabled && !!this.token; },
+    async call(path, body){
+      const res = await fetch('/api' + path, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(this.token ? {'Authorization': 'Bearer ' + this.token} : {})
+        },
+        body: JSON.stringify(body || {})
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw Object.assign(new Error(data.error || 'API-fout'), {status: res.status, data});
+      return data;
+    }
+  };
+
+  function applyState(state){
+    if (!state) return;
+    if (state.user) user = state.user;
+    if (state.invoices) invoices = state.invoices;
+    if (state.trip) trip = state.trip;
+    if (state.posts) posts = state.posts;
+    if (typeof state.creatorCredit === 'number') creatorCredit = state.creatorCredit;
+  }
+
   /* ---------- helpers ---------- */
 
   const $ = s => document.querySelector(s);
@@ -1060,16 +1094,16 @@
   }
 
   /* Salon-rechten: gast alleen liken; RTG onderling reageren/dm'en;
-     Lifestyle & Business onderling volledig. */
+     Lifestyle & Business volledige interactie met alle leden. */
   function canEngage(authorTier){
     if (user.tier === 'guest') return false;
     if (user.tier === 'rtg') return authorTier === 'rtg';
-    return authorTier === 'lifestyle' || authorTier === 'business';
+    return true;
   }
   function engageHint(authorTier){
     if (user.tier === 'guest') return 'Zonder pas kunt u alleen liken. Reageren en berichten zijn voor leden.';
     if (user.tier === 'rtg') return 'Met de RTG Pass reageert en dm’t u alleen met andere RTG-leden. Upgrade naar Lifestyle of Business voor meer.';
-    return 'Lifestyle- en Business-leden communiceren onderling. Bij RTG-leden kunt u liken.';
+    return 'Lifestyle- en Business-leden kunnen met alle leden communiceren.';
   }
 
   /* ---------- login / logout ---------- */
@@ -1078,8 +1112,17 @@
     btn.addEventListener('click', () => login(btn.dataset.login));
   });
 
-  function login(tier){
+  async function login(tier){
     user = {tier, ...PERSONAS[tier]};
+    if (API.enabled){
+      try {
+        const data = await API.call('/login', {tier});
+        API.token = data.token;
+        applyState(data.state);
+      } catch (e) {
+        API.enabled = false; /* geen backend bereikbaar — lokale demo */
+      }
+    }
     $('#gate').classList.add('hidden');
     $('#portal').classList.add('active');
     renderHeader();
@@ -1095,6 +1138,8 @@
   }
 
   function logout(){
+    if (API.live) API.call('/logout').catch(() => {});
+    API.token = null;
     user = null;
     $('#portal').classList.remove('active');
     $('#gate').classList.remove('hidden');
@@ -1275,12 +1320,22 @@
       if (payBtn) payBtn.addEventListener('click', toggle);
       if (detailBtn) detailBtn.addEventListener('click', toggle);
       const confirmBtn = item.querySelector('.js-confirm');
-      if (confirmBtn) confirmBtn.addEventListener('click', () => {
+      if (confirmBtn) confirmBtn.addEventListener('click', async () => {
         const inv = invoices.find(i => i.id === item.dataset.inv);
-        inv.status = 'paid';
-        inv.date = 'Zojuist betaald';
-        const tlItem = trip.items.find(t => t.status === 'open');
-        if (tlItem && inv.id === 'RTG-2026-0158'){ tlItem.status = 'paid'; tlItem.label = 'Bevestigd'; }
+        if (API.live){
+          try {
+            const data = await API.call('/pay', {invoiceId: inv.id});
+            applyState(data.state);
+          } catch (e) { toast(e.message || 'Betaling mislukt — probeer het opnieuw.'); return; }
+        } else {
+          inv.status = 'paid';
+          inv.date = 'Zojuist betaald';
+          for (const tlItem of trip.items){
+            if (tlItem.invoiceId === inv.id || (!tlItem.invoiceId && tlItem.status === 'open' && inv.id === 'RTG-2026-0158')){
+              tlItem.status = 'paid'; tlItem.label = 'Bevestigd'; break;
+            }
+          }
+        }
         toast('Betaling bevestigd. ' + eur(Math.round(inv.bijdrage * 0.3)) + ' van uw bijdrage gaat naar de RTFoundation.');
         renderPayments();
         renderOverview();
@@ -1373,17 +1428,36 @@
       '</div>';
 
     const body = $('#chatBody');
+    const chatHistory = [];
     function bubble(text, who){
       const el = document.createElement('div');
       el.className = 'bubble ' + who;
       el.textContent = text;
       body.appendChild(el);
       body.scrollTop = body.scrollHeight;
+      return el;
     }
     function ask(q){
       if (!q.trim()) return;
       bubble(q, 'user');
-      setTimeout(() => bubble(aiAnswer(q), 'ai'), 550);
+      chatHistory.push({role:'user', content:q});
+      if (API.live){
+        const pending = bubble('…', 'ai');
+        API.call('/ai', {messages: chatHistory})
+          .then(d => { pending.textContent = d.reply; chatHistory.push({role:'assistant', content:d.reply}); })
+          .catch(() => {
+            const r = aiAnswer(q);
+            pending.textContent = r;
+            chatHistory.push({role:'assistant', content:r});
+          })
+          .finally(() => { body.scrollTop = body.scrollHeight; });
+      } else {
+        setTimeout(() => {
+          const r = aiAnswer(q);
+          bubble(r, 'ai');
+          chatHistory.push({role:'assistant', content:r});
+        }, 550);
+      }
     }
 
     const first = user.full.split(' ')[0];
@@ -1445,6 +1519,7 @@
         post.likes += post.liked ? 1 : -1;
         ev.currentTarget.classList.toggle('liked', post.liked);
         el.querySelector('.lc').textContent = post.likes;
+        if (API.live) API.call('/like', {postId: post.id, liked: post.liked}).catch(() => {});
       });
 
       const commentBtn = el.querySelector('.js-comment');
@@ -1454,9 +1529,13 @@
       });
 
       const form = el.querySelector('.comment-form');
-      form.querySelector('button').addEventListener('click', () => {
+      form.querySelector('button').addEventListener('click', async () => {
         const inp = form.querySelector('input');
         if (!inp.value.trim()) return;
+        if (API.live){
+          try { await API.call('/comment', {postId: post.id, text: inp.value.trim()}); }
+          catch (e) { toast(e.message || 'Reageren is hier niet toegestaan.'); return; }
+        }
         post.comments.push({who:user.full, tier:user.tier, text:inp.value.trim()});
         const d = document.createElement('div');
         d.className = 'comment';
@@ -1469,7 +1548,7 @@
 
       el.querySelector('.js-dm').addEventListener('click', ev => {
         if (ev.currentTarget.disabled) return;
-        openDM(post.author);
+        openDM(post);
       });
 
       /* uitleg tonen bij klik op geblokkeerde knoppen */
@@ -1482,16 +1561,23 @@
 
   /* ---------- DM modal ---------- */
 
-  function openDM(name){
-    $('#dmTitle').textContent = 'Bericht aan ' + name;
+  let dmTarget = null;
+  function openDM(post){
+    dmTarget = post;
+    $('#dmTitle').textContent = 'Bericht aan ' + post.author;
     $('#dmText').value = '';
     $('#modal-overlay').classList.add('open');
     $('#dmText').focus();
   }
   $('#dmCancel').addEventListener('click', () => $('#modal-overlay').classList.remove('open'));
   $('#modal-overlay').addEventListener('click', e => { if (e.target.id === 'modal-overlay') e.currentTarget.classList.remove('open'); });
-  $('#dmSend').addEventListener('click', () => {
-    if (!$('#dmText').value.trim()) return;
+  $('#dmSend').addEventListener('click', async () => {
+    const text = $('#dmText').value.trim();
+    if (!text || !dmTarget) return;
+    if (API.live){
+      try { await API.call('/dm', {postId: dmTarget.id, text}); }
+      catch (e) { toast(e.message || 'Bericht kon niet worden verzonden.'); return; }
+    }
     $('#modal-overlay').classList.remove('open');
     toast('Bericht verzonden binnen De Salon.');
   });

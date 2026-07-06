@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ledenportaal — Rahul Travel Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --white:#FFFFFF;
+    --black:#0C0C0B;
+    --burgundy:#7F1634;
+    --burgundy-bright:#9E1C40;
+    --burgundy-on-dark:#C23A5E;
+    --gold:#857007;
+    --gold-bright:#A98F1C;
+    --line:#DEDBD5;
+    --grey:#4D4A45;
+    --grey-soft:#8A8680;
+    --paper:#F7F5F1;
+    --green:#2E6B4F;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--paper);
+    color:var(--black);
+    font-family:'Inter',sans-serif;
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+
+  h1,h2,h3,.display{
+    font-family:'Bodoni Moda',serif;
+    font-weight:500;
+    letter-spacing:-0.01em;
+  }
+
+  a{color:inherit;text-decoration:none;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .kicker{
+    font-size:0.78rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--burgundy);
+    font-weight:600;
+    margin-bottom:1rem;
+    display:block;
+  }
+
+  .folio{
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+    margin-bottom:2rem;
+  }
+  .folio::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .btn{
+    display:inline-block;
+    padding:0.85rem 1.9rem;
+    background:var(--black);
+    color:var(--white);
+    font-size:0.82rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    font-weight:600;
+    border:1px solid var(--black);
+    transition:all 0.25s ease;
+  }
+  .btn:hover{background:var(--burgundy);border-color:var(--burgundy);}
+  .btn-ghost{background:transparent;color:var(--black);}
+  .btn-ghost:hover{background:var(--black);color:var(--white);}
+  .btn-small{padding:0.5rem 1.1rem;font-size:0.72rem;}
+
+  /* ---------- header ---------- */
+
+  header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    padding:1rem 0;
+    background:rgba(247,245,241,0.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  header .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+  }
+  .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
+  .brandmark .bm-block{
+    background:var(--burgundy);
+    color:var(--white);
+    font-family:'Bodoni Moda',serif;
+    font-weight:500;
+    font-size:0.95rem;
+    letter-spacing:0.05em;
+    padding:0.45rem 0.9rem;
+    line-height:1;
+  }
+  .brandmark .bm-tagline{
+    margin-top:0.35rem;
+    font-size:0.52rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--gold);
+    padding-left:0.1rem;
+  }
+  .header-user{
+    display:flex;
+    align-items:center;
+    gap:0.9rem;
+    font-size:0.8rem;
+    color:var(--grey);
+  }
+  .header-user .tier-chip{margin:0;}
+  .header-user button{
+    background:none;
+    border:none;
+    font-size:0.75rem;
+    letter-spacing:0.04em;
+    color:var(--grey-soft);
+    text-decoration:underline;
+    text-underline-offset:3px;
+  }
+  .header-user button:hover{color:var(--burgundy);}
+
+  .tier-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    font-size:0.66rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-weight:600;
+    padding:0.28rem 0.7rem;
+    border:1px solid var(--line);
+    background:var(--white);
+    color:var(--grey);
+    white-space:nowrap;
+  }
+  .tier-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--grey-soft);}
+  .tier-chip.t-rtg .dot{background:var(--burgundy);}
+  .tier-chip.t-lifestyle .dot{background:var(--gold-bright);}
+  .tier-chip.t-business .dot{background:var(--black);}
+  .tier-chip.t-guest .dot{background:var(--grey-soft);}
+
+  /* ---------- gate (login) ---------- */
+
+  #gate{padding:clamp(4rem, 9vw, 8rem) 0 clamp(5rem, 10vw, 9rem);}
+  #gate .gate-head{max-width:640px;margin-bottom:3.5rem;}
+  #gate h1{font-size:clamp(2.2rem, 5vw, 3.6rem);line-height:1.05;}
+  #gate .deck{margin-top:1.25rem;color:var(--grey);max-width:52ch;}
+  #gate .demo-note{
+    margin-top:1rem;
+    font-size:0.78rem;
+    color:var(--grey-soft);
+    font-style:italic;
+  }
+  .gate-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .gate-card{
+    background:var(--white);
+    padding:2.25rem 1.75rem;
+    text-align:left;
+    border:none;
+    display:flex;
+    flex-direction:column;
+    gap:0.9rem;
+    min-height:260px;
+    transition:background 0.25s ease;
+  }
+  .gate-card:hover{background:var(--paper);}
+  .gate-card h3{font-size:1.25rem;}
+  .gate-card p{font-size:0.85rem;color:var(--grey);flex:1;line-height:1.55;}
+  .gate-card .enter{
+    font-size:0.78rem;
+    letter-spacing:0.05em;
+    font-weight:600;
+    color:var(--burgundy);
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+  }
+  .gate-card:hover .enter .arrow{transform:translateX(4px);}
+  .gate-card .enter .arrow{transition:transform 0.25s ease;display:inline-block;}
+  @media (max-width:960px){.gate-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.gate-grid{grid-template-columns:1fr;}}
+
+  /* ---------- portal shell ---------- */
+
+  #portal{display:none;}
+  #portal.active{display:block;}
+  #gate.hidden{display:none;}
+
+  .portal-nav{
+    background:var(--black);
+    position:sticky;
+    top:63px;
+    z-index:90;
+  }
+  .portal-nav .wrap{
+    display:flex;
+    gap:0;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .portal-nav .wrap::-webkit-scrollbar{display:none;}
+  .portal-nav button{
+    background:none;
+    border:none;
+    color:rgba(255,255,255,0.55);
+    font-size:0.78rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:1.05rem 1.25rem;
+    white-space:nowrap;
+    border-bottom:2px solid transparent;
+    transition:color 0.2s ease;
+  }
+  .portal-nav button:hover{color:var(--white);}
+  .portal-nav button.active{
+    color:var(--white);
+    border-bottom-color:var(--burgundy-on-dark);
+  }
+  .portal-nav button .lock{font-size:0.7rem;opacity:0.7;margin-left:0.3rem;}
+
+  .panel{display:none;padding:clamp(2.5rem, 5vw, 4.5rem) 0 clamp(4rem, 8vw, 7rem);}
+  .panel.active{display:block;}
+  .panel h2{font-size:clamp(1.7rem, 3vw, 2.4rem);line-height:1.12;}
+  .panel .deck{margin-top:0.9rem;color:var(--grey);max-width:56ch;}
+
+  .locked-panel{
+    margin-top:2.5rem;
+    background:var(--white);
+    border:1px solid var(--line);
+    padding:3.5rem 2.5rem;
+    text-align:center;
+  }
+  .locked-panel .big{font-family:'Bodoni Moda',serif;font-size:1.6rem;margin-bottom:0.75rem;}
+  .locked-panel p{color:var(--grey);max-width:44ch;margin:0 auto 1.75rem;font-size:0.92rem;}
+
+  /* ---------- overview ---------- */
+
+  .ov-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1.25rem;
+    margin-top:2.5rem;
+  }
+  .ov-card{
+    background:var(--white);
+    border:1px solid var(--line);
+    padding:1.9rem 1.7rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.4rem;
+  }
+  .ov-card .label{
+    font-size:0.68rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+  }
+  .ov-card .value{
+    font-family:'Bodoni Moda',serif;
+    font-size:1.9rem;
+    line-height:1.1;
+  }
+  .ov-card .value.accent{color:var(--burgundy);}
+  .ov-card .sub{font-size:0.8rem;color:var(--grey);}
+  .ov-card .go{
+    margin-top:auto;
+    padding-top:1rem;
+    font-size:0.75rem;
+    font-weight:600;
+    letter-spacing:0.04em;
+    color:var(--burgundy);
+    background:none;border:none;text-align:left;
+  }
+  .ov-card .go:hover{text-decoration:underline;text-underline-offset:3px;}
+  @media (max-width:860px){.ov-grid{grid-template-columns:1fr;}}
+
+  /* ---------- pass card ---------- */
+
+  .pass-stage{
+    margin-top:3rem;
+    display:grid;
+    grid-template-columns:minmax(300px, 460px) 1fr;
+    gap:3.5rem;
+    align-items:center;
+  }
+  .idcard{
+    aspect-ratio:1.586;
+    background:linear-gradient(135deg, #151312 0%, #0C0C0B 55%, #1C1210 100%);
+    color:var(--white);
+    padding:clamp(1.4rem, 3vw, 2rem);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 30px 60px -25px rgba(12,12,11,0.5);
+  }
+  .idcard::before{
+    content:"";
+    position:absolute;
+    top:-40%;right:-25%;
+    width:70%;height:180%;
+    background:radial-gradient(closest-side, rgba(158,28,64,0.28), transparent 70%);
+    pointer-events:none;
+  }
+  .idcard.tier-lifestyle::before{background:radial-gradient(closest-side, rgba(169,143,28,0.30), transparent 70%);}
+  .idcard.tier-business::before{background:radial-gradient(closest-side, rgba(255,255,255,0.10), transparent 70%);}
+  .idcard .row{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;}
+  .idcard .brand{
+    font-family:'Bodoni Moda',serif;
+    font-size:1rem;
+    letter-spacing:0.05em;
+  }
+  .idcard .brand small{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-size:0.5rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.5);
+    margin-top:0.3rem;
+  }
+  .idcard .tier-name{
+    font-size:0.62rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--burgundy-on-dark);
+    text-align:right;
+  }
+  .idcard.tier-lifestyle .tier-name{color:var(--gold-bright);}
+  .idcard.tier-business .tier-name{color:rgba(255,255,255,0.75);}
+  .idcard .holder{
+    font-family:'Bodoni Moda',serif;
+    font-size:clamp(1.3rem, 2.6vw, 1.7rem);
+    letter-spacing:0.02em;
+  }
+  .idcard .meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:1rem;
+  }
+  .idcard .meta .mrow{
+    font-size:0.6rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.45);
+  }
+  .idcard .meta .mrow b{
+    display:block;
+    font-size:0.78rem;
+    color:rgba(255,255,255,0.85);
+    font-weight:500;
+    letter-spacing:0.06em;
+    margin-top:0.15rem;
+  }
+  .idcard svg{display:block;background:var(--white);padding:4px;width:64px;height:64px;}
+  .pass-copy h2{max-width:16ch;}
+  .pass-copy ul{
+    list-style:none;
+    margin-top:1.75rem;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+  }
+  .pass-copy li{
+    padding-left:1.5rem;
+    position:relative;
+    font-size:0.92rem;
+    color:var(--grey);
+  }
+  .pass-copy li::before{
+    content:"—";
+    position:absolute;
+    left:0;
+    color:var(--burgundy);
+  }
+  .app-note{
+    margin-top:2rem;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-left:3px solid var(--burgundy);
+    padding:1.1rem 1.4rem;
+    font-size:0.85rem;
+    color:var(--grey);
+  }
+  @media (max-width:900px){.pass-stage{grid-template-columns:1fr;gap:2.5rem;}}
+
+  /* ---------- payments ---------- */
+
+  .pay-summary{
+    display:flex;
+    gap:1.25rem;
+    margin-top:2.5rem;
+    flex-wrap:wrap;
+  }
+  .pay-summary .ov-card{flex:1;min-width:200px;}
+  .pay-list{margin-top:1.5rem;display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .pay-item{background:var(--white);padding:1.5rem 1.7rem;}
+  .pay-item .top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+  .pay-item h3{font-size:1.1rem;font-weight:500;}
+  .pay-item .pid{font-size:0.72rem;letter-spacing:0.1em;color:var(--grey-soft);text-transform:uppercase;margin-top:0.2rem;}
+  .pay-item .right{display:flex;align-items:center;gap:1.25rem;}
+  .pay-item .amount{font-family:'Bodoni Moda',serif;font-size:1.35rem;}
+  .status{
+    font-size:0.66rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-weight:600;
+    padding:0.3rem 0.75rem;
+    border:1px solid var(--line);
+  }
+  .status.open{color:var(--burgundy);border-color:rgba(127,22,52,0.35);}
+  .status.paid{color:var(--green);border-color:rgba(46,107,79,0.35);}
+  .pay-breakdown{
+    margin-top:1.25rem;
+    border-top:1px dashed var(--line);
+    padding-top:1.1rem;
+    display:none;
+    font-size:0.85rem;
+    color:var(--grey);
+  }
+  .pay-breakdown.open{display:block;}
+  .pay-breakdown .rowline{
+    display:flex;
+    justify-content:space-between;
+    padding:0.3rem 0;
+  }
+  .pay-breakdown .rowline.total{
+    border-top:1px solid var(--line);
+    margin-top:0.4rem;
+    padding-top:0.7rem;
+    color:var(--black);
+    font-weight:600;
+  }
+  .pay-breakdown .foundation{color:var(--gold);}
+  .pay-breakdown .confirm{margin-top:1.25rem;display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;}
+  .linkish{
+    background:none;border:none;
+    font-size:0.78rem;
+    color:var(--grey-soft);
+    text-decoration:underline;
+    text-underline-offset:3px;
+  }
+  .linkish:hover{color:var(--burgundy);}
+
+  /* ---------- trips ---------- */
+
+  .trip-card{
+    margin-top:2.5rem;
+    background:var(--black);
+    color:var(--white);
+    padding:clamp(2rem, 4vw, 3rem);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:2rem;
+    flex-wrap:wrap;
+  }
+  .trip-card .dest{font-family:'Bodoni Moda',serif;font-size:clamp(2rem, 4.5vw, 3.2rem);line-height:1;}
+  .trip-card .dates{margin-top:0.75rem;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.55);}
+  .trip-card .count{text-align:right;font-size:0.8rem;color:rgba(255,255,255,0.55);}
+  .trip-card .count b{
+    display:block;
+    font-family:'Bodoni Moda',serif;
+    font-size:2rem;
+    color:var(--burgundy-on-dark);
+    font-weight:500;
+  }
+  .timeline{margin-top:1px;display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-top:none;}
+  .tl-item{
+    background:var(--white);
+    padding:1.4rem 1.7rem;
+    display:grid;
+    grid-template-columns:110px 1fr auto;
+    gap:1.5rem;
+    align-items:center;
+  }
+  .tl-item .when{
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+  }
+  .tl-item h3{font-size:1.02rem;font-weight:500;}
+  .tl-item p{font-size:0.82rem;color:var(--grey);margin-top:0.15rem;}
+  @media (max-width:640px){.tl-item{grid-template-columns:1fr;gap:0.5rem;}}
+  .services-note{margin-top:2.5rem;}
+
+  /* ---------- AI ---------- */
+
+  .ai-grid{
+    margin-top:2.5rem;
+    display:grid;
+    grid-template-columns:1.15fr 0.85fr;
+    gap:2.5rem;
+    align-items:start;
+  }
+  .chat{
+    background:var(--white);
+    border:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    height:520px;
+  }
+  .chat-bar{
+    padding:0.9rem 1.4rem;
+    border-bottom:1px solid var(--line);
+    font-size:0.75rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+  }
+  .chat-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+  .chat-body{flex:1;overflow-y:auto;padding:1.4rem;display:flex;flex-direction:column;gap:0.8rem;}
+  .bubble{
+    max-width:82%;
+    padding:0.8rem 1.1rem;
+    font-size:0.88rem;
+    line-height:1.5;
+    white-space:pre-line;
+  }
+  .bubble.ai{background:var(--paper);border:1px solid var(--line);align-self:flex-start;}
+  .bubble.user{background:var(--black);color:var(--white);align-self:flex-end;}
+  .chat-input{
+    display:flex;
+    border-top:1px solid var(--line);
+  }
+  .chat-input input{
+    flex:1;
+    border:none;
+    padding:1rem 1.4rem;
+    font-family:'Inter',sans-serif;
+    font-size:0.88rem;
+    background:var(--white);
+    outline:none;
+  }
+  .chat-input button{
+    border:none;
+    background:var(--black);
+    color:var(--white);
+    padding:0 1.75rem;
+    font-size:0.75rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .chat-input button:hover{background:var(--burgundy);}
+  .ai-side h3{font-size:1.15rem;margin-bottom:0.6rem;}
+  .ai-side p{font-size:0.88rem;color:var(--grey);}
+  .chips{display:flex;flex-wrap:wrap;gap:0.6rem;margin-top:1.5rem;}
+  .chip{
+    border:1px solid var(--line);
+    background:var(--white);
+    padding:0.55rem 1rem;
+    font-size:0.78rem;
+    color:var(--grey);
+    transition:all 0.2s ease;
+  }
+  .chip:hover{border-color:var(--burgundy);color:var(--burgundy);}
+  @media (max-width:900px){.ai-grid{grid-template-columns:1fr;}}
+
+  /* ---------- salon (social) ---------- */
+
+  .salon-head{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:3rem;
+    align-items:start;
+  }
+  .rules-card{
+    background:var(--white);
+    border:1px solid var(--line);
+    padding:1.75rem;
+  }
+  .rules-card h3{font-size:1.05rem;margin-bottom:1rem;}
+  .rules-card table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+  .rules-card th,.rules-card td{
+    text-align:left;
+    padding:0.55rem 0.5rem;
+    border-top:1px solid var(--line);
+    color:var(--grey);
+  }
+  .rules-card th{
+    font-size:0.64rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    font-weight:600;
+    border-top:none;
+  }
+  .rules-card .yes{color:var(--green);font-weight:600;}
+  .rules-card .no{color:var(--grey-soft);}
+  .creator-banner{
+    margin-top:2.5rem;
+    background:linear-gradient(120deg, #100A0C, #2A0A16);
+    color:var(--white);
+    padding:1.75rem 2rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:2rem;
+    flex-wrap:wrap;
+  }
+  .creator-banner .txt h3{font-size:1.2rem;}
+  .creator-banner .txt p{font-size:0.82rem;color:rgba(255,255,255,0.6);margin-top:0.3rem;max-width:52ch;}
+  .creator-banner .credit{text-align:right;}
+  .creator-banner .credit b{
+    display:block;
+    font-family:'Bodoni Moda',serif;
+    font-size:2rem;
+    font-weight:500;
+    color:var(--gold-bright);
+    line-height:1.1;
+  }
+  .creator-banner .credit span{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.5);}
+
+  .feed{
+    margin-top:2.5rem;
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:1.5rem;
+  }
+  @media (max-width:820px){.feed{grid-template-columns:1fr;}.salon-head{grid-template-columns:1fr;gap:1.75rem;}}
+  .post{
+    background:var(--white);
+    border:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+  }
+  .post-head{
+    padding:1.1rem 1.4rem;
+    display:flex;
+    align-items:center;
+    gap:0.9rem;
+  }
+  .avatar{
+    width:40px;height:40px;
+    border-radius:50%;
+    background:var(--black);
+    color:var(--white);
+    font-family:'Bodoni Moda',serif;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.95rem;
+    flex-shrink:0;
+  }
+  .avatar.a-rtg{background:var(--burgundy);}
+  .avatar.a-lifestyle{background:var(--gold);}
+  .avatar.a-business{background:var(--black);}
+  .post-head .who{flex:1;min-width:0;}
+  .post-head .who b{display:block;font-weight:600;font-size:0.9rem;}
+  .post-head .who span{font-size:0.72rem;color:var(--grey-soft);}
+  .post-visual{
+    aspect-ratio:4/3;
+    display:flex;
+    align-items:flex-end;
+    padding:1.4rem;
+    color:var(--white);
+    position:relative;
+  }
+  .post-visual .place{
+    font-family:'Bodoni Moda',serif;
+    font-size:1.8rem;
+    font-style:italic;
+    text-shadow:0 2px 18px rgba(0,0,0,0.35);
+  }
+  .v-kyoto{background:linear-gradient(160deg,#3E1F26 0%,#7F1634 60%,#B8657B 100%);}
+  .v-zurich{background:linear-gradient(160deg,#10151C 0%,#2C3A4D 60%,#7C93AC 100%);}
+  .v-lissabon{background:linear-gradient(160deg,#1F1A0C 0%,#857007 65%,#D9C36A 100%);}
+  .v-singapore{background:linear-gradient(160deg,#0B1F1A 0%,#2E6B4F 65%,#8FC0A9 100%);}
+  .v-marrakech{background:linear-gradient(160deg,#2A130A 0%,#9E4A1C 60%,#E0A470 100%);}
+  .post-body{padding:1.2rem 1.4rem;flex:1;}
+  .post-body p{font-size:0.88rem;color:var(--grey);}
+  .post-reward{
+    margin-top:0.8rem;
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:600;
+  }
+  .post-actions{
+    border-top:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    padding:0.6rem 0.9rem;
+    gap:0.25rem;
+  }
+  .pa-btn{
+    background:none;
+    border:none;
+    font-size:0.78rem;
+    color:var(--grey);
+    padding:0.45rem 0.7rem;
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    transition:color 0.2s ease;
+  }
+  .pa-btn:hover:not(:disabled){color:var(--burgundy);}
+  .pa-btn:disabled{color:#C6C2BB;cursor:not-allowed;}
+  .pa-btn.liked{color:var(--burgundy);font-weight:600;}
+  .comments{border-top:1px solid var(--line);padding:1rem 1.4rem;display:none;}
+  .comments.open{display:block;}
+  .comment{font-size:0.82rem;padding:0.4rem 0;color:var(--grey);}
+  .comment b{color:var(--black);font-weight:600;}
+  .comment-form{display:flex;gap:0.6rem;margin-top:0.75rem;}
+  .comment-form input{
+    flex:1;
+    border:1px solid var(--line);
+    padding:0.55rem 0.9rem;
+    font-family:'Inter',sans-serif;
+    font-size:0.82rem;
+    outline:none;
+    background:var(--paper);
+  }
+  .comment-form button{
+    border:1px solid var(--black);
+    background:var(--black);
+    color:var(--white);
+    font-size:0.7rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:0 1rem;
+    font-weight:600;
+  }
+
+  /* ---------- toast & modal ---------- */
+
+  #toast{
+    position:fixed;
+    bottom:1.75rem;
+    left:50%;
+    transform:translate(-50%, 20px);
+    background:var(--black);
+    color:var(--white);
+    font-size:0.82rem;
+    padding:0.85rem 1.5rem;
+    opacity:0;
+    pointer-events:none;
+    transition:all 0.3s ease;
+    z-index:300;
+    max-width:90vw;
+    text-align:center;
+  }
+  #toast.show{opacity:1;transform:translate(-50%, 0);}
+
+  #modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(12,12,11,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:200;
+    padding:1.5rem;
+  }
+  #modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--white);
+    width:100%;
+    max-width:440px;
+    padding:2rem;
+  }
+  .modal h3{font-size:1.25rem;margin-bottom:0.4rem;}
+  .modal .sub{font-size:0.8rem;color:var(--grey-soft);margin-bottom:1.25rem;}
+  .modal textarea{
+    width:100%;
+    border:1px solid var(--line);
+    background:var(--paper);
+    padding:0.9rem;
+    font-family:'Inter',sans-serif;
+    font-size:0.88rem;
+    min-height:110px;
+    resize:vertical;
+    outline:none;
+  }
+  .modal .actions{display:flex;gap:0.75rem;margin-top:1.25rem;justify-content:flex-end;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="index.html" class="brandmark">
+      <span class="bm-block">Rahul Travel Group</span>
+      <span class="bm-tagline">Ledenportaal</span>
+    </a>
+    <div class="header-user" id="headerUser">
+      <a href="index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>
+    </div>
+  </div>
+</header>
+
+<!-- ========== GATE ========== -->
+<section id="gate">
+  <div class="wrap">
+    <div class="gate-head">
+      <span class="kicker">Ledenportaal</span>
+      <h1>Uw sleutel tot alles wat RTG regelt.</h1>
+      <p class="deck">Betalingen, reizen, uw persoonlijke AI en De Salon — het besloten sociale netwerk van RTG. Dit portaal is tegelijk uw toegangskaart voor de RTG-app die eraan komt.</p>
+      <p class="demo-note">Conceptdemo — kies hieronder met welk profiel u het portaal wilt ervaren. Elke pas heeft andere rechten.</p>
+    </div>
+    <div class="gate-grid">
+      <button class="gate-card" data-login="guest">
+        <span class="tier-chip t-guest"><span class="dot"></span>Zonder pas</span>
+        <h3>Gast</h3>
+        <p>Kijk mee in De Salon. Gasten kunnen posts liken, maar niet reageren of berichten sturen — en zien wat lidmaatschap ontsluit.</p>
+        <span class="enter">Binnenkijken <span class="arrow">→</span></span>
+      </button>
+      <button class="gate-card" data-login="rtg">
+        <span class="tier-chip t-rtg"><span class="dot"></span>RTG Pass</span>
+        <h3>S. Janssen</h3>
+        <p>Volledig portaal met de AI-Butler. In De Salon reageert en dm't u met andere RTG-leden; bij Lifestyle- en Business-leden kunt u liken.</p>
+        <span class="enter">Inloggen als RTG-lid <span class="arrow">→</span></span>
+      </button>
+      <button class="gate-card" data-login="lifestyle">
+        <span class="tier-chip t-lifestyle"><span class="dot"></span>Lifestyle Pass</span>
+        <h3>I. van Rhijn</h3>
+        <p>Volledig portaal, persoonlijke concierge én AI-voorbereiding. In De Salon volledige interactie met Lifestyle- en Business-leden.</p>
+        <span class="enter">Inloggen als Lifestyle-lid <span class="arrow">→</span></span>
+      </button>
+      <button class="gate-card" data-login="business">
+        <span class="tier-chip t-business"><span class="dot"></span>Business Pass</span>
+        <h3>A. de Vries</h3>
+        <p>Volledig portaal, zakelijk ingericht. In De Salon volledige interactie met Business- en Lifestyle-leden.</p>
+        <span class="enter">Inloggen als Business-lid <span class="arrow">→</span></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== PORTAL ========== -->
+<div id="portal">
+  <nav class="portal-nav">
+    <div class="wrap" id="tabBar"></div>
+  </nav>
+
+  <!-- overview -->
+  <section class="panel" data-panel="overzicht">
+    <div class="wrap">
+      <div class="folio">Portaal — Overzicht</div>
+      <h2 id="ovGreeting">Welkom terug.</h2>
+      <p class="deck">Alles wat loopt, in één oogopslag: uw eerstvolgende reis, openstaande betalingen en uw creator-krediet uit De Salon.</p>
+      <div class="ov-grid" id="ovGrid"></div>
+    </div>
+  </section>
+
+  <!-- pass -->
+  <section class="panel" data-panel="pas">
+    <div class="wrap">
+      <div class="folio">Portaal — Mijn pas</div>
+      <h2>Uw digitale toegangskaart.</h2>
+      <p class="deck">Eén pas voor alles: het portaal, uw boekingen en straks de RTG-app. Toon de code bij partners en check-ins.</p>
+      <div id="passStage"></div>
+    </div>
+  </section>
+
+  <!-- payments -->
+  <section class="panel" data-panel="betalingen">
+    <div class="wrap">
+      <div class="folio">Portaal — Betalingen</div>
+      <h2>Elke euro zichtbaar.</h2>
+      <p class="deck">Nettoprijs, vaste bijdrage en het deel dat naar de RTFoundation gaat — per boeking uitgesplitst. Openstaande bedragen betaalt u hier direct.</p>
+      <div id="payStage"></div>
+    </div>
+  </section>
+
+  <!-- trips -->
+  <section class="panel" data-panel="reizen">
+    <div class="wrap">
+      <div class="folio">Portaal — Reizen &amp; diensten</div>
+      <h2>Alles wat voor u geregeld is.</h2>
+      <p class="deck">Uw komende reis met elke geboekte dienst op een rij — van vlucht tot tafelreservering, met de actuele status.</p>
+      <div id="tripStage"></div>
+    </div>
+  </section>
+
+  <!-- AI -->
+  <section class="panel" data-panel="ai">
+    <div class="wrap">
+      <div class="folio">Portaal — Persoonlijke AI</div>
+      <h2 id="aiTitle">Uw persoonlijke AI.</h2>
+      <p class="deck" id="aiDeck">Exclusief voor leden: een AI die uw reizen kent en helpt met elke voorbereiding — van paklijst tot documenten.</p>
+      <div id="aiStage"></div>
+    </div>
+  </section>
+
+  <!-- salon -->
+  <section class="panel" data-panel="salon">
+    <div class="wrap">
+      <div class="folio">Portaal — De Salon</div>
+      <div class="salon-head">
+        <div>
+          <h2>De Salon.</h2>
+          <p class="deck">Het besloten netwerk van RTG-leden. Geen algoritme dat schreeuwt om aandacht — een salon waar reizen gedeeld worden zoals ze beleefd zijn. Wie mooie content maakt, verdient reiskorting.</p>
+          <p class="deck" id="salonViewerNote" style="margin-top:0.75rem;font-size:0.85rem;"></p>
+        </div>
+        <div class="rules-card">
+          <h3>Wie kan wat in De Salon</h3>
+          <table>
+            <tr><th></th><th>Liken</th><th>Reageren</th><th>DM</th></tr>
+            <tr><td>Zonder pas</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td></tr>
+            <tr><td>RTG Pass</td><td class="yes">✓</td><td class="yes">✓ RTG-leden</td><td class="yes">✓ RTG-leden</td></tr>
+            <tr><td>Lifestyle Pass</td><td class="yes">✓</td><td class="yes">✓ Lifestyle &amp; Business</td><td class="yes">✓ Lifestyle &amp; Business</td></tr>
+            <tr><td>Business Pass</td><td class="yes">✓</td><td class="yes">✓ Business &amp; Lifestyle</td><td class="yes">✓ Business &amp; Lifestyle</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="creator-banner" id="creatorBanner"></div>
+      <div class="feed" id="feed"></div>
+    </div>
+  </section>
+</div>
+
+<div id="toast"></div>
+
+<div id="modal-overlay">
+  <div class="modal">
+    <h3 id="dmTitle">Bericht</h3>
+    <p class="sub" id="dmSub">Privébericht binnen De Salon.</p>
+    <textarea id="dmText" placeholder="Schrijf uw bericht…"></textarea>
+    <div class="actions">
+      <button class="btn btn-ghost btn-small" id="dmCancel">Annuleren</button>
+      <button class="btn btn-small" id="dmSend">Versturen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  /* ---------- data ---------- */
+
+  const TIERS = {
+    guest:     {label:'Zonder pas',     chip:'t-guest'},
+    rtg:       {label:'RTG Pass',       chip:'t-rtg'},
+    lifestyle: {label:'Lifestyle Pass', chip:'t-lifestyle'},
+    business:  {label:'Business Pass',  chip:'t-business'}
+  };
+
+  const PERSONAS = {
+    guest:     {name:'Gast',          full:'Gast',              since:null,          number:null},
+    rtg:       {name:'S. Janssen',    full:'Sophie Janssen',    since:'Maart 2026',  number:'RTG · 2026 · 8841'},
+    lifestyle: {name:'I. van Rhijn',  full:'Isabelle van Rhijn',since:'Augustus 2025', number:'LSP · 2025 · 0217'},
+    business:  {name:'A. de Vries',   full:'Alexander de Vries',since:'November 2025', number:'BSP · 2025 · 1104'}
+  };
+
+  const invoices = [
+    {id:'RTG-2026-0158', desc:'Kyoto — Hoshinoya, 4 nachten', netto:2840, bijdrage:190, status:'open',  date:'Vervalt 28 juli 2026'},
+    {id:'RTG-2026-0141', desc:'KLM Amsterdam – Osaka, business class (2 pers.)', netto:3120, bijdrage:210, status:'open', date:'Vervalt 15 augustus 2026'},
+    {id:'RTG-2026-0093', desc:'Lissabon — Palácio weekend, incl. transfers', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
+    {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
+  ];
+
+  const trip = {
+    dest:'Kyoto', dates:'12 – 19 oktober 2026', days:98,
+    items:[
+      {when:'12 okt', title:'KLM KL867 — Amsterdam → Osaka Kansai', sub:'Business class, 2 personen · stoelen 2A/2C', status:'paid', label:'Bevestigd'},
+      {when:'12 okt', title:'Privétransfer Kansai → Hoshinoya Kyoto', sub:'Chauffeur wacht bij aankomsthal, naambord RTG', status:'paid', label:'Bevestigd'},
+      {when:'12–16 okt', title:'Hoshinoya Kyoto — Riverside suite', sub:'4 nachten, ontbijt op de kamer, late check-out', status:'open', label:'Wacht op betaling'},
+      {when:'14 okt', title:'Privé-theeceremonie, Gion', sub:'Met vertaler · 2 personen · 15:00 uur', status:'paid', label:'Bevestigd'},
+      {when:'15 okt', title:'Diner — Kikunoi Honten (3★)', sub:'Kaiseki-menu · tafel 19:30 uur', status:'req', label:'In aanvraag'},
+      {when:'16–19 okt', title:'Ryokan Tawaraya — traditionele kamer', sub:'3 nachten, kaiseki-halfpension', status:'open', label:'Wacht op betaling'}
+    ]
+  };
+
+  const posts = [
+    {id:1, author:'Isabelle van Rhijn', tier:'lifestyle', place:'Kyoto', visual:'v-kyoto',
+     text:'De theeceremonie die mijn concierge regelde — geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
+     likes:124, liked:false, reward:6,
+     comments:[{who:'Alexander de Vries', tier:'business', text:'Staat genoteerd voor november. Dank.'}]},
+    {id:2, author:'Alexander de Vries', tier:'business', place:'Zürich', visual:'v-zurich',
+     text:'Ochtendvlucht, twee vergaderingen, om 18:00 aan het meer. De Business Pass plant de dag strakker dan mijn assistent ooit deed.',
+     likes:89, liked:false, reward:4,
+     comments:[]},
+    {id:3, author:'Sophie Janssen', tier:'rtg', place:'Lissabon', visual:'v-lissabon',
+     text:'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt.',
+     likes:203, liked:false, reward:8,
+     comments:[{who:'Nadia Karim', tier:'rtg', text:'Welk palácio was dit? Sta op het punt te boeken!'}]},
+    {id:4, author:'Marcus Bergwerff', tier:'business', place:'Singapore', visual:'v-singapore',
+     text:'Layover van 9 uur omgezet in een middag Raffles + spa. De AI stelde het voor, mijn concierge bevestigde binnen 10 minuten.',
+     likes:57, liked:false, reward:2,
+     comments:[]},
+    {id:5, author:'Nadia Karim', tier:'rtg', place:'Marrakech', visual:'v-marrakech',
+     text:'Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Reizen dat iets teruggeeft — dat deel vertel ik iedereen.',
+     likes:141, liked:false, reward:5,
+     comments:[]}
+  ];
+
+  const TABS = [
+    {key:'overzicht',  label:'Overzicht',        members:true},
+    {key:'pas',        label:'Mijn pas',          members:false},
+    {key:'betalingen', label:'Betalingen',        members:true},
+    {key:'reizen',     label:'Reizen & diensten', members:true},
+    {key:'ai',         label:'Persoonlijke AI',   members:true},
+    {key:'salon',      label:'De Salon',          members:false}
+  ];
+
+  let user = null;
+  let creatorCredit = 86;
+
+  /* ---------- helpers ---------- */
+
+  const $ = s => document.querySelector(s);
+  const eur = n => '€ ' + n.toLocaleString('nl-NL');
+
+  let toastTimer;
+  function toast(msg){
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  function chip(tier){
+    return '<span class="tier-chip ' + TIERS[tier].chip + '"><span class="dot"></span>' + TIERS[tier].label + '</span>';
+  }
+
+  /* Salon-rechten: gast alleen liken; RTG onderling reageren/dm'en;
+     Lifestyle & Business onderling volledig. */
+  function canEngage(authorTier){
+    if (user.tier === 'guest') return false;
+    if (user.tier === 'rtg') return authorTier === 'rtg';
+    return authorTier === 'lifestyle' || authorTier === 'business';
+  }
+  function engageHint(authorTier){
+    if (user.tier === 'guest') return 'Zonder pas kunt u alleen liken. Reageren en berichten zijn voor leden.';
+    if (user.tier === 'rtg') return 'Met de RTG Pass reageert en dm’t u alleen met andere RTG-leden. Upgrade naar Lifestyle of Business voor meer.';
+    return 'Lifestyle- en Business-leden communiceren onderling. Bij RTG-leden kunt u liken.';
+  }
+
+  /* ---------- login / logout ---------- */
+
+  document.querySelectorAll('[data-login]').forEach(btn => {
+    btn.addEventListener('click', () => login(btn.dataset.login));
+  });
+
+  function login(tier){
+    user = {tier, ...PERSONAS[tier]};
+    $('#gate').classList.add('hidden');
+    $('#portal').classList.add('active');
+    renderHeader();
+    renderTabs();
+    renderOverview();
+    renderPass();
+    renderPayments();
+    renderTrip();
+    renderAI();
+    renderSalon();
+    openTab(tier === 'guest' ? 'salon' : 'overzicht');
+    window.scrollTo({top:0});
+  }
+
+  function logout(){
+    user = null;
+    $('#portal').classList.remove('active');
+    $('#gate').classList.remove('hidden');
+    $('#headerUser').innerHTML = '<a href="index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>';
+    window.scrollTo({top:0});
+  }
+
+  function renderHeader(){
+    $('#headerUser').innerHTML =
+      chip(user.tier) +
+      '<span>' + user.name + '</span>' +
+      '<button id="logoutBtn">Uitloggen</button>';
+    $('#logoutBtn').addEventListener('click', logout);
+  }
+
+  /* ---------- tabs ---------- */
+
+  function renderTabs(){
+    const bar = $('#tabBar');
+    bar.innerHTML = '';
+    TABS.forEach(t => {
+      const locked = t.members && user.tier === 'guest';
+      const b = document.createElement('button');
+      b.innerHTML = t.label + (locked ? ' <span class="lock">🔒</span>' : '');
+      b.addEventListener('click', () => openTab(t.key));
+      b.dataset.tab = t.key;
+      bar.appendChild(b);
+    });
+  }
+
+  function openTab(key){
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === key));
+    document.querySelectorAll('#tabBar button').forEach(b => b.classList.toggle('active', b.dataset.tab === key));
+  }
+
+  function lockedBlock(what){
+    return '<div class="locked-panel">' +
+      '<div class="big">Alleen voor leden.</div>' +
+      '<p>' + what + ' is onderdeel van het RTG-lidmaatschap. Kies de pas die bij uw ritme past en dit portaal opent volledig.</p>' +
+      '<a href="index.html#passen" class="btn">Bekijk de passen</a>' +
+      '</div>';
+  }
+
+  /* ---------- overview ---------- */
+
+  function renderOverview(){
+    const grid = $('#ovGrid');
+    if (user.tier === 'guest'){
+      $('#ovGreeting').textContent = 'Welkom, gast.';
+      grid.innerHTML = lockedBlock('Het overzicht');
+      grid.style.display = 'block';
+      return;
+    }
+    grid.style.display = 'grid';
+    $('#ovGreeting').textContent = 'Welkom terug, ' + user.full.split(' ')[0] + '.';
+    const open = invoices.filter(i => i.status === 'open');
+    const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+    grid.innerHTML =
+      '<div class="ov-card"><span class="label">Eerstvolgende reis</span>' +
+        '<span class="value">' + trip.dest + '</span>' +
+        '<span class="sub">' + trip.dates + ' · over ' + trip.days + ' dagen</span>' +
+        '<button class="go" data-goto="reizen">Bekijk reis & diensten →</button></div>' +
+      '<div class="ov-card"><span class="label">Openstaand</span>' +
+        '<span class="value accent">' + eur(openSum) + '</span>' +
+        '<span class="sub">' + open.length + ' openstaande betaling' + (open.length === 1 ? '' : 'en') + '</span>' +
+        '<button class="go" data-goto="betalingen">Naar betalingen →</button></div>' +
+      '<div class="ov-card"><span class="label">Creator-krediet uit De Salon</span>' +
+        '<span class="value" style="color:var(--gold);">' + eur(creatorCredit) + '</span>' +
+        '<span class="sub">Verdiend met uw content · inzetbaar op elke boeking</span>' +
+        '<button class="go" data-goto="salon">Naar De Salon →</button></div>';
+    grid.querySelectorAll('[data-goto]').forEach(b =>
+      b.addEventListener('click', () => openTab(b.dataset.goto)));
+  }
+
+  /* ---------- pass card ---------- */
+
+  function qrSvg(seed){
+    let s = seed, cells = '';
+    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    for (let y = 0; y < 13; y++){
+      for (let x = 0; x < 13; x++){
+        const corner = (x < 4 && y < 4) || (x > 8 && y < 4) || (x < 4 && y > 8);
+        const on = corner
+          ? ((x % 12 < 1 || x % 12 > 2 ? 1 : 0) || (y % 12 < 1 || y % 12 > 2 ? 1 : 0)) &&
+            !((x % 12 === 1 || x % 12 === 2) && (y % 12 === 1 || y % 12 === 2)) || (x===1&&y===1)||(x===2&&y===2)||(x===11&&y===1)||(x===1&&y===11)
+          : rnd() > 0.5;
+        if (on) cells += '<rect x="' + x + '" y="' + y + '" width="1" height="1"/>';
+      }
+    }
+    return '<svg viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg" fill="#0C0C0B">' + cells + '</svg>';
+  }
+
+  function renderPass(){
+    const stage = $('#passStage');
+    if (user.tier === 'guest'){
+      stage.innerHTML = lockedBlock('De digitale pas');
+      return;
+    }
+    stage.innerHTML =
+      '<div class="pass-stage">' +
+        '<div class="idcard tier-' + user.tier + '">' +
+          '<div class="row">' +
+            '<div class="brand">Rahul Travel Group<small>Experience the Elite Class</small></div>' +
+            '<div class="tier-name">' + TIERS[user.tier].label + '</div>' +
+          '</div>' +
+          '<div class="holder">' + user.full + '</div>' +
+          '<div class="meta">' +
+            '<div>' +
+              '<div class="mrow">Lidnummer<b>' + user.number + '</b></div>' +
+              '<div class="mrow" style="margin-top:0.6rem;">Lid sinds<b>' + user.since + '</b></div>' +
+            '</div>' +
+            qrSvg(user.number.length * 7919) +
+          '</div>' +
+        '</div>' +
+        '<div class="pass-copy">' +
+          '<span class="kicker">Eén pas, straks één app</span>' +
+          '<h2>Deze kaart is uw sleutel tot de RTG-app.</h2>' +
+          '<ul>' +
+            '<li>Toon de code bij partnerhotels en lounges voor directe herkenning.</li>' +
+            '<li>Bij de lancering van de RTG-app logt u hiermee in — zonder nieuw account.</li>' +
+            '<li>Uw pas draagt uw Salon-identiteit: wat u hier opbouwt, reist mee.</li>' +
+          '</ul>' +
+          '<div class="app-note"><b>RTG-app — in ontwikkeling.</b> Boeken, betalen, De Salon en uw AI, straks in één app op uw telefoon. Leden met een actieve pas krijgen als eerste toegang.</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  /* ---------- payments ---------- */
+
+  function renderPayments(){
+    const stage = $('#payStage');
+    if (user.tier === 'guest'){
+      stage.innerHTML = lockedBlock('Het betaaloverzicht');
+      return;
+    }
+    const open = invoices.filter(i => i.status === 'open');
+    const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+    const foundationYear = invoices.reduce((s,i) => s + i.bijdrage * 0.3, 0);
+
+    let html = '<div class="pay-summary">' +
+      '<div class="ov-card"><span class="label">Openstaand</span><span class="value accent">' + eur(openSum) + '</span><span class="sub">' + open.length + ' factu(u)r(en)</span></div>' +
+      '<div class="ov-card"><span class="label">Naar de RTFoundation dit jaar</span><span class="value" style="color:var(--gold);">' + eur(Math.round(foundationYear)) + '</span><span class="sub">30% van elke bijdrage, automatisch</span></div>' +
+      '<div class="ov-card"><span class="label">Creator-krediet beschikbaar</span><span class="value">' + eur(creatorCredit) + '</span><span class="sub">Wordt verrekend bij uw volgende betaling</span></div>' +
+    '</div>';
+
+    html += '<div class="pay-list">' + invoices.map(inv => {
+      const total = inv.netto + inv.bijdrage;
+      return '<div class="pay-item" data-inv="' + inv.id + '">' +
+        '<div class="top">' +
+          '<div><h3>' + inv.desc + '</h3><div class="pid">' + inv.id + ' · ' + inv.date + '</div></div>' +
+          '<div class="right">' +
+            '<span class="amount">' + eur(total) + '</span>' +
+            '<span class="status ' + (inv.status === 'paid' ? 'paid' : 'open') + '">' + (inv.status === 'paid' ? 'Betaald' : 'Open') + '</span>' +
+            (inv.status === 'open'
+              ? '<button class="btn btn-small js-pay">Betaal</button>'
+              : '<button class="linkish js-detail">Details</button>') +
+          '</div>' +
+        '</div>' +
+        '<div class="pay-breakdown">' +
+          (inv.netto > 0 ? '<div class="rowline"><span>Nettoprijs (inkoop)</span><span>' + eur(inv.netto) + '</span></div>' : '') +
+          '<div class="rowline"><span>Vaste ledenbijdrage</span><span>' + eur(inv.bijdrage) + '</span></div>' +
+          '<div class="rowline foundation"><span>waarvan naar de RTFoundation (30%)</span><span>' + eur(Math.round(inv.bijdrage * 0.3)) + '</span></div>' +
+          '<div class="rowline total"><span>Totaal</span><span>' + eur(total) + '</span></div>' +
+          (inv.status === 'open'
+            ? '<div class="confirm"><button class="btn btn-small js-confirm">Bevestig betaling</button><span style="font-size:0.75rem;color:var(--grey-soft);">Demo — er wordt niets afgeschreven.</span></div>'
+            : '') +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+
+    stage.innerHTML = html;
+
+    stage.querySelectorAll('.pay-item').forEach(item => {
+      const bd = item.querySelector('.pay-breakdown');
+      const toggle = () => bd.classList.toggle('open');
+      const payBtn = item.querySelector('.js-pay');
+      const detailBtn = item.querySelector('.js-detail');
+      if (payBtn) payBtn.addEventListener('click', toggle);
+      if (detailBtn) detailBtn.addEventListener('click', toggle);
+      const confirmBtn = item.querySelector('.js-confirm');
+      if (confirmBtn) confirmBtn.addEventListener('click', () => {
+        const inv = invoices.find(i => i.id === item.dataset.inv);
+        inv.status = 'paid';
+        inv.date = 'Zojuist betaald';
+        const tlItem = trip.items.find(t => t.status === 'open');
+        if (tlItem && inv.id === 'RTG-2026-0158'){ tlItem.status = 'paid'; tlItem.label = 'Bevestigd'; }
+        toast('Betaling bevestigd. ' + eur(Math.round(inv.bijdrage * 0.3)) + ' van uw bijdrage gaat naar de RTFoundation.');
+        renderPayments();
+        renderOverview();
+        renderTrip();
+      });
+    });
+  }
+
+  /* ---------- trip ---------- */
+
+  function renderTrip(){
+    const stage = $('#tripStage');
+    if (user.tier === 'guest'){
+      stage.innerHTML = lockedBlock('Het reisoverzicht');
+      return;
+    }
+    const statusClass = s => s === 'paid' ? 'paid' : 'open';
+    stage.innerHTML =
+      '<div class="trip-card">' +
+        '<div><div class="dest">' + trip.dest + '</div><div class="dates">' + trip.dates + '</div></div>' +
+        '<div class="count"><b>' + trip.days + '</b>dagen te gaan</div>' +
+      '</div>' +
+      '<div class="timeline">' + trip.items.map(it =>
+        '<div class="tl-item">' +
+          '<span class="when">' + it.when + '</span>' +
+          '<div><h3>' + it.title + '</h3><p>' + it.sub + '</p></div>' +
+          '<span class="status ' + statusClass(it.status) + '">' + it.label + '</span>' +
+        '</div>').join('') + '</div>' +
+      '<p class="services-note deck" style="font-size:0.85rem;">Iets wijzigen of toevoegen? ' +
+        (user.tier === 'lifestyle'
+          ? 'Uw concierge regelt het — één bericht is genoeg.'
+          : 'Vraag het uw persoonlijke AI, of app de Butler.') + '</p>';
+  }
+
+  /* ---------- AI ---------- */
+
+  const AI_NAMES = {
+    rtg:       {title:'De Butler.', deck:'Uw AI kent uw reis naar Kyoto, uw voorkeuren en uw agenda. Vraag wat u wilt — de Butler bereidt alles voor.'},
+    lifestyle: {title:'Uw AI, naast uw concierge.', deck:'Uw concierge blijft uw vaste aanspreekpunt. Deze AI staat ernaast voor directe voorbereiding: paklijsten, documenten, planning — dag en nacht.'},
+    business:  {title:'Uw uitvoerende AI.', deck:'Kort en precies. De AI bereidt uw reizen voor zoals een goede chief of staff dat doet: alles klaar vóór u erom vraagt.'}
+  };
+
+  function aiAnswer(q){
+    const l = q.toLowerCase();
+    if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer'))
+      return 'Voor Kyoto in oktober (14–22°C, kans op regen):\n— Lichte lagen + een regenjas\n— Nette schoenen die makkelijk uitgaan (ryokan & tempels)\n— Ingetogen kleding voor Kikunoi Honten\n— Adapter type A\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
+    if (l.includes('visum') || l.includes('paspoort') || l.includes('document'))
+      return 'Voor Japan heeft u geen visum nodig bij verblijf tot 90 dagen. Uw paspoort moet geldig zijn tijdens het hele verblijf — de uwe is geldig tot 2031, dus dat zit goed. Ik zet uw boekingsbevestigingen alvast klaar voor de douane-app (Visit Japan Web).';
+    if (l.includes('weer'))
+      return 'Kyoto medio oktober: gemiddeld 14–22°C, af en toe regen, en het begin van de herfstkleuren — de esdoorns in Arashiyama beginnen dan net te kleuren. De beste ochtend voor de bamboetuin is direct na zonsopgang; zal ik een vroege wandeling inplannen?';
+    if (l.includes('plan') || l.includes('dag') || l.includes('doen'))
+      return 'Voorstel voor 14 oktober:\n— 08:00 Arashiyama vóór de drukte\n— 11:30 lunch bij een sobameester in Sagano\n— 15:00 uw privé-theeceremonie in Gion (staat al vast)\n— 19:00 avondwandeling langs Pontocho\n\nZal ik de lunch laten reserveren?';
+    if (l.includes('restaurant') || l.includes('eten') || l.includes('diner'))
+      return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag — bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki of een counter-kaiseki in Higashiyama, beide via ons netwerk tegen normale prijs, zonder toeristische toeslag.';
+    return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Kyoto kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning — zeg het maar.';
+  }
+
+  function renderAI(){
+    const stage = $('#aiStage');
+    if (user.tier === 'guest'){
+      $('#aiTitle').textContent = 'Uw persoonlijke AI.';
+      stage.innerHTML = lockedBlock('De persoonlijke AI');
+      return;
+    }
+    const meta = AI_NAMES[user.tier];
+    $('#aiTitle').textContent = meta.title;
+    $('#aiDeck').textContent = meta.deck;
+
+    stage.innerHTML =
+      '<div class="ai-grid">' +
+        '<div class="chat">' +
+          '<div class="chat-bar"><span class="dot"></span> Persoonlijke AI — altijd beschikbaar</div>' +
+          '<div class="chat-body" id="chatBody"></div>' +
+          '<div class="chat-input">' +
+            '<input id="chatText" type="text" placeholder="Stel een vraag over uw reis…">' +
+            '<button id="chatSend">Stuur</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ai-side">' +
+          '<h3>Wat de AI voor u voorbereidt</h3>' +
+          '<p>De AI is gekoppeld aan uw boekingen. Hij kent uw reis naar ' + trip.dest + ', uw betalingen en uw voorkeuren — en werkt exclusief voor u.</p>' +
+          '<div class="chips">' +
+            '<button class="chip">Wat moet ik inpakken?</button>' +
+            '<button class="chip">Heb ik een visum nodig?</button>' +
+            '<button class="chip">Hoe is het weer in oktober?</button>' +
+            '<button class="chip">Plan mijn dag in Kyoto</button>' +
+            '<button class="chip">Regel een restaurant</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    const body = $('#chatBody');
+    function bubble(text, who){
+      const el = document.createElement('div');
+      el.className = 'bubble ' + who;
+      el.textContent = text;
+      body.appendChild(el);
+      body.scrollTop = body.scrollHeight;
+    }
+    function ask(q){
+      if (!q.trim()) return;
+      bubble(q, 'user');
+      setTimeout(() => bubble(aiAnswer(q), 'ai'), 550);
+    }
+
+    const first = user.full.split(' ')[0];
+    bubble('Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Uw reis naar Kyoto begint over ' + trip.days + ' dagen. Waarmee kan ik u helpen met de voorbereiding?', 'ai');
+
+    $('#chatSend').addEventListener('click', () => { ask($('#chatText').value); $('#chatText').value=''; });
+    $('#chatText').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value=''; } });
+    stage.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
+  }
+
+  /* ---------- salon ---------- */
+
+  function renderSalon(){
+    $('#salonViewerNote').innerHTML = '<b>Uw rechten:</b> ' + engageHint();
+
+    const banner = $('#creatorBanner');
+    if (user.tier === 'guest'){
+      banner.innerHTML =
+        '<div class="txt"><h3>Maak content, verdien korting.</h3>' +
+        '<p>Leden die hun reizen delen in De Salon verdienen reiskrediet: elke 50 likes op een post is 1% korting op een volgende boeking, tot 10% per kwartaal.</p></div>' +
+        '<a href="index.html#passen" class="btn btn-small" style="background:var(--white);color:var(--black);border-color:var(--white);">Word lid</a>';
+    } else {
+      banner.innerHTML =
+        '<div class="txt"><h3>Maak content, verdien korting.</h3>' +
+        '<p>Elke 50 likes op uw posts is 1% reiskorting, tot 10% per kwartaal. Uw krediet wordt automatisch verrekend bij uw volgende betaling.</p></div>' +
+        '<div class="credit"><b>' + eur(creatorCredit) + '</b><span>Uw creator-krediet</span></div>';
+    }
+
+    const feed = $('#feed');
+    feed.innerHTML = posts.map(p => {
+      const engage = canEngage(p.tier);
+      return '<article class="post" data-post="' + p.id + '">' +
+        '<div class="post-head">' +
+          '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
+          '<div class="who"><b>' + p.author + '</b><span>' + TIERS[p.tier].label + ' · ' + p.place + '</span></div>' +
+          chip(p.tier) +
+        '</div>' +
+        '<div class="post-visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>' +
+        '<div class="post-body"><p>' + p.text + '</p>' +
+          '<div class="post-reward">✦ Verdiende ' + p.reward + '% reiskorting met deze post</div>' +
+        '</div>' +
+        '<div class="post-actions">' +
+          '<button class="pa-btn js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +
+          '<button class="pa-btn js-comment" ' + (engage ? '' : 'disabled title="' + engageHint(p.tier) + '"') + '>Reageren (' + p.comments.length + ')</button>' +
+          '<button class="pa-btn js-dm" ' + (engage ? '' : 'disabled title="' + engageHint(p.tier) + '"') + '>Bericht</button>' +
+        '</div>' +
+        '<div class="comments">' +
+          '<div class="c-list">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b> — ' + c.text + '</div>').join('') + '</div>' +
+          '<div class="comment-form"><input type="text" placeholder="Schrijf een reactie…"><button>Plaats</button></div>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+
+    feed.querySelectorAll('.post').forEach(el => {
+      const post = posts.find(p => p.id === Number(el.dataset.post));
+
+      el.querySelector('.js-like').addEventListener('click', ev => {
+        post.liked = !post.liked;
+        post.likes += post.liked ? 1 : -1;
+        ev.currentTarget.classList.toggle('liked', post.liked);
+        el.querySelector('.lc').textContent = post.likes;
+      });
+
+      const commentBtn = el.querySelector('.js-comment');
+      commentBtn.addEventListener('click', () => {
+        if (commentBtn.disabled) return;
+        el.querySelector('.comments').classList.toggle('open');
+      });
+
+      const form = el.querySelector('.comment-form');
+      form.querySelector('button').addEventListener('click', () => {
+        const inp = form.querySelector('input');
+        if (!inp.value.trim()) return;
+        post.comments.push({who:user.full, tier:user.tier, text:inp.value.trim()});
+        const d = document.createElement('div');
+        d.className = 'comment';
+        d.innerHTML = '<b>' + user.full + '</b> — ' + inp.value.trim().replace(/</g,'&lt;');
+        el.querySelector('.c-list').appendChild(d);
+        inp.value = '';
+        commentBtn.innerHTML = 'Reageren (' + post.comments.length + ')';
+        toast('Reactie geplaatst.');
+      });
+
+      el.querySelector('.js-dm').addEventListener('click', ev => {
+        if (ev.currentTarget.disabled) return;
+        openDM(post.author);
+      });
+
+      /* uitleg tonen bij klik op geblokkeerde knoppen */
+      el.querySelectorAll('.pa-btn:disabled').forEach(b => {
+        b.style.pointerEvents = 'auto';
+        b.addEventListener('click', e => { e.preventDefault(); toast(engageHint(post.tier)); });
+      });
+    });
+  }
+
+  /* ---------- DM modal ---------- */
+
+  function openDM(name){
+    $('#dmTitle').textContent = 'Bericht aan ' + name;
+    $('#dmText').value = '';
+    $('#modal-overlay').classList.add('open');
+    $('#dmText').focus();
+  }
+  $('#dmCancel').addEventListener('click', () => $('#modal-overlay').classList.remove('open'));
+  $('#modal-overlay').addEventListener('click', e => { if (e.target.id === 'modal-overlay') e.currentTarget.classList.remove('open'); });
+  $('#dmSend').addEventListener('click', () => {
+    if (!$('#dmText').value.trim()) return;
+    $('#modal-overlay').classList.remove('open');
+    toast('Bericht verzonden binnen De Salon.');
+  });
+})();
+</script>
+
+</body>
+</html>

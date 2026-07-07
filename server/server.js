@@ -1,4 +1,4 @@
-/* RTG Ledenportaal — backend.
+/* RTG Ledenportaal, backend.
    Start: npm start (of node server/server.js). Draait op http://localhost:3000.
    Zet ANTHROPIC_API_KEY in de omgeving om de persoonlijke AI op de echte
    Claude API te laten draaien; zonder key vallen we terug op demo-antwoorden. */
@@ -23,7 +23,7 @@ if (process.env.ANTHROPIC_API_KEY) {
     anthropic = new Anthropic();
     console.log('Persoonlijke AI: Claude API actief (claude-opus-4-8).');
   } catch (e) {
-    console.warn('ANTHROPIC_API_KEY gevonden maar @anthropic-ai/sdk ontbreekt — demo-antwoorden actief.');
+    console.warn('ANTHROPIC_API_KEY gevonden maar @anthropic-ai/sdk ontbreekt, demo-antwoorden actief.');
   }
 } else {
   console.log('Persoonlijke AI: demo-antwoorden (zet ANTHROPIC_API_KEY voor echte Claude).');
@@ -150,7 +150,7 @@ function canEngage(sess, post) {
 
 function engageError(viewerTier) {
   if (viewerTier === 'guest') return 'Zonder pas kunt u alleen liken. Reageren en berichten zijn voor leden.';
-  return 'Met de RTG Pass reageert en dm’t u alleen met andere RTG-leden — tenzij dit lid u eerst heeft aangesproken.';
+  return 'Met de RTG Pass reageert en dm’t u alleen met andere RTG-leden, tenzij dit lid u eerst heeft aangesproken.';
 }
 
 /* Na een reactie/DM van een hoger lid op een RTG-post: leg het contact vast. */
@@ -536,7 +536,7 @@ app.post('/api/supplier/price', supplierAuth, (req, res) => {
   save();
   // backoffice ziet het live binnenkomen
   sseToOffice('sync', { scope: 'prices' });
-  sseToOffice('notify', { icon: '💶', title: 'Nieuwe dynamische prijs', body: req.supplier.name + ': ' + service + ' — € ' + price });
+  sseToOffice('notify', { icon: '💶', title: 'Nieuwe dynamische prijs', body: req.supplier.name + ': ' + service + ', € ' + price });
   res.json({ ok: true, entry });
 });
 
@@ -581,7 +581,7 @@ app.post('/api/supplier/refund', supplierAuth, (req, res) => {
   save();
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
-  notify(o.customerTier, { icon: '↩️', title: req.supplier.name + ' — terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
+  notify(o.customerTier, { icon: '↩️', title: req.supplier.name + ', terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
   res.json({ ok: true, order: o });
 });
 
@@ -614,7 +614,7 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
   res.json({ supplier: publicSupplier(s), menu: s.menu || [] });
 });
 
-// bestelling plaatsen (restaurant/bar/club) — klant verschijnt onder codenaam
+// bestelling plaatsen (restaurant/bar/club), klant verschijnt onder codenaam
 app.post('/api/order', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const s = findSupplier(req.body.supplierCode);
@@ -641,7 +641,7 @@ app.post('/api/order', auth, (req, res) => {
   db.data.orders.unshift(order);
   save();
   // leverancier + backoffice live
-  notifySupplier(s.code, { icon: '🛎️', title: 'Nieuwe bestelling', body: persona.codename + ' — ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+  notifySupplier(s.code, { icon: '🛎️', title: 'Nieuwe bestelling', body: persona.codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
   sseToSupplier(s.code, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   res.json({ ok: true, order });
@@ -723,7 +723,7 @@ function aiSystemPrompt(tier) {
   return [
     'Je bent de exclusieve persoonlijke reis-AI van Rahul Travel Group (RTG), een membership-reisclub die tegen inkoopprijs boekt en 30% van elke ledenbijdrage aan de RTFoundation doneert.',
     AI_TONE[tier] || AI_TONE.rtg,
-    'Je bent de frictieloze vriend van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay) — verwijs daarnaar, vraag nooit om betaalgegevens.',
+    'Je bent de frictieloze vriend van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay), verwijs daarnaar, vraag nooit om betaalgegevens.',
     'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig je kort dat het geregeld is en noem je wat je vervolgens in de gaten houdt.',
     'Je helpt het lid met reisvoorbereiding: paklijsten, documenten en visa, weer, dagplanning, restaurants en wijzigingen aan geboekte diensten. Antwoord in het Nederlands, beknopt (maximaal ~120 woorden), zonder opsmuk.',
     `Het lid: ${persona.full} (${tier === 'rtg' ? 'RTG Pass' : tier === 'lifestyle' ? 'Lifestyle Pass' : 'Business Pass'}), lid sinds ${persona.since}.`,
@@ -741,16 +741,16 @@ function cannedAnswer(q) {
   if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
     return 'Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00 en een avondwandeling langs Pontocho.\n\nVolgende dat ik in de gaten houd: de bevestiging van Kikunoi Honten. U hoeft niets te doen.';
   if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer'))
-    return 'Voor Kyoto in oktober (14–22°C, kans op regen):\n— Lichte lagen + een regenjas\n— Nette schoenen die makkelijk uitgaan (ryokan & tempels)\n— Ingetogen kleding voor Kikunoi Honten\n— Adapter type A\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
+    return 'Voor Kyoto in oktober (14-22°C, kans op regen):\n• Lichte lagen + een regenjas\n• Nette schoenen die makkelijk uitgaan (ryokan & tempels)\n• Ingetogen kleding voor Kikunoi Honten\n• Adapter type A\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
   if (l.includes('visum') || l.includes('paspoort') || l.includes('document'))
     return 'Voor Japan heeft u geen visum nodig bij verblijf tot 90 dagen. Uw paspoort moet geldig zijn tijdens het hele verblijf. Ik zet uw boekingsbevestigingen alvast klaar voor de douane-app (Visit Japan Web).';
   if (l.includes('weer'))
-    return 'Kyoto medio oktober: gemiddeld 14–22°C, af en toe regen, en het begin van de herfstkleuren — de esdoorns in Arashiyama beginnen dan net te kleuren. De beste ochtend voor de bamboetuin is direct na zonsopgang; zal ik een vroege wandeling inplannen?';
+    return 'Kyoto medio oktober: gemiddeld 14-22°C, af en toe regen, en het begin van de herfstkleuren, de esdoorns in Arashiyama beginnen dan net te kleuren. De beste ochtend voor de bamboetuin is direct na zonsopgang; zal ik een vroege wandeling inplannen?';
   if (l.includes('plan') || l.includes('dag') || l.includes('doen'))
-    return 'Voorstel voor 14 oktober:\n— 08:00 Arashiyama vóór de drukte\n— 11:30 lunch bij een sobameester in Sagano\n— 15:00 uw privé-theeceremonie in Gion (staat al vast)\n— 19:00 avondwandeling langs Pontocho\n\nZal ik de lunch laten reserveren?';
+    return 'Voorstel voor 14 oktober:\n• 08:00 Arashiyama vóór de drukte\n• 11:30 lunch bij een sobameester in Sagano\n• 15:00 uw privé-theeceremonie in Gion (staat al vast)\n• 19:00 avondwandeling langs Pontocho\n\nZal ik de lunch laten reserveren?';
   if (l.includes('restaurant') || l.includes('eten') || l.includes('diner'))
-    return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag — bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki of een counter-kaiseki in Higashiyama, beide via ons netwerk tegen normale prijs.';
-  return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Kyoto kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning — zeg het maar.';
+    return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki of een counter-kaiseki in Higashiyama, beide via ons netwerk tegen normale prijs.';
+  return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Kyoto kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.';
 }
 
 app.post('/api/ai', auth, async (req, res) => {
@@ -763,7 +763,7 @@ app.post('/api/ai', auth, async (req, res) => {
     .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }))
     .slice(-12);
   // De Claude API vereist dat het gesprek met een user-beurt begint; de
-  // proactieve opener van de AI staat vooraan als assistant — knip die eraf.
+  // proactieve opener van de AI staat vooraan als assistant, knip die eraf.
   while (history.length && history[0].role !== 'user') history.shift();
   if (!history.length || history[history.length - 1].role !== 'user') {
     return res.status(400).json({ error: 'Geen vraag ontvangen.' });
@@ -796,6 +796,6 @@ initRealtime();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`RTG-portaal draait op http://localhost:${PORT} — open http://localhost:${PORT}/portaal.html`);
+  console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/portaal.html`);
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 });

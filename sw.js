@@ -1,4 +1,4 @@
-/* RTG app — service worker: cachet de app-schil zodat de app installeerbaar
+/* RTG app, service worker: cachet de app-schil zodat de app installeerbaar
    is en offline opent. API-verkeer gaat altijd naar het netwerk. */
 const CACHE = 'rtg-app-v1';
 const SHELL = ['app.html', 'manifest.webmanifest', 'icon.svg'];

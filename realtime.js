@@ -1,4 +1,4 @@
-/* RTG realtime — gedeeld door het website-portaal en de app.
+/* RTG realtime, gedeeld door het website-portaal en de app.
    - live updates via Server-Sent Events (schermen werken bij zonder refresh)
    - notificaties (in-app belletje + systeemmelding als het scherm open is)
    - web-push registratie (systeemmelding als het scherm dicht is) */

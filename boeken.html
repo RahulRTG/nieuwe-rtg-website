@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Boeken via een partner — Rahul Travel Group</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Boeken via een partner, Rahul Travel Group</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -164,7 +165,7 @@
   .trip-body li{
     font-size:0.8rem;color:var(--grey);padding-left:1.1rem;position:relative;
   }
-  .trip-body li::before{content:"—";position:absolute;left:0;color:var(--burgundy);}
+  .trip-body li::before{content:",";position:absolute;left:0;color:var(--burgundy);}
   .trip-price{
     margin-top:1.5rem;border-top:1px solid var(--line);padding-top:1.25rem;
   }
@@ -330,7 +331,7 @@
   <div class="wrap hero-inner">
     <span class="kicker">Boeken zonder pas · via een partner</span>
     <h1>Boek via wie u <span class="accent">vertrouwt</span>.</h1>
-    <p class="deck">Geen lid? Via onze partners en creators boekt u toch de reizen die RTG voor haar leden inkoopt. Eén heldere totaalprijs, alles inbegrepen — en uw partner blijft uw aanspreekpunt, van boeking tot thuiskomst.</p>
+    <p class="deck">Geen lid? Via onze partners en creators boekt u toch de reizen die RTG voor haar leden inkoopt. Eén heldere totaalprijs, alles inbegrepen, en uw partner blijft uw aanspreekpunt, van boeking tot thuiskomst.</p>
   </div>
 </section>
 
@@ -341,7 +342,7 @@
 
 <section class="trips">
   <div class="wrap">
-    <div class="folio">N° 01 — De reizen</div>
+    <div class="folio">N° 01, De reizen</div>
     <span class="kicker">Gecureerd, tegen inkoop</span>
     <h2>Dezelfde reizen die onze leden boeken.</h2>
     <div class="trip-grid" id="tripGrid"></div>
@@ -350,13 +351,13 @@
 
 <section class="split-strip on-black">
   <div class="wrap">
-    <div class="folio">N° 02 — Waarom via een partner</div>
+    <div class="folio">N° 02, Waarom via een partner</div>
     <span class="kicker">Vertrouwd, geregeld, compleet</span>
     <h2>Boeken via een partner, geregeld door RTG.</h2>
-    <p class="deck">Uw partner kent u; wij kennen reizen. U boekt via het gezicht dat u vertrouwt, en RTG regelt daarachter alles — dezelfde inkoop, dezelfde afhandeling en dezelfde zorg als voor onze leden.</p>
+    <p class="deck">Uw partner kent u; wij kennen reizen. U boekt via het gezicht dat u vertrouwt, en RTG regelt daarachter alles: dezelfde inkoop, dezelfde afhandeling en dezelfde zorg als voor onze leden.</p>
     <div class="split-cards">
-      <div class="c"><b>Inkoop</b><span>Dezelfde reizen als onze leden</span><p>Elke reis komt uit de inkoopkanalen waar RTG voor haar leden boekt — geen doorverkochte pakketten.</p></div>
-      <div class="c"><b>Aanspreekpunt</b><span>Uw partner blijft betrokken</span><p>Uw boeking blijft gekoppeld aan de creator of het bedrijf via wie u kwam — vertrouwd, van begin tot eind.</p></div>
+      <div class="c"><b>Inkoop</b><span>Dezelfde reizen als onze leden</span><p>Elke reis komt uit de inkoopkanalen waar RTG voor haar leden boekt, geen doorverkochte pakketten.</p></div>
+      <div class="c"><b>Aanspreekpunt</b><span>Uw partner blijft betrokken</span><p>Uw boeking blijft gekoppeld aan de creator of het bedrijf via wie u kwam, vertrouwd, van begin tot eind.</p></div>
       <div class="c"><b>Afhandeling</b><span>RTG regelt alles</span><p>Bevestigingen, wijzigingen en zorg onderweg lopen via RTG, met dezelfde standaard als voor leden.</p></div>
     </div>
   </div>
@@ -365,10 +366,10 @@
 <section class="upsell">
   <div class="wrap upsell-inner">
     <div>
-      <div class="folio">N° 03 — Voor de volgende keer</div>
+      <div class="folio">N° 03, Voor de volgende keer</div>
       <span class="kicker">Rekent u even mee</span>
       <h2>Met een pas boekt u tegen inkoop.</h2>
-      <p>Leden betalen de nettoprijs plus een vaste, transparante bijdrage — daar zit niets tussen. Wie vaker reist, verdient de pas dus vanzelf terug. En u krijgt er De Salon, de persoonlijke AI en betalen met één tik bij.</p>
+      <p>Leden betalen de nettoprijs plus een vaste, transparante bijdrage, daar zit niets tussen. Wie vaker reist, verdient de pas dus vanzelf terug. En u krijgt er De Salon, de persoonlijke AI en betalen met één tik bij.</p>
       <a href="index.html#passen" class="btn" style="margin-top:2rem;">Bekijk de passen</a>
     </div>
     <div class="compare-mini" id="compareMini"></div>
@@ -403,7 +404,7 @@
   const $ = s => document.querySelector(s);
   const eur = n => '€ ' + n.toLocaleString('nl-NL');
 
-  /* Lokale demo-data — gebruikt wanneer de backend niet bereikbaar is.
+  /* Lokale demo-data, gebruikt wanneer de backend niet bereikbaar is.
      De klant ziet alleen totaalprijzen; de verdeling is interne administratie. */
   const PARTNERS_LOCAL = {
     NOVA:  {code:'NOVA',  name:'Nova van Dijk',            type:'influencer', handle:'@novatravels · 380k volgers'},
@@ -413,13 +414,13 @@
   let TRIPS = [
     {id:'kyoto-herfst', dest:'Kyoto', visual:'v-kyoto', title:'Kyoto in herfstkleur', dates:'8 dagen · oktober 2026', price:2760,
      desc:'Hoshinoya aan de rivier, privé-theeceremonie in Gion en de esdoorns van Arashiyama vóór de drukte.',
-     includes:['Vlucht business class','Hoshinoya Kyoto — 4 nachten','Ryokan Tawaraya — 3 nachten','Privétransfers & theeceremonie']},
+     includes:['Vlucht business class','Hoshinoya Kyoto, 4 nachten','Ryokan Tawaraya, 3 nachten','Privétransfers & theeceremonie']},
     {id:'lissabon-palacio', dest:'Lissabon', visual:'v-lissabon', title:'Palácio-weekend Lissabon', dates:'4 dagen · doorlopend', price:1127,
-     desc:'Een palácio voor de prijs van een gewoon hotel — hetzelfde adres waar onze leden over posten in De Salon.',
-     includes:['Vlucht & transfers','Palácio-suite — 3 nachten','Ontbijt & late check-out','Tafelreservering fado-avond']},
+     desc:'Een palácio voor de prijs van een gewoon hotel, hetzelfde adres waar onze leden over posten in De Salon.',
+     includes:['Vlucht & transfers','Palácio-suite, 3 nachten','Ontbijt & late check-out','Tafelreservering fado-avond']},
     {id:'marrakech-riad', dest:'Marrakech', visual:'v-marrakech', title:'Riad & woestijn Marrakech', dates:'5 dagen · doorlopend', price:1323,
-     desc:'Een riad in de medina, hammam en een avond in de Agafay-woestijn — ingekocht zoals wij dat voor leden doen.',
-     includes:['Vlucht & privétransfers','Riad — 4 nachten','Hammam & diner in de Agafay','Gids door de souks']}
+     desc:'Een riad in de medina, hammam en een avond in de Agafay-woestijn, ingekocht zoals wij dat voor leden doen.',
+     includes:['Vlucht & privétransfers','Riad, 4 nachten','Hammam & diner in de Agafay','Gids door de souks']}
   ];
 
   const API = {
@@ -457,7 +458,7 @@
           '<div class="avatar">' + partner.name[0] + '</div>' +
           '<div class="who"><b>U boekt via ' + partner.name + '</b>' +
             '<span>' + (partner.type === 'influencer' ? 'Creator · ' : 'Partnerbedrijf · ') + partner.handle + '</span></div>' +
-          '<div class="share">Geverifieerde RTG-partner. Uw boeking blijft aan ' + partner.name.split(' ')[0] + ' gekoppeld — zij blijven uw aanspreekpunt, van boeking tot thuiskomst.</div>' +
+          '<div class="share">Geverifieerde RTG-partner. Uw boeking blijft aan ' + partner.name.split(' ')[0] + ' gekoppeld, zij blijven uw aanspreekpunt, van boeking tot thuiskomst.</div>' +
         '</div>';
     } else {
       box.innerHTML =
@@ -507,7 +508,7 @@
           '<ul>' + t.includes.map(i => '<li>' + i + '</li>').join('') + '</ul>' +
           '<div class="trip-price">' +
             '<div class="total">' + eur(t.price) + '</div>' +
-            '<div class="split">Totaalprijs, alles inbegrepen — geen kosten achteraf.</div>' +
+            '<div class="split">Totaalprijs, alles inbegrepen, geen kosten achteraf.</div>' +
           '</div>' +
           '<button class="btn-book" data-trip="' + t.id + '">' + APPLE_SVG + 'Boek nu</button>' +
         '</div>' +
@@ -521,7 +522,7 @@
   function renderCompare(){
     const t = TRIPS[0];
     $('#compareMini').innerHTML =
-      '<div class="row"><span>' + t.title + ' — zonder pas</span><b>' + eur(t.price) + '</b></div>' +
+      '<div class="row"><span>' + t.title + ', zonder pas</span><b>' + eur(t.price) + '</b></div>' +
       '<div class="row win"><span>Met RTG Pass (nettoprijs + vaste bijdrage)</span><b>vanaf ' + eur(t.price - 170) + '</b></div>' +
       '<div class="row"><span>Uw voordeel als lid, op één reis</span><b>' + eur(170) + '</b></div>';
   }
@@ -544,14 +545,14 @@
       '<div class="sub">' + t.dates + (partner ? ' · via ' + partner.name : '') + '</div>' +
       '<div class="book-lines">' +
         t.includes.map(i => '<div class="rowline"><span>' + i + '</span><span>inbegrepen</span></div>').join('') +
-        '<div class="rowline total"><span>Totaal — alles inbegrepen</span><span>' + eur(t.price) + '</span></div>' +
+        '<div class="rowline total"><span>Totaal, alles inbegrepen</span><span>' + eur(t.price) + '</span></div>' +
       '</div>' +
       '<div class="book-form">' +
         '<input id="bkName" placeholder="Uw naam">' +
         '<input id="bkEmail" type="email" placeholder="E-mailadres">' +
       '</div>' +
       '<div class="book-actions">' +
-        '<button class="btn-pay" id="bkPay">' + APPLE_SVG + 'Boek en betaal — ' + eur(t.price) + '</button>' +
+        '<button class="btn-pay" id="bkPay">' + APPLE_SVG + 'Boek en betaal, ' + eur(t.price) + '</button>' +
         '<button class="linkish" id="bkCancel">Annuleren</button>' +
       '</div>';
     $('#book-overlay').classList.add('open');
@@ -579,7 +580,7 @@
           ref = data.ref;
         } catch (e) {
           pw.classList.remove('open');
-          toast(e.message || 'Boeken mislukt — probeer het opnieuw.');
+          toast(e.message || 'Boeken mislukt, probeer het opnieuw.');
           return;
         }
       }
@@ -594,7 +595,7 @@
             '<h3>Geboekt.</h3>' +
             '<div class="ref">Referentie ' + ref + '</div>' +
             '<p>De bevestiging is onderweg naar ' + email + '. Wij nemen binnen 24 uur contact op voor de reisdetails.</p>' +
-            (partner ? '<p class="partner-line">Geboekt via ' + partner.name + ' — zij blijven uw aanspreekpunt.</p>' : '') +
+            (partner ? '<p class="partner-line">Geboekt via ' + partner.name + ', zij blijven uw aanspreekpunt.</p>' : '') +
             '<p style="margin-top:1.25rem;">Vaker zo reizen, tegen ledencondities?</p>' +
             '<a href="index.html#passen" class="btn" style="margin-top:1rem;">Bekijk de passen</a>' +
             '<div style="margin-top:1rem;"><button class="linkish" id="bkClose">Sluiten</button></div>' +

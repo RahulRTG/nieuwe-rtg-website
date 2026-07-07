@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0C0C0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>RTG — de app</title>
+<title>RTG, de app</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -493,6 +493,57 @@
   .paycard.scanning .icon{animation:pulse 0.9s ease-in-out infinite;}
   .paycard.done .lbl{color:#2E6B4F;font-weight:600;}
 
+  /* ter plaatse: leveranciers, orders, menu-overlay */
+  .sup-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.15rem;margin-top:0.8rem;display:flex;align-items:center;gap:0.9rem;}
+  .sup-card .ic{font-size:1.6rem;flex-shrink:0;}
+  .sup-card .t{flex:1;min-width:0;}
+  .sup-card .t b{display:block;font-size:0.92rem;font-weight:600;}
+  .sup-card .t span{font-size:0.72rem;color:var(--soft);}
+  .sup-card .go{background:#fff;color:#000;border:none;border-radius:999px;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
+  .sup-card .go.ghost{background:none;color:var(--muted);border:1px solid var(--line);}
+  .sec-label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 0.2rem;}
+  .myorder{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.05rem;margin-top:0.7rem;}
+  .myorder .r1{display:flex;justify-content:space-between;align-items:center;gap:0.6rem;}
+  .myorder .nm{font-weight:600;font-size:0.86rem;}
+  .myorder .sub2{font-size:0.7rem;color:var(--soft);margin-top:0.1rem;}
+  .myorder .amt{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
+  .mo-pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
+  .mo-pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .mo-pill.bereiding{color:#C99A2E;border-color:rgba(201,154,46,0.4);}
+  .mo-pill.klaar,.mo-pill.geserveerd{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .myorder .acts{margin-top:0.7rem;display:flex;gap:0.5rem;align-items:center;}
+  .mo-pay{background:#fff;color:#000;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
+  .mo-pay svg{width:12px;height:12px;}
+  .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
+
+  .menu-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:80;display:none;}
+  .menu-scrim.open{display:block;}
+  .menu-sheet{position:absolute;left:0;right:0;bottom:0;z-index:81;background:var(--bg);border-top:1px solid var(--line);border-radius:20px 20px 0 0;max-height:88%;display:none;flex-direction:column;}
+  .menu-sheet.open{display:flex;}
+  .ms-head{padding:1.1rem 1.25rem 0.9rem;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);}
+  .ms-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
+  .ms-head span{display:block;font-size:0.68rem;color:var(--soft);margin-top:0.15rem;}
+  .ms-close{background:none;border:none;color:var(--muted);font-size:1rem;}
+  .ms-body{flex:1;overflow-y:auto;padding:0.5rem 1.25rem 1rem;}
+  .ms-cat{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin:1rem 0 0.4rem;}
+  .ms-item{padding:0.8rem 0;border-bottom:1px solid var(--line);display:flex;gap:0.8rem;align-items:flex-start;}
+  .ms-item .info{flex:1;min-width:0;}
+  .ms-item .nm{font-weight:600;font-size:0.86rem;}
+  .ms-item .ds{font-size:0.74rem;color:var(--muted);margin-top:0.2rem;}
+  .ms-item .alg{margin-top:0.35rem;display:flex;gap:0.3rem;flex-wrap:wrap;}
+  .ms-item .alg span{font-size:0.58rem;color:#C99A2E;border:1px solid rgba(201,154,46,0.3);border-radius:999px;padding:0.12rem 0.45rem;}
+  .ms-item .side{text-align:right;flex-shrink:0;}
+  .ms-item .pr{font-family:'Bodoni Moda',serif;font-size:0.95rem;}
+  .qty{display:inline-flex;align-items:center;gap:0.5rem;margin-top:0.4rem;}
+  .qty button{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:0.9rem;line-height:1;}
+  .qty b{min-width:14px;text-align:center;font-size:0.85rem;}
+  .ms-foot{border-top:1px solid var(--line);padding:1rem 1.25rem calc(1rem + env(safe-area-inset-bottom,0px));}
+  .ms-note{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;}
+  .ms-tag{display:flex;align-items:center;gap:0.5rem;margin-top:0.7rem;font-size:0.8rem;color:var(--muted);}
+  .ms-tag input{width:18px;height:18px;accent-color:var(--burgundy);}
+  .ms-order{margin-top:0.8rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
+  .ms-order:disabled{opacity:0.4;}
+
   #toast{
     position:absolute;
     bottom:calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
@@ -514,13 +565,13 @@
     <div class="logo">Rahul Travel Group</div>
     <div class="tagline">Experience the Elite Class</div>
     <h1>De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
-    <p class="deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon — en uw account draait op uw codenaam, niet op uw echte naam.</p>
+    <p class="deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, en uw account draait op uw codenaam, niet op uw echte naam.</p>
     <div class="gate-list">
       <button class="gate-btn t-rtg" data-login="rtg"><span class="dot"></span><span><b>S. Janssen</b><span>RTG Pass · codenaam Zilveren Valk</span></span></button>
       <button class="gate-btn t-lifestyle" data-login="lifestyle"><span class="dot"></span><span><b>I. van Rhijn</b><span>Lifestyle Pass · codenaam Gouden Ibis</span></span></button>
       <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>A. de Vries</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
     </div>
-    <p class="note">Conceptdemo — de app is er voor leden. Kies een profiel om in te loggen.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
+    <p class="note">Conceptdemo, de app is er voor leden. Kies een profiel om in te loggen.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
   </div>
 
   <!-- app -->
@@ -560,12 +611,12 @@
         <h2>Uw reis.</h2>
         <p class="sub" id="tripSub"></p>
         <div class="card" id="tripList"></div>
-        <p class="sub" style="margin-top:1rem;">Wijzigen of toevoegen? Vraag het de AI — één bericht is genoeg.</p>
+        <p class="sub" style="margin-top:1rem;">Wijzigen of toevoegen? Vraag het de AI, één bericht is genoeg.</p>
       </div>
 
       <div class="view" data-view="betalen">
         <h2>Betalen.</h2>
-        <p class="sub">Eén tik — Face ID. Uw betalingen staan op uw codenaam.</p>
+        <p class="sub">Eén tik, Face ID. Uw betalingen staan op uw codenaam.</p>
         <div class="card" id="payList"></div>
         <div id="payAllWrap"></div>
       </div>
@@ -583,8 +634,15 @@
 
       <div class="view" data-view="salon">
         <h2>De Salon.</h2>
-        <p class="sub">Posts verschijnen 7 dagen na verblijf — voor uw veiligheid.</p>
+        <p class="sub">Posts verschijnen 7 dagen na verblijf, voor uw veiligheid.</p>
         <div id="feed"></div>
+      </div>
+
+      <div class="view" data-view="terplaatse">
+        <h2>Ter plaatse.</h2>
+        <p class="sub" id="tpSub">Bestel, betaal en reserveer bij RTG-partners op uw bestemming.</p>
+        <div id="myOrders"></div>
+        <div id="supplierList"></div>
       </div>
 
     </div>
@@ -595,6 +653,7 @@
       <button data-tab="betalen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg>Betalen</button>
       <button data-tab="ai"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>AI</button>
       <button data-tab="salon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="10.5" r="2.4"/><path d="M3.5 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><path d="M14.5 18.5c.5-2.2 1.6-3.4 3.4-3.4 1.4 0 2.6.8 3.1 2.4"/></svg>Salon</button>
+      <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Ter plaatse</button>
     </div>
   </div>
 
@@ -605,6 +664,17 @@
       <div class="icon" id="payIcon"></div>
       <div class="lbl" id="payLbl">Betalen met Face ID…</div>
     </div>
+  </div>
+
+  <!-- menu / bestel-overlay -->
+  <div id="menu-scrim" class="menu-scrim"></div>
+  <div id="menu-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b id="msName"></b><span id="msMeta"></span></div>
+      <button class="ms-close" id="msClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body" id="msBody"></div>
+    <div class="ms-foot" id="msFoot"></div>
   </div>
 
   <div id="toast"></div>
@@ -627,25 +697,25 @@
 
   let user = null;
   let invoices = [
-    {id:'RTG-2026-0158', desc:'Kyoto — Hoshinoya, 4 nachten', netto:2840, bijdrage:190, status:'open', date:'Vervalt 28 juli 2026'},
-    {id:'RTG-2026-0141', desc:'KLM Amsterdam – Osaka, business class (2 pers.)', netto:3120, bijdrage:210, status:'open', date:'Vervalt 15 augustus 2026'},
-    {id:'RTG-2026-0093', desc:'Lissabon — Palácio weekend, incl. transfers', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
+    {id:'RTG-2026-0158', desc:'Kyoto, Hoshinoya, 4 nachten', netto:2840, bijdrage:190, status:'open', date:'Vervalt 28 juli 2026'},
+    {id:'RTG-2026-0141', desc:'KLM Amsterdam - Osaka, business class (2 pers.)', netto:3120, bijdrage:210, status:'open', date:'Vervalt 15 augustus 2026'},
+    {id:'RTG-2026-0093', desc:'Lissabon, Palácio weekend, incl. transfers', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
     {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
   ];
   let trip = {
-    dest:'Kyoto', dates:'12 – 19 oktober 2026', days:98,
+    dest:'Kyoto', dates:'12 - 19 oktober 2026', days:98,
     items:[
-      {when:'12 okt', title:'KLM KL867 — Amsterdam → Osaka Kansai', sub:'Business class · stoelen 2A/2C', status:'paid', label:'Bevestigd'},
+      {when:'12 okt', title:'KLM KL867, Amsterdam → Osaka Kansai', sub:'Business class · stoelen 2A/2C', status:'paid', label:'Bevestigd'},
       {when:'12 okt', title:'Privétransfer Kansai → Hoshinoya', sub:'Chauffeur bij aankomsthal', status:'paid', label:'Bevestigd'},
-      {when:'12–16 okt', title:'Hoshinoya Kyoto — Riverside suite', sub:'4 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
+      {when:'12-16 okt', title:'Hoshinoya Kyoto, Riverside suite', sub:'4 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
       {when:'14 okt', title:'Privé-theeceremonie, Gion', sub:'Met vertaler · 15:00 uur', status:'paid', label:'Bevestigd'},
-      {when:'15 okt', title:'Diner — Kikunoi Honten (3★)', sub:'Kaiseki · 19:30 uur', status:'req', label:'In aanvraag'},
-      {when:'16–19 okt', title:'Ryokan Tawaraya', sub:'3 nachten, kaiseki-halfpension', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
+      {when:'15 okt', title:'Diner, Kikunoi Honten (3★)', sub:'Kaiseki · 19:30 uur', status:'req', label:'In aanvraag'},
+      {when:'16-19 okt', title:'Ryokan Tawaraya', sub:'3 nachten, kaiseki-halfpension', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
     ]
   };
   let posts = [
     {id:1, author:'Isabelle van Rhijn', tier:'lifestyle', place:'Kyoto', visual:'v-kyoto',
-     text:'De theeceremonie die mijn concierge regelde — geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
+     text:'De theeceremonie die mijn concierge regelde, geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
      likes:124, liked:false, comments:[{who:'Alexander de Vries', tier:'business', text:'Staat genoteerd voor november. Dank.'}]},
     {id:2, author:'Alexander de Vries', tier:'business', place:'Zürich', visual:'v-zurich',
      text:'Ochtendvlucht, twee vergaderingen, om 18:00 aan het meer. De Business Pass plant strakker dan mijn assistent ooit deed.',
@@ -654,7 +724,7 @@
      text:'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen bestaan echt.',
      likes:203, liked:false, comments:[
        {who:'Nadia Karim', tier:'rtg', text:'Welk palácio was dit? Sta op het punt te boeken!'},
-       {who:'Alexander de Vries', tier:'business', text:'Sophie, dit wil ik in november zien — welke wijk was dit?'}
+       {who:'Alexander de Vries', tier:'business', text:'Sophie, dit wil ik in november zien, welke wijk was dit?'}
      ]},
     {id:4, author:'Marcus Bergwerff', tier:'business', place:'Singapore', visual:'v-singapore',
      text:'Layover van 9 uur omgezet in een middag Raffles + spa. De AI stelde het voor, mijn concierge bevestigde binnen 10 minuten.',
@@ -741,7 +811,8 @@
     } catch (e) { return; }
     if (scope === 'payments'){ renderPay(); renderHome(); renderTrip(); }
     else if (scope === 'salon'){ renderSalon(); renderHome(); }
-    else { renderPay(); renderHome(); renderTrip(); renderSalon(); }
+    else if (scope === 'orders'){ renderTerPlaatse(); }
+    else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); }
   }
 
   function timeAgo(iso){
@@ -789,7 +860,7 @@
   $('#notifPush').addEventListener('click', async () => {
     if (!window.RTGRealtime) return;
     const r = await RTGRealtime.enablePush();
-    toast(r === 'on' ? 'Push-notificaties staan aan.' : r === 'denied' ? 'Toestemming geweigerd — zet meldingen aan in uw instellingen.' : 'Push is hier niet beschikbaar.');
+    toast(r === 'on' ? 'Push-notificaties staan aan.' : r === 'denied' ? 'Toestemming geweigerd, zet meldingen aan in uw instellingen.' : 'Push is hier niet beschikbaar.');
     renderBell();
   });
 
@@ -810,8 +881,135 @@
     renderPay();
     renderAI();
     renderSalon();
+    renderTerPlaatse();
     openTab('home');
   }
+
+  /* ---------- ter plaatse: bestellen bij RTG-partners ---------- */
+  const ALG_ICON = '<svg viewBox="0 0 64 64" fill="none" stroke="#0C0C0B" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/><path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/><circle cx="23.5" cy="26.5" r="2.6" fill="#0C0C0B"/><circle cx="40.5" cy="26.5" r="2.6" fill="#0C0C0B"/><path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
+  let suppliers = [];
+  let myOrders = [];
+  let menuState = null; // { supplier, menu, qty:{}, note, tag }
+
+  async function renderTerPlaatse(){
+    if (!API.live){
+      $('#supplierList').innerHTML = '<div class="empty" style="padding:2rem 1rem;color:var(--soft);text-align:center;font-size:0.85rem;">Ter plaatse werkt via de RTG-server. Start de app met de backend om te bestellen bij partners.</div>';
+      return;
+    }
+    try {
+      const [sd, od] = await Promise.all([API.call('/suppliers', { city: trip.dest }), API.call('/orders/mine')]);
+      suppliers = sd.suppliers || [];
+      myOrders = od.orders || [];
+      $('#tpSub').textContent = 'RTG-partners in ' + (sd.city || trip.dest) + ', bestel, betaal en reserveer.';
+    } catch (e) { return; }
+
+    // mijn lopende bestellingen bovenaan
+    const active = myOrders.filter(o => o.status !== 'terugbetaald');
+    $('#myOrders').innerHTML = active.length
+      ? '<div class="sec-label">Mijn bestellingen</div>' + active.map(o => {
+          const pc = o.status === 'nieuw' ? 'nieuw' : o.status === 'in bereiding' ? 'bereiding' : 'klaar';
+          return '<div class="myorder" data-ref="' + o.ref + '">' +
+            '<div class="r1"><div><div class="nm">' + o.supplierName + '</div><div class="sub2">' + o.items.reduce((n,i)=>n+i.qty,0) + ' item(s) · ' + timeAgo(o.at) + '</div></div>' +
+              '<div style="text-align:right;"><div class="amt">' + eur(o.total) + '</div><span class="mo-pill ' + pc + '">' + o.status + '</span></div></div>' +
+            '<div class="acts">' + (o.paid
+              ? '<span class="mo-paid">✓ Betaald</span>'
+              : '<button class="mo-pay js-opay">' + FID_MINI + 'Betaal met Face ID</button>') +
+              (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ getagd voor Salon</span>' : '') +
+            '</div></div>';
+        }).join('')
+      : '';
+    $('#myOrders').querySelectorAll('.myorder').forEach(el => {
+      const o = active.find(x => x.ref === el.dataset.ref);
+      const pb = el.querySelector('.js-opay');
+      if (pb) pb.addEventListener('click', () => payOrder(o));
+    });
+
+    // partners
+    $('#supplierList').innerHTML = '<div class="sec-label">Partners op uw bestemming</div>' + suppliers.map(s => {
+      const canOrder = s.hasMenu;
+      return '<div class="sup-card">' +
+        '<span class="ic">' + (s.icon || '📍') + '</span>' +
+        '<div class="t"><b>' + s.name + '</b><span>' + s.typeLabel + ' · ' + s.city + '</span></div>' +
+        (canOrder
+          ? '<button class="go" data-menu="' + s.code + '">Bekijk kaart</button>'
+          : '<button class="go ghost" data-loc="' + s.code + '">Locatie</button>') +
+      '</div>';
+    }).join('');
+    $('#supplierList').querySelectorAll('[data-menu]').forEach(b => b.addEventListener('click', () => openMenu(b.dataset.menu)));
+    $('#supplierList').querySelectorAll('[data-loc]').forEach(b => b.addEventListener('click', () => {
+      const s = suppliers.find(x => x.code === b.dataset.loc);
+      toast(s.name + ', ' + (s.loc && s.loc.label ? s.loc.label : 'locatie gedeeld zodra u onderweg bent') + '.');
+    }));
+  }
+
+  const FID_MINI = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/><path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/><circle cx="23.5" cy="26.5" r="3" fill="currentColor"/><circle cx="40.5" cy="26.5" r="3" fill="currentColor"/><path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
+
+  async function openMenu(code){
+    let data;
+    try { data = await API.call('/supplier/menu/get', { code }); }
+    catch (e) { toast(e.message); return; }
+    menuState = { supplier: data.supplier, menu: data.menu, qty: {}, note: '', tag: false };
+    $('#msName').textContent = data.supplier.name;
+    $('#msMeta').textContent = data.supplier.typeLabel + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
+    renderMenuSheet();
+    $('#menu-sheet').classList.add('open');
+    $('#menu-scrim').classList.add('open');
+  }
+
+  function renderMenuSheet(){
+    const m = menuState.menu;
+    const cats = [...new Set(m.map(x => x.cat))];
+    $('#msBody').innerHTML = cats.map(c =>
+      '<div class="ms-cat">' + c + '</div>' + m.filter(x => x.cat === c).map(x => {
+        const q = menuState.qty[x.id] || 0;
+        return '<div class="ms-item" data-id="' + x.id + '">' +
+          '<div class="info"><div class="nm">' + x.name + '</div>' +
+            (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
+            (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + a + '</span>').join('') + '</div>' : '') +
+          '</div>' +
+          '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +
+            '<div class="qty"><button class="js-minus">−</button><b>' + q + '</b><button class="js-plus">+</button></div>' +
+          '</div></div>';
+      }).join('')
+    ).join('');
+    $('#msBody').querySelectorAll('.ms-item').forEach(el => {
+      const id = el.dataset.id;
+      el.querySelector('.js-plus').addEventListener('click', () => { menuState.qty[id] = (menuState.qty[id]||0)+1; renderMenuSheet(); });
+      el.querySelector('.js-minus').addEventListener('click', () => { menuState.qty[id] = Math.max(0,(menuState.qty[id]||0)-1); renderMenuSheet(); });
+    });
+    const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
+    const count = Object.values(menuState.qty).reduce((a,b)=>a+b,0);
+    $('#msFoot').innerHTML =
+      '<input class="ms-note" id="msNote" placeholder="Allergie of opmerking (bijv. geen noten)" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
+      '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> Tag dit voor De Salon (7 dagen na verblijf)</label>' +
+      '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? 'Bestel ' + count + ' item(s), ' + eur(total) : 'Kies gerechten') + '</button>';
+    $('#msNote').addEventListener('input', e => menuState.note = e.target.value);
+    $('#msTag').addEventListener('change', e => menuState.tag = e.target.checked);
+    const ob = $('#msOrder');
+    if (count) ob.addEventListener('click', placeOrder);
+  }
+
+  async function placeOrder(){
+    const items = Object.entries(menuState.qty).filter(([,q]) => q > 0).map(([id,qty]) => ({ id, qty }));
+    if (!items.length) return;
+    try {
+      await API.call('/order', { supplierCode: menuState.supplier.code, items, allergyNote: menuState.note, tagSalon: menuState.tag });
+    } catch (e) { toast(e.message); return; }
+    $('#menu-sheet').classList.remove('open');
+    $('#menu-scrim').classList.remove('open');
+    toast('Bestelling geplaatst bij ' + menuState.supplier.name + '.');
+    renderTerPlaatse();
+  }
+
+  function payOrder(o){
+    payWithFaceId(eur(o.total), async () => {
+      await API.call('/order/pay', { ref: o.ref });
+      return o;
+    }, { message: () => 'Betaald aan ' + o.supplierName + '.', after: () => renderTerPlaatse() });
+  }
+
+  $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
+  $('#menu-scrim').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
 
   /* ---------- home + codenaam ---------- */
 
@@ -841,7 +1039,7 @@
     $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · lid sinds ' + user.since;
 
     $('#codecard').innerHTML =
-      '<div class="label">Uw codenaam — uw identiteit in onze systemen</div>' +
+      '<div class="label">Uw codenaam, uw identiteit in onze systemen</div>' +
       '<div class="cn">' + user.codename + '</div>' +
       '<div class="row">' +
         '<div>' +
@@ -872,7 +1070,7 @@
     $('#homeSalon').innerHTML =
       '<div class="label">De Salon</div>' +
       '<div class="big gold">' + creatorLikes.toLocaleString('nl-NL') + '</div>' +
-      '<div class="meta">likes dit kwartaal — content levert voorrang, korting en gratis diensten op</div>' +
+      '<div class="meta">likes dit kwartaal, content levert voorrang, korting en gratis diensten op</div>' +
       '<button class="go" data-goto="salon">Naar De Salon →</button>';
     document.querySelectorAll('#content [data-goto]').forEach(b =>
       b.addEventListener('click', () => openTab(b.dataset.goto)));
@@ -917,8 +1115,9 @@
   }
 
   let payBusy = false;
-  function payWithFaceId(amount, doPay){
+  function payWithFaceId(amount, doPay, opts){
     if (payBusy) return;
+    opts = opts || {};
     payBusy = true;
     const pw = $('#paywait'), card = pw.querySelector('.paycard');
     $('#payAmt').textContent = amount;
@@ -928,15 +1127,16 @@
     pw.classList.add('open');
     setTimeout(async () => {
       try {
-        const foundation = await doPay();
+        const result = await doPay();
         card.classList.remove('scanning'); card.classList.add('done');
         $('#payIcon').innerHTML = CHECK;
         $('#payLbl').textContent = 'Bevestigd';
         setTimeout(() => {
           pw.classList.remove('open');
           payBusy = false;
-          toast('Betaald. ' + eur(foundation) + ' gaat naar de RTFoundation.');
-          renderPay(); renderHome(); renderTrip();
+          if (opts.message) toast(opts.message(result));
+          else { toast('Betaald. ' + eur(result) + ' gaat naar de RTFoundation.'); renderPay(); renderHome(); renderTrip(); }
+          if (opts.after) opts.after(result);
         }, 700);
       } catch (e) {
         pw.classList.remove('open');
@@ -962,7 +1162,7 @@
       '</div>';
     }).join('');
     $('#payAllWrap').innerHTML = open.length
-      ? '<button class="btn-pay payall" id="payAll">' + FID + 'Betaal alles — ' + eur(openSum) + '</button>'
+      ? '<button class="btn-pay payall" id="payAll">' + FID + 'Betaal alles, ' + eur(openSum) + '</button>'
       : '';
     document.querySelectorAll('.js-pay').forEach(b =>
       b.addEventListener('click', () => payWithFaceId(eur(Number(b.dataset.amt)), () => executePay(b.dataset.inv))));
@@ -981,12 +1181,12 @@
     const open = invoices.filter(i => i.status === 'open');
     if (open.length){
       const sum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
-      lines.push('— Er ' + (open.length === 1 ? 'staat nog 1 betaling' : 'staan nog ' + open.length + ' betalingen') +
+      lines.push('• Er ' + (open.length === 1 ? 'staat nog 1 betaling' : 'staan nog ' + open.length + ' betalingen') +
         ' open (' + eur(sum) + '). Eén tik in Betalen en het is geregeld.');
     }
     const pending = trip.items.find(i => i.status === 'req');
-    if (pending) lines.push('— ' + pending.title.replace('Diner — ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging.');
-    lines.push('— Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.');
+    if (pending) lines.push('• ' + pending.title.replace('Diner, ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging.');
+    lines.push('• Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.');
     return lines.join('\n');
   }
 
@@ -995,16 +1195,16 @@
     if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
       return 'Geregeld. De paklijst staat klaar (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00, avondwandeling langs Pontocho.\n\nIk bewaak nu de bevestiging van Kikunoi Honten. U hoeft niets te doen.';
     if (l.includes('inpak') || l.includes('paklijst'))
-      return 'Voor Kyoto in oktober (14–22°C, kans op regen):\n— Lichte lagen + regenjas\n— Nette schoenen die makkelijk uitgaan\n— Ingetogen kleding voor Kikunoi Honten\n— Adapter type A\n\nZal ik er een afvinklijst van maken?';
+      return 'Voor Kyoto in oktober (14-22°C, kans op regen):\n• Lichte lagen + regenjas\n• Nette schoenen die makkelijk uitgaan\n• Ingetogen kleding voor Kikunoi Honten\n• Adapter type A\n\nZal ik er een afvinklijst van maken?';
     if (l.includes('visum') || l.includes('paspoort'))
       return 'Voor Japan heeft u geen visum nodig tot 90 dagen. Ik zet uw boekingsbevestigingen klaar voor Visit Japan Web.';
     if (l.includes('weer'))
-      return 'Kyoto medio oktober: 14–22°C, af en toe regen, het begin van de herfstkleuren. Zal ik een vroege wandeling door Arashiyama inplannen?';
+      return 'Kyoto medio oktober: 14-22°C, af en toe regen, het begin van de herfstkleuren. Zal ik een vroege wandeling door Arashiyama inplannen?';
     if (l.includes('plan') || l.includes('dag'))
-      return 'Voorstel voor 14 oktober:\n— 08:00 Arashiyama vóór de drukte\n— 11:30 lunch in Sagano\n— 15:00 uw theeceremonie in Gion\n— 19:00 avondwandeling Pontocho\n\nZal ik de lunch reserveren?';
+      return 'Voorstel voor 14 oktober:\n• 08:00 Arashiyama vóór de drukte\n• 11:30 lunch in Sagano\n• 15:00 uw theeceremonie in Gion\n• 19:00 avondwandeling Pontocho\n\nZal ik de lunch reserveren?';
     if (l.includes('restaurant') || l.includes('diner') || l.includes('eten'))
-      return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag — bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki.';
-    return 'Daar kom ik vandaag nog op terug. Ik kan alvast helpen met de paklijst, documenten, het weer of een dagplan — zeg het maar.';
+      return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki.';
+    return 'Daar kom ik vandaag nog op terug. Ik kan alvast helpen met de paklijst, documenten, het weer of een dagplan, zeg het maar.';
   }
 
   function bubble(text, who){
@@ -1062,7 +1262,7 @@
           '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>Reageren (' + p.comments.length + ')</button>' +
         '</div>' +
         '<div class="comments">' +
-          '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b> — ' + c.text + '</div>').join('') + '</div>' +
+          '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b>, ' + c.text + '</div>').join('') + '</div>' +
           '<div class="cform"><input placeholder="Schrijf een reactie…"><button>Plaats</button></div>' +
         '</div>' +
       '</article>';
@@ -1087,7 +1287,7 @@
         b.addEventListener('click', e => {
           e.preventDefault();
           toast(user.tier === 'rtg'
-            ? 'Met de RTG Pass reageert u met RTG-leden — of met wie u eerst aanspreekt.'
+            ? 'Met de RTG Pass reageert u met RTG-leden, of met wie u eerst aanspreekt.'
             : 'Reageren is hier niet beschikbaar.');
         });
       });
@@ -1101,7 +1301,7 @@
         post.comments.push({who: user.full, tier: user.tier, text: inp.value.trim()});
         const d = document.createElement('div');
         d.className = 'comment';
-        d.innerHTML = '<b>' + user.full + '</b> — ' + inp.value.trim().replace(/</g, '&lt;');
+        d.innerHTML = '<b>' + user.full + '</b>, ' + inp.value.trim().replace(/</g, '&lt;');
         el.querySelector('.clist').appendChild(d);
         inp.value = '';
         commBtn.textContent = 'Reageren (' + post.comments.length + ')';

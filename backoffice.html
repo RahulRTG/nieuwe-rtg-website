@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>RTG Backoffice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.55);--soft:rgba(244,241,236,0.38);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-0.01em;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
+  a{color:inherit;text-decoration:none;}
+  input{font-family:'Inter',sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem);}
+
+  header{border-bottom:1px solid var(--line);padding:1.1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;}
+  .brand{font-family:'Bodoni Moda',serif;font-size:1.1rem;}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:0.56rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);}
+  .live{display:inline-flex;align-items:center;gap:0.45rem;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+  .live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(76,154,117,0.2);}
+
+  /* login */
+  #gate{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem;}
+  .gate-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:2.25rem;}
+  .gate-card .k{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+  .gate-card h1{font-size:1.7rem;margin-top:0.75rem;}
+  .gate-card p{margin-top:0.6rem;font-size:0.85rem;color:var(--muted);}
+  .gate-card input{width:100%;margin-top:1.5rem;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0.85rem 1rem;color:var(--txt);font-size:0.95rem;letter-spacing:0.08em;text-transform:uppercase;outline:none;}
+  .gate-card button{width:100%;margin-top:0.9rem;background:#fff;color:#000;border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
+  .gate-card .hint{margin-top:1rem;font-size:0.72rem;color:var(--soft);}
+
+  #app{display:none;padding:2rem 0 4rem;}
+  #app.on{display:block;}
+  .stat{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+  .stat .b{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.25rem;}
+  .stat .l{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
+  .stat .v{font-family:'Bodoni Moda',serif;font-size:1.8rem;margin-top:0.3rem;}
+  .stat .v.a{color:var(--burgundy);} .stat .v.g{color:var(--gold);}
+  @media (max-width:720px){.stat{grid-template-columns:repeat(2,1fr);}}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  @media (max-width:860px){.cols{grid-template-columns:1fr;}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .panel h2{font-size:1.15rem;padding:1.1rem 1.25rem;border-bottom:1px solid var(--line);}
+  .panel .rows{max-height:440px;overflow-y:auto;}
+  .row{padding:0.9rem 1.25rem;border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .row .r1{display:flex;justify-content:space-between;gap:0.8rem;align-items:baseline;}
+  .row .nm{font-weight:600;font-size:0.88rem;}
+  .row .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
+  .row .amt{font-family:'Bodoni Moda',serif;font-size:1.05rem;white-space:nowrap;}
+  .row .amt.g{color:var(--gold);}
+  .pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.22rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
+  .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .pill.bereiding{color:var(--amber);}
+  .pill.klaar,.pill.geserveerd{color:var(--green);}
+  .empty{padding:2.5rem 1.25rem;text-align:center;color:var(--soft);font-size:0.85rem;}
+  .flash{animation:flash 1.6s ease;}
+  @keyframes flash{0%{background:rgba(194,58,94,0.18);}100%{background:transparent;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Rahul Travel Group<small>Backoffice</small></div>
+    <span class="live" id="liveInd" style="display:none;"><span class="dot"></span>Live</span>
+  </div>
+</header>
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="k">Backoffice</div>
+    <h1>Inloggen</h1>
+    <p>Live overzicht van alle dynamische prijzen, bestellingen en ritten via RTG-partners.</p>
+    <input id="code" placeholder="Backoffice-code" value="RTG-OFFICE">
+    <button id="loginBtn">Inloggen</button>
+    <div class="hint">Demo-code: RTG-OFFICE</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="wrap">
+    <div class="stat" id="stat"></div>
+    <div class="cols">
+      <div class="panel">
+        <h2>Dynamische prijzen</h2>
+        <div class="rows" id="prices"></div>
+      </div>
+      <div class="panel">
+        <h2>Bestellingen &amp; ritten</h2>
+        <div class="rows" id="orders"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const eur = n => '€ ' + Number(n).toLocaleString('nl-NL');
+  let token = null, state = null, source = null;
+  const enabled = location.protocol === 'http:' || location.protocol === 'https:';
+
+  async function call(path, body){
+    const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(token?{'Authorization':'Bearer '+token}:{})}, body: JSON.stringify(body||{}) });
+    const d = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d.error||'Fout');
+    return d;
+  }
+  function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return 'zojuist'; const m=Math.round(s/60); if(m<60)return m+' min'; const h=Math.round(m/60); if(h<24)return h+' u'; return Math.round(h/24)+' d'; }
+
+  $('#loginBtn').addEventListener('click', login);
+  $('#code').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
+
+  async function login(){
+    if (!enabled){ alert('Start de RTG-server (npm start) om de backoffice te gebruiken.'); return; }
+    try {
+      const d = await call('/office/login', { code: $('#code').value.trim() });
+      token = d.token; state = d.state;
+    } catch(e){ alert(e.message); return; }
+    $('#gate').style.display = 'none';
+    $('#app').classList.add('on');
+    $('#liveInd').style.display = 'inline-flex';
+    render();
+    stream();
+  }
+
+  async function refresh(){ try { state = (await call('/office/state')).state; render(); } catch(e){} }
+
+  function render(){
+    const paid = state.orders.filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
+    $('#stat').innerHTML =
+      '<div class="b"><div class="l">Partners</div><div class="v">'+state.suppliers.length+'</div></div>' +
+      '<div class="b"><div class="l">Prijsvoorstellen</div><div class="v a">'+state.prices.length+'</div></div>' +
+      '<div class="b"><div class="l">Bestellingen</div><div class="v a">'+state.orders.length+'</div></div>' +
+      '<div class="b"><div class="l">Omzet via partners</div><div class="v g">'+eur(paid)+'</div></div>';
+
+    $('#prices').innerHTML = state.prices.length ? state.prices.map(p =>
+      '<div class="row"><div class="r1"><div><div class="nm">'+p.supplierName+'</div><div class="sub">'+p.service+' · '+timeAgo(p.at)+' geleden</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
+    ).join('') : '<div class="empty">Nog geen prijzen. Zodra een partner een dynamische prijs doorgeeft, verschijnt die hier live.</div>';
+
+    $('#orders').innerHTML = state.orders.length ? state.orders.map(o => {
+      const pc = o.status==='nieuw'?'nieuw':o.status==='in bereiding'?'bereiding':'klaar';
+      return '<div class="row"><div class="r1"><div><div class="nm">'+o.supplierName+' <span style="color:var(--soft);font-weight:400;">· gast '+o.customerCodename+'</span></div>'+
+        '<div class="sub">'+o.items.reduce((n,i)=>n+i.qty,0)+' item(s) · '+timeAgo(o.at)+' geleden · '+(o.paid?'betaald':'onbetaald')+'</div></div>'+
+        '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><span class="pill '+pc+'">'+o.status+'</span></div></div></div>';
+    }).join('') : '<div class="empty">Nog geen bestellingen of ritten via partners.</div>';
+  }
+
+  function stream(){
+    if (!window.EventSource) return;
+    try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(token)); } catch(e){ return; }
+    source.addEventListener('sync', () => refresh());
+    source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
+  }
+})();
+</script>
+</body>
+</html>

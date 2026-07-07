@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bloomingdale Bloemendaal × RTG — Reizen voor gasten en team</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Bloomingdale Bloemendaal × RTG, Reizen voor gasten en team</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -300,8 +301,8 @@
   <div class="wrap hero-inner">
     <span class="kicker">Bloomingdale Bloemendaal × Rahul Travel Group</span>
     <h1>Reizen, geregeld zoals bij ons <span class="accent">aan zee</span>.</h1>
-    <p class="deck">Bloomingdale werkt samen met Rahul Travel Group: onze gasten boeken hier bijzondere reizen uit de RTG-collectie, en ons team reist met personeelsvoordeel — als extra arbeidsvoorwaarde. Eén heldere totaalprijs, alles geregeld.</p>
-    <p class="demo-note">Conceptdemo — personeelscode voor de demo: BLOOM-TEAM</p>
+    <p class="deck">Bloomingdale werkt samen met Rahul Travel Group: onze gasten boeken hier bijzondere reizen uit de RTG-collectie, en ons team reist met personeelsvoordeel, als extra arbeidsvoorwaarde. Eén heldere totaalprijs, alles geregeld.</p>
+    <p class="demo-note">Conceptdemo, personeelscode voor de demo: BLOOM-TEAM</p>
   </div>
 </section>
 
@@ -310,13 +311,13 @@
     <div class="channel-card" id="guestCard">
       <span class="tag">Voor gasten</span>
       <h3>Boek een reis uit onze selectie</h3>
-      <p>Bloomingdale selecteerde drie reizen uit de RTG-collectie — dezelfde adressen waar RTG-leden over posten. U boekt direct, wij en RTG regelen de rest.</p>
+      <p>Bloomingdale selecteerde drie reizen uit de RTG-collectie, dezelfde adressen waar RTG-leden over posten. U boekt direct, wij en RTG regelen de rest.</p>
       <div class="row"><a href="#reizen" class="btn btn-small">Bekijk de reizen</a></div>
     </div>
     <div class="channel-card" id="staffCard">
       <span class="tag">Voor het team</span>
       <h3>Personeelsvoordeel Bloomingdale</h3>
-      <p>Werk je bij Bloomingdale? Met je personeelscode boek je dezelfde reizen met personeelsvoordeel — ons cadeau, geregeld via RTG.</p>
+      <p>Werk je bij Bloomingdale? Met je personeelscode boek je dezelfde reizen met personeelsvoordeel, ons cadeau, geregeld via RTG.</p>
       <div class="row" id="staffRow">
         <input id="staffInput" placeholder="PERSONEELSCODE" maxlength="16">
         <button class="btn btn-small" id="staffBtn">Activeren</button>
@@ -327,7 +328,7 @@
 
 <section class="trips" id="reizen">
   <div class="wrap">
-    <div class="folio">N° 01 — De Bloomingdale-selectie</div>
+    <div class="folio">N° 01, De Bloomingdale-selectie</div>
     <span class="kicker" id="tripsKicker">Gecureerd door Bloomingdale, geregeld door RTG</span>
     <h2 id="tripsTitle">Drie reizen, gekozen voor onze gasten.</h2>
     <div class="trip-grid" id="tripGrid"></div>
@@ -336,15 +337,15 @@
 
 <section class="pitch on-black">
   <div class="wrap">
-    <div class="folio">N° 02 — Voor bedrijven</div>
+    <div class="folio">N° 02, Voor bedrijven</div>
     <span class="kicker">Ook zo'n pagina voor uw bedrijf?</span>
     <h2>Laat uw personeel en uw klanten via RTG reizen.</h2>
-    <p class="deck">Dit is de partnertool van Rahul Travel Group: één eigen, co-branded pagina met twee kanalen. Uw team reist met personeelsvoordeel — een arbeidsvoorwaarde die u niets kost om op te zetten. Uw klanten boeken reizen onder uw naam, terwijl RTG de inkoop en afhandeling draagt.</p>
+    <p class="deck">Dit is de partnertool van Rahul Travel Group: één eigen, co-branded pagina met twee kanalen. Uw team reist met personeelsvoordeel, een arbeidsvoorwaarde die u niets kost om op te zetten. Uw klanten boeken reizen onder uw naam, terwijl RTG de inkoop en afhandeling draagt.</p>
     <div class="pitch-cards">
       <div class="c">
         <h3>Personeelskanaal</h3>
         <div class="sub">Secundaire arbeidsvoorwaarde</div>
-        <p>Uw medewerkers boeken met een eigen personeelscode tegen personeelsvoordeel. U geeft een voordeel dat voelt als een cadeau — zonder eigen reisafdeling.</p>
+        <p>Uw medewerkers boeken met een eigen personeelscode tegen personeelsvoordeel. U geeft een voordeel dat voelt als een cadeau, zonder eigen reisafdeling.</p>
       </div>
       <div class="c">
         <h3>Klantenkanaal</h3>
@@ -389,17 +390,17 @@
   const PARTNER_CODE = 'BLOOM';
   const STAFF_CODE_LOCAL = 'BLOOM-TEAM';
 
-  /* Lokale demo-data (fallback zonder backend) — alleen totaalprijzen. */
+  /* Lokale demo-data (fallback zonder backend), alleen totaalprijzen. */
   let TRIPS = [
     {id:'kyoto-herfst', dest:'Kyoto', visual:'v-kyoto', title:'Kyoto in herfstkleur', dates:'8 dagen · oktober 2026', price:2760, staffPrice:2592,
      desc:'Hoshinoya aan de rivier, privé-theeceremonie in Gion en de esdoorns van Arashiyama vóór de drukte.',
-     includes:['Vlucht business class','Hoshinoya Kyoto — 4 nachten','Ryokan Tawaraya — 3 nachten','Privétransfers & theeceremonie']},
+     includes:['Vlucht business class','Hoshinoya Kyoto, 4 nachten','Ryokan Tawaraya, 3 nachten','Privétransfers & theeceremonie']},
     {id:'lissabon-palacio', dest:'Lissabon', visual:'v-lissabon', title:'Palácio-weekend Lissabon', dates:'4 dagen · doorlopend', price:1127, staffPrice:1058,
-     desc:'Een palácio voor de prijs van een gewoon hotel — een vast favoriet adres van het Bloomingdale-team.',
-     includes:['Vlucht & transfers','Palácio-suite — 3 nachten','Ontbijt & late check-out','Tafelreservering fado-avond']},
+     desc:'Een palácio voor de prijs van een gewoon hotel, een vast favoriet adres van het Bloomingdale-team.',
+     includes:['Vlucht & transfers','Palácio-suite, 3 nachten','Ontbijt & late check-out','Tafelreservering fado-avond']},
     {id:'marrakech-riad', dest:'Marrakech', visual:'v-marrakech', title:'Riad & woestijn Marrakech', dates:'5 dagen · doorlopend', price:1323, staffPrice:1242,
-     desc:'Een riad in de medina, hammam en een avond in de Agafay-woestijn — voor als het seizoen aan zee erop zit.',
-     includes:['Vlucht & privétransfers','Riad — 4 nachten','Hammam & diner in de Agafay','Gids door de souks']}
+     desc:'Een riad in de medina, hammam en een avond in de Agafay-woestijn, voor als het seizoen aan zee erop zit.',
+     includes:['Vlucht & privétransfers','Riad, 4 nachten','Hammam & diner in de Agafay','Gids door de souks']}
   ];
 
   const API = {
@@ -457,7 +458,7 @@
     $('#tripsKicker').textContent = 'Personeelsvoordeel Bloomingdale actief';
     $('#tripsTitle').textContent = 'Dezelfde reizen, met jouw teamvoordeel.';
     renderTrips();
-    toast('Personeelsvoordeel geactiveerd — veel plezier!');
+    toast('Personeelsvoordeel geactiveerd, veel plezier!');
   }
 
   /* ---------- reizen ---------- */
@@ -474,7 +475,7 @@
           '<p>' + t.desc + '</p>' +
           '<div class="trip-price">' +
             '<div class="total">' + eur(price) + (showStaff ? '<s>' + eur(t.price) + '</s>' : '') + '</div>' +
-            '<div class="split">Totaalprijs, alles inbegrepen — geen kosten achteraf.</div>' +
+            '<div class="split">Totaalprijs, alles inbegrepen, geen kosten achteraf.</div>' +
             (showStaff ? '<span class="staff-badge">Personeelsvoordeel Bloomingdale</span>' : '') +
           '</div>' +
           '<button class="btn-book" data-trip="' + t.id + '">' + APPLE_SVG + 'Boek nu</button>' +
@@ -506,14 +507,14 @@
       '<div class="book-lines">' +
         t.includes.map(i => '<div class="rowline"><span>' + i + '</span><span>inbegrepen</span></div>').join('') +
         (showStaff ? '<div class="rowline benefit"><span>Personeelsvoordeel Bloomingdale</span><span>− ' + eur(t.price - t.staffPrice) + '</span></div>' : '') +
-        '<div class="rowline total"><span>Totaal — alles inbegrepen</span><span>' + eur(price) + '</span></div>' +
+        '<div class="rowline total"><span>Totaal, alles inbegrepen</span><span>' + eur(price) + '</span></div>' +
       '</div>' +
       '<div class="book-form">' +
         '<input id="bkName" placeholder="' + (showStaff ? 'Je naam' : 'Uw naam') + '">' +
         '<input id="bkEmail" type="email" placeholder="E-mailadres">' +
       '</div>' +
       '<div class="book-actions">' +
-        '<button class="btn-pay" id="bkPay">' + APPLE_SVG + 'Boek en betaal — ' + eur(price) + '</button>' +
+        '<button class="btn-pay" id="bkPay">' + APPLE_SVG + 'Boek en betaal, ' + eur(price) + '</button>' +
         '<button class="linkish" id="bkCancel">Annuleren</button>' +
       '</div>';
     $('#book-overlay').classList.add('open');
@@ -544,7 +545,7 @@
           ref = data.ref;
         } catch (e) {
           pw.classList.remove('open');
-          toast(e.message || 'Boeken mislukt — probeer het opnieuw.');
+          toast(e.message || 'Boeken mislukt, probeer het opnieuw.');
           return;
         }
       }
@@ -560,8 +561,8 @@
             '<div class="ref">Referentie ' + ref + '</div>' +
             '<p>De bevestiging is onderweg naar ' + email + '. RTG neemt binnen 24 uur contact op voor de reisdetails.</p>' +
             '<p class="bloom-line">' + (isStaff
-              ? 'Geboekt met personeelsvoordeel Bloomingdale — fijne reis!'
-              : 'Geboekt via Bloomingdale Bloemendaal — tot snel aan zee.') + '</p>' +
+              ? 'Geboekt met personeelsvoordeel Bloomingdale, fijne reis!'
+              : 'Geboekt via Bloomingdale Bloemendaal, tot snel aan zee.') + '</p>' +
             '<div style="margin-top:1.25rem;"><button class="linkish" id="bkClose">Sluiten</button></div>' +
           '</div>';
         $('#bkClose').addEventListener('click', () => $('#book-overlay').classList.remove('open'));

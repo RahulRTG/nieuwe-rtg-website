@@ -120,6 +120,10 @@
   }
   .channel-card h3{font-size:1.4rem;margin-top:0.75rem;}
   .channel-card p{margin-top:0.75rem;font-size:0.9rem;color:var(--grey);}
+  .staff-login{margin-top:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;}
+  .staff-login input{border:1px solid var(--line);background:var(--sand);padding:0.75rem 1rem;font-family:'Inter',sans-serif;font-size:0.9rem;outline:none;width:170px;text-transform:none;letter-spacing:0;color:var(--black);}
+  .staff-login input:focus{border-color:var(--bloom-bright);}
+  .staff-or{margin-top:1rem;font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--grey-soft);}
   .channel-card .row{margin-top:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;}
   .channel-card input{
     border:1px solid var(--line);background:var(--sand);
@@ -302,7 +306,7 @@
     <span class="kicker">Bloomingdale Bloemendaal × Rahul Travel Group</span>
     <h1>Reizen, geregeld zoals bij ons <span class="accent">aan zee</span>.</h1>
     <p class="deck">Bloomingdale werkt samen met Rahul Travel Group: onze gasten boeken hier bijzondere reizen uit de RTG-collectie, en ons team reist met personeelsvoordeel, als extra arbeidsvoorwaarde. Eén heldere totaalprijs, alles geregeld.</p>
-    <p class="demo-note">Conceptdemo, personeelscode voor de demo: BLOOM-TEAM</p>
+    <p class="demo-note">Conceptdemo, demo-account: gebruikersnaam Rahul, wachtwoord Imran. Of personeelscode BLOOM-TEAM.</p>
   </div>
 </section>
 
@@ -317,7 +321,13 @@
     <div class="channel-card" id="staffCard">
       <span class="tag">Voor het team</span>
       <h3>Personeelsvoordeel Bloomingdale</h3>
-      <p>Werk je bij Bloomingdale? Met je personeelscode boek je dezelfde reizen met personeelsvoordeel, ons cadeau, geregeld via RTG.</p>
+      <p>Werk je bij Bloomingdale? Log in met je account of personeelscode en boek dezelfde reizen met personeelsvoordeel, ons cadeau, geregeld via RTG.</p>
+      <form class="staff-login" id="staffLogin">
+        <input id="staffUser" placeholder="Gebruikersnaam" autocomplete="username" autocapitalize="none">
+        <input id="staffPass" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+        <button class="btn btn-small" type="submit">Inloggen</button>
+      </form>
+      <p class="staff-or">of met personeelscode</p>
       <div class="row" id="staffRow">
         <input id="staffInput" placeholder="PERSONEELSCODE" maxlength="16">
         <button class="btn btn-small" id="staffBtn">Activeren</button>
@@ -448,8 +458,33 @@
       ok = code === STAFF_CODE_LOCAL;
     }
     if (!ok){ toast('Deze personeelscode kennen we niet.'); return; }
+    finishStaff(code);
+  }
+
+  /* Inloggen met gebruikersnaam + wachtwoord (demo-account). */
+  async function loginStaff(u, p){
+    let code = null;
+    if (API.enabled){
+      try {
+        const data = await API.call('/staff', { username: u, password: p });
+        code = data.staffCode || STAFF_CODE_LOCAL;
+        const t = await API.call('/partnertrips', { staffCode: code });
+        if (t.trips) TRIPS = t.trips;
+      } catch (e) { toast('Onjuiste gebruikersnaam of wachtwoord.'); return; }
+    } else {
+      if (!(String(u).trim().toLowerCase() === 'rahul' && p === 'Imran')){
+        toast('Onjuiste gebruikersnaam of wachtwoord.'); return;
+      }
+      code = STAFF_CODE_LOCAL;
+    }
+    finishStaff(code);
+  }
+
+  function finishStaff(code){
     staffMode = true;
     staffCode = code;
+    const login = $('#staffLogin'); if (login) login.style.display = 'none';
+    const or = document.querySelector('.staff-or'); if (or) or.style.display = 'none';
     $('#staffRow').innerHTML = '<span class="staff-active">✓ Personeelsvoordeel actief</span>' +
       '<button class="linkish" id="staffOff">Uitzetten</button>';
     $('#staffOff').addEventListener('click', () => location.reload());
@@ -578,6 +613,10 @@
 
   $('#staffBtn').addEventListener('click', activateStaff);
   $('#staffInput').addEventListener('keydown', e => { if (e.key === 'Enter') activateStaff(); });
+  $('#staffLogin').addEventListener('submit', e => {
+    e.preventDefault();
+    loginStaff($('#staffUser').value, $('#staffPass').value);
+  });
   $('#guestCard').classList.add('active');
 
   (async function init(){

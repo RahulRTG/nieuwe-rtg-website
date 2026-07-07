@@ -268,6 +268,18 @@
   @media (max-width:960px){.gate-grid{grid-template-columns:repeat(2,1fr);}}
   @media (max-width:560px){.gate-grid{grid-template-columns:1fr;}}
 
+  /* ---------- login (gebruikersnaam + wachtwoord) ---------- */
+  .login-box{max-width:420px;margin-bottom:3rem;border:1px solid var(--line);background:var(--white);padding:2rem;}
+  .login-box .lb-k{font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--burgundy);font-weight:600;}
+  .login-box h3{font-size:1.4rem;margin-top:0.6rem;}
+  .login-box form{margin-top:1.4rem;display:flex;flex-direction:column;gap:0.7rem;}
+  .login-box input{border:1px solid var(--line);background:var(--paper);padding:0.85rem 1rem;font-size:0.95rem;font-family:inherit;color:var(--black);outline:none;}
+  .login-box input:focus{border-color:var(--burgundy);background:var(--white);}
+  .login-box button{background:var(--black);color:var(--white);border:none;padding:0.95rem;font-size:0.82rem;letter-spacing:0.05em;text-transform:uppercase;font-weight:600;cursor:pointer;transition:background 0.2s ease;}
+  .login-box button:hover{background:var(--burgundy);}
+  .login-box .lb-hint{margin-top:1rem;font-size:0.76rem;color:var(--grey-soft);}
+  .login-box .lb-hint b{color:var(--grey);}
+
   /* ---------- portal shell ---------- */
 
   #portal{display:none;}
@@ -995,7 +1007,17 @@
       <span class="kicker">Ledenportaal</span>
       <h1>Uw sleutel tot alles wat RTG regelt.</h1>
       <p class="deck">Betalingen, reizen, uw persoonlijke AI en De Salon, het besloten sociale netwerk van RTG. Dit portaal is tegelijk uw toegangskaart voor de RTG-app die eraan komt.</p>
-      <p class="demo-note">Conceptdemo, kies hieronder met welk profiel u het portaal wilt ervaren. Elke pas heeft andere rechten.</p>
+      <p class="demo-note">Log in met uw account, of kies hieronder een demoprofiel. Elke pas heeft andere rechten.</p>
+    </div>
+    <div class="login-box">
+      <span class="lb-k">Ledenlogin</span>
+      <h3>Inloggen</h3>
+      <form id="loginForm">
+        <input id="liUser" name="username" placeholder="Gebruikersnaam" autocomplete="username" autocapitalize="none">
+        <input id="liPass" name="password" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+        <button type="submit">Inloggen</button>
+      </form>
+      <p class="lb-hint">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>.</p>
     </div>
     <div class="gate-grid">
       <button class="gate-card" data-login="guest">
@@ -1289,15 +1311,38 @@
     btn.addEventListener('click', () => login(btn.dataset.login));
   });
 
-  async function login(tier){
-    user = {tier, ...PERSONAS[tier]};
-    if (API.enabled){
-      try {
-        const data = await API.call('/login', {tier});
-        API.token = data.token;
-        applyState(data.state);
-      } catch (e) {
-        API.enabled = false; /* geen backend bereikbaar, lokale demo */
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    login(null, { u: $('#liUser').value, p: $('#liPass').value });
+  });
+
+  async function login(tier, cred){
+    if (cred){
+      if (API.enabled){
+        try {
+          const data = await API.call('/login', { username: cred.u, password: cred.p });
+          API.token = data.token;
+          applyState(data.state);
+          tier = (data.state && data.state.user && data.state.user.tier) || 'business';
+        } catch (e) { toast('Onjuiste gebruikersnaam of wachtwoord.'); return; }
+      } else {
+        if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
+          toast('Onjuiste gebruikersnaam of wachtwoord.'); return;
+        }
+        tier = 'business';
+      }
+      user = {tier, ...PERSONAS[tier]};
+    } else {
+      user = {tier, ...PERSONAS[tier]};
+      if (API.enabled){
+        try {
+          const data = await API.call('/login', {tier});
+          API.token = data.token;
+          applyState(data.state);
+        } catch (e) {
+          API.enabled = false; /* geen backend bereikbaar, lokale demo */
+        }
       }
     }
     if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;

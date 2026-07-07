@@ -45,6 +45,18 @@ const PERSONAS = {
 // token -> { tier, key } (in-memory; verdwijnt bij herstart, data blijft in db.json)
 const sessions = new Map();
 
+/* ---------- demo-account: één inlog (Rahul / Imran) voor elk kanaal ----------
+   Zo kunt u het klantportaal, de leverancier-app en het personeelskanaal met
+   dezelfde gebruikersnaam en wachtwoord uitproberen. De gebruikersnaam is
+   hoofdletterongevoelig, het wachtwoord niet. */
+const DEMO_USER = (process.env.DEMO_USER || 'rahul').trim().toLowerCase();
+const DEMO_PASS = process.env.DEMO_PASS || 'Imran';
+const DEMO_SUPPLIER = process.env.DEMO_SUPPLIER || 'KIKUNOI';
+function hasCred(body) { return !!body && (body.username != null || body.password != null); }
+function checkCred(username, password) {
+  return String(username || '').trim().toLowerCase() === DEMO_USER && String(password || '') === DEMO_PASS;
+}
+
 /* ---------- live updates (SSE) + notificaties + web-push ----------
    Elk open scherm (website-portaal of app) houdt een SSE-verbinding open.
    Bij elke wijziging sturen we:
@@ -187,7 +199,12 @@ function stateFor(sess) {
 app.get('/api/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claude' : 'demo' }));
 
 app.post('/api/login', (req, res) => {
-  const tier = String(req.body.tier || '');
+  let tier = String(req.body.tier || '');
+  if (hasCred(req.body)) {
+    if (!checkCred(req.body.username, req.body.password))
+      return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
+    tier = 'business'; // het demo-account is een volledig lidmaatschap
+  }
   if (!PERSONAS[tier]) return res.status(400).json({ error: 'Onbekende pas.' });
   const token = crypto.randomBytes(24).toString('hex');
   const sess = { tier, key: tier === 'guest' ? 'guest-' + token.slice(0, 8) : tier };
@@ -385,9 +402,17 @@ app.post('/api/partner', (req, res) => {
 });
 
 app.post('/api/staff', (req, res) => {
-  const partner = findStaffPartner(req.body.staffCode);
+  let partner;
+  if (hasCred(req.body)) {
+    if (!checkCred(req.body.username, req.body.password))
+      return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
+    partner = db.data.partners.find(p => p.staff) || null;
+  } else {
+    partner = findStaffPartner(req.body.staffCode);
+  }
   if (!partner) return res.status(404).json({ error: 'Deze personeelscode kennen we niet.' });
-  res.json({ ok: true, partner: publicPartner(partner) });
+  // De personeelscode gaat mee terug zodat de inlog verder werkt zoals de code-invoer.
+  res.json({ ok: true, partner: publicPartner(partner), staffCode: partner.staff ? partner.staff.code : null });
 });
 
 app.post('/api/partnertrips', (req, res) => {
@@ -494,7 +519,14 @@ function supplierState(s) {
 // ---- leverancier: inloggen, live-stream, dashboard ----
 
 app.post('/api/supplier/login', (req, res) => {
-  const s = findSupplier(req.body.code);
+  let s;
+  if (hasCred(req.body)) {
+    if (!checkCred(req.body.username, req.body.password))
+      return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
+    s = findSupplier(DEMO_SUPPLIER);
+  } else {
+    s = findSupplier(req.body.code);
+  }
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
   const token = crypto.randomBytes(24).toString('hex');
   sessions.set(token, { role: 'supplier', code: s.code });

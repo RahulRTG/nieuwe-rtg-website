@@ -113,6 +113,12 @@
   .gate-btn b{display:block;font-size:0.95rem;font-weight:600;}
   .gate-btn span{font-size:0.74rem;color:var(--soft);}
   #gate .note{margin-top:1.75rem;font-size:0.72rem;color:var(--soft);font-style:italic;}
+  .login-form{margin-top:2.25rem;display:flex;flex-direction:column;gap:0.65rem;}
+  .login-form input{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.95rem 1.1rem;color:var(--txt);font-size:0.95rem;font-family:inherit;outline:none;}
+  .login-form input:focus{border-color:var(--burgundy);}
+  .login-form button{background:#fff;color:#000;border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
+  .login-form button:active{opacity:0.85;}
+  .gate-or{margin:1.9rem 0 0.35rem;font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);text-align:center;}
 
   /* ---------- app-chroom ---------- */
 
@@ -566,12 +572,18 @@
     <div class="tagline">Experience the Elite Class</div>
     <h1>De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
     <p class="deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, en uw account draait op uw codenaam, niet op uw echte naam.</p>
+    <form class="login-form" id="loginForm">
+      <input id="liUser" name="username" placeholder="Gebruikersnaam" autocomplete="username" autocapitalize="none">
+      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+      <button type="submit">Inloggen</button>
+    </form>
+    <p class="gate-or">of kies een demoprofiel</p>
     <div class="gate-list">
       <button class="gate-btn t-rtg" data-login="rtg"><span class="dot"></span><span><b>S. Janssen</b><span>RTG Pass · codenaam Zilveren Valk</span></span></button>
       <button class="gate-btn t-lifestyle" data-login="lifestyle"><span class="dot"></span><span><b>I. van Rhijn</b><span>Lifestyle Pass · codenaam Gouden Ibis</span></span></button>
       <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>A. de Vries</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
     </div>
-    <p class="note">Conceptdemo, de app is er voor leden. Kies een profiel om in te loggen.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
+    <p class="note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
   </div>
 
   <!-- app -->
@@ -782,14 +794,37 @@
   document.querySelectorAll('[data-login]').forEach(b =>
     b.addEventListener('click', () => login(b.dataset.login)));
 
-  async function login(tier){
-    user = {...PERSONAS[tier]};
-    if (API.enabled){
-      try {
-        const data = await API.call('/login', {tier});
-        API.token = data.token;
-        applyState(data.state);
-      } catch (e) { API.enabled = false; }
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    login(null, { u: $('#liUser').value, p: $('#liPass').value });
+  });
+
+  async function login(tier, cred){
+    if (cred){
+      if (API.enabled){
+        try {
+          const data = await API.call('/login', { username: cred.u, password: cred.p });
+          API.token = data.token;
+          applyState(data.state);
+          tier = (data.state && data.state.user && data.state.user.tier) || 'business';
+        } catch (e) { toast('Onjuiste gebruikersnaam of wachtwoord.'); return; }
+      } else {
+        if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
+          toast('Onjuiste gebruikersnaam of wachtwoord.'); return;
+        }
+        tier = 'business';
+      }
+      user = {...PERSONAS[tier]};
+    } else {
+      user = {...PERSONAS[tier]};
+      if (API.enabled){
+        try {
+          const data = await API.call('/login', {tier});
+          API.token = data.token;
+          applyState(data.state);
+        } catch (e) { API.enabled = false; }
+      }
     }
     if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
     $('#gate').style.display = 'none';

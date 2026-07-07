@@ -28,3 +28,28 @@ self.addEventListener('fetch', e => {
     )
   );
 });
+
+/* Push-notificatie: toont een systeemmelding, ook als de app dicht is. */
+self.addEventListener('push', e => {
+  let data = {};
+  try { data = e.data ? e.data.json() : {}; } catch (err) {}
+  const title = data.title || 'Rahul Travel Group';
+  e.waitUntil(self.registration.showNotification(title, {
+    body: data.body || '',
+    icon: data.icon || 'icon.svg',
+    badge: 'icon.svg',
+    tag: data.tag,
+    data: { url: 'app.html' }
+  }));
+});
+
+/* Tik op de melding opent (of focust) de app. */
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const c of list) if (c.url.includes('app.html') && 'focus' in c) return c.focus();
+      return self.clients.openWindow((e.notification.data && e.notification.data.url) || 'app.html');
+    })
+  );
+});

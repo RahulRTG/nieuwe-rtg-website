@@ -155,6 +155,68 @@
   }
   .code-chip .cdot{width:7px;height:7px;border-radius:50%;background:var(--burgundy);}
 
+  .bell{
+    position:relative;
+    background:none;border:none;
+    color:var(--muted);
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .bell svg{width:21px;height:21px;}
+  .bell-badge{
+    position:absolute;top:-2px;right:-2px;
+    min-width:16px;height:16px;padding:0 4px;
+    background:var(--burgundy);color:#fff;
+    border-radius:999px;font-size:0.6rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .notif-scrim{
+    position:absolute;inset:0;background:rgba(0,0,0,0.5);
+    z-index:44;display:none;
+  }
+  .notif-scrim.open{display:block;}
+  .notif-panel{
+    position:absolute;
+    top:0;right:0;
+    width:86%;max-width:340px;
+    height:100%;
+    background:var(--bg);
+    border-left:1px solid var(--line);
+    z-index:45;
+    transform:translateX(100%);
+    transition:transform 0.25s ease;
+    display:flex;flex-direction:column;
+    padding-top:env(safe-area-inset-top, 0px);
+  }
+  .notif-panel.open{transform:translateX(0);}
+  .notif-head{
+    padding:1.2rem 1.25rem 1rem;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--line);
+  }
+  .notif-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;font-weight:500;}
+  .notif-push{
+    background:var(--card);border:1px solid var(--line);color:var(--muted);
+    border-radius:999px;padding:0.4rem 0.85rem;font-size:0.68rem;
+  }
+  .notif-push.on{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .notif-list{flex:1;overflow-y:auto;padding:0.5rem 0;}
+  .notif-item{
+    display:flex;gap:0.85rem;
+    padding:0.9rem 1.25rem;
+    border-bottom:1px solid var(--line);
+  }
+  .notif-item.unread{background:rgba(194,58,94,0.06);}
+  .notif-item .ic{
+    width:32px;height:32px;flex-shrink:0;border-radius:50%;
+    background:var(--card);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:0.9rem;color:var(--burgundy);
+  }
+  .notif-item .tx b{display:block;font-size:0.84rem;font-weight:600;}
+  .notif-item .tx span{font-size:0.78rem;color:var(--muted);line-height:1.4;}
+  .notif-item .tx time{display:block;margin-top:0.2rem;font-size:0.66rem;color:var(--soft);}
+  .notif-empty{padding:2.5rem 1.25rem;text-align:center;color:var(--soft);font-size:0.85rem;}
+
   .content{
     flex:1;
     overflow-y:auto;
@@ -395,6 +457,7 @@
   .tabbar{
     position:absolute;
     left:0;right:0;bottom:0;
+    z-index:30;
     background:rgba(12,12,11,0.92);
     backdrop-filter:blur(14px);
     border-top:1px solid var(--line);
@@ -464,8 +527,23 @@
   <div id="app">
     <div class="topbar">
       <div class="brand">RTG<small>de app</small></div>
-      <button class="code-chip" id="codeChip"><span class="cdot"></span><span id="codeChipTxt"></span></button>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <button class="bell" id="bell" aria-label="Meldingen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
+        </button>
+        <button class="code-chip" id="codeChip"><span class="cdot"></span><span id="codeChipTxt"></span></button>
+      </div>
     </div>
+
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-head">
+        <b>Meldingen</b>
+        <button class="notif-push" id="notifPush">Push aanzetten</button>
+      </div>
+      <div class="notif-list" id="notifList"></div>
+    </div>
+    <div class="notif-scrim" id="notifScrim"></div>
 
     <div class="content" id="content">
 
@@ -532,6 +610,7 @@
   <div id="toast"></div>
 </div>
 
+<script src="realtime.js"></script>
 <script>
 (function(){
   const $ = s => document.querySelector(s);
@@ -646,7 +725,73 @@
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
     renderAll();
+    if (API.live && window.RTGRealtime){
+      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell });
+    }
   }
+
+  /* ---------- live updates ---------- */
+
+  // een scherm werkt zichzelf bij zonder page-refresh
+  async function syncScope(scope){
+    if (!API.live) return;
+    try {
+      const data = await API.call('/state');
+      applyState(data.state);
+    } catch (e) { return; }
+    if (scope === 'payments'){ renderPay(); renderHome(); renderTrip(); }
+    else if (scope === 'salon'){ renderSalon(); renderHome(); }
+    else { renderPay(); renderHome(); renderTrip(); renderSalon(); }
+  }
+
+  function timeAgo(iso){
+    const s = Math.max(1, Math.round((Date.now() - new Date(iso)) / 1000));
+    if (s < 60) return 'zojuist';
+    const m = Math.round(s / 60);
+    if (m < 60) return m + ' min geleden';
+    const h = Math.round(m / 60);
+    if (h < 24) return h + ' uur geleden';
+    return Math.round(h / 24) + ' dag(en) geleden';
+  }
+
+  function renderBell(){
+    const R = window.RTGRealtime;
+    if (!R) return;
+    const n = R.unread();
+    const badge = $('#bellBadge');
+    badge.style.display = n > 0 ? 'flex' : 'none';
+    badge.textContent = n > 9 ? '9+' : n;
+    const list = $('#notifList');
+    list.innerHTML = R.notifications.length
+      ? R.notifications.map(x =>
+          '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +
+            '<div class="ic">' + (x.icon || '•') + '</div>' +
+            '<div class="tx"><b>' + x.title + '</b><span>' + x.body + '</span><time>' + timeAgo(x.at) + '</time></div>' +
+          '</div>').join('')
+      : '<div class="notif-empty">Nog geen meldingen. Zodra iemand op uw post reageert of u een bericht stuurt, ziet u het hier.</div>';
+    const pb = $('#notifPush');
+    const st = R.pushState();
+    if (st === 'on'){ pb.textContent = '✓ Push aan'; pb.classList.add('on'); }
+    else if (st === 'unsupported'){ pb.style.display = 'none'; }
+    else { pb.textContent = 'Push aanzetten'; pb.classList.remove('on'); }
+  }
+
+  function openNotif(open){
+    $('#notifPanel').classList.toggle('open', open);
+    $('#notifScrim').classList.toggle('open', open);
+    if (open && window.RTGRealtime && RTGRealtime.unread() > 0){
+      RTGRealtime.markRead();
+      renderBell();
+    }
+  }
+  $('#bell').addEventListener('click', () => openNotif(true));
+  $('#notifScrim').addEventListener('click', () => openNotif(false));
+  $('#notifPush').addEventListener('click', async () => {
+    if (!window.RTGRealtime) return;
+    const r = await RTGRealtime.enablePush();
+    toast(r === 'on' ? 'Push-notificaties staan aan.' : r === 'denied' ? 'Toestemming geweigerd — zet meldingen aan in uw instellingen.' : 'Push is hier niet beschikbaar.');
+    renderBell();
+  });
 
   document.querySelectorAll('.tabbar button').forEach(b =>
     b.addEventListener('click', () => openTab(b.dataset.tab)));

@@ -50,6 +50,12 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/partnertrips` `{staffCode?}` | Gecureerde reizen — alleen totaalprijzen; met geldige personeelscode ook personeelsprijzen |
 | `POST /api/book` `{code \| staffCode, tripId, name, email}` | Boeking zonder pas via een partner of personeelscode |
 
+## Live updates & push-notificaties
+
+Website-portaal en app delen dezelfde backend en werken **live bij zonder herladen**, via Server-Sent Events (`GET /api/stream`). Betaal je in de app, dan daalt het openstaande bedrag in een geopend website-portaal meteen; reageert iemand op je post, dan verschijnt de reactie live in beide.
+
+Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je eigen posts komen binnen als in-app melding, als systeemmelding wanneer het scherm openstaat, en als **web-push** wanneer het scherm dicht is. Push draait op VAPID (`web-push`), met de service worker als ontvanger; de publieke sleutel komt van `GET /api/push/key`, subscriptions gaan naar `POST /api/push/subscribe`.
+
 ## De app (PWA)
 
 **app.html** is de RTG-app als installeerbare web-app (PWA, met `manifest.webmanifest` + `sw.js`): mobiele app-schil met tabbalk — Home, Reizen, Betalen (Face ID), AI en De Salon — draaiend op dezelfde backend als de site. Open op een telefoon en kies "Zet op beginscherm" om te installeren.

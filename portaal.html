@@ -161,6 +161,60 @@
     white-space:nowrap;
   }
   .tier-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--grey-soft);}
+
+  /* ---------- notificaties ---------- */
+  .bell{
+    position:relative;background:none;border:none;cursor:pointer;
+    color:var(--grey);width:36px;height:36px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .bell svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;}
+  .bell:hover{color:var(--burgundy);}
+  .bell-badge{
+    position:absolute;top:0;right:0;
+    min-width:16px;height:16px;padding:0 4px;
+    background:var(--burgundy);color:#fff;
+    border-radius:999px;font-size:0.6rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .notif-scrim{position:fixed;inset:0;background:rgba(12,12,11,0.35);z-index:110;display:none;}
+  .notif-scrim.open{display:block;}
+  .notif-panel{
+    position:fixed;top:0;right:0;bottom:0;
+    width:min(380px, 90vw);
+    background:var(--white);
+    border-left:1px solid var(--line);
+    z-index:120;
+    transform:translateX(100%);
+    transition:transform 0.25s ease;
+    display:flex;flex-direction:column;
+    box-shadow:-20px 0 60px -30px rgba(0,0,0,0.4);
+  }
+  .notif-panel.open{transform:translateX(0);}
+  .notif-head{
+    padding:1.5rem 1.5rem 1.1rem;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--line);
+  }
+  .notif-head b{font-family:'Bodoni Moda',serif;font-size:1.35rem;font-weight:500;}
+  .notif-push{
+    background:var(--paper);border:1px solid var(--line);color:var(--grey);cursor:pointer;
+    border-radius:999px;padding:0.4rem 0.85rem;font-size:0.7rem;
+  }
+  .notif-push.on{color:var(--green);border-color:rgba(46,107,79,0.4);}
+  .notif-close{background:none;border:none;font-size:1rem;color:var(--grey-soft);cursor:pointer;}
+  .notif-list{flex:1;overflow-y:auto;}
+  .notif-item{display:flex;gap:0.9rem;padding:1rem 1.5rem;border-bottom:1px solid var(--line);}
+  .notif-item.unread{background:rgba(127,22,52,0.04);}
+  .notif-item .ic{
+    width:34px;height:34px;flex-shrink:0;border-radius:50%;
+    background:var(--paper);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:0.95rem;color:var(--burgundy);
+  }
+  .notif-item .tx b{display:block;font-size:0.88rem;font-weight:600;}
+  .notif-item .tx span{font-size:0.82rem;color:var(--grey);line-height:1.45;}
+  .notif-item .tx time{display:block;margin-top:0.25rem;font-size:0.7rem;color:var(--grey-soft);}
+  .notif-empty{padding:3rem 1.5rem;text-align:center;color:var(--grey-soft);font-size:0.88rem;line-height:1.6;}
   .tier-chip.t-rtg .dot{background:var(--burgundy);}
   .tier-chip.t-lifestyle .dot{background:var(--gold-bright);}
   .tier-chip.t-business .dot{background:var(--black);}
@@ -921,6 +975,18 @@
   </div>
 </header>
 
+<div class="notif-scrim" id="notifScrim"></div>
+<aside class="notif-panel" id="notifPanel">
+  <div class="notif-head">
+    <b>Meldingen</b>
+    <div style="display:flex;gap:0.6rem;align-items:center;">
+      <button class="notif-push" id="notifPush">Push aanzetten</button>
+      <button class="notif-close" id="notifClose" aria-label="Sluiten">✕</button>
+    </div>
+  </div>
+  <div class="notif-list" id="notifList"></div>
+</aside>
+
 <!-- ========== GATE ========== -->
 <section id="gate">
   <div class="wrap">
@@ -1065,6 +1131,7 @@
   </div>
 </div>
 
+<script src="realtime.js"></script>
 <script>
 (function(){
   /* ---------- data ---------- */
@@ -1245,10 +1312,14 @@
     renderSalon();
     openTab(tier === 'guest' ? 'salon' : 'overzicht');
     window.scrollTo({top:0});
+    if (API.live && user.tier !== 'guest' && window.RTGRealtime){
+      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell });
+    }
   }
 
   function logout(){
     if (API.live) API.call('/logout').catch(() => {});
+    if (window.RTGRealtime) RTGRealtime.stop();
     API.token = null;
     user = null;
     $('#portal').classList.remove('active');
@@ -1258,12 +1329,86 @@
   }
 
   function renderHeader(){
+    const bell = user.tier === 'guest' ? '' :
+      '<button class="bell" id="bell" aria-label="Meldingen">' +
+        '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>' +
+        '<span class="bell-badge" id="bellBadge" style="display:none;">0</span>' +
+      '</button>';
     $('#headerUser').innerHTML =
+      bell +
       chip(user.tier) +
       '<span>' + user.name + '</span>' +
       '<button id="logoutBtn">Uitloggen</button>';
     $('#logoutBtn').addEventListener('click', logout);
+    const b = $('#bell');
+    if (b) b.addEventListener('click', () => openNotif(true));
   }
+
+  /* ---------- live updates & notificaties ---------- */
+
+  async function syncScope(scope){
+    if (!API.live) return;
+    try { applyState((await API.call('/state')).state); }
+    catch (e) { return; }
+    if (scope === 'payments'){ renderPayments(); renderOverview(); renderTrip(); }
+    else if (scope === 'salon'){ renderSalon(); renderOverview(); }
+    else { renderPayments(); renderOverview(); renderTrip(); renderSalon(); }
+  }
+
+  function timeAgo(iso){
+    const s = Math.max(1, Math.round((Date.now() - new Date(iso)) / 1000));
+    if (s < 60) return 'zojuist';
+    const m = Math.round(s / 60);
+    if (m < 60) return m + ' min geleden';
+    const h = Math.round(m / 60);
+    if (h < 24) return h + ' uur geleden';
+    return Math.round(h / 24) + ' dag(en) geleden';
+  }
+
+  function renderBell(){
+    const R = window.RTGRealtime;
+    if (!R) return;
+    const badge = $('#bellBadge');
+    if (badge){
+      const n = R.unread();
+      badge.style.display = n > 0 ? 'flex' : 'none';
+      badge.textContent = n > 9 ? '9+' : n;
+    }
+    const list = $('#notifList');
+    if (list){
+      list.innerHTML = R.notifications.length
+        ? R.notifications.map(x =>
+            '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +
+              '<div class="ic">' + (x.icon || '•') + '</div>' +
+              '<div class="tx"><b>' + x.title + '</b><span>' + x.body + '</span><time>' + timeAgo(x.at) + '</time></div>' +
+            '</div>').join('')
+        : '<div class="notif-empty">Nog geen meldingen. Zodra iemand op uw post reageert, u een bericht stuurt of uw reis wijzigt, ziet u het hier — live.</div>';
+    }
+    const pb = $('#notifPush');
+    if (pb){
+      const st = R.pushState();
+      if (st === 'on'){ pb.textContent = '✓ Push aan'; pb.classList.add('on'); }
+      else if (st === 'unsupported'){ pb.style.display = 'none'; }
+      else { pb.textContent = 'Push aanzetten'; pb.classList.remove('on'); }
+    }
+  }
+
+  function openNotif(open){
+    $('#notifPanel').classList.toggle('open', open);
+    $('#notifScrim').classList.toggle('open', open);
+    if (open && window.RTGRealtime && RTGRealtime.unread() > 0){
+      RTGRealtime.markRead();
+      renderBell();
+    }
+  }
+  $('#notifScrim').addEventListener('click', () => openNotif(false));
+  $('#notifClose').addEventListener('click', () => openNotif(false));
+  $('#notifPush').addEventListener('click', async () => {
+    if (!window.RTGRealtime) return;
+    const r = await RTGRealtime.enablePush();
+    toast(r === 'on' ? 'Push-notificaties staan aan.' : r === 'denied' ? 'Toestemming geweigerd — zet meldingen aan in uw browserinstellingen.' : 'Push is hier niet beschikbaar.');
+    renderBell();
+  });
 
   /* ---------- tabs ---------- */
 
@@ -1786,6 +1931,11 @@
     $('#modal-overlay').classList.remove('open');
     toast('Bericht verzonden binnen De Salon.');
   });
+
+  /* service worker registreren zodat web-push ook op de website werkt */
+  if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
 })();
 </script>
 

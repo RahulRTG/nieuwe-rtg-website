@@ -45,6 +45,75 @@ const PERSONAS = {
 // token -> { tier, key } (in-memory; verdwijnt bij herstart, data blijft in db.json)
 const sessions = new Map();
 
+/* ---------- live updates (SSE) + notificaties + web-push ----------
+   Elk open scherm (website-portaal of app) houdt een SSE-verbinding open.
+   Bij elke wijziging sturen we:
+   - 'sync'   → betrokken schermen herladen hun data zonder page-refresh
+   - 'notify' → een notificatie voor de eigenaar van een post/betaling,
+     ook als web-push wanneer het scherm dicht is. */
+
+let webpush = null;
+try { webpush = require('web-push'); } catch (e) { /* zonder push: alleen SSE */ }
+
+// welke persona hoort bij een auteursnaam (voor gerichte notificaties)
+const AUTHOR_TIER = {
+  'Sophie Janssen': 'rtg',
+  'Isabelle van Rhijn': 'lifestyle',
+  'Alexander de Vries': 'business'
+};
+
+const sseClients = []; // { tier, res }
+
+function initRealtime() {
+  if (!db.data.notifications) db.data.notifications = { rtg: [], lifestyle: [], business: [] };
+  if (!db.data.pushSubs) db.data.pushSubs = { rtg: [], lifestyle: [], business: [] };
+  if (webpush) {
+    if (!db.data.vapid) {
+      db.data.vapid = webpush.generateVAPIDKeys();
+      save();
+    }
+    webpush.setVapidDetails('mailto:leden@rahultravelgroup.example', db.data.vapid.publicKey, db.data.vapid.privateKey);
+  }
+}
+
+function sseSend(res, event, data) {
+  res.write('event: ' + event + '\n');
+  res.write('data: ' + JSON.stringify(data) + '\n\n');
+}
+
+// stuur een sync-signaal naar één of meer tiers (open schermen herladen data)
+function broadcastSync(tiers, scope) {
+  const set = new Set(tiers);
+  for (const c of sseClients) if (set.has(c.tier)) sseSend(c.res, 'sync', { scope });
+}
+
+// notificeer één tier: opslaan, naar open schermen sturen én web-push
+function notify(tier, note) {
+  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
+  db.data.notifications[tier] = (db.data.notifications[tier] || []);
+  db.data.notifications[tier].unshift(n);
+  db.data.notifications[tier] = db.data.notifications[tier].slice(0, 40);
+  save();
+  for (const c of sseClients) if (c.tier === tier) sseSend(c.res, 'notify', n);
+  sendPush(tier, n);
+  return n;
+}
+
+function sendPush(tier, note) {
+  if (!webpush) return;
+  const subs = db.data.pushSubs[tier] || [];
+  const payload = JSON.stringify({ title: note.title, body: note.body, icon: 'icon.svg', tag: note.id });
+  for (const sub of subs.slice()) {
+    webpush.sendNotification(sub, payload).catch(err => {
+      // verlopen/ongeldige subscription opruimen
+      if (err && (err.statusCode === 404 || err.statusCode === 410)) {
+        db.data.pushSubs[tier] = (db.data.pushSubs[tier] || []).filter(s => s.endpoint !== sub.endpoint);
+        save();
+      }
+    });
+  }
+}
+
 function auth(req, res, next) {
   const header = req.get('authorization') || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
@@ -132,6 +201,54 @@ app.post('/api/logout', auth, (req, res) => {
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session) }));
 
+/* Live-verbinding. EventSource kan geen Authorization-header sturen, dus het
+   token gaat als query-parameter. */
+app.get('/api/stream', (req, res) => {
+  const sess = sessions.get(req.query.token);
+  if (!sess) return res.status(401).end();
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive'
+  });
+  res.write('retry: 3000\n\n');
+  const client = { tier: sess.tier, res };
+  sseClients.push(client);
+  // onopgehaalde notificaties meteen meesturen
+  const unread = (db.data.notifications[sess.tier] || []).filter(n => !n.read);
+  sseSend(res, 'hello', { unread });
+  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
+  req.on('close', () => {
+    clearInterval(ping);
+    const i = sseClients.indexOf(client);
+    if (i >= 0) sseClients.splice(i, 1);
+  });
+});
+
+// notificaties ophalen / als gelezen markeren
+app.post('/api/notifications', auth, (req, res) => {
+  res.json({ notifications: db.data.notifications[req.session.tier] || [] });
+});
+app.post('/api/notifications/read', auth, (req, res) => {
+  (db.data.notifications[req.session.tier] || []).forEach(n => n.read = true);
+  save();
+  res.json({ ok: true });
+});
+
+// web-push: publieke sleutel + subscription opslaan
+app.get('/api/push/key', (req, res) => {
+  res.json({ key: webpush && db.data.vapid ? db.data.vapid.publicKey : null });
+});
+app.post('/api/push/subscribe', auth, (req, res) => {
+  if (!webpush) return res.status(501).json({ error: 'Push niet beschikbaar.' });
+  const sub = req.body.subscription;
+  if (!sub || !sub.endpoint) return res.status(400).json({ error: 'Ongeldige subscription.' });
+  const list = db.data.pushSubs[req.session.tier] = (db.data.pushSubs[req.session.tier] || []);
+  if (!list.some(s => s.endpoint === sub.endpoint)) list.push(sub);
+  save();
+  res.json({ ok: true });
+});
+
 /* Eén tik betaalt: één factuur ({invoiceId}) of alles wat openstaat ({all:true}).
    De echte Face ID-/Apple Pay-verificatie gebeurt op het toestel; de server
    verwerkt de betaling in één aanroep. */
@@ -157,6 +274,8 @@ app.post('/api/pay', auth, (req, res) => {
     }
   }
   save();
+  // ander open scherm van hetzelfde lid meteen bijwerken
+  broadcastSync([req.session.tier], 'payments');
   res.json({ ok: true, foundation, state: stateFor(req.session) });
 });
 
@@ -167,7 +286,15 @@ app.post('/api/like', auth, (req, res) => {
   if (req.body.liked) post.likedBy[req.session.key] = true;
   else delete post.likedBy[req.session.key];
   save();
-  res.json({ ok: true, likes: post.baseLikes + Object.keys(post.likedBy).length });
+  const likes = post.baseLikes + Object.keys(post.likedBy).length;
+  // alle open Salon-schermen de nieuwe like-telling laten zien
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  // de eigenaar van de post een notificatie geven (niet bij eigen like)
+  const ownerTier = AUTHOR_TIER[post.author];
+  if (req.body.liked && ownerTier && ownerTier !== req.session.tier) {
+    notify(ownerTier, { icon: '♥', title: 'Nieuwe like', body: PERSONAS[req.session.tier].full + ' vindt uw post over ' + post.place + ' mooi.', scope: 'salon' });
+  }
+  res.json({ ok: true, likes });
 });
 
 app.post('/api/comment', auth, (req, res) => {
@@ -183,6 +310,13 @@ app.post('/api/comment', auth, (req, res) => {
   post.comments.push(comment);
   registerContact(req.session, post);
   save();
+  // alle Salon-schermen tonen de nieuwe reactie live
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  // de eigenaar van de post krijgt een notificatie (niet bij eigen reactie)
+  const ownerTier = AUTHOR_TIER[post.author];
+  if (ownerTier && ownerTier !== req.session.tier) {
+    notify(ownerTier, { icon: '💬', title: 'Nieuwe reactie', body: persona.full + ': “' + text.slice(0, 80) + '”', scope: 'salon' });
+  }
   res.json({ ok: true, comment });
 });
 
@@ -203,6 +337,11 @@ app.post('/api/dm', auth, (req, res) => {
     at: new Date().toISOString()
   });
   save();
+  // de ontvanger krijgt een notificatie/push van het privébericht
+  const ownerTier = AUTHOR_TIER[post.author];
+  if (ownerTier && ownerTier !== req.session.tier) {
+    notify(ownerTier, { icon: '✉', title: 'Nieuw bericht in De Salon', body: PERSONAS[req.session.tier].full + ' stuurde u een bericht.', scope: 'salon' });
+  }
   res.json({ ok: true });
 });
 
@@ -379,7 +518,10 @@ app.post('/api/ai', auth, async (req, res) => {
 
 /* ---------- start ---------- */
 
+initRealtime();
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`RTG-portaal draait op http://localhost:${PORT} — open http://localhost:${PORT}/portaal.html`);
+  console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 });

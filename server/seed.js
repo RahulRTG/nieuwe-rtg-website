@@ -106,6 +106,66 @@ module.exports = function seed() {
         includes: ['Vlucht & privétransfers', 'Riad — 4 nachten', 'Hammam & diner in de Agafay', 'Gids door de souks']
       }
     ],
-    bookings: []
+    bookings: [],
+
+    /* ---------- leveranciers ----------
+       De leverancier-app is één app die zich aanpast aan het type. Elk type
+       heeft eigen mogelijkheden (caps) die de app-schermen bepalen. Leveranciers
+       gebruiken de app gratis in ruil voor de beste dynamische prijs aan RTG. */
+    supplierTypes: {
+      hotel:      { label: 'Hotel',        icon: '🏨', caps: ['bookings', 'location', 'pricing'] },
+      apartment:  { label: 'Appartement',  icon: '🏡', caps: ['bookings', 'location', 'pricing'] },
+      taxi:       { label: 'Taxi',         icon: '🚘', caps: ['rides', 'location', 'pricing'] },
+      jet:        { label: 'Privéjet',     icon: '✈️', caps: ['rides', 'location', 'pricing'] },
+      restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'location', 'pricing'] },
+      bar:        { label: 'Bar',          icon: '🍸', caps: ['menu', 'orders', 'location', 'pricing'] },
+      club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'location', 'pricing'] }
+    },
+
+    /* Voorbeeldleveranciers (demo-inlogcodes). serviceRate = de dynamische
+       marge die de leverancier aan RTG biedt — intern, nooit aan de klant. */
+    suppliers: [
+      {
+        code: 'HOSHI', name: 'Hoshinoya Kyoto', type: 'hotel', city: 'Kyoto',
+        loc: { lat: 35.015, lng: 135.671, label: 'Arashiyama, Kyoto' }, rate: 0.12,
+        menu: []
+      },
+      {
+        code: 'KIKUNOI', name: 'Kikunoi Honten', type: 'restaurant', city: 'Kyoto',
+        loc: { lat: 35.001, lng: 135.780, label: 'Higashiyama, Kyoto' }, rate: 0.15,
+        menu: [
+          { id: 'm1', cat: 'Kaiseki', name: 'Hassun — seizoensvoorgerecht', desc: 'Acht kleine gerechten die het seizoen vieren.', price: 45, allergens: ['vis', 'soja', 'sesam'] },
+          { id: 'm2', cat: 'Kaiseki', name: 'Mukozuke — sashimi', desc: 'Dagverse vangst, gesneden aan tafel.', price: 60, allergens: ['vis'] },
+          { id: 'm3', cat: 'Kaiseki', name: 'Wagyu-hoofdgerecht', desc: 'A5 wagyu, licht gegrild, met seizoensgroenten.', price: 120, allergens: ['soja'] },
+          { id: 'm4', cat: 'Zoet', name: 'Matcha & wagashi', desc: 'Ceremoniële matcha met huisgemaakte wagashi.', price: 22, allergens: ['gluten', 'melk'] }
+        ]
+      },
+      {
+        code: 'PONTO', name: 'Bar Pontocho', type: 'bar', city: 'Kyoto',
+        loc: { lat: 35.004, lng: 135.770, label: 'Pontocho-steeg, Kyoto' }, rate: 0.18,
+        menu: [
+          { id: 'b1', cat: 'Signatuur', name: 'Yuzu Highball', desc: 'Japanse whisky, yuzu, bruisend.', price: 16, allergens: [] },
+          { id: 'b2', cat: 'Signatuur', name: 'Umeshu Sour', desc: 'Pruimenlikeur, citroen, eiwit.', price: 15, allergens: ['ei'] },
+          { id: 'b3', cat: 'Alcoholvrij', name: 'Sakura Spritz (0%)', desc: 'Kersenbloesem, tonic, geen alcohol.', price: 12, allergens: [] },
+          { id: 'b4', cat: 'Hapjes', name: 'Edamame & nori', desc: 'Gestoomde edamame met zeezout.', price: 8, allergens: ['soja'] }
+        ]
+      },
+      {
+        code: 'MKKX', name: 'Kyoto Executive Cars', type: 'taxi', city: 'Kyoto',
+        loc: { lat: 34.986, lng: 135.759, label: 'Kyoto Station' }, rate: 0.20,
+        menu: []
+      },
+      {
+        code: 'JETAG', name: 'Aria Private Aviation', type: 'jet', city: 'Amsterdam', country: 'NL',
+        loc: { lat: 52.308, lng: 4.764, label: 'Schiphol Business Aviation' }, rate: 0.10,
+        menu: []
+      }
+    ],
+
+    /* Bestellingen (restaurant/bar/club) en ritten (taxi/jet) tussen klant en
+       leverancier; live gedeeld via SSE, zichtbaar in de backoffice (db.json). */
+    orders: [],
+    rides: [],
+    supplierPrices: []  // dynamische prijsvoorstellen aan RTG (backoffice)
   };
 };

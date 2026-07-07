@@ -67,6 +67,7 @@ const sseClients = []; // { tier, res }
 function initRealtime() {
   if (!db.data.notifications) db.data.notifications = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.pushSubs) db.data.pushSubs = { rtg: [], lifestyle: [], business: [] };
+  if (!db.data.supplierNotifications) db.data.supplierNotifications = {};
   if (webpush) {
     if (!db.data.vapid) {
       db.data.vapid = webpush.generateVAPIDKeys();
@@ -433,6 +434,279 @@ app.post('/api/book', (req, res) => {
   save();
   res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total });
 });
+
+/* ================= LEVERANCIER-KANAAL =================
+   Eén app voor alle leverancierstypes. Communiceert live (SSE) met de
+   klanten-app, de website en de backoffice. Leveranciers gebruiken de app
+   gratis; in ruil bieden ze RTG hun beste dynamische prijs. */
+
+// SSE-routering naar een specifieke leverancier of naar de backoffice
+function sseToSupplier(code, event, data) {
+  for (const c of sseClients) if (c.sup === code) sseSend(c.res, event, data);
+}
+function sseToOffice(event, data) {
+  for (const c of sseClients) if (c.office) sseSend(c.res, event, data);
+}
+
+function notifySupplier(code, note) {
+  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
+  db.data.supplierNotifications[code] = (db.data.supplierNotifications[code] || []);
+  db.data.supplierNotifications[code].unshift(n);
+  db.data.supplierNotifications[code] = db.data.supplierNotifications[code].slice(0, 40);
+  save();
+  sseToSupplier(code, 'notify', n);
+  return n;
+}
+
+function findSupplier(code) {
+  return db.data.suppliers.find(s => s.code === String(code || '').trim().toUpperCase()) || null;
+}
+function supplierAuth(req, res, next) {
+  const header = req.get('authorization') || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  const sess = token && sessions.get(token);
+  if (!sess || sess.role !== 'supplier') return res.status(401).json({ error: 'Niet ingelogd als leverancier.' });
+  req.supplier = findSupplier(sess.code);
+  if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
+  next();
+}
+
+// publieke weergave van een leverancier (voor de klant)
+function publicSupplier(s) {
+  const t = db.data.supplierTypes[s.type] || {};
+  return { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
+           city: s.city, caps: t.caps || [], loc: s.loc, hasMenu: (s.menu || []).length > 0 };
+}
+
+// dashboarddata voor de ingelogde leverancier
+function supplierState(s) {
+  const t = db.data.supplierTypes[s.type] || {};
+  return {
+    supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
+    menu: s.menu || [],
+    orders: db.data.orders.filter(o => o.supplierCode === s.code),
+    rides: db.data.rides.filter(r => r.supplierCode === s.code),
+    prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code),
+    notifications: db.data.supplierNotifications[s.code] || []
+  };
+}
+
+// ---- leverancier: inloggen, live-stream, dashboard ----
+
+app.post('/api/supplier/login', (req, res) => {
+  const s = findSupplier(req.body.code);
+  if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
+  const token = crypto.randomBytes(24).toString('hex');
+  sessions.set(token, { role: 'supplier', code: s.code });
+  res.json({ token, state: supplierState(s) });
+});
+
+app.get('/api/supplier/stream', (req, res) => {
+  const sess = sessions.get(req.query.token);
+  if (!sess || sess.role !== 'supplier') return res.status(401).end();
+  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
+  res.write('retry: 3000\n\n');
+  const client = { sup: sess.code, res };
+  sseClients.push(client);
+  sseSend(res, 'hello', { unread: (db.data.supplierNotifications[sess.code] || []).filter(n => !n.read) });
+  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
+  req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
+});
+
+app.post('/api/supplier/state', supplierAuth, (req, res) => res.json({ state: supplierState(req.supplier) }));
+
+app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
+  (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => n.read = true);
+  save();
+  res.json({ ok: true });
+});
+
+// ---- dynamische prijs aan RTG (backoffice) ----
+app.post('/api/supplier/price', supplierAuth, (req, res) => {
+  const service = String(req.body.service || '').trim().slice(0, 120);
+  const price = Number(req.body.price);
+  if (!service || !(price > 0)) return res.status(400).json({ error: 'Vul een dienst en geldige prijs in.' });
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    supplierCode: req.supplier.code, supplierName: req.supplier.name, type: req.supplier.type,
+    service, price, at: new Date().toISOString()
+  };
+  db.data.supplierPrices.unshift(entry);
+  db.data.supplierPrices = db.data.supplierPrices.slice(0, 200);
+  save();
+  // backoffice ziet het live binnenkomen
+  sseToOffice('sync', { scope: 'prices' });
+  sseToOffice('notify', { icon: '💶', title: 'Nieuwe dynamische prijs', body: req.supplier.name + ': ' + service + ' — € ' + price });
+  res.json({ ok: true, entry });
+});
+
+// ---- menukaart bijwerken (restaurant/bar/club) ----
+app.post('/api/supplier/menu', supplierAuth, (req, res) => {
+  if (!Array.isArray(req.body.menu)) return res.status(400).json({ error: 'Menu ontbreekt.' });
+  req.supplier.menu = req.body.menu.slice(0, 100).map(m => ({
+    id: String(m.id || crypto.randomBytes(3).toString('hex')),
+    cat: String(m.cat || 'Overig').slice(0, 40),
+    name: String(m.name || '').slice(0, 80),
+    desc: String(m.desc || '').slice(0, 200),
+    price: Math.max(0, Number(m.price) || 0),
+    allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : []
+  }));
+  save();
+  res.json({ ok: true, menu: req.supplier.menu });
+});
+
+// ---- leverancier werkt orderstatus bij → klant live op de hoogte ----
+app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
+  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  const allowed = ['nieuw', 'in bereiding', 'klaar', 'geserveerd', 'geweigerd'];
+  const status = String(req.body.status || '');
+  if (!allowed.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+  o.status = status;
+  save();
+  broadcastSync([o.customerTier], 'orders');
+  sseToOffice('sync', { scope: 'orders' });
+  notify(o.customerTier, { icon: '🍽️', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
+  res.json({ ok: true, order: o });
+});
+
+// ---- leverancier stort terug → klant krijgt melding ----
+app.post('/api/supplier/refund', supplierAuth, (req, res) => {
+  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  if (!o.paid) return res.status(409).json({ error: 'Deze bestelling is niet betaald.' });
+  o.paid = false;
+  o.refunded = true;
+  o.status = 'terugbetaald';
+  save();
+  broadcastSync([o.customerTier], 'orders');
+  sseToOffice('sync', { scope: 'orders' });
+  notify(o.customerTier, { icon: '↩️', title: req.supplier.name + ' — terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
+  res.json({ ok: true, order: o });
+});
+
+// ---- leverancier deelt live locatie → klanten met actieve rit/bestelling ----
+app.post('/api/supplier/location', supplierAuth, (req, res) => {
+  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    req.supplier.loc = { lat, lng, label: String(req.body.label || req.supplier.loc.label || '').slice(0, 80) };
+    save();
+  }
+  // klanten met een actieve rit bij deze leverancier live bijwerken
+  const tiers = new Set(db.data.rides.filter(r => r.supplierCode === req.supplier.code && r.status !== 'gearriveerd').map(r => r.customerTier));
+  broadcastSync([...tiers], 'orders');
+  res.json({ ok: true, loc: req.supplier.loc });
+});
+
+/* ================= KLANTZIJDE (leden-app) ================= */
+
+// leveranciers voor de huidige stad/reis van het lid
+app.post('/api/suppliers', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const city = req.body.city;
+  const list = db.data.suppliers.filter(s => !city || s.city === city).map(publicSupplier);
+  res.json({ suppliers: list, city: db.data.trip.dest });
+});
+
+app.post('/api/supplier/menu/get', auth, (req, res) => {
+  const s = findSupplier(req.body.code);
+  if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
+  res.json({ supplier: publicSupplier(s), menu: s.menu || [] });
+});
+
+// bestelling plaatsen (restaurant/bar/club) — klant verschijnt onder codenaam
+app.post('/api/order', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
+  const wanted = Array.isArray(req.body.items) ? req.body.items : [];
+  const items = [];
+  let total = 0;
+  for (const w of wanted) {
+    const m = (s.menu || []).find(x => x.id === w.id);
+    const qty = Math.min(20, Math.max(1, parseInt(w.qty, 10) || 1));
+    if (m) { items.push({ id: m.id, name: m.name, qty, price: m.price }); total += m.price * qty; }
+  }
+  if (!items.length) return res.status(400).json({ error: 'Geen geldige gerechten gekozen.' });
+  const persona = PERSONAS[req.session.tier];
+  const order = {
+    ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    supplierCode: s.code, supplierName: s.name, type: s.type,
+    customerTier: req.session.tier, customerCodename: persona.codename,
+    items, total,
+    allergyNote: String(req.body.allergyNote || '').slice(0, 200),
+    tagSalon: !!req.body.tagSalon,
+    status: 'nieuw', paid: false, at: new Date().toISOString()
+  };
+  db.data.orders.unshift(order);
+  save();
+  // leverancier + backoffice live
+  notifySupplier(s.code, { icon: '🛎️', title: 'Nieuwe bestelling', body: persona.codename + ' — ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+  sseToSupplier(s.code, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true, order });
+});
+
+// bestelling betalen (Face ID op het toestel)
+app.post('/api/order/pay', auth, (req, res) => {
+  const o = db.data.orders.find(x => x.ref === req.body.ref && x.customerTier === req.session.tier);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
+  o.paid = true;
+  save();
+  notifySupplier(o.supplierCode, { icon: '✅', title: 'Betaald', body: o.customerCodename + ' heeft € ' + o.total + ' voldaan.' });
+  sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true, order: o });
+});
+
+app.post('/api/orders/mine', auth, (req, res) => {
+  res.json({ orders: db.data.orders.filter(o => o.customerTier === req.session.tier) });
+});
+
+/* ================= BACKOFFICE (RTG) =================
+   De backoffice ziet alle binnenkomende dynamische prijzen, bestellingen en
+   ritten live. Demo-toegang met een vaste code. */
+const OFFICE_CODE = process.env.OFFICE_CODE || 'RTG-OFFICE';
+
+app.post('/api/office/login', (req, res) => {
+  if (String(req.body.code || '').trim().toUpperCase() !== OFFICE_CODE) {
+    return res.status(401).json({ error: 'Onjuiste backoffice-code.' });
+  }
+  const token = crypto.randomBytes(24).toString('hex');
+  sessions.set(token, { role: 'office' });
+  res.json({ token, state: officeState() });
+});
+
+function officeAuth(req, res, next) {
+  const header = req.get('authorization') || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  const sess = token && sessions.get(token);
+  if (!sess || sess.role !== 'office') return res.status(401).json({ error: 'Geen backoffice-sessie.' });
+  next();
+}
+
+function officeState() {
+  return {
+    prices: db.data.supplierPrices.slice(0, 60),
+    orders: db.data.orders.slice(0, 60),
+    rides: db.data.rides.slice(0, 60),
+    suppliers: db.data.suppliers.map(publicSupplier)
+  };
+}
+
+app.get('/api/office/stream', (req, res) => {
+  const sess = sessions.get(req.query.token);
+  if (!sess || sess.role !== 'office') return res.status(401).end();
+  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
+  res.write('retry: 3000\n\n');
+  const client = { office: true, res };
+  sseClients.push(client);
+  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
+  req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
+});
+
+app.post('/api/office/state', officeAuth, (req, res) => res.json({ state: officeState() }));
 
 /* ---------- persoonlijke AI ---------- */
 

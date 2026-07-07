@@ -7,6 +7,7 @@ const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
 const { db, load, save } = require('./db');
+const i18n = require('./translate');
 
 load();
 
@@ -21,6 +22,7 @@ if (process.env.ANTHROPIC_API_KEY) {
   try {
     const Anthropic = require('@anthropic-ai/sdk');
     anthropic = new Anthropic();
+    i18n.setAnthropic(anthropic);
     console.log('Persoonlijke AI: Claude API actief (claude-opus-4-8).');
   } catch (e) {
     console.warn('ANTHROPIC_API_KEY gevonden maar @anthropic-ai/sdk ontbreekt, demo-antwoorden actief.');
@@ -174,20 +176,32 @@ function registerContact(sess, post) {
 
 /* ---------- state per gebruiker ---------- */
 
-function stateFor(sess) {
+function stateFor(sess, lang) {
+  lang = lang === 'en' ? 'en' : 'nl';
   const persona = PERSONAS[sess.tier];
+  // Systeeminhoud (facturen, reis, menu) wordt gelokaliseerd. Berichten van
+  // leden (posts, reacties) houden hun originele tekst + de taal van de auteur,
+  // zodat de ontvanger ze in zijn eigen taal vertaald kan lezen.
   const posts = db.data.posts.map(p => ({
     id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual,
-    text: p.text, reward: p.reward, featured: !!p.featured,
+    text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
     likes: p.baseLikes + Object.keys(p.likedBy).length,
     liked: !!p.likedBy[sess.key],
-    comments: p.comments,
+    comments: p.comments.map(c => ({ who: c.who, tier: c.tier, text: c.text, lang: c.lang || 'nl' })),
     canEngage: canEngage(sess, p)
   }));
-  const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0, creatorLikes: 0 };
+  const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0, creatorLikes: 0, lang };
   if (sess.tier !== 'guest') {
-    state.invoices = db.data.invoices;
-    state.trip = db.data.trip;
+    state.invoices = db.data.invoices.map(inv => ({
+      ...inv, desc: i18n.localize(inv.desc, lang), date: i18n.localize(inv.date, lang)
+    }));
+    state.trip = {
+      ...db.data.trip,
+      dates: i18n.localize(db.data.trip.dates, lang),
+      items: db.data.trip.items.map(it => ({
+        ...it, when: i18n.localize(it.when, lang), title: i18n.localize(it.title, lang), sub: i18n.localize(it.sub, lang)
+      }))
+    };
     state.creatorCredit = db.data.creatorCredit[sess.tier] || 0;
     state.creatorLikes = db.data.creatorLikes[sess.tier] || 0;
   }
@@ -209,7 +223,7 @@ app.post('/api/login', (req, res) => {
   const token = crypto.randomBytes(24).toString('hex');
   const sess = { tier, key: tier === 'guest' ? 'guest-' + token.slice(0, 8) : tier };
   sessions.set(token, sess);
-  res.json({ token, state: stateFor(sess) });
+  res.json({ token, state: stateFor(sess, req.body.lang) });
 });
 
 app.post('/api/logout', auth, (req, res) => {
@@ -217,7 +231,7 @@ app.post('/api/logout', auth, (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session) }));
+app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
 
 /* Live-verbinding. EventSource kan geen Authorization-header sturen, dus het
    token gaat als query-parameter. */
@@ -294,7 +308,7 @@ app.post('/api/pay', auth, (req, res) => {
   save();
   // ander open scherm van hetzelfde lid meteen bijwerken
   broadcastSync([req.session.tier], 'payments');
-  res.json({ ok: true, foundation, state: stateFor(req.session) });
+  res.json({ ok: true, foundation, state: stateFor(req.session, req.body.lang) });
 });
 
 app.post('/api/like', auth, (req, res) => {
@@ -324,7 +338,8 @@ app.post('/api/comment', auth, (req, res) => {
   const text = String(req.body.text || '').trim().slice(0, 500);
   if (!text) return res.status(400).json({ error: 'Lege reactie.' });
   const persona = PERSONAS[req.session.tier];
-  const comment = { who: persona.full, tier: req.session.tier, text };
+  const clang = req.body.lang === 'en' ? 'en' : 'nl';
+  const comment = { who: persona.full, tier: req.session.tier, text, lang: clang };
   post.comments.push(comment);
   registerContact(req.session, post);
   save();
@@ -352,6 +367,7 @@ app.post('/api/dm', auth, (req, res) => {
     fromTier: req.session.tier,
     to: post.author,
     text,
+    lang: req.body.lang === 'en' ? 'en' : 'nl',
     at: new Date().toISOString()
   });
   save();
@@ -361,6 +377,20 @@ app.post('/api/dm', auth, (req, res) => {
     notify(ownerTier, { icon: '✉', title: 'Nieuw bericht in De Salon', body: PERSONAS[req.session.tier].full + ' stuurde u een bericht.', scope: 'salon' });
   }
   res.json({ ok: true });
+});
+
+/* Vertaal een bericht naar de taal van de ontvanger. Iedereen schrijft in de
+   eigen taal; de lezer krijgt het in de zijne (en andersom). */
+app.post('/api/translate', async (req, res) => {
+  const text = String(req.body.text || '').slice(0, 1500);
+  const to = req.body.to === 'en' ? 'en' : 'nl';
+  const from = (req.body.from === 'en' || req.body.from === 'nl') ? req.body.from : undefined;
+  try {
+    const out = await i18n.translate(text, to, from);
+    res.json(out);
+  } catch (e) {
+    res.json({ text, translated: false });
+  }
 });
 
 /* ---------- partnerkanaal: boeken zonder pas ----------
@@ -385,10 +415,10 @@ function publicPartner(p) {
   return { code: p.code, name: p.name, type: p.type, handle: p.handle, hasStaff: !!p.staff };
 }
 
-function publicTrip(t, staffRate) {
+function publicTrip(t, staffRate, lang) {
   const out = {
-    id: t.id, dest: t.dest, visual: t.visual, title: t.title,
-    dates: t.dates, desc: t.desc, includes: t.includes,
+    id: t.id, dest: t.dest, visual: t.visual, title: i18n.localize(t.title, lang),
+    dates: i18n.localize(t.dates, lang), desc: i18n.localize(t.desc, lang), includes: i18n.localizeList(t.includes, lang),
     price: Math.round(t.netto * (1 + db.data.partnerService))
   };
   if (staffRate != null) out.staffPrice = Math.round(t.netto * (1 + staffRate));
@@ -421,7 +451,7 @@ app.post('/api/partnertrips', (req, res) => {
     const p = findStaffPartner(req.body.staffCode);
     if (p) staffRate = p.staff.serviceRate;
   }
-  res.json({ trips: db.data.partnerTrips.map(t => publicTrip(t, staffRate)) });
+  res.json({ trips: db.data.partnerTrips.map(t => publicTrip(t, staffRate, req.body.lang)) });
 });
 
 app.post('/api/book', (req, res) => {
@@ -497,10 +527,11 @@ function supplierAuth(req, res, next) {
 }
 
 // publieke weergave van een leverancier (voor de klant)
-function publicSupplier(s) {
+function publicSupplier(s, lang) {
   const t = db.data.supplierTypes[s.type] || {};
+  const loc = s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : s.loc;
   return { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
-           city: s.city, caps: t.caps || [], loc: s.loc, hasMenu: (s.menu || []).length > 0 };
+           city: s.city, caps: t.caps || [], loc, hasMenu: (s.menu || []).length > 0 };
 }
 
 // dashboarddata voor de ingelogde leverancier
@@ -636,14 +667,16 @@ app.post('/api/supplier/location', supplierAuth, (req, res) => {
 app.post('/api/suppliers', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const city = req.body.city;
-  const list = db.data.suppliers.filter(s => !city || s.city === city).map(publicSupplier);
+  const list = db.data.suppliers.filter(s => !city || s.city === city).map(s => publicSupplier(s, req.body.lang));
   res.json({ suppliers: list, city: db.data.trip.dest });
 });
 
 app.post('/api/supplier/menu/get', auth, (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
-  res.json({ supplier: publicSupplier(s), menu: s.menu || [] });
+  const lang = req.body.lang;
+  const menu = (s.menu || []).map(m => ({ ...m, name: i18n.localize(m.name, lang), desc: i18n.localize(m.desc, lang), cat: i18n.localize(m.cat, lang) }));
+  res.json({ supplier: publicSupplier(s, lang), menu });
 });
 
 // bestelling plaatsen (restaurant/bar/club), klant verschijnt onder codenaam

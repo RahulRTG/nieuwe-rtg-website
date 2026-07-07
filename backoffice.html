@@ -77,11 +77,11 @@
 <div id="gate">
   <div class="gate-card">
     <div class="k">Backoffice</div>
-    <h1>Inloggen</h1>
-    <p>Live overzicht van alle dynamische prijzen, bestellingen en ritten via RTG-partners.</p>
-    <input id="code" placeholder="Backoffice-code" value="RTG-OFFICE">
-    <button id="loginBtn">Inloggen</button>
-    <div class="hint">Demo-code: RTG-OFFICE</div>
+    <h1 data-i18n="gate.h">Inloggen</h1>
+    <p data-i18n="gate.p">Live overzicht van alle dynamische prijzen, bestellingen en ritten via RTG-partners.</p>
+    <input id="code" placeholder="Backoffice-code" data-i18n-ph="gate.ph" value="RTG-OFFICE">
+    <button id="loginBtn" data-i18n="gate.btn">Inloggen</button>
+    <div class="hint" data-i18n="gate.hint">Demo-code: RTG-OFFICE</div>
   </div>
 </div>
 
@@ -90,11 +90,11 @@
     <div class="stat" id="stat"></div>
     <div class="cols">
       <div class="panel">
-        <h2>Dynamische prijzen</h2>
+        <h2 data-i18n="panel.prices">Dynamische prijzen</h2>
         <div class="rows" id="prices"></div>
       </div>
       <div class="panel">
-        <h2>Bestellingen &amp; ritten</h2>
+        <h2 data-i18n="panel.orders">Bestellingen &amp; ritten</h2>
         <div class="rows" id="orders"></div>
       </div>
     </div>
@@ -162,5 +162,14 @@
   }
 })();
 </script>
+<script>
+window.I18N = { en: {
+  'gate.h':'Sign in',
+  'gate.p':'Live overview of all dynamic prices, orders and rides via RTG partners.',
+  'gate.ph':'Back-office code', 'gate.btn':'Sign in', 'gate.hint':'Demo code: RTG-OFFICE',
+  'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides'
+} };
+</script>
+<script src="i18n.js"></script>
 </body>
 </html>

@@ -152,16 +152,16 @@
 
   <div id="gate">
     <div class="badge">RTG Partners</div>
-    <h1>De leverancier-<em>app</em>.</h1>
-    <p class="deck">Eén app voor hotels, taxi's, privéjets, appartementen, restaurants, bars en clubs. Ontvang RTG-gasten, deel uw menu, beheer bestellingen en ritten, live verbonden met de gast en de RTG-backoffice.</p>
+    <h1 data-i18n-html="gate.title">De leverancier-<em>app</em>.</h1>
+    <p class="deck" data-i18n="gate.deck">Eén app voor hotels, taxi's, privéjets, appartementen, restaurants, bars en clubs. Ontvang RTG-gasten, deel uw menu, beheer bestellingen en ritten, live verbonden met de gast en de RTG-backoffice.</p>
     <form class="login-form" id="loginForm">
-      <input id="liUser" name="username" placeholder="Gebruikersnaam" autocomplete="username" autocapitalize="none">
-      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" autocomplete="current-password">
-      <button type="submit">Inloggen</button>
+      <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
+      <button type="submit" data-i18n="gate.signin">Inloggen</button>
     </form>
-    <p class="gate-or">of kies een demo-partner</p>
+    <p class="gate-or" data-i18n="gate.or">of kies een demo-partner</p>
     <div class="gate-list" id="gateList"></div>
-    <p class="free"><b>Demo-account:</b> gebruikersnaam Rahul, wachtwoord Imran. <b>Gratis te gebruiken:</b> als partner betaalt u niets voor de app. In ruil levert u RTG uw beste dynamische prijs, die u zelf in de app doorgeeft.</p>
+    <p class="free" data-i18n-html="gate.free"><b>Demo-account:</b> gebruikersnaam Rahul, wachtwoord Imran. <b>Gratis te gebruiken:</b> als partner betaalt u niets voor de app. In ruil levert u RTG uw beste dynamische prijs, die u zelf in de app doorgeeft.</p>
   </div>
 
   <div id="app">
@@ -469,5 +469,14 @@
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
 </script>
+<script>
+window.I18N = { en: {
+  'gate.title':'The supplier <em>app</em>.',
+  'gate.deck':'One app for hotels, taxis, private jets, apartments, restaurants, bars and clubs. Welcome RTG guests, share your menu, manage orders and rides, live-connected with the guest and the RTG back office.',
+  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo partner',
+  'gate.free':'<b>Demo account:</b> username Rahul, password Imran. <b>Free to use:</b> as a partner you pay nothing for the app. In return you supply RTG your best dynamic price, which you submit in the app yourself.'
+} };
+</script>
+<script src="i18n.js"></script>
 </body>
 </html>

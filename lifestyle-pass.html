@@ -419,9 +419,9 @@
 
 <section class="hero on-white">
   <div class="wrap hero-inner">
-    <span class="kicker">Concierge · Volledig persoonlijk</span>
+    <span class="kicker" data-i18n="hero.kicker">Concierge · Volledig persoonlijk</span>
     <h1>Lifestyle Pass</h1>
-    <p class="deck">Geen chatbot, geen wachtrij. Bij de Lifestyle Pass spreekt u rechtstreeks met uw vaste concierge, via WhatsApp, van de eerste vraag tot de laatste check-out.</p>
+    <p class="deck" data-i18n="hero.deck">Geen chatbot, geen wachtrij. Bij de Lifestyle Pass spreekt u rechtstreeks met uw vaste concierge, via WhatsApp, van de eerste vraag tot de laatste check-out.</p>
     <div class="hero-cta">
       <a href="#voorbeeld" class="btn">Maak kennis met uw concierge</a>
       <a href="index.html#passen" class="btn btn-ghost">Terug naar overzicht</a>
@@ -520,5 +520,12 @@
   </div>
 </footer>
 
+<script>
+window.I18N = { en: {
+  'hero.kicker':'Concierge · Fully personal',
+  'hero.deck':'No chatbot, no queue. With the Lifestyle Pass you speak directly with your dedicated concierge, via WhatsApp, from the first question to the last check-out.'
+} };
+</script>
+<script src="i18n.js"></script>
 </body>
 </html>

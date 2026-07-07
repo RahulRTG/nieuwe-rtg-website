@@ -188,9 +188,9 @@
 <section class="hero">
   <div class="wrap hero-inner">
     <div>
-      <span class="kicker">De RTG-app</span>
-      <h1>Uw pas, altijd <em>op zak</em>.</h1>
-      <p class="deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, in één app op uw telefoon. Geen appstore nodig: u installeert de app rechtstreeks vanaf deze pagina, in enkele seconden.</p>
+      <span class="kicker" data-i18n="hero.kicker">De RTG-app</span>
+      <h1 data-i18n-html="hero.title">Uw pas, altijd <em>op zak</em>.</h1>
+      <p class="deck" data-i18n="hero.deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, in één app op uw telefoon. Geen appstore nodig: u installeert de app rechtstreeks vanaf deze pagina, in enkele seconden.</p>
       <div class="cta-row">
         <button class="btn" id="installBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
@@ -420,5 +420,13 @@
 })();
 </script>
 
+<script>
+window.I18N = { en: {
+  'hero.kicker':'The RTG app',
+  'hero.title':'Your membership, always <em>with you</em>.',
+  'hero.deck':'Bookings, one-tap payment, your personal AI and The Salon, in one app on your phone. No app store needed: you install the app directly from this page, in seconds.'
+} };
+</script>
+<script src="i18n.js"></script>
 </body>
 </html>

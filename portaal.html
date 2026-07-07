@@ -1004,45 +1004,45 @@
 <section id="gate">
   <div class="wrap">
     <div class="gate-head">
-      <span class="kicker">Ledenportaal</span>
-      <h1>Uw sleutel tot alles wat RTG regelt.</h1>
-      <p class="deck">Betalingen, reizen, uw persoonlijke AI en De Salon, het besloten sociale netwerk van RTG. Dit portaal is tegelijk uw toegangskaart voor de RTG-app die eraan komt.</p>
-      <p class="demo-note">Log in met uw account, of kies hieronder een demoprofiel. Elke pas heeft andere rechten.</p>
+      <span class="kicker" data-i18n="gate.kicker">Ledenportaal</span>
+      <h1 data-i18n="gate.title">Uw sleutel tot alles wat RTG regelt.</h1>
+      <p class="deck" data-i18n="gate.deck">Betalingen, reizen, uw persoonlijke AI en De Salon, het besloten sociale netwerk van RTG. Dit portaal is tegelijk uw toegangskaart voor de RTG-app die eraan komt.</p>
+      <p class="demo-note" data-i18n="gate.note">Log in met uw account, of kies hieronder een demoprofiel. Elke pas heeft andere rechten.</p>
     </div>
     <div class="login-box">
-      <span class="lb-k">Ledenlogin</span>
-      <h3>Inloggen</h3>
+      <span class="lb-k" data-i18n="gate.lb.k">Ledenlogin</span>
+      <h3 data-i18n="gate.lb.h">Inloggen</h3>
       <form id="loginForm">
-        <input id="liUser" name="username" placeholder="Gebruikersnaam" autocomplete="username" autocapitalize="none">
-        <input id="liPass" name="password" type="password" placeholder="Wachtwoord" autocomplete="current-password">
-        <button type="submit">Inloggen</button>
+        <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+        <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
+        <button type="submit" data-i18n="gate.signin">Inloggen</button>
       </form>
-      <p class="lb-hint">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>.</p>
+      <p class="lb-hint" data-i18n-html="gate.hint">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>.</p>
     </div>
     <div class="gate-grid">
       <button class="gate-card" data-login="guest">
-        <span class="tier-chip t-guest"><span class="dot"></span>Zonder pas</span>
-        <h3>Gast</h3>
-        <p>Kijk mee in De Salon. Gasten kunnen posts liken, maar niet reageren of berichten sturen, en zien wat lidmaatschap ontsluit.</p>
-        <span class="enter">Binnenkijken <span class="arrow">→</span></span>
+        <span class="tier-chip t-guest"><span class="dot"></span><span data-i18n="gate.guest.chip">Zonder pas</span></span>
+        <h3 data-i18n="gate.guest.h">Gast</h3>
+        <p data-i18n="gate.guest.p">Kijk mee in De Salon. Gasten kunnen posts liken, maar niet reageren of berichten sturen, en zien wat lidmaatschap ontsluit.</p>
+        <span class="enter" data-i18n-html="gate.guest.go">Binnenkijken <span class="arrow">→</span></span>
       </button>
       <button class="gate-card" data-login="rtg">
         <span class="tier-chip t-rtg"><span class="dot"></span>RTG Pass</span>
         <h3>S. Janssen</h3>
-        <p>Volledig portaal met de AI-Butler. In De Salon reageert en dm't u met andere RTG-leden; bij Lifestyle- en Business-leden kunt u liken.</p>
-        <span class="enter">Inloggen als RTG-lid <span class="arrow">→</span></span>
+        <p data-i18n="gate.rtg.p">Volledig portaal met de AI-Butler. In De Salon reageert en dm't u met andere RTG-leden; bij Lifestyle- en Business-leden kunt u liken.</p>
+        <span class="enter" data-i18n-html="gate.rtg.go">Inloggen als RTG-lid <span class="arrow">→</span></span>
       </button>
       <button class="gate-card" data-login="lifestyle">
         <span class="tier-chip t-lifestyle"><span class="dot"></span>Lifestyle Pass</span>
         <h3>I. van Rhijn</h3>
-        <p>Volledig portaal, persoonlijke concierge én AI-voorbereiding. In De Salon volledige interactie met alle leden.</p>
-        <span class="enter">Inloggen als Lifestyle-lid <span class="arrow">→</span></span>
+        <p data-i18n="gate.life.p">Volledig portaal, persoonlijke concierge én AI-voorbereiding. In De Salon volledige interactie met alle leden.</p>
+        <span class="enter" data-i18n-html="gate.life.go">Inloggen als Lifestyle-lid <span class="arrow">→</span></span>
       </button>
       <button class="gate-card" data-login="business">
         <span class="tier-chip t-business"><span class="dot"></span>Business Pass</span>
         <h3>A. de Vries</h3>
-        <p>Volledig portaal, zakelijk ingericht. In De Salon volledige interactie met alle leden.</p>
-        <span class="enter">Inloggen als Business-lid <span class="arrow">→</span></span>
+        <p data-i18n="gate.biz.p">Volledig portaal, zakelijk ingericht. In De Salon volledige interactie met alle leden.</p>
+        <span class="enter" data-i18n-html="gate.biz.go">Inloggen als Business-lid <span class="arrow">→</span></span>
       </button>
     </div>
   </div>
@@ -1984,6 +1984,26 @@
   }
 })();
 </script>
+<script>
+window.I18N = { en: {
+  'gate.kicker':'Member portal', 'gate.title':'Your key to everything RTG arranges.',
+  'gate.deck':'Payments, journeys, your personal AI and The Salon, the private social network of RTG. This portal is also your access card for the RTG app that is on its way.',
+  'gate.note':'Sign in with your account, or choose a demo profile below. Each membership has different rights.',
+  'gate.lb.k':'Member login', 'gate.lb.h':'Sign in',
+  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in',
+  'gate.hint':'Demo account: username <b>Rahul</b>, password <b>Imran</b>.',
+  'gate.guest.chip':'No membership', 'gate.guest.h':'Guest',
+  'gate.guest.p':'Look inside The Salon. Guests can like posts, but not comment or send messages, and see what membership unlocks.',
+  'gate.guest.go':'Take a look <span class="arrow">→</span>',
+  'gate.rtg.p':'Full portal with the AI Butler. In The Salon you comment and DM with other RTG members; with Lifestyle and Business members you can like.',
+  'gate.rtg.go':'Sign in as an RTG member <span class="arrow">→</span>',
+  'gate.life.p':'Full portal, personal concierge and AI preparation. In The Salon, full interaction with all members.',
+  'gate.life.go':'Sign in as a Lifestyle member <span class="arrow">→</span>',
+  'gate.biz.p':'Full portal, set up for business. In The Salon, full interaction with all members.',
+  'gate.biz.go':'Sign in as a Business member <span class="arrow">→</span>'
+} };
+</script>
+<script src="i18n.js"></script>
 
 </body>
 </html>

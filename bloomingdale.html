@@ -304,30 +304,30 @@
 <section class="hero">
   <div class="wrap hero-inner">
     <span class="kicker">Bloomingdale Bloemendaal × Rahul Travel Group</span>
-    <h1>Reizen, geregeld zoals bij ons <span class="accent">aan zee</span>.</h1>
-    <p class="deck">Bloomingdale werkt samen met Rahul Travel Group: onze gasten boeken hier bijzondere reizen uit de RTG-collectie, en ons team reist met personeelsvoordeel, als extra arbeidsvoorwaarde. Eén heldere totaalprijs, alles geregeld.</p>
-    <p class="demo-note">Conceptdemo, demo-account: gebruikersnaam Rahul, wachtwoord Imran. Of personeelscode BLOOM-TEAM.</p>
+    <h1 data-i18n-html="b.hero.title">Reizen, geregeld zoals bij ons <span class="accent">aan zee</span>.</h1>
+    <p class="deck" data-i18n="b.hero.deck">Bloomingdale werkt samen met Rahul Travel Group: onze gasten boeken hier bijzondere reizen uit de RTG-collectie, en ons team reist met personeelsvoordeel, als extra arbeidsvoorwaarde. Eén heldere totaalprijs, alles geregeld.</p>
+    <p class="demo-note" data-i18n="b.hero.demo">Conceptdemo, demo-account: gebruikersnaam Rahul, wachtwoord Imran. Of personeelscode BLOOM-TEAM.</p>
   </div>
 </section>
 
 <div class="wrap channels" id="kanalen">
   <div class="channel-grid">
     <div class="channel-card" id="guestCard">
-      <span class="tag">Voor gasten</span>
-      <h3>Boek een reis uit onze selectie</h3>
-      <p>Bloomingdale selecteerde drie reizen uit de RTG-collectie, dezelfde adressen waar RTG-leden over posten. U boekt direct, wij en RTG regelen de rest.</p>
-      <div class="row"><a href="#reizen" class="btn btn-small">Bekijk de reizen</a></div>
+      <span class="tag" data-i18n="b.guest.tag">Voor gasten</span>
+      <h3 data-i18n="b.guest.h">Boek een reis uit onze selectie</h3>
+      <p data-i18n="b.guest.p">Bloomingdale selecteerde drie reizen uit de RTG-collectie, dezelfde adressen waar RTG-leden over posten. U boekt direct, wij en RTG regelen de rest.</p>
+      <div class="row"><a href="#reizen" class="btn btn-small" data-i18n="b.guest.btn">Bekijk de reizen</a></div>
     </div>
     <div class="channel-card" id="staffCard">
-      <span class="tag">Voor het team</span>
-      <h3>Personeelsvoordeel Bloomingdale</h3>
-      <p>Werk je bij Bloomingdale? Log in met je account of personeelscode en boek dezelfde reizen met personeelsvoordeel, ons cadeau, geregeld via RTG.</p>
+      <span class="tag" data-i18n="b.staff.tag">Voor het team</span>
+      <h3 data-i18n="b.staff.h">Personeelsvoordeel Bloomingdale</h3>
+      <p data-i18n="b.staff.p">Werk je bij Bloomingdale? Log in met je account of personeelscode en boek dezelfde reizen met personeelsvoordeel, ons cadeau, geregeld via RTG.</p>
       <form class="staff-login" id="staffLogin">
-        <input id="staffUser" placeholder="Gebruikersnaam" autocomplete="username" autocapitalize="none">
-        <input id="staffPass" type="password" placeholder="Wachtwoord" autocomplete="current-password">
-        <button class="btn btn-small" type="submit">Inloggen</button>
+        <input id="staffUser" placeholder="Gebruikersnaam" data-i18n-ph="b.user" autocomplete="username" autocapitalize="none">
+        <input id="staffPass" type="password" placeholder="Wachtwoord" data-i18n-ph="b.pass" autocomplete="current-password">
+        <button class="btn btn-small" type="submit" data-i18n="b.signin">Inloggen</button>
       </form>
-      <p class="staff-or">of met personeelscode</p>
+      <p class="staff-or" data-i18n="b.staff.or">of met personeelscode</p>
       <div class="row" id="staffRow">
         <input id="staffInput" placeholder="PERSONEELSCODE" maxlength="16">
         <button class="btn btn-small" id="staffBtn">Activeren</button>
@@ -633,6 +633,20 @@
   })();
 })();
 </script>
+<script>
+window.I18N = { en: {
+  'b.hero.title':'Travel, arranged the way we do it <span class="accent">by the sea</span>.',
+  'b.hero.deck':'Bloomingdale works together with Rahul Travel Group: our guests book special journeys from the RTG collection here, and our team travels with staff benefits, as an extra employment perk. One clear total price, everything arranged.',
+  'b.hero.demo':'Concept demo, demo account: username Rahul, password Imran. Or staff code BLOOM-TEAM.',
+  'b.guest.tag':'For guests', 'b.guest.h':'Book a journey from our selection',
+  'b.guest.p':'Bloomingdale selected three journeys from the RTG collection, the same addresses RTG members post about. You book directly, we and RTG arrange the rest.',
+  'b.guest.btn':'View the journeys',
+  'b.staff.tag':'For the team', 'b.staff.h':'Bloomingdale staff benefit',
+  'b.staff.p':'Do you work at Bloomingdale? Sign in with your account or staff code and book the same journeys with staff benefits, our gift, arranged via RTG.',
+  'b.user':'Username', 'b.pass':'Password', 'b.signin':'Sign in', 'b.staff.or':'or with a staff code'
+} };
+</script>
+<script src="i18n.js"></script>
 
 </body>
 </html>

@@ -473,9 +473,9 @@
 
 <section class="hero on-burgundy">
   <div class="wrap hero-inner">
-    <span class="kicker">Instap · Volledig geautomatiseerd</span>
+    <span class="kicker" data-i18n="hero.kicker">Instap · Volledig geautomatiseerd</span>
     <h1>RTG Pass</h1>
-    <p class="deck">Geen aanvraagformulier, geen wachttijd. De RTG Pass werkt via WhatsApp: je stelt jezelf voor, de Butler stelt een paar gerichte vragen, en toegang volgt vanzelf, rustig en zonder ophef.</p>
+    <p class="deck" data-i18n="hero.deck">Geen aanvraagformulier, geen wachttijd. De RTG Pass werkt via WhatsApp: je stelt jezelf voor, de Butler stelt een paar gerichte vragen, en toegang volgt vanzelf, rustig en zonder ophef.</p>
     <div class="hero-cta">
       <a href="#butler" class="btn">Praat met de Butler</a>
       <a href="index.html#passen" class="btn btn-ghost">Terug naar overzicht</a>
@@ -658,5 +658,12 @@
 })();
 </script>
 
+<script>
+window.I18N = { en: {
+  'hero.kicker':'Entry · Fully automated',
+  'hero.deck':'No application form, no waiting time. The RTG Pass works via WhatsApp: you introduce yourself, the Butler asks a few targeted questions, and access follows naturally, calmly and without fuss.'
+} };
+</script>
+<script src="i18n.js"></script>
 </body>
 </html>

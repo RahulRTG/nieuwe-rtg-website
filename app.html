@@ -570,20 +570,20 @@
   <div id="gate">
     <div class="logo">Rahul Travel Group</div>
     <div class="tagline">Experience the Elite Class</div>
-    <h1>De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
-    <p class="deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, en uw account draait op uw codenaam, niet op uw echte naam.</p>
+    <h1 data-i18n-html="gate.title">De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
+    <p class="deck" data-i18n="gate.deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, en uw account draait op uw codenaam, niet op uw echte naam.</p>
     <form class="login-form" id="loginForm">
-      <input id="liUser" name="username" placeholder="Gebruikersnaam" autocomplete="username" autocapitalize="none">
-      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" autocomplete="current-password">
-      <button type="submit">Inloggen</button>
+      <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
+      <button type="submit" data-i18n="gate.signin">Inloggen</button>
     </form>
-    <p class="gate-or">of kies een demoprofiel</p>
+    <p class="gate-or" data-i18n="gate.or">of kies een demoprofiel</p>
     <div class="gate-list">
       <button class="gate-btn t-rtg" data-login="rtg"><span class="dot"></span><span><b>S. Janssen</b><span>RTG Pass · codenaam Zilveren Valk</span></span></button>
       <button class="gate-btn t-lifestyle" data-login="lifestyle"><span class="dot"></span><span><b>I. van Rhijn</b><span>Lifestyle Pass · codenaam Gouden Ibis</span></span></button>
       <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>A. de Vries</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
     </div>
-    <p class="note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
+    <p class="note" data-i18n-html="gate.note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
   </div>
 
   <!-- app -->
@@ -1352,5 +1352,14 @@
   }
 })();
 </script>
+<script>
+window.I18N = { en: {
+  'gate.title':'The app.<br>Your membership, <em>always</em> with you.',
+  'gate.deck':'Bookings, one-tap payment, your personal AI and The Salon, and your account runs on your codename, not your real name.',
+  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
+  'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>'
+} };
+</script>
+<script src="i18n.js"></script>
 </body>
 </html>

@@ -420,9 +420,9 @@
 
 <section class="hero on-black">
   <div class="wrap hero-inner">
-    <span class="kicker">Zakelijk · Hybride</span>
+    <span class="kicker" data-i18n="hero.kicker">Zakelijk · Hybride</span>
     <h1>Business Pass</h1>
-    <p class="deck">Eén vaste accountmanager voor de strategie. Automatische verwerking voor de uitvoering. Geen overhead, geen wachttijd.</p>
+    <p class="deck" data-i18n="hero.deck">Eén vaste accountmanager voor de strategie. Automatische verwerking voor de uitvoering. Geen overhead, geen wachttijd.</p>
     <div class="hero-cta">
       <a href="#hybride" class="btn">Bekijk de werkwijze</a>
       <a href="index.html#passen" class="btn btn-ghost">Terug naar overzicht</a>
@@ -532,5 +532,12 @@
   </div>
 </footer>
 
+<script>
+window.I18N = { en: {
+  'hero.kicker':'Business · Hybrid',
+  'hero.deck':'One dedicated account manager for strategy. Automated processing for execution. No overhead, no waiting time.'
+} };
+</script>
+<script src="i18n.js"></script>
 </body>
 </html>

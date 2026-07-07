@@ -601,8 +601,8 @@
 
     <div class="notif-panel" id="notifPanel">
       <div class="notif-head">
-        <b>Meldingen</b>
-        <button class="notif-push" id="notifPush">Push aanzetten</button>
+        <b data-i18n="app.notifs">Meldingen</b>
+        <button class="notif-push" id="notifPush" data-i18n="app.pushenable">Push aanzetten</button>
       </div>
       <div class="notif-list" id="notifList"></div>
     </div>
@@ -620,38 +620,38 @@
       </div>
 
       <div class="view" data-view="reizen">
-        <h2>Uw reis.</h2>
+        <h2 data-i18n="app.v.trip">Uw reis.</h2>
         <p class="sub" id="tripSub"></p>
         <div class="card" id="tripList"></div>
-        <p class="sub" style="margin-top:1rem;">Wijzigen of toevoegen? Vraag het de AI, één bericht is genoeg.</p>
+        <p class="sub" style="margin-top:1rem;" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Vraag het de AI, één bericht is genoeg.</p>
       </div>
 
       <div class="view" data-view="betalen">
-        <h2>Betalen.</h2>
-        <p class="sub">Eén tik, Face ID. Uw betalingen staan op uw codenaam.</p>
+        <h2 data-i18n="app.v.pay">Betalen.</h2>
+        <p class="sub" data-i18n="app.v.pay.sub">Eén tik, Face ID. Uw betalingen staan op uw codenaam.</p>
         <div class="card" id="payList"></div>
         <div id="payAllWrap"></div>
       </div>
 
       <div class="view" data-view="ai">
         <h2 id="aiTitle">Uw AI.</h2>
-        <p class="sub">De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.</p>
+        <p class="sub" data-i18n="app.v.ai.sub">De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.</p>
         <div class="chat" id="chat"></div>
         <div class="chips" id="chips"></div>
         <div class="askrow">
-          <input id="askInput" placeholder="Stel een vraag…">
-          <button id="askBtn">Stuur</button>
+          <input id="askInput" placeholder="Stel een vraag…" data-i18n-ph="app.v.ai.ph">
+          <button id="askBtn" data-i18n="app.v.ai.send">Stuur</button>
         </div>
       </div>
 
       <div class="view" data-view="salon">
-        <h2>De Salon.</h2>
-        <p class="sub">Posts verschijnen 7 dagen na verblijf, voor uw veiligheid.</p>
+        <h2 data-i18n="app.v.salon">De Salon.</h2>
+        <p class="sub" data-i18n="app.v.salon.sub">Posts verschijnen 7 dagen na verblijf, voor uw veiligheid.</p>
         <div id="feed"></div>
       </div>
 
       <div class="view" data-view="terplaatse">
-        <h2>Ter plaatse.</h2>
+        <h2 data-i18n="app.v.tp">Ter plaatse.</h2>
         <p class="sub" id="tpSub">Bestel, betaal en reserveer bij RTG-partners op uw bestemming.</p>
         <div id="myOrders"></div>
         <div id="supplierList"></div>
@@ -660,12 +660,12 @@
     </div>
 
     <div class="tabbar" id="tabbar">
-      <button data-tab="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</button>
-      <button data-tab="reizen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-6-8 4-2 6-2-5-8 1z"/></svg>Reizen</button>
-      <button data-tab="betalen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg>Betalen</button>
-      <button data-tab="ai"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>AI</button>
-      <button data-tab="salon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="10.5" r="2.4"/><path d="M3.5 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><path d="M14.5 18.5c.5-2.2 1.6-3.4 3.4-3.4 1.4 0 2.6.8 3.1 2.4"/></svg>Salon</button>
-      <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Ter plaatse</button>
+      <button data-tab="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span data-i18n="app.tab.home">Home</span></button>
+      <button data-tab="reizen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-6-8 4-2 6-2-5-8 1z"/></svg><span data-i18n="app.tab.trips">Reizen</span></button>
+      <button data-tab="betalen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg><span data-i18n="app.tab.pay">Betalen</span></button>
+      <button data-tab="ai"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg><span data-i18n="app.tab.ai">AI</span></button>
+      <button data-tab="salon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="10.5" r="2.4"/><path d="M3.5 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><path d="M14.5 18.5c.5-2.2 1.6-3.4 3.4-3.4 1.4 0 2.6.8 3.1 2.4"/></svg><span data-i18n="app.tab.salon">Salon</span></button>
+      <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="app.tab.tp">Ter plaatse</span></button>
     </div>
   </div>
 
@@ -696,7 +696,18 @@
 <script>
 (function(){
   const $ = s => document.querySelector(s);
-  const eur = n => '€ ' + n.toLocaleString('nl-NL');
+  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  const nfmt = n => Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  const eur = n => '€ ' + nfmt(n);
+  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded' };
+  const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
+  const LBL = { 'Bevestigd':'Confirmed', 'Wacht op betaling':'Awaiting payment', 'In aanvraag':'Requested', 'Betaald':'Paid' };
+  const tLbl = s => (lang() === 'en' ? (LBL[s] || s) : s);
+  const ALG = { 'vis':'fish', 'soja':'soy', 'sesam':'sesame', 'gluten':'gluten', 'noten':'nuts', 'schaaldieren':'shellfish', 'ei':'egg', 'melk':'milk', 'pinda':'peanut', 'selderij':'celery', 'mosterd':'mustard' };
+  const tAlg = a => (lang() === 'en' ? (ALG[a] || a) : a);
+  const TYPELABEL = { 'Hotel':'Hotel', 'Restaurant':'Restaurant', 'Bar':'Bar', 'Taxi':'Taxi', 'Privéjet':'Private jet', 'Appartement':'Apartment', 'Club':'Club' };
+  const tType = s => (lang() === 'en' ? (TYPELABEL[s] || s) : s);
 
   /* ---------- lokale demo-data (fallback zonder backend) ---------- */
 
@@ -852,12 +863,13 @@
 
   function timeAgo(iso){
     const s = Math.max(1, Math.round((Date.now() - new Date(iso)) / 1000));
-    if (s < 60) return 'zojuist';
+    if (s < 60) return T('t.now','zojuist');
+    const ago = T('t.ago',' geleden');
     const m = Math.round(s / 60);
-    if (m < 60) return m + ' min geleden';
+    if (m < 60) return m + T('t.min',' min') + ago;
     const h = Math.round(m / 60);
-    if (h < 24) return h + ' uur geleden';
-    return Math.round(h / 24) + ' dag(en) geleden';
+    if (h < 24) return h + T('t.hour',' uur') + ago;
+    return Math.round(h / 24) + T('t.days',' dag(en)') + ago;
   }
 
   function renderBell(){
@@ -874,12 +886,12 @@
             '<div class="ic">' + (x.icon || '•') + '</div>' +
             '<div class="tx"><b>' + x.title + '</b><span>' + x.body + '</span><time>' + timeAgo(x.at) + '</time></div>' +
           '</div>').join('')
-      : '<div class="notif-empty">Nog geen meldingen. Zodra iemand op uw post reageert of u een bericht stuurt, ziet u het hier.</div>';
+      : '<div class="notif-empty">'+T('app.nonotif','Nog geen meldingen. Zodra iemand op uw post reageert of u een bericht stuurt, ziet u het hier.')+'</div>';
     const pb = $('#notifPush');
     const st = R.pushState();
-    if (st === 'on'){ pb.textContent = '✓ Push aan'; pb.classList.add('on'); }
+    if (st === 'on'){ pb.textContent = '✓ '+T('app.pushon','Push aan'); pb.classList.add('on'); }
     else if (st === 'unsupported'){ pb.style.display = 'none'; }
-    else { pb.textContent = 'Push aanzetten'; pb.classList.remove('on'); }
+    else { pb.textContent = T('app.pushenable','Push aanzetten'); pb.classList.remove('on'); }
   }
 
   function openNotif(open){
@@ -895,7 +907,7 @@
   $('#notifPush').addEventListener('click', async () => {
     if (!window.RTGRealtime) return;
     const r = await RTGRealtime.enablePush();
-    toast(r === 'on' ? 'Push-notificaties staan aan.' : r === 'denied' ? 'Toestemming geweigerd, zet meldingen aan in uw instellingen.' : 'Push is hier niet beschikbaar.');
+    toast(r === 'on' ? T('app.pushtoast.on','Push-notificaties staan aan.') : r === 'denied' ? T('app.pushtoast.denied','Toestemming geweigerd, zet meldingen aan in uw instellingen.') : T('app.pushtoast.no','Push is hier niet beschikbaar.'));
     renderBell();
   });
 
@@ -928,28 +940,28 @@
 
   async function renderTerPlaatse(){
     if (!API.live){
-      $('#supplierList').innerHTML = '<div class="empty" style="padding:2rem 1rem;color:var(--soft);text-align:center;font-size:0.85rem;">Ter plaatse werkt via de RTG-server. Start de app met de backend om te bestellen bij partners.</div>';
+      $('#supplierList').innerHTML = '<div class="empty" style="padding:2rem 1rem;color:var(--soft);text-align:center;font-size:0.85rem;">'+T('app.tp.needserver','Ter plaatse werkt via de RTG-server. Start de app met de backend om te bestellen bij partners.')+'</div>';
       return;
     }
     try {
       const [sd, od] = await Promise.all([API.call('/suppliers', { city: trip.dest }), API.call('/orders/mine')]);
       suppliers = sd.suppliers || [];
       myOrders = od.orders || [];
-      $('#tpSub').textContent = 'RTG-partners in ' + (sd.city || trip.dest) + ', bestel, betaal en reserveer.';
+      $('#tpSub').textContent = T('app.tp.partnersin','RTG-partners in') + ' ' + (sd.city || trip.dest) + ', ' + T('app.tp.orderpayreserve','bestel, betaal en reserveer.');
     } catch (e) { return; }
 
     // mijn lopende bestellingen bovenaan
     const active = myOrders.filter(o => o.status !== 'terugbetaald');
     $('#myOrders').innerHTML = active.length
-      ? '<div class="sec-label">Mijn bestellingen</div>' + active.map(o => {
+      ? '<div class="sec-label">'+T('app.tp.myorders','Mijn bestellingen')+'</div>' + active.map(o => {
           const pc = o.status === 'nieuw' ? 'nieuw' : o.status === 'in bereiding' ? 'bereiding' : 'klaar';
           return '<div class="myorder" data-ref="' + o.ref + '">' +
-            '<div class="r1"><div><div class="nm">' + o.supplierName + '</div><div class="sub2">' + o.items.reduce((n,i)=>n+i.qty,0) + ' item(s) · ' + timeAgo(o.at) + '</div></div>' +
-              '<div style="text-align:right;"><div class="amt">' + eur(o.total) + '</div><span class="mo-pill ' + pc + '">' + o.status + '</span></div></div>' +
+            '<div class="r1"><div><div class="nm">' + o.supplierName + '</div><div class="sub2">' + o.items.reduce((n,i)=>n+i.qty,0) + ' ' + T('app.items','item(s)') + ' · ' + timeAgo(o.at) + '</div></div>' +
+              '<div style="text-align:right;"><div class="amt">' + eur(o.total) + '</div><span class="mo-pill ' + pc + '">' + tStatus(o.status) + '</span></div></div>' +
             '<div class="acts">' + (o.paid
-              ? '<span class="mo-paid">✓ Betaald</span>'
-              : '<button class="mo-pay js-opay">' + FID_MINI + 'Betaal met Face ID</button>') +
-              (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ getagd voor Salon</span>' : '') +
+              ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
+              : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
+              (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ '+T('app.taggedsalon','getagd voor Salon')+'</span>' : '') +
             '</div></div>';
         }).join('')
       : '';
@@ -960,20 +972,20 @@
     });
 
     // partners
-    $('#supplierList').innerHTML = '<div class="sec-label">Partners op uw bestemming</div>' + suppliers.map(s => {
+    $('#supplierList').innerHTML = '<div class="sec-label">'+T('app.tp.partnersdest','Partners op uw bestemming')+'</div>' + suppliers.map(s => {
       const canOrder = s.hasMenu;
       return '<div class="sup-card">' +
         '<span class="ic">' + (s.icon || '📍') + '</span>' +
-        '<div class="t"><b>' + s.name + '</b><span>' + s.typeLabel + ' · ' + s.city + '</span></div>' +
+        '<div class="t"><b>' + s.name + '</b><span>' + tType(s.typeLabel) + ' · ' + s.city + '</span></div>' +
         (canOrder
-          ? '<button class="go" data-menu="' + s.code + '">Bekijk kaart</button>'
-          : '<button class="go ghost" data-loc="' + s.code + '">Locatie</button>') +
+          ? '<button class="go" data-menu="' + s.code + '">'+T('app.tp.viewmenu','Bekijk kaart')+'</button>'
+          : '<button class="go ghost" data-loc="' + s.code + '">'+T('app.tp.location','Locatie')+'</button>') +
       '</div>';
     }).join('');
     $('#supplierList').querySelectorAll('[data-menu]').forEach(b => b.addEventListener('click', () => openMenu(b.dataset.menu)));
     $('#supplierList').querySelectorAll('[data-loc]').forEach(b => b.addEventListener('click', () => {
       const s = suppliers.find(x => x.code === b.dataset.loc);
-      toast(s.name + ', ' + (s.loc && s.loc.label ? s.loc.label : 'locatie gedeeld zodra u onderweg bent') + '.');
+      toast(s.name + ', ' + (s.loc && s.loc.label ? s.loc.label : T('app.tp.locwhenenroute','locatie gedeeld zodra u onderweg bent')) + '.');
     }));
   }
 
@@ -985,7 +997,7 @@
     catch (e) { toast(e.message); return; }
     menuState = { supplier: data.supplier, menu: data.menu, qty: {}, note: '', tag: false };
     $('#msName').textContent = data.supplier.name;
-    $('#msMeta').textContent = data.supplier.typeLabel + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
+    $('#msMeta').textContent = tType(data.supplier.typeLabel) + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
     renderMenuSheet();
     $('#menu-sheet').classList.add('open');
     $('#menu-scrim').classList.add('open');
@@ -1000,7 +1012,7 @@
         return '<div class="ms-item" data-id="' + x.id + '">' +
           '<div class="info"><div class="nm">' + x.name + '</div>' +
             (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
-            (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + a + '</span>').join('') + '</div>' : '') +
+            (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + tAlg(a) + '</span>').join('') + '</div>' : '') +
           '</div>' +
           '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +
             '<div class="qty"><button class="js-minus">−</button><b>' + q + '</b><button class="js-plus">+</button></div>' +
@@ -1015,9 +1027,9 @@
     const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
     const count = Object.values(menuState.qty).reduce((a,b)=>a+b,0);
     $('#msFoot').innerHTML =
-      '<input class="ms-note" id="msNote" placeholder="Allergie of opmerking (bijv. geen noten)" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
-      '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> Tag dit voor De Salon (7 dagen na verblijf)</label>' +
-      '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? 'Bestel ' + count + ' item(s), ' + eur(total) : 'Kies gerechten') + '</button>';
+      '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
+      '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> ' + T('app.ms.tag','Tag dit voor De Salon (7 dagen na verblijf)') + '</label>' +
+      '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? T('app.ms.order','Bestel') + ' ' + count + ' ' + T('app.items','item(s)') + ', ' + eur(total) : T('app.ms.choose','Kies gerechten')) + '</button>';
     $('#msNote').addEventListener('input', e => menuState.note = e.target.value);
     $('#msTag').addEventListener('change', e => menuState.tag = e.target.checked);
     const ob = $('#msOrder');
@@ -1032,7 +1044,7 @@
     } catch (e) { toast(e.message); return; }
     $('#menu-sheet').classList.remove('open');
     $('#menu-scrim').classList.remove('open');
-    toast('Bestelling geplaatst bij ' + menuState.supplier.name + '.');
+    toast(T('app.orderplaced','Bestelling geplaatst bij') + ' ' + menuState.supplier.name + '.');
     renderTerPlaatse();
   }
 
@@ -1040,7 +1052,7 @@
     payWithFaceId(eur(o.total), async () => {
       await API.call('/order/pay', { ref: o.ref });
       return o;
-    }, { message: () => 'Betaald aan ' + o.supplierName + '.', after: () => renderTerPlaatse() });
+    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.', after: () => renderTerPlaatse() });
   }
 
   $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
@@ -1070,43 +1082,42 @@
 
   function renderHome(){
     const first = user.full.split(' ')[0];
-    $('#homeGreeting').textContent = 'Welkom, ' + first + '.';
-    $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · lid sinds ' + user.since;
+    $('#homeGreeting').textContent = T('app.welcome','Welkom,') + ' ' + first + '.';
+    $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
 
     $('#codecard').innerHTML =
-      '<div class="label">Uw codenaam, uw identiteit in onze systemen</div>' +
+      '<div class="label">'+T('app.cc.label','Uw codenaam, uw identiteit in onze systemen')+'</div>' +
       '<div class="cn">' + user.codename + '</div>' +
       '<div class="row">' +
         '<div>' +
-          '<div class="mrow">Lidnummer<b>' + user.number + '</b></div>' +
-          '<div class="mrow" style="margin-top:0.55rem;">Pas<b>' + TIER_LABEL[user.tier] + '</b></div>' +
+          '<div class="mrow">'+T('app.cc.membernr','Lidnummer')+'<b>' + user.number + '</b></div>' +
+          '<div class="mrow" style="margin-top:0.55rem;">'+T('app.cc.pass','Pas')+'<b>' + TIER_LABEL[user.tier] + '</b></div>' +
         '</div>' + qrSvg(user.number.length * 7919) +
       '</div>' +
-      '<button class="whybtn" id="whyBtn">Waarom een codenaam? →</button>' +
-      '<div class="why"><b>Uw echte naam staat niet in onze reisdata.</b> ' +
-        'Reserveringen, betalingen en Salon-activiteit staan op uw codenaam. Uw echte naam ligt in een gescheiden, versleutelde kluis en wordt pas bij ticketing en check-in eenmalig gekoppeld. ' +
-        'Zou reisdata ooit gestolen worden, dan heeft de aanvaller nooit de juiste naam bij uw reizen.</div>';
+      '<button class="whybtn" id="whyBtn">'+T('app.cc.why','Waarom een codenaam?')+' →</button>' +
+      '<div class="why"><b>'+T('app.cc.why.h','Uw echte naam staat niet in onze reisdata.')+'</b> ' +
+        T('app.cc.why.b','Reserveringen, betalingen en Salon-activiteit staan op uw codenaam. Uw echte naam ligt in een gescheiden, versleutelde kluis en wordt pas bij ticketing en check-in eenmalig gekoppeld. Zou reisdata ooit gestolen worden, dan heeft de aanvaller nooit de juiste naam bij uw reizen.')+'</div>';
     $('#whyBtn').addEventListener('click', () => toggleWhy());
 
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
 
     $('#homeTrip').innerHTML =
-      '<div class="label">Eerstvolgende reis</div>' +
+      '<div class="label">'+T('app.nexttrip','Eerstvolgende reis')+'</div>' +
       '<div class="big">' + trip.dest + '</div>' +
-      '<div class="meta">' + trip.dates + ' · over ' + trip.days + ' dagen</div>' +
-      '<button class="go" data-goto="reizen">Bekijk uw reis →</button>';
+      '<div class="meta">' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen') + '</div>' +
+      '<button class="go" data-goto="reizen">'+T('app.viewtrip','Bekijk uw reis')+' →</button>';
     $('#homePay').innerHTML = open.length
-      ? '<div class="label">Openstaand</div><div class="big accent">' + eur(openSum) + '</div>' +
-        '<div class="meta">' + open.length + ' betaling' + (open.length === 1 ? '' : 'en') + ' · één tik met Face ID</div>' +
-        '<button class="go" data-goto="betalen">Nu betalen →</button>'
-      : '<div class="label">Betalingen</div><div class="big" style="color:var(--green);">Alles voldaan</div>' +
-        '<div class="meta">Er staat niets open.</div>';
+      ? '<div class="label">'+T('app.outstanding','Openstaand')+'</div><div class="big accent">' + eur(openSum) + '</div>' +
+        '<div class="meta">' + open.length + ' ' + (open.length === 1 ? T('app.payment','betaling') : T('app.payments','betalingen')) + ' · ' + T('app.onetapfid','één tik met Face ID') + '</div>' +
+        '<button class="go" data-goto="betalen">'+T('app.paynow','Nu betalen')+' →</button>'
+      : '<div class="label">'+T('app.payments.cap','Betalingen')+'</div><div class="big" style="color:var(--green);">'+T('app.allsettled','Alles voldaan')+'</div>' +
+        '<div class="meta">'+T('app.nothingopen','Er staat niets open.')+'</div>';
     $('#homeSalon').innerHTML =
-      '<div class="label">De Salon</div>' +
-      '<div class="big gold">' + creatorLikes.toLocaleString('nl-NL') + '</div>' +
-      '<div class="meta">likes dit kwartaal, content levert voorrang, korting en gratis diensten op</div>' +
-      '<button class="go" data-goto="salon">Naar De Salon →</button>';
+      '<div class="label">'+T('app.thesalon','De Salon')+'</div>' +
+      '<div class="big gold">' + nfmt(creatorLikes) + '</div>' +
+      '<div class="meta">'+T('app.likesquarter','likes dit kwartaal, content levert voorrang, korting en gratis diensten op')+'</div>' +
+      '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
     document.querySelectorAll('#content [data-goto]').forEach(b =>
       b.addEventListener('click', () => openTab(b.dataset.goto)));
   }
@@ -1114,11 +1125,11 @@
   /* ---------- reizen ---------- */
 
   function renderTrip(){
-    $('#tripSub').textContent = trip.dest + ' · ' + trip.dates + ' · over ' + trip.days + ' dagen';
+    $('#tripSub').textContent = trip.dest + ' · ' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen');
     $('#tripList').innerHTML = trip.items.map(it =>
       '<div class="rowitem">' +
         '<div class="t"><b>' + it.title + '</b><span>' + it.when + ' · ' + it.sub + '</span></div>' +
-        '<span class="pill ' + (it.status === 'paid' ? 'paid' : it.status === 'req' ? 'req' : 'open') + '">' + it.label + '</span>' +
+        '<span class="pill ' + (it.status === 'paid' ? 'paid' : it.status === 'req' ? 'req' : 'open') + '">' + tLbl(it.label) + '</span>' +
       '</div>').join('');
   }
 
@@ -1157,7 +1168,7 @@
     const pw = $('#paywait'), card = pw.querySelector('.paycard');
     $('#payAmt').textContent = amount;
     $('#payIcon').innerHTML = FID.replace(/currentColor/g, '#0C0C0B');
-    $('#payLbl').textContent = 'Betalen met Face ID…';
+    $('#payLbl').textContent = T('app.payingfid','Betalen met Face ID…');
     card.classList.add('scanning'); card.classList.remove('done');
     pw.classList.add('open');
     setTimeout(async () => {
@@ -1165,18 +1176,18 @@
         const result = await doPay();
         card.classList.remove('scanning'); card.classList.add('done');
         $('#payIcon').innerHTML = CHECK;
-        $('#payLbl').textContent = 'Bevestigd';
+        $('#payLbl').textContent = T('app.confirmed','Bevestigd');
         setTimeout(() => {
           pw.classList.remove('open');
           payBusy = false;
           if (opts.message) toast(opts.message(result));
-          else { toast('Betaald. ' + eur(result) + ' gaat naar de RTFoundation.'); renderPay(); renderHome(); renderTrip(); }
+          else { toast(T('app.paid','Betaald') + '. ' + eur(result) + ' ' + T('app.tofoundation','gaat naar de RTFoundation.')); renderPay(); renderHome(); renderTrip(); }
           if (opts.after) opts.after(result);
         }, 700);
       } catch (e) {
         pw.classList.remove('open');
         payBusy = false;
-        toast(e.message || 'Betaling mislukt.');
+        toast(e.message || T('app.payfailed','Betaling mislukt.'));
       }
     }, 1100);
   }
@@ -1191,13 +1202,13 @@
         '<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:0.45rem;">' +
           '<span class="amount">' + eur(total) + '</span>' +
           (inv.status === 'open'
-            ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + 'Betaal</button>'
-            : '<span class="pill paid">Betaald</span>') +
+            ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>'
+            : '<span class="pill paid">'+T('app.paid','Betaald')+'</span>') +
         '</div>' +
       '</div>';
     }).join('');
     $('#payAllWrap').innerHTML = open.length
-      ? '<button class="btn-pay payall" id="payAll">' + FID + 'Betaal alles, ' + eur(openSum) + '</button>'
+      ? '<button class="btn-pay payall" id="payAll">' + FID + T('app.payall','Betaal alles') + ', ' + eur(openSum) + '</button>'
       : '';
     document.querySelectorAll('.js-pay').forEach(b =>
       b.addEventListener('click', () => payWithFaceId(eur(Number(b.dataset.amt)), () => executePay(b.dataset.inv))));
@@ -1211,35 +1222,39 @@
 
   function aiOpener(){
     const first = user.full.split(' ')[0];
-    const lines = ['Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') +
-      ' Uw reis naar ' + trip.dest + ' begint over ' + trip.days + ' dagen. Ik heb alvast vooruitgedacht:'];
+    const lines = [ (lang()==='en'
+      ? ('Good day' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Your journey to ' + trip.dest + ' begins in ' + trip.days + ' days. I have already thought ahead:')
+      : ('Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Uw reis naar ' + trip.dest + ' begint over ' + trip.days + ' dagen. Ik heb alvast vooruitgedacht:')) ];
     const open = invoices.filter(i => i.status === 'open');
     if (open.length){
       const sum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
-      lines.push('• Er ' + (open.length === 1 ? 'staat nog 1 betaling' : 'staan nog ' + open.length + ' betalingen') +
-        ' open (' + eur(sum) + '). Eén tik in Betalen en het is geregeld.');
+      lines.push(lang()==='en'
+        ? ('• There ' + (open.length === 1 ? 'is 1 payment' : 'are ' + open.length + ' payments') + ' still open (' + eur(sum) + '). One tap in Payments and it is done.')
+        : ('• Er ' + (open.length === 1 ? 'staat nog 1 betaling' : 'staan nog ' + open.length + ' betalingen') + ' open (' + eur(sum) + '). Eén tik in Betalen en het is geregeld.'));
     }
     const pending = trip.items.find(i => i.status === 'req');
-    if (pending) lines.push('• ' + pending.title.replace('Diner, ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging.');
-    lines.push('• Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.');
+    if (pending) lines.push(lang()==='en'
+      ? ('• ' + pending.title.replace('Diner, ', 'Your table at ') + ' is still being requested; I am watching for the confirmation.')
+      : ('• ' + pending.title.replace('Diner, ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging.'));
+    lines.push(T('ai.opener.plan','• Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.'));
     return lines.join('\n');
   }
 
   function aiAnswer(q){
     const l = q.toLowerCase().trim();
-    if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
-      return 'Geregeld. De paklijst staat klaar (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00, avondwandeling langs Pontocho.\n\nIk bewaak nu de bevestiging van Kikunoi Honten. U hoeft niets te doen.';
-    if (l.includes('inpak') || l.includes('paklijst'))
-      return 'Voor Kyoto in oktober (14-22°C, kans op regen):\n• Lichte lagen + regenjas\n• Nette schoenen die makkelijk uitgaan\n• Ingetogen kleding voor Kikunoi Honten\n• Adapter type A\n\nZal ik er een afvinklijst van maken?';
-    if (l.includes('visum') || l.includes('paspoort'))
-      return 'Voor Japan heeft u geen visum nodig tot 90 dagen. Ik zet uw boekingsbevestigingen klaar voor Visit Japan Web.';
-    if (l.includes('weer'))
-      return 'Kyoto medio oktober: 14-22°C, af en toe regen, het begin van de herfstkleuren. Zal ik een vroege wandeling door Arashiyama inplannen?';
-    if (l.includes('plan') || l.includes('dag'))
-      return 'Voorstel voor 14 oktober:\n• 08:00 Arashiyama vóór de drukte\n• 11:30 lunch in Sagano\n• 15:00 uw theeceremonie in Gion\n• 19:00 avondwandeling Pontocho\n\nZal ik de lunch reserveren?';
-    if (l.includes('restaurant') || l.includes('diner') || l.includes('eten'))
-      return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki.';
-    return 'Daar kom ik vandaag nog op terug. Ik kan alvast helpen met de paklijst, documenten, het weer of een dagplan, zeg het maar.';
+    if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het|yes|please|go ahead|sure|arrange it)\b/.test(l))
+      return T('ai.a.yes','Geregeld. De paklijst staat klaar (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00, avondwandeling langs Pontocho.\n\nIk bewaak nu de bevestiging van Kikunoi Honten. U hoeft niets te doen.');
+    if (l.includes('inpak') || l.includes('paklijst') || l.includes('pack'))
+      return T('ai.a.pack','Voor Kyoto in oktober (14-22°C, kans op regen):\n• Lichte lagen + regenjas\n• Nette schoenen die makkelijk uitgaan\n• Ingetogen kleding voor Kikunoi Honten\n• Adapter type A\n\nZal ik er een afvinklijst van maken?');
+    if (l.includes('visum') || l.includes('paspoort') || l.includes('visa') || l.includes('passport'))
+      return T('ai.a.visa','Voor Japan heeft u geen visum nodig tot 90 dagen. Ik zet uw boekingsbevestigingen klaar voor Visit Japan Web.');
+    if (l.includes('weer') || l.includes('weather'))
+      return T('ai.a.weather','Kyoto medio oktober: 14-22°C, af en toe regen, het begin van de herfstkleuren. Zal ik een vroege wandeling door Arashiyama inplannen?');
+    if (l.includes('plan') || l.includes('dag') || l.includes('day'))
+      return T('ai.a.plan','Voorstel voor 14 oktober:\n• 08:00 Arashiyama vóór de drukte\n• 11:30 lunch in Sagano\n• 15:00 uw theeceremonie in Gion\n• 19:00 avondwandeling Pontocho\n\nZal ik de lunch reserveren?');
+    if (l.includes('restaurant') || l.includes('diner') || l.includes('eten') || l.includes('dinner') || l.includes('eat'))
+      return T('ai.a.rest','Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki.');
+    return T('ai.a.default','Daar kom ik vandaag nog op terug. Ik kan alvast helpen met de paklijst, documenten, het weer of een dagplan, zeg het maar.');
   }
 
   function bubble(text, who){
@@ -1267,14 +1282,16 @@
   }
 
   function renderAI(){
-    $('#aiTitle').textContent = user.tier === 'rtg' ? 'De Butler.' : user.tier === 'lifestyle' ? 'Uw AI.' : 'Uw uitvoerende AI.';
+    $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','Uw uitvoerende AI.');
     $('#chat').innerHTML = '';
     chatHistory.length = 0;
     const opener = aiOpener();
     bubble(opener, 'ai');
     chatHistory.push({role:'assistant', content:opener});
-    $('#chips').innerHTML = ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant']
-      .map(c => '<button class="chip">' + c + '</button>').join('');
+    const chips = lang()==='en'
+      ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
+      : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant'];
+    $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
     document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
   }
   $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
@@ -1288,17 +1305,17 @@
       return '<article class="post" data-post="' + p.id + '">' +
         '<div class="head">' +
           '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
-          '<div><b>' + p.author + '</b><span>' + TIER_LABEL[p.tier] + ' · ' + p.place + ' · 7 dagen na verblijf</span></div>' +
+          '<div><b>' + p.author + '</b><span>' + TIER_LABEL[p.tier] + ' · ' + p.place + ' · ' + T('app.salon.7days','7 dagen na verblijf') + '</span></div>' +
         '</div>' +
         '<div class="visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>' +
         '<div class="body">' + p.text + '</div>' +
         '<div class="acts">' +
           '<button class="pa js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +
-          '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>Reageren (' + p.comments.length + ')</button>' +
+          '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>' + T('app.salon.comment','Reageren') + ' (' + p.comments.length + ')</button>' +
         '</div>' +
         '<div class="comments">' +
           '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b>, ' + c.text + '</div>').join('') + '</div>' +
-          '<div class="cform"><input placeholder="Schrijf een reactie…"><button>Plaats</button></div>' +
+          '<div class="cform"><input placeholder="' + T('app.salon.write','Schrijf een reactie…') + '"><button>' + T('app.salon.post','Plaats') + '</button></div>' +
         '</div>' +
       '</article>';
     }).join('');
@@ -1322,8 +1339,8 @@
         b.addEventListener('click', e => {
           e.preventDefault();
           toast(user.tier === 'rtg'
-            ? 'Met de RTG Pass reageert u met RTG-leden, of met wie u eerst aanspreekt.'
-            : 'Reageren is hier niet beschikbaar.');
+            ? T('app.salon.rtgnote','Met de RTG Pass reageert u met RTG-leden, of met wie u eerst aanspreekt.')
+            : T('app.salon.nocomment','Reageren is hier niet beschikbaar.'));
         });
       });
       el.querySelector('.cform button').addEventListener('click', async () => {
@@ -1331,7 +1348,7 @@
         if (!inp.value.trim()) return;
         if (API.live){
           try { await API.call('/comment', {postId: post.id, text: inp.value.trim()}); }
-          catch (e) { toast(e.message || 'Reageren niet toegestaan.'); return; }
+          catch (e) { toast(e.message || T('app.salon.notallowed','Reageren niet toegestaan.')); return; }
         }
         post.comments.push({who: user.full, tier: user.tier, text: inp.value.trim()});
         const d = document.createElement('div');
@@ -1339,11 +1356,21 @@
         d.innerHTML = '<b>' + user.full + '</b>, ' + inp.value.trim().replace(/</g, '&lt;');
         el.querySelector('.clist').appendChild(d);
         inp.value = '';
-        commBtn.textContent = 'Reageren (' + post.comments.length + ')';
-        toast('Reactie geplaatst.');
+        commBtn.textContent = T('app.salon.comment','Reageren') + ' (' + post.comments.length + ')';
+        toast(T('app.salon.posted','Reactie geplaatst.'));
       });
     });
   }
+
+  /* ---------- taal gewijzigd: dynamische schermen opnieuw opbouwen ---------- */
+  window.addEventListener('rtglang', () => {
+    if (!user) return;
+    const active = (document.querySelector('.tabbar button.active') || {}).dataset;
+    const tab = active ? active.tab : 'home';
+    renderAll();
+    renderBell();
+    openTab(tab);
+  });
 
   /* ---------- PWA ---------- */
 
@@ -1357,7 +1384,45 @@ window.I18N = { en: {
   'gate.title':'The app.<br>Your membership, <em>always</em> with you.',
   'gate.deck':'Bookings, one-tap payment, your personal AI and The Salon, and your account runs on your codename, not your real name.',
   'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
-  'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>'
+  'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>',
+  't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
+  'app.tab.home':'Home', 'app.tab.trips':'Journeys', 'app.tab.pay':'Payments', 'app.tab.ai':'AI', 'app.tab.salon':'Salon', 'app.tab.tp':'On site',
+  'app.notifs':'Notifications', 'app.pushenable':'Turn on push', 'app.pushon':'Push on',
+  'app.nonotif':'No notifications yet. As soon as someone replies to your post or sends you a message, you will see it here.',
+  'app.pushtoast.on':'Push notifications are on.', 'app.pushtoast.denied':'Permission denied, enable notifications in your settings.', 'app.pushtoast.no':'Push is not available here.',
+  'app.items':'item(s)', 'app.paid':'Paid', 'app.paywithfid':'Pay with Face ID', 'app.taggedsalon':'tagged for Salon',
+  'app.tp.needserver':'On site works via the RTG server. Start the app with the backend to order from partners.',
+  'app.tp.partnersin':'RTG partners in', 'app.tp.orderpayreserve':'order, pay and reserve.', 'app.tp.myorders':'My orders',
+  'app.tp.partnersdest':'Partners at your destination', 'app.tp.viewmenu':'View menu', 'app.tp.location':'Location',
+  'app.tp.locwhenenroute':'location shared once you are on your way',
+  'app.ms.note':'Allergy or note (e.g. no nuts)', 'app.ms.tag':'Tag this for The Salon (7 days after the stay)',
+  'app.ms.order':'Order', 'app.ms.choose':'Choose dishes', 'app.orderplaced':'Order placed with', 'app.paidto':'Paid to',
+  'app.welcome':'Welcome,', 'app.membersince':'member since',
+  'app.cc.label':'Your codename, your identity in our systems', 'app.cc.membernr':'Member no.', 'app.cc.pass':'Membership',
+  'app.cc.why':'Why a codename?', 'app.cc.why.h':'Your real name is not in our travel data.',
+  'app.cc.why.b':'Reservations, payments and Salon activity are held under your codename. Your real name sits in a separate, encrypted vault and is linked only once, at ticketing and check-in. Were travel data ever stolen, the attacker would never have the right name with your journeys.',
+  'app.nexttrip':'Next journey', 'app.in':'in', 'app.days':'days', 'app.viewtrip':'View your journey',
+  'app.outstanding':'Outstanding', 'app.payment':'payment', 'app.payments':'payments', 'app.onetapfid':'one tap with Face ID', 'app.paynow':'Pay now',
+  'app.payments.cap':'Payments', 'app.allsettled':'All settled', 'app.nothingopen':'Nothing is outstanding.',
+  'app.thesalon':'The Salon', 'app.likesquarter':'likes this quarter, content earns priority, discounts and complimentary services', 'app.tosalon':'To The Salon',
+  'app.payingfid':'Paying with Face ID…', 'app.confirmed':'Confirmed', 'app.tofoundation':'goes to the RTFoundation.', 'app.payfailed':'Payment failed.',
+  'app.pay':'Pay', 'app.payall':'Pay all',
+  'ai.opener.plan':'• Shall I prepare a packing list and a day plan for 14 October? A single "yes" is enough.',
+  'ai.a.yes':'Done. The packing list is ready (light layers, a raincoat, smart shoes that slip off easily, a type A adapter) and the day plan for 14 October is scheduled: Arashiyama at 08:00, lunch in Sagano, your tea ceremony at 15:00, an evening stroll along Pontocho.\n\nI am now watching for the confirmation from Kikunoi Honten. You need not do a thing.',
+  'ai.a.pack':'For Kyoto in October (14-22°C, chance of rain):\n• Light layers + raincoat\n• Smart shoes that slip off easily\n• Understated attire for Kikunoi Honten\n• Type A adapter\n\nShall I turn it into a checklist?',
+  'ai.a.visa':'For Japan you need no visa for up to 90 days. I will prepare your booking confirmations for Visit Japan Web.',
+  'ai.a.weather':'Kyoto in mid-October: 14-22°C, occasional rain, the start of the autumn colours. Shall I schedule an early walk through Arashiyama?',
+  'ai.a.plan':'Proposal for 14 October:\n• 08:00 Arashiyama before the crowds\n• 11:30 lunch in Sagano\n• 15:00 your tea ceremony in Gion\n• 19:00 evening stroll Pontocho\n\nShall I reserve the lunch?',
+  'ai.a.rest':'Your table at Kikunoi Honten (15 Oct, 19:30) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of Gion Sasaki.',
+  'ai.a.default':'I will come back to that today. In the meantime I can help with the packing list, documents, the weather or a day plan, just say the word.',
+  'ai.title.rtg':'The Butler.', 'ai.title.life':'Your AI.', 'ai.title.biz':'Your executive AI.',
+  'app.salon.7days':'7 days after the stay', 'app.salon.comment':'Comment', 'app.salon.write':'Write a comment…', 'app.salon.post':'Post',
+  'app.salon.rtgnote':'With the RTG Pass you comment with RTG members, or with whoever addresses you first.', 'app.salon.nocomment':'Commenting is not available here.',
+  'app.salon.notallowed':'Commenting not permitted.', 'app.salon.posted':'Comment posted.',
+  'app.v.trip':'Your journey.', 'app.v.trip.note':'Change or add something? Ask the AI, one message is enough.',
+  'app.v.pay':'Payments.', 'app.v.pay.sub':'One tap, Face ID. Your payments are held under your codename.',
+  'app.v.ai.sub':'The frictionless friend: it spots things, suggests, and one "yes" is enough.', 'app.v.ai.ph':'Ask a question…', 'app.v.ai.send':'Send',
+  'app.v.salon':'The Salon.', 'app.v.salon.sub':'Posts appear 7 days after the stay, for your safety.', 'app.v.tp':'On site.'
 } };
 </script>
 <script src="i18n.js"></script>

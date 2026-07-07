@@ -104,7 +104,11 @@
 <script>
 (function(){
   const $ = s => document.querySelector(s);
-  const eur = n => '€ ' + Number(n).toLocaleString('nl-NL');
+  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded' };
+  const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
   let token = null, state = null, source = null;
   const enabled = location.protocol === 'http:' || location.protocol === 'https:';
 
@@ -114,7 +118,7 @@
     if (!res.ok) throw new Error(d.error||'Fout');
     return d;
   }
-  function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return 'zojuist'; const m=Math.round(s/60); if(m<60)return m+' min'; const h=Math.round(m/60); if(h<24)return h+' u'; return Math.round(h/24)+' d'; }
+  function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const ago=T('t.ago',' geleden'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min')+ago; const h=Math.round(m/60); if(h<24)return h+T('t.h',' u')+ago; return Math.round(h/24)+T('t.d',' d')+ago; }
 
   $('#loginBtn').addEventListener('click', login);
   $('#code').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
@@ -137,21 +141,21 @@
   function render(){
     const paid = state.orders.filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
     $('#stat').innerHTML =
-      '<div class="b"><div class="l">Partners</div><div class="v">'+state.suppliers.length+'</div></div>' +
-      '<div class="b"><div class="l">Prijsvoorstellen</div><div class="v a">'+state.prices.length+'</div></div>' +
-      '<div class="b"><div class="l">Bestellingen</div><div class="v a">'+state.orders.length+'</div></div>' +
-      '<div class="b"><div class="l">Omzet via partners</div><div class="v g">'+eur(paid)+'</div></div>';
+      '<div class="b"><div class="l">'+T('bo.partners','Partners')+'</div><div class="v">'+state.suppliers.length+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.proposals','Prijsvoorstellen')+'</div><div class="v a">'+state.prices.length+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.orders','Bestellingen')+'</div><div class="v a">'+state.orders.length+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.revenue','Omzet via partners')+'</div><div class="v g">'+eur(paid)+'</div></div>';
 
     $('#prices').innerHTML = state.prices.length ? state.prices.map(p =>
-      '<div class="row"><div class="r1"><div><div class="nm">'+p.supplierName+'</div><div class="sub">'+p.service+' · '+timeAgo(p.at)+' geleden</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
-    ).join('') : '<div class="empty">Nog geen prijzen. Zodra een partner een dynamische prijs doorgeeft, verschijnt die hier live.</div>';
+      '<div class="row"><div class="r1"><div><div class="nm">'+p.supplierName+'</div><div class="sub">'+p.service+' · '+timeAgo(p.at)+'</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
+    ).join('') : '<div class="empty">'+T('bo.noprices','Nog geen prijzen. Zodra een partner een dynamische prijs doorgeeft, verschijnt die hier live.')+'</div>';
 
     $('#orders').innerHTML = state.orders.length ? state.orders.map(o => {
       const pc = o.status==='nieuw'?'nieuw':o.status==='in bereiding'?'bereiding':'klaar';
-      return '<div class="row"><div class="r1"><div><div class="nm">'+o.supplierName+' <span style="color:var(--soft);font-weight:400;">· gast '+o.customerCodename+'</span></div>'+
-        '<div class="sub">'+o.items.reduce((n,i)=>n+i.qty,0)+' item(s) · '+timeAgo(o.at)+' geleden · '+(o.paid?'betaald':'onbetaald')+'</div></div>'+
-        '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><span class="pill '+pc+'">'+o.status+'</span></div></div></div>';
-    }).join('') : '<div class="empty">Nog geen bestellingen of ritten via partners.</div>';
+      return '<div class="row"><div class="r1"><div><div class="nm">'+o.supplierName+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+o.customerCodename+'</span></div>'+
+        '<div class="sub">'+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('bo.items','item(s)')+' · '+timeAgo(o.at)+' · '+(o.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
+        '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><span class="pill '+pc+'">'+tStatus(o.status)+'</span></div></div></div>';
+    }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
   }
 
   function stream(){
@@ -160,6 +164,8 @@
     source.addEventListener('sync', () => refresh());
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
   }
+
+  window.addEventListener('rtglang', () => { if (state) render(); });
 })();
 </script>
 <script>
@@ -167,7 +173,12 @@ window.I18N = { en: {
   'gate.h':'Sign in',
   'gate.p':'Live overview of all dynamic prices, orders and rides via RTG partners.',
   'gate.ph':'Back-office code', 'gate.btn':'Sign in', 'gate.hint':'Demo code: RTG-OFFICE',
-  'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides'
+  'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides',
+  'bo.partners':'Partners', 'bo.proposals':'Price proposals', 'bo.orders':'Orders', 'bo.revenue':'Revenue via partners',
+  'bo.noprices':'No prices yet. As soon as a partner submits a dynamic price, it appears here live.',
+  'bo.noorders':'No orders or rides via partners yet.',
+  'bo.guest':'guest', 'bo.items':'item(s)', 'bo.paid':'paid', 'bo.unpaid':'unpaid',
+  't.now':'just now', 't.ago':' ago', 't.min':' min', 't.h':' h', 't.d':' d'
 } };
 </script>
 <script src="i18n.js"></script>

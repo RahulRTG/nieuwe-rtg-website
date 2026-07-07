@@ -175,7 +175,7 @@
 
     <div class="notif-scrim" id="notifScrim"></div>
     <aside class="notif-panel" id="notifPanel">
-      <div class="notif-head"><b>Meldingen</b><button class="obtn" id="notifClose">Sluiten</button></div>
+      <div class="notif-head"><b data-i18n="sup.notifs">Meldingen</b><button class="obtn" id="notifClose" data-i18n="sup.close">Sluiten</button></div>
       <div class="notif-list" id="notifList"></div>
     </aside>
 
@@ -187,31 +187,31 @@
         <div id="homeExtra"></div>
       </div>
       <div class="view" data-view="orders">
-        <h2>Bestellingen</h2>
-        <p class="sub">Live van RTG-gasten. Werk de status bij of stort terug.</p>
+        <h2 data-i18n="sup.v.orders">Bestellingen</h2>
+        <p class="sub" data-i18n="sup.v.orders.sub">Live van RTG-gasten. Werk de status bij of stort terug.</p>
         <div id="orderList"></div>
       </div>
       <div class="view" data-view="rides">
-        <h2>Ritten</h2>
-        <p class="sub">Aanvragen van RTG-gasten, met live locatie.</p>
+        <h2 data-i18n="tab.rides">Ritten</h2>
+        <p class="sub" data-i18n="sup.v.rides.sub">Aanvragen van RTG-gasten, met live locatie.</p>
         <div id="rideList"></div>
       </div>
       <div class="view" data-view="menu">
-        <h2>Menukaart</h2>
-        <p class="sub">Wat gasten vooraf zien, inclusief allergenen.</p>
+        <h2 data-i18n="sup.menu">Menukaart</h2>
+        <p class="sub" data-i18n="sup.v.menu.sub">Wat gasten vooraf zien, inclusief allergenen.</p>
         <div id="menuList"></div>
       </div>
       <div class="view" data-view="price">
-        <h2>Dynamische prijs</h2>
-        <p class="sub">Geef RTG uw beste prijs. Gaat rechtstreeks naar de backoffice.</p>
-        <div class="field"><label>Dienst</label><input id="prService" placeholder="Bijv. Kaiseki-diner (2 pers.)"></div>
-        <div class="field"><label>Uw prijs aan RTG (€)</label><input id="prPrice" type="number" inputmode="decimal" placeholder="240"></div>
-        <button class="bigbtn" id="prSend">Verstuur naar RTG</button>
+        <h2 data-i18n="sup.v.price">Dynamische prijs</h2>
+        <p class="sub" data-i18n="sup.v.price.sub">Geef RTG uw beste prijs. Gaat rechtstreeks naar de backoffice.</p>
+        <div class="field"><label data-i18n="sup.f.service">Dienst</label><input id="prService" placeholder="Bijv. Kaiseki-diner (2 pers.)" data-i18n-ph="sup.f.service.ph"></div>
+        <div class="field"><label data-i18n="sup.f.price">Uw prijs aan RTG (€)</label><input id="prPrice" type="number" inputmode="decimal" placeholder="240"></div>
+        <button class="bigbtn" id="prSend" data-i18n="sup.f.send">Verstuur naar RTG</button>
         <div class="card" id="prHistory" style="margin-top:1.4rem;"></div>
       </div>
       <div class="view" data-view="location">
-        <h2>Locatie</h2>
-        <p class="sub">Deel uw live locatie zodat gasten u vinden, en zie waar zij zijn.</p>
+        <h2 data-i18n="tab.location">Locatie</h2>
+        <p class="sub" data-i18n="sup.v.loc.sub">Deel uw live locatie zodat gasten u vinden, en zie waar zij zijn.</p>
         <div id="locWrap"></div>
       </div>
     </div>
@@ -225,7 +225,15 @@
 <script>
 (function(){
   const $ = s => document.querySelector(s);
-  const eur = n => '€ ' + Number(n).toLocaleString('nl-NL');
+  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded' };
+  const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
+  const TYPELABEL = { 'Hotel':'Hotel', 'Restaurant':'Restaurant', 'Bar':'Bar', 'Taxi':'Taxi', 'Privéjet':'Private jet', 'Appartement':'Apartment', 'Club':'Club' };
+  const tType = s => (lang() === 'en' ? (TYPELABEL[s] || s) : s);
+  const ALG = { 'vis':'fish', 'soja':'soy', 'sesam':'sesame', 'gluten':'gluten', 'noten':'nuts', 'schaaldieren':'shellfish', 'ei':'egg', 'melk':'milk', 'pinda':'peanut', 'selderij':'celery', 'mosterd':'mustard' };
+  const tAlg = a => (lang() === 'en' ? (ALG[a] || a) : a);
 
   const DEMO = [
     { code:'KIKUNOI', name:'Kikunoi Honten', type:'Restaurant', icon:'🍽️', sub:'Restaurant · Kyoto' },
@@ -263,7 +271,7 @@
 
   let toastTimer;
   function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3000); }
-  function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return 'zojuist'; const m=Math.round(s/60); if(m<60)return m+' min geleden'; const h=Math.round(m/60); if(h<24)return h+' uur geleden'; return Math.round(h/24)+' dag(en) geleden'; }
+  function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const ago=T('t.ago',' geleden'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min')+ago; const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur')+ago; return Math.round(h/24)+T('t.days',' dag(en)')+ago; }
   function has(cap){ return S && S.caps && S.caps.includes(cap); }
 
   // ---- login ----
@@ -280,13 +288,13 @@
   }
 
   async function login(code, cred){
-    if (!API.enabled){ toast('Start de server (npm start) om de leverancier-app te gebruiken.'); return; }
+    if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return; }
     try {
       const body = cred ? { username: cred.u, password: cred.p } : { code };
       const d = await API.call('/supplier/login', body);
       API.token = d.token;
       applyState(d.state);
-    } catch(e){ toast(cred ? 'Onjuiste gebruikersnaam of wachtwoord.' : (e.message||'Inloggen mislukt.')); return; }
+    } catch(e){ toast(cred ? T('login.bad','Onjuiste gebruikersnaam of wachtwoord.') : (e.message||T('login.failed','Inloggen mislukt.'))); return; }
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
     buildTabs();
@@ -304,7 +312,7 @@
     const keys = Object.keys(TABDEF).filter(k => !TABDEF[k].cap || has(TABDEF[k].cap));
     // bookings voor hotel/appartement → toon onder 'orders'-plek als 'Boekingen'
     $('#tabbar').innerHTML = keys.map((k,i) =>
-      '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+TABDEF[k].label+'</button>'
+      '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+T('tab.'+k, TABDEF[k].label)+'</button>'
     ).join('');
     document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
   }
@@ -317,7 +325,7 @@
   function renderAll(){
     $('#supIcon').textContent = S.icon;
     $('#supName').textContent = S.name;
-    $('#supType').textContent = S.typeLabel + ' · ' + S.city;
+    $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
@@ -326,18 +334,18 @@
   function renderHome(){
     const open = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
     const revenue = (state.orders||[]).filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
-    $('#homeH').textContent = 'Goedendag, ' + S.name.split(' ')[0] + '.';
-    $('#homeSub').textContent = S.typeLabel + ' · verbonden met RTG';
+    $('#homeH').textContent = T('sup.hello','Goedendag,') + ' ' + S.name.split(' ')[0] + '.';
+    $('#homeSub').textContent = tType(S.typeLabel) + ' · ' + T('sup.connected','verbonden met RTG');
     let stat = '';
-    if (has('orders')) stat += '<div class="b"><div class="l">Open orders</div><div class="v a">'+open.length+'</div></div>';
-    if (has('rides')) stat += '<div class="b"><div class="l">Ritten</div><div class="v a">'+(state.rides||[]).length+'</div></div>';
-    if (has('bookings')) stat += '<div class="b"><div class="l">Boekingen</div><div class="v a">'+(state.orders||[]).length+'</div></div>';
-    stat += '<div class="b"><div class="l">Ontvangen</div><div class="v g">'+eur(revenue)+'</div></div>';
+    if (has('orders')) stat += '<div class="b"><div class="l">'+T('sup.openorders','Open orders')+'</div><div class="v a">'+open.length+'</div></div>';
+    if (has('rides')) stat += '<div class="b"><div class="l">'+T('tab.rides','Ritten')+'</div><div class="v a">'+(state.rides||[]).length+'</div></div>';
+    if (has('bookings')) stat += '<div class="b"><div class="l">'+T('sup.bookings','Boekingen')+'</div><div class="v a">'+(state.orders||[]).length+'</div></div>';
+    stat += '<div class="b"><div class="l">'+T('sup.received','Ontvangen')+'</div><div class="v g">'+eur(revenue)+'</div></div>';
     $('#homeStat').innerHTML = stat;
-    let extra = '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">Uw dynamische prijs aan RTG</div>'+
-      '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">U levert RTG uw beste prijs; RTG brengt de gasten. Uw huidige marge-afspraak: <b style="color:var(--gold);">'+Math.round((S.rate||0)*100)+'%</b>.</div>'+
-      '<button class="obtn primary" style="margin-top:0.8rem;" data-goto="price">Nieuwe prijs doorgeven</button></div>';
-    if (has('menu')) extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">Menukaart</div><div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+(state.menu||[]).length+' gerechten zichtbaar voor gasten.</div><button class="obtn" style="margin-top:0.8rem;" data-goto="menu">Bekijk menu</button></div>';
+    let extra = '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.yourprice','Uw dynamische prijs aan RTG')+'</div>'+
+      '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('sup.pricebody','U levert RTG uw beste prijs; RTG brengt de gasten. Uw huidige marge-afspraak:')+' <b style="color:var(--gold);">'+Math.round((S.rate||0)*100)+'%</b>.</div>'+
+      '<button class="obtn primary" style="margin-top:0.8rem;" data-goto="price">'+T('sup.newprice','Nieuwe prijs doorgeven')+'</button></div>';
+    if (has('menu')) extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.menu','Menukaart')+'</div><div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+(state.menu||[]).length+' '+T('sup.dishesvisible','gerechten zichtbaar voor gasten.')+'</div><button class="obtn" style="margin-top:0.8rem;" data-goto="menu">'+T('sup.viewmenu','Bekijk menu')+'</button></div>';
     $('#homeExtra').innerHTML = extra;
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', ()=>openTab(b.dataset.goto)));
   }
@@ -349,19 +357,19 @@
     const list = state.orders || [];
     $('#orderList').innerHTML = list.length ? list.map(o =>
       '<div class="order" data-ref="'+o.ref+'">'+
-        '<div class="top"><div><div class="who">Gast <span class="cn">'+o.customerCodename+'</span></div><div class="ref">'+o.ref+' · '+timeAgo(o.at)+'</div></div>'+
-          '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><div style="margin-top:0.3rem;"><span class="pill '+pillClass(o.status)+'">'+o.status+'</span></div></div></div>'+
+        '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+o.customerCodename+'</span></div><div class="ref">'+o.ref+' · '+timeAgo(o.at)+'</div></div>'+
+          '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><div style="margin-top:0.3rem;"><span class="pill '+pillClass(o.status)+'">'+tStatus(o.status)+'</span></div></div></div>'+
         '<ul>'+o.items.map(i=>'<li><span>'+i.qty+'× '+i.name+'</span><span>'+eur(i.price*i.qty)+'</span></li>').join('')+'</ul>'+
-        (o.allergyNote?'<div class="allergy">⚠ Allergie: '+o.allergyNote+'</div>':'')+
-        (o.tagSalon?'<div class="salon">✦ Gast wil dit taggen voor De Salon</div>':'')+
+        (o.allergyNote?'<div class="allergy">⚠ '+T('sup.allergy','Allergie:')+' '+o.allergyNote+'</div>':'')+
+        (o.tagSalon?'<div class="salon">✦ '+T('sup.wantssalon','Gast wil dit taggen voor De Salon')+'</div>':'')+
         '<div class="acts">'+
-          '<span class="pill '+(o.paid?'betaald':'onbetaald')+'">'+(o.refunded?'terugbetaald':o.paid?'✓ betaald':'nog niet betaald')+'</span>'+
-          (NEXT[o.status]?'<button class="obtn primary js-next">Markeer: '+NEXT[o.status]+'</button>':'')+
-          (o.status==='nieuw'?'<button class="obtn warn js-reject">Weiger</button>':'')+
-          (o.paid&&!o.refunded?'<button class="obtn warn js-refund">Terugstorten</button>':'')+
+          '<span class="pill '+(o.paid?'betaald':'onbetaald')+'">'+(o.refunded?T('sup.refunded','terugbetaald'):o.paid?'✓ '+T('bo.paid','betaald'):T('sup.notpaid','nog niet betaald'))+'</span>'+
+          (NEXT[o.status]?'<button class="obtn primary js-next">'+T('sup.markas','Markeer:')+' '+tStatus(NEXT[o.status])+'</button>':'')+
+          (o.status==='nieuw'?'<button class="obtn warn js-reject">'+T('sup.reject','Weiger')+'</button>':'')+
+          (o.paid&&!o.refunded?'<button class="obtn warn js-refund">'+T('sup.refund','Terugstorten')+'</button>':'')+
         '</div>'+
       '</div>'
-    ).join('') : '<div class="empty">Nog geen bestellingen. Zodra een RTG-gast bij u bestelt, verschijnt het hier, live.</div>';
+    ).join('') : '<div class="empty">'+T('sup.noorders','Nog geen bestellingen. Zodra een RTG-gast bij u bestelt, verschijnt het hier, live.')+'</div>';
     document.querySelectorAll('.order').forEach(el => {
       const ref = el.dataset.ref;
       const o = list.find(x=>x.ref===ref);
@@ -371,11 +379,11 @@
     });
   }
   async function setStatus(ref, status){
-    try { await API.call('/supplier/order/status', {ref, status}); toast('Status: '+status); await refresh(); }
+    try { await API.call('/supplier/order/status', {ref, status}); toast(T('sup.status','Status:')+' '+tStatus(status)); await refresh(); }
     catch(e){ toast(e.message); }
   }
   async function refund(ref){
-    try { const d = await API.call('/supplier/refund', {ref}); toast('Terugbetaald: '+eur(d.order.total)); await refresh(); }
+    try { const d = await API.call('/supplier/refund', {ref}); toast(T('sup.refundedtoast','Terugbetaald:')+' '+eur(d.order.total)); await refresh(); }
     catch(e){ toast(e.message); }
   }
 
@@ -383,20 +391,20 @@
   function renderRides(){
     const list = state.rides || [];
     $('#rideList').innerHTML = list.length ? list.map(r =>
-      '<div class="order"><div class="top"><div><div class="who">Gast <span class="cn">'+r.customerCodename+'</span></div><div class="ref">'+(r.from||',')+' → '+(r.to||',')+'</div></div><span class="pill nieuw">'+r.status+'</span></div></div>'
-    ).join('') : '<div class="empty">Geen ritaanvragen. RTG-gasten die een rit boeken, verschijnen hier met bestemming en live locatie.</div>';
+      '<div class="order"><div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+r.customerCodename+'</span></div><div class="ref">'+(r.from||',')+' → '+(r.to||',')+'</div></div><span class="pill nieuw">'+tStatus(r.status)+'</span></div></div>'
+    ).join('') : '<div class="empty">'+T('sup.norides','Geen ritaanvragen. RTG-gasten die een rit boeken, verschijnen hier met bestemming en live locatie.')+'</div>';
   }
 
   // ---- menu ----
   function renderMenu(){
     const m = state.menu || [];
-    if (!m.length){ $('#menuList').innerHTML = '<div class="empty">Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.</div>'; return; }
+    if (!m.length){ $('#menuList').innerHTML = '<div class="empty">'+T('sup.nomenu','Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.')+'</div>'; return; }
     const cats = [...new Set(m.map(x=>x.cat))];
     $('#menuList').innerHTML = cats.map(c =>
       '<div class="menu-cat">'+c+'</div>' + m.filter(x=>x.cat===c).map(x =>
         '<div class="mitem"><div class="r1"><span class="nm">'+x.name+'</span><span class="pr">'+eur(x.price)+'</span></div>'+
         (x.desc?'<div class="ds">'+x.desc+'</div>':'')+
-        (x.allergens&&x.allergens.length?'<div class="alg">'+x.allergens.map(a=>'<span>'+a+'</span>').join('')+'</div>':'')+
+        (x.allergens&&x.allergens.length?'<div class="alg">'+x.allergens.map(a=>'<span>'+tAlg(a)+'</span>').join('')+'</div>':'')+
         '</div>'
       ).join('')
     ).join('');
@@ -405,14 +413,14 @@
   // ---- dynamische prijs ----
   function renderPrice(){
     const h = state.prices || [];
-    $('#prHistory').innerHTML = '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin-bottom:0.3rem;">Eerder doorgegeven</div>' +
-      (h.length ? h.slice(0,8).map(p=>'<div class="price-row"><span class="s">'+p.service+'<br><span style="font-size:0.66rem;color:var(--soft);">'+timeAgo(p.at)+'</span></span><span class="p">'+eur(p.price)+'</span></div>').join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">Nog geen prijzen doorgegeven.</div>');
+    $('#prHistory').innerHTML = '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin-bottom:0.3rem;">'+T('sup.pricehist','Eerder doorgegeven')+'</div>' +
+      (h.length ? h.slice(0,8).map(p=>'<div class="price-row"><span class="s">'+p.service+'<br><span style="font-size:0.66rem;color:var(--soft);">'+timeAgo(p.at)+'</span></span><span class="p">'+eur(p.price)+'</span></div>').join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('sup.noprices','Nog geen prijzen doorgegeven.')+'</div>');
   }
   $('#prSend').addEventListener('click', async () => {
     const service = $('#prService').value.trim();
     const price = Number($('#prPrice').value);
-    if (!service || !(price>0)){ toast('Vul een dienst en prijs in.'); return; }
-    try { await API.call('/supplier/price', {service, price}); toast('Prijs verstuurd naar RTG.'); $('#prService').value=''; $('#prPrice').value=''; await refresh(); openTab('price'); }
+    if (!service || !(price>0)){ toast(T('sup.fillprice','Vul een dienst en prijs in.')); return; }
+    try { await API.call('/supplier/price', {service, price}); toast(T('sup.pricesent','Prijs verstuurd naar RTG.')); $('#prService').value=''; $('#prPrice').value=''; await refresh(); openTab('price'); }
     catch(e){ toast(e.message); }
   });
 
@@ -420,21 +428,21 @@
   function renderLocation(){
     const loc = S.loc || {};
     $('#locWrap').innerHTML =
-      '<div class="loc-card"><div class="loc-map"><div class="pin"></div><div class="lbl">'+(loc.label||'Locatie onbekend')+'</div></div>'+
-      '<div class="loc-info">Uw locatie is zichtbaar voor RTG-gasten met een actieve rit of bestelling bij u. Gasten delen hun locatie terug wanneer zij onderweg zijn.</div></div>'+
-      '<button class="bigbtn" id="locShare">Deel mijn live locatie</button>';
+      '<div class="loc-card"><div class="loc-map"><div class="pin"></div><div class="lbl">'+(loc.label||T('sup.locunknown','Locatie onbekend'))+'</div></div>'+
+      '<div class="loc-info">'+T('sup.locinfo','Uw locatie is zichtbaar voor RTG-gasten met een actieve rit of bestelling bij u. Gasten delen hun locatie terug wanneer zij onderweg zijn.')+'</div></div>'+
+      '<button class="bigbtn" id="locShare">'+T('sup.sharelive','Deel mijn live locatie')+'</button>';
     $('#locShare').addEventListener('click', shareLocation);
   }
   function shareLocation(){
     if (navigator.geolocation){
       navigator.geolocation.getCurrentPosition(async pos => {
-        try { await API.call('/supplier/location', { lat: pos.coords.latitude, lng: pos.coords.longitude, label: 'Live positie' }); toast('Live locatie gedeeld met gasten.'); await refresh(); }
+        try { await API.call('/supplier/location', { lat: pos.coords.latitude, lng: pos.coords.longitude, label: 'Live positie' }); toast(T('sup.locshared','Live locatie gedeeld met gasten.')); await refresh(); }
         catch(e){ toast(e.message); }
       }, () => demoShare(), { timeout: 4000 });
     } else demoShare();
   }
   async function demoShare(){
-    try { await API.call('/supplier/location', { lat: S.loc.lat, lng: S.loc.lng, label: S.loc.label }); toast('Locatie gedeeld (demo-positie).'); }
+    try { await API.call('/supplier/location', { lat: S.loc.lat, lng: S.loc.lng, label: S.loc.label }); toast(T('sup.locshareddemo','Locatie gedeeld (demo-positie).')); }
     catch(e){ toast(e.message); }
   }
 
@@ -444,7 +452,7 @@
     const b = $('#bellBadge'); b.style.display = unread>0?'flex':'none'; b.textContent = unread>9?'9+':unread;
     $('#notifList').innerHTML = notifs.length ? notifs.map(n =>
       '<div class="notif-item'+(n.read?'':' unread')+'"><div class="ic">'+(n.icon||'•')+'</div><div class="tx"><b>'+n.title+'</b><span>'+n.body+'</span><time>'+timeAgo(n.at)+'</time></div></div>'
-    ).join('') : '<div class="empty">Nog geen meldingen. Nieuwe bestellingen en betalingen ziet u hier live.</div>';
+    ).join('') : '<div class="empty">'+T('sup.nonotif','Nog geen meldingen. Nieuwe bestellingen en betalingen ziet u hier live.')+'</div>';
   }
   async function loadNotifs(){ try { const d = await API.call('/supplier/notifications', {}); } catch(e){} }
   $('#bell').addEventListener('click', () => { $('#notifPanel').classList.add('open'); $('#notifScrim').classList.add('open'); if (notifs.some(n=>!n.read)){ notifs.forEach(n=>n.read=true); API.call('/supplier/notifications/read').catch(()=>{}); renderBell(); } });
@@ -465,6 +473,12 @@
     });
   }
 
+  window.addEventListener('rtglang', () => {
+    if (!S) return;
+    const active = (document.querySelector('.tabbar button.active') || {}).dataset ? document.querySelector('.tabbar button.active').dataset.tab : 'home';
+    buildTabs(); renderAll(); openTab(active || 'home');
+  });
+
   renderGate();
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
@@ -474,7 +488,35 @@ window.I18N = { en: {
   'gate.title':'The supplier <em>app</em>.',
   'gate.deck':'One app for hotels, taxis, private jets, apartments, restaurants, bars and clubs. Welcome RTG guests, share your menu, manage orders and rides, live-connected with the guest and the RTG back office.',
   'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo partner',
-  'gate.free':'<b>Demo account:</b> username Rahul, password Imran. <b>Free to use:</b> as a partner you pay nothing for the app. In return you supply RTG your best dynamic price, which you submit in the app yourself.'
+  'gate.free':'<b>Demo account:</b> username Rahul, password Imran. <b>Free to use:</b> as a partner you pay nothing for the app. In return you supply RTG your best dynamic price, which you submit in the app yourself.',
+  'tab.home':'Overview', 'tab.orders':'Orders', 'tab.rides':'Rides', 'tab.menu':'Menu', 'tab.price':'Price', 'tab.location':'Location',
+  't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
+  'login.bad':'Incorrect username or password.', 'login.failed':'Sign-in failed.',
+  'sup.needserver':'Start the server (npm start) to use the supplier app.',
+  'sup.hello':'Good day,', 'sup.connected':'connected with RTG',
+  'sup.openorders':'Open orders', 'sup.bookings':'Bookings', 'sup.received':'Received',
+  'sup.yourprice':'Your dynamic price to RTG',
+  'sup.pricebody':'You supply RTG your best price; RTG brings the guests. Your current margin agreement:',
+  'sup.newprice':'Submit a new price', 'sup.menu':'Menu', 'sup.dishesvisible':'dishes visible to guests.', 'sup.viewmenu':'View menu',
+  'sup.guest':'Guest', 'sup.allergy':'Allergy:', 'sup.wantssalon':'Guest wants to tag this for The Salon',
+  'sup.refunded':'refunded', 'sup.notpaid':'not paid yet', 'sup.markas':'Mark as:', 'sup.reject':'Decline', 'sup.refund':'Refund',
+  'sup.noorders':'No orders yet. As soon as an RTG guest orders with you, it appears here, live.',
+  'sup.status':'Status:', 'sup.refundedtoast':'Refunded:',
+  'sup.norides':'No ride requests. RTG guests who book a ride appear here with destination and live location.',
+  'sup.nomenu':'No menu yet. Add dishes so guests can order in advance.',
+  'sup.pricehist':'Previously submitted', 'sup.noprices':'No prices submitted yet.',
+  'sup.fillprice':'Enter a service and a price.', 'sup.pricesent':'Price sent to RTG.',
+  'sup.locunknown':'Location unknown',
+  'sup.locinfo':'Your location is visible to RTG guests with an active ride or order with you. Guests share their location back when they are on their way.',
+  'sup.sharelive':'Share my live location', 'sup.locshared':'Live location shared with guests.', 'sup.locshareddemo':'Location shared (demo position).',
+  'sup.nonotif':'No notifications yet. New orders and payments appear here live.',
+  'sup.notifs':'Notifications', 'sup.close':'Close',
+  'sup.v.orders':'Orders', 'sup.v.orders.sub':'Live from RTG guests. Update the status or issue a refund.',
+  'sup.v.rides.sub':'Requests from RTG guests, with live location.',
+  'sup.v.menu.sub':'What guests see in advance, including allergens.',
+  'sup.v.price':'Dynamic price', 'sup.v.price.sub':'Give RTG your best price. Goes straight to the back office.',
+  'sup.f.service':'Service', 'sup.f.service.ph':'E.g. Kaiseki dinner (2 pers.)', 'sup.f.price':'Your price to RTG (€)', 'sup.f.send':'Send to RTG',
+  'sup.v.loc.sub':'Share your live location so guests find you, and see where they are.'
 } };
 </script>
 <script src="i18n.js"></script>

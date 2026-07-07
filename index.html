@@ -134,6 +134,7 @@
   nav ul{
     list-style:none;
     display:flex;
+    align-items:center;
     gap:2.25rem;
   }
   nav a{
@@ -143,6 +144,16 @@
     transition:color 0.2s ease;
   }
   nav a:hover{color:var(--burgundy);}
+  nav a.nav-login{
+    background:var(--burgundy);
+    color:var(--white);
+    padding:0.6rem 1.35rem;
+    border-radius:999px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    transition:background 0.2s ease;
+  }
+  nav a.nav-login:hover{background:var(--black);color:var(--white);}
 
   /* ---------- hero ---------- */
 
@@ -175,6 +186,8 @@
     margin-top:3rem;
     display:inline-flex;
     align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
     gap:0.9rem;
   }
   .btn{
@@ -198,6 +211,16 @@
     color:var(--black);
   }
   .btn-ghost:hover{
+    background:var(--black);
+    color:var(--white);
+    border-color:var(--black);
+  }
+  .btn-login{
+    background:var(--burgundy);
+    color:var(--white);
+    border-color:var(--burgundy);
+  }
+  .btn-login:hover{
     background:var(--black);
     color:var(--white);
     border-color:var(--black);
@@ -507,8 +530,11 @@
 
   @media (max-width:600px){
     footer .wrap{flex-direction:column;gap:1rem;text-align:center;}
-    nav ul{gap:1.2rem;}
-    nav a{font-size:0.75rem;}
+    /* geen hamburger-menu: op smalle schermen alleen de inlogknop in de balk,
+       de overige links zijn bereikbaar via de hero en door te scrollen */
+    nav ul li:not(.nav-cta){display:none;}
+    nav ul{gap:0;}
+    nav a.nav-login{padding:0.55rem 1.2rem;font-size:0.8rem;}
   }
 </style>
 </head>
@@ -527,7 +553,7 @@
         <li><a href="#over">Over RTG</a></li>
         <li><a href="portaal.html">Ledenportaal</a></li>
         <li><a href="download.html">App</a></li>
-        <li><a href="toegang.html">Inloggen</a></li>
+        <li class="nav-cta"><a href="toegang.html" class="nav-login">Inloggen</a></li>
       </ul>
     </nav>
   </div>
@@ -539,6 +565,7 @@
     <h1>Toegang tot wat <span class="accent">gesloten</span> is.</h1>
     <p class="deck">Rahul Travel Group koopt in tegen inkoopprijs en geeft dat voordeel door aan haar leden. Drie passen, elk met een eigen ritme, maar met dezelfde belofte: geen tussenlagen en geen opslag zonder reden.</p>
     <div class="hero-cta">
+      <a href="toegang.html" class="btn btn-login">Inloggen</a>
       <a href="#passen" class="btn">Bekijk de passen</a>
       <a href="#over" class="btn btn-ghost">Wat is RTG</a>
     </div>

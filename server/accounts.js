@@ -35,8 +35,16 @@ function init() {
     tier TEXT NOT NULL DEFAULT 'rtg',
     codename TEXT,
     real_name TEXT,
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    verified TEXT NOT NULL DEFAULT 'unverified',
+    id_doc TEXT,
+    member_state TEXT
   )`);
+  // Migratie voor databases van vóór de verificatie-/ledeninhoud-kolommen.
+  const cols = db.prepare('PRAGMA table_info(users)').all().map(c => c.name);
+  for (const [name, def] of [['verified', "TEXT NOT NULL DEFAULT 'unverified'"], ['id_doc', 'TEXT'], ['member_state', 'TEXT']]) {
+    if (!cols.includes(name)) db.exec(`ALTER TABLE users ADD COLUMN ${name} ${def}`);
+  }
   if (fs.existsSync(SECRET_FILE)) {
     SECRET = fs.readFileSync(SECRET_FILE);
   } else {
@@ -120,10 +128,31 @@ function publicUser(u) {
     codename: u.codename,
     number: 'RTG · ' + since.getFullYear() + ' · ' + String(1000 + u.id).slice(-4),
     since: months[since.getMonth()] + ' ' + since.getFullYear(),
-    account: true
+    account: true, verified: u.verified || 'unverified'
   };
 }
 
+/* ---------- ledeninhoud per persoon (eigen boekingen/betalingen) ---------- */
+function getMemberState(userId) {
+  const row = db.prepare('SELECT member_state FROM users WHERE id = ?').get(userId);
+  if (!row || !row.member_state) return null;
+  try { return JSON.parse(row.member_state); } catch (e) { return null; }
+}
+function saveMemberState(userId, obj) {
+  db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(JSON.stringify(obj), userId);
+}
+
+/* ---------- identiteitsverificatie ---------- */
+function setVerification(userId, status, docFilename) {
+  if (docFilename !== undefined) db.prepare('UPDATE users SET verified = ?, id_doc = ? WHERE id = ?').run(status, docFilename, userId);
+  else db.prepare('UPDATE users SET verified = ? WHERE id = ?').run(status, userId);
+  return getUserById(userId);
+}
+function listByVerification(status) {
+  return db.prepare('SELECT * FROM users WHERE verified = ? ORDER BY created_at DESC').all(status);
+}
+
 module.exports = {
-  init, createUser, getUserById, findByLogin, verifyPassword, issueToken, verifyToken, count, publicUser
+  init, createUser, getUserById, findByLogin, verifyPassword, issueToken, verifyToken, count, publicUser,
+  getMemberState, saveMemberState, setVerification, listByVerification
 };

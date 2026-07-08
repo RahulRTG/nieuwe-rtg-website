@@ -17,6 +17,7 @@ if (!process.execArgv.some(a => a.includes('experimental-sqlite'))) {
 
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const { db, load, save } = require('./db');
 const i18n = require('./translate');
@@ -26,7 +27,9 @@ load();
 accounts.init();
 // Demo-account zodat Rahul/Imran ook via de echte accountlogin werkt.
 if (accounts.count() === 0) {
-  accounts.createUser({ username: 'Rahul', email: 'rahul@rtg.example', password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran' });
+  const u = accounts.createUser({ username: 'Rahul', email: 'rahul@rtg.example', password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran' });
+  accounts.saveMemberState(u.id, memberTemplate());
+  accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
 }
 
 const app = express();
@@ -205,6 +208,18 @@ function registerContact(sess, post) {
 
 /* ---------- state per gebruiker ---------- */
 
+/* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
+   -facturen, zodat elk lid zijn eigen boekingen/betalingen heeft (wat de één
+   betaalt, verandert niets bij de ander). */
+function memberTemplate() {
+  return {
+    invoices: JSON.parse(JSON.stringify(db.data.invoices)),
+    trip: JSON.parse(JSON.stringify(db.data.trip)),
+    creatorCredit: 0,
+    creatorLikes: 0
+  };
+}
+
 function stateFor(sess, lang) {
   lang = lang === 'en' ? 'en' : 'nl';
   // Echte accounts tonen hun eigen identiteit (naam, codenaam); demo-sessies
@@ -223,18 +238,23 @@ function stateFor(sess, lang) {
   }));
   const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0, creatorLikes: 0, lang };
   if (sess.tier !== 'guest') {
-    state.invoices = db.data.invoices.map(inv => ({
+    // Echte accounts hebben hun eigen boekingen/betalingen; demo-sessies delen
+    // de vaste demo-inhoud.
+    const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate()) : db.data;
+    state.invoices = (md.invoices || []).map(inv => ({
       ...inv, desc: i18n.localize(inv.desc, lang), date: i18n.localize(inv.date, lang)
     }));
-    state.trip = {
-      ...db.data.trip,
-      dates: i18n.localize(db.data.trip.dates, lang),
-      items: db.data.trip.items.map(it => ({
-        ...it, when: i18n.localize(it.when, lang), title: i18n.localize(it.title, lang), sub: i18n.localize(it.sub, lang)
-      }))
-    };
-    state.creatorCredit = db.data.creatorCredit[sess.tier] || 0;
-    state.creatorLikes = db.data.creatorLikes[sess.tier] || 0;
+    if (md.trip) {
+      state.trip = {
+        ...md.trip,
+        dates: i18n.localize(md.trip.dates, lang),
+        items: (md.trip.items || []).map(it => ({
+          ...it, when: i18n.localize(it.when, lang), title: i18n.localize(it.title, lang), sub: i18n.localize(it.sub, lang)
+        }))
+      };
+    }
+    state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
+    state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
   }
   return state;
 }
@@ -278,6 +298,7 @@ app.post('/api/auth/register', (req, res) => {
   } catch (e) {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
+  accounts.saveMemberState(user.id, memberTemplate());
   const token = accounts.issueToken(user.id);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
   res.json({ token, state: stateFor(sess, req.body.lang) });
@@ -296,6 +317,34 @@ app.post('/api/auth/login', (req, res) => {
 
 app.post('/api/auth/me', auth, (req, res) => {
   res.json({ user: req.session.account ? accounts.publicUser(req.session.account) : stateFor(req.session, req.body.lang).user });
+});
+
+/* ---------- identiteitsverificatie (tegen nepaccounts) ----------
+   Een lid uploadt een foto van zijn identiteitsbewijs; RTG keurt die goed in de
+   backoffice. Zo weet je zeker dat er een echt mens achter een account zit, en
+   kan een geverifieerd lid daarna in één tik boeken.
+   Let op (AVG): een ID-document is een bijzonder persoonsgegeven. Het bestand
+   wordt buiten de repo bewaard (server/data/uploads, gitignored) en is alleen
+   voor de backoffice zichtbaar. Voor productie: versleutel het bestand, bewaar
+   het zo kort mogelijk, en gebruik bij voorkeur een gecertificeerde KYC-dienst. */
+const UPLOAD_DIR = path.join(__dirname, 'data', 'uploads');
+
+app.post('/api/verify/upload', express.json({ limit: '6mb' }), auth, (req, res) => {
+  if (!req.session.account) return res.status(403).json({ error: 'Verificatie is voor echte accounts.' });
+  const m = /^data:image\/(png|jpe?g|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(req.body.image || ''));
+  if (!m) return res.status(400).json({ error: 'Upload een foto (JPG, PNG of WebP) van uw identiteitsbewijs.' });
+  const buf = Buffer.from(m[2], 'base64');
+  if (buf.length > 5 * 1024 * 1024) return res.status(413).json({ error: 'Bestand te groot (max 5 MB).' });
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  const ext = m[1] === 'jpeg' ? 'jpg' : m[1];
+  const fname = req.session.account.id + '-' + Date.now() + '.' + ext;
+  fs.writeFileSync(path.join(UPLOAD_DIR, fname), buf);
+  accounts.setVerification(req.session.account.id, 'pending', fname);
+  res.json({ ok: true, status: 'pending' });
+});
+
+app.post('/api/verify/status', auth, (req, res) => {
+  res.json({ status: req.session.account ? req.session.account.verified : 'n/a' });
 });
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
@@ -353,12 +402,16 @@ app.post('/api/push/subscribe', auth, (req, res) => {
    verwerkt de betaling in één aanroep. */
 app.post('/api/pay', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  // Echte accounts betalen hun eigen facturen; demo-sessies de gedeelde demo.
+  const own = !!req.session.account;
+  const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;
+  const invoices = md.invoices || [];
   let targets;
   if (req.body.all) {
-    targets = db.data.invoices.filter(i => i.status === 'open');
+    targets = invoices.filter(i => i.status === 'open');
     if (!targets.length) return res.status(409).json({ error: 'Er staat niets open.' });
   } else {
-    const inv = db.data.invoices.find(i => i.id === req.body.invoiceId);
+    const inv = invoices.find(i => i.id === req.body.invoiceId);
     if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
     if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
     targets = [inv];
@@ -368,11 +421,12 @@ app.post('/api/pay', auth, (req, res) => {
     inv.status = 'paid';
     inv.date = 'Zojuist betaald';
     foundation += Math.round(inv.bijdrage * 0.3);
-    for (const item of db.data.trip.items) {
+    for (const item of (md.trip ? md.trip.items : [])) {
       if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
     }
   }
-  save();
+  if (own) accounts.saveMemberState(req.session.account.id, md);
+  else save();
   // ander open scherm van hetzelfde lid meteen bijwerken
   broadcastSync([req.session.tier], 'payments');
   res.json({ ok: true, foundation, state: stateFor(req.session, req.body.lang) });
@@ -839,6 +893,36 @@ app.get('/api/office/stream', (req, res) => {
 });
 
 app.post('/api/office/state', officeAuth, (req, res) => res.json({ state: officeState() }));
+
+/* Backoffice: identiteitsverificaties beoordelen. */
+function pendingVerifications() {
+  return accounts.listByVerification('pending').map(u => ({
+    id: u.id, name: u.real_name || u.username, email: u.email, codename: u.codename,
+    tier: u.tier, doc: u.id_doc, at: u.created_at
+  }));
+}
+app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications() }));
+
+app.post('/api/office/verify', officeAuth, (req, res) => {
+  const user = accounts.getUserById(Number(req.body.userId));
+  if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
+  const status = req.body.decision === 'approve' ? 'verified' : 'rejected';
+  accounts.setVerification(user.id, status);
+  notify(user.tier, { icon: status === 'verified' ? '✅' : '⚠',
+    title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
+    body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
+  res.json({ ok: true, status, pending: pendingVerifications() });
+});
+
+// Het geüploade document bekijken (alleen backoffice; token via query voor <img>).
+app.get('/api/office/doc', (req, res) => {
+  const sess = sessions.get(req.query.token);
+  if (!sess || sess.role !== 'office') return res.status(401).end();
+  const file = path.basename(String(req.query.file || '')); // geen padtraversal
+  const full = path.join(UPLOAD_DIR, file);
+  if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return res.status(404).end();
+  res.sendFile(full);
+});
 
 /* ---------- persoonlijke AI ---------- */
 

@@ -53,6 +53,7 @@ const NL2EN = {
   'Staat genoteerd voor november. Dank.': 'Noted for November. Thank you.',
   'Welk palácio was dit? Sta op het punt te boeken!': 'Which palácio was this? I am about to book!',
   'Sophie, dit wil ik in november zien, welke wijk was dit?': 'Sophie, I want to see this in November, which district was this?',
+  'Welke wijk was dit? Ik zou er graag in het voorjaar heen.': 'Which district was this? I would love to go there in spring.',
   // menu, Kikunoi
   'Hassun, seizoensvoorgerecht': 'Hassun, seasonal starter',
   'Acht kleine gerechten die het seizoen vieren.': 'Eight small dishes celebrating the season.',

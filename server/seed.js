@@ -52,8 +52,9 @@ module.exports = function seed() {
         text: 'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt.',
         baseLikes: 203, likedBy: {}, reward: 8, featured: true,
         comments: [
-          { who: 'Nadia Karim', tier: 'rtg', text: 'Welk palácio was dit? Sta op het punt te boeken!' },
-          { who: 'Alexander de Vries', tier: 'business', text: 'Sophie, dit wil ik in november zien, welke wijk was dit?' }
+          { who: 'Nadia Karim', tier: 'rtg', text: 'Welk palácio was dit? Sta op het punt te boeken!', lang: 'nl' },
+          { who: 'Alexander de Vries', tier: 'business', text: 'Sophie, dit wil ik in november zien, welke wijk was dit?', lang: 'nl' },
+          { who: 'James Whitfield', tier: 'business', text: 'Which district was this? I would love to go there in spring.', lang: 'en' }
         ]
       },
       {

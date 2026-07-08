@@ -1,6 +1,6 @@
 /* RTG app, service worker: cachet de app-schil zodat de app installeerbaar
    is en offline opent. API-verkeer gaat altijd naar het netwerk. */
-const CACHE = 'rtg-app-v2';
+const CACHE = 'rtg-app-v3';
 const SHELL = ['/apps/app.html', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -18,6 +18,21 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/api/')) return;
+
+  // HTML-pagina's: netwerk eerst, zodat wijzigingen meteen zichtbaar zijn en de
+  // cache alleen als offline-vangnet dient. Overige assets blijven cache-first.
+  const isPage = e.request.mode === 'navigate' || url.pathname.endsWith('.html');
+  if (isPage) {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copy));
+        return res;
+      }).catch(() => caches.match(e.request).then(hit => hit || caches.match('/apps/app.html')))
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(e.request).then(hit => hit ||
       fetch(e.request).then(res => {

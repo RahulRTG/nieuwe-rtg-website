@@ -1031,6 +1031,7 @@
       <form id="regForm" style="display:none;">
         <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
         <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
+        <input id="rgPhone" type="tel" placeholder="Mobiel nummer (WhatsApp)" data-i18n-ph="gate.phone" autocomplete="tel">
         <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
         <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
       </form>
@@ -1388,7 +1389,7 @@
   const regForm = document.getElementById('regForm');
   if (regForm) regForm.addEventListener('submit', e => {
     e.preventDefault();
-    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, p: $('#rgPass').value });
+    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, p: $('#rgPass').value });
   });
   const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
   function showGateForm(which){
@@ -1448,7 +1449,7 @@
       if (API.enabled){
         try {
           const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, password: cred.p })
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, password: cred.p })
             : await API.call('/auth/login', { login: cred.u, password: cred.p });
           API.token = data.token;
           applyState(data.state);           // user = het echte account
@@ -2174,7 +2175,7 @@ window.I18N = { en: {
   'gate.forgotsent':'If this email is known, we will send a reset link.', 'gate.resetok':'Password set. You can sign in now.',
   'gate.verified':'Your email address has been confirmed.', 'gate.verifyfail':'Confirmation link invalid or expired.',
   'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in',
-  'gate.name':'Your name', 'gate.email':'Email address', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
+  'gate.name':'Your name', 'gate.email':'Email address', 'gate.phone':'Mobile number (WhatsApp)', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
   'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
   'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',

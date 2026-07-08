@@ -76,6 +76,17 @@
   .doc-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out;}
   .doc-scrim.open{display:flex;}
   .doc-scrim img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+  .conv-scrim{cursor:default;}
+  .conv-card{width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .conv-head{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--line);}
+  .conv-head b{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
+  .conv-body{flex:1;overflow-y:auto;padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:0.55rem;}
+  .cmsg{max-width:80%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.85rem;line-height:1.4;}
+  .cmsg.in{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px;}
+  .cmsg.out{align-self:flex-end;background:var(--burgundy);color:#fff;border-bottom-right-radius:4px;}
+  .cmsg .wa{display:block;font-size:0.58rem;opacity:0.7;margin-bottom:0.2rem;}
+  .conv-reply{display:flex;gap:0.5rem;padding:0.9rem 1.25rem;border-top:1px solid var(--line);}
+  .conv-reply input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0.7rem 1rem;color:var(--txt);font-family:inherit;font-size:0.88rem;outline:none;}
 </style>
 </head>
 <body>
@@ -111,12 +122,28 @@
         <div class="rows" id="orders"></div>
       </div>
     </div>
-    <div class="panel" style="margin-top:1.5rem;">
-      <h2 data-i18n="panel.verify">Identiteitsverificaties</h2>
-      <div class="rows" id="verify"></div>
+    <div class="cols" style="margin-top:1.5rem;">
+      <div class="panel">
+        <h2 data-i18n="panel.verify">Identiteitsverificaties</h2>
+        <div class="rows" id="verify"></div>
+      </div>
+      <div class="panel">
+        <h2 data-i18n="panel.concierge">Concierge-inbox</h2>
+        <div class="rows" id="concierge"></div>
+      </div>
     </div>
   </div>
   <div class="doc-scrim" id="docScrim"><img id="docImg" alt="Document"></div>
+  <div class="doc-scrim conv-scrim" id="convScrim">
+    <div class="conv-card" onclick="event.stopPropagation()">
+      <div class="conv-head"><b id="convWho"></b><button id="convClose" class="vbtn">✕</button></div>
+      <div class="conv-body" id="convBody"></div>
+      <form class="conv-reply" id="convReply">
+        <input id="convText" placeholder="Antwoord als concierge…" data-i18n-ph="bo.replyph" autocomplete="off">
+        <button type="submit" class="vbtn ok" data-i18n="bo.send">Stuur</button>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -152,6 +179,7 @@
     $('#liveInd').style.display = 'inline-flex';
     render();
     loadVerify();
+    loadConcierge();
     stream();
   }
 
@@ -183,6 +211,40 @@
     loadVerify();
   }
 
+  const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  let convData = [], convUser = null;
+  async function loadConcierge(){
+    try { convData = (await call('/office/conversations')).conversations || []; } catch(e){ return; }
+    $('#concierge').innerHTML = convData.length ? convData.map(c =>
+      '<div class="vrow" data-uid="'+c.userId+'"><div class="vi"><div class="nm">'+c.codename+
+        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+c.tier+'</span>'+
+        (c.needsConcierge?' <span class="pill nieuw">'+T('bo.waiting','wacht')+'</span>':'')+'</div>'+
+        '<div class="sub">'+(c.lastFrom==='concierge'?'↩ ':'')+escHtml((c.last||'').slice(0,55))+'</div></div>'+
+        '<button class="vbtn ok" data-open>'+T('bo.open','Open')+'</button></div>'
+    ).join('') : '<div class="empty">'+T('bo.noconv','Nog geen gesprekken.')+'</div>';
+    $('#concierge').querySelectorAll('.vrow').forEach(row =>
+      row.querySelector('[data-open]').addEventListener('click', () => openThread(Number(row.dataset.uid))));
+    if (convUser && $('#convScrim').classList.contains('open')) openThread(convUser);
+  }
+  function openThread(uid){
+    const c = convData.find(x => x.userId === uid); if (!c) return;
+    convUser = uid;
+    $('#convWho').textContent = c.codename + ' · ' + c.tier;
+    $('#convBody').innerHTML = c.messages.map(m =>
+      '<div class="cmsg '+(m.from==='member'?'in':'out')+'">'+(m.channel==='whatsapp'?'<span class="wa">📱 WhatsApp</span>':'')+escHtml(m.text)+'</div>'
+    ).join('');
+    $('#convScrim').classList.add('open');
+    setTimeout(()=>{ const b=$('#convBody'); b.scrollTop=b.scrollHeight; }, 30);
+  }
+  $('#convClose').addEventListener('click', () => $('#convScrim').classList.remove('open'));
+  $('#convScrim').addEventListener('click', () => $('#convScrim').classList.remove('open'));
+  $('#convReply').addEventListener('submit', async e => {
+    e.preventDefault();
+    const t = $('#convText').value.trim(); if (!t || !convUser) return;
+    try { convData = (await call('/office/reply', { userId: convUser, text: t })).conversations || convData; $('#convText').value=''; openThread(convUser); loadConcierge(); }
+    catch(e2){ alert(e2.message); }
+  });
+
   function render(){
     const paid = state.orders.filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
     $('#stat').innerHTML =
@@ -206,7 +268,7 @@
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(token)); } catch(e){ return; }
-    source.addEventListener('sync', () => { refresh(); loadVerify(); });
+    source.addEventListener('sync', () => { refresh(); loadVerify(); loadConcierge(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
   }
 
@@ -220,8 +282,9 @@ window.I18N = { en: {
   'gate.h':'Sign in',
   'gate.p':'Live overview of all dynamic prices, orders and rides via RTG partners.',
   'gate.ph':'Back-office code', 'gate.btn':'Sign in', 'gate.hint':'Demo code: RTG-OFFICE',
-  'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides', 'panel.verify':'Identity verifications',
+  'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides', 'panel.verify':'Identity verifications', 'panel.concierge':'Concierge inbox',
   'bo.viewdoc':'Document', 'bo.approve':'Approve', 'bo.reject':'Reject', 'bo.noverify':'No pending verifications.',
+  'bo.waiting':'waiting', 'bo.open':'Open', 'bo.noconv':'No conversations yet.', 'bo.replyph':'Reply as concierge…', 'bo.send':'Send',
   'bo.partners':'Partners', 'bo.proposals':'Price proposals', 'bo.orders':'Orders', 'bo.revenue':'Revenue via partners',
   'bo.noprices':'No prices yet. As soon as a partner submits a dynamic price, it appears here live.',
   'bo.noorders':'No orders or rides via partners yet.',

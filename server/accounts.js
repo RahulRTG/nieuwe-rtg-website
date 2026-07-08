@@ -54,6 +54,8 @@ function init() {
     codename TEXT,
     enc_name TEXT,
     enc_email TEXT,
+    enc_phone TEXT,
+    phone_hash TEXT,
     created_at TEXT NOT NULL,
     verified TEXT NOT NULL DEFAULT 'unverified',
     id_doc TEXT,
@@ -66,6 +68,7 @@ function init() {
   const cols = db.prepare('PRAGMA table_info(users)').all().map(c => c.name);
   const add = (n, d) => { if (!cols.includes(n)) db.exec(`ALTER TABLE users ADD COLUMN ${n} ${d}`); };
   add('email_hash', 'TEXT'); add('enc_name', 'TEXT'); add('enc_email', 'TEXT');
+  add('enc_phone', 'TEXT'); add('phone_hash', 'TEXT');
   add('verified', "TEXT NOT NULL DEFAULT 'unverified'"); add('id_doc', 'TEXT'); add('member_state', 'TEXT');
   add('email_verified', 'INTEGER NOT NULL DEFAULT 0'); add('reset_hash', 'TEXT'); add('reset_expires', 'INTEGER');
 
@@ -93,6 +96,19 @@ function dec(blob) {
 function emailHash(email) {
   return crypto.createHmac('sha256', VAULT).update(String(email || '').trim().toLowerCase()).digest('hex');
 }
+// Normaliseer een telefoonnummer tot louter cijfers (met landcode) voor de hash,
+// zodat een inkomend WhatsApp-nummer aan het juiste account gekoppeld kan worden.
+function normalizePhone(phone) {
+  let p = String(phone || '').replace(/[^\d+]/g, '');
+  if (p.startsWith('00')) p = '+' + p.slice(2);
+  if (p.startsWith('0')) p = '+31' + p.slice(1); // NL-standaard voor de demo
+  if (!p.startsWith('+') && p.length >= 9) p = '+' + p;
+  return p.replace(/\D/g, '');
+}
+function phoneHash(phone) {
+  const n = normalizePhone(phone);
+  return n ? crypto.createHmac('sha256', VAULT).update(n).digest('hex') : null;
+}
 
 /* ---------- wachtwoorden (scrypt + salt, tijd-veilige vergelijking) ---------- */
 function hashPassword(pw) {
@@ -114,11 +130,11 @@ function makeCodename() {
 }
 
 /* ---------- gebruikers ---------- */
-function createUser({ email, username, password, tier, realName }) {
+function createUser({ email, username, password, tier, realName, phone }) {
   tier = ['rtg', 'lifestyle', 'business'].includes(tier) ? tier : 'rtg';
   const info = db.prepare(
-    `INSERT INTO users (email_hash, username, password_hash, tier, codename, enc_name, enc_email, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO users (email_hash, username, password_hash, tier, codename, enc_name, enc_email, enc_phone, phone_hash, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     email ? emailHash(email) : null,
     username || null,
@@ -127,9 +143,16 @@ function createUser({ email, username, password, tier, realName }) {
     makeCodename(),
     enc(realName),
     enc(email),
+    phone ? enc(phone) : null,
+    phone ? phoneHash(phone) : null,
     new Date().toISOString()
   );
   return getUserById(info.lastInsertRowid);
+}
+function findByPhone(phone) {
+  const h = phoneHash(phone);
+  if (!h) return null;
+  return db.prepare('SELECT * FROM users WHERE phone_hash = ?').get(h) || null;
 }
 function getUserById(id) { return db.prepare('SELECT * FROM users WHERE id = ?').get(id) || null; }
 function findByLogin(login) {
@@ -144,6 +167,7 @@ function count() { return db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
 function realNameOf(u) { return u ? (dec(u.enc_name) || u.username || 'Lid') : null; }
 function emailOf(u) { return u ? dec(u.enc_email) : null; }
+function phoneOf(u) { return u ? dec(u.enc_phone) : null; }
 
 /* ---------- staatloze ondertekende tokens ---------- */
 function sign(body) { return crypto.createHmac('sha256', SECRET).update(body).digest('hex').slice(0, 32); }
@@ -210,7 +234,7 @@ function publicUser(u) {
   const shortName = parts.length > 1 ? parts[0][0] + '. ' + parts.slice(1).join(' ') : parts[0];
   return {
     id: u.id, tier: u.tier, name: shortName, full,
-    email: emailOf(u), codename: u.codename,
+    email: emailOf(u), phone: phoneOf(u), codename: u.codename,
     number: 'RTG · ' + since.getFullYear() + ' · ' + String(1000 + u.id).slice(-4),
     since: months[since.getMonth()] + ' ' + since.getFullYear(),
     account: true, verified: u.verified || 'unverified', emailVerified: !!u.email_verified
@@ -237,9 +261,18 @@ function listByVerification(status) {
   return db.prepare('SELECT * FROM users WHERE verified = ? ORDER BY created_at DESC').all(status);
 }
 
+/* Gesprekken (WhatsApp + app) per account, voor de concierge-inbox. */
+function conversations() {
+  const rows = db.prepare('SELECT id, tier, codename, member_state FROM users WHERE member_state IS NOT NULL').all();
+  return rows.map(r => {
+    let md = {}; try { md = JSON.parse(r.member_state) || {}; } catch (e) {}
+    return { id: r.id, tier: r.tier, codename: r.codename, conversation: md.conversation || [], needsConcierge: !!md.needsConcierge };
+  }).filter(x => x.conversation.length);
+}
+
 module.exports = {
-  init, createUser, getUserById, findByLogin, verifyPassword, issueToken, verifyToken, count, publicUser,
-  getMemberState, saveMemberState, setVerification, listByVerification,
-  realNameOf, emailOf, issueActionToken, verifyActionToken,
+  init, createUser, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
+  getMemberState, saveMemberState, setVerification, listByVerification, conversations,
+  realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword
 };

@@ -32,7 +32,7 @@ load();
 accounts.init();
 // Demo-account zodat Rahul/Imran ook via de echte accountlogin werkt.
 if (accounts.count() === 0) {
-  const u = accounts.createUser({ username: 'Rahul', email: 'rahul@rtg.example', password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran' });
+  const u = accounts.createUser({ username: 'Rahul', email: 'rahul@rtg.example', password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran', phone: '+31612345678' });
   accounts.saveMemberState(u.id, memberTemplate());
   accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
 }
@@ -292,14 +292,16 @@ app.post('/api/logout', auth, (req, res) => {
 app.post('/api/auth/register', (req, res) => {
   const name = String(req.body.name || '').trim().slice(0, 80);
   const email = String(req.body.email || '').trim().toLowerCase();
+  const phone = String(req.body.phone || '').trim().slice(0, 30);
   const password = String(req.body.password || '');
   if (!name) return res.status(400).json({ error: 'Vul uw naam in.' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
+  if (phone.replace(/\D/g, '').length < 8) return res.status(400).json({ error: 'Vul een geldig mobiel nummer in (voor uw WhatsApp-lijn).' });
   if (password.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
   if (accounts.findByLogin(email)) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
   let user;
   try {
-    user = accounts.createUser({ email, username: req.body.username || null, password, tier: req.body.tier, realName: name });
+    user = accounts.createUser({ email, username: req.body.username || null, password, tier: req.body.tier, realName: name, phone });
   } catch (e) {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
@@ -1057,6 +1059,109 @@ app.post('/api/ai', auth, async (req, res) => {
     }
   }
   res.json({ reply: cannedAnswer(history[history.length - 1].content), source: 'demo' });
+});
+
+/* ================= GEKOPPELD GESPREK: WhatsApp + app in één thread =================
+   Elk lid heeft één doorlopend gesprek. Of ze nu via WhatsApp of in de app
+   schrijven, het komt in dezelfde thread. RTG Pass wordt beantwoord door de
+   Butler (AI); Lifestyle en Business gaan naar een menselijke concierge, die in
+   de backoffice antwoordt. In productie loopt WhatsApp via de WhatsApp Business
+   API (Meta/Twilio); hier is de webhook gesimuleerd. */
+
+async function generateAiReply(tier, convo) {
+  const history = convo
+    .filter(m => m.from === 'member' || m.from === 'butler')
+    .map(m => ({ role: m.from === 'member' ? 'user' : 'assistant', content: String(m.text).slice(0, 2000) }))
+    .slice(-12);
+  while (history.length && history[0].role !== 'user') history.shift();
+  const last = history.length ? history[history.length - 1].content : '';
+  if (anthropic && history.length && history[history.length - 1].role === 'user') {
+    try {
+      const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 1024, system: aiSystemPrompt(tier), messages: history });
+      const reply = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+      if (reply) return reply;
+    } catch (e) { console.error('Claude-fout (butler):', e.message); }
+  }
+  return cannedAnswer(last);
+}
+
+function convOf(userId) { const md = accounts.getMemberState(userId) || {}; return md.conversation || []; }
+
+async function memberSays(user, text, channel) {
+  const md = accounts.getMemberState(user.id) || {};
+  md.conversation = md.conversation || [];
+  md.conversation.push({ from: 'member', text: String(text).slice(0, 1000), at: new Date().toISOString(), channel });
+  if (user.tier === 'rtg') {
+    // De Butler (AI) antwoordt meteen.
+    const reply = await generateAiReply(user.tier, md.conversation);
+    md.conversation.push({ from: 'butler', text: reply, at: new Date().toISOString(), channel: 'butler' });
+    md.needsConcierge = false;
+  } else {
+    // Lifestyle/Business: een mens (concierge) reageert via de backoffice.
+    md.needsConcierge = true;
+  }
+  md.conversation = md.conversation.slice(-120);
+  accounts.saveMemberState(user.id, md);
+  broadcastSync([user.tier], 'chat');
+  if (user.tier !== 'rtg') sseToOffice('sync', { scope: 'concierge' });
+}
+
+app.post('/api/chat/history', auth, (req, res) => {
+  if (!req.session.account) return res.json({ messages: [], mode: 'butler', demo: true });
+  res.json({
+    messages: convOf(req.session.account.id),
+    mode: req.session.tier === 'rtg' ? 'butler' : 'concierge',
+    phone: accounts.phoneOf(req.session.account)
+  });
+});
+
+app.post('/api/chat/send', auth, async (req, res) => {
+  if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
+  const text = String(req.body.text || '').trim();
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  await memberSays(req.session.account, text, 'app');
+  res.json({ ok: true, messages: convOf(req.session.account.id), mode: req.session.tier === 'rtg' ? 'butler' : 'concierge' });
+});
+
+/* Inkomend WhatsApp-bericht. In productie de door Meta ondertekende webhook;
+   hier een eenvoudige { from, text } om de koppeling te demonstreren. */
+app.post('/api/whatsapp/webhook', async (req, res) => {
+  const from = req.body.from || (((req.body.entry || [])[0]?.changes || [])[0]?.value?.messages || [])[0]?.from;
+  const text = req.body.text || (((req.body.entry || [])[0]?.changes || [])[0]?.value?.messages || [])[0]?.text?.body;
+  if (!from || !text) return res.status(400).json({ error: 'Nummer of tekst ontbreekt.' });
+  const user = accounts.findByPhone(from);
+  if (!user) return res.json({ ok: true, matched: false }); // onbekend nummer: negeren
+  await memberSays(user, text, 'whatsapp');
+  res.json({ ok: true, matched: true });
+});
+
+/* Backoffice: concierge-inbox voor Lifestyle/Business-leden. */
+function conciergeInbox() {
+  return accounts.conversations()
+    .filter(c => c.tier === 'lifestyle' || c.tier === 'business')
+    .map(c => {
+      const last = c.conversation[c.conversation.length - 1] || {};
+      return { userId: c.id, codename: c.codename, tier: c.tier, needsConcierge: c.needsConcierge,
+        last: last.text || '', lastAt: last.at || null, lastFrom: last.from || '', messages: c.conversation };
+    })
+    .sort((a, b) => (b.needsConcierge - a.needsConcierge) || (new Date(b.lastAt) - new Date(a.lastAt)));
+}
+app.post('/api/office/conversations', officeAuth, (req, res) => res.json({ conversations: conciergeInbox() }));
+
+app.post('/api/office/reply', officeAuth, (req, res) => {
+  const u = accounts.getUserById(Number(req.body.userId));
+  if (!u) return res.status(404).json({ error: 'Account niet gevonden.' });
+  const text = String(req.body.text || '').trim();
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  const md = accounts.getMemberState(u.id) || {};
+  md.conversation = md.conversation || [];
+  md.conversation.push({ from: 'concierge', text: text.slice(0, 1000), at: new Date().toISOString(), channel: 'concierge' });
+  md.needsConcierge = false;
+  accounts.saveMemberState(u.id, md);
+  broadcastSync([u.tier], 'chat');
+  notify(u.tier, { icon: '💬', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
+  // In productie gaat dit antwoord ook via WhatsApp naar accounts.phoneOf(u).
+  res.json({ ok: true, conversations: conciergeInbox() });
 });
 
 /* ---------- start ---------- */

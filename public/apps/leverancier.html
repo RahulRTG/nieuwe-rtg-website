@@ -121,6 +121,30 @@
   .ph-pick{display:flex;gap:0.5rem;margin-top:0.6rem;overflow-x:auto;}
   .ph-pick img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid transparent;flex-shrink:0;cursor:pointer;}
   .ph-pick img.sel{border-color:var(--gold);}
+
+  /* kassa */
+  .pos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;margin-top:0.7rem;}
+  .pos-key{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:0.8rem 0.9rem;text-align:left;color:var(--txt);}
+  .pos-key:active{border-color:var(--gold);}
+  .pos-key b{display:block;font-size:0.82rem;font-weight:600;}
+  .pos-key span{font-size:0.72rem;color:var(--gold);}
+  .pos-bon{margin-top:0.9rem;border-top:1px dashed var(--line);padding-top:0.5rem;}
+  .pos-line{display:flex;justify-content:space-between;font-size:0.84rem;color:var(--muted);padding:0.25rem 0;}
+  .pos-line.total{border-top:1px dashed var(--line);margin-top:0.3rem;padding-top:0.5rem;color:var(--txt);font-weight:600;font-size:0.95rem;}
+  .pos-pay{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.9rem;}
+  .pos-pay .obtn:disabled{opacity:0.4;}
+  .pos-day{display:flex;align-items:baseline;gap:0.7rem;margin-top:0.5rem;}
+  .pos-day b{font-family:'Bodoni Moda',serif;font-size:1.9rem;color:var(--gold);}
+  .pos-day span{font-size:0.74rem;color:var(--soft);}
+  .pos-chips{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.55rem;}
+  .pos-chips span{font-size:0.68rem;border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;color:var(--muted);}
+  .pos-chips.actors span{color:var(--gold);border-color:rgba(169,143,28,0.35);}
+  .pos-sale{display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--line);}
+  .pos-sale:last-child{border-bottom:none;}
+  .pos-sale b{display:block;font-size:0.84rem;font-weight:600;}
+  .pos-sale > div:first-child span{font-size:0.66rem;color:var(--soft);}
+  .pos-sale .amt{font-family:'Bodoni Moda',serif;font-size:1rem;white-space:nowrap;text-align:right;}
+  .pos-sale .amt .m{display:block;font-family:'Inter',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);}
   .pill{display:inline-block;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.28rem 0.6rem;border-radius:999px;border:1px solid var(--line);white-space:nowrap;}
   .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .pill.bereiding{color:var(--amber);border-color:rgba(201,154,46,0.4);}
@@ -339,6 +363,11 @@
         <p class="sub" data-i18n="sup.v.loc.sub">Deel uw live locatie zodat gasten u vinden, en zie waar zij zijn.</p>
         <div id="locWrap"></div>
       </div>
+      <div class="view" data-view="kassa">
+        <h2 data-i18n="sup.v.kassa">Kassa</h2>
+        <p class="sub" data-i18n="sup.v.kassa.sub">Afrekenen, bonnen en het dagoverzicht, per medewerker bijgehouden.</p>
+        <div id="kassaWrap"></div>
+      </div>
       <div class="view" data-view="rooms">
         <h2 data-i18n="sup.v.rooms">Kamers</h2>
         <p class="sub" data-i18n="sup.v.rooms.sub">Zet kamers aan of uit. Gasten zien alleen wat aan staat, live.</p>
@@ -384,12 +413,22 @@
     { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' }
   ];
 
+  // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
+  const SECTOR_DEF = {
+    horeca:  { label:'RTG Horeca',  labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️' },
+    hotel:   { label:'RTG Hotel',   labelEn:'RTG Hotel',       codes:['HOSHI'],           icon:'🏨' },
+    vervoer: { label:'RTG Vervoer', labelEn:'RTG Transport',   codes:['MKKX','JETAG'],    icon:'🚘' }
+  };
+  const SECTOR = (new URLSearchParams(location.search).get('sector') || '').toLowerCase();
+  const SDEF = SECTOR_DEF[SECTOR] || null;
+
   const TABDEF = {
     home:     { label:'Overzicht', svg:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>' },
     orders:   { label:'Orders',    svg:'<path d="M6 2h9l3 3v17H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>', cap:'orders' },
     rides:    { label:'Ritten',    svg:'<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>', cap:'rides' },
     menu:     { label:'Menu',      svg:'<path d="M4 3v18M8 3v6a2 2 0 0 1-4 0M18 3c-2 0-3 2-3 5s1 4 3 4v9"/>', cap:'menu' },
     price:    { label:'Prijs',     svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 2-2.5 1.5-2.5 3.5M12 16v.5"/>', cap:'pricing' },
+    kassa:    { label:'Kassa',     svg:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M7 13h2M11 13h2M15 13h2M7 16.5h2M11 16.5h2M15 16.5h2"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
     page:     { label:'Pagina',    svg:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6"/>' },
@@ -422,9 +461,19 @@
   function initials(name){ return String(name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 
   function renderGate(){
-    $('#gateList').innerHTML = DEMO.map(d =>
+    const list = SDEF ? DEMO.filter(d => SDEF.codes.includes(d.code)) : DEMO;
+    if (SDEF){
+      document.title = SDEF.label + ', RTG Partners';
+      const badge = document.querySelector('#gate .badge');
+      if (badge) badge.textContent = (lang() === 'en' ? SDEF.labelEn : SDEF.label);
+    }
+    $('#gateList').innerHTML = list.map(d =>
       '<button class="gate-btn" data-code="'+d.code+'"><span class="ic">'+d.icon+'</span><span><b>'+d.name+'</b><span>'+d.sub+'</span></span></button>'
-    ).join('');
+    ).join('') + (SDEF ? '' :
+      '<div style="margin-top:0.9rem;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);">'+T('gate.sectorapps','Of open de app voor uw sector')+'</div>'+
+      '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">'+
+        Object.keys(SECTOR_DEF).map(k => '<a class="obtn" style="text-decoration:none;" href="/apps/partner-'+k+'.html">'+SECTOR_DEF[k].icon+' '+(lang()==='en'?SECTOR_DEF[k].labelEn:SECTOR_DEF[k].label)+'</a>').join('')+
+      '</div>');
     document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
     const lf = document.getElementById('loginForm');
     if (lf) lf.addEventListener('submit', e => {
@@ -539,7 +588,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderRooms(); renderPage(); renderTeam();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderPage(); renderTeam();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -702,6 +751,113 @@
   async function demoShare(){
     try { await API.call('/supplier/location', { lat: S.loc.lat, lng: S.loc.lng, label: S.loc.label }); toast(T('sup.locshareddemo','Locatie gedeeld (demo-positie).')); }
     catch(e){ toast(e.message); }
+  }
+
+  // ---- kassa, per sector ----
+  let bon = {};        // horeca: menu-id -> aantal
+  function bonTotal(){ return (state.menu||[]).reduce((s,m)=>s+m.price*(bon[m.id]||0),0); }
+  function methodLabel(m){ return m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):T('pos.room','Op de kamer'); }
+
+  function renderKassa(){
+    const el = $('#kassaWrap'); if (!el) return;
+    const type = S.type;
+    let html = '';
+    if (type==='restaurant'||type==='bar'||type==='club') html = kassaHoreca();
+    else if (type==='hotel'||type==='apartment') html = kassaHotel();
+    else html = kassaVervoer();
+    html += kassaDay();
+    el.innerHTML = html;
+    bindKassa(type);
+  }
+
+  // horeca: tik gerechten aan, bon loopt op, afrekenen met PIN of contant
+  function kassaHoreca(){
+    const m = state.menu || [];
+    if (!m.length) return '<div class="card"><div style="font-size:0.84rem;color:var(--muted);">'+T('pos.nomenu','Zet eerst gerechten op de menukaart; die worden hier uw kassaknoppen.')+'</div></div>';
+    const total = bonTotal();
+    const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+x.name+'</span><span>'+eur(x.price*bon[x.id])+'</span></div>').join('');
+    return '<div class="card"><div class="tt-h">'+T('pos.newbon','Nieuwe bon')+'</div>'+
+      '<div class="pos-grid">'+m.map(x=>'<button class="pos-key" data-pos="'+x.id+'"><b>'+x.name+'</b><span>'+eur(x.price)+(bon[x.id]?' · '+bon[x.id]+'×':'')+'</span></button>').join('')+'</div>'+
+      (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+'</span></div></div>':'')+
+      '<div class="pos-pay">'+
+        '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
+        '<button class="obtn primary js-pay" data-method="pin"'+(total?'':' disabled')+'>'+T('pos.paypin','Afrekenen, PIN')+'</button>'+
+        '<button class="obtn js-pay" data-method="contant"'+(total?'':' disabled')+'>'+T('pos.cash','Contant')+'</button>'+
+      '</div></div>';
+  }
+
+  // hotel: bedrag op de kamer zetten of direct afrekenen
+  function kassaHotel(){
+    const rooms = state.rooms || [];
+    return '<div class="card"><div class="tt-h">'+T('pos.charge','Afrekening of kamerlast')+'</div>'+
+      '<div class="field"><label>'+T('pos.roomlbl','Kamer (optioneel)')+'</label><select id="posRoom" style="width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
+        '<option value="">'+T('pos.noroom','Geen kamer, losse verkoop')+'</option>'+
+        rooms.map(r=>'<option value="'+r.name.replace(/"/g,'&quot;')+'">'+r.name+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>'+T('pos.desc','Omschrijving')+'</label><input id="posDesc" placeholder="'+T('pos.deschotel','Bijv. minibar, spa, roomservice')+'"></div>'+
+      '<div class="field"><label>'+T('pos.amount','Bedrag (€)')+'</label><input id="posAmt" type="number" inputmode="decimal" placeholder="45"></div>'+
+      '<div class="pos-pay">'+
+        '<button class="obtn primary js-pay" data-method="kamer">'+T('pos.toroom','Op de kamer')+'</button>'+
+        '<button class="obtn js-pay" data-method="pin">'+T('pos.pin','PIN')+'</button>'+
+        '<button class="obtn js-pay" data-method="contant">'+T('pos.cash','Contant')+'</button>'+
+      '</div></div>';
+  }
+
+  // vervoer: rit afrekenen
+  function kassaVervoer(){
+    return '<div class="card"><div class="tt-h">'+T('pos.ridebill','Rit afrekenen')+'</div>'+
+      '<div class="field"><label>'+T('pos.ride','Rit')+'</label><input id="posDesc" placeholder="'+T('pos.descride','Bijv. Kyoto Station naar Gion')+'"></div>'+
+      '<div class="field"><label>'+T('pos.amount','Bedrag (€)')+'</label><input id="posAmt" type="number" inputmode="decimal" placeholder="28"></div>'+
+      '<div class="pos-pay">'+
+        '<button class="obtn primary js-pay" data-method="pin">'+T('pos.paypin','Afrekenen, PIN')+'</button>'+
+        '<button class="obtn js-pay" data-method="contant">'+T('pos.cash','Contant')+'</button>'+
+      '</div></div>';
+  }
+
+  // dagoverzicht: totaal, per betaalmethode, per medewerker, laatste bonnen
+  function kassaDay(){
+    const p = state.pos || { total:0, count:0, byMethod:{}, byActor:{}, sales:[] };
+    let html = '<div class="card"><div class="tt-h">'+T('pos.today','Vandaag')+'</div>'+
+      '<div class="pos-day"><b>'+eur(p.total)+'</b><span>'+p.count+' '+T('pos.bons','bon(nen)')+'</span></div>';
+    const methods = Object.keys(p.byMethod);
+    if (methods.length) html += '<div class="pos-chips">'+methods.map(m=>'<span>'+methodLabel(m)+' '+eur(p.byMethod[m])+'</span>').join('')+'</div>';
+    const actors = Object.keys(p.byActor);
+    if (actors.length>1 || (actors.length===1 && actors[0]!==actor().name))
+      html += '<div class="pos-chips actors">'+actors.map(a=>'<span>'+a+' '+eur(p.byActor[a])+'</span>').join('')+'</div>';
+    html += p.sales.length
+      ? p.sales.map(s=>'<div class="pos-sale"><div><b>'+(s.desc||((s.items||[]).map(i=>i.qty+'× '+i.name).join(', '))||T('pos.sale','Verkoop'))+'</b>'+
+          '<span>'+s.bon+' · '+s.actor+(s.room?' · '+s.room:'')+' · '+timeAgo(s.at)+'</span></div>'+
+          '<div class="amt">'+eur(s.total)+'<span class="m">'+methodLabel(s.method)+'</span></div></div>').join('')
+      : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('pos.nosales','Nog geen verkopen vandaag.')+'</div>';
+    return html + '</div>';
+  }
+
+  function bindKassa(type){
+    document.querySelectorAll('[data-pos]').forEach(b => b.addEventListener('click', () => {
+      const id = b.dataset.pos; bon[id] = (bon[id]||0)+1; renderKassa(); openTab('kassa');
+    }));
+    const clear = $('#posClear'); if (clear) clear.addEventListener('click', () => { bon = {}; renderKassa(); openTab('kassa'); });
+    document.querySelectorAll('.js-pay').forEach(b => b.addEventListener('click', () => paySale(type, b.dataset.method)));
+  }
+
+  async function paySale(type, method){
+    let body = { method };
+    if (type==='restaurant'||type==='bar'||type==='club'){
+      const items = (state.menu||[]).filter(m=>bon[m.id]).map(m=>({ name:m.name, qty:bon[m.id], price:m.price }));
+      if (!items.length){ toast(T('pos.empty','Tik eerst gerechten aan.')); return; }
+      body.items = items; body.total = bonTotal();
+    } else {
+      body.total = Number(($('#posAmt')||{}).value);
+      body.desc = (($('#posDesc')||{}).value||'').trim();
+      const room = ($('#posRoom')||{}).value;
+      if (room) body.room = room;
+      if (!(body.total>0)){ toast(T('pos.fillamount','Vul een bedrag in.')); return; }
+    }
+    try {
+      const d = await API.call('/supplier/pos/sale', body);
+      bon = {};
+      toast(T('pos.done','Afgerekend:')+' '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+'), '+T('pos.bonnr','bon')+' '+d.sale.bon);
+      await refresh(); openTab('kassa');
+    } catch(e){ toast(e.message); }
   }
 
   // ---- kamers (hotel/appartement) ----
@@ -931,6 +1087,17 @@ window.I18N = { en: {
   'sup.v.loc.sub':'Share your live location so guests find you, and see where they are.',
   'tab.team':'Team', 'sup.v.team':'Team', 'sup.v.team.sub':'Staff, who did what and the internal chat of this business.',
   'tab.rooms':'Rooms', 'sup.v.rooms':'Rooms', 'sup.v.rooms.sub':'Switch rooms on or off. Guests only see what is on, live.',
+  'tab.kassa':'Register', 'sup.v.kassa':'Register', 'sup.v.kassa.sub':'Checkout, receipts and the day overview, tracked per staff member.',
+  'gate.sectorapps':'Or open the app for your sector',
+  'pos.pin':'Card', 'pos.cash':'Cash', 'pos.room':'To the room', 'pos.toroom':'To the room',
+  'pos.nomenu':'Add dishes to the menu first; they become your register keys here.',
+  'pos.newbon':'New receipt', 'pos.total':'Total', 'pos.clear':'Clear', 'pos.paypin':'Checkout, card',
+  'pos.charge':'Checkout or room charge', 'pos.roomlbl':'Room (optional)', 'pos.noroom':'No room, single sale',
+  'pos.desc':'Description', 'pos.deschotel':'E.g. minibar, spa, room service', 'pos.amount':'Amount (€)',
+  'pos.ridebill':'Charge a ride', 'pos.ride':'Ride', 'pos.descride':'E.g. Kyoto Station to Gion',
+  'pos.today':'Today', 'pos.bons':'receipt(s)', 'pos.nosales':'No sales today yet.', 'pos.sale':'Sale',
+  'pos.empty':'Tap some dishes first.', 'pos.fillamount':'Enter an amount.',
+  'pos.done':'Paid:', 'pos.bonnr':'receipt',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

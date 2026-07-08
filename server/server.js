@@ -130,6 +130,7 @@ function initRealtime() {
     if (!Array.isArray(s.photos)) s.photos = [];
     if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
   }
+  if (!db.data.posSales) db.data.posSales = {};                   // kassaverkopen per bedrijf
   if (webpush) {
     if (!db.data.vapid) {
       db.data.vapid = webpush.generateVAPIDKeys();
@@ -752,6 +753,7 @@ function supplierState(s, actor) {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
     rooms: s.rooms || null,
     photos: s.photos || [],
+    pos: posDay(s.code),
     menu: s.menu || [],
     orders: db.data.orders.filter(o => o.supplierCode === s.code).map(o => {
       const L = db.data.live[o.customerKey || o.customerTier];
@@ -921,6 +923,47 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
   sseToOffice('sync', { scope: 'salon' });
   res.json({ ok: true, postId: post.id });
 });
+
+// ---- kassa: verkopen registreren, per sector (bon, kamer, rit) ----
+const POS_METHODS = ['pin', 'contant', 'kamer'];
+app.post('/api/supplier/pos/sale', supplierAuth, (req, res) => {
+  const total = Number(req.body.total);
+  if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
+  const method = POS_METHODS.includes(req.body.method) ? req.body.method : 'pin';
+  const items = Array.isArray(req.body.items)
+    ? req.body.items.slice(0, 40).map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
+    : null;
+  const sale = {
+    id: crypto.randomBytes(4).toString('hex'),
+    bon: pickupCode(),
+    actor: req.actor.name,
+    desc: String(req.body.desc || '').slice(0, 140),
+    room: req.body.room ? String(req.body.room).slice(0, 60) : null,
+    items, total, method,
+    at: new Date().toISOString()
+  };
+  const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
+  list.unshift(sale);
+  db.data.posSales[req.supplier.code] = list.slice(0, 300);
+  save();
+  logActivity(req.supplier.code, req.actor, 'rekende € ' + total + ' af (' + method + (sale.room ? ', ' + sale.room : '') + ')');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
+  res.json({ ok: true, sale });
+});
+
+// dagoverzicht (Z-rapport): vandaag, per betaalmethode en per medewerker
+function posDay(code) {
+  const today = new Date().toISOString().slice(0, 10);
+  const sales = (db.data.posSales[code] || []).filter(s => s.at.slice(0, 10) === today);
+  const byMethod = {}, byActor = {};
+  let total = 0;
+  for (const s of sales) {
+    total += s.total;
+    byMethod[s.method] = (byMethod[s.method] || 0) + s.total;
+    byActor[s.actor] = (byActor[s.actor] || 0) + s.total;
+  }
+  return { total, count: sales.length, byMethod, byActor, sales: sales.slice(0, 25) };
+}
 
 // Interne teamchat binnen het bedrijf.
 app.post('/api/supplier/team/message', supplierAuth, (req, res) => {

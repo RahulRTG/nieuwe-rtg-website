@@ -124,6 +124,7 @@ function initRealtime() {
   if (!db.data.supplierNotifications) db.data.supplierNotifications = {};
   if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
   if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
+  if (!db.data.supplierInvites) db.data.supplierInvites = {};     // open personeelsuitnodigingen, per uitnodigingscode
   if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
   if (webpush) {
     if (!db.data.vapid) {
@@ -716,8 +717,22 @@ function supplierAuth(req, res, next) {
   req.supplier = findSupplier(sess.code);
   if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
   // Wie is er aan het werk (voor toeschrijving van activiteiten).
-  req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager };
+  req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, perms: sess.perms || null };
   next();
+}
+
+// Mag deze medewerker deze functie gebruiken? Managers en bestaande accounts
+// zonder rechtenlijst mogen alles; anders bepaalt de lijst van de uitnodiging het.
+function actorCan(actor, cap) {
+  if (!actor || actor.manager) return true;
+  if (!actor.perms || !actor.perms.length) return true;
+  return actor.perms.includes(cap);
+}
+function requireCap(cap) {
+  return (req, res, next) => {
+    if (!actorCan(req.actor, cap)) return res.status(403).json({ error: 'Je account heeft geen toegang tot deze functie. Vraag je manager om toegang.' });
+    next();
+  };
 }
 
 // Legt vast wie wat deed binnen het bedrijf; live zichtbaar in de team-tab.
@@ -735,6 +750,47 @@ function publicSupplier(s, lang) {
   const loc = s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : s.loc;
   return { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
            city: s.city, caps: t.caps || [], loc, hasMenu: (s.menu || []).length > 0 };
+}
+
+// Slimme dagbriefing: de app signaleert zelf wat nu aandacht nodig heeft.
+// Gestructureerd (type + gegevens), de app-kant maakt er tekst van in de juiste taal.
+function supplierInsights(s) {
+  const t = db.data.supplierTypes[s.type] || {};
+  const caps = t.caps || [];
+  const out = [];
+  const orders = db.data.orders.filter(o => o.supplierCode === s.code);
+  const open = orders.filter(o => !['geserveerd', 'geweigerd', 'terugbetaald'].includes(o.status));
+  const fresh = open.filter(o => o.status === 'nieuw');
+  if (fresh.length) {
+    const oldestMin = Math.max(1, Math.round((Date.now() - Math.min(...fresh.map(o => +new Date(o.at)))) / 60000));
+    out.push({ type: 'neworders', n: fresh.length, min: oldestMin, tab: 'orders', icon: '🔔', urgent: oldestMin >= 10 });
+  }
+  const allergy = open.filter(o => o.allergyNote);
+  if (allergy.length) out.push({ type: 'allergy', n: allergy.length, who: allergy[0].customerCodename, note: allergy[0].allergyNote, tab: 'orders', icon: '⚠️', urgent: true });
+  const soon = guestsFor(s.code).filter(g => !g.arrived && g.etaMin != null && g.etaMin <= 12);
+  if (soon.length) out.push({ type: 'arriving', n: soon.length, min: Math.min(...soon.map(g => g.etaMin)), tab: 'home', icon: '📍', urgent: true });
+  if (caps.includes('rides')) {
+    const waiting = db.data.rides.filter(r => r.supplierCode === s.code && r.status === 'aangevraagd');
+    if (waiting.length) out.push({ type: 'rides', n: waiting.length, tab: 'rides', icon: '🚘', urgent: true });
+  }
+  if (caps.includes('pricing')) {
+    const last = db.data.supplierPrices.find(p => p.supplierCode === s.code);
+    const days = last ? Math.floor((Date.now() - new Date(last.at)) / 86400000) : null;
+    if (days == null || days >= 7) out.push({ type: 'price', days, tab: 'price', icon: '💶' });
+  }
+  if (caps.includes('menu')) {
+    const missing = (s.menu || []).filter(m => !String(m.desc || '').trim()).length;
+    if (missing) out.push({ type: 'menudesc', n: missing, tab: 'menu', icon: '📖' });
+  }
+  if (!accounts.countStaff(s.code)) out.push({ type: 'noteam', tab: 'team', icon: '👥' });
+  return out.sort((a, b) => (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0)).slice(0, 4);
+}
+
+// Open uitnodigingen van dit bedrijf (alleen voor de manager zichtbaar).
+function openInvites(code) {
+  return Object.values(db.data.supplierInvites)
+    .filter(i => i.supplierCode === code && !i.usedBy && i.expiresAt > Date.now())
+    .sort((a, b) => new Date(b.at) - new Date(a.at));
 }
 
 // dashboarddata voor de ingelogde leverancier
@@ -761,6 +817,8 @@ function supplierState(s, actor) {
     staff: accounts.listStaff(s.code).map(accounts.publicStaff),
     activity: (db.data.supplierActivity[s.code] || []).slice(0, 40),
     team: (db.data.supplierTeam[s.code] || []).slice(-60),
+    insights: supplierInsights(s),
+    invites: (actor && actor.manager) ? openInvites(s.code) : [],
     actor: actor || { name: 'Beheer', role: 'manager', manager: true }
   };
 }
@@ -775,7 +833,7 @@ app.post('/api/supplier/login', (req, res) => {
     if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
     const staff = accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
     if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) return res.status(401).json({ error: 'Onjuiste PIN.' });
-    actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
+    actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager', perms: accounts.staffPerms(staff) };
   } else if (hasCred(req.body)) {
     if (!checkCred(req.body.username, req.body.password))
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
@@ -787,7 +845,7 @@ app.post('/api/supplier/login', (req, res) => {
   }
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
   const token = crypto.randomBytes(24).toString('hex');
-  sessions.set(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager });
+  sessions.set(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, perms: actor.perms || null });
   logActivity(s.code, actor, actor.name + ' logde in');
   res.json({ token, state: supplierState(s, actor) });
 });
@@ -817,6 +875,78 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
     logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team');
   }
   res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
+});
+
+/* ---- personeel uitnodigen via een link ----
+   De manager maakt een uitnodiging met rol + functierechten en deelt de link.
+   De genodigde opent de link, kiest een naam en eigen pincode, en zit direct
+   in de app — met precies de functies die het bedrijf heeft opengezet. */
+
+const INVITE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 dagen geldig
+
+app.post('/api/supplier/invite/create', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel uitnodigen.' });
+  const t = db.data.supplierTypes[req.supplier.type] || {};
+  const valid = (t.caps || []).concat(['location']);
+  const perms = Array.isArray(req.body.perms) ? req.body.perms.map(String).filter(p => valid.includes(p)).slice(0, 12) : [];
+  const invite = {
+    code: crypto.randomBytes(4).toString('hex').toUpperCase(),
+    supplierCode: req.supplier.code,
+    role: req.body.role === 'manager' ? 'manager' : 'staff',
+    perms: req.body.role === 'manager' ? [] : perms, // manager = altijd alles
+    invitedBy: req.actor.name,
+    at: new Date().toISOString(),
+    expiresAt: Date.now() + INVITE_TTL,
+    usedBy: null
+  };
+  db.data.supplierInvites[invite.code] = invite;
+  save();
+  logActivity(req.supplier.code, req.actor, 'maakte een uitnodiging aan (' + (invite.role === 'manager' ? 'manager' : 'medewerker') + ')');
+  res.json({ ok: true, invite, link: '/apps/leverancier.html?invite=' + invite.code });
+});
+
+app.post('/api/supplier/invite/revoke', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan uitnodigingen intrekken.' });
+  const inv = db.data.supplierInvites[String(req.body.code || '').toUpperCase()];
+  if (inv && inv.supplierCode === req.supplier.code) {
+    delete db.data.supplierInvites[inv.code];
+    save();
+    logActivity(req.supplier.code, req.actor, 'trok een uitnodiging in');
+  }
+  res.json({ ok: true, invites: openInvites(req.supplier.code) });
+});
+
+// Publiek: de genodigde bekijkt waarvoor de uitnodiging is (geen login nodig).
+app.post('/api/supplier/invite/info', (req, res) => {
+  const inv = db.data.supplierInvites[String(req.body.code || '').trim().toUpperCase()];
+  if (!inv) return res.status(404).json({ error: 'Deze uitnodiging bestaat niet (meer).' });
+  if (inv.usedBy) return res.status(410).json({ error: 'Deze uitnodiging is al gebruikt.' });
+  if (inv.expiresAt <= Date.now()) return res.status(410).json({ error: 'Deze uitnodiging is verlopen.' });
+  const s = findSupplier(inv.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
+  const t = db.data.supplierTypes[s.type] || {};
+  res.json({ supplier: { name: s.name, icon: t.icon, typeLabel: t.label, city: s.city }, role: inv.role, perms: inv.perms, invitedBy: inv.invitedBy });
+});
+
+// Publiek: uitnodiging accepteren → eigen account met zelfgekozen PIN, direct ingelogd.
+app.post('/api/supplier/invite/accept', (req, res) => {
+  const inv = db.data.supplierInvites[String(req.body.code || '').trim().toUpperCase()];
+  if (!inv || inv.usedBy || inv.expiresAt <= Date.now()) return res.status(410).json({ error: 'Deze uitnodiging is niet (meer) geldig.' });
+  const s = findSupplier(inv.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
+  const name = String(req.body.name || '').trim().slice(0, 60);
+  const pin = String(req.body.pin || '');
+  if (name.length < 2) return res.status(400).json({ error: 'Vul je naam in.' });
+  if (!/^\d{4}$/.test(pin)) return res.status(400).json({ error: 'Kies een pincode van 4 cijfers.' });
+  const staff = accounts.createStaff({ supplierCode: s.code, name, role: inv.role, pin, perms: inv.perms });
+  inv.usedBy = { name, at: new Date().toISOString() };
+  save();
+  const actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager', perms: accounts.staffPerms(staff) };
+  const token = crypto.randomBytes(24).toString('hex');
+  sessions.set(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, perms: actor.perms || null });
+  logActivity(s.code, actor, name + ' accepteerde de uitnodiging van ' + inv.invitedBy + ' en zit in het team');
+  notifySupplier(s.code, { icon: '🤝', title: 'Nieuw teamlid', body: name + ' heeft de uitnodiging geaccepteerd.' });
+  res.json({ token, state: supplierState(s, actor) });
 });
 
 // Interne teamchat binnen het bedrijf.
@@ -852,7 +982,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
 });
 
 // ---- dynamische prijs aan RTG (backoffice) ----
-app.post('/api/supplier/price', supplierAuth, (req, res) => {
+app.post('/api/supplier/price', supplierAuth, requireCap('pricing'), (req, res) => {
   const service = String(req.body.service || '').trim().slice(0, 120);
   const price = Number(req.body.price);
   if (!service || !(price > 0)) return res.status(400).json({ error: 'Vul een dienst en geldige prijs in.' });
@@ -872,7 +1002,7 @@ app.post('/api/supplier/price', supplierAuth, (req, res) => {
 });
 
 // ---- menukaart bijwerken (restaurant/bar/club) ----
-app.post('/api/supplier/menu', supplierAuth, (req, res) => {
+app.post('/api/supplier/menu', supplierAuth, requireCap('menu'), (req, res) => {
   if (!Array.isArray(req.body.menu)) return res.status(400).json({ error: 'Menu ontbreekt.' });
   req.supplier.menu = req.body.menu.slice(0, 100).map(m => ({
     id: String(m.id || crypto.randomBytes(3).toString('hex')),
@@ -888,7 +1018,7 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
 });
 
 // ---- leverancier werkt orderstatus bij → klant live op de hoogte ----
-app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
+app.post('/api/supplier/order/status', supplierAuth, requireCap('orders'), (req, res) => {
   const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   const allowed = ['nieuw', 'in bereiding', 'klaar', 'geserveerd', 'geweigerd'];
@@ -904,7 +1034,7 @@ app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
 });
 
 // ---- leverancier stort terug → klant krijgt melding ----
-app.post('/api/supplier/refund', supplierAuth, (req, res) => {
+app.post('/api/supplier/refund', supplierAuth, requireCap('orders'), (req, res) => {
   const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   if (!o.paid) return res.status(409).json({ error: 'Deze bestelling is niet betaald.' });
@@ -920,7 +1050,7 @@ app.post('/api/supplier/refund', supplierAuth, (req, res) => {
 });
 
 // ---- leverancier deelt live locatie → klanten met actieve rit/bestelling ----
-app.post('/api/supplier/location', supplierAuth, (req, res) => {
+app.post('/api/supplier/location', supplierAuth, requireCap('location'), (req, res) => {
   const lat = Number(req.body.lat), lng = Number(req.body.lng);
   if (Number.isFinite(lat) && Number.isFinite(lng)) {
     req.supplier.loc = { lat, lng, label: String(req.body.label || req.supplier.loc.label || '').slice(0, 80) };
@@ -934,7 +1064,7 @@ app.post('/api/supplier/location', supplierAuth, (req, res) => {
 });
 
 // ---- vervoerspartner werkt de ritstatus bij → lid live op de hoogte ----
-app.post('/api/supplier/ride/status', supplierAuth, (req, res) => {
+app.post('/api/supplier/ride/status', supplierAuth, requireCap('rides'), (req, res) => {
   const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
   if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
   const allowed = ['aangevraagd', 'onderweg', 'aangekomen', 'rijdt', 'gearriveerd', 'geweigerd'];
@@ -948,6 +1078,120 @@ app.post('/api/supplier/ride/status', supplierAuth, (req, res) => {
   notify(r.customerTier, { icon: '🚗', title: req.supplier.name, body: 'Uw rit is nu: ' + status + '.', scope: 'orders' });
   logActivity(req.supplier.code, req.actor, 'zette rit ' + r.ref + ' op "' + status + '"');
   res.json({ ok: true, ride: r });
+});
+
+/* ---- AI-copiloot voor de leverancier ----
+   Eén assistent per bedrijf die de live werkelijkheid kent: open orders,
+   allergieën, gasten onderweg, omzet, prijshistorie en het team. Met een
+   ANTHROPIC_API_KEY draait dit op Claude; zonder key geeft de copiloot
+   demo-antwoorden op basis van dezelfde echte cijfers. */
+
+function supplierAiContext(s) {
+  const t = db.data.supplierTypes[s.type] || {};
+  const orders = db.data.orders.filter(o => o.supplierCode === s.code);
+  const open = orders.filter(o => !['geserveerd', 'geweigerd', 'terugbetaald'].includes(o.status));
+  const revenue = orders.filter(o => o.paid).reduce((sum, o) => sum + o.total, 0);
+  const rides = db.data.rides.filter(r => r.supplierCode === s.code && !['gearriveerd', 'geweigerd'].includes(r.status));
+  const prices = db.data.supplierPrices.filter(p => p.supplierCode === s.code).slice(0, 5);
+  const guests = guestsFor(s.code);
+  return {
+    caps: t.caps || [], typeLabel: t.label, open, revenue, rides, prices, guests,
+    staffCount: accounts.countStaff(s.code),
+    menuCount: (s.menu || []).length,
+    menuNoDesc: (s.menu || []).filter(m => !String(m.desc || '').trim()).length
+  };
+}
+
+function supplierAiSystem(s, actor, lang) {
+  const c = supplierAiContext(s);
+  const orderLines = c.open.slice(0, 8).map(o =>
+    `- ${o.ref}: gast ${o.customerCodename}, € ${o.total}, status "${o.status}"${o.paid ? ', betaald' : ', onbetaald'}${o.allergyNote ? ', ALLERGIE: ' + o.allergyNote : ''}`
+  ).join('\n');
+  const rideLines = c.rides.slice(0, 6).map(r => `- ${r.ref}: ${r.from || '?'} → ${r.to || 'open bestemming'}, status "${r.status}"`).join('\n');
+  const priceLines = c.prices.map(p => `- ${p.service}: € ${p.price} (${p.at.slice(0, 10)})`).join('\n');
+  const guestLines = c.guests.map(g => `- ${g.codename}: ${g.arrived ? 'gearriveerd' : (g.etaMin != null ? '~' + g.etaMin + ' min onderweg' : 'onderweg')}`).join('\n');
+  return [
+    `Je bent de AI-copiloot van "${s.name}" (${c.typeLabel}, ${s.city}) in de RTG Partners-app van Rahul Travel Group.`,
+    `Je praat met ${actor.name} (${actor.manager ? 'manager' : 'medewerker'}). Wees een efficiënte, zakelijke rechterhand: kort, concreet, vooruitdenkend. Sluit af met één concreet voorstel waar de gebruiker met "ja" op kan reageren, als dat past.`,
+    `Het bedrijf levert RTG zijn beste dynamische prijs (marge-afspraak: ${Math.round((s.rate || 0) * 100)}%); RTG brengt de gasten. Gasten heten uitsluitend bij hun codenaam (privacy by design), gebruik nooit echte namen.`,
+    `Live situatie van nu:`,
+    `Ontvangen omzet: € ${c.revenue}. Open orders: ${c.open.length}.${orderLines ? '\n' + orderLines : ''}`,
+    c.caps.includes('rides') ? `Actieve ritten: ${c.rides.length}.${rideLines ? '\n' + rideLines : ''}` : '',
+    guestLines ? `Gasten onderweg naar het bedrijf:\n${guestLines}` : 'Er zijn nu geen gasten onderweg.',
+    priceLines ? `Laatst doorgegeven prijzen:\n${priceLines}` : 'Nog geen dynamische prijzen doorgegeven.',
+    c.caps.includes('menu') ? `Menukaart: ${c.menuCount} items${c.menuNoDesc ? ', waarvan ' + c.menuNoDesc + ' zonder beschrijving (help daar desgevraagd mee: verfijnde, korte beschrijvingen in de stijl van het bedrijf)' : ''}.` : '',
+    `Team: ${c.staffCount} persoonlijke accounts. Managers kunnen personeel uitnodigen via de Team-tab (uitnodigingslink met functierechten).`,
+    `Regels: verzin geen orders, gasten, boekingen of partnerschappen die hierboven niet staan. Je kunt zelf niets uitvoeren in de systemen; verwijs naar de juiste tab in de app ("Orders", "Ritten", "Menu", "Prijs", "Locatie", "Team"). Beloof nooit RTG-lidmaatschappen of toegang namens RTG. Bedragen zijn interne administratie, nooit met gasten delen.`,
+    lang === 'en' ? 'Answer in English.' : 'Antwoord in het Nederlands.',
+    'Maximaal ~120 woorden per antwoord, geen opsmuk.'
+  ].filter(Boolean).join('\n');
+}
+
+/* Demo-antwoorden zonder API-key: dezelfde echte cijfers, vaste formuleringen. */
+function cannedSupplierAnswer(q, s, lang) {
+  const c = supplierAiContext(s);
+  const l = String(q).toLowerCase();
+  const en = lang === 'en';
+  if (l.includes('omzet') || l.includes('verdien') || l.includes('revenue') || l.includes('earn'))
+    return en
+      ? `You have received € ${c.revenue} in paid orders, and ${c.open.length} order(s) are still open. See the Orders tab for which ones are unpaid.`
+      : `U heeft € ${c.revenue} aan betaalde orders ontvangen; er staan nog ${c.open.length} order(s) open. In de Orders-tab ziet u welke nog onbetaald zijn.`;
+  if (l.includes('allergi') || l.includes('allerg')) {
+    const a = c.open.filter(o => o.allergyNote);
+    return a.length
+      ? (en ? `Attention: ${a.length} open order(s) with an allergy note. ${a.map(o => o.customerCodename + ': ' + o.allergyNote).join('; ')}. Brief the kitchen now.` : `Let op: ${a.length} open order(s) met een allergiemelding. ${a.map(o => o.customerCodename + ': ' + o.allergyNote).join('; ')}. Informeer de keuken direct.`)
+      : (en ? 'No allergy notes in the open orders right now.' : 'Op dit moment geen allergiemeldingen in de open orders.');
+  }
+  if (l.includes('order') || l.includes('bestell'))
+    return en
+      ? `${c.open.length} open order(s)${c.open.length ? ': ' + c.open.map(o => `${o.ref} (${o.status})`).join(', ') : ''}. Update the status in the Orders tab so the guest sees it live.`
+      : `${c.open.length} open order(s)${c.open.length ? ': ' + c.open.map(o => `${o.ref} (${o.status})`).join(', ') : ''}. Werk de status bij in de Orders-tab; de gast ziet het live.`;
+  if (l.includes('prijs') || l.includes('price')) {
+    const last = c.prices[0];
+    return en
+      ? `Your margin agreement with RTG is ${Math.round((s.rate || 0) * 100)}%. ${last ? `Last submitted: ${last.service} at € ${last.price}.` : 'You have not submitted a price yet.'} A fresh dynamic price keeps you at the top of RTG's proposals — submit one in the Price tab.`
+      : `Uw marge-afspraak met RTG is ${Math.round((s.rate || 0) * 100)}%. ${last ? `Laatst doorgegeven: ${last.service} voor € ${last.price}.` : 'U heeft nog geen prijs doorgegeven.'} Een verse dynamische prijs houdt u bovenaan in de RTG-voorstellen — geef er een door in de Prijs-tab.`;
+  }
+  if (l.includes('gast') || l.includes('guest') || l.includes('onderweg'))
+    return c.guests.length
+      ? (en ? `${c.guests.length} guest(s) heading your way: ${c.guests.map(g => g.codename + (g.arrived ? ' (arrived)' : g.etaMin != null ? ` (~${g.etaMin} min)` : '')).join(', ')}. Make sure everything is ready.` : `${c.guests.length} gast(en) onderweg: ${c.guests.map(g => g.codename + (g.arrived ? ' (gearriveerd)' : g.etaMin != null ? ` (~${g.etaMin} min)` : '')).join(', ')}. Zorg dat alles klaarstaat.`)
+      : (en ? 'No guests on their way right now.' : 'Er zijn nu geen gasten naar u onderweg.');
+  if (l.includes('menu'))
+    return en
+      ? `Your menu has ${c.menuCount} items${c.menuNoDesc ? `, ${c.menuNoDesc} without a description. Guests order more when dishes are described — with the full AI enabled I draft those texts for you.` : '.'}`
+      : `Uw menukaart telt ${c.menuCount} items${c.menuNoDesc ? `, waarvan ${c.menuNoDesc} zonder beschrijving. Gasten bestellen meer bij beschreven gerechten — met de volledige AI help ik met tekstvoorstellen.` : '.'}`;
+  if (l.includes('team') || l.includes('personeel') || l.includes('staff') || l.includes('uitnodig') || l.includes('invite'))
+    return en
+      ? `Your team has ${c.staffCount} personal account(s). In the Team tab a manager can create an invite link and choose exactly which functions the new colleague gets.`
+      : `Uw team telt ${c.staffCount} persoonlijke account(s). In de Team-tab maakt een manager een uitnodigingslink en bepaalt precies welke functies de nieuwe collega krijgt.`;
+  return en
+    ? `Right now: ${c.open.length} open order(s), € ${c.revenue} received${c.guests.length ? `, ${c.guests.length} guest(s) on the way` : ''}. Ask me about revenue, orders, allergies, prices, your menu or the team.`
+    : `Stand van nu: ${c.open.length} open order(s), € ${c.revenue} ontvangen${c.guests.length ? `, ${c.guests.length} gast(en) onderweg` : ''}. Vraag me naar omzet, orders, allergieën, prijzen, het menu of het team.`;
+}
+
+app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
+  const lang = req.body.lang === 'en' ? 'en' : 'nl';
+  const history = (Array.isArray(req.body.messages) ? req.body.messages : [])
+    .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }))
+    .slice(-12);
+  while (history.length && history[0].role !== 'user') history.shift();
+  if (!history.length || history[history.length - 1].role !== 'user') {
+    return res.status(400).json({ error: 'Geen vraag ontvangen.' });
+  }
+  if (anthropic) {
+    try {
+      const response = await anthropic.messages.create({
+        model: 'claude-opus-4-8',
+        max_tokens: 1024,
+        system: supplierAiSystem(req.supplier, req.actor, lang),
+        messages: history
+      });
+      const reply = response.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+      if (reply) return res.json({ reply, source: 'claude' });
+    } catch (e) { console.error('Claude-fout (copiloot):', e.message); }
+  }
+  res.json({ reply: cannedSupplierAnswer(history[history.length - 1].content, req.supplier, lang), source: 'demo' });
 });
 
 /* ================= KLANTZIJDE (leden-app) ================= */

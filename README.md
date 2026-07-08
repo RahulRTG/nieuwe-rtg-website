@@ -65,6 +65,18 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/staff` `{staffCode}` | Personeelscode van een partnerbedrijf valideren (demo: `BLOOM-TEAM`) |
 | `POST /api/partnertrips` `{staffCode?}` | Gecureerde reizen, alleen totaalprijzen; met geldige personeelscode ook personeelsprijzen |
 | `POST /api/book` `{code \| staffCode, tripId, name, email}` | Boeking zonder pas via een partner of personeelscode |
+| `POST /api/supplier/ai` `{messages, lang}` | AI-copiloot van de leverancier: kent live orders, allergieën, gasten onderweg, omzet, prijzen en team (Claude indien key, anders demo met echte cijfers) |
+| `POST /api/supplier/invite/create` `{role, perms}` | Manager maakt een uitnodigingslink met functierechten (7 dagen geldig) |
+| `POST /api/supplier/invite/info` / `accept` `{code, name, pin}` | Genodigde bekijkt en accepteert de uitnodiging: eigen naam + pincode, direct ingelogd |
+| `POST /api/supplier/invite/revoke` `{code}` | Manager trekt een open uitnodiging in |
+
+## De leverancier-app (apps/leverancier.html)
+
+Eén app voor alle partnertypes (hotel, restaurant, bar, club, taxi, privéjet, appartement), met per type passende functies. Naast orders, ritten, menukaart, dynamische prijzen en live locatie heeft de app:
+
+- **Copiloot**: een AI-assistent per bedrijf die de live stand kent (open orders, allergieën, gasten onderweg, omzet, prijshistorie, team) en concrete vervolgstappen voorstelt. Draait op Claude met `ANTHROPIC_API_KEY`; zonder key demo-antwoorden op basis van dezelfde echte cijfers.
+- **Slimme dagbriefing**: het overzicht signaleert zelf wat aandacht vraagt (wachtende orders, allergieën, gasten die bijna arriveren, verouderde prijzen, kale menukaart) en linkt door naar de juiste tab.
+- **Personeel uitnodigen met functierechten**: een manager maakt een uitnodigingslink en vinkt aan welke functies de collega krijgt (bijv. alleen Orders + Menu). De genodigde opent de link, kiest een eigen naam en pincode en is direct ingelogd. Rechten worden server-side afgedwongen; de tabbalk toont alleen wat mag. Alles is terug te zien in "Wie deed wat".
 
 ## Live updates & push-notificaties
 

@@ -82,6 +82,8 @@ function init() {
     active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL
   )`);
+  // Rechten per medewerker: JSON-array van functies (null = alles binnen het bedrijf).
+  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN perms TEXT'); } catch (e) {}
 
   SECRET = loadKey(SECRET_FILE);
   VAULT = loadKey(VAULT_FILE);
@@ -282,10 +284,11 @@ function conversations() {
 }
 
 /* ---------- leverancier-personeel (PIN-accounts binnen een bedrijf) ---------- */
-function createStaff({ supplierCode, name, pin, role }) {
+function createStaff({ supplierCode, name, pin, role, perms }) {
   const info = db.prepare(
-    'INSERT INTO supplier_staff (supplier_code, name, pin_hash, role, created_at) VALUES (?, ?, ?, ?, ?)'
-  ).run(String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), hashPassword(String(pin)), role === 'manager' ? 'manager' : 'staff', new Date().toISOString());
+    'INSERT INTO supplier_staff (supplier_code, name, pin_hash, role, created_at, perms) VALUES (?, ?, ?, ?, ?, ?)'
+  ).run(String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), hashPassword(String(pin)), role === 'manager' ? 'manager' : 'staff', new Date().toISOString(),
+        Array.isArray(perms) && perms.length ? JSON.stringify(perms.map(String).slice(0, 12)) : null);
   return getStaffById(info.lastInsertRowid);
 }
 function getStaffById(id) { return db.prepare('SELECT * FROM supplier_staff WHERE id = ? AND active = 1').get(id) || null; }
@@ -293,12 +296,13 @@ function listStaff(code) { return db.prepare('SELECT * FROM supplier_staff WHERE
 function countStaff(code) { return db.prepare('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
 function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && verifyPassword(String(pin), s.pin_hash)) ? s : null; }
 function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); }
-function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role } : null; }
+function staffPerms(s) { if (!s || !s.perms) return null; try { const p = JSON.parse(s.perms); return Array.isArray(p) && p.length ? p : null; } catch (e) { return null; } }
+function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, perms: staffPerms(s) } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
 module.exports = {
   init, createUser, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
-  createStaff, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, makePin,
+  createStaff, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, staffPerms, makePin,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword

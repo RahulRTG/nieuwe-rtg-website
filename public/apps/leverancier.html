@@ -222,6 +222,41 @@
   .notif-item .tx span{font-size:0.78rem;color:var(--muted);}
   .notif-item .tx time{display:block;margin-top:0.2rem;font-size:0.66rem;color:var(--soft);}
 
+  /* dagbriefing op het overzicht */
+  .brief-item{display:flex;align-items:flex-start;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--line);font-size:0.83rem;line-height:1.45;color:var(--muted);cursor:pointer;}
+  .brief-item:last-child{border-bottom:none;}
+  .brief-item .ic{font-size:1rem;line-height:1.4;}
+  .brief-item b{color:var(--txt);font-weight:600;}
+  .brief-item.urgent b{color:var(--burgundy);}
+  .brief-item .arr{margin-left:auto;color:var(--soft);align-self:center;}
+
+  /* AI-copiloot */
+  .ai-chips{display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:1rem;}
+  .ai-chip{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:0.5rem 0.85rem;font-size:0.73rem;}
+  .ai-chip:active{background:var(--card2);color:var(--txt);}
+  .ai-typing{align-self:flex-start;background:var(--card2);border:1px solid var(--line);border-radius:14px;border-top-left-radius:5px;padding:0.6rem 0.9rem;color:var(--soft);font-size:0.85rem;letter-spacing:0.2em;}
+
+  /* personeel uitnodigen */
+  .inv-perm{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.7rem;}
+  .inv-perm label{display:flex;align-items:center;gap:0.35rem;border:1px solid var(--line);border-radius:999px;padding:0.42rem 0.8rem;font-size:0.72rem;color:var(--soft);cursor:pointer;user-select:none;}
+  .inv-perm label.on{color:var(--txt);border-color:rgba(169,143,28,0.55);background:rgba(169,143,28,0.08);}
+  .inv-perm input{display:none;}
+  .inv-link{margin-top:0.8rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.35);border-radius:12px;padding:0.9rem 1rem;font-size:0.8rem;line-height:1.55;}
+  .inv-link code{display:block;margin:0.4rem 0 0.6rem;font-size:0.72rem;color:var(--gold);word-break:break-all;font-family:ui-monospace,monospace;}
+  .inv-row{display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;}
+  .inv-row:last-child{border-bottom:none;}
+  .inv-row .cd{font-family:ui-monospace,monospace;color:var(--gold);font-size:0.78rem;}
+  .inv-row .meta{flex:1;color:var(--soft);font-size:0.7rem;line-height:1.4;}
+
+  /* uitnodiging accepteren (via link) */
+  #inviteGate{position:absolute;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column;justify-content:center;padding:2.5rem 1.75rem calc(env(safe-area-inset-bottom,0px) + 3rem);overflow-y:auto;}
+  #inviteGate.open{display:flex;}
+  #inviteGate .badge{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+  #inviteGate h1{font-size:1.9rem;line-height:1.15;margin-top:1.4rem;}
+  #inviteGate h1 em{color:var(--burgundy);font-style:italic;}
+  #inviteGate .deck{margin-top:0.8rem;font-size:0.86rem;color:var(--muted);line-height:1.6;}
+  #inviteGate .deck b{color:var(--gold);}
+
   #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:#fff;color:#000;font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
 </style>
@@ -260,6 +295,11 @@
     </div>
   </div>
 
+  <div id="inviteGate">
+    <div class="badge">RTG Partners</div>
+    <div id="invBody"></div>
+  </div>
+
   <div id="app">
     <div class="topbar">
       <div class="who"><span class="ic" id="supIcon"></span><div><b id="supName"></b><span id="supType"></span></div></div>
@@ -282,6 +322,13 @@
         <p class="sub" id="homeSub"></p>
         <div class="stat" id="homeStat"></div>
         <div id="homeExtra"></div>
+      </div>
+      <div class="view" data-view="ai">
+        <h2 data-i18n="ai.title">Copiloot</h2>
+        <p class="sub" data-i18n="ai.sub">Uw AI-rechterhand. Kent de live stand van uw bedrijf: orders, gasten, prijzen en team.</p>
+        <div class="ai-chips" id="aiChips"></div>
+        <div class="tt-chat" id="aiChat" style="margin-top:1.1rem;"></div>
+        <div class="tt-compose"><input id="aiMsg" placeholder="Vraag de copiloot iets" data-i18n-ph="ai.ph"><button id="aiSend" data-i18n="team.send">Stuur</button></div>
       </div>
       <div class="view" data-view="orders">
         <h2 data-i18n="sup.v.orders">Bestellingen</h2>
@@ -348,6 +395,7 @@
 
   const TABDEF = {
     home:     { label:'Overzicht', svg:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>' },
+    ai:       { label:'Copiloot',  svg:'<path d="M12 3.5l1.8 4.7 4.7 1.8-4.7 1.8L12 16.5l-1.8-4.7-4.7-1.8 4.7-1.8z"/><path d="M18.5 15l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z"/>' },
     orders:   { label:'Orders',    svg:'<path d="M6 2h9l3 3v17H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>', cap:'orders' },
     rides:    { label:'Ritten',    svg:'<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>', cap:'rides' },
     menu:     { label:'Menu',      svg:'<path d="M4 3v18M8 3v6a2 2 0 0 1-4 0M18 3c-2 0-3 2-3 5s1 4 3 4v9"/>', cap:'menu' },
@@ -372,11 +420,22 @@
   let state = null;      // dashboard state
   let notifs = [];
   let source = null;
+  let aiMsgs = [];       // copiloot-gesprek van deze sessie
 
   let toastTimer;
   function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3000); }
   function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const ago=T('t.ago',' geleden'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min')+ago; const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur')+ago; return Math.round(h/24)+T('t.days',' dag(en)')+ago; }
   function has(cap){ return S && S.caps && S.caps.includes(cap); }
+  // Mag de ingelogde persoon deze functie zien? Managers en accounts zonder
+  // rechtenlijst zien alles; anders bepaalt de uitnodiging van de manager het.
+  function canCap(cap){
+    if (!cap) return true;
+    const a = actor();
+    if (a.manager) return true;
+    const p = a.perms;
+    if (!p || !p.length) return true;
+    return p.includes(cap);
+  }
 
   // ---- login ----
   function initials(name){ return String(name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
@@ -455,15 +514,22 @@
       toast(isCred ? T('login.bad','Onjuiste gebruikersnaam of wachtwoord.') : (e.message||T('login.failed','Inloggen mislukt.')));
       return false;
     }
+    enterApp();
+    return true;
+  }
+
+  // Gemeenschappelijke entree in de app (na login of geaccepteerde uitnodiging).
+  function enterApp(){
     $('#staffPick').classList.remove('open');
     $('#spPin').classList.remove('open');
+    $('#inviteGate').classList.remove('open');
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
+    aiMsgs = [];
     buildTabs();
     renderAll();
     startStream();
     loadNotifs();
-    return true;
   }
 
   // Wissel van gebruiker: sessie loslaten, terug naar het inlogscherm.
@@ -481,7 +547,7 @@
 
   // ---- tabs op basis van caps ----
   function buildTabs(){
-    const keys = Object.keys(TABDEF).filter(k => !TABDEF[k].cap || has(TABDEF[k].cap));
+    const keys = Object.keys(TABDEF).filter(k => (!TABDEF[k].cap || has(TABDEF[k].cap)) && canCap(TABDEF[k].cap));
     // bookings voor hotel/appartement → toon onder 'orders'-plek als 'Boekingen'
     $('#tabbar').innerHTML = keys.map((k,i) =>
       '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+T('tab.'+k, TABDEF[k].label)+'</button>'
@@ -499,7 +565,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderTeam();
+    renderHome(); renderAI(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderTeam();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -523,6 +589,13 @@
     stat += '<div class="b"><div class="l">'+T('sup.received','Ontvangen')+'</div><div class="v g">'+eur(revenue)+'</div></div>';
     $('#homeStat').innerHTML = stat;
     let extra = '';
+    // Slimme dagbriefing: de app signaleert zelf wat nu aandacht vraagt.
+    const ins = state.insights || [];
+    if (ins.length){
+      extra += '<div class="card" style="padding-top:0.5rem;padding-bottom:0.35rem;"><div class="tt-h" style="padding:0.5rem 0 0.15rem;">'+T('ins.title','Vandaag belangrijk')+'</div>'+
+        ins.map(i => '<div class="brief-item'+(i.urgent?' urgent':'')+'" data-goto="'+i.tab+'"><span class="ic">'+i.icon+'</span><span>'+insightText(i)+'</span><span class="arr">›</span></div>').join('')+
+        '</div>';
+    }
     const guests = (state.guests || []);
     if (guests.length){
       extra += '<div class="card" style="border-color:rgba(194,58,94,0.35);"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);display:flex;align-items:center;gap:0.4rem;"><span class="livedot"></span>'+T('sup.enroute','Gasten onderweg naar u')+'</div>'+
@@ -536,6 +609,73 @@
     if (has('menu')) extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.menu','Menukaart')+'</div><div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+(state.menu||[]).length+' '+T('sup.dishesvisible','gerechten zichtbaar voor gasten.')+'</div><button class="obtn" style="margin-top:0.8rem;" data-goto="menu">'+T('sup.viewmenu','Bekijk menu')+'</button></div>';
     $('#homeExtra').innerHTML = extra;
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', ()=>openTab(b.dataset.goto)));
+  }
+
+  // Labels voor functierechten (gedeeld door team-tab en uitnodigingsscherm).
+  const CAPLABEL = { orders:['tab.orders','Orders'], rides:['tab.rides','Ritten'], menu:['tab.menu','Menu'], pricing:['tab.price','Prijs'], location:['tab.location','Locatie'], bookings:['sup.bookings','Boekingen'], reservations:['cap.reservations','Reserveringen'] };
+  function capLabel(c){ const d = CAPLABEL[c]; return d ? T(d[0], d[1]) : c; }
+
+  // ---- dagbriefing: gestructureerde signalen van de server → leesbare tekst ----
+  function fmtT(key, nl, vars){
+    return T(key, nl).replace(/\{(\w+)\}/g, (_, k) => vars && vars[k] != null ? vars[k] : '');
+  }
+  function insightText(i){
+    switch(i.type){
+      case 'neworders': return fmtT('ins.neworders','<b>{n} nieuwe order(s)</b>, de oudste wacht al {min} min.', i);
+      case 'allergy':   return fmtT('ins.allergy','<b>Allergie</b> bij gast {who}: {note}.', i);
+      case 'arriving':  return fmtT('ins.arriving','<b>{n} gast(en)</b> arriveren binnen ~{min} min. Zorg dat alles klaarstaat.', i);
+      case 'rides':     return fmtT('ins.rides','<b>{n} ritaanvraag(en)</b> wachten op acceptatie.', i);
+      case 'price':     return i.days == null ? T('ins.price0','<b>Nog geen dynamische prijs</b> doorgegeven. Uw eerste prijs zet u op de kaart bij RTG.') : fmtT('ins.price','Uw laatste prijs is <b>{days} dagen oud</b>. Een verse prijs houdt u bovenaan bij RTG.', i);
+      case 'menudesc':  return fmtT('ins.menudesc','<b>{n} gerecht(en) zonder beschrijving</b> op de kaart. Beschreven gerechten worden vaker besteld.', i);
+      case 'noteam':    return T('ins.noteam','<b>Nog geen persoonlijke accounts.</b> Nodig uw team uit via de Team-tab.');
+      default: return '';
+    }
+  }
+
+  // ---- AI-copiloot ----
+  const AI_CHIPS = [
+    { key:'ai.chip1', nl:'Wat is de stand van vandaag?' },
+    { key:'ai.chip2', nl:'Zijn er allergieën waar ik op moet letten?' },
+    { key:'ai.chip3', nl:'Welke prijs kan ik doorgeven?' },
+    { key:'ai.chip4', nl:'Hoe nodig ik personeel uit?' }
+  ];
+  let aiBusy = false;
+  function renderAI(){
+    if (!aiMsgs.length){
+      aiMsgs.push({ role:'assistant', content:
+        T('ai.hello','Goedendag').replace(/\.$/,'') + ' ' + actor().name.split(' ')[0] + '. ' +
+        T('ai.hello2','Ik ben de copiloot van') + ' ' + S.name + '. ' +
+        T('ai.hello3','Ik ken de live stand van het bedrijf: orders, gasten onderweg, prijzen en het team. Waarmee kan ik helpen?') });
+    }
+    $('#aiChips').innerHTML = AI_CHIPS.map((c,i) => '<button class="ai-chip" data-chip="'+i+'">'+T(c.key, c.nl)+'</button>').join('');
+    document.querySelectorAll('[data-chip]').forEach(b => b.addEventListener('click', () => sendAI(T(AI_CHIPS[b.dataset.chip].key, AI_CHIPS[b.dataset.chip].nl))));
+    const box = $('#aiChat');
+    box.innerHTML = aiMsgs.map(m =>
+      '<div class="tt-msg '+(m.role==='user'?'me':'other')+'">'+(m.role==='assistant'?'<span class="who">'+T('ai.name','Copiloot')+'</span>':'')+esc(m.content).replace(/\n/g,'<br>')+'</div>'
+    ).join('') + (aiBusy ? '<div class="ai-typing">•••</div>' : '');
+    box.scrollTop = box.scrollHeight;
+    const inEl = $('#aiMsg');
+    if (inEl && !inEl.dataset.bound){
+      inEl.dataset.bound = '1';
+      inEl.addEventListener('keydown', e => { if (e.key==='Enter') sendAI(); });
+      $('#aiSend').addEventListener('click', () => sendAI());
+    }
+  }
+  async function sendAI(preset){
+    if (aiBusy) return;
+    const inEl = $('#aiMsg');
+    const text = (preset != null ? preset : (inEl.value||'')).trim();
+    if (!text) return;
+    if (preset == null) inEl.value = '';
+    aiMsgs.push({ role:'user', content:text });
+    aiBusy = true; renderAI(); openTab('ai');
+    try {
+      const d = await API.call('/supplier/ai', { messages: aiMsgs.map(m=>({role:m.role, content:m.content})), lang: lang() });
+      aiMsgs.push({ role:'assistant', content: d.reply });
+    } catch(e){
+      aiMsgs.push({ role:'assistant', content: T('ai.error','De copiloot is even niet bereikbaar. Probeer het zo opnieuw.') });
+    }
+    aiBusy = false; renderAI();
   }
 
   // ---- orders ----
@@ -678,13 +818,38 @@
       const you = a.staffId && m.id === a.staffId;
       const rm = (a.manager && !you) ? '<button class="tt-rm" data-rm="'+m.id+'">'+T('team.remove','Verwijder')+'</button>' : '';
       const tag = you ? '<span class="you">'+T('team.you','jij')+'</span>' : '';
-      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+rm+'</div>';
+      const permTxt = (m.role !== 'manager' && m.perms && m.perms.length) ? ' · ' + m.perms.map(capLabel).join(', ') : '';
+      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+permTxt+'</span></span>'+rm+'</div>';
     }).join('') || '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
     if (a.manager){
       html += '<div class="tt-add"><input id="ttName" placeholder="'+T('team.name','Naam')+'"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.add','Toevoegen')+'</button></div>';
       if (lastPin) html += '<div class="tt-pinbox">'+T('team.pinintro','Pincode voor')+' '+lastPin.name+': <b>'+lastPin.pin+'</b><br>'+T('team.pinnote','Noteer deze code. Hiermee logt deze persoon in op zijn eigen account. De code is later niet meer te zien.')+'</div>';
     }
     html += '</div>';
+
+    // personeel uitnodigen via een link (alleen manager)
+    if (a.manager){
+      const capsAvail = (S.caps||[]).filter(c => CAPLABEL[c]);
+      html += '<div class="card"><div class="tt-h">'+T('inv.title','Personeel uitnodigen')+'</div>'+
+        '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted);line-height:1.55;">'+T('inv.deck','Deel een uitnodigingslink. Je collega kiest zelf een naam en pincode en krijgt alleen de functies die je aanvinkt.')+'</div>'+
+        '<div class="tt-add"><select id="invRole" style="flex:1;padding:0.7rem;"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+' · '+T('inv.allfn','alle functies')+'</option></select><button id="invMake">'+T('inv.make','Maak link')+'</button></div>'+
+        '<div class="inv-perm" id="invPerms">'+capsAvail.map(c=>'<label class="on"><input type="checkbox" checked value="'+c+'">'+capLabel(c)+'</label>').join('')+'</div>';
+      if (lastInvite){
+        html += '<div class="inv-link">'+T('inv.ready','Uitnodiging klaar. Deel deze link met je collega:')+'<code>'+esc(location.origin + lastInvite.link)+'</code>'+
+          '<button class="obtn primary" id="invCopy">'+T('inv.copy','Kopieer link')+'</button>'+
+          (navigator.share?' <button class="obtn" id="invShare">'+T('inv.share','Deel')+'</button>':'')+'</div>';
+      }
+      const openInv = state.invites || [];
+      if (openInv.length){
+        html += '<div class="tt-h" style="margin-top:1rem;">'+T('inv.open','Open uitnodigingen')+'</div>'+
+          openInv.map(i => {
+            const days = Math.max(1, Math.ceil((i.expiresAt - Date.now())/86400000));
+            const fns = (i.role==='manager' || !(i.perms||[]).length) ? T('inv.allfn','alle functies') : i.perms.map(capLabel).join(', ');
+            return '<div class="inv-row"><span class="cd">'+i.code+'</span><span class="meta">'+T('role.'+i.role, i.role==='manager'?'Manager':'Medewerker')+' · '+fns+'<br>'+fmtT('inv.exp','nog {days} dag(en) geldig', {days})+'</span><button class="tt-rm" data-rvk="'+i.code+'">'+T('inv.revoke','Trek in')+'</button></div>';
+          }).join('');
+      }
+      html += '</div>';
+    }
 
     // activiteit
     html += '<div class="card"><div class="tt-h">'+T('team.activity','Wie deed wat')+'</div>';
@@ -704,6 +869,12 @@
 
     document.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', ()=>removeStaff(Number(b.dataset.rm))));
     const addBtn = $('#ttAdd'); if (addBtn) addBtn.addEventListener('click', addStaff);
+    document.querySelectorAll('#invPerms input').forEach(cb => cb.addEventListener('change', () => cb.parentElement.classList.toggle('on', cb.checked)));
+    const invRole = $('#invRole'); if (invRole) invRole.addEventListener('change', () => { $('#invPerms').style.display = invRole.value==='manager' ? 'none' : 'flex'; });
+    const invMk = $('#invMake'); if (invMk) invMk.addEventListener('click', createInvite);
+    const invCp = $('#invCopy'); if (invCp) invCp.addEventListener('click', copyInvite);
+    const invSh = $('#invShare'); if (invSh) invSh.addEventListener('click', shareInvite);
+    document.querySelectorAll('[data-rvk]').forEach(b => b.addEventListener('click', ()=>revokeInvite(b.dataset.rvk)));
     const send = $('#ttSend'); if (send) send.addEventListener('click', sendTeam);
     const msg = $('#ttMsg'); if (msg) msg.addEventListener('keydown', e => { if (e.key==='Enter') sendTeam(); });
     const chat = $('#ttChat'); if (chat) chat.scrollTop = chat.scrollHeight;
@@ -726,6 +897,67 @@
     el.value = '';
     try { await API.call('/supplier/team/message', { text }); await refresh(); openTab('team'); }
     catch(e){ toast(e.message); }
+  }
+
+  // ---- personeel uitnodigen (manager maakt en deelt een link) ----
+  let lastInvite = null; // laatst aangemaakte uitnodiging, getoond met kopieerknop
+  async function createInvite(){
+    const role = $('#invRole').value;
+    const perms = [...document.querySelectorAll('#invPerms input:checked')].map(cb => cb.value);
+    try { lastInvite = await API.call('/supplier/invite/create', { role, perms }); toast(T('inv.made','Uitnodigingslink aangemaakt.')); await refresh(); openTab('team'); }
+    catch(e){ toast(e.message); }
+  }
+  function inviteUrl(){ return lastInvite ? location.origin + lastInvite.link : ''; }
+  async function copyInvite(){
+    try { await navigator.clipboard.writeText(inviteUrl()); toast(T('inv.copied','Link gekopieerd.')); }
+    catch(e){ toast(inviteUrl()); }
+  }
+  function shareInvite(){
+    navigator.share({ title:'RTG Partners', text: T('inv.sharetext','Je bent uitgenodigd voor het team van')+' '+S.name, url: inviteUrl() }).catch(()=>{});
+  }
+  async function revokeInvite(code){
+    try { await API.call('/supplier/invite/revoke', { code }); if (lastInvite && lastInvite.invite && lastInvite.invite.code===code) lastInvite=null; toast(T('inv.revoked','Uitnodiging ingetrokken.')); await refresh(); openTab('team'); }
+    catch(e){ toast(e.message); }
+  }
+
+  // ---- uitnodiging accepteren (genodigde opent de link) ----
+  function initInvite(code){
+    const g = $('#inviteGate');
+    g.classList.add('open');
+    $('#invBody').innerHTML = '<h1>'+T('invg.checking','Uitnodiging controleren…')+'</h1>';
+    API.call('/supplier/invite/info', { code }).then(d => {
+      const fns = (d.role!=='manager' && (d.perms||[]).length) ? '<br>'+T('invg.access','Je krijgt toegang tot:')+' <b>'+d.perms.map(capLabel).join(', ')+'</b>' : '';
+      $('#invBody').innerHTML =
+        '<h1>'+T('invg.title','Welkom bij het team van')+' <em>'+esc(d.supplier.name)+'</em>.</h1>'+
+        '<p class="deck">'+(d.supplier.icon||'')+' '+esc(d.supplier.typeLabel||'')+' · '+esc(d.supplier.city||'')+'<br>'+
+        T('invg.by','Uitgenodigd door')+' <b>'+esc(d.invitedBy)+'</b> '+T('invg.as','als')+' <b>'+T('role.'+d.role, d.role==='manager'?'Manager':'Medewerker')+'</b>'+fns+'</p>'+
+        '<form class="login-form" id="invForm">'+
+        '<input id="invName" placeholder="'+T('invg.name','Je volledige naam')+'" autocomplete="name">'+
+        '<input id="invPin" type="password" inputmode="numeric" maxlength="4" placeholder="'+T('invg.pin','Kies een pincode (4 cijfers)')+'" autocomplete="new-password">'+
+        '<input id="invPin2" type="password" inputmode="numeric" maxlength="4" placeholder="'+T('invg.pin2','Herhaal je pincode')+'" autocomplete="new-password">'+
+        '<button type="submit">'+T('invg.go','Aan de slag')+'</button></form>';
+      $('#invForm').addEventListener('submit', e => { e.preventDefault(); acceptInvite(code); });
+    }).catch(e => {
+      $('#invBody').innerHTML = '<h1>'+T('invg.invalid','Deze uitnodiging is niet meer geldig.')+'</h1>'+
+        '<p class="deck">'+esc(e.message||'')+'</p>'+
+        '<button class="bigbtn" id="invClose">'+T('invg.tologin','Naar het inlogscherm')+'</button>';
+      $('#invClose').addEventListener('click', () => { g.classList.remove('open'); history.replaceState({}, '', location.pathname); });
+    });
+  }
+  async function acceptInvite(code){
+    const name = $('#invName').value.trim();
+    const pin = $('#invPin').value, pin2 = $('#invPin2').value;
+    if (name.length < 2){ toast(T('invg.fillname','Vul je naam in.')); return; }
+    if (!/^\d{4}$/.test(pin)){ toast(T('invg.badpin','Kies een pincode van 4 cijfers.')); return; }
+    if (pin !== pin2){ toast(T('invg.nomatch','De pincodes komen niet overeen.')); return; }
+    try {
+      const d = await API.call('/supplier/invite/accept', { code, name, pin });
+      API.token = d.token;
+      applyState(d.state);
+      history.replaceState({}, '', location.pathname);
+      enterApp();
+      toast(T('invg.welcome','Welkom in het team!'));
+    } catch(e){ toast(e.message); }
   }
 
   // ---- meldingen ----
@@ -764,6 +996,9 @@
   $('#actorChip').addEventListener('click', switchUser);
   buildPad();
   renderGate();
+  // Geopend via een uitnodigingslink? Toon dan direct het welkomstscherm.
+  const invParam = new URLSearchParams(location.search).get('invite');
+  if (invParam && API.enabled) initInvite(invParam.trim().toUpperCase());
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 })();
 </script>
@@ -814,7 +1049,30 @@ window.I18N = { en: {
   'team.name':'Name', 'team.add':'Add', 'team.pinintro':'PIN for', 'team.pinnote':'Note this code. Your colleague signs in to their own account with it. The code cannot be shown again later.',
   'team.activity':'Who did what', 'team.noactivity':'No activity recorded yet.',
   'team.chat':'Internal team chat', 'team.nochat':'No messages yet. Send your team a message.', 'team.msgph':'Message to the team', 'team.send':'Send',
-  'team.fillname':'Enter a name.', 'team.added':'Added. PIN: ', 'team.removed':'Removed from the team.'
+  'team.fillname':'Enter a name.', 'team.added':'Added. PIN: ', 'team.removed':'Removed from the team.',
+  'tab.ai':'Copilot', 'ai.title':'Copilot', 'ai.name':'Copilot',
+  'ai.sub':'Your AI right hand. Knows the live state of your business: orders, guests, prices and team.',
+  'ai.ph':'Ask the copilot anything', 'ai.hello':'Good day', 'ai.hello2':'I am the copilot of', 'ai.hello3':'I know the live state of the business: orders, guests on their way, prices and the team. How can I help?',
+  'ai.error':'The copilot is briefly unavailable. Please try again in a moment.',
+  'ai.chip1':'What is today’s status?', 'ai.chip2':'Any allergies I should know about?', 'ai.chip3':'What price should I submit?', 'ai.chip4':'How do I invite staff?',
+  'ins.title':'Important today',
+  'ins.neworders':'<b>{n} new order(s)</b>, the oldest has been waiting {min} min.',
+  'ins.allergy':'<b>Allergy</b> for guest {who}: {note}.',
+  'ins.arriving':'<b>{n} guest(s)</b> arriving within ~{min} min. Make sure everything is ready.',
+  'ins.rides':'<b>{n} ride request(s)</b> waiting for acceptance.',
+  'ins.price0':'<b>No dynamic price submitted yet.</b> Your first price puts you on RTG’s map.',
+  'ins.price':'Your last price is <b>{days} days old</b>. A fresh price keeps you at the top with RTG.',
+  'ins.menudesc':'<b>{n} dish(es) without a description</b> on the menu. Described dishes get ordered more.',
+  'ins.noteam':'<b>No personal accounts yet.</b> Invite your team via the Team tab.',
+  'cap.reservations':'Reservations',
+  'inv.title':'Invite staff', 'inv.deck':'Share an invite link. Your colleague picks their own name and PIN and only gets the functions you tick.',
+  'inv.allfn':'all functions', 'inv.make':'Create link', 'inv.made':'Invite link created.',
+  'inv.ready':'Invite ready. Share this link with your colleague:', 'inv.copy':'Copy link', 'inv.copied':'Link copied.', 'inv.share':'Share',
+  'inv.sharetext':'You are invited to the team of', 'inv.open':'Open invites', 'inv.exp':'valid for {days} more day(s)', 'inv.revoke':'Revoke', 'inv.revoked':'Invite revoked.',
+  'invg.checking':'Checking your invite…', 'invg.title':'Welcome to the team of', 'invg.by':'Invited by', 'invg.as':'as', 'invg.access':'You get access to:',
+  'invg.name':'Your full name', 'invg.pin':'Choose a PIN (4 digits)', 'invg.pin2':'Repeat your PIN', 'invg.go':'Get started',
+  'invg.fillname':'Enter your name.', 'invg.badpin':'Choose a 4-digit PIN.', 'invg.nomatch':'The PINs do not match.', 'invg.welcome':'Welcome to the team!',
+  'invg.invalid':'This invite is no longer valid.', 'invg.tologin':'Go to the sign-in screen'
 } };
 </script>
 <script src="/shared/i18n.js"></script>

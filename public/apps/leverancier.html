@@ -83,6 +83,16 @@
   .order li{font-size:0.82rem;color:var(--muted);display:flex;justify-content:space-between;}
   .order .allergy{margin-top:0.6rem;font-size:0.76rem;color:var(--amber);background:rgba(201,154,46,0.1);border:1px solid rgba(201,154,46,0.25);border-radius:8px;padding:0.4rem 0.6rem;}
   .order .salon{margin-top:0.5rem;font-size:0.68rem;color:var(--burgundy);letter-spacing:0.04em;}
+  .order .enroute,.enroute{margin-top:0.6rem;font-size:0.76rem;color:var(--gold);background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:8px;padding:0.45rem 0.65rem;line-height:1.4;}
+  .order .enroute.here,.enroute.here{color:var(--green);background:rgba(76,154,117,0.12);border-color:rgba(76,154,117,0.35);}
+  .livedot{width:8px;height:8px;border-radius:50%;background:var(--burgundy);display:inline-block;animation:livepulse 1.4s infinite;}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 6px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
+  .guest-row{display:flex;justify-content:space-between;align-items:center;padding:0.55rem 0;border-bottom:1px solid var(--line);}
+  .guest-row:last-child{border-bottom:none;}
+  .guest-row .cn{font-weight:600;font-size:0.88rem;color:var(--gold);}
+  .guest-row .ge{font-size:0.72rem;color:var(--muted);}
+  .guest-row .ge b{font-family:'Bodoni Moda',serif;font-size:1.05rem;color:var(--txt);}
+  .guest-row .ge.here{color:var(--green);font-weight:600;}
   .pill{display:inline-block;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.28rem 0.6rem;border-radius:999px;border:1px solid var(--line);white-space:nowrap;}
   .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .pill.bereiding{color:var(--amber);border-color:rgba(201,154,46,0.4);}
@@ -320,7 +330,8 @@
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
   const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
-  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded' };
+  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded',
+    'aangevraagd':'requested', 'onderweg':'on the way', 'aangekomen':'at pickup', 'rijdt':'driving', 'gearriveerd':'completed' };
   const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
   const TYPELABEL = { 'Hotel':'Hotel', 'Restaurant':'Restaurant', 'Bar':'Bar', 'Taxi':'Taxi', 'Privéjet':'Private jet', 'Appartement':'Apartment', 'Club':'Club' };
   const tType = s => (lang() === 'en' ? (TYPELABEL[s] || s) : s);
@@ -511,7 +522,15 @@
     if (has('bookings')) stat += '<div class="b"><div class="l">'+T('sup.bookings','Boekingen')+'</div><div class="v a">'+(state.orders||[]).length+'</div></div>';
     stat += '<div class="b"><div class="l">'+T('sup.received','Ontvangen')+'</div><div class="v g">'+eur(revenue)+'</div></div>';
     $('#homeStat').innerHTML = stat;
-    let extra = '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.yourprice','Uw dynamische prijs aan RTG')+'</div>'+
+    let extra = '';
+    const guests = (state.guests || []);
+    if (guests.length){
+      extra += '<div class="card" style="border-color:rgba(194,58,94,0.35);"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);display:flex;align-items:center;gap:0.4rem;"><span class="livedot"></span>'+T('sup.enroute','Gasten onderweg naar u')+'</div>'+
+        guests.map(g => '<div class="guest-row"><span class="cn">'+g.codename+'</span>'+
+          (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>':(g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>':'<span class="ge">'+T('sup.enrouteshort','onderweg')+'</span>'))+
+        '</div>').join('')+'</div>';
+    }
+    extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.yourprice','Uw dynamische prijs aan RTG')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('sup.pricebody','U levert RTG uw beste prijs; RTG brengt de gasten. Uw huidige marge-afspraak:')+' <b style="color:var(--gold);">'+Math.round((S.rate||0)*100)+'%</b>.</div>'+
       '<button class="obtn primary" style="margin-top:0.8rem;" data-goto="price">'+T('sup.newprice','Nieuwe prijs doorgeven')+'</button></div>';
     if (has('menu')) extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.menu','Menukaart')+'</div><div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+(state.menu||[]).length+' '+T('sup.dishesvisible','gerechten zichtbaar voor gasten.')+'</div><button class="obtn" style="margin-top:0.8rem;" data-goto="menu">'+T('sup.viewmenu','Bekijk menu')+'</button></div>';
@@ -529,6 +548,7 @@
         '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+o.customerCodename+'</span></div><div class="ref">'+o.ref+' · '+timeAgo(o.at)+'</div></div>'+
           '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><div style="margin-top:0.3rem;"><span class="pill '+pillClass(o.status)+'">'+tStatus(o.status)+'</span></div></div></div>'+
         '<ul>'+o.items.map(i=>'<li><span>'+i.qty+'× '+i.name+'</span><span>'+eur(i.price*i.qty)+'</span></li>').join('')+'</ul>'+
+        (o.guestArrived?'<div class="enroute here">🎉 '+T('sup.guesthere','Gast is gearriveerd. Serveer nu.')+'</div>':(o.guestEtaMin!=null?'<div class="enroute">📍 '+T('sup.guesteta','Gast onderweg, arriveert over ~')+o.guestEtaMin+' '+T('sup.min','min')+'. '+T('sup.readyontime','Zet op tijd klaar.')+'</div>':''))+
         (o.allergyNote?'<div class="allergy">⚠ '+T('sup.allergy','Allergie:')+' '+o.allergyNote+'</div>':'')+
         (o.tagSalon?'<div class="salon">✦ '+T('sup.wantssalon','Gast wil dit taggen voor De Salon')+'</div>':'')+
         '<div class="acts">'+
@@ -557,11 +577,39 @@
   }
 
   // ---- rides (taxi/jet) ----
+  const NEXT_RIDE = { 'aangevraagd':'onderweg', 'onderweg':'aangekomen', 'aangekomen':'rijdt', 'rijdt':'gearriveerd' };
+  const RIDE_NEXT_LABEL = { 'onderweg':'sup.ride.accept', 'aangekomen':'sup.ride.atpickup', 'rijdt':'sup.ride.driving', 'gearriveerd':'sup.ride.done' };
+  const RIDE_NEXT_NL = { 'onderweg':'Accepteer, rij naar gast', 'aangekomen':'Ik ben bij de gast', 'rijdt':'Gast ingestapt, rijden', 'gearriveerd':'Rit voltooid' };
+  function ridePill(st){ return st==='aangevraagd'?'nieuw':st==='gearriveerd'?'klaar':'bereiding'; }
   function renderRides(){
-    const list = state.rides || [];
-    $('#rideList').innerHTML = list.length ? list.map(r =>
-      '<div class="order"><div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+r.customerCodename+'</span></div><div class="ref">'+(r.from||',')+' → '+(r.to||',')+'</div></div><span class="pill nieuw">'+tStatus(r.status)+'</span></div></div>'
-    ).join('') : '<div class="empty">'+T('sup.norides','Geen ritaanvragen. RTG-gasten die een rit boeken, verschijnen hier met bestemming en live locatie.')+'</div>';
+    const list = (state.rides || []).filter(r => r.status !== 'gearriveerd' && r.status !== 'geweigerd');
+    $('#rideList').innerHTML = list.length ? list.map(r => {
+      const nxt = NEXT_RIDE[r.status];
+      const eta = (r.status === 'aangevraagd' || r.status === 'onderweg')
+        ? (r.pickupEtaMin != null ? '<div class="enroute">🚗 '+T('sup.pickupeta','Gast op ~')+r.pickupEtaMin+' '+T('sup.min','min')+' '+T('sup.rijden','rijden')+'.</div>' : '')
+        : (r.status === 'rijdt' && r.dropEtaMin != null ? '<div class="enroute">🏁 '+T('sup.dropeta','Aankomst bestemming over ~')+r.dropEtaMin+' '+T('sup.min','min')+'.</div>' : '');
+      return '<div class="order" data-rref="'+r.ref+'">'+
+        '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+r.customerCodename+'</span></div>'+
+          '<div class="ref">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+' · '+timeAgo(r.at)+'</div></div>'+
+          '<span class="pill '+ridePill(r.status)+'">'+tStatus(r.status)+'</span></div>'+
+        eta +
+        '<div class="acts">'+
+          (nxt?'<button class="obtn primary js-rnext">'+T(RIDE_NEXT_LABEL[nxt], RIDE_NEXT_NL[nxt])+'</button>':'')+
+          (r.status==='aangevraagd'?'<button class="obtn warn js-rreject">'+T('sup.reject','Weiger')+'</button>':'')+
+          (r.loc?'':'')+
+        '</div>'+
+      '</div>';
+    }).join('') : '<div class="empty">'+T('sup.norides','Geen ritaanvragen. RTG-gasten die een rit boeken, verschijnen hier met bestemming en live locatie.')+'</div>';
+    document.querySelectorAll('[data-rref]').forEach(el => {
+      const ref = el.dataset.rref;
+      const r = (state.rides||[]).find(x=>x.ref===ref);
+      const nb = el.querySelector('.js-rnext'); if (nb) nb.addEventListener('click', ()=>setRideStatus(ref, NEXT_RIDE[r.status]));
+      const rj = el.querySelector('.js-rreject'); if (rj) rj.addEventListener('click', ()=>setRideStatus(ref,'geweigerd'));
+    });
+  }
+  async function setRideStatus(ref, status){
+    try { await API.call('/supplier/ride/status', {ref, status}); toast(T('sup.status','Status:')+' '+tStatus(status)); await refresh(); }
+    catch(e){ toast(e.message); }
   }
 
   // ---- menu ----
@@ -739,6 +787,10 @@ window.I18N = { en: {
   'sup.noorders':'No orders yet. As soon as an RTG guest orders with you, it appears here, live.',
   'sup.status':'Status:', 'sup.refundedtoast':'Refunded:',
   'sup.norides':'No ride requests. RTG guests who book a ride appear here with destination and live location.',
+  'sup.guesteta':'Guest on the way, arriving in ~', 'sup.min':'min', 'sup.readyontime':'Have it ready on time.', 'sup.guesthere':'Guest has arrived. Serve now.',
+  'sup.enroute':'Guests on the way to you', 'sup.arrived':'arrived', 'sup.minaway':'min', 'sup.enrouteshort':'on the way',
+  'sup.pickupeta':'Guest ~', 'sup.rijden':'away by car', 'sup.dropeta':'Arriving at destination in ~', 'sup.opendest':'open destination',
+  'sup.ride.accept':'Accept, drive to guest', 'sup.ride.atpickup':'I am at the guest', 'sup.ride.driving':'Guest on board, driving', 'sup.ride.done':'Trip completed',
   'sup.nomenu':'No menu yet. Add dishes so guests can order in advance.',
   'sup.pricehist':'Previously submitted', 'sup.noprices':'No prices submitted yet.',
   'sup.fillprice':'Enter a service and a price.', 'sup.pricesent':'Price sent to RTG.',

@@ -60,6 +60,8 @@
   .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .pill.bereiding{color:var(--amber);}
   .pill.klaar,.pill.geserveerd{color:var(--green);}
+  .livedot{width:9px;height:9px;border-radius:50%;background:var(--burgundy);display:inline-block;vertical-align:middle;animation:livepulse 1.4s infinite;}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 7px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
   .empty{padding:2.5rem 1.25rem;text-align:center;color:var(--soft);font-size:0.85rem;}
   .flash{animation:flash 1.6s ease;}
   @keyframes flash{0%{background:rgba(194,58,94,0.18);}100%{background:transparent;}}
@@ -112,6 +114,10 @@
 <div id="app">
   <div class="wrap">
     <div class="stat" id="stat"></div>
+    <div class="panel" style="margin-bottom:1.5rem;">
+      <h2><span class="livedot"></span> <span data-i18n="panel.live">Live onderweg</span></h2>
+      <div class="rows" id="liveList"></div>
+    </div>
     <div class="cols">
       <div class="panel">
         <h2 data-i18n="panel.prices">Dynamische prijzen</h2>
@@ -253,6 +259,15 @@
       '<div class="b"><div class="l">'+T('bo.orders','Bestellingen')+'</div><div class="v a">'+state.orders.length+'</div></div>' +
       '<div class="b"><div class="l">'+T('bo.revenue','Omzet via partners')+'</div><div class="v g">'+eur(paid)+'</div></div>';
 
+    const live = state.live || [];
+    $('#liveList').innerHTML = live.length ? live.map(g =>
+      '<div class="row"><div class="r1"><div><div class="nm">'+g.codename+
+        (g.dest?' <span style="color:var(--soft);font-weight:400;">· '+T('bo.to','naar')+' '+g.dest.name+'</span>':'')+'</div>'+
+        '<div class="sub">'+(g.arrived?'✓ '+T('bo.arrived','gearriveerd'):T('bo.onthemove','onderweg')+' ('+T('bo.mode.'+g.mode, g.mode==='walking'?'lopend':g.mode==='flying'?'vliegend':'rijdend')+')')+
+        ' · '+(g.partners||[]).join(', ')+'</div></div>'+
+        '<span class="pill '+(g.arrived?'klaar':'bereiding')+'">'+(g.arrived?T('bo.arrived','gearriveerd'):T('bo.live','live'))+'</span></div></div>'
+    ).join('') : '<div class="empty">'+T('bo.nolive','Niemand is nu onderweg. Zodra een lid een reis live zet, ziet u hier waar zij zijn en met welke partners.')+'</div>';
+
     $('#prices').innerHTML = state.prices.length ? state.prices.map(p =>
       '<div class="row"><div class="r1"><div><div class="nm">'+p.supplierName+'</div><div class="sub">'+p.service+' · '+timeAgo(p.at)+'</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
     ).join('') : '<div class="empty">'+T('bo.noprices','Nog geen prijzen. Zodra een partner een dynamische prijs doorgeeft, verschijnt die hier live.')+'</div>';
@@ -283,6 +298,9 @@ window.I18N = { en: {
   'gate.p':'Live overview of all dynamic prices, orders and rides via RTG partners.',
   'gate.ph':'Back-office code', 'gate.btn':'Sign in', 'gate.hint':'Demo code: RTG-OFFICE',
   'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides', 'panel.verify':'Identity verifications', 'panel.concierge':'Concierge inbox',
+  'panel.live':'Live on the move', 'bo.to':'to', 'bo.arrived':'arrived', 'bo.onthemove':'on the move', 'bo.live':'live',
+  'bo.mode.walking':'walking', 'bo.mode.driving':'driving', 'bo.mode.flying':'flying',
+  'bo.nolive':'Nobody is on the move right now. As soon as a member puts a journey live, you will see here where they are and with which partners.',
   'bo.viewdoc':'Document', 'bo.approve':'Approve', 'bo.reject':'Reject', 'bo.noverify':'No pending verifications.',
   'bo.waiting':'waiting', 'bo.open':'Open', 'bo.noconv':'No conversations yet.', 'bo.replyph':'Reply as concierge…', 'bo.send':'Send',
   'bo.partners':'Partners', 'bo.proposals':'Price proposals', 'bo.orders':'Orders', 'bo.revenue':'Revenue via partners',

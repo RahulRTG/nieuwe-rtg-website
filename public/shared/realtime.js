@@ -55,7 +55,7 @@
 
     _foreground(n){
       if ('Notification' in window && Notification.permission === 'granted'){
-        try { new Notification(n.title, { body: n.body, icon: 'icon.svg', tag: n.id }); } catch (e) {}
+        try { new Notification(n.title, { body: n.body, icon: '/icon.svg', tag: n.id }); } catch (e) {}
       }
     },
 

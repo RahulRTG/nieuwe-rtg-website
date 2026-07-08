@@ -535,6 +535,48 @@
   .mo-pay svg{width:12px;height:12px;}
   .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
 
+  /* ---- Onderweg (live reis) ---- */
+  .live-start{background:linear-gradient(150deg,#1a1413,#151312);border:1px solid var(--line);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;}
+  .live-start .lh{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
+  .live-start .ld{font-size:0.8rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;}
+  .live-dest-row{display:flex;gap:0.5rem;margin-top:0.85rem;}
+  .live-dest-row select{flex:1;min-width:0;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.84rem;color:var(--txt);outline:none;font-family:inherit;}
+  .live-mode{display:flex;gap:0.4rem;margin-top:0.6rem;}
+  .live-mode button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem;font-size:0.72rem;font-family:inherit;}
+  .live-mode button.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
+  .live-go{margin-top:0.8rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.85rem;font-size:0.84rem;font-weight:600;font-family:inherit;}
+
+  .live-panel{background:linear-gradient(150deg,#1c1414,#151312);border:1px solid rgba(194,58,94,0.35);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;overflow:hidden;}
+  .live-top{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;}
+  .live-badge{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);font-weight:700;}
+  .live-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--burgundy);animation:livepulse 1.4s infinite;}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 7px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
+  .live-stop{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.68rem;font-family:inherit;}
+  .live-headline{margin-top:0.7rem;font-family:'Bodoni Moda',serif;font-size:1.35rem;line-height:1.15;}
+  .live-headline em{font-style:normal;color:var(--gold);}
+  .live-sub{font-size:0.78rem;color:var(--muted);margin-top:0.2rem;}
+  .live-map{position:relative;height:130px;margin:0.9rem 0 0.2rem;border-radius:14px;border:1px solid var(--line);background:radial-gradient(circle at 30% 30%,rgba(194,58,94,0.08),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),#100e0d;overflow:hidden;}
+  .live-map .mk{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.9rem;transition:left 0.9s ease,top 0.9s ease;}
+  .live-map .mk .lbl{font-size:0.52rem;letter-spacing:0.04em;color:var(--muted);background:rgba(0,0,0,0.5);padding:1px 4px;border-radius:4px;white-space:nowrap;}
+  .live-map .mk.me{z-index:3;}
+  .live-map .mk.me .pin{width:14px;height:14px;border-radius:50%;background:var(--burgundy);box-shadow:0 0 0 5px rgba(194,58,94,0.25);}
+  .live-partner{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
+  .live-partner:last-child{border-bottom:none;}
+  .live-partner .pic{font-size:1.25rem;flex-shrink:0;}
+  .live-partner .pt{flex:1;min-width:0;}
+  .live-partner .pt b{display:block;font-size:0.86rem;font-weight:600;}
+  .live-partner .pt span{font-size:0.72rem;color:var(--muted);}
+  .live-partner .eta{text-align:right;white-space:nowrap;}
+  .live-partner .eta .n{font-family:'Bodoni Moda',serif;font-size:1.1rem;color:var(--gold);}
+  .live-partner .eta .u{font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);}
+  .live-partner .eta.arr .n{color:var(--green);font-size:0.9rem;}
+  .live-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
+  .live-acts button{flex:1;min-width:120px;border-radius:999px;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
+  .live-acts .prim{background:#fff;color:#000;border-color:#fff;}
+  .live-acts .sec{background:var(--card2,#1B1817);color:var(--txt);}
+  .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
+  .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
+
   .menu-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:80;display:none;}
   .menu-scrim.open{display:block;}
   .menu-sheet{position:absolute;left:0;right:0;bottom:0;z-index:81;background:var(--bg);border-top:1px solid var(--line);border-radius:20px 20px 0 0;max-height:88%;display:none;flex-direction:column;}
@@ -682,6 +724,7 @@
       <div class="view" data-view="terplaatse">
         <h2 data-i18n="app.v.tp">Ter plaatse.</h2>
         <p class="sub" id="tpSub">Bestel, betaal en reserveer bij RTG-partners op uw bestemming.</p>
+        <div id="livePanel"></div>
         <div id="myOrders"></div>
         <div id="supplierList"></div>
       </div>
@@ -950,6 +993,7 @@
     if (scope === 'payments'){ renderPay(); renderHome(); renderTrip(); }
     else if (scope === 'salon'){ renderSalon(); renderHome(); }
     else if (scope === 'orders'){ renderTerPlaatse(); }
+    else if (scope === 'live'){ renderLive(); }
     else if (scope === 'chat'){ if (user.account) renderChat(); }
     else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
   }
@@ -1043,6 +1087,8 @@
       $('#tpSub').textContent = T('app.tp.partnersin','RTG-partners in') + ' ' + (sd.city || trip.dest) + ', ' + T('app.tp.orderpayreserve','bestel, betaal en reserveer.');
     } catch (e) { return; }
 
+    renderLive();  // live "onderweg"-paneel bovenaan
+
     // mijn lopende bestellingen bovenaan
     const active = myOrders.filter(o => o.status !== 'terugbetaald');
     $('#myOrders').innerHTML = active.length
@@ -1080,6 +1126,164 @@
       const s = suppliers.find(x => x.code === b.dataset.loc);
       toast(s.name + ', ' + (s.loc && s.loc.label ? s.loc.label : T('app.tp.locwhenenroute','locatie gedeeld zodra u onderweg bent')) + '.');
     }));
+  }
+
+  /* ---------- Onderweg (live reis) ---------- */
+  let liveData = null;
+  let liveMode = 'driving';
+  let simTimer = null;
+  const RIDE_ST = { 'aangevraagd':'requested', 'onderweg':'on the way', 'aangekomen':'arrived', 'rijdt':'driving', 'gearriveerd':'completed', 'geweigerd':'declined' };
+  const tRide = s => (lang() === 'en' ? (RIDE_ST[s] || s) : s);
+
+  async function renderLive(){
+    if (!API.live){ $('#livePanel').innerHTML = ''; return; }
+    try { liveData = (await API.call('/live/state')).live; }
+    catch (e){ $('#livePanel').innerHTML = ''; return; }
+    if (!liveData || !liveData.active){ stopSim(); renderLiveStart(); }
+    else renderLivePanel();
+  }
+
+  function renderLiveStart(){
+    const opts = suppliers.map(s => '<option value="' + s.code + '">' + s.name + ' (' + tType(s.typeLabel) + ')</option>').join('');
+    const modes = [['walking','Lopen'],['driving','Rijden'],['flying','Vliegen']];
+    $('#livePanel').innerHTML =
+      '<div class="live-start">' +
+        '<div class="lh">' + T('live.start.h','Ergens heen?') + '</div>' +
+        '<div class="ld">' + T('live.start.d','Zet uw reis live. Uw partners, uw taxi, het restaurant, zien waar u bent en zorgen dat alles klaarstaat wanneer u aankomt. Altijd op codenaam, nooit op naam.') + '</div>' +
+        '<div class="live-dest-row"><select id="liveDest">' + opts + '</select></div>' +
+        '<div class="live-mode">' + modes.map(m => '<button data-mode="' + m[0] + '"' + (m[0]===liveMode?' class="on"':'') + '>' + T('live.mode.'+m[0], m[1]) + '</button>').join('') + '</div>' +
+        '<button class="live-go" id="liveGo">' + T('live.go','Start onderweg') + '</button>' +
+      '</div>';
+    $('#livePanel').querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+      liveMode = b.dataset.mode;
+      $('#livePanel').querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x.dataset.mode === liveMode));
+    }));
+    $('#liveGo').addEventListener('click', startLive);
+  }
+
+  async function startLive(){
+    const destCode = $('#liveDest').value;
+    try { liveData = (await API.call('/live/start', { destCode, mode: liveMode })).live; toast(T('live.started','U bent onderweg. Uw partners zijn op de hoogte.')); renderLivePanel(); }
+    catch (e){ toast(e.message); }
+  }
+
+  // projecteer lat/lng-punten in het 130px-kaartje (percentage-coördinaten)
+  function projectPoints(pts){
+    if (!pts.length) return [];
+    const lats = pts.map(p => p.lat), lngs = pts.map(p => p.lng);
+    let minLat = Math.min(...lats), maxLat = Math.max(...lats), minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+    let dLat = (maxLat - minLat) || 0.002, dLng = (maxLng - minLng) || 0.002;
+    minLat -= dLat*0.2; maxLat += dLat*0.2; minLng -= dLng*0.2; maxLng += dLng*0.2;
+    dLat = maxLat - minLat; dLng = maxLng - minLng;
+    return pts.map(p => ({ x: ((p.lng - minLng)/dLng)*100, y: (1 - (p.lat - minLat)/dLat)*100 }));
+  }
+
+  function renderLivePanel(){
+    const L = liveData; if (!L) return;
+    const dest = L.dest;
+    let head, sub = '';
+    if (L.arrived && dest){ head = T('live.arrivedh','U bent <em>gearriveerd</em>'); sub = dest.name; }
+    else if (dest){ head = T('live.headingto','Onderweg naar') + ' <em>' + dest.name + '</em>'; sub = dest.etaMin != null ? T('live.aankomst','aankomst over ~') + dest.etaMin + ' ' + T('live.min','min') : ''; }
+    else { head = T('live.moving','U bent <em>onderweg</em>'); }
+
+    const pts = [];
+    if (L.me) pts.push({ lat: L.me.lat, lng: L.me.lng, me: true });
+    L.partners.forEach(p => { if (p.loc) pts.push({ lat: p.loc.lat, lng: p.loc.lng, icon: p.icon, name: p.name }); });
+    const proj = projectPoints(pts);
+    const markers = proj.map((pt,i) => {
+      const s = pts[i];
+      return '<div class="mk' + (s.me?' me':'') + '" style="left:' + pt.x.toFixed(1) + '%;top:' + pt.y.toFixed(1) + '%;">' +
+        (s.me ? '<div class="pin"></div>' : '<div>' + s.icon + '</div>') +
+        '<div class="lbl">' + (s.me ? T('live.you','U') : s.name) + '</div></div>';
+    }).join('');
+
+    const partners = L.partners.map(p => {
+      const isVeh = p.type === 'taxi' || p.type === 'jet';
+      let eta;
+      if (p.ride && isVeh){
+        eta = p.taxiEtaMin != null && p.ride.status !== 'gearriveerd'
+          ? '<div class="eta"><div class="n">' + p.taxiEtaMin + '</div><div class="u">' + T('live.mintoyou','min naar u') + '</div></div>'
+          : '<div class="eta"><div class="n" style="font-size:0.9rem;">' + tRide(p.ride.status) + '</div></div>';
+      } else if (p.isDest && L.arrived){
+        eta = '<div class="eta arr"><div class="n">✓ ' + T('live.here','ter plaatse') + '</div></div>';
+      } else {
+        eta = p.etaMin != null ? '<div class="eta"><div class="n">' + p.etaMin + '</div><div class="u">' + T('live.minaway','min heen') + '</div></div>' : '';
+      }
+      let line2 = tType(p.typeLabel);
+      if (p.ride) line2 += ' · ' + T('live.ride','rit') + ' ' + tRide(p.ride.status);
+      else if (p.order) line2 += ' · ' + p.order.items + ' ' + T('app.items','item(s)') + ', ' + tStatus(p.order.status);
+      return '<div class="live-partner"><span class="pic">' + p.icon + '</span><div class="pt"><b>' + p.name + '</b><span>' + line2 + '</span></div>' + eta + '</div>';
+    }).join('');
+
+    let preorder = '';
+    const destSup = dest ? suppliers.find(s => s.code === dest.code) : null;
+    if (dest && destSup && destSup.hasMenu && !dest.order && !L.arrived){
+      preorder = '<div class="live-preorder"><span>' + T('live.preorder','Bestel vast vooruit, dan staat het klaar als u aankomt.') + '</span><button id="livePre">' + T('live.preorderbtn','Vooruit bestellen') + '</button></div>';
+    }
+
+    const hasVeh = L.partners.some(p => p.type === 'taxi' || p.type === 'jet');
+    const acts = '<div class="live-acts">' +
+      '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
+      (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
+      '<button class="prim" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>' +
+    '</div>';
+
+    $('#livePanel').innerHTML =
+      '<div class="live-panel">' +
+        '<div class="live-top"><span class="live-badge"><span class="dot"></span>' + T('live.badge','Live onderweg') + '</span><button class="live-stop" id="liveStop">' + T('live.stop','Stop') + '</button></div>' +
+        '<div class="live-headline">' + head + '</div>' + (sub ? '<div class="live-sub">' + sub + '</div>' : '') +
+        '<div class="live-map">' + markers + '</div>' +
+        preorder +
+        '<div style="margin-top:0.5rem;">' + partners + '</div>' +
+        acts +
+      '</div>';
+
+    $('#liveStop').addEventListener('click', stopLive);
+    $('#liveSim').addEventListener('click', simulateRide);
+    $('#liveShare').addEventListener('click', shareMyLocation);
+    const tx = $('#liveTaxi'); if (tx) tx.addEventListener('click', requestTaxi);
+    const pre = $('#livePre'); if (pre) pre.addEventListener('click', () => { if (dest) openMenu(dest.code); });
+  }
+
+  async function stopLive(){
+    stopSim();
+    try { await API.call('/live/stop'); } catch (e) {}
+    liveData = null; toast(T('live.stopped','Reis gestopt.')); renderLive();
+  }
+
+  async function requestTaxi(){
+    const veh = suppliers.find(s => s.type === 'taxi') || suppliers.find(s => s.type === 'jet');
+    if (!veh){ toast(T('live.notaxi','Geen vervoerspartner beschikbaar op deze bestemming.')); return; }
+    try { await API.call('/ride/request', { supplierCode: veh.code, toCode: (liveData && liveData.destCode) || undefined }); toast(veh.name + ' ' + T('live.taxireq','is gevraagd. U ziet de taxi live naderen.')); await renderLive(); }
+    catch (e){ toast(e.message); }
+  }
+
+  function shareMyLocation(){
+    if (navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(async pos => {
+        try { liveData = (await API.call('/live/update', { lat: pos.coords.latitude, lng: pos.coords.longitude })).live; renderLivePanel(); toast(T('live.shared','Locatie gedeeld met uw partners.')); }
+        catch (e){ toast(e.message); }
+      }, () => toast(T('live.geodenied','Locatie niet beschikbaar. Gebruik "Simuleer rit" voor de demo.')), { timeout: 4000 });
+    } else toast(T('live.geono','Locatie is hier niet beschikbaar.'));
+  }
+
+  function stopSim(){ if (simTimer){ clearInterval(simTimer); simTimer = null; } }
+  function simulateRide(){
+    const L = liveData;
+    if (!L || !L.me || !L.dest || !L.dest.loc){ toast(T('live.nosim','Kies eerst een bestemming.')); return; }
+    stopSim();
+    const start = { lat: L.me.lat, lng: L.me.lng };
+    const end = { lat: L.dest.loc.lat, lng: L.dest.loc.lng };
+    let step = 0; const N = 16;
+    toast(T('live.simstart','Simulatie gestart, u nadert de bestemming.'));
+    simTimer = setInterval(async () => {
+      step++;
+      const t = step / N;
+      const lat = start.lat + (end.lat - start.lat) * t + (Math.random() - 0.5) * 0.0004;
+      const lng = start.lng + (end.lng - start.lng) * t + (Math.random() - 0.5) * 0.0004;
+      try { liveData = (await API.call('/live/update', { lat, lng })).live; renderLivePanel(); } catch (e) {}
+      if (step >= N) stopSim();
+    }, 900);
   }
 
   const FID_MINI = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/><path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/><circle cx="23.5" cy="26.5" r="3" fill="currentColor"/><circle cx="40.5" cy="26.5" r="3" fill="currentColor"/><path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
@@ -1570,6 +1774,17 @@ window.I18N = { en: {
   'app.tp.partnersin':'RTG partners in', 'app.tp.orderpayreserve':'order, pay and reserve.', 'app.tp.myorders':'My orders',
   'app.tp.partnersdest':'Partners at your destination', 'app.tp.viewmenu':'View menu', 'app.tp.location':'Location',
   'app.tp.locwhenenroute':'location shared once you are on your way',
+  'live.start.h':'Heading somewhere?', 'live.start.d':'Put your journey live. Your partners, your taxi, the restaurant, see where you are and make sure everything is ready when you arrive. Always by codename, never by name.',
+  'live.mode.walking':'Walk', 'live.mode.driving':'Drive', 'live.mode.flying':'Fly', 'live.go':'Start journey',
+  'live.started':'You are on your way. Your partners have been notified.', 'live.badge':'Live journey', 'live.stop':'Stop', 'live.stopped':'Journey stopped.',
+  'live.headingto':'On the way to', 'live.arrivedh':'You have <em>arrived</em>', 'live.moving':'You are <em>on the way</em>',
+  'live.aankomst':'arriving in ~', 'live.min':'min', 'live.you':'You', 'live.here':'on site',
+  'live.mintoyou':'min to you', 'live.minaway':'min away', 'live.ride':'ride',
+  'live.preorder':'Pre-order now so it is ready when you arrive.', 'live.preorderbtn':'Order ahead',
+  'live.simulate':'Simulate ride', 'live.taxi':'Request a taxi', 'live.share':'Share my location',
+  'live.notaxi':'No transport partner available at this destination.', 'live.taxireq':'has been requested. You will see the taxi approach live.',
+  'live.shared':'Location shared with your partners.', 'live.geodenied':'Location unavailable. Use "Simulate ride" for the demo.', 'live.geono':'Location is not available here.',
+  'live.nosim':'Choose a destination first.', 'live.simstart':'Simulation started, you are approaching the destination.',
   'app.ms.note':'Allergy or note (e.g. no nuts)', 'app.ms.tag':'Tag this for The Salon (7 days after the stay)',
   'app.ms.order':'Order', 'app.ms.choose':'Choose dishes', 'app.orderplaced':'Order placed with', 'app.paidto':'Paid to',
   'app.welcome':'Welcome,', 'app.membersince':'member since',

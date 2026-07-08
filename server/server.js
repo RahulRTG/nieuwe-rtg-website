@@ -124,6 +124,7 @@ function initRealtime() {
   if (!db.data.supplierNotifications) db.data.supplierNotifications = {};
   if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
   if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
+  if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
   if (webpush) {
     if (!db.data.vapid) {
       db.data.vapid = webpush.generateVAPIDKeys();
@@ -428,7 +429,7 @@ app.get('/api/stream', (req, res) => {
     'Connection': 'keep-alive'
   });
   res.write('retry: 3000\n\n');
-  const client = { tier: sess.tier, res };
+  const client = { tier: sess.tier, key: sess.key, res };
   sseClients.push(client);
   // onopgehaalde notificaties meteen meesturen
   const unread = (db.data.notifications[sess.tier] || []).filter(n => !n.read);
@@ -742,8 +743,19 @@ function supplierState(s, actor) {
   return {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
     menu: s.menu || [],
-    orders: db.data.orders.filter(o => o.supplierCode === s.code),
-    rides: db.data.rides.filter(r => r.supplierCode === s.code),
+    orders: db.data.orders.filter(o => o.supplierCode === s.code).map(o => {
+      const L = db.data.live[o.customerKey || o.customerTier];
+      const enroute = L && L.active && connectedSupplierCodes(o.customerKey || o.customerTier).includes(s.code);
+      const me = enroute && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
+      return { ...o, guestEtaMin: me && s.loc ? etaMinutes(haversine(me, s.loc), L.mode) : null, guestArrived: !!(L && L.arrived && L.destCode === s.code) };
+    }),
+    rides: db.data.rides.filter(r => r.supplierCode === s.code).map(r => {
+      const L = db.data.live[r.customerKey || r.customerTier];
+      const guest = L && L.active && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
+      const toS = r.toCode ? findSupplier(r.toCode) : null;
+      return { ...r, guestLoc: guest, pickupEtaMin: guest && s.loc ? etaMinutes(haversine(s.loc, guest), 'driving') : null, dropEtaMin: guest && toS && toS.loc ? etaMinutes(haversine(guest, toS.loc), 'driving') : null };
+    }),
+    guests: guestsFor(s.code),
     prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code),
     notifications: db.data.supplierNotifications[s.code] || [],
     staff: accounts.listStaff(s.code).map(accounts.publicStaff),
@@ -916,9 +928,26 @@ app.post('/api/supplier/location', supplierAuth, (req, res) => {
     logActivity(req.supplier.code, req.actor, 'deelde de live locatie');
   }
   // klanten met een actieve rit bij deze leverancier live bijwerken
-  const tiers = new Set(db.data.rides.filter(r => r.supplierCode === req.supplier.code && r.status !== 'gearriveerd').map(r => r.customerTier));
-  broadcastSync([...tiers], 'orders');
+  const rides = db.data.rides.filter(r => r.supplierCode === req.supplier.code && r.status !== 'gearriveerd');
+  for (const r of rides) { broadcastSync([r.customerTier], 'orders'); sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' }); }
   res.json({ ok: true, loc: req.supplier.loc });
+});
+
+// ---- vervoerspartner werkt de ritstatus bij → lid live op de hoogte ----
+app.post('/api/supplier/ride/status', supplierAuth, (req, res) => {
+  const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
+  const allowed = ['aangevraagd', 'onderweg', 'aangekomen', 'rijdt', 'gearriveerd', 'geweigerd'];
+  const status = String(req.body.status || '');
+  if (!allowed.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+  r.status = status;
+  save();
+  broadcastSync([r.customerTier], 'orders');
+  sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' });
+  sseToOffice('sync', { scope: 'orders' });
+  notify(r.customerTier, { icon: '🚗', title: req.supplier.name, body: 'Uw rit is nu: ' + status + '.', scope: 'orders' });
+  logActivity(req.supplier.code, req.actor, 'zette rit ' + r.ref + ' op "' + status + '"');
+  res.json({ ok: true, ride: r });
 });
 
 /* ================= KLANTZIJDE (leden-app) ================= */
@@ -989,6 +1018,184 @@ app.post('/api/orders/mine', auth, (req, res) => {
   res.json({ orders: db.data.orders.filter(o => (o.customerKey || o.customerTier) === req.session.key) });
 });
 
+/* ================= LIVE REIS (onderweg) =================
+   Koppelt een reizend lid en al zijn partners realtime. Het lid deelt zijn
+   positie, de partners de hunne. Zo staan pre-orders klaar op het moment dat
+   het lid aankomt, weet de taxi precies waar en wanneer op te halen, en ziet
+   het lid live waar zijn vervoer is. Alles op codenaam, nooit op echte naam. */
+
+function toRad(d) { return d * Math.PI / 180; }
+function haversine(a, b) {
+  if (!a || !b || !Number.isFinite(a.lat) || !Number.isFinite(b.lat)) return null;
+  const R = 6371000;
+  const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return Math.round(2 * R * Math.asin(Math.sqrt(s)));
+}
+function etaMinutes(meters, mode) {
+  if (meters == null) return null;
+  const kmh = mode === 'walking' ? 4.8 : mode === 'flying' ? 700 : 26; // lopen / vliegen / rijden in de stad
+  return Math.max(1, Math.round((meters / 1000) / kmh * 60));
+}
+function sseToCustomer(key, event, data) {
+  for (const c of sseClients) if (c.key === key) sseSend(c.res, event, data);
+}
+function liveCodename(session) {
+  return session.account ? session.account.codename : PERSONAS[session.tier].codename;
+}
+
+// Partners die op dit moment met dit reizende lid te maken hebben: de bestemming,
+// plus elke partner met een lopende bestelling of rit.
+function connectedSupplierCodes(key) {
+  const set = new Set();
+  const L = db.data.live[key];
+  if (L && L.destCode) set.add(L.destCode);
+  for (const o of db.data.orders)
+    if ((o.customerKey || o.customerTier) === key && !['terugbetaald', 'geserveerd', 'geweigerd'].includes(o.status)) set.add(o.supplierCode);
+  for (const r of db.data.rides)
+    if ((r.customerKey || r.customerTier) === key && r.status !== 'gearriveerd' && r.status !== 'geweigerd') set.add(r.supplierCode);
+  return [...set];
+}
+
+// Duw een live-signaal naar het lid zelf, naar alle betrokken partners en de backoffice.
+function pushLive(key) {
+  sseToCustomer(key, 'sync', { scope: 'live' });
+  for (const code of connectedSupplierCodes(key)) sseToSupplier(code, 'sync', { scope: 'live' });
+  sseToOffice('sync', { scope: 'live' });
+}
+
+// Volledige live-toestand voor het lid: eigen positie plus elke partner met afstand en ETA.
+function liveStateFor(key, lang) {
+  const L = db.data.live[key];
+  const active = !!(L && L.active);
+  const me = L && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng, at: L.updatedAt } : null;
+  const mode = (L && L.mode) || 'driving';
+  const partners = connectedSupplierCodes(key).map(code => {
+    const s = findSupplier(code); if (!s) return null;
+    const t = db.data.supplierTypes[s.type] || {};
+    const dist = me && s.loc ? haversine(me, s.loc) : null;
+    const order = db.data.orders.find(o => (o.customerKey || o.customerTier) === key && o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd'].includes(o.status));
+    const ride = db.data.rides.find(r => (r.customerKey || r.customerTier) === key && r.supplierCode === code && r.status !== 'gearriveerd' && r.status !== 'geweigerd');
+    return {
+      code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
+      loc: s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : null,
+      isDest: !!(L && L.destCode === code),
+      distance: dist,
+      etaMin: etaMinutes(dist, mode),
+      // voor een rit telt de ETA van het voertuig naar het lid
+      taxiEtaMin: ride && me && s.loc ? etaMinutes(haversine(s.loc, me), 'driving') : null,
+      order: order ? { ref: order.ref, status: order.status, items: order.items.reduce((n, i) => n + i.qty, 0), total: order.total, paid: order.paid } : null,
+      ride: ride ? { ref: ride.ref, status: ride.status, to: ride.to } : null
+    };
+  }).filter(Boolean);
+  const destCode = L && L.destCode ? L.destCode : null;
+  return { active, mode, me, arrived: !!(L && L.arrived), destCode, dest: destCode ? (partners.find(p => p.code === destCode) || null) : null, partners };
+}
+
+// Reizende leden die op dit moment met deze partner te maken hebben (voor de leverancier-app).
+function guestsFor(code) {
+  const out = [];
+  const s = findSupplier(code);
+  for (const key of Object.keys(db.data.live)) {
+    const L = db.data.live[key];
+    if (!L || !L.active) continue;
+    if (!connectedSupplierCodes(key).includes(code)) continue;
+    const me = Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
+    const dist = me && s && s.loc ? haversine(me, s.loc) : null;
+    const order = db.data.orders.find(o => (o.customerKey || o.customerTier) === key && o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd'].includes(o.status));
+    const ride = db.data.rides.find(r => (r.customerKey || r.customerTier) === key && r.supplierCode === code && r.status !== 'gearriveerd' && r.status !== 'geweigerd');
+    out.push({
+      codename: L.codename, distance: dist, etaMin: etaMinutes(dist, L.mode),
+      heading: L.destCode === code, arrived: !!L.arrived,
+      orderRef: order ? order.ref : null, rideRef: ride ? ride.ref : null
+    });
+  }
+  return out.sort((a, b) => (a.etaMin == null ? 999 : a.etaMin) - (b.etaMin == null ? 999 : b.etaMin));
+}
+
+// Lid start "onderweg" naar een bestemming (optioneel een partner).
+app.post('/api/live/start', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const key = req.session.key;
+  const destCode = req.body.destCode ? String(req.body.destCode).trim().toUpperCase() : null;
+  const dest = destCode ? findSupplier(destCode) : null;
+  const mode = ['walking', 'driving', 'flying'].includes(req.body.mode) ? req.body.mode : 'driving';
+  // Startpositie: meegegeven, anders het hotel op de bestemming, anders vlakbij de bestemming.
+  let start = (Number.isFinite(+req.body.lat) && Number.isFinite(+req.body.lng)) ? { lat: +req.body.lat, lng: +req.body.lng } : null;
+  if (!start) { const hotel = db.data.suppliers.find(s => s.type === 'hotel' && s.city === db.data.trip.dest); if (hotel && hotel.loc) start = { lat: hotel.loc.lat, lng: hotel.loc.lng }; }
+  if (!start && dest && dest.loc) start = { lat: dest.loc.lat + 0.012, lng: dest.loc.lng - 0.014 };
+  db.data.live[key] = {
+    key, tier: req.session.tier, codename: liveCodename(req.session),
+    active: true, mode, destCode,
+    lat: start ? start.lat : null, lng: start ? start.lng : null,
+    updatedAt: new Date().toISOString(), startedAt: new Date().toISOString(), arrived: false
+  };
+  save();
+  if (dest) notifySupplier(dest.code, { icon: '📍', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
+  pushLive(key);
+  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
+});
+
+// Lid deelt een nieuwe positie; partners en backoffice zien het live.
+app.post('/api/live/update', auth, (req, res) => {
+  const key = req.session.key;
+  const L = db.data.live[key];
+  if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
+  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) { L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); }
+  // automatische aankomst binnen ~150 m van de bestemming
+  const dest = L.destCode ? findSupplier(L.destCode) : null;
+  if (dest && dest.loc && !L.arrived) {
+    const d = haversine({ lat: L.lat, lng: L.lng }, dest.loc);
+    if (d != null && d < 150) {
+      L.arrived = true;
+      notifySupplier(dest.code, { icon: '🎉', title: 'Gast gearriveerd', body: L.codename + ' is bij u aangekomen.' });
+      notify(L.tier, { icon: '📍', title: 'Aangekomen', body: 'U bent bij ' + dest.name + '.', scope: 'live' });
+    }
+  }
+  save();
+  pushLive(key);
+  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
+});
+
+app.post('/api/live/stop', auth, (req, res) => {
+  const key = req.session.key;
+  const L = db.data.live[key];
+  if (L) { L.active = false; save(); pushLive(key); }
+  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
+});
+
+app.post('/api/live/state', auth, (req, res) => {
+  res.json({ live: liveStateFor(req.session.key, req.body.lang) });
+});
+
+// Lid vraagt een rit aan bij een vervoerspartner (taxi/jet).
+app.post('/api/ride/request', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  if (!s || !caps.includes('rides')) return res.status(404).json({ error: 'Geen vervoerspartner gevonden.' });
+  const dest = req.body.toCode ? findSupplier(req.body.toCode) : null;
+  const codename = liveCodename(req.session);
+  const ride = {
+    ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    supplierCode: s.code, supplierName: s.name, type: s.type,
+    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    from: String(req.body.from || 'Huidige locatie').slice(0, 80),
+    to: String(req.body.to || (dest && dest.name) || '').slice(0, 80),
+    toCode: dest ? dest.code : null,
+    when: String(req.body.when || 'Zo snel mogelijk').slice(0, 40),
+    status: 'aangevraagd', at: new Date().toISOString()
+  };
+  db.data.rides.unshift(ride);
+  save();
+  notifySupplier(s.code, { icon: '🚗', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') });
+  sseToSupplier(s.code, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  pushLive(req.session.key);
+  res.json({ ok: true, ride });
+});
+
 /* ================= BACKOFFICE (RTG) =================
    De backoffice ziet alle binnenkomende dynamische prijzen, bestellingen en
    ritten live. Demo-toegang met een vaste code. */
@@ -1012,10 +1219,23 @@ function officeAuth(req, res, next) {
 }
 
 function officeState() {
+  // live overzicht: welke leden zijn nu onderweg, waarheen en met welke partners
+  const live = Object.keys(db.data.live).map(key => {
+    const L = db.data.live[key];
+    if (!L || !L.active) return null;
+    const dest = L.destCode ? findSupplier(L.destCode) : null;
+    return {
+      codename: L.codename, tier: L.tier, mode: L.mode, arrived: !!L.arrived,
+      dest: dest ? { code: dest.code, name: dest.name } : null,
+      partners: connectedSupplierCodes(key).map(c => { const s = findSupplier(c); return s ? s.name : c; }),
+      updatedAt: L.updatedAt
+    };
+  }).filter(Boolean);
   return {
     prices: db.data.supplierPrices.slice(0, 60),
     orders: db.data.orders.slice(0, 60),
     rides: db.data.rides.slice(0, 60),
+    live,
     suppliers: db.data.suppliers.map(publicSupplier)
   };
 }

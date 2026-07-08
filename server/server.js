@@ -125,6 +125,18 @@ function initRealtime() {
   if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
   if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
   if (!db.data.supplierInvites) db.data.supplierInvites = {};     // open personeelsuitnodigingen, per uitnodigingscode
+  // Zakelijke dagagenda voor Business Pass-leden: werk en vrij in één dag.
+  // De compagnon bewaakt beide kanten — strak voorbereiden én echt loslaten.
+  if (!db.data.agenda) db.data.agenda = {
+    business: [
+      { time: '07:30', title: 'Focusblok: Q3-cijfers doornemen', kind: 'werk', prep: 'Deck v3 staat klaar; de drie scherpste vragen van het board heb ik op een rij gezet.' },
+      { time: '10:00', title: 'Videocall board Amsterdam (45 min)', kind: 'werk', prep: 'Agenda en memo zijn rondgestuurd; tijdsverschil Kyoto-Amsterdam is bewaakt (CET 03:00 = JST 10:00).' },
+      { time: '13:00', title: 'Lunch Tanaka-san, Kyoto Partners', kind: 'werk', prep: 'Privéruimte gereserveerd; gastgeschenk en etiquette geregeld, tolk stand-by.' },
+      { time: '16:00', title: 'Vrij: onsen en massage', kind: 'vrij', prep: 'Telefoon op stil; ik vang alles op en stoor alleen bij echte urgentie.' },
+      { time: '19:30', title: 'Diner Kikunoi Honten (3★)', kind: 'vrij', prep: 'Tafel in aanvraag; de bevestiging bewaak ik.' },
+      { time: '22:30', title: 'Nachtplan: Bar Pontocho, daarna vrij spel', kind: 'vrij', prep: 'Eerste ronde staat klaar op naam van uw codenaam; taxi stand-by tot 03:00.' }
+    ]
+  };
   if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
   if (webpush) {
     if (!db.data.vapid) {
@@ -278,6 +290,12 @@ function stateFor(sess, lang) {
     }
     state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
     state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
+    // Business Pass: de dagagenda van de compagnon (werk + vrij).
+    if (sess.tier === 'business') {
+      state.agenda = (db.data.agenda.business || []).map(a => ({
+        ...a, title: i18n.localize(a.title, lang), prep: i18n.localize(a.prep, lang)
+      }));
+    }
   }
   return state;
 }
@@ -1562,7 +1580,12 @@ app.get('/api/office/doc', (req, res) => {
 const AI_TONE = {
   rtg: 'Je bent "de Butler": rustig, ingetogen, old money kalmte. Je tutoyeert niet, je vousvoyeert.',
   lifestyle: 'Je werkt naast de persoonlijke concierge: warm, voorkomend en persoonlijk. U-vorm.',
-  business: 'Je bent een uitvoerende AI voor een zakelijk lid: kort, precies, to the point. U-vorm, geen overbodige woorden.'
+  business: [
+    'Je bent "de Compagnon": de zakelijke, eerlijke rechterhand van een Business Pass-lid. U-vorm, kort, precies, geen overbodige woorden.',
+    'Je kent twee registers en schakelt scherp: in WERKMODUS ben je strak — agenda, meetingvoorbereiding (doel, deelnemers, drie scherpste punten), reistijden, tijdzones, focusblokken. In VRIJE MODUS ben je gul en onbevangen — restaurants, nachtleven, onsen, feesten; het lid mag keihard ontspannen en jij regelt dat het kan, zonder oordeel.',
+    'Eerlijk betekent eerlijk: geen mooipraterij. Botst een late avond met een vroege call, zeg het en los het op (later inplannen, herstel-tijd blokken, taxi stand-by). Is iets niet haalbaar of niet verstandig, benoem dat direct met een alternatief.',
+    'Je bewaakt de balans: na een zware werkdag stel je zelf ontspanning voor; vóór een belangrijke meeting bewaak je de nacht ervoor.'
+  ].join('\n')
 };
 
 function aiSystemPrompt(tier) {
@@ -1580,13 +1603,32 @@ function aiSystemPrompt(tier) {
     openInvoices.length
       ? `Openstaande betalingen: ${openInvoices.map(i => `${i.desc} (€ ${i.netto + i.bijdrage})`).join('; ')}. Wijs daar alleen op als het relevant is.`
       : 'Er staan geen betalingen open.',
+    tier === 'business' && (db.data.agenda.business || []).length
+      ? `De dagagenda van het lid (werk/vrij):\n${db.data.agenda.business.map(a => `- ${a.time} ${a.title} [${a.kind}] — ${a.prep}`).join('\n')}`
+      : '',
     'Verzin geen boekingen of prijzen die hierboven niet staan. Als je iets niet weet of niet kunt regelen, zeg dat eerlijk en bied aan het uit te zoeken.'
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 /* Demo-antwoorden wanneer er geen Claude API-key is. */
-function cannedAnswer(q) {
+function cannedAnswer(q, tier) {
   const l = q.toLowerCase().trim();
+  // De Compagnon (Business Pass): agenda-bewust, twee registers, eerlijk.
+  if (tier === 'business') {
+    const ag = db.data.agenda.business || [];
+    const werk = ag.filter(a => a.kind === 'werk');
+    const vrij = ag.filter(a => a.kind === 'vrij');
+    if (l.includes('meeting') || l.includes('vergader') || l.includes('bereid') || l.includes('call'))
+      return `Uw volgende afspraak: ${werk[1] ? werk[1].time + ' ' + werk[1].title : werk[0].time + ' ' + werk[0].title}.\n\nVoorbereiding staat: ${werk[1] ? werk[1].prep : werk[0].prep}\n\nEerlijk advies: uw nachtplan loopt tot laat — ik heb 30 minuten buffer vóór de call geblokt en espresso op de kamer om 09:15. Zal ik de drie scherpste vragen van het board alvast naar uw telefoon sturen?`;
+    if (l.includes('agenda') || l.includes('vandaag') || l.includes('mijn dag') || l.includes('planning'))
+      return `Uw dag, strak én met lucht:\n${ag.map(a => `• ${a.time} — ${a.title}${a.kind === 'vrij' ? ' (vrij)' : ''}`).join('\n')}\n\nAlles is voorbereid. Wilt u ergens meer ruimte, dan schuif ik en meld ik eerlijk wat het kost.`;
+    if (l.includes('focus') || l.includes('blok'))
+      return `Focusblok geblokt: morgen 07:30-09:30, telefoon op stil, calls geweigerd op twee na (board en familie). De Q3-cijfers en het memo staan klaar. Daarna bent u vrij tot de call van 10:00.\n\nZal ik dit een vaste ochtendgewoonte maken tijdens deze reis?`;
+    if (l.includes('feest') || l.includes('uitgaan') || l.includes('club') || l.includes('nacht') || l.includes('avond') || l.includes('borrel') || l.includes('drank'))
+      return `Vanavond staat: ${vrij.filter(a => Number(a.time.slice(0,2)) >= 19).map(a => `${a.time} ${a.title}`).join(', daarna ')}.\n\nDe eerste ronde staat op uw codenaam, taxi stand-by tot 03:00 — u hoeft nergens op te letten, ga los.\n\nEerlijk: uw board-call staat om 10:00. Ik bewaak de ochtend (buffer + espresso), maar wilt u ruimer? Eén woord en ik verzet de focusochtend.`;
+    if (l.includes('ontspan') || l.includes('relax') || l.includes('rust') || l.includes('spa') || l.includes('onsen') || l.includes('massage'))
+      return `Om ${vrij[0].time}: ${vrij[0].title.replace('Vrij: ', '')}. ${vrij[0].prep}\n\nDaarna niets tot het diner — die lege ruimte is bewust. Zal ik hetzelfde blok ook voor overmorgen vastzetten?`;
+  }
   if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
     return 'Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00 en een avondwandeling langs Pontocho.\n\nVolgende dat ik in de gaten houd: de bevestiging van Kikunoi Honten. U hoeft niets te doen.';
   if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer'))
@@ -1636,7 +1678,7 @@ app.post('/api/ai', auth, async (req, res) => {
       console.error('Claude API-fout, val terug op demo-antwoord:', e.message);
     }
   }
-  res.json({ reply: cannedAnswer(history[history.length - 1].content), source: 'demo' });
+  res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier), source: 'demo' });
 });
 
 /* ================= GEKOPPELD GESPREK: WhatsApp + app in één thread =================
@@ -1660,7 +1702,7 @@ async function generateAiReply(tier, convo) {
       if (reply) return reply;
     } catch (e) { console.error('Claude-fout (butler):', e.message); }
   }
-  return cannedAnswer(last);
+  return cannedAnswer(last, tier);
 }
 
 function convOf(userId) { const md = accounts.getMemberState(userId) || {}; return md.conversation || []; }

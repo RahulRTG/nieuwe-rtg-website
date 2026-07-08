@@ -248,6 +248,19 @@
     padding:1.3rem 1.35rem;
     margin-top:1rem;
   }
+
+  /* compagnon-dagplan (Business Pass): werk strak, vrij met lucht */
+  .ag-row{display:flex;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--line);align-items:baseline;}
+  .ag-row:last-child{border-bottom:none;}
+  .ag-row .tm{font-family:'Bodoni Moda',serif;font-size:0.95rem;color:var(--muted);min-width:3.1rem;}
+  .ag-row.next .tm{color:var(--burgundy);}
+  .ag-row .ti{flex:1;font-size:0.86rem;}
+  .ag-row .ti small{display:block;color:var(--soft);font-size:0.72rem;margin-top:0.15rem;line-height:1.4;}
+  .ag-tag{font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:0.22rem 0.6rem;white-space:nowrap;color:var(--soft);}
+  .ag-tag.vrij{color:var(--gold);border-color:rgba(169,143,28,0.45);}
+  .ag-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
+  .ag-acts button{background:none;border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:0.55rem 0.95rem;font-size:0.76rem;cursor:pointer;font-family:inherit;}
+  .ag-acts button.primary{background:#fff;color:#000;border-color:#fff;font-weight:600;}
   .card .label{
     font-size:0.62rem;
     letter-spacing:0.16em;
@@ -685,6 +698,7 @@
         <div id="verifyBanner"></div>
         <input type="file" id="verifyFile" accept="image/*" style="display:none;">
         <div class="codecard" id="codecard"></div>
+        <div class="card" id="homeDay" style="display:none;"></div>
         <div class="card" id="homeTrip"></div>
         <div class="card" id="homePay"></div>
         <div class="card" id="homeSalon"></div>
@@ -866,6 +880,16 @@
      likes:141, liked:false, comments:[]}
   ];
   let creatorLikes = 320;
+  // Dagagenda van de Compagnon (Business Pass): werk en vrij in één dag.
+  // Zonder server geldt deze demo-agenda; met server komt hij uit /api/state.
+  let agenda = [
+    {time:'07:30', title:'Focusblok: Q3-cijfers doornemen', kind:'werk', prep:'Deck v3 staat klaar; de drie scherpste vragen van het board op een rij.'},
+    {time:'10:00', title:'Videocall board Amsterdam (45 min)', kind:'werk', prep:'Agenda en memo rondgestuurd; tijdsverschil bewaakt.'},
+    {time:'13:00', title:'Lunch Tanaka-san, Kyoto Partners', kind:'werk', prep:'Privéruimte gereserveerd; gastgeschenk en etiquette geregeld.'},
+    {time:'16:00', title:'Vrij: onsen en massage', kind:'vrij', prep:'Telefoon op stil; ik vang alles op.'},
+    {time:'19:30', title:'Diner Kikunoi Honten (3★)', kind:'vrij', prep:'Tafel in aanvraag; bevestiging bewaak ik.'},
+    {time:'22:30', title:'Nachtplan: Bar Pontocho, daarna vrij spel', kind:'vrij', prep:'Eerste ronde op uw codenaam; taxi stand-by tot 03:00.'}
+  ];
 
   /* ---------- backend-koppeling ---------- */
 
@@ -892,6 +916,7 @@
     if (state.trip) trip = state.trip;
     if (state.posts) posts = state.posts;
     if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
+    if (state.agenda) agenda = state.agenda;
   }
 
   let toastTimer;
@@ -1430,6 +1455,28 @@
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
 
+    // Business Pass: het dagplan van de Compagnon — werk strak, vrij met lucht.
+    const dayCard = $('#homeDay');
+    if (user.tier === 'business' && agenda && agenda.length){
+      dayCard.style.display = '';
+      dayCard.innerHTML =
+        '<div class="label">'+T('app.day.label','Uw dag, bewaakt door de Compagnon')+'</div>' +
+        agenda.map((a,i) =>
+          '<div class="ag-row'+(i===1?' next':'')+'"><span class="tm">'+a.time+'</span>' +
+          '<span class="ti">'+a.title+'<small>'+a.prep+'</small></span>' +
+          '<span class="ag-tag'+(a.kind==='vrij'?' vrij':'')+'">'+(a.kind==='vrij'?T('app.day.free','vrij'):T('app.day.work','werk'))+'</span></div>'
+        ).join('') +
+        '<div class="ag-acts">' +
+          '<button class="primary" id="agPrep">'+T('app.day.prep','Bereid mijn meeting voor')+'</button>' +
+          '<button id="agNight">'+T('app.day.night','Plan mijn avond')+'</button>' +
+        '</div>';
+      $('#agPrep').addEventListener('click', () => { openTab('ai'); ask(T('app.day.prep.q','Bereid mijn volgende meeting voor')); });
+      $('#agNight').addEventListener('click', () => { openTab('ai'); ask(T('app.day.night.q','Plan mijn avond: uitgaan')); });
+    } else {
+      dayCard.style.display = 'none';
+      dayCard.innerHTML = '';
+    }
+
     $('#homeTrip').innerHTML =
       '<div class="label">'+T('app.nexttrip','Eerstvolgende reis')+'</div>' +
       '<div class="big">' + trip.dest + '</div>' +
@@ -1564,12 +1611,53 @@
     if (pending) lines.push(lang()==='en'
       ? ('• ' + pending.title.replace('Diner, ', 'Your table at ') + ' is still being requested; I am watching for the confirmation.')
       : ('• ' + pending.title.replace('Diner, ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging.'));
+    // De Compagnon opent met beide kanten van de dag: de eerstvolgende
+    // verplichting én het moment van loslaten.
+    if (user.tier === 'business' && agenda && agenda.length){
+      const werk = agenda.find(a => a.kind === 'werk');
+      const vrij = agenda.filter(a => a.kind === 'vrij').pop();
+      if (werk) lines.push(lang()==='en'
+        ? ('• Work: ' + werk.time + ' ' + werk.title + '. Preparation is done.')
+        : ('• Werk: ' + werk.time + ' ' + werk.title + '. De voorbereiding staat.'));
+      if (vrij) lines.push(lang()==='en'
+        ? ('• Unwind: ' + vrij.time + ' ' + vrij.title + '. Let go — I am keeping watch.')
+        : ('• Loslaten: ' + vrij.time + ' ' + vrij.title + '. Ga los — ik houd de wacht.'));
+      lines.push(lang()==='en'
+        ? '• Honest note: the night runs late and your board call is at 10:00. I blocked a buffer. Shall I keep it that way?'
+        : '• Eerlijke noot: de avond loopt laat door en uw board-call staat om 10:00. Ik heb een buffer geblokt. Zo houden?');
+      return lines.join('\n');
+    }
     lines.push(T('ai.opener.plan','• Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.'));
     return lines.join('\n');
   }
 
   function aiAnswer(q){
     const l = q.toLowerCase().trim();
+    // Offline-fallback van de Compagnon (Business Pass), agenda-bewust.
+    if (user && user.tier === 'business' && agenda && agenda.length){
+      const werk = agenda.filter(a => a.kind === 'werk');
+      const vrij = agenda.filter(a => a.kind === 'vrij');
+      if (l.includes('meeting') || l.includes('vergader') || l.includes('bereid') || l.includes('call') || l.includes('prepare'))
+        return (lang()==='en'
+          ? ('Your next commitment: ' + werk[1].time + ' ' + werk[1].title + '.\n\nPreparation: ' + werk[1].prep + '\n\nHonest note: your night plan runs late — I blocked a 30-minute buffer before the call, espresso at 09:15. Shall I send the three sharpest board questions to your phone?')
+          : ('Uw volgende afspraak: ' + werk[1].time + ' ' + werk[1].title + '.\n\nVoorbereiding: ' + werk[1].prep + '\n\nEerlijk: uw nachtplan loopt laat door — ik heb 30 minuten buffer vóór de call geblokt, espresso om 09:15. Zal ik de drie scherpste boardvragen naar uw telefoon sturen?'));
+      if (l.includes('agenda') || l.includes('vandaag') || l.includes('planning') || l.includes('today'))
+        return (lang()==='en' ? 'Your day, tight where it must be, loose where it may:\n' : 'Uw dag, strak waar het moet, los waar het mag:\n')
+          + agenda.map(a => '• ' + a.time + ' — ' + a.title + (a.kind==='vrij' ? (lang()==='en'?' (free)':' (vrij)') : '')).join('\n')
+          + (lang()==='en' ? '\n\nEverything is prepared. Want more room somewhere? I will shift it and tell you honestly what it costs.' : '\n\nAlles is voorbereid. Wilt u ergens meer ruimte, dan schuif ik en zeg ik eerlijk wat het kost.');
+      if (l.includes('focus') || l.includes('blok') || l.includes('block'))
+        return (lang()==='en'
+          ? 'Focus block set: 07:30-09:30, phone silenced, only the board and family get through. The Q3 numbers and memo are ready. Make this a fixed morning habit for this trip?'
+          : 'Focusblok staat: 07:30-09:30, telefoon op stil, alleen het board en familie komen erdoor. De Q3-cijfers en het memo staan klaar. Zal ik dit een vaste ochtendgewoonte maken voor deze reis?');
+      if (l.includes('feest') || l.includes('uitgaan') || l.includes('club') || l.includes('nacht') || l.includes('avond') || l.includes('night') || l.includes('party'))
+        return (lang()==='en'
+          ? ('Tonight: ' + vrij.filter(a => Number(a.time.slice(0,2)) >= 19).map(a => a.time + ' ' + a.title).join(', then ') + '.\n\nFirst round is on your codename, taxi on standby until 03:00 — let go completely, I am keeping watch.\n\nHonest: your board call is at 10:00. The buffer is set; say the word and I move the morning.')
+          : ('Vanavond: ' + vrij.filter(a => Number(a.time.slice(0,2)) >= 19).map(a => a.time + ' ' + a.title).join(', daarna ') + '.\n\nDe eerste ronde staat op uw codenaam, taxi stand-by tot 03:00 — ga volledig los, ik houd de wacht.\n\nEerlijk: uw board-call staat om 10:00. De buffer staat; één woord en ik verzet de ochtend.'));
+      if (l.includes('ontspan') || l.includes('relax') || l.includes('spa') || l.includes('onsen') || l.includes('massage') || l.includes('rust') || l.includes('downtime'))
+        return (lang()==='en'
+          ? (vrij[0].time + ': ' + vrij[0].title.replace('Vrij: ','') + '. ' + vrij[0].prep + '\n\nAfter that, nothing until dinner — that empty space is deliberate. Shall I lock the same block in for the day after tomorrow?')
+          : ('Om ' + vrij[0].time + ': ' + vrij[0].title.replace('Vrij: ','') + '. ' + vrij[0].prep + '\n\nDaarna niets tot het diner — die lege ruimte is bewust. Zal ik hetzelfde blok voor overmorgen vastzetten?'));
+    }
     if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het|yes|please|go ahead|sure|arrange it)\b/.test(l))
       return T('ai.a.yes','Geregeld. De paklijst staat klaar (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00, avondwandeling langs Pontocho.\n\nIk bewaak nu de bevestiging van Kikunoi Honten. U hoeft niets te doen.');
     if (l.includes('inpak') || l.includes('paklijst') || l.includes('pack'))
@@ -1651,15 +1739,25 @@
 
   function renderAI(){
     if (user.account){ renderChat(); return; }
-    $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','Uw uitvoerende AI.');
+    const biz = user.tier === 'business';
+    $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','De Compagnon.');
+    const deck = document.querySelector('.view[data-view="ai"] .sub');
+    if (deck) deck.textContent = biz
+      ? T('ai.deck.biz','Zakelijk en eerlijk: strak in werkmodus, gul als u loslaat. Beide kanten bewaakt.')
+      : T('app.v.ai.sub','De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.');
     $('#chat').innerHTML = '';
     chatHistory.length = 0;
     const opener = aiOpener();
     bubble(opener, 'ai');
     chatHistory.push({role:'assistant', content:opener});
-    const chips = lang()==='en'
-      ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
-      : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant'];
+    // De Compagnon kent twee registers: werk (voorbereiden, focus) en vrij (loslaten).
+    const chips = biz
+      ? (lang()==='en'
+          ? ['Prepare my next meeting','What is on my agenda today?','Block focus time','Plan my night out','Arrange me some downtime']
+          : ['Bereid mijn volgende meeting voor','Wat staat er vandaag op de agenda?','Blok focustijd in','Plan mijn avond: uitgaan','Regel ontspanning'])
+      : (lang()==='en'
+          ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
+          : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant']);
     $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
     document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
   }
@@ -1805,7 +1903,11 @@ window.I18N = { en: {
   'ai.a.plan':'Proposal for 14 October:\n• 08:00 Arashiyama before the crowds\n• 11:30 lunch in Sagano\n• 15:00 your tea ceremony in Gion\n• 19:00 evening stroll Pontocho\n\nShall I reserve the lunch?',
   'ai.a.rest':'Your table at Kikunoi Honten (15 Oct, 19:30) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of Gion Sasaki.',
   'ai.a.default':'I will come back to that today. In the meantime I can help with the packing list, documents, the weather or a day plan, just say the word.',
-  'ai.title.rtg':'The Butler.', 'ai.title.life':'Your AI.', 'ai.title.biz':'Your executive AI.',
+  'ai.title.rtg':'The Butler.', 'ai.title.life':'Your AI.', 'ai.title.biz':'The Companion.',
+  'ai.deck.biz':'Businesslike and honest: sharp in work mode, generous when you let go. Both sides guarded.',
+  'app.day.label':'Your day, guarded by the Companion', 'app.day.free':'free', 'app.day.work':'work',
+  'app.day.prep':'Prepare my meeting', 'app.day.night':'Plan my night',
+  'app.day.prep.q':'Prepare my next meeting', 'app.day.night.q':'Plan my night out',
   'chat.concierge.title':'Your concierge.', 'chat.butler.deck':'The Butler, here and on WhatsApp. One conversation, wherever you write.',
   'chat.concierge.deck':'Your personal concierge, here and on WhatsApp. One conversation, wherever you write.',
   'chat.concierge.hi':'Good day. Write to us here or on WhatsApp; your concierge will help you personally.',

@@ -63,6 +63,19 @@
   .empty{padding:2.5rem 1.25rem;text-align:center;color:var(--soft);font-size:0.85rem;}
   .flash{animation:flash 1.6s ease;}
   @keyframes flash{0%{background:rgba(194,58,94,0.18);}100%{background:transparent;}}
+  .vrow{display:flex;align-items:center;gap:0.9rem;padding:0.9rem 1.25rem;border-bottom:1px solid var(--line);}
+  .vrow:last-child{border-bottom:none;}
+  .vrow .vi{flex:1;min-width:0;}
+  .vrow .vi .nm{font-weight:600;font-size:0.9rem;}
+  .vrow .vi .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;overflow:hidden;text-overflow:ellipsis;}
+  .vbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:600;cursor:pointer;}
+  .vbtn.doc{color:var(--muted);}
+  .vbtn.ok{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .vbtn.no{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .vbtn:hover{background:rgba(255,255,255,0.05);}
+  .doc-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out;}
+  .doc-scrim.open{display:flex;}
+  .doc-scrim img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
 </style>
 </head>
 <body>
@@ -98,7 +111,12 @@
         <div class="rows" id="orders"></div>
       </div>
     </div>
+    <div class="panel" style="margin-top:1.5rem;">
+      <h2 data-i18n="panel.verify">Identiteitsverificaties</h2>
+      <div class="rows" id="verify"></div>
+    </div>
   </div>
+  <div class="doc-scrim" id="docScrim"><img id="docImg" alt="Document"></div>
 </div>
 
 <script>
@@ -133,10 +151,37 @@
     $('#app').classList.add('on');
     $('#liveInd').style.display = 'inline-flex';
     render();
+    loadVerify();
     stream();
   }
 
   async function refresh(){ try { state = (await call('/office/state')).state; render(); } catch(e){} }
+
+  async function loadVerify(){
+    let pend = [];
+    try { pend = (await call('/office/verifications')).pending || []; } catch(e){ return; }
+    $('#verify').innerHTML = pend.length ? pend.map(v =>
+      '<div class="vrow" data-id="'+v.id+'">' +
+        '<div class="vi"><div class="nm">'+v.name+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+v.codename+'</span></div>' +
+          '<div class="sub">'+(v.email||'')+' · '+v.tier+'</div></div>' +
+        '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
+        '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
+        '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
+      '</div>').join('') : '<div class="empty">'+T('bo.noverify','Geen openstaande verificaties.')+'</div>';
+    $('#verify').querySelectorAll('.vrow').forEach(row => {
+      const id = Number(row.dataset.id);
+      row.querySelector('[data-doc]').addEventListener('click', e => {
+        $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(token)+'&file='+encodeURIComponent(e.target.dataset.doc);
+        $('#docScrim').classList.add('open');
+      });
+      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve'));
+      row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject'));
+    });
+  }
+  async function decide(userId, decision){
+    try { await call('/office/verify', { userId, decision }); } catch(e){ alert(e.message); return; }
+    loadVerify();
+  }
 
   function render(){
     const paid = state.orders.filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
@@ -161,11 +206,13 @@
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(token)); } catch(e){ return; }
-    source.addEventListener('sync', () => refresh());
+    source.addEventListener('sync', () => { refresh(); loadVerify(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
   }
 
-  window.addEventListener('rtglang', () => { if (state) render(); });
+  $('#docScrim').addEventListener('click', () => { $('#docScrim').classList.remove('open'); $('#docImg').src = ''; });
+
+  window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
 })();
 </script>
 <script>
@@ -173,7 +220,8 @@ window.I18N = { en: {
   'gate.h':'Sign in',
   'gate.p':'Live overview of all dynamic prices, orders and rides via RTG partners.',
   'gate.ph':'Back-office code', 'gate.btn':'Sign in', 'gate.hint':'Demo code: RTG-OFFICE',
-  'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides',
+  'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides', 'panel.verify':'Identity verifications',
+  'bo.viewdoc':'Document', 'bo.approve':'Approve', 'bo.reject':'Reject', 'bo.noverify':'No pending verifications.',
   'bo.partners':'Partners', 'bo.proposals':'Price proposals', 'bo.orders':'Orders', 'bo.revenue':'Revenue via partners',
   'bo.noprices':'No prices yet. As soon as a partner submits a dynamic price, it appears here live.',
   'bo.noorders':'No orders or rides via partners yet.',

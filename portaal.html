@@ -281,6 +281,12 @@
   .login-box .lb-hint b{color:var(--grey);}
   .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--burgundy);font-size:0.82rem;cursor:pointer;font-family:inherit;text-align:left;}
   .gate-switch:hover{text-decoration:underline;}
+  .vbanner{background:var(--white);border:1px solid var(--gold-bright);border-radius:16px;padding:1.4rem 1.6rem;margin-bottom:2rem;max-width:640px;}
+  .vbanner.pending{border-color:var(--line);}
+  .vbanner b{font-size:1.05rem;font-family:'Bodoni Moda',serif;font-weight:500;display:block;}
+  .vbanner span{display:block;margin-top:0.5rem;font-size:0.88rem;color:var(--grey);line-height:1.55;}
+  .vbanner .vbtn{margin-top:1rem;background:var(--burgundy);color:var(--white);border:none;border-radius:999px;padding:0.7rem 1.4rem;font-size:0.82rem;letter-spacing:0.03em;font-weight:600;cursor:pointer;font-family:inherit;}
+  .vbanner .vbtn:hover{background:var(--black);}
 
   /* ---------- portal shell ---------- */
 
@@ -1073,6 +1079,8 @@
       <div class="folio" data-i18n="p.f.overview">Portaal, Overzicht</div>
       <h2 id="ovGreeting">Welkom terug.</h2>
       <p class="deck" data-i18n="p.d.overview">Alles wat loopt, in één oogopslag: uw eerstvolgende reis, openstaande betalingen en uw creator-krediet uit De Salon.</p>
+      <div id="verifyBanner"></div>
+      <input type="file" id="verifyFile" accept="image/*" style="display:none;">
       <div class="ov-grid" id="ovGrid"></div>
     </div>
   </section>
@@ -1556,7 +1564,38 @@
 
   /* ---------- overview ---------- */
 
+  function renderVerifyBanner(){
+    const el = $('#verifyBanner');
+    if (!el) return;
+    const v = user && user.account ? user.verified : null;
+    if (!user || !user.account || v === 'verified'){ el.innerHTML = ''; return; }
+    if (v === 'pending'){
+      el.innerHTML = '<div class="vbanner pending"><b>'+T('vf.pending.h','Verificatie in behandeling')+'</b><span>'+T('vf.pending.b','We controleren uw document. U kunt het portaal gewoon blijven gebruiken.')+'</span></div>';
+      return;
+    }
+    el.innerHTML = '<div class="vbanner"><b>'+T('vf.h','Verifieer uw identiteit, boek in één tik')+'</b>' +
+      '<span>'+T('vf.b','Eén foto van uw identiteitsbewijs. Zo weten we zeker dat u het bent, houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw document is alleen zichtbaar voor RTG.')+'</span>' +
+      '<button class="vbtn" id="verifyStart">'+T('vf.btn','Document uploaden')+'</button></div>';
+    $('#verifyStart').addEventListener('click', () => $('#verifyFile').click());
+  }
+  (function initVerifyUpload(){
+    const vf = document.getElementById('verifyFile');
+    if (!vf) return;
+    vf.addEventListener('change', () => {
+      const file = vf.files[0]; if (!file) return;
+      if (file.size > 5 * 1024 * 1024){ toast(T('vf.toobig','Bestand te groot (max 5 MB).')); vf.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try { await API.call('/verify/upload', { image: reader.result }); user.verified = 'pending'; renderVerifyBanner(); toast(T('vf.sent','Document ontvangen, we controleren het.')); }
+        catch (e){ toast(e.message || 'Upload mislukt.'); }
+      };
+      reader.readAsDataURL(file);
+      vf.value = '';
+    });
+  })();
+
   function renderOverview(){
+    renderVerifyBanner();
     const grid = $('#ovGrid');
     if (user.tier === 'guest'){
       $('#ovGreeting').textContent = T('p.welcomeguest','Welkom, gast.');
@@ -2083,6 +2122,9 @@ window.I18N = { en: {
   'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in',
   'gate.name':'Your name', 'gate.email':'Email address', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
+  'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
+  'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',
+  'vf.pending.h':'Verification in progress', 'vf.pending.b':'We are reviewing your document. You can keep using the portal as normal.',
   'gate.hint':'Demo account: username <b>Rahul</b>, password <b>Imran</b>.',
   'gate.guest.chip':'No membership', 'gate.guest.h':'Guest',
   'gate.guest.p':'Look inside The Salon. Guests can like posts, but not comment or send messages, and see what membership unlocks.',

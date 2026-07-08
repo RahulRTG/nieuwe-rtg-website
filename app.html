@@ -121,6 +121,12 @@
   .gate-or{margin:1.9rem 0 0.35rem;font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);text-align:center;}
   .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--gold);font-size:0.76rem;cursor:pointer;font-family:inherit;text-align:center;}
   .gate-switch:hover{text-decoration:underline;}
+  .vbanner{background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1.25rem;display:flex;flex-direction:column;gap:0.4rem;}
+  .vbanner.pending{border-color:var(--line);}
+  .vbanner b{font-size:0.95rem;}
+  .vbanner span{font-size:0.8rem;color:var(--muted);line-height:1.5;}
+  .vbanner .vbtn{align-self:flex-start;margin-top:0.55rem;background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.6rem 1.15rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .vbanner .vbtn:active{opacity:0.85;}
 
   /* ---------- app-chroom ---------- */
 
@@ -626,6 +632,8 @@
       <div class="view" data-view="home">
         <h2 id="homeGreeting">Welkom.</h2>
         <p class="sub" id="homeSub"></p>
+        <div id="verifyBanner"></div>
+        <input type="file" id="verifyFile" accept="image/*" style="display:none;">
         <div class="codecard" id="codecard"></div>
         <div class="card" id="homeTrip"></div>
         <div class="card" id="homePay"></div>
@@ -1145,7 +1153,38 @@
     why.classList.toggle('open', forceOpen === true ? true : !why.classList.contains('open'));
   }
 
+  function renderVerifyBanner(){
+    const el = $('#verifyBanner');
+    if (!el) return;
+    const v = user && user.account ? user.verified : null;
+    if (!user || !user.account || v === 'verified'){ el.innerHTML = ''; return; }
+    if (v === 'pending'){
+      el.innerHTML = '<div class="vbanner pending"><b>'+T('vf.pending.h','Verificatie in behandeling')+'</b><span>'+T('vf.pending.b','We controleren uw document. U kunt de app gewoon blijven gebruiken.')+'</span></div>';
+      return;
+    }
+    el.innerHTML = '<div class="vbanner"><b>'+T('vf.h','Verifieer uw identiteit, boek in één tik')+'</b>' +
+      '<span>'+T('vf.b','Eén foto van uw identiteitsbewijs. Zo weten we zeker dat u het bent, houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw document is alleen zichtbaar voor RTG.')+'</span>' +
+      '<button class="vbtn" id="verifyStart">'+T('vf.btn','Document uploaden')+'</button></div>';
+    $('#verifyStart').addEventListener('click', () => $('#verifyFile').click());
+  }
+  (function initVerifyUpload(){
+    const vf = document.getElementById('verifyFile');
+    if (!vf) return;
+    vf.addEventListener('change', () => {
+      const file = vf.files[0]; if (!file) return;
+      if (file.size > 5 * 1024 * 1024){ toast(T('vf.toobig','Bestand te groot (max 5 MB).')); vf.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try { await API.call('/verify/upload', { image: reader.result }); user.verified = 'pending'; renderVerifyBanner(); toast(T('vf.sent','Document ontvangen, we controleren het.')); }
+        catch (e){ toast(e.message || 'Upload mislukt.'); }
+      };
+      reader.readAsDataURL(file);
+      vf.value = '';
+    });
+  })();
+
   function renderHome(){
+    renderVerifyBanner();
     const first = user.full.split(' ')[0];
     $('#homeGreeting').textContent = T('app.welcome','Welkom,') + ' ' + first + '.';
     $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
@@ -1454,6 +1493,9 @@ window.I18N = { en: {
   'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
   'gate.name':'Your name', 'gate.email':'Email address', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
+  'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
+  'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',
+  'vf.pending.h':'Verification in progress', 'vf.pending.b':'We are reviewing your document. You can keep using the app as normal.',
   'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
   'msg.from':'translated from', 'msg.orig':'show original', 'msg.showtrans':'show translation',

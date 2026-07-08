@@ -119,6 +119,8 @@
   .login-form button{background:#fff;color:#000;border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
   .login-form button:active{opacity:0.85;}
   .gate-or{margin:1.9rem 0 0.35rem;font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);text-align:center;}
+  .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--gold);font-size:0.76rem;cursor:pointer;font-family:inherit;text-align:center;}
+  .gate-switch:hover{text-decoration:underline;}
 
   /* ---------- app-chroom ---------- */
 
@@ -576,10 +578,18 @@
     <h1 data-i18n-html="gate.title">De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
     <p class="deck" data-i18n="gate.deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, en uw account draait op uw codenaam, niet op uw echte naam.</p>
     <form class="login-form" id="loginForm">
-      <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+      <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
       <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
       <button type="submit" data-i18n="gate.signin">Inloggen</button>
     </form>
+    <form class="login-form" id="regForm" style="display:none;">
+      <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
+      <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
+      <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
+      <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
+    </form>
+    <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Nog geen account? Registreer</button>
+    <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
     <p class="gate-or" data-i18n="gate.or">of kies een demoprofiel</p>
     <div class="gate-list">
       <button class="gate-btn t-rtg" data-login="rtg"><span class="dot"></span><span><b>S. Janssen</b><span>RTG Pass · codenaam Zilveren Valk</span></span></button>
@@ -850,23 +860,38 @@
     e.preventDefault();
     login(null, { u: $('#liUser').value, p: $('#liPass').value });
   });
+  const regForm = document.getElementById('regForm');
+  if (regForm) regForm.addEventListener('submit', e => {
+    e.preventDefault();
+    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, p: $('#rgPass').value });
+  });
+  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin');
+  if (toReg) toReg.addEventListener('click', () => {
+    $('#loginForm').style.display = 'none'; $('#regForm').style.display = 'flex';
+    toReg.style.display = 'none'; toLogin.style.display = '';
+  });
+  if (toLogin) toLogin.addEventListener('click', () => {
+    $('#regForm').style.display = 'none'; $('#loginForm').style.display = 'flex';
+    toLogin.style.display = 'none'; toReg.style.display = '';
+  });
 
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
         try {
-          const data = await API.call('/login', { username: cred.u, password: cred.p });
+          const data = cred.register
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, password: cred.p })
+            : await API.call('/auth/login', { login: cred.u, password: cred.p });
           API.token = data.token;
-          applyState(data.state);
-          tier = (data.state && data.state.user && data.state.user.tier) || 'business';
-        } catch (e) { toast('Onjuiste gebruikersnaam of wachtwoord.'); return; }
+          applyState(data.state);           // user = het echte account
+          tier = user.tier;
+        } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
-          toast('Onjuiste gebruikersnaam of wachtwoord.'); return;
+          toast('Onjuiste inloggegevens.'); return;
         }
-        tier = 'business';
+        tier = 'business'; user = {...PERSONAS[tier]};
       }
-      user = {...PERSONAS[tier]};
     } else {
       user = {...PERSONAS[tier]};
       if (API.enabled){
@@ -1426,7 +1451,9 @@
 window.I18N = { en: {
   'gate.title':'The app.<br>Your membership, <em>always</em> with you.',
   'gate.deck':'Bookings, one-tap payment, your personal AI and The Salon, and your account runs on your codename, not your real name.',
-  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
+  'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
+  'gate.name':'Your name', 'gate.email':'Email address', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
+  'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
   'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
   'msg.from':'translated from', 'msg.orig':'show original', 'msg.showtrans':'show translation',

@@ -279,6 +279,8 @@
   .login-box button:hover{background:var(--burgundy);}
   .login-box .lb-hint{margin-top:1rem;font-size:0.76rem;color:var(--grey-soft);}
   .login-box .lb-hint b{color:var(--grey);}
+  .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--burgundy);font-size:0.82rem;cursor:pointer;font-family:inherit;text-align:left;}
+  .gate-switch:hover{text-decoration:underline;}
 
   /* ---------- portal shell ---------- */
 
@@ -1014,12 +1016,20 @@
     </div>
     <div class="login-box">
       <span class="lb-k" data-i18n="gate.lb.k">Ledenlogin</span>
-      <h3 data-i18n="gate.lb.h">Inloggen</h3>
+      <h3 id="lbTitle" data-i18n="gate.lb.h">Inloggen</h3>
       <form id="loginForm">
-        <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+        <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
         <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
         <button type="submit" data-i18n="gate.signin">Inloggen</button>
       </form>
+      <form id="regForm" style="display:none;">
+        <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
+        <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
+        <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
+        <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
+      </form>
+      <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Nog geen account? Registreer</button>
+      <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
       <p class="lb-hint" data-i18n-html="gate.hint">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>.</p>
     </div>
     <div class="gate-grid">
@@ -1358,23 +1368,40 @@
     e.preventDefault();
     login(null, { u: $('#liUser').value, p: $('#liPass').value });
   });
+  const regForm = document.getElementById('regForm');
+  if (regForm) regForm.addEventListener('submit', e => {
+    e.preventDefault();
+    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, p: $('#rgPass').value });
+  });
+  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin');
+  if (toReg) toReg.addEventListener('click', () => {
+    $('#loginForm').style.display = 'none'; $('#regForm').style.display = 'flex';
+    toReg.style.display = 'none'; toLogin.style.display = '';
+    $('#lbTitle').textContent = T('gate.lb.hreg', 'Account aanmaken');
+  });
+  if (toLogin) toLogin.addEventListener('click', () => {
+    $('#regForm').style.display = 'none'; $('#loginForm').style.display = 'flex';
+    toLogin.style.display = 'none'; toReg.style.display = '';
+    $('#lbTitle').textContent = T('gate.lb.h', 'Inloggen');
+  });
 
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
         try {
-          const data = await API.call('/login', { username: cred.u, password: cred.p });
+          const data = cred.register
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, password: cred.p })
+            : await API.call('/auth/login', { login: cred.u, password: cred.p });
           API.token = data.token;
-          applyState(data.state);
-          tier = (data.state && data.state.user && data.state.user.tier) || 'business';
-        } catch (e) { toast('Onjuiste gebruikersnaam of wachtwoord.'); return; }
+          applyState(data.state);           // user = het echte account
+          tier = user.tier;
+        } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
-          toast('Onjuiste gebruikersnaam of wachtwoord.'); return;
+          toast('Onjuiste inloggegevens.'); return;
         }
-        tier = 'business';
+        tier = 'business'; user = {tier, ...PERSONAS[tier]};
       }
-      user = {tier, ...PERSONAS[tier]};
     } else {
       user = {tier, ...PERSONAS[tier]};
       if (API.enabled){
@@ -2052,8 +2079,10 @@ window.I18N = { en: {
   'gate.kicker':'Member portal', 'gate.title':'Your key to everything RTG arranges.',
   'gate.deck':'Payments, journeys, your personal AI and The Salon, the private social network of RTG. This portal is also your access card for the RTG app that is on its way.',
   'gate.note':'Sign in with your account, or choose a demo profile below. Each membership has different rights.',
-  'gate.lb.k':'Member login', 'gate.lb.h':'Sign in',
-  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in',
+  'gate.lb.k':'Member login', 'gate.lb.h':'Sign in', 'gate.lb.hreg':'Create account',
+  'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in',
+  'gate.name':'Your name', 'gate.email':'Email address', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
+  'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
   'gate.hint':'Demo account: username <b>Rahul</b>, password <b>Imran</b>.',
   'gate.guest.chip':'No membership', 'gate.guest.h':'Guest',
   'gate.guest.p':'Look inside The Salon. Guests can like posts, but not comment or send messages, and see what membership unlocks.',

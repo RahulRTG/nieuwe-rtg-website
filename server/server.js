@@ -3,13 +3,31 @@
    Zet ANTHROPIC_API_KEY in de omgeving om de persoonlijke AI op de echte
    Claude API te laten draaien; zonder key vallen we terug op demo-antwoorden. */
 
+/* De accountsdatabase gebruikt de ingebouwde SQLite van Node, die nog achter
+   een vlag zit. Wordt de server zonder die vlag gestart, dan herstarten we
+   onszelf ermee, zodat zowel `npm start` als `node server/server.js` werkt. */
+if (!process.execArgv.some(a => a.includes('experimental-sqlite'))) {
+  const r = require('child_process').spawnSync(
+    process.execPath,
+    ['--experimental-sqlite', __filename, ...process.argv.slice(2)],
+    { stdio: 'inherit' }
+  );
+  process.exit(r.status == null ? 1 : r.status);
+}
+
 const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
 const { db, load, save } = require('./db');
 const i18n = require('./translate');
+const accounts = require('./accounts');
 
 load();
+accounts.init();
+// Demo-account zodat Rahul/Imran ook via de echte accountlogin werkt.
+if (accounts.count() === 0) {
+  accounts.createUser({ username: 'Rahul', email: 'rahul@rtg.example', password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran' });
+}
 
 const app = express();
 app.use(express.json({ limit: '64kb' }));
@@ -129,10 +147,21 @@ function sendPush(tier, note) {
   }
 }
 
+/* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
+   (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
+function resolveSession(token) {
+  if (!token) return null;
+  const demo = sessions.get(token);
+  if (demo) return demo;
+  const user = accounts.verifyToken(token);
+  if (user) return { tier: user.tier, key: 'user-' + user.id, account: user };
+  return null;
+}
+
 function auth(req, res, next) {
   const header = req.get('authorization') || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-  const sess = token && sessions.get(token);
+  const sess = resolveSession(token);
   if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
   req.session = sess;
   next();
@@ -178,7 +207,9 @@ function registerContact(sess, post) {
 
 function stateFor(sess, lang) {
   lang = lang === 'en' ? 'en' : 'nl';
-  const persona = PERSONAS[sess.tier];
+  // Echte accounts tonen hun eigen identiteit (naam, codenaam); demo-sessies
+  // vallen terug op de vaste persona's.
+  const persona = sess.account ? accounts.publicUser(sess.account) : PERSONAS[sess.tier];
   // Systeeminhoud (facturen, reis, menu) wordt gelokaliseerd. Berichten van
   // leden (posts, reacties) houden hun originele tekst + de taal van de auteur,
   // zodat de ontvanger ze in zijn eigen taal vertaald kan lezen.
@@ -231,12 +262,48 @@ app.post('/api/logout', auth, (req, res) => {
   res.json({ ok: true });
 });
 
+/* ---------- echte accounts (registreren / inloggen) ---------- */
+
+app.post('/api/auth/register', (req, res) => {
+  const name = String(req.body.name || '').trim().slice(0, 80);
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const password = String(req.body.password || '');
+  if (!name) return res.status(400).json({ error: 'Vul uw naam in.' });
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
+  if (password.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
+  if (accounts.findByLogin(email)) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
+  let user;
+  try {
+    user = accounts.createUser({ email, username: req.body.username || null, password, tier: req.body.tier, realName: name });
+  } catch (e) {
+    return res.status(409).json({ error: 'Dit account bestaat al.' });
+  }
+  const token = accounts.issueToken(user.id);
+  const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+  res.json({ token, state: stateFor(sess, req.body.lang) });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const login = req.body.login || req.body.email || req.body.username;
+  const user = accounts.findByLogin(login);
+  if (!user || !accounts.verifyPassword(req.body.password, user.password_hash)) {
+    return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
+  }
+  const token = accounts.issueToken(user.id);
+  const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+  res.json({ token, state: stateFor(sess, req.body.lang) });
+});
+
+app.post('/api/auth/me', auth, (req, res) => {
+  res.json({ user: req.session.account ? accounts.publicUser(req.session.account) : stateFor(req.session, req.body.lang).user });
+});
+
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
 
 /* Live-verbinding. EventSource kan geen Authorization-header sturen, dus het
    token gaat als query-parameter. */
 app.get('/api/stream', (req, res) => {
-  const sess = sessions.get(req.query.token);
+  const sess = resolveSession(req.query.token);
   if (!sess) return res.status(401).end();
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',

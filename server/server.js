@@ -763,7 +763,7 @@ function supplierInsights(s) {
   const fresh = open.filter(o => o.status === 'nieuw');
   if (fresh.length) {
     const oldestMin = Math.max(1, Math.round((Date.now() - Math.min(...fresh.map(o => +new Date(o.at)))) / 60000));
-    out.push({ type: 'neworders', n: fresh.length, min: oldestMin, tab: 'orders', icon: '🔔', urgent: oldestMin >= 10 });
+    out.push({ type: 'neworders', kind: caps.includes('bookings') ? 'bookings' : 'orders', n: fresh.length, min: oldestMin, tab: 'orders', icon: '🔔', urgent: oldestMin >= 10 });
   }
   const allergy = open.filter(o => o.allergyNote);
   if (allergy.length) out.push({ type: 'allergy', n: allergy.length, who: allergy[0].customerCodename, note: allergy[0].allergyNote, tab: 'orders', icon: '⚠️', urgent: true });
@@ -1102,6 +1102,17 @@ function supplierAiContext(s) {
   };
 }
 
+/* Vakkennis per bedrijfstak: de copiloot denkt mee in de taal van het vak. */
+const BRANCH_HINTS = {
+  restaurant: 'Denk mee als een ervaren keuken- en zaalmanager: mise-en-place, allergieën eerst, timing afstemmen op gasten die eraan komen (ETA), en een menukaart die verleidt. Denk in services en couverts.',
+  bar: 'Denk mee als een barmanager: voorraad en mise-en-place voor de avond, allergieën bij cocktails en snacks, piekmomenten voorzien wanneer gasten onderweg zijn.',
+  club: 'Denk mee als een clubmanager: gastenlijst en aankomsttijden, tafels en bottle service voorbereiden, de avondplanning strak houden.',
+  hotel: 'Denk mee als een hotel-operations manager: aankomsten en boekingen vandaag eerst, kamers op tijd gereed, voorkeuren van gasten doorgeven, en een scherpe dynamische prijs per seizoen.',
+  apartment: 'Denk mee als een verhuurmanager: check-ins voorbereiden, sleuteloverdracht en schoonmaak-timing, en een scherpe dynamische prijs per periode.',
+  taxi: 'Denk mee als een fleet-dispatcher: nieuwe ritaanvragen direct oppakken, aanrijtijden bewaken, slim positioneren bij gasten die onderweg zijn.',
+  jet: 'Denk mee als een flight-ops coördinator: aanvragen snel bevestigen, slots en vliegtijden bewaken, catering en voorkeuren van de gast voorbereiden.'
+};
+
 function supplierAiSystem(s, actor, lang) {
   const c = supplierAiContext(s);
   const orderLines = c.open.slice(0, 8).map(o =>
@@ -1112,6 +1123,7 @@ function supplierAiSystem(s, actor, lang) {
   const guestLines = c.guests.map(g => `- ${g.codename}: ${g.arrived ? 'gearriveerd' : (g.etaMin != null ? '~' + g.etaMin + ' min onderweg' : 'onderweg')}`).join('\n');
   return [
     `Je bent de AI-copiloot van "${s.name}" (${c.typeLabel}, ${s.city}) in de RTG Partners-app van Rahul Travel Group.`,
+    BRANCH_HINTS[s.type] || '',
     `Je praat met ${actor.name} (${actor.manager ? 'manager' : 'medewerker'}). Wees een efficiënte, zakelijke rechterhand: kort, concreet, vooruitdenkend. Sluit af met één concreet voorstel waar de gebruiker met "ja" op kan reageren, als dat past.`,
     `Het bedrijf levert RTG zijn beste dynamische prijs (marge-afspraak: ${Math.round((s.rate || 0) * 100)}%); RTG brengt de gasten. Gasten heten uitsluitend bij hun codenaam (privacy by design), gebruik nooit echte namen.`,
     `Live situatie van nu:`,
@@ -1152,6 +1164,14 @@ function cannedSupplierAnswer(q, s, lang) {
       ? `Your margin agreement with RTG is ${Math.round((s.rate || 0) * 100)}%. ${last ? `Last submitted: ${last.service} at € ${last.price}.` : 'You have not submitted a price yet.'} A fresh dynamic price keeps you at the top of RTG's proposals — submit one in the Price tab.`
       : `Uw marge-afspraak met RTG is ${Math.round((s.rate || 0) * 100)}%. ${last ? `Laatst doorgegeven: ${last.service} voor € ${last.price}.` : 'U heeft nog geen prijs doorgegeven.'} Een verse dynamische prijs houdt u bovenaan in de RTG-voorstellen — geef er een door in de Prijs-tab.`;
   }
+  if (l.includes('rit') || l.includes('ride'))
+    return c.rides.length
+      ? (en ? `${c.rides.length} active ride(s): ${c.rides.map(r => `${r.ref} (${r.status})`).join(', ')}. Accept or update them in the Rides tab — the guest follows you live.` : `${c.rides.length} actieve rit(ten): ${c.rides.map(r => `${r.ref} (${r.status})`).join(', ')}. Accepteer of werk bij in de Ritten-tab; de gast volgt u live.`)
+      : (en ? 'No open ride requests right now. New requests appear live, with pickup location and ETA.' : 'Geen open ritaanvragen op dit moment. Nieuwe aanvragen verschijnen hier live, met ophaallocatie en aanrijtijd.');
+  if (l.includes('boeking') || l.includes('aankomst') || l.includes('booking') || l.includes('arrival') || l.includes('check'))
+    return (c.open.length || c.guests.length)
+      ? (en ? `${c.open.length} open booking(s)${c.guests.length ? ` and ${c.guests.length} guest(s) on their way (${c.guests.map(g => g.codename + (g.etaMin != null ? ` ~${g.etaMin} min` : '')).join(', ')})` : ''}. Have everything ready before they arrive.` : `${c.open.length} open boeking(en)${c.guests.length ? ` en ${c.guests.length} gast(en) onderweg (${c.guests.map(g => g.codename + (g.etaMin != null ? ` ~${g.etaMin} min` : '')).join(', ')})` : ''}. Zorg dat alles klaarstaat vóór aankomst.`)
+      : (en ? 'No open bookings or arrivals right now. New RTG bookings appear here live.' : 'Geen open boekingen of aankomsten op dit moment. Nieuwe RTG-boekingen verschijnen hier live.');
   if (l.includes('gast') || l.includes('guest') || l.includes('onderweg'))
     return c.guests.length
       ? (en ? `${c.guests.length} guest(s) heading your way: ${c.guests.map(g => g.codename + (g.arrived ? ' (arrived)' : g.etaMin != null ? ` (~${g.etaMin} min)` : '')).join(', ')}. Make sure everything is ready.` : `${c.guests.length} gast(en) onderweg: ${c.guests.map(g => g.codename + (g.arrived ? ' (gearriveerd)' : g.etaMin != null ? ` (~${g.etaMin} min)` : '')).join(', ')}. Zorg dat alles klaarstaat.`)
@@ -1164,6 +1184,15 @@ function cannedSupplierAnswer(q, s, lang) {
     return en
       ? `Your team has ${c.staffCount} personal account(s). In the Team tab a manager can create an invite link and choose exactly which functions the new colleague gets.`
       : `Uw team telt ${c.staffCount} persoonlijke account(s). In de Team-tab maakt een manager een uitnodigingslink en bepaalt precies welke functies de nieuwe collega krijgt.`;
+  // Slotantwoord in het register van de bedrijfstak.
+  if (c.caps.includes('rides'))
+    return en
+      ? `Right now: ${c.rides.length} active ride(s), € ${c.revenue} received${c.guests.length ? `, ${c.guests.length} guest(s) waiting` : ''}. Ask me about rides, revenue, prices or the team.`
+      : `Stand van nu: ${c.rides.length} actieve rit(ten), € ${c.revenue} ontvangen${c.guests.length ? `, ${c.guests.length} gast(en) wachtend` : ''}. Vraag me naar ritten, omzet, prijzen of het team.`;
+  if (c.caps.includes('bookings'))
+    return en
+      ? `Right now: ${c.open.length} open booking(s), € ${c.revenue} received${c.guests.length ? `, ${c.guests.length} guest(s) on the way` : ''}. Ask me about bookings, arrivals, revenue, prices or the team.`
+      : `Stand van nu: ${c.open.length} open boeking(en), € ${c.revenue} ontvangen${c.guests.length ? `, ${c.guests.length} gast(en) onderweg` : ''}. Vraag me naar boekingen, aankomsten, omzet, prijzen of het team.`;
   return en
     ? `Right now: ${c.open.length} open order(s), € ${c.revenue} received${c.guests.length ? `, ${c.guests.length} guest(s) on the way` : ''}. Ask me about revenue, orders, allergies, prices, your menu or the team.`
     : `Stand van nu: ${c.open.length} open order(s), € ${c.revenue} ontvangen${c.guests.length ? `, ${c.guests.length} gast(en) onderweg` : ''}. Vraag me naar omzet, orders, allergieën, prijzen, het menu of het team.`;

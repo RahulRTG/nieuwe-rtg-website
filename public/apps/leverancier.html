@@ -222,6 +222,11 @@
   .notif-item .tx span{font-size:0.78rem;color:var(--muted);}
   .notif-item .tx time{display:block;margin-top:0.2rem;font-size:0.66rem;color:var(--soft);}
 
+  /* branchekeuze op het inlogscherm */
+  .branch-row{display:flex;gap:0.45rem;margin-top:1.6rem;flex-wrap:wrap;}
+  .branch-chip{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:0.5rem 0.95rem;font-size:0.74rem;display:inline-flex;align-items:center;gap:0.4rem;}
+  .branch-chip.on{color:var(--txt);border-color:rgba(194,58,94,0.55);background:rgba(194,58,94,0.08);}
+
   /* dagbriefing op het overzicht */
   .brief-item{display:flex;align-items:flex-start;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--line);font-size:0.83rem;line-height:1.45;color:var(--muted);cursor:pointer;}
   .brief-item:last-child{border-bottom:none;}
@@ -265,9 +270,10 @@
 <div id="shell">
 
   <div id="gate">
-    <div class="badge">RTG Partners</div>
-    <h1 data-i18n-html="gate.title">De leverancier-<em>app</em>.</h1>
-    <p class="deck" data-i18n="gate.deck">Eén app voor hotels, taxi's, privéjets, appartementen, restaurants, bars en clubs. Ontvang RTG-gasten, deel uw menu, beheer bestellingen en ritten, live verbonden met de gast en de RTG-backoffice.</p>
+    <div class="badge" id="gateBadge">RTG Partners</div>
+    <h1 id="gateTitle" data-i18n-html="gate.title">De leverancier-<em>app</em>.</h1>
+    <p class="deck" id="gateDeck" data-i18n="gate.deck">Eén app voor hotels, taxi's, privéjets, appartementen, restaurants, bars en clubs. Ontvang RTG-gasten, deel uw menu, beheer bestellingen en ritten, live verbonden met de gast en de RTG-backoffice.</p>
+    <div class="branch-row" id="branchRow"></div>
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
       <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
@@ -386,12 +392,47 @@
   const tAlg = a => (lang() === 'en' ? (ALG[a] || a) : a);
 
   const DEMO = [
-    { code:'KIKUNOI', name:'Kikunoi Honten', type:'Restaurant', icon:'🍽️', sub:'Restaurant · Kyoto' },
-    { code:'PONTO',   name:'Bar Pontocho',    type:'Bar',        icon:'🍸', sub:'Bar · Kyoto' },
-    { code:'HOSHI',   name:'Hoshinoya Kyoto', type:'Hotel',      icon:'🏨', sub:'Hotel · Kyoto' },
-    { code:'MKKX',    name:'Kyoto Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Kyoto' },
-    { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' }
+    { code:'KIKUNOI', name:'Kikunoi Honten', type:'Restaurant', icon:'🍽️', sub:'Restaurant · Kyoto', b:'horeca' },
+    { code:'PONTO',   name:'Bar Pontocho',    type:'Bar',        icon:'🍸', sub:'Bar · Kyoto', b:'horeca' },
+    { code:'HOSHI',   name:'Hoshinoya Kyoto', type:'Hotel',      icon:'🏨', sub:'Hotel · Kyoto', b:'verblijf' },
+    { code:'MKKX',    name:'Kyoto Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Kyoto', b:'vervoer' },
+    { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam', b:'vervoer' }
   ];
+
+  /* Drie branche-apps op één gedeeld fundament: elke bedrijfstak krijgt een
+     eigen ingang (?b=horeca|verblijf|vervoer), eigen taal en een copiloot
+     die met dát vak meedenkt. */
+  const BRANCHES = {
+    horeca: {
+      icon:'🍽️', types:['restaurant','bar','club'],
+      label:['branch.horeca','Horeca'],
+      title:['gate.b.horeca.title','De horeca-<em>app</em>.'],
+      deck:['gate.b.horeca.deck','Voor restaurants, bars en clubs. Ontvang RTG-gasten, beheer bestellingen live, houd allergieën als eerste in het vizier en laat de copiloot meedenken met keuken en zaal.'],
+      hello:['ai.hello3.horeca','Ik denk mee met keuken en zaal: bestellingen, allergieën, gasten die eraan komen en de kaart. Waarmee kan ik helpen?']
+    },
+    verblijf: {
+      icon:'🏨', types:['hotel','apartment'],
+      label:['branch.verblijf','Verblijf'],
+      title:['gate.b.verblijf.title','De verblijf-<em>app</em>.'],
+      deck:['gate.b.verblijf.deck','Voor hotels en appartementen. Zie boekingen en aankomsten vroeg, zet alles op tijd klaar en geef RTG uw beste prijs — met een copiloot die meedenkt als operations manager.'],
+      hello:['ai.hello3.verblijf','Ik denk mee als operations manager: boekingen, aankomsten en uw dynamische prijs. Waarmee kan ik helpen?']
+    },
+    vervoer: {
+      icon:'🚘', types:['taxi','jet'],
+      label:['branch.vervoer','Vervoer'],
+      title:['gate.b.vervoer.title','De vervoer-<em>app</em>.'],
+      deck:['gate.b.vervoer.deck','Voor taxi’s en privéjets. Accepteer aanvragen direct, bewaak aanrijtijden met live locatie en laat de copiloot meedenken als dispatcher.'],
+      hello:['ai.hello3.vervoer','Ik denk mee als dispatcher: ritaanvragen, aanrijtijden en uw dynamische prijs. Waarmee kan ik helpen?']
+    }
+  };
+  let branch = new URLSearchParams(location.search).get('b');
+  if (!BRANCHES[branch]) branch = null;
+  // Bij welke branche hoort het ingelogde bedrijf?
+  function branchOf(){
+    if (!S) return null;
+    for (const k in BRANCHES) if (BRANCHES[k].types.includes(S.type)) return k;
+    return null;
+  }
 
   const TABDEF = {
     home:     { label:'Overzicht', svg:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>' },
@@ -441,15 +482,43 @@
   function initials(name){ return String(name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 
   function renderGate(){
-    $('#gateList').innerHTML = DEMO.map(d =>
+    // Kop, intro en badge volgen de gekozen branche.
+    const B = branch ? BRANCHES[branch] : null;
+    const h1 = $('#gateTitle'), deck = $('#gateDeck');
+    if (B){
+      h1.removeAttribute('data-i18n-html'); deck.removeAttribute('data-i18n');
+      h1.innerHTML = T(B.title[0], B.title[1]);
+      deck.textContent = T(B.deck[0], B.deck[1]);
+      $('#gateBadge').textContent = 'RTG Partners · ' + T(B.label[0], B.label[1]);
+    } else {
+      h1.innerHTML = T('gate.title','De leverancier-<em>app</em>.');
+      deck.textContent = T('gate.deck','Eén app voor hotels, taxi’s, privéjets, appartementen, restaurants, bars en clubs. Ontvang RTG-gasten, deel uw menu, beheer bestellingen en ritten, live verbonden met de gast en de RTG-backoffice.');
+      $('#gateBadge').textContent = 'RTG Partners';
+    }
+    // Branchekeuze: elke bedrijfstak zijn eigen app, op hetzelfde fundament.
+    $('#branchRow').innerHTML =
+      '<button class="branch-chip'+(!branch?' on':'')+'" data-branch="">'+T('branch.all','Alle branches')+'</button>' +
+      Object.keys(BRANCHES).map(k =>
+        '<button class="branch-chip'+(branch===k?' on':'')+'" data-branch="'+k+'">'+BRANCHES[k].icon+' '+T(BRANCHES[k].label[0], BRANCHES[k].label[1])+'</button>'
+      ).join('');
+    document.querySelectorAll('[data-branch]').forEach(b => b.addEventListener('click', () => {
+      branch = b.dataset.branch || null;
+      history.replaceState({}, '', branch ? '?b=' + branch : location.pathname);
+      renderGate();
+    }));
+    const list = branch ? DEMO.filter(d => d.b === branch) : DEMO;
+    $('#gateList').innerHTML = list.map(d =>
       '<button class="gate-btn" data-code="'+d.code+'"><span class="ic">'+d.icon+'</span><span><b>'+d.name+'</b><span>'+d.sub+'</span></span></button>'
     ).join('');
     document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
     const lf = document.getElementById('loginForm');
-    if (lf) lf.addEventListener('submit', e => {
-      e.preventDefault();
-      login({ username: document.getElementById('liUser').value, password: document.getElementById('liPass').value }, true);
-    });
+    if (lf && !lf.dataset.bound){
+      lf.dataset.bound = '1';
+      lf.addEventListener('submit', e => {
+        e.preventDefault();
+        login({ username: document.getElementById('liUser').value, password: document.getElementById('liPass').value }, true);
+      });
+    }
   }
 
   // Stap 1: bedrijf gekozen → toon "Wie ben je?" met het personeel van dit bedrijf.
@@ -621,7 +690,9 @@
   }
   function insightText(i){
     switch(i.type){
-      case 'neworders': return fmtT('ins.neworders','<b>{n} nieuwe order(s)</b>, de oudste wacht al {min} min.', i);
+      case 'neworders': return i.kind === 'bookings'
+        ? fmtT('ins.newbookings','<b>{n} nieuwe boeking(en)</b>, de oudste wacht al {min} min op bevestiging.', i)
+        : fmtT('ins.neworders','<b>{n} nieuwe order(s)</b>, de oudste wacht al {min} min.', i);
       case 'allergy':   return fmtT('ins.allergy','<b>Allergie</b> bij gast {who}: {note}.', i);
       case 'arriving':  return fmtT('ins.arriving','<b>{n} gast(en)</b> arriveren binnen ~{min} min. Zorg dat alles klaarstaat.', i);
       case 'rides':     return fmtT('ins.rides','<b>{n} ritaanvraag(en)</b> wachten op acceptatie.', i);
@@ -633,22 +704,29 @@
   }
 
   // ---- AI-copiloot ----
-  const AI_CHIPS = [
-    { key:'ai.chip1', nl:'Wat is de stand van vandaag?' },
-    { key:'ai.chip2', nl:'Zijn er allergieën waar ik op moet letten?' },
-    { key:'ai.chip3', nl:'Welke prijs kan ik doorgeven?' },
-    { key:'ai.chip4', nl:'Hoe nodig ik personeel uit?' }
-  ];
+  // De vraag-chips volgen het vak: horeca vraagt naar allergieën en orders,
+  // verblijf naar boekingen, vervoer naar ritten. Prijs en team gelden overal.
+  function aiChips(){
+    const chips = [{ key:'ai.chip1', nl:'Wat is de stand van vandaag?' }];
+    if (has('orders'))   chips.push({ key:'ai.chip2', nl:'Zijn er allergieën waar ik op moet letten?' });
+    if (has('bookings')) chips.push({ key:'ai.chip.bookings', nl:'Welke boekingen en aankomsten zijn er?' });
+    if (has('rides'))    chips.push({ key:'ai.chip.rides', nl:'Staan er ritaanvragen open?' });
+    chips.push({ key:'ai.chip3', nl:'Welke prijs kan ik doorgeven?' });
+    chips.push({ key:'ai.chip4', nl:'Hoe nodig ik personeel uit?' });
+    return chips.slice(0, 4);
+  }
   let aiBusy = false;
   function renderAI(){
     if (!aiMsgs.length){
+      const B = BRANCHES[branchOf()];
       aiMsgs.push({ role:'assistant', content:
         T('ai.hello','Goedendag').replace(/\.$/,'') + ' ' + actor().name.split(' ')[0] + '. ' +
         T('ai.hello2','Ik ben de copiloot van') + ' ' + S.name + '. ' +
-        T('ai.hello3','Ik ken de live stand van het bedrijf: orders, gasten onderweg, prijzen en het team. Waarmee kan ik helpen?') });
+        (B ? T(B.hello[0], B.hello[1]) : T('ai.hello3','Ik ken de live stand van het bedrijf: orders, gasten onderweg, prijzen en het team. Waarmee kan ik helpen?')) });
     }
-    $('#aiChips').innerHTML = AI_CHIPS.map((c,i) => '<button class="ai-chip" data-chip="'+i+'">'+T(c.key, c.nl)+'</button>').join('');
-    document.querySelectorAll('[data-chip]').forEach(b => b.addEventListener('click', () => sendAI(T(AI_CHIPS[b.dataset.chip].key, AI_CHIPS[b.dataset.chip].nl))));
+    const CHIPS = aiChips();
+    $('#aiChips').innerHTML = CHIPS.map((c,i) => '<button class="ai-chip" data-chip="'+i+'">'+T(c.key, c.nl)+'</button>').join('');
+    document.querySelectorAll('[data-chip]').forEach(b => b.addEventListener('click', () => sendAI(T(CHIPS[b.dataset.chip].key, CHIPS[b.dataset.chip].nl))));
     const box = $('#aiChat');
     box.innerHTML = aiMsgs.map(m =>
       '<div class="tt-msg '+(m.role==='user'?'me':'other')+'">'+(m.role==='assistant'?'<span class="who">'+T('ai.name','Copiloot')+'</span>':'')+esc(m.content).replace(/\n/g,'<br>')+'</div>'
@@ -988,7 +1066,7 @@
   }
 
   window.addEventListener('rtglang', () => {
-    if (!S) return;
+    if (!S){ renderGate(); return; }
     const active = (document.querySelector('.tabbar button.active') || {}).dataset ? document.querySelector('.tabbar button.active').dataset.tab : 'home';
     buildTabs(); renderAll(); openTab(active || 'home');
   });
@@ -1072,7 +1150,19 @@ window.I18N = { en: {
   'invg.checking':'Checking your invite…', 'invg.title':'Welcome to the team of', 'invg.by':'Invited by', 'invg.as':'as', 'invg.access':'You get access to:',
   'invg.name':'Your full name', 'invg.pin':'Choose a PIN (4 digits)', 'invg.pin2':'Repeat your PIN', 'invg.go':'Get started',
   'invg.fillname':'Enter your name.', 'invg.badpin':'Choose a 4-digit PIN.', 'invg.nomatch':'The PINs do not match.', 'invg.welcome':'Welcome to the team!',
-  'invg.invalid':'This invite is no longer valid.', 'invg.tologin':'Go to the sign-in screen'
+  'invg.invalid':'This invite is no longer valid.', 'invg.tologin':'Go to the sign-in screen',
+  'branch.all':'All sectors', 'branch.horeca':'Hospitality', 'branch.verblijf':'Stay', 'branch.vervoer':'Transport',
+  'gate.b.horeca.title':'The hospitality <em>app</em>.',
+  'gate.b.horeca.deck':'For restaurants, bars and clubs. Welcome RTG guests, manage orders live, keep allergies front and centre and let the copilot think along with kitchen and floor.',
+  'gate.b.verblijf.title':'The stay <em>app</em>.',
+  'gate.b.verblijf.deck':'For hotels and apartments. See bookings and arrivals early, have everything ready on time and give RTG your best price — with a copilot that thinks like an operations manager.',
+  'gate.b.vervoer.title':'The transport <em>app</em>.',
+  'gate.b.vervoer.deck':'For taxis and private jets. Accept requests instantly, track pickup times with live location and let the copilot think like a dispatcher.',
+  'ai.hello3.horeca':'I think along with kitchen and floor: orders, allergies, guests on their way and the menu. How can I help?',
+  'ai.hello3.verblijf':'I think along as an operations manager: bookings, arrivals and your dynamic price. How can I help?',
+  'ai.hello3.vervoer':'I think along as a dispatcher: ride requests, pickup times and your dynamic price. How can I help?',
+  'ai.chip.bookings':'Which bookings and arrivals are coming?', 'ai.chip.rides':'Any open ride requests?',
+  'ins.newbookings':'<b>{n} new booking(s)</b>, the oldest has been waiting {min} min for confirmation.'
 } };
 </script>
 <script src="/shared/i18n.js"></script>

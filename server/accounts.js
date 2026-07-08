@@ -72,6 +72,17 @@ function init() {
   add('verified', "TEXT NOT NULL DEFAULT 'unverified'"); add('id_doc', 'TEXT'); add('member_state', 'TEXT');
   add('email_verified', 'INTEGER NOT NULL DEFAULT 0'); add('reset_hash', 'TEXT'); add('reset_expires', 'INTEGER');
 
+  // Personeelsaccounts binnen een leverancier-bedrijfsaccount (PIN-login).
+  db.exec(`CREATE TABLE IF NOT EXISTS supplier_staff (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    supplier_code TEXT NOT NULL,
+    name TEXT NOT NULL,
+    pin_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'staff',
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL
+  )`);
+
   SECRET = loadKey(SECRET_FILE);
   VAULT = loadKey(VAULT_FILE);
 }
@@ -270,8 +281,24 @@ function conversations() {
   }).filter(x => x.conversation.length);
 }
 
+/* ---------- leverancier-personeel (PIN-accounts binnen een bedrijf) ---------- */
+function createStaff({ supplierCode, name, pin, role }) {
+  const info = db.prepare(
+    'INSERT INTO supplier_staff (supplier_code, name, pin_hash, role, created_at) VALUES (?, ?, ?, ?, ?)'
+  ).run(String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), hashPassword(String(pin)), role === 'manager' ? 'manager' : 'staff', new Date().toISOString());
+  return getStaffById(info.lastInsertRowid);
+}
+function getStaffById(id) { return db.prepare('SELECT * FROM supplier_staff WHERE id = ? AND active = 1').get(id) || null; }
+function listStaff(code) { return db.prepare('SELECT * FROM supplier_staff WHERE supplier_code = ? AND active = 1 ORDER BY (role=\'manager\') DESC, id').all(String(code || '').toUpperCase()); }
+function countStaff(code) { return db.prepare('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
+function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && verifyPassword(String(pin), s.pin_hash)) ? s : null; }
+function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); }
+function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role } : null; }
+function makePin() { return String(crypto.randomInt(1000, 10000)); }
+
 module.exports = {
   init, createUser, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
+  createStaff, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, makePin,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword

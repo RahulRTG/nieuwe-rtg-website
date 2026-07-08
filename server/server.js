@@ -37,6 +37,20 @@ if (accounts.count() === 0) {
   accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
 }
 
+// Demo-personeel per leverancier: een manager (PIN 1234) en een medewerker (PIN 5678).
+const STAFF_SEED = {
+  KIKUNOI: [['Yuki Tanaka', 'manager'], ['Kenji Mori', 'staff']],
+  PONTO: [['Aiko Sato', 'manager'], ['Ren Kimura', 'staff']],
+  HOSHI: [['Haruki Ito', 'manager'], ['Mei Kobayashi', 'staff']],
+  MKKX: [['Daisuke Yamamoto', 'manager']],
+  JETAG: [['Sophie Bakker', 'manager']]
+};
+for (const [code, people] of Object.entries(STAFF_SEED)) {
+  if (accounts.countStaff(code) === 0) {
+    people.forEach(([name, role], i) => accounts.createStaff({ supplierCode: code, name, role, pin: i === 0 ? '1234' : '5678' }));
+  }
+}
+
 const app = express();
 app.use(express.json({ limit: '64kb' }));
 app.use(express.static(path.join(__dirname, '..')));
@@ -108,6 +122,8 @@ function initRealtime() {
   if (!db.data.notifications) db.data.notifications = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.pushSubs) db.data.pushSubs = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.supplierNotifications) db.data.supplierNotifications = {};
+  if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
+  if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
   if (webpush) {
     if (!db.data.vapid) {
       db.data.vapid = webpush.generateVAPIDKeys();
@@ -698,7 +714,18 @@ function supplierAuth(req, res, next) {
   if (!sess || sess.role !== 'supplier') return res.status(401).json({ error: 'Niet ingelogd als leverancier.' });
   req.supplier = findSupplier(sess.code);
   if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
+  // Wie is er aan het werk (voor toeschrijving van activiteiten).
+  req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager };
   next();
+}
+
+// Legt vast wie wat deed binnen het bedrijf; live zichtbaar in de team-tab.
+function logActivity(code, actor, text) {
+  const list = db.data.supplierActivity[code] = (db.data.supplierActivity[code] || []);
+  list.unshift({ who: actor ? actor.name : 'Beheer', text, at: new Date().toISOString() });
+  db.data.supplierActivity[code] = list.slice(0, 80);
+  save();
+  sseToSupplier(code, 'sync', { scope: 'team' });
 }
 
 // publieke weergave van een leverancier (voor de klant)
@@ -710,7 +737,7 @@ function publicSupplier(s, lang) {
 }
 
 // dashboarddata voor de ingelogde leverancier
-function supplierState(s) {
+function supplierState(s, actor) {
   const t = db.data.supplierTypes[s.type] || {};
   return {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
@@ -718,25 +745,78 @@ function supplierState(s) {
     orders: db.data.orders.filter(o => o.supplierCode === s.code),
     rides: db.data.rides.filter(r => r.supplierCode === s.code),
     prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code),
-    notifications: db.data.supplierNotifications[s.code] || []
+    notifications: db.data.supplierNotifications[s.code] || [],
+    staff: accounts.listStaff(s.code).map(accounts.publicStaff),
+    activity: (db.data.supplierActivity[s.code] || []).slice(0, 40),
+    team: (db.data.supplierTeam[s.code] || []).slice(-60),
+    actor: actor || { name: 'Beheer', role: 'manager', manager: true }
   };
 }
 
 // ---- leverancier: inloggen, live-stream, dashboard ----
 
 app.post('/api/supplier/login', (req, res) => {
-  let s;
-  if (hasCred(req.body)) {
+  let s, actor;
+  if (req.body.staffId != null) {
+    // Persoonlijke personeelslogin met PIN, binnen het bedrijfsaccount.
+    s = findSupplier(req.body.code);
+    if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
+    const staff = accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
+    if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) return res.status(401).json({ error: 'Onjuiste PIN.' });
+    actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
+  } else if (hasCred(req.body)) {
     if (!checkCred(req.body.username, req.body.password))
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
     s = findSupplier(DEMO_SUPPLIER);
+    actor = { name: 'Beheer', role: 'manager', manager: true };
   } else {
     s = findSupplier(req.body.code);
+    actor = { name: 'Beheer', role: 'manager', manager: true };
   }
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
   const token = crypto.randomBytes(24).toString('hex');
-  sessions.set(token, { role: 'supplier', code: s.code });
-  res.json({ token, state: supplierState(s) });
+  sessions.set(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager });
+  logActivity(s.code, actor, actor.name + ' logde in');
+  res.json({ token, state: supplierState(s, actor) });
+});
+
+// Roster van het bedrijf (voor het personeel-inlogscherm; geen PINs).
+app.post('/api/supplier/roster', (req, res) => {
+  const s = findSupplier(req.body.code);
+  if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
+  res.json({ supplier: { code: s.code, name: s.name }, staff: accounts.listStaff(s.code).map(accounts.publicStaff) });
+});
+
+// Manager voegt personeel toe (krijgt een PIN) of verwijdert het.
+app.post('/api/supplier/staff/add', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
+  const name = String(req.body.name || '').trim().slice(0, 60);
+  if (!name) return res.status(400).json({ error: 'Vul een naam in.' });
+  const pin = accounts.makePin();
+  const staff = accounts.createStaff({ supplierCode: req.supplier.code, name, role: req.body.role === 'manager' ? 'manager' : 'staff', pin });
+  logActivity(req.supplier.code, req.actor, req.actor.name + ' voegde ' + name + ' toe aan het team');
+  res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
+});
+app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel verwijderen.' });
+  const st = accounts.getStaffById(Number(req.body.staffId));
+  if (st && String(st.supplier_code).toUpperCase() === req.supplier.code) {
+    accounts.deactivateStaff(st.id);
+    logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team');
+  }
+  res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
+});
+
+// Interne teamchat binnen het bedrijf.
+app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
+  const text = String(req.body.text || '').trim().slice(0, 500);
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  const list = db.data.supplierTeam[req.supplier.code] = (db.data.supplierTeam[req.supplier.code] || []);
+  list.push({ who: req.actor.name, role: req.actor.role, text, at: new Date().toISOString() });
+  db.data.supplierTeam[req.supplier.code] = list.slice(-100);
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  res.json({ ok: true });
 });
 
 app.get('/api/supplier/stream', (req, res) => {
@@ -751,7 +831,7 @@ app.get('/api/supplier/stream', (req, res) => {
   req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
 });
 
-app.post('/api/supplier/state', supplierAuth, (req, res) => res.json({ state: supplierState(req.supplier) }));
+app.post('/api/supplier/state', supplierAuth, (req, res) => res.json({ state: supplierState(req.supplier, req.actor) }));
 
 app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => n.read = true);
@@ -775,6 +855,7 @@ app.post('/api/supplier/price', supplierAuth, (req, res) => {
   // backoffice ziet het live binnenkomen
   sseToOffice('sync', { scope: 'prices' });
   sseToOffice('notify', { icon: '💶', title: 'Nieuwe dynamische prijs', body: req.supplier.name + ': ' + service + ', € ' + price });
+  logActivity(req.supplier.code, req.actor, 'gaf een prijs door: ' + service + ' (€ ' + price + ')');
   res.json({ ok: true, entry });
 });
 
@@ -790,6 +871,7 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : []
   }));
   save();
+  logActivity(req.supplier.code, req.actor, 'werkte de menukaart bij');
   res.json({ ok: true, menu: req.supplier.menu });
 });
 
@@ -805,6 +887,7 @@ app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
   notify(o.customerTier, { icon: '🍽️', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
+  logActivity(req.supplier.code, req.actor, 'zette ' + o.ref + ' op "' + status + '"');
   res.json({ ok: true, order: o });
 });
 
@@ -817,6 +900,7 @@ app.post('/api/supplier/refund', supplierAuth, (req, res) => {
   o.refunded = true;
   o.status = 'terugbetaald';
   save();
+  logActivity(req.supplier.code, req.actor, 'stortte € ' + o.total + ' terug (' + o.ref + ')');
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
   notify(o.customerTier, { icon: '↩️', title: req.supplier.name + ', terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
@@ -829,6 +913,7 @@ app.post('/api/supplier/location', supplierAuth, (req, res) => {
   if (Number.isFinite(lat) && Number.isFinite(lng)) {
     req.supplier.loc = { lat, lng, label: String(req.body.label || req.supplier.loc.label || '').slice(0, 80) };
     save();
+    logActivity(req.supplier.code, req.actor, 'deelde de live locatie');
   }
   // klanten met een actieve rit bij deze leverancier live bijwerken
   const tiers = new Set(db.data.rides.filter(r => r.supplierCode === req.supplier.code && r.status !== 'gearriveerd').map(r => r.customerTier));

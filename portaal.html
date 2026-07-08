@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lifestyle Pass — Rahul Travel Group</title>
+<title>Jouw portaal — Rahul Travel Group</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -306,161 +306,6 @@
     color:var(--white);
   }
 
-  /* ---------- concierge example ---------- */
-
-  .example-head{
-    text-align:center;
-    max-width:640px;
-    margin:0 auto 3.5rem;
-  }
-  .example-head h2{
-    font-size:clamp(2rem, 3.6vw, 2.9rem);
-  }
-  .example-head p{
-    margin-top:1.25rem;
-    color:var(--grey);
-  }
-  .on-black .example-head p{color:rgba(255,255,255,0.6);}
-
-  .example{
-    max-width:560px;
-    margin:0 auto;
-    background:#151412;
-    border:1px solid rgba(255,255,255,0.12);
-  }
-  .example-bar{
-    padding:1rem 1.5rem;
-    border-bottom:1px solid rgba(255,255,255,0.12);
-    display:flex;
-    align-items:center;
-    gap:0.75rem;
-    font-size:0.8rem;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:rgba(255,255,255,0.5);
-  }
-  .example-bar .dot{
-    width:7px;height:7px;
-    background:var(--burgundy-on-dark);
-  }
-  .example-body{
-    padding:2rem 1.75rem;
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
-  }
-  .bubble{
-    font-family:'Inter',sans-serif;
-    padding:0.9rem 1.15rem;
-    font-size:0.92rem;
-    line-height:1.5;
-    max-width:82%;
-  }
-  .bubble.concierge{
-    background:#201f1c;
-    color:var(--white);
-    align-self:flex-start;
-    border-left:2px solid var(--burgundy-on-dark);
-  }
-  .bubble.user{
-    background:var(--burgundy);
-    color:var(--white);
-    align-self:flex-end;
-  }
-  .example-caption{
-    text-align:center;
-    margin-top:1.5rem;
-    font-size:0.8rem;
-    color:var(--grey-soft);
-    font-style:italic;
-  }
-  .on-black .example-caption{color:rgba(255,255,255,0.4);}
-  .example-input{
-    display:flex;
-    gap:0.6rem;
-    padding:1.25rem 1.75rem;
-    border-top:1px solid rgba(255,255,255,0.12);
-  }
-  .example-input input{
-    flex:1;
-    background:#0f0e0d;
-    border:1px solid rgba(255,255,255,0.12);
-    color:var(--white);
-    font-family:'Inter',sans-serif;
-    font-size:0.9rem;
-    padding:0.75rem 1rem;
-  }
-  .example-input input:focus{
-    outline:none;
-    border-color:var(--burgundy-on-dark);
-  }
-  .example-input button{
-    background:var(--burgundy);
-    border:none;
-    color:var(--white);
-    font-family:'Inter',sans-serif;
-    font-size:0.85rem;
-    padding:0.75rem 1.25rem;
-    cursor:pointer;
-    transition:background 0.2s ease;
-  }
-  .example-input button:hover{
-    background:var(--burgundy-bright);
-  }
-  .example-input button:disabled{
-    opacity:0.5;
-    cursor:default;
-  }
-  .bubble.typing{
-    display:flex;
-    gap:0.3rem;
-    align-items:center;
-  }
-  .bubble.typing span{
-    width:5px;height:5px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.4);
-    animation:blink 1.1s infinite ease-in-out;
-  }
-  .bubble.typing span:nth-child(2){animation-delay:0.15s;}
-  .bubble.typing span:nth-child(3){animation-delay:0.3s;}
-  @keyframes blink{
-    0%,80%,100%{opacity:0.25;}
-    40%{opacity:1;}
-  }
-
-  /* ---------- features ---------- */
-
-  .feat-grid{
-    display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:1px;
-    background:var(--line);
-    margin-top:3.5rem;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
-  }
-  .feat-card{
-    background:var(--white);
-    padding:2.5rem;
-  }
-  .feat-card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 18px 32px rgba(0,0,0,0.14);
-  }
-  .feat-card h3{
-    font-size:1.15rem;
-    margin-bottom:0.6rem;
-  }
-  .feat-card p{
-    color:var(--grey);
-    font-size:1rem;
-  }
-
-  @media (max-width:860px){
-    .feat-grid{grid-template-columns:1fr;}
-  }
-
   /* ---------- cta ---------- */
 
   .cta{text-align:center;}
@@ -493,18 +338,6 @@
     align-items:center;
     font-size:0.8rem;
     color:var(--grey-soft);
-  }
-
-  /* ---------- notitieboek ---------- */
-
-  .dossier-noot{
-    margin-top:2.5rem;
-    font-family:'Inter',sans-serif;
-    font-size:0.78rem;
-    letter-spacing:0.04em;
-    color:var(--grey-soft);
-    text-align:center;
-    font-style:italic;
   }
 
   /* ---------- leesbalk + pager ---------- */
@@ -578,38 +411,6 @@
   .on-black .advert .ad-sub{color:rgba(255,255,255,0.75);}
   .advert .btn{margin-top:2.75rem;}
 
-  /* ---------- volgende pagina ---------- */
-
-  .next-page{
-    display:block;
-    border-top:1px solid var(--line);
-    padding:2.75rem 0;
-    background:var(--white);
-  }
-  .next-page .wrap{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:1rem;
-  }
-  .next-page .np-label{
-    font-size:0.75rem;
-    letter-spacing:0.18em;
-    text-transform:uppercase;
-    color:var(--grey-soft);
-  }
-  .next-page .np-title{
-    font-family:'Bodoni Moda',serif;
-    font-style:italic;
-    font-size:clamp(1.2rem, 2.2vw, 1.6rem);
-    color:var(--black);
-    display:inline-flex;
-    align-items:center;
-    gap:0.75rem;
-  }
-  .next-page .np-arrow{transition:transform 0.25s ease;}
-  .next-page:hover .np-arrow{transform:translateX(6px);}
-
   /* ---------- pagina-omslag ---------- */
 
   @view-transition{navigation:auto;}
@@ -647,6 +448,156 @@
     .hero-inner > *{animation:none;}
     .reveal{opacity:1; transform:none; transition:none;}
   }
+  .intro.on-black p.lede{color:var(--white);}
+  /* ---------- portaal ---------- */
+
+  .portaal .wrap{max-width:860px;}
+  .tabbar{
+    display:flex;
+    gap:2rem;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    margin-bottom:2.5rem;
+    overflow-x:auto;
+  }
+  .tab{
+    background:none;
+    border:none;
+    padding:1.1rem 0;
+    font-family:'Inter',sans-serif;
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    white-space:nowrap;
+    transition:color 0.2s ease;
+  }
+  .tab:hover{color:var(--grey);}
+  .tab.actief{
+    color:var(--burgundy);
+    border-bottom-color:var(--burgundy);
+  }
+  .paneel{display:none;}
+  .paneel.actief{display:block;}
+  .rij{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:2rem;
+    padding:1.5rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .rij h3{font-size:1.15rem;margin-bottom:0.35rem;}
+  .rij p{color:var(--grey);font-size:1rem;}
+  .rij .meta{
+    font-family:'Inter',sans-serif;
+    font-size:0.72rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    white-space:nowrap;
+  }
+  .paneel-noot{
+    margin-top:2rem;
+    font-family:'Inter',sans-serif;
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+    color:var(--grey-soft);
+    font-style:italic;
+  }
+  .portaal-chat{border:1px solid var(--line);}
+  .pc-bar{
+    padding:1rem 1.5rem;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+    font-family:'Inter',sans-serif;
+    font-size:0.8rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--grey);
+  }
+  .pc-bar .dot{width:7px;height:7px;background:var(--burgundy);}
+  .pc-body{
+    padding:2rem 1.75rem;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    min-height:260px;
+    max-height:420px;
+    overflow-y:auto;
+  }
+  .bubble{
+    font-family:'Inter',sans-serif;
+    padding:0.9rem 1.15rem;
+    font-size:0.92rem;
+    line-height:1.5;
+    max-width:82%;
+    animation:rise 0.35s ease;
+  }
+  @keyframes rise{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .bubble.assistent{
+    background:#201f1c;
+    color:var(--white);
+    align-self:flex-start;
+    border-left:2px solid var(--burgundy-on-dark);
+  }
+  .bubble.user{
+    background:var(--burgundy);
+    color:var(--white);
+    align-self:flex-end;
+  }
+  .bubble.typing{display:flex;gap:0.3rem;align-items:center;}
+  .bubble.typing span{
+    width:5px;height:5px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.5);
+    animation:blink 1.1s infinite ease-in-out;
+  }
+  .bubble.typing span:nth-child(2){animation-delay:0.15s;}
+  .bubble.typing span:nth-child(3){animation-delay:0.3s;}
+  @keyframes blink{
+    0%,80%,100%{opacity:0.25;}
+    40%{opacity:1;}
+  }
+  .pc-input{
+    display:flex;
+    gap:0.6rem;
+    padding:1.25rem 1.5rem;
+    border-top:1px solid var(--line);
+  }
+  .pc-input input{
+    flex:1;
+    background:var(--white);
+    border:1px solid var(--line);
+    color:var(--black);
+    font-family:'Inter',sans-serif;
+    font-size:0.9rem;
+    padding:0.75rem 1rem;
+  }
+  .pc-input input:focus{outline:none;border-color:var(--burgundy);}
+  .pc-input button{
+    background:var(--burgundy);
+    border:none;
+    color:var(--white);
+    font-family:'Inter',sans-serif;
+    font-size:0.85rem;
+    padding:0.75rem 1.25rem;
+    cursor:pointer;
+    transition:background 0.2s ease;
+  }
+  .pc-input button:hover{background:var(--burgundy-bright);}
+  .pc-input button:disabled{opacity:0.5;cursor:default;}
+  @media (max-width:600px){
+    .rij{flex-direction:column;gap:0.5rem;}
+    .tabbar{gap:1.25rem;}
+  }
 </style>
 </head>
 <body>
@@ -662,8 +613,8 @@
     <nav>
       <ul>
         <li><a href="index.html#passen">Passen</a></li>
-        <li><a href="#voorbeeld">Een gesprek</a></li>
-        <li><a href="rtfoundation.html">Foundation</a></li>
+        <li><a href="toegang.html">Toegang</a></li>
+        <li><a href="index.html">De cover</a></li>
       </ul>
     </nav>
   </div>
@@ -671,144 +622,129 @@
 
 <section class="hero on-white">
   <div class="wrap hero-inner">
-    <span class="kicker">Concierge · Volledig persoonlijk</span>
-    <h1>Lifestyle Pass</h1>
-    <p class="deck">Geen wachtrij, geen anoniem team. Bij de Lifestyle Pass spreekt u met uw vaste concierge, met een echt team op de achtergrond voor alles wat meer aandacht vraagt.</p>
+    <span class="kicker">Ledenportaal · Voorbeeldweergave</span>
+    <h1>Jouw portaal</h1>
+    <p class="deck">Alle gesprekken die je via WhatsApp voert, je reizen en aankopen, je diensten — bewaard in één map, gekoppeld aan je account en straks aan de RTG App. Met een eigen assistent die direct helpt, of een mens inschakelt.</p>
     <div class="hero-cta">
-      <a href="#voorbeeld" class="btn">Maak kennis met uw concierge</a>
-      <a href="index.html#passen" class="btn btn-ghost">Terug naar overzicht</a>
+      <a href="#portaal" class="btn">Open de map</a>
+      <a href="toegang.html" class="btn btn-ghost">Hoe je toegang krijgt</a>
     </div>
   </div>
 </section>
 
-<section class="intro on-white">
+<section class="portaal on-white" id="portaal">
   <div class="wrap">
-    <div class="folio reveal">N° 01 — Wat het is</div>
-    <div class="flow reveal">
-      <p class="lede"><span class="dropcap">D</span>e Lifestyle Pass draait om aandacht. Eén vaste concierge kent uw voorkeuren, volgt uw agenda en regelt de rest, rustig en precies. Geen wisselend team, geen herhaalde uitleg — gewoon iemand die u al kent.</p>
+    <div class="folio reveal">Jouw map — Voorbeeldweergave</div>
+
+    <div class="tabbar reveal" role="tablist">
+      <button class="tab actief" data-paneel="gesprekken">Gesprekken</button>
+      <button class="tab" data-paneel="reizen">Reizen &amp; aankopen</button>
+      <button class="tab" data-paneel="diensten">Diensten</button>
+      <button class="tab" data-paneel="assistent">Je assistent</button>
     </div>
 
-    <div class="steps-grid">
-      <div class="step reveal">
-        <span class="n">01</span>
-        <h3>Eén vast aanspreekpunt</h3>
-        <p>Dezelfde concierge bij ieder contact, die uw voorkeuren al kent.</p>
+    <div class="paneel actief" id="paneel-gesprekken">
+      <div class="rij">
+        <div>
+          <h3>Omboeking Lissabon</h3>
+          <p>"…de vlucht van vrijdag is verzet naar 09.40, het hotel is ingelicht…"</p>
+        </div>
+        <span class="meta">WhatsApp · 28 jun 2026</span>
       </div>
-      <div class="step reveal">
-        <span class="n">02</span>
-        <h3>Een gesprek, geen formulier</h3>
-        <p>Via WhatsApp, in gewone taal. Geen vragenlijsten, geen portalen.</p>
+      <div class="rij">
+        <div>
+          <h3>Ballotage-gesprek</h3>
+          <p>"…reist een paar keer per jaar, let op beenruimte, notenallergie genoteerd…"</p>
+        </div>
+        <span class="meta">WhatsApp · 14 jun 2026</span>
       </div>
-      <div class="step reveal">
-        <span class="n">03</span>
-        <h3>Van planning tot nazorg</h3>
-        <p>Van de eerste boeking tot de laatste check-out volgt uw concierge het hele traject.</p>
+      <div class="rij">
+        <div>
+          <h3>Eerste kennismaking</h3>
+          <p>"…welkom bij RTG — je map is aangemaakt…"</p>
+        </div>
+        <span class="meta">WhatsApp · 14 jun 2026</span>
       </div>
+      <p class="paneel-noot">Zodra WhatsApp gekoppeld is, verschijnt hier elk gesprek vanzelf — er raakt niets kwijt.</p>
     </div>
 
-    <div class="pull-quote reveal">
-      <p>U hoeft het niet uit te leggen. Uw concierge weet het al.</p>
+    <div class="paneel" id="paneel-reizen">
+      <div class="rij">
+        <div>
+          <h3>Lissabon — 3 nachten, Alfama</h3>
+          <p>Vlucht en verblijf, geboekt tegen nettoprijs.</p>
+        </div>
+        <span class="meta">Bevestigd · jul 2026</span>
+      </div>
+      <div class="rij">
+        <div>
+          <h3>Milaan — lang weekend</h3>
+          <p>Twee personen, wijziging onderweg verwerkt.</p>
+        </div>
+        <span class="meta">Voltooid · mei 2026</span>
+      </div>
+      <div class="rij">
+        <div>
+          <h3>Personal shopping — zomergarderobe</h3>
+          <p>Via de concierge-lijn, geleverd op adres.</p>
+        </div>
+        <span class="meta">Voltooid · apr 2026</span>
+      </div>
+      <p class="paneel-noot">Hier staan straks al je reizen en aankopen — met bevestigingen en documenten op één plek.</p>
     </div>
-  </div>
-</section>
 
-<section class="butler on-white" id="voorbeeld">
-  <div class="wrap">
-    <div class="folio reveal">N° 02 — Maak kennis</div>
-    <div class="example-head reveal">
-      <span class="kicker">Probeer het zelf</span>
-      <h2>Een gesprek, geen script.</h2>
-      <p>Uw digitale concierge staat klaar. Voor alles wat persoonlijke aandacht van het vaste team vraagt, schakelt zij dat er direct bij.</p>
+    <div class="paneel" id="paneel-diensten">
+      <div class="rij">
+        <div>
+          <h3>RTG Pass</h3>
+          <p>Nettoprijzen, de Butler als enige lijn, 30% van je bijdrage naar de RTFoundation.</p>
+        </div>
+        <span class="meta">Actief</span>
+      </div>
+      <div class="rij">
+        <div>
+          <h3>Jouw account &amp; de RTG App</h3>
+          <p>Dit portaal is je account. Dezelfde login werkt straks in de RTG App — reizen, kleding, events, alles in één gesprek.</p>
+        </div>
+        <span class="meta">Binnenkort</span>
+      </div>
+      <div class="rij">
+        <div>
+          <h3>Lifestyle Pass</h3>
+          <p>Een vaste concierge met een echt team erachter — na menselijke goedkeuring, of op uitnodiging.</p>
+        </div>
+        <span class="meta">Op uitnodiging</span>
+      </div>
+      <p class="paneel-noot">Diensten en upgrades beheer je straks hier — en in de app.</p>
     </div>
 
-    <div class="example">
-      <div class="example-bar"><span class="dot"></span> Uw concierge</div>
-      <div class="example-body" id="conciergeBody"></div>
-      <form class="example-input" id="conciergeForm">
-        <input type="text" id="conciergeInput" placeholder="Typ uw bericht…" autocomplete="off">
-        <button type="submit" id="conciergeSend">Verstuur</button>
-      </form>
+    <div class="paneel" id="paneel-assistent">
+      <div class="portaal-chat">
+        <div class="pc-bar"><span class="dot"></span> Jouw assistent</div>
+        <div class="pc-body" id="pcBody"></div>
+        <form class="pc-input" id="pcForm">
+          <input type="text" id="pcInput" placeholder="Stel je vraag…" autocomplete="off">
+          <button type="submit" id="pcSend">Verstuur</button>
+        </form>
+      </div>
+      <p class="paneel-noot">Je assistent helpt direct waar het kan — en schakelt het team in wanneer een mens het verschil maakt.</p>
     </div>
-    <div class="example-caption">Voor complexere zaken verbindt de concierge u door met het vaste team.</div>
   </div>
 </section>
 
 <section class="advert on-black">
   <div class="wrap reveal">
     <span class="ad-label">— Advertentie —</span>
-    <h2>Tijd is kapitaal.</h2>
-    <p class="ad-sub">Business Pass — één accountmanager voor de strategie, automatische uitvoering voor de rest.</p>
-    <a href="business-pass.html" class="btn">Bekijk de Business Pass</a>
-  </div>
-</section>
-
-<section class="intro on-white">
-  <div class="wrap">
-    <div class="folio reveal">N° 03 — Wat u krijgt</div>
-    <div class="feat-grid">
-      <div class="feat-card reveal">
-        <h3>Vaste concierge</h3>
-        <p>Dezelfde persoon bij ieder contact, die uw voorkeuren al kent.</p>
-      </div>
-      <div class="feat-card reveal">
-        <h3>WhatsApp als enige lijn</h3>
-        <p>Geen aparte app, geen inlogportaal. Eén vertrouwd kanaal.</p>
-      </div>
-      <div class="feat-card reveal">
-        <h3>Altijd een team achter de hand</h3>
-        <p>Uw digitale concierge regelt het meeste direct; voor de rest staat het vaste team klaar.</p>
-      </div>
-      <div class="feat-card reveal">
-        <h3>30% naar de RTFoundation</h3>
-        <p>Ook bij de Lifestyle Pass gaat een vast deel van uw bijdrage direct naar liefdadigheid.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="intro on-white">
-  <div class="wrap">
-    <div class="folio reveal">N° 04 — Uit het notitieboek</div>
-    <p class="lede reveal">Drie dossiers van de afgelopen twaalf maanden. U herkent er misschien iets in.</p>
-
-    <div class="steps-grid">
-      <div class="step reveal">
-        <span class="n">I</span>
-        <h3>De transfer</h3>
-        <p>Medische keuring op maandag, gezin dinsdag overgevlogen, woensdag drie huizen bezichtigd. Alles stond voordat de persconferentie begon — en niets ervan haalde de pers.</p>
-      </div>
-      <div class="step reveal">
-        <span class="n">II</span>
-        <h3>De overname</h3>
-        <p>Achtenveertig uur, drie steden, zeven gesprekken. Uw concierge herboekte twee keer onderweg, en de handtekening viel op tijd. Het vliegtuig wachtte, niet u.</p>
-      </div>
-      <div class="step reveal">
-        <span class="n">III</span>
-        <h3>De stille zomer</h3>
-        <p>Een huis dat nergens online staat, personeel dat al wist hoe u uw koffie drinkt, en drie weken lang geen enkele foto. Privacy is geen verzoek — het is het uitgangspunt.</p>
-      </div>
-    </div>
-
-    <p class="dossier-noot">Ontleend aan echte dossiers. Namen, plaatsen en details zijn gewijzigd.</p>
-  </div>
-</section>
-
-<section class="cta on-black">
-  <div class="wrap reveal">
-    <span class="kicker">Klaar om kennis te maken</span>
-    <h2>Sommige dingen regelt u liever niet zelf.</h2>
-    <p class="deck">Maak kennis met uw concierge en ervaar binnen één gesprek het verschil. Toegang tot de Lifestyle Pass volgt na menselijke goedkeuring — of op uitnodiging.</p>
-    <div class="cta-actions">
-      <a href="#voorbeeld" class="btn">Maak kennis met uw concierge</a>
-      <a href="index.html" class="btn btn-ghost">Terug naar home</a>
-    </div>
+    <h2>Nog geen toegang?</h2>
+    <p class="ad-sub">De ballotage is een gesprek, geen formulier — en iedereen mag aanschuiven.</p>
+    <a href="toegang.html" class="btn">Lees hoe toegang werkt</a>
   </div>
 </section>
 
 <section class="pager on-white reveal">
   <div class="wrap">
     <span class="pager-label">Sla de pagina om</span>
-    <a href="business-pass.html">Business Pass — de strateeg <span class="pijl">→</span></a>
+    <a href="index.html">Terug naar de cover <span class="pijl">→</span></a>
   </div>
 </section>
 
@@ -819,6 +755,45 @@
   </div>
 </footer>
 
-<script src="lifestyle-pass.js"></script>
+<script src="portaal.js"></script>
+<script>
+  (function(){
+    const targets = document.querySelectorAll('.reveal');
+    if (!targets.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      targets.forEach(el => el.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    targets.forEach(el => observer.observe(el));
+  })();
+
+  (function(){
+    const bar = document.createElement('div');
+    bar.className = 'leesbalk';
+    document.body.appendChild(bar);
+
+    function update(){
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      bar.style.width = (max > 0 ? (doc.scrollTop / max) * 100 : 0) + '%';
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+</script>
+
 </body>
 </html>

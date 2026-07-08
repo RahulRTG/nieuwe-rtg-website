@@ -6,7 +6,7 @@
 <title>Rahul Travel Group — Toegang tot wat gesloten is</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --white:#FFFFFF;
@@ -27,7 +27,8 @@
   body{
     background:var(--white);
     color:var(--black);
-    font-family:'Inter',sans-serif;
+    font-family:'EB Garamond',serif;
+    font-size:1.0625rem;
     font-weight:400;
     line-height:1.6;
     -webkit-font-smoothing:antialiased;
@@ -51,7 +52,7 @@
 
   section{
     position:relative;
-    padding:clamp(6rem, 12vw, 11rem) 0;
+    padding:clamp(6.5rem, 13vw, 12rem) 0;
     overflow:hidden;
   }
 
@@ -67,7 +68,7 @@
     display:flex;
     align-items:center;
     gap:0.75rem;
-    margin-bottom:2.5rem;
+    margin-bottom:3rem;
   }
   .on-black .folio{color:rgba(255,255,255,0.45);}
 
@@ -85,7 +86,7 @@
     text-transform:uppercase;
     color:var(--burgundy);
     font-weight:600;
-    margin-bottom:1.25rem;
+    margin-bottom:1.6rem;
     display:block;
   }
   .on-black .kicker{color:var(--burgundy-on-dark);}
@@ -96,20 +97,25 @@
     position:fixed;
     top:0;left:0;right:0;
     z-index:100;
-    padding:1.1rem 0;
+    padding:1rem 0 0.85rem;
     background:rgba(255,255,255,0.86);
     backdrop-filter:blur(10px);
+  }
+  .masthead{
+    display:flex;
+    justify-content:center;
+    padding-bottom:0.85rem;
     border-bottom:1px solid var(--line);
   }
-  header .wrap{
+  .masthead-nav{
     display:flex;
-    align-items:center;
-    justify-content:space-between;
+    justify-content:center;
+    padding-top:0.7rem;
   }
   .brandmark{
     display:inline-flex;
     flex-direction:column;
-    align-items:flex-start;
+    align-items:center;
   }
   .brandmark .bm-block{
     background:var(--burgundy);
@@ -134,8 +140,10 @@
     list-style:none;
     display:flex;
     gap:2.25rem;
+    justify-content:center;
   }
   nav a{
+    font-family:'Inter',sans-serif;
     font-size:0.85rem;
     letter-spacing:0.03em;
     color:var(--grey);
@@ -146,7 +154,7 @@
   /* ---------- hero ---------- */
 
   .hero{
-    padding-top:clamp(9rem, 16vw, 13rem);
+    padding-top:clamp(11rem, 18vw, 15rem);
     padding-bottom:clamp(7rem, 12vw, 10rem);
   }
   .hero-inner{
@@ -155,16 +163,21 @@
     margin:0 auto;
   }
   .hero h1{
-    font-size:clamp(2.6rem, 6.2vw, 5.4rem);
-    line-height:1.02;
+    font-size:clamp(3rem, 8vw, 7.5rem);
+    line-height:0.95;
+    letter-spacing:-0.02em;
   }
   .hero h1 .accent{
     color:var(--burgundy);
     font-style:italic;
   }
+  .hero.on-black h1 .accent{
+    color:var(--burgundy-on-dark);
+  }
+  .on-black .hero p.deck{color:rgba(255,255,255,0.75);}
   .hero p.deck{
     margin-top:2rem;
-    font-size:clamp(1.05rem, 1.6vw, 1.25rem);
+    font-size:clamp(1rem, 1.4vw, 1.15rem);
     color:var(--grey);
     max-width:540px;
     margin-left:auto;
@@ -181,6 +194,7 @@
     padding:0.95rem 2.1rem;
     background:var(--black);
     color:var(--white);
+    font-family:'Inter',sans-serif;
     font-size:0.85rem;
     letter-spacing:0.05em;
     text-transform:uppercase;
@@ -191,6 +205,7 @@
   .btn:hover{
     background:var(--burgundy);
     border-color:var(--burgundy);
+    transform:translateY(-2px);
   }
   .btn-ghost{
     background:transparent;
@@ -322,9 +337,8 @@
     display:flex;
     flex-direction:column;
     min-height:420px;
-    transition:background 0.3s ease;
   }
-  .pass-card:hover{background:#141312;}
+  .pass-card:hover{background:#141312; transform:translateY(-6px);}
   .pass-tag{
     font-size:0.75rem;
     letter-spacing:0.14em;
@@ -338,7 +352,7 @@
   }
   .pass-card p{
     color:rgba(255,255,255,0.62);
-    font-size:0.95rem;
+    font-size:1.02rem;
     flex:1;
   }
   .pass-card .tone{
@@ -443,21 +457,230 @@
     color:var(--grey-soft);
   }
 
+  /* ---------- leesbalk + pager ---------- */
+
+  .leesbalk{
+    position:fixed;
+    top:0;left:0;
+    height:2px;
+    width:0;
+    background:var(--burgundy-bright);
+    z-index:200;
+  }
+  .pager{
+    text-align:center;
+    padding:clamp(4rem, 8vw, 6rem) 0;
+  }
+  .pager-label{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-size:0.75rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    margin-bottom:1.25rem;
+  }
+  .on-black .pager-label{color:rgba(255,255,255,0.5);}
+  .pager a{
+    font-family:'Bodoni Moda',serif;
+    font-style:italic;
+    font-size:clamp(2rem, 4.5vw, 3.2rem);
+    line-height:1.1;
+    display:inline-block;
+  }
+  .pager .pijl{
+    display:inline-block;
+    transition:transform 0.25s ease;
+  }
+  .pager a:hover .pijl{transform:translateX(0.4em);}
+
   @media (max-width:600px){
     footer .wrap{flex-direction:column;gap:1rem;text-align:center;}
-    nav ul{gap:1.2rem;}
+    nav ul{gap:1.2rem;flex-wrap:wrap;}
     nav a{font-size:0.75rem;}
+    .masthead-nav{padding-top:0.55rem;}
+  }
+
+  /* ---------- advertentie ---------- */
+
+  .on-burgundy{background:var(--burgundy);color:var(--white);}
+  .on-burgundy .btn{
+    background:var(--white);
+    color:var(--black);
+    border-color:var(--white);
+  }
+  .on-burgundy .btn:hover{
+    background:var(--black);
+    color:var(--white);
+    border-color:var(--black);
+  }
+  .on-burgundy .kicker{color:var(--gold);}
+  .on-burgundy .folio{color:rgba(255,255,255,0.75);}
+  .on-burgundy .folio::after{background:rgba(255,255,255,0.25);}
+
+  .advert{text-align:center;}
+  .advert .ad-label{
+    display:block;
+    font-size:0.65rem;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    margin-bottom:3.5rem;
+  }
+  .on-black .advert .ad-label, .on-burgundy .advert .ad-label{color:rgba(255,255,255,0.45);}
+  .advert h2{
+    font-size:clamp(2.6rem, 6vw, 5rem);
+    line-height:1.02;
+    max-width:14ch;
+    margin:0 auto;
+  }
+  .advert .ad-sub{
+    margin-top:1.75rem;
+    font-family:'Bodoni Moda',serif;
+    font-style:italic;
+    font-size:clamp(1.05rem, 1.8vw, 1.35rem);
+  }
+  .on-black .advert .ad-sub, .on-burgundy .advert .ad-sub{color:rgba(255,255,255,0.8);}
+  .advert .btn{margin-top:2.75rem;}
+
+  /* ---------- interview ---------- */
+
+  .interview .wrap{max-width:760px;}
+  .interview h2{
+    font-size:clamp(1.9rem, 3.6vw, 2.8rem);
+    line-height:1.15;
+    margin-bottom:3rem;
+  }
+  .interview .qa + .qa{margin-top:2.5rem;}
+  .interview .vraag{
+    font-family:'Bodoni Moda',serif;
+    font-style:italic;
+    font-size:1.3rem;
+    margin-bottom:0.75rem;
+  }
+  .interview .antwoord{
+    color:rgba(255,255,255,0.85);
+    max-width:60ch;
+  }
+
+  /* ---------- volgende pagina ---------- */
+
+  .next-page{
+    display:block;
+    border-top:1px solid var(--line);
+    padding:2.75rem 0;
+    background:var(--white);
+  }
+  .next-page .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+  }
+  .next-page .np-label{
+    font-size:0.75rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+  }
+  .next-page .np-title{
+    font-family:'Bodoni Moda',serif;
+    font-style:italic;
+    font-size:clamp(1.2rem, 2.2vw, 1.6rem);
+    color:var(--black);
+    display:inline-flex;
+    align-items:center;
+    gap:0.75rem;
+  }
+  .next-page .np-arrow{transition:transform 0.25s ease;}
+  .next-page:hover .np-arrow{transform:translateX(6px);}
+
+  /* ---------- inhoud (sommaire) ---------- */
+
+  .inhoud .wrap{max-width:760px;}
+  .toc{list-style:none;}
+  .toc a{
+    display:flex;
+    align-items:baseline;
+    gap:1.25rem;
+    padding:1.15rem 0;
+  }
+  .toc .t{
+    font-family:'Bodoni Moda',serif;
+    font-size:clamp(1.2rem, 2.2vw, 1.6rem);
+    transition:color 0.25s ease;
+  }
+  .toc .dots{
+    flex:1;
+    border-bottom:1px dotted var(--grey-soft);
+    transform:translateY(-0.35em);
+  }
+  .toc .ref{
+    font-size:0.75rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--grey-soft);
+    white-space:nowrap;
+  }
+  .toc a:hover .t{
+    color:var(--burgundy);
+    font-style:italic;
+  }
+
+  /* ---------- pagina-omslag ---------- */
+
+  @view-transition{navigation:auto;}
+  ::view-transition-old(root){animation:pageOut 0.4s ease both;}
+  ::view-transition-new(root){animation:pageIn 0.5s ease both;}
+  @keyframes pageOut{to{opacity:0; transform:translateX(-2.5%);}}
+  @keyframes pageIn{from{opacity:0; transform:translateX(2.5%);}}
+  @media (prefers-reduced-motion: reduce){
+    ::view-transition-old(root), ::view-transition-new(root){animation:none;}
+  }
+
+  /* ---------- motion ---------- */
+
+  @keyframes heroRise{
+    from{opacity:0; transform:translateY(16px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .hero-inner > *{animation:heroRise 0.9s ease both;}
+  .hero-inner > *:nth-child(1){animation-delay:0.05s;}
+  .hero-inner > *:nth-child(2){animation-delay:0.16s;}
+  .hero-inner > *:nth-child(3){animation-delay:0.3s;}
+  .hero-inner > *:nth-child(4){animation-delay:0.45s;}
+
+  .reveal{
+    opacity:0;
+    transform:translateY(28px);
+    transition:opacity 0.7s ease, transform 0.7s ease, box-shadow 0.35s ease;
+  }
+  .reveal.is-visible{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .passes-grid .pass-card{
+    transition:opacity 0.7s ease, transform 0.7s ease, background 0.3s ease;
+  }
+  .passes-grid .pass-card:nth-child(2){transition-delay:0.1s;}
+  .passes-grid .pass-card:nth-child(3){transition-delay:0.2s;}
+
+  @media (prefers-reduced-motion: reduce){
+    .hero-inner > *{animation:none;}
+    .reveal{opacity:1; transform:none; transition:none;}
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="wrap">
+  <div class="wrap masthead">
     <a href="index.html" class="brandmark">
       <span class="bm-block">Rahul Travel Group</span>
       <span class="bm-tagline">Experience the Elite Class</span>
     </a>
+  </div>
+  <div class="wrap masthead-nav">
     <nav>
       <ul>
         <li><a href="#passen">Passen</a></li>
@@ -468,9 +691,9 @@
   </div>
 </header>
 
-<section class="hero on-white">
+<section class="hero on-white" id="heroSection">
   <div class="wrap hero-inner">
-    <span class="kicker">Membership, geen loyaliteitsprogramma</span>
+    <span class="kicker" id="heroKicker">Membership, geen loyaliteitsprogramma</span>
     <h1>Toegang tot wat <span class="accent">gesloten</span> is.</h1>
     <p class="deck">Rahul Travel Group koopt in tegen inkoopprijs en geeft dat voordeel door aan haar leden. Drie passen, elk met een eigen ritme, maar met dezelfde belofte: geen tussenlagen en geen opslag zonder reden.</p>
     <div class="hero-cta">
@@ -480,24 +703,38 @@
   </div>
 </section>
 
-<section class="manifesto on-black">
+<section class="inhoud on-white">
   <div class="wrap">
-    <div class="folio">N° 01 — Manifest</div>
-    <div class="flow">
+    <div class="folio reveal">Inhoud — Editie N° 01 · 2026</div>
+    <ol class="toc reveal">
+      <li><a href="#manifest"><span class="t">Het manifest</span><span class="dots"></span><span class="ref">N° 01</span></a></li>
+      <li><a href="#passen"><span class="t">De drie passen</span><span class="dots"></span><span class="ref">N° 02</span></a></li>
+      <li><a href="#interview"><span class="t">Het interview</span><span class="dots"></span><span class="ref">N° 03</span></a></li>
+      <li><a href="rtg-pass.html"><span class="t">RTG Pass — de instap</span><span class="dots"></span><span class="ref">Katern I</span></a></li>
+      <li><a href="lifestyle-pass.html"><span class="t">Lifestyle Pass — de concierge</span><span class="dots"></span><span class="ref">Katern II</span></a></li>
+      <li><a href="business-pass.html"><span class="t">Business Pass — de uitvoering</span><span class="dots"></span><span class="ref">Katern III</span></a></li>
+    </ol>
+  </div>
+</section>
+
+<section class="manifesto on-black" id="manifest">
+  <div class="wrap">
+    <div class="folio reveal">N° 01 — Manifest</div>
+    <div class="flow reveal">
       <p class="lede"><span class="dropcap">W</span>ij geloven niet in korting. Korting is wat je krijgt als excuus voor een prijs die nooit klopte. Wij kopen in op het niveau waarop de grote spelers inkopen, en geven dat door zonder marge die zich verstopt in kleine lettertjes.</p>
     </div>
-    <div class="signature">— Het uitgangspunt achter elke pas</div>
+    <div class="signature reveal">— Het uitgangspunt achter elke pas</div>
   </div>
 </section>
 
 <section class="intel on-white">
   <div class="wrap intel-grid">
-    <div>
+    <div class="reveal">
       <span class="kicker">Hoe het werkt</span>
       <h2>Eén inkoopmodel, drie manieren om er gebruik van te maken.</h2>
       <p class="intel-copy">Via gespecialiseerde groothandelskanalen krijgt RTG toegang tot nettoprijzen die normaal alleen reisbureaus en touroperators zien. Leden betalen die prijs plus een vaste, transparante bijdrage.</p>
     </div>
-    <ul class="intel-list">
+    <ul class="intel-list reveal">
       <li>
         <span class="n">01</span>
         <h3>Inkoopprijs als basis</h3>
@@ -517,31 +754,40 @@
   </div>
 </section>
 
+<section class="advert on-burgundy">
+  <div class="wrap reveal">
+    <span class="ad-label">— Advertentie —</span>
+    <h2>Dezelfde prijs als het reisbureau. Zonder het reisbureau.</h2>
+    <p class="ad-sub">RTG Pass — toegang vanaf één gesprek.</p>
+    <a href="rtg-pass.html" class="btn">Ontdek de RTG Pass</a>
+  </div>
+</section>
+
 <section class="passes on-black" id="passen">
   <div class="wrap">
-    <div class="folio">N° 02 — De drie passen</div>
+    <div class="folio reveal">N° 02 — De drie passen</div>
     <span class="kicker">Kies je ritme</span>
     <h2 style="font-size:clamp(2rem, 3.6vw, 2.9rem); max-width:20ch;">Drie passen, drie manieren van reizen, elk met een eigen script.</h2>
 
     <div class="passes-grid">
-      <div class="pass-card">
+      <div class="pass-card reveal">
         <span class="pass-tag">Instap</span>
         <h3>RTG Pass</h3>
         <p>Voor wie toegang als vanzelfsprekend beschouwt. Volledig geautomatiseerd, AI-gedreven, met WhatsApp als voordeur.</p>
         <span class="tone">"Old money kalmte. Geen behoefte om indruk te maken."</span>
         <a href="rtg-pass.html" class="go">Ontdek de RTG Pass <span class="arrow">→</span></a>
       </div>
-      <div class="pass-card">
+      <div class="pass-card reveal">
         <span class="pass-tag">Concierge</span>
         <h3>Lifestyle Pass</h3>
-        <p>Voor wie liever met een mens spreekt. Volledig persoonlijke concierge via WhatsApp, ingetogen en voorkomend, van begin tot eind.</p>
+        <p>Voor wie aandacht als maatstaf ziet. Een vaste concierge met een echt team erachter — na menselijke goedkeuring, of op uitnodiging.</p>
         <span class="tone">"Uw vertrouwde rechterhand, rustig en precies."</span>
         <a href="lifestyle-pass.html" class="go">Ontdek de Lifestyle Pass <span class="arrow">→</span></a>
       </div>
-      <div class="pass-card">
+      <div class="pass-card reveal">
         <span class="pass-tag">Zakelijk</span>
         <h3>Business Pass</h3>
-        <p>Voor wie tijd als kapitaal ziet. Hybride: een mens voor de relatie, AI voor de uitvoering. Scherp en zakelijk, zonder overbodige woorden.</p>
+        <p>Voor wie tijd als kapitaal ziet. Hybride: een mens voor de relatie, AI voor de uitvoering — na goedkeuring, of op uitnodiging.</p>
         <span class="tone">"Uw strategische partner: efficiënt en to the point."</span>
         <a href="business-pass.html" class="go">Ontdek de Business Pass <span class="arrow">→</span></a>
       </div>
@@ -551,11 +797,11 @@
 
 <section class="foundation on-white" id="foundation">
   <div class="wrap foundation-inner">
-    <div class="stat-block">
+    <div class="stat-block reveal">
       <div class="stat-number">30%</div>
       <div class="stat-label">van elke bijdrage naar liefdadigheid</div>
     </div>
-    <div>
+    <div class="reveal">
       <span class="kicker">RTFoundation</span>
       <h2>Reizen dat structureel iets teruggeeft.</h2>
       <p class="foundation-copy">Bij elke ledenbijdrage, ongeacht de pas, gaat 30% direct naar de RTFoundation. Dat gebeurt bij elke boeking, als vast en zichtbaar onderdeel van het model.</p>
@@ -564,8 +810,28 @@
   </div>
 </section>
 
+<section class="interview on-burgundy" id="interview">
+  <div class="wrap reveal">
+    <div class="folio">N° 03 — Het interview</div>
+    <span class="kicker">Vijf minuten met de oprichter</span>
+    <h2>“Wij verkopen geen droom. Wij verwijderen de opslag.”</h2>
+    <div class="qa">
+      <p class="vraag">U verkoopt toegang, geen reizen. Waarom?</p>
+      <p class="antwoord">Reizen kun je overal kopen. Wat je nergens kunt kopen, is de prijs waarvoor de reiswereld zelf inkoopt. Dat is het enige dat wij toevoegen — en het enige dat telt.</p>
+    </div>
+    <div class="qa">
+      <p class="vraag">Waarom drie passen?</p>
+      <p class="antwoord">Omdat ritme verschilt. De een reist op gevoel, de ander op agenda. De prijs is voor iedereen hetzelfde; de aandacht eromheen niet.</p>
+    </div>
+    <div class="qa">
+      <p class="vraag">En de dertig procent?</p>
+      <p class="antwoord">Die staat vast. Dertig procent van elke bijdrage gaat naar de RTFoundation. Niet als gebaar, maar als uitgangspunt.</p>
+    </div>
+  </div>
+</section>
+
 <section class="cta on-black">
-  <div class="wrap">
+  <div class="wrap reveal">
     <span class="kicker">Klaar om te beginnen</span>
     <h2>Toegang claim je zelf.</h2>
     <p class="deck">Kies de pas die het beste aansluit en zie binnen enkele minuten wat inkoopprijs echt betekent.</p>
@@ -576,12 +842,83 @@
   </div>
 </section>
 
+<section class="pager on-white reveal">
+  <div class="wrap">
+    <span class="pager-label">Sla de pagina om</span>
+    <a href="rtg-pass.html">RTG Pass — de instap <span class="pijl">→</span></a>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <span>© 2026 Rahul Travel Group</span>
     <span>RTG Pass · Lifestyle Pass · Business Pass</span>
   </div>
 </footer>
+
+<script>
+  (function(){
+    const hour = new Date().getHours();
+    let greeting, dark;
+
+    if (hour >= 5 && hour < 12) {
+      greeting = 'Goedemorgen'; dark = false;
+    } else if (hour >= 12 && hour < 18) {
+      greeting = 'Goedemiddag'; dark = false;
+    } else if (hour >= 18 && hour < 23) {
+      greeting = 'Goedenavond'; dark = true;
+    } else {
+      greeting = 'Goedenacht'; dark = true;
+    }
+
+    const hero = document.getElementById('heroSection');
+    const kicker = document.getElementById('heroKicker');
+
+    kicker.textContent = greeting + ' — membership, geen loyaliteitsprogramma';
+
+    if (dark) {
+      hero.classList.remove('on-white');
+      hero.classList.add('on-black');
+    }
+  })();
+
+  (function(){
+    const targets = document.querySelectorAll('.reveal');
+    if (!targets.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      targets.forEach(el => el.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    targets.forEach(el => observer.observe(el));
+  })();
+
+  (function(){
+    const bar = document.createElement('div');
+    bar.className = 'leesbalk';
+    document.body.appendChild(bar);
+
+    function update(){
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      bar.style.width = (max > 0 ? (doc.scrollTop / max) * 100 : 0) + '%';
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+</script>
 
 </body>
 </html>

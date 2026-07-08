@@ -6,465 +6,24 @@
 <title>RTG Pass — Rahul Travel Group</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --white:#FFFFFF;
-    --black:#0C0C0B;
-    --burgundy:#7F1634;
-    --burgundy-bright:#9E1C40;
-    --burgundy-on-dark:#C23A5E;
-    --gold:#857007;
-    --line:#DEDBD5;
-    --grey:#4D4A45;
-    --grey-soft:#8A8680;
-  }
-
-  *{margin:0;padding:0;box-sizing:border-box;}
-
-  html{scroll-behavior:smooth;}
-
-  body{
-    background:var(--white);
-    color:var(--black);
-    font-family:'Inter',sans-serif;
-    font-weight:400;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-
-  h1,h2,h3,.display{
-    font-family:'Bodoni Moda',serif;
-    font-weight:500;
-    letter-spacing:-0.01em;
-  }
-
-  a{color:inherit;text-decoration:none;}
-
-  .wrap{
-    max-width:1180px;
-    margin:0 auto;
-    padding:0 clamp(1.5rem, 4vw, 3rem);
-  }
-
-  section{
-    position:relative;
-    padding:clamp(6rem, 12vw, 11rem) 0;
-    overflow:hidden;
-  }
-
-  .on-black{background:var(--black);color:var(--white);}
-  .on-white{background:var(--white);color:var(--black);}
-
-  .folio{
-    font-family:'Inter',sans-serif;
-    font-size:0.75rem;
-    letter-spacing:0.18em;
-    text-transform:uppercase;
-    color:var(--grey-soft);
-    display:flex;
-    align-items:center;
-    gap:0.75rem;
-    margin-bottom:2.5rem;
-  }
-  .on-black .folio{color:rgba(255,255,255,0.45);}
-  .folio::after{
-    content:"";
-    flex:1;
-    height:1px;
-    background:var(--line);
-  }
-  .on-black .folio::after{background:rgba(255,255,255,0.14);}
-
-  .kicker{
-    font-size:0.8rem;
-    letter-spacing:0.16em;
-    text-transform:uppercase;
-    color:var(--burgundy);
-    font-weight:600;
-    margin-bottom:1.25rem;
-    display:block;
-  }
-  .on-black .kicker{color:var(--burgundy-on-dark);}
-
-  /* ---------- nav ---------- */
-
-  header{
-    position:fixed;
-    top:0;left:0;right:0;
-    z-index:100;
-    padding:1.1rem 0;
-    background:rgba(255,255,255,0.86);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
-  }
-  header .wrap{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .brandmark{
-    display:inline-flex;
-    flex-direction:column;
-    align-items:flex-start;
-  }
-  .brandmark .bm-block{
-    background:var(--burgundy);
-    color:var(--white);
-    font-family:'Bodoni Moda',serif;
-    font-weight:500;
-    font-size:1.05rem;
-    letter-spacing:0.05em;
-    padding:0.5rem 1.05rem;
-    line-height:1;
-  }
-  .brandmark .bm-tagline{
-    margin-top:0.45rem;
-    font-family:'Inter',sans-serif;
-    font-size:0.58rem;
-    letter-spacing:0.24em;
-    text-transform:uppercase;
-    color:var(--gold);
-    padding-left:0.15rem;
-  }
-  nav ul{
-    list-style:none;
-    display:flex;
-    gap:2.25rem;
-  }
-  nav a{
-    font-size:0.85rem;
-    letter-spacing:0.03em;
-    color:var(--grey);
-    transition:color 0.2s ease;
-  }
-  nav a:hover{color:var(--burgundy);}
-
-  /* ---------- hero ---------- */
-
-  .hero{
-    padding-top:clamp(9rem, 16vw, 13rem);
-    padding-bottom:clamp(6rem, 10vw, 8rem);
-  }
-  .hero-inner{
-    max-width:820px;
-  }
-  .hero h1{
-    font-size:clamp(2.6rem, 6vw, 5rem);
-    line-height:1.03;
-    max-width:14ch;
-  }
-  .hero p.deck{
-    margin-top:2rem;
-    font-size:clamp(1.05rem, 1.6vw, 1.25rem);
-    color:var(--grey);
-    max-width:520px;
-  }
-  .hero-cta{
-    margin-top:3rem;
-    display:inline-flex;
-    align-items:center;
-    gap:0.9rem;
-  }
-  .btn{
-    display:inline-block;
-    padding:0.95rem 2.1rem;
-    background:var(--black);
-    color:var(--white);
-    font-size:0.85rem;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
-    font-weight:600;
-    border:1px solid var(--black);
-    transition:all 0.25s ease;
-    cursor:pointer;
-  }
-  .btn:hover{
-    background:var(--burgundy);
-    border-color:var(--burgundy);
-  }
-  .btn-ghost{
-    background:transparent;
-    color:var(--black);
-  }
-  .btn-ghost:hover{
-    background:var(--black);
-    color:var(--white);
-    border-color:var(--black);
-  }
-  .on-black .btn-ghost{
-    color:var(--white);
-    border-color:rgba(255,255,255,0.35);
-  }
-  .on-black .btn-ghost:hover{
-    background:var(--white);
-    color:var(--black);
-  }
-  .on-black .btn{
-    background:var(--white);
-    color:var(--black);
-    border-color:var(--white);
-  }
-  .on-black .btn:hover{
-    background:var(--burgundy-on-dark);
-    color:var(--white);
-    border-color:var(--burgundy-on-dark);
-  }
-
-  /* ---------- burgundy-dominant sections (RTG Pass signature) ---------- */
-
-  .on-burgundy{background:var(--burgundy);color:var(--white);}
-  .on-burgundy .folio{color:var(--white);}
-  .on-burgundy .folio::after{background:rgba(255,255,255,0.25);}
-  .on-burgundy .kicker{color:var(--gold);}
-  .on-burgundy .hero p.deck{color:var(--white);}
-  .on-burgundy .step .n{color:var(--white);}
-  .on-burgundy .step p{color:var(--white);}
-  .on-burgundy .btn-ghost{
-    color:var(--white);
-    border-color:rgba(255,255,255,0.4);
-  }
-  .on-burgundy .btn-ghost:hover{
-    background:var(--white);
-    color:var(--black);
-  }
-  .on-burgundy .btn:hover{
-    background:var(--white);
-    color:var(--black);
-    border-color:var(--white);
-  }
-  .on-burgundy .feat-card{color:var(--black);}
-
-  /* ---------- manifesto-style intro ---------- */
-
-  .intro .wrap{max-width:760px;}
-  .intro p.lede{
-    font-family:'Bodoni Moda',serif;
-    font-size:clamp(1.4rem, 2.6vw, 1.9rem);
-    line-height:1.4;
-    font-weight:400;
-  }
-
-  /* ---------- how it works ---------- */
-
-  .steps-grid{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:3.5rem;
-    margin-top:3.5rem;
-  }
-  .step .n{
-    font-family:'Bodoni Moda',serif;
-    font-style:italic;
-    color:var(--burgundy);
-    font-size:1.4rem;
-    display:block;
-    margin-bottom:1rem;
-  }
-  .step h3{
-    font-size:1.15rem;
-    margin-bottom:0.6rem;
-  }
-  .step p{
-    color:var(--grey);
-    font-size:0.95rem;
-  }
-
-  @media (max-width:860px){
-    .steps-grid{grid-template-columns:1fr;gap:2.25rem;}
-  }
-
-  /* ---------- butler ---------- */
-
-  .butler-head{
-    text-align:center;
-    max-width:640px;
-    margin:0 auto 3.5rem;
-  }
-  .butler-head h2{
-    font-size:clamp(2rem, 3.6vw, 2.9rem);
-  }
-  .butler-head p{
-    margin-top:1.25rem;
-    color:var(--white);
-  }
-
-  .butler{
-    max-width:560px;
-    margin:0 auto;
-    background:#151412;
-    border:1px solid var(--black);
-  }
-  .butler-bar{
-    padding:1rem 1.5rem;
-    border-bottom:1px solid var(--black);
-    display:flex;
-    align-items:center;
-    gap:0.75rem;
-    font-size:0.8rem;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--white);
-  }
-  .butler-bar .dot{
-    width:7px;height:7px;
-    background:var(--burgundy-on-dark);
-  }
-  .butler-body{
-    padding:2rem 1.75rem;
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
-    min-height:220px;
-  }
-  .bubble{
-    padding:0.9rem 1.15rem;
-    font-size:0.92rem;
-    line-height:1.5;
-    max-width:82%;
-    animation:rise 0.35s ease;
-  }
-  @keyframes rise{
-    from{opacity:0; transform:translateY(6px);}
-    to{opacity:1; transform:translateY(0);}
-  }
-  .bubble.butler{
-    background:#201f1c;
-    color:var(--white);
-    align-self:flex-start;
-    border-left:2px solid var(--burgundy-on-dark);
-  }
-  .bubble.user{
-    background:var(--burgundy);
-    color:var(--white);
-    align-self:flex-end;
-  }
-  .butler-options{
-    display:flex;
-    flex-direction:column;
-    gap:0.6rem;
-    align-self:flex-start;
-    width:100%;
-    max-width:82%;
-  }
-  .butler-options button{
-    text-align:left;
-    background:transparent;
-    border:1px solid var(--black);
-    color:var(--white);
-    font-family:'Inter',sans-serif;
-    font-size:0.88rem;
-    padding:0.75rem 1rem;
-    cursor:pointer;
-    transition:all 0.2s ease;
-  }
-  .butler-options button:hover{
-    border-color:var(--burgundy-on-dark);
-    background:rgba(194,58,94,0.1);
-  }
-  .butler-reveal{
-    margin-top:0.5rem;
-    align-self:flex-start;
-  }
-  .butler-reveal .btn{
-    padding:0.85rem 1.75rem;
-  }
-  .butler-restart{
-    text-align:center;
-    margin-top:1.5rem;
-  }
-  .butler-restart button{
-    background:none;
-    border:none;
-    color:var(--white);
-    font-size:0.8rem;
-    letter-spacing:0.04em;
-    text-decoration:underline;
-    cursor:pointer;
-  }
-
-  /* ---------- features ---------- */
-
-  .feat-grid{
-    display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:1px;
-    background:var(--line);
-    margin-top:3.5rem;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
-  }
-  .feat-card{
-    background:var(--white);
-    padding:2.5rem;
-  }
-  .feat-card h3{
-    font-size:1.15rem;
-    margin-bottom:0.6rem;
-  }
-  .feat-card p{
-    color:var(--grey);
-    font-size:0.92rem;
-  }
-
-  @media (max-width:860px){
-    .feat-grid{grid-template-columns:1fr;}
-  }
-
-  /* ---------- cta ---------- */
-
-  .cta{text-align:center;}
-  .cta h2{
-    font-size:clamp(2.2rem, 5vw, 3.6rem);
-    max-width:16ch;
-    margin:0 auto;
-    line-height:1.08;
-  }
-  .cta .deck{
-    margin-top:1.5rem;
-    color:var(--white);
-    max-width:44ch;
-    margin-left:auto;
-    margin-right:auto;
-  }
-  .cta-actions{
-    margin-top:2.75rem;
-    display:inline-flex;
-    gap:1rem;
-  }
-
-  footer{
-    padding:3rem 0;
-    border-top:1px solid var(--line);
-  }
-  footer .wrap{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:0.8rem;
-    color:var(--grey-soft);
-  }
-
-  @media (max-width:600px){
-    footer .wrap{flex-direction:column;gap:1rem;text-align:center;}
-    nav ul{gap:1.2rem;}
-    nav a{font-size:0.75rem;}
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="rtg-pass.css">
 </head>
 <body>
 
 <header>
-  <div class="wrap">
+  <div class="wrap masthead">
     <a href="index.html" class="brandmark">
       <span class="bm-block">Rahul Travel Group</span>
       <span class="bm-tagline">Experience the Elite Class</span>
     </a>
+  </div>
+  <div class="wrap masthead-nav">
     <nav>
       <ul>
         <li><a href="index.html#passen">Passen</a></li>
         <li><a href="#butler">De Butler</a></li>
-        <li><a href="index.html#foundation">Foundation</a></li>
+        <li><a href="rtfoundation.html">Foundation</a></li>
       </ul>
     </nav>
   </div>
@@ -484,41 +43,52 @@
 
 <section class="intro on-burgundy">
   <div class="wrap">
-    <div class="folio">N° 01 — Wat het is</div>
-    <p class="lede">De RTG Pass is niet bedoeld om indruk te maken. Het is de manier waarop je toegang krijgt tot dezelfde nettoprijzen als reisbureaus, zonder tussenkomst van een adviseur — via een gesprek dat aanvoelt als een berichtje aan een kennis, niet als een sollicitatie.</p>
+    <div class="folio reveal">N° 01 — Wat het is</div>
+    <p class="lede reveal">De RTG Pass is niet bedoeld om indruk te maken. Het is de manier waarop je toegang krijgt tot dezelfde nettoprijzen als reisbureaus, zonder tussenkomst van een adviseur — via een gesprek dat aanvoelt als een berichtje aan een kennis, niet als een sollicitatie.</p>
 
     <div class="steps-grid">
-      <div class="step">
+      <div class="step reveal">
         <span class="n">01</span>
         <h3>Je stelt jezelf voor</h3>
         <p>Via WhatsApp, in een paar zinnen. Geen account, geen wachtwoord.</p>
       </div>
-      <div class="step">
+      <div class="step reveal">
         <span class="n">02</span>
         <h3>De Butler vraagt door</h3>
         <p>Een paar gerichte vragen over hoe je reist — genoeg om de juiste toegang te bepalen.</p>
       </div>
-      <div class="step">
+      <div class="step reveal">
         <span class="n">03</span>
         <h3>Toegang volgt vanzelf</h3>
         <p>Geen beoordelingsperiode, geen wachtlijst. Zodra het duidelijk is, is het geregeld.</p>
       </div>
     </div>
+
+    <div class="pull-quote reveal">
+      <p>Toegang is geen gunst die je verdient. Het is een prijs die je altijd al had moeten krijgen.</p>
+    </div>
   </div>
 </section>
 
-<section class="butler on-black" id="butler">
+<section class="on-burgundy" id="butler">
   <div class="wrap">
-    <div class="folio">N° 02 — De Butler</div>
-    <div class="butler-head">
+    <div class="folio reveal">N° 02 — De Butler</div>
+    <div class="butler-head reveal">
       <span class="kicker">Probeer het zelf</span>
       <h2>Een kort gesprek, geen formulier.</h2>
-      <p>Dit is een simulatie van het gesprek dat je normaal via WhatsApp voert — zelfde toon, zelfde vragen.</p>
+      <p>Praat rechtstreeks met de Butler — geen simulatie, geen wachttijd. Hetzelfde gesprek voer je straks via WhatsApp.</p>
     </div>
 
     <div class="butler">
       <div class="butler-bar"><span class="dot"></span> De Butler</div>
       <div class="butler-body" id="butlerBody"></div>
+      <form class="butler-input" id="butlerForm">
+        <input type="text" id="butlerInput" placeholder="Typ je antwoord…" autocomplete="off">
+        <button type="submit" id="butlerSend">Verstuur</button>
+      </form>
+    </div>
+    <div class="butler-reveal">
+      <a href="index.html#passen" class="btn">Toegang aanvragen</a>
     </div>
     <div class="butler-restart">
       <button id="butlerRestart" style="display:none;">Begin opnieuw</button>
@@ -528,21 +98,21 @@
 
 <section class="intro on-burgundy">
   <div class="wrap">
-    <div class="folio">N° 03 — Wat je krijgt</div>
+    <div class="folio reveal">N° 03 — Wat je krijgt</div>
     <div class="feat-grid">
-      <div class="feat-card">
+      <div class="feat-card reveal">
         <h3>Nettoprijzen</h3>
         <p>Dezelfde inkoopprijs die reisbureaus en touroperators zien, zonder consumentenmarge.</p>
       </div>
-      <div class="feat-card">
+      <div class="feat-card reveal">
         <h3>WhatsApp als enige voordeur</h3>
         <p>Geen app om te installeren, geen portaal om te onthouden — één gesprek, altijd bereikbaar.</p>
       </div>
-      <div class="feat-card">
+      <div class="feat-card reveal">
         <h3>Automatische bevestiging</h3>
         <p>Boekingen worden direct verwerkt, zonder tussenpersoon die nog moet goedkeuren.</p>
       </div>
-      <div class="feat-card">
+      <div class="feat-card reveal">
         <h3>30% naar de RTFoundation</h3>
         <p>Ook bij de RTG Pass gaat een vast deel van je bijdrage direct naar liefdadigheid.</p>
       </div>
@@ -550,8 +120,47 @@
   </div>
 </section>
 
-<section class="cta on-black">
+<section class="intro on-burgundy">
   <div class="wrap">
+    <div class="folio reveal">N° 04 — De rekensom</div>
+    <p class="lede reveal">Geen mystiek, gewoon de som. Dit is wat dezelfde reis kost wanneer je hem boekt tegen de prijs die de reisbranche zelf betaalt.</p>
+
+    <div class="steps-grid">
+      <div class="step reveal">
+        <span class="n">01</span>
+        <h3>Een week Algarve</h3>
+        <p>Gezin, vier personen, meivakantie. Zelfde vlucht, zelfde resort.</p>
+        <span class="rekensom-prijs"><span class="rekensom-oud">€ 2.340</span>€ 1.760</span>
+      </div>
+      <div class="step reveal">
+        <span class="n">02</span>
+        <h3>Lang weekend Milaan</h3>
+        <p>Twee personen, hotel in het centrum, vrijdag tot maandag.</p>
+        <span class="rekensom-prijs"><span class="rekensom-oud">€ 640</span>€ 470</span>
+      </div>
+      <div class="step reveal">
+        <span class="n">03</span>
+        <h3>Wintersport Oostenrijk</h3>
+        <p>Vier vrienden, een week, appartement naast de piste.</p>
+        <span class="rekensom-prijs"><span class="rekensom-oud">€ 3.280</span>€ 2.510</span>
+      </div>
+    </div>
+
+    <p class="rekensom-noot">Illustratieve voorbeelden op basis van gemiddelde consumentenmarges — geen lopende aanbiedingen.</p>
+  </div>
+</section>
+
+<section class="advert on-white">
+  <div class="wrap reveal">
+    <span class="ad-label">— Advertentie —</span>
+    <h2>Aandacht is de echte luxe.</h2>
+    <p class="ad-sub">Lifestyle Pass — één vaste concierge, met een heel team erachter.</p>
+    <a href="lifestyle-pass.html" class="btn">Maak kennis met de Lifestyle Pass</a>
+  </div>
+</section>
+
+<section class="cta on-black">
+  <div class="wrap reveal">
     <span class="kicker">Klaar om te beginnen</span>
     <h2>Old money wacht niet in de rij.</h2>
     <p class="deck">Praat met de Butler en zie binnen enkele minuten of de RTG Pass bij je past.</p>
@@ -562,6 +171,13 @@
   </div>
 </section>
 
+<section class="pager on-burgundy reveal">
+  <div class="wrap">
+    <span class="pager-label">Sla de pagina om</span>
+    <a href="lifestyle-pass.html">Lifestyle Pass — de rechterhand <span class="pijl">→</span></a>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <span>© 2026 Rahul Travel Group</span>
@@ -569,93 +185,7 @@
   </div>
 </footer>
 
-<script>
-(function(){
-  const questions = [
-    {
-      q: "Fijn dat je er bent. Wat brengt je meestal op reis?",
-      options: ["Zakelijk", "Vrije tijd", "Allebei door elkaar"]
-    },
-    {
-      q: "Hoe vaak boek je een verblijf of vlucht?",
-      options: ["Vrijwel maandelijks", "Een paar keer per jaar", "Onregelmatig"]
-    },
-    {
-      q: "Wat weegt voor jou het zwaarst?",
-      options: ["De prijs", "Het gemak", "De vrijheid om te wijzigen"]
-    }
-  ];
-
-  const body = document.getElementById('butlerBody');
-  const restartBtn = document.getElementById('butlerRestart');
-  let step = 0;
-  const answers = [];
-
-  function addBubble(text, who){
-    const el = document.createElement('div');
-    el.className = 'bubble ' + who;
-    el.textContent = text;
-    body.appendChild(el);
-    body.scrollTop = body.scrollHeight;
-  }
-
-  function renderQuestion(){
-    const current = questions[step];
-    addBubble(current.q, 'butler');
-
-    const optWrap = document.createElement('div');
-    optWrap.className = 'butler-options';
-    current.options.forEach(opt => {
-      const b = document.createElement('button');
-      b.textContent = opt;
-      b.onclick = () => {
-        optWrap.remove();
-        answers.push(opt);
-        addBubble(opt, 'user');
-        step++;
-        setTimeout(() => {
-          if (step < questions.length) {
-            renderQuestion();
-          } else {
-            renderClose();
-          }
-        }, 450);
-      };
-      optWrap.appendChild(b);
-    });
-    body.appendChild(optWrap);
-    body.scrollTop = body.scrollHeight;
-  }
-
-  function renderClose(){
-    const closing = "Duidelijk. Op basis hiervan past de RTG Pass bij jou — nettoprijzen, WhatsApp als voordeur, geen wachttijd.";
-    addBubble(closing, 'butler');
-
-    const reveal = document.createElement('div');
-    reveal.className = 'butler-reveal';
-    const a = document.createElement('a');
-    a.href = 'index.html#passen';
-    a.className = 'btn';
-    a.textContent = 'Toegang aanvragen';
-    reveal.appendChild(a);
-    body.appendChild(reveal);
-    body.scrollTop = body.scrollHeight;
-
-    restartBtn.style.display = 'inline-block';
-  }
-
-  function start(){
-    body.innerHTML = '';
-    step = 0;
-    answers.length = 0;
-    restartBtn.style.display = 'none';
-    renderQuestion();
-  }
-
-  restartBtn.addEventListener('click', start);
-  start();
-})();
-</script>
+<script src="rtg-pass.js"></script>
 
 </body>
 </html>

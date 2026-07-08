@@ -594,7 +594,12 @@
       <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
       <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
     </form>
+    <form class="login-form" id="forgotForm" style="display:none;">
+      <input id="fgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
+      <button type="submit" data-i18n="gate.sendreset">Stuur herstel-link</button>
+    </form>
     <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Nog geen account? Registreer</button>
+    <button class="gate-switch" id="toForgot" type="button" data-i18n="gate.forgot">Wachtwoord vergeten?</button>
     <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
     <p class="gate-or" data-i18n="gate.or">of kies een demoprofiel</p>
     <div class="gate-list">
@@ -873,14 +878,25 @@
     e.preventDefault();
     login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, p: $('#rgPass').value });
   });
-  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin');
-  if (toReg) toReg.addEventListener('click', () => {
-    $('#loginForm').style.display = 'none'; $('#regForm').style.display = 'flex';
-    toReg.style.display = 'none'; toLogin.style.display = '';
-  });
-  if (toLogin) toLogin.addEventListener('click', () => {
-    $('#regForm').style.display = 'none'; $('#loginForm').style.display = 'flex';
-    toLogin.style.display = 'none'; toReg.style.display = '';
+  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
+  function showGateForm(which){
+    ['#loginForm','#regForm','#forgotForm'].forEach(sel => { const f=$(sel); if(f) f.style.display='none'; });
+    const map = { login:'#loginForm', register:'#regForm', forgot:'#forgotForm' };
+    const f = $(map[which]); if (f) f.style.display = 'flex';
+    if (toReg) toReg.style.display = which==='login' ? '' : 'none';
+    if (toForgot) toForgot.style.display = which==='login' ? '' : 'none';
+    if (toLogin) toLogin.style.display = which==='login' ? 'none' : '';
+  }
+  if (toReg) toReg.addEventListener('click', () => showGateForm('register'));
+  if (toForgot) toForgot.addEventListener('click', () => showGateForm('forgot'));
+  if (toLogin) toLogin.addEventListener('click', () => showGateForm('login'));
+  const forgotForm = document.getElementById('forgotForm');
+  if (forgotForm) forgotForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    try { await API.call('/auth/forgot', { email: $('#fgEmail').value }); }
+    catch (e2){ /* stil, geen bestaan lekken */ }
+    toast(T('gate.forgotsent','Als dit e-mailadres bekend is, sturen we een herstel-link.'));
+    showGateForm('login');
   });
 
   async function login(tier, cred){
@@ -1493,6 +1509,7 @@ window.I18N = { en: {
   'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
   'gate.name':'Your name', 'gate.email':'Email address', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
+  'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.forgotsent':'If this email is known, we will send a reset link.',
   'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
   'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',
   'vf.pending.h':'Verification in progress', 'vf.pending.b':'We are reviewing your document. You can keep using the app as normal.',

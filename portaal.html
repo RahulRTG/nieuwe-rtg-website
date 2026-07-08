@@ -1034,7 +1034,16 @@
         <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
         <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
       </form>
+      <form id="forgotForm" style="display:none;">
+        <input id="fgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
+        <button type="submit" data-i18n="gate.sendreset">Stuur herstel-link</button>
+      </form>
+      <form id="resetForm" style="display:none;">
+        <input id="rsPass" type="password" placeholder="Nieuw wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
+        <button type="submit" data-i18n="gate.setpass">Wachtwoord instellen</button>
+      </form>
       <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Nog geen account? Registreer</button>
+      <button class="gate-switch" id="toForgot" type="button" data-i18n="gate.forgot">Wachtwoord vergeten?</button>
       <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
       <p class="lb-hint" data-i18n-html="gate.hint">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>.</p>
     </div>
@@ -1381,17 +1390,58 @@
     e.preventDefault();
     login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, p: $('#rgPass').value });
   });
-  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin');
-  if (toReg) toReg.addEventListener('click', () => {
-    $('#loginForm').style.display = 'none'; $('#regForm').style.display = 'flex';
-    toReg.style.display = 'none'; toLogin.style.display = '';
-    $('#lbTitle').textContent = T('gate.lb.hreg', 'Account aanmaken');
+  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
+  function showGateForm(which){
+    ['#loginForm','#regForm','#forgotForm','#resetForm'].forEach(sel => { const f=$(sel); if(f) f.style.display='none'; });
+    const map = { login:'#loginForm', register:'#regForm', forgot:'#forgotForm', reset:'#resetForm' };
+    const f = $(map[which]); if (f) f.style.display = 'flex';
+    if (toReg) toReg.style.display = which==='login' ? '' : 'none';
+    if (toForgot) toForgot.style.display = which==='login' ? '' : 'none';
+    if (toLogin) toLogin.style.display = (which==='login' || which==='reset') ? 'none' : '';
+    if (which==='reset' && toLogin) toLogin.style.display = '';
+    $('#lbTitle').textContent = which==='register' ? T('gate.lb.hreg','Account aanmaken')
+      : which==='forgot' ? T('gate.lb.hforgot','Wachtwoord vergeten')
+      : which==='reset' ? T('gate.lb.hreset','Nieuw wachtwoord instellen')
+      : T('gate.lb.h','Inloggen');
+  }
+  if (toReg) toReg.addEventListener('click', () => showGateForm('register'));
+  if (toForgot) toForgot.addEventListener('click', () => showGateForm('forgot'));
+  if (toLogin) toLogin.addEventListener('click', () => showGateForm('login'));
+
+  const forgotForm = document.getElementById('forgotForm');
+  if (forgotForm) forgotForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      const d = await API.call('/auth/forgot', { email: $('#fgEmail').value });
+      toast(T('gate.forgotsent','Als dit e-mailadres bekend is, sturen we een herstel-link.'));
+      if (d.devResetUrl) location.href = d.devResetUrl; // dev: meteen naar de reset-pagina
+      else showGateForm('login');
+    } catch (e2){ toast(e2.message || 'Er ging iets mis.'); }
   });
-  if (toLogin) toLogin.addEventListener('click', () => {
-    $('#regForm').style.display = 'none'; $('#loginForm').style.display = 'flex';
-    toLogin.style.display = 'none'; toReg.style.display = '';
-    $('#lbTitle').textContent = T('gate.lb.h', 'Inloggen');
+
+  let resetToken = null;
+  const resetForm = document.getElementById('resetForm');
+  if (resetForm) resetForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      await API.call('/auth/reset', { token: resetToken, password: $('#rsPass').value });
+      toast(T('gate.resetok','Wachtwoord ingesteld. U kunt nu inloggen.'));
+      history.replaceState(null, '', location.pathname);
+      showGateForm('login');
+    } catch (e2){ toast(e2.message || 'Herstel mislukt.'); }
   });
+
+  // Bevestigings- en herstel-links uit de e-mail afhandelen.
+  (function handleAuthLinks(){
+    const q = new URLSearchParams(location.search);
+    if (q.get('verify')){
+      API.call('/auth/verify-email', { token: q.get('verify') })
+        .then(() => toast(T('gate.verified','Uw e-mailadres is bevestigd.')))
+        .catch(() => toast(T('gate.verifyfail','Bevestigingslink ongeldig of verlopen.')))
+        .finally(() => history.replaceState(null, '', location.pathname));
+    }
+    if (q.get('reset')){ resetToken = q.get('reset'); showGateForm('reset'); }
+  })();
 
   async function login(tier, cred){
     if (cred){
@@ -2119,6 +2169,10 @@ window.I18N = { en: {
   'gate.deck':'Payments, journeys, your personal AI and The Salon, the private social network of RTG. This portal is also your access card for the RTG app that is on its way.',
   'gate.note':'Sign in with your account, or choose a demo profile below. Each membership has different rights.',
   'gate.lb.k':'Member login', 'gate.lb.h':'Sign in', 'gate.lb.hreg':'Create account',
+  'gate.lb.hforgot':'Forgot password', 'gate.lb.hreset':'Set a new password',
+  'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.setpass':'Set password',
+  'gate.forgotsent':'If this email is known, we will send a reset link.', 'gate.resetok':'Password set. You can sign in now.',
+  'gate.verified':'Your email address has been confirmed.', 'gate.verifyfail':'Confirmation link invalid or expired.',
   'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in',
   'gate.name':'Your name', 'gate.email':'Email address', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',

@@ -22,6 +22,11 @@ const crypto = require('crypto');
 const { db, load, save } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
+const mail = require('./mail');
+
+function appUrl(req) {
+  return process.env.APP_URL || req.headers.origin || (req.protocol + '://' + req.get('host'));
+}
 
 load();
 accounts.init();
@@ -299,9 +304,54 @@ app.post('/api/auth/register', (req, res) => {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
   accounts.saveMemberState(user.id, memberTemplate());
+  // bevestigingsmail met een echte, werkende link
+  const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
+  const verifyUrl = appUrl(req) + '/portaal.html?verify=' + vtok;
+  mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
+    'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl);
   const token = accounts.issueToken(user.id);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
-  res.json({ token, state: stateFor(sess, req.body.lang) });
+  res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true, ...(mail.configured ? {} : { devVerifyUrl: verifyUrl }) });
+});
+
+app.post('/api/auth/verify-email', (req, res) => {
+  const u = accounts.verifyActionToken(req.body.token, 'verify-email');
+  if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen bevestigingslink.' });
+  accounts.setEmailVerified(u.id);
+  res.json({ ok: true });
+});
+
+app.post('/api/auth/resend', auth, (req, res) => {
+  if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
+  const u = req.session.account;
+  const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
+  const url = appUrl(req) + '/portaal.html?verify=' + vtok;
+  mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
+  res.json({ ok: true, ...(mail.configured ? {} : { devVerifyUrl: url }) });
+});
+
+app.post('/api/auth/forgot', (req, res) => {
+  const email = String(req.body.email || '').trim();
+  const u = email ? accounts.findByLogin(email) : null;
+  let devResetUrl;
+  if (u) {
+    const tok = accounts.createReset(u.id);
+    const url = appUrl(req) + '/portaal.html?reset=' + tok;
+    mail.send(accounts.emailOf(u) || email, 'Wachtwoord herstellen bij Rahul Travel Group',
+      'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url);
+    if (!mail.configured) devResetUrl = url;
+  }
+  // Altijd hetzelfde antwoord: niet verklappen of een e-mailadres bestaat.
+  res.json({ ok: true, ...(devResetUrl ? { devResetUrl } : {}) });
+});
+
+app.post('/api/auth/reset', (req, res) => {
+  const u = accounts.findByReset(req.body.token);
+  if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen herstel-link.' });
+  const pw = String(req.body.password || '');
+  if (pw.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
+  accounts.setPassword(u.id, pw);
+  res.json({ ok: true });
 });
 
 app.post('/api/auth/login', (req, res) => {
@@ -458,9 +508,10 @@ app.post('/api/comment', auth, (req, res) => {
   }
   const text = String(req.body.text || '').trim().slice(0, 500);
   if (!text) return res.status(400).json({ error: 'Lege reactie.' });
-  const persona = PERSONAS[req.session.tier];
+  // Echte leden verschijnen in De Salon onder hun codenaam, nooit hun echte naam.
+  const who = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
   const clang = req.body.lang === 'en' ? 'en' : 'nl';
-  const comment = { who: persona.full, tier: req.session.tier, text, lang: clang };
+  const comment = { who, tier: req.session.tier, text, lang: clang };
   post.comments.push(comment);
   registerContact(req.session, post);
   save();
@@ -469,7 +520,7 @@ app.post('/api/comment', auth, (req, res) => {
   // de eigenaar van de post krijgt een notificatie (niet bij eigen reactie)
   const ownerTier = AUTHOR_TIER[post.author];
   if (ownerTier && ownerTier !== req.session.tier) {
-    notify(ownerTier, { icon: '💬', title: 'Nieuwe reactie', body: persona.full + ': “' + text.slice(0, 80) + '”', scope: 'salon' });
+    notify(ownerTier, { icon: '💬', title: 'Nieuwe reactie', body: who + ': “' + text.slice(0, 80) + '”', scope: 'salon' });
   }
   res.json({ ok: true, comment });
 });
@@ -483,8 +534,9 @@ app.post('/api/dm', auth, (req, res) => {
   const text = String(req.body.text || '').trim().slice(0, 1000);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
   registerContact(req.session, post);
+  const fromName = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
   db.data.dms.push({
-    from: PERSONAS[req.session.tier].full,
+    from: fromName,
     fromTier: req.session.tier,
     to: post.author,
     text,
@@ -495,7 +547,7 @@ app.post('/api/dm', auth, (req, res) => {
   // de ontvanger krijgt een notificatie/push van het privébericht
   const ownerTier = AUTHOR_TIER[post.author];
   if (ownerTier && ownerTier !== req.session.tier) {
-    notify(ownerTier, { icon: '✉', title: 'Nieuw bericht in De Salon', body: PERSONAS[req.session.tier].full + ' stuurde u een bericht.', scope: 'salon' });
+    notify(ownerTier, { icon: '✉', title: 'Nieuw bericht in De Salon', body: fromName + ' stuurde u een bericht.', scope: 'salon' });
   }
   res.json({ ok: true });
 });
@@ -814,11 +866,11 @@ app.post('/api/order', auth, (req, res) => {
     if (m) { items.push({ id: m.id, name: m.name, qty, price: m.price }); total += m.price * qty; }
   }
   if (!items.length) return res.status(400).json({ error: 'Geen geldige gerechten gekozen.' });
-  const persona = PERSONAS[req.session.tier];
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
   const order = {
     ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     supplierCode: s.code, supplierName: s.name, type: s.type,
-    customerTier: req.session.tier, customerCodename: persona.codename,
+    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     items, total,
     allergyNote: String(req.body.allergyNote || '').slice(0, 200),
     tagSalon: !!req.body.tagSalon,
@@ -827,7 +879,7 @@ app.post('/api/order', auth, (req, res) => {
   db.data.orders.unshift(order);
   save();
   // leverancier + backoffice live
-  notifySupplier(s.code, { icon: '🛎️', title: 'Nieuwe bestelling', body: persona.codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+  notifySupplier(s.code, { icon: '🛎️', title: 'Nieuwe bestelling', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
   sseToSupplier(s.code, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   res.json({ ok: true, order });
@@ -835,7 +887,7 @@ app.post('/api/order', auth, (req, res) => {
 
 // bestelling betalen (Face ID op het toestel)
 app.post('/api/order/pay', auth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.customerTier === req.session.tier);
+  const o = db.data.orders.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
   o.paid = true;
@@ -847,7 +899,7 @@ app.post('/api/order/pay', auth, (req, res) => {
 });
 
 app.post('/api/orders/mine', auth, (req, res) => {
-  res.json({ orders: db.data.orders.filter(o => o.customerTier === req.session.tier) });
+  res.json({ orders: db.data.orders.filter(o => (o.customerKey || o.customerTier) === req.session.key) });
 });
 
 /* ================= BACKOFFICE (RTG) =================
@@ -896,8 +948,9 @@ app.post('/api/office/state', officeAuth, (req, res) => res.json({ state: office
 
 /* Backoffice: identiteitsverificaties beoordelen. */
 function pendingVerifications() {
+  // De backoffice mag voor de KYC-controle de echte naam/e-mail uit de kluis zien.
   return accounts.listByVerification('pending').map(u => ({
-    id: u.id, name: u.real_name || u.username, email: u.email, codename: u.codename,
+    id: u.id, name: accounts.realNameOf(u), email: accounts.emailOf(u), codename: u.codename,
     tier: u.tier, doc: u.id_doc, at: u.created_at
   }));
 }

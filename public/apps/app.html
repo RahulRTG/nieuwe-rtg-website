@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>RTG, de app</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B;
+    --card:#151312;
+    --card2:#1B1817;
+    --line:rgba(255,255,255,0.09);
+    --txt:#F4F1EC;
+    --muted:rgba(244,241,236,0.55);
+    --soft:rgba(244,241,236,0.38);
+    --burgundy:#C23A5E;
+    --burgundy-deep:#7F1634;
+    --gold:#A98F1C;
+    --green:#4C9A75;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+  body{
+    background:#000;
+    font-family:'Inter',sans-serif;
+    color:var(--txt);
+    display:flex;
+    justify-content:center;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-0.01em;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
+  a{color:inherit;text-decoration:none;}
+
+  #shell{
+    width:100%;
+    max-width:430px;
+    min-height:100dvh;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  /* op desktop: telefoonkader, zodat het concept als app leest */
+  @media (min-width:520px){
+    body{background:#201d1c;padding:2.5rem 0;}
+    #shell{
+      min-height:860px;
+      max-height:900px;
+      border-radius:40px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.1);
+      box-shadow:0 40px 90px -30px rgba(0,0,0,0.8);
+    }
+  }
+
+  /* ---------- login ---------- */
+
+  #gate{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:2.5rem 1.75rem 3rem;
+    gap:0;
+  }
+  #gate .logo{
+    background:var(--burgundy-deep);
+    color:#fff;
+    font-family:'Bodoni Moda',serif;
+    font-size:1.05rem;
+    letter-spacing:0.05em;
+    padding:0.55rem 1.1rem;
+    align-self:flex-start;
+  }
+  #gate .tagline{
+    margin-top:0.6rem;
+    font-size:0.56rem;
+    letter-spacing:0.26em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  #gate h1{font-size:2.2rem;line-height:1.1;margin-top:2.5rem;}
+  #gate h1 em{color:var(--burgundy);font-style:italic;}
+  #gate .deck{margin-top:1rem;font-size:0.9rem;color:var(--muted);line-height:1.6;}
+  .gate-list{margin-top:2.25rem;display:flex;flex-direction:column;gap:0.75rem;}
+  .gate-btn{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:1.1rem 1.25rem;
+    text-align:left;
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    transition:background 0.2s ease;
+  }
+  .gate-btn:active{background:var(--card2);}
+  .gate-btn .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .gate-btn.t-rtg .dot{background:var(--burgundy);}
+  .gate-btn.t-lifestyle .dot{background:var(--gold);}
+  .gate-btn.t-business .dot{background:#fff;}
+  .gate-btn b{display:block;font-size:0.95rem;font-weight:600;}
+  .gate-btn span{font-size:0.74rem;color:var(--soft);}
+  #gate .note{margin-top:1.75rem;font-size:0.72rem;color:var(--soft);font-style:italic;}
+  .login-form{margin-top:2.25rem;display:flex;flex-direction:column;gap:0.65rem;}
+  .login-form input{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.95rem 1.1rem;color:var(--txt);font-size:0.95rem;font-family:inherit;outline:none;}
+  .login-form input:focus{border-color:var(--burgundy);}
+  .login-form button{background:#fff;color:#000;border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
+  .login-form button:active{opacity:0.85;}
+  .gate-or{margin:1.9rem 0 0.35rem;font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);text-align:center;}
+  .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--gold);font-size:0.76rem;cursor:pointer;font-family:inherit;text-align:center;}
+  .gate-switch:hover{text-decoration:underline;}
+  .vbanner{background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1.25rem;display:flex;flex-direction:column;gap:0.4rem;}
+  .vbanner.pending{border-color:var(--line);}
+  .vbanner b{font-size:0.95rem;}
+  .vbanner span{font-size:0.8rem;color:var(--muted);line-height:1.5;}
+  .vbanner .vbtn{align-self:flex-start;margin-top:0.55rem;background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.6rem 1.15rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .vbanner .vbtn:active{opacity:0.85;}
+
+  /* ---------- app-chroom ---------- */
+
+  #app{display:none;flex:1;flex-direction:column;min-height:0;}
+  #app.active{display:flex;}
+
+  .topbar{
+    padding:calc(env(safe-area-inset-top, 0px) + 1rem) 1.5rem 0.9rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--line);
+    background:var(--bg);
+  }
+  .topbar .brand{
+    font-family:'Bodoni Moda',serif;
+    font-size:1rem;
+    letter-spacing:0.06em;
+  }
+  .topbar .brand small{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-size:0.5rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  .code-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:0.45rem;
+    border:1px solid var(--line);
+    background:var(--card);
+    border-radius:999px;
+    padding:0.4rem 0.85rem;
+    font-size:0.68rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .code-chip .cdot{width:7px;height:7px;border-radius:50%;background:var(--burgundy);}
+
+  .bell{
+    position:relative;
+    background:none;border:none;
+    color:var(--muted);
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .bell svg{width:21px;height:21px;}
+  .bell-badge{
+    position:absolute;top:-2px;right:-2px;
+    min-width:16px;height:16px;padding:0 4px;
+    background:var(--burgundy);color:#fff;
+    border-radius:999px;font-size:0.6rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .notif-scrim{
+    position:absolute;inset:0;background:rgba(0,0,0,0.5);
+    z-index:44;display:none;
+  }
+  .notif-scrim.open{display:block;}
+  .notif-panel{
+    position:absolute;
+    top:0;right:0;
+    width:86%;max-width:340px;
+    height:100%;
+    background:var(--bg);
+    border-left:1px solid var(--line);
+    z-index:45;
+    transform:translateX(100%);
+    transition:transform 0.25s ease;
+    display:flex;flex-direction:column;
+    padding-top:env(safe-area-inset-top, 0px);
+  }
+  .notif-panel.open{transform:translateX(0);}
+  .notif-head{
+    padding:1.2rem 1.25rem 1rem;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--line);
+  }
+  .notif-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;font-weight:500;}
+  .notif-push{
+    background:var(--card);border:1px solid var(--line);color:var(--muted);
+    border-radius:999px;padding:0.4rem 0.85rem;font-size:0.68rem;
+  }
+  .notif-push.on{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .notif-list{flex:1;overflow-y:auto;padding:0.5rem 0;}
+  .notif-item{
+    display:flex;gap:0.85rem;
+    padding:0.9rem 1.25rem;
+    border-bottom:1px solid var(--line);
+  }
+  .notif-item.unread{background:rgba(194,58,94,0.06);}
+  .notif-item .ic{
+    width:32px;height:32px;flex-shrink:0;border-radius:50%;
+    background:var(--card);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:0.9rem;color:var(--burgundy);
+  }
+  .notif-item .tx b{display:block;font-size:0.84rem;font-weight:600;}
+  .notif-item .tx span{font-size:0.78rem;color:var(--muted);line-height:1.4;}
+  .notif-item .tx time{display:block;margin-top:0.2rem;font-size:0.66rem;color:var(--soft);}
+  .notif-empty{padding:2.5rem 1.25rem;text-align:center;color:var(--soft);font-size:0.85rem;}
+
+  .content{
+    flex:1;
+    overflow-y:auto;
+    padding:1.4rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 6rem);
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+  .view h2{font-size:1.7rem;line-height:1.15;}
+  .view .sub{margin-top:0.4rem;font-size:0.85rem;color:var(--muted);}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:1.3rem 1.35rem;
+    margin-top:1rem;
+  }
+  .card .label{
+    font-size:0.62rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--soft);
+  }
+  .card .big{font-family:'Bodoni Moda',serif;font-size:1.7rem;margin-top:0.35rem;}
+  .card .big.accent{color:var(--burgundy);}
+  .card .big.gold{color:var(--gold);}
+  .card .meta{margin-top:0.3rem;font-size:0.78rem;color:var(--muted);}
+  .card .go{
+    margin-top:0.9rem;
+    background:none;border:none;
+    font-size:0.75rem;font-weight:600;
+    color:var(--burgundy);
+    padding:0;
+  }
+
+  /* codenaam-kaart (de digitale pas in de app) */
+  .codecard{
+    margin-top:1rem;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:
+      radial-gradient(120% 140% at 85% -10%, rgba(158,28,64,0.4), transparent 60%),
+      linear-gradient(150deg, #191412 0%, #100D0C 70%);
+    padding:1.5rem 1.4rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .codecard .label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--soft);}
+  .codecard .cn{
+    font-family:'Bodoni Moda',serif;
+    font-size:2rem;
+    margin-top:0.4rem;
+    letter-spacing:0.02em;
+  }
+  .codecard .row{
+    margin-top:1.1rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:1rem;
+  }
+  .codecard .mrow{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
+  .codecard .mrow b{display:block;font-size:0.78rem;color:var(--muted);font-weight:500;margin-top:0.2rem;letter-spacing:0.08em;}
+  .codecard svg{background:#fff;padding:4px;width:58px;height:58px;border-radius:6px;display:block;}
+  .codecard .why{
+    margin-top:1.2rem;
+    border-top:1px solid var(--line);
+    padding-top:1rem;
+    font-size:0.78rem;
+    color:var(--muted);
+    line-height:1.55;
+    display:none;
+  }
+  .codecard .why.open{display:block;}
+  .codecard .why b{color:var(--txt);}
+  .codecard .whybtn{
+    margin-top:1rem;
+    background:none;border:none;padding:0;
+    font-size:0.74rem;font-weight:600;color:var(--burgundy);
+  }
+
+  /* lijsten */
+  .rowitem{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    padding:1rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .rowitem:last-child{border-bottom:none;}
+  .rowitem .t{flex:1;min-width:0;}
+  .rowitem .t b{display:block;font-size:0.88rem;font-weight:600;}
+  .rowitem .t span{font-size:0.72rem;color:var(--soft);}
+  .rowitem .amount{font-family:'Bodoni Moda',serif;font-size:1.05rem;white-space:nowrap;}
+  .pill{
+    font-size:0.6rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-weight:600;
+    padding:0.28rem 0.65rem;
+    border-radius:999px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  .pill.open{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .pill.paid{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .pill.req{color:var(--gold);border-color:rgba(169,143,28,0.4);}
+
+  .btn-pay{
+    display:inline-flex;
+    align-items:center;
+    gap:0.5rem;
+    background:#fff;
+    color:#000;
+    border:none;
+    border-radius:999px;
+    padding:0.65rem 1.2rem;
+    font-size:0.78rem;
+    font-weight:600;
+    transition:transform 0.15s ease;
+  }
+  .btn-pay:active{transform:scale(0.97);}
+  .btn-pay svg{width:14px;height:14px;}
+  .payall{margin-top:1.1rem;width:100%;justify-content:center;padding:0.9rem;}
+
+  /* AI-chat */
+  .chat{
+    margin-top:1rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.7rem;
+  }
+  .bubble{
+    max-width:88%;
+    padding:0.8rem 1rem;
+    font-size:0.86rem;
+    line-height:1.5;
+    white-space:pre-line;
+    border-radius:16px;
+  }
+  .bubble.ai{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px;}
+  .bubble.user{background:var(--burgundy-deep);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+  .bubble.pending{font-style:italic;color:var(--muted);}
+  .wa-badge{display:block;font-size:0.6rem;letter-spacing:0.04em;opacity:0.75;margin-bottom:0.25rem;}
+  .chips{display:flex;gap:0.5rem;overflow-x:auto;margin-top:1rem;padding-bottom:0.3rem;scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex-shrink:0;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--muted);
+    border-radius:999px;
+    padding:0.5rem 0.95rem;
+    font-size:0.74rem;
+  }
+  .askrow{
+    margin-top:0.9rem;
+    display:flex;
+    gap:0.5rem;
+  }
+  .askrow input{
+    flex:1;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:0.8rem 1.1rem;
+    font-family:'Inter',sans-serif;
+    font-size:0.85rem;
+    color:var(--txt);
+    outline:none;
+  }
+  .askrow button{
+    background:#fff;color:#000;border:none;border-radius:999px;
+    padding:0 1.2rem;font-size:0.75rem;font-weight:600;
+  }
+
+  /* salon */
+  .post{
+    margin-top:1rem;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+  }
+  .post .head{
+    padding:0.9rem 1.15rem;
+    display:flex;align-items:center;gap:0.75rem;
+  }
+  .post .avatar{
+    width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Bodoni Moda',serif;font-size:0.9rem;color:#fff;
+    flex-shrink:0;background:#333;
+  }
+  .post .avatar.a-rtg{background:var(--burgundy-deep);}
+  .post .avatar.a-lifestyle{background:var(--gold);}
+  .post .avatar.a-business{background:#2E2B29;}
+  .post .head b{display:block;font-size:0.84rem;}
+  .post .head span{font-size:0.68rem;color:var(--soft);}
+  .post .visual{
+    aspect-ratio:16/10;
+    display:flex;align-items:flex-end;padding:1rem 1.15rem;
+  }
+  .post .visual .place{
+    font-family:'Bodoni Moda',serif;font-style:italic;font-size:1.4rem;color:#fff;
+    text-shadow:0 2px 16px rgba(0,0,0,0.4);
+  }
+  .v-kyoto{background:linear-gradient(160deg,#3E1F26 0%,#7F1634 60%,#B8657B 100%);}
+  .v-zurich{background:linear-gradient(160deg,#10151C 0%,#2C3A4D 60%,#7C93AC 100%);}
+  .v-lissabon{background:linear-gradient(160deg,#1F1A0C 0%,#857007 65%,#D9C36A 100%);}
+  .v-singapore{background:linear-gradient(160deg,#0B1F1A 0%,#2E6B4F 65%,#8FC0A9 100%);}
+  .v-marrakech{background:linear-gradient(160deg,#2A130A 0%,#9E4A1C 60%,#E0A470 100%);}
+  .post .body{padding:1rem 1.15rem;font-size:0.84rem;color:var(--muted);line-height:1.55;}
+  .post .acts{
+    display:flex;align-items:center;gap:0.3rem;
+    border-top:1px solid var(--line);
+    padding:0.4rem 0.6rem;
+  }
+  .pa{
+    background:none;border:none;
+    font-size:0.76rem;color:var(--muted);
+    padding:0.5rem 0.6rem;
+    display:inline-flex;align-items:center;gap:0.35rem;
+  }
+  .pa.liked{color:var(--burgundy);font-weight:600;}
+  .pa:disabled{color:rgba(244,241,236,0.2);}
+  .comments{border-top:1px solid var(--line);padding:0.8rem 1.15rem;display:none;}
+  .comments.open{display:block;}
+  .comment{font-size:0.78rem;color:var(--muted);padding:0.3rem 0;}
+  .comment b{color:var(--txt);font-weight:600;}
+  .msg-note{display:block;}
+  .msg-toggle{background:none;border:none;padding:0;margin-top:0.15rem;color:var(--gold);font-size:0.66rem;cursor:pointer;font-family:inherit;letter-spacing:0.02em;}
+  .msg-toggle:hover{text-decoration:underline;}
+  .cform{display:flex;gap:0.5rem;margin-top:0.6rem;}
+  .cform input{
+    flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;
+    padding:0.55rem 0.95rem;font-size:0.78rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;
+  }
+  .cform button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 0.95rem;font-size:0.68rem;font-weight:600;}
+
+  /* tabbalk */
+  .tabbar{
+    position:absolute;
+    left:0;right:0;bottom:0;
+    z-index:30;
+    background:rgba(12,12,11,0.92);
+    backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);
+    display:flex;
+    padding:0.55rem 0.5rem calc(env(safe-area-inset-bottom, 0px) + 0.55rem);
+  }
+  .tabbar button{
+    flex:1;
+    background:none;border:none;
+    display:flex;flex-direction:column;align-items:center;gap:0.25rem;
+    font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--soft);
+  }
+  .tabbar button svg{width:21px;height:21px;stroke:currentColor;}
+  .tabbar button.active{color:var(--txt);}
+  .tabbar button.active svg{stroke:var(--burgundy);}
+
+  /* overlays */
+  #paywait{
+    position:absolute;inset:0;background:rgba(0,0,0,0.65);
+    display:none;align-items:center;justify-content:center;z-index:60;
+  }
+  #paywait.open{display:flex;}
+  .paycard{
+    background:#fff;color:#0C0C0B;width:260px;
+    padding:2rem 1.8rem;text-align:center;border-radius:22px;
+  }
+  .paycard .amt{font-family:'Bodoni Moda',serif;font-size:1.4rem;margin-bottom:0.9rem;}
+  .paycard .icon{width:52px;height:52px;margin:0 auto 0.8rem;}
+  .paycard .icon svg{width:100%;height:100%;}
+  .paycard .lbl{font-size:0.8rem;color:#4D4A45;}
+  @keyframes pulse{0%{transform:scale(1);opacity:0.8;}50%{transform:scale(1.08);opacity:1;}100%{transform:scale(1);opacity:0.8;}}
+  .paycard.scanning .icon{animation:pulse 0.9s ease-in-out infinite;}
+  .paycard.done .lbl{color:#2E6B4F;font-weight:600;}
+
+  /* ter plaatse: leveranciers, orders, menu-overlay */
+  .sup-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.15rem;margin-top:0.8rem;display:flex;align-items:center;gap:0.9rem;}
+  .sup-card .ic{font-size:1.6rem;flex-shrink:0;}
+  .sup-card .t{flex:1;min-width:0;}
+  .sup-card .t b{display:block;font-size:0.92rem;font-weight:600;}
+  .sup-card .t span{font-size:0.72rem;color:var(--soft);}
+  .sup-card .go{background:#fff;color:#000;border:none;border-radius:999px;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
+  .sup-card .go.ghost{background:none;color:var(--muted);border:1px solid var(--line);}
+  .sec-label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 0.2rem;}
+  .myorder{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.05rem;margin-top:0.7rem;}
+  .myorder .r1{display:flex;justify-content:space-between;align-items:center;gap:0.6rem;}
+  .myorder .nm{font-weight:600;font-size:0.86rem;}
+  .myorder .sub2{font-size:0.7rem;color:var(--soft);margin-top:0.1rem;}
+  .myorder .amt{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
+  .mo-pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
+  .mo-pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .mo-pill.bereiding{color:#C99A2E;border-color:rgba(201,154,46,0.4);}
+  .mo-pill.klaar,.mo-pill.geserveerd{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .myorder .acts{margin-top:0.7rem;display:flex;gap:0.5rem;align-items:center;}
+  .mo-pay{background:#fff;color:#000;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
+  .mo-pay svg{width:12px;height:12px;}
+  .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
+
+  /* ---- Onderweg (live reis) ---- */
+  .live-start{background:linear-gradient(150deg,#1a1413,#151312);border:1px solid var(--line);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;}
+  .live-start .lh{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
+  .live-start .ld{font-size:0.8rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;}
+  .live-dest-row{display:flex;gap:0.5rem;margin-top:0.85rem;}
+  .live-dest-row select{flex:1;min-width:0;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.84rem;color:var(--txt);outline:none;font-family:inherit;}
+  .live-mode{display:flex;gap:0.4rem;margin-top:0.6rem;}
+  .live-mode button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem;font-size:0.72rem;font-family:inherit;}
+  .live-mode button.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
+  .live-go{margin-top:0.8rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.85rem;font-size:0.84rem;font-weight:600;font-family:inherit;}
+
+  .live-panel{background:linear-gradient(150deg,#1c1414,#151312);border:1px solid rgba(194,58,94,0.35);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;overflow:hidden;}
+  .live-top{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;}
+  .live-badge{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);font-weight:700;}
+  .live-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--burgundy);animation:livepulse 1.4s infinite;}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 7px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
+  .live-stop{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.68rem;font-family:inherit;}
+  .live-headline{margin-top:0.7rem;font-family:'Bodoni Moda',serif;font-size:1.35rem;line-height:1.15;}
+  .live-headline em{font-style:normal;color:var(--gold);}
+  .live-sub{font-size:0.78rem;color:var(--muted);margin-top:0.2rem;}
+  .live-map{position:relative;height:130px;margin:0.9rem 0 0.2rem;border-radius:14px;border:1px solid var(--line);background:radial-gradient(circle at 30% 30%,rgba(194,58,94,0.08),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),#100e0d;overflow:hidden;}
+  .live-map .mk{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.9rem;transition:left 0.9s ease,top 0.9s ease;}
+  .live-map .mk .lbl{font-size:0.52rem;letter-spacing:0.04em;color:var(--muted);background:rgba(0,0,0,0.5);padding:1px 4px;border-radius:4px;white-space:nowrap;}
+  .live-map .mk.me{z-index:3;}
+  .live-map .mk.me .pin{width:14px;height:14px;border-radius:50%;background:var(--burgundy);box-shadow:0 0 0 5px rgba(194,58,94,0.25);}
+  .live-partner{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
+  .live-partner:last-child{border-bottom:none;}
+  .live-partner .pic{font-size:1.25rem;flex-shrink:0;}
+  .live-partner .pt{flex:1;min-width:0;}
+  .live-partner .pt b{display:block;font-size:0.86rem;font-weight:600;}
+  .live-partner .pt span{font-size:0.72rem;color:var(--muted);}
+  .live-partner .eta{text-align:right;white-space:nowrap;}
+  .live-partner .eta .n{font-family:'Bodoni Moda',serif;font-size:1.1rem;color:var(--gold);}
+  .live-partner .eta .u{font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);}
+  .live-partner .eta.arr .n{color:var(--green);font-size:0.9rem;}
+  .live-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
+  .live-acts button{flex:1;min-width:120px;border-radius:999px;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
+  .live-acts .prim{background:#fff;color:#000;border-color:#fff;}
+  .live-acts .sec{background:var(--card2,#1B1817);color:var(--txt);}
+  .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
+  .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
+
+  .menu-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:80;display:none;}
+  .menu-scrim.open{display:block;}
+  .menu-sheet{position:absolute;left:0;right:0;bottom:0;z-index:81;background:var(--bg);border-top:1px solid var(--line);border-radius:20px 20px 0 0;max-height:88%;display:none;flex-direction:column;}
+  .menu-sheet.open{display:flex;}
+  .ms-head{padding:1.1rem 1.25rem 0.9rem;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);}
+  .ms-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
+  .ms-head span{display:block;font-size:0.68rem;color:var(--soft);margin-top:0.15rem;}
+  .ms-close{background:none;border:none;color:var(--muted);font-size:1rem;}
+  .ms-body{flex:1;overflow-y:auto;padding:0.5rem 1.25rem 1rem;}
+  .ms-cat{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin:1rem 0 0.4rem;}
+  .ms-item{padding:0.8rem 0;border-bottom:1px solid var(--line);display:flex;gap:0.8rem;align-items:flex-start;}
+  .ms-item .info{flex:1;min-width:0;}
+  .ms-item .nm{font-weight:600;font-size:0.86rem;}
+  .ms-item .ds{font-size:0.74rem;color:var(--muted);margin-top:0.2rem;}
+  .ms-item .alg{margin-top:0.35rem;display:flex;gap:0.3rem;flex-wrap:wrap;}
+  .ms-item .alg span{font-size:0.58rem;color:#C99A2E;border:1px solid rgba(201,154,46,0.3);border-radius:999px;padding:0.12rem 0.45rem;}
+  .ms-item .side{text-align:right;flex-shrink:0;}
+  .ms-item .pr{font-family:'Bodoni Moda',serif;font-size:0.95rem;}
+  .qty{display:inline-flex;align-items:center;gap:0.5rem;margin-top:0.4rem;}
+  .qty button{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:0.9rem;line-height:1;}
+  .qty b{min-width:14px;text-align:center;font-size:0.85rem;}
+  .ms-foot{border-top:1px solid var(--line);padding:1rem 1.25rem calc(1rem + env(safe-area-inset-bottom,0px));}
+  .ms-note{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;}
+  .ms-tag{display:flex;align-items:center;gap:0.5rem;margin-top:0.7rem;font-size:0.8rem;color:var(--muted);}
+  .ms-tag input{width:18px;height:18px;accent-color:var(--burgundy);}
+  .ms-order{margin-top:0.8rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
+  .ms-order:disabled{opacity:0.4;}
+
+  #toast{
+    position:absolute;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
+    left:50%;transform:translate(-50%, 16px);
+    background:#fff;color:#000;
+    font-size:0.78rem;font-weight:500;
+    padding:0.75rem 1.25rem;border-radius:999px;
+    opacity:0;pointer-events:none;transition:all 0.3s ease;
+    z-index:70;max-width:86%;text-align:center;
+  }
+  #toast.show{opacity:1;transform:translate(-50%, 0);}
+</style>
+</head>
+<body>
+<div id="shell">
+
+  <!-- login -->
+  <div id="gate">
+    <div class="logo">Rahul Travel Group</div>
+    <div class="tagline">Experience the Elite Class</div>
+    <h1 data-i18n-html="gate.title">De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
+    <p class="deck" data-i18n="gate.deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, en uw account draait op uw codenaam, niet op uw echte naam.</p>
+    <form class="login-form" id="loginForm">
+      <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
+      <button type="submit" data-i18n="gate.signin">Inloggen</button>
+    </form>
+    <form class="login-form" id="regForm" style="display:none;">
+      <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
+      <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
+      <input id="rgPhone" type="tel" placeholder="Mobiel nummer (WhatsApp)" data-i18n-ph="gate.phone" autocomplete="tel">
+      <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
+      <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
+    </form>
+    <form class="login-form" id="forgotForm" style="display:none;">
+      <input id="fgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
+      <button type="submit" data-i18n="gate.sendreset">Stuur herstel-link</button>
+    </form>
+    <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Nog geen account? Registreer</button>
+    <button class="gate-switch" id="toForgot" type="button" data-i18n="gate.forgot">Wachtwoord vergeten?</button>
+    <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
+    <p class="gate-or" data-i18n="gate.or">of kies een demoprofiel</p>
+    <div class="gate-list">
+      <button class="gate-btn t-rtg" data-login="rtg"><span class="dot"></span><span><b>S. Janssen</b><span>RTG Pass · codenaam Zilveren Valk</span></span></button>
+      <button class="gate-btn t-lifestyle" data-login="lifestyle"><span class="dot"></span><span><b>I. van Rhijn</b><span>Lifestyle Pass · codenaam Gouden Ibis</span></span></button>
+      <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>A. de Vries</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
+    </div>
+    <p class="note" data-i18n-html="gate.note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
+  </div>
+
+  <!-- app -->
+  <div id="app">
+    <div class="topbar">
+      <div class="brand">RTG<small>de app</small></div>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <button class="bell" id="bell" aria-label="Meldingen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
+        </button>
+        <button class="code-chip" id="codeChip"><span class="cdot"></span><span id="codeChipTxt"></span></button>
+      </div>
+    </div>
+
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-head">
+        <b data-i18n="app.notifs">Meldingen</b>
+        <button class="notif-push" id="notifPush" data-i18n="app.pushenable">Push aanzetten</button>
+      </div>
+      <div class="notif-list" id="notifList"></div>
+    </div>
+    <div class="notif-scrim" id="notifScrim"></div>
+
+    <div class="content" id="content">
+
+      <div class="view" data-view="home">
+        <h2 id="homeGreeting">Welkom.</h2>
+        <p class="sub" id="homeSub"></p>
+        <div id="verifyBanner"></div>
+        <input type="file" id="verifyFile" accept="image/*" style="display:none;">
+        <div class="codecard" id="codecard"></div>
+        <div class="card" id="homeTrip"></div>
+        <div class="card" id="homePay"></div>
+        <div class="card" id="homeSalon"></div>
+      </div>
+
+      <div class="view" data-view="reizen">
+        <h2 data-i18n="app.v.trip">Uw reis.</h2>
+        <p class="sub" id="tripSub"></p>
+        <div class="card" id="tripList"></div>
+        <p class="sub" style="margin-top:1rem;" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Vraag het de AI, één bericht is genoeg.</p>
+      </div>
+
+      <div class="view" data-view="betalen">
+        <h2 data-i18n="app.v.pay">Betalen.</h2>
+        <p class="sub" data-i18n="app.v.pay.sub">Eén tik, Face ID. Uw betalingen staan op uw codenaam.</p>
+        <div class="card" id="payList"></div>
+        <div id="payAllWrap"></div>
+      </div>
+
+      <div class="view" data-view="ai">
+        <h2 id="aiTitle">Uw AI.</h2>
+        <p class="sub" data-i18n="app.v.ai.sub">De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.</p>
+        <div class="chat" id="chat"></div>
+        <div class="chips" id="chips"></div>
+        <div class="askrow">
+          <input id="askInput" placeholder="Stel een vraag…" data-i18n-ph="app.v.ai.ph">
+          <button id="askBtn" data-i18n="app.v.ai.send">Stuur</button>
+        </div>
+      </div>
+
+      <div class="view" data-view="salon">
+        <h2 data-i18n="app.v.salon">De Salon.</h2>
+        <p class="sub" data-i18n="app.v.salon.sub">Posts verschijnen 7 dagen na verblijf, voor uw veiligheid.</p>
+        <div id="feed"></div>
+      </div>
+
+      <div class="view" data-view="terplaatse">
+        <h2 data-i18n="app.v.tp">Ter plaatse.</h2>
+        <p class="sub" id="tpSub">Bestel, betaal en reserveer bij RTG-partners op uw bestemming.</p>
+        <div id="livePanel"></div>
+        <div id="myOrders"></div>
+        <div id="supplierList"></div>
+      </div>
+
+    </div>
+
+    <div class="tabbar" id="tabbar">
+      <button data-tab="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span data-i18n="app.tab.home">Home</span></button>
+      <button data-tab="reizen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-6-8 4-2 6-2-5-8 1z"/></svg><span data-i18n="app.tab.trips">Reizen</span></button>
+      <button data-tab="betalen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg><span data-i18n="app.tab.pay">Betalen</span></button>
+      <button data-tab="ai"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg><span data-i18n="app.tab.ai">AI</span></button>
+      <button data-tab="salon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="10.5" r="2.4"/><path d="M3.5 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><path d="M14.5 18.5c.5-2.2 1.6-3.4 3.4-3.4 1.4 0 2.6.8 3.1 2.4"/></svg><span data-i18n="app.tab.salon">Salon</span></button>
+      <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="app.tab.tp">Ter plaatse</span></button>
+    </div>
+  </div>
+
+  <!-- betaaloverlay -->
+  <div id="paywait">
+    <div class="paycard">
+      <div class="amt" id="payAmt"></div>
+      <div class="icon" id="payIcon"></div>
+      <div class="lbl" id="payLbl">Betalen met Face ID…</div>
+    </div>
+  </div>
+
+  <!-- menu / bestel-overlay -->
+  <div id="menu-scrim" class="menu-scrim"></div>
+  <div id="menu-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b id="msName"></b><span id="msMeta"></span></div>
+      <button class="ms-close" id="msClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body" id="msBody"></div>
+    <div class="ms-foot" id="msFoot"></div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script src="/shared/realtime.js"></script>
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  const nfmt = n => Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  const eur = n => '€ ' + nfmt(n);
+  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded' };
+  const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
+  const LBL = { 'Bevestigd':'Confirmed', 'Wacht op betaling':'Awaiting payment', 'In aanvraag':'Requested', 'Betaald':'Paid' };
+  const tLbl = s => (lang() === 'en' ? (LBL[s] || s) : s);
+  const ALG = { 'vis':'fish', 'soja':'soy', 'sesam':'sesame', 'gluten':'gluten', 'noten':'nuts', 'schaaldieren':'shellfish', 'ei':'egg', 'melk':'milk', 'pinda':'peanut', 'selderij':'celery', 'mosterd':'mustard' };
+  const tAlg = a => (lang() === 'en' ? (ALG[a] || a) : a);
+  const TYPELABEL = { 'Hotel':'Hotel', 'Restaurant':'Restaurant', 'Bar':'Bar', 'Taxi':'Taxi', 'Privéjet':'Private jet', 'Appartement':'Apartment', 'Club':'Club' };
+  const tType = s => (lang() === 'en' ? (TYPELABEL[s] || s) : s);
+  const LANGNAME = { nl: { nl:'Nederlands', en:'Engels' }, en: { nl:'Dutch', en:'English' } };
+  const langName = code => (LANGNAME[lang()] || LANGNAME.nl)[code] || code;
+  const escAttr = s => String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  // Een bericht dat in een andere taal is geschreven, wordt automatisch voor de
+  // lezer vertaald (met knop om het origineel te tonen).
+  function msgHTML(text, olang){
+    return '<span class="msg" data-olang="'+(olang||'nl')+'" data-otext="'+escAttr(text)+'">' +
+      '<span class="msg-t">'+String(text).replace(/</g,'&lt;')+'</span>' +
+      '<span class="msg-note"></span></span>';
+  }
+  async function hydrateMsgs(root){
+    const to = lang();
+    for (const el of root.querySelectorAll('.msg')){
+      const from = el.dataset.olang || 'nl';
+      if (from === to || el.dataset.done) continue;
+      el.dataset.done = '1';
+      if (!API.live) continue;
+      try {
+        const r = await API.call('/translate', { text: el.dataset.otext, to, from });
+        if (r && r.translated){
+          const tEl = el.querySelector('.msg-t'); tEl.textContent = r.text;
+          const note = el.querySelector('.msg-note');
+          note.innerHTML = '<button class="msg-toggle" type="button"></button>';
+          const btn = note.querySelector('.msg-toggle');
+          const setLabel = shown => btn.textContent = shown==='t'
+            ? '🌐 ' + T('msg.from','vertaald uit') + ' ' + langName(from) + ' · ' + T('msg.orig','toon origineel')
+            : '🌐 ' + T('msg.showtrans','toon vertaling');
+          let shown = 't'; setLabel(shown);
+          btn.addEventListener('click', () => {
+            shown = shown==='t' ? 'o' : 't';
+            tEl.textContent = shown==='t' ? r.text : el.dataset.otext;
+            setLabel(shown);
+          });
+        }
+      } catch (e) {}
+    }
+  }
+
+  /* ---------- lokale demo-data (fallback zonder backend) ---------- */
+
+  const PERSONAS = {
+    rtg:       {name:'S. Janssen',   full:'Sophie Janssen',     since:'Maart 2026',    number:'RTG · 2026 · 8841', codename:'Zilveren Valk',    tier:'rtg'},
+    lifestyle: {name:'I. van Rhijn', full:'Isabelle van Rhijn', since:'Augustus 2025', number:'LSP · 2025 · 0217', codename:'Gouden Ibis',      tier:'lifestyle'},
+    business:  {name:'A. de Vries',  full:'Alexander de Vries', since:'November 2025', number:'BSP · 2025 · 1104', codename:'Noordelijke Ster', tier:'business'}
+  };
+  const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass'};
+
+  let user = null;
+  let invoices = [
+    {id:'RTG-2026-0158', desc:'Kyoto, Hoshinoya, 4 nachten', netto:2840, bijdrage:190, status:'open', date:'Vervalt 28 juli 2026'},
+    {id:'RTG-2026-0141', desc:'KLM Amsterdam - Osaka, business class (2 pers.)', netto:3120, bijdrage:210, status:'open', date:'Vervalt 15 augustus 2026'},
+    {id:'RTG-2026-0093', desc:'Lissabon, Palácio weekend, incl. transfers', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
+    {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
+  ];
+  let trip = {
+    dest:'Kyoto', dates:'12 - 19 oktober 2026', days:98,
+    items:[
+      {when:'12 okt', title:'KLM KL867, Amsterdam → Osaka Kansai', sub:'Business class · stoelen 2A/2C', status:'paid', label:'Bevestigd'},
+      {when:'12 okt', title:'Privétransfer Kansai → Hoshinoya', sub:'Chauffeur bij aankomsthal', status:'paid', label:'Bevestigd'},
+      {when:'12-16 okt', title:'Hoshinoya Kyoto, Riverside suite', sub:'4 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
+      {when:'14 okt', title:'Privé-theeceremonie, Gion', sub:'Met vertaler · 15:00 uur', status:'paid', label:'Bevestigd'},
+      {when:'15 okt', title:'Diner, Kikunoi Honten (3★)', sub:'Kaiseki · 19:30 uur', status:'req', label:'In aanvraag'},
+      {when:'16-19 okt', title:'Ryokan Tawaraya', sub:'3 nachten, kaiseki-halfpension', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
+    ]
+  };
+  let posts = [
+    {id:1, author:'Isabelle van Rhijn', tier:'lifestyle', place:'Kyoto', visual:'v-kyoto',
+     text:'De theeceremonie die mijn concierge regelde, geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
+     likes:124, liked:false, comments:[{who:'Alexander de Vries', tier:'business', text:'Staat genoteerd voor november. Dank.'}]},
+    {id:2, author:'Alexander de Vries', tier:'business', place:'Zürich', visual:'v-zurich',
+     text:'Ochtendvlucht, twee vergaderingen, om 18:00 aan het meer. De Business Pass plant strakker dan mijn assistent ooit deed.',
+     likes:89, liked:false, comments:[]},
+    {id:3, author:'Sophie Janssen', tier:'rtg', place:'Lissabon', visual:'v-lissabon',
+     text:'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen bestaan echt.',
+     likes:203, liked:false, comments:[
+       {who:'Nadia Karim', tier:'rtg', text:'Welk palácio was dit? Sta op het punt te boeken!'},
+       {who:'Alexander de Vries', tier:'business', text:'Sophie, dit wil ik in november zien, welke wijk was dit?'}
+     ]},
+    {id:4, author:'Marcus Bergwerff', tier:'business', place:'Singapore', visual:'v-singapore',
+     text:'Layover van 9 uur omgezet in een middag Raffles + spa. De AI stelde het voor, mijn concierge bevestigde binnen 10 minuten.',
+     likes:57, liked:false, comments:[]},
+    {id:5, author:'Nadia Karim', tier:'rtg', place:'Marrakech', visual:'v-marrakech',
+     text:'Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Dat deel vertel ik iedereen.',
+     likes:141, liked:false, comments:[]}
+  ];
+  let creatorLikes = 320;
+
+  /* ---------- backend-koppeling ---------- */
+
+  const API = {
+    enabled: location.protocol === 'http:' || location.protocol === 'https:',
+    token: null,
+    get live(){ return this.enabled && !!this.token; },
+    async call(path, body){
+      const res = await fetch('/api' + path, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json', ...(this.token ? {'Authorization':'Bearer '+this.token} : {})},
+        body: JSON.stringify(Object.assign({ lang: (window.RTGi18n ? RTGi18n.lang : 'nl') }, body || {}))
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw Object.assign(new Error(data.error || 'API-fout'), {status: res.status});
+      return data;
+    }
+  };
+
+  function applyState(state){
+    if (!state) return;
+    if (state.user) user = state.user;
+    if (state.invoices) invoices = state.invoices;
+    if (state.trip) trip = state.trip;
+    if (state.posts) posts = state.posts;
+    if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
+  }
+
+  let toastTimer;
+  function toast(msg){
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function canEngage(p){
+    if (typeof p.canEngage === 'boolean') return p.canEngage;
+    if (user.tier === 'rtg') return p.tier === 'rtg';
+    return true;
+  }
+
+  /* ---------- login & tabs ---------- */
+
+  document.querySelectorAll('[data-login]').forEach(b =>
+    b.addEventListener('click', () => login(b.dataset.login)));
+
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    login(null, { u: $('#liUser').value, p: $('#liPass').value });
+  });
+  const regForm = document.getElementById('regForm');
+  if (regForm) regForm.addEventListener('submit', e => {
+    e.preventDefault();
+    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, p: $('#rgPass').value });
+  });
+  const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
+  function showGateForm(which){
+    ['#loginForm','#regForm','#forgotForm'].forEach(sel => { const f=$(sel); if(f) f.style.display='none'; });
+    const map = { login:'#loginForm', register:'#regForm', forgot:'#forgotForm' };
+    const f = $(map[which]); if (f) f.style.display = 'flex';
+    if (toReg) toReg.style.display = which==='login' ? '' : 'none';
+    if (toForgot) toForgot.style.display = which==='login' ? '' : 'none';
+    if (toLogin) toLogin.style.display = which==='login' ? 'none' : '';
+  }
+  if (toReg) toReg.addEventListener('click', () => showGateForm('register'));
+  if (toForgot) toForgot.addEventListener('click', () => showGateForm('forgot'));
+  if (toLogin) toLogin.addEventListener('click', () => showGateForm('login'));
+  const forgotForm = document.getElementById('forgotForm');
+  if (forgotForm) forgotForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    try { await API.call('/auth/forgot', { email: $('#fgEmail').value }); }
+    catch (e2){ /* stil, geen bestaan lekken */ }
+    toast(T('gate.forgotsent','Als dit e-mailadres bekend is, sturen we een herstel-link.'));
+    showGateForm('login');
+  });
+
+  async function login(tier, cred){
+    if (cred){
+      if (API.enabled){
+        try {
+          const data = cred.register
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, password: cred.p })
+            : await API.call('/auth/login', { login: cred.u, password: cred.p });
+          API.token = data.token;
+          applyState(data.state);           // user = het echte account
+          tier = user.tier;
+        } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
+      } else {
+        if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
+          toast('Onjuiste inloggegevens.'); return;
+        }
+        tier = 'business'; user = {...PERSONAS[tier]};
+      }
+    } else {
+      user = {...PERSONAS[tier]};
+      if (API.enabled){
+        try {
+          const data = await API.call('/login', {tier});
+          API.token = data.token;
+          applyState(data.state);
+        } catch (e) { API.enabled = false; }
+      }
+    }
+    if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
+    $('#gate').style.display = 'none';
+    $('#app').classList.add('active');
+    renderAll();
+    if (API.live && window.RTGRealtime){
+      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell });
+    }
+  }
+
+  /* ---------- live updates ---------- */
+
+  // een scherm werkt zichzelf bij zonder page-refresh
+  async function syncScope(scope){
+    if (!API.live) return;
+    try {
+      const data = await API.call('/state');
+      applyState(data.state);
+    } catch (e) { return; }
+    if (scope === 'payments'){ renderPay(); renderHome(); renderTrip(); }
+    else if (scope === 'salon'){ renderSalon(); renderHome(); }
+    else if (scope === 'orders'){ renderTerPlaatse(); }
+    else if (scope === 'live'){ renderLive(); }
+    else if (scope === 'chat'){ if (user.account) renderChat(); }
+    else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
+  }
+
+  function timeAgo(iso){
+    const s = Math.max(1, Math.round((Date.now() - new Date(iso)) / 1000));
+    if (s < 60) return T('t.now','zojuist');
+    const ago = T('t.ago',' geleden');
+    const m = Math.round(s / 60);
+    if (m < 60) return m + T('t.min',' min') + ago;
+    const h = Math.round(m / 60);
+    if (h < 24) return h + T('t.hour',' uur') + ago;
+    return Math.round(h / 24) + T('t.days',' dag(en)') + ago;
+  }
+
+  function renderBell(){
+    const R = window.RTGRealtime;
+    if (!R) return;
+    const n = R.unread();
+    const badge = $('#bellBadge');
+    badge.style.display = n > 0 ? 'flex' : 'none';
+    badge.textContent = n > 9 ? '9+' : n;
+    const list = $('#notifList');
+    list.innerHTML = R.notifications.length
+      ? R.notifications.map(x =>
+          '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +
+            '<div class="ic">' + (x.icon || '•') + '</div>' +
+            '<div class="tx"><b>' + x.title + '</b><span>' + x.body + '</span><time>' + timeAgo(x.at) + '</time></div>' +
+          '</div>').join('')
+      : '<div class="notif-empty">'+T('app.nonotif','Nog geen meldingen. Zodra iemand op uw post reageert of u een bericht stuurt, ziet u het hier.')+'</div>';
+    const pb = $('#notifPush');
+    const st = R.pushState();
+    if (st === 'on'){ pb.textContent = '✓ '+T('app.pushon','Push aan'); pb.classList.add('on'); }
+    else if (st === 'unsupported'){ pb.style.display = 'none'; }
+    else { pb.textContent = T('app.pushenable','Push aanzetten'); pb.classList.remove('on'); }
+  }
+
+  function openNotif(open){
+    $('#notifPanel').classList.toggle('open', open);
+    $('#notifScrim').classList.toggle('open', open);
+    if (open && window.RTGRealtime && RTGRealtime.unread() > 0){
+      RTGRealtime.markRead();
+      renderBell();
+    }
+  }
+  $('#bell').addEventListener('click', () => openNotif(true));
+  $('#notifScrim').addEventListener('click', () => openNotif(false));
+  $('#notifPush').addEventListener('click', async () => {
+    if (!window.RTGRealtime) return;
+    const r = await RTGRealtime.enablePush();
+    toast(r === 'on' ? T('app.pushtoast.on','Push-notificaties staan aan.') : r === 'denied' ? T('app.pushtoast.denied','Toestemming geweigerd, zet meldingen aan in uw instellingen.') : T('app.pushtoast.no','Push is hier niet beschikbaar.'));
+    renderBell();
+  });
+
+  document.querySelectorAll('.tabbar button').forEach(b =>
+    b.addEventListener('click', () => openTab(b.dataset.tab)));
+  $('#codeChip').addEventListener('click', () => { openTab('home'); toggleWhy(true); });
+
+  function openTab(tab){
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $('#content').scrollTop = 0;
+  }
+
+  function renderAll(){
+    $('#codeChipTxt').textContent = user.codename;
+    renderHome();
+    renderTrip();
+    renderPay();
+    renderAI();
+    renderSalon();
+    renderTerPlaatse();
+    openTab('home');
+  }
+
+  /* ---------- ter plaatse: bestellen bij RTG-partners ---------- */
+  const ALG_ICON = '<svg viewBox="0 0 64 64" fill="none" stroke="#0C0C0B" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/><path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/><circle cx="23.5" cy="26.5" r="2.6" fill="#0C0C0B"/><circle cx="40.5" cy="26.5" r="2.6" fill="#0C0C0B"/><path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
+  let suppliers = [];
+  let myOrders = [];
+  let menuState = null; // { supplier, menu, qty:{}, note, tag }
+
+  async function renderTerPlaatse(){
+    if (!API.live){
+      $('#supplierList').innerHTML = '<div class="empty" style="padding:2rem 1rem;color:var(--soft);text-align:center;font-size:0.85rem;">'+T('app.tp.needserver','Ter plaatse werkt via de RTG-server. Start de app met de backend om te bestellen bij partners.')+'</div>';
+      return;
+    }
+    try {
+      const [sd, od] = await Promise.all([API.call('/suppliers', { city: trip.dest }), API.call('/orders/mine')]);
+      suppliers = sd.suppliers || [];
+      myOrders = od.orders || [];
+      $('#tpSub').textContent = T('app.tp.partnersin','RTG-partners in') + ' ' + (sd.city || trip.dest) + ', ' + T('app.tp.orderpayreserve','bestel, betaal en reserveer.');
+    } catch (e) { return; }
+
+    renderLive();  // live "onderweg"-paneel bovenaan
+
+    // mijn lopende bestellingen bovenaan
+    const active = myOrders.filter(o => o.status !== 'terugbetaald');
+    $('#myOrders').innerHTML = active.length
+      ? '<div class="sec-label">'+T('app.tp.myorders','Mijn bestellingen')+'</div>' + active.map(o => {
+          const pc = o.status === 'nieuw' ? 'nieuw' : o.status === 'in bereiding' ? 'bereiding' : 'klaar';
+          return '<div class="myorder" data-ref="' + o.ref + '">' +
+            '<div class="r1"><div><div class="nm">' + o.supplierName + '</div><div class="sub2">' + o.items.reduce((n,i)=>n+i.qty,0) + ' ' + T('app.items','item(s)') + ' · ' + timeAgo(o.at) + '</div></div>' +
+              '<div style="text-align:right;"><div class="amt">' + eur(o.total) + '</div><span class="mo-pill ' + pc + '">' + tStatus(o.status) + '</span></div></div>' +
+            '<div class="acts">' + (o.paid
+              ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
+              : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
+              (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ '+T('app.taggedsalon','getagd voor Salon')+'</span>' : '') +
+            '</div></div>';
+        }).join('')
+      : '';
+    $('#myOrders').querySelectorAll('.myorder').forEach(el => {
+      const o = active.find(x => x.ref === el.dataset.ref);
+      const pb = el.querySelector('.js-opay');
+      if (pb) pb.addEventListener('click', () => payOrder(o));
+    });
+
+    // partners
+    $('#supplierList').innerHTML = '<div class="sec-label">'+T('app.tp.partnersdest','Partners op uw bestemming')+'</div>' + suppliers.map(s => {
+      const canOrder = s.hasMenu;
+      return '<div class="sup-card">' +
+        '<span class="ic">' + (s.icon || '📍') + '</span>' +
+        '<div class="t"><b>' + s.name + '</b><span>' + tType(s.typeLabel) + ' · ' + s.city + '</span></div>' +
+        (canOrder
+          ? '<button class="go" data-menu="' + s.code + '">'+T('app.tp.viewmenu','Bekijk kaart')+'</button>'
+          : '<button class="go ghost" data-loc="' + s.code + '">'+T('app.tp.location','Locatie')+'</button>') +
+      '</div>';
+    }).join('');
+    $('#supplierList').querySelectorAll('[data-menu]').forEach(b => b.addEventListener('click', () => openMenu(b.dataset.menu)));
+    $('#supplierList').querySelectorAll('[data-loc]').forEach(b => b.addEventListener('click', () => {
+      const s = suppliers.find(x => x.code === b.dataset.loc);
+      toast(s.name + ', ' + (s.loc && s.loc.label ? s.loc.label : T('app.tp.locwhenenroute','locatie gedeeld zodra u onderweg bent')) + '.');
+    }));
+  }
+
+  /* ---------- Onderweg (live reis) ---------- */
+  let liveData = null;
+  let liveMode = 'driving';
+  let simTimer = null;
+  const RIDE_ST = { 'aangevraagd':'requested', 'onderweg':'on the way', 'aangekomen':'arrived', 'rijdt':'driving', 'gearriveerd':'completed', 'geweigerd':'declined' };
+  const tRide = s => (lang() === 'en' ? (RIDE_ST[s] || s) : s);
+
+  async function renderLive(){
+    if (!API.live){ $('#livePanel').innerHTML = ''; return; }
+    try { liveData = (await API.call('/live/state')).live; }
+    catch (e){ $('#livePanel').innerHTML = ''; return; }
+    if (!liveData || !liveData.active){ stopSim(); renderLiveStart(); }
+    else renderLivePanel();
+  }
+
+  function renderLiveStart(){
+    const opts = suppliers.map(s => '<option value="' + s.code + '">' + s.name + ' (' + tType(s.typeLabel) + ')</option>').join('');
+    const modes = [['walking','Lopen'],['driving','Rijden'],['flying','Vliegen']];
+    $('#livePanel').innerHTML =
+      '<div class="live-start">' +
+        '<div class="lh">' + T('live.start.h','Ergens heen?') + '</div>' +
+        '<div class="ld">' + T('live.start.d','Zet uw reis live. Uw partners, uw taxi, het restaurant, zien waar u bent en zorgen dat alles klaarstaat wanneer u aankomt. Altijd op codenaam, nooit op naam.') + '</div>' +
+        '<div class="live-dest-row"><select id="liveDest">' + opts + '</select></div>' +
+        '<div class="live-mode">' + modes.map(m => '<button data-mode="' + m[0] + '"' + (m[0]===liveMode?' class="on"':'') + '>' + T('live.mode.'+m[0], m[1]) + '</button>').join('') + '</div>' +
+        '<button class="live-go" id="liveGo">' + T('live.go','Start onderweg') + '</button>' +
+      '</div>';
+    $('#livePanel').querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+      liveMode = b.dataset.mode;
+      $('#livePanel').querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x.dataset.mode === liveMode));
+    }));
+    $('#liveGo').addEventListener('click', startLive);
+  }
+
+  async function startLive(){
+    const destCode = $('#liveDest').value;
+    try { liveData = (await API.call('/live/start', { destCode, mode: liveMode })).live; toast(T('live.started','U bent onderweg. Uw partners zijn op de hoogte.')); renderLivePanel(); }
+    catch (e){ toast(e.message); }
+  }
+
+  // projecteer lat/lng-punten in het 130px-kaartje (percentage-coördinaten)
+  function projectPoints(pts){
+    if (!pts.length) return [];
+    const lats = pts.map(p => p.lat), lngs = pts.map(p => p.lng);
+    let minLat = Math.min(...lats), maxLat = Math.max(...lats), minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+    let dLat = (maxLat - minLat) || 0.002, dLng = (maxLng - minLng) || 0.002;
+    minLat -= dLat*0.2; maxLat += dLat*0.2; minLng -= dLng*0.2; maxLng += dLng*0.2;
+    dLat = maxLat - minLat; dLng = maxLng - minLng;
+    return pts.map(p => ({ x: ((p.lng - minLng)/dLng)*100, y: (1 - (p.lat - minLat)/dLat)*100 }));
+  }
+
+  function renderLivePanel(){
+    const L = liveData; if (!L) return;
+    const dest = L.dest;
+    let head, sub = '';
+    if (L.arrived && dest){ head = T('live.arrivedh','U bent <em>gearriveerd</em>'); sub = dest.name; }
+    else if (dest){ head = T('live.headingto','Onderweg naar') + ' <em>' + dest.name + '</em>'; sub = dest.etaMin != null ? T('live.aankomst','aankomst over ~') + dest.etaMin + ' ' + T('live.min','min') : ''; }
+    else { head = T('live.moving','U bent <em>onderweg</em>'); }
+
+    const pts = [];
+    if (L.me) pts.push({ lat: L.me.lat, lng: L.me.lng, me: true });
+    L.partners.forEach(p => { if (p.loc) pts.push({ lat: p.loc.lat, lng: p.loc.lng, icon: p.icon, name: p.name }); });
+    const proj = projectPoints(pts);
+    const markers = proj.map((pt,i) => {
+      const s = pts[i];
+      return '<div class="mk' + (s.me?' me':'') + '" style="left:' + pt.x.toFixed(1) + '%;top:' + pt.y.toFixed(1) + '%;">' +
+        (s.me ? '<div class="pin"></div>' : '<div>' + s.icon + '</div>') +
+        '<div class="lbl">' + (s.me ? T('live.you','U') : s.name) + '</div></div>';
+    }).join('');
+
+    const partners = L.partners.map(p => {
+      const isVeh = p.type === 'taxi' || p.type === 'jet';
+      let eta;
+      if (p.ride && isVeh){
+        eta = p.taxiEtaMin != null && p.ride.status !== 'gearriveerd'
+          ? '<div class="eta"><div class="n">' + p.taxiEtaMin + '</div><div class="u">' + T('live.mintoyou','min naar u') + '</div></div>'
+          : '<div class="eta"><div class="n" style="font-size:0.9rem;">' + tRide(p.ride.status) + '</div></div>';
+      } else if (p.isDest && L.arrived){
+        eta = '<div class="eta arr"><div class="n">✓ ' + T('live.here','ter plaatse') + '</div></div>';
+      } else {
+        eta = p.etaMin != null ? '<div class="eta"><div class="n">' + p.etaMin + '</div><div class="u">' + T('live.minaway','min heen') + '</div></div>' : '';
+      }
+      let line2 = tType(p.typeLabel);
+      if (p.ride) line2 += ' · ' + T('live.ride','rit') + ' ' + tRide(p.ride.status);
+      else if (p.order) line2 += ' · ' + p.order.items + ' ' + T('app.items','item(s)') + ', ' + tStatus(p.order.status);
+      return '<div class="live-partner"><span class="pic">' + p.icon + '</span><div class="pt"><b>' + p.name + '</b><span>' + line2 + '</span></div>' + eta + '</div>';
+    }).join('');
+
+    let preorder = '';
+    const destSup = dest ? suppliers.find(s => s.code === dest.code) : null;
+    if (dest && destSup && destSup.hasMenu && !dest.order && !L.arrived){
+      preorder = '<div class="live-preorder"><span>' + T('live.preorder','Bestel vast vooruit, dan staat het klaar als u aankomt.') + '</span><button id="livePre">' + T('live.preorderbtn','Vooruit bestellen') + '</button></div>';
+    }
+
+    const hasVeh = L.partners.some(p => p.type === 'taxi' || p.type === 'jet');
+    const acts = '<div class="live-acts">' +
+      '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
+      (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
+      '<button class="prim" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>' +
+    '</div>';
+
+    $('#livePanel').innerHTML =
+      '<div class="live-panel">' +
+        '<div class="live-top"><span class="live-badge"><span class="dot"></span>' + T('live.badge','Live onderweg') + '</span><button class="live-stop" id="liveStop">' + T('live.stop','Stop') + '</button></div>' +
+        '<div class="live-headline">' + head + '</div>' + (sub ? '<div class="live-sub">' + sub + '</div>' : '') +
+        '<div class="live-map">' + markers + '</div>' +
+        preorder +
+        '<div style="margin-top:0.5rem;">' + partners + '</div>' +
+        acts +
+      '</div>';
+
+    $('#liveStop').addEventListener('click', stopLive);
+    $('#liveSim').addEventListener('click', simulateRide);
+    $('#liveShare').addEventListener('click', shareMyLocation);
+    const tx = $('#liveTaxi'); if (tx) tx.addEventListener('click', requestTaxi);
+    const pre = $('#livePre'); if (pre) pre.addEventListener('click', () => { if (dest) openMenu(dest.code); });
+  }
+
+  async function stopLive(){
+    stopSim();
+    try { await API.call('/live/stop'); } catch (e) {}
+    liveData = null; toast(T('live.stopped','Reis gestopt.')); renderLive();
+  }
+
+  async function requestTaxi(){
+    const veh = suppliers.find(s => s.type === 'taxi') || suppliers.find(s => s.type === 'jet');
+    if (!veh){ toast(T('live.notaxi','Geen vervoerspartner beschikbaar op deze bestemming.')); return; }
+    try { await API.call('/ride/request', { supplierCode: veh.code, toCode: (liveData && liveData.destCode) || undefined }); toast(veh.name + ' ' + T('live.taxireq','is gevraagd. U ziet de taxi live naderen.')); await renderLive(); }
+    catch (e){ toast(e.message); }
+  }
+
+  function shareMyLocation(){
+    if (navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(async pos => {
+        try { liveData = (await API.call('/live/update', { lat: pos.coords.latitude, lng: pos.coords.longitude })).live; renderLivePanel(); toast(T('live.shared','Locatie gedeeld met uw partners.')); }
+        catch (e){ toast(e.message); }
+      }, () => toast(T('live.geodenied','Locatie niet beschikbaar. Gebruik "Simuleer rit" voor de demo.')), { timeout: 4000 });
+    } else toast(T('live.geono','Locatie is hier niet beschikbaar.'));
+  }
+
+  function stopSim(){ if (simTimer){ clearInterval(simTimer); simTimer = null; } }
+  function simulateRide(){
+    const L = liveData;
+    if (!L || !L.me || !L.dest || !L.dest.loc){ toast(T('live.nosim','Kies eerst een bestemming.')); return; }
+    stopSim();
+    const start = { lat: L.me.lat, lng: L.me.lng };
+    const end = { lat: L.dest.loc.lat, lng: L.dest.loc.lng };
+    let step = 0; const N = 16;
+    toast(T('live.simstart','Simulatie gestart, u nadert de bestemming.'));
+    simTimer = setInterval(async () => {
+      step++;
+      const t = step / N;
+      const lat = start.lat + (end.lat - start.lat) * t + (Math.random() - 0.5) * 0.0004;
+      const lng = start.lng + (end.lng - start.lng) * t + (Math.random() - 0.5) * 0.0004;
+      try { liveData = (await API.call('/live/update', { lat, lng })).live; renderLivePanel(); } catch (e) {}
+      if (step >= N) stopSim();
+    }, 900);
+  }
+
+  const FID_MINI = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/><path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/><circle cx="23.5" cy="26.5" r="3" fill="currentColor"/><circle cx="40.5" cy="26.5" r="3" fill="currentColor"/><path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
+
+  async function openMenu(code){
+    let data;
+    try { data = await API.call('/supplier/menu/get', { code }); }
+    catch (e) { toast(e.message); return; }
+    menuState = { supplier: data.supplier, menu: data.menu, qty: {}, note: '', tag: false };
+    $('#msName').textContent = data.supplier.name;
+    $('#msMeta').textContent = tType(data.supplier.typeLabel) + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
+    renderMenuSheet();
+    $('#menu-sheet').classList.add('open');
+    $('#menu-scrim').classList.add('open');
+  }
+
+  function renderMenuSheet(){
+    const m = menuState.menu;
+    const cats = [...new Set(m.map(x => x.cat))];
+    $('#msBody').innerHTML = cats.map(c =>
+      '<div class="ms-cat">' + c + '</div>' + m.filter(x => x.cat === c).map(x => {
+        const q = menuState.qty[x.id] || 0;
+        return '<div class="ms-item" data-id="' + x.id + '">' +
+          '<div class="info"><div class="nm">' + x.name + '</div>' +
+            (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
+            (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + tAlg(a) + '</span>').join('') + '</div>' : '') +
+          '</div>' +
+          '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +
+            '<div class="qty"><button class="js-minus">−</button><b>' + q + '</b><button class="js-plus">+</button></div>' +
+          '</div></div>';
+      }).join('')
+    ).join('');
+    $('#msBody').querySelectorAll('.ms-item').forEach(el => {
+      const id = el.dataset.id;
+      el.querySelector('.js-plus').addEventListener('click', () => { menuState.qty[id] = (menuState.qty[id]||0)+1; renderMenuSheet(); });
+      el.querySelector('.js-minus').addEventListener('click', () => { menuState.qty[id] = Math.max(0,(menuState.qty[id]||0)-1); renderMenuSheet(); });
+    });
+    const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
+    const count = Object.values(menuState.qty).reduce((a,b)=>a+b,0);
+    $('#msFoot').innerHTML =
+      '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
+      '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> ' + T('app.ms.tag','Tag dit voor De Salon (7 dagen na verblijf)') + '</label>' +
+      '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? T('app.ms.order','Bestel') + ' ' + count + ' ' + T('app.items','item(s)') + ', ' + eur(total) : T('app.ms.choose','Kies gerechten')) + '</button>';
+    $('#msNote').addEventListener('input', e => menuState.note = e.target.value);
+    $('#msTag').addEventListener('change', e => menuState.tag = e.target.checked);
+    const ob = $('#msOrder');
+    if (count) ob.addEventListener('click', placeOrder);
+  }
+
+  async function placeOrder(){
+    const items = Object.entries(menuState.qty).filter(([,q]) => q > 0).map(([id,qty]) => ({ id, qty }));
+    if (!items.length) return;
+    try {
+      await API.call('/order', { supplierCode: menuState.supplier.code, items, allergyNote: menuState.note, tagSalon: menuState.tag });
+    } catch (e) { toast(e.message); return; }
+    $('#menu-sheet').classList.remove('open');
+    $('#menu-scrim').classList.remove('open');
+    toast(T('app.orderplaced','Bestelling geplaatst bij') + ' ' + menuState.supplier.name + '.');
+    renderTerPlaatse();
+  }
+
+  function payOrder(o){
+    payWithFaceId(eur(o.total), async () => {
+      await API.call('/order/pay', { ref: o.ref });
+      return o;
+    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.', after: () => renderTerPlaatse() });
+  }
+
+  $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
+  $('#menu-scrim').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
+
+  /* ---------- home + codenaam ---------- */
+
+  function qrSvg(seed){
+    let s = seed, cells = '';
+    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    for (let y = 0; y < 13; y++) for (let x = 0; x < 13; x++){
+      const corner = (x < 4 && y < 4) || (x > 8 && y < 4) || (x < 4 && y > 8);
+      const on = corner
+        ? ((x % 12 < 1 || x % 12 > 2 ? 1 : 0) || (y % 12 < 1 || y % 12 > 2 ? 1 : 0)) &&
+          !((x % 12 === 1 || x % 12 === 2) && (y % 12 === 1 || y % 12 === 2)) || (x===1&&y===1)||(x===2&&y===2)||(x===11&&y===1)||(x===1&&y===11)
+        : rnd() > 0.5;
+      if (on) cells += '<rect x="' + x + '" y="' + y + '" width="1" height="1"/>';
+    }
+    return '<svg viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg" fill="#0C0C0B">' + cells + '</svg>';
+  }
+
+  function toggleWhy(forceOpen){
+    const why = document.querySelector('.codecard .why');
+    if (!why) return;
+    why.classList.toggle('open', forceOpen === true ? true : !why.classList.contains('open'));
+  }
+
+  function renderVerifyBanner(){
+    const el = $('#verifyBanner');
+    if (!el) return;
+    const v = user && user.account ? user.verified : null;
+    if (!user || !user.account || v === 'verified'){ el.innerHTML = ''; return; }
+    if (v === 'pending'){
+      el.innerHTML = '<div class="vbanner pending"><b>'+T('vf.pending.h','Verificatie in behandeling')+'</b><span>'+T('vf.pending.b','We controleren uw document. U kunt de app gewoon blijven gebruiken.')+'</span></div>';
+      return;
+    }
+    el.innerHTML = '<div class="vbanner"><b>'+T('vf.h','Verifieer uw identiteit, boek in één tik')+'</b>' +
+      '<span>'+T('vf.b','Eén foto van uw identiteitsbewijs. Zo weten we zeker dat u het bent, houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw document is alleen zichtbaar voor RTG.')+'</span>' +
+      '<button class="vbtn" id="verifyStart">'+T('vf.btn','Document uploaden')+'</button></div>';
+    $('#verifyStart').addEventListener('click', () => $('#verifyFile').click());
+  }
+  (function initVerifyUpload(){
+    const vf = document.getElementById('verifyFile');
+    if (!vf) return;
+    vf.addEventListener('change', () => {
+      const file = vf.files[0]; if (!file) return;
+      if (file.size > 5 * 1024 * 1024){ toast(T('vf.toobig','Bestand te groot (max 5 MB).')); vf.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try { await API.call('/verify/upload', { image: reader.result }); user.verified = 'pending'; renderVerifyBanner(); toast(T('vf.sent','Document ontvangen, we controleren het.')); }
+        catch (e){ toast(e.message || 'Upload mislukt.'); }
+      };
+      reader.readAsDataURL(file);
+      vf.value = '';
+    });
+  })();
+
+  function renderHome(){
+    renderVerifyBanner();
+    const first = user.full.split(' ')[0];
+    $('#homeGreeting').textContent = T('app.welcome','Welkom,') + ' ' + first + '.';
+    $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
+
+    $('#codecard').innerHTML =
+      '<div class="label">'+T('app.cc.label','Uw codenaam, uw identiteit in onze systemen')+'</div>' +
+      '<div class="cn">' + user.codename + '</div>' +
+      '<div class="row">' +
+        '<div>' +
+          '<div class="mrow">'+T('app.cc.membernr','Lidnummer')+'<b>' + user.number + '</b></div>' +
+          '<div class="mrow" style="margin-top:0.55rem;">'+T('app.cc.pass','Pas')+'<b>' + TIER_LABEL[user.tier] + '</b></div>' +
+        '</div>' + qrSvg(user.number.length * 7919) +
+      '</div>' +
+      '<button class="whybtn" id="whyBtn">'+T('app.cc.why','Waarom een codenaam?')+' →</button>' +
+      '<div class="why"><b>'+T('app.cc.why.h','Uw echte naam staat niet in onze reisdata.')+'</b> ' +
+        T('app.cc.why.b','Reserveringen, betalingen en Salon-activiteit staan op uw codenaam. Uw echte naam ligt in een gescheiden, versleutelde kluis en wordt pas bij ticketing en check-in eenmalig gekoppeld. Zou reisdata ooit gestolen worden, dan heeft de aanvaller nooit de juiste naam bij uw reizen.')+'</div>';
+    $('#whyBtn').addEventListener('click', () => toggleWhy());
+
+    const open = invoices.filter(i => i.status === 'open');
+    const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+
+    $('#homeTrip').innerHTML =
+      '<div class="label">'+T('app.nexttrip','Eerstvolgende reis')+'</div>' +
+      '<div class="big">' + trip.dest + '</div>' +
+      '<div class="meta">' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen') + '</div>' +
+      '<button class="go" data-goto="reizen">'+T('app.viewtrip','Bekijk uw reis')+' →</button>';
+    $('#homePay').innerHTML = open.length
+      ? '<div class="label">'+T('app.outstanding','Openstaand')+'</div><div class="big accent">' + eur(openSum) + '</div>' +
+        '<div class="meta">' + open.length + ' ' + (open.length === 1 ? T('app.payment','betaling') : T('app.payments','betalingen')) + ' · ' + T('app.onetapfid','één tik met Face ID') + '</div>' +
+        '<button class="go" data-goto="betalen">'+T('app.paynow','Nu betalen')+' →</button>'
+      : '<div class="label">'+T('app.payments.cap','Betalingen')+'</div><div class="big" style="color:var(--green);">'+T('app.allsettled','Alles voldaan')+'</div>' +
+        '<div class="meta">'+T('app.nothingopen','Er staat niets open.')+'</div>';
+    $('#homeSalon').innerHTML =
+      '<div class="label">'+T('app.thesalon','De Salon')+'</div>' +
+      '<div class="big gold">' + nfmt(creatorLikes) + '</div>' +
+      '<div class="meta">'+T('app.likesquarter','likes dit kwartaal, content levert voorrang, korting en gratis diensten op')+'</div>' +
+      '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
+    document.querySelectorAll('#content [data-goto]').forEach(b =>
+      b.addEventListener('click', () => openTab(b.dataset.goto)));
+  }
+
+  /* ---------- reizen ---------- */
+
+  function renderTrip(){
+    $('#tripSub').textContent = trip.dest + ' · ' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen');
+    $('#tripList').innerHTML = trip.items.map(it =>
+      '<div class="rowitem">' +
+        '<div class="t"><b>' + it.title + '</b><span>' + it.when + ' · ' + it.sub + '</span></div>' +
+        '<span class="pill ' + (it.status === 'paid' ? 'paid' : it.status === 'req' ? 'req' : 'open') + '">' + tLbl(it.label) + '</span>' +
+      '</div>').join('');
+  }
+
+  /* ---------- betalen (Face ID) ---------- */
+
+  const FID = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M6 19 V13 a7 7 0 0 1 7-7 h6"/><path d="M45 6 h6 a7 7 0 0 1 7 7 v6"/>' +
+    '<path d="M58 45 v6 a7 7 0 0 1-7 7 h-6"/><path d="M19 58 h-6 a7 7 0 0 1-7-7 v-6"/>' +
+    '<circle cx="23.5" cy="26.5" r="2.6" fill="currentColor" stroke="none"/><circle cx="40.5" cy="26.5" r="2.6" fill="currentColor" stroke="none"/>' +
+    '<path d="M32 26 v8.5 a2.2 2.2 0 0 1-2.2 2.2"/><path d="M23 42.5 a12.5 8.5 0 0 0 18 0"/></svg>';
+  const CHECK = '<svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="28" stroke="#2E6B4F" stroke-width="3.5"/>' +
+    '<path d="M20 33 l8.5 8.5 L45 23" stroke="#2E6B4F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  async function executePay(target){
+    let foundation = 0;
+    if (API.live){
+      const data = await API.call('/pay', target === 'all' ? {all:true} : {invoiceId: target});
+      foundation = data.foundation;
+      applyState(data.state);
+    } else {
+      const targets = target === 'all' ? invoices.filter(i => i.status === 'open') : invoices.filter(i => i.id === target);
+      for (const inv of targets){
+        inv.status = 'paid'; inv.date = 'Zojuist betaald';
+        foundation += Math.round(inv.bijdrage * 0.3);
+        for (const t of trip.items) if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
+      }
+    }
+    return foundation;
+  }
+
+  let payBusy = false;
+  function payWithFaceId(amount, doPay, opts){
+    if (payBusy) return;
+    opts = opts || {};
+    payBusy = true;
+    const pw = $('#paywait'), card = pw.querySelector('.paycard');
+    $('#payAmt').textContent = amount;
+    $('#payIcon').innerHTML = FID.replace(/currentColor/g, '#0C0C0B');
+    $('#payLbl').textContent = T('app.payingfid','Betalen met Face ID…');
+    card.classList.add('scanning'); card.classList.remove('done');
+    pw.classList.add('open');
+    setTimeout(async () => {
+      try {
+        const result = await doPay();
+        card.classList.remove('scanning'); card.classList.add('done');
+        $('#payIcon').innerHTML = CHECK;
+        $('#payLbl').textContent = T('app.confirmed','Bevestigd');
+        setTimeout(() => {
+          pw.classList.remove('open');
+          payBusy = false;
+          if (opts.message) toast(opts.message(result));
+          else { toast(T('app.paid','Betaald') + '. ' + eur(result) + ' ' + T('app.tofoundation','gaat naar de RTFoundation.')); renderPay(); renderHome(); renderTrip(); }
+          if (opts.after) opts.after(result);
+        }, 700);
+      } catch (e) {
+        pw.classList.remove('open');
+        payBusy = false;
+        toast(e.message || T('app.payfailed','Betaling mislukt.'));
+      }
+    }, 1100);
+  }
+
+  function renderPay(){
+    const open = invoices.filter(i => i.status === 'open');
+    const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+    $('#payList').innerHTML = invoices.map(inv => {
+      const total = inv.netto + inv.bijdrage;
+      return '<div class="rowitem">' +
+        '<div class="t"><b>' + inv.desc + '</b><span>' + inv.id + ' · ' + inv.date + '</span></div>' +
+        '<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:0.45rem;">' +
+          '<span class="amount">' + eur(total) + '</span>' +
+          (inv.status === 'open'
+            ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>'
+            : '<span class="pill paid">'+T('app.paid','Betaald')+'</span>') +
+        '</div>' +
+      '</div>';
+    }).join('');
+    $('#payAllWrap').innerHTML = open.length
+      ? '<button class="btn-pay payall" id="payAll">' + FID + T('app.payall','Betaal alles') + ', ' + eur(openSum) + '</button>'
+      : '';
+    document.querySelectorAll('.js-pay').forEach(b =>
+      b.addEventListener('click', () => payWithFaceId(eur(Number(b.dataset.amt)), () => executePay(b.dataset.inv))));
+    const pa = $('#payAll');
+    if (pa) pa.addEventListener('click', () => payWithFaceId(eur(openSum), () => executePay('all')));
+  }
+
+  /* ---------- AI ---------- */
+
+  const chatHistory = [];
+
+  function aiOpener(){
+    const first = user.full.split(' ')[0];
+    const lines = [ (lang()==='en'
+      ? ('Good day' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Your journey to ' + trip.dest + ' begins in ' + trip.days + ' days. I have already thought ahead:')
+      : ('Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Uw reis naar ' + trip.dest + ' begint over ' + trip.days + ' dagen. Ik heb alvast vooruitgedacht:')) ];
+    const open = invoices.filter(i => i.status === 'open');
+    if (open.length){
+      const sum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+      lines.push(lang()==='en'
+        ? ('• There ' + (open.length === 1 ? 'is 1 payment' : 'are ' + open.length + ' payments') + ' still open (' + eur(sum) + '). One tap in Payments and it is done.')
+        : ('• Er ' + (open.length === 1 ? 'staat nog 1 betaling' : 'staan nog ' + open.length + ' betalingen') + ' open (' + eur(sum) + '). Eén tik in Betalen en het is geregeld.'));
+    }
+    const pending = trip.items.find(i => i.status === 'req');
+    if (pending) lines.push(lang()==='en'
+      ? ('• ' + pending.title.replace('Diner, ', 'Your table at ') + ' is still being requested; I am watching for the confirmation.')
+      : ('• ' + pending.title.replace('Diner, ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging.'));
+    lines.push(T('ai.opener.plan','• Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.'));
+    return lines.join('\n');
+  }
+
+  function aiAnswer(q){
+    const l = q.toLowerCase().trim();
+    if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het|yes|please|go ahead|sure|arrange it)\b/.test(l))
+      return T('ai.a.yes','Geregeld. De paklijst staat klaar (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00, avondwandeling langs Pontocho.\n\nIk bewaak nu de bevestiging van Kikunoi Honten. U hoeft niets te doen.');
+    if (l.includes('inpak') || l.includes('paklijst') || l.includes('pack'))
+      return T('ai.a.pack','Voor Kyoto in oktober (14-22°C, kans op regen):\n• Lichte lagen + regenjas\n• Nette schoenen die makkelijk uitgaan\n• Ingetogen kleding voor Kikunoi Honten\n• Adapter type A\n\nZal ik er een afvinklijst van maken?');
+    if (l.includes('visum') || l.includes('paspoort') || l.includes('visa') || l.includes('passport'))
+      return T('ai.a.visa','Voor Japan heeft u geen visum nodig tot 90 dagen. Ik zet uw boekingsbevestigingen klaar voor Visit Japan Web.');
+    if (l.includes('weer') || l.includes('weather'))
+      return T('ai.a.weather','Kyoto medio oktober: 14-22°C, af en toe regen, het begin van de herfstkleuren. Zal ik een vroege wandeling door Arashiyama inplannen?');
+    if (l.includes('plan') || l.includes('dag') || l.includes('day'))
+      return T('ai.a.plan','Voorstel voor 14 oktober:\n• 08:00 Arashiyama vóór de drukte\n• 11:30 lunch in Sagano\n• 15:00 uw theeceremonie in Gion\n• 19:00 avondwandeling Pontocho\n\nZal ik de lunch reserveren?');
+    if (l.includes('restaurant') || l.includes('diner') || l.includes('eten') || l.includes('dinner') || l.includes('eat'))
+      return T('ai.a.rest','Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki.');
+    return T('ai.a.default','Daar kom ik vandaag nog op terug. Ik kan alvast helpen met de paklijst, documenten, het weer of een dagplan, zeg het maar.');
+  }
+
+  function bubble(text, who){
+    const el = document.createElement('div');
+    el.className = 'bubble ' + who;
+    el.textContent = text;
+    $('#chat').appendChild(el);
+    $('#content').scrollTop = $('#content').scrollHeight;
+    return el;
+  }
+
+  const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+  function ask(q){
+    if (!q.trim()) return;
+    if (user.account){ chatSend(q); return; }   // echte accounts: gekoppeld gesprek
+    bubble(q, 'user');
+    chatHistory.push({role:'user', content:q});
+    if (API.live){
+      const pending = bubble('…', 'ai');
+      API.call('/ai', {messages: chatHistory})
+        .then(d => { pending.textContent = d.reply; chatHistory.push({role:'assistant', content:d.reply}); })
+        .catch(() => { const r = aiAnswer(q); pending.textContent = r; chatHistory.push({role:'assistant', content:r}); })
+        .finally(() => { $('#content').scrollTop = $('#content').scrollHeight; });
+    } else {
+      setTimeout(() => { const r = aiAnswer(q); bubble(r, 'ai'); chatHistory.push({role:'assistant', content:r}); }, 500);
+    }
+  }
+
+  /* ---------- gekoppeld gesprek (WhatsApp + app) voor echte accounts ---------- */
+  function renderChatMsgs(msgs, concierge){
+    const chat = $('#chat');
+    if (!msgs.length){
+      chat.innerHTML = '';
+      bubble(concierge ? T('chat.concierge.hi','Goedendag. Schrijf ons hier of via WhatsApp; uw concierge helpt u persoonlijk.') : aiOpener(), 'ai');
+      return;
+    }
+    chat.innerHTML = msgs.map(m => {
+      const who = m.from === 'member' ? 'user' : 'ai';
+      const wa = m.channel === 'whatsapp' ? '<span class="wa-badge">📱 WhatsApp</span>' : '';
+      return '<div class="bubble ' + who + '">' + wa + escHtml(m.text) + '</div>';
+    }).join('');
+    const last = msgs[msgs.length - 1];
+    if (concierge && last && last.from === 'member'){
+      chat.innerHTML += '<div class="bubble ai pending">' + T('chat.concierge.pending','Uw concierge is ingelicht en reageert zo.') + '</div>';
+    }
+    $('#content').scrollTop = $('#content').scrollHeight;
+  }
+  async function renderChat(){
+    const concierge = user.tier !== 'rtg';
+    $('#aiTitle').textContent = concierge ? T('chat.concierge.title','Uw concierge.') : T('ai.title.rtg','De Butler.');
+    const deck = document.querySelector('.view[data-view="ai"] .sub');
+    if (deck) deck.textContent = concierge
+      ? T('chat.concierge.deck','Uw persoonlijke concierge, hier én via WhatsApp. Eén gesprek, waar u ook schrijft.')
+      : T('chat.butler.deck','De Butler, hier én via WhatsApp. Eén gesprek, waar u ook schrijft.');
+    $('#chips').innerHTML = '';
+    if (!API.live){ $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); return; }
+    try { const d = await API.call('/chat/history'); renderChatMsgs(d.messages, concierge); }
+    catch (e) { $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); }
+  }
+  async function chatSend(q){
+    if (!API.live){ bubble(q, 'user'); setTimeout(() => bubble(aiAnswer(q), 'ai'), 400); return; }
+    try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, user.tier !== 'rtg'); }
+    catch (e) { toast(e.message || 'Versturen mislukt.'); }
+  }
+
+  function renderAI(){
+    if (user.account){ renderChat(); return; }
+    $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','Uw uitvoerende AI.');
+    $('#chat').innerHTML = '';
+    chatHistory.length = 0;
+    const opener = aiOpener();
+    bubble(opener, 'ai');
+    chatHistory.push({role:'assistant', content:opener});
+    const chips = lang()==='en'
+      ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
+      : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant'];
+    $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
+    document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
+  }
+  $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
+  $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
+
+  /* ---------- salon ---------- */
+
+  function renderSalon(){
+    $('#feed').innerHTML = posts.map(p => {
+      const engage = canEngage(p);
+      return '<article class="post" data-post="' + p.id + '">' +
+        '<div class="head">' +
+          '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
+          '<div><b>' + p.author + '</b><span>' + TIER_LABEL[p.tier] + ' · ' + p.place + ' · ' + T('app.salon.7days','7 dagen na verblijf') + '</span></div>' +
+        '</div>' +
+        '<div class="visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>' +
+        '<div class="body">' + msgHTML(p.text, p.lang) + '</div>' +
+        '<div class="acts">' +
+          '<button class="pa js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +
+          '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>' + T('app.salon.comment','Reageren') + ' (' + p.comments.length + ')</button>' +
+        '</div>' +
+        '<div class="comments">' +
+          '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b>, ' + msgHTML(c.text, c.lang) + '</div>').join('') + '</div>' +
+          '<div class="cform"><input placeholder="' + T('app.salon.write','Schrijf een reactie…') + '"><button>' + T('app.salon.post','Plaats') + '</button></div>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+    hydrateMsgs($('#feed'));
+
+    document.querySelectorAll('.post').forEach(el => {
+      const post = posts.find(p => p.id === Number(el.dataset.post));
+      el.querySelector('.js-like').addEventListener('click', ev => {
+        post.liked = !post.liked;
+        post.likes += post.liked ? 1 : -1;
+        ev.currentTarget.classList.toggle('liked', post.liked);
+        el.querySelector('.lc').textContent = post.likes;
+        if (API.live) API.call('/like', {postId: post.id, liked: post.liked}).catch(() => {});
+      });
+      const commBtn = el.querySelector('.js-comm');
+      commBtn.addEventListener('click', () => {
+        if (commBtn.disabled) return;
+        el.querySelector('.comments').classList.toggle('open');
+      });
+      el.querySelectorAll('.pa:disabled').forEach(b => {
+        b.style.pointerEvents = 'auto';
+        b.addEventListener('click', e => {
+          e.preventDefault();
+          toast(user.tier === 'rtg'
+            ? T('app.salon.rtgnote','Met de RTG Pass reageert u met RTG-leden, of met wie u eerst aanspreekt.')
+            : T('app.salon.nocomment','Reageren is hier niet beschikbaar.'));
+        });
+      });
+      el.querySelector('.cform button').addEventListener('click', async () => {
+        const inp = el.querySelector('.cform input');
+        if (!inp.value.trim()) return;
+        if (API.live){
+          try { await API.call('/comment', {postId: post.id, text: inp.value.trim()}); }
+          catch (e) { toast(e.message || T('app.salon.notallowed','Reageren niet toegestaan.')); return; }
+        }
+        post.comments.push({who: user.full, tier: user.tier, text: inp.value.trim()});
+        const d = document.createElement('div');
+        d.className = 'comment';
+        d.innerHTML = '<b>' + user.full + '</b>, ' + inp.value.trim().replace(/</g, '&lt;');
+        el.querySelector('.clist').appendChild(d);
+        inp.value = '';
+        commBtn.textContent = T('app.salon.comment','Reageren') + ' (' + post.comments.length + ')';
+        toast(T('app.salon.posted','Reactie geplaatst.'));
+      });
+    });
+  }
+
+  /* ---------- taal gewijzigd: dynamische schermen opnieuw opbouwen ---------- */
+  window.addEventListener('rtglang', async () => {
+    if (!user) return;
+    const active = (document.querySelector('.tabbar button.active') || {}).dataset;
+    const tab = active ? active.tab : 'home';
+    // inhoud opnieuw ophalen in de nieuwe taal (facturen, reis, menu's)
+    if (API.live){ try { applyState((await API.call('/state')).state); } catch (e) {} }
+    renderAll();
+    renderBell();
+    openTab(tab);
+  });
+
+  /* ---------- PWA ---------- */
+
+  if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+})();
+</script>
+<script>
+window.I18N = { en: {
+  'gate.title':'The app.<br>Your membership, <em>always</em> with you.',
+  'gate.deck':'Bookings, one-tap payment, your personal AI and The Salon, and your account runs on your codename, not your real name.',
+  'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
+  'gate.name':'Your name', 'gate.email':'Email address', 'gate.phone':'Mobile number (WhatsApp)', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
+  'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
+  'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.forgotsent':'If this email is known, we will send a reset link.',
+  'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
+  'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',
+  'vf.pending.h':'Verification in progress', 'vf.pending.b':'We are reviewing your document. You can keep using the app as normal.',
+  'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>',
+  't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
+  'msg.from':'translated from', 'msg.orig':'show original', 'msg.showtrans':'show translation',
+  'app.tab.home':'Home', 'app.tab.trips':'Journeys', 'app.tab.pay':'Payments', 'app.tab.ai':'AI', 'app.tab.salon':'Salon', 'app.tab.tp':'On site',
+  'app.notifs':'Notifications', 'app.pushenable':'Turn on push', 'app.pushon':'Push on',
+  'app.nonotif':'No notifications yet. As soon as someone replies to your post or sends you a message, you will see it here.',
+  'app.pushtoast.on':'Push notifications are on.', 'app.pushtoast.denied':'Permission denied, enable notifications in your settings.', 'app.pushtoast.no':'Push is not available here.',
+  'app.items':'item(s)', 'app.paid':'Paid', 'app.paywithfid':'Pay with Face ID', 'app.taggedsalon':'tagged for Salon',
+  'app.tp.needserver':'On site works via the RTG server. Start the app with the backend to order from partners.',
+  'app.tp.partnersin':'RTG partners in', 'app.tp.orderpayreserve':'order, pay and reserve.', 'app.tp.myorders':'My orders',
+  'app.tp.partnersdest':'Partners at your destination', 'app.tp.viewmenu':'View menu', 'app.tp.location':'Location',
+  'app.tp.locwhenenroute':'location shared once you are on your way',
+  'live.start.h':'Heading somewhere?', 'live.start.d':'Put your journey live. Your partners, your taxi, the restaurant, see where you are and make sure everything is ready when you arrive. Always by codename, never by name.',
+  'live.mode.walking':'Walk', 'live.mode.driving':'Drive', 'live.mode.flying':'Fly', 'live.go':'Start journey',
+  'live.started':'You are on your way. Your partners have been notified.', 'live.badge':'Live journey', 'live.stop':'Stop', 'live.stopped':'Journey stopped.',
+  'live.headingto':'On the way to', 'live.arrivedh':'You have <em>arrived</em>', 'live.moving':'You are <em>on the way</em>',
+  'live.aankomst':'arriving in ~', 'live.min':'min', 'live.you':'You', 'live.here':'on site',
+  'live.mintoyou':'min to you', 'live.minaway':'min away', 'live.ride':'ride',
+  'live.preorder':'Pre-order now so it is ready when you arrive.', 'live.preorderbtn':'Order ahead',
+  'live.simulate':'Simulate ride', 'live.taxi':'Request a taxi', 'live.share':'Share my location',
+  'live.notaxi':'No transport partner available at this destination.', 'live.taxireq':'has been requested. You will see the taxi approach live.',
+  'live.shared':'Location shared with your partners.', 'live.geodenied':'Location unavailable. Use "Simulate ride" for the demo.', 'live.geono':'Location is not available here.',
+  'live.nosim':'Choose a destination first.', 'live.simstart':'Simulation started, you are approaching the destination.',
+  'app.ms.note':'Allergy or note (e.g. no nuts)', 'app.ms.tag':'Tag this for The Salon (7 days after the stay)',
+  'app.ms.order':'Order', 'app.ms.choose':'Choose dishes', 'app.orderplaced':'Order placed with', 'app.paidto':'Paid to',
+  'app.welcome':'Welcome,', 'app.membersince':'member since',
+  'app.cc.label':'Your codename, your identity in our systems', 'app.cc.membernr':'Member no.', 'app.cc.pass':'Membership',
+  'app.cc.why':'Why a codename?', 'app.cc.why.h':'Your real name is not in our travel data.',
+  'app.cc.why.b':'Reservations, payments and Salon activity are held under your codename. Your real name sits in a separate, encrypted vault and is linked only once, at ticketing and check-in. Were travel data ever stolen, the attacker would never have the right name with your journeys.',
+  'app.nexttrip':'Next journey', 'app.in':'in', 'app.days':'days', 'app.viewtrip':'View your journey',
+  'app.outstanding':'Outstanding', 'app.payment':'payment', 'app.payments':'payments', 'app.onetapfid':'one tap with Face ID', 'app.paynow':'Pay now',
+  'app.payments.cap':'Payments', 'app.allsettled':'All settled', 'app.nothingopen':'Nothing is outstanding.',
+  'app.thesalon':'The Salon', 'app.likesquarter':'likes this quarter, content earns priority, discounts and complimentary services', 'app.tosalon':'To The Salon',
+  'app.payingfid':'Paying with Face ID…', 'app.confirmed':'Confirmed', 'app.tofoundation':'goes to the RTFoundation.', 'app.payfailed':'Payment failed.',
+  'app.pay':'Pay', 'app.payall':'Pay all',
+  'ai.opener.plan':'• Shall I prepare a packing list and a day plan for 14 October? A single "yes" is enough.',
+  'ai.a.yes':'Done. The packing list is ready (light layers, a raincoat, smart shoes that slip off easily, a type A adapter) and the day plan for 14 October is scheduled: Arashiyama at 08:00, lunch in Sagano, your tea ceremony at 15:00, an evening stroll along Pontocho.\n\nI am now watching for the confirmation from Kikunoi Honten. You need not do a thing.',
+  'ai.a.pack':'For Kyoto in October (14-22°C, chance of rain):\n• Light layers + raincoat\n• Smart shoes that slip off easily\n• Understated attire for Kikunoi Honten\n• Type A adapter\n\nShall I turn it into a checklist?',
+  'ai.a.visa':'For Japan you need no visa for up to 90 days. I will prepare your booking confirmations for Visit Japan Web.',
+  'ai.a.weather':'Kyoto in mid-October: 14-22°C, occasional rain, the start of the autumn colours. Shall I schedule an early walk through Arashiyama?',
+  'ai.a.plan':'Proposal for 14 October:\n• 08:00 Arashiyama before the crowds\n• 11:30 lunch in Sagano\n• 15:00 your tea ceremony in Gion\n• 19:00 evening stroll Pontocho\n\nShall I reserve the lunch?',
+  'ai.a.rest':'Your table at Kikunoi Honten (15 Oct, 19:30) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of Gion Sasaki.',
+  'ai.a.default':'I will come back to that today. In the meantime I can help with the packing list, documents, the weather or a day plan, just say the word.',
+  'ai.title.rtg':'The Butler.', 'ai.title.life':'Your AI.', 'ai.title.biz':'Your executive AI.',
+  'chat.concierge.title':'Your concierge.', 'chat.butler.deck':'The Butler, here and on WhatsApp. One conversation, wherever you write.',
+  'chat.concierge.deck':'Your personal concierge, here and on WhatsApp. One conversation, wherever you write.',
+  'chat.concierge.hi':'Good day. Write to us here or on WhatsApp; your concierge will help you personally.',
+  'chat.concierge.pending':'Your concierge has been notified and will reply shortly.',
+  'app.salon.7days':'7 days after the stay', 'app.salon.comment':'Comment', 'app.salon.write':'Write a comment…', 'app.salon.post':'Post',
+  'app.salon.rtgnote':'With the RTG Pass you comment with RTG members, or with whoever addresses you first.', 'app.salon.nocomment':'Commenting is not available here.',
+  'app.salon.notallowed':'Commenting not permitted.', 'app.salon.posted':'Comment posted.',
+  'app.v.trip':'Your journey.', 'app.v.trip.note':'Change or add something? Ask the AI, one message is enough.',
+  'app.v.pay':'Payments.', 'app.v.pay.sub':'One tap, Face ID. Your payments are held under your codename.',
+  'app.v.ai.sub':'The frictionless friend: it spots things, suggests, and one "yes" is enough.', 'app.v.ai.ph':'Ask a question…', 'app.v.ai.send':'Send',
+  'app.v.salon':'The Salon.', 'app.v.salon.sub':'Posts appear 7 days after the stay, for your safety.', 'app.v.tp':'On site.'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
+</body>
+</html>

@@ -1,3 +1,14 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>RTG Pass, Rahul Travel Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
   :root{
     --white:#FFFFFF;
     --black:#0C0C0B;
@@ -17,8 +28,7 @@
   body{
     background:var(--white);
     color:var(--black);
-    font-family:'EB Garamond',serif;
-    font-size:1.0625rem;
+    font-family:'Inter',sans-serif;
     font-weight:400;
     line-height:1.6;
     -webkit-font-smoothing:antialiased;
@@ -40,7 +50,7 @@
 
   section{
     position:relative;
-    padding:clamp(6.5rem, 13vw, 12rem) 0;
+    padding:clamp(6rem, 12vw, 11rem) 0;
     overflow:hidden;
   }
 
@@ -56,9 +66,9 @@
     display:flex;
     align-items:center;
     gap:0.75rem;
-    margin-bottom:3rem;
+    margin-bottom:2.5rem;
   }
-  .on-black .folio{color:rgba(255,255,255,0.45);}
+  .on-black .folio{color:var(--white);}
   .folio::after{
     content:"";
     flex:1;
@@ -73,7 +83,7 @@
     text-transform:uppercase;
     color:var(--burgundy);
     font-weight:600;
-    margin-bottom:1.6rem;
+    margin-bottom:1.25rem;
     display:block;
   }
   .on-black .kicker{color:var(--burgundy-on-dark);}
@@ -84,25 +94,20 @@
     position:fixed;
     top:0;left:0;right:0;
     z-index:100;
-    padding:1rem 0 0.85rem;
+    padding:1.1rem 0;
     background:rgba(255,255,255,0.86);
     backdrop-filter:blur(10px);
-  }
-  .masthead{
-    display:flex;
-    justify-content:center;
-    padding-bottom:0.85rem;
     border-bottom:1px solid var(--line);
   }
-  .masthead-nav{
+  header .wrap{
     display:flex;
-    justify-content:center;
-    padding-top:0.7rem;
+    align-items:center;
+    justify-content:space-between;
   }
   .brandmark{
     display:inline-flex;
     flex-direction:column;
-    align-items:center;
+    align-items:flex-start;
   }
   .brandmark .bm-block{
     background:var(--burgundy);
@@ -127,10 +132,8 @@
     list-style:none;
     display:flex;
     gap:2.25rem;
-    justify-content:center;
   }
   nav a{
-    font-family:'Inter',sans-serif;
     font-size:0.85rem;
     letter-spacing:0.03em;
     color:var(--grey);
@@ -141,21 +144,20 @@
   /* ---------- hero ---------- */
 
   .hero{
-    padding-top:clamp(11rem, 18vw, 15rem);
+    padding-top:clamp(9rem, 16vw, 13rem);
     padding-bottom:clamp(6rem, 10vw, 8rem);
   }
   .hero-inner{
     max-width:820px;
   }
   .hero h1{
-    font-size:clamp(2.8rem, 7vw, 6.2rem);
-    line-height:0.98;
-    letter-spacing:-0.015em;
+    font-size:clamp(2.6rem, 6vw, 5rem);
+    line-height:1.03;
     max-width:14ch;
   }
   .hero p.deck{
     margin-top:2rem;
-    font-size:clamp(1rem, 1.4vw, 1.15rem);
+    font-size:clamp(1.05rem, 1.6vw, 1.25rem);
     color:var(--grey);
     max-width:520px;
   }
@@ -170,7 +172,6 @@
     padding:0.95rem 2.1rem;
     background:var(--black);
     color:var(--white);
-    font-family:'Inter',sans-serif;
     font-size:0.85rem;
     letter-spacing:0.05em;
     text-transform:uppercase;
@@ -182,7 +183,6 @@
   .btn:hover{
     background:var(--burgundy);
     border-color:var(--burgundy);
-    transform:translateY(-2px);
   }
   .btn-ghost{
     background:transparent;
@@ -218,7 +218,7 @@
   .on-burgundy .folio{color:var(--white);}
   .on-burgundy .folio::after{background:rgba(255,255,255,0.25);}
   .on-burgundy .kicker{color:var(--gold);}
-  .hero.on-burgundy p.deck{color:var(--white);}
+  .on-burgundy .hero p.deck{color:var(--white);}
   .on-burgundy .step .n{color:var(--white);}
   .on-burgundy .step p{color:var(--white);}
   .on-burgundy .btn-ghost{
@@ -268,37 +268,11 @@
   }
   .step p{
     color:var(--grey);
-    font-size:1.02rem;
+    font-size:0.95rem;
   }
-  .step:hover{transform:translateY(-6px);}
 
   @media (max-width:860px){
     .steps-grid{grid-template-columns:1fr;gap:2.25rem;}
-  }
-
-  /* ---------- pull-quote ---------- */
-
-  .pull-quote{
-    max-width:640px;
-    margin:clamp(3rem, 6vw, 5rem) auto;
-    text-align:center;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
-    padding:clamp(2.5rem, 5vw, 3.5rem) 0;
-  }
-  .on-black .pull-quote, .on-burgundy .pull-quote{
-    border-color:rgba(255,255,255,0.18);
-  }
-  .pull-quote p{
-    font-family:'Bodoni Moda',serif;
-    font-style:italic;
-    font-weight:400;
-    font-size:clamp(1.6rem, 3.2vw, 2.4rem);
-    line-height:1.3;
-    color:var(--black);
-  }
-  .on-black .pull-quote p, .on-burgundy .pull-quote p{
-    color:var(--white);
   }
 
   /* ---------- butler ---------- */
@@ -345,7 +319,6 @@
     min-height:220px;
   }
   .bubble{
-    font-family:'Inter',sans-serif;
     padding:0.9rem 1.15rem;
     font-size:0.92rem;
     line-height:1.5;
@@ -391,8 +364,8 @@
     background:rgba(194,58,94,0.1);
   }
   .butler-reveal{
-    text-align:center;
-    margin-top:2rem;
+    margin-top:0.5rem;
+    align-self:flex-start;
   }
   .butler-reveal .btn{
     padding:0.85rem 1.75rem;
@@ -410,64 +383,6 @@
     text-decoration:underline;
     cursor:pointer;
   }
-  .butler-input{
-    display:flex;
-    gap:0.6rem;
-    padding:1.25rem 1.75rem;
-    border-top:1px solid var(--black);
-  }
-  .butler-input input{
-    flex:1;
-    background:#0f0e0d;
-    border:1px solid var(--black);
-    color:var(--white);
-    font-family:'Inter',sans-serif;
-    font-size:0.9rem;
-    padding:0.75rem 1rem;
-  }
-  .butler-input input:focus{
-    outline:none;
-    border-color:var(--burgundy-on-dark);
-  }
-  .butler-input button{
-    background:var(--burgundy);
-    border:none;
-    color:var(--white);
-    font-family:'Inter',sans-serif;
-    font-size:0.85rem;
-    padding:0.75rem 1.25rem;
-    cursor:pointer;
-    transition:background 0.2s ease;
-  }
-  .butler-input button:hover{
-    background:var(--burgundy-bright);
-  }
-  .butler-input button:disabled{
-    opacity:0.5;
-    cursor:default;
-  }
-  .bubble.typing{
-    display:flex;
-    gap:0.3rem;
-    align-items:center;
-  }
-  .bubble.typing span{
-    width:5px;height:5px;
-    border-radius:50%;
-    background:var(--grey-soft);
-    animation:blink 1.1s infinite ease-in-out;
-  }
-  .bubble.typing span:nth-child(2){animation-delay:0.15s;}
-  .bubble.typing span:nth-child(3){animation-delay:0.3s;}
-  @keyframes blink{
-    0%,80%,100%{opacity:0.25;}
-    40%{opacity:1;}
-  }
-  .butler-error{
-    color:var(--burgundy-on-dark);
-    font-size:0.85rem;
-    align-self:flex-start;
-  }
 
   /* ---------- features ---------- */
 
@@ -484,17 +399,13 @@
     background:var(--white);
     padding:2.5rem;
   }
-  .feat-card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 18px 32px rgba(0,0,0,0.14);
-  }
   .feat-card h3{
     font-size:1.15rem;
     margin-bottom:0.6rem;
   }
   .feat-card p{
     color:var(--grey);
-    font-size:1rem;
+    font-size:0.92rem;
   }
 
   @media (max-width:860px){
@@ -535,174 +446,224 @@
     color:var(--grey-soft);
   }
 
-  /* ---------- rekensom ---------- */
-
-  .rekensom-prijs{
-    display:block;
-    margin-top:1rem;
-    font-family:'Bodoni Moda',serif;
-    font-size:1.7rem;
-    color:var(--white);
-  }
-  .rekensom-oud{
-    font-size:1.05rem;
-    color:rgba(255,255,255,0.45);
-    text-decoration:line-through;
-    margin-right:0.75rem;
-  }
-  .rekensom-noot{
-    margin-top:2.5rem;
-    font-family:'Inter',sans-serif;
-    font-size:0.78rem;
-    letter-spacing:0.04em;
-    color:rgba(255,255,255,0.5);
-    text-align:center;
-  }
-
-  /* ---------- leesbalk + pager ---------- */
-
-  .leesbalk{
-    position:fixed;
-    top:0;left:0;
-    height:2px;
-    width:0;
-    background:var(--burgundy-bright);
-    z-index:200;
-  }
-  .pager{
-    text-align:center;
-    padding:clamp(4rem, 8vw, 6rem) 0;
-  }
-  .pager-label{
-    display:block;
-    font-family:'Inter',sans-serif;
-    font-size:0.75rem;
-    letter-spacing:0.18em;
-    text-transform:uppercase;
-    color:var(--grey-soft);
-    margin-bottom:1.25rem;
-  }
-  .on-black .pager-label{color:rgba(255,255,255,0.5);}
-  .on-burgundy .pager-label{color:rgba(255,255,255,0.6);}
-  .pager a{
-    font-family:'Bodoni Moda',serif;
-    font-style:italic;
-    font-size:clamp(2rem, 4.5vw, 3.2rem);
-    line-height:1.1;
-    display:inline-block;
-  }
-  .pager .pijl{
-    display:inline-block;
-    transition:transform 0.25s ease;
-  }
-  .pager a:hover .pijl{transform:translateX(0.4em);}
-
   @media (max-width:600px){
     footer .wrap{flex-direction:column;gap:1rem;text-align:center;}
-    nav ul{gap:1.2rem;flex-wrap:wrap;}
+    nav ul{gap:1.2rem;}
     nav a{font-size:0.75rem;}
-    .masthead-nav{padding-top:0.55rem;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="/index.html" class="brandmark">
+      <span class="bm-block">Rahul Travel Group</span>
+      <span class="bm-tagline">Experience the Elite Class</span>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="/index.html#passen">Passen</a></li>
+        <li><a href="#butler">De Butler</a></li>
+        <li><a href="/index.html#foundation">Foundation</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="hero on-burgundy">
+  <div class="wrap hero-inner">
+    <span class="kicker" data-i18n="hero.kicker">Instap · Volledig geautomatiseerd</span>
+    <h1>RTG Pass</h1>
+    <p class="deck" data-i18n="hero.deck">Geen aanvraagformulier, geen wachttijd. De RTG Pass werkt via WhatsApp: je stelt jezelf voor, de Butler stelt een paar gerichte vragen, en toegang volgt vanzelf, rustig en zonder ophef.</p>
+    <div class="hero-cta">
+      <a href="#butler" class="btn">Praat met de Butler</a>
+      <a href="/index.html#passen" class="btn btn-ghost">Terug naar overzicht</a>
+    </div>
+  </div>
+</section>
+
+<section class="intro on-burgundy">
+  <div class="wrap">
+    <div class="folio">N° 01, Wat het is</div>
+    <p class="lede">De RTG Pass is niet bedoeld om indruk te maken. Het is de manier waarop je toegang krijgt tot dezelfde nettoprijzen als reisbureaus, zonder tussenkomst van een adviseur, via een gesprek dat aanvoelt als een berichtje aan een kennis, niet als een sollicitatie.</p>
+
+    <div class="steps-grid">
+      <div class="step">
+        <span class="n">01</span>
+        <h3>Je stelt jezelf voor</h3>
+        <p>Via WhatsApp, in een paar zinnen. Geen account, geen wachtwoord.</p>
+      </div>
+      <div class="step">
+        <span class="n">02</span>
+        <h3>De Butler vraagt door</h3>
+        <p>Een paar gerichte vragen over hoe je reist, genoeg om de juiste toegang te bepalen.</p>
+      </div>
+      <div class="step">
+        <span class="n">03</span>
+        <h3>Toegang volgt vanzelf</h3>
+        <p>Geen beoordelingsperiode, geen wachtlijst. Zodra het duidelijk is, is het geregeld.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="butler on-black" id="butler">
+  <div class="wrap">
+    <div class="folio">N° 02, De Butler</div>
+    <div class="butler-head">
+      <span class="kicker">Probeer het zelf</span>
+      <h2>Een kort gesprek, geen formulier.</h2>
+      <p>Dit is een simulatie van het gesprek dat je normaal via WhatsApp voert, zelfde toon, zelfde vragen.</p>
+    </div>
+
+    <div class="butler">
+      <div class="butler-bar"><span class="dot"></span> De Butler</div>
+      <div class="butler-body" id="butlerBody"></div>
+    </div>
+    <div class="butler-restart">
+      <button id="butlerRestart" style="display:none;">Begin opnieuw</button>
+    </div>
+  </div>
+</section>
+
+<section class="intro on-burgundy">
+  <div class="wrap">
+    <div class="folio">N° 03, Wat je krijgt</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <h3>Nettoprijzen</h3>
+        <p>Dezelfde inkoopprijs die reisbureaus en touroperators zien, zonder consumentenmarge.</p>
+      </div>
+      <div class="feat-card">
+        <h3>WhatsApp als enige voordeur</h3>
+        <p>Geen app om te installeren, geen portaal om te onthouden, één gesprek, altijd bereikbaar.</p>
+      </div>
+      <div class="feat-card">
+        <h3>Automatische bevestiging</h3>
+        <p>Boekingen worden direct verwerkt, zonder tussenpersoon die nog moet goedkeuren.</p>
+      </div>
+      <div class="feat-card">
+        <h3>30% naar de RTFoundation</h3>
+        <p>Ook bij de RTG Pass gaat een vast deel van je bijdrage direct naar liefdadigheid.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta on-black">
+  <div class="wrap">
+    <span class="kicker">Klaar om te beginnen</span>
+    <h2>Old money wacht niet in de rij.</h2>
+    <p class="deck">Praat met de Butler en zie binnen enkele minuten of de RTG Pass bij je past.</p>
+    <div class="cta-actions">
+      <a href="#butler" class="btn">Praat met de Butler</a>
+      <a href="/index.html" class="btn btn-ghost">Terug naar home</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Rahul Travel Group</span>
+    <span>RTG Pass · Lifestyle Pass · Business Pass</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const questions = [
+    {
+      q: "Fijn dat je er bent. Wat brengt je meestal op reis?",
+      options: ["Zakelijk", "Vrije tijd", "Allebei door elkaar"]
+    },
+    {
+      q: "Hoe vaak boek je een verblijf of vlucht?",
+      options: ["Vrijwel maandelijks", "Een paar keer per jaar", "Onregelmatig"]
+    },
+    {
+      q: "Wat weegt voor jou het zwaarst?",
+      options: ["De prijs", "Het gemak", "De vrijheid om te wijzigen"]
+    }
+  ];
+
+  const body = document.getElementById('butlerBody');
+  const restartBtn = document.getElementById('butlerRestart');
+  let step = 0;
+  const answers = [];
+
+  function addBubble(text, who){
+    const el = document.createElement('div');
+    el.className = 'bubble ' + who;
+    el.textContent = text;
+    body.appendChild(el);
+    body.scrollTop = body.scrollHeight;
   }
 
-  /* ---------- advertentie ---------- */
+  function renderQuestion(){
+    const current = questions[step];
+    addBubble(current.q, 'butler');
 
-  .advert{text-align:center;}
-  .advert .ad-label{
-    display:block;
-    font-size:0.65rem;
-    letter-spacing:0.3em;
-    text-transform:uppercase;
-    color:var(--grey-soft);
-    margin-bottom:3.5rem;
-  }
-  .on-black .advert .ad-label, .on-burgundy .advert .ad-label{color:rgba(255,255,255,0.45);}
-  .advert h2{
-    font-size:clamp(2.6rem, 6vw, 5rem);
-    line-height:1.02;
-    max-width:14ch;
-    margin:0 auto;
-  }
-  .advert .ad-sub{
-    margin-top:1.75rem;
-    font-family:'Bodoni Moda',serif;
-    font-style:italic;
-    font-size:clamp(1.05rem, 1.8vw, 1.35rem);
-    color:var(--grey);
-  }
-  .on-black .advert .ad-sub, .on-burgundy .advert .ad-sub{color:rgba(255,255,255,0.8);}
-  .advert .btn{margin-top:2.75rem;}
-
-  /* ---------- volgende pagina ---------- */
-
-  .next-page{
-    display:block;
-    border-top:1px solid var(--line);
-    padding:2.75rem 0;
-    background:var(--white);
-  }
-  .next-page .wrap{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:1rem;
-  }
-  .next-page .np-label{
-    font-size:0.75rem;
-    letter-spacing:0.18em;
-    text-transform:uppercase;
-    color:var(--grey-soft);
-  }
-  .next-page .np-title{
-    font-family:'Bodoni Moda',serif;
-    font-style:italic;
-    font-size:clamp(1.2rem, 2.2vw, 1.6rem);
-    color:var(--black);
-    display:inline-flex;
-    align-items:center;
-    gap:0.75rem;
-  }
-  .next-page .np-arrow{transition:transform 0.25s ease;}
-  .next-page:hover .np-arrow{transform:translateX(6px);}
-
-  /* ---------- pagina-omslag ---------- */
-
-  @view-transition{navigation:auto;}
-  ::view-transition-old(root){animation:pageOut 0.4s ease both;}
-  ::view-transition-new(root){animation:pageIn 0.5s ease both;}
-  @keyframes pageOut{to{opacity:0; transform:translateX(-2.5%);}}
-  @keyframes pageIn{from{opacity:0; transform:translateX(2.5%);}}
-  @media (prefers-reduced-motion: reduce){
-    ::view-transition-old(root), ::view-transition-new(root){animation:none;}
+    const optWrap = document.createElement('div');
+    optWrap.className = 'butler-options';
+    current.options.forEach(opt => {
+      const b = document.createElement('button');
+      b.textContent = opt;
+      b.onclick = () => {
+        optWrap.remove();
+        answers.push(opt);
+        addBubble(opt, 'user');
+        step++;
+        setTimeout(() => {
+          if (step < questions.length) {
+            renderQuestion();
+          } else {
+            renderClose();
+          }
+        }, 450);
+      };
+      optWrap.appendChild(b);
+    });
+    body.appendChild(optWrap);
+    body.scrollTop = body.scrollHeight;
   }
 
-  /* ---------- motion ---------- */
+  function renderClose(){
+    const closing = "Duidelijk. Op basis hiervan past de RTG Pass bij jou, nettoprijzen, WhatsApp als voordeur, geen wachttijd.";
+    addBubble(closing, 'butler');
 
-  @keyframes heroRise{
-    from{opacity:0; transform:translateY(16px);}
-    to{opacity:1; transform:translateY(0);}
-  }
-  .hero-inner > *{animation:heroRise 0.9s ease both;}
-  .hero-inner > *:nth-child(1){animation-delay:0.05s;}
-  .hero-inner > *:nth-child(2){animation-delay:0.16s;}
-  .hero-inner > *:nth-child(3){animation-delay:0.3s;}
-  .hero-inner > *:nth-child(4){animation-delay:0.45s;}
+    const reveal = document.createElement('div');
+    reveal.className = 'butler-reveal';
+    const a = document.createElement('a');
+    a.href = 'index.html#passen';
+    a.className = 'btn';
+    a.textContent = 'Toegang aanvragen';
+    reveal.appendChild(a);
+    body.appendChild(reveal);
+    body.scrollTop = body.scrollHeight;
 
-  .reveal{
-    opacity:0;
-    transform:translateY(28px);
-    transition:opacity 0.7s ease, transform 0.7s ease, box-shadow 0.35s ease;
+    restartBtn.style.display = 'inline-block';
   }
-  .reveal.is-visible{
-    opacity:1;
-    transform:translateY(0);
-  }
-  .steps-grid .step:nth-child(2){transition-delay:0.1s;}
-  .steps-grid .step:nth-child(3){transition-delay:0.2s;}
-  .feat-grid .feat-card:nth-child(2){transition-delay:0.1s;}
-  .feat-grid .feat-card:nth-child(3){transition-delay:0.2s;}
-  .feat-grid .feat-card:nth-child(4){transition-delay:0.3s;}
 
-  @media (prefers-reduced-motion: reduce){
-    .hero-inner > *{animation:none;}
-    .reveal{opacity:1; transform:none; transition:none;}
+  function start(){
+    body.innerHTML = '';
+    step = 0;
+    answers.length = 0;
+    restartBtn.style.display = 'none';
+    renderQuestion();
   }
+
+  restartBtn.addEventListener('click', start);
+  start();
+})();
+</script>
+
+<script>
+window.I18N = { en: {
+  'hero.kicker':'Entry · Fully automated',
+  'hero.deck':'No application form, no waiting time. The RTG Pass works via WhatsApp: you introduce yourself, the Butler asks a few targeted questions, and access follows naturally, calmly and without fuss.'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
+</body>
+</html>

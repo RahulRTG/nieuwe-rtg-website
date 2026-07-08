@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>RTG Partners, leverancier-app</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.55); --soft:rgba(244,241,236,0.38);
+    --burgundy:#C23A5E; --burgundy-deep:#7F1634; --gold:#A98F1C; --green:#4C9A75; --amber:#C99A2E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:#000;font-family:'Inter',sans-serif;color:var(--txt);display:flex;justify-content:center;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-0.01em;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
+  a{color:inherit;text-decoration:none;}
+  input,textarea,select{font-family:'Inter',sans-serif;}
+
+  #shell{width:100%;max-width:460px;min-height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;}
+  @media (min-width:540px){body{background:#201d1c;padding:2.5rem 0;}#shell{min-height:880px;max-height:920px;border-radius:38px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 90px -30px rgba(0,0,0,0.8);}}
+
+  /* login */
+  #gate{flex:1;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 1.75rem 3rem;}
+  #gate .badge{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+  #gate h1{font-size:2rem;line-height:1.1;margin-top:1.5rem;}
+  #gate h1 em{color:var(--burgundy);font-style:italic;}
+  #gate .deck{margin-top:0.9rem;font-size:0.88rem;color:var(--muted);line-height:1.6;}
+  .gate-list{margin-top:2rem;display:flex;flex-direction:column;gap:0.65rem;}
+  .gate-btn{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:0.95rem 1.1rem;text-align:left;display:flex;align-items:center;gap:0.9rem;transition:background 0.2s;}
+  .gate-btn:active{background:var(--card2);}
+  .gate-btn .ic{font-size:1.4rem;}
+  .gate-btn b{display:block;font-size:0.92rem;font-weight:600;}
+  .gate-btn span{font-size:0.72rem;color:var(--soft);}
+  #gate .free{margin-top:1.75rem;font-size:0.76rem;color:var(--soft);line-height:1.6;border-top:1px solid var(--line);padding-top:1.25rem;}
+  #gate .free b{color:var(--gold);}
+  .login-form{margin-top:1.75rem;display:flex;flex-direction:column;gap:0.6rem;}
+  .login-form input{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:0.9rem 1rem;color:var(--txt);font-size:0.92rem;font-family:inherit;outline:none;}
+  .login-form input:focus{border-color:var(--burgundy);}
+  .login-form button{background:#fff;color:#000;border:none;border-radius:999px;padding:0.95rem;font-size:0.86rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .login-form button:active{opacity:0.85;}
+  .gate-or{margin:1.6rem 0 0.75rem;font-size:0.64rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);}
+
+  /* app */
+  #app{display:none;flex:1;flex-direction:column;min-height:0;}
+  #app.active{display:flex;}
+  .topbar{padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.4rem 0.9rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);}
+  .topbar .who{display:flex;align-items:center;gap:0.7rem;}
+  .topbar .who .ic{font-size:1.5rem;}
+  .topbar .who b{display:block;font-size:0.92rem;font-weight:600;}
+  .topbar .who span{font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);}
+  .bell{position:relative;background:none;border:none;color:var(--muted);width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+  .bell svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;}
+  .bell-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 4px;background:var(--burgundy);color:#fff;border-radius:999px;font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+  .content{flex:1;overflow-y:auto;padding:1.3rem 1.4rem calc(env(safe-area-inset-bottom,0px) + 6rem);}
+  .view{display:none;}
+  .view.active{display:block;}
+  .view h2{font-size:1.5rem;line-height:1.15;}
+  .view .sub{margin-top:0.35rem;font-size:0.82rem;color:var(--muted);}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-top:0.9rem;}
+  .stat{display:flex;gap:0.8rem;margin-top:0.9rem;}
+  .stat .b{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;}
+  .stat .b .l{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
+  .stat .b .v{font-family:'Bodoni Moda',serif;font-size:1.5rem;margin-top:0.2rem;}
+  .stat .b .v.a{color:var(--burgundy);}
+  .stat .b .v.g{color:var(--gold);}
+
+  .order{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-top:0.8rem;}
+  .order .top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.8rem;}
+  .order .who{font-weight:600;font-size:0.9rem;}
+  .order .who .cn{color:var(--gold);}
+  .order .ref{font-size:0.62rem;letter-spacing:0.08em;color:var(--soft);text-transform:uppercase;margin-top:0.15rem;}
+  .order .amt{font-family:'Bodoni Moda',serif;font-size:1.2rem;white-space:nowrap;}
+  .order ul{list-style:none;margin-top:0.7rem;display:flex;flex-direction:column;gap:0.25rem;}
+  .order li{font-size:0.82rem;color:var(--muted);display:flex;justify-content:space-between;}
+  .order .allergy{margin-top:0.6rem;font-size:0.76rem;color:var(--amber);background:rgba(201,154,46,0.1);border:1px solid rgba(201,154,46,0.25);border-radius:8px;padding:0.4rem 0.6rem;}
+  .order .salon{margin-top:0.5rem;font-size:0.68rem;color:var(--burgundy);letter-spacing:0.04em;}
+  .order .enroute,.enroute{margin-top:0.6rem;font-size:0.76rem;color:var(--gold);background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:8px;padding:0.45rem 0.65rem;line-height:1.4;}
+  .order .enroute.here,.enroute.here{color:var(--green);background:rgba(76,154,117,0.12);border-color:rgba(76,154,117,0.35);}
+  .livedot{width:8px;height:8px;border-radius:50%;background:var(--burgundy);display:inline-block;animation:livepulse 1.4s infinite;}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 6px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
+  .guest-row{display:flex;justify-content:space-between;align-items:center;padding:0.55rem 0;border-bottom:1px solid var(--line);}
+  .guest-row:last-child{border-bottom:none;}
+  .guest-row .cn{font-weight:600;font-size:0.88rem;color:var(--gold);}
+  .guest-row .ge{font-size:0.72rem;color:var(--muted);}
+  .guest-row .ge b{font-family:'Bodoni Moda',serif;font-size:1.05rem;color:var(--txt);}
+  .guest-row .ge.here{color:var(--green);font-weight:600;}
+  .pill{display:inline-block;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.28rem 0.6rem;border-radius:999px;border:1px solid var(--line);white-space:nowrap;}
+  .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .pill.bereiding{color:var(--amber);border-color:rgba(201,154,46,0.4);}
+  .pill.klaar,.pill.geserveerd{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .pill.betaald{color:var(--green);}
+  .pill.onbetaald{color:var(--soft);}
+  .order .acts{margin-top:0.85rem;display:flex;gap:0.5rem;flex-wrap:wrap;}
+  .obtn{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:0.5rem 0.9rem;font-size:0.74rem;font-weight:500;}
+  .obtn.primary{background:#fff;color:#000;border-color:#fff;}
+  .obtn.warn{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+
+  .menu-cat{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin:1.1rem 0 0.5rem;}
+  .mitem{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.85rem 1rem;margin-top:0.5rem;}
+  .mitem .r1{display:flex;justify-content:space-between;gap:0.8rem;}
+  .mitem .nm{font-weight:600;font-size:0.88rem;}
+  .mitem .pr{font-family:'Bodoni Moda',serif;font-size:1rem;white-space:nowrap;}
+  .mitem .ds{font-size:0.76rem;color:var(--muted);margin-top:0.25rem;}
+  .mitem .alg{margin-top:0.4rem;display:flex;gap:0.35rem;flex-wrap:wrap;}
+  .mitem .alg span{font-size:0.6rem;color:var(--amber);border:1px solid rgba(201,154,46,0.3);border-radius:999px;padding:0.15rem 0.5rem;}
+
+  .field{margin-top:0.9rem;}
+  .field label{font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--soft);display:block;margin-bottom:0.4rem;}
+  .field input,.field textarea{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;}
+  .field textarea{min-height:70px;resize:vertical;}
+  .bigbtn{margin-top:1.1rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.95rem;font-size:0.86rem;font-weight:600;}
+  .price-row{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 0;border-bottom:1px solid var(--line);font-size:0.85rem;}
+  .price-row:last-child{border-bottom:none;}
+  .price-row .s{color:var(--muted);}
+  .price-row .p{font-family:'Bodoni Moda',serif;font-size:1.05rem;color:var(--gold);}
+
+  .loc-card{margin-top:0.9rem;border-radius:16px;overflow:hidden;border:1px solid var(--line);}
+  .loc-map{height:150px;background:linear-gradient(135deg,#12100f,#1c1512);position:relative;display:flex;align-items:center;justify-content:center;}
+  .loc-map .pin{width:16px;height:16px;border-radius:50%;background:var(--burgundy);box-shadow:0 0 0 6px rgba(194,58,94,0.25);}
+  .loc-map .lbl{position:absolute;bottom:0.6rem;left:0.8rem;font-size:0.72rem;color:var(--muted);}
+  .loc-info{padding:0.9rem 1rem;font-size:0.8rem;color:var(--muted);}
+
+  .empty{padding:2.5rem 1rem;text-align:center;color:var(--soft);font-size:0.85rem;line-height:1.6;}
+
+  /* personeel kiezen (wie ben je?) */
+  #staffPick{position:absolute;inset:0;z-index:60;background:var(--bg);display:none;flex-direction:column;padding:2.5rem 1.75rem calc(env(safe-area-inset-bottom,0px) + 2rem);overflow-y:auto;}
+  #staffPick.open{display:flex;}
+  .sp-back{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:0.82rem;padding:0.2rem 0;}
+  .sp-biz{margin-top:1.5rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+  #staffPick h2{font-size:1.8rem;margin-top:0.5rem;}
+  .sp-deck{margin-top:0.6rem;font-size:0.84rem;color:var(--muted);line-height:1.6;}
+  .sp-list{margin-top:1.6rem;display:flex;flex-direction:column;gap:0.6rem;}
+  .sp-person{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:0.95rem 1.1rem;text-align:left;display:flex;align-items:center;gap:0.9rem;}
+  .sp-person:active{background:var(--card2);}
+  .sp-person .av{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:0.95rem;font-weight:600;color:var(--gold);}
+  .sp-person b{display:block;font-size:0.92rem;font-weight:600;}
+  .sp-person span{font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--soft);}
+  .sp-biz-btn{margin-top:1.2rem;width:100%;background:none;border:1px dashed var(--line);color:var(--muted);border-radius:15px;padding:0.9rem;font-size:0.82rem;}
+  .sp-biz-btn:active{background:var(--card);}
+  /* pincode-scherm */
+  .sp-pin{position:absolute;inset:0;background:var(--bg);z-index:65;display:none;flex-direction:column;justify-content:center;align-items:center;padding:2rem 1.75rem calc(env(safe-area-inset-bottom,0px) + 2rem);}
+  .sp-pin.open{display:flex;}
+  .sp-pin-name{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
+  .sp-pin-role{margin-top:0.3rem;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);}
+  .sp-pin-hint{margin-top:0.8rem;font-size:0.8rem;color:var(--muted);}
+  .sp-dots{margin:1.4rem 0 1.6rem;display:flex;gap:0.75rem;}
+  .sp-dots i{width:13px;height:13px;border-radius:50%;border:1px solid var(--muted);transition:background 0.15s;}
+  .sp-dots i.on{background:var(--txt);border-color:var(--txt);}
+  .sp-dots.bad i{border-color:var(--burgundy);}
+  .sp-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:0.7rem;width:100%;max-width:260px;}
+  .sp-key{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0.95rem 0;font-size:1.35rem;font-family:'Bodoni Moda',serif;color:var(--txt);}
+  .sp-key:active{background:var(--card2);}
+  .sp-key.wide{font-size:0.9rem;font-family:'Inter',sans-serif;color:var(--muted);}
+  .sp-pin-cancel{margin-top:1.6rem;background:none;border:none;color:var(--soft);font-size:0.82rem;}
+
+  /* actor-chip in de topbar */
+  .actor-chip{display:flex;align-items:center;gap:0.45rem;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.7rem 0.35rem 0.4rem;margin-left:auto;margin-right:0.5rem;}
+  .actor-chip .av{width:24px;height:24px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:0.66rem;font-weight:700;color:var(--gold);}
+  .actor-chip .nm{font-size:0.72rem;font-weight:600;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* team-tab */
+  .tt-h{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
+  .tt-person{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
+  .tt-person:last-child{border-bottom:none;}
+  .tt-person .av{width:34px;height:34px;flex-shrink:0;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:var(--gold);}
+  .tt-person .nm{flex:1;}
+  .tt-person .nm b{display:block;font-size:0.86rem;font-weight:600;}
+  .tt-person .nm span{font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);}
+  .tt-person .you{font-size:0.58rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;}
+  .tt-rm{background:none;border:1px solid var(--line);color:var(--soft);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.68rem;}
+  .tt-rm:active{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .tt-add{margin-top:0.8rem;display:flex;gap:0.5rem;}
+  .tt-add input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;font-size:0.86rem;color:var(--txt);outline:none;}
+  .tt-add select{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;}
+  .tt-add button{background:#fff;color:#000;border:none;border-radius:12px;padding:0 1rem;font-size:0.82rem;font-weight:600;}
+  .tt-pinbox{margin-top:0.8rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.35);border-radius:12px;padding:0.9rem 1rem;font-size:0.82rem;color:var(--txt);line-height:1.6;}
+  .tt-pinbox b{color:var(--gold);font-family:'Bodoni Moda',serif;font-size:1.3rem;letter-spacing:0.15em;}
+  .tt-act{display:flex;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--line);font-size:0.82rem;}
+  .tt-act:last-child{border-bottom:none;}
+  .tt-act .aw{color:var(--gold);font-weight:600;white-space:nowrap;}
+  .tt-act .ax{color:var(--muted);flex:1;}
+  .tt-act time{color:var(--soft);font-size:0.66rem;white-space:nowrap;}
+  .tt-chat{display:flex;flex-direction:column;gap:0.6rem;margin-top:0.4rem;max-height:none;}
+  .tt-msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.85rem;line-height:1.45;}
+  .tt-msg.other{align-self:flex-start;background:var(--card2);border:1px solid var(--line);border-top-left-radius:5px;}
+  .tt-msg.me{align-self:flex-end;background:var(--burgundy-deep);border-top-right-radius:5px;}
+  .tt-msg .who{display:block;font-size:0.64rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:0.2rem;}
+  .tt-msg.me .who{color:rgba(255,255,255,0.7);}
+  .tt-msg time{display:block;margin-top:0.3rem;font-size:0.6rem;color:var(--soft);}
+  .tt-compose{display:flex;gap:0.5rem;margin-top:0.9rem;}
+  .tt-compose input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.88rem;color:var(--txt);outline:none;}
+  .tt-compose button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
+
+  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:rgba(12,12,11,0.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;padding:0.55rem 0.4rem calc(env(safe-area-inset-bottom,0px) + 0.55rem);overflow-x:auto;scrollbar-width:none;}
+  .tabbar::-webkit-scrollbar{display:none;}
+  .tabbar button{flex:1;min-width:64px;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:0.25rem;font-size:0.56rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);}
+  .tabbar button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;}
+  .tabbar button.active{color:var(--txt);}
+  .tabbar button.active svg{stroke:var(--burgundy);}
+
+  /* meldingenpaneel */
+  .notif-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:44;display:none;}
+  .notif-scrim.open{display:block;}
+  .notif-panel{position:absolute;top:0;right:0;width:88%;max-width:360px;height:100%;background:var(--bg);border-left:1px solid var(--line);z-index:45;transform:translateX(100%);transition:transform 0.25s;display:flex;flex-direction:column;}
+  .notif-panel.open{transform:translateX(0);}
+  .notif-head{padding:1.2rem 1.25rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);}
+  .notif-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;font-weight:500;}
+  .notif-list{flex:1;overflow-y:auto;}
+  .notif-item{display:flex;gap:0.8rem;padding:0.9rem 1.25rem;border-bottom:1px solid var(--line);}
+  .notif-item.unread{background:rgba(194,58,94,0.06);}
+  .notif-item .ic{width:32px;height:32px;flex-shrink:0;border-radius:50%;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+  .notif-item .tx b{display:block;font-size:0.84rem;}
+  .notif-item .tx span{font-size:0.78rem;color:var(--muted);}
+  .notif-item .tx time{display:block;margin-top:0.2rem;font-size:0.66rem;color:var(--soft);}
+
+  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:#fff;color:#000;font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+<div id="shell">
+
+  <div id="gate">
+    <div class="badge">RTG Partners</div>
+    <h1 data-i18n-html="gate.title">De leverancier-<em>app</em>.</h1>
+    <p class="deck" data-i18n="gate.deck">Eén app voor hotels, taxi's, privéjets, appartementen, restaurants, bars en clubs. Ontvang RTG-gasten, deel uw menu, beheer bestellingen en ritten, live verbonden met de gast en de RTG-backoffice.</p>
+    <form class="login-form" id="loginForm">
+      <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
+      <button type="submit" data-i18n="gate.signin">Inloggen</button>
+    </form>
+    <p class="gate-or" data-i18n="gate.or">of kies een demo-partner</p>
+    <div class="gate-list" id="gateList"></div>
+    <p class="free" data-i18n-html="gate.free"><b>Demo-account:</b> gebruikersnaam Rahul, wachtwoord Imran. <b>Gratis te gebruiken:</b> als partner betaalt u niets voor de app. In ruil levert u RTG uw beste dynamische prijs, die u zelf in de app doorgeeft.</p>
+  </div>
+
+  <div id="staffPick">
+    <button class="sp-back" id="spBack" data-i18n="sp.back">← Terug</button>
+    <div class="sp-biz" id="spBiz"></div>
+    <h2 data-i18n="sp.who">Wie ben je?</h2>
+    <p class="sp-deck" data-i18n="sp.deck">Kies je persoonlijke account. Alles wat je doet, wordt onder jouw naam bijgehouden.</p>
+    <div class="sp-list" id="spList"></div>
+    <button class="sp-biz-btn" id="spBizBtn" data-i18n="sp.business">Inloggen als bedrijfsaccount (beheer)</button>
+    <div class="sp-pin" id="spPin">
+      <div class="sp-pin-name" id="spPinName"></div>
+      <div class="sp-pin-role" id="spPinRole"></div>
+      <div class="sp-pin-hint" data-i18n="sp.enterpin">Voer je pincode in</div>
+      <div class="sp-dots" id="spDots"><i></i><i></i><i></i><i></i></div>
+      <div class="sp-pad" id="spPad"></div>
+      <button class="sp-pin-cancel" id="spPinCancel" data-i18n="sp.cancel">Annuleren</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <div class="topbar">
+      <div class="who"><span class="ic" id="supIcon"></span><div><b id="supName"></b><span id="supType"></span></div></div>
+      <button class="actor-chip" id="actorChip" aria-label="Wissel gebruiker"><span class="av" id="actorAv"></span><span class="nm" id="actorName"></span></button>
+      <button class="bell" id="bell" aria-label="Meldingen">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
+      </button>
+    </div>
+
+    <div class="notif-scrim" id="notifScrim"></div>
+    <aside class="notif-panel" id="notifPanel">
+      <div class="notif-head"><b data-i18n="sup.notifs">Meldingen</b><button class="obtn" id="notifClose" data-i18n="sup.close">Sluiten</button></div>
+      <div class="notif-list" id="notifList"></div>
+    </aside>
+
+    <div class="content" id="content">
+      <div class="view" data-view="home">
+        <h2 id="homeH">Vandaag.</h2>
+        <p class="sub" id="homeSub"></p>
+        <div class="stat" id="homeStat"></div>
+        <div id="homeExtra"></div>
+      </div>
+      <div class="view" data-view="orders">
+        <h2 data-i18n="sup.v.orders">Bestellingen</h2>
+        <p class="sub" data-i18n="sup.v.orders.sub">Live van RTG-gasten. Werk de status bij of stort terug.</p>
+        <div id="orderList"></div>
+      </div>
+      <div class="view" data-view="rides">
+        <h2 data-i18n="tab.rides">Ritten</h2>
+        <p class="sub" data-i18n="sup.v.rides.sub">Aanvragen van RTG-gasten, met live locatie.</p>
+        <div id="rideList"></div>
+      </div>
+      <div class="view" data-view="menu">
+        <h2 data-i18n="sup.menu">Menukaart</h2>
+        <p class="sub" data-i18n="sup.v.menu.sub">Wat gasten vooraf zien, inclusief allergenen.</p>
+        <div id="menuList"></div>
+      </div>
+      <div class="view" data-view="price">
+        <h2 data-i18n="sup.v.price">Dynamische prijs</h2>
+        <p class="sub" data-i18n="sup.v.price.sub">Geef RTG uw beste prijs. Gaat rechtstreeks naar de backoffice.</p>
+        <div class="field"><label data-i18n="sup.f.service">Dienst</label><input id="prService" placeholder="Bijv. Kaiseki-diner (2 pers.)" data-i18n-ph="sup.f.service.ph"></div>
+        <div class="field"><label data-i18n="sup.f.price">Uw prijs aan RTG (€)</label><input id="prPrice" type="number" inputmode="decimal" placeholder="240"></div>
+        <button class="bigbtn" id="prSend" data-i18n="sup.f.send">Verstuur naar RTG</button>
+        <div class="card" id="prHistory" style="margin-top:1.4rem;"></div>
+      </div>
+      <div class="view" data-view="location">
+        <h2 data-i18n="tab.location">Locatie</h2>
+        <p class="sub" data-i18n="sup.v.loc.sub">Deel uw live locatie zodat gasten u vinden, en zie waar zij zijn.</p>
+        <div id="locWrap"></div>
+      </div>
+      <div class="view" data-view="team">
+        <h2 data-i18n="sup.v.team">Team</h2>
+        <p class="sub" data-i18n="sup.v.team.sub">Personeel, wie wat deed en interne chat van dit bedrijf.</p>
+        <div id="teamWrap"></div>
+      </div>
+    </div>
+
+    <div class="tabbar" id="tabbar"></div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded',
+    'aangevraagd':'requested', 'onderweg':'on the way', 'aangekomen':'at pickup', 'rijdt':'driving', 'gearriveerd':'completed' };
+  const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
+  const TYPELABEL = { 'Hotel':'Hotel', 'Restaurant':'Restaurant', 'Bar':'Bar', 'Taxi':'Taxi', 'Privéjet':'Private jet', 'Appartement':'Apartment', 'Club':'Club' };
+  const tType = s => (lang() === 'en' ? (TYPELABEL[s] || s) : s);
+  const ALG = { 'vis':'fish', 'soja':'soy', 'sesam':'sesame', 'gluten':'gluten', 'noten':'nuts', 'schaaldieren':'shellfish', 'ei':'egg', 'melk':'milk', 'pinda':'peanut', 'selderij':'celery', 'mosterd':'mustard' };
+  const tAlg = a => (lang() === 'en' ? (ALG[a] || a) : a);
+
+  const DEMO = [
+    { code:'KIKUNOI', name:'Kikunoi Honten', type:'Restaurant', icon:'🍽️', sub:'Restaurant · Kyoto' },
+    { code:'PONTO',   name:'Bar Pontocho',    type:'Bar',        icon:'🍸', sub:'Bar · Kyoto' },
+    { code:'HOSHI',   name:'Hoshinoya Kyoto', type:'Hotel',      icon:'🏨', sub:'Hotel · Kyoto' },
+    { code:'MKKX',    name:'Kyoto Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Kyoto' },
+    { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' }
+  ];
+
+  const TABDEF = {
+    home:     { label:'Overzicht', svg:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>' },
+    orders:   { label:'Orders',    svg:'<path d="M6 2h9l3 3v17H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>', cap:'orders' },
+    rides:    { label:'Ritten',    svg:'<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>', cap:'rides' },
+    menu:     { label:'Menu',      svg:'<path d="M4 3v18M8 3v6a2 2 0 0 1-4 0M18 3c-2 0-3 2-3 5s1 4 3 4v9"/>', cap:'menu' },
+    price:    { label:'Prijs',     svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 2-2.5 1.5-2.5 3.5M12 16v.5"/>', cap:'pricing' },
+    location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
+    team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' }
+  };
+
+  const API = {
+    enabled: location.protocol === 'http:' || location.protocol === 'https:',
+    token: null,
+    get live(){ return this.enabled && !!this.token; },
+    async call(path, body){
+      const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(this.token?{'Authorization':'Bearer '+this.token}:{})}, body: JSON.stringify(body||{}) });
+      const data = await res.json().catch(()=>({}));
+      if (!res.ok) throw Object.assign(new Error(data.error||'API-fout'), {status:res.status});
+      return data;
+    }
+  };
+
+  let S = null;          // supplier
+  let state = null;      // dashboard state
+  let notifs = [];
+  let source = null;
+
+  let toastTimer;
+  function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3000); }
+  function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const ago=T('t.ago',' geleden'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min')+ago; const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur')+ago; return Math.round(h/24)+T('t.days',' dag(en)')+ago; }
+  function has(cap){ return S && S.caps && S.caps.includes(cap); }
+
+  // ---- login ----
+  function initials(name){ return String(name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+
+  function renderGate(){
+    $('#gateList').innerHTML = DEMO.map(d =>
+      '<button class="gate-btn" data-code="'+d.code+'"><span class="ic">'+d.icon+'</span><span><b>'+d.name+'</b><span>'+d.sub+'</span></span></button>'
+    ).join('');
+    document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
+    const lf = document.getElementById('loginForm');
+    if (lf) lf.addEventListener('submit', e => {
+      e.preventDefault();
+      login({ username: document.getElementById('liUser').value, password: document.getElementById('liPass').value }, true);
+    });
+  }
+
+  // Stap 1: bedrijf gekozen → toon "Wie ben je?" met het personeel van dit bedrijf.
+  let pickCode = null;
+  async function pickPartner(code){
+    if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return; }
+    pickCode = code;
+    let roster = { supplier:{ name: code }, staff: [] };
+    try { roster = await API.call('/supplier/roster', { code }); } catch(e){}
+    $('#spBiz').textContent = roster.supplier.name;
+    $('#spList').innerHTML = (roster.staff||[]).map(m =>
+      '<button class="sp-person" data-sid="'+m.id+'" data-name="'+m.name.replace(/"/g,'&quot;')+'" data-role="'+m.role+'">'+
+        '<span class="av">'+initials(m.name)+'</span><span><b>'+m.name+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span></button>'
+    ).join('') || '<div class="empty" style="padding:1.2rem 0;">'+T('sp.nostaff','Nog geen persoonlijke accounts. Log in als bedrijfsaccount en voeg je team toe.')+'</div>';
+    document.querySelectorAll('.sp-person').forEach(b => b.addEventListener('click', () => openPin(b.dataset.sid, b.dataset.name, b.dataset.role)));
+    $('#spPin').classList.remove('open');
+    $('#staffPick').classList.add('open');
+  }
+  $('#spBack').addEventListener('click', () => $('#staffPick').classList.remove('open'));
+  $('#spBizBtn').addEventListener('click', () => login({ code: pickCode }, false));
+
+  // Stap 2: persoon gekozen → pincode invoeren.
+  let pinFor = null, pinBuf = '';
+  function renderDots(){
+    document.querySelectorAll('#spDots i').forEach((el,i)=> el.classList.toggle('on', i < pinBuf.length));
+  }
+  function openPin(sid, name, role){
+    pinFor = Number(sid); pinBuf = '';
+    $('#spPinName').textContent = name;
+    $('#spPinRole').textContent = T('role.'+role, role==='manager'?'Manager':'Medewerker');
+    $('#spDots').classList.remove('bad'); renderDots();
+    $('#spPin').classList.add('open');
+  }
+  function buildPad(){
+    const keys = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
+    $('#spPad').innerHTML = keys.map(k => k==='' ? '<span></span>' :
+      '<button class="sp-key'+(k==='⌫'?' wide':'')+'" data-k="'+k+'">'+k+'</button>').join('');
+    document.querySelectorAll('#spPad [data-k]').forEach(b => b.addEventListener('click', () => pinKey(b.dataset.k)));
+  }
+  async function pinKey(k){
+    $('#spDots').classList.remove('bad');
+    if (k==='⌫'){ pinBuf = pinBuf.slice(0,-1); renderDots(); return; }
+    if (pinBuf.length >= 4) return;
+    pinBuf += k; renderDots();
+    if (pinBuf.length === 4){
+      const pin = pinBuf;
+      const ok = await login({ code: pickCode, staffId: pinFor, pin }, false, true);
+      if (!ok){ $('#spDots').classList.add('bad'); pinBuf=''; setTimeout(renderDots, 400); }
+    }
+  }
+  $('#spPinCancel').addEventListener('click', () => { $('#spPin').classList.remove('open'); pinBuf=''; });
+
+  // Gemeenschappelijke login. Geeft true/false terug bij PIN, zodat de pad kan reageren.
+  async function login(body, isCred, silent){
+    if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return false; }
+    try {
+      const d = await API.call('/supplier/login', body);
+      API.token = d.token;
+      applyState(d.state);
+    } catch(e){
+      if (silent) return false;
+      toast(isCred ? T('login.bad','Onjuiste gebruikersnaam of wachtwoord.') : (e.message||T('login.failed','Inloggen mislukt.')));
+      return false;
+    }
+    $('#staffPick').classList.remove('open');
+    $('#spPin').classList.remove('open');
+    $('#gate').style.display = 'none';
+    $('#app').classList.add('active');
+    buildTabs();
+    renderAll();
+    startStream();
+    loadNotifs();
+    return true;
+  }
+
+  // Wissel van gebruiker: sessie loslaten, terug naar het inlogscherm.
+  function switchUser(){
+    if (source){ try{ source.close(); }catch(_){} source = null; }
+    API.token = null; state = null; S = null; notifs = [];
+    $('#app').classList.remove('active');
+    $('#gate').style.display = '';
+    if (pickCode) pickPartner(pickCode); else $('#staffPick').classList.remove('open');
+  }
+
+  function applyState(st){ state = st; S = st.supplier; }
+
+  async function refresh(){ try { applyState((await API.call('/supplier/state')).state); renderAll(); } catch(e){} }
+
+  // ---- tabs op basis van caps ----
+  function buildTabs(){
+    const keys = Object.keys(TABDEF).filter(k => !TABDEF[k].cap || has(TABDEF[k].cap));
+    // bookings voor hotel/appartement → toon onder 'orders'-plek als 'Boekingen'
+    $('#tabbar').innerHTML = keys.map((k,i) =>
+      '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+T('tab.'+k, TABDEF[k].label)+'</button>'
+    ).join('');
+    document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
+  }
+  function openTab(tab){
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+    $('#content').scrollTop = 0;
+  }
+
+  function renderAll(){
+    $('#supIcon').textContent = S.icon;
+    $('#supName').textContent = S.name;
+    $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
+    renderActor();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderTeam();
+    if (!document.querySelector('.tabbar button.active')) openTab('home');
+  }
+
+  function actor(){ return (state && state.actor) || { name:'Beheer', role:'manager', manager:true }; }
+  function renderActor(){
+    const a = actor();
+    $('#actorAv').textContent = initials(a.name);
+    $('#actorName').textContent = a.name;
+  }
+
+  // ---- home ----
+  function renderHome(){
+    const open = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
+    const revenue = (state.orders||[]).filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
+    $('#homeH').textContent = T('sup.hello','Goedendag,') + ' ' + S.name.split(' ')[0] + '.';
+    $('#homeSub').textContent = tType(S.typeLabel) + ' · ' + T('sup.connected','verbonden met RTG');
+    let stat = '';
+    if (has('orders')) stat += '<div class="b"><div class="l">'+T('sup.openorders','Open orders')+'</div><div class="v a">'+open.length+'</div></div>';
+    if (has('rides')) stat += '<div class="b"><div class="l">'+T('tab.rides','Ritten')+'</div><div class="v a">'+(state.rides||[]).length+'</div></div>';
+    if (has('bookings')) stat += '<div class="b"><div class="l">'+T('sup.bookings','Boekingen')+'</div><div class="v a">'+(state.orders||[]).length+'</div></div>';
+    stat += '<div class="b"><div class="l">'+T('sup.received','Ontvangen')+'</div><div class="v g">'+eur(revenue)+'</div></div>';
+    $('#homeStat').innerHTML = stat;
+    let extra = '';
+    const guests = (state.guests || []);
+    if (guests.length){
+      extra += '<div class="card" style="border-color:rgba(194,58,94,0.35);"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);display:flex;align-items:center;gap:0.4rem;"><span class="livedot"></span>'+T('sup.enroute','Gasten onderweg naar u')+'</div>'+
+        guests.map(g => '<div class="guest-row"><span class="cn">'+g.codename+'</span>'+
+          (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>':(g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>':'<span class="ge">'+T('sup.enrouteshort','onderweg')+'</span>'))+
+        '</div>').join('')+'</div>';
+    }
+    extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.yourprice','Uw dynamische prijs aan RTG')+'</div>'+
+      '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('sup.pricebody','U levert RTG uw beste prijs; RTG brengt de gasten. Uw huidige marge-afspraak:')+' <b style="color:var(--gold);">'+Math.round((S.rate||0)*100)+'%</b>.</div>'+
+      '<button class="obtn primary" style="margin-top:0.8rem;" data-goto="price">'+T('sup.newprice','Nieuwe prijs doorgeven')+'</button></div>';
+    if (has('menu')) extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.menu','Menukaart')+'</div><div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+(state.menu||[]).length+' '+T('sup.dishesvisible','gerechten zichtbaar voor gasten.')+'</div><button class="obtn" style="margin-top:0.8rem;" data-goto="menu">'+T('sup.viewmenu','Bekijk menu')+'</button></div>';
+    $('#homeExtra').innerHTML = extra;
+    document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', ()=>openTab(b.dataset.goto)));
+  }
+
+  // ---- orders ----
+  const NEXT = { 'nieuw':'in bereiding', 'in bereiding':'klaar', 'klaar':'geserveerd' };
+  function pillClass(st){ return st==='nieuw'?'nieuw':st==='in bereiding'?'bereiding':(st==='klaar'||st==='geserveerd')?'klaar':''; }
+  function renderOrders(){
+    const list = state.orders || [];
+    $('#orderList').innerHTML = list.length ? list.map(o =>
+      '<div class="order" data-ref="'+o.ref+'">'+
+        '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+o.customerCodename+'</span></div><div class="ref">'+o.ref+' · '+timeAgo(o.at)+'</div></div>'+
+          '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><div style="margin-top:0.3rem;"><span class="pill '+pillClass(o.status)+'">'+tStatus(o.status)+'</span></div></div></div>'+
+        '<ul>'+o.items.map(i=>'<li><span>'+i.qty+'× '+i.name+'</span><span>'+eur(i.price*i.qty)+'</span></li>').join('')+'</ul>'+
+        (o.guestArrived?'<div class="enroute here">🎉 '+T('sup.guesthere','Gast is gearriveerd. Serveer nu.')+'</div>':(o.guestEtaMin!=null?'<div class="enroute">📍 '+T('sup.guesteta','Gast onderweg, arriveert over ~')+o.guestEtaMin+' '+T('sup.min','min')+'. '+T('sup.readyontime','Zet op tijd klaar.')+'</div>':''))+
+        (o.allergyNote?'<div class="allergy">⚠ '+T('sup.allergy','Allergie:')+' '+o.allergyNote+'</div>':'')+
+        (o.tagSalon?'<div class="salon">✦ '+T('sup.wantssalon','Gast wil dit taggen voor De Salon')+'</div>':'')+
+        '<div class="acts">'+
+          '<span class="pill '+(o.paid?'betaald':'onbetaald')+'">'+(o.refunded?T('sup.refunded','terugbetaald'):o.paid?'✓ '+T('bo.paid','betaald'):T('sup.notpaid','nog niet betaald'))+'</span>'+
+          (NEXT[o.status]?'<button class="obtn primary js-next">'+T('sup.markas','Markeer:')+' '+tStatus(NEXT[o.status])+'</button>':'')+
+          (o.status==='nieuw'?'<button class="obtn warn js-reject">'+T('sup.reject','Weiger')+'</button>':'')+
+          (o.paid&&!o.refunded?'<button class="obtn warn js-refund">'+T('sup.refund','Terugstorten')+'</button>':'')+
+        '</div>'+
+      '</div>'
+    ).join('') : '<div class="empty">'+T('sup.noorders','Nog geen bestellingen. Zodra een RTG-gast bij u bestelt, verschijnt het hier, live.')+'</div>';
+    document.querySelectorAll('.order').forEach(el => {
+      const ref = el.dataset.ref;
+      const o = list.find(x=>x.ref===ref);
+      const nb = el.querySelector('.js-next'); if (nb) nb.addEventListener('click', ()=>setStatus(ref, NEXT[o.status]));
+      const rj = el.querySelector('.js-reject'); if (rj) rj.addEventListener('click', ()=>setStatus(ref,'geweigerd'));
+      const rf = el.querySelector('.js-refund'); if (rf) rf.addEventListener('click', ()=>refund(ref));
+    });
+  }
+  async function setStatus(ref, status){
+    try { await API.call('/supplier/order/status', {ref, status}); toast(T('sup.status','Status:')+' '+tStatus(status)); await refresh(); }
+    catch(e){ toast(e.message); }
+  }
+  async function refund(ref){
+    try { const d = await API.call('/supplier/refund', {ref}); toast(T('sup.refundedtoast','Terugbetaald:')+' '+eur(d.order.total)); await refresh(); }
+    catch(e){ toast(e.message); }
+  }
+
+  // ---- rides (taxi/jet) ----
+  const NEXT_RIDE = { 'aangevraagd':'onderweg', 'onderweg':'aangekomen', 'aangekomen':'rijdt', 'rijdt':'gearriveerd' };
+  const RIDE_NEXT_LABEL = { 'onderweg':'sup.ride.accept', 'aangekomen':'sup.ride.atpickup', 'rijdt':'sup.ride.driving', 'gearriveerd':'sup.ride.done' };
+  const RIDE_NEXT_NL = { 'onderweg':'Accepteer, rij naar gast', 'aangekomen':'Ik ben bij de gast', 'rijdt':'Gast ingestapt, rijden', 'gearriveerd':'Rit voltooid' };
+  function ridePill(st){ return st==='aangevraagd'?'nieuw':st==='gearriveerd'?'klaar':'bereiding'; }
+  function renderRides(){
+    const list = (state.rides || []).filter(r => r.status !== 'gearriveerd' && r.status !== 'geweigerd');
+    $('#rideList').innerHTML = list.length ? list.map(r => {
+      const nxt = NEXT_RIDE[r.status];
+      const eta = (r.status === 'aangevraagd' || r.status === 'onderweg')
+        ? (r.pickupEtaMin != null ? '<div class="enroute">🚗 '+T('sup.pickupeta','Gast op ~')+r.pickupEtaMin+' '+T('sup.min','min')+' '+T('sup.rijden','rijden')+'.</div>' : '')
+        : (r.status === 'rijdt' && r.dropEtaMin != null ? '<div class="enroute">🏁 '+T('sup.dropeta','Aankomst bestemming over ~')+r.dropEtaMin+' '+T('sup.min','min')+'.</div>' : '');
+      return '<div class="order" data-rref="'+r.ref+'">'+
+        '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+r.customerCodename+'</span></div>'+
+          '<div class="ref">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+' · '+timeAgo(r.at)+'</div></div>'+
+          '<span class="pill '+ridePill(r.status)+'">'+tStatus(r.status)+'</span></div>'+
+        eta +
+        '<div class="acts">'+
+          (nxt?'<button class="obtn primary js-rnext">'+T(RIDE_NEXT_LABEL[nxt], RIDE_NEXT_NL[nxt])+'</button>':'')+
+          (r.status==='aangevraagd'?'<button class="obtn warn js-rreject">'+T('sup.reject','Weiger')+'</button>':'')+
+          (r.loc?'':'')+
+        '</div>'+
+      '</div>';
+    }).join('') : '<div class="empty">'+T('sup.norides','Geen ritaanvragen. RTG-gasten die een rit boeken, verschijnen hier met bestemming en live locatie.')+'</div>';
+    document.querySelectorAll('[data-rref]').forEach(el => {
+      const ref = el.dataset.rref;
+      const r = (state.rides||[]).find(x=>x.ref===ref);
+      const nb = el.querySelector('.js-rnext'); if (nb) nb.addEventListener('click', ()=>setRideStatus(ref, NEXT_RIDE[r.status]));
+      const rj = el.querySelector('.js-rreject'); if (rj) rj.addEventListener('click', ()=>setRideStatus(ref,'geweigerd'));
+    });
+  }
+  async function setRideStatus(ref, status){
+    try { await API.call('/supplier/ride/status', {ref, status}); toast(T('sup.status','Status:')+' '+tStatus(status)); await refresh(); }
+    catch(e){ toast(e.message); }
+  }
+
+  // ---- menu ----
+  function renderMenu(){
+    const m = state.menu || [];
+    if (!m.length){ $('#menuList').innerHTML = '<div class="empty">'+T('sup.nomenu','Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.')+'</div>'; return; }
+    const cats = [...new Set(m.map(x=>x.cat))];
+    $('#menuList').innerHTML = cats.map(c =>
+      '<div class="menu-cat">'+c+'</div>' + m.filter(x=>x.cat===c).map(x =>
+        '<div class="mitem"><div class="r1"><span class="nm">'+x.name+'</span><span class="pr">'+eur(x.price)+'</span></div>'+
+        (x.desc?'<div class="ds">'+x.desc+'</div>':'')+
+        (x.allergens&&x.allergens.length?'<div class="alg">'+x.allergens.map(a=>'<span>'+tAlg(a)+'</span>').join('')+'</div>':'')+
+        '</div>'
+      ).join('')
+    ).join('');
+  }
+
+  // ---- dynamische prijs ----
+  function renderPrice(){
+    const h = state.prices || [];
+    $('#prHistory').innerHTML = '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin-bottom:0.3rem;">'+T('sup.pricehist','Eerder doorgegeven')+'</div>' +
+      (h.length ? h.slice(0,8).map(p=>'<div class="price-row"><span class="s">'+p.service+'<br><span style="font-size:0.66rem;color:var(--soft);">'+timeAgo(p.at)+'</span></span><span class="p">'+eur(p.price)+'</span></div>').join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('sup.noprices','Nog geen prijzen doorgegeven.')+'</div>');
+  }
+  $('#prSend').addEventListener('click', async () => {
+    const service = $('#prService').value.trim();
+    const price = Number($('#prPrice').value);
+    if (!service || !(price>0)){ toast(T('sup.fillprice','Vul een dienst en prijs in.')); return; }
+    try { await API.call('/supplier/price', {service, price}); toast(T('sup.pricesent','Prijs verstuurd naar RTG.')); $('#prService').value=''; $('#prPrice').value=''; await refresh(); openTab('price'); }
+    catch(e){ toast(e.message); }
+  });
+
+  // ---- locatie ----
+  function renderLocation(){
+    const loc = S.loc || {};
+    $('#locWrap').innerHTML =
+      '<div class="loc-card"><div class="loc-map"><div class="pin"></div><div class="lbl">'+(loc.label||T('sup.locunknown','Locatie onbekend'))+'</div></div>'+
+      '<div class="loc-info">'+T('sup.locinfo','Uw locatie is zichtbaar voor RTG-gasten met een actieve rit of bestelling bij u. Gasten delen hun locatie terug wanneer zij onderweg zijn.')+'</div></div>'+
+      '<button class="bigbtn" id="locShare">'+T('sup.sharelive','Deel mijn live locatie')+'</button>';
+    $('#locShare').addEventListener('click', shareLocation);
+  }
+  function shareLocation(){
+    if (navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(async pos => {
+        try { await API.call('/supplier/location', { lat: pos.coords.latitude, lng: pos.coords.longitude, label: 'Live positie' }); toast(T('sup.locshared','Live locatie gedeeld met gasten.')); await refresh(); }
+        catch(e){ toast(e.message); }
+      }, () => demoShare(), { timeout: 4000 });
+    } else demoShare();
+  }
+  async function demoShare(){
+    try { await API.call('/supplier/location', { lat: S.loc.lat, lng: S.loc.lng, label: S.loc.label }); toast(T('sup.locshareddemo','Locatie gedeeld (demo-positie).')); }
+    catch(e){ toast(e.message); }
+  }
+
+  // ---- team ----
+  let lastPin = null; // laatst gegenereerde pincode, eenmalig getoond aan de manager
+  function renderTeam(){
+    const a = actor();
+    const staff = state.staff || [];
+    const activity = state.activity || [];
+    const team = state.team || [];
+    let html = '';
+
+    // personeel
+    html += '<div class="card"><div class="tt-h">'+T('team.roster','Personeel')+'</div>';
+    html += staff.map(m => {
+      const you = a.staffId && m.id === a.staffId;
+      const rm = (a.manager && !you) ? '<button class="tt-rm" data-rm="'+m.id+'">'+T('team.remove','Verwijder')+'</button>' : '';
+      const tag = you ? '<span class="you">'+T('team.you','jij')+'</span>' : '';
+      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+rm+'</div>';
+    }).join('') || '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
+    if (a.manager){
+      html += '<div class="tt-add"><input id="ttName" placeholder="'+T('team.name','Naam')+'"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.add','Toevoegen')+'</button></div>';
+      if (lastPin) html += '<div class="tt-pinbox">'+T('team.pinintro','Pincode voor')+' '+lastPin.name+': <b>'+lastPin.pin+'</b><br>'+T('team.pinnote','Noteer deze code. Hiermee logt deze persoon in op zijn eigen account. De code is later niet meer te zien.')+'</div>';
+    }
+    html += '</div>';
+
+    // activiteit
+    html += '<div class="card"><div class="tt-h">'+T('team.activity','Wie deed wat')+'</div>';
+    html += activity.length ? activity.map(e =>
+      '<div class="tt-act"><span class="aw">'+e.who+'</span><span class="ax">'+e.text+'</span><time>'+timeAgo(e.at)+'</time></div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('team.noactivity','Nog geen activiteit vastgelegd.')+'</div>';
+    html += '</div>';
+
+    // interne chat
+    html += '<div class="card"><div class="tt-h" style="margin-bottom:0.6rem;">'+T('team.chat','Interne teamchat')+'</div><div class="tt-chat" id="ttChat">';
+    html += team.length ? team.map(m =>
+      '<div class="tt-msg '+(m.who===a.name?'me':'other')+'"><span class="who">'+m.who+'</span>'+esc(m.text)+'<time>'+timeAgo(m.at)+'</time></div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.4rem 0;">'+T('team.nochat','Nog geen berichten. Stuur je team een bericht.')+'</div>';
+    html += '</div><div class="tt-compose"><input id="ttMsg" placeholder="'+T('team.msgph','Bericht aan het team')+'"><button id="ttSend">'+T('team.send','Stuur')+'</button></div></div>';
+
+    $('#teamWrap').innerHTML = html;
+
+    document.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', ()=>removeStaff(Number(b.dataset.rm))));
+    const addBtn = $('#ttAdd'); if (addBtn) addBtn.addEventListener('click', addStaff);
+    const send = $('#ttSend'); if (send) send.addEventListener('click', sendTeam);
+    const msg = $('#ttMsg'); if (msg) msg.addEventListener('keydown', e => { if (e.key==='Enter') sendTeam(); });
+    const chat = $('#ttChat'); if (chat) chat.scrollTop = chat.scrollHeight;
+  }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  async function addStaff(){
+    const name = ($('#ttName').value||'').trim();
+    const role = $('#ttRole').value;
+    if (!name){ toast(T('team.fillname','Vul een naam in.')); return; }
+    try { const d = await API.call('/supplier/staff/add', { name, role }); lastPin = { name: d.staff.name, pin: d.pin }; toast(T('team.added','Toegevoegd. Pincode: ')+d.pin); await refresh(); openTab('team'); }
+    catch(e){ toast(e.message); }
+  }
+  async function removeStaff(id){
+    try { await API.call('/supplier/staff/remove', { staffId: id }); toast(T('team.removed','Verwijderd uit het team.')); await refresh(); openTab('team'); }
+    catch(e){ toast(e.message); }
+  }
+  async function sendTeam(){
+    const el = $('#ttMsg'); const text = (el.value||'').trim();
+    if (!text) return;
+    el.value = '';
+    try { await API.call('/supplier/team/message', { text }); await refresh(); openTab('team'); }
+    catch(e){ toast(e.message); }
+  }
+
+  // ---- meldingen ----
+  function renderBell(){
+    const unread = notifs.filter(n=>!n.read).length;
+    const b = $('#bellBadge'); b.style.display = unread>0?'flex':'none'; b.textContent = unread>9?'9+':unread;
+    $('#notifList').innerHTML = notifs.length ? notifs.map(n =>
+      '<div class="notif-item'+(n.read?'':' unread')+'"><div class="ic">'+(n.icon||'•')+'</div><div class="tx"><b>'+n.title+'</b><span>'+n.body+'</span><time>'+timeAgo(n.at)+'</time></div></div>'
+    ).join('') : '<div class="empty">'+T('sup.nonotif','Nog geen meldingen. Nieuwe bestellingen en betalingen ziet u hier live.')+'</div>';
+  }
+  async function loadNotifs(){ try { const d = await API.call('/supplier/notifications', {}); } catch(e){} }
+  $('#bell').addEventListener('click', () => { $('#notifPanel').classList.add('open'); $('#notifScrim').classList.add('open'); if (notifs.some(n=>!n.read)){ notifs.forEach(n=>n.read=true); API.call('/supplier/notifications/read').catch(()=>{}); renderBell(); } });
+  $('#notifClose').addEventListener('click', () => { $('#notifPanel').classList.remove('open'); $('#notifScrim').classList.remove('open'); });
+  $('#notifScrim').addEventListener('click', () => { $('#notifPanel').classList.remove('open'); $('#notifScrim').classList.remove('open'); });
+
+  // ---- live stream ----
+  function startStream(){
+    if (!window.EventSource) return;
+    try { source = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
+    source.addEventListener('hello', e => { const d=JSON.parse(e.data); notifs = d.unread||[]; renderBell(); });
+    source.addEventListener('sync', e => { refresh(); });
+    source.addEventListener('notify', e => {
+      const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
+      if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }
+      toast(n.title + ', ' + n.body);
+      refresh();
+    });
+  }
+
+  window.addEventListener('rtglang', () => {
+    if (!S) return;
+    const active = (document.querySelector('.tabbar button.active') || {}).dataset ? document.querySelector('.tabbar button.active').dataset.tab : 'home';
+    buildTabs(); renderAll(); openTab(active || 'home');
+  });
+
+  $('#actorChip').addEventListener('click', switchUser);
+  buildPad();
+  renderGate();
+  if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+})();
+</script>
+<script>
+window.I18N = { en: {
+  'gate.title':'The supplier <em>app</em>.',
+  'gate.deck':'One app for hotels, taxis, private jets, apartments, restaurants, bars and clubs. Welcome RTG guests, share your menu, manage orders and rides, live-connected with the guest and the RTG back office.',
+  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo partner',
+  'gate.free':'<b>Demo account:</b> username Rahul, password Imran. <b>Free to use:</b> as a partner you pay nothing for the app. In return you supply RTG your best dynamic price, which you submit in the app yourself.',
+  'tab.home':'Overview', 'tab.orders':'Orders', 'tab.rides':'Rides', 'tab.menu':'Menu', 'tab.price':'Price', 'tab.location':'Location',
+  't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
+  'login.bad':'Incorrect username or password.', 'login.failed':'Sign-in failed.',
+  'sup.needserver':'Start the server (npm start) to use the supplier app.',
+  'sup.hello':'Good day,', 'sup.connected':'connected with RTG',
+  'sup.openorders':'Open orders', 'sup.bookings':'Bookings', 'sup.received':'Received',
+  'sup.yourprice':'Your dynamic price to RTG',
+  'sup.pricebody':'You supply RTG your best price; RTG brings the guests. Your current margin agreement:',
+  'sup.newprice':'Submit a new price', 'sup.menu':'Menu', 'sup.dishesvisible':'dishes visible to guests.', 'sup.viewmenu':'View menu',
+  'sup.guest':'Guest', 'sup.allergy':'Allergy:', 'sup.wantssalon':'Guest wants to tag this for The Salon',
+  'sup.refunded':'refunded', 'sup.notpaid':'not paid yet', 'sup.markas':'Mark as:', 'sup.reject':'Decline', 'sup.refund':'Refund',
+  'sup.noorders':'No orders yet. As soon as an RTG guest orders with you, it appears here, live.',
+  'sup.status':'Status:', 'sup.refundedtoast':'Refunded:',
+  'sup.norides':'No ride requests. RTG guests who book a ride appear here with destination and live location.',
+  'sup.guesteta':'Guest on the way, arriving in ~', 'sup.min':'min', 'sup.readyontime':'Have it ready on time.', 'sup.guesthere':'Guest has arrived. Serve now.',
+  'sup.enroute':'Guests on the way to you', 'sup.arrived':'arrived', 'sup.minaway':'min', 'sup.enrouteshort':'on the way',
+  'sup.pickupeta':'Guest ~', 'sup.rijden':'away by car', 'sup.dropeta':'Arriving at destination in ~', 'sup.opendest':'open destination',
+  'sup.ride.accept':'Accept, drive to guest', 'sup.ride.atpickup':'I am at the guest', 'sup.ride.driving':'Guest on board, driving', 'sup.ride.done':'Trip completed',
+  'sup.nomenu':'No menu yet. Add dishes so guests can order in advance.',
+  'sup.pricehist':'Previously submitted', 'sup.noprices':'No prices submitted yet.',
+  'sup.fillprice':'Enter a service and a price.', 'sup.pricesent':'Price sent to RTG.',
+  'sup.locunknown':'Location unknown',
+  'sup.locinfo':'Your location is visible to RTG guests with an active ride or order with you. Guests share their location back when they are on their way.',
+  'sup.sharelive':'Share my live location', 'sup.locshared':'Live location shared with guests.', 'sup.locshareddemo':'Location shared (demo position).',
+  'sup.nonotif':'No notifications yet. New orders and payments appear here live.',
+  'sup.notifs':'Notifications', 'sup.close':'Close',
+  'sup.v.orders':'Orders', 'sup.v.orders.sub':'Live from RTG guests. Update the status or issue a refund.',
+  'sup.v.rides.sub':'Requests from RTG guests, with live location.',
+  'sup.v.menu.sub':'What guests see in advance, including allergens.',
+  'sup.v.price':'Dynamic price', 'sup.v.price.sub':'Give RTG your best price. Goes straight to the back office.',
+  'sup.f.service':'Service', 'sup.f.service.ph':'E.g. Kaiseki dinner (2 pers.)', 'sup.f.price':'Your price to RTG (€)', 'sup.f.send':'Send to RTG',
+  'sup.v.loc.sub':'Share your live location so guests find you, and see where they are.',
+  'tab.team':'Team', 'sup.v.team':'Team', 'sup.v.team.sub':'Staff, who did what and the internal chat of this business.',
+  'sp.back':'← Back', 'sp.who':'Who are you?', 'sp.deck':'Choose your personal account. Everything you do is tracked under your name.',
+  'sp.business':'Sign in as the business account (management)', 'sp.enterpin':'Enter your PIN', 'sp.cancel':'Cancel',
+  'sp.nostaff':'No personal accounts yet. Sign in as the business account and add your team.',
+  'role.manager':'Manager', 'role.staff':'Staff',
+  'team.roster':'Staff', 'team.remove':'Remove', 'team.you':'you', 'team.nostaff':'No staff added yet.',
+  'team.name':'Name', 'team.add':'Add', 'team.pinintro':'PIN for', 'team.pinnote':'Note this code. Your colleague signs in to their own account with it. The code cannot be shown again later.',
+  'team.activity':'Who did what', 'team.noactivity':'No activity recorded yet.',
+  'team.chat':'Internal team chat', 'team.nochat':'No messages yet. Send your team a message.', 'team.msgph':'Message to the team', 'team.send':'Send',
+  'team.fillname':'Enter a name.', 'team.added':'Added. PIN: ', 'team.removed':'Removed from the team.'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
+</body>
+</html>

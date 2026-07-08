@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>RTG Backoffice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.55);--soft:rgba(244,241,236,0.38);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-0.01em;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
+  a{color:inherit;text-decoration:none;}
+  input{font-family:'Inter',sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem);}
+
+  header{border-bottom:1px solid var(--line);padding:1.1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;}
+  .brand{font-family:'Bodoni Moda',serif;font-size:1.1rem;}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:0.56rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);}
+  .live{display:inline-flex;align-items:center;gap:0.45rem;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+  .live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(76,154,117,0.2);}
+
+  /* login */
+  #gate{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem;}
+  .gate-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:2.25rem;}
+  .gate-card .k{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+  .gate-card h1{font-size:1.7rem;margin-top:0.75rem;}
+  .gate-card p{margin-top:0.6rem;font-size:0.85rem;color:var(--muted);}
+  .gate-card input{width:100%;margin-top:1.5rem;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0.85rem 1rem;color:var(--txt);font-size:0.95rem;letter-spacing:0.08em;text-transform:uppercase;outline:none;}
+  .gate-card button{width:100%;margin-top:0.9rem;background:#fff;color:#000;border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
+  .gate-card .hint{margin-top:1rem;font-size:0.72rem;color:var(--soft);}
+
+  #app{display:none;padding:2rem 0 4rem;}
+  #app.on{display:block;}
+  .stat{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+  .stat .b{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.25rem;}
+  .stat .l{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
+  .stat .v{font-family:'Bodoni Moda',serif;font-size:1.8rem;margin-top:0.3rem;}
+  .stat .v.a{color:var(--burgundy);} .stat .v.g{color:var(--gold);}
+  @media (max-width:720px){.stat{grid-template-columns:repeat(2,1fr);}}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  @media (max-width:860px){.cols{grid-template-columns:1fr;}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .panel h2{font-size:1.15rem;padding:1.1rem 1.25rem;border-bottom:1px solid var(--line);}
+  .panel .rows{max-height:440px;overflow-y:auto;}
+  .row{padding:0.9rem 1.25rem;border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .row .r1{display:flex;justify-content:space-between;gap:0.8rem;align-items:baseline;}
+  .row .nm{font-weight:600;font-size:0.88rem;}
+  .row .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
+  .row .amt{font-family:'Bodoni Moda',serif;font-size:1.05rem;white-space:nowrap;}
+  .row .amt.g{color:var(--gold);}
+  .pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.22rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
+  .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .pill.bereiding{color:var(--amber);}
+  .pill.klaar,.pill.geserveerd{color:var(--green);}
+  .livedot{width:9px;height:9px;border-radius:50%;background:var(--burgundy);display:inline-block;vertical-align:middle;animation:livepulse 1.4s infinite;}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 7px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
+  .empty{padding:2.5rem 1.25rem;text-align:center;color:var(--soft);font-size:0.85rem;}
+  .flash{animation:flash 1.6s ease;}
+  @keyframes flash{0%{background:rgba(194,58,94,0.18);}100%{background:transparent;}}
+  .vrow{display:flex;align-items:center;gap:0.9rem;padding:0.9rem 1.25rem;border-bottom:1px solid var(--line);}
+  .vrow:last-child{border-bottom:none;}
+  .vrow .vi{flex:1;min-width:0;}
+  .vrow .vi .nm{font-weight:600;font-size:0.9rem;}
+  .vrow .vi .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;overflow:hidden;text-overflow:ellipsis;}
+  .vbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:600;cursor:pointer;}
+  .vbtn.doc{color:var(--muted);}
+  .vbtn.ok{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .vbtn.no{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+  .vbtn:hover{background:rgba(255,255,255,0.05);}
+  .doc-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out;}
+  .doc-scrim.open{display:flex;}
+  .doc-scrim img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+  .conv-scrim{cursor:default;}
+  .conv-card{width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .conv-head{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--line);}
+  .conv-head b{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
+  .conv-body{flex:1;overflow-y:auto;padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:0.55rem;}
+  .cmsg{max-width:80%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.85rem;line-height:1.4;}
+  .cmsg.in{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px;}
+  .cmsg.out{align-self:flex-end;background:var(--burgundy);color:#fff;border-bottom-right-radius:4px;}
+  .cmsg .wa{display:block;font-size:0.58rem;opacity:0.7;margin-bottom:0.2rem;}
+  .conv-reply{display:flex;gap:0.5rem;padding:0.9rem 1.25rem;border-top:1px solid var(--line);}
+  .conv-reply input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0.7rem 1rem;color:var(--txt);font-family:inherit;font-size:0.88rem;outline:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Rahul Travel Group<small>Backoffice</small></div>
+    <span class="live" id="liveInd" style="display:none;"><span class="dot"></span>Live</span>
+  </div>
+</header>
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="k">Backoffice</div>
+    <h1 data-i18n="gate.h">Inloggen</h1>
+    <p data-i18n="gate.p">Live overzicht van alle dynamische prijzen, bestellingen en ritten via RTG-partners.</p>
+    <input id="code" placeholder="Backoffice-code" data-i18n-ph="gate.ph" value="RTG-OFFICE">
+    <button id="loginBtn" data-i18n="gate.btn">Inloggen</button>
+    <div class="hint" data-i18n="gate.hint">Demo-code: RTG-OFFICE</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="wrap">
+    <div class="stat" id="stat"></div>
+    <div class="panel" style="margin-bottom:1.5rem;">
+      <h2><span class="livedot"></span> <span data-i18n="panel.live">Live onderweg</span></h2>
+      <div class="rows" id="liveList"></div>
+    </div>
+    <div class="cols">
+      <div class="panel">
+        <h2 data-i18n="panel.prices">Dynamische prijzen</h2>
+        <div class="rows" id="prices"></div>
+      </div>
+      <div class="panel">
+        <h2 data-i18n="panel.orders">Bestellingen &amp; ritten</h2>
+        <div class="rows" id="orders"></div>
+      </div>
+    </div>
+    <div class="cols" style="margin-top:1.5rem;">
+      <div class="panel">
+        <h2 data-i18n="panel.verify">Identiteitsverificaties</h2>
+        <div class="rows" id="verify"></div>
+      </div>
+      <div class="panel">
+        <h2 data-i18n="panel.concierge">Concierge-inbox</h2>
+        <div class="rows" id="concierge"></div>
+      </div>
+    </div>
+  </div>
+  <div class="doc-scrim" id="docScrim"><img id="docImg" alt="Document"></div>
+  <div class="doc-scrim conv-scrim" id="convScrim">
+    <div class="conv-card" onclick="event.stopPropagation()">
+      <div class="conv-head"><b id="convWho"></b><button id="convClose" class="vbtn">✕</button></div>
+      <div class="conv-body" id="convBody"></div>
+      <form class="conv-reply" id="convReply">
+        <input id="convText" placeholder="Antwoord als concierge…" data-i18n-ph="bo.replyph" autocomplete="off">
+        <button type="submit" class="vbtn ok" data-i18n="bo.send">Stuur</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded' };
+  const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
+  let token = null, state = null, source = null;
+  const enabled = location.protocol === 'http:' || location.protocol === 'https:';
+
+  async function call(path, body){
+    const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(token?{'Authorization':'Bearer '+token}:{})}, body: JSON.stringify(body||{}) });
+    const d = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d.error||'Fout');
+    return d;
+  }
+  function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const ago=T('t.ago',' geleden'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min')+ago; const h=Math.round(m/60); if(h<24)return h+T('t.h',' u')+ago; return Math.round(h/24)+T('t.d',' d')+ago; }
+
+  $('#loginBtn').addEventListener('click', login);
+  $('#code').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
+
+  async function login(){
+    if (!enabled){ alert('Start de RTG-server (npm start) om de backoffice te gebruiken.'); return; }
+    try {
+      const d = await call('/office/login', { code: $('#code').value.trim() });
+      token = d.token; state = d.state;
+    } catch(e){ alert(e.message); return; }
+    $('#gate').style.display = 'none';
+    $('#app').classList.add('on');
+    $('#liveInd').style.display = 'inline-flex';
+    render();
+    loadVerify();
+    loadConcierge();
+    stream();
+  }
+
+  async function refresh(){ try { state = (await call('/office/state')).state; render(); } catch(e){} }
+
+  async function loadVerify(){
+    let pend = [];
+    try { pend = (await call('/office/verifications')).pending || []; } catch(e){ return; }
+    $('#verify').innerHTML = pend.length ? pend.map(v =>
+      '<div class="vrow" data-id="'+v.id+'">' +
+        '<div class="vi"><div class="nm">'+v.name+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+v.codename+'</span></div>' +
+          '<div class="sub">'+(v.email||'')+' · '+v.tier+'</div></div>' +
+        '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
+        '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
+        '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
+      '</div>').join('') : '<div class="empty">'+T('bo.noverify','Geen openstaande verificaties.')+'</div>';
+    $('#verify').querySelectorAll('.vrow').forEach(row => {
+      const id = Number(row.dataset.id);
+      row.querySelector('[data-doc]').addEventListener('click', e => {
+        $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(token)+'&file='+encodeURIComponent(e.target.dataset.doc);
+        $('#docScrim').classList.add('open');
+      });
+      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve'));
+      row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject'));
+    });
+  }
+  async function decide(userId, decision){
+    try { await call('/office/verify', { userId, decision }); } catch(e){ alert(e.message); return; }
+    loadVerify();
+  }
+
+  const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  let convData = [], convUser = null;
+  async function loadConcierge(){
+    try { convData = (await call('/office/conversations')).conversations || []; } catch(e){ return; }
+    $('#concierge').innerHTML = convData.length ? convData.map(c =>
+      '<div class="vrow" data-uid="'+c.userId+'"><div class="vi"><div class="nm">'+c.codename+
+        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+c.tier+'</span>'+
+        (c.needsConcierge?' <span class="pill nieuw">'+T('bo.waiting','wacht')+'</span>':'')+'</div>'+
+        '<div class="sub">'+(c.lastFrom==='concierge'?'↩ ':'')+escHtml((c.last||'').slice(0,55))+'</div></div>'+
+        '<button class="vbtn ok" data-open>'+T('bo.open','Open')+'</button></div>'
+    ).join('') : '<div class="empty">'+T('bo.noconv','Nog geen gesprekken.')+'</div>';
+    $('#concierge').querySelectorAll('.vrow').forEach(row =>
+      row.querySelector('[data-open]').addEventListener('click', () => openThread(Number(row.dataset.uid))));
+    if (convUser && $('#convScrim').classList.contains('open')) openThread(convUser);
+  }
+  function openThread(uid){
+    const c = convData.find(x => x.userId === uid); if (!c) return;
+    convUser = uid;
+    $('#convWho').textContent = c.codename + ' · ' + c.tier;
+    $('#convBody').innerHTML = c.messages.map(m =>
+      '<div class="cmsg '+(m.from==='member'?'in':'out')+'">'+(m.channel==='whatsapp'?'<span class="wa">📱 WhatsApp</span>':'')+escHtml(m.text)+'</div>'
+    ).join('');
+    $('#convScrim').classList.add('open');
+    setTimeout(()=>{ const b=$('#convBody'); b.scrollTop=b.scrollHeight; }, 30);
+  }
+  $('#convClose').addEventListener('click', () => $('#convScrim').classList.remove('open'));
+  $('#convScrim').addEventListener('click', () => $('#convScrim').classList.remove('open'));
+  $('#convReply').addEventListener('submit', async e => {
+    e.preventDefault();
+    const t = $('#convText').value.trim(); if (!t || !convUser) return;
+    try { convData = (await call('/office/reply', { userId: convUser, text: t })).conversations || convData; $('#convText').value=''; openThread(convUser); loadConcierge(); }
+    catch(e2){ alert(e2.message); }
+  });
+
+  function render(){
+    const paid = state.orders.filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
+    $('#stat').innerHTML =
+      '<div class="b"><div class="l">'+T('bo.partners','Partners')+'</div><div class="v">'+state.suppliers.length+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.proposals','Prijsvoorstellen')+'</div><div class="v a">'+state.prices.length+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.orders','Bestellingen')+'</div><div class="v a">'+state.orders.length+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.revenue','Omzet via partners')+'</div><div class="v g">'+eur(paid)+'</div></div>';
+
+    const live = state.live || [];
+    $('#liveList').innerHTML = live.length ? live.map(g =>
+      '<div class="row"><div class="r1"><div><div class="nm">'+g.codename+
+        (g.dest?' <span style="color:var(--soft);font-weight:400;">· '+T('bo.to','naar')+' '+g.dest.name+'</span>':'')+'</div>'+
+        '<div class="sub">'+(g.arrived?'✓ '+T('bo.arrived','gearriveerd'):T('bo.onthemove','onderweg')+' ('+T('bo.mode.'+g.mode, g.mode==='walking'?'lopend':g.mode==='flying'?'vliegend':'rijdend')+')')+
+        ' · '+(g.partners||[]).join(', ')+'</div></div>'+
+        '<span class="pill '+(g.arrived?'klaar':'bereiding')+'">'+(g.arrived?T('bo.arrived','gearriveerd'):T('bo.live','live'))+'</span></div></div>'
+    ).join('') : '<div class="empty">'+T('bo.nolive','Niemand is nu onderweg. Zodra een lid een reis live zet, ziet u hier waar zij zijn en met welke partners.')+'</div>';
+
+    $('#prices').innerHTML = state.prices.length ? state.prices.map(p =>
+      '<div class="row"><div class="r1"><div><div class="nm">'+p.supplierName+'</div><div class="sub">'+p.service+' · '+timeAgo(p.at)+'</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
+    ).join('') : '<div class="empty">'+T('bo.noprices','Nog geen prijzen. Zodra een partner een dynamische prijs doorgeeft, verschijnt die hier live.')+'</div>';
+
+    $('#orders').innerHTML = state.orders.length ? state.orders.map(o => {
+      const pc = o.status==='nieuw'?'nieuw':o.status==='in bereiding'?'bereiding':'klaar';
+      return '<div class="row"><div class="r1"><div><div class="nm">'+o.supplierName+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+o.customerCodename+'</span></div>'+
+        '<div class="sub">'+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('bo.items','item(s)')+' · '+timeAgo(o.at)+' · '+(o.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
+        '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><span class="pill '+pc+'">'+tStatus(o.status)+'</span></div></div></div>';
+    }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
+  }
+
+  function stream(){
+    if (!window.EventSource) return;
+    try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(token)); } catch(e){ return; }
+    source.addEventListener('sync', () => { refresh(); loadVerify(); loadConcierge(); });
+    source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
+  }
+
+  $('#docScrim').addEventListener('click', () => { $('#docScrim').classList.remove('open'); $('#docImg').src = ''; });
+
+  window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
+})();
+</script>
+<script>
+window.I18N = { en: {
+  'gate.h':'Sign in',
+  'gate.p':'Live overview of all dynamic prices, orders and rides via RTG partners.',
+  'gate.ph':'Back-office code', 'gate.btn':'Sign in', 'gate.hint':'Demo code: RTG-OFFICE',
+  'panel.prices':'Dynamic prices', 'panel.orders':'Orders & rides', 'panel.verify':'Identity verifications', 'panel.concierge':'Concierge inbox',
+  'panel.live':'Live on the move', 'bo.to':'to', 'bo.arrived':'arrived', 'bo.onthemove':'on the move', 'bo.live':'live',
+  'bo.mode.walking':'walking', 'bo.mode.driving':'driving', 'bo.mode.flying':'flying',
+  'bo.nolive':'Nobody is on the move right now. As soon as a member puts a journey live, you will see here where they are and with which partners.',
+  'bo.viewdoc':'Document', 'bo.approve':'Approve', 'bo.reject':'Reject', 'bo.noverify':'No pending verifications.',
+  'bo.waiting':'waiting', 'bo.open':'Open', 'bo.noconv':'No conversations yet.', 'bo.replyph':'Reply as concierge…', 'bo.send':'Send',
+  'bo.partners':'Partners', 'bo.proposals':'Price proposals', 'bo.orders':'Orders', 'bo.revenue':'Revenue via partners',
+  'bo.noprices':'No prices yet. As soon as a partner submits a dynamic price, it appears here live.',
+  'bo.noorders':'No orders or rides via partners yet.',
+  'bo.guest':'guest', 'bo.items':'item(s)', 'bo.paid':'paid', 'bo.unpaid':'unpaid',
+  't.now':'just now', 't.ago':' ago', 't.min':' min', 't.h':' h', 't.d':' d'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
+</body>
+</html>

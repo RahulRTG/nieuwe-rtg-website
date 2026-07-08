@@ -53,7 +53,7 @@ for (const [code, people] of Object.entries(STAFF_SEED)) {
 
 const app = express();
 app.use(express.json({ limit: '64kb' }));
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 /* ---------- Claude API (optioneel) ---------- */
 
@@ -159,7 +159,7 @@ function notify(tier, note) {
 function sendPush(tier, note) {
   if (!webpush) return;
   const subs = db.data.pushSubs[tier] || [];
-  const payload = JSON.stringify({ title: note.title, body: note.body, icon: 'icon.svg', tag: note.id });
+  const payload = JSON.stringify({ title: note.title, body: note.body, icon: '/icon.svg', tag: note.id });
   for (const sub of subs.slice()) {
     webpush.sendNotification(sub, payload).catch(err => {
       // verlopen/ongeldige subscription opruimen
@@ -324,7 +324,7 @@ app.post('/api/auth/register', (req, res) => {
   accounts.saveMemberState(user.id, memberTemplate());
   // bevestigingsmail met een echte, werkende link
   const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
-  const verifyUrl = appUrl(req) + '/portaal.html?verify=' + vtok;
+  const verifyUrl = appUrl(req) + '/apps/portaal.html?verify=' + vtok;
   mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
     'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl);
   const token = accounts.issueToken(user.id);
@@ -343,7 +343,7 @@ app.post('/api/auth/resend', auth, (req, res) => {
   if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
   const u = req.session.account;
   const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
-  const url = appUrl(req) + '/portaal.html?verify=' + vtok;
+  const url = appUrl(req) + '/apps/portaal.html?verify=' + vtok;
   mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
   res.json({ ok: true, ...(mail.configured ? {} : { devVerifyUrl: url }) });
 });
@@ -354,7 +354,7 @@ app.post('/api/auth/forgot', (req, res) => {
   let devResetUrl;
   if (u) {
     const tok = accounts.createReset(u.id);
-    const url = appUrl(req) + '/portaal.html?reset=' + tok;
+    const url = appUrl(req) + '/apps/portaal.html?reset=' + tok;
     mail.send(accounts.emailOf(u) || email, 'Wachtwoord herstellen bij Rahul Travel Group',
       'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url);
     if (!mail.configured) devResetUrl = url;
@@ -1255,6 +1255,6 @@ initRealtime();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/portaal.html`);
+  console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/portaal.html`);
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 });

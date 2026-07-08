@@ -1,6 +1,22 @@
-# Rahul Travel Group — website & ledenportaal
+# Rahul Travel Group, website & ledenportaal
 
-Conceptwebsite van Rahul Travel Group: homepage, drie passen (RTG / Lifestyle / Business), een ledenportaal met betalingen, reizen & diensten, een persoonlijke AI, een digitale toegangskaart voor de toekomstige RTG-app en **De Salon** — het besloten sociale netwerk van RTG.
+Conceptwebsite van Rahul Travel Group: homepage, drie passen (RTG / Lifestyle / Business), een ledenportaal met betalingen, reizen & diensten, een persoonlijke AI, een digitale toegangskaart voor de toekomstige RTG-app en **De Salon**, het besloten sociale netwerk van RTG.
+
+## Projectstructuur
+
+```
+public/            alles wat de browser laadt (de webroot die de server serveert)
+├── index.html     homepage (bereikbaar op /)
+├── sw.js          service worker (staat bewust in de root: scope /)
+├── manifest.webmanifest
+├── icon.svg
+├── shared/        gedeelde client-scripts (i18n.js, realtime.js)
+├── site/          marketingpagina's (passen, foundation, boeken, toegang, download, bloomingdale)
+└── apps/          de web-apps (app, portaal, leverancier, backoffice)
+server/            Node.js/Express-backend + data (db.json, rtg.db, sleutels, uploads)
+```
+
+Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
 
 ## Starten (met backend)
 
@@ -11,7 +27,7 @@ npm install
 npm start
 ```
 
-Open daarna **http://localhost:3000/portaal.html** (de rest van de site staat op http://localhost:3000).
+Open daarna **http://localhost:3000/apps/portaal.html** (de rest van de site staat op http://localhost:3000).
 
 Met de backend actief lopen inloggen, betalingen, likes, reacties, DM's en de AI via de echte API:
 
@@ -41,13 +57,13 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/state` | Actuele state voor de ingelogde gebruiker |
 | `POST /api/pay` `{invoiceId}` | Betaal een openstaande factuur (werkt de reis-tijdlijn bij) |
 | `POST /api/like` `{postId, liked}` | Like/unlike (mag iedereen, ook gasten) |
-| `POST /api/comment` `{postId, text}` | Reageren — rechten per pas, server-side afgedwongen |
-| `POST /api/dm` `{postId, text}` | Privébericht — zelfde rechten als reageren |
+| `POST /api/comment` `{postId, text}` | Reageren, rechten per pas, server-side afgedwongen |
+| `POST /api/dm` `{postId, text}` | Privébericht, zelfde rechten als reageren |
 | `POST /api/ai` `{messages}` | Persoonlijke AI (Claude indien key aanwezig, anders demo) |
 | `POST /api/logout` | Sessie beëindigen |
 | `POST /api/partner` `{code}` | Partnercode valideren (demo-codes: `NOVA`, `ATLAS`, `BLOOM`) |
 | `POST /api/staff` `{staffCode}` | Personeelscode van een partnerbedrijf valideren (demo: `BLOOM-TEAM`) |
-| `POST /api/partnertrips` `{staffCode?}` | Gecureerde reizen — alleen totaalprijzen; met geldige personeelscode ook personeelsprijzen |
+| `POST /api/partnertrips` `{staffCode?}` | Gecureerde reizen, alleen totaalprijzen; met geldige personeelscode ook personeelsprijzen |
 | `POST /api/book` `{code \| staffCode, tripId, name, email}` | Boeking zonder pas via een partner of personeelscode |
 
 ## Live updates & push-notificaties
@@ -58,12 +74,12 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 
 ## De app (PWA)
 
-**app.html** is de RTG-app als installeerbare web-app (PWA, met `manifest.webmanifest` + `sw.js`): mobiele app-schil met tabbalk — Home, Reizen, Betalen (Face ID), AI en De Salon — draaiend op dezelfde backend als de site. Open op een telefoon en kies "Zet op beginscherm" om te installeren.
+**apps/app.html** is de RTG-app als installeerbare web-app (PWA, met `manifest.webmanifest` + `sw.js`): mobiele app-schil met tabbalk (Home, Reizen, Betalen met Face ID, AI en De Salon), draaiend op dezelfde backend als de site. Open op een telefoon en kies "Zet op beginscherm" om te installeren.
 
 **Codenaam (privacy by design):** elke klant krijgt een codenaam (bijv. *Zilveren Valk*). Reserveringen, betalingen en reisdata staan in de systemen op de codenaam; de echte naam ligt in een gescheiden kluis en wordt pas bij ticketing/check-in gekoppeld. Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam.
 
 ## Partnerkanaal
 
-Niet-leden boeken via **boeken.html** — bereikbaar via een partnerlink zoals `boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs, service en de commissieverdeling tussen partner en RTG zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`.
+Niet-leden boeken via **site/boeken.html**, bereikbaar via een partnerlink zoals `/site/boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs, service en de commissieverdeling tussen partner en RTG zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`.
 
-**Bloomingdale Bloemendaal** (`bloomingdale.html`) is de voorbeeld-pagina van de partnertool voor bedrijven: een co-branded pagina met twee kanalen — een klantenkanaal (gasten boeken onder het merk van de partner) en een personeelskanaal (medewerkers boeken met personeelsvoordeel via code `BLOOM-TEAM`, als secundaire arbeidsvoorwaarde). Beide kanalen leveren RTG én de partner omzet op; de verdeling blijft onzichtbaar voor de boeker.
+**Bloomingdale Bloemendaal** (`site/bloomingdale.html`) is de voorbeeld-pagina van de partnertool voor bedrijven: een co-branded pagina met twee kanalen. Een klantenkanaal (gasten boeken onder het merk van de partner) en een personeelskanaal (medewerkers boeken met personeelsvoordeel via code `BLOOM-TEAM`, als secundaire arbeidsvoorwaarde). Beide kanalen leveren RTG én de partner omzet op; de verdeling blijft onzichtbaar voor de boeker.

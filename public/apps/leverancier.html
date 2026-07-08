@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0C0C0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>RTG Partners, leverancier-app</title>
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -716,7 +716,7 @@
   $('#actorChip').addEventListener('click', switchUser);
   buildPad();
   renderGate();
-  if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 })();
 </script>
 <script>
@@ -765,6 +765,6 @@ window.I18N = { en: {
   'team.fillname':'Enter a name.', 'team.added':'Added. PIN: ', 'team.removed':'Removed from the team.'
 } };
 </script>
-<script src="i18n.js"></script>
+<script src="/shared/i18n.js"></script>
 </body>
 </html>

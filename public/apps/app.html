@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>RTG, de app</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -610,7 +610,7 @@
       <button class="gate-btn t-lifestyle" data-login="lifestyle"><span class="dot"></span><span><b>I. van Rhijn</b><span>Lifestyle Pass · codenaam Gouden Ibis</span></span></button>
       <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>A. de Vries</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
     </div>
-    <p class="note" data-i18n-html="gate.note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
+    <p class="note" data-i18n-html="gate.note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
   </div>
 
   <!-- app -->
@@ -721,7 +721,7 @@
   <div id="toast"></div>
 </div>
 
-<script src="realtime.js"></script>
+<script src="/shared/realtime.js"></script>
 <script>
 (function(){
   const $ = s => document.querySelector(s);
@@ -1543,7 +1543,7 @@
   /* ---------- PWA ---------- */
 
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 })();
 </script>
@@ -1558,7 +1558,7 @@ window.I18N = { en: {
   'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
   'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',
   'vf.pending.h':'Verification in progress', 'vf.pending.b':'We are reviewing your document. You can keep using the app as normal.',
-  'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>',
+  'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
   'msg.from':'translated from', 'msg.orig':'show original', 'msg.showtrans':'show translation',
   'app.tab.home':'Home', 'app.tab.trips':'Journeys', 'app.tab.pay':'Payments', 'app.tab.ai':'AI', 'app.tab.salon':'Salon', 'app.tab.tp':'On site',
@@ -1604,6 +1604,6 @@ window.I18N = { en: {
   'app.v.salon':'The Salon.', 'app.v.salon.sub':'Posts appear 7 days after the stay, for your safety.', 'app.v.tp':'On site.'
 } };
 </script>
-<script src="i18n.js"></script>
+<script src="/shared/i18n.js"></script>
 </body>
 </html>

@@ -6,9 +6,9 @@
 <title>Download de RTG-app, Rahul Travel Group</title>
 <meta name="description" content="De RTG-app: uw pas, betalen met één tik, uw persoonlijke AI en De Salon. Installeer op uw telefoon.">
 <meta name="theme-color" content="#0C0C0B">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -171,15 +171,15 @@
 
 <header>
   <div class="wrap">
-    <a href="index.html" class="brandmark">
+    <a href="/index.html" class="brandmark">
       <span class="bm-block">Rahul Travel Group</span>
       <span class="bm-tagline">De app</span>
     </a>
     <nav>
       <ul>
-        <li><a href="index.html#passen">Passen</a></li>
-        <li><a href="portaal.html">Ledenportaal</a></li>
-        <li><a href="app.html">Open de app</a></li>
+        <li><a href="/index.html#passen">Passen</a></li>
+        <li><a href="/apps/portaal.html">Ledenportaal</a></li>
+        <li><a href="/apps/app.html">Open de app</a></li>
       </ul>
     </nav>
   </div>
@@ -196,7 +196,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
           Installeer de app
         </button>
-        <a href="app.html" class="btn btn-ghost">Open in de browser</a>
+        <a href="/apps/app.html" class="btn btn-ghost">Open in de browser</a>
       </div>
       <p class="platform-note" id="platformNote">Werkt op iPhone, Android en desktop. Voor leden met een actieve pas.</p>
     </div>
@@ -341,7 +341,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
         Installeer de app
       </button>
-      <a href="index.html#passen" class="btn btn-ghost">Bekijk de passen</a>
+      <a href="/index.html#passen" class="btn btn-ghost">Bekijk de passen</a>
     </div>
   </div>
 </section>
@@ -349,7 +349,7 @@
 <footer>
   <div class="wrap">
     <span>© 2026 Rahul Travel Group</span>
-    <span><a href="app.html">Open de app</a> · <a href="portaal.html">Ledenportaal</a></span>
+    <span><a href="/apps/app.html">Open de app</a> · <a href="/apps/portaal.html">Ledenportaal</a></span>
   </div>
 </footer>
 
@@ -398,7 +398,7 @@
       return;
     }
     // fallback: open de app; de browser biedt install via zijn eigen menu
-    window.location.href = 'app.html';
+    window.location.href = '/apps/app.html';
   }
 
   ['#installBtn', '#installBtn2'].forEach(sel => {
@@ -415,7 +415,7 @@
 
   // service worker registreren zodat de app installeerbaar is vanaf deze pagina
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 })();
 </script>
@@ -427,6 +427,6 @@ window.I18N = { en: {
   'hero.deck':'Bookings, one-tap payment, your personal AI and The Salon, in one app on your phone. No app store needed: you install the app directly from this page, in seconds.'
 } };
 </script>
-<script src="i18n.js"></script>
+<script src="/shared/i18n.js"></script>
 </body>
 </html>

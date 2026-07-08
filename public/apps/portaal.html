@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>Ledenportaal, Rahul Travel Group</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -989,12 +989,12 @@
 
 <header>
   <div class="wrap">
-    <a href="index.html" class="brandmark">
+    <a href="/index.html" class="brandmark">
       <span class="bm-block">Rahul Travel Group</span>
       <span class="bm-tagline">Ledenportaal</span>
     </a>
     <div class="header-user" id="headerUser">
-      <a href="index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>
+      <a href="/index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>
     </div>
   </div>
 </header>
@@ -1185,7 +1185,7 @@
   </div>
 </div>
 
-<script src="realtime.js"></script>
+<script src="/shared/realtime.js"></script>
 <script>
 (function(){
   /* ---------- data ---------- */
@@ -1498,7 +1498,7 @@
     user = null;
     $('#portal').classList.remove('active');
     $('#gate').classList.remove('hidden');
-    $('#headerUser').innerHTML = '<a href="index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>';
+    $('#headerUser').innerHTML = '<a href="/index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>';
     window.scrollTo({top:0});
   }
 
@@ -1609,7 +1609,7 @@
     return '<div class="locked-panel">' +
       '<div class="big">'+T('p.membersonly','Alleen voor leden.')+'</div>' +
       '<p>' + what + ' ' + T('p.locked.body','is onderdeel van het RTG-lidmaatschap. Kies de pas die bij uw ritme past en dit portaal opent volledig.') + '</p>' +
-      '<a href="index.html#passen" class="btn">'+T('p.viewpasses','Bekijk de passen')+'</a>' +
+      '<a href="/index.html#passen" class="btn">'+T('p.viewpasses','Bekijk de passen')+'</a>' +
       '</div>';
   }
 
@@ -1724,7 +1724,7 @@
             '<li>'+T('p.pass.li2','Uw account draait op uw codenaam, uw echte naam ligt in een gescheiden kluis en wordt pas bij ticketing gekoppeld. Bij een hack heeft niemand de juiste naam.')+'</li>' +
             '<li>'+T('p.pass.li3','Uw pas draagt uw Salon-identiteit: wat u hier opbouwt, reist mee.')+'</li>' +
           '</ul>' +
-          '<div class="app-note"><b>'+T('p.pass.appnote.b','RTG-app, download beschikbaar.')+'</b> '+T('p.pass.appnote','Boeken, betalen met één tik, De Salon en uw AI in één app op uw telefoon.')+' <a href="download.html" style="color:var(--burgundy);font-weight:600;text-decoration:underline;text-underline-offset:3px;">'+T('p.downloadapp','Download de app')+' →</a></div>' +
+          '<div class="app-note"><b>'+T('p.pass.appnote.b','RTG-app, download beschikbaar.')+'</b> '+T('p.pass.appnote','Boeken, betalen met één tik, De Salon en uw AI in één app op uw telefoon.')+' <a href="/site/download.html" style="color:var(--burgundy);font-weight:600;text-decoration:underline;text-underline-offset:3px;">'+T('p.downloadapp','Download de app')+' →</a></div>' +
         '</div>' +
       '</div>';
   }
@@ -2036,7 +2036,7 @@
       banner.innerHTML =
         '<div class="txt"><h3>'+T('p.salon.bannerh','Maak content, verdien meer dan korting.')+'</h3>' +
         '<p>'+T('p.salon.guestp1','Leden die hun reizen delen, klimmen per kwartaal een ladder op:')+' ' + ladderText + '. '+T('p.salon.featured','Uitgelichte posts verschijnen, met naamsvermelding, als beeld op de RTG-website.')+'</p></div>' +
-        '<a href="index.html#passen" class="btn btn-small" style="background:var(--white);color:var(--black);border-color:var(--white);">'+T('p.becomemember','Word lid')+'</a>';
+        '<a href="/index.html#passen" class="btn btn-small" style="background:var(--white);color:var(--black);border-color:var(--white);">'+T('p.becomemember','Word lid')+'</a>';
     } else {
       const level = [...LADDER].reverse().find(l => creatorLikes >= l.likes);
       const next = LADDER.find(l => creatorLikes < l.likes);
@@ -2160,7 +2160,7 @@
 
   /* service worker registreren zodat web-push ook op de website werkt */
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 })();
 </script>
@@ -2247,7 +2247,7 @@ window.I18N = { en: {
   'p.dm.title':'Message', 'p.dm.sub':'Private message within The Salon.', 'p.dm.ph':'Write your message…', 'p.dm.cancel':'Cancel', 'p.dm.send':'Send'
 } };
 </script>
-<script src="i18n.js"></script>
+<script src="/shared/i18n.js"></script>
 
 </body>
 </html>

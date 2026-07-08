@@ -1,7 +1,7 @@
 /* RTG app, service worker: cachet de app-schil zodat de app installeerbaar
    is en offline opent. API-verkeer gaat altijd naar het netwerk. */
-const CACHE = 'rtg-app-v1';
-const SHELL = ['app.html', 'manifest.webmanifest', 'icon.svg'];
+const CACHE = 'rtg-app-v2';
+const SHELL = ['/apps/app.html', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));
@@ -24,7 +24,7 @@ self.addEventListener('fetch', e => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
         return res;
-      }).catch(() => caches.match('app.html'))
+      }).catch(() => caches.match('/apps/app.html'))
     )
   );
 });
@@ -36,10 +36,10 @@ self.addEventListener('push', e => {
   const title = data.title || 'Rahul Travel Group';
   e.waitUntil(self.registration.showNotification(title, {
     body: data.body || '',
-    icon: data.icon || 'icon.svg',
-    badge: 'icon.svg',
+    icon: data.icon || '/icon.svg',
+    badge: '/icon.svg',
     tag: data.tag,
-    data: { url: 'app.html' }
+    data: { url: '/apps/app.html' }
   }));
 });
 
@@ -48,8 +48,8 @@ self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      for (const c of list) if (c.url.includes('app.html') && 'focus' in c) return c.focus();
-      return self.clients.openWindow((e.notification.data && e.notification.data.url) || 'app.html');
+      for (const c of list) if (c.url.includes('/apps/app.html') && 'focus' in c) return c.focus();
+      return self.clients.openWindow((e.notification.data && e.notification.data.url) || '/apps/app.html');
     })
   );
 });

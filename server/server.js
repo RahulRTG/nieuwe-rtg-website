@@ -125,6 +125,11 @@ function initRealtime() {
   if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
   if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
   if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
+  // sector-features: elke partner een fotopagina, hotels/appartementen kamers
+  for (const s of db.data.suppliers) {
+    if (!Array.isArray(s.photos)) s.photos = [];
+    if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
+  }
   if (webpush) {
     if (!db.data.vapid) {
       db.data.vapid = webpush.generateVAPIDKeys();
@@ -252,6 +257,7 @@ function stateFor(sess, lang) {
   // zodat de ontvanger ze in zijn eigen taal vertaald kan lezen.
   const posts = db.data.posts.map(p => ({
     id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual,
+    photo: p.photo || null, partner: !!p.partner,
     text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
     likes: p.baseLikes + Object.keys(p.likedBy).length,
     liked: !!p.likedBy[sess.key],
@@ -734,7 +740,9 @@ function publicSupplier(s, lang) {
   const t = db.data.supplierTypes[s.type] || {};
   const loc = s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : s.loc;
   return { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
-           city: s.city, caps: t.caps || [], loc, hasMenu: (s.menu || []).length > 0 };
+           city: s.city, caps: t.caps || [], loc, hasMenu: (s.menu || []).length > 0,
+           photos: s.photos || [],
+           rooms: (s.rooms || []).filter(r => r.available).map(r => ({ id: r.id, name: r.name, desc: i18n.localize(r.desc, lang), price: r.price })) };
 }
 
 // dashboarddata voor de ingelogde leverancier
@@ -742,6 +750,8 @@ function supplierState(s, actor) {
   const t = db.data.supplierTypes[s.type] || {};
   return {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
+    rooms: s.rooms || null,
+    photos: s.photos || [],
     menu: s.menu || [],
     orders: db.data.orders.filter(o => o.supplierCode === s.code).map(o => {
       const L = db.data.live[o.customerKey || o.customerTier];
@@ -817,6 +827,99 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
     logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team');
   }
   res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
+});
+
+/* ---- sector-slimmigheden ----
+   Ophaalcodes voor bars/restaurants, kamerbeheer voor hotels, een eigen
+   fotopagina voor elke partner en rechtstreeks publiceren op De Salon. */
+
+// korte, ondubbelzinnige ophaalcode (geen 0/O, 1/I)
+function pickupCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for (let i = 0; i < 4; i++) c += chars[crypto.randomInt(chars.length)];
+  return c;
+}
+
+// ---- kamers (hotel/appartement): aan/uit, toevoegen, verwijderen ----
+app.post('/api/supplier/room/add', supplierAuth, (req, res) => {
+  if (!Array.isArray(req.supplier.rooms)) return res.status(400).json({ error: 'Kamers zijn er alleen voor hotels en appartementen.' });
+  const name = String(req.body.name || '').trim().slice(0, 60);
+  const price = Math.max(0, Number(req.body.price) || 0);
+  if (!name || !price) return res.status(400).json({ error: 'Vul een kamernaam en prijs in.' });
+  const room = { id: crypto.randomBytes(3).toString('hex'), name, desc: String(req.body.desc || '').slice(0, 120), price, available: true };
+  req.supplier.rooms.push(room);
+  save();
+  logActivity(req.supplier.code, req.actor, 'voegde kamer "' + name + '" toe');
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  res.json({ ok: true, rooms: req.supplier.rooms });
+});
+app.post('/api/supplier/room/toggle', supplierAuth, (req, res) => {
+  const room = (req.supplier.rooms || []).find(r => r.id === req.body.id);
+  if (!room) return res.status(404).json({ error: 'Kamer niet gevonden.' });
+  room.available = !room.available;
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette kamer "' + room.name + '" ' + (room.available ? 'aan' : 'uit'));
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  res.json({ ok: true, rooms: req.supplier.rooms });
+});
+app.post('/api/supplier/room/remove', supplierAuth, (req, res) => {
+  const i = (req.supplier.rooms || []).findIndex(r => r.id === req.body.id);
+  if (i >= 0) {
+    logActivity(req.supplier.code, req.actor, 'verwijderde kamer "' + req.supplier.rooms[i].name + '"');
+    req.supplier.rooms.splice(i, 1);
+    save();
+    broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  }
+  res.json({ ok: true, rooms: req.supplier.rooms || [] });
+});
+
+// ---- fotopagina: foto's die gasten zien bij de partner ----
+app.post('/api/supplier/photo/add', express.json({ limit: '6mb' }), supplierAuth, (req, res) => {
+  const img = String(req.body.image || '');
+  if (!/^data:image\/(jpeg|png|webp);base64,/.test(img)) return res.status(400).json({ error: 'Alleen JPG, PNG of WebP.' });
+  if (img.length > 1.5 * 1024 * 1024) return res.status(413).json({ error: 'Foto te groot (max ~1 MB).' });
+  req.supplier.photos = req.supplier.photos || [];
+  if (req.supplier.photos.length >= 6) return res.status(409).json({ error: 'Maximaal 6 foto\'s. Verwijder er eerst een.' });
+  req.supplier.photos.push(img);
+  save();
+  logActivity(req.supplier.code, req.actor, 'plaatste een foto op de pagina');
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  res.json({ ok: true, count: req.supplier.photos.length });
+});
+app.post('/api/supplier/photo/remove', supplierAuth, (req, res) => {
+  const i = parseInt(req.body.index, 10);
+  if (req.supplier.photos && i >= 0 && i < req.supplier.photos.length) {
+    req.supplier.photos.splice(i, 1);
+    save();
+    logActivity(req.supplier.code, req.actor, 'verwijderde een foto van de pagina');
+    broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  }
+  res.json({ ok: true, count: (req.supplier.photos || []).length });
+});
+
+// ---- rechtstreeks publiceren op De Salon (als RTG-partner) ----
+app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAuth, (req, res) => {
+  const text = String(req.body.text || '').trim().slice(0, 600);
+  if (!text) return res.status(400).json({ error: 'Schrijf eerst een tekst.' });
+  let photo = null;
+  const pi = parseInt(req.body.photoIndex, 10);
+  if (Number.isInteger(pi) && req.supplier.photos && req.supplier.photos[pi]) photo = req.supplier.photos[pi];
+  else if (typeof req.body.image === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(req.body.image) && req.body.image.length <= 1.5 * 1024 * 1024) photo = req.body.image;
+  const post = {
+    id: Date.now(),
+    author: req.supplier.name, tier: 'partner', partner: true,
+    place: req.supplier.city, visual: null, photo,
+    text, lang: req.body.lang === 'en' ? 'en' : 'nl',
+    baseLikes: 0, likedBy: {}, comments: []
+  };
+  db.data.posts.unshift(post);
+  db.data.posts = db.data.posts.slice(0, 60);
+  save();
+  logActivity(req.supplier.code, req.actor, 'publiceerde op De Salon');
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  sseToOffice('sync', { scope: 'salon' });
+  res.json({ ok: true, postId: post.id });
 });
 
 // Interne teamchat binnen het bedrijf.
@@ -985,6 +1088,7 @@ app.post('/api/order', auth, (req, res) => {
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
   const order = {
     ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    pickup: pickupCode(),
     supplierCode: s.code, supplierName: s.name, type: s.type,
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     items, total,

@@ -129,7 +129,12 @@ module.exports = function seed() {
       {
         code: 'HOSHI', name: 'Hoshinoya Kyoto', type: 'hotel', city: 'Kyoto',
         loc: { lat: 35.015, lng: 135.671, label: 'Arashiyama, Kyoto' }, rate: 0.12,
-        menu: []
+        menu: [],
+        rooms: [
+          { id: 'r1', name: 'Riverside suite', desc: '55 m², rivierzicht, privé-onsen', price: 780, available: true },
+          { id: 'r2', name: 'Garden kamer', desc: '40 m², tuinzicht, tatami-zithoek', price: 520, available: true },
+          { id: 'r3', name: 'Corner suite', desc: '70 m², twee balkons, butler-service', price: 940, available: false }
+        ]
       },
       {
         code: 'KIKUNOI', name: 'Kikunoi Honten', type: 'restaurant', city: 'Kyoto',

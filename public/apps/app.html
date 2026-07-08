@@ -50,6 +50,7 @@
     display:flex;
     flex-direction:column;
     position:relative;
+    overflow:hidden; /* off-screen panelen (meldingen) mogen de mobiele viewport niet oprekken */
   }
   /* op desktop: telefoonkader, zodat het concept als app leest */
   @media (min-width:520px){
@@ -577,6 +578,36 @@
   .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
   .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
 
+  /* ---- oplichtend ophaalcode-scherm ---- */
+  #glowCode{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;cursor:pointer;
+    background:radial-gradient(circle at 50% 42%, #FFF8E7 0%, #F3E3B8 45%, #D9B96A 100%);animation:gcbreathe 2.4s ease-in-out infinite;}
+  #glowCode.open{display:flex;}
+  @keyframes gcbreathe{0%,100%{filter:brightness(1);}50%{filter:brightness(1.12);}}
+  .gc-inner{text-align:center;color:#1c1508;padding:1.5rem;max-width:100%;overflow:hidden;}
+  .gc-sup{font-size:0.8rem;letter-spacing:0.22em;text-transform:uppercase;font-weight:600;opacity:0.75;}
+  .gc-code{font-family:'Bodoni Moda',serif;font-size:min(4.4rem,16vw);letter-spacing:0.18em;margin:1.2rem 0 0.6rem;text-indent:0.18em;white-space:nowrap;
+    text-shadow:0 0 30px rgba(255,255,255,0.9);animation:gcpulse 1.6s ease-in-out infinite;}
+  @keyframes gcpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+  .gc-hint{font-size:0.92rem;font-weight:500;}
+  .gc-close{margin-top:2.2rem;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.55;}
+  .mo-code{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:700;}
+
+  /* fotostrip + kamers in de partner-sheet */
+  .ms-photos{display:flex;gap:0.5rem;overflow-x:auto;padding:0.8rem 0 0.2rem;scrollbar-width:none;}
+  .ms-photos::-webkit-scrollbar{display:none;}
+  .ms-photos img{height:110px;border-radius:12px;flex-shrink:0;object-fit:cover;border:1px solid var(--line);}
+  .ms-room{display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.75rem 0;border-bottom:1px solid var(--line);}
+  .ms-room:last-child{border-bottom:none;}
+  .ms-room .rt b{display:block;font-size:0.88rem;font-weight:600;}
+  .ms-room .rt span{font-size:0.72rem;color:var(--muted);}
+  .ms-room .rp{font-family:'Bodoni Moda',serif;font-size:1.05rem;color:var(--gold);white-space:nowrap;}
+
+  /* partner-post in De Salon */
+  .post .visual img{width:100%;height:100%;object-fit:cover;display:block;}
+  .a-partner{background:linear-gradient(140deg,#A98F1C,#6E5B10)!important;}
+  .partner-badge{display:inline-block;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--gold);border:1px solid rgba(169,143,28,0.45);border-radius:999px;padding:0.14rem 0.5rem;margin-left:0.4rem;vertical-align:middle;}
+  .v-partner{background:linear-gradient(160deg,#2a2415 0%,#6E5B10 70%,#A98F1C 100%);}
+
   .menu-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:80;display:none;}
   .menu-scrim.open{display:block;}
   .menu-sheet{position:absolute;left:0;right:0;bottom:0;z-index:81;background:var(--bg);border-top:1px solid var(--line);border-radius:20px 20px 0 0;max-height:88%;display:none;flex-direction:column;}
@@ -761,6 +792,15 @@
     <div class="ms-foot" id="msFoot"></div>
   </div>
 
+  <div id="glowCode">
+    <div class="gc-inner">
+      <div class="gc-sup" id="gcSup"></div>
+      <div class="gc-code" id="gcCode"></div>
+      <div class="gc-hint" data-i18n="app.gc.hint">Laat dit scherm zien bij het ophalen</div>
+      <div class="gc-close" data-i18n="app.gc.close">Tik om te sluiten</div>
+    </div>
+  </div>
+
   <div id="toast"></div>
 </div>
 
@@ -825,7 +865,7 @@
     lifestyle: {name:'I. van Rhijn', full:'Isabelle van Rhijn', since:'Augustus 2025', number:'LSP · 2025 · 0217', codename:'Gouden Ibis',      tier:'lifestyle'},
     business:  {name:'A. de Vries',  full:'Alexander de Vries', since:'November 2025', number:'BSP · 2025 · 1104', codename:'Noordelijke Ster', tier:'business'}
   };
-  const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass'};
+  const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass', partner:'RTG-partner'};
 
   let user = null;
   let invoices = [
@@ -1100,6 +1140,7 @@
             '<div class="acts">' + (o.paid
               ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
               : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
+              (o.pickup ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon ophaalcode') + '</button>' : '') +
               (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ '+T('app.taggedsalon','getagd voor Salon')+'</span>' : '') +
             '</div></div>';
         }).join('')
@@ -1108,16 +1149,20 @@
       const o = active.find(x => x.ref === el.dataset.ref);
       const pb = el.querySelector('.js-opay');
       if (pb) pb.addEventListener('click', () => payOrder(o));
+      const cb = el.querySelector('.js-ocode');
+      if (cb) cb.addEventListener('click', () => showGlow(o));
     });
 
     // partners
     $('#supplierList').innerHTML = '<div class="sec-label">'+T('app.tp.partnersdest','Partners op uw bestemming')+'</div>' + suppliers.map(s => {
-      const canOrder = s.hasMenu;
+      const rooms = (s.rooms || []).length, photos = (s.photos || []).length;
+      const viewable = s.hasMenu || rooms || photos;
+      const sub = tType(s.typeLabel) + ' · ' + s.city + (rooms ? ' · ' + rooms + ' ' + T('app.roomsfree','kamer(s) vrij') : '');
       return '<div class="sup-card">' +
         '<span class="ic">' + (s.icon || '📍') + '</span>' +
-        '<div class="t"><b>' + s.name + '</b><span>' + tType(s.typeLabel) + ' · ' + s.city + '</span></div>' +
-        (canOrder
-          ? '<button class="go" data-menu="' + s.code + '">'+T('app.tp.viewmenu','Bekijk kaart')+'</button>'
+        '<div class="t"><b>' + s.name + '</b><span>' + sub + '</span></div>' +
+        (viewable
+          ? '<button class="go" data-menu="' + s.code + '">'+(s.hasMenu ? T('app.tp.viewmenu','Bekijk kaart') : T('app.tp.view','Bekijk'))+'</button>'
           : '<button class="go ghost" data-loc="' + s.code + '">'+T('app.tp.location','Locatie')+'</button>') +
       '</div>';
     }).join('');
@@ -1302,8 +1347,18 @@
 
   function renderMenuSheet(){
     const m = menuState.menu;
+    const s = menuState.supplier;
+    // fotostrip + kamers van de partner (hotels, of elke partner met foto's)
+    let head = '';
+    if (s.photos && s.photos.length)
+      head += '<div class="ms-photos">' + s.photos.map(p => '<img src="' + p + '" alt="">').join('') + '</div>';
+    if (s.rooms && s.rooms.length){
+      head += '<div class="ms-cat">' + T('app.ms.rooms','Beschikbare kamers') + '</div>' +
+        s.rooms.map(r => '<div class="ms-room"><div class="rt"><b>' + r.name + '</b>' + (r.desc ? '<span>' + r.desc + '</span>' : '') + '</div><div class="rp">' + eur(r.price) + ' <span style="font-size:0.62rem;color:var(--soft);">' + T('app.ms.pernight','p.n.') + '</span></div></div>').join('') +
+        '<div style="margin:0.5rem 0 0.6rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote','Boeken gaat via uw concierge of Butler AI, tegen nettoprijs.') + '</div>';
+    }
     const cats = [...new Set(m.map(x => x.cat))];
-    $('#msBody').innerHTML = cats.map(c =>
+    $('#msBody').innerHTML = head + cats.map(c =>
       '<div class="ms-cat">' + c + '</div>' + m.filter(x => x.cat === c).map(x => {
         const q = menuState.qty[x.id] || 0;
         return '<div class="ms-item" data-id="' + x.id + '">' +
@@ -1321,6 +1376,7 @@
       el.querySelector('.js-plus').addEventListener('click', () => { menuState.qty[id] = (menuState.qty[id]||0)+1; renderMenuSheet(); });
       el.querySelector('.js-minus').addEventListener('click', () => { menuState.qty[id] = Math.max(0,(menuState.qty[id]||0)-1); renderMenuSheet(); });
     });
+    if (!m.length){ $('#msFoot').innerHTML = ''; return; }
     const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
     const count = Object.values(menuState.qty).reduce((a,b)=>a+b,0);
     $('#msFoot').innerHTML =
@@ -1354,6 +1410,14 @@
 
   $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
   $('#menu-scrim').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
+
+  /* ---------- oplichtend ophaalcode-scherm ---------- */
+  function showGlow(o){
+    $('#gcSup').textContent = o.supplierName;
+    $('#gcCode').textContent = o.pickup;
+    $('#glowCode').classList.add('open');
+  }
+  $('#glowCode').addEventListener('click', () => $('#glowCode').classList.remove('open'));
 
   /* ---------- home + codenaam ---------- */
 
@@ -1671,12 +1735,18 @@
   function renderSalon(){
     $('#feed').innerHTML = posts.map(p => {
       const engage = canEngage(p);
+      const visual = p.photo
+        ? '<div class="visual"><img src="' + p.photo + '" alt=""><span class="place">' + p.place + '</span></div>'
+        : '<div class="visual ' + (p.visual || 'v-partner') + '"><span class="place">' + p.place + '</span></div>';
+      const meta = p.partner
+        ? TIER_LABEL.partner + ' · ' + p.place
+        : TIER_LABEL[p.tier] + ' · ' + p.place + ' · ' + T('app.salon.7days','7 dagen na verblijf');
       return '<article class="post" data-post="' + p.id + '">' +
         '<div class="head">' +
           '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
-          '<div><b>' + p.author + '</b><span>' + TIER_LABEL[p.tier] + ' · ' + p.place + ' · ' + T('app.salon.7days','7 dagen na verblijf') + '</span></div>' +
+          '<div><b>' + p.author + (p.partner ? '<span class="partner-badge">' + T('app.partner','Partner') + '</span>' : '') + '</b><span>' + meta + '</span></div>' +
         '</div>' +
-        '<div class="visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>' +
+        visual +
         '<div class="body">' + msgHTML(p.text, p.lang) + '</div>' +
         '<div class="acts">' +
           '<button class="pa js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +
@@ -1785,6 +1855,10 @@ window.I18N = { en: {
   'live.notaxi':'No transport partner available at this destination.', 'live.taxireq':'has been requested. You will see the taxi approach live.',
   'live.shared':'Location shared with your partners.', 'live.geodenied':'Location unavailable. Use "Simulate ride" for the demo.', 'live.geono':'Location is not available here.',
   'live.nosim':'Choose a destination first.', 'live.simstart':'Simulation started, you are approaching the destination.',
+  'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
+  'app.roomsfree':'room(s) available', 'app.tp.view':'View',
+  'app.ms.rooms':'Available rooms', 'app.ms.pernight':'p.n.', 'app.ms.roomnote':'Booking goes via your concierge or Butler AI, at net price.',
+  'app.partner':'Partner',
   'app.ms.note':'Allergy or note (e.g. no nuts)', 'app.ms.tag':'Tag this for The Salon (7 days after the stay)',
   'app.ms.order':'Order', 'app.ms.choose':'Choose dishes', 'app.orderplaced':'Order placed with', 'app.paidto':'Paid to',
   'app.welcome':'Welcome,', 'app.membersince':'member since',

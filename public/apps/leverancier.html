@@ -23,7 +23,7 @@
   a{color:inherit;text-decoration:none;}
   input,textarea,select{font-family:'Inter',sans-serif;}
 
-  #shell{width:100%;max-width:460px;min-height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;}
+  #shell{width:100%;max-width:460px;min-height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;}
   @media (min-width:540px){body{background:#201d1c;padding:2.5rem 0;}#shell{min-height:880px;max-height:920px;border-radius:38px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 90px -30px rgba(0,0,0,0.8);}}
 
   /* login */
@@ -93,6 +93,34 @@
   .guest-row .ge{font-size:0.72rem;color:var(--muted);}
   .guest-row .ge b{font-family:'Bodoni Moda',serif;font-size:1.05rem;color:var(--txt);}
   .guest-row .ge.here{color:var(--green);font-weight:600;}
+
+  /* ophaalcode op de orderkaart */
+  .order .pickup{margin-top:0.45rem;font-size:0.72rem;color:var(--muted);}
+  .order .pickup b{font-family:'Bodoni Moda',serif;font-size:1.15rem;color:var(--gold);letter-spacing:0.22em;margin-left:0.3rem;}
+
+  /* kamers */
+  .room-row{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
+  .room-row:last-of-type{border-bottom:none;}
+  .room-row.off .rr-t b{color:var(--soft);}
+  .room-row .rr-t{flex:1;min-width:0;}
+  .room-row .rr-t b{display:block;font-size:0.88rem;font-weight:600;}
+  .room-row .rr-t span{font-size:0.72rem;color:var(--soft);}
+  .rr-toggle{width:46px;height:26px;flex-shrink:0;border-radius:999px;border:1px solid var(--line);background:var(--card2);position:relative;transition:background 0.2s;}
+  .rr-toggle span{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--soft);transition:all 0.2s;}
+  .rr-toggle.on{background:rgba(76,154,117,0.35);border-color:rgba(76,154,117,0.5);}
+  .rr-toggle.on span{left:22px;background:var(--green);}
+  .rr-del{background:none;border:1px solid var(--line);color:var(--soft);border-radius:999px;width:28px;height:28px;font-size:0.7rem;flex-shrink:0;}
+
+  /* fotopagina + salon-composer */
+  .ph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.7rem;}
+  .ph{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--card2);}
+  .ph img{width:100%;height:100%;object-fit:cover;display:block;}
+  .ph button{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,0.65);color:#fff;font-size:0.6rem;}
+  .ph.add{display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--soft);cursor:pointer;border-style:dashed;}
+  .salon-ta{width:100%;margin-top:0.7rem;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.8rem 0.9rem;font-size:0.88rem;color:var(--txt);min-height:84px;resize:vertical;outline:none;font-family:inherit;}
+  .ph-pick{display:flex;gap:0.5rem;margin-top:0.6rem;overflow-x:auto;}
+  .ph-pick img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid transparent;flex-shrink:0;cursor:pointer;}
+  .ph-pick img.sel{border-color:var(--gold);}
   .pill{display:inline-block;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.28rem 0.6rem;border-radius:999px;border:1px solid var(--line);white-space:nowrap;}
   .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .pill.bereiding{color:var(--amber);border-color:rgba(201,154,46,0.4);}
@@ -311,6 +339,16 @@
         <p class="sub" data-i18n="sup.v.loc.sub">Deel uw live locatie zodat gasten u vinden, en zie waar zij zijn.</p>
         <div id="locWrap"></div>
       </div>
+      <div class="view" data-view="rooms">
+        <h2 data-i18n="sup.v.rooms">Kamers</h2>
+        <p class="sub" data-i18n="sup.v.rooms.sub">Zet kamers aan of uit. Gasten zien alleen wat aan staat, live.</p>
+        <div id="roomsWrap"></div>
+      </div>
+      <div class="view" data-view="page">
+        <h2 data-i18n="sup.v.page">Uw pagina</h2>
+        <p class="sub" data-i18n="sup.v.page.sub">Foto's die gasten zien, en publiceer rechtstreeks op De Salon.</p>
+        <div id="pageWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="sup.v.team">Team</h2>
         <p class="sub" data-i18n="sup.v.team.sub">Personeel, wie wat deed en interne chat van dit bedrijf.</p>
@@ -352,7 +390,9 @@
     rides:    { label:'Ritten',    svg:'<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>', cap:'rides' },
     menu:     { label:'Menu',      svg:'<path d="M4 3v18M8 3v6a2 2 0 0 1-4 0M18 3c-2 0-3 2-3 5s1 4 3 4v9"/>', cap:'menu' },
     price:    { label:'Prijs',     svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 2-2.5 1.5-2.5 3.5M12 16v.5"/>', cap:'pricing' },
+    rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
+    page:     { label:'Pagina',    svg:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6"/>' },
     team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' }
   };
 
@@ -499,7 +539,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderTeam();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderRooms(); renderPage(); renderTeam();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -545,7 +585,8 @@
     const list = state.orders || [];
     $('#orderList').innerHTML = list.length ? list.map(o =>
       '<div class="order" data-ref="'+o.ref+'">'+
-        '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+o.customerCodename+'</span></div><div class="ref">'+o.ref+' · '+timeAgo(o.at)+'</div></div>'+
+        '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+o.customerCodename+'</span></div><div class="ref">'+o.ref+' · '+timeAgo(o.at)+'</div>'+
+          (o.pickup && !['geserveerd','geweigerd','terugbetaald'].includes(o.status) ? '<div class="pickup">'+T('sup.pickup','Ophaalcode')+' <b>'+o.pickup+'</b></div>' : '')+'</div>'+
           '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><div style="margin-top:0.3rem;"><span class="pill '+pillClass(o.status)+'">'+tStatus(o.status)+'</span></div></div></div>'+
         '<ul>'+o.items.map(i=>'<li><span>'+i.qty+'× '+i.name+'</span><span>'+eur(i.price*i.qty)+'</span></li>').join('')+'</ul>'+
         (o.guestArrived?'<div class="enroute here">🎉 '+T('sup.guesthere','Gast is gearriveerd. Serveer nu.')+'</div>':(o.guestEtaMin!=null?'<div class="enroute">📍 '+T('sup.guesteta','Gast onderweg, arriveert over ~')+o.guestEtaMin+' '+T('sup.min','min')+'. '+T('sup.readyontime','Zet op tijd klaar.')+'</div>':''))+
@@ -661,6 +702,89 @@
   async function demoShare(){
     try { await API.call('/supplier/location', { lat: S.loc.lat, lng: S.loc.lng, label: S.loc.label }); toast(T('sup.locshareddemo','Locatie gedeeld (demo-positie).')); }
     catch(e){ toast(e.message); }
+  }
+
+  // ---- kamers (hotel/appartement) ----
+  function renderRooms(){
+    const el = $('#roomsWrap'); if (!el) return;
+    const rooms = state.rooms;
+    if (!Array.isArray(rooms)){ el.innerHTML = ''; return; }
+    let html = '<div class="card">';
+    html += rooms.length ? rooms.map(r =>
+      '<div class="room-row'+(r.available?'':' off')+'">'+
+        '<div class="rr-t"><b>'+r.name+'</b><span>'+(r.desc||'')+' · '+eur(r.price)+' '+T('sup.pernight','p.n.')+'</span></div>'+
+        '<button class="rr-toggle'+(r.available?' on':'')+'" data-rtoggle="'+r.id+'" aria-label="aan/uit"><span></span></button>'+
+        '<button class="rr-del" data-rdel="'+r.id+'">✕</button>'+
+      '</div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>';
+    html += '<div class="tt-add" style="flex-wrap:wrap;">'+
+      '<input id="rmName" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;min-width:120px;">'+
+      '<input id="rmPrice" type="number" inputmode="decimal" placeholder="€" style="flex:1;min-width:70px;">'+
+      '<button id="rmAdd">'+T('team.add','Toevoegen')+'</button></div>';
+    html += '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('sup.roomnote','Uit = direct onzichtbaar voor gasten en de backoffice, zonder telefoontjes.')+'</div>';
+    html += '</div>';
+    el.innerHTML = html;
+    el.querySelectorAll('[data-rtoggle]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/room/toggle', { id: b.dataset.rtoggle }); await refresh(); openTab('rooms'); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-rdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/room/remove', { id: b.dataset.rdel }); toast(T('sup.roomremoved','Kamer verwijderd.')); await refresh(); openTab('rooms'); } catch(e){ toast(e.message); }
+    }));
+    const add = $('#rmAdd'); if (add) add.addEventListener('click', async () => {
+      const name = $('#rmName').value.trim(), price = Number($('#rmPrice').value);
+      if (!name || !(price>0)){ toast(T('sup.roomfill','Vul een kamernaam en prijs in.')); return; }
+      try { await API.call('/supplier/room/add', { name, price }); toast(T('sup.roomadded','Kamer toegevoegd en direct zichtbaar.')); await refresh(); openTab('rooms'); } catch(e){ toast(e.message); }
+    });
+  }
+
+  // ---- pagina: foto's + publiceren op De Salon ----
+  function fileToDataURL(file, cb){
+    const reader = new FileReader();
+    reader.onload = () => cb(String(reader.result));
+    reader.readAsDataURL(file);
+  }
+  function renderPage(){
+    const el = $('#pageWrap'); if (!el) return;
+    const photos = state.photos || [];
+    let html = '<div class="card"><div class="tt-h">'+T('sup.photos','Foto\'s op uw pagina')+' ('+photos.length+'/6)</div>';
+    html += '<div class="ph-grid">'+
+      photos.map((p,i)=>'<div class="ph"><img src="'+p+'" alt=""><button data-phdel="'+i+'">✕</button></div>').join('')+
+      (photos.length<6?'<label class="ph add">+<input type="file" id="phFile" accept="image/jpeg,image/png,image/webp" style="display:none;"></label>':'')+
+    '</div>';
+    html += '<div style="margin-top:0.6rem;font-size:0.72rem;color:var(--soft);">'+T('sup.photonote','Gasten zien deze foto\'s in de RTG-app bij uw pagina, direct na plaatsen.')+'</div></div>';
+
+    html += '<div class="card"><div class="tt-h">'+T('sup.salonpub','Publiceer op De Salon')+'</div>'+
+      '<textarea id="spText" class="salon-ta" placeholder="'+T('sup.salonph','Vertel RTG-leden over uw nieuwste gerecht, suite of avond...')+'"></textarea>'+
+      (photos.length?'<div class="ph-pick">'+photos.map((p,i)=>'<img src="'+p+'" data-pick="'+i+'" alt="">').join('')+'</div>':'')+
+      '<button class="bigbtn" id="spPost" style="margin-top:0.8rem;">'+T('sup.salonpost','Publiceer als RTG-partner')+'</button>'+
+      '<div style="margin-top:0.6rem;font-size:0.72rem;color:var(--soft);">'+T('sup.salonnote','Uw bericht verschijnt in De Salon van alle leden, met uw bedrijfsnaam als partner.')+'</div></div>';
+    el.innerHTML = html;
+
+    el.querySelectorAll('[data-phdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/photo/remove', { index: Number(b.dataset.phdel) }); await refresh(); openTab('page'); } catch(e){ toast(e.message); }
+    }));
+    const f = $('#phFile'); if (f) f.addEventListener('change', () => {
+      const file = f.files && f.files[0]; if (!file) return;
+      if (file.size > 1024*1024){ toast(T('sup.phtoobig','Foto te groot (max 1 MB).')); return; }
+      fileToDataURL(file, async url => {
+        try { await API.call('/supplier/photo/add', { image: url }); toast(T('sup.phadded','Foto geplaatst.')); await refresh(); openTab('page'); } catch(e){ toast(e.message); }
+      });
+    });
+    let picked = null;
+    el.querySelectorAll('[data-pick]').forEach(img => img.addEventListener('click', () => {
+      picked = picked === Number(img.dataset.pick) ? null : Number(img.dataset.pick);
+      el.querySelectorAll('[data-pick]').forEach(x => x.classList.toggle('sel', Number(x.dataset.pick) === picked));
+    }));
+    const post = $('#spPost'); if (post) post.addEventListener('click', async () => {
+      const text = $('#spText').value.trim();
+      if (!text){ toast(T('sup.salonempty','Schrijf eerst een tekst.')); return; }
+      try {
+        await API.call('/supplier/salon/post', { text, photoIndex: picked });
+        toast(T('sup.salondone','Gepubliceerd op De Salon.'));
+        $('#spText').value = ''; picked = null;
+        el.querySelectorAll('[data-pick]').forEach(x => x.classList.remove('sel'));
+      } catch(e){ toast(e.message); }
+    });
   }
 
   // ---- team ----
@@ -806,6 +930,17 @@ window.I18N = { en: {
   'sup.f.service':'Service', 'sup.f.service.ph':'E.g. Kaiseki dinner (2 pers.)', 'sup.f.price':'Your price to RTG (€)', 'sup.f.send':'Send to RTG',
   'sup.v.loc.sub':'Share your live location so guests find you, and see where they are.',
   'tab.team':'Team', 'sup.v.team':'Team', 'sup.v.team.sub':'Staff, who did what and the internal chat of this business.',
+  'tab.rooms':'Rooms', 'sup.v.rooms':'Rooms', 'sup.v.rooms.sub':'Switch rooms on or off. Guests only see what is on, live.',
+  'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
+  'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
+  'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',
+  'sup.roomnote':'Off = instantly invisible to guests and the back office, no phone calls.',
+  'sup.roomremoved':'Room removed.', 'sup.roomfill':'Enter a room name and price.', 'sup.roomadded':'Room added and instantly visible.',
+  'sup.photos':'Photos on your page', 'sup.photonote':'Guests see these photos in the RTG app on your page, right after posting.',
+  'sup.phtoobig':'Photo too large (max 1 MB).', 'sup.phadded':'Photo published.',
+  'sup.salonpub':'Publish to The Salon', 'sup.salonph':'Tell RTG members about your newest dish, suite or evening...',
+  'sup.salonpost':'Publish as RTG partner', 'sup.salonnote':'Your post appears in The Salon of all members, with your business name as partner.',
+  'sup.salonempty':'Write a text first.', 'sup.salondone':'Published to The Salon.',
   'sp.back':'← Back', 'sp.who':'Who are you?', 'sp.deck':'Choose your personal account. Everything you do is tracked under your name.',
   'sp.business':'Sign in as the business account (management)', 'sp.enterpin':'Enter your PIN', 'sp.cancel':'Cancel',
   'sp.nostaff':'No personal accounts yet. Sign in as the business account and add your team.',

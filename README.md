@@ -12,7 +12,14 @@ public/            alles wat de browser laadt (de webroot die de server serveert
 ├── icon.svg
 ├── shared/        gedeelde client-scripts (i18n.js, realtime.js)
 ├── site/          marketingpagina's (passen, foundation, boeken, toegang, download, bloomingdale)
-└── apps/          de web-apps (app, portaal, leverancier, backoffice)
+└── apps/          alle web-apps, per doelgroep en genre:
+    ├── index.html         app-overzicht (hub)
+    ├── leden.html         leden-app (de passen; alias van app.html)
+    ├── personeel.html     personeels-app (rooster, taken, walkie-talkie, SOS)
+    ├── partners.html      werkgevers-app (alias van leverancier.html, alle genres)
+    ├── restaurant/bar/hotel/appartement/taxi/privejet.html  eigen app per genre
+    ├── portaal.html       ledenportaal (web)
+    └── backoffice.html    RTG-backoffice
 server/            Node.js/Express-backend + data (db.json, rtg.db, sleutels, uploads)
 ```
 

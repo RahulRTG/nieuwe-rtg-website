@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<title>RTG Apps, alles op een rij</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.55); --soft:rgba(244,241,236,0.38);
+    --burgundy:#C23A5E; --gold:#A98F1C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--txt);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px;margin:0 auto;padding:3rem 1.5rem 4rem;}
+  .badge{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:2.2rem;margin-top:1.2rem;line-height:1.1;}
+  h1 em{color:var(--burgundy);font-style:italic;}
+  .deck{margin-top:0.8rem;font-size:0.9rem;color:var(--muted);line-height:1.6;max-width:34rem;}
+  h2{font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);font-family:'Inter',sans-serif;font-weight:600;margin:2.4rem 0 0.9rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.7rem;}
+  a.app{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.15rem;text-decoration:none;color:var(--txt);display:flex;align-items:center;gap:0.85rem;transition:border-color 0.2s, transform 0.2s;}
+  a.app:hover{border-color:var(--gold);transform:translateY(-2px);}
+  a.app .ic{font-size:1.6rem;flex-shrink:0;}
+  a.app b{display:block;font-size:0.9rem;font-weight:600;}
+  a.app span{display:block;font-size:0.7rem;color:var(--soft);margin-top:0.15rem;line-height:1.4;}
+  .home{display:inline-block;margin-top:2.6rem;font-size:0.8rem;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;}
+  .home:hover{color:var(--gold);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">Rahul Travel Group</span>
+  <h1 data-i18n-html="hub.title">Alle apps, <em>op een rij</em>.</h1>
+  <p class="deck" data-i18n="hub.deck">Elk genre zijn eigen app, allemaal live verbonden met dezelfde RTG-backend: leden, personeel, werkgevers en elke sector apart.</p>
+
+  <h2 data-i18n="hub.members">Voor leden</h2>
+  <div class="grid">
+    <a class="app" href="/apps/leden.html"><span class="ic">🎫</span><span><b data-i18n="hub.leden">Leden-app</b><span data-i18n="hub.leden.s">Uw pas, boeken, betalen, onderweg en De Salon</span></span></a>
+    <a class="app" href="/apps/portaal.html"><span class="ic">🖥️</span><span><b data-i18n="hub.portaal">Ledenportaal</b><span data-i18n="hub.portaal.s">Hetzelfde lidmaatschap, op het grote scherm</span></span></a>
+  </div>
+
+  <h2 data-i18n="hub.staff">Voor personeel</h2>
+  <div class="grid">
+    <a class="app" href="/apps/personeel.html"><span class="ic">👤</span><span><b data-i18n="hub.pd">Personeels-app</b><span data-i18n="hub.pd.s">Rooster, taken, teamchat, walkie-talkie en SOS</span></span></a>
+  </div>
+
+  <h2 data-i18n="hub.employers">Voor werkgevers (partners)</h2>
+  <div class="grid">
+    <a class="app" href="/apps/partners.html"><span class="ic">🤝</span><span><b data-i18n="hub.partners">Partner-app</b><span data-i18n="hub.partners.s">Het volledige beheer, alle genres in een app</span></span></a>
+  </div>
+
+  <h2 data-i18n="hub.genres">Per genre</h2>
+  <div class="grid">
+    <a class="app" href="/apps/restaurant.html"><span class="ic">🍽️</span><span><b>RTG Restaurant</b><span data-i18n="hub.rest.s">Kassa, orders, tafels, menukaart</span></span></a>
+    <a class="app" href="/apps/bar.html"><span class="ic">🍸</span><span><b>RTG Bar &amp; Club</b><span data-i18n="hub.bar.s">Kassa, ophaalcodes, tafels</span></span></a>
+    <a class="app" href="/apps/hotel.html"><span class="ic">🏨</span><span><b>RTG Hotel</b><span data-i18n="hub.hotel.s">Kamers, housekeeping, gasten, minibar</span></span></a>
+    <a class="app" href="/apps/appartement.html"><span class="ic">🏡</span><span><b>RTG Appartement</b><span data-i18n="hub.apt.s">Digitale deuren, units, gasten</span></span></a>
+    <a class="app" href="/apps/taxi.html"><span class="ic">🚘</span><span><b>RTG Taxi</b><span data-i18n="hub.taxi.s">Ritten, live locatie, kassa</span></span></a>
+    <a class="app" href="/apps/privejet.html"><span class="ic">✈️</span><span><b>RTG Privéjet</b><span data-i18n="hub.jet.s">Vluchten, aanvragen, kassa</span></span></a>
+  </div>
+
+  <h2 data-i18n="hub.rtg">Voor RTG</h2>
+  <div class="grid">
+    <a class="app" href="/apps/backoffice.html"><span class="ic">🗝️</span><span><b data-i18n="hub.bo">Backoffice</b><span data-i18n="hub.bo.s">Prijzen, orders, verificaties, concierge, live</span></span></a>
+  </div>
+
+  <a class="home" href="/index.html" data-i18n="hub.home">← Naar de website</a>
+</div>
+<script>
+window.I18N = { en: {
+  'hub.title':'All apps, <em>in one place</em>.',
+  'hub.deck':'Every genre has its own app, all live-connected to the same RTG backend: members, staff, employers and each sector separately.',
+  'hub.members':'For members', 'hub.leden':'Member app', 'hub.leden.s':'Your pass, booking, payments, on the move and The Salon',
+  'hub.portaal':'Member portal', 'hub.portaal.s':'The same membership, on the big screen',
+  'hub.staff':'For staff', 'hub.pd':'Staff app', 'hub.pd.s':'Schedule, tasks, team chat, walkie-talkie and SOS',
+  'hub.employers':'For employers (partners)', 'hub.partners':'Partner app', 'hub.partners.s':'Full management, every genre in one app',
+  'hub.genres':'Per genre',
+  'hub.rest.s':'Register, orders, tables, menu', 'hub.bar.s':'Register, pickup codes, tables',
+  'hub.hotel.s':'Rooms, housekeeping, guests, minibar', 'hub.apt.s':'Smart doors, units, guests',
+  'hub.taxi.s':'Rides, live location, register', 'hub.jet.s':'Flights, requests, register',
+  'hub.rtg':'For RTG', 'hub.bo':'Back office', 'hub.bo.s':'Prices, orders, verifications, concierge, live',
+  'hub.home':'← To the website'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
+</body>
+</html>

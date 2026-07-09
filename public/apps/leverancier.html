@@ -581,9 +581,15 @@
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
   const SECTOR_DEF = {
-    horeca:  { label:'RTG Horeca',  labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️' },
-    hotel:   { label:'RTG Verblijf', labelEn:'RTG Stays',      codes:['HOSHI','SAKURA'],  icon:'🏨' },
-    vervoer: { label:'RTG Vervoer', labelEn:'RTG Transport',   codes:['MKKX','JETAG'],    icon:'🚘' }
+    restaurant:  { label:'RTG Restaurant',  labelEn:'RTG Restaurant', codes:['KIKUNOI'], icon:'🍽️' },
+    bar:         { label:'RTG Bar & Club',  labelEn:'RTG Bar & Club', codes:['PONTO'],   icon:'🍸' },
+    hotel:       { label:'RTG Hotel',       labelEn:'RTG Hotel',      codes:['HOSHI'],   icon:'🏨' },
+    appartement: { label:'RTG Appartement', labelEn:'RTG Apartment',  codes:['SAKURA'],  icon:'🏡' },
+    taxi:        { label:'RTG Taxi',        labelEn:'RTG Taxi',       codes:['MKKX'],    icon:'🚘' },
+    privejet:    { label:'RTG Privéjet',    labelEn:'RTG Private Jet', codes:['JETAG'],  icon:'✈️' },
+    horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
+    verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
+    vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG'],    icon:'🚘', legacy:true }
   };
   const SECTOR = (new URLSearchParams(location.search).get('sector') || '').toLowerCase();
   const SDEF = SECTOR_DEF[SECTOR] || null;
@@ -647,9 +653,10 @@
     ).join('') + (SDEF ? '' :
       '<div style="margin-top:0.9rem;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);">'+T('gate.sectorapps','Of open de app voor uw sector')+'</div>'+
       '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">'+
-        Object.keys(SECTOR_DEF).map(k => '<a class="obtn" style="text-decoration:none;" href="/apps/partner-'+k+'.html">'+SECTOR_DEF[k].icon+' '+(lang()==='en'?SECTOR_DEF[k].labelEn:SECTOR_DEF[k].label)+'</a>').join('')+
+        Object.keys(SECTOR_DEF).filter(k => !SECTOR_DEF[k].legacy).map(k => '<a class="obtn" style="text-decoration:none;" href="/apps/'+k+'.html">'+SECTOR_DEF[k].icon+' '+(lang()==='en'?SECTOR_DEF[k].labelEn:SECTOR_DEF[k].label)+'</a>').join('')+
       '</div>'+
-      '<a class="obtn" style="text-decoration:none;display:inline-block;margin-top:0.8rem;border-color:rgba(169,143,28,0.4);color:var(--gold);" href="/apps/personeel.html">👤 '+T('gate.staffapp','Werkt u hier? Open de personeels-app')+'</a>');
+      '<a class="obtn" style="text-decoration:none;display:inline-block;margin-top:0.8rem;border-color:rgba(169,143,28,0.4);color:var(--gold);" href="/apps/personeel.html">👤 '+T('gate.staffapp','Werkt u hier? Open de personeels-app')+'</a>'+
+      '<a class="obtn" style="text-decoration:none;display:inline-block;margin-top:0.8rem;margin-left:0.5rem;" href="/apps/">📱 '+T('gate.allapps','Alle RTG-apps')+'</a>');
     document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
     const lf = document.getElementById('loginForm');
     if (lf) lf.addEventListener('submit', e => {
@@ -1843,7 +1850,7 @@ window.I18N = { en: {
   'tab.team':'Team', 'sup.v.team':'Team', 'sup.v.team.sub':'Staff, who did what and the internal chat of this business.',
   'tab.rooms':'Rooms', 'sup.v.rooms':'Rooms', 'sup.v.rooms.sub':'Switch rooms on or off. Guests only see what is on, live.',
   'tab.kassa':'Register', 'sup.v.kassa':'Register', 'sup.v.kassa.sub':'Checkout, receipts and the day overview, tracked per staff member.',
-  'gate.sectorapps':'Or open the app for your sector', 'gate.staffapp':'Work here? Open the staff app',
+  'gate.sectorapps':'Or open the app for your genre', 'gate.staffapp':'Work here? Open the staff app', 'gate.allapps':'All RTG apps',
   'pos.pin':'Card', 'pos.cash':'Cash', 'pos.room':'To the room', 'pos.toroom':'To the room',
   'pos.nomenu':'Add dishes to the menu first; they become your register keys here.',
   'pos.newbon':'New receipt', 'pos.total':'Total', 'pos.clear':'Clear', 'pos.paypin':'Checkout, card',

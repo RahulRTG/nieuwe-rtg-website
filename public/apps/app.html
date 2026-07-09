@@ -739,6 +739,7 @@
         <div class="card" id="homeTrip"></div>
         <div class="card" id="homePay"></div>
         <div class="card" id="homeSalon"></div>
+        <div class="card" id="homeCv"></div>
       </div>
 
       <div class="view" data-view="reizen">
@@ -810,6 +811,25 @@
     </div>
     <div class="ms-body" id="msBody"></div>
     <div class="ms-foot" id="msFoot"></div>
+  </div>
+
+  <!-- cv-builder: solliciteer met uw RTG-cv bij elke partner -->
+  <div id="cv-scrim" class="menu-scrim"></div>
+  <div id="cv-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b data-i18n="cv.h">Uw RTG-cv</b><span data-i18n="cv.sub">Eenmaal maken, overal mee solliciteren</span></div>
+      <button class="ms-close" id="cvClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body" id="cvBody">
+      <div class="field" style="margin-top:0.6rem;"><label data-i18n="cv.name">Uw naam</label><input id="cvName"></div>
+      <div class="field"><label data-i18n="cv.contact">Telefoon of e-mail</label><input id="cvContact"></div>
+      <div class="field"><label data-i18n="cv.headline">Gewenste functie</label><input id="cvHeadline" placeholder="Bijv. Bediening of Receptie" data-i18n-ph="cv.headline.ph"></div>
+      <div class="field"><label data-i18n="cv.exp">Werkervaring (een regel per baan)</label><textarea id="cvExp" style="min-height:90px;" placeholder="Bediening bij De Zwaan (2022-2025)&#10;Runner bij Hotel Astoria (2020-2022)" data-i18n-ph="cv.exp.ph"></textarea></div>
+      <div class="field"><label data-i18n="cv.skills">Vaardigheden (komma's)</label><input id="cvSkills" placeholder="wijnkennis, kassa, gastvrijheid" data-i18n-ph="cv.skills.ph"></div>
+      <div class="field"><label data-i18n="cv.lang">Talen (komma's)</label><input id="cvLang" placeholder="Nederlands, Engels"></div>
+      <div class="field"><label data-i18n="cv.about">Over u (kort)</label><textarea id="cvAbout" style="min-height:70px;"></textarea></div>
+    </div>
+    <div class="ms-foot"><button class="ms-order" id="cvSave" data-i18n="cv.save">Bewaar mijn cv</button></div>
   </div>
 
   <!-- gastchat met een partner (roomservice, eigenaar) -->
@@ -1142,6 +1162,7 @@
     renderAI();
     renderSalon();
     renderTerPlaatse();
+    loadCv();
     openTab('home');
   }
 
@@ -1402,8 +1423,16 @@
         s.rooms.map(r => '<div class="ms-room"><div class="rt"><b>' + r.name + '</b>' + (r.desc ? '<span>' + r.desc + '</span>' : '') + '</div><div class="rp">' + eur(r.price) + ' <span style="font-size:0.62rem;color:var(--soft);">' + T('app.ms.pernight','p.n.') + '</span></div></div>').join('') +
         '<div style="margin:0.5rem 0 0.6rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote','Boeken gaat via uw concierge of Butler AI, tegen nettoprijs.') + '</div>';
     }
+    const funcs = APPLY_FUNCS[s.type] || [];
+    const applyBlock = funcs.length
+      ? '<div class="ms-cat">' + T('cv.workat','Werken bij') + ' ' + s.name + '</div>' +
+        '<div style="display:flex;gap:0.5rem;align-items:center;padding:0.3rem 0 0.9rem;">' +
+        '<select id="apFunc2" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.86rem;color:var(--txt);outline:none;">' +
+        funcs.map(f => '<option>' + f + '</option>').join('') + '</select>' +
+        '<button class="vbtn" id="apGo2">' + T('cv.apply','Solliciteer') + '</button></div>'
+      : '';
     const cats = [...new Set(m.map(x => x.cat))];
-    $('#msBody').innerHTML = head + cats.map(c =>
+    $('#msBody').innerHTML = head + applyBlock + cats.map(c =>
       '<div class="ms-cat">' + c + '</div>' + m.filter(x => x.cat === c).map(x => {
         const q = menuState.qty[x.id] || 0;
         return '<div class="ms-item" data-id="' + x.id + '">' +
@@ -1416,6 +1445,8 @@
           '</div></div>';
       }).join('')
     ).join('');
+    const apGo = $('#apGo2');
+    if (apGo) apGo.addEventListener('click', () => memberApply(menuState.supplier.code, $('#apFunc2').value, ''));
     $('#msBody').querySelectorAll('.ms-item').forEach(el => {
       const id = el.dataset.id;
       el.querySelector('.js-plus').addEventListener('click', () => { menuState.qty[id] = (menuState.qty[id]||0)+1; renderMenuSheet(); });
@@ -1459,6 +1490,68 @@
 
   $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
   $('#menu-scrim').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
+
+  /* ---------- cv-builder + solliciteren via RTG ---------- */
+  let myCv = null, myCvReady = false;
+  const APPLY_FUNCS = {
+    restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
+    bar:        ['Bediening','Bar','Keuken','Security'],
+    club:       ['Bediening','Bar','Security'],
+    hotel:      ['Receptie','Housekeeping','Roomservice','Onderhoud','Security'],
+    apartment:  ['Beheer','Housekeeping','Onderhoud'],
+    taxi:       ['Taxi centrale','Chauffeur'],
+    jet:        ['Operations','Crew','Piloot']
+  };
+  async function loadCv(){
+    if (!API.live) return;
+    try { const d = await API.call('/cv/get'); myCv = d.cv; myCvReady = d.ready; renderCvCard(); } catch(e){}
+  }
+  function renderCvCard(){
+    const el = $('#homeCv'); if (!el) return;
+    el.innerHTML = '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('cv.card.k','Werken via RTG')+'</div>'+
+      (myCvReady
+        ? '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">✓ '+T('cv.card.ready','Uw cv staat klaar. Solliciteer bij elke RTG-partner in een tik, via Ter plaatse.')+'</div>'
+        : '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('cv.card.build','Maak eenmalig uw cv met de cv-builder en solliciteer daarna bij elke RTG-partner op dezelfde manier.')+'</div>')+
+      '<button class="vbtn" style="margin-top:0.8rem;" id="cvOpen">'+(myCvReady?T('cv.card.edit','Bewerk mijn cv'):T('cv.card.make','Maak mijn cv'))+'</button>';
+    $('#cvOpen').addEventListener('click', openCvSheet);
+  }
+  function openCvSheet(){
+    const c = myCv || {};
+    $('#cvName').value = c.name || (user && user.full) || '';
+    $('#cvContact').value = c.contact || (user && (user.phone || user.email)) || '';
+    $('#cvHeadline').value = c.headline || '';
+    $('#cvExp').value = (c.experience || []).join('\n');
+    $('#cvSkills').value = (c.skills || []).join(', ');
+    $('#cvLang').value = (c.languages || []).join(', ');
+    $('#cvAbout').value = c.about || '';
+    $('#cv-sheet').classList.add('open');
+    $('#cv-scrim').classList.add('open');
+  }
+  function closeCvSheet(){ $('#cv-sheet').classList.remove('open'); $('#cv-scrim').classList.remove('open'); }
+  $('#cvClose').addEventListener('click', closeCvSheet);
+  $('#cv-scrim').addEventListener('click', closeCvSheet);
+  $('#cvSave').addEventListener('click', async () => {
+    try {
+      const d = await API.call('/cv/save', {
+        name: $('#cvName').value, contact: $('#cvContact').value, headline: $('#cvHeadline').value,
+        experience: $('#cvExp').value, skills: $('#cvSkills').value, languages: $('#cvLang').value, about: $('#cvAbout').value
+      });
+      myCv = d.cv; myCvReady = d.ready;
+      toast(d.ready ? T('cv.saved','Cv bewaard. U kunt nu overal solliciteren.') : T('cv.savedpart','Bewaard. Vul ervaring of vaardigheden aan om te kunnen solliciteren.'));
+      renderCvCard(); closeCvSheet();
+    } catch(e){ toast(e.message); }
+  });
+  async function memberApply(code, func, note){
+    try {
+      await API.call('/member/apply', { supplierCode: code, func, note });
+      toast(T('cv.applied','Sollicitatie verstuurd, met uw RTG-cv erbij.'));
+      return true;
+    } catch(e){
+      toast(e.message);
+      if (/cv/i.test(e.message)) openCvSheet();
+      return false;
+    }
+  }
 
   /* ---------- gastchat met een partner ---------- */
   let pchat = null; // { code, name, dept, depts }
@@ -1970,6 +2063,16 @@ window.I18N = { en: {
   'live.door':'Open the door', 'live.dooropen':'is open. It locks itself after', 'live.sec':'seconds.',
   'app.pc.sub':'Direct contact, under your codename', 'app.pc.ph':'Type a message', 'app.pc.send':'Send',
   'app.pc.empty':'Ask the team directly. Room service, a request to the owner, or just arranging something.',
+  'cv.h':'Your RTG resume', 'cv.sub':'Build once, apply everywhere',
+  'cv.name':'Your name', 'cv.contact':'Phone or email', 'cv.headline':'Desired position', 'cv.headline.ph':'E.g. Service or Reception',
+  'cv.exp':'Work experience (one line per job)', 'cv.exp.ph':'Service at De Zwaan (2022-2025)\nRunner at Hotel Astoria (2020-2022)',
+  'cv.skills':'Skills (commas)', 'cv.skills.ph':'wine knowledge, register, hospitality', 'cv.lang':'Languages (commas)', 'cv.about':'About you (short)',
+  'cv.save':'Save my resume', 'cv.saved':'Resume saved. You can now apply anywhere.',
+  'cv.savedpart':'Saved. Add experience or skills to be able to apply.',
+  'cv.card.k':'Work via RTG', 'cv.card.ready':'Your resume is ready. Apply at any RTG partner in one tap, via On site.',
+  'cv.card.build':'Build your resume once with the resume builder, then apply at every RTG partner the same way.',
+  'cv.card.edit':'Edit my resume', 'cv.card.make':'Build my resume',
+  'cv.workat':'Work at', 'cv.apply':'Apply', 'cv.applied':'Application sent, with your RTG resume attached.',
   'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
   'app.roomsfree':'room(s) available', 'app.tp.view':'View',
   'app.ms.closed':'Orders are temporarily closed. The menu remains on view.',

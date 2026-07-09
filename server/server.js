@@ -176,6 +176,7 @@ function initRealtime() {
   if (!db.data.posSales) db.data.posSales = {};                   // kassaverkopen per bedrijf
   if (!db.data.guestChats) db.data.guestChats = {};               // gastchats: lid <-> partner (roomservice, eigenaar)
   if (!db.data.applications) db.data.applications = {};            // sollicitaties per bedrijf
+  if (!db.data.cvs) db.data.cvs = {};                               // cv per lid (cv-builder in de leden-app)
   if (webpush) {
     if (!db.data.vapid) {
       db.data.vapid = webpush.generateVAPIDKeys();
@@ -1455,6 +1456,7 @@ app.post('/api/supplier/apply', (req, res) => {
   save();
   notifySupplier(s.code, { icon: '📝', title: 'Nieuwe sollicitatie', body: name + ' solliciteert als ' + func + '.' });
   sseToSupplier(s.code, 'sync', { scope: 'team' });
+  sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
 });
 app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
@@ -1468,12 +1470,68 @@ app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
     save();
     logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
     sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+    sseToOffice('sync', { scope: 'team' });
     return res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
   }
   a.status = 'afgewezen';
   save();
   logActivity(req.supplier.code, req.actor, 'wees de sollicitatie van ' + a.name + ' af');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  res.json({ ok: true });
+});
+
+/* ---- cv-builder (leden-app): het cv is de sleutel tot solliciteren ---- */
+function cvReady(cv) {
+  return !!(cv && cv.name && cv.contact && ((cv.experience || []).length || (cv.skills || []).length));
+}
+app.post('/api/cv/get', auth, (req, res) => {
+  const cv = db.data.cvs[req.session.key] || null;
+  res.json({ cv, ready: cvReady(cv) });
+});
+app.post('/api/cv/save', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const b = req.body || {};
+  const cv = {
+    name: String(b.name || '').trim().slice(0, 60),
+    contact: String(b.contact || '').trim().slice(0, 80),
+    headline: String(b.headline || '').trim().slice(0, 80),
+    experience: String(b.experience || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 12),
+    skills: String(b.skills || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 15),
+    languages: String(b.languages || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 8),
+    about: String(b.about || '').trim().slice(0, 400),
+    updatedAt: new Date().toISOString()
+  };
+  if (!cv.name || !cv.contact) return res.status(400).json({ error: 'Vul minimaal uw naam en contactgegevens in.' });
+  db.data.cvs[req.session.key] = cv;
+  save();
+  res.json({ ok: true, cv, ready: cvReady(cv) });
+});
+
+// RTG-lid solliciteert bij een partner; kan pas met een afgerond cv
+app.post('/api/member/apply', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const cv = db.data.cvs[req.session.key];
+  if (!cvReady(cv)) return res.status(409).json({ error: 'Maak eerst uw cv af in de cv-builder; daarmee solliciteert u bij elke RTG-partner in een tik.', needCv: true });
+  const func = String(req.body.func || '').trim().slice(0, 40);
+  if (!func) return res.status(400).json({ error: 'Kies een functie.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    name: cv.name, func, contact: cv.contact,
+    note: String(req.body.note || '').trim().slice(0, 400),
+    viaRTG: true, codename,
+    cv: { headline: cv.headline, experience: cv.experience, skills: cv.skills, languages: cv.languages, about: cv.about },
+    status: 'nieuw', at: new Date().toISOString()
+  };
+  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+  list.unshift(entry);
+  db.data.applications[s.code] = list.slice(0, 100);
+  save();
+  notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTG', body: cv.name + ' (RTG-lid) solliciteert als ' + func + ', met cv.' });
+  sseToSupplier(s.code, 'sync', { scope: 'team' });
+  sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
 });
 
@@ -2156,11 +2214,18 @@ function officeState() {
       updatedAt: L.updatedAt
     };
   }).filter(Boolean);
+  const applications = [];
+  for (const [code, list] of Object.entries(db.data.applications || {})) {
+    const sup = findSupplier(code);
+    for (const a of list) applications.push({ company: sup ? sup.name : code, name: a.name, func: a.func, status: a.status, viaRTG: !!a.viaRTG, at: a.at });
+  }
+  applications.sort((x, y) => (y.at || '').localeCompare(x.at || ''));
   return {
     prices: db.data.supplierPrices.slice(0, 60),
     orders: db.data.orders.slice(0, 60),
     rides: db.data.rides.slice(0, 60),
     live,
+    applications: applications.slice(0, 40),
     suppliers: db.data.suppliers.map(publicSupplier)
   };
 }

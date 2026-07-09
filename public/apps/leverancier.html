@@ -1741,11 +1741,24 @@
     const apps = (state.applications || []).filter(x => x.status === 'nieuw');
     const decided = (state.applications || []).filter(x => x.status !== 'nieuw').slice(0, 4);
     html += '<div class="card"><div class="tt-h">'+T('ap.h','Sollicitaties')+(apps.length?' <i class="gc-unread">'+apps.length+'</i>':'')+'</div>';
+    const apCv = x => {
+      if (!x.viaRTG || !x.cv) return '';
+      const c = x.cv, parts = [];
+      if (c.headline) parts.push('<b style="color:var(--txt);">'+c.headline+'</b>');
+      if (c.experience && c.experience.length) parts.push(c.experience.slice(0,3).join(' · '));
+      if (c.skills && c.skills.length) parts.push(T('ap.skills','Vaardigheden')+': '+c.skills.join(', '));
+      if (c.languages) parts.push(T('ap.langs','Talen')+': '+c.languages);
+      if (!parts.length) return '';
+      return '<div style="flex-basis:100%;font-size:0.72rem;color:var(--muted);line-height:1.5;margin-top:0.35rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;">📄 '+parts.join('<br>')+'</div>';
+    };
     html += apps.length ? apps.map(x =>
-      '<div class="tk-row"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+x.contact+(x.note?' · "'+x.note.slice(0,60)+'"':'')+' · '+timeAgo(x.at)+'</span></div>'+
+      '<div class="tk-row" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+
+      (x.viaRTG?' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</i>':'')+
+      '</b><span>'+x.contact+(x.note?' · "'+x.note.slice(0,60)+'"':'')+' · '+timeAgo(x.at)+'</span></div>'+
       (a.manager ? '<button class="obtn primary" data-aphire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-apno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button>' : '')+
+      apCv(x)+
       '</div>'
-    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.5rem 0;">'+T('ap.none','Geen open sollicitaties. Kandidaten solliciteren via het startscherm van deze app.')+'</div>';
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.5rem 0;">'+T('ap.none','Geen open sollicitaties. Kandidaten solliciteren via het startscherm van deze app, RTG-leden via de leden-app met hun cv.')+'</div>';
     html += decided.map(x => '<div class="tk-row done"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+x.status+'</span></div></div>').join('');
     html += '</div>';
 
@@ -2049,7 +2062,8 @@ window.I18N = { en: {
   'sp.a.send':'Send application', 'sp.a.fill':'Enter your name and a phone number or email.',
   'sp.a.sent':'Sent. ', 'sp.a.sent2':'will contact you.',
   'ap.h':'Applications', 'ap.hire':'Hire', 'ap.reject':'Reject', 'ap.hired':'Hired. PIN: ',
-  'ap.none':'No open applications. Candidates apply via the start screen of this app.',
+  'ap.none':'No open applications. Candidates apply via the start screen of this app, RTG members via the member app with their CV.',
+  'ap.skills':'Skills', 'ap.langs':'Languages',
   'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',

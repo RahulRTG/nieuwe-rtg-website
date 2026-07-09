@@ -139,6 +139,10 @@
         <div class="rows" id="concierge"></div>
       </div>
     </div>
+    <div class="panel" style="margin-top:1.5rem;">
+      <h2 data-i18n="panel.apps">Sollicitaties bij partners</h2>
+      <div class="rows" id="appsList"></div>
+    </div>
   </div>
   <div class="doc-scrim" id="docScrim"><img id="docImg" alt="Document"></div>
   <div class="doc-scrim conv-scrim" id="convScrim">
@@ -279,6 +283,16 @@
         '<div class="sub">'+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('bo.items','item(s)')+' · '+timeAgo(o.at)+' · '+(o.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
         '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><span class="pill '+pc+'">'+tStatus(o.status)+'</span></div></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
+
+    const apps = state.applications || [];
+    $('#appsList').innerHTML = apps.length ? apps.map(x => {
+      const pc = x.status==='nieuw'?'nieuw':x.status==='aangenomen'?'klaar':'bereiding';
+      const st = x.status==='nieuw'?T('bo.ap.new','nieuw'):x.status==='aangenomen'?T('bo.ap.hired','aangenomen'):T('bo.ap.rejected','afgewezen');
+      return '<div class="row"><div class="r1"><div><div class="nm">'+x.name+' <span style="color:var(--soft);font-weight:400;">· '+x.func+'</span>'+
+        (x.viaRTG?' <span style="font-size:0.58rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</span>':'')+'</div>'+
+        '<div class="sub">'+x.company+' · '+timeAgo(x.at)+'</div></div>'+
+        '<span class="pill '+pc+'">'+st+'</span></div></div>';
+    }).join('') : '<div class="empty">'+T('bo.noapps','Nog geen sollicitaties. Kandidaten solliciteren via de partner-apps, RTG-leden via de leden-app met hun cv.')+'</div>';
   }
 
   function stream(){
@@ -308,6 +322,8 @@ window.I18N = { en: {
   'bo.noprices':'No prices yet. As soon as a partner submits a dynamic price, it appears here live.',
   'bo.noorders':'No orders or rides via partners yet.',
   'bo.guest':'guest', 'bo.items':'item(s)', 'bo.paid':'paid', 'bo.unpaid':'unpaid',
+  'panel.apps':'Applications at partners', 'bo.ap.new':'new', 'bo.ap.hired':'hired', 'bo.ap.rejected':'rejected',
+  'bo.noapps':'No applications yet. Candidates apply via the partner apps, RTG members via the member app with their CV.',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.h':' h', 't.d':' d'
 } };
 </script>

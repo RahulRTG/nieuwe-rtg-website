@@ -122,6 +122,22 @@
   .ph-pick img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid transparent;flex-shrink:0;cursor:pointer;}
   .ph-pick img.sel{border-color:var(--gold);}
 
+  /* deuren */
+  .door-row{display:flex;align-items:center;gap:0.8rem;padding:0.75rem 0;border-bottom:1px solid var(--line);}
+  .door-row:last-of-type{border-bottom:none;}
+  .door-row .dl{font-size:1.3rem;flex-shrink:0;}
+  .door-row .dt{flex:1;min-width:0;}
+  .door-row .dt b{display:block;font-size:0.88rem;font-weight:600;}
+  .door-row .dt span{font-size:0.7rem;color:var(--soft);}
+  .door-row.open .dt span{color:var(--green);}
+  .door-row.open{background:rgba(76,154,117,0.06);border-radius:10px;padding-left:0.5rem;padding-right:0.5rem;}
+
+  /* gastenkaart */
+  .gmap{position:relative;height:140px;margin:0.8rem 0 0.4rem;border-radius:14px;border:1px solid var(--line);background:radial-gradient(circle at 40% 35%,rgba(194,58,94,0.07),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),#100e0d;overflow:hidden;}
+  .gmap .mk{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:1rem;transition:left 0.9s ease,top 0.9s ease;}
+  .gmap .mk .lbl{font-size:0.52rem;color:var(--muted);background:rgba(0,0,0,0.5);padding:1px 4px;border-radius:4px;white-space:nowrap;}
+  .gmap .gpin{width:13px;height:13px;border-radius:50%;background:var(--burgundy);box-shadow:0 0 0 5px rgba(194,58,94,0.25);}
+
   /* kassa */
   .pos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;margin-top:0.7rem;}
   .pos-key{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:0.8rem 0.9rem;text-align:left;color:var(--txt);}
@@ -368,6 +384,16 @@
         <p class="sub" data-i18n="sup.v.kassa.sub">Afrekenen, bonnen en het dagoverzicht, per medewerker bijgehouden.</p>
         <div id="kassaWrap"></div>
       </div>
+      <div class="view" data-view="doors">
+        <h2 data-i18n="sup.v.doors">Deuren</h2>
+        <p class="sub" data-i18n="sup.v.doors.sub">Open of vergrendel op afstand. Een geopende deur vergrendelt zichzelf na 10 seconden.</p>
+        <div id="doorsWrap"></div>
+      </div>
+      <div class="view" data-view="gasten">
+        <h2 data-i18n="sup.v.gasten">Gasten</h2>
+        <p class="sub" data-i18n="sup.v.gasten.sub">Verbind met een gast die onderweg is en volg de aankomst live.</p>
+        <div id="gastenWrap"></div>
+      </div>
       <div class="view" data-view="rooms">
         <h2 data-i18n="sup.v.rooms">Kamers</h2>
         <p class="sub" data-i18n="sup.v.rooms.sub">Zet kamers aan of uit. Gasten zien alleen wat aan staat, live.</p>
@@ -409,6 +435,7 @@
     { code:'KIKUNOI', name:'Kikunoi Honten', type:'Restaurant', icon:'🍽️', sub:'Restaurant · Kyoto' },
     { code:'PONTO',   name:'Bar Pontocho',    type:'Bar',        icon:'🍸', sub:'Bar · Kyoto' },
     { code:'HOSHI',   name:'Hoshinoya Kyoto', type:'Hotel',      icon:'🏨', sub:'Hotel · Kyoto' },
+    { code:'SAKURA',  name:'Sakura Machiya Residence', type:'Appartement', icon:'🏡', sub:'Appartement · Kyoto' },
     { code:'MKKX',    name:'Kyoto Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Kyoto' },
     { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' }
   ];
@@ -416,7 +443,7 @@
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
   const SECTOR_DEF = {
     horeca:  { label:'RTG Horeca',  labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️' },
-    hotel:   { label:'RTG Hotel',   labelEn:'RTG Hotel',       codes:['HOSHI'],           icon:'🏨' },
+    hotel:   { label:'RTG Verblijf', labelEn:'RTG Stays',      codes:['HOSHI','SAKURA'],  icon:'🏨' },
     vervoer: { label:'RTG Vervoer', labelEn:'RTG Transport',   codes:['MKKX','JETAG'],    icon:'🚘' }
   };
   const SECTOR = (new URLSearchParams(location.search).get('sector') || '').toLowerCase();
@@ -430,6 +457,8 @@
     price:    { label:'Prijs',     svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 2-2.5 1.5-2.5 3.5M12 16v.5"/>', cap:'pricing' },
     kassa:    { label:'Kassa',     svg:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M7 13h2M11 13h2M15 13h2M7 16.5h2M11 16.5h2M15 16.5h2"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
+    doors:    { label:'Deuren',    svg:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><circle cx="15" cy="12" r="1.2"/><path d="M5 21h14"/>', cap:'doors' },
+    gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>', cap:'bookings' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
     page:     { label:'Pagina',    svg:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6"/>' },
     team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' }
@@ -588,7 +617,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderPage(); renderTeam();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderDoors(); renderGasten(); renderPage(); renderTeam();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -942,6 +971,77 @@
     });
   }
 
+  // ---- slimme deuren (appartementen) ----
+  function renderDoors(){
+    const el = $('#doorsWrap'); if (!el) return;
+    const doors = state.doors;
+    if (!Array.isArray(doors)){ el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="card">'+
+      (doors.length ? doors.map(d =>
+        '<div class="door-row'+(d.locked?'':' open')+'">'+
+          '<span class="dl">'+(d.locked?'🔒':'🔓')+'</span>'+
+          '<div class="dt"><b>'+d.name+'</b><span>'+(d.locked?T('door.locked','Vergrendeld'):T('door.open','OPEN, vergrendelt zichzelf'))+
+            (d.lastBy?' · '+T('door.lastby','laatst:')+' '+d.lastBy+(d.lastAt?', '+timeAgo(d.lastAt):''):'')+'</span></div>'+
+          '<button class="obtn'+(d.locked?' primary':' warn')+'" data-door="'+d.id+'">'+(d.locked?T('door.openbtn','Open 10 sec'):T('door.lockbtn','Vergrendel nu'))+'</button>'+
+        '</div>'
+      ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('door.none','Nog geen digitale deuren gekoppeld.')+'</div>')+
+      '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('door.note','Elke opening komt in de activiteitenfeed: wie, welke deur, wanneer. Gearriveerde gasten kunnen de voordeur zelf openen via hun app.')+'</div>'+
+    '</div>';
+    el.querySelectorAll('[data-door]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/door/toggle', { id: b.dataset.door }); await refresh(); openTab('doors'); }
+      catch(e){ toast(e.message); }
+    }));
+  }
+
+  // ---- gasten live volgen (hotel/appartement) ----
+  function renderGasten(){
+    const el = $('#gastenWrap'); if (!el) return;
+    if (!has('bookings')){ el.innerHTML = ''; return; }
+    const guests = state.guests || [];
+    const nearby = state.nearbyGuests || [];
+
+    // kaartje: het eigen pand + verbonden gasten met positie
+    const pts = [];
+    if (S.loc) pts.push({ lat:S.loc.lat, lng:S.loc.lng, me:true });
+    guests.forEach(g => { if (g.loc) pts.push({ lat:g.loc.lat, lng:g.loc.lng, name:g.codename }); });
+    let map = '';
+    if (pts.length > 1){
+      const lats = pts.map(p=>p.lat), lngs = pts.map(p=>p.lng);
+      let minLat=Math.min(...lats), maxLat=Math.max(...lats), minLng=Math.min(...lngs), maxLng=Math.max(...lngs);
+      let dLat=(maxLat-minLat)||0.002, dLng=(maxLng-minLng)||0.002;
+      minLat-=dLat*0.2; maxLat+=dLat*0.2; minLng-=dLng*0.2; maxLng+=dLng*0.2;
+      dLat=maxLat-minLat; dLng=maxLng-minLng;
+      map = '<div class="gmap">'+pts.map(p=>{
+        const x=((p.lng-minLng)/dLng)*100, y=(1-(p.lat-minLat)/dLat)*100;
+        return '<div class="mk" style="left:'+x.toFixed(1)+'%;top:'+y.toFixed(1)+'%;">'+
+          (p.me?'<div>'+S.icon+'</div>':'<div class="gpin"></div>')+
+          '<div class="lbl">'+(p.me?S.name.split(' ')[0]:p.name)+'</div></div>';
+      }).join('')+'</div>';
+    }
+
+    let html = '<div class="card"><div class="tt-h">'+T('gst.connected','Verbonden gasten')+'</div>'+map+
+      (guests.length ? guests.map(g =>
+        '<div class="guest-row"><span class="cn">'+g.codename+'</span>'+
+        (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>'
+          : g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>'
+          : '<span class="ge">'+T('sup.enrouteshort','onderweg')+'</span>')+'</div>'
+      ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('gst.none','Nog geen verbonden gasten.')+'</div>')+'</div>';
+
+    html += '<div class="card"><div class="tt-h">'+T('gst.nearby','Nu onderweg (nog niet verbonden)')+'</div>'+
+      (nearby.length ? nearby.map(g =>
+        '<div class="guest-row"><span class="cn">'+g.codename+'</span>'+
+        '<div style="display:flex;align-items:center;gap:0.6rem;">'+(g.dest?'<span class="ge">'+T('gst.to','naar')+' '+g.dest+'</span>':'')+
+        '<button class="obtn primary" data-connect="'+g.codename.replace(/"/g,'&quot;')+'">'+T('gst.connect','Verbind')+'</button></div></div>'
+      ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('gst.nonearby','Er is nu niemand live onderweg.')+'</div>')+
+      '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('gst.note','Verbinden meldt het bij de gast: u volgt de aankomst om alles klaar te zetten. U ziet daarna live de positie en aankomsttijd.')+'</div></div>';
+
+    el.innerHTML = html;
+    el.querySelectorAll('[data-connect]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/guest/connect', { codename: b.dataset.connect }); toast(T('gst.done','Verbonden. De gast is op de hoogte.')); await refresh(); openTab('gasten'); }
+      catch(e){ toast(e.message); }
+    }));
+  }
+
   // ---- pagina: foto's + publiceren op De Salon ----
   function fileToDataURL(file, cb){
     const reader = new FileReader();
@@ -1151,6 +1251,15 @@ window.I18N = { en: {
   'pos.codeph':'E.g. TBS9', 'pos.redeem':'Redeem', 'pos.entercode':'Enter a pickup code.',
   'pos.waspaid':'already paid in the app', 'pos.chargedrtg':'charged via RTG', 'pos.redeemed':'Handed out to',
   'pos.openrooms':'Open room folios', 'pos.posts':'item(s)', 'pos.checkoutpin':'Check-out, card', 'pos.checkedout':'Checked out:',
+  'tab.doors':'Doors', 'sup.v.doors':'Doors', 'sup.v.doors.sub':'Open or lock remotely. An opened door locks itself after 10 seconds.',
+  'door.locked':'Locked', 'door.open':'OPEN, locking itself', 'door.lastby':'last:', 'door.openbtn':'Open 10 sec', 'door.lockbtn':'Lock now',
+  'door.none':'No smart doors linked yet.',
+  'door.note':'Every opening lands in the activity feed: who, which door, when. Arrived guests can open the front door themselves via their app.',
+  'tab.gasten':'Guests', 'sup.v.gasten':'Guests', 'sup.v.gasten.sub':'Connect with a guest on their way and follow the arrival live.',
+  'gst.connected':'Connected guests', 'gst.none':'No connected guests yet.',
+  'gst.nearby':'On the move now (not yet connected)', 'gst.nonearby':'Nobody is live on the move right now.',
+  'gst.to':'to', 'gst.connect':'Connect', 'gst.done':'Connected. The guest has been notified.',
+  'gst.note':'Connecting notifies the guest: you follow the arrival to have everything ready. You then see the live position and arrival time.',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

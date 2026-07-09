@@ -39,6 +39,7 @@ if (accounts.count() === 0) {
 
 // Demo-personeel per leverancier: een manager (PIN 1234) en een medewerker (PIN 5678).
 const STAFF_SEED = {
+  SAKURA: [['Naomi Sato', 'manager'], ['Ren Watanabe', 'staff']],
   KIKUNOI: [['Yuki Tanaka', 'manager'], ['Kenji Mori', 'staff']],
   PONTO: [['Aiko Sato', 'manager'], ['Ren Kimura', 'staff']],
   HOSHI: [['Haruki Ito', 'manager'], ['Mei Kobayashi', 'staff']],
@@ -129,6 +130,27 @@ function initRealtime() {
   for (const s of db.data.suppliers) {
     if (!Array.isArray(s.photos)) s.photos = [];
     if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
+    if (s.type === 'apartment' && !Array.isArray(s.doors)) s.doors = [];
+  }
+  // oudere databases: appartement-partner en doors-cap toevoegen
+  if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
+    db.data.supplierTypes.apartment.caps.splice(1, 0, 'doors');
+  if (!db.data.suppliers.find(s => s.code === 'SAKURA')) {
+    db.data.suppliers.push({
+      code: 'SAKURA', name: 'Sakura Machiya Residence', type: 'apartment', city: 'Kyoto',
+      loc: { lat: 35.003, lng: 135.775, label: 'Gion, Kyoto' }, rate: 0.12,
+      menu: [], photos: [],
+      rooms: [
+        { id: 'a1', name: 'Machiya 1, straatzijde', desc: '65 m², eigen entree, tuinbad', price: 430, available: true },
+        { id: 'a2', name: 'Machiya 2, tuinzijde', desc: '80 m², twee slaapkamers, terras', price: 560, available: true }
+      ],
+      doors: [
+        { id: 'd1', name: 'Voordeur (straat)', locked: true },
+        { id: 'd2', name: 'Machiya 1', locked: true },
+        { id: 'd3', name: 'Machiya 2', locked: true },
+        { id: 'd4', name: 'Fietsenberging', locked: true }
+      ]
+    });
   }
   if (!db.data.posSales) db.data.posSales = {};                   // kassaverkopen per bedrijf
   if (webpush) {
@@ -752,8 +774,13 @@ function supplierState(s, actor) {
   return {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
     rooms: s.rooms || null,
+    doors: s.doors || null,
     photos: s.photos || [],
     pos: posDay(s.code),
+    // leden die nu live onderweg zijn maar nog niet met dit bedrijf verbonden
+    nearbyGuests: Object.values(db.data.live)
+      .filter(L => L.active && !connectedSupplierCodes(L.key).includes(s.code))
+      .map(L => { const d = L.destCode ? findSupplier(L.destCode) : null; return { codename: L.codename, dest: d ? d.name : null }; }),
     menu: s.menu || [],
     orders: db.data.orders.filter(o => o.supplierCode === s.code).map(o => {
       const L = db.data.live[o.customerKey || o.customerTier];
@@ -1040,6 +1067,74 @@ app.post('/api/supplier/pos/checkout', supplierAuth, (req, res) => {
   res.json({ ok: true, sale });
 });
 
+/* ---- slimme deuren (appartementen): op afstand openen via de app ----
+   Openen is tijdelijk: na 10 seconden vergrendelt de deur zichzelf weer,
+   zoals een echt smart lock. Elke handeling komt in de activiteitenfeed. */
+const DOOR_RELOCK_MS = 10000;
+function unlockDoor(s, door, who) {
+  door.locked = false;
+  door.lastBy = who;
+  door.lastAt = new Date().toISOString();
+  save();
+  sseToSupplier(s.code, 'sync', { scope: 'doors' });
+  setTimeout(() => {
+    const cur = (s.doors || []).find(d => d.id === door.id);
+    if (cur && !cur.locked) {
+      cur.locked = true;
+      save();
+      sseToSupplier(s.code, 'sync', { scope: 'doors' });
+    }
+  }, DOOR_RELOCK_MS);
+}
+
+app.post('/api/supplier/door/toggle', supplierAuth, (req, res) => {
+  const door = (req.supplier.doors || []).find(d => d.id === req.body.id);
+  if (!door) return res.status(404).json({ error: 'Deur niet gevonden.' });
+  if (door.locked) {
+    unlockDoor(req.supplier, door, req.actor.name);
+    logActivity(req.supplier.code, req.actor, 'opende "' + door.name + '" op afstand');
+  } else {
+    door.locked = true;
+    door.lastBy = req.actor.name;
+    door.lastAt = new Date().toISOString();
+    save();
+    logActivity(req.supplier.code, req.actor, 'vergrendelde "' + door.name + '"');
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'doors' });
+  }
+  res.json({ ok: true, doors: req.supplier.doors });
+});
+
+// De gearriveerde gast opent de voordeur vanuit de leden-app (digitale sleutel).
+app.post('/api/live/door', auth, (req, res) => {
+  const L = db.data.live[req.session.key];
+  if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
+  const dest = L.destCode ? findSupplier(L.destCode) : null;
+  if (!dest || !(dest.doors || []).length) return res.status(404).json({ error: 'Deze bestemming heeft geen digitale deuren.' });
+  if (!L.arrived) return res.status(409).json({ error: 'De deur opent pas als u bent aangekomen.' });
+  const door = dest.doors[0];
+  unlockDoor(dest, door, L.codename);
+  logActivity(dest.code, { name: L.codename }, 'gast opende "' + door.name + '" via de app');
+  notifySupplier(dest.code, { icon: '🔓', title: 'Deur geopend', body: L.codename + ' heeft "' + door.name + '" geopend via de app.' });
+  res.json({ ok: true, door: { name: door.name, relockSec: DOOR_RELOCK_MS / 1000 } });
+});
+
+/* ---- verbinding maken met een gast (hotel/appartement) ----
+   Het hotel ziet welke leden nu live onderweg zijn en kan verbinden: de gast
+   krijgt een melding, het hotel verschijnt in het onderweg-scherm van de
+   gast, en het hotel volgt de aankomst live (positie en ETA). */
+app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
+  const codename = String(req.body.codename || '').trim();
+  const key = Object.keys(db.data.live).find(k => db.data.live[k].active && db.data.live[k].codename === codename);
+  if (!key) return res.status(404).json({ error: 'Deze gast is nu niet live onderweg.' });
+  const L = db.data.live[key];
+  L.connected = [...new Set([...(L.connected || []), req.supplier.code])];
+  save();
+  logActivity(req.supplier.code, req.actor, 'verbond met gast ' + codename);
+  notify(L.tier, { icon: '🤝', title: req.supplier.name, body: 'Volgt uw aankomst om alles voor u klaar te zetten.', scope: 'live' });
+  pushLive(key);
+  res.json({ ok: true, guests: guestsFor(req.supplier.code) });
+});
+
 // Interne teamchat binnen het bedrijf.
 app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
   const text = String(req.body.text || '').trim().slice(0, 500);
@@ -1272,6 +1367,7 @@ function connectedSupplierCodes(key) {
   const set = new Set();
   const L = db.data.live[key];
   if (L && L.destCode) set.add(L.destCode);
+  if (L) for (const c of (L.connected || [])) set.add(c);
   for (const o of db.data.orders)
     if ((o.customerKey || o.customerTier) === key && !['terugbetaald', 'geserveerd', 'geweigerd'].includes(o.status)) set.add(o.supplierCode);
   for (const r of db.data.rides)
@@ -1301,6 +1397,7 @@ function liveStateFor(key, lang) {
     return {
       code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
       loc: s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : null,
+      hasDoors: (s.doors || []).length > 0,
       isDest: !!(L && L.destCode === code),
       distance: dist,
       etaMin: etaMinutes(dist, mode),
@@ -1328,6 +1425,7 @@ function guestsFor(code) {
     const ride = db.data.rides.find(r => (r.customerKey || r.customerTier) === key && r.supplierCode === code && r.status !== 'gearriveerd' && r.status !== 'geweigerd');
     out.push({
       codename: L.codename, distance: dist, etaMin: etaMinutes(dist, L.mode),
+      loc: me, mode: L.mode,
       heading: L.destCode === code, arrived: !!L.arrived,
       orderRef: order ? order.ref : null, rideRef: ride ? ride.ref : null
     });

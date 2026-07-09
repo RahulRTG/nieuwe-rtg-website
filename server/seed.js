@@ -115,7 +115,7 @@ module.exports = function seed() {
        gebruiken de app gratis in ruil voor de beste dynamische prijs aan RTG. */
     supplierTypes: {
       hotel:      { label: 'Hotel',        icon: '🏨', caps: ['bookings', 'location', 'pricing'] },
-      apartment:  { label: 'Appartement',  icon: '🏡', caps: ['bookings', 'location', 'pricing'] },
+      apartment:  { label: 'Appartement',  icon: '🏡', caps: ['bookings', 'doors', 'location', 'pricing'] },
       taxi:       { label: 'Taxi',         icon: '🚘', caps: ['rides', 'location', 'pricing'] },
       jet:        { label: 'Privéjet',     icon: '✈️', caps: ['rides', 'location', 'pricing'] },
       restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'location', 'pricing'] },
@@ -144,6 +144,21 @@ module.exports = function seed() {
           { id: 'm2', cat: 'Kaiseki', name: 'Mukozuke, sashimi', desc: 'Dagverse vangst, gesneden aan tafel.', price: 60, allergens: ['vis'] },
           { id: 'm3', cat: 'Kaiseki', name: 'Wagyu-hoofdgerecht', desc: 'A5 wagyu, licht gegrild, met seizoensgroenten.', price: 120, allergens: ['soja'] },
           { id: 'm4', cat: 'Zoet', name: 'Matcha & wagashi', desc: 'Ceremoniële matcha met huisgemaakte wagashi.', price: 22, allergens: ['gluten', 'melk'] }
+        ]
+      },
+      {
+        code: 'SAKURA', name: 'Sakura Machiya Residence', type: 'apartment', city: 'Kyoto',
+        loc: { lat: 35.003, lng: 135.775, label: 'Gion, Kyoto' }, rate: 0.12,
+        menu: [],
+        rooms: [
+          { id: 'a1', name: 'Machiya 1, straatzijde', desc: '65 m², eigen entree, tuinbad', price: 430, available: true },
+          { id: 'a2', name: 'Machiya 2, tuinzijde', desc: '80 m², twee slaapkamers, terras', price: 560, available: true }
+        ],
+        doors: [
+          { id: 'd1', name: 'Voordeur (straat)', locked: true },
+          { id: 'd2', name: 'Machiya 1', locked: true },
+          { id: 'd3', name: 'Machiya 2', locked: true },
+          { id: 'd4', name: 'Fietsenberging', locked: true }
         ]
       },
       {

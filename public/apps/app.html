@@ -575,6 +575,8 @@
   .live-acts button{flex:1;min-width:120px;border-radius:999px;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
   .live-acts .prim{background:#fff;color:#000;border-color:#fff;}
   .live-acts .sec{background:var(--card2,#1B1817);color:var(--txt);}
+  .live-acts .glowbtn{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border-color:#D9B96A;animation:doorglow 1.8s ease-in-out infinite;}
+  @keyframes doorglow{0%,100%{box-shadow:0 0 0 0 rgba(217,185,106,0.4);}50%{box-shadow:0 0 18px 2px rgba(217,185,106,0.55);}}
   .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
   .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
 
@@ -1267,10 +1269,13 @@
     }
 
     const hasVeh = L.partners.some(p => p.type === 'taxi' || p.type === 'jet');
+    const canDoor = L.arrived && dest && dest.hasDoors;
     const acts = '<div class="live-acts">' +
+      (canDoor ? '<button class="prim glowbtn" id="liveDoor">🔓 ' + T('live.door','Open de deur') + '</button>' : '') +
       '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
       (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
-      '<button class="prim" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>' +
+      (canDoor ? '' : '<button class="prim" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>') +
+      (canDoor ? '<button class="sec" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>' : '') +
     '</div>';
 
     $('#livePanel').innerHTML =
@@ -1288,6 +1293,10 @@
     $('#liveShare').addEventListener('click', shareMyLocation);
     const tx = $('#liveTaxi'); if (tx) tx.addEventListener('click', requestTaxi);
     const pre = $('#livePre'); if (pre) pre.addEventListener('click', () => { if (dest) openMenu(dest.code); });
+    const dr = $('#liveDoor'); if (dr) dr.addEventListener('click', async () => {
+      try { const d = await API.call('/live/door'); toast('🔓 ' + d.door.name + ' ' + T('live.dooropen','is open. Vergrendelt zichzelf na') + ' ' + d.door.relockSec + ' ' + T('live.sec','seconden.')); }
+      catch(e){ toast(e.message); }
+    });
   }
 
   async function stopLive(){
@@ -1855,6 +1864,7 @@ window.I18N = { en: {
   'live.notaxi':'No transport partner available at this destination.', 'live.taxireq':'has been requested. You will see the taxi approach live.',
   'live.shared':'Location shared with your partners.', 'live.geodenied':'Location unavailable. Use "Simulate ride" for the demo.', 'live.geono':'Location is not available here.',
   'live.nosim':'Choose a destination first.', 'live.simstart':'Simulation started, you are approaching the destination.',
+  'live.door':'Open the door', 'live.dooropen':'is open. It locks itself after', 'live.sec':'seconds.',
   'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
   'app.roomsfree':'room(s) available', 'app.tp.view':'View',
   'app.ms.rooms':'Available rooms', 'app.ms.pernight':'p.n.', 'app.ms.roomnote':'Booking goes via your concierge or Butler AI, at net price.',

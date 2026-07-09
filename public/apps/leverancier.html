@@ -122,6 +122,27 @@
   .ph-pick img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid transparent;flex-shrink:0;cursor:pointer;}
   .ph-pick img.sel{border-color:var(--gold);}
 
+  /* housekeeping + klussen */
+  .hk-pill{display:inline-block;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;padding:0.12rem 0.5rem;border-radius:999px;border:1px solid var(--line);vertical-align:middle;margin-left:0.3rem;}
+  .hk-schoon{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .hk-vuil{color:var(--amber);border-color:rgba(201,154,46,0.4);}
+  .hk-bezig{color:#7FA8C9;border-color:rgba(127,168,201,0.4);}
+  .hk-bezet{color:var(--txt);border-color:rgba(244,241,236,0.3);}
+  .hk-defect{color:var(--burgundy);border-color:rgba(194,58,94,0.45);}
+  .hk-chips{display:flex;gap:0.35rem;flex-wrap:wrap;width:100%;margin-top:0.5rem;}
+  .hk-chip{background:none;border:1px solid var(--line);color:var(--soft);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.66rem;font-family:inherit;}
+  .hk-chip.on.hk-schoon{background:rgba(76,154,117,0.15);color:var(--green);border-color:rgba(76,154,117,0.5);}
+  .hk-chip.on.hk-vuil{background:rgba(201,154,46,0.15);color:var(--amber);border-color:rgba(201,154,46,0.5);}
+  .hk-chip.on.hk-bezig{background:rgba(127,168,201,0.15);color:#7FA8C9;border-color:rgba(127,168,201,0.5);}
+  .hk-chip.on.hk-bezet{background:rgba(244,241,236,0.1);color:var(--txt);}
+  .hk-chip.on.hk-defect{background:rgba(194,58,94,0.15);color:var(--burgundy);border-color:rgba(194,58,94,0.5);}
+  .tk-row{display:flex;align-items:center;gap:0.6rem;padding:0.65rem 0;border-bottom:1px solid var(--line);}
+  .tk-row:last-of-type{border-bottom:none;}
+  .tk-row.done{opacity:0.55;}
+  .tk-row .tk-t{flex:1;min-width:0;}
+  .tk-row .tk-t b{display:block;font-size:0.86rem;font-weight:600;}
+  .tk-row .tk-t span{font-size:0.7rem;color:var(--soft);}
+
   /* vandaag nog doen */
   .todo-row{display:flex;align-items:center;gap:0.7rem;width:100%;background:none;border:none;border-bottom:1px solid var(--line);padding:0.7rem 0;text-align:left;color:var(--txt);font-family:inherit;}
   .todo-row:last-of-type{border-bottom:none;}
@@ -418,6 +439,11 @@
         <p class="sub" data-i18n="sup.v.minibar.sub">Tel per kamer wat is gebruikt. Het verbruik gaat automatisch op de kamerrekening en de aanvullijst staat klaar.</p>
         <div id="minibarWrap"></div>
       </div>
+      <div class="view" data-view="klussen">
+        <h2 data-i18n="sup.v.klussen">Klussen</h2>
+        <p class="sub" data-i18n="sup.v.klussen.sub">Onderhoud en gevonden voorwerpen. Een defecte kamer zet hier automatisch een klus klaar.</p>
+        <div id="klussenWrap"></div>
+      </div>
       <div class="view" data-view="doors">
         <h2 data-i18n="sup.v.doors">Deuren</h2>
         <p class="sub" data-i18n="sup.v.doors.sub">Open of vergrendel op afstand. Een geopende deur vergrendelt zichzelf na 10 seconden.</p>
@@ -497,6 +523,7 @@
     kassa:    { label:'Kassa',     svg:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M7 13h2M11 13h2M15 13h2M7 16.5h2M11 16.5h2M15 16.5h2"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
+    klussen:  { label:'Klussen',   svg:'<path d="M14.5 6.5a4 4 0 0 0-5.6 4.9L3 17.3V21h3.7l5.9-5.9a4 4 0 0 0 4.9-5.6l-2.6 2.6-2.4-2.4z"/>', cap:'bookings' },
     doors:    { label:'Deuren',    svg:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><circle cx="15" cy="12" r="1.2"/><path d="M5 21h14"/>', cap:'doors' },
     gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>', cap:'bookings' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
@@ -658,7 +685,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderKlussen(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -698,6 +725,12 @@
     }
     const openRooms = Object.keys((state.pos && state.pos.openRooms) || {}).length;
     if (openRooms) todos.push({ icon:'🧾', txt: openRooms + ' ' + T('todo.folio','open kamerrekening(en)'), tab:'kassa' });
+    const dirty = (state.rooms || []).filter(r => r.hk && (r.hk.status === 'vuil')).length;
+    if (dirty) todos.push({ icon:'🧹', txt: dirty + ' ' + T('todo.dirty','kamer(s) schoon te maken'), tab:'rooms' });
+    const defect = (state.rooms || []).filter(r => r.hk && r.hk.status === 'defect').length;
+    if (defect) todos.push({ icon:'⚠️', txt: defect + ' ' + T('todo.defect','kamer(s) defect'), tab:'rooms' });
+    const openTickets = (state.tickets || []).filter(t => t.status !== 'klaar').length;
+    if (openTickets) todos.push({ icon:'🔧', txt: openTickets + ' ' + T('todo.tickets','open klus(sen)'), tab:'klussen' });
     extra += '<div class="card"><div class="tt-h">' + T('todo.h','Vandaag nog doen') + '</div>' +
       (todos.length ? todos.map(t =>
         '<button class="todo-row" data-goto="' + t.tab + '"><span>' + t.icon + '</span><b>' + t.txt + '</b><i>›</i></button>'
@@ -1001,19 +1034,30 @@
     } catch(e){ toast(e.message); }
   }
 
-  // ---- kamers (hotel/appartement) ----
+  // ---- kamers (hotel/appartement): beschikbaarheid + housekeeping ----
+  const HK_LABEL = { schoon:'Schoon', vuil:'Vuil', bezig:'Bezig', bezet:'Bezet', defect:'Defect' };
+  const HK_LABEL_EN = { schoon:'Clean', vuil:'Dirty', bezig:'In progress', bezet:'Occupied', defect:'Out of order' };
+  const tHk = s => (lang() === 'en' ? (HK_LABEL_EN[s] || s) : (HK_LABEL[s] || s));
+  let hkDefectFor = null; // kamer-id waarvoor de defect-notitie openstaat
   function renderRooms(){
     const el = $('#roomsWrap'); if (!el) return;
     const rooms = state.rooms;
     if (!Array.isArray(rooms)){ el.innerHTML = ''; return; }
     let html = '<div class="card">';
-    html += rooms.length ? rooms.map(r =>
-      '<div class="room-row'+(r.available?'':' off')+'">'+
-        '<div class="rr-t"><b>'+r.name+'</b><span>'+(r.desc||'')+' · '+eur(r.price)+' '+T('sup.pernight','p.n.')+'</span></div>'+
+    html += rooms.length ? rooms.map(r => {
+      const hk = (r.hk && r.hk.status) || 'schoon';
+      return '<div class="room-row'+(r.available?'':' off')+'" style="flex-wrap:wrap;">'+
+        '<div class="rr-t"><b>'+r.name+' <span class="hk-pill hk-'+hk+'">'+tHk(hk)+'</span></b>'+
+          '<span>'+(r.desc||'')+' · '+eur(r.price)+' '+T('sup.pernight','p.n.')+
+          (r.hk && r.hk.by ? ' · '+r.hk.by+(r.hk.at?', '+timeAgo(r.hk.at):'') : '')+
+          (hk==='defect' && r.hk.note ? ' · ⚠ '+r.hk.note : '')+'</span></div>'+
         '<button class="rr-toggle'+(r.available?' on':'')+'" data-rtoggle="'+r.id+'" aria-label="aan/uit"><span></span></button>'+
         '<button class="rr-del" data-rdel="'+r.id+'">✕</button>'+
-      '</div>'
-    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>';
+        '<div class="hk-chips">'+['schoon','vuil','bezig','bezet','defect'].map(s =>
+          '<button class="hk-chip hk-'+s+(hk===s?' on':'')+'" data-hk="'+r.id+'" data-hkst="'+s+'">'+tHk(s)+'</button>').join('')+'</div>'+
+        (hkDefectFor===r.id ? '<div class="tt-add" style="width:100%;"><input id="hkNote" placeholder="'+T('hk.noteph','Wat is er kapot?')+'"><button id="hkNoteOk">'+T('hk.report','Meld defect')+'</button></div>' : '')+
+      '</div>';
+    }).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>';
     html += '<div class="tt-add" style="flex-wrap:wrap;">'+
       '<input id="rmName" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;min-width:120px;">'+
       '<input id="rmPrice" type="number" inputmode="decimal" placeholder="€" style="flex:1;min-width:70px;">'+
@@ -1024,6 +1068,18 @@
     el.querySelectorAll('[data-rtoggle]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/room/toggle', { id: b.dataset.rtoggle }); await refresh(); openTab('rooms'); } catch(e){ toast(e.message); }
     }));
+    el.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.hk, st = b.dataset.hkst;
+      if (st === 'defect'){ hkDefectFor = id; renderRooms(); openTab('rooms'); const n = $('#hkNote'); if (n) n.focus(); return; }
+      hkDefectFor = null;
+      try { await API.call('/supplier/room/hk', { id, status: st }); await refresh(); openTab('rooms'); } catch(e){ toast(e.message); }
+    }));
+    const hkOk = $('#hkNoteOk'); if (hkOk) hkOk.addEventListener('click', async () => {
+      const note = ($('#hkNote').value || '').trim();
+      const id = hkDefectFor; hkDefectFor = null;
+      try { await API.call('/supplier/room/hk', { id, status: 'defect', note }); toast(T('hk.reported','Defect gemeld, klus staat klaar voor onderhoud en de kamer is uit de verkoop.')); await refresh(); openTab('rooms'); }
+      catch(e){ toast(e.message); }
+    });
     el.querySelectorAll('[data-rdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/room/remove', { id: b.dataset.rdel }); toast(T('sup.roomremoved','Kamer verwijderd.')); await refresh(); openTab('rooms'); } catch(e){ toast(e.message); }
     }));
@@ -1105,6 +1161,62 @@
       mbRoom = null; mbQty = {};
       await refresh(); openTab('minibar');
     } catch(e){ toast(e.message); }
+  }
+
+  // ---- klussen (onderhoud) + gevonden voorwerpen ----
+  function renderKlussen(){
+    const el = $('#klussenWrap'); if (!el) return;
+    if (!has('bookings')){ el.innerHTML = ''; return; }
+    const tickets = state.tickets || [];
+    const lost = state.lostfound || [];
+    const open = tickets.filter(t => t.status !== 'klaar');
+    const done = tickets.filter(t => t.status === 'klaar').slice(0, 6);
+    const roomOpts = (state.rooms || []).map(r => '<option value="' + r.name.replace(/"/g,'&quot;') + '">' + r.name + '</option>').join('');
+
+    let html = '<div class="card"><div class="tt-h">' + T('tk.open','Openstaande klussen') + ' (' + open.length + ')</div>';
+    html += open.length ? open.map(t =>
+      '<div class="tk-row"><div class="tk-t"><b>' + t.text + '</b><span>' + (t.room ? t.room + ' · ' : '') + t.by + ' · ' + timeAgo(t.at) + '</span></div>' +
+      '<span class="pill ' + (t.status === 'bezig' ? 'bereiding' : 'nieuw') + '">' + (t.status === 'bezig' ? T('tk.busy','bezig') : T('tk.new','open')) + '</span>' +
+      (t.status === 'open'
+        ? '<button class="obtn primary" data-tk="' + t.id + '" data-tkst="bezig">' + T('tk.pickup','Oppakken') + '</button>'
+        : '<button class="obtn primary" data-tk="' + t.id + '" data-tkst="klaar">' + T('tk.done','Klaar') + '</button>') +
+      '</div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--green);padding:0.6rem 0;">✓ ' + T('tk.none','Geen openstaande klussen.') + '</div>';
+    html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="tkText" placeholder="' + T('tk.newph','Nieuwe klus, bijv. lamp vervangen') + '" style="flex:2;min-width:140px;">' +
+      '<select id="tkRoom" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="">' + T('tk.noroom','Algemeen') + '</option>' + roomOpts + '</select>' +
+      '<button id="tkAdd">' + T('team.add','Toevoegen') + '</button></div>';
+    if (done.length) html += '<div class="tt-h" style="margin-top:1rem;">' + T('tk.donelist','Afgerond') + '</div>' + done.map(t =>
+      '<div class="tk-row done"><div class="tk-t"><b>' + t.text + '</b><span>' + (t.doneBy || '') + (t.doneAt ? ' · ' + timeAgo(t.doneAt) : '') + '</span></div><span class="pill klaar">✓</span></div>').join('');
+    html += '</div>';
+
+    html += '<div class="card"><div class="tt-h">' + T('lf.h','Gevonden voorwerpen') + '</div>';
+    const kept = lost.filter(l => l.status === 'bewaard');
+    html += kept.length ? kept.map(l =>
+      '<div class="tk-row"><div class="tk-t"><b>' + l.item + '</b><span>' + (l.room ? l.room + ' · ' : '') + (l.storage ? T('lf.at','ligt bij') + ' ' + l.storage + ' · ' : '') + l.by + ' · ' + timeAgo(l.at) + '</span></div>' +
+      '<button class="obtn" data-lf="' + l.id + '">' + T('lf.picked','Opgehaald') + '</button></div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">' + T('lf.none','Niets in bewaring.') + '</div>';
+    html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="lfItem" placeholder="' + T('lf.itemph','Voorwerp, bijv. zonnebril') + '" style="flex:2;min-width:120px;">' +
+      '<input id="lfStorage" placeholder="' + T('lf.storageph','Bewaarplek') + '" style="flex:1;min-width:90px;">' +
+      '<select id="lfRoom" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="">' + T('lf.noroom','Elders') + '</option>' + roomOpts + '</select>' +
+      '<button id="lfAdd">' + T('team.add','Toevoegen') + '</button></div></div>';
+
+    el.innerHTML = html;
+    el.querySelectorAll('[data-tk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/ticket/status', { id: b.dataset.tk, status: b.dataset.tkst }); await refresh(); openTab('klussen'); } catch(e){ toast(e.message); }
+    }));
+    const ta = $('#tkAdd'); if (ta) ta.addEventListener('click', async () => {
+      const text = $('#tkText').value.trim();
+      if (!text){ toast(T('tk.fill','Omschrijf de klus.')); return; }
+      try { await API.call('/supplier/ticket/add', { text, room: $('#tkRoom').value }); toast(T('tk.added','Klus gemeld.')); await refresh(); openTab('klussen'); } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-lf]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/lost/done', { id: b.dataset.lf }); toast(T('lf.pickedtoast','Meegegeven en afgemeld.')); await refresh(); openTab('klussen'); } catch(e){ toast(e.message); }
+    }));
+    const la = $('#lfAdd'); if (la) la.addEventListener('click', async () => {
+      const item = $('#lfItem').value.trim();
+      if (!item){ toast(T('lf.fill','Omschrijf het voorwerp.')); return; }
+      try { await API.call('/supplier/lost/add', { item, storage: $('#lfStorage').value, room: $('#lfRoom').value }); toast(T('lf.added','Geregistreerd.')); await refresh(); openTab('klussen'); } catch(e){ toast(e.message); }
+    });
   }
 
   // ---- slimme deuren (appartementen) ----
@@ -1457,6 +1569,16 @@ window.I18N = { en: {
   'todo.h':'To do today', 'todo.none':'All caught up. No open actions.',
   'todo.chats':'unanswered guest message(s)', 'todo.orders':'new order(s)', 'todo.rides':'open ride request(s)',
   'todo.minibar':'minibar(s) still to count', 'todo.folio':'open room folio(s)',
+  'todo.dirty':'room(s) to clean', 'todo.defect':'room(s) out of order', 'todo.tickets':'open job(s)',
+  'hk.noteph':'What is broken?', 'hk.report':'Report defect',
+  'hk.reported':'Defect reported, a job is ready for maintenance and the room is off sale.',
+  'tab.klussen':'Jobs', 'sup.v.klussen':'Jobs', 'sup.v.klussen.sub':'Maintenance and lost & found. A room out of order automatically creates a job here.',
+  'tk.open':'Open jobs', 'tk.busy':'in progress', 'tk.new':'open', 'tk.pickup':'Pick up', 'tk.done':'Done',
+  'tk.none':'No open jobs.', 'tk.newph':'New job, e.g. replace lamp', 'tk.noroom':'General', 'tk.donelist':'Completed',
+  'tk.fill':'Describe the job.', 'tk.added':'Job reported.',
+  'lf.h':'Lost & found', 'lf.at':'stored at', 'lf.picked':'Picked up', 'lf.none':'Nothing in storage.',
+  'lf.itemph':'Item, e.g. sunglasses', 'lf.storageph':'Storage spot', 'lf.noroom':'Elsewhere',
+  'lf.fill':'Describe the item.', 'lf.added':'Registered.', 'lf.pickedtoast':'Handed over and signed off.',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

@@ -140,6 +140,11 @@ function initRealtime() {
       ];
   }
   if (!db.data.minibarCounts) db.data.minibarCounts = {};          // minibartellingen per bedrijf
+  if (!db.data.tickets) db.data.tickets = {};                      // klussen/onderhoud per bedrijf
+  if (!db.data.lostfound) db.data.lostfound = {};                  // gevonden voorwerpen per bedrijf
+  for (const s of db.data.suppliers)
+    for (const r of (s.rooms || []))
+      if (!r.hk) r.hk = { status: 'schoon' };                      // housekeeping-status per kamer
   // oudere databases: appartement-partner en doors-cap toevoegen
   if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
     db.data.supplierTypes.apartment.caps.splice(1, 0, 'doors');
@@ -792,6 +797,8 @@ function supplierState(s, actor) {
     } : null,
     photos: s.photos || [],
     pos: posDay(s.code),
+    tickets: (db.data.tickets[s.code] || []).slice(0, 40),
+    lostfound: (db.data.lostfound[s.code] || []).slice(0, 40),
     guestChats: Object.entries(db.data.guestChats)
       .filter(([, c]) => c.supplierCode === s.code && c.messages.length)
       .map(([k, c]) => ({ key: k, codename: c.codename, dept: c.dept || 'Team', unread: c.unreadPartner, last: c.messages[c.messages.length - 1].text.slice(0, 60), lastFrom: c.messages[c.messages.length - 1].from, lastAt: c.lastAt }))
@@ -895,7 +902,7 @@ app.post('/api/supplier/room/add', supplierAuth, (req, res) => {
   const name = String(req.body.name || '').trim().slice(0, 60);
   const price = Math.max(0, Number(req.body.price) || 0);
   if (!name || !price) return res.status(400).json({ error: 'Vul een kamernaam en prijs in.' });
-  const room = { id: crypto.randomBytes(3).toString('hex'), name, desc: String(req.body.desc || '').slice(0, 120), price, available: true };
+  const room = { id: crypto.randomBytes(3).toString('hex'), name, desc: String(req.body.desc || '').slice(0, 120), price, available: true, hk: { status: 'schoon' } };
   req.supplier.rooms.push(room);
   save();
   logActivity(req.supplier.code, req.actor, 'voegde kamer "' + name + '" toe');
@@ -911,6 +918,96 @@ app.post('/api/supplier/room/toggle', supplierAuth, (req, res) => {
   broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
   res.json({ ok: true, rooms: req.supplier.rooms });
 });
+/* ---- housekeeping: status per kamer ----
+   schoon / vuil / bezig / bezet / defect. Defect maakt de kamer direct
+   onboekbaar en zet automatisch een klus voor onderhoud klaar. */
+const HK_STATUSES = ['schoon', 'vuil', 'bezig', 'bezet', 'defect'];
+function addTicket(code, actor, text, room) {
+  const t = {
+    id: crypto.randomBytes(4).toString('hex'),
+    text: String(text).slice(0, 160), room: room || null,
+    status: 'open', by: actor ? actor.name : 'Systeem', at: new Date().toISOString()
+  };
+  const list = db.data.tickets[code] = (db.data.tickets[code] || []);
+  list.unshift(t);
+  db.data.tickets[code] = list.slice(0, 120);
+  return t;
+}
+app.post('/api/supplier/room/hk', supplierAuth, (req, res) => {
+  const room = (req.supplier.rooms || []).find(r => r.id === req.body.id);
+  if (!room) return res.status(404).json({ error: 'Kamer niet gevonden.' });
+  const status = String(req.body.status || '');
+  if (!HK_STATUSES.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+  const note = String(req.body.note || '').trim().slice(0, 140);
+  const wasDefect = room.hk && room.hk.status === 'defect';
+  room.hk = { status, note: status === 'defect' ? note : '', by: req.actor.name, at: new Date().toISOString() };
+  if (status === 'defect') {
+    // direct uit de verkoop en een klus voor onderhoud
+    if (room.available) { room.available = false; room.hkDisabledAvail = true; }
+    addTicket(req.supplier.code, req.actor, 'Kamer defect: ' + (note || room.name), room.name);
+    logActivity(req.supplier.code, req.actor, 'meldde ' + room.name + ' defect' + (note ? ': ' + note : ''));
+  } else {
+    if (wasDefect && room.hkDisabledAvail) { room.available = true; delete room.hkDisabledAvail; }
+    logActivity(req.supplier.code, req.actor, 'zette ' + room.name + ' op "' + status + '"');
+  }
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
+  res.json({ ok: true, rooms: req.supplier.rooms });
+});
+
+// ---- klussen (onderhoud): melden, oppakken, afronden ----
+app.post('/api/supplier/ticket/add', supplierAuth, (req, res) => {
+  const text = String(req.body.text || '').trim().slice(0, 160);
+  if (!text) return res.status(400).json({ error: 'Omschrijf de klus.' });
+  const t = addTicket(req.supplier.code, req.actor, text, String(req.body.room || '').slice(0, 60) || null);
+  save();
+  logActivity(req.supplier.code, req.actor, 'meldde een klus: ' + text.slice(0, 60));
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
+  res.json({ ok: true, ticket: t });
+});
+app.post('/api/supplier/ticket/status', supplierAuth, (req, res) => {
+  const t = (db.data.tickets[req.supplier.code] || []).find(x => x.id === req.body.id);
+  if (!t) return res.status(404).json({ error: 'Klus niet gevonden.' });
+  const status = ['open', 'bezig', 'klaar'].includes(req.body.status) ? req.body.status : 'open';
+  t.status = status;
+  if (status === 'bezig') { t.by = req.actor.name; }
+  if (status === 'klaar') { t.doneBy = req.actor.name; t.doneAt = new Date().toISOString(); }
+  save();
+  logActivity(req.supplier.code, req.actor, (status === 'klaar' ? 'rondde een klus af: ' : status === 'bezig' ? 'pakte een klus op: ' : 'heropende een klus: ') + t.text.slice(0, 60));
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
+  res.json({ ok: true, ticket: t });
+});
+
+// ---- gevonden voorwerpen ----
+app.post('/api/supplier/lost/add', supplierAuth, (req, res) => {
+  const item = String(req.body.item || '').trim().slice(0, 100);
+  if (!item) return res.status(400).json({ error: 'Omschrijf het voorwerp.' });
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    item, room: String(req.body.room || '').slice(0, 60) || null,
+    storage: String(req.body.storage || '').trim().slice(0, 80) || null,
+    status: 'bewaard', by: req.actor.name, at: new Date().toISOString()
+  };
+  const list = db.data.lostfound[req.supplier.code] = (db.data.lostfound[req.supplier.code] || []);
+  list.unshift(entry);
+  db.data.lostfound[req.supplier.code] = list.slice(0, 120);
+  save();
+  logActivity(req.supplier.code, req.actor, 'registreerde een gevonden voorwerp: ' + item + (entry.room ? ' (' + entry.room + ')' : ''));
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
+  res.json({ ok: true, entry });
+});
+app.post('/api/supplier/lost/done', supplierAuth, (req, res) => {
+  const e = (db.data.lostfound[req.supplier.code] || []).find(x => x.id === req.body.id);
+  if (e) {
+    e.status = 'opgehaald'; e.doneBy = req.actor.name; e.doneAt = new Date().toISOString();
+    save();
+    logActivity(req.supplier.code, req.actor, 'gaf een gevonden voorwerp mee: ' + e.item);
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
+  }
+  res.json({ ok: true });
+});
+
 app.post('/api/supplier/room/remove', supplierAuth, (req, res) => {
   const i = (req.supplier.rooms || []).findIndex(r => r.id === req.body.id);
   if (i >= 0) {
@@ -1080,6 +1177,9 @@ app.post('/api/supplier/pos/checkout', supplierAuth, (req, res) => {
   };
   list.unshift(sale);
   db.data.posSales[req.supplier.code] = list.slice(0, 300);
+  // na het uitchecken staat de kamer automatisch op "vuil" voor housekeeping
+  const rm = (req.supplier.rooms || []).find(r => r.name === room);
+  if (rm) rm.hk = { status: 'vuil', by: 'Systeem (check-out)', at: new Date().toISOString() };
   save();
   logActivity(req.supplier.code, req.actor, 'checkte ' + room + ' uit: € ' + total + ' (' + method + ')');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });

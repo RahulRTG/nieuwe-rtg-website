@@ -24,6 +24,33 @@
     --green:#2E6B4F;
   }
 
+  /* Pas-thema's: RTG Pass bordeaux met wit en goud, Lifestyle Pass parelmoer
+     met goud en bordeaux, Business Pass het zwart/wit-standaard. De semantische
+     variabelen kantelen mee: --paper is de pagina, --white de kaarten,
+     --black de tekst en knoppen. */
+  body.theme-rtg{
+    --white:#2E0A15;
+    --black:#FBF6F1;
+    --burgundy:#C23A5E;
+    --burgundy-bright:#E0637F;
+    --gold:#C9A82E;
+    --gold-bright:#D9BC49;
+    --line:rgba(255,255,255,0.14);
+    --grey:rgba(251,246,241,0.75);
+    --grey-soft:rgba(251,246,241,0.5);
+    --paper:#22060E;
+    --green:#4C9A75;
+  }
+  body.theme-life{
+    --paper:#FAF8F3;
+    --line:#E3DFD6;
+  }
+  /* Blokken die vaste lichte tekst dragen, blijven in het RTG-thema donker. */
+  body.theme-rtg header{background:rgba(34,6,14,0.92);}
+  body.theme-rtg .portal-nav{background:#180409;}
+  body.theme-rtg .portal-nav button.active{color:#FBF6F1;}
+  body.theme-rtg .trip-card{background:#180409;}
+
   *{margin:0;padding:0;box-sizing:border-box;}
 
   html{scroll-behavior:smooth;}
@@ -1474,6 +1501,9 @@
       }
     }
     if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
+    // Pas-thema: RTG bordeaux, Lifestyle parelmoer, Business/gast standaard.
+    document.body.classList.toggle('theme-rtg', tier === 'rtg');
+    document.body.classList.toggle('theme-life', tier === 'lifestyle');
     $('#gate').classList.add('hidden');
     $('#portal').classList.add('active');
     renderHeader();
@@ -1496,6 +1526,7 @@
     if (window.RTGRealtime) RTGRealtime.stop();
     API.token = null;
     user = null;
+    document.body.classList.remove('theme-rtg', 'theme-life');
     $('#portal').classList.remove('active');
     $('#gate').classList.remove('hidden');
     $('#headerUser').innerHTML = '<a href="/index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>';

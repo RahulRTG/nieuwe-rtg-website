@@ -54,7 +54,8 @@
     overflow:hidden;
   }
 
-  .on-black{background:var(--black);color:var(--white);}
+  /* RTG Pass leeft in bordeaux: de donkere secties zijn bordeauxzwart, geen zwart. */
+  .on-black{background:#20060D;color:var(--white);}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -218,7 +219,7 @@
   .on-burgundy .folio{color:var(--white);}
   .on-burgundy .folio::after{background:rgba(255,255,255,0.25);}
   .on-burgundy .kicker{color:var(--gold);}
-  .on-burgundy .hero p.deck{color:var(--white);}
+  .hero.on-burgundy p.deck{color:var(--white);}
   .on-burgundy .step .n{color:var(--white);}
   .on-burgundy .step p{color:var(--white);}
   .on-burgundy .btn-ghost{
@@ -293,7 +294,7 @@
   .butler{
     max-width:560px;
     margin:0 auto;
-    background:#151412;
+    background:#20060D;
     border:1px solid var(--black);
   }
   .butler-bar{

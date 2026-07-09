@@ -26,7 +26,7 @@
   html{scroll-behavior:smooth;}
 
   body{
-    background:var(--white);
+    background:#FAF8F3;
     color:var(--black);
     font-family:'Inter',sans-serif;
     font-weight:400;
@@ -54,8 +54,12 @@
     overflow:hidden;
   }
 
+  /* Lifestyle Pass leeft in parelmoer: wit wordt parelmoerwit, met een gouden
+     folio-draad; bordeaux blijft het accent. */
+  .on-white{background:#FAF8F3;color:var(--black);}
   .on-black{background:var(--black);color:var(--white);}
-  .on-white{background:var(--white);color:var(--black);}
+  .on-white .folio{color:var(--gold);}
+  .on-white .folio::after{background:rgba(133,112,7,0.3);}
 
   .folio{
     font-family:'Inter',sans-serif;

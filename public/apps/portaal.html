@@ -872,9 +872,12 @@
     display:flex;
     align-items:flex-end;
     padding:1.4rem;
-    color:var(--white);
+    color:#FFFFFF;
     position:relative;
+    overflow:hidden;
   }
+  .post-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .post-visual .place{position:relative;z-index:2;}
   .post-visual .place{
     font-family:'Bodoni Moda',serif;
     font-size:1.8rem;
@@ -2088,7 +2091,9 @@
           '<div class="who"><b>' + p.author + '</b><span>' + TIERS[p.tier].label + ' · ' + p.place + '</span></div>' +
           chip(p.tier) +
         '</div>' +
-        '<div class="post-visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>' +
+        (p.image
+          ? '<div class="post-visual"><img src="' + p.image + '" alt="" loading="lazy"><span class="place">' + p.place + '</span></div>'
+          : '<div class="post-visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>') +
         '<div class="post-body"><p>' + msgHTML(p.text, p.lang) + '</p>' +
           '<div class="post-reward">✦ '+T('p.post.earned','Verdiende')+' ' + p.reward + '% '+T('p.post.discount','reiskorting met deze post')+'</div>' +
           (p.featured ? '<div class="post-flag">★ '+T('p.post.featured','Uitgelicht als beeld op rtg.nl')+'</div>' : '') +

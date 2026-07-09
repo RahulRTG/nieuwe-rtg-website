@@ -303,6 +303,41 @@
   /* reisagenda van de Butler (RTG Pass): dag-tot-dag */
   .rp-day{margin-top:1rem;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
   .rp-day:first-of-type{margin-top:0.7rem;}
+  /* De Salon: delen met foto-editor */
+  .share-cta{margin-top:1rem;width:100%;background:var(--card);border:1px dashed var(--line);border-radius:16px;padding:1rem 1.1rem;display:flex;align-items:center;gap:0.85rem;text-align:left;color:var(--txt);}
+  .share-cta:active{background:var(--card2);}
+  .share-cta .ic{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--gold);}
+  .share-cta b{display:block;font-size:0.88rem;}
+  .share-cta span span{font-size:0.72rem;color:var(--soft);line-height:1.4;display:block;margin-top:0.15rem;}
+  .post .visual{position:relative;overflow:hidden;}
+  .post .visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .post .visual .place{position:relative;z-index:2;}
+  .pa.js-del{margin-left:auto;color:var(--soft);}
+
+  /* composer */
+  #cx{position:absolute;inset:0;z-index:75;background:var(--bg);display:none;flex-direction:column;}
+  #cx.open{display:flex;}
+  .cx-top{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.3rem 0.9rem;border-bottom:1px solid var(--line);}
+  .cx-top b{font-family:'Bodoni Moda',serif;font-size:1.2rem;font-weight:500;}
+  .cx-close{background:none;border:1px solid var(--line);border-radius:999px;color:var(--muted);padding:0.45rem 0.9rem;font-size:0.76rem;}
+  .cx-body{flex:1;overflow-y:auto;padding:1.1rem 1.3rem calc(env(safe-area-inset-bottom,0px) + 1.5rem);}
+  .cx-pick{width:100%;aspect-ratio:4/3;border:1px dashed var(--line);border-radius:16px;background:var(--card);color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;font-size:0.85rem;}
+  .cx-canvas-wrap{display:none;border-radius:16px;overflow:hidden;border:1px solid var(--line);}
+  .cx-canvas-wrap.has{display:block;}
+  #cxCanvas{width:100%;display:block;touch-action:none;}
+  .cx-lbl{margin-top:1.15rem;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
+  .cx-tools{display:flex;gap:0.5rem;margin-top:0.55rem;flex-wrap:wrap;}
+  .cx-tools button{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:0.55rem 0.95rem;font-size:0.75rem;}
+  .cx-tools button.on{background:var(--btn-bg);color:var(--btn-txt);border-color:var(--btn-bg);}
+  .cx-cap textarea{width:100%;margin-top:0.55rem;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--txt);padding:0.85rem 1rem;font-size:0.88rem;font-family:inherit;min-height:64px;resize:vertical;outline:none;}
+  .cx-cap textarea:focus{border-color:var(--burgundy);}
+  .cx-id{display:flex;gap:0.5rem;margin-top:0.55rem;}
+  .cx-id button{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem;font-size:0.68rem;color:var(--soft);text-align:left;line-height:1.4;}
+  .cx-id button b{display:block;font-size:0.8rem;color:var(--txt);margin-bottom:0.15rem;}
+  .cx-id button.on{border-color:var(--gold);}
+  .cx-pub{margin-top:1.25rem;width:100%;background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;padding:0.95rem;font-size:0.86rem;font-weight:600;}
+  .cx-note{margin-top:0.75rem;font-size:0.7rem;color:var(--soft);line-height:1.55;text-align:center;}
+
   /* wensenboek van de Rechterhand (Lifestyle Pass) */
   .wb-add{display:flex;gap:0.5rem;margin-top:0.8rem;}
   .wb-add input{flex:1;background:none;border:1px solid var(--line);border-radius:999px;padding:0.6rem 1rem;font-size:0.82rem;color:var(--txt);font-family:inherit;outline:none;}
@@ -822,6 +857,46 @@
     </div>
     <div class="ms-body" id="msBody"></div>
     <div class="ms-foot" id="msFoot"></div>
+  </div>
+
+  <!-- De Salon: composer met foto-editor (blur, penseel, stijl, AI-caption) -->
+  <div id="cx">
+    <div class="cx-top"><b data-i18n="cx.title">Delen in De Salon</b><button class="cx-close" id="cxClose" data-i18n="cx.close">Sluiten</button></div>
+    <div class="cx-body">
+      <input type="file" id="cxFile" accept="image/*" style="display:none;">
+      <button class="cx-pick" id="cxPick">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="2.5"/><circle cx="9" cy="10.5" r="1.7"/><path d="M3 17.5l5-4.5 4 3.5 3.5-3 5.5 4.5"/></svg>
+        <span data-i18n="cx.pick">Kies een foto van uw reis</span>
+      </button>
+      <div class="cx-canvas-wrap" id="cxWrap"><canvas id="cxCanvas"></canvas></div>
+      <div id="cxTools" style="display:none;">
+        <div class="cx-lbl" data-i18n="cx.privacy">Privacy</div>
+        <div class="cx-tools">
+          <button id="cxFaces">✦ <span data-i18n="cx.blurfaces">Blur alle gezichten</span></button>
+          <button id="cxBrush" data-i18n="cx.brush">Blur-penseel</button>
+          <button id="cxReset" data-i18n="cx.reset">Herstel</button>
+        </div>
+        <div class="cx-lbl" data-i18n="cx.style">Stijl</div>
+        <div class="cx-tools" id="cxFilters">
+          <button data-f="none" class="on" data-i18n="cx.f.none">Origineel</button>
+          <button data-f="grayscale(1) contrast(1.06)" data-i18n="cx.f.mono">Zwart-wit</button>
+          <button data-f="sepia(0.28) saturate(1.05) contrast(1.02)" data-i18n="cx.f.warm">Goudwarm</button>
+          <button data-f="brightness(0.9) saturate(1.15) contrast(1.1)" data-i18n="cx.f.evening">Avond</button>
+        </div>
+        <div class="cx-lbl" data-i18n="cx.caption">Onderschrift</div>
+        <div class="cx-cap">
+          <textarea id="cxText" maxlength="500" data-i18n-ph="cx.caption.ph" placeholder="Waar was dit, en waarom was het bijzonder?"></textarea>
+          <div class="cx-tools" style="margin-top:0.55rem;"><button id="cxAI">✦ <span data-i18n="cx.writewith">Laat de AI meeschrijven</span></button></div>
+        </div>
+        <div class="cx-lbl" data-i18n="cx.postas">Posten als</div>
+        <div class="cx-id">
+          <button id="cxAsCode" class="on"><b id="cxCodeName"></b><span data-i18n="cx.ascode">uw codenaam — niemand ziet wie u bent</span></button>
+          <button id="cxAsSelf"><b id="cxSelfName"></b><span data-i18n="cx.asself">uw naam — zichtbaar voor leden</span></button>
+        </div>
+        <button class="cx-pub" id="cxPub" data-i18n="cx.publish">Plaats in De Salon</button>
+        <p class="cx-note" data-i18n="cx.note">De bewerkte foto verlaat uw telefoon, het origineel nooit. Verwijderen kan altijd. En De Salon kent geen algoritme: gewoon op volgorde, zonder eindeloos scrollen.</p>
+      </div>
+    </div>
   </div>
 
   <div id="toast"></div>
@@ -2009,19 +2084,199 @@
 
   /* ---------- salon ---------- */
 
+  /* ---------- De Salon: delen met foto-editor ----------
+     De onbewerkte foto verlaat de telefoon nooit: blur (AI-gezichtsdetectie
+     via de server, anders browser-FaceDetector, anders penseel), stijlfilters
+     en caption-hulp draaien allemaal op een canvas op het toestel. */
+  const CX = { orig:null, brush:false, filter:'none', busy:false, asCodename:true };
+  const cxC = () => $('#cxCanvas');
+
+  function tAgo(iso){
+    const s = Math.max(1, Math.round((Date.now() - new Date(iso)) / 1000));
+    if (s < 60) return T('t.justnow','zojuist');
+    const m = Math.round(s/60); if (m < 60) return m + T('t.minago',' min geleden');
+    const h = Math.round(m/60); if (h < 24) return h + T('t.hourago',' uur geleden');
+    return Math.round(h/24) + T('t.dayago',' dag(en) geleden');
+  }
+
+  function openCX(){
+    $('#cxCodeName').textContent = user.codename;
+    $('#cxSelfName').textContent = user.full;
+    cxIdentity(true);
+    $('#cx').classList.add('open');
+  }
+  function closeCX(){
+    $('#cx').classList.remove('open');
+    CX.orig = null; CX.brush = false; CX.filter = 'none'; CX.busy = false;
+    $('#cxWrap').classList.remove('has'); $('#cxTools').style.display = 'none';
+    $('#cxPick').style.display = ''; $('#cxText').value = ''; $('#cxFile').value = '';
+    cxC().style.filter = ''; $('#cxBrush').classList.remove('on');
+    document.querySelectorAll('#cxFilters button').forEach(b => b.classList.toggle('on', b.dataset.f === 'none'));
+  }
+  function cxIdentity(code){
+    CX.asCodename = code;
+    $('#cxAsCode').classList.toggle('on', code);
+    $('#cxAsSelf').classList.toggle('on', !code);
+  }
+
+  async function cxLoad(file){
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    await new Promise((ok, err) => { img.onload = ok; img.onerror = err; img.src = url; });
+    URL.revokeObjectURL(url);
+    const MAX = 1400, sc = Math.min(1, MAX / Math.max(img.width, img.height));
+    const c = cxC();
+    c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    CX.orig = document.createElement('canvas');
+    CX.orig.width = c.width; CX.orig.height = c.height;
+    CX.orig.getContext('2d').drawImage(c, 0, 0);
+    $('#cxPick').style.display = 'none';
+    $('#cxWrap').classList.add('has');
+    $('#cxTools').style.display = '';
+  }
+
+  // pixelatie: onomkeerbaar (echt blurren, geen laagje eroverheen)
+  function cxPixelate(x, y, w, h, ellips){
+    const c = cxC(), ctx = c.getContext('2d');
+    x = Math.max(0, Math.round(x)); y = Math.max(0, Math.round(y));
+    w = Math.min(c.width - x, Math.round(w)); h = Math.min(c.height - y, Math.round(h));
+    if (w < 4 || h < 4) return;
+    const block = Math.max(6, Math.round(Math.max(w, h) / 9));
+    const sw = Math.max(1, Math.round(w / block)), sh = Math.max(1, Math.round(h / block));
+    const small = document.createElement('canvas');
+    small.width = sw; small.height = sh;
+    small.getContext('2d').drawImage(c, x, y, w, h, 0, 0, sw, sh);
+    ctx.save();
+    if (ellips){ ctx.beginPath(); ctx.ellipse(x + w/2, y + h/2, w/2, h/2, 0, 0, Math.PI * 2); ctx.clip(); }
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(small, 0, 0, sw, sh, x, y, w, h);
+    ctx.restore();
+    ctx.imageSmoothingEnabled = true;
+  }
+
+  async function cxAutoBlur(){
+    if (!CX.orig || CX.busy) return;
+    CX.busy = true;
+    const btn = $('#cxFaces'), old = btn.innerHTML;
+    btn.textContent = T('cx.detecting','Gezichten zoeken…');
+    const c = cxC();
+    let boxes = null;
+    if (API.live){
+      try {
+        const d = await API.call('/salon/faces', { image: c.toDataURL('image/jpeg', 0.7) });
+        boxes = (d.faces || []).map(f => ({ x: f.x * c.width, y: f.y * c.height, w: f.w * c.width, h: f.h * c.height }));
+      } catch (e) { /* geen key of fout: probeer de browser */ }
+    }
+    if (!boxes && 'FaceDetector' in window){
+      try {
+        const fs = await new window.FaceDetector({ fastMode: true }).detect(c);
+        boxes = fs.map(f => ({ x: f.boundingBox.x, y: f.boundingBox.y, w: f.boundingBox.width, h: f.boundingBox.height }));
+      } catch (e) {}
+    }
+    btn.innerHTML = old; CX.busy = false;
+    if (!boxes){ toast(T('cx.nodetect','Geen AI-detectie beschikbaar; gebruik het blur-penseel.')); cxBrushOn(true); return; }
+    if (!boxes.length){ toast(T('cx.nofaces','Geen gezichten gevonden in deze foto.')); return; }
+    boxes.forEach(b => cxPixelate(b.x - b.w * 0.25, b.y - b.h * 0.3, b.w * 1.5, b.h * 1.6, true));
+    toast(boxes.length + T('cx.blurred',' gezicht(en) onherkenbaar gemaakt.'));
+  }
+
+  function cxBrushOn(on){
+    CX.brush = (on === undefined) ? !CX.brush : on;
+    $('#cxBrush').classList.toggle('on', CX.brush);
+    if (CX.brush) toast(T('cx.brushhint','Veeg over wat onherkenbaar moet worden.'));
+  }
+  let cxDown = false;
+  function cxBrushAt(ev){
+    const c = cxC(), r = c.getBoundingClientRect();
+    const x = (ev.clientX - r.left) * (c.width / r.width);
+    const y = (ev.clientY - r.top) * (c.height / r.height);
+    const rad = Math.max(36, c.width / 11);
+    cxPixelate(x - rad/2, y - rad/2, rad, rad, true);
+  }
+
+  const CX_CAPTIONS_NL = ['Sommige ochtenden vragen geen plannen, alleen aanwezigheid.','Geboekt tegen inkoopprijs, onthouden voor altijd.','De stilte hier was het eigenlijke uitzicht.','Wie goed reist, heeft weinig woorden nodig.','Dit soort licht laat zich niet reserveren, wel vinden.'];
+  const CX_CAPTIONS_EN = ['Some mornings ask for no plans, only presence.','Booked at cost, remembered forever.','The silence here was the real view.','Those who travel well need few words.','This kind of light cannot be reserved, only found.'];
+  async function cxCaption(){
+    const hint = ($('#cxText').value || '').trim();
+    if (API.live){
+      try { const d = await API.call('/salon/caption', { hint: hint || trip.dest }); $('#cxText').value = d.caption; return; }
+      catch (e) {}
+    }
+    const cc = lang() === 'en' ? CX_CAPTIONS_EN : CX_CAPTIONS_NL;
+    $('#cxText').value = cc[Math.floor(Math.random() * cc.length)];
+  }
+
+  async function cxPublish(){
+    if (!CX.orig){ toast(T('cx.needphoto','Kies eerst een foto.')); return; }
+    if (CX.busy) return;
+    CX.busy = true;
+    const b = $('#cxPub'); b.textContent = T('cx.publishing','Plaatsen…');
+    const src = cxC();
+    const out = document.createElement('canvas');
+    out.width = src.width; out.height = src.height;
+    const octx = out.getContext('2d');
+    if (CX.filter !== 'none') octx.filter = CX.filter;
+    octx.drawImage(src, 0, 0);
+    const dataUrl = out.toDataURL('image/jpeg', 0.85);
+    const text = ($('#cxText').value || '').trim();
+    if (API.live){
+      try {
+        await API.call('/salon/post', { image: dataUrl, text, asCodename: CX.asCodename, lang: lang() });
+        applyState((await API.call('/state')).state);
+      } catch (e) {
+        toast(e.message || T('cx.failed','Plaatsen mislukt.'));
+        CX.busy = false; b.textContent = T('cx.publish','Plaats in De Salon');
+        return;
+      }
+    } else {
+      posts.unshift({ id: Date.now(), author: CX.asCodename ? user.codename : user.full, tier: user.tier, place: trip.dest, image: dataUrl, text, likes: 0, liked: false, comments: [], at: new Date().toISOString(), mine: true });
+    }
+    b.textContent = T('cx.publish','Plaats in De Salon');
+    closeCX();
+    renderSalon();
+    toast(T('cx.done','Geplaatst in De Salon.'));
+  }
+
+  $('#cxPick').addEventListener('click', () => $('#cxFile').click());
+  $('#cxFile').addEventListener('change', e => { if (e.target.files[0]) cxLoad(e.target.files[0]).catch(() => toast(T('cx.loadfail','Foto laden mislukt.'))); });
+  $('#cxClose').addEventListener('click', closeCX);
+  $('#cxFaces').addEventListener('click', cxAutoBlur);
+  $('#cxBrush').addEventListener('click', () => cxBrushOn());
+  $('#cxReset').addEventListener('click', () => { if (CX.orig) cxC().getContext('2d').drawImage(CX.orig, 0, 0); });
+  $('#cxAI').addEventListener('click', cxCaption);
+  $('#cxAsCode').addEventListener('click', () => cxIdentity(true));
+  $('#cxAsSelf').addEventListener('click', () => cxIdentity(false));
+  $('#cxPub').addEventListener('click', cxPublish);
+  document.querySelectorAll('#cxFilters button').forEach(b => b.addEventListener('click', () => {
+    CX.filter = b.dataset.f;
+    cxC().style.filter = b.dataset.f === 'none' ? '' : b.dataset.f;
+    document.querySelectorAll('#cxFilters button').forEach(x => x.classList.toggle('on', x === b));
+  }));
+  $('#cxCanvas').addEventListener('pointerdown', e => { if (!CX.brush) return; cxDown = true; cxBrushAt(e); e.target.setPointerCapture(e.pointerId); });
+  $('#cxCanvas').addEventListener('pointermove', e => { if (cxDown && CX.brush) cxBrushAt(e); });
+  $('#cxCanvas').addEventListener('pointerup', () => cxDown = false);
+
   function renderSalon(){
-    $('#feed').innerHTML = posts.map(p => {
+    $('#feed').innerHTML =
+      '<button class="share-cta" id="shareBtn"><span class="ic">' +
+        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="2.5"/><circle cx="9" cy="10.5" r="1.7"/><path d="M3 17.5l5-4.5 4 3.5 3.5-3 5.5 4.5"/></svg></span>' +
+        '<span><b>' + T('salon.share','Deel een moment') + '</b><span>' + T('salon.share.sub','Foto met AI-bewerking: gezichten blurren, stijl en caption — en posten onder uw codenaam.') + '</span></span></button>' +
+      posts.map(p => {
       const engage = canEngage(p);
       return '<article class="post" data-post="' + p.id + '">' +
         '<div class="head">' +
           '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
-          '<div><b>' + p.author + '</b><span>' + TIER_LABEL[p.tier] + ' · ' + p.place + ' · ' + T('app.salon.7days','7 dagen na verblijf') + '</span></div>' +
+          '<div><b>' + p.author + '</b><span>' + TIER_LABEL[p.tier] + ' · ' + p.place + ' · ' + (p.at ? tAgo(p.at) : T('app.salon.7days','7 dagen na verblijf')) + '</span></div>' +
         '</div>' +
-        '<div class="visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>' +
+        (p.image
+          ? '<div class="visual"><img src="' + p.image + '" alt="" loading="lazy"><span class="place">' + p.place + '</span></div>'
+          : '<div class="visual ' + p.visual + '"><span class="place">' + p.place + '</span></div>') +
         '<div class="body">' + msgHTML(p.text, p.lang) + '</div>' +
         '<div class="acts">' +
           '<button class="pa js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +
           '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>' + T('app.salon.comment','Reageren') + ' (' + p.comments.length + ')</button>' +
+          (p.mine ? '<button class="pa js-del">' + T('salon.del','Verwijder') + '</button>' : '') +
         '</div>' +
         '<div class="comments">' +
           '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b>, ' + msgHTML(c.text, c.lang) + '</div>').join('') + '</div>' +
@@ -2030,9 +2285,21 @@
       '</article>';
     }).join('');
     hydrateMsgs($('#feed'));
+    $('#shareBtn').addEventListener('click', openCX);
 
     document.querySelectorAll('.post').forEach(el => {
       const post = posts.find(p => p.id === Number(el.dataset.post));
+      const del = el.querySelector('.js-del');
+      if (del) del.addEventListener('click', async () => {
+        if (API.live){
+          try { await API.call('/salon/delete', { postId: post.id }); applyState((await API.call('/state')).state); }
+          catch (e) { toast(e.message || T('salon.delfail','Verwijderen mislukt.')); return; }
+        } else {
+          posts.splice(posts.indexOf(post), 1);
+        }
+        renderSalon();
+        toast(T('salon.deleted','Post verwijderd.'));
+      });
       el.querySelector('.js-like').addEventListener('click', ev => {
         post.liked = !post.liked;
         post.likes += post.liked ? 1 : -1;
@@ -2147,6 +2414,19 @@ window.I18N = { en: {
   'ai.a.rest':'Your table at Kikunoi Honten (15 Oct, 19:30) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of Gion Sasaki.',
   'ai.a.default':'I will come back to that today. In the meantime I can help with the packing list, documents, the weather or a day plan, just say the word.',
   'ai.title.rtg':'The Butler.', 'ai.title.life':'The Right Hand.', 'ai.title.biz':'The Companion.',
+  'salon.share':'Share a moment', 'salon.share.sub':'Photo with AI editing: blur faces, style and caption — posted under your codename.',
+  'salon.del':'Delete', 'salon.deleted':'Post deleted.', 'salon.delfail':'Deleting failed.',
+  't.justnow':'just now', 't.minago':' min ago', 't.hourago':' hr ago', 't.dayago':' day(s) ago',
+  'cx.title':'Share in The Salon', 'cx.close':'Close', 'cx.pick':'Choose a photo from your trip',
+  'cx.privacy':'Privacy', 'cx.blurfaces':'Blur all faces', 'cx.brush':'Blur brush', 'cx.reset':'Restore',
+  'cx.style':'Style', 'cx.f.none':'Original', 'cx.f.mono':'Black & white', 'cx.f.warm':'Gold warm', 'cx.f.evening':'Evening',
+  'cx.caption':'Caption', 'cx.caption.ph':'Where was this, and why was it special?', 'cx.writewith':'Let the AI write along',
+  'cx.postas':'Post as', 'cx.ascode':'your codename — nobody sees who you are', 'cx.asself':'your name — visible to members',
+  'cx.publish':'Post to The Salon', 'cx.publishing':'Posting…', 'cx.done':'Posted to The Salon.', 'cx.failed':'Posting failed.',
+  'cx.note':'The edited photo leaves your phone, the original never does. You can always delete. And The Salon has no algorithm: chronological, no endless scroll.',
+  'cx.detecting':'Finding faces…', 'cx.nodetect':'No AI detection available; use the blur brush.', 'cx.nofaces':'No faces found in this photo.',
+  'cx.blurred':' face(s) made unrecognisable.', 'cx.brushhint':'Swipe over what should be unrecognisable.',
+  'cx.needphoto':'Choose a photo first.', 'cx.loadfail':'Loading the photo failed.',
   'ai.deck.life':'Quiet, flawless and ahead of you: you only hear about it once it is handled.',
   'app.rh.label':'Quietly handled, your right hand got there first', 'app.rh.done':'handled',
   'app.rh.wb':'The wish book', 'app.rh.ph':'Saying it once is enough…', 'app.rh.add':'Note it',

@@ -52,7 +52,11 @@ for (const [code, people] of Object.entries(STAFF_SEED)) {
 }
 
 const app = express();
-app.use(express.json({ limit: '64kb' }));
+// Routes die een foto in de body dragen, parsen hun eigen (ruimere) JSON;
+// de globale 64kb-parser zou ze anders al met 413 afwijzen.
+const BIG_JSON_ROUTES = ['/api/verify/upload', '/api/salon/post', '/api/salon/faces'];
+const smallJson = express.json({ limit: '64kb' });
+app.use((req, res, next) => BIG_JSON_ROUTES.includes(req.path) ? next() : smallJson(req, res, next));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 /* ---------- Claude API (optioneel) ---------- */
@@ -307,6 +311,7 @@ function stateFor(sess, lang) {
   // zodat de ontvanger ze in zijn eigen taal vertaald kan lezen.
   const posts = db.data.posts.map(p => ({
     id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual,
+    image: p.image || null, at: p.at || null, mine: !!p.byKey && p.byKey === sess.key,
     text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
     likes: p.baseLikes + Object.keys(p.likedBy).length,
     liked: !!p.likedBy[sess.key],
@@ -646,6 +651,119 @@ app.post('/api/dm', auth, (req, res) => {
     notify(ownerTier, { icon: '✉', title: 'Nieuw bericht in De Salon', body: fromName + ' stuurde u een bericht.', scope: 'salon' });
   }
   res.json({ ok: true });
+});
+
+/* ================= DE SALON: zelf posten, met foto =================
+   Leden delen foto's die op de telefoon al bewerkt zijn (gezichtsblur,
+   penseel, filters) — de onbewerkte foto verlaat het toestel nooit.
+   Privacy by design: posten kan onder codenaam (standaard aan). */
+
+function dataUrlImage(dataUrl) {
+  const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ''));
+  if (!m) return null;
+  return { type: m[1], ext: m[1] === 'jpeg' ? 'jpg' : m[1], buf: Buffer.from(m[2], 'base64'), b64: m[2] };
+}
+
+app.post('/api/salon/post', express.json({ limit: '8mb' }), auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Posten in De Salon is voor leden.' });
+  const text = String(req.body.text || '').trim().slice(0, 500);
+  const img = dataUrlImage(req.body.image);
+  if (!img) return res.status(400).json({ error: 'Voeg een foto toe.' });
+  if (img.buf.length > 6 * 1024 * 1024) return res.status(400).json({ error: 'De foto is te groot.' });
+  const persona = req.session.account ? accounts.publicUser(req.session.account) : PERSONAS[req.session.tier];
+  const asCodename = req.body.asCodename !== false; // privacy standaard aan
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  const fname = 'salon-' + crypto.randomBytes(8).toString('hex') + '.' + img.ext;
+  fs.writeFileSync(path.join(UPLOAD_DIR, fname), img.buf);
+  const post = {
+    id: Date.now(),
+    author: asCodename ? (persona.codename || persona.full) : persona.full,
+    tier: req.session.tier,
+    place: String(req.body.place || '').trim().slice(0, 60) || db.data.trip.dest,
+    image: '/api/salon/img/' + fname,
+    text, lang: req.body.lang === 'en' ? 'en' : 'nl',
+    baseLikes: 0, likedBy: {}, comments: [],
+    at: new Date().toISOString(), byKey: req.session.key
+  };
+  db.data.posts.unshift(post);
+  db.data.posts = db.data.posts.slice(0, 60);
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true, id: post.id });
+});
+
+// Salonfoto's staan in de feed voor alle bezoekers van De Salon; geen token
+// nodig, wel een padtraversal-guard en alleen salon-bestanden.
+app.get('/api/salon/img/:file', (req, res) => {
+  const file = path.basename(String(req.params.file || ''));
+  const full = path.join(UPLOAD_DIR, file);
+  if (!file.startsWith('salon-') || !fs.existsSync(full)) return res.status(404).end();
+  res.sendFile(full);
+});
+
+app.post('/api/salon/delete', auth, (req, res) => {
+  const i = db.data.posts.findIndex(p => p.id === Number(req.body.postId));
+  if (i === -1) return res.status(404).json({ error: 'Post niet gevonden.' });
+  const p = db.data.posts[i];
+  if (!p.byKey || p.byKey !== req.session.key) return res.status(403).json({ error: 'Alleen uw eigen post kan verwijderd worden.' });
+  db.data.posts.splice(i, 1);
+  if (p.image) {
+    const f = path.join(UPLOAD_DIR, path.basename(p.image));
+    if (f.startsWith(UPLOAD_DIR) && fs.existsSync(f)) { try { fs.unlinkSync(f); } catch (_) {} }
+  }
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true });
+});
+
+/* Caption-hulp: de AI schrijft mee in de toon van het huis. */
+const CANNED_CAPTIONS = [
+  'Sommige ochtenden vragen geen plannen, alleen aanwezigheid.',
+  'Geboekt tegen inkoopprijs, onthouden voor altijd.',
+  'De stilte hier was het eigenlijke uitzicht.',
+  'Wie goed reist, heeft weinig woorden nodig.',
+  'Dit soort licht laat zich niet reserveren, wel vinden.'
+];
+app.post('/api/salon/caption', auth, async (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Voor leden.' });
+  const hint = String(req.body.hint || '').slice(0, 200);
+  if (anthropic) {
+    try {
+      const r = await anthropic.messages.create({
+        model: 'claude-opus-4-8', max_tokens: 120,
+        system: 'Je schrijft korte captions voor De Salon, het besloten reisnetwerk van Rahul Travel Group. Ingetogen old money-toon: geen hashtags, geen emoji, geen uitroeptekens, maximaal twee zinnen. Antwoord uitsluitend met de caption zelf, in het Nederlands (of Engels als de context Engels is).',
+        messages: [{ role: 'user', content: 'Schrijf één caption bij een reisfoto. Context: ' + (hint || 'een bijzonder reismoment') }]
+      });
+      const cap = r.content.filter(b => b.type === 'text').map(b => b.text).join(' ').trim().replace(/^["']|["']$/g, '');
+      if (cap) return res.json({ caption: cap });
+    } catch (e) { /* val terug op vaste captions */ }
+  }
+  res.json({ caption: CANNED_CAPTIONS[Math.floor(Math.random() * CANNED_CAPTIONS.length)] });
+});
+
+/* AI-gezichtsdetectie voor de blur: Claude kijkt naar de foto en geeft
+   genormaliseerde kaders terug. Zonder API-key valt de app terug op de
+   browser-FaceDetector of het handmatige penseel. */
+app.post('/api/salon/faces', express.json({ limit: '8mb' }), auth, async (req, res) => {
+  if (!anthropic) return res.status(501).json({ error: 'AI-detectie vraagt een API-key; gebruik het penseel of de browser-detectie.' });
+  const img = dataUrlImage(req.body.image);
+  if (!img) return res.status(400).json({ error: 'Geen afbeelding ontvangen.' });
+  try {
+    const r = await anthropic.messages.create({
+      model: 'claude-opus-4-8', max_tokens: 300,
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/' + img.type, data: img.b64 } },
+        { type: 'text', text: 'Geef de posities van alle zichtbare menselijke gezichten in deze foto als JSON: {"faces":[{"x":0,"y":0,"w":0,"h":0}]} met coördinaten genormaliseerd van 0 tot 1 (oorsprong linksboven, x/y = linkerbovenhoek van het kader). Antwoord met uitsluitend de JSON. Geen gezichten: {"faces":[]}.' }
+      ]}]
+    });
+    const txt = r.content.filter(b => b.type === 'text').map(b => b.text).join('');
+    const json = JSON.parse((txt.match(/\{[\s\S]*\}/) || ['{"faces":[]}'])[0]);
+    const faces = (Array.isArray(json.faces) ? json.faces : []).slice(0, 20)
+      .filter(f => [f.x, f.y, f.w, f.h].every(n => typeof n === 'number' && n >= 0 && n <= 1));
+    res.json({ faces });
+  } catch (e) {
+    res.status(502).json({ error: 'AI-detectie lukte niet; gebruik het penseel.' });
+  }
 });
 
 /* Vertaal een bericht naar de taal van de ontvanger. Iedereen schrijft in de

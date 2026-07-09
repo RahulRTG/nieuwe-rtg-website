@@ -1816,6 +1816,7 @@
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
     const foundationYear = invoices.reduce((s,i) => s + i.bijdrage * 0.3, 0);
+    const eurC = n => '\u20ac ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     let html = '<div class="pay-summary">' +
       '<div class="ov-card"><span class="label">'+T('p.outstanding','Openstaand')+'</span><span class="value accent">' + eur(openSum) + '</span><span class="sub">' + open.length + ' ' + T('p.invoices','factu(u)r(en)') + '</span></div>' +
@@ -1841,6 +1842,12 @@
           '<div class="rowline"><span>'+T('p.fixedcontrib','Vaste ledenbijdrage')+'</span><span>' + eur(inv.bijdrage) + '</span></div>' +
           '<div class="rowline foundation"><span>'+T('p.ofwhichfoundation','waarvan naar de RTFoundation (30%)')+'</span><span>' + eur(Math.round(inv.bijdrage * 0.3)) + '</span></div>' +
           '<div class="rowline total"><span>'+T('p.total','Totaal')+'</span><span>' + eur(total) + '</span></div>' +
+          (user.tier === 'business'
+            ? '<div class="rowline"><span>'+T('p.vat','Btw 21% (in de bijdrage begrepen)')+'</span><span>' + eurC(inv.btw || 0) + '</span></div>' +
+              (inv.netto > 0 ? '<div class="rowline"><span>'+T('p.toms','Reisdeel: btw-margeregeling reisdiensten')+'</span><span>' + eurC(0) + '</span></div>' : '') +
+              '<div class="rowline"><span>'+T('p.ledger','Afboekcode (grootboek)')+'</span><span><b>' + (inv.afboekcode || '4510') + '</b> · ' + (inv.afboeklabel || '') + '</span></div>' +
+              '<div class="rowline" style="font-size:0.72rem;color:var(--grey-soft);"><span>RTG (Rahul Travel Group)</span><span>KvK 82273510 · btw NL002291440B89</span></div>'
+            : '') +
           (inv.status === 'open'
             ? '<div class="confirm"><span style="font-size:0.75rem;color:var(--grey-soft);">'+T('p.payconfirm','Betalen gaat met één tik, Face ID of Apple Pay, zonder formulieren. (Demo: er wordt niets afgeschreven.)')+'</span></div>'
             : '') +
@@ -2225,6 +2232,7 @@ window.I18N = { en: {
   'p.netprice':'Net price (wholesale)', 'p.fixedcontrib':'Fixed member contribution', 'p.ofwhichfoundation':'of which to the RTFoundation (30%)', 'p.total':'Total',
   'p.payconfirm':'Payment is one tap, Face ID or Apple Pay, no forms. (Demo: nothing is charged.)', 'p.payall':'Pay all', 'p.payall.sub':'One tap, all outstanding payments at once.',
   'p.bank.h':'Prefer a bank transfer?', 'p.bank.to':'Transfer the amount to', 'p.bank.name':'in the name of RTG, quoting your code name', 'p.bank.ref':'and the invoice number. Once received, we mark the invoice as paid.',
+  'p.vat':'VAT 21% (included in the contribution)', 'p.toms':'Travel part: VAT margin scheme for travel services', 'p.ledger':'Ledger code (posting)',
   'p.lock.trip':'The travel overview', 'p.daystogo':'days to go', 'p.changeadd':'Change or add something?',
   'p.changeadd.life':'Your concierge arranges it, one message is enough.', 'p.changeadd.ai':'Ask your personal AI, or message the Butler.',
   'p.ai.plan':'• Shall I prepare a packing list and a day plan for 14 October? A single "yes" is enough.',

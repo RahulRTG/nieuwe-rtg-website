@@ -408,9 +408,19 @@ function stateFor(sess, lang) {
     // Echte accounts hebben hun eigen boekingen/betalingen; demo-sessies delen
     // de vaste demo-inhoud.
     const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate()) : db.data;
-    state.invoices = (md.invoices || []).map(inv => ({
-      ...inv, desc: i18n.localize(inv.desc, lang), date: i18n.localize(inv.date, lang)
-    }));
+    // Elke factuur krijgt een afboekcode (grootboeksuggestie) en de btw die in
+    // de ledenbijdrage is begrepen. Business-leden zien de volledige specificatie.
+    state.invoices = (md.invoices || []).map(inv => {
+      const contrib = /lidmaatschap|jaarbijdrage/i.test(inv.desc);
+      return {
+        ...inv, desc: i18n.localize(inv.desc, lang), date: i18n.localize(inv.date, lang),
+        afboekcode: contrib ? '4560' : '4510',
+        afboeklabel: lang === 'en'
+          ? (contrib ? 'subscriptions and memberships' : 'travel and lodging expenses')
+          : (contrib ? 'contributies en abonnementen' : 'reis- en verblijfkosten'),
+        btw: Math.round((inv.bijdrage - inv.bijdrage / 1.21) * 100) / 100
+      };
+    });
     if (md.trip) {
       state.trip = {
         ...md.trip,

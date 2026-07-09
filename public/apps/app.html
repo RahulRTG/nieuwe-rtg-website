@@ -1843,6 +1843,27 @@
   function renderPay(){
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+    // Business Pass: de volledige, boekhoudklare specificatie onder elke factuur
+    // (incl. afboekcode en btw). RTG en Lifestyle houden de rustige weergave.
+    const eurC = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const specRow = (l, v, strong) => '<div style="display:flex;justify-content:space-between;gap:1rem;"><span>' + l + '</span><span style="text-align:right;flex-shrink:0;' + (strong ? 'color:var(--txt);font-weight:600;' : '') + '">' + v + '</span></div>';
+    const bizSpec = inv => {
+      if (user.tier !== 'business') return '';
+      const total = inv.netto + inv.bijdrage;
+      return '<div style="margin:0 0 0.9rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.7rem;color:var(--muted);line-height:1.8;">' +
+        '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.3rem;">' + T('inv.spec','Factuurspecificatie') + '</div>' +
+        specRow(T('inv.number','Factuurnummer'), inv.id) +
+        specRow(T('inv.holder','Op naam van'), user.codename + ' · Business Pass') +
+        (inv.netto > 0 ? specRow(T('inv.net','Nettoprijs (inkoop)'), eurC(inv.netto)) : '') +
+        specRow(T('inv.contrib','Ledenbijdrage'), eurC(inv.bijdrage)) +
+        specRow(T('inv.foundation','waarvan naar de RTFoundation (30%)'), eurC(Math.round(inv.bijdrage * 0.3))) +
+        specRow(T('inv.vat','Btw 21% (in de bijdrage begrepen)'), eurC(inv.btw || 0)) +
+        (inv.netto > 0 ? specRow(T('inv.toms','Reisdeel: btw-margeregeling reisdiensten'), eurC(0)) : '') +
+        specRow(T('inv.total','Totaal'), eurC(total), true) +
+        specRow(T('inv.ledger','Afboekcode (grootboek)'), '<b style="color:var(--txt);">' + (inv.afboekcode || '4510') + '</b> · ' + (inv.afboeklabel || '')) +
+        '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.5rem;font-size:0.64rem;">RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · ' + RTG_IBAN + '</div>' +
+      '</div>';
+    };
     $('#payList').innerHTML = invoices.map(inv => {
       const total = inv.netto + inv.bijdrage;
       return '<div class="rowitem">' +
@@ -1853,7 +1874,7 @@
             ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>'
             : '<span class="pill paid">'+T('app.paid','Betaald')+'</span>') +
         '</div>' +
-      '</div>';
+      '</div>' + bizSpec(inv);
     }).join('');
     $('#payAllWrap').innerHTML = (open.length
       ? '<button class="btn-pay payall" id="payAll">' + FID + T('app.payall','Betaal alles') + ', ' + eur(openSum) + '</button>'
@@ -2175,6 +2196,11 @@ window.I18N = { en: {
   'app.bank.name':'in the name of RTG, quoting your code name',
   'app.bank.ref':'and the invoice number. Once received, we mark the invoice as paid.',
   'app.bank.copy':'Copy IBAN', 'app.bank.copied':'IBAN copied.',
+  'inv.spec':'Invoice specification', 'inv.number':'Invoice number', 'inv.holder':'In the name of',
+  'inv.net':'Net price (purchase)', 'inv.contrib':'Membership contribution',
+  'inv.foundation':'of which to the RTFoundation (30%)', 'inv.vat':'VAT 21% (included in the contribution)',
+  'inv.toms':'Travel part: VAT margin scheme for travel services', 'inv.total':'Total',
+  'inv.ledger':'Ledger code (posting)',
   'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
   'app.roomsfree':'room(s) available', 'app.tp.view':'View',
   'app.ms.closed':'Orders are temporarily closed. The menu remains on view.',

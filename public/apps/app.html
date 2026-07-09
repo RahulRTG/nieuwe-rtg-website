@@ -126,8 +126,9 @@
   .vbanner.pending{border-color:var(--line);}
   .vbanner b{font-size:0.95rem;}
   .vbanner span{font-size:0.8rem;color:var(--muted);line-height:1.5;}
-  .vbanner .vbtn{align-self:flex-start;margin-top:0.55rem;background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.6rem 1.15rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;}
-  .vbanner .vbtn:active{opacity:0.85;}
+  .vbtn{align-self:flex-start;background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.6rem 1.15rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .vbtn:active{opacity:0.85;}
+  .vbanner .vbtn{margin-top:0.55rem;}
 
   /* ---------- app-chroom ---------- */
 
@@ -725,6 +726,7 @@
         <button class="notif-push" id="notifPush" data-i18n="app.pushenable">Push aanzetten</button>
       </div>
       <div class="notif-list" id="notifList"></div>
+      <button id="logoutBtn" style="margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);background:none;border:1px solid var(--line);border-radius:12px;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
     </div>
     <div class="notif-scrim" id="notifScrim"></div>
 
@@ -987,6 +989,7 @@
     if (state.trip) trip = state.trip;
     if (state.posts) posts = state.posts;
     if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
+    if (state.myApplications) myApps = state.myApplications;
   }
 
   let toastTimer;
@@ -1068,12 +1071,37 @@
       }
     }
     if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
+    if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
     renderAll();
     if (API.live && window.RTGRealtime){
       RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell });
     }
+  }
+
+  // Blijf ingelogd: met een bewaard token slaat de app het startscherm over.
+  async function restoreSession(){
+    if (!API.enabled) return;
+    let t = null; try { t = localStorage.getItem('rtg_member_token'); } catch(e){}
+    if (!t) return;
+    API.token = t;
+    try {
+      applyState((await API.call('/state')).state);
+      $('#gate').style.display = 'none';
+      $('#app').classList.add('active');
+      renderAll();
+      if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell });
+    } catch(e){
+      API.token = null;
+      try { localStorage.removeItem('rtg_member_token'); } catch(e2){}
+    }
+  }
+
+  async function doLogout(){
+    try { if (API.live) await API.call('/logout'); } catch(e){}
+    try { localStorage.removeItem('rtg_member_token'); } catch(e){}
+    location.reload();
   }
 
   /* ---------- live updates ---------- */
@@ -1090,6 +1118,7 @@
     else if (scope === 'orders'){ renderTerPlaatse(); }
     else if (scope === 'live'){ renderLive(); }
     else if (scope === 'gchat'){ if (pchat) loadPChat(); }
+    else if (scope === 'apply'){ renderCvCard(); }
     else if (scope === 'chat'){ if (user.account) renderChat(); }
     else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
   }
@@ -1492,7 +1521,7 @@
   $('#menu-scrim').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
 
   /* ---------- cv-builder + solliciteren via RTG ---------- */
-  let myCv = null, myCvReady = false;
+  let myCv = null, myCvReady = false, myApps = [];
   const APPLY_FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -1512,6 +1541,13 @@
       (myCvReady
         ? '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">✓ '+T('cv.card.ready','Uw cv staat klaar. Solliciteer bij elke RTG-partner in een tik, via Ter plaatse.')+'</div>'
         : '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('cv.card.build','Maak eenmalig uw cv met de cv-builder en solliciteer daarna bij elke RTG-partner op dezelfde manier.')+'</div>')+
+      (myApps.length ? '<div style="margin-top:0.9rem;display:flex;flex-direction:column;gap:0.45rem;">'+myApps.map(a => {
+        const kleur = a.status==='aangenomen' ? '#4CAF7D' : a.status==='afgewezen' ? 'var(--burgundy)' : 'var(--gold)';
+        const label = a.status==='aangenomen' ? T('cv.st.hired','aangenomen') : a.status==='afgewezen' ? T('cv.st.rejected','afgewezen') : T('cv.st.new','in behandeling');
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;font-size:0.78rem;color:var(--muted);">'+
+          '<span>'+a.company+' · '+a.func+'</span>'+
+          '<span style="flex-shrink:0;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:'+kleur+';border:1px solid '+kleur+';border-radius:999px;padding:0.15rem 0.55rem;">'+label+'</span></div>';
+      }).join('')+'</div>' : '')+
       '<button class="vbtn" style="margin-top:0.8rem;" id="cvOpen">'+(myCvReady?T('cv.card.edit','Bewerk mijn cv'):T('cv.card.make','Maak mijn cv'))+'</button>';
     $('#cvOpen').addEventListener('click', openCvSheet);
   }
@@ -2024,6 +2060,10 @@
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
+  restoreSession();
 })();
 </script>
 <script>
@@ -2073,6 +2113,7 @@ window.I18N = { en: {
   'cv.card.build':'Build your resume once with the resume builder, then apply at every RTG partner the same way.',
   'cv.card.edit':'Edit my resume', 'cv.card.make':'Build my resume',
   'cv.workat':'Work at', 'cv.apply':'Apply', 'cv.applied':'Application sent, with your RTG resume attached.',
+  'cv.st.hired':'hired', 'cv.st.rejected':'not selected', 'cv.st.new':'under review', 'app.logout':'Sign out',
   'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
   'app.roomsfree':'room(s) available', 'app.tp.view':'View',
   'app.ms.closed':'Orders are temporarily closed. The menu remains on view.',

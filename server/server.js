@@ -85,8 +85,24 @@ const PERSONAS = {
   business:  { name: 'A. de Vries',  full: 'Alexander de Vries', since: 'November 2025',  number: 'BSP · 2025 · 1104', codename: 'Noordelijke Ster' }
 };
 
-// token -> { tier, key } (in-memory; verdwijnt bij herstart, data blijft in db.json)
+// token -> { tier, key }. In-memory voor snelheid, gespiegeld in db.json
+// zodat ingelogde gebruikers een serverherstart overleven.
 const sessions = new Map();
+function rememberSession(token, sess) {
+  sess.at = new Date().toISOString();
+  sessions.set(token, sess);
+  db.data.sessions[token] = sess;
+  const toks = Object.keys(db.data.sessions);
+  if (toks.length > 400) {
+    toks.sort((a, b) => new Date(db.data.sessions[a].at || 0) - new Date(db.data.sessions[b].at || 0));
+    for (const t of toks.slice(0, toks.length - 400)) { delete db.data.sessions[t]; sessions.delete(t); }
+  }
+  save();
+}
+function forgetSession(token) {
+  sessions.delete(token);
+  if (db.data.sessions) { delete db.data.sessions[token]; save(); }
+}
 
 /* ---------- demo-account: één inlog (Rahul / Imran) voor elk kanaal ----------
    Zo kunt u het klantportaal, de leverancier-app en het personeelskanaal met
@@ -120,6 +136,8 @@ const AUTHOR_TIER = {
 const sseClients = []; // { tier, res }
 
 function initRealtime() {
+  if (!db.data.sessions) db.data.sessions = {};
+  for (const [t, s] of Object.entries(db.data.sessions)) if (!sessions.has(t)) sessions.set(t, s);
   if (!db.data.notifications) db.data.notifications = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.pushSubs) db.data.pushSubs = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.supplierNotifications) db.data.supplierNotifications = {};
@@ -330,8 +348,19 @@ function stateFor(sess, lang) {
     }
     state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
     state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
+    state.myApplications = myApplications(sess.key);
   }
   return state;
+}
+
+// De sollicitaties van dit lid, over alle partners heen, nieuwste eerst.
+function myApplications(key) {
+  const out = [];
+  for (const [code, list] of Object.entries(db.data.applications || {})) {
+    const s = findSupplier(code);
+    for (const a of list) if (a.key === key) out.push({ company: s ? s.name : code, func: a.func, status: a.status, at: a.at });
+  }
+  return out.sort((x, y) => new Date(y.at) - new Date(x.at)).slice(0, 10);
 }
 
 /* ---------- endpoints ---------- */
@@ -348,12 +377,12 @@ app.post('/api/login', (req, res) => {
   if (!PERSONAS[tier]) return res.status(400).json({ error: 'Onbekende pas.' });
   const token = crypto.randomBytes(24).toString('hex');
   const sess = { tier, key: tier === 'guest' ? 'guest-' + token.slice(0, 8) : tier };
-  sessions.set(token, sess);
+  rememberSession(token, sess);
   res.json({ token, state: stateFor(sess, req.body.lang) });
 });
 
 app.post('/api/logout', auth, (req, res) => {
-  for (const [token, sess] of sessions) if (sess === req.session) sessions.delete(token);
+  for (const [token, sess] of sessions) if (sess === req.session) forgetSession(token);
   res.json({ ok: true });
 });
 
@@ -848,14 +877,25 @@ function supplierState(s, actor) {
 
 // ---- leverancier: inloggen, live-stream, dashboard ----
 
+// Bescherming tegen PIN-raden: na 5 foute pogingen een minuut wachten.
+const pinFails = new Map(); // 'CODE:staffId' -> { n, until }
 app.post('/api/supplier/login', (req, res) => {
   let s, actor;
   if (req.body.staffId != null) {
     // Persoonlijke personeelslogin met PIN, binnen het bedrijfsaccount.
     s = findSupplier(req.body.code);
     if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
+    const fk = s.code + ':' + req.body.staffId;
+    const fail = pinFails.get(fk);
+    if (fail && fail.until > Date.now())
+      return res.status(429).json({ error: 'Te veel foute pogingen. Wacht een minuut en probeer het opnieuw.' });
     const staff = accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
-    if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) return res.status(401).json({ error: 'Onjuiste PIN.' });
+    if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) {
+      const n = ((fail && fail.n) || 0) + 1;
+      pinFails.set(fk, n >= 5 ? { n: 0, until: Date.now() + 60000 } : { n, until: 0 });
+      return res.status(401).json({ error: 'Onjuiste PIN.' });
+    }
+    pinFails.delete(fk);
     actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
   } else if (hasCred(req.body)) {
     if (!checkCred(req.body.username, req.body.password))
@@ -868,7 +908,7 @@ app.post('/api/supplier/login', (req, res) => {
   }
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
   const token = crypto.randomBytes(24).toString('hex');
-  sessions.set(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager });
+  rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager });
   logActivity(s.code, actor, actor.name + ' logde in');
   res.json({ token, state: supplierState(s, actor) });
 });
@@ -1471,14 +1511,31 @@ app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
     logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
     sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
     sseToOffice('sync', { scope: 'team' });
+    notifyApplicant(a, req.supplier);
     return res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
   }
   a.status = 'afgewezen';
   save();
   logActivity(req.supplier.code, req.actor, 'wees de sollicitatie van ' + a.name + ' af');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  notifyApplicant(a, req.supplier);
   res.json({ ok: true });
 });
+
+// Solliciteerde een RTG-lid, dan hoort het lid direct van het besluit:
+// live in de app en (bij demo-profielen) als notificatie met push.
+function notifyApplicant(a, supplier) {
+  if (!a.key) return;
+  const hired = a.status === 'aangenomen';
+  if (db.data.notifications[a.key]) {
+    notify(a.key, {
+      icon: hired ? '🎉' : '📝',
+      title: hired ? 'U bent aangenomen!' : 'Sollicitatie afgerond',
+      body: supplier.name + ' heeft uw sollicitatie als ' + a.func + (hired ? ' geaccepteerd. Het bedrijf neemt contact met u op.' : ' helaas afgewezen.')
+    });
+  }
+  sseToCustomer(a.key, 'sync', { scope: 'apply' });
+}
 
 /* ---- cv-builder (leden-app): het cv is de sleutel tot solliciteren ---- */
 function cvReady(cv) {
@@ -1521,7 +1578,7 @@ app.post('/api/member/apply', auth, (req, res) => {
     id: crypto.randomBytes(4).toString('hex'),
     name: cv.name, func, contact: cv.contact,
     note: String(req.body.note || '').trim().slice(0, 400),
-    viaRTG: true, codename,
+    viaRTG: true, codename, key: req.session.key,
     cv: { headline: cv.headline, experience: cv.experience, skills: cv.skills, languages: cv.languages, about: cv.about },
     status: 'nieuw', at: new Date().toISOString()
   };
@@ -2189,7 +2246,7 @@ app.post('/api/office/login', (req, res) => {
     return res.status(401).json({ error: 'Onjuiste backoffice-code.' });
   }
   const token = crypto.randomBytes(24).toString('hex');
-  sessions.set(token, { role: 'office' });
+  rememberSession(token, { role: 'office' });
   res.json({ token, state: officeState() });
 });
 

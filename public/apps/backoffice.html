@@ -185,6 +185,11 @@
       const d = await call('/office/login', { code: $('#code').value.trim() });
       token = d.token; state = d.state;
     } catch(e){ alert(e.message); return; }
+    try { localStorage.setItem('rtg_office_token', token); } catch(e){}
+    enterApp();
+  }
+
+  function enterApp(){
     $('#gate').style.display = 'none';
     $('#app').classList.add('on');
     $('#liveInd').style.display = 'inline-flex';
@@ -193,6 +198,21 @@
     loadConcierge();
     stream();
   }
+
+  // Blijf ingelogd: met een bewaard token direct het overzicht in.
+  (async function restoreSession(){
+    if (!enabled) return;
+    let t = null; try { t = localStorage.getItem('rtg_office_token'); } catch(e){}
+    if (!t) return;
+    token = t;
+    try {
+      state = (await call('/office/state')).state;
+      enterApp();
+    } catch(e){
+      token = null;
+      try { localStorage.removeItem('rtg_office_token'); } catch(e2){}
+    }
+  })();
 
   async function refresh(){ try { state = (await call('/office/state')).state; render(); } catch(e){} }
 

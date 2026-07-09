@@ -1,6 +1,8 @@
 /* RTG app, service worker: cachet de app-schil zodat de app installeerbaar
-   is en offline opent. API-verkeer gaat altijd naar het netwerk. */
-const CACHE = 'rtg-app-v2';
+   is en offline opent. API-verkeer gaat altijd naar het netwerk.
+   Pagina's en scripts zijn network-first: een update op de server komt
+   direct door, de cache is alleen het vangnet zonder verbinding. */
+const CACHE = 'rtg-app-v3';
 const SHELL = ['/apps/app.html', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -18,14 +20,23 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/api/')) return;
+  // Iconen en manifests veranderen zelden: die mogen uit de cache komen.
+  const staticAsset = /^\/(icons|manifests)\//.test(url.pathname) || url.pathname === '/icon.svg';
   e.respondWith(
-    caches.match(e.request).then(hit => hit ||
-      fetch(e.request).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy));
-        return res;
-      }).catch(() => caches.match('/apps/app.html'))
-    )
+    staticAsset
+      ? caches.match(e.request).then(hit => hit ||
+          fetch(e.request).then(res => {
+            const copy = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, copy));
+            return res;
+          }))
+      : fetch(e.request).then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, copy));
+          return res;
+        }).catch(() =>
+          caches.match(e.request).then(hit => hit || caches.match('/apps/app.html'))
+        )
   );
 });
 

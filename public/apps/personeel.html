@@ -248,6 +248,7 @@
         const d = await API.call('/supplier/login', { code: c, staffId, pin: $('#pinInp').value });
         API.token = d.token; state = d.state; code = c;
         me = { name: d.state.actor.name, role: d.state.actor.role, staffId: d.state.actor.staffId };
+        try { localStorage.setItem('rtg_pda_token', API.token); localStorage.setItem('rtg_pda_code', code); } catch(e2){}
         week = await API.call('/supplier/schedule', {}).catch(()=>null);
         enter();
       } catch(e){ toast(e.message || T('pd.badpin','Onjuiste pincode.')); }
@@ -267,6 +268,25 @@
   }
   function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; renderAll(); } catch(e){} }
+
+  // Blijf ingelogd: met een bewaard token direct naar Vandaag, zonder PIN.
+  async function restoreSession(){
+    let t = null, c = null;
+    try { t = localStorage.getItem('rtg_pda_token'); c = localStorage.getItem('rtg_pda_code'); } catch(e){}
+    if (!t || !c || !BEDRIJVEN[c]) return;
+    API.token = t;
+    try {
+      const st = (await API.call('/supplier/state')).state;
+      if (!st.actor || !st.actor.staffId){ API.token = null; return; } // alleen persoonlijke logins herstellen
+      state = st; code = c;
+      me = { name: st.actor.name, role: st.actor.role, staffId: st.actor.staffId };
+      week = await API.call('/supplier/schedule', {}).catch(()=>null);
+      enter();
+    } catch(e){
+      API.token = null;
+      try { localStorage.removeItem('rtg_pda_token'); localStorage.removeItem('rtg_pda_code'); } catch(e2){}
+    }
+  }
 
   function myShift(dayIndex){
     if (!week) return null;
@@ -448,7 +468,10 @@
     $('#content').scrollTop = 0;
   }
   document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
-  $('#switchBtn').addEventListener('click', () => location.reload());
+  $('#switchBtn').addEventListener('click', () => {
+    try { localStorage.removeItem('rtg_pda_token'); localStorage.removeItem('rtg_pda_code'); } catch(e){}
+    location.reload();
+  });
   $('#sosBtn').addEventListener('click', sendSOS);
 
   function startStream(){
@@ -466,6 +489,7 @@
   window.addEventListener('rtglang', () => { if (state) renderAll(); else stepSector(); });
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
   stepSector();
+  restoreSession();
 })();
 </script>
 <script>

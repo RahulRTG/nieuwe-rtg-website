@@ -826,6 +826,12 @@
       toast(isCred ? T('login.bad','Onjuiste gebruikersnaam of wachtwoord.') : (e.message||T('login.failed','Inloggen mislukt.')));
       return false;
     }
+    try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
+    enterApp();
+    return true;
+  }
+
+  function enterApp(){
     $('#staffPick').classList.remove('open');
     $('#spPin').classList.remove('open');
     $('#gate').style.display = 'none';
@@ -834,13 +840,32 @@
     renderAll();
     startStream();
     loadNotifs();
-    return true;
+  }
+
+  // Blijf ingelogd: met een bewaard token direct de app in, zonder PIN.
+  async function restoreSession(){
+    if (!API.enabled) return;
+    let t = null; try { t = localStorage.getItem('rtg_sup_token'); } catch(e){}
+    if (!t) return;
+    API.token = t;
+    try {
+      const st = (await API.call('/supplier/state')).state;
+      // In een sector-app alleen herstellen als de sessie bij deze sector hoort;
+      // het token blijft bewaard voor de app waar het wel bij hoort.
+      if (SDEF && st.supplier && !SDEF.codes.includes(st.supplier.code)){ API.token = null; return; }
+      applyState(st);
+      enterApp();
+    } catch(e){
+      API.token = null;
+      try { localStorage.removeItem('rtg_sup_token'); } catch(e2){}
+    }
   }
 
   // Wissel van gebruiker: sessie loslaten, terug naar het inlogscherm.
   function switchUser(){
     if (source){ try{ source.close(); }catch(_){} source = null; }
     API.token = null; state = null; S = null; notifs = [];
+    try { localStorage.removeItem('rtg_sup_token'); } catch(e){}
     $('#app').classList.remove('active');
     $('#gate').style.display = '';
     if (pickCode) pickPartner(pickCode); else $('#staffPick').classList.remove('open');
@@ -1943,6 +1968,7 @@
   renderAIThread();
   buildPad();
   renderGate();
+  restoreSession();
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 })();
 </script>

@@ -150,6 +150,23 @@ function initRealtime() {
       ]}
     ]
   };
+  // Lifestyle Pass (€ 20.000 p/m): "de Rechterhand". Twee signatuurstukken:
+  // wat er stil geregeld is vóórdat het lid het vroeg, en het wensenboek —
+  // één keer uitspreken, voor altijd toegepast.
+  if (!db.data.geregeld) db.data.geregeld = {
+    lifestyle: [
+      { at: '06:40', title: 'Transfer verzet na vertraging-signaal', detail: 'KL867 kent 40 minuten vertraging-risico; uw chauffeur in Osaka is al omgeboekt. U merkt er niets van.' },
+      { at: '23:15', title: 'Suite stil geüpgraded', detail: 'De riviervleugel van Hoshinoya kwam vrij; uw voorkeur voor stromend water is doorgevoerd. Zelfde tarief.' },
+      { at: '18:00', title: 'Regen op 13 oktober voorzien', detail: 'Het bamboebos is naar het droge ochtendvenster verplaatst; de lunch schuift mee. Uw middag blijft vrij.' }
+    ]
+  };
+  if (!db.data.wensen) db.data.wensen = {
+    lifestyle: [
+      { text: 'Stevige kussens, nooit dons', at: 'mei 2026' },
+      { text: 'De tafel nooit bij de ingang', at: 'april 2026' },
+      { text: 'Bruisend water zonder ijs, met citroen', at: 'maart 2026' }
+    ]
+  };
   // Zakelijke dagagenda voor Business Pass-leden: werk en vrij in één dag.
   // De compagnon bewaakt beide kanten — strak voorbereiden én echt loslaten.
   if (!db.data.agenda) db.data.agenda = {
@@ -326,6 +343,15 @@ function stateFor(sess, lang) {
       state.reisplan = (db.data.reisplan.rtg || []).map(d => ({
         ...d, label: i18n.localize(d.label, lang),
         items: d.items.map(it => ({ ...it, time: i18n.localize(it.time, lang), title: i18n.localize(it.title, lang), note: i18n.localize(it.note, lang) }))
+      }));
+    }
+    // Lifestyle Pass: wat de Rechterhand stil regelde + het wensenboek.
+    if (sess.tier === 'lifestyle') {
+      state.geregeld = (db.data.geregeld.lifestyle || []).map(g => ({
+        ...g, title: i18n.localize(g.title, lang), detail: i18n.localize(g.detail, lang)
+      }));
+      state.wensen = (db.data.wensen.lifestyle || []).map(w => ({
+        ...w, text: i18n.localize(w.text, lang)
       }));
     }
   }
@@ -1616,7 +1642,12 @@ const AI_TONE = {
     'Vrije momenten in het reisplan zijn bewust open. Vraagt het lid erom ("vul mijn avond in"), stel dan één passend plan voor op basis van het ritme van de dag — na een vroege ochtend iets rustigs, vóór een grote avond geen zware middag.',
     'Verwijs waar het kan naar de dag in het reisplan ("op de 14e, vóór uw theeceremonie") zodat het lid voelt dat de hele reis bewaakt wordt.'
   ].join('\n'),
-  lifestyle: 'Je werkt naast de persoonlijke concierge: warm, voorkomend en persoonlijk. U-vorm.',
+  lifestyle: [
+    'Je bent "de Rechterhand" van een Lifestyle Pass-lid (€ 20.000 per maand) en je werkt naast de persoonlijke concierge: warm, voorkomend en persoonlijk. U-vorm.',
+    'De standaard op dit niveau is stil, feilloos en vooruit: het lid hoort pas iets wanneer het al geregeld is. Je meldt wat er stil geregeld is — nooit wat er nog moet. Vraag niet om bevestiging voor kleine zaken; regel ze en meld het achteraf in één zin.',
+    'Je kent het wensenboek van het lid uit je hoofd en past elke wens ongevraagd toe. Noemt het lid terloops een voorkeur, dan noteer je die als wens en bevestig je kort: "Genoteerd. Dit vergeten wij niet."',
+    'Grote of gevoelige zaken draag je warm over aan de menselijke concierge, die dag en nacht persoonlijk bevestigt. Beloof nooit zelf toegang tot passen; definitieve boekingen bevestigt altijd de concierge.'
+  ].join('\n'),
   business: [
     'Je bent "de Compagnon": de zakelijke, eerlijke rechterhand van een Business Pass-lid. U-vorm, kort, precies, geen overbodige woorden.',
     'Je kent twee registers en schakelt scherp: in WERKMODUS ben je strak — agenda, meetingvoorbereiding (doel, deelnemers, drie scherpste punten), reistijden, tijdzones, focusblokken. In VRIJE MODUS ben je gul en onbevangen — restaurants, nachtleven, onsen, feesten; het lid mag keihard ontspannen en jij regelt dat het kan, zonder oordeel.',
@@ -1646,6 +1677,12 @@ function aiSystemPrompt(tier) {
     tier === 'rtg' && (db.data.reisplan.rtg || []).length
       ? `Het dag-tot-dag reisplan dat jij bewaakt:\n${db.data.reisplan.rtg.map(d => `${d.day} (${d.label}):\n${d.items.map(i => `  - ${i.time} ${i.title} — ${i.note}`).join('\n')}`).join('\n')}`
       : '',
+    tier === 'lifestyle' && (db.data.geregeld.lifestyle || []).length
+      ? `Wat je al stil geregeld hebt (meld dit als het ter sprake komt, het lid hoefde niets te doen):\n${db.data.geregeld.lifestyle.map(g => `- ${g.at} ${g.title} — ${g.detail}`).join('\n')}`
+      : '',
+    tier === 'lifestyle' && (db.data.wensen.lifestyle || []).length
+      ? `Het wensenboek van het lid (pas elke wens ongevraagd toe):\n${db.data.wensen.lifestyle.map(w => `- ${w.text}`).join('\n')}`
+      : '',
     'Verzin geen boekingen of prijzen die hierboven niet staan. Als je iets niet weet of niet kunt regelen, zeg dat eerlijk en bied aan het uit te zoeken.'
   ].filter(Boolean).join('\n');
 }
@@ -1668,6 +1705,21 @@ function cannedAnswer(q, tier) {
       return `Vanavond staat: ${vrij.filter(a => Number(a.time.slice(0,2)) >= 19).map(a => `${a.time} ${a.title}`).join(', daarna ')}.\n\nDe eerste ronde staat op uw codenaam, taxi stand-by tot 03:00 — u hoeft nergens op te letten, ga los.\n\nEerlijk: uw board-call staat om 10:00. Ik bewaak de ochtend (buffer + espresso), maar wilt u ruimer? Eén woord en ik verzet de focusochtend.`;
     if (l.includes('ontspan') || l.includes('relax') || l.includes('rust') || l.includes('spa') || l.includes('onsen') || l.includes('massage'))
       return `Om ${vrij[0].time}: ${vrij[0].title.replace('Vrij: ', '')}. ${vrij[0].prep}\n\nDaarna niets tot het diner — die lege ruimte is bewust. Zal ik hetzelfde blok ook voor overmorgen vastzetten?`;
+  }
+  // De Rechterhand (Lifestyle Pass): stil geregeld, wensenboek, warme overdracht.
+  if (tier === 'lifestyle') {
+    const ger = db.data.geregeld.lifestyle || [];
+    const wns = db.data.wensen.lifestyle || [];
+    if (l.includes('geregeld') || l.includes('gebeurd') || l.includes('nieuws') || l.includes('update') || l.includes('gedaan'))
+      return `Terwijl u met andere dingen bezig was:\n${ger.map(g => `• ${g.title} — ${g.detail}`).join('\n')}\n\nU hoefde nergens aan te denken. Zo hoort het.`;
+    if (l.includes('wens') || l.includes('voorkeur') || l.includes('noteer') || l.includes('onthoud'))
+      return `Genoteerd. Dit vergeten wij niet — elke volgende boeking past het ongevraagd toe, zonder dat u het hoeft te herhalen.\n\nUw wensenboek telt nu ${wns.length + 1} wensen. De laatste drie: ${wns.slice(0, 3).map(w => w.text.toLowerCase()).join('; ')}.`;
+    if (l.includes('verras') || l.includes('bijzonder') || l.includes('speciaal') || l.includes('15'))
+      return 'Voor de 15e heb ik iets in gedachten dat niet te boeken valt: een avondbezoek aan een tempel in Higashiyama ná sluiting, alleen u, de priester en de tuin in lantaarnlicht. Uw voorkeur voor stilte is meegenomen; vervoer en timing regel ik geruisloos rond uw diner.\n\nUw concierge belt u vandaag persoonlijk om dit te bevestigen. U hoeft alleen maar ja te knikken.';
+    if (l.includes('concierge') || l.includes('bel') || l.includes('mens') || l.includes('contact'))
+      return 'Uw concierge is ingelicht en neemt binnen enkele minuten persoonlijk contact op, dag en nacht. Alles wat wij hier bespraken, weet zij al — u hoeft niets te herhalen.';
+    if (l.includes('rustig') || l.includes('rust') || l.includes('stil') || l.includes('avond'))
+      return 'Voor een rustige avond: de riviersuite is al voorbereid — bruisend water zonder ijs met citroen staat koud, het kussenmenu is op stevig gezet en het personeel weet dat u niet gestoord wilt worden na 21:00.\n\nMocht u toch trek krijgen: één bericht en er staat binnen twintig minuten iets lichts voor de deur.';
   }
   // De Butler (RTG Pass): reisplan-bewust — kent elke dag, vult vrije momenten in.
   if (tier === 'rtg') {
@@ -1695,6 +1747,21 @@ function cannedAnswer(q, tier) {
     return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki of een counter-kaiseki in Higashiyama, beide via ons netwerk tegen normale prijs.';
   return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Kyoto kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.';
 }
+
+/* Het wensenboek: één keer uitspreken, voor altijd toegepast. De concierge
+   in de backoffice wordt live ingelicht — op codenaam, nooit op echte naam. */
+app.post('/api/wens', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Het wensenboek is exclusief voor leden.' });
+  const text = String(req.body.text || '').trim().slice(0, 140);
+  if (!text) return res.status(400).json({ error: 'Vertel ons uw wens.' });
+  const list = db.data.wensen[req.session.tier] = (db.data.wensen[req.session.tier] || []);
+  list.unshift({ text, at: new Date().toISOString() });
+  db.data.wensen[req.session.tier] = list.slice(0, 30);
+  save();
+  const persona = req.session.account ? accounts.publicUser(req.session.account) : PERSONAS[req.session.tier];
+  sseToOffice('notify', { icon: '✦', title: 'Nieuwe wens in het wensenboek', body: (persona.codename || 'Een lid') + ': ' + text });
+  res.json({ ok: true, wensen: db.data.wensen[req.session.tier] });
+});
 
 app.post('/api/ai', auth, async (req, res) => {
   if (req.session.tier === 'guest') {

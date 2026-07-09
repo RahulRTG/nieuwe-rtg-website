@@ -264,6 +264,11 @@
   /* reisagenda van de Butler (RTG Pass): dag-tot-dag */
   .rp-day{margin-top:1rem;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
   .rp-day:first-of-type{margin-top:0.7rem;}
+  /* wensenboek van de Rechterhand (Lifestyle Pass) */
+  .wb-add{display:flex;gap:0.5rem;margin-top:0.8rem;}
+  .wb-add input{flex:1;background:none;border:1px solid var(--line);border-radius:999px;padding:0.6rem 1rem;font-size:0.82rem;color:var(--txt);font-family:inherit;outline:none;}
+  .wb-add input:focus{border-color:var(--burgundy);}
+  .wb-add button{background:none;border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:0 1rem;font-size:0.76rem;cursor:pointer;font-family:inherit;}
   .card .label{
     font-size:0.62rem;
     letter-spacing:0.16em;
@@ -915,6 +920,18 @@
       {time:'19:30', title:'Diner Kikunoi Honten (3★)', note:'Kaiseki, in aanvraag; de bevestiging wordt bewaakt. Taxi om 19:00.'}
     ]}
   ];
+  // De Rechterhand (Lifestyle Pass): wat er stil geregeld is + het wensenboek.
+  // Zonder server geldt deze demo-data; met server komt het uit /api/state.
+  let geregeld = [
+    {at:'06:40', title:'Transfer verzet na vertraging-signaal', detail:'KL867 kent 40 minuten vertraging-risico; uw chauffeur in Osaka is al omgeboekt. U merkt er niets van.'},
+    {at:'23:15', title:'Suite stil geüpgraded', detail:'De riviervleugel van Hoshinoya kwam vrij; uw voorkeur voor stromend water is doorgevoerd. Zelfde tarief.'},
+    {at:'18:00', title:'Regen op 13 oktober voorzien', detail:'Het bamboebos is naar het droge ochtendvenster verplaatst; de lunch schuift mee. Uw middag blijft vrij.'}
+  ];
+  let wensen = [
+    {text:'Stevige kussens, nooit dons'},
+    {text:'De tafel nooit bij de ingang'},
+    {text:'Bruisend water zonder ijs, met citroen'}
+  ];
 
   /* ---------- backend-koppeling ---------- */
 
@@ -943,6 +960,8 @@
     if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
     if (state.agenda) agenda = state.agenda;
     if (state.reisplan) reisplan = state.reisplan;
+    if (state.geregeld) geregeld = state.geregeld;
+    if (state.wensen) wensen = state.wensen;
   }
 
   let toastTimer;
@@ -1498,6 +1517,40 @@
         '</div>';
       $('#agPrep').addEventListener('click', () => { openTab('ai'); ask(T('app.day.prep.q','Bereid mijn volgende meeting voor')); });
       $('#agNight').addEventListener('click', () => { openTab('ai'); ask(T('app.day.night.q','Plan mijn avond: uitgaan')); });
+    } else if (user.tier === 'lifestyle' && geregeld && geregeld.length){
+      // Lifestyle Pass: de Rechterhand — het lid hoort het pas als het al geregeld is.
+      dayCard.style.display = '';
+      dayCard.innerHTML =
+        '<div class="label">'+T('app.rh.label','Stil geregeld, uw rechterhand was u voor')+'</div>' +
+        geregeld.map(g =>
+          '<div class="ag-row"><span class="tm">'+g.at+'</span>' +
+          '<span class="ti">'+g.title+'<small>'+g.detail+'</small></span>' +
+          '<span class="ag-tag vrij">'+T('app.rh.done','geregeld')+'</span></div>'
+        ).join('') +
+        '<div class="rp-day">'+T('app.rh.wb','Het wensenboek')+'</div>' +
+        (wensen||[]).slice(0,3).map(w =>
+          '<div class="ag-row"><span class="ti">✦ '+escHtml(w.text)+'</span></div>'
+        ).join('') +
+        '<div class="wb-add"><input id="wbInput" maxlength="140" placeholder="'+T('app.rh.ph','Eén keer zeggen is genoeg…')+'"><button id="wbAdd">'+T('app.rh.add','Noteer')+'</button></div>' +
+        '<div class="ag-acts">' +
+          '<button class="primary" id="rhSurprise">'+T('app.rh.surprise','Verras ons op de 15e')+'</button>' +
+          '<button id="rhAsk">'+T('app.rh.ask','Wat is er al geregeld?')+'</button>' +
+        '</div>';
+      const addWens = async () => {
+        const el = $('#wbInput'); const text = (el.value||'').trim();
+        if (!text) return;
+        el.value = '';
+        if (API.live){
+          try { const d = await API.call('/wens', {text}); wensen = d.wensen; }
+          catch(e){ toast(e.message || 'Noteren mislukt.'); return; }
+        } else wensen.unshift({text});
+        toast(T('app.rh.noted','Genoteerd. Dit vergeten wij niet.'));
+        renderHome();
+      };
+      $('#wbAdd').addEventListener('click', addWens);
+      $('#wbInput').addEventListener('keydown', e => { if (e.key==='Enter') addWens(); });
+      $('#rhSurprise').addEventListener('click', () => { openTab('ai'); ask(T('app.rh.surprise.q','Verras ons op de 15e')); });
+      $('#rhAsk').addEventListener('click', () => { openTab('ai'); ask(T('app.rh.ask.q','Wat is er al geregeld?')); });
     } else if (user.tier === 'rtg' && reisplan && reisplan.length){
       // RTG Pass: de reisagenda van de Butler — dag één uitgelicht, de rest in één oogopslag.
       const d1 = reisplan[0];
@@ -1697,6 +1750,17 @@
         : '• Eerlijke noot: de avond loopt laat door en uw board-call staat om 10:00. Ik heb een buffer geblokt. Zo houden?');
       return lines.join('\n');
     }
+    // De Rechterhand opent met wat er al stil geregeld is: op dit niveau
+    // hoort het lid pas iets wanneer het al gedaan is.
+    if (user.tier === 'lifestyle' && geregeld && geregeld.length){
+      lines.push(lang()==='en'
+        ? ('• Quietly handled while you were away: ' + geregeld.map(g => g.title.toLowerCase()).join('; ') + '. You did not have to do a thing.')
+        : ('• Stil geregeld terwijl u er niet mee bezig was: ' + geregeld.map(g => g.title.toLowerCase()).join('; ') + '. U hoefde niets te doen.'));
+      lines.push(lang()==='en'
+        ? ('• Your wish book holds ' + (wensen||[]).length + ' wishes; every new booking applies them unasked.')
+        : ('• Uw wensenboek telt ' + (wensen||[]).length + ' wensen; elke nieuwe boeking past ze ongevraagd toe.'));
+      return lines.join('\n');
+    }
     // De Butler opent met de reisagenda: alles staat, de vrije momenten zijn bewust open.
     if (user.tier === 'rtg' && reisplan && reisplan.length){
       lines.push(lang()==='en'
@@ -1737,6 +1801,29 @@
         return (lang()==='en'
           ? (vrij[0].time + ': ' + vrij[0].title.replace('Vrij: ','') + '. ' + vrij[0].prep + '\n\nAfter that, nothing until dinner — that empty space is deliberate. Shall I lock the same block in for the day after tomorrow?')
           : ('Om ' + vrij[0].time + ': ' + vrij[0].title.replace('Vrij: ','') + '. ' + vrij[0].prep + '\n\nDaarna niets tot het diner — die lege ruimte is bewust. Zal ik hetzelfde blok voor overmorgen vastzetten?'));
+    }
+    // Offline-fallback van de Rechterhand (Lifestyle Pass): stil geregeld + wensenboek.
+    if (user && user.tier === 'lifestyle' && geregeld && geregeld.length){
+      if (l.includes('geregeld') || l.includes('gebeurd') || l.includes('update') || l.includes('handled') || l.includes('gedaan'))
+        return (lang()==='en' ? 'While you were busy with other things:\n' : 'Terwijl u met andere dingen bezig was:\n')
+          + geregeld.map(g => '• ' + g.title + ' — ' + g.detail).join('\n')
+          + (lang()==='en' ? '\n\nYou did not have to think about any of it. As it should be.' : '\n\nU hoefde nergens aan te denken. Zo hoort het.');
+      if (l.includes('wens') || l.includes('voorkeur') || l.includes('noteer') || l.includes('wish') || l.includes('remember'))
+        return (lang()==='en'
+          ? ('Noted. We will not forget — every future booking applies it unasked, without you repeating it.\n\nYour wish book now holds ' + (wensen.length + 1) + ' wishes.')
+          : ('Genoteerd. Dit vergeten wij niet — elke volgende boeking past het ongevraagd toe, zonder dat u het hoeft te herhalen.\n\nUw wensenboek telt nu ' + (wensen.length + 1) + ' wensen.'));
+      if (l.includes('verras') || l.includes('bijzonder') || l.includes('speciaal') || l.includes('surprise') || l.includes('15'))
+        return (lang()==='en'
+          ? 'For the 15th I have something in mind that cannot be booked: an evening visit to a temple in Higashiyama after closing — just you, the priest and the garden in lantern light. Your preference for quiet is taken into account; transport and timing are arranged silently around your dinner.\n\nYour concierge will call you personally today to confirm. All you have to do is nod.'
+          : 'Voor de 15e heb ik iets in gedachten dat niet te boeken valt: een avondbezoek aan een tempel in Higashiyama ná sluiting — alleen u, de priester en de tuin in lantaarnlicht. Uw voorkeur voor stilte is meegenomen; vervoer en timing regel ik geruisloos rond uw diner.\n\nUw concierge belt u vandaag persoonlijk om dit te bevestigen. U hoeft alleen maar ja te knikken.');
+      if (l.includes('concierge') || l.includes('bel') || l.includes('contact') || l.includes('call'))
+        return (lang()==='en'
+          ? 'Your concierge has been informed and will contact you personally within minutes, day or night. Everything we discussed here, she already knows — you will not have to repeat a thing.'
+          : 'Uw concierge is ingelicht en neemt binnen enkele minuten persoonlijk contact op, dag en nacht. Alles wat wij hier bespraken, weet zij al — u hoeft niets te herhalen.');
+      if (l.includes('rustig') || l.includes('rust') || l.includes('stil') || l.includes('quiet') || l.includes('avond') || l.includes('evening'))
+        return (lang()==='en'
+          ? 'For a quiet evening: the river suite is prepared — sparkling water without ice, with lemon, is chilled, the pillow menu is set to firm, and the staff know not to disturb you after 21:00.\n\nShould you get peckish: one message and something light is at your door within twenty minutes.'
+          : 'Voor een rustige avond: de riviersuite is al voorbereid — bruisend water zonder ijs met citroen staat koud, het kussenmenu is op stevig gezet en het personeel weet dat u na 21:00 niet gestoord wilt worden.\n\nMocht u toch trek krijgen: één bericht en er staat binnen twintig minuten iets lichts voor de deur.');
     }
     // Offline-fallback van de Butler (RTG Pass), reisplan-bewust.
     if (user && user.tier === 'rtg' && reisplan && reisplan.length){
@@ -1837,13 +1924,15 @@
   function renderAI(){
     if (user.account){ renderChat(); return; }
     const biz = user.tier === 'business';
-    $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','De Compagnon.');
+    $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','De Rechterhand.') : T('ai.title.biz','De Compagnon.');
     const deck = document.querySelector('.view[data-view="ai"] .sub');
     if (deck) deck.textContent = biz
       ? T('ai.deck.biz','Zakelijk en eerlijk: strak in werkmodus, gul als u loslaat. Beide kanten bewaakt.')
       : user.tier === 'rtg'
         ? T('ai.deck.rtg','De slimste reisagenda-assistent: elke dag voorbereid, vrije momenten op verzoek ingevuld.')
-        : T('app.v.ai.sub','De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.');
+        : user.tier === 'lifestyle'
+          ? T('ai.deck.life','Stil, feilloos en vooruit: u hoort het pas wanneer het al geregeld is.')
+          : T('app.v.ai.sub','De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.');
     $('#chat').innerHTML = '';
     chatHistory.length = 0;
     const opener = aiOpener();
@@ -1859,9 +1948,13 @@
         ? (lang()==='en'
             ? ['Show my travel agenda','Fill my free evening','How do I get to the tea ceremony?','What should I pack?','Yes, arrange it']
             : ['Toon mijn reisagenda','Vul mijn vrije avond in','Hoe kom ik bij de theeceremonie?','Wat moet ik inpakken?','Ja, regel het'])
-        : (lang()==='en'
-            ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
-            : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant']);
+        : user.tier === 'lifestyle'
+          ? (lang()==='en'
+              ? ['What has been handled?','Surprise us on the 15th','Note a wish','A quiet evening, please','Bring in my concierge']
+              : ['Wat is er al geregeld?','Verras ons op de 15e','Noteer een wens','Een rustige avond, graag','Schakel mijn concierge in'])
+          : (lang()==='en'
+              ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
+              : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant']);
     $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
     document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
   }
@@ -2007,7 +2100,13 @@ window.I18N = { en: {
   'ai.a.plan':'Proposal for 14 October:\n• 08:00 Arashiyama before the crowds\n• 11:30 lunch in Sagano\n• 15:00 your tea ceremony in Gion\n• 19:00 evening stroll Pontocho\n\nShall I reserve the lunch?',
   'ai.a.rest':'Your table at Kikunoi Honten (15 Oct, 19:30) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of Gion Sasaki.',
   'ai.a.default':'I will come back to that today. In the meantime I can help with the packing list, documents, the weather or a day plan, just say the word.',
-  'ai.title.rtg':'The Butler.', 'ai.title.life':'Your AI.', 'ai.title.biz':'The Companion.',
+  'ai.title.rtg':'The Butler.', 'ai.title.life':'The Right Hand.', 'ai.title.biz':'The Companion.',
+  'ai.deck.life':'Quiet, flawless and ahead of you: you only hear about it once it is handled.',
+  'app.rh.label':'Quietly handled, your right hand got there first', 'app.rh.done':'handled',
+  'app.rh.wb':'The wish book', 'app.rh.ph':'Saying it once is enough…', 'app.rh.add':'Note it',
+  'app.rh.noted':'Noted. We will not forget.',
+  'app.rh.surprise':'Surprise us on the 15th', 'app.rh.surprise.q':'Surprise us on the 15th',
+  'app.rh.ask':'What has been handled?', 'app.rh.ask.q':'What has been handled?',
   'ai.deck.biz':'Businesslike and honest: sharp in work mode, generous when you let go. Both sides guarded.',
   'app.day.label':'Your day, guarded by the Companion', 'app.day.free':'free', 'app.day.work':'work',
   'app.rp.label':'Your travel agenda, curated by the Butler',

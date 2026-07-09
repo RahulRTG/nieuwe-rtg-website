@@ -32,9 +32,11 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
    - `SMTP_URL=smtp://user:pass@host:587` + `MAIL_FROM="Rahul Travel Group <no-reply@domein.nl>"`
    - `ANTHROPIC_API_KEY=...` voor echte AI en vloeiende chatvertaling
 3. **E-maildomein:** SPF/DKIM/DMARC instellen bij de DNS zodat mail aankomt.
-4. **Betalingen:** Mollie of Adyen koppelen. De KvK-inschrijving is er al
-   (Handelsregister 82273510), dus het aanmelden bij een betaalprovider kan direct;
-   alleen de zakelijke bankrekening is nog nodig. Tot die tijd blijven betalingen gesimuleerd.
+4. **Betalingen:** Mollie of Adyen koppelen. KvK (82273510) en zakelijke rekening
+   (NL62 INGB 0111 1775 88) zijn er allebei, dus het aanmelden bij een betaalprovider
+   kan per direct. Tot de koppeling blijven app-betalingen gesimuleerd; leden zien
+   in het betaalscherm wel al de overboekingsinstructie met deze IBAN en hun
+   codenaam als kenmerk.
 5. **Kluis-sleutels:** `server/data/secret.key` en `vault.key` verhuizen naar een
    secrets manager van de hosting; nooit in git.
 6. **Database:** bij groei db.json vervangen door PostgreSQL; de SQLite-accounts

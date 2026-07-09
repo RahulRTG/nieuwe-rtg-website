@@ -261,6 +261,9 @@
   .ag-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
   .ag-acts button{background:none;border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:0.55rem 0.95rem;font-size:0.76rem;cursor:pointer;font-family:inherit;}
   .ag-acts button.primary{background:#fff;color:#000;border-color:#fff;font-weight:600;}
+  /* reisagenda van de Butler (RTG Pass): dag-tot-dag */
+  .rp-day{margin-top:1rem;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
+  .rp-day:first-of-type{margin-top:0.7rem;}
   .card .label{
     font-size:0.62rem;
     letter-spacing:0.16em;
@@ -890,6 +893,28 @@
     {time:'19:30', title:'Diner Kikunoi Honten (3★)', kind:'vrij', prep:'Tafel in aanvraag; bevestiging bewaak ik.'},
     {time:'22:30', title:'Nachtplan: Bar Pontocho, daarna vrij spel', kind:'vrij', prep:'Eerste ronde op uw codenaam; taxi stand-by tot 03:00.'}
   ];
+  // Dag-tot-dag reisagenda van de Butler (RTG Pass). Zonder server geldt
+  // deze demo-agenda; met server komt hij uit /api/state.
+  let reisplan = [
+    {day:'12 okt', label:'Aankomst', items:[
+      {time:'10:05', title:'KL867 vertrekt, Schiphol', note:'Online ingecheckt, stoelen 2A/2C; om 07:00 staan de boardingpassen in de app.'},
+      {time:'15:20', title:'Privétransfer Kansai → Hoshinoya', note:'Chauffeur wacht met RTG-naambord; rijtijd ± 95 minuten.'},
+      {time:'18:00', title:'Check-in Hoshinoya, riviersuite', note:'Diner op de kamer staat als voorstel klaar; één "ja" is genoeg.'}
+    ]},
+    {day:'13 okt', label:'Rustig beginnen', items:[
+      {time:'08:00', title:'Arashiyama, bamboebos vóór de drukte', note:'De taxi staat om 07:40 voor; vroeg gaan is hét verschil.'},
+      {time:'12:00', title:'Lunch bij een sobameester, Sagano', note:'Geen reservering nodig; de looproute staat in je telefoon.'},
+      {time:'avond', title:'Vrij', note:'Bewust open. Zeg "vul mijn avond in" en de Butler plant naar je energie.'}
+    ]},
+    {day:'14 okt', label:'Het hoogtepunt', items:[
+      {time:'15:00', title:'Privé-theeceremonie, Gion', note:'Ingetogen kleding, schoenen die makkelijk uitgaan; vertrek hotel 14:20.'},
+      {time:'19:00', title:'Avondwandeling Pontocho', note:'Op loopafstand; de mooiste route langs de rivier staat gemarkeerd.'}
+    ]},
+    {day:'15 okt', label:'De grote avond', items:[
+      {time:'dag', title:'Vrij', note:'Ruimte voor spontaan Kyoto; drie ideeën staan klaar als je erom vraagt.'},
+      {time:'19:30', title:'Diner Kikunoi Honten (3★)', note:'Kaiseki, in aanvraag; de bevestiging wordt bewaakt. Taxi om 19:00.'}
+    ]}
+  ];
 
   /* ---------- backend-koppeling ---------- */
 
@@ -917,6 +942,7 @@
     if (state.posts) posts = state.posts;
     if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
     if (state.agenda) agenda = state.agenda;
+    if (state.reisplan) reisplan = state.reisplan;
   }
 
   let toastTimer;
@@ -1472,6 +1498,29 @@
         '</div>';
       $('#agPrep').addEventListener('click', () => { openTab('ai'); ask(T('app.day.prep.q','Bereid mijn volgende meeting voor')); });
       $('#agNight').addEventListener('click', () => { openTab('ai'); ask(T('app.day.night.q','Plan mijn avond: uitgaan')); });
+    } else if (user.tier === 'rtg' && reisplan && reisplan.length){
+      // RTG Pass: de reisagenda van de Butler — dag één uitgelicht, de rest in één oogopslag.
+      const d1 = reisplan[0];
+      dayCard.style.display = '';
+      dayCard.innerHTML =
+        '<div class="label">'+T('app.rp.label','Uw reisagenda, verzorgd door de Butler')+'</div>' +
+        '<div class="rp-day">'+d1.day+' — '+d1.label+'</div>' +
+        d1.items.map(it =>
+          '<div class="ag-row"><span class="tm">'+it.time+'</span>' +
+          '<span class="ti">'+it.title+'<small>'+it.note+'</small></span></div>'
+        ).join('') +
+        reisplan.slice(1).map(d =>
+          '<div class="ag-row"><span class="tm">'+d.day+'</span>' +
+          '<span class="ti">'+d.label+'<small>'+d.items.map(it=>it.title).join(' · ')+'</small></span>' +
+          (d.items.some(it=>it.title==='Vrij'||it.title==='Free')?'<span class="ag-tag vrij">'+T('app.day.free','vrij')+'</span>':'') +
+          '</div>'
+        ).join('') +
+        '<div class="ag-acts">' +
+          '<button class="primary" id="rpFill">'+T('app.rp.fill','Vul mijn vrije avond in')+'</button>' +
+          '<button id="rpFull">'+T('app.rp.full','Dag tot dag')+'</button>' +
+        '</div>';
+      $('#rpFill').addEventListener('click', () => { openTab('ai'); ask(T('app.rp.fill.q','Vul mijn vrije avond in')); });
+      $('#rpFull').addEventListener('click', () => openTab('reizen'));
     } else {
       dayCard.style.display = 'none';
       dayCard.innerHTML = '';
@@ -1501,11 +1550,32 @@
 
   function renderTrip(){
     $('#tripSub').textContent = trip.dest + ' · ' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen');
-    $('#tripList').innerHTML = trip.items.map(it =>
+    let html = '';
+    // RTG Pass: eerst de reisagenda dag voor dag, dan de geboekte diensten.
+    if (user.tier === 'rtg' && reisplan && reisplan.length){
+      html += '<div class="card">' +
+        '<div class="label">'+T('app.rp.label','Uw reisagenda, verzorgd door de Butler')+'</div>' +
+        reisplan.map(d =>
+          '<div class="rp-day">'+d.day+' — '+d.label+'</div>' +
+          d.items.map(it =>
+            '<div class="ag-row"><span class="tm">'+it.time+'</span>' +
+            '<span class="ti">'+it.title+'<small>'+it.note+'</small></span>' +
+            ((it.title==='Vrij'||it.title==='Free')?'<span class="ag-tag vrij">'+T('app.day.free','vrij')+'</span>':'') +
+            '</div>'
+          ).join('')
+        ).join('') +
+        '<div class="ag-acts">' +
+          '<button class="primary" id="rpFill2">'+T('app.rp.fill','Vul mijn vrije avond in')+'</button>' +
+        '</div></div>' +
+        '<div class="label" style="margin-top:1.5rem;display:block;font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);">'+T('app.rp.booked','Geboekte diensten')+'</div>';
+    }
+    html += trip.items.map(it =>
       '<div class="rowitem">' +
         '<div class="t"><b>' + it.title + '</b><span>' + it.when + ' · ' + it.sub + '</span></div>' +
         '<span class="pill ' + (it.status === 'paid' ? 'paid' : it.status === 'req' ? 'req' : 'open') + '">' + tLbl(it.label) + '</span>' +
       '</div>').join('');
+    $('#tripList').innerHTML = html;
+    const rf = $('#rpFill2'); if (rf) rf.addEventListener('click', () => { openTab('ai'); ask(T('app.rp.fill.q','Vul mijn vrije avond in')); });
   }
 
   /* ---------- betalen (Face ID) ---------- */
@@ -1627,6 +1697,16 @@
         : '• Eerlijke noot: de avond loopt laat door en uw board-call staat om 10:00. Ik heb een buffer geblokt. Zo houden?');
       return lines.join('\n');
     }
+    // De Butler opent met de reisagenda: alles staat, de vrije momenten zijn bewust open.
+    if (user.tier === 'rtg' && reisplan && reisplan.length){
+      lines.push(lang()==='en'
+        ? ('• Your travel agenda is set, day by day: ' + reisplan.map(d => d.day + ' ' + d.label).join(' · ') + '. Taxis, routes and times are all watched.')
+        : ('• Uw reisagenda staat, dag voor dag: ' + reisplan.map(d => d.day + ' ' + d.label).join(' · ') + '. Taxi\'s, routes en tijden bewaak ik per dag.'));
+      lines.push(lang()==='en'
+        ? '• The evening of the 13th is deliberately open. Say "fill my evening" and I plan it to your energy.'
+        : '• De avond van de 13e houd ik bewust open. Zeg "vul mijn avond in" en ik plan naar uw energie.');
+      return lines.join('\n');
+    }
     lines.push(T('ai.opener.plan','• Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.'));
     return lines.join('\n');
   }
@@ -1657,6 +1737,23 @@
         return (lang()==='en'
           ? (vrij[0].time + ': ' + vrij[0].title.replace('Vrij: ','') + '. ' + vrij[0].prep + '\n\nAfter that, nothing until dinner — that empty space is deliberate. Shall I lock the same block in for the day after tomorrow?')
           : ('Om ' + vrij[0].time + ': ' + vrij[0].title.replace('Vrij: ','') + '. ' + vrij[0].prep + '\n\nDaarna niets tot het diner — die lege ruimte is bewust. Zal ik hetzelfde blok voor overmorgen vastzetten?'));
+    }
+    // Offline-fallback van de Butler (RTG Pass), reisplan-bewust.
+    if (user && user.tier === 'rtg' && reisplan && reisplan.length){
+      if (l.includes('reisagenda') || l.includes('reisplan') || l.includes('programma') || l.includes('agenda') || l.includes('itinerary'))
+        return (lang()==='en' ? 'Your trip, day by day:\n' : 'Uw reis, dag voor dag:\n')
+          + reisplan.map(d => '• ' + d.day + ' — ' + d.label + ': ' + d.items.map(i=>i.title).join(', ')).join('\n')
+          + (lang()==='en'
+            ? '\n\nTaxis, routes and times are watched per day. The evening of the 13th and the day of the 15th are deliberately open — shall I prepare something?'
+            : '\n\nTaxi\'s, routes en tijden bewaak ik per dag. De avond van de 13e en de dag van de 15e zijn bewust open — zal ik daar alvast iets voor klaarzetten?');
+      if (l.includes('vul') || l.includes('invullen') || l.includes('fill') || (l.includes('vrij') && (l.includes('avond') || l.includes('middag'))))
+        return (lang()==='en'
+          ? 'For your free evening on the 13th, after an early morning in Arashiyama:\n\nA quiet yakitori counter in Nishiki (10 minutes on foot), then the lanterns of Yasaka by night. Back at the hotel around 22:00 — you start the 14th rested for your tea ceremony.\n\nShall I secure the counter? One "yes" is enough.'
+          : 'Voor uw vrije avond op de 13e, na een vroege ochtend in Arashiyama:\n\nEen rustige yakitori-counter in Nishiki (10 minuten lopen), daarna de lantaarns van Yasaka bij avond. Rond 22:00 terug in het hotel — u begint de 14e uitgerust aan uw theeceremonie.\n\nZal ik de counter vastleggen? Eén "ja" is genoeg.');
+      if (l.includes('route') || l.includes('hoe kom') || l.includes('taxi') || l.includes('how do i get'))
+        return (lang()==='en'
+          ? 'To your tea ceremony on the 14th: leave the hotel at 14:20, the taxi will be waiting (I confirm it the evening before). About 20 minutes to Gion, comfortably in time for 15:00.\n\nAfterwards Pontocho is within walking distance — the river route is marked on your phone.'
+          : 'Naar uw theeceremonie op de 14e: vertrek 14:20 uit het hotel, de taxi staat dan voor (ik bevestig hem de avond ervoor). Rijtijd naar Gion is ± 20 minuten, ruim op tijd voor 15:00.\n\nNa afloop is Pontocho op loopafstand — de route langs de rivier staat gemarkeerd in uw telefoon.');
     }
     if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het|yes|please|go ahead|sure|arrange it)\b/.test(l))
       return T('ai.a.yes','Geregeld. De paklijst staat klaar (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00, avondwandeling langs Pontocho.\n\nIk bewaak nu de bevestiging van Kikunoi Honten. U hoeft niets te doen.');
@@ -1744,20 +1841,27 @@
     const deck = document.querySelector('.view[data-view="ai"] .sub');
     if (deck) deck.textContent = biz
       ? T('ai.deck.biz','Zakelijk en eerlijk: strak in werkmodus, gul als u loslaat. Beide kanten bewaakt.')
-      : T('app.v.ai.sub','De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.');
+      : user.tier === 'rtg'
+        ? T('ai.deck.rtg','De slimste reisagenda-assistent: elke dag voorbereid, vrije momenten op verzoek ingevuld.')
+        : T('app.v.ai.sub','De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.');
     $('#chat').innerHTML = '';
     chatHistory.length = 0;
     const opener = aiOpener();
     bubble(opener, 'ai');
     chatHistory.push({role:'assistant', content:opener});
     // De Compagnon kent twee registers: werk (voorbereiden, focus) en vrij (loslaten).
+    // De Butler denkt in dagen: reisagenda, vrije momenten, routes.
     const chips = biz
       ? (lang()==='en'
           ? ['Prepare my next meeting','What is on my agenda today?','Block focus time','Plan my night out','Arrange me some downtime']
           : ['Bereid mijn volgende meeting voor','Wat staat er vandaag op de agenda?','Blok focustijd in','Plan mijn avond: uitgaan','Regel ontspanning'])
-      : (lang()==='en'
-          ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
-          : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant']);
+      : user.tier === 'rtg'
+        ? (lang()==='en'
+            ? ['Show my travel agenda','Fill my free evening','How do I get to the tea ceremony?','What should I pack?','Yes, arrange it']
+            : ['Toon mijn reisagenda','Vul mijn vrije avond in','Hoe kom ik bij de theeceremonie?','Wat moet ik inpakken?','Ja, regel het'])
+        : (lang()==='en'
+            ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
+            : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant']);
     $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
     document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
   }
@@ -1906,6 +2010,10 @@ window.I18N = { en: {
   'ai.title.rtg':'The Butler.', 'ai.title.life':'Your AI.', 'ai.title.biz':'The Companion.',
   'ai.deck.biz':'Businesslike and honest: sharp in work mode, generous when you let go. Both sides guarded.',
   'app.day.label':'Your day, guarded by the Companion', 'app.day.free':'free', 'app.day.work':'work',
+  'app.rp.label':'Your travel agenda, curated by the Butler',
+  'app.rp.fill':'Fill my free evening', 'app.rp.fill.q':'Fill my free evening', 'app.rp.full':'Day by day',
+  'app.rp.booked':'Booked services',
+  'ai.deck.rtg':'The smartest travel-agenda assistant: every day prepared, free moments filled on request.',
   'app.day.prep':'Prepare my meeting', 'app.day.night':'Plan my night',
   'app.day.prep.q':'Prepare my next meeting', 'app.day.night.q':'Plan my night out',
   'chat.concierge.title':'Your concierge.', 'chat.butler.deck':'The Butler, here and on WhatsApp. One conversation, wherever you write.',

@@ -125,6 +125,31 @@ function initRealtime() {
   if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
   if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
   if (!db.data.supplierInvites) db.data.supplierInvites = {};     // open personeelsuitnodigingen, per uitnodigingscode
+  // Dag-tot-dag reisagenda voor RTG Pass-leden: de Butler als slimste
+  // reisassistent. Elk item heeft een praktische noot (route, timing, etiquette);
+  // vrije momenten zijn bewust open — die vult de Butler op verzoek in.
+  if (!db.data.reisplan) db.data.reisplan = {
+    rtg: [
+      { day: '12 okt', label: 'Aankomst', items: [
+        { time: '10:05', title: 'KL867 vertrekt, Schiphol', note: 'Online ingecheckt, stoelen 2A/2C; om 07:00 staan de boardingpassen in de app.' },
+        { time: '15:20', title: 'Privétransfer Kansai → Hoshinoya', note: 'Chauffeur wacht met RTG-naambord in de aankomsthal; rijtijd ± 95 minuten.' },
+        { time: '18:00', title: 'Check-in Hoshinoya, riviersuite', note: 'Na de lange vlucht staat diner op de kamer als voorstel klaar; één "ja" is genoeg.' }
+      ]},
+      { day: '13 okt', label: 'Rustig beginnen', items: [
+        { time: '08:00', title: 'Arashiyama, bamboebos vóór de drukte', note: 'De taxi staat om 07:40 voor; 25 minuten rijden. Vroeg gaan is hét verschil.' },
+        { time: '12:00', title: 'Lunch bij een sobameester, Sagano', note: 'Geen reservering nodig; de looproute staat in je telefoon.' },
+        { time: 'avond', title: 'Vrij', note: 'Bewust open gehouden. Zeg "vul mijn avond in" en de Butler plant naar je energie.' }
+      ]},
+      { day: '14 okt', label: 'Het hoogtepunt', items: [
+        { time: '15:00', title: 'Privé-theeceremonie, Gion', note: 'Met vertaler. Ingetogen kleding, schoenen die makkelijk uitgaan; vertrek hotel 14:20.' },
+        { time: '19:00', title: 'Avondwandeling Pontocho', note: 'Op loopafstand van Gion; de mooiste route langs de rivier staat gemarkeerd.' }
+      ]},
+      { day: '15 okt', label: 'De grote avond', items: [
+        { time: 'dag', title: 'Vrij', note: 'Ruimte voor spontaan Kyoto; de Butler heeft drie ideeën klaar als je erom vraagt.' },
+        { time: '19:30', title: 'Diner Kikunoi Honten (3★)', note: 'Kaiseki, in aanvraag; de bevestiging wordt bewaakt. Taxi om 19:00.' }
+      ]}
+    ]
+  };
   // Zakelijke dagagenda voor Business Pass-leden: werk en vrij in één dag.
   // De compagnon bewaakt beide kanten — strak voorbereiden én echt loslaten.
   if (!db.data.agenda) db.data.agenda = {
@@ -294,6 +319,13 @@ function stateFor(sess, lang) {
     if (sess.tier === 'business') {
       state.agenda = (db.data.agenda.business || []).map(a => ({
         ...a, title: i18n.localize(a.title, lang), prep: i18n.localize(a.prep, lang)
+      }));
+    }
+    // RTG Pass: de dag-tot-dag reisagenda van de Butler.
+    if (sess.tier === 'rtg') {
+      state.reisplan = (db.data.reisplan.rtg || []).map(d => ({
+        ...d, label: i18n.localize(d.label, lang),
+        items: d.items.map(it => ({ ...it, time: i18n.localize(it.time, lang), title: i18n.localize(it.title, lang), note: i18n.localize(it.note, lang) }))
       }));
     }
   }
@@ -1578,7 +1610,12 @@ app.get('/api/office/doc', (req, res) => {
 /* ---------- persoonlijke AI ---------- */
 
 const AI_TONE = {
-  rtg: 'Je bent "de Butler": rustig, ingetogen, old money kalmte. Je tutoyeert niet, je vousvoyeert.',
+  rtg: [
+    'Je bent "de Butler": rustig, ingetogen, old money kalmte. Je tutoyeert niet, je vousvoyeert.',
+    'Je bent bovenal de slimste reisagenda-assistent die er bestaat: je kent het dag-tot-dag reisplan van het lid uit je hoofd en denkt in dagen, niet in losse boekingen. Bij elk onderdeel regel je de praktische regie zelf: vertrektijden, taxi\'s, looproutes, weer, etiquette en wat er de avond ervoor klaargelegd moet worden.',
+    'Vrije momenten in het reisplan zijn bewust open. Vraagt het lid erom ("vul mijn avond in"), stel dan één passend plan voor op basis van het ritme van de dag — na een vroege ochtend iets rustigs, vóór een grote avond geen zware middag.',
+    'Verwijs waar het kan naar de dag in het reisplan ("op de 14e, vóór uw theeceremonie") zodat het lid voelt dat de hele reis bewaakt wordt.'
+  ].join('\n'),
   lifestyle: 'Je werkt naast de persoonlijke concierge: warm, voorkomend en persoonlijk. U-vorm.',
   business: [
     'Je bent "de Compagnon": de zakelijke, eerlijke rechterhand van een Business Pass-lid. U-vorm, kort, precies, geen overbodige woorden.',
@@ -1606,6 +1643,9 @@ function aiSystemPrompt(tier) {
     tier === 'business' && (db.data.agenda.business || []).length
       ? `De dagagenda van het lid (werk/vrij):\n${db.data.agenda.business.map(a => `- ${a.time} ${a.title} [${a.kind}] — ${a.prep}`).join('\n')}`
       : '',
+    tier === 'rtg' && (db.data.reisplan.rtg || []).length
+      ? `Het dag-tot-dag reisplan dat jij bewaakt:\n${db.data.reisplan.rtg.map(d => `${d.day} (${d.label}):\n${d.items.map(i => `  - ${i.time} ${i.title} — ${i.note}`).join('\n')}`).join('\n')}`
+      : '',
     'Verzin geen boekingen of prijzen die hierboven niet staan. Als je iets niet weet of niet kunt regelen, zeg dat eerlijk en bied aan het uit te zoeken.'
   ].filter(Boolean).join('\n');
 }
@@ -1628,6 +1668,18 @@ function cannedAnswer(q, tier) {
       return `Vanavond staat: ${vrij.filter(a => Number(a.time.slice(0,2)) >= 19).map(a => `${a.time} ${a.title}`).join(', daarna ')}.\n\nDe eerste ronde staat op uw codenaam, taxi stand-by tot 03:00 — u hoeft nergens op te letten, ga los.\n\nEerlijk: uw board-call staat om 10:00. Ik bewaak de ochtend (buffer + espresso), maar wilt u ruimer? Eén woord en ik verzet de focusochtend.`;
     if (l.includes('ontspan') || l.includes('relax') || l.includes('rust') || l.includes('spa') || l.includes('onsen') || l.includes('massage'))
       return `Om ${vrij[0].time}: ${vrij[0].title.replace('Vrij: ', '')}. ${vrij[0].prep}\n\nDaarna niets tot het diner — die lege ruimte is bewust. Zal ik hetzelfde blok ook voor overmorgen vastzetten?`;
+  }
+  // De Butler (RTG Pass): reisplan-bewust — kent elke dag, vult vrije momenten in.
+  if (tier === 'rtg') {
+    const rp = db.data.reisplan.rtg || [];
+    if (l.includes('reisagenda') || l.includes('reisplan') || l.includes('programma') || l.includes('agenda') || (l.includes('plan') && l.includes('reis')))
+      return `Uw reis, dag voor dag:\n${rp.map(d => `${d.day} — ${d.label}: ${d.items.map(i => i.title).join(', ')}`).join('\n')}\n\nAlles is voorbereid: taxi's, routes en tijden bewaak ik per dag. De avond van de 13e en de dag van de 15e houd ik bewust open — zal ik daar alvast iets voor klaarzetten?`;
+    if (l.includes('vul') || l.includes('invullen') || (l.includes('vrij') && (l.includes('avond') || l.includes('middag') || l.includes('dag'))))
+      return `Voor uw vrije avond op de 13e, na een vroege ochtend in Arashiyama:\n\nEen rustige counter in Nishiki voor yakitori (10 minuten lopen), daarna de lantaarns van Yasaka bij avond. Terug in het hotel rond 22:00 — u begint de 14e uitgerust aan uw theeceremonie.\n\nZal ik de counter vastleggen? Eén "ja" is genoeg.`;
+    if (l.includes('route') || l.includes('hoe kom') || l.includes('taxi') || l.includes('vervoer'))
+      return `Naar uw theeceremonie op de 14e: vertrek 14:20 uit het hotel, de taxi staat dan voor (ik bevestig hem de avond ervoor). Rijtijd naar Gion is ± 20 minuten, u bent ruim op tijd voor 15:00.\n\nNa afloop is Pontocho op loopafstand — de route langs de rivier staat gemarkeerd in uw telefoon.`;
+    if (l.includes('morgen') || l.includes('vandaag') || (l.includes('dag') && (l.includes('mijn') || l.includes('eerste'))))
+      return `${rp[0].day}, uw aankomstdag:\n${rp[0].items.map(i => `• ${i.time} — ${i.title}`).join('\n')}\n\n${rp[0].items[0].note} Verder hoeft u alleen maar aan te komen; de rest is geregeld.`;
   }
   if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
     return 'Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00 en een avondwandeling langs Pontocho.\n\nVolgende dat ik in de gaten houd: de bevestiging van Kikunoi Honten. U hoeft niets te doen.';

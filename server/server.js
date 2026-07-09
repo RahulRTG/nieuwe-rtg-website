@@ -410,10 +410,25 @@ function stateFor(sess, lang) {
     const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate()) : db.data;
     // Elke factuur krijgt een afboekcode (grootboeksuggestie) en de btw die in
     // de ledenbijdrage is begrepen. Business-leden zien de volledige specificatie.
+    // De maandbijdrage volgt het prijsmodel per pas: 65 (RTG) of 20.000
+    // (Lifestyle) ex 21% btw; Business is prijs op maat (demo-bedrag hieronder).
+    const MAANDBIJDRAGE_EX = { rtg: 65, lifestyle: 20000, business: 7500 };
+    const PASNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
     state.invoices = (md.invoices || []).map(inv => {
-      const contrib = /lidmaatschap|jaarbijdrage/i.test(inv.desc);
+      const contrib = /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(inv.desc);
+      if (contrib && MAANDBIJDRAGE_EX[sess.tier]) {
+        const ex = MAANDBIJDRAGE_EX[sess.tier];
+        inv = {
+          ...inv,
+          desc: (lang === 'en' ? 'Monthly contribution ' : 'Maandbijdrage ') + PASNAAM[sess.tier] +
+                (sess.tier === 'business' ? (lang === 'en' ? ' (bespoke)' : ' (prijs op maat)') : '') +
+                (lang === 'en' ? ' \u00b7 July 2026' : ' \u00b7 juli 2026'),
+          netto: 0,
+          bijdrage: Math.round(ex * 1.21 * 100) / 100
+        };
+      }
       return {
-        ...inv, desc: i18n.localize(inv.desc, lang), date: i18n.localize(inv.date, lang),
+        ...inv, desc: contrib ? inv.desc : i18n.localize(inv.desc, lang), date: i18n.localize(inv.date, lang),
         afboekcode: contrib ? '4560' : '4510',
         afboeklabel: lang === 'en'
           ? (contrib ? 'subscriptions and memberships' : 'travel and lodging expenses')

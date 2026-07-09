@@ -32,10 +32,10 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
    - `SMTP_URL=smtp://user:pass@host:587` + `MAIL_FROM="Rahul Travel Group <no-reply@domein.nl>"`
    - `ANTHROPIC_API_KEY=...` voor echte AI en vloeiende chatvertaling
 3. **E-maildomein:** SPF/DKIM/DMARC instellen bij de DNS zodat mail aankomt.
-4. **Betalingen:** Mollie of Adyen koppelen. KvK (82273510, statutair RTG, met
-   handelsnamen RTG Lifestyle en RTG Business) en zakelijke rekening
-   (NL62 INGB 0111 1775 88, t.n.v. RTG) zijn er allebei en de tenaamstelling komt
-   overeen met de KvK-naam, dus het aanmelden bij een betaalprovider kan per direct. Tot de koppeling blijven app-betalingen gesimuleerd; leden zien
+4. **Betalingen:** Mollie of Adyen koppelen. Alles wat zij vragen is er:
+   KvK 82273510 (statutair RTG, handelsnamen RTG Lifestyle en RTG Business),
+   btw-id NL002291440B89 en zakelijke rekening NL62 INGB 0111 1775 88 t.n.v. RTG
+   (tenaamstelling komt overeen met de KvK-naam). Aanmelden kan per direct. Tot de koppeling blijven app-betalingen gesimuleerd; leden zien
    in het betaalscherm wel al de overboekingsinstructie met deze IBAN en hun
    codenaam als kenmerk.
 5. **Kluis-sleutels:** `server/data/secret.key` en `vault.key` verhuizen naar een

@@ -47,7 +47,7 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 2. **Eén signatuurelement, geen stapeling van trucjes.** Niet steeds nieuwe visuele devices toevoegen.
 3. **Stark zwart/wit ritme**, geen beige/marmer-gradients, geen ronde hoeken of gouden randjes.
 4. **Veel lucht** — genereuze verticale padding; bij twijfel meer ruimte.
-5. **Geen stockfoto's/echte productfoto's** — visuals met CSS/SVG bouwen.
+5. **Geen stockfoto's, geen modellen, geen extern beeld.** Campagnefoto's zijn AI-gegenereerd in eigen huis (staan in `public/campagne/`, gemaakt via Pollinations; stijl: quiet luxury, gedempte tinten, bordeaux-accenten, géén mensen) en worden eerlijk gelabeld ("AI · eigen huis"). Overige visuals met CSS/SVG bouwen.
 
 ### Tone of voice — verschilt per pass, bewust zo
 - **RTG Pass**: "old money" — ingetogen, zeker, "je/jij"-vorm

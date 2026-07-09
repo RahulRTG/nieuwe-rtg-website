@@ -398,6 +398,12 @@
     nav ul{gap:1.2rem;}
     nav a{font-size:0.75rem;}
   }
+  /* campagnebeeld uit eigen huis */
+  .ad-band{position:relative;padding:0;}
+  .ad-band img{width:100%;display:block;aspect-ratio:21/9;object-fit:cover;}
+  .ad-band::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(12,12,11,0.5));}
+  .ad-band .ad-tag{position:absolute;z-index:1;left:clamp(1.5rem,6vw,5rem);bottom:clamp(1.5rem,5vw,3.5rem);color:#fff;font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(1.5rem,3.4vw,2.8rem);text-shadow:0 2px 26px rgba(0,0,0,0.6);}
+  .ad-band .ad-cr{position:absolute;z-index:1;right:clamp(1rem,3vw,2rem);bottom:1rem;color:rgba(255,255,255,0.75);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;}
 </style>
 </head>
 <body>
@@ -511,6 +517,12 @@
       </div>
     </div>
   </div>
+</section>
+
+<section class="ad-band" aria-label="Campagnebeeld">
+  <img src="/campagne/jet.jpg" alt="Privéjet-cabine in avondlicht — campagnebeeld, gegenereerd door de RTG-AI">
+  <span class="ad-tag">Vertrek wanneer ú beslist.</span>
+  <span class="ad-cr">Campagne · AI · eigen huis</span>
 </section>
 
 <section class="cta on-black">

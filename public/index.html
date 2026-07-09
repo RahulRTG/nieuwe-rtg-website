@@ -430,6 +430,23 @@
   .v-kyoto{background:linear-gradient(160deg,#3E1F26 0%,#7F1634 60%,#B8657B 100%);}
   .v-lissabon{background:linear-gradient(160deg,#1F1A0C 0%,#857007 65%,#D9C36A 100%);}
   .v-marrakech{background:linear-gradient(160deg,#2A130A 0%,#9E4A1C 60%,#E0A470 100%);}
+  .salon-visual.photo{background-size:cover;background-position:center;position:relative;}
+  .salon-visual.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 52%,rgba(12,12,11,0.55));}
+  .salon-visual.photo .place{position:relative;z-index:1;}
+
+  /* ---------- campagne (beeld uit eigen huis) ---------- */
+  .campagne h2{font-size:clamp(1.9rem,3.4vw,2.7rem);line-height:1.12;max-width:22ch;}
+  .campagne .lead{margin-top:1.25rem;font-size:1.02rem;color:var(--grey);max-width:58ch;}
+  .campagne-hero{margin-top:3rem;position:relative;}
+  .campagne-hero img{width:100%;display:block;aspect-ratio:12/5;object-fit:cover;}
+  .campagne-hero .tag{position:absolute;left:clamp(1rem,4vw,2.5rem);bottom:clamp(0.9rem,3.5vw,1.8rem);color:var(--white);font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(1.3rem,2.6vw,2.1rem);text-shadow:0 2px 24px rgba(0,0,0,0.55);}
+  .campagne-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:1.5rem;}
+  .campagne-grid figure{margin:0;}
+  .campagne-grid img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;}
+  .campagne-grid figcaption{margin-top:0.6rem;font-size:0.76rem;color:var(--grey-soft);display:flex;justify-content:space-between;gap:1rem;}
+  .campagne-grid figcaption .cr{white-space:nowrap;letter-spacing:0.08em;text-transform:uppercase;font-size:0.62rem;color:var(--gold);}
+  .campagne-note{margin-top:2.25rem;font-size:0.8rem;color:var(--grey-soft);font-style:italic;max-width:64ch;}
+  @media (max-width:860px){.campagne-grid{grid-template-columns:1fr;}}
   .salon-card .body{padding:1.25rem 1.4rem 1.5rem;flex:1;display:flex;flex-direction:column;}
   .salon-card .body p{font-size:0.9rem;color:var(--grey);flex:1;}
   .salon-card .by{
@@ -650,21 +667,21 @@
 
     <div class="salon-cards">
       <div class="salon-card">
-        <div class="salon-visual v-kyoto"><span class="place">Kyoto</span></div>
+        <div class="salon-visual photo" style="background-image:url('/campagne/kyoto-suite.jpg');"><span class="place">Kyoto</span></div>
         <div class="body">
           <p data-i18n="salon.q1">"De theeceremonie die mijn concierge regelde, geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek."</p>
           <div class="by">Isabelle van Rhijn · Lifestyle Pass</div>
         </div>
       </div>
       <div class="salon-card">
-        <div class="salon-visual v-lissabon"><span class="place">Lissabon</span></div>
+        <div class="salon-visual photo" style="background-image:url('/campagne/palacio.jpg');"><span class="place">Lissabon</span></div>
         <div class="body">
           <p data-i18n="salon.q2">"Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt."</p>
           <div class="by">Sophie Janssen · RTG Pass</div>
         </div>
       </div>
       <div class="salon-card">
-        <div class="salon-visual v-marrakech"><span class="place">Marrakech</span></div>
+        <div class="salon-visual photo" style="background-image:url('/campagne/riad.jpg');"><span class="place">Marrakech</span></div>
         <div class="body">
           <p data-i18n="salon.q3">"Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Reizen dat iets teruggeeft, dat deel vertel ik iedereen."</p>
           <div class="by">Nadia Karim · RTG Pass</div>
@@ -674,6 +691,34 @@
 
     <p class="salon-note" data-i18n="salon.note">Voor de veiligheid van onze leden verschijnt elke post standaard 7 dagen na het verblijf. Uitgelichte posts fungeren, altijd met naamsvermelding, als beeld op deze site.</p>
     <a href="/apps/portaal.html" class="btn btn-ghost" style="margin-top:1.5rem;" data-i18n="salon.cta">Bekijk De Salon in het portaal</a>
+  </div>
+</section>
+
+<section class="campagne on-white" id="campagne">
+  <div class="wrap">
+    <div class="folio" data-i18n="camp.folio">N° 04, De campagne</div>
+    <span class="kicker" data-i18n="camp.kicker">Volledig in eigen huis</span>
+    <h2 data-i18n="camp.title">Zelfs onze campagne maken we zelf.</h2>
+    <p class="lead" data-i18n="camp.copy">Geen fotograaf, geen modellen, geen bureau. Elk campagnebeeld op deze site is in eigen huis gemaakt door onze AI — dezelfde die uw reizen voorbereidt. Wat u hier ziet, is niet ingekocht maar ontworpen: de standaard waaraan wij elke reis toetsen.</p>
+    <div class="campagne-hero">
+      <img src="/campagne/hero.jpg" alt="Kyoto in ochtendmist — campagnebeeld, gegenereerd door de RTG-AI">
+      <span class="tag" data-i18n="camp.tag">Kyoto, vóór de drukte.</span>
+    </div>
+    <div class="campagne-grid">
+      <figure>
+        <img src="/campagne/jet.jpg" alt="Privéjet-cabine in avondlicht — campagnebeeld, gegenereerd door de RTG-AI">
+        <figcaption><span data-i18n="camp.c1">Vertrek wanneer ú wilt.</span><span class="cr" data-i18n="camp.cr">AI · eigen huis</span></figcaption>
+      </figure>
+      <figure>
+        <img src="/campagne/kaiseki.jpg" alt="Kaiseki-diner bij kaarslicht — campagnebeeld, gegenereerd door de RTG-AI">
+        <figcaption><span data-i18n="camp.c2">De tafel die nergens te boeken is.</span><span class="cr" data-i18n="camp.cr">AI · eigen huis</span></figcaption>
+      </figure>
+      <figure>
+        <img src="/campagne/onsen.jpg" alt="Privé-onsen met herfstbladeren — campagnebeeld, gegenereerd door de RTG-AI">
+        <figcaption><span data-i18n="camp.c3">Stilte, gereserveerd.</span><span class="cr" data-i18n="camp.cr">AI · eigen huis</span></figcaption>
+      </figure>
+    </div>
+    <p class="campagne-note" data-i18n="camp.note">Geen stockbeeld, geen modellen, geen extern bureau. Deze campagne is gegenereerd door de AI van RTG — en dat vertellen we er eerlijk bij.</p>
   </div>
 </section>
 
@@ -743,6 +788,13 @@ window.I18N = { en: {
   'salon.q2':'"For the price of an ordinary hotel, a palácio, via a single WhatsApp message. Net prices aren\'t marketing, they truly exist."',
   'salon.q3':'"A riad at wholesale price, and 30% of my contribution went to the RTFoundation. Travel that gives back, that part I tell everyone."',
   'salon.note':'For our members\' safety, every post appears seven days after the stay by default. Featured posts serve, always with attribution, as imagery on this site.',
+  'camp.folio':'N° 04, The campaign', 'camp.kicker':'Entirely in-house',
+  'camp.title':'Even our campaign is made by us.',
+  'camp.copy':'No photographer, no models, no agency. Every campaign image on this site is made in-house by our AI — the same one that prepares your journeys. What you see here was not bought but designed: the standard we hold every journey to.',
+  'camp.tag':'Kyoto, before the crowds.',
+  'camp.c1':'Depart when you decide.', 'camp.c2':'The table no one can book.', 'camp.c3':'Silence, reserved.',
+  'camp.cr':'AI · in-house',
+  'camp.note':'No stock imagery, no models, no external agency. This campaign was generated by RTG\'s AI — and we say so, honestly.',
   'salon.cta':'See The Salon in the portal',
   'found.statlabel':'of every contribution goes to charity',
   'found.title':'Travel that gives back, structurally.',

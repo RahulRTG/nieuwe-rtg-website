@@ -54,6 +54,17 @@ for (const [code, people] of Object.entries(STAFF_SEED)) {
 
 const app = express();
 app.disable('x-powered-by');
+const PRODUCTION = process.env.NODE_ENV === 'production';
+app.set('trust proxy', 1); // achter een reverse proxy (hosting) klopt req.secure dan
+
+// In productie: alles naar https, en HSTS zodat browsers het onthouden.
+app.use((req, res, next) => {
+  if (PRODUCTION) {
+    if (!req.secure) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
+    res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
 
 /* Security-headers op elk antwoord. De CSP staat inline scripts/styles toe
    (de apps zijn bewust self-contained), maar verbiedt elk ander extern
@@ -188,6 +199,29 @@ const AUTHOR_TIER = {
 
 const sseClients = []; // { tier, res }
 
+/* Alles wat elk partnerbedrijf standaard nodig heeft; wordt gebruikt voor
+   bestaande bedrijven (migratie bij opstarten) en voor nieuwe partners die
+   via de onboarding worden goedgekeurd. */
+function ensureSupplierDefaults(s) {
+  if (!Array.isArray(s.menu)) s.menu = [];
+  if (!Array.isArray(s.photos)) s.photos = [];
+  if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
+  if (s.type === 'apartment' && !Array.isArray(s.doors)) s.doors = [];
+  if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.minibar))
+    s.minibar = [
+      { id: 'mb1', name: 'Mineraalwater', price: 5 },
+      { id: 'mb2', name: 'Frisdrank', price: 6 },
+      { id: 'mb3', name: 'Mini-drank', price: 12 },
+      { id: 'mb4', name: 'Snack', price: 7 }
+    ];
+  for (const r of (s.rooms || [])) if (!r.hk) r.hk = { status: 'schoon' };
+  if (!s.settings) s.settings = { ordersOpen: true, reservationsOpen: true };
+  const caps = ((db.data.supplierTypes || {})[s.type] || {}).caps || [];
+  if (caps.includes('menu') && !Array.isArray(s.tables))
+    s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
+  if (typeof s.rate !== 'number') s.rate = 0.12;
+}
+
 function initRealtime() {
   if (!db.data.sessions) db.data.sessions = {};
   // migratie: sessies van voor de token-hashing (ruwe tokens, 48 tekens)
@@ -204,33 +238,13 @@ function initRealtime() {
   if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
   if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
   if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
+  if (!db.data.partnerApplications) db.data.partnerApplications = []; // bedrijven die partner willen worden
   // sector-features: elke partner een fotopagina, hotels/appartementen kamers
-  for (const s of db.data.suppliers) {
-    if (!Array.isArray(s.photos)) s.photos = [];
-    if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
-    if (s.type === 'apartment' && !Array.isArray(s.doors)) s.doors = [];
-    if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.minibar))
-      s.minibar = [
-        { id: 'mb1', name: 'Mineraalwater', price: 5 },
-        { id: 'mb2', name: 'Frisdrank', price: 6 },
-        { id: 'mb3', name: 'Mini-drank', price: 12 },
-        { id: 'mb4', name: 'Snack', price: 7 }
-      ];
-  }
+  for (const s of db.data.suppliers) ensureSupplierDefaults(s);
   if (!db.data.minibarCounts) db.data.minibarCounts = {};          // minibartellingen per bedrijf
   if (!db.data.tickets) db.data.tickets = {};                      // klussen/onderhoud per bedrijf
   if (!db.data.lostfound) db.data.lostfound = {};                  // gevonden voorwerpen per bedrijf
-  for (const s of db.data.suppliers)
-    for (const r of (s.rooms || []))
-      if (!r.hk) r.hk = { status: 'schoon' };                      // housekeeping-status per kamer
-  for (const s of db.data.suppliers) {
-    // bedrijfsinstellingen: bestellingen en reserveringen open of dicht
-    if (!s.settings) s.settings = { ordersOpen: true, reservationsOpen: true };
-    // tafelindeling voor horeca
-    const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
-    if (caps.includes('menu') && !Array.isArray(s.tables))
-      s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
-  }
+  // (kamers, instellingen en tafels zitten in ensureSupplierDefaults)
   // oudere databases: appartement-partner en doors-cap toevoegen
   if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
     db.data.supplierTypes.apartment.caps.splice(1, 0, 'doors');
@@ -1599,8 +1613,15 @@ app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
 // Solliciteerde een RTG-lid, dan hoort het lid direct van het besluit:
 // live in de app en (bij demo-profielen) als notificatie met push.
 function notifyApplicant(a, supplier) {
-  if (!a.key) return;
   const hired = a.status === 'aangenomen';
+  // e-mail werkt voor iedereen met een e-mailadres als contact, ook zonder RTG-account
+  if (/@/.test(a.contact || '')) {
+    mail.send(a.contact, hired ? 'U bent aangenomen bij ' + supplier.name : 'Uw sollicitatie bij ' + supplier.name,
+      'Beste ' + a.name + ',\n\n' + supplier.name + ' heeft uw sollicitatie als ' + a.func +
+      (hired ? ' geaccepteerd. Het bedrijf neemt contact met u op over uw eerste werkdag.' : ' helaas afgewezen.') +
+      '\n\nRahul Travel Group');
+  }
+  if (!a.key) return;
   if (db.data.notifications[a.key]) {
     notify(a.key, {
       icon: hired ? '🎉' : '📝',
@@ -1666,6 +1687,76 @@ app.post('/api/privacy/delete', auth, (req, res) => {
   for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
   save();
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true });
+});
+
+/* ---- partner-onboarding: bedrijven melden zichzelf aan ----
+   Publiek formulier -> aanvraag in de backoffice -> bij goedkeuring maakt de
+   server het bedrijf aan met een leverancierscode en een manager-PIN, en
+   mailt die naar de aanvrager. Vanaf dat moment werkt de hele partner-app. */
+function makeSupplierCode(name) {
+  let base = String(name).toUpperCase().replace(/[^A-Z]/g, '').slice(0, 6) || 'PARTNER';
+  let code = base, n = 2;
+  while (db.data.suppliers.find(s => s.code === code)) code = base + n++;
+  return code;
+}
+
+app.post('/api/partner/apply', (req, res) => {
+  const b = req.body || {};
+  const company = String(b.company || '').trim().slice(0, 80);
+  const type = String(b.type || '').trim();
+  const city = String(b.city || '').trim().slice(0, 60);
+  const contactName = String(b.contactName || '').trim().slice(0, 60);
+  const email = String(b.email || '').trim().toLowerCase().slice(0, 80);
+  const phone = String(b.phone || '').trim().slice(0, 30);
+  const note = String(b.note || '').trim().slice(0, 500);
+  if (!db.data.supplierTypes[type]) return res.status(400).json({ error: 'Kies een geldig type bedrijf.' });
+  if (!company || !city || !contactName) return res.status(400).json({ error: 'Vul de bedrijfsnaam, plaats en contactpersoon in.' });
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
+  if (db.data.partnerApplications.some(a => a.status === 'nieuw' && a.email === email && a.company.toLowerCase() === company.toLowerCase()))
+    return res.status(409).json({ error: 'Deze aanvraag staat al open. We nemen contact met u op.' });
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    company, type, city, contactName, email, phone, note,
+    status: 'nieuw', at: new Date().toISOString()
+  };
+  db.data.partnerApplications.unshift(entry);
+  db.data.partnerApplications = db.data.partnerApplications.slice(0, 200);
+  save();
+  mail.send(email, 'Uw partner-aanvraag bij Rahul Travel Group',
+    'Beste ' + contactName + ',\n\nWe hebben uw aanvraag voor ' + company + ' (' + city + ') ontvangen. ' +
+    'We beoordelen elke partner persoonlijk en komen binnen twee werkdagen bij u terug.\n\nRahul Travel Group');
+  sseToOffice('sync', { scope: 'team' });
+  res.json({ ok: true });
+});
+
+app.post('/api/office/partner/decide', officeAuth, (req, res) => {
+  const a = db.data.partnerApplications.find(x => x.id === req.body.id);
+  if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
+  if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
+  if (req.body.action === 'goedkeuren') {
+    const code = makeSupplierCode(a.company);
+    const s = { code, name: a.company, type: a.type, city: a.city, loc: null, rate: 0.12, menu: [] };
+    ensureSupplierDefaults(s);
+    db.data.suppliers.push(s);
+    const pin = accounts.makePin();
+    accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager', func: 'Beheer', pin });
+    a.status = 'goedgekeurd'; a.code = code;
+    save();
+    const url = appUrl(req);
+    mail.send(a.email, 'Welkom als partner van Rahul Travel Group',
+      'Beste ' + a.contactName + ',\n\n' + a.company + ' is goedgekeurd als RTG-partner.\n\n' +
+      'Uw leverancierscode: ' + code + '\nUw manager-PIN: ' + pin + ' (op naam van ' + a.contactName + ')\n\n' +
+      'Open de partner-app op ' + url + '/apps/partners.html, kies uw bedrijf via de code, ' +
+      'log in als management met uw PIN en stel uw pagina, menukaart en team in.\n\nRahul Travel Group');
+    sseToOffice('sync', { scope: 'team' });
+    return res.json({ ok: true, code, pin });
+  }
+  a.status = 'afgewezen';
+  save();
+  mail.send(a.email, 'Uw partner-aanvraag bij Rahul Travel Group',
+    'Beste ' + a.contactName + ',\n\nNa beoordeling kunnen we ' + a.company + ' op dit moment helaas geen partnerplek aanbieden.\n\nRahul Travel Group');
+  sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
 });
 
@@ -2419,7 +2510,8 @@ function officeState() {
     rides: db.data.rides.slice(0, 60),
     live,
     applications: applications.slice(0, 40),
-    suppliers: db.data.suppliers.map(publicSupplier)
+    suppliers: db.data.suppliers.map(publicSupplier),
+    partnerApplications: (db.data.partnerApplications || []).slice(0, 40)
   };
 }
 
@@ -2451,6 +2543,11 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
   if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
   const status = req.body.decision === 'approve' ? 'verified' : 'rejected';
   accounts.setVerification(user.id, status);
+  mail.send(accounts.emailOf(user), status === 'verified' ? 'Uw identiteit is geverifieerd' : 'Uw verificatie is afgewezen',
+    'Beste ' + accounts.realNameOf(user) + ',\n\n' +
+    (status === 'verified' ? 'Uw identiteit is geverifieerd. U kunt nu in een tik boeken.' :
+     'We konden uw document niet goedkeuren. Probeer het opnieuw met een duidelijkere foto.') +
+    '\n\nRahul Travel Group');
   notify(user.tier, { icon: status === 'verified' ? '✅' : '⚠',
     title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
     body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
@@ -2652,12 +2749,62 @@ app.post('/api/office/reply', officeAuth, (req, res) => {
   res.json({ ok: true, conversations: conciergeInbox() });
 });
 
+/* ---------- afsluiters: nette 404 en centrale foutafhandeling ---------- */
+
+app.use('/api', (req, res) => res.status(404).json({ error: 'Onbekend eindpunt.' }));
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, '..', 'public', 'site', '404.html'));
+});
+app.use((err, req, res, next) => {
+  console.error('[fout]', err && err.message);
+  if (res.headersSent) return next(err);
+  res.status(err && err.type === 'entity.too.large' ? 413 : 500)
+     .json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
+});
+
+/* ---------- dagelijkse back-up van de data ---------- */
+
+const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
+function backupData() {
+  try {
+    const day = new Date().toISOString().slice(0, 10);
+    const dir = path.join(BACKUP_DIR, day);
+    fs.mkdirSync(dir, { recursive: true });
+    for (const f of ['db.json', 'rtg.db']) {
+      const from = path.join(__dirname, 'data', f);
+      if (fs.existsSync(from)) fs.copyFileSync(from, path.join(dir, f));
+    }
+    // hooguit 14 dagen bewaren
+    const days = fs.readdirSync(BACKUP_DIR).sort();
+    for (const d of days.slice(0, Math.max(0, days.length - 14)))
+      fs.rmSync(path.join(BACKUP_DIR, d), { recursive: true, force: true });
+  } catch (e) { console.warn('[backup] mislukt:', e.message); }
+}
+
 /* ---------- start ---------- */
 
 initRealtime();
+backupData();
+setInterval(backupData, 24 * 60 * 60 * 1000);
+
+// Eerlijke opstartcontrole: waarschuw als demo-instellingen mee naar productie gaan.
+if (PRODUCTION) {
+  if (!process.env.OFFICE_CODE) console.warn('[start] LET OP: OFFICE_CODE staat op de demo-waarde. Zet een eigen code in de omgeving.');
+  if (!process.env.DEMO_PASS) console.warn('[start] LET OP: het demo-account (Rahul/Imran) is actief. Zet DEMO_USER/DEMO_PASS of schakel het uit.');
+  if (!process.env.SMTP_URL) console.warn('[start] LET OP: geen SMTP_URL; e-mail gaat naar de outbox in plaats van naar klanten.');
+  if (!process.env.ANTHROPIC_API_KEY) console.warn('[start] Info: geen ANTHROPIC_API_KEY; AI en chatvertaling draaien in demo-stand.');
+}
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/portaal.html`);
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
+});
+
+// Netjes afsluiten: data wegschrijven, verbindingen sluiten, dan pas stoppen.
+for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
+  console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
+  try { save(); } catch (e) {}
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(0), 3000).unref();
 });

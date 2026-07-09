@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>Partner worden, Rahul Travel Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --white:#FFFFFF; --black:#0C0C0B; --burgundy:#7F1634; --burgundy-bright:#9E1C40;
+    --gold:#857007; --line:#DEDBD5; --grey:#4D4A45; --grey-soft:#8A8680;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
+  header{padding:2rem 0;border-bottom:1px solid var(--line);}
+  header .wrap{display:flex;justify-content:space-between;align-items:center;}
+  .logo{font-family:'Bodoni Moda',serif;font-size:1.3rem;}
+  .logo small{display:block;font-size:0.6rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--grey-soft);font-family:'Inter',sans-serif;}
+  header a.back{font-size:0.8rem;color:var(--grey);border-bottom:1px solid var(--line);padding-bottom:2px;}
+  section{padding:clamp(3.5rem,8vw,6rem) 0;}
+  .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(2.2rem,5vw,3.2rem);line-height:1.1;margin-top:1rem;}
+  h1 em{color:var(--burgundy);font-style:italic;}
+  .deck{margin-top:1.2rem;font-size:1.02rem;color:var(--grey);max-width:38rem;}
+  .points{margin-top:2.2rem;display:grid;gap:0.9rem;}
+  .points div{display:flex;gap:0.8rem;font-size:0.9rem;color:var(--grey);}
+  .points b{color:var(--black);font-weight:600;}
+  form{margin-top:3rem;display:grid;gap:1.1rem;max-width:34rem;}
+  label{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--grey-soft);font-weight:600;display:block;margin-bottom:0.35rem;}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:0.85rem 1rem;font-size:0.95rem;font-family:inherit;color:var(--black);background:var(--white);outline:none;}
+  input:focus,select:focus,textarea:focus{border-color:var(--burgundy);}
+  textarea{min-height:100px;resize:vertical;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+  @media (max-width:560px){.two{grid-template-columns:1fr;}}
+  button{background:var(--black);color:var(--white);border:none;border-radius:999px;padding:1rem 2.2rem;font-size:0.95rem;font-weight:600;cursor:pointer;font-family:inherit;justify-self:start;}
+  button:hover{background:var(--burgundy);}
+  .msg{display:none;margin-top:1.4rem;padding:1rem 1.2rem;border-radius:12px;font-size:0.9rem;}
+  .msg.ok{display:block;background:#F2F7F1;border:1px solid #BFD8BC;color:#2E5A34;}
+  .msg.err{display:block;background:#FBF0F2;border:1px solid #E4B9C4;color:var(--burgundy);}
+  .note{margin-top:2.5rem;font-size:0.78rem;color:var(--grey-soft);max-width:34rem;}
+  footer{border-top:1px solid var(--line);padding:2rem 0;font-size:0.78rem;color:var(--grey-soft);}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="logo">Rahul Travel Group<small data-i18n="pw.tag">Partnerkanaal</small></div>
+    <a class="back" href="/index.html" data-i18n="pw.home">← rahultravelgroup</a>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <span class="kicker" data-i18n="pw.kicker">Voor hotels, restaurants, bars, appartementen, vervoer</span>
+    <h1 data-i18n-html="pw.title">Word partner, <em>zonder gedoe</em>.</h1>
+    <p class="deck" data-i18n="pw.deck">RTG-leden reizen op nettoprijzen en betalen via de app. Als partner krijgt u er gratis een compleet systeem bij: kassa, bestellingen, reserveringen, personeelsbeheer met rooster en walkie-talkie, een eigen AI-assistent en live verbinding met uw gasten onderweg.</p>
+    <div class="points">
+      <div><span>💶</span><span><b>Directe omzet</b>, leden bestellen en betalen in de app; u ziet alles live binnenkomen.</span></div>
+      <div><span>🧾</span><span><b>Een volledige kassa</b> op maat van uw sector, inclusief Z-rapport, ophaalcodes en kamerrekeningen.</span></div>
+      <div><span>👥</span><span><b>Personeel geregeld</b>, eigen PIN per medewerker, rooster, taken, teamchat en sollicitaties op een plek.</span></div>
+      <div><span>🔒</span><span><b>Privacy by design</b>, uw gasten reizen onder codenaam; u ziet wat nodig is, niet meer.</span></div>
+    </div>
+
+    <form id="paForm">
+      <div>
+        <label for="paCompany" data-i18n="pw.company">Bedrijfsnaam</label>
+        <input id="paCompany" required maxlength="80" autocomplete="organization">
+      </div>
+      <div class="two">
+        <div>
+          <label for="paType" data-i18n="pw.type">Type bedrijf</label>
+          <select id="paType">
+            <option value="restaurant">Restaurant</option>
+            <option value="bar">Bar</option>
+            <option value="club">Club</option>
+            <option value="hotel">Hotel</option>
+            <option value="apartment" data-i18n="pw.apartment">Appartementen</option>
+            <option value="taxi">Taxi / vervoer</option>
+            <option value="jet" data-i18n="pw.jet">Privéjet / luchtvaart</option>
+          </select>
+        </div>
+        <div>
+          <label for="paCity" data-i18n="pw.city">Plaats</label>
+          <input id="paCity" required maxlength="60" autocomplete="address-level2">
+        </div>
+      </div>
+      <div class="two">
+        <div>
+          <label for="paName" data-i18n="pw.contact">Contactpersoon</label>
+          <input id="paName" required maxlength="60" autocomplete="name">
+        </div>
+        <div>
+          <label for="paPhone" data-i18n="pw.phone">Telefoon (optioneel)</label>
+          <input id="paPhone" maxlength="30" autocomplete="tel">
+        </div>
+      </div>
+      <div>
+        <label for="paEmail" data-i18n="pw.email">E-mailadres</label>
+        <input id="paEmail" type="email" required maxlength="80" autocomplete="email">
+      </div>
+      <div>
+        <label for="paNote" data-i18n="pw.note">Vertel kort iets over uw zaak (optioneel)</label>
+        <textarea id="paNote" maxlength="500"></textarea>
+      </div>
+      <button type="submit" data-i18n="pw.send">Vraag een partnerplek aan</button>
+      <div class="msg" id="paMsg"></div>
+    </form>
+
+    <p class="note" data-i18n="pw.privacy">We gebruiken deze gegevens alleen om uw aanvraag te beoordelen en contact met u op te nemen. Na goedkeuring ontvangt u per e-mail uw leverancierscode en manager-PIN voor de partner-app. Zie ook ons <a href="/site/privacy.html" style="text-decoration:underline;">privacybeleid</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© Rahul Travel Group · <a href="/site/privacy.html" data-i18n="pw.f.privacy">Privacybeleid</a> · <a href="/site/voorwaarden.html" data-i18n="pw.f.terms">Voorwaarden</a></div>
+</footer>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  document.getElementById('paForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('#paMsg');
+    msg.className = 'msg';
+    try {
+      const res = await fetch('/api/partner/apply', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: $('#paCompany').value, type: $('#paType').value, city: $('#paCity').value,
+          contactName: $('#paName').value, email: $('#paEmail').value, phone: $('#paPhone').value, note: $('#paNote').value
+        })
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
+      msg.className = 'msg ok';
+      msg.textContent = T('pw.ok', 'Dank u. Uw aanvraag is binnen; we beoordelen elke partner persoonlijk en komen binnen twee werkdagen bij u terug per e-mail.');
+      e.target.reset();
+    } catch (err) {
+      msg.className = 'msg err';
+      msg.textContent = err.message === 'Failed to fetch' ? T('pw.offline', 'Start de RTG-server (npm start) om dit formulier te gebruiken.') : err.message;
+    }
+  });
+})();
+</script>
+<script>
+window.I18N = { en: {
+  'pw.tag':'Partner channel', 'pw.home':'← rahultravelgroup',
+  'pw.kicker':'For hotels, restaurants, bars, apartments, transport',
+  'pw.title':'Become a partner, <em>without the hassle</em>.',
+  'pw.deck':'RTG members travel at net prices and pay through the app. As a partner you get a complete system for free: register, orders, reservations, staff management with schedules and walkie-talkie, your own AI assistant and a live connection with your guests on the move.',
+  'pw.company':'Company name', 'pw.type':'Type of business', 'pw.city':'City',
+  'pw.contact':'Contact person', 'pw.phone':'Phone (optional)', 'pw.email':'Email address',
+  'pw.note':'Tell us briefly about your business (optional)', 'pw.send':'Request a partner spot',
+  'pw.apartment':'Apartments', 'pw.jet':'Private jet / aviation',
+  'pw.ok':'Thank you. Your request has been received; we review every partner personally and will get back to you by email within two working days.',
+  'pw.offline':'Start the RTG server (npm start) to use this form.',
+  'pw.privacy':'We only use these details to review your request and contact you. After approval you receive your supplier code and manager PIN for the partner app by email. See also our privacy policy.',
+  'pw.f.privacy':'Privacy policy', 'pw.f.terms':'Terms'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
+</body>
+</html>

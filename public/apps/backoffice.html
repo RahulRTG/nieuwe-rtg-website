@@ -139,9 +139,16 @@
         <div class="rows" id="concierge"></div>
       </div>
     </div>
-    <div class="panel" style="margin-top:1.5rem;">
-      <h2 data-i18n="panel.apps">Sollicitaties bij partners</h2>
-      <div class="rows" id="appsList"></div>
+    <div class="cols" style="margin-top:1.5rem;">
+      <div class="panel">
+        <h2 data-i18n="panel.apps">Sollicitaties bij partners</h2>
+        <div class="rows" id="appsList"></div>
+      </div>
+      <div class="panel">
+        <h2 data-i18n="panel.pa">Partner-aanvragen</h2>
+        <div id="paResult" style="display:none;margin:0.9rem 1.25rem 0;padding:0.8rem 1rem;border:1px solid var(--gold);border-radius:12px;font-size:0.8rem;line-height:1.6;"></div>
+        <div class="rows" id="paList"></div>
+      </div>
     </div>
   </div>
   <div class="doc-scrim" id="docScrim"><img id="docImg" alt="Document"></div>
@@ -313,6 +320,31 @@
         '<div class="sub">'+x.company+' · '+timeAgo(x.at)+'</div></div>'+
         '<span class="pill '+pc+'">'+st+'</span></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noapps','Nog geen sollicitaties. Kandidaten solliciteren via de partner-apps, RTG-leden via de leden-app met hun cv.')+'</div>';
+
+    const pas = state.partnerApplications || [];
+    $('#paList').innerHTML = pas.length ? pas.map(x => {
+      const pc = x.status==='nieuw'?'nieuw':x.status==='goedgekeurd'?'klaar':'bereiding';
+      const st = x.status==='nieuw'?T('bo.pa.new','nieuw'):x.status==='goedgekeurd'?T('bo.pa.ok','goedgekeurd'):T('bo.pa.no','afgewezen');
+      return '<div class="row"><div class="r1"><div><div class="nm">'+x.company+' <span style="color:var(--soft);font-weight:400;">· '+x.type+' · '+x.city+'</span></div>'+
+        '<div class="sub">'+x.contactName+' · '+x.email+(x.phone?' · '+x.phone:'')+' · '+timeAgo(x.at)+(x.note?'<br>"'+x.note.slice(0,120)+'"':'')+(x.code?' · code '+x.code:'')+'</div></div>'+
+        (x.status==='nieuw'
+          ? '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-paok="'+x.id+'">'+T('bo.pa.approve','Goedkeuren')+'</button><button class="vbtn" data-pano="'+x.id+'">'+T('bo.pa.reject','Afwijzen')+'</button></div>'
+          : '<span class="pill '+pc+'">'+st+'</span>')+
+        '</div></div>';
+    }).join('') : '<div class="empty">'+T('bo.nopa','Nog geen aanvragen. Bedrijven melden zich aan via de pagina "Partner worden" op de site.')+'</div>';
+    document.querySelectorAll('[data-paok]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await call('/office/partner/decide', { id: b.dataset.paok, action: 'goedkeuren' });
+        const box = $('#paResult');
+        box.style.display = 'block';
+        box.innerHTML = '✅ '+T('bo.pa.done','Goedgekeurd. Geef dit eenmalig door (staat ook in de welkomstmail):')+
+          '<br><b>'+T('bo.pa.code','Leverancierscode')+': '+d.code+'</b> · <b>'+T('bo.pa.pin','Manager-PIN')+': '+d.pin+'</b>';
+        await refresh();
+      } catch(e){ alert(e.message); }
+    }));
+    document.querySelectorAll('[data-pano]').forEach(b => b.addEventListener('click', async () => {
+      try { await call('/office/partner/decide', { id: b.dataset.pano, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
+    }));
   }
 
   function stream(){
@@ -344,6 +376,11 @@ window.I18N = { en: {
   'bo.guest':'guest', 'bo.items':'item(s)', 'bo.paid':'paid', 'bo.unpaid':'unpaid',
   'panel.apps':'Applications at partners', 'bo.ap.new':'new', 'bo.ap.hired':'hired', 'bo.ap.rejected':'rejected',
   'bo.noapps':'No applications yet. Candidates apply via the partner apps, RTG members via the member app with their CV.',
+  'panel.pa':'Partner requests', 'bo.pa.new':'new', 'bo.pa.ok':'approved', 'bo.pa.no':'rejected',
+  'bo.pa.approve':'Approve', 'bo.pa.reject':'Reject',
+  'bo.pa.done':'Approved. Share this once (it is also in the welcome email):',
+  'bo.pa.code':'Supplier code', 'bo.pa.pin':'Manager PIN',
+  'bo.nopa':'No requests yet. Businesses sign up via the "Become a partner" page on the site.',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.h':' h', 't.d':' d'
 } };
 </script>

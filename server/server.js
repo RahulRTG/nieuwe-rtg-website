@@ -53,6 +53,23 @@ for (const [code, people] of Object.entries(STAFF_SEED)) {
 }
 
 const app = express();
+app.disable('x-powered-by');
+
+/* Security-headers op elk antwoord. De CSP staat inline scripts/styles toe
+   (de apps zijn bewust self-contained), maar verbiedt elk ander extern
+   verkeer dan de Google Fonts en blokkeert framing en MIME-sniffing. */
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('X-Frame-Options', 'DENY');
+  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self)');
+  res.set('Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
+    "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
+  next();
+});
+
 app.use(express.json({ limit: '8mb' }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -85,13 +102,18 @@ const PERSONAS = {
   business:  { name: 'A. de Vries',  full: 'Alexander de Vries', since: 'November 2025',  number: 'BSP · 2025 · 1104', codename: 'Noordelijke Ster' }
 };
 
-// token -> { tier, key }. In-memory voor snelheid, gespiegeld in db.json
-// zodat ingelogde gebruikers een serverherstart overleven.
+// sha256(token) -> { tier, key }. In-memory voor snelheid, gespiegeld in
+// db.json zodat ingelogde gebruikers een serverherstart overleven.
+// Alleen de hash wordt bewaard: wie db.json in handen krijgt, heeft daarmee
+// nog geen bruikbare tokens. Sessies verlopen na 30 dagen zonder gebruik.
 const sessions = new Map();
+const TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+function tokenHash(token) { return crypto.createHash('sha256').update(String(token)).digest('hex'); }
 function rememberSession(token, sess) {
   sess.at = new Date().toISOString();
-  sessions.set(token, sess);
-  db.data.sessions[token] = sess;
+  const h = tokenHash(token);
+  sessions.set(h, sess);
+  db.data.sessions[h] = sess;
   const toks = Object.keys(db.data.sessions);
   if (toks.length > 400) {
     toks.sort((a, b) => new Date(db.data.sessions[a].at || 0) - new Date(db.data.sessions[b].at || 0));
@@ -99,9 +121,40 @@ function rememberSession(token, sess) {
   }
   save();
 }
-function forgetSession(token) {
-  sessions.delete(token);
-  if (db.data.sessions) { delete db.data.sessions[token]; save(); }
+// hash is de map-sleutel (zie rememberSession); aanroepers geven de hash door
+function forgetSession(hash) {
+  sessions.delete(hash);
+  if (db.data.sessions) { delete db.data.sessions[hash]; save(); }
+}
+// Centrale sessie-opzoeking: hasht het token, controleert het verloop en
+// schuift het venster op bij actief gebruik (hooguit eens per uur wegschrijven).
+function sessionFor(token) {
+  if (!token) return null;
+  const h = tokenHash(token);
+  const sess = sessions.get(h);
+  if (!sess) return null;
+  const age = Date.now() - new Date(sess.at || 0).getTime();
+  if (age > TOKEN_TTL_MS) { forgetSession(h); return null; }
+  if (age > 60 * 60 * 1000) { sess.at = new Date().toISOString(); save(); }
+  return sess;
+}
+
+/* Inlogpogingen afremmen: per bron en doel hooguit tien mislukkingen,
+   daarna vijf minuten wachten. Geldt voor wachtwoorden en toegangscodes. */
+const loginFails = new Map(); // bucket -> { n, until }
+function tooManyTries(res, bucket) {
+  const f = loginFails.get(bucket);
+  if (f && f.until > Date.now()) {
+    res.status(429).json({ error: 'Te veel pogingen. Probeer het over een paar minuten opnieuw.' });
+    return true;
+  }
+  return false;
+}
+function noteFailedTry(bucket) {
+  const f = loginFails.get(bucket) || { n: 0, until: 0 };
+  f.n += 1;
+  if (f.n >= 10) { f.until = Date.now() + 5 * 60000; f.n = 0; }
+  loginFails.set(bucket, f);
 }
 
 /* ---------- demo-account: één inlog (Rahul / Imran) voor elk kanaal ----------
@@ -137,6 +190,13 @@ const sseClients = []; // { tier, res }
 
 function initRealtime() {
   if (!db.data.sessions) db.data.sessions = {};
+  // migratie: sessies van voor de token-hashing (ruwe tokens, 48 tekens)
+  // worden eenmalig omgezet naar hun sha256-sleutel, zodat niemand uitlogt
+  let migrated = false;
+  for (const [t, s] of Object.entries(db.data.sessions)) {
+    if (t.length !== 64) { db.data.sessions[tokenHash(t)] = s; delete db.data.sessions[t]; migrated = true; }
+  }
+  if (migrated) save();
   for (const [t, s] of Object.entries(db.data.sessions)) if (!sessions.has(t)) sessions.set(t, s);
   if (!db.data.notifications) db.data.notifications = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.pushSubs) db.data.pushSubs = { rtg: [], lifestyle: [], business: [] };
@@ -246,7 +306,7 @@ function sendPush(tier, note) {
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
 function resolveSession(token) {
   if (!token) return null;
-  const demo = sessions.get(token);
+  const demo = sessionFor(token);
   if (demo) return demo;
   const user = accounts.verifyToken(token);
   if (user) return { tier: user.tier, key: 'user-' + user.id, account: user };
@@ -370,8 +430,13 @@ app.get('/api/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claud
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
   if (hasCred(req.body)) {
-    if (!checkCred(req.body.username, req.body.password))
+    const bucket = 'demo:' + req.ip;
+    if (tooManyTries(res, bucket)) return;
+    if (!checkCred(req.body.username, req.body.password)) {
+      noteFailedTry(bucket);
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
+    }
+    loginFails.delete(bucket);
     tier = 'business'; // het demo-account is een volledig lidmaatschap
   }
   if (!PERSONAS[tier]) return res.status(400).json({ error: 'Onbekende pas.' });
@@ -457,10 +522,14 @@ app.post('/api/auth/reset', (req, res) => {
 
 app.post('/api/auth/login', (req, res) => {
   const login = req.body.login || req.body.email || req.body.username;
+  const bucket = 'auth:' + req.ip + ':' + String(login || '').toLowerCase().slice(0, 60);
+  if (tooManyTries(res, bucket)) return;
   const user = accounts.findByLogin(login);
   if (!user || !accounts.verifyPassword(req.body.password, user.password_hash)) {
+    noteFailedTry(bucket);
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
+  loginFails.delete(bucket);
   const token = accounts.issueToken(user.id);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
   res.json({ token, state: stateFor(sess, req.body.lang) });
@@ -793,7 +862,7 @@ function findSupplier(code) {
 function supplierAuth(req, res, next) {
   const header = req.get('authorization') || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-  const sess = token && sessions.get(token);
+  const sess = token && sessionFor(token);
   if (!sess || sess.role !== 'supplier') return res.status(401).json({ error: 'Niet ingelogd als leverancier.' });
   req.supplier = findSupplier(sess.code);
   if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
@@ -898,8 +967,13 @@ app.post('/api/supplier/login', (req, res) => {
     pinFails.delete(fk);
     actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
   } else if (hasCred(req.body)) {
-    if (!checkCred(req.body.username, req.body.password))
+    const bucket = 'sup:' + req.ip;
+    if (tooManyTries(res, bucket)) return;
+    if (!checkCred(req.body.username, req.body.password)) {
+      noteFailedTry(bucket);
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
+    }
+    loginFails.delete(bucket);
     s = findSupplier(DEMO_SUPPLIER);
     actor = { name: 'Beheer', role: 'manager', manager: true };
   } else {
@@ -1537,6 +1611,64 @@ function notifyApplicant(a, supplier) {
   sseToCustomer(a.key, 'sync', { scope: 'apply' });
 }
 
+/* ---- AVG-rechten: inzage en vergetelheid, rechtstreeks vanuit de app ----
+   Export levert alles wat op deze persoon herleidbaar is in een JSON;
+   verwijderen wist of anonimiseert het en logt alle sessies van dit lid uit. */
+app.post('/api/privacy/export', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const key = req.session.key;
+  const chats = {};
+  for (const [k, msgs] of Object.entries(db.data.guestChats || {})) {
+    if (k.split('|')[1] === key) chats[k] = msgs;
+  }
+  const likes = db.data.posts.filter(p => p.likedBy && p.likedBy[key]).map(p => ({ postId: p.id, author: p.author }));
+  const state = stateFor(req.session, req.body.lang);
+  res.json({
+    exportedAt: new Date().toISOString(),
+    note: 'Alle gegevens die RTG over u bewaart, onder uw codenaam (pseudonimisering).',
+    profile: state.user,
+    cv: db.data.cvs[key] || null,
+    applications: myApplications(key),
+    invoices: state.invoices || [],
+    trip: state.trip || null,
+    live: db.data.live[key] || null,
+    orders: db.data.orders.filter(o => (o.customerKey || o.customerTier) === key),
+    guestChats: chats,
+    likedPosts: likes,
+    notifications: db.data.notifications[key] || []
+  });
+});
+
+app.post('/api/privacy/delete', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const key = req.session.key;
+  // cv en live-locatie weg, chats weg, likes weg
+  delete db.data.cvs[key];
+  delete db.data.live[key];
+  for (const k of Object.keys(db.data.guestChats || {})) if (k.split('|')[1] === key) delete db.data.guestChats[k];
+  for (const p of db.data.posts) if (p.likedBy) delete p.likedBy[key];
+  // sollicitaties anonimiseren: het bedrijf houdt zijn administratie,
+  // maar zonder iets dat naar deze persoon herleidbaar is
+  for (const list of Object.values(db.data.applications || {})) {
+    for (const a of list) if (a.key === key) {
+      a.name = '(op verzoek verwijderd)'; a.contact = ''; a.note = '';
+      a.cv = null; a.codename = null; a.key = null;
+    }
+  }
+  // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
+  if (db.data.notifications[key]) db.data.notifications[key] = [];
+  // echt account: verwijder het account zelf, inclusief documentupload
+  if (req.session.account) {
+    const doc = accounts.deleteUser(req.session.account.id);
+    if (doc) { try { fs.unlinkSync(path.join(UPLOAD_DIR, path.basename(doc))); } catch (e) {} }
+  }
+  // alle sessies van dit lid uitloggen
+  for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true });
+});
+
 /* ---- cv-builder (leden-app): het cv is de sleutel tot solliciteren ---- */
 function cvReady(cv) {
   return !!(cv && cv.name && cv.contact && ((cv.experience || []).length || (cv.skills || []).length));
@@ -1867,7 +1999,7 @@ app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
 });
 
 app.get('/api/supplier/stream', (req, res) => {
-  const sess = sessions.get(req.query.token);
+  const sess = sessionFor(req.query.token);
   if (!sess || sess.role !== 'supplier') return res.status(401).end();
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
   res.write('retry: 3000\n\n');
@@ -2242,9 +2374,13 @@ app.post('/api/ride/request', auth, (req, res) => {
 const OFFICE_CODE = process.env.OFFICE_CODE || 'RTG-OFFICE';
 
 app.post('/api/office/login', (req, res) => {
+  const bucket = 'office:' + req.ip;
+  if (tooManyTries(res, bucket)) return;
   if (String(req.body.code || '').trim().toUpperCase() !== OFFICE_CODE) {
+    noteFailedTry(bucket);
     return res.status(401).json({ error: 'Onjuiste backoffice-code.' });
   }
+  loginFails.delete(bucket);
   const token = crypto.randomBytes(24).toString('hex');
   rememberSession(token, { role: 'office' });
   res.json({ token, state: officeState() });
@@ -2253,7 +2389,7 @@ app.post('/api/office/login', (req, res) => {
 function officeAuth(req, res, next) {
   const header = req.get('authorization') || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-  const sess = token && sessions.get(token);
+  const sess = token && sessionFor(token);
   if (!sess || sess.role !== 'office') return res.status(401).json({ error: 'Geen backoffice-sessie.' });
   next();
 }
@@ -2288,7 +2424,7 @@ function officeState() {
 }
 
 app.get('/api/office/stream', (req, res) => {
-  const sess = sessions.get(req.query.token);
+  const sess = sessionFor(req.query.token);
   if (!sess || sess.role !== 'office') return res.status(401).end();
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
   res.write('retry: 3000\n\n');
@@ -2323,7 +2459,7 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
 
 // Het geüploade document bekijken (alleen backoffice; token via query voor <img>).
 app.get('/api/office/doc', (req, res) => {
-  const sess = sessions.get(req.query.token);
+  const sess = sessionFor(req.query.token);
   if (!sess || sess.role !== 'office') return res.status(401).end();
   const file = path.basename(String(req.query.file || '')); // geen padtraversal
   const full = path.join(UPLOAD_DIR, file);

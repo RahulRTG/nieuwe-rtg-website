@@ -297,9 +297,19 @@ function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 
 function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
+/* AVG-vergetelheid: verwijdert het account definitief. Geeft de bestandsnaam
+   van een eventueel geupload identiteitsdocument terug, zodat de server die
+   ook van schijf kan wissen. */
+function deleteUser(id) {
+  const u = getUserById(id);
+  if (!u) return null;
+  db.prepare('DELETE FROM users WHERE id = ?').run(id);
+  return u.id_doc || null;
+}
+
 module.exports = {
   init, createUser, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
-  createStaff, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, makePin,
+  createStaff, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, makePin, deleteUser,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword

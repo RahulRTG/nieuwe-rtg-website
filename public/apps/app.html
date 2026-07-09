@@ -63,6 +63,9 @@
       border:1px solid rgba(255,255,255,0.1);
       box-shadow:0 40px 90px -30px rgba(0,0,0,0.8);
     }
+    /* binnen het telefoonkader blijven de panelen in het kader */
+    .notif-panel{position:absolute;height:100%;}
+    .notif-scrim{position:absolute;}
   }
 
   /* ---------- login ---------- */
@@ -187,15 +190,17 @@
     display:flex;align-items:center;justify-content:center;
   }
   .notif-scrim{
-    position:absolute;inset:0;background:rgba(0,0,0,0.5);
+    position:fixed;inset:0;background:rgba(0,0,0,0.5);
     z-index:44;display:none;
   }
   .notif-scrim.open{display:block;}
   .notif-panel{
-    position:absolute;
+    /* vast aan het scherm, niet aan de (langere) pagina: zo blijven de
+       knoppen onderin (uitloggen, AVG) altijd bereikbaar */
+    position:fixed;
     top:0;right:0;
     width:86%;max-width:340px;
-    height:100%;
+    height:100dvh;
     background:var(--bg);
     border-left:1px solid var(--line);
     z-index:45;
@@ -726,7 +731,14 @@
         <button class="notif-push" id="notifPush" data-i18n="app.pushenable">Push aanzetten</button>
       </div>
       <div class="notif-list" id="notifList"></div>
-      <button id="logoutBtn" style="margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);background:none;border:1px solid var(--line);border-radius:12px;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
+        <button id="logoutBtn" style="background:none;border:1px solid var(--line);border-radius:12px;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
+        <div style="display:flex;gap:0.5rem;">
+          <button id="privExport" style="flex:1;background:none;border:1px solid var(--line);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--soft);" data-i18n="app.priv.export">Download mijn gegevens</button>
+          <button id="privDelete" style="flex:1;background:none;border:1px solid rgba(194,58,94,0.4);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--burgundy);" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
+        </div>
+        <div style="font-size:0.6rem;color:var(--soft);line-height:1.5;" data-i18n="app.priv.note">Uw AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist uw cv, chats, likes en locatie en logt u overal uit.</div>
+      </div>
     </div>
     <div class="notif-scrim" id="notifScrim"></div>
 
@@ -2063,6 +2075,33 @@
 
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
+
+  /* ---------- AVG: inzage en vergetelheid ---------- */
+  const privExport = document.getElementById('privExport');
+  if (privExport) privExport.addEventListener('click', async () => {
+    if (!API.live){ toast(T('app.priv.needlogin','Log eerst in.')); return; }
+    try {
+      const data = await API.call('/privacy/export');
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'rtg-mijn-gegevens.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast(T('app.priv.exported','Uw gegevens zijn gedownload als JSON.'));
+    } catch(e){ toast(e.message); }
+  });
+  const privDelete = document.getElementById('privDelete');
+  if (privDelete) privDelete.addEventListener('click', async () => {
+    if (!API.live){ toast(T('app.priv.needlogin','Log eerst in.')); return; }
+    if (!confirm(T('app.priv.confirm','Weet u het zeker? Dit wist uw cv, chats, likes en locatie definitief en logt u overal uit.'))) return;
+    try {
+      await API.call('/privacy/delete');
+      try { localStorage.removeItem('rtg_member_token'); } catch(e2){}
+      location.reload();
+    } catch(e){ toast(e.message); }
+  });
+
   restoreSession();
 })();
 </script>
@@ -2114,6 +2153,10 @@ window.I18N = { en: {
   'cv.card.edit':'Edit my resume', 'cv.card.make':'Build my resume',
   'cv.workat':'Work at', 'cv.apply':'Apply', 'cv.applied':'Application sent, with your RTG resume attached.',
   'cv.st.hired':'hired', 'cv.st.rejected':'not selected', 'cv.st.new':'under review', 'app.logout':'Sign out',
+  'app.priv.export':'Download my data', 'app.priv.delete':'Delete my data',
+  'app.priv.note':'Your GDPR rights: access and erasure, no forms needed. Deleting wipes your resume, chats, likes and location and signs you out everywhere.',
+  'app.priv.needlogin':'Sign in first.', 'app.priv.exported':'Your data has been downloaded as JSON.',
+  'app.priv.confirm':'Are you sure? This permanently wipes your resume, chats, likes and location and signs you out everywhere.',
   'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
   'app.roomsfree':'room(s) available', 'app.tp.view':'View',
   'app.ms.closed':'Orders are temporarily closed. The menu remains on view.',

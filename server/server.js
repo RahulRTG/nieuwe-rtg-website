@@ -183,6 +183,20 @@ function initRealtime() {
       { time: '22:30', title: 'Nachtplan: Bar Pontocho, daarna vrij spel', kind: 'vrij', prep: 'Eerste ronde staat klaar op naam van uw codenaam; taxi stand-by tot 03:00.' }
     ]
   };
+  // De Salon levert de content: uitgelichte posts dragen het beeld van de
+  // site, altijd met naamsvermelding. Bestaande databases krijgen de
+  // campagnebeelden bij de bijbehorende seed-posts.
+  const PROMO_IMAGES = { 1: '/campagne/kyoto-suite.jpg', 3: '/campagne/palacio.jpg', 4: '/campagne/jet.jpg', 5: '/campagne/riad.jpg' };
+  let promoDirty = false;
+  for (const p of db.data.posts || []) {
+    if (PROMO_IMAGES[p.id] && !p.image) { p.image = PROMO_IMAGES[p.id]; p.featured = true; promoDirty = true; }
+  }
+  if (!(db.data.posts || []).some(p => p.id === 6)) {
+    db.data.posts.push({ id: 6, author: 'Nadia Karim', tier: 'rtg', place: 'Kyoto', visual: 'v-kyoto', image: '/campagne/bamboe.jpg', text: 'Om 07:40 stond de taxi al voor. Het bamboebos vóór de drukte — de Butler wist precies waarom.', baseLikes: 96, likedBy: {}, reward: 4, featured: true, comments: [] });
+    db.data.posts.push({ id: 7, author: 'James Whitfield', tier: 'business', place: 'Hakone', visual: 'v-kyoto', image: '/campagne/onsen.jpg', lang: 'en', text: 'The onsen at dusk, maples just turning. My concierge called it "worth the detour" — an understatement.', baseLikes: 61, likedBy: {}, reward: 3, featured: true, comments: [] });
+    promoDirty = true;
+  }
+  if (promoDirty) save();
   if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
   if (webpush) {
     if (!db.data.vapid) {
@@ -581,6 +595,22 @@ app.post('/api/pay', auth, (req, res) => {
   // ander open scherm van hetzelfde lid meteen bijwerken
   broadcastSync([req.session.tier], 'payments');
   res.json({ ok: true, foundation, state: stateFor(req.session, req.body.lang) });
+});
+
+/* De Salon levert de content: uitgelichte posts (met beeld) zijn het
+   promotiemateriaal van de site. Publiek endpoint, alleen featured posts —
+   RTG cureert wat campagne wordt. */
+app.get('/api/salon/promo', (req, res) => {
+  const posts = (db.data.posts || [])
+    .filter(p => p.featured && p.image)
+    .map(p => ({
+      id: p.id, author: p.author, tier: p.tier, place: p.place,
+      text: p.text, lang: p.lang || 'nl', image: p.image,
+      likes: (p.baseLikes || 0) + Object.keys(p.likedBy || {}).length
+    }))
+    .sort((a, b) => b.likes - a.likes)
+    .slice(0, 6);
+  res.json({ posts });
 });
 
 app.post('/api/like', auth, (req, res) => {

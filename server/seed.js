@@ -36,7 +36,7 @@ module.exports = function seed() {
 
     posts: [
       {
-        id: 1, author: 'Isabelle van Rhijn', tier: 'lifestyle', place: 'Kyoto', visual: 'v-kyoto',
+        id: 1, author: 'Isabelle van Rhijn', tier: 'lifestyle', place: 'Kyoto', visual: 'v-kyoto', image: '/campagne/kyoto-suite.jpg',
         text: 'De theeceremonie die mijn concierge regelde, geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
         baseLikes: 124, likedBy: {}, reward: 6, featured: true,
         comments: [{ who: 'Alexander de Vries', tier: 'business', text: 'Staat genoteerd voor november. Dank.' }]
@@ -48,7 +48,7 @@ module.exports = function seed() {
         comments: []
       },
       {
-        id: 3, author: 'Sophie Janssen', tier: 'rtg', place: 'Lissabon', visual: 'v-lissabon',
+        id: 3, author: 'Sophie Janssen', tier: 'rtg', place: 'Lissabon', visual: 'v-lissabon', image: '/campagne/palacio.jpg',
         text: 'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt.',
         baseLikes: 203, likedBy: {}, reward: 8, featured: true,
         comments: [
@@ -58,15 +58,27 @@ module.exports = function seed() {
         ]
       },
       {
-        id: 4, author: 'Marcus Bergwerff', tier: 'business', place: 'Singapore', visual: 'v-singapore',
+        id: 4, author: 'Marcus Bergwerff', tier: 'business', place: 'Singapore', visual: 'v-singapore', image: '/campagne/jet.jpg',
         text: 'Layover van 9 uur omgezet in een middag Raffles + spa. De AI stelde het voor, mijn concierge bevestigde binnen 10 minuten.',
-        baseLikes: 57, likedBy: {}, reward: 2,
+        baseLikes: 57, likedBy: {}, reward: 2, featured: true,
         comments: []
       },
       {
-        id: 5, author: 'Nadia Karim', tier: 'rtg', place: 'Marrakech', visual: 'v-marrakech',
+        id: 5, author: 'Nadia Karim', tier: 'rtg', place: 'Marrakech', visual: 'v-marrakech', image: '/campagne/riad.jpg',
         text: 'Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Reizen dat iets teruggeeft, dat deel vertel ik iedereen.',
         baseLikes: 141, likedBy: {}, reward: 5, featured: true,
+        comments: []
+      },
+      {
+        id: 6, author: 'Nadia Karim', tier: 'rtg', place: 'Kyoto', visual: 'v-kyoto', image: '/campagne/bamboe.jpg',
+        text: 'Om 07:40 stond de taxi al voor. Het bamboebos vóór de drukte — de Butler wist precies waarom.',
+        baseLikes: 96, likedBy: {}, reward: 4, featured: true,
+        comments: []
+      },
+      {
+        id: 7, author: 'James Whitfield', tier: 'business', place: 'Hakone', visual: 'v-kyoto', image: '/campagne/onsen.jpg', lang: 'en',
+        text: 'The onsen at dusk, maples just turning. My concierge called it "worth the detour" — an understatement.',
+        baseLikes: 61, likedBy: {}, reward: 3, featured: true,
         comments: []
       }
     ],

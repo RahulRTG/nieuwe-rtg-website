@@ -47,7 +47,7 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 2. **Eén signatuurelement, geen stapeling van trucjes.** Niet steeds nieuwe visuele devices toevoegen.
 3. **Stark zwart/wit ritme**, geen beige/marmer-gradients, geen ronde hoeken of gouden randjes.
 4. **Veel lucht** — genereuze verticale padding; bij twijfel meer ruimte.
-5. **Geen stockfoto's, geen modellen, geen extern beeld.** Campagnefoto's zijn AI-gegenereerd in eigen huis (staan in `public/campagne/`, gemaakt via Pollinations; stijl: quiet luxury, gedempte tinten, bordeaux-accenten, géén mensen) en worden eerlijk gelabeld ("AI · eigen huis"). Overige visuals met CSS/SVG bouwen.
+5. **De Salon levert het beeld.** Site- en campagnebeeld zijn uitgelichte Salon-posts (featured, altijd met naamsvermelding — label "Uit De Salon · naam"; endpoint `/api/salon/promo`, alleen featured posts, RTG cureert). De onderliggende demo-beelden zijn AI-gegenereerd in eigen huis (`public/campagne/`, via Pollinations; quiet luxury, gedempte tinten, géén mensen) — geen stockfoto's, geen modellen, geen extern beeld. Overige visuals met CSS/SVG bouwen.
 
 ### Tone of voice — verschilt per pass, bewust zo
 - **RTG Pass**: "old money" — ingetogen, zeker, "je/jij"-vorm

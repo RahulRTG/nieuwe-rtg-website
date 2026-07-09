@@ -122,6 +122,34 @@
   .ph-pick img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid transparent;flex-shrink:0;cursor:pointer;}
   .ph-pick img.sel{border-color:var(--gold);}
 
+  /* tafels */
+  .tbl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.55rem;margin-top:0.8rem;}
+  .tbl{position:relative;border-radius:14px;border:1px solid var(--line);background:var(--card2);padding:0.85rem 0.4rem 0.7rem;display:flex;flex-direction:column;align-items:center;gap:0.15rem;color:var(--txt);font-family:inherit;}
+  .tbl b{font-size:0.8rem;font-weight:600;}
+  .tbl span{font-size:0.62rem;color:var(--soft);}
+  .tbl i{font-style:normal;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;margin-top:0.2rem;}
+  .tbl-vrij{border-color:rgba(76,154,117,0.45);} .tbl-vrij i{color:var(--green);}
+  .tbl-bezet{border-color:rgba(194,58,94,0.45);background:rgba(194,58,94,0.08);} .tbl-bezet i{color:var(--burgundy);}
+  .tbl-gereserveerd{border-color:rgba(201,154,46,0.45);} .tbl-gereserveerd i{color:var(--amber);}
+  .tbl-dicht{opacity:0.5;} .tbl-dicht i{color:var(--soft);}
+  .tbl-del{position:absolute;top:4px;right:6px;font-style:normal;font-size:0.62rem;color:var(--soft);}
+
+  /* buzz + memo */
+  .tt-buzz{background:none;border:1px solid var(--line);border-radius:999px;width:34px;height:34px;font-size:0.9rem;flex-shrink:0;margin-right:0.3rem;}
+  .tt-buzz:active{border-color:var(--gold);}
+  .tt-mic{background:var(--card2);border:1px solid var(--line);border-radius:999px;width:44px;height:44px;font-size:1rem;flex-shrink:0;}
+  .tt-mic.rec{background:var(--burgundy-deep);border-color:var(--burgundy);animation:recpulse 1s infinite;}
+  @keyframes recpulse{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 8px rgba(194,58,94,0);}}
+  #buzzOverlay{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;background:rgba(127,22,52,0.96);cursor:pointer;}
+  #buzzOverlay.on{display:flex;animation:bzshake 0.5s ease-in-out 0s 4;}
+  @keyframes bzshake{0%,100%{transform:translateX(0);}20%{transform:translateX(-10px);}40%{transform:translateX(10px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
+  #buzzOverlay .bz{text-align:center;color:#fff;}
+  #buzzOverlay .bz-ic{font-size:3.5rem;animation:bzring 0.4s ease-in-out infinite;}
+  @keyframes bzring{0%,100%{transform:rotate(-12deg);}50%{transform:rotate(12deg);}}
+  #buzzOverlay b{display:block;margin-top:0.8rem;font-family:'Bodoni Moda',serif;font-size:1.8rem;font-weight:500;}
+  #buzzOverlay span{display:block;font-size:0.95rem;opacity:0.85;margin-top:0.2rem;}
+  #buzzOverlay i{display:block;margin-top:2rem;font-style:normal;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;opacity:0.6;}
+
   /* meer-grid + AI */
   .meer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-top:1rem;}
   .meer-btn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 0.5rem 0.95rem;display:flex;flex-direction:column;align-items:center;gap:0.55rem;color:var(--txt);font-family:inherit;}
@@ -452,6 +480,16 @@
         <p class="sub" data-i18n="sup.v.minibar.sub">Tel per kamer wat is gebruikt. Het verbruik gaat automatisch op de kamerrekening en de aanvullijst staat klaar.</p>
         <div id="minibarWrap"></div>
       </div>
+      <div class="view" data-view="tafels">
+        <h2 data-i18n="sup.v.tafels">Tafels</h2>
+        <p class="sub" data-i18n="sup.v.tafels.sub">De indeling van de zaal. Tik een tafel om de status te wisselen.</p>
+        <div id="tafelsWrap"></div>
+      </div>
+      <div class="view" data-view="beheer">
+        <h2 data-i18n="sup.v.beheer">Beheer</h2>
+        <p class="sub" data-i18n="sup.v.beheer.sub">Instellingen van het bedrijf. Alleen voor managers en chefs.</p>
+        <div id="beheerWrap"></div>
+      </div>
       <div class="view" data-view="klussen">
         <h2 data-i18n="sup.v.klussen">Klussen</h2>
         <p class="sub" data-i18n="sup.v.klussen.sub">Onderhoud en gevonden voorwerpen. Een defecte kamer zet hier automatisch een klus klaar.</p>
@@ -548,7 +586,9 @@
     kassa:    { label:'Kassa',     svg:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M7 13h2M11 13h2M15 13h2M7 16.5h2M11 16.5h2M15 16.5h2"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
+    tafels:   { label:'Tafels',    svg:'<circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>', cap:'menu' },
     klussen:  { label:'Klussen',   svg:'<path d="M14.5 6.5a4 4 0 0 0-5.6 4.9L3 17.3V21h3.7l5.9-5.9a4 4 0 0 0 4.9-5.6l-2.6 2.6-2.4-2.4z"/>', cap:'bookings' },
+    beheer:   { label:'Beheer',    svg:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/>' },
     doors:    { label:'Deuren',    svg:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><circle cx="15" cy="12" r="1.2"/><path d="M5 21h14"/>', cap:'doors' },
     gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>', cap:'bookings' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
@@ -722,7 +762,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderKlussen(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -864,19 +904,41 @@
     catch(e){ toast(e.message); }
   }
 
-  // ---- menu ----
+  // ---- menu: bekijken voor iedereen, bewerken voor managers/chefs ----
   function renderMenu(){
+    const el = $('#menuList'); if (!el) return;
     const m = state.menu || [];
-    if (!m.length){ $('#menuList').innerHTML = '<div class="empty">'+T('sup.nomenu','Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.')+'</div>'; return; }
+    const canEdit = actor().manager;
     const cats = [...new Set(m.map(x=>x.cat))];
-    $('#menuList').innerHTML = cats.map(c =>
+    let html = m.length ? cats.map(c =>
       '<div class="menu-cat">'+c+'</div>' + m.filter(x=>x.cat===c).map(x =>
-        '<div class="mitem"><div class="r1"><span class="nm">'+x.name+'</span><span class="pr">'+eur(x.price)+'</span></div>'+
+        '<div class="mitem"><div class="r1"><span class="nm">'+x.name+'</span><span style="display:flex;align-items:center;gap:0.5rem;"><span class="pr">'+eur(x.price)+'</span>'+
+        (canEdit?'<button class="rr-del" data-mdel="'+x.id+'">✕</button>':'')+'</span></div>'+
         (x.desc?'<div class="ds">'+x.desc+'</div>':'')+
         (x.allergens&&x.allergens.length?'<div class="alg">'+x.allergens.map(a=>'<span>'+tAlg(a)+'</span>').join('')+'</div>':'')+
         '</div>'
       ).join('')
-    ).join('');
+    ).join('') : '<div class="empty">'+T('sup.nomenu','Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.')+'</div>';
+    if (canEdit){
+      html += '<div class="card" style="margin-top:1.2rem;"><div class="tt-h">'+T('menu.add','Gerecht toevoegen')+'</div>'+
+        '<div class="field"><label>'+T('menu.name','Naam')+'</label><input id="mnName" placeholder="'+T('menu.nameph','Bijv. Wagyu tataki')+'"></div>'+
+        '<div style="display:flex;gap:0.5rem;"><div class="field" style="flex:2;"><label>'+T('menu.cat','Categorie')+'</label><input id="mnCat" placeholder="'+T('menu.catph','Bijv. Kaiseki')+'"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('menu.price','Prijs (€)')+'</label><input id="mnPrice" type="number" inputmode="decimal" placeholder="45"></div></div>'+
+        '<div class="field"><label>'+T('menu.desc','Omschrijving')+'</label><input id="mnDesc" placeholder="'+T('menu.descph','Kort en smakelijk')+'"></div>'+
+        '<div class="field"><label>'+T('menu.alg','Allergenen (komma\'s)')+'</label><input id="mnAlg" placeholder="vis, soja"></div>'+
+        '<button class="bigbtn" id="mnAdd">'+T('menu.addbtn','Zet op de kaart')+'</button></div>';
+    }
+    el.innerHTML = html;
+    el.querySelectorAll('[data-mdel]').forEach(b => b.addEventListener('click', async () => {
+      const menu = (state.menu||[]).filter(x => x.id !== b.dataset.mdel);
+      try { await API.call('/supplier/menu', { menu }); toast(T('menu.removed','Van de kaart gehaald.')); await refresh(); openTab('menu'); } catch(e){ toast(e.message); }
+    }));
+    const add = $('#mnAdd'); if (add) add.addEventListener('click', async () => {
+      const name = $('#mnName').value.trim(), price = Number($('#mnPrice').value);
+      if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
+      const item = { id: 'm'+Date.now().toString(36), cat: $('#mnCat').value.trim()||T('menu.other','Overig'), name, desc: $('#mnDesc').value.trim(), price, allergens: $('#mnAlg').value.split(',').map(a=>a.trim().toLowerCase()).filter(Boolean) };
+      try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); toast(T('menu.added','Staat op de kaart, gasten zien het direct.')); await refresh(); openTab('menu'); } catch(e){ toast(e.message); }
+    });
   }
 
   // ---- dynamische prijs ----
@@ -1200,6 +1262,66 @@
     } catch(e){ toast(e.message); }
   }
 
+  // ---- tafelindeling (horeca) ----
+  const TBL_NEXT = { vrij:'bezet', bezet:'gereserveerd', gereserveerd:'dicht', dicht:'vrij' };
+  const TBL_EN = { vrij:'free', bezet:'occupied', gereserveerd:'reserved', dicht:'closed' };
+  const tTbl = s => (lang()==='en' ? (TBL_EN[s]||s) : s);
+  function renderTafels(){
+    const el = $('#tafelsWrap'); if (!el) return;
+    const tables = state.tables;
+    if (!Array.isArray(tables)){ el.innerHTML = ''; return; }
+    const canEdit = actor().manager;
+    const free = tables.filter(t=>t.status==='vrij').length;
+    let html = '<div class="card"><div class="tt-h">'+T('tbl.floor','Zaal')+' · '+free+'/'+tables.length+' '+T('tbl.free','vrij')+'</div>'+
+      '<div class="tbl-grid">'+tables.map(t =>
+        '<button class="tbl tbl-'+t.status+'" data-tbl="'+t.id+'"><b>'+t.name+'</b><span>'+t.seats+' '+T('tbl.pers','pers.')+'</span><i>'+tTbl(t.status)+'</i>'+
+        (canEdit?'<em class="tbl-del" data-tdel="'+t.id+'">✕</em>':'')+'</button>'
+      ).join('')+'</div>'+
+      '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('tbl.note','Tik een tafel: vrij, bezet, gereserveerd, dicht. Gasten zien live hoeveel tafels vrij zijn.')+'</div>';
+    if (canEdit){
+      html += '<div class="tt-add"><input id="tblName" placeholder="'+T('tbl.nameph','Bijv. Tafel 7 of Bar links')+'" style="flex:2;min-width:130px;"><input id="tblSeats" type="number" inputmode="numeric" placeholder="4" style="flex:1;min-width:60px;"><button id="tblAdd">'+T('team.add','Toevoegen')+'</button></div>';
+    }
+    html += '</div>';
+    el.innerHTML = html;
+    el.querySelectorAll('[data-tbl]').forEach(b => b.addEventListener('click', async e => {
+      if (e.target.classList.contains('tbl-del')) return;
+      const t = tables.find(x=>x.id===b.dataset.tbl);
+      try { await API.call('/supplier/table/status', { id: t.id, status: TBL_NEXT[t.status]||'vrij' }); await refresh(); openTab('tafels'); } catch(err){ toast(err.message); }
+    }));
+    el.querySelectorAll('[data-tdel]').forEach(x => x.addEventListener('click', async e => {
+      e.stopPropagation();
+      try { await API.call('/supplier/table/remove', { id: x.dataset.tdel }); await refresh(); openTab('tafels'); } catch(err){ toast(err.message); }
+    }));
+    const add = $('#tblAdd'); if (add) add.addEventListener('click', async () => {
+      const name = $('#tblName').value.trim(), seats = Number($('#tblSeats').value)||2;
+      if (!name){ toast(T('tbl.fill','Geef de tafel een naam.')); return; }
+      try { await API.call('/supplier/table/add', { name, seats }); await refresh(); openTab('tafels'); } catch(e){ toast(e.message); }
+    });
+  }
+
+  // ---- beheer: open/dicht-schakelaars (managers/chefs) ----
+  function renderBeheer(){
+    const el = $('#beheerWrap'); if (!el) return;
+    if (!actor().manager){
+      el.innerHTML = '<div class="card"><div style="font-size:0.84rem;color:var(--muted);">'+T('bh.only','Alleen managers en chefs kunnen instellingen aanpassen. Vraag uw manager.')+'</div></div>';
+      return;
+    }
+    const st = state.settings || { ordersOpen: true, reservationsOpen: true };
+    const row = (key, label, sub, on) =>
+      '<div class="room-row"><div class="rr-t"><b>'+label+'</b><span>'+sub+'</span></div>'+
+      '<button class="rr-toggle'+(on?' on':'')+'" data-set="'+key+'" data-val="'+(!on)+'"><span></span></button></div>';
+    el.innerHTML = '<div class="card">'+
+      row('ordersOpen', T('bh.orders','Bestellingen'), on1(st.ordersOpen), st.ordersOpen) +
+      row('reservationsOpen', T('bh.res','Reserveringen'), on1(st.reservationsOpen), st.reservationsOpen) +
+      '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('bh.note','Dicht = leden kunnen direct niet meer bestellen of reserveren; de kaart blijft zichtbaar. Alles wordt gelogd.')+'</div></div>'+
+      '<div class="card"><div class="tt-h">'+T('bh.more','Verder beheren')+'</div>'+
+      '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);line-height:1.7;">'+T('bh.tips','Menukaart bewerken doet u onder Menu. Tafels onder Tafels. Kamers en prijzen onder Kamers. Personeel en pincodes onder Team.')+'</div></div>';
+    function on1(v){ return v ? T('bh.open','Open, gasten kunnen dit nu gebruiken') : T('bh.closed','Dicht, tijdelijk niet beschikbaar'); }
+    el.querySelectorAll('[data-set]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/settings', { [b.dataset.set]: b.dataset.val === 'true' }); toast(T('bh.saved','Opgeslagen, leden zien het direct.')); await refresh(); openTab('beheer'); } catch(e){ toast(e.message); }
+    }));
+  }
+
   // ---- klussen (onderhoud) + gevonden voorwerpen ----
   function renderKlussen(){
     const el = $('#klussenWrap'); if (!el) return;
@@ -1483,9 +1605,10 @@
     html += '<div class="card"><div class="tt-h">'+T('team.roster','Personeel')+'</div>';
     html += staff.map(m => {
       const you = a.staffId && m.id === a.staffId;
+      const buzz = you ? '' : '<button class="tt-buzz" data-buzz="'+m.id+'" title="'+T('team.buzz','Oproepen (tril)')+'">📳</button>';
       const rm = (a.manager && !you) ? '<button class="tt-rm" data-rm="'+m.id+'">'+T('team.remove','Verwijder')+'</button>' : '';
       const tag = you ? '<span class="you">'+T('team.you','jij')+'</span>' : '';
-      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+rm+'</div>';
+      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+buzz+rm+'</div>';
     }).join('') || '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
     if (a.manager){
       html += '<div class="tt-add"><input id="ttName" placeholder="'+T('team.name','Naam')+'"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.add','Toevoegen')+'</button></div>';
@@ -1503,17 +1626,70 @@
     // interne chat
     html += '<div class="card"><div class="tt-h" style="margin-bottom:0.6rem;">'+T('team.chat','Interne teamchat')+'</div><div class="tt-chat" id="ttChat">';
     html += team.length ? team.map(m =>
-      '<div class="tt-msg '+(m.who===a.name?'me':'other')+'"><span class="who">'+m.who+'</span>'+esc(m.text)+'<time>'+timeAgo(m.at)+'</time></div>'
+      '<div class="tt-msg '+(m.who===a.name?'me':'other')+'"><span class="who">'+m.who+'</span>'+
+      (m.audio ? '<audio controls src="'+m.audio+'" style="width:200px;max-width:100%;height:34px;"></audio>' : esc(m.text))+
+      '<time>'+timeAgo(m.at)+'</time></div>'
     ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.4rem 0;">'+T('team.nochat','Nog geen berichten. Stuur je team een bericht.')+'</div>';
-    html += '</div><div class="tt-compose"><input id="ttMsg" placeholder="'+T('team.msgph','Bericht aan het team')+'"><button id="ttSend">'+T('team.send','Stuur')+'</button></div></div>';
+    html += '</div><div class="tt-compose"><button class="tt-mic" id="ttMic" title="'+T('team.memo','Spraakmemo')+'">🎤</button><input id="ttMsg" placeholder="'+T('team.msgph','Bericht aan het team')+'"><button id="ttSend">'+T('team.send','Stuur')+'</button></div></div>';
 
     $('#teamWrap').innerHTML = html;
 
     document.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', ()=>removeStaff(Number(b.dataset.rm))));
+    document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
+        toast(d.reached ? '📳 '+d.name+' '+T('team.buzzed','wordt opgeroepen.') : d.name+' '+T('team.buzzoff','heeft de app nu niet open.')); }
+      catch(e){ toast(e.message); }
+    }));
     const addBtn = $('#ttAdd'); if (addBtn) addBtn.addEventListener('click', addStaff);
     const send = $('#ttSend'); if (send) send.addEventListener('click', sendTeam);
     const msg = $('#ttMsg'); if (msg) msg.addEventListener('keydown', e => { if (e.key==='Enter') sendTeam(); });
+    const mic = $('#ttMic'); if (mic) mic.addEventListener('click', () => toggleMemo(mic));
     const chat = $('#ttChat'); if (chat) chat.scrollTop = chat.scrollHeight;
+  }
+
+  // ---- spraakmemo: opnemen en als teamchat-bericht versturen ----
+  let memoRec = null;
+  async function toggleMemo(btn){
+    if (memoRec){ memoRec.stop(); return; }
+    if (!navigator.mediaDevices || !window.MediaRecorder){ toast(T('memo.no','Opnemen is hier niet beschikbaar.')); return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const chunks = [];
+      memoRec = new MediaRecorder(stream);
+      memoRec.ondataavailable = e => chunks.push(e.data);
+      memoRec.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        btn.classList.remove('rec');
+        memoRec = null;
+        const blob = new Blob(chunks, { type: chunks[0] && chunks[0].type || 'audio/webm' });
+        if (blob.size < 200){ toast(T('memo.short','Te kort.')); return; }
+        if (blob.size > 1.4 * 1024 * 1024){ toast(T('memo.long','Memo te lang (max ~1 minuut).')); return; }
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try { await API.call('/supplier/team/message', { audio: reader.result }); toast(T('memo.sent','Spraakmemo verstuurd.')); await refresh(); openTab('team'); }
+          catch(e){ toast(e.message); }
+        };
+        reader.readAsDataURL(blob);
+      };
+      memoRec.start();
+      btn.classList.add('rec');
+      toast(T('memo.rec','Opnemen... tik nogmaals om te versturen.'));
+    } catch(e){ toast(T('memo.denied','Geen toegang tot de microfoon.')); }
+  }
+
+  // ---- opgeroepen worden: trilscherm ----
+  function showBuzz(from){
+    if (navigator.vibrate) navigator.vibrate([300,120,300,120,600]);
+    let el = document.getElementById('buzzOverlay');
+    if (!el){
+      el = document.createElement('div');
+      el.id = 'buzzOverlay';
+      document.getElementById('shell').appendChild(el);
+      el.addEventListener('click', () => el.classList.remove('on'));
+    }
+    el.innerHTML = '<div class="bz"><div class="bz-ic">📳</div><b>'+esc(from)+'</b><span>'+T('buzz.calls','roept u op')+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
+    el.classList.add('on');
+    setTimeout(() => el.classList.remove('on'), 8000);
   }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   async function addStaff(){
@@ -1553,6 +1729,7 @@
     if (!window.EventSource) return;
     try { source = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
     source.addEventListener('hello', e => { const d=JSON.parse(e.data); notifs = d.unread||[]; renderBell(); });
+    source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('sync', e => { refresh(); });
     source.addEventListener('notify', e => {
       const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
@@ -1667,6 +1844,24 @@ window.I18N = { en: {
   'ai.empty':'Your assistant knows the whole business: the register, the rooms, the jobs, the guests. Ask something or give an instruction.',
   'ai.c1':'Revenue today', 'ai.c2':'Unanswered messages', 'ai.c3':'Which rooms are dirty?', 'ai.c4':'Which minibars left to count?',
   'ai.c5':'Open orders', 'ai.c6':'Open the front door', 'ai.c7':'Who is on the way?', 'ai.c8':'Which jobs are open?',
+  'menu.add':'Add a dish', 'menu.name':'Name', 'menu.nameph':'E.g. Wagyu tataki', 'menu.cat':'Category', 'menu.catph':'E.g. Kaiseki',
+  'menu.price':'Price (€)', 'menu.desc':'Description', 'menu.descph':'Short and tasty', 'menu.alg':'Allergens (commas)',
+  'menu.addbtn':'Put on the menu', 'menu.removed':'Taken off the menu.', 'menu.fill':'Enter a name and price.',
+  'menu.added':'On the menu, guests see it right away.', 'menu.other':'Other',
+  'tab.tafels':'Tables', 'sup.v.tafels':'Tables', 'sup.v.tafels.sub':'The floor plan. Tap a table to change its status.',
+  'tbl.floor':'Floor', 'tbl.free':'free', 'tbl.pers':'pers.', 'tbl.nameph':'E.g. Table 7 or Bar left', 'tbl.fill':'Name the table.',
+  'tbl.note':'Tap a table: free, occupied, reserved, closed. Guests see live how many tables are free.',
+  'tab.beheer':'Manage', 'sup.v.beheer':'Manage', 'sup.v.beheer.sub':'Business settings. Managers and chefs only.',
+  'bh.only':'Only managers and chefs can change settings. Ask your manager.',
+  'bh.orders':'Orders', 'bh.res':'Reservations',
+  'bh.open':'Open, guests can use this now', 'bh.closed':'Closed, temporarily unavailable',
+  'bh.note':'Closed = members instantly cannot order or reserve; the menu stays visible. Everything is logged.',
+  'bh.more':'Manage further', 'bh.tips':'Edit the menu under Menu. Tables under Tables. Rooms and prices under Rooms. Staff and PINs under Team.',
+  'bh.saved':'Saved, members see it immediately.',
+  'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
+  'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',
+  'memo.sent':'Voice memo sent.', 'memo.rec':'Recording... tap again to send.', 'memo.denied':'No microphone access.',
+  'buzz.calls':'is calling you', 'buzz.close':'Tap to acknowledge',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

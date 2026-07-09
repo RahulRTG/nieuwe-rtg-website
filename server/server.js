@@ -53,7 +53,7 @@ for (const [code, people] of Object.entries(STAFF_SEED)) {
 }
 
 const app = express();
-app.use(express.json({ limit: '64kb' }));
+app.use(express.json({ limit: '8mb' }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 /* ---------- Claude API (optioneel) ---------- */
@@ -145,6 +145,14 @@ function initRealtime() {
   for (const s of db.data.suppliers)
     for (const r of (s.rooms || []))
       if (!r.hk) r.hk = { status: 'schoon' };                      // housekeeping-status per kamer
+  for (const s of db.data.suppliers) {
+    // bedrijfsinstellingen: bestellingen en reserveringen open of dicht
+    if (!s.settings) s.settings = { ordersOpen: true, reservationsOpen: true };
+    // tafelindeling voor horeca
+    const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
+    if (caps.includes('menu') && !Array.isArray(s.tables))
+      s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
+  }
   // oudere databases: appartement-partner en doors-cap toevoegen
   if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
     db.data.supplierTypes.apartment.caps.splice(1, 0, 'doors');
@@ -779,6 +787,9 @@ function publicSupplier(s, lang) {
   return { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
            city: s.city, caps: t.caps || [], loc, hasMenu: (s.menu || []).length > 0,
            depts: deptsFor(s),
+           ordersOpen: !s.settings || s.settings.ordersOpen !== false,
+           reservationsOpen: !s.settings || s.settings.reservationsOpen !== false,
+           tablesFree: (s.tables || []).filter(x => x.status === 'vrij').length,
            photos: s.photos || [],
            rooms: (s.rooms || []).filter(r => r.available).map(r => ({ id: r.id, name: r.name, desc: i18n.localize(r.desc, lang), price: r.price })) };
 }
@@ -790,6 +801,8 @@ function supplierState(s, actor) {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
     rooms: s.rooms || null,
     doors: s.doors || null,
+    tables: s.tables || null,
+    settings: s.settings || { ordersOpen: true, reservationsOpen: true },
     minibar: Array.isArray(s.minibar) ? {
       catalog: s.minibar,
       countedToday: [...new Set((db.data.minibarCounts[s.code] || []).filter(e => e.at.slice(0, 10) === new Date().toISOString().slice(0, 10)).map(e => e.room))],
@@ -1396,6 +1409,82 @@ app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
   res.json({ ok: true, guests: guestsFor(req.supplier.code) });
 });
 
+/* ---- beheer: alleen managers/chefs passen instellingen, tafels en menu aan ---- */
+function managerOnly(req, res) {
+  if (!req.actor.manager) { res.status(403).json({ error: 'Alleen een manager kan dit aanpassen.' }); return false; }
+  return true;
+}
+
+// bestellingen en reserveringen open of dicht; leden merken het direct
+app.post('/api/supplier/settings', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const st = req.supplier.settings = req.supplier.settings || { ordersOpen: true, reservationsOpen: true };
+  const changed = [];
+  if (typeof req.body.ordersOpen === 'boolean' && st.ordersOpen !== req.body.ordersOpen) { st.ordersOpen = req.body.ordersOpen; changed.push('bestellingen ' + (st.ordersOpen ? 'open' : 'dicht')); }
+  if (typeof req.body.reservationsOpen === 'boolean' && st.reservationsOpen !== req.body.reservationsOpen) { st.reservationsOpen = req.body.reservationsOpen; changed.push('reserveringen ' + (st.reservationsOpen ? 'open' : 'dicht')); }
+  save();
+  if (changed.length) logActivity(req.supplier.code, req.actor, 'zette ' + changed.join(' en '));
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'settings' });
+  res.json({ ok: true, settings: st });
+});
+
+// ---- tafelindeling (horeca): status door iedereen, indeling door de manager ----
+const TABLE_STATUSES = ['vrij', 'bezet', 'gereserveerd', 'dicht'];
+app.post('/api/supplier/table/status', supplierAuth, (req, res) => {
+  const t = (req.supplier.tables || []).find(x => x.id === req.body.id);
+  if (!t) return res.status(404).json({ error: 'Tafel niet gevonden.' });
+  const status = String(req.body.status || '');
+  if (!TABLE_STATUSES.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+  t.status = status;
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette ' + t.name + ' op "' + status + '"');
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'tables' });
+  res.json({ ok: true, tables: req.supplier.tables });
+});
+app.post('/api/supplier/table/add', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const name = String(req.body.name || '').trim().slice(0, 40);
+  const seats = Math.min(20, Math.max(1, parseInt(req.body.seats, 10) || 2));
+  if (!name) return res.status(400).json({ error: 'Geef de tafel een naam.' });
+  req.supplier.tables = req.supplier.tables || [];
+  req.supplier.tables.push({ id: crypto.randomBytes(3).toString('hex'), name, seats, status: 'vrij' });
+  save();
+  logActivity(req.supplier.code, req.actor, 'voegde ' + name + ' toe (' + seats + ' pers.)');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'tables' });
+  res.json({ ok: true, tables: req.supplier.tables });
+});
+app.post('/api/supplier/table/remove', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const i = (req.supplier.tables || []).findIndex(x => x.id === req.body.id);
+  if (i >= 0) {
+    logActivity(req.supplier.code, req.actor, 'verwijderde ' + req.supplier.tables[i].name);
+    req.supplier.tables.splice(i, 1);
+    save();
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'tables' });
+  }
+  res.json({ ok: true, tables: req.supplier.tables || [] });
+});
+
+// ---- team oproepen: iemand laten trillen, gericht via SSE ----
+app.post('/api/supplier/team/buzz', supplierAuth, (req, res) => {
+  const target = req.body.staffId == null ? null : Number(req.body.staffId);
+  let name = 'Beheer';
+  if (target != null) {
+    const st = accounts.getStaffById(target);
+    if (!st || String(st.supplier_code).toUpperCase() !== req.supplier.code) return res.status(404).json({ error: 'Teamlid niet gevonden.' });
+    name = st.name;
+  }
+  let reached = 0;
+  for (const c of sseClients) {
+    if (c.sup !== req.supplier.code) continue;
+    if (target == null ? c.staffId == null : c.staffId === target) { sseSend(c.res, 'buzz', { from: req.actor.name }); reached++; }
+  }
+  logActivity(req.supplier.code, req.actor, 'riep ' + name + ' op (tril)');
+  res.json({ ok: true, reached, name });
+});
+
 /* ---- AI-assistent voor de leverancier-app ----
    Begrijpt vragen EN voert acties uit: kamers op status zetten, deuren
    openen, klussen melden, dagomzet, gasten onderweg, open chats, minibar.
@@ -1545,12 +1634,15 @@ function scheduleFor(code) {
 }
 app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
 
-// Interne teamchat binnen het bedrijf.
+// Interne teamchat binnen het bedrijf (tekst of spraakmemo).
 app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
   const text = String(req.body.text || '').trim().slice(0, 500);
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  let audio = null;
+  if (typeof req.body.audio === 'string' && /^data:audio\//.test(req.body.audio) && req.body.audio.length <= 2 * 1024 * 1024)
+    audio = req.body.audio;
+  if (!text && !audio) return res.status(400).json({ error: 'Leeg bericht.' });
   const list = db.data.supplierTeam[req.supplier.code] = (db.data.supplierTeam[req.supplier.code] || []);
-  list.push({ who: req.actor.name, role: req.actor.role, text, at: new Date().toISOString() });
+  list.push({ who: req.actor.name, role: req.actor.role, text: text || (audio ? '' : text), audio, at: new Date().toISOString() });
   db.data.supplierTeam[req.supplier.code] = list.slice(-100);
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
@@ -1562,7 +1654,7 @@ app.get('/api/supplier/stream', (req, res) => {
   if (!sess || sess.role !== 'supplier') return res.status(401).end();
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
   res.write('retry: 3000\n\n');
-  const client = { sup: sess.code, res };
+  const client = { sup: sess.code, staffId: sess.staffId != null ? sess.staffId : null, res };
   sseClients.push(client);
   sseSend(res, 'hello', { unread: (db.data.supplierNotifications[sess.code] || []).filter(n => !n.read) });
   const ping = setInterval(() => res.write(': ping\n\n'), 25000);
@@ -1699,6 +1791,7 @@ app.post('/api/order', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const s = findSupplier(req.body.supplierCode);
   if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
+  if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen bestellingen aan.' });
   const wanted = Array.isArray(req.body.items) ? req.body.items : [];
   const items = [];
   let total = 0;

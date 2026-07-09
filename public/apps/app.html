@@ -1422,6 +1422,10 @@
       el.querySelector('.js-minus').addEventListener('click', () => { menuState.qty[id] = Math.max(0,(menuState.qty[id]||0)-1); renderMenuSheet(); });
     });
     if (!m.length){ $('#msFoot').innerHTML = ''; return; }
+    if (menuState.supplier.ordersOpen === false){
+      $('#msFoot').innerHTML = '<div style="padding:0.9rem 0;text-align:center;font-size:0.82rem;color:var(--soft);">⏸ ' + T('app.ms.closed','Bestellingen zijn tijdelijk gesloten. De kaart blijft ter inzage.') + '</div>';
+      return;
+    }
     const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
     const count = Object.values(menuState.qty).reduce((a,b)=>a+b,0);
     $('#msFoot').innerHTML =
@@ -1967,6 +1971,7 @@ window.I18N = { en: {
   'app.pc.empty':'Ask the team directly. Room service, a request to the owner, or just arranging something.',
   'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
   'app.roomsfree':'room(s) available', 'app.tp.view':'View',
+  'app.ms.closed':'Orders are temporarily closed. The menu remains on view.',
   'app.ms.rooms':'Available rooms', 'app.ms.pernight':'p.n.', 'app.ms.roomnote':'Booking goes via your concierge or Butler AI, at net price.',
   'app.partner':'Partner',
   'app.ms.note':'Allergy or note (e.g. no nuts)', 'app.ms.tag':'Tag this for The Salon (7 days after the stay)',

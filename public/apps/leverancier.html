@@ -169,6 +169,38 @@
   .ink-row .why{color:var(--soft);font-size:0.7rem;display:block;margin-top:0.1rem;}
   .ink-row .n{font-family:'Bodoni Moda',serif;color:var(--gold);white-space:nowrap;}
 
+  /* personeels-app: klokbalk, PDA-tafels, dagchat, deur, rondes */
+  .klokbar{display:none;align-items:center;gap:0.6rem;padding:0.55rem 1.4rem;border-bottom:1px solid var(--line);font-size:0.74rem;color:var(--muted);}
+  .klokbar.show{display:flex;}
+  .klokbar .dot{width:9px;height:9px;border-radius:50%;background:var(--soft);flex-shrink:0;}
+  .klokbar.in .dot{background:var(--green);box-shadow:0 0 0 4px rgba(76,154,117,0.15);}
+  .klokbar button{margin-left:auto;background:#fff;color:#000;border:none;border-radius:999px;padding:0.45rem 1rem;font-size:0.72rem;font-weight:600;}
+  .klokbar.in button{background:none;border:1px solid var(--line);color:var(--muted);}
+  .pda-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;margin-top:1rem;}
+  .pda-t{aspect-ratio:1;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--txt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.15rem;position:relative;}
+  .pda-t b{font-family:'Bodoni Moda',serif;font-size:1.15rem;font-weight:500;}
+  .pda-t span{font-size:0.54rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.05em;text-align:center;padding:0 0.2rem;}
+  .pda-t.bezet{border-color:rgba(194,58,94,0.5);background:rgba(194,58,94,0.08);}
+  .pda-t.rekening{border-color:rgba(169,143,28,0.55);background:rgba(169,143,28,0.1);}
+  .pda-t.sel{outline:2px solid rgba(255,255,255,0.85);}
+  .pda-t i{position:absolute;top:6px;right:8px;font-style:normal;color:var(--gold);font-size:0.7rem;}
+  .pda-tip{display:flex;gap:0.55rem;font-size:0.8rem;line-height:1.5;padding:0.5rem 0;border-bottom:1px solid var(--line);}
+  .pda-tip:last-child{border-bottom:none;}
+  .pda-tip .nr{font-family:'Bodoni Moda',serif;color:var(--gold);white-space:nowrap;}
+  .dc-leden{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.8rem;}
+  .dc-leden span{font-size:0.66rem;border:1px solid rgba(76,154,117,0.4);color:var(--green);border-radius:999px;padding:0.25rem 0.6rem;}
+  .dc-sys{text-align:center;font-size:0.7rem;color:var(--soft);font-style:italic;margin:0.6rem 0;}
+  .dc-kanaal{display:flex;gap:0.45rem;margin-top:1rem;}
+  .dc-kanaal button{background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.45rem 0.9rem;font-size:0.72rem;}
+  .dc-kanaal button.on{background:#fff;color:#000;border-color:#fff;font-weight:600;}
+  .res-row{display:flex;gap:0.7rem;align-items:center;padding:0.7rem 0;border-bottom:1px solid var(--line);font-size:0.82rem;}
+  .res-row:last-child{border-bottom:none;}
+  .res-row .tijd{font-family:'Bodoni Moda',serif;font-size:1rem;color:var(--gold);min-width:3rem;}
+  .res-row .wie{flex:1;}
+  .res-row .wie b{display:block;font-size:0.86rem;}
+  .res-row .wie span{font-size:0.7rem;color:var(--soft);}
+  .lock-note{margin-top:1rem;background:rgba(169,143,28,0.08);border:1px solid rgba(169,143,28,0.35);border-radius:14px;padding:0.9rem 1rem;font-size:0.82rem;line-height:1.5;color:var(--txt);}
+
   /* personeel kiezen (wie ben je?) */
   #staffPick{position:absolute;inset:0;z-index:60;background:var(--bg);display:none;flex-direction:column;padding:2.5rem 1.75rem calc(env(safe-area-inset-bottom,0px) + 2rem);overflow-y:auto;}
   #staffPick.open{display:flex;}
@@ -354,6 +386,8 @@
       </button>
     </div>
 
+    <div class="klokbar" id="klokbar"></div>
+
     <div class="notif-scrim" id="notifScrim"></div>
     <aside class="notif-panel" id="notifPanel">
       <div class="notif-head"><b data-i18n="sup.notifs">Meldingen</b><button class="obtn" id="notifClose" data-i18n="sup.close">Sluiten</button></div>
@@ -412,6 +446,26 @@
         <h2 data-i18n="sup.v.team">Team</h2>
         <p class="sub" data-i18n="sup.v.team.sub">Personeel, wie wat deed en interne chat van dit bedrijf.</p>
         <div id="teamWrap"></div>
+      </div>
+      <div class="view" data-view="pda">
+        <h2 data-i18n="pda.title">Tafels</h2>
+        <p class="sub" data-i18n="pda.sub">De PDA van de bediening: tafels, gangen, gasten en tips — live met de keuken.</p>
+        <div id="pdaWrap"></div>
+      </div>
+      <div class="view" data-view="gasten">
+        <h2 data-i18n="deur.title">De deur</h2>
+        <p class="sub" data-i18n="deur.sub">Reserveringen en aankomsten. Eén tik en keuken én bediening weten het.</p>
+        <div id="gastenWrap"></div>
+      </div>
+      <div class="view" data-view="schoon">
+        <h2 data-i18n="zorg.title">Zorgrondes</h2>
+        <p class="sub" data-i18n="zorg.sub">Toiletten en voorzieningen, elke ronde afgevinkt met naam en tijd.</p>
+        <div id="schoonWrap"></div>
+      </div>
+      <div class="view" data-view="dagchat">
+        <h2 data-i18n="dc.title">Dagchat</h2>
+        <p class="sub" data-i18n="dc.sub">De chat van vandaag. Inklokken is meedoen, uitklokken is eruit.</p>
+        <div id="dagchatWrap"></div>
       </div>
     </div>
 
@@ -487,8 +541,14 @@
     keuken:   { label:'Keuken',    svg:'<path d="M6 13a6 6 0 0 1 12 0"/><path d="M4 13h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M12 7V5M8.5 7.5l-1-1.7M15.5 7.5l1-1.7"/>', cap:'kitchen' },
     price:    { label:'Prijs',     svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 2-2.5 1.5-2.5 3.5M12 16v.5"/>', cap:'pricing' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
-    team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' }
+    team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' },
+    pda:      { label:'Tafels',     svg:'<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 11h8M8 15h5"/>' },
+    gasten:   { label:'Deur',       svg:'<path d="M4 21V5a2 2 0 0 1 2-2h9v18"/><path d="M15 21h5"/><circle cx="12" cy="11.5" r="0.8" fill="currentColor"/>' },
+    schoon:   { label:'Zorg',       svg:'<path d="M12 3c2.8 3.2 5.5 6.2 5.5 9.5a5.5 5.5 0 0 1-11 0C6.5 9.2 9.2 6.2 12 3z"/>' },
+    dagchat:  { label:'Dagchat',    svg:'<path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/><path d="M9 11.5h6"/>' }
   };
+  // Welke functie-tabs alleen voor zaken met tafels (horeca) gelden.
+  const HORECA_TABS = ['pda', 'gasten', 'schoon'];
 
   const API = {
     enabled: location.protocol === 'http:' || location.protocol === 'https:',
@@ -576,7 +636,7 @@
     $('#spBiz').textContent = roster.supplier.name;
     $('#spList').innerHTML = (roster.staff||[]).map(m =>
       '<button class="sp-person" data-sid="'+m.id+'" data-name="'+m.name.replace(/"/g,'&quot;')+'" data-role="'+m.role+'">'+
-        '<span class="av">'+initials(m.name)+'</span><span><b>'+m.name+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span></button>'
+        '<span class="av">'+initials(m.name)+'</span><span><b>'+m.name+'</b><span>'+(m.functieLabel || T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker'))+'</span></span></button>'
     ).join('') || '<div class="empty" style="padding:1.2rem 0;">'+T('sp.nostaff','Nog geen persoonlijke accounts. Log in als bedrijfsaccount en voeg je team toe.')+'</div>';
     document.querySelectorAll('.sp-person').forEach(b => b.addEventListener('click', () => openPin(b.dataset.sid, b.dataset.name, b.dataset.role)));
     $('#spPin').classList.remove('open');
@@ -661,14 +721,25 @@
 
   // ---- tabs op basis van caps ----
   function buildTabs(){
-    const keys = Object.keys(TABDEF).filter(k => (!TABDEF[k].cap || has(TABDEF[k].cap)) && canCap(TABDEF[k].cap));
-    // bookings voor hotel/appartement → toon onder 'orders'-plek als 'Boekingen'
+    // rolgebaseerd: elke functie ziet alleen de eigen schermen
+    const a = actor();
+    const fTabs = (state && state.functies && state.functies[a.functie]) ? state.functies[a.functie].tabs : Object.keys(TABDEF);
+    const keys = Object.keys(TABDEF).filter(k =>
+      fTabs.includes(k) &&
+      (!HORECA_TABS.includes(k) || (state && state.tafels)) &&
+      (!TABDEF[k].cap || has(TABDEF[k].cap)) && canCap(TABDEF[k].cap));
     $('#tabbar').innerHTML = keys.map((k,i) =>
       '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+T('tab.'+k, TABDEF[k].label)+'</button>'
     ).join('');
     document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
   }
   function openTab(tab){
+    // personeel zonder klok: alles behalve het overzicht blijft dicht
+    const a = actor();
+    if (tab !== 'home' && a.staffId && !a.klokvrij && !a.ingeklokt){
+      toast(T('klok.first','Klok eerst in — dan gaan je functies open.'));
+      tab = 'home';
+    }
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
     document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
     $('#content').scrollTop = 0;
@@ -679,9 +750,145 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
+    renderKlok();
     renderHome(); renderAI(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderTeam();
     if (has('kitchen') && canCap('kitchen')) renderKeuken();
+    renderPda(); renderDagchat(); renderGasten(); renderSchoon();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
+  }
+
+  // ---- klok: in- en uitklokken bepaalt wat er open is ----
+  function renderKlok(){
+    const bar = $('#klokbar'); const a = actor();
+    if (!a.staffId || a.klokvrij){ bar.className = 'klokbar'; bar.innerHTML = ''; return; }
+    bar.className = 'klokbar show' + (a.ingeklokt ? ' in' : '');
+    bar.innerHTML = '<span class="dot"></span><span>' +
+      (a.ingeklokt ? T('klok.in','Ingeklokt') + ' · ' + a.functieLabel : T('klok.uit','Uitgeklokt') + ' · ' + T('klok.locked','functies vergrendeld')) +
+      '</span><button id="klokBtn">' + (a.ingeklokt ? T('klok.doUit','Uitklokken') : T('klok.doIn','Inklokken')) + '</button>';
+    $('#klokBtn').addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/klok');
+        applyState(d.state); buildTabs(); renderAll(); openTab(actor().ingeklokt ? 'dagchat' : 'home');
+        toast(actor().ingeklokt ? T('klok.welkom','Ingeklokt. Fijne dienst!') : T('klok.tot','Uitgeklokt. Tot de volgende dienst.'));
+      } catch(e){ toast(e.message); }
+    });
+  }
+
+  // ---- PDA van de bediening: tafels, gangen, gasten, AI-tips ----
+  let pdaSel = null;
+  function renderPda(){
+    const w = $('#pdaWrap'); if (!w) return;
+    if (!state.tafels){ w.innerHTML = ''; return; }
+    const tips = state.tafelTips || [];
+    let html = '';
+    if (tips.length) html += '<div class="card" style="margin-top:1rem;"><div class="tt-h">'+T('pda.tips','De AI kijkt mee')+'</div>' +
+      tips.map(t => '<div class="pda-tip"><span class="nr">T'+t.tafel+'</span><span>'+t.tip+'</span></div>').join('') + '</div>';
+    html += '<div class="pda-grid">' + state.tafels.map(t =>
+      '<button class="pda-t '+t.status+(pdaSel===t.nr?' sel':'')+'" data-nr="'+t.nr+'"><b>'+t.nr+'</b>' +
+      '<span>'+(t.status==='vrij'?T('pda.vrij','vrij'):t.status==='rekening'?T('pda.rekening','rekening'):t.gasten+'p'+(t.gang?' · '+t.gang:''))+'</span>' +
+      (t.codename?'<i>✦</i>':'')+'</button>'
+    ).join('') + '</div>';
+    const t = state.tafels.find(x => x.nr === pdaSel);
+    if (t){
+      html += '<div class="card">' +
+        '<div class="tt-h">'+T('pda.tafel','Tafel')+' '+t.nr+(t.codename?' · <span style="color:var(--gold);">'+t.codename+'</span>':'')+'</div>' +
+        (t.notitie?'<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--amber);">📌 '+esc(t.notitie)+'</div>':'') +
+        '<div style="margin-top:0.9rem;display:flex;gap:0.5rem;flex-wrap:wrap;">';
+      if (t.status === 'vrij'){
+        html += '<button class="obtn primary" data-ta="status" data-v="bezet" data-g="2">'+T('pda.z2','Bezet · 2p')+'</button>' +
+                '<button class="obtn primary" data-ta="status" data-v="bezet" data-g="4">'+T('pda.z4','Bezet · 4p')+'</button>' +
+                '<button class="obtn primary" data-ta="status" data-v="bezet" data-g="6">'+T('pda.z6','Bezet · 6p')+'</button>';
+      } else {
+        if (t.status === 'bezet') html += '<button class="obtn primary" data-ta="gang">'+T('pda.gang','Volgende gang → keuken')+'</button>' +
+          '<button class="obtn" data-ta="status" data-v="rekening">'+T('pda.vraagrek','Rekening')+'</button>';
+        html += '<button class="obtn warn" data-ta="status" data-v="vrij">'+T('pda.vrijgeven','Vrijgeven')+'</button>';
+      }
+      html += '</div>';
+      if (t.status !== 'vrij'){
+        html += '<div class="tt-add" style="margin-top:0.8rem;"><input id="pdaGast" placeholder="'+T('pda.gastph','Codenaam RTG-gast')+'" value="'+esc(t.codename||'')+'"><button id="pdaKoppel">'+T('pda.koppel','Koppel')+'</button></div>' +
+                '<div class="tt-add" style="margin-top:0.5rem;"><input id="pdaNoot" placeholder="'+T('pda.nootph','Notitie voor keuken en collega’s')+'" value="'+esc(t.notitie||'')+'"><button id="pdaNootBtn">'+T('pda.bewaar','Bewaar')+'</button></div>';
+      }
+      html += '</div>';
+    }
+    w.innerHTML = html;
+    w.querySelectorAll('[data-nr]').forEach(b => b.addEventListener('click', () => { const n=Number(b.dataset.nr); pdaSel = (pdaSel===n)?null:n; renderPda(); }));
+    w.querySelectorAll('[data-ta]').forEach(b => b.addEventListener('click', () => tafelAct(t.nr, b.dataset.ta, b.dataset.v, b.dataset.g)));
+    const kop = document.getElementById('pdaKoppel'); if (kop) kop.addEventListener('click', () => tafelAct(t.nr, 'gast', document.getElementById('pdaGast').value));
+    const nb = document.getElementById('pdaNootBtn'); if (nb) nb.addEventListener('click', () => tafelAct(t.nr, 'notitie', document.getElementById('pdaNoot').value));
+  }
+  async function tafelAct(nr, action, value, gasten){
+    try { const d = await API.call('/supplier/tafel', { nr, action, value, gasten }); applyState(d.state); renderPda(); renderHome(); if (action==='gang') toast(T('pda.gangok','Doorgegeven — het keukenscherm meldt het nu.')); }
+    catch(e){ toast(e.message); }
+  }
+
+  // ---- dagchat: inklokken = erin, uitklokken = eruit; apart leads-kanaal ----
+  let dcKanaal = 'dag';
+  function renderDagchat(){
+    const w = $('#dagchatWrap'); if (!w) return;
+    const a = actor(); const c = state.dagchat || { leden: [], msgs: [] };
+    if (!a.lead) dcKanaal = 'dag';
+    let html = '';
+    if (a.lead) html += '<div class="dc-kanaal"><button data-dk="dag"'+(dcKanaal==='dag'?' class="on"':'')+'>'+T('dc.dag','Dagchat')+'</button><button data-dk="leads"'+(dcKanaal==='leads'?' class="on"':'')+'>'+T('dc.leads','Teamleiders')+'</button></div>';
+    html += '<div class="dc-leden">' + (c.leden.length
+      ? c.leden.map(n => '<span>🟢 ' + n + '</span>').join('')
+      : '<span style="border-color:var(--line);color:var(--soft);">'+T('dc.leeg','Nog niemand ingeklokt vandaag')+'</span>') + '</div>';
+    const msgs = (c.msgs || []).filter(m => dcKanaal==='leads' ? m.kanaal==='leads' : m.kanaal!=='leads');
+    html += '<div class="card"><div class="tt-chat" id="dcChat" style="max-height:340px;overflow-y:auto;">';
+    html += msgs.length ? msgs.map(m => m.sys
+      ? '<div class="dc-sys">'+m.text+'</div>'
+      : '<div class="tt-msg '+(m.who===a.name?'me':'other')+'"><span class="who">'+m.who+' · '+m.functie+'</span>'+esc(m.text)+'<time>'+timeAgo(m.at)+'</time></div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);">'+T('dc.geen','Nog geen berichten in dit kanaal vandaag.')+'</div>';
+    html += '</div>';
+    const mag = !a.staffId || a.klokvrij || a.ingeklokt;
+    html += '<div class="tt-compose"><input id="dcMsg" placeholder="'+(mag?T('dc.ph','Bericht aan de dienst van vandaag'):T('dc.lockedph','Klok in om mee te praten'))+'"'+(mag?'':' disabled')+'><button id="dcSend"'+(mag?'':' disabled')+'>'+T('team.send','Stuur')+'</button></div></div>';
+    w.innerHTML = html;
+    w.querySelectorAll('[data-dk]').forEach(b => b.addEventListener('click', () => { dcKanaal = b.dataset.dk; renderDagchat(); }));
+    const s = document.getElementById('dcSend'); if (s) s.addEventListener('click', sendDagchat);
+    const i = document.getElementById('dcMsg'); if (i) i.addEventListener('keydown', e => { if (e.key==='Enter') sendDagchat(); });
+    const ch = document.getElementById('dcChat'); if (ch) ch.scrollTop = ch.scrollHeight;
+  }
+  async function sendDagchat(){
+    const el = document.getElementById('dcMsg'); const text = (el.value||'').trim();
+    if (!text) return; el.value = '';
+    try { const d = await API.call('/supplier/dagchat', { text, kanaal: dcKanaal }); state.dagchat = d.dagchat; renderDagchat(); }
+    catch(e){ toast(e.message); }
+  }
+
+  // ---- de deur: reserveringen en aankomsten (deurhost) ----
+  function renderGasten(){
+    const w = $('#gastenWrap'); if (!w) return;
+    const res = state.reserveringen || [];
+    let html = '<div class="card" style="margin-top:1rem;"><div class="tt-h">'+T('deur.res','Reserveringen vanavond')+'</div>';
+    html += res.length ? res.map((r,i) =>
+      '<div class="res-row"><span class="tijd">'+r.tijd+'</span><span class="wie"><b>'+r.codename+' · '+r.personen+'p · '+T('pda.tafel','Tafel')+' '+r.tafel+'</b><span>'+(r.noot||'')+'</span></span>' +
+      (r.status==='aangekomen' ? '<span class="pill klaar">✓ '+T('deur.binnen','binnen')+'</span>' : '<button class="obtn primary" data-res="'+i+'">'+T('deur.meld','Meld aankomst')+'</button>') + '</div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);">'+T('deur.geen','Geen reserveringen vandaag.')+'</div>';
+    html += '</div>';
+    const guests = state.guests || [];
+    if (guests.length){
+      html += '<div class="card" style="border-color:rgba(194,58,94,0.35);"><div class="tt-h" style="color:var(--burgundy);"><span class="livedot"></span> '+T('sup.enroute','Gasten onderweg naar u')+'</div>' +
+        guests.map(g => '<div class="guest-row"><span class="cn">'+g.codename+'</span>' +
+          (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>':(g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>':'<span class="ge">'+T('sup.enrouteshort','onderweg')+'</span>')) + '</div>').join('') + '</div>';
+    }
+    w.innerHTML = html;
+    w.querySelectorAll('[data-res]').forEach(b => b.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/reservering', { idx: Number(b.dataset.res) }); applyState(d.state); renderGasten(); renderPda(); toast(T('deur.gemeld','Gemeld — keuken en bediening zien het live.')); }
+      catch(e){ toast(e.message); }
+    }));
+  }
+
+  // ---- zorgrondes (toiletzorg/schoonmaak) ----
+  function renderSchoon(){
+    const w = $('#schoonWrap'); if (!w) return;
+    const r = state.rondes || { list: [] };
+    w.innerHTML = '<div class="card" style="margin-top:1rem;"><div class="tt-h">'+T('zorg.rondes','Rondes van vandaag')+'</div>' +
+      r.list.map((it,i) =>
+        '<label class="mise-row'+(it.done?' done':'')+'"><input type="checkbox" data-ronde="'+i+'"'+(it.done?' checked':'')+'><span style="flex:1;">'+it.tijd+' — '+it.taak+(it.done&&it.door?' <span style="color:var(--soft);font-size:0.7rem;">('+it.door+')</span>':'')+'</span></label>'
+      ).join('') + '</div>';
+    w.querySelectorAll('[data-ronde]').forEach(c => c.addEventListener('change', async () => {
+      try { const d = await API.call('/supplier/ronde', { idx: Number(c.dataset.ronde) }); state.rondes = d.rondes; renderSchoon(); }
+      catch(e){ toast(e.message); renderSchoon(); }
+    }));
   }
 
   function actor(){ return (state && state.actor) || { name:'Beheer', role:'manager', manager:true }; }
@@ -722,6 +929,16 @@
       '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('sup.pricebody','U levert RTG uw beste prijs; RTG brengt de gasten. Uw huidige marge-afspraak:')+' <b style="color:var(--gold);">'+Math.round((S.rate||0)*100)+'%</b>.</div>'+
       '<button class="obtn primary" style="margin-top:0.8rem;" data-goto="price">'+T('sup.newprice','Nieuwe prijs doorgeven')+'</button></div>';
     if (has('menu')) extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.menu','Menukaart')+'</div><div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+(state.menu||[]).length+' '+T('sup.dishesvisible','gerechten zichtbaar voor gasten.')+'</div><button class="obtn" style="margin-top:0.8rem;" data-goto="menu">'+T('sup.viewmenu','Bekijk menu')+'</button></div>';
+    // klok-vergrendeling + wie er nu in dienst is
+    const aH = actor();
+    if (aH.staffId && !aH.klokvrij && !aH.ingeklokt){
+      extra = '<div class="lock-note">🔒 '+T('klok.locknote','Je bent nog niet ingeklokt. Klok in via de balk hierboven — daarna gaan je functies en de dagchat open.')+'</div>' + extra;
+    }
+    const inDienst = (state.personeel||[]).filter(p => p.ingeklokt);
+    if (inDienst.length){
+      extra += '<div class="card"><div class="tt-h">'+T('sup.indienst','Nu in dienst')+'</div><div style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);line-height:1.8;">' +
+        inDienst.map(p => '🟢 ' + p.name + ' <span style="color:var(--soft);">(' + ((state.functies&&state.functies[p.functie])?state.functies[p.functie].label:p.functie) + ')</span>').join('<br>') + '</div></div>';
+    }
     $('#homeExtra').innerHTML = extra;
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', ()=>openTab(b.dataset.goto)));
   }
@@ -1277,6 +1494,23 @@
 </script>
 <script>
 window.I18N = { en: {
+  'tab.pda':'Tables', 'tab.gasten':'Door', 'tab.schoon':'Care', 'tab.dagchat':'Day chat',
+  'pda.title':'Tables', 'pda.sub':'The service PDA: tables, courses, guests and tips — live with the kitchen.',
+  'pda.tips':'The AI is watching along', 'pda.vrij':'free', 'pda.rekening':'bill', 'pda.tafel':'Table',
+  'pda.z2':'Seat · 2p', 'pda.z4':'Seat · 4p', 'pda.z6':'Seat · 6p', 'pda.gang':'Next course → kitchen', 'pda.vraagrek':'Bill', 'pda.vrijgeven':'Clear table',
+  'pda.gastph':'RTG guest codename', 'pda.koppel':'Link', 'pda.nootph':'Note for kitchen and colleagues', 'pda.bewaar':'Save',
+  'pda.gangok':'Sent — the kitchen screen shows it now.',
+  'deur.title':'The door', 'deur.sub':'Reservations and arrivals. One tap and kitchen and service both know.',
+  'deur.res':'Tonight’s reservations', 'deur.binnen':'seated', 'deur.meld':'Report arrival', 'deur.geen':'No reservations today.',
+  'deur.gemeld':'Reported — kitchen and service see it live.',
+  'zorg.title':'Care rounds', 'zorg.sub':'Restrooms and amenities, every round ticked off with name and time.', 'zorg.rondes':'Today’s rounds',
+  'dc.title':'Day chat', 'dc.sub':'Today’s chat. Clocking in joins you, clocking out removes you.',
+  'dc.dag':'Day chat', 'dc.leads':'Team leads', 'dc.leeg':'No one clocked in yet today', 'dc.geen':'No messages in this channel today.',
+  'dc.ph':'Message to today’s shift', 'dc.lockedph':'Clock in to join the conversation',
+  'klok.in':'Clocked in', 'klok.uit':'Clocked out', 'klok.locked':'functions locked', 'klok.doIn':'Clock in', 'klok.doUit':'Clock out',
+  'klok.first':'Clock in first — then your functions open up.', 'klok.welkom':'Clocked in. Have a good shift!', 'klok.tot':'Clocked out. Until next shift.',
+  'klok.locknote':'You are not clocked in yet. Clock in via the bar above — your functions and the day chat open after that.',
+  'sup.indienst':'On shift now',
   'tab.keuken':'Kitchen', 'sup.v.keuken.sub':'Screens, roster, recipes, purchasing and mise en place — the AI thinks along so nothing jams.',
   'k.sub.kds':'Screens', 'k.sub.rooster':'Roster', 'k.sub.recepten':'Recipes', 'k.sub.inkoop':'Purchasing', 'k.sub.mise':'Mise en place',
   'k.loading':'Loading…', 'k.refresh':'Refresh the screens',

@@ -37,18 +37,38 @@ if (accounts.count() === 0) {
   accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
 }
 
-// Demo-personeel per leverancier: een manager (PIN 1234) en een medewerker (PIN 5678).
+// Demo-personeel per leverancier: [naam, rechten (manager/staff), functie].
+// Managers loggen in met PIN 1234, alle anderen met 5678.
 const STAFF_SEED = {
-  KIKUNOI: [['Yuki Tanaka', 'manager'], ['Kenji Mori', 'staff']],
-  PONTO: [['Aiko Sato', 'manager'], ['Ren Kimura', 'staff']],
-  HOSHI: [['Haruki Ito', 'manager'], ['Mei Kobayashi', 'staff']],
-  MKKX: [['Daisuke Yamamoto', 'manager']],
-  JETAG: [['Sophie Bakker', 'manager']]
+  KIKUNOI: [
+    ['Daan Visser', 'manager', 'eigenaar'],
+    ['Yuki Tanaka', 'manager', 'chef'],
+    ['Kenji Mori', 'staff', 'souschef'],
+    ['Hana Suzuki', 'staff', 'keuken'],
+    ['Emi Nakamura', 'staff', 'keuken'],
+    ['Akira Kondo', 'staff', 'shiftleader'],
+    ['Sora Fujii', 'staff', 'bediening'],
+    ['Mika Hayashi', 'staff', 'bediening'],
+    ['Noa Ishida', 'staff', 'deurhost'],
+    ['Yui Okada', 'staff', 'toilet'],
+    ['Luna Takeda', 'staff', 'eventmanager']
+  ],
+  PONTO: [['Aiko Sato', 'manager', 'manager'], ['Ren Kimura', 'staff', 'bediening']],
+  HOSHI: [['Haruki Ito', 'manager', 'manager'], ['Mei Kobayashi', 'staff', 'bediening']],
+  MKKX: [['Daisuke Yamamoto', 'manager', 'manager']],
+  JETAG: [['Sophie Bakker', 'manager', 'manager']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
-  if (accounts.countStaff(code) === 0) {
-    people.forEach(([name, role], i) => accounts.createStaff({ supplierCode: code, name, role, pin: i === 0 ? '1234' : '5678' }));
-  }
+  const bestaand = accounts.listStaff(code).map(s => s.name);
+  people.forEach(([name, role]) => {
+    if (!bestaand.includes(name)) accounts.createStaff({ supplierCode: code, name, role, pin: role === 'manager' ? '1234' : '5678' });
+  });
+}
+// functie per medewerker (op naam), voor rolgebaseerde schermen
+const FUNCTIE_SEED = {};
+for (const [code, people] of Object.entries(STAFF_SEED)) {
+  FUNCTIE_SEED[code] = {};
+  for (const [name, , functie] of people) FUNCTIE_SEED[code][name] = functie || 'bediening';
 }
 
 const app = express();
@@ -258,6 +278,26 @@ function initRealtime() {
     const st = db.data.supplierTypes[t];
     if (st && st.caps && !st.caps.includes('kitchen')) st.caps.push('kitchen');
   }
+  // Personeels-app: functies, klok, dagchat, tafels (PDA), reserveringen, rondes.
+  db.data.functies = db.data.functies || {};
+  for (const [code, map] of Object.entries(FUNCTIE_SEED)) db.data.functies[code] = { ...map, ...(db.data.functies[code] || {}) };
+  if (!db.data.klok) db.data.klok = {};                           // { code: { staffId: iso|null } }
+  if (!db.data.dagchat) db.data.dagchat = {};                     // { code: { datum, leden:[], msgs:[] } }
+  if (!db.data.gangsignalen) db.data.gangsignalen = {};           // { code: [{tafel, door, at}] }
+  if (!db.data.tafels) db.data.tafels = {};                       // { code: [{nr,status,gasten,codename,gang,notitie}] }
+  for (const s of db.data.suppliers) {
+    if (['restaurant', 'bar', 'club'].includes(s.type) && !db.data.tafels[s.code]) {
+      db.data.tafels[s.code] = Array.from({ length: 8 }, (_, i) => ({ nr: i + 1, status: 'vrij', gasten: 0, codename: null, gang: null, notitie: '' }));
+    }
+  }
+  if (!db.data.reserveringen) db.data.reserveringen = {
+    KIKUNOI: [
+      { tijd: '18:00', codename: 'Zilveren Valk', personen: 2, tafel: 4, status: 'verwacht', noot: 'theeceremonie eerder die dag — rustige tafel' },
+      { tijd: '19:30', codename: 'Gouden Reiger', personen: 4, tafel: 6, status: 'verwacht', noot: 'verjaardag; dessert met kaars' },
+      { tijd: '20:15', codename: 'Stille Kraanvogel', personen: 2, tafel: 2, status: 'verwacht', noot: 'allergie: schaaldieren' }
+    ]
+  };
+  if (!db.data.rondes) db.data.rondes = {};                       // { code: { datum, list:[{tijd,taak,done,door}] } }
   if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
   if (webpush) {
     if (!db.data.vapid) {
@@ -1079,6 +1119,78 @@ function openInvites(code) {
 }
 
 // dashboarddata voor de ingelogde leverancier
+/* ---------- personeels-app: functies, klok, dagchat, tafels ---------- */
+
+// Welke schermen elke functie ziet; leads delen een eigen chatkanaal.
+// klokvrij = mag de app gebruiken zonder in te klokken (beheer).
+const FUNCTIES = {
+  eigenaar:     { label: 'Eigenaar',     lead: true, klokvrij: true, tabs: ['home', 'ai', 'pda', 'orders', 'keuken', 'gasten', 'schoon', 'menu', 'price', 'location', 'team', 'dagchat'] },
+  manager:      { label: 'Manager',      lead: true, klokvrij: true, tabs: ['home', 'ai', 'pda', 'orders', 'keuken', 'gasten', 'schoon', 'menu', 'price', 'location', 'team', 'dagchat'] },
+  shiftleader:  { label: 'Shiftleader',  lead: true, tabs: ['home', 'ai', 'pda', 'orders', 'keuken', 'gasten', 'team', 'dagchat'] },
+  eventmanager: { label: 'Eventmanager', lead: true, tabs: ['home', 'ai', 'keuken', 'gasten', 'dagchat'] },
+  chef:         { label: 'Chef-kok',     lead: true, tabs: ['home', 'ai', 'keuken', 'orders', 'menu', 'dagchat'] },
+  souschef:     { label: 'Souschef',     tabs: ['home', 'ai', 'keuken', 'orders', 'dagchat'] },
+  keuken:       { label: 'Keuken',       tabs: ['home', 'keuken', 'dagchat'] },
+  bediening:    { label: 'Bediening',    tabs: ['home', 'ai', 'pda', 'orders', 'dagchat'] },
+  deurhost:     { label: 'Deurhost',     tabs: ['home', 'gasten', 'dagchat'] },
+  toilet:       { label: 'Toiletzorg',   tabs: ['home', 'schoon', 'dagchat'] }
+};
+function functieVan(code, actor) {
+  if (!actor || !actor.staffId) return 'manager';   // bedrijfsaccount (Beheer)
+  const f = (db.data.functies[code] || {})[actor.name];
+  return FUNCTIES[f] ? f : (actor.manager ? 'manager' : 'bediening');
+}
+function isIngeklokt(code, staffId) { return !!(db.data.klok[code] || {})[staffId]; }
+function vandaag() { return new Date().toISOString().slice(0, 10); }
+function dagchatVoor(code) {
+  let c = db.data.dagchat[code];
+  if (!c || c.datum !== vandaag()) c = db.data.dagchat[code] = { datum: vandaag(), leden: [], msgs: [] };
+  return c;
+}
+function sysMsg(code, text) {
+  const c = dagchatVoor(code);
+  c.msgs.push({ sys: true, kanaal: 'dag', text, at: new Date().toISOString() });
+  c.msgs = c.msgs.slice(-200);
+}
+// Werkvloer-functies vereisen dat een personeelslid is ingeklokt.
+function werkCap(req, res) {
+  const a = req.actor || {};
+  const f = FUNCTIES[functieVan(req.supplier.code, a)];
+  if (a.staffId && !(f && f.klokvrij) && !isIngeklokt(req.supplier.code, a.staffId)) {
+    res.status(403).json({ error: 'Eerst inklokken. Je functies gaan open zodra je dienst begint.' });
+    return false;
+  }
+  return true;
+}
+function rondesVoor(code) {
+  let r = db.data.rondes[code];
+  if (!r || r.datum !== vandaag()) {
+    r = db.data.rondes[code] = { datum: vandaag(), list: ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'].map(tijd => (
+      { tijd, taak: 'Ronde: toiletten, handdoeken, zeep en bloemen', done: false, door: null }
+    )) };
+    r.list.splice(1, 0, { tijd: '11:00', taak: 'Spiegels en fonteinen poetsen', done: false, door: null });
+    r.list.push({ tijd: '23:00', taak: 'Eindronde + voorraad doorgeven aan inkoop', done: false, door: null });
+  }
+  return r;
+}
+// PDA-tips voor de bediening: heuristiek per tafel + gekoppelde gast.
+function tafelTips(s) {
+  const tips = [];
+  const tafels = db.data.tafels[s.code] || [];
+  const open = db.data.orders.filter(o => o.supplierCode === s.code && !['geserveerd', 'geweigerd', 'terugbetaald'].includes(o.status));
+  for (const t of tafels) {
+    if (t.status !== 'bezet') { if (t.status === 'rekening') tips.push({ tafel: t.nr, tip: 'Tafel ' + t.nr + ' wacht op de rekening — gedeeld betalen en fooi kan de gast zelf in de app.' }); continue; }
+    const o = t.codename ? open.find(x => x.customerCodename === t.codename) : null;
+    if (o && o.allergyNote) tips.push({ tafel: t.nr, tip: '⚠ Tafel ' + t.nr + ' (' + t.codename + '): allergie — ' + o.allergyNote + '. Check bij elke gang.' });
+    if (o && o.status === 'klaar') tips.push({ tafel: t.nr, tip: 'Tafel ' + t.nr + ': borden staan op de pas — nu uitlopen.' });
+    if (t.gang === 'hoofdgerecht' && !o) tips.push({ tafel: t.nr, tip: 'Tafel ' + t.nr + ' zit op het hoofdgerecht — peil straks het dessertmoment.' });
+    if (t.gasten >= 4) tips.push({ tafel: t.nr, tip: 'Tafel ' + t.nr + ' (' + t.gasten + ' pers.): schenk rond vóór de volgende gang, grote tafels lopen leeg.' });
+  }
+  const res = (db.data.reserveringen[s.code] || []).filter(r => r.status === 'verwacht');
+  if (res.length) tips.push({ tafel: res[0].tafel, tip: 'Om ' + res[0].tijd + ' komt ' + res[0].codename + ' (' + res[0].personen + ' pers., tafel ' + res[0].tafel + ')' + (res[0].noot ? ' — ' + res[0].noot : '') + '.' });
+  return tips.slice(0, 6);
+}
+
 function supplierState(s, actor) {
   const t = db.data.supplierTypes[s.type] || {};
   return {
@@ -1106,7 +1218,23 @@ function supplierState(s, actor) {
     invites: (actor && actor.manager) ? openInvites(s.code) : [],
     recepten: ((db.data.keuken || {}).recepten || {})[s.code] || {},
     rooster: ((db.data.keuken || {}).rooster || {})[s.code] || null,
-    actor: actor || { name: 'Beheer', role: 'manager', manager: true }
+    // personeels-app
+    functies: FUNCTIES,
+    personeel: accounts.listStaff(s.code).map(st => ({
+      ...accounts.publicStaff(st),
+      functie: functieVan(s.code, { staffId: st.id, name: st.name, manager: st.role === 'manager' }),
+      ingeklokt: isIngeklokt(s.code, st.id)
+    })),
+    dagchat: dagchatVoor(s.code),
+    tafels: db.data.tafels[s.code] || null,
+    tafelTips: ['restaurant', 'bar', 'club'].includes(s.type) ? tafelTips(s) : [],
+    reserveringen: db.data.reserveringen[s.code] || [],
+    rondes: rondesVoor(s.code),
+    actor: (function () {
+      const a = actor || { name: 'Beheer', role: 'manager', manager: true };
+      const f = functieVan(s.code, a);
+      return { ...a, functie: f, functieLabel: FUNCTIES[f].label, lead: !!FUNCTIES[f].lead, klokvrij: !!FUNCTIES[f].klokvrij, ingeklokt: a.staffId ? isIngeklokt(s.code, a.staffId) : true };
+    })()
   };
 }
 
@@ -1141,7 +1269,10 @@ app.post('/api/supplier/login', (req, res) => {
 app.post('/api/supplier/roster', (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
-  res.json({ supplier: { code: s.code, name: s.name }, staff: accounts.listStaff(s.code).map(accounts.publicStaff) });
+  res.json({ supplier: { code: s.code, name: s.name }, staff: accounts.listStaff(s.code).map(st => {
+    const f = functieVan(s.code, { staffId: st.id, name: st.name, manager: st.role === 'manager' });
+    return { ...accounts.publicStaff(st), functie: f, functieLabel: FUNCTIES[f].label };
+  }) });
 });
 
 // Manager voegt personeel toe (krijgt een PIN) of verwijdert het.
@@ -1698,6 +1829,9 @@ app.post('/api/supplier/kds', supplierAuth, (req, res) => {
     const alg = list.find(x => x.allergie);
     if (alg) adviesKeuken.push('⚠ ' + p + ': allergie op ticket ' + alg.ref + ' (' + alg.allergie + ') — aparte plank, apart gereedschap.');
   }
+  // gang-signalen van de bediening (PDA): laatste 15 minuten
+  const gangRecent = (db.data.gangsignalen[code] || []).filter(g => Date.now() - new Date(g.at) < 15 * 60000);
+  for (const g of gangRecent.slice(0, 4)) adviesKeuken.push('🍽️ Tafel ' + g.tafel + ': bediening vraagt de volgende gang (' + g.gang + ') — ' + g.door + '.');
   if (klaar.length) adviesPas.push('🛎️ ' + klaar.length + ' bord(en) staan klaar op de pas — nu lopen, de warmte is het bord.');
   const nieuw = open.filter(o => o.status === 'nieuw');
   if (nieuw.length >= 2) adviesPas.push('⏱️ ' + nieuw.length + ' nieuwe tickets: geef de keuken de volgorde door, oudste eerst.');
@@ -1776,6 +1910,111 @@ app.post('/api/supplier/mise', supplierAuth, (req, res) => {
     '🚚 De inkooplevering komt om 14:00: verse vis en zuivel pas ná levering verwerken.'
   ];
   res.json({ dag: DAGEN[idx], couverts, parties: Object.entries(parties).map(([partie, taken]) => ({ partie, taken })), notes });
+});
+
+/* ---------- personeels-app: klok, dagchat, PDA-tafels, rondes, deur ---------- */
+
+// In- of uitklokken. Inklokken opent de functies én de dagchat; uitklokken sluit beide.
+app.post('/api/supplier/klok', supplierAuth, (req, res) => {
+  const a = req.actor;
+  if (!a.staffId) return res.status(400).json({ error: 'Het bedrijfsaccount hoeft niet in te klokken.' });
+  const code = req.supplier.code;
+  db.data.klok[code] = db.data.klok[code] || {};
+  const chat = dagchatVoor(code);
+  const f = FUNCTIES[functieVan(code, a)];
+  if (isIngeklokt(code, a.staffId)) {
+    delete db.data.klok[code][a.staffId];
+    chat.leden = chat.leden.filter(n => n !== a.name);
+    sysMsg(code, a.name + ' (' + f.label + ') is uitgeklokt.');
+    logActivity(code, a, 'klokte uit');
+  } else {
+    db.data.klok[code][a.staffId] = new Date().toISOString();
+    if (!chat.leden.includes(a.name)) chat.leden.push(a.name);
+    sysMsg(code, a.name + ' (' + f.label + ') is ingeklokt. Welkom in de dienst.');
+    logActivity(code, a, 'klokte in als ' + f.label);
+  }
+  save();
+  sseToSupplier(code, 'sync', { scope: 'personeel' });
+  res.json({ ok: true, state: supplierState(req.supplier, req.actor) });
+});
+
+// Dagchat: iedereen die ingeklokt is; kanaal 'leads' alleen voor teamleiders.
+app.post('/api/supplier/dagchat', supplierAuth, (req, res) => {
+  if (!werkCap(req, res)) return;
+  const a = req.actor;
+  const code = req.supplier.code;
+  const f = functieVan(code, a);
+  const kanaal = req.body.kanaal === 'leads' ? 'leads' : 'dag';
+  if (kanaal === 'leads' && !FUNCTIES[f].lead) return res.status(403).json({ error: 'Het leads-kanaal is voor teamleiders.' });
+  const text = String(req.body.text || '').trim().slice(0, 300);
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  const chat = dagchatVoor(code);
+  if (a.staffId && !chat.leden.includes(a.name)) return res.status(403).json({ error: 'Eerst inklokken om mee te praten.' });
+  chat.msgs.push({ who: a.name, functie: FUNCTIES[f].label, kanaal, text, at: new Date().toISOString() });
+  chat.msgs = chat.msgs.slice(-200);
+  save();
+  sseToSupplier(code, 'sync', { scope: 'dagchat' });
+  res.json({ ok: true, dagchat: chat });
+});
+
+// PDA van de bediening: tafelstatus, gast koppelen, gang naar de keuken, notitie.
+app.post('/api/supplier/tafel', supplierAuth, (req, res) => {
+  if (!werkCap(req, res)) return;
+  const code = req.supplier.code;
+  const t = (db.data.tafels[code] || []).find(x => x.nr === Number(req.body.nr));
+  if (!t) return res.status(404).json({ error: 'Tafel niet gevonden.' });
+  const act = String(req.body.action || '');
+  if (act === 'status') {
+    t.status = ['vrij', 'bezet', 'rekening'].includes(req.body.value) ? req.body.value : t.status;
+    if (t.status === 'vrij') { t.codename = null; t.gasten = 0; t.gang = null; t.notitie = ''; }
+    if (t.status === 'bezet') { t.gasten = Math.min(12, Math.max(1, parseInt(req.body.gasten, 10) || 2)); t.gang = 'aperitief'; }
+    if (t.status === 'rekening') sysMsg(code, 'Tafel ' + t.nr + ' vraagt de rekening (' + req.actor.name + ').');
+  } else if (act === 'gast') {
+    t.codename = String(req.body.value || '').slice(0, 40) || null;
+    if (t.codename) sysMsg(code, 'Tafel ' + t.nr + ': RTG-gast ' + t.codename + ' gekoppeld — voorkeuren en allergieën staan op de PDA.');
+  } else if (act === 'gang') {
+    const volgorde = ['aperitief', 'voorgerecht', 'hoofdgerecht', 'dessert', 'digestief'];
+    t.gang = volgorde[Math.min(volgorde.length - 1, volgorde.indexOf(t.gang || 'aperitief') + 1)];
+    db.data.gangsignalen[code] = (db.data.gangsignalen[code] || []);
+    db.data.gangsignalen[code].unshift({ tafel: t.nr, gang: t.gang, door: req.actor.name, at: new Date().toISOString() });
+    db.data.gangsignalen[code] = db.data.gangsignalen[code].slice(0, 20);
+  } else if (act === 'notitie') {
+    t.notitie = String(req.body.value || '').slice(0, 120);
+  }
+  save();
+  logActivity(code, req.actor, 'PDA: tafel ' + t.nr + ' — ' + (act === 'gang' ? 'volgende gang (' + t.gang + ')' : act));
+  sseToSupplier(code, 'sync', { scope: 'tafels' });
+  res.json({ ok: true, tafel: t, state: supplierState(req.supplier, req.actor) });
+});
+
+// Schoonmaakrondes (toiletzorg): afvinken met naam en tijd.
+app.post('/api/supplier/ronde', supplierAuth, (req, res) => {
+  if (!werkCap(req, res)) return;
+  const r = rondesVoor(req.supplier.code);
+  const item = r.list[Number(req.body.idx)];
+  if (!item) return res.status(404).json({ error: 'Ronde niet gevonden.' });
+  item.done = !item.done;
+  item.door = item.done ? req.actor.name : null;
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'rondes' });
+  res.json({ ok: true, rondes: r });
+});
+
+// Deurhost: reservering afhandelen; aankomst gaat live naar keuken en bediening.
+app.post('/api/supplier/reservering', supplierAuth, (req, res) => {
+  if (!werkCap(req, res)) return;
+  const code = req.supplier.code;
+  const r = (db.data.reserveringen[code] || [])[Number(req.body.idx)];
+  if (!r) return res.status(404).json({ error: 'Reservering niet gevonden.' });
+  r.status = r.status === 'verwacht' ? 'aangekomen' : 'verwacht';
+  if (r.status === 'aangekomen') {
+    const t = (db.data.tafels[code] || []).find(x => x.nr === r.tafel);
+    if (t) { t.status = 'bezet'; t.gasten = r.personen; t.codename = r.codename; t.gang = 'aperitief'; if (r.noot) t.notitie = r.noot; }
+    sysMsg(code, '🚪 ' + r.codename + ' (' + r.personen + ' pers.) is aangekomen — tafel ' + r.tafel + '. ' + (r.noot || ''));
+  }
+  save();
+  sseToSupplier(code, 'sync', { scope: 'tafels' });
+  res.json({ ok: true, reserveringen: db.data.reserveringen[code], state: supplierState(req.supplier, req.actor) });
 });
 
 /* ================= LIVE REIS (onderweg) =================

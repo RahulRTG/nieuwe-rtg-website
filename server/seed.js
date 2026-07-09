@@ -130,9 +130,9 @@ module.exports = function seed() {
       apartment:  { label: 'Appartement',  icon: '🏡', caps: ['bookings', 'location', 'pricing'] },
       taxi:       { label: 'Taxi',         icon: '🚘', caps: ['rides', 'location', 'pricing'] },
       jet:        { label: 'Privéjet',     icon: '✈️', caps: ['rides', 'location', 'pricing'] },
-      restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'location', 'pricing'] },
-      bar:        { label: 'Bar',          icon: '🍸', caps: ['menu', 'orders', 'location', 'pricing'] },
-      club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'location', 'pricing'] }
+      restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'location', 'pricing', 'kitchen'] },
+      bar:        { label: 'Bar',          icon: '🍸', caps: ['menu', 'orders', 'location', 'pricing', 'kitchen'] },
+      club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'location', 'pricing', 'kitchen'] }
     },
 
     /* Voorbeeldleveranciers (demo-inlogcodes). serviceRate = de dynamische

@@ -631,6 +631,33 @@
   .mo-pay{background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
   .mo-pay svg{width:12px;height:12px;}
   .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
+  .mo-rest{font-size:0.66rem;color:var(--gold);margin-top:0.15rem;}
+  /* gedeeld betalen + fooi */
+  .sp-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:58;display:none;}
+  .sp-scrim.open{display:block;}
+  .sp-sheet{position:absolute;left:0;right:0;bottom:0;z-index:59;background:var(--card);border-top:1px solid var(--line);border-radius:22px 22px 0 0;padding:1.2rem 1.3rem calc(env(safe-area-inset-bottom,0px) + 1.2rem);transform:translateY(105%);transition:transform 0.28s;max-height:82%;overflow-y:auto;}
+  .sp-sheet.open{transform:translateY(0);}
+  .sp-sheet h3{font-family:'Bodoni Moda',serif;font-size:1.25rem;font-weight:500;}
+  .sp-sheet .who2{margin-top:0.2rem;font-size:0.76rem;color:var(--muted);}
+  .sp-mode{display:flex;gap:0.45rem;margin-top:1rem;}
+  .sp-mode button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:0.6rem 0.3rem;font-size:0.72rem;}
+  .sp-mode button.on{border-color:var(--burgundy);color:var(--txt);background:rgba(194,58,94,0.08);}
+  .sp-block{margin-top:0.9rem;}
+  .sp-pers{display:flex;align-items:center;gap:1rem;justify-content:center;}
+  .sp-pers button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--txt);font-size:1.1rem;}
+  .sp-pers b{font-family:'Bodoni Moda',serif;font-size:1.3rem;min-width:5.5rem;text-align:center;}
+  .sp-item{display:flex;gap:0.6rem;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--line);font-size:0.84rem;}
+  .sp-item:last-child{border-bottom:none;}
+  .sp-item input{width:17px;height:17px;accent-color:var(--burgundy);}
+  .sp-item .pr2{margin-left:auto;color:var(--muted);}
+  .sp-tip{display:flex;gap:0.45rem;margin-top:0.5rem;}
+  .sp-tip button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem 0;font-size:0.74rem;}
+  .sp-tip button.on{border-color:var(--gold);color:var(--txt);background:rgba(169,143,28,0.1);}
+  .sp-sum{margin-top:1rem;display:flex;justify-content:space-between;font-size:0.86rem;color:var(--muted);}
+  .sp-sum b{font-family:'Bodoni Moda',serif;font-size:1.15rem;color:var(--txt);}
+  .sp-label{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin-top:1.1rem;}
+  .sp-sheet .bigbtn{display:flex;align-items:center;justify-content:center;gap:0.5rem;}
+  .sp-sheet .bigbtn svg{width:16px;height:16px;flex-shrink:0;}
 
   /* ---- Onderweg (live reis) ---- */
   .live-start{background:linear-gradient(150deg,#1a1413,#151312);border:1px solid var(--line);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;}
@@ -838,6 +865,10 @@
       <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="app.tab.tp">Ter plaatse</span></button>
     </div>
   </div>
+
+  <!-- gedeeld betalen + fooi -->
+  <div class="sp-scrim" id="spScrim"></div>
+  <div class="sp-sheet" id="spSheet"></div>
 
   <!-- betaaloverlay -->
   <div id="paywait">
@@ -1288,9 +1319,12 @@
           return '<div class="myorder" data-ref="' + o.ref + '">' +
             '<div class="r1"><div><div class="nm">' + o.supplierName + '</div><div class="sub2">' + o.items.reduce((n,i)=>n+i.qty,0) + ' ' + T('app.items','item(s)') + ' · ' + timeAgo(o.at) + '</div></div>' +
               '<div style="text-align:right;"><div class="amt">' + eur(o.total) + '</div><span class="mo-pill ' + pc + '">' + tStatus(o.status) + '</span></div></div>' +
+            ((o.payments && o.payments.length && !o.paid)
+              ? '<div class="mo-rest">' + T('sp.stillopen','nog open') + ' ' + eur(Math.max(0, Math.round((o.total - o.payments.reduce((s,p)=>s+p.bedrag,0))*100)/100)) + ' · ' + o.payments.length + ' ' + T('sp.paidparts','deelbetaling(en)') + '</div>'
+              : '') +
             '<div class="acts">' + (o.paid
-              ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
-              : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
+              ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+(o.fooi?' · '+eur(o.fooi)+' '+T('sp.tipword','fooi'):'')+'</span>'
+              : '<button class="mo-pay js-opay">' + FID_MINI + T('sp.paybill','Betaal de rekening') + '</button>') +
               (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ '+T('app.taggedsalon','getagd voor Salon')+'</span>' : '') +
             '</div></div>';
         }).join('')
@@ -1536,12 +1570,78 @@
     renderTerPlaatse();
   }
 
+  // Gedeeld betalen: alles, gelijk delen of precies de eigen gerechten — met fooi.
+  const SP = { o:null, mode:'vol', personen:2, items:{}, tip:0, tipPct:null };
+  function orderRest(o){ return Math.max(0, Math.round((o.total - (o.payments||[]).reduce((s,p)=>s+p.bedrag,0)) * 100) / 100); }
   function payOrder(o){
-    payWithFaceId(eur(o.total), async () => {
-      await API.call('/order/pay', { ref: o.ref });
-      return o;
-    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.', after: () => renderTerPlaatse() });
+    SP.o = o; SP.mode = 'vol'; SP.personen = 2; SP.items = {}; SP.tip = 0; SP.tipPct = null;
+    renderSplit();
+    $('#spScrim').classList.add('open'); $('#spSheet').classList.add('open');
   }
+  function spAmount(){
+    const o = SP.o, rest = orderRest(o);
+    if (SP.mode === 'gelijk') return Math.min(rest, Math.round((o.total / SP.personen) * 100) / 100);
+    if (SP.mode === 'items') return Math.min(rest, o.items.filter(i => SP.items[i.id]).reduce((s,i) => s + i.price * i.qty, 0));
+    return rest;
+  }
+  function renderSplit(){
+    const o = SP.o, rest = orderRest(o), bedrag = spAmount();
+    const tip = SP.tipPct != null ? Math.round(bedrag * SP.tipPct) : SP.tip;
+    $('#spSheet').innerHTML =
+      '<h3>' + T('sp.title','De rekening') + '</h3>' +
+      '<div class="who2">' + o.supplierName + ' · ' + eur(o.total) + (rest < o.total ? ' · ' + T('sp.stillopen','nog open') + ' ' + eur(rest) : '') + '</div>' +
+      '<div class="sp-mode">' +
+        '<button data-m="vol"' + (SP.mode==='vol'?' class="on"':'') + '>' + T('sp.all','Alles') + '</button>' +
+        '<button data-m="gelijk"' + (SP.mode==='gelijk'?' class="on"':'') + '>' + T('sp.equal','Gelijk delen') + '</button>' +
+        '<button data-m="items"' + (SP.mode==='items'?' class="on"':'') + '>' + T('sp.mine','Mijn gerechten') + '</button>' +
+      '</div>' +
+      (SP.mode === 'gelijk'
+        ? '<div class="sp-block sp-pers"><button id="spMin">−</button><b>' + SP.personen + ' ' + T('sp.persons','personen') + '</b><button id="spPlus">+</button></div>'
+        : '') +
+      (SP.mode === 'items'
+        ? '<div class="sp-block">' + o.items.map(i =>
+            '<label class="sp-item"><input type="checkbox" data-item="' + i.id + '"' + (SP.items[i.id]?' checked':'') + '><span>' + i.qty + '× ' + i.name + '</span><span class="pr2">' + eur(i.price * i.qty) + '</span></label>'
+          ).join('') + '</div>'
+        : '') +
+      '<div class="sp-label">' + T('sp.tip','Fooi voor het team') + '</div>' +
+      '<div class="sp-tip">' +
+        '<button data-tip="0"' + (!tip?' class="on"':'') + '>' + T('sp.notip','Geen') + '</button>' +
+        '<button data-tippct="0.05"' + (SP.tipPct===0.05?' class="on"':'') + '>5%</button>' +
+        '<button data-tippct="0.10"' + (SP.tipPct===0.10?' class="on"':'') + '>10%</button>' +
+        '<button data-tippct="0.15"' + (SP.tipPct===0.15?' class="on"':'') + '>15%</button>' +
+      '</div>' +
+      '<div class="sp-sum"><span>' + T('sp.youpay','U betaalt') + (tip ? ' + ' + eur(tip) + ' ' + T('sp.tipword','fooi') : '') + '</span><b>' + eur(bedrag + tip) + '</b></div>' +
+      '<button class="bigbtn" id="spPay"' + (bedrag > 0 ? '' : ' disabled style="opacity:0.5;"') + '>' + FID_MINI + ' ' + T('app.paywithfid','Betaal met Face ID') + '</button>' +
+      '<button class="obtn" id="spCancel" style="width:100%;margin-top:0.6rem;border:none;color:var(--soft);background:none;">' + T('sp.cancel','Annuleren') + '</button>';
+    $('#spSheet').querySelectorAll('[data-m]').forEach(b => b.addEventListener('click', () => { SP.mode = b.dataset.m; renderSplit(); }));
+    const mn = $('#spMin'), pl = $('#spPlus');
+    if (mn) mn.addEventListener('click', () => { SP.personen = Math.max(2, SP.personen - 1); renderSplit(); });
+    if (pl) pl.addEventListener('click', () => { SP.personen = Math.min(20, SP.personen + 1); renderSplit(); });
+    $('#spSheet').querySelectorAll('[data-item]').forEach(c => c.addEventListener('change', () => { SP.items[c.dataset.item] = c.checked; renderSplit(); }));
+    $('#spSheet').querySelectorAll('[data-tippct]').forEach(b => b.addEventListener('click', () => { SP.tipPct = Number(b.dataset.tippct); SP.tip = 0; renderSplit(); }));
+    const nt = $('#spSheet').querySelector('[data-tip="0"]');
+    if (nt) nt.addEventListener('click', () => { SP.tipPct = null; SP.tip = 0; renderSplit(); });
+    $('#spCancel').addEventListener('click', closeSplit);
+    $('#spPay').addEventListener('click', () => {
+      const fooi = SP.tipPct != null ? Math.round(spAmount() * SP.tipPct) : SP.tip;
+      const body = { ref: o.ref, mode: SP.mode, fooi };
+      if (SP.mode === 'gelijk') body.personen = SP.personen;
+      if (SP.mode === 'items'){
+        body.itemIds = o.items.filter(i => SP.items[i.id]).map(i => i.id);
+        if (!body.itemIds.length){ toast(T('sp.pickitems','Kies eerst je eigen gerechten.')); return; }
+      }
+      closeSplit();
+      payWithFaceId(eur(spAmount() + fooi), async () => {
+        const d = await API.call('/order/pay', body);
+        return d;
+      }, { message: d => (d && d.rest > 0
+            ? T('sp.partpaid','Uw deel is betaald. Nog open: ') + eur(d.rest)
+            : T('sp.fullpaid','Rekening voldaan bij ') + o.supplierName + '.'),
+           after: () => renderTerPlaatse() });
+    });
+  }
+  function closeSplit(){ $('#spScrim').classList.remove('open'); $('#spSheet').classList.remove('open'); }
+  $('#spScrim').addEventListener('click', closeSplit);
 
   $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
   $('#menu-scrim').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
@@ -2435,6 +2535,10 @@ window.I18N = { en: {
   'app.rh.ask':'What has been handled?', 'app.rh.ask.q':'What has been handled?',
   'ai.deck.biz':'Businesslike and honest: sharp in work mode, generous when you let go. Both sides guarded.',
   'app.day.label':'Your day, guarded by the Companion', 'app.day.free':'free', 'app.day.work':'work',
+  'sp.title':'The bill', 'sp.stillopen':'still open', 'sp.all':'Everything', 'sp.equal':'Split equally', 'sp.mine':'My dishes',
+  'sp.persons':'people', 'sp.tip':'Tip for the team', 'sp.notip':'None', 'sp.youpay':'You pay', 'sp.tipword':'tip',
+  'sp.cancel':'Cancel', 'sp.pickitems':'Select your own dishes first.', 'sp.partpaid':'Your share is paid. Still open: ',
+  'sp.fullpaid':'Bill settled at ', 'sp.paidparts':'partial payment(s)', 'sp.paybill':'Pay the bill',
   'app.rp.label':'Your travel agenda, curated by the Butler',
   'app.rp.fill':'Fill my free evening', 'app.rp.fill.q':'Fill my free evening', 'app.rp.full':'Day by day',
   'app.rp.booked':'Booked services',

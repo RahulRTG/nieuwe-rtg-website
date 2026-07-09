@@ -197,6 +197,67 @@ function initRealtime() {
     promoDirty = true;
   }
   if (promoDirty) save();
+  // Keuken-intelligentie voor horeca-partners: brigade, weer, recepten en
+  // schoonmaak vormen de basis voor rooster, schermen, inkoop en mise en place.
+  if (!db.data.keuken) db.data.keuken = {
+    // weersverwachting per stad (demo): temperatuur + regenkans per dag
+    weer: {
+      Kyoto: [
+        { dag: 'ma', temp: 19, regen: 10 }, { dag: 'di', temp: 21, regen: 0 },
+        { dag: 'wo', temp: 22, regen: 0 }, { dag: 'do', temp: 18, regen: 70 },
+        { dag: 'vr', temp: 17, regen: 90 }, { dag: 'za', temp: 20, regen: 20 },
+        { dag: 'zo', temp: 22, regen: 0 }
+      ]
+    },
+    // brigade per zaak: skill 1-3, contracturen p/w, vaste afspraken (dagen), uurloon
+    staf: {
+      KIKUNOI: [
+        { naam: 'Yuki Tanaka', rol: 'chef', partie: 'warm', skill: 3, contract: 38, uurloon: 34, afspraken: [] },
+        { naam: 'Kenji Mori', rol: 'sous-chef', partie: 'warm', skill: 3, contract: 36, uurloon: 28, afspraken: ['zo'] },
+        { naam: 'Hana Suzuki', rol: 'chef de partie koud', partie: 'koud', skill: 2, contract: 32, uurloon: 22, afspraken: ['wo'] },
+        { naam: 'Taro Watanabe', rol: 'commis', partie: 'koud', skill: 1, contract: 24, uurloon: 16, afspraken: ['ma', 'di'] },
+        { naam: 'Emi Nakamura', rol: 'patissier', partie: 'patisserie', skill: 3, contract: 28, uurloon: 26, afspraken: ['ma'] },
+        { naam: 'Sora Fujii', rol: 'pas/runner', partie: 'pas', skill: 2, contract: 30, uurloon: 18, afspraken: [] }
+      ],
+      PONTO: [
+        { naam: 'Aiko Sato', rol: 'barmanager', partie: 'bar', skill: 3, contract: 36, uurloon: 26, afspraken: [] },
+        { naam: 'Ren Kimura', rol: 'bartender', partie: 'bar', skill: 2, contract: 28, uurloon: 19, afspraken: ['ma'] },
+        { naam: 'Nao Ishida', rol: 'barback', partie: 'bar', skill: 1, contract: 20, uurloon: 14, afspraken: ['di', 'wo'] }
+      ]
+    },
+    // recepten & bereidingswijze per menukaart-item (partie = station)
+    recepten: {
+      KIKUNOI: {
+        m1: { partie: 'koud', tijd: 25, ingredienten: ['seizoensgroenten (8 soorten)', 'dashi', 'witte sojasaus', 'sesam'], stappen: ['Dashi trekken, 20 minuten zacht', 'Groenten per soort apart garen en glaceren', 'Op houten plank schikken in oneven aantallen', 'Vlak voor de pas afmaken met sesam'], mise: ['dashi 2L', 'groenten gesneden per soort', 'glaceerlak'] },
+        m2: { partie: 'koud', tijd: 12, ingredienten: ['dagvis van de markt', 'daikon', 'shiso', 'verse wasabi'], stappen: ['Vis fileren en op doek laten rusten', 'Daikon tot engelenhaar snijden', 'Aan tafel snijden, op bestelling', 'Wasabi vers raspen, nooit vooraf'], mise: ['vis gefileerd op doek', 'daikon-garnituur', 'shisoblad geplukt'] },
+        m3: { partie: 'warm', tijd: 18, ingredienten: ['A5 wagyu', 'binchotan-houtskool', 'seizoensgroenten', 'sansho-peper'], stappen: ['Wagyu 30 minuten op kamertemperatuur', 'Binchotan op temperatuur, zonder vlam', 'Kort grillen; 2 minuten rust per 100 gram', 'Trancheren tegen de draad, sansho erover'], mise: ['wagyu geportioneerd', 'binchotan aan', 'groenten voorgegaard'] },
+        m4: { partie: 'patisserie', tijd: 8, ingredienten: ['ceremoniële matcha', 'wagashi van het seizoen', 'water van 80°C'], stappen: ['Kom voorverwarmen', 'Matcha zeven, 70 ml water van 80°C', 'Kloppen tot fijne schuimkraag (W-beweging)', 'Serveren met wagashi op cederhout'], mise: ['matcha gezeefd', 'wagashi gevormd', 'kommen voorverwarmd'] }
+      },
+      PONTO: {
+        b1: { partie: 'bar', tijd: 4, ingredienten: ['Japanse whisky 50 ml', 'yuzu-sap 15 ml', 'sodawater', 'yuzu-zeste'], stappen: ['Glas met ijs voorkoelen', 'Whisky en yuzu op nieuw ijs', 'Aanvullen met soda, één keer roeren', 'Zeste erover uitknijpen'], mise: ['yuzu geperst', 'zestes gesneden', 'glazen gekoeld'] },
+        b2: { partie: 'bar', tijd: 5, ingredienten: ['umeshu 45 ml', 'citroensap 20 ml', 'eiwit', 'angostura'], stappen: ['Dry shake zonder ijs voor de schuimkraag', 'Shake met ijs, 12 seconden', 'Dubbel zeven in gekoelde coupe', 'Drie druppels angostura'], mise: ['citroen geperst', 'eiwit gescheiden', 'coupes gekoeld'] },
+        b3: { partie: 'bar', tijd: 3, ingredienten: ['sakura-siroop 20 ml', 'tonic', 'citroen', 'bloesemgarnituur'], stappen: ['Wijnglas met ijs', 'Siroop en tonic zacht mengen', 'Citroentwist en bloesem'], mise: ['siroop afgevuld', 'garnituur klaar'] },
+        b4: { partie: 'keuken', tijd: 6, ingredienten: ['edamame', 'zeezout', 'nori-vlokken'], stappen: ['Stomen, 5 minuten', 'Heet mengen met zout en nori'], mise: ['edamame gedopt klaar', 'nori-zout gemengd'] }
+      }
+    },
+    schoonmaak: {
+      KIKUNOI: [
+        { taak: 'Afzuiging diepreinigen', wanneer: 'vr na dienst', product: 'ontvetter (2L)' },
+        { taak: 'Koelcellen uitsoppen + temperatuurlog', wanneer: 'wo ochtend', product: 'desinfectie (1L)' },
+        { taak: 'Binchotan-grill uitbranden', wanneer: 'dagelijks', product: 'grillborstel' }
+      ],
+      PONTO: [
+        { taak: 'Tapleidingen doorspoelen', wanneer: 'ma ochtend', product: 'leidingreiniger' },
+        { taak: 'IJsmachine desinfecteren', wanneer: 'do ochtend', product: 'desinfectie (1L)' }
+      ]
+    },
+    rooster: {}   // laatst gegenereerde weekrooster per zaak
+  };
+  // horeca-types krijgen de keukenfuncties
+  for (const t of ['restaurant', 'bar', 'club']) {
+    const st = db.data.supplierTypes[t];
+    if (st && st.caps && !st.caps.includes('kitchen')) st.caps.push('kitchen');
+  }
   if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
   if (webpush) {
     if (!db.data.vapid) {
@@ -1043,6 +1104,8 @@ function supplierState(s, actor) {
     team: (db.data.supplierTeam[s.code] || []).slice(-60),
     insights: supplierInsights(s),
     invites: (actor && actor.manager) ? openInvites(s.code) : [],
+    recepten: ((db.data.keuken || {}).recepten || {})[s.code] || {},
+    rooster: ((db.data.keuken || {}).rooster || {})[s.code] || null,
     actor: actor || { name: 'Beheer', role: 'manager', manager: true }
   };
 }
@@ -1498,21 +1561,221 @@ app.post('/api/order', auth, (req, res) => {
   res.json({ ok: true, order });
 });
 
-// bestelling betalen (Face ID op het toestel)
+// Betalen: volledig, gedeeld in gelijke delen, of precies de eigen
+// gerechten — altijd met optionele fooi. Deelbetalingen stapelen op tot
+// de rekening compleet is; de zaak ziet elke deelbetaling live.
 app.post('/api/order/pay', auth, (req, res) => {
   const o = db.data.orders.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
-  o.paid = true;
+  o.payments = o.payments || [];
+  const alBetaald = o.payments.reduce((s, p) => s + p.bedrag, 0);
+  const rest = Math.max(0, o.total - alBetaald);
+  const mode = req.body.mode === 'gelijk' ? 'gelijk' : req.body.mode === 'items' ? 'items' : 'vol';
+  let bedrag = rest;
+  let omschrijving = 'de rekening';
+  if (mode === 'gelijk') {
+    const personen = Math.min(20, Math.max(2, parseInt(req.body.personen, 10) || 2));
+    bedrag = Math.min(rest, Math.round((o.total / personen) * 100) / 100);
+    omschrijving = '1/' + personen + ' deel';
+  } else if (mode === 'items') {
+    const ids = Array.isArray(req.body.itemIds) ? req.body.itemIds.map(String) : [];
+    bedrag = Math.min(rest, o.items.filter(i => ids.includes(String(i.id))).reduce((s, i) => s + i.price * i.qty, 0));
+    if (!(bedrag > 0)) return res.status(400).json({ error: 'Kies eerst je eigen gerechten.' });
+    omschrijving = 'eigen gerechten';
+  }
+  if (!(bedrag > 0)) return res.status(400).json({ error: 'Er staat niets meer open op deze rekening.' });
+  const fooi = Math.min(500, Math.max(0, Math.round((Number(req.body.fooi) || 0) * 100) / 100));
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  o.payments.push({ door: codename, bedrag, fooi, mode, at: new Date().toISOString() });
+  o.fooi = Math.round(((o.fooi || 0) + fooi) * 100) / 100;
+  const totaalBetaald = alBetaald + bedrag;
+  if (totaalBetaald >= o.total - 0.01) o.paid = true;
   save();
-  notifySupplier(o.supplierCode, { icon: '✅', title: 'Betaald', body: o.customerCodename + ' heeft € ' + o.total + ' voldaan.' });
+  notifySupplier(o.supplierCode, {
+    icon: o.paid ? '✅' : '💳',
+    title: o.paid ? 'Rekening voldaan' : 'Deelbetaling',
+    body: codename + ' betaalde € ' + bedrag.toLocaleString('nl-NL') + ' (' + omschrijving + ')'
+      + (fooi ? ' + € ' + fooi.toLocaleString('nl-NL') + ' fooi' : '')
+      + (o.paid ? '. Rekening compleet.' : '. Nog open: € ' + Math.max(0, Math.round((o.total - totaalBetaald) * 100) / 100).toLocaleString('nl-NL') + '.')
+  });
   sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, order: o });
+  res.json({ ok: true, order: o, betaald: bedrag, fooi, rest: Math.max(0, Math.round((o.total - totaalBetaald) * 100) / 100) });
 });
 
 app.post('/api/orders/mine', auth, (req, res) => {
   res.json({ orders: db.data.orders.filter(o => (o.customerKey || o.customerTier) === req.session.key) });
+});
+
+/* ================= KEUKEN-INTELLIGENTIE (horeca) =================
+   Rooster, recepten, pratende schermen, inkoop en mise en place voor
+   restaurants, bars en clubs. De intelligentie is uitlegbaar en
+   deterministisch: weer + kassa + brigade in, beslissingen met reden uit. */
+
+const DAGEN = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
+const DRUKTE_BASIS = { ma: 0.55, di: 0.6, wo: 0.7, do: 0.85, vr: 1.1, za: 1.25, zo: 0.9 };
+
+function keukenCap(req, res) {
+  const caps = (db.data.supplierTypes[req.supplier.type] || {}).caps || [];
+  if (!caps.includes('kitchen')) { res.status(403).json({ error: 'Geen keukenfuncties voor dit type zaak.' }); return false; }
+  return true;
+}
+const weerVoor = city => db.data.keuken.weer[city] || db.data.keuken.weer.Kyoto;
+const brigadeVoor = code => db.data.keuken.staf[code] || db.data.keuken.staf.KIKUNOI;
+
+// verwachte drukte per dag: weekdag-patroon + weer (regen drukt de inloop)
+function drukte(dagIdx, w) {
+  let d = DRUKTE_BASIS[DAGEN[dagIdx]];
+  if (w.regen >= 60) d -= 0.15; else if (w.regen === 0 && w.temp >= 20) d += 0.1;
+  return Math.round(d * 100) / 100;
+}
+
+/* 1. Slimme roostermaker: weer, locatie, skill, contracturen, afspraken, kosten. */
+app.post('/api/supplier/rooster', supplierAuth, (req, res) => {
+  if (!keukenCap(req, res)) return;
+  const weer = weerVoor(req.supplier.city);
+  const brigade = brigadeVoor(req.supplier.code).map(m => ({ ...m, ingepland: 0 }));
+  const uitleg = [];
+  let kosten = 0;
+  const week = DAGEN.map((dag, i) => {
+    const w = weer[i];
+    const d = drukte(i, w);
+    const piek = d >= 1;
+    const nodig = Math.max(2, Math.round(brigade.length * Math.min(1, d / 1.1)));
+    // beschikbaar = geen vaste afspraak die dag; op piekdagen skill eerst,
+    // op rustige dagen wie uren tekortkomt en de laagste loonkosten
+    const beschikbaar = brigade.filter(m => !m.afspraken.includes(dag));
+    beschikbaar.sort((a, b) => piek
+      ? (b.skill - a.skill) || ((a.ingepland / a.contract) - (b.ingepland / b.contract))
+      : ((a.ingepland / a.contract) - (b.ingepland / b.contract)) || (a.uurloon - b.uurloon));
+    const dienst = beschikbaar.slice(0, Math.min(nodig, beschikbaar.length));
+    dienst.forEach(m => { m.ingepland += 8; kosten += 8 * m.uurloon; });
+    const noot = w.regen >= 60 ? 'regen (' + w.regen + '%): kleinere bezetting'
+      : piek ? 'piekdag: sterkste brigade staat'
+      : d <= 0.6 ? 'rustig: minimale bezetting, laagste loonkosten' : '';
+    return { dag, temp: w.temp, regen: w.regen, verwacht: Math.round(d * 40), mensen: dienst.map(m => ({ naam: m.naam, rol: m.rol, skill: m.skill })), noot };
+  });
+  const regenDagen = weer.filter(w => w.regen >= 60).map(w => w.dag);
+  if (regenDagen.length) uitleg.push('☔ ' + regenDagen.join(' en ') + ' ≥ 60% regen in ' + req.supplier.city + ' (' + (req.supplier.loc && req.supplier.loc.label || '') + '): looploop valt weg, bezetting omlaag.');
+  for (const m of brigade) {
+    if (m.ingepland < m.contract - 8) uitleg.push('⚠ ' + m.naam + ' komt ' + (m.contract - m.ingepland) + ' uur tekort op ' + m.contract + ' contracturen — extra dienst of verlof afstemmen.');
+    else if (m.ingepland >= m.contract) uitleg.push('✓ ' + m.naam + ' zit op contracturen (' + m.ingepland + '/' + m.contract + ').');
+    if (m.afspraken.length) uitleg.push('✓ Afspraak gerespecteerd: ' + m.naam + ' staat niet op ' + m.afspraken.join('/') + '.');
+  }
+  const naief = brigade.reduce((s, m) => s + 7 * 8 * m.uurloon, 0);
+  const besparing = Math.max(0, naief - kosten);
+  uitleg.push('💶 Loonkosten deze week € ' + kosten.toLocaleString('nl-NL') + ' — € ' + besparing.toLocaleString('nl-NL') + ' bespaard t.o.v. volle bezetting, zonder piekdagen te verzwakken.');
+  const rooster = { week, uitleg, kosten, besparing, at: new Date().toISOString() };
+  db.data.keuken.rooster[req.supplier.code] = rooster;
+  save();
+  logActivity(req.supplier.code, req.actor, 'liet de AI een weekrooster maken (€ ' + besparing.toLocaleString('nl-NL') + ' besparing)');
+  res.json({ rooster });
+});
+
+/* 3. Pratende keuken- en passchermen: parties + advies zodat niets vastloopt. */
+app.post('/api/supplier/kds', supplierAuth, (req, res) => {
+  if (!keukenCap(req, res)) return;
+  const code = req.supplier.code;
+  const rec = db.data.keuken.recepten[code] || {};
+  const open = db.data.orders.filter(o => o.supplierCode === code && ['nieuw', 'in bereiding'].includes(o.status));
+  const klaar = db.data.orders.filter(o => o.supplierCode === code && o.status === 'klaar');
+  const parties = {};
+  for (const o of open) for (const it of o.items) {
+    const r = rec[it.id] || {};
+    const p = r.partie || 'keuken';
+    (parties[p] = parties[p] || []).push({ ref: o.ref, item: it.name, qty: it.qty, tijd: r.tijd || 10, status: o.status, gast: o.customerCodename, allergie: o.allergyNote || null });
+  }
+  const adviesKeuken = [], adviesPas = [];
+  const warm = parties.warm || parties.bar || [];
+  const koud = parties.koud || [];
+  if (warm.length >= 2) {
+    const langste = warm.slice().sort((a, b) => b.tijd - a.tijd)[0];
+    adviesKeuken.push('🔥 ' + (parties.warm ? 'Warm' : 'Bar') + ' loopt vol (' + warm.length + ' tickets): start de langste bereiding eerst — ' + langste.item + ' (' + langste.tijd + ' min).');
+  }
+  if (koud.length && warm.length >= 2) adviesKeuken.push('🥢 Koud: leg ' + koud[0].item + ' pas op het laatst op — anders staat het droog te worden terwijl warm nog ' + warm.length + ' tickets heeft.');
+  for (const [p, list] of Object.entries(parties)) {
+    const alg = list.find(x => x.allergie);
+    if (alg) adviesKeuken.push('⚠ ' + p + ': allergie op ticket ' + alg.ref + ' (' + alg.allergie + ') — aparte plank, apart gereedschap.');
+  }
+  if (klaar.length) adviesPas.push('🛎️ ' + klaar.length + ' bord(en) staan klaar op de pas — nu lopen, de warmte is het bord.');
+  const nieuw = open.filter(o => o.status === 'nieuw');
+  if (nieuw.length >= 2) adviesPas.push('⏱️ ' + nieuw.length + ' nieuwe tickets: geef de keuken de volgorde door, oudste eerst.');
+  else if (nieuw.length === 1) adviesPas.push('📋 Nieuw ticket van ' + nieuw[0].customerCodename + ' — bevestig richting gast, keuken is ingelicht.');
+  if (!open.length && !klaar.length) {
+    adviesKeuken.push('✅ Geen open tickets. Gebruik de luwte voor de mise en place van vanavond.');
+    adviesPas.push('✅ De pas is schoon. Loop de reserveringen van vanavond na.');
+  }
+  res.json({ parties: Object.entries(parties).map(([partie, tickets]) => ({ partie, tickets })), adviesKeuken, adviesPas, klaar: klaar.length });
+});
+
+/* 4. Inkoopsuggesties: kassa + schoonmaakplanning, of event-modus met
+   personen/allergenen → bestellijst inclusief vervangende gerechten. */
+app.post('/api/supplier/inkoop', supplierAuth, (req, res) => {
+  if (!keukenCap(req, res)) return;
+  const code = req.supplier.code;
+  const menu = req.supplier.menu || [];
+  const rec = db.data.keuken.recepten[code] || {};
+  const ev = req.body.event;
+  if (ev && ev.personen) {
+    const personen = Math.min(500, Math.max(1, parseInt(ev.personen, 10) || 1));
+    const allergenen = (Array.isArray(ev.allergenen) ? ev.allergenen : String(ev.allergenen || '').split(/[,;]/))
+      .map(s => String(s).trim().toLowerCase()).filter(Boolean);
+    const gezien = new Set(); const lijst = []; const vervangers = [];
+    for (const m of menu) {
+      const conflict = (m.allergens || []).filter(a => allergenen.includes(a));
+      if (conflict.length) {
+        const alt = menu.find(x => x.id !== m.id && !(x.allergens || []).some(a => allergenen.includes(a)));
+        vervangers.push({ gerecht: m.name, allergeen: conflict.join(', '), vervangDoor: alt ? alt.name : 'chef stelt een alternatief samen', voorAantal: Math.max(1, Math.ceil(personen * 0.15)) });
+      }
+      for (const i of ((rec[m.id] || {}).ingredienten || []).slice(0, 2)) {
+        if (gezien.has(i)) continue; gezien.add(i);
+        lijst.push({ product: i, hoeveelheid: 'voor ' + personen + ' couverts (+8% marge)', reden: m.name });
+      }
+    }
+    logActivity(code, req.actor, 'maakte een event-bestellijst (' + personen + ' personen' + (allergenen.length ? ', allergenen: ' + allergenen.join(', ') : '') + ')');
+    sseToOffice('notify', { icon: '📦', title: 'Event-inkoop ' + req.supplier.name, body: personen + ' personen' + (allergenen.length ? ' · ' + allergenen.join(', ') : '') + (ev.datum ? ' · ' + ev.datum : '') });
+    return res.json({ event: { personen, allergenen, datum: String(ev.datum || '').slice(0, 40) }, lijst, vervangers, noot: 'Hoeveelheden inclusief 8% marge. Voor gasten met een allergie staat een vervangend gerecht ingepland; de bestelling dekt beide.' });
+  }
+  // kassagedreven: wat verkocht is bepaalt wat besteld wordt, weekend +40%
+  const betaald = db.data.orders.filter(o => o.supplierCode === code && o.paid);
+  const verkocht = {};
+  for (const o of betaald) for (const it of o.items) verkocht[it.id] = (verkocht[it.id] || 0) + it.qty;
+  const gezien = new Set(); const lijst = [];
+  for (const m of menu) {
+    const n = verkocht[m.id] || 0;
+    const basis = Math.max(1, Math.ceil(n * 1.4));
+    for (const i of ((rec[m.id] || {}).ingredienten || []).slice(0, 2)) {
+      if (gezien.has(i)) continue; gezien.add(i);
+      lijst.push({ product: i, hoeveelheid: basis + '× dagvoorraad', reden: n ? 'kassa: ' + n + '× ' + m.name + ' verkocht' : 'basisvoorraad voor ' + m.name });
+    }
+  }
+  const schoonmaak = (db.data.keuken.schoonmaak[code] || []).map(s => ({ product: s.product, hoeveelheid: '1×', reden: s.taak + ' (' + s.wanneer + ')' }));
+  res.json({ lijst, schoonmaak, noot: 'Op basis van de kassa (' + betaald.length + ' betaalde bestellingen), het aankomende weekend (+40%) en de schoonmaakplanning.' });
+});
+
+/* 5. Automatische mise en place: weekverloop + weer + inkooplevering. */
+app.post('/api/supplier/mise', supplierAuth, (req, res) => {
+  if (!keukenCap(req, res)) return;
+  const code = req.supplier.code;
+  const rec = db.data.keuken.recepten[code] || {};
+  const weer = weerVoor(req.supplier.city);
+  const idx = (new Date().getDay() + 6) % 7;   // 0 = maandag
+  const w = weer[idx];
+  const d = drukte(idx, w);
+  const couverts = Math.round(d * 40);
+  const factor = Math.max(1, Math.round(couverts / 15));
+  const parties = {};
+  for (const m of (req.supplier.menu || [])) {
+    const r = rec[m.id]; if (!r) continue;
+    (parties[r.partie] = parties[r.partie] || []).push(...(r.mise || []).map(taak => ({ taak, hoeveelheid: factor + '× basis', voor: m.name })));
+  }
+  const notes = [
+    '📅 ' + DAGEN[idx] + ': verwacht ~' + couverts + ' couverts (' + Math.round(d * 100) + '% van piek' + (w.regen >= 60 ? ', regen drukt de inloop' : w.regen === 0 && w.temp >= 20 ? ', mooi weer trekt aan' : '') + ').',
+    idx >= 3 && idx <= 5 ? '📈 Aanloop naar het weekend: mise ruimer draaien, morgen wordt drukker.' : '📉 Doordeweeks: krap draaien — verspilling kost meer dan bijsnijden.',
+    '🚚 De inkooplevering komt om 14:00: verse vis en zuivel pas ná levering verwerken.'
+  ];
+  res.json({ dag: DAGEN[idx], couverts, parties: Object.entries(parties).map(([partie, taken]) => ({ partie, taken })), notes });
 });
 
 /* ================= LIVE REIS (onderweg) =================

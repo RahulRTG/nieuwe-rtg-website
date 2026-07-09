@@ -580,6 +580,20 @@
   .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
   .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
 
+  /* ---- gastchat met een partner ---- */
+  .pc-body{display:flex;flex-direction:column;gap:0.55rem;padding-top:0.9rem;min-height:200px;}
+  .pc-msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.86rem;line-height:1.45;}
+  .pc-msg.me{align-self:flex-end;background:var(--burgundy-deep);border-top-right-radius:5px;color:#fff;}
+  .pc-msg.them{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-top-left-radius:5px;}
+  .pc-msg .who{display:block;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:0.15rem;}
+  .pc-msg.me .who{color:rgba(255,255,255,0.65);}
+  .pc-msg time{display:block;margin-top:0.25rem;font-size:0.58rem;color:var(--soft);}
+  .pc-empty{padding:1.6rem 0.5rem;text-align:center;color:var(--soft);font-size:0.82rem;line-height:1.6;}
+  .pc-foot{display:flex;gap:0.5rem;padding:0.8rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);border-top:1px solid var(--line);}
+  .pc-foot input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;}
+  .pc-foot button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 1.2rem;font-size:0.84rem;font-weight:600;}
+  .sup-card .chatb{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;width:36px;height:36px;font-size:0.95rem;flex-shrink:0;margin-right:0.4rem;}
+
   /* ---- oplichtend ophaalcode-scherm ---- */
   #glowCode{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;cursor:pointer;
     background:radial-gradient(circle at 50% 42%, #FFF8E7 0%, #F3E3B8 45%, #D9B96A 100%);animation:gcbreathe 2.4s ease-in-out infinite;}
@@ -792,6 +806,20 @@
     </div>
     <div class="ms-body" id="msBody"></div>
     <div class="ms-foot" id="msFoot"></div>
+  </div>
+
+  <!-- gastchat met een partner (roomservice, eigenaar) -->
+  <div id="pchat-scrim" class="menu-scrim"></div>
+  <div id="pchat-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b id="pcName"></b><span data-i18n="app.pc.sub">Rechtstreeks contact, op uw codenaam</span></div>
+      <button class="ms-close" id="pcClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body pc-body" id="pcBody"></div>
+    <div class="pc-foot">
+      <input id="pcInput" placeholder="Typ een bericht" data-i18n-ph="app.pc.ph" autocomplete="off">
+      <button id="pcSend" data-i18n="app.pc.send">Stuur</button>
+    </div>
   </div>
 
   <div id="glowCode">
@@ -1036,6 +1064,7 @@
     else if (scope === 'salon'){ renderSalon(); renderHome(); }
     else if (scope === 'orders'){ renderTerPlaatse(); }
     else if (scope === 'live'){ renderLive(); }
+    else if (scope === 'gchat'){ if (pchat) loadPChat(); }
     else if (scope === 'chat'){ if (user.account) renderChat(); }
     else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
   }
@@ -1163,11 +1192,13 @@
       return '<div class="sup-card">' +
         '<span class="ic">' + (s.icon || '📍') + '</span>' +
         '<div class="t"><b>' + s.name + '</b><span>' + sub + '</span></div>' +
+        '<button class="chatb" data-chat="' + s.code + '" aria-label="Chat">💬</button>' +
         (viewable
           ? '<button class="go" data-menu="' + s.code + '">'+(s.hasMenu ? T('app.tp.viewmenu','Bekijk kaart') : T('app.tp.view','Bekijk'))+'</button>'
           : '<button class="go ghost" data-loc="' + s.code + '">'+T('app.tp.location','Locatie')+'</button>') +
       '</div>';
     }).join('');
+    $('#supplierList').querySelectorAll('[data-chat]').forEach(b => b.addEventListener('click', () => openPChat(b.dataset.chat)));
     $('#supplierList').querySelectorAll('[data-menu]').forEach(b => b.addEventListener('click', () => openMenu(b.dataset.menu)));
     $('#supplierList').querySelectorAll('[data-loc]').forEach(b => b.addEventListener('click', () => {
       const s = suppliers.find(x => x.code === b.dataset.loc);
@@ -1419,6 +1450,52 @@
 
   $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
   $('#menu-scrim').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
+
+  /* ---------- gastchat met een partner ---------- */
+  let pchat = null; // { code, name }
+  async function openPChat(code){
+    const s = suppliers.find(x => x.code === code);
+    if (!s) return;
+    pchat = { code, name: s.name };
+    $('#pcName').textContent = s.name;
+    $('#pchat-sheet').classList.add('open');
+    $('#pchat-scrim').classList.add('open');
+    await loadPChat();
+    $('#pcInput').focus();
+  }
+  function closePChat(){
+    pchat = null;
+    $('#pchat-sheet').classList.remove('open');
+    $('#pchat-scrim').classList.remove('open');
+  }
+  async function loadPChat(){
+    if (!pchat) return;
+    let msgs = [];
+    try { msgs = (await API.call('/partner/chat/history', { supplierCode: pchat.code })).messages || []; }
+    catch(e){ return; }
+    renderPChat(msgs);
+  }
+  function renderPChat(msgs){
+    $('#pcBody').innerHTML = msgs.length ? msgs.map(m =>
+      '<div class="pc-msg ' + (m.from === 'guest' ? 'me' : 'them') + '">' +
+        (m.from === 'partner' ? '<span class="who">' + m.who + '</span>' : '') +
+        m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
+        '<time>' + timeAgo(m.at) + '</time></div>'
+    ).join('') : '<div class="pc-empty">' + T('app.pc.empty','Stel uw vraag rechtstreeks aan het team. Roomservice, een verzoek aan de eigenaar, of gewoon even iets regelen.') + '</div>';
+    const b = $('#pcBody'); b.scrollTop = b.scrollHeight;
+  }
+  async function sendPChat(){
+    const inp = $('#pcInput');
+    const text = (inp.value || '').trim();
+    if (!text || !pchat) return;
+    inp.value = '';
+    try { renderPChat((await API.call('/partner/chat/send', { supplierCode: pchat.code, text })).messages); }
+    catch(e){ toast(e.message); }
+  }
+  $('#pcClose').addEventListener('click', closePChat);
+  $('#pchat-scrim').addEventListener('click', closePChat);
+  $('#pcSend').addEventListener('click', sendPChat);
+  $('#pcInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendPChat(); });
 
   /* ---------- oplichtend ophaalcode-scherm ---------- */
   function showGlow(o){
@@ -1865,6 +1942,8 @@ window.I18N = { en: {
   'live.shared':'Location shared with your partners.', 'live.geodenied':'Location unavailable. Use "Simulate ride" for the demo.', 'live.geono':'Location is not available here.',
   'live.nosim':'Choose a destination first.', 'live.simstart':'Simulation started, you are approaching the destination.',
   'live.door':'Open the door', 'live.dooropen':'is open. It locks itself after', 'live.sec':'seconds.',
+  'app.pc.sub':'Direct contact, under your codename', 'app.pc.ph':'Type a message', 'app.pc.send':'Send',
+  'app.pc.empty':'Ask the team directly. Room service, a request to the owner, or just arranging something.',
   'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
   'app.roomsfree':'room(s) available', 'app.tp.view':'View',
   'app.ms.rooms':'Available rooms', 'app.ms.pernight':'p.n.', 'app.ms.roomnote':'Booking goes via your concierge or Butler AI, at net price.',

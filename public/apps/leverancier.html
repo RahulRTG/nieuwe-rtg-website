@@ -122,6 +122,15 @@
   .ph-pick img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid transparent;flex-shrink:0;cursor:pointer;}
   .ph-pick img.sel{border-color:var(--gold);}
 
+  /* gastchat */
+  .gc-row{display:flex;align-items:center;gap:0.75rem;width:100%;background:none;border:none;border-bottom:1px solid var(--line);padding:0.75rem 0;text-align:left;color:var(--txt);}
+  .gc-row:last-of-type{border-bottom:none;}
+  .gc-row .av{width:36px;height:36px;flex-shrink:0;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:var(--gold);}
+  .gc-row .gt{flex:1;min-width:0;}
+  .gc-row .gt b{display:block;font-size:0.88rem;font-weight:600;}
+  .gc-row .gt > span{display:block;font-size:0.72rem;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .gc-unread{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;background:var(--burgundy);color:#fff;border-radius:999px;font-size:0.6rem;font-style:normal;font-weight:700;vertical-align:middle;margin-left:0.3rem;}
+
   /* deuren */
   .door-row{display:flex;align-items:center;gap:0.8rem;padding:0.75rem 0;border-bottom:1px solid var(--line);}
   .door-row:last-of-type{border-bottom:none;}
@@ -399,6 +408,11 @@
         <p class="sub" data-i18n="sup.v.rooms.sub">Zet kamers aan of uit. Gasten zien alleen wat aan staat, live.</p>
         <div id="roomsWrap"></div>
       </div>
+      <div class="view" data-view="gchat">
+        <h2 data-i18n="sup.v.gchat">Gastchat</h2>
+        <p class="sub" data-i18n="sup.v.gchat.sub">Rechtstreekse berichten van gasten: roomservice, verzoeken, vragen.</p>
+        <div id="gchatWrap"></div>
+      </div>
       <div class="view" data-view="page">
         <h2 data-i18n="sup.v.page">Uw pagina</h2>
         <p class="sub" data-i18n="sup.v.page.sub">Foto's die gasten zien, en publiceer rechtstreeks op De Salon.</p>
@@ -460,6 +474,7 @@
     doors:    { label:'Deuren',    svg:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><circle cx="15" cy="12" r="1.2"/><path d="M5 21h14"/>', cap:'doors' },
     gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>', cap:'bookings' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
+    gchat:    { label:'Gastchat',  svg:'<path d="M21 12a8 8 0 0 1-8 8H4l2.5-3A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>' },
     page:     { label:'Pagina',    svg:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6"/>' },
     team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' }
   };
@@ -617,7 +632,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderDoors(); renderGasten(); renderPage(); renderTeam();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -1042,6 +1057,57 @@
     }));
   }
 
+  // ---- gastchat: berichten van gasten beantwoorden ----
+  let gchatKey = null; // open gesprek
+  function renderGChat(){
+    const el = $('#gchatWrap'); if (!el) return;
+    const chats = state.guestChats || [];
+    if (gchatKey && !chats.find(c => c.key === gchatKey)) gchatKey = null;
+    if (!gchatKey){
+      el.innerHTML = '<div class="card">' + (chats.length ? chats.map(c =>
+        '<button class="gc-row" data-gchat="' + c.key + '">' +
+          '<span class="av">' + c.codename.split(' ').map(w=>w[0]).slice(0,2).join('') + '</span>' +
+          '<span class="gt"><b>' + c.codename + (c.unread ? ' <i class="gc-unread">' + c.unread + '</i>' : '') + '</b>' +
+          '<span>' + (c.lastFrom === 'partner' ? T('gc.you','U: ') : '') + c.last + ' · ' + timeAgo(c.lastAt) + '</span></span>' +
+        '</button>'
+      ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">' + T('gc.none','Nog geen gesprekken. Berichten van gasten verschijnen hier live.') + '</div>') + '</div>';
+      el.querySelectorAll('[data-gchat]').forEach(b => b.addEventListener('click', () => { gchatKey = b.dataset.gchat; renderGChat(); openTab('gchat'); }));
+      return;
+    }
+    const meta = chats.find(c => c.key === gchatKey);
+    el.innerHTML = '<button class="sp-back" id="gcBack">← ' + T('gc.back','Alle gesprekken') + '</button>' +
+      '<div class="card"><div class="tt-h">' + T('sup.guest','Gast') + ' <span style="color:var(--gold);">' + (meta ? meta.codename : '') + '</span></div>' +
+      '<div class="tt-chat" id="gcThread"></div>' +
+      '<div class="tt-compose"><input id="gcMsg" placeholder="' + T('gc.ph','Antwoord de gast') + '" autocomplete="off"><button id="gcSend">' + T('team.send','Stuur') + '</button></div></div>';
+    $('#gcBack').addEventListener('click', () => { gchatKey = null; renderGChat(); openTab('gchat'); });
+    $('#gcSend').addEventListener('click', sendGChat);
+    $('#gcMsg').addEventListener('keydown', e => { if (e.key === 'Enter') sendGChat(); });
+    loadGChatThread();
+  }
+  async function loadGChatThread(){
+    if (!gchatKey) return;
+    try {
+      const d = await API.call('/supplier/chat/history', { key: gchatKey });
+      fillGChatThread(d.messages);
+    } catch(e){}
+  }
+  function fillGChatThread(msgs){
+    const t = $('#gcThread'); if (!t) return;
+    t.innerHTML = (msgs || []).map(m =>
+      '<div class="tt-msg ' + (m.from === 'partner' ? 'me' : 'other') + '"><span class="who">' + m.who + '</span>' +
+      m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '<time>' + timeAgo(m.at) + '</time></div>'
+    ).join('');
+    t.scrollTop = t.scrollHeight;
+  }
+  async function sendGChat(){
+    const inp = $('#gcMsg');
+    const text = (inp.value || '').trim();
+    if (!text || !gchatKey) return;
+    inp.value = '';
+    try { fillGChatThread((await API.call('/supplier/chat/send', { key: gchatKey, text })).messages); }
+    catch(e){ toast(e.message); }
+  }
+
   // ---- pagina: foto's + publiceren op De Salon ----
   function fileToDataURL(file, cb){
     const reader = new FileReader();
@@ -1260,6 +1326,8 @@ window.I18N = { en: {
   'gst.nearby':'On the move now (not yet connected)', 'gst.nonearby':'Nobody is live on the move right now.',
   'gst.to':'to', 'gst.connect':'Connect', 'gst.done':'Connected. The guest has been notified.',
   'gst.note':'Connecting notifies the guest: you follow the arrival to have everything ready. You then see the live position and arrival time.',
+  'tab.gchat':'Guest chat', 'sup.v.gchat':'Guest chat', 'sup.v.gchat.sub':'Direct messages from guests: room service, requests, questions.',
+  'gc.none':'No conversations yet. Guest messages appear here live.', 'gc.you':'You: ', 'gc.back':'All conversations', 'gc.ph':'Reply to the guest',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

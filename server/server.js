@@ -153,6 +153,7 @@ function initRealtime() {
     });
   }
   if (!db.data.posSales) db.data.posSales = {};                   // kassaverkopen per bedrijf
+  if (!db.data.guestChats) db.data.guestChats = {};               // gastchats: lid <-> partner (roomservice, eigenaar)
   if (webpush) {
     if (!db.data.vapid) {
       db.data.vapid = webpush.generateVAPIDKeys();
@@ -777,6 +778,10 @@ function supplierState(s, actor) {
     doors: s.doors || null,
     photos: s.photos || [],
     pos: posDay(s.code),
+    guestChats: Object.entries(db.data.guestChats)
+      .filter(([, c]) => c.supplierCode === s.code && c.messages.length)
+      .map(([k, c]) => ({ key: k, codename: c.codename, unread: c.unreadPartner, last: c.messages[c.messages.length - 1].text.slice(0, 60), lastFrom: c.messages[c.messages.length - 1].from, lastAt: c.lastAt }))
+      .sort((a, b) => (b.lastAt || '').localeCompare(a.lastAt || '')),
     // leden die nu live onderweg zijn maar nog niet met dit bedrijf verbonden
     nearbyGuests: Object.values(db.data.live)
       .filter(L => L.active && !connectedSupplierCodes(L.key).includes(s.code))
@@ -1116,6 +1121,76 @@ app.post('/api/live/door', auth, (req, res) => {
   logActivity(dest.code, { name: L.codename }, 'gast opende "' + door.name + '" via de app');
   notifySupplier(dest.code, { icon: '🔓', title: 'Deur geopend', body: L.codename + ' heeft "' + door.name + '" geopend via de app.' });
   res.json({ ok: true, door: { name: door.name, relockSec: DOOR_RELOCK_MS / 1000 } });
+});
+
+/* ---- gastchat: rechtstreeks appen met roomservice of de eigenaar ----
+   Een gesprek per lid per partner, op codenaam. De gast begint vanuit de
+   leden-app; het personeel antwoordt vanuit de Gastchat-tab. Beide kanten
+   live via SSE, met notificaties over en weer. */
+function chatKeyOf(supplierCode, customerKey) { return supplierCode + '|' + customerKey; }
+function getChat(supplierCode, customerKey, codename, tier) {
+  const k = chatKeyOf(supplierCode, customerKey);
+  if (!db.data.guestChats[k]) {
+    db.data.guestChats[k] = { supplierCode, customerKey, codename, tier, messages: [], unreadGuest: 0, unreadPartner: 0, lastAt: null };
+  }
+  return db.data.guestChats[k];
+}
+
+// gast stuurt een bericht aan een partner
+app.post('/api/partner/chat/send', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const text = String(req.body.text || '').trim().slice(0, 500);
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const chat = getChat(s.code, req.session.key, codename, req.session.tier);
+  chat.codename = codename;
+  chat.messages.push({ from: 'guest', who: codename, text, at: new Date().toISOString() });
+  chat.messages = chat.messages.slice(-120);
+  chat.unreadPartner += 1;
+  chat.lastAt = new Date().toISOString();
+  save();
+  notifySupplier(s.code, { icon: '💬', title: codename, body: text.slice(0, 90) });
+  sseToSupplier(s.code, 'sync', { scope: 'gchat' });
+  sseToCustomer(req.session.key, 'sync', { scope: 'gchat' });
+  res.json({ ok: true, messages: chat.messages });
+});
+
+// gast opent het gesprek (en markeert het als gelezen)
+app.post('/api/partner/chat/history', auth, (req, res) => {
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const k = chatKeyOf(s.code, req.session.key);
+  const chat = db.data.guestChats[k];
+  if (chat && chat.unreadGuest) { chat.unreadGuest = 0; save(); }
+  res.json({ messages: chat ? chat.messages : [] });
+});
+
+// personeel antwoordt (onder eigen naam, uit het persoonlijke account)
+app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
+  const chat = db.data.guestChats[String(req.body.key || '')];
+  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
+  const text = String(req.body.text || '').trim().slice(0, 500);
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  chat.messages.push({ from: 'partner', who: req.actor.name, text, at: new Date().toISOString() });
+  chat.messages = chat.messages.slice(-120);
+  chat.unreadGuest += 1;
+  chat.lastAt = new Date().toISOString();
+  save();
+  logActivity(req.supplier.code, req.actor, 'antwoordde ' + chat.codename + ' in de gastchat');
+  notify(chat.tier, { icon: '💬', title: req.supplier.name, body: text.slice(0, 90), scope: 'gchat' });
+  sseToCustomer(chat.customerKey, 'sync', { scope: 'gchat' });
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
+  res.json({ ok: true, messages: chat.messages });
+});
+
+// personeel opent een gesprek (en markeert het als gelezen)
+app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
+  const chat = db.data.guestChats[String(req.body.key || '')];
+  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
+  if (chat.unreadPartner) { chat.unreadPartner = 0; save(); }
+  res.json({ messages: chat.messages, codename: chat.codename });
 });
 
 /* ---- verbinding maken met een gast (hotel/appartement) ----

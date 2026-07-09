@@ -679,22 +679,107 @@
     });
   }
 
-  // Stap 1: bedrijf gekozen → toon "Wie ben je?" met het personeel van dit bedrijf.
-  let pickCode = null;
+  // Functies per genre: zo kiest personeel direct de eigen rol,
+  // en solliciteert een kandidaat overal op dezelfde manier.
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet' };
+  const FUNCS = {
+    restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
+    bar:        ['Bediening','Bar','Keuken','Security'],
+    club:       ['Bediening','Bar','Security'],
+    hotel:      ['Receptie','Housekeeping','Roomservice','Onderhoud','Security'],
+    apartment:  ['Beheer','Housekeeping','Onderhoud'],
+    taxi:       ['Taxi centrale','Chauffeur'],
+    jet:        ['Operations','Crew','Piloot']
+  };
+  let pickCode = null, gateRoster = null;
+  const spH2 = () => document.querySelector('#staffPick h2');
+  const spDeck = () => document.querySelector('#staffPick .sp-deck');
+
   async function pickPartner(code){
     if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return; }
     pickCode = code;
-    let roster = { supplier:{ name: code }, staff: [] };
-    try { roster = await API.call('/supplier/roster', { code }); } catch(e){}
-    $('#spBiz').textContent = roster.supplier.name;
-    $('#spList').innerHTML = (roster.staff||[]).map(m =>
-      '<button class="sp-person" data-sid="'+m.id+'" data-name="'+m.name.replace(/"/g,'&quot;')+'" data-role="'+m.role+'">'+
-        '<span class="av">'+initials(m.name)+'</span><span><b>'+m.name+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span></button>'
-    ).join('') || '<div class="empty" style="padding:1.2rem 0;">'+T('sp.nostaff','Nog geen persoonlijke accounts. Log in als bedrijfsaccount en voeg je team toe.')+'</div>';
-    document.querySelectorAll('.sp-person').forEach(b => b.addEventListener('click', () => openPin(b.dataset.sid, b.dataset.name, b.dataset.role)));
+    gateRoster = { supplier:{ name: code }, staff: [] };
+    try { gateRoster = await API.call('/supplier/roster', { code }); } catch(e){}
+    $('#spBiz').textContent = gateRoster.supplier.name;
+    $('#spBizBtn').style.display = 'none';
     $('#spPin').classList.remove('open');
+    renderRoles();
     $('#staffPick').classList.add('open');
   }
+  // Stap 1: de rol
+  function renderRoles(){
+    spH2().textContent = T('sp.roleq','Wie bent u?');
+    spDeck().textContent = T('sp.roledeck','Kies uw rol. Personeel logt in met de eigen pincode; alles wat u doet staat op uw naam.');
+    $('#spBack2') && $('#spBack2').remove();
+    $('#spList').innerHTML = [
+      ['personeel','👥',T('sp.r.staff','Personeel'),T('sp.r.staff.s','Bediening, keuken, receptie, chauffeurs...')],
+      ['management','⭐',T('sp.r.mgmt','Management'),T('sp.r.mgmt.s','Managers en chefs, met beheer-rechten')],
+      ['beheer','🗝️',T('sp.r.admin','Beheer'),T('sp.r.admin.s','Het bedrijfsaccount, volledige toegang')],
+      ['sollicit','📝',T('sp.r.apply','Solliciteren'),T('sp.r.apply.s','Werken bij ' + gateRoster.supplier.name + '? Solliciteer direct.')]
+    ].map(r =>
+      '<button class="sp-person" data-rol="'+r[0]+'"><span class="av">'+r[1]+'</span><span><b>'+r[2]+'</b><span>'+r[3]+'</span></span></button>'
+    ).join('');
+    $('#spList').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => {
+      const r = b.dataset.rol;
+      if (r === 'beheer') login({ code: pickCode }, false);
+      else if (r === 'management') renderPersons(null, true);
+      else if (r === 'personeel') renderFuncs();
+      else renderApply();
+    }));
+  }
+  // Stap 2a: personeel kiest de functie
+  function renderFuncs(){
+    const type = TYPEOF[pickCode] || 'restaurant';
+    spH2().textContent = T('sp.funcq','Wat is uw functie?');
+    spDeck().textContent = T('sp.funcdeck','Kies uw functie, daarna uw naam en pincode.');
+    $('#spList').innerHTML = (FUNCS[type]||[]).map(f =>
+      '<button class="sp-person" data-func="'+f.replace(/"/g,'&quot;')+'"><span class="av">'+f[0]+'</span><span><b>'+f+'</b></span></button>'
+    ).join('') + backBtn();
+    $('#spList').querySelectorAll('[data-func]').forEach(b => b.addEventListener('click', () => renderPersons(b.dataset.func, false)));
+    bindBack(renderRoles);
+  }
+  // Stap 2b/3: personen (van een functie, of het management)
+  function renderPersons(func, mgmt){
+    const all = gateRoster.staff || [];
+    let list = mgmt ? all.filter(m => m.role === 'manager')
+      : all.filter(m => (m.func||'').toLowerCase() === String(func).toLowerCase());
+    const fallback = !mgmt && !list.length;
+    if (fallback) list = all;
+    spH2().textContent = mgmt ? T('sp.r.mgmt','Management') : func;
+    spDeck().textContent = fallback ? T('sp.nofunc','Nog niemand met deze functie; kies uw naam uit het team.') : T('sp.pickname','Kies uw naam en voer uw pincode in.');
+    $('#spList').innerHTML = (list.map(m =>
+      '<button class="sp-person" data-sid="'+m.id+'" data-name="'+m.name.replace(/"/g,'&quot;')+'" data-role="'+m.role+'">'+
+        '<span class="av">'+initials(m.name)+'</span><span><b>'+m.name+'</b><span>'+(m.func||T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker'))+'</span></span></button>'
+    ).join('') || '<div class="empty" style="padding:1.2rem 0;">'+T('sp.nostaff','Nog geen persoonlijke accounts. Log in als Beheer en voeg je team toe.')+'</div>') + backBtn();
+    $('#spList').querySelectorAll('.sp-person[data-sid]').forEach(b => b.addEventListener('click', () => openPin(b.dataset.sid, b.dataset.name, b.dataset.role)));
+    bindBack(mgmt ? renderRoles : renderFuncs);
+  }
+  // Solliciteren: bij elk bedrijf hetzelfde formulier
+  function renderApply(){
+    const type = TYPEOF[pickCode] || 'restaurant';
+    spH2().textContent = T('sp.applyh','Solliciteren');
+    spDeck().textContent = T('sp.applydeck','Bij elke RTG-partner solliciteert u op dezelfde manier. Het bedrijf ziet uw sollicitatie direct in de app.');
+    $('#spList').innerHTML =
+      '<div class="field" style="margin-top:0.4rem;"><label>'+T('sp.a.name','Uw naam')+'</label><input id="apName"></div>'+
+      '<div class="field"><label>'+T('sp.a.func','Functie')+'</label><select id="apFunc" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
+        (FUNCS[type]||[]).map(f=>'<option>'+f+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>'+T('sp.a.contact','Telefoon of e-mail')+'</label><input id="apContact"></div>'+
+      '<div class="field"><label>'+T('sp.a.note','Korte motivatie (optioneel)')+'</label><textarea id="apNote" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;min-height:70px;resize:vertical;"></textarea></div>'+
+      '<button class="bigbtn" id="apSend">'+T('sp.a.send','Verstuur sollicitatie')+'</button>' + backBtn();
+    bindBack(renderRoles);
+    $('#apSend').addEventListener('click', async () => {
+      const name = $('#apName').value.trim(), contact = $('#apContact').value.trim();
+      if (!name || !contact){ toast(T('sp.a.fill','Vul uw naam en telefoonnummer of e-mailadres in.')); return; }
+      try {
+        await API.call('/supplier/apply', { code: pickCode, name, func: $('#apFunc').value, contact, note: $('#apNote').value.trim() });
+        toast(T('sp.a.sent','Verstuurd. ') + gateRoster.supplier.name + ' ' + T('sp.a.sent2','neemt contact met u op.'));
+        renderRoles();
+      } catch(e){ toast(e.message); }
+    });
+  }
+  function backBtn(){ return '<button class="sp-biz-btn" id="spBack2" style="margin-top:0.9rem;">← '+T('sp.back','Terug')+'</button>'; }
+  function bindBack(fn){ const b = $('#spBack2'); if (b) b.addEventListener('click', fn); }
+
   $('#spBack').addEventListener('click', () => $('#staffPick').classList.remove('open'));
   $('#spBizBtn').addEventListener('click', () => login({ code: pickCode }, false));
 
@@ -840,6 +925,8 @@
     if (defect) todos.push({ icon:'⚠️', txt: defect + ' ' + T('todo.defect','kamer(s) defect'), tab:'rooms' });
     const openTickets = (state.tickets || []).filter(t => t.status !== 'klaar').length;
     if (openTickets) todos.push({ icon:'🔧', txt: openTickets + ' ' + T('todo.tickets','open klus(sen)'), tab:'klussen' });
+    const newApps = (state.applications || []).filter(x => x.status === 'nieuw').length;
+    if (newApps) todos.push({ icon:'📝', txt: newApps + ' ' + T('todo.apps','nieuwe sollicitatie(s)'), tab:'team' });
     extra += '<div class="card"><div class="tt-h">' + T('todo.h','Vandaag nog doen') + '</div>' +
       (todos.length ? todos.map(t =>
         '<button class="todo-row" data-goto="' + t.tab + '"><span>' + t.icon + '</span><b>' + t.txt + '</b><i>›</i></button>'
@@ -1642,12 +1729,24 @@
       const buzz = you ? '' : '<button class="tt-buzz" data-buzz="'+m.id+'" title="'+T('team.buzz','Oproepen (tril)')+'">📳</button>';
       const rm = (a.manager && !you) ? '<button class="tt-rm" data-rm="'+m.id+'">'+T('team.remove','Verwijder')+'</button>' : '';
       const tag = you ? '<span class="you">'+T('team.you','jij')+'</span>' : '';
-      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+buzz+rm+'</div>';
+      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+(m.func? m.func+' · ':'')+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+buzz+rm+'</div>';
     }).join('') || '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
     if (a.manager){
-      html += '<div class="tt-add"><input id="ttName" placeholder="'+T('team.name','Naam')+'"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.add','Toevoegen')+'</button></div>';
+      html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="ttName" placeholder="'+T('team.name','Naam')+'" style="flex:2;min-width:110px;"><input id="ttFunc" placeholder="'+T('team.func','Functie')+'" style="flex:1;min-width:90px;"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.add','Toevoegen')+'</button></div>';
       if (lastPin) html += '<div class="tt-pinbox">'+T('team.pinintro','Pincode voor')+' '+lastPin.name+': <b>'+lastPin.pin+'</b><br>'+T('team.pinnote','Noteer deze code. Hiermee logt deze persoon in op zijn eigen account. De code is later niet meer te zien.')+'</div>';
     }
+    html += '</div>';
+
+    // sollicitaties: overal hetzelfde kanaal, de manager beslist
+    const apps = (state.applications || []).filter(x => x.status === 'nieuw');
+    const decided = (state.applications || []).filter(x => x.status !== 'nieuw').slice(0, 4);
+    html += '<div class="card"><div class="tt-h">'+T('ap.h','Sollicitaties')+(apps.length?' <i class="gc-unread">'+apps.length+'</i>':'')+'</div>';
+    html += apps.length ? apps.map(x =>
+      '<div class="tk-row"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+x.contact+(x.note?' · "'+x.note.slice(0,60)+'"':'')+' · '+timeAgo(x.at)+'</span></div>'+
+      (a.manager ? '<button class="obtn primary" data-aphire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-apno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button>' : '')+
+      '</div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.5rem 0;">'+T('ap.none','Geen open sollicitaties. Kandidaten solliciteren via het startscherm van deze app.')+'</div>';
+    html += decided.map(x => '<div class="tk-row done"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+x.status+'</span></div></div>').join('');
     html += '</div>';
 
     // activiteit
@@ -1678,6 +1777,17 @@
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
         toast(d.reached ? '📳 '+d.name+' '+T('team.buzzed','wordt opgeroepen.') : d.name+' '+T('team.buzzoff','heeft de app nu niet open.')); }
       catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-aphire]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/apply/decide', { id: b.dataset.aphire, action: 'aannemen' });
+        lastPin = { name: d.staff.name, pin: d.pin };
+        toast(T('ap.hired','Aangenomen. Pincode: ') + d.pin);
+        await refresh(); openTab('team');
+      } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-apno]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/apply/decide', { id: b.dataset.apno, action: 'afwijzen' }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
     }));
     const addBtn = $('#ttAdd'); if (addBtn) addBtn.addEventListener('click', addStaff);
     const send = $('#ttSend'); if (send) send.addEventListener('click', sendTeam);
@@ -1927,6 +2037,20 @@ window.I18N = { en: {
   'bh.note':'Closed = members instantly cannot order or reserve; the menu stays visible. Everything is logged.',
   'bh.more':'Manage further', 'bh.tips':'Edit the menu under Menu. Tables under Tables. Rooms and prices under Rooms. Staff and PINs under Team.',
   'bh.saved':'Saved, members see it immediately.',
+  'sp.roleq':'Who are you?', 'sp.roledeck':'Choose your role. Staff sign in with their own PIN; everything you do is on your name.',
+  'sp.r.staff':'Staff', 'sp.r.staff.s':'Service, kitchen, reception, drivers...',
+  'sp.r.mgmt':'Management', 'sp.r.mgmt.s':'Managers and chefs, with admin rights',
+  'sp.r.admin':'Administration', 'sp.r.admin.s':'The business account, full access',
+  'sp.r.apply':'Apply for a job', 'sp.r.apply.s':'Want to work here? Apply directly.',
+  'sp.funcq':'What is your role?', 'sp.funcdeck':'Pick your role, then your name and PIN.',
+  'sp.nofunc':'Nobody with this role yet; pick your name from the team.', 'sp.pickname':'Pick your name and enter your PIN.',
+  'sp.applyh':'Apply', 'sp.applydeck':'You apply the same way at every RTG partner. The business sees your application right in the app.',
+  'sp.a.name':'Your name', 'sp.a.func':'Position', 'sp.a.contact':'Phone or email', 'sp.a.note':'Short motivation (optional)',
+  'sp.a.send':'Send application', 'sp.a.fill':'Enter your name and a phone number or email.',
+  'sp.a.sent':'Sent. ', 'sp.a.sent2':'will contact you.',
+  'ap.h':'Applications', 'ap.hire':'Hire', 'ap.reject':'Reject', 'ap.hired':'Hired. PIN: ',
+  'ap.none':'No open applications. Candidates apply via the start screen of this app.',
+  'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',
   'memo.sent':'Voice memo sent.', 'memo.rec':'Recording... tap again to send.', 'memo.denied':'No microphone access.',

@@ -39,16 +39,16 @@ if (accounts.count() === 0) {
 
 // Demo-personeel per leverancier: een manager (PIN 1234) en een medewerker (PIN 5678).
 const STAFF_SEED = {
-  SAKURA: [['Naomi Sato', 'manager'], ['Ren Watanabe', 'staff']],
-  KIKUNOI: [['Yuki Tanaka', 'manager'], ['Kenji Mori', 'staff']],
-  PONTO: [['Aiko Sato', 'manager'], ['Ren Kimura', 'staff']],
-  HOSHI: [['Haruki Ito', 'manager'], ['Mei Kobayashi', 'staff']],
-  MKKX: [['Daisuke Yamamoto', 'manager']],
-  JETAG: [['Sophie Bakker', 'manager']]
+  SAKURA: [['Naomi Sato', 'manager', 'Beheer'], ['Ren Watanabe', 'staff', 'Onderhoud']],
+  KIKUNOI: [['Yuki Tanaka', 'manager', 'Keuken'], ['Kenji Mori', 'staff', 'Bediening']],
+  PONTO: [['Aiko Sato', 'manager', 'Bar'], ['Ren Kimura', 'staff', 'Bediening']],
+  HOSHI: [['Haruki Ito', 'manager', 'Receptie'], ['Mei Kobayashi', 'staff', 'Housekeeping']],
+  MKKX: [['Daisuke Yamamoto', 'manager', 'Taxi centrale'], ['Hana Suzuki', 'staff', 'Chauffeur']],
+  JETAG: [['Sophie Bakker', 'manager', 'Operations'], ['Lucas de Jong', 'staff', 'Crew']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
-    people.forEach(([name, role], i) => accounts.createStaff({ supplierCode: code, name, role, pin: i === 0 ? '1234' : '5678' }));
+    people.forEach(([name, role, func], i) => accounts.createStaff({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
   }
 }
 
@@ -175,6 +175,7 @@ function initRealtime() {
   }
   if (!db.data.posSales) db.data.posSales = {};                   // kassaverkopen per bedrijf
   if (!db.data.guestChats) db.data.guestChats = {};               // gastchats: lid <-> partner (roomservice, eigenaar)
+  if (!db.data.applications) db.data.applications = {};            // sollicitaties per bedrijf
   if (webpush) {
     if (!db.data.vapid) {
       db.data.vapid = webpush.generateVAPIDKeys();
@@ -837,6 +838,7 @@ function supplierState(s, actor) {
     prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code),
     notifications: db.data.supplierNotifications[s.code] || [],
     staff: accounts.listStaff(s.code).map(accounts.publicStaff),
+    applications: (db.data.applications[s.code] || []).slice(0, 30),
     activity: (db.data.supplierActivity[s.code] || []).slice(0, 40),
     team: (db.data.supplierTeam[s.code] || []).slice(-60),
     actor: actor || { name: 'Beheer', role: 'manager', manager: true }
@@ -883,7 +885,7 @@ app.post('/api/supplier/staff/add', supplierAuth, (req, res) => {
   const name = String(req.body.name || '').trim().slice(0, 60);
   if (!name) return res.status(400).json({ error: 'Vul een naam in.' });
   const pin = accounts.makePin();
-  const staff = accounts.createStaff({ supplierCode: req.supplier.code, name, role: req.body.role === 'manager' ? 'manager' : 'staff', pin });
+  const staff = accounts.createStaff({ supplierCode: req.supplier.code, name, role: req.body.role === 'manager' ? 'manager' : 'staff', func: String(req.body.func || '').slice(0, 40) || null, pin });
   logActivity(req.supplier.code, req.actor, req.actor.name + ' voegde ' + name + ' toe aan het team');
   res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
 });
@@ -1428,6 +1430,51 @@ app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
   notify(L.tier, { icon: '🤝', title: req.supplier.name, body: 'Volgt uw aankomst om alles voor u klaar te zetten.', scope: 'live' });
   pushLive(key);
   res.json({ ok: true, guests: guestsFor(req.supplier.code) });
+});
+
+/* ---- solliciteren: bij elk bedrijf op dezelfde manier ----
+   Openbaar formulier per bedrijf; de manager ziet de sollicitatie in de app
+   en neemt aan (dan ontstaat direct een personeelsaccount met pincode) of
+   wijst af. Zo wordt personeel zoeken voor elk bedrijf gelijk en simpel. */
+app.post('/api/supplier/apply', (req, res) => {
+  const s = findSupplier(req.body.code);
+  if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
+  const name = String(req.body.name || '').trim().slice(0, 60);
+  const func = String(req.body.func || '').trim().slice(0, 40);
+  const contact = String(req.body.contact || '').trim().slice(0, 80);
+  const note = String(req.body.note || '').trim().slice(0, 400);
+  if (!name || !func || !contact) return res.status(400).json({ error: 'Vul uw naam, de functie en een telefoonnummer of e-mailadres in.' });
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    name, func, contact, note, status: 'nieuw',
+    at: new Date().toISOString()
+  };
+  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+  list.unshift(entry);
+  db.data.applications[s.code] = list.slice(0, 100);
+  save();
+  notifySupplier(s.code, { icon: '📝', title: 'Nieuwe sollicitatie', body: name + ' solliciteert als ' + func + '.' });
+  sseToSupplier(s.code, 'sync', { scope: 'team' });
+  res.json({ ok: true });
+});
+app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const a = (db.data.applications[req.supplier.code] || []).find(x => x.id === req.body.id);
+  if (!a) return res.status(404).json({ error: 'Sollicitatie niet gevonden.' });
+  if (req.body.action === 'aannemen') {
+    const pin = accounts.makePin();
+    const staff = accounts.createStaff({ supplierCode: req.supplier.code, name: a.name, role: 'staff', func: a.func, pin });
+    a.status = 'aangenomen';
+    save();
+    logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+    return res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
+  }
+  a.status = 'afgewezen';
+  save();
+  logActivity(req.supplier.code, req.actor, 'wees de sollicitatie van ' + a.name + ' af');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  res.json({ ok: true });
 });
 
 /* ---- beheer: alleen managers/chefs passen instellingen, tafels en menu aan ---- */

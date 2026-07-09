@@ -82,6 +82,7 @@ function init() {
     active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL
   )`);
+  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN func TEXT'); } catch (e) { /* kolom bestaat al */ }
 
   SECRET = loadKey(SECRET_FILE);
   VAULT = loadKey(VAULT_FILE);
@@ -282,10 +283,10 @@ function conversations() {
 }
 
 /* ---------- leverancier-personeel (PIN-accounts binnen een bedrijf) ---------- */
-function createStaff({ supplierCode, name, pin, role }) {
+function createStaff({ supplierCode, name, pin, role, func }) {
   const info = db.prepare(
-    'INSERT INTO supplier_staff (supplier_code, name, pin_hash, role, created_at) VALUES (?, ?, ?, ?, ?)'
-  ).run(String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), hashPassword(String(pin)), role === 'manager' ? 'manager' : 'staff', new Date().toISOString());
+    'INSERT INTO supplier_staff (supplier_code, name, pin_hash, role, func, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+  ).run(String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), hashPassword(String(pin)), role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString());
   return getStaffById(info.lastInsertRowid);
 }
 function getStaffById(id) { return db.prepare('SELECT * FROM supplier_staff WHERE id = ? AND active = 1').get(id) || null; }
@@ -293,7 +294,7 @@ function listStaff(code) { return db.prepare('SELECT * FROM supplier_staff WHERE
 function countStaff(code) { return db.prepare('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
 function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && verifyPassword(String(pin), s.pin_hash)) ? s : null; }
 function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); }
-function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role } : null; }
+function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
 module.exports = {

@@ -1,0 +1,20 @@
+{
+  "name": "RTG Restaurant, kassa en orders",
+  "short_name": "RTG Restaurant",
+  "id": "/apps/restaurant",
+  "description": "RTG Restaurant, kassa en orders",
+  "lang": "nl",
+  "start_url": "/apps/leverancier.html?sector=restaurant",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/restaurant.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

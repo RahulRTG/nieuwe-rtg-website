@@ -1,0 +1,20 @@
+{
+  "name": "RTG Ledenportaal",
+  "short_name": "RTG Portaal",
+  "id": "/apps/portaal",
+  "description": "RTG Ledenportaal",
+  "lang": "nl",
+  "start_url": "/apps/portaal.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/portaal.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

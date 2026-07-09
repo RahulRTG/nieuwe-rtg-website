@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0C0C0B">
 <title>RTG Personeel, uw dienst en taken</title>
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/icons/personeel.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifests/personeel.webmanifest">
+<link rel="apple-touch-icon" href="/icons/personeel.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -462,6 +464,7 @@
   }
 
   window.addEventListener('rtglang', () => { if (state) renderAll(); else stepSector(); });
+  if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
   stepSector();
 })();
 </script>

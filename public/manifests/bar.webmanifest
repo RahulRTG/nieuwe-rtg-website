@@ -1,0 +1,20 @@
+{
+  "name": "RTG Bar en Club, kassa en codes",
+  "short_name": "RTG Bar & Club",
+  "id": "/apps/bar",
+  "description": "RTG Bar en Club, kassa en codes",
+  "lang": "nl",
+  "start_url": "/apps/leverancier.html?sector=bar",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/bar.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

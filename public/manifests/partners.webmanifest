@@ -1,0 +1,20 @@
+{
+  "name": "RTG Partners, de werkgevers-app",
+  "short_name": "RTG Partners",
+  "id": "/apps/partners",
+  "description": "RTG Partners, de werkgevers-app",
+  "lang": "nl",
+  "start_url": "/apps/leverancier.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/partners.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

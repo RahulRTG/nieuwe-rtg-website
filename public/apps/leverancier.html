@@ -6,7 +6,21 @@
 <meta name="theme-color" content="#0C0C0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>RTG Partners, leverancier-app</title>
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="icon" id="favLink" href="/icons/partners.svg" type="image/svg+xml">
+<link rel="manifest" id="manifestLink" href="/manifests/partners.webmanifest">
+<link rel="apple-touch-icon" id="touchLink" href="/icons/partners.svg">
+<script>
+(function(){
+  var sec = (new URLSearchParams(location.search).get('sector')||'').toLowerCase();
+  var alias = { horeca:'restaurant', verblijf:'hotel', vervoer:'taxi' };
+  sec = alias[sec] || sec;
+  if (['restaurant','bar','hotel','appartement','taxi','privejet'].indexOf(sec) >= 0){
+    document.getElementById('manifestLink').href = '/manifests/'+sec+'.webmanifest';
+    document.getElementById('favLink').href = '/icons/'+sec+'.svg';
+    document.getElementById('touchLink').href = '/icons/'+sec+'.svg';
+  }
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">

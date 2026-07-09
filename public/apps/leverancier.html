@@ -756,7 +756,7 @@
   // ---- kassa, per sector ----
   let bon = {};        // horeca: menu-id -> aantal
   function bonTotal(){ return (state.menu||[]).reduce((s,m)=>s+m.price*(bon[m.id]||0),0); }
-  function methodLabel(m){ return m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):T('pos.room','Op de kamer'); }
+  function methodLabel(m){ return m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):T('pos.room','Op de kamer'); }
 
   function renderKassa(){
     const el = $('#kassaWrap'); if (!el) return;
@@ -783,7 +783,12 @@
         '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
         '<button class="obtn primary js-pay" data-method="pin"'+(total?'':' disabled')+'>'+T('pos.paypin','Afrekenen, PIN')+'</button>'+
         '<button class="obtn js-pay" data-method="contant"'+(total?'':' disabled')+'>'+T('pos.cash','Contant')+'</button>'+
-      '</div></div>';
+      '</div></div>'+
+      // gast toont het oplichtende scherm; sla de code aan om de bestelling uit te geven
+      '<div class="card"><div class="tt-h">'+T('pos.redeemh','RTG-ophaalcode innen')+'</div>'+
+      '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat het oplichtende scherm zien. Sla de code aan; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven.')+'</div>'+
+      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Bijv. TBS9')+'" maxlength="4" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:0.2em;font-weight:700;"><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
+      '<div id="posRedeemResult"></div></div>';
   }
 
   // hotel: bedrag op de kamer zetten of direct afrekenen
@@ -799,7 +804,21 @@
         '<button class="obtn primary js-pay" data-method="kamer">'+T('pos.toroom','Op de kamer')+'</button>'+
         '<button class="obtn js-pay" data-method="pin">'+T('pos.pin','PIN')+'</button>'+
         '<button class="obtn js-pay" data-method="contant">'+T('pos.cash','Contant')+'</button>'+
-      '</div></div>';
+      '</div></div>' + kassaOpenRooms();
+  }
+
+  // open kamerrekeningen: alles wat op de kamer staat, in één keer uitchecken
+  function kassaOpenRooms(){
+    const open = (state.pos && state.pos.openRooms) || {};
+    const rooms = Object.keys(open);
+    if (!rooms.length) return '';
+    return '<div class="card"><div class="tt-h">'+T('pos.openrooms','Open kamerrekeningen')+'</div>'+
+      rooms.map(r =>
+        '<div class="pos-sale"><div><b>'+r+'</b><span>'+open[r].count+' '+T('pos.posts','post(en)')+'</span></div>'+
+        '<div style="display:flex;align-items:center;gap:0.5rem;"><span class="amt" style="font-family:\'Bodoni Moda\',serif;">'+eur(open[r].total)+'</span>'+
+        '<button class="obtn primary js-checkout" data-room="'+r.replace(/"/g,'&quot;')+'" data-method="pin">'+T('pos.checkoutpin','Check-out, PIN')+'</button>'+
+        '<button class="obtn js-checkout" data-room="'+r.replace(/"/g,'&quot;')+'" data-method="contant">'+T('pos.cash','Contant')+'</button></div></div>'
+      ).join('')+'</div>';
   }
 
   // vervoer: rit afrekenen
@@ -837,6 +856,36 @@
     }));
     const clear = $('#posClear'); if (clear) clear.addEventListener('click', () => { bon = {}; renderKassa(); openTab('kassa'); });
     document.querySelectorAll('.js-pay').forEach(b => b.addEventListener('click', () => paySale(type, b.dataset.method)));
+    const redeem = $('#posRedeem'); if (redeem) redeem.addEventListener('click', redeemCode);
+    const codeInp = $('#posCode'); if (codeInp) codeInp.addEventListener('keydown', e => { if (e.key==='Enter') redeemCode(); });
+    document.querySelectorAll('.js-checkout').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/pos/checkout', { room: b.dataset.room, method: b.dataset.method });
+        toast(T('pos.checkedout','Uitgecheckt:')+' '+b.dataset.room+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')');
+        await refresh(); openTab('kassa');
+      } catch(e){ toast(e.message); }
+    }));
+  }
+
+  async function redeemCode(){
+    const inp = $('#posCode');
+    const code = (inp.value||'').trim().toUpperCase();
+    if (!code){ toast(T('pos.entercode','Voer een ophaalcode in.')); return; }
+    const box = $('#posRedeemResult');
+    try {
+      const d = await API.call('/supplier/pos/redeem', { code });
+      const o = d.order;
+      box.innerHTML = '<div class="enroute here" style="margin-top:0.8rem;">✓ '+code+' · '+T('sup.guest','Gast')+' <b>'+o.codename+'</b> · '+
+        o.items.map(i=>i.qty+'× '+i.name).join(', ')+' · '+eur(o.total)+
+        (o.wasPaid ? ' · '+T('pos.waspaid','al betaald in de app') : ' · '+T('pos.chargedrtg','afgerekend via RTG'))+'</div>';
+      inp.value = '';
+      toast(T('pos.redeemed','Uitgegeven aan')+' '+o.codename+'.');
+      await refresh(); openTab('kassa');
+      $('#posRedeemResult').innerHTML = box.innerHTML;
+    } catch(e){
+      box.innerHTML = '<div class="enroute" style="margin-top:0.8rem;border-color:rgba(194,58,94,0.4);color:var(--burgundy);">'+e.message+'</div>';
+      toast(e.message);
+    }
   }
 
   async function paySale(type, method){
@@ -1097,7 +1146,11 @@ window.I18N = { en: {
   'pos.ridebill':'Charge a ride', 'pos.ride':'Ride', 'pos.descride':'E.g. Kyoto Station to Gion',
   'pos.today':'Today', 'pos.bons':'receipt(s)', 'pos.nosales':'No sales today yet.', 'pos.sale':'Sale',
   'pos.empty':'Tap some dishes first.', 'pos.fillamount':'Enter an amount.',
-  'pos.done':'Paid:', 'pos.bonnr':'receipt',
+  'pos.done':'Paid:', 'pos.bonnr':'receipt', 'pos.rtg':'RTG code',
+  'pos.redeemh':'Redeem RTG pickup code', 'pos.redeemsub':'The guest shows the glowing screen. Enter the code; the order is matched, charged if needed and handed out.',
+  'pos.codeph':'E.g. TBS9', 'pos.redeem':'Redeem', 'pos.entercode':'Enter a pickup code.',
+  'pos.waspaid':'already paid in the app', 'pos.chargedrtg':'charged via RTG', 'pos.redeemed':'Handed out to',
+  'pos.openrooms':'Open room folios', 'pos.posts':'item(s)', 'pos.checkoutpin':'Check-out, card', 'pos.checkedout':'Checked out:',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

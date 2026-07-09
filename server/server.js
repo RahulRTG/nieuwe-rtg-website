@@ -951,19 +951,94 @@ app.post('/api/supplier/pos/sale', supplierAuth, (req, res) => {
   res.json({ ok: true, sale });
 });
 
-// dagoverzicht (Z-rapport): vandaag, per betaalmethode en per medewerker
+// dagoverzicht (Z-rapport): ontvangen vandaag, per betaalmethode en medewerker.
+// Kamerlasten tellen pas mee als omzet bij het uitchecken (anders dubbel).
 function posDay(code) {
   const today = new Date().toISOString().slice(0, 10);
-  const sales = (db.data.posSales[code] || []).filter(s => s.at.slice(0, 10) === today);
+  const all = db.data.posSales[code] || [];
+  const sales = all.filter(s => s.at.slice(0, 10) === today);
   const byMethod = {}, byActor = {};
   let total = 0;
   for (const s of sales) {
+    byActor[s.actor] = (byActor[s.actor] || 0) + s.total;
+    if (s.method === 'kamer') continue;
     total += s.total;
     byMethod[s.method] = (byMethod[s.method] || 0) + s.total;
-    byActor[s.actor] = (byActor[s.actor] || 0) + s.total;
   }
-  return { total, count: sales.length, byMethod, byActor, sales: sales.slice(0, 25) };
+  // open kamerrekeningen (alle dagen): nog niet uitgecheckte kamerlasten
+  const openRooms = {};
+  for (const s of all) {
+    if (s.method !== 'kamer' || s.settled || !s.room) continue;
+    const r = openRooms[s.room] = openRooms[s.room] || { total: 0, count: 0 };
+    r.total += s.total;
+    r.count += 1;
+  }
+  return { total, count: sales.length, byMethod, byActor, openRooms, sales: sales.slice(0, 25) };
 }
+
+// ---- RTG-ophaalcode innen aan de kassa ----
+// De gast toont het oplichtende scherm; het personeel slaat de code aan.
+// De bestelling wordt gekoppeld, zo nodig betaald en als uitgegeven gemarkeerd.
+app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
+  const code = String(req.body.code || '').trim().toUpperCase();
+  if (!code) return res.status(400).json({ error: 'Voer een ophaalcode in.' });
+  const o = db.data.orders.find(x => x.supplierCode === req.supplier.code && x.pickup === code);
+  if (!o) return res.status(404).json({ error: 'Onbekende code voor dit bedrijf.' });
+  if (o.refunded || o.status === 'geweigerd') return res.status(409).json({ error: 'Deze bestelling is geannuleerd.' });
+  if (o.status === 'geserveerd') return res.status(409).json({ error: 'Code ' + code + ' is al uitgegeven.' });
+  const wasPaid = o.paid;
+  let sale = null;
+  if (!o.paid) {
+    // afrekenen via RTG-lidmaatschap; komt als omzet in het dagoverzicht
+    o.paid = true;
+    sale = {
+      id: crypto.randomBytes(4).toString('hex'),
+      bon: pickupCode(),
+      actor: req.actor.name,
+      desc: 'RTG-code ' + code + ' (' + o.ref + ')',
+      room: null,
+      items: o.items, total: o.total, method: 'rtg',
+      at: new Date().toISOString()
+    };
+    const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
+    list.unshift(sale);
+    db.data.posSales[req.supplier.code] = list.slice(0, 300);
+  }
+  o.status = 'geserveerd';
+  save();
+  logActivity(req.supplier.code, req.actor, 'gaf bestelling ' + o.ref + ' uit op code ' + code + (wasPaid ? '' : ' en rekende € ' + o.total + ' af (RTG)'));
+  broadcastSync([o.customerTier], 'orders');
+  sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
+  notify(o.customerTier, { icon: '✨', title: req.supplier.name, body: 'Uw bestelling is uitgegeven. Veel plezier.', scope: 'orders' });
+  res.json({ ok: true, order: { ref: o.ref, codename: o.customerCodename, items: o.items, total: o.total, wasPaid }, sale });
+});
+
+// ---- uitchecken: alle open kamerlasten van een kamer in één keer afrekenen ----
+app.post('/api/supplier/pos/checkout', supplierAuth, (req, res) => {
+  const room = String(req.body.room || '').slice(0, 60);
+  const method = ['pin', 'contant'].includes(req.body.method) ? req.body.method : 'pin';
+  const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
+  const open = list.filter(s => s.method === 'kamer' && !s.settled && s.room === room);
+  if (!open.length) return res.status(404).json({ error: 'Geen open kamerlasten voor deze kamer.' });
+  let total = 0;
+  for (const s of open) { s.settled = true; total += s.total; }
+  const sale = {
+    id: crypto.randomBytes(4).toString('hex'),
+    bon: pickupCode(),
+    actor: req.actor.name,
+    desc: 'Check-out ' + room + ' (' + open.length + ' post(en))',
+    room, items: null, total, method,
+    at: new Date().toISOString()
+  };
+  list.unshift(sale);
+  db.data.posSales[req.supplier.code] = list.slice(0, 300);
+  save();
+  logActivity(req.supplier.code, req.actor, 'checkte ' + room + ' uit: € ' + total + ' (' + method + ')');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
+  res.json({ ok: true, sale });
+});
 
 // Interne teamchat binnen het bedrijf.
 app.post('/api/supplier/team/message', supplierAuth, (req, res) => {

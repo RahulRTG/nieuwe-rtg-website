@@ -25,12 +25,51 @@
     --burgundy-deep:#7F1634;
     --gold:#A98F1C;
     --green:#4C9A75;
+    --btn-bg:#FFFFFF;
+    --btn-txt:#000000;
+    --bar:rgba(12,12,11,0.92);
+    --rim:#000000;
+  }
+
+  /* Pas-thema's: elk lidmaatschap zijn eigen wereld.
+     RTG Pass = bordeaux met wit en goud. Lifestyle Pass = parelmoer met goud
+     en bordeaux accenten. Business Pass = het donkere standaardthema. */
+  body.theme-rtg{
+    --bg:#22060E;
+    --card:#2E0A15;
+    --card2:#3A0F1C;
+    --line:rgba(255,255,255,0.13);
+    --txt:#FBF6F1;
+    --muted:rgba(251,246,241,0.62);
+    --soft:rgba(251,246,241,0.42);
+    --burgundy:#E0637F;
+    --burgundy-deep:#9E1C40;
+    --gold:#C9A82E;
+    --bar:rgba(34,6,14,0.92);
+    --rim:#160408;
+  }
+  body.theme-life{
+    --bg:#FAF8F3;
+    --card:#FFFFFF;
+    --card2:#F1EDE5;
+    --line:rgba(12,12,11,0.12);
+    --txt:#171512;
+    --muted:rgba(23,21,18,0.62);
+    --soft:rgba(23,21,18,0.45);
+    --burgundy:#7F1634;
+    --burgundy-deep:#7F1634;
+    --gold:#857007;
+    --green:#2E6B4F;
+    --btn-bg:#0C0C0B;
+    --btn-txt:#FFFFFF;
+    --bar:rgba(250,248,243,0.92);
+    --rim:#E8E4DB;
   }
 
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
   body{
-    background:#000;
+    background:var(--rim);
     font-family:'Inter',sans-serif;
     color:var(--txt);
     display:flex;
@@ -116,7 +155,7 @@
   .login-form{margin-top:2.25rem;display:flex;flex-direction:column;gap:0.65rem;}
   .login-form input{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.95rem 1.1rem;color:var(--txt);font-size:0.95rem;font-family:inherit;outline:none;}
   .login-form input:focus{border-color:var(--burgundy);}
-  .login-form button{background:#fff;color:#000;border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
+  .login-form button{background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
   .login-form button:active{opacity:0.85;}
   .gate-or{margin:1.9rem 0 0.35rem;font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);text-align:center;}
   .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--gold);font-size:0.76rem;cursor:pointer;font-family:inherit;text-align:center;}
@@ -260,7 +299,7 @@
   .ag-tag.vrij{color:var(--gold);border-color:rgba(169,143,28,0.45);}
   .ag-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
   .ag-acts button{background:none;border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:0.55rem 0.95rem;font-size:0.76rem;cursor:pointer;font-family:inherit;}
-  .ag-acts button.primary{background:#fff;color:#000;border-color:#fff;font-weight:600;}
+  .ag-acts button.primary{background:var(--btn-bg);color:var(--btn-txt);border-color:var(--btn-bg);font-weight:600;}
   /* reisagenda van de Butler (RTG Pass): dag-tot-dag */
   .rp-day{margin-top:1rem;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
   .rp-day:first-of-type{margin-top:0.7rem;}
@@ -291,15 +330,17 @@
   .codecard{
     margin-top:1rem;
     border-radius:20px;
-    border:1px solid var(--line);
+    border:1px solid rgba(255,255,255,0.09);
     background:
       radial-gradient(120% 140% at 85% -10%, rgba(158,28,64,0.4), transparent 60%),
       linear-gradient(150deg, #191412 0%, #100D0C 70%);
     padding:1.5rem 1.4rem;
     position:relative;
     overflow:hidden;
+    /* de pas blijft in elk thema donker, dus de tekst vast licht */
+    color:#F4F1EC;
   }
-  .codecard .label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--soft);}
+  .codecard .label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,241,236,0.38);}
   .codecard .cn{
     font-family:'Bodoni Moda',serif;
     font-size:2rem;
@@ -313,24 +354,24 @@
     align-items:flex-end;
     gap:1rem;
   }
-  .codecard .mrow{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
-  .codecard .mrow b{display:block;font-size:0.78rem;color:var(--muted);font-weight:500;margin-top:0.2rem;letter-spacing:0.08em;}
+  .codecard .mrow{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(244,241,236,0.38);}
+  .codecard .mrow b{display:block;font-size:0.78rem;color:rgba(244,241,236,0.55);font-weight:500;margin-top:0.2rem;letter-spacing:0.08em;}
   .codecard svg{background:#fff;padding:4px;width:58px;height:58px;border-radius:6px;display:block;}
   .codecard .why{
     margin-top:1.2rem;
-    border-top:1px solid var(--line);
+    border-top:1px solid rgba(255,255,255,0.09);
     padding-top:1rem;
     font-size:0.78rem;
-    color:var(--muted);
+    color:rgba(244,241,236,0.55);
     line-height:1.55;
     display:none;
   }
   .codecard .why.open{display:block;}
-  .codecard .why b{color:var(--txt);}
+  .codecard .why b{color:#F4F1EC;}
   .codecard .whybtn{
     margin-top:1rem;
     background:none;border:none;padding:0;
-    font-size:0.74rem;font-weight:600;color:var(--burgundy);
+    font-size:0.74rem;font-weight:600;color:#C23A5E;
   }
 
   /* lijsten */
@@ -365,8 +406,8 @@
     display:inline-flex;
     align-items:center;
     gap:0.5rem;
-    background:#fff;
-    color:#000;
+    background:var(--btn-bg);
+    color:var(--btn-txt);
     border:none;
     border-radius:999px;
     padding:0.65rem 1.2rem;
@@ -425,7 +466,7 @@
     outline:none;
   }
   .askrow button{
-    background:#fff;color:#000;border:none;border-radius:999px;
+    background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;
     padding:0 1.2rem;font-size:0.75rem;font-weight:600;
   }
 
@@ -491,14 +532,14 @@
     flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;
     padding:0.55rem 0.95rem;font-size:0.78rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;
   }
-  .cform button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 0.95rem;font-size:0.68rem;font-weight:600;}
+  .cform button{background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;padding:0 0.95rem;font-size:0.68rem;font-weight:600;}
 
   /* tabbalk */
   .tabbar{
     position:absolute;
     left:0;right:0;bottom:0;
     z-index:30;
-    background:rgba(12,12,11,0.92);
+    background:var(--bar);
     backdrop-filter:blur(14px);
     border-top:1px solid var(--line);
     display:flex;
@@ -539,7 +580,7 @@
   .sup-card .t{flex:1;min-width:0;}
   .sup-card .t b{display:block;font-size:0.92rem;font-weight:600;}
   .sup-card .t span{font-size:0.72rem;color:var(--soft);}
-  .sup-card .go{background:#fff;color:#000;border:none;border-radius:999px;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
+  .sup-card .go{background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
   .sup-card .go.ghost{background:none;color:var(--muted);border:1px solid var(--line);}
   .sec-label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 0.2rem;}
   .myorder{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.05rem;margin-top:0.7rem;}
@@ -552,7 +593,7 @@
   .mo-pill.bereiding{color:#C99A2E;border-color:rgba(201,154,46,0.4);}
   .mo-pill.klaar,.mo-pill.geserveerd{color:var(--green);border-color:rgba(76,154,117,0.4);}
   .myorder .acts{margin-top:0.7rem;display:flex;gap:0.5rem;align-items:center;}
-  .mo-pay{background:#fff;color:#000;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
+  .mo-pay{background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
   .mo-pay svg{width:12px;height:12px;}
   .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
 
@@ -565,7 +606,7 @@
   .live-mode{display:flex;gap:0.4rem;margin-top:0.6rem;}
   .live-mode button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem;font-size:0.72rem;font-family:inherit;}
   .live-mode button.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
-  .live-go{margin-top:0.8rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.85rem;font-size:0.84rem;font-weight:600;font-family:inherit;}
+  .live-go{margin-top:0.8rem;width:100%;background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;padding:0.85rem;font-size:0.84rem;font-weight:600;font-family:inherit;}
 
   .live-panel{background:linear-gradient(150deg,#1c1414,#151312);border:1px solid rgba(194,58,94,0.35);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;overflow:hidden;}
   .live-top{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;}
@@ -593,7 +634,7 @@
   .live-partner .eta.arr .n{color:var(--green);font-size:0.9rem;}
   .live-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
   .live-acts button{flex:1;min-width:120px;border-radius:999px;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
-  .live-acts .prim{background:#fff;color:#000;border-color:#fff;}
+  .live-acts .prim{background:var(--btn-bg);color:var(--btn-txt);border-color:var(--btn-bg);}
   .live-acts .sec{background:var(--card2,#1B1817);color:var(--txt);}
   .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
   .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
@@ -623,14 +664,14 @@
   .ms-note{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;}
   .ms-tag{display:flex;align-items:center;gap:0.5rem;margin-top:0.7rem;font-size:0.8rem;color:var(--muted);}
   .ms-tag input{width:18px;height:18px;accent-color:var(--burgundy);}
-  .ms-order{margin-top:0.8rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
+  .ms-order{margin-top:0.8rem;width:100%;background:var(--btn-bg);color:var(--btn-txt);border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
   .ms-order:disabled{opacity:0.4;}
 
   #toast{
     position:absolute;
     bottom:calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
     left:50%;transform:translate(-50%, 16px);
-    background:#fff;color:#000;
+    background:var(--btn-bg);color:var(--btn-txt);
     font-size:0.78rem;font-weight:500;
     padding:0.75rem 1.25rem;border-radius:999px;
     opacity:0;pointer-events:none;transition:all 0.3s ease;
@@ -1129,6 +1170,11 @@
   }
 
   function renderAll(){
+    // Pas-thema: RTG bordeaux, Lifestyle parelmoer, Business donker (standaard).
+    document.body.classList.toggle('theme-rtg', user.tier === 'rtg');
+    document.body.classList.toggle('theme-life', user.tier === 'lifestyle');
+    const tc = document.querySelector('meta[name="theme-color"]');
+    if (tc) tc.content = user.tier === 'rtg' ? '#22060E' : user.tier === 'lifestyle' ? '#FAF8F3' : '#0C0C0B';
     $('#codeChipTxt').textContent = user.codename;
     renderHome();
     renderTrip();

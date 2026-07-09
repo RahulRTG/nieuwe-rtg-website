@@ -581,6 +581,10 @@
   .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
 
   /* ---- gastchat met een partner ---- */
+  .pc-depts{display:flex;gap:0.4rem;overflow-x:auto;padding:0.7rem 1.25rem 0;scrollbar-width:none;}
+  .pc-depts::-webkit-scrollbar{display:none;}
+  .pc-depts button{flex-shrink:0;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-family:inherit;}
+  .pc-depts button.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
   .pc-body{display:flex;flex-direction:column;gap:0.55rem;padding-top:0.9rem;min-height:200px;}
   .pc-msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.86rem;line-height:1.45;}
   .pc-msg.me{align-self:flex-end;background:var(--burgundy-deep);border-top-right-radius:5px;color:#fff;}
@@ -815,6 +819,7 @@
       <div><b id="pcName"></b><span data-i18n="app.pc.sub">Rechtstreeks contact, op uw codenaam</span></div>
       <button class="ms-close" id="pcClose" aria-label="Sluiten">✕</button>
     </div>
+    <div class="pc-depts" id="pcDepts"></div>
     <div class="ms-body pc-body" id="pcBody"></div>
     <div class="pc-foot">
       <input id="pcInput" placeholder="Typ een bericht" data-i18n-ph="app.pc.ph" autocomplete="off">
@@ -1452,16 +1457,32 @@
   $('#menu-scrim').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
 
   /* ---------- gastchat met een partner ---------- */
-  let pchat = null; // { code, name }
+  let pchat = null; // { code, name, dept, depts }
+  const DEPT_EN = { 'Receptie':'Reception', 'Roomservice':'Room service', 'Housekeeping':'Housekeeping', 'Onderhoud':'Maintenance', 'Security':'Security', 'Beheer':'Management', 'Team':'Team' };
+  const tDept = d => (lang() === 'en' ? (DEPT_EN[d] || d) : d);
   async function openPChat(code){
     const s = suppliers.find(x => x.code === code);
     if (!s) return;
-    pchat = { code, name: s.name };
+    const depts = s.depts && s.depts.length ? s.depts : ['Team'];
+    pchat = { code, name: s.name, dept: depts[0], depts };
     $('#pcName').textContent = s.name;
+    renderPChatDepts();
     $('#pchat-sheet').classList.add('open');
     $('#pchat-scrim').classList.add('open');
     await loadPChat();
     $('#pcInput').focus();
+  }
+  function renderPChatDepts(){
+    const el = $('#pcDepts');
+    if (!pchat || pchat.depts.length < 2){ el.innerHTML = ''; return; }
+    el.innerHTML = pchat.depts.map(d =>
+      '<button data-dept="' + d + '"' + (d === pchat.dept ? ' class="on"' : '') + '>' + tDept(d) + '</button>'
+    ).join('');
+    el.querySelectorAll('[data-dept]').forEach(b => b.addEventListener('click', async () => {
+      pchat.dept = b.dataset.dept;
+      renderPChatDepts();
+      await loadPChat();
+    }));
   }
   function closePChat(){
     pchat = null;
@@ -1471,7 +1492,7 @@
   async function loadPChat(){
     if (!pchat) return;
     let msgs = [];
-    try { msgs = (await API.call('/partner/chat/history', { supplierCode: pchat.code })).messages || []; }
+    try { msgs = (await API.call('/partner/chat/history', { supplierCode: pchat.code, dept: pchat.dept })).messages || []; }
     catch(e){ return; }
     renderPChat(msgs);
   }
@@ -1489,7 +1510,7 @@
     const text = (inp.value || '').trim();
     if (!text || !pchat) return;
     inp.value = '';
-    try { renderPChat((await API.call('/partner/chat/send', { supplierCode: pchat.code, text })).messages); }
+    try { renderPChat((await API.call('/partner/chat/send', { supplierCode: pchat.code, dept: pchat.dept, text })).messages); }
     catch(e){ toast(e.message); }
   }
   $('#pcClose').addEventListener('click', closePChat);

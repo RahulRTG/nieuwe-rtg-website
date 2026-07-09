@@ -134,6 +134,13 @@ module.exports = function seed() {
           { id: 'r1', name: 'Riverside suite', desc: '55 m², rivierzicht, privé-onsen', price: 780, available: true },
           { id: 'r2', name: 'Garden kamer', desc: '40 m², tuinzicht, tatami-zithoek', price: 520, available: true },
           { id: 'r3', name: 'Corner suite', desc: '70 m², twee balkons, butler-service', price: 940, available: false }
+        ],
+        minibar: [
+          { id: 'mb1', name: 'Mineraalwater', price: 6 },
+          { id: 'mb2', name: 'Groene thee (fles)', price: 8 },
+          { id: 'mb3', name: 'Cola', price: 7 },
+          { id: 'mb4', name: 'Sake (mini)', price: 14 },
+          { id: 'mb5', name: 'Chocolade Kyoto', price: 9 }
         ]
       },
       {
@@ -159,6 +166,12 @@ module.exports = function seed() {
           { id: 'd2', name: 'Machiya 1', locked: true },
           { id: 'd3', name: 'Machiya 2', locked: true },
           { id: 'd4', name: 'Fietsenberging', locked: true }
+        ],
+        minibar: [
+          { id: 'mb1', name: 'Mineraalwater', price: 4 },
+          { id: 'mb2', name: 'Craft bier Kyoto', price: 9 },
+          { id: 'mb3', name: 'Sake (mini)', price: 12 },
+          { id: 'mb4', name: 'Rijstcrackers', price: 6 }
         ]
       },
       {

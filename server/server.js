@@ -131,7 +131,15 @@ function initRealtime() {
     if (!Array.isArray(s.photos)) s.photos = [];
     if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
     if (s.type === 'apartment' && !Array.isArray(s.doors)) s.doors = [];
+    if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.minibar))
+      s.minibar = [
+        { id: 'mb1', name: 'Mineraalwater', price: 5 },
+        { id: 'mb2', name: 'Frisdrank', price: 6 },
+        { id: 'mb3', name: 'Mini-drank', price: 12 },
+        { id: 'mb4', name: 'Snack', price: 7 }
+      ];
   }
+  if (!db.data.minibarCounts) db.data.minibarCounts = {};          // minibartellingen per bedrijf
   // oudere databases: appartement-partner en doors-cap toevoegen
   if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
     db.data.supplierTypes.apartment.caps.splice(1, 0, 'doors');
@@ -765,6 +773,7 @@ function publicSupplier(s, lang) {
   const loc = s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : s.loc;
   return { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
            city: s.city, caps: t.caps || [], loc, hasMenu: (s.menu || []).length > 0,
+           depts: deptsFor(s),
            photos: s.photos || [],
            rooms: (s.rooms || []).filter(r => r.available).map(r => ({ id: r.id, name: r.name, desc: i18n.localize(r.desc, lang), price: r.price })) };
 }
@@ -776,11 +785,16 @@ function supplierState(s, actor) {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
     rooms: s.rooms || null,
     doors: s.doors || null,
+    minibar: Array.isArray(s.minibar) ? {
+      catalog: s.minibar,
+      countedToday: [...new Set((db.data.minibarCounts[s.code] || []).filter(e => e.at.slice(0, 10) === new Date().toISOString().slice(0, 10)).map(e => e.room))],
+      recent: (db.data.minibarCounts[s.code] || []).slice(0, 12)
+    } : null,
     photos: s.photos || [],
     pos: posDay(s.code),
     guestChats: Object.entries(db.data.guestChats)
       .filter(([, c]) => c.supplierCode === s.code && c.messages.length)
-      .map(([k, c]) => ({ key: k, codename: c.codename, unread: c.unreadPartner, last: c.messages[c.messages.length - 1].text.slice(0, 60), lastFrom: c.messages[c.messages.length - 1].from, lastAt: c.lastAt }))
+      .map(([k, c]) => ({ key: k, codename: c.codename, dept: c.dept || 'Team', unread: c.unreadPartner, last: c.messages[c.messages.length - 1].text.slice(0, 60), lastFrom: c.messages[c.messages.length - 1].from, lastAt: c.lastAt }))
       .sort((a, b) => (b.lastAt || '').localeCompare(a.lastAt || '')),
     // leden die nu live onderweg zijn maar nog niet met dit bedrijf verbonden
     nearbyGuests: Object.values(db.data.live)
@@ -1072,6 +1086,65 @@ app.post('/api/supplier/pos/checkout', supplierAuth, (req, res) => {
   res.json({ ok: true, sale });
 });
 
+/* ---- minibar-telling: personeel telt per kamer, kosten gaan automatisch
+   op de kamerrekening en de aanvulling staat meteen op papier ---- */
+app.post('/api/supplier/minibar/count', supplierAuth, (req, res) => {
+  if (!Array.isArray(req.supplier.minibar)) return res.status(400).json({ error: 'Minibar is er alleen voor hotels en appartementen.' });
+  const room = String(req.body.room || '').slice(0, 60);
+  if (!room) return res.status(400).json({ error: 'Kies een kamer.' });
+  const wanted = Array.isArray(req.body.items) ? req.body.items : [];
+  const items = [];
+  let total = 0;
+  for (const w of wanted) {
+    const m = req.supplier.minibar.find(x => x.id === w.id);
+    const qty = Math.min(20, Math.max(0, parseInt(w.qty, 10) || 0));
+    if (m && qty > 0) { items.push({ name: m.name, qty, price: m.price }); total += m.price * qty; }
+  }
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    room, actor: req.actor.name, items, total,
+    at: new Date().toISOString()
+  };
+  const list = db.data.minibarCounts[req.supplier.code] = (db.data.minibarCounts[req.supplier.code] || []);
+  list.unshift(entry);
+  db.data.minibarCounts[req.supplier.code] = list.slice(0, 300);
+  // verbruik automatisch als kamerlast op de rekening (komt mee bij check-out)
+  if (total > 0) {
+    const sale = {
+      id: crypto.randomBytes(4).toString('hex'),
+      bon: pickupCode(),
+      actor: req.actor.name,
+      desc: 'Minibar: ' + items.map(i => i.qty + 'x ' + i.name).join(', '),
+      room, items, total, method: 'kamer',
+      at: new Date().toISOString()
+    };
+    const sales = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
+    sales.unshift(sale);
+    db.data.posSales[req.supplier.code] = sales.slice(0, 300);
+  }
+  save();
+  logActivity(req.supplier.code, req.actor, 'telde de minibar van ' + room + (total > 0 ? ': € ' + total + ' verbruik, aanvullen: ' + items.map(i => i.qty + 'x ' + i.name).join(', ') : ': niets gebruikt'));
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
+  res.json({ ok: true, entry, charged: total });
+});
+
+// catalogusbeheer: artikelen toevoegen of verwijderen
+app.post('/api/supplier/minibar/item/add', supplierAuth, (req, res) => {
+  if (!Array.isArray(req.supplier.minibar)) return res.status(400).json({ error: 'Minibar is er alleen voor hotels en appartementen.' });
+  const name = String(req.body.name || '').trim().slice(0, 60);
+  const price = Math.max(0, Number(req.body.price) || 0);
+  if (!name || !price) return res.status(400).json({ error: 'Vul een artikel en prijs in.' });
+  req.supplier.minibar.push({ id: crypto.randomBytes(3).toString('hex'), name, price });
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette "' + name + '" in de minibar-catalogus');
+  res.json({ ok: true, minibar: req.supplier.minibar });
+});
+app.post('/api/supplier/minibar/item/remove', supplierAuth, (req, res) => {
+  const i = (req.supplier.minibar || []).findIndex(x => x.id === req.body.id);
+  if (i >= 0) { req.supplier.minibar.splice(i, 1); save(); }
+  res.json({ ok: true, minibar: req.supplier.minibar || [] });
+});
+
 /* ---- slimme deuren (appartementen): op afstand openen via de app ----
    Openen is tijdelijk: na 10 seconden vergrendelt de deur zichzelf weer,
    zoals een echt smart lock. Elke handeling komt in de activiteitenfeed. */
@@ -1127,44 +1200,55 @@ app.post('/api/live/door', auth, (req, res) => {
    Een gesprek per lid per partner, op codenaam. De gast begint vanuit de
    leden-app; het personeel antwoordt vanuit de Gastchat-tab. Beide kanten
    live via SSE, met notificaties over en weer. */
-function chatKeyOf(supplierCode, customerKey) { return supplierCode + '|' + customerKey; }
-function getChat(supplierCode, customerKey, codename, tier) {
-  const k = chatKeyOf(supplierCode, customerKey);
+// afdelingen per sector: de gast kiest met wie hij spreekt
+function deptsFor(s) {
+  if (s.type === 'hotel') return ['Receptie', 'Roomservice', 'Housekeeping', 'Onderhoud', 'Security'];
+  if (s.type === 'apartment') return ['Beheer', 'Onderhoud', 'Security'];
+  return ['Team'];
+}
+function chatKeyOf(supplierCode, customerKey, dept) { return supplierCode + '|' + customerKey + '|' + dept; }
+function getChat(s, customerKey, codename, tier, dept) {
+  const k = chatKeyOf(s.code, customerKey, dept);
   if (!db.data.guestChats[k]) {
-    db.data.guestChats[k] = { supplierCode, customerKey, codename, tier, messages: [], unreadGuest: 0, unreadPartner: 0, lastAt: null };
+    db.data.guestChats[k] = { supplierCode: s.code, customerKey, codename, tier, dept, messages: [], unreadGuest: 0, unreadPartner: 0, lastAt: null };
   }
   return db.data.guestChats[k];
 }
+function validDept(s, dept) {
+  const list = deptsFor(s);
+  return list.includes(dept) ? dept : list[0];
+}
 
-// gast stuurt een bericht aan een partner
+// gast stuurt een bericht aan een partner (per afdeling een eigen gesprek)
 app.post('/api/partner/chat/send', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const s = findSupplier(req.body.supplierCode);
   if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
   const text = String(req.body.text || '').trim().slice(0, 500);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  const dept = validDept(s, String(req.body.dept || ''));
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  const chat = getChat(s.code, req.session.key, codename, req.session.tier);
+  const chat = getChat(s, req.session.key, codename, req.session.tier, dept);
   chat.codename = codename;
   chat.messages.push({ from: 'guest', who: codename, text, at: new Date().toISOString() });
   chat.messages = chat.messages.slice(-120);
   chat.unreadPartner += 1;
   chat.lastAt = new Date().toISOString();
   save();
-  notifySupplier(s.code, { icon: '💬', title: codename, body: text.slice(0, 90) });
+  notifySupplier(s.code, { icon: '💬', title: codename + ' → ' + dept, body: text.slice(0, 90) });
   sseToSupplier(s.code, 'sync', { scope: 'gchat' });
   sseToCustomer(req.session.key, 'sync', { scope: 'gchat' });
   res.json({ ok: true, messages: chat.messages });
 });
 
-// gast opent het gesprek (en markeert het als gelezen)
+// gast opent het gesprek met een afdeling (en markeert het als gelezen)
 app.post('/api/partner/chat/history', auth, (req, res) => {
   const s = findSupplier(req.body.supplierCode);
   if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
-  const k = chatKeyOf(s.code, req.session.key);
-  const chat = db.data.guestChats[k];
+  const dept = validDept(s, String(req.body.dept || ''));
+  const chat = db.data.guestChats[chatKeyOf(s.code, req.session.key, dept)];
   if (chat && chat.unreadGuest) { chat.unreadGuest = 0; save(); }
-  res.json({ messages: chat ? chat.messages : [] });
+  res.json({ messages: chat ? chat.messages : [], dept });
 });
 
 // personeel antwoordt (onder eigen naam, uit het persoonlijke account)
@@ -1178,8 +1262,8 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
   chat.unreadGuest += 1;
   chat.lastAt = new Date().toISOString();
   save();
-  logActivity(req.supplier.code, req.actor, 'antwoordde ' + chat.codename + ' in de gastchat');
-  notify(chat.tier, { icon: '💬', title: req.supplier.name, body: text.slice(0, 90), scope: 'gchat' });
+  logActivity(req.supplier.code, req.actor, 'antwoordde ' + chat.codename + ' (' + (chat.dept || 'Team') + ')');
+  notify(chat.tier, { icon: '💬', title: req.supplier.name + (chat.dept ? ' · ' + chat.dept : ''), body: text.slice(0, 90), scope: 'gchat' });
   sseToCustomer(chat.customerKey, 'sync', { scope: 'gchat' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
   res.json({ ok: true, messages: chat.messages });

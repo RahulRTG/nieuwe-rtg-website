@@ -122,6 +122,26 @@
   .ph-pick img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid transparent;flex-shrink:0;cursor:pointer;}
   .ph-pick img.sel{border-color:var(--gold);}
 
+  /* vandaag nog doen */
+  .todo-row{display:flex;align-items:center;gap:0.7rem;width:100%;background:none;border:none;border-bottom:1px solid var(--line);padding:0.7rem 0;text-align:left;color:var(--txt);font-family:inherit;}
+  .todo-row:last-of-type{border-bottom:none;}
+  .todo-row span{font-size:1.1rem;flex-shrink:0;}
+  .todo-row b{flex:1;font-size:0.86rem;font-weight:600;}
+  .todo-row i{color:var(--soft);font-style:normal;font-size:1.1rem;}
+
+  /* minibar */
+  .mb-rooms{display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.7rem;}
+  .mb-room{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem 0.9rem;font-size:0.76rem;font-family:inherit;}
+  .mb-room.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
+  .mb-item{display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--line);}
+  .mb-item:last-of-type{border-bottom:none;}
+  .mb-item .mi b{display:block;font-size:0.86rem;font-weight:600;}
+  .mb-item .mi span{font-size:0.7rem;color:var(--gold);}
+  .mb-item .qty{display:flex;align-items:center;gap:0.6rem;}
+  .mb-item .qty button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:1rem;}
+  .mb-item .qty b{min-width:18px;text-align:center;font-size:0.95rem;}
+  .gc-dept{font-style:normal;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(169,143,28,0.35);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;margin-left:0.25rem;}
+
   /* gastchat */
   .gc-row{display:flex;align-items:center;gap:0.75rem;width:100%;background:none;border:none;border-bottom:1px solid var(--line);padding:0.75rem 0;text-align:left;color:var(--txt);}
   .gc-row:last-of-type{border-bottom:none;}
@@ -393,6 +413,11 @@
         <p class="sub" data-i18n="sup.v.kassa.sub">Afrekenen, bonnen en het dagoverzicht, per medewerker bijgehouden.</p>
         <div id="kassaWrap"></div>
       </div>
+      <div class="view" data-view="minibar">
+        <h2 data-i18n="sup.v.minibar">Minibar</h2>
+        <p class="sub" data-i18n="sup.v.minibar.sub">Tel per kamer wat is gebruikt. Het verbruik gaat automatisch op de kamerrekening en de aanvullijst staat klaar.</p>
+        <div id="minibarWrap"></div>
+      </div>
       <div class="view" data-view="doors">
         <h2 data-i18n="sup.v.doors">Deuren</h2>
         <p class="sub" data-i18n="sup.v.doors.sub">Open of vergrendel op afstand. Een geopende deur vergrendelt zichzelf na 10 seconden.</p>
@@ -471,6 +496,7 @@
     price:    { label:'Prijs',     svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 2-2.5 1.5-2.5 3.5M12 16v.5"/>', cap:'pricing' },
     kassa:    { label:'Kassa',     svg:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M7 13h2M11 13h2M15 13h2M7 16.5h2M11 16.5h2M15 16.5h2"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
+    minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
     doors:    { label:'Deuren',    svg:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><circle cx="15" cy="12" r="1.2"/><path d="M5 21h14"/>', cap:'doors' },
     gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>', cap:'bookings' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
@@ -632,7 +658,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -656,6 +682,28 @@
     stat += '<div class="b"><div class="l">'+T('sup.received','Ontvangen')+'</div><div class="v g">'+eur(revenue)+'</div></div>';
     $('#homeStat').innerHTML = stat;
     let extra = '';
+
+    // Vandaag nog doen: alles wat aandacht vraagt, met een sprong naar de juiste tab
+    const todos = [];
+    const unreadChats = (state.guestChats || []).reduce((n, c) => n + (c.unread || 0), 0);
+    if (unreadChats) todos.push({ icon:'💬', txt: unreadChats + ' ' + T('todo.chats','onbeantwoord(e) gastbericht(en)'), tab:'gchat' });
+    const newOrders = (state.orders || []).filter(o => o.status === 'nieuw').length;
+    if (newOrders) todos.push({ icon:'🛎️', txt: newOrders + ' ' + T('todo.orders','nieuwe bestelling(en)'), tab:'orders' });
+    const newRides = (state.rides || []).filter(r => r.status === 'aangevraagd').length;
+    if (newRides) todos.push({ icon:'🚗', txt: newRides + ' ' + T('todo.rides','open ritaanvraag/-vragen'), tab:'rides' });
+    if (state.minibar){
+      const roomsAll = (state.rooms || []).map(r => r.name);
+      const notCounted = roomsAll.filter(r => !state.minibar.countedToday.includes(r));
+      if (notCounted.length) todos.push({ icon:'🧊', txt: notCounted.length + ' ' + T('todo.minibar','minibar(s) nog tellen'), tab:'minibar' });
+    }
+    const openRooms = Object.keys((state.pos && state.pos.openRooms) || {}).length;
+    if (openRooms) todos.push({ icon:'🧾', txt: openRooms + ' ' + T('todo.folio','open kamerrekening(en)'), tab:'kassa' });
+    extra += '<div class="card"><div class="tt-h">' + T('todo.h','Vandaag nog doen') + '</div>' +
+      (todos.length ? todos.map(t =>
+        '<button class="todo-row" data-goto="' + t.tab + '"><span>' + t.icon + '</span><b>' + t.txt + '</b><i>›</i></button>'
+      ).join('') : '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--green);">✓ ' + T('todo.none','Alles is bij. Geen openstaande acties.') + '</div>') +
+      '</div>';
+
     const guests = (state.guests || []);
     if (guests.length){
       extra += '<div class="card" style="border-color:rgba(194,58,94,0.35);"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);display:flex;align-items:center;gap:0.4rem;"><span class="livedot"></span>'+T('sup.enroute','Gasten onderweg naar u')+'</div>'+
@@ -986,6 +1034,79 @@
     });
   }
 
+  // ---- minibar-telling per kamer ----
+  let mbRoom = null;       // gekozen kamer
+  let mbQty = {};          // artikel-id -> gebruikt aantal
+  function renderMinibar(){
+    const el = $('#minibarWrap'); if (!el) return;
+    const mb = state.minibar;
+    if (!mb){ el.innerHTML = ''; return; }
+    const rooms = (state.rooms || []).map(r => r.name);
+    if (mbRoom && !rooms.includes(mbRoom)) mbRoom = null;
+
+    // telling invoeren
+    let html = '<div class="card"><div class="tt-h">' + T('mb.count','Telling invoeren') + '</div>';
+    html += '<div class="mb-rooms">' + rooms.map(r => {
+      const done = mb.countedToday.includes(r);
+      return '<button class="mb-room' + (mbRoom === r ? ' on' : '') + '" data-mbroom="' + r.replace(/"/g,'&quot;') + '">' + (done ? '✓ ' : '') + r + '</button>';
+    }).join('') + '</div>';
+    if (mbRoom){
+      html += '<div style="margin-top:0.8rem;font-size:0.74rem;color:var(--soft);">' + T('mb.howmany','Hoeveel is er gebruikt uit') + ' ' + mbRoom + '?</div>';
+      html += mb.catalog.map(m => {
+        const q = mbQty[m.id] || 0;
+        return '<div class="mb-item"><div class="mi"><b>' + m.name + '</b><span>' + eur(m.price) + '</span></div>' +
+          '<div class="qty"><button data-mbmin="' + m.id + '">−</button><b>' + q + '</b><button data-mbplus="' + m.id + '">+</button></div></div>';
+      }).join('');
+      const total = mb.catalog.reduce((s, m) => s + m.price * (mbQty[m.id] || 0), 0);
+      html += '<button class="bigbtn" id="mbSubmit">' + (total > 0
+        ? T('mb.register','Registreer telling') + ', ' + eur(total) + ' ' + T('mb.toroom','op de kamer')
+        : T('mb.registerzero','Registreer: niets gebruikt')) + '</button>';
+    }
+    html += '</div>';
+
+    // vandaag-overzicht
+    const notCounted = rooms.filter(r => !mb.countedToday.includes(r));
+    html += '<div class="card"><div class="tt-h">' + T('mb.today','Vandaag geteld') + ' (' + mb.countedToday.length + '/' + rooms.length + ')</div>' +
+      (notCounted.length
+        ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--amber);">' + T('mb.todo','Nog tellen:') + ' ' + notCounted.join(', ') + '</div>'
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--green);">✓ ' + T('mb.alldone','Alle kamers zijn vandaag geteld.') + '</div>') +
+      (mb.recent.length ? mb.recent.map(e =>
+        '<div class="pos-sale"><div><b>' + e.room + '</b><span>' + (e.items.length ? e.items.map(i => i.qty + 'x ' + i.name).join(', ') : T('mb.nothing','niets gebruikt')) + ' · ' + e.actor + ' · ' + timeAgo(e.at) + '</span></div>' +
+        '<div class="amt" style="font-family:\'Bodoni Moda\',serif;">' + (e.total ? eur(e.total) : '') + '</div></div>').join('') : '') +
+      '</div>';
+
+    // catalogus
+    html += '<div class="card"><div class="tt-h">' + T('mb.catalog','Catalogus') + '</div>' +
+      mb.catalog.map(m => '<div class="pos-sale"><div><b>' + m.name + '</b></div><div style="display:flex;align-items:center;gap:0.5rem;"><span class="amt" style="font-family:\'Bodoni Moda\',serif;">' + eur(m.price) + '</span><button class="rr-del" data-mbdel="' + m.id + '">✕</button></div></div>').join('') +
+      '<div class="tt-add"><input id="mbName" placeholder="' + T('mb.newitem','Nieuw artikel') + '" style="flex:2;min-width:110px;"><input id="mbPrice" type="number" inputmode="decimal" placeholder="€" style="flex:1;min-width:60px;"><button id="mbAdd">' + T('team.add','Toevoegen') + '</button></div></div>';
+
+    el.innerHTML = html;
+    el.querySelectorAll('[data-mbroom]').forEach(b => b.addEventListener('click', () => { mbRoom = b.dataset.mbroom; mbQty = {}; renderMinibar(); openTab('minibar'); }));
+    el.querySelectorAll('[data-mbplus]').forEach(b => b.addEventListener('click', () => { mbQty[b.dataset.mbplus] = (mbQty[b.dataset.mbplus] || 0) + 1; renderMinibar(); openTab('minibar'); }));
+    el.querySelectorAll('[data-mbmin]').forEach(b => b.addEventListener('click', () => { mbQty[b.dataset.mbmin] = Math.max(0, (mbQty[b.dataset.mbmin] || 0) - 1); renderMinibar(); openTab('minibar'); }));
+    const sub = $('#mbSubmit'); if (sub) sub.addEventListener('click', submitMinibar);
+    el.querySelectorAll('[data-mbdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/minibar/item/remove', { id: b.dataset.mbdel }); await refresh(); openTab('minibar'); } catch(e){ toast(e.message); }
+    }));
+    const add = $('#mbAdd'); if (add) add.addEventListener('click', async () => {
+      const name = $('#mbName').value.trim(), price = Number($('#mbPrice').value);
+      if (!name || !(price > 0)){ toast(T('mb.fill','Vul een artikel en prijs in.')); return; }
+      try { await API.call('/supplier/minibar/item/add', { name, price }); toast(T('mb.added','Artikel toegevoegd.')); await refresh(); openTab('minibar'); } catch(e){ toast(e.message); }
+    });
+  }
+  async function submitMinibar(){
+    if (!mbRoom) return;
+    const items = Object.entries(mbQty).filter(([,q]) => q > 0).map(([id, qty]) => ({ id, qty }));
+    try {
+      const d = await API.call('/supplier/minibar/count', { room: mbRoom, items });
+      toast(d.charged > 0
+        ? T('mb.done','Geteld. ') + eur(d.charged) + ' ' + T('mb.charged','op de kamerrekening gezet.')
+        : T('mb.donezero','Geteld: niets gebruikt.'));
+      mbRoom = null; mbQty = {};
+      await refresh(); openTab('minibar');
+    } catch(e){ toast(e.message); }
+  }
+
   // ---- slimme deuren (appartementen) ----
   function renderDoors(){
     const el = $('#doorsWrap'); if (!el) return;
@@ -1067,7 +1188,7 @@
       el.innerHTML = '<div class="card">' + (chats.length ? chats.map(c =>
         '<button class="gc-row" data-gchat="' + c.key + '">' +
           '<span class="av">' + c.codename.split(' ').map(w=>w[0]).slice(0,2).join('') + '</span>' +
-          '<span class="gt"><b>' + c.codename + (c.unread ? ' <i class="gc-unread">' + c.unread + '</i>' : '') + '</b>' +
+          '<span class="gt"><b>' + c.codename + ' <em class="gc-dept">' + c.dept + '</em>' + (c.unread ? ' <i class="gc-unread">' + c.unread + '</i>' : '') + '</b>' +
           '<span>' + (c.lastFrom === 'partner' ? T('gc.you','U: ') : '') + c.last + ' · ' + timeAgo(c.lastAt) + '</span></span>' +
         '</button>'
       ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">' + T('gc.none','Nog geen gesprekken. Berichten van gasten verschijnen hier live.') + '</div>') + '</div>';
@@ -1076,7 +1197,7 @@
     }
     const meta = chats.find(c => c.key === gchatKey);
     el.innerHTML = '<button class="sp-back" id="gcBack">← ' + T('gc.back','Alle gesprekken') + '</button>' +
-      '<div class="card"><div class="tt-h">' + T('sup.guest','Gast') + ' <span style="color:var(--gold);">' + (meta ? meta.codename : '') + '</span></div>' +
+      '<div class="card"><div class="tt-h">' + T('sup.guest','Gast') + ' <span style="color:var(--gold);">' + (meta ? meta.codename : '') + '</span>' + (meta && meta.dept ? ' · ' + meta.dept : '') + '</div>' +
       '<div class="tt-chat" id="gcThread"></div>' +
       '<div class="tt-compose"><input id="gcMsg" placeholder="' + T('gc.ph','Antwoord de gast') + '" autocomplete="off"><button id="gcSend">' + T('team.send','Stuur') + '</button></div></div>';
     $('#gcBack').addEventListener('click', () => { gchatKey = null; renderGChat(); openTab('gchat'); });
@@ -1328,6 +1449,14 @@ window.I18N = { en: {
   'gst.note':'Connecting notifies the guest: you follow the arrival to have everything ready. You then see the live position and arrival time.',
   'tab.gchat':'Guest chat', 'sup.v.gchat':'Guest chat', 'sup.v.gchat.sub':'Direct messages from guests: room service, requests, questions.',
   'gc.none':'No conversations yet. Guest messages appear here live.', 'gc.you':'You: ', 'gc.back':'All conversations', 'gc.ph':'Reply to the guest',
+  'tab.minibar':'Minibar', 'sup.v.minibar':'Minibar', 'sup.v.minibar.sub':'Count per room what was used. Consumption goes to the room folio automatically and the restock list is ready.',
+  'mb.count':'Enter a count', 'mb.howmany':'How much was used from', 'mb.register':'Register count', 'mb.toroom':'to the room', 'mb.registerzero':'Register: nothing used',
+  'mb.today':'Counted today', 'mb.todo':'Still to count:', 'mb.alldone':'All rooms counted today.', 'mb.nothing':'nothing used',
+  'mb.catalog':'Catalogue', 'mb.newitem':'New item', 'mb.fill':'Enter an item and price.', 'mb.added':'Item added.',
+  'mb.done':'Counted. ', 'mb.charged':'charged to the room folio.', 'mb.donezero':'Counted: nothing used.',
+  'todo.h':'To do today', 'todo.none':'All caught up. No open actions.',
+  'todo.chats':'unanswered guest message(s)', 'todo.orders':'new order(s)', 'todo.rides':'open ride request(s)',
+  'todo.minibar':'minibar(s) still to count', 'todo.folio':'open room folio(s)',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

@@ -122,6 +122,19 @@
   .ph-pick img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid transparent;flex-shrink:0;cursor:pointer;}
   .ph-pick img.sel{border-color:var(--gold);}
 
+  /* meer-grid + AI */
+  .meer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-top:1rem;}
+  .meer-btn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 0.5rem 0.95rem;display:flex;flex-direction:column;align-items:center;gap:0.55rem;color:var(--txt);font-family:inherit;}
+  .meer-btn:active{background:var(--card2);border-color:var(--gold);}
+  .meer-btn svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .meer-btn b{font-size:0.72rem;font-weight:600;}
+  .ai-chips{display:flex;gap:0.45rem;overflow-x:auto;margin-top:0.9rem;scrollbar-width:none;padding-bottom:0.2rem;}
+  .ai-chips::-webkit-scrollbar{display:none;}
+  .ai-chip{flex-shrink:0;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem 0.9rem;font-size:0.74rem;font-family:inherit;}
+  .ai-chip:active{border-color:var(--gold);color:var(--gold);}
+  .ai-thread{display:flex;flex-direction:column;gap:0.6rem;margin-top:0.9rem;min-height:160px;}
+  .ai-did{display:block;margin-top:0.35rem;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--green);font-weight:700;}
+
   /* housekeeping + klussen */
   .hk-pill{display:inline-block;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;padding:0.12rem 0.5rem;border-radius:999px;border:1px solid var(--line);vertical-align:middle;margin-left:0.3rem;}
   .hk-schoon{color:var(--green);border-color:rgba(76,154,117,0.4);}
@@ -474,6 +487,18 @@
         <p class="sub" data-i18n="sup.v.team.sub">Personeel, wie wat deed en interne chat van dit bedrijf.</p>
         <div id="teamWrap"></div>
       </div>
+      <div class="view" data-view="ai">
+        <h2 data-i18n="sup.v.ai">AI-assistent</h2>
+        <p class="sub" data-i18n="sup.v.ai.sub">Vraag wat u wilt weten of laat het uitvoeren: kamers, deuren, klussen, omzet, gasten.</p>
+        <div class="ai-chips" id="aiChips"></div>
+        <div class="ai-thread" id="aiThread"></div>
+        <div class="tt-compose" style="margin-top:0.8rem;"><input id="aiInput" placeholder="Bijv. zet Riverside suite op schoon" data-i18n-ph="ai.ph" autocomplete="off"><button id="aiSend" data-i18n="team.send">Stuur</button></div>
+      </div>
+      <div class="view" data-view="meer">
+        <h2 data-i18n="sup.v.meer">Alle functies</h2>
+        <p class="sub" data-i18n="sup.v.meer.sub">Alles van uw bedrijf, overzichtelijk op een rij.</p>
+        <div id="meerWrap"></div>
+      </div>
     </div>
 
     <div class="tabbar" id="tabbar"></div>
@@ -528,6 +553,8 @@
     gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>', cap:'bookings' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
     gchat:    { label:'Gastchat',  svg:'<path d="M21 12a8 8 0 0 1-8 8H4l2.5-3A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>' },
+    ai:       { label:'AI',        svg:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>' },
+    meer:     { label:'Meer',      svg:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>' },
     page:     { label:'Pagina',    svg:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6"/>' },
     team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' }
   };
@@ -570,7 +597,8 @@
       '<div style="margin-top:0.9rem;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);">'+T('gate.sectorapps','Of open de app voor uw sector')+'</div>'+
       '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">'+
         Object.keys(SECTOR_DEF).map(k => '<a class="obtn" style="text-decoration:none;" href="/apps/partner-'+k+'.html">'+SECTOR_DEF[k].icon+' '+(lang()==='en'?SECTOR_DEF[k].labelEn:SECTOR_DEF[k].label)+'</a>').join('')+
-      '</div>');
+      '</div>'+
+      '<a class="obtn" style="text-decoration:none;display:inline-block;margin-top:0.8rem;border-color:rgba(169,143,28,0.4);color:var(--gold);" href="/apps/personeel.html">👤 '+T('gate.staffapp','Werkt u hier? Open de personeels-app')+'</a>');
     document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
     const lf = document.getElementById('loginForm');
     if (lf) lf.addEventListener('submit', e => {
@@ -665,19 +693,28 @@
 
   async function refresh(){ try { applyState((await API.call('/supplier/state')).state); renderAll(); } catch(e){} }
 
-  // ---- tabs op basis van caps ----
+  // ---- navigatie: vijf vaste knoppen, de rest overzichtelijk onder "Meer" ----
+  const MAIN_TABS = ['home', 'kassa', 'ai', 'gchat', 'meer'];
   function buildTabs(){
-    const keys = Object.keys(TABDEF).filter(k => !TABDEF[k].cap || has(TABDEF[k].cap));
-    // bookings voor hotel/appartement → toon onder 'orders'-plek als 'Boekingen'
-    $('#tabbar').innerHTML = keys.map((k,i) =>
+    $('#tabbar').innerHTML = MAIN_TABS.map((k,i) =>
       '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+T('tab.'+k, TABDEF[k].label)+'</button>'
     ).join('');
     document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
   }
   function openTab(tab){
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
-    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+    const hi = MAIN_TABS.includes(tab) ? tab : 'meer';
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab===hi));
     $('#content').scrollTop = 0;
+  }
+  // alle overige functies als nette knoppen in het Meer-scherm
+  function renderMeer(){
+    const el = $('#meerWrap'); if (!el) return;
+    const keys = Object.keys(TABDEF).filter(k => !MAIN_TABS.includes(k) && (!TABDEF[k].cap || has(TABDEF[k].cap)));
+    el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
+      '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
+    ).join('') + '</div>';
+    el.querySelectorAll('[data-goto2]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto2)));
   }
 
   function renderAll(){
@@ -685,7 +722,7 @@
     $('#supName').textContent = S.name;
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderKlussen(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderKlussen(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     if (!document.querySelector('.tabbar button.active')) openTab('home');
   }
 
@@ -1391,6 +1428,48 @@
     });
   }
 
+  // ---- AI-assistent ----
+  let aiMsgs = [];
+  function renderAIChips(){
+    const el = $('#aiChips'); if (!el) return;
+    let chips = [T('ai.c1','Dagomzet'), T('ai.c2','Onbeantwoorde berichten')];
+    if (has('bookings')) chips.push(T('ai.c3','Welke kamers zijn vuil?'), T('ai.c4','Welke minibars nog tellen?'));
+    if (has('orders')) chips.push(T('ai.c5','Open bestellingen'));
+    if (has('doors')) chips.push(T('ai.c6','Open de voordeur'));
+    chips.push(T('ai.c7','Wie is er onderweg?'), T('ai.c8','Welke klussen staan open?'));
+    el.innerHTML = chips.map(c => '<button class="ai-chip">'+c+'</button>').join('');
+    el.querySelectorAll('.ai-chip').forEach(b => b.addEventListener('click', () => { $('#aiInput').value = b.textContent; sendAI(); }));
+  }
+  function renderAIThread(){
+    const t = $('#aiThread'); if (!t) return;
+    t.innerHTML = aiMsgs.length ? aiMsgs.map(m =>
+      '<div class="tt-msg ' + (m.role === 'user' ? 'me' : 'other') + '">' +
+      (m.role === 'ai' ? '<span class="who">✦ AI</span>' : '') +
+      m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
+      (m.did ? '<span class="ai-did">✓ ' + T('ai.did','uitgevoerd') + '</span>' : '') + '</div>'
+    ).join('') : '<div class="pcempty" style="padding:1.4rem 0.5rem;text-align:center;color:var(--soft);font-size:0.82rem;line-height:1.6;">' + T('ai.empty','Uw assistent kent het hele bedrijf: de kassa, de kamers, de klussen, de gasten. Vraag iets of geef een opdracht.') + '</div>';
+    t.scrollTop = t.scrollHeight;
+  }
+  async function sendAI(){
+    const inp = $('#aiInput');
+    const q = (inp.value || '').trim();
+    if (!q) return;
+    inp.value = '';
+    aiMsgs.push({ role: 'user', text: q });
+    aiMsgs.push({ role: 'ai', text: '…' });
+    renderAIThread();
+    try {
+      const d = await API.call('/supplier/ai', { q });
+      aiMsgs[aiMsgs.length - 1] = { role: 'ai', text: d.reply, did: d.did };
+      renderAIThread();
+      if (d.did) await refresh();
+      openTab('ai');
+    } catch(e){
+      aiMsgs[aiMsgs.length - 1] = { role: 'ai', text: e.message };
+      renderAIThread();
+    }
+  }
+
   // ---- team ----
   let lastPin = null; // laatst gegenereerde pincode, eenmalig getoond aan de manager
   function renderTeam(){
@@ -1490,6 +1569,9 @@
   });
 
   $('#actorChip').addEventListener('click', switchUser);
+  $('#aiSend').addEventListener('click', sendAI);
+  $('#aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendAI(); });
+  renderAIThread();
   buildPad();
   renderGate();
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
@@ -1536,7 +1618,7 @@ window.I18N = { en: {
   'tab.team':'Team', 'sup.v.team':'Team', 'sup.v.team.sub':'Staff, who did what and the internal chat of this business.',
   'tab.rooms':'Rooms', 'sup.v.rooms':'Rooms', 'sup.v.rooms.sub':'Switch rooms on or off. Guests only see what is on, live.',
   'tab.kassa':'Register', 'sup.v.kassa':'Register', 'sup.v.kassa.sub':'Checkout, receipts and the day overview, tracked per staff member.',
-  'gate.sectorapps':'Or open the app for your sector',
+  'gate.sectorapps':'Or open the app for your sector', 'gate.staffapp':'Work here? Open the staff app',
   'pos.pin':'Card', 'pos.cash':'Cash', 'pos.room':'To the room', 'pos.toroom':'To the room',
   'pos.nomenu':'Add dishes to the menu first; they become your register keys here.',
   'pos.newbon':'New receipt', 'pos.total':'Total', 'pos.clear':'Clear', 'pos.paypin':'Checkout, card',
@@ -1579,6 +1661,12 @@ window.I18N = { en: {
   'lf.h':'Lost & found', 'lf.at':'stored at', 'lf.picked':'Picked up', 'lf.none':'Nothing in storage.',
   'lf.itemph':'Item, e.g. sunglasses', 'lf.storageph':'Storage spot', 'lf.noroom':'Elsewhere',
   'lf.fill':'Describe the item.', 'lf.added':'Registered.', 'lf.pickedtoast':'Handed over and signed off.',
+  'tab.ai':'AI', 'tab.meer':'More', 'sup.v.ai':'AI assistant', 'sup.v.ai.sub':'Ask anything or have it done: rooms, doors, jobs, revenue, guests.',
+  'sup.v.meer':'All functions', 'sup.v.meer.sub':'Everything in your business, neatly in one place.',
+  'ai.ph':'E.g. set Riverside suite to clean', 'ai.did':'done',
+  'ai.empty':'Your assistant knows the whole business: the register, the rooms, the jobs, the guests. Ask something or give an instruction.',
+  'ai.c1':'Revenue today', 'ai.c2':'Unanswered messages', 'ai.c3':'Which rooms are dirty?', 'ai.c4':'Which minibars left to count?',
+  'ai.c5':'Open orders', 'ai.c6':'Open the front door', 'ai.c7':'Who is on the way?', 'ai.c8':'Which jobs are open?',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

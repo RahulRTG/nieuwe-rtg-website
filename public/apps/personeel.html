@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<title>RTG Personeel, uw dienst en taken</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.55); --soft:rgba(244,241,236,0.38);
+    --burgundy:#C23A5E; --burgundy-deep:#7F1634; --gold:#A98F1C; --green:#4C9A75; --amber:#C99A2E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:#000;font-family:'Inter',sans-serif;color:var(--txt);display:flex;justify-content:center;-webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
+  input,select{font-family:'Inter',sans-serif;}
+  #shell{width:100%;max-width:460px;min-height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  @media (min-width:540px){body{background:#201d1c;padding:2.5rem 0;}#shell{min-height:880px;max-height:920px;border-radius:38px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 90px -30px rgba(0,0,0,0.8);}}
+
+  /* stappen-gate */
+  #gate{flex:1;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 1.75rem 3rem;}
+  #gate .badge{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+  #gate h1{font-size:1.9rem;line-height:1.12;margin-top:1.4rem;}
+  #gate h1 em{color:var(--burgundy);font-style:italic;}
+  #gate .deck{margin-top:0.8rem;font-size:0.86rem;color:var(--muted);line-height:1.6;}
+  .glist{margin-top:1.8rem;display:flex;flex-direction:column;gap:0.6rem;}
+  .gbtn{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:0.95rem 1.1rem;text-align:left;display:flex;align-items:center;gap:0.9rem;}
+  .gbtn:active{background:var(--card2);}
+  .gbtn .ic{font-size:1.4rem;}
+  .gbtn b{display:block;font-size:0.92rem;font-weight:600;}
+  .gbtn span{font-size:0.72rem;color:var(--soft);}
+  .gback{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:0.82rem;margin-bottom:1rem;padding:0;}
+  .pinrow{margin-top:1.4rem;display:flex;gap:0.6rem;}
+  .pinrow input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:0.9rem 1rem;color:var(--txt);font-size:1.1rem;letter-spacing:0.4em;text-align:center;outline:none;}
+  .pinrow input:focus{border-color:var(--burgundy);}
+  .pinrow button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 1.4rem;font-size:0.86rem;font-weight:600;}
+
+  /* app */
+  #app{display:none;flex:1;flex-direction:column;min-height:0;}
+  #app.active{display:flex;}
+  .topbar{padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.4rem 0.9rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);}
+  .topbar .who b{display:block;font-size:0.94rem;font-weight:600;}
+  .topbar .who span{font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);}
+  .switch{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.7rem;color:var(--muted);}
+  .content{flex:1;overflow-y:auto;padding:1.3rem 1.4rem calc(env(safe-area-inset-bottom,0px) + 6rem);}
+  .view{display:none;}
+  .view.active{display:block;}
+  .view h2{font-size:1.5rem;}
+  .view .sub{margin-top:0.35rem;font-size:0.82rem;color:var(--muted);}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-top:0.9rem;}
+  .k{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
+
+  .shift-big{margin-top:0.5rem;font-family:'Bodoni Moda',serif;font-size:1.5rem;color:var(--gold);}
+  .task{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
+  .task:last-child{border-bottom:none;}
+  .task .ic{font-size:1.1rem;flex-shrink:0;}
+  .task .t{flex:1;min-width:0;}
+  .task .t b{display:block;font-size:0.86rem;font-weight:600;}
+  .task .t span{font-size:0.7rem;color:var(--soft);}
+  .abtn{background:#fff;color:#000;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;white-space:nowrap;}
+  .abtn.ghost{background:none;border:1px solid var(--line);color:var(--txt);}
+  .pill{display:inline-block;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
+  .pill.g{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .pill.a{color:var(--amber);border-color:rgba(201,154,46,0.4);}
+  .pill.b{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
+
+  .rooster-day{margin-top:0.9rem;}
+  .rooster-day .dh{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;}
+  .rrow{display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;border-radius:10px;font-size:0.84rem;}
+  .rrow.me{background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);}
+  .rrow span{color:var(--muted);font-size:0.76rem;}
+  .rrow.me span{color:var(--gold);}
+
+  .chat{display:flex;flex-direction:column;gap:0.55rem;margin-top:0.6rem;}
+  .msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.85rem;line-height:1.45;}
+  .msg.me{align-self:flex-end;background:var(--burgundy-deep);border-top-right-radius:5px;color:#fff;}
+  .msg.other{align-self:flex-start;background:var(--card2);border:1px solid var(--line);border-top-left-radius:5px;}
+  .msg .who{display:block;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:0.15rem;}
+  .msg.me .who{color:rgba(255,255,255,0.65);}
+  .compose{display:flex;gap:0.5rem;margin-top:0.9rem;}
+  .compose input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.88rem;color:var(--txt);outline:none;}
+  .compose button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
+  .act{display:flex;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;}
+  .act:last-child{border-bottom:none;}
+  .act b{color:var(--gold);font-weight:600;white-space:nowrap;}
+  .act span{color:var(--muted);flex:1;}
+  .act time{color:var(--soft);font-size:0.64rem;white-space:nowrap;}
+
+  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:rgba(12,12,11,0.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;padding:0.55rem 0.4rem calc(env(safe-area-inset-bottom,0px) + 0.55rem);}
+  .tabbar button{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:0.25rem;font-size:0.58rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);}
+  .tabbar button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .tabbar button.active{color:var(--txt);}
+  .tabbar button.active svg{stroke:var(--burgundy);}
+  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:#fff;color:#000;font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+<div id="shell">
+
+  <div id="gate">
+    <div class="badge">RTG Personeel</div>
+    <h1 data-i18n-html="pd.title">Uw dienst, <em>in uw zak</em>.</h1>
+    <p class="deck" data-i18n="pd.deck">Rooster, taken, teamchat en de werkzaamheden van uw bedrijf. Kies uw sector, uw bedrijf en log in met uw pincode.</p>
+    <div id="gateStep"></div>
+  </div>
+
+  <div id="app">
+    <div class="topbar">
+      <div class="who"><b id="meName"></b><span id="meSub"></span></div>
+      <button class="switch" id="switchBtn" data-i18n="pd.switch">Wissel</button>
+    </div>
+    <div class="content" id="content">
+      <div class="view active" data-view="vandaag">
+        <h2 data-i18n="pd.v.today">Vandaag.</h2>
+        <p class="sub" id="todaySub"></p>
+        <div id="todayWrap"></div>
+      </div>
+      <div class="view" data-view="rooster">
+        <h2 data-i18n="pd.v.rooster">Rooster</h2>
+        <p class="sub" data-i18n="pd.v.rooster.sub">De komende zeven dagen, uw diensten uitgelicht.</p>
+        <div id="roosterWrap"></div>
+      </div>
+      <div class="view" data-view="taken">
+        <h2 data-i18n="pd.v.taken">Taken</h2>
+        <p class="sub" data-i18n="pd.v.taken.sub">Klussen, kamers en alles wat vandaag aandacht vraagt.</p>
+        <div id="takenWrap"></div>
+      </div>
+      <div class="view" data-view="team">
+        <h2 data-i18n="pd.v.team">Team</h2>
+        <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
+        <div id="teamWrap"></div>
+      </div>
+    </div>
+    <div class="tabbar" id="tabbar">
+      <button data-tab="vandaag" class="active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span data-i18n="pd.t.today">Vandaag</span></button>
+      <button data-tab="rooster"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span data-i18n="pd.t.rooster">Rooster</span></button>
+      <button data-tab="taken"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span data-i18n="pd.t.taken">Taken</span></button>
+      <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
+
+  const SECTORS = [
+    { id:'horeca',  icon:'🍽️', nl:'Horeca',  en:'Hospitality', sub:'Restaurants, bars, clubs', codes:['KIKUNOI','PONTO'] },
+    { id:'verblijf',icon:'🏨', nl:'Verblijf', en:'Stays', sub:'Hotels en appartementen', codes:['HOSHI','SAKURA'] },
+    { id:'vervoer', icon:'🚘', nl:'Vervoer', en:'Transport', sub:'Taxi\'s en privéjets', codes:['MKKX','JETAG'] }
+  ];
+  const BEDRIJVEN = {
+    KIKUNOI:{ name:'Kikunoi Honten', icon:'🍽️' }, PONTO:{ name:'Bar Pontocho', icon:'🍸' },
+    HOSHI:{ name:'Hoshinoya Kyoto', icon:'🏨' }, SAKURA:{ name:'Sakura Machiya Residence', icon:'🏡' },
+    MKKX:{ name:'Kyoto Executive Cars', icon:'🚘' }, JETAG:{ name:'Aria Private Aviation', icon:'✈️' }
+  };
+
+  const API = {
+    token: null,
+    async call(path, body){
+      const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(this.token?{'Authorization':'Bearer '+this.token}:{})}, body: JSON.stringify(body||{}) });
+      const data = await res.json().catch(()=>({}));
+      if (!res.ok) throw new Error(data.error||'Fout');
+      return data;
+    }
+  };
+
+  let state = null, me = null, code = null, week = null;
+  let toastTimer;
+  function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3000); }
+  function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min'); const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur'); return Math.round(h/24)+T('t.days',' dg'); }
+  function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  /* ---------- stappen-gate: sector -> bedrijf -> wie -> pincode ---------- */
+  function stepSector(){
+    $('#gateStep').innerHTML = '<div class="glist">' + SECTORS.map(s =>
+      '<button class="gbtn" data-sec="'+s.id+'"><span class="ic">'+s.icon+'</span><span><b>'+(lang()==='en'?s.en:s.nl)+'</b><span>'+s.sub+'</span></span></button>'
+    ).join('') + '</div>';
+    document.querySelectorAll('[data-sec]').forEach(b => b.addEventListener('click', () => stepBedrijf(b.dataset.sec)));
+  }
+  function stepBedrijf(secId){
+    const sec = SECTORS.find(s => s.id === secId);
+    $('#gateStep').innerHTML = '<button class="gback" id="gb1">← '+T('pd.back','Terug')+'</button><div class="glist">' + sec.codes.map(c =>
+      '<button class="gbtn" data-bedrijf="'+c+'"><span class="ic">'+BEDRIJVEN[c].icon+'</span><span><b>'+BEDRIJVEN[c].name+'</b><span>'+T('pd.choose','Kies uw bedrijf')+'</span></span></button>'
+    ).join('') + '</div>';
+    $('#gb1').addEventListener('click', stepSector);
+    document.querySelectorAll('[data-bedrijf]').forEach(b => b.addEventListener('click', () => stepWie(secId, b.dataset.bedrijf)));
+  }
+  async function stepWie(secId, c){
+    let roster = { staff: [] };
+    try { roster = await API.call('/supplier/roster', { code: c }); }
+    catch(e){ toast(T('pd.needserver','Start de server om in te loggen.')); return; }
+    $('#gateStep').innerHTML = '<button class="gback" id="gb2">← '+T('pd.back','Terug')+'</button><div class="glist">' + (roster.staff||[]).map(m =>
+      '<button class="gbtn" data-wie="'+m.id+'" data-nm="'+esc(m.name)+'"><span class="ic">'+(m.role==='manager'?'⭐':'👤')+'</span><span><b>'+m.name+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+'</span></span></button>'
+    ).join('') + '</div>';
+    $('#gb2').addEventListener('click', () => stepBedrijf(secId));
+    document.querySelectorAll('[data-wie]').forEach(b => b.addEventListener('click', () => stepPin(secId, c, Number(b.dataset.wie), b.dataset.nm)));
+  }
+  function stepPin(secId, c, staffId, nm){
+    $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+T('pd.back','Terug')+'</button>'+
+      '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
+      '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
+      '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>';
+    $('#gb3').addEventListener('click', () => stepWie(secId, c));
+    const go = async () => {
+      try {
+        const d = await API.call('/supplier/login', { code: c, staffId, pin: $('#pinInp').value });
+        API.token = d.token; state = d.state; code = c;
+        me = { name: d.state.actor.name, role: d.state.actor.role, staffId: d.state.actor.staffId };
+        week = await API.call('/supplier/schedule', {}).catch(()=>null);
+        enter();
+      } catch(e){ toast(e.message || T('pd.badpin','Onjuiste pincode.')); }
+    };
+    $('#pinGo').addEventListener('click', go);
+    $('#pinInp').addEventListener('keydown', e => { if (e.key==='Enter') go(); });
+    $('#pinInp').focus();
+  }
+
+  function enter(){
+    $('#gate').style.display = 'none';
+    $('#app').classList.add('active');
+    $('#meName').textContent = me.name;
+    $('#meSub').textContent = BEDRIJVEN[code].name + ' · ' + (me.role==='manager'?'Manager':T('pd.staff','Medewerker'));
+    renderAll();
+    startStream();
+  }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderTeam(); }
+  async function refresh(){ try { state = (await API.call('/supplier/state')).state; renderAll(); } catch(e){} }
+
+  function myShift(dayIndex){
+    if (!week) return null;
+    const d = week.days[dayIndex]; if (!d) return null;
+    const m = d.staff.find(x => x.id === me.staffId);
+    return m ? m.shift : null;
+  }
+  function taskList(){
+    const t = [];
+    (state.tickets||[]).filter(x=>x.status!=='klaar').forEach(x => t.push({ icon:'🔧', b:x.text, s:(x.room?x.room+' · ':'')+(x.status==='bezig'?T('pd.busy','wordt opgepakt'):T('pd.open','open')), kind:'ticket', id:x.id, status:x.status }));
+    (state.rooms||[]).filter(r=>r.hk&&r.hk.status==='vuil').forEach(r => t.push({ icon:'🧹', b:r.name, s:T('pd.toclean','schoonmaken'), kind:'hk', id:r.id }));
+    if (state.minibar){
+      (state.rooms||[]).map(r=>r.name).filter(n=>!state.minibar.countedToday.includes(n)).forEach(n => t.push({ icon:'🧊', b:T('pd.minibar','Minibar tellen')+': '+n, s:T('pd.inapp','via de bedrijfsapp'), kind:'info' }));
+    }
+    (state.orders||[]).filter(o=>o.status==='nieuw').forEach(o => t.push({ icon:'🛎️', b:T('pd.order','Nieuwe bestelling')+' '+o.customerCodename, s:eur(o.total)+' · code '+o.pickup, kind:'info' }));
+    (state.rides||[]).filter(r=>r.status==='aangevraagd').forEach(r => t.push({ icon:'🚗', b:T('pd.ride','Ritaanvraag')+' '+r.customerCodename, s:(r.from||'')+' → '+(r.to||''), kind:'info' }));
+    (state.guestChats||[]).filter(c=>c.unread).forEach(c => t.push({ icon:'💬', b:c.codename+' ('+c.dept+')', s:c.last, kind:'info' }));
+    return t;
+  }
+
+  function renderToday(){
+    const shift = myShift(0);
+    const tasks = taskList();
+    $('#todaySub').textContent = new Date().toLocaleDateString(lang()==='en'?'en-GB':'nl-NL', { weekday:'long', day:'numeric', month:'long' });
+    $('#todayWrap').innerHTML =
+      '<div class="card"><div class="k">'+T('pd.myshift','Uw dienst vandaag')+'</div><div class="shift-big">'+(shift||T('pd.noshift','Geen dienst'))+'</div></div>'+
+      '<div class="card"><div class="k">'+T('pd.tasksnow','Nu aandacht nodig')+' ('+tasks.length+')</div>'+
+      (tasks.length ? tasks.slice(0,6).map(t=>'<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(t.b)+'</b><span>'+esc(t.s)+'</span></div></div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--green);">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+
+      (tasks.length>6?'<div style="margin-top:0.5rem;font-size:0.74rem;color:var(--soft);">+'+(tasks.length-6)+' '+T('pd.more','meer onder Taken')+'</div>':'')+'</div>';
+  }
+
+  function renderRooster(){
+    if (!week){ $('#roosterWrap').innerHTML = ''; return; }
+    $('#roosterWrap').innerHTML = week.days.map((d,i) =>
+      '<div class="rooster-day"><div class="dh">'+d.label+' · '+d.date.slice(8,10)+'-'+d.date.slice(5,7)+'</div>'+
+      d.staff.map(m => '<div class="rrow'+(m.id===me.staffId?' me':'')+'"><b>'+esc(m.name)+(m.id===me.staffId?' ('+T('pd.you','u')+')':'')+'</b><span>'+m.shift+'</span></div>').join('')+
+      '</div>'
+    ).join('');
+  }
+
+  function renderTaken(){
+    const tasks = taskList();
+    $('#takenWrap').innerHTML = '<div class="card">'+(tasks.length ? tasks.map(t => {
+      let act = '';
+      if (t.kind==='ticket') act = t.status==='open'
+        ? '<button class="abtn" data-tk="'+t.id+'" data-st="bezig">'+T('pd.pickup','Oppakken')+'</button>'
+        : '<button class="abtn" data-tk="'+t.id+'" data-st="klaar">'+T('pd.done','Klaar')+'</button>';
+      if (t.kind==='hk') act = '<button class="abtn" data-hk="'+t.id+'">'+T('pd.clean','Schoon')+'</button>';
+      return '<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(t.b)+'</b><span>'+esc(t.s)+'</span></div>'+act+'</div>';
+    }).join('') : '<div style="font-size:0.84rem;color:var(--green);padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
+    document.querySelectorAll('[data-tk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/ticket/status', { id:b.dataset.tk, status:b.dataset.st }); toast(b.dataset.st==='klaar'?T('pd.tickdone','Klus afgerond.'):T('pd.tickbusy','Opgepakt.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/room/hk', { id:b.dataset.hk, status:'schoon' }); toast(T('pd.cleaned','Kamer staat op schoon.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    }));
+  }
+
+  function renderTeam(){
+    const team = state.team || [];
+    const act = (state.activity || []).slice(0, 10);
+    $('#teamWrap').innerHTML =
+      '<div class="card"><div class="k">'+T('pd.chat','Teamchat')+'</div><div class="chat">'+
+      (team.length ? team.map(m=>'<div class="msg '+(m.who===me.name?'me':'other')+'"><span class="who">'+esc(m.who)+'</span>'+esc(m.text)+'</div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.nochat','Nog geen berichten.')+'</div>')+
+      '</div><div class="compose"><input id="tmMsg" placeholder="'+T('pd.msgph','Bericht aan het team')+'"><button id="tmSend">'+T('pd.send','Stuur')+'</button></div></div>'+
+      '<div class="card"><div class="k">'+T('pd.activity','Wie deed wat')+'</div>'+
+      (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);padding:0.4rem 0;">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>';
+    const send = async () => {
+      const inp = $('#tmMsg'); const text = (inp.value||'').trim(); if (!text) return;
+      inp.value = '';
+      try { await API.call('/supplier/team/message', { text }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
+    };
+    $('#tmSend').addEventListener('click', send);
+    $('#tmMsg').addEventListener('keydown', e => { if (e.key==='Enter') send(); });
+  }
+
+  function openTab(tab){
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+    $('#content').scrollTop = 0;
+  }
+  document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
+  $('#switchBtn').addEventListener('click', () => location.reload());
+
+  function startStream(){
+    if (!window.EventSource) return;
+    try {
+      const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
+      src.addEventListener('sync', () => refresh());
+      src.addEventListener('notify', () => refresh());
+    } catch(e){}
+  }
+
+  window.addEventListener('rtglang', () => { if (state) renderAll(); else stepSector(); });
+  stepSector();
+})();
+</script>
+<script>
+window.I18N = { en: {
+  'pd.title':'Your shift, <em>in your pocket</em>.',
+  'pd.deck':'Schedule, tasks, team chat and the work of your business. Pick your sector, your company and sign in with your PIN.',
+  'pd.back':'Back', 'pd.choose':'Choose your company', 'pd.staff':'Staff member', 'pd.login':'Sign in',
+  'pd.pinhint':'Demo: manager 1234, staff 5678.', 'pd.badpin':'Wrong PIN.', 'pd.needserver':'Start the server to sign in.',
+  'pd.switch':'Switch', 'pd.v.today':'Today.', 'pd.v.rooster':'Schedule', 'pd.v.rooster.sub':'The next seven days, your shifts highlighted.',
+  'pd.v.taken':'Tasks', 'pd.v.taken.sub':'Jobs, rooms and everything needing attention today.',
+  'pd.v.team':'Team', 'pd.v.team.sub':'Internal chat and who did what.',
+  'pd.t.today':'Today', 'pd.t.rooster':'Schedule', 'pd.t.taken':'Tasks', 'pd.t.team':'Team',
+  'pd.myshift':'Your shift today', 'pd.noshift':'No shift', 'pd.tasksnow':'Needs attention now',
+  'pd.alldone':'All caught up.', 'pd.more':'more under Tasks',
+  'pd.busy':'being picked up', 'pd.open':'open', 'pd.toclean':'to clean', 'pd.minibar':'Count minibar', 'pd.inapp':'via the business app',
+  'pd.order':'New order', 'pd.ride':'Ride request', 'pd.you':'you',
+  'pd.pickup':'Pick up', 'pd.done':'Done', 'pd.clean':'Clean', 'pd.tickdone':'Job completed.', 'pd.tickbusy':'Picked up.', 'pd.cleaned':'Room set to clean.',
+  'pd.chat':'Team chat', 'pd.nochat':'No messages yet.', 'pd.msgph':'Message to the team', 'pd.send':'Send',
+  'pd.activity':'Who did what', 'pd.noact':'No activity yet.',
+  't.now':'now', 't.min':' min', 't.hour':' h', 't.days':' d'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
+</body>
+</html>

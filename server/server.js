@@ -933,26 +933,28 @@ function addTicket(code, actor, text, room) {
   db.data.tickets[code] = list.slice(0, 120);
   return t;
 }
+function setRoomHk(s, room, status, note, actor) {
+  const wasDefect = room.hk && room.hk.status === 'defect';
+  room.hk = { status, note: status === 'defect' ? note : '', by: actor.name, at: new Date().toISOString() };
+  if (status === 'defect') {
+    // direct uit de verkoop en een klus voor onderhoud
+    if (room.available) { room.available = false; room.hkDisabledAvail = true; }
+    addTicket(s.code, actor, 'Kamer defect: ' + (note || room.name), room.name);
+    logActivity(s.code, actor, 'meldde ' + room.name + ' defect' + (note ? ': ' + note : ''));
+  } else {
+    if (wasDefect && room.hkDisabledAvail) { room.available = true; delete room.hkDisabledAvail; }
+    logActivity(s.code, actor, 'zette ' + room.name + ' op "' + status + '"');
+  }
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  sseToSupplier(s.code, 'sync', { scope: 'rooms' });
+}
 app.post('/api/supplier/room/hk', supplierAuth, (req, res) => {
   const room = (req.supplier.rooms || []).find(r => r.id === req.body.id);
   if (!room) return res.status(404).json({ error: 'Kamer niet gevonden.' });
   const status = String(req.body.status || '');
   if (!HK_STATUSES.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
-  const note = String(req.body.note || '').trim().slice(0, 140);
-  const wasDefect = room.hk && room.hk.status === 'defect';
-  room.hk = { status, note: status === 'defect' ? note : '', by: req.actor.name, at: new Date().toISOString() };
-  if (status === 'defect') {
-    // direct uit de verkoop en een klus voor onderhoud
-    if (room.available) { room.available = false; room.hkDisabledAvail = true; }
-    addTicket(req.supplier.code, req.actor, 'Kamer defect: ' + (note || room.name), room.name);
-    logActivity(req.supplier.code, req.actor, 'meldde ' + room.name + ' defect' + (note ? ': ' + note : ''));
-  } else {
-    if (wasDefect && room.hkDisabledAvail) { room.available = true; delete room.hkDisabledAvail; }
-    logActivity(req.supplier.code, req.actor, 'zette ' + room.name + ' op "' + status + '"');
-  }
-  save();
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
+  setRoomHk(req.supplier, room, status, String(req.body.note || '').trim().slice(0, 140), req.actor);
   res.json({ ok: true, rooms: req.supplier.rooms });
 });
 
@@ -1393,6 +1395,155 @@ app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
   pushLive(key);
   res.json({ ok: true, guests: guestsFor(req.supplier.code) });
 });
+
+/* ---- AI-assistent voor de leverancier-app ----
+   Begrijpt vragen EN voert acties uit: kamers op status zetten, deuren
+   openen, klussen melden, dagomzet, gasten onderweg, open chats, minibar.
+   Zonder API-key werkt de intent-motor; met key beantwoordt Claude ook
+   vrije vragen met de bedrijfscontext. */
+function aiFindRoom(s, ql) {
+  return (s.rooms || []).find(r => ql.includes(r.name.toLowerCase())) ||
+         (s.rooms || []).find(r => r.name.toLowerCase().split(/[ ,]+/).some(w => w.length > 3 && ql.includes(w)));
+}
+function aiFindDoor(s, ql) {
+  return (s.doors || []).find(d => ql.includes(d.name.toLowerCase())) ||
+         (s.doors || []).find(d => d.name.toLowerCase().split(/[ (]+/).some(w => w.length > 3 && ql.includes(w))) ||
+         ((ql.includes('deur') || ql.includes('door')) ? (s.doors || [])[0] : null);
+}
+app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
+  const s = req.supplier;
+  const q = String(req.body.q || '').trim().slice(0, 300);
+  if (!q) return res.status(400).json({ error: 'Stel een vraag.' });
+  const ql = q.toLowerCase();
+  const A = (reply, did) => res.json({ reply, did: !!did });
+
+  // ---- acties ----
+  // kamerstatus: "zet <kamer> op schoon/vuil/bezig/bezet" of "meld <kamer> defect: reden"
+  const hkWord = { schoon:'schoon', clean:'schoon', vuil:'vuil', dirty:'vuil', bezig:'bezig', bezet:'bezet', occupied:'bezet', defect:'defect', kapot:'defect', stuk:'defect' };
+  const hkHit = Object.keys(hkWord).find(w => ql.includes(w));
+  const room = aiFindRoom(s, ql);
+  if (room && hkHit && /\b(zet|meld|maak|markeer|set|mark|is)\b/.test(ql)) {
+    const status = hkWord[hkHit];
+    const note = (q.split(/[:,]/)[1] || '').trim().slice(0, 140);
+    setRoomHk(s, room, status, status === 'defect' ? (note || 'gemeld via AI') : '', req.actor);
+    return A(status === 'defect'
+      ? room.name + ' staat op defect: uit de verkoop en er staat een klus klaar voor onderhoud.'
+      : room.name + ' staat nu op "' + status + '".', true);
+  }
+  // deuren: "open de voordeur" / "vergrendel machiya 1"
+  if (/\b(open|vergrendel|lock|sluit)\b/.test(ql) && (s.doors || []).length) {
+    const door = aiFindDoor(s, ql);
+    if (door) {
+      if (/\b(vergrendel|lock|sluit)\b/.test(ql)) {
+        door.locked = true; door.lastBy = req.actor.name; door.lastAt = new Date().toISOString(); save();
+        logActivity(s.code, req.actor, 'vergrendelde "' + door.name + '" via de AI-assistent');
+        sseToSupplier(s.code, 'sync', { scope: 'doors' });
+        return A(door.name + ' is vergrendeld.', true);
+      }
+      unlockDoor(s, door, req.actor.name);
+      logActivity(s.code, req.actor, 'opende "' + door.name + '" via de AI-assistent');
+      return A(door.name + ' is open en vergrendelt zichzelf over 10 seconden.', true);
+    }
+  }
+  // klus melden: "meld klus: lamp kapot" / "nieuwe klus ..."
+  const klusMatch = q.match(/(?:meld(?:\s+een)?\s+klus|nieuwe\s+klus|new\s+job)[:\s]+(.{3,})/i);
+  if (klusMatch) {
+    const t = addTicket(s.code, req.actor, klusMatch[1].trim(), room ? room.name : null);
+    save();
+    logActivity(s.code, req.actor, 'meldde een klus via de AI-assistent: ' + t.text.slice(0, 50));
+    sseToSupplier(s.code, 'sync', { scope: 'rooms' });
+    return A('Klus genoteerd' + (t.room ? ' voor ' + t.room : '') + ': "' + t.text + '". Onderhoud ziet hem in de klussenlijst.', true);
+  }
+
+  // ---- vragen ----
+  if (/(omzet|dagtotaal|z.rapport|verdiend|revenue|kassa)/.test(ql)) {
+    const p = posDay(s.code);
+    const methods = Object.entries(p.byMethod).map(([m, v]) => m + ' € ' + v).join(', ');
+    const open = Object.entries(p.openRooms || {}).map(([r, v]) => r + ' € ' + v.total).join(', ');
+    return A('Vandaag ontvangen: € ' + p.total + ' over ' + p.count + ' bon(nen)' + (methods ? ' (' + methods + ')' : '') +
+      (open ? '. Nog open op kamers: ' + open + '.' : '.'));
+  }
+  if (/(vuil|schoon|status|kamers?\b).*(kamer|room|status)|welke kamers/.test(ql) && (s.rooms || []).length) {
+    const lines = s.rooms.map(r => r.name + ': ' + ((r.hk && r.hk.status) || 'schoon') + (r.available ? '' : ' (uit de verkoop)'));
+    return A('Kamerstatus. ' + lines.join('. ') + '.');
+  }
+  if (/(klus|onderhoud|jobs?|tickets?)/.test(ql)) {
+    const open = (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar');
+    return A(open.length
+      ? 'Er staan ' + open.length + ' klus(sen) open: ' + open.map(t => t.text + (t.room ? ' (' + t.room + ')' : '') + (t.status === 'bezig' ? ', wordt opgepakt' : '')).join('; ') + '.'
+      : 'Er zijn geen openstaande klussen.');
+  }
+  if (/(onderweg|gast(en)?\b|eta|guests?)/.test(ql)) {
+    const g = guestsFor(s.code);
+    return A(g.length
+      ? g.map(x => x.codename + (x.arrived ? ' is gearriveerd' : x.etaMin != null ? ' arriveert over ~' + x.etaMin + ' min' : ' is onderweg')).join('. ') + '.'
+      : 'Er is nu geen gast live onderweg naar u.');
+  }
+  if (/(bericht|chat|onbeantwoord|messages?)/.test(ql)) {
+    const chats = Object.values(db.data.guestChats).filter(c => c.supplierCode === s.code && c.unreadPartner > 0);
+    return A(chats.length
+      ? 'U heeft ' + chats.reduce((n, c) => n + c.unreadPartner, 0) + ' onbeantwoord(e) bericht(en): ' + chats.map(c => c.codename + ' (' + (c.dept || 'Team') + '): "' + c.messages[c.messages.length - 1].text.slice(0, 40) + '"').join('; ') + '.'
+      : 'Alle gastberichten zijn beantwoord.');
+  }
+  if (/(minibar)/.test(ql) && Array.isArray(s.minibar)) {
+    const today = new Date().toISOString().slice(0, 10);
+    const counted = [...new Set((db.data.minibarCounts[s.code] || []).filter(e => e.at.slice(0, 10) === today).map(e => e.room))];
+    const todo = (s.rooms || []).map(r => r.name).filter(n => !counted.includes(n));
+    return A(todo.length ? 'Nog te tellen: ' + todo.join(', ') + '.' : 'Alle minibars zijn vandaag geteld.');
+  }
+  if (/(bestelling|orders?|bon(nen)?\b)/.test(ql)) {
+    const open = db.data.orders.filter(o => o.supplierCode === s.code && !['geserveerd', 'geweigerd', 'terugbetaald'].includes(o.status));
+    return A(open.length
+      ? open.length + ' open bestelling(en): ' + open.map(o => o.customerCodename + ' € ' + o.total + ' (' + o.status + ', code ' + o.pickup + ')').join('; ') + '.'
+      : 'Er zijn geen open bestellingen.');
+  }
+  if (/(rooster|dienst|schedule|shift)/.test(ql)) {
+    const wk = scheduleFor(s.code);
+    const today = wk.days[0];
+    return A('Vandaag: ' + today.staff.map(x => x.name + ' ' + x.shift).join('; ') + '. Het volledige rooster staat in de personeels-app.');
+  }
+
+  // vrije vraag: Claude met bedrijfscontext, anders hulptekst
+  if (anthropic) {
+    try {
+      const p = posDay(s.code);
+      const ctx = 'Bedrijf: ' + s.name + ' (' + s.type + ', ' + s.city + '). Vandaag ontvangen: € ' + p.total + '. ' +
+        'Kamers: ' + (s.rooms || []).map(r => r.name + '=' + ((r.hk && r.hk.status) || 'schoon')).join(', ') + '. ' +
+        'Open klussen: ' + (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length + '.';
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 300,
+        system: 'Je bent de AI-assistent van een RTG-partner. Antwoord kort en concreet in de taal van de vraag. Context: ' + ctx,
+        messages: [{ role: 'user', content: q }]
+      });
+      return A(response.content[0].text);
+    } catch (e) { /* val terug op hulptekst */ }
+  }
+  return A('Dat begrijp ik nog niet helemaal. U kunt mij bijvoorbeeld vragen: "dagomzet", "welke kamers zijn vuil", "zet Riverside suite op schoon", "meld Garden kamer defect: douche lekt", "open de voordeur", "meld klus: lamp vervangen", "wie is er onderweg", "onbeantwoorde berichten", "welke minibars nog tellen" of "open bestellingen".');
+});
+
+/* ---- weekrooster: deterministisch gegenereerd per personeelslid ---- */
+const SHIFT_NAMES = ['Ochtend 07:00-15:00', 'Avond 15:00-23:00', 'Vrij'];
+function scheduleFor(code) {
+  const staff = accounts.listStaff(code).map(accounts.publicStaff);
+  const days = [];
+  const now = new Date();
+  const dayNames = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+  for (let d = 0; d < 7; d++) {
+    const date = new Date(now.getTime() + d * 86400000);
+    const doy = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+    days.push({
+      date: date.toISOString().slice(0, 10),
+      label: (d === 0 ? 'Vandaag' : d === 1 ? 'Morgen' : dayNames[date.getDay()]),
+      staff: staff.map((m, i) => ({
+        id: m.id, name: m.name, role: m.role,
+        // managers vaker overdag; iedereen om de paar dagen vrij
+        shift: SHIFT_NAMES[(m.id * 3 + doy + (m.role === 'manager' ? 0 : i)) % 3]
+      }))
+    });
+  }
+  return { days, shifts: SHIFT_NAMES };
+}
+app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
 
 // Interne teamchat binnen het bedrijf.
 app.post('/api/supplier/team/message', supplierAuth, (req, res) => {

@@ -150,6 +150,17 @@
   #buzzOverlay span{display:block;font-size:0.95rem;opacity:0.85;margin-top:0.2rem;}
   #buzzOverlay i{display:block;margin-top:2rem;font-style:normal;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;opacity:0.6;}
 
+  #pttBar{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%) translateY(-60px);z-index:9997;background:var(--card2);border:1px solid var(--gold);color:var(--txt);border-radius:999px;padding:0.55rem 1.1rem;font-size:0.8rem;transition:transform 0.25s;white-space:nowrap;}
+  #pttBar.on{transform:translateX(-50%) translateY(0);}
+  #pttBar b{color:var(--gold);}
+  #alarmOverlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(160,20,30,0.97);cursor:pointer;}
+  #alarmOverlay.on{display:flex;animation:bzshake 0.4s ease-in-out 0s 6;}
+  #alarmOverlay .bz{text-align:center;color:#fff;}
+  #alarmOverlay .bz-ic{font-size:3.8rem;animation:bzring 0.35s ease-in-out infinite;}
+  #alarmOverlay b{display:block;margin-top:0.8rem;font-family:'Bodoni Moda',serif;font-size:1.9rem;font-weight:500;}
+  #alarmOverlay span{display:block;font-size:0.95rem;opacity:0.9;margin-top:0.2rem;}
+  #alarmOverlay i{display:block;margin-top:2rem;font-style:normal;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;opacity:0.6;}
+
   /* meer-grid + AI */
   .meer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-top:1rem;}
   .meer-btn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 0.5rem 0.95rem;display:flex;flex-direction:column;align-items:center;gap:0.55rem;color:var(--txt);font-family:inherit;}
@@ -604,7 +615,7 @@
     token: null,
     get live(){ return this.enabled && !!this.token; },
     async call(path, body){
-      const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(this.token?{'Authorization':'Bearer '+this.token}:{})}, body: JSON.stringify(body||{}) });
+      const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(this.token?{'Authorization':'Bearer '+this.token}:{})}, body: JSON.stringify(Object.assign({ lang: (window.RTGi18n ? RTGi18n.lang : 'nl') }, body||{})) });
       const data = await res.json().catch(()=>({}));
       if (!res.ok) throw Object.assign(new Error(data.error||'API-fout'), {status:res.status});
       return data;
@@ -1487,7 +1498,9 @@
     const t = $('#gcThread'); if (!t) return;
     t.innerHTML = (msgs || []).map(m =>
       '<div class="tt-msg ' + (m.from === 'partner' ? 'me' : 'other') + '"><span class="who">' + m.who + '</span>' +
-      m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '<time>' + timeAgo(m.at) + '</time></div>'
+      m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
+      (m.orig ? '<span style="display:block;margin-top:0.25rem;font-size:0.68rem;color:var(--soft);font-style:italic;">' + m.orig.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>' : '') +
+      '<time>' + timeAgo(m.at) + '</time></div>'
     ).join('');
     t.scrollTop = t.scrollHeight;
   }
@@ -1602,7 +1615,7 @@
     let html = '';
 
     // personeel
-    html += '<div class="card"><div class="tt-h">'+T('team.roster','Personeel')+'</div>';
+    html += '<div class="card"><div class="tt-h" style="display:flex;justify-content:space-between;align-items:center;">'+T('team.roster','Personeel')+'<button class="obtn" id="buzzAll" style="font-size:0.66rem;">📢 '+T('team.buzzall','Iedereen')+'</button></div>';
     html += staff.map(m => {
       const you = a.staffId && m.id === a.staffId;
       const buzz = you ? '' : '<button class="tt-buzz" data-buzz="'+m.id+'" title="'+T('team.buzz','Oproepen (tril)')+'">📳</button>';
@@ -1635,6 +1648,11 @@
     $('#teamWrap').innerHTML = html;
 
     document.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', ()=>removeStaff(Number(b.dataset.rm))));
+    const ba = $('#buzzAll'); if (ba) ba.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/team/buzz', { all: true });
+        toast('📢 '+T('team.allbuzzed','Hele team opgeroepen')+' ('+d.reached+' '+T('team.online','online')+').'); }
+      catch(e){ toast(e.message); }
+    });
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
         toast(d.reached ? '📳 '+d.name+' '+T('team.buzzed','wordt opgeroepen.') : d.name+' '+T('team.buzzoff','heeft de app nu niet open.')); }
@@ -1691,6 +1709,34 @@
     el.classList.add('on');
     setTimeout(() => el.classList.remove('on'), 8000);
   }
+
+  // walkie-talkie: binnenkomende spraakmemo direct afspelen
+  function playPtt(from, audio){
+    if (navigator.vibrate) navigator.vibrate(150);
+    let bar = document.getElementById('pttBar');
+    if (!bar){ bar = document.createElement('div'); bar.id = 'pttBar'; document.getElementById('shell').appendChild(bar); }
+    bar.innerHTML = '🔊 <b>'+esc(from)+'</b> '+T('ptt.speaks','spreekt');
+    bar.classList.add('on');
+    try { const a = new Audio(audio); a.play().catch(()=>{}); a.onended = () => bar.classList.remove('on'); } catch(e){}
+    setTimeout(() => bar.classList.remove('on'), 15000);
+    refresh();
+  }
+
+  // security-alarm: schermvullend, met locatie
+  function showAlarm(d){
+    if (navigator.vibrate) navigator.vibrate([500,150,500,150,800]);
+    let el = document.getElementById('alarmOverlay');
+    if (!el){
+      el = document.createElement('div');
+      el.id = 'alarmOverlay';
+      document.getElementById('shell').appendChild(el);
+      el.addEventListener('click', () => el.classList.remove('on'));
+    }
+    const locTxt = d.loc ? (d.label ? d.label + ' · ' : '') + d.loc.lat.toFixed(4) + ', ' + d.loc.lng.toFixed(4) : T('alarm.noloc','locatie onbekend');
+    el.innerHTML = '<div class="bz"><div class="bz-ic">🚨</div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('alarm.needs','heeft direct assistentie nodig'))+'</span>'+
+      '<span style="margin-top:0.6rem;font-size:0.8rem;">📍 '+esc(locTxt)+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
+    el.classList.add('on');
+  }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   async function addStaff(){
     const name = ($('#ttName').value||'').trim();
@@ -1730,6 +1776,8 @@
     try { source = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
     source.addEventListener('hello', e => { const d=JSON.parse(e.data); notifs = d.unread||[]; renderBell(); });
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
+    source.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
+    source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
     source.addEventListener('sync', e => { refresh(); });
     source.addEventListener('notify', e => {
       const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
@@ -1862,6 +1910,8 @@ window.I18N = { en: {
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',
   'memo.sent':'Voice memo sent.', 'memo.rec':'Recording... tap again to send.', 'memo.denied':'No microphone access.',
   'buzz.calls':'is calling you', 'buzz.close':'Tap to acknowledge',
+  'team.buzzall':'Everyone', 'team.allbuzzed':'Whole team called', 'team.online':'online',
+  'ptt.speaks':'speaking', 'alarm.needs':'needs immediate assistance', 'alarm.noloc':'location unknown',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

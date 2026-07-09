@@ -97,6 +97,18 @@
   .tabbar button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
   .tabbar button.active{color:var(--txt);}
   .tabbar button.active svg{stroke:var(--burgundy);}
+  .sos{background:rgba(194,58,94,0.15);border:1px solid var(--burgundy);color:var(--burgundy);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:700;}
+  .sos:active{background:var(--burgundy);color:#fff;}
+  #pttBar{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%) translateY(-60px);z-index:9997;background:var(--card2);border:1px solid var(--gold);color:var(--txt);border-radius:999px;padding:0.55rem 1.1rem;font-size:0.8rem;transition:transform 0.25s;white-space:nowrap;}
+  #pttBar.on{transform:translateX(-50%) translateY(0);}
+  #pttBar b{color:var(--gold);}
+  #alarmOverlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(160,20,30,0.97);cursor:pointer;}
+  #alarmOverlay.on{display:flex;animation:bzshake 0.4s ease-in-out 0s 6;}
+  #alarmOverlay .bz{text-align:center;color:#fff;}
+  #alarmOverlay .bz-ic{font-size:3.8rem;animation:bzring 0.35s ease-in-out infinite;}
+  #alarmOverlay b{display:block;margin-top:0.8rem;font-family:'Bodoni Moda',serif;font-size:1.9rem;font-weight:500;}
+  #alarmOverlay span{display:block;font-size:0.95rem;opacity:0.9;margin-top:0.2rem;}
+  #alarmOverlay i{display:block;margin-top:2rem;font-style:normal;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;opacity:0.6;}
   .micbtn{background:var(--card2);border:1px solid var(--line);border-radius:999px;width:44px;height:44px;font-size:1rem;flex-shrink:0;}
   .micbtn.rec{background:var(--burgundy-deep);border-color:var(--burgundy);animation:recpulse 1s infinite;}
   @keyframes recpulse{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 8px rgba(194,58,94,0);}}
@@ -126,7 +138,10 @@
   <div id="app">
     <div class="topbar">
       <div class="who"><b id="meName"></b><span id="meSub"></span></div>
-      <button class="switch" id="switchBtn" data-i18n="pd.switch">Wissel</button>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <button class="sos" id="sosBtn">🚨 SOS</button>
+        <button class="switch" id="switchBtn" data-i18n="pd.switch">Wissel</button>
+      </div>
     </div>
     <div class="content" id="content">
       <div class="view active" data-view="vandaag">
@@ -182,7 +197,7 @@
   const API = {
     token: null,
     async call(path, body){
-      const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(this.token?{'Authorization':'Bearer '+this.token}:{})}, body: JSON.stringify(body||{}) });
+      const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(this.token?{'Authorization':'Bearer '+this.token}:{})}, body: JSON.stringify(Object.assign({ lang: (window.RTGi18n ? RTGi18n.lang : 'nl') }, body||{})) });
       const data = await res.json().catch(()=>({}));
       if (!res.ok) throw new Error(data.error||'Fout');
       return data;
@@ -314,7 +329,7 @@
     const act = (state.activity || []).slice(0, 10);
     const staff = (state.staff || []).filter(m => m.id !== me.staffId);
     $('#teamWrap').innerHTML =
-      (staff.length ? '<div class="card"><div class="k">'+T('pd.buzzh','Collega oproepen')+'</div>'+
+      (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">📢 '+T('pd.buzzall','Iedereen')+'</button></div>'+
         staff.map(m=>'<div class="task"><span class="ic">'+(m.role==='manager'?'⭐':'👤')+'</span><div class="t"><b>'+esc(m.name)+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+'</span></div><button class="abtn ghost" data-buzz="'+m.id+'">📳 '+T('pd.buzz','Tril')+'</button></div>').join('')+'</div>' : '')+
       '<div class="card"><div class="k">'+T('pd.chat','Teamchat')+'</div><div class="chat">'+
       (team.length ? team.map(m=>'<div class="msg '+(m.who===me.name?'me':'other')+'"><span class="who">'+esc(m.who)+'</span>'+
@@ -329,6 +344,10 @@
     };
     $('#tmSend').addEventListener('click', send);
     $('#tmMsg').addEventListener('keydown', e => { if (e.key==='Enter') send(); });
+    const ba = document.getElementById('buzzAll'); if (ba) ba.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/team/buzz', { all: true }); toast('📢 '+T('pd.allbuzzed','Hele team opgeroepen')+' ('+d.reached+').'); }
+      catch(e){ toast(e.message); }
+    });
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
         toast(d.reached ? '📳 '+d.name+' '+T('pd.buzzed','wordt opgeroepen.') : d.name+' '+T('pd.buzzoff','heeft de app nu niet open.')); }
@@ -381,6 +400,46 @@
     setTimeout(() => el.classList.remove('on'), 8000);
   }
 
+  function playPtt(from, audio){
+    if (navigator.vibrate) navigator.vibrate(150);
+    let bar = document.getElementById('pttBar');
+    if (!bar){ bar = document.createElement('div'); bar.id = 'pttBar'; document.getElementById('shell').appendChild(bar); }
+    bar.innerHTML = '🔊 <b>'+esc(from)+'</b> '+T('pd.speaks','spreekt');
+    bar.classList.add('on');
+    try { const a = new Audio(audio); a.play().catch(()=>{}); a.onended = () => bar.classList.remove('on'); } catch(e){}
+    setTimeout(() => bar.classList.remove('on'), 15000);
+    refresh();
+  }
+  function showAlarm(d){
+    if (navigator.vibrate) navigator.vibrate([500,150,500,150,800]);
+    let el = document.getElementById('alarmOverlay');
+    if (!el){
+      el = document.createElement('div');
+      el.id = 'alarmOverlay';
+      document.getElementById('shell').appendChild(el);
+      el.addEventListener('click', () => el.classList.remove('on'));
+    }
+    const locTxt = d.loc ? (d.label ? d.label + ' · ' : '') + d.loc.lat.toFixed(4) + ', ' + d.loc.lng.toFixed(4) : T('pd.noloc','locatie onbekend');
+    el.innerHTML = '<div class="bz"><div class="bz-ic">🚨</div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('pd.needs','heeft direct assistentie nodig'))+'</span>'+
+      '<span style="margin-top:0.6rem;font-size:0.8rem;">📍 '+esc(locTxt)+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
+    el.classList.add('on');
+  }
+
+  // SOS: locatie meesturen als die er is, en direct het hele bedrijf alarmeren
+  async function sendSOS(){
+    const fire = async (lat, lng) => {
+      try { await API.call('/supplier/security', { lat, lng }); toast('🚨 '+T('pd.sossent','Noodoproep verstuurd. Het team en RTG zijn gealarmeerd.')); }
+      catch(e){ toast(e.message); }
+    };
+    if (navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        pos => fire(pos.coords.latitude, pos.coords.longitude),
+        () => fire(undefined, undefined),
+        { timeout: 2500 }
+      );
+    } else fire(undefined, undefined);
+  }
+
   function openTab(tab){
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
     document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
@@ -388,6 +447,7 @@
   }
   document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
   $('#switchBtn').addEventListener('click', () => location.reload());
+  $('#sosBtn').addEventListener('click', sendSOS);
 
   function startStream(){
     if (!window.EventSource) return;
@@ -395,6 +455,8 @@
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
       src.addEventListener('sync', () => refresh());
       src.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
+      src.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
+      src.addEventListener('alarm', e => { const d=JSON.parse(e.data); if (d.from !== me.name) showAlarm(d); });
       src.addEventListener('notify', () => refresh());
     } catch(e){}
   }
@@ -424,6 +486,9 @@ window.I18N = { en: {
   'pd.buzzcalls':'is calling you', 'pd.buzzclose':'Tap to acknowledge',
   'pd.memono':'Recording not available here.', 'pd.memolong':'Memo too long.', 'pd.memosent':'Voice memo sent.',
   'pd.memorec':'Recording... tap again to send.', 'pd.memodenied':'No microphone access.',
+  'pd.buzzall':'Everyone', 'pd.allbuzzed':'Whole team called', 'pd.speaks':'speaking',
+  'pd.noloc':'location unknown', 'pd.needs':'needs immediate assistance',
+  'pd.sossent':'Emergency call sent. The team and RTG have been alerted.',
   't.now':'now', 't.min':' min', 't.hour':' h', 't.days':' d'
 } };
 </script>

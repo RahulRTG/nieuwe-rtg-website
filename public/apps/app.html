@@ -1505,6 +1505,7 @@
       '<div class="pc-msg ' + (m.from === 'guest' ? 'me' : 'them') + '">' +
         (m.from === 'partner' ? '<span class="who">' + m.who + '</span>' : '') +
         m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
+        (m.orig ? '<span style="display:block;margin-top:0.25rem;font-size:0.66rem;opacity:0.55;font-style:italic;">' + m.orig.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>' : '') +
         '<time>' + timeAgo(m.at) + '</time></div>'
     ).join('') : '<div class="pc-empty">' + T('app.pc.empty','Stel uw vraag rechtstreeks aan het team. Roomservice, een verzoek aan de eigenaar, of gewoon even iets regelen.') + '</div>';
     const b = $('#pcBody'); b.scrollTop = b.scrollHeight;

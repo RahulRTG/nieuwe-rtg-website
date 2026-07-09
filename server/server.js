@@ -1334,6 +1334,26 @@ function validDept(s, dept) {
   return list.includes(dept) ? dept : list[0];
 }
 
+/* Elk gastgesprek is meertalig: ieder schrijft in de eigen taal en de
+   ontvanger leest het in de zijne. Vertalingen worden per bericht gecachet. */
+async function trChat(messages, to) {
+  const out = [];
+  for (const m of messages) {
+    const from = m.lang || 'nl';
+    if (from === to || !m.text) { out.push({ ...m, orig: null }); continue; }
+    m.tr = m.tr || {};
+    if (!m.tr[to]) {
+      try {
+        const r = await i18n.translate(m.text, to, from);
+        m.tr[to] = (r && typeof r === 'object') ? (r.text || m.text) : String(r || m.text);
+        save();
+      } catch (e) { m.tr[to] = m.text; }
+    }
+    out.push({ ...m, text: m.tr[to], orig: m.text, tr: undefined });
+  }
+  return out;
+}
+
 // gast stuurt een bericht aan een partner (per afdeling een eigen gesprek)
 app.post('/api/partner/chat/send', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -1345,7 +1365,7 @@ app.post('/api/partner/chat/send', auth, (req, res) => {
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
   const chat = getChat(s, req.session.key, codename, req.session.tier, dept);
   chat.codename = codename;
-  chat.messages.push({ from: 'guest', who: codename, text, at: new Date().toISOString() });
+  chat.messages.push({ from: 'guest', who: codename, text, lang: req.body.lang === 'en' ? 'en' : 'nl', at: new Date().toISOString() });
   chat.messages = chat.messages.slice(-120);
   chat.unreadPartner += 1;
   chat.lastAt = new Date().toISOString();
@@ -1353,7 +1373,7 @@ app.post('/api/partner/chat/send', auth, (req, res) => {
   notifySupplier(s.code, { icon: '💬', title: codename + ' → ' + dept, body: text.slice(0, 90) });
   sseToSupplier(s.code, 'sync', { scope: 'gchat' });
   sseToCustomer(req.session.key, 'sync', { scope: 'gchat' });
-  res.json({ ok: true, messages: chat.messages });
+  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ ok: true, messages }));
 });
 
 // gast opent het gesprek met een afdeling (en markeert het als gelezen)
@@ -1363,7 +1383,8 @@ app.post('/api/partner/chat/history', auth, (req, res) => {
   const dept = validDept(s, String(req.body.dept || ''));
   const chat = db.data.guestChats[chatKeyOf(s.code, req.session.key, dept)];
   if (chat && chat.unreadGuest) { chat.unreadGuest = 0; save(); }
-  res.json({ messages: chat ? chat.messages : [], dept });
+  const to = req.body.lang === 'en' ? 'en' : 'nl';
+  trChat(chat ? chat.messages : [], to).then(messages => res.json({ messages, dept }));
 });
 
 // personeel antwoordt (onder eigen naam, uit het persoonlijke account)
@@ -1372,7 +1393,7 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   const text = String(req.body.text || '').trim().slice(0, 500);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  chat.messages.push({ from: 'partner', who: req.actor.name, text, at: new Date().toISOString() });
+  chat.messages.push({ from: 'partner', who: req.actor.name, text, lang: req.body.lang === 'en' ? 'en' : 'nl', at: new Date().toISOString() });
   chat.messages = chat.messages.slice(-120);
   chat.unreadGuest += 1;
   chat.lastAt = new Date().toISOString();
@@ -1381,7 +1402,7 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
   notify(chat.tier, { icon: '💬', title: req.supplier.name + (chat.dept ? ' · ' + chat.dept : ''), body: text.slice(0, 90), scope: 'gchat' });
   sseToCustomer(chat.customerKey, 'sync', { scope: 'gchat' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
-  res.json({ ok: true, messages: chat.messages });
+  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ ok: true, messages }));
 });
 
 // personeel opent een gesprek (en markeert het als gelezen)
@@ -1389,7 +1410,7 @@ app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
   const chat = db.data.guestChats[String(req.body.key || '')];
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   if (chat.unreadPartner) { chat.unreadPartner = 0; save(); }
-  res.json({ messages: chat.messages, codename: chat.codename });
+  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ messages, codename: chat.codename }));
 });
 
 /* ---- verbinding maken met een gast (hotel/appartement) ----
@@ -1467,11 +1488,12 @@ app.post('/api/supplier/table/remove', supplierAuth, (req, res) => {
   res.json({ ok: true, tables: req.supplier.tables || [] });
 });
 
-// ---- team oproepen: iemand laten trillen, gericht via SSE ----
+// ---- team oproepen: een collega of het hele bedrijf, gericht via SSE ----
 app.post('/api/supplier/team/buzz', supplierAuth, (req, res) => {
+  const all = req.body.all === true;
   const target = req.body.staffId == null ? null : Number(req.body.staffId);
   let name = 'Beheer';
-  if (target != null) {
+  if (!all && target != null) {
     const st = accounts.getStaffById(target);
     if (!st || String(st.supplier_code).toUpperCase() !== req.supplier.code) return res.status(404).json({ error: 'Teamlid niet gevonden.' });
     name = st.name;
@@ -1479,10 +1501,35 @@ app.post('/api/supplier/team/buzz', supplierAuth, (req, res) => {
   let reached = 0;
   for (const c of sseClients) {
     if (c.sup !== req.supplier.code) continue;
-    if (target == null ? c.staffId == null : c.staffId === target) { sseSend(c.res, 'buzz', { from: req.actor.name }); reached++; }
+    if (all) {
+      // iedereen behalve de oproeper zelf
+      if (c.staffId === (req.actor.staffId != null ? req.actor.staffId : null)) continue;
+      sseSend(c.res, 'buzz', { from: req.actor.name, all: true }); reached++;
+    } else if (target == null ? c.staffId == null : c.staffId === target) {
+      sseSend(c.res, 'buzz', { from: req.actor.name }); reached++;
+    }
   }
-  logActivity(req.supplier.code, req.actor, 'riep ' + name + ' op (tril)');
-  res.json({ ok: true, reached, name });
+  logActivity(req.supplier.code, req.actor, all ? 'riep het hele team op (tril)' : 'riep ' + name + ' op (tril)');
+  res.json({ ok: true, reached, name: all ? 'het hele team' : name });
+});
+
+// ---- security-alarm: melding met locatie naar het hele bedrijf en RTG ----
+app.post('/api/supplier/security', supplierAuth, (req, res) => {
+  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  const loc = (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng }
+    : (req.supplier.loc ? { lat: req.supplier.loc.lat, lng: req.supplier.loc.lng } : null);
+  const alarm = {
+    from: req.actor.name,
+    company: req.supplier.name,
+    note: String(req.body.note || '').trim().slice(0, 140),
+    loc, label: req.supplier.loc ? req.supplier.loc.label : null,
+    at: new Date().toISOString()
+  };
+  logActivity(req.supplier.code, req.actor, 'SECURITY-ALARM' + (alarm.note ? ': ' + alarm.note : '') + (loc ? ' (locatie gedeeld)' : ''));
+  notifySupplier(req.supplier.code, { icon: '🚨', title: 'NOODOPROEP ' + req.actor.name, body: (alarm.note || 'Directe assistentie nodig.') + (alarm.label ? ' Locatie: ' + alarm.label : '') });
+  for (const c of sseClients) if (c.sup === req.supplier.code) sseSend(c.res, 'alarm', alarm);
+  sseToOffice('notify', { icon: '🚨', title: 'Noodoproep bij ' + req.supplier.name, body: req.actor.name + (alarm.note ? ': ' + alarm.note : ' vraagt directe assistentie.') + (loc ? ' Locatie: ' + (alarm.label || lat.toFixed ? loc.lat.toFixed(4) + ', ' + loc.lng.toFixed(4) : '') : '') });
+  res.json({ ok: true, alarm });
 });
 
 /* ---- AI-assistent voor de leverancier-app ----
@@ -1643,6 +1690,14 @@ app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
   if (!text && !audio) return res.status(400).json({ error: 'Leeg bericht.' });
   const list = db.data.supplierTeam[req.supplier.code] = (db.data.supplierTeam[req.supplier.code] || []);
   list.push({ who: req.actor.name, role: req.actor.role, text: text || (audio ? '' : text), audio, at: new Date().toISOString() });
+  // walkie-talkie: spraakmemo's klinken direct bij iedereen die de app open heeft
+  if (audio) {
+    for (const c of sseClients) {
+      if (c.sup !== req.supplier.code) continue;
+      if (c.staffId === (req.actor.staffId != null ? req.actor.staffId : null)) continue;
+      sseSend(c.res, 'ptt', { from: req.actor.name, audio });
+    }
+  }
   db.data.supplierTeam[req.supplier.code] = list.slice(-100);
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });

@@ -790,6 +790,11 @@
         ['events','\uD83C\uDF9F',T('st.events','Events-scherm'),T('st.events.s','Gastenlijst en check-in aan de deur')]
       );
     }
+    if (['taxi','jet'].includes(gtype)){
+      st.push(['chauffeur', gtype==='jet' ? '\u2708\uFE0F' : '\uD83D\uDE98',
+        gtype==='jet' ? T('st.crew','Crew-post') : T('st.chauffeur','Chauffeurspost'),
+        T('st.chauffeur.s','Uw ritten, route en verdiensten; grote knoppen per ritfase')]);
+    }
     st.push(['kantoor','\uD83D\uDDDD',T('st.kantoor','Kantoor'),
       horeca ? T('st.kantoor.s','Alles aanpassen: HR, keuken, bar, bediening en events (alleen management)')
              : T('st.kantoor.s2','Alles aanpassen: HR, marketing en het aanbod (alleen management)')]);
@@ -1017,7 +1022,8 @@
   }
   function stationLabel(st){
     return { keuken: T('st.keuken','Keuken-scherm'), bar: T('st.bar','Bar-scherm'), bediening: T('st.bediening','Bedieningspost'),
-             events: T('st.events','Events-scherm'), kantoor: T('st.kantoor','Kantoor') }[st] || st;
+             events: T('st.events','Events-scherm'), kantoor: T('st.kantoor','Kantoor'),
+             chauffeur: (S && S.type === 'jet') ? T('st.crew','Crew-post') : T('st.chauffeur','Chauffeurspost') }[st] || st;
   }
   function tickClock(){
     const el = $('#stClock');
@@ -1162,6 +1168,41 @@
       }).join('') : '<div class="st-empty">'+T('ev.none','Nog geen events. De manager maakt ze aan in het Kantoor; leden melden zich aan via de leden-app.')+'</div>';
     } else if (stationMode === 'kantoor'){
       html += renderKantoor();
+    } else if (stationMode === 'chauffeur'){
+      // de chauffeurspost: mijn actieve rit groot in beeld, open ritten om te
+      // pakken, en de verdiensten van vandaag
+      const mij = actor().staffId;
+      const ritten = state.rides || [];
+      const actief = ritten.filter(r => !RIT_KLAAR(r.status) && r.driver && r.driver.staffId === mij);
+      const open = ritten.filter(r => r.status === 'aangevraagd' && !r.driver);
+      const vandaag = new Date().toISOString().slice(0, 10);
+      const klaarVandaag = ritten.filter(r => (r.status === 'afgerond' || r.status === 'gearriveerd') && r.driver && r.driver.staffId === mij && String(r.finishedAt || r.at).slice(0, 10) === vandaag);
+      const omzet = klaarVandaag.reduce((s2, r) => s2 + (r.quote || 0), 0);
+      html += '<div class="st-sec">'+T('ch.mijn','Mijn rit')+' ('+actief.length+')</div>';
+      html += actief.length ? actief.map(r => {
+        const nxt = NEXT_RIDE[r.status];
+        return '<div class="tkc" style="grid-column:1/-1;">'+
+          '<div class="tkc-top"><span class="tkc-code" style="font-size:1.3rem;">'+r.customerCodename+'</span><span class="tkc-age">'+tStatus(r.status)+'</span></div>'+
+          '<div class="tkc-who" style="font-size:0.95rem;">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+
+          '<div class="tkc-who">'+ritRegel(r)+(r.vehicle?' · 🚘 '+r.vehicle.name+' ('+(r.vehicle.plate||'')+')':'')+'</div>'+
+          (r.note?'<div class="tkc-alg">📝 '+r.note+'</div>':'')+
+          (r.pickupEtaMin!=null && r.status==='onderweg' ? '<div class="tkc-who">🧭 ~'+r.pickupEtaMin+' min '+T('ch.naargast','naar de gast')+'</div>':'')+
+          (r.dropEtaMin!=null && r.status==='aan-boord' ? '<div class="tkc-who">🏁 ~'+r.dropEtaMin+' min '+T('ch.naarbestemming','naar de bestemming')+'</div>':'')+
+          (nxt?'<div class="tkc-act"><button class="tkc-ready" data-chgo="'+r.ref+'" data-st="'+nxt+'">'+T(RIDE_NEXT_LABEL[nxt], RIDE_NEXT_NL[nxt])+'</button></div>':'')+
+        '</div>';
+      }).join('') : '<div class="st-empty">'+T('ch.geenrit','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>';
+      html += '<div class="st-sec">'+T('ch.open','Open ritten')+' ('+open.length+')</div>';
+      html += open.length ? open.map(r =>
+        '<div class="tkc">'+
+          '<div class="tkc-top"><span class="tkc-code">'+r.customerCodename+'</span><span class="tkc-age">'+timeAgo(r.at)+'</span></div>'+
+          '<div class="tkc-who">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+
+          '<div class="tkc-who">'+ritRegel(r)+' · '+r.when+'</div>'+
+          '<div class="tkc-act"><button class="tkc-start" data-chneem="'+r.ref+'">'+T('ch.neem','Neem deze rit')+'</button></div>'+
+        '</div>'
+      ).join('') : '<div class="st-empty">'+T('ch.geenopen','Geen open aanvragen. Nieuwe ritten verschijnen hier vanzelf.')+'</div>';
+      html += '<div class="st-sec">'+T('ch.vandaag','Vandaag')+'</div>'+
+        '<div class="tkc"><div class="tkc-top"><span style="font-weight:600;">'+klaarVandaag.length+' '+T('ch.ritten','rit(ten) afgerond')+'</span>'+
+        '<span class="tkc-code">'+eur(omzet)+'</span></div><div class="tkc-who">'+T('ch.netto','Volledig voor de zaak: RTG rekent 0% commissie.')+'</div></div>';
     } else {
       const st = stationMode;
       if (st === 'keuken'){
@@ -1361,6 +1402,18 @@
       try { await API.call('/supplier/mep/daily/done', { date: b.dataset.dmdone, taskId: b.dataset.item }); await refresh(); } catch(e){ toast(e.message); }
     }));
     if (stationMode === 'kantoor') bindKantoor(el);
+    // chauffeurspost: ritfase doorzetten of een open rit aannemen
+    el.querySelectorAll('[data-chgo]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/ride/status', { ref: b.dataset.chgo, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-chneem]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const s2 = await API.call('/supplier/ride/suggest', { ref: b.dataset.chneem });
+        await API.call('/supplier/ride/assign', { ref: b.dataset.chneem, self: true, vehicleId: s2.vehicleId });
+        toast(T('ch.genomen','Rit is van u.') + (s2.vehicleName ? ' 🚘 ' + s2.vehicleName : ''));
+        await refresh();
+      } catch(e){ toast(e.message); }
+    }));
   }
 
   /* ---- het Kantoor: de eigenaar/manager past hier alles aan ---- */
@@ -1386,7 +1439,12 @@
       ['kamers','\uD83C\uDFE1',T('kt.units','Verblijven')],
       ['deuren','\uD83D\uDEAA',T('kt.deuren','Deuren')]
     );
-    if (type === 'taxi' || type === 'jet') secs.push(['prijzen','\uD83D\uDCB6',T('kt.prijzen','Prijzen')]);
+    if (type === 'taxi' || type === 'jet') secs.push(
+      ['ritten','\uD83D\uDDFA',T('kt.ritten','Ritten')],
+      ['vloot', type==='jet' ? '\u2708\uFE0F' : '\uD83D\uDE98', T('kt.vloot','Vloot')],
+      ['tarief','\uD83E\uDDEE',T('kt.tarief','Tarief')],
+      ['prijzen','\uD83D\uDCB6',T('kt.prijzen','Prijzen')]
+    );
     secs.push(['marketing','\uD83D\uDCE3','Marketing']);
     if (!secs.some(s2 => s2[0] === kantoorSec)) kantoorSec = 'hr';
     let html = '<div class="st-chips">'+secs.map(s2 =>
@@ -1512,6 +1570,50 @@
           '<button class="obtn'+(d.locked?' primary':' warn')+'" data-kdoor="'+d.id+'">'+(d.locked?T('door.openbtn','Open 10 sec'):T('door.lockbtn','Vergrendel nu'))+'</button></div>').join('')
         : '<div class="tkc-who">'+T('door.none','Nog geen digitale deuren gekoppeld.')+'</div>')+
         '<div class="tkc-who">'+T('door.note','Elke opening komt in de activiteitenfeed: wie, welke deur, wanneer. Gearriveerde gasten kunnen de voordeur zelf openen via hun app.')+'</div></div>';
+    }
+    if (kantoorSec === 'ritten'){
+      // dispatch: open ritten toewijzen (slim voorstel met een tik), lopende ritten volgen
+      const ritten = state.rides || [];
+      const open = ritten.filter(r => r.status === 'aangevraagd' && !r.driver);
+      const bezig = ritten.filter(r => !RIT_KLAAR(r.status) && (r.driver || r.status !== 'aangevraagd'));
+      const chauffeurs = (state.staff||[]);
+      const wagens = (state.fleet||[]).filter(v=>v.active);
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗺 '+T('kt.openritten','Open aanvragen')+' ('+open.length+')</h3>'+
+        (open.length ? open.map(r =>
+          '<div class="st-row" style="flex-wrap:wrap;"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+r.when+'</span></span>'+
+          '<span class="acts" style="flex-wrap:wrap;">'+
+            '<select class="st-in" data-ktch="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+chauffeurs.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
+            '<select class="st-in" data-ktvg="'+r.ref+'" style="width:auto;padding:0.45rem 0.6rem;">'+wagens.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('')+'</select>'+
+            '<button class="obtn primary" data-ktwijs="'+r.ref+'">'+T('kt.wijs','Wijs toe')+'</button>'+
+            '<button class="obtn" data-ktslim="'+r.ref+'">✨ '+T('kt.slim','Slim')+'</button></span></div>'
+        ).join('') : '<div class="tkc-who">'+T('kt.geenopen','Geen open aanvragen.')+'</div>')+'</div>';
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+T('kt.lopend','Lopend')+' ('+bezig.length+')</h3>'+
+        (bezig.length ? bezig.map(r =>
+          '<div class="st-row"><span>'+r.customerCodename+' · '+tStatus(r.status)+
+          '<span class="sub">'+(r.driver?r.driver.name:'?')+(r.vehicle?' · '+r.vehicle.name:'')+' · '+(r.to||'?')+' · '+(r.quote?eur(r.quote):'')+'</span></span></div>'
+        ).join('') : '<div class="tkc-who">'+T('kt.geenlopend','Niets onderweg.')+'</div>')+'</div>';
+    }
+    if (kantoorSec === 'vloot'){
+      const wagens = state.fleet || [];
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(type==='jet'?'✈️ '+T('kt.vloot','Vloot'):'🚘 '+T('kt.vloot','Vloot'))+' ('+wagens.length+')</h3>'+
+        (wagens.length ? wagens.map(v =>
+          '<div class="st-row"><span>'+v.name+(v.active?'':' · '+T('kt.offline','offline'))+'<span class="sub">'+(v.plate||'')+' · '+v.seats+' '+T('tbl.pers','pers.')+'</span></span>'+
+          '<span class="acts"><button class="obtn'+(v.active?' primary':' warn')+'" data-ktvt="'+v.id+'">'+(v.active?T('kt.isopen','Open'):T('kt.isclosed','Dicht'))+'</button>'+
+          '<button class="obtn warn" data-ktvd="'+v.id+'">✕</button></span></div>'
+        ).join('') : '<div class="tkc-who">'+T('kt.geenvloot','Nog geen voertuigen.')+'</div>')+
+        '<div class="st-form"><input class="st-in" id="ktVn" placeholder="'+T('kt.vnaam','Naam, bijv. Mercedes S-klasse')+'">'+
+        '<div style="display:flex;gap:0.5rem;"><input class="st-in" id="ktVp" placeholder="'+T('kt.kenteken','Kenteken / registratie')+'" style="flex:2;"><input class="st-in" id="ktVs" type="number" placeholder="4" style="flex:1;"></div>'+
+        '<button class="bigbtn" id="ktVAdd" style="margin-top:0.2rem;">'+T('kt.vadd','Voertuig toevoegen')+'</button></div></div>';
+    }
+    if (kantoorSec === 'tarief'){
+      const t2 = (state.settings && state.settings.tarief) || {};
+      html += '<div class="tkc"><h3>🧮 '+T('kt.tarief','Tarief')+'</h3>'+
+        '<div class="tkc-who">'+T('kt.tarief.s','Elke aanvraag krijgt hiermee direct een vaste nettoprijs voor het lid; u houdt 100%.')+'</div>'+
+        '<div class="st-form">'+
+        '<label style="font-size:0.7rem;color:var(--soft);">'+T('kt.start','Starttarief (€)')+'</label><input class="st-in" id="ktTa" type="number" step="0.1" value="'+(t2.start||0)+'">'+
+        '<label style="font-size:0.7rem;color:var(--soft);">'+T('kt.perkm','Per kilometer (€)')+'</label><input class="st-in" id="ktTb" type="number" step="0.1" value="'+(t2.perKm||0)+'">'+
+        '<label style="font-size:0.7rem;color:var(--soft);">'+T('kt.min','Minimumprijs (€)')+'</label><input class="st-in" id="ktTc" type="number" step="1" value="'+(t2.minimum||0)+'">'+
+        '<button class="bigbtn" id="ktTSave" style="margin-top:0.2rem;">'+T('kt.tsave','Tarief opslaan')+'</button></div></div>';
     }
     if (kantoorSec === 'prijzen'){
       const h = state.prices || [];
@@ -1693,6 +1795,46 @@
     el.querySelectorAll('[data-kdoor]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/door/toggle', { id: b.dataset.kdoor }); await refresh(); } catch(e){ toast(e.message); }
     }));
+    // dispatch: toewijzen met de hand of met het slimme voorstel
+    el.querySelectorAll('[data-ktwijs]').forEach(b => b.addEventListener('click', async () => {
+      const ref = b.dataset.ktwijs;
+      try {
+        await API.call('/supplier/ride/assign', { ref, staffId: Number(el.querySelector('[data-ktch="'+ref+'"]').value), vehicleId: el.querySelector('[data-ktvg="'+ref+'"]') ? el.querySelector('[data-ktvg="'+ref+'"]').value : null });
+        kantoorMsg = '✅ '+T('kt.gewezen','Rit toegewezen; de gast en de chauffeur zijn op de hoogte.');
+        await refresh();
+      } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-ktslim]').forEach(b => b.addEventListener('click', async () => {
+      const ref = b.dataset.ktslim;
+      b.disabled = true;
+      try {
+        const s2 = await API.call('/supplier/ride/suggest', { ref });
+        if (!s2.staffId){ toast(T('kt.niemandvrij','Iedereen is bezet.')); b.disabled = false; return; }
+        await API.call('/supplier/ride/assign', { ref, staffId: s2.staffId, vehicleId: s2.vehicleId });
+        kantoorMsg = '✨ '+T('kt.slimgewezen','Slim toegewezen:')+' <b>'+s2.staffName+'</b>'+(s2.vehicleName?' · '+s2.vehicleName:'');
+        await refresh();
+      } catch(e){ toast(e.message); b.disabled = false; }
+    }));
+    // vloot
+    el.querySelectorAll('[data-ktvt]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/fleet', { action: 'toggle', id: b.dataset.ktvt }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-ktvd]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/fleet', { action: 'remove', id: b.dataset.ktvd }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    const ktV = el.querySelector('#ktVAdd'); if (ktV) ktV.addEventListener('click', async () => {
+      const name = el.querySelector('#ktVn').value.trim();
+      if (!name){ toast(T('kt.vnaamleeg','Geef het voertuig een naam.')); return; }
+      try { await API.call('/supplier/fleet', { action: 'add', name, plate: el.querySelector('#ktVp').value.trim(), seats: Number(el.querySelector('#ktVs').value)||4 }); await refresh(); } catch(e){ toast(e.message); }
+    });
+    // tarief
+    const ktT2 = el.querySelector('#ktTSave'); if (ktT2) ktT2.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/settings', { tarief: { start: Number(el.querySelector('#ktTa').value), perKm: Number(el.querySelector('#ktTb').value), minimum: Number(el.querySelector('#ktTc').value) } });
+        kantoorMsg = '✅ '+T('kt.tklaar','Tarief opgeslagen; nieuwe aanvragen krijgen direct de nieuwe prijs.');
+        await refresh();
+      } catch(e){ toast(e.message); }
+    });
     // prijzen aan RTG
     const kPr = el.querySelector('#kPrSend'); if (kPr) kPr.addEventListener('click', async () => {
       const service = el.querySelector('#kPrS').value.trim(), price = Number(el.querySelector('#kPrP').value);
@@ -1865,12 +2007,17 @@
   }
 
   // ---- rides (taxi/jet) ----
-  const NEXT_RIDE = { 'aangevraagd':'onderweg', 'onderweg':'aangekomen', 'aangekomen':'rijdt', 'rijdt':'gearriveerd' };
-  const RIDE_NEXT_LABEL = { 'onderweg':'sup.ride.accept', 'aangekomen':'sup.ride.atpickup', 'rijdt':'sup.ride.driving', 'gearriveerd':'sup.ride.done' };
-  const RIDE_NEXT_NL = { 'onderweg':'Accepteer, rij naar gast', 'aangekomen':'Ik ben bij de gast', 'rijdt':'Gast ingestapt, rijden', 'gearriveerd':'Rit voltooid' };
-  function ridePill(st){ return st==='aangevraagd'?'nieuw':st==='gearriveerd'?'klaar':'bereiding'; }
+  const NEXT_RIDE = { 'aangevraagd':'geaccepteerd', 'geaccepteerd':'onderweg', 'onderweg':'aangekomen', 'aangekomen':'aan-boord', 'aan-boord':'afgerond',
+                      'rijdt':'afgerond', 'gearriveerd':null };
+  const RIDE_NEXT_LABEL = { 'geaccepteerd':'sup.ride.accept', 'onderweg':'sup.ride.go', 'aangekomen':'sup.ride.atpickup', 'aan-boord':'sup.ride.driving', 'afgerond':'sup.ride.done' };
+  const RIDE_NEXT_NL = { 'geaccepteerd':'Accepteer de rit', 'onderweg':'Ik rijd naar de gast', 'aangekomen':'Ik sta voor', 'aan-boord':'Gast aan boord', 'afgerond':'Rit afronden' };
+  const RIT_KLAAR = st => st === 'gearriveerd' || st === 'afgerond' || st === 'geweigerd';
+  function ridePill(st){ return st==='aangevraagd'?'nieuw':RIT_KLAAR(st)?'klaar':'bereiding'; }
+  function ritRegel(r){
+    return (r.passengers?'👤 '+r.passengers+' ':'')+(r.luggage?'🧳 '+r.luggage+' ':'')+(r.km?'· '+r.km+' km ':'')+(r.quote?'· <b style="color:var(--gold);">'+eur(r.quote)+'</b>':'');
+  }
   function renderRides(){
-    const list = (state.rides || []).filter(r => r.status !== 'gearriveerd' && r.status !== 'geweigerd');
+    const list = (state.rides || []).filter(r => !RIT_KLAAR(r.status));
     $('#rideList').innerHTML = list.length ? list.map(r => {
       const nxt = NEXT_RIDE[r.status];
       const eta = (r.status === 'aangevraagd' || r.status === 'onderweg')
@@ -1880,11 +2027,13 @@
         '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+r.customerCodename+'</span></div>'+
           '<div class="ref">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+' · '+timeAgo(r.at)+'</div></div>'+
           '<span class="pill '+ridePill(r.status)+'">'+tStatus(r.status)+'</span></div>'+
+        '<div class="ref" style="margin-top:0.25rem;">'+ritRegel(r)+
+          (r.driver?' · 🚘 '+r.driver.name+(r.vehicle?' ('+r.vehicle.name+')':''):' · <span style="color:var(--amber,#B8860B);">'+T('sup.ride.nodriver','nog geen chauffeur')+'</span>')+'</div>'+
+        (r.note?'<div class="ref">📝 '+r.note+'</div>':'')+
         eta +
         '<div class="acts">'+
           (nxt?'<button class="obtn primary js-rnext">'+T(RIDE_NEXT_LABEL[nxt], RIDE_NEXT_NL[nxt])+'</button>':'')+
           (r.status==='aangevraagd'?'<button class="obtn warn js-rreject">'+T('sup.reject','Weiger')+'</button>':'')+
-          (r.loc?'':'')+
         '</div>'+
       '</div>';
     }).join('') : '<div class="empty">'+T('sup.norides','Geen ritaanvragen. RTG-gasten die een rit boeken, verschijnen hier met bestemming en live locatie.')+'</div>';
@@ -2988,6 +3137,27 @@ window.I18N = { en: {
   'kt.ev.fill':'Enter at least a name and date.', 'kt.ev.made':'Event created as draft. Publish it when it is ready.',
   'kt.ev.publish':'Publish for members', 'kt.ev.offline':'Take offline',
   'kt.hired':'Hired.', 'kt.pinonce':'share once', 'kt.fillname':'Enter a name.',
+  'st.chauffeur':'Driver post', 'st.crew':'Crew post',
+  'st.chauffeur.s':'Your rides, route and earnings; big buttons per stage',
+  'ch.mijn':'My ride', 'ch.open':'Open rides', 'ch.vandaag':'Today',
+  'ch.geenrit':'No active ride. Take an open ride below.',
+  'ch.geenopen':'No open requests. New rides appear here automatically.',
+  'ch.neem':'Take this ride', 'ch.genomen':'The ride is yours.',
+  'ch.ritten':'ride(s) completed', 'ch.netto':'All yours: RTG charges 0% commission.',
+  'ch.naargast':'to the guest', 'ch.naarbestemming':'to the destination',
+  'sup.ride.accept':'Accept the ride', 'sup.ride.go':'Driving to the guest',
+  'sup.ride.atpickup':'I have arrived', 'sup.ride.driving':'Guest on board', 'sup.ride.done':'Complete the ride',
+  'sup.ride.nodriver':'no driver yet',
+  'kt.ritten':'Rides', 'kt.vloot':'Fleet', 'kt.tarief':'Tariff',
+  'kt.openritten':'Open requests', 'kt.geenopen':'No open requests.',
+  'kt.lopend':'In progress', 'kt.geenlopend':'Nothing on the road.',
+  'kt.wijs':'Assign', 'kt.slim':'Smart', 'kt.gewezen':'Ride assigned; guest and driver have been notified.',
+  'kt.slimgewezen':'Smart-assigned:', 'kt.niemandvrij':'Everyone is busy.',
+  'kt.geenvloot':'No vehicles yet.', 'kt.vnaam':'Name, e.g. Mercedes S-class',
+  'kt.kenteken':'Plate / registration', 'kt.vadd':'Add vehicle', 'kt.vnaamleeg':'Give the vehicle a name.',
+  'kt.tarief.s':'Every request instantly gets a fixed net price for the member; you keep 100%.',
+  'kt.start':'Base fare (€)', 'kt.perkm':'Per kilometre (€)', 'kt.min':'Minimum price (€)',
+  'kt.tsave':'Save tariff', 'kt.tklaar':'Tariff saved; new requests get the new price immediately.',
   'kt.kamers':'Rooms', 'kt.units':'Stays', 'kt.deuren':'Doors', 'kt.prijzen':'Prices',
   'kt.unit':'stay', 'kt.kamer':'room', 'kt.offline':'offline',
   'kt.unitadd':'Add stay', 'kt.kameradd':'Add room',

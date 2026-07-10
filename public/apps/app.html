@@ -918,6 +918,35 @@
     </div>
   </div>
 
+  <!-- rit aanvragen: personen, bagage, tijdstip; prijs komt direct terug -->
+  <div id="ride-scrim" class="menu-scrim"></div>
+  <div id="ride-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b id="rideSup"></b><span data-i18n="ride.sub">Vaste nettoprijs, direct bevestigd</span></div>
+      <button class="ms-close" id="rideClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body" style="padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.7rem;">
+      <div style="display:flex;gap:0.6rem;">
+        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.pax">Personen</span>
+          <select id="ridePax" class="ms-note" style="margin-top:0.3rem;"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
+        </label>
+        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.bag">Koffers</span>
+          <select id="rideBag" class="ms-note" style="margin-top:0.3rem;"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option></select>
+        </label>
+      </div>
+      <div style="display:flex;gap:0.6rem;">
+        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.plan">Wanneer</span>
+          <select id="ridePlan" class="ms-note" style="margin-top:0.3rem;"><option value="nu" data-i18n="ride.nu">Nu</option><option value="later" data-i18n="ride.later">Op een tijd</option></select>
+        </label>
+        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.tijd">Tijd</span>
+          <input id="rideTijd" type="time" class="ms-note" style="margin-top:0.3rem;">
+        </label>
+      </div>
+      <input id="rideNote" class="ms-note" placeholder="Bijv. kinderzitje, voor de zij-ingang" data-i18n-ph="ride.noteph">
+      <button class="ms-order" id="rideGo" data-i18n="ride.go">Vraag de rit aan</button>
+    </div>
+  </div>
+
   <!-- dm tussen leden (Salon-connecties) -->
   <div id="dm-scrim" class="menu-scrim"></div>
   <div id="dm-sheet" class="menu-sheet">
@@ -1338,6 +1367,9 @@
   $('#dmInput').addEventListener('keydown', e => { if (e.key === 'Enter') stuurDm(); });
   const dmDicht = () => { $('#dm-sheet').classList.remove('open'); $('#dm-scrim').classList.remove('open'); dmWith = null; };
   $('#dmClose').addEventListener('click', dmDicht);
+  $('#rideGo').addEventListener('click', verstuurRit);
+  $('#rideClose').addEventListener('click', () => { $('#ride-sheet').classList.remove('open'); $('#ride-scrim').classList.remove('open'); });
+  $('#ride-scrim').addEventListener('click', () => { $('#ride-sheet').classList.remove('open'); $('#ride-scrim').classList.remove('open'); });
   $('#dm-scrim').addEventListener('click', dmDicht);
 
   /* ---- post delen ---- */
@@ -1672,7 +1704,7 @@
   let liveData = null;
   let liveMode = 'driving';
   let simTimer = null;
-  const RIDE_ST = { 'aangevraagd':'requested', 'onderweg':'on the way', 'aangekomen':'arrived', 'rijdt':'driving', 'gearriveerd':'completed', 'geweigerd':'declined' };
+  const RIDE_ST = { 'aangevraagd':'requested', 'geaccepteerd':'confirmed', 'onderweg':'on the way', 'aangekomen':'arrived', 'rijdt':'driving', 'aan-boord':'on board', 'gearriveerd':'completed', 'afgerond':'completed', 'geweigerd':'declined' };
   const tRide = s => (lang() === 'en' ? (RIDE_ST[s] || s) : s);
 
   async function renderLive(){
@@ -1750,7 +1782,13 @@
         eta = p.etaMin != null ? '<div class="eta"><div class="n">' + p.etaMin + '</div><div class="u">' + T('live.minaway','min heen') + '</div></div>' : '';
       }
       let line2 = tType(p.typeLabel);
-      if (p.ride) line2 += ' · ' + T('live.ride','rit') + ' ' + tRide(p.ride.status);
+      if (p.ride){
+        line2 += ' · ' + T('live.ride','rit') + ' ' + tRide(p.ride.status);
+        const extra = [];
+        if (p.ride.driver) extra.push('🚘 ' + p.ride.driver + (p.ride.vehicle ? ' · ' + p.ride.vehicle : ''));
+        if (p.ride.quote) extra.push(T('live.vast','vaste nettoprijs') + ' ' + eur(p.ride.quote));
+        if (extra.length) line2 += '<br>' + extra.join(' · ');
+      }
       else if (p.order) line2 += ' · ' + p.order.items + ' ' + T('app.items','item(s)') + ', ' + tStatus(p.order.status);
       return '<div class="live-partner"><span class="pic">' + p.icon + '</span><div class="pt"><b>' + p.name + '</b><span>' + line2 + '</span></div>' + eta + '</div>';
     }).join('');
@@ -1798,11 +1836,30 @@
     liveData = null; toast(T('live.stopped','Reis gestopt.')); renderLive();
   }
 
-  async function requestTaxi(){
+  function requestTaxi(){
     const veh = suppliers.find(s => s.type === 'taxi') || suppliers.find(s => s.type === 'jet');
     if (!veh){ toast(T('live.notaxi','Geen vervoerspartner beschikbaar op deze bestemming.')); return; }
-    try { await API.call('/ride/request', { supplierCode: veh.code, toCode: (liveData && liveData.destCode) || undefined }); toast(veh.name + ' ' + T('live.taxireq','is gevraagd. U ziet de taxi live naderen.')); await renderLive(); }
-    catch (e){ toast(e.message); }
+    // nette aanvraag: personen, bagage en tijdstip; de prijs komt direct terug
+    $('#rideSup').textContent = veh.name;
+    $('#ride-sheet').dataset.code = veh.code;
+    $('#ride-sheet').classList.add('open'); $('#ride-scrim').classList.add('open');
+  }
+  async function verstuurRit(){
+    const code = $('#ride-sheet').dataset.code;
+    const wanneer = $('#ridePlan').value === 'later' ? ($('#rideTijd').value ? T('live.om','om') + ' ' + $('#rideTijd').value : 'Zo snel mogelijk') : 'Zo snel mogelijk';
+    try {
+      const d = await API.call('/ride/request', {
+        supplierCode: code,
+        toCode: (liveData && liveData.destCode) || undefined,
+        passengers: Number($('#ridePax').value) || 1,
+        luggage: Number($('#rideBag').value) || 0,
+        when: wanneer,
+        note: $('#rideNote').value.trim()
+      });
+      $('#ride-sheet').classList.remove('open'); $('#ride-scrim').classList.remove('open');
+      toast('🚘 ' + T('live.taxireq2','Rit aangevraagd.') + (d.ride && d.ride.quote ? ' ' + T('live.vast','vaste nettoprijs') + ': ' + eur(d.ride.quote) : ''));
+      await renderLive();
+    } catch (e){ toast(e.message); }
   }
 
   function shareMyLocation(){
@@ -2562,6 +2619,10 @@
 </script>
 <script>
 window.I18N = { en: {
+  'ride.sub':'Fixed net price, confirmed instantly', 'ride.pax':'Passengers', 'ride.bag':'Luggage',
+  'ride.plan':'When', 'ride.nu':'Now', 'ride.later':'At a time', 'ride.tijd':'Time',
+  'ride.noteph':'E.g. child seat, side entrance', 'ride.go':'Request the ride',
+  'live.taxireq2':'Ride requested.', 'live.vast':'fixed net price', 'live.om':'at',
   'sal.dm.sub':'Member chat, on codenames', 'sal.dm.leeg':'No messages yet. Say hello.',
   'sal.share.h':'Share with a connection', 'sal.deel':'Share with a connection', 'sal.gedeeld':'Shared.',
   'sal.add':'Add', 'sal.zoek':'Search', 'sal.zoekph':'Search by codename, e.g. Golden Ibis',

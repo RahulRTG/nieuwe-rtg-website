@@ -242,6 +242,20 @@ function ensureSupplierDefaults(s) {
     }
   }
   if (typeof s.rate !== 'number') s.rate = 0.12;
+  // vervoerders: een vloot en een tarief, zodat elke rit direct een vaste
+  // nettoprijs krijgt en het kantoor voertuigen aan chauffeurs kan koppelen
+  const caps2 = (db.data.supplierTypes[s.type] || {}).caps || [];
+  if (caps2.includes('rides')) {
+    if (!Array.isArray(s.fleet)) s.fleet = s.type === 'jet'
+      ? [{ id: 'v1', name: 'Cessna Citation XLS', plate: 'PH-RTG', seats: 8, active: true },
+         { id: 'v2', name: 'Embraer Phenom 300', plate: 'PH-RTE', seats: 9, active: true }]
+      : [{ id: 'v1', name: 'Mercedes S-klasse', plate: 'RT-01-GX', seats: 3, active: true },
+         { id: 'v2', name: 'Mercedes V-klasse', plate: 'RT-02-GX', seats: 6, active: true }];
+    s.settings = s.settings || {};
+    if (!s.settings.tarief) s.settings.tarief = s.type === 'jet'
+      ? { start: 0, perKm: 9, minimum: 7500 }
+      : { start: 15, perKm: 2.4, minimum: 25 };
+  }
 }
 
 function initRealtime() {
@@ -363,6 +377,13 @@ function auth(req, res, next) {
   req.session = sess;
   dirTouch(sess);
   next();
+}
+
+/* Schoonmaakhulp voor vrije tekstvelden: knipt op lengte en haalt < en >
+   weg, zodat door gebruikers ingevoerde namen en berichten nooit als
+   opmaak in andermans scherm kunnen belanden. */
+function schoon(v, n) {
+  return String(v == null ? '' : v).replace(/[<>]/g, '').slice(0, n || 120).trim();
 }
 
 /* Ledengids voor Salon-connecties: sleutel -> codenaam. Wordt bijgehouden
@@ -1161,6 +1182,7 @@ function supplierState(s, actor) {
     doors: s.doors || null,
     tables: s.tables || null,
     settings: s.settings || { ordersOpen: true, reservationsOpen: true },
+    fleet: s.fleet || null,
     minibar: Array.isArray(s.minibar) ? {
       catalog: s.minibar,
       countedToday: [...new Set((db.data.minibarCounts[s.code] || []).filter(e => e.at.slice(0, 10) === new Date().toISOString().slice(0, 10)).map(e => e.room))],
@@ -1265,7 +1287,7 @@ app.post('/api/supplier/roster', (req, res) => {
 // Manager voegt personeel toe (krijgt een PIN) of verwijdert het.
 app.post('/api/supplier/staff/add', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
-  const name = String(req.body.name || '').trim().slice(0, 60);
+  const name = schoon(req.body.name, 60);
   if (!name) return res.status(400).json({ error: 'Vul een naam in.' });
   const pin = accounts.makePin();
   const staff = accounts.createStaff({ supplierCode: req.supplier.code, name, role: req.body.role === 'manager' ? 'manager' : 'staff', func: String(req.body.func || '').slice(0, 40) || null, pin });
@@ -1297,7 +1319,7 @@ function pickupCode() {
 // ---- kamers (hotel/appartement): aan/uit, toevoegen, verwijderen ----
 app.post('/api/supplier/room/add', supplierAuth, (req, res) => {
   if (!Array.isArray(req.supplier.rooms)) return res.status(400).json({ error: 'Kamers zijn er alleen voor hotels en appartementen.' });
-  const name = String(req.body.name || '').trim().slice(0, 60);
+  const name = schoon(req.body.name, 60);
   const price = Math.max(0, Number(req.body.price) || 0);
   if (!name || !price) return res.status(400).json({ error: 'Vul een kamernaam en prijs in.' });
   const room = { id: crypto.randomBytes(3).toString('hex'), name, desc: String(req.body.desc || '').slice(0, 120), price, available: true, hk: { status: 'schoon' } };
@@ -1631,7 +1653,7 @@ app.post('/api/supplier/minibar/count', supplierAuth, (req, res) => {
 // catalogusbeheer: artikelen toevoegen of verwijderen
 app.post('/api/supplier/minibar/item/add', supplierAuth, (req, res) => {
   if (!Array.isArray(req.supplier.minibar)) return res.status(400).json({ error: 'Minibar is er alleen voor hotels en appartementen.' });
-  const name = String(req.body.name || '').trim().slice(0, 60);
+  const name = schoon(req.body.name, 60);
   const price = Math.max(0, Number(req.body.price) || 0);
   if (!name || !price) return res.status(400).json({ error: 'Vul een artikel en prijs in.' });
   req.supplier.minibar.push({ id: crypto.randomBytes(3).toString('hex'), name, price });
@@ -1822,7 +1844,7 @@ app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
 app.post('/api/supplier/apply', (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
-  const name = String(req.body.name || '').trim().slice(0, 60);
+  const name = schoon(req.body.name, 60);
   const func = String(req.body.func || '').trim().slice(0, 40);
   const contact = String(req.body.contact || '').trim().slice(0, 80);
   const note = String(req.body.note || '').trim().slice(0, 400);
@@ -2622,6 +2644,15 @@ app.post('/api/supplier/settings', supplierAuth, (req, res) => {
   const changed = [];
   if (typeof req.body.ordersOpen === 'boolean' && st.ordersOpen !== req.body.ordersOpen) { st.ordersOpen = req.body.ordersOpen; changed.push('bestellingen ' + (st.ordersOpen ? 'open' : 'dicht')); }
   if (typeof req.body.reservationsOpen === 'boolean' && st.reservationsOpen !== req.body.reservationsOpen) { st.reservationsOpen = req.body.reservationsOpen; changed.push('reserveringen ' + (st.reservationsOpen ? 'open' : 'dicht')); }
+  // vervoerders: het tarief dat elke nieuwe rit direct een vaste prijs geeft
+  if (req.body.tarief && typeof req.body.tarief === 'object') {
+    const t = st.tarief = st.tarief || {};
+    for (const k of ['start', 'perKm', 'minimum']) {
+      const v = Number(req.body.tarief[k]);
+      if (Number.isFinite(v) && v >= 0 && v <= 100000) t[k] = Math.round(v * 100) / 100;
+    }
+    changed.push('het tarief bij');
+  }
   save();
   if (changed.length) logActivity(req.supplier.code, req.actor, 'zette ' + changed.join(' en '));
   broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
@@ -2928,9 +2959,9 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
   if (!Array.isArray(req.body.menu)) return res.status(400).json({ error: 'Menu ontbreekt.' });
   req.supplier.menu = req.body.menu.slice(0, 100).map(m => ({
     id: String(m.id || crypto.randomBytes(3).toString('hex')),
-    cat: String(m.cat || 'Overig').slice(0, 40),
-    name: String(m.name || '').slice(0, 80),
-    desc: String(m.desc || '').slice(0, 200),
+    cat: schoon(m.cat || 'Overig', 40),
+    name: schoon(m.name, 80),
+    desc: schoon(m.desc, 200),
     price: Math.max(0, Number(m.price) || 0),
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
     station: m.station === 'bar' ? 'bar' : 'keuken',
@@ -3070,20 +3101,119 @@ app.post('/api/supplier/location', supplierAuth, (req, res) => {
 });
 
 // ---- vervoerspartner werkt de ritstatus bij → lid live op de hoogte ----
-app.post('/api/supplier/ride/status', supplierAuth, (req, res) => {
-  const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
-  const allowed = ['aangevraagd', 'onderweg', 'aangekomen', 'rijdt', 'gearriveerd', 'geweigerd'];
-  const status = String(req.body.status || '');
-  if (!allowed.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+/* Ritstatus: een vaste, logische keten met nette meldingen naar de gast.
+   Oude statusnamen (rijdt/gearriveerd) blijven werken voor bestaande data. */
+const RIT_KETEN = ['aangevraagd', 'geaccepteerd', 'onderweg', 'aangekomen', 'aan-boord', 'afgerond'];
+const RIT_LEGACY = { rijdt: 'aan-boord', gearriveerd: 'afgerond' };
+const RIT_MELDING = {
+  geaccepteerd: 'Uw rit is bevestigd.',
+  onderweg: 'Uw chauffeur is onderweg naar u.',
+  aangekomen: 'Uw chauffeur staat voor.',
+  'aan-boord': 'Goede reis!',
+  afgerond: 'U bent gearriveerd. Dank voor het reizen met RTG.',
+  geweigerd: 'De rit kon helaas niet worden aangenomen.'
+};
+function ritVerder(req, res, r, status) {
   r.status = status;
+  const gastLoc = (() => { const L = db.data.live[r.customerKey || r.customerTier]; return L && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null; })();
+  if (status === 'onderweg') r.pickupEtaMin = etaMinutes(haversine(req.supplier.loc, gastLoc), 'driving') || 6;
+  if (status === 'aan-boord') { r.boardedAt = new Date().toISOString(); r.dropEtaMin = r.km ? etaMinutes(r.km * 1000, r.type === 'jet' ? 'flying' : 'driving') : 12; }
+  if (status === 'afgerond') r.finishedAt = new Date().toISOString();
   save();
   broadcastSync([r.customerTier], 'orders');
   sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' });
   sseToOffice('sync', { scope: 'orders' });
-  notify(r.customerTier, { icon: '🚗', title: req.supplier.name, body: 'Uw rit is nu: ' + status + '.', scope: 'orders' });
+  notify(r.customerTier, { icon: r.type === 'jet' ? '✈️' : '🚗', title: req.supplier.name, body: RIT_MELDING[status] || ('Uw rit is nu: ' + status + '.'), scope: 'orders' });
   logActivity(req.supplier.code, req.actor, 'zette rit ' + r.ref + ' op "' + status + '"');
   res.json({ ok: true, ride: r });
+}
+app.post('/api/supplier/ride/status', supplierAuth, (req, res) => {
+  const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
+  let status = String(req.body.status || '');
+  if (RIT_LEGACY[status]) status = RIT_LEGACY[status];
+  if (status !== 'geweigerd') {
+    if (!RIT_KETEN.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+    // de keten mag alleen vooruit (overslaan mag, teruggaan niet)
+    const nu = RIT_KETEN.indexOf(RIT_LEGACY[r.status] || r.status);
+    const straks = RIT_KETEN.indexOf(status);
+    if (straks <= nu) return res.status(409).json({ error: 'Deze rit is al ' + r.status + '.' });
+  } else if (['aan-boord', 'afgerond'].includes(RIT_LEGACY[r.status] || r.status)) {
+    return res.status(409).json({ error: 'Een lopende of afgeronde rit kan niet meer geweigerd worden.' });
+  }
+  ritVerder(req, res, r, status);
+});
+
+/* Slimme toewijzing: de eerste vrije chauffeur en een passend, vrij voertuig. */
+function ritBezetting(code) {
+  const actief = db.data.rides.filter(r => r.supplierCode === code && ['geaccepteerd', 'onderweg', 'aangekomen', 'aan-boord'].includes(RIT_LEGACY[r.status] || r.status));
+  return {
+    drukkeChauffeurs: new Set(actief.filter(r => r.driver).map(r => r.driver.staffId)),
+    bezetteVoertuigen: new Set(actief.filter(r => r.vehicle).map(r => r.vehicle.id))
+  };
+}
+app.post('/api/supplier/ride/suggest', supplierAuth, (req, res) => {
+  const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
+  const { drukkeChauffeurs, bezetteVoertuigen } = ritBezetting(req.supplier.code);
+  const staff = accounts.listStaff(req.supplier.code);
+  const rijders = staff.filter(m => /chauffeur|piloot|pilot|crew|centrale|operations/i.test(m.func || ''));
+  const pool = rijders.length ? rijders : staff;
+  const chauffeur = pool.find(m => !drukkeChauffeurs.has(m.id)) || null;
+  const voertuig = (req.supplier.fleet || []).find(v => v.active && v.seats >= (r.passengers || 1) && !bezetteVoertuigen.has(v.id))
+    || (req.supplier.fleet || []).find(v => v.active && !bezetteVoertuigen.has(v.id)) || null;
+  res.json({ ok: true,
+    staffId: chauffeur ? chauffeur.id : null, staffName: chauffeur ? chauffeur.name : null,
+    vehicleId: voertuig ? voertuig.id : null, vehicleName: voertuig ? voertuig.name : null });
+});
+
+/* Toewijzen: het kantoor wijst toe, of een chauffeur neemt de rit zelf. */
+app.post('/api/supplier/ride/assign', supplierAuth, (req, res) => {
+  const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
+  if (['afgerond', 'geweigerd'].includes(RIT_LEGACY[r.status] || r.status)) return res.status(409).json({ error: 'Deze rit is al afgerond.' });
+  const staff = accounts.listStaff(req.supplier.code);
+  const wilZelf = req.body.self === true;
+  const staffId = wilZelf ? req.actor.staffId : Number(req.body.staffId);
+  const m = staff.find(x => x.id === staffId);
+  if (!m) return res.status(404).json({ error: 'Deze medewerker kennen we niet.' });
+  if (!wilZelf && !req.actor.manager && req.actor.staffId !== staffId)
+    return res.status(403).json({ error: 'Alleen een manager wijst ritten aan anderen toe.' });
+  const v = (req.supplier.fleet || []).find(x => x.id === String(req.body.vehicleId || '')) || null;
+  r.driver = { staffId: m.id, name: m.name };
+  r.vehicle = v ? { id: v.id, name: v.name, plate: v.plate, seats: v.seats } : null;
+  if ((RIT_LEGACY[r.status] || r.status) === 'aangevraagd') r.status = 'geaccepteerd';
+  save();
+  broadcastSync([r.customerTier], 'orders');
+  sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' });
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  notify(r.customerTier, { icon: r.type === 'jet' ? '✈️' : '🚗', title: req.supplier.name,
+    body: m.name.split(' ')[0] + ' komt u halen' + (v ? ' in de ' + v.name + ' (' + v.plate + ')' : '') + '.', scope: 'orders' });
+  logActivity(req.supplier.code, req.actor, 'wees rit ' + r.ref + ' toe aan ' + m.name + (v ? ' met ' + v.name : ''));
+  res.json({ ok: true, ride: r });
+});
+
+/* Vlootbeheer (kantoor, alleen management) */
+app.post('/api/supplier/fleet', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  const s = req.supplier;
+  s.fleet = s.fleet || [];
+  const a = String(req.body.action || '');
+  if (a === 'add') {
+    const name = schoon(req.body.name, 50), plate = schoon(req.body.plate, 16);
+    if (!name) return res.status(400).json({ error: 'Geef het voertuig een naam.' });
+    s.fleet.push({ id: 'v' + Date.now().toString(36), name, plate, seats: Math.min(20, Math.max(1, Number(req.body.seats) || 4)), active: true });
+  } else if (a === 'remove') {
+    s.fleet = s.fleet.filter(v => v.id !== req.body.id);
+  } else if (a === 'toggle') {
+    const v = s.fleet.find(x => x.id === req.body.id);
+    if (v) v.active = !v.active;
+  } else return res.status(400).json({ error: 'Onbekende actie.' });
+  save();
+  sseToSupplier(s.code, 'sync', { scope: 'settings' });
+  logActivity(s.code, req.actor, 'werkte de vloot bij');
+  res.json({ ok: true, fleet: s.fleet });
 });
 
 /* ================= KLANTZIJDE (leden-app) ================= */
@@ -3126,8 +3256,8 @@ app.post('/api/order', auth, (req, res) => {
     supplierCode: s.code, supplierName: s.name, type: s.type,
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     items, total,
-    table: String(req.body.table || '').slice(0, 24),
-    allergyNote: String(req.body.allergyNote || '').slice(0, 200),
+    table: schoon(req.body.table, 24),
+    allergyNote: schoon(req.body.allergyNote, 200),
     tagSalon: !!req.body.tagSalon,
     status: 'nieuw', paid: false, at: new Date().toISOString()
   };
@@ -3226,7 +3356,10 @@ function liveStateFor(key, lang) {
       // voor een rit telt de ETA van het voertuig naar het lid
       taxiEtaMin: ride && me && s.loc ? etaMinutes(haversine(s.loc, me), 'driving') : null,
       order: order ? { ref: order.ref, status: order.status, items: order.items.reduce((n, i) => n + i.qty, 0), total: order.total, paid: order.paid } : null,
-      ride: ride ? { ref: ride.ref, status: ride.status, to: ride.to } : null
+      ride: ride ? { ref: ride.ref, status: ride.status, to: ride.to, quote: ride.quote, km: ride.km,
+                     passengers: ride.passengers, driver: ride.driver ? ride.driver.name : null,
+                     vehicle: ride.vehicle ? ride.vehicle.name + (ride.vehicle.plate ? ' · ' + ride.vehicle.plate : '') : null,
+                     pickupEtaMin: ride.pickupEtaMin, dropEtaMin: ride.dropEtaMin } : null
     };
   }).filter(Boolean);
   const destCode = L && L.destCode ? L.destCode : null;
@@ -3319,19 +3452,34 @@ app.post('/api/ride/request', auth, (req, res) => {
   if (!s || !caps.includes('rides')) return res.status(404).json({ error: 'Geen vervoerspartner gevonden.' });
   const dest = req.body.toCode ? findSupplier(req.body.toCode) : null;
   const codename = liveCodename(req.session);
+  // slimme offerte: afstand uit de live-locatie en de bestemming, anders een
+  // realistisch stadsgemiddelde; prijs volgt het tarief van de vervoerder
+  const pax = Math.min(9, Math.max(1, Number(req.body.passengers) || 1));
+  const koffers = Math.min(9, Math.max(0, Number(req.body.luggage) || 0));
+  const L = db.data.live[req.session.key];
+  const van = (L && Number.isFinite(L.lat)) ? { lat: L.lat, lng: L.lng } : (s.loc || null);
+  const naar = dest && dest.loc ? dest.loc : null;
+  let km = s.type === 'jet' ? 350 : 9;
+  const meters = haversine(van, naar);
+  if (meters != null && meters > 200) km = Math.max(1, meters / 1000);
+  const t = (s.settings && s.settings.tarief) || {};
+  const quote = Math.round(Math.max(t.minimum || 0, (t.start || 0) + (t.perKm || 2.5) * km));
   const ride = {
     ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     supplierCode: s.code, supplierName: s.name, type: s.type,
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
-    from: String(req.body.from || 'Huidige locatie').slice(0, 80),
-    to: String(req.body.to || (dest && dest.name) || '').slice(0, 80),
+    from: schoon(req.body.from || 'Huidige locatie', 80),
+    to: schoon(req.body.to || (dest && dest.name) || '', 80),
     toCode: dest ? dest.code : null,
-    when: String(req.body.when || 'Zo snel mogelijk').slice(0, 40),
+    when: schoon(req.body.when || 'Zo snel mogelijk', 40),
+    passengers: pax, luggage: koffers, note: schoon(req.body.note, 140),
+    km: Math.round(km * 10) / 10, quote,
+    driver: null, vehicle: null,
     status: 'aangevraagd', at: new Date().toISOString()
   };
   db.data.rides.unshift(ride);
   save();
-  notifySupplier(s.code, { icon: '🚗', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') });
+  notifySupplier(s.code, { icon: '🚗', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' · ' + pax + 'p · € ' + quote });
   sseToSupplier(s.code, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   pushLive(req.session.key);

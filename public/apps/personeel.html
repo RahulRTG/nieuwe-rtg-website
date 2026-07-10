@@ -161,6 +161,11 @@
         <p class="sub" data-i18n="pd.v.taken.sub">Klussen, kamers en alles wat vandaag aandacht vraagt.</p>
         <div id="takenWrap"></div>
       </div>
+      <div class="view" data-view="ritten">
+        <h2 data-i18n="pd.v.ritten">Ritten</h2>
+        <p class="sub" data-i18n="pd.v.ritten.sub">Uw rit, open aanvragen en uw verdiensten van vandaag.</p>
+        <div id="rittenWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -171,6 +176,7 @@
       <button data-tab="vandaag" class="active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span data-i18n="pd.t.today">Vandaag</span></button>
       <button data-tab="rooster"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span data-i18n="pd.t.rooster">Rooster</span></button>
       <button data-tab="taken"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span data-i18n="pd.t.taken">Taken</span></button>
+      <button data-tab="ritten" id="tabRitten" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M7.5 20v1M16.5 20v1"/></svg><span data-i18n="pd.t.ritten">Ritten</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
   </div>
@@ -266,7 +272,7 @@
     renderAll();
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderRitten(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; renderAll(); } catch(e){} }
 
   // Blijf ingelogd: met een bewaard token direct naar Vandaag, zonder PIN.
@@ -343,6 +349,59 @@
     }));
     document.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/room/hk', { id:b.dataset.hk, status:'schoon' }); toast(T('pd.cleaned','Kamer staat op schoon.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    }));
+  }
+
+  // Ritten: chauffeurs en crew van vervoerspartners (taxi en jet) werken hun
+  // ritten volledig vanuit de zak af: nemen, stap voor stap rijden, verdiensten.
+  const NEXT_RIDE = { 'aangevraagd':'geaccepteerd', 'geaccepteerd':'onderweg', 'onderweg':'aangekomen', 'aangekomen':'aan-boord', 'aan-boord':'afgerond', 'rijdt':'afgerond', 'gearriveerd':null };
+  const RIDE_LBL = { 'geaccepteerd':['pd.r.accept','Accepteer'], 'onderweg':['pd.r.go','Ik rijd'], 'aangekomen':['pd.r.atpickup','Ik sta voor'], 'aan-boord':['pd.r.board','Aan boord'], 'afgerond':['pd.r.done','Afronden'] };
+  const RIT_ST = { 'aangevraagd':['pd.rs.new','nieuw'], 'geaccepteerd':['pd.rs.acc','geaccepteerd'], 'onderweg':['pd.rs.go','onderweg'], 'aangekomen':['pd.rs.at','staat voor'], 'aan-boord':['pd.rs.board','gast aan boord'], 'rijdt':['pd.rs.board','gast aan boord'] };
+  const RIT_KLAAR = st => st === 'gearriveerd' || st === 'afgerond' || st === 'geweigerd';
+  const heeftRitten = () => !!(state && state.supplier && (state.supplier.caps || []).includes('rides'));
+  function renderRitten(){
+    const aan = heeftRitten();
+    const tabBtn = document.getElementById('tabRitten');
+    if (tabBtn) tabBtn.style.display = aan ? '' : 'none';
+    const wrap = $('#rittenWrap');
+    if (!aan){ if (wrap) wrap.innerHTML = ''; return; }
+    const jet = state.supplier && state.supplier.type === 'jet';
+    const ritten = state.rides || [];
+    const mijn = ritten.filter(r => !RIT_KLAAR(r.status) && r.driver && r.driver.staffId === me.staffId);
+    const straks = r => r.plannedFor && (new Date(r.plannedFor) - Date.now()) > 45 * 60000;
+    const alleOpen = ritten.filter(r => r.status === 'aangevraagd' && !r.driver);
+    const open = alleOpen.filter(r => !straks(r));
+    const gepland = alleOpen.filter(straks);
+    const vandaag = new Date().toISOString().slice(0, 10);
+    const klaar = ritten.filter(r => (r.status === 'afgerond' || r.status === 'gearriveerd') && r.driver && r.driver.staffId === me.staffId && String(r.finishedAt || r.at).slice(0, 10) === vandaag);
+    const omzet = klaar.reduce((s, r) => s + (r.quote || 0), 0);
+    const regel = r => (r.from || '') + ' → ' + (r.to || T('pd.r.opendest','open bestemming')) + (r.passengers ? ' · ' + r.passengers + 'p' : '') + (r.quote ? ' · ' + eur(r.quote) : '');
+    wrap.innerHTML =
+      '<div class="card"><div class="k">'+T('pd.r.mijn','Uw rit')+' ('+mijn.length+')</div>'+
+      (mijn.length ? mijn.map(r => {
+        const nxt = NEXT_RIDE[r.status];
+        const st = RIT_ST[r.status];
+        return '<div class="task"><span class="ic">'+(jet?'✈️':'🚗')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' · 📝 '+esc(r.note):'')+'</span></div>'+
+          (nxt ? '<button class="abtn" data-pdgo="'+r.ref+'" data-st="'+nxt+'">'+T(RIDE_LBL[nxt][0], RIDE_LBL[nxt][1])+'</button>' : '')+'</div>';
+      }).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geen','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>')+'</div>'+
+      '<div class="card"><div class="k">'+T('pd.r.openh','Open aanvragen')+' ('+open.length+')</div>'+
+      (open.length ? open.map(r =>
+        '<div class="task"><span class="ic">🔔</span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc(regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>'
+      ).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geenopen','Geen open aanvragen. Nieuwe ritten verschijnen hier vanzelf.')+'</div>')+'</div>'+
+      (gepland.length ? '<div class="card"><div class="k">'+T('pd.r.gepland','Gepland')+' ('+gepland.length+')</div>'+
+        gepland.map(r => '<div class="task"><span class="ic">📅</span><div class="t"><b>'+esc(r.customerCodename)+'</b><span>'+esc((r.when || '') + ' · ' + regel(r))+'</span></div><button class="abtn" data-pdneem="'+r.ref+'">'+T('pd.r.neem','Neem')+'</button></div>').join('')+'</div>' : '')+
+      '<div class="card"><div class="k">'+T('pd.r.vandaag','Vandaag')+'</div>'+
+      '<div class="task"><span class="ic">💶</span><div class="t"><b>'+klaar.length+' '+T('pd.r.klaar','rit(ten) afgerond')+' · '+eur(omzet)+'</b><span>'+T('pd.r.netto','Volledig voor de zaak: RTG rekent 0% commissie.')+'</span></div></div></div>';
+    document.querySelectorAll('[data-pdgo]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/ride/status', { ref: b.dataset.pdgo, status: b.dataset.st }); await refresh(); openTab('ritten'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-pdneem]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const s = await API.call('/supplier/ride/suggest', { ref: b.dataset.pdneem });
+        await API.call('/supplier/ride/assign', { ref: b.dataset.pdneem, self: true, vehicleId: s.vehicleId });
+        toast(T('pd.r.genomen','De rit is van u.') + (s.vehicleName ? ' · ' + s.vehicleName : ''));
+        await refresh(); openTab('ritten');
+      } catch(e){ toast(e.message); }
     }));
   }
 
@@ -501,7 +560,15 @@ window.I18N = { en: {
   'pd.switch':'Switch', 'pd.v.today':'Today.', 'pd.v.rooster':'Schedule', 'pd.v.rooster.sub':'The next seven days, your shifts highlighted.',
   'pd.v.taken':'Tasks', 'pd.v.taken.sub':'Jobs, rooms and everything needing attention today.',
   'pd.v.team':'Team', 'pd.v.team.sub':'Internal chat and who did what.',
-  'pd.t.today':'Today', 'pd.t.rooster':'Schedule', 'pd.t.taken':'Tasks', 'pd.t.team':'Team',
+  'pd.t.today':'Today', 'pd.t.rooster':'Schedule', 'pd.t.taken':'Tasks', 'pd.t.team':'Team', 'pd.t.ritten':'Rides',
+  'pd.v.ritten':'Rides', 'pd.v.ritten.sub':'Your ride, open requests and today\'s earnings.',
+  'pd.r.mijn':'Your ride', 'pd.r.geen':'No active ride. Take an open ride below.',
+  'pd.r.openh':'Open requests', 'pd.r.geenopen':'No open requests. New rides appear here automatically.',
+  'pd.r.gepland':'Scheduled', 'pd.r.neem':'Take', 'pd.r.genomen':'The ride is yours.',
+  'pd.r.vandaag':'Today', 'pd.r.klaar':'ride(s) completed', 'pd.r.netto':'All for the business: RTG charges 0% commission.',
+  'pd.r.opendest':'open destination',
+  'pd.r.accept':'Accept', 'pd.r.go':'On my way', 'pd.r.atpickup':'I have arrived', 'pd.r.board':'On board', 'pd.r.done':'Complete',
+  'pd.rs.new':'new', 'pd.rs.acc':'accepted', 'pd.rs.go':'en route', 'pd.rs.at':'at pickup', 'pd.rs.board':'guest on board',
   'pd.myshift':'Your shift today', 'pd.noshift':'No shift', 'pd.tasksnow':'Needs attention now',
   'pd.alldone':'All caught up.', 'pd.more':'more under Tasks',
   'pd.busy':'being picked up', 'pd.open':'open', 'pd.toclean':'to clean', 'pd.minibar':'Count minibar', 'pd.inapp':'via the business app',

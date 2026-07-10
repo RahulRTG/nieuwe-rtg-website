@@ -1201,13 +1201,13 @@ function supplierState(s, actor) {
       .filter(L => L.active && !connectedSupplierCodes(L.key).includes(s.code))
       .map(L => { const d = L.destCode ? findSupplier(L.destCode) : null; return { codename: L.codename, dest: d ? d.name : null }; }),
     menu: s.menu || [],
-    orders: db.data.orders.filter(o => o.supplierCode === s.code).map(o => {
+    orders: db.data.orders.filter(o => o.supplierCode === s.code && o.status !== 'wacht-op-betaling').map(o => {
       const L = db.data.live[o.customerKey || o.customerTier];
       const enroute = L && L.active && connectedSupplierCodes(o.customerKey || o.customerTier).includes(s.code);
       const me = enroute && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
       return { ...o, guestEtaMin: me && s.loc ? etaMinutes(haversine(me, s.loc), L.mode) : null, guestArrived: !!(L && L.arrived && L.destCode === s.code) };
     }),
-    rides: db.data.rides.filter(r => r.supplierCode === s.code).map(r => {
+    rides: db.data.rides.filter(r => r.supplierCode === s.code && r.status !== 'wacht-op-betaling').map(r => {
       const L = db.data.live[r.customerKey || r.customerTier];
       const guest = L && L.active && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
       const toS = r.toCode ? findSupplier(r.toCode) : null;
@@ -3130,6 +3130,7 @@ function ritVerder(req, res, r, status) {
 app.post('/api/supplier/ride/status', supplierAuth, (req, res) => {
   const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
   if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
+  if (r.status === 'wacht-op-betaling') return res.status(409).json({ error: 'Deze rit is nog niet betaald.' });
   let status = String(req.body.status || '');
   if (RIT_LEGACY[status]) status = RIT_LEGACY[status];
   if (status !== 'geweigerd') {
@@ -3171,6 +3172,7 @@ app.post('/api/supplier/ride/suggest', supplierAuth, (req, res) => {
 app.post('/api/supplier/ride/assign', supplierAuth, (req, res) => {
   const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
   if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
+  if (r.status === 'wacht-op-betaling') return res.status(409).json({ error: 'Deze rit is nog niet betaald.' });
   if (['afgerond', 'geweigerd'].includes(RIT_LEGACY[r.status] || r.status)) return res.status(409).json({ error: 'Deze rit is al afgerond.' });
   const staff = accounts.listStaff(req.supplier.code);
   const wilZelf = req.body.self === true;
@@ -3259,14 +3261,11 @@ app.post('/api/order', auth, (req, res) => {
     table: schoon(req.body.table, 24),
     allergyNote: schoon(req.body.allergyNote, 200),
     tagSalon: !!req.body.tagSalon,
-    status: 'nieuw', paid: false, at: new Date().toISOString()
+    // betalen-eerst: pas definitief (en pas zichtbaar voor de zaak) na afrekenen
+    status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
   };
   db.data.orders.unshift(order);
   save();
-  // leverancier + backoffice live
-  notifySupplier(s.code, { icon: '🛎️', title: 'Nieuwe bestelling', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
-  sseToSupplier(s.code, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
   res.json({ ok: true, order });
 });
 
@@ -3275,9 +3274,13 @@ app.post('/api/order/pay', auth, (req, res) => {
   const o = db.data.orders.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
+  if (Date.now() - new Date(o.at) > 30 * 60000) return res.status(410).json({ error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' });
   o.paid = true;
+  o.paidAt = new Date().toISOString();
+  if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
   save();
-  notifySupplier(o.supplierCode, { icon: '✅', title: 'Betaald', body: o.customerCodename + ' heeft € ' + o.total + ' voldaan.' });
+  // nu pas hoort de zaak ervan: betaald = definitief
+  notifySupplier(o.supplierCode, { icon: '\u{1F6CE}\uFE0F', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
   sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   res.json({ ok: true, order: o });
@@ -3323,7 +3326,7 @@ function connectedSupplierCodes(key) {
   for (const o of db.data.orders)
     if ((o.customerKey || o.customerTier) === key && !['terugbetaald', 'geserveerd', 'geweigerd'].includes(o.status)) set.add(o.supplierCode);
   for (const r of db.data.rides)
-    if ((r.customerKey || r.customerTier) === key && r.status !== 'gearriveerd' && r.status !== 'geweigerd') set.add(r.supplierCode);
+    if ((r.customerKey || r.customerTier) === key && !['gearriveerd', 'afgerond', 'geweigerd'].includes(r.status)) set.add(r.supplierCode);
   return [...set];
 }
 
@@ -3472,18 +3475,47 @@ app.post('/api/ride/request', auth, (req, res) => {
     to: schoon(req.body.to || (dest && dest.name) || '', 80),
     toCode: dest ? dest.code : null,
     when: schoon(req.body.when || 'Zo snel mogelijk', 40),
+    // vooruit plannen: datum en tijd geven een geplande rit (taxi en jet)
+    plannedFor: (() => {
+      const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+      const iso = d + 'T' + (/^\d{2}:\d{2}$/.test(u) ? u : '12:00') + ':00';
+      return isNaN(new Date(iso)) ? null : iso;
+    })(),
     passengers: pax, luggage: koffers, note: schoon(req.body.note, 140),
     km: Math.round(km * 10) / 10, quote,
     driver: null, vehicle: null,
-    status: 'aangevraagd', at: new Date().toISOString()
+    // betalen-eerst: pas na afrekenen wordt de rit definitief en zichtbaar
+    status: quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
+    paid: quote === 0, at: new Date().toISOString()
   };
+  if (ride.plannedFor) ride.when = 'Gepland: ' + ride.plannedFor.slice(0, 16).replace('T', ' ');
   db.data.rides.unshift(ride);
   save();
-  notifySupplier(s.code, { icon: '🚗', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' · ' + pax + 'p · € ' + quote });
-  sseToSupplier(s.code, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
+  if (ride.status === 'aangevraagd') {
+    notifySupplier(s.code, { icon: '\u{1F697}', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
+    sseToSupplier(s.code, 'sync', { scope: 'orders' });
+    sseToOffice('sync', { scope: 'orders' });
+  }
   pushLive(req.session.key);
   res.json({ ok: true, ride });
+});
+
+// rit betalen: hiermee wordt hij definitief en gaat hij naar de vervoerder
+app.post('/api/ride/pay', auth, (req, res) => {
+  const r = db.data.rides.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
+  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
+  if (r.paid) return res.status(409).json({ error: 'Al betaald.' });
+  if (Date.now() - new Date(r.at) > 30 * 60000) return res.status(410).json({ error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' });
+  r.paid = true;
+  r.paidAt = new Date().toISOString();
+  if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
+  save();
+  notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? '\u2708\uFE0F' : '\u{1F697}', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
+  sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  pushLive(req.session.key);
+  res.json({ ok: true, ride: r });
 });
 
 /* ================= BACKOFFICE (RTG) =================
@@ -3533,8 +3565,8 @@ function officeState() {
   applications.sort((x, y) => (y.at || '').localeCompare(x.at || ''));
   return {
     prices: db.data.supplierPrices.slice(0, 60),
-    orders: db.data.orders.slice(0, 60),
-    rides: db.data.rides.slice(0, 60),
+    orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').slice(0, 60),
+    rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').slice(0, 60),
     live,
     applications: applications.slice(0, 40),
     suppliers: db.data.suppliers.map(publicSupplier),

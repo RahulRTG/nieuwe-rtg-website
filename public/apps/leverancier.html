@@ -979,6 +979,25 @@
      pas als alle stations klaar zijn, is de bestelling klaar en ziet de
      bedieningspost hem bij "Uit te serveren". */
   let stationMode = null, stClockTimer = null;
+  // een scherm per keukensectie: hetzelfde keukenscherm, zes kanten
+  const KSECTIES = {
+    chef:    ['\uD83D\uDC68\u200D\uD83C\uDF73', 'Chef'],
+    warm:    ['\uD83D\uDD25', 'Warme kant'],
+    koud:    ['\u2744\uFE0F', 'Koude kant'],
+    snack:   ['\uD83C\uDF5F', 'Snacks'],
+    dessert: ['\uD83C\uDF70', 'Desserts'],
+    pas:     ['\uD83C\uDF7D\uFE0F', 'De pas']
+  };
+  let keukenSectie = (() => { try { return localStorage.getItem('rtg_sup_ksectie') || 'chef'; } catch(e){ return 'chef'; } })();
+  function sectieOf(it){
+    const m = (state && state.menu || []).find(x => x.id === it.id);
+    return (m && m.station !== 'bar') ? (m.sectie || 'warm') : null;
+  }
+  function sectiesVanOrder(o){
+    const set = new Set();
+    (o.items||[]).forEach(it => { const s2 = sectieOf(it); if (s2) set.add(s2); });
+    return [...set];
+  }
 
   function stationOf(it){
     const m = (state && state.menu || []).find(x => x.id === it.id);
@@ -1025,6 +1044,7 @@
   function ticketCard(o, st, opts){
     opts = opts || {};
     const items = (o.items||[]).filter(it => !st || stationOf(it) === st);
+    const secIcon = it => (st === 'keuken' && sectieOf(it)) ? KSECTIES[sectieOf(it)][0] + ' ' : '';
     const a = ageMin(o.at);
     const late = !opts.dim && a >= 10;
     const phase = (o.stations||{})[st];
@@ -1039,8 +1059,12 @@
     return '<div class="tkc'+(late?' late':'')+(opts.dim?' dim':'')+'">'+
       '<div class="tkc-top"><span class="tkc-code">'+o.pickup+'</span><span class="tkc-age">'+a+' min</span></div>'+
       '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+(o.paid?'':' \u00b7 '+T('st.unpaid','onbetaald'))+'</div>'+
-      '<div class="tkc-items">'+items.map(it=>'<span><b>'+it.qty+'\u00d7</b>'+it.name+'</span>').join('')+'</div>'+
+      '<div class="tkc-items">'+items.map(it=>'<span><b>'+it.qty+'\u00d7</b>'+secIcon(it)+it.name+'</span>').join('')+'</div>'+
       (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
+      (st==='keuken'&&sectiesVanOrder(o).length>1?'<div class="st-badges">'+sectiesVanOrder(o).map(s2=>{
+        const p2=(o.secties||{})[s2]||'';
+        return '<span class="st-badge '+p2+'">'+KSECTIES[s2][0]+' '+T('ks.'+s2, KSECTIES[s2][1])+(p2?' \u00b7 '+(p2==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
+      }).join('')+'</div>':'')+
       (opts.badges?'<div class="st-badges">'+orderStations(o).map(s2=>{
         const p=(o.stations||{})[s2]||'';
         return '<span class="st-badge '+p+'">'+(s2==='bar'?'\uD83C\uDF78':'\uD83D\uDD25')+' '+s2+(p?' \u00b7 '+(p==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
@@ -1094,7 +1118,7 @@
   function renderStation(){
     const el = $('#stBody'); if (!el || !state) return;
     $('#stBiz').textContent = S ? S.name : '';
-    $('#stLabel').textContent = stationLabel(stationMode);
+    $('#stLabel').textContent = stationLabel(stationMode) + (stationMode === 'keuken' ? ' \u00b7 ' + T('ks.'+keukenSectie, (KSECTIES[keukenSectie]||['',''])[1]) : '');
     const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
     let html = '';
     if (stationMode === 'bediening'){
@@ -1133,6 +1157,63 @@
       html += renderKantoor();
     } else {
       const st = stationMode;
+      if (st === 'keuken'){
+        // kies de kant: chef ziet alles, elke sectie alleen het eigen werk, de pas verzamelt
+        html += '<div class="st-chips">'+Object.keys(KSECTIES).map(k =>
+          '<button data-ksel="'+k+'"'+(keukenSectie===k?' class="on"':'')+'>'+KSECTIES[k][0]+' '+T('ks.'+k, KSECTIES[k][1])+'</button>').join('')+'</div>';
+        if (keukenSectie !== 'chef' && keukenSectie !== 'pas'){
+          const sec = keukenSectie;
+          const mijn = live.filter(o => sectiesVanOrder(o).includes(sec));
+          const actief = mijn.filter(o => (o.secties||{})[sec] !== 'klaar');
+          const klaarHier = mijn.filter(o => (o.secties||{})[sec] === 'klaar');
+          const kaart = (o, dim) => {
+            const items = (o.items||[]).filter(it => sectieOf(it) === sec);
+            const a = ageMin(o.at); const late = !dim && a >= 10;
+            const fase = (o.secties||{})[sec];
+            return '<div class="tkc'+(late?' late':'')+(dim?' dim':'')+'">'+
+              '<div class="tkc-top"><span class="tkc-code">'+o.pickup+'</span><span class="tkc-age">'+a+' min</span></div>'+
+              '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+'</div>'+
+              '<div class="tkc-items">'+items.map(it=>'<span><b>'+it.qty+'\u00d7</b>'+it.name+'</span>').join('')+'</div>'+
+              (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
+              (dim?'':'<div class="tkc-act">'+(!fase?'<button class="tkc-start" data-secgo="'+o.ref+'" data-phase="bezig">'+T('st.start','Start')+'</button>':'')+
+                '<button class="tkc-ready" data-secgo="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div>')+
+            '</div>';
+          };
+          html += actief.length ? actief.map(o=>kaart(o,false)).join('') : '<div class="st-empty">'+T('ks.calm','Niets voor deze kant. Nieuwe bestellingen met werk voor ')+T('ks.'+sec, KSECTIES[sec][1]).toLowerCase()+T('ks.calm2',' verschijnen hier vanzelf.')+'</div>';
+          if (klaarHier.length){
+            html += '<div class="st-sec">'+T('ks.done','Klaargemeld door deze kant')+'</div>';
+            html += klaarHier.map(o=>kaart(o,true)).join('');
+          }
+          el.innerHTML = html;
+          bindStation(el);
+          return;
+        }
+        if (keukenSectie === 'pas'){
+          const keukenOrders = live.filter(o => sectiesVanOrder(o).length);
+          const bezig = keukenOrders.filter(o => (o.stations||{}).keuken !== 'klaar');
+          const opDePas = keukenOrders.filter(o => (o.stations||{}).keuken === 'klaar');
+          const badge = o => '<div class="st-badges">'+sectiesVanOrder(o).map(s2=>{
+            const p2=(o.secties||{})[s2]||'';
+            return '<span class="st-badge '+p2+'">'+KSECTIES[s2][0]+' '+T('ks.'+s2, KSECTIES[s2][1])+(p2?' \u00b7 '+(p2==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
+          }).join('')+'</div>';
+          html += '<div class="st-sec">'+T('ks.pas.klaar','Op de pas, samenstellen en doorgeven')+' ('+opDePas.length+')</div>';
+          html += opDePas.length ? opDePas.map(o =>
+            '<div class="tkc"><div class="tkc-top"><span class="tkc-code">'+o.pickup+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
+            '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+(o.status==='klaar'?T('ks.pas.wacht','wacht op bediening'):T('ks.pas.bar','wacht nog op de bar'))+'</div>'+
+            '<div class="tkc-items">'+(o.items||[]).filter(it=>sectieOf(it)).map(it=>'<span><b>'+it.qty+'\u00d7</b>'+KSECTIES[sectieOf(it)][0]+' '+it.name+'</span>').join('')+'</div>'+
+            (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+'</div>'
+          ).join('') : '<div class="st-empty">'+T('ks.pas.leeg','Nog niets op de pas. Zodra alle kanten klaar zijn, komt de bestelling hier binnen.')+'</div>';
+          html += '<div class="st-sec">'+T('ks.pas.bezig','In de maak, per kant')+' ('+bezig.length+')</div>';
+          html += bezig.map(o =>
+            '<div class="tkc"><div class="tkc-top"><span class="tkc-code">'+o.pickup+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
+            badge(o)+
+            (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+'</div>'
+          ).join('');
+          el.innerHTML = html;
+          bindStation(el);
+          return;
+        }
+      }
       const mine = live.filter(o => (o.items||[]).some(it => stationOf(it) === st));
       const act = mine.filter(o => (o.stations||{})[st] !== 'klaar');
       const done = mine.filter(o => (o.stations||{})[st] === 'klaar');
@@ -1184,6 +1265,18 @@
       html += runsheetStrip(st);
     }
     el.innerHTML = html;
+    bindStation(el);
+  }
+
+  function bindStation(el){
+    el.querySelectorAll('[data-ksel]').forEach(b => b.addEventListener('click', () => {
+      keukenSectie = b.dataset.ksel;
+      try { localStorage.setItem('rtg_sup_ksectie', keukenSectie); } catch(e){}
+      renderStation();
+    }));
+    el.querySelectorAll('[data-secgo]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/order/sectie', { ref: b.dataset.secgo, sectie: keukenSectie, phase: b.dataset.phase }); await refresh(); } catch(e){ toast(e.message); }
+    }));
     el.querySelectorAll('[data-stgo]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/order/station', { ref: b.dataset.stgo, station: stationMode, phase: b.dataset.phase }); await refresh(); } catch(e){ toast(e.message); }
     }));
@@ -2728,6 +2821,12 @@ window.I18N = { en: {
   'dm.today':'Forecast today', 'dm.tomorrow':'Forecast tomorrow', 'dm.redo':'Redo for today', 'dm.redo2':'Redo for tomorrow',
   'dm.busy':'Forecasting...', 'dm.done1':'Forecast ready:', 'dm.hist':'based on', 'dm.days':'days of history',
   'dm.alldone':'All ticked off, the line is set.',
+  'ks.chef':'Chef', 'ks.warm':'Hot side', 'ks.koud':'Cold side', 'ks.snack':'Snacks', 'ks.dessert':'Desserts', 'ks.pas':'The pass',
+  'ks.calm':'Nothing for this side. New orders with work for ', 'ks.calm2':' appear here automatically.',
+  'ks.done':'Marked ready by this side',
+  'ks.pas.klaar':'On the pass, assemble and hand over', 'ks.pas.wacht':'waiting for service', 'ks.pas.bar':'still waiting for the bar',
+  'ks.pas.leeg':'Nothing on the pass yet. As soon as every side is done, the order lands here.',
+  'ks.pas.bezig':'In the making, per side',
   'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',

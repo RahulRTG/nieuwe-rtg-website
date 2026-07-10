@@ -230,9 +230,17 @@ function ensureSupplierDefaults(s) {
   }
   // elk gerecht hoort bij een werkplek: de keuken of de bar; de manager kan
   // dit per item omzetten onder Menu. Bars/clubs bereiden standaard aan de bar.
-  for (const m of (s.menu || []))
+  for (const m of (s.menu || [])) {
     if (m.station !== 'keuken' && m.station !== 'bar')
       m.station = (s.type === 'bar' || s.type === 'club') ? 'bar' : 'keuken';
+    // binnen de keuken: de sectie (warme kant, koude kant, snacks, dessert)
+    if (m.station === 'keuken' && !['warm', 'koud', 'snack', 'dessert'].includes(m.sectie)) {
+      const t = ((m.cat || '') + ' ' + (m.name || '') + ' ' + (m.desc || '')).toLowerCase();
+      m.sectie = /dessert|zoet|wagashi|matcha|ijs|patisserie|sweet|taart/.test(t) ? 'dessert'
+        : /sashimi|salade|koud|tartaar|carpaccio|oester|ceviche/.test(t) ? 'koud'
+        : /snack|bites|friet|fries|nacho|bitterbal|kroket/.test(t) ? 'snack' : 'warm';
+    }
+  }
   if (typeof s.rate !== 'number') s.rate = 0.12;
 }
 
@@ -2616,7 +2624,8 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     desc: String(m.desc || '').slice(0, 200),
     price: Math.max(0, Number(m.price) || 0),
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
-    station: m.station === 'bar' ? 'bar' : 'keuken'
+    station: m.station === 'bar' ? 'bar' : 'keuken',
+    sectie: ['warm', 'koud', 'snack', 'dessert'].includes(m.sectie) ? m.sectie : 'warm'
   }));
   save();
   logActivity(req.supplier.code, req.actor, 'werkte de menukaart bij');
@@ -2632,6 +2641,44 @@ function stationsForOrder(s, o) {
   }
   return [...set];
 }
+
+// welke keukensecties heeft deze bestelling nodig?
+function sectiesForOrder(s, o) {
+  const set = new Set();
+  for (const it of (o.items || [])) {
+    const m = (s.menu || []).find(x => x.id === it.id);
+    if (m && m.station !== 'bar') set.add(m.sectie || 'warm');
+  }
+  return [...set];
+}
+
+// keukensectie (warme kant, koude kant, snacks, dessert) meldt bezig of klaar
+app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
+  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  const sectie = String(req.body.sectie || '');
+  if (!['warm', 'koud', 'snack', 'dessert'].includes(sectie)) return res.status(400).json({ error: 'Onbekende sectie.' });
+  const phase = req.body.phase === 'klaar' ? 'klaar' : 'bezig';
+  o.secties = o.secties || {};
+  o.secties[sectie] = phase;
+  if (o.status === 'nieuw') o.status = 'in bereiding';
+  const nodig = sectiesForOrder(req.supplier, o);
+  const wasKlaar = o.status === 'klaar';
+  if (nodig.length && nodig.every(x => o.secties[x] === 'klaar')) {
+    o.stations = o.stations || {};
+    o.stations.keuken = 'klaar';                            // de hele keuken is klaar
+    const stNodig = stationsForOrder(req.supplier, o);
+    if (stNodig.every(st => o.stations[st] === 'klaar')) o.status = 'klaar';
+  }
+  save();
+  broadcastSync([o.customerTier], 'orders');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  if (o.status === 'klaar' && !wasKlaar)
+    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
+  logActivity(req.supplier.code, req.actor, sectie + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
+  res.json({ ok: true, order: o });
+});
 
 // ---- werkplekken: keuken- en barscherm melden hun deel bezig of klaar ----
 app.post('/api/supplier/order/station', supplierAuth, (req, res) => {

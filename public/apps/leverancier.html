@@ -776,24 +776,29 @@
     ].map(r =>
       '<button class="sp-person" data-rol="'+r[0]+'"><span class="av">'+r[1]+'</span><span><b>'+r[2]+'</b><span>'+r[3]+'</span></span></button>'
     ).join('');
-    // Horecazaken krijgen vaste werkplekken: het keukenscherm, het barscherm
-    // en de bedieningspost. Een werkplek open je met je eigen naam en PIN.
+    // Vaste werkplekken. Horeca krijgt keuken, bar, bediening en events;
+    // elk bedrijf krijgt een Kantoor waar het management alles regelt.
+    // Een werkplek open je met je eigen naam en PIN.
     const gtype = (gateRoster.supplier && gateRoster.supplier.type) || TYPEOF[pickCode] || '';
-    if (['restaurant','bar','club'].includes(gtype)){
-      const st = [
+    const horeca = ['restaurant','bar','club'].includes(gtype);
+    const st = [];
+    if (horeca){
+      st.push(
         ['keuken','\uD83D\uDD25',T('st.keuken','Keuken-scherm'),T('st.keuken.s','Bontickets, bump-knoppen, allergieen groot in beeld')],
         ['bar','\uD83C\uDF78',T('st.bar','Bar-scherm'),T('st.bar.s','Drankjes klaarmelden, ophaalcodes groot in beeld')],
         ['bediening','\uD83E\uDDFE',T('st.bediening','Bedieningspost'),T('st.bediening.s','Uitserveren, tafels en de PDA op een plek')],
-        ['events','\uD83C\uDF9F',T('st.events','Events-scherm'),T('st.events.s','Gastenlijst en check-in aan de deur')],
-        ['kantoor','\uD83D\uDDDD',T('st.kantoor','Kantoor'),T('st.kantoor.s','Alles aanpassen: HR, keuken, bar, bediening en events (alleen management)')]
-      ];
-      $('#spList').innerHTML += '<div style="margin:0.9rem 0 0.4rem;font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);">'+T('st.h','Werkplekken')+'</div>' +
-        st.map(r => '<button class="sp-person" data-station="'+r[0]+'"><span class="av">'+r[1]+'</span><span><b>'+r[2]+'</b><span>'+r[3]+'</span></span></button>').join('');
-      $('#spList').querySelectorAll('[data-station]').forEach(b => b.addEventListener('click', () => {
-        pendingStation = b.dataset.station;
-        renderStationPersons();
-      }));
+        ['events','\uD83C\uDF9F',T('st.events','Events-scherm'),T('st.events.s','Gastenlijst en check-in aan de deur')]
+      );
     }
+    st.push(['kantoor','\uD83D\uDDDD',T('st.kantoor','Kantoor'),
+      horeca ? T('st.kantoor.s','Alles aanpassen: HR, keuken, bar, bediening en events (alleen management)')
+             : T('st.kantoor.s2','Alles aanpassen: HR, marketing en het aanbod (alleen management)')]);
+    $('#spList').innerHTML += '<div style="margin:0.9rem 0 0.4rem;font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);">'+T('st.h','Werkplekken')+'</div>' +
+      st.map(r => '<button class="sp-person" data-station="'+r[0]+'"><span class="av">'+r[1]+'</span><span><b>'+r[2]+'</b><span>'+r[3]+'</span></span></button>').join('');
+    $('#spList').querySelectorAll('[data-station]').forEach(b => b.addEventListener('click', () => {
+      pendingStation = b.dataset.station;
+      renderStationPersons();
+    }));
     $('#spList').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => {
       const r = b.dataset.rol;
       pendingStation = null;
@@ -1361,13 +1366,29 @@
   /* ---- het Kantoor: de eigenaar/manager past hier alles aan ---- */
   let kantoorSec = 'hr', kantoorMsg = '';
   function renderKantoor(){
-    const secs = [
-      ['hr','\uD83D\uDC65',T('kt.hr','HR & team')],
+    // Elk bedrijf heeft HR en Marketing; de rest van de secties hangt af van
+    // de sector: horeca beheert de kaart en events, een hotel de kamers en
+    // minibar, een appartement de deuren, vervoer de prijzen aan RTG.
+    const type = (S && S.type) || 'restaurant';
+    const horeca = ['restaurant','bar','club'].includes(type);
+    const secs = [['hr','\uD83D\uDC65',T('kt.hr','HR & team')]];
+    if (horeca) secs.push(
       ['keuken','\uD83D\uDD25',T('kt.keuken','Keuken')],
       ['bar','\uD83C\uDF78','Bar'],
       ['bediening','\uD83E\uDDFE',T('kt.bediening','Bediening')],
       ['events','\uD83C\uDF9F','Events']
-    ];
+    );
+    if (type === 'hotel') secs.push(
+      ['kamers','\uD83D\uDECF',T('kt.kamers','Kamers')],
+      ['minibar','\uD83E\uDDCA','Minibar']
+    );
+    if (type === 'apartment') secs.push(
+      ['kamers','\uD83C\uDFE1',T('kt.units','Verblijven')],
+      ['deuren','\uD83D\uDEAA',T('kt.deuren','Deuren')]
+    );
+    if (type === 'taxi' || type === 'jet') secs.push(['prijzen','\uD83D\uDCB6',T('kt.prijzen','Prijzen')]);
+    secs.push(['marketing','\uD83D\uDCE3','Marketing']);
+    if (!secs.some(s2 => s2[0] === kantoorSec)) kantoorSec = 'hr';
     let html = '<div class="st-chips">'+secs.map(s2 =>
       '<button data-ksec="'+s2[0]+'"'+(kantoorSec===s2[0]?' class="on"':'')+'>'+s2[1]+' '+s2[2]+'</button>').join('')+'</div>';
     if (kantoorMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+kantoorMsg+'</div>'; }
@@ -1456,6 +1477,65 @@
         '<div class="tkc-act" style="margin-top:0.7rem;"><button class="'+(e.published?'tkc-start':'tkc-ready')+'" data-kevpub="'+e.id+'">'+(e.published?T('kt.ev.offline','Haal offline'):T('kt.ev.publish','Publiceer voor leden'))+'</button>'+
         '<button class="tkc-start" data-kevdel="'+e.id+'" style="flex:0 0 auto;">\u2715</button></div></div>';
       }).join('');
+    }
+    if (kantoorSec === 'kamers'){
+      const rooms = state.rooms || [];
+      const unit = type === 'apartment' ? T('kt.unit','verblijf') : T('kt.kamer','kamer');
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(type==='apartment'?'🏡 '+T('kt.units','Verblijven'):'🛏 '+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
+        (rooms.length ? rooms.map(r => {
+          const hk = (r.hk && r.hk.status) || 'schoon';
+          return '<div class="st-row"><span>'+r.name+(r.available?'':' · '+T('kt.offline','offline'))+
+            '<span class="sub">'+eur(r.price)+' '+T('sup.pernight','p.n.')+' · '+tHk(hk)+(hk==='defect'&&r.hk&&r.hk.note?' · ⚠ '+r.hk.note:'')+'</span></span>'+
+            '<span class="acts"><button class="obtn'+(r.available?' primary':' warn')+'" data-kmrt="'+r.id+'">'+(r.available?T('kt.isopen','Open'):T('kt.isclosed','Dicht'))+'</button>'+
+            '<button class="obtn" data-kmhk="'+r.id+'" data-cur="'+hk+'">🧹 '+tHk(hk)+'</button>'+
+            '<button class="obtn warn" data-kmrd="'+r.id+'">✕</button></span></div>';
+        }).join('') : '<div class="tkc-who">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>')+
+        '<div class="st-form"><div style="display:flex;gap:0.5rem;"><input class="st-in" id="kRmN" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;"><input class="st-in" id="kRmP" type="number" inputmode="decimal" placeholder="€" style="flex:1;"></div>'+
+        '<button class="bigbtn" id="kRmAdd" style="margin-top:0.2rem;">'+(type==='apartment'?T('kt.unitadd','Verblijf toevoegen'):T('kt.kameradd','Kamer toevoegen'))+'</button></div>'+
+        '<div class="tkc-who">'+T('kt.hknote','Tik op de bezem om de housekeeping-status door te schakelen; Dicht = direct onzichtbaar voor gasten.')+'</div></div>';
+    }
+    if (kantoorSec === 'minibar'){
+      const cat = (state.minibar && state.minibar.catalog) || [];
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🧊 '+T('kt.mbcat','Minibar-catalogus')+' ('+cat.length+')</h3>'+
+        (cat.length ? cat.map(m=>'<div class="st-row"><span>'+m.name+'<span class="sub">'+eur(m.price)+'</span></span>'+
+          '<button class="obtn warn" data-kmbd="'+m.id+'">✕</button></div>').join('')
+        : '<div class="tkc-who">'+T('kt.nomb','Nog geen artikelen in de minibar.')+'</div>')+
+        '<div class="st-form"><div style="display:flex;gap:0.5rem;"><input class="st-in" id="kMbN" placeholder="'+T('mb.newitem','Nieuw artikel')+'" style="flex:2;"><input class="st-in" id="kMbP" type="number" inputmode="decimal" placeholder="€" style="flex:1;"></div>'+
+        '<button class="bigbtn" id="kMbAdd" style="margin-top:0.2rem;">'+T('team.add','Toevoegen')+'</button></div>'+
+        '<div class="tkc-who">'+T('kt.mbnote','De telling per kamer doet housekeeping in het tabblad Minibar; hier beheert u het assortiment en de prijzen.')+'</div></div>';
+    }
+    if (kantoorSec === 'deuren'){
+      const doors = state.doors || [];
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🚪 '+T('kt.deuren','Deuren')+'</h3>'+
+        (doors.length ? doors.map(d=>'<div class="st-row"><span>'+(d.locked?'🔒':'🔓')+' '+d.name+
+          '<span class="sub">'+(d.locked?T('door.locked','Vergrendeld'):T('door.open','OPEN, vergrendelt zichzelf'))+(d.lastBy?' · '+T('door.lastby','laatst:')+' '+d.lastBy:'')+'</span></span>'+
+          '<button class="obtn'+(d.locked?' primary':' warn')+'" data-kdoor="'+d.id+'">'+(d.locked?T('door.openbtn','Open 10 sec'):T('door.lockbtn','Vergrendel nu'))+'</button></div>').join('')
+        : '<div class="tkc-who">'+T('door.none','Nog geen digitale deuren gekoppeld.')+'</div>')+
+        '<div class="tkc-who">'+T('door.note','Elke opening komt in de activiteitenfeed: wie, welke deur, wanneer. Gearriveerde gasten kunnen de voordeur zelf openen via hun app.')+'</div></div>';
+    }
+    if (kantoorSec === 'prijzen'){
+      const h = state.prices || [];
+      html += '<div class="tkc"><h3>💶 '+T('kt.newprice','Prijs doorgeven aan RTG')+'</h3>'+
+        '<div class="st-form"><input class="st-in" id="kPrS" placeholder="'+T('kt.service','Dienst, bijv. Luchthaven, centrum')+'">'+
+        '<input class="st-in" id="kPrP" type="number" inputmode="decimal" placeholder="€">'+
+        '<button class="bigbtn" id="kPrSend" style="margin-top:0.2rem;">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
+        '<div class="tkc-who">'+T('kt.pricenote','RTG-leden betalen uw nettoprijs plus de transparante bijdrage; u ontvangt altijd het volledige bedrag.')+'</div></div>';
+      html += '<div class="tkc"><h3>'+T('sup.pricehist','Eerder doorgegeven')+'</h3>'+
+        (h.length ? h.slice(0,10).map(p=>'<div class="st-row"><span>'+p.service+'<span class="sub">'+timeAgo(p.at)+'</span></span><b style="color:var(--gold);">'+eur(p.price)+'</b></div>').join('')
+        : '<div class="tkc-who">'+T('sup.noprices','Nog geen prijzen doorgegeven.')+'</div>')+'</div>';
+    }
+    if (kantoorSec === 'marketing'){
+      const photos = state.photos || [];
+      html += '<div class="tkc"><h3>📷 '+T('sup.photos','Foto\'s op uw pagina')+' ('+photos.length+'/6)</h3>'+
+        '<div class="ph-grid" style="margin-top:0.5rem;">'+
+        photos.map((p,i)=>'<div class="ph"><img src="'+p+'" alt=""><button data-kphd="'+i+'">✕</button></div>').join('')+
+        (photos.length<6?'<label class="ph add">+<input type="file" id="kPhFile" accept="image/jpeg,image/png,image/webp" style="display:none;"></label>':'')+
+        '</div><div class="tkc-who">'+T('sup.photonote','Gasten zien deze foto\'s in de RTG-app bij uw pagina, direct na plaatsen.')+'</div></div>';
+      html += '<div class="tkc"><h3>📣 '+T('sup.salonpub','Publiceer op De Salon')+'</h3>'+
+        '<div class="st-form"><textarea class="st-in" id="kSpText" placeholder="'+T('kt.salonph','Vertel RTG-leden over uw nieuwste aanbod, suite of avond...')+'" style="min-height:70px;resize:vertical;"></textarea>'+
+        (photos.length?'<div class="ph-pick">'+photos.map((p,i)=>'<img src="'+p+'" data-kpick="'+i+'" alt="">').join('')+'</div>':'')+
+        '<button class="bigbtn" id="kSpPost">'+T('sup.salonpost','Publiceer als RTG-partner')+'</button></div>'+
+        '<div class="tkc-who">'+T('sup.salonnote','Uw bericht verschijnt in De Salon van alle leden, met uw bedrijfsnaam als partner.')+'</div></div>';
     }
     return html;
   }
@@ -1584,6 +1664,64 @@
         kantoorMsg = '\u2728 '+d.added+' '+T('rs.suggested','regels voorgesteld. Pas aan wat niet past en publiceer het event.');
         await refresh(); } catch(e){ toast(e.message); b.disabled = false; }
     }));
+    // kamers of verblijven: open/dicht, housekeeping doorschakelen, toevoegen
+    el.querySelectorAll('[data-kmrt]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/room/toggle', { id: b.dataset.kmrt }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kmhk]').forEach(b => b.addEventListener('click', async () => {
+      const volg = { schoon:'vuil', vuil:'bezig', bezig:'bezet', bezet:'defect', defect:'schoon' };
+      try { await API.call('/supplier/room/hk', { id: b.dataset.kmhk, status: volg[b.dataset.cur] || 'schoon' }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kmrd]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/room/remove', { id: b.dataset.kmrd }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    const kRm = el.querySelector('#kRmAdd'); if (kRm) kRm.addEventListener('click', async () => {
+      const name = el.querySelector('#kRmN').value.trim(), price = Number(el.querySelector('#kRmP').value);
+      if (!name || !(price>0)){ toast(T('sup.roomfill','Vul een kamernaam en prijs in.')); return; }
+      try { await API.call('/supplier/room/add', { name, price }); kantoorMsg = '\u2705 '+T('sup.roomadded','Kamer toegevoegd en direct zichtbaar.'); await refresh(); } catch(e){ toast(e.message); }
+    });
+    // minibar-assortiment
+    el.querySelectorAll('[data-kmbd]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/minibar/item/remove', { id: b.dataset.kmbd }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    const kMb = el.querySelector('#kMbAdd'); if (kMb) kMb.addEventListener('click', async () => {
+      const name = el.querySelector('#kMbN').value.trim(), price = Number(el.querySelector('#kMbP').value);
+      if (!name || !(price>0)){ toast(T('mb.fill','Vul een artikel en prijs in.')); return; }
+      try { await API.call('/supplier/minibar/item/add', { name, price }); await refresh(); } catch(e){ toast(e.message); }
+    });
+    // deuren
+    el.querySelectorAll('[data-kdoor]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/door/toggle', { id: b.dataset.kdoor }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // prijzen aan RTG
+    const kPr = el.querySelector('#kPrSend'); if (kPr) kPr.addEventListener('click', async () => {
+      const service = el.querySelector('#kPrS').value.trim(), price = Number(el.querySelector('#kPrP').value);
+      if (!service || !(price>0)){ toast(T('sup.fillprice','Vul een dienst en prijs in.')); return; }
+      try { await API.call('/supplier/price', { service, price }); kantoorMsg = '\u2705 '+T('sup.pricesent','Prijs verstuurd naar RTG.'); await refresh(); } catch(e){ toast(e.message); }
+    });
+    // marketing: foto's en een Salon-bericht
+    el.querySelectorAll('[data-kphd]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/photo/remove', { index: Number(b.dataset.kphd) }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    const kPh = el.querySelector('#kPhFile'); if (kPh) kPh.addEventListener('change', () => {
+      const file = kPh.files && kPh.files[0]; if (!file) return;
+      if (file.size > 1024*1024){ toast(T('sup.phtoobig','Foto te groot (max 1 MB).')); return; }
+      fileToDataURL(file, async url => {
+        try { await API.call('/supplier/photo/add', { image: url }); kantoorMsg = '\u2705 '+T('sup.phadded','Foto geplaatst.'); await refresh(); } catch(e){ toast(e.message); }
+      });
+    });
+    let kPicked = null;
+    el.querySelectorAll('[data-kpick]').forEach(img => img.addEventListener('click', () => {
+      kPicked = kPicked === Number(img.dataset.kpick) ? null : Number(img.dataset.kpick);
+      el.querySelectorAll('[data-kpick]').forEach(x => x.classList.toggle('sel', Number(x.dataset.kpick) === kPicked));
+    }));
+    const kSp = el.querySelector('#kSpPost'); if (kSp) kSp.addEventListener('click', async () => {
+      const text = el.querySelector('#kSpText').value.trim();
+      if (!text){ toast(T('sup.salonempty','Schrijf eerst een tekst.')); return; }
+      try { await API.call('/supplier/salon/post', { text, photoIndex: kPicked });
+        kantoorMsg = '\u2705 '+T('sup.salondone','Gepubliceerd op De Salon.');
+        await refresh(); } catch(e){ toast(e.message); }
+    });
   }
 
   async function refresh(){ try { applyState((await API.call('/supplier/state')).state); renderAll(); } catch(e){} }
@@ -2829,6 +2967,7 @@ window.I18N = { en: {
   'menu.station':'Workstation', 'menu.keuken':'Kitchen', 'menu.stmoved':'Moved to the other station.',
   'st.events':'Events display', 'st.events.s':'Guest list and door check-in',
   'st.kantoor':'The Office', 'st.kantoor.s':'Adjust everything: HR, kitchen, bar, service and events (management only)',
+  'st.kantoor.s2':'Adjust everything: HR, marketing and your offering (management only)',
   'st.pickmgr':'The Office is for owners and managers. Pick your name and enter your PIN.',
   'ev.concept':'draft', 'ev.signedup':'signed up', 'ev.inside':'inside', 'ev.pers':'guests', 'ev.in':'inside',
   'ev.checkin':'Check in', 'ev.noguests':'No sign-ups yet.',
@@ -2849,6 +2988,15 @@ window.I18N = { en: {
   'kt.ev.fill':'Enter at least a name and date.', 'kt.ev.made':'Event created as draft. Publish it when it is ready.',
   'kt.ev.publish':'Publish for members', 'kt.ev.offline':'Take offline',
   'kt.hired':'Hired.', 'kt.pinonce':'share once', 'kt.fillname':'Enter a name.',
+  'kt.kamers':'Rooms', 'kt.units':'Stays', 'kt.deuren':'Doors', 'kt.prijzen':'Prices',
+  'kt.unit':'stay', 'kt.kamer':'room', 'kt.offline':'offline',
+  'kt.unitadd':'Add stay', 'kt.kameradd':'Add room',
+  'kt.hknote':'Tap the broom to cycle the housekeeping status; Closed = instantly invisible to guests.',
+  'kt.mbcat':'Minibar catalogue', 'kt.nomb':'No minibar items yet.',
+  'kt.mbnote':'Housekeeping enters the per-room count in the Minibar tab; here you manage the range and prices.',
+  'kt.newprice':'Send a price to RTG', 'kt.service':'Service, e.g. Airport, city centre', 'kt.sendprice':'Send to RTG',
+  'kt.pricenote':'RTG members pay your net price plus the transparent contribution; you always receive the full amount.',
+  'kt.salonph':'Tell RTG members about your latest offering, suite or evening...',
   'rs.h':'Run sheet', 'rs.all':'Everyone', 'rs.doit':'Done', 'rs.what':'What needs to happen?',
   'rs.add':'Add line', 'rs.none':'No run sheet yet. Enter lines, paste an existing one, or let the AI draft it.',
   'rs.paste':'Paste an existing run sheet here (one time and task per line), or pick a file...',

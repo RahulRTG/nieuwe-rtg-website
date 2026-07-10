@@ -150,7 +150,8 @@ module.exports = function seed() {
           { id: 'm1', cat: 'Kaiseki', name: 'Hassun, seizoensvoorgerecht', desc: 'Acht kleine gerechten die het seizoen vieren.', price: 45, allergens: ['vis', 'soja', 'sesam'] },
           { id: 'm2', cat: 'Kaiseki', name: 'Mukozuke, sashimi', desc: 'Dagverse vangst, gesneden aan tafel.', price: 60, allergens: ['vis'] },
           { id: 'm3', cat: 'Kaiseki', name: 'Wagyu-hoofdgerecht', desc: 'A5 wagyu, licht gegrild, met seizoensgroenten.', price: 120, allergens: ['soja'] },
-          { id: 'm4', cat: 'Zoet', name: 'Matcha & wagashi', desc: 'Ceremoniële matcha met huisgemaakte wagashi.', price: 22, allergens: ['gluten', 'melk'] }
+          { id: 'm4', cat: 'Zoet', name: 'Matcha & wagashi', desc: 'Ceremoniële matcha met huisgemaakte wagashi.', price: 22, allergens: ['gluten', 'melk'] },
+          { id: 'm5', cat: 'Dranken', name: 'Junmai daiginjo sake', desc: 'Huisselectie, koud geserveerd per glas.', price: 18, allergens: [], station: 'bar' }
         ]
       },
       {

@@ -1049,26 +1049,41 @@
   }
 
   // draaiboek-regels voor een werkplek: alle gepubliceerde events vanaf vandaag
+  function dueOf(e, it){
+    const d = new Date((e.date || '2099-01-01') + 'T00:00:00');
+    d.setDate(d.getDate() - (it.daysBefore || 0));
+    return d.toISOString().slice(0, 10);
+  }
+  function dueLabel(due, daysBefore){
+    const today = new Date().toISOString().slice(0, 10);
+    const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+    const naam = due === today ? T('rs.today','vandaag') : due === morgen ? T('rs.tomorrow','morgen') : due;
+    return naam + (daysBefore ? ' \u00b7 D-' + daysBefore : '');
+  }
   function runsheetFor(station){
     const today = new Date().toISOString().slice(0, 10);
     const out = [];
     for (const e of (state.events || [])){
       if (!e.published || (e.date || '') < today) continue;
       for (const it of (e.runsheet || [])){
-        if (station === 'party' || it.station === station || it.station === 'alle') out.push({ e, it });
+        if (station === 'party' || it.station === station || it.station === 'alle')
+          out.push({ e, it, due: dueOf(e, it) });
       }
     }
-    out.sort((a, b) => (a.e.date + a.it.time).localeCompare(b.e.date + b.it.time));
+    out.sort((a, b) => a.due.localeCompare(b.due) || (a.it.time.localeCompare(b.it.time)));
     return out;
   }
   const RUN_ICON = { keuken:'\uD83D\uDD25', bar:'\uD83C\uDF78', bediening:'\uD83E\uDDFE', party:'\uD83C\uDF9F', alle:'\uD83D\uDCE2' };
   function runsheetStrip(station){
     const rows = runsheetFor(station);
     if (!rows.length) return '';
-    return '<div class="st-sec">\uD83D\uDCCB '+T('rs.h','Draaiboek')+'</div>'+
+    const today = new Date().toISOString().slice(0, 10);
+    return '<div class="st-sec">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' & '+T('rs.mep','mise en place')+'</div>'+
       '<div class="tkc" style="grid-column:1/-1;">'+rows.map(r =>
         '<div class="st-row'+(r.it.done?'" style="opacity:0.5;':'"')+'">'+
-        '<span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+r.it.time+'</b>'+
+        '<span>'+
+        '<span style="display:inline-block;min-width:5.4rem;margin-right:0.5rem;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:'+(r.due===today?'var(--burgundy)':'var(--soft)')+';">'+dueLabel(r.due, r.it.daysBefore)+'</span>'+
+        '<b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+r.it.time+'</b>'+
         (station==='party'?'<span style="margin-right:0.4rem;">'+(RUN_ICON[r.it.station]||'')+'</span>':'')+
         (r.it.done?'<s>'+r.it.text+'</s>':r.it.text)+
         '<span class="sub">'+r.e.name+' \u00b7 '+r.e.date+(r.it.done&&r.it.doneBy?' \u00b7 \u2713 '+r.it.doneBy:'')+'</span></span>'+
@@ -1126,6 +1141,28 @@
         html += '<div class="st-sec">'+T('st.done','Klaargemeld, wacht op uitserveren')+'</div>';
         html += done.map(o => ticketCard(o, st, { dim:true })).join('');
       }
+      if (st === 'keuken'){
+        const today2 = new Date().toISOString().slice(0, 10);
+        const evs2 = (state.events||[]).filter(e => e.published && (e.date||'') >= today2 && (e.catering && e.catering.mode !== 'geen' || (e.allergies||[]).length));
+        if (evs2.length){
+          html += '<div class="st-sec">\uD83D\uDC68\u200D\uD83C\uDF73 '+T('ek.h','Event-keuken')+'</div>';
+          html += evs2.map(e => {
+            const dishes = e.catering.mode === 'menu'
+              ? e.catering.itemIds.map(id => (state.menu||[]).find(m => m.id === id)).filter(Boolean)
+              : (state.menu||[]).filter(m => m.station !== 'bar');
+            const covers = Math.max((e.guests||[]).reduce((n,g)=>n+g.qty,0), Math.ceil(e.capacity*0.6));
+            return '<div class="tkc">'+
+              '<div class="tkc-top"><span style="font-weight:600;">'+e.name+'</span><span class="tkc-age">'+e.date+'</span></div>'+
+              '<div class="tkc-who">'+(e.catering.mode==='menu'?T('ek.menu','Vast menu')+' \u00b7 '+dishes.length+' '+T('ek.courses','gangen'):e.catering.mode==='alacarte'?'\u00c0 la carte':'')+' \u00b7 \u00b1'+covers+' couverts</div>'+
+              (e.catering.mode==='menu' && dishes.length ? '<div class="tkc-items" style="font-size:0.82rem;">'+dishes.map(d=>'<span>\u2022 '+d.name+'</span>').join('')+'</div>' : '')+
+              ((e.allergies||[]).length ? (e.allergies||[]).map(a =>
+                '<div class="tkc-alg">\u26a0 '+a.allergen+' ('+a.count+'\u00d7)'+
+                (a.alternative?'<br>\u2192 <b>'+a.alternative.name+'</b>'+(a.alternative.desc?': '+a.alternative.desc:''):'<br>'+T('ek.noalt','Nog geen vervangend gerecht, vraag het Kantoor of tik hieronder.'))+'</div>').join('') : '')+
+              '<div class="tkc-act"><button class="tkc-ready" data-kmep="'+e.id+'">\u2728 '+T('ek.mep','Organiseer de mise en place')+'</button></div>'+
+            '</div>';
+          }).join('');
+        }
+      }
       html += runsheetStrip(st);
     }
     el.innerHTML = html;
@@ -1143,6 +1180,12 @@
     }));
     el.querySelectorAll('[data-rundone]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/event/runsheet/done', { id: b.dataset.rundone, itemId: b.dataset.item }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kmep]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true; b.textContent = T('ek.busy','De mise en place wordt georganiseerd...');
+      try { const d = await API.call('/supplier/event/mep', { id: b.dataset.kmep });
+        toast('\u2705 '+d.added+' '+T('ek.planned','MEP-taken ingepland voor '+d.covers+' couverts.'));
+        await refresh(); } catch(e){ toast(e.message); b.disabled = false; }
     }));
     if (stationMode === 'kantoor') bindKantoor(el);
   }
@@ -1211,11 +1254,28 @@
         const stOpts = [['keuken','\uD83D\uDD25 '+T('kt.keuken','Keuken')],['bar','\uD83C\uDF78 Bar'],['bediening','\uD83E\uDDFE '+T('kt.bediening','Bediening')],['party','\uD83C\uDF9F Party manager'],['alle','\uD83D\uDCE2 '+T('rs.all','Iedereen')]];
         return '<div class="tkc'+(e.published?'':' dim')+'" style="grid-column:1/-1;"><div class="tkc-top"><span style="font-weight:600;">'+e.name+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
         '<div class="tkc-who">'+taken+' / '+e.capacity+' '+T('ev.signedup','aangemeld')+(e.price?' \u00b7 '+eur(e.price)+' p.p.':'')+(e.published?'':' \u00b7 '+T('ev.concept','concept'))+'</div>'+
-        '<h3 style="margin-top:0.4rem;">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' ('+rs.length+')</h3>'+
-        (rs.length ? rs.map(it=>'<div class="st-row"><span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+it.time+'</b>'+(RUN_ICON[it.station]||'')+' '+it.text+(it.done?' <span class="sub" style="display:inline;">\u2713 '+(it.doneBy||'')+'</span>':'')+'</span>'+
+        '<h3 style="margin-top:0.4rem;">\uD83D\uDC68\u200D\uD83C\uDF73 '+T('ek.h','Event-keuken')+'</h3>'+
+        '<div class="st-form"><select class="st-in" id="kcm'+e.id+'">'+
+          '<option value="geen"'+(e.catering.mode==='geen'?' selected':'')+'>'+T('ek.none','Geen eten / n.v.t.')+'</option>'+
+          '<option value="menu"'+(e.catering.mode==='menu'?' selected':'')+'>'+T('ek.menu','Vast menu')+'</option>'+
+          '<option value="alacarte"'+(e.catering.mode==='alacarte'?' selected':'')+'>\u00c0 la carte</option></select>'+
+        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+(state.menu||[]).filter(m=>m.station!=='bar').map(m=>
+          '<button class="mn-station'+(e.catering.itemIds.includes(m.id)?'" style="border-color:var(--gold);color:var(--gold);':'"')+'" data-kdish="'+m.id+'" data-ev="'+e.id+'">'+m.name+'</button>').join('')+'</div>'+
+        '<button class="obtn" data-kcat="'+e.id+'">'+T('ek.save','Bewaar de eventkeuken')+'</button></div>'+
+        '<div class="st-form" style="margin-top:0.5rem;">'+
+        ((e.allergies||[]).map(a=>'<div class="st-row"><span>\u26a0 '+a.allergen+' ('+a.count+'\u00d7)'+
+          (a.alternative?'<span class="sub">\u2192 '+a.alternative.name+'</span>':'')+'</span>'+
+          '<span class="acts">'+(!a.alternative?'<button class="obtn primary" data-kalt="'+e.id+'" data-al="'+a.id+'">\u2728 '+T('ek.alt','Vervangend gerecht')+'</button>':'')+
+          '<button class="obtn warn" data-kaldel="'+e.id+'" data-al="'+a.id+'">\u2715</button></span></div>').join(''))+
+        '<div style="display:flex;gap:0.5rem;"><input class="st-in" id="kaN'+e.id+'" placeholder="'+T('ek.allergen','Allergeen, bijv. noten')+'" style="flex:2;"><input class="st-in" id="kaC'+e.id+'" type="number" placeholder="1\u00d7" style="flex:1;"></div>'+
+        '<button class="obtn" data-kaladd="'+e.id+'">'+T('ek.addal','Allergeen registreren')+'</button>'+
+        '<button class="obtn primary" data-kmep="'+e.id+'">\u2728 '+T('ek.mep','Organiseer de mise en place')+'</button></div>'+
+        '<h3 style="margin-top:0.6rem;">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' ('+rs.length+')</h3>'+
+        (rs.length ? rs.map(it=>'<div class="st-row"><span>'+(it.daysBefore?'<span style="font-size:0.6rem;letter-spacing:0.06em;color:var(--soft);margin-right:0.4rem;">D-'+it.daysBefore+'</span>':'')+'<b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+it.time+'</b>'+(RUN_ICON[it.station]||'')+' '+it.text+(it.done?' <span class="sub" style="display:inline;">\u2713 '+(it.doneBy||'')+'</span>':'')+'</span>'+
           '<button class="obtn warn" data-krdel="'+e.id+'" data-item="'+it.id+'">\u2715</button></div>').join('')
           : '<div class="tkc-who">'+T('rs.none','Nog geen draaiboek. Voer regels in, plak een bestaand draaiboek, of laat de AI er een opstellen.')+'</div>')+
         '<div class="st-form"><div style="display:flex;gap:0.5rem;"><input class="st-in" type="time" id="krT'+e.id+'" style="flex:1;">'+
+        '<select class="st-in" id="krD'+e.id+'" style="flex:1;"><option value="0">'+T('rs.d0','Dag zelf')+'</option><option value="1">D-1</option><option value="2">D-2</option><option value="3">D-3</option></select>'+
         '<select class="st-in" id="krS'+e.id+'" style="flex:1.4;">'+stOpts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></div>'+
         '<input class="st-in" id="krX'+e.id+'" placeholder="'+T('rs.what','Wat moet er gebeuren?')+'">'+
         '<button class="obtn" data-kradd="'+e.id+'">'+T('rs.add','Regel toevoegen')+'</button></div>'+
@@ -1296,7 +1356,41 @@
       const id = b.dataset.kradd;
       const text = el.querySelector('#krX'+id).value.trim();
       if (!text){ toast(T('rs.fill','Omschrijf wat er moet gebeuren.')); return; }
-      try { await API.call('/supplier/event/runsheet', { id, action:'add', item: { time: el.querySelector('#krT'+id).value || '00:00', station: el.querySelector('#krS'+id).value, text } }); await refresh(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/event/runsheet', { id, action:'add', item: { time: el.querySelector('#krT'+id).value || '00:00', station: el.querySelector('#krS'+id).value, text, daysBefore: Number(el.querySelector('#krD'+id).value)||0 } }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // eventkeuken: gerechten aan/uit tikken en bewaren
+    el.querySelectorAll('[data-kdish]').forEach(b => b.addEventListener('click', () => {
+      const aan = b.style.borderColor !== '';
+      b.style.borderColor = aan ? '' : 'var(--gold)';
+      b.style.color = aan ? '' : 'var(--gold)';
+    }));
+    el.querySelectorAll('[data-kcat]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.kcat;
+      const itemIds = [...el.querySelectorAll('[data-kdish][data-ev="'+id+'"]')].filter(x => x.style.borderColor !== '').map(x => x.dataset.kdish);
+      try { await API.call('/supplier/event/catering', { id, mode: el.querySelector('#kcm'+id).value, itemIds });
+        kantoorMsg = '\u2705 '+T('ek.saved','Eventkeuken bewaard; de keuken ziet het direct op het keukenscherm.');
+        await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kaladd]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.kaladd;
+      const allergen = el.querySelector('#kaN'+id).value.trim();
+      if (!allergen){ toast(T('ek.fillallergen','Vul het allergeen in.')); return; }
+      try { await API.call('/supplier/event/allergy', { id, action:'add', allergen, count: Number(el.querySelector('#kaC'+id).value)||1 }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kaldel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/event/allergy', { id: b.dataset.kaldel, action:'remove', allergyId: b.dataset.al }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kalt]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true; b.textContent = T('ek.thinking','De chef denkt na...');
+      try { const d = await API.call('/supplier/event/allergy/alt', { id: b.dataset.kalt, allergyId: b.dataset.al });
+        kantoorMsg = '\u2728 '+T('ek.altmade','Vervangend gerecht')+': <b>'+d.alternative.name+'</b>'+(d.alternative.desc?' \u00b7 '+d.alternative.desc:'');
+        await refresh(); } catch(e){ toast(e.message); b.disabled = false; }
+    }));
+    el.querySelectorAll('[data-kmep]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true; b.textContent = T('ek.busy','De mise en place wordt georganiseerd...');
+      try { const d = await API.call('/supplier/event/mep', { id: b.dataset.kmep });
+        kantoorMsg = '\u2705 '+d.added+' '+T('ek.planned2','MEP-taken ingepland (') + d.covers + ' couverts); '+T('ek.onscreen','de keuken ziet ze dagen vooruit op het keukenscherm.');
+        await refresh(); } catch(e){ toast(e.message); b.disabled = false; }
     }));
     el.querySelectorAll('[data-krdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/event/runsheet', { id: b.dataset.krdel, action:'remove', itemId: b.dataset.item }); await refresh(); } catch(e){ toast(e.message); }
@@ -2594,6 +2688,14 @@ window.I18N = { en: {
   'rs.fill':'Describe what needs to happen.', 'rs.pastefirst':'Paste a run sheet or upload a file first.',
   'rs.loaded':'File loaded, click Process with AI.', 'rs.imported':'lines added to the run sheet, routed to the right stations.',
   'rs.suggested':'lines drafted. Adjust what does not fit and publish the event.', 'rs.thinking':'The AI is drafting...',
+  'rs.today':'today', 'rs.tomorrow':'tomorrow', 'rs.mep':'mise en place', 'rs.d0':'Event day',
+  'ek.h':'Event kitchen', 'ek.none':'No food / n.a.', 'ek.menu':'Set menu', 'ek.courses':'courses',
+  'ek.save':'Save the event kitchen', 'ek.saved':'Event kitchen saved; the kitchen sees it on the kitchen display right away.',
+  'ek.allergen':'Allergen, e.g. nuts', 'ek.addal':'Register allergen', 'ek.fillallergen':'Enter the allergen.',
+  'ek.alt':'Replacement dish', 'ek.altmade':'Replacement dish', 'ek.thinking':'The chef is thinking...',
+  'ek.noalt':'No replacement dish yet; ask The Office or tap below.',
+  'ek.mep':'Organise the mise en place', 'ek.busy':'Organising the mise en place...',
+  'ek.planned':'MEP tasks planned.', 'ek.planned2':'MEP tasks planned (', 'ek.onscreen':'the kitchen sees them days ahead on the kitchen display.',
   'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',

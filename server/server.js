@@ -221,7 +221,12 @@ function ensureSupplierDefaults(s) {
     s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
   // horecazaken kunnen events organiseren (het Kantoor maakt ze, leden melden zich aan)
   if (['restaurant', 'bar', 'club'].includes(s.type) && !Array.isArray(s.events)) s.events = [];
-  for (const e of (s.events || [])) if (!Array.isArray(e.runsheet)) e.runsheet = [];
+  for (const e of (s.events || [])) {
+    if (!Array.isArray(e.runsheet)) e.runsheet = [];
+    for (const it of e.runsheet) if (typeof it.daysBefore !== 'number') it.daysBefore = 0;
+    if (!e.catering) e.catering = { mode: 'geen', itemIds: [], note: '' };
+    if (!Array.isArray(e.allergies)) e.allergies = [];
+  }
   // elk gerecht hoort bij een werkplek: de keuken of de bar; de manager kan
   // dit per item omzetten onder Menu. Bars/clubs bereiden standaard aan de bar.
   for (const m of (s.menu || []))
@@ -1746,7 +1751,9 @@ app.post('/api/supplier/event', supplierAuth, (req, res) => {
       desc: String((req.body.event || {}).desc || '').trim().slice(0, 200),
       capacity: Math.min(2000, Math.max(1, parseInt((req.body.event || {}).capacity, 10) || 50)),
       price: Math.max(0, Number((req.body.event || {}).price) || 0),
-      published: false, guests: [], runsheet: [], at: new Date().toISOString()
+      published: false, guests: [], runsheet: [],
+      catering: { mode: 'geen', itemIds: [], note: '' }, allergies: [],
+      at: new Date().toISOString()
     };
     s.events.unshift(e);
     s.events = s.events.slice(0, 40);
@@ -1782,19 +1789,21 @@ app.post('/api/supplier/event/checkin', supplierAuth, (req, res) => {
    voorgesteld); elke regel verschijnt op het scherm van de juiste werkplek:
    keuken, bar, bediening of de party manager (het Events-scherm). */
 const RUN_STATIONS = ['keuken', 'bar', 'bediening', 'party', 'alle'];
-function runItem(time, station, text) {
+function runItem(time, station, text, daysBefore, mep) {
   return {
     id: crypto.randomBytes(3).toString('hex'),
     time: /^\d{2}:\d{2}$/.test(time) ? time : '00:00',
     station: RUN_STATIONS.includes(station) ? station : 'alle',
-    text: String(text || '').trim().slice(0, 140),
+    text: String(text || '').trim().slice(0, 160),
+    daysBefore: Math.min(14, Math.max(0, parseInt(daysBefore, 10) || 0)),
+    mep: !!mep,
     done: false, doneBy: null
   };
 }
 // draaiboeken lopen vaak over middernacht heen: 01:00 afbouw hoort NA 23:00,
 // dus alles voor 06:00 telt als "die nacht" en sorteert achteraan
 function runKey(t) { const [h, m] = String(t).split(':').map(Number); return ((h < 6 ? h + 24 : h) * 60 + (m || 0)); }
-function sortRunsheet(e) { e.runsheet.sort((a, b) => runKey(a.time) - runKey(b.time)); }
+function sortRunsheet(e) { e.runsheet.sort((a, b) => ((b.daysBefore || 0) - (a.daysBefore || 0)) || (runKey(a.time) - runKey(b.time))); }
 
 // handmatig: regel toevoegen of verwijderen (Kantoor)
 app.post('/api/supplier/event/runsheet', supplierAuth, (req, res) => {
@@ -1805,7 +1814,7 @@ app.post('/api/supplier/event/runsheet', supplierAuth, (req, res) => {
   if (req.body.action === 'add') {
     const it = req.body.item || {};
     if (!String(it.text || '').trim()) return res.status(400).json({ error: 'Omschrijf wat er moet gebeuren.' });
-    e.runsheet.push(runItem(it.time, it.station, it.text));
+    e.runsheet.push(runItem(it.time, it.station, it.text, it.daysBefore));
     if (e.runsheet.length > 60) e.runsheet = e.runsheet.slice(0, 60);
     sortRunsheet(e);
   } else if (req.body.action === 'remove') {
@@ -1898,6 +1907,149 @@ app.post('/api/supplier/event/runsheet/ai', supplierAuth, async (req, res) => {
   logActivity(req.supplier.code, req.actor, (mode === 'import' ? 'importeerde' : 'liet de AI een') + ' draaiboek ' + (mode === 'import' ? 'voor' : 'opstellen voor') + ' "' + e.name + '" (' + items.length + ' regels)');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
   res.json({ ok: true, event: e, added: items.length, ai: !!anthropic });
+});
+
+/* ---- event-keuken: menukeuze, allergenen met vervangend gerecht, en de
+   mise en place die dagen vooruit wordt georganiseerd ---- */
+
+// menukeuze: vast menu (gerechten van de kaart) of a la carte (Kantoor)
+app.post('/api/supplier/event/catering', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
+  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  const mode = ['menu', 'alacarte', 'geen'].includes(req.body.mode) ? req.body.mode : 'geen';
+  const ids = Array.isArray(req.body.itemIds) ? req.body.itemIds.filter(id => (req.supplier.menu || []).some(m => m.id === id)).slice(0, 20) : [];
+  e.catering = { mode, itemIds: mode === 'menu' ? ids : [], note: String(req.body.note || '').slice(0, 200) };
+  save();
+  logActivity(req.supplier.code, req.actor, 'stelde de eventkeuken in voor "' + e.name + '" (' + (mode === 'menu' ? ids.length + ' gangen' : mode) + ')');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, event: e });
+});
+
+// allergenen registreren; per allergeen kan een vervangend gerecht worden bedacht
+app.post('/api/supplier/event/allergy', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
+  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  e.allergies = e.allergies || [];
+  if (req.body.action === 'add') {
+    const allergen = String(req.body.allergen || '').trim().toLowerCase().slice(0, 30);
+    if (!allergen) return res.status(400).json({ error: 'Vul het allergeen in.' });
+    if (e.allergies.some(a => a.allergen === allergen)) return res.status(409).json({ error: 'Dit allergeen staat er al.' });
+    e.allergies.push({ id: crypto.randomBytes(3).toString('hex'), allergen, count: Math.min(500, Math.max(1, parseInt(req.body.count, 10) || 1)), alternative: null });
+  } else if (req.body.action === 'remove') {
+    e.allergies = e.allergies.filter(a => a.id !== req.body.allergyId);
+  } else return res.status(400).json({ error: 'Onbekende actie.' });
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, event: e });
+});
+
+// gerechten die het event serveert (vast menu, of de hele keukenkaart bij a la carte)
+function cateringDishes(s, e) {
+  const menu = s.menu || [];
+  if (e.catering && e.catering.mode === 'menu')
+    return e.catering.itemIds.map(id => menu.find(m => m.id === id)).filter(Boolean);
+  if (e.catering && e.catering.mode === 'alacarte')
+    return menu.filter(m => m.station !== 'bar');
+  return [];
+}
+function eventCovers(e) {
+  const aangemeld = (e.guests || []).reduce((n, g) => n + g.qty, 0);
+  return Math.max(aangemeld, Math.ceil(e.capacity * 0.6));
+}
+
+// vervangend gerecht verzinnen voor een allergeen (Claude, anders vakkundige fallback)
+const ALT_IDEE = {
+  noten: ['krokant van geroosterde pompoen- en zonnebloempitten', 'zonder noten, met dezelfde textuur'],
+  pinda: ['sesam-soja dressing in plaats van satesaus', 'vrij van pinda'],
+  gluten: ['glutenvrije variant met rijstbloem en boekweit', 'volledig glutenvrij bereid'],
+  lactose: ['romige basis van kokosmelk en cashewcreme', 'zonder zuivel'],
+  melk: ['romige basis van kokosmelk', 'zonder zuivel'],
+  vis: ['gegrilde groente met dashi van kombu', 'zonder vis, zelfde umami'],
+  schaaldieren: ['knapperige tofu met yuzu-glaze', 'vrij van schaal- en schelpdieren'],
+  soja: ['dressing op basis van miso-vrije bouillon en citrus', 'sojavrij'],
+  ei: ['binding met aquafaba', 'zonder ei'],
+  sesam: ['topping van geroosterde quinoa', 'sesamvrij']
+};
+app.post('/api/supplier/event/allergy/alt', supplierAuth, async (req, res) => {
+  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
+  const al = e && (e.allergies || []).find(a => a.id === req.body.allergyId);
+  if (!al) return res.status(404).json({ error: 'Allergeen niet gevonden.' });
+  const dishes = cateringDishes(req.supplier, e);
+  const geraakt = dishes.filter(d => (d.allergens || []).some(x => String(x).toLowerCase().includes(al.allergen)));
+  let alt = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 400,
+        system: 'Je bent een chef-kok. Antwoord UITSLUITEND met JSON: {"name":"...","desc":"..."}. Bedenk een volwaardig vervangend gerecht in de stijl van de kaart, veilig voor het allergeen, kort en concreet in het Nederlands.',
+        messages: [{ role: 'user', content: 'Allergeen: ' + al.allergen + '. Getroffen gerecht(en): ' + (geraakt.map(d => d.name + ' (' + (d.desc || '') + ')').join('; ') || 'onbekend') + '. Keuken: ' + req.supplier.name + '.' }]
+      });
+      alt = JSON.parse((msg.content[0].text.match(/\{[\s\S]*\}/) || ['{}'])[0]);
+      if (!alt.name) alt = null;
+    } catch (err) { alt = null; }
+  }
+  if (!alt) {
+    const idee = ALT_IDEE[al.allergen] || ['aangepaste bereiding zonder ' + al.allergen, 'veilig voor ' + al.allergen];
+    const basis = geraakt[0] ? geraakt[0].name : 'het hoofdgerecht';
+    alt = { name: basis + ', variant zonder ' + al.allergen, desc: 'Zelfde opbouw als ' + basis.toLowerCase() + ', met ' + idee[0] + '; ' + idee[1] + '.' };
+  }
+  al.alternative = { name: String(alt.name).slice(0, 80), desc: String(alt.desc || '').slice(0, 200) };
+  save();
+  logActivity(req.supplier.code, req.actor, 'vervangend gerecht voor ' + al.allergen + ': "' + al.alternative.name + '" (' + e.name + ')');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, event: e, alternative: al.alternative, ai: !!anthropic });
+});
+
+// de MEP-organisator: bouwt de complete mise en place voor het keukenteam,
+// dagen vooruit, op basis van menu, aantallen en allergenen (keukenscherm/Kantoor)
+app.post('/api/supplier/event/mep', supplierAuth, async (req, res) => {
+  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
+  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  const dishes = cateringDishes(req.supplier, e);
+  if (!dishes.length && (!e.catering || e.catering.mode !== 'alacarte'))
+    return res.status(409).json({ error: 'Stel eerst de eventkeuken in (vast menu of a la carte) in het Kantoor.' });
+  const covers = eventCovers(e);
+  let items = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 1400,
+        system: 'Je bent een sous-chef die de mise en place plant. Antwoord UITSLUITEND met een JSON-array van {"daysBefore":0-3,"time":"HH:MM","task":"..."}. Maximaal 18 taken, Nederlands, concreet met aantallen. daysBefore 2 = twee dagen voor het event.',
+        messages: [{ role: 'user', content: 'Event: ' + e.name + ' op ' + e.date + ', ' + covers + ' couverts. Gerechten: ' + (dishes.map(d => d.name).join('; ') || 'a la carte van de kaart') + '. Allergenen: ' + ((e.allergies || []).map(a => a.allergen + ' (' + a.count + 'x' + (a.alternative ? ', vervanger: ' + a.alternative.name : '') + ')').join('; ') || 'geen') + '.' }]
+      });
+      const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
+      if (Array.isArray(arr) && arr.length) items = arr.slice(0, 18).map(x => runItem(x.time, 'keuken', x.task, x.daysBefore, true));
+    } catch (err) { items = null; }
+  }
+  if (!items) {
+    items = [
+      runItem('10:00', 'keuken', 'Bestellingen plaatsen en voorraad controleren voor ' + e.name + ' (' + covers + ' couverts)', 2, true),
+      runItem('15:00', 'keuken', 'Fonds, sauzen en marinades opzetten die tijd nodig hebben', 2, true),
+      runItem('09:00', 'keuken', 'Levering ontvangen en controleren op kwaliteit en aantallen', 1, true),
+      runItem('11:00', 'keuken', 'Koeling indelen per gang, bakken labelen met datum en gerecht', 1, true)
+    ];
+    for (const d of dishes.slice(0, 8)) {
+      items.push(runItem('13:00', 'keuken', 'Mise en place ' + d.name + ': snijwerk, portioneren (' + covers + ')', 1, true));
+      items.push(runItem('14:00', 'keuken', 'Verse afwerking en garnituur ' + d.name + ', proeven met de chef', 0, true));
+    }
+    if (e.catering && e.catering.mode === 'alacarte')
+      items.push(runItem('12:00', 'keuken', 'Parstock per station aanvullen voor a la carte (' + covers + ' couverts verwacht)', 1, true));
+    for (const a of (e.allergies || [])) {
+      items.push(runItem('12:00', 'keuken', 'Vervangend gerecht ' + (a.alternative ? '"' + a.alternative.name + '"' : 'voor ' + a.allergen) + ' voorbereiden, ' + a.count + 'x, strikt gescheiden werken (' + a.allergen + ')', 1, true));
+      items.push(runItem('16:00', 'keuken', 'Aparte uitgifte klaarzetten voor gasten met ' + a.allergen + ' (' + a.count + 'x), pan en snijplank apart', 0, true));
+    }
+    items.push(runItem('10:00', 'keuken', 'MEP-briefing keukenteam: taken verdelen, tijden en allergenen doorspreken', 0, true));
+  }
+  // eerdere automatische MEP weggooien zodat opnieuw organiseren geen dubbels geeft
+  e.runsheet = (e.runsheet || []).filter(x => !x.mep);
+  e.runsheet = [...e.runsheet, ...items].slice(0, 90);
+  sortRunsheet(e);
+  save();
+  logActivity(req.supplier.code, req.actor, 'organiseerde de mise en place voor "' + e.name + '" (' + items.length + ' taken, ' + covers + ' couverts)');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, event: e, added: items.length, covers, ai: !!anthropic });
 });
 
 // lid meldt zich aan voor een gepubliceerd event

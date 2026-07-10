@@ -221,6 +221,7 @@ function ensureSupplierDefaults(s) {
     s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
   // horecazaken kunnen events organiseren (het Kantoor maakt ze, leden melden zich aan)
   if (['restaurant', 'bar', 'club'].includes(s.type) && !Array.isArray(s.events)) s.events = [];
+  if (['restaurant', 'bar', 'club'].includes(s.type) && !s.dailyMeps) s.dailyMeps = {}; // dagelijkse mise en place (a la carte)
   for (const e of (s.events || [])) {
     if (!Array.isArray(e.runsheet)) e.runsheet = [];
     for (const it of e.runsheet) if (typeof it.daysBefore !== 'number') it.daysBefore = 0;
@@ -996,6 +997,15 @@ function supplierState(s, actor) {
     staff: accounts.listStaff(s.code).map(accounts.publicStaff),
     applications: (db.data.applications[s.code] || []).slice(0, 30),
     events: s.events || null,
+    dailyMeps: (() => {
+      if (!s.dailyMeps) return null;
+      const vandaag = new Date().toISOString().slice(0, 10);
+      const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+      const out = {};
+      if (s.dailyMeps[vandaag]) out[vandaag] = s.dailyMeps[vandaag];
+      if (s.dailyMeps[morgen]) out[morgen] = s.dailyMeps[morgen];
+      return out;
+    })(),
     activity: (db.data.supplierActivity[s.code] || []).slice(0, 40),
     team: (db.data.supplierTeam[s.code] || []).slice(-60),
     actor: actor || { name: 'Beheer', role: 'manager', manager: true }
@@ -2050,6 +2060,91 @@ app.post('/api/supplier/event/mep', supplierAuth, async (req, res) => {
   logActivity(req.supplier.code, req.actor, 'organiseerde de mise en place voor "' + e.name + '" (' + items.length + ' taken, ' + covers + ' couverts)');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
   res.json({ ok: true, event: e, added: items.length, covers, ai: !!anthropic });
+});
+
+/* ---- dagelijkse mise en place (a la carte, geen event) ----
+   De keuken voorspelt de dag: verwachte couverts uit de verkoophistorie van de
+   afgelopen drie weken, de tafelcapaciteit en de weekdag; per gerecht een
+   portie-aantal en een MEP-takenlijst voor het team. */
+function weekdagFactor(d) {
+  const wd = d.getDay(); // 0 = zondag
+  if (wd === 5 || wd === 6) return [1.25, 'vrijdag/zaterdag, druk'];
+  if (wd === 0) return [1.0, 'zondag, gemiddeld'];
+  return [0.85, 'doordeweeks, rustiger'];
+}
+app.post('/api/supplier/mep/daily', supplierAuth, async (req, res) => {
+  const s = req.supplier;
+  if (!s.dailyMeps) return res.status(400).json({ error: 'De dagelijkse mise en place is er voor restaurants, bars en clubs.' });
+  const menu = (s.menu || []).filter(m => m.station !== 'bar');
+  if (!menu.length) return res.status(409).json({ error: 'Zet eerst gerechten op de kaart; daar rekent de voorspelling mee.' });
+  const dagen = req.body.day === 'morgen' ? 1 : 0;
+  const doel = new Date(Date.now() + dagen * 86400000);
+  const date = doel.toISOString().slice(0, 10);
+  const [factor, factorLabel] = weekdagFactor(doel);
+
+  // historie: bestellingen van de afgelopen 21 dagen
+  const sinds = Date.now() - 21 * 86400000;
+  const hist = db.data.orders.filter(o => o.supplierCode === s.code && new Date(o.at).getTime() >= sinds && !['geweigerd', 'terugbetaald'].includes(o.status));
+  const perGerecht = {}; let histQty = 0; const histDagen = new Set();
+  for (const o of hist) {
+    histDagen.add(String(o.at).slice(0, 10));
+    for (const it of (o.items || [])) {
+      const m = menu.find(x => x.id === it.id);
+      if (m) { perGerecht[m.id] = (perGerecht[m.id] || 0) + it.qty; histQty += it.qty; }
+    }
+  }
+  const stoelen = (s.tables || []).reduce((n, t) => n + (t.seats || 0), 0) || 24;
+  const basis = Math.round(stoelen * 2 * factor);                 // twee zittingen
+  const histGem = histDagen.size ? Math.round((histQty / histDagen.size) * factor) : 0;
+  const covers = Math.max(basis, histGem);
+  const portions = menu.map(m => {
+    const aandeel = histQty ? (perGerecht[m.id] || 0) / histQty : 1 / menu.length;
+    return { name: m.name, n: Math.max(5, Math.ceil((covers * aandeel) / 5) * 5) };
+  });
+
+  let tasks = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 900,
+        system: 'Je bent een sous-chef. Antwoord UITSLUITEND met een JSON-array van {"time":"HH:MM","task":"..."}. Maximaal 10 taken voor de dagelijkse a la carte mise en place, Nederlands, concreet met aantallen.',
+        messages: [{ role: 'user', content: 'Verwacht: ' + covers + ' couverts (' + factorLabel + '). Porties: ' + portions.map(p => p.name + ' ' + p.n + 'x').join('; ') + '.' }]
+      });
+      const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
+      if (Array.isArray(arr) && arr.length) tasks = arr.slice(0, 10).map(x => ({ id: crypto.randomBytes(3).toString('hex'), time: /^\d{2}:\d{2}$/.test(x.time) ? x.time : '12:00', task: String(x.task).slice(0, 160), done: false, doneBy: null }));
+    } catch (err) { tasks = null; }
+  }
+  if (!tasks) {
+    const t = (time, task) => ({ id: crypto.randomBytes(3).toString('hex'), time, task, done: false, doneBy: null });
+    tasks = [
+      t('09:00', 'Voorraad naast de voorspelling leggen (' + covers + ' couverts, ' + factorLabel + ') en bijbestellen'),
+      t('10:30', 'Koeling checken, alles labelen; parstock per station bepalen'),
+      ...portions.slice(0, 8).map(p => t('13:00', 'MEP ' + p.name + ': ' + p.n + ' porties (snijwerk, sauzen, portioneren)')),
+      t('15:30', 'Garnituren en verse afwerking klaarzetten per station'),
+      t('16:30', 'Lijn-check met de chef: proeven, aantallen aftekenen, briefing service')
+    ];
+  }
+  s.dailyMeps[date] = { date, covers, factorLabel, portions, tasks, by: req.actor.name, at: new Date().toISOString() };
+  // oude dagen opruimen
+  const gisteren = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  for (const k of Object.keys(s.dailyMeps)) if (k < gisteren) delete s.dailyMeps[k];
+  save();
+  logActivity(s.code, req.actor, 'voorspelde de mise en place voor ' + date + ' (' + covers + ' couverts)');
+  sseToSupplier(s.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, plan: s.dailyMeps[date], histDagen: histDagen.size, ai: !!anthropic });
+});
+
+app.post('/api/supplier/mep/daily/done', supplierAuth, (req, res) => {
+  const plan = s => (s.dailyMeps || {})[req.body.date];
+  const p = plan(req.supplier);
+  const it = p && (p.tasks || []).find(x => x.id === req.body.taskId);
+  if (!it) return res.status(404).json({ error: 'Taak niet gevonden.' });
+  it.done = !it.done;
+  it.doneBy = it.done ? req.actor.name : null;
+  save();
+  if (it.done) logActivity(req.supplier.code, req.actor, 'vinkte af: ' + it.time + ' ' + it.task.slice(0, 60));
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, plan: p });
 });
 
 // lid meldt zich aan voor een gepubliceerd event

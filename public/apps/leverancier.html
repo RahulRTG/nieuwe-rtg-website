@@ -1142,8 +1142,26 @@
         html += done.map(o => ticketCard(o, st, { dim:true })).join('');
       }
       if (st === 'keuken'){
-        const today2 = new Date().toISOString().slice(0, 10);
-        const evs2 = (state.events||[]).filter(e => e.published && (e.date||'') >= today2 && (e.catering && e.catering.mode !== 'geen' || (e.allergies||[]).length));
+        const vandaagStr = new Date().toISOString().slice(0, 10);
+        const morgenStr = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+        const dms = state.dailyMeps || {};
+        html += '<div class="st-sec">\uD83D\uDCC5 '+T('dm.h','Dagelijkse mise en place (\u00e0 la carte)')+'</div>';
+        const dmCard = (plan, label) => {
+          const open = plan.tasks.filter(x=>!x.done).length;
+          return '<div class="tkc" style="grid-column:1/-1;">'+
+            '<div class="tkc-top"><span style="font-weight:600;">'+label+' \u00b7 \u00b1'+plan.covers+' couverts</span><span class="tkc-age">'+plan.factorLabel+' \u00b7 '+T('dm.by','voorspeld door')+' '+plan.by+'</span></div>'+
+            '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+plan.portions.map(p=>'<span class="st-badge">'+p.name+' \u00b7 <b style="color:var(--gold);">'+p.n+'\u00d7</b></span>').join('')+'</div>'+
+            plan.tasks.map(x=>'<div class="st-row'+(x.done?'" style="opacity:0.5;':'"')+'"><span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+x.time+'</b>'+(x.done?'<s>'+x.task+'</s>':x.task)+(x.done&&x.doneBy?'<span class="sub">\u2713 '+x.doneBy+'</span>':'')+'</span>'+
+              '<button class="obtn'+(x.done?' primary':'')+'" data-dmdone="'+plan.date+'" data-item="'+x.id+'">'+(x.done?'\u2713':T('rs.doit','Gedaan'))+'</button></div>').join('')+
+            (open?'':'<div class="tkc-who">\u2705 '+T('dm.alldone','Alles afgevinkt, de lijn staat.')+'</div>')+
+          '</div>';
+        };
+        if (dms[vandaagStr]) html += dmCard(dms[vandaagStr], T('rs.today','vandaag').toUpperCase());
+        if (dms[morgenStr]) html += dmCard(dms[morgenStr], T('rs.tomorrow','morgen').toUpperCase());
+        html += '<div class="tkc"><div class="tkc-who">'+T('dm.deck','De voorspelling rekent met de verkoop van de afgelopen drie weken, de tafelcapaciteit en de weekdag.')+'</div>'+
+          '<div class="tkc-act"><button class="tkc-start" data-dmgen="vandaag">\u2728 '+(dms[vandaagStr]?T('dm.redo','Opnieuw voor vandaag'):T('dm.today','Voorspel vandaag'))+'</button>'+
+          '<button class="tkc-start" data-dmgen="morgen">\u2728 '+(dms[morgenStr]?T('dm.redo2','Opnieuw voor morgen'):T('dm.tomorrow','Voorspel morgen'))+'</button></div></div>';
+        const evs2 = (state.events||[]).filter(e => e.published && (e.date||'') >= vandaagStr && (e.catering && e.catering.mode !== 'geen' || (e.allergies||[]).length));
         if (evs2.length){
           html += '<div class="st-sec">\uD83D\uDC68\u200D\uD83C\uDF73 '+T('ek.h','Event-keuken')+'</div>';
           html += evs2.map(e => {
@@ -1186,6 +1204,15 @@
       try { const d = await API.call('/supplier/event/mep', { id: b.dataset.kmep });
         toast('\u2705 '+d.added+' '+T('ek.planned','MEP-taken ingepland voor '+d.covers+' couverts.'));
         await refresh(); } catch(e){ toast(e.message); b.disabled = false; }
+    }));
+    el.querySelectorAll('[data-dmgen]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true; b.textContent = T('dm.busy','Voorspellen...');
+      try { const d = await API.call('/supplier/mep/daily', { day: b.dataset.dmgen });
+        toast('\u2728 '+T('dm.done1','Voorspelling klaar:')+' '+d.plan.covers+' couverts ('+d.plan.factorLabel+')'+(d.histDagen?', '+T('dm.hist','op basis van')+' '+d.histDagen+' '+T('dm.days','dagen historie'):''));
+        await refresh(); } catch(e){ toast(e.message); b.disabled = false; }
+    }));
+    el.querySelectorAll('[data-dmdone]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/mep/daily/done', { date: b.dataset.dmdone, taskId: b.dataset.item }); await refresh(); } catch(e){ toast(e.message); }
     }));
     if (stationMode === 'kantoor') bindKantoor(el);
   }
@@ -2696,6 +2723,11 @@ window.I18N = { en: {
   'ek.noalt':'No replacement dish yet; ask The Office or tap below.',
   'ek.mep':'Organise the mise en place', 'ek.busy':'Organising the mise en place...',
   'ek.planned':'MEP tasks planned.', 'ek.planned2':'MEP tasks planned (', 'ek.onscreen':'the kitchen sees them days ahead on the kitchen display.',
+  'dm.h':'Daily mise en place (a la carte)', 'dm.by':'forecast by',
+  'dm.deck':'The forecast uses the past three weeks of sales, the table capacity and the day of the week.',
+  'dm.today':'Forecast today', 'dm.tomorrow':'Forecast tomorrow', 'dm.redo':'Redo for today', 'dm.redo2':'Redo for tomorrow',
+  'dm.busy':'Forecasting...', 'dm.done1':'Forecast ready:', 'dm.hist':'based on', 'dm.days':'days of history',
+  'dm.alldone':'All ticked off, the line is set.',
   'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',

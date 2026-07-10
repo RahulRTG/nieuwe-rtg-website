@@ -105,6 +105,14 @@
       document.body.appendChild(scrim);
       scrim.querySelectorAll('[data-lang]').forEach(b =>
         b.addEventListener('click', () => { this.set(b.dataset.lang); this.closeModal(); }));
+      // De keuze mag nooit de pagina gijzelen: klik ernaast of Escape = huidige
+      // taal houden en gewoon verder. De schakelaar linksonder blijft bestaan.
+      scrim.addEventListener('click', e => {
+        if (e.target === scrim) { this.set(this.lang); this.closeModal(); }
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { this.set(this.lang); this.closeModal(); }
+      });
     },
     openModal() { this.buildModal(this.lang); const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.add('open'); },
     closeModal() { const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.remove('open'); },

@@ -1432,6 +1432,16 @@
 
   /* ---- het Kantoor: de eigenaar/manager past hier alles aan ---- */
   let kantoorSec = 'hr', kantoorMsg = '';
+  // ritgeschiedenis komt gepagineerd van de server (schaalvast bij miljoenen ritten)
+  let histData = null, histPage = 1, histQ = '', histBusy = false;
+  async function laadHistorie(){
+    if (histBusy) return;
+    histBusy = true;
+    try { histData = await API.call('/supplier/ride/history', { page: histPage, q: histQ }); }
+    catch(e){ histData = { items: [], total: 0, page: 1, pages: 1, omzet: 0 }; }
+    histBusy = false;
+    renderStation();
+  }
   function renderKantoor(){
     // Elk bedrijf heeft HR en Marketing; de rest van de secties hangt af van
     // de sector: horeca beheert de kaart en events, een hotel de kamers en
@@ -1621,17 +1631,27 @@
         ).join('') : '<div class="tkc-who">'+T('kt.geenlopend','Niets onderweg.')+'</div>')+'</div>';
     }
     if (kantoorSec === 'historie'){
-      // ritgeschiedenis: alle afgeronde ritten, omzet en een CSV-export voor de boekhouding
-      const klaarH = (state.rides || []).filter(r => r.status === 'afgerond' || r.status === 'gearriveerd')
-        .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));
-      const omzetH = klaarH.reduce((s2, r) => s2 + (r.quote || 0), 0);
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>📒 '+T('kt.historie','Historie')+' ('+klaarH.length+')</h3>'+
-        '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b style="color:var(--gold);">'+eur(omzetH)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
-        (klaarH.length ? klaarH.slice(0, 40).map(r =>
-          '<div class="st-row"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+String(r.finishedAt||r.at).slice(0,16).replace('T',' ')+(r.driver?' · '+r.driver.name:'')+'</span></span>'+
-          '<b style="color:var(--gold);">'+(r.quote?eur(r.quote):'')+'</b></div>'
-        ).join('') : '<div class="tkc-who">'+T('kt.geenhistorie','Nog geen afgeronde ritten.')+'</div>')+
-        (klaarH.length ? '<div class="st-form"><button class="bigbtn" id="ktCsv">⬇ '+T('kt.csv','Exporteer als CSV')+'</button></div>' : '')+'</div>';
+      // ritgeschiedenis: gepagineerd en doorzoekbaar via de server, zodat dit
+      // scherm er hetzelfde uitziet met tien of tien miljoen afgeronde ritten
+      if (!histData){
+        laadHistorie();
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📒 '+T('kt.historie','Historie')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+      } else {
+        const h = histData;
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📒 '+T('kt.historie','Historie')+' ('+h.total+')</h3>'+
+          '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b style="color:var(--gold);">'+eur(h.omzet)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
+          '<div style="display:flex;gap:0.5rem;margin:0.5rem 0;"><input class="st-in" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'" style="flex:1;">'+
+          '<button class="obtn" id="ktHzGo">🔍 '+T('kt.zoek','Zoek')+'</button></div>'+
+          (h.items.length ? h.items.map(r =>
+            '<div class="st-row"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+String(r.finishedAt||r.at).slice(0,16).replace('T',' ')+(r.driver?' · '+r.driver.name:'')+'</span></span>'+
+            '<b style="color:var(--gold);">'+(r.quote?eur(r.quote):'')+'</b></div>'
+          ).join('') : '<div class="tkc-who">'+(histQ ? T('kt.nietsgevonden','Niets gevonden voor deze zoekopdracht.') : T('kt.geenhistorie','Nog geen afgeronde ritten.'))+'</div>')+
+          (h.pages > 1 ? '<div style="display:flex;align-items:center;justify-content:center;gap:0.9rem;margin-top:0.6rem;">'+
+            '<button class="obtn" data-khist="-1"'+(h.page<=1?' disabled':'')+'>‹</button>'+
+            '<span class="tkc-who" style="margin:0;">'+T('kt.pagina','Pagina')+' '+h.page+' / '+h.pages+'</span>'+
+            '<button class="obtn" data-khist="1"'+(h.page>=h.pages?' disabled':'')+'>›</button></div>' : '')+
+          (h.total ? '<div class="st-form"><button class="bigbtn" id="ktCsv">⬇ '+T('kt.csv','Exporteer alles als CSV')+' ('+h.total+')</button></div>' : '')+'</div>';
+      }
     }
     if (kantoorSec === 'vloot'){
       const wagens = state.fleet || [];
@@ -1683,7 +1703,7 @@
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; renderStation(); }));
     el.querySelectorAll('[data-khire]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/apply/decide', { id: b.dataset.khire, action: 'aannemen' });
         kantoorMsg = '\u2705 '+T('kt.hired','Aangenomen.')+' <b>'+d.staff.name+'</b> \u00b7 PIN: <b style="color:var(--gold);">'+d.pin+'</b> ('+T('kt.pinonce','geef eenmalig door')+')';
@@ -1835,25 +1855,23 @@
     el.querySelectorAll('[data-kdoor]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/door/toggle', { id: b.dataset.kdoor }); await refresh(); } catch(e){ toast(e.message); }
     }));
-    // ritgeschiedenis exporteren als csv (puntkomma's en een BOM zodat spreadsheets het direct goed openen)
+    // ritgeschiedenis: bladeren, zoeken en de volledige export van de server
     const ktCsv = el.querySelector('#ktCsv'); if (ktCsv) ktCsv.addEventListener('click', () => {
-      const klaarH = (state.rides || []).filter(r => r.status === 'afgerond' || r.status === 'gearriveerd')
-        .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));
-      const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-      const kop = ['datum','referentie','gast','van','naar','km','personen','prijs','chauffeur','voertuig'];
-      const regels = klaarH.map(r => [
-        String(r.finishedAt || r.at).slice(0, 16).replace('T', ' '), r.ref, r.customerCodename,
-        r.from || '', r.to || '', r.km || '', r.passengers || 1,
-        (r.quote || 0).toFixed(2).replace('.', ','),
-        r.driver ? r.driver.name : '', r.vehicle ? r.vehicle.name : ''
-      ].map(esc).join(';'));
-      const blob = new Blob(['\uFEFF' + kop.join(';') + '\n' + regels.join('\n')], { type: 'text/csv;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'ritten-' + ((state.supplier && state.supplier.code) || 'rtg').toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.csv';
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      window.open('/api/supplier/rides.csv?token=' + encodeURIComponent(API.token), '_blank');
     });
+    el.querySelectorAll('[data-khist]').forEach(b => b.addEventListener('click', () => {
+      histPage = Math.max(1, histPage + Number(b.dataset.khist));
+      histData = null;
+      renderStation();
+    }));
+    const ktHzoek = () => {
+      histQ = (el.querySelector('#ktHz') ? el.querySelector('#ktHz').value : '').trim();
+      histPage = 1;
+      histData = null;
+      renderStation();
+    };
+    const hzGo = el.querySelector('#ktHzGo'); if (hzGo) hzGo.addEventListener('click', ktHzoek);
+    const hzIn = el.querySelector('#ktHz'); if (hzIn) hzIn.addEventListener('keydown', e => { if (e.key === 'Enter') ktHzoek(); });
     // dispatch: toewijzen met de hand of met het slimme voorstel
     el.querySelectorAll('[data-ktwijs]').forEach(b => b.addEventListener('click', async () => {
       const ref = b.dataset.ktwijs;
@@ -3210,7 +3228,9 @@ window.I18N = { en: {
   'kt.ritten':'Rides', 'kt.vloot':'Fleet', 'kt.tarief':'Tariff', 'kt.historie':'History',
   'kt.gepland':'Scheduled', 'kt.nietsgepland':'No scheduled rides. Members can book rides days ahead.',
   'ch.gepland':'Scheduled', 'kt.omzet':'Total ride revenue', 'kt.nulcom':'RTG charges 0% commission.',
-  'kt.geenhistorie':'No completed rides yet.', 'kt.csv':'Export as CSV',
+  'kt.geenhistorie':'No completed rides yet.', 'kt.csv':'Export everything as CSV',
+  'kt.laden':'Loading...', 'kt.zoekrit':'Search by guest, reference or driver', 'kt.zoek':'Search',
+  'kt.nietsgevonden':'Nothing found for this search.', 'kt.pagina':'Page',
   'kt.openritten':'Open requests', 'kt.geenopen':'No open requests.',
   'kt.lopend':'In progress', 'kt.geenlopend':'Nothing on the road.',
   'kt.wijs':'Assign', 'kt.slim':'Smart', 'kt.gewezen':'Ride assigned; guest and driver have been notified.',

@@ -148,7 +148,7 @@
       <div class="rows" id="alertList"></div>
     </div>
     <div class="panel" style="margin-bottom:1.5rem;">
-      <h2><span class="livedot"></span> <span data-i18n="panel.live">Live onderweg</span></h2>
+      <h2><span class="livedot"></span> <span data-i18n="panel.live">Live onderweg</span> <span id="liveTot" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--soft);"></span></h2>
       <div class="rows" id="liveList"></div>
     </div>
     <div class="cols" style="margin-bottom:1.5rem;">
@@ -167,8 +167,13 @@
         <div class="rows" id="prices"></div>
       </div>
       <div class="panel">
-        <h2 class="ph"><span data-i18n="panel.orders">Bestellingen &amp; ritten</span><button class="hbtn" id="csvBtn">⬇ <span data-i18n="bo.csv">CSV</span></button></h2>
+        <h2 class="ph"><span><span data-i18n="panel.orders">Bestellingen &amp; ritten</span> <span id="tlTot" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--soft);"></span></span><button class="hbtn" id="csvBtn">⬇ <span data-i18n="bo.csv">CSV</span></button></h2>
         <div class="rows" id="orders"></div>
+        <div id="tlPager" style="display:none;align-items:center;justify-content:center;gap:0.9rem;padding:0.7rem;border-top:1px solid var(--line);">
+          <button class="hbtn" id="tlPrev">‹</button>
+          <span style="font-size:0.72rem;color:var(--soft);" id="tlWaar"></span>
+          <button class="hbtn" id="tlNext">›</button>
+        </div>
       </div>
     </div>
     <div class="cols" style="margin-top:1.5rem;">
@@ -216,6 +221,7 @@
     'aangevraagd':'requested', 'geaccepteerd':'accepted', 'onderweg':'en route', 'aangekomen':'at pickup', 'aan-boord':'on board', 'rijdt':'on board', 'afgerond':'completed', 'gearriveerd':'completed' };
   const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
   let token = null, state = null, source = null;
+  let tl = null, tlPage = 1, tlTimer = null;
   const enabled = location.protocol === 'http:' || location.protocol === 'https:';
 
   async function call(path, body){
@@ -244,6 +250,7 @@
     $('#app').classList.add('on');
     $('#liveInd').style.display = 'inline-flex';
     render();
+    laadTimeline();
     loadVerify();
     loadConcierge();
     stream();
@@ -390,22 +397,10 @@
       '<div class="row"><div class="r1"><div><div class="nm">'+p.supplierName+'</div><div class="sub">'+p.service+' · '+timeAgo(p.at)+'</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
     ).join('') : '<div class="empty">'+T('bo.noprices','Nog geen prijzen. Zodra een partner een dynamische prijs doorgeeft, verschijnt die hier live.')+'</div>';
 
-    // bestellingen en ritten in een tijdlijn: nieuwste bovenaan
-    const KLAAR_R = { 'afgerond':1, 'gearriveerd':1, 'geweigerd':1 };
-    const regels = state.orders.filter(o => past(o.supplierName, o.customerCodename, o.ref)).map(o => ({ at: o.at, html: (() => {
-      const pc = o.status==='nieuw'?'nieuw':o.status==='in bereiding'?'bereiding':'klaar';
-      return '<div class="row"><div class="r1"><div><div class="nm">'+o.supplierName+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+o.customerCodename+'</span></div>'+
-        '<div class="sub">🛎️ '+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('bo.items','item(s)')+' · '+timeAgo(o.at)+' · '+(o.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
-        '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><span class="pill '+pc+'">'+tStatus(o.status)+'</span></div></div></div>';
-    })() })).concat((state.rides || []).filter(r => past(r.supplierName, r.customerCodename, r.ref, r.from||'', r.to||'')).map(r => ({ at: r.at, html: (() => {
-      const pc = r.status==='aangevraagd'?'nieuw':KLAAR_R[r.status]?'klaar':'bereiding';
-      return '<div class="row"><div class="r1"><div><div class="nm">'+r.supplierName+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+r.customerCodename+'</span></div>'+
-        '<div class="sub">'+(r.type==='jet'?'✈️':'🚗')+' '+(r.from||'')+' → '+(r.to||'?')+' · '+timeAgo(r.at)+(r.plannedFor?' · '+escHtml(r.when||''):'')+' · '+(r.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
-        '<div style="text-align:right;"><div class="amt">'+eur(r.quote||0)+'</div><span class="pill '+pc+'">'+tStatus(r.status)+'</span></div></div></div>';
-    })() })));
-    regels.sort((a, b) => new Date(b.at) - new Date(a.at));
-    $('#orders').innerHTML = regels.length ? regels.map(x => x.html).join('')
-      : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
+    // tijdlijn (bestellingen & ritten) komt gepagineerd van de server
+    renderTimeline();
+    const totals = state.totals || {};
+    $('#liveTot').textContent = totals.live > (state.live || []).length ? (state.live || []).length + ' ' + T('bo.van', 'van') + ' ' + totals.live : '';
 
     const apps = (state.applications || []).filter(x => past(x.name, x.func, x.company));
     $('#appsList').innerHTML = apps.length ? apps.map(x => {
@@ -443,10 +438,37 @@
     }));
   }
 
+  // De tijdlijn is schaalvast: de server bladert en zoekt door de volledige
+  // historie; het scherm toont altijd 25 regels plus het eerlijke totaal.
+  async function laadTimeline(){
+    try { tl = await call('/office/timeline', { page: tlPage, q: ($('#zoekInp').value || '').trim() }); }
+    catch(e){ tl = { items: [], total: 0, page: 1, pages: 1 }; }
+    renderTimeline();
+  }
+  function renderTimeline(){
+    if (!tl) return;
+    const KLAAR_R = { 'afgerond':1, 'gearriveerd':1, 'geweigerd':1, 'geserveerd':1, 'terugbetaald':1, 'klaar':1 };
+    $('#tlTot').textContent = '(' + tl.total.toLocaleString(lang()==='en'?'en-US':'nl-NL') + ')';
+    $('#orders').innerHTML = tl.items.length ? tl.items.map(x => {
+      const pc = (x.status==='nieuw'||x.status==='aangevraagd')?'nieuw':KLAAR_R[x.status]?'klaar':'bereiding';
+      const icoon = x.soort==='order'?'🛎️':x.soort==='jet'?'✈️':'🚗';
+      return '<div class="row"><div class="r1"><div><div class="nm">'+x.supplierName+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+x.customerCodename+'</span></div>'+
+        '<div class="sub">'+icoon+' '+escHtml(x.sub||'')+' · '+timeAgo(x.at)+(x.when?' · '+escHtml(x.when):'')+' · '+(x.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
+        '<div style="text-align:right;"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';
+    }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
+    const pager = $('#tlPager');
+    pager.style.display = tl.pages > 1 ? 'flex' : 'none';
+    $('#tlWaar').textContent = T('bo.pagina','Pagina') + ' ' + tl.page + ' / ' + tl.pages;
+    $('#tlPrev').disabled = tl.page <= 1;
+    $('#tlNext').disabled = tl.page >= tl.pages;
+  }
+  $('#tlPrev').addEventListener('click', () => { if (tlPage > 1){ tlPage--; laadTimeline(); } });
+  $('#tlNext').addEventListener('click', () => { if (tl && tlPage < tl.pages){ tlPage++; laadTimeline(); } });
+
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(token)); } catch(e){ return; }
-    source.addEventListener('sync', () => { refresh(); loadVerify(); loadConcierge(); });
+    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadConcierge(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
   }
 
@@ -462,25 +484,19 @@
     catch(e){ box.textContent = e.message; }
   });
 
-  // zoeken: een veld dat live door alle panelen heen filtert
-  $('#zoekInp').addEventListener('input', () => { if (state) render(); });
-
-  // export voor de boekhouding: alle bestellingen en ritten als csv
-  $('#csvBtn').addEventListener('click', () => {
+  // zoeken: filtert de panelen direct en laat de server door de volledige
+  // tijdlijn zoeken (met een korte adempauze tegen onnodige verzoeken)
+  $('#zoekInp').addEventListener('input', () => {
     if (!state) return;
-    const esc2 = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-    const kop = ['datum','soort','partner','gast','omschrijving','status','betaald','bedrag'];
-    const rijen = state.orders.map(o => [String(o.at).slice(0,16).replace('T',' '), 'bestelling', o.supplierName, o.customerCodename,
-        o.items.map(i=>i.qty+'x '+i.name).join(', '), o.status, o.paid?'ja':'nee', (o.total||0).toFixed(2).replace('.',',')])
-      .concat((state.rides||[]).map(r => [String(r.at).slice(0,16).replace('T',' '), r.type==='jet'?'jetrit':'taxirit', r.supplierName, r.customerCodename,
-        (r.from||'')+' naar '+(r.to||'?'), r.status, r.paid?'ja':'nee', (r.quote||0).toFixed(2).replace('.',',')]))
-      .map(rij => rij.map(esc2).join(';'));
-    const blob = new Blob(['\uFEFF' + kop.join(';') + '\n' + rijen.join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'rtg-backoffice-' + new Date().toISOString().slice(0,10) + '.csv';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    render();
+    clearTimeout(tlTimer);
+    tlTimer = setTimeout(() => { tlPage = 1; laadTimeline(); }, 350);
+  });
+
+  // export voor de boekhouding: de server bouwt het volledige bestand,
+  // hoe groot de historie ook is
+  $('#csvBtn').addEventListener('click', () => {
+    if (token) window.open('/api/office/export.csv?token=' + encodeURIComponent(token), '_blank');
   });
 
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
@@ -514,6 +530,7 @@ window.I18N = { en: {
   'bo.nudge':'Send reminder', 'bo.nudged':'reminded',
   'bo.noalerts':'All running smoothly. Stuck orders, waiting members and open reviews appear here automatically.',
   'bo.trans':'transaction(s)', 'bo.opennow':'open now', 'bo.minride':'min per ride', 'bo.noperf':'No partner figures yet.',
+  'bo.van':'of', 'bo.pagina':'Page',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.h':' h', 't.d':' d'
 } };
 </script>

@@ -1174,8 +1174,18 @@ function publicSupplier(s, lang) {
 }
 
 // dashboarddata voor de ingelogde leverancier
+// Schaalvast: de schermen krijgen alleen het werk van nu plus een korte staart;
+// alles daarbuiten loopt via gepagineerde endpoints en totalen.
 function supplierState(s, actor) {
   const t = db.data.supplierTypes[s.type] || {};
+  const vandaag = new Date().toISOString().slice(0, 10);
+  const ORDER_KLAAR = { 'geserveerd': 1, 'geweigerd': 1, 'terugbetaald': 1 };
+  const alleOrders = db.data.orders.filter(o => o.supplierCode === s.code && o.status !== 'wacht-op-betaling');
+  const zichtOrders = alleOrders.filter(o => !ORDER_KLAAR[o.status] || String(o.at).slice(0, 10) === vandaag).slice(0, 80);
+  const RIDE_KLAAR = { 'afgerond': 1, 'gearriveerd': 1, 'geweigerd': 1 };
+  const alleRitten = db.data.rides.filter(r => r.supplierCode === s.code && r.status !== 'wacht-op-betaling');
+  const klaarAll = alleRitten.filter(r => r.status === 'afgerond' || r.status === 'gearriveerd');
+  const zichtRitten = alleRitten.filter(r => !RIDE_KLAAR[r.status] || String(r.finishedAt || r.at).slice(0, 10) === vandaag).slice(0, 80);
   return {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
     rooms: s.rooms || null,
@@ -1195,26 +1205,34 @@ function supplierState(s, actor) {
     guestChats: Object.entries(db.data.guestChats)
       .filter(([, c]) => c.supplierCode === s.code && c.messages.length)
       .map(([k, c]) => ({ key: k, codename: c.codename, dept: c.dept || 'Team', unread: c.unreadPartner, last: c.messages[c.messages.length - 1].text.slice(0, 60), lastFrom: c.messages[c.messages.length - 1].from, lastAt: c.lastAt }))
-      .sort((a, b) => (b.lastAt || '').localeCompare(a.lastAt || '')),
+      .sort((a, b) => (b.lastAt || '').localeCompare(a.lastAt || ''))
+      .slice(0, 30),
     // leden die nu live onderweg zijn maar nog niet met dit bedrijf verbonden
     nearbyGuests: Object.values(db.data.live)
       .filter(L => L.active && !connectedSupplierCodes(L.key).includes(s.code))
+      .slice(0, 12)
       .map(L => { const d = L.destCode ? findSupplier(L.destCode) : null; return { codename: L.codename, dest: d ? d.name : null }; }),
     menu: s.menu || [],
-    orders: db.data.orders.filter(o => o.supplierCode === s.code && o.status !== 'wacht-op-betaling').map(o => {
+    orders: zichtOrders.map(o => {
       const L = db.data.live[o.customerKey || o.customerTier];
       const enroute = L && L.active && connectedSupplierCodes(o.customerKey || o.customerTier).includes(s.code);
       const me = enroute && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
       return { ...o, guestEtaMin: me && s.loc ? etaMinutes(haversine(me, s.loc), L.mode) : null, guestArrived: !!(L && L.arrived && L.destCode === s.code) };
     }),
-    rides: db.data.rides.filter(r => r.supplierCode === s.code && r.status !== 'wacht-op-betaling').map(r => {
+    rides: zichtRitten.map(r => {
       const L = db.data.live[r.customerKey || r.customerTier];
       const guest = L && L.active && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
       const toS = r.toCode ? findSupplier(r.toCode) : null;
       return { ...r, guestLoc: guest, pickupEtaMin: guest && s.loc ? etaMinutes(haversine(s.loc, guest), 'driving') : null, dropEtaMin: guest && toS && toS.loc ? etaMinutes(haversine(guest, toS.loc), 'driving') : null };
     }),
-    guests: guestsFor(s.code),
-    prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code),
+    totals: {
+      orders: alleOrders.length,
+      rides: alleRitten.length,
+      historie: klaarAll.length,
+      ritOmzet: klaarAll.reduce((s2, r) => s2 + (r.quote || 0), 0)
+    },
+    guests: guestsFor(s.code).slice(0, 30),
+    prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code).slice(0, 20),
     notifications: db.data.supplierNotifications[s.code] || [],
     staff: accounts.listStaff(s.code).map(accounts.publicStaff),
     applications: (db.data.applications[s.code] || []).slice(0, 30),
@@ -3197,6 +3215,47 @@ app.post('/api/supplier/ride/assign', supplierAuth, (req, res) => {
 });
 
 /* Vlootbeheer (kantoor, alleen management) */
+// Ritgeschiedenis, schaalvast: gepagineerd en doorzoekbaar, met het omzettotaal
+// over de volledige historie (dus ook wat niet op deze pagina staat).
+app.post('/api/supplier/ride/history', supplierAuth, (req, res) => {
+  const q = String(req.body.q || '').trim().toLowerCase().slice(0, 60);
+  const alle = db.data.rides
+    .filter(r => r.supplierCode === req.supplier.code && (r.status === 'afgerond' || r.status === 'gearriveerd'))
+    .filter(r => !q || [r.customerCodename, r.ref, r.from, r.to, r.driver && r.driver.name, r.vehicle && r.vehicle.name].join(' ').toLowerCase().includes(q))
+    .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));
+  const per = 25;
+  const pages = Math.max(1, Math.ceil(alle.length / per));
+  const page = Math.min(pages, Math.max(1, Number(req.body.page) || 1));
+  res.json({
+    items: alle.slice((page - 1) * per, page * per),
+    total: alle.length, page, pages,
+    omzet: alle.reduce((s2, r) => s2 + (r.quote || 0), 0)
+  });
+});
+
+// Volledige ritgeschiedenis als CSV, op de server opgebouwd zodat de export
+// compleet is hoe groot de historie ook wordt (token via query voor de download).
+app.get('/api/supplier/rides.csv', (req, res) => {
+  const sess = sessionFor(String(req.query.token || ''));
+  if (!sess || sess.role !== 'supplier') return res.status(401).end();
+  const alle = db.data.rides
+    .filter(r => r.supplierCode === sess.code && (r.status === 'afgerond' || r.status === 'gearriveerd'))
+    .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));
+  const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="ritten-' + sess.code.toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.csv"');
+  res.write('\uFEFF' + ['datum', 'referentie', 'gast', 'van', 'naar', 'km', 'personen', 'prijs', 'chauffeur', 'voertuig'].join(';') + '\n');
+  for (const r of alle) {
+    res.write([
+      String(r.finishedAt || r.at).slice(0, 16).replace('T', ' '), r.ref, r.customerCodename,
+      r.from || '', r.to || '', r.km || '', r.passengers || 1,
+      (r.quote || 0).toFixed(2).replace('.', ','),
+      r.driver ? r.driver.name : '', r.vehicle ? r.vehicle.name : ''
+    ].map(esc).join(';') + '\n');
+  }
+  res.end();
+});
+
 app.post('/api/supplier/fleet', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
   const s = req.supplier;
@@ -3287,7 +3346,9 @@ app.post('/api/order/pay', auth, (req, res) => {
 });
 
 app.post('/api/orders/mine', auth, (req, res) => {
-  res.json({ orders: db.data.orders.filter(o => (o.customerKey || o.customerTier) === req.session.key) });
+  // schaalvast: de laatste 25 bestellingen plus het eerlijke totaal
+  const mijn = db.data.orders.filter(o => (o.customerKey || o.customerTier) === req.session.key);
+  res.json({ orders: mijn.slice(0, 25), total: mijn.length });
 });
 
 /* ================= LIVE REIS (onderweg) =================
@@ -3633,13 +3694,65 @@ function officeState() {
     prices: db.data.supplierPrices.slice(0, 60),
     orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').slice(0, 60),
     rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').slice(0, 60),
-    live,
+    live: live.slice(0, 40),
     applications: applications.slice(0, 40),
     suppliers: db.data.suppliers.map(publicSupplier),
     partnerApplications: (db.data.partnerApplications || []).slice(0, 40),
-    stats, week, performance, alerts: alerts.slice(0, 20)
+    stats, week, performance: performance.slice(0, 12), alerts: alerts.slice(0, 20),
+    // totalen over de volledige data, zodat de schermen eerlijk blijven
+    // vertellen hoeveel er echt is, hoe groot de lijsten ook worden
+    totals: {
+      orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').length,
+      rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').length,
+      leden: Object.keys(db.data.memberDir || {}).length,
+      partners: db.data.suppliers.length,
+      live: live.length
+    }
   };
 }
+
+// De volledige tijdlijn van bestellingen en ritten: gepagineerd en doorzoekbaar
+// over alles wat er ooit was, niet alleen de laatste zestig regels.
+app.post('/api/office/timeline', officeAuth, (req, res) => {
+  const q = String(req.body.q || '').trim().toLowerCase().slice(0, 60);
+  const past = tekst => !q || tekst.toLowerCase().includes(q);
+  const alles = db.data.orders
+    .filter(o => o.status !== 'wacht-op-betaling' && past([o.supplierName, o.customerCodename, o.ref, o.status].join(' ')))
+    .map(o => ({ soort: 'order', at: o.at, ref: o.ref, supplierName: o.supplierName, customerCodename: o.customerCodename,
+      status: o.status, paid: !!o.paid, bedrag: o.total || 0, sub: o.items.reduce((n, i) => n + i.qty, 0) + ' item(s)' }))
+    .concat(db.data.rides
+      .filter(r => r.status !== 'wacht-op-betaling' && past([r.supplierName, r.customerCodename, r.ref, r.from, r.to, r.status].join(' ')))
+      .map(r => ({ soort: r.type === 'jet' ? 'jet' : 'taxi', at: r.at, ref: r.ref, supplierName: r.supplierName, customerCodename: r.customerCodename,
+        status: r.status, paid: !!r.paid, bedrag: r.quote || 0, sub: (r.from || '') + ' → ' + (r.to || '?'), when: r.plannedFor ? r.when : null })));
+  alles.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  const per = 25;
+  const pages = Math.max(1, Math.ceil(alles.length / per));
+  const page = Math.min(pages, Math.max(1, Number(req.body.page) || 1));
+  res.json({ items: alles.slice((page - 1) * per, page * per), total: alles.length, page, pages });
+});
+
+// Volledige export voor de boekhouding, op de server opgebouwd.
+app.get('/api/office/export.csv', (req, res) => {
+  const sess = sessionFor(String(req.query.token || ''));
+  if (!sess || sess.role !== 'office') return res.status(401).end();
+  const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');
+  res.write('\uFEFF' + ['datum', 'soort', 'partner', 'gast', 'omschrijving', 'status', 'betaald', 'bedrag'].join(';') + '\n');
+  for (const o of db.data.orders) {
+    if (o.status === 'wacht-op-betaling') continue;
+    res.write([String(o.at).slice(0, 16).replace('T', ' '), 'bestelling', o.supplierName, o.customerCodename,
+      o.items.map(i => i.qty + 'x ' + i.name).join(', '), o.status, o.paid ? 'ja' : 'nee',
+      (o.total || 0).toFixed(2).replace('.', ',')].map(esc).join(';') + '\n');
+  }
+  for (const r of db.data.rides) {
+    if (r.status === 'wacht-op-betaling') continue;
+    res.write([String(r.at).slice(0, 16).replace('T', ' '), r.type === 'jet' ? 'jetrit' : 'taxirit', r.supplierName, r.customerCodename,
+      (r.from || '') + ' naar ' + (r.to || '?'), r.status, r.paid ? 'ja' : 'nee',
+      (r.quote || 0).toFixed(2).replace('.', ',')].map(esc).join(';') + '\n');
+  }
+  res.end();
+});
 
 app.get('/api/office/stream', (req, res) => {
   const sess = sessionFor(req.query.token);

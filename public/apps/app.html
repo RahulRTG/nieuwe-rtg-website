@@ -1475,8 +1475,20 @@
         funcs.map(f => '<option>' + f + '</option>').join('') + '</select>' +
         '<button class="vbtn" id="apGo2">' + T('cv.apply','Solliciteer') + '</button></div>'
       : '';
+    const evs = s.events || [];
+    const eventsBlock = evs.length
+      ? '<div class="ms-cat">\uD83C\uDF9F ' + T('ev.h','Events') + '</div>' + evs.map(e =>
+          '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem 1rem;margin-bottom:0.6rem;">' +
+          '<div style="display:flex;justify-content:space-between;gap:0.6rem;align-items:baseline;"><b style="font-size:0.92rem;">' + e.name + '</b><span style="font-size:0.7rem;color:var(--soft);flex-shrink:0;">' + e.date + (e.time ? ' \u00b7 ' + e.time : '') + '</span></div>' +
+          (e.desc ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + e.desc + '</div>' : '') +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;gap:0.6rem;">' +
+          '<span style="font-size:0.72rem;color:' + (e.spotsLeft > 0 ? 'var(--soft)' : 'var(--burgundy)') + ';">' + (e.spotsLeft > 0 ? e.spotsLeft + ' ' + T('ev.spots','plekken vrij') : T('ev.full','Vol')) + (e.price ? ' \u00b7 ' + eur(e.price) + ' p.p.' : ' \u00b7 ' + T('ev.free','gratis')) + '</span>' +
+          (e.spotsLeft > 0 ? '<button class="vbtn" data-rsvp="' + e.id + '">' + T('ev.join','Zet mij op de lijst') + '</button>' : '') +
+          '</div></div>'
+        ).join('')
+      : '';
     const cats = [...new Set(m.map(x => x.cat))];
-    $('#msBody').innerHTML = head + applyBlock + cats.map(c =>
+    $('#msBody').innerHTML = head + eventsBlock + applyBlock + cats.map(c =>
       '<div class="ms-cat">' + c + '</div>' + m.filter(x => x.cat === c).map(x => {
         const q = menuState.qty[x.id] || 0;
         return '<div class="ms-item" data-id="' + x.id + '">' +
@@ -1491,6 +1503,13 @@
     ).join('');
     const apGo = $('#apGo2');
     if (apGo) apGo.addEventListener('click', () => memberApply(menuState.supplier.code, $('#apFunc2').value, ''));
+    document.querySelectorAll('[data-rsvp]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await API.call('/event/rsvp', { supplierCode: menuState.supplier.code, eventId: b.dataset.rsvp, qty: 1 });
+        toast(T('ev.joined','U staat op de gastenlijst. Uw codenaam is uw toegang.'));
+        await openMenu(menuState.supplier.code); // sheet ververst: plekken en knop kloppen weer
+      } catch(e){ toast(e.message); }
+    }));
     $('#msBody').querySelectorAll('.ms-item').forEach(el => {
       const id = el.dataset.id;
       el.querySelector('.js-plus').addEventListener('click', () => { menuState.qty[id] = (menuState.qty[id]||0)+1; renderMenuSheet(); });
@@ -2187,6 +2206,8 @@ window.I18N = { en: {
   'cv.card.build':'Build your resume once with the resume builder, then apply at every RTG partner the same way.',
   'cv.card.edit':'Edit my resume', 'cv.card.make':'Build my resume',
   'cv.workat':'Work at', 'cv.apply':'Apply', 'cv.applied':'Application sent, with your RTG resume attached.',
+  'ev.h':'Events', 'ev.spots':'spots left', 'ev.full':'Full', 'ev.free':'free',
+  'ev.join':'Put me on the list', 'ev.joined':'You are on the guest list. Your code name is your entry.',
   'cv.st.hired':'hired', 'cv.st.rejected':'not selected', 'cv.st.new':'under review', 'app.logout':'Sign out',
   'app.priv.export':'Download my data', 'app.priv.delete':'Delete my data',
   'app.priv.note':'Your GDPR rights: access and erasure, no forms needed. Deleting wipes your resume, chats, likes and location and signs you out everywhere.',

@@ -219,6 +219,8 @@ function ensureSupplierDefaults(s) {
   const caps = ((db.data.supplierTypes || {})[s.type] || {}).caps || [];
   if (caps.includes('menu') && !Array.isArray(s.tables))
     s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
+  // horecazaken kunnen events organiseren (het Kantoor maakt ze, leden melden zich aan)
+  if (['restaurant', 'bar', 'club'].includes(s.type) && !Array.isArray(s.events)) s.events = [];
   // elk gerecht hoort bij een werkplek: de keuken of de bar; de manager kan
   // dit per item omzetten onder Menu. Bars/clubs bereiden standaard aan de bar.
   for (const m of (s.menu || []))
@@ -935,6 +937,11 @@ function publicSupplier(s, lang) {
            reservationsOpen: !s.settings || s.settings.reservationsOpen !== false,
            tablesFree: (s.tables || []).filter(x => x.status === 'vrij').length,
            photos: s.photos || [],
+           events: (s.events || []).filter(e => e.published).map(e => ({
+             id: e.id, name: e.name, date: e.date, time: e.time, desc: e.desc, price: e.price,
+             capacity: e.capacity,
+             spotsLeft: Math.max(0, e.capacity - (e.guests || []).reduce((n, g) => n + g.qty, 0))
+           })),
            rooms: (s.rooms || []).filter(r => r.available).map(r => ({ id: r.id, name: r.name, desc: i18n.localize(r.desc, lang), price: r.price })) };
 }
 
@@ -982,6 +989,7 @@ function supplierState(s, actor) {
     notifications: db.data.supplierNotifications[s.code] || [],
     staff: accounts.listStaff(s.code).map(accounts.publicStaff),
     applications: (db.data.applications[s.code] || []).slice(0, 30),
+    events: s.events || null,
     activity: (db.data.supplierActivity[s.code] || []).slice(0, 40),
     team: (db.data.supplierTeam[s.code] || []).slice(-60),
     actor: actor || { name: 'Beheer', role: 'manager', manager: true }
@@ -1718,6 +1726,74 @@ app.post('/api/privacy/delete', auth, (req, res) => {
   save();
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
   res.json({ ok: true });
+});
+
+/* ---- events: het Kantoor maakt ze, leden melden zich aan, de deur checkt in ---- */
+app.post('/api/supplier/event', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const s = req.supplier;
+  if (!Array.isArray(s.events)) return res.status(400).json({ error: 'Events zijn er voor restaurants, bars en clubs.' });
+  const a = String(req.body.action || '');
+  if (a === 'add') {
+    const name = String((req.body.event || {}).name || '').trim().slice(0, 80);
+    const date = String((req.body.event || {}).date || '').slice(0, 10);
+    if (!name || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ error: 'Vul minimaal een naam en datum in.' });
+    const e = {
+      id: crypto.randomBytes(4).toString('hex'),
+      name, date,
+      time: String((req.body.event || {}).time || '').slice(0, 5),
+      desc: String((req.body.event || {}).desc || '').trim().slice(0, 200),
+      capacity: Math.min(2000, Math.max(1, parseInt((req.body.event || {}).capacity, 10) || 50)),
+      price: Math.max(0, Number((req.body.event || {}).price) || 0),
+      published: false, guests: [], at: new Date().toISOString()
+    };
+    s.events.unshift(e);
+    s.events = s.events.slice(0, 40);
+    logActivity(s.code, req.actor, 'maakte event "' + name + '" aan');
+  } else {
+    const e = s.events.find(x => x.id === req.body.id);
+    if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+    if (a === 'publish') { e.published = !e.published; logActivity(s.code, req.actor, (e.published ? 'publiceerde' : 'haalde offline') + ' event "' + e.name + '"'); }
+    else if (a === 'remove') { s.events = s.events.filter(x => x.id !== req.body.id); logActivity(s.code, req.actor, 'verwijderde event "' + e.name + '"'); }
+    else return res.status(400).json({ error: 'Onbekende actie.' });
+  }
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'events');
+  sseToSupplier(s.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, events: s.events });
+});
+
+// aan de deur: gast afvinken (elke medewerker mag dit, op eigen naam)
+app.post('/api/supplier/event/checkin', supplierAuth, (req, res) => {
+  const e = (req.supplier.events || []).find(x => x.id === req.body.eventId);
+  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  const g = (e.guests || []).find(x => x.key === req.body.key);
+  if (!g) return res.status(404).json({ error: 'Gast niet gevonden.' });
+  g.checkedIn = !g.checkedIn;
+  save();
+  logActivity(req.supplier.code, req.actor, (g.checkedIn ? 'checkte ' : 'zette check-in terug voor ') + g.codename + ' in bij "' + e.name + '"');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, event: e });
+});
+
+// lid meldt zich aan voor een gepubliceerd event
+app.post('/api/event/rsvp', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  const e = s && (s.events || []).find(x => x.id === req.body.eventId && x.published);
+  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  const qty = Math.min(8, Math.max(1, parseInt(req.body.qty, 10) || 1));
+  const taken = (e.guests || []).reduce((n, g) => n + g.qty, 0);
+  if (e.guests.some(g => g.key === req.session.key)) return res.status(409).json({ error: 'U staat al op de gastenlijst.' });
+  if (taken + qty > e.capacity) return res.status(409).json({ error: 'Dit event is vol.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  e.guests.push({ key: req.session.key, codename, qty, at: new Date().toISOString(), checkedIn: false });
+  save();
+  notifySupplier(s.code, { icon: '\uD83C\uDF9F', title: 'Aanmelding voor ' + e.name, body: codename + ', ' + qty + ' pers.' });
+  notify(req.session.tier, { icon: '\uD83C\uDF9F', title: s.name, body: 'U staat op de gastenlijst van ' + e.name + ' (' + e.date + (e.time ? ', ' + e.time : '') + '), ' + qty + ' pers. Uw codenaam is uw toegang.', scope: 'events' });
+  sseToSupplier(s.code, 'sync', { scope: 'events' });
+  sseToOffice('sync', { scope: 'events' });
+  res.json({ ok: true, spotsLeft: Math.max(0, e.capacity - taken - qty) });
 });
 
 /* ---- partner-onboarding: bedrijven melden zichzelf aan ----

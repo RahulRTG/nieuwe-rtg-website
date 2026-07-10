@@ -417,6 +417,18 @@
   .st-badge.bezig{color:var(--gold);border-color:rgba(169,143,28,0.5);}
   .st-tblgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:0.5rem;}
   .mn-station{background:none;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.55rem;font-size:0.72rem;color:var(--muted);}
+  .st-chips{grid-column:1/-1;display:flex;gap:0.45rem;flex-wrap:wrap;}
+  .st-chips button{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.78rem;color:var(--muted);}
+  .st-chips button.on{border-color:var(--gold);color:var(--gold);}
+  .st-row{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.86rem;}
+  .st-row:last-child{border-bottom:none;}
+  .st-row .sub{display:block;font-size:0.68rem;color:var(--soft);}
+  .st-row .acts{display:flex;gap:0.4rem;flex-shrink:0;}
+  .st-in{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.65rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;}
+  .st-form{display:grid;gap:0.5rem;margin-top:0.6rem;}
+  .tkc h3{font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  .ev-bar{height:5px;border-radius:99px;background:var(--card2);overflow:hidden;}
+  .ev-bar i{display:block;height:100%;background:var(--gold);}
   .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:rgba(12,12,11,0.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;padding:0.55rem 0.4rem calc(env(safe-area-inset-bottom,0px) + 0.55rem);overflow-x:auto;scrollbar-width:none;}
   .tabbar::-webkit-scrollbar{display:none;}
   .tabbar button{flex:1;min-width:64px;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:0.25rem;font-size:0.56rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);}
@@ -769,7 +781,9 @@
       const st = [
         ['keuken','\uD83D\uDD25',T('st.keuken','Keuken-scherm'),T('st.keuken.s','Bontickets, bump-knoppen, allergieen groot in beeld')],
         ['bar','\uD83C\uDF78',T('st.bar','Bar-scherm'),T('st.bar.s','Drankjes klaarmelden, ophaalcodes groot in beeld')],
-        ['bediening','\uD83E\uDDFE',T('st.bediening','Bedieningspost'),T('st.bediening.s','Uitserveren, tafels en de PDA op een plek')]
+        ['bediening','\uD83E\uDDFE',T('st.bediening','Bedieningspost'),T('st.bediening.s','Uitserveren, tafels en de PDA op een plek')],
+        ['events','\uD83C\uDF9F',T('st.events','Events-scherm'),T('st.events.s','Gastenlijst en check-in aan de deur')],
+        ['kantoor','\uD83D\uDDDD',T('st.kantoor','Kantoor'),T('st.kantoor.s','Alles aanpassen: HR, keuken, bar, bediening en events (alleen management)')]
       ];
       $('#spList').innerHTML += '<div style="margin:0.9rem 0 0.4rem;font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);">'+T('st.h','Werkplekken')+'</div>' +
         st.map(r => '<button class="sp-person" data-station="'+r[0]+'"><span class="av">'+r[1]+'</span><span><b>'+r[2]+'</b><span>'+r[3]+'</span></span></button>').join('');
@@ -790,10 +804,13 @@
 
   // Werkplek openen: iedereen van het team mag dat, op eigen naam en PIN.
   function renderStationPersons(){
-    const all = gateRoster.staff || [];
-    const naam = { keuken: T('st.keuken','Keuken-scherm'), bar: T('st.bar','Bar-scherm'), bediening: T('st.bediening','Bedieningspost') }[pendingStation] || '';
+    let all = gateRoster.staff || [];
+    if (pendingStation === 'kantoor') all = all.filter(m => m.role === 'manager');
+    const naam = stationLabel(pendingStation);
     spH2().textContent = naam;
-    spDeck().textContent = T('st.pickname','Wie opent deze werkplek? Kies uw naam en voer uw pincode in.');
+    spDeck().textContent = pendingStation === 'kantoor'
+      ? T('st.pickmgr','Het Kantoor is voor eigenaren en managers. Kies uw naam en voer uw pincode in.')
+      : T('st.pickname','Wie opent deze werkplek? Kies uw naam en voer uw pincode in.');
     $('#spList').innerHTML = (all.map(m =>
       '<button class="sp-person" data-sid="'+m.id+'" data-name="'+m.name.replace(/"/g,'&quot;')+'" data-role="'+m.role+'">'+
         '<span class="av">'+initials(m.name)+'</span><span><b>'+m.name+'</b><span>'+(m.func||T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker'))+'</span></span></button>'
@@ -973,7 +990,8 @@
     return [...set];
   }
   function stationLabel(st){
-    return { keuken: T('st.keuken','Keuken-scherm'), bar: T('st.bar','Bar-scherm'), bediening: T('st.bediening','Bedieningspost') }[st] || st;
+    return { keuken: T('st.keuken','Keuken-scherm'), bar: T('st.bar','Bar-scherm'), bediening: T('st.bediening','Bedieningspost'),
+             events: T('st.events','Events-scherm'), kantoor: T('st.kantoor','Kantoor') }[st] || st;
   }
   function tickClock(){
     const el = $('#stClock');
@@ -1050,6 +1068,24 @@
       }
       html += '<div class="st-sec">'+T('st.more','Meer')+'</div>'+
         '<a class="tkc" style="text-decoration:none;align-items:flex-start;" href="/apps/personeel.html"><b style="font-size:0.95rem;">\uD83D\uDCF1 '+T('st.pda','Open de volledige PDA')+'</b><span style="font-size:0.74rem;color:var(--soft);">'+T('st.pda.s','Rooster, taken, teamchat, walkie-talkie en SOS.')+'</span></a>';
+    } else if (stationMode === 'events'){
+      const evs = state.events || [];
+      html += evs.length ? evs.map(e => {
+        const taken = (e.guests||[]).reduce((n,g)=>n+g.qty,0);
+        const inb = (e.guests||[]).filter(g=>g.checkedIn).reduce((n,g)=>n+g.qty,0);
+        return '<div class="tkc'+(e.published?'':' dim')+'">'+
+          '<div class="tkc-top"><span style="font-size:1.05rem;font-weight:600;">'+e.name+(e.published?'':' \u00b7 '+T('ev.concept','concept'))+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
+          (e.desc?'<div class="tkc-who">'+e.desc+'</div>':'')+
+          '<div class="tkc-who">'+taken+' / '+e.capacity+' '+T('ev.signedup','aangemeld')+' \u00b7 '+inb+' '+T('ev.inside','binnen')+(e.price?' \u00b7 '+eur(e.price)+' p.p.':'')+'</div>'+
+          '<div class="ev-bar"><i style="width:'+Math.min(100, Math.round(taken/e.capacity*100))+'%;"></i></div>'+
+          ((e.guests||[]).length ? '<div style="display:flex;flex-direction:column;">'+e.guests.map(g =>
+            '<div class="st-row"><span>'+g.codename+' \u00b7 '+g.qty+' '+T('ev.pers','pers.')+'</span>'+
+            '<button class="obtn'+(g.checkedIn?' primary':'')+'" data-evcheck="'+e.id+'" data-key="'+g.key+'">'+(g.checkedIn?'\u2713 '+T('ev.in','binnen'):T('ev.checkin','Check in'))+'</button></div>'
+          ).join('')+'</div>' : '<div class="tkc-who">'+T('ev.noguests','Nog geen aanmeldingen.')+'</div>')+
+        '</div>';
+      }).join('') : '<div class="st-empty">'+T('ev.none','Nog geen events. De manager maakt ze aan in het Kantoor; leden melden zich aan via de leden-app.')+'</div>';
+    } else if (stationMode === 'kantoor'){
+      html += renderKantoor();
     } else {
       const st = stationMode;
       const mine = live.filter(o => (o.items||[]).some(it => stationOf(it) === st));
@@ -1070,6 +1106,140 @@
     }));
     el.querySelectorAll('[data-sttbl]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/table/status', { id: b.dataset.sttbl, status: TBL_NEXT[b.dataset.cur]||'vrij' }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-evcheck]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/event/checkin', { eventId: b.dataset.evcheck, key: b.dataset.key }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    if (stationMode === 'kantoor') bindKantoor(el);
+  }
+
+  /* ---- het Kantoor: de eigenaar/manager past hier alles aan ---- */
+  let kantoorSec = 'hr', kantoorMsg = '';
+  function renderKantoor(){
+    const secs = [
+      ['hr','\uD83D\uDC65',T('kt.hr','HR & team')],
+      ['keuken','\uD83D\uDD25',T('kt.keuken','Keuken')],
+      ['bar','\uD83C\uDF78','Bar'],
+      ['bediening','\uD83E\uDDFE',T('kt.bediening','Bediening')],
+      ['events','\uD83C\uDF9F','Events']
+    ];
+    let html = '<div class="st-chips">'+secs.map(s2 =>
+      '<button data-ksec="'+s2[0]+'"'+(kantoorSec===s2[0]?' class="on"':'')+'>'+s2[1]+' '+s2[2]+'</button>').join('')+'</div>';
+    if (kantoorMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+kantoorMsg+'</div>'; }
+
+    if (kantoorSec === 'hr'){
+      const apps = (state.applications||[]).filter(x=>x.status==='nieuw');
+      html += '<div class="tkc"><h3>'+T('kt.sollicitaties','Sollicitaties')+(apps.length?' ('+apps.length+')':'')+'</h3>'+
+        (apps.length ? apps.map(x=>'<div class="st-row"><span>'+x.name+' \u00b7 '+x.func+(x.viaRTG?' \u00b7 RTG':'')+'<span class="sub">'+x.contact+'</span></span>'+
+          '<span class="acts"><button class="obtn primary" data-khire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-kno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button></span></div>').join('')
+        : '<div class="tkc-who">'+T('kt.noapps','Geen open sollicitaties.')+'</div>')+'</div>';
+      html += '<div class="tkc"><h3>'+T('kt.team','Team & pincodes')+'</h3>'+
+        (state.staff||[]).map(m=>'<div class="st-row"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+'</span></span>'+
+          '<span class="acts">'+(m.id!==actor().staffId?'<button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.remove','Verwijder')+'</button>':'')+'</span></div>').join('')+
+        '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name','Naam')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
+        '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
+        '<button class="bigbtn" id="ktAdd" style="margin-top:0.2rem;">'+T('kt.add','Toevoegen, PIN verschijnt eenmalig')+'</button></div></div>';
+      html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
+        '<button class="obtn" id="ktBuzz" style="margin-top:0.4rem;">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
+    }
+    if (kantoorSec === 'keuken' || kantoorSec === 'bar'){
+      const stn = kantoorSec;
+      const items = (state.menu||[]).filter(m=>(m.station==='bar')===(stn==='bar'));
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(stn==='bar'?'\uD83C\uDF78 Bar':'\uD83D\uDD25 '+T('kt.keuken','Keuken'))+' \u00b7 '+items.length+' '+T('kt.items','items op de kaart')+'</h3>'+
+        (items.length ? items.map(x=>'<div class="st-row"><span>'+x.name+'<span class="sub">'+x.cat+' \u00b7 '+eur(x.price)+'</span></span>'+
+          '<span class="acts"><button class="obtn" data-kst="'+x.id+'">\u21c4 '+(stn==='bar'?T('kt.tokeuken','naar keuken'):T('kt.tobar','naar bar'))+'</button><button class="obtn warn" data-kmdel="'+x.id+'">\u2715</button></span></div>').join('')
+        : '<div class="tkc-who">'+T('kt.noitems','Nog niets op de kaart voor deze werkplek.')+'</div>')+
+        '<div class="st-form"><input class="st-in" id="ktMn" placeholder="'+T('menu.name','Naam')+'"><div style="display:flex;gap:0.5rem;"><input class="st-in" id="ktMc" placeholder="'+T('menu.cat','Categorie')+'" style="flex:2;"><input class="st-in" id="ktMp" type="number" inputmode="decimal" placeholder="\u20ac" style="flex:1;"></div>'+
+        '<button class="bigbtn" id="ktMAdd" style="margin-top:0.2rem;">'+T('kt.addcard','Zet op de kaart bij ')+(stn==='bar'?'de bar':T('kt.dekitchen','de keuken'))+'</button></div></div>';
+    }
+    if (kantoorSec === 'bediening'){
+      const st2 = state.settings || {};
+      html += '<div class="tkc"><h3>'+T('kt.open','Open of dicht')+'</h3>'+
+        '<div class="st-row"><span>'+T('bh.orders','Bestellingen')+'<span class="sub">'+T('kt.orders.s','Leden kunnen bestellen via de app')+'</span></span><button class="obtn'+(st2.ordersOpen!==false?' primary':' warn')+'" data-ktoggle="ordersOpen">'+(st2.ordersOpen!==false?T('kt.isopen','Open'):T('kt.isclosed','Dicht'))+'</button></div>'+
+        '<div class="st-row"><span>'+T('bh.res','Reserveringen')+'<span class="sub">'+T('kt.res.s','Nieuwe reserveringen aannemen')+'</span></span><button class="obtn'+(st2.reservationsOpen!==false?' primary':' warn')+'" data-ktoggle="reservationsOpen">'+(st2.reservationsOpen!==false?T('kt.isopen','Open'):T('kt.isclosed','Dicht'))+'</button></div></div>';
+      html += '<div class="tkc"><h3>'+T('kt.tafels','Tafelindeling')+'</h3>'+
+        (state.tables||[]).map(t=>'<div class="st-row"><span>'+t.name+'<span class="sub">'+t.seats+' '+T('tbl.pers','pers.')+' \u00b7 '+tTbl(t.status)+'</span></span>'+
+          '<span class="acts"><button class="obtn" data-sttbl="'+t.id+'" data-cur="'+t.status+'">\u21bb</button><button class="obtn warn" data-ktdel="'+t.id+'">\u2715</button></span></div>').join('')+
+        '<div class="st-form"><div style="display:flex;gap:0.5rem;"><input class="st-in" id="ktTn" placeholder="'+T('kt.tafelnaam','Tafelnaam')+'" style="flex:2;"><input class="st-in" id="ktTs" type="number" placeholder="4" style="flex:1;"></div>'+
+        '<button class="bigbtn" id="ktTAdd" style="margin-top:0.2rem;">'+T('kt.tafeladd','Tafel toevoegen')+'</button></div></div>';
+    }
+    if (kantoorSec === 'events'){
+      const evs = state.events || [];
+      html += '<div class="tkc"><h3>'+T('kt.newevent','Nieuw event')+'</h3><div class="st-form">'+
+        '<input class="st-in" id="kEvName" placeholder="'+T('kt.ev.name','Naam, bijv. Jazz & sake night')+'">'+
+        '<div style="display:flex;gap:0.5rem;"><input class="st-in" id="kEvDate" type="date" style="flex:2;"><input class="st-in" id="kEvTime" type="time" style="flex:1;"></div>'+
+        '<input class="st-in" id="kEvDesc" placeholder="'+T('kt.ev.desc','Korte omschrijving')+'">'+
+        '<div style="display:flex;gap:0.5rem;"><input class="st-in" id="kEvCap" type="number" placeholder="'+T('kt.ev.cap','Capaciteit')+'" style="flex:1;"><input class="st-in" id="kEvPrice" type="number" placeholder="'+T('kt.ev.price','Prijs p.p. (0 = gratis)')+'" style="flex:1;"></div>'+
+        '<button class="bigbtn" id="kEvAdd" style="margin-top:0.2rem;">'+T('kt.ev.add','Maak aan als concept')+'</button></div></div>';
+      html += evs.map(e=>{
+        const taken=(e.guests||[]).reduce((n,g)=>n+g.qty,0);
+        return '<div class="tkc'+(e.published?'':' dim')+'"><div class="tkc-top"><span style="font-weight:600;">'+e.name+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
+        '<div class="tkc-who">'+taken+' / '+e.capacity+' '+T('ev.signedup','aangemeld')+(e.price?' \u00b7 '+eur(e.price)+' p.p.':'')+'</div>'+
+        '<div class="tkc-act"><button class="'+(e.published?'tkc-start':'tkc-ready')+'" data-kevpub="'+e.id+'">'+(e.published?T('kt.ev.offline','Haal offline'):T('kt.ev.publish','Publiceer voor leden'))+'</button>'+
+        '<button class="tkc-start" data-kevdel="'+e.id+'" style="flex:0 0 auto;">\u2715</button></div></div>';
+      }).join('');
+    }
+    return html;
+  }
+
+  function bindKantoor(el){
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; renderStation(); }));
+    el.querySelectorAll('[data-khire]').forEach(b => b.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/apply/decide', { id: b.dataset.khire, action: 'aannemen' });
+        kantoorMsg = '\u2705 '+T('kt.hired','Aangenomen.')+' <b>'+d.staff.name+'</b> \u00b7 PIN: <b style="color:var(--gold);">'+d.pin+'</b> ('+T('kt.pinonce','geef eenmalig door')+')';
+        await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kno]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/apply/decide', { id: b.dataset.kno, action: 'afwijzen' }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/staff/remove', { staffId: b.dataset.kdel }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    const ktAdd = el.querySelector('#ktAdd'); if (ktAdd) ktAdd.addEventListener('click', async () => {
+      const name = el.querySelector('#ktName').value.trim(); if(!name){ toast(T('kt.fillname','Vul een naam in.')); return; }
+      try { const d = await API.call('/supplier/staff/add', { name, func: el.querySelector('#ktFunc').value.trim(), role: el.querySelector('#ktRole').value });
+        kantoorMsg = '\u2705 <b>'+d.staff.name+'</b> \u00b7 PIN: <b style="color:var(--gold);">'+d.pin+'</b> ('+T('kt.pinonce','geef eenmalig door')+')';
+        await refresh(); } catch(e){ toast(e.message); }
+    });
+    const ktBuzz = el.querySelector('#ktBuzz'); if (ktBuzz) ktBuzz.addEventListener('click', async () => {
+      try { await API.call('/supplier/team/buzz', { all: true }); toast(T('kt.buzzed','Iedereen opgeroepen.')); } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-kst]').forEach(b => b.addEventListener('click', async () => {
+      const menu = (state.menu||[]).map(x => x.id === b.dataset.kst ? { ...x, station: x.station === 'bar' ? 'keuken' : 'bar' } : x);
+      try { await API.call('/supplier/menu', { menu }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kmdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/menu', { menu: (state.menu||[]).filter(x=>x.id!==b.dataset.kmdel) }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    const ktM = el.querySelector('#ktMAdd'); if (ktM) ktM.addEventListener('click', async () => {
+      const name = el.querySelector('#ktMn').value.trim(), price = Number(el.querySelector('#ktMp').value);
+      if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
+      const item = { id: 'm'+Date.now().toString(36), cat: el.querySelector('#ktMc').value.trim()||T('menu.other','Overig'), name, desc:'', price, allergens:[], station: kantoorSec };
+      try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); await refresh(); } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-ktoggle]').forEach(b => b.addEventListener('click', async () => {
+      const k = b.dataset.ktoggle, cur = (state.settings||{})[k] !== false;
+      try { const body = {}; body[k] = !cur; await API.call('/supplier/settings', body); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-ktdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/table/remove', { id: b.dataset.ktdel }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    const ktT = el.querySelector('#ktTAdd'); if (ktT) ktT.addEventListener('click', async () => {
+      const name = el.querySelector('#ktTn').value.trim(); if(!name){ toast(T('kt.filltafel','Geef de tafel een naam.')); return; }
+      try { await API.call('/supplier/table/add', { name, seats: Number(el.querySelector('#ktTs').value)||4 }); await refresh(); } catch(e){ toast(e.message); }
+    });
+    const kEv = el.querySelector('#kEvAdd'); if (kEv) kEv.addEventListener('click', async () => {
+      const name = el.querySelector('#kEvName').value.trim(), date = el.querySelector('#kEvDate').value;
+      if (!name || !date){ toast(T('kt.ev.fill','Vul minimaal een naam en datum in.')); return; }
+      try { await API.call('/supplier/event', { action:'add', event: { name, date, time: el.querySelector('#kEvTime').value, desc: el.querySelector('#kEvDesc').value.trim(), capacity: Number(el.querySelector('#kEvCap').value)||50, price: Number(el.querySelector('#kEvPrice').value)||0 } });
+        kantoorMsg = '\u2705 '+T('kt.ev.made','Event aangemaakt als concept. Publiceer hem zodra hij af is.');
+        await refresh(); } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-kevpub]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/event', { action:'publish', id: b.dataset.kevpub }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kevdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/event', { action:'remove', id: b.dataset.kevdel }); await refresh(); } catch(e){ toast(e.message); }
     }));
   }
 
@@ -2314,6 +2484,28 @@ window.I18N = { en: {
   'st.done':'Marked ready, waiting to be served', 'st.unpaid':'unpaid',
   'st.b.klaar':'ready', 'st.b.bezig':'working',
   'menu.station':'Workstation', 'menu.keuken':'Kitchen', 'menu.stmoved':'Moved to the other station.',
+  'st.events':'Events display', 'st.events.s':'Guest list and door check-in',
+  'st.kantoor':'The Office', 'st.kantoor.s':'Adjust everything: HR, kitchen, bar, service and events (management only)',
+  'st.pickmgr':'The Office is for owners and managers. Pick your name and enter your PIN.',
+  'ev.concept':'draft', 'ev.signedup':'signed up', 'ev.inside':'inside', 'ev.pers':'guests', 'ev.in':'inside',
+  'ev.checkin':'Check in', 'ev.noguests':'No sign-ups yet.',
+  'ev.none':'No events yet. The manager creates them in The Office; members sign up via the member app.',
+  'kt.hr':'HR & team', 'kt.keuken':'Kitchen', 'kt.bediening':'Service',
+  'kt.sollicitaties':'Applications', 'kt.noapps':'No open applications.',
+  'kt.team':'Team & PINs', 'kt.staff':'Staff member', 'kt.remove':'Remove',
+  'kt.name':'Name', 'kt.func':'Role (e.g. Service)', 'kt.add':'Add, PIN shows once',
+  'kt.oproep':'Call the whole team', 'kt.oproep.s':'Make every phone buzz, e.g. for a briefing.',
+  'kt.buzzall':'Buzz everyone', 'kt.buzzed':'Everyone buzzed.',
+  'kt.items':'items on the menu', 'kt.noitems':'Nothing on the menu for this station yet.',
+  'kt.tokeuken':'to kitchen', 'kt.tobar':'to bar', 'kt.addcard':'Put on the menu at ', 'kt.dekitchen':'the kitchen',
+  'kt.open':'Open or closed', 'kt.orders.s':'Members can order through the app', 'kt.res.s':'Accept new reservations',
+  'kt.isopen':'Open', 'kt.isclosed':'Closed',
+  'kt.tafels':'Table layout', 'kt.tafelnaam':'Table name', 'kt.tafeladd':'Add table', 'kt.filltafel':'Give the table a name.',
+  'kt.newevent':'New event', 'kt.ev.name':'Name, e.g. Jazz & sake night', 'kt.ev.desc':'Short description',
+  'kt.ev.cap':'Capacity', 'kt.ev.price':'Price p.p. (0 = free)', 'kt.ev.add':'Create as draft',
+  'kt.ev.fill':'Enter at least a name and date.', 'kt.ev.made':'Event created as draft. Publish it when it is ready.',
+  'kt.ev.publish':'Publish for members', 'kt.ev.offline':'Take offline',
+  'kt.hired':'Hired.', 'kt.pinonce':'share once', 'kt.fillname':'Enter a name.',
   'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',

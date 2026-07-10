@@ -221,6 +221,7 @@ function ensureSupplierDefaults(s) {
     s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
   // horecazaken kunnen events organiseren (het Kantoor maakt ze, leden melden zich aan)
   if (['restaurant', 'bar', 'club'].includes(s.type) && !Array.isArray(s.events)) s.events = [];
+  for (const e of (s.events || [])) if (!Array.isArray(e.runsheet)) e.runsheet = [];
   // elk gerecht hoort bij een werkplek: de keuken of de bar; de manager kan
   // dit per item omzetten onder Menu. Bars/clubs bereiden standaard aan de bar.
   for (const m of (s.menu || []))
@@ -1745,7 +1746,7 @@ app.post('/api/supplier/event', supplierAuth, (req, res) => {
       desc: String((req.body.event || {}).desc || '').trim().slice(0, 200),
       capacity: Math.min(2000, Math.max(1, parseInt((req.body.event || {}).capacity, 10) || 50)),
       price: Math.max(0, Number((req.body.event || {}).price) || 0),
-      published: false, guests: [], at: new Date().toISOString()
+      published: false, guests: [], runsheet: [], at: new Date().toISOString()
     };
     s.events.unshift(e);
     s.events = s.events.slice(0, 40);
@@ -1774,6 +1775,129 @@ app.post('/api/supplier/event/checkin', supplierAuth, (req, res) => {
   logActivity(req.supplier.code, req.actor, (g.checkedIn ? 'checkte ' : 'zette check-in terug voor ') + g.codename + ' in bij "' + e.name + '"');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
   res.json({ ok: true, event: e });
+});
+
+/* ---- het draaiboek: wie doet wat en wanneer, per werkplek ----
+   De manager vult het in het Kantoor (handmatig, geplakt of door de AI
+   voorgesteld); elke regel verschijnt op het scherm van de juiste werkplek:
+   keuken, bar, bediening of de party manager (het Events-scherm). */
+const RUN_STATIONS = ['keuken', 'bar', 'bediening', 'party', 'alle'];
+function runItem(time, station, text) {
+  return {
+    id: crypto.randomBytes(3).toString('hex'),
+    time: /^\d{2}:\d{2}$/.test(time) ? time : '00:00',
+    station: RUN_STATIONS.includes(station) ? station : 'alle',
+    text: String(text || '').trim().slice(0, 140),
+    done: false, doneBy: null
+  };
+}
+// draaiboeken lopen vaak over middernacht heen: 01:00 afbouw hoort NA 23:00,
+// dus alles voor 06:00 telt als "die nacht" en sorteert achteraan
+function runKey(t) { const [h, m] = String(t).split(':').map(Number); return ((h < 6 ? h + 24 : h) * 60 + (m || 0)); }
+function sortRunsheet(e) { e.runsheet.sort((a, b) => runKey(a.time) - runKey(b.time)); }
+
+// handmatig: regel toevoegen of verwijderen (Kantoor)
+app.post('/api/supplier/event/runsheet', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
+  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  e.runsheet = e.runsheet || [];
+  if (req.body.action === 'add') {
+    const it = req.body.item || {};
+    if (!String(it.text || '').trim()) return res.status(400).json({ error: 'Omschrijf wat er moet gebeuren.' });
+    e.runsheet.push(runItem(it.time, it.station, it.text));
+    if (e.runsheet.length > 60) e.runsheet = e.runsheet.slice(0, 60);
+    sortRunsheet(e);
+  } else if (req.body.action === 'remove') {
+    e.runsheet = e.runsheet.filter(x => x.id !== req.body.itemId);
+  } else return res.status(400).json({ error: 'Onbekende actie.' });
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, event: e });
+});
+
+// afvinken op de werkvloer (elke medewerker, op eigen naam)
+app.post('/api/supplier/event/runsheet/done', supplierAuth, (req, res) => {
+  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
+  const it = e && (e.runsheet || []).find(x => x.id === req.body.itemId);
+  if (!it) return res.status(404).json({ error: 'Regel niet gevonden.' });
+  it.done = !it.done;
+  it.doneBy = it.done ? req.actor.name : null;
+  save();
+  if (it.done) logActivity(req.supplier.code, req.actor, 'vinkte af: ' + it.time + ' ' + it.text + ' (' + e.name + ')');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, event: e });
+});
+
+// AI-hulp: een draaiboek voorstellen, of geplakte/geuploade tekst omzetten
+function fallbackRunsheet(e) {
+  // zonder Claude-sleutel: een gedegen standaard-draaiboek rond de starttijd
+  const start = /^\d{2}:\d{2}$/.test(e.time || '') ? e.time : '20:00';
+  const [h, m] = start.split(':').map(Number);
+  const at = min => { const t = h * 60 + m + min; const hh = Math.floor(((t % 1440) + 1440) % 1440 / 60), mm = ((t % 1440) + 1440) % 1440 % 60; return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0'); };
+  return [
+    runItem(at(-180), 'keuken', 'Mise en place voor ' + e.name + ', voorraad controleren'),
+    runItem(at(-120), 'bar', 'Bar bevoorraden, koeling vullen, ijs en garnering klaar'),
+    runItem(at(-90), 'bediening', 'Zaal en tafels inrichten volgens de indeling'),
+    runItem(at(-60), 'party', 'Techniek en muziek testen, licht instellen'),
+    runItem(at(-30), 'alle', 'Briefing met het hele team: verloop, allergieen, vips'),
+    runItem(at(-15), 'party', 'Gastenlijst openen op het Events-scherm, deurpost bemannen'),
+    runItem(at(0), 'party', 'Deuren open, welkom door de party manager'),
+    runItem(at(30), 'bediening', 'Eerste ronde langs alle tafels'),
+    runItem(at(90), 'keuken', 'Bijvullen en tweede uitgifte voorbereiden'),
+    runItem(at(150), 'bar', 'Voorraad peilen, bijbestellen indien nodig'),
+    runItem(at(240), 'party', 'Laatste ronde aankondigen, afrekenen voorbereiden'),
+    runItem(at(270), 'alle', 'Afbouw: zaal, bar en keuken volgens sluitlijst')
+  ];
+}
+function parseRunsheetText(text) {
+  // geplakte regels zoals "18:00 keuken mise en place" of "18.00 - Bar - koeling"
+  const items = [];
+  for (const line of String(text || '').split('\n')) {
+    const l = line.trim(); if (!l) continue;
+    const tm = l.match(/(\d{1,2})[:.](\d{2})/);
+    const time = tm ? String(tm[1]).padStart(2, '0') + ':' + tm[2] : '00:00';
+    const lower = l.toLowerCase();
+    const station = /keuken|kitchen|chef/.test(lower) ? 'keuken'
+      : /\bbar\b|dranken/.test(lower) ? 'bar'
+      : /bediening|service|zaal|tafel/.test(lower) ? 'bediening'
+      : /party|deur|dj|muziek|licht|host/.test(lower) ? 'party' : 'alle';
+    let txt = l.replace(/(\d{1,2})[:.](\d{2})/, '').replace(/^[\s\-\u00b7:,]+/, '').trim();
+    txt = txt.replace(/^(keuken|bar|bediening|party|alle|service)\b[\s\-\u00b7:,]*/i, '').trim();
+    if (txt) items.push(runItem(time, station, txt));
+    if (items.length >= 40) break;
+  }
+  return items;
+}
+app.post('/api/supplier/event/runsheet/ai', supplierAuth, async (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
+  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  const mode = req.body.mode === 'import' ? 'import' : 'suggest';
+  let items = null;
+  if (anthropic) {
+    try {
+      const prompt = mode === 'import'
+        ? 'Zet dit geplakte draaiboek om naar JSON. Bron:\n' + String(req.body.text || '').slice(0, 4000)
+        : 'Stel een professioneel horeca-draaiboek op voor dit event: "' + e.name + '" op ' + e.date + (e.time ? ' om ' + e.time : '') + (e.desc ? ' (' + e.desc + ')' : '') + ', capaciteit ' + e.capacity + '.';
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 1200,
+        system: 'Je bent een horeca-draaiboekplanner. Antwoord UITSLUITEND met een JSON-array van objecten {"time":"HH:MM","station":"keuken|bar|bediening|party|alle","text":"..."}. Maximaal 20 regels, Nederlands, praktisch en concreet. party = de party manager/deur.',
+        messages: [{ role: 'user', content: prompt }]
+      });
+      const raw = (msg.content[0].text.match(/\[[\s\S]*\]/) || [null])[0];
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr) && arr.length) items = arr.slice(0, 20).map(x => runItem(x.time, x.station, x.text));
+    } catch (err) { items = null; }
+  }
+  if (!items) items = mode === 'import' ? parseRunsheetText(req.body.text) : fallbackRunsheet(e);
+  if (!items.length) return res.status(400).json({ error: 'Geen bruikbare regels gevonden. Zet per regel een tijd en een taak.' });
+  e.runsheet = [...(e.runsheet || []), ...items].slice(0, 60);
+  sortRunsheet(e);
+  save();
+  logActivity(req.supplier.code, req.actor, (mode === 'import' ? 'importeerde' : 'liet de AI een') + ' draaiboek ' + (mode === 'import' ? 'voor' : 'opstellen voor') + ' "' + e.name + '" (' + items.length + ' regels)');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
+  res.json({ ok: true, event: e, added: items.length, ai: !!anthropic });
 });
 
 // lid meldt zich aan voor een gepubliceerd event

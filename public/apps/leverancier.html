@@ -1048,6 +1048,34 @@
       act+'</div>';
   }
 
+  // draaiboek-regels voor een werkplek: alle gepubliceerde events vanaf vandaag
+  function runsheetFor(station){
+    const today = new Date().toISOString().slice(0, 10);
+    const out = [];
+    for (const e of (state.events || [])){
+      if (!e.published || (e.date || '') < today) continue;
+      for (const it of (e.runsheet || [])){
+        if (station === 'party' || it.station === station || it.station === 'alle') out.push({ e, it });
+      }
+    }
+    out.sort((a, b) => (a.e.date + a.it.time).localeCompare(b.e.date + b.it.time));
+    return out;
+  }
+  const RUN_ICON = { keuken:'\uD83D\uDD25', bar:'\uD83C\uDF78', bediening:'\uD83E\uDDFE', party:'\uD83C\uDF9F', alle:'\uD83D\uDCE2' };
+  function runsheetStrip(station){
+    const rows = runsheetFor(station);
+    if (!rows.length) return '';
+    return '<div class="st-sec">\uD83D\uDCCB '+T('rs.h','Draaiboek')+'</div>'+
+      '<div class="tkc" style="grid-column:1/-1;">'+rows.map(r =>
+        '<div class="st-row'+(r.it.done?'" style="opacity:0.5;':'"')+'">'+
+        '<span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+r.it.time+'</b>'+
+        (station==='party'?'<span style="margin-right:0.4rem;">'+(RUN_ICON[r.it.station]||'')+'</span>':'')+
+        (r.it.done?'<s>'+r.it.text+'</s>':r.it.text)+
+        '<span class="sub">'+r.e.name+' \u00b7 '+r.e.date+(r.it.done&&r.it.doneBy?' \u00b7 \u2713 '+r.it.doneBy:'')+'</span></span>'+
+        '<button class="obtn'+(r.it.done?' primary':'')+'" data-rundone="'+r.e.id+'" data-item="'+r.it.id+'">'+(r.it.done?'\u2713':T('rs.doit','Gedaan'))+'</button></div>'
+      ).join('')+'</div>';
+  }
+
   function renderStation(){
     const el = $('#stBody'); if (!el || !state) return;
     $('#stBiz').textContent = S ? S.name : '';
@@ -1061,6 +1089,7 @@
       html += serve.length ? serve.map(o => ticketCard(o, null, { serve:true })).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
       html += '<div class="st-sec">'+T('st.making','In de maak')+' ('+making.length+')</div>';
       html += making.length ? making.map(o => ticketCard(o, null, { dim:false, badges:true })).join('') : '<div class="st-empty">'+T('st.nomaking','Geen lopende bestellingen.')+'</div>';
+      html += runsheetStrip('bediening');
       const tables = state.tables || [];
       if (tables.length){
         html += '<div class="st-sec">'+T('st.tables','Tafels, tik om te wisselen')+'</div><div class="st-tblgrid">'+
@@ -1070,6 +1099,7 @@
         '<a class="tkc" style="text-decoration:none;align-items:flex-start;" href="/apps/personeel.html"><b style="font-size:0.95rem;">\uD83D\uDCF1 '+T('st.pda','Open de volledige PDA')+'</b><span style="font-size:0.74rem;color:var(--soft);">'+T('st.pda.s','Rooster, taken, teamchat, walkie-talkie en SOS.')+'</span></a>';
     } else if (stationMode === 'events'){
       const evs = state.events || [];
+      html += runsheetStrip('party');
       html += evs.length ? evs.map(e => {
         const taken = (e.guests||[]).reduce((n,g)=>n+g.qty,0);
         const inb = (e.guests||[]).filter(g=>g.checkedIn).reduce((n,g)=>n+g.qty,0);
@@ -1096,6 +1126,7 @@
         html += '<div class="st-sec">'+T('st.done','Klaargemeld, wacht op uitserveren')+'</div>';
         html += done.map(o => ticketCard(o, st, { dim:true })).join('');
       }
+      html += runsheetStrip(st);
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-stgo]').forEach(b => b.addEventListener('click', async () => {
@@ -1109,6 +1140,9 @@
     }));
     el.querySelectorAll('[data-evcheck]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/event/checkin', { eventId: b.dataset.evcheck, key: b.dataset.key }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-rundone]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/event/runsheet/done', { id: b.dataset.rundone, itemId: b.dataset.item }); await refresh(); } catch(e){ toast(e.message); }
     }));
     if (stationMode === 'kantoor') bindKantoor(el);
   }
@@ -1173,9 +1207,25 @@
         '<button class="bigbtn" id="kEvAdd" style="margin-top:0.2rem;">'+T('kt.ev.add','Maak aan als concept')+'</button></div></div>';
       html += evs.map(e=>{
         const taken=(e.guests||[]).reduce((n,g)=>n+g.qty,0);
-        return '<div class="tkc'+(e.published?'':' dim')+'"><div class="tkc-top"><span style="font-weight:600;">'+e.name+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
-        '<div class="tkc-who">'+taken+' / '+e.capacity+' '+T('ev.signedup','aangemeld')+(e.price?' \u00b7 '+eur(e.price)+' p.p.':'')+'</div>'+
-        '<div class="tkc-act"><button class="'+(e.published?'tkc-start':'tkc-ready')+'" data-kevpub="'+e.id+'">'+(e.published?T('kt.ev.offline','Haal offline'):T('kt.ev.publish','Publiceer voor leden'))+'</button>'+
+        const rs = e.runsheet || [];
+        const stOpts = [['keuken','\uD83D\uDD25 '+T('kt.keuken','Keuken')],['bar','\uD83C\uDF78 Bar'],['bediening','\uD83E\uDDFE '+T('kt.bediening','Bediening')],['party','\uD83C\uDF9F Party manager'],['alle','\uD83D\uDCE2 '+T('rs.all','Iedereen')]];
+        return '<div class="tkc'+(e.published?'':' dim')+'" style="grid-column:1/-1;"><div class="tkc-top"><span style="font-weight:600;">'+e.name+'</span><span class="tkc-age">'+e.date+(e.time?' \u00b7 '+e.time:'')+'</span></div>'+
+        '<div class="tkc-who">'+taken+' / '+e.capacity+' '+T('ev.signedup','aangemeld')+(e.price?' \u00b7 '+eur(e.price)+' p.p.':'')+(e.published?'':' \u00b7 '+T('ev.concept','concept'))+'</div>'+
+        '<h3 style="margin-top:0.4rem;">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' ('+rs.length+')</h3>'+
+        (rs.length ? rs.map(it=>'<div class="st-row"><span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+it.time+'</b>'+(RUN_ICON[it.station]||'')+' '+it.text+(it.done?' <span class="sub" style="display:inline;">\u2713 '+(it.doneBy||'')+'</span>':'')+'</span>'+
+          '<button class="obtn warn" data-krdel="'+e.id+'" data-item="'+it.id+'">\u2715</button></div>').join('')
+          : '<div class="tkc-who">'+T('rs.none','Nog geen draaiboek. Voer regels in, plak een bestaand draaiboek, of laat de AI er een opstellen.')+'</div>')+
+        '<div class="st-form"><div style="display:flex;gap:0.5rem;"><input class="st-in" type="time" id="krT'+e.id+'" style="flex:1;">'+
+        '<select class="st-in" id="krS'+e.id+'" style="flex:1.4;">'+stOpts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></div>'+
+        '<input class="st-in" id="krX'+e.id+'" placeholder="'+T('rs.what','Wat moet er gebeuren?')+'">'+
+        '<button class="obtn" data-kradd="'+e.id+'">'+T('rs.add','Regel toevoegen')+'</button></div>'+
+        '<div class="st-form" style="margin-top:0.7rem;">'+
+        '<textarea class="st-in" id="krP'+e.id+'" placeholder="'+T('rs.paste','Plak hier een bestaand draaiboek (per regel een tijd en taak), of kies een bestand...')+'" style="min-height:64px;resize:vertical;"></textarea>'+
+        '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'+
+        '<label class="obtn" style="cursor:pointer;">\uD83D\uDCC4 '+T('rs.upload','Upload bestand')+'<input type="file" accept=".txt,.csv,.md,text/plain" data-krfile="'+e.id+'" style="display:none;"></label>'+
+        '<button class="obtn" data-krimp="'+e.id+'">'+T('rs.import','Verwerk met AI')+'</button>'+
+        '<button class="obtn primary" data-krai="'+e.id+'">\u2728 '+T('rs.suggest','Laat de AI een draaiboek opstellen')+'</button></div></div>'+
+        '<div class="tkc-act" style="margin-top:0.7rem;"><button class="'+(e.published?'tkc-start':'tkc-ready')+'" data-kevpub="'+e.id+'">'+(e.published?T('kt.ev.offline','Haal offline'):T('kt.ev.publish','Publiceer voor leden'))+'</button>'+
         '<button class="tkc-start" data-kevdel="'+e.id+'" style="flex:0 0 auto;">\u2715</button></div></div>';
       }).join('');
     }
@@ -1240,6 +1290,37 @@
     }));
     el.querySelectorAll('[data-kevdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/event', { action:'remove', id: b.dataset.kevdel }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // draaiboek: regel toevoegen / weghalen / plakken / uploaden / AI
+    el.querySelectorAll('[data-kradd]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.kradd;
+      const text = el.querySelector('#krX'+id).value.trim();
+      if (!text){ toast(T('rs.fill','Omschrijf wat er moet gebeuren.')); return; }
+      try { await API.call('/supplier/event/runsheet', { id, action:'add', item: { time: el.querySelector('#krT'+id).value || '00:00', station: el.querySelector('#krS'+id).value, text } }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-krdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/event/runsheet', { id: b.dataset.krdel, action:'remove', itemId: b.dataset.item }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-krfile]').forEach(inp => inp.addEventListener('change', () => {
+      const f = inp.files && inp.files[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => { el.querySelector('#krP'+inp.dataset.krfile).value = String(rd.result || '').slice(0, 6000); toast(T('rs.loaded','Bestand ingeladen, klik op Verwerk met AI.')); };
+      rd.readAsText(f);
+    }));
+    el.querySelectorAll('[data-krimp]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.krimp;
+      const text = el.querySelector('#krP'+id).value.trim();
+      if (!text){ toast(T('rs.pastefirst','Plak eerst een draaiboek of upload een bestand.')); return; }
+      b.disabled = true;
+      try { const d = await API.call('/supplier/event/runsheet/ai', { id, mode:'import', text });
+        kantoorMsg = '\u2705 '+d.added+' '+T('rs.imported','regels in het draaiboek gezet, verdeeld over de werkplekken.');
+        await refresh(); } catch(e){ toast(e.message); b.disabled = false; }
+    }));
+    el.querySelectorAll('[data-krai]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true; b.textContent = T('rs.thinking','De AI stelt het draaiboek op...');
+      try { const d = await API.call('/supplier/event/runsheet/ai', { id: b.dataset.krai, mode:'suggest' });
+        kantoorMsg = '\u2728 '+d.added+' '+T('rs.suggested','regels voorgesteld. Pas aan wat niet past en publiceer het event.');
+        await refresh(); } catch(e){ toast(e.message); b.disabled = false; }
     }));
   }
 
@@ -2506,6 +2587,13 @@ window.I18N = { en: {
   'kt.ev.fill':'Enter at least a name and date.', 'kt.ev.made':'Event created as draft. Publish it when it is ready.',
   'kt.ev.publish':'Publish for members', 'kt.ev.offline':'Take offline',
   'kt.hired':'Hired.', 'kt.pinonce':'share once', 'kt.fillname':'Enter a name.',
+  'rs.h':'Run sheet', 'rs.all':'Everyone', 'rs.doit':'Done', 'rs.what':'What needs to happen?',
+  'rs.add':'Add line', 'rs.none':'No run sheet yet. Enter lines, paste an existing one, or let the AI draft it.',
+  'rs.paste':'Paste an existing run sheet here (one time and task per line), or pick a file...',
+  'rs.upload':'Upload file', 'rs.import':'Process with AI', 'rs.suggest':'Let the AI draft a run sheet',
+  'rs.fill':'Describe what needs to happen.', 'rs.pastefirst':'Paste a run sheet or upload a file first.',
+  'rs.loaded':'File loaded, click Process with AI.', 'rs.imported':'lines added to the run sheet, routed to the right stations.',
+  'rs.suggested':'lines drafted. Adjust what does not fit and publish the event.', 'rs.thinking':'The AI is drafting...',
   'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',

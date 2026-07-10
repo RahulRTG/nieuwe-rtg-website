@@ -30,6 +30,8 @@ fi
 
 echo ""
 echo "  De site draait zo op:  http://localhost:3000"
+echo "  Er starten drie servers: valt er een uit, dan neemt de volgende het"
+echo "  direct over en wordt de gevallen server automatisch herstart."
 echo "  Dit venster openlaten. Stoppen doe je met Ctrl+C of het venster sluiten."
 echo ""
 

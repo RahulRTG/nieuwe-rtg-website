@@ -19,12 +19,23 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
 - [x] HTTPS-redirect en HSTS zodra `NODE_ENV=production`
 - [x] Dagelijkse back-ups (14 dagen) van db.json en rtg.db, netjes afsluiten bij herstart
 - [x] Waarschuwingen bij het opstarten als demo-instellingen mee naar productie gaan
+- [x] Failover: `npm start` draait drie servers (poort 3001-3003) achter een
+      poortwachter op poort 3000. Valt de actieve server uit, dan neemt de
+      volgende gezonde server het binnen enkele seconden over (met de laatste
+      data van schijf) en wordt de gevallen server automatisch herstart; zodra
+      die weer stabiel is, krijgt hij het werk terug. Alleen de actieve server
+      schrijft naar de database, en het wegschrijven is atomisch zodat een
+      crash nooit een half bestand achterlaat. Een enkele server zonder
+      failover starten kan met `npm run single`.
 
 ## Nog te doen voor livegang (extern)
 
 1. **Domein + hosting.** Node 18+, `npm install && NODE_ENV=production npm start` achter
    een reverse proxy (Caddy/Nginx/hosting-platform) met TLS-certificaat.
    De app leunt op `trust proxy`; zet de proxy zo dat `X-Forwarded-Proto` meekomt.
+   Het failover-trio vangt vastlopers en crashes van de software op; kies bij
+   de hoster daarnaast een pakket met redundante hardware (of twee machines),
+   want tegen een kapotte machine of stroomuitval helpt alleen een tweede machine.
 2. **Omgevingsvariabelen zetten:**
    - `NODE_ENV=production`
    - `OFFICE_CODE=<eigen sterke code>` (vervangt RTG-OFFICE)

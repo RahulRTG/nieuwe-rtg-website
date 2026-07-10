@@ -486,7 +486,36 @@ function myApplications(key) {
 
 /* ---------- endpoints ---------- */
 
-app.get('/api/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claude' : 'demo' }));
+app.get('/api/health', (req, res) => res.json({
+  ok: true, ai: anthropic ? 'claude' : 'demo',
+  server: Number(process.env.RTG_SERVER || 1), active: db.writable,
+  pid: process.pid, up: Math.round(process.uptime())
+}));
+
+/* ---- failover-cluster (server/trio.js): drie servers, een actief ----
+   De poortwachter promoveert of degradeert een server via deze endpoints.
+   Alleen bereikbaar met de clustersleutel die het trio bij de start deelt;
+   draait de server los (zonder sleutel), dan bestaan ze feitelijk niet. */
+const CLUSTER_KEY = process.env.RTG_CLUSTER_KEY || null;
+app.post('/api/cluster/:actie', (req, res) => {
+  if (!CLUSTER_KEY || req.get('x-rtg-cluster') !== CLUSTER_KEY) return res.status(404).json({ error: 'Onbekend.' });
+  const nr = process.env.RTG_SERVER || '1';
+  if (req.params.actie === 'promote') {
+    // Eerst schrijfrecht, dan de verse data van schijf laden (bestaat er nog
+    // geen database, dan wordt de seed nu ook echt bewaard) en tot slot de
+    // realtime-tabellen (sessies, notificaties) opnieuw opbouwen.
+    db.writable = true;
+    try { load(); initRealtime(); } catch (e) {
+      db.writable = false;
+      return res.status(500).json({ error: 'Data laden mislukte: ' + e.message });
+    }
+    console.log('[cluster] server ' + nr + ' neemt over en is nu actief');
+  } else if (req.params.actie === 'demote') {
+    db.writable = false;
+    console.log('[cluster] server ' + nr + ' gaat terug naar standby');
+  } else return res.status(400).json({ error: 'Onbekende actie.' });
+  res.json({ ok: true, active: db.writable });
+});
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
@@ -3440,6 +3469,7 @@ app.use((err, req, res, next) => {
 
 const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
 function backupData() {
+  if (!db.writable) return; // standby-servers maken geen backups, dat doet de actieve
   try {
     const day = new Date().toISOString().slice(0, 10);
     const dir = path.join(BACKUP_DIR, day);
@@ -3471,7 +3501,11 @@ if (PRODUCTION) {
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
-  console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/portaal.html`);
+  if (process.env.RTG_SERVER) {
+    console.log(`klaar op poort ${PORT}, rol: ${db.writable ? 'actief' : 'standby'}`);
+  } else {
+    console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/portaal.html`);
+  }
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 });
 

@@ -38,7 +38,8 @@
 
   #app{display:none;padding:2rem 0 4rem;}
   #app.on{display:block;}
-  .stat{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+  .stat{display:grid;grid-template-columns:repeat(6,1fr);gap:1rem;margin-bottom:1.5rem;}
+  @media (max-width:1000px){.stat{grid-template-columns:repeat(3,1fr);}}
   .stat .b{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.25rem;}
   .stat .l{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
   .stat .v{font-family:'Bodoni Moda',serif;font-size:1.8rem;margin-top:0.3rem;}
@@ -90,6 +91,31 @@
   .cmsg .wa{display:block;font-size:0.58rem;opacity:0.7;margin-bottom:0.2rem;}
   .conv-reply{display:flex;gap:0.5rem;padding:0.9rem 1.25rem;border-top:1px solid var(--line);}
   .conv-reply input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0.7rem 1rem;color:var(--txt);font-family:inherit;font-size:0.88rem;outline:none;}
+
+  /* slimme laag: actiecentrum, briefing, zoeken, prestaties en weekomzet */
+  .panel h2.ph{display:flex;justify-content:space-between;align-items:center;gap:0.8rem;}
+  .hbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.35rem 0.85rem;font-size:0.7rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;}
+  .hbtn:hover{background:rgba(255,255,255,0.05);}
+  .alert{display:flex;align-items:center;gap:0.9rem;padding:0.85rem 1.25rem;border-bottom:1px solid var(--line);font-size:0.85rem;}
+  .alert:last-child{border-bottom:none;}
+  .alert .lv{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .alert.rood .lv{background:var(--burgundy);box-shadow:0 0 0 4px rgba(194,58,94,0.18);animation:livepulse 1.4s infinite;}
+  .alert.amber .lv{background:var(--amber);box-shadow:0 0 0 4px rgba(201,154,46,0.15);}
+  .alert.info .lv{background:var(--green);box-shadow:0 0 0 4px rgba(76,154,117,0.15);}
+  .alert .tx{flex:1;min-width:0;}
+  .brief{margin:0.9rem 1.25rem 0;padding:0.9rem 1.1rem;border:1px solid var(--gold);border-radius:12px;font-size:0.85rem;line-height:1.65;display:none;}
+  .brief.on{display:block;}
+  .zoekbar{margin-bottom:1.5rem;}
+  .zoekbar input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.8rem 1.25rem;color:var(--txt);font-size:0.9rem;outline:none;font-family:'Inter',sans-serif;}
+  .zoekbar input:focus{border-color:var(--gold);}
+  .chart{display:flex;align-items:flex-end;gap:0.6rem;height:170px;padding:1.25rem;}
+  .chart .cb{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;height:100%;justify-content:flex-end;}
+  .chart .cb i{display:block;width:100%;max-width:44px;background:linear-gradient(180deg,var(--gold),rgba(169,143,28,0.3));border-radius:6px 6px 2px 2px;min-height:2px;}
+  .chart .cb.vandaag i{background:linear-gradient(180deg,var(--burgundy),rgba(194,58,94,0.3));}
+  .chart .cb b{font-size:0.64rem;font-weight:600;white-space:nowrap;}
+  .chart .cb span{font-size:0.58rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.06em;}
+  .perfbar{height:4px;border-radius:99px;background:rgba(255,255,255,0.07);margin-top:0.5rem;overflow:hidden;}
+  .perfbar i{display:block;height:100%;background:var(--gold);border-radius:99px;}
 </style>
 </head>
 <body>
@@ -115,9 +141,25 @@
 <div id="app">
   <div class="wrap">
     <div class="stat" id="stat"></div>
+    <div class="zoekbar"><input id="zoekInp" placeholder="Zoek op gast, partner, referentie of plaats…" data-i18n-ph="bo.zoekph" autocomplete="off"></div>
+    <div class="panel" style="margin-bottom:1.5rem;">
+      <h2 class="ph"><span>🎯 <span data-i18n="panel.actie">Actiecentrum</span></span><button class="hbtn" id="briefBtn">📋 <span data-i18n="bo.brief">Dagbriefing</span></button></h2>
+      <div class="brief" id="briefBox"></div>
+      <div class="rows" id="alertList"></div>
+    </div>
     <div class="panel" style="margin-bottom:1.5rem;">
       <h2><span class="livedot"></span> <span data-i18n="panel.live">Live onderweg</span></h2>
       <div class="rows" id="liveList"></div>
+    </div>
+    <div class="cols" style="margin-bottom:1.5rem;">
+      <div class="panel">
+        <h2 data-i18n="panel.perf">Partnerprestaties</h2>
+        <div class="rows" id="perfList"></div>
+      </div>
+      <div class="panel">
+        <h2 data-i18n="panel.week">Omzet per dag</h2>
+        <div class="chart" id="weekChart"></div>
+      </div>
     </div>
     <div class="cols">
       <div class="panel">
@@ -125,7 +167,7 @@
         <div class="rows" id="prices"></div>
       </div>
       <div class="panel">
-        <h2 data-i18n="panel.orders">Bestellingen &amp; ritten</h2>
+        <h2 class="ph"><span data-i18n="panel.orders">Bestellingen &amp; ritten</span><button class="hbtn" id="csvBtn">⬇ <span data-i18n="bo.csv">CSV</span></button></h2>
         <div class="rows" id="orders"></div>
       </div>
     </div>
@@ -170,7 +212,8 @@
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
   const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
-  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded' };
+  const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded',
+    'aangevraagd':'requested', 'geaccepteerd':'accepted', 'onderweg':'en route', 'aangekomen':'at pickup', 'aan-boord':'on board', 'rijdt':'on board', 'afgerond':'completed', 'gearriveerd':'completed' };
   const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
   let token = null, state = null, source = null;
   const enabled = location.protocol === 'http:' || location.protocol === 'https:';
@@ -284,14 +327,56 @@
   });
 
   function render(){
-    const paid = state.orders.filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
+    const st2 = state.stats || {};
+    const alerts = state.alerts || [];
+    // globale zoekfilter: een veld dat door alle lijsten heen zoekt
+    const q = (($('#zoekInp')||{}).value || '').trim().toLowerCase();
+    const past = function(){ return !q || [].slice.call(arguments).join(' ').toLowerCase().includes(q); };
     $('#stat').innerHTML =
       '<div class="b"><div class="l">'+T('bo.partners','Partners')+'</div><div class="v">'+state.suppliers.length+'</div></div>' +
-      '<div class="b"><div class="l">'+T('bo.proposals','Prijsvoorstellen')+'</div><div class="v a">'+state.prices.length+'</div></div>' +
-      '<div class="b"><div class="l">'+T('bo.orders','Bestellingen')+'</div><div class="v a">'+state.orders.length+'</div></div>' +
-      '<div class="b"><div class="l">'+T('bo.revenue','Omzet via partners')+'</div><div class="v g">'+eur(paid)+'</div></div>';
+      '<div class="b"><div class="l">'+T('bo.livenu','Nu onderweg')+'</div><div class="v">'+(st2.liveNu||0)+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.today','Vandaag')+'</div><div class="v a">'+(st2.aantalVandaag||0)+' · '+eur(st2.omzetVandaag||0)+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.weekrev','Weekomzet')+'</div><div class="v g">'+eur(st2.omzetWeek||0)+'</div></div>' +
+      '<div class="b"><div class="l">RTFoundation</div><div class="v g">'+eur(st2.foundation||0)+'</div></div>' +
+      '<div class="b"><div class="l">'+T('bo.actions','Open acties')+'</div><div class="v'+(alerts.some(a=>a.level==='rood')?' a':'')+'">'+alerts.length+'</div></div>';
 
-    const live = state.live || [];
+    // actiecentrum: vastgelopen zaken bovenaan, met een herinneringsknop
+    $('#alertList').innerHTML = alerts.length ? alerts.map(a => {
+      const koeling = a.nudgedAt && (Date.now() - new Date(a.nudgedAt)) < 10*60000;
+      const knop = (a.kind === 'order' || a.kind === 'ride')
+        ? (koeling ? '<span class="pill klaar">'+T('bo.nudged','herinnerd')+'</span>'
+                   : '<button class="vbtn ok" data-nudge="'+a.ref+'" data-nkind="'+a.kind+'">⏰ '+T('bo.nudge','Stuur herinnering')+'</button>')
+        : '';
+      return '<div class="alert '+a.level+'"><span class="lv"></span><div class="tx">'+escHtml(a.text)+'</div>'+knop+'</div>';
+    }).join('') : '<div class="empty">✓ '+T('bo.noalerts','Alles loopt. Vastgelopen bestellingen, wachtende leden en open beoordelingen verschijnen hier vanzelf.')+'</div>';
+    $('#alertList').querySelectorAll('[data-nudge]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await call('/office/nudge', { ref: b.dataset.nudge, kind: b.dataset.nkind }); await refresh(); }
+      catch(e){ alert(e.message); b.disabled = false; }
+    }));
+
+    // partnerprestaties: omzetranglijst met open werk en gemiddelde ritduur
+    const perf = state.performance || [];
+    const maxOmzet = Math.max.apply(null, perf.map(p=>p.omzet).concat([1]));
+    const medaille = ['🥇','🥈','🥉'];
+    $('#perfList').innerHTML = perf.length ? perf.filter(p => past(p.name, p.code, p.type)).map((p, i) =>
+      '<div class="row"><div class="r1"><div style="flex:1;min-width:0;"><div class="nm">'+(medaille[i]||'')+' '+p.name+
+        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+p.code+'</span></div>'+
+        '<div class="sub">'+p.aantal+' '+T('bo.trans','transactie(s)')+' · '+p.openNu+' '+T('bo.opennow','nu open')+
+        (p.gemMin!=null?' · Ø '+p.gemMin+' '+T('bo.minride','min per rit'):'')+'</div>'+
+        '<div class="perfbar"><i style="width:'+Math.max(2, Math.round(p.omzet/maxOmzet*100))+'%;"></i></div></div>'+
+        '<div class="amt g">'+eur(p.omzet)+'</div></div></div>'
+    ).join('') : '<div class="empty">'+T('bo.noperf','Nog geen partnercijfers.')+'</div>';
+
+    // omzet per dag: de laatste zeven dagen als staafjes, vandaag uitgelicht
+    const wk = state.week || [];
+    const maxDag = Math.max.apply(null, wk.map(d=>d.omzet).concat([1]));
+    $('#weekChart').innerHTML = wk.map((d, i) =>
+      '<div class="cb'+(i===wk.length-1?' vandaag':'')+'" title="'+d.aantal+' '+T('bo.trans','transactie(s)')+'">'+
+      '<b>'+(d.omzet?eur(d.omzet):'·')+'</b><i style="height:'+Math.max(2, Math.round(d.omzet/maxDag*72))+'%;"></i><span>'+d.label+'</span></div>'
+    ).join('');
+
+    const live = (state.live || []).filter(g => past(g.codename, (g.dest&&g.dest.name)||'', (g.partners||[]).join(' ')));
     $('#liveList').innerHTML = live.length ? live.map(g =>
       '<div class="row"><div class="r1"><div><div class="nm">'+g.codename+
         (g.dest?' <span style="color:var(--soft);font-weight:400;">· '+T('bo.to','naar')+' '+g.dest.name+'</span>':'')+'</div>'+
@@ -300,18 +385,29 @@
         '<span class="pill '+(g.arrived?'klaar':'bereiding')+'">'+(g.arrived?T('bo.arrived','gearriveerd'):T('bo.live','live'))+'</span></div></div>'
     ).join('') : '<div class="empty">'+T('bo.nolive','Niemand is nu onderweg. Zodra een lid een reis live zet, ziet u hier waar zij zijn en met welke partners.')+'</div>';
 
-    $('#prices').innerHTML = state.prices.length ? state.prices.map(p =>
+    const prijzen = state.prices.filter(p => past(p.supplierName, p.service));
+    $('#prices').innerHTML = prijzen.length ? prijzen.map(p =>
       '<div class="row"><div class="r1"><div><div class="nm">'+p.supplierName+'</div><div class="sub">'+p.service+' · '+timeAgo(p.at)+'</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
     ).join('') : '<div class="empty">'+T('bo.noprices','Nog geen prijzen. Zodra een partner een dynamische prijs doorgeeft, verschijnt die hier live.')+'</div>';
 
-    $('#orders').innerHTML = state.orders.length ? state.orders.map(o => {
+    // bestellingen en ritten in een tijdlijn: nieuwste bovenaan
+    const KLAAR_R = { 'afgerond':1, 'gearriveerd':1, 'geweigerd':1 };
+    const regels = state.orders.filter(o => past(o.supplierName, o.customerCodename, o.ref)).map(o => ({ at: o.at, html: (() => {
       const pc = o.status==='nieuw'?'nieuw':o.status==='in bereiding'?'bereiding':'klaar';
       return '<div class="row"><div class="r1"><div><div class="nm">'+o.supplierName+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+o.customerCodename+'</span></div>'+
-        '<div class="sub">'+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('bo.items','item(s)')+' · '+timeAgo(o.at)+' · '+(o.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
+        '<div class="sub">🛎️ '+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('bo.items','item(s)')+' · '+timeAgo(o.at)+' · '+(o.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
         '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><span class="pill '+pc+'">'+tStatus(o.status)+'</span></div></div></div>';
-    }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
+    })() })).concat((state.rides || []).filter(r => past(r.supplierName, r.customerCodename, r.ref, r.from||'', r.to||'')).map(r => ({ at: r.at, html: (() => {
+      const pc = r.status==='aangevraagd'?'nieuw':KLAAR_R[r.status]?'klaar':'bereiding';
+      return '<div class="row"><div class="r1"><div><div class="nm">'+r.supplierName+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+r.customerCodename+'</span></div>'+
+        '<div class="sub">'+(r.type==='jet'?'✈️':'🚗')+' '+(r.from||'')+' → '+(r.to||'?')+' · '+timeAgo(r.at)+(r.plannedFor?' · '+escHtml(r.when||''):'')+' · '+(r.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
+        '<div style="text-align:right;"><div class="amt">'+eur(r.quote||0)+'</div><span class="pill '+pc+'">'+tStatus(r.status)+'</span></div></div></div>';
+    })() })));
+    regels.sort((a, b) => new Date(b.at) - new Date(a.at));
+    $('#orders').innerHTML = regels.length ? regels.map(x => x.html).join('')
+      : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
 
-    const apps = state.applications || [];
+    const apps = (state.applications || []).filter(x => past(x.name, x.func, x.company));
     $('#appsList').innerHTML = apps.length ? apps.map(x => {
       const pc = x.status==='nieuw'?'nieuw':x.status==='aangenomen'?'klaar':'bereiding';
       const st = x.status==='nieuw'?T('bo.ap.new','nieuw'):x.status==='aangenomen'?T('bo.ap.hired','aangenomen'):T('bo.ap.rejected','afgewezen');
@@ -321,7 +417,7 @@
         '<span class="pill '+pc+'">'+st+'</span></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noapps','Nog geen sollicitaties. Kandidaten solliciteren via de partner-apps, RTG-leden via de leden-app met hun cv.')+'</div>';
 
-    const pas = state.partnerApplications || [];
+    const pas = (state.partnerApplications || []).filter(x => past(x.company, x.type, x.city, x.contactName));
     $('#paList').innerHTML = pas.length ? pas.map(x => {
       const pc = x.status==='nieuw'?'nieuw':x.status==='goedgekeurd'?'klaar':'bereiding';
       const st = x.status==='nieuw'?T('bo.pa.new','nieuw'):x.status==='goedgekeurd'?T('bo.pa.ok','goedgekeurd'):T('bo.pa.no','afgewezen');
@@ -356,6 +452,37 @@
 
   $('#docScrim').addEventListener('click', () => { $('#docScrim').classList.remove('open'); $('#docImg').src = ''; });
 
+  // dagbriefing: een samenvatting van vandaag in gewone taal, met een tik
+  $('#briefBtn').addEventListener('click', async () => {
+    const box = $('#briefBox');
+    if (box.classList.contains('on')){ box.classList.remove('on'); return; }
+    box.textContent = '…';
+    box.classList.add('on');
+    try { box.textContent = (await call('/office/briefing', { lang: lang() })).briefing; }
+    catch(e){ box.textContent = e.message; }
+  });
+
+  // zoeken: een veld dat live door alle panelen heen filtert
+  $('#zoekInp').addEventListener('input', () => { if (state) render(); });
+
+  // export voor de boekhouding: alle bestellingen en ritten als csv
+  $('#csvBtn').addEventListener('click', () => {
+    if (!state) return;
+    const esc2 = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const kop = ['datum','soort','partner','gast','omschrijving','status','betaald','bedrag'];
+    const rijen = state.orders.map(o => [String(o.at).slice(0,16).replace('T',' '), 'bestelling', o.supplierName, o.customerCodename,
+        o.items.map(i=>i.qty+'x '+i.name).join(', '), o.status, o.paid?'ja':'nee', (o.total||0).toFixed(2).replace('.',',')])
+      .concat((state.rides||[]).map(r => [String(r.at).slice(0,16).replace('T',' '), r.type==='jet'?'jetrit':'taxirit', r.supplierName, r.customerCodename,
+        (r.from||'')+' naar '+(r.to||'?'), r.status, r.paid?'ja':'nee', (r.quote||0).toFixed(2).replace('.',',')]))
+      .map(rij => rij.map(esc2).join(';'));
+    const blob = new Blob(['\uFEFF' + kop.join(';') + '\n' + rijen.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'rtg-backoffice-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  });
+
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
 })();
 </script>
@@ -381,6 +508,12 @@ window.I18N = { en: {
   'bo.pa.done':'Approved. Share this once (it is also in the welcome email):',
   'bo.pa.code':'Supplier code', 'bo.pa.pin':'Manager PIN',
   'bo.nopa':'No requests yet. Businesses sign up via the "Become a partner" page on the site.',
+  'panel.actie':'Action centre', 'bo.brief':'Daily briefing', 'panel.perf':'Partner performance', 'panel.week':'Revenue per day',
+  'bo.zoekph':'Search by guest, partner, reference or place…', 'bo.csv':'CSV',
+  'bo.livenu':'On the move', 'bo.today':'Today', 'bo.weekrev':'Week revenue', 'bo.actions':'Open actions',
+  'bo.nudge':'Send reminder', 'bo.nudged':'reminded',
+  'bo.noalerts':'All running smoothly. Stuck orders, waiting members and open reviews appear here automatically.',
+  'bo.trans':'transaction(s)', 'bo.opennow':'open now', 'bo.minride':'min per ride', 'bo.noperf':'No partner figures yet.',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.h':' h', 't.d':' d'
 } };
 </script>

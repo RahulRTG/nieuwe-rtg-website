@@ -3563,6 +3563,72 @@ function officeState() {
     for (const a of list) applications.push({ company: sup ? sup.name : code, name: a.name, func: a.func, status: a.status, viaRTG: !!a.viaRTG, at: a.at });
   }
   applications.sort((x, y) => (y.at || '').localeCompare(x.at || ''));
+  // slimme laag: dagcijfers, weektrend, partnerprestaties en een actiecentrum
+  const nu = Date.now();
+  const dagVan = iso => String(iso || '').slice(0, 10);
+  const betaaldeOrders = db.data.orders.filter(o => o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald');
+  const betaaldeRitten = db.data.rides.filter(r => r.paid && r.status !== 'geweigerd');
+  const week = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(nu - i * 86400000).toISOString().slice(0, 10);
+    const dagOrders = betaaldeOrders.filter(o => dagVan(o.paidAt || o.at) === d);
+    const dagRitten = betaaldeRitten.filter(r => dagVan(r.paidAt || r.at) === d);
+    week.push({
+      date: d,
+      label: new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short' }),
+      omzet: dagOrders.reduce((s2, o) => s2 + (o.total || 0), 0) + dagRitten.reduce((s2, r) => s2 + (r.quote || 0), 0),
+      aantal: dagOrders.length + dagRitten.length
+    });
+  }
+  const fonds = db.data.invoices
+    .filter(i => i.status === 'paid' || i.status === 'betaald')
+    .reduce((s2, i) => s2 + Math.round((i.bijdrage || 0) * 0.3), 0);
+  const stats = {
+    omzetVandaag: week[6].omzet, aantalVandaag: week[6].aantal,
+    omzetWeek: week.reduce((s2, d) => s2 + d.omzet, 0),
+    foundation: fonds, liveNu: live.length
+  };
+  const performance = db.data.suppliers.map(s => {
+    const or = betaaldeOrders.filter(o => o.supplierCode === s.code);
+    const ri = betaaldeRitten.filter(r => r.supplierCode === s.code);
+    const openNu = db.data.orders.filter(o => o.supplierCode === s.code && o.paid && (o.status === 'nieuw' || o.status === 'in bereiding')).length
+      + db.data.rides.filter(r => r.supplierCode === s.code && r.paid && !['afgerond', 'gearriveerd', 'geweigerd', 'wacht-op-betaling'].includes(r.status)).length;
+    const duur = ri.filter(r => r.finishedAt).map(r => (new Date(r.finishedAt) - new Date(r.at)) / 60000);
+    return {
+      code: s.code, name: s.name, type: s.type,
+      omzet: or.reduce((x, o) => x + (o.total || 0), 0) + ri.reduce((x, r) => x + (r.quote || 0), 0),
+      aantal: or.length + ri.length, openNu,
+      gemMin: duur.length ? Math.round(duur.reduce((x, y) => x + y, 0) / duur.length) : null
+    };
+  }).sort((a, b) => b.omzet - a.omzet);
+  // actiecentrum: alles wat nu een oog van RTG nodig heeft, belangrijkste eerst
+  const alerts = [];
+  const minGeleden = iso => Math.round((nu - new Date(iso)) / 60000);
+  for (const o of db.data.orders) {
+    if (!o.paid || o.status !== 'nieuw') continue;
+    const m = minGeleden(o.paidAt || o.at);
+    if (m >= 10) alerts.push({ level: 'rood', kind: 'order', ref: o.ref, supplierCode: o.supplierCode, nudgedAt: o.nudgedAt || null,
+      text: 'Bestelling ' + o.ref + ' bij ' + o.supplierName + ' staat al ' + m + ' min onaangeroerd (gast ' + o.customerCodename + ').' });
+  }
+  for (const r of db.data.rides) {
+    if (!r.paid || r.status !== 'aangevraagd' || r.driver) continue;
+    const straks = r.plannedFor && (new Date(r.plannedFor) - nu) > 45 * 60000;
+    const m = minGeleden(r.paidAt || r.at);
+    if (!straks && m >= 10) alerts.push({ level: 'rood', kind: 'ride', ref: r.ref, supplierCode: r.supplierCode, nudgedAt: r.nudgedAt || null,
+      text: 'Rit ' + r.ref + ' bij ' + r.supplierName + ' wacht al ' + m + ' min op een chauffeur (gast ' + r.customerCodename + ').' });
+    else if (straks && (new Date(r.plannedFor) - nu) < 24 * 3600000) alerts.push({ level: 'amber', kind: 'ride', ref: r.ref, supplierCode: r.supplierCode, nudgedAt: r.nudgedAt || null,
+      text: 'Geplande rit ' + r.ref + ' (' + String(r.plannedFor).slice(0, 16).replace('T', ' ') + ') bij ' + r.supplierName + ' heeft nog geen chauffeur.' });
+  }
+  const verif = accounts.listByVerification('pending').length;
+  if (verif) alerts.push({ level: 'amber', kind: 'verify', text: verif + ' identiteitsverificatie(s) wachten op beoordeling.' });
+  const wachtend = conciergeInbox().filter(c => c.needsConcierge).length;
+  if (wachtend) alerts.push({ level: 'amber', kind: 'concierge', text: wachtend + ' lid/leden wachten op een antwoord van de concierge.' });
+  const nieuwePartners = (db.data.partnerApplications || []).filter(p => p.status === 'nieuw').length;
+  if (nieuwePartners) alerts.push({ level: 'info', kind: 'partner', text: nieuwePartners + ' nieuwe partner-aanvraag/aanvragen om te beoordelen.' });
+  const nieuweSollicitaties = applications.filter(a => a.status === 'nieuw').length;
+  if (nieuweSollicitaties) alerts.push({ level: 'info', kind: 'apps', text: nieuweSollicitaties + ' open sollicitatie(s) bij partners.' });
+  const volgorde = { rood: 0, amber: 1, info: 2 };
+  alerts.sort((a, b) => volgorde[a.level] - volgorde[b.level]);
   return {
     prices: db.data.supplierPrices.slice(0, 60),
     orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').slice(0, 60),
@@ -3570,7 +3636,8 @@ function officeState() {
     live,
     applications: applications.slice(0, 40),
     suppliers: db.data.suppliers.map(publicSupplier),
-    partnerApplications: (db.data.partnerApplications || []).slice(0, 40)
+    partnerApplications: (db.data.partnerApplications || []).slice(0, 40),
+    stats, week, performance, alerts: alerts.slice(0, 20)
   };
 }
 
@@ -3586,6 +3653,57 @@ app.get('/api/office/stream', (req, res) => {
 });
 
 app.post('/api/office/state', officeAuth, (req, res) => res.json({ state: officeState() }));
+
+// Backoffice port een partner: een vriendelijke herinnering bij een blijven-liggen
+// bestelling of rit. Maximaal een keer per tien minuten per regel.
+app.post('/api/office/nudge', officeAuth, (req, res) => {
+  const kind = req.body.kind === 'ride' ? 'ride' : 'order';
+  const lijst = kind === 'ride' ? db.data.rides : db.data.orders;
+  const x = lijst.find(i => i.ref === req.body.ref);
+  if (!x) return res.status(404).json({ error: 'Niet gevonden.' });
+  if (x.nudgedAt && Date.now() - new Date(x.nudgedAt) < 10 * 60000)
+    return res.status(409).json({ error: 'Er is net al een herinnering gestuurd. Geef de zaak even de tijd.' });
+  x.nudgedAt = new Date().toISOString();
+  save();
+  notifySupplier(x.supplierCode, { icon: '⏰', title: 'Herinnering van RTG',
+    body: (kind === 'ride' ? 'Rit ' : 'Bestelling ') + x.ref + ' van ' + x.customerCodename + ' wacht nog op actie. Kunt u er even naar kijken?' });
+  sseToSupplier(x.supplierCode, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true });
+});
+
+// Dagbriefing: een leesbare samenvatting van de dag, opgebouwd uit de echte
+// cijfers (geen AI-sleutel nodig, dus altijd beschikbaar en altijd juist).
+app.post('/api/office/briefing', officeAuth, (req, res) => {
+  const en = req.body.lang === 'en';
+  const st = officeState();
+  const s = st.stats;
+  const eurF = n => '€ ' + Number(n).toLocaleString(en ? 'en-US' : 'nl-NL');
+  const zinnen = [];
+  zinnen.push(en
+    ? 'Today the partners processed ' + s.aantalVandaag + ' paid order(s) and ride(s) for ' + eurF(s.omzetVandaag) + ' in net revenue; this week stands at ' + eurF(s.omzetWeek) + '.'
+    : 'Vandaag verwerkten de partners ' + s.aantalVandaag + ' betaalde bestelling(en) en rit(ten), goed voor ' + eurF(s.omzetVandaag) + ' nettomzet; de week staat op ' + eurF(s.omzetWeek) + '.');
+  const top = (st.performance || []).find(p => p.omzet > 0);
+  if (top) zinnen.push(en
+    ? 'Best performing partner: ' + top.name + ' (' + eurF(top.omzet) + ', ' + top.aantal + ' transaction(s)).'
+    : 'Best presterende partner: ' + top.name + ' (' + eurF(top.omzet) + ', ' + top.aantal + ' transactie(s)).');
+  zinnen.push(en
+    ? (s.liveNu ? s.liveNu + ' member(s) are on the move right now.' : 'No members are on the move at the moment.')
+    : (s.liveNu ? s.liveNu + ' lid/leden zijn nu onderweg.' : 'Er is nu niemand onderweg.'));
+  const rood = (st.alerts || []).filter(a => a.level === 'rood').length;
+  const rest = (st.alerts || []).length - rood;
+  if (rood) zinnen.push(en
+    ? rood + ' item(s) are stuck and need immediate attention; see the action centre.'
+    : rood + ' zaak/zaken lopen vast en vragen nu aandacht; zie het actiecentrum.');
+  else if (rest) zinnen.push(en
+    ? 'Nothing is stuck; ' + rest + ' routine item(s) are waiting in the action centre.'
+    : 'Niets loopt vast; er wachten nog ' + rest + ' routinepunt(en) in het actiecentrum.');
+  else zinnen.push(en ? 'The action centre is empty: everything is running smoothly.' : 'Het actiecentrum is leeg: alles loopt.');
+  zinnen.push(en
+    ? 'The RTFoundation received ' + eurF(s.foundation) + ' so far (30% of paid member contributions).'
+    : 'De RTFoundation ontving tot nu toe ' + eurF(s.foundation) + ' (30% van de betaalde ledenbijdragen).');
+  res.json({ briefing: zinnen.join(' ') });
+});
 
 /* Backoffice: identiteitsverificaties beoordelen. */
 function pendingVerifications() {

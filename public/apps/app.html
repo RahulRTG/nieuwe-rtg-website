@@ -638,6 +638,62 @@
   .menu-scrim.open{display:block;}
   .menu-sheet{position:absolute;left:0;right:0;bottom:0;z-index:81;background:var(--bg);border-top:1px solid var(--line);border-radius:20px 20px 0 0;max-height:88%;display:none;flex-direction:column;}
   .menu-sheet.open{display:flex;}
+
+  /* ---- Salon-connecties: vrienden, dm en bellen ---- */
+  .sc-bar{margin:0 0 1.1rem;}
+  .sc-strip{display:flex;gap:0.7rem;overflow-x:auto;scrollbar-width:none;padding:0.2rem 0 0.4rem;}
+  .sc-strip::-webkit-scrollbar{display:none;}
+  .sc-p{flex:0 0 auto;width:58px;text-align:center;background:none;border:none;padding:0;cursor:pointer;}
+  .sc-av{position:relative;width:52px;height:52px;margin:0 auto;border-radius:50%;background:var(--card);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;color:var(--txt);}
+  .sc-p.add .sc-av{border-style:dashed;color:var(--soft);font-size:1.3rem;}
+  .sc-badge{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:9px;background:var(--burgundy);color:#fff;
+    font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+  .sc-p span{display:block;margin-top:0.3rem;font-size:0.58rem;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sc-req{background:var(--card);border:1px solid rgba(169,143,28,0.4);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.6rem;
+    display:flex;align-items:center;gap:0.6rem;font-size:0.82rem;}
+  .sc-req b{flex:1;}
+  .sc-req button{border:1px solid var(--line);background:var(--bg);color:var(--txt);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.74rem;}
+  .sc-req button.ja{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .sc-zoek{display:none;gap:0.5rem;margin-top:0.5rem;}
+  .sc-zoek.open{display:flex;}
+  .sc-zoek input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.9rem;font-size:0.85rem;color:var(--txt);outline:none;}
+  .sc-zoek button{background:var(--burgundy);border:none;color:#fff;border-radius:12px;padding:0 1rem;font-size:0.8rem;}
+  .sc-res{margin-top:0.5rem;display:flex;flex-direction:column;gap:0.4rem;}
+  .sc-hit{display:flex;align-items:center;gap:0.6rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.8rem;font-size:0.82rem;}
+  .sc-hit b{flex:1;}
+  .sc-hit button{border:1px solid var(--gold);background:none;color:var(--gold);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.72rem;}
+
+  .dm-body{flex:1;overflow-y:auto;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.5rem;min-height:220px;}
+  .dm-m{max-width:82%;padding:0.55rem 0.85rem;border-radius:14px;font-size:0.86rem;line-height:1.45;background:var(--card);border:1px solid var(--line);align-self:flex-start;}
+  .dm-m.mine{align-self:flex-end;background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .dm-m .tijd{display:block;font-size:0.6rem;opacity:0.6;margin-top:0.2rem;}
+  .dm-post{margin-top:0.35rem;border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:0.45rem 0.6rem;font-size:0.74rem;}
+  .dm-m:not(.mine) .dm-post{border-color:var(--line);}
+  .dm-post b{display:block;font-size:0.7rem;}
+  .dm-call{display:flex;gap:0.5rem;}
+  .dm-call button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:1rem;}
+
+  .cs-scrim{position:absolute;inset:0;z-index:120;background:rgba(10,10,9,0.94);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;}
+  .cs-scrim.open{display:flex;}
+  .cs-avatar{width:96px;height:96px;border-radius:50%;background:var(--card);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:600;color:var(--txt);}
+  .cs-naam{font-size:1.15rem;font-weight:600;color:#fff;}
+  .cs-sub{font-size:0.8rem;color:var(--soft);}
+  .cs-knoppen{display:flex;gap:1.6rem;margin-top:0.6rem;}
+  .cs-knop{width:62px;height:62px;border-radius:50%;border:none;font-size:1.4rem;color:#fff;}
+  .cs-knop.aan{background:#2E7D4F;}
+  .cs-knop.uit{background:#B3273F;}
+  #callScreen{position:absolute;inset:0;z-index:121;background:#000;display:none;flex-direction:column;}
+  #callScreen.open{display:flex;}
+  #csRemote{flex:1;width:100%;object-fit:cover;background:#0C0C0B;}
+  #csLocal{position:absolute;right:14px;top:64px;width:104px;height:140px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,0.3);background:#111;z-index:2;}
+  .cs-top{position:absolute;top:0;left:0;right:0;padding:0.9rem 1.1rem;display:flex;justify-content:space-between;align-items:center;
+    background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0));color:#fff;z-index:2;font-size:0.9rem;}
+  .cs-foot{position:absolute;bottom:0;left:0;right:0;padding:1.2rem 0 calc(1.4rem + env(safe-area-inset-bottom,0));display:flex;justify-content:center;gap:1.4rem;
+    background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.65));z-index:2;}
+  .cs-mini{width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,0.35);background:rgba(255,255,255,0.12);color:#fff;font-size:1.1rem;}
+  .cs-mini.dicht{background:rgba(255,255,255,0.55);color:#111;}
+  #csAudioOnly{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem;color:#fff;z-index:1;}
   .ms-head{padding:1.1rem 1.25rem 0.9rem;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);}
   .ms-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
   .ms-head span{display:block;font-size:0.68rem;color:var(--soft);margin-top:0.15rem;}
@@ -784,6 +840,7 @@
       <div class="view" data-view="salon">
         <h2 data-i18n="app.v.salon">De Salon.</h2>
         <p class="sub" data-i18n="app.v.salon.sub">Posts verschijnen 7 dagen na verblijf, voor uw veiligheid.</p>
+        <div class="sc-bar" id="socialBar"></div>
         <div id="feed"></div>
       </div>
 
@@ -858,6 +915,58 @@
     <div class="pc-foot">
       <input id="pcInput" placeholder="Typ een bericht" data-i18n-ph="app.pc.ph" autocomplete="off">
       <button id="pcSend" data-i18n="app.pc.send">Stuur</button>
+    </div>
+  </div>
+
+  <!-- dm tussen leden (Salon-connecties) -->
+  <div id="dm-scrim" class="menu-scrim"></div>
+  <div id="dm-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b id="dmNaam"></b><span data-i18n="sal.dm.sub">Ledenchat, op codenaam</span></div>
+      <div class="dm-call">
+        <button id="dmBel" title="Bellen">📞</button>
+        <button id="dmVideo" title="Videobellen">🎥</button>
+        <button class="ms-close" id="dmClose" aria-label="Sluiten">✕</button>
+      </div>
+    </div>
+    <div class="dm-body" id="dmBody"></div>
+    <div class="pc-foot">
+      <input id="dmInput" placeholder="Typ een bericht" data-i18n-ph="app.pc.ph" autocomplete="off">
+      <button id="dmSend" data-i18n="app.pc.send">Stuur</button>
+    </div>
+  </div>
+
+  <!-- salon-post delen met een connectie -->
+  <div id="share-scrim" class="menu-scrim"></div>
+  <div id="share-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b data-i18n="sal.share.h">Deel met een connectie</b></div>
+      <button class="ms-close" id="shareClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body" id="shareList" style="padding:1rem 1.1rem;"></div>
+  </div>
+
+  <!-- inkomende oproep -->
+  <div id="callIncoming" class="cs-scrim">
+    <div class="cs-avatar" id="ciAv"></div>
+    <div class="cs-naam" id="ciNaam"></div>
+    <div class="cs-sub" id="ciSoort"></div>
+    <div class="cs-knoppen">
+      <button class="cs-knop uit" id="ciNee" aria-label="Weigeren">✕</button>
+      <button class="cs-knop aan" id="ciJa" aria-label="Opnemen">✓</button>
+    </div>
+  </div>
+
+  <!-- gespreksscherm -->
+  <div id="callScreen">
+    <video id="csRemote" autoplay playsinline></video>
+    <div id="csAudioOnly"><div class="cs-avatar" id="csAv"></div><div class="cs-naam" id="csNaam2"></div></div>
+    <video id="csLocal" autoplay muted playsinline></video>
+    <div class="cs-top"><span id="csNaam"></span><span id="csTijd">0:00</span></div>
+    <div class="cs-foot">
+      <button class="cs-mini" id="csMute" aria-label="Microfoon">🎙</button>
+      <button class="cs-mini" id="csCam" aria-label="Camera">🎥</button>
+      <button class="cs-knop uit" id="csWeg" aria-label="Ophangen">✕</button>
     </div>
   </div>
 
@@ -1091,8 +1200,9 @@
     $('#app').classList.add('active');
     renderAll();
     if (API.live && window.RTGRealtime){
-      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell });
+      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal });
     }
+    loadSocial();
   }
 
   // Blijf ingelogd: met een bewaard token slaat de app het startscherm over.
@@ -1106,7 +1216,8 @@
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
-      if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell });
+      if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal });
+      loadSocial();
     } catch(e){
       API.token = null;
       try { localStorage.removeItem('rtg_member_token'); } catch(e2){}
@@ -1117,6 +1228,287 @@
     try { if (API.live) await API.call('/logout'); } catch(e){}
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     location.reload();
+  }
+
+  /* ================= SALON-CONNECTIES =================
+     Leden voegen elkaar toe op codenaam, chatten 1-op-1, delen posts
+     en bellen elkaar. Bellen is echte WebRTC: beeld en geluid gaan
+     rechtstreeks tussen de twee telefoons; de server geeft alleen de
+     belsignalen door en ziet nooit het gesprek. */
+  let social = { me: null, codename: null, connections: [], requests: [] };
+  let socialOK = false;      // false = gast of nog niet geladen: geen sociale UI
+  let dmWith = null, dmNaam = '';
+  const escT = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const initCN = cn => String(cn||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+  async function loadSocial(){
+    if (!API.live) return;
+    try {
+      const d = await API.call('/member/connections');
+      social = d; socialOK = true;
+    } catch(e){ socialOK = false; }
+    renderSocialBar();
+  }
+
+  function renderSocialBar(){
+    const el = $('#socialBar'); if (!el) return;
+    if (!socialOK){ el.innerHTML = ''; return; }
+    let html = '';
+    for (const r of (social.requests || [])){
+      html += '<div class="sc-req"><b>' + escT(r.codename) + '</b><span style="color:var(--soft);font-size:0.7rem;">' + T('sal.wilverbinden','wil verbinden') + '</span>' +
+        '<button class="ja" data-scja="' + escT(r.key) + '">' + T('sal.accepteer','Accepteer') + '</button>' +
+        '<button data-scnee="' + escT(r.key) + '">✕</button></div>';
+    }
+    html += '<div class="sc-strip">' +
+      '<button class="sc-p add" id="scAddBtn"><span class="sc-av">+</span><span>' + T('sal.add','Toevoegen') + '</span></button>' +
+      (social.connections || []).map(c =>
+        '<button class="sc-p" data-scdm="' + escT(c.key) + '" data-cn="' + escT(c.codename) + '">' +
+          '<span class="sc-av">' + initCN(c.codename) + (c.unread ? '<span class="sc-badge">' + c.unread + '</span>' : '') + '</span>' +
+          '<span>' + escT(c.codename.split(' ')[0]) + '</span></button>'
+      ).join('') + '</div>';
+    html += '<div class="sc-zoek" id="scZoek"><input id="scQ" placeholder="' + T('sal.zoekph','Zoek op codenaam, bijv. Gouden Ibis') + '"><button id="scGo">' + T('sal.zoek','Zoek') + '</button></div>' +
+      '<div class="sc-res" id="scRes"></div>';
+    el.innerHTML = html;
+
+    el.querySelectorAll('[data-scja]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/member/connect/respond', { key: b.dataset.scja, action: 'accept' }); toast(T('sal.verbonden','Verbonden.')); loadSocial(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-scnee]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/member/connect/respond', { key: b.dataset.scnee, action: 'decline' }); loadSocial(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-scdm]').forEach(b => b.addEventListener('click', () => openDm(b.dataset.scdm, b.dataset.cn)));
+    const add = $('#scAddBtn'); if (add) add.addEventListener('click', () => { $('#scZoek').classList.toggle('open'); const q = $('#scQ'); if (q) q.focus(); });
+    const go = $('#scGo'); if (go) go.addEventListener('click', zoekLeden);
+    const q = $('#scQ'); if (q) q.addEventListener('keydown', e => { if (e.key === 'Enter') zoekLeden(); });
+  }
+
+  async function zoekLeden(){
+    const q = $('#scQ').value.trim();
+    if (q.length < 2){ toast(T('sal.zoekkort','Typ minimaal twee letters.')); return; }
+    try {
+      const d = await API.call('/member/find', { q });
+      $('#scRes').innerHTML = (d.results || []).map(r =>
+        '<div class="sc-hit"><span class="sc-av" style="width:34px;height:34px;font-size:0.7rem;">' + initCN(r.codename) + '</span><b>' + escT(r.codename) + '</b>' +
+        (r.status === 'geen' ? '<button data-scvz="' + escT(r.key) + '">' + T('sal.verzoek','Verzoek sturen') + '</button>'
+         : r.status === 'verbonden' ? '<span style="color:var(--green,#2E7D4F);font-size:0.72rem;">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
+         : r.status === 'aangevraagd' ? '<span style="color:var(--soft);font-size:0.72rem;">' + T('sal.gevraagd','aangevraagd') + '</span>'
+         : '<span style="color:var(--gold);font-size:0.72rem;">' + T('sal.wachtu','wacht op u') + '</span>') + '</div>'
+      ).join('') || '<div style="font-size:0.78rem;color:var(--soft);">' + T('sal.niksgevonden','Geen leden gevonden met deze codenaam.') + '</div>';
+      $('#scRes').querySelectorAll('[data-scvz]').forEach(b => b.addEventListener('click', async () => {
+        try { await API.call('/member/connect', { key: b.dataset.scvz }); toast(T('sal.verzonden','Verzoek verstuurd.')); zoekLeden(); } catch(e){ toast(e.message); }
+      }));
+    } catch(e){ toast(e.message); }
+  }
+
+  /* ---- dm ---- */
+  async function openDm(key, naam){
+    dmWith = key; dmNaam = naam;
+    $('#dmNaam').textContent = naam;
+    $('#dm-sheet').classList.add('open'); $('#dm-scrim').classList.add('open');
+    await laadDm();
+    loadSocial(); // ongelezen-teller bijwerken
+  }
+  async function laadDm(){
+    if (!dmWith) return;
+    try {
+      const d = await API.call('/member/dm', { withKey: dmWith });
+      $('#dmBody').innerHTML = (d.messages || []).map(m => dmBubbel(m)).join('') ||
+        '<div style="font-size:0.78rem;color:var(--soft);text-align:center;margin:auto 0;">' + T('sal.dm.leeg','Nog geen berichten. Zeg hallo.') + '</div>';
+      $('#dmBody').scrollTop = 999999;
+    } catch(e){ toast(e.message); }
+  }
+  function dmBubbel(m){
+    const mijn = m.from === social.me;
+    const tijd = new Date(m.at).toLocaleTimeString(lang()==='en'?'en-GB':'nl-NL',{hour:'2-digit',minute:'2-digit'});
+    return '<div class="dm-m' + (mijn ? ' mine' : '') + '">' + escT(m.text) +
+      (m.post ? '<div class="dm-post"><b>↗ ' + escT(m.post.author) + ' · ' + escT(m.post.place) + '</b>' + escT(m.post.text) + '…</div>' : '') +
+      '<span class="tijd">' + tijd + '</span></div>';
+  }
+  function dmToevoegen(m){ const b = $('#dmBody'); b.insertAdjacentHTML('beforeend', dmBubbel(m)); b.scrollTop = 999999; }
+  async function stuurDm(){
+    const text = $('#dmInput').value.trim();
+    if (!text || !dmWith) return;
+    $('#dmInput').value = '';
+    try {
+      const d = await API.call('/member/dm/send', { toKey: dmWith, text });
+      dmToevoegen(d.message);
+    } catch(e){ toast(e.message); }
+  }
+  $('#dmSend').addEventListener('click', stuurDm);
+  $('#dmInput').addEventListener('keydown', e => { if (e.key === 'Enter') stuurDm(); });
+  const dmDicht = () => { $('#dm-sheet').classList.remove('open'); $('#dm-scrim').classList.remove('open'); dmWith = null; };
+  $('#dmClose').addEventListener('click', dmDicht);
+  $('#dm-scrim').addEventListener('click', dmDicht);
+
+  /* ---- post delen ---- */
+  let deelPost = null;
+  function openShare(postId){
+    if (!socialOK){ toast(T('sal.eerstlid','Alleen voor leden.')); return; }
+    if (!(social.connections || []).length){ toast(T('sal.geenconn','Nog geen connecties. Voeg eerst iemand toe in De Salon.')); return; }
+    deelPost = postId;
+    $('#shareList').innerHTML = social.connections.map(c =>
+      '<button class="sc-hit" style="width:100%;cursor:pointer;" data-deel="' + escT(c.key) + '"><span class="sc-av" style="width:34px;height:34px;font-size:0.7rem;">' + initCN(c.codename) + '</span><b>' + escT(c.codename) + '</b><span style="color:var(--gold);font-size:0.72rem;">↗</span></button>'
+    ).join('');
+    $('#shareList').querySelectorAll('[data-deel]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await API.call('/member/dm/send', { toKey: b.dataset.deel, postId: deelPost, text: '' });
+        toast(T('sal.gedeeld','Gedeeld.'));
+        $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open');
+      } catch(e){ toast(e.message); }
+    }));
+    $('#share-sheet').classList.add('open'); $('#share-scrim').classList.add('open');
+  }
+  $('#shareClose').addEventListener('click', () => { $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open'); });
+  $('#share-scrim').addEventListener('click', () => { $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open'); });
+
+  /* ---- bellen en videobellen (WebRTC) ---- */
+  let call = null;        // { pc, stream, withKey, naam, video, richting, pendingIce, timer, t0 }
+  let inkomend = null;    // { from, codename, video }
+
+  function belUI(open){
+    $('#callScreen').classList.toggle('open', !!open);
+    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; }
+  }
+  function belTimer(){
+    if (!call) return;
+    const s = Math.round((Date.now() - call.t0) / 1000);
+    $('#csTijd').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+  function maakPc(){
+    const pc = new RTCPeerConnection({ iceServers: [] });
+    call.stream.getTracks().forEach(t => pc.addTrack(t, call.stream));
+    pc.onicecandidate = ev => { if (ev.candidate && call) API.call('/member/call', { toKey: call.withKey, kind: 'ice', payload: ev.candidate }).catch(()=>{}); };
+    pc.ontrack = ev => {
+      const v = $('#csRemote');
+      if (v.srcObject !== ev.streams[0]) v.srcObject = ev.streams[0];
+    };
+    pc.onconnectionstatechange = () => {
+      if (pc.connectionState === 'connected' && call && !call.t0){ call.t0 = Date.now(); call.timer = setInterval(belTimer, 1000); }
+      if (['failed', 'closed'].includes(pc.connectionState)) eindeGesprek(false);
+    };
+    call.pc = pc;
+    window.__rtgCall = () => call; // voor tests
+    return pc;
+  }
+  async function pakMedia(video){
+    try { return await navigator.mediaDevices.getUserMedia({ audio: true, video: video ? { facingMode: 'user' } : false }); }
+    catch(e){ toast(T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
+  }
+  function toonGesprek(naam, video){
+    $('#csNaam').textContent = naam; $('#csNaam2').textContent = naam;
+    $('#csAv').textContent = initCN(naam);
+    $('#csAudioOnly').style.display = video ? 'none' : 'flex';
+    $('#csLocal').style.display = video ? '' : 'none';
+    $('#csCam').style.display = video ? '' : 'none';
+    $('#csTijd').textContent = T('sal.belt','gaat over…');
+    belUI(true);
+  }
+  async function beginGesprek(video){
+    if (!dmWith) return;
+    if (call){ toast(T('sal.algesprek','Er loopt al een gesprek.')); return; }
+    const stream = await pakMedia(video);
+    if (!stream) return;
+    call = { withKey: dmWith, naam: dmNaam, video, richting: 'uit', pendingIce: [], stream, t0: 0 };
+    $('#csLocal').srcObject = stream;
+    toonGesprek(dmNaam, video);
+    try { await API.call('/member/call', { toKey: call.withKey, kind: 'ring', video }); }
+    catch(e){ toast(e.message); eindeGesprek(false); }
+  }
+  $('#dmBel').addEventListener('click', () => beginGesprek(false));
+  $('#dmVideo').addEventListener('click', () => beginGesprek(true));
+
+  async function neemOp(){
+    $('#callIncoming').classList.remove('open');
+    if (!inkomend) return;
+    const stream = await pakMedia(inkomend.video);
+    if (!stream){ API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{}); inkomend = null; return; }
+    call = { withKey: inkomend.from, naam: inkomend.codename, video: inkomend.video, richting: 'in', pendingIce: [], stream, t0: 0 };
+    $('#csLocal').srcObject = stream;
+    toonGesprek(inkomend.codename, inkomend.video);
+    await API.call('/member/call', { toKey: call.withKey, kind: 'accept' }).catch(()=>{});
+    inkomend = null;
+  }
+  $('#ciJa').addEventListener('click', neemOp);
+  $('#ciNee').addEventListener('click', () => {
+    $('#callIncoming').classList.remove('open');
+    if (inkomend) API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{});
+    inkomend = null;
+  });
+
+  function eindeGesprek(zeggen){
+    if (!call) { belUI(false); return; }
+    if (zeggen) API.call('/member/call', { toKey: call.withKey, kind: 'hangup' }).catch(()=>{});
+    clearInterval(call.timer);
+    try { call.stream.getTracks().forEach(t => t.stop()); } catch(e){}
+    try { if (call.pc) call.pc.close(); } catch(e){}
+    call = null;
+    belUI(false);
+  }
+  $('#csWeg').addEventListener('click', () => eindeGesprek(true));
+  $('#csMute').addEventListener('click', () => {
+    if (!call) return;
+    const t = call.stream.getAudioTracks()[0]; if (!t) return;
+    t.enabled = !t.enabled;
+    $('#csMute').classList.toggle('dicht', !t.enabled);
+  });
+  $('#csCam').addEventListener('click', () => {
+    if (!call) return;
+    const t = call.stream.getVideoTracks()[0]; if (!t) return;
+    t.enabled = !t.enabled;
+    $('#csCam').classList.toggle('dicht', !t.enabled);
+  });
+
+  async function flushIce(){
+    if (!call || !call.pc || !call.pc.remoteDescription) return;
+    for (const c of call.pendingIce.splice(0)) { try { await call.pc.addIceCandidate(c); } catch(e){} }
+  }
+  async function opBelsignaal(d){
+    if (d.kind === 'ring'){
+      if (call){ API.call('/member/call', { toKey: d.from, kind: 'busy' }).catch(()=>{}); return; }
+      inkomend = { from: d.from, codename: d.codename, video: d.video };
+      $('#ciAv').textContent = initCN(d.codename);
+      $('#ciNaam').textContent = d.codename;
+      $('#ciSoort').textContent = d.video ? T('sal.videogesprek','Videogesprek') : T('sal.spraakoproep','Spraakoproep');
+      $('#callIncoming').classList.add('open');
+      return;
+    }
+    if (!call || d.from !== call.withKey) return;
+    if (d.kind === 'accept'){
+      const pc = maakPc();
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      API.call('/member/call', { toKey: call.withKey, kind: 'offer', payload: offer }).catch(()=>{});
+    } else if (d.kind === 'offer'){
+      const pc = maakPc();
+      await pc.setRemoteDescription(d.payload);
+      await flushIce();
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      API.call('/member/call', { toKey: call.withKey, kind: 'answer', payload: answer }).catch(()=>{});
+    } else if (d.kind === 'answer'){
+      await call.pc.setRemoteDescription(d.payload);
+      await flushIce();
+    } else if (d.kind === 'ice'){
+      if (call.pc && call.pc.remoteDescription) { try { await call.pc.addIceCandidate(d.payload); } catch(e){} }
+      else call.pendingIce.push(d.payload);
+    } else if (d.kind === 'hangup' || d.kind === 'decline' || d.kind === 'busy'){
+      toast(d.kind === 'busy' ? T('sal.bezet','In gesprek.') : d.kind === 'decline' ? T('sal.geweigerd','Oproep geweigerd.') : T('sal.opgehangen','Gesprek beëindigd.'));
+      eindeGesprek(false);
+    }
+  }
+
+  function opSociaal(d){
+    if (d.kind === 'request'){ toast('🤝 ' + d.from + ' ' + T('sal.wilverbinden','wil verbinden')); loadSocial(); }
+    else if (d.kind === 'accepted'){ toast('🤝 ' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
+    else if (d.kind === 'dm'){
+      if (dmWith === d.from && $('#dm-sheet').classList.contains('open')){
+        dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
+        API.call('/member/dm', { withKey: d.from }).catch(()=>{}); // gelezen
+      } else {
+        toast('💬 ' + d.codename + ': ' + (d.text || '↗').slice(0, 60));
+        loadSocial();
+      }
+    }
   }
 
   /* ---------- live updates ---------- */
@@ -2064,6 +2456,7 @@
         '<div class="acts">' +
           '<button class="pa js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +
           '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>' + T('app.salon.comment','Reageren') + ' (' + p.comments.length + ')</button>' +
+          '<button class="pa js-share" title="' + T('sal.deel','Delen met een connectie') + '">↗</button>' +
         '</div>' +
         '<div class="comments">' +
           '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b>, ' + msgHTML(c.text, c.lang) + '</div>').join('') + '</div>' +
@@ -2082,6 +2475,8 @@
         el.querySelector('.lc').textContent = post.likes;
         if (API.live) API.call('/like', {postId: post.id, liked: post.liked}).catch(() => {});
       });
+      const shareBtn = el.querySelector('.js-share');
+      if (shareBtn) shareBtn.addEventListener('click', () => openShare(post.id));
       const commBtn = el.querySelector('.js-comm');
       commBtn.addEventListener('click', () => {
         if (commBtn.disabled) return;
@@ -2167,6 +2562,17 @@
 </script>
 <script>
 window.I18N = { en: {
+  'sal.dm.sub':'Member chat, on codenames', 'sal.dm.leeg':'No messages yet. Say hello.',
+  'sal.share.h':'Share with a connection', 'sal.deel':'Share with a connection', 'sal.gedeeld':'Shared.',
+  'sal.add':'Add', 'sal.zoek':'Search', 'sal.zoekph':'Search by codename, e.g. Golden Ibis',
+  'sal.zoekkort':'Type at least two letters.', 'sal.niksgevonden':'No members found with this codename.',
+  'sal.verzoek':'Send request', 'sal.verzonden':'Request sent.', 'sal.isverbonden':'connected',
+  'sal.gevraagd':'requested', 'sal.wachtu':'waiting for you', 'sal.wilverbinden':'wants to connect',
+  'sal.accepteer':'Accept', 'sal.verbonden':'Connected.', 'sal.accepteerde':'accepted your request',
+  'sal.eerstlid':'Members only.', 'sal.geenconn':'No connections yet. Add someone in The Salon first.',
+  'sal.belt':'ringing…', 'sal.videogesprek':'Video call', 'sal.spraakoproep':'Voice call',
+  'sal.algesprek':'A call is already in progress.', 'sal.geenmedia':'No access to microphone or camera.',
+  'sal.bezet':'Busy.', 'sal.geweigerd':'Call declined.', 'sal.opgehangen':'Call ended.',
   'gate.title':'The app.<br>Your membership, <em>always</em> with you.',
   'gate.deck':'Bookings, one-tap payment, your personal AI and The Salon, and your account runs on your codename, not your real name.',
   'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',

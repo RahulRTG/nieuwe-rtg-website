@@ -288,6 +288,12 @@ function initRealtime() {
     });
   }
   if (!db.data.posSales) db.data.posSales = {};                   // kassaverkopen per bedrijf
+  // Salon-connecties: leden vinden elkaar op codenaam, chatten en bellen 1-op-1
+  if (!db.data.connections) db.data.connections = [];              // { a, b, requestedBy, status, at }
+  if (!db.data.memberChats) db.data.memberChats = {};              // 'sleutelA|sleutelB' -> { messages, read }
+  if (!db.data.memberDir) db.data.memberDir = {};                  // sleutel -> { codename, tier }
+  for (const t of ['rtg', 'lifestyle', 'business'])
+    if (!db.data.memberDir[t]) db.data.memberDir[t] = { codename: PERSONAS[t].codename, tier: t };
   if (!db.data.guestChats) db.data.guestChats = {};               // gastchats: lid <-> partner (roomservice, eigenaar)
   if (!db.data.applications) db.data.applications = {};            // sollicitaties per bedrijf
   if (!db.data.cvs) db.data.cvs = {};                               // cv per lid (cv-builder in de leden-app)
@@ -355,7 +361,21 @@ function auth(req, res, next) {
   const sess = resolveSession(token);
   if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
   req.session = sess;
+  dirTouch(sess);
   next();
+}
+
+/* Ledengids voor Salon-connecties: sleutel -> codenaam. Wordt bijgehouden
+   zodra een lid iets doet; zo kunnen leden elkaar op codenaam vinden
+   zonder dat er ooit een echte naam over de lijn gaat. */
+function dirTouch(sess) {
+  if (!sess || sess.tier === 'guest' || !db.data.memberDir) return;
+  const cn = liveCodename(sess);
+  const cur = db.data.memberDir[sess.key];
+  if (!cur || cur.codename !== cn || cur.tier !== sess.tier) {
+    db.data.memberDir[sess.key] = { codename: cn, tier: sess.tier };
+    save();
+  }
 }
 
 /* ---------- Salon-rechten (server-side afgedwongen) ----------
@@ -690,6 +710,148 @@ app.post('/api/notifications', auth, (req, res) => {
 app.post('/api/notifications/read', auth, (req, res) => {
   (db.data.notifications[req.session.tier] || []).forEach(n => n.read = true);
   save();
+  res.json({ ok: true });
+});
+
+/* ================= SALON-CONNECTIES =================
+   Leden voegen elkaar toe op codenaam, sturen elkaar berichten, delen
+   Salon-posts en bellen elkaar (audio/video via WebRTC; de server is
+   alleen het signaleringskanaal en ziet nooit beeld of geluid). */
+
+function dmSleutel(a, b) { return [a, b].sort().join('|'); }
+function connectieTussen(a, b) {
+  return db.data.connections.find(c => (c.a === a && c.b === b) || (c.a === b && c.b === a));
+}
+function geenGast(req, res) {
+  if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return true; }
+  return false;
+}
+
+// leden zoeken op codenaam (nooit op echte naam)
+app.post('/api/member/find', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const q = String(req.body.q || '').trim().toLowerCase();
+  if (q.length < 2) return res.json({ results: [] });
+  const results = Object.entries(db.data.memberDir)
+    .filter(([key, m]) => key !== req.session.key && m.codename.toLowerCase().includes(q))
+    .slice(0, 8)
+    .map(([key, m]) => {
+      const c = connectieTussen(req.session.key, key);
+      return { key, codename: m.codename, tier: m.tier,
+               status: c ? (c.status === 'accepted' ? 'verbonden' : (c.requestedBy === req.session.key ? 'aangevraagd' : 'wacht-op-u')) : 'geen' };
+    });
+  res.json({ results });
+});
+
+// verzoek sturen
+app.post('/api/member/connect', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const key = String(req.body.key || '');
+  if (key === req.session.key) return res.status(400).json({ error: 'Dat bent u zelf.' });
+  if (!db.data.memberDir[key]) return res.status(404).json({ error: 'Dit lid kennen we niet.' });
+  let c = connectieTussen(req.session.key, key);
+  if (c && c.status === 'accepted') return res.json({ ok: true, status: 'verbonden' });
+  if (c) return res.json({ ok: true, status: c.requestedBy === req.session.key ? 'aangevraagd' : 'wacht-op-u' });
+  c = { a: req.session.key, b: key, requestedBy: req.session.key, status: 'pending', at: new Date().toISOString() };
+  db.data.connections.push(c);
+  save();
+  sseToCustomer(key, 'social', { kind: 'request', from: liveCodename(req.session) });
+  res.json({ ok: true, status: 'aangevraagd' });
+});
+
+// verzoek beantwoorden
+app.post('/api/member/connect/respond', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const key = String(req.body.key || '');
+  const c = connectieTussen(req.session.key, key);
+  if (!c || c.status !== 'pending' || c.requestedBy === req.session.key)
+    return res.status(404).json({ error: 'Geen openstaand verzoek van dit lid.' });
+  if (req.body.action === 'accept') {
+    c.status = 'accepted';
+    c.acceptedAt = new Date().toISOString();
+    save();
+    sseToCustomer(key, 'social', { kind: 'accepted', by: liveCodename(req.session) });
+    return res.json({ ok: true, status: 'verbonden' });
+  }
+  db.data.connections = db.data.connections.filter(x => x !== c);
+  save();
+  res.json({ ok: true, status: 'geen' });
+});
+
+// mijn connecties + openstaande verzoeken + ongelezen tellers
+app.post('/api/member/connections', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const mij = req.session.key;
+  const naam = k => (db.data.memberDir[k] || {}).codename || k;
+  const conns = db.data.connections
+    .filter(c => (c.a === mij || c.b === mij) && c.status === 'accepted')
+    .map(c => {
+      const ander = c.a === mij ? c.b : c.a;
+      const chat = db.data.memberChats[dmSleutel(mij, ander)];
+      const laatst = chat && chat.messages.length ? chat.messages[chat.messages.length - 1] : null;
+      const gelezen = chat && chat.read && chat.read[mij] ? chat.read[mij] : '';
+      const unread = chat ? chat.messages.filter(m => m.from !== mij && m.at > gelezen).length : 0;
+      return { key: ander, codename: naam(ander), tier: (db.data.memberDir[ander] || {}).tier,
+               unread, last: laatst ? (laatst.post ? '↗ Salon-post' : laatst.text.slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
+    })
+    .sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
+  const verzoeken = db.data.connections
+    .filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij)
+    .map(c => ({ key: c.requestedBy, codename: naam(c.requestedBy), at: c.at }));
+  res.json({ me: mij, codename: liveCodename(req.session), connections: conns, requests: verzoeken });
+});
+
+// gesprek ophalen (en als gelezen markeren)
+app.post('/api/member/dm', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const ander = String(req.body.withKey || '');
+  const c = connectieTussen(req.session.key, ander);
+  if (!c || c.status !== 'accepted') return res.status(403).json({ error: 'U bent nog niet verbonden met dit lid.' });
+  const k = dmSleutel(req.session.key, ander);
+  const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
+  chat.read[req.session.key] = new Date().toISOString();
+  save();
+  res.json({ messages: chat.messages.slice(-80), codename: (db.data.memberDir[ander] || {}).codename });
+});
+
+// bericht sturen; optioneel met een gedeelde Salon-post erbij
+app.post('/api/member/dm/send', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const ander = String(req.body.toKey || '');
+  const c = connectieTussen(req.session.key, ander);
+  if (!c || c.status !== 'accepted') return res.status(403).json({ error: 'U bent nog niet verbonden met dit lid.' });
+  const text = String(req.body.text || '').slice(0, 500).trim();
+  let postDeel = null;
+  if (req.body.postId != null) {
+    const p = db.data.posts.find(x => x.id === Number(req.body.postId));
+    if (p) postDeel = { id: p.id, author: p.author, place: p.place, text: String(p.text || '').slice(0, 120), photo: p.photo || null };
+  }
+  if (!text && !postDeel) return res.status(400).json({ error: 'Leeg bericht.' });
+  const k = dmSleutel(req.session.key, ander);
+  const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
+  const msg = { from: req.session.key, text, post: postDeel, at: new Date().toISOString() };
+  chat.messages.push(msg);
+  if (chat.messages.length > 300) chat.messages = chat.messages.slice(-300);
+  chat.read[req.session.key] = msg.at;
+  save();
+  const mijnNaam = liveCodename(req.session);
+  sseToCustomer(ander, 'social', { kind: 'dm', from: req.session.key, codename: mijnNaam, text: msg.text, post: msg.post, at: msg.at });
+  res.json({ ok: true, message: msg });
+});
+
+// bel-signalering: pure doorgeefluik tussen twee verbonden leden
+app.post('/api/member/call', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const ander = String(req.body.toKey || '');
+  const c = connectieTussen(req.session.key, ander);
+  if (!c || c.status !== 'accepted') return res.status(403).json({ error: 'U bent nog niet verbonden met dit lid.' });
+  const kind = String(req.body.kind || '');
+  if (!['ring', 'accept', 'offer', 'answer', 'ice', 'hangup', 'decline', 'busy'].includes(kind))
+    return res.status(400).json({ error: 'Onbekend signaal.' });
+  sseToCustomer(ander, 'call', {
+    kind, from: req.session.key, codename: liveCodename(req.session),
+    video: !!req.body.video, payload: req.body.payload || null
+  });
   res.json({ ok: true });
 });
 

@@ -24,6 +24,8 @@
       this.token = token;
       this.onSync = opts.onSync || null;
       this.onChange = opts.onChange || null;
+      this.onSocial = opts.onSocial || null;
+      this.onCall = opts.onCall || null;
       try {
         const r = await fetch('/api/notifications', {
           method: 'POST',
@@ -50,6 +52,14 @@
         this.notifications.unshift(n);
         if (this.onChange) this.onChange(n);
         this._foreground(n);
+      });
+      // Salon-connecties: verzoeken en berichten tussen leden
+      this.source.addEventListener('social', e => {
+        if (this.onSocial) this.onSocial(JSON.parse(e.data));
+      });
+      // bellen en videobellen: WebRTC-signalen tussen leden
+      this.source.addEventListener('call', e => {
+        if (this.onCall) this.onCall(JSON.parse(e.data));
       });
     },
 

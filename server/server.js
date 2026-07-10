@@ -2137,7 +2137,8 @@ app.post('/api/supplier/menu/recipe', supplierAuth, async (req, res) => {
    Kijkt naar alle open bonnen: voorrang voor oude bonnen, dezelfde gerechten
    in een keer maken, en per tafel alles tegelijk laten uitgaan. */
 const coachCache = new Map(); // code -> { hash, lines, at }
-function coachRules(s, open) {
+function coachRules(s, open, lang) {
+  const en = lang === 'en';
   const lines = [];
   const nu = Date.now();
   const age = o => Math.round((nu - new Date(o.at)) / 60000);
@@ -2146,11 +2147,16 @@ function coachRules(s, open) {
   const vers = open.filter(o => !Object.keys(o.secties || {}).length && !Object.keys(o.stations || {}).length);
   if (vers.length) {
     const oudste = vers.reduce((a, b) => new Date(a.at) < new Date(b.at) ? a : b);
-    lines.push('\u25b6 Eerst oppakken: bon ' + oudste.pickup + (tafel(oudste) ? ' (' + tafel(oudste) + ')' : '') + ', wacht ' + age(oudste) + ' min.');
+    const wie = oudste.pickup + (tafel(oudste) ? ' (' + tafel(oudste) + ')' : '');
+    lines.push(en ? '\u25b6 Pick up first: ticket ' + wie + ', waiting ' + age(oudste) + ' min.'
+                  : '\u25b6 Eerst oppakken: bon ' + wie + ', wacht ' + age(oudste) + ' min.');
   }
   // 2. te laat
-  for (const o of open) if (age(o) >= 12 && o.status !== 'klaar')
-    lines.push('\u26a0 Bon ' + o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '') + ' wacht al ' + age(o) + ' min, geef voorrang.');
+  for (const o of open) if (age(o) >= 12 && o.status !== 'klaar') {
+    const wie = o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '');
+    lines.push(en ? '\u26a0 Ticket ' + wie + ' has been waiting ' + age(o) + ' min, give it priority.'
+                  : '\u26a0 Bon ' + wie + ' wacht al ' + age(o) + ' min, geef voorrang.');
+  }
   // 3. batchen: hetzelfde gerecht op meerdere bonnen tegelijk maken
   const per = {};
   for (const o of open) for (const it of (o.items || [])) {
@@ -2162,27 +2168,33 @@ function coachRules(s, open) {
     per[it.id].qty += it.qty; per[it.id].bonnen.push(o.pickup);
   }
   for (const p of Object.values(per)) if (p.bonnen.length >= 2)
-    lines.push('\uD83C\uDF73 Maak ' + p.qty + '\u00d7 ' + p.name + ' in \u00e9\u00e9n keer (bonnen ' + p.bonnen.join(', ') + ').');
+    lines.push(en ? '\uD83C\uDF73 Make ' + p.qty + '\u00d7 ' + p.name + ' in one go (tickets ' + p.bonnen.join(', ') + ').'
+                  : '\uD83C\uDF73 Maak ' + p.qty + '\u00d7 ' + p.name + ' in \u00e9\u00e9n keer (bonnen ' + p.bonnen.join(', ') + ').');
   // 4. samen uitsturen: binnen een bon is een kant klaar terwijl een andere nog niet gestart is
   for (const o of open) {
     const nodig = sectiesForOrder(s, o);
     const klaarK = nodig.filter(x => (o.secties || {})[x] === 'klaar');
     const nietGestart = nodig.filter(x => !(o.secties || {})[x]);
-    if (klaarK.length && nietGestart.length)
-      lines.push('\u23f1 Bon ' + o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '') + ': ' + klaarK.join('/') + ' is klaar, start ' + nietGestart.join(' en ') + ' zodat alles samen uitgaat.');
+    if (klaarK.length && nietGestart.length) {
+      const wie = o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '');
+      lines.push(en ? '\u23f1 Ticket ' + wie + ': ' + klaarK.join('/') + ' is done, start ' + nietGestart.join(' and ') + ' so everything leaves together.'
+                    : '\u23f1 Bon ' + wie + ': ' + klaarK.join('/') + ' is klaar, start ' + nietGestart.join(' en ') + ' zodat alles samen uitgaat.');
+    }
   }
   // 5. tafels: meerdere bonnen voor dezelfde tafel gelijktrekken
   const perTafel = {};
   for (const o of open) if (o.table) { perTafel[o.table] = perTafel[o.table] || []; perTafel[o.table].push(o); }
   for (const [t, os] of Object.entries(perTafel)) if (os.length >= 2)
-    lines.push('\uD83E\uDE91 ' + t + ' heeft ' + os.length + ' bonnen (' + os.map(o => o.pickup).join(', ') + '): stem de kanten af zodat de tafel in \u00e9\u00e9n keer uitgaat.');
+    lines.push(en ? '\uD83E\uDE91 ' + t + ' has ' + os.length + ' tickets (' + os.map(o => o.pickup).join(', ') + '): line up the sections so the table leaves in one go.'
+                  : '\uD83E\uDE91 ' + t + ' heeft ' + os.length + ' bonnen (' + os.map(o => o.pickup).join(', ') + '): stem de kanten af zodat de tafel in \u00e9\u00e9n keer uitgaat.');
   return lines.slice(0, 6);
 }
 app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
   const s = req.supplier;
+  const lang = req.body.lang === 'en' ? 'en' : 'nl';
   const open = db.data.orders.filter(o => o.supplierCode === s.code && ['nieuw', 'in bereiding'].includes(o.status) && sectiesForOrder(s, o).length);
   if (!open.length) return res.json({ ok: true, lines: [], ai: !!anthropic });
-  const hash = crypto.createHash('sha1').update(JSON.stringify(open.map(o => [o.ref, o.status, o.table, o.secties, Math.floor((Date.now() - new Date(o.at)) / 300000)]))).digest('hex');
+  const hash = crypto.createHash('sha1').update(lang + JSON.stringify(open.map(o => [o.ref, o.status, o.table, o.secties, Math.floor((Date.now() - new Date(o.at)) / 300000)]))).digest('hex');
   const cached = coachCache.get(s.code);
   if (cached && cached.hash === hash) return res.json({ ok: true, lines: cached.lines, ai: !!anthropic, cached: true });
   let lines = null;
@@ -2191,14 +2203,16 @@ app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
       const beeld = open.map(o => ({ bon: o.pickup, tafel: o.table || null, min: Math.round((Date.now() - new Date(o.at)) / 60000), items: o.items.map(i => i.qty + 'x ' + i.name), kanten: o.secties || {} }));
       const msg = await anthropic.messages.create({
         model: 'claude-sonnet-5', max_tokens: 600,
-        system: 'Je bent een sous-chef die de lijn aanstuurt. Antwoord UITSLUITEND met een JSON-array van maximaal 6 korte Nederlandse aanwijzingen (strings): wat nu maken, wat batchen, welke tafel samen uitgaat, wie voorrang krijgt.',
+        system: lang === 'en'
+          ? 'You are a sous-chef running the line. Reply ONLY with a JSON array of at most 6 short English instructions (strings): what to fire now, what to batch, which table leaves together, who gets priority.'
+          : 'Je bent een sous-chef die de lijn aanstuurt. Antwoord UITSLUITEND met een JSON-array van maximaal 6 korte Nederlandse aanwijzingen (strings): wat nu maken, wat batchen, welke tafel samen uitgaat, wie voorrang krijgt.',
         messages: [{ role: 'user', content: JSON.stringify(beeld) }]
       });
       const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
       if (Array.isArray(arr) && arr.length) lines = arr.slice(0, 6).map(x => String(x).slice(0, 160));
     } catch (err) { lines = null; }
   }
-  if (!lines) lines = coachRules(s, open);
+  if (!lines) lines = coachRules(s, open, lang);
   coachCache.set(s.code, { hash, lines, at: Date.now() });
   res.json({ ok: true, lines, ai: !!anthropic });
 });

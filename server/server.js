@@ -951,6 +951,7 @@ function publicSupplier(s, lang) {
            ordersOpen: !s.settings || s.settings.ordersOpen !== false,
            reservationsOpen: !s.settings || s.settings.reservationsOpen !== false,
            tablesFree: (s.tables || []).filter(x => x.status === 'vrij').length,
+           tableNames: (s.tables || []).map(t => t.name),
            photos: s.photos || [],
            events: (s.events || []).filter(e => e.published).map(e => ({
              id: e.id, name: e.name, date: e.date, time: e.time, desc: e.desc, price: e.price,
@@ -2070,6 +2071,109 @@ app.post('/api/supplier/event/mep', supplierAuth, async (req, res) => {
   res.json({ ok: true, event: e, added: items.length, covers, ai: !!anthropic });
 });
 
+/* ---- recept/bereidingswijze per gerecht: uitklapbaar op de bon, zodat ook
+   nieuwe mensen weten wat ze maken en hoe. De AI schrijft hem desgewenst. ---- */
+app.post('/api/supplier/menu/recipe', supplierAuth, async (req, res) => {
+  const m = (req.supplier.menu || []).find(x => x.id === req.body.itemId);
+  if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
+  let recept = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 700,
+        system: 'Je bent een chef-kok die werkinstructies schrijft voor nieuwe keukenkrachten. Antwoord in het Nederlands, platte tekst, maximaal 10 korte genummerde stappen: mise en place, bereiding, afwerking en bord. Concreet, geen inleiding.',
+        messages: [{ role: 'user', content: 'Gerecht: ' + m.name + (m.desc ? ' (' + m.desc + ')' : '') + '. Keuken: ' + req.supplier.name + '. Allergenen: ' + ((m.allergens || []).join(', ') || 'geen') + '.' }]
+      });
+      recept = String(msg.content[0].text || '').trim().slice(0, 1500);
+    } catch (err) { recept = null; }
+  }
+  if (!recept) {
+    recept = '1. Mise en place: alle ingredienten voor ' + m.name + ' afwegen en klaarzetten.\n' +
+      (m.desc ? '2. Basis: ' + m.desc + '\n' : '2. Basis volgens de huisreceptuur van ' + req.supplier.name + '.\n') +
+      '3. Bereiden op de eigen sectie (' + (m.sectie || 'warm') + '); tussentijds proeven.\n' +
+      ((m.allergens || []).length ? '4. LET OP allergenen: ' + m.allergens.join(', ') + '. Bij een allergie-bon strikt gescheiden werken.\n' : '') +
+      '5. Afwerking en garnituur; bord vegen.\n' +
+      '6. Doorgeven aan de pas; chef proeft steekproefsgewijs.\n' +
+      '(Laat de manager dit recept aanscherpen in het Kantoor, of zet een ANTHROPIC_API_KEY voor een uitgewerkt recept.)';
+  }
+  m.recept = recept;
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette het recept van ' + m.name + ' op de bon');
+  // bewust geen sync-broadcast: het scherm dat het recept opvroeg werkt zijn
+  // eigen menukopie bij, andere schermen zien het bij hun eerstvolgende refresh
+  res.json({ ok: true, recept, ai: !!anthropic });
+});
+
+/* ---- de keukenhulp: AI-coach die zegt wat er nu moet gebeuren ----
+   Kijkt naar alle open bonnen: voorrang voor oude bonnen, dezelfde gerechten
+   in een keer maken, en per tafel alles tegelijk laten uitgaan. */
+const coachCache = new Map(); // code -> { hash, lines, at }
+function coachRules(s, open) {
+  const lines = [];
+  const nu = Date.now();
+  const age = o => Math.round((nu - new Date(o.at)) / 60000);
+  const tafel = o => o.table ? o.table : null;
+  // 1. voorrang: oudste onaangeroerde bon
+  const vers = open.filter(o => !Object.keys(o.secties || {}).length && !Object.keys(o.stations || {}).length);
+  if (vers.length) {
+    const oudste = vers.reduce((a, b) => new Date(a.at) < new Date(b.at) ? a : b);
+    lines.push('\u25b6 Eerst oppakken: bon ' + oudste.pickup + (tafel(oudste) ? ' (' + tafel(oudste) + ')' : '') + ', wacht ' + age(oudste) + ' min.');
+  }
+  // 2. te laat
+  for (const o of open) if (age(o) >= 12 && o.status !== 'klaar')
+    lines.push('\u26a0 Bon ' + o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '') + ' wacht al ' + age(o) + ' min, geef voorrang.');
+  // 3. batchen: hetzelfde gerecht op meerdere bonnen tegelijk maken
+  const per = {};
+  for (const o of open) for (const it of (o.items || [])) {
+    const m = (s.menu || []).find(x => x.id === it.id);
+    if (!m || m.station === 'bar') continue;
+    const sec = m.sectie || 'warm';
+    if ((o.secties || {})[sec] === 'klaar') continue;
+    per[it.id] = per[it.id] || { name: it.name, qty: 0, bonnen: [] };
+    per[it.id].qty += it.qty; per[it.id].bonnen.push(o.pickup);
+  }
+  for (const p of Object.values(per)) if (p.bonnen.length >= 2)
+    lines.push('\uD83C\uDF73 Maak ' + p.qty + '\u00d7 ' + p.name + ' in \u00e9\u00e9n keer (bonnen ' + p.bonnen.join(', ') + ').');
+  // 4. samen uitsturen: binnen een bon is een kant klaar terwijl een andere nog niet gestart is
+  for (const o of open) {
+    const nodig = sectiesForOrder(s, o);
+    const klaarK = nodig.filter(x => (o.secties || {})[x] === 'klaar');
+    const nietGestart = nodig.filter(x => !(o.secties || {})[x]);
+    if (klaarK.length && nietGestart.length)
+      lines.push('\u23f1 Bon ' + o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '') + ': ' + klaarK.join('/') + ' is klaar, start ' + nietGestart.join(' en ') + ' zodat alles samen uitgaat.');
+  }
+  // 5. tafels: meerdere bonnen voor dezelfde tafel gelijktrekken
+  const perTafel = {};
+  for (const o of open) if (o.table) { perTafel[o.table] = perTafel[o.table] || []; perTafel[o.table].push(o); }
+  for (const [t, os] of Object.entries(perTafel)) if (os.length >= 2)
+    lines.push('\uD83E\uDE91 ' + t + ' heeft ' + os.length + ' bonnen (' + os.map(o => o.pickup).join(', ') + '): stem de kanten af zodat de tafel in \u00e9\u00e9n keer uitgaat.');
+  return lines.slice(0, 6);
+}
+app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
+  const s = req.supplier;
+  const open = db.data.orders.filter(o => o.supplierCode === s.code && ['nieuw', 'in bereiding'].includes(o.status) && sectiesForOrder(s, o).length);
+  if (!open.length) return res.json({ ok: true, lines: [], ai: !!anthropic });
+  const hash = crypto.createHash('sha1').update(JSON.stringify(open.map(o => [o.ref, o.status, o.table, o.secties, Math.floor((Date.now() - new Date(o.at)) / 300000)]))).digest('hex');
+  const cached = coachCache.get(s.code);
+  if (cached && cached.hash === hash) return res.json({ ok: true, lines: cached.lines, ai: !!anthropic, cached: true });
+  let lines = null;
+  if (anthropic) {
+    try {
+      const beeld = open.map(o => ({ bon: o.pickup, tafel: o.table || null, min: Math.round((Date.now() - new Date(o.at)) / 60000), items: o.items.map(i => i.qty + 'x ' + i.name), kanten: o.secties || {} }));
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 600,
+        system: 'Je bent een sous-chef die de lijn aanstuurt. Antwoord UITSLUITEND met een JSON-array van maximaal 6 korte Nederlandse aanwijzingen (strings): wat nu maken, wat batchen, welke tafel samen uitgaat, wie voorrang krijgt.',
+        messages: [{ role: 'user', content: JSON.stringify(beeld) }]
+      });
+      const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
+      if (Array.isArray(arr) && arr.length) lines = arr.slice(0, 6).map(x => String(x).slice(0, 160));
+    } catch (err) { lines = null; }
+  }
+  if (!lines) lines = coachRules(s, open);
+  coachCache.set(s.code, { hash, lines, at: Date.now() });
+  res.json({ ok: true, lines, ai: !!anthropic });
+});
+
 /* ---- dagelijkse mise en place (a la carte, geen event) ----
    De keuken voorspelt de dag: verwachte couverts uit de verkoophistorie van de
    afgelopen drie weken, de tafelcapaciteit en de weekdag; per gerecht een
@@ -2625,7 +2729,8 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     price: Math.max(0, Number(m.price) || 0),
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
     station: m.station === 'bar' ? 'bar' : 'keuken',
-    sectie: ['warm', 'koud', 'snack', 'dessert'].includes(m.sectie) ? m.sectie : 'warm'
+    sectie: ['warm', 'koud', 'snack', 'dessert'].includes(m.sectie) ? m.sectie : 'warm',
+    recept: String(m.recept || '').slice(0, 1500)
   }));
   save();
   logActivity(req.supplier.code, req.actor, 'werkte de menukaart bij');
@@ -2651,6 +2756,17 @@ function sectiesForOrder(s, o) {
   }
   return [...set];
 }
+
+// tafel op een bon zetten of aanpassen (bediening, keuken)
+app.post('/api/supplier/order/table', supplierAuth, (req, res) => {
+  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  o.table = String(req.body.table || '').slice(0, 24);
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette ' + o.ref + ' op ' + (o.table || 'geen tafel'));
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  res.json({ ok: true, order: o });
+});
 
 // keukensectie (warme kant, koude kant, snacks, dessert) meldt bezig of klaar
 app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
@@ -2805,6 +2921,7 @@ app.post('/api/order', auth, (req, res) => {
     supplierCode: s.code, supplierName: s.name, type: s.type,
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     items, total,
+    table: String(req.body.table || '').slice(0, 24),
     allergyNote: String(req.body.allergyNote || '').slice(0, 200),
     tagSalon: !!req.body.tagSalon,
     status: 'nieuw', paid: false, at: new Date().toISOString()

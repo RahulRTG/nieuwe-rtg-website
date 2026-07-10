@@ -405,6 +405,8 @@
   .tkc-who{font-size:0.7rem;color:var(--soft);}
   .tkc-items{display:flex;flex-direction:column;gap:0.3rem;font-size:0.98rem;line-height:1.4;}
   .tkc-items b{color:var(--gold);margin-right:0.45rem;}
+  .rcp-item{cursor:pointer;}
+  .rcp-item:hover{color:var(--gold);}
   .tkc-alg{font-size:0.74rem;color:#E5484D;background:rgba(229,72,77,0.08);border:1px solid rgba(229,72,77,0.35);border-radius:8px;padding:0.4rem 0.6rem;}
   .tkc-act{display:flex;gap:0.5rem;margin-top:0.2rem;}
   .tkc-act button{flex:1;border:none;border-radius:10px;padding:0.9rem;font-size:0.92rem;font-weight:600;font-family:inherit;}
@@ -1057,9 +1059,9 @@
         '<button class="tkc-ready" data-stgo="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div>';
     }
     return '<div class="tkc'+(late?' late':'')+(opts.dim?' dim':'')+'">'+
-      '<div class="tkc-top"><span class="tkc-code">'+o.pickup+'</span><span class="tkc-age">'+a+' min</span></div>'+
+      '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span style="font-size:0.95rem;color:var(--txt);">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+a+' min</span></div>'+
       '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+(o.paid?'':' \u00b7 '+T('st.unpaid','onbetaald'))+'</div>'+
-      '<div class="tkc-items">'+items.map(it=>'<span><b>'+it.qty+'\u00d7</b>'+secIcon(it)+it.name+'</span>').join('')+'</div>'+
+      '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+it.name+'</span>').join('')+'</div>'+
       (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
       (st==='keuken'&&sectiesVanOrder(o).length>1?'<div class="st-badges">'+sectiesVanOrder(o).map(s2=>{
         const p2=(o.secties||{})[s2]||'';
@@ -1127,7 +1129,7 @@
       html += '<div class="st-sec">'+T('st.toserve','Uit te serveren')+' ('+serve.length+')</div>';
       html += serve.length ? serve.map(o => ticketCard(o, null, { serve:true })).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
       html += '<div class="st-sec">'+T('st.making','In de maak')+' ('+making.length+')</div>';
-      html += making.length ? making.map(o => ticketCard(o, null, { dim:false, badges:true })).join('') : '<div class="st-empty">'+T('st.nomaking','Geen lopende bestellingen.')+'</div>';
+      html += making.length ? making.map(o => ticketCard(o, null, { dim:false, badges:true }).replace('</div>$','') .replace(/<\/div>$/, '<div class="tkc-act"><button class="tkc-start" data-settbl="'+o.ref+'" data-cur="'+(o.table||'')+'">\uD83E\uDE91 '+(o.table?o.table+' \u00b7 '+T('st.tblwissel','wijzig'):T('st.tblset','Tafel kiezen'))+'</button></div></div>')).join('') : '<div class="st-empty">'+T('st.nomaking','Geen lopende bestellingen.')+'</div>';
       html += runsheetStrip('bediening');
       const tables = state.tables || [];
       if (tables.length){
@@ -1161,6 +1163,7 @@
         // kies de kant: chef ziet alles, elke sectie alleen het eigen werk, de pas verzamelt
         html += '<div class="st-chips">'+Object.keys(KSECTIES).map(k =>
           '<button data-ksel="'+k+'"'+(keukenSectie===k?' class="on"':'')+'>'+KSECTIES[k][0]+' '+T('ks.'+k, KSECTIES[k][1])+'</button>').join('')+'</div>';
+        html += '<div id="coachBox" style="grid-column:1/-1;display:none;"></div>';
         if (keukenSectie !== 'chef' && keukenSectie !== 'pas'){
           const sec = keukenSectie;
           const mijn = live.filter(o => sectiesVanOrder(o).includes(sec));
@@ -1171,9 +1174,9 @@
             const a = ageMin(o.at); const late = !dim && a >= 10;
             const fase = (o.secties||{})[sec];
             return '<div class="tkc'+(late?' late':'')+(dim?' dim':'')+'">'+
-              '<div class="tkc-top"><span class="tkc-code">'+o.pickup+'</span><span class="tkc-age">'+a+' min</span></div>'+
+              '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span style="font-size:0.95rem;color:var(--txt);">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+a+' min</span></div>'+
               '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+'</div>'+
-              '<div class="tkc-items">'+items.map(it=>'<span><b>'+it.qty+'\u00d7</b>'+it.name+'</span>').join('')+'</div>'+
+              '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+it.name+'</span>').join('')+'</div>'+
               (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
               (dim?'':'<div class="tkc-act">'+(!fase?'<button class="tkc-start" data-secgo="'+o.ref+'" data-phase="bezig">'+T('st.start','Start')+'</button>':'')+
                 '<button class="tkc-ready" data-secgo="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div>')+
@@ -1198,14 +1201,14 @@
           }).join('')+'</div>';
           html += '<div class="st-sec">'+T('ks.pas.klaar','Op de pas, samenstellen en doorgeven')+' ('+opDePas.length+')</div>';
           html += opDePas.length ? opDePas.map(o =>
-            '<div class="tkc"><div class="tkc-top"><span class="tkc-code">'+o.pickup+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
+            '<div class="tkc"><div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span style="font-size:0.95rem;color:var(--txt);">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
             '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+(o.status==='klaar'?T('ks.pas.wacht','wacht op bediening'):T('ks.pas.bar','wacht nog op de bar'))+'</div>'+
             '<div class="tkc-items">'+(o.items||[]).filter(it=>sectieOf(it)).map(it=>'<span><b>'+it.qty+'\u00d7</b>'+KSECTIES[sectieOf(it)][0]+' '+it.name+'</span>').join('')+'</div>'+
             (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+'</div>'
           ).join('') : '<div class="st-empty">'+T('ks.pas.leeg','Nog niets op de pas. Zodra alle kanten klaar zijn, komt de bestelling hier binnen.')+'</div>';
           html += '<div class="st-sec">'+T('ks.pas.bezig','In de maak, per kant')+' ('+bezig.length+')</div>';
           html += bezig.map(o =>
-            '<div class="tkc"><div class="tkc-top"><span class="tkc-code">'+o.pickup+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
+            '<div class="tkc"><div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span style="font-size:0.95rem;color:var(--txt);">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
             badge(o)+
             (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+'</div>'
           ).join('');
@@ -1268,7 +1271,52 @@
     bindStation(el);
   }
 
+  // de keukenhulp: haalt live advies op (Claude of de regel-coach) en toont het
+  let coachSeq = 0;
+  async function loadCoach(el){
+    const box = el.querySelector('#coachBox'); if (!box) return;
+    const mijn = ++coachSeq;
+    try {
+      const d = await API.call('/supplier/kitchen/coach', {});
+      if (mijn !== coachSeq) return; // er is al een nieuwere render
+      if (!d.lines || !d.lines.length){ box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      box.innerHTML = '<div class="tkc" style="border-color:rgba(169,143,28,0.5);">'+
+        '<h3>\uD83E\uDD16 '+T('kc.h','Keukenhulp')+(d.ai?' \u00b7 Claude':'')+'</h3>'+
+        d.lines.map(l=>'<div style="font-size:0.9rem;line-height:1.6;padding:0.2rem 0;">'+l+'</div>').join('')+'</div>';
+    } catch(e){ box.style.display = 'none'; }
+  }
+  // recept uitrollen onder het gerecht; nog geen recept? Dan schrijft de AI er een.
+  async function toggleRecept(span){
+    const bestaand = span.parentElement.querySelector('.rcp-open[data-for="'+span.dataset.rcp+'"]');
+    if (bestaand){ bestaand.remove(); return; }
+    const m = (state.menu||[]).find(x => x.id === span.dataset.rcp);
+    const div = document.createElement('div');
+    div.className = 'rcp-open';
+    div.dataset.for = span.dataset.rcp;
+    div.style.cssText = 'grid-column:1/-1;white-space:pre-line;font-size:0.78rem;color:var(--muted);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.8rem;margin:0.2rem 0 0.3rem;line-height:1.6;';
+    if (m && m.recept){
+      div.textContent = m.recept;
+      span.insertAdjacentElement('afterend', div);
+    } else {
+      div.textContent = T('rcp.making','Nog geen recept; de AI schrijft er nu een...');
+      span.insertAdjacentElement('afterend', div);
+      try {
+        const d = await API.call('/supplier/menu/recipe', { itemId: span.dataset.rcp });
+        div.textContent = d.recept;
+        if (m) m.recept = d.recept;
+      } catch(e){ div.textContent = e.message; }
+    }
+  }
+
   function bindStation(el){
+    if (stationMode === 'keuken') loadCoach(el);
+    el.querySelectorAll('.rcp-item').forEach(s2 => s2.addEventListener('click', () => toggleRecept(s2)));
+    el.querySelectorAll('[data-settbl]').forEach(b => b.addEventListener('click', async () => {
+      const t = prompt(T('st.tblq','Welke tafel? (leeg = geen tafel)'), b.dataset.cur || '');
+      if (t === null) return;
+      try { await API.call('/supplier/order/table', { ref: b.dataset.settbl, table: t.trim() }); await refresh(); } catch(e){ toast(e.message); }
+    }));
     el.querySelectorAll('[data-ksel]').forEach(b => b.addEventListener('click', () => {
       keukenSectie = b.dataset.ksel;
       try { localStorage.setItem('rtg_sup_ksectie', keukenSectie); } catch(e){}
@@ -2827,6 +2875,8 @@ window.I18N = { en: {
   'ks.pas.klaar':'On the pass, assemble and hand over', 'ks.pas.wacht':'waiting for service', 'ks.pas.bar':'still waiting for the bar',
   'ks.pas.leeg':'Nothing on the pass yet. As soon as every side is done, the order lands here.',
   'ks.pas.bezig':'In the making, per side',
+  'kc.h':'Kitchen coach', 'rcp.making':'No recipe yet; the AI is writing one now...',
+  'st.tblq':'Which table? (empty = no table)', 'st.tblset':'Pick table', 'st.tblwissel':'change',
   'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
   'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',

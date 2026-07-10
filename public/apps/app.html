@@ -1447,7 +1447,7 @@
     let data;
     try { data = await API.call('/supplier/menu/get', { code }); }
     catch (e) { toast(e.message); return; }
-    menuState = { supplier: data.supplier, menu: data.menu, qty: {}, note: '', tag: false };
+    menuState = { supplier: data.supplier, menu: data.menu, qty: {}, note: '', tag: false, table: '' };
     $('#msName').textContent = data.supplier.name;
     $('#msMeta').textContent = tType(data.supplier.typeLabel) + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
     renderMenuSheet();
@@ -1522,10 +1522,16 @@
     }
     const total = m.reduce((s,x) => s + x.price * (menuState.qty[x.id]||0), 0);
     const count = Object.values(menuState.qty).reduce((a,b)=>a+b,0);
+    const tafels = menuState.supplier.tableNames || [];
     $('#msFoot').innerHTML =
+      (tafels.length ? '<select class="ms-note" id="msTable" style="margin-bottom:0.5rem;">'+
+        '<option value="">' + T('app.ms.tableq','Aan welke tafel zit u? (optioneel)') + '</option>'+
+        tafels.map(t => '<option' + (menuState.table === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' : '') +
       '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
       '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> ' + T('app.ms.tag','Tag dit voor De Salon (7 dagen na verblijf)') + '</label>' +
       '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? T('app.ms.order','Bestel') + ' ' + count + ' ' + T('app.items','item(s)') + ', ' + eur(total) : T('app.ms.choose','Kies gerechten')) + '</button>';
+    const mt = $('#msTable');
+    if (mt) mt.addEventListener('change', e => menuState.table = e.target.value);
     $('#msNote').addEventListener('input', e => menuState.note = e.target.value);
     $('#msTag').addEventListener('change', e => menuState.tag = e.target.checked);
     const ob = $('#msOrder');
@@ -1536,7 +1542,7 @@
     const items = Object.entries(menuState.qty).filter(([,q]) => q > 0).map(([id,qty]) => ({ id, qty }));
     if (!items.length) return;
     try {
-      await API.call('/order', { supplierCode: menuState.supplier.code, items, allergyNote: menuState.note, tagSalon: menuState.tag });
+      await API.call('/order', { supplierCode: menuState.supplier.code, items, table: menuState.table || '', allergyNote: menuState.note, tagSalon: menuState.tag });
     } catch (e) { toast(e.message); return; }
     $('#menu-sheet').classList.remove('open');
     $('#menu-scrim').classList.remove('open');
@@ -2227,7 +2233,7 @@ window.I18N = { en: {
   'app.ms.closed':'Orders are temporarily closed. The menu remains on view.',
   'app.ms.rooms':'Available rooms', 'app.ms.pernight':'p.n.', 'app.ms.roomnote':'Booking goes via your concierge or Butler AI, at net price.',
   'app.partner':'Partner',
-  'app.ms.note':'Allergy or note (e.g. no nuts)', 'app.ms.tag':'Tag this for The Salon (7 days after the stay)',
+  'app.ms.note':'Allergy or note (e.g. no nuts)', 'app.ms.tableq':'Which table are you at? (optional)', 'app.ms.tag':'Tag this for The Salon (7 days after the stay)',
   'app.ms.order':'Order', 'app.ms.choose':'Choose dishes', 'app.orderplaced':'Order placed with', 'app.paidto':'Paid to',
   'app.welcome':'Welcome,', 'app.membersince':'member since',
   'app.cc.label':'Your codename, your identity in our systems', 'app.cc.membernr':'Member no.', 'app.cc.pass':'Membership',

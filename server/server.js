@@ -219,6 +219,11 @@ function ensureSupplierDefaults(s) {
   const caps = ((db.data.supplierTypes || {})[s.type] || {}).caps || [];
   if (caps.includes('menu') && !Array.isArray(s.tables))
     s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
+  // elk gerecht hoort bij een werkplek: de keuken of de bar; de manager kan
+  // dit per item omzetten onder Menu. Bars/clubs bereiden standaard aan de bar.
+  for (const m of (s.menu || []))
+    if (m.station !== 'keuken' && m.station !== 'bar')
+      m.station = (s.type === 'bar' || s.type === 'club') ? 'bar' : 'keuken';
   if (typeof s.rate !== 'number') s.rate = 0.12;
 }
 
@@ -1030,7 +1035,7 @@ app.post('/api/supplier/login', (req, res) => {
 app.post('/api/supplier/roster', (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
-  res.json({ supplier: { code: s.code, name: s.name }, staff: accounts.listStaff(s.code).map(accounts.publicStaff) });
+  res.json({ supplier: { code: s.code, name: s.name, type: s.type }, staff: accounts.listStaff(s.code).map(accounts.publicStaff) });
 });
 
 // Manager voegt personeel toe (krijgt een PIN) of verwijdert het.
@@ -2163,11 +2168,44 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     name: String(m.name || '').slice(0, 80),
     desc: String(m.desc || '').slice(0, 200),
     price: Math.max(0, Number(m.price) || 0),
-    allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : []
+    allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
+    station: m.station === 'bar' ? 'bar' : 'keuken'
   }));
   save();
   logActivity(req.supplier.code, req.actor, 'werkte de menukaart bij');
   res.json({ ok: true, menu: req.supplier.menu });
+});
+
+// Welke werkplekken (keuken/bar) heeft deze bestelling nodig?
+function stationsForOrder(s, o) {
+  const set = new Set();
+  for (const it of (o.items || [])) {
+    const m = (s.menu || []).find(x => x.id === it.id);
+    set.add(m && m.station === 'bar' ? 'bar' : 'keuken');
+  }
+  return [...set];
+}
+
+// ---- werkplekken: keuken- en barscherm melden hun deel bezig of klaar ----
+app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
+  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  const station = req.body.station === 'bar' ? 'bar' : 'keuken';
+  const phase = req.body.phase === 'klaar' ? 'klaar' : 'bezig';
+  o.stations = o.stations || {};
+  o.stations[station] = phase;
+  if (o.status === 'nieuw') o.status = 'in bereiding';
+  const needed = stationsForOrder(req.supplier, o);
+  const wasKlaar = o.status === 'klaar';
+  if (needed.every(st => o.stations[st] === 'klaar')) o.status = 'klaar';
+  save();
+  broadcastSync([o.customerTier], 'orders');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  if (o.status === 'klaar' && !wasKlaar)
+    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
+  logActivity(req.supplier.code, req.actor, (station === 'bar' ? 'bar' : 'keuken') + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
+  res.json({ ok: true, order: o });
 });
 
 // ---- leverancier werkt orderstatus bij → klant live op de hoogte ----

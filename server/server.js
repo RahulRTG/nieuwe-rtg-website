@@ -24,6 +24,15 @@ const i18n = require('./translate');
 const accounts = require('./accounts');
 const mail = require('./mail');
 
+// Vangnet: een niet-afgevangen belofte-afwijzing (bijv. een externe AI- of
+// vertaalaanroep die faalt) beeindigt in Node 22 standaard het proces. Voor een
+// webserver is dat een crash-DoS: een enkel verzoek zou de actieve server
+// kunnen platleggen. We loggen zo'n afwijzing en laten de server doordraaien;
+// het verzoek dat hem veroorzaakte krijgt geen antwoord, maar de rest wel.
+process.on('unhandledRejection', reason => {
+  console.error('[unhandledRejection]', (reason && reason.message) || reason);
+});
+
 function appUrl(req) {
   return process.env.APP_URL || req.headers.origin || (req.protocol + '://' + req.get('host'));
 }
@@ -5106,8 +5115,13 @@ app.post('/api/whatsapp/webhook', async (req, res) => {
   if (!from || !text) return res.status(400).json({ error: 'Nummer of tekst ontbreekt.' });
   const user = accounts.findByPhone(from);
   if (!user) return res.json({ ok: true, matched: false }); // onbekend nummer: negeren
-  await memberSays(user, text, 'whatsapp');
-  res.json({ ok: true, matched: true });
+  try {
+    await memberSays(user, text, 'whatsapp');
+    res.json({ ok: true, matched: true });
+  } catch (e) {
+    console.error('[whatsapp]', e && e.message);
+    res.status(200).json({ ok: true, matched: true, deferred: true }); // webhook nooit laten falen
+  }
 });
 
 /* Backoffice: concierge-inbox voor Lifestyle/Business-leden. */

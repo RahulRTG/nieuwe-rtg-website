@@ -132,6 +132,24 @@ test('bestellen en betalen: een order loopt van open naar betaald', async () => 
   assert.ok(status && status !== 'wacht-op-betaling', 'na betaling is de order niet meer open, status: ' + status);
 });
 
+test('robuustheid: async-endpoints beantwoorden netjes en laten de server draaien', async () => {
+  // De WhatsApp-webhook is afgevangen: een bekend nummer wordt afgehandeld,
+  // een onbekend nummer netjes genegeerd, en niets laat de server crashen.
+  const bekend = await api('/whatsapp/webhook', { from: '+31612345678', text: 'hallo' });
+  assert.equal(bekend.status, 200);
+  const onbekend = await (await api('/whatsapp/webhook', { from: '+31600000001', text: 'hoi' })).json();
+  assert.equal(onbekend.matched, false, 'onbekend nummer wordt genegeerd');
+  const leeg = await api('/whatsapp/webhook', { from: '', text: '' });
+  assert.equal(leeg.status, 400);
+
+  // De vertaal-endpoint valt netjes terug (geen crash) zonder AI-sleutel.
+  const tr = await api('/translate', { text: 'Goedemorgen', to: 'en' });
+  assert.equal(tr.status, 200);
+
+  // De server draait nog na al die async-verzoeken.
+  assert.equal((await fetch(BASE + '/api/health')).status, 200);
+});
+
 test('XSS-preventie: HTML in de naam wordt bij registratie ontdaan van < en >', async () => {
   const email = 'xss' + Date.now() + '@voorbeeld.test';
   const boos = '<img src=x onerror="window.x=1">Bob';

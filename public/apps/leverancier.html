@@ -647,7 +647,9 @@
     { code:'HOSHI',   name:'Hoshinoya Kyoto', type:'Hotel',      icon:'🏨', sub:'Hotel · Kyoto' },
     { code:'SAKURA',  name:'Sakura Machiya Residence', type:'Appartement', icon:'🏡', sub:'Appartement · Kyoto' },
     { code:'MKKX',    name:'Kyoto Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Kyoto' },
-    { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' }
+    { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' },
+    { code:'AYAKA',   name:'Studio Ayaka', type:'Zelfstandig', icon:'🧑‍🎨', sub:'Mode & styling · Kyoto' },
+    { code:'KAITO',   name:'Kaito Health', type:'Zelfstandig', icon:'🏋️', sub:'Health & wellness · Kyoto' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -658,6 +660,7 @@
     appartement: { label:'RTG Appartement', labelEn:'RTG Apartment',  codes:['SAKURA'],  icon:'🏡' },
     taxi:        { label:'RTG Taxi',        labelEn:'RTG Taxi',       codes:['MKKX'],    icon:'🚘' },
     privejet:    { label:'RTG Privéjet',    labelEn:'RTG Private Jet', codes:['JETAG'],  icon:'✈️' },
+    zzp:         { label:'RTG Zelfstandig', labelEn:'RTG Independent', codes:['AYAKA','KAITO'], icon:'🧑‍🎨' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG'],    icon:'🚘', legacy:true }
@@ -738,7 +741,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', AYAKA:'zzp', KAITO:'zzp' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -789,6 +792,9 @@
         ['bediening','\uD83E\uDDFE',T('st.bediening','Bedieningspost'),T('st.bediening.s','Uitserveren, tafels en de PDA op een plek')],
         ['events','\uD83C\uDF9F',T('st.events','Events-scherm'),T('st.events.s','Gastenlijst en check-in aan de deur')]
       );
+    }
+    if (gtype === 'zzp'){
+      st.push(['agenda','\uD83D\uDDD3\uFE0F',T('st.agenda','Agenda'),T('st.agenda.s','Uw boekingen: bevestigen, leveren en afronden')]);
     }
     if (['taxi','jet'].includes(gtype)){
       st.push(['chauffeur', gtype==='jet' ? '\u2708\uFE0F' : '\uD83D\uDE98',
@@ -1217,6 +1223,33 @@
       html += '<div class="st-sec">'+T('ch.vandaag','Vandaag')+'</div>'+
         '<div class="tkc"><div class="tkc-top"><span style="font-weight:600;">'+klaarVandaag.length+' '+T('ch.ritten','rit(ten) afgerond')+'</span>'+
         '<span class="tkc-code">'+eur(omzet)+'</span></div><div class="tkc-who">'+T('ch.netto','Volledig voor de zaak: RTG rekent 0% commissie.')+'</div></div>';
+    } else if (stationMode === 'agenda'){
+      // de agenda van de zelfstandige professional: aanvragen bevestigen,
+      // leveren en afronden, met de verdiensten van vandaag eronder
+      const bs = state.boekingen || [];
+      const openB = bs.filter(b => b.status === 'aangevraagd');
+      const komend = bs.filter(b => b.status === 'bevestigd');
+      const vandaagB = new Date().toISOString().slice(0, 10);
+      const klaarB = bs.filter(b => b.status === 'afgerond' && String(b.finishedAt || b.at).slice(0, 10) === vandaagB);
+      const omzetB = klaarB.reduce((x, b) => x + (b.price || 0), 0);
+      const kaartB = (b, acties) => '<div class="tkc" style="grid-column:1/-1;">'+
+        '<div class="tkc-top"><span class="tkc-code" style="font-size:1.2rem;">'+b.customerCodename+'</span><span class="tkc-age">'+(b.wanneer || timeAgo(b.at))+'</span></div>'+
+        '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'📦 ':'🗓️ ')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--gold);">'+eur(b.price)+'</b></div>'+
+        (b.note?'<div class="tkc-alg">📝 '+b.note+'</div>':'')+
+        (acties?'<div class="tkc-act">'+acties+'</div>':'')+
+      '</div>';
+      html += '<div class="st-sec">'+T('ag.open','Nieuwe aanvragen')+' ('+openB.length+')</div>';
+      html += openB.length ? openB.map(b => kaartB(b,
+        '<button class="tkc-start" data-bkgo="'+b.ref+'" data-st="bevestigd">'+T('ag.bevestig','Bevestig')+'</button>'+
+        '<button class="obtn warn" data-bkgo="'+b.ref+'" data-st="geweigerd" style="margin-left:0.5rem;">'+T('ag.weiger','Weiger')+'</button>')).join('')
+        : '<div class="st-empty">'+T('ag.geenopen','Geen nieuwe aanvragen. Leden boeken uw diensten en producten via de RTG-app; betaald is definitief.')+'</div>';
+      html += '<div class="st-sec">'+T('ag.komend','Bevestigd')+' ('+komend.length+')</div>';
+      html += komend.length ? komend.map(b => kaartB(b,
+        '<button class="tkc-ready" data-bkgo="'+b.ref+'" data-st="afgerond">'+T('ag.rondaf','Rond af')+'</button>')).join('')
+        : '<div class="st-empty">'+T('ag.geenkomend','Nog niets bevestigd.')+'</div>';
+      html += '<div class="st-sec">'+T('ch.vandaag','Vandaag')+'</div>'+
+        '<div class="tkc"><div class="tkc-top"><span style="font-weight:600;">'+klaarB.length+' '+T('ag.klaar','afspraak/afspraken afgerond')+'</span>'+
+        '<span class="tkc-code">'+eur(omzetB)+'</span></div><div class="tkc-who">'+T('ch.netto','Volledig voor de zaak: RTG rekent 0% commissie.')+'</div></div>';
     } else {
       const st = stationMode;
       if (st === 'keuken'){
@@ -1420,6 +1453,9 @@
     el.querySelectorAll('[data-chgo]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/ride/status', { ref: b.dataset.chgo, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
     }));
+    el.querySelectorAll('[data-bkgo]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.bkgo, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
+    }));
     el.querySelectorAll('[data-chneem]').forEach(b => b.addEventListener('click', async () => {
       try {
         const s2 = await API.call('/supplier/ride/suggest', { ref: b.dataset.chneem });
@@ -1494,6 +1530,7 @@
       ['tarief','\uD83E\uDDEE',T('kt.tarief','Tarief')],
       ['prijzen','\uD83D\uDCB6',T('kt.prijzen','Prijzen')]
     );
+    if (type === 'zzp') secs.push(['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]);
     secs.push(['marketing','\uD83D\uDCE3','Marketing']);
     if (!secs.some(s2 => s2[0] === kantoorSec)) kantoorSec = 'bo';
     let html = '<div class="st-chips">'+secs.map(s2 =>
@@ -1828,6 +1865,22 @@
         '<label style="font-size:0.7rem;color:var(--soft);">'+T('kt.min','Minimumprijs (€)')+'</label><input class="st-in" id="ktTc" type="number" step="1" value="'+(t2.minimum||0)+'">'+
         '<button class="bigbtn" id="ktTSave" style="margin-top:0.2rem;">'+T('kt.tsave','Tarief opslaan')+'</button></div></div>';
     }
+    if (kantoorSec === 'diensten'){
+      // het aanbod van de zelfstandige: diensten en producten, eigen beheer
+      const sv = state.services || [];
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗂️ '+T('kt.aanbod','Uw diensten en producten')+' ('+sv.length+')</h3>'+
+        (sv.length ? sv.map(x =>
+          '<div class="st-row"><span>'+(x.soort==='product'?'📦':'🗓️')+' '+x.name+'<span class="sub">'+(x.desc||'')+(x.duurMin?' · '+x.duurMin+' min':'')+'</span></span>'+
+          '<span class="acts"><b style="color:var(--gold);margin-right:0.4rem;">'+eur(x.price)+'</b><button class="obtn warn" data-svdel="'+x.id+'">✕</button></span></div>').join('')
+          : '<div class="tkc-who">'+T('kt.geenaanbod','Nog geen aanbod. Voeg hieronder uw eerste dienst of product toe.')+'</div>')+
+        '<div class="st-form"><input class="st-in" id="svNaam" placeholder="'+T('kt.svnaam','Naam, bijv. Personal styling')+'">'+
+        '<input class="st-in" id="svDesc" placeholder="'+T('kt.svdesc','Korte omschrijving')+'">'+
+        '<div style="display:flex;gap:0.5rem;"><input class="st-in" id="svPrijs" type="number" placeholder="€" style="flex:1;">'+
+        '<input class="st-in" id="svDuur" type="number" placeholder="'+T('kt.svduur','min.')+'" style="flex:1;">'+
+        '<select class="st-in" id="svSoort" style="flex:1;"><option value="dienst">'+T('kt.svdienst','Dienst')+'</option><option value="product">'+T('kt.svproduct','Product')+'</option></select></div>'+
+        '<button class="bigbtn" id="svAdd" style="margin-top:0.2rem;">'+T('kt.svadd','Zet in de RTG-app')+'</button></div>'+
+        '<div class="tkc-who">'+T('kt.svnote','Leden zien dit direct in de app en boeken met datum en tijd; u houdt 100% van de prijs.')+'</div></div>';
+    }
     if (kantoorSec === 'prijzen'){
       const h = state.prices || [];
       html += '<div class="tkc"><h3>💶 '+T('kt.newprice','Prijs doorgeven aan RTG')+'</h3>'+
@@ -2058,6 +2111,20 @@
     // deuren
     el.querySelectorAll('[data-kdoor]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/door/toggle', { id: b.dataset.kdoor }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // aanbodbeheer van de zelfstandige
+    const svA = el.querySelector('#svAdd'); if (svA) svA.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/service', { action: 'add',
+          name: el.querySelector('#svNaam').value, desc: el.querySelector('#svDesc').value,
+          price: Number(el.querySelector('#svPrijs').value), duurMin: Number(el.querySelector('#svDuur').value),
+          soort: el.querySelector('#svSoort').value });
+        kantoorMsg = '✅ '+T('kt.svklaar','In de app gezet; leden kunnen direct boeken.');
+        await refresh();
+      } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-svdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/service', { action: 'remove', id: b.dataset.svdel }); await refresh(); } catch(e){ toast(e.message); }
     }));
     // verlofaanvragen beslissen
     el.querySelectorAll('[data-kvja]').forEach(b => b.addEventListener('click', async () => {
@@ -3472,6 +3539,17 @@ window.I18N = { en: {
   'fn.regels':'Rules in ', 'fn.ai':'AI accountant',
   'fn.ai.s':'Knows your country, your figures and the rules. Ask about VAT, wage costs, gift cards or filing deadlines.',
   'fn.ai.ph':'E.g. how much VAT do I remit this month?', 'fn.vraag':'Ask',
+  'st.agenda':'Diary', 'st.agenda.s':'Your bookings: confirm, deliver and complete',
+  'ag.open':'New requests', 'ag.bevestig':'Confirm', 'ag.weiger':'Decline',
+  'ag.geenopen':'No new requests. Members book your services and products via the RTG app; paid means confirmed.',
+  'ag.komend':'Confirmed', 'ag.rondaf':'Complete', 'ag.geenkomend':'Nothing confirmed yet.',
+  'ag.klaar':'appointment(s) completed',
+  'kt.diensten':'Offering', 'kt.aanbod':'Your services and products',
+  'kt.geenaanbod':'No offering yet. Add your first service or product below.',
+  'kt.svnaam':'Name, e.g. Personal styling', 'kt.svdesc':'Short description', 'kt.svduur':'min.',
+  'kt.svdienst':'Service', 'kt.svproduct':'Product', 'kt.svadd':'Put in the RTG app',
+  'kt.svnote':'Members see this instantly in the app and book with date and time; you keep 100% of the price.',
+  'kt.svklaar':'Live in the app; members can book right away.',
   'kt.verlof':'Leave & sick', 'kt.vja':'Approve', 'kt.vnee':'Decline',
   'kt.geenverlof':'No open requests. Staff request leave via the PDA; sick reports also arrive here.',
   'kt.ziek':'reported sick', 'kt.vok':'approved', 'kt.vno':'declined', 'kt.vzm':'reported',

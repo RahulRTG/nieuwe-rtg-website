@@ -44,7 +44,10 @@ const STAFF_SEED = {
   PONTO: [['Aiko Sato', 'manager', 'Bar'], ['Ren Kimura', 'staff', 'Bediening']],
   HOSHI: [['Haruki Ito', 'manager', 'Receptie'], ['Mei Kobayashi', 'staff', 'Housekeeping']],
   MKKX: [['Daisuke Yamamoto', 'manager', 'Taxi centrale'], ['Hana Suzuki', 'staff', 'Chauffeur']],
-  JETAG: [['Sophie Bakker', 'manager', 'Operations'], ['Lucas de Jong', 'staff', 'Crew']]
+  JETAG: [['Sophie Bakker', 'manager', 'Operations'], ['Lucas de Jong', 'staff', 'Crew']],
+  // zelfstandigen: eenmanszaken, dus alleen een eigenaar met beheer-rechten
+  AYAKA: [['Ayaka Nishimura', 'manager', 'Personal stylist']],
+  KAITO: [['Kaito Tanabe', 'manager', 'Personal trainer']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -302,6 +305,35 @@ function initRealtime() {
     });
   }
   if (!db.data.posSales) db.data.posSales = {};                   // kassaverkopen per bedrijf
+  // het zzp-genre: zelfstandige professionals (mode, health, fotografie...)
+  // bieden diensten en producten aan; leden boeken met datum en tijd
+  if (!db.data.supplierTypes.zzp)
+    db.data.supplierTypes.zzp = { label: 'Zelfstandig professional', icon: '🧑‍🎨', caps: ['services', 'location', 'pricing'] };
+  if (!db.data.boekingen) db.data.boekingen = [];
+  if (!db.data.suppliers.find(s => s.code === 'AYAKA')) {
+    db.data.suppliers.push({
+      code: 'AYAKA', name: 'Studio Ayaka', type: 'zzp', city: 'Kyoto', vak: 'Mode & styling',
+      loc: { lat: 35.006, lng: 135.772, label: 'Gion, Kyoto' }, rate: 0.1,
+      menu: [], photos: [],
+      services: [
+        { id: 's1', name: 'Personal styling, seizoensgarderobe', desc: 'Twee uur aan huis of in de studio, incl. kleurenanalyse', price: 240, duurMin: 120, soort: 'dienst' },
+        { id: 's2', name: 'Persoonlijke shopdag Kyoto', desc: 'Een dag langs ateliers en verborgen boetieks', price: 520, duurMin: 360, soort: 'dienst' },
+        { id: 's3', name: 'Zijden pochet, handgemaakt', desc: 'Uit eigen atelier, geleverd op de suite', price: 85, soort: 'product' }
+      ]
+    });
+  }
+  if (!db.data.suppliers.find(s => s.code === 'KAITO')) {
+    db.data.suppliers.push({
+      code: 'KAITO', name: 'Kaito Health', type: 'zzp', city: 'Kyoto', vak: 'Health & wellness',
+      loc: { lat: 35.011, lng: 135.768, label: 'Nakagyo, Kyoto' }, rate: 0.1,
+      menu: [], photos: [],
+      services: [
+        { id: 's1', name: 'Personal training, privesessie', desc: 'In de hotelgym of buiten, incl. programma op maat', price: 110, duurMin: 60, soort: 'dienst' },
+        { id: 's2', name: 'Sportmassage, 60 minuten', desc: 'Op de kamer; tafel en olien inbegrepen', price: 95, duurMin: 60, soort: 'dienst' },
+        { id: 's3', name: 'Voedingsplan op maat, per week', desc: 'Afgestemd op reisschema en de keukens onderweg', price: 150, soort: 'product' }
+      ]
+    });
+  }
   // Salon-connecties: leden vinden elkaar op codenaam, chatten en bellen 1-op-1
   if (!db.data.connections) db.data.connections = [];              // { a, b, requestedBy, status, at }
   if (!db.data.memberChats) db.data.memberChats = {};              // 'sleutelA|sleutelB' -> { messages, read }
@@ -1174,7 +1206,12 @@ function publicSupplier(s, lang) {
              capacity: e.capacity,
              spotsLeft: Math.max(0, e.capacity - (e.guests || []).reduce((n, g) => n + g.qty, 0))
            })),
-           rooms: (s.rooms || []).filter(r => r.available).map(r => ({ id: r.id, name: r.name, desc: i18n.localize(r.desc, lang), price: r.price })) };
+           rooms: (s.rooms || []).filter(r => r.available).map(r => ({ id: r.id, name: r.name, desc: i18n.localize(r.desc, lang), price: r.price })),
+           // zelfstandigen: het vak en de boekbare diensten/producten
+           vak: s.vak || null,
+           services: (t.caps || []).includes('services')
+             ? (s.services || []).map(x => ({ id: x.id, name: x.name, desc: x.desc, price: x.price, duurMin: x.duurMin || null, soort: x.soort || 'dienst' }))
+             : undefined };
 }
 
 // dashboarddata voor de ingelogde leverancier
@@ -1190,8 +1227,13 @@ function supplierState(s, actor) {
   const alleRitten = db.data.rides.filter(r => r.supplierCode === s.code && r.status !== 'wacht-op-betaling');
   const klaarAll = alleRitten.filter(r => r.status === 'afgerond' || r.status === 'gearriveerd');
   const zichtRitten = alleRitten.filter(r => !RIDE_KLAAR[r.status] || String(r.finishedAt || r.at).slice(0, 10) === vandaag).slice(0, 80);
+  const BOEK_KLAAR = { 'afgerond': 1, 'geweigerd': 1 };
+  const alleBoekingen = db.data.boekingen.filter(b => b.supplierCode === s.code && b.status !== 'wacht-op-betaling');
+  const zichtBoekingen = alleBoekingen.filter(b => !BOEK_KLAAR[b.status] || String(b.finishedAt || b.at).slice(0, 10) === vandaag).slice(0, 80);
   return {
-    supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate },
+    supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate, vak: s.vak || null },
+    services: s.services || null,
+    boekingen: zichtBoekingen,
     rooms: s.rooms || null,
     doors: s.doors || null,
     tables: s.tables || null,
@@ -1233,7 +1275,8 @@ function supplierState(s, actor) {
       orders: alleOrders.length,
       rides: alleRitten.length,
       historie: klaarAll.length,
-      ritOmzet: klaarAll.reduce((s2, r) => s2 + (r.quote || 0), 0)
+      ritOmzet: klaarAll.reduce((s2, r) => s2 + (r.quote || 0), 0),
+      boekingen: alleBoekingen.length
     },
     // personeelszaken voor het kantoor: verlofaanvragen en wie er nu binnen is
     verlof: (db.data.verlof[s.code] || []).slice(0, 30),
@@ -3020,6 +3063,7 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   const vandaag = new Date().toISOString().slice(0, 10);
   const orders = db.data.orders.filter(o => o.supplierCode === s.code && o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald');
   const ritten = db.data.rides.filter(r => r.supplierCode === s.code && r.paid && r.status !== 'geweigerd');
+  const boekingen = db.data.boekingen.filter(b => b.supplierCode === s.code && b.paid && b.status !== 'geweigerd');
   // kassaverkopen zonder dubbeltellingen: RTG-codes zijn al app-omzet,
   // kamerlasten tellen pas bij het uitchecken
   const kassa = (db.data.posSales[s.code] || []).filter(v => v.method !== 'rtg' && v.method !== 'kamer');
@@ -3031,17 +3075,20 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
       label: new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short' }),
       omzet: orders.filter(o => dag(o.paidAt || o.at) === d).reduce((x, o) => x + (o.total || 0), 0)
         + ritten.filter(r => dag(r.paidAt || r.at) === d).reduce((x, r) => x + (r.quote || 0), 0)
+        + boekingen.filter(b => dag(b.paidAt || b.at) === d).reduce((x, b) => x + (b.price || 0), 0)
         + kassa.filter(v => dag(v.at) === d).reduce((x, v) => x + (v.total || 0), 0),
       aantal: orders.filter(o => dag(o.paidAt || o.at) === d).length
         + ritten.filter(r => dag(r.paidAt || r.at) === d).length
+        + boekingen.filter(b => dag(b.paidAt || b.at) === d).length
         + kassa.filter(v => dag(v.at) === d).length
     });
   }
-  // toppers: wat verkoopt het best, app en kassa samen
+  // toppers: wat verkoopt het best, app, kassa en boekingen samen
   const teller = {};
   const telItems = lijst => { for (const it of (lijst || [])) { if (!it.name) continue; const t = teller[it.name] = teller[it.name] || { naam: it.name, aantal: 0, omzet: 0 }; t.aantal += it.qty || 1; t.omzet += (it.price || 0) * (it.qty || 1); } };
   for (const o of orders) telItems(o.items);
   for (const v of kassa) telItems(v.items);
+  for (const b of boekingen) { const t2 = teller[b.service.name] = teller[b.service.name] || { naam: b.service.name, aantal: 0, omzet: 0 }; t2.aantal += 1; t2.omzet += b.price || 0; }
   const toppers = Object.values(teller).sort((a, b) => b.omzet - a.omzet).slice(0, 8);
   // actiecentrum van de zaak
   const alerts = [];
@@ -3062,6 +3109,12 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
       alerts.push({ level: 'amber', text: en
         ? 'Scheduled ride ' + r.ref + ' (' + String(r.plannedFor).slice(0, 16).replace('T', ' ') + ') has no driver yet.'
         : 'Geplande rit ' + r.ref + ' (' + String(r.plannedFor).slice(0, 16).replace('T', ' ') + ') heeft nog geen chauffeur.' });
+  }
+  for (const b of db.data.boekingen) {
+    if (b.supplierCode !== s.code || !b.paid || b.status !== 'aangevraagd') continue;
+    if (minGeleden(b.paidAt || b.at) >= 30) alerts.push({ level: 'amber', text: en
+      ? 'Booking ' + b.ref + ' (' + b.service.name + ') is still waiting for your confirmation.'
+      : 'Boeking ' + b.ref + ' (' + b.service.name + ') wacht nog op uw bevestiging.' });
   }
   const verlofN = (db.data.verlof[s.code] || []).filter(v => v.status === 'nieuw').length;
   if (verlofN) alerts.push({ level: 'amber', text: en ? verlofN + ' leave request(s) await your decision (HR & team).' : verlofN + ' verlofaanvraag/aanvragen wachten op uw besluit (HR & team).' });
@@ -3104,6 +3157,115 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
       : (en ? 'Everything is running smoothly.' : 'Alles loopt.'));
   zin.push(en ? 'RTG charges 0% commission: this revenue is fully yours.' : 'RTG rekent 0% commissie: deze omzet is volledig van u.');
   res.json({ stats, week, toppers, alerts: alerts.slice(0, 12), briefing: zin.join(' ') });
+});
+
+/* ---- zzp-boekingen: diensten en producten van zelfstandige professionals ----
+   Leden boeken met datum en tijd; de zelfstandige bevestigt, levert en rondt
+   af. Betalen-eerst geldt hier net zo (tenzij de zaak achteraf kiest). */
+const BOEK_KETEN = ['aangevraagd', 'bevestigd', 'afgerond'];
+
+app.post('/api/booking/request', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  if (!s || !caps.includes('services')) return res.status(404).json({ error: 'Geen zelfstandige professional gevonden.' });
+  if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen boekingen aan.' });
+  const dienst = (s.services || []).find(x => x.id === req.body.serviceId);
+  if (!dienst) return res.status(404).json({ error: 'Deze dienst bestaat niet (meer).' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const vooraf = optieAan(s, 'betaalVooraf');
+  const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
+  const wanneer = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d + (/^\d{2}:\d{2}$/.test(u) ? ' ' + u : '') : null;
+  const boeking = {
+    ref: 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    supplierCode: s.code, supplierName: s.name,
+    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    service: { id: dienst.id, name: dienst.name, soort: dienst.soort || 'dienst', duurMin: dienst.duurMin || null },
+    price: dienst.price,
+    wanneer, note: schoon(req.body.note, 140),
+    betaalMoment: vooraf ? 'vooraf' : 'achteraf',
+    status: vooraf ? 'wacht-op-betaling' : 'aangevraagd',
+    paid: false, at: new Date().toISOString()
+  };
+  db.data.boekingen.unshift(boeking);
+  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  save();
+  if (!vooraf) {
+    notifySupplier(s.code, { icon: '🗓️', title: 'Nieuwe boeking (betaling achteraf)', body: codename + ': ' + dienst.name + (wanneer ? ' · ' + wanneer : '') + ' · € ' + dienst.price });
+    sseToSupplier(s.code, 'sync', { scope: 'orders' });
+    sseToOffice('sync', { scope: 'orders' });
+  }
+  res.json({ ok: true, boeking });
+});
+
+app.post('/api/booking/pay', auth, (req, res) => {
+  const b = db.data.boekingen.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
+  if (!b) return res.status(404).json({ error: 'Boeking niet gevonden.' });
+  if (b.paid) return res.status(409).json({ error: 'Al betaald.' });
+  if (b.status === 'wacht-op-betaling' && Date.now() - new Date(b.at) > 30 * 60000)
+    return res.status(410).json({ error: 'Deze aanvraag is verlopen. Boek opnieuw.' });
+  b.paid = true;
+  b.paidAt = new Date().toISOString();
+  if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
+  save();
+  notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
+  sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true, boeking: b });
+});
+
+app.post('/api/bookings/mine', auth, (req, res) => {
+  const mijn = db.data.boekingen.filter(b => (b.customerKey || b.customerTier) === req.session.key);
+  res.json({ boekingen: mijn.slice(0, 25), total: mijn.length });
+});
+
+// de zelfstandige bevestigt, rondt af of weigert (alleen vooruit in de keten)
+app.post('/api/supplier/booking/status', supplierAuth, (req, res) => {
+  const b = db.data.boekingen.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!b) return res.status(404).json({ error: 'Boeking niet gevonden.' });
+  if (b.status === 'wacht-op-betaling') return res.status(409).json({ error: 'Deze boeking is nog niet betaald.' });
+  const status = String(req.body.status || '');
+  if (status !== 'geweigerd') {
+    if (!BOEK_KETEN.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
+    if (BOEK_KETEN.indexOf(status) <= BOEK_KETEN.indexOf(b.status)) return res.status(409).json({ error: 'Deze boeking is al ' + b.status + '.' });
+  } else if (b.status === 'afgerond') {
+    return res.status(409).json({ error: 'Deze boeking is al afgerond.' });
+  }
+  b.status = status;
+  if (status === 'afgerond') b.finishedAt = new Date().toISOString();
+  save();
+  const MELDING = { bevestigd: 'Uw afspraak is bevestigd.', afgerond: 'Dank u wel; uw afspraak is afgerond.', geweigerd: 'Uw aanvraag kon helaas niet worden bevestigd.' };
+  notify(b.customerTier, { icon: '🗓️', title: req.supplier.name, body: MELDING[status] + (b.wanneer && status === 'bevestigd' ? ' (' + b.wanneer + ')' : ''), scope: 'orders' });
+  sseToCustomer(b.customerKey || b.customerTier, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  logActivity(req.supplier.code, req.actor, 'zette boeking ' + b.ref + ' op "' + status + '"');
+  res.json({ ok: true, boeking: b });
+});
+
+// dienstenbeheer: de zelfstandige is baas over het eigen aanbod
+app.post('/api/supplier/service', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor de eigenaar.' });
+  const s = req.supplier;
+  s.services = s.services || [];
+  const a = String(req.body.action || '');
+  if (a === 'add') {
+    const name = schoon(req.body.name, 80);
+    const price = Math.round(Number(req.body.price) * 100) / 100;
+    if (!name || !(price > 0)) return res.status(400).json({ error: 'Geef de dienst een naam en een prijs.' });
+    s.services.push({
+      id: 'sv' + Date.now().toString(36),
+      name, desc: schoon(req.body.desc, 140), price,
+      duurMin: Number(req.body.duurMin) > 0 ? Math.round(Number(req.body.duurMin)) : null,
+      soort: req.body.soort === 'product' ? 'product' : 'dienst'
+    });
+  } else if (a === 'remove') {
+    s.services = s.services.filter(x => x.id !== req.body.id);
+  } else return res.status(400).json({ error: 'Onbekende actie.' });
+  save();
+  logActivity(s.code, req.actor, 'werkte het aanbod bij');
+  sseToSupplier(s.code, 'sync', { scope: 'settings' });
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  res.json({ ok: true, services: s.services });
 });
 
 /* ---- cadeaukaarten ----
@@ -3162,7 +3324,7 @@ app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
 
 /* ---- de boekhouding van de zaak: btw per genre, personeelskosten, cadeaukaarten ---- */
 function centen(n) { return Math.round(n * 100) / 100; }
-const FIN_CAT = { eten: 'Eten (keuken)', drank: 'Dranken (bar)', logies: 'Logies', vervoer: 'Personenvervoer', jet: 'Internationaal vervoer' };
+const FIN_CAT = { eten: 'Eten (keuken)', drank: 'Dranken (bar)', logies: 'Logies', vervoer: 'Personenvervoer', jet: 'Internationaal vervoer', dienst: 'Diensten & producten' };
 
 function financeVoor(s) {
   const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
@@ -3187,6 +3349,10 @@ function financeVoor(s) {
   for (const r of db.data.rides) {
     if (r.supplierCode !== s.code || !r.paid || !inMaand(r.paidAt || r.at)) continue;
     tel(s.type === 'jet' ? 'jet' : 'vervoer', r.quote || 0);
+  }
+  for (const b of db.data.boekingen) {
+    if (b.supplierCode !== s.code || !b.paid || b.status === 'geweigerd' || !inMaand(b.paidAt || b.at)) continue;
+    tel('dienst', b.price || 0);
   }
   // cadeaukaarten (meervoudig inwisselbaar): btw-moment is de inwisseling
   const kaarten = (db.data.giftcards || []).filter(g => g.supplierCode === s.code);
@@ -4363,7 +4529,11 @@ app.post('/api/office/timeline', officeAuth, (req, res) => {
     .concat(db.data.rides
       .filter(r => r.status !== 'wacht-op-betaling' && past([r.supplierName, r.customerCodename, r.ref, r.from, r.to, r.status].join(' ')))
       .map(r => ({ soort: r.type === 'jet' ? 'jet' : 'taxi', at: r.at, ref: r.ref, supplierName: r.supplierName, customerCodename: r.customerCodename,
-        status: r.status, paid: !!r.paid, bedrag: r.quote || 0, sub: (r.from || '') + ' → ' + (r.to || '?'), when: r.plannedFor ? r.when : null })));
+        status: r.status, paid: !!r.paid, bedrag: r.quote || 0, sub: (r.from || '') + ' → ' + (r.to || '?'), when: r.plannedFor ? r.when : null })))
+    .concat(db.data.boekingen
+      .filter(b => b.status !== 'wacht-op-betaling' && past([b.supplierName, b.customerCodename, b.ref, b.service.name, b.status].join(' ')))
+      .map(b => ({ soort: 'dienst', at: b.at, ref: b.ref, supplierName: b.supplierName, customerCodename: b.customerCodename,
+        status: b.status, paid: !!b.paid, bedrag: b.price || 0, sub: b.service.name, when: b.wanneer || null })));
   alles.sort((a, b) => String(b.at).localeCompare(String(a.at)));
   const per = 25;
   const pages = Math.max(1, Math.ceil(alles.length / per));
@@ -4390,6 +4560,12 @@ app.get('/api/office/export.csv', (req, res) => {
     res.write([String(r.at).slice(0, 16).replace('T', ' '), r.type === 'jet' ? 'jetrit' : 'taxirit', r.supplierName, r.customerCodename,
       (r.from || '') + ' naar ' + (r.to || '?'), r.status, r.paid ? 'ja' : 'nee',
       (r.quote || 0).toFixed(2).replace('.', ',')].map(esc).join(';') + '\n');
+  }
+  for (const b of db.data.boekingen) {
+    if (b.status === 'wacht-op-betaling') continue;
+    res.write([String(b.at).slice(0, 16).replace('T', ' '), 'boeking', b.supplierName, b.customerCodename,
+      b.service.name + (b.wanneer ? ' (' + b.wanneer + ')' : ''), b.status, b.paid ? 'ja' : 'nee',
+      (b.price || 0).toFixed(2).replace('.', ',')].map(esc).join(';') + '\n');
   }
   res.end();
 });

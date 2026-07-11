@@ -1517,6 +1517,28 @@
           (b.alerts.length ? b.alerts.map(a =>
             '<div class="st-row"><span>'+(a.level==='rood'?'🔴':a.level==='amber'?'🟠':'🟢')+' '+a.text+'</span></div>').join('')
             : '<div class="tkc-who">✓ '+T('bz.niks','Alles loopt. Vastgelopen bestellingen, wachtende gasten en open personeelszaken verschijnen hier vanzelf.')+'</div>')+'</div>';
+        // baas over uw zaak: elke functie aan of uit; alleen app-betalen heeft
+        // bewust geen knop, wel kiest u het moment (vooraf of achteraf)
+        const caps2 = (S && S.caps) || [];
+        const inst = state.settings || {};
+        const optAan = k => !inst.opties || inst.opties[k] !== false;
+        const rijen = [];
+        if (caps2.includes('menu') || caps2.includes('rooms')){
+          rijen.push(['ordersOpen', T('sw.orders','Bestellen via de app'), T('sw.orders.s','Leden kunnen bij u bestellen'), inst.ordersOpen !== false]);
+          rijen.push(['reservationsOpen', T('sw.res','Reserveringen'), T('sw.res.s','Nieuwe reserveringen aannemen'), inst.reservationsOpen !== false]);
+        }
+        rijen.push(['betaalVooraf', T('sw.vooraf','Vooraf betalen'), T('sw.vooraf.s','Uit = gasten betalen achteraf. Betalen zelf gaat altijd via de app.'), optAan('betaalVooraf')]);
+        rijen.push(['gastchat', T('sw.chat','Gastchat'), T('sw.chat.s','Gasten kunnen uw team berichten sturen'), optAan('gastchat')]);
+        if (caps2.includes('rides')) rijen.push(['ritten', T('sw.ritten','Ritaanvragen'), T('sw.ritten.s','Nieuwe ritten aannemen via de app'), optAan('ritten')]);
+        if (caps2.includes('doors')) rijen.push(['deurenGast', T('sw.deuren','Digitale gastsleutel'), T('sw.deuren.s','Gearriveerde gasten openen zelf de voordeur'), optAan('deurenGast')]);
+        if (horeca) rijen.push(['events', T('sw.events','Event-aanmeldingen'), T('sw.events.s','Leden kunnen zich aanmelden voor uw events'), optAan('events')]);
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🎛 '+T('sw.h','Baas over uw zaak')+'</h3>'+
+          '<div class="tkc-who">'+T('sw.s','Zet elke functie aan of uit wanneer u dat wilt. Alleen betalen via de app staat altijd aan; het moment (vooraf of achteraf) bepaalt u zelf.')+'</div>'+
+          rijen.map(r =>
+            '<div class="st-row"><span>'+r[1]+'<span class="sub">'+r[2]+'</span></span>'+
+            '<button class="obtn'+(r[3]?' primary':' warn')+'" data-kopt="'+r[0]+'" data-val="'+(r[3]?'0':'1')+'">'+(r[3]?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>').join('')+
+          '<div class="st-row"><span>'+T('sw.apppay','Betalen via de app')+'<span class="sub">'+T('sw.apppay.s','Vast onderdeel van elk RTG-partnerschap')+'</span></span>'+
+          '<span class="pill klaar">'+T('sw.altijd','Altijd aan')+'</span></div></div>';
         const maxD = Math.max.apply(null, b.week.map(d => d.omzet).concat([1]));
         html += '<div class="tkc"><h3>📈 '+T('bz.weekh','Omzet per dag')+'</h3>'+
           '<div style="display:flex;align-items:flex-end;gap:0.45rem;height:120px;margin-top:0.4rem;">'+
@@ -1775,6 +1797,17 @@
 
   function bindKantoor(el){
     el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; renderStation(); }));
+    // schakelaars van de zaak: elke functie aan of uit, direct doorgevoerd
+    el.querySelectorAll('[data-kopt]').forEach(b => b.addEventListener('click', async () => {
+      const k = b.dataset.kopt, v = b.dataset.val === '1';
+      b.disabled = true;
+      try {
+        if (k === 'ordersOpen' || k === 'reservationsOpen') await API.call('/supplier/settings', { [k]: v });
+        else await API.call('/supplier/settings', { opties: { [k]: v } });
+        boData = null;
+        await refresh();
+      } catch(e){ toast(e.message); b.disabled = false; }
+    }));
     const bb = el.querySelector('#boBrief'); if (bb) bb.addEventListener('click', () => {
       const t2 = el.querySelector('#boBriefTxt');
       if (!t2) return;
@@ -3323,6 +3356,16 @@ window.I18N = { en: {
   'bz.niks':'All running smoothly. Stuck orders, waiting guests and open staff matters appear here automatically.',
   'bz.weekh':'Revenue per day', 'bz.top':'Best sellers', 'bz.verkocht':'sold',
   'bz.geentop':'No sales yet. As soon as the app or the register sells something, your best sellers appear here.',
+  'sw.h':'In charge of your business',
+  'sw.s':'Switch every feature on or off whenever you want. Only paying through the app is always on; the moment (upfront or afterwards) is your call.',
+  'sw.orders':'Ordering via the app', 'sw.orders.s':'Members can place orders with you',
+  'sw.res':'Reservations', 'sw.res.s':'Accept new reservations',
+  'sw.vooraf':'Pay upfront', 'sw.vooraf.s':'Off = guests pay afterwards. Paying itself always goes through the app.',
+  'sw.chat':'Guest chat', 'sw.chat.s':'Guests can message your team',
+  'sw.ritten':'Ride requests', 'sw.ritten.s':'Accept new rides via the app',
+  'sw.deuren':'Digital guest key', 'sw.deuren.s':'Arrived guests open the front door themselves',
+  'sw.events':'Event sign-ups', 'sw.events.s':'Members can sign up for your events',
+  'sw.aan':'On', 'sw.uit':'Off', 'sw.apppay':'Paying via the app', 'sw.apppay.s':'A fixed part of every RTG partnership', 'sw.altijd':'Always on',
   'kt.verlof':'Leave & sick', 'kt.vja':'Approve', 'kt.vnee':'Decline',
   'kt.geenverlof':'No open requests. Staff request leave via the PDA; sick reports also arrive here.',
   'kt.ziek':'reported sick', 'kt.vok':'approved', 'kt.vno':'declined', 'kt.vzm':'reported',

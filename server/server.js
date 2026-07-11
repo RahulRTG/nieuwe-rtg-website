@@ -1737,6 +1737,7 @@ app.post('/api/live/door', auth, (req, res) => {
   if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
   const dest = L.destCode ? findSupplier(L.destCode) : null;
   if (!dest || !(dest.doors || []).length) return res.status(404).json({ error: 'Deze bestemming heeft geen digitale deuren.' });
+  if (!optieAan(dest, 'deurenGast')) return res.status(409).json({ error: dest.name + ' heeft de digitale gastsleutel op dit moment uitstaan. Meld u bij de receptie.' });
   if (!L.arrived) return res.status(409).json({ error: 'De deur opent pas als u bent aangekomen.' });
   const door = dest.doors[0];
   unlockDoor(dest, door, L.codename);
@@ -1793,6 +1794,7 @@ app.post('/api/partner/chat/send', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const s = findSupplier(req.body.supplierCode);
   if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  if (!optieAan(s, 'gastchat')) return res.status(409).json({ error: s.name + ' heeft de gastchat op dit moment uitstaan.' });
   const text = String(req.body.text || '').trim().slice(0, 500);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
   const dept = validDept(s, String(req.body.dept || ''));
@@ -2519,6 +2521,7 @@ app.post('/api/event/rsvp', auth, (req, res) => {
   const s = findSupplier(req.body.supplierCode);
   const e = s && (s.events || []).find(x => x.id === req.body.eventId && x.published);
   if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  if (!optieAan(s, 'events')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen event-aanmeldingen aan.' });
   const qty = Math.min(8, Math.max(1, parseInt(req.body.qty, 10) || 1));
   const taken = (e.guests || []).reduce((n, g) => n + g.qty, 0);
   if (e.guests.some(g => g.key === req.session.key)) return res.status(409).json({ error: 'U staat al op de gastenlijst.' });
@@ -2665,12 +2668,35 @@ function managerOnly(req, res) {
 }
 
 // bestellingen en reserveringen open of dicht; leden merken het direct
+/* Elke zaak is baas over de eigen opties. Alles kan aan of uit, met een
+   principiele uitzondering: betalen via de app staat altijd aan (daar is
+   bewust geen sleutel voor). Wel kiest de zaak het moment: vooraf of achteraf. */
+const ZAAK_OPTIES = {
+  betaalVooraf: 'vooraf betalen',
+  gastchat: 'de gastchat',
+  ritten: 'ritaanvragen',
+  deurenGast: 'de digitale gastsleutel',
+  events: 'event-aanmeldingen'
+};
+function optieAan(s, naam) {
+  return !s.settings || !s.settings.opties || s.settings.opties[naam] !== false;
+}
+
 app.post('/api/supplier/settings', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const st = req.supplier.settings = req.supplier.settings || { ordersOpen: true, reservationsOpen: true };
   const changed = [];
   if (typeof req.body.ordersOpen === 'boolean' && st.ordersOpen !== req.body.ordersOpen) { st.ordersOpen = req.body.ordersOpen; changed.push('bestellingen ' + (st.ordersOpen ? 'open' : 'dicht')); }
   if (typeof req.body.reservationsOpen === 'boolean' && st.reservationsOpen !== req.body.reservationsOpen) { st.reservationsOpen = req.body.reservationsOpen; changed.push('reserveringen ' + (st.reservationsOpen ? 'open' : 'dicht')); }
+  if (req.body.opties && typeof req.body.opties === 'object') {
+    st.opties = st.opties || {};
+    for (const k of Object.keys(ZAAK_OPTIES)) {
+      if (typeof req.body.opties[k] === 'boolean' && st.opties[k] !== req.body.opties[k]) {
+        st.opties[k] = req.body.opties[k];
+        changed.push(ZAAK_OPTIES[k] + ' ' + (req.body.opties[k] ? 'aan' : 'uit'));
+      }
+    }
+  }
   // vervoerders: het tarief dat elke nieuwe rit direct een vaste prijs geeft
   if (req.body.tarief && typeof req.body.tarief === 'object') {
     const t = st.tarief = st.tarief || {};
@@ -3566,6 +3592,9 @@ app.post('/api/order', auth, (req, res) => {
   }
   if (!items.length) return res.status(400).json({ error: 'Geen geldige gerechten gekozen.' });
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  // de zaak kiest het betaalmoment: vooraf (standaard, pas zichtbaar na
+  // afrekenen) of achteraf (direct zichtbaar, betalen via de app volgt)
+  const vooraf = optieAan(s, 'betaalVooraf');
   const order = {
     ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     pickup: pickupCode(),
@@ -3575,11 +3604,16 @@ app.post('/api/order', auth, (req, res) => {
     table: schoon(req.body.table, 24),
     allergyNote: schoon(req.body.allergyNote, 200),
     tagSalon: !!req.body.tagSalon,
-    // betalen-eerst: pas definitief (en pas zichtbaar voor de zaak) na afrekenen
-    status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
+    betaalMoment: vooraf ? 'vooraf' : 'achteraf',
+    status: vooraf ? 'wacht-op-betaling' : 'nieuw', paid: false, at: new Date().toISOString()
   };
   db.data.orders.unshift(order);
   save();
+  if (!vooraf) {
+    notifySupplier(s.code, { icon: '\u{1F6CE}️', title: 'Nieuwe bestelling (betaling achteraf)', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+    sseToSupplier(s.code, 'sync', { scope: 'orders' });
+    sseToOffice('sync', { scope: 'orders' });
+  }
   res.json({ ok: true, order });
 });
 
@@ -3588,7 +3622,8 @@ app.post('/api/order/pay', auth, (req, res) => {
   const o = db.data.orders.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
-  if (Date.now() - new Date(o.at) > 30 * 60000) return res.status(410).json({ error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' });
+  // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
+  if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return res.status(410).json({ error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' });
   o.paid = true;
   o.paidAt = new Date().toISOString();
   if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
@@ -3678,6 +3713,7 @@ function liveStateFor(key, lang) {
       ride: ride ? { ref: ride.ref, status: ride.status, to: ride.to, quote: ride.quote, km: ride.km,
                      passengers: ride.passengers, driver: ride.driver ? ride.driver.name : null,
                      vehicle: ride.vehicle ? ride.vehicle.name + (ride.vehicle.plate ? ' · ' + ride.vehicle.plate : '') : null,
+                     paid: !!ride.paid,
                      pickupEtaMin: ride.pickupEtaMin, dropEtaMin: ride.dropEtaMin } : null
     };
   }).filter(Boolean);
@@ -3769,6 +3805,7 @@ app.post('/api/ride/request', auth, (req, res) => {
   const s = findSupplier(req.body.supplierCode);
   const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
   if (!s || !caps.includes('rides')) return res.status(404).json({ error: 'Geen vervoerspartner gevonden.' });
+  if (!optieAan(s, 'ritten')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen ritaanvragen aan.' });
   const dest = req.body.toCode ? findSupplier(req.body.toCode) : null;
   const codename = liveCodename(req.session);
   // slimme offerte: afstand uit de live-locatie en de bestemming, anders een
@@ -3801,8 +3838,9 @@ app.post('/api/ride/request', auth, (req, res) => {
     passengers: pax, luggage: koffers, note: schoon(req.body.note, 140),
     km: Math.round(km * 10) / 10, quote,
     driver: null, vehicle: null,
-    // betalen-eerst: pas na afrekenen wordt de rit definitief en zichtbaar
-    status: quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
+    // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf
+    betaalMoment: optieAan(s, 'betaalVooraf') ? 'vooraf' : 'achteraf',
+    status: optieAan(s, 'betaalVooraf') && quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
     paid: quote === 0, at: new Date().toISOString()
   };
   if (ride.plannedFor) ride.when = 'Gepland: ' + ride.plannedFor.slice(0, 16).replace('T', ' ');
@@ -3822,7 +3860,8 @@ app.post('/api/ride/pay', auth, (req, res) => {
   const r = db.data.rides.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
   if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
   if (r.paid) return res.status(409).json({ error: 'Al betaald.' });
-  if (Date.now() - new Date(r.at) > 30 * 60000) return res.status(410).json({ error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' });
+  // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
+  if (r.status === 'wacht-op-betaling' && Date.now() - new Date(r.at) > 30 * 60000) return res.status(410).json({ error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' });
   r.paid = true;
   r.paidAt = new Date().toISOString();
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';

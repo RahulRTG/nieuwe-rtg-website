@@ -1791,6 +1791,9 @@
         if (p.ride.driver) extra.push('🚘 ' + p.ride.driver + (p.ride.vehicle ? ' · ' + p.ride.vehicle : ''));
         if (p.ride.quote) extra.push(T('live.vast','vaste nettoprijs') + ' ' + eur(p.ride.quote));
         if (extra.length) line2 += '<br>' + extra.join(' · ');
+        // betaling achteraf: de zaak liet de rit direct rijden; afrekenen kan nu
+        if (!p.ride.paid && p.ride.quote && p.ride.status !== 'wacht-op-betaling')
+          line2 += '<br><button class="js-rpay" data-rref="' + p.ride.ref + '" data-rq="' + p.ride.quote + '" style="margin-top:0.35rem;background:none;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.7rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('live.betaalrit','Betaal de rit') + ' · ' + eur(p.ride.quote) + '</button>';
       }
       else if (p.order) line2 += ' · ' + p.order.items + ' ' + T('app.items','item(s)') + ', ' + tStatus(p.order.status);
       return '<div class="live-partner"><span class="pic">' + p.icon + '</span><div class="pt"><b>' + p.name + '</b><span>' + line2 + '</span></div>' + eta + '</div>';
@@ -1824,6 +1827,12 @@
 
     $('#liveStop').addEventListener('click', stopLive);
     $('#liveSim').addEventListener('click', simulateRide);
+    document.querySelectorAll('.js-rpay').forEach(b => b.addEventListener('click', () => {
+      const bedrag = eur(Number(b.dataset.rq));
+      payWithFaceId(bedrag, async () => {
+        await API.call('/ride/pay', { ref: b.dataset.rref });
+      }, { message: () => T('live.ritbetaald','Rit betaald en definitief:') + ' ' + bedrag, after: () => renderLive() });
+    }));
     $('#liveShare').addEventListener('click', shareMyLocation);
     const tx = $('#liveTaxi'); if (tx) tx.addEventListener('click', requestTaxi);
     const pre = $('#livePre'); if (pre) pre.addEventListener('click', () => { if (dest) openMenu(dest.code); });
@@ -2009,8 +2018,13 @@
     } catch (e) { toast(e.message); return; }
     $('#menu-sheet').classList.remove('open');
     $('#menu-scrim').classList.remove('open');
-    // betalen-eerst: de bestelling is pas definitief na directe betaling
-    payOrder(d.order);
+    if (d.order.status === 'wacht-op-betaling'){
+      // betalen-eerst: de bestelling is pas definitief na directe betaling
+      payOrder(d.order);
+    } else {
+      // deze zaak koos betaling achteraf: de bestelling loopt al, afrekenen kan zo
+      toast('🛎️ ' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalachteraf','Betalen kan achteraf via Bestellingen.'));
+    }
     renderTerPlaatse();
   }
 
@@ -2638,7 +2652,8 @@ window.I18N = { en: {
   'live.ritbetaald':'Ride paid and confirmed:', 'ride.pax':'Passengers', 'ride.bag':'Luggage',
   'ride.plan':'When', 'ride.nu':'Now', 'ride.later':'At a time', 'ride.tijd':'Time',
   'ride.noteph':'E.g. child seat, side entrance', 'ride.go':'Request the ride',
-  'live.taxireq2':'Ride requested.', 'live.vast':'fixed net price', 'live.om':'at',
+  'live.taxireq2':'Ride requested.', 'live.vast':'fixed net price', 'live.om':'at', 'live.betaalrit':'Pay the ride',
+  'app.orderok':'Order placed.', 'app.betaalachteraf':'You can pay afterwards via Orders.',
   'sal.dm.sub':'Member chat, on codenames', 'sal.dm.leeg':'No messages yet. Say hello.',
   'sal.share.h':'Share with a connection', 'sal.deel':'Share with a connection', 'sal.gedeeld':'Shared.',
   'sal.add':'Add', 'sal.zoek':'Search', 'sal.zoekph':'Search by codename, e.g. Golden Ibis',

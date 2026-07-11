@@ -220,6 +220,10 @@
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  // Escapet tekst die als HTML-inhoud in het scherm belandt (namen, plaatsen,
+  // diensten, sollicitaties), zodat door leden/partners ingevoerde tekst nooit
+  // als opmaak of script in de backoffice kan uitvoeren.
+  const escHtml = s => String(s == null ? '' : s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
   const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded',
     'aangevraagd':'requested', 'geaccepteerd':'accepted', 'onderweg':'en route', 'aangekomen':'at pickup', 'aan-boord':'on board', 'rijdt':'on board', 'afgerond':'completed', 'gearriveerd':'completed' };
@@ -283,8 +287,8 @@
     try { pend = (await call('/office/verifications')).pending || []; } catch(e){ return; }
     $('#verify').innerHTML = pend.length ? pend.map(v =>
       '<div class="vrow" data-id="'+v.id+'">' +
-        '<div class="vi"><div class="nm">'+v.name+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+v.codename+'</span></div>' +
-          '<div class="sub">'+(v.email||'')+' · '+v.tier+'</div></div>' +
+        '<div class="vi"><div class="nm">'+escHtml(v.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.codename)+'</span></div>' +
+          '<div class="sub">'+escHtml(v.email||'')+' · '+escHtml(v.tier)+'</div></div>' +
         '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
@@ -304,13 +308,12 @@
     loadVerify();
   }
 
-  const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   let convData = [], convUser = null;
   async function loadConcierge(){
     try { convData = (await call('/office/conversations')).conversations || []; } catch(e){ return; }
     $('#concierge').innerHTML = convData.length ? convData.map(c =>
-      '<div class="vrow" data-uid="'+c.userId+'"><div class="vi"><div class="nm">'+c.codename+
-        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+c.tier+'</span>'+
+      '<div class="vrow" data-uid="'+c.userId+'"><div class="vi"><div class="nm">'+escHtml(c.codename)+
+        ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(c.tier)+'</span>'+
         (c.needsConcierge?' <span class="pill nieuw">'+T('bo.waiting','wacht')+'</span>':'')+'</div>'+
         '<div class="sub">'+(c.lastFrom==='concierge'?'↩ ':'')+escHtml((c.last||'').slice(0,55))+'</div></div>'+
         '<button class="vbtn ok" data-open>'+T('bo.open','Open')+'</button></div>'
@@ -421,16 +424,16 @@
 
     const live = (state.live || []).filter(g => past(g.codename, (g.dest&&g.dest.name)||'', (g.partners||[]).join(' ')));
     $('#liveList').innerHTML = live.length ? live.map(g =>
-      '<div class="row"><div class="r1"><div><div class="nm">'+g.codename+
-        (g.dest?' <span style="color:var(--soft);font-weight:400;">· '+T('bo.to','naar')+' '+g.dest.name+'</span>':'')+'</div>'+
+      '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(g.codename)+
+        (g.dest?' <span style="color:var(--soft);font-weight:400;">· '+T('bo.to','naar')+' '+escHtml(g.dest.name)+'</span>':'')+'</div>'+
         '<div class="sub">'+(g.arrived?'✓ '+T('bo.arrived','gearriveerd'):T('bo.onthemove','onderweg')+' ('+T('bo.mode.'+g.mode, g.mode==='walking'?'lopend':g.mode==='flying'?'vliegend':'rijdend')+')')+
-        ' · '+(g.partners||[]).join(', ')+'</div></div>'+
+        ' · '+escHtml((g.partners||[]).join(', '))+'</div></div>'+
         '<span class="pill '+(g.arrived?'klaar':'bereiding')+'">'+(g.arrived?T('bo.arrived','gearriveerd'):T('bo.live','live'))+'</span></div></div>'
     ).join('') : '<div class="empty">'+T('bo.nolive','Niemand is nu onderweg. Zodra een lid een reis live zet, ziet u hier waar zij zijn en met welke partners.')+'</div>';
 
     const prijzen = state.prices.filter(p => past(p.supplierName, p.service));
     $('#prices').innerHTML = prijzen.length ? prijzen.map(p =>
-      '<div class="row"><div class="r1"><div><div class="nm">'+p.supplierName+'</div><div class="sub">'+p.service+' · '+timeAgo(p.at)+'</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
+      '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(p.supplierName)+'</div><div class="sub">'+escHtml(p.service)+' · '+timeAgo(p.at)+'</div></div><div class="amt g">'+eur(p.price)+'</div></div></div>'
     ).join('') : '<div class="empty">'+T('bo.noprices','Nog geen prijzen. Zodra een partner een dynamische prijs doorgeeft, verschijnt die hier live.')+'</div>';
 
     // tijdlijn (bestellingen & ritten) komt gepagineerd van de server
@@ -442,9 +445,9 @@
     $('#appsList').innerHTML = apps.length ? apps.map(x => {
       const pc = x.status==='nieuw'?'nieuw':x.status==='aangenomen'?'klaar':'bereiding';
       const st = x.status==='nieuw'?T('bo.ap.new','nieuw'):x.status==='aangenomen'?T('bo.ap.hired','aangenomen'):T('bo.ap.rejected','afgewezen');
-      return '<div class="row"><div class="r1"><div><div class="nm">'+x.name+' <span style="color:var(--soft);font-weight:400;">· '+x.func+'</span>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.name)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.func)+'</span>'+
         (x.viaRTG?' <span style="font-size:0.58rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</span>':'')+'</div>'+
-        '<div class="sub">'+x.company+' · '+timeAgo(x.at)+'</div></div>'+
+        '<div class="sub">'+escHtml(x.company)+' · '+timeAgo(x.at)+'</div></div>'+
         '<span class="pill '+pc+'">'+st+'</span></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noapps','Nog geen sollicitaties. Kandidaten solliciteren via de partner-apps, RTG-leden via de leden-app met hun cv.')+'</div>';
 
@@ -452,8 +455,8 @@
     $('#paList').innerHTML = pas.length ? pas.map(x => {
       const pc = x.status==='nieuw'?'nieuw':x.status==='goedgekeurd'?'klaar':'bereiding';
       const st = x.status==='nieuw'?T('bo.pa.new','nieuw'):x.status==='goedgekeurd'?T('bo.pa.ok','goedgekeurd'):T('bo.pa.no','afgewezen');
-      return '<div class="row"><div class="r1"><div><div class="nm">'+x.company+' <span style="color:var(--soft);font-weight:400;">· '+x.type+' · '+x.city+'</span></div>'+
-        '<div class="sub">'+x.contactName+' · '+x.email+(x.phone?' · '+x.phone:'')+' · '+timeAgo(x.at)+(x.note?'<br>"'+x.note.slice(0,120)+'"':'')+(x.code?' · code '+x.code:'')+'</div></div>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.company)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.type)+' · '+escHtml(x.city)+'</span></div>'+
+        '<div class="sub">'+escHtml(x.contactName)+' · '+escHtml(x.email)+(x.phone?' · '+escHtml(x.phone):'')+' · '+timeAgo(x.at)+(x.note?'<br>"'+escHtml(x.note.slice(0,120))+'"':'')+(x.code?' · code '+escHtml(x.code):'')+'</div></div>'+
         (x.status==='nieuw'
           ? '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-paok="'+x.id+'">'+T('bo.pa.approve','Goedkeuren')+'</button><button class="vbtn" data-pano="'+x.id+'">'+T('bo.pa.reject','Afwijzen')+'</button></div>'
           : '<span class="pill '+pc+'">'+st+'</span>')+
@@ -488,7 +491,7 @@
     $('#orders').innerHTML = tl.items.length ? tl.items.map(x => {
       const pc = (x.status==='nieuw'||x.status==='aangevraagd')?'nieuw':KLAAR_R[x.status]?'klaar':'bereiding';
       const icoon = x.soort==='order'?'🛎️':x.soort==='jet'?'✈️':'🚗';
-      return '<div class="row"><div class="r1"><div><div class="nm">'+x.supplierName+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+x.customerCodename+'</span></div>'+
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.supplierName)+' <span style="color:var(--soft);font-weight:400;">· '+T('bo.guest','gast')+' '+escHtml(x.customerCodename)+'</span></div>'+
         '<div class="sub">'+icoon+' '+escHtml(x.sub||'')+' · '+timeAgo(x.at)+(x.when?' · '+escHtml(x.when):'')+' · '+(x.paid?T('bo.paid','betaald'):T('bo.unpaid','onbetaald'))+'</div></div>'+
         '<div style="text-align:right;"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';

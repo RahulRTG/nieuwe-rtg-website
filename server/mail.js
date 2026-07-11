@@ -12,7 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const OUTBOX = path.join(__dirname, 'data', 'outbox');
+const OUTBOX = path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'outbox');
 const SMTP_URL = process.env.SMTP_URL || '';
 const FROM = process.env.MAIL_FROM || 'Rahul Travel Group <no-reply@rahultravelgroup.example>';
 

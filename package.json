@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server/trio.js",
     "single": "node --experimental-sqlite server/server.js",
-    "nood": "node server/nood.js"
+    "nood": "node server/nood.js",
+    "test": "node --experimental-sqlite --test test/*.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

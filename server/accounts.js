@@ -20,7 +20,8 @@ const path = require('path');
 const crypto = require('crypto');
 const { DatabaseSync } = require('node:sqlite');
 
-const DATA_DIR = path.join(__dirname, 'data');
+// Zelfde datamap als db.js: instelbaar met RTG_DATA_DIR (tests + productie).
+const DATA_DIR = process.env.RTG_DATA_DIR || path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'rtg.db');
 const SECRET_FILE = path.join(DATA_DIR, 'secret.key');   // ondertekent sessietokens
 const VAULT_FILE = path.join(DATA_DIR, 'vault.key');     // versleutelt de identiteitskluis

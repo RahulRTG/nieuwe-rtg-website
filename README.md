@@ -52,6 +52,32 @@ ANTHROPIC_API_KEY=sk-ant-... npm start
 
 Zonder key geeft de AI vaste demo-antwoorden.
 
+## Tests
+
+```bash
+npm test
+```
+
+Draait de geautomatiseerde tests (Node's eigen testrunner, geen extra
+packages). Ze bewaken de plekken waar geld en wet aan hangen:
+
+- de identiteitskluis (naam/e-mail versleuteld, codenaam operationeel),
+  wachtwoord-hashing (scrypt) en sessietokens;
+- de zzp-belastingtool (rekenkundige invarianten, afscherming per pas,
+  peiljaar) en de leeftijdslaag (leeftijdsgroep uit de geboortedatum);
+- De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
+  en de AVG-rechten (inzage en definitieve verwijdering).
+
+De tests draaien in een tijdelijke datamap (`RTG_DATA_DIR`) en raken de echte
+data nooit aan.
+
+## Datamap instelbaar (RTG_DATA_DIR)
+
+Standaard staan database, sleutels en uploads in `server/data`. Met
+`RTG_DATA_DIR=/pad/naar/data` verplaatst u die map, handig om data en sleutels
+op productie los van de app-schijf te zetten (bijvoorbeeld op een aparte
+volume of secrets-mount) en om tests te isoleren.
+
 ## Noodserver (tweede adres, andere machine)
 
 Naast de drie hoofdservers met poortwachter (`npm start`) is er een losse

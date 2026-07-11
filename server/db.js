@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const seed = require('./seed');
 
-const DATA_DIR = path.join(__dirname, 'data');
+// De datamap is instelbaar met RTG_DATA_DIR (handig voor tests en om data en
+// sleutels op productie los van de app-schijf te zetten). Standaard server/data.
+const DATA_DIR = process.env.RTG_DATA_DIR || path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 /* writable: in de failover-opstelling (server/trio.js) schrijft alleen de
@@ -29,4 +31,4 @@ function save() {
   fs.renameSync(tmp, DB_FILE);
 }
 
-module.exports = { db, load, save };
+module.exports = { db, load, save, DATA_DIR };

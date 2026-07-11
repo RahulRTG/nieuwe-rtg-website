@@ -19,7 +19,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { db, load, save } = require('./db');
+const { db, load, save, DATA_DIR } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const mail = require('./mail');
@@ -778,7 +778,7 @@ app.post('/api/auth/me', auth, (req, res) => {
    wordt buiten de repo bewaard (server/data/uploads, gitignored) en is alleen
    voor de backoffice zichtbaar. Voor productie: versleutel het bestand, bewaar
    het zo kort mogelijk, en gebruik bij voorkeur een gecertificeerde KYC-dienst. */
-const UPLOAD_DIR = path.join(__dirname, 'data', 'uploads');
+const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 
 app.post('/api/verify/upload', express.json({ limit: '6mb' }), auth, (req, res) => {
   if (!req.session.account) return res.status(403).json({ error: 'Verificatie is voor echte accounts.' });
@@ -2937,7 +2937,13 @@ function managerOnly(req, res) {
 /* ---- boekhouding per land en genre ----
    Een praktische samenvatting van btw-tarieven, werkgeverslasten en
    aangifteregels per land, als kennisbasis voor de AI-boekhouder.
-   Voorlichting voor de demo-omgeving; geen bindend fiscaal advies. */
+   Voorlichting voor de demo-omgeving; geen bindend fiscaal advies.
+   PEILJAAR: het jaar waarvoor de tarieven en bedragen hieronder zijn
+   nagelopen. Tarieven, aftrekposten en heffingskortingen wijzigen jaarlijks;
+   werk dit getal en de tabellen (LANDEN en ZZP) elk jaar bij en laat ze
+   fiscaal toetsen. Het peiljaar gaat mee in elke fiscale API-uitkomst, zodat
+   de gebruiker altijd ziet op welk jaar een berekening is gebaseerd. */
+const FISCAAL_PEILJAAR = 2025;
 const LANDEN = {
   NL: { naam: 'Nederland', alcoholLeeftijd: 18, tarieven: { eten: 9, drank: 21, logies: 9, vervoer: 9, jet: 0, standaard: 21 },
     lasten: 0.28, vakantiegeld: 0.08, uurloonMin: 14.06,
@@ -3598,6 +3604,7 @@ function financeVoor(s) {
   return {
     land: landCode, landNaam: L.naam,
     landen: Object.entries(LANDEN).map(([k, v]) => ({ code: k, naam: v.naam })),
+    peiljaar: FISCAAL_PEILJAAR,
     maand,
     btw, btwTotaal: centen(btw.reduce((x, r2) => x + r2.btw, 0)),
     personeel: {
@@ -3613,7 +3620,7 @@ function financeVoor(s) {
       L.extra,
       'Cadeaukaarten zijn bij verkoop nog geen omzet: het saldo (€ ' + gcOpen + ') staat als verplichting op de balans en de btw hoort bij de inwisseling.',
       'Indicatie minimumuurloon in ' + L.naam + ': € ' + L.uurloonMin + ' per uur. Reken bovenop het brutoloon ~' + Math.round(L.lasten * 100) + '% werkgeverslasten' + (L.vakantiegeld ? ' en ' + Math.round(L.vakantiegeld * 1000) / 10 + '% vakantiegeld' : '') + '.',
-      'Dit overzicht is voorlichting, geen fiscaal advies; de aangifte en afdracht blijven de verantwoordelijkheid van de onderneming.'
+      'Dit overzicht is voorlichting (peiljaar ' + FISCAAL_PEILJAAR + '), geen fiscaal advies; de aangifte en afdracht blijven de verantwoordelijkheid van de onderneming.'
     ]
   };
 }
@@ -3699,7 +3706,7 @@ app.post('/api/member/zzp', auth, (req, res) => {
   const Z = ZZP[landCode];
   const winst = Math.max(0, Math.min(5000000, Math.round(Number(req.body.winst) || 0)));
   if (!winst) return res.status(400).json({ error: 'Vul uw verwachte jaarwinst in.' });
-  const out = { land: landCode, landNaam: LANDEN[landCode].naam, regime: Z.regime, winst, posten: [], regels: Z.regels.slice(), indicatie: true };
+  const out = { land: landCode, landNaam: LANDEN[landCode].naam, regime: Z.regime, winst, posten: [], regels: Z.regels.slice(), indicatie: true, peiljaar: FISCAAL_PEILJAAR };
   let belasting = 0, belastbaar = winst;
   if (landCode === 'NL') {
     const uren = req.body.urencriterium !== false;
@@ -3735,6 +3742,7 @@ app.post('/api/member/zzp', auth, (req, res) => {
   out.netto = centen(winst - belasting);
   out.reserveerPct = Math.max(20, Math.min(50, Math.round(belasting / winst * 100) + 5));
   out.perMaand = centen(belasting / 12);
+  out.regels.push('Indicatieve berekening op basis van de tarieven van ' + FISCAAL_PEILJAAR + '; controleer jaarlijks en raadpleeg voor uw aangifte een fiscalist.');
   res.json(out);
 });
 
@@ -5114,7 +5122,7 @@ app.use((err, req, res, next) => {
 
 /* ---------- dagelijkse back-up van de data ---------- */
 
-const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
+const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 function backupData() {
   if (!db.writable) return; // standby-servers maken geen backups, dat doet de actieve
   try {
@@ -5122,7 +5130,7 @@ function backupData() {
     const dir = path.join(BACKUP_DIR, day);
     fs.mkdirSync(dir, { recursive: true });
     for (const f of ['db.json', 'rtg.db']) {
-      const from = path.join(__dirname, 'data', f);
+      const from = path.join(DATA_DIR, f);
       if (fs.existsSync(from)) fs.copyFileSync(from, path.join(dir, f));
     }
     // hooguit 14 dagen bewaren

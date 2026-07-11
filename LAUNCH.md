@@ -6,6 +6,12 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
 ## Al geregeld (zit in de code)
 
 - [x] Alle apps en flows: leden, partners per genre, personeel, backoffice
+- [x] Geautomatiseerde tests (`npm test`, Node's testrunner, geen extra packages):
+      identiteitskluis en wachtwoord-hashing, sessietokens, de zzp-belastingtool
+      (rekenkundige invarianten + peiljaar), de leeftijdslaag, De Salon-rechten,
+      de bestel- en betaalflow en de AVG-rechten. Draaien in een tijdelijke
+      datamap (`RTG_DATA_DIR`), raken echte data niet aan
+- [x] Datamap instelbaar met `RTG_DATA_DIR` (data en sleutels los van de app-schijf)
 - [x] Blijf ingelogd + uitloggen in elke app; sessies overleven een herstart
 - [x] Tokens gehasht op schijf, sessieverloop na 30 dagen, PIN- en login-rate-limiting
 - [x] Security-headers: CSP, HSTS (productie), anti-framing, nosniff, Permissions-Policy
@@ -51,8 +57,16 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
    codenaam als kenmerk.
 5. **Kluis-sleutels:** `server/data/secret.key` en `vault.key` verhuizen naar een
    secrets manager van de hosting; nooit in git.
-6. **Database:** bij groei db.json vervangen door PostgreSQL; de SQLite-accounts
-   kunnen langer mee. Back-ups extern opslaan (nu lokaal, 14 dagen).
+6. **Database en schaal (belangrijk, eerlijk):** de operationele data staat nu in
+   een enkel `db.json` dat bij elke wijziging in zijn geheel wordt herschreven.
+   Dat is bewust simpel en veilig (atomisch, nooit een half bestand), maar het
+   schaalt niet: bij duizenden gelijktijdige gebruikers moet `db.json` vervangen
+   worden door PostgreSQL (de SQLite-accounts kunnen langer mee). Let ook op wat
+   het failover-trio wel en niet doet: het vangt een vastloper of crash van de
+   software op (crashbestendigheid), maar geeft GEEN extra capaciteit; er schrijft
+   maar een server tegelijk, op dezelfde schijf. Meer capaciteit en bescherming
+   tegen kapotte hardware komen pas met een echte database en meerdere machines.
+   Back-ups extern opslaan (nu lokaal, 14 dagen).
 7. **Juridisch nalopen (voor livegang door een advocaat laten toetsen):**
    - De drie documenten: privacybeleid, algemene voorwaarden en partnervoorwaarden
      (`/site/privacy.html`, `/site/voorwaarden.html`, `/site/partnervoorwaarden.html`).

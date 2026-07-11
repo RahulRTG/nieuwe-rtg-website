@@ -1954,6 +1954,7 @@ app.post('/api/supplier/minibar/count', supplierAuth, (req, res) => {
 
 // catalogusbeheer: artikelen toevoegen of verwijderen
 app.post('/api/supplier/minibar/item/add', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return; // de minibar-catalogus is voor het management
   if (!Array.isArray(req.supplier.minibar)) return res.status(400).json({ error: 'Minibar is er alleen voor hotels en appartementen.' });
   const name = schoon(req.body.name, 60);
   const price = Math.max(0, Number(req.body.price) || 0);
@@ -1964,6 +1965,7 @@ app.post('/api/supplier/minibar/item/add', supplierAuth, (req, res) => {
   res.json({ ok: true, minibar: req.supplier.minibar });
 });
 app.post('/api/supplier/minibar/item/remove', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return; // de minibar-catalogus is voor het management
   const i = (req.supplier.minibar || []).findIndex(x => x.id === req.body.id);
   if (i >= 0) { req.supplier.minibar.splice(i, 1); save(); }
   res.json({ ok: true, minibar: req.supplier.minibar || [] });
@@ -3994,6 +3996,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
 
 // ---- dynamische prijs aan RTG (backoffice) ----
 app.post('/api/supplier/price', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return; // dynamische prijzen naar RTG zijn management
   const service = String(req.body.service || '').trim().slice(0, 120);
   const price = Number(req.body.price);
   if (!service || !(price > 0)) return res.status(400).json({ error: 'Vul een dienst en geldige prijs in.' });
@@ -4014,6 +4017,7 @@ app.post('/api/supplier/price', supplierAuth, (req, res) => {
 
 // ---- menukaart bijwerken (restaurant/bar/club) ----
 app.post('/api/supplier/menu', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return; // de kaart en de prijzen zijn voor het management
   if (!Array.isArray(req.body.menu)) return res.status(400).json({ error: 'Menu ontbreekt.' });
   req.supplier.menu = req.body.menu.slice(0, 100).map(m => {
     // ledenprijsgarantie: de publieke prijs is het plafond; als er geen aparte
@@ -4136,6 +4140,7 @@ app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
 
 // ---- leverancier stort terug → klant krijgt melding ----
 app.post('/api/supplier/refund', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return; // geld terugstorten is een management-handeling
   const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   if (!o.paid) return res.status(409).json({ error: 'Deze bestelling is niet betaald.' });

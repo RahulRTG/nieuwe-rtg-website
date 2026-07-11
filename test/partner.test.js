@@ -184,6 +184,25 @@ test('ledenprijsgarantie: een lid betaalt nooit meer dan de eigen publieke prijs
   assert.equal(order.total, 120, 'twee keer 60, niet twee keer 100');
 });
 
+test('rechten: alleen een manager kan terugbetalen, de kaart en prijzen wijzigen', async () => {
+  // Een niet-manager medewerker (PIN 5678). HOSHI, want KIKUNOI's medewerker is
+  // in de rate-limit-test hierboven kort op slot gezet.
+  const roster = await json(await api('/supplier/roster', { code: 'HOSHI' }));
+  const medew = roster.staff.find(m => m.role !== 'manager');
+  const staffTok = (await json(await api('/supplier/login', { code: 'HOSHI', staffId: medew.id, pin: '5678' }))).token;
+
+  // Een medewerker mag NIET terugbetalen, de kaart wijzigen of prijzen doorgeven.
+  assert.equal((await api('/supplier/refund', { ref: 'RTG-O-NOPE' }, staffTok)).status, 403, 'medewerker kan niet terugbetalen');
+  assert.equal((await api('/supplier/menu', { menu: [] }, staffTok)).status, 403, 'medewerker kan de kaart niet wijzigen');
+  assert.equal((await api('/supplier/price', { service: 'X', price: 5 }, staffTok)).status, 403, 'medewerker kan geen prijs doorgeven');
+
+  // Een manager komt WEL langs de rechtencheck (daarna pas body-/refvalidatie:
+  // 404 voor een onbekende ref, 400 voor een ontbrekend menu; geen 403).
+  const mgr = await partnerToken('HOSHI');
+  assert.equal((await api('/supplier/refund', { ref: 'RTG-O-NOPE' }, mgr)).status, 404, 'manager mag terugbetalen (ref bestaat alleen niet)');
+  assert.equal((await api('/supplier/menu', {}, mgr)).status, 400, 'manager mag de kaart wijzigen (body ontbreekt hier)');
+});
+
 test('afscherming: leverancier-endpoints eisen een leverancier-sessie', async () => {
   // Zonder token.
   assert.equal((await api('/supplier/order/status', { ref: 'x', status: 'klaar' })).status, 401);

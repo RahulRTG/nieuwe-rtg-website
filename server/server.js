@@ -46,7 +46,7 @@ const STAFF_SEED = {
   MKKX: [['Paolo Mendez', 'manager', 'Taxi centrale'], ['Yara El Idrissi', 'staff', 'Chauffeur']],
   JETAG: [['Sophie Bakker', 'manager', 'Operations'], ['Lucas de Jong', 'staff', 'Crew']],
   // zelfstandigen: eenmanszaken, dus alleen een eigenaar met beheer-rechten
-  AYAKA: [['Summer Jolanda Vissen', 'manager', 'Goudsmid']],
+  AYAKA: [['Livia Bergkamp', 'manager', 'Goudsmid']],
   KAITO: [['Milan de Wit', 'manager', 'Personal trainer']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
@@ -348,7 +348,7 @@ function initRealtime() {
   if (!db.data.boekingen) db.data.boekingen = [];
   if (!db.data.suppliers.find(s => s.code === 'AYAKA')) {
     db.data.suppliers.push({
-      code: 'AYAKA', name: 'Atelier Summer', type: 'zzp', city: 'Ibiza', vak: 'Sieraden & goudsmid',
+      code: 'AYAKA', name: 'Atelier Marfil', type: 'zzp', city: 'Ibiza', vak: 'Sieraden & goudsmid',
       loc: { lat: 38.909, lng: 1.435, label: 'Dalt Vila, Ibiza' }, rate: 0.1,
       menu: [], photos: [],
       services: [

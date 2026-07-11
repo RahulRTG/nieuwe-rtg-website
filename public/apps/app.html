@@ -2741,8 +2741,8 @@
     $('#feed').innerHTML = posts.map(p => {
       const engage = canEngage(p);
       const visual = p.photo
-        ? '<div class="visual"><img src="' + p.photo + '" alt=""><span class="place">' + p.place + '</span></div>'
-        : '<div class="visual ' + (p.visual || 'v-partner') + '"><span class="place">' + p.place + '</span></div>';
+        ? '<div class="visual"><img src="' + p.photo + '" alt=""><span class="place">' + escT(p.place) + '</span></div>'
+        : '<div class="visual ' + (p.visual || 'v-partner') + '"><span class="place">' + escT(p.place) + '</span></div>';
       // partners posten zonder wachttijd: hun bericht staat er direct, met
       // tijdstempel; de 7-dagen-privacyregel geldt alleen voor ledenposts
       const meta = p.partner
@@ -2774,8 +2774,8 @@
         : '';
       return '<article class="post" data-post="' + p.id + '">' +
         '<div class="head">' +
-          '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
-          '<div><b>' + p.author + (p.partner ? '<span class="partner-badge">' + T('app.partner','Partner') + '</span>' : '') + '</b><span>' + meta + (p.partnerCode && p.volgers != null ? ' · ' + p.volgers + ' ' + T('sal.volgers','volgers') : '') + '</span></div>' +
+          '<div class="avatar a-' + p.tier + '">' + escT((p.author || ' ')[0]) + '</div>' +
+          '<div><b>' + escT(p.author) + (p.partner ? '<span class="partner-badge">' + T('app.partner','Partner') + '</span>' : '') + '</b><span>' + escT(meta) + (p.partnerCode && p.volgers != null ? ' · ' + p.volgers + ' ' + T('sal.volgers','volgers') : '') + '</span></div>' +
           volg +
         '</div>' +
         visual +
@@ -2787,7 +2787,7 @@
           '<button class="pa js-share" title="' + T('sal.deel','Delen met een connectie') + '">↗</button>' +
         '</div>' +
         '<div class="comments">' +
-          '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b>, ' + msgHTML(c.text, c.lang) + '</div>').join('') + '</div>' +
+          '<div class="clist">' + p.comments.map(c => '<div class="comment"><b>' + escT(c.who) + '</b>, ' + msgHTML(c.text, c.lang) + '</div>').join('') + '</div>' +
           '<div class="cform"><input placeholder="' + T('app.salon.write','Schrijf een reactie…') + '"><button>' + T('app.salon.post','Plaats') + '</button></div>' +
         '</div>' +
       '</article>';

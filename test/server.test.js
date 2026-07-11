@@ -132,6 +132,17 @@ test('bestellen en betalen: een order loopt van open naar betaald', async () => 
   assert.ok(status && status !== 'wacht-op-betaling', 'na betaling is de order niet meer open, status: ' + status);
 });
 
+test('XSS-preventie: HTML in de naam wordt bij registratie ontdaan van < en >', async () => {
+  const email = 'xss' + Date.now() + '@voorbeeld.test';
+  const boos = '<img src=x onerror="window.x=1">Bob';
+  const reg = await (await api('/auth/register', { name: boos, email, phone: '+31699887766', password: 'geheim12', tier: 'rtg', geboortedatum: '1990-05-05' })).json();
+  assert.ok(reg.token, 'registratie lukt');
+  const dossier = await (await api('/privacy/export', {}, reg.token)).json();
+  const naam = dossier.profile.full;
+  assert.ok(!/[<>]/.test(naam), 'de opgeslagen naam bevat geen < of >, kreeg: ' + naam);
+  assert.ok(naam.includes('Bob'), 'de gewone tekst blijft staan');
+});
+
 test('AVG: een lid kan zijn dossier inzien en definitief laten wissen', async () => {
   const email = 'avg' + Date.now() + '@voorbeeld.test';
   const reg = await (await api('/auth/register', { name: 'AVG Lid', email, phone: '+31655667788', password: 'geheim12', tier: 'rtg', geboortedatum: '1990-01-01' })).json();

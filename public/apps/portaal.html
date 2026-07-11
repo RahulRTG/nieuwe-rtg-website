@@ -1317,6 +1317,9 @@
   const LANGNAME = { nl: { nl:'Nederlands', en:'Engels' }, en: { nl:'Dutch', en:'English' } };
   const langName = code => (LANGNAME[lang()] || LANGNAME.nl)[code] || code;
   const escAttr = s => String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  // Escapet tekst die als HTML-inhoud wordt geplaatst (namen, plaatsen), zodat
+  // door partners/leden ingevoerde tekst nooit als opmaak in andermans scherm belandt.
+  const escT = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   // Berichten van andere leden worden automatisch voor de lezer vertaald.
   function msgHTML(text, olang){
     return '<span class="msg" data-olang="'+(olang||'nl')+'" data-otext="'+escAttr(text)+'">' +
@@ -2071,13 +2074,13 @@
       const engage = (typeof p.canEngage === 'boolean') ? p.canEngage : canEngage(p.tier);
       return '<article class="post" data-post="' + p.id + '">' +
         '<div class="post-head">' +
-          '<div class="avatar a-' + p.tier + '">' + p.author[0] + '</div>' +
-          '<div class="who"><b>' + p.author + '</b><span>' + TIERS[p.tier].label + ' · ' + p.place + '</span></div>' +
+          '<div class="avatar a-' + p.tier + '">' + escT((p.author || ' ')[0]) + '</div>' +
+          '<div class="who"><b>' + escT(p.author) + '</b><span>' + TIERS[p.tier].label + ' · ' + escT(p.place) + '</span></div>' +
           chip(p.tier) +
         '</div>' +
         (p.photo
-          ? '<div class="post-visual" style="background:#111;"><img src="' + p.photo + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"><span class="place">' + p.place + '</span></div>'
-          : '<div class="post-visual ' + (p.visual || 'v-ibiza') + '"><span class="place">' + p.place + '</span></div>') +
+          ? '<div class="post-visual" style="background:#111;"><img src="' + p.photo + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"><span class="place">' + escT(p.place) + '</span></div>'
+          : '<div class="post-visual ' + (p.visual || 'v-ibiza') + '"><span class="place">' + escT(p.place) + '</span></div>') +
         '<div class="post-body"><p>' + msgHTML(p.text, p.lang) + '</p>' +
           (p.partner ? '' : '<div class="post-reward">✦ '+T('p.post.earned','Verdiende')+' ' + (p.reward || 0) + '% '+T('p.post.discount','reiskorting met deze post')+'</div>') +
           (p.featured ? '<div class="post-flag">★ '+T('p.post.featured','Uitgelicht als beeld op rtg.nl')+'</div>' : '') +
@@ -2089,7 +2092,7 @@
           '<button class="pa-btn js-dm" ' + (engage ? '' : 'disabled title="' + engageHint(p.tier) + '"') + '>'+T('p.message','Bericht')+'</button>' +
         '</div>' +
         '<div class="comments">' +
-          '<div class="c-list">' + p.comments.map(c => '<div class="comment"><b>' + c.who + '</b>, ' + msgHTML(c.text, c.lang) + '</div>').join('') + '</div>' +
+          '<div class="c-list">' + p.comments.map(c => '<div class="comment"><b>' + escT(c.who) + '</b>, ' + msgHTML(c.text, c.lang) + '</div>').join('') + '</div>' +
           '<div class="comment-form"><input type="text" placeholder="'+T('p.writecomment','Schrijf een reactie…')+'"><button>'+T('p.postbtn','Plaats')+'</button></div>' +
         '</div>' +
       '</article>';

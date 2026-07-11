@@ -690,7 +690,8 @@ app.post('/api/logout', auth, (req, res) => {
 /* ---------- echte accounts (registreren / inloggen) ---------- */
 
 app.post('/api/auth/register', (req, res) => {
-  const name = String(req.body.name || '').trim().slice(0, 80);
+  // schoon(): de echte naam wordt o.a. in de backoffice (KYC) getoond; geen opmaak.
+  const name = schoon(req.body.name, 80);
   const email = String(req.body.email || '').trim().toLowerCase();
   const phone = String(req.body.phone || '').trim().slice(0, 30);
   const password = String(req.body.password || '');
@@ -2826,13 +2827,15 @@ function makeSupplierCode(name) {
 
 app.post('/api/partner/apply', (req, res) => {
   const b = req.body || {};
-  const company = String(b.company || '').trim().slice(0, 80);
+  // schoon(): strip < en > uit vrije tekst. De bedrijfsnaam en plaats komen later
+  // in andermans schermen (De Salon, backoffice), dus nooit als opmaak laten landen.
+  const company = schoon(b.company, 80);
   const type = String(b.type || '').trim();
-  const city = String(b.city || '').trim().slice(0, 60);
-  const contactName = String(b.contactName || '').trim().slice(0, 60);
+  const city = schoon(b.city, 60);
+  const contactName = schoon(b.contactName, 60);
   const email = String(b.email || '').trim().toLowerCase().slice(0, 80);
   const phone = String(b.phone || '').trim().slice(0, 30);
-  const note = String(b.note || '').trim().slice(0, 500);
+  const note = schoon(b.note, 500);
   if (!db.data.supplierTypes[type]) return res.status(400).json({ error: 'Kies een geldig type bedrijf.' });
   if (!company || !city || !contactName) return res.status(400).json({ error: 'Vul de bedrijfsnaam, plaats en contactpersoon in.' });
   // juridisch vereist: uitdrukkelijk akkoord met de partnervoorwaarden,

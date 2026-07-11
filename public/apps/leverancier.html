@@ -1442,6 +1442,16 @@
     boBusy = false;
     renderStation();
   }
+  // boekhouding: btw per genre, personeelskosten en cadeaukaarten, per land
+  let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
+  async function laadFinance(){
+    if (finBusy) return;
+    finBusy = true;
+    try { finData = await API.call('/supplier/finance', {}); }
+    catch(e){ finData = { error: e.message }; }
+    finBusy = false;
+    renderStation();
+  }
   // ritgeschiedenis komt gepagineerd van de server (schaalvast bij miljoenen ritten)
   let histData = null, histPage = 1, histQ = '', histBusy = false;
   async function laadHistorie(){
@@ -1460,6 +1470,7 @@
     const horeca = ['restaurant','bar','club'].includes(type);
     const secs = [
       ['bo','\uD83D\uDCCA',T('kt.bo','Backoffice')],
+      ['fin','\uD83D\uDCDA',T('kt.fin','Boekhouding')],
       ['hr','\uD83D\uDC65',T('kt.hr','HR & team')]
     ];
     if (horeca) secs.push(
@@ -1551,6 +1562,55 @@
           (b.toppers.length ? b.toppers.map((t2, i) =>
             '<div class="st-row"><span>'+(['🥇','🥈','🥉'][i]||'')+' '+t2.naam+'<span class="sub">'+t2.aantal+'x '+T('bz.verkocht','verkocht')+'</span></span><b style="color:var(--gold);">'+eur(t2.omzet)+'</b></div>').join('')
             : '<div class="tkc-who">'+T('bz.geentop','Nog geen verkopen. Zodra er via de app of de kassa verkocht wordt, staan de toppers hier.')+'</div>')+'</div>';
+      }
+    }
+    if (kantoorSec === 'fin'){
+      // de boekhouding van de zaak: btw per genre, personeelskosten uit de
+      // klokuren en een boekhoudkundig correcte cadeaukaartenadministratie
+      if (!finData){
+        laadFinance();
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📚 '+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+      } else if (finData.error){
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📚 '+T('kt.fin','Boekhouding')+'</h3><div class="tkc-who">'+finData.error+'</div></div>';
+      } else {
+        const f = finData;
+        if (finMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+finMsg+'</div>'; }
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🌍 '+T('fn.land','Land & uurloon')+'</h3>'+
+          '<div class="tkc-who">'+T('fn.land.s','Het land bepaalt de btw-tarieven, werkgeverslasten en aangifteregels; het uurloon voedt de personeelskosten.')+'</div>'+
+          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">'+
+          '<select class="st-in" id="fnLand" style="flex:2;min-width:130px;">'+f.landen.map(l=>'<option value="'+l.code+'"'+(l.code===f.land?' selected':'')+'>'+l.naam+'</option>').join('')+'</select>'+
+          '<input class="st-in" id="fnUur" type="number" step="0.5" value="'+f.personeel.uurloon+'" style="flex:1;min-width:80px;" placeholder="€/uur">'+
+          '<button class="obtn primary" id="fnSave">'+T('fn.save','Opslaan')+'</button></div></div>';
+        html += '<div class="tkc"><h3>🧾 '+T('fn.btw','Btw deze maand')+' ('+f.maand+')</h3>'+
+          (f.btw.length ? f.btw.map(r =>
+            '<div class="st-row"><span>'+r.label+'<span class="sub">'+T('fn.omzet','omzet')+' '+eur(r.omzet)+' · '+T('fn.grondslag','grondslag')+' '+eur(r.grondslag)+' · '+r.tarief+'%</span></span>'+
+            '<b style="color:var(--gold);">'+eur(r.btw)+'</b></div>').join('')
+            : '<div class="tkc-who">'+T('fn.geenomzet','Nog geen omzet deze maand.')+'</div>')+
+          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.afdragen','Af te dragen btw')+'</b></span><b style="color:var(--gold);">'+eur(f.btwTotaal)+'</b></div></div>';
+        html += '<div class="tkc"><h3>👥 '+T('fn.personeel','Personeelskosten')+' ('+f.maand+')</h3>'+
+          '<div class="st-row"><span>'+T('fn.uren','Geklokte uren')+' × € '+f.personeel.uurloon+'<span class="sub">'+f.personeel.uren+' '+T('fn.uur','uur')+'</span></span><b>'+eur(f.personeel.bruto)+'</b></div>'+
+          '<div class="st-row"><span>'+T('fn.lasten','Werkgeverslasten')+'<span class="sub">~'+f.personeel.lastenPct+'% ('+f.landNaam+')</span></span><b>'+eur(f.personeel.lasten)+'</b></div>'+
+          (f.personeel.vakantiegeld ? '<div class="st-row"><span>'+T('fn.vak','Vakantiegeldreserve')+'<span class="sub">'+f.personeel.vakantiegeldPct+'%</span></span><b>'+eur(f.personeel.vakantiegeld)+'</b></div>' : '')+
+          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.totaal','Totale loonkosten')+'</b></span><b style="color:var(--gold);">'+eur(f.personeel.totaal)+'</b></div>'+
+          '<div class="tkc-who">'+T('fn.minuur','Indicatie minimumuurloon')+': € '+f.personeel.uurloonMin+'</div></div>';
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🎁 '+T('fn.gc','Cadeaukaarten')+'</h3>'+
+          '<div class="st-row"><span>'+T('fn.gcverkocht','Verkocht deze maand')+'<span class="sub">'+T('fn.gcv.s','nog geen omzet, geen btw')+'</span></span><b>'+eur(f.giftcards.verkocht)+'</b></div>'+
+          '<div class="st-row"><span>'+T('fn.gcin','Ingewisseld deze maand')+'<span class="sub">'+T('fn.gci.s','omzet + btw-moment')+'</span></span><b>'+eur(f.giftcards.ingewisseld)+'</b></div>'+
+          '<div class="st-row"><span>'+T('fn.gcopen','Openstaand saldo')+'<span class="sub">'+T('fn.gco.s','verplichting op de balans')+' · '+f.giftcards.aantal+' '+T('fn.kaarten','kaart(en)')+'</span></span><b style="color:var(--gold);">'+eur(f.giftcards.open)+'</b></div>'+
+          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.4rem;">'+
+          '<input class="st-in" id="gcBedrag" type="number" placeholder="€ 50" style="flex:1;min-width:80px;">'+
+          '<button class="obtn primary" id="gcSell">🎁 '+T('fn.gcsell','Verkoop kaart')+'</button></div>'+
+          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.3rem;">'+
+          '<input class="st-in" id="gcCode" placeholder="RTG-GC-XXXXXX" style="flex:2;min-width:130px;">'+
+          '<input class="st-in" id="gcInBedrag" type="number" placeholder="€" style="flex:1;min-width:70px;">'+
+          '<button class="obtn" id="gcRedeem">'+T('fn.gcredeem','In te wisselen')+'</button></div></div>';
+        html += '<div class="tkc"><h3>📜 '+T('fn.regels','Regels in ')+f.landNaam+'</h3>'+
+          f.regels.map(r => '<div class="tkc-who" style="line-height:1.5;">• '+r+'</div>').join('')+'</div>';
+        html += '<div class="tkc"><h3>🤖 '+T('fn.ai','AI-boekhouder')+'</h3>'+
+          '<div class="tkc-who">'+T('fn.ai.s','Kent uw land, uw cijfers en de regels. Vraag naar btw, loonkosten, cadeaukaarten of aangiftetermijnen.')+'</div>'+
+          '<div style="display:flex;gap:0.5rem;"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" style="flex:1;">'+
+          '<button class="obtn primary" id="accGo">'+T('fn.vraag','Vraag')+'</button></div>'+
+          '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;">'+accAntwoord+'</div></div>';
       }
     }
     if (kantoorSec === 'hr'){
@@ -1796,7 +1856,41 @@
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; renderStation(); }));
+    // boekhouding: land en uurloon opslaan, cadeaukaarten en de AI-boekhouder
+    const fnS = el.querySelector('#fnSave'); if (fnS) fnS.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/settings', { land: el.querySelector('#fnLand').value, uurloon: Number(el.querySelector('#fnUur').value) });
+        finData = null; finMsg = '';
+        await refresh();
+      } catch(e){ toast(e.message); }
+    });
+    const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
+        finMsg = '🎁 '+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--gold);">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
+        finData = null;
+        renderStation();
+      } catch(e){ toast(e.message); }
+    });
+    const gR = el.querySelector('#gcRedeem'); if (gR) gR.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/giftcard/redeem', { code: el.querySelector('#gcCode').value, bedrag: Number(el.querySelector('#gcInBedrag').value) });
+        finMsg = '✅ '+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b style="color:var(--gold);">€ '+d.saldo+'</b>';
+        finData = null;
+        renderStation();
+      } catch(e){ toast(e.message); }
+    });
+    const aG = el.querySelector('#accGo'); if (aG) aG.addEventListener('click', async () => {
+      const q = el.querySelector('#accQ').value.trim();
+      if (!q) return;
+      accAntwoord = '…';
+      renderStation();
+      try { accAntwoord = esc((await API.call('/supplier/accountant', { question: q })).answer); }
+      catch(e){ accAntwoord = esc(e.message); }
+      renderStation();
+    });
+    const aQ = el.querySelector('#accQ'); if (aQ) aQ.addEventListener('keydown', e => { if (e.key === 'Enter' && aG) aG.click(); });
     // schakelaars van de zaak: elke functie aan of uit, direct doorgevoerd
     el.querySelectorAll('[data-kopt]').forEach(b => b.addEventListener('click', async () => {
       const k = b.dataset.kopt, v = b.dataset.val === '1';
@@ -3366,6 +3460,18 @@ window.I18N = { en: {
   'sw.deuren':'Digital guest key', 'sw.deuren.s':'Arrived guests open the front door themselves',
   'sw.events':'Event sign-ups', 'sw.events.s':'Members can sign up for your events',
   'sw.aan':'On', 'sw.uit':'Off', 'sw.apppay':'Paying via the app', 'sw.apppay.s':'A fixed part of every RTG partnership', 'sw.altijd':'Always on',
+  'kt.fin':'Accounting', 'fn.land':'Country & hourly wage',
+  'fn.land.s':'The country sets the VAT rates, employer costs and filing rules; the hourly wage feeds the staff costs.',
+  'fn.save':'Save', 'fn.btw':'VAT this month', 'fn.omzet':'revenue', 'fn.grondslag':'base', 'fn.geenomzet':'No revenue yet this month.',
+  'fn.afdragen':'VAT to remit', 'fn.personeel':'Staff costs', 'fn.uren':'Clocked hours', 'fn.uur':'hours',
+  'fn.lasten':'Employer costs', 'fn.vak':'Holiday pay reserve', 'fn.totaal':'Total wage costs', 'fn.minuur':'Indicative minimum hourly wage',
+  'fn.gc':'Gift cards', 'fn.gcverkocht':'Sold this month', 'fn.gcv.s':'not yet revenue, no VAT',
+  'fn.gcin':'Redeemed this month', 'fn.gci.s':'revenue + VAT moment',
+  'fn.gcopen':'Outstanding balance', 'fn.gco.s':'liability on the balance sheet', 'fn.kaarten':'card(s)',
+  'fn.gcsell':'Sell card', 'fn.gcredeem':'Redeem', 'fn.gcklaar':'Gift card sold. Hand over this code:', 'fn.gcgeind':'Redeemed. Remaining balance on the card:',
+  'fn.regels':'Rules in ', 'fn.ai':'AI accountant',
+  'fn.ai.s':'Knows your country, your figures and the rules. Ask about VAT, wage costs, gift cards or filing deadlines.',
+  'fn.ai.ph':'E.g. how much VAT do I remit this month?', 'fn.vraag':'Ask',
   'kt.verlof':'Leave & sick', 'kt.vja':'Approve', 'kt.vnee':'Decline',
   'kt.geenverlof':'No open requests. Staff request leave via the PDA; sick reports also arrive here.',
   'kt.ziek':'reported sick', 'kt.vok':'approved', 'kt.vno':'declined', 'kt.vzm':'reported',

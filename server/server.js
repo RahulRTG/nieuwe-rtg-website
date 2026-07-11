@@ -310,6 +310,7 @@ function initRealtime() {
     if (!db.data.memberDir[t]) db.data.memberDir[t] = { codename: PERSONAS[t].codename, tier: t };
   if (!db.data.guestChats) db.data.guestChats = {};               // gastchats: lid <-> partner (roomservice, eigenaar)
   if (!db.data.trustLine) db.data.trustLine = [];                  // vertrouwenslijn: staflid <-> RTG-vertrouwenspersoon (werkgever ziet niets)
+  if (!db.data.giftcards) db.data.giftcards = [];                  // cadeaukaarten per zaak (btw pas bij inwisseling)
   if (!db.data.verlof) db.data.verlof = {};                        // verlofaanvragen en ziekmeldingen per bedrijf
   if (!db.data.klok) db.data.klok = {};                            // in- en uitkloktijden per bedrijf
   if (!db.data.applications) db.data.applications = {};            // sollicitaties per bedrijf
@@ -2668,6 +2669,61 @@ function managerOnly(req, res) {
 }
 
 // bestellingen en reserveringen open of dicht; leden merken het direct
+/* ---- boekhouding per land en genre ----
+   Een praktische samenvatting van btw-tarieven, werkgeverslasten en
+   aangifteregels per land, als kennisbasis voor de AI-boekhouder.
+   Voorlichting voor de demo-omgeving; geen bindend fiscaal advies. */
+const LANDEN = {
+  NL: { naam: 'Nederland', tarieven: { eten: 9, drank: 21, logies: 9, vervoer: 9, jet: 0, standaard: 21 },
+    lasten: 0.28, vakantiegeld: 0.08, uurloonMin: 14.06,
+    aangifte: 'Btw-aangifte per kwartaal (of maandelijks), loonaangifte maandelijks bij de Belastingdienst.',
+    extra: 'Toeristenbelasting verschilt per gemeente (Amsterdam 12,5% op logies). Eten en niet-alcoholische dranken 9%, alcohol 21%.',
+    zakelijk: { horeca: 'Btw op eten en drinken in een horecagelegenheid is NIET aftrekbaar; de kosten zelf zijn wel opvoerbaar.',
+      logies: 'Btw op een zakelijke overnachting (9%) is aftrekbaar.',
+      vervoer: 'Btw op taxi en openbaar vervoer (9%) is aftrekbaar bij zakelijk gebruik.',
+      jet: 'Internationaal personenvervoer valt onder het 0%-tarief; er is dus geen btw om terug te vorderen.' } },
+  BE: { naam: 'Belgie', tarieven: { eten: 12, drank: 21, logies: 6, vervoer: 6, jet: 0, standaard: 21 },
+    lasten: 0.27, vakantiegeld: 0.092, uurloonMin: 12.11,
+    aangifte: 'Btw-aangifte per maand of kwartaal; DIMONA-melding voor elk personeelslid voor de eerste werkdag.',
+    extra: 'Restaurantdiensten 12%, dranken 21%; de witte kassa (GKS) is verplicht in de horeca boven de omzetdrempel.',
+    zakelijk: { horeca: 'Btw op restaurantkosten is niet aftrekbaar; de kosten zijn voor 69% aftrekbaar in de vennootschapsbelasting.',
+      logies: 'Btw op een zakelijke hotelovernachting (6%) is aftrekbaar.',
+      vervoer: 'Btw op personenvervoer (6%) is beperkt aftrekbaar.',
+      jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
+  DE: { naam: 'Duitsland', tarieven: { eten: 19, drank: 19, logies: 7, vervoer: 7, jet: 0, standaard: 19 },
+    lasten: 0.21, vakantiegeld: 0, uurloonMin: 12.82,
+    aangifte: 'Umsatzsteuer-Voranmeldung per maand of kwartaal via ELSTER; loonaangifte maandelijks.',
+    extra: 'Eten in het restaurant 19%, afhaal en bezorging 7%. Hotelovernachting 7%, maar het ontbijt 19%: gesplitst factureren.',
+    zakelijk: { horeca: 'Bewirtungskosten: 70% aftrekbaar als kosten; de btw is volledig aftrekbaar met een correct Bewirtungsbeleg.',
+      logies: 'Btw op de overnachting (7%) is aftrekbaar; het ontbijt staat apart op 19%.',
+      vervoer: 'Btw op taxiritten tot 50 km (7%) is aftrekbaar.',
+      jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
+  FR: { naam: 'Frankrijk', tarieven: { eten: 10, drank: 20, logies: 10, vervoer: 10, jet: 0, standaard: 20 },
+    lasten: 0.42, vakantiegeld: 0, uurloonMin: 11.88,
+    aangifte: 'TVA per maand (regime reel) of per kwartaal; taxe de sejour per overnachting per gemeente.',
+    extra: 'Eten en niet-alcoholische dranken 10%, alcohol 20%. Werkgeverslasten horen bij de hoogste van Europa.',
+    zakelijk: { horeca: 'TVA op zakelijke maaltijden is aftrekbaar met een factuur op bedrijfsnaam.',
+      logies: 'TVA op hotelkosten voor eigen werknemers is NIET aftrekbaar; voor genodigden wel.',
+      vervoer: 'TVA op personenvervoer is niet aftrekbaar.',
+      jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
+  ES: { naam: 'Spanje', tarieven: { eten: 10, drank: 21, logies: 10, vervoer: 10, jet: 0, standaard: 21 },
+    lasten: 0.30, vakantiegeld: 0, uurloonMin: 8.87,
+    aangifte: 'IVA per kwartaal (modelo 303) met een jaaroverzicht (modelo 390); loonaangifte maandelijks.',
+    extra: 'Horeca en hotels 10%; alcohol in de winkel 21%, als onderdeel van de horecadienst 10%.',
+    zakelijk: { horeca: 'IVA op zakelijke maaltijden is aftrekbaar met een volledige factuur (factura completa).',
+      logies: 'IVA op zakelijke overnachtingen is aftrekbaar.',
+      vervoer: 'IVA op vervoer is aftrekbaar bij zakelijk gebruik.',
+      jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
+  JP: { naam: 'Japan', tarieven: { eten: 10, drank: 10, logies: 10, vervoer: 10, jet: 0, standaard: 10 },
+    lasten: 0.16, vakantiegeld: 0, uurloonMin: 6.7,
+    aangifte: 'Consumption tax (10%) jaarlijks of per kwartaal; sinds 2023 is een qualified invoice vereist voor aftrek.',
+    extra: 'Ter plaatse eten 10%, afhaal 8%. Accommodation tax per stad (Kyoto heft per persoon per nacht).',
+    zakelijk: { horeca: 'Consumption tax op zakelijke maaltijden is aftrekbaar met een qualified invoice.',
+      logies: 'Consumption tax op het hotel is aftrekbaar; de accommodation tax is een kostenpost.',
+      vervoer: 'Consumption tax op taxiritten is aftrekbaar met een qualified invoice.',
+      jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } }
+};
+
 /* Elke zaak is baas over de eigen opties. Alles kan aan of uit, met een
    principiele uitzondering: betalen via de app staat altijd aan (daar is
    bewust geen sleutel voor). Wel kiest de zaak het moment: vooraf of achteraf. */
@@ -2696,6 +2752,15 @@ app.post('/api/supplier/settings', supplierAuth, (req, res) => {
         changed.push(ZAAK_OPTIES[k] + ' ' + (req.body.opties[k] ? 'aan' : 'uit'));
       }
     }
+  }
+  // boekhouding: het land bepaalt de tarieven en regels, het uurloon de personeelskosten
+  if (typeof req.body.land === 'string' && LANDEN[req.body.land] && st.land !== req.body.land) {
+    st.land = req.body.land;
+    changed.push('het land op ' + LANDEN[req.body.land].naam);
+  }
+  if (req.body.uurloon != null) {
+    const u = Number(req.body.uurloon);
+    if (Number.isFinite(u) && u >= 0 && u <= 500) { st.uurloon = Math.round(u * 100) / 100; changed.push('het uurloon bij'); }
   }
   // vervoerders: het tarief dat elke nieuwe rit direct een vaste prijs geeft
   if (req.body.tarief && typeof req.body.tarief === 'object') {
@@ -3039,6 +3104,205 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
       : (en ? 'Everything is running smoothly.' : 'Alles loopt.'));
   zin.push(en ? 'RTG charges 0% commission: this revenue is fully yours.' : 'RTG rekent 0% commissie: deze omzet is volledig van u.');
   res.json({ stats, week, toppers, alerts: alerts.slice(0, 12), briefing: zin.join(' ') });
+});
+
+/* ---- cadeaukaarten ----
+   Kopen via de leden-app (Face ID) of verkopen aan de kassa; innen door de
+   zaak op code. Boekhoudkundig correct: de verkoop is nog geen omzet (het
+   saldo is een verplichting op de balans), de btw hoort bij de inwisseling. */
+const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+
+app.post('/api/giftcard/buy', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const bedrag = Math.round(Number(req.body.bedrag));
+  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const kaart = { code: gcCode(), supplierCode: s.code, supplierName: s.name, bedrag, saldo: bedrag,
+    kocht: codename, customerKey: req.session.key, at: new Date().toISOString(), verzilveringen: [] };
+  db.data.giftcards.unshift(kaart);
+  db.data.giftcards = db.data.giftcards.slice(0, 20000);
+  save();
+  notifySupplier(s.code, { icon: '🎁', title: 'Cadeaukaart verkocht', body: codename + ' kocht via de app een cadeaukaart van € ' + bedrag + '.' });
+  sseToSupplier(s.code, 'sync', { scope: 'pos' });
+  res.json({ ok: true, kaart });
+});
+
+app.post('/api/giftcards/mine', auth, (req, res) => {
+  res.json({ kaarten: (db.data.giftcards || []).filter(g => g.customerKey === req.session.key).slice(0, 20) });
+});
+
+app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
+  const bedrag = Math.round(Number(req.body.bedrag));
+  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
+  const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
+    kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
+  db.data.giftcards.unshift(kaart);
+  db.data.giftcards = db.data.giftcards.slice(0, 20000);
+  save();
+  logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
+  res.json({ ok: true, kaart });
+});
+
+app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
+  const code = String(req.body.code || '').trim().toUpperCase();
+  const g = (db.data.giftcards || []).find(x => x.code === code && x.supplierCode === req.supplier.code);
+  if (!g) return res.status(404).json({ error: 'Deze cadeaukaart kennen we hier niet.' });
+  const bedrag = Math.round(Number(req.body.bedrag) * 100) / 100;
+  if (!(bedrag > 0)) return res.status(400).json({ error: 'Geen geldig bedrag.' });
+  if (bedrag > g.saldo) return res.status(409).json({ error: 'Onvoldoende saldo: er staat nog € ' + g.saldo + ' op deze kaart.' });
+  g.saldo = Math.round((g.saldo - bedrag) * 100) / 100;
+  g.verzilveringen = g.verzilveringen || [];
+  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor: req.actor.name });
+  save();
+  logActivity(req.supplier.code, req.actor, 'inde € ' + bedrag + ' van cadeaukaart ' + g.code + ' (rest € ' + g.saldo + ')');
+  res.json({ ok: true, saldo: g.saldo, kaart: { code: g.code, saldo: g.saldo } });
+});
+
+/* ---- de boekhouding van de zaak: btw per genre, personeelskosten, cadeaukaarten ---- */
+function centen(n) { return Math.round(n * 100) / 100; }
+const FIN_CAT = { eten: 'Eten (keuken)', drank: 'Dranken (bar)', logies: 'Logies', vervoer: 'Personenvervoer', jet: 'Internationaal vervoer' };
+
+function financeVoor(s) {
+  const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
+  const L = LANDEN[landCode];
+  const maand = new Date().toISOString().slice(0, 7);
+  const inMaand = iso => String(iso || '').slice(0, 7) === maand;
+  const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
+  const basisCat = caps.includes('rides') ? (s.type === 'jet' ? 'jet' : 'vervoer') : caps.includes('rooms') ? 'logies' : 'eten';
+  // omzet per belastingcategorie: bar-items zijn drank, keuken-items eten
+  const potten = {};
+  const tel = (cat, bedrag) => { if (bedrag > 0) potten[cat] = (potten[cat] || 0) + bedrag; };
+  const catVan = naam => { const m = (s.menu || []).find(x => x.name === naam); return m && m.station === 'bar' ? 'drank' : basisCat === 'eten' ? 'eten' : basisCat; };
+  for (const o of db.data.orders) {
+    if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
+    for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
+  }
+  for (const v of db.data.posSales[s.code] || []) {
+    if (v.method === 'rtg' || v.method === 'kamer' || !inMaand(v.at)) continue;
+    if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
+    else tel(basisCat, v.total || 0);
+  }
+  for (const r of db.data.rides) {
+    if (r.supplierCode !== s.code || !r.paid || !inMaand(r.paidAt || r.at)) continue;
+    tel(s.type === 'jet' ? 'jet' : 'vervoer', r.quote || 0);
+  }
+  // cadeaukaarten (meervoudig inwisselbaar): btw-moment is de inwisseling
+  const kaarten = (db.data.giftcards || []).filter(g => g.supplierCode === s.code);
+  const gcVerkocht = kaarten.filter(g => inMaand(g.at)).reduce((x, g) => x + g.bedrag, 0);
+  let gcIngewisseld = 0;
+  for (const g of kaarten) for (const w of g.verzilveringen || []) if (inMaand(w.at)) gcIngewisseld += w.bedrag;
+  if (gcIngewisseld) tel(basisCat, gcIngewisseld);
+  const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
+  const btw = Object.entries(potten).map(([cat, omzet]) => {
+    const t = L.tarieven[cat] != null ? L.tarieven[cat] : L.tarieven.standaard;
+    const grondslag = centen(omzet / (1 + t / 100));
+    return { cat, label: FIN_CAT[cat] || cat, tarief: t, omzet: centen(omzet), grondslag, btw: centen(omzet - grondslag) };
+  }).sort((a, b) => b.omzet - a.omzet);
+  // personeelskosten uit de klokuren van deze maand
+  const uurloon = (s.settings && Number(s.settings.uurloon)) || 16;
+  const duurUur = e => ((e.out ? new Date(e.out) : new Date()) - new Date(e.in)) / 3600000;
+  const uren = (db.data.klok[s.code] || []).filter(e => String(e.in).slice(0, 7) === maand).reduce((x, e) => x + duurUur(e), 0);
+  const bruto = centen(uren * uurloon);
+  return {
+    land: landCode, landNaam: L.naam,
+    landen: Object.entries(LANDEN).map(([k, v]) => ({ code: k, naam: v.naam })),
+    maand,
+    btw, btwTotaal: centen(btw.reduce((x, r2) => x + r2.btw, 0)),
+    personeel: {
+      uren: Math.round(uren * 10) / 10, uurloon, bruto,
+      lasten: centen(bruto * L.lasten), lastenPct: Math.round(L.lasten * 100),
+      vakantiegeld: centen(bruto * L.vakantiegeld), vakantiegeldPct: Math.round(L.vakantiegeld * 1000) / 10,
+      totaal: centen(bruto * (1 + L.lasten + L.vakantiegeld)),
+      uurloonMin: L.uurloonMin
+    },
+    giftcards: { verkocht: centen(gcVerkocht), ingewisseld: centen(gcIngewisseld), open: gcOpen, aantal: kaarten.length },
+    regels: [
+      L.aangifte,
+      L.extra,
+      'Cadeaukaarten zijn bij verkoop nog geen omzet: het saldo (€ ' + gcOpen + ') staat als verplichting op de balans en de btw hoort bij de inwisseling.',
+      'Indicatie minimumuurloon in ' + L.naam + ': € ' + L.uurloonMin + ' per uur. Reken bovenop het brutoloon ~' + Math.round(L.lasten * 100) + '% werkgeverslasten' + (L.vakantiegeld ? ' en ' + Math.round(L.vakantiegeld * 1000) / 10 + '% vakantiegeld' : '') + '.'
+    ]
+  };
+}
+
+app.post('/api/supplier/finance', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  res.json(financeVoor(req.supplier));
+});
+
+// AI-boekhouder van de zaak: kent het land, de regels en de eigen cijfers
+function cannedBoekhouder(vraag, fin, L) {
+  const v = vraag.toLowerCase();
+  if (/btw|vat|tarief|belasting|afdra/.test(v))
+    return 'In ' + L.naam + ' gelden voor u deze tarieven: ' + fin.btw.map(r => r.label + ' ' + r.tarief + '%').join(', ') + '. Deze maand is de af te dragen btw € ' + fin.btwTotaal + ' over € ' + centen(fin.btw.reduce((x, r) => x + r.grondslag, 0)) + ' grondslag. ' + L.aangifte;
+  if (/personeel|loon|salaris|lasten|vakantiegeld|kost/.test(v))
+    return 'Deze maand: ' + fin.personeel.uren + ' geklokte uren tegen € ' + fin.personeel.uurloon + ' = € ' + fin.personeel.bruto + ' bruto. Daar komt ~' + fin.personeel.lastenPct + '% werkgeverslasten (€ ' + fin.personeel.lasten + ')' + (fin.personeel.vakantiegeld ? ' en ' + fin.personeel.vakantiegeldPct + '% vakantiegeldreserve (€ ' + fin.personeel.vakantiegeld + ')' : '') + ' bij: totaal € ' + fin.personeel.totaal + '. Indicatie minimumuurloon in ' + L.naam + ': € ' + fin.personeel.uurloonMin + '.';
+  if (/cadeau|bon|kaart|voucher|gift/.test(v))
+    return 'Uw cadeaukaarten zijn meervoudig inwisselbaar: de verkoop (deze maand € ' + fin.giftcards.verkocht + ') is nog geen omzet en kent geen btw. Pas bij inwisseling (deze maand € ' + fin.giftcards.ingewisseld + ') boekt u omzet met btw. Het openstaande saldo van € ' + fin.giftcards.open + ' staat als verplichting op de balans.';
+  if (/aangifte|deadline|wanneer|termijn/.test(v))
+    return L.aangifte + ' ' + L.extra;
+  return 'Uw maand in ' + L.naam + ': af te dragen btw € ' + fin.btwTotaal + ', personeelskosten € ' + fin.personeel.totaal + ' (' + fin.personeel.uren + ' uur), cadeaukaarten € ' + fin.giftcards.open + ' open. Vraag me naar btw, personeelskosten, cadeaukaarten of aangiftetermijnen. Dit is voorlichting, geen bindend fiscaal advies.';
+}
+
+app.post('/api/supplier/accountant', supplierAuth, async (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  const vraag = String(req.body.question || '').trim().slice(0, 400);
+  if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
+  const fin = financeVoor(req.supplier);
+  const L = LANDEN[fin.land];
+  let answer = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 500,
+        system: 'Je bent de AI-boekhouder van RTG voor ' + req.supplier.name + ' (' + req.supplier.type + ') in ' + L.naam + '. ' +
+          'Regels: ' + fin.regels.join(' ') + ' Zakelijke aftrek: ' + Object.values(L.zakelijk).join(' ') + ' ' +
+          'Cijfers deze maand: btw ' + JSON.stringify(fin.btw) + ', af te dragen € ' + fin.btwTotaal + '; personeel ' + JSON.stringify(fin.personeel) + '; cadeaukaarten ' + JSON.stringify(fin.giftcards) + '. ' +
+          'Antwoord in het Nederlands, maximaal 130 woorden, praktisch en concreet. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
+        messages: [{ role: 'user', content: vraag }]
+      });
+      answer = msg.content[0].text;
+    } catch (err) { answer = null; }
+  }
+  if (!answer) answer = cannedBoekhouder(vraag, fin, L);
+  res.json({ answer, land: fin.land, ai: !!anthropic });
+});
+
+// AI-boekhouder voor het Business Pass-lid: wat is per land terug te vorderen
+app.post('/api/member/accountant', auth, async (req, res) => {
+  if (req.session.tier !== 'business') return res.status(403).json({ error: 'De AI-boekhouder is onderdeel van de Business Pass.' });
+  const landCode = LANDEN[req.body.land] ? req.body.land : 'NL';
+  const L = LANDEN[landCode];
+  const vraag = String(req.body.question || '').trim().slice(0, 400);
+  if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
+  const key = req.session.key;
+  const horeca = db.data.orders.filter(o => (o.customerKey || o.customerTier) === key && o.paid).reduce((x, o) => x + o.total, 0);
+  const vervoer = db.data.rides.filter(r => (r.customerKey || r.customerTier) === key && r.paid).reduce((x, r) => x + (r.quote || 0), 0);
+  let answer = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 450,
+        system: 'Je bent de AI-boekhouder van de RTG Business Pass. Het lid reist zakelijk; het gekozen land is ' + L.naam + '. ' +
+          'Aftrekregels daar: horeca: ' + L.zakelijk.horeca + ' logies: ' + L.zakelijk.logies + ' vervoer: ' + L.zakelijk.vervoer + ' jet: ' + L.zakelijk.jet + ' ' +
+          'Uitgaven via RTG: horeca € ' + horeca + ', vervoer € ' + vervoer + '. Facturen staan boekhoudklaar in het portaal met afboekcode en btw-specificatie. ' +
+          'Antwoord in het Nederlands, maximaal 120 woorden, praktisch. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
+        messages: [{ role: 'user', content: vraag }]
+      });
+      answer = msg.content[0].text;
+    } catch (err) { answer = null; }
+  }
+  if (!answer) {
+    const v = vraag.toLowerCase();
+    if (/hotel|overnacht|logies|slapen/.test(v)) answer = L.naam + ': ' + L.zakelijk.logies;
+    else if (/taxi|vervoer|rit|jet|vlieg/.test(v)) answer = L.naam + ': ' + L.zakelijk.vervoer + ' ' + L.zakelijk.jet + ' Via RTG gaf u € ' + vervoer + ' uit aan vervoer.';
+    else if (/eten|diner|restaurant|horeca|lunch|terugvorder|aftrek|btw/.test(v)) answer = L.naam + ': ' + L.zakelijk.horeca + ' Via RTG gaf u € ' + horeca + ' uit in de horeca. Uw facturen staan boekhoudklaar in het portaal, met afboekcode en btw-specificatie.';
+    else answer = 'Voor ' + L.naam + ' geldt: ' + L.zakelijk.horeca + ' ' + L.zakelijk.logies + ' ' + L.zakelijk.vervoer + ' Vraag me gerust naar een specifieke uitgave.';
+    answer += ' Dit is voorlichting, geen bindend fiscaal advies.';
+  }
+  res.json({ answer, land: landCode, landen: Object.entries(LANDEN).map(([k, v2]) => ({ code: k, naam: v2.naam })), ai: !!anthropic });
 });
 
 /* ---- AI-assistent voor de leverancier-app ----

@@ -749,6 +749,8 @@
       <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
       <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
       <input id="rgPhone" type="tel" placeholder="Mobiel nummer (WhatsApp)" data-i18n-ph="gate.phone" autocomplete="tel">
+      <label style="display:block;font-size:0.68rem;color:var(--soft);margin:0.15rem 0 0.25rem;" data-i18n="gate.geb">Geboortedatum (zoals in uw paspoort; lidmaatschap vanaf 15 jaar)</label>
+      <input id="rgGeb" type="date" autocomplete="bday">
       <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
       <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
     </form>
@@ -1192,7 +1194,7 @@
   const regForm = document.getElementById('regForm');
   if (regForm) regForm.addEventListener('submit', e => {
     e.preventDefault();
-    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, p: $('#rgPass').value });
+    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, geboortedatum: $('#rgGeb').value, p: $('#rgPass').value });
   });
   const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
   function showGateForm(which){
@@ -1220,7 +1222,7 @@
       if (API.enabled){
         try {
           const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, password: cred.p })
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p })
             : await API.call('/auth/login', { login: cred.u, password: cred.p });
           API.token = data.token;
           applyState(data.state);           // user = het echte account
@@ -1947,6 +1949,8 @@
   function requestTaxi(){
     const veh = suppliers.find(s => s.type === 'taxi') || suppliers.find(s => s.type === 'jet');
     if (!veh){ toast(T('live.notaxi','Geen vervoerspartner beschikbaar op deze bestemming.')); return; }
+    // paspoortleeftijd: privejets boek je vanaf 18 jaar
+    if (veh.type === 'jet' && user.leeftijdsgroep === '15-17'){ toast(T('live.jet18','Privejets boek je vanaf 18 jaar. Een taxi regelen we graag voor je.')); return; }
     // nette aanvraag: personen, bagage en tijdstip; de prijs komt direct terug
     $('#rideSup').textContent = veh.name;
     $('#ride-sheet').dataset.code = veh.code;
@@ -2014,7 +2018,7 @@
     let data;
     try { data = await API.call('/supplier/menu/get', { code }); }
     catch (e) { toast(e.message); return; }
-    menuState = { supplier: data.supplier, menu: data.menu, qty: {}, note: '', tag: false, table: '' };
+    menuState = { supplier: data.supplier, menu: data.menu, alcohol: data.alcohol || null, qty: {}, note: '', tag: false, table: '' };
     $('#msName').textContent = data.supplier.name;
     $('#msMeta').textContent = tType(data.supplier.typeLabel) + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
     renderMenuSheet();
@@ -2058,13 +2062,16 @@
     $('#msBody').innerHTML = head + eventsBlock + applyBlock + cats.map(c =>
       '<div class="ms-cat">' + c + '</div>' + m.filter(x => x.cat === c).map(x => {
         const q = menuState.qty[x.id] || 0;
+        // alcohol op slot: onder de landsgrens (paspoortleeftijd) niet bestelbaar
+        const slot = x.station === 'bar' && menuState.alcohol && menuState.alcohol.mag === false;
         return '<div class="ms-item" data-id="' + x.id + '">' +
           '<div class="info"><div class="nm">' + x.name + '</div>' +
             (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
             (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + tAlg(a) + '</span>').join('') + '</div>' : '') +
           '</div>' +
           '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +
-            '<div class="qty"><button class="js-minus">−</button><b>' + q + '</b><button class="js-plus">+</button></div>' +
+            (slot ? '<div class="qty" style="opacity:0.55;font-size:0.64rem;justify-content:center;">🔞 ' + menuState.alcohol.grens + '+</div>'
+              : '<div class="qty"><button class="js-minus">−</button><b>' + q + '</b><button class="js-plus">+</button></div>') +
           '</div></div>';
       }).join('')
     ).join('');
@@ -2079,8 +2086,9 @@
     }));
     $('#msBody').querySelectorAll('.ms-item').forEach(el => {
       const id = el.dataset.id;
-      el.querySelector('.js-plus').addEventListener('click', () => { menuState.qty[id] = (menuState.qty[id]||0)+1; renderMenuSheet(); });
-      el.querySelector('.js-minus').addEventListener('click', () => { menuState.qty[id] = Math.max(0,(menuState.qty[id]||0)-1); renderMenuSheet(); });
+      const plus = el.querySelector('.js-plus'), min = el.querySelector('.js-minus');
+      if (plus) plus.addEventListener('click', () => { menuState.qty[id] = (menuState.qty[id]||0)+1; renderMenuSheet(); });
+      if (min) min.addEventListener('click', () => { menuState.qty[id] = Math.max(0,(menuState.qty[id]||0)-1); renderMenuSheet(); });
     });
     if (!m.length){ $('#msFoot').innerHTML = ''; return; }
     if (menuState.supplier.ordersOpen === false){
@@ -2097,7 +2105,10 @@
       '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
       '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> ' + T('app.ms.tag','Tag dit voor De Salon (7 dagen na verblijf)') + '</label>' +
       ((menuState.supplier.hasMenu !== false && (menuState.menu || []).some(x => x.station === 'bar'))
-        ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">🔞 ' + T('app.ms.18','Alcohol: alleen 18+; de zaak kan om legitimatie vragen.') + '</div>' : '') +
+        ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">🔞 ' +
+          (menuState.alcohol && menuState.alcohol.mag === false
+            ? T('app.ms.geenalc','Alcohol staat voor u uit:') + ' ' + (menuState.alcohol.land || '') + ' ' + T('app.ms.vanaf','hanteert') + ' ' + menuState.alcohol.grens + '+ ' + T('app.ms.pasp','(leeftijd geverifieerd via uw paspoort).')
+            : 'Alcohol: ' + ((menuState.alcohol && menuState.alcohol.grens) || 18) + '+; ' + T('app.ms.18b','de zaak kan om legitimatie vragen.')) + '</div>' : '') +
       '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? T('app.ms.order','Bestel') + ' ' + count + ' ' + T('app.items','item(s)') + ', ' + eur(total) : T('app.ms.choose','Kies gerechten')) + '</button>';
     const mt = $('#msTable');
     if (mt) mt.addEventListener('change', e => menuState.table = e.target.value);
@@ -2341,6 +2352,7 @@
         '<div>' +
           '<div class="mrow">'+T('app.cc.membernr','Lidnummer')+'<b>' + user.number + '</b></div>' +
           '<div class="mrow" style="margin-top:0.55rem;">'+T('app.cc.pass','Pas')+'<b>' + TIER_LABEL[user.tier] + '</b></div>' +
+          (user.leeftijdsgroep ? '<div class="mrow" style="margin-top:0.55rem;">'+T('app.cc.age','Leeftijd')+'<b>' + user.leeftijdsgroep + ' \u00b7 ' + T('app.cc.ageok','paspoort') + '</b></div>' : '') +
         '</div>' + qrSvg(user.number.length * 7919) +
       '</div>' +
       '<button class="whybtn" id="whyBtn">'+T('app.cc.why','Waarom een codenaam?')+' →</button>' +
@@ -2927,6 +2939,11 @@ window.I18N = { en: {
   'sal.claim':'Claim this offer', 'sal.geclaimd':'times claimed', 'sal.claimok':'Claimed. Your code:',
   'sal.poll':'Poll', 'sal.stemmen':'vote(s)', 'app.salon.direct':'posted instantly',
   'app.ms.18':'Alcohol: 18+ only; the venue may ask for ID.',
+  'app.ms.18b':'the venue may ask for ID.',
+  'app.ms.geenalc':'Alcohol is off for you:', 'app.ms.vanaf':'requires', 'app.ms.pasp':'(age verified via your passport).',
+  'app.cc.age':'Age', 'app.cc.ageok':'passport',
+  'gate.geb':'Date of birth (as in your passport; membership from age 15)',
+  'live.jet18':'Private jets can be booked from age 18. We will gladly arrange a taxi for you.',
   'sal.dm.sub':'Member chat, on codenames', 'sal.dm.leeg':'No messages yet. Say hello.',
   'sal.share.h':'Share with a connection', 'sal.deel':'Share with a connection', 'sal.gedeeld':'Shared.',
   'sal.add':'Add', 'sal.zoek':'Search', 'sal.zoekph':'Search by codename, e.g. Golden Ibis',

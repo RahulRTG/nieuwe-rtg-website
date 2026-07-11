@@ -1080,6 +1080,7 @@
       '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+(o.paid?'':' \u00b7 '+T('st.unpaid','onbetaald'))+'</div>'+
       '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+it.name+'</span>').join('')+'</div>'+
       (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
+      (o.leeftijdOk?'<div class="tkc-alg" style="background:rgba(45,140,80,0.14);color:#2d8c50;">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
       (st==='keuken'&&sectiesVanOrder(o).length>1?'<div class="st-badges">'+sectiesVanOrder(o).map(s2=>{
         const p2=(o.secties||{})[s2]||'';
         return '<span class="st-badge '+p2+'">'+KSECTIES[s2][0]+' '+T('ks.'+s2, KSECTIES[s2][1])+(p2?' \u00b7 '+(p2==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
@@ -3543,6 +3544,7 @@ window.I18N = { en: {
   'st.pda':'Open the full PDA', 'st.pda.s':'Schedule, tasks, team chat, walkie-talkie and SOS.',
   'st.calm':'All quiet. New orders appear here automatically.',
   'st.done':'Marked ready, waiting to be served', 'st.unpaid':'unpaid',
+  'st.agever':'Age verified in the app (passport)',
   'st.b.klaar':'ready', 'st.b.bezig':'working',
   'menu.station':'Workstation', 'menu.keuken':'Kitchen', 'menu.stmoved':'Moved to the other station.',
   'st.events':'Events display', 'st.events.s':'Guest list and door check-in',

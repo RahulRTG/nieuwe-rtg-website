@@ -111,10 +111,42 @@ if (process.env.ANTHROPIC_API_KEY) {
    Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam. */
 const PERSONAS = {
   guest:     { name: 'Gast',         full: 'Gast',               since: null,             number: null,                codename: 'GAST' },
-  rtg:       { name: 'S. Janssen',   full: 'Sophie Janssen',     since: 'Maart 2026',     number: 'RTG · 2026 · 8841', codename: 'Zilveren Valk' },
-  lifestyle: { name: 'I. van Rhijn', full: 'Isabelle van Rhijn', since: 'Augustus 2025',  number: 'LSP · 2025 · 0217', codename: 'Gouden Ibis' },
-  business:  { name: 'A. de Vries',  full: 'Alexander de Vries', since: 'November 2025',  number: 'BSP · 2025 · 1104', codename: 'Noordelijke Ster' }
+  rtg:       { name: 'S. Janssen',   full: 'Sophie Janssen',     since: 'Maart 2026',     number: 'RTG · 2026 · 8841', codename: 'Zilveren Valk',   geboren: '2007-02-14' },
+  lifestyle: { name: 'I. van Rhijn', full: 'Isabelle van Rhijn', since: 'Augustus 2025',  number: 'LSP · 2025 · 0217', codename: 'Gouden Ibis',     geboren: '1991-06-02' },
+  business:  { name: 'A. de Vries',  full: 'Alexander de Vries', since: 'November 2025',  number: 'BSP · 2025 · 1104', codename: 'Noordelijke Ster', geboren: '1984-11-23' }
 };
+
+/* ---------- leeftijd uit het paspoort ----------
+   Elke pas wordt met paspoort aangevraagd, dus de leeftijd van een lid is
+   geverifieerd. Die stuurt functies: 15-17 (jeugdlid: geen alcohol, geen
+   privejet, altijd vooraf betalen), 18-21 (alcohol volgt de landsgrens van de
+   zaak, bijvoorbeeld 20 in Japan) en 21+. Partners zien nooit de
+   geboortedatum, hooguit dat de leeftijd geverifieerd is. */
+function leeftijdVan(geboren) {
+  if (!geboren || !/^\d{4}-\d{2}-\d{2}$/.test(String(geboren))) return null;
+  const g = new Date(geboren);
+  if (isNaN(g)) return null;
+  const nu = new Date();
+  let j = nu.getFullYear() - g.getFullYear();
+  if (nu.getMonth() < g.getMonth() || (nu.getMonth() === g.getMonth() && nu.getDate() < g.getDate())) j--;
+  return j;
+}
+function geborenVan(sess) {
+  if (!sess || sess.tier === 'guest') return null;
+  if (sess.account) return (accounts.getMemberState(sess.account.id) || {}).geboren || null;
+  return (PERSONAS[sess.tier] || {}).geboren || null;
+}
+function leeftijdsgroepVan(lft) {
+  if (lft == null) return null;
+  if (lft < 18) return '15-17';
+  if (lft <= 21) return '18-21';
+  return '21+';
+}
+// de alcoholgrens volgt het land van de zaak (LANDEN staat verderop)
+function alcoholGrensVan(s) {
+  const land = LANDEN[(s.settings && s.settings.land) || 'NL'] || LANDEN.NL;
+  return { grens: land.alcoholLeeftijd || 18, land: land.naam };
+}
 
 // sha256(token) -> { tier, key }. In-memory voor snelheid, gespiegeld in
 // db.json zodat ingelogde gebruikers een serverherstart overleven.
@@ -567,6 +599,9 @@ function stateFor(sess, lang) {
     state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
     state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
     state.myApplications = myApplications(sess.key);
+    // leeftijd uit het paspoort: het lid ziet de eigen groep; partners nooit
+    const lft = leeftijdVan(geborenVan(sess));
+    if (lft != null) { state.user.leeftijd = lft; state.user.leeftijdsgroep = leeftijdsgroepVan(lft); }
   }
   return state;
 }
@@ -649,6 +684,13 @@ app.post('/api/auth/register', (req, res) => {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
   if (phone.replace(/\D/g, '').length < 8) return res.status(400).json({ error: 'Vul een geldig mobiel nummer in (voor uw WhatsApp-lijn).' });
   if (password.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
+  // de pas wordt met paspoort aangevraagd: geboortedatum is verplicht en
+  // bepaalt de leeftijdsgroep (15-17 alleen met toestemming van ouder/voogd)
+  const geboren = String(req.body.geboortedatum || '').slice(0, 10);
+  const lftNieuw = leeftijdVan(geboren);
+  if (lftNieuw == null) return res.status(400).json({ error: 'Vul uw geboortedatum in zoals in uw paspoort.' });
+  if (lftNieuw < 15) return res.status(400).json({ error: 'Het RTG-lidmaatschap kan vanaf 15 jaar.' });
+  if (lftNieuw > 120) return res.status(400).json({ error: 'Controleer uw geboortedatum.' });
   if (accounts.findByLogin(email)) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
   let user;
   try {
@@ -656,7 +698,9 @@ app.post('/api/auth/register', (req, res) => {
   } catch (e) {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
-  accounts.saveMemberState(user.id, memberTemplate());
+  const mdNieuw = memberTemplate();
+  mdNieuw.geboren = geboren;
+  accounts.saveMemberState(user.id, mdNieuw);
   // bevestigingsmail met een echte, werkende link
   const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
   const verifyUrl = appUrl(req) + '/apps/portaal.html?verify=' + vtok;
@@ -2895,7 +2939,7 @@ function managerOnly(req, res) {
    aangifteregels per land, als kennisbasis voor de AI-boekhouder.
    Voorlichting voor de demo-omgeving; geen bindend fiscaal advies. */
 const LANDEN = {
-  NL: { naam: 'Nederland', tarieven: { eten: 9, drank: 21, logies: 9, vervoer: 9, jet: 0, standaard: 21 },
+  NL: { naam: 'Nederland', alcoholLeeftijd: 18, tarieven: { eten: 9, drank: 21, logies: 9, vervoer: 9, jet: 0, standaard: 21 },
     lasten: 0.28, vakantiegeld: 0.08, uurloonMin: 14.06,
     aangifte: 'Btw-aangifte per kwartaal (of maandelijks), loonaangifte maandelijks bij de Belastingdienst.',
     extra: 'Toeristenbelasting verschilt per gemeente (Amsterdam 12,5% op logies). Eten en niet-alcoholische dranken 9%, alcohol 21%.',
@@ -2903,7 +2947,7 @@ const LANDEN = {
       logies: 'Btw op een zakelijke overnachting (9%) is aftrekbaar.',
       vervoer: 'Btw op taxi en openbaar vervoer (9%) is aftrekbaar bij zakelijk gebruik.',
       jet: 'Internationaal personenvervoer valt onder het 0%-tarief; er is dus geen btw om terug te vorderen.' } },
-  BE: { naam: 'Belgie', tarieven: { eten: 12, drank: 21, logies: 6, vervoer: 6, jet: 0, standaard: 21 },
+  BE: { naam: 'Belgie', alcoholLeeftijd: 18, tarieven: { eten: 12, drank: 21, logies: 6, vervoer: 6, jet: 0, standaard: 21 },
     lasten: 0.27, vakantiegeld: 0.092, uurloonMin: 12.11,
     aangifte: 'Btw-aangifte per maand of kwartaal; DIMONA-melding voor elk personeelslid voor de eerste werkdag.',
     extra: 'Restaurantdiensten 12%, dranken 21%; de witte kassa (GKS) is verplicht in de horeca boven de omzetdrempel.',
@@ -2911,7 +2955,7 @@ const LANDEN = {
       logies: 'Btw op een zakelijke hotelovernachting (6%) is aftrekbaar.',
       vervoer: 'Btw op personenvervoer (6%) is beperkt aftrekbaar.',
       jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
-  DE: { naam: 'Duitsland', tarieven: { eten: 19, drank: 19, logies: 7, vervoer: 7, jet: 0, standaard: 19 },
+  DE: { naam: 'Duitsland', alcoholLeeftijd: 18, tarieven: { eten: 19, drank: 19, logies: 7, vervoer: 7, jet: 0, standaard: 19 },
     lasten: 0.21, vakantiegeld: 0, uurloonMin: 12.82,
     aangifte: 'Umsatzsteuer-Voranmeldung per maand of kwartaal via ELSTER; loonaangifte maandelijks.',
     extra: 'Eten in het restaurant 19%, afhaal en bezorging 7%. Hotelovernachting 7%, maar het ontbijt 19%: gesplitst factureren.',
@@ -2919,7 +2963,7 @@ const LANDEN = {
       logies: 'Btw op de overnachting (7%) is aftrekbaar; het ontbijt staat apart op 19%.',
       vervoer: 'Btw op taxiritten tot 50 km (7%) is aftrekbaar.',
       jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
-  FR: { naam: 'Frankrijk', tarieven: { eten: 10, drank: 20, logies: 10, vervoer: 10, jet: 0, standaard: 20 },
+  FR: { naam: 'Frankrijk', alcoholLeeftijd: 18, tarieven: { eten: 10, drank: 20, logies: 10, vervoer: 10, jet: 0, standaard: 20 },
     lasten: 0.42, vakantiegeld: 0, uurloonMin: 11.88,
     aangifte: 'TVA per maand (regime reel) of per kwartaal; taxe de sejour per overnachting per gemeente.',
     extra: 'Eten en niet-alcoholische dranken 10%, alcohol 20%. Werkgeverslasten horen bij de hoogste van Europa.',
@@ -2927,7 +2971,7 @@ const LANDEN = {
       logies: 'TVA op hotelkosten voor eigen werknemers is NIET aftrekbaar; voor genodigden wel.',
       vervoer: 'TVA op personenvervoer is niet aftrekbaar.',
       jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
-  ES: { naam: 'Spanje', tarieven: { eten: 10, drank: 21, logies: 10, vervoer: 10, jet: 0, standaard: 21 },
+  ES: { naam: 'Spanje', alcoholLeeftijd: 18, tarieven: { eten: 10, drank: 21, logies: 10, vervoer: 10, jet: 0, standaard: 21 },
     lasten: 0.30, vakantiegeld: 0, uurloonMin: 8.87,
     aangifte: 'IVA per kwartaal (modelo 303) met een jaaroverzicht (modelo 390); loonaangifte maandelijks.',
     extra: 'Horeca en hotels 10%; alcohol in de winkel 21%, als onderdeel van de horecadienst 10%.',
@@ -2935,7 +2979,7 @@ const LANDEN = {
       logies: 'IVA op zakelijke overnachtingen is aftrekbaar.',
       vervoer: 'IVA op vervoer is aftrekbaar bij zakelijk gebruik.',
       jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
-  JP: { naam: 'Japan', tarieven: { eten: 10, drank: 10, logies: 10, vervoer: 10, jet: 0, standaard: 10 },
+  JP: { naam: 'Japan', alcoholLeeftijd: 20, tarieven: { eten: 10, drank: 10, logies: 10, vervoer: 10, jet: 0, standaard: 10 },
     lasten: 0.16, vakantiegeld: 0, uurloonMin: 6.7,
     aangifte: 'Consumption tax (10%) jaarlijks of per kwartaal; sinds 2023 is een qualified invoice vereist voor aftrek.',
     extra: 'Ter plaatse eten 10%, afhaal 8%. Accommodation tax per stad (Kyoto heft per persoon per nacht).',
@@ -3351,7 +3395,9 @@ app.post('/api/booking/request', auth, (req, res) => {
   const dienst = (s.services || []).find(x => x.id === req.body.serviceId);
   if (!dienst) return res.status(404).json({ error: 'Deze dienst bestaat niet (meer).' });
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  const vooraf = optieAan(s, 'betaalVooraf');
+  // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak
+  const lftB = leeftijdVan(geborenVan(req.session));
+  const vooraf = optieAan(s, 'betaalVooraf') || (lftB != null && lftB < 18);
   const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
   const wanneer = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d + (/^\d{2}:\d{2}$/.test(u) ? ' ' + u : '') : null;
   const boeking = {
@@ -4262,7 +4308,11 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
   if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
   const lang = req.body.lang;
   const menu = (s.menu || []).map(m => ({ ...m, name: i18n.localize(m.name, lang), desc: i18n.localize(m.desc, lang), cat: i18n.localize(m.cat, lang) }));
-  res.json({ supplier: publicSupplier(s, lang), menu });
+  // leeftijdsinfo voor de bestelflow: mag dit lid hier alcohol bestellen?
+  const aInfo = alcoholGrensVan(s);
+  const lftM = leeftijdVan(geborenVan(req.session));
+  res.json({ supplier: publicSupplier(s, lang), menu,
+    alcohol: { grens: aInfo.grens, land: aInfo.land, geverifieerd: lftM != null, mag: lftM == null || lftM >= aInfo.grens } });
 });
 
 // bestelling plaatsen (restaurant/bar/club), klant verschijnt onder codenaam
@@ -4281,9 +4331,18 @@ app.post('/api/order', auth, (req, res) => {
   }
   if (!items.length) return res.status(400).json({ error: 'Geen geldige gerechten gekozen.' });
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  // leeftijd uit het paspoort: alcohol (bar-items) alleen boven de grens van
+  // het land van de zaak; de partner ziet enkel dat de leeftijd geverifieerd is
+  const lft = leeftijdVan(geborenVan(req.session));
+  const metAlcohol = items.some(it => { const m = (s.menu || []).find(x => x.id === it.id); return m && m.station === 'bar'; });
+  if (metAlcohol && lft != null) {
+    const a = alcoholGrensVan(s);
+    if (lft < a.grens) return res.status(403).json({ error: 'Alcohol is in ' + a.land + ' vanaf ' + a.grens + ' jaar; je leeftijd is via je paspoort geverifieerd. Kies iets zonder alcohol.' });
+  }
   // de zaak kiest het betaalmoment: vooraf (standaard, pas zichtbaar na
-  // afrekenen) of achteraf (direct zichtbaar, betalen via de app volgt)
-  const vooraf = optieAan(s, 'betaalVooraf');
+  // afrekenen) of achteraf (direct zichtbaar, betalen via de app volgt);
+  // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak
+  const vooraf = optieAan(s, 'betaalVooraf') || (lft != null && lft < 18);
   const order = {
     ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     pickup: pickupCode(),
@@ -4294,6 +4353,7 @@ app.post('/api/order', auth, (req, res) => {
     allergyNote: schoon(req.body.allergyNote, 200),
     tagSalon: !!req.body.tagSalon,
     betaalMoment: vooraf ? 'vooraf' : 'achteraf',
+    leeftijdOk: metAlcohol && lft != null ? true : undefined,
     status: vooraf ? 'wacht-op-betaling' : 'nieuw', paid: false, at: new Date().toISOString()
   };
   db.data.orders.unshift(order);
@@ -4495,6 +4555,10 @@ app.post('/api/ride/request', auth, (req, res) => {
   const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
   if (!s || !caps.includes('rides')) return res.status(404).json({ error: 'Geen vervoerspartner gevonden.' });
   if (!optieAan(s, 'ritten')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen ritaanvragen aan.' });
+  // leeftijd uit het paspoort: privejets boek je vanaf 18 jaar
+  const lftR = leeftijdVan(geborenVan(req.session));
+  if (s.type === 'jet' && lftR != null && lftR < 18)
+    return res.status(403).json({ error: 'Privejets boek je vanaf 18 jaar. Een taxi regelen we graag voor je.' });
   const dest = req.body.toCode ? findSupplier(req.body.toCode) : null;
   const codename = liveCodename(req.session);
   // slimme offerte: afstand uit de live-locatie en de bestemming, anders een
@@ -4527,9 +4591,10 @@ app.post('/api/ride/request', auth, (req, res) => {
     passengers: pax, luggage: koffers, note: schoon(req.body.note, 140),
     km: Math.round(km * 10) / 10, quote,
     driver: null, vehicle: null,
-    // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf
-    betaalMoment: optieAan(s, 'betaalVooraf') ? 'vooraf' : 'achteraf',
-    status: optieAan(s, 'betaalVooraf') && quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
+    // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf;
+    // jeugdleden (15-17) betalen altijd vooraf
+    betaalMoment: (optieAan(s, 'betaalVooraf') || (lftR != null && lftR < 18)) ? 'vooraf' : 'achteraf',
+    status: (optieAan(s, 'betaalVooraf') || (lftR != null && lftR < 18)) && quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
     paid: quote === 0, at: new Date().toISOString()
   };
   if (ride.plannedFor) ride.when = 'Gepland: ' + ride.plannedFor.slice(0, 16).replace('T', ' ');

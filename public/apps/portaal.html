@@ -1034,6 +1034,8 @@
         <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
         <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
         <input id="rgPhone" type="tel" placeholder="Mobiel nummer (WhatsApp)" data-i18n-ph="gate.phone" autocomplete="tel">
+        <label style="display:block;font-size:0.68rem;color:var(--soft);margin:0.15rem 0 0.25rem;" data-i18n="gate.geb">Geboortedatum (zoals in uw paspoort; lidmaatschap vanaf 15 jaar)</label>
+        <input id="rgGeb" type="date" autocomplete="bday">
         <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
         <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
       </form>
@@ -1392,7 +1394,7 @@
   const regForm = document.getElementById('regForm');
   if (regForm) regForm.addEventListener('submit', e => {
     e.preventDefault();
-    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, p: $('#rgPass').value });
+    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, geboortedatum: $('#rgGeb').value, p: $('#rgPass').value });
   });
   const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
   function showGateForm(which){
@@ -1452,7 +1454,7 @@
       if (API.enabled){
         try {
           const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, password: cred.p })
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p })
             : await API.call('/auth/login', { login: cred.u, password: cred.p });
           API.token = data.token;
           applyState(data.state);           // user = het echte account

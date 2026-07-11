@@ -94,6 +94,12 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ limit: '8mb' }));
+
+// RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
+// (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
+// draait mee op dezelfde database en failover.
+app.use('/api/foundation', require('./foundation').router);
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 /* ---------- Claude API (optioneel) ---------- */

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Schrift</title>
+<link rel="stylesheet" href="stijl.css">
+<style>
+  body{height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+  .kop{display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;border-bottom:1px solid var(--lijn);}
+  .kop .brand{font-family:var(--serif);font-weight:500;}.kop .brand b{color:var(--goud);}
+  .kop .mini{color:var(--zacht);font-size:.8rem;}
+  .kop .status{margin-left:auto;font-size:.78rem;color:var(--zacht);display:flex;align-items:center;gap:.4rem;}
+  .view{flex:1;overflow:hidden;position:relative;}
+  .tab{position:absolute;inset:0;display:none;flex-direction:column;padding:.7rem;gap:.6rem;overflow:auto;}
+  .tab.aan{display:flex;}
+  .tabbar{display:flex;border-top:1px solid var(--lijn);background:var(--paneel2);}
+  .tabbar button{flex:1;background:none;color:var(--zacht);padding:.5rem 0 .6rem;font-size:.7rem;display:flex;flex-direction:column;align-items:center;gap:.15rem;}
+  .tabbar button .ic{font-size:1.2rem;}
+  .tabbar button.aan{color:var(--goud);}
+  .boardbox{flex:1;background:var(--bord);border:1px solid var(--lijn);border-radius:var(--radius);position:relative;overflow:hidden;min-height:0;}
+  .boardbox canvas{position:absolute;inset:0;width:100%;height:100%;}
+  .wachtbord{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--zacht);font-size:.9rem;text-align:center;padding:2rem;}
+  .pgstrip{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem;}
+  .pgstrip .pg{min-width:2.2rem;height:2.2rem;border-radius:8px;background:#26221d;color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;}
+  .pgstrip .pg.aan{border-color:var(--goud);}
+  .pgstrip .add{background:#1c1a16;color:var(--goud);font-size:1.1rem;}
+  .paginabox{flex:1;min-height:0;display:flex;flex-direction:column;}
+  textarea.schrijf{flex:1;background:#fbf7ec;color:#1a1a1a;border:1px solid var(--lijn);border-radius:12px;padding:1rem;font-size:1.05rem;line-height:1.9;
+    background-image:repeating-linear-gradient(#fbf7ec 0 30px,#e6dcc4 30px 31px);resize:none;outline:none;}
+  .tekencanvasbox{flex:1;position:relative;background:var(--bord);border:1px solid var(--lijn);border-radius:12px;overflow:hidden;min-height:0;}
+  .tekencanvasbox canvas{position:absolute;inset:0;width:100%;height:100%;}
+  .schrijftools{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
+  .tbtn{width:2rem;height:2rem;border-radius:9px;background:#26221d;color:#fff;display:flex;align-items:center;justify-content:center;}
+  .tbtn.aan{background:var(--goud);color:#1a1710;}
+  .kleur{width:1.4rem;height:1.4rem;border-radius:50%;border:2px solid rgba(255,255,255,.2);}
+  .kleur.aan{border-color:#fff;}
+  .titelinp{background:none;border:none;border-bottom:1px solid var(--lijn);color:var(--txt);font-size:.95rem;padding:.2rem;outline:none;flex:1;min-width:6rem;}
+  .item{padding:.8rem;}
+  .item h4{font-size:.95rem;margin-bottom:.3rem;font-family:var(--serif);font-weight:500;}
+  .item .mini{color:var(--zacht);font-size:.75rem;}
+  .opgave-open textarea{width:100%;min-height:6rem;margin:.5rem 0;}
+  .klaar{color:var(--groen);font-weight:600;}
+  .chat{flex:1;overflow:auto;display:flex;flex-direction:column;gap:.5rem;padding:.2rem;}
+  .bubbel{max-width:85%;padding:.6rem .8rem;border-radius:14px;font-size:.92rem;line-height:1.45;white-space:pre-wrap;}
+  .bubbel.bram{background:var(--paneel);border:1px solid var(--lijn);align-self:flex-start;border-bottom-left-radius:4px;}
+  .bubbel.ik{background:var(--goud);color:#1a1710;align-self:flex-end;border-bottom-right-radius:4px;}
+  .tip{background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:12px;padding:.7rem .9rem;font-size:.9rem;}
+  .tip b{color:var(--goud);}
+  .chatrij{display:flex;gap:.5rem;}
+  .chatrij input{flex:1;}
+</style>
+</head>
+<body>
+<div class="kop">
+  <div class="brand">RT<b>Foundation</b></div>
+  <div><div id="mVak" style="font-weight:600;font-size:.9rem;">Les</div><div class="mini" id="mNaam"></div></div>
+  <div class="status"><span class="dot" id="liveDot"></span><span id="liveTxt">verbinden…</span> · <span id="bewaard">opgeslagen</span></div>
+</div>
+
+<div class="view">
+  <div class="tab aan" id="tab-bord">
+    <div class="boardbox"><canvas id="liveBord"></canvas><div class="wachtbord" id="wacht">Zodra de begeleider op het bord schrijft, zie je het hier live.</div></div>
+    <button class="knop groen" id="bewaarFoto">📸 Bewaar dit bord in mijn schrift</button>
+  </div>
+
+  <div class="tab" id="tab-schrift">
+    <div class="pgstrip" id="pgStrip"></div>
+    <div class="schrijftools" id="tekentools" style="display:none;">
+      <button class="tbtn aan" data-tool="pen">✏️</button>
+      <button class="tbtn" data-tool="gum">🧽</button>
+      <span class="kleur aan" data-kleur="#111111" style="background:#111"></span>
+      <span class="kleur" data-kleur="#3f6fb0" style="background:#3f6fb0"></span>
+      <span class="kleur" data-kleur="#b4574e" style="background:#b4574e"></span>
+      <span class="kleur" data-kleur="#5FA56A" style="background:#5FA56A"></span>
+      <button class="tbtn" id="tUndo">↶</button>
+    </div>
+    <input class="titelinp" id="pgTitel" placeholder="Titel van deze bladzijde" style="margin:.2rem 0;">
+    <div class="paginabox" id="paginabox"></div>
+  </div>
+
+  <div class="tab" id="tab-opgaven"><div id="opgLijst"><div class="mini">Nog geen opgaven. De begeleider zet ze hier klaar.</div></div></div>
+  <div class="tab" id="tab-agenda"><div id="agLijst"><div class="mini">Nog niets in de agenda.</div></div></div>
+
+  <div class="tab" id="tab-bram">
+    <div class="tip" id="tipBox">💡 <b>Tip van de dag:</b> <span id="tipTxt">…</span></div>
+    <div class="chat" id="chat"></div>
+    <div class="chatrij"><input class="veld" id="vraag" placeholder="Vraag Bram om hulp met leren…"><button class="knop" id="stuur">Vraag</button></div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <button data-tab="bord" class="aan"><span class="ic">🖍️</span>Bord</button>
+  <button data-tab="schrift"><span class="ic">📓</span>Schrift</button>
+  <button data-tab="opgaven"><span class="ic">📝</span>Opgaven</button>
+  <button data-tab="agenda"><span class="ic">📅</span>Agenda</button>
+  <button data-tab="bram"><span class="ic">🤖</span>Bram</button>
+</div>
+
+<script src="tekenen.js"></script>
+<script src="realtime.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const q = new URLSearchParams(location.search);
+let CODE=(q.get('code')||'').toUpperCase(), TOKEN=q.get('t')||'', NAAM='';
+if(!CODE||!TOKEN){ try{ const d=JSON.parse(localStorage.getItem('rtf_leerling')||'null'); if(d){CODE=d.code;TOKEN=d.token;NAAM=d.naam;} }catch(e){} }
+if(!CODE||!TOKEN){ location.href='index.html'; }
+
+async function api(p,b){ const r=await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
+async function get(p){ const r=await fetch('/api/foundation'+p+(p.includes('?')?'&':'?')+'token='+encodeURIComponent(TOKEN)); return r.json(); }
+
+document.querySelectorAll('.tabbar button').forEach(b=> b.addEventListener('click', ()=>{
+  document.querySelectorAll('.tabbar button').forEach(x=>x.classList.remove('aan')); b.classList.add('aan');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('aan')); $('#tab-'+b.dataset.tab).classList.add('aan');
+  if(b.dataset.tab==='schrift') setTimeout(()=> huidigePagina(), 30);
+  if(b.dataset.tab==='bord') setTimeout(()=> liveBord.resize(), 30);
+}));
+
+const liveBord = new TekenBord($('#liveBord'), { readOnly:true, background:'#12110F' });
+function bordNietLeeg(){ $('#wacht').style.display = liveBord.leeg() ? 'flex' : 'none'; }
+get('/bord/'+CODE).then(d=>{ liveBord.setStrokes(d.strokes||[]); bordNietLeeg(); });
+
+$('#bewaarFoto').addEventListener('click', ()=>{
+  const data = liveBord.fotoDataURL();
+  pages.push({ type:'foto', titel:'Bordfoto '+new Date().toLocaleString('nl-NL',{hour:'2-digit',minute:'2-digit'}), data });
+  huidig = pages.length-1; bewaar(); tekenStrip();
+  document.querySelector('.tabbar [data-tab="schrift"]').click();
+});
+
+let pages = [], huidig = 0, tekenbord = null, bewaarTimer = null;
+function markDirty(){ $('#bewaard').textContent='bewaren…'; clearTimeout(bewaarTimer); bewaarTimer=setTimeout(bewaar, 900); }
+function vangHuidigeTekening(){ if(tekenbord && pages[huidig] && pages[huidig].type==='tekening') pages[huidig].strokes = tekenbord.getStrokes(); }
+async function bewaar(){ vangHuidigeTekening(); try{ await api('/schrift/opslaan',{ pages }); $('#bewaard').textContent='opgeslagen'; }catch(e){ $('#bewaard').textContent='niet opgeslagen'; } }
+function tekenStrip(){
+  const strip=$('#pgStrip');
+  strip.innerHTML = pages.map((p,i)=> '<div class="pg '+(i===huidig?'aan':'')+'" data-i="'+i+'">'+(p.type==='tekening'?'✎':p.type==='foto'?'📷':(i+1))+'</div>').join('')
+    + '<div class="pg add" data-add="tekst" title="Tekstblad">T</div><div class="pg add" data-add="tekening" title="Tekenblad">✎</div>';
+  strip.querySelectorAll('[data-i]').forEach(el=> el.addEventListener('click', ()=>{ vangHuidigeTekening(); huidig=Number(el.dataset.i); huidigePagina(); tekenStrip(); }));
+  strip.querySelectorAll('[data-add]').forEach(el=> el.addEventListener('click', ()=>{ vangHuidigeTekening(); pages.push(el.dataset.add==='tekening'?{type:'tekening',titel:'',strokes:[]}:{type:'tekst',titel:'',inhoud:''}); huidig=pages.length-1; huidigePagina(); tekenStrip(); markDirty(); }));
+}
+function huidigePagina(){
+  const box=$('#paginabox'), p=pages[huidig]; tekenbord=null; $('#tekentools').style.display='none';
+  if(!p){ box.innerHTML='<div class="mini">Nog geen bladzijde. Maak er een met T (typen) of ✎ (tekenen).</div>'; $('#pgTitel').value=''; return; }
+  $('#pgTitel').value = p.titel||'';
+  if(p.type==='tekst'){ box.innerHTML='<textarea class="schrijf" id="schrijf" placeholder="Schrijf hier…"></textarea>'; const ta=$('#schrijf'); ta.value=p.inhoud||''; ta.addEventListener('input', ()=>{ p.inhoud=ta.value; markDirty(); }); }
+  else if(p.type==='foto'){ box.innerHTML='<img src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" style="width:100%;border-radius:12px;background:#12110F;">'; }
+  else { box.innerHTML='<div class="tekencanvasbox"><canvas id="schrijfcanvas"></canvas></div>'; $('#tekentools').style.display='flex';
+    setTimeout(()=>{ tekenbord=new TekenBord($('#schrijfcanvas'), { background:'#12110F', kleur:'#111111', onStroke:()=>markDirty() }); tekenbord.kleur='#111111'; tekenbord.dikte=5; tekenbord.setStrokes(p.strokes||[]); },20); }
+}
+$('#pgTitel').addEventListener('input', e=>{ if(pages[huidig]){ pages[huidig].titel=e.target.value; markDirty(); } });
+$('#tekentools').querySelectorAll('[data-tool]').forEach(b=> b.addEventListener('click', ()=>{ $('#tekentools').querySelectorAll('[data-tool]').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); if(tekenbord) tekenbord.tool=b.dataset.tool; }));
+$('#tekentools').querySelectorAll('[data-kleur]').forEach(b=> b.addEventListener('click', ()=>{ $('#tekentools').querySelectorAll('[data-kleur]').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); if(tekenbord) tekenbord.kleur=b.dataset.kleur; }));
+$('#tUndo').addEventListener('click', ()=>{ if(tekenbord){ tekenbord.undo(); markDirty(); } });
+
+let opgaven=[];
+function toonOpgaven(){
+  const box=$('#opgLijst');
+  if(!opgaven.length){ box.innerHTML='<div class="mini">Nog geen opgaven. De begeleider zet ze hier klaar.</div>'; return; }
+  box.innerHTML = opgaven.slice().reverse().map(o=>
+    '<div class="kaart item" data-o="'+esc(o.id)+'"><h4>Opgave</h4><div>'+esc(o.tekst)+'</div>'+
+    (o.klaar?'<div class="klaar">✓ Ingeleverd</div>':'<button class="knop klein groen" data-open="'+esc(o.id)+'" style="margin-top:.5rem;">Maken & inleveren</button>')+
+    '<div class="opgave-open" id="op-'+esc(o.id)+'" style="display:none;"><textarea class="veld" placeholder="Typ hier je antwoord…"></textarea><button class="knop klein" data-lever="'+esc(o.id)+'">Inleveren</button></div></div>'
+  ).join('');
+  box.querySelectorAll('[data-open]').forEach(b=> b.addEventListener('click', ()=>{ $('#op-'+b.dataset.open).style.display='block'; b.style.display='none'; }));
+  box.querySelectorAll('[data-lever]').forEach(b=> b.addEventListener('click', async ()=>{
+    const wrap=$('#op-'+b.dataset.lever); const ant=wrap.querySelector('textarea').value.trim(); if(!ant) return;
+    try{ await api('/opgave/inleveren',{ opgaveId:b.dataset.lever, antwoord:ant }); const o=opgaven.find(x=>x.id===b.dataset.lever); if(o)o.klaar=true; toonOpgaven(); pages.push({type:'tekst',titel:'Opgave',inhoud:ant}); bewaar(); }
+    catch(e){ alert(e.message); }
+  }));
+}
+
+function toonAgenda(list){ $('#agLijst').innerHTML = (list&&list.length) ? list.map(a=> '<div class="kaart item">'+(a.datum?'<div class="mini" style="color:var(--goud)">'+esc(a.datum)+'</div>':'')+'<div>'+esc(a.tekst)+'</div></div>').join('') : '<div class="mini">Nog niets in de agenda.</div>'; }
+
+let gesprek=[{role:'assistant',content:'Hoi! Ik ben Bram, je bijleshulp. Waar ben je mee bezig? Ik help je graag op weg, zonder het antwoord zomaar te geven. 😊'}];
+function toonChat(){ $('#chat').innerHTML = gesprek.map(m=> '<div class="bubbel '+(m.role==='user'?'ik':'bram')+'">'+esc(m.content)+'</div>').join(''); $('#chat').scrollTop=1e9; }
+async function vraagBram(){
+  const t=$('#vraag').value.trim(); if(!t) return;
+  gesprek.push({role:'user',content:t}); $('#vraag').value=''; toonChat();
+  gesprek.push({role:'assistant',content:'…'}); toonChat();
+  try{ const d=await api('/ai',{ messages: gesprek.filter(m=>m.content!=='…') }); gesprek[gesprek.length-1]={role:'assistant',content:d.text}; }
+  catch(e){ gesprek[gesprek.length-1]={role:'assistant',content:'Sorry, ik ben er even niet. Probeer het zo nog eens.'}; }
+  toonChat();
+}
+$('#stuur').addEventListener('click', vraagBram);
+$('#vraag').addEventListener('keydown', e=>{ if(e.key==='Enter') vraagBram(); });
+fetch('/api/foundation/tip').then(r=>r.json()).then(d=>{ $('#tipTxt').textContent=d.tip; }).catch(()=>{});
+
+get('/schrift/'+CODE).then(d=>{ pages=(d.schrift&&d.schrift.pages)||[]; tekenStrip(); huidigePagina(); }).catch(()=>{ tekenStrip(); });
+get('/les/'+CODE).then(d=>{ const l=d.les||{}; $('#mVak').textContent=l.vak||'Les'; $('#mNaam').textContent=NAAM?('Schrift van '+NAAM):''; opgaven=(l.opgaven||[]).map(o=>({...o})); toonOpgaven(); toonAgenda(l.agenda||[]); });
+toonChat();
+
+KlasLive.verbind(CODE,'leerling',TOKEN,{
+  stroke: s => { liveBord.addStroke(s); bordNietLeeg(); },
+  wis: () => { liveBord.clear(); bordNietLeeg(); },
+  bord: d => { liveBord.setStrokes(d.strokes||[]); bordNietLeeg(); },
+  opgave: o => { opgaven.push({...o,klaar:false}); toonOpgaven(); },
+  agenda: d => toonAgenda(d.agenda||[])
+});
+$('#liveDot').classList.add('aan'); $('#liveTxt').textContent='live';
+window.addEventListener('beforeunload', ()=>{ try{ vangHuidigeTekening(); navigator.sendBeacon && navigator.sendBeacon('/api/foundation/schrift/opslaan', new Blob([JSON.stringify({code:CODE,token:TOKEN,pages})],{type:'application/json'})); }catch(e){} });
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Bord</title>
+<link rel="stylesheet" href="stijl.css">
+<style>
+  body{height:100vh;overflow:hidden;}
+  .app{display:grid;grid-template-columns:1fr 20rem;grid-template-rows:auto 1fr;height:100vh;gap:.7rem;padding:.7rem;}
+  .top{grid-column:1/3;display:flex;align-items:center;gap:1rem;}
+  .brand{font-family:var(--serif);font-weight:500;font-size:1.1rem;}
+  .brand b{color:var(--goud);}
+  .code{margin-left:auto;display:flex;align-items:center;gap:.7rem;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.4rem .8rem;}
+  .code b{letter-spacing:.32em;font-size:1.25rem;color:var(--goud);}
+  .online{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--zacht);}
+  .mini{font-size:.72rem;color:var(--zacht);}
+  .board-wrap{position:relative;background:var(--bord);border:1px solid var(--lijn);border-radius:var(--radius);overflow:hidden;}
+  .board-inner{position:relative;width:100%;height:100%;}
+  canvas#bord{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  .tools{position:absolute;left:50%;bottom:.9rem;transform:translateX(-50%);display:flex;gap:.4rem;align-items:center;
+    background:rgba(12,12,11,.88);backdrop-filter:blur(6px);border:1px solid var(--lijn);border-radius:14px;padding:.45rem .6rem;flex-wrap:wrap;justify-content:center;max-width:95%;}
+  .tbtn{width:2.2rem;height:2.2rem;border-radius:10px;background:#26221d;color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;}
+  .tbtn.aan{background:var(--goud);color:#1a1710;}
+  .kleur{width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid rgba(255,255,255,.2);}
+  .kleur.aan{border-color:#fff;transform:scale(1.15);}
+  input[type=range]{width:6rem;accent-color:var(--goud);}
+  .zij{display:flex;flex-direction:column;gap:.7rem;overflow-y:auto;}
+  .paneel{padding:.9rem;}
+  .paneel h3{font-size:.95rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem;font-family:var(--serif);font-weight:500;}
+  .ll{display:flex;align-items:center;gap:.5rem;padding:.35rem 0;font-size:.9rem;cursor:pointer;border-radius:8px;}
+  .ll:hover{background:#1c1a16;}
+  .ll .n{flex:1;}
+  textarea.veld{min-height:3.2rem;resize:vertical;margin-bottom:.5rem;}
+  .ag{display:flex;gap:.4rem;align-items:flex-start;padding:.4rem 0;border-bottom:1px solid var(--lijn);font-size:.85rem;}
+  .ag time{color:var(--goud);font-size:.72rem;display:block;}
+  .ag button{margin-left:auto;background:none;color:var(--zacht);font-size:1rem;}
+  .verberg-zij .zij{display:none;}
+  .verberg-zij .app{grid-template-columns:1fr;}
+  dialog{border:none;background:transparent;color:var(--txt);}
+  dialog::backdrop{background:rgba(4,4,3,.75);}
+  .modal{width:min(94vw,44rem);max-height:88vh;overflow:auto;padding:1.4rem;}
+  .modal h3{font-family:var(--serif);font-weight:500;}
+  .pageview{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.8rem;margin:.6rem 0;}
+  .pageview h4{font-size:.85rem;color:var(--zacht);margin-bottom:.4rem;}
+  .pageview .tekst{white-space:pre-wrap;font-size:.92rem;line-height:1.45;}
+  .pageview canvas,.pageview img{width:100%;border-radius:8px;background:var(--bord);display:block;}
+  @media(max-width:820px){.app{grid-template-columns:1fr;}.zij{position:fixed;inset:auto 0 0 0;max-height:44vh;background:var(--bg);z-index:5;padding:.7rem;border-top:1px solid var(--lijn);}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="top">
+    <div class="brand">RT<b>Foundation</b></div>
+    <button class="knop grijs klein" id="btnZij">Paneel</button>
+    <div class="code">
+      <span class="mini">Lescode</span><b id="lesCode">------</b>
+      <button class="knop klein" id="btnKopieer">Kopieer</button>
+      <span class="online"><span class="dot" id="onDot"></span><span id="onAantal">0</span> online</span>
+    </div>
+  </div>
+
+  <div class="board-wrap"><div class="board-inner">
+    <canvas id="bord"></canvas>
+    <div class="tools" id="tools">
+      <button class="tbtn aan" data-tool="pen" title="Pen">✏️</button>
+      <button class="tbtn" data-tool="marker" title="Marker">🖍️</button>
+      <button class="tbtn" data-tool="gum" title="Gum">🧽</button>
+      <span style="width:1px;height:1.6rem;background:var(--lijn)"></span>
+      <span class="kleur aan" data-kleur="#ffffff" style="background:#ffffff"></span>
+      <span class="kleur" data-kleur="#C9A24B" style="background:#C9A24B"></span>
+      <span class="kleur" data-kleur="#6FB1E6" style="background:#6FB1E6"></span>
+      <span class="kleur" data-kleur="#5FA56A" style="background:#5FA56A"></span>
+      <span class="kleur" data-kleur="#E0796F" style="background:#E0796F"></span>
+      <input type="range" id="dikte" min="1" max="40" value="4" title="Dikte">
+      <span style="width:1px;height:1.6rem;background:var(--lijn)"></span>
+      <button class="tbtn" id="btnUndo" title="Ongedaan maken">↶</button>
+      <button class="tbtn" id="btnWis" title="Bord wissen">🗑️</button>
+    </div>
+  </div></div>
+
+  <div class="zij" id="zij">
+    <div class="kaart paneel">
+      <h3>👩‍🎓 Leerlingen (<span id="llAantal">0</span>)</h3>
+      <div id="llLijst"><div class="mini">Nog niemand. Deel de lescode <b id="codeInline">------</b>.</div></div>
+    </div>
+    <div class="kaart paneel">
+      <h3>📝 Opgave klaarzetten</h3>
+      <textarea class="veld" id="opgTekst" placeholder="Typ hier een vraag of opdracht voor de klas..."></textarea>
+      <button class="knop groen klein" id="opgZet">Zet klaar voor de klas</button>
+      <div id="opgLijst" style="margin-top:.6rem;"></div>
+    </div>
+    <div class="kaart paneel">
+      <h3>📅 Agenda / huiswerk</h3>
+      <input class="veld" id="agTekst" placeholder="Bijv. Maak §3.2, opgave 1 t/m 8" style="margin-bottom:.4rem;">
+      <div style="display:flex;gap:.4rem;">
+        <input class="veld" id="agDatum" type="date" style="flex:1;">
+        <button class="knop klein" id="agAdd">+</button>
+      </div>
+      <div id="agLijst" style="margin-top:.6rem;"></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlgSchrift"><div class="kaart modal">
+  <div style="display:flex;align-items:center;margin-bottom:.6rem;">
+    <h3 id="svNaam" style="font-size:1.1rem;">Schrift</h3>
+    <button class="knop grijs klein" style="margin-left:auto;" onclick="document.getElementById('dlgSchrift').close()">Sluiten</button>
+  </div>
+  <div id="svBody"></div>
+</div></dialog>
+
+<script src="tekenen.js"></script>
+<script src="realtime.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const q = new URLSearchParams(location.search);
+let CODE = (q.get('code')||'').toUpperCase(), TOKEN = q.get('t')||'';
+if(!CODE || !TOKEN){ try{ const d=JSON.parse(localStorage.getItem('rtf_docent')||'null'); if(d){CODE=d.code;TOKEN=d.token;} }catch(e){} }
+if(!CODE || !TOKEN){ location.href='index.html'; }
+
+async function api(p,b){ const r=await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
+async function get(p){ const r=await fetch('/api/foundation'+p); return r.json(); }
+
+$('#lesCode').textContent = CODE; $('#codeInline').textContent = CODE;
+$('#btnKopieer').addEventListener('click', ()=> navigator.clipboard && navigator.clipboard.writeText(CODE));
+$('#btnZij').addEventListener('click', ()=> document.body.classList.toggle('verberg-zij'));
+
+const bord = new TekenBord($('#bord'), { background:'#12110F', onStroke: s => { api('/bord/stroke',{ stroke:s }).catch(()=>{}); } });
+$('#tools').querySelectorAll('[data-tool]').forEach(b=> b.addEventListener('click', ()=>{ $('#tools').querySelectorAll('[data-tool]').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); bord.tool=b.dataset.tool; }));
+$('#tools').querySelectorAll('[data-kleur]').forEach(b=> b.addEventListener('click', ()=>{ $('#tools').querySelectorAll('[data-kleur]').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); bord.kleur=b.dataset.kleur; }));
+$('#dikte').addEventListener('input', e=> bord.dikte=Number(e.target.value));
+$('#btnUndo').addEventListener('click', ()=>{ bord.undo(); api('/bord/undo',{}).catch(()=>{}); });
+$('#btnWis').addEventListener('click', ()=>{ if(confirm('Het hele bord wissen voor de klas?')){ bord.clear(); api('/bord/wis',{}).catch(()=>{}); } });
+get('/bord/'+CODE).then(d=> bord.setStrokes(d.strokes||[]));
+
+$('#opgZet').addEventListener('click', async ()=>{ const t=$('#opgTekst').value.trim(); if(!t) return; try{ await api('/opgave',{ tekst:t }); $('#opgTekst').value=''; opgavenOphalen(); }catch(e){ alert(e.message); } });
+async function opgavenOphalen(){
+  const r = await fetch('/api/foundation/opgaven/'+CODE+'?token='+encodeURIComponent(TOKEN)); const d = await r.json().catch(()=>({opgaven:[]}));
+  $('#opgLijst').innerHTML = (d.opgaven||[]).slice().reverse().map(o=>{ const n=Object.keys(o.inzendingen||{}).length;
+    return '<div class="ag"><div><div>'+esc(o.tekst)+'</div><span class="mini">'+n+' ingeleverd</span></div></div>'; }).join('') || '<div class="mini">Nog geen opgaven.</div>';
+}
+
+$('#agAdd').addEventListener('click', async ()=>{ const t=$('#agTekst').value.trim(); if(!t) return; try{ const d=await api('/agenda',{ tekst:t, datum:$('#agDatum').value }); $('#agTekst').value=''; $('#agDatum').value=''; toonAgenda(d.agenda); }catch(e){ alert(e.message); } });
+function toonAgenda(list){
+  $('#agLijst').innerHTML = (list||[]).map(a=> '<div class="ag"><div>'+(a.datum?'<time>'+esc(a.datum)+'</time>':'')+esc(a.tekst)+'</div><button data-del="'+esc(a.id)+'" title="Verwijder">×</button></div>').join('') || '<div class="mini">Nog niets in de agenda.</div>';
+  $('#agLijst').querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{ const d=await api('/agenda/verwijder',{ itemId:b.dataset.del }); toonAgenda(d.agenda); }));
+}
+
+function toonLeerlingen(lijst){
+  $('#llAantal').textContent = lijst.length;
+  const online = lijst.filter(l=>l.online).length;
+  $('#onAantal').textContent = online; $('#onDot').classList.toggle('aan', online>0);
+  const box=$('#llLijst');
+  if(!lijst.length){ box.innerHTML='<div class="mini">Nog niemand. Deel de lescode <b>'+CODE+'</b>.</div>'; return; }
+  box.innerHTML = lijst.map(l=> '<div class="ll" data-sid="'+esc(l.studentId)+'" data-naam="'+esc(l.naam)+'"><span class="dot '+(l.online?'aan':'')+'"></span><span class="n">'+esc(l.naam)+'</span>'+(l.ingeleverd?'<span class="badge">'+l.ingeleverd+' ✓</span>':'')+'<span class="mini">bekijk schrift</span></div>').join('');
+  box.querySelectorAll('[data-sid]').forEach(el=> el.addEventListener('click', ()=> bekijkSchrift(el.dataset.sid, el.dataset.naam)));
+}
+
+async function bekijkSchrift(sid, naam){
+  $('#svNaam').textContent = 'Schrift van '+naam;
+  $('#svBody').innerHTML = '<div class="mini">Laden...</div>';
+  $('#dlgSchrift').showModal();
+  const r = await fetch('/api/foundation/schrift/'+CODE+'/'+sid+'?token='+encodeURIComponent(TOKEN)); const d = await r.json().catch(()=>({}));
+  const pages = (d.schrift&&d.schrift.pages)||[];
+  if(!pages.length){ $('#svBody').innerHTML='<div class="mini">Dit schrift is nog leeg.</div>'; return; }
+  $('#svBody').innerHTML = pages.map((p,i)=>{
+    if(p.type==='tekst') return '<div class="pageview"><h4>'+esc(p.titel||('Bladzijde '+(i+1)))+'</h4><div class="tekst">'+esc(p.inhoud||'')+'</div></div>';
+    if(p.type==='foto') return '<div class="pageview"><h4>'+esc(p.titel||'Bordfoto')+'</h4><img src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" alt=""></div>';
+    return '<div class="pageview"><h4>'+esc(p.titel||('Tekening '+(i+1)))+'</h4><canvas data-idx="'+i+'" width="640" height="360"></canvas></div>';
+  }).join('');
+  $('#svBody').querySelectorAll('canvas[data-idx]').forEach(cv=>{ const p=pages[Number(cv.dataset.idx)]; const tb=new TekenBord(cv,{readOnly:true,background:'#12110F'}); tb.setStrokes(p.strokes||[]); });
+}
+
+KlasLive.verbind(CODE, 'docent', TOKEN, { presentie: d => toonLeerlingen(d.leerlingen||[]), inzending: () => opgavenOphalen() });
+opgavenOphalen();
+get('/les/'+CODE).then(d=> toonAgenda((d.les&&d.les.agenda)||[])).catch(()=>{});
+</script>
+</body>
+</html>

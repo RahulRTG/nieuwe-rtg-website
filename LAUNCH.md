@@ -69,6 +69,14 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
    - **Productregel die dit model beschermt:** bundel NOOIT meerdere reisdiensten
      in een boeking of betaling ("boek je hele reis in een tik" zou RTG alsnog
      organisator maken en SGR/insolventiedekking vereisen).
+   - **Founding-actie:** bepaal en publiceer de sluitingsdatum (staat nu als "wordt
+     nog aangekondigd" op partner-worden en in de partnervoorwaarden) en leg per
+     partner vast wanneer de uitnodiging is verstuurd en wat het antwoord was; dat
+     bewijs bepaalt later wie founding is. Laat de doorbelasting van
+     onderhoudskosten "zonder maximum" toetsen: een open kostenclausule is b2b
+     toegestaan maar moet transparant en gespecificeerd zijn om afdwingbaar te
+     blijven (overweeg een jaarlijkse specificatieplicht en een opzegrecht bij
+     forse stijging).
    - **Ledenprijsgarantie (bewust geen prijspariteit):** de partnervoorwaarden
      bevatten een ledenprijsgarantie die uitsluitend aan de EIGEN publieke prijs
      van de partner refereert. Dit is bewust: brede prijspariteitsclausules

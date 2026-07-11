@@ -11,7 +11,7 @@ public/            alles wat de browser laadt (de webroot die de server serveert
 ├── manifest.webmanifest
 ├── icon.svg
 ├── shared/        gedeelde client-scripts (i18n.js, realtime.js)
-├── site/          marketingpagina's (passen, foundation, boeken, toegang, download, bloomingdale)
+├── site/          marketingpagina's (passen, foundation, boeken, toegang, download, partner-worden)
 └── apps/          alle web-apps, per doelgroep en genre:
     ├── index.html         app-overzicht (hub)
     ├── leden.html         leden-app (de passen; alias van app.html)
@@ -68,8 +68,8 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/dm` `{postId, text}` | Privébericht, zelfde rechten als reageren |
 | `POST /api/ai` `{messages}` | Persoonlijke AI (Claude indien key aanwezig, anders demo) |
 | `POST /api/logout` | Sessie beëindigen |
-| `POST /api/partner` `{code}` | Partnercode valideren (demo-codes: `NOVA`, `ATLAS`, `BLOOM`) |
-| `POST /api/staff` `{staffCode}` | Personeelscode van een partnerbedrijf valideren (demo: `BLOOM-TEAM`) |
+| `POST /api/partner` `{code}` | Partnercode valideren (demo-codes: `NOVA`, `ATLAS`) |
+| `POST /api/staff` `{staffCode}` | Personeelscode van een partnerbedrijf valideren |
 | `POST /api/partnertrips` `{staffCode?}` | Gecureerde reizen, alleen totaalprijzen; met geldige personeelscode ook personeelsprijzen |
 | `POST /api/book` `{code \| staffCode, tripId, name, email}` | Boeking zonder pas via een partner of personeelscode |
 | `POST /api/cv/get` / `POST /api/cv/save` | Het RTG-cv van het lid (de cv-builder in de leden-app) |
@@ -111,5 +111,3 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 ## Partnerkanaal
 
 Niet-leden boeken via **site/boeken.html**, bereikbaar via een partnerlink zoals `/site/boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs, service en de commissieverdeling tussen partner en RTG zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`.
-
-**Bloomingdale Bloemendaal** (`site/bloomingdale.html`) is de voorbeeld-pagina van de partnertool voor bedrijven: een co-branded pagina met twee kanalen. Een klantenkanaal (gasten boeken onder het merk van de partner) en een personeelskanaal (medewerkers boeken met personeelsvoordeel via code `BLOOM-TEAM`, als secundaire arbeidsvoorwaarde). Beide kanalen leveren RTG én de partner omzet op; de verdeling blijft onzichtbaar voor de boeker.

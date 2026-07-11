@@ -83,9 +83,7 @@ module.exports = function seed() {
        hebben: eigen code, lager servicetarief (arbeidsvoorwaarde). */
     partners: [
       { code: 'NOVA',  name: 'Nova van Dijk',          type: 'influencer', handle: '@novatravels · 380k volgers', share: 0.40 },
-      { code: 'ATLAS', name: 'Atlas Executive Travel', type: 'bedrijf',    handle: 'zakelijk reisbureau, Amsterdam', share: 0.35 },
-      { code: 'BLOOM', name: 'Bloomingdale Bloemendaal', type: 'bedrijf',  handle: 'strandpaviljoen & events, Bloemendaal aan Zee', share: 0.35,
-        staff: { code: 'BLOOM-TEAM', serviceRate: 0.08 } }
+      { code: 'ATLAS', name: 'Atlas Executive Travel', type: 'bedrijf',    handle: 'zakelijk reisbureau, Amsterdam', share: 0.35 }
     ],
     partnerTrips: [
       {

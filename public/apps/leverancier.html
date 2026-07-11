@@ -1490,6 +1490,22 @@
         '<button class="bigbtn" id="ktAdd" style="margin-top:0.2rem;">'+T('kt.add','Toevoegen, PIN verschijnt eenmalig')+'</button></div></div>';
       html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
         '<button class="obtn" id="ktBuzz" style="margin-top:0.4rem;">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
+      // personeelszaken: verlofaanvragen beslissen en zien wie er nu is ingeklokt
+      const verlofOpen = (state.verlof || []).filter(v => v.status === 'nieuw');
+      const verlofRest = (state.verlof || []).filter(v => v.status !== 'nieuw').slice(0, 8);
+      html += '<div class="tkc"><h3>\uD83C\uDF34 '+T('kt.verlof','Verlof & ziek')+(verlofOpen.length ? ' ('+verlofOpen.length+')' : '')+'</h3>'+
+        (verlofOpen.length ? verlofOpen.map(v =>
+          '<div class="st-row" style="flex-wrap:wrap;"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+(v.reden?' \u00B7 '+v.reden:'')+'</span></span>'+
+          '<span class="acts"><button class="obtn primary" data-kvja="'+v.id+'">'+T('kt.vja','Goedkeuren')+'</button><button class="obtn warn" data-kvnee="'+v.id+'">'+T('kt.vnee','Afwijzen')+'</button></span></div>').join('')
+          : '<div class="tkc-who">'+T('kt.geenverlof','Geen open aanvragen. Personeel vraagt verlof aan via de PDA; ziekmeldingen komen hier ook binnen.')+'</div>')+
+        (verlofRest.length ? verlofRest.map(v =>
+          '<div class="st-row"><span>'+v.name+'<span class="sub">'+(v.soort==='ziek'?T('kt.ziek','ziek gemeld')+' '+v.van:v.van+' t/m '+(v.tot||''))+'</span></span>'+
+          '<span class="sub" style="text-transform:uppercase;font-size:0.6rem;letter-spacing:0.06em;">'+(v.status==='goedgekeurd'?'\u2705 '+T('kt.vok','goedgekeurd'):v.status==='afgewezen'?'\u2715 '+T('kt.vno','afgewezen'):'\uD83E\uDD12 '+T('kt.vzm','gemeld'))+'</span></div>').join('') : '')+'</div>';
+      const klok2 = state.klok || { vandaag: [], binnen: [] };
+      html += '<div class="tkc"><h3>\u23F1 '+T('kt.klok','Nu ingeklokt')+' ('+klok2.binnen.length+')</h3>'+
+        (klok2.binnen.length ? klok2.binnen.map(n => '<div class="st-row"><span>\uD83D\uDFE2 '+n+'</span></div>').join('')
+          : '<div class="tkc-who">'+T('kt.niemandin','Niemand is nu ingeklokt.')+'</div>')+
+        (klok2.vandaag.length ? '<div class="tkc-who" style="margin-top:0.4rem;">'+T('kt.klokv','Vandaag geklokt')+': '+klok2.vandaag.length+' '+T('kt.klokr','registratie(s)')+' \u00B7 '+[...new Set(klok2.vandaag.map(e=>e.name))].length+' '+T('kt.klokp','personen')+'</div>' : '')+'</div>';
     }
     if (kantoorSec === 'keuken' || kantoorSec === 'bar'){
       const stn = kantoorSec;
@@ -1854,6 +1870,13 @@
     // deuren
     el.querySelectorAll('[data-kdoor]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/door/toggle', { id: b.dataset.kdoor }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // verlofaanvragen beslissen
+    el.querySelectorAll('[data-kvja]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/leave/decide', { id: b.dataset.kvja, action: 'goedkeuren' }); kantoorMsg = '✅ '+T('kt.vgedaan','Verlof goedgekeurd; het staflid ziet dit direct op de PDA.'); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kvnee]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/leave/decide', { id: b.dataset.kvnee, action: 'afwijzen' }); await refresh(); } catch(e){ toast(e.message); }
     }));
     // ritgeschiedenis: bladeren, zoeken en de volledige export van de server
     const ktCsv = el.querySelector('#ktCsv'); if (ktCsv) ktCsv.addEventListener('click', () => {
@@ -3231,6 +3254,12 @@ window.I18N = { en: {
   'kt.geenhistorie':'No completed rides yet.', 'kt.csv':'Export everything as CSV',
   'kt.laden':'Loading...', 'kt.zoekrit':'Search by guest, reference or driver', 'kt.zoek':'Search',
   'kt.nietsgevonden':'Nothing found for this search.', 'kt.pagina':'Page',
+  'kt.verlof':'Leave & sick', 'kt.vja':'Approve', 'kt.vnee':'Decline',
+  'kt.geenverlof':'No open requests. Staff request leave via the PDA; sick reports also arrive here.',
+  'kt.ziek':'reported sick', 'kt.vok':'approved', 'kt.vno':'declined', 'kt.vzm':'reported',
+  'kt.vgedaan':'Leave approved; the staff member sees this on the PDA right away.',
+  'kt.klok':'Clocked in now', 'kt.niemandin':'Nobody is clocked in right now.',
+  'kt.klokv':'Clocked today', 'kt.klokr':'entry(ies)', 'kt.klokp':'people',
   'kt.openritten':'Open requests', 'kt.geenopen':'No open requests.',
   'kt.lopend':'In progress', 'kt.geenlopend':'Nothing on the road.',
   'kt.wijs':'Assign', 'kt.slim':'Smart', 'kt.gewezen':'Ride assigned; guest and driver have been notified.',

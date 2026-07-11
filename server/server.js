@@ -3270,6 +3270,83 @@ app.post('/api/supplier/accountant', supplierAuth, async (req, res) => {
   res.json({ answer, land: fin.land, ai: !!anthropic });
 });
 
+/* ---- zzp-belastingtool (Business Pass) ----
+   Indicatieve berekening voor zelfstandigen per land. Nederland volledig
+   (ondernemersaftrek, MKB-vrijstelling, schijven, heffingskortingen, KOR);
+   overige landen met het regime en een indicatieve effectieve heffing. */
+const ZZP = {
+  NL: { regime: 'Eenmanszaak / zzp',
+    zelfstandigenaftrek: 2470, startersaftrek: 2123, mkbVrijstelling: 0.127,
+    schijven: [[38441, 0.3582], [76817, 0.3748], [Infinity, 0.495]],
+    ahk: { max: 3068, afbouwVanaf: 24813, afbouw: 0.06337 },
+    arbeidskorting: { max: 5599, afbouwVanaf: 43071, afbouw: 0.0651 },
+    korGrens: 20000,
+    regels: ['Urencriterium: minimaal 1.225 uur per jaar ondernemen geeft recht op de zelfstandigenaftrek.',
+      'MKB-winstvrijstelling: 12,7% van de winst na ondernemersaftrek is vrijgesteld.',
+      'KOR: onder € 20.000 omzet per jaar kunt u vrijstelling van btw aanvragen.',
+      'Reserveer daarnaast voor de inkomensafhankelijke bijdrage Zvw (~5,26% tot het maximum).'] },
+  BE: { regime: 'Zelfstandige in hoofdberoep', simpel: 0.42,
+    regels: ['Sociale bijdragen: ~20,5% van het netto belastbaar inkomen, per kwartaal vooruit.',
+      'Progressieve personenbelasting van 25% tot 50%, belastingvrije som ~€ 10.910.'] },
+  DE: { regime: 'Freiberufler / Einzelunternehmen', simpel: 0.35,
+    regels: ['Grundfreibetrag € 12.096; daarboven progressief 14% tot 42% (45% Spitzensteuersatz).',
+      'Freiberufler betalen geen Gewerbesteuer; een Gewerbe boven € 24.500 winst wel.'] },
+  FR: { regime: 'Micro-entrepreneur (BNC)', simpel: 0.30,
+    regels: ['Micro-regime tot € 77.700 omzet voor diensten: sociale lasten ~21,2% van de omzet.',
+      'Optioneel versement liberatoire: inkomstenbelasting als vast percentage direct bij de bron.'] },
+  ES: { regime: 'Autonomo', simpel: 0.32,
+    regels: ['Maandelijkse cuota op basis van de werkelijke inkomsten (tabel per tranche).',
+      'IRPF progressief 19% tot 47%; kwartaalvoorschot van 20% via modelo 130.'] },
+  JP: { regime: 'Kojin jigyo (eenmanszaak)', simpel: 0.25,
+    regels: ['De blauwe aangifte (aoiro shinkoku) geeft tot ¥ 650.000 extra aftrek.',
+      'Nationale inkomstenbelasting 5% tot 45%, plus ~10% lokale inkomstenbelasting.'] }
+};
+
+app.post('/api/member/zzp', auth, (req, res) => {
+  if (req.session.tier !== 'business') return res.status(403).json({ error: 'De zzp-belastingtool is onderdeel van de Business Pass.' });
+  const landCode = ZZP[req.body.land] ? req.body.land : 'NL';
+  const Z = ZZP[landCode];
+  const winst = Math.max(0, Math.min(5000000, Math.round(Number(req.body.winst) || 0)));
+  if (!winst) return res.status(400).json({ error: 'Vul uw verwachte jaarwinst in.' });
+  const out = { land: landCode, landNaam: LANDEN[landCode].naam, regime: Z.regime, winst, posten: [], regels: Z.regels.slice(), indicatie: true };
+  let belasting = 0, belastbaar = winst;
+  if (landCode === 'NL') {
+    const uren = req.body.urencriterium !== false;
+    const za = uren ? Math.min(Z.zelfstandigenaftrek, winst) : 0;
+    const sa = uren && req.body.starter ? Z.startersaftrek : 0;
+    const rest = Math.max(0, winst - za - sa);
+    const mkb = centen(rest * Z.mkbVrijstelling);
+    belastbaar = centen(rest - mkb);
+    out.posten.push(za ? { label: 'Zelfstandigenaftrek', bedrag: -za }
+                       : { label: 'Zelfstandigenaftrek (urencriterium niet gehaald)', bedrag: 0 });
+    if (sa) out.posten.push({ label: 'Startersaftrek', bedrag: -sa });
+    out.posten.push({ label: 'MKB-winstvrijstelling (12,7%)', bedrag: -mkb });
+    let vorige = 0, ib = 0;
+    for (const [grens, tarief] of Z.schijven) {
+      const deel = Math.max(0, Math.min(belastbaar, grens) - vorige);
+      ib += deel * tarief;
+      vorige = grens;
+      if (belastbaar <= grens) break;
+    }
+    const ahk = Math.max(0, Z.ahk.max - Math.max(0, belastbaar - Z.ahk.afbouwVanaf) * Z.ahk.afbouw);
+    const ak = Math.max(0, Z.arbeidskorting.max - Math.max(0, belastbaar - Z.arbeidskorting.afbouwVanaf) * Z.arbeidskorting.afbouw);
+    const korting = Math.min(ib, ahk + ak);
+    belasting = Math.max(0, centen(ib - korting));
+    out.posten.push({ label: 'Inkomstenbelasting (schijven)', bedrag: centen(ib) });
+    out.posten.push({ label: 'Heffingskortingen (indicatie)', bedrag: -centen(korting) });
+    if (winst < Z.korGrens) out.regels.unshift('Met deze omzet komt u waarschijnlijk in aanmerking voor de KOR (btw-vrijstelling): minder administratie, geen btw-aangifte.');
+  } else {
+    belasting = centen(winst * Z.simpel);
+    out.posten.push({ label: 'Indicatieve heffing (~' + Math.round(Z.simpel * 100) + '% effectief, incl. sociale lasten)', bedrag: belasting });
+  }
+  out.belastbaar = centen(belastbaar);
+  out.belasting = belasting;
+  out.netto = centen(winst - belasting);
+  out.reserveerPct = Math.max(20, Math.min(50, Math.round(belasting / winst * 100) + 5));
+  out.perMaand = centen(belasting / 12);
+  res.json(out);
+});
+
 // AI-boekhouder voor het Business Pass-lid: wat is per land terug te vorderen
 app.post('/api/member/accountant', auth, async (req, res) => {
   if (req.session.tier !== 'business') return res.status(403).json({ error: 'De AI-boekhouder is onderdeel van de Business Pass.' });
@@ -3287,6 +3364,7 @@ app.post('/api/member/accountant', auth, async (req, res) => {
         model: 'claude-sonnet-5', max_tokens: 450,
         system: 'Je bent de AI-boekhouder van de RTG Business Pass. Het lid reist zakelijk; het gekozen land is ' + L.naam + '. ' +
           'Aftrekregels daar: horeca: ' + L.zakelijk.horeca + ' logies: ' + L.zakelijk.logies + ' vervoer: ' + L.zakelijk.vervoer + ' jet: ' + L.zakelijk.jet + ' ' +
+          'Voor zelfstandigen geldt daar het regime ' + ZZP[landCode].regime + ': ' + ZZP[landCode].regels.join(' ') + ' Er is een zzp-rekentool in de app voor een indicatie van belasting en nettowinst. ' +
           'Uitgaven via RTG: horeca € ' + horeca + ', vervoer € ' + vervoer + '. Facturen staan boekhoudklaar in het portaal met afboekcode en btw-specificatie. ' +
           'Antwoord in het Nederlands, maximaal 120 woorden, praktisch. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
         messages: [{ role: 'user', content: vraag }]
@@ -3296,7 +3374,9 @@ app.post('/api/member/accountant', auth, async (req, res) => {
   }
   if (!answer) {
     const v = vraag.toLowerCase();
-    if (/hotel|overnacht|logies|slapen/.test(v)) answer = L.naam + ': ' + L.zakelijk.logies;
+    if (/zzp|zelfstandig|eenmanszaak|freelan|kor\b|urencriterium|autonomo|micro-?entre|freiberuf/.test(v))
+      answer = 'Voor zelfstandigen in ' + L.naam + ' (' + ZZP[landCode].regime + '): ' + ZZP[landCode].regels.join(' ') + ' Gebruik de zzp-rekentool hieronder voor een indicatie van uw belasting, nettowinst en hoeveel u maandelijks opzij zet.';
+    else if (/hotel|overnacht|logies|slapen/.test(v)) answer = L.naam + ': ' + L.zakelijk.logies;
     else if (/taxi|vervoer|rit|jet|vlieg/.test(v)) answer = L.naam + ': ' + L.zakelijk.vervoer + ' ' + L.zakelijk.jet + ' Via RTG gaf u € ' + vervoer + ' uit aan vervoer.';
     else if (/eten|diner|restaurant|horeca|lunch|terugvorder|aftrek|btw/.test(v)) answer = L.naam + ': ' + L.zakelijk.horeca + ' Via RTG gaf u € ' + horeca + ' uit in de horeca. Uw facturen staan boekhoudklaar in het portaal, met afboekcode en btw-specificatie.';
     else answer = 'Voor ' + L.naam + ' geldt: ' + L.zakelijk.horeca + ' ' + L.zakelijk.logies + ' ' + L.zakelijk.vervoer + ' Vraag me gerust naar een specifieke uitgave.';

@@ -959,6 +959,7 @@
         </label>
       </div>
       <input id="rideNote" class="ms-note" placeholder="Bijv. kinderzitje, voor de zij-ingang" data-i18n-ph="ride.noteph">
+      <div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;" data-i18n="ride.los">U boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de vervoerder.</div>
       <button class="ms-order" id="rideGo" data-i18n="ride.go">Vraag de rit aan</button>
     </div>
   </div>
@@ -1771,6 +1772,7 @@
       '<input id="boekDatum" type="date" value="' + morgen + '" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;color-scheme:dark;">' +
       '<input id="boekTijd" type="time" value="14:00" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;color-scheme:dark;"></div>' +
       '<input id="boekNote" placeholder="' + T('boek.noteph','Bijv. maat, locatie of blessure') + '" style="width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.82rem;">' +
+      '<div style="font-size:0.66rem;color:var(--soft);margin:0.5rem 0 0;">' + T('boek.los','U boekt rechtstreeks bij deze professional: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de professional.') + '</div>' +
       '<button id="boekGo" class="btn-pay" style="width:100%;margin-top:0.7rem;justify-content:center;">' + FID + T('boek.go','Boek en betaal') + '</button>';
     $('#boek-sheet').classList.add('open');
     $('#boek-scrim').classList.add('open');
@@ -2104,6 +2106,7 @@
         tafels.map(t => '<option' + (menuState.table === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' : '') +
       '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
       '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> ' + T('app.ms.tag','Tag dit voor De Salon (7 dagen na verblijf)') + '</label>' +
+      '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">' + T('app.ms.los','U bestelt rechtstreeks bij deze zaak: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de zaak.') + '</div>' +
       ((menuState.supplier.hasMenu !== false && (menuState.menu || []).some(x => x.station === 'bar'))
         ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">🔞 ' +
           (menuState.alcohol && menuState.alcohol.mag === false
@@ -2940,6 +2943,9 @@ window.I18N = { en: {
   'sal.poll':'Poll', 'sal.stemmen':'vote(s)', 'app.salon.direct':'posted instantly',
   'app.ms.18':'Alcohol: 18+ only; the venue may ask for ID.',
   'app.ms.18b':'the venue may ask for ID.',
+  'app.ms.los':'You order directly from this venue: a separate contract, and your payment goes directly to the venue.',
+  'ride.los':'You book directly with this operator: a separate contract, and your payment goes directly to the operator.',
+  'boek.los':'You book directly with this professional: a separate contract, and your payment goes directly to the professional.',
   'app.ms.geenalc':'Alcohol is off for you:', 'app.ms.vanaf':'requires', 'app.ms.pasp':'(age verified via your passport).',
   'app.cc.age':'Age', 'app.cc.ageok':'passport',
   'gate.geb':'Date of birth (as in your passport; membership from age 15)',

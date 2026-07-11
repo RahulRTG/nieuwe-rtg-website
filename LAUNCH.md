@@ -60,12 +60,22 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
    - E-mailadressen (privacy@/legal@/partners@/security@) echt aanmaken.
    - Verwerkersovereenkomsten met partners formeel ondertekenen (de afspraken staan
      in de partnervoorwaarden, maar een getekende DPA per partner is netter).
-   - **Pakketreizenrichtlijn:** zodra RTG gecombineerde reizen verkoopt gelden de
-     regels voor pakketreizen (informatieplichten, insolventiedekking, bijv. via
-     SGR/garantiefonds). Voor livegang regelen.
+   - **Platformmodel (bewuste keuze):** RTG is bemiddelaar, geen reisorganisator.
+     Elke dienst is een losse overeenkomst tussen lid en partner en wordt apart en
+     rechtstreeks aan de partner betaald. Laat de advocaat toetsen dat deze
+     constructie standhoudt (organisator vs. gekoppeld reisarrangement) en of de
+     informatieplicht bij gekoppelde reisarrangementen (standaardformulieren)
+     voldoende in de bestelflow zit.
+   - **Productregel die dit model beschermt:** bundel NOOIT meerdere reisdiensten
+     in een boeking of betaling ("boek je hele reis in een tik" zou RTG alsnog
+     organisator maken en SGR/insolventiedekking vereisen).
+   - **Merchant of record:** richt de betaaldienstverlener zo in dat de partner de
+     ontvanger van elke betaling is (bijv. directe charges op het account van de
+     partner, zoals Stripe Connect direct charges). RTG mag zelf geen reizigersgeld
+     onder zich houden; anders komen derdengelden en mogelijk een PSD2-vraag terug.
    - **Cadeaukaarten:** het openstaande saldo is een verplichting van de uitgevende
-     partner; laat toetsen of een derdengeldenregeling nodig is zodra RTG de
-     betaling int.
+     partner; de verkoop loopt, net als alles, rechtstreeks naar de partner. Laat
+     toetsen dat RTG hiermee buiten een derdengeldenregeling blijft.
    - **Fiscale/AI-tools:** de disclaimers ("voorlichting, geen advies") staan overal
      in de app en in de voorwaarden; laat de landenregels (LANDEN/ZZP in
      `server/server.js`) jaarlijks actualiseren.

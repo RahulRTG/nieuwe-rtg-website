@@ -69,6 +69,14 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
    - **Productregel die dit model beschermt:** bundel NOOIT meerdere reisdiensten
      in een boeking of betaling ("boek je hele reis in een tik" zou RTG alsnog
      organisator maken en SGR/insolventiedekking vereisen).
+   - **Ledenprijsgarantie (bewust geen prijspariteit):** de partnervoorwaarden
+     bevatten een ledenprijsgarantie die uitsluitend aan de EIGEN publieke prijs
+     van de partner refereert. Dit is bewust: brede prijspariteitsclausules
+     (verbod om elders goedkoper te zijn) vallen sinds 2022 buiten de Europese
+     groepsvrijstelling en zijn in o.a. Frankrijk, Belgie, Oostenrijk en Italie
+     voor hotels zelfs helemaal verboden (zie ook HvJ EU 2024 inzake Booking.com).
+     Laat de clausule per land toetsen en verbreed hem nooit naar andere kanalen;
+     exclusiviteit eisen is om dezelfde reden uitgesloten.
    - **Merchant of record:** richt de betaaldienstverlener zo in dat de partner de
      ontvanger van elke betaling is (bijv. directe charges op het account van de
      partner, zoals Stripe Connect direct charges). RTG mag zelf geen reizigersgeld

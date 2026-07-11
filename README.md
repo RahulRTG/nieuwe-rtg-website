@@ -52,6 +52,27 @@ ANTHROPIC_API_KEY=sk-ant-... npm start
 
 Zonder key geeft de AI vaste demo-antwoorden.
 
+## Noodserver (tweede adres, andere machine)
+
+Naast de drie hoofdservers met poortwachter (`npm start`) is er een losse
+**noodserver** die op een andere machine bij een andere hoster hoort te draaien:
+
+```bash
+RTG_HOOFD_URL=https://rahultravelgroup.example npm run nood
+```
+
+De noodserver (standaard poort 3100, instelbaar met `RTG_NOOD_POORT`) serveert
+alle apps en pagina's zelf en stuurt API-verkeer door naar de hoofdingang.
+Vallen de hoofdservers of hun datacenter uit, dan blijven alle pagina's op het
+noodadres gewoon laden; de API antwoordt dan met een nette uitleg en de apps
+tonen hun demoweergave tot de hoofdservers terug zijn. Eigen status:
+`GET /nood/health`.
+
+Alle apps zijn ook op desktop te openen: de telefoon-apps (leden-app,
+partner-apps, PDA) tonen op een breed scherm een gecentreerd toestelkader, de
+backoffice is een volwaardige desktopwerkplek, en elke app is als PWA ook op
+de desktop te installeren (Chrome/Edge: installeren via de adresbalk).
+
 ## Zonder backend
 
 De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het portaal schakelt dan automatisch over naar lokale demo-data. Alle interactie werkt, maar niets wordt bewaard.

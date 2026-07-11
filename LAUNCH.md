@@ -99,8 +99,13 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
      de app garandeert al dat werkgevers geen inzage hebben.
    - **Leeftijdscontrole alcohol:** contractueel bij de partner belegd
      (partnervoorwaarden art. 4) en zichtbaar in de bestelflow (18+-melding).
-8. **Extern security-audit / pentest** voor de eerste echte klantdata.
-9. **App stores (optioneel):** de PWA's werken al op het beginscherm; native
+8. **Noodserver extern hosten:** draai `server/nood.js` bij een ANDERE hoster in
+   een ANDER datacenter dan de hoofdservers (bijv. hoofdservers bij hoster A,
+   noodserver bij hoster B), met `RTG_HOOFD_URL` naar de hoofdingang. Publiceer
+   het noodadres (bijv. nood.rahultravelgroup.example) op een plek die leden
+   kennen, of regel DNS-failover naar het noodadres.
+9. **Extern security-audit / pentest** voor de eerste echte klantdata.
+10. **App stores (optioneel):** de PWA's werken al op het beginscherm; native
    verpakking (Capacitor) kan later zonder herbouw.
 
 ## Handig om te weten

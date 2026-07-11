@@ -5,7 +5,8 @@
   "description": "Rahul Travel Group, website, ledenportaal en backend",
   "scripts": {
     "start": "node server/trio.js",
-    "single": "node --experimental-sqlite server/server.js"
+    "single": "node --experimental-sqlite server/server.js",
+    "nood": "node server/nood.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

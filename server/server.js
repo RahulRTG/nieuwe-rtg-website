@@ -259,6 +259,10 @@ function ensureSupplierDefaults(s) {
       ? { start: 0, perKm: 9, minimum: 7500 }
       : { start: 15, perKm: 2.4, minimum: 25 };
   }
+  // verplicht onderdeel van elk RTG-partnerschap: een bedrijfsaccount op De
+  // Salon, met volgers en marketinggereedschap (aanbiedingen, polls, cijfers)
+  if (!s.salon) s.salon = { bio: '', volgers: [], sinds: new Date().toISOString() };
+  if (!Array.isArray(s.salon.volgers)) s.salon.volgers = [];
 }
 
 function initRealtime() {
@@ -493,15 +497,31 @@ function stateFor(sess, lang) {
   // Systeeminhoud (facturen, reis, menu) wordt gelokaliseerd. Berichten van
   // leden (posts, reacties) houden hun originele tekst + de taal van de auteur,
   // zodat de ontvanger ze in zijn eigen taal vertaald kan lezen.
-  const posts = db.data.posts.map(p => ({
-    id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual,
-    photo: p.photo || null, partner: !!p.partner,
-    text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
-    likes: p.baseLikes + Object.keys(p.likedBy).length,
-    liked: !!p.likedBy[sess.key],
-    comments: p.comments.map(c => ({ who: c.who, tier: c.tier, text: c.text, lang: c.lang || 'nl' })),
-    canEngage: canEngage(sess, p)
-  }));
+  const posts = db.data.posts.map(p => {
+    const sup = p.partnerCode ? findSupplier(p.partnerCode) : null;
+    const claim = p.deal ? (p.deal.claims || []).find(c => c.key === sess.key) : null;
+    return {
+      id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual,
+      photo: p.photo || null, partner: !!p.partner,
+      text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
+      likes: p.baseLikes + Object.keys(p.likedBy).length,
+      liked: !!p.likedBy[sess.key],
+      comments: p.comments.map(c => ({ who: c.who, tier: c.tier, text: c.text, lang: c.lang || 'nl' })),
+      canEngage: canEngage(sess, p),
+      // bedrijfslaag: volgen, exclusieve aanbiedingen en polls
+      partnerCode: p.partnerCode || null,
+      volgIk: sup && sup.salon ? sup.salon.volgers.includes(sess.key) : false,
+      volgers: sup && sup.salon ? sup.salon.volgers.length : undefined,
+      deal: p.deal ? { titel: p.deal.titel, geldigTot: p.deal.geldigTot || null,
+        claims: (p.deal.claims || []).length, mijnCode: claim ? claim.code : null } : null,
+      poll: p.poll ? {
+        vraag: p.poll.vraag,
+        totaal: p.poll.opties.reduce((n, o) => n + o.stemmen.length, 0),
+        opties: p.poll.opties.map((o, i) => ({ tekst: o.tekst, stemmen: o.stemmen.length, mijn: o.stemmen.includes(sess.key) })),
+        gestemd: p.poll.opties.some(o => o.stemmen.includes(sess.key))
+      } : null
+    };
+  });
   const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0, creatorLikes: 0, lang };
   if (sess.tier !== 'guest') {
     // Echte accounts hebben hun eigen boekingen/betalingen; demo-sessies delen
@@ -1546,7 +1566,7 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
   else if (typeof req.body.image === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(req.body.image) && req.body.image.length <= 1.5 * 1024 * 1024) photo = req.body.image;
   const post = {
     id: Date.now(),
-    author: req.supplier.name, tier: 'partner', partner: true,
+    author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo,
     text, lang: req.body.lang === 'en' ? 'en' : 'nl',
     baseLikes: 0, likedBy: {}, comments: []
@@ -1555,9 +1575,159 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
   db.data.posts = db.data.posts.slice(0, 60);
   save();
   logActivity(req.supplier.code, req.actor, 'publiceerde op De Salon');
+  salonNaarVolgers(req.supplier, text);
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
   sseToOffice('sync', { scope: 'salon' });
   res.json({ ok: true, postId: post.id });
+});
+
+/* ---- De Salon voor bedrijven: volgers, aanbiedingen, polls en cijfers ----
+   Het Salon-profiel is een verplicht onderdeel van elk partnerschap; deze
+   endpoints geven de zaak marketinggereedschap en klantbinding. */
+function salonNaarVolgers(s, tekst) {
+  // volgers krijgen een melding zodra hun zaak iets nieuws plaatst
+  const volgers = (s.salon && s.salon.volgers) || [];
+  const tiers = [...new Set(volgers.map(k => (db.data.memberDir[k] || {}).tier).filter(Boolean))];
+  for (const tier of tiers) notify(tier, { icon: '✦', title: 'De Salon · ' + s.name, body: String(tekst).slice(0, 90), scope: 'salon' });
+  for (const k of volgers) sseToCustomer(k, 'sync', { scope: 'salon' });
+}
+
+// lid volgt of ontvolgt een zaak
+app.post('/api/salon/volg', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.code);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  s.salon = s.salon || { bio: '', volgers: [], sinds: new Date().toISOString() };
+  const i = s.salon.volgers.indexOf(req.session.key);
+  if (i >= 0) s.salon.volgers.splice(i, 1);
+  else s.salon.volgers.push(req.session.key);
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true, volgIk: i < 0, volgers: s.salon.volgers.length });
+});
+
+// exclusieve member-aanbieding plaatsen (klantbinding: claimen met een code)
+app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  const titel = schoon(req.body.titel, 80);
+  const text = schoon(req.body.text, 400);
+  if (!titel || !text) return res.status(400).json({ error: 'Geef de aanbieding een titel en een tekst.' });
+  const geldigTot = /^\d{4}-\d{2}-\d{2}$/.test(String(req.body.geldigTot || '')) ? req.body.geldigTot : null;
+  const post = {
+    id: Date.now(),
+    author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
+    place: req.supplier.city, visual: null, photo: null,
+    text, lang: 'nl', baseLikes: 0, likedBy: {}, comments: [],
+    deal: { titel, geldigTot, claims: [] }
+  };
+  db.data.posts.unshift(post);
+  db.data.posts = db.data.posts.slice(0, 60);
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette een aanbieding op De Salon: "' + titel + '"');
+  salonNaarVolgers(req.supplier, '🎁 ' + titel);
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true, postId: post.id });
+});
+
+// lid claimt een aanbieding en krijgt een persoonlijke code voor aan de kassa
+app.post('/api/salon/deal/claim', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const p = db.data.posts.find(x => x.id === Number(req.body.postId));
+  if (!p || !p.deal) return res.status(404).json({ error: 'Aanbieding niet gevonden.' });
+  if (p.deal.geldigTot && p.deal.geldigTot < new Date().toISOString().slice(0, 10))
+    return res.status(410).json({ error: 'Deze aanbieding is verlopen.' });
+  const al = p.deal.claims.find(c => c.key === req.session.key);
+  if (al) return res.json({ ok: true, code: al.code, alGeclaimd: true });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const claim = { key: req.session.key, codename, code: 'RTG-D-' + crypto.randomBytes(3).toString('hex').toUpperCase(), at: new Date().toISOString(), used: false };
+  p.deal.claims.push(claim);
+  save();
+  notifySupplier(p.partnerCode, { icon: '🎁', title: 'Aanbieding geclaimd', body: codename + ' claimde "' + p.deal.titel + '" (' + p.deal.claims.length + 'x totaal).' });
+  res.json({ ok: true, code: claim.code });
+});
+
+// de zaak verzilvert een claimcode aan de kassa
+app.post('/api/supplier/salon/deal/redeem', supplierAuth, (req, res) => {
+  const code = String(req.body.code || '').trim().toUpperCase();
+  for (const p of db.data.posts) {
+    if (!p.deal || p.partnerCode !== req.supplier.code) continue;
+    const claim = p.deal.claims.find(c => c.code === code);
+    if (claim) {
+      if (claim.used) return res.status(409).json({ error: 'Deze code is al verzilverd.' });
+      claim.used = true;
+      claim.usedAt = new Date().toISOString();
+      save();
+      logActivity(req.supplier.code, req.actor, 'verzilverde aanbiedingscode ' + code + ' (' + claim.codename + ')');
+      return res.json({ ok: true, titel: p.deal.titel, codename: claim.codename });
+    }
+  }
+  res.status(404).json({ error: 'Deze code kennen we hier niet.' });
+});
+
+// poll plaatsen: vraag de leden wat zij willen (marketinginzicht)
+app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  const vraag = schoon(req.body.vraag, 140);
+  const opties = (Array.isArray(req.body.opties) ? req.body.opties : []).map(o => schoon(o, 60)).filter(Boolean).slice(0, 4);
+  if (!vraag || opties.length < 2) return res.status(400).json({ error: 'Geef een vraag en minstens twee opties.' });
+  const post = {
+    id: Date.now(),
+    author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
+    place: req.supplier.city, visual: null, photo: null,
+    text: vraag, lang: 'nl', baseLikes: 0, likedBy: {}, comments: [],
+    poll: { vraag, opties: opties.map(t2 => ({ tekst: t2, stemmen: [] })) }
+  };
+  db.data.posts.unshift(post);
+  db.data.posts = db.data.posts.slice(0, 60);
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette een poll op De Salon');
+  salonNaarVolgers(req.supplier, '📊 ' + vraag);
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true, postId: post.id });
+});
+
+app.post('/api/salon/poll/stem', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const p = db.data.posts.find(x => x.id === Number(req.body.postId));
+  if (!p || !p.poll) return res.status(404).json({ error: 'Poll niet gevonden.' });
+  if (p.poll.opties.some(o => o.stemmen.includes(req.session.key))) return res.status(409).json({ error: 'U heeft al gestemd.' });
+  const i = Number(req.body.optie);
+  if (!p.poll.opties[i]) return res.status(400).json({ error: 'Onbekende optie.' });
+  p.poll.opties[i].stemmen.push(req.session.key);
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true });
+});
+
+// het bedrijfsprofiel: bio instellen en de marketingcijfers van de zaak
+app.post('/api/supplier/salon/bio', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  req.supplier.salon = req.supplier.salon || { bio: '', volgers: [], sinds: new Date().toISOString() };
+  req.supplier.salon.bio = schoon(req.body.bio, 200);
+  save();
+  logActivity(req.supplier.code, req.actor, 'werkte het Salon-profiel bij');
+  res.json({ ok: true, salon: { bio: req.supplier.salon.bio, volgers: req.supplier.salon.volgers.length } });
+});
+
+app.post('/api/supplier/salon/stats', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  const s = req.supplier;
+  const eigen = db.data.posts.filter(p => p.partnerCode === s.code);
+  const likes = eigen.reduce((n, p) => n + p.baseLikes + Object.keys(p.likedBy).length, 0);
+  const reacties = eigen.reduce((n, p) => n + p.comments.length, 0);
+  res.json({
+    volgers: (s.salon && s.salon.volgers.length) || 0,
+    bio: (s.salon && s.salon.bio) || '',
+    posts: eigen.length, likes, reacties,
+    deals: eigen.filter(p => p.deal).map(p => ({
+      titel: p.deal.titel, geldigTot: p.deal.geldigTot,
+      claims: p.deal.claims.length, verzilverd: p.deal.claims.filter(c => c.used).length
+    })),
+    polls: eigen.filter(p => p.poll).map(p => ({
+      vraag: p.poll.vraag,
+      opties: p.poll.opties.map(o => ({ tekst: o.tekst, stemmen: o.stemmen.length }))
+    }))
+  });
 });
 
 // ---- kassa: verkopen registreren, per sector (bon, kamer, rit) ----
@@ -2638,7 +2808,9 @@ app.post('/api/office/partner/decide', officeAuth, (req, res) => {
       'Beste ' + a.contactName + ',\n\n' + a.company + ' is goedgekeurd als RTG-partner.\n\n' +
       'Uw leverancierscode: ' + code + '\nUw manager-PIN: ' + pin + ' (op naam van ' + a.contactName + ')\n\n' +
       'Open de partner-app op ' + url + '/apps/partners.html, kies uw bedrijf via de code, ' +
-      'log in als management met uw PIN en stel uw pagina, menukaart en team in.\n\nRahul Travel Group');
+      'log in als management met uw PIN en stel uw pagina, menukaart en team in.\n\n' +
+      'Uw bedrijfsaccount op De Salon is direct aangemaakt; dit is een vast onderdeel van elk RTG-partnerschap. ' +
+      'Via Kantoor, Marketing stelt u uw profiel in, plaatst u berichten, aanbiedingen en polls, en ziet u uw volgers en cijfers.\n\nRahul Travel Group');
     sseToOffice('sync', { scope: 'team' });
     return res.json({ ok: true, code, pin });
   }

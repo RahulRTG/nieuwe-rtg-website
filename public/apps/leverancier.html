@@ -1480,6 +1480,16 @@
   }
   // boekhouding: btw per genre, personeelskosten en cadeaukaarten, per land
   let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
+  // Salon-bedrijfsprofiel: volgers, aanbiedingen, polls en cijfers
+  let mktData = null, mktBusy = false, mktMsg = '';
+  async function laadMarketing(){
+    if (mktBusy) return;
+    mktBusy = true;
+    try { mktData = await API.call('/supplier/salon/stats', {}); }
+    catch(e){ mktData = { error: e.message }; }
+    mktBusy = false;
+    renderStation();
+  }
   async function laadFinance(){
     if (finBusy) return;
     finBusy = true;
@@ -1903,13 +1913,79 @@
         '<div class="st-form"><textarea class="st-in" id="kSpText" placeholder="'+T('kt.salonph','Vertel RTG-leden over uw nieuwste aanbod, suite of avond...')+'" style="min-height:70px;resize:vertical;"></textarea>'+
         (photos.length?'<div class="ph-pick">'+photos.map((p,i)=>'<img src="'+p+'" data-kpick="'+i+'" alt="">').join('')+'</div>':'')+
         '<button class="bigbtn" id="kSpPost">'+T('sup.salonpost','Publiceer als RTG-partner')+'</button></div>'+
-        '<div class="tkc-who">'+T('sup.salonnote','Uw bericht verschijnt in De Salon van alle leden, met uw bedrijfsnaam als partner.')+'</div></div>';
+        '<div class="tkc-who">'+T('sup.salonnote','Uw bericht verschijnt in De Salon van alle leden, met uw bedrijfsnaam als partner; uw volgers krijgen een melding.')+'</div></div>';
+      // het verplichte Salon-bedrijfsaccount met marketinggereedschap en cijfers
+      if (!mktData){
+        laadMarketing();
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+      } else if (mktData.error){
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3><div class="tkc-who">'+mktData.error+'</div></div>';
+      } else {
+        const mk = mktData;
+        if (mktMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+mktMsg+'</div>'; }
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>✦ '+T('mk.salon','Uw Salon-bedrijfsaccount')+'</h3>'+
+          '<div class="tkc-who">'+T('mk.salon.s','Vast onderdeel van uw RTG-partnerschap: leden volgen uw zaak en krijgen een melding bij elk bericht.')+'</div>'+
+          '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;">'+
+          [[T('mk.volgers','Volgers'), mk.volgers], [T('mk.posts','Berichten'), mk.posts], ['Likes', mk.likes], [T('mk.reacties','Reacties'), mk.reacties]]
+          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;text-align:center;">'+
+            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.25rem;color:var(--gold);">'+x[1]+'</div>'+
+            '<div style="font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.1rem;">'+x[0]+'</div></div>').join('')+'</div>'+
+          '<div class="st-form"><textarea class="st-in" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. Kaiseki sinds 1912, drie generaties.')+'" style="min-height:52px;resize:vertical;">'+(mk.bio||'')+'</textarea>'+
+          '<button class="obtn primary" id="mkBioSave" style="align-self:flex-start;">'+T('mk.biosave','Bio opslaan')+'</button></div></div>';
+        html += '<div class="tkc"><h3>🎁 '+T('mk.deal','Exclusieve aanbieding')+'</h3>'+
+          '<div class="tkc-who">'+T('mk.deal.s','Alleen voor leden; zij claimen met een persoonlijke code die u aan de kassa verzilvert. Pure klantbinding.')+'</div>'+
+          '<div class="st-form"><input class="st-in" id="mkDt" placeholder="'+T('mk.dealtitel','Titel, bijv. Amuse van het huis')+'">'+
+          '<input class="st-in" id="mkDx" placeholder="'+T('mk.dealtekst','Tekst, bijv. Bij elk diner deze maand')+'">'+
+          '<input class="st-in" id="mkDg" type="date">'+
+          '<button class="bigbtn" id="mkDealGo">'+T('mk.dealgo','Zet op De Salon')+'</button></div>'+
+          (mk.deals.length ? mk.deals.map(d2 =>
+            '<div class="st-row"><span>'+d2.titel+'<span class="sub">'+(d2.geldigTot?'t/m '+d2.geldigTot+' · ':'')+d2.claims+' '+T('mk.claims','geclaimd')+' · '+d2.verzilverd+' '+T('mk.verzilverd','verzilverd')+'</span></span></div>').join('') : '')+
+          '<div style="display:flex;gap:0.5rem;margin-top:0.4rem;"><input class="st-in" id="mkCode" placeholder="RTG-D-XXXXXX" style="flex:1;">'+
+          '<button class="obtn" id="mkRedeem">'+T('mk.innen','Verzilver')+'</button></div></div>';
+        html += '<div class="tkc"><h3>📊 '+T('mk.poll','Vraag het uw leden (poll)')+'</h3>'+
+          '<div class="tkc-who">'+T('mk.poll.s','Marketinginzicht: laat leden kiezen en zie live de uitslag.')+'</div>'+
+          '<div class="st-form"><input class="st-in" id="mkPv" placeholder="'+T('mk.pollvraag','Vraag, bijv. welk menu in december?')+'">'+
+          '<input class="st-in" id="mkP1" placeholder="'+T('mk.optie','Optie')+' 1"><input class="st-in" id="mkP2" placeholder="'+T('mk.optie','Optie')+' 2"><input class="st-in" id="mkP3" placeholder="'+T('mk.optie','Optie')+' 3 ('+T('mk.optioneel','optioneel')+')">'+
+          '<button class="bigbtn" id="mkPollGo">'+T('mk.pollgo','Plaats de poll')+'</button></div>'+
+          (mk.polls.length ? mk.polls.map(pl =>
+            '<div style="margin-top:0.4rem;"><div class="tkc-who" style="color:var(--txt);">'+pl.vraag+'</div>'+
+            pl.opties.map(o => '<div class="st-row" style="padding:0.3rem 0;"><span class="sub">'+o.tekst+'</span><b style="color:var(--gold);">'+o.stemmen+'</b></div>').join('')+'</div>').join('') : '')+'</div>';
+      }
     }
     return html;
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; renderStation(); }));
+    // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
+    const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
+      try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = '✅ '+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }
+    });
+    const mkD = el.querySelector('#mkDealGo'); if (mkD) mkD.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/salon/deal', { titel: el.querySelector('#mkDt').value, text: el.querySelector('#mkDx').value, geldigTot: el.querySelector('#mkDg').value });
+        mktMsg = '🎁 '+T('mk.dealklaar','Aanbieding staat op De Salon; uw volgers hebben een melding gekregen.');
+        mktData = null;
+        renderStation();
+      } catch(e){ toast(e.message); }
+    });
+    const mkR = el.querySelector('#mkRedeem'); if (mkR) mkR.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/salon/deal/redeem', { code: el.querySelector('#mkCode').value });
+        mktMsg = '✅ '+T('mk.geind','Verzilverd:')+' <b>'+d.titel+'</b> · '+d.codename;
+        mktData = null;
+        renderStation();
+      } catch(e){ toast(e.message); }
+    });
+    const mkP = el.querySelector('#mkPollGo'); if (mkP) mkP.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/salon/poll', { vraag: el.querySelector('#mkPv').value,
+          opties: [el.querySelector('#mkP1').value, el.querySelector('#mkP2').value, el.querySelector('#mkP3').value].filter(x => x && x.trim()) });
+        mktMsg = '📊 '+T('mk.pollklaar','Poll staat op De Salon.');
+        mktData = null;
+        renderStation();
+      } catch(e){ toast(e.message); }
+    });
     // boekhouding: land en uurloon opslaan, cadeaukaarten en de AI-boekhouder
     const fnS = el.querySelector('#fnSave'); if (fnS) fnS.addEventListener('click', async () => {
       try {
@@ -3550,6 +3626,17 @@ window.I18N = { en: {
   'kt.svdienst':'Service', 'kt.svproduct':'Product', 'kt.svadd':'Put in the RTG app',
   'kt.svnote':'Members see this instantly in the app and book with date and time; you keep 100% of the price.',
   'kt.svklaar':'Live in the app; members can book right away.',
+  'mk.salon':'Your Salon business account',
+  'mk.salon.s':'A fixed part of your RTG partnership: members follow your business and get notified on every post.',
+  'mk.volgers':'Followers', 'mk.posts':'Posts', 'mk.reacties':'Comments',
+  'mk.bioph':'Your bio on The Salon, e.g. Kaiseki since 1912, three generations.', 'mk.biosave':'Save bio', 'mk.bioklaar':'Bio saved.',
+  'mk.deal':'Exclusive offer', 'mk.deal.s':'Members only; they claim a personal code you redeem at the register. Pure retention.',
+  'mk.dealtitel':'Title, e.g. Amuse on the house', 'mk.dealtekst':'Text, e.g. With every dinner this month',
+  'mk.dealgo':'Put on The Salon', 'mk.claims':'claimed', 'mk.verzilverd':'redeemed', 'mk.innen':'Redeem',
+  'mk.dealklaar':'Offer is live on The Salon; your followers have been notified.', 'mk.geind':'Redeemed:',
+  'mk.poll':'Ask your members (poll)', 'mk.poll.s':'Marketing insight: let members choose and watch the results live.',
+  'mk.pollvraag':'Question, e.g. which menu in December?', 'mk.optie':'Option', 'mk.optioneel':'optional',
+  'mk.pollgo':'Post the poll', 'mk.pollklaar':'Poll is live on The Salon.',
   'kt.verlof':'Leave & sick', 'kt.vja':'Approve', 'kt.vnee':'Decline',
   'kt.geenverlof':'No open requests. Staff request leave via the PDA; sick reports also arrive here.',
   'kt.ziek':'reported sick', 'kt.vok':'approved', 'kt.vno':'declined', 'kt.vzm':'reported',

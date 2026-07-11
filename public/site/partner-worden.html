@@ -82,6 +82,7 @@
             <option value="apartment" data-i18n="pw.apartment">Appartementen</option>
             <option value="taxi">Taxi / vervoer</option>
             <option value="jet" data-i18n="pw.jet">Privéjet / luchtvaart</option>
+            <option value="zzp" data-i18n="pw.zzp">Zelfstandig professional (mode, health, en meer)</option>
           </select>
         </div>
         <div>
@@ -107,6 +108,10 @@
         <label for="paNote" data-i18n="pw.note">Vertel kort iets over uw zaak (optioneel)</label>
         <textarea id="paNote" maxlength="500"></textarea>
       </div>
+      <label style="display:flex;align-items:flex-start;gap:0.6rem;font-size:0.82rem;color:var(--grey,#4D4A45);cursor:pointer;">
+        <input type="checkbox" id="paAkkoord" style="margin-top:0.25rem;">
+        <span data-i18n-html="pw.akkoord">Ik ga akkoord met de <a href="/site/partnervoorwaarden.html" target="_blank" style="text-decoration:underline;">partnervoorwaarden</a>, inclusief de verwerkersafspraken voor gastgegevens en het verplichte Salon-bedrijfsaccount.</span>
+      </label>
       <button type="submit" data-i18n="pw.send">Vraag een partnerplek aan</button>
       <div class="msg" id="paMsg"></div>
     </form>
@@ -116,7 +121,7 @@
 </section>
 
 <footer>
-  <div class="wrap">© RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · <a href="/site/privacy.html" data-i18n="pw.f.privacy">Privacybeleid</a> · <a href="/site/voorwaarden.html" data-i18n="pw.f.terms">Voorwaarden</a></div>
+  <div class="wrap">© RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · <a href="/site/privacy.html" data-i18n="pw.f.privacy">Privacybeleid</a> · <a href="/site/voorwaarden.html" data-i18n="pw.f.terms">Voorwaarden</a> · <a href="/site/partnervoorwaarden.html" data-i18n="pw.f.pterms">Partnervoorwaarden</a></div>
 </footer>
 
 <script>
@@ -132,7 +137,8 @@
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           company: $('#paCompany').value, type: $('#paType').value, city: $('#paCity').value,
-          contactName: $('#paName').value, email: $('#paEmail').value, phone: $('#paPhone').value, note: $('#paNote').value
+          contactName: $('#paName').value, email: $('#paEmail').value, phone: $('#paPhone').value, note: $('#paNote').value,
+          akkoord: document.getElementById('paAkkoord').checked === true
         })
       });
       const d = await res.json().catch(() => ({}));

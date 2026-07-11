@@ -2096,6 +2096,8 @@
         tafels.map(t => '<option' + (menuState.table === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' : '') +
       '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
       '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> ' + T('app.ms.tag','Tag dit voor De Salon (7 dagen na verblijf)') + '</label>' +
+      ((menuState.supplier.hasMenu !== false && (menuState.menu || []).some(x => x.station === 'bar'))
+        ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">🔞 ' + T('app.ms.18','Alcohol: alleen 18+; de zaak kan om legitimatie vragen.') + '</div>' : '') +
       '<button class="ms-order" id="msOrder"' + (count ? '' : ' disabled') + '>' + (count ? T('app.ms.order','Bestel') + ' ' + count + ' ' + T('app.items','item(s)') + ', ' + eur(total) : T('app.ms.choose','Kies gerechten')) + '</button>';
     const mt = $('#msTable');
     if (mt) mt.addEventListener('change', e => menuState.table = e.target.value);
@@ -2924,6 +2926,7 @@ window.I18N = { en: {
   'sal.deal':'Members only', 'sal.uwcode':'Your code', 'sal.toon':'show at the register',
   'sal.claim':'Claim this offer', 'sal.geclaimd':'times claimed', 'sal.claimok':'Claimed. Your code:',
   'sal.poll':'Poll', 'sal.stemmen':'vote(s)', 'app.salon.direct':'posted instantly',
+  'app.ms.18':'Alcohol: 18+ only; the venue may ask for ID.',
   'sal.dm.sub':'Member chat, on codenames', 'sal.dm.leeg':'No messages yet. Say hello.',
   'sal.share.h':'Share with a connection', 'sal.deel':'Share with a connection', 'sal.gedeeld':'Shared.',
   'sal.add':'Add', 'sal.zoek':'Search', 'sal.zoekph':'Search by codename, e.g. Golden Ibis',

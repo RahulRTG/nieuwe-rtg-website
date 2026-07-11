@@ -2773,12 +2773,17 @@ app.post('/api/partner/apply', (req, res) => {
   const note = String(b.note || '').trim().slice(0, 500);
   if (!db.data.supplierTypes[type]) return res.status(400).json({ error: 'Kies een geldig type bedrijf.' });
   if (!company || !city || !contactName) return res.status(400).json({ error: 'Vul de bedrijfsnaam, plaats en contactpersoon in.' });
+  // juridisch vereist: uitdrukkelijk akkoord met de partnervoorwaarden,
+  // inclusief de verwerkersafspraken en het verplichte Salon-account
+  if (req.body.akkoord !== true) return res.status(400).json({ error: 'Ga akkoord met de partnervoorwaarden (inclusief de verwerkersafspraken) om een partnerplek aan te vragen.' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
   if (db.data.partnerApplications.some(a => a.status === 'nieuw' && a.email === email && a.company.toLowerCase() === company.toLowerCase()))
     return res.status(409).json({ error: 'Deze aanvraag staat al open. We nemen contact met u op.' });
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     company, type, city, contactName, email, phone, note,
+    // vastlegging van het akkoord (bewijs): wat en wanneer
+    akkoord: { partnervoorwaarden: true, verwerkersafspraken: true, at: new Date().toISOString() },
     status: 'nieuw', at: new Date().toISOString()
   };
   db.data.partnerApplications.unshift(entry);
@@ -3561,7 +3566,8 @@ function financeVoor(s) {
       L.aangifte,
       L.extra,
       'Cadeaukaarten zijn bij verkoop nog geen omzet: het saldo (€ ' + gcOpen + ') staat als verplichting op de balans en de btw hoort bij de inwisseling.',
-      'Indicatie minimumuurloon in ' + L.naam + ': € ' + L.uurloonMin + ' per uur. Reken bovenop het brutoloon ~' + Math.round(L.lasten * 100) + '% werkgeverslasten' + (L.vakantiegeld ? ' en ' + Math.round(L.vakantiegeld * 1000) / 10 + '% vakantiegeld' : '') + '.'
+      'Indicatie minimumuurloon in ' + L.naam + ': € ' + L.uurloonMin + ' per uur. Reken bovenop het brutoloon ~' + Math.round(L.lasten * 100) + '% werkgeverslasten' + (L.vakantiegeld ? ' en ' + Math.round(L.vakantiegeld * 1000) / 10 + '% vakantiegeld' : '') + '.',
+      'Dit overzicht is voorlichting, geen fiscaal advies; de aangifte en afdracht blijven de verantwoordelijkheid van de onderneming.'
     ]
   };
 }

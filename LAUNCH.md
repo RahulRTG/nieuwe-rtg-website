@@ -53,9 +53,26 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
    secrets manager van de hosting; nooit in git.
 6. **Database:** bij groei db.json vervangen door PostgreSQL; de SQLite-accounts
    kunnen langer mee. Back-ups extern opslaan (nu lokaal, 14 dagen).
-7. **Juridisch nalopen:** privacybeleid en voorwaarden door een jurist laten toetsen;
-   e-mailadressen (privacy@/legal@/security@) echt aanmaken; verwerkersovereenkomsten
-   met partners.
+7. **Juridisch nalopen (voor livegang door een advocaat laten toetsen):**
+   - De drie documenten: privacybeleid, algemene voorwaarden en partnervoorwaarden
+     (`/site/privacy.html`, `/site/voorwaarden.html`, `/site/partnervoorwaarden.html`).
+     Het partner-akkoord wordt al technisch afgedwongen en vastgelegd bij de aanvraag.
+   - E-mailadressen (privacy@/legal@/partners@/security@) echt aanmaken.
+   - Verwerkersovereenkomsten met partners formeel ondertekenen (de afspraken staan
+     in de partnervoorwaarden, maar een getekende DPA per partner is netter).
+   - **Pakketreizenrichtlijn:** zodra RTG gecombineerde reizen verkoopt gelden de
+     regels voor pakketreizen (informatieplichten, insolventiedekking, bijv. via
+     SGR/garantiefonds). Voor livegang regelen.
+   - **Cadeaukaarten:** het openstaande saldo is een verplichting van de uitgevende
+     partner; laat toetsen of een derdengeldenregeling nodig is zodra RTG de
+     betaling int.
+   - **Fiscale/AI-tools:** de disclaimers ("voorlichting, geen advies") staan overal
+     in de app en in de voorwaarden; laat de landenregels (LANDEN/ZZP in
+     `server/server.js`) jaarlijks actualiseren.
+   - **Vertrouwenspersoon:** wijs een echte, gekwalificeerde vertrouwenspersoon aan;
+     de app garandeert al dat werkgevers geen inzage hebben.
+   - **Leeftijdscontrole alcohol:** contractueel bij de partner belegd
+     (partnervoorwaarden art. 4) en zichtbaar in de bestelflow (18+-melding).
 8. **Extern security-audit / pentest** voor de eerste echte klantdata.
 9. **App stores (optioneel):** de PWA's werken al op het beginscherm; native
    verpakking (Capacitor) kan later zonder herbouw.

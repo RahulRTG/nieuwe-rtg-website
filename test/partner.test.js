@@ -49,8 +49,12 @@ test.after(() => {
 
 // Helper: log als lid in en geef het token terug.
 async function lidToken(tier) { return (await json(await api('/login', { tier }))).token; }
-// Helper: log als leverancier in met alleen de code (manager "Beheer").
-async function partnerToken(code) { return (await json(await api('/supplier/login', { code }))).token; }
+// Helper: log als leverancier in op naam + persoonlijke pincode (manager, PIN 1234).
+async function partnerToken(code) {
+  const roster = await json(await api('/supplier/roster', { code }));
+  const mgr = roster.staff.find(m => m.role === 'manager') || roster.staff[0];
+  return (await json(await api('/supplier/login', { code, staffId: mgr.id, pin: '1234' }))).token;
+}
 
 test('personeelslogin: juiste PIN werkt, verkeerde niet, en na 5 pogingen volgt een slot', async () => {
   const roster = await json(await api('/supplier/roster', { code: 'KIKUNOI' }));
@@ -72,6 +76,18 @@ test('personeelslogin: juiste PIN werkt, verkeerde niet, en na 5 pogingen volgt 
   }
   const naSlot = await api('/supplier/login', { code: 'KIKUNOI', staffId: medewerker.id, pin: '0000' });
   assert.equal(naSlot.status, 429, 'na vijf foute pogingen volgt een wachttijd');
+});
+
+test('leverancier-login: iedereen heeft een eigen code; inloggen met alleen de bedrijfscode kan niet', async () => {
+  // Alleen de bedrijfscode geeft GEEN toegang meer (geen anonieme "Beheer").
+  const alleenCode = await api('/supplier/login', { code: 'KIKUNOI' });
+  assert.equal(alleenCode.status, 401, 'inloggen met alleen de code wordt geweigerd');
+  // Met naam + persoonlijke pincode wel.
+  const roster = await json(await api('/supplier/roster', { code: 'KIKUNOI' }));
+  const mgr = roster.staff.find(m => m.role === 'manager');
+  const ok = await api('/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' });
+  assert.equal(ok.status, 200);
+  assert.ok((await json(ok)).token, 'persoonlijke pincode geeft een sessie');
 });
 
 test('restaurant/keuken (KDS): een order loopt van nieuw naar klaar', async () => {
@@ -141,6 +157,31 @@ test('hotel: kamer toevoegen, housekeeping en beschikbaarheid', async () => {
   // Handmatig dichtzetten (toggle) werkt ook.
   const dicht = (await json(await api('/supplier/room/toggle', { id: room.id }, partner))).rooms.find(r => r.id === room.id);
   assert.equal(dicht.available, false);
+});
+
+test('ledenprijsgarantie: een lid betaalt nooit meer dan de eigen publieke prijs', async () => {
+  const partner = await partnerToken('PONTO');
+  // De partner probeert een ledenprijs (100) BOVEN de publieke prijs (60) te
+  // zetten, en een tweede item met een ledenprijs (40) ONDER de publieke (50).
+  const opslaan = await api('/supplier/menu', {
+    menu: [
+      { id: 'test1', cat: 'Test', name: 'Duur item', price: 100, publiekePrijs: 60, station: 'keuken' },
+      { id: 'test2', cat: 'Test', name: 'Voordelig item', price: 40, publiekePrijs: 50, station: 'keuken' }
+    ]
+  }, partner);
+  assert.equal(opslaan.status, 200);
+  const menu = (await json(opslaan)).menu;
+  const t1 = menu.find(m => m.id === 'test1');
+  assert.equal(t1.publiekePrijs, 60);
+  assert.equal(t1.price, 60, 'de ledenprijs wordt bij opslaan afgekapt op de publieke prijs');
+  const t2 = menu.find(m => m.id === 'test2');
+  assert.equal(t2.price, 40, 'een ledenprijs onder de publieke prijs blijft staan');
+
+  // Een lid bestelt het dure item: het betaalt de publieke prijs (60), niet 100.
+  const lid = await lidToken('business');
+  const order = (await json(await api('/order', { supplierCode: 'PONTO', items: [{ id: 'test1', qty: 2 }] }, lid))).order;
+  assert.equal(order.items[0].price, 60, 'het lid wordt de publieke prijs gerekend');
+  assert.equal(order.total, 120, 'twee keer 60, niet twee keer 100');
 });
 
 test('afscherming: leverancier-endpoints eisen een leverancier-sessie', async () => {

@@ -480,7 +480,6 @@
     <h2 data-i18n="sp.who">Wie ben je?</h2>
     <p class="sp-deck" data-i18n="sp.deck">Kies je persoonlijke account. Alles wat je doet, wordt onder jouw naam bijgehouden.</p>
     <div class="sp-list" id="spList"></div>
-    <button class="sp-biz-btn" id="spBizBtn" data-i18n="sp.business">Inloggen als bedrijfsaccount (beheer)</button>
     <div class="sp-pin" id="spPin">
       <div class="sp-pin-name" id="spPinName"></div>
       <div class="sp-pin-role" id="spPinRole"></div>
@@ -761,7 +760,6 @@
     gateRoster = { supplier:{ name: code }, staff: [] };
     try { gateRoster = await API.call('/supplier/roster', { code }); } catch(e){}
     $('#spBiz').textContent = gateRoster.supplier.name;
-    $('#spBizBtn').style.display = 'none';
     $('#spPin').classList.remove('open');
     renderRoles();
     $('#staffPick').classList.add('open');
@@ -773,8 +771,7 @@
     $('#spBack2') && $('#spBack2').remove();
     $('#spList').innerHTML = [
       ['personeel','👥',T('sp.r.staff','Personeel'),T('sp.r.staff.s','Bediening, keuken, receptie, chauffeurs...')],
-      ['management','⭐',T('sp.r.mgmt','Management'),T('sp.r.mgmt.s','Managers en chefs, met beheer-rechten')],
-      ['beheer','🗝️',T('sp.r.admin','Beheer'),T('sp.r.admin.s','Het bedrijfsaccount, volledige toegang')],
+      ['management','⭐',T('sp.r.mgmt','Management'),T('sp.r.mgmt.s','Managers en chefs, volledige toegang met eigen pincode')],
       ['sollicit','📝',T('sp.r.apply','Solliciteren'),T('sp.r.apply.s','Werken bij ' + gateRoster.supplier.name + '? Solliciteer direct.')]
     ].map(r =>
       '<button class="sp-person" data-rol="'+r[0]+'"><span class="av">'+r[1]+'</span><span><b>'+r[2]+'</b><span>'+r[3]+'</span></span></button>'
@@ -813,8 +810,7 @@
     $('#spList').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => {
       const r = b.dataset.rol;
       pendingStation = null;
-      if (r === 'beheer') login({ code: pickCode }, false);
-      else if (r === 'management') renderPersons(null, true);
+      if (r === 'management') renderPersons(null, true);
       else if (r === 'personeel') renderFuncs();
       else renderApply();
     }));
@@ -890,7 +886,6 @@
   function bindBack(fn){ const b = $('#spBack2'); if (b) b.addEventListener('click', fn); }
 
   $('#spBack').addEventListener('click', () => $('#staffPick').classList.remove('open'));
-  $('#spBizBtn').addEventListener('click', () => login({ code: pickCode }, false));
 
   // Stap 2: persoon gekozen → pincode invoeren.
   let pinFor = null, pinBuf = '';

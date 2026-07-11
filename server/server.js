@@ -237,6 +237,17 @@ const sseClients = []; // { tier, res }
 /* Alles wat elk partnerbedrijf standaard nodig heeft; wordt gebruikt voor
    bestaande bedrijven (migratie bij opstarten) en voor nieuwe partners die
    via de onboarding worden goedgekeurd. */
+/* Ledenprijsgarantie (partnervoorwaarden): een lid betaalt bij een partner nooit
+   meer dan de eigen publieke prijs van die partner. De publieke prijs is de
+   referentie (het plafond); de ledenprijs wordt daar altijd op afgekapt. Dit
+   wordt op drie plekken afgedwongen: bij het normaliseren van een menukaart,
+   bij het opslaan ervan, en nog eens bij het plaatsen van een bestelling. */
+function ledenPrijs(publiek, ledenprijs) {
+  const p = Math.max(0, Number(publiek) || 0);
+  const l = Math.max(0, Number(ledenprijs != null ? ledenprijs : publiek) || 0);
+  return Math.min(l, p);
+}
+
 function ensureSupplierDefaults(s) {
   if (!Array.isArray(s.menu)) s.menu = [];
   if (!Array.isArray(s.photos)) s.photos = [];
@@ -266,6 +277,9 @@ function ensureSupplierDefaults(s) {
   // elk gerecht hoort bij een werkplek: de keuken of de bar; de manager kan
   // dit per item omzetten onder Menu. Bars/clubs bereiden standaard aan de bar.
   for (const m of (s.menu || [])) {
+    // ledenprijsgarantie: publieke prijs als referentie, ledenprijs nooit hoger
+    if (typeof m.publiekePrijs !== 'number' || m.publiekePrijs < 0) m.publiekePrijs = Math.max(0, Number(m.price) || 0);
+    m.price = ledenPrijs(m.publiekePrijs, m.price);
     if (m.station !== 'keuken' && m.station !== 'bar')
       m.station = (s.type === 'bar' || s.type === 'club') ? 'bar' : 'keuken';
     // binnen de keuken: de sectie (warme kant, koude kant, snacks, dessert)
@@ -1402,8 +1416,10 @@ app.post('/api/supplier/login', (req, res) => {
     s = findSupplier(DEMO_SUPPLIER);
     actor = { name: 'Beheer', role: 'manager', manager: true };
   } else {
-    s = findSupplier(req.body.code);
-    actor = { name: 'Beheer', role: 'manager', manager: true };
+    // Geen anonieme toegang meer met alleen de bedrijfscode: iedereen logt in op
+    // de eigen naam met een persoonlijke pincode (of het bedrijfsaccount met
+    // gebruikersnaam en wachtwoord). Zo staat elke handeling op een persoon.
+    return res.status(401).json({ error: 'Kies wie u bent en voer uw persoonlijke pincode in.' });
   }
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
   const token = crypto.randomBytes(24).toString('hex');
@@ -3999,17 +4015,23 @@ app.post('/api/supplier/price', supplierAuth, (req, res) => {
 // ---- menukaart bijwerken (restaurant/bar/club) ----
 app.post('/api/supplier/menu', supplierAuth, (req, res) => {
   if (!Array.isArray(req.body.menu)) return res.status(400).json({ error: 'Menu ontbreekt.' });
-  req.supplier.menu = req.body.menu.slice(0, 100).map(m => ({
+  req.supplier.menu = req.body.menu.slice(0, 100).map(m => {
+    // ledenprijsgarantie: de publieke prijs is het plafond; als er geen aparte
+    // publieke prijs is meegegeven, is de opgegeven prijs meteen de publieke.
+    const publiek = Math.max(0, Number(m.publiekePrijs != null ? m.publiekePrijs : m.price) || 0);
+    return {
     id: String(m.id || crypto.randomBytes(3).toString('hex')),
     cat: schoon(m.cat || 'Overig', 40),
     name: schoon(m.name, 80),
     desc: schoon(m.desc, 200),
-    price: Math.max(0, Number(m.price) || 0),
+    publiekePrijs: publiek,
+    price: ledenPrijs(publiek, m.price),
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
     station: m.station === 'bar' ? 'bar' : 'keuken',
     sectie: ['warm', 'koud', 'snack', 'dessert'].includes(m.sectie) ? m.sectie : 'warm',
     recept: String(m.recept || '').slice(0, 1500)
-  }));
+    };
+  });
   save();
   logActivity(req.supplier.code, req.actor, 'werkte de menukaart bij');
   res.json({ ok: true, menu: req.supplier.menu });
@@ -4335,7 +4357,9 @@ app.post('/api/order', auth, (req, res) => {
   for (const w of wanted) {
     const m = (s.menu || []).find(x => x.id === w.id);
     const qty = Math.min(20, Math.max(1, parseInt(w.qty, 10) || 1));
-    if (m) { items.push({ id: m.id, name: m.name, qty, price: m.price }); total += m.price * qty; }
+    // ledenprijsgarantie: reken nooit meer dan de publieke prijs, ook al zou
+    // de menuprijs door een fout hoger staan (extra vangnet na het opslaan)
+    if (m) { const unit = ledenPrijs(m.publiekePrijs, m.price); items.push({ id: m.id, name: m.name, qty, price: unit }); total += unit * qty; }
   }
   if (!items.length) return res.status(400).json({ error: 'Geen geldige gerechten gekozen.' });
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;

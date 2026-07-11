@@ -532,7 +532,7 @@
       <div class="view" data-view="price">
         <h2 data-i18n="sup.v.price">Dynamische prijs</h2>
         <p class="sub" data-i18n="sup.v.price.sub">Geef RTG uw beste prijs. Gaat rechtstreeks naar de backoffice.</p>
-        <div class="field"><label data-i18n="sup.f.service">Dienst</label><input id="prService" placeholder="Bijv. Kaiseki-diner (2 pers.)" data-i18n-ph="sup.f.service.ph"></div>
+        <div class="field"><label data-i18n="sup.f.service">Dienst</label><input id="prService" placeholder="Bijv. Chef-diner (2 pers.)" data-i18n-ph="sup.f.service.ph"></div>
         <div class="field"><label data-i18n="sup.f.price">Uw prijs aan RTG (€)</label><input id="prPrice" type="number" inputmode="decimal" placeholder="240"></div>
         <button class="bigbtn" id="prSend" data-i18n="sup.f.send">Verstuur naar RTG</button>
         <div class="card" id="prHistory" style="margin-top:1.4rem;"></div>
@@ -642,14 +642,14 @@
   const tAlg = a => (lang() === 'en' ? (ALG[a] || a) : a);
 
   const DEMO = [
-    { code:'KIKUNOI', name:'Kikunoi Honten', type:'Restaurant', icon:'🍽️', sub:'Restaurant · Kyoto' },
-    { code:'PONTO',   name:'Bar Pontocho',    type:'Bar',        icon:'🍸', sub:'Bar · Kyoto' },
-    { code:'HOSHI',   name:'Hoshinoya Kyoto', type:'Hotel',      icon:'🏨', sub:'Hotel · Kyoto' },
-    { code:'SAKURA',  name:'Sakura Machiya Residence', type:'Appartement', icon:'🏡', sub:'Appartement · Kyoto' },
-    { code:'MKKX',    name:'Kyoto Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Kyoto' },
+    { code:'KIKUNOI', name:'Sal de Mar',      type:'Restaurant', icon:'🍽️', sub:'Restaurant · Ibiza' },
+    { code:'PONTO',   name:'Sunset Ibiza',    type:'Bar',        icon:'🍸', sub:'Bar · Ibiza' },
+    { code:'HOSHI',   name:'Aguamarina Ibiza', type:'Hotel',     icon:'🏨', sub:'Hotel · Ibiza' },
+    { code:'SAKURA',  name:'Villa Bahia Ibiza', type:'Appartement', icon:'🏡', sub:'Appartement · Ibiza' },
+    { code:'MKKX',    name:'Ibiza Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Ibiza' },
     { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' },
-    { code:'AYAKA',   name:'Studio Ayaka', type:'Zelfstandig', icon:'🧑‍🎨', sub:'Mode & styling · Kyoto' },
-    { code:'KAITO',   name:'Kaito Health', type:'Zelfstandig', icon:'🏋️', sub:'Health & wellness · Kyoto' }
+    { code:'AYAKA',   name:'Atelier Summer', type:'Zelfstandig', icon:'🧑‍🎨', sub:'Sieraden & goudsmid · Ibiza' },
+    { code:'KAITO',   name:'Studio Milan', type:'Zelfstandig', icon:'🏋️', sub:'Health & wellness · Ibiza' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -1931,7 +1931,7 @@
           .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;text-align:center;">'+
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.25rem;color:var(--gold);">'+x[1]+'</div>'+
             '<div style="font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.1rem;">'+x[0]+'</div></div>').join('')+'</div>'+
-          '<div class="st-form"><textarea class="st-in" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. Kaiseki sinds 1912, drie generaties.')+'" style="min-height:52px;resize:vertical;">'+(mk.bio||'')+'</textarea>'+
+          '<div class="st-form"><textarea class="st-in" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. aan zee sinds 1998, drie generaties.')+'" style="min-height:52px;resize:vertical;">'+(mk.bio||'')+'</textarea>'+
           '<button class="obtn primary" id="mkBioSave" style="align-self:flex-start;">'+T('mk.biosave','Bio opslaan')+'</button></div></div>';
         html += '<div class="tkc"><h3>🎁 '+T('mk.deal','Exclusieve aanbieding')+'</h3>'+
           '<div class="tkc-who">'+T('mk.deal.s','Alleen voor leden; zij claimen met een persoonlijke code die u aan de kassa verzilvert. Pure klantbinding.')+'</div>'+
@@ -2500,8 +2500,8 @@
     ).join('') : '<div class="empty">'+T('sup.nomenu','Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.')+'</div>';
     if (canEdit){
       html += '<div class="card" style="margin-top:1.2rem;"><div class="tt-h">'+T('menu.add','Gerecht toevoegen')+'</div>'+
-        '<div class="field"><label>'+T('menu.name','Naam')+'</label><input id="mnName" placeholder="'+T('menu.nameph','Bijv. Wagyu tataki')+'"></div>'+
-        '<div style="display:flex;gap:0.5rem;"><div class="field" style="flex:2;"><label>'+T('menu.cat','Categorie')+'</label><input id="mnCat" placeholder="'+T('menu.catph','Bijv. Kaiseki')+'"></div>'+
+        '<div class="field"><label>'+T('menu.name','Naam')+'</label><input id="mnName" placeholder="'+T('menu.nameph','Bijv. gegrilde octopus')+'"></div>'+
+        '<div style="display:flex;gap:0.5rem;"><div class="field" style="flex:2;"><label>'+T('menu.cat','Categorie')+'</label><input id="mnCat" placeholder="'+T('menu.catph','Bijv. Voorgerechten')+'"></div>'+
         '<div class="field" style="flex:1;"><label>'+T('menu.price','Prijs (€)')+'</label><input id="mnPrice" type="number" inputmode="decimal" placeholder="45"></div></div>'+
         '<div class="field"><label>'+T('menu.desc','Omschrijving')+'</label><input id="mnDesc" placeholder="'+T('menu.descph','Kort en smakelijk')+'"></div>'+
         '<div class="field"><label>'+T('menu.alg','Allergenen (komma\'s)')+'</label><input id="mnAlg" placeholder="vis, soja"></div>'+
@@ -2635,7 +2635,7 @@
   // vervoer: rit afrekenen
   function kassaVervoer(){
     return '<div class="card"><div class="tt-h">'+T('pos.ridebill','Rit afrekenen')+'</div>'+
-      '<div class="field"><label>'+T('pos.ride','Rit')+'</label><input id="posDesc" placeholder="'+T('pos.descride','Bijv. Kyoto Station naar Gion')+'"></div>'+
+      '<div class="field"><label>'+T('pos.ride','Rit')+'</label><input id="posDesc" placeholder="'+T('pos.descride','Bijv. luchthaven naar Cala Jondal')+'"></div>'+
       '<div class="field"><label>'+T('pos.amount','Bedrag (€)')+'</label><input id="posAmt" type="number" inputmode="decimal" placeholder="28"></div>'+
       '<div class="pos-pay">'+
         '<button class="obtn primary js-pay" data-method="pin">'+T('pos.paypin','Afrekenen, PIN')+'</button>'+
@@ -3451,7 +3451,7 @@ window.I18N = { en: {
   'sup.v.rides.sub':'Requests from RTG guests, with live location.',
   'sup.v.menu.sub':'What guests see in advance, including allergens.',
   'sup.v.price':'Dynamic price', 'sup.v.price.sub':'Give RTG your best price. Goes straight to the back office.',
-  'sup.f.service':'Service', 'sup.f.service.ph':'E.g. Kaiseki dinner (2 pers.)', 'sup.f.price':'Your price to RTG (€)', 'sup.f.send':'Send to RTG',
+  'sup.f.service':'Service', 'sup.f.service.ph':'E.g. Chef dinner (2 pers.)', 'sup.f.price':'Your price to RTG (€)', 'sup.f.send':'Send to RTG',
   'sup.v.loc.sub':'Share your live location so guests find you, and see where they are.',
   'tab.team':'Team', 'sup.v.team':'Team', 'sup.v.team.sub':'Staff, who did what and the internal chat of this business.',
   'tab.rooms':'Rooms', 'sup.v.rooms':'Rooms', 'sup.v.rooms.sub':'Switch rooms on or off. Guests only see what is on, live.',
@@ -3462,7 +3462,7 @@ window.I18N = { en: {
   'pos.newbon':'New receipt', 'pos.total':'Total', 'pos.clear':'Clear', 'pos.paypin':'Checkout, card',
   'pos.charge':'Checkout or room charge', 'pos.roomlbl':'Room (optional)', 'pos.noroom':'No room, single sale',
   'pos.desc':'Description', 'pos.deschotel':'E.g. minibar, spa, room service', 'pos.amount':'Amount (€)',
-  'pos.ridebill':'Charge a ride', 'pos.ride':'Ride', 'pos.descride':'E.g. Kyoto Station to Gion',
+  'pos.ridebill':'Charge a ride', 'pos.ride':'Ride', 'pos.descride':'E.g. airport to Cala Jondal',
   'pos.today':'Today', 'pos.bons':'receipt(s)', 'pos.nosales':'No sales today yet.', 'pos.sale':'Sale',
   'pos.empty':'Tap some dishes first.', 'pos.fillamount':'Enter an amount.',
   'pos.done':'Paid:', 'pos.bonnr':'receipt', 'pos.rtg':'RTG code',
@@ -3505,7 +3505,7 @@ window.I18N = { en: {
   'ai.empty':'Your assistant knows the whole business: the register, the rooms, the jobs, the guests. Ask something or give an instruction.',
   'ai.c1':'Revenue today', 'ai.c2':'Unanswered messages', 'ai.c3':'Which rooms are dirty?', 'ai.c4':'Which minibars left to count?',
   'ai.c5':'Open orders', 'ai.c6':'Open the front door', 'ai.c7':'Who is on the way?', 'ai.c8':'Which jobs are open?',
-  'menu.add':'Add a dish', 'menu.name':'Name', 'menu.nameph':'E.g. Wagyu tataki', 'menu.cat':'Category', 'menu.catph':'E.g. Kaiseki',
+  'menu.add':'Add a dish', 'menu.name':'Name', 'menu.nameph':'E.g. Grilled octopus', 'menu.cat':'Category', 'menu.catph':'E.g. Starters',
   'menu.price':'Price (€)', 'menu.desc':'Description', 'menu.descph':'Short and tasty', 'menu.alg':'Allergens (commas)',
   'menu.addbtn':'Put on the menu', 'menu.removed':'Taken off the menu.', 'menu.fill':'Enter a name and price.',
   'menu.added':'On the menu, guests see it right away.', 'menu.other':'Other',
@@ -3631,7 +3631,7 @@ window.I18N = { en: {
   'mk.salon':'Your Salon business account',
   'mk.salon.s':'A fixed part of your RTG partnership: members follow your business and get notified on every post.',
   'mk.volgers':'Followers', 'mk.posts':'Posts', 'mk.reacties':'Comments',
-  'mk.bioph':'Your bio on The Salon, e.g. Kaiseki since 1912, three generations.', 'mk.biosave':'Save bio', 'mk.bioklaar':'Bio saved.',
+  'mk.bioph':'Your bio on The Salon, e.g. by the sea since 1998, three generations.', 'mk.biosave':'Save bio', 'mk.bioklaar':'Bio saved.',
   'mk.deal':'Exclusive offer', 'mk.deal.s':'Members only; they claim a personal code you redeem at the register. Pure retention.',
   'mk.dealtitel':'Title, e.g. Amuse on the house', 'mk.dealtekst':'Text, e.g. With every dinner this month',
   'mk.dealgo':'Put on The Salon', 'mk.claims':'claimed', 'mk.verzilverd':'redeemed', 'mk.innen':'Redeem',

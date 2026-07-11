@@ -39,15 +39,15 @@ if (accounts.count() === 0) {
 
 // Demo-personeel per leverancier: een manager (PIN 1234) en een medewerker (PIN 5678).
 const STAFF_SEED = {
-  SAKURA: [['Naomi Sato', 'manager', 'Beheer'], ['Ren Watanabe', 'staff', 'Onderhoud']],
-  KIKUNOI: [['Yuki Tanaka', 'manager', 'Keuken'], ['Kenji Mori', 'staff', 'Bediening']],
-  PONTO: [['Aiko Sato', 'manager', 'Bar'], ['Ren Kimura', 'staff', 'Bediening']],
-  HOSHI: [['Haruki Ito', 'manager', 'Receptie'], ['Mei Kobayashi', 'staff', 'Housekeeping']],
-  MKKX: [['Daisuke Yamamoto', 'manager', 'Taxi centrale'], ['Hana Suzuki', 'staff', 'Chauffeur']],
+  SAKURA: [['Marc Bosch', 'manager', 'Beheer'], ['Rosa Torres', 'staff', 'Onderhoud']],
+  KIKUNOI: [['Mateo Ferrer', 'manager', 'Keuken'], ['Nora Prins', 'staff', 'Bediening']],
+  PONTO: [['Diego Serra', 'manager', 'Bar'], ['Lisa Groen', 'staff', 'Bediening']],
+  HOSHI: [['Carla Vidal', 'manager', 'Receptie'], ['Ibrahim Yildiz', 'staff', 'Housekeeping']],
+  MKKX: [['Paolo Mendez', 'manager', 'Taxi centrale'], ['Yara El Idrissi', 'staff', 'Chauffeur']],
   JETAG: [['Sophie Bakker', 'manager', 'Operations'], ['Lucas de Jong', 'staff', 'Crew']],
   // zelfstandigen: eenmanszaken, dus alleen een eigenaar met beheer-rechten
-  AYAKA: [['Ayaka Nishimura', 'manager', 'Personal stylist']],
-  KAITO: [['Kaito Tanabe', 'manager', 'Personal trainer']]
+  AYAKA: [['Summer Jolanda Vissen', 'manager', 'Goudsmid']],
+  KAITO: [['Milan de Wit', 'manager', 'Personal trainer']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -111,9 +111,9 @@ if (process.env.ANTHROPIC_API_KEY) {
    Wordt reisdata ooit gestolen, dan heeft de aanvaller nooit de juiste naam. */
 const PERSONAS = {
   guest:     { name: 'Gast',         full: 'Gast',               since: null,             number: null,                codename: 'GAST' },
-  rtg:       { name: 'S. Janssen',   full: 'Sophie Janssen',     since: 'Maart 2026',     number: 'RTG · 2026 · 8841', codename: 'Zilveren Valk',   geboren: '2007-02-14' },
-  lifestyle: { name: 'I. van Rhijn', full: 'Isabelle van Rhijn', since: 'Augustus 2025',  number: 'LSP · 2025 · 0217', codename: 'Gouden Ibis',     geboren: '1991-06-02' },
-  business:  { name: 'A. de Vries',  full: 'Alexander de Vries', since: 'November 2025',  number: 'BSP · 2025 · 1104', codename: 'Noordelijke Ster', geboren: '1984-11-23' }
+  rtg:       { name: 'K. Kiss',    full: 'Katja Kiss',    since: 'Maart 2026',     number: 'RTG · 2026 · 8841', codename: 'Amberen Vos',      geboren: '1994-09-14' },
+  lifestyle: { name: 'F. Johanna', full: 'Fleur Johanna', since: 'Augustus 2025',  number: 'LSP · 2025 · 0217', codename: 'Gouden Ibis',      geboren: '1957-02-20' },
+  business:  { name: 'R. Imran',   full: 'Rahul Imran',   since: 'November 2025',  number: 'BSP · 2025 · 1104', codename: 'Noordelijke Ster', geboren: '1992-11-30' }
 };
 
 /* ---------- leeftijd uit het paspoort ----------
@@ -227,9 +227,9 @@ try { webpush = require('web-push'); } catch (e) { /* zonder push: alleen SSE */
 
 // welke persona hoort bij een auteursnaam (voor gerichte notificaties)
 const AUTHOR_TIER = {
-  'Sophie Janssen': 'rtg',
-  'Isabelle van Rhijn': 'lifestyle',
-  'Alexander de Vries': 'business'
+  'Katja Kiss': 'rtg',
+  'Fleur Johanna': 'lifestyle',
+  'Rahul Imran': 'business'
 };
 
 const sseClients = []; // { tier, res }
@@ -325,18 +325,18 @@ function initRealtime() {
     db.data.supplierTypes.apartment.caps.splice(1, 0, 'doors');
   if (!db.data.suppliers.find(s => s.code === 'SAKURA')) {
     db.data.suppliers.push({
-      code: 'SAKURA', name: 'Sakura Machiya Residence', type: 'apartment', city: 'Kyoto',
-      loc: { lat: 35.003, lng: 135.775, label: 'Gion, Kyoto' }, rate: 0.12,
+      code: 'SAKURA', name: 'Villa Bahia Ibiza', type: 'apartment', city: 'Ibiza',
+      loc: { lat: 38.876, lng: 1.325, label: 'Cala Jondal, Ibiza' }, rate: 0.12,
       menu: [], photos: [],
       rooms: [
-        { id: 'a1', name: 'Machiya 1, straatzijde', desc: '65 m², eigen entree, tuinbad', price: 430, available: true },
-        { id: 'a2', name: 'Machiya 2, tuinzijde', desc: '80 m², twee slaapkamers, terras', price: 560, available: true }
+        { id: 'a1', name: 'Casa Mar, zeezijde', desc: '65 m², eigen entree, plunge pool', price: 430, available: true },
+        { id: 'a2', name: 'Casa Jardin, tuinzijde', desc: '90 m², twee slaapkamers, terras', price: 560, available: true }
       ],
       doors: [
-        { id: 'd1', name: 'Voordeur (straat)', locked: true },
-        { id: 'd2', name: 'Machiya 1', locked: true },
-        { id: 'd3', name: 'Machiya 2', locked: true },
-        { id: 'd4', name: 'Fietsenberging', locked: true }
+        { id: 'd1', name: 'Voordeur (oprit)', locked: true },
+        { id: 'd2', name: 'Casa Mar', locked: true },
+        { id: 'd3', name: 'Casa Jardin', locked: true },
+        { id: 'd4', name: 'Poolhouse', locked: true }
       ]
     });
   }
@@ -348,20 +348,20 @@ function initRealtime() {
   if (!db.data.boekingen) db.data.boekingen = [];
   if (!db.data.suppliers.find(s => s.code === 'AYAKA')) {
     db.data.suppliers.push({
-      code: 'AYAKA', name: 'Studio Ayaka', type: 'zzp', city: 'Kyoto', vak: 'Mode & styling',
-      loc: { lat: 35.006, lng: 135.772, label: 'Gion, Kyoto' }, rate: 0.1,
+      code: 'AYAKA', name: 'Atelier Summer', type: 'zzp', city: 'Ibiza', vak: 'Sieraden & goudsmid',
+      loc: { lat: 38.909, lng: 1.435, label: 'Dalt Vila, Ibiza' }, rate: 0.1,
       menu: [], photos: [],
       services: [
-        { id: 's1', name: 'Personal styling, seizoensgarderobe', desc: 'Twee uur aan huis of in de studio, incl. kleurenanalyse', price: 240, duurMin: 120, soort: 'dienst' },
-        { id: 's2', name: 'Persoonlijke shopdag Kyoto', desc: 'Een dag langs ateliers en verborgen boetieks', price: 520, duurMin: 360, soort: 'dienst' },
-        { id: 's3', name: 'Zijden pochet, handgemaakt', desc: 'Uit eigen atelier, geleverd op de suite', price: 85, soort: 'product' }
+        { id: 's1', name: 'Sieraad op maat, ontwerpsessie', desc: 'Twee uur in het atelier of op de suite, incl. schetsontwerp', price: 240, duurMin: 120, soort: 'dienst' },
+        { id: 's2', name: 'Gouden ring, handgesmeed', desc: 'Op maat gesmeed, binnen de vakantie geleverd', price: 520, duurMin: 360, soort: 'dienst' },
+        { id: 's3', name: 'Zilveren hanger, uit voorraad', desc: 'Uit eigen atelier, geleverd op de suite', price: 85, soort: 'product' }
       ]
     });
   }
   if (!db.data.suppliers.find(s => s.code === 'KAITO')) {
     db.data.suppliers.push({
-      code: 'KAITO', name: 'Kaito Health', type: 'zzp', city: 'Kyoto', vak: 'Health & wellness',
-      loc: { lat: 35.011, lng: 135.768, label: 'Nakagyo, Kyoto' }, rate: 0.1,
+      code: 'KAITO', name: 'Studio Milan', type: 'zzp', city: 'Ibiza', vak: 'Health & wellness',
+      loc: { lat: 38.972, lng: 1.416, label: 'Ibiza-stad, haven' }, rate: 0.1,
       menu: [], photos: [],
       services: [
         { id: 's1', name: 'Personal training, privesessie', desc: 'In de hotelgym of buiten, incl. programma op maat', price: 110, duurMin: 60, soort: 'dienst' },
@@ -2982,7 +2982,7 @@ const LANDEN = {
   JP: { naam: 'Japan', alcoholLeeftijd: 20, tarieven: { eten: 10, drank: 10, logies: 10, vervoer: 10, jet: 0, standaard: 10 },
     lasten: 0.16, vakantiegeld: 0, uurloonMin: 6.7,
     aangifte: 'Consumption tax (10%) jaarlijks of per kwartaal; sinds 2023 is een qualified invoice vereist voor aftrek.',
-    extra: 'Ter plaatse eten 10%, afhaal 8%. Accommodation tax per stad (Kyoto heft per persoon per nacht).',
+    extra: 'Ter plaatse eten 10%, afhaal 8%. Accommodation tax per stad (sommige steden heffen per persoon per nacht).',
     zakelijk: { horeca: 'Consumption tax op zakelijke maaltijden is aftrekbaar met een qualified invoice.',
       logies: 'Consumption tax op het hotel is aftrekbaar; de accommodation tax is een kostenpost.',
       vervoer: 'Consumption tax op taxiritten is aftrekbaar met een qualified invoice.',
@@ -4945,18 +4945,18 @@ function aiSystemPrompt(tier) {
 function cannedAnswer(q) {
   const l = q.toLowerCase().trim();
   if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het)\b/.test(l))
-    return 'Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00 en een avondwandeling langs Pontocho.\n\nVolgende dat ik in de gaten houd: de bevestiging van Kikunoi Honten. U hoeft niets te doen.';
+    return 'Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte kleding, zwemkleding, zonnebescherming, een lichte trui voor de avond) en het dagplan voor 20 juli is ingepland: 10:00 privéboot naar Formentera, lunch aan boord, en om 21:00 uw tafel bij Sal de Mar.\n\nVolgende dat ik in de gaten houd: de bevestiging van Sal de Mar. U hoeft niets te doen.';
   if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer'))
-    return 'Voor Kyoto in oktober (14-22°C, kans op regen):\n• Lichte lagen + een regenjas\n• Nette schoenen die makkelijk uitgaan (ryokan & tempels)\n• Ingetogen kleding voor Kikunoi Honten\n• Adapter type A\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
+    return 'Voor Ibiza in juli (25-31°C, zonnig):\n• Lichte kleding + zwemkleding\n• Zonnebrand en een hoed\n• Nette outfit voor Sal de Mar\n• Een lichte trui voor de avonden aan zee\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?';
   if (l.includes('visum') || l.includes('paspoort') || l.includes('document'))
-    return 'Voor Japan heeft u geen visum nodig bij verblijf tot 90 dagen. Uw paspoort moet geldig zijn tijdens het hele verblijf. Ik zet uw boekingsbevestigingen alvast klaar voor de douane-app (Visit Japan Web).';
+    return 'Voor Ibiza (Spanje, EU) heeft u als Nederlander geen visum nodig; een geldige ID-kaart of paspoort volstaat. Ik zet uw boekingsbevestigingen alvast klaar in de app, mocht ernaar gevraagd worden.';
   if (l.includes('weer'))
-    return 'Kyoto medio oktober: gemiddeld 14-22°C, af en toe regen, en het begin van de herfstkleuren, de esdoorns in Arashiyama beginnen dan net te kleuren. De beste ochtend voor de bamboetuin is direct na zonsopgang; zal ik een vroege wandeling inplannen?';
+    return 'Ibiza medio juli: gemiddeld 25-31°C, veel zon en warme avonden. De beste tijd voor de boot naar Formentera is vroeg in de ochtend, vóór de drukte; zal ik het vertrek op 10:00 laten aanhouden?';
   if (l.includes('plan') || l.includes('dag') || l.includes('doen'))
-    return 'Voorstel voor 14 oktober:\n• 08:00 Arashiyama vóór de drukte\n• 11:30 lunch bij een sobameester in Sagano\n• 15:00 uw privé-theeceremonie in Gion (staat al vast)\n• 19:00 avondwandeling langs Pontocho\n\nZal ik de lunch laten reserveren?';
+    return 'Voorstel voor 20 juli:\n• 10:00 privéboot naar Formentera\n• 13:00 lunch aan boord of op het strand\n• 18:00 terug, borrel bij Sunset Ibiza\n• 21:00 diner bij Sal de Mar (staat in aanvraag)\n\nZal ik de strandlunch laten reserveren?';
   if (l.includes('restaurant') || l.includes('eten') || l.includes('diner'))
-    return 'Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki of een counter-kaiseki in Higashiyama, beide via ons netwerk tegen normale prijs.';
-  return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Kyoto kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.';
+    return 'Uw tafel bij Sal de Mar (19 jul, 21:00) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan een strandrestaurant in Cala Jondal of een adres in Marina Botafoch, beide via ons netwerk tegen normale prijs.';
+  return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Ibiza kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.';
 }
 
 app.post('/api/ai', auth, async (req, res) => {

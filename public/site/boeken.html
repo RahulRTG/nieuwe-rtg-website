@@ -149,9 +149,9 @@
     font-family:'Bodoni Moda',serif;font-style:italic;font-size:1.7rem;
     text-shadow:0 2px 18px rgba(0,0,0,0.35);
   }
-  .v-kyoto{background:linear-gradient(160deg,#3E1F26 0%,#7F1634 60%,#B8657B 100%);}
-  .v-lissabon{background:linear-gradient(160deg,#1F1A0C 0%,#857007 65%,#D9C36A 100%);}
-  .v-marrakech{background:linear-gradient(160deg,#2A130A 0%,#9E4A1C 60%,#E0A470 100%);}
+  .v-ibiza{background:linear-gradient(160deg,#0B2A3A 0%,#1E7A8C 55%,#F2A65A 100%);}
+  .v-gstaad{background:linear-gradient(160deg,#1A2230 0%,#3E5A7A 55%,#C9D6E4 100%);}
+  .v-monaco{background:linear-gradient(160deg,#0A1024 0%,#1B2A6B 55%,#C9A24B 100%);}
   .trip-body{padding:1.5rem 1.6rem 1.75rem;flex:1;display:flex;flex-direction:column;}
   .trip-body h3{font-size:1.25rem;}
   .trip-body .dates{
@@ -411,15 +411,15 @@
     ATLAS: {code:'ATLAS', name:'Atlas Executive Travel',   type:'bedrijf',    handle:'zakelijk reisbureau, Amsterdam'}
   };
   let TRIPS = [
-    {id:'kyoto-herfst', dest:'Kyoto', visual:'v-kyoto', title:'Kyoto in herfstkleur', dates:'8 dagen · oktober 2026', price:2760,
-     desc:'Hoshinoya aan de rivier, privé-theeceremonie in Gion en de esdoorns van Arashiyama vóór de drukte.',
-     includes:['Vlucht business class','Hoshinoya Kyoto, 4 nachten','Ryokan Tawaraya, 3 nachten','Privétransfers & theeceremonie']},
-    {id:'lissabon-palacio', dest:'Lissabon', visual:'v-lissabon', title:'Palácio-weekend Lissabon', dates:'4 dagen · doorlopend', price:1127,
-     desc:'Een palácio voor de prijs van een gewoon hotel, hetzelfde adres waar onze leden over posten in De Salon.',
-     includes:['Vlucht & transfers','Palácio-suite, 3 nachten','Ontbijt & late check-out','Tafelreservering fado-avond']},
-    {id:'marrakech-riad', dest:'Marrakech', visual:'v-marrakech', title:'Riad & woestijn Marrakech', dates:'5 dagen · doorlopend', price:1323,
-     desc:'Een riad in de medina, hammam en een avond in de Agafay-woestijn, ingekocht zoals wij dat voor leden doen.',
-     includes:['Vlucht & privétransfers','Riad, 4 nachten','Hammam & diner in de Agafay','Gids door de souks']}
+    {id:'ibiza-jetset', dest:'Ibiza', visual:'v-ibiza', title:'Ibiza, jetset-week', dates:'7 dagen · zomer 2026', price:2760,
+     desc:'Vanaf Schiphol naar het eiland: deels hotel aan zee, deels een villa met eigen zwembad, boot naar Formentera en de beste diners.',
+     includes:['Vlucht of privéjet vanaf Schiphol','Aguamarina Ibiza, 3 nachten','Villa Bahia Ibiza, 4 nachten','Privéboot & transfers']},
+    {id:'gstaad-alpien', dest:'Gstaad', visual:'v-gstaad', title:'Gstaad, alpien weekend', dates:'4 dagen · doorlopend', price:1980,
+     desc:'Een chalet met open haard, privélift de piste op en diners in de bergen, hetzelfde adres waar onze leden over posten in De Salon.',
+     includes:['Vlucht & transfers','Chalet, 3 nachten','Skipas & privélift','Diner in de bergen']},
+    {id:'monaco-glamour', dest:'Monaco', visual:'v-monaco', title:'Monaco, haven & glamour', dates:'4 dagen · doorlopend', price:2340,
+     desc:'Suite met zicht op de jachthaven, een avond in het casino en een tafel langs het circuit, ingekocht zoals wij dat voor leden doen.',
+     includes:['Vlucht & privétransfers','Suite met havenzicht, 3 nachten','Avond in het casino','Tafel langs het circuit']}
   ];
 
   const API = {

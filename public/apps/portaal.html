@@ -856,10 +856,11 @@
     font-style:italic;
     text-shadow:0 2px 18px rgba(0,0,0,0.35);
   }
-  .v-kyoto{background:linear-gradient(160deg,#3E1F26 0%,#7F1634 60%,#B8657B 100%);}
-  .v-zurich{background:linear-gradient(160deg,#10151C 0%,#2C3A4D 60%,#7C93AC 100%);}
+  .v-ibiza{background:linear-gradient(160deg,#0B2A3A 0%,#1E7A8C 55%,#F2A65A 100%);}
+  .v-gstaad{background:linear-gradient(160deg,#1A2230 0%,#3E5A7A 55%,#C9D6E4 100%);}
+  .v-monaco{background:linear-gradient(160deg,#0A1024 0%,#1B2A6B 55%,#C9A24B 100%);}
+  .v-dubai{background:linear-gradient(160deg,#2A1A08 0%,#B57A2A 55%,#F0D08A 100%);}
   .v-lissabon{background:linear-gradient(160deg,#1F1A0C 0%,#857007 65%,#D9C36A 100%);}
-  .v-singapore{background:linear-gradient(160deg,#0B1F1A 0%,#2E6B4F 65%,#8FC0A9 100%);}
   .v-marrakech{background:linear-gradient(160deg,#2A130A 0%,#9E4A1C 60%,#E0A470 100%);}
   .post-body{padding:1.2rem 1.4rem;flex:1;}
   .post-body p{font-size:0.88rem;color:var(--grey);}
@@ -1061,19 +1062,19 @@
       </button>
       <button class="gate-card" data-login="rtg">
         <span class="tier-chip t-rtg"><span class="dot"></span>RTG Pass</span>
-        <h3>S. Janssen</h3>
+        <h3>K. Kiss</h3>
         <p data-i18n="gate.rtg.p">Volledig portaal met de AI-Butler. In De Salon reageert en dm't u met andere RTG-leden; bij Lifestyle- en Business-leden kunt u liken.</p>
         <span class="enter" data-i18n-html="gate.rtg.go">Inloggen als RTG-lid <span class="arrow">→</span></span>
       </button>
       <button class="gate-card" data-login="lifestyle">
         <span class="tier-chip t-lifestyle"><span class="dot"></span>Lifestyle Pass</span>
-        <h3>I. van Rhijn</h3>
+        <h3>F. Johanna</h3>
         <p data-i18n="gate.life.p">Volledig portaal, persoonlijke concierge én AI-voorbereiding. In De Salon volledige interactie met alle leden.</p>
         <span class="enter" data-i18n-html="gate.life.go">Inloggen als Lifestyle-lid <span class="arrow">→</span></span>
       </button>
       <button class="gate-card" data-login="business">
         <span class="tier-chip t-business"><span class="dot"></span>Business Pass</span>
-        <h3>A. de Vries</h3>
+        <h3>R. Imran</h3>
         <p data-i18n="gate.biz.p">Volledig portaal, zakelijk ingericht. In De Salon volledige interactie met alle leden.</p>
         <span class="enter" data-i18n-html="gate.biz.go">Inloggen als Business-lid <span class="arrow">→</span></span>
       </button>
@@ -1204,53 +1205,53 @@
 
   const PERSONAS = {
     guest:     {name:'Gast',          full:'Gast',              since:null,          number:null},
-    rtg:       {name:'S. Janssen',    full:'Sophie Janssen',    since:'Maart 2026',  number:'RTG · 2026 · 8841'},
-    lifestyle: {name:'I. van Rhijn',  full:'Isabelle van Rhijn',since:'Augustus 2025', number:'LSP · 2025 · 0217'},
-    business:  {name:'A. de Vries',   full:'Alexander de Vries',since:'November 2025', number:'BSP · 2025 · 1104'}
+    rtg:       {name:'K. Kiss',    full:'Katja Kiss',    since:'Maart 2026',  number:'RTG · 2026 · 8841'},
+    lifestyle: {name:'F. Johanna', full:'Fleur Johanna', since:'Augustus 2025', number:'LSP · 2025 · 0217'},
+    business:  {name:'R. Imran',   full:'Rahul Imran',   since:'November 2025', number:'BSP · 2025 · 1104'}
   };
 
   let invoices = [
-    {id:'RTG-2026-0158', desc:'Kyoto, Hoshinoya, 4 nachten', netto:2840, bijdrage:190, status:'open',  date:'Vervalt 28 juli 2026'},
-    {id:'RTG-2026-0141', desc:'KLM Amsterdam - Osaka, business class (2 pers.)', netto:3120, bijdrage:210, status:'open', date:'Vervalt 15 augustus 2026'},
-    {id:'RTG-2026-0093', desc:'Lissabon, Palácio weekend, incl. transfers', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
+    {id:'RTG-2026-0158', desc:'Ibiza, Aguamarina, 3 nachten', netto:1740, bijdrage:150, status:'open',  date:'Vervalt 28 juli 2026'},
+    {id:'RTG-2026-0141', desc:'Villa Bahia Ibiza, Cala Jondal, 4 nachten', netto:2240, bijdrage:180, status:'open', date:'Vervalt 15 augustus 2026'},
+    {id:'RTG-2026-0093', desc:'Privejet Schiphol - Ibiza (retour, gedeeld)', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
     {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
   ];
 
   let trip = {
-    dest:'Kyoto', dates:'12 - 19 oktober 2026', days:98,
+    dest:'Ibiza', dates:'18 - 25 juli 2026', days:7,
     items:[
-      {when:'12 okt', title:'KLM KL867, Amsterdam → Osaka Kansai', sub:'Business class, 2 personen · stoelen 2A/2C', status:'paid', label:'Bevestigd'},
-      {when:'12 okt', title:'Privétransfer Kansai → Hoshinoya Kyoto', sub:'Chauffeur wacht bij aankomsthal, naambord RTG', status:'paid', label:'Bevestigd'},
-      {when:'12-16 okt', title:'Hoshinoya Kyoto, Riverside suite', sub:'4 nachten, ontbijt op de kamer, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
-      {when:'14 okt', title:'Privé-theeceremonie, Gion', sub:'Met vertaler · 2 personen · 15:00 uur', status:'paid', label:'Bevestigd'},
-      {when:'15 okt', title:'Diner, Kikunoi Honten (3★)', sub:'Kaiseki-menu · tafel 19:30 uur', status:'req', label:'In aanvraag'},
-      {when:'16-19 okt', title:'Ryokan Tawaraya, traditionele kamer', sub:'3 nachten, kaiseki-halfpension', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
+      {when:'18 jul', title:'KLM KL1263, Amsterdam Schiphol → Ibiza', sub:'Economy comfort, 2 personen', status:'paid', label:'Bevestigd'},
+      {when:'18 jul', title:'Privétransfer luchthaven → Aguamarina', sub:'Chauffeur wacht bij aankomsthal, naambord RTG', status:'paid', label:'Bevestigd'},
+      {when:'18-21 jul', title:'Aguamarina Ibiza, Sea-view suite', sub:'3 nachten, ontbijt, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
+      {when:'19 jul', title:'Diner, Sal de Mar', sub:'Chef-menu · tafel 21:00 uur', status:'req', label:'In aanvraag'},
+      {when:'20 jul', title:'Privéboot naar Formentera', sub:'Met de groep · 10:00 uur', status:'paid', label:'Bevestigd'},
+      {when:'21-25 jul', title:'Villa Bahia Ibiza, Cala Jondal', sub:'4 nachten, eigen zwembad', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
     ]
   };
 
   let posts = [
-    {id:1, author:'Isabelle van Rhijn', tier:'lifestyle', place:'Kyoto', visual:'v-kyoto',
-     text:'De theeceremonie die mijn concierge regelde, geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.',
-     likes:124, liked:false, reward:6, featured:true,
-     comments:[{who:'Alexander de Vries', tier:'business', text:'Staat genoteerd voor november. Dank.'}]},
-    {id:2, author:'Alexander de Vries', tier:'business', place:'Zürich', visual:'v-zurich',
-     text:'Ochtendvlucht, twee vergaderingen, om 18:00 aan het meer. De Business Pass plant de dag strakker dan mijn assistent ooit deed.',
-     likes:89, liked:false, reward:4,
+    {id:1, author:'Katja Kiss', tier:'rtg', place:'Ibiza', visual:'v-ibiza',
+     text:'Met de hele vriendengroep neergestreken: de helft in het hotel aan zee, wij in de villa boven Cala Jondal. Rahul kwam met de privéjet, wij pakten de ochtendvlucht, en toch checken we samen in.',
+     likes:168, liked:false, reward:7, featured:true,
+     comments:[{who:'Timothy de Groot', tier:'rtg', text:'Tussen twee tentamens door even bijkomen, precies wat ik nodig had.'}]},
+    {id:2, author:'Rahul Imran', tier:'business', place:'Ibiza', visual:'v-ibiza',
+     text:'Ochtend: twee calls vanaf het terras. Middag: boot naar Formentera met de groep. De jet stond klaar op Schiphol Business Aviation.',
+     likes:96, liked:false, reward:4,
      comments:[]},
-    {id:3, author:'Sophie Janssen', tier:'rtg', place:'Lissabon', visual:'v-lissabon',
-     text:'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt.',
-     likes:203, liked:false, reward:8, featured:true,
+    {id:3, author:'Fleur Johanna', tier:'lifestyle', place:'Gstaad', visual:'v-gstaad',
+     text:'Wij oude rotten trekken de bergen in terwijl de jeugd op Ibiza ligt. Chalet in Gstaad, open haard, en morgen de piste op. Op je 69e mag dat.',
+     likes:132, liked:false, reward:6, featured:true,
      comments:[
-       {who:'Nadia Karim', tier:'rtg', text:'Welk palácio was dit? Sta op het punt te boeken!'},
-       {who:'Alexander de Vries', tier:'business', text:'Sophie, dit wil ik in november zien, welke wijk was dit?'}
+       {who:'Marieke Hooi', tier:'lifestyle', text:'Als schooldirectrice tel ik de dagen af tot de vakantie; deze is het waard.'},
+       {who:'William Draak', tier:'business', text:'Vanuit Monaco groeten wij Gstaad. De boekhouding klopt, de rosé ook.'}
      ]},
-    {id:4, author:'Marcus Bergwerff', tier:'business', place:'Singapore', visual:'v-singapore',
-     text:'Layover van 9 uur omgezet in een middag Raffles + spa. De AI stelde het voor, mijn concierge bevestigde binnen 10 minuten.',
-     likes:57, liked:false, reward:2,
+    {id:4, author:'Dani da Cruz Carvalho', tier:'business', place:'Monaco', visual:'v-monaco',
+     text:'Na mijn voetbaljaren dacht ik alles gezien te hebben in Monaco, maar aankomen op codenaam en toch als vanouds ontvangen worden, dat is nieuw.',
+     likes:214, liked:false, reward:8, featured:true,
      comments:[]},
-    {id:5, author:'Nadia Karim', tier:'rtg', place:'Marrakech', visual:'v-marrakech',
-     text:'Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Reizen dat iets teruggeeft, dat deel vertel ik iedereen.',
-     likes:141, liked:false, reward:5, featured:true,
+    {id:5, author:'Feroz Mohammed', tier:'business', place:'Dubai', visual:'v-dubai',
+     text:'Een week Dubai met vrienden: de een in de wolkenkrabber-suite, de ander in een strandappartement aan de Palm. Ik werk voor de Nederlandse staat, maar deze dagen tel ik even niet mee.',
+     likes:78, liked:false, reward:3,
      comments:[]}
   ];
 
@@ -1917,12 +1918,12 @@
   /* ---------- AI ---------- */
 
   const AI_NAMES = {
-    rtg:       {title:'De Butler.', deck:'Uw frictieloze vriend: hij kent uw reis naar Kyoto, signaleert wat geregeld moet worden en komt zelf met voorstellen, vóór u erom vraagt.'},
+    rtg:       {title:'De Butler.', deck:'Uw frictieloze vriend: hij kent uw reis naar Ibiza, signaleert wat geregeld moet worden en komt zelf met voorstellen, vóór u erom vraagt.'},
     lifestyle: {title:'Uw AI, naast uw concierge.', deck:'Uw concierge blijft uw vaste aanspreekpunt. Deze AI denkt daarnaast proactief mee: hij signaleert, stelt voor en lost op, dag en nacht, zonder dat u hoeft te vragen.'},
     business:  {title:'Uw uitvoerende AI.', deck:'Als een goede chief of staff: alles klaar vóór u erom vraagt. Signaleert openstaande zaken, stelt de volgende stap voor, u zegt alleen ja of nee.'}
   };
   const AI_NAMES_EN = {
-    rtg:       {title:'The Butler.', deck:'Your frictionless friend: he knows your journey to Kyoto, spots what needs arranging and comes up with suggestions himself, before you ask.'},
+    rtg:       {title:'The Butler.', deck:'Your frictionless friend: he knows your journey to Ibiza, spots what needs arranging and comes up with suggestions himself, before you ask.'},
     lifestyle: {title:'Your AI, alongside your concierge.', deck:'Your concierge remains your dedicated point of contact. This AI also thinks ahead proactively: it spots, suggests and resolves, day and night, without you having to ask.'},
     business:  {title:'Your executive AI.', deck:'Like a good chief of staff: everything ready before you ask. It spots open matters, proposes the next step, you only say yes or no.'}
   };
@@ -1953,18 +1954,18 @@
   function aiAnswer(q){
     const l = q.toLowerCase().trim();
     if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het|yes|please|go ahead|sure|arrange it)\b/.test(l))
-      return T('p.ai.a.yes','Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte lagen, regenjas, nette schoenen die makkelijk uitgaan, adapter type A) en het dagplan voor 14 oktober is ingepland: Arashiyama om 08:00, lunch in Sagano, uw theeceremonie om 15:00 en een avondwandeling langs Pontocho.\n\nVolgende dat ik in de gaten houd: de bevestiging van Kikunoi Honten. U hoeft niets te doen.');
+      return T('p.ai.a.yes','Geregeld. De paklijst staat klaar in uw reisoverzicht (lichte kleding, zwemkleding, zonnebrand, een lichte trui voor de avond) en het dagplan voor 20 juli is ingepland: 10:00 boot naar Formentera, lunch aan boord en om 21:00 uw tafel bij Sal de Mar.\n\nVolgende dat ik in de gaten houd: de bevestiging van Sal de Mar. U hoeft niets te doen.');
     if (l.includes('inpak') || l.includes('paklijst') || l.includes('koffer') || l.includes('pack'))
-      return T('p.ai.a.pack','Voor Kyoto in oktober (14-22°C, kans op regen):\n• Lichte lagen + een regenjas\n• Nette schoenen die makkelijk uitgaan (ryokan & tempels)\n• Ingetogen kleding voor Kikunoi Honten\n• Adapter type A\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?');
+      return T('p.ai.a.pack','Voor Ibiza in juli (25-31°C, zonnig):\n• Lichte kleding + zwemkleding\n• Zonnebrand en een hoed\n• Nette outfit voor Sal de Mar\n• Een lichte trui voor de avond\n\nZal ik hier een afvinklijst van maken in uw reisoverzicht?');
     if (l.includes('visum') || l.includes('paspoort') || l.includes('document') || l.includes('visa') || l.includes('passport'))
-      return T('p.ai.a.visa','Voor Japan heeft u geen visum nodig bij verblijf tot 90 dagen. Uw paspoort moet geldig zijn tijdens het hele verblijf, de uwe is geldig tot 2031, dus dat zit goed. Ik zet uw boekingsbevestigingen alvast klaar voor de douane-app (Visit Japan Web).');
+      return T('p.ai.a.visa','Voor Ibiza (Spanje, EU) heeft u als Nederlander geen visum nodig; een geldige ID-kaart of paspoort volstaat, en de uwe is geldig tot 2031, dus dat zit goed. Ik zet uw boekingsbevestigingen alvast klaar in de app.');
     if (l.includes('weer') || l.includes('weather'))
-      return T('p.ai.a.weather','Kyoto medio oktober: gemiddeld 14-22°C, af en toe regen, en het begin van de herfstkleuren, de esdoorns in Arashiyama beginnen dan net te kleuren. De beste ochtend voor de bamboetuin is direct na zonsopgang; zal ik een vroege wandeling inplannen?');
+      return T('p.ai.a.weather','Ibiza medio juli: gemiddeld 25-31°C, veel zon en warme avonden. De beste tijd voor de boot naar Formentera is vroeg in de ochtend, vóór de drukte; zal ik het vertrek op 10:00 laten aanhouden?');
     if (l.includes('plan') || l.includes('dag') || l.includes('doen') || l.includes('day'))
-      return T('p.ai.a.plan','Voorstel voor 14 oktober:\n• 08:00 Arashiyama vóór de drukte\n• 11:30 lunch bij een sobameester in Sagano\n• 15:00 uw privé-theeceremonie in Gion (staat al vast)\n• 19:00 avondwandeling langs Pontocho\n\nZal ik de lunch laten reserveren?');
+      return T('p.ai.a.plan','Voorstel voor 20 juli:\n• 10:00 privéboot naar Formentera\n• 13:00 lunch aan boord of op het strand\n• 18:00 borrel bij Sunset Ibiza\n• 21:00 diner bij Sal de Mar (staat in aanvraag)\n\nZal ik de strandlunch laten reserveren?');
     if (l.includes('restaurant') || l.includes('eten') || l.includes('diner') || l.includes('dinner') || l.includes('eat'))
-      return T('p.ai.a.rest','Uw tafel bij Kikunoi Honten (15 okt, 19:30) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan Gion Sasaki of een counter-kaiseki in Higashiyama, beide via ons netwerk tegen normale prijs, zonder toeristische toeslag.');
-    return T('p.ai.a.default','Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Kyoto kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.');
+      return T('p.ai.a.rest','Uw tafel bij Sal de Mar (19 jul, 21:00) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan een strandrestaurant in Cala Jondal of een adres in Marina Botafoch, beide via ons netwerk tegen normale prijs, zonder toeristische toeslag.');
+    return T('p.ai.a.default','Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Ibiza kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.');
   }
 
   function renderAI(){
@@ -1993,8 +1994,8 @@
           '<p>'+T('p.ai.friend.body','De AI is gekoppeld aan uw boekingen en betalingen. Hij wacht niet op uw vraag: hij signaleert openstaande zaken, bewaakt aanvragen en stelt zelf de volgende stap voor. U zegt alleen ja of nee.')+'</p>' +
           '<div class="chips">' +
             (lang()==='en'
-              ? ['Yes, arrange it','What should I pack?','Do I need a visa?','What is the weather like in October?','Plan my day in Kyoto','Arrange a restaurant']
-              : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Hoe is het weer in oktober?','Plan mijn dag in Kyoto','Regel een restaurant']
+              ? ['Yes, arrange it','What should I pack?','Do I need a visa?','What is the weather like in July?','Plan my day in Ibiza','Arrange a restaurant']
+              : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Hoe is het weer in juli?','Plan mijn dag in Ibiza','Regel een restaurant']
             ).map(c => '<button class="chip">'+c+'</button>').join('') +
           '</div>' +
         '</div>' +
@@ -2076,7 +2077,7 @@
         '</div>' +
         (p.photo
           ? '<div class="post-visual" style="background:#111;"><img src="' + p.photo + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"><span class="place">' + p.place + '</span></div>'
-          : '<div class="post-visual ' + (p.visual || 'v-kyoto') + '"><span class="place">' + p.place + '</span></div>') +
+          : '<div class="post-visual ' + (p.visual || 'v-ibiza') + '"><span class="place">' + p.place + '</span></div>') +
         '<div class="post-body"><p>' + msgHTML(p.text, p.lang) + '</p>' +
           (p.partner ? '' : '<div class="post-reward">✦ '+T('p.post.earned','Verdiende')+' ' + (p.reward || 0) + '% '+T('p.post.discount','reiskorting met deze post')+'</div>') +
           (p.featured ? '<div class="post-flag">★ '+T('p.post.featured','Uitgelicht als beeld op rtg.nl')+'</div>' : '') +
@@ -2238,13 +2239,13 @@ window.I18N = { en: {
   'p.lock.trip':'The travel overview', 'p.daystogo':'days to go', 'p.changeadd':'Change or add something?',
   'p.changeadd.life':'Your concierge arranges it, one message is enough.', 'p.changeadd.ai':'Ask your personal AI, or message the Butler.',
   'p.ai.plan':'• Shall I prepare a packing list and a day plan for 14 October? A single "yes" is enough.',
-  'p.ai.a.yes':'Done. The packing list is ready in your travel overview (light layers, a raincoat, smart shoes that slip off easily, a type A adapter) and the day plan for 14 October is scheduled: Arashiyama at 08:00, lunch in Sagano, your tea ceremony at 15:00 and an evening stroll along Pontocho.\n\nNext, I am watching for the confirmation from Kikunoi Honten. You need not do a thing.',
-  'p.ai.a.pack':'For Kyoto in October (14-22°C, chance of rain):\n• Light layers + a raincoat\n• Smart shoes that slip off easily (ryokan & temples)\n• Understated attire for Kikunoi Honten\n• Type A adapter\n\nShall I turn this into a checklist in your travel overview?',
-  'p.ai.a.visa':'For Japan you need no visa for stays up to 90 days. Your passport must be valid for the whole stay, yours is valid until 2031, so that is fine. I will prepare your booking confirmations for the customs app (Visit Japan Web).',
-  'p.ai.a.weather':'Kyoto in mid-October: on average 14-22°C, occasional rain, and the start of the autumn colours, the maples in Arashiyama are just beginning to turn. The best morning for the bamboo grove is right after sunrise; shall I schedule an early walk?',
-  'p.ai.a.plan':'Proposal for 14 October:\n• 08:00 Arashiyama before the crowds\n• 11:30 lunch with a soba master in Sagano\n• 15:00 your private tea ceremony in Gion (already set)\n• 19:00 evening stroll along Pontocho\n\nShall I have the lunch reserved?',
-  'p.ai.a.rest':'Your table at Kikunoi Honten (15 Oct, 19:30) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of Gion Sasaki or a counter kaiseki in Higashiyama, both via our network at normal price, without a tourist surcharge.',
-  'p.ai.a.default':'I will look into that and come back to you today. For your journey to Kyoto I can already help with the packing list, documents, the weather or a day plan, just say the word.',
+  'p.ai.a.yes':'Done. The packing list is ready in your travel overview (light clothing, swimwear, sunscreen, a light sweater for the evening) and the day plan for 20 July is scheduled: 10:00 boat to Formentera, lunch on board and at 21:00 your table at Sal de Mar.\n\nNext, I am watching for the confirmation from Sal de Mar. You need not do a thing.',
+  'p.ai.a.pack':'For Ibiza in July (25-31°C, sunny):\n• Light clothing + swimwear\n• Sunscreen and a hat\n• A smart outfit for Sal de Mar\n• A light sweater for the evening\n\nShall I turn this into a checklist in your travel overview?',
+  'p.ai.a.visa':'For Ibiza (Spain, EU) you need no visa; a valid ID card or passport is enough, and yours is valid until 2031, so that is fine. I will prepare your booking confirmations in the app.',
+  'p.ai.a.weather':'Ibiza in mid-July: on average 25-31°C, plenty of sun and warm evenings. The best time for the boat to Formentera is early in the morning, before the crowds; shall I keep the departure at 10:00?',
+  'p.ai.a.plan':'Proposal for 20 July:\n• 10:00 private boat to Formentera\n• 13:00 lunch on board or on the beach\n• 18:00 drinks at Sunset Ibiza\n• 21:00 dinner at Sal de Mar (being requested)\n\nShall I have the beach lunch reserved?',
+  'p.ai.a.rest':'Your table at Sal de Mar (19 Jul, 21:00) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of a beach restaurant in Cala Jondal or an address in Marina Botafoch, both via our network at normal price, without a tourist surcharge.',
+  'p.ai.a.default':'I will look into that and come back to you today. For your journey to Ibiza I can already help with the packing list, documents, the weather or a day plan, just say the word.',
   'p.ai.guesttitle':'Your personal AI.', 'p.lock.ai':'The personal AI', 'p.ai.bar':'Personal AI, always available', 'p.ai.ph':'Ask a question about your journey…', 'p.ai.send':'Send',
   'p.ai.friend':'The frictionless friend', 'p.ai.friend.body':'The AI is linked to your bookings and payments. It does not wait for your question: it spots open matters, watches requests and proposes the next step itself. You only say yes or no.',
   'p.hint.guest':'Without a membership you can only like. Commenting and messages are for members.',

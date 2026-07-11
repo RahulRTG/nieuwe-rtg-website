@@ -14,9 +14,9 @@
    demo-inhoud (facturen, reis, posts, reacties, menukaarten, partnerreizen). */
 const NL2EN = {
   // facturen
-  'Kyoto, Hoshinoya, 4 nachten': 'Kyoto, Hoshinoya, 4 nights',
-  'KLM Amsterdam - Osaka, business class (2 pers.)': 'KLM Amsterdam - Osaka, business class (2 pers.)',
-  'Lissabon, Palácio weekend, incl. transfers': 'Lisbon, Palácio weekend, incl. transfers',
+  'Ibiza, Aguamarina, 3 nachten': 'Ibiza, Aguamarina, 3 nights',
+  'Villa Bahia Ibiza, Cala Jondal, 4 nachten': 'Villa Bahia Ibiza, Cala Jondal, 4 nights',
+  'Privejet Schiphol - Ibiza (retour, gedeeld)': 'Private jet Schiphol - Ibiza (return, shared)',
   'Jaarbijdrage lidmaatschap 2026': 'Annual membership contribution 2026',
   'Vervalt 28 juli 2026': 'Due 28 July 2026',
   'Vervalt 15 augustus 2026': 'Due 15 August 2026',
@@ -24,71 +24,85 @@ const NL2EN = {
   'Betaald op 4 januari 2026': 'Paid on 4 January 2026',
   'Zojuist betaald': 'Just paid',
   // reis
-  '12 - 19 oktober 2026': '12 - 19 October 2026',
-  '12 okt': '12 Oct', '12-16 okt': '12-16 Oct', '14 okt': '14 Oct', '15 okt': '15 Oct', '16-19 okt': '16-19 Oct',
-  'KLM KL867, Amsterdam → Osaka Kansai': 'KLM KL867, Amsterdam → Osaka Kansai',
-  'Business class, 2 personen · stoelen 2A/2C': 'Business class, 2 people · seats 2A/2C',
-  'Privétransfer Kansai → Hoshinoya Kyoto': 'Private transfer Kansai → Hoshinoya Kyoto',
+  '18 - 25 juli 2026': '18 - 25 July 2026',
+  '18 jul': '18 Jul', '18-21 jul': '18-21 Jul', '19 jul': '19 Jul', '20 jul': '20 Jul', '21-25 jul': '21-25 Jul',
+  'KLM KL1263, Amsterdam Schiphol \u2192 Ibiza': 'KLM KL1263, Amsterdam Schiphol \u2192 Ibiza',
+  'Economy comfort, 2 personen \u00b7 de rest van de groep vloog priv\u00e9': 'Economy comfort, 2 people \u00b7 the rest of the group flew private',
+  'Economy comfort, 2 personen': 'Economy comfort, 2 people',
+  'Priv\u00e9transfer luchthaven \u2192 Aguamarina': 'Private transfer airport \u2192 Aguamarina',
   'Chauffeur wacht bij aankomsthal, naambord RTG': 'Driver waits in the arrivals hall, RTG name board',
-  'Hoshinoya Kyoto, Riverside suite': 'Hoshinoya Kyoto, Riverside suite',
-  '4 nachten, ontbijt op de kamer, late check-out': '4 nights, breakfast in the room, late check-out',
-  'Privé-theeceremonie, Gion': 'Private tea ceremony, Gion',
-  'Met vertaler · 2 personen · 15:00 uur': 'With interpreter · 2 people · 15:00',
-  'Diner, Kikunoi Honten (3★)': 'Dinner, Kikunoi Honten (3★)',
-  'Kaiseki-menu · tafel 19:30 uur': 'Kaiseki menu · table 19:30',
-  'Ryokan Tawaraya, traditionele kamer': 'Ryokan Tawaraya, traditional room',
-  '3 nachten, kaiseki-halfpension': '3 nights, kaiseki half board',
-  // post-teksten
-  'De theeceremonie die mijn concierge regelde, geen toeristen, geen haast. Dit is waarom ik niet meer zelf boek.':
-    'The tea ceremony my concierge arranged, no tourists, no rush. This is why I no longer book myself.',
-  'Ochtendvlucht, twee vergaderingen, om 18:00 aan het meer. De Business Pass plant de dag strakker dan mijn assistent ooit deed.':
-    'Morning flight, two meetings, by the lake at 18:00. The Business Pass plans the day tighter than my assistant ever did.',
-  'Voor de prijs van een gewoon hotel een palácio, via één WhatsApp-bericht. Nettoprijzen zijn geen marketing, ze bestaan echt.':
-    'For the price of an ordinary hotel, a palácio, via a single WhatsApp message. Net prices aren\'t marketing, they truly exist.',
-  'Layover van 9 uur omgezet in een middag Raffles + spa. De AI stelde het voor, mijn concierge bevestigde binnen 10 minuten.':
-    'A 9-hour layover turned into an afternoon at Raffles + spa. The AI suggested it, my concierge confirmed within 10 minutes.',
-  'Riad tegen inkoopprijs, en 30% van mijn bijdrage ging naar de RTFoundation. Reizen dat iets teruggeeft, dat deel vertel ik iedereen.':
-    'A riad at wholesale price, and 30% of my contribution went to the RTFoundation. Travel that gives back, that part I tell everyone.',
+  'Chauffeur bij aankomsthal': 'Driver in the arrivals hall',
+  'Aguamarina Ibiza, Sea-view suite': 'Aguamarina Ibiza, Sea-view suite',
+  '3 nachten, ontbijt, late check-out': '3 nights, breakfast, late check-out',
+  '3 nachten, late check-out': '3 nights, late check-out',
+  'Diner, Sal de Mar': 'Dinner, Sal de Mar',
+  'Chef-menu \u00b7 tafel 21:00 uur': 'Chef menu \u00b7 table 21:00',
+  'Chef-menu \u00b7 21:00 uur': 'Chef menu \u00b7 21:00',
+  'Priv\u00e9boot naar Formentera': 'Private boat to Formentera',
+  'Met de hele groep \u00b7 10:00 uur': 'With the whole group \u00b7 10:00',
+  'Met de groep \u00b7 10:00 uur': 'With the group \u00b7 10:00',
+  'Villa Bahia Ibiza, Cala Jondal': 'Villa Bahia Ibiza, Cala Jondal',
+  '4 nachten, eigen zwembad': '4 nights, private pool',
+  // post-teksten (seed)
+  'Met de hele vriendengroep neergestreken: de helft in het hotel aan zee, wij met z\'n vieren in de villa boven Cala Jondal. Rahul kwam met de priv\u00e9jet vanaf Schiphol, wij pakten gewoon de ochtendvlucht, en toch checken we samen in. Dit is reizen zonder gedoe.':
+    'The whole group of friends has landed: half in the seaside hotel, the four of us in the villa above Cala Jondal. Rahul came by private jet from Schiphol, we just took the morning flight, and still we check in together. This is travel without hassle.',
+  'Ochtend: twee calls vanaf het terras. Middag: boot naar Formentera met de groep. De Business Pass plant mijn dag strakker dan welke assistent ook, en de jet stond klaar op Schiphol Business Aviation.':
+    'Morning: two calls from the terrace. Afternoon: boat to Formentera with the group. The Business Pass plans my day tighter than any assistant, and the jet was ready at Schiphol Business Aviation.',
+  'Wij oude rotten trekken de bergen in terwijl de jeugd op Ibiza ligt. Chalet in Gstaad, open haard, en morgen een priv\u00e9lift de piste op. Op je 69e mag dat.':
+    'We old hands head into the mountains while the youngsters lie on Ibiza. A chalet in Gstaad, an open fire, and tomorrow a private lift up the slopes. At 69 you are allowed.',
+  'Na mijn voetbaljaren dacht ik alles gezien te hebben in Monaco, maar aankomen op codenaam en toch als vanouds ontvangen worden, dat is nieuw. Eerst de jachthaven, dan het casino.':
+    'After my football years I thought I had seen everything in Monaco, but arriving on a codename and still being received as ever, that is new. First the marina, then the casino.',
+  'Een week Dubai met vrienden: de een in de wolkenkrabber-suite, de ander in een strandappartement aan de Palm. Ik werk voor de Nederlandse staat, maar deze dagen tel ik even niet mee.':
+    'A week in Dubai with friends: one in the skyscraper suite, the other in a beach apartment on the Palm. I work for the Dutch state, but these days I am simply off the clock.',
+  'Een ring gesmeed voor de tweeling van Ashley, hier op het terras afgemaakt. Goudsmid zijn op vakantie, omdat het niet als werk voelt tussen deze mensen. 30% van mijn bijdrage ging bovendien naar de RTFoundation.':
+    'Forged a ring for Ashley\'s twins, finished right here on the terrace. Being a goldsmith on holiday, because it does not feel like work among these people. And 30% of my contribution went to the RTFoundation.',
   // reacties (seed)
-  'Staat genoteerd voor november. Dank.': 'Noted for November. Thank you.',
-  'Welk palácio was dit? Sta op het punt te boeken!': 'Which palácio was this? I am about to book!',
-  'Sophie, dit wil ik in november zien, welke wijk was dit?': 'Sophie, I want to see this in November, which district was this?',
-  'Welke wijk was dit? Ik zou er graag in het voorjaar heen.': 'Which district was this? I would love to go there in spring.',
-  // menu, Kikunoi
-  'Hassun, seizoensvoorgerecht': 'Hassun, seasonal starter',
-  'Acht kleine gerechten die het seizoen vieren.': 'Eight small dishes celebrating the season.',
-  'Mukozuke, sashimi': 'Mukozuke, sashimi',
-  'Dagverse vangst, gesneden aan tafel.': 'Catch of the day, sliced at the table.',
-  'Wagyu-hoofdgerecht': 'Wagyu main course',
-  'A5 wagyu, licht gegrild, met seizoensgroenten.': 'A5 wagyu, lightly grilled, with seasonal vegetables.',
-  'Matcha & wagashi': 'Matcha & wagashi',
-  'Ceremoniële matcha met huisgemaakte wagashi.': 'Ceremonial matcha with house-made wagashi.',
-  'Kaiseki': 'Kaiseki', 'Zoet': 'Sweet',
-  // menu, Pontocho
-  'Yuzu Highball': 'Yuzu Highball', 'Japanse whisky, yuzu, bruisend.': 'Japanese whisky, yuzu, sparkling.',
-  'Umeshu Sour': 'Umeshu Sour', 'Pruimenlikeur, citroen, eiwit.': 'Plum liqueur, lemon, egg white.',
-  'Sakura Spritz (0%)': 'Sakura Spritz (0%)', 'Kersenbloesem, tonic, geen alcohol.': 'Cherry blossom, tonic, no alcohol.',
-  'Edamame & nori': 'Edamame & nori', 'Gestoomde edamame met zeezout.': 'Steamed edamame with sea salt.',
-  'Signatuur': 'Signature', 'Alcoholvrij': 'Non-alcoholic', 'Hapjes': 'Bites',
+  'Tussen twee tentamens door even bijkomen, precies wat ik nodig had.': 'Recovering between two exams, exactly what I needed.',
+  '22, tussen twee tentamens door even bijkomen, precies wat ik nodig had.': '22, recovering between two exams, exactly what I needed.',
+  'Snackbar dicht, telefoon uit, ik ben even niemands baas.': 'Snack bar closed, phone off, for once I am nobody\'s boss.',
+  'De strandtent hier kan nog wat leren van ons, maar de zonsondergang niet.': 'The beach bar here could learn a thing from us, but the sunset could not.',
+  'En vanavond koken we samen in de villa, jij snijdt.': 'And tonight we cook together in the villa, you chop.',
+  'Als schooldirectrice tel ik de dagen af tot de vakantie; deze is het waard.': 'As a head teacher I count down the days to the holiday; this one is worth it.',
+  'Vanuit Monaco groeten wij Gstaad. De boekhouding klopt, de ros\u00e9 ook.': 'From Monaco we greet Gstaad. The books add up, and so does the ros\u00e9.',
+  'Wij zitten in Dubai, andere warmte, dezelfde club. Tot in september.': 'We are in Dubai, different heat, same club. See you in September.',
+  'Als arts weet ik: rust is ook zorg. Deze zonsondergang is op doktersvoorschrift.': 'As a doctor I know: rest is care too. This sunset is on doctor\'s orders.',
+  'En als jullie advocaat zeg ik: de contracten kunnen wachten tot maandag.': 'And as your lawyer I say: the contracts can wait until Monday.',
+  'Twee kleine mannetjes thuis bij oma, ik hier even mama-af. Dank Summer.': 'Two little ones at home with grandma, me here off mum-duty for a moment. Thanks Summer.',
+  'Shoot afgezegd, vriendinnen gekozen. Beste besluit van het jaar.': 'Shoot cancelled, friends chosen. Best decision of the year.',
+  'Model zijn is 90% wachten; hier wacht ik met een cocktail.': 'Modelling is 90% waiting; here I wait with a cocktail.',
+  // menu, Sal de Mar
+  'Gazpacho de sandia': 'Gazpacho de sandia', 'Koude tomaten-watermeloensoep met basilicum.': 'Chilled tomato-watermelon soup with basil.',
+  'Pulpo a la brasa': 'Pulpo a la brasa', 'Gegrilde octopus, aardappelcreme, pimenton.': 'Grilled octopus, potato cream, pimenton.',
+  'Ibicenca lamsrack': 'Ibicenca lamb rack', 'Van het eiland, kruidenkorst, seizoensgroenten.': 'From the island, herb crust, seasonal vegetables.',
+  'Flao, Ibizaanse kaastaart': 'Flao, Ibizan cheesecake', 'Met munt en honing, huisrecept.': 'With mint and honey, house recipe.',
+  'Cava brut, per glas': 'Cava brut, by the glass', 'Huisselectie, koud geserveerd.': 'House selection, served cold.',
+  'Voorgerechten': 'Starters', 'Hoofdgerechten': 'Mains', 'Zoet': 'Sweet',
+  // menu, Sunset Ibiza
+  'Hierbas Sunset': 'Hierbas Sunset', 'Ibizaanse kruidenlikeur, citroen, bruisend.': 'Ibizan herb liqueur, lemon, sparkling.',
+  'Sangria blanca': 'Sangria blanca', 'Cava, perzik, munt.': 'Cava, peach, mint.',
+  'Virgin Colada (0%)': 'Virgin Colada (0%)', 'Kokos, ananas, geen alcohol.': 'Coconut, pineapple, no alcohol.',
+  'Patatas bravas': 'Patatas bravas', 'Met pittige saus en aioli.': 'With spicy sauce and aioli.',
+  'Signatuur': 'Signature', 'Alcoholvrij': 'Non-alcoholic', 'Hapjes': 'Bites', 'Dranken': 'Drinks',
   // partnerreizen
-  'Kyoto in herfstkleur': 'Kyoto in autumn colour', '8 dagen · oktober 2026': '8 days · October 2026',
-  'Hoshinoya aan de rivier, privé-theeceremonie in Gion en de esdoorns van Arashiyama vóór de drukte.':
-    'Hoshinoya by the river, a private tea ceremony in Gion and the maples of Arashiyama before the crowds.',
-  'Palácio-weekend Lissabon': 'Palácio weekend Lisbon', '4 dagen · doorlopend': '4 days · year-round',
-  'Een palácio voor de prijs van een gewoon hotel, hetzelfde adres waar onze leden over posten in De Salon.':
-    'A palácio for the price of an ordinary hotel, the same address our members post about in The Salon.',
-  'Riad & woestijn Marrakech': 'Riad & desert Marrakech', '5 dagen · doorlopend': '5 days · year-round',
-  'Een riad in de medina, hammam en een avond in de Agafay-woestijn, ingekocht zoals wij dat voor leden doen.':
-    'A riad in the medina, a hammam and an evening in the Agafay desert, bought the way we do for members.',
-  'Vlucht business class': 'Business class flight', 'Hoshinoya Kyoto, 4 nachten': 'Hoshinoya Kyoto, 4 nights',
-  'Ryokan Tawaraya, 3 nachten': 'Ryokan Tawaraya, 3 nights', 'Privétransfers & theeceremonie': 'Private transfers & tea ceremony',
-  'Vlucht & transfers': 'Flight & transfers', 'Palácio-suite, 3 nachten': 'Palácio suite, 3 nights',
-  'Ontbijt & late check-out': 'Breakfast & late check-out', 'Tafelreservering fado-avond': 'Table reservation, fado evening',
-  'Vlucht & privétransfers': 'Flight & private transfers', 'Riad, 4 nachten': 'Riad, 4 nights',
-  'Hammam & diner in de Agafay': 'Hammam & dinner in the Agafay', 'Gids door de souks': 'Guide through the souks',
+  'Ibiza, jetset-week': 'Ibiza, jetset week', '7 dagen \u00b7 zomer 2026': '7 days \u00b7 summer 2026',
+  'Vanaf Schiphol naar het eiland: deels hotel aan zee, deels een villa met eigen zwembad, boot naar Formentera en diners bij de beste adressen.':
+    'From Schiphol to the island: part seaside hotel, part villa with its own pool, a boat to Formentera and dinners at the finest addresses.',
+  'Gstaad, alpien weekend': 'Gstaad, alpine weekend', '4 dagen \u00b7 doorlopend': '4 days \u00b7 year-round',
+  'Een chalet met open haard, priv\u00e9lift de piste op en diners in de bergen, hetzelfde adres waar onze leden over posten in De Salon.':
+    'A chalet with an open fire, a private lift up the slopes and dinners in the mountains, the same address our members post about in The Salon.',
+  'Monaco, haven & glamour': 'Monaco, harbour & glamour',
+  'Suite met zicht op de jachthaven, een avond in het casino en een tafel langs het circuit, ingekocht zoals wij dat voor leden doen.':
+    'A suite overlooking the marina, an evening at the casino and a table along the circuit, bought the way we do for members.',
+  'Vlucht of priv\u00e9jet vanaf Schiphol': 'Flight or private jet from Schiphol', 'Aguamarina Ibiza, 3 nachten': 'Aguamarina Ibiza, 3 nights',
+  'Villa Bahia Ibiza, 4 nachten': 'Villa Bahia Ibiza, 4 nights', 'Priv\u00e9boot & transfers': 'Private boat & transfers',
+  'Vlucht & transfers': 'Flight & transfers', 'Chalet, 3 nachten': 'Chalet, 3 nights',
+  'Skipas & priv\u00e9lift': 'Ski pass & private lift', 'Diner in de bergen': 'Dinner in the mountains',
+  'Vlucht & priv\u00e9transfers': 'Flight & private transfers', 'Suite met havenzicht, 3 nachten': 'Suite with harbour view, 3 nights',
+  'Avond in het casino': 'Evening at the casino', 'Tafel langs het circuit': 'Table along the circuit',
   // locatielabels
-  'Arashiyama, Kyoto': 'Arashiyama, Kyoto', 'Higashiyama, Kyoto': 'Higashiyama, Kyoto',
-  'Pontocho-steeg, Kyoto': 'Pontocho alley, Kyoto', 'Kyoto Station': 'Kyoto Station',
+  'Santa Eularia, Ibiza': 'Santa Eularia, Ibiza', 'Marina Botafoch, Ibiza': 'Marina Botafoch, Ibiza',
+  'Cala Jondal, Ibiza': 'Cala Jondal, Ibiza', 'Sant Antoni, Ibiza': 'Sant Antoni, Ibiza',
+  'Aeroport dEivissa': 'Eivissa Airport', 'Dalt Vila, Ibiza': 'Dalt Vila, Ibiza', 'Ibiza-stad, haven': 'Ibiza town, harbour',
   'Schiphol Business Aviation': 'Schiphol Business Aviation', 'Live positie': 'Live position'
 };
 

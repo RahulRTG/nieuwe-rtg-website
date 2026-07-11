@@ -2725,8 +2725,10 @@
       const visual = p.photo
         ? '<div class="visual"><img src="' + p.photo + '" alt=""><span class="place">' + p.place + '</span></div>'
         : '<div class="visual ' + (p.visual || 'v-partner') + '"><span class="place">' + p.place + '</span></div>';
+      // partners posten zonder wachttijd: hun bericht staat er direct, met
+      // tijdstempel; de 7-dagen-privacyregel geldt alleen voor ledenposts
       const meta = p.partner
-        ? TIER_LABEL.partner + ' · ' + p.place
+        ? TIER_LABEL.partner + ' · ' + p.place + ' · ' + (p.at ? timeAgo(p.at) : T('app.salon.direct','direct geplaatst'))
         : TIER_LABEL[p.tier] + ' · ' + p.place + ' · ' + T('app.salon.7days','7 dagen na verblijf');
       // bedrijfslaag: volg-knop, exclusieve aanbieding en poll
       const volg = p.partnerCode
@@ -2921,7 +2923,7 @@ window.I18N = { en: {
   'sal.volgok':'You now follow', 'sal.ontvolgd':'Unfollowed.',
   'sal.deal':'Members only', 'sal.uwcode':'Your code', 'sal.toon':'show at the register',
   'sal.claim':'Claim this offer', 'sal.geclaimd':'times claimed', 'sal.claimok':'Claimed. Your code:',
-  'sal.poll':'Poll', 'sal.stemmen':'vote(s)',
+  'sal.poll':'Poll', 'sal.stemmen':'vote(s)', 'app.salon.direct':'posted instantly',
   'sal.dm.sub':'Member chat, on codenames', 'sal.dm.leeg':'No messages yet. Say hello.',
   'sal.share.h':'Share with a connection', 'sal.deel':'Share with a connection', 'sal.gedeeld':'Shared.',
   'sal.add':'Add', 'sal.zoek':'Search', 'sal.zoekph':'Search by codename, e.g. Golden Ibis',

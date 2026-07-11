@@ -501,7 +501,7 @@ function stateFor(sess, lang) {
     const sup = p.partnerCode ? findSupplier(p.partnerCode) : null;
     const claim = p.deal ? (p.deal.claims || []).find(c => c.key === sess.key) : null;
     return {
-      id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual,
+      id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual, at: p.at || null,
       photo: p.photo || null, partner: !!p.partner,
       text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
       likes: p.baseLikes + Object.keys(p.likedBy).length,
@@ -1569,6 +1569,7 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo,
     text, lang: req.body.lang === 'en' ? 'en' : 'nl',
+    at: new Date().toISOString(),
     baseLikes: 0, likedBy: {}, comments: []
   };
   db.data.posts.unshift(post);
@@ -1617,7 +1618,7 @@ app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo: null,
-    text, lang: 'nl', baseLikes: 0, likedBy: {}, comments: [],
+    text, lang: 'nl', at: new Date().toISOString(), baseLikes: 0, likedBy: {}, comments: [],
     deal: { titel, geldigTot, claims: [] }
   };
   db.data.posts.unshift(post);
@@ -1674,7 +1675,7 @@ app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo: null,
-    text: vraag, lang: 'nl', baseLikes: 0, likedBy: {}, comments: [],
+    text: vraag, lang: 'nl', at: new Date().toISOString(), baseLikes: 0, likedBy: {}, comments: [],
     poll: { vraag, opties: opties.map(t2 => ({ tekst: t2, stemmen: [] })) }
   };
   db.data.posts.unshift(post);

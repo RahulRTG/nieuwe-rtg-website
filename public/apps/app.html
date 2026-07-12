@@ -863,6 +863,7 @@
         <h2>Je gezinsruimte.</h2>
         <p class="sub" id="gezinSub">De RTFoundation-gezinnen die je als oppas of familie volgt.</p>
         <div class="card" id="gezinFamilies"></div>
+        <div id="gezinInfo"></div>
         <div class="card" id="gezinFeed"></div>
       </div>
 
@@ -2449,7 +2450,41 @@
     const rb=$('#rtfReplyBtn'); if(rb) rb.addEventListener('click', rtfReply);
     const ri=$('#rtfReplyIn'); if(ri) ri.addEventListener('keydown', e=>{ if(e.key==='Enter') rtfReply(); });
     if (m.filter(x=>!x.gelezen).length) API.call('/rtf/meldingen/gelezen').catch(()=>{});
+    if (g.length) laadGezinInfo();
   }
+  const telHref = t => 'tel:' + String(t||'').replace(/[^0-9+]/g,'');
+  function geleden(iso){ const s=Math.floor((Date.now()-new Date(iso).getTime())/1000); if(s<60)return 'net nu'; if(s<3600)return Math.floor(s/60)+' min geleden'; if(s<86400)return Math.floor(s/3600)+' uur geleden'; return Math.floor(s/86400)+' dag(en) geleden'; }
+  function datumKort(d){ try{ const dt=new Date(d+'T00:00:00'); const vd=new Date(); vd.setHours(0,0,0,0); const mo=new Date(vd); mo.setDate(mo.getDate()+1); if(dt.getTime()===vd.getTime())return 'Vandaag'; if(dt.getTime()===mo.getTime())return 'Morgen'; return dt.toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }
+  async function laadGezinInfo(){
+    const box = $('#gezinInfo'); if(!box) return;
+    let d; try{ d = await API.call('/rtf/overzicht'); }catch(e){ box.innerHTML=''; return; }
+    box.innerHTML = (d.gezinnen||[]).map(gz=>{
+      const o = gz.oppasinfo||{};
+      const meerdan1 = (d.gezinnen||[]).length>1;
+      let h = '';
+      if (meerdan1) h += '<div class="label" style="margin:.4rem 0 .2rem;color:var(--burgundy);">'+esc(gz.gezinNaam)+'</div>';
+      // Belangrijke info
+      h += '<div class="card"><div class="label">📋 Belangrijke info</div>';
+      h += (o.noodcontacten&&o.noodcontacten.length)
+        ? '<div style="margin:.2rem 0 .6rem;">'+o.noodcontacten.map(c=>'<a href="'+telHref(c.telefoon)+'" style="display:flex;align-items:center;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--txt);"><span>📞</span><b style="flex:1;">'+esc(c.naam||'Contact')+(c.wie?' <span class="meta">· '+esc(c.wie)+'</span>':'')+'</b><span style="color:var(--gold);">'+esc(c.telefoon)+'</span></a>').join('')+'</div>'
+        : '';
+      h += infoRij('💊 Allergieën en medisch', o.allergie);
+      h += infoRij('🍽️ Eten en bedtijden', o.eten);
+      h += infoRij('🏠 Huisregels', o.huisregels);
+      if (!(o.noodcontacten&&o.noodcontacten.length) && !o.allergie && !o.eten && !o.huisregels) h += '<div class="meta">Het gezin heeft nog geen info ingevuld.</div>';
+      h += '<div class="meta" style="margin-top:.6rem;">Bij nood: bel 112.</div></div>';
+      // Agenda
+      const ag = (gz.agenda||[]).filter(a=>!a.voorbij).slice(0,8);
+      h += '<div class="card"><div class="label">📅 Agenda</div>'+
+        (ag.length ? ag.map(a=>'<div style="display:flex;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);white-space:nowrap;">'+(a.tijd||datumKort(a.datum))+'</b><span style="flex:1;">'+esc(a.titel)+(a.wieNaam?' <span class="meta">· '+esc(a.wieNaam)+'</span>':'')+'<div class="meta">'+datumKort(a.datum)+'</div></span></div>').join('') : '<div class="meta">Niets gepland.</div>')+'</div>';
+      // Waar is iedereen
+      const loc = (gz.locaties||[]);
+      h += '<div class="card"><div class="label">📍 Waar is iedereen</div>'+
+        (loc.length ? loc.map(l=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);"><span style="width:1.8rem;height:1.8rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;">'+(l.avatar||'🙂')+'</span><div style="flex:1;"><b>'+esc(l.naam)+'</b><div class="meta">'+esc(l.status)+' · '+geleden(l.at)+'</div></div>'+(l.lat!=null?'<a href="https://www.google.com/maps?q='+l.lat+','+l.lon+'" target="_blank" rel="noopener" style="color:var(--gold);white-space:nowrap;">Kaart →</a>':'')+'</div>').join('') : '<div class="meta">Niemand deelt nu iets.</div>')+'</div>';
+      return h;
+    }).join('');
+  }
+  function infoRij(titel, tekst){ return tekst ? '<div style="margin-top:.5rem;"><div class="meta" style="font-weight:600;color:var(--txt);">'+esc(titel)+'</div><div style="white-space:pre-wrap;line-height:1.4;font-size:.92rem;">'+esc(tekst)+'</div></div>' : ''; }
   async function rtfReply(){
     const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
     const g=(rtf.gekoppeld||[]); if(!g.length) return;

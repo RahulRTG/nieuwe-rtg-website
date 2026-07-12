@@ -843,6 +843,20 @@ function gekoppeldeGezinnen(userId) {
   }
   return uit;
 }
+// alles wat een gekoppelde oppas/familie mag lezen, klaar voor de RTG-app:
+// de belangrijke info (allergieen, eten, huisregels, noodnummers), de agenda,
+// en waar iedereen is. Precies de gast-functies van de RTFoundation-app.
+function gastOverzicht(userId) {
+  const uit = [];
+  for (const g of Object.values(G())) {
+    const p = Object.values(g.profielen).find(x => x.koppel && x.koppel.userId === userId);
+    if (!p) continue;
+    const locaties = Object.values(g.locaties || {}).filter(l => g.profielen[l.pid])
+      .sort((a, b) => (b.at || '').localeCompare(a.at || '')).map(l => locatiePubliek(l, p.id));
+    uit.push({ code: g.code, gezinNaam: g.naam, profielNaam: p.naam, oppasinfo: oppasinfoPubliek(g), agenda: agendaPubliek(g), locaties });
+  }
+  return uit;
+}
 // de RTG-server hangt hier zijn web-push in, zodat een melding ook op de
 // telefoon van de gekoppelde oppas/familie binnenkomt (ook als de app dicht is)
 let pushHook = null;
@@ -903,13 +917,15 @@ router.post('/gezin/agenda/verwijder', (req, res) => {
   s.g.agenda = (s.g.agenda || []).filter(a => a.id !== req.body.itemId); save();
   res.json({ ok: true });
 });
+function agendaPubliek(g) {
+  const vandaag = new Date().toISOString().slice(0, 10);
+  return (g.agenda || [])
+    .map(a => ({ id: a.id, titel: a.titel, datum: a.datum, tijd: a.tijd, wie: a.wie, wieNaam: a.wie && g.profielen[a.wie] ? g.profielen[a.wie].naam : '', voorbij: a.datum < vandaag, vandaag: a.datum === vandaag }))
+    .sort((a, b) => (a.datum + (a.tijd || '99:99')).localeCompare(b.datum + (b.tijd || '99:99')));
+}
 router.get('/gezin/:code/agenda', (req, res) => {
   const s = sessieVan(req, res); if (!s) return;
-  const vandaag = new Date().toISOString().slice(0, 10);
-  const items = (s.g.agenda || [])
-    .map(a => ({ id: a.id, titel: a.titel, datum: a.datum, tijd: a.tijd, wie: a.wie, wieNaam: a.wie && s.g.profielen[a.wie] ? s.g.profielen[a.wie].naam : '', voorbij: a.datum < vandaag, vandaag: a.datum === vandaag }))
-    .sort((a, b) => (a.datum + (a.tijd || '99:99')).localeCompare(b.datum + (b.tijd || '99:99')));
-  res.json({ agenda: items, magBewerken: !isGast(s.p) });
+  res.json({ agenda: agendaPubliek(s.g), magBewerken: !isGast(s.p) });
 });
 
 /* klusjes en sterren: kinderen verdienen sterren met klusjes. Een ouder zet ze
@@ -968,4 +984,4 @@ router.get('/gezin/:code/klussen', (req, res) => {
 
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, setPushHook, berichtVanGast };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, setPushHook, berichtVanGast };

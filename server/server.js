@@ -921,6 +921,12 @@ app.post('/api/rtf/meldingen/gelezen', auth, (req, res) => {
   accounts.saveMemberState(req.session.account.id, md);
   res.json({ ok: true });
 });
+// alle gast-gegevens (belangrijke info, agenda, waar iedereen is) van de
+// gezinnen waaraan dit lid gekoppeld is, om in de RTG-app te lezen
+app.post('/api/rtf/overzicht', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  res.json({ gezinnen: rtf.gastOverzicht(req.session.account.id) });
+});
 // terugberichten naar het gezin (bijv. de oppas antwoordt op een oproep)
 app.post('/api/rtf/bericht', auth, (req, res) => {
   if (!eisAccount(req, res)) return;

@@ -345,6 +345,19 @@ test('oppas met RTG-pas: koppelt zijn gastprofiel en krijgt de gezinsmeldingen i
   const ber = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/berichten?token=' + g.token));
   assert.ok(ber.berichten.some(b => b.vanNaam === 'Opa' && /pas graag op/.test(b.tekst)), 'het antwoord staat in de gezinsberichten');
 
+  // de ouder vult de belangrijke info en agenda in en deelt een locatie
+  await api('/gezin/oppasinfo', { code: g.code, token: g.token, allergie: 'Pinda-allergie bij Sanne', eten: 'Bed om 19:30', huisregels: 'Schoenen uit' });
+  await api('/gezin/agenda', { code: g.code, token: g.token, titel: 'Zwemles', datum: '2026-09-01', tijd: '16:00' });
+  await api('/gezin/locatie', { code: g.code, token: g.token, status: 'op school', lat: 52.1, lon: 5.1 });
+  // opa leest alles (allergenen, agenda, waar iedereen is) in de RTG-app
+  const ov = await json(await rtgCall('/rtf/overzicht', {}));
+  const gz = (ov.gezinnen || []).find(x => x.gezinNaam === 'Fam Steun');
+  assert.ok(gz, 'het gekoppelde gezin staat in het overzicht');
+  assert.match(gz.oppasinfo.allergie, /Pinda/);
+  assert.match(gz.oppasinfo.huisregels, /Schoenen/);
+  assert.ok(gz.agenda.some(a => a.titel === 'Zwemles'), 'de agenda is zichtbaar');
+  assert.ok(gz.locaties.some(l => l.status === 'op school' && l.lat === 52.1), 'de locatie is zichtbaar');
+
   // ontkoppelen kan, daarna geen nieuwe meldingen meer
   assert.equal((await rtgCall('/rtf/ontkoppel', { code: g.code, profielId: gast.profiel.id })).status, 200);
   const st2 = await json(await rtgCall('/state', {}));

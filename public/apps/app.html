@@ -1042,6 +1042,7 @@
 </div>
 
 <script src="/shared/realtime.js"></script>
+<script src="/apps/geo.js"></script>
 <script src="/apps/foundation/gezin-rt.js"></script>
 <script>
 (function(){
@@ -1761,12 +1762,16 @@
       if (cb) cb.addEventListener('click', () => showGlow(o));
     });
 
-    // partners
-    $('#supplierList').innerHTML = '<div class="sec-label">'+T('app.tp.partnersdest','Partners op uw bestemming')+'</div>' + suppliers.map(s => {
+    // partners: op afstand tonen en sorteren wanneer we de locatie weten
+    const mijnPlek = window.Geo ? Geo.laatste() : null;
+    const supRij = suppliers.map(s => ({ s, km: mijnPlek && s.loc ? Geo.afstandKm(mijnPlek, s.loc) : null }));
+    if (mijnPlek) supRij.sort((a,b) => (a.km==null?1e9:a.km) - (b.km==null?1e9:b.km));
+    $('#supplierList').innerHTML = '<div class="sec-label">'+T('app.tp.partnersdest','Partners op uw bestemming')+'</div>' + supRij.map(({s, km}) => {
       const rooms = (s.rooms || []).length, photos = (s.photos || []).length;
       const zzp = (s.services || []).length > 0;
       const viewable = s.hasMenu || rooms || photos;
-      const sub = (s.vak ? s.vak : tType(s.typeLabel)) + ' · ' + s.city + (rooms ? ' · ' + rooms + ' ' + T('app.roomsfree','kamer(s) vrij') : '');
+      const afst = km!=null ? ' · 📍 ' + Geo.tekst(km) : '';
+      const sub = (s.vak ? s.vak : tType(s.typeLabel)) + ' · ' + s.city + (rooms ? ' · ' + rooms + ' ' + T('app.roomsfree','kamer(s) vrij') : '') + afst;
       return '<div class="sup-card">' +
         '<span class="ic">' + (s.icon || '📍') + '</span>' +
         '<div class="t"><b>' + s.name + '</b><span>' + sub + '</span></div>' +
@@ -1781,6 +1786,8 @@
     $('#supplierList').querySelectorAll('[data-chat]').forEach(b => b.addEventListener('click', () => openPChat(b.dataset.chat)));
     $('#supplierList').querySelectorAll('[data-menu]').forEach(b => b.addEventListener('click', () => openMenu(b.dataset.menu)));
     $('#supplierList').querySelectorAll('[data-boek]').forEach(b => b.addEventListener('click', () => openBoekSheet(b.dataset.boek)));
+    // eenmalig de locatie ophalen zodat partners op afstand worden getoond en gesorteerd
+    if (window.Geo && !mijnPlek && !renderTerPlaatse._gps){ renderTerPlaatse._gps = true; Geo.positie().then(p => { if (p) renderTerPlaatse(); }); }
     renderAfspraken();
   }
 

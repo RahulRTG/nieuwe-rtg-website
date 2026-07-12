@@ -47,6 +47,7 @@
     <div class="balkje">
       <label for="lft">Jouw leeftijd</label>
       <input class="veld" id="lft" type="number" inputmode="numeric" min="16" max="99" value="16">
+      <button class="knop grijs klein" id="gpsBtn" type="button" style="padding:.4rem .7rem;">📍 Toon afstand</button>
       <span id="cvStatus" class="cvstatus"></span>
     </div>
     <div class="lijst" id="lijst"><div class="leeg">Vacatures laden...</div></div>
@@ -54,6 +55,7 @@
 </div>
 
 <script src="sessie.js"></script>
+<script src="/apps/geo.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) {}
@@ -106,6 +108,7 @@ function toonCvStatus(){
 }
 
 let vacatures = [];
+let mijnPlek = Geo.laatste(); // {lat,lng} of null
 async function laad(){
   const lft = Math.max(16, parseInt($('#lft').value,10) || 16);
   try {
@@ -118,9 +121,13 @@ async function laad(){
 function teken(){
   const verz = verzonden();
   if (!vacatures.length){ $('#lijst').innerHTML = '<div class="leeg">Er staan nu geen vacatures open die bij jouw leeftijd passen. Kijk gerust later nog eens; partners plaatsen doorlopend nieuwe kansen.</div>'; return; }
-  $('#lijst').innerHTML = vacatures.map(v=>{
+  // afstand berekenen en op afstand sorteren wanneer we de locatie weten
+  const rij = vacatures.map(v => ({ v, km: mijnPlek && v.loc ? Geo.afstandKm(mijnPlek, v.loc) : null }));
+  if (mijnPlek) rij.sort((a,b) => (a.km==null?1e9:a.km) - (b.km==null?1e9:b.km));
+  $('#lijst').innerHTML = rij.map(({v, km})=>{
     const al = verz.includes(v.id);
-    const meta = [ SOORT[v.soort]||v.soort, 'vanaf '+v.minLeeftijd+' jaar', v.plaats, v.uren ].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('');
+    const afst = km!=null ? '📍 '+Geo.tekst(km)+' van jou' : '';
+    const meta = [ SOORT[v.soort]||v.soort, 'vanaf '+v.minLeeftijd+' jaar', v.plaats||v.stad, v.uren, afst ].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('');
     return '<div class="kaart vac">'+
       '<div class="kop"><span class="ic">'+esc(v.icon||'🏢')+'</span><div><h2>'+esc(v.func)+'</h2><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div><div class="meta">'+meta+'</div></div></div>'+
       (v.omschrijving?'<div class="oms">'+esc(v.omschrijving)+'</div>':'<div class="oms" style="opacity:.7;">Solliciteer met je cv; het bedrijf neemt daarna contact met je op.</div>')+
@@ -169,6 +176,16 @@ Sessie.ophalen().then(d=>{
   toonCvStatus();
   $('#lft').addEventListener('change', laad);
   $('#lft').addEventListener('input', ()=>{ clearTimeout(window._lt); window._lt = setTimeout(laad, 500); });
+  // afstand tonen: eerder gegeven toestemming meteen gebruiken, anders op de knop
+  async function vraagGps(){
+    const btn = $('#gpsBtn'); const oud = btn.textContent; btn.textContent = 'Locatie zoeken...'; btn.disabled = true;
+    const p = await Geo.positie();
+    btn.disabled = false;
+    if (p){ mijnPlek = p; btn.textContent = '📍 Dichtstbij eerst'; teken(); }
+    else { btn.textContent = oud; alert('We konden je locatie niet ophalen. Zet locatie aan in je browser om de afstand te zien.'); }
+  }
+  $('#gpsBtn').addEventListener('click', vraagGps);
+  if (Geo.heeft()){ Geo.positie().then(p=>{ if(p){ mijnPlek = p; $('#gpsBtn').textContent = '📍 Dichtstbij eerst'; teken(); } }); }
   laad();
 });
 

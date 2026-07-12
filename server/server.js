@@ -2367,7 +2367,10 @@ function openVacatures(minLeeftijd) {
         id: v.id, supplierCode: code, bedrijf: s.name, soort: v.soort,
         type: s.type || null, typeLabel: t.label || null, icon: t.icon || '🏢',
         func: v.func, omschrijving: v.omschrijving, plaats: v.plaats, uren: v.uren,
-        minLeeftijd: v.minLeeftijd, at: v.at
+        minLeeftijd: v.minLeeftijd, at: v.at,
+        // locatie van het bedrijf, zodat de app de afstand kan tonen
+        loc: s.loc ? { lat: s.loc.lat, lng: s.loc.lng, label: s.loc.label } : null,
+        stad: s.city || null
       });
     }
   }

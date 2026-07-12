@@ -667,6 +667,34 @@ router.get('/gezin/:code/locaties', (req, res) => {
   res.json({ locaties: alle, ikDeel: !!(s.g.locaties && s.g.locaties[s.p.id]) });
 });
 
+/* belangrijke gezinsinfo voor de oppas: noodnummers, allergieen, bedtijden en
+   huisregels. Iedereen in het gezin (ook een gast) mag dit lezen; alleen een
+   ouder of de beheerder mag het aanpassen. */
+function oppasinfoPubliek(g) {
+  const o = g.oppasinfo || {};
+  return { noodcontacten: o.noodcontacten || [], allergie: o.allergie || '', eten: o.eten || '', huisregels: o.huisregels || '', updatedAt: o.updatedAt || null, updatedBy: o.updatedBy || '' };
+}
+router.get('/gezin/:code/oppasinfo', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  res.json({ oppasinfo: oppasinfoPubliek(s.g), magBewerken: ['beheerder', 'ouder'].includes(s.p.rol) });
+});
+router.post('/gezin/oppasinfo', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  if (!['beheerder', 'ouder'].includes(s.p.rol)) return res.status(403).json({ error: 'Alleen een ouder of de beheerder kan de gezinsinfo aanpassen.' });
+  const noodcontacten = (Array.isArray(req.body.noodcontacten) ? req.body.noodcontacten : []).slice(0, 12)
+    .map(c => ({ naam: schoon(c && c.naam, 40), telefoon: schoon(c && c.telefoon, 30), wie: schoon(c && c.wie, 40) }))
+    .filter(c => c.naam || c.telefoon);
+  s.g.oppasinfo = {
+    noodcontacten,
+    allergie: schoon(req.body.allergie, 1500),
+    eten: schoon(req.body.eten, 1500),
+    huisregels: schoon(req.body.huisregels, 1500),
+    updatedAt: nu(), updatedBy: s.p.naam
+  };
+  save();
+  res.json({ ok: true, oppasinfo: oppasinfoPubliek(s.g) });
+});
+
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
 module.exports = { router };

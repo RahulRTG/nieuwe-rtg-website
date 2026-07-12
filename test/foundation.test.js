@@ -243,6 +243,19 @@ test('gastrol: een oppas/familielid mag meehelpen maar niet bij de privezaken', 
   const lid = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Broer', rol: 'gezinslid' }));
   const lt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: lid.profiel.id }))).token;
   assert.equal((await api('/gezin/spaardoel/maak', { code: g.code, token: lt, naam: 'fiets', doel: 50 })).status, 200);
+
+  // belangrijke gezinsinfo: de ouder vult in, de gast (oppas) mag het lezen maar niet wijzigen
+  assert.equal((await api('/gezin/oppasinfo', { code: g.code, token: gt, allergie: 'stiekem' })).status, 403);
+  const bewaard = await api('/gezin/oppasinfo', { code: g.code, token: g.token,
+    noodcontacten: [{ naam: 'Mam', wie: 'Moeder', telefoon: '06 12 34 56 78' }, { naam: '', telefoon: '' }],
+    allergie: 'Sanne is allergisch voor pinda\'s', eten: 'Bed om 19:30', huisregels: 'Schoenen uit' });
+  assert.equal(bewaard.status, 200);
+  // de gast leest het overzicht: lege contacten zijn eruit gefilterd
+  const gezien = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/oppasinfo?token=' + gt));
+  assert.equal(gezien.oppasinfo.noodcontacten.length, 1);
+  assert.equal(gezien.oppasinfo.noodcontacten[0].naam, 'Mam');
+  assert.match(gezien.oppasinfo.allergie, /pinda/);
+  assert.equal(gezien.magBewerken, false, 'een gast mag niet bewerken');
 });
 
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {

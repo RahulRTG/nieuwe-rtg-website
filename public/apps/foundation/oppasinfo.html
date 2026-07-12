@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Belangrijke info</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .bijgewerkt{font-size:.78rem;color:var(--zacht);margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;}
+  .tekstblok{line-height:1.55;white-space:pre-wrap;}
+  .nood112{background:#1a1512;border:1px solid var(--rood);border-radius:12px;padding:.9rem 1.1rem;line-height:1.5;font-size:.95rem;margin-bottom:1rem;}
+  .nood112 b{color:#e9a;}
+  .contact{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:.5rem;text-decoration:none;color:var(--txt);}
+  .contact .ic{font-size:1.3rem;}
+  .contact .nm{font-weight:600;}
+  .contact .wie{font-size:.8rem;color:var(--zacht);}
+  .contact .tel{margin-left:auto;color:var(--goud);font-weight:600;white-space:nowrap;}
+  /* bewerken */
+  .veld{width:100%;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;color:var(--txt);outline:none;margin-bottom:.6rem;}
+  .veld:focus{border-color:var(--goud);}
+  .crij{display:flex;gap:.5rem;margin-bottom:.5rem;}
+  .crij input{flex:1;margin-bottom:0;}
+  .crij .del{background:#2a221d;color:var(--zacht);border-radius:10px;padding:0 .7rem;font-size:1.1rem;}
+  .knoprij{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem;}
+  .ok{color:var(--groen);font-size:.88rem;min-height:1.1rem;margin-top:.5rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  #bewerk{display:none;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>📋 Belangrijke info</h1>
+  <div class="intro" id="intro">Alles wat een oppas, opa/oma of familielid moet weten om goed voor de kinderen te zorgen.</div>
+  <div class="bijgewerkt" id="bijgewerkt"></div>
+
+  <!-- LEZEN -->
+  <div id="lezen">
+    <div class="nood112"><b>Bij nood of gevaar: bel 112.</b> Twijfel je? Bel gerust een van de contacten hieronder.</div>
+
+    <div class="kaart blok">
+      <h2>📞 Noodnummers</h2>
+      <div id="contacten"><div class="leeg">Nog geen nummers ingevuld.</div></div>
+    </div>
+    <div class="kaart blok">
+      <h2>💊 Allergieën en medisch</h2>
+      <div class="tekstblok" id="vAllergie"><span class="leeg">Nog niets ingevuld.</span></div>
+    </div>
+    <div class="kaart blok">
+      <h2>🍽️ Eten en bedtijden</h2>
+      <div class="tekstblok" id="vEten"><span class="leeg">Nog niets ingevuld.</span></div>
+    </div>
+    <div class="kaart blok">
+      <h2>🏠 Huisregels en bijzonderheden</h2>
+      <div class="tekstblok" id="vHuisregels"><span class="leeg">Nog niets ingevuld.</span></div>
+    </div>
+    <div class="knoprij"><button class="knop" id="naarBewerk" hidden>Info aanpassen</button></div>
+  </div>
+
+  <!-- BEWERKEN (alleen ouder/beheerder) -->
+  <div id="bewerk">
+    <div class="kaart blok">
+      <h2>📞 Noodnummers</h2>
+      <div id="contactVelden"></div>
+      <button class="knop grijs klein" id="contactPlus">+ Nummer toevoegen</button>
+    </div>
+    <div class="kaart blok">
+      <h2>💊 Allergieën en medisch</h2>
+      <textarea class="veld" id="eAllergie" rows="3" placeholder="Bijv. Sanne is allergisch voor pinda's. Noodmedicatie ligt in de keukenla." maxlength="1500"></textarea>
+    </div>
+    <div class="kaart blok">
+      <h2>🍽️ Eten en bedtijden</h2>
+      <textarea class="veld" id="eEten" rows="3" placeholder="Bijv. Avondeten om 18:00. Tim naar bed om 19:30 met een verhaaltje, Sanne om 20:30." maxlength="1500"></textarea>
+    </div>
+    <div class="kaart blok">
+      <h2>🏠 Huisregels en bijzonderheden</h2>
+      <textarea class="veld" id="eHuisregels" rows="3" placeholder="Bijv. Schoenen uit in huis. Max half uur schermtijd. De hond mag niet naar buiten." maxlength="1500"></textarea>
+    </div>
+    <div class="ok" id="ok"></div>
+    <div class="fout" id="fout"></div>
+    <div class="knoprij"><button class="knop" id="bewaar">Opslaan</button><button class="knop grijs" id="annuleer">Annuleren</button></div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+const telHref = t => 'tel:' + String(t||'').replace(/[^0-9+]/g,'');
+let magBewerken = false, huidig = { noodcontacten:[], allergie:'', eten:'', huisregels:'' };
+
+async function laad(){
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/oppasinfo?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    huidig = d.oppasinfo; magBewerken = d.magBewerken;
+    render();
+  }catch(e){ $('#intro').textContent = 'Kon de info niet laden.'; }
+}
+function render(){
+  const o = huidig;
+  // contacten
+  $('#contacten').innerHTML = (o.noodcontacten && o.noodcontacten.length)
+    ? o.noodcontacten.map(c=> '<a class="contact" href="'+telHref(c.telefoon)+'"><span class="ic">📞</span><span><span class="nm">'+esc(c.naam||'Contact')+'</span>'+(c.wie?'<span class="wie"> · '+esc(c.wie)+'</span>':'')+'</span><span class="tel">'+esc(c.telefoon)+'</span></a>').join('')
+    : '<div class="leeg">Nog geen nummers ingevuld.</div>';
+  vul('#vAllergie', o.allergie); vul('#vEten', o.eten); vul('#vHuisregels', o.huisregels);
+  $('#bijgewerkt').textContent = o.updatedAt ? ('Laatst bijgewerkt door '+esc(o.updatedBy||'het gezin')+' op '+new Date(o.updatedAt).toLocaleDateString('nl-NL')) : '';
+  $('#naarBewerk').hidden = !magBewerken;
+  if (!magBewerken) $('#intro').textContent = 'Alles wat je moet weten om goed voor de kinderen te zorgen. Deze info is door het gezin ingevuld.';
+}
+function vul(sel, tekst){ const el=$(sel); if(tekst){ el.textContent = tekst; } else { el.innerHTML = '<span class="leeg">Nog niets ingevuld.</span>'; } }
+
+// bewerken
+function contactRij(c){
+  c = c || { naam:'', telefoon:'', wie:'' };
+  const div = document.createElement('div'); div.className='crij';
+  div.innerHTML = '<input class="veld" data-k="naam" placeholder="Naam" maxlength="40" value="'+esc(c.naam)+'">'+
+    '<input class="veld" data-k="wie" placeholder="Wie (bijv. Mama)" maxlength="40" value="'+esc(c.wie)+'">'+
+    '<input class="veld" data-k="telefoon" placeholder="Telefoon" inputmode="tel" maxlength="30" value="'+esc(c.telefoon)+'">'+
+    '<button class="del" title="Weghalen">×</button>';
+  div.querySelector('.del').onclick = ()=> div.remove();
+  return div;
+}
+function vulBewerk(){
+  const box = $('#contactVelden'); box.innerHTML='';
+  (huidig.noodcontacten && huidig.noodcontacten.length ? huidig.noodcontacten : [{}]).forEach(c=> box.appendChild(contactRij(c)));
+  $('#eAllergie').value = huidig.allergie||''; $('#eEten').value = huidig.eten||''; $('#eHuisregels').value = huidig.huisregels||'';
+  $('#ok').textContent=''; $('#fout').textContent='';
+}
+$('#naarBewerk').onclick = ()=>{ vulBewerk(); $('#lezen').style.display='none'; $('#bewerk').style.display='block'; };
+$('#annuleer').onclick = ()=>{ $('#bewerk').style.display='none'; $('#lezen').style.display='block'; };
+$('#contactPlus').onclick = ()=> $('#contactVelden').appendChild(contactRij());
+$('#bewaar').onclick = async ()=>{
+  $('#fout').textContent=''; $('#ok').textContent='';
+  const noodcontacten = [...$('#contactVelden').children].map(rij=>{
+    const g={}; rij.querySelectorAll('[data-k]').forEach(i=> g[i.dataset.k]=i.value); return g;
+  });
+  try{
+    const d = await api('/gezin/oppasinfo', { code:s.code, token:s.token, noodcontacten, allergie:$('#eAllergie').value, eten:$('#eEten').value, huisregels:$('#eHuisregels').value });
+    huidig = d.oppasinfo; render();
+    $('#bewerk').style.display='none'; $('#lezen').style.display='block';
+  }catch(e){ $('#fout').textContent = e.message; }
+};
+
+laad();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

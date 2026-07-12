@@ -136,6 +136,20 @@ test('beveiliging: mislukte tech-login wordt gemeld; een kritieke melding komt i
   assert.ok(!(office2.state.alerts || []).some(a => a.kind === 'beveiliging'));
 });
 
+test('noodrem: staat standaard aan; alleen de eigenaar schakelt hem', async () => {
+  let st = await (await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })).json();
+  assert.equal(st.beveiliging.autoReactie, true, 'de noodrem staat standaard aan');
+  // zonder token: geen toegang tot de schakelaar
+  assert.equal((await post('/api/techniek/beveiliging/auto', { aan: false })).status, 401);
+  // de eigenaar zet hem uit en weer aan
+  const uit = await (await post('/api/techniek/beveiliging/auto', { aan: false }, techToken)).json();
+  assert.equal(uit.autoReactie, false);
+  st = await (await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })).json();
+  assert.equal(st.beveiliging.autoReactie, false);
+  const aan = await (await post('/api/techniek/beveiliging/auto', { aan: true }, techToken)).json();
+  assert.equal(aan.autoReactie, true);
+});
+
 test('alleen de eigenaar besluit; techniek blijft altijd bereikbaar', async () => {
   // zonder token: geen aanvraag kunnen doen
   assert.equal((await post('/api/techniek/functie', { id: 'betalen', aan: false })).status, 401);

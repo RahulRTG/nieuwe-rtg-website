@@ -73,3 +73,45 @@ test('beveiliging: één melding gericht afhandelen laat de rest open', () => {
   assert.equal(bev.handelAf(a.id), 1);
   assert.equal(bev.openTotaal(), 1);
 });
+
+/* ---------- de automatische noodrem ---------- */
+const zekering = (db, id) => (db.data.techniek.zekeringen || {})[id] || { aan: true };
+
+test('noodrem: brute force vanaf 3 bronnen laat de registratie-zekering springen', () => {
+  const { db, bev } = opzet();
+  bev.meld('brute-force', 'kritiek', 'a', { bron: 'ip1' });
+  bev.meld('brute-force', 'kritiek', 'b', { bron: 'ip2' });
+  assert.notEqual(zekering(db, 'registratie').aan, false, 'onder de drempel gebeurt er niets');
+  bev.meld('brute-force', 'kritiek', 'c', { bron: 'ip3' });
+  assert.equal(zekering(db, 'registratie').aan, false, 'derde bron: registratie eraf');
+  assert.match(zekering(db, 'registratie').reden, /noodrem/);
+  assert.notEqual(zekering(db, 'onderhoud').aan, false, 'de onderhoudsstand blijft nog aan');
+  // en er staat een eigen kritieke melding over de ingreep op het bord
+  assert.ok(bev.samenvatting().recent.some(m => m.type === 'auto-reactie'));
+});
+
+test('noodrem: vanaf 6 bronnen gaat ook de onderhouds-zekering eruit', () => {
+  const { db, bev } = opzet();
+  for (let i = 1; i <= 6; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip' + i });
+  assert.equal(zekering(db, 'registratie').aan, false);
+  assert.equal(zekering(db, 'onderhoud').aan, false, 'brede aanval: hele app op slot');
+});
+
+test('noodrem: uitgezet door de eigenaar -> er springt niets', () => {
+  const { db, bev } = opzet();
+  bev.zetAuto(false);
+  for (let i = 1; i <= 6; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip' + i });
+  assert.notEqual(zekering(db, 'registratie').aan, false);
+  assert.notEqual(zekering(db, 'onderhoud').aan, false);
+  assert.equal(bev.autoAan(), false);
+  bev.zetAuto(true);
+  assert.equal(bev.autoAan(), true);
+});
+
+test('noodrem: springt niet dubbel en de melding erover escaleert naar de eigenaar', () => {
+  const { bev, meldingen } = opzet();
+  for (let i = 1; i <= 4; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip' + i });
+  const ingrepen = bev.samenvatting().recent.filter(m => m.type === 'auto-reactie');
+  assert.equal(ingrepen.length, 1, 'de registratie-zekering springt maar één keer');
+  assert.ok(meldingen.some(n => /noodrem/i.test(n.body)), 'de eigenaar hoort van de ingreep');
+});

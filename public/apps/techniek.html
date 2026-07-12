@@ -99,9 +99,12 @@
     <div id="tabStatus" role="tabpanel" aria-labelledby="tabBtnStatus">
       <div class="telrij" id="tellers"></div>
       <div id="beveiligBlok" hidden>
-        <div class="sec" style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="sec" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
           <span>Beveiliging &amp; inbraakdetectie</span>
-          <button class="knop grijs klein" id="bBevAf" hidden>Alles gezien</button>
+          <span style="display:flex;gap:.4rem;">
+            <button class="knop grijs klein" id="bBevAuto" hidden>Noodrem</button>
+            <button class="knop grijs klein" id="bBevAf" hidden>Alles gezien</button>
+          </span>
         </div>
         <div class="kaart" id="beveiliging"></div>
       </div>
@@ -327,6 +330,13 @@
       .catch(function(e){ toast(e.message); });
   }
   $('#bBevAf').addEventListener('click', bevAfhandelen);
+  var noodremAan = true;
+  $('#bBevAuto').addEventListener('click', function(){
+    if (noodremAan && !confirm('De automatische noodrem uitzetten? Bij een brute-force-aanval springen de zekeringen dan NIET meer vanzelf.')) return;
+    api('/api/techniek/beveiliging/auto', { method:'POST', body:{ aan: !noodremAan } })
+      .then(function(d){ toast(d.autoReactie ? 'Noodrem aan: zekeringen springen vanzelf bij een aanval.' : 'Noodrem uit.'); laad(); })
+      .catch(function(e){ toast(e.message); });
+  });
 
   function laad(){
     return api('/api/techniek/status').then(function(d){
@@ -339,10 +349,15 @@
         tellerKaart(d.samenvatting.fout,'Storing')];
       if (bev.open) tellers.push(tellerKaart(bev.open, bev.kritiek?'Beveiliging!':'Beveiliging'));
       vervang($('#tellers'), tellers);
-      // beveiligingsmeldingen: alleen tonen als er iets is (of ooit iets was)
-      $('#beveiligBlok').hidden = !(bev.recent && bev.recent.length);
-      if (bev.recent && bev.recent.length) vervang($('#beveiliging'), bev.recent.map(beveiligRij));
+      // beveiligingsmeldingen: tonen bij meldingen, en altijd voor de eigenaar
+      // (die ziet er ook de noodrem-schakelaar)
+      $('#beveiligBlok').hidden = !(d.eigenaar || (bev.recent && bev.recent.length));
+      vervang($('#beveiliging'), (bev.recent && bev.recent.length) ? bev.recent.map(beveiligRij)
+        : el('div',{class:'muted'},'Geen beveiligingsmeldingen. Brute force en pogingen om deze pagina binnen te komen verschijnen hier vanzelf.'));
       $('#bBevAf').hidden = !(d.eigenaar && bev.open);
+      noodremAan = bev.autoReactie !== false;
+      $('#bBevAuto').hidden = !d.eigenaar;
+      Util.tekst($('#bBevAuto'), noodremAan ? 'Noodrem: AAN' : 'Noodrem: UIT');
       vervang($('#checks'), d.checks.map(checkRij));
       $('#zekeringBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));

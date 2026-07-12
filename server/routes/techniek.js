@@ -198,6 +198,14 @@ module.exports = (kern) => {
     res.json({ ok: true, afgehandeld: n, beveiliging: beveilig.samenvatting() });
   });
 
+  /* De automatische noodrem aan- of uitzetten (alleen de eigenaar). Aan =
+     bij een brede brute-force-aanval springen de zekeringen vanzelf. */
+  app.post('/api/techniek/beveiliging/auto', techAuth, eigenaarAlleen, (req, res) => {
+    if (!beveilig) return res.status(503).json({ error: 'Beveiligingsmodule niet actief.' });
+    const aan = beveilig.zetAuto(req.body.aan !== false && req.body.aan !== 'false');
+    res.json({ ok: true, autoReactie: aan });
+  });
+
   // Iemand handmatig toegang geven of intrekken (alleen de eigenaar).
   app.post('/api/techniek/toegang', techAuth, eigenaarAlleen, (req, res) => {
     const t = staat();

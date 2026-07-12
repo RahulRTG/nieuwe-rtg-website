@@ -40,7 +40,7 @@ const FUNCTIES = [
   { id: 'member-werk', categorie: 'Leden (RTG-app)', naam: 'Vacatures & solliciteren (leden)', standaard: true,
     uitleg: 'Leden solliciteren met hun cv op vacatures bij partners.', paden: ['/api/member/apply'] },
   { id: 'zakelijk', categorie: 'Leden (RTG-app)', naam: 'RTG Zakelijk (professioneel netwerk)', standaard: true,
-    uitleg: 'De LinkedIn-laag van de Business Pass: zakelijk profiel, gids, verbinden, feed en aanbevelingen.', paden: ['/api/zakelijk'] },
+    uitleg: 'De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.', paden: ['/api/zakelijk'] },
 
   // ---- Sociaal (De Salon) ----
   { id: 'social', categorie: 'Sociaal (De Salon)', naam: 'Sociale laag (RTG + RTF)', standaard: true,

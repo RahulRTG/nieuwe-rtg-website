@@ -19,6 +19,11 @@ function codenaamVan(handle) {
 }
 function soortVan(handle) { return isRtf(handle) ? 'rtf' : ((db.data.memberDir[handle] || {}).tier || 'rtg'); }
 function isKindHandle(handle) { if (isRtf(handle)) { const i = rtf.profielInfoVanHandle(handle); return !!(i && i.kind); } return false; }
+/* Beschermd (15 of jonger, of rol kind): de open vriendenlaag is dicht. Zo'n
+   profiel is onvindbaar in het zoeken, kan zelf geen verzoeken sturen en kan
+   door vreemden niet benaderd worden; alleen een ouder/verzorger voegt
+   contacten toe (ouderVerbind). RTG-leden zijn 15+, dus dit raakt alleen RTF. */
+function isBeschermdHandle(handle) { if (isRtf(handle)) { const i = rtf.profielInfoVanHandle(handle); return !!(i && i.beschermd); } return false; }
 function verbActief(c) { return !!(c && c.status === 'accepted' && (!c.voogdWacht || c.voogdWacht.length === 0)); }
 
 /* ---------- sociale veiligheid: blokkeren, melden, snelheidslimiet ----------
@@ -54,7 +59,7 @@ function sociaalRate(mij, actie, max, perMs) {
 }
 // ouder-meekijk: de contacten van een kind, en het recht om er een te verwijderen
 function kindContacten(gezinCode, kidHandle) {
-  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.kind);
+  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.beschermd);
   if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
   const contacten = db.data.connections.filter(c => c.a === kidHandle || c.b === kidHandle).map(c => {
     const ander = c.a === kidHandle ? c.b : c.a;
@@ -63,7 +68,7 @@ function kindContacten(gezinCode, kidHandle) {
   return { status: 200, contacten };
 }
 function kindVerwijder(gezinCode, kidHandle, anderHandle) {
-  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.kind);
+  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.beschermd);
   if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
   db.data.connections = db.data.connections.filter(c => !((c.a === kidHandle && c.b === anderHandle) || (c.a === anderHandle && c.b === kidHandle)));
   save();
@@ -82,31 +87,64 @@ function socialZoek(mij, q) {
   const seen = new Set([mij]);
   const handles = [];
   for (const [key, m] of Object.entries(db.data.memberDir)) { if (!seen.has(key) && m.codename && m.codename.toLowerCase().includes(q)) { seen.add(key); handles.push(key); } }
-  for (const sp of rtf.socialProfielen()) { if (!seen.has(sp.handle) && sp.codenaam.toLowerCase().includes(q)) { seen.add(sp.handle); handles.push(sp.handle); } }
+  // beschermde profielen (15 of jonger) zijn onvindbaar: niemand kan ze opzoeken
+  for (const sp of rtf.socialProfielen()) { if (!sp.beschermd && !seen.has(sp.handle) && sp.codenaam.toLowerCase().includes(q)) { seen.add(sp.handle); handles.push(sp.handle); } }
   return handles.slice(0, 10).map(h => ({ key: h, codename: codenaamVan(h), tier: soortVan(h), status: statusVan(mij, connectieTussen(mij, h)) }));
 }
-// vriendschapsverzoek van 'mij' naar 'naar'
-function socialVerbind(mij, naar) {
+/* vriendschapsverzoek van 'mij' naar 'naar'. doorOuder=true betekent: een
+   ouder/verzorger doet dit namens zijn beschermde kind (via ouderVerbind); dan
+   geldt de ouder-goedkeuring voor de kant van dit kind als al gegeven. */
+function socialVerbind(mij, naar, doorOuder) {
   if (naar === mij) return { status: 400, error: 'Dat ben je zelf.' };
   if (!codeExists(naar)) return { status: 404, error: 'Deze codenaam kennen we niet.' };
+  // beschermd profiel (15 of jonger): kan zelf geen verzoeken sturen...
+  if (!doorOuder && isBeschermdHandle(mij)) return { status: 403, error: 'Je ouder of verzorger voegt vrienden voor je toe.' };
+  // ...en is voor anderen onbenaderbaar (404: we verklappen niet dat het bestaat)
+  if (!doorOuder && isBeschermdHandle(naar)) return { status: 404, error: 'Deze codenaam kennen we niet.' };
   if (isGeblokkeerd(mij, naar)) return { status: 403, error: 'Verbinden met deze codenaam kan niet.' };
   if (!sociaalRate(mij, 'verbind', 30, 60 * 60 * 1000)) return { status: 429, error: 'Te veel vriendschapsverzoeken. Probeer het later opnieuw.' };
   let c = connectieTussen(mij, naar);
   if (c && verbActief(c)) return { status: 200, ok: true, st: 'verbonden' };
   if (c) return { status: 200, ok: true, st: statusVan(mij, c) };
   const voogdWacht = [];
-  if (isKindHandle(mij)) voogdWacht.push(mij);
-  if (isKindHandle(naar)) voogdWacht.push(naar);
+  // de ouder-goedkeuring van de eigen kant is bij doorOuder al gegeven
+  if (!doorOuder && isBeschermdHandle(mij)) voogdWacht.push(mij);
+  // is de ANDER ook een beschermd kind (kan alleen via doorOuder), dan moet
+  // diens eigen ouder nog akkoord geven
+  if (isBeschermdHandle(naar)) voogdWacht.push(naar);
   c = { a: mij, b: naar, requestedBy: mij, status: 'pending', at: new Date().toISOString(), voogdWacht };
   db.data.connections.push(c); save();
   sseToCustomer(naar, 'social', { kind: 'request', from: codenaamVan(mij) });
   return { status: 200, ok: true, st: voogdWacht.length ? 'wacht-op-ouder' : 'aangevraagd' };
 }
+/* Een ouder/verzorger voegt een contact toe voor zijn beschermde kind: het enige
+   kanaal waarlangs een beschermd profiel nieuwe vrienden krijgt. De andere kant
+   moet nog wel zelf accepteren (of, als die ook beschermd is, diens ouder). */
+function ouderVerbind(gezinCode, kidHandle, doel) {
+  const sp = rtf.socialProfielen().find(x => x.handle === kidHandle && x.gezinCode === gezinCode);
+  if (!sp) return { status: 403, error: 'Dit is geen profiel van jouw gezin.' };
+  // doel mag een handle zijn of een exacte codenaam (zo typt een ouder gewoon de codenaam over)
+  let naar = String(doel || '').trim();
+  if (!codeExists(naar)) {
+    const q = naar.toLowerCase();
+    const kandidaten = [];
+    for (const [key, m] of Object.entries(db.data.memberDir)) if (m.codename && m.codename.toLowerCase() === q) kandidaten.push(key);
+    // exacte codenaam mag ook een beschermd profiel zijn: twee gezinnen kunnen zo
+    // hun kinderen verbinden (codenaam offline uitgewisseld), en de ouder van het
+    // andere kind moet daarna alsnog akkoord geven (voogdWacht).
+    for (const p of rtf.socialProfielen()) if (p.codenaam.toLowerCase() === q) kandidaten.push(p.handle);
+    if (kandidaten.length !== 1) return { status: 404, error: 'Geen (eenduidige) codenaam gevonden. Typ de volledige codenaam over.' };
+    naar = kandidaten[0];
+  }
+  // ook een ouder kan zijn kind niet met een ander beschermd kind verbinden
+  // zonder dat DIENS ouder akkoord geeft; dat regelt voogdWacht hieronder.
+  return socialVerbind(kidHandle, naar, true);
+}
 // verzoek beantwoorden (accepteren/afwijzen); een kind kan niet zelf accepteren
 function socialAntwoord(mij, ander, action) {
   const c = connectieTussen(mij, ander);
   if (!c || c.status !== 'pending' || c.requestedBy === mij) return { status: 404, error: 'Geen openstaand verzoek van deze codenaam.' };
-  if (isKindHandle(mij)) return { status: 403, error: 'Een ouder moet dit verzoek eerst goedkeuren.' };
+  if (isBeschermdHandle(mij)) return { status: 403, error: 'Een ouder moet dit verzoek eerst goedkeuren.' };
   if (action === 'accept') {
     c.status = 'accepted'; c.acceptedAt = new Date().toISOString(); save();
     sseToCustomer(ander, 'social', { kind: 'accepted', by: codenaamVan(mij) });
@@ -125,7 +163,7 @@ function socialConnecties(mij) {
     const unread = chat ? chat.messages.filter(m => m.from !== mij && m.at > gelezen).length : 0;
     return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
   }).sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
-  const requests = db.data.connections.filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isKindHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at }));
+  const requests = db.data.connections.filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isBeschermdHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at }));
   return { connections: conns, requests };
 }
 // DM lezen/sturen (werkt over beide werelden zolang de vriendschap actief is)
@@ -152,7 +190,7 @@ function socialDmSend(mij, ander, text) {
 const zijnVrienden = (a, b) => verbActief(connectieTussen(a, b));
 // vriendschapsverzoeken van kinderen van dit gezin die op ouderakkoord wachten
 function socialTeKeuren(gezinCode) {
-  const kids = new Set(rtf.socialProfielen().filter(sp => sp.gezinCode === gezinCode && sp.kind).map(sp => sp.handle));
+  const kids = new Set(rtf.socialProfielen().filter(sp => sp.gezinCode === gezinCode && sp.beschermd).map(sp => sp.handle));
   return db.data.connections.filter(c => c.status === 'pending' && c.voogdWacht && c.voogdWacht.some(h => kids.has(h))).map(c => {
     const kid = c.voogdWacht.find(h => kids.has(h));
     const ander = c.a === kid ? c.b : c.a;
@@ -160,7 +198,7 @@ function socialTeKeuren(gezinCode) {
   });
 }
 function socialGoedkeur(gezinCode, kidHandle, anderHandle, akkoord) {
-  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.kind);
+  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.beschermd);
   if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
   const c = connectieTussen(kidHandle, anderHandle);
   if (!c || c.status !== 'pending') return { status: 404, error: 'Verzoek niet gevonden.' };
@@ -238,5 +276,5 @@ function verhaalBekijken(mij, id) {
   return { status: 200, foto: s.foto, tekst: s.tekst, van: codenaamVan(s.van), at: s.at };
 }
 
-  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken };
+  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken };
 };

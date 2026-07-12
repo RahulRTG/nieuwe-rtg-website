@@ -74,12 +74,22 @@
 
   <div class="stories" id="stories"></div>
 
-  <div class="sec">Vriend toevoegen</div>
-  <div class="zoekrij">
-    <input class="veld" id="zoek" placeholder="Zoek op codenaam (bijv. Gouden Vos)" maxlength="40">
-    <button class="knop" id="zoekBtn">Zoek</button>
+  <div id="zoekBlok">
+    <div class="sec">Vriend toevoegen</div>
+    <div class="zoekrij">
+      <input class="veld" id="zoek" placeholder="Zoek op codenaam (bijv. Gouden Vos)" maxlength="40">
+      <button class="knop" id="zoekBtn">Zoek</button>
+    </div>
+    <div class="lijst" id="zoekRes"></div>
   </div>
-  <div class="lijst" id="zoekRes"></div>
+  <!-- beschermd profiel (15 of jonger): zoeken staat dicht, de ouder voegt toe -->
+  <div id="beschermdBlok" hidden>
+    <div class="sec">Vrienden</div>
+    <div class="kaart" style="padding:.9rem 1.1rem;line-height:1.5;font-size:.9rem;">
+      🛡️ Je ouder of verzorger voegt vrienden voor je toe. Je kunt hier gewoon chatten,
+      bellen en snappen met je gezin en met de vrienden die zij hebben toegevoegd.
+    </div>
+  </div>
 
   <div id="teKeurenBlok" hidden>
     <div class="sec">Goed te keuren (voor je kind)</div>
@@ -176,9 +186,13 @@ let mijnHandle = null;
 
 async function laad(){
   let d; try{ d = await soc('/connections'); }catch(e){ $('#vrienden').innerHTML='<div class="leeg">Kon contacten niet laden.</div>'; return; }
-  mij = { beheerder:!!d.beheerder, kind:!!d.kind, codenaam:d.codename };
+  mij = { beheerder:!!d.beheerder, kind:!!d.kind, beschermd:!!d.beschermd, codenaam:d.codename };
   mijnHandle = d.me;
-  $('#mijncn').innerHTML = 'Jouw codenaam: <b>'+esc(d.codename)+'</b><br><span style="color:var(--zacht);font-size:.8rem;">Geef deze aan iemand die jou wil toevoegen.</span>';
+  // beschermd (15 of jonger): geen zoekveld; de ouder/verzorger voegt vrienden toe
+  $('#zoekBlok').hidden = mij.beschermd;
+  $('#beschermdBlok').hidden = !mij.beschermd;
+  $('#mijncn').innerHTML = 'Jouw codenaam: <b>'+esc(d.codename)+'</b><br><span style="color:var(--zacht);font-size:.8rem;">'+
+    (mij.beschermd ? 'Je ouder kan deze codenaam aan een ander gezin geven.' : 'Geef deze aan iemand die jou wil toevoegen.')+'</span>';
   // vrienden (opgebouwd met de veilige component-bouwer i.p.v. HTML-strings)
   const cs = d.connections||[];
   vervang($('#vrienden'), cs.length ? cs.map(c=> E('div',{class:'rij'},
@@ -188,7 +202,7 @@ async function laad(){
     E('button',{class:'knop mini', onclick:()=>openChat(c.key,c.codename)}, 'Chat'),
     E('button',{class:'knop grijs mini', onclick:()=>kiesSnap(c.key,c.codename)}, '📷'),
     E('button',{class:'knop grijs mini', title:'Blokkeren of melden', onclick:()=>blokkeerMelden(c.key,c.codename)}, '🚫')
-  )) : E('div',{class:'leeg'}, 'Nog geen vrienden. Zoek hierboven op codenaam.'));
+  )) : E('div',{class:'leeg'}, mij.beschermd ? 'Nog geen vrienden. Je ouder of verzorger kan ze toevoegen.' : 'Nog geen vrienden. Zoek hierboven op codenaam.'));
   // verzoeken (niet voor kinderen)
   const reqs = d.requests||[];
   $('#verzoekenBlok').hidden = !reqs.length;
@@ -234,10 +248,23 @@ function renderMeekijk(kinderen){
   $('#meekijkBlok').hidden = !(mij.beheerder && kinderen.length);
   if (!(mij.beheerder && kinderen.length)) return;
   $('#meekijk').innerHTML = kinderen.map(k=>
-    '<div class="rij"><span class="av">'+initcn(k.codenaam)+'</span><div class="nm">'+esc(k.codenaam)+'<small>bekijk met wie je kind contact heeft</small></div>'+
+    '<div class="rij"><span class="av">'+initcn(k.codenaam)+'</span><div class="nm">'+esc(k.codenaam)+'<small>jij voegt vrienden toe en kijkt mee</small></div>'+
+    '<button class="knop mini" data-voeg="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">➕ Vriend</button>'+
     '<button class="knop grijs mini" data-kijk="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Bekijk</button></div>'
   ).join('');
   $('#meekijk').querySelectorAll('[data-kijk]').forEach(b=> b.addEventListener('click', ()=> kindContacten(b.dataset.kijk, b.dataset.cn)));
+  $('#meekijk').querySelectorAll('[data-voeg]').forEach(b=> b.addEventListener('click', ()=> ouderVoegt(b.dataset.voeg, b.dataset.cn)));
+}
+// Een ouder voegt een vriend toe voor zijn kind: op exacte codenaam. De andere
+// kant moet daarna nog zelf accepteren (of diens ouder, als die ook een kind is).
+async function ouderVoegt(kindHandle, cn){
+  const codenaam = prompt('Welke codenaam wil je als vriend toevoegen voor '+cn+'?\n\nTyp de volledige codenaam over (bijv. "Gouden Vos AB12").','');
+  if (!codenaam || !codenaam.trim()) return;
+  try{
+    const r = await soc('/oudervoeg', { kindHandle, codenaam: codenaam.trim() });
+    alert(r.status==='verbonden' ? 'Toegevoegd en verbonden.' : 'Verzoek verstuurd. Zodra de ander (of diens ouder) accepteert, zijn ze vrienden.');
+    laad();
+  }catch(e){ alert(e.message); }
 }
 async function kindContacten(kindHandle, cn){
   let d; try{ d = await soc('/kind/contacten', { kindHandle }); }catch(e){ alert(e.message); return; }

@@ -3,7 +3,7 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
+  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
 
 // leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam)
 app.post('/api/member/find', auth, (req, res) => {
@@ -127,10 +127,26 @@ function rtfSociaal(req, res) {
   if (sess.gast) { res.status(403).json({ error: 'Als oppas of familielid doe je hier niet mee.' }); return null; }
   return sess;
 }
-app.post('/api/rtf/social/find', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ results: socialZoek(s.handle, req.body.q) }); });
+// Beschermd profiel (15 of jonger): zoeken en zelf verzoeken sturen staat dicht;
+// de ouder/verzorger voegt vrienden toe via /api/rtf/social/oudervoeg.
+app.post('/api/rtf/social/find', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
+  res.json({ results: socialZoek(s.handle, req.body.q) });
+});
 app.post('/api/rtf/social/connect', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
+  if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
   const r = socialVerbind(s.handle, String(req.body.key || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.st });
+});
+// Een ouder/beheerder voegt een contact toe voor een beschermd kind van zijn gezin
+// (op exacte codenaam). De andere kant moet daarna nog gewoon zelf accepteren.
+app.post('/api/rtf/social/oudervoeg', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder voegt contacten toe voor een kind.' });
+  const r = ouderVerbind(s.g.code, String(req.body.kindHandle || ''), String(req.body.codenaam || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
 });
@@ -144,8 +160,8 @@ app.post('/api/rtf/social/connections', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   const sc = socialConnecties(s.handle);
   // beheerder: ook de kinderen van het gezin, zodat de ouder kan meekijken
-  const kinderen = s.beheerder ? rtf.socialProfielen().filter(sp => sp.gezinCode === s.g.code && sp.kind).map(sp => ({ handle: sp.handle, codenaam: sp.codenaam })) : [];
-  res.json({ me: s.handle, codename: s.codenaam, kind: s.kind, beheerder: s.beheerder, connections: sc.connections, requests: sc.requests, teKeuren: s.beheerder ? socialTeKeuren(s.g.code) : [], kinderen });
+  const kinderen = s.beheerder ? rtf.socialProfielen().filter(sp => sp.gezinCode === s.g.code && sp.beschermd).map(sp => ({ handle: sp.handle, codenaam: sp.codenaam })) : [];
+  res.json({ me: s.handle, codename: s.codenaam, kind: s.kind, beschermd: s.beschermd, beheerder: s.beheerder, connections: sc.connections, requests: sc.requests, teKeuren: s.beheerder ? socialTeKeuren(s.g.code) : [], kinderen });
 });
 app.post('/api/rtf/social/dm', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;

@@ -484,18 +484,23 @@ test('cross-app vrienden: RTF en RTG vinden elkaar op codenaam, chatten, snappen
   const rtgThread = await json(await raw('/member/dm', { withKey: ouderKey }, rtgTok));
   assert.ok((rtgThread.messages || []).some(m => /Hoi RTG/.test(m.text)), 'RTG leest het bericht van de RTF-ouder');
 
-  // RTG voegt het KIND toe: dat wacht op ouderakkoord
+  // Het KIND (15 of jonger) is beschermd: onvindbaar voor RTG, en alleen de
+  // ouder voegt vrienden toe (oudervoeg). Daarna accepteert de RTG-kant gewoon.
   const found2 = await json(await raw('/member/find', { q: kindCn.split(' ')[0] }, rtgTok));
-  const kindKey = (found2.results.find(r => r.codename === kindCn) || {}).key;
-  const kc = await json(await raw('/member/connect', { key: kindKey }, rtgTok));
-  assert.equal(kc.status, 'wacht-op-ouder', 'vriendschap met een kind wacht op de ouder');
-  assert.equal((await raw('/member/dm/send', { toKey: kindKey, text: 'hoi' }, rtgTok)).status, 403, 'nog geen chat voor akkoord');
-  // de ouder/beheerder keurt goed
+  assert.ok(!found2.results.some(r => r.codename === kindCn), 'een beschermd kind is onvindbaar in het zoeken');
   const bConns = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
-  const tk = (bConns.teKeuren || []).find(t => t.kindHandle === kindKey);
-  assert.ok(tk, 'de beheerder ziet het te keuren verzoek voor het kind');
-  await raw('/rtf/social/goedkeuren', { code: g.code, token: g.token, kindHandle: tk.kindHandle, anderKey: tk.anderKey, akkoord: true });
-  assert.equal((await raw('/member/dm/send', { toKey: kindKey, text: 'hoi vriendje' }, rtgTok)).status, 200, 'na ouderakkoord mag de chat');
+  const kindKey = (bConns.kinderen.find(k => k.codenaam === kindCn) || {}).handle;
+  assert.ok(kindKey, 'de ouder ziet het kind in zijn meekijk-lijst');
+  assert.equal((await raw('/member/connect', { key: kindKey }, rtgTok)).status, 404, 'rechtstreeks verbinden met een beschermd kind kan niet');
+  assert.equal((await raw('/member/dm/send', { toKey: kindKey, text: 'hoi' }, rtgTok)).status, 403, 'geen chat zonder vriendschap');
+  // de ouder voegt de RTG-vriend toe voor het kind; RTG accepteert
+  const voeg = await json(await raw('/rtf/social/oudervoeg', { code: g.code, token: g.token, kindHandle: kindKey, codenaam: rtgCn }));
+  assert.ok(voeg.ok, 'de ouder voegt een vriend toe voor het kind');
+  const rtgReqs = await json(await raw('/member/connections', {}, rtgTok));
+  const vzk = (rtgReqs.requests || []).find(r => r.key === kindKey);
+  assert.ok(vzk, 'RTG ziet het door de ouder gestuurde verzoek');
+  await raw('/member/connect/respond', { key: kindKey, action: 'accept' }, rtgTok);
+  assert.equal((await raw('/member/dm/send', { toKey: kindKey, text: 'hoi vriendje' }, rtgTok)).status, 200, 'na ouder-toevoeging en acceptatie mag de chat');
 
   // SNAP: RTG snapt naar de ouder; die bekijkt hem een keer en dan is hij weg
   assert.equal((await raw('/member/snap/send', { toKey: ouderKey, foto, tekst: 'kiek' }, rtgTok)).status, 200);
@@ -656,17 +661,21 @@ test('sociale veiligheid: blokkeren, melden en ouder-meekijk op kindcontacten', 
   // MELDEN: een melding wordt aangenomen
   assert.equal((await raw('/member/report', { key: ouderKey, reden: 'ongepast' }, rtgTok)).status, 200);
 
-  // OUDER-MEEKIJK: het lid vraagt het kind aan (wacht op ouder), de ouder ziet dat het een volwassene is
+  // OUDER-MEEKIJK: het kind is onvindbaar voor het lid; de ouder voegt het lid
+  // toe voor het kind, ziet in het meekijken dat het een VOLWASSENE is, en kan
+  // het contact ook weer verwijderen.
   const memberKey = (await json(await raw('/member/connections', {}, rtgTok))).me;
   const found2 = await json(await raw('/member/find', { q: kindCn.split(' ')[0] }, rtgTok));
-  const kindKey = found2.results.find(r => r.codename === kindCn).key;
-  await raw('/member/connect', { key: kindKey }, rtgTok);
+  assert.ok(!found2.results.some(r => r.codename === kindCn), 'het beschermde kind is onvindbaar voor het lid');
   const bConns = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
-  const tk = (bConns.teKeuren || []).find(t => t.kindHandle === kindKey);
-  assert.ok(tk && tk.volwassene === true, 'de ouder ziet dat het verzoek van een volwassene komt');
-  // de ouder kijkt de contacten van het kind in en verwijdert het lopende contact met het lid
+  const kindKey = (bConns.kinderen.find(k => k.codenaam === kindCn) || {}).handle;
+  assert.ok(kindKey, 'de ouder ziet het kind in het meekijk-lijstje');
+  assert.ok((await json(await raw('/rtf/social/oudervoeg', { code: g.code, token: g.token, kindHandle: kindKey, codenaam: rtgCn }))).ok);
+  // de ouder kijkt de contacten van het kind in: het lid staat er als volwassene
   const contacten = await json(await raw('/rtf/social/kind/contacten', { code: g.code, token: g.token, kindHandle: kindKey }));
-  assert.ok((contacten.contacten || []).some(c => c.key === memberKey), 'de ouder ziet het contact van het kind met het lid');
+  const cc = (contacten.contacten || []).find(c => c.key === memberKey);
+  assert.ok(cc, 'de ouder ziet het contact van het kind met het lid');
+  assert.equal(cc.volwassene, true, 'en ziet dat het een volwassene is');
   assert.equal((await raw('/rtf/social/kind/verwijder', { code: g.code, token: g.token, kindHandle: kindKey, anderKey: memberKey })).status, 200);
   const na = await json(await raw('/rtf/social/kind/contacten', { code: g.code, token: g.token, kindHandle: kindKey }));
   assert.ok(!(na.contacten || []).some(c => c.key === memberKey), 'na verwijderen is het contact weg');

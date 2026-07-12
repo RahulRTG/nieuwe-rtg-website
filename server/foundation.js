@@ -368,6 +368,13 @@ const GROEP_INFO = {
 };
 const magSolliciteren = groep => groep === 'jong' || groep === 'volw';
 const groepLeeftijd = groep => (GROEP_INFO[groep] || {}).vanaf; // ondergrens voor de vacature-filter
+/* Beschermd profiel (15 jaar of jonger, of rol kind): de open vriendenlaag is
+   voor hen gesloten. Ze zijn onvindbaar en onbenaderbaar; alleen een ouder of
+   verzorger voegt contacten voor hen toe. Chatten en bellen binnen het gezin
+   blijft altijd werken (dat is de aparte gezinslaag). We kennen alleen de
+   leeftijdsgroep, niet de exacte leeftijd, dus de hele tienergroep (12 t/m 15)
+   valt eronder: liever een 15-jarige te streng dan een 12-jarige te los. */
+const isBeschermd = p => !!p && (p.rol === 'kind' || ['mini', 'kind', 'tiener'].includes(p.groep));
 function schoonGroep(v) { return GROEPEN.includes(v) ? v : null; }
 // een gast (oppas, opa/oma of familielid) helpt mee, maar mag niet bij de
 // privezaken van het gezin (geld, mentale steun, dromen, cv, reisaanvraag).
@@ -407,7 +414,7 @@ function socialProfielen() {
     for (const p of Object.values(g.profielen || {})) {
       if (isGast(p)) continue;
       if (!p.codenaam) { ensureCodenaam(p); veranderd = true; }
-      uit.push({ handle: rtfHandle(g.code, p.id), codenaam: p.codenaam, rol: p.rol, kind: p.rol === 'kind', gezinCode: g.code });
+      uit.push({ handle: rtfHandle(g.code, p.id), codenaam: p.codenaam, rol: p.rol, kind: p.rol === 'kind', beschermd: isBeschermd(p), gezinCode: g.code });
     }
   }
   if (veranderd) save();
@@ -418,7 +425,7 @@ function profielInfoVanHandle(handle) {
   if (!m) return null;
   const g = G()[m[1]]; if (!g) return null;
   const p = g.profielen[m[2]]; if (!p || isGast(p)) return null;
-  return { handle, codenaam: ensureCodenaam(p), naam: p.naam, avatar: p.avatar, kleur: p.kleur, rol: p.rol, kind: p.rol === 'kind', gezinCode: g.code };
+  return { handle, codenaam: ensureCodenaam(p), naam: p.naam, avatar: p.avatar, kleur: p.kleur, rol: p.rol, kind: p.rol === 'kind', beschermd: isBeschermd(p), gezinCode: g.code };
 }
 // beheerder(s) van het gezin waar dit kind-handle bij hoort
 function beheerdersVanHandle(handle) {
@@ -1161,7 +1168,7 @@ function verifieerProfiel(code, token) {
   const p = profielVan(g, token);
   if (!p) return null;
   if (!isGast(p)) ensureCodenaam(p);
-  return { g, p, gast: isGast(p), handle: rtfHandle(g.code, p.id), codenaam: p.codenaam, kind: p.rol === 'kind', beheerder: p.rol === 'beheerder' };
+  return { g, p, gast: isGast(p), handle: rtfHandle(g.code, p.id), codenaam: p.codenaam, kind: p.rol === 'kind', beschermd: isBeschermd(p), beheerder: p.rol === 'beheerder' };
 }
 function bewaarSollicitatie(code, profielId, ref) {
   const g = G()[String(code || '').toUpperCase()];

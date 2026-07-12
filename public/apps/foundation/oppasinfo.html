@@ -50,7 +50,8 @@
 
     <div class="kaart blok">
       <h2>📞 Noodnummers</h2>
-      <div id="contacten"><div class="leeg">Nog geen nummers ingevuld.</div></div>
+      <div class="h" style="color:var(--zacht);font-size:.85rem;margin-bottom:.7rem;">Alleen voor noodgevallen: huisarts, 112, een buur. Het gezin zelf bereik je via <a href="contact.html" style="color:var(--goud)">Contact</a> in de app, geen telefoonnummer nodig.</div>
+      <div id="contacten"><div class="leeg">Nog geen noodnummers ingevuld.</div></div>
     </div>
     <div class="kaart blok">
       <h2>💊 Allergieën en medisch</h2>
@@ -128,7 +129,7 @@ function contactRij(c){
   c = c || { naam:'', telefoon:'', wie:'' };
   const div = document.createElement('div'); div.className='crij';
   div.innerHTML = '<input class="veld" data-k="naam" placeholder="Naam" maxlength="40" value="'+esc(c.naam)+'">'+
-    '<input class="veld" data-k="wie" placeholder="Wie (bijv. Mama)" maxlength="40" value="'+esc(c.wie)+'">'+
+    '<input class="veld" data-k="wie" placeholder="Wie (bijv. Huisarts)" maxlength="40" value="'+esc(c.wie)+'">'+
     '<input class="veld" data-k="telefoon" placeholder="Telefoon" inputmode="tel" maxlength="30" value="'+esc(c.telefoon)+'">'+
     '<button class="del" title="Weghalen">×</button>';
   div.querySelector('.del').onclick = ()=> div.remove();

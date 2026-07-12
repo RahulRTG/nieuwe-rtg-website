@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Contact</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .lid{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.7rem .9rem;margin-bottom:.5rem;cursor:pointer;}
+  .lid .av{width:2.6rem;height:2.6rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .lid .nm{font-weight:600;}
+  .lid .laatste{font-size:.82rem;color:var(--zacht);max-width:12rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lid .tel{margin-left:auto;font-size:.72rem;color:var(--zacht);}
+  .lid .badge{margin-left:auto;background:var(--rood);color:#fff;font-size:.7rem;font-weight:700;border-radius:999px;min-width:1.3rem;height:1.3rem;display:flex;align-items:center;justify-content:center;padding:0 .3rem;}
+  /* gesprek */
+  .thread{display:none;flex-direction:column;height:calc(100vh - 2rem);max-width:44rem;margin:0 auto;}
+  .thread.open{display:flex;}
+  .tkop{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
+  .tkop .terug{background:transparent;color:var(--zacht);font-size:1.3rem;}
+  .tkop .av{width:2.2rem;height:2.2rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+  .tkop .nm{font-weight:600;flex:1;}
+  .tkop .bel{background:transparent;font-size:1.3rem;padding:.2rem .35rem;}
+  .berichten{flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;}
+  .b{max-width:80%;padding:.5rem .8rem;border-radius:14px;line-height:1.4;font-size:.95rem;white-space:pre-wrap;}
+  .b.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
+  .b.jij{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
+  .invoer{display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--lijn);}
+  .invoer input{flex:1;background:var(--paneel2);border:1px solid var(--lijn);border-radius:999px;padding:.6rem 1rem;color:var(--txt);outline:none;}
+  .invoer button{background:var(--goud);color:#1a1710;border-radius:999px;padding:.5rem 1.1rem;font-weight:700;}
+  .leeg{color:var(--zacht);font-size:.9rem;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" id="lijstView">
+  <h1>💬 Contact</h1>
+  <div class="intro">Bericht of (video)bel je gezin en de oppas in de app. Zo hoef je geen telefoonnummers te delen; je bereikt elkaar hier.</div>
+  <div id="lijst"><div class="leeg">Laden...</div></div>
+</div>
+
+<div class="thread" id="threadView">
+  <div class="tkop">
+    <button class="terug" id="tTerug">←</button>
+    <span class="av" id="tAv"></span><span class="nm" id="tNaam"></span>
+    <button class="bel" id="tBel" title="Bellen">📞</button>
+    <button class="bel" id="tVideo" title="Videobellen">🎥</button>
+  </div>
+  <div class="berichten" id="berichten"></div>
+  <div class="invoer"><input id="tIn" placeholder="Typ een bericht..." maxlength="1000"><button id="tStuur">Stuur</button></div>
+</div>
+
+<script src="sessie.js"></script>
+<script src="gezin-rt.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+let leden = {}, actief = null;
+
+async function laadLeden(){
+  const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
+  (d.profielen||[]).forEach(p=>{ if(p.id!==s.profiel.id) leden[p.id]=p; });
+  GezinRT.init({ base:'/api/foundation', code:s.code, token:s.token, mijnId:s.profiel.id, mijnNaam:s.profiel.naam,
+    leden:Object.values(leden), onChat: onChat });
+}
+function onChat(m){
+  if (actief && (m.van===actief || m.naar===actief) && (m.van===s.profiel.id || m.van===actief)){
+    voegBericht(m); // in het open gesprek
+    if (m.van===actief) fetch('/api/foundation/gezin/'+s.code+'/chat/'+actief+'?token='+encodeURIComponent(s.token)); // gelezen
+  }
+  laadLijst();
+}
+async function laadLijst(){
+  try{
+    const d = await GezinRT.chats();
+    const box = $('#lijst');
+    if (!d.chats || !d.chats.length){ box.innerHTML='<div class="leeg">Nog geen gezinsleden om mee te chatten.</div>'; return; }
+    box.innerHTML = d.chats.map(c=>{
+      const rol = c.gekoppeld ? 'oppas/familie' : ({beheerder:'beheerder',ouder:'ouder',kind:'kind',gezinslid:'gezinslid',gast:'oppas/familie'}[c.rol]||'');
+      return '<div class="lid" data-id="'+c.id+'"><span class="av" style="background:'+c.kleur+'">'+c.avatar+'</span>'+
+        '<div style="min-width:0;"><div class="nm">'+esc(c.naam)+'</div><div class="laatste">'+(c.laatste?esc(c.laatste):'<span style="opacity:.6">'+rol+'</span>')+'</div></div>'+
+        (c.ongelezen? '<span class="badge">'+c.ongelezen+'</span>' : '<span class="tel">'+rol+'</span>')+'</div>';
+    }).join('');
+    box.querySelectorAll('[data-id]').forEach(el=> el.onclick=()=> openGesprek(el.dataset.id));
+  }catch(e){ $('#lijst').innerHTML='<div class="leeg">Kon de gesprekken niet laden.</div>'; }
+}
+async function openGesprek(id){
+  actief = id; const l = leden[id]||{naam:'Gezinslid',avatar:'🙂',kleur:'#C9A24B'};
+  $('#tAv').textContent=l.avatar; $('#tAv').style.background=l.kleur; $('#tNaam').textContent=l.naam;
+  $('#lijstView').style.display='none'; $('#balk').style.display='none'; $('#threadView').classList.add('open');
+  const d = await GezinRT.thread(id);
+  $('#berichten').innerHTML=''; (d.berichten||[]).forEach(voegBericht);
+  scrollNaarBeneden();
+}
+function voegBericht(m){
+  const mij = m.vanMij!==undefined ? m.vanMij : (m.van===s.profiel.id);
+  const div=document.createElement('div'); div.className='b '+(mij?'ik':'jij'); div.textContent=m.tekst;
+  $('#berichten').appendChild(div); scrollNaarBeneden();
+}
+function scrollNaarBeneden(){ const b=$('#berichten'); b.scrollTop=b.scrollHeight; }
+$('#tTerug').onclick=()=>{ actief=null; $('#threadView').classList.remove('open'); $('#lijstView').style.display=''; $('#balk').style.display=''; laadLijst(); };
+async function stuur(){
+  const t=$('#tIn').value.trim(); if(!t||!actief) return; $('#tIn').value='';
+  try{ const r = await GezinRT.stuur(actief, t); voegBericht(Object.assign(r.bericht,{vanMij:true})); }catch(e){ alert(e.message); }
+}
+$('#tStuur').onclick=stuur;
+$('#tIn').addEventListener('keydown', e=>{ if(e.key==='Enter') stuur(); });
+$('#tBel').onclick=()=> actief && GezinRT.bel(actief, false);
+$('#tVideo').onclick=()=> actief && GezinRT.bel(actief, true);
+
+(async ()=>{ await laadLeden(); laadLijst(); })();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

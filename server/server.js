@@ -927,6 +927,13 @@ app.post('/api/rtf/overzicht', auth, (req, res) => {
   if (!eisAccount(req, res)) return;
   res.json({ gezinnen: rtf.gastOverzicht(req.session.account.id) });
 });
+// het chat-/belkanaal van een gekoppeld gezin (profieltoken + leden) voor de RTG-app
+app.post('/api/rtf/kanaal', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const info = rtf.kanaalInfo(req.session.account.id, req.body.code);
+  if (!info) return res.status(403).json({ error: 'Je bent niet aan dit gezin gekoppeld.' });
+  res.json(info);
+});
 // terugberichten naar het gezin (bijv. de oppas antwoordt op een oproep)
 app.post('/api/rtf/bericht', auth, (req, res) => {
   if (!eisAccount(req, res)) return;

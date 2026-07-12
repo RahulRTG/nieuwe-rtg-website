@@ -393,6 +393,40 @@ test('gezinsagenda en klusjes: plannen samen en sterren verdienen', async () => 
   assert.equal((await fetch(BASE + '/api/foundation/gezin/' + g.code + '/klussen?token=' + gt)).status, 403);
 });
 
+test('in de app chatten en bellen tussen gezinsleden', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Praat', naam: 'Ma', pin: '2020' }));
+  const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Tim', rol: 'kind' }));
+  const kt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const maId = (await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token))).profiel.id;
+
+  // Ma stuurt Tim een chatbericht
+  assert.equal((await api('/gezin/chat', { code: g.code, token: g.token, naar: kind.profiel.id, tekst: 'Kom je eten?' })).status, 200);
+  // Tim leest het gesprek en ziet het (niet van hemzelf)
+  const thread = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/chat/' + maId + '?token=' + kt));
+  assert.ok(thread.berichten.some(b => b.tekst === 'Kom je eten?' && b.vanMij === false));
+  // in Tims chatlijst staat Ma met het laatste bericht (nu gelezen, dus 0 ongelezen)
+  const lijst = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/chats?token=' + kt));
+  const metMa = lijst.chats.find(c => c.naam === 'Ma');
+  assert.equal(metMa.laatste, 'Kom je eten?');
+  assert.equal(metMa.ongelezen, 0);
+  // Tim antwoordt
+  await api('/gezin/chat', { code: g.code, token: kt, naar: maId, tekst: 'Ja!' });
+  const maLijst = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/chats?token=' + g.token));
+  assert.equal(maLijst.chats.find(c => c.naam === 'Tim').ongelezen, 1);
+
+  // een belsignaal doorgeven lukt (relay); onbekend lid faalt
+  assert.equal((await api('/gezin/bel', { code: g.code, token: g.token, naar: kind.profiel.id, kind: 'ring', video: true })).status, 200);
+  assert.equal((await api('/gezin/bel', { code: g.code, token: g.token, naar: 'xxx', kind: 'ring' })).status, 404);
+
+  // de gekoppelde oppas krijgt via de RTG-app het kanaal (profieltoken + leden)
+  const reg = await json(await (await fetch(BASE + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Oma', email: 'o' + Date.now() + '@v.test', phone: '0612345678', password: 'geheim123', geboortedatum: '1955-01-01', tier: 'rtg' }) })));
+  const gast = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oma', rol: 'gast' }));
+  await fetch(BASE + '/api/rtf/koppel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token }, body: JSON.stringify({ code: g.code, profielId: gast.profiel.id }) });
+  const kan = await json(await (await fetch(BASE + '/api/rtf/kanaal', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token }, body: JSON.stringify({ code: g.code }) })));
+  assert.ok(kan.token && kan.profielId === gast.profiel.id);
+  assert.ok(kan.leden.some(l => l.naam === 'Ma') && kan.leden.some(l => l.naam === 'Tim'));
+});
+
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {
   const L = await les();
   const goed = await api('/ai', { code: L.code, token: L.sToken, messages: [{ role: 'user', content: 'Help met breuken' }] });

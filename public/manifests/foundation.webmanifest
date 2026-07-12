@@ -15,6 +15,7 @@
   "shortcuts": [
     { "name": "Leren", "url": "/apps/foundation/leren.html" },
     { "name": "Onze dromen", "url": "/apps/foundation/dromen.html" },
+    { "name": "Contact", "url": "/apps/foundation/contact.html" },
     { "name": "Gezinsagenda", "url": "/apps/foundation/agenda.html" },
     { "name": "Klusjes en sterren", "url": "/apps/foundation/klusjes.html" },
     { "name": "Veilig thuis", "url": "/apps/foundation/veilig.html" },

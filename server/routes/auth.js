@@ -136,10 +136,12 @@ app.post('/api/verify/upload', express.json({ limit: '6mb' }), auth, (req, res) 
   if (!m) return res.status(400).json({ error: 'Upload een foto (JPG, PNG of WebP) van uw identiteitsbewijs.' });
   const buf = Buffer.from(m[2], 'base64');
   if (buf.length > 5 * 1024 * 1024) return res.status(413).json({ error: 'Bestand te groot (max 5 MB).' });
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  // Identiteitsbewijs: alleen de eigenaar van het proces mag erbij (map 0700, bestand 0600).
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true, mode: 0o700 });
+  try { fs.chmodSync(UPLOAD_DIR, 0o700); } catch (e) {}
   const ext = m[1] === 'jpeg' ? 'jpg' : m[1];
   const fname = req.session.account.id + '-' + Date.now() + '.' + ext;
-  fs.writeFileSync(path.join(UPLOAD_DIR, fname), buf);
+  fs.writeFileSync(path.join(UPLOAD_DIR, fname), buf, { mode: 0o600 });
   accounts.setVerification(req.session.account.id, 'pending', fname);
   res.json({ ok: true, status: 'pending' });
 });

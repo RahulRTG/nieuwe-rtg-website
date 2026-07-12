@@ -21,6 +21,11 @@ const db = { data: null, writable: process.env.RTG_ROL !== 'standby' };
 const REDIS_URL = process.env.REDIS_URL;
 let rPub = null, rSub = null, versie = 0, externCb = null;
 
+// Privacy op schijf: de datamap en de databestanden bevatten chats, sessies en
+// (tijdelijk) snaps. Alleen de eigenaar mag ze lezen (map 0700, bestanden 0600).
+function besloten(f) { try { fs.chmodSync(f, 0o600); } catch (e) {} }
+function beslotenMap(d) { try { fs.mkdirSync(d, { recursive: true, mode: 0o700 }); fs.chmodSync(d, 0o700); } catch (e) { try { fs.mkdirSync(d, { recursive: true }); } catch (x) {} } }
+
 /* Opslagmotor. Standaard 'json' (een db.json-bestand, zoals altijd). Met
    RTG_STORE=sqlite bewaart de server elke top-level collectie als een rij in een
    SQLite-database (WAL, transactioneel). Dat schaalt veel beter dan telkens een
@@ -40,8 +45,10 @@ const laatsteJson = new Map(); // collectie -> laatst weggeschreven JSON (om ong
 function sqliteInit() {
   if (kvdb) return;
   const { DatabaseSync } = require('node:sqlite');
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  kvdb = new DatabaseSync(path.join(DATA_DIR, 'store.db'));
+  beslotenMap(DATA_DIR);
+  const bestand = path.join(DATA_DIR, 'store.db');
+  kvdb = new DatabaseSync(bestand);
+  besloten(bestand);
   kvdb.exec('PRAGMA journal_mode=WAL');
   kvdb.exec('PRAGMA synchronous=NORMAL');
   kvdb.exec('PRAGMA busy_timeout=5000'); // wacht kort als een ander proces net schrijft
@@ -158,8 +165,12 @@ function pollSqlite() {
   try {
     // per collectie kijken of een ANDER proces een nieuwere versie schreef dan wij
     // al toepasten (een globale hoogwatergrens zou een lager genummerde wijziging
-    // van een ander proces missen zodra wij zelf iets hoger schreven).
-    const rows = kvdb.prepare('SELECT key, val, ver FROM kv').all();
+    // van een ander proces missen zodra wij zelf iets hoger schreven). We halen
+    // alleen rijen op boven onze laagst-toegepaste versie, zodat we niet elke
+    // keer alle collecties hoeven te deserialiseren.
+    let laagst = 0;
+    for (const v of toegepast.values()) if (v < laagst || laagst === 0) laagst = v;
+    const rows = kvdb.prepare('SELECT key, val, ver FROM kv WHERE ver > ?').all(laagst);
     let sessieGewijzigd = false;
     for (const r of rows) {
       if (r.ver <= (toegepast.get(r.key) || 0)) continue;
@@ -233,12 +244,13 @@ function save() {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
     saveSqlite();
   } else {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+    beslotenMap(DATA_DIR);
     // Atomisch wegschrijven: eerst een tijdelijk bestand, dan hernoemen.
     // Valt de server midden in een save uit, dan blijft het oude bestand heel.
     const tmp = DB_FILE + '.tmp';
-    fs.writeFileSync(tmp, JSON.stringify(db.data, null, 2));
+    fs.writeFileSync(tmp, JSON.stringify(db.data, null, 2), { mode: 0o600 });
     fs.renameSync(tmp, DB_FILE);
+    besloten(DB_FILE);
     spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis (lees-replica's)
   }
 }

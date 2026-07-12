@@ -45,6 +45,8 @@ function meldMisbruik(mij, doel, reden) {
 const sociaalTellers = new Map(); // actie:handle -> { n, reset }
 function sociaalRate(mij, actie, max, perMs) {
   const k = actie + ':' + mij, nu = Date.now();
+  // begrens de geheugengroei: ruim af en toe verlopen tellers op
+  if (sociaalTellers.size > 5000) for (const [kk, tt] of sociaalTellers) if (tt.reset < nu) sociaalTellers.delete(kk);
   let t = sociaalTellers.get(k);
   if (!t || t.reset < nu) { t = { n: 0, reset: nu + perMs }; sociaalTellers.set(k, t); }
   t.n++;

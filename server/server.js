@@ -2530,10 +2530,11 @@ function backupData() {
   try {
     const day = new Date().toISOString().slice(0, 10);
     const dir = path.join(BACKUP_DIR, day);
-    fs.mkdirSync(dir, { recursive: true });
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    try { fs.chmodSync(dir, 0o700); } catch (e) {}
     for (const f of ['db.json', 'rtg.db', 'store.db']) {
       const from = path.join(DATA_DIR, f);
-      if (fs.existsSync(from)) fs.copyFileSync(from, path.join(dir, f));
+      if (fs.existsSync(from)) { const doel = path.join(dir, f); fs.copyFileSync(from, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
     }
     // hooguit 14 dagen bewaren
     const days = fs.readdirSync(BACKUP_DIR).sort();
@@ -2559,6 +2560,17 @@ initRealtime();
 startGedeeld().catch(e => console.warn('[db] gedeelde data mislukt:', e.message));
 // Kruisproces-synchronisatie voor de SQLite-opslag (echt losse schrijvende servers).
 startSqliteSync();
+// Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
+// opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke bezoekers.
+setInterval(() => {
+  const nu = Date.now();
+  for (const [k, f] of loginFails) if (f.until < nu) loginFails.delete(k);
+  for (const [k, f] of pinFails) if (f.until < nu) pinFails.delete(k);
+  for (const [k, lijst] of sseBuffer) {
+    const vers = lijst.filter(e => nu - e.at < SSE_BUFFER_TTL);
+    if (!vers.length) sseBuffer.delete(k); else if (vers.length !== lijst.length) sseBuffer.set(k, vers);
+  }
+}, 5 * 60 * 1000).unref();
 backupData();
 setInterval(backupData, 24 * 60 * 60 * 1000);
 

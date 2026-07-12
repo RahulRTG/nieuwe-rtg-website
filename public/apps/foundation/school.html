@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>School · RTFoundation</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:46rem;margin:0 auto;padding:1.2rem 1.2rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.6rem 0 .3rem;}
+  .intro{color:var(--zacht);font-size:.92rem;line-height:1.5;margin-bottom:1.1rem;}
+  .sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.6rem 0 .7rem;}
+  .kaart.blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;flex-wrap:wrap;}
+  .kop b{font-size:1.05rem;}
+  .kop .sub{color:var(--zacht);font-size:.8rem;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-top:1px solid var(--lijn);font-size:.9rem;}
+  .rij:first-of-type{border-top:none;}
+  .rij .mid{flex:1;min-width:0;}
+  .rij small{display:block;color:var(--zacht);}
+  .cijfer{font-weight:700;min-width:2.4rem;text-align:center;border-radius:8px;padding:.15rem .3rem;background:var(--paneel2);}
+  .cijfer.goed{color:#7EE0A3;}
+  .cijfer.slecht{color:#F4B8C6;}
+  .knoprij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;}
+  .leeg{color:var(--zacht);font-size:.85rem;padding:.4rem 0;}
+  .af{opacity:.55;text-decoration:line-through;}
+  input.veld, textarea.veld, select.veld{width:100%;margin-bottom:.55rem;}
+  .mini{font-size:.78rem;color:var(--zacht);}
+  .mini a{color:var(--goud);cursor:pointer;text-decoration:none;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--goud);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--goud);outline-offset:2px;}
+  /* berichten-overlay */
+  .ov{position:fixed;inset:0;background:rgba(4,4,3,.8);display:none;align-items:flex-end;justify-content:center;z-index:80;}
+  .ov.open{display:flex;}
+  .ovkaart{background:var(--paneel);border:1px solid var(--lijn);border-radius:18px 18px 0 0;width:100%;max-width:34rem;max-height:80vh;display:flex;flex-direction:column;}
+  .ovkop{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;border-bottom:1px solid var(--lijn);}
+  .ovx{background:none;border:none;color:var(--txt);font-size:1rem;cursor:pointer;}
+  .chatlijst{flex:1;overflow-y:auto;padding:.8rem 1rem;display:flex;flex-direction:column;gap:.45rem;}
+  .bub{max-width:80%;padding:.5rem .75rem;border-radius:12px;background:var(--paneel2);font-size:.9rem;line-height:1.4;}
+  .bub.mijn{align-self:flex-end;background:#24371f;}
+  .bub small{display:block;color:var(--zacht);font-size:.68rem;margin-top:.15rem;}
+  .chatvoet{display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--lijn);}
+  .chatvoet .veld{flex:1;margin:0;}
+</style>
+</head>
+<body>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<header id="balk"></header>
+<main class="wrap" id="hoofd" tabindex="-1">
+  <h1>🏫 School</h1>
+  <div class="intro">Alles van school op één plek: het rooster van vandaag, huiswerk met één tik af, cijfers, mededelingen en ziekmelden zonder bellen. Berichten met de leraar lopen altijd via het gezin, dus een ouder kijkt mee.</div>
+
+  <!-- gezinsweergave -->
+  <section id="vGezin" hidden>
+    <div id="schoolLijst"></div>
+    <div id="koppelBlok" hidden>
+      <div class="sec">Kind koppelen aan een klas</div>
+      <div class="kaart blok">
+        <input class="veld" id="kopCode" placeholder="Klascode (van de leraar)" maxlength="8" autocapitalize="characters">
+        <select class="veld" id="kopKind"></select>
+        <button class="knop" id="kopDoe">Koppelen</button>
+        <div class="mini" id="kopFout" style="color:var(--rood);min-height:1rem;"></div>
+      </div>
+    </div>
+    <div class="mini" style="margin-top:1rem;">Ben je leraar? <a id="naarLeraar">Open de leraaromgeving</a></div>
+  </section>
+
+  <!-- leraarweergave -->
+  <section id="vLeraar" hidden>
+    <div class="sec">Leraaromgeving</div>
+    <div class="kaart blok" id="lrInlog">
+      <b>Klas openen</b>
+      <div class="mini" style="margin:.3rem 0 .6rem;">Met je klascode en leraar-token. Nog geen klas? Maak er hieronder een.</div>
+      <input class="veld" id="lrCode" placeholder="Klascode" maxlength="8" autocapitalize="characters">
+      <input class="veld" id="lrToken" placeholder="Leraar-token">
+      <button class="knop" id="lrOpen">Open klas</button>
+      <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
+      <b>Nieuwe klas</b>
+      <input class="veld" id="nkNaam" placeholder="Klasnaam (bijv. Groep 8)" maxlength="60" style="margin-top:.5rem;">
+      <input class="veld" id="nkLeraar" placeholder="Jouw naam" maxlength="60">
+      <input class="veld" id="nkSchool" placeholder="School (optioneel)" maxlength="80">
+      <button class="knop" id="nkDoe">Klas aanmaken</button>
+      <div class="mini" id="lrFout" style="color:var(--rood);min-height:1rem;"></div>
+    </div>
+    <div id="lrDash" hidden></div>
+    <div class="mini" style="margin-top:1rem;"><a id="terugGezin">← Terug naar de gezinsweergave</a></div>
+  </section>
+</main>
+
+<!-- berichten-overlay (leraar <-> gezin) -->
+<div class="ov" id="chatOv" aria-label="Schoolberichten">
+  <div class="ovkaart">
+    <div class="ovkop"><b id="chatTitel">Berichten</b><button class="ovx" id="chatX" aria-label="Sluiten">✕</button></div>
+    <div class="chatlijst" id="chatLijst"></div>
+    <div class="chatvoet">
+      <input class="veld" id="chatIn" placeholder="Schrijf een bericht" maxlength="500">
+      <button class="knop" id="chatStuur">Stuur</button>
+    </div>
+  </div>
+</div>
+
+<script src="/apps/util.js"></script>
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const E = Util.el, vervang = Util.vervang, esc = Util.escapeHTML;
+const s = window.Sessie ? Sessie.huidig() : null;
+if (window.Sessie && s && s.token) Sessie.balk($('#balk'), { terug: 'index.html' });
+
+function api(pad, body){
+  return fetch('/api/foundation'+pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{}) })
+    .then(r => r.json().catch(()=>({})).then(d => { if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }));
+}
+const gezinApi = (pad, body) => api(pad, Object.assign({ code: s && s.code, token: s && s.token }, body||{}));
+
+/* ---------- weergave-schakelaar ---------- */
+function toon(view){
+  $('#vGezin').hidden = view !== 'gezin';
+  $('#vLeraar').hidden = view !== 'leraar';
+}
+$('#naarLeraar').addEventListener('click', ()=> toon('leraar'));
+$('#terugGezin').addEventListener('click', ()=> { toon('gezin'); });
+
+/* ---------- gezinsweergave ---------- */
+let ouder = false;
+async function laadGezin(){
+  if (!s || !s.token){ toon('leraar'); return; }
+  toon('gezin');
+  let d;
+  try { d = await gezinApi('/school/mijn'); } catch(e){ vervang($('#schoolLijst'), E('div',{class:'leeg'}, e.message)); return; }
+  ouder = !!d.ouder;
+  $('#koppelBlok').hidden = !ouder;
+  if (ouder) vulKindKeuze();
+  const lijst = d.school || [];
+  if (!lijst.length){
+    vervang($('#schoolLijst'), E('div',{class:'kaart blok'},
+      E('b', null, 'Nog geen klas gekoppeld'),
+      E('div',{class:'mini', style:{marginTop:'.3rem'}}, ouder
+        ? 'Vraag de klascode aan de leraar en koppel je kind hieronder.'
+        : 'Vraag je ouder of verzorger om je te koppelen met de klascode van je leraar.')));
+    return;
+  }
+  vervang($('#schoolLijst'), lijst.map(kaartVoor));
+}
+function kaartVoor(x){
+  const open = (x.huiswerk||[]).filter(h => !h.af);
+  const kaart = E('div',{class:'kaart blok'},
+    E('div',{class:'kop'},
+      E('b', null, x.klas.naam + ' · ' + x.kind.naam),
+      E('span',{class:'sub'}, (x.klas.school ? x.klas.school + ' · ' : '') + x.klas.leraar)),
+    // vandaag
+    E('div',{class:'sec', style:{margin:'0.8rem 0 0.3rem'}}, 'Vandaag'),
+    x.vandaag && x.vandaag.length
+      ? x.vandaag.map(r => E('div',{class:'rij'}, E('div',{class:'mid'}, (r.van||'') + (r.tot ? ' tot ' + r.tot : '') + '  ' + (r.vak||''), r.lokaal ? E('small', null, r.lokaal) : null)))
+      : E('div',{class:'leeg'}, 'Geen lessen (of nog geen rooster).'),
+    // huiswerk
+    E('div',{class:'sec', style:{margin:'0.8rem 0 0.3rem'}}, 'Huiswerk (' + open.length + ' open)'),
+    (x.huiswerk && x.huiswerk.length) ? x.huiswerk.slice(0, 8).map(h => huiswerkRij(x, h)) : E('div',{class:'leeg'}, 'Geen huiswerk. Lekker.'),
+    // cijfers
+    E('div',{class:'sec', style:{margin:'0.8rem 0 0.3rem'}}, 'Cijfers' + gemiddelde(x.cijfers)),
+    (x.cijfers && x.cijfers.length) ? x.cijfers.slice(0, 6).map(c =>
+      E('div',{class:'rij'},
+        E('span',{class:'cijfer ' + (c.cijfer >= 5.5 ? 'goed' : 'slecht')}, String(c.cijfer)),
+        E('div',{class:'mid'}, c.vak || 'Vak', E('small', null, (c.omschrijving || '') + (c.weging > 1 ? ' (weegt ' + c.weging + 'x)' : ''))))
+    ) : E('div',{class:'leeg'}, 'Nog geen cijfers.'),
+    // mededelingen
+    (x.mededelingen && x.mededelingen.length)
+      ? [E('div',{class:'sec', style:{margin:'0.8rem 0 0.3rem'}}, 'Mededelingen'),
+         x.mededelingen.slice(0, 3).map(m => E('div',{class:'rij'}, E('div',{class:'mid'}, m.tekst, E('small', null, m.at.slice(0, 10)))))]
+      : null,
+    // acties
+    E('div',{class:'knoprij'},
+      E('button',{class:'knop klein', onclick:()=>openChat(x)}, '💬 Bericht aan de leraar'),
+      ouder ? E('button',{class:'knop grijs klein', onclick:()=>ziekmelden(x)}, '🤒 Ziekmelden') : null,
+      E('a',{class:'knop grijs klein', href:'leren.html', style:{textDecoration:'none'}}, '🤖 AI-bijles')));
+  if ((x.absenties||[]).some(a => !a.afgehandeld))
+    kaart.appendChild(E('div',{class:'mini', style:{marginTop:'.5rem', color:'var(--goud2)'}}, 'Ziek gemeld. De leraar ziet dit.'));
+  return kaart;
+}
+function gemiddelde(cijfers){
+  if (!cijfers || !cijfers.length) return '';
+  let som = 0, w = 0;
+  for (const c of cijfers){ som += c.cijfer * (c.weging || 1); w += (c.weging || 1); }
+  return ' · gemiddeld ' + (som / w).toFixed(1);
+}
+function huiswerkRij(x, h){
+  const knop = E('button',{class:'knop grijs mini', onclick:async()=>{
+    try{ await gezinApi('/school/huiswerk/af', { klasCode: x.klas.code, profielId: x.kind.profielId, huiswerkId: h.id, af: !h.af }); laadGezin(); }
+    catch(e){ alert(e.message); }
+  }}, h.af ? '↩' : '✓');
+  return E('div',{class:'rij' + (h.af ? ' af' : '')},
+    knop,
+    E('div',{class:'mid'}, h.titel + (h.vak ? ' · ' + h.vak : ''),
+      E('small', null, (h.deadline ? 'voor ' + h.deadline + '. ' : '') + (h.omschrijving || ''))));
+}
+async function ziekmelden(x){
+  const reden = prompt('Ziekmelden: ' + x.kind.naam + ' bij ' + x.klas.naam + '.\nEventueel een korte toelichting:', 'ziek');
+  if (reden === null) return;
+  try{ await gezinApi('/school/ziekmelden', { klasCode: x.klas.code, profielId: x.kind.profielId, reden }); alert('Ziek gemeld. De leraar ziet het meteen; je hoeft niet meer te bellen.'); laadGezin(); }
+  catch(e){ alert(e.message); }
+}
+async function vulKindKeuze(){
+  try{
+    const d = await api('/gezin/inloggen', { code: s.code });
+    vervang($('#kopKind'), (d.profielen||[]).map(p => E('option',{value:p.id}, p.naam)));
+  }catch(e){}
+}
+$('#kopCode').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
+$('#kopDoe').addEventListener('click', async ()=>{
+  $('#kopFout').textContent = '';
+  try{
+    await gezinApi('/school/koppel', { klasCode: $('#kopCode').value.trim(), profielId: $('#kopKind').value });
+    $('#kopCode').value = ''; laadGezin();
+  }catch(e){ $('#kopFout').textContent = e.message; }
+});
+
+/* ---------- berichten (gezin-kant): de ouder kijkt altijd mee ---------- */
+let chatCtx = null;
+function openChat(x){
+  chatCtx = { soort: 'gezin', klasCode: x.klas.code, profielId: x.kind.profielId, titel: x.klas.leraar };
+  $('#chatTitel').textContent = 'Berichten met ' + x.klas.leraar;
+  $('#chatOv').classList.add('open');
+  chatLaad();
+}
+async function chatLaad(tekst){
+  try{
+    let d;
+    if (chatCtx.soort === 'gezin') d = await gezinApi('/school/bericht/gezin', { klasCode: chatCtx.klasCode, profielId: chatCtx.profielId, tekst: tekst || '' });
+    else d = await api('/school/bericht/leraar', { klasCode: chatCtx.klasCode, leraarToken: chatCtx.leraarToken, leerling: chatCtx.leerling, tekst: tekst || '' });
+    const mijnKant = chatCtx.soort === 'gezin' ? 'gezin' : 'leraar';
+    vervang($('#chatLijst'), (d.berichten||[]).map(b =>
+      E('div',{class:'bub' + (b.van === mijnKant ? ' mijn' : '')}, b.tekst, E('small', null, b.naam + ' · ' + b.at.slice(11, 16)))));
+    $('#chatLijst').scrollTop = 1e9;
+  }catch(e){ alert(e.message); }
+}
+$('#chatX').addEventListener('click', ()=> $('#chatOv').classList.remove('open'));
+$('#chatStuur').addEventListener('click', ()=>{ const t = $('#chatIn').value.trim(); if (t){ $('#chatIn').value=''; chatLaad(t); } });
+$('#chatIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('#chatStuur').click(); });
+
+/* ---------- leraaromgeving ---------- */
+const LS = 'rtfSchoolLeraar';
+function bewaardeKlas(){ try{ return JSON.parse(localStorage.getItem(LS) || 'null'); }catch(e){ return null; } }
+$('#lrCode').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
+$('#nkDoe').addEventListener('click', async ()=>{
+  $('#lrFout').textContent = '';
+  try{
+    const d = await api('/school/klas/maak', { naam: $('#nkNaam').value, leraar: $('#nkLeraar').value, school: $('#nkSchool').value });
+    localStorage.setItem(LS, JSON.stringify({ code: d.code, token: d.leraarToken }));
+    alert('Klas aangemaakt.\n\nKlascode voor de ouders: ' + d.code + '\nJouw leraar-token (bewaar goed): ' + d.leraarToken);
+    laadLeraar(d.code, d.leraarToken);
+  }catch(e){ $('#lrFout').textContent = e.message; }
+});
+$('#lrOpen').addEventListener('click', ()=> laadLeraar($('#lrCode').value.trim(), $('#lrToken').value.trim()));
+
+async function laadLeraar(code, token){
+  $('#lrFout').textContent = '';
+  let d;
+  try{ d = await api('/school/klas', { klasCode: code, leraarToken: token }); }
+  catch(e){ $('#lrFout').textContent = e.message; return; }
+  localStorage.setItem(LS, JSON.stringify({ code, token }));
+  $('#lrInlog').hidden = true;
+  const her = ()=> laadLeraar(code, token);
+  const lrApi = (pad, body) => api(pad, Object.assign({ klasCode: code, leraarToken: token }, body||{}));
+
+  const dash = E('div', null,
+    E('div',{class:'kaart blok'},
+      E('div',{class:'kop'}, E('b', null, d.naam + (d.school ? ' · ' + d.school : '')),
+        E('span',{class:'sub'}, 'klascode voor ouders: ' + d.code)),
+      E('div',{class:'mini', style:{marginTop:'.3rem'}}, (d.leerlingen||[]).length + ' leerling(en) gekoppeld.')),
+    // ziekmeldingen
+    E('div',{class:'sec'}, 'Ziekmeldingen van vandaag'),
+    E('div',{class:'kaart blok'},
+      (d.absenties && d.absenties.length) ? d.absenties.map(a =>
+        E('div',{class:'rij'},
+          E('div',{class:'mid'}, a.naam + ' · ' + a.reden, E('small', null, 'gemeld door ' + a.doorNaam + ' om ' + a.at.slice(11, 16))),
+          E('button',{class:'knop grijs mini', onclick:async()=>{ try{ await lrApi('/school/absentie/afhandelen', { id: a.id }); her(); }catch(e){ alert(e.message); } }}, 'Gezien')))
+        : E('div',{class:'leeg'}, 'Geen openstaande ziekmeldingen.')),
+    // huiswerk
+    E('div',{class:'sec'}, 'Huiswerk opgeven'),
+    E('div',{class:'kaart blok'},
+      E('input',{class:'veld', id:'hwTitel', placeholder:'Titel (bijv. Hoofdstuk 4 lezen)', maxlength:80}),
+      E('input',{class:'veld', id:'hwVak', placeholder:'Vak', maxlength:40}),
+      E('input',{class:'veld', id:'hwDeadline', type:'date'}),
+      E('textarea',{class:'veld', id:'hwOms', placeholder:'Toelichting (optioneel)', rows:2, maxlength:500}),
+      E('button',{class:'knop', onclick:async()=>{
+        try{ await lrApi('/school/huiswerk/maak', { titel: $('#hwTitel').value, vak: $('#hwVak').value, deadline: $('#hwDeadline').value, omschrijving: $('#hwOms').value }); her(); }
+        catch(e){ alert(e.message); }
+      }}, 'Opgeven'),
+      (d.huiswerk||[]).slice(0, 5).map(h => E('div',{class:'rij'},
+        E('div',{class:'mid'}, h.titel + (h.vak ? ' · ' + h.vak : ''),
+          E('small', null, (h.deadline ? 'voor ' + h.deadline + ' · ' : '') + (h.afDoor||[]).length + ' af'))))),
+    // cijfers en berichten per leerling
+    E('div',{class:'sec'}, 'Leerlingen'),
+    E('div',{class:'kaart blok'},
+      (d.leerlingen && d.leerlingen.length) ? d.leerlingen.map(l => E('div',{class:'rij'},
+        E('div',{class:'mid'}, l.naam),
+        E('button',{class:'knop mini', onclick:async()=>{
+          const vak = prompt('Vak voor het cijfer van ' + l.naam + ':', 'Rekenen'); if (vak === null) return;
+          const cf = prompt('Cijfer (1 t/m 10):', '7'); if (cf === null) return;
+          const oms = prompt('Waarvoor? (bijv. Toets H4)', '') || '';
+          try{ await lrApi('/school/cijfer/geef', { leerling: l.sleutel, vak, cijfer: Number(String(cf).replace(',', '.')), omschrijving: oms }); alert('Cijfer ingevoerd. Het gezin ziet het meteen.'); }
+          catch(e){ alert(e.message); }
+        }}, 'Cijfer'),
+        E('button',{class:'knop grijs mini', onclick:()=>{
+          chatCtx = { soort: 'leraar', klasCode: code, leraarToken: token, leerling: l.sleutel };
+          $('#chatTitel').textContent = 'Berichten met het gezin van ' + l.naam;
+          $('#chatOv').classList.add('open');
+          chatLaad();
+        }}, '💬')))
+        : E('div',{class:'leeg'}, 'Nog geen leerlingen. Geef de klascode (' + d.code + ') aan de ouders.')),
+    // mededeling + rooster
+    E('div',{class:'sec'}, 'Mededeling en rooster'),
+    E('div',{class:'kaart blok'},
+      E('div',{class:'knoprij', style:{marginTop:0}},
+        E('button',{class:'knop klein', onclick:async()=>{
+          const t = prompt('Mededeling aan alle ouders en kinderen:', ''); if (!t) return;
+          try{ await lrApi('/school/mededeling', { tekst: t }); alert('Verstuurd.'); her(); }catch(e){ alert(e.message); }
+        }}, '📣 Mededeling'),
+        E('button',{class:'knop grijs klein', onclick:async()=>{
+          const uitleg = 'Een regel per les: dag van tot vak lokaal\nDagen: ma di wo do vr\n\nBijvoorbeeld:\nma 08:30 09:15 Rekenen lokaal 3\nma 09:15 10:00 Taal lokaal 3';
+          const huidig = (d.rooster||[]).map(r => [r.dag, r.van, r.tot, r.vak, r.lokaal].filter(Boolean).join(' ')).join('\n');
+          const inp = prompt(uitleg, huidig); if (inp === null) return;
+          const rooster = inp.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+            const [dag, van, tot, ...rest] = l.split(/\s+/);
+            const vakLokaal = rest.join(' ').split(/\s+lokaal\s+/i);
+            return { dag, van, tot, vak: vakLokaal[0] || '', lokaal: vakLokaal[1] ? 'lokaal ' + vakLokaal[1] : '' };
+          });
+          try{ await lrApi('/school/rooster/zet', { rooster }); alert('Rooster opgeslagen.'); her(); }catch(e){ alert(e.message); }
+        }}, '🗓 Rooster'))));
+  const houder = $('#lrDash');
+  houder.hidden = false;
+  vervang(houder, dash);
+}
+
+/* ---------- start ---------- */
+const bewaard = bewaardeKlas();
+if (s && s.token) laadGezin();
+else { toon('leraar'); if (bewaard) laadLeraar(bewaard.code, bewaard.token); }
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

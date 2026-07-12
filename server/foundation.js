@@ -1202,4 +1202,8 @@ router.post('/gezin/sollicitaties', (req, res) => {
 
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
+// RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
+// dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
+require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto });
+
 module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, beheerdersVanHandle };

@@ -22,6 +22,7 @@ const PAGINAS = [
   '/apps/index.html',
   '/apps/foundation/index.html',
   '/apps/foundation/vrienden.html',
+  '/apps/foundation/school.html',
   '/apps/app.html',
   '/apps/portaal.html',
   '/apps/leverancier.html',

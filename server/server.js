@@ -23,6 +23,24 @@ const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChang
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const mail = require('./mail');
+const logboek = require('./log');
+const log = logboek.log;
+const betaal = require('./betaal');
+
+/* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
+   pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
+   monitoring een kwestie van configuratie, niet van codewijziging. */
+if (process.env.SENTRY_DSN) {
+  try {
+    const Sentry = require('@sentry/node');
+    Sentry.init({ dsn: process.env.SENTRY_DSN, environment: process.env.NODE_ENV || 'development',
+      tracesSampleRate: Number(process.env.SENTRY_TRACES || 0) });
+    log.onError((err, ctx) => Sentry.captureException(err, { extra: ctx }));
+    log.info('Fout-tracker: Sentry actief.');
+  } catch (e) {
+    log.warn('SENTRY_DSN gezet maar @sentry/node ontbreekt; fout-tracker uit.');
+  }
+}
 
 // Vangnet: een niet-afgevangen belofte-afwijzing (bijv. een externe AI- of
 // vertaalaanroep die faalt) beeindigt in Node 22 standaard het proces. Voor een
@@ -30,12 +48,25 @@ const mail = require('./mail');
 // kunnen platleggen. We loggen zo'n afwijzing en laten de server doordraaien;
 // het verzoek dat hem veroorzaakte krijgt geen antwoord, maar de rest wel.
 process.on('unhandledRejection', reason => {
-  console.error('[unhandledRejection]', (reason && reason.message) || reason);
+  log.uitzondering(reason instanceof Error ? reason : new Error(String(reason)), { bron: 'unhandledRejection' });
+});
+// Een niet-afgevangen synchrone uitzondering laat de staat mogelijk half klaar
+// achter; we loggen hem mét stack en stoppen netjes, zodat de proces-manager
+// (Docker/systemd) ons herstart in plaats van door te draaien op kapotte staat.
+process.on('uncaughtException', err => {
+  log.uitzondering(err, { bron: 'uncaughtException', fataal: true });
+  try { save(); } catch (e) {}
+  setTimeout(() => process.exit(1), 200).unref();
 });
 
 function appUrl(req) {
   return process.env.APP_URL || req.headers.origin || (req.protocol + '://' + req.get('host'));
 }
+
+// Fail-fast: weiger te starten als productie onveilig is ingesteld (demo aan,
+// geen versleutelingssleutel, standaard-geheimen). Dit stopt het proces vóór
+// er ook maar één verzoek binnenkomt.
+require('./config').pasToe(process.env, log);
 
 load();
 accounts.init();
@@ -71,6 +102,7 @@ const app = express();
 app.disable('x-powered-by');
 const PRODUCTION = process.env.NODE_ENV === 'production';
 app.set('trust proxy', 1); // achter een reverse proxy (hosting) klopt req.secure dan
+app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
 
 // In productie: alles naar https, en HSTS zodat browsers het onthouden.
 app.use((req, res, next) => {
@@ -94,6 +126,26 @@ app.use((req, res, next) => {
     "font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
     "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
   next();
+});
+
+/* Betaal-webhook: de provider (Stripe) bevestigt hier een betaling. Dit MOET
+   vóór de JSON-parser staan én de ruwe body houden, want de handtekening wordt
+   over de onbewerkte bytes berekend. Een ongeldige handtekening -> 400. */
+app.post('/api/betaal/webhook', express.raw({ type: '*/*', limit: '1mb' }), (req, res) => {
+  let evt;
+  try {
+    evt = betaal.verifieerWebhook(req.body, req.get('stripe-signature') || req.get('x-rtg-signature'));
+  } catch (e) {
+    log.warn('betaal-webhook geweigerd', { fout: e.message, id: req.id });
+    return res.status(400).json({ error: 'Ongeldige handtekening.' });
+  }
+  try {
+    // De betaalstatus komt hier binnen als geverifieerde waarheid. Het routeren
+    // van evt.type naar de juiste factuur is domeinlogica die de member-routes
+    // oppakken; we loggen de gebeurtenis zodat ze traceerbaar is.
+    log.info('betaal-webhook', { type: (evt && evt.type) || 'onbekend', id: evt && evt.id });
+  } catch (e) { log.uitzondering(e, { bron: 'betaal-webhook' }); }
+  res.json({ ok: true });
 });
 
 app.use(express.json({ limit: '8mb' }));
@@ -758,11 +810,26 @@ function myApplications(key) {
 
 /* ---------- endpoints ---------- */
 
+// Liveness: draait het proces? (Voor de load balancer/monitor, altijd 200 als
+// het proces leeft.)
 app.get('/api/health', (req, res) => res.json({
   ok: true, ai: anthropic ? 'claude' : 'demo',
   server: Number(process.env.RTG_SERVER || 1), active: db.writable,
   pid: process.pid, up: Math.round(process.uptime())
 }));
+
+// Readiness: mag deze instance verkeer krijgen? Controleert dat de datalaag
+// echt bruikbaar is (kan lezen). Een standby- of half-gestarte server geeft 503,
+// zodat de load balancer hem overslaat tot hij klaar is.
+app.get('/api/ready', (req, res) => {
+  let dataOk = false;
+  try { dataOk = !!db.data && typeof db.data === 'object'; } catch (e) { dataOk = false; }
+  const klaar = dataOk;
+  res.status(klaar ? 200 : 503).json({
+    ready: klaar, data: dataOk, writable: !!db.writable,
+    redis: process.env.REDIS_URL ? 'geconfigureerd' : 'uit', up: Math.round(process.uptime())
+  });
+});
 
 /* ---- failover-cluster (server/trio.js): drie servers, een actief ----
    De poortwachter promoveert of degradeert een server via deze endpoints.
@@ -2476,7 +2543,7 @@ const kern = {
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
   ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom,
-  aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, auth, broadcastSync,
+  aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat,
@@ -2516,10 +2583,10 @@ app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, '..', 'public', 'site', '404.html'));
 });
 app.use((err, req, res, next) => {
-  console.error('[fout]', err && err.message);
+  log.uitzondering(err instanceof Error ? err : new Error(String(err)), { id: req && req.id, p: req && req.path });
   if (res.headersSent) return next(err);
-  res.status(err && err.type === 'entity.too.large' ? 413 : 500)
-     .json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
+  res.status(err && err.type === 'entity.too.large' ? 413 : (err.status || 500))
+     .json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
 });
 
 /* ---------- dagelijkse back-up van de data ---------- */

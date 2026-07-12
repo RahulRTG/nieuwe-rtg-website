@@ -1,7 +1,7 @@
 /* Domein "member" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, findSupplier, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept } = kern;
+  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, findSupplier, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept } = kern;
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
 
@@ -54,7 +54,7 @@ app.post('/api/rtf/bericht', auth, (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/pay', auth, (req, res) => {
+app.post('/api/pay', auth, async (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   // Echte accounts betalen hun eigen facturen; demo-sessies de gedeelde demo.
   const own = !!req.session.account;
@@ -70,20 +70,44 @@ app.post('/api/pay', auth, (req, res) => {
     if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
     targets = [inv];
   }
-  let foundation = 0;
+  // De afschrijving loopt via de betaalprovider met een idempotentiesleutel per
+  // factuur: twee keer op "betaal" tikken of een netwerk-herhaling schrijft nooit
+  // dubbel af. In demo-stand bevestigt de provider direct ('betaald'); met een
+  // echte Stripe-sleutel komt de definitieve bevestiging via de webhook, en
+  // markeren we hier nog niets als betaald.
+  const wie = own ? ('acc:' + req.session.account.id) : ('sess:' + req.session.tier);
+  let foundation = 0, provider = betaal.AANBIEDER, intents = [];
   for (const inv of targets) {
-    inv.status = 'paid';
-    inv.date = 'Zojuist betaald';
-    foundation += Math.round(inv.bijdrage * 0.3);
-    for (const item of (md.trip ? md.trip.items : [])) {
-      if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
+    let uitslag;
+    try {
+      uitslag = await betaal.maakBetaling({
+        bedrag: Math.max(1, Math.round((inv.bijdrage || 0) * 100)), // euro's -> centen
+        valuta: 'eur', referentie: String(inv.id),
+        idempotentieSleutel: wie + ':inv:' + inv.id,
+        omschrijving: 'RTG factuur ' + inv.id
+      });
+    } catch (e) { return res.status(502).json({ error: 'Betaling kon niet worden gestart.' }); }
+    const bevestigd = uitslag.status === 'betaald' || uitslag.status === 'succeeded';
+    if (bevestigd) {
+      inv.status = 'paid';
+      inv.date = 'Zojuist betaald';
+      inv.betaalId = uitslag.id;
+      foundation += Math.round((inv.bijdrage || 0) * 0.3);
+      for (const item of (md.trip ? md.trip.items : [])) {
+        if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
+      }
+    } else {
+      // echte kaartbetaling: client rondt af met clientSecret, webhook bevestigt
+      intents.push({ invoiceId: inv.id, clientSecret: uitslag.clientSecret, status: uitslag.status });
     }
   }
   if (own) accounts.saveMemberState(req.session.account.id, md);
   else save();
   // ander open scherm van hetzelfde lid meteen bijwerken
   broadcastSync([req.session.tier], 'payments');
-  res.json({ ok: true, foundation, state: stateFor(req.session, req.body.lang) });
+  const antwoord = { ok: true, foundation, provider, state: stateFor(req.session, req.body.lang) };
+  if (intents.length) { antwoord.pending = true; antwoord.intents = intents; } // wachten op kaartbevestiging
+  res.json(antwoord);
 });
 
 app.post('/api/like', auth, (req, res) => {

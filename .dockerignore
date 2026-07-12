@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.github
+.env
+.env.*
+server/data
+public/dist
+*.md
+test
+scripts/a11y.js
+.DS_Store
+/tmp
+coverage

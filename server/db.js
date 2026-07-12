@@ -248,6 +248,26 @@ function load() {
   if (db.data.__schema == null) db.data.__schema = 1;
 }
 
+/* Atomisch én duurzaam wegschrijven. Naast hernoemen (atomisch: het oude
+   bestand blijft heel bij een crash midden in de save) forceren we de bytes met
+   fsync naar schijf, en daarna de map, zodat de hernoeming zelf een
+   stroomstoring overleeft. Zonder die fsync kan de directory de nieuwe naam al
+   hebben terwijl de data nog in de buffer stond: dat geeft een leeg of half
+   bestand na een stroomuitval. */
+function schrijfDuurzaam(doel, data, mode) {
+  const tmp = doel + '.tmp';
+  const fd = fs.openSync(tmp, 'w', mode || 0o600);
+  try {
+    fs.writeSync(fd, typeof data === 'string' ? Buffer.from(data) : data);
+    fs.fsyncSync(fd);
+  } finally { fs.closeSync(fd); }
+  try { fs.chmodSync(tmp, mode || 0o600); } catch (e) {}
+  fs.renameSync(tmp, doel);
+  // de map fsync-en maakt de hernoeming duurzaam; niet elk platform staat dit
+  // toe (Windows), dus fouten hier zijn niet fataal.
+  try { const dfd = fs.openSync(path.dirname(doel), 'r'); try { fs.fsyncSync(dfd); } finally { fs.closeSync(dfd); } } catch (e) {}
+}
+
 function save() {
   if (!db.writable) return;
   if (STORE === 'sqlite') {
@@ -255,12 +275,9 @@ function save() {
     saveSqlite();
   } else {
     beslotenMap(DATA_DIR);
-    // Atomisch wegschrijven: eerst een tijdelijk bestand, dan hernoemen.
-    // Valt de server midden in een save uit, dan blijft het oude bestand heel.
-    const tmp = DB_FILE + '.tmp';
+    // Atomisch + duurzaam wegschrijven (zie schrijfDuurzaam).
     const uit = kluis.AAN ? kluis.versleutel(JSON.stringify(db.data)) : JSON.stringify(db.data, null, 2);
-    fs.writeFileSync(tmp, uit, { mode: 0o600 });
-    fs.renameSync(tmp, DB_FILE);
+    schrijfDuurzaam(DB_FILE, uit, 0o600);
     besloten(DB_FILE);
     spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis (lees-replica's)
   }
@@ -311,4 +328,4 @@ async function startGedeeld() {
 // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.
 function onExternalChange(cb) { externCb = cb; }
 
-module.exports = { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChange, merge3 };
+module.exports = { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChange, merge3, schrijfDuurzaam };

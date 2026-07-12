@@ -76,7 +76,22 @@
     <div class="ok" id="bOk"></div>
     <div class="fout" id="bFout"></div>
   </div>
+
+  <div class="kaart blok">
+    <h2>Gegevens en privacy</h2>
+    <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--goud)">privacy en veiligheid</a>-pagina.</div>
+    <button class="knop rood" id="wisAlles">Alle gegevens van ons gezin verwijderen</button>
+    <div class="h" style="margin:.6rem 0 0;">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
+  </div>
 </div>
+
+<dialog id="dlgWis"><div class="kaart modal">
+  <h3>Alles verwijderen?</h3>
+  <div class="sub" style="color:var(--zacht);font-size:.88rem;margin-bottom:1rem;line-height:1.45;">Hiermee verdwijnt alles van jullie gezin voorgoed: profielen, spaardoelen, dromen, berichten, locaties en de gezinsinfo. Vul je pincode in om te bevestigen.</div>
+  <input class="veld" id="wPin" placeholder="Jouw pincode" inputmode="numeric" maxlength="6" type="password">
+  <div class="fout" id="wFout"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop rood" id="wDoe">Definitief verwijderen</button></div>
+</div></dialog>
 
 <!-- profiel toevoegen / bewerken -->
 <dialog id="dlg"><div class="kaart modal">
@@ -188,6 +203,17 @@ async function stuur(soort){
 }
 $('#bStuur').onclick=()=>stuur('bericht');
 $('#bReis').onclick=()=>stuur('reis');
+
+$('#wisAlles').onclick=()=>{ $('#wPin').value=''; $('#wFout').textContent=''; $('#dlgWis').showModal(); };
+$('#wDoe').onclick=async()=>{
+  $('#wFout').textContent='';
+  try{
+    await api('/gezin/wissen', { code:s.code, token:s.token, pin:$('#wPin').value.trim() });
+    Sessie.uitloggen();
+    alert('Alle gegevens van jullie gezin zijn verwijderd.');
+    location.href='index.html';
+  }catch(e){ $('#wFout').textContent = e.message; }
+};
 
 laad();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});

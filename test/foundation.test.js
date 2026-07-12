@@ -258,6 +258,37 @@ test('gastrol: een oppas/familielid mag meehelpen maar niet bij de privezaken', 
   assert.equal(gezien.magBewerken, false, 'een gast mag niet bewerken');
 });
 
+test('privacy: gevoelige data ligt versleuteld op schijf en het gezin kan alles wissen', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Privacy', naam: 'Ouder', pin: '9753' }));
+  const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kai', rol: 'kind' }));
+  const kt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+
+  // gevoelige zaken achterlaten: locatie, gezondheidsinfo en een bericht
+  await api('/gezin/locatie', { code: g.code, token: kt, status: 'op school', lat: 52.31337, lon: 4.94211 });
+  await api('/gezin/oppasinfo', { code: g.code, token: g.token, allergie: 'GEHEIM-ALLERGIE-PINDAKAAS', eten: '', huisregels: '' });
+  await api('/gezin/bericht', { code: g.code, token: kt, naar: 'allen', soort: 'hulp', tekst: 'GEHEIM-BERICHT-IK-WIL-PRATEN' });
+  await new Promise(r => setTimeout(r, 200)); // even wachten tot alles is weggeschreven
+
+  // het ruwe databasebestand mag deze gegevens niet leesbaar bevatten
+  const ruw = fs.readFileSync(path.join(TMP, 'db.json'), 'utf8');
+  assert.ok(ruw.includes('enc:'), 'er staat versleutelde data in de database');
+  assert.ok(!ruw.includes('GEHEIM-ALLERGIE-PINDAKAAS'), 'de allergie-info staat niet leesbaar op schijf');
+  assert.ok(!ruw.includes('GEHEIM-BERICHT-IK-WIL-PRATEN'), 'het bericht staat niet leesbaar op schijf');
+  assert.ok(!ruw.includes('52.31337'), 'de exacte locatie staat niet leesbaar op schijf');
+  // maar via de app is alles gewoon leesbaar
+  const info = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/oppasinfo?token=' + kt));
+  assert.match(info.oppasinfo.allergie, /PINDAKAAS/);
+  const loc = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/locaties?token=' + g.token));
+  assert.equal(loc.locaties.find(l => l.naam === 'Kai').lat, 52.31337);
+
+  // AVG: wissen kan alleen de beheerder met de juiste pincode
+  assert.equal((await api('/gezin/wissen', { code: g.code, token: kt, pin: '9753' })).status, 403); // kind mag niet
+  assert.equal((await api('/gezin/wissen', { code: g.code, token: g.token, pin: '0000' })).status, 403); // foute pin
+  assert.equal((await api('/gezin/wissen', { code: g.code, token: g.token, pin: '9753' })).status, 200);
+  // daarna bestaat het gezin niet meer
+  assert.equal((await api('/gezin/inloggen', { code: g.code })).status, 404);
+});
+
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {
   const L = await les();
   const goed = await api('/ai', { code: L.code, token: L.sToken, messages: [{ role: 'user', content: 'Help met breuken' }] });

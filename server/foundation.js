@@ -9,7 +9,58 @@
    wegschrijven en de dagelijkse back-up van de hoofdserver. */
 const express = require('express');
 const crypto = require('crypto');
-const { db, save } = require('./db');
+const fs = require('fs');
+const path = require('path');
+const { db, save, DATA_DIR } = require('./db');
+
+/* ---------- versleuteling van gevoelige gezinsdata ----------
+   Locatie van kinderen, gezondheidsinfo (allergieen/medisch) en berichten liggen
+   versleuteld op schijf (AES-256-GCM), zodat ze niet leesbaar zijn als het
+   databasebestand ooit in verkeerde handen valt. De sleutel staat apart, buiten
+   de database. Waarden krijgen een "enc:"-prefix; oude platte waarden blijven
+   leesbaar (zachte migratie). */
+function laadSleutel() {
+  const f = path.join(DATA_DIR, 'foundation.key');
+  try { if (fs.existsSync(f)) return fs.readFileSync(f); } catch (e) {}
+  const k = crypto.randomBytes(32);
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(f, k, { mode: 0o600 }); } catch (e) {}
+  return k;
+}
+const SLEUTEL = laadSleutel();
+function encS(text) {
+  if (text == null || text === '') return text;
+  try {
+    const iv = crypto.randomBytes(12);
+    const c = crypto.createCipheriv('aes-256-gcm', SLEUTEL, iv);
+    const ct = Buffer.concat([c.update(String(text), 'utf8'), c.final()]);
+    return 'enc:' + Buffer.concat([iv, c.getAuthTag(), ct]).toString('base64');
+  } catch (e) { return text; }
+}
+function decS(blob) {
+  if (typeof blob !== 'string' || !blob.startsWith('enc:')) return blob; // oude/onversleutelde waarde
+  try {
+    const buf = Buffer.from(blob.slice(4), 'base64');
+    const d = crypto.createDecipheriv('aes-256-gcm', SLEUTEL, buf.subarray(0, 12));
+    d.setAuthTag(buf.subarray(12, 28));
+    return Buffer.concat([d.update(buf.subarray(28)), d.final()]).toString('utf8');
+  } catch (e) { return ''; }
+}
+
+/* ---------- rate-limiting: bescherming tegen het raden van gezinscodes en pincodes ---------- */
+const pogingen = new Map(); // bucket -> { n, until }
+function teVaak(res, bucket) {
+  const f = pogingen.get(bucket);
+  if (f && f.until > Date.now()) { res.status(429).json({ error: 'Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.' }); return true; }
+  return false;
+}
+function misluktePoging(bucket, max = 10, minuten = 5) {
+  const f = pogingen.get(bucket) || { n: 0, until: 0 };
+  f.n += 1;
+  if (f.n >= max) { f.until = Date.now() + minuten * 60000; f.n = 0; }
+  pogingen.set(bucket, f);
+}
+function goedePoging(bucket) { pogingen.delete(bucket); }
+const ipVan = req => String((req.headers['x-forwarded-for'] || '').split(',')[0].trim() || (req.socket && req.socket.remoteAddress) || 'onbekend');
 
 let anthropic = null;
 if (process.env.ANTHROPIC_API_KEY) {
@@ -337,6 +388,9 @@ function beheerderVan(g, req, res) {
 function berichtVoorMij(b, pid) { return b.naar === 'allen' || b.naar === pid || b.van === pid; }
 
 router.post('/gezin/maak', (req, res) => {
+  const bucket = 'maak:' + ipVan(req);
+  if (teVaak(res, bucket)) return;
+  misluktePoging(bucket, 8, 30); // hooguit 8 nieuwe gezinnen per adres per half uur
   const naam = schoon(req.body.gezinsnaam, 40);
   const beheerder = schoon(req.body.naam, 40);
   if (!naam) return res.status(400).json({ error: 'Geef je gezin een naam.' });
@@ -352,7 +406,10 @@ router.post('/gezin/maak', (req, res) => {
 });
 
 router.post('/gezin/inloggen', (req, res) => {
-  const g = gezinVan(req, res); if (!g) return;
+  const bucket = 'inlog:' + ipVan(req);
+  if (teVaak(res, bucket)) return;
+  const g = gezinVan(req, res); if (!g) { misluktePoging(bucket, 12, 5); return; } // raden van gezinscodes afremmen
+  goedePoging(bucket);
   res.json({ gezin: pubGezin(g), profielen: Object.values(g.profielen).map(pubProfiel) });
 });
 
@@ -360,7 +417,12 @@ router.post('/gezin/profiel/kies', (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
   const p = g.profielen[String(req.body.profielId || '')];
   if (!p) return res.status(404).json({ error: 'Dit profiel bestaat niet meer.' });
-  if (p.pin && p.pin.hash && !checkPin(p.pin, req.body.pin)) return res.status(403).json({ error: 'De pincode klopt niet.' });
+  const bucket = 'pin:' + g.code + ':' + p.id;
+  if (p.pin && p.pin.hash) {
+    if (teVaak(res, bucket)) return;
+    if (!checkPin(p.pin, req.body.pin)) { misluktePoging(bucket, 6, 5); return res.status(403).json({ error: 'De pincode klopt niet.' }); }
+    goedePoging(bucket);
+  }
   res.json({ token: p.token, profiel: pubProfiel(p), gezin: pubGezin(g) });
 });
 
@@ -424,10 +486,10 @@ router.post('/gezin/bericht', (req, res) => {
   if (!tekst) return res.status(400).json({ error: 'Schrijf een bericht.' });
   const naar = req.body.naar && g.profielen[req.body.naar] ? req.body.naar : 'allen';
   const soort = ['reis', 'hulp'].includes(req.body.soort) ? req.body.soort : 'bericht';
-  const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar, soort, tekst, at: nu(), gelezenDoor: [p.id] };
+  const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar, soort, tekst: encS(tekst), at: nu(), gelezenDoor: [p.id] };
   if (!g.berichten) g.berichten = [];
   g.berichten.unshift(b); g.berichten = g.berichten.slice(0, 200); save();
-  res.json({ ok: true, bericht: b });
+  res.json({ ok: true, bericht: Object.assign({}, b, { tekst }) });
 });
 
 router.get('/gezin/:code/berichten', (req, res) => {
@@ -437,7 +499,7 @@ router.get('/gezin/:code/berichten', (req, res) => {
   const mijn = (g.berichten || []).filter(b => berichtVoorMij(b, p.id)).map(b => ({
     id: b.id, van: b.van, vanNaam: b.vanNaam, vanAvatar: b.vanAvatar, naar: b.naar,
     naarNaam: b.naar === 'allen' ? 'iedereen' : (g.profielen[b.naar] ? g.profielen[b.naar].naam : ''),
-    soort: b.soort, tekst: b.tekst, at: b.at, vanMij: b.van === p.id,
+    soort: b.soort, tekst: decS(b.tekst), at: b.at, vanMij: b.van === p.id,
     gelezen: (b.gelezenDoor || []).includes(p.id)
   }));
   res.json({ berichten: mijn });
@@ -646,13 +708,20 @@ router.post('/gezin/locatie', (req, res) => {
   if (req.body.lat != null && req.body.lon != null) {
     const lat = Number(req.body.lat), lon = Number(req.body.lon);
     if (isFinite(lat) && isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
-      rec.lat = Math.round(lat * 1e5) / 1e5; rec.lon = Math.round(lon * 1e5) / 1e5;
+      // de precieze GPS-plek ligt versleuteld op schijf
+      rec.plek = encS((Math.round(lat * 1e5) / 1e5) + ',' + (Math.round(lon * 1e5) / 1e5));
     }
   }
   if (!s.g.locaties) s.g.locaties = {};
   s.g.locaties[s.p.id] = rec; save();
-  res.json({ ok: true, locatie: rec });
+  res.json({ ok: true });
 });
+function locatiePubliek(l, mij) {
+  const out = { pid: l.pid, naam: l.naam, avatar: l.avatar, kleur: l.kleur, status: l.status, at: l.at, vanMij: l.pid === mij };
+  if (l.plek) { const d = decS(l.plek); const komma = d.indexOf(','); if (komma > 0) { out.lat = Number(d.slice(0, komma)); out.lon = Number(d.slice(komma + 1)); } }
+  else if (l.lat != null) { out.lat = l.lat; out.lon = l.lon; } // oude, onversleutelde data
+  return out;
+}
 router.post('/gezin/locatie/stop', (req, res) => {
   const s = sessieVan(req, res); if (!s) return;
   if (s.g.locaties) delete s.g.locaties[s.p.id]; save();
@@ -663,7 +732,7 @@ router.get('/gezin/:code/locaties', (req, res) => {
   const alle = Object.values(s.g.locaties || {})
     .filter(l => s.g.profielen[l.pid]) // alleen bestaande profielen
     .sort((a, b) => (b.at || '').localeCompare(a.at || ''))
-    .map(l => Object.assign({}, l, { vanMij: l.pid === s.p.id }));
+    .map(l => locatiePubliek(l, s.p.id));
   res.json({ locaties: alle, ikDeel: !!(s.g.locaties && s.g.locaties[s.p.id]) });
 });
 
@@ -672,7 +741,11 @@ router.get('/gezin/:code/locaties', (req, res) => {
    ouder of de beheerder mag het aanpassen. */
 function oppasinfoPubliek(g) {
   const o = g.oppasinfo || {};
-  return { noodcontacten: o.noodcontacten || [], allergie: o.allergie || '', eten: o.eten || '', huisregels: o.huisregels || '', updatedAt: o.updatedAt || null, updatedBy: o.updatedBy || '' };
+  // noodcontacten en gezondheidsinfo liggen versleuteld; hier weer leesbaar maken
+  let contacten = [];
+  if (Array.isArray(o.noodcontacten)) contacten = o.noodcontacten; // oude, onversleutelde data
+  else if (o.noodcontacten) { try { contacten = JSON.parse(decS(o.noodcontacten)) || []; } catch (e) { contacten = []; } }
+  return { noodcontacten: contacten, allergie: decS(o.allergie) || '', eten: decS(o.eten) || '', huisregels: decS(o.huisregels) || '', updatedAt: o.updatedAt || null, updatedBy: o.updatedBy || '' };
 }
 router.get('/gezin/:code/oppasinfo', (req, res) => {
   const s = sessieVan(req, res); if (!s) return;
@@ -685,14 +758,25 @@ router.post('/gezin/oppasinfo', (req, res) => {
     .map(c => ({ naam: schoon(c && c.naam, 40), telefoon: schoon(c && c.telefoon, 30), wie: schoon(c && c.wie, 40) }))
     .filter(c => c.naam || c.telefoon);
   s.g.oppasinfo = {
-    noodcontacten,
-    allergie: schoon(req.body.allergie, 1500),
-    eten: schoon(req.body.eten, 1500),
-    huisregels: schoon(req.body.huisregels, 1500),
+    noodcontacten: encS(JSON.stringify(noodcontacten)),
+    allergie: encS(schoon(req.body.allergie, 1500)),
+    eten: encS(schoon(req.body.eten, 1500)),
+    huisregels: encS(schoon(req.body.huisregels, 1500)),
     updatedAt: nu(), updatedBy: s.p.naam
   };
   save();
   res.json({ ok: true, oppasinfo: oppasinfoPubliek(s.g) });
+});
+
+/* AVG: het recht om vergeten te worden. De beheerder kan met zijn pincode alle
+   gegevens van het gezin in een keer en onherroepelijk verwijderen. */
+router.post('/gezin/wissen', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  const p = profielVan(g, req.body && req.body.token);
+  if (!p || p.rol !== 'beheerder') return res.status(403).json({ error: 'Alleen de beheerder kan het gezin wissen.' });
+  if (!checkPin(p.pin, req.body.pin)) return res.status(403).json({ error: 'De pincode klopt niet.' });
+  delete G()[g.code]; save();
+  res.json({ ok: true });
 });
 
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));

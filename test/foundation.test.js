@@ -591,6 +591,40 @@ test('cross-app bellen: RTG en RTF sturen belsignalen over en weer via het live-
   }
 });
 
+test('realtime herstel: gemiste belsignalen worden opnieuw afgespeeld na herverbinden', async () => {
+  const now = Date.now();
+  const rtg = await json(await raw('/auth/register', { name: 'Herstel Lid', email: 'hl' + now + '@v.test', phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
+  const rtgTok = rtg.token, rtgCn = rtg.state.user.codename;
+  const rtgKey = (await json(await raw('/member/connections', {}, rtgTok))).me;
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Herstel Fam', naam: 'Ouder', pin: '2468', groep: 'volw' }));
+  const mij = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token));
+  const ouderCn = mij.profiel.codenaam;
+  const found = await json(await raw('/member/find', { q: ouderCn.split(' ')[0] }, rtgTok));
+  const ouderKey = found.results.find(r => r.codename === ouderCn).key;
+  await raw('/member/connect', { key: ouderKey }, rtgTok);
+  const oConns = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
+  await raw('/rtf/social/respond', { code: g.code, token: g.token, key: oConns.requests.find(x => x.codename === rtgCn).key, action: 'accept' });
+
+  // twee belsignalen terwijl het lid GEEN stream open heeft (worden gebufferd)
+  await raw('/rtf/social/call', { code: g.code, token: g.token, toKey: rtgKey, kind: 'ring', video: false });
+  await raw('/rtf/social/call', { code: g.code, token: g.token, toKey: rtgKey, kind: 'ring', video: true });
+
+  // het lid verbindt (opnieuw) met since=1: de gemiste signalen worden nagestuurd
+  const ac = new AbortController();
+  const res = await fetch(BASE + '/api/stream?token=' + encodeURIComponent(rtgTok) + '&since=1', { signal: ac.signal });
+  const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = '', calls = 0;
+  const t0 = Date.now();
+  while (Date.now() - t0 < 800) {
+    const { value, done } = await Promise.race([reader.read(), new Promise(r => setTimeout(() => r({ value: undefined, done: false }), 300))]);
+    if (done) break;
+    if (value) buf += dec.decode(value, { stream: true });
+    calls = (buf.match(/event: call/g) || []).length;
+    if (calls >= 2) break;
+  }
+  ac.abort();
+  assert.ok(calls >= 2, 'beide gemiste belsignalen zijn opnieuw afgespeeld (kreeg ' + calls + ')');
+});
+
 test('sociale veiligheid: blokkeren, melden en ouder-meekijk op kindcontacten', async () => {
   const now = Date.now();
   const rtg = await json(await raw('/auth/register', { name: 'Veilig Lid', email: 'vl' + now + '@v.test', phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));

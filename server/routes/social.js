@@ -3,7 +3,7 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
+  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
 
 // leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam)
 app.post('/api/member/find', auth, (req, res) => {
@@ -203,6 +203,9 @@ app.get('/api/rtf/social/stream', (req, res) => {
   res.write('retry: 3000\n\n');
   const client = { tier: 'rtf', key: sess.handle, res };
   sseClients.push(client);
+  // gemiste persoonlijke events opnieuw afspelen na een verbroken verbinding
+  const sinds = Number(req.headers['last-event-id'] || req.query.since || 0);
+  if (sinds) speelOpnieuw(res, sess.handle, sinds);
   sseSend(res, 'hello', {});
   const ping = setInterval(() => res.write(': ping\n\n'), 25000);
   req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });

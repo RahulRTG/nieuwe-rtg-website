@@ -262,14 +262,39 @@ const sseClients = []; // { tier, res }
    bereiken. Elke sseTo*-functie publiceert; elk proces levert de events af aan
    zijn eigen open verbindingen. */
 const bus = require('./bus').maakBus();
+
+/* Betrouwbaarheid: persoonlijke events (dm, snap, belsignaal) krijgen een
+   oplopend id en worden kort bewaard per ontvanger. Verbreekt een verbinding
+   even (mobiel netwerk, Redis-hik), dan stuurt EventSource bij het herstellen
+   zijn laatste id mee (Last-Event-ID) en spelen we de gemiste events opnieuw af.
+   Zo gaat een oproep- of chatsignaal niet stil verloren. */
+const SSE_BUFFER_TTL = 2 * 60 * 1000; // twee minuten terugspelen is ruim genoeg
+const sseBuffer = new Map();          // key -> [{ id, event, data, at }]
+let _sseMs = 0, _sseSeq = 0;
+function nextSseId() { const t = Date.now(); if (t > _sseMs) { _sseMs = t; _sseSeq = 0; } else { _sseSeq++; } return _sseMs * 1000 + _sseSeq; }
+function bufferEvent(key, id, event, data) {
+  const nu = Date.now();
+  let lijst = sseBuffer.get(key);
+  if (!lijst) { lijst = []; sseBuffer.set(key, lijst); }
+  lijst.push({ id, event, data, at: nu });
+  // opschonen: hooguit 50 per ontvanger en niets ouder dan de TTL
+  const vers = lijst.filter(e => nu - e.at < SSE_BUFFER_TTL);
+  sseBuffer.set(key, vers.slice(-50));
+}
+function speelOpnieuw(res, key, sinds) {
+  const lijst = sseBuffer.get(key);
+  if (!lijst || !sinds) return;
+  for (const e of lijst) if (e.id > sinds) sseSend(res, e.event, e.data, e.id);
+}
 function leverSse(m) {
+  if (m.doel === 'key' && m.id) bufferEvent(m.match, m.id, m.event, m.data);
   for (const c of sseClients) {
     let raak = false;
     if (m.doel === 'key') raak = c.key === m.match;
     else if (m.doel === 'sup') raak = c.sup === m.match;
     else if (m.doel === 'office') raak = !!c.office;
     else if (m.doel === 'tier') raak = m.match.includes(c.tier);
-    if (raak) sseSend(c.res, m.event, m.data);
+    if (raak) sseSend(c.res, m.event, m.data, m.doel === 'key' ? m.id : undefined);
   }
 }
 bus.subscribe('sse', leverSse);
@@ -463,7 +488,8 @@ function initRealtime() {
   }
 }
 
-function sseSend(res, event, data) {
+function sseSend(res, event, data, id) {
+  if (id != null) res.write('id: ' + id + '\n');
   res.write('event: ' + event + '\n');
   res.write('data: ' + JSON.stringify(data) + '\n\n');
 }
@@ -784,6 +810,9 @@ app.get('/api/stream', (req, res) => {
   res.write('retry: 3000\n\n');
   const client = { tier: sess.tier, key: sess.key, res };
   sseClients.push(client);
+  // gemiste persoonlijke events opnieuw afspelen (na een korte verbroken verbinding)
+  const sinds = Number(req.headers['last-event-id'] || req.query.since || 0);
+  if (sinds) speelOpnieuw(res, sess.key, sinds);
   // onopgehaalde notificaties meteen meesturen
   const unread = (db.data.notifications[sess.tier] || []).filter(n => !n.read);
   sseSend(res, 'hello', { unread });
@@ -2287,7 +2316,7 @@ function etaMinutes(meters, mode) {
   return Math.max(1, Math.round((meters / 1000) / kmh * 60));
 }
 function sseToCustomer(key, event, data) {
-  bus.publish('sse', { doel: 'key', match: key, event, data });
+  bus.publish('sse', { doel: 'key', match: key, event, data, id: nextSseId() });
 }
 function liveCodename(session) {
   return session.account ? session.account.codename : PERSONAS[session.tier].codename;
@@ -2657,31 +2686,32 @@ function conciergeInbox() {
    uitsluitend via deze kern met de gedeelde data en realtime praat. Zo kan een
    domein later als eigen proces draaien zonder de routecode te veranderen. */
 const kern = {
-  AI_TONE, ALT_IDEE, AUTHOR_TIER, BOEK_KETEN, CLUSTER_KEY, DATA_DIR, DEMO_PASS, DEMO_SUPPLIER,
-  DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN, OFFICE_CODE, PERSONAS,
-  POS_METHODS, PRODUCTION, RIT_KETEN, RIT_LEGACY, RIT_MELDING, RUN_STATIONS, SHIFT_NAMES, SNAP_TTL,
-  STAFF_SEED, STORY_TTL, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN, ZAAK_OPTIES, ZZP,
-  accounts, addContact, addTicket, aiFindDoor, aiFindRoom, aiSystemPrompt, alcoholGrensVan, anthropic,
-  app, appUrl, applyChatPubliek, auth, blokkeer, broadcastSync, bus, canEngage,
-  cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant, chatKeyOf, chatStuur, checkCred,
-  coachCache, coachRules, codeExists, codenaamVan, conciergeInbox, connectedSupplierCodes, connectieTussen, convOf,
-  crypto, cvReady, db, deblokkeer, deptsFor, dirTouch, dmSleutel, eisAccount,
-  engageError, ensureApplyChat, ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor,
-  findPartner, findStaffPartner, findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast,
-  geldigeFoto, generateAiReply, getChat, guestsFor, hasContact, hasCred, haversine, i18n,
-  initRealtime, isGeblokkeerd, isKindHandle, isRtf, kindContacten, kindVerwijder, klokVan, ledenPrijs,
-  leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, meldMisbruik, meldWerkgever, memberSays, memberTemplate, myApplications,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, opschonenSnaps,
-  optieAan, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner,
-  publicSupplier, publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder,
-  rtf, runItem, runKey, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder,
-  sendPush, sendPushToUser, sessionFor, sessions, setRoomHk, snapOpenen, snapSturen, snapsVoor,
-  sociaalRate, sociaalTellers, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren,
-  socialVerbind, socialZoek, soortVan, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice,
-  sseToSupplier, stateFor, stationsForOrder, statusVan, supplierAuth, supplierState, toRad, tokenHash,
-  tooManyTries, trChat, trustVan, unlockDoor, urenVan, validDept, verbActief, verhaalBekijken,
-  verhaalPlaatsen, verhalenVoor, webpush, weekdagFactor, werkgeverSollicitatie, zijnVrienden
+  AI_TONE, ALT_IDEE, AUTHOR_TIER, BOEK_KETEN, CLUSTER_KEY, DATA_DIR, DEMO, DEMO_PASS,
+  DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN, OFFICE_CODE,
+  PERSONAS, POS_METHODS, PRODUCTION, RIT_KETEN, RIT_LEGACY, RIT_MELDING, RUN_STATIONS, SHIFT_NAMES,
+  SNAP_TTL, SSE_BUFFER_TTL, STAFF_SEED, STORY_TTL, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
+  ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom,
+  aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, auth, blokkeer,
+  broadcastSync, bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen,
+  chatApplicant, chatKeyOf, chatStuur, checkCred, coachCache, coachRules, codeExists, codenaamVan,
+  conciergeInbox, connectedSupplierCodes, connectieTussen, convOf, crypto, cvReady, db, deblokkeer,
+  deptsFor, dirTouch, dmSleutel, eisAccount, engageError, ensureApplyChat, ensureSupplierDefaults, etaMinutes,
+  eventCovers, express, fallbackRunsheet, financeVoor, findPartner, findStaffPartner, findSupplier, forgetSession,
+  fs, gcCode, geborenVan, geenGast, geldigeFoto, generateAiReply, getChat, guestsFor,
+  hasContact, hasCred, haversine, i18n, initRealtime, isGeblokkeerd, isKindHandle, isRtf,
+  kindContacten, kindVerwijder, klokVan, ledenPrijs, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename,
+  liveStateFor, load, logActivity, loginFails, mail, makeSupplierCode, managerOnly, meldMisbruik,
+  meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, noteFailedTry, notify, notifyApplicant,
+  notifySupplier, officeAuth, officeState, openVacatures, opschonenSnaps, optieAan, parseRunsheetText, path,
+  pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, publicTrip, pushLive,
+  registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf, runItem, runKey,
+  salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sendPush, sendPushToUser, sessionFor,
+  sessions, setRoomHk, snapOpenen, snapSturen, snapsVoor, sociaalRate, sociaalTellers, socialAntwoord,
+  socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, socialVerbind, socialZoek, soortVan,
+  sortRunsheet, speelOpnieuw, sseBuffer, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier,
+  stateFor, stationsForOrder, statusVan, supplierAuth, supplierState, toRad, tokenHash, tooManyTries,
+  trChat, trustVan, unlockDoor, urenVan, validDept, verbActief, verhaalBekijken, verhaalPlaatsen,
+  verhalenVoor, webpush, weekdagFactor, werkgeverSollicitatie, zijnVrienden
 };
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
    geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen

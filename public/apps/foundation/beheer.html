@@ -113,6 +113,16 @@
     <option value="beheerder">Beheerder</option>
   </select>
   <div class="rolhint" id="rolhint" hidden>Een oppas, opa/oma of familielid ziet alleen het broodnodige: waar de kinderen zijn, contact met het gezin, en samen leren of even rust. De privezaken van het gezin (geld, steun, dromen) blijven verborgen.</div>
+  <label style="display:block;font-size:.82rem;color:var(--zacht);margin:.2rem 0 .35rem;">Leeftijdsgroep (zo krijgt iedereen wat bij zijn leeftijd past)</label>
+  <select class="veld" id="dGroep">
+    <option value="">Kies een leeftijdsgroep</option>
+    <option value="mini">Allerkleinsten (0 t/m 4)</option>
+    <option value="kind">Kind (5 t/m 11)</option>
+    <option value="tiener">Tiener (12 t/m 15)</option>
+    <option value="jong">Jongvolwassen (16 t/m 21+)</option>
+    <option value="volw">Volwassen</option>
+  </select>
+  <div class="rolhint" id="groephint" hidden>Vanaf 16 jaar (jongvolwassen of volwassen) verschijnen echte vacatures van RTG-partners in de app, om met het eigen cv op te solliciteren.</div>
   <input class="veld" id="dPin" placeholder="Pincode (leeg = geen)" inputmode="numeric" maxlength="6">
   <div class="fout" id="dFout"></div>
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="dDoe">Opslaan</button></div>
@@ -133,6 +143,7 @@ function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;',
 function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid',gast:'Oppas of familie'}[p.rol]||''); }
 
 $('#dRol').addEventListener('change', ()=>{ $('#rolhint').hidden = $('#dRol').value !== 'gast'; });
+$('#dGroep').addEventListener('change', ()=>{ $('#groephint').hidden = !(['jong','volw'].includes($('#dGroep').value)); });
 (function(){
   const av=$('#dAv'); AVATARS.forEach(a=>{ const b=document.createElement('button'); b.textContent=a; b.onclick=()=>{ dAv=a; [...av.children].forEach(c=>c.classList.toggle('aan',c.textContent===a)); }; av.appendChild(b); });
   const kl=$('#dKl'); KLEUREN.forEach(c=>{ const b=document.createElement('button'); b.style.background=c; b.onclick=()=>{ dKl=c; [...kl.children].forEach(x=>x.classList.toggle('aan',x.style.background===b.style.background)); }; kl.appendChild(b); });
@@ -150,7 +161,7 @@ async function laad(){
   d.profielen.forEach(p=>{
     const row=document.createElement('div'); row.className='prow';
     row.innerHTML='<span class="av" style="background:'+p.kleur+'">'+p.avatar+'</span>'+
-      '<div><div class="nm">'+esc(p.naam)+(p.heeftPin?' 🔒':'')+'</div><div class="rl">'+rolTekst(p)+'</div></div>'+
+      '<div><div class="nm">'+esc(p.naam)+(p.heeftPin?' 🔒':'')+'</div><div class="rl">'+rolTekst(p)+(p.groepNaam?' · '+esc(p.groepNaam):'')+'</div></div>'+
       '<div class="sp"><button class="knop grijs klein" data-bew="'+p.id+'">Bewerken</button>'+
       (p.beheerder && d.profielen.filter(x=>x.beheerder).length<=1 ? '' : '<button class="knop rood klein" data-del="'+p.id+'">×</button>')+'</div>';
     pl.appendChild(row);
@@ -193,7 +204,7 @@ async function laad(){
 
 function bewerk(p){
   bewerkId=p.id; $('#dTitel').textContent='Profiel bewerken';
-  $('#dNaam').value=p.naam; dAv=p.avatar; dKl=p.kleur; $('#dRol').value=p.rol; $('#dPin').value=''; $('#rolhint').hidden = p.rol!=='gast';
+  $('#dNaam').value=p.naam; dAv=p.avatar; dKl=p.kleur; $('#dRol').value=p.rol; $('#dGroep').value=p.groep||''; $('#groephint').hidden=!(['jong','volw'].includes(p.groep)); $('#dPin').value=''; $('#rolhint').hidden = p.rol!=='gast';
   [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
   [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
   $('#dPin').placeholder = p.heeftPin ? 'Pincode wijzigen (leeg = laten staan)' : 'Pincode (leeg = geen)';
@@ -201,14 +212,14 @@ function bewerk(p){
 }
 $('#bNieuw').onclick=()=>{
   bewerkId=null; $('#dTitel').textContent='Profiel toevoegen';
-  $('#dNaam').value=''; dAv='🙂'; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dPin').value=''; $('#dPin').placeholder='Pincode (leeg = geen)'; $('#rolhint').hidden=true;
+  $('#dNaam').value=''; dAv='🙂'; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dGroep').value=''; $('#groephint').hidden=true; $('#dPin').value=''; $('#dPin').placeholder='Pincode (leeg = geen)'; $('#rolhint').hidden=true;
   [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
   [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
   $('#dFout').textContent=''; $('#dlg').showModal();
 };
 $('#dDoe').onclick=async()=>{
   $('#dFout').textContent='';
-  const body={ code:s.code, token:s.token, naam:$('#dNaam').value, avatar:dAv, kleur:dKl, rol:$('#dRol').value };
+  const body={ code:s.code, token:s.token, naam:$('#dNaam').value, avatar:dAv, kleur:dKl, rol:$('#dRol').value, groep:$('#dGroep').value };
   const pin=$('#dPin').value.trim();
   try{
     if(bewerkId){ if(pin!=='') body.pin=pin; body.profielId=bewerkId; await api('/gezin/profiel/wijzig', body); }

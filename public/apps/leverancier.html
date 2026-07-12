@@ -3200,12 +3200,34 @@
     }
     html += '</div>';
 
+    // vacatures: het bedrijf plaatst openstaande functies; die verschijnen ook
+    // in de RTFoundation zodat leden vanaf 16 jaar met hun cv solliciteren.
+    const vacs = state.vacatures || [];
+    html += '<div class="card"><div class="tt-h">'+T('vac.h','Vacatures')+' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:#7ecb8f;border:1px solid #7ecb8f;border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">'+T('vac.rtf','ook in RTFoundation')+'</i></div>';
+    html += '<div style="font-size:0.78rem;color:var(--soft);margin-bottom:0.6rem;">'+T('vac.intro','Vacatures die je hier plaatst komen ook in de RTFoundation-app. Leden van gezinnen die het minder breed hebben solliciteren er vanaf 16 jaar in een tik op, met hun cv.')+'</div>';
+    html += vacs.length ? vacs.map(v =>
+      '<div class="tk-row" style="flex-wrap:wrap;'+(v.open?'':'opacity:0.55;')+'"><div class="tk-t"><b>'+esc(v.func)+' <span style="font-weight:400;color:var(--soft);">'+T('vac.soort.'+v.soort, v.soort)+' · '+T('vac.vanaf','vanaf')+' '+v.minLeeftijd+' '+T('vac.jaar','jaar')+'</span></b><span>'+(v.plaats?esc(v.plaats)+' · ':'')+(v.uren?esc(v.uren)+' · ':'')+(v.open?T('vac.open','staat open'):T('vac.dicht','gesloten'))+'</span></div>'+
+      (a.manager ? '<button class="obtn" data-vactoggle="'+v.id+'" data-vacnow="'+(v.open?'sluit':'open')+'">'+(v.open?T('vac.sluitbtn','Sluiten'):T('vac.openbtn','Openen'))+'</button><button class="obtn warn" data-vacdel="'+v.id+'">'+T('vac.del','Verwijderen')+'</button>' : '')+
+      '</div>'
+    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.4rem 0;">'+T('vac.geen','Nog geen vacatures. Plaats er een om personeel te vinden via de RTFoundation.')+'</div>';
+    if (a.manager){
+      html += '<div class="tt-add" style="flex-wrap:wrap;gap:0.4rem;margin-top:0.7rem;">'+
+        '<input id="vacFunc" placeholder="'+T('vac.func','Functie (bijv. afwasser)')+'" style="flex:2;min-width:130px;">'+
+        '<select id="vacSoort" style="flex:1;min-width:110px;"><option value="bijbaan">'+T('vac.soort.bijbaan','Bijbaan')+'</option><option value="vakantiewerk">'+T('vac.soort.vakantiewerk','Vakantiewerk')+'</option><option value="parttime">'+T('vac.soort.parttime','Parttime')+'</option><option value="fulltime">'+T('vac.soort.fulltime','Fulltime')+'</option><option value="stage">'+T('vac.soort.stage','Stage')+'</option><option value="vrijwilliger">'+T('vac.soort.vrijwilliger','Vrijwilliger')+'</option></select>'+
+        '<select id="vacLft" style="flex:1;min-width:90px;"><option value="16">'+T('vac.vanaf','vanaf')+' 16</option><option value="18">'+T('vac.vanaf','vanaf')+' 18</option><option value="21">'+T('vac.vanaf','vanaf')+' 21</option></select>'+
+        '<input id="vacPlaats" placeholder="'+T('vac.plaats','Plaats')+'" style="flex:1;min-width:90px;">'+
+        '<input id="vacUren" placeholder="'+T('vac.uren','Uren (bijv. 8-16u/week)')+'" style="flex:1;min-width:110px;">'+
+        '<input id="vacOms" placeholder="'+T('vac.oms','Korte omschrijving')+'" style="flex:2;min-width:150px;">'+
+        '<button id="vacAdd">'+T('vac.plaatsbtn','Vacature plaatsen')+'</button></div>';
+    }
+    html += '</div>';
+
     // sollicitaties: overal hetzelfde kanaal, de manager beslist
     const apps = (state.applications || []).filter(x => x.status === 'nieuw');
     const decided = (state.applications || []).filter(x => x.status !== 'nieuw').slice(0, 4);
     html += '<div class="card"><div class="tt-h">'+T('ap.h','Sollicitaties')+(apps.length?' <i class="gc-unread">'+apps.length+'</i>':'')+'</div>';
     const apCv = x => {
-      if (!x.viaRTG || !x.cv) return '';
+      if ((!x.viaRTG && !x.viaRTF) || !x.cv) return '';
       const c = x.cv, parts = [];
       if (c.headline) parts.push('<b style="color:var(--txt);">'+c.headline+'</b>');
       if (c.experience && c.experience.length) parts.push(c.experience.slice(0,3).join(' · '));
@@ -3217,6 +3239,7 @@
     html += apps.length ? apps.map(x =>
       '<div class="tk-row" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+
       (x.viaRTG?' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</i>':'')+
+      (x.viaRTF?' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:#7ecb8f;border:1px solid #7ecb8f;border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTF</i>':'')+
       '</b><span>'+x.contact+(x.note?' · "'+x.note.slice(0,60)+'"':'')+' · '+timeAgo(x.at)+'</span></div>'+
       (a.manager ? '<button class="obtn primary" data-aphire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-apno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button>' : '')+
       apCv(x)+
@@ -3264,6 +3287,24 @@
     }));
     document.querySelectorAll('[data-apno]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/apply/decide', { id: b.dataset.apno, action: 'afwijzen' }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
+    }));
+    const vacAdd = $('#vacAdd'); if (vacAdd) vacAdd.addEventListener('click', async () => {
+      const func = $('#vacFunc').value.trim();
+      if (!func) { toast(T('vac.needfunc','Geef de functie een naam.')); return; }
+      try {
+        await API.call('/supplier/vacature', {
+          func, soort: $('#vacSoort').value, minLeeftijd: Number($('#vacLft').value),
+          plaats: $('#vacPlaats').value.trim(), uren: $('#vacUren').value.trim(), omschrijving: $('#vacOms').value.trim()
+        });
+        toast('✅ '+T('vac.geplaatst','Vacature geplaatst en zichtbaar in de RTFoundation.'));
+        await refresh(); openTab('team');
+      } catch(e){ toast(e.message); }
+    });
+    document.querySelectorAll('[data-vactoggle]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/vacature/verwijder', { id: b.dataset.vactoggle, action: b.dataset.vacnow }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-vacdel]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/vacature/verwijder', { id: b.dataset.vacdel }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
     }));
     const addBtn = $('#ttAdd'); if (addBtn) addBtn.addEventListener('click', addStaff);
     const send = $('#ttSend'); if (send) send.addEventListener('click', sendTeam);
@@ -3528,6 +3569,14 @@ window.I18N = { en: {
   'ap.h':'Applications', 'ap.hire':'Hire', 'ap.reject':'Reject', 'ap.hired':'Hired. PIN: ',
   'ap.none':'No open applications. Candidates apply via the start screen of this app, RTG members via the member app with their CV.',
   'ap.skills':'Skills', 'ap.langs':'Languages',
+  'vac.h':'Vacancies', 'vac.rtf':'also in RTFoundation',
+  'vac.intro':'Vacancies you post here also appear in the RTFoundation app. Members of families on a tight budget apply in one tap from age 16, with their CV.',
+  'vac.vanaf':'from', 'vac.jaar':'years', 'vac.open':'open', 'vac.dicht':'closed',
+  'vac.sluitbtn':'Close', 'vac.openbtn':'Open', 'vac.del':'Delete',
+  'vac.geen':'No vacancies yet. Post one to find staff via RTFoundation.',
+  'vac.func':'Position (e.g. dishwasher)', 'vac.plaats':'Location', 'vac.uren':'Hours (e.g. 8-16h/week)', 'vac.oms':'Short description',
+  'vac.plaatsbtn':'Post vacancy', 'vac.needfunc':'Give the position a name.', 'vac.geplaatst':'Vacancy posted and visible in RTFoundation.',
+  'vac.soort.bijbaan':'Side job', 'vac.soort.vakantiewerk':'Holiday work', 'vac.soort.parttime':'Part-time', 'vac.soort.fulltime':'Full-time', 'vac.soort.stage':'Internship', 'vac.soort.vrijwilliger':'Volunteer',
   'st.h':'Workstations', 'st.keuken':'Kitchen display', 'st.keuken.s':'Order tickets, bump buttons, allergies writ large',
   'st.bar':'Bar display', 'st.bar.s':'Mark drinks ready, pickup codes writ large',
   'st.bediening':'Service station', 'st.bediening.s':'Serving, tables and the PDA in one place',

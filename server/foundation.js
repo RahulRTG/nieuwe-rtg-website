@@ -355,6 +355,20 @@ function nieuweGezinscode() {
   return c;
 }
 const ROLLEN = ['beheerder', 'ouder', 'kind', 'gezinslid', 'gast'];
+// vijf leeftijdsgroepen, zodat de hele onder- en middenlaag zich thuis voelt in
+// de app: van de allerkleinsten tot de volwassenen. De groep stuurt welke tips
+// en tegels iemand ziet, en of iemand mag solliciteren op vacatures (vanaf 16).
+const GROEPEN = ['mini', 'kind', 'tiener', 'jong', 'volw'];
+const GROEP_INFO = {
+  mini:   { naam: 'Allerkleinsten', bereik: '0 t/m 4 jaar',   emoji: '🧸', vanaf: 0 },
+  kind:   { naam: 'Kind',           bereik: '5 t/m 11 jaar',  emoji: '🎒', vanaf: 5 },
+  tiener: { naam: 'Tiener',         bereik: '12 t/m 15 jaar', emoji: '🛹', vanaf: 12 },
+  jong:   { naam: 'Jongvolwassen',  bereik: '16 t/m 21+ jaar', emoji: '🚀', vanaf: 16 },
+  volw:   { naam: 'Volwassen',      bereik: 'volwassen',      emoji: '🧑', vanaf: 22 }
+};
+const magSolliciteren = groep => groep === 'jong' || groep === 'volw';
+const groepLeeftijd = groep => (GROEP_INFO[groep] || {}).vanaf; // ondergrens voor de vacature-filter
+function schoonGroep(v) { return GROEPEN.includes(v) ? v : null; }
 // een gast (oppas, opa/oma of familielid) helpt mee, maar mag niet bij de
 // privezaken van het gezin (geld, mentale steun, dromen, cv, reisaanvraag).
 const isGast = p => p && p.rol === 'gast';
@@ -373,7 +387,16 @@ const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
 function schoonAvatar(v) { const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim(); return s ? Array.from(s).slice(0, 2).join('') : '🙂'; }
 function schoonKleur(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? v : KLEUREN[0]; }
 
-function pubProfiel(p) { return { id: p.id, naam: p.naam, rol: p.rol, avatar: p.avatar, kleur: p.kleur, heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder', gast: p.rol === 'gast', gekoppeld: !!p.koppel }; }
+function pubProfiel(p) {
+  const groep = p.groep && GROEP_INFO[p.groep] ? p.groep : null;
+  return {
+    id: p.id, naam: p.naam, rol: p.rol, avatar: p.avatar, kleur: p.kleur,
+    heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder',
+    gast: p.rol === 'gast', gekoppeld: !!p.koppel,
+    groep, groepNaam: groep ? GROEP_INFO[groep].naam : null, groepBereik: groep ? GROEP_INFO[groep].bereik : null,
+    magSolliciteren: magSolliciteren(groep)
+  };
+}
 function pubGezin(g) { return { code: g.code, naam: g.naam }; }
 function gezinVan(req, res) {
   const code = String((req.body && req.body.code) || req.params.code || '').toUpperCase();
@@ -402,7 +425,7 @@ router.post('/gezin/maak', (req, res) => {
   const code = nieuweGezinscode();
   const pid = rid(4);
   const profiel = { id: pid, naam: beheerder, rol: 'beheerder', avatar: schoonAvatar(req.body.avatar) || '👑',
-    kleur: schoonKleur(req.body.kleur), pin: hashPin(req.body.pin), token: rid(24), at: nu() };
+    kleur: schoonKleur(req.body.kleur), pin: hashPin(req.body.pin), groep: schoonGroep(req.body.groep) || 'volw', token: rid(24), at: nu() };
   const g = { id: rid(4), code, naam, at: nu(), profielen: { [pid]: profiel }, berichten: [] };
   G()[code] = g; save();
   res.json({ code, token: profiel.token, profiel: pubProfiel(profiel), gezin: pubGezin(g) });
@@ -447,6 +470,7 @@ router.post('/gezin/profiel/maak', (req, res) => {
   if (Object.keys(g.profielen).length >= 12) return res.status(400).json({ error: 'Een gezin kan tot 12 profielen hebben.' });
   const rol = ROLLEN.includes(req.body.rol) ? req.body.rol : 'kind';
   const p = { id: rid(4), naam, rol, avatar: schoonAvatar(req.body.avatar), kleur: schoonKleur(req.body.kleur), token: rid(24), at: nu() };
+  const g0 = schoonGroep(req.body.groep); if (g0) p.groep = g0;
   if (req.body.pin) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers, of laat hem leeg.' }); p.pin = hashPin(req.body.pin); }
   g.profielen[p.id] = p; save();
   res.json({ profiel: pubProfiel(p) });
@@ -460,6 +484,7 @@ router.post('/gezin/profiel/wijzig', (req, res) => {
   if (typeof req.body.naam === 'string' && schoon(req.body.naam, 40)) p.naam = schoon(req.body.naam, 40);
   if (req.body.avatar != null) p.avatar = schoonAvatar(req.body.avatar);
   if (req.body.kleur != null) p.kleur = schoonKleur(req.body.kleur);
+  if (req.body.groep != null) { const gg = schoonGroep(req.body.groep); if (gg) p.groep = gg; else delete p.groep; }
   if (ROLLEN.includes(req.body.rol)) {
     if (p.rol === 'beheerder' && req.body.rol !== 'beheerder' && Object.values(g.profielen).filter(x => x.rol === 'beheerder').length <= 1)
       return res.status(400).json({ error: 'Er moet altijd minstens een beheerder blijven.' });

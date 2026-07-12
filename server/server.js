@@ -415,6 +415,7 @@ function initRealtime() {
   if (!db.data.verlof) db.data.verlof = {};                        // verlofaanvragen en ziekmeldingen per bedrijf
   if (!db.data.klok) db.data.klok = {};                            // in- en uitkloktijden per bedrijf
   if (!db.data.applications) db.data.applications = {};            // sollicitaties per bedrijf
+  if (!db.data.vacatures) db.data.vacatures = {};                  // openstaande vacatures per bedrijf (ook zichtbaar in de RTFoundation)
   if (!db.data.cvs) db.data.cvs = {};                               // cv per lid (cv-builder in de leden-app)
   if (webpush) {
     if (!db.data.vapid) {
@@ -1481,6 +1482,7 @@ function supplierState(s, actor) {
     notifications: db.data.supplierNotifications[s.code] || [],
     staff: accounts.listStaff(s.code).map(accounts.publicStaff),
     applications: (db.data.applications[s.code] || []).slice(0, 30),
+    vacatures: (db.data.vacatures[s.code] || []).slice(0, 40),
     events: s.events || null,
     dailyMeps: (() => {
       if (!s.dailyMeps) return null;
@@ -2303,6 +2305,122 @@ app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
   logActivity(req.supplier.code, req.actor, 'wees de sollicitatie van ' + a.name + ' af');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
   notifyApplicant(a, req.supplier);
+  res.json({ ok: true });
+});
+
+/* ---- vacatures: het bedrijf plaatst openstaande functies ----
+   Deze vacatures verschijnen ook in de RTFoundation, zodat leden van arme
+   gezinnen (vanaf 16 jaar, met een verplicht cv) er in een tik op solliciteren.
+   De leeftijdsgrens sluit aan op de RTF-leeftijdsgroepen: standaard 16 jaar. */
+const VAC_SOORTEN = ['bijbaan', 'fulltime', 'parttime', 'stage', 'vrijwilliger', 'vakantiewerk'];
+app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const b = req.body || {};
+  const func = String(b.func || '').trim().slice(0, 60);
+  if (!func) return res.status(400).json({ error: 'Geef de functie een naam.' });
+  let minLeeftijd = parseInt(b.minLeeftijd, 10);
+  if (!Number.isFinite(minLeeftijd) || minLeeftijd < 16) minLeeftijd = 16; // solliciteren mag vanaf 16
+  if (minLeeftijd > 99) minLeeftijd = 99;
+  const soort = VAC_SOORTEN.includes(b.soort) ? b.soort : 'bijbaan';
+  const list = db.data.vacatures[req.supplier.code] = (db.data.vacatures[req.supplier.code] || []);
+  const bestaand = b.id ? list.find(v => v.id === b.id) : null;
+  const vac = bestaand || { id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString() };
+  vac.func = func;
+  vac.omschrijving = String(b.omschrijving || '').trim().slice(0, 500);
+  vac.plaats = String(b.plaats || '').trim().slice(0, 60);
+  vac.uren = String(b.uren || '').trim().slice(0, 40);
+  vac.soort = soort;
+  vac.minLeeftijd = minLeeftijd;
+  vac.open = b.open !== false;
+  if (!bestaand) { list.unshift(vac); db.data.vacatures[req.supplier.code] = list.slice(0, 40); }
+  save();
+  logActivity(req.supplier.code, req.actor, (bestaand ? 'wijzigde de vacature ' : 'plaatste een vacature ') + func);
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  res.json({ ok: true, vacatures: (db.data.vacatures[req.supplier.code] || []).slice(0, 40) });
+});
+app.post('/api/supplier/vacature/verwijder', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const list = db.data.vacatures[req.supplier.code] || [];
+  const i = list.findIndex(v => v.id === req.body.id);
+  if (i < 0) return res.status(404).json({ error: 'Vacature niet gevonden.' });
+  const soort = req.body.action === 'sluit' || req.body.action === 'open';
+  if (soort) { list[i].open = req.body.action === 'open'; }
+  else { list.splice(i, 1); }
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  res.json({ ok: true, vacatures: list.slice(0, 40) });
+});
+
+/* ---- vacatures voor de RTFoundation ----
+   Openbare lijst met alle openstaande vacatures over alle partners heen. De
+   RTF-app filtert op de leeftijdsgroep van het profiel (vanaf 16 jaar). */
+function openVacatures(minLeeftijd) {
+  const uit = [];
+  for (const [code, list] of Object.entries(db.data.vacatures || {})) {
+    const s = findSupplier(code);
+    if (!s) continue;
+    const t = db.data.supplierTypes[s.type] || {};
+    for (const v of list) {
+      if (!v.open) continue;
+      if (minLeeftijd != null && v.minLeeftijd > minLeeftijd) continue;
+      uit.push({
+        id: v.id, supplierCode: code, bedrijf: s.name, soort: v.soort,
+        type: s.type || null, typeLabel: t.label || null, icon: t.icon || '🏢',
+        func: v.func, omschrijving: v.omschrijving, plaats: v.plaats, uren: v.uren,
+        minLeeftijd: v.minLeeftijd, at: v.at
+      });
+    }
+  }
+  uit.sort((a, b) => (b.at || '').localeCompare(a.at || ''));
+  return uit;
+}
+app.post('/api/rtf/vacatures', (req, res) => {
+  const lft = parseInt(req.body && req.body.leeftijd, 10);
+  const minOk = Number.isFinite(lft) ? lft : null;
+  res.json({ vacatures: openVacatures(minOk).slice(0, 100), magSolliciteren: minOk == null || minOk >= 16 });
+});
+
+/* Een RTF-lid solliciteert met het cv uit de RTFoundation-cv-maker. Het cv is
+   verplicht vanaf 16 jaar; jonger dan 16 kan niet solliciteren. Het bedrijf
+   ziet de sollicitatie in dezelfde lijst als alle andere, met de RTF-markering. */
+app.post('/api/rtf/solliciteer', (req, res) => {
+  const b = req.body || {};
+  const lft = parseInt(b.leeftijd, 10);
+  if (!Number.isFinite(lft) || lft < 16)
+    return res.status(403).json({ error: 'Solliciteren kan vanaf 16 jaar. Jongere gezinsleden vinden in de app juist leer- en groeitips.' });
+  const s = findSupplier(b.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
+  const vac = (db.data.vacatures[s.code] || []).find(v => v.id === b.vacatureId && v.open);
+  if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
+  if (lft < vac.minLeeftijd)
+    return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn.' });
+  const cv = b.cv || {};
+  const name = String(cv.name || '').trim().slice(0, 60);
+  const contact = String(cv.contact || '').trim().slice(0, 80);
+  const heeftInhoud = (Array.isArray(cv.experience) && cv.experience.length) || (Array.isArray(cv.skills) && cv.skills.length) || (cv.about || '').trim();
+  if (!name || !contact || !heeftInhoud)
+    return res.status(409).json({ error: 'Maak eerst je cv af in de RTF-app (naam, contact en werk of vaardigheden). Daarmee solliciteer je in een tik.', needCv: true });
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    name, func: vac.func, contact,
+    note: String(b.note || '').trim().slice(0, 400),
+    viaRTF: true,
+    cv: {
+      headline: String(cv.headline || '').slice(0, 80),
+      experience: (Array.isArray(cv.experience) ? cv.experience : []).slice(0, 12).map(x => String(x).slice(0, 120)),
+      skills: (Array.isArray(cv.skills) ? cv.skills : []).slice(0, 15).map(x => String(x).slice(0, 40)),
+      languages: (Array.isArray(cv.languages) ? cv.languages : []).slice(0, 8).map(x => String(x).slice(0, 30)),
+      about: String(cv.about || '').slice(0, 400)
+    },
+    status: 'nieuw', at: new Date().toISOString()
+  };
+  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+  list.unshift(entry);
+  db.data.applications[s.code] = list.slice(0, 100);
+  save();
+  notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTFoundation', body: name + ' solliciteert als ' + vac.func + ', met cv.' });
+  sseToSupplier(s.code, 'sync', { scope: 'team' });
+  sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
 });
 

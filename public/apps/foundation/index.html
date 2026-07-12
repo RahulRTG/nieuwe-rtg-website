@@ -16,6 +16,7 @@
   .logo{font-family:var(--serif);font-size:2.3rem;font-weight:500;letter-spacing:-.01em;line-height:1.1;}
   .logo b{color:var(--goud);font-weight:600;}
   .deck{color:var(--zacht);max-width:36rem;margin:.9rem auto 0;line-height:1.55;}
+  .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--goud);border-radius:999px;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
   .tiles{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
   @media(max-width:560px){.tiles{grid-template-columns:1fr;}}
   .tile{display:flex;flex-direction:column;gap:.5rem;padding:1.5rem;text-decoration:none;color:var(--txt);transition:transform .12s,border-color .12s;position:relative;overflow:hidden;}
@@ -144,6 +145,11 @@
       <p>Allergieën, eten en bedtijden, huisregels en noodnummers: alles wat een oppas of familielid moet weten om goed voor de kinderen te zorgen.</p>
       <span class="cta">Bekijk de gezinsinfo →</span>
     </a>
+    <a class="kaart tile" id="tileWerk" href="werk.html" hidden>
+      <div class="ic">💼</div><h2>Werk en vacatures</h2>
+      <p>Echte vacatures van de partners van Rahul Travel Group, op één plek. Solliciteer vanaf 16 jaar in een tik met je eigen cv uit deze app.</p>
+      <span class="cta">Vind een baan of bijbaan →</span>
+    </a>
   </div>
 
   <div id="secOuder" hidden>
@@ -257,12 +263,18 @@ const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
 let mAv = '👑', mKl = KLEUREN[0], pinProfiel = null;
 
 function toon(id){ ['vWelkom','vProfielen','vHub'].forEach(v => $('#'+v).hidden = (v!==id)); }
-function toonRol(rol){
+function toonRol(profiel){
+  const rol = profiel.rol;
   const kind = rol === 'kind';
   const gast = rol === 'gast';
   $('#secOuder').hidden = kind || gast;
   $('#secKind').hidden = !kind;
   $('#tileDromen').style.display = gast ? 'none' : ''; // dromen blijven binnen het gezin
+  // werk en vacatures: vanaf 16 jaar (leeftijdsgroep jong/volw), niet voor gasten
+  $('#tileWerk').hidden = gast || !profiel.magSolliciteren;
+  if (profiel.groepNaam && !gast){
+    $('#hWelkom').innerHTML = esc($('#hWelkom').textContent) + ' <span class="grpbadge">' + esc(profiel.groepNaam) + '</span>';
+  }
   $('#hDeck').textContent = gast
     ? 'Fijn dat je meehelpt. Hier vind je wat je nodig hebt om er te zijn voor de kinderen: weten waar ze zijn, contact met het gezin, en samen leren of even rust. De privezaken van het gezin blijven privé.'
     : kind
@@ -287,7 +299,7 @@ async function start(){
     // controleer token; toon hub
     const d = await Sessie.ophalen();
     if (d && d.profiel){
-      Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel.rol);
+      Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel);
       // openstaand verzoek om alles te verwijderen
       if (d.wisVerzoek){
         if (d.wisVerzoek.vanMij){

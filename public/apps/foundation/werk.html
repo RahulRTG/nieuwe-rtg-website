@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Werk en vacatures</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .balkje{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:1.1rem;}
+  .balkje label{font-size:.85rem;color:var(--zacht);}
+  .balkje .veld{max-width:6rem;padding:.45rem .6rem;}
+  .cvstatus{font-size:.85rem;line-height:1.45;}
+  .cvstatus.ok{color:var(--groen,#7ecb8f);}
+  .cvstatus.mis{color:var(--rood);}
+  .lijst{display:flex;flex-direction:column;gap:.8rem;}
+  .vac{padding:1rem 1.1rem;}
+  .vac .kop{display:flex;align-items:flex-start;gap:.7rem;}
+  .vac .ic{font-size:1.6rem;line-height:1;}
+  .vac h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin:0;}
+  .vac .bedrijf{color:var(--goud);font-size:.9rem;font-weight:600;}
+  .vac .meta{color:var(--zacht);font-size:.82rem;margin-top:.25rem;display:flex;gap:.5rem;flex-wrap:wrap;}
+  .vac .meta span{background:var(--paneel2);border:1px solid var(--lijn);border-radius:999px;padding:.1rem .55rem;}
+  .vac .oms{color:var(--zacht);font-size:.9rem;line-height:1.45;margin:.6rem 0 .8rem;}
+  .vac .acties{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .vac .verstuurd{color:var(--groen,#7ecb8f);font-size:.88rem;font-weight:600;}
+  .leeg{color:var(--zacht);text-align:center;padding:2rem 1rem;line-height:1.5;}
+  .jong{background:#181712;border:1px solid var(--lijn);border-radius:12px;padding:1.1rem;color:var(--zacht);line-height:1.5;}
+  .jong b{color:var(--txt);}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>💼 Werk en vacatures</h1>
+  <div class="intro">Echte vacatures van de partners van Rahul Travel Group, bij elkaar op één plek. Solliciteren kan vanaf 16 jaar, in een tik, met het cv dat je in deze app maakt.</div>
+
+  <div id="teJong" class="jong" hidden></div>
+
+  <div id="werkkant" hidden>
+    <div class="balkje">
+      <label for="lft">Jouw leeftijd</label>
+      <input class="veld" id="lft" type="number" inputmode="numeric" min="16" max="99" value="16">
+      <span id="cvStatus" class="cvstatus"></span>
+    </div>
+    <div class="lijst" id="lijst"><div class="leeg">Vacatures laden...</div></div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+// De vacatures en het solliciteren lopen via de RTG-server (/api/rtf/...), niet
+// via de foundation-router. Daarom hier een eigen aanroep in plaats van Sessie.api.
+function rtfApi(pad, body){
+  return fetch('/api/rtf' + pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{}) })
+    .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(d){ if(!r.ok){ var e=new Error(d.error||'Er ging iets mis.'); e.needCv=!!d.needCv; e.status=r.status; throw e; } return d; }); });
+}
+
+const GROEP_VANAF = { mini:0, kind:5, tiener:12, jong:16, volw:22 };
+const SOORT = { bijbaan:'Bijbaan', vakantiewerk:'Vakantiewerk', parttime:'Parttime', fulltime:'Fulltime', stage:'Stage', vrijwilliger:'Vrijwilliger' };
+const VERZ_KEY = 'rtf_sollicitaties'; // welke vacatures dit toestel al verstuurde
+
+function verzonden(){ try { return JSON.parse(localStorage.getItem(VERZ_KEY)||'[]'); } catch(e){ return []; } }
+function markeerVerzonden(id){ const l = verzonden(); if (!l.includes(id)){ l.push(id); localStorage.setItem(VERZ_KEY, JSON.stringify(l.slice(-200))); } }
+
+// Het cv uit de RTF-cv-maker (localStorage) omzetten naar het formaat dat de
+// server verwacht. Zo solliciteer je met precies wat je hier hebt ingevuld.
+function bouwCv(){
+  let raw; try { raw = JSON.parse(localStorage.getItem('rtf_cv')||'null'); } catch(e){}
+  if (!raw) return null;
+  const v = raw.velden || {};
+  const werk = (raw.werk||[]).filter(w=>w.functie||w.bedrijf).map(w=>{
+    const kop = [w.functie, w.bedrijf, w.periode].filter(Boolean).join(' - ');
+    return w.beschrijving ? kop + ': ' + w.beschrijving : kop;
+  });
+  const opl = (raw.opleiding||[]).filter(o=>o.opleiding||o.school).map(o=> [o.opleiding, o.school, o.periode].filter(Boolean).join(' - '));
+  return {
+    name: String(v.naam||'').trim(),
+    contact: [v.email, v.telefoon].map(x=>String(x||'').trim()).filter(Boolean).join(' / ') || String(v.woonplaats||'').trim(),
+    headline: String(v.functie||'').trim(),
+    experience: werk,
+    skills: String(v.skills||'').split(',').map(x=>x.trim()).filter(Boolean),
+    languages: String(v.talen||'').split(',').map(x=>x.trim()).filter(Boolean),
+    about: [String(v.profiel||'').trim(), opl.length ? ('Opleiding: '+opl.join('; ')) : ''].filter(Boolean).join('\n')
+  };
+}
+function cvKlaar(cv){ return !!(cv && cv.name && cv.contact && (cv.experience.length || cv.skills.length || cv.about)); }
+
+function toonCvStatus(){
+  const cv = bouwCv();
+  const el = $('#cvStatus');
+  if (cvKlaar(cv)){ el.className = 'cvstatus ok'; el.innerHTML = '✅ Je cv is klaar (' + esc(cv.name) + '). <a href="cv.html" style="color:inherit;text-decoration:underline;">Aanpassen</a>'; }
+  else { el.className = 'cvstatus mis'; el.innerHTML = '📄 Maak eerst je cv af om te kunnen solliciteren. <a href="cv.html" style="color:inherit;text-decoration:underline;font-weight:700;">Naar de cv-maker →</a>'; }
+}
+
+let vacatures = [];
+async function laad(){
+  const lft = Math.max(16, parseInt($('#lft').value,10) || 16);
+  try {
+    const d = await rtfApi('/vacatures', { leeftijd: lft });
+    vacatures = d.vacatures || [];
+    teken();
+  } catch(e){ $('#lijst').innerHTML = '<div class="leeg">Kon de vacatures even niet laden. Probeer het zo nog eens.</div>'; }
+}
+
+function teken(){
+  const verz = verzonden();
+  if (!vacatures.length){ $('#lijst').innerHTML = '<div class="leeg">Er staan nu geen vacatures open die bij jouw leeftijd passen. Kijk gerust later nog eens; partners plaatsen doorlopend nieuwe kansen.</div>'; return; }
+  $('#lijst').innerHTML = vacatures.map(v=>{
+    const al = verz.includes(v.id);
+    const meta = [ SOORT[v.soort]||v.soort, 'vanaf '+v.minLeeftijd+' jaar', v.plaats, v.uren ].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('');
+    return '<div class="kaart vac">'+
+      '<div class="kop"><span class="ic">'+esc(v.icon||'🏢')+'</span><div><h2>'+esc(v.func)+'</h2><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div><div class="meta">'+meta+'</div></div></div>'+
+      (v.omschrijving?'<div class="oms">'+esc(v.omschrijving)+'</div>':'<div class="oms" style="opacity:.7;">Solliciteer met je cv; het bedrijf neemt daarna contact met je op.</div>')+
+      '<div class="acties">'+
+      (al ? '<span class="verstuurd">✅ Sollicitatie verstuurd</span>'
+          : '<button class="knop" data-sol="'+esc(v.id)+'" data-code="'+esc(v.supplierCode)+'">Solliciteer met mijn cv</button>')+
+      '</div></div>';
+  }).join('');
+  document.querySelectorAll('[data-sol]').forEach(b=> b.addEventListener('click', ()=> solliciteer(b)));
+}
+
+async function solliciteer(btn){
+  const cv = bouwCv();
+  if (!cvKlaar(cv)){
+    if (confirm('Je hebt nog geen compleet cv. Wil je nu naar de cv-maker om het af te maken?')) location.href = 'cv.html';
+    return;
+  }
+  const lft = Math.max(16, parseInt($('#lft').value,10) || 16);
+  btn.disabled = true; btn.textContent = 'Versturen...';
+  try {
+    await rtfApi('/solliciteer', { supplierCode: btn.dataset.code, vacatureId: btn.dataset.sol, leeftijd: lft, cv });
+    markeerVerzonden(btn.dataset.sol);
+    teken();
+  } catch(e){
+    btn.disabled = false; btn.textContent = 'Solliciteer met mijn cv';
+    if (e && e.needCv) { if (confirm('Maak eerst je cv af. Nu naar de cv-maker?')) location.href='cv.html'; }
+    else alert(e.message || 'Solliciteren lukte even niet.');
+  }
+}
+
+// Klopt het token nog, en mag dit profiel al solliciteren (vanaf 16)?
+Sessie.ophalen().then(d=>{
+  const p = (d && d.profiel) || (s && s.profiel) || {};
+  const vanaf = GROEP_VANAF[p.groep];
+  if (!p.magSolliciteren){
+    $('#teJong').hidden = false;
+    $('#teJong').innerHTML = '<b>Solliciteren kan vanaf 16 jaar.</b><br>' +
+      (vanaf!=null && vanaf < 16
+        ? 'Jij hoort bij de groep ' + esc(p.groepNaam||'') + '. Op de startpagina vind je juist leuke dingen die bij jou passen: leren, dromen en samen groeien. Later, vanaf 16, staan hier echte vacatures voor je klaar.'
+        : 'Vraag de beheerder om je leeftijdsgroep in te stellen (Gezin beheren), dan verschijnen hier de vacatures.') +
+      '<div style="margin-top:.8rem;"><a class="knop grijs klein" href="index.html">← Terug naar start</a></div>';
+    return;
+  }
+  $('#werkkant').hidden = false;
+  if (vanaf!=null) $('#lft').value = Math.max(16, vanaf);
+  toonCvStatus();
+  $('#lft').addEventListener('change', laad);
+  $('#lft').addEventListener('input', ()=>{ clearTimeout(window._lt); window._lt = setTimeout(laad, 500); });
+  laad();
+});
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

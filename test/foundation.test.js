@@ -453,6 +453,65 @@ function raw(pad, body, token) {
   });
 }
 
+test('cross-app vrienden: RTF en RTG vinden elkaar op codenaam, chatten, snappen; kind wacht op ouder', async () => {
+  const now = Date.now();
+  const foto = 'data:image/png;base64,' + Buffer.from('x'.repeat(60)).toString('base64');
+  // RTG-lid
+  const rtg = await json(await raw('/auth/register', { name: 'Lid Soc', email: 'ls' + now + '@v.test', phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
+  const rtgTok = rtg.token, rtgCn = rtg.state.user.codename;
+  await raw('/member/connections', {}, rtgTok); // zet zichzelf in de gids
+
+  // RTF-gezin: een ouder (beheerder) en een kind, beiden met codenaam
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Soc Fam', naam: 'Ouder', pin: '2468', groep: 'volw' }));
+  const mij = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token));
+  const ouderCn = mij.profiel.codenaam;
+  assert.ok(ouderCn, 'een gezinslid krijgt een codenaam');
+  const kind0 = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Sara', rol: 'kind', groep: 'kind' }));
+  const kindCn = kind0.profiel.codenaam;
+
+  // RTG vindt de RTF-ouder op codenaam en stuurt een verzoek
+  const found = await json(await raw('/member/find', { q: ouderCn.split(' ')[0] }, rtgTok));
+  const ouderKey = (found.results.find(r => r.codename === ouderCn) || {}).key;
+  assert.ok(ouderKey, 'RTG vindt de RTF-ouder op codenaam');
+  assert.equal((await raw('/member/connect', { key: ouderKey }, rtgTok)).status, 200);
+  // de ouder ziet en accepteert het verzoek via de RTF-social-endpoints
+  const oConns = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
+  const verzoek = (oConns.requests || []).find(x => x.codename === rtgCn);
+  assert.ok(verzoek, 'de ouder ziet het verzoek van RTG');
+  await raw('/rtf/social/respond', { code: g.code, token: g.token, key: verzoek.key, action: 'accept' });
+  // nu vrienden: de ouder chat met RTG, RTG leest het
+  assert.equal((await raw('/rtf/social/dm/send', { code: g.code, token: g.token, toKey: verzoek.key, text: 'Hoi RTG!' })).status, 200);
+  const rtgThread = await json(await raw('/member/dm', { withKey: ouderKey }, rtgTok));
+  assert.ok((rtgThread.messages || []).some(m => /Hoi RTG/.test(m.text)), 'RTG leest het bericht van de RTF-ouder');
+
+  // RTG voegt het KIND toe: dat wacht op ouderakkoord
+  const found2 = await json(await raw('/member/find', { q: kindCn.split(' ')[0] }, rtgTok));
+  const kindKey = (found2.results.find(r => r.codename === kindCn) || {}).key;
+  const kc = await json(await raw('/member/connect', { key: kindKey }, rtgTok));
+  assert.equal(kc.status, 'wacht-op-ouder', 'vriendschap met een kind wacht op de ouder');
+  assert.equal((await raw('/member/dm/send', { toKey: kindKey, text: 'hoi' }, rtgTok)).status, 403, 'nog geen chat voor akkoord');
+  // de ouder/beheerder keurt goed
+  const bConns = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
+  const tk = (bConns.teKeuren || []).find(t => t.kindHandle === kindKey);
+  assert.ok(tk, 'de beheerder ziet het te keuren verzoek voor het kind');
+  await raw('/rtf/social/goedkeuren', { code: g.code, token: g.token, kindHandle: tk.kindHandle, anderKey: tk.anderKey, akkoord: true });
+  assert.equal((await raw('/member/dm/send', { toKey: kindKey, text: 'hoi vriendje' }, rtgTok)).status, 200, 'na ouderakkoord mag de chat');
+
+  // SNAP: RTG snapt naar de ouder; die bekijkt hem een keer en dan is hij weg
+  assert.equal((await raw('/member/snap/send', { toKey: ouderKey, foto, tekst: 'kiek' }, rtgTok)).status, 200);
+  const snaps = await json(await raw('/rtf/social/snaps', { code: g.code, token: g.token }));
+  const snapId = (snaps.snaps[0] || {}).id;
+  assert.ok(snapId, 'de ouder ziet een snap binnenkomen');
+  assert.ok((await json(await raw('/rtf/social/snap/view', { code: g.code, token: g.token, id: snapId }))).foto, 'de ouder opent de snap');
+  const snaps2 = await json(await raw('/rtf/social/snaps', { code: g.code, token: g.token }));
+  assert.ok(!snaps2.snaps.some(s => s.id === snapId), 'de snap is weg na bekijken');
+
+  // STORY: de ouder plaatst een 24-uurs verhaal; de RTG-vriend ziet het
+  assert.equal((await raw('/rtf/social/story/post', { code: g.code, token: g.token, foto, tekst: 'ons verhaal' })).status, 200);
+  const stories = await json(await raw('/member/stories', {}, rtgTok));
+  assert.ok(stories.stories.some(s => s.van === ouderCn), 'de RTG-vriend ziet het verhaal van de RTF-vriend');
+});
+
 test('automatisch vertalen: bericht komt in de taal van de lezer, beide kanten op', async () => {
   // Nederlands naar Engels (vaste seed-zin) en Engels naar Nederlands (woordniveau)
   const nl2en = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'Snackbar dicht, telefoon uit, ik ben even niemands baas.', to: 'en' }) })));

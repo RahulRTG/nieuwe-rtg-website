@@ -387,12 +387,54 @@ const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
 function schoonAvatar(v) { const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim(); return s ? Array.from(s).slice(0, 2).join('') : '🙂'; }
 function schoonKleur(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? v : KLEUREN[0]; }
 
+/* Elk gezinslid krijgt een codenaam, net als een RTG-lid, zodat RTF- en
+   RTG-mensen elkaar op codenaam kunnen vinden en toevoegen zonder ooit een
+   echte naam of adres te delen. */
+const CNAAM_KLEUR = ['Gouden', 'Zilveren', 'Koperen', 'Blauwe', 'Groene', 'Rode', 'Witte', 'Zwarte', 'Paarse', 'Oranje'];
+const CNAAM_DIER = ['Vos', 'Havik', 'Lynx', 'Otter', 'Das', 'Reiger', 'Hert', 'Uil', 'Merel', 'Wolf', 'Bever', 'Zwaan', 'Valk', 'Egel'];
+function nieuweCodenaam() {
+  const k = CNAAM_KLEUR[crypto.randomInt(CNAAM_KLEUR.length)];
+  const d = CNAAM_DIER[crypto.randomInt(CNAAM_DIER.length)];
+  const s = crypto.randomBytes(2).toString('hex').toUpperCase();
+  return k + ' ' + d + ' ' + s;
+}
+function ensureCodenaam(p) { if (!p.codenaam) p.codenaam = nieuweCodenaam(); return p.codenaam; }
+const rtfHandle = (code, pid) => 'rtf:' + String(code).toUpperCase() + ':' + pid;
+// alle gezinsleden (geen gasten) voor de gedeelde codenaam-gids
+function socialProfielen() {
+  const uit = []; let veranderd = false;
+  for (const g of Object.values(G())) {
+    for (const p of Object.values(g.profielen || {})) {
+      if (isGast(p)) continue;
+      if (!p.codenaam) { ensureCodenaam(p); veranderd = true; }
+      uit.push({ handle: rtfHandle(g.code, p.id), codenaam: p.codenaam, rol: p.rol, kind: p.rol === 'kind', gezinCode: g.code });
+    }
+  }
+  if (veranderd) save();
+  return uit;
+}
+function profielInfoVanHandle(handle) {
+  const m = /^rtf:([A-Z0-9]+):(.+)$/.exec(String(handle || ''));
+  if (!m) return null;
+  const g = G()[m[1]]; if (!g) return null;
+  const p = g.profielen[m[2]]; if (!p || isGast(p)) return null;
+  return { handle, codenaam: ensureCodenaam(p), naam: p.naam, avatar: p.avatar, kleur: p.kleur, rol: p.rol, kind: p.rol === 'kind', gezinCode: g.code };
+}
+// beheerder(s) van het gezin waar dit kind-handle bij hoort
+function beheerdersVanHandle(handle) {
+  const m = /^rtf:([A-Z0-9]+):(.+)$/.exec(String(handle || ''));
+  if (!m) return [];
+  const g = G()[m[1]]; if (!g) return [];
+  return Object.values(g.profielen).filter(x => x.rol === 'beheerder').map(x => rtfHandle(g.code, x.id));
+}
+
 function pubProfiel(p) {
   const groep = p.groep && GROEP_INFO[p.groep] ? p.groep : null;
+  if (!isGast(p)) ensureCodenaam(p);
   return {
     id: p.id, naam: p.naam, rol: p.rol, avatar: p.avatar, kleur: p.kleur,
     heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder',
-    gast: p.rol === 'gast', gekoppeld: !!p.koppel,
+    gast: p.rol === 'gast', gekoppeld: !!p.koppel, codenaam: p.codenaam || null,
     groep, groepNaam: groep ? GROEP_INFO[groep].naam : null, groepBereik: groep ? GROEP_INFO[groep].bereik : null,
     magSolliciteren: magSolliciteren(groep)
   };
@@ -1118,7 +1160,8 @@ function verifieerProfiel(code, token) {
   if (!g) return null;
   const p = profielVan(g, token);
   if (!p) return null;
-  return { g, p, gast: isGast(p) };
+  if (!isGast(p)) ensureCodenaam(p);
+  return { g, p, gast: isGast(p), handle: rtfHandle(g.code, p.id), codenaam: p.codenaam, kind: p.rol === 'kind', beheerder: p.rol === 'beheerder' };
 }
 function bewaarSollicitatie(code, profielId, ref) {
   const g = G()[String(code || '').toUpperCase()];
@@ -1152,4 +1195,4 @@ router.post('/gezin/sollicitaties', (req, res) => {
 
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, beheerdersVanHandle };

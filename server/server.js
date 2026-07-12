@@ -423,6 +423,8 @@ function initRealtime() {
   if (!db.data.applications) db.data.applications = {};            // sollicitaties per bedrijf
   if (!db.data.vacatures) db.data.vacatures = {};                  // openstaande vacatures per bedrijf (ook zichtbaar in de RTFoundation)
   if (!db.data.applyChats) db.data.applyChats = {};                // chat tussen sollicitant en werkgever (na uitnodigen/aannemen)
+  if (!db.data.snaps) db.data.snaps = [];                          // Snapchat-achtige snaps: foto die na bekijken verdwijnt
+  if (!db.data.stories) db.data.stories = [];                      // 24-uurs verhalen, zichtbaar voor vrienden
   if (!db.data.cvs) db.data.cvs = {};                               // cv per lid (cv-builder in de leden-app)
   if (webpush) {
     if (!db.data.vapid) {
@@ -974,78 +976,211 @@ function geenGast(req, res) {
   return false;
 }
 
-// leden zoeken op codenaam (nooit op echte naam)
+/* ---------- gedeelde vriendenlaag over RTG en RTFoundation ----------
+   Iedereen (RTG-lid, gratis account, RTFoundation-gezinslid) heeft een codenaam
+   en een "handle". RTG: de sessiesleutel (user-<id> of tier). RTFoundation:
+   rtf:<GEZINSCODE>:<profielId>. Zo kunnen RTF en RTG elkaar op codenaam vinden,
+   toevoegen, chatten, bellen en snappen. Kinderprofielen hebben ouderakkoord
+   nodig voordat een vriendschap actief wordt. */
+const isRtf = h => typeof h === 'string' && h.startsWith('rtf:');
+function codeExists(handle) { return isRtf(handle) ? !!rtf.profielInfoVanHandle(handle) : !!db.data.memberDir[handle]; }
+function codenaamVan(handle) {
+  if (isRtf(handle)) { const i = rtf.profielInfoVanHandle(handle); return i ? i.codenaam : handle; }
+  return (db.data.memberDir[handle] || {}).codename || handle;
+}
+function soortVan(handle) { return isRtf(handle) ? 'rtf' : ((db.data.memberDir[handle] || {}).tier || 'rtg'); }
+function isKindHandle(handle) { if (isRtf(handle)) { const i = rtf.profielInfoVanHandle(handle); return !!(i && i.kind); } return false; }
+function verbActief(c) { return !!(c && c.status === 'accepted' && (!c.voogdWacht || c.voogdWacht.length === 0)); }
+function statusVan(mij, c) {
+  if (!c) return 'geen';
+  if (verbActief(c)) return 'verbonden';
+  if (c.voogdWacht && c.voogdWacht.length) return 'wacht-op-ouder';
+  return c.requestedBy === mij ? 'aangevraagd' : 'wacht-op-u';
+}
+// zoek op codenaam over beide werelden
+function socialZoek(mij, q) {
+  q = String(q || '').trim().toLowerCase();
+  if (q.length < 2) return [];
+  const seen = new Set([mij]);
+  const handles = [];
+  for (const [key, m] of Object.entries(db.data.memberDir)) { if (!seen.has(key) && m.codename && m.codename.toLowerCase().includes(q)) { seen.add(key); handles.push(key); } }
+  for (const sp of rtf.socialProfielen()) { if (!seen.has(sp.handle) && sp.codenaam.toLowerCase().includes(q)) { seen.add(sp.handle); handles.push(sp.handle); } }
+  return handles.slice(0, 10).map(h => ({ key: h, codename: codenaamVan(h), tier: soortVan(h), status: statusVan(mij, connectieTussen(mij, h)) }));
+}
+// vriendschapsverzoek van 'mij' naar 'naar'
+function socialVerbind(mij, naar) {
+  if (naar === mij) return { status: 400, error: 'Dat ben je zelf.' };
+  if (!codeExists(naar)) return { status: 404, error: 'Deze codenaam kennen we niet.' };
+  let c = connectieTussen(mij, naar);
+  if (c && verbActief(c)) return { status: 200, ok: true, st: 'verbonden' };
+  if (c) return { status: 200, ok: true, st: statusVan(mij, c) };
+  const voogdWacht = [];
+  if (isKindHandle(mij)) voogdWacht.push(mij);
+  if (isKindHandle(naar)) voogdWacht.push(naar);
+  c = { a: mij, b: naar, requestedBy: mij, status: 'pending', at: new Date().toISOString(), voogdWacht };
+  db.data.connections.push(c); save();
+  if (!isRtf(naar)) sseToCustomer(naar, 'social', { kind: 'request', from: codenaamVan(mij) });
+  return { status: 200, ok: true, st: voogdWacht.length ? 'wacht-op-ouder' : 'aangevraagd' };
+}
+// verzoek beantwoorden (accepteren/afwijzen); een kind kan niet zelf accepteren
+function socialAntwoord(mij, ander, action) {
+  const c = connectieTussen(mij, ander);
+  if (!c || c.status !== 'pending' || c.requestedBy === mij) return { status: 404, error: 'Geen openstaand verzoek van deze codenaam.' };
+  if (isKindHandle(mij)) return { status: 403, error: 'Een ouder moet dit verzoek eerst goedkeuren.' };
+  if (action === 'accept') {
+    c.status = 'accepted'; c.acceptedAt = new Date().toISOString(); save();
+    if (!isRtf(ander)) sseToCustomer(ander, 'social', { kind: 'accepted', by: codenaamVan(mij) });
+    return { status: 200, ok: true, st: verbActief(c) ? 'verbonden' : 'wacht-op-ouder' };
+  }
+  db.data.connections = db.data.connections.filter(x => x !== c); save();
+  return { status: 200, ok: true, st: 'geen' };
+}
+// mijn vrienden + openstaande verzoeken
+function socialConnecties(mij) {
+  const conns = db.data.connections.filter(c => (c.a === mij || c.b === mij) && verbActief(c)).map(c => {
+    const ander = c.a === mij ? c.b : c.a;
+    const chat = db.data.memberChats[dmSleutel(mij, ander)];
+    const laatst = chat && chat.messages.length ? chat.messages[chat.messages.length - 1] : null;
+    const gelezen = chat && chat.read && chat.read[mij] ? chat.read[mij] : '';
+    const unread = chat ? chat.messages.filter(m => m.from !== mij && m.at > gelezen).length : 0;
+    return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
+  }).sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
+  const requests = db.data.connections.filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isKindHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at }));
+  return { connections: conns, requests };
+}
+// DM lezen/sturen (werkt over beide werelden zolang de vriendschap actief is)
+function socialDm(mij, ander) {
+  if (!verbActief(connectieTussen(mij, ander))) return { status: 403, error: 'Je bent nog niet verbonden met deze codenaam.' };
+  const k = dmSleutel(mij, ander);
+  const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
+  chat.read[mij] = new Date().toISOString(); save();
+  return { status: 200, messages: chat.messages.slice(-80), codename: codenaamVan(ander) };
+}
+function socialDmSend(mij, ander, text) {
+  if (!verbActief(connectieTussen(mij, ander))) return { status: 403, error: 'Je bent nog niet verbonden met deze codenaam.' };
+  text = String(text || '').slice(0, 500).trim();
+  if (!text) return { status: 400, error: 'Leeg bericht.' };
+  const k = dmSleutel(mij, ander);
+  const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
+  chat.messages.push({ from: mij, text, at: new Date().toISOString() });
+  chat.messages = chat.messages.slice(-200); save();
+  if (!isRtf(ander)) sseToCustomer(ander, 'social', { kind: 'dm', from: mij, codename: codenaamVan(mij), text });
+  return { status: 200, ok: true, messages: chat.messages.slice(-80) };
+}
+const zijnVrienden = (a, b) => verbActief(connectieTussen(a, b));
+// vriendschapsverzoeken van kinderen van dit gezin die op ouderakkoord wachten
+function socialTeKeuren(gezinCode) {
+  const kids = new Set(rtf.socialProfielen().filter(sp => sp.gezinCode === gezinCode && sp.kind).map(sp => sp.handle));
+  return db.data.connections.filter(c => c.status === 'pending' && c.voogdWacht && c.voogdWacht.some(h => kids.has(h))).map(c => {
+    const kid = c.voogdWacht.find(h => kids.has(h));
+    const ander = c.a === kid ? c.b : c.a;
+    return { kindHandle: kid, kind: codenaamVan(kid), anderKey: ander, ander: codenaamVan(ander), anderSoort: soortVan(ander), richting: c.requestedBy === kid ? 'uit' : 'in', at: c.at };
+  });
+}
+function socialGoedkeur(gezinCode, kidHandle, anderHandle, akkoord) {
+  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.kind);
+  if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
+  const c = connectieTussen(kidHandle, anderHandle);
+  if (!c || c.status !== 'pending') return { status: 404, error: 'Verzoek niet gevonden.' };
+  if (!akkoord) { db.data.connections = db.data.connections.filter(x => x !== c); save(); return { status: 200, ok: true, st: 'afgewezen' }; }
+  c.voogdWacht = (c.voogdWacht || []).filter(h => h !== kidHandle);
+  // als het kind de ontvanger is, geldt het ouderakkoord ook als accepteren
+  if (c.requestedBy !== kidHandle && c.status === 'pending') { c.status = 'accepted'; c.acceptedAt = new Date().toISOString(); }
+  save();
+  return { status: 200, ok: true, st: verbActief(c) ? 'verbonden' : 'wacht' };
+}
+
+/* ---------- snaps en 24-uurs verhalen (Snapchat-achtig) ----------
+   Een snap is een foto die je naar een vriend stuurt; die kan hem een keer
+   bekijken en dan is hij weg. Een verhaal (story) is 24 uur zichtbaar voor al je
+   vrienden. Foto's zijn kleine data-URL's; alles verloopt vanzelf. */
+const SNAP_TTL = 24 * 60 * 60 * 1000;   // een niet-bekeken snap verloopt na 24 uur
+const STORY_TTL = 24 * 60 * 60 * 1000;
+function geldigeFoto(s) { return typeof s === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(s) && s.length <= 900 * 1024; }
+function opschonenSnaps() {
+  const nu = Date.now();
+  const voor = db.data.snaps.length + db.data.stories.length;
+  db.data.snaps = db.data.snaps.filter(s => !s.bekeken && (nu - new Date(s.at).getTime()) < SNAP_TTL);
+  db.data.stories = db.data.stories.filter(s => (nu - new Date(s.at).getTime()) < STORY_TTL);
+  if (voor !== db.data.snaps.length + db.data.stories.length) save();
+}
+function snapSturen(van, naar, foto, tekst) {
+  if (!zijnVrienden(van, naar)) return { status: 403, error: 'Je kunt alleen snappen naar een vriend.' };
+  if (!geldigeFoto(foto)) return { status: 400, error: 'Kies een foto (max ~900 kB).' };
+  const snap = { id: crypto.randomBytes(5).toString('hex'), van, naar, foto, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), bekeken: false };
+  db.data.snaps.push(snap);
+  db.data.snaps = db.data.snaps.slice(-2000);
+  save();
+  if (!isRtf(naar)) sseToCustomer(naar, 'social', { kind: 'snap', from: codenaamVan(van) });
+  return { status: 200, ok: true };
+}
+// binnengekomen snaps voor 'mij' (alleen dat er een is, nog niet de foto)
+function snapsVoor(mij) {
+  opschonenSnaps();
+  return db.data.snaps.filter(s => s.naar === mij && !s.bekeken)
+    .map(s => ({ id: s.id, van: codenaamVan(s.van), at: s.at, tekst: s.tekst }));
+}
+// een snap openen: geef de foto terug en markeer als bekeken (verdwijnt daarna)
+function snapOpenen(mij, id) {
+  const s = db.data.snaps.find(x => x.id === id && x.naar === mij && !x.bekeken);
+  if (!s) return { status: 404, error: 'Deze snap is er niet meer.' };
+  s.bekeken = true; s.bekekenAt = new Date().toISOString();
+  const foto = s.foto, tekst = s.tekst, van = codenaamVan(s.van);
+  // meteen weg: na bekijken bewaren we de foto niet
+  db.data.snaps = db.data.snaps.filter(x => x.id !== id);
+  save();
+  return { status: 200, foto, tekst, van };
+}
+function verhaalPlaatsen(van, foto, tekst) {
+  if (!geldigeFoto(foto)) return { status: 400, error: 'Kies een foto (max ~900 kB).' };
+  db.data.stories = db.data.stories.filter(s => !(s.van === van)); // een verhaal per persoon tegelijk (het nieuwste)
+  db.data.stories.push({ id: crypto.randomBytes(5).toString('hex'), van, foto, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), kijkers: [] });
+  db.data.stories = db.data.stories.slice(-1000);
+  save();
+  return { status: 200, ok: true };
+}
+// de verhalen van mijn vrienden (en die van mezelf)
+function verhalenVoor(mij) {
+  opschonenSnaps();
+  return db.data.stories.filter(s => s.van === mij || zijnVrienden(mij, s.van))
+    .sort((a, b) => String(b.at).localeCompare(String(a.at)))
+    .map(s => ({ id: s.id, van: codenaamVan(s.van), vanMij: s.van === mij, at: s.at, gezien: s.kijkers.includes(mij) }));
+}
+function verhaalBekijken(mij, id) {
+  opschonenSnaps();
+  const s = db.data.stories.find(x => x.id === id);
+  if (!s || (s.van !== mij && !zijnVrienden(mij, s.van))) return { status: 404, error: 'Dit verhaal is er niet meer.' };
+  if (!s.kijkers.includes(mij)) { s.kijkers.push(mij); save(); }
+  return { status: 200, foto: s.foto, tekst: s.tekst, van: codenaamVan(s.van), at: s.at };
+}
+
+// leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam)
 app.post('/api/member/find', auth, (req, res) => {
   if (geenGast(req, res)) return;
-  const q = String(req.body.q || '').trim().toLowerCase();
-  if (q.length < 2) return res.json({ results: [] });
-  const results = Object.entries(db.data.memberDir)
-    .filter(([key, m]) => key !== req.session.key && m.codename.toLowerCase().includes(q))
-    .slice(0, 8)
-    .map(([key, m]) => {
-      const c = connectieTussen(req.session.key, key);
-      return { key, codename: m.codename, tier: m.tier,
-               status: c ? (c.status === 'accepted' ? 'verbonden' : (c.requestedBy === req.session.key ? 'aangevraagd' : 'wacht-op-u')) : 'geen' };
-    });
-  res.json({ results });
+  res.json({ results: socialZoek(req.session.key, req.body.q) });
 });
 
-// verzoek sturen
+// verzoek sturen (mag ook naar een RTF-codenaam)
 app.post('/api/member/connect', auth, (req, res) => {
   if (geenGast(req, res)) return;
-  const key = String(req.body.key || '');
-  if (key === req.session.key) return res.status(400).json({ error: 'Dat bent u zelf.' });
-  if (!db.data.memberDir[key]) return res.status(404).json({ error: 'Dit lid kennen we niet.' });
-  let c = connectieTussen(req.session.key, key);
-  if (c && c.status === 'accepted') return res.json({ ok: true, status: 'verbonden' });
-  if (c) return res.json({ ok: true, status: c.requestedBy === req.session.key ? 'aangevraagd' : 'wacht-op-u' });
-  c = { a: req.session.key, b: key, requestedBy: req.session.key, status: 'pending', at: new Date().toISOString() };
-  db.data.connections.push(c);
-  save();
-  sseToCustomer(key, 'social', { kind: 'request', from: liveCodename(req.session) });
-  res.json({ ok: true, status: 'aangevraagd' });
+  const r = socialVerbind(req.session.key, String(req.body.key || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.st });
 });
 
 // verzoek beantwoorden
 app.post('/api/member/connect/respond', auth, (req, res) => {
   if (geenGast(req, res)) return;
-  const key = String(req.body.key || '');
-  const c = connectieTussen(req.session.key, key);
-  if (!c || c.status !== 'pending' || c.requestedBy === req.session.key)
-    return res.status(404).json({ error: 'Geen openstaand verzoek van dit lid.' });
-  if (req.body.action === 'accept') {
-    c.status = 'accepted';
-    c.acceptedAt = new Date().toISOString();
-    save();
-    sseToCustomer(key, 'social', { kind: 'accepted', by: liveCodename(req.session) });
-    return res.json({ ok: true, status: 'verbonden' });
-  }
-  db.data.connections = db.data.connections.filter(x => x !== c);
-  save();
-  res.json({ ok: true, status: 'geen' });
+  const r = socialAntwoord(req.session.key, String(req.body.key || ''), req.body.action);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.st });
 });
 
-// mijn connecties + openstaande verzoeken + ongelezen tellers
+// mijn vrienden + openstaande verzoeken + ongelezen tellers
 app.post('/api/member/connections', auth, (req, res) => {
   if (geenGast(req, res)) return;
-  const mij = req.session.key;
-  const naam = k => (db.data.memberDir[k] || {}).codename || k;
-  const conns = db.data.connections
-    .filter(c => (c.a === mij || c.b === mij) && c.status === 'accepted')
-    .map(c => {
-      const ander = c.a === mij ? c.b : c.a;
-      const chat = db.data.memberChats[dmSleutel(mij, ander)];
-      const laatst = chat && chat.messages.length ? chat.messages[chat.messages.length - 1] : null;
-      const gelezen = chat && chat.read && chat.read[mij] ? chat.read[mij] : '';
-      const unread = chat ? chat.messages.filter(m => m.from !== mij && m.at > gelezen).length : 0;
-      return { key: ander, codename: naam(ander), tier: (db.data.memberDir[ander] || {}).tier,
-               unread, last: laatst ? (laatst.post ? '↗ Salon-post' : laatst.text.slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
-    })
-    .sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
-  const verzoeken = db.data.connections
-    .filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij)
-    .map(c => ({ key: c.requestedBy, codename: naam(c.requestedBy), at: c.at }));
-  res.json({ me: mij, codename: liveCodename(req.session), connections: conns, requests: verzoeken });
+  const sc = socialConnecties(req.session.key);
+  res.json({ me: req.session.key, codename: liveCodename(req.session), connections: sc.connections, requests: sc.requests });
 });
 
 // gesprek ophalen (en als gelezen markeren)
@@ -1053,12 +1188,12 @@ app.post('/api/member/dm', auth, (req, res) => {
   if (geenGast(req, res)) return;
   const ander = String(req.body.withKey || '');
   const c = connectieTussen(req.session.key, ander);
-  if (!c || c.status !== 'accepted') return res.status(403).json({ error: 'U bent nog niet verbonden met dit lid.' });
+  if (!verbActief(c)) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
   const k = dmSleutel(req.session.key, ander);
   const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
   chat.read[req.session.key] = new Date().toISOString();
   save();
-  res.json({ messages: chat.messages.slice(-80), codename: (db.data.memberDir[ander] || {}).codename });
+  res.json({ messages: chat.messages.slice(-80), codename: codenaamVan(ander) });
 });
 
 // bericht sturen; optioneel met een gedeelde Salon-post erbij
@@ -1066,7 +1201,7 @@ app.post('/api/member/dm/send', auth, (req, res) => {
   if (geenGast(req, res)) return;
   const ander = String(req.body.toKey || '');
   const c = connectieTussen(req.session.key, ander);
-  if (!c || c.status !== 'accepted') return res.status(403).json({ error: 'U bent nog niet verbonden met dit lid.' });
+  if (!verbActief(c)) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
   const text = String(req.body.text || '').slice(0, 500).trim();
   let postDeel = null;
   if (req.body.postId != null) {
@@ -1091,7 +1226,7 @@ app.post('/api/member/call', auth, (req, res) => {
   if (geenGast(req, res)) return;
   const ander = String(req.body.toKey || '');
   const c = connectieTussen(req.session.key, ander);
-  if (!c || c.status !== 'accepted') return res.status(403).json({ error: 'U bent nog niet verbonden met dit lid.' });
+  if (!verbActief(c)) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
   const kind = String(req.body.kind || '');
   if (!['ring', 'accept', 'offer', 'answer', 'ice', 'hangup', 'decline', 'busy'].includes(kind))
     return res.status(400).json({ error: 'Onbekend signaal.' });
@@ -1100,6 +1235,108 @@ app.post('/api/member/call', auth, (req, res) => {
     video: !!req.body.video, payload: req.body.payload || null
   });
   res.json({ ok: true });
+});
+
+/* ---------- snaps en verhalen: RTG-kant (auth) ---------- */
+app.post('/api/member/snap/send', express.json({ limit: '1.5mb' }), auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const r = snapSturen(req.session.key, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true });
+});
+app.post('/api/member/snaps', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ snaps: snapsVoor(req.session.key) }); });
+app.post('/api/member/snap/view', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const r = snapOpenen(req.session.key, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ foto: r.foto, tekst: r.tekst, van: r.van });
+});
+app.post('/api/member/story/post', express.json({ limit: '1.5mb' }), auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const r = verhaalPlaatsen(req.session.key, req.body.foto, req.body.tekst);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true });
+});
+app.post('/api/member/stories', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ stories: verhalenVoor(req.session.key) }); });
+app.post('/api/member/story/view', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const r = verhaalBekijken(req.session.key, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ foto: r.foto, tekst: r.tekst, van: r.van, at: r.at });
+});
+
+/* ---------- vriendenlaag en snaps: RTFoundation-kant (gezin-token) ----------
+   Een gezinslid (geen gast) doet mee met dezelfde vriendenlaag als de RTG-app,
+   zodat RTF en RTG elkaar op codenaam vinden, chatten, snappen en verhalen delen.
+   Kinderen hebben ouderakkoord nodig. */
+function rtfSociaal(req, res) {
+  const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
+  if (!sess) { res.status(403).json({ error: 'Log opnieuw in bij je gezin.' }); return null; }
+  if (sess.gast) { res.status(403).json({ error: 'Als oppas of familielid doe je hier niet mee.' }); return null; }
+  return sess;
+}
+app.post('/api/rtf/social/find', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ results: socialZoek(s.handle, req.body.q) }); });
+app.post('/api/rtf/social/connect', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = socialVerbind(s.handle, String(req.body.key || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.st });
+});
+app.post('/api/rtf/social/respond', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = socialAntwoord(s.handle, String(req.body.key || ''), req.body.action);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.st });
+});
+app.post('/api/rtf/social/connections', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const sc = socialConnecties(s.handle);
+  res.json({ me: s.handle, codename: s.codenaam, kind: s.kind, beheerder: s.beheerder, connections: sc.connections, requests: sc.requests, teKeuren: s.beheerder ? socialTeKeuren(s.g.code) : [] });
+});
+app.post('/api/rtf/social/dm', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = socialDm(s.handle, String(req.body.withKey || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ messages: r.messages, codename: r.codename });
+});
+app.post('/api/rtf/social/dm/send', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = socialDmSend(s.handle, String(req.body.toKey || ''), req.body.text);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, messages: r.messages });
+});
+app.post('/api/rtf/social/goedkeuren', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder keurt vriendschappen goed.' });
+  const r = socialGoedkeur(s.g.code, String(req.body.kindHandle || ''), String(req.body.anderKey || ''), req.body.akkoord !== false);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.st });
+});
+app.post('/api/rtf/social/snap/send', express.json({ limit: '1.5mb' }), (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = snapSturen(s.handle, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true });
+});
+app.post('/api/rtf/social/snaps', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ snaps: snapsVoor(s.handle) }); });
+app.post('/api/rtf/social/snap/view', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = snapOpenen(s.handle, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ foto: r.foto, tekst: r.tekst, van: r.van });
+});
+app.post('/api/rtf/social/story/post', express.json({ limit: '1.5mb' }), (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = verhaalPlaatsen(s.handle, req.body.foto, req.body.tekst);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true });
+});
+app.post('/api/rtf/social/stories', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ stories: verhalenVoor(s.handle) }); });
+app.post('/api/rtf/social/story/view', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = verhaalBekijken(s.handle, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ foto: r.foto, tekst: r.tekst, van: r.van, at: r.at });
 });
 
 // web-push: publieke sleutel + subscription opslaan

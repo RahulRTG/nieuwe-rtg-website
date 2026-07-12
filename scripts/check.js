@@ -75,7 +75,7 @@ loop(path.join(ROOT, 'public'), /\.html$/, f => {
   for (const img of imgs) if (!/\balt\s*=/.test(img)) { a11y++; fout('<img> zonder alt in ' + rel); }
 });
 // c) de vlaggenschip-schermen moeten een sla-over-link en een main-landmark hebben.
-const VLAGGENSCHIP = ['apps/index.html', 'apps/app.html', 'apps/portaal.html',
+const VLAGGENSCHIP = ['apps/index.html', 'apps/app.html',
   'apps/foundation/index.html', 'apps/foundation/vrienden.html'];
 for (const rel of VLAGGENSCHIP) {
   const p = path.join(ROOT, 'public', rel);

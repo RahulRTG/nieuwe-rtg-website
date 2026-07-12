@@ -773,6 +773,10 @@
       <input id="fgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
       <button type="submit" data-i18n="gate.sendreset">Stuur herstel-link</button>
     </form>
+    <form class="login-form" id="resetForm" style="display:none;">
+      <input id="rsPass" type="password" placeholder="Nieuw wachtwoord" data-i18n-ph="gate.newpass2" autocomplete="new-password">
+      <button type="submit" data-i18n="gate.doreset">Stel nieuw wachtwoord in</button>
+    </form>
     <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Nog geen account? Registreer</button>
     <button class="gate-switch" id="toForgot" type="button" data-i18n="gate.forgot">Wachtwoord vergeten?</button>
     <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
@@ -1286,8 +1290,8 @@
   });
   const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
   function showGateForm(which){
-    ['#loginForm','#regForm','#forgotForm'].forEach(sel => { const f=$(sel); if(f) f.style.display='none'; });
-    const map = { login:'#loginForm', register:'#regForm', forgot:'#forgotForm' };
+    ['#loginForm','#regForm','#forgotForm','#resetForm'].forEach(sel => { const f=$(sel); if(f) f.style.display='none'; });
+    const map = { login:'#loginForm', register:'#regForm', forgot:'#forgotForm', reset:'#resetForm' };
     const f = $(map[which]); if (f) f.style.display = 'flex';
     if (toReg) toReg.style.display = which==='login' ? '' : 'none';
     if (toForgot) toForgot.style.display = which==='login' ? '' : 'none';
@@ -1304,6 +1308,29 @@
     toast(T('gate.forgotsent','Als dit e-mailadres bekend is, sturen we een herstel-link.'));
     showGateForm('login');
   });
+  // wachtwoord-herstel: de link uit de e-mail komt hier binnen (?reset=)
+  let resetToken = null;
+  const resetForm = document.getElementById('resetForm');
+  if (resetForm) resetForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      await API.call('/auth/reset', { token: resetToken, password: $('#rsPass').value });
+      toast(T('gate.resetok','Wachtwoord aangepast. Log in met uw nieuwe wachtwoord.'));
+      showGateForm('login');
+    } catch (e2){ toast(e2.message || 'Herstel mislukt.'); }
+  });
+  // bevestigings- en herstel-links uit de e-mail afhandelen (voorheen het
+  // aparte ledenportaal; het grote scherm zit nu gewoon in de pas-apps zelf)
+  (function handleAuthLinks(){
+    const q = new URLSearchParams(location.search);
+    if (q.get('verify')){
+      API.call('/auth/verify-email', { token: q.get('verify') })
+        .then(() => toast(T('gate.verified','Uw e-mailadres is bevestigd.')))
+        .catch(() => toast(T('gate.verifyfail','Bevestigingslink ongeldig of verlopen.')))
+        .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
+    }
+    if (q.get('reset')){ resetToken = q.get('reset'); showGateForm('reset'); }
+  })();
 
   async function login(tier, cred){
     if (cred){
@@ -3765,6 +3792,8 @@ window.I18N = { en: {
   'gate.name':'Your name', 'gate.email':'Email address', 'gate.phone':'Mobile number (WhatsApp)', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
   'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.forgotsent':'If this email is known, we will send a reset link.',
+  'gate.newpass2':'New password', 'gate.doreset':'Set new password', 'gate.resetok':'Password changed. Sign in with your new password.',
+  'gate.verified':'Your email address has been confirmed.', 'gate.verifyfail':'Confirmation link invalid or expired.',
   'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
   'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',
   'vf.pending.h':'Verification in progress', 'vf.pending.b':'We are reviewing your document. You can keep using the app as normal.',

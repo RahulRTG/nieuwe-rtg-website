@@ -2728,7 +2728,7 @@ const server = app.listen(PORT, () => {
   if (process.env.RTG_SERVER) {
     console.log(`klaar op poort ${PORT}, rol: ${db.writable ? 'actief' : 'standby'}`);
   } else {
-    console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/portaal.html`);
+    console.log(`RTG-portaal draait op http://localhost:${PORT}, open http://localhost:${PORT}/apps/app.html`);
   }
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 });

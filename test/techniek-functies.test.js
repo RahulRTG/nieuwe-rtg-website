@@ -93,6 +93,22 @@ test('weigeren laat alles zoals het was; dubbel schakelen is "ongewijzigd"', asy
   assert.equal(nop.status, 'ongewijzigd');
 });
 
+test('een open aanvraag is zichtbaar in het actiecentrum van de Backoffice', async () => {
+  const vz = await (await post('/api/techniek/functie', { id: 'verificatie', aan: false }, techToken)).json();
+  assert.equal(vz.status, 'wacht');
+  // de backoffice (demo-code) ziet de waarschuwing in het actiecentrum
+  const login = await (await post('/api/office/login', { code: 'RTG-OFFICE' })).json();
+  const alert = (login.state.alerts || []).find(a => a.kind === 'functie');
+  assert.ok(alert, 'het actiecentrum meldt de wachtende functieaanvraag');
+  assert.match(alert.text, /bevestiging/);
+  // na het besluit (weigeren) verdwijnt de melding weer
+  await post('/api/techniek/functie/besluit', { verzoekId: vz.verzoekId, akkoord: false }, techToken);
+  const officeToken = login.token;
+  const st = await (await fetch(BASE + '/api/office/state', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + officeToken }, body: '{}' })).json();
+  assert.ok(!(st.state.alerts || []).some(a => a.kind === 'functie'), 'na het besluit is het actiecentrum weer schoon');
+});
+
 test('alleen de eigenaar besluit; techniek blijft altijd bereikbaar', async () => {
   // zonder token: geen aanvraag kunnen doen
   assert.equal((await post('/api/techniek/functie', { id: 'betalen', aan: false })).status, 401);

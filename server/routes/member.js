@@ -56,6 +56,8 @@ app.post('/api/rtf/bericht', auth, (req, res) => {
 
 app.post('/api/pay', auth, async (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const zPay = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.betalingen;
+  if (zPay && zPay.aan === false) return res.status(503).json({ error: 'Betalen is tijdelijk uitgeschakeld.' });
   // Echte accounts betalen hun eigen facturen; demo-sessies de gedeelde demo.
   const own = !!req.session.account;
   const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;

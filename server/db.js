@@ -285,6 +285,14 @@ async function flushBijAfsluiten() {
   try { await pg.flush(db.data); } catch (e) {}
 }
 
+// Ping de database voor de gezondheidscheck; geeft de antwoordtijd in ms.
+async function pgPing() {
+  if (STORE !== 'postgres' || !pg) throw new Error('PostgreSQL is niet actief.');
+  const t = Date.now();
+  await pg.pool.query('SELECT 1');
+  return Date.now() - t;
+}
+
 function load() {
   if (STORE === 'postgres') {
     // Warme cache / fallback; de echte gedeelde data komt via startPostgres().
@@ -404,4 +412,4 @@ async function startGedeeld() {
 // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.
 function onExternalChange(cb) { externCb = cb; }
 
-module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, merge3, schrijfDuurzaam };
+module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, pgPing, onExternalChange, merge3, schrijfDuurzaam };

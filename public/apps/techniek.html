@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG · Technische status</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;
+    --muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--gold:#C9A24B;
+    --groen:#3BA55D;--oranje:#D6A32E;--rood:#D6455F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  a{color:var(--gold);}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .wrap{max-width:960px;margin:0 auto;padding:1.6rem 1.2rem 4rem;}
+  header.kop{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+  .kop h1{font-size:1.35rem;font-weight:600;letter-spacing:-.01em;}
+  .kop .sub{font-size:.8rem;color:var(--soft);}
+  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:10px;padding:.55rem .9rem;font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit;}
+  .knop.grijs{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .knop.rood{background:#3a1420;color:#F4B8C6;border:1px solid var(--rood);}
+  .knop.klein{padding:.35rem .6rem;font-size:.75rem;}
+  .veld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.7rem .8rem;color:var(--txt);font-family:inherit;font-size:.9rem;margin-bottom:.6rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;}
+  .login{max-width:22rem;margin:6vh auto 0;}
+  .login h1{font-size:1.3rem;margin-bottom:.3rem;}
+  .login p{color:var(--soft);font-size:.85rem;margin-bottom:1.1rem;}
+  .fout{color:var(--rood);font-size:.82rem;min-height:1.1rem;margin-top:.2rem;}
+  .telrij{display:flex;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+  .tel{flex:1;min-width:7rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
+  .tel .n{font-size:1.5rem;font-weight:700;}
+  .tel .l{font-size:.72rem;color:var(--soft);text-transform:uppercase;letter-spacing:.08em;}
+  .sec{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.6rem 0 .7rem;}
+  .rij{display:flex;align-items:flex-start;gap:.8rem;padding:.8rem 0;border-top:1px solid var(--line);}
+  .rij:first-child{border-top:none;}
+  .bol{width:.85rem;height:.85rem;border-radius:50%;flex-shrink:0;margin-top:.3rem;box-shadow:0 0 8px currentColor;}
+  .bol.ok{background:var(--groen);color:var(--groen);}
+  .bol.waarschuwing{background:var(--oranje);color:var(--oranje);}
+  .bol.fout{background:var(--rood);color:var(--rood);}
+  .rij .naam{font-weight:600;font-size:.92rem;}
+  .rij .code{font-size:.68rem;color:var(--soft);font-family:ui-monospace,monospace;margin-left:.5rem;}
+  .rij .detail{font-size:.82rem;color:var(--muted);margin-top:.15rem;}
+  .rij .mid{flex:1;min-width:0;}
+  .advies{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.7rem .85rem;margin-top:.5rem;font-size:.82rem;white-space:pre-wrap;color:var(--txt);}
+  .zeker{display:flex;align-items:center;gap:.8rem;padding:.8rem 0;border-top:1px solid var(--line);}
+  .zeker:first-child{border-top:none;}
+  .zeker .mid{flex:1;}
+  .badge{font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:999px;}
+  .badge.aan{background:#12321f;color:#7EE0A3;}
+  .badge.uit{background:#3a1420;color:#F4B8C6;}
+  .muted{color:var(--soft);font-size:.8rem;}
+  .toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
+</style>
+</head>
+<body>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<main class="wrap" id="hoofd" tabindex="-1">
+  <section id="vLogin" class="kaart login" hidden>
+    <h1>Technische status</h1>
+    <p>Beveiligde pagina. Alleen de eigenaar en handmatig toegelaten personen kunnen inloggen.</p>
+    <input class="veld" id="liLogin" placeholder="E-mail of gebruikersnaam" autocomplete="username">
+    <input class="veld" id="liPass" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+    <button class="knop" id="bLogin" style="width:100%;">Inloggen</button>
+    <div class="fout" id="loginFout"></div>
+  </section>
+
+  <div id="vBord" hidden>
+    <header class="kop">
+      <div>
+        <h1>Technische status</h1>
+        <div class="sub" id="wieSub"></div>
+      </div>
+      <div style="display:flex;gap:.5rem;">
+        <button class="knop grijs klein" id="bVernieuw">Vernieuwen</button>
+        <button class="knop grijs klein" id="bUit">Uitloggen</button>
+      </div>
+    </header>
+    <div class="telrij" id="tellers"></div>
+    <div class="sec">Functies &amp; codes</div>
+    <div class="kaart" id="checks"></div>
+    <div id="zekeringBlok" hidden>
+      <div class="sec">Zekeringen</div>
+      <div class="kaart" id="zekeringen"></div>
+    </div>
+    <div id="toegangBlok" hidden>
+      <div class="sec">Toegang beheren</div>
+      <div class="kaart">
+        <div id="toegangLijst"></div>
+        <div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;">
+          <input class="veld" id="grantEmail" placeholder="E-mail van een RTG-account" style="flex:1;margin-bottom:0;min-width:12rem;">
+          <button class="knop klein" id="bGrant">Toegang geven</button>
+        </div>
+        <div class="fout" id="grantFout"></div>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="/apps/util.js"></script>
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+  var el = Util.el, vervang = Util.vervang;
+  var token = sessionStorage.getItem('techToken') || null;
+  var eigenaar = false;
+  var timer = null;
+
+  function toast(t){ var e=$('#toast'); Util.tekst(e,t); e.style.opacity='1'; clearTimeout(e._t); e._t=setTimeout(function(){e.style.opacity='0';},2200); }
+
+  function api(pad, opties){
+    opties = opties || {};
+    var h = { 'content-type':'application/json' };
+    if (token) h['authorization'] = 'Bearer ' + token;
+    return fetch(pad, { method: opties.method||'GET', headers:h, body: opties.body?JSON.stringify(opties.body):undefined })
+      .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error||('Fout '+r.status)); return j; }); });
+  }
+
+  function toonLogin(){ $('#vLogin').hidden=false; $('#vBord').hidden=true; }
+  function toonBord(){ $('#vLogin').hidden=true; $('#vBord').hidden=false; }
+
+  $('#bLogin').addEventListener('click', function(){
+    $('#loginFout').textContent='';
+    api('/api/techniek/inloggen', { method:'POST', body:{ login:$('#liLogin').value.trim(), wachtwoord:$('#liPass').value } })
+      .then(function(d){ token=d.token; sessionStorage.setItem('techToken', token); start(); })
+      .catch(function(e){ $('#loginFout').textContent = e.message; });
+  });
+  $('#liPass').addEventListener('keydown', function(e){ if(e.key==='Enter') $('#bLogin').click(); });
+  $('#bUit').addEventListener('click', function(){ token=null; sessionStorage.removeItem('techToken'); if(timer)clearInterval(timer); toonLogin(); });
+  $('#bVernieuw').addEventListener('click', function(){ laad(); });
+
+  function tellerKaart(n, label){ return el('div',{class:'tel'}, el('div',{class:'n'}, String(n)), el('div',{class:'l'}, label)); }
+
+  function checkRij(c){
+    var mid = el('div',{class:'mid'},
+      el('div', null, el('span',{class:'naam'}, c.naam), el('span',{class:'code'}, c.code)),
+      el('div',{class:'detail'}, c.detail)
+    );
+    var acties = el('div',null);
+    if (c.status !== 'ok'){
+      var knop = el('button',{class:'knop grijs klein', onclick:function(){
+        knop.disabled=true; Util.tekst(knop,'AI denkt na...');
+        api('/api/techniek/ai', { method:'POST', body:{ checkId:c.id } })
+          .then(function(d){ var adv=el('div',{class:'advies'}, d.advies); mid.appendChild(adv); knop.remove(); })
+          .catch(function(e){ knop.disabled=false; Util.tekst(knop,'AI: los op'); toast(e.message); });
+      }}, 'AI: los op');
+      acties.appendChild(knop);
+    }
+    return el('div',{class:'rij'}, el('div',{class:'bol '+c.status}), mid, acties);
+  }
+
+  function zekerRij(z){
+    var badge = el('span',{class:'badge '+(z.aan===false?'uit':'aan')}, z.aan===false?'GESPRONGEN':'AAN');
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, z.naam), el('span',{class:'code'}, z.code)),
+      el('div',{class:'muted'}, z.uitleg || ''),
+      z.aan===false && z.reden ? el('div',{class:'muted', style:{color:'#F4B8C6'}}, 'Reden: '+z.reden) : null
+    );
+    var knop;
+    if (z.aan===false){
+      knop = el('button',{class:'knop klein', onclick:function(){ zetZekering(z.id,'reset'); }}, 'Zekering erin');
+    } else {
+      knop = el('button',{class:'knop rood klein', onclick:function(){
+        var reden = prompt('Waarom deze zekering uitschakelen? ('+z.naam+')','handmatig'); if(reden===null) return;
+        zetZekering(z.id,'spring',reden);
+      }}, 'Zekering eruit');
+    }
+    return el('div',{class:'zeker'}, badge, mid, knop);
+  }
+  function zetZekering(id, actie, reden){
+    api('/api/techniek/zekering', { method:'POST', body:{ id:id, actie:actie, reden:reden } })
+      .then(function(){ toast(actie==='reset'?'Zekering er weer in.':'Zekering eruit.'); laad(); })
+      .catch(function(e){ toast(e.message); });
+  }
+
+  function toegangRij(t){
+    var knop = el('button',{class:'knop grijs klein', onclick:function(){
+      api('/api/techniek/toegang', { method:'POST', body:{ email:t.email, actie:'intrek' } }).then(function(){ toast('Toegang ingetrokken.'); laad(); }).catch(function(e){ toast(e.message); });
+    }}, 'Intrekken');
+    return el('div',{class:'zeker'}, el('div',{class:'mid'}, el('div',{class:'naam'}, t.naam||'?'), el('div',{class:'muted'}, t.email||('#'+t.id))), knop);
+  }
+  $('#bGrant').addEventListener('click', function(){
+    $('#grantFout').textContent='';
+    api('/api/techniek/toegang', { method:'POST', body:{ email:$('#grantEmail').value.trim(), actie:'verleen' } })
+      .then(function(){ $('#grantEmail').value=''; toast('Toegang gegeven.'); laad(); })
+      .catch(function(e){ $('#grantFout').textContent = e.message; });
+  });
+
+  function laad(){
+    return api('/api/techniek/status').then(function(d){
+      eigenaar = d.eigenaar;
+      $('#wieSub').textContent = (d.naam||'') + (d.eigenaar?' · eigenaar':' · toegelaten');
+      vervang($('#tellers'),
+        tellerKaart(d.samenvatting.ok,'In orde'),
+        tellerKaart(d.samenvatting.waarschuwing,'Let op'),
+        tellerKaart(d.samenvatting.fout,'Storing'));
+      vervang($('#checks'), d.checks.map(checkRij));
+      $('#zekeringBlok').hidden = !d.eigenaar;
+      if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));
+      $('#toegangBlok').hidden = !d.eigenaar;
+      if (d.eigenaar) vervang($('#toegangLijst'), (d.toegang&&d.toegang.length)? d.toegang.map(toegangRij) : el('div',{class:'muted'},'Nog niemand extra toegelaten.'));
+    }).catch(function(e){
+      if (/401|403|Log in|toegang/i.test(e.message)){ token=null; sessionStorage.removeItem('techToken'); toonLogin(); }
+      else toast(e.message);
+    });
+  }
+
+  function start(){
+    if (!token){ toonLogin(); return; }
+    toonBord();
+    laad();
+    if (timer) clearInterval(timer);
+    timer = setInterval(laad, 12000); // elke 12s verversen
+  }
+  start();
+})();
+</script>
+</body>
+</html>

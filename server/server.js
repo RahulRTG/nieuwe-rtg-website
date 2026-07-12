@@ -150,6 +150,26 @@ app.post('/api/betaal/webhook', express.raw({ type: '*/*', limit: '1mb' }), (req
 
 app.use(express.json({ limit: '8mb' }));
 
+/* Hoofdzekering: staat de onderhouds-zekering uit (gesprongen), dan is de app in
+   onderhoud. Alle API's geven dan 503, behalve de technische pagina en de
+   health/ready-checks, en behalve verzoeken van de eigenaar (met geldig token).
+   Zo kan de eigenaar de app bewust "spanningsloos" maken en er zelf bij blijven
+   om de zekering er weer in te doen. */
+app.use((req, res, next) => {
+  const z = db.data && db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.onderhoud;
+  if (!z || z.aan !== false) return next(); // normaal: stroom staat erop
+  const p = req.path;
+  if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
+  try {
+    const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || req.query.token;
+    const u = tok ? accounts.verifyToken(tok) : null;
+    const owner = accounts.findByLogin(process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example');
+    if (u && owner && u.id === owner.id) return next(); // de eigenaar mag er wel bij
+  } catch (e) {}
+  if (p.startsWith('/api/')) return res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' });
+  next();
+});
+
 // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
 // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
 // draait mee op dezelfde database en failover.
@@ -2567,7 +2587,7 @@ Object.assign(kern, sociaal); // de sociale kern-helpers erbij
    die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar
    het juiste domeinproces. De infra-endpoints (health, stream, push, cluster,
    translate) en de foundation-mount zitten in de kern en draaien altijd mee. */
-const ALLE_DOMEINEN = ['auth', 'member', 'supplier', 'office', 'staff', 'social'];
+const ALLE_DOMEINEN = ['auth', 'member', 'supplier', 'office', 'staff', 'social', 'techniek'];
 const gekozenDomeinen = (process.env.RTG_DOMAINS || ALLE_DOMEINEN.join(','))
   .split(',').map(s => s.trim()).filter(Boolean);
 for (const naam of gekozenDomeinen) {

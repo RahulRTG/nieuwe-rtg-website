@@ -1,7 +1,7 @@
 /* Domein "auth" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, schoon, sessions, stateFor, tooManyTries } = kern;
+  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, schoon, sessions, stateFor, tooManyTries } = kern;
   // Demo-inlog (snelle pas-login zonder wachtwoord, en het demo-account) alleen
   // buiten productie of met RTG_DEMO=1. Echte leden loggen in via /api/auth/login.
   const DEMO = !PRODUCTION || process.env.RTG_DEMO === '1';
@@ -35,6 +35,11 @@ app.post('/api/logout', auth, (req, res) => {
 });
 
 app.post('/api/auth/register', (req, res) => {
+  // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
+  // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
+  // technische pagina.
+  const zReg = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.registratie;
+  if (zReg && zReg.aan === false) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.' });
   // schoon(): de echte naam wordt o.a. in de backoffice (KYC) getoond; geen opmaak.
   const name = schoon(req.body.name, 80);
   const email = String(req.body.email || '').trim().toLowerCase();

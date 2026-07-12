@@ -512,6 +512,85 @@ test('cross-app vrienden: RTF en RTG vinden elkaar op codenaam, chatten, snappen
   assert.ok(stories.stories.some(s => s.van === ouderCn), 'de RTG-vriend ziet het verhaal van de RTF-vriend');
 });
 
+// open een SSE-kanaal en wacht op een benoemd event (voor de belsignalen)
+async function openStream(url) {
+  const ac = new AbortController();
+  const res = await fetch(url, { signal: ac.signal });
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '';
+  const wachters = [];
+  (async () => {
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let idx;
+        while ((idx = buf.indexOf('\n\n')) >= 0) {
+          const chunk = buf.slice(0, idx); buf = buf.slice(idx + 2);
+          let ev = 'message', data = '';
+          for (const l of chunk.split('\n')) {
+            if (l.startsWith('event:')) ev = l.slice(6).trim();
+            else if (l.startsWith('data:')) data += l.slice(5).trim();
+          }
+          if (!data) continue;
+          let parsed; try { parsed = JSON.parse(data); } catch (e) { parsed = data; }
+          for (let i = wachters.length - 1; i >= 0; i--) if (wachters[i].event === ev) { wachters[i].resolve(parsed); wachters.splice(i, 1); }
+        }
+      }
+    } catch (e) {}
+  })();
+  return {
+    wachtOp(event) { return new Promise((resolve, reject) => { const w = { event, resolve }; wachters.push(w); setTimeout(() => { const i = wachters.indexOf(w); if (i >= 0) { wachters.splice(i, 1); reject(new Error('geen ' + event + '-signaal op tijd')); } }, 4000); }); },
+    sluit() { try { ac.abort(); } catch (e) {} }
+  };
+}
+
+test('cross-app bellen: RTG en RTF sturen belsignalen over en weer via het live-kanaal', async () => {
+  const now = Date.now();
+  // RTG-lid en RTF-ouder, bevriend maken
+  const rtg = await json(await raw('/auth/register', { name: 'Bel Lid', email: 'bl' + now + '@v.test', phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
+  const rtgTok = rtg.token, rtgCn = rtg.state.user.codename;
+  await raw('/member/connections', {}, rtgTok);
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Bel Fam', naam: 'Ouder', pin: '2468', groep: 'volw' }));
+  const mij = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token));
+  const ouderCn = mij.profiel.codenaam;
+  const found = await json(await raw('/member/find', { q: ouderCn.split(' ')[0] }, rtgTok));
+  const ouderKey = (found.results.find(r => r.codename === ouderCn) || {}).key;
+  await raw('/member/connect', { key: ouderKey }, rtgTok);
+  const oConns = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
+  const verzoek = (oConns.requests || []).find(x => x.codename === rtgCn);
+  await raw('/rtf/social/respond', { code: g.code, token: g.token, key: verzoek.key, action: 'accept' });
+  const rtgKey = verzoek.key; // handle van het RTG-lid
+
+  const rtgStream = await openStream(BASE + '/api/stream?token=' + encodeURIComponent(rtgTok));
+  const rtfStream = await openStream(BASE + '/api/rtf/social/stream?code=' + encodeURIComponent(g.code) + '&token=' + encodeURIComponent(g.token));
+  try {
+    // RTG belt de RTF-ouder: de ouder krijgt het 'ring'-signaal live binnen
+    const wachtRtf = rtfStream.wachtOp('call');
+    assert.equal((await raw('/member/call', { toKey: ouderKey, kind: 'ring', video: false }, rtgTok)).status, 200);
+    const inkRtf = await wachtRtf;
+    assert.equal(inkRtf.kind, 'ring');
+    assert.equal(inkRtf.codename, rtgCn, 'de ouder ziet wie er belt');
+
+    // RTF belt terug: het RTG-lid krijgt het videosignaal binnen
+    const wachtRtg = rtgStream.wachtOp('call');
+    assert.equal((await raw('/rtf/social/call', { code: g.code, token: g.token, toKey: rtgKey, kind: 'ring', video: true })).status, 200);
+    const inkRtg = await wachtRtg;
+    assert.equal(inkRtg.kind, 'ring');
+    assert.equal(inkRtg.video, true);
+    assert.equal(inkRtg.from, ouderKey, 'het lid weet naar wie het moet terugsignaleren');
+
+    // niet naar een vreemde: alleen vrienden mogen elkaar bellen
+    const vreemd = await json(await raw('/auth/register', { name: 'Vreemd', email: 'vr' + now + '@v.test', phone: '06' + String(now + 1).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
+    const vKey = (await json(await raw('/member/connections', {}, vreemd.token))).me;
+    assert.equal((await raw('/rtf/social/call', { code: g.code, token: g.token, toKey: vKey, kind: 'ring' })).status, 403, 'geen belsignaal naar een niet-vriend');
+  } finally {
+    rtgStream.sluit(); rtfStream.sluit();
+  }
+});
+
 test('automatisch vertalen: bericht komt in de taal van de lezer, beide kanten op', async () => {
   // Nederlands naar Engels (vaste seed-zin) en Engels naar Nederlands (woordniveau)
   const nl2en = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'Snackbar dicht, telefoon uit, ik ben even niemands baas.', to: 'en' }) })));

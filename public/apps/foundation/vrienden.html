@@ -45,13 +45,26 @@
   .invoer .veld{flex:1;}
   .snapfull{max-width:100%;max-height:70vh;border-radius:10px;}
   .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--goud);cursor:pointer;opacity:.75;}
+  /* bellen */
+  .ovkop .belk-kop{background:none;border:none;font-size:1.15rem;cursor:pointer;padding:0 .1rem;}
+  .belwrap{position:relative;width:100%;height:70vh;max-height:70vh;display:flex;align-items:center;justify-content:center;background:#000;}
+  #belRemote{width:100%;height:100%;object-fit:cover;background:#000;}
+  #belLocal{position:absolute;right:.7rem;bottom:5.4rem;width:6.5rem;border-radius:8px;border:1px solid #333;object-fit:cover;background:#111;}
+  .belaudio{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+  .belav{width:5.5rem;height:5.5rem;border-radius:50%;background:var(--paneel2);display:flex;align-items:center;justify-content:center;font-size:2.2rem;border:2px solid var(--goud);}
+  .belinfo{position:absolute;top:1rem;left:0;right:0;text-align:center;color:#fff;}
+  .beltijd{color:#bbb;font-size:.82rem;margin-top:.15rem;}
+  .belknoppen{position:absolute;bottom:1.1rem;left:0;right:0;display:flex;gap:1.2rem;justify-content:center;}
+  .belk{width:3.2rem;height:3.2rem;border-radius:50%;border:none;font-size:1.2rem;cursor:pointer;background:#333;color:#fff;}
+  .belk.op{background:var(--rood,#d33);}
+  #melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;z-index:10001;font-size:.85rem;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .2s;pointer-events:none;}
 </style>
 </head>
 <body>
 <div id="balk"></div>
 <div class="wrap">
   <h1>👋 Contacten</h1>
-  <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam.</div>
+  <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam.</div>
   <div class="mijncn" id="mijncn"></div>
 
   <div class="stories" id="stories"></div>
@@ -79,7 +92,10 @@
 
 <!-- chat -->
 <div class="ov" id="chatOv"><div class="ovkaart">
-  <div class="ovkop"><b id="chatWie"></b><button class="ovx" id="chatX">✕</button></div>
+  <div class="ovkop"><b id="chatWie"></b>
+    <button class="belk-kop" id="chatBel" title="Bellen">📞</button>
+    <button class="belk-kop" id="chatVideo" title="Videobellen">🎥</button>
+    <button class="ovx" id="chatX">✕</button></div>
   <div class="msgs" id="chatMsgs"></div>
   <div class="invoer">
     <button class="knop grijs" id="snapBtn" title="Stuur een snap">📷</button>
@@ -98,6 +114,31 @@
 <div class="ov" id="storyOv"><div class="ovkaart" style="background:#000;">
   <div class="ovkop" style="border-color:#222;"><b id="storyVan"></b><button class="ovx" id="storyX">✕</button></div>
   <div style="padding:1rem;text-align:center;"><img class="snapfull" id="storyImg" alt=""><div id="storyTxt" style="color:#fff;margin-top:.6rem;"></div></div>
+</div></div>
+
+<!-- belscherm -->
+<div class="ov" id="belOv"><div class="ovkaart" style="background:#000;">
+  <div class="belwrap">
+    <video id="belRemote" autoplay playsinline></video>
+    <video id="belLocal" autoplay playsinline muted></video>
+    <div class="belaudio" id="belAudio"><div class="belav" id="belAv">🙂</div></div>
+    <div class="belinfo"><b id="belNaam"></b><div class="beltijd" id="belTijd"></div></div>
+    <div class="belknoppen">
+      <button class="belk" id="belMute" title="Microfoon">🎤</button>
+      <button class="belk" id="belCam" title="Camera">🎥</button>
+      <button class="belk op" id="belWeg" title="Ophangen">📴</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- inkomende oproep -->
+<div class="ov" id="inkOv"><div class="ovkaart" style="max-width:22rem;text-align:center;padding:1.4rem;">
+  <div class="belav" id="inkAv" style="margin:0 auto 1rem;">🙂</div>
+  <b id="inkNaam"></b><div class="beltijd" id="inkSoort" style="margin:.3rem 0 1.2rem;"></div>
+  <div style="display:flex;gap:1rem;justify-content:center;">
+    <button class="knop" id="inkJa">Opnemen</button>
+    <button class="knop grijs" id="inkNee">Weiger</button>
+  </div>
 </div></div>
 
 <input type="file" id="fotoIn" accept="image/*" style="display:none;">
@@ -206,6 +247,8 @@ async function chatStuur(){
   catch(e){ alert(e.message); }
 }
 $('#snapBtn').addEventListener('click', ()=> kiesSnap(chatMet, chatCn));
+$('#chatBel').addEventListener('click', ()=>{ if(chatMet) belStart(chatMet, chatCn, false); });
+$('#chatVideo').addEventListener('click', ()=>{ if(chatMet) belStart(chatMet, chatCn, true); });
 
 // ---- snaps versturen ----
 let snapNaar=null, storyMode=false;
@@ -233,9 +276,10 @@ function verklein(file){
 async function laadSnaps(){
   let d; try{ d = await soc('/snaps'); }catch(e){ return; }
   // toon binnengekomen snaps bovenaan de vriendenlijst als knoppen
+  const oud = $('#nieuweSnaps'); if (oud) oud.remove();
   const snaps = d.snaps||[];
   if (!snaps.length) return;
-  const el = document.createElement('div'); el.className='lijst'; el.style.marginBottom='.6rem';
+  const el = document.createElement('div'); el.id='nieuweSnaps'; el.className='lijst'; el.style.marginBottom='.6rem';
   el.innerHTML = '<div class="sec" style="margin-top:0;">Nieuwe snaps</div>' + snaps.map(sn=>
     '<div class="rij"><span class="av">📷</span><div class="nm">'+esc(sn.van)+'<small>stuurde je een snap</small></div><button class="knop mini" data-opensnap="'+esc(sn.id)+'">Bekijk</button></div>'
   ).join('');
@@ -266,7 +310,74 @@ async function openStory(id){
 }
 $('#storyX').addEventListener('click', ()=>{ $('#storyOv').classList.remove('open'); $('#storyImg').src=''; laadStories(); });
 
+// ---- korte melding ----
+function meld(t){ const el=$('#melding'); el.textContent=t; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(()=>{ el.style.opacity='0'; }, 2600); }
+
+// ---- bellen (WebRTC; server is alleen signaleringskanaal) ----
+let call=null, inkomend=null, iceConfig=null;
+function belSein(toKey, kind, extra){ return soc('/call', Object.assign({ toKey, kind }, extra||{})).catch(()=>{}); }
+async function haalIce(){ if(iceConfig) return iceConfig; try{ iceConfig=(await (await fetch('/api/ice')).json()).iceServers; }catch(e){ iceConfig=[{urls:'stun:stun.l.google.com:19302'}]; } return iceConfig; }
+async function pakMedia(video){ try{ return await navigator.mediaDevices.getUserMedia({ audio:true, video: video?{facingMode:'user'}:false }); }catch(e){ meld('Geen toegang tot microfoon of camera.'); return null; } }
+function belUI(open){ $('#belOv').classList.toggle('open', !!open); if(!open){ $('#belRemote').srcObject=null; $('#belLocal').srcObject=null; } }
+function belTimer(){ if(!call) return; const n=Math.round((Date.now()-call.t0)/1000); $('#belTijd').textContent=Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
+function toonBel(naam, video){ $('#belNaam').textContent=naam; $('#belAv').textContent=initcn(naam); $('#belAudio').style.display=video?'none':'flex'; $('#belLocal').style.display=video?'':'none'; $('#belCam').style.display=video?'':'none'; $('#belTijd').textContent='belt...'; belUI(true); }
+function maakPc(){
+  const pc=new RTCPeerConnection({ iceServers: iceConfig||[{urls:'stun:stun.l.google.com:19302'}] });
+  call.stream.getTracks().forEach(t=> pc.addTrack(t, call.stream));
+  pc.onicecandidate=ev=>{ if(ev.candidate && call) belSein(call.met,'ice',{payload:ev.candidate}); };
+  pc.ontrack=ev=>{ const v=$('#belRemote'); if(v.srcObject!==ev.streams[0]) v.srcObject=ev.streams[0]; };
+  pc.onconnectionstatechange=()=>{ if(pc.connectionState==='connected'&&call&&!call.t0){ call.t0=Date.now(); call.timer=setInterval(belTimer,1000); $('#belTijd').textContent='0:00'; } if(['failed','closed'].includes(pc.connectionState)) eindeBel(false); };
+  call.pc=pc; return pc;
+}
+async function belStart(key, cn, video){
+  if(call){ meld('Er loopt al een gesprek.'); return; }
+  $('#chatOv').classList.remove('open');
+  await haalIce(); const stream=await pakMedia(video); if(!stream) return;
+  call={ met:key, naam:cn, video, richting:'uit', pendingIce:[], stream, t0:0 };
+  $('#belLocal').srcObject=stream; toonBel(cn, video);
+  belSein(key,'ring',{video});
+}
+async function neemOp(){
+  $('#inkOv').classList.remove('open'); if(!inkomend) return;
+  await haalIce(); const stream=await pakMedia(inkomend.video);
+  if(!stream){ belSein(inkomend.from,'decline'); inkomend=null; return; }
+  call={ met:inkomend.from, naam:inkomend.codename, video:inkomend.video, richting:'in', pendingIce:[], stream, t0:0 };
+  $('#belLocal').srcObject=stream; toonBel(inkomend.codename, inkomend.video);
+  belSein(call.met,'accept'); inkomend=null;
+}
+function eindeBel(zeggen){ if(!call){ belUI(false); return; } if(zeggen) belSein(call.met,'hangup'); clearInterval(call.timer); try{ call.stream.getTracks().forEach(t=>t.stop()); }catch(e){} try{ if(call.pc) call.pc.close(); }catch(e){} call=null; belUI(false); }
+async function flushIce(){ if(!call||!call.pc||!call.pc.remoteDescription) return; for(const c of call.pendingIce.splice(0)){ try{ await call.pc.addIceCandidate(c); }catch(e){} } }
+async function opBelsignaal(d){
+  if(d.kind==='ring'){ if(call){ belSein(d.from,'busy'); return; } inkomend={ from:d.from, codename:d.codename, video:d.video }; $('#inkAv').textContent=initcn(d.codename); $('#inkNaam').textContent=d.codename; $('#inkSoort').textContent=d.video?'Videogesprek':'Spraakoproep'; $('#inkOv').classList.add('open'); return; }
+  if(!call || d.from!==call.met) return;
+  if(d.kind==='accept'){ const pc=maakPc(); const offer=await pc.createOffer(); await pc.setLocalDescription(offer); belSein(call.met,'offer',{payload:offer}); }
+  else if(d.kind==='offer'){ const pc=maakPc(); await pc.setRemoteDescription(d.payload); await flushIce(); const answer=await pc.createAnswer(); await pc.setLocalDescription(answer); belSein(call.met,'answer',{payload:answer}); }
+  else if(d.kind==='answer'){ await call.pc.setRemoteDescription(d.payload); await flushIce(); }
+  else if(d.kind==='ice'){ if(call.pc && call.pc.remoteDescription){ try{ await call.pc.addIceCandidate(d.payload); }catch(e){} } else call.pendingIce.push(d.payload); }
+  else if(['hangup','decline','busy'].includes(d.kind)){ meld(d.kind==='busy'?'In gesprek.':d.kind==='decline'?'Oproep geweigerd.':'Gesprek beeindigd.'); eindeBel(false); }
+}
+$('#belWeg').addEventListener('click', ()=> eindeBel(true));
+$('#belMute').addEventListener('click', ()=>{ if(!call) return; const t=call.stream.getAudioTracks()[0]; if(!t) return; t.enabled=!t.enabled; $('#belMute').style.opacity=t.enabled?'1':'.4'; });
+$('#belCam').addEventListener('click', ()=>{ if(!call) return; const t=call.stream.getVideoTracks()[0]; if(!t) return; t.enabled=!t.enabled; $('#belCam').style.opacity=t.enabled?'1':'.4'; });
+$('#inkJa').addEventListener('click', neemOp);
+$('#inkNee').addEventListener('click', ()=>{ $('#inkOv').classList.remove('open'); if(inkomend) belSein(inkomend.from,'decline'); inkomend=null; });
+
+// ---- live-kanaal: dm, snaps, verzoeken en belsignalen komen meteen binnen ----
+function opSociaal(d){
+  if(d.kind==='dm'){ if(chatMet===d.from && $('#chatOv').classList.contains('open')) laadChat(); else { meld('Nieuw bericht'); if(!document.querySelector('.ov.open')) laad(); } }
+  else if(d.kind==='snap'){ meld('Nieuwe snap'); if(!document.querySelector('.ov.open')) laad(); }
+  else if(!document.querySelector('.ov.open')) laad();
+}
+function startStream(){
+  try{
+    const es=new EventSource('/api/rtf/social/stream?code='+encodeURIComponent(s.code)+'&token='+encodeURIComponent(s.token));
+    es.addEventListener('call', e=>{ try{ opBelsignaal(JSON.parse(e.data)); }catch(x){} });
+    es.addEventListener('social', e=>{ try{ opSociaal(JSON.parse(e.data)); }catch(x){} });
+  }catch(e){}
+}
+
 laad();
+startStream();
 setInterval(()=>{ if(!document.querySelector('.ov.open')) laad(); }, 12000);
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>

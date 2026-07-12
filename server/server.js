@@ -1019,7 +1019,7 @@ function socialVerbind(mij, naar) {
   if (isKindHandle(naar)) voogdWacht.push(naar);
   c = { a: mij, b: naar, requestedBy: mij, status: 'pending', at: new Date().toISOString(), voogdWacht };
   db.data.connections.push(c); save();
-  if (!isRtf(naar)) sseToCustomer(naar, 'social', { kind: 'request', from: codenaamVan(mij) });
+  sseToCustomer(naar, 'social', { kind: 'request', from: codenaamVan(mij) });
   return { status: 200, ok: true, st: voogdWacht.length ? 'wacht-op-ouder' : 'aangevraagd' };
 }
 // verzoek beantwoorden (accepteren/afwijzen); een kind kan niet zelf accepteren
@@ -1029,7 +1029,7 @@ function socialAntwoord(mij, ander, action) {
   if (isKindHandle(mij)) return { status: 403, error: 'Een ouder moet dit verzoek eerst goedkeuren.' };
   if (action === 'accept') {
     c.status = 'accepted'; c.acceptedAt = new Date().toISOString(); save();
-    if (!isRtf(ander)) sseToCustomer(ander, 'social', { kind: 'accepted', by: codenaamVan(mij) });
+    sseToCustomer(ander, 'social', { kind: 'accepted', by: codenaamVan(mij) });
     return { status: 200, ok: true, st: verbActief(c) ? 'verbonden' : 'wacht-op-ouder' };
   }
   db.data.connections = db.data.connections.filter(x => x !== c); save();
@@ -1064,7 +1064,7 @@ function socialDmSend(mij, ander, text) {
   const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
   chat.messages.push({ from: mij, text, at: new Date().toISOString() });
   chat.messages = chat.messages.slice(-200); save();
-  if (!isRtf(ander)) sseToCustomer(ander, 'social', { kind: 'dm', from: mij, codename: codenaamVan(mij), text });
+  sseToCustomer(ander, 'social', { kind: 'dm', from: mij, codename: codenaamVan(mij), text });
   return { status: 200, ok: true, messages: chat.messages.slice(-80) };
 }
 const zijnVrienden = (a, b) => verbActief(connectieTussen(a, b));
@@ -1111,7 +1111,7 @@ function snapSturen(van, naar, foto, tekst) {
   db.data.snaps.push(snap);
   db.data.snaps = db.data.snaps.slice(-2000);
   save();
-  if (!isRtf(naar)) sseToCustomer(naar, 'social', { kind: 'snap', from: codenaamVan(van) });
+  sseToCustomer(naar, 'social', { kind: 'snap', from: codenaamVan(van) });
   return { status: 200, ok: true };
 }
 // binnengekomen snaps voor 'mij' (alleen dat er een is, nog niet de foto)
@@ -1337,6 +1337,33 @@ app.post('/api/rtf/social/story/view', (req, res) => {
   const r = verhaalBekijken(s.handle, String(req.body.id || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ foto: r.foto, tekst: r.tekst, van: r.van, at: r.at });
+});
+/* Live-kanaal voor de RTF-vriendenlaag: net als /api/stream, maar op gezin-token.
+   De verbinding staat in dezelfde sseClients-lijst, met de handle als sleutel, zodat
+   dm-, snap-, verzoek- en belsignalen de RTF-app net zo bereiken als de RTG-app.
+   EventSource kan geen header sturen, dus code en token gaan als query-parameter. */
+app.get('/api/rtf/social/stream', (req, res) => {
+  const sess = rtf.verifieerProfiel(req.query.code, req.query.token);
+  if (!sess || sess.gast) return res.status(401).end();
+  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', Connection: 'keep-alive' });
+  res.write('retry: 3000\n\n');
+  const client = { tier: 'rtf', key: sess.handle, res };
+  sseClients.push(client);
+  sseSend(res, 'hello', {});
+  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
+  req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
+});
+/* Belsignaal vanuit de RTF-app naar een vriend (RTF of RTG). Zelfde WebRTC-flow
+   als bij de leden; de server is alleen het signaleringskanaal. */
+app.post('/api/rtf/social/call', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const ander = String(req.body.toKey || '');
+  if (!verbActief(connectieTussen(s.handle, ander))) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
+  const kind = String(req.body.kind || '');
+  if (!['ring', 'accept', 'offer', 'answer', 'ice', 'hangup', 'decline', 'busy'].includes(kind))
+    return res.status(400).json({ error: 'Onbekend signaal.' });
+  sseToCustomer(ander, 'call', { kind, from: s.handle, codename: s.codenaam, video: !!req.body.video, payload: req.body.payload || null });
+  res.json({ ok: true });
 });
 
 // web-push: publieke sleutel + subscription opslaan

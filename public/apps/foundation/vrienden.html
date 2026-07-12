@@ -159,6 +159,7 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 // gedeelde, veilige helpers uit /apps/util.js
 const esc = Util.escapeHTML;
 const initcn = Util.initialen;
+const E = Util.el, vervang = Util.vervang; // veilige component-bouwer
 // social-endpoints lopen via /api/rtf/social met het gezin-token
 function soc(pad, body){
   return fetch('/api/rtf/social'+pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })
@@ -173,38 +174,35 @@ async function laad(){
   mij = { beheerder:!!d.beheerder, kind:!!d.kind, codenaam:d.codename };
   mijnHandle = d.me;
   $('#mijncn').innerHTML = 'Jouw codenaam: <b>'+esc(d.codename)+'</b><br><span style="color:var(--zacht);font-size:.8rem;">Geef deze aan iemand die jou wil toevoegen.</span>';
-  // vrienden
+  // vrienden (opgebouwd met de veilige component-bouwer i.p.v. HTML-strings)
   const cs = d.connections||[];
-  $('#vrienden').innerHTML = cs.length ? cs.map(c=>
-    '<div class="rij"><span class="av">'+initcn(c.codename)+'</span><div class="nm">'+esc(c.codename)+(c.unread?'<span class="badge">'+c.unread+'</span>':'')+
-    '<small>'+(c.tier==='rtf'?'RTFoundation':'RTG')+(c.last?' · '+esc(c.last):'')+'</small></div>'+
-    '<button class="knop mini" data-chat="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'">Chat</button>'+
-    '<button class="knop grijs mini" data-snap="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'">📷</button>'+
-    '<button class="knop grijs mini" data-blok="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'" title="Blokkeren of melden">🚫</button></div>'
-  ).join('') : '<div class="leeg">Nog geen vrienden. Zoek hierboven op codenaam.</div>';
-  $('#vrienden').querySelectorAll('[data-chat]').forEach(b=> b.addEventListener('click', ()=> openChat(b.dataset.chat, b.dataset.cn)));
-  $('#vrienden').querySelectorAll('[data-snap]').forEach(b=> b.addEventListener('click', ()=> kiesSnap(b.dataset.snap, b.dataset.cn)));
-  $('#vrienden').querySelectorAll('[data-blok]').forEach(b=> b.addEventListener('click', ()=> blokkeerMelden(b.dataset.blok, b.dataset.cn)));
+  vervang($('#vrienden'), cs.length ? cs.map(c=> E('div',{class:'rij'},
+    E('span',{class:'av'}, initcn(c.codename)),
+    E('div',{class:'nm'}, c.codename, c.unread ? E('span',{class:'badge'}, c.unread) : null,
+      E('small', null, (c.tier==='rtf'?'RTFoundation':'RTG') + (c.last?' · '+c.last:''))),
+    E('button',{class:'knop mini', onclick:()=>openChat(c.key,c.codename)}, 'Chat'),
+    E('button',{class:'knop grijs mini', onclick:()=>kiesSnap(c.key,c.codename)}, '📷'),
+    E('button',{class:'knop grijs mini', title:'Blokkeren of melden', onclick:()=>blokkeerMelden(c.key,c.codename)}, '🚫')
+  )) : E('div',{class:'leeg'}, 'Nog geen vrienden. Zoek hierboven op codenaam.'));
   // verzoeken (niet voor kinderen)
   const reqs = d.requests||[];
   $('#verzoekenBlok').hidden = !reqs.length;
-  $('#verzoeken').innerHTML = reqs.map(r=>
-    '<div class="rij"><span class="av">'+initcn(r.codename)+'</span><div class="nm">'+esc(r.codename)+'<small>wil je vriend zijn</small></div>'+
-    '<button class="knop mini" data-ja="'+esc(r.key)+'">Accepteer</button><button class="knop grijs mini" data-nee="'+esc(r.key)+'">✕</button></div>'
-  ).join('');
-  $('#verzoeken').querySelectorAll('[data-ja]').forEach(b=> b.addEventListener('click', async()=>{ try{ await soc('/respond',{key:b.dataset.ja,action:'accept'}); laad(); }catch(e){ alert(e.message); } }));
-  $('#verzoeken').querySelectorAll('[data-nee]').forEach(b=> b.addEventListener('click', async()=>{ try{ await soc('/respond',{key:b.dataset.nee,action:'decline'}); laad(); }catch(e){ alert(e.message); } }));
+  vervang($('#verzoeken'), reqs.map(r=> E('div',{class:'rij'},
+    E('span',{class:'av'}, initcn(r.codename)),
+    E('div',{class:'nm'}, r.codename, E('small', null, 'wil je vriend zijn')),
+    E('button',{class:'knop mini', onclick:async()=>{ try{ await soc('/respond',{key:r.key,action:'accept'}); laad(); }catch(e){ alert(e.message); } }}, 'Accepteer'),
+    E('button',{class:'knop grijs mini', onclick:async()=>{ try{ await soc('/respond',{key:r.key,action:'decline'}); laad(); }catch(e){ alert(e.message); } }}, '✕')
+  )));
   // te keuren (beheerder)
   const tk = d.teKeuren||[];
   $('#teKeurenBlok').hidden = !(mij.beheerder && tk.length);
-  $('#teKeuren').innerHTML = tk.map(t=>
-    '<div class="rij"><span class="av">'+initcn(t.ander)+'</span><div class="nm">'+esc(t.ander)+
-    (t.volwassene?' <span class="badge" style="background:var(--rood);">volwassene</span>':'')+
-    '<small>wil bevriend zijn met '+esc(t.kind)+' ('+(t.richting==='uit'?'jouw kind vroeg dit':'verzoek aan jouw kind')+')</small></div>'+
-    '<button class="knop mini" data-goja="'+esc(t.kindHandle)+'|'+esc(t.anderKey)+'">Goedkeuren</button><button class="knop grijs mini" data-gonee="'+esc(t.kindHandle)+'|'+esc(t.anderKey)+'">Weiger</button></div>'
-  ).join('');
-  $('#teKeuren').querySelectorAll('[data-goja]').forEach(b=> b.addEventListener('click', ()=> keur(b.dataset.goja, true)));
-  $('#teKeuren').querySelectorAll('[data-gonee]').forEach(b=> b.addEventListener('click', ()=> keur(b.dataset.gonee, false)));
+  vervang($('#teKeuren'), tk.map(t=> E('div',{class:'rij'},
+    E('span',{class:'av'}, initcn(t.ander)),
+    E('div',{class:'nm'}, t.ander, t.volwassene ? E('span',{class:'badge', style:{background:'var(--rood)'}}, 'volwassene') : null,
+      E('small', null, 'wil bevriend zijn met '+t.kind+' ('+(t.richting==='uit'?'jouw kind vroeg dit':'verzoek aan jouw kind')+')')),
+    E('button',{class:'knop mini', onclick:()=>keur(t.kindHandle+'|'+t.anderKey, true)}, 'Goedkeuren'),
+    E('button',{class:'knop grijs mini', onclick:()=>keur(t.kindHandle+'|'+t.anderKey, false)}, 'Weiger')
+  )));
   // ouder-meekijk: de contacten van elk kind
   renderMeekijk(d.kinderen||[]);
   laadStories(); laadSnaps();

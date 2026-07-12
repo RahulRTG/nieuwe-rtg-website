@@ -54,12 +54,17 @@ nu streng (zie 8): geen `unsafe-inline` meer voor scripts.
 - Strenge CSP met een per-antwoord nonce: `unsafe-inline` voor scripts is weg,
   ingespoten scripts worden geblokkeerd (in de browser getest over zes apps;
   een script zonder nonce wordt geweigerd). Uit te zetten met `RTG_CSP_NONCE=0`.
-- Gedeelde front-end-hulp `public/apps/util.js` (veilig escapen, initialen) in
-  plaats van een kopie per app.
+- Gedeelde front-end-hulp `public/apps/util.js`: veilig escapen, initialen, en
+  een veilige component-/DOM-bouwer `Util.el(tag, props, ...kinderen)` die
+  schermen uit kleine stukjes bouwt zonder ooit `innerHTML` met invoer te vullen
+  (tekst gaat altijd via `textContent`, handlers via `addEventListener`). De
+  RTF-Contacten (de nieuwste, meest gevoelige lijsten) draait nu op deze bouwer
+  in plaats van HTML-strings aan elkaar te plakken; andere schermen kunnen
+  stapsgewijs volgen. Een volledig componentframework voor alle apps blijft een
+  grotere, aparte migratie, maar de veilige bouwsteen is er nu.
 - `npm run check` bewaakt de afspraken (geen inline handlers, geen brede
   streepjes, kloppende service-worker-shells, alle server-bestanden compileren),
   zodat de frontend zonder zwaar buildsysteem toch gedisciplineerd blijft.
-Een volledig componentframework blijft een grotere, aparte migratie.
 
 ## 9. Operationeel broos  (aangepakt)
 Corrupte `db.json` valt bij het laden terug op de nieuwste dagbackup; een

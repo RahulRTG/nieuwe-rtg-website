@@ -10,7 +10,7 @@ const functies = require('../functies');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
-  const { app, accounts, anthropic, betaal, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path } = kern;
+  const { app, accounts, anthropic, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path } = kern;
   const OWNER_EMAIL = process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example';
 
   function staat() {
@@ -42,7 +42,14 @@ module.exports = (kern) => {
   function techAuth(req, res, next) {
     const user = gebruikerUit(req);
     if (!user) return res.status(401).json({ error: 'Log in met je account.' });
-    if (!magInzien(user)) return res.status(403).json({ error: 'Geen toegang tot de technische pagina.' });
+    if (!magInzien(user)) {
+      // een GELDIG account dat toch de technische pagina probeert te openen: dit
+      // is een mogelijke rechten-escalatie -> meteen een kritieke melding
+      if (beveilig) beveilig.meld('tech-toegang-geweigerd', 'kritiek',
+        'Account "' + accounts.realNameOf(user) + '" probeerde de technische pagina te openen zonder recht.',
+        { bron: 'user:' + user.id });
+      return res.status(403).json({ error: 'Geen toegang tot de technische pagina.' });
+    }
     req.techUser = user; next();
   }
   function eigenaarAlleen(req, res, next) {
@@ -63,9 +70,19 @@ module.exports = (kern) => {
   // wordt hier meteen gecontroleerd (anders 403, ook met geldig wachtwoord).
   app.post('/api/techniek/inloggen', (req, res) => {
     const user = accounts.findByLogin(req.body.login);
-    if (!user || !accounts.verifyPassword(String(req.body.wachtwoord || ''), user.password_hash))
+    if (!user || !accounts.verifyPassword(String(req.body.wachtwoord || ''), user.password_hash)) {
+      if (beveilig) beveilig.meld('tech-login-mislukt', 'waarschuwing',
+        'Mislukte inlogpoging op de technische pagina (login: ' + String(req.body.login || '').slice(0, 40) + ').',
+        { bron: req.ip });
       return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
-    if (!magInzien(user)) return res.status(403).json({ error: 'Dit account heeft geen toegang tot de technische pagina.' });
+    }
+    if (!magInzien(user)) {
+      // juist wachtwoord, maar geen recht op de technische pagina: hoog signaal
+      if (beveilig) beveilig.meld('tech-login-zonder-recht', 'kritiek',
+        'Account "' + accounts.realNameOf(user) + '" logde correct in maar heeft geen recht op de technische pagina.',
+        { bron: 'user:' + user.id });
+      return res.status(403).json({ error: 'Dit account heeft geen toegang tot de technische pagina.' });
+    }
     res.json({ token: accounts.issueToken(user.id, 1), eigenaar: isEigenaar(user), naam: accounts.realNameOf(user) });
   });
 
@@ -84,6 +101,7 @@ module.exports = (kern) => {
       // open aanvragen bovenaan, daarna de laatst behandelde (audit-spoor)
       verzoeken: verzoeken.filter(v => v.status === 'wacht')
         .concat(verzoeken.filter(v => v.status !== 'wacht').slice(-8).reverse()),
+      beveiliging: beveilig ? beveilig.samenvatting() : { open: 0, kritiek: 0, waarschuwing: 0, recent: [] },
       samenvatting: {
         ok: checks.filter(c => c.status === 'ok').length,
         waarschuwing: checks.filter(c => c.status === 'waarschuwing').length,
@@ -170,6 +188,14 @@ module.exports = (kern) => {
     vz.besluitAt = new Date().toISOString();
     save();
     res.json({ ok: true, status: vz.status, functies: functies.catalogus(t.functies) });
+  });
+
+  /* Beveiligingsmelding(en) afhandelen: de eigenaar bevestigt dat hij ze heeft
+     gezien. Zonder id: alle open meldingen ineens. */
+  app.post('/api/techniek/beveiliging/afhandelen', techAuth, eigenaarAlleen, (req, res) => {
+    if (!beveilig) return res.json({ ok: true, afgehandeld: 0 });
+    const n = beveilig.handelAf(req.body.id ? String(req.body.id) : null);
+    res.json({ ok: true, afgehandeld: n, beveiliging: beveilig.samenvatting() });
   });
 
   // Iemand handmatig toegang geven of intrekken (alleen de eigenaar).

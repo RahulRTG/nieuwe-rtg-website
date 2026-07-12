@@ -326,7 +326,13 @@ function tooManyTries(res, bucket) {
 function noteFailedTry(bucket) {
   const f = loginFails.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
-  if (f.n >= 10) { f.until = Date.now() + 5 * 60000; f.n = 0; }
+  if (f.n >= 10) {
+    f.until = Date.now() + 5 * 60000; f.n = 0;
+    // de rate-limit sloeg aan: dit ziet eruit als brute force op een inlog
+    if (beveilig) beveilig.meld('brute-force', 'kritiek',
+      'Te veel mislukte inlogpogingen (' + String(bucket).split(':')[0] + '). De inlog is tijdelijk op slot gezet; mogelijk een brute-force-aanval.',
+      { bron: bucket });
+  }
   loginFails.set(bucket, f);
 }
 
@@ -645,6 +651,23 @@ function sendPush(tier, note) {
     });
   }
 }
+
+/* Beveiligingsmeldingen (inbraakdetectie) voor het technische bord. Een kritieke
+   melding gaat meteen naar de eigenaar: web-push op zijn telefoon en een e-mail. */
+function eigenaarAccount() {
+  try { return accounts.findByLogin(process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example'); } catch (e) { return null; }
+}
+const beveilig = require('./beveiliging')({
+  db, save,
+  notifyOwner: (note) => {
+    const o = eigenaarAccount();
+    if (!o) return;
+    try { sendPushToUser(o.id, { title: note.title, body: note.body, tag: 'beveiliging' }); } catch (e) {}
+    try { mail.send(accounts.emailOf(o), note.title,
+      'Beste ' + accounts.realNameOf(o) + ',\n\n' + note.body +
+      '\n\nOpen de technische pagina (Beveiliging) om te zien wat er speelt.\n\nRahul Travel Group'); } catch (e) {}
+  }
+});
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
@@ -2401,6 +2424,9 @@ function officeState() {
   const openFuncties = ((db.data.techniek || {}).functieVerzoeken || []).filter(v => v.status === 'wacht').length;
   if (openFuncties) alerts.push({ level: 'amber', kind: 'functie',
     text: openFuncties + ' functieaanvraag/-aanvragen wachten op bevestiging van de eigenaar. Accepteren of weigeren kan alleen op de technische pagina.' });
+  const kritiekeBeveiliging = beveilig.openKritiek();
+  if (kritiekeBeveiliging) alerts.push({ level: 'rood', kind: 'beveiliging',
+    text: kritiekeBeveiliging + ' kritieke beveiligingsmelding(en). Bekijk ze op de technische pagina onder Beveiliging.' });
   const nieuweSollicitaties = applications.filter(a => a.status === 'nieuw').length;
   if (nieuweSollicitaties) alerts.push({ level: 'info', kind: 'apps', text: nieuweSollicitaties + ' open sollicitatie(s) bij partners.' });
   const volgorde = { rood: 0, amber: 1, info: 2 };
@@ -2585,7 +2611,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom,
+  ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, beveilig,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,

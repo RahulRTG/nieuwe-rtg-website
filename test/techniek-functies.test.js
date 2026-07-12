@@ -109,6 +109,33 @@ test('een open aanvraag is zichtbaar in het actiecentrum van de Backoffice', asy
   assert.ok(!(st.state.alerts || []).some(a => a.kind === 'functie'), 'na het besluit is het actiecentrum weer schoon');
 });
 
+test('beveiliging: mislukte tech-login wordt gemeld; een kritieke melding komt in het actiecentrum', async () => {
+  // een mislukte inlog op de technische pagina -> waarschuwing op het bord
+  assert.equal((await post('/api/techniek/inloggen', { login: 'indringer@x.nl', wachtwoord: 'fout' })).status, 401);
+  let st = await (await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })).json();
+  assert.ok(st.beveiliging.open >= 1, 'de mislukte login staat op het bord');
+  assert.ok(st.beveiliging.recent.some(m => m.type === 'tech-login-mislukt'));
+
+  // een echt account dat correct inlogt maar geen recht heeft = kritiek
+  await post('/api/auth/register', { name: 'Nieuwsgierig Lid', email: 'lid@x.nl', phone: '0611112222', password: 'welkom123', geboortedatum: '1995-05-05' });
+  assert.equal((await post('/api/techniek/inloggen', { login: 'lid@x.nl', wachtwoord: 'welkom123' })).status, 403);
+  st = await (await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })).json();
+  assert.ok(st.beveiliging.kritiek >= 1, 'een geldig account zonder recht is een kritieke melding');
+
+  // die kritieke melding staat als rode regel in het actiecentrum van de Backoffice
+  const office = await (await post('/api/office/login', { code: 'RTG-OFFICE' })).json();
+  const alert = (office.state.alerts || []).find(a => a.kind === 'beveiliging');
+  assert.ok(alert && alert.level === 'rood', 'het actiecentrum toont de kritieke beveiligingsmelding');
+
+  // de eigenaar markeert alles als gezien -> het bord en het actiecentrum zijn schoon
+  await post('/api/techniek/beveiliging/afhandelen', {}, techToken);
+  st = await (await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })).json();
+  assert.equal(st.beveiliging.open, 0);
+  const office2 = await (await fetch(BASE + '/api/office/state', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + office.token }, body: '{}' })).json();
+  assert.ok(!(office2.state.alerts || []).some(a => a.kind === 'beveiliging'));
+});
+
 test('alleen de eigenaar besluit; techniek blijft altijd bereikbaar', async () => {
   // zonder token: geen aanvraag kunnen doen
   assert.equal((await post('/api/techniek/functie', { id: 'betalen', aan: false })).status, 401);

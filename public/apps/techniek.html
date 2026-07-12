@@ -98,6 +98,13 @@
 
     <div id="tabStatus" role="tabpanel" aria-labelledby="tabBtnStatus">
       <div class="telrij" id="tellers"></div>
+      <div id="beveiligBlok" hidden>
+        <div class="sec" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Beveiliging &amp; inbraakdetectie</span>
+          <button class="knop grijs klein" id="bBevAf" hidden>Alles gezien</button>
+        </div>
+        <div class="kaart" id="beveiliging"></div>
+      </div>
       <div class="sec">Functies &amp; codes (gezondheid)</div>
       <div class="kaart" id="checks"></div>
       <div id="zekeringBlok" hidden>
@@ -303,14 +310,39 @@
     zetFunctie({ alles:true, aan:false });
   });
 
+  /* ---------- beveiliging (inbraakdetectie) ---------- */
+  var ernstKleur = { kritiek:'fout', waarschuwing:'waarschuwing', info:'ok' };
+  function beveiligRij(m){
+    var kop = el('div', null,
+      el('span',{class:'naam'}, m.tekst),
+      m.aantal>1 ? el('span',{class:'code'}, m.aantal+'x') : null,
+      m.afgehandeld ? el('span',{class:'code'}, 'gezien') : null);
+    return el('div',{class:'rij', style: m.afgehandeld?{opacity:'.55'}:null},
+      el('div',{class:'bol '+(ernstKleur[m.ernst]||'waarschuwing')}),
+      el('div',{class:'mid'}, kop, el('div',{class:'detail'}, new Date(m.at).toLocaleString('nl-NL'))));
+  }
+  function bevAfhandelen(){
+    api('/api/techniek/beveiliging/afhandelen', { method:'POST', body:{} })
+      .then(function(){ toast('Beveiligingsmeldingen als gezien gemarkeerd.'); laad(); })
+      .catch(function(e){ toast(e.message); });
+  }
+  $('#bBevAf').addEventListener('click', bevAfhandelen);
+
   function laad(){
     return api('/api/techniek/status').then(function(d){
       eigenaar = d.eigenaar;
       $('#wieSub').textContent = (d.naam||'') + (d.eigenaar?' · eigenaar':' · toegelaten');
-      vervang($('#tellers'),
+      var bev = d.beveiliging || { open:0, kritiek:0, recent:[] };
+      var tellers = [
         tellerKaart(d.samenvatting.ok,'In orde'),
         tellerKaart(d.samenvatting.waarschuwing,'Let op'),
-        tellerKaart(d.samenvatting.fout,'Storing'));
+        tellerKaart(d.samenvatting.fout,'Storing')];
+      if (bev.open) tellers.push(tellerKaart(bev.open, bev.kritiek?'Beveiliging!':'Beveiliging'));
+      vervang($('#tellers'), tellers);
+      // beveiligingsmeldingen: alleen tonen als er iets is (of ooit iets was)
+      $('#beveiligBlok').hidden = !(bev.recent && bev.recent.length);
+      if (bev.recent && bev.recent.length) vervang($('#beveiliging'), bev.recent.map(beveiligRij));
+      $('#bBevAf').hidden = !(d.eigenaar && bev.open);
       vervang($('#checks'), d.checks.map(checkRij));
       $('#zekeringBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));

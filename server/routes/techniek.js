@@ -6,6 +6,7 @@
    ("er weer in doen") of met de hand uitschakelen, en heeft een AI die bij een
    storing een diagnose en herstelstappen geeft. */
 const techniek = require('../techniek');
+const functies = require('../functies');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
@@ -16,6 +17,7 @@ module.exports = (kern) => {
     if (!db.data.techniek) db.data.techniek = {};
     const t = db.data.techniek;
     if (!Array.isArray(t.toegang)) t.toegang = [];
+    if (!t.functies) t.functies = {}; // leeg = alles op de standaard (aan)
     if (!t.zekeringen) t.zekeringen = techniek.standaardZekeringen();
     // ontbrekende standaard-zekeringen bijvullen (voor nieuwe versies)
     const std = techniek.standaardZekeringen();
@@ -72,9 +74,12 @@ module.exports = (kern) => {
     const checks = await techniek.draaiChecks(ctx());
     const t = staat();
     const zeker = Object.keys(t.zekeringen).map(id => ({ id, ...t.zekeringen[id] }));
+    const cat = functies.catalogus(t.functies);
     const uit = {
       eigenaar: isEigenaar(req.techUser), naam: accounts.realNameOf(req.techUser),
       checks, zekeringen: zeker,
+      functies: cat,
+      functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),
       samenvatting: {
         ok: checks.filter(c => c.status === 'ok').length,
         waarschuwing: checks.filter(c => c.status === 'waarschuwing').length,
@@ -97,6 +102,25 @@ module.exports = (kern) => {
     else return res.status(400).json({ error: 'Actie moet reset of spring zijn.' });
     save();
     res.json({ ok: true, id: req.body.id, aan: z.aan });
+  });
+
+  /* Functieschakelaars aan/uit zetten (alleen de eigenaar). Drie vormen:
+     - één functie:      { id, aan }
+     - hele categorie:   { categorie, aan }
+     - alles:            { alles: true, aan }
+     Zo kun je het systeem functie voor functie openzetten, of in één klik een
+     hele categorie (of alles) aan/uit. */
+  app.post('/api/techniek/functie', techAuth, eigenaarAlleen, (req, res) => {
+    const t = staat();
+    const aan = req.body.aan !== false && req.body.aan !== 'false';
+    let doelwit = [];
+    if (req.body.alles) doelwit = functies.FUNCTIES;
+    else if (req.body.categorie) doelwit = functies.FUNCTIES.filter(f => f.categorie === req.body.categorie);
+    else if (req.body.id) { const f = functies.OP_ID[req.body.id]; if (!f) return res.status(404).json({ error: 'Onbekende functie.' }); doelwit = [f]; }
+    else return res.status(400).json({ error: 'Geef id, categorie of alles op.' });
+    for (const f of doelwit) t.functies[f.id] = { aan };
+    save();
+    res.json({ ok: true, aangepast: doelwit.length, functies: functies.catalogus(t.functies) });
   });
 
   // Iemand handmatig toegang geven of intrekken (alleen de eigenaar).

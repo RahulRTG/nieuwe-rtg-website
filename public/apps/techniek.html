@@ -55,6 +55,17 @@
   .badge.uit{background:#3a1420;color:#F4B8C6;}
   .muted{color:var(--soft);font-size:.8rem;}
   .toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
+  .tabs{display:flex;gap:.4rem;margin-bottom:1.2rem;border-bottom:1px solid var(--line);}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--soft);padding:.6rem .9rem;font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;}
+  .tab[aria-selected="true"]{color:var(--txt);border-bottom-color:var(--gold);}
+  .catkop{display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap;margin:1.4rem 0 .5rem;}
+  .catkop h2{font-size:.95rem;font-weight:600;}
+  .fn{display:flex;align-items:flex-start;gap:.8rem;padding:.75rem 0;border-top:1px solid var(--line);}
+  .fn:first-child{border-top:none;}
+  .fn .mid{flex:1;min-width:0;}
+  .schakel{border:1px solid var(--line);border-radius:999px;padding:.3rem .8rem;font-weight:700;font-size:.72rem;cursor:pointer;font-family:inherit;flex-shrink:0;min-width:5.4rem;}
+  .schakel.aan{background:#12321f;color:#7EE0A3;border-color:#1f5637;}
+  .schakel.uit{background:#3a1420;color:#F4B8C6;border-color:var(--rood);}
 </style>
 </head>
 <body>
@@ -80,23 +91,46 @@
         <button class="knop grijs klein" id="bUit">Uitloggen</button>
       </div>
     </header>
-    <div class="telrij" id="tellers"></div>
-    <div class="sec">Functies &amp; codes</div>
-    <div class="kaart" id="checks"></div>
-    <div id="zekeringBlok" hidden>
-      <div class="sec">Zekeringen</div>
-      <div class="kaart" id="zekeringen"></div>
+    <div class="tabs" role="tablist" id="tabbar">
+      <button class="tab" role="tab" id="tabBtnStatus" aria-selected="true" aria-controls="tabStatus">Statusbord</button>
+      <button class="tab" role="tab" id="tabBtnFuncties" aria-selected="false" aria-controls="tabFuncties" hidden>Functies aan/uit</button>
     </div>
-    <div id="toegangBlok" hidden>
-      <div class="sec">Toegang beheren</div>
-      <div class="kaart">
-        <div id="toegangLijst"></div>
-        <div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;">
-          <input class="veld" id="grantEmail" placeholder="E-mail van een RTG-account" style="flex:1;margin-bottom:0;min-width:12rem;">
-          <button class="knop klein" id="bGrant">Toegang geven</button>
-        </div>
-        <div class="fout" id="grantFout"></div>
+
+    <div id="tabStatus" role="tabpanel" aria-labelledby="tabBtnStatus">
+      <div class="telrij" id="tellers"></div>
+      <div class="sec">Functies &amp; codes (gezondheid)</div>
+      <div class="kaart" id="checks"></div>
+      <div id="zekeringBlok" hidden>
+        <div class="sec">Zekeringen</div>
+        <div class="kaart" id="zekeringen"></div>
       </div>
+      <div id="toegangBlok" hidden>
+        <div class="sec">Toegang beheren</div>
+        <div class="kaart">
+          <div id="toegangLijst"></div>
+          <div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;">
+            <input class="veld" id="grantEmail" placeholder="E-mail van een RTG-account" style="flex:1;margin-bottom:0;min-width:12rem;">
+            <button class="knop klein" id="bGrant">Toegang geven</button>
+          </div>
+          <div class="fout" id="grantFout"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tabFuncties" role="tabpanel" aria-labelledby="tabBtnFuncties" hidden>
+      <div class="kaart" style="margin-bottom:1rem;">
+        <div class="fn" style="border-top:none;">
+          <div class="mid">
+            <div class="naam">Alle functies in één keer</div>
+            <div class="muted">Zet het hele systeem in één klik aan of uit, of gebruik hieronder de knoppen per functie om alles rustig een voor een open te zetten.</div>
+          </div>
+          <div style="display:flex;gap:.4rem;flex-shrink:0;">
+            <button class="knop grijs klein" id="bAllesAan">Alles aan</button>
+            <button class="knop rood klein" id="bAllesUit">Alles uit</button>
+          </div>
+        </div>
+      </div>
+      <div id="functies"></div>
     </div>
   </div>
 </main>
@@ -191,6 +225,49 @@
       .catch(function(e){ $('#grantFout').textContent = e.message; });
   });
 
+  /* ---------- tabbladen ---------- */
+  function toonTab(naam){
+    var status = naam !== 'functies';
+    $('#tabStatus').hidden = !status; $('#tabFuncties').hidden = status;
+    $('#tabBtnStatus').setAttribute('aria-selected', status?'true':'false');
+    $('#tabBtnFuncties').setAttribute('aria-selected', status?'false':'true');
+  }
+  $('#tabBtnStatus').addEventListener('click', function(){ toonTab('status'); });
+  $('#tabBtnFuncties').addEventListener('click', function(){ toonTab('functies'); });
+
+  /* ---------- functieschakelaars ---------- */
+  function zetFunctie(body, melding){
+    api('/api/techniek/functie', { method:'POST', body:body })
+      .then(function(){ toast(melding); laad(); })
+      .catch(function(e){ toast(e.message); });
+  }
+  function functieRij(f){
+    var schakel = el('button',{class:'schakel '+(f.aan?'aan':'uit'),
+      'aria-label':(f.aan?'Zet uit: ':'Zet aan: ')+f.naam,
+      onclick:function(){ zetFunctie({ id:f.id, aan:!f.aan }, f.naam+(f.aan?' uit.':' aan.')); }},
+      f.aan?'AAN':'UIT');
+    return el('div',{class:'fn'},
+      el('div',{class:'mid'},
+        el('div',{class:'naam'}, f.naam),
+        el('div',{class:'muted'}, f.uitleg||'')),
+      schakel);
+  }
+  function categorieBlok(g){
+    var aanAlle = function(aan){ return function(){ zetFunctie({ categorie:g.categorie, aan:aan }, g.categorie+(aan?' volledig aan.':' volledig uit.')); }; };
+    return el('div', null,
+      el('div',{class:'catkop'},
+        el('h2', null, g.categorie),
+        el('div',{style:{display:'flex',gap:'.4rem'}},
+          el('button',{class:'knop grijs klein', onclick:aanAlle(true)}, 'Alles aan'),
+          el('button',{class:'knop grijs klein', onclick:aanAlle(false)}, 'Alles uit'))),
+      el('div',{class:'kaart'}, g.functies.map(functieRij)));
+  }
+  $('#bAllesAan').addEventListener('click', function(){ zetFunctie({ alles:true, aan:true }, 'Alle functies aan.'); });
+  $('#bAllesUit').addEventListener('click', function(){
+    if (!confirm('Weet je het zeker? Dit zet ALLE functionaliteiten van het hele platform uit. De technische pagina blijft bereikbaar zodat je ze weer aan kunt zetten.')) return;
+    zetFunctie({ alles:true, aan:false }, 'Alle functies uit.');
+  });
+
   function laad(){
     return api('/api/techniek/status').then(function(d){
       eigenaar = d.eigenaar;
@@ -204,6 +281,12 @@
       if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));
       $('#toegangBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#toegangLijst'), (d.toegang&&d.toegang.length)? d.toegang.map(toegangRij) : el('div',{class:'muted'},'Nog niemand extra toegelaten.'));
+      // functies-tab alleen voor de eigenaar
+      $('#tabBtnFuncties').hidden = !d.eigenaar;
+      var uitLabel = d.functiesUit ? ('Functies aan/uit · '+d.functiesUit+' uit') : 'Functies aan/uit';
+      $('#tabBtnFuncties').textContent = uitLabel;
+      if (d.eigenaar && d.functies) vervang($('#functies'), d.functies.map(categorieBlok));
+      if (!d.eigenaar) toonTab('status');
     }).catch(function(e){
       if (/401|403|Log in|toegang/i.test(e.message)){ token=null; sessionStorage.removeItem('techToken'); toonLogin(); }
       else toast(e.message);

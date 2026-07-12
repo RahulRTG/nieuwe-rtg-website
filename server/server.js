@@ -170,6 +170,22 @@ app.use((req, res, next) => {
   next();
 });
 
+/* Functieschakelaars: per functionaliteit een bewuste aan/uit-knop (beheerd op
+   de technische pagina). Staat een functie uit, dan geeft zijn API 503. De
+   technische pagina zelf en de health/ready-checks blijven altijd bereikbaar,
+   zodat de eigenaar alles weer aan kan zetten. */
+const functies = require('./functies');
+app.use((req, res, next) => {
+  const p = req.path;
+  if (!p.startsWith('/api/')) return next();
+  if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
+  const staat = db.data && db.data.techniek && db.data.techniek.functies;
+  if (!staat) return next(); // niets uitgezet: alles staat aan
+  const dicht = functies.padGeblokkeerd(p, staat);
+  if (dicht) return res.status(503).json({ error: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.', functie: dicht.id, naam: dicht.naam });
+  next();
+});
+
 // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
 // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
 // draait mee op dezelfde database en failover.

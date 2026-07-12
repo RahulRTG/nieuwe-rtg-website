@@ -106,6 +106,43 @@ test('op reis met de foundation: een aanvraag wordt bewaard, onvolledig geweiger
   assert.ok(h.aanvragen >= 1, 'de aanvraag is bewaard');
 });
 
+test('het gezin: aanmaken, profiel toevoegen, kiezen met pincode, en een reis-oproep', async () => {
+  // een gezin zonder pincode kan niet
+  assert.equal((await api('/gezin/maak', { gezinsnaam: 'De Wit', naam: 'Sam' })).status, 400);
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'De Wit', naam: 'Sam', pin: '2468' }));
+  assert.equal(g.code.length, 6);
+  assert.ok(g.token && g.profiel.beheerder);
+
+  // de beheerder voegt een kind-profiel toe met eigen pincode
+  const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Noor', rol: 'kind', pin: '1111' }));
+  assert.equal(kind.profiel.naam, 'Noor');
+  assert.ok(kind.profiel.heeftPin);
+  // zonder beheerder-token mag je geen profiel toevoegen
+  assert.equal((await api('/gezin/profiel/maak', { code: g.code, token: 'nep', naam: 'Indringer' })).status, 403);
+
+  // inloggen toont de profielen zonder tokens
+  const lijst = await json(await api('/gezin/inloggen', { code: g.code }));
+  assert.equal(lijst.profielen.length, 2);
+  assert.ok(lijst.profielen.every(p => p.token === undefined));
+
+  // een profiel kiezen met verkeerde pin faalt, met goede pin lukt
+  assert.equal((await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id, pin: '9999' })).status, 403);
+  const open = await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id, pin: '1111' }));
+  assert.ok(open.token);
+
+  // de beheerder stuurt een reis-oproep aan iedereen; het kind ziet hem
+  await api('/gezin/bericht', { code: g.code, token: g.token, naar: 'allen', soort: 'reis', tekst: 'We gaan misschien op reis!' });
+  const ber = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/berichten?token=' + open.token));
+  assert.ok(ber.berichten.some(b => b.soort === 'reis' && /op reis/.test(b.tekst)));
+  // ongelezen-teller staat op 1 voor het kind
+  const mij = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + open.token));
+  assert.equal(mij.ongelezen, 1);
+
+  // de laatste beheerder kan niet worden verwijderd
+  const beheerders = lijst.profielen.filter(p => p.beheerder);
+  assert.equal((await api('/gezin/profiel/verwijder', { code: g.code, token: g.token, profielId: beheerders[0].id })).status, 400);
+});
+
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {
   const L = await les();
   const goed = await api('/ai', { code: L.code, token: L.sToken, messages: [{ role: 'user', content: 'Help met breuken' }] });

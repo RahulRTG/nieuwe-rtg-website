@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Gezin beheren</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.2rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.6rem 0 .2rem;}
+  .zin{color:var(--zacht);line-height:1.5;margin-bottom:1.4rem;}
+  .blok{padding:1.2rem;margin-bottom:1.2rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
+  .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
+  .codepaneel{display:flex;align-items:center;gap:.8rem;justify-content:space-between;flex-wrap:wrap;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.9rem 1.1rem;}
+  .codepaneel .code{font-size:1.5rem;font-weight:700;letter-spacing:.28em;color:var(--goud);}
+  .plist{display:flex;flex-direction:column;gap:.6rem;}
+  .prow{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .8rem;}
+  .prow .av{width:2.4rem;height:2.4rem;border-radius:.7rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .prow .nm{font-weight:600;}.prow .rl{font-size:.78rem;color:var(--zacht);}
+  .prow .sp{margin-left:auto;display:flex;gap:.4rem;}
+  .avkies{display:flex;flex-wrap:wrap;gap:.4rem;margin:.3rem 0 .8rem;}
+  .avkies button{width:2.2rem;height:2.2rem;border-radius:.6rem;background:var(--paneel2);font-size:1.2rem;border:2px solid transparent;}
+  .avkies button.aan{border-color:var(--goud);}
+  .klkies{display:flex;gap:.4rem;margin-bottom:.9rem;}
+  .klkies button{width:1.7rem;height:1.7rem;border-radius:50%;border:2px solid transparent;}
+  .klkies button.aan{border-color:var(--txt);transform:scale(1.12);}
+  .veld{margin-bottom:.7rem;}
+  select.veld{appearance:none;}
+  .rijknop{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .ok{color:var(--groen);font-size:.85rem;min-height:1.1rem;}
+  .naarkeuze{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem;}
+  .naarkeuze button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.4rem .8rem;font-size:.85rem;}
+  .naarkeuze button.aan{background:var(--goud);color:#1a1710;border-color:var(--goud);font-weight:700;}
+  dialog{border:none;background:transparent;color:var(--txt);}
+  dialog::backdrop{background:rgba(4,4,3,.78);}
+  .modal{width:min(92vw,25rem);padding:1.5rem;}
+  .modal h3{font-family:var(--serif);font-weight:500;font-size:1.2rem;margin-bottom:.9rem;}
+  .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>Gezin beheren</h1>
+  <div class="zin" id="zin">Voeg profielen toe voor je gezin en houd iedereen op de hoogte.</div>
+
+  <div class="kaart blok">
+    <h2>Jullie gezinscode</h2>
+    <div class="h">Hiermee logt iedereen thuis in op hetzelfde gezin. Deel hem alleen met je eigen gezin.</div>
+    <div class="codepaneel"><span class="code" id="uCode">------</span><button class="knop grijs klein" id="uDeel">Kopieer</button></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Profielen</h2>
+    <div class="h">Ieder gezinslid een eigen profiel. Bescherm een profiel met een pincode als dat nodig is.</div>
+    <div class="plist" id="plist"></div>
+    <div style="margin-top:1rem;"><button class="knop" id="bNieuw">+ Profiel toevoegen</button></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Bericht of oproep sturen</h2>
+    <div class="h">Leg iets uit, moedig aan, of roep iedereen op: "de foundation gaat op reis!" Het bericht verschijnt bij het belletje van de profielen.</div>
+    <div class="naarkeuze" id="naar"></div>
+    <textarea class="veld" id="bTekst" rows="3" placeholder="Schrijf je bericht..." maxlength="800"></textarea>
+    <div class="rijknop">
+      <button class="knop" id="bStuur">Bericht sturen</button>
+      <button class="knop grijs" id="bReis">✈️ Oproep: we gaan op reis</button>
+    </div>
+    <div class="ok" id="bOk"></div>
+    <div class="fout" id="bFout"></div>
+  </div>
+</div>
+
+<!-- profiel toevoegen / bewerken -->
+<dialog id="dlg"><div class="kaart modal">
+  <h3 id="dTitel">Profiel toevoegen</h3>
+  <input class="veld" id="dNaam" placeholder="Naam" maxlength="40">
+  <div class="avkies" id="dAv"></div>
+  <div class="klkies" id="dKl"></div>
+  <select class="veld" id="dRol">
+    <option value="kind">Kind</option>
+    <option value="ouder">Ouder</option>
+    <option value="gezinslid">Gezinslid</option>
+    <option value="beheerder">Beheerder</option>
+  </select>
+  <input class="veld" id="dPin" placeholder="Pincode (leeg = geen)" inputmode="numeric" maxlength="6">
+  <div class="fout" id="dFout"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="dDoe">Opslaan</button></div>
+</div></dialog>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const api = Sessie.api;
+const AVATARS = ['🙂','😀','🦊','🐼','🐵','🦁','🐯','🐧','🦉','🐢','🌟','⚽','🎨','🎧','📚','🚀','🌈','🐬','🦄','👑'];
+const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
+let dAv='🙂', dKl=KLEUREN[0], bewerkId=null, naarWie='allen';
+
+const s = Sessie.huidig();
+if (!s || !s.token){ location.href='index.html'; }
+
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid'}[p.rol]||''); }
+
+(function(){
+  const av=$('#dAv'); AVATARS.forEach(a=>{ const b=document.createElement('button'); b.textContent=a; b.onclick=()=>{ dAv=a; [...av.children].forEach(c=>c.classList.toggle('aan',c.textContent===a)); }; av.appendChild(b); });
+  const kl=$('#dKl'); KLEUREN.forEach(c=>{ const b=document.createElement('button'); b.style.background=c; b.onclick=()=>{ dKl=c; [...kl.children].forEach(x=>x.classList.toggle('aan',x.style.background===b.style.background)); }; kl.appendChild(b); });
+})();
+
+async function laad(){
+  const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
+  if (d.error || !d.profiel){ location.href='index.html'; return; }
+  if (!d.profiel.beheerder){ document.querySelector('.wrap').innerHTML='<h1>Alleen de beheerder</h1><p class="zin">Alleen de beheerder van het gezin kan hier profielen en berichten beheren. <a href="index.html" style="color:var(--goud)">Terug naar de app</a>.</p>'; return; }
+  Sessie.balk($('#balk'), { terug:'index.html', terugTekst:'← Terug' });
+  $('#uCode').textContent = s.code;
+  $('#zin').textContent = 'Beheer het gezin "' + d.gezin.naam + '". Voeg profielen toe en houd iedereen op de hoogte.';
+  // profielen
+  const pl=$('#plist'); pl.innerHTML='';
+  d.profielen.forEach(p=>{
+    const row=document.createElement('div'); row.className='prow';
+    row.innerHTML='<span class="av" style="background:'+p.kleur+'">'+p.avatar+'</span>'+
+      '<div><div class="nm">'+esc(p.naam)+(p.heeftPin?' 🔒':'')+'</div><div class="rl">'+rolTekst(p)+'</div></div>'+
+      '<div class="sp"><button class="knop grijs klein" data-bew="'+p.id+'">Bewerken</button>'+
+      (p.beheerder && d.profielen.filter(x=>x.beheerder).length<=1 ? '' : '<button class="knop rood klein" data-del="'+p.id+'">×</button>')+'</div>';
+    pl.appendChild(row);
+  });
+  pl.querySelectorAll('[data-bew]').forEach(b=> b.onclick=()=> bewerk(d.profielen.find(x=>x.id===b.dataset.bew)));
+  pl.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=> verwijder(b.dataset.del));
+  // naar-keuze
+  const nk=$('#naar'); nk.innerHTML=''; naarWie='allen';
+  function knop(id, tekst){ const b=document.createElement('button'); b.textContent=tekst; b.onclick=()=>{ naarWie=id; [...nk.children].forEach(c=>c.classList.toggle('aan', c===b)); }; return b; }
+  const allen=knop('allen','Iedereen'); allen.classList.add('aan'); nk.appendChild(allen);
+  d.profielen.filter(p=> p.id!==d.profiel.id).forEach(p=> nk.appendChild(knop(p.id, p.naam)));
+}
+
+function bewerk(p){
+  bewerkId=p.id; $('#dTitel').textContent='Profiel bewerken';
+  $('#dNaam').value=p.naam; dAv=p.avatar; dKl=p.kleur; $('#dRol').value=p.rol; $('#dPin').value='';
+  [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
+  [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
+  $('#dPin').placeholder = p.heeftPin ? 'Pincode wijzigen (leeg = laten staan)' : 'Pincode (leeg = geen)';
+  $('#dFout').textContent=''; $('#dlg').showModal();
+}
+$('#bNieuw').onclick=()=>{
+  bewerkId=null; $('#dTitel').textContent='Profiel toevoegen';
+  $('#dNaam').value=''; dAv='🙂'; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dPin').value=''; $('#dPin').placeholder='Pincode (leeg = geen)';
+  [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
+  [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
+  $('#dFout').textContent=''; $('#dlg').showModal();
+};
+$('#dDoe').onclick=async()=>{
+  $('#dFout').textContent='';
+  const body={ code:s.code, token:s.token, naam:$('#dNaam').value, avatar:dAv, kleur:dKl, rol:$('#dRol').value };
+  const pin=$('#dPin').value.trim();
+  try{
+    if(bewerkId){ if(pin!=='') body.pin=pin; body.profielId=bewerkId; await api('/gezin/profiel/wijzig', body); }
+    else { if(pin!=='') body.pin=pin; await api('/gezin/profiel/maak', body); }
+    $('#dlg').close(); laad();
+  }catch(e){ $('#dFout').textContent=e.message; }
+};
+async function verwijder(id){
+  if(!confirm('Dit profiel verwijderen? Het schrift en de cv van dit profiel op dit toestel blijven staan.')) return;
+  try{ await api('/gezin/profiel/verwijder', { code:s.code, token:s.token, profielId:id }); laad(); }
+  catch(e){ alert(e.message); }
+}
+document.querySelectorAll('[data-sluit]').forEach(b=> b.onclick=e=> e.target.closest('dialog').close());
+
+$('#uDeel').onclick=async()=>{ try{ await navigator.clipboard.writeText(s.code); $('#uDeel').textContent='Gekopieerd!'; setTimeout(()=>$('#uDeel').textContent='Kopieer',1500); }catch(e){ alert('Gezinscode: '+s.code); } };
+
+async function stuur(soort){
+  $('#bOk').textContent=''; $('#bFout').textContent='';
+  const tekst=$('#bTekst').value.trim();
+  if(soort==='reis' && !tekst){ $('#bTekst').value='We hebben goed nieuws: de foundation kan ons misschien op reis sturen. Kijk samen bij "Op reis met de foundation".'; }
+  try{
+    await api('/gezin/bericht', { code:s.code, token:s.token, naar:naarWie, tekst:$('#bTekst').value.trim(), soort });
+    $('#bTekst').value=''; $('#bOk').textContent = soort==='reis' ? 'De reis-oproep is verstuurd.' : 'Je bericht is verstuurd.';
+  }catch(e){ $('#bFout').textContent=e.message; }
+}
+$('#bStuur').onclick=()=>stuur('bericht');
+$('#bReis').onclick=()=>stuur('reis');
+
+laad();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

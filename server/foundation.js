@@ -290,6 +290,165 @@ router.post('/reis/aanvraag', (req, res) => {
   res.json({ ok: true });
 });
 
-router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
+/* ---------- het gezin: een account, meerdere profielen (net als bij een
+   streamingdienst). De beheerder (ouder of verzorger) maakt het gezin aan en
+   kan profielen toevoegen, en berichten of een reis-oproep sturen naar iedereen
+   of naar een profiel. Iedereen logt in op hetzelfde gezin met de gezinscode en
+   kiest daarna zijn eigen profiel. ---------- */
+function G() { const f = F(); if (!f.gezinnen) f.gezinnen = {}; return f.gezinnen; }
+function nieuweGezinscode() {
+  let c; do { c = Array.from({ length: 6 }, () => LETTERS[crypto.randomInt(LETTERS.length)]).join(''); } while (G()[c]);
+  return c;
+}
+const ROLLEN = ['beheerder', 'ouder', 'kind', 'gezinslid'];
+const KLEUREN = ['#C9A24B', '#5FA56A', '#6AA6C9', '#B4574E', '#B07AC0', '#D08A3E'];
+function hashPin(pin) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  return { salt, hash: crypto.scryptSync(String(pin), salt, 32).toString('hex') };
+}
+function checkPin(rec, pin) {
+  if (!rec || !rec.hash) return false;
+  let h; try { h = crypto.scryptSync(String(pin), rec.salt, 32); } catch (e) { return false; }
+  const b = Buffer.from(rec.hash, 'hex');
+  return h.length === b.length && crypto.timingSafeEqual(h, b);
+}
+const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
+function schoonAvatar(v) { const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim(); return s ? Array.from(s).slice(0, 2).join('') : '🙂'; }
+function schoonKleur(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? v : KLEUREN[0]; }
+
+function pubProfiel(p) { return { id: p.id, naam: p.naam, rol: p.rol, avatar: p.avatar, kleur: p.kleur, heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder' }; }
+function pubGezin(g) { return { code: g.code, naam: g.naam }; }
+function gezinVan(req, res) {
+  const code = String((req.body && req.body.code) || req.params.code || '').toUpperCase();
+  const g = G()[code];
+  if (!g) { res.status(404).json({ error: 'Dit gezin kennen we niet. Klopt de gezinscode?' }); return null; }
+  return g;
+}
+function profielVan(g, token) { return Object.values(g.profielen || {}).find(p => p.token === token); }
+function beheerderVan(g, req, res) {
+  const t = (req.body && req.body.token) || req.query.token;
+  const p = profielVan(g, t);
+  if (!p || p.rol !== 'beheerder') { res.status(403).json({ error: 'Alleen de beheerder van het gezin kan dit doen.' }); return null; }
+  return p;
+}
+function berichtVoorMij(b, pid) { return b.naar === 'allen' || b.naar === pid || b.van === pid; }
+
+router.post('/gezin/maak', (req, res) => {
+  const naam = schoon(req.body.gezinsnaam, 40);
+  const beheerder = schoon(req.body.naam, 40);
+  if (!naam) return res.status(400).json({ error: 'Geef je gezin een naam.' });
+  if (!beheerder) return res.status(400).json({ error: 'Vul je eigen naam in.' });
+  if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Kies een pincode van 4 tot 6 cijfers. Die beschermt de beheerder.' });
+  const code = nieuweGezinscode();
+  const pid = rid(4);
+  const profiel = { id: pid, naam: beheerder, rol: 'beheerder', avatar: schoonAvatar(req.body.avatar) || '👑',
+    kleur: schoonKleur(req.body.kleur), pin: hashPin(req.body.pin), token: rid(24), at: nu() };
+  const g = { id: rid(4), code, naam, at: nu(), profielen: { [pid]: profiel }, berichten: [] };
+  G()[code] = g; save();
+  res.json({ code, token: profiel.token, profiel: pubProfiel(profiel), gezin: pubGezin(g) });
+});
+
+router.post('/gezin/inloggen', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  res.json({ gezin: pubGezin(g), profielen: Object.values(g.profielen).map(pubProfiel) });
+});
+
+router.post('/gezin/profiel/kies', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  const p = g.profielen[String(req.body.profielId || '')];
+  if (!p) return res.status(404).json({ error: 'Dit profiel bestaat niet meer.' });
+  if (p.pin && p.pin.hash && !checkPin(p.pin, req.body.pin)) return res.status(403).json({ error: 'De pincode klopt niet.' });
+  res.json({ token: p.token, profiel: pubProfiel(p), gezin: pubGezin(g) });
+});
+
+router.get('/gezin/:code/mij', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  const p = profielVan(g, req.query.token);
+  if (!p) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+  const ongelezen = (g.berichten || []).filter(b => berichtVoorMij(b, p.id) && b.van !== p.id && !(b.gelezenDoor || []).includes(p.id)).length;
+  res.json({ gezin: pubGezin(g), profiel: pubProfiel(p), profielen: Object.values(g.profielen).map(pubProfiel), ongelezen });
+});
+
+router.post('/gezin/profiel/maak', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  if (!beheerderVan(g, req, res)) return;
+  const naam = schoon(req.body.naam, 40);
+  if (!naam) return res.status(400).json({ error: 'Vul een naam in voor het nieuwe profiel.' });
+  if (Object.keys(g.profielen).length >= 12) return res.status(400).json({ error: 'Een gezin kan tot 12 profielen hebben.' });
+  const rol = ROLLEN.includes(req.body.rol) ? req.body.rol : 'kind';
+  const p = { id: rid(4), naam, rol, avatar: schoonAvatar(req.body.avatar), kleur: schoonKleur(req.body.kleur), token: rid(24), at: nu() };
+  if (req.body.pin) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers, of laat hem leeg.' }); p.pin = hashPin(req.body.pin); }
+  g.profielen[p.id] = p; save();
+  res.json({ profiel: pubProfiel(p) });
+});
+
+router.post('/gezin/profiel/wijzig', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  if (!beheerderVan(g, req, res)) return;
+  const p = g.profielen[String(req.body.profielId || '')];
+  if (!p) return res.status(404).json({ error: 'Profiel niet gevonden.' });
+  if (typeof req.body.naam === 'string' && schoon(req.body.naam, 40)) p.naam = schoon(req.body.naam, 40);
+  if (req.body.avatar != null) p.avatar = schoonAvatar(req.body.avatar);
+  if (req.body.kleur != null) p.kleur = schoonKleur(req.body.kleur);
+  if (ROLLEN.includes(req.body.rol)) {
+    if (p.rol === 'beheerder' && req.body.rol !== 'beheerder' && Object.values(g.profielen).filter(x => x.rol === 'beheerder').length <= 1)
+      return res.status(400).json({ error: 'Er moet altijd minstens een beheerder blijven.' });
+    p.rol = req.body.rol;
+  }
+  if (req.body.pin === '') { delete p.pin; }
+  else if (req.body.pin != null) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers.' }); p.pin = hashPin(req.body.pin); }
+  save();
+  res.json({ profiel: pubProfiel(p) });
+});
+
+router.post('/gezin/profiel/verwijder', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  const beheerder = beheerderVan(g, req, res); if (!beheerder) return;
+  const id = String(req.body.profielId || '');
+  const p = g.profielen[id];
+  if (!p) return res.status(404).json({ error: 'Profiel niet gevonden.' });
+  if (p.rol === 'beheerder' && Object.values(g.profielen).filter(x => x.rol === 'beheerder').length <= 1)
+    return res.status(400).json({ error: 'De laatste beheerder kan niet worden verwijderd.' });
+  delete g.profielen[id]; save();
+  res.json({ ok: true });
+});
+
+router.post('/gezin/bericht', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  const p = profielVan(g, (req.body && req.body.token));
+  if (!p) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+  const tekst = schoon(req.body.tekst, 800);
+  if (!tekst) return res.status(400).json({ error: 'Schrijf een bericht.' });
+  const naar = req.body.naar && g.profielen[req.body.naar] ? req.body.naar : 'allen';
+  const soort = req.body.soort === 'reis' ? 'reis' : 'bericht';
+  const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar, soort, tekst, at: nu(), gelezenDoor: [p.id] };
+  if (!g.berichten) g.berichten = [];
+  g.berichten.unshift(b); g.berichten = g.berichten.slice(0, 200); save();
+  res.json({ ok: true, bericht: b });
+});
+
+router.get('/gezin/:code/berichten', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  const p = profielVan(g, req.query.token);
+  if (!p) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+  const mijn = (g.berichten || []).filter(b => berichtVoorMij(b, p.id)).map(b => ({
+    id: b.id, van: b.van, vanNaam: b.vanNaam, vanAvatar: b.vanAvatar, naar: b.naar,
+    naarNaam: b.naar === 'allen' ? 'iedereen' : (g.profielen[b.naar] ? g.profielen[b.naar].naam : ''),
+    soort: b.soort, tekst: b.tekst, at: b.at, vanMij: b.van === p.id,
+    gelezen: (b.gelezenDoor || []).includes(p.id)
+  }));
+  res.json({ berichten: mijn });
+});
+
+router.post('/gezin/bericht/gelezen', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  const p = profielVan(g, (req.body && req.body.token));
+  if (!p) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+  for (const b of (g.berichten || [])) if (berichtVoorMij(b, p.id) && !(b.gelezenDoor || []).includes(p.id)) { (b.gelezenDoor = b.gelezenDoor || []).push(p.id); }
+  save();
+  res.json({ ok: true });
+});
+
+router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
 module.exports = { router };

@@ -10,10 +10,10 @@
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
 <style>
-  .wrap{max-width:52rem;margin:0 auto;padding:1.6rem 1.2rem 3rem;}
-  .hero{text-align:center;padding:1.4rem 0 1.8rem;}
+  .wrap{max-width:52rem;margin:0 auto;padding:1.2rem 1.2rem 3rem;}
+  .hero{text-align:center;padding:1rem 0 1.4rem;}
   .kick{margin-bottom:.7rem;}
-  .logo{font-family:var(--serif);font-size:2.4rem;font-weight:500;letter-spacing:-.01em;line-height:1.1;}
+  .logo{font-family:var(--serif);font-size:2.3rem;font-weight:500;letter-spacing:-.01em;line-height:1.1;}
   .logo b{color:var(--goud);font-weight:600;}
   .deck{color:var(--zacht);max-width:36rem;margin:.9rem auto 0;line-height:1.55;}
   .tiles{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
@@ -28,48 +28,229 @@
   .gratis b{color:var(--goud);}
   .foot{text-align:center;margin-top:1.4rem;font-size:.8rem;}
   .foot a{color:var(--zacht);text-decoration:none;}
+  /* welkom + profielkiezer */
+  .knoprij{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:1.6rem;}
+  .uitleg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-top:2rem;text-align:left;}
+  @media(max-width:560px){.uitleg{grid-template-columns:1fr;}}
+  .uitleg .u{padding:1rem 1.1rem;}
+  .uitleg .u b{color:var(--goud);display:block;margin-bottom:.3rem;}
+  .uitleg .u p{color:var(--zacht);font-size:.85rem;line-height:1.45;}
+  .profwrap{max-width:40rem;margin:0 auto;text-align:center;padding-top:2.5rem;}
+  .profgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(6rem,1fr));gap:1.2rem;margin-top:2rem;justify-content:center;}
+  .prof{background:transparent;display:flex;flex-direction:column;align-items:center;gap:.5rem;text-decoration:none;color:var(--txt);}
+  .prof .av{position:relative;width:4.6rem;height:4.6rem;border-radius:1.1rem;display:flex;align-items:center;justify-content:center;font-size:2.2rem;border:2px solid transparent;transition:transform .12s,border-color .12s;}
+  .prof .slot-pin{position:absolute;bottom:-.3rem;right:-.3rem;background:var(--paneel);border:1px solid var(--lijn);border-radius:50%;width:1.4rem;height:1.4rem;display:flex;align-items:center;justify-content:center;font-size:.75rem;}
+  .prof:hover .av{transform:translateY(-3px);border-color:var(--txt);}
+  .prof .nm{font-size:.9rem;}.prof .slot{font-size:.72rem;color:var(--zacht);}
+  .prof.add .av{background:var(--paneel);border:2px dashed var(--lijn);color:var(--zacht);}
+  dialog{border:none;background:transparent;color:var(--txt);}
+  dialog::backdrop{background:rgba(4,4,3,.78);}
+  .modal{width:min(92vw,26rem);padding:1.6rem;}
+  .modal h3{font-size:1.25rem;margin-bottom:.4rem;font-family:var(--serif);font-weight:500;}
+  .modal .sub{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
+  .modal .veld{margin-bottom:.8rem;}
+  .avkies{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem;}
+  .avkies button{width:2.4rem;height:2.4rem;border-radius:.7rem;background:var(--paneel2);font-size:1.3rem;border:2px solid transparent;}
+  .avkies button.aan{border-color:var(--goud);}
+  .klkies{display:flex;gap:.4rem;margin-bottom:.9rem;}
+  .klkies button{width:1.8rem;height:1.8rem;border-radius:50%;border:2px solid transparent;}
+  .klkies button.aan{border-color:var(--txt);transform:scale(1.12);}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
+  .codebig{text-transform:uppercase;letter-spacing:.3em;text-align:center;font-size:1.25rem;font-weight:700;}
+  .mini{text-align:center;margin-top:1.4rem;font-size:.82rem;color:var(--zacht);}
+  .mini a{color:var(--goud);text-decoration:none;cursor:pointer;}
+  #balk{position:sticky;top:0;background:var(--bg);z-index:30;}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div id="balk"></div>
+
+<!-- 1. Welkom: nog geen gezin -->
+<section id="vWelkom" class="wrap" hidden>
   <div class="hero">
     <div class="kick">RTFoundation</div>
     <div class="logo">Gratis hulp om <b>vooruit</b> te komen</div>
-    <div class="deck">Voor gezinnen met weinig geld. Alles hier is en blijft kosteloos: onderwijs, een sterk cv, even rust, en de kans op een echte vakantie. Mogelijk gemaakt door de leden van Rahul Travel Group.</div>
+    <div class="deck">Voor gezinnen met weinig geld. Maak samen een gratis gezins-account: iedereen krijgt zijn eigen profiel, net als bij een streamingdienst. Zo weet de app wie je bent, en kan een ouder of verzorger het gezin bij elkaar houden en oproepen als de foundation op reis gaat.</div>
+    <div class="knoprij">
+      <button class="knop" id="bMaak">Maak een gezin aan</button>
+      <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
+    </div>
   </div>
+  <div class="uitleg">
+    <div class="kaart u"><b>Eén gezin, ieder een profiel</b><p>De ouder of verzorger is beheerder en beschermt zijn profiel met een pincode. Kinderen tikken gewoon hun eigen profiel aan.</p></div>
+    <div class="kaart u"><b>Alles onder één dak</b><p>Onderwijs, een cv-maker, even rust en de kans op een vakantie. De app kent je naam en helpt gericht.</p></div>
+    <div class="kaart u"><b>Altijd gratis</b><p>Geen kosten, geen kleine lettertjes. Mogelijk gemaakt door de leden van Rahul Travel Group.</p></div>
+  </div>
+  <div class="foot" style="margin-top:2rem;"><a href="/site/rtfoundation.html">Over de RTFoundation →</a></div>
+</section>
 
+<!-- 2. Profielkiezer: gezin bekend, kies wie je bent -->
+<section id="vProfielen" class="profwrap" hidden>
+  <div class="kick">Wie leert er vandaag?</div>
+  <div class="logo" style="font-size:1.9rem;margin-top:.4rem;" id="pGezinNaam">Gezin</div>
+  <div class="profgrid" id="pGrid"></div>
+  <div class="mini"><a id="pAnder">Ander gezin</a></div>
+</section>
+
+<!-- 3. De hub: ingelogd -->
+<section id="vHub" class="wrap" hidden>
+  <div class="hero" style="padding-top:.4rem;">
+    <div class="logo" id="hWelkom">Welkom terug</div>
+    <div class="deck">Alles hier is en blijft kosteloos: onderwijs, een sterk cv, even rust, en de kans op een echte vakantie.</div>
+  </div>
   <div class="tiles">
     <a class="kaart tile" href="leren.html">
-      <div class="ic">📚</div>
-      <h2>Leren</h2>
+      <div class="ic">📚</div><h2>Leren</h2>
       <p>Een live digitaal schoolbord en een eigen schrift met AI-bijleshulp. Zodat dure bijles thuis niet meer nodig is.</p>
       <span class="cta">Open het lesbord →</span>
     </a>
     <a class="kaart tile" href="cv.html">
-      <div class="ic">📄</div>
-      <h2>CV-maker</h2>
+      <div class="ic">📄</div><h2>CV-maker</h2>
       <p>Maak in een paar minuten een verzorgd cv om werk te vinden. Sla het op je toestel op en print het gratis.</p>
       <span class="cta">Maak je cv →</span>
     </a>
     <a class="kaart tile" href="rust.html">
-      <div class="ic">🌿</div>
-      <h2>Even rust</h2>
+      <div class="ic">🌿</div><h2>Even rust</h2>
       <p>Adem tot rust, teken vrij om te ontspannen, en lees een bemoedigende kaart. Een rustig hoekje voor het hele gezin.</p>
       <span class="cta">Neem even rust →</span>
     </a>
     <a class="kaart tile" href="reis.html">
-      <div class="ic">✈️</div>
-      <h2>Op reis met de foundation</h2>
+      <div class="ic">✈️</div><h2>Op reis met de foundation</h2>
       <p>De foundation stuurt gezinnen die het zwaar hebben op vakantie. Vraag het aan of draag een gezin voor, discreet en gratis.</p>
       <span class="cta">Vraag een reis aan →</span>
     </a>
   </div>
-
-  <div class="gratis"><b>Altijd gratis, geen account, geen kleine lettertjes.</b> De RTFoundation wordt betaald uit de bijdragen van RTG-leden. Bij elke reis die een lid maakt, komt hulp voor een ander gezin dichterbij.</div>
+  <div class="gratis"><b>Altijd gratis, geen kleine lettertjes.</b> De RTFoundation wordt betaald uit de bijdragen van RTG-leden. Bij elke reis die een lid maakt, komt hulp voor een ander gezin dichterbij.</div>
   <div class="foot"><a href="/site/rtfoundation.html">Over de RTFoundation →</a></div>
-</div>
+</section>
 
+<!-- gezin aanmaken -->
+<dialog id="dlgMaak"><div class="kaart modal">
+  <h3>Maak je gezin aan</h3>
+  <div class="sub">Dit doe je één keer. Daarna logt iedereen thuis in op hetzelfde gezin.</div>
+  <input class="veld" id="mGezin" placeholder="Naam van je gezin (bijv. Gezin De Wit)" maxlength="40">
+  <input class="veld" id="mNaam" placeholder="Jouw naam (beheerder)" maxlength="40">
+  <div class="avkies" id="mAv"></div>
+  <div class="klkies" id="mKl"></div>
+  <input class="veld" id="mPin" placeholder="Kies een pincode (4 tot 6 cijfers)" inputmode="numeric" maxlength="6">
+  <div class="fout" id="mFout"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="mDoe">Gezin aanmaken</button></div>
+</div></dialog>
+
+<!-- inloggen met gezinscode -->
+<dialog id="dlgLogin"><div class="kaart modal">
+  <h3>Inloggen bij je gezin</h3>
+  <div class="sub">Vul de gezinscode in die je bij het aanmaken hebt gekregen.</div>
+  <input class="veld codebig" id="gCode" placeholder="GEZINSCODE" maxlength="6" autocapitalize="characters">
+  <div class="fout" id="gFout"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="gDoe">Verder</button></div>
+</div></dialog>
+
+<!-- pincode voor een beschermd profiel -->
+<dialog id="dlgPin"><div class="kaart modal">
+  <h3 id="pinTitel">Pincode</h3>
+  <div class="sub">Dit profiel is beschermd met een pincode.</div>
+  <input class="veld codebig" id="pinIn" placeholder="••••" inputmode="numeric" maxlength="6" type="password">
+  <div class="fout" id="pinFout"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="pinDoe">Open profiel</button></div>
+</div></dialog>
+
+<script src="sessie.js"></script>
 <script>
+const $ = s => document.querySelector(s);
+const api = Sessie.api;
+const AVATARS = ['🙂','😀','🦊','🐼','🐵','🦁','🐯','🐧','🦉','🐢','🌟','⚽','🎨','🎧','📚','🚀','🌈','🐬','🦄','👑'];
+const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
+let mAv = '👑', mKl = KLEUREN[0], pinProfiel = null;
+
+function toon(id){ ['vWelkom','vProfielen','vHub'].forEach(v => $('#'+v).hidden = (v!==id)); }
+
+// avatar/kleur kiezers vullen
+(function(){
+  const av = $('#mAv'); AVATARS.forEach(a=>{ const b=document.createElement('button'); b.textContent=a; if(a===mAv)b.classList.add('aan'); b.onclick=()=>{ mAv=a; [...av.children].forEach(c=>c.classList.toggle('aan',c.textContent===a)); }; av.appendChild(b); });
+  const kl = $('#mKl'); KLEUREN.forEach(c=>{ const b=document.createElement('button'); b.style.background=c; if(c===mKl)b.classList.add('aan'); b.onclick=()=>{ mKl=c; [...kl.children].forEach(x=>x.classList.toggle('aan',x.style.background===b.style.background)); }; kl.appendChild(b); });
+})();
+
+document.querySelectorAll('[data-sluit]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
+$('#gCode').addEventListener('input', e=> e.target.value = e.target.value.toUpperCase());
+
+// ---- start: bepaal welk scherm ----
+async function start(){
+  const hash = location.hash;
+  const s = Sessie.huidig();
+  if (s && s.token && hash !== '#profielen'){
+    // controleer token; toon hub
+    const d = await Sessie.ophalen();
+    if (d && d.profiel){ Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toon('vHub'); return; }
+    Sessie.wisProfiel();
+  }
+  if (s && s.code){ // gezin bekend: toon profielkiezer
+    location.hash='';
+    await profielen(s.code);
+    return;
+  }
+  toon('vWelkom');
+}
+
+async function profielen(code){
+  try{
+    const d = await api('/gezin/inloggen', { code });
+    Sessie.zet(Object.assign(Sessie.huidig()||{}, { code, gezin: d.gezin }));
+    $('#pGezinNaam').textContent = d.gezin.naam;
+    const grid = $('#pGrid'); grid.innerHTML='';
+    d.profielen.forEach(p=>{
+      const a = document.createElement('button'); a.className='prof';
+      a.innerHTML = '<span class="av" style="background:'+p.kleur+'">'+p.avatar+(p.heeftPin?'<span class="slot-pin">🔒</span>':'')+'</span><span class="nm">'+esc(p.naam)+'</span><span class="slot">'+rolTekst(p)+'</span>';
+      a.onclick = ()=> kies(code, p);
+      grid.appendChild(a);
+    });
+    toon('vProfielen');
+  }catch(e){ alert(e.message); Sessie.uitloggen(); toon('vWelkom'); }
+}
+function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid'}[p.rol]||''); }
+
+async function kies(code, p){
+  if (p.heeftPin){ pinProfiel = { code, id: p.id, naam: p.naam }; $('#pinTitel').textContent='Hoi '+p.naam; $('#pinIn').value=''; $('#pinFout').textContent=''; $('#dlgPin').showModal(); setTimeout(()=>$('#pinIn').focus(),50); return; }
+  await open(code, p.id, '');
+}
+async function open(code, profielId, pin){
+  const d = await api('/gezin/profiel/kies', { code, profielId, pin });
+  Sessie.zet({ code, token: d.token, gezin: d.gezin, profiel: d.profiel });
+  location.hash=''; location.reload();
+}
+
+$('#pinDoe').addEventListener('click', async ()=>{
+  $('#pinFout').textContent='';
+  try{ await open(pinProfiel.code, pinProfiel.id, $('#pinIn').value.trim()); }
+  catch(e){ $('#pinFout').textContent = e.message; }
+});
+$('#pinIn').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#pinDoe').click(); });
+
+$('#bMaak').addEventListener('click', ()=> $('#dlgMaak').showModal());
+$('#bLogin').addEventListener('click', ()=> $('#dlgLogin').showModal());
+$('#pAnder').addEventListener('click', ()=>{ Sessie.uitloggen(); toon('vWelkom'); });
+
+$('#mDoe').addEventListener('click', async ()=>{
+  $('#mFout').textContent='';
+  try{
+    const d = await api('/gezin/maak', { gezinsnaam: $('#mGezin').value, naam: $('#mNaam').value, pin: $('#mPin').value.trim(), avatar: mAv, kleur: mKl });
+    Sessie.zet({ code: d.code, token: d.token, gezin: d.gezin, profiel: d.profiel });
+    $('#dlgMaak').close();
+    alert('Je gezin is aangemaakt! Deel de gezinscode met je gezin: ' + d.code + '\n\nSchrijf hem ergens op; hiermee logt iedereen in.');
+    location.reload();
+  }catch(e){ $('#mFout').textContent = e.message; }
+});
+$('#gDoe').addEventListener('click', async ()=>{
+  $('#gFout').textContent='';
+  const code = $('#gCode').value.trim().toUpperCase();
+  try{ await api('/gezin/inloggen', { code }); $('#dlgLogin').close(); await profielen(code); }
+  catch(e){ $('#gFout').textContent = e.message; }
+});
+
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+window.addEventListener('hashchange', start);
+start();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>

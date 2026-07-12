@@ -113,12 +113,16 @@
   <button class="knop" style="flex:1;" id="btnBekijk">Bekijk cv</button>
 </div>
 
+<script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const KEY = 'rtf_cv';
 let cv = { velden:{}, werk:[], opleiding:[] };
 try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) cv=Object.assign(cv,s); }catch(e){}
+// het profiel kennen we al: vul de naam vast in als die nog leeg is
+const _pnaam = (window.Sessie && Sessie.naam && Sessie.naam()) || '';
+if (_pnaam && !cv.velden.naam) cv.velden.naam = _pnaam;
 
 function bewaar(){ try{ localStorage.setItem(KEY, JSON.stringify(cv)); }catch(e){} }
 

@@ -812,6 +812,7 @@
         <div class="card" id="homeTrip"></div>
         <div class="card" id="homePay"></div>
         <div class="card" id="homeSalon"></div>
+        <div class="card" id="homeContacts"></div>
         <div class="card" id="homeCv"></div>
         <div class="card" id="homeFoundation"></div>
       </div>
@@ -1314,6 +1315,46 @@
       social = d; socialOK = true;
     } catch(e){ socialOK = false; }
     renderSocialBar();
+    renderContacts();
+  }
+
+  // Contacten-kaart op Home: na het toevoegen bericht of (video)bel je elkaar met één tik
+  function snelBel(key, naam, video){ dmWith = key; dmNaam = naam; beginGesprek(video); }
+  function renderContacts(){
+    const el = $('#homeContacts'); if (!el) return;
+    if (!socialOK || !user || user.tier === 'guest'){ el.style.display='none'; return; }
+    el.style.display='';
+    const conns = social.connections || [], reqs = social.requests || [];
+    const totUnread = conns.reduce((n,c)=> n + (c.unread||0), 0);
+    let html = '<div class="label">Contacten'+(totUnread?' · <span style="color:var(--gold)">'+totUnread+' nieuw</span>':'')+'</div>';
+    reqs.forEach(r => {
+      html += '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+
+        '<span class="sc-av" style="width:2rem;height:2rem;">'+initCN(r.codename)+'</span>'+
+        '<div style="flex:1;min-width:0;"><b>'+escT(r.codename)+'</b><div class="meta">wil verbinden</div></div>'+
+        '<button class="go" style="padding:.2rem .6rem;" data-cja="'+escT(r.key)+'">Accepteer</button>'+
+        '<button class="go" style="background:transparent;color:var(--muted);padding:.2rem .4rem;" data-cnee="'+escT(r.key)+'">✕</button></div>';
+    });
+    if (!conns.length && !reqs.length){
+      html += '<div class="big" style="font-size:1.02rem;">Nog geen contacten</div>'+
+        '<div class="meta" style="margin:.2rem 0 .7rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
+        '<button class="go" data-goto="salon">Iemand toevoegen →</button>';
+    } else {
+      html += conns.map(c =>
+        '<div class="hc-rij" style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+
+        '<span class="sc-av" style="width:2.2rem;height:2.2rem;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+initCN(c.codename)+(c.unread?'<span class="sc-badge">'+c.unread+'</span>':'')+'</span>'+
+        '<b style="flex:1;min-width:0;cursor:pointer;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">'+escT(c.codename)+'</b>'+
+        '<button class="go" style="padding:.2rem .55rem;" data-dm="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">Bericht</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .4rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">📞</button>'+
+        '<button class="go" style="background:transparent;padding:.2rem .4rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(c.codename)+'">🎥</button></div>'
+      ).join('') + '<button class="go" style="margin-top:.7rem;background:transparent;color:var(--muted);" data-goto="salon">+ Iemand toevoegen</button>';
+    }
+    el.innerHTML = html;
+    el.querySelectorAll('[data-dm]').forEach(b => b.addEventListener('click', () => openDm(b.dataset.dm, b.dataset.cn)));
+    el.querySelectorAll('[data-bel]').forEach(b => b.addEventListener('click', () => snelBel(b.dataset.bel, b.dataset.cn, false)));
+    el.querySelectorAll('[data-vid]').forEach(b => b.addEventListener('click', () => snelBel(b.dataset.vid, b.dataset.cn, true)));
+    el.querySelectorAll('[data-cja]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/member/connect/respond', { key: b.dataset.cja, action: 'accept' }); toast(T('sal.verbonden','Verbonden.')); loadSocial(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-cnee]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/member/connect/respond', { key: b.dataset.cnee, action: 'decline' }); loadSocial(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
   }
 
   function renderSocialBar(){
@@ -1443,8 +1484,10 @@
     const s = Math.round((Date.now() - call.t0) / 1000);
     $('#csTijd').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
   }
+  let iceConfig = null;
+  async function haalIce(){ if (iceConfig) return iceConfig; try { iceConfig = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
   function maakPc(){
-    const pc = new RTCPeerConnection({ iceServers: [] });
+    const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls:'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(t => pc.addTrack(t, call.stream));
     pc.onicecandidate = ev => { if (ev.candidate && call) API.call('/member/call', { toKey: call.withKey, kind: 'ice', payload: ev.candidate }).catch(()=>{}); };
     pc.ontrack = ev => {
@@ -1475,6 +1518,7 @@
   async function beginGesprek(video){
     if (!dmWith) return;
     if (call){ toast(T('sal.algesprek','Er loopt al een gesprek.')); return; }
+    await haalIce();
     const stream = await pakMedia(video);
     if (!stream) return;
     call = { withKey: dmWith, naam: dmNaam, video, richting: 'uit', pendingIce: [], stream, t0: 0 };
@@ -1489,6 +1533,7 @@
   async function neemOp(){
     $('#callIncoming').classList.remove('open');
     if (!inkomend) return;
+    await haalIce();
     const stream = await pakMedia(inkomend.video);
     if (!stream){ API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{}); inkomend = null; return; }
     call = { withKey: inkomend.from, naam: inkomend.codename, video: inkomend.video, richting: 'in', pendingIce: [], stream, t0: 0 };
@@ -2400,6 +2445,7 @@
       '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
     document.querySelectorAll('#content [data-goto]').forEach(b =>
       b.addEventListener('click', () => openTab(b.dataset.goto)));
+    renderContacts();
     renderFoundation();
   }
 

@@ -393,6 +393,12 @@ test('gezinsagenda en klusjes: plannen samen en sterren verdienen', async () => 
   assert.equal((await fetch(BASE + '/api/foundation/gezin/' + g.code + '/klussen?token=' + gt)).status, 403);
 });
 
+test('WebRTC: de app krijgt ijs-servers (STUN) voor het bellen', async () => {
+  const d = await json(await fetch(BASE + '/api/ice'));
+  assert.ok(Array.isArray(d.iceServers) && d.iceServers.length >= 1, 'er is minstens een ICE-server');
+  assert.ok(JSON.stringify(d.iceServers).includes('stun:'), 'STUN staat aan');
+});
+
 test('in de app chatten en bellen tussen gezinsleden', async () => {
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Praat', naam: 'Ma', pin: '2020' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Tim', rol: 'kind' }));

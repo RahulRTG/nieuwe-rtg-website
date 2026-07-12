@@ -1088,6 +1088,20 @@ app.post('/api/member/call', auth, (req, res) => {
 app.get('/api/push/key', (req, res) => {
   res.json({ key: webpush && db.data.vapid ? db.data.vapid.publicKey : null });
 });
+
+/* ICE-servers voor WebRTC-bellen (leden onderling en de RTFoundation-gezinnen).
+   STUN werkt voor de meeste verbindingen; achter een streng mobiel netwerk
+   (symmetrische NAT) is een TURN-server nodig om het beeld er altijd doorheen te
+   krijgen. Zet die aan met de omgevingsvariabelen TURN_URL/TURN_USER/TURN_PASS.
+   Zie docs/turn-server.md voor de volledige productie-opzet. */
+function iceServers() {
+  const list = [{ urls: (process.env.STUN_URL || 'stun:stun.l.google.com:19302').split(',').map(s => s.trim()) }];
+  if (process.env.TURN_URL && process.env.TURN_USER && process.env.TURN_PASS) {
+    list.push({ urls: process.env.TURN_URL.split(',').map(s => s.trim()), username: process.env.TURN_USER, credential: process.env.TURN_PASS });
+  }
+  return list;
+}
+app.get('/api/ice', (req, res) => res.json({ iceServers: iceServers() }));
 app.post('/api/push/subscribe', auth, (req, res) => {
   if (!webpush) return res.status(501).json({ error: 'Push niet beschikbaar.' });
   const sub = req.body.subscription;

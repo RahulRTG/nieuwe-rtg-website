@@ -22,6 +22,7 @@
       S.mijnId = opts.mijnId; S.mijnNaam = opts.mijnNaam || 'ik';
       GezinRT.setLeden(opts.leden || []);
       onChat = opts.onChat || null; onBelStatus = opts.onBelStatus || null;
+      haalIce();
       injectUI();
       verbind();
     },
@@ -48,8 +49,10 @@
   function belUI(open) { var s = document.getElementById('grt-call'); if (s) s.style.display = open ? 'flex' : 'none'; if (!open) { var r = document.getElementById('grt-remote'), l = document.getElementById('grt-local'); if (r) r.srcObject = null; if (l) l.srcObject = null; } }
   function tijdTik() { if (!call) return; var s = Math.round((Date.now() - call.t0) / 1000); var el = document.getElementById('grt-tijd'); if (el) el.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
   function pakMedia(video) { return navigator.mediaDevices.getUserMedia({ audio: true, video: video ? { facingMode: 'user' } : false }).catch(function () { return null; }); }
+  var iceConfig = null;
+  function haalIce() { if (iceConfig) return Promise.resolve(iceConfig); return fetch('/api/ice').then(function (r) { return r.json(); }).then(function (d) { iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
   function maakPc() {
-    var pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    var pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(function (t) { pc.addTrack(t, call.stream); });
     pc.onicecandidate = function (ev) { if (ev.candidate && call) seinNaar(call.met, 'ice', ev.candidate); };
     pc.ontrack = function (ev) { var v = document.getElementById('grt-remote'); if (v && v.srcObject !== ev.streams[0]) v.srcObject = ev.streams[0]; };
@@ -71,6 +74,7 @@
   }
   function beginGesprek(naarId, video) {
     if (call) { return; }
+    haalIce();
     pakMedia(video).then(function (stream) {
       if (!stream) { alert('Geen toegang tot microfoon of camera.'); return; }
       call = { met: naarId, video: video, richting: 'uit', pendingIce: [], stream: stream, t0: 0 };

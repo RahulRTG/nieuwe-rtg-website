@@ -86,6 +86,11 @@
     <div class="lijst" id="verzoeken"></div>
   </div>
 
+  <div id="meekijkBlok" hidden>
+    <div class="sec">Meekijken met je kinderen</div>
+    <div class="lijst" id="meekijk"></div>
+  </div>
+
   <div class="sec">Mijn vrienden</div>
   <div class="lijst" id="vrienden"><div class="leeg">Laden...</div></div>
 </div>
@@ -172,10 +177,12 @@ async function laad(){
     '<div class="rij"><span class="av">'+initcn(c.codename)+'</span><div class="nm">'+esc(c.codename)+(c.unread?'<span class="badge">'+c.unread+'</span>':'')+
     '<small>'+(c.tier==='rtf'?'RTFoundation':'RTG')+(c.last?' · '+esc(c.last):'')+'</small></div>'+
     '<button class="knop mini" data-chat="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'">Chat</button>'+
-    '<button class="knop grijs mini" data-snap="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'">📷</button></div>'
+    '<button class="knop grijs mini" data-snap="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'">📷</button>'+
+    '<button class="knop grijs mini" data-blok="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'" title="Blokkeren of melden">🚫</button></div>'
   ).join('') : '<div class="leeg">Nog geen vrienden. Zoek hierboven op codenaam.</div>';
   $('#vrienden').querySelectorAll('[data-chat]').forEach(b=> b.addEventListener('click', ()=> openChat(b.dataset.chat, b.dataset.cn)));
   $('#vrienden').querySelectorAll('[data-snap]').forEach(b=> b.addEventListener('click', ()=> kiesSnap(b.dataset.snap, b.dataset.cn)));
+  $('#vrienden').querySelectorAll('[data-blok]').forEach(b=> b.addEventListener('click', ()=> blokkeerMelden(b.dataset.blok, b.dataset.cn)));
   // verzoeken (niet voor kinderen)
   const reqs = d.requests||[];
   $('#verzoekenBlok').hidden = !reqs.length;
@@ -189,16 +196,55 @@ async function laad(){
   const tk = d.teKeuren||[];
   $('#teKeurenBlok').hidden = !(mij.beheerder && tk.length);
   $('#teKeuren').innerHTML = tk.map(t=>
-    '<div class="rij"><span class="av">'+initcn(t.ander)+'</span><div class="nm">'+esc(t.ander)+'<small>wil bevriend zijn met '+esc(t.kind)+' ('+(t.richting==='uit'?'jouw kind vroeg dit':'verzoek aan jouw kind')+')</small></div>'+
+    '<div class="rij"><span class="av">'+initcn(t.ander)+'</span><div class="nm">'+esc(t.ander)+
+    (t.volwassene?' <span class="badge" style="background:var(--rood);">volwassene</span>':'')+
+    '<small>wil bevriend zijn met '+esc(t.kind)+' ('+(t.richting==='uit'?'jouw kind vroeg dit':'verzoek aan jouw kind')+')</small></div>'+
     '<button class="knop mini" data-goja="'+esc(t.kindHandle)+'|'+esc(t.anderKey)+'">Goedkeuren</button><button class="knop grijs mini" data-gonee="'+esc(t.kindHandle)+'|'+esc(t.anderKey)+'">Weiger</button></div>'
   ).join('');
   $('#teKeuren').querySelectorAll('[data-goja]').forEach(b=> b.addEventListener('click', ()=> keur(b.dataset.goja, true)));
   $('#teKeuren').querySelectorAll('[data-gonee]').forEach(b=> b.addEventListener('click', ()=> keur(b.dataset.gonee, false)));
+  // ouder-meekijk: de contacten van elk kind
+  renderMeekijk(d.kinderen||[]);
   laadStories(); laadSnaps();
 }
 async function keur(pair, akkoord){
   const [kindHandle, anderKey] = pair.split('|');
   try{ await soc('/goedkeuren', { kindHandle, anderKey, akkoord }); laad(); }catch(e){ alert(e.message); }
+}
+
+// ---- blokkeren en melden ----
+async function blokkeerMelden(key, cn){
+  const keuze = prompt('Wat wil je doen met '+cn+'?\n\nTyp 1 = Blokkeren (geen contact meer)\nTyp 2 = Melden bij de beheerder\nTyp 3 = Blokkeren en melden', '1');
+  if (keuze === null) return;
+  try{
+    if (keuze === '2' || keuze === '3'){ const reden = prompt('Wat is er aan de hand? (kort)','') || ''; await soc('/report', { key, reden }); }
+    if (keuze === '1' || keuze === '3'){ await soc('/block', { key }); }
+    alert(keuze === '2' ? 'Bedankt, je melding is doorgegeven.' : 'Gedaan. Deze codenaam kan geen contact meer met je maken.');
+    laad();
+  }catch(e){ alert(e.message); }
+}
+
+// ---- ouder-meekijk: contacten van elk kind ----
+function renderMeekijk(kinderen){
+  $('#meekijkBlok').hidden = !(mij.beheerder && kinderen.length);
+  if (!(mij.beheerder && kinderen.length)) return;
+  $('#meekijk').innerHTML = kinderen.map(k=>
+    '<div class="rij"><span class="av">'+initcn(k.codenaam)+'</span><div class="nm">'+esc(k.codenaam)+'<small>bekijk met wie je kind contact heeft</small></div>'+
+    '<button class="knop grijs mini" data-kijk="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Bekijk</button></div>'
+  ).join('');
+  $('#meekijk').querySelectorAll('[data-kijk]').forEach(b=> b.addEventListener('click', ()=> kindContacten(b.dataset.kijk, b.dataset.cn)));
+}
+async function kindContacten(kindHandle, cn){
+  let d; try{ d = await soc('/kind/contacten', { kindHandle }); }catch(e){ alert(e.message); return; }
+  const lijst = d.contacten||[];
+  if (!lijst.length){ alert(cn+' heeft nog geen contacten.'); return; }
+  const regels = lijst.map((c,i)=> (i+1)+'. '+c.codename+(c.volwassene?' (VOLWASSENE)':'')+' - '+c.status).join('\n');
+  const kies = prompt('Contacten van '+cn+':\n\n'+regels+'\n\nTyp een nummer om dat contact te verwijderen, of Annuleer.','');
+  if (kies === null) return;
+  const idx = parseInt(kies,10)-1;
+  if (isNaN(idx) || !lijst[idx]) return;
+  if (!confirm('Contact met '+lijst[idx].codename+' verwijderen voor '+cn+'?')) return;
+  try{ await soc('/kind/verwijder', { kindHandle, anderKey: lijst[idx].key }); alert('Contact verwijderd.'); }catch(e){ alert(e.message); }
 }
 
 // ---- zoeken ----

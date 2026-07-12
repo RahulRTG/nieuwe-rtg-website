@@ -591,6 +591,53 @@ test('cross-app bellen: RTG en RTF sturen belsignalen over en weer via het live-
   }
 });
 
+test('sociale veiligheid: blokkeren, melden en ouder-meekijk op kindcontacten', async () => {
+  const now = Date.now();
+  const rtg = await json(await raw('/auth/register', { name: 'Veilig Lid', email: 'vl' + now + '@v.test', phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
+  const rtgTok = rtg.token, rtgCn = rtg.state.user.codename;
+  await raw('/member/connections', {}, rtgTok);
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Veilig Fam', naam: 'Ouder', pin: '2468', groep: 'volw' }));
+  const mij = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token));
+  const ouderCn = mij.profiel.codenaam;
+  const kind0 = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Sam', rol: 'kind', groep: 'kind' }));
+  const kindCn = kind0.profiel.codenaam;
+
+  // RTG en ouder worden vrienden
+  const found = await json(await raw('/member/find', { q: ouderCn.split(' ')[0] }, rtgTok));
+  const ouderKey = found.results.find(r => r.codename === ouderCn).key;
+  await raw('/member/connect', { key: ouderKey }, rtgTok);
+  const oConns = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
+  await raw('/rtf/social/respond', { code: g.code, token: g.token, key: oConns.requests.find(x => x.codename === rtgCn).key, action: 'accept' });
+
+  // BLOKKEREN: het lid blokkeert de ouder; de vriendschap valt weg en de ouder kan niet meer appen
+  assert.equal((await raw('/member/block', { key: ouderKey }, rtgTok)).status, 200);
+  const naBlok = await json(await raw('/member/connections', {}, rtgTok));
+  assert.ok(!(naBlok.connections || []).some(c => c.key === ouderKey), 'na blokkeren is de vriendschap weg');
+  assert.equal((await raw('/rtf/social/dm/send', { code: g.code, token: g.token, toKey: (await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }))).me, text: 'hoi' })).status, 403, 'de ouder kan niet meer terugkoppelen');
+  // opnieuw verbinden lukt niet zolang de blokkade staat
+  assert.equal((await raw('/member/connect', { key: ouderKey }, rtgTok)).status, 403, 'verbinden met een geblokkeerde kan niet');
+  await raw('/member/unblock', { key: ouderKey }, rtgTok);
+  assert.equal((await raw('/member/connect', { key: ouderKey }, rtgTok)).status, 200, 'na deblokkeren mag het weer');
+
+  // MELDEN: een melding wordt aangenomen
+  assert.equal((await raw('/member/report', { key: ouderKey, reden: 'ongepast' }, rtgTok)).status, 200);
+
+  // OUDER-MEEKIJK: het lid vraagt het kind aan (wacht op ouder), de ouder ziet dat het een volwassene is
+  const memberKey = (await json(await raw('/member/connections', {}, rtgTok))).me;
+  const found2 = await json(await raw('/member/find', { q: kindCn.split(' ')[0] }, rtgTok));
+  const kindKey = found2.results.find(r => r.codename === kindCn).key;
+  await raw('/member/connect', { key: kindKey }, rtgTok);
+  const bConns = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
+  const tk = (bConns.teKeuren || []).find(t => t.kindHandle === kindKey);
+  assert.ok(tk && tk.volwassene === true, 'de ouder ziet dat het verzoek van een volwassene komt');
+  // de ouder kijkt de contacten van het kind in en verwijdert het lopende contact met het lid
+  const contacten = await json(await raw('/rtf/social/kind/contacten', { code: g.code, token: g.token, kindHandle: kindKey }));
+  assert.ok((contacten.contacten || []).some(c => c.key === memberKey), 'de ouder ziet het contact van het kind met het lid');
+  assert.equal((await raw('/rtf/social/kind/verwijder', { code: g.code, token: g.token, kindHandle: kindKey, anderKey: memberKey })).status, 200);
+  const na = await json(await raw('/rtf/social/kind/contacten', { code: g.code, token: g.token, kindHandle: kindKey }));
+  assert.ok(!(na.contacten || []).some(c => c.key === memberKey), 'na verwijderen is het contact weg');
+});
+
 test('automatisch vertalen: bericht komt in de taal van de lezer, beide kanten op', async () => {
   // Nederlands naar Engels (vaste seed-zin) en Engels naar Nederlands (woordniveau)
   const nl2en = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'Snackbar dicht, telefoon uit, ik ben even niemands baas.', to: 'en' }) })));

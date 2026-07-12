@@ -3,7 +3,7 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, db, save, rtf, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken } = kern;
+  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
 
 // leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam)
 app.post('/api/member/find', auth, (req, res) => {
@@ -76,6 +76,7 @@ app.post('/api/member/dm/send', auth, (req, res) => {
 app.post('/api/member/call', auth, (req, res) => {
   if (geenGast(req, res)) return;
   const ander = String(req.body.toKey || '');
+  if (isGeblokkeerd(req.session.key, ander)) return res.status(403).json({ error: 'Dit contact is niet beschikbaar.' });
   const c = connectieTussen(req.session.key, ander);
   if (!verbActief(c)) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
   const kind = String(req.body.kind || '');
@@ -142,7 +143,9 @@ app.post('/api/rtf/social/respond', (req, res) => {
 app.post('/api/rtf/social/connections', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   const sc = socialConnecties(s.handle);
-  res.json({ me: s.handle, codename: s.codenaam, kind: s.kind, beheerder: s.beheerder, connections: sc.connections, requests: sc.requests, teKeuren: s.beheerder ? socialTeKeuren(s.g.code) : [] });
+  // beheerder: ook de kinderen van het gezin, zodat de ouder kan meekijken
+  const kinderen = s.beheerder ? rtf.socialProfielen().filter(sp => sp.gezinCode === s.g.code && sp.kind).map(sp => ({ handle: sp.handle, codenaam: sp.codenaam })) : [];
+  res.json({ me: s.handle, codename: s.codenaam, kind: s.kind, beheerder: s.beheerder, connections: sc.connections, requests: sc.requests, teKeuren: s.beheerder ? socialTeKeuren(s.g.code) : [], kinderen });
 });
 app.post('/api/rtf/social/dm', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
@@ -209,12 +212,36 @@ app.get('/api/rtf/social/stream', (req, res) => {
 app.post('/api/rtf/social/call', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   const ander = String(req.body.toKey || '');
+  if (isGeblokkeerd(s.handle, ander)) return res.status(403).json({ error: 'Dit contact is niet beschikbaar.' });
   if (!verbActief(connectieTussen(s.handle, ander))) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
   const kind = String(req.body.kind || '');
   if (!['ring', 'accept', 'offer', 'answer', 'ice', 'hangup', 'decline', 'busy'].includes(kind))
     return res.status(400).json({ error: 'Onbekend signaal.' });
   sseToCustomer(ander, 'call', { kind, from: s.handle, codename: s.codenaam, video: !!req.body.video, payload: req.body.payload || null });
   res.json({ ok: true });
+});
+
+/* ---------- veiligheid: blokkeren, melden, ouder-meekijk ---------- */
+// RTG-lid
+app.post('/api/member/block', auth, (req, res) => { if (geenGast(req, res)) return; const r = blokkeer(req.session.key, String(req.body.key || '')); res.status(r.status).json(r); });
+app.post('/api/member/unblock', auth, (req, res) => { if (geenGast(req, res)) return; const r = deblokkeer(req.session.key, String(req.body.key || '')); res.status(r.status).json(r); });
+app.post('/api/member/report', auth, (req, res) => { if (geenGast(req, res)) return; const r = meldMisbruik(req.session.key, String(req.body.key || ''), req.body.reden); res.status(r.status).json(r); });
+// RTF-gezinslid
+app.post('/api/rtf/social/block', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; const r = blokkeer(s.handle, String(req.body.key || '')); res.status(r.status).json(r); });
+app.post('/api/rtf/social/unblock', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; const r = deblokkeer(s.handle, String(req.body.key || '')); res.status(r.status).json(r); });
+app.post('/api/rtf/social/report', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; const r = meldMisbruik(s.handle, String(req.body.key || ''), req.body.reden); res.status(r.status).json(r); });
+// ouder-meekijk: de contacten van een kind bekijken en er een verwijderen (alleen de beheerder)
+app.post('/api/rtf/social/kind/contacten', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan meekijken.' });
+  const r = kindContacten(s.g.code, String(req.body.kindHandle || ''));
+  res.status(r.status).json(r.error ? { error: r.error } : { contacten: r.contacten });
+});
+app.post('/api/rtf/social/kind/verwijder', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan dit.' });
+  const r = kindVerwijder(s.g.code, String(req.body.kindHandle || ''), String(req.body.anderKey || ''));
+  res.status(r.status).json(r);
 });
 
 // web-push: publieke sleutel + subscription opslaan

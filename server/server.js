@@ -448,6 +448,8 @@ function initRealtime() {
   if (!db.data.applyChats) db.data.applyChats = {};                // chat tussen sollicitant en werkgever (na uitnodigen/aannemen)
   if (!db.data.snaps) db.data.snaps = [];                          // Snapchat-achtige snaps: foto die na bekijken verdwijnt
   if (!db.data.stories) db.data.stories = [];                      // 24-uurs verhalen, zichtbaar voor vrienden
+  if (!db.data.blocks) db.data.blocks = [];                        // { door, doel, at } geblokkeerde codenamen (beide kanten dicht)
+  if (!db.data.reports) db.data.reports = [];                      // { door, doel, reden, at } meldingen van misbruik voor de backoffice
   if (!db.data.cvs) db.data.cvs = {};                               // cv per lid (cv-builder in de leden-app)
   if (webpush) {
     if (!db.data.vapid) {
@@ -843,6 +845,53 @@ function codenaamVan(handle) {
 function soortVan(handle) { return isRtf(handle) ? 'rtf' : ((db.data.memberDir[handle] || {}).tier || 'rtg'); }
 function isKindHandle(handle) { if (isRtf(handle)) { const i = rtf.profielInfoVanHandle(handle); return !!(i && i.kind); } return false; }
 function verbActief(c) { return !!(c && c.status === 'accepted' && (!c.voogdWacht || c.voogdWacht.length === 0)); }
+
+/* ---------- sociale veiligheid: blokkeren, melden, snelheidslimiet ----------
+   Blokkeren werkt beide kanten op: geen verzoek, chat, snap of belsignaal meer.
+   De snelheidslimiet remt spam en pesten (te veel verzoeken/berichten/snaps).
+   Een melding komt in db.data.reports terecht voor de backoffice. */
+const isGeblokkeerd = (a, b) => db.data.blocks.some(x => (x.door === a && x.doel === b) || (x.door === b && x.doel === a));
+function blokkeer(mij, doel) {
+  if (!mij || !doel || mij === doel) return { status: 400, error: 'Ongeldig.' };
+  if (!db.data.blocks.some(x => x.door === mij && x.doel === doel)) db.data.blocks.push({ door: mij, doel, at: new Date().toISOString() });
+  // bestaande vriendschap of openstaand verzoek meteen weg
+  db.data.connections = db.data.connections.filter(c => !((c.a === mij && c.b === doel) || (c.a === doel && c.b === mij)));
+  save();
+  return { status: 200, ok: true };
+}
+function deblokkeer(mij, doel) { db.data.blocks = db.data.blocks.filter(x => !(x.door === mij && x.doel === doel)); save(); return { status: 200, ok: true }; }
+function meldMisbruik(mij, doel, reden) {
+  if (!doel) return { status: 400, error: 'Wie wil je melden?' };
+  db.data.reports.push({ door: mij, doel, codenaamDoel: codenaamVan(doel), reden: String(reden || '').replace(/[<>]/g, '').slice(0, 300), at: new Date().toISOString() });
+  db.data.reports = db.data.reports.slice(-5000);
+  save();
+  return { status: 200, ok: true };
+}
+const sociaalTellers = new Map(); // actie:handle -> { n, reset }
+function sociaalRate(mij, actie, max, perMs) {
+  const k = actie + ':' + mij, nu = Date.now();
+  let t = sociaalTellers.get(k);
+  if (!t || t.reset < nu) { t = { n: 0, reset: nu + perMs }; sociaalTellers.set(k, t); }
+  t.n++;
+  return t.n <= max;
+}
+// ouder-meekijk: de contacten van een kind, en het recht om er een te verwijderen
+function kindContacten(gezinCode, kidHandle) {
+  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.kind);
+  if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
+  const contacten = db.data.connections.filter(c => c.a === kidHandle || c.b === kidHandle).map(c => {
+    const ander = c.a === kidHandle ? c.b : c.a;
+    return { key: ander, codename: codenaamVan(ander), soort: soortVan(ander), volwassene: !isKindHandle(ander), status: verbActief(c) ? 'vriend' : (c.voogdWacht && c.voogdWacht.length ? 'wacht-op-ouder' : 'aangevraagd') };
+  });
+  return { status: 200, contacten };
+}
+function kindVerwijder(gezinCode, kidHandle, anderHandle) {
+  const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.kind);
+  if (!okKid) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
+  db.data.connections = db.data.connections.filter(c => !((c.a === kidHandle && c.b === anderHandle) || (c.a === anderHandle && c.b === kidHandle)));
+  save();
+  return { status: 200, ok: true };
+}
 function statusVan(mij, c) {
   if (!c) return 'geen';
   if (verbActief(c)) return 'verbonden';
@@ -863,6 +912,8 @@ function socialZoek(mij, q) {
 function socialVerbind(mij, naar) {
   if (naar === mij) return { status: 400, error: 'Dat ben je zelf.' };
   if (!codeExists(naar)) return { status: 404, error: 'Deze codenaam kennen we niet.' };
+  if (isGeblokkeerd(mij, naar)) return { status: 403, error: 'Verbinden met deze codenaam kan niet.' };
+  if (!sociaalRate(mij, 'verbind', 30, 60 * 60 * 1000)) return { status: 429, error: 'Te veel vriendschapsverzoeken. Probeer het later opnieuw.' };
   let c = connectieTussen(mij, naar);
   if (c && verbActief(c)) return { status: 200, ok: true, st: 'verbonden' };
   if (c) return { status: 200, ok: true, st: statusVan(mij, c) };
@@ -909,8 +960,10 @@ function socialDm(mij, ander) {
   return { status: 200, messages: chat.messages.slice(-80), codename: codenaamVan(ander) };
 }
 function socialDmSend(mij, ander, text) {
+  if (isGeblokkeerd(mij, ander)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
   if (!verbActief(connectieTussen(mij, ander))) return { status: 403, error: 'Je bent nog niet verbonden met deze codenaam.' };
-  text = String(text || '').slice(0, 500).trim();
+  if (!sociaalRate(mij, 'dm', 60, 60 * 1000)) return { status: 429, error: 'Rustig aan met berichten sturen.' };
+  text = String(text || '').replace(/[<>]/g, '').slice(0, 500).trim();
   if (!text) return { status: 400, error: 'Leeg bericht.' };
   const k = dmSleutel(mij, ander);
   const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
@@ -926,7 +979,7 @@ function socialTeKeuren(gezinCode) {
   return db.data.connections.filter(c => c.status === 'pending' && c.voogdWacht && c.voogdWacht.some(h => kids.has(h))).map(c => {
     const kid = c.voogdWacht.find(h => kids.has(h));
     const ander = c.a === kid ? c.b : c.a;
-    return { kindHandle: kid, kind: codenaamVan(kid), anderKey: ander, ander: codenaamVan(ander), anderSoort: soortVan(ander), richting: c.requestedBy === kid ? 'uit' : 'in', at: c.at };
+    return { kindHandle: kid, kind: codenaamVan(kid), anderKey: ander, ander: codenaamVan(ander), anderSoort: soortVan(ander), volwassene: !isKindHandle(ander), richting: c.requestedBy === kid ? 'uit' : 'in', at: c.at };
   });
 }
 function socialGoedkeur(gezinCode, kidHandle, anderHandle, akkoord) {
@@ -957,9 +1010,11 @@ function opschonenSnaps() {
   if (voor !== db.data.snaps.length + db.data.stories.length) save();
 }
 function snapSturen(van, naar, foto, tekst) {
+  if (isGeblokkeerd(van, naar)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
   if (!zijnVrienden(van, naar)) return { status: 403, error: 'Je kunt alleen snappen naar een vriend.' };
+  if (!sociaalRate(van, 'snap', 40, 5 * 60 * 1000)) return { status: 429, error: 'Rustig aan met snaps sturen.' };
   if (!geldigeFoto(foto)) return { status: 400, error: 'Kies een foto (max ~900 kB).' };
-  const snap = { id: crypto.randomBytes(5).toString('hex'), van, naar, foto, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), bekeken: false };
+  const snap = { id: crypto.randomBytes(5).toString('hex'), van, naar, foto, tekst: String(tekst || '').replace(/[<>]/g, '').slice(0, 120), at: new Date().toISOString(), bekeken: false };
   db.data.snaps.push(snap);
   db.data.snaps = db.data.snaps.slice(-2000);
   save();
@@ -2601,25 +2656,26 @@ const kern = {
   POS_METHODS, PRODUCTION, RIT_KETEN, RIT_LEGACY, RIT_MELDING, RUN_STATIONS, SHIFT_NAMES, SNAP_TTL,
   STAFF_SEED, STORY_TTL, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN, ZAAK_OPTIES, ZZP,
   accounts, addContact, addTicket, aiFindDoor, aiFindRoom, aiSystemPrompt, alcoholGrensVan, anthropic,
-  app, appUrl, applyChatPubliek, auth, broadcastSync, canEngage, cannedAnswer, cannedBoekhouder,
-  cateringDishes, centen, chatApplicant, chatKeyOf, chatStuur, checkCred, coachCache, coachRules,
-  codeExists, codenaamVan, conciergeInbox, connectedSupplierCodes, connectieTussen, convOf, crypto, cvReady,
-  db, deptsFor, dirTouch, dmSleutel, eisAccount, engageError, ensureApplyChat, ensureSupplierDefaults,
-  etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, findPartner, findStaffPartner, findSupplier,
-  forgetSession, fs, gcCode, geborenVan, geenGast, geldigeFoto, generateAiReply, getChat,
-  guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, isKindHandle, isRtf,
-  klokVan, ledenPrijs, leeftijdVan, leeftijdsgroepVan, liveCodename, liveStateFor, load, logActivity,
-  loginFails, mail, makeSupplierCode, managerOnly, meldWerkgever, memberSays, memberTemplate, myApplications,
+  app, appUrl, applyChatPubliek, auth, blokkeer, broadcastSync, bus, canEngage,
+  cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant, chatKeyOf, chatStuur, checkCred,
+  coachCache, coachRules, codeExists, codenaamVan, conciergeInbox, connectedSupplierCodes, connectieTussen, convOf,
+  crypto, cvReady, db, deblokkeer, deptsFor, dirTouch, dmSleutel, eisAccount,
+  engageError, ensureApplyChat, ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor,
+  findPartner, findStaffPartner, findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast,
+  geldigeFoto, generateAiReply, getChat, guestsFor, hasContact, hasCred, haversine, i18n,
+  initRealtime, isGeblokkeerd, isKindHandle, isRtf, kindContacten, kindVerwijder, klokVan, ledenPrijs,
+  leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
+  mail, makeSupplierCode, managerOnly, meldMisbruik, meldWerkgever, memberSays, memberTemplate, myApplications,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, opschonenSnaps,
   optieAan, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner,
   publicSupplier, publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder,
   rtf, runItem, runKey, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder,
   sendPush, sendPushToUser, sessionFor, sessions, setRoomHk, snapOpenen, snapSturen, snapsVoor,
-  socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, socialVerbind, socialZoek,
-  soortVan, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor,
-  stationsForOrder, statusVan, supplierAuth, supplierState, toRad, tokenHash, tooManyTries, trChat,
-  trustVan, unlockDoor, urenVan, validDept, verbActief, verhaalBekijken, verhaalPlaatsen, verhalenVoor,
-  webpush, weekdagFactor, werkgeverSollicitatie, zijnVrienden
+  sociaalRate, sociaalTellers, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren,
+  socialVerbind, socialZoek, soortVan, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice,
+  sseToSupplier, stateFor, stationsForOrder, statusVan, supplierAuth, supplierState, toRad, tokenHash,
+  tooManyTries, trChat, trustVan, unlockDoor, urenVan, validDept, verbActief, verhaalBekijken,
+  verhaalPlaatsen, verhalenVoor, webpush, weekdagFactor, werkgeverSollicitatie, zijnVrienden
 };
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
    geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen

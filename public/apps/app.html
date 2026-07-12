@@ -988,6 +988,7 @@
       <div class="dm-call">
         <button id="dmBel" title="Bellen">📞</button>
         <button id="dmVideo" title="Videobellen">🎥</button>
+        <button id="dmBlok" title="Blokkeren of melden">🚫</button>
         <button class="ms-close" id="dmClose" aria-label="Sluiten">✕</button>
       </div>
     </div>
@@ -1638,6 +1639,16 @@
   }
   $('#dmBel').addEventListener('click', () => beginGesprek(false));
   $('#dmVideo').addEventListener('click', () => beginGesprek(true));
+  $('#dmBlok').addEventListener('click', async () => {
+    if (!dmWith) return;
+    const keuze = prompt('Wat wil je doen met ' + dmNaam + '?\n\n1 = Blokkeren\n2 = Melden\n3 = Blokkeren en melden', '1');
+    if (keuze === null) return;
+    try {
+      if (keuze === '2' || keuze === '3') { const reden = prompt('Wat is er aan de hand?', '') || ''; await API.call('/member/report', { key: dmWith, reden }); }
+      if (keuze === '1' || keuze === '3') { await API.call('/member/block', { key: dmWith }); $('#dm-sheet').classList.remove('open'); loadSocial(); }
+      toast(keuze === '2' ? T('sal.gemeld', 'Bedankt, je melding is doorgegeven.') : T('sal.geblokkeerd', 'Geblokkeerd.'));
+    } catch (e) { toast(e.message); }
+  });
 
   async function neemOp(){
     $('#callIncoming').classList.remove('open');

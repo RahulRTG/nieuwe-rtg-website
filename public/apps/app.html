@@ -859,6 +859,13 @@
         <div id="supplierList"></div>
       </div>
 
+      <div class="view" data-view="gezin">
+        <h2>Je gezinsruimte.</h2>
+        <p class="sub" id="gezinSub">De RTFoundation-gezinnen die je als oppas of familie volgt.</p>
+        <div class="card" id="gezinFamilies"></div>
+        <div class="card" id="gezinFeed"></div>
+      </div>
+
     </div>
 
     <div class="tabbar" id="tabbar">
@@ -868,6 +875,7 @@
       <button data-tab="ai"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg><span data-i18n="app.tab.ai">AI</span></button>
       <button data-tab="salon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="10.5" r="2.4"/><path d="M3.5 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><path d="M14.5 18.5c.5-2.2 1.6-3.4 3.4-3.4 1.4 0 2.6.8 3.1 2.4"/></svg><span data-i18n="app.tab.salon">Salon</span></button>
       <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="app.tab.tp">Ter plaatse</span></button>
+      <button data-tab="gezin" id="tabGezin" style="display:none;position:relative;"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-6-4.2-6-9a4 4 0 0 1 7.4-2A4 4 0 0 1 18 11c0 4.8-6 9-6 9z"/></svg><span>Gezin</span><span id="tabGezinDot" style="display:none;position:absolute;top:4px;right:18px;width:8px;height:8px;border-radius:50%;background:var(--burgundy,#C23A5E);"></span></button>
     </div>
   </div>
 
@@ -1658,6 +1666,7 @@
     renderTerPlaatse();
     loadCv();
     openTab('home');
+    if ((rtf.gekoppeld || []).length) ensurePush(false); // stil vernieuwen als het al aan staat
   }
 
   /* ---------- ter plaatse: bestellen bij RTG-partners ---------- */
@@ -2391,32 +2400,61 @@
     renderFoundation();
   }
 
-  /* ---------- RTFoundation: als oppas/opa/oma een gezin volgen ---------- */
+  /* ---------- RTFoundation: eigen gezinsruimte voor gekoppelde oppas/opa/oma ---------- */
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function renderFoundation(){
-    const el = $('#homeFoundation'); if (!el) return;
-    if (!user || !user.account){ el.style.display='none'; return; }
-    el.style.display='';
-    const m = (rtf.meldingen || []), g = (rtf.gekoppeld || []);
+    const homeEl = $('#homeFoundation'), tab = $('#tabGezin'), dot = $('#tabGezinDot');
+    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.style.display='none'; return; }
+    const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
     const ongelezen = m.filter(x=>!x.gelezen).length;
-    let html = '<div class="label">RTFoundation'+(ongelezen?' · <span style="color:var(--gold)">'+ongelezen+' nieuw</span>':'')+'</div>';
-    if (!g.length){
-      html += '<div class="big" style="font-size:1.05rem;line-height:1.4;">Ben je oppas, opa of oma?</div>'+
-        '<div class="meta" style="margin:.3rem 0 .7rem;">Volg een RTFoundation-gezin met je pas, dan krijg je hun meldingen hier, zonder een extra app.</div>'+
-        '<button class="go" id="rtfKoppelBtn">Koppel een gezin →</button>';
-    } else {
-      html += '<div class="meta" style="margin-bottom:.6rem;">Je volgt: '+g.map(x=>esc(x.gezinNaam)+' (als '+esc(x.profielNaam)+')').join(', ')+'.</div>';
-      html += m.length
-        ? '<div id="rtfMeld">'+m.slice(0,8).map(x=>
-            '<div style="padding:.55rem .7rem;border:1px solid var(--line);border-radius:12px;margin-bottom:.4rem;'+(x.gelezen?'opacity:.6;':'')+(x.soort==='hulp'?'border-color:#B4574E;':'')+'">'+
-            '<div style="font-size:.72rem;color:var(--muted);">'+(x.soort==='hulp'?'🆘 ':'')+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
-            '<div style="font-size:.9rem;line-height:1.4;margin-top:.15rem;white-space:pre-wrap;">'+esc(x.tekst)+'</div></div>').join('')+'</div>'
-        : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier.</div>';
-      html += '<button class="go" id="rtfKoppelBtn" style="margin-top:.3rem;">Nog een gezin koppelen →</button>';
+    if (tab) tab.style.display = g.length ? '' : 'none';
+    if (dot) dot.style.display = (g.length && ongelezen) ? 'block' : 'none';
+    // compacte ingang op Home
+    if (homeEl){
+      homeEl.style.display='';
+      if (!g.length){
+        homeEl.innerHTML = '<div class="label">RTFoundation</div>'+
+          '<div class="big" style="font-size:1.05rem;line-height:1.4;">Ben je oppas, opa of oma?</div>'+
+          '<div class="meta" style="margin:.3rem 0 .7rem;">Volg een RTFoundation-gezin met je pas, dan krijg je hun meldingen hier op je telefoon, zonder een extra app.</div>'+
+          '<button class="go" id="rtfKoppelBtn">Koppel een gezin →</button>';
+      } else {
+        homeEl.innerHTML = '<div class="label">Je gezinsruimte'+(ongelezen?' · <span style="color:var(--gold)">'+ongelezen+' nieuw</span>':'')+'</div>'+
+          '<div class="big" style="font-size:1.05rem;">'+g.map(x=>esc(x.gezinNaam)).join(', ')+'</div>'+
+          '<div class="meta" style="margin:.2rem 0 .7rem;">'+(ongelezen? ongelezen+' nieuwe melding'+(ongelezen>1?'en':'') : 'Alles gelezen')+'</div>'+
+          '<button class="go" data-goto="gezin">Open je gezinsruimte →</button>';
+      }
+      const kb = $('#rtfKoppelBtn'); if (kb) kb.addEventListener('click', rtfKoppelStart);
+      homeEl.querySelectorAll('[data-goto]').forEach(b=> b.addEventListener('click', ()=> openTab(b.dataset.goto)));
     }
-    el.innerHTML = html;
-    const kb = $('#rtfKoppelBtn'); if (kb) kb.addEventListener('click', rtfKoppelStart);
-    if (ongelezen) API.call('/rtf/meldingen/gelezen').catch(()=>{});
+    renderGezin();
+  }
+  function rtfBerichtHtml(x){
+    return '<div style="padding:.55rem .7rem;border:1px solid var(--line);border-radius:12px;margin:.4rem 0;'+(x.gelezen?'':'border-color:var(--burgundy,#C23A5E);')+(x.soort==='hulp'?'background:rgba(194,58,94,.08);':'')+'">'+
+      '<div style="font-size:.72rem;color:var(--muted);">'+(x.soort==='hulp'?'🆘 ':(x.soort==='reis'?'✈️ ':''))+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
+      '<div style="font-size:.92rem;line-height:1.4;margin-top:.15rem;white-space:pre-wrap;">'+esc(x.tekst)+'</div></div>';
+  }
+  function renderGezin(){
+    const fam = $('#gezinFamilies'), feed = $('#gezinFeed'); if (!fam || !feed) return;
+    const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
+    $('#gezinSub').textContent = g.length ? 'De RTFoundation-gezinnen die je als oppas of familie volgt.' : 'Je volgt nog geen gezin.';
+    fam.innerHTML = '<div class="label">Gevolgde gezinnen</div>'+
+      (g.length ? g.map(x=>'<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><b style="flex:1;">'+esc(x.gezinNaam)+'</b><span class="meta">als '+esc(x.profielNaam)+'</span><button class="go" style="background:transparent;color:var(--muted);padding:.2rem .4rem;" data-los="'+x.code+'|'+x.profielId+'">Ontkoppel</button></div>').join('') : '<div class="meta">Nog geen gezin gekoppeld.</div>')+
+      '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;"><button class="go" id="rtfKoppelBtn2">Koppel een gezin →</button><button class="go" id="rtfPushBtn" style="background:transparent;color:var(--muted);">🔔 Meldingen op mijn telefoon</button></div>';
+    feed.innerHTML = '<div class="label">Meldingen van het gezin</div>'+
+      (m.length ? m.slice(0,30).map(rtfBerichtHtml).join('') : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier en op je telefoon.</div>')+
+      (g.length ? '<div style="display:flex;gap:.5rem;margin-top:.8rem;"><input id="rtfReplyIn" placeholder="Antwoord het gezin..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;color:var(--txt);"><button class="go" id="rtfReplyBtn">Stuur</button></div>' : '');
+    fam.querySelectorAll('[data-los]').forEach(b=> b.addEventListener('click', async ()=>{ const [code,pid]=b.dataset.los.split('|'); if(!confirm('Dit gezin niet meer volgen?')) return; try{ await API.call('/rtf/ontkoppel',{code,profielId:pid}); toast('Ontkoppeld.'); await refreshState(); renderFoundation(); if(!(rtf.gekoppeld||[]).length) openTab('home'); }catch(e){ toast(e.message); } }));
+    const kb=$('#rtfKoppelBtn2'); if(kb) kb.addEventListener('click', rtfKoppelStart);
+    const pb=$('#rtfPushBtn'); if(pb) pb.addEventListener('click', ()=> ensurePush(true));
+    const rb=$('#rtfReplyBtn'); if(rb) rb.addEventListener('click', rtfReply);
+    const ri=$('#rtfReplyIn'); if(ri) ri.addEventListener('keydown', e=>{ if(e.key==='Enter') rtfReply(); });
+    if (m.filter(x=>!x.gelezen).length) API.call('/rtf/meldingen/gelezen').catch(()=>{});
+  }
+  async function rtfReply(){
+    const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
+    const g=(rtf.gekoppeld||[]); if(!g.length) return;
+    try{ await API.call('/rtf/bericht',{ code:g[0].code, tekst:t }); inp.value=''; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
+    catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){
     const code = prompt('Vul de gezinscode in die je van het gezin kreeg:');
@@ -2428,9 +2466,31 @@
       const idx = parseInt(keuze,10)-1;
       if (isNaN(idx) || !d.profielen[idx]) return;
       const r = await API.call('/rtf/koppel', { code: code.trim().toUpperCase(), profielId: d.profielen[idx].id });
-      toast('Gekoppeld aan '+r.gezinNaam+'. Je krijgt hun meldingen nu hier.');
-      await refreshState(); renderFoundation();
+      toast('Gekoppeld aan '+r.gezinNaam+'. Je krijgt hun meldingen nu ook op je telefoon.');
+      await refreshState(); renderFoundation(); openTab('gezin');
+      ensurePush(true);
     } catch(e){ toast(e.message || 'Koppelen lukte niet.'); }
+  }
+  // web-push aanzetten voor gezinsmeldingen op de telefoon
+  function urlB64ToUint8(base64){
+    const pad='='.repeat((4-base64.length%4)%4); const b=(base64+pad).replace(/-/g,'+').replace(/_/g,'/');
+    const raw=atob(b); const arr=new Uint8Array(raw.length); for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i); return arr;
+  }
+  async function ensurePush(interactief){
+    try{
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)){ if(interactief) toast('Push wordt op dit toestel niet ondersteund.'); return; }
+      const keyRes = await fetch('/api/push/key').then(r=>r.json()).catch(()=>({}));
+      if (!keyRes.key){ if(interactief) toast('Meldingen zijn nu niet beschikbaar.'); return; }
+      if (interactief || Notification.permission==='default'){
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted'){ if(interactief) toast('Zet meldingen aan in je instellingen om ze te ontvangen.'); return; }
+      } else if (Notification.permission !== 'granted'){ return; }
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToUint8(keyRes.key) });
+      await API.call('/push/subscribe', { subscription: sub });
+      if (interactief) toast('Top! Gezinsmeldingen komen nu ook op je telefoon binnen.');
+    }catch(e){ if(interactief) toast('Meldingen aanzetten lukte niet.'); }
   }
 
   /* ---------- reizen ---------- */

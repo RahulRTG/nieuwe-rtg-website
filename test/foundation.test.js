@@ -340,6 +340,11 @@ test('oppas met RTG-pas: koppelt zijn gastprofiel en krijgt de gezinsmeldingen i
   assert.equal(st.state.foundation.gekoppeld.length, 1);
   assert.ok(st.state.foundation.meldingen.some(x => /op reis/.test(x.tekst) && x.gezin === 'Fam Steun'), 'de melding staat in de RTG-app');
 
+  // opa antwoordt het gezin vanuit de RTG-app; het komt in de gezinsberichten
+  assert.equal((await rtgCall('/rtf/bericht', { code: g.code, tekst: 'Wat leuk, ik pas graag op!' })).status, 200);
+  const ber = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/berichten?token=' + g.token));
+  assert.ok(ber.berichten.some(b => b.vanNaam === 'Opa' && /pas graag op/.test(b.tekst)), 'het antwoord staat in de gezinsberichten');
+
   // ontkoppelen kan, daarna geen nieuwe meldingen meer
   assert.equal((await rtgCall('/rtf/ontkoppel', { code: g.code, profielId: gast.profiel.id })).status, 200);
   const st2 = await json(await rtgCall('/state', {}));

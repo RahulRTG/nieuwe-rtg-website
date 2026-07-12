@@ -100,6 +100,8 @@ app.use(express.json({ limit: '8mb' }));
 // draait mee op dezelfde database en failover.
 const rtf = require('./foundation');
 app.use('/api/foundation', rtf.router);
+// een gezinsmelding voor een gekoppelde oppas/familie ook als telefoonmelding (web-push)
+rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch (e) {} });
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -339,6 +341,7 @@ function initRealtime() {
   for (const [t, s] of Object.entries(db.data.sessions)) if (!sessions.has(t)) sessions.set(t, s);
   if (!db.data.notifications) db.data.notifications = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.pushSubs) db.data.pushSubs = { rtg: [], lifestyle: [], business: [] };
+  if (!db.data.pushSubsUser) db.data.pushSubsUser = {}; // per account: userId -> [subscriptions]
   if (!db.data.supplierNotifications) db.data.supplierNotifications = {};
   if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
   if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
@@ -443,6 +446,22 @@ function notify(tier, note) {
   for (const c of sseClients) if (c.tier === tier) sseSend(c.res, 'notify', n);
   sendPush(tier, n);
   return n;
+}
+
+// push naar één specifiek account (voor persoonlijke meldingen, bijv. van de RTFoundation)
+function sendPushToUser(userId, note) {
+  if (!webpush || userId == null) return;
+  const subs = (db.data.pushSubsUser[userId] || []).slice();
+  if (!subs.length) return;
+  const payload = JSON.stringify({ title: note.title, body: note.body, icon: '/icon.svg', tag: note.tag });
+  for (const sub of subs) {
+    webpush.sendNotification(sub, payload).catch(err => {
+      if (err && (err.statusCode === 404 || err.statusCode === 410)) {
+        db.data.pushSubsUser[userId] = (db.data.pushSubsUser[userId] || []).filter(s => s.endpoint !== sub.endpoint);
+        save();
+      }
+    });
+  }
 }
 
 function sendPush(tier, note) {
@@ -902,6 +921,13 @@ app.post('/api/rtf/meldingen/gelezen', auth, (req, res) => {
   accounts.saveMemberState(req.session.account.id, md);
   res.json({ ok: true });
 });
+// terugberichten naar het gezin (bijv. de oppas antwoordt op een oproep)
+app.post('/api/rtf/bericht', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const r = rtf.berichtVanGast({ userId: req.session.account.id, code: req.body.code, tekst: req.body.tekst });
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json({ ok: true });
+});
 
 /* ================= SALON-CONNECTIES =================
    Leden voegen elkaar toe op codenaam, sturen elkaar berichten, delen
@@ -1055,6 +1081,12 @@ app.post('/api/push/subscribe', auth, (req, res) => {
   if (!sub || !sub.endpoint) return res.status(400).json({ error: 'Ongeldige subscription.' });
   const list = db.data.pushSubs[req.session.tier] = (db.data.pushSubs[req.session.tier] || []);
   if (!list.some(s => s.endpoint === sub.endpoint)) list.push(sub);
+  // echte accounts krijgen ook een persoonlijke push-lijst (voor o.a. RTFoundation-meldingen)
+  if (req.session.account) {
+    const uid = req.session.account.id;
+    const ulist = db.data.pushSubsUser[uid] = (db.data.pushSubsUser[uid] || []);
+    if (!ulist.some(s => s.endpoint === sub.endpoint)) ulist.push(sub);
+  }
   save();
   res.json({ ok: true });
 });

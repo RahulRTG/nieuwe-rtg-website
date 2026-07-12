@@ -843,19 +843,44 @@ function gekoppeldeGezinnen(userId) {
   }
   return uit;
 }
-// bezorg een gezinsmelding ook in de RTG-app van gekoppelde gasten
+// de RTG-server hangt hier zijn web-push in, zodat een melding ook op de
+// telefoon van de gekoppelde oppas/familie binnenkomt (ook als de app dicht is)
+let pushHook = null;
+function setPushHook(fn) { pushHook = fn; }
+
+// bezorg een gezinsmelding ook in de RTG-app (inbox + telefoonmelding) van gekoppelde gasten
 function bezorgAanGasten(g, bericht) {
   let accounts; try { accounts = require('./accounts'); } catch (e) { return; }
-  const ontvangers = Object.values(g.profielen).filter(p => p.rol === 'gast' && p.koppel && p.koppel.userId && (bericht.naar === 'allen' || bericht.naar === p.id));
+  const ontvangers = Object.values(g.profielen).filter(p => p.rol === 'gast' && p.koppel && p.koppel.userId && p.id !== bericht.van && (bericht.naar === 'allen' || bericht.naar === p.id));
+  const tekst = decS(bericht.tekst);
   for (const p of ontvangers) {
     try {
       const md = accounts.getMemberState(p.koppel.userId) || {};
       if (!Array.isArray(md.foundationMeldingen)) md.foundationMeldingen = [];
-      md.foundationMeldingen.unshift({ id: rid(4), at: nu(), gezin: g.naam, profielNaam: p.naam, van: bericht.vanNaam, tekst: decS(bericht.tekst), soort: bericht.soort, gelezen: false });
+      md.foundationMeldingen.unshift({ id: rid(4), at: nu(), gezin: g.naam, code: g.code, profielNaam: p.naam, van: bericht.vanNaam, tekst, soort: bericht.soort, gelezen: false });
       md.foundationMeldingen = md.foundationMeldingen.slice(0, 40);
       accounts.saveMemberState(p.koppel.userId, md);
     } catch (e) { /* een gekoppelde gast minder bereikt: niet fataal */ }
+    if (pushHook) {
+      const kop = bericht.soort === 'hulp' ? '🆘 ' + g.naam : (bericht.soort === 'reis' ? '✈️ ' + g.naam : g.naam);
+      try { pushHook(p.koppel.userId, { title: 'RTFoundation · ' + kop, body: (bericht.vanNaam ? bericht.vanNaam + ': ' : '') + tekst.slice(0, 120), tag: 'rtf-' + bericht.id }); } catch (e) {}
+    }
   }
+}
+
+// een gekoppelde oppas/familie stuurt vanuit de RTG-app een bericht terug naar het gezin
+function berichtVanGast({ userId, code, tekst }) {
+  const g = G()[String(code || '').toUpperCase()];
+  if (!g) return { error: 'Dit gezin kennen we niet.', status: 404 };
+  const p = Object.values(g.profielen).find(x => x.koppel && x.koppel.userId === userId);
+  if (!p) return { error: 'Je bent niet (meer) aan dit gezin gekoppeld.', status: 403 };
+  const schoonTekst = schoon(tekst, 800);
+  if (!schoonTekst) return { error: 'Schrijf een bericht.', status: 400 };
+  const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar: 'allen', soort: 'bericht', tekst: encS(schoonTekst), at: nu(), gelezenDoor: [p.id] };
+  if (!g.berichten) g.berichten = [];
+  g.berichten.unshift(b); g.berichten = g.berichten.slice(0, 200); save();
+  bezorgAanGasten(g, b); // andere gekoppelde gasten krijgen het ook
+  return { ok: true };
 }
 
 /* gezinsagenda: samen plannen. Het gezin voegt toe; iedereen (ook de oppas) mag
@@ -943,4 +968,4 @@ router.get('/gezin/:code/klussen', (req, res) => {
 
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, setPushHook, berichtVanGast };

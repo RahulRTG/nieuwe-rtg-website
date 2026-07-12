@@ -2629,6 +2629,9 @@ startGedeeld().catch(e => console.warn('[db] gedeelde data mislukt:', e.message)
 startSqliteSync();
 // PostgreSQL-opslag aanzetten (gedeelde, duurzame database over meerdere instances).
 startPostgres().catch(e => log.uitzondering(e instanceof Error ? e : new Error(String(e)), { bron: 'startPostgres' }));
+// Accounts eveneens delen via PostgreSQL (zodat een registratie op instance A ook
+// op instance B werkt); zonder DATABASE_URL blijft dit inert.
+accounts.startPostgres().catch(e => log.uitzondering(e instanceof Error ? e : new Error(String(e)), { bron: 'accounts.startPostgres' }));
 // Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
 // opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke bezoekers.
 setInterval(() => {
@@ -2666,7 +2669,7 @@ for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
   console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
   try { save(); } catch (e) {}
   // Bij Postgres: nog een laatste flush zodat niets in de write-behind hangt.
-  Promise.resolve(flushBijAfsluiten()).catch(() => {}).finally(() => {
+  Promise.allSettled([Promise.resolve(flushBijAfsluiten()), Promise.resolve(accounts.flushBijAfsluiten())]).finally(() => {
     server.close(() => process.exit(0));
   });
   setTimeout(() => process.exit(0), 3000).unref();

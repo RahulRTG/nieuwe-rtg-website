@@ -28,7 +28,8 @@ test('config: onveilige productie geeft blokkerende fouten', () => {
 
 test('config: veilige productie is foutloos', () => {
   const r = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
-    APP_URL: 'https://x', DATABASE_URL: 'postgresql://x', REDIS_URL: 'r', SENTRY_DSN: 's', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k' });
+    APP_URL: 'https://x', DATABASE_URL: 'postgresql://x', RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
+    REDIS_URL: 'r', SENTRY_DSN: 's', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k' });
   assert.equal(r.fouten.length, 0);
   assert.equal(r.waarschuwingen.length, 0);
 });

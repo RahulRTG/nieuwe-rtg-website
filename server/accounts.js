@@ -22,6 +22,10 @@ const { DatabaseSync } = require('node:sqlite');
 
 // Zelfde datamap als db.js: instelbaar met RTG_DATA_DIR (tests + productie).
 const DATA_DIR = process.env.RTG_DATA_DIR || path.join(__dirname, 'data');
+// Gedeelde accounts over meerdere instances: met DATABASE_URL spiegelt SQLite
+// naar PostgreSQL (zie server/pgaccounts.js). Zonder verandert er niets.
+const DATABASE_URL = process.env.DATABASE_URL || process.env.PG_URL || null;
+const PGMODE = !!DATABASE_URL;
 const DB_FILE = path.join(DATA_DIR, 'rtg.db');
 const SECRET_FILE = path.join(DATA_DIR, 'secret.key');   // ondertekent sessietokens
 const VAULT_FILE = path.join(DATA_DIR, 'vault.key');     // versleutelt de identiteitskluis
@@ -36,10 +40,17 @@ const CODENAMES = [
   'Nachtorchidee', 'Zeearend', 'Poolvos', 'Marmeren Valk', 'Saffieren Ooievaar'
 ];
 
-function loadKey(file) {
+/* Sleutels laden. Bij meerdere instances MOETEN de identiteitskluis (VAULT) en
+   de token-ondertekening (SECRET) op elke instance gelijk zijn, anders kan de ene
+   instance de gegevens van de andere niet ontsleutelen en klopt de e-mail-hash
+   voor het inloggen niet. Daarom eerst uit de omgeving (gedeeld secret manager),
+   en pas als terugval een lokaal bestand (prima voor één instance / lokaal). */
+function loadKey(file, envName) {
+  const env = envName ? process.env[envName] : null;
+  if (env) return /^[0-9a-fA-F]{64}$/.test(env) ? Buffer.from(env, 'hex') : crypto.createHash('sha256').update(env).digest();
   if (fs.existsSync(file)) return fs.readFileSync(file);
   const k = crypto.randomBytes(32);
-  fs.writeFileSync(file, k);
+  try { fs.writeFileSync(file, k); } catch (e) {}
   return k;
 }
 
@@ -85,9 +96,102 @@ function init() {
   )`);
   try { db.exec('ALTER TABLE supplier_staff ADD COLUMN func TEXT'); } catch (e) { /* kolom bestaat al */ }
 
-  SECRET = loadKey(SECRET_FILE);
-  VAULT = loadKey(VAULT_FILE);
+  SECRET = loadKey(SECRET_FILE, 'RTG_SECRET_KEY');
+  VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');
 }
+
+/* ---------- PostgreSQL-spiegel (alleen met DATABASE_URL) ----------
+   SQLite blijft de synchrone lokale cache; elke wijziging wordt (gecoalesceerd)
+   naar Postgres doorgeschreven, en bij het opstarten trekken we de gedeelde
+   staat uit Postgres. Zonder DATABASE_URL is dit alles inert. */
+let pg = null, pgKlaar = false, idBlok = null, idRefillBezig = false, externCb = null;
+const pgLog = { warn: (m, v) => console.warn('[pgaccounts]', m, v || '') };
+const vuileUsers = new Set(), vuileStaff = new Set(), verwijderdeUsers = new Set();
+let mirrorTimer = null;
+
+function rawUser(id) { return db.prepare('SELECT * FROM users WHERE id = ?').get(id) || null; }
+function rawStaff(id) { return db.prepare('SELECT * FROM supplier_staff WHERE id = ?').get(id) || null; }
+
+function nieuwId() {
+  if (!PGMODE || !idBlok) return null;              // buiten PG of vóór reservering: SQLite-autoincrement
+  if (idBlok.volgende > idBlok.eind) { refillBlok(); return null; }
+  const id = idBlok.volgende++;
+  if (idBlok.eind - idBlok.volgende < 100) refillBlok(); // ruim op tijd bijvullen
+  return id;
+}
+async function refillBlok() {
+  if (idRefillBezig || !pg) return;
+  idRefillBezig = true;
+  try { idBlok = await pg.reserveerBlok(); }
+  catch (e) { pgLog.warn('id-blok reserveren mislukt', { fout: e.message }); }
+  finally { idRefillBezig = false; }
+}
+
+function planMirror() { if (!PGMODE || !pgKlaar || mirrorTimer) return; mirrorTimer = setTimeout(flushMirror, 150); if (mirrorTimer.unref) mirrorTimer.unref(); }
+async function flushMirror() {
+  mirrorTimer = null;
+  if (!pg || !pgKlaar) return;
+  const us = [...vuileUsers]; vuileUsers.clear();
+  const ss = [...vuileStaff]; vuileStaff.clear();
+  const del = [...verwijderdeUsers]; verwijderdeUsers.clear();
+  for (const id of del) { try { await pg.deleteUser(id); } catch (e) { verwijderdeUsers.add(id); } }
+  for (const id of us) { const r = rawUser(id); if (r) { try { await pg.upsertUser(r); } catch (e) { vuileUsers.add(id); } } }
+  for (const id of ss) { const r = rawStaff(id); if (r) { try { await pg.upsertStaff(r); } catch (e) { vuileStaff.add(id); } } }
+  if (vuileUsers.size || vuileStaff.size || verwijderdeUsers.size) planMirror();
+}
+function markUser(id) { if (PGMODE && id != null) { vuileUsers.add(Number(id)); planMirror(); } }
+function markStaff(id) { if (PGMODE && id != null) { vuileStaff.add(Number(id)); planMirror(); } }
+function markDelete(id) { if (PGMODE && id != null) { verwijderdeUsers.add(Number(id)); vuileUsers.delete(Number(id)); planMirror(); } }
+
+// Trek een enkele, door NOTIFY gemelde rij van een ander proces in de lokale cache.
+function upsertLocalUser(r) {
+  const cols = pg.USER_COLS;
+  db.prepare(`INSERT OR REPLACE INTO users (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`)
+    .run(...cols.map(c => r[c] === undefined ? null : r[c]));
+}
+function upsertLocalStaff(r) {
+  const cols = pg.STAFF_COLS;
+  db.prepare(`INSERT OR REPLACE INTO supplier_staff (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`)
+    .run(...cols.map(c => r[c] === undefined ? null : r[c]));
+}
+async function pullEen(payload) {
+  try {
+    const [soort, idStr] = String(payload).split(':'); const id = Number(idStr);
+    if (soort === 'user') {
+      const { rows } = await pg.pool.query('SELECT * FROM users WHERE id = $1', [id]);
+      if (rows.length) upsertLocalUser(rows[0]); else db.prepare('DELETE FROM users WHERE id = ?').run(id);
+      if (externCb) externCb();
+    } else if (soort === 'staff') {
+      const { rows } = await pg.pool.query('SELECT * FROM supplier_staff WHERE id = $1', [id]);
+      if (rows.length) upsertLocalStaff(rows[0]);
+    }
+  } catch (e) {}
+}
+
+/* Start de Postgres-spiegel: schema klaarzetten, gedeelde staat ophalen
+   (Postgres wint), lokale rijen die nog niet gedeeld zijn erheen duwen (eerste
+   migratie), een id-blok reserveren en live meeluisteren. */
+async function startPostgres() {
+  if (!PGMODE) return false;
+  pg = require('./pgaccounts').maakPgAccounts({ url: DATABASE_URL, log: pgLog });
+  await pg.schema();
+  const { users, staff } = await pg.pullAlles();
+  for (const r of users) upsertLocalUser(r);   // Postgres wint
+  for (const r of staff) upsertLocalStaff(r);
+  // Lokale rijen die (nog) niet in Postgres staan: eenmalig erheen duwen.
+  const pgUserIds = new Set(users.map(r => Number(r.id)));
+  const pgStaffIds = new Set(staff.map(r => Number(r.id)));
+  for (const r of db.prepare('SELECT id FROM users').all()) if (!pgUserIds.has(Number(r.id))) markUser(r.id);
+  for (const r of db.prepare('SELECT id FROM supplier_staff').all()) if (!pgStaffIds.has(Number(r.id))) markStaff(r.id);
+  idBlok = await pg.reserveerBlok();
+  pgKlaar = true;
+  planMirror(); // duw eventuele lokaal-only rijen nu weg
+  await pg.luister(pullEen);
+  console.log('[accounts] PostgreSQL-spiegel actief (gedeelde accounts over instances).');
+  return true;
+}
+function onExternalChange(cb) { externCb = cb; }
+async function flushBijAfsluiten() { if (PGMODE && pg && pgKlaar) { try { await flushMirror(); } catch (e) {} } }
 
 /* ---------- identiteitskluis (versleuteling van naam/e-mail) ---------- */
 function enc(text) {
@@ -147,10 +251,7 @@ function createUser({ email, username, password, tier, realName, phone }) {
   // 'guest' is de gratis (bestel/betaal) laag: een echt account met paspoort,
   // maar zonder betaalde pas. rtg/lifestyle/business zijn de betaalde passen.
   tier = ['rtg', 'lifestyle', 'business', 'guest'].includes(tier) ? tier : 'rtg';
-  const info = db.prepare(
-    `INSERT INTO users (email_hash, username, password_hash, tier, codename, enc_name, enc_email, enc_phone, phone_hash, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).run(
+  const vals = [
     email ? emailHash(email) : null,
     username || null,
     hashPassword(password),
@@ -161,8 +262,21 @@ function createUser({ email, username, password, tier, realName, phone }) {
     phone ? enc(phone) : null,
     phone ? phoneHash(phone) : null,
     new Date().toISOString()
-  );
-  return getUserById(info.lastInsertRowid);
+  ];
+  const kolommen = 'email_hash, username, password_hash, tier, codename, enc_name, enc_email, enc_phone, phone_hash, created_at';
+  // In Postgres-modus geven we een globaal uniek id mee (uit het gereserveerde
+  // blok), zodat twee instances nooit hetzelfde id uitdelen. Anders SQLite-autoincrement.
+  const id = nieuwId();
+  let newId;
+  if (id != null) {
+    db.prepare(`INSERT INTO users (id, ${kolommen}) VALUES (?, ${vals.map(() => '?').join(', ')})`).run(id, ...vals);
+    newId = id;
+  } else {
+    const info = db.prepare(`INSERT INTO users (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
+    newId = info.lastInsertRowid;
+  }
+  markUser(newId);
+  return getUserById(newId);
 }
 function findByPhone(phone) {
   const h = phoneHash(phone);
@@ -219,12 +333,14 @@ function verifyActionToken(token, purpose) {
 /* ---------- e-mailbevestiging & wachtwoord-herstel ---------- */
 function setEmailVerified(userId) {
   db.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').run(userId);
+  markUser(userId);
   return getUserById(userId);
 }
 function createReset(userId, ttlMs = 3600000) {
   const token = crypto.randomBytes(24).toString('hex');
   const hash = crypto.createHash('sha256').update(token).digest('hex');
   db.prepare('UPDATE users SET reset_hash = ?, reset_expires = ? WHERE id = ?').run(hash, Date.now() + ttlMs, userId);
+  markUser(userId);
   return token;
 }
 function findByReset(token) {
@@ -236,6 +352,7 @@ function findByReset(token) {
 function setPassword(userId, password) {
   db.prepare('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
     .run(hashPassword(password), userId);
+  markUser(userId);
   return getUserById(userId);
 }
 
@@ -264,12 +381,14 @@ function getMemberState(userId) {
 }
 function saveMemberState(userId, obj) {
   db.prepare('UPDATE users SET member_state = ? WHERE id = ?').run(JSON.stringify(obj), userId);
+  markUser(userId);
 }
 
 /* ---------- identiteitsverificatie ---------- */
 function setVerification(userId, status, docFilename) {
   if (docFilename !== undefined) db.prepare('UPDATE users SET verified = ?, id_doc = ? WHERE id = ?').run(status, docFilename, userId);
   else db.prepare('UPDATE users SET verified = ? WHERE id = ?').run(status, userId);
+  markUser(userId);
   return getUserById(userId);
 }
 function listByVerification(status) {
@@ -287,16 +406,25 @@ function conversations() {
 
 /* ---------- leverancier-personeel (PIN-accounts binnen een bedrijf) ---------- */
 function createStaff({ supplierCode, name, pin, role, func }) {
-  const info = db.prepare(
-    'INSERT INTO supplier_staff (supplier_code, name, pin_hash, role, func, created_at) VALUES (?, ?, ?, ?, ?, ?)'
-  ).run(String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), hashPassword(String(pin)), role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString());
-  return getStaffById(info.lastInsertRowid);
+  const vals = [String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), hashPassword(String(pin)), role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString()];
+  const kolommen = 'supplier_code, name, pin_hash, role, func, created_at';
+  const id = nieuwId();
+  let newId;
+  if (id != null) {
+    db.prepare(`INSERT INTO supplier_staff (id, ${kolommen}) VALUES (?, ${vals.map(() => '?').join(', ')})`).run(id, ...vals);
+    newId = id;
+  } else {
+    const info = db.prepare(`INSERT INTO supplier_staff (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
+    newId = info.lastInsertRowid;
+  }
+  markStaff(newId);
+  return getStaffById(newId);
 }
 function getStaffById(id) { return db.prepare('SELECT * FROM supplier_staff WHERE id = ? AND active = 1').get(id) || null; }
 function listStaff(code) { return db.prepare('SELECT * FROM supplier_staff WHERE supplier_code = ? AND active = 1 ORDER BY (role=\'manager\') DESC, id').all(String(code || '').toUpperCase()); }
 function countStaff(code) { return db.prepare('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
 function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && verifyPassword(String(pin), s.pin_hash)) ? s : null; }
-function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); }
+function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); markStaff(id); }
 function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
@@ -307,11 +435,13 @@ function deleteUser(id) {
   const u = getUserById(id);
   if (!u) return null;
   db.prepare('DELETE FROM users WHERE id = ?').run(id);
+  markDelete(id);
   return u.id_doc || null;
 }
 
 module.exports = {
-  init, createUser, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
+  init, startPostgres, onExternalChange, flushBijAfsluiten,
+  createUser, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
   createStaff, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, makePin, deleteUser,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,

@@ -56,12 +56,17 @@ Volledige lijst met uitleg: `.env.example`.
   met stack; optionele Sentry-koppeling via `SENTRY_DSN`.
 - **Fail-fast configuratie** — `server/config.js` stopt de start bij een
   onveilige productie-instelling.
-- **Opslag** — de gedeelde data draait op **PostgreSQL** (`DATABASE_URL`):
-  transacties, row-locks en `LISTEN/NOTIFY` voor live cross-instance-updates,
-  met dezelfde 3-weg-merge zodat gelijktijdige schrijvers elkaar niet
-  overschrijven. Een lokale snapshot dient als warme cache en fallback als
+- **Opslag** — zowel de gedeelde data als de **accounts** draaien op
+  **PostgreSQL** (`DATABASE_URL`): transacties, row-locks en `LISTEN/NOTIFY` voor
+  live cross-instance-updates, met dezelfde 3-weg-merge zodat gelijktijdige
+  schrijvers elkaar niet overschrijven. Accounts krijgen globaal-unieke id's uit
+  een Postgres-reeks (blokken per instance), en SQLite blijft als lokale
+  synchrone cache. Een lokale snapshot dient als warme cache en fallback als
   Postgres even wegvalt. Zonder `DATABASE_URL` valt de app terug op een lokaal
   bestand (of `RTG_STORE=sqlite`).
+  **Let op bij meerdere instances:** zet `RTG_VAULT_KEY` en `RTG_SECRET_KEY`
+  (gedeeld en gelijk), anders kan de ene instance de versleutelde naam/e-mail van
+  de andere niet lezen en kloppen de e-mail-login-hash en sessietokens niet.
 - **Data-duurzaamheid** — lokaal wegschrijven gaat atomisch (tmp + rename) én
   duurzaam (`fsync` op bestand en map), plus dagelijkse back-ups met retentie en
   een tweede-schijf-kopie (`RTG_BACKUP_DIR`). Herstelt automatisch uit de
@@ -100,12 +105,11 @@ Dit is het deel dat je niet in dit repo kunt afvinken:
    een derde geverifieerd. Doe dit vóór je echt geld en persoonsgegevens raakt.
 2. **Echte betaalcertificering.** De naad staat klaar, maar PCI-scope,
    terugboekingen, refunds, boekhouding en reconciliatie zijn nog werk.
-3. **Database onder last.** De opslag draait nu op PostgreSQL (transacties,
-   row-locks, LISTEN/NOTIFY, item-merge bij gelijktijdige schrijvers), en dat is
-   met tests bewezen voor correctheid en multi-writer. Wat nog rest: load-tests
-   op productievolume, afstemmen van pool/connlimits, en een read-replica-/
-   backup-strategie voor Postgres zelf. (De accounts-tabel draait nog op SQLite;
-   die kan als vervolgstap mee naar Postgres.)
+3. **Database onder last.** De gedeelde data én de accounts draaien nu op
+   PostgreSQL (transacties, row-locks, LISTEN/NOTIFY, item-merge bij gelijktijdige
+   schrijvers, globaal-unieke id's), met tests voor correctheid en multi-writer.
+   Wat nog rest: load-tests op productievolume, afstemmen van pool/connlimits, en
+   een read-replica-/backup-strategie voor Postgres zelf.
 4. **Kinderen en moderatie (het zwaarst).** De RTFoundation richt zich op
    minderjarigen, met chat, snaps en (video)bellen. Dat vereist: echte moderatie
    (mensen + tooling, niet alleen block/report), leeftijdsverificatie, een DPIA,

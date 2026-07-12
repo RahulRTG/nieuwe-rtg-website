@@ -280,6 +280,10 @@ function ensureSupplierDefaults(s) {
     ];
   for (const r of (s.rooms || [])) if (!r.hk) r.hk = { status: 'schoon' };
   if (!s.settings) s.settings = { ordersOpen: true, reservationsOpen: true };
+  // land van het bedrijf (voor btw, alcoholgrens en het zoeken op land in de
+  // RTFoundation-vacatures). RTG is internationaal; onze demopartners staan op
+  // Ibiza en horen dus bij Spanje.
+  if (!s.settings.land) s.settings.land = /ibiza|spanje|spain|españa/i.test(s.city || '') ? 'ES' : 'NL';
   const caps = ((db.data.supplierTypes || {})[s.type] || {}).caps || [];
   if (caps.includes('menu') && !Array.isArray(s.tables))
     s.tables = [1, 2, 3, 4, 5, 6].map(n => ({ id: 't' + n, name: 'Tafel ' + n, seats: n % 3 === 0 ? 6 : n % 2 === 0 ? 4 : 2, status: 'vrij' }));
@@ -2354,12 +2358,14 @@ app.post('/api/supplier/vacature/verwijder', supplierAuth, (req, res) => {
 /* ---- vacatures voor de RTFoundation ----
    Openbare lijst met alle openstaande vacatures over alle partners heen. De
    RTF-app filtert op de leeftijdsgroep van het profiel (vanaf 16 jaar). */
-function openVacatures(minLeeftijd) {
+function openVacatures(minLeeftijd, land) {
   const uit = [];
   for (const [code, list] of Object.entries(db.data.vacatures || {})) {
     const s = findSupplier(code);
     if (!s) continue;
     const t = db.data.supplierTypes[s.type] || {};
+    const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
+    if (land && landCode !== land) continue;
     for (const v of list) {
       if (!v.open) continue;
       if (minLeeftijd != null && v.minLeeftijd > minLeeftijd) continue;
@@ -2368,6 +2374,9 @@ function openVacatures(minLeeftijd) {
         type: s.type || null, typeLabel: t.label || null, icon: t.icon || '🏢',
         func: v.func, omschrijving: v.omschrijving, plaats: v.plaats, uren: v.uren,
         minLeeftijd: v.minLeeftijd, at: v.at,
+        // land van het bedrijf: RTG is internationaal, dus je solliciteert ook
+        // gerust in het buitenland
+        land: landCode, landNaam: LANDEN[landCode].naam,
         // locatie van het bedrijf, zodat de app de afstand kan tonen
         loc: s.loc ? { lat: s.loc.lat, lng: s.loc.lng, label: s.loc.label } : null,
         stad: s.city || null
@@ -2380,7 +2389,13 @@ function openVacatures(minLeeftijd) {
 app.post('/api/rtf/vacatures', (req, res) => {
   const lft = parseInt(req.body && req.body.leeftijd, 10);
   const minOk = Number.isFinite(lft) ? lft : null;
-  res.json({ vacatures: openVacatures(minOk).slice(0, 100), magSolliciteren: minOk == null || minOk >= 16 });
+  const land = req.body && typeof req.body.land === 'string' && LANDEN[req.body.land] ? req.body.land : null;
+  const alle = openVacatures(minOk); // zonder landfilter, om de landenlijst te vullen
+  const landen = [];
+  for (const v of alle) if (!landen.some(l => l.code === v.land)) landen.push({ code: v.land, naam: v.landNaam });
+  landen.sort((a, b) => a.naam.localeCompare(b.naam));
+  const zichtbaar = land ? alle.filter(v => v.land === land) : alle;
+  res.json({ vacatures: zichtbaar.slice(0, 100), landen, magSolliciteren: minOk == null || minOk >= 16 });
 });
 
 /* Een RTF-lid solliciteert met het cv uit de RTFoundation-cv-maker. Het cv is

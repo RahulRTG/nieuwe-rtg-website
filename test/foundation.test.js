@@ -486,6 +486,17 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   const gevonden = lijst.vacatures.find(v => v.id === vacId);
   assert.ok(gevonden, 'vacature verschijnt in de RTFoundation');
   assert.equal(gevonden.bedrijf, login.state.supplier.name);
+  // internationaal: elke vacature draagt een land, en er is een landenlijst om
+  // in het buitenland te zoeken
+  assert.ok(gevonden.land && gevonden.landNaam, 'de vacature draagt een land');
+  assert.ok(Array.isArray(lijst.landen) && lijst.landen.some(l => l.code === gevonden.land), 'de landenlijst bevat het land');
+  // filteren op een land waar niets staat, geeft geen resultaten
+  const leegLand = gevonden.land === 'JP' ? 'NL' : 'JP';
+  const geenLijst = await json(await raw('/rtf/vacatures', { leeftijd: 16, land: leegLand }));
+  assert.ok(!geenLijst.vacatures.some(v => v.id === vacId), 'landfilter sluit andere landen uit');
+  // filteren op het juiste land toont de vacature wel
+  const welLijst = await json(await raw('/rtf/vacatures', { leeftijd: 16, land: gevonden.land }));
+  assert.ok(welLijst.vacatures.some(v => v.id === vacId), 'landfilter toont het juiste land');
 
   // onder de 16 kan niet solliciteren
   const teJong = await raw('/rtf/solliciteer', { supplierCode: supCode, vacatureId: vacId, leeftijd: 14, cv: { name: 'Jon', contact: 'j@v.test', skills: ['netjes'] } });

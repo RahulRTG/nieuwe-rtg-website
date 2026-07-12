@@ -39,7 +39,7 @@
 <div id="balk"></div>
 <div class="wrap">
   <h1>💼 Werk en vacatures</h1>
-  <div class="intro">Echte vacatures van de partners van Rahul Travel Group, bij elkaar op één plek. Solliciteren kan vanaf 16 jaar, in een tik, met het cv dat je in deze app maakt.</div>
+  <div class="intro">Echte vacatures van de partners van Rahul Travel Group, wereldwijd op één plek. Solliciteren kan vanaf 16 jaar, in een tik, met het cv dat je in deze app maakt. Zoek dichtbij of juist in het buitenland: kies een land hieronder.</div>
 
   <div id="teJong" class="jong" hidden></div>
 
@@ -47,6 +47,8 @@
     <div class="balkje">
       <label for="lft">Jouw leeftijd</label>
       <input class="veld" id="lft" type="number" inputmode="numeric" min="16" max="99" value="16">
+      <label for="land">Land</label>
+      <select class="veld" id="land" style="max-width:11rem;"><option value="">🌍 Overal</option></select>
       <button class="knop grijs klein" id="gpsBtn" type="button" style="padding:.4rem .7rem;">📍 Toon afstand</button>
       <span id="cvStatus" class="cvstatus"></span>
     </div>
@@ -72,6 +74,8 @@ function rtfApi(pad, body){
 
 const GROEP_VANAF = { mini:0, kind:5, tiener:12, jong:16, volw:22 };
 const SOORT = { bijbaan:'Bijbaan', vakantiewerk:'Vakantiewerk', parttime:'Parttime', fulltime:'Fulltime', stage:'Stage', vrijwilliger:'Vrijwilliger' };
+const VLAG = { NL:'🇳🇱', BE:'🇧🇪', DE:'🇩🇪', FR:'🇫🇷', ES:'🇪🇸', JP:'🇯🇵' };
+function vlag(code){ return VLAG[code] || '🏳️'; }
 const VERZ_KEY = 'rtf_sollicitaties'; // welke vacatures dit toestel al verstuurde
 
 function verzonden(){ try { return JSON.parse(localStorage.getItem(VERZ_KEY)||'[]'); } catch(e){ return []; } }
@@ -109,25 +113,40 @@ function toonCvStatus(){
 
 let vacatures = [];
 let mijnPlek = Geo.laatste(); // {lat,lng} of null
+function vulLanden(landen){
+  const sel = $('#land'); const huidig = sel.value;
+  sel.innerHTML = '<option value="">🌍 Overal</option>' +
+    (landen||[]).map(l => '<option value="'+esc(l.code)+'">'+vlag(l.code)+' '+esc(l.naam)+'</option>').join('');
+  if ([...sel.options].some(o=>o.value===huidig)) sel.value = huidig;
+}
 async function laad(){
   const lft = Math.max(16, parseInt($('#lft').value,10) || 16);
+  const land = $('#land').value || undefined;
   try {
-    const d = await rtfApi('/vacatures', { leeftijd: lft });
+    const d = await rtfApi('/vacatures', { leeftijd: lft, land });
     vacatures = d.vacatures || [];
+    vulLanden(d.landen);
     teken();
   } catch(e){ $('#lijst').innerHTML = '<div class="leeg">Kon de vacatures even niet laden. Probeer het zo nog eens.</div>'; }
 }
 
 function teken(){
   const verz = verzonden();
-  if (!vacatures.length){ $('#lijst').innerHTML = '<div class="leeg">Er staan nu geen vacatures open die bij jouw leeftijd passen. Kijk gerust later nog eens; partners plaatsen doorlopend nieuwe kansen.</div>'; return; }
+  if (!vacatures.length){
+    const land = $('#land').value;
+    $('#lijst').innerHTML = '<div class="leeg">'+(land
+      ? 'Er staan nu geen passende vacatures open in dit land. Kies "Overal" of een ander land, of kijk later nog eens.'
+      : 'Er staan nu geen vacatures open die bij jouw leeftijd passen. Kijk gerust later nog eens; partners plaatsen doorlopend nieuwe kansen.')+'</div>';
+    return;
+  }
   // afstand berekenen en op afstand sorteren wanneer we de locatie weten
   const rij = vacatures.map(v => ({ v, km: mijnPlek && v.loc ? Geo.afstandKm(mijnPlek, v.loc) : null }));
   if (mijnPlek) rij.sort((a,b) => (a.km==null?1e9:a.km) - (b.km==null?1e9:b.km));
   $('#lijst').innerHTML = rij.map(({v, km})=>{
     const al = verz.includes(v.id);
     const afst = km!=null ? '📍 '+Geo.tekst(km)+' van jou' : '';
-    const meta = [ SOORT[v.soort]||v.soort, 'vanaf '+v.minLeeftijd+' jaar', v.plaats||v.stad, v.uren, afst ].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('');
+    const landChip = v.landNaam ? vlag(v.land)+' '+v.landNaam : '';
+    const meta = [ SOORT[v.soort]||v.soort, 'vanaf '+v.minLeeftijd+' jaar', landChip, v.plaats||v.stad, v.uren, afst ].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('');
     return '<div class="kaart vac">'+
       '<div class="kop"><span class="ic">'+esc(v.icon||'🏢')+'</span><div><h2>'+esc(v.func)+'</h2><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div><div class="meta">'+meta+'</div></div></div>'+
       (v.omschrijving?'<div class="oms">'+esc(v.omschrijving)+'</div>':'<div class="oms" style="opacity:.7;">Solliciteer met je cv; het bedrijf neemt daarna contact met je op.</div>')+
@@ -176,6 +195,7 @@ Sessie.ophalen().then(d=>{
   toonCvStatus();
   $('#lft').addEventListener('change', laad);
   $('#lft').addEventListener('input', ()=>{ clearTimeout(window._lt); window._lt = setTimeout(laad, 500); });
+  $('#land').addEventListener('change', laad);
   // afstand tonen: eerder gegeven toestemming meteen gebruiken, anders op de knop
   async function vraagGps(){
     const btn = $('#gpsBtn'); const oud = btn.textContent; btn.textContent = 'Locatie zoeken...'; btn.disabled = true;

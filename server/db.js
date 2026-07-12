@@ -58,6 +58,65 @@ function loadSqlite() {
   for (const r of rows) { data[r.key] = JSON.parse(r.val); laatsteJson.set(r.key, r.val); toegepast.set(r.key, r.ver); }
   return data;
 }
+
+/* Drie-weg samenvoeging op item-niveau. Schrijven twee processen tegelijk naar
+   DEZELFDE collectie (bijv. allebei een gezin toevoegen aan foundation.gezinnen,
+   of allebei een sessie), dan voegen we hun wijzigingen per item samen in plaats
+   van de hele collectie te overschrijven. base = onze laatst-gesynchroniseerde
+   waarde, ours = ons geheugen, theirs = wat er nu in de store staat.
+   - objecten (maps): sleutel voor sleutel; een kant die niet wijzigde geeft mee.
+   - arrays met een id (of a+b bij connecties): als map op die sleutel mergen,
+     zodat toevoegingen van beide kanten blijven en verwijderingen doorwerken.
+   - overige arrays/scalars: de gewijzigde kant wint (anders de onze). */
+const _j = x => JSON.stringify(x);
+function itemSleutel(it) {
+  if (!it || typeof it !== 'object') return null;
+  if (it.id != null) return 'id:' + it.id;
+  if (it.a != null && it.b != null) return 'ab:' + [it.a, it.b].sort().join('|');
+  return null;
+}
+function soort(x) { return Array.isArray(x) ? 'array' : (x && typeof x === 'object' ? 'object' : 'scalar'); }
+function merge3(base, ours, theirs) {
+  if (theirs === undefined) return ours;
+  if (ours === undefined) return theirs;
+  if (soort(ours) !== soort(theirs) || (base !== undefined && soort(base) !== soort(ours))) {
+    return _j(ours) !== _j(base) ? ours : theirs; // structuur veranderde: de gewijzigde kant
+  }
+  if (soort(ours) === 'scalar') {
+    if (_j(ours) === _j(base)) return theirs;
+    if (_j(theirs) === _j(base)) return ours;
+    return ours; // beide gewijzigd: de onze (laatste schrijver)
+  }
+  if (soort(ours) === 'object') {
+    const res = {}, b = base || {};
+    for (const k of new Set([...Object.keys(b), ...Object.keys(ours), ...Object.keys(theirs)])) {
+      const bo = b[k], oo = ours[k], to = theirs[k];
+      if (oo === undefined && bo !== undefined && _j(to) === _j(bo)) continue; // wij verwijderden
+      if (to === undefined && bo !== undefined && _j(oo) === _j(bo)) continue; // zij verwijderden
+      const m = merge3(bo, oo, to);
+      if (m !== undefined) res[k] = m;
+    }
+    return res;
+  }
+  // arrays
+  const b = base || [];
+  const keybaar = [ours, theirs, b].every(arr => Array.isArray(arr) && arr.every(it => itemSleutel(it) != null));
+  if (keybaar) {
+    const mapVan = arr => { const m = new Map(); for (const it of arr) m.set(itemSleutel(it), it); return m; };
+    const mb = mapVan(b), mo = mapVan(ours), mt = mapVan(theirs), res = new Map();
+    for (const k of new Set([...mb.keys(), ...mo.keys(), ...mt.keys()])) {
+      const bo = mb.get(k), oo = mo.get(k), to = mt.get(k);
+      if (oo === undefined && mb.has(k) && _j(to) === _j(bo)) continue; // wij verwijderden
+      if (to === undefined && mb.has(k) && _j(oo) === _j(bo)) continue; // zij verwijderden
+      const m = merge3(bo, oo, to);
+      if (m !== undefined) res.set(k, m);
+    }
+    return [...res.values()];
+  }
+  if (_j(ours) === _j(base)) return theirs;
+  if (_j(theirs) === _j(base)) return ours;
+  return ours;
+}
 function saveSqlite() {
   sqliteInit();
   const gewijzigd = [];
@@ -68,10 +127,21 @@ function saveSqlite() {
   if (!gewijzigd.length) return;
   const bump = kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'");
   const huidig = kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'");
+  const lees = kvdb.prepare('SELECT val, ver FROM kv WHERE key = ?');
   const up = kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver');
-  kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat het versienummer klopt
+  kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat de versie en de merge kloppen
   try {
-    for (const [k, j] of gewijzigd) {
+    for (const [k, jOns] of gewijzigd) {
+      let j = jOns;
+      const rij = lees.get(k);
+      // Schreef een ander proces deze collectie ondertussen? Voeg per item samen
+      // in plaats van hun wijzigingen te overschrijven.
+      if (rij && rij.ver > (toegepast.get(k) || 0)) {
+        const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
+        const samen = merge3(base, db.data[k], JSON.parse(rij.val));
+        db.data[k] = samen;
+        j = JSON.stringify(samen);
+      }
       bump.run();
       const v = huidig.get().v;
       up.run(k, j, v);
@@ -93,8 +163,16 @@ function pollSqlite() {
     let sessieGewijzigd = false;
     for (const r of rows) {
       if (r.ver <= (toegepast.get(r.key) || 0)) continue;
-      db.data[r.key] = JSON.parse(r.val);
-      laatsteJson.set(r.key, r.val);
+      const baseJson = laatsteJson.get(r.key);
+      const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[r.key]) !== baseJson;
+      if (lokaalOpenstaand) {
+        // wij hebben nog niet-opgeslagen wijzigingen: samenvoegen en die niet
+        // als "opgeslagen" markeren, zodat de eerstvolgende save ze wegschrijft.
+        db.data[r.key] = merge3(JSON.parse(baseJson), db.data[r.key], JSON.parse(r.val));
+      } else {
+        db.data[r.key] = JSON.parse(r.val);
+        laatsteJson.set(r.key, r.val);
+      }
       toegepast.set(r.key, r.ver);
       if (r.key === 'sessions') sessieGewijzigd = true;
     }
@@ -210,4 +288,4 @@ async function startGedeeld() {
 // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.
 function onExternalChange(cb) { externCb = cb; }
 
-module.exports = { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChange };
+module.exports = { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChange, merge3 };

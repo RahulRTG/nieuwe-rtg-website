@@ -88,17 +88,23 @@ module.exports = (ctx) => {
     return (k.leerlingen || []).find(l => l.sleutel === leerlingSleutel(g.code, profielId));
   }
 
+  // een school is pas bruikbaar als RTG hem heeft goedgekeurd. Oude scholen
+  // (van voor deze stap) hebben geen status en blijven gewoon actief.
+  const isActief = (sch) => (sch.status || 'actief') === 'actief';
+
   /* ---------- stap 1: de SCHOOL meldt zich aan ----------
      De aanmelder (directie/administratie) krijgt de schoolcode (om aan het
-     personeel te geven) en het beheer-token (de sleutel van de school). */
+     personeel te geven) en het beheer-token (de sleutel van de school). De
+     school staat eerst op 'wacht': RTG keurt hem in de Backoffice goed voordat
+     er personeel toegelaten of klassen gemaakt kunnen worden. */
   router.post('/school/school/maak', (req, res) => {
     const naam = schoon(req.body.naam, 80);
     const plaats = schoon(req.body.plaats, 60);
     if (!naam) return res.status(400).json({ error: 'Vul de naam van de school in.' });
     const code = schoolCode();
-    S()[code] = { code, naam, plaats: plaats || null, token: rid(16), at: nu(), personeel: {} };
+    S()[code] = { code, naam, plaats: plaats || null, token: rid(16), at: nu(), status: 'wacht', personeel: {} };
     save();
-    res.json({ ok: true, schoolCode: code, beheerToken: S()[code].token, naam });
+    res.json({ ok: true, schoolCode: code, beheerToken: S()[code].token, naam, status: 'wacht' });
   });
 
   /* ---------- stap 2: PERSONEEL meldt zich aan bij de school ----------
@@ -124,7 +130,8 @@ module.exports = (ctx) => {
     const klassen = p.status === 'actief' && p.rol === 'leraar'
       ? Object.values(K()).filter(k => k.schoolCode === sch.code && k.leraarId === p.id).map(klasSamenvatting)
       : [];
-    res.json({ ok: true, naam: p.naam, rol: p.rol, status: p.status, school: { naam: sch.naam, plaats: sch.plaats, code: sch.code }, klassen });
+    res.json({ ok: true, naam: p.naam, rol: p.rol, status: p.status,
+      school: { naam: sch.naam, plaats: sch.plaats, code: sch.code, status: sch.status || 'actief' }, klassen });
   });
 
   /* ---------- directie: overzicht en personeelsbesluiten ---------- */
@@ -141,7 +148,7 @@ module.exports = (ctx) => {
   router.post('/school/school/overzicht', (req, res) => {
     const sch = schoolVan(req, res); if (!sch) return;
     res.json({
-      ok: true, schoolCode: sch.code, naam: sch.naam, plaats: sch.plaats,
+      ok: true, schoolCode: sch.code, naam: sch.naam, plaats: sch.plaats, status: sch.status || 'actief',
       personeel: Object.values(sch.personeel || {}).map(p => ({ id: p.id, naam: p.naam, rol: p.rol, status: p.status, at: p.at })),
       klassen: Object.values(K()).filter(k => k.schoolCode === sch.code).map(klasSamenvatting)
     });
@@ -150,8 +157,11 @@ module.exports = (ctx) => {
     const sch = schoolVan(req, res); if (!sch) return;
     const p = (sch.personeel || {})[String(req.body.personeelId || '')];
     if (!p) return res.status(404).json({ error: 'Dit personeelslid is niet gevonden.' });
-    if (req.body.akkoord === false) delete sch.personeel[p.id];
-    else p.status = 'actief';
+    // afwijzen mag altijd (spam opruimen), maar toelaten kan pas als RTG de school
+    // zelf heeft goedgekeurd
+    if (req.body.akkoord === false) { delete sch.personeel[p.id]; save(); return res.json({ ok: true }); }
+    if (!isActief(sch)) return res.status(403).json({ error: 'De school wacht nog op goedkeuring door RTG. Zodra RTG de school activeert, kun je personeel toelaten.' });
+    p.status = 'actief';
     save();
     res.json({ ok: true });
   });
@@ -160,6 +170,7 @@ module.exports = (ctx) => {
   router.post('/school/leraar/klas/maak', (req, res) => {
     const pv = personeelVan(req, res); if (!pv) return;
     const { sch, p } = pv;
+    if (!isActief(sch)) return res.status(403).json({ error: 'De school wacht nog op goedkeuring door RTG.' });
     if (p.status !== 'actief') return res.status(403).json({ error: 'De school moet je aanmelding eerst goedkeuren.' });
     if (p.rol !== 'leraar') return res.status(403).json({ error: 'Alleen een leraar maakt klassen.' });
     const naam = schoon(req.body.naam, 60);

@@ -272,7 +272,8 @@ $('#scMaak').addEventListener('click', async ()=>{
   try{
     const d = await api('/school/school/maak', { naam: $('#scNaam').value, plaats: $('#scPlaats').value });
     localStorage.setItem(LS_DIR, JSON.stringify({ code: d.schoolCode, token: d.beheerToken }));
-    alert('School aangemeld.\n\nSchoolcode voor je personeel: ' + d.schoolCode + '\nBeheer-token (bewaar goed): ' + d.beheerToken);
+    alert('School aangemeld.\n\nSchoolcode voor je personeel: ' + d.schoolCode + '\nBeheer-token (bewaar goed): ' + d.beheerToken +
+      '\n\nRTG controleert je aanmelding. Zodra de school is goedgekeurd, kun je personeel toelaten en klassen aanmaken.');
     laadDirectie(d.schoolCode, d.beheerToken);
   }catch(e){ $('#lrFout').textContent = e.message; }
 });
@@ -311,6 +312,10 @@ async function laadDirectie(code, token){
       E('div',{class:'kop'}, E('b', null, d.naam + (d.plaats ? ' · ' + d.plaats : '')),
         E('span',{class:'sub'}, 'schoolcode voor personeel: ' + d.schoolCode)),
       E('div',{class:'mini', style:{marginTop:'.3rem'}}, actief.length + ' personeelslid/-leden actief · ' + d.klassen.length + ' klas(sen)'),
+      d.status !== 'actief' ? E('div',{class:'mini', style:{marginTop:'.4rem', padding:'.5rem .6rem', border:'1px solid var(--goud, #c8a24a)', borderRadius:'10px'}},
+        d.status === 'afgewezen'
+          ? 'RTG heeft deze schoolaanmelding afgewezen. Neem contact op met RTG als je denkt dat dit niet klopt.'
+          : '⏳ Deze school wacht op goedkeuring door RTG. Je kunt alvast aanmeldingen ontvangen, maar personeel toelaten en klassen maken kan pas na goedkeuring.') : null,
       E('div',{class:'knoprij'},
         E('button',{class:'knop grijs klein', onclick:()=>{ localStorage.removeItem(LS_DIR); ov.hidden = true; $('#lrInlog').hidden = false; }}, 'Uitloggen'))),
     wachtend.length ? [E('div',{class:'sec'}, 'Aanmeldingen (wachten op jou)'),

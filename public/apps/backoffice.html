@@ -208,6 +208,12 @@
         <div class="rows" id="paList"></div>
       </div>
     </div>
+    <div class="cols" style="margin-top:1.5rem;">
+      <div class="panel">
+        <h2 data-i18n="panel.schools">Schoolaanmeldingen (RTF School)</h2>
+        <div class="rows" id="schoolList"></div>
+      </div>
+    </div>
   </div>
   <div class="doc-scrim" id="docScrim"><img id="docImg" alt="Document"></div>
   <div class="doc-scrim conv-scrim" id="convScrim">
@@ -484,6 +490,22 @@
     document.querySelectorAll('[data-pano]').forEach(b => b.addEventListener('click', async () => {
       try { await call('/office/partner/decide', { id: b.dataset.pano, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
     }));
+
+    // schoolaanmeldingen: een school kan pas personeel toelaten en klassen maken
+    // nadat RTG hem hier goedkeurt
+    const scholen = (state.pendingSchools || []).filter(x => past(x.naam, x.code, x.plaats));
+    $('#schoolList').innerHTML = scholen.length ? scholen.map(x =>
+      '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.naam)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.plaats||'')+'</span></div>'+
+        '<div class="sub">'+T('bo.sc.code','code')+' '+escHtml(x.code)+' · '+x.personeel+' '+T('bo.sc.staff','aanmelding(en) personeel')+' · '+timeAgo(x.at)+'</div></div>'+
+        '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-scok="'+escHtml(x.code)+'">'+T('bo.sc.approve','Goedkeuren')+'</button><button class="vbtn" data-scno="'+escHtml(x.code)+'">'+T('bo.sc.reject','Afwijzen')+'</button></div>'+
+      '</div></div>'
+    ).join('') : '<div class="empty">'+T('bo.nosc','Geen wachtende schoolaanmeldingen. Scholen melden zich aan via de RTFoundation-app; hier keurt u ze goed voordat ze personeel en klassen kunnen aanmaken.')+'</div>';
+    document.querySelectorAll('[data-scok]').forEach(b => b.addEventListener('click', async () => {
+      try { await call('/office/school/decide', { code: b.dataset.scok, action: 'goedkeuren' }); await refresh(); } catch(e){ alert(e.message); }
+    }));
+    document.querySelectorAll('[data-scno]').forEach(b => b.addEventListener('click', async () => {
+      try { await call('/office/school/decide', { code: b.dataset.scno, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
+    }));
   }
 
   // De tijdlijn is schaalvast: de server bladert en zoekt door de volledige
@@ -572,6 +594,9 @@ window.I18N = { en: {
   'bo.pa.done':'Approved. Share this once (it is also in the welcome email):',
   'bo.pa.code':'Supplier code', 'bo.pa.pin':'Manager PIN',
   'bo.nopa':'No requests yet. Businesses sign up via the "Become a partner" page on the site.',
+  'panel.schools':'School registrations (RTF School)', 'bo.sc.code':'code', 'bo.sc.staff':'staff registration(s)',
+  'bo.sc.approve':'Approve', 'bo.sc.reject':'Reject',
+  'bo.nosc':'No school registrations waiting. Schools sign up via the RTFoundation app; approve them here before they can add staff and classes.',
   'panel.actie':'Action centre', 'bo.brief':'Daily briefing', 'panel.perf':'Partner performance', 'panel.week':'Revenue per day',
   'bo.zoekph':'Search by guest, partner, reference or place…', 'bo.csv':'CSV',
   'bo.livenu':'On the move', 'bo.today':'Today', 'bo.weekrev':'Week revenue', 'bo.actions':'Open actions',

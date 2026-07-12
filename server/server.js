@@ -2380,6 +2380,8 @@ function officeState() {
   if (trustOpen) alerts.push({ level: 'amber', kind: 'trust', text: trustOpen + ' bericht(en) op de vertrouwenslijn wachten op de vertrouwenspersoon.' });
   const nieuwePartners = (db.data.partnerApplications || []).filter(p => p.status === 'nieuw').length;
   if (nieuwePartners) alerts.push({ level: 'info', kind: 'partner', text: nieuwePartners + ' nieuwe partner-aanvraag/aanvragen om te beoordelen.' });
+  const wachtScholen = Object.values(((db.data.foundation || {}).scholen) || {}).filter(s => (s.status || 'actief') === 'wacht');
+  if (wachtScholen.length) alerts.push({ level: 'info', kind: 'school', text: wachtScholen.length + ' schoolaanmelding(en) voor RTF School om te beoordelen.' });
   const nieuweSollicitaties = applications.filter(a => a.status === 'nieuw').length;
   if (nieuweSollicitaties) alerts.push({ level: 'info', kind: 'apps', text: nieuweSollicitaties + ' open sollicitatie(s) bij partners.' });
   const volgorde = { rood: 0, amber: 1, info: 2 };
@@ -2392,6 +2394,8 @@ function officeState() {
     applications: applications.slice(0, 40),
     suppliers: db.data.suppliers.map(publicSupplier),
     partnerApplications: (db.data.partnerApplications || []).slice(0, 40),
+    pendingSchools: wachtScholen.map(s => ({ code: s.code, naam: s.naam, plaats: s.plaats, at: s.at,
+      personeel: Object.keys(s.personeel || {}).length })).slice(0, 40),
     stats, week, performance: performance.slice(0, 12), alerts: alerts.slice(0, 20),
     // totalen over de volledige data, zodat de schermen eerlijk blijven
     // vertellen hoeveel er echt is, hoe groot de lijsten ook worden

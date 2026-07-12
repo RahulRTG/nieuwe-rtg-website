@@ -20,7 +20,22 @@ function api(pad, body) {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
   });
 }
+// losse helper voor de RTG-backoffice (buiten /api/foundation): schoolgoedkeuring.
+// officeAuth verwacht de sessietoken als Bearer-header, niet in de body.
+function office(pad, body, token) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return fetch(BASE + '/api' + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) });
+}
 const json = r => r.json();
+
+// log in bij de backoffice met de demo-code en keur een schoolaanmelding goed
+async function keurSchoolGoed(schoolCode) {
+  const login = await json(await office('/office/login', { code: 'RTG-OFFICE' }));
+  const d = await json(await office('/office/school/decide', { code: schoolCode, action: 'goedkeuren' }, login.token));
+  assert.ok(d.ok && d.status === 'actief', 'RTG keurt de school goed');
+  return login.token;
+}
 
 test.before(async () => {
   child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
@@ -43,6 +58,7 @@ test.after(() => {
    personeel, dan pas de kinderen. */
 async function opzet(naam) {
   const sch = await json(await api('/school/school/maak', { naam: 'De Regenboog ' + naam, plaats: 'Utrecht' }));
+  await keurSchoolGoed(sch.schoolCode); // RTG activeert de school eerst
   const p = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Juf ' + naam, rol: 'leraar' }));
   await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: p.personeelId, akkoord: true });
   const kl = await json(await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 8' }));
@@ -156,9 +172,35 @@ test('mededeling van de leraar bereikt het gezin', async () => {
   assert.ok(mijn.school[0].mededelingen.some(m => /ouderavond/.test(m.tekst)));
 });
 
+test('RTG keurt de school goed: zonder goedkeuring geen personeel toelaten of klassen maken', async () => {
+  const sch = await json(await api('/school/school/maak', { naam: 'De Wachtkamer', plaats: 'Almere' }));
+  assert.equal(sch.status, 'wacht', 'een nieuwe school staat op wacht');
+  const p = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Juf Nog', rol: 'leraar' }));
+  // zolang RTG de school niet activeert: directie kan personeel niet toelaten, en er komen geen klassen
+  assert.equal((await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: p.personeelId, akkoord: true })).status, 403);
+  assert.equal((await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 5' })).status, 403);
+  // de school verschijnt in het backoffice-actiecentrum en in de wachtlijst
+  const login = await json(await office('/office/login', { code: 'RTG-OFFICE' }));
+  assert.ok(login.state.alerts.some(a => a.kind === 'school'), 'de wachtende school staat in het actiecentrum');
+  assert.ok((login.state.pendingSchools || []).some(s => s.code === sch.schoolCode));
+  const lijst = await json(await office('/office/schools', {}, login.token));
+  assert.ok(lijst.schools.some(s => s.code === sch.schoolCode && s.status === 'wacht'));
+  // een niet-ingelogde beoordeling wordt geweigerd
+  assert.equal((await office('/office/school/decide', { code: sch.schoolCode, action: 'goedkeuren' })).status, 401);
+  // RTG keurt goed
+  await office('/office/school/decide', { code: sch.schoolCode, action: 'goedkeuren' }, login.token);
+  // dubbele beoordeling kan niet meer
+  assert.equal((await office('/office/school/decide', { code: sch.schoolCode, action: 'goedkeuren' }, login.token)).status, 409);
+  // NU kan de directie het personeel toelaten en de leraar een klas maken
+  assert.equal((await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: p.personeelId, akkoord: true })).status, 200);
+  const kl = await json(await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 5' }));
+  assert.ok(kl.ok && kl.code);
+});
+
 test('school eerst: personeel wacht op goedkeuring; pas daarna klassen maken', async () => {
   const sch = await json(await api('/school/school/maak', { naam: 'Het Kompas', plaats: 'Rotterdam' }));
   assert.ok(sch.schoolCode && sch.beheerToken);
+  await keurSchoolGoed(sch.schoolCode); // RTG activeert de school; dan pas telt de personeelsgoedkeuring
   // een leraar meldt zich aan: status wacht
   const p = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Bram', rol: 'leraar' }));
   assert.equal(p.status, 'wacht');
@@ -184,6 +226,7 @@ test('school eerst: personeel wacht op goedkeuring; pas daarna klassen maken', a
 
 test('personeel: afwijzen verwijdert de aanmelding; ondersteuning maakt geen klassen; leraar van school A niet bij school B', async () => {
   const sch = await json(await api('/school/school/maak', { naam: 'De Klimop', plaats: 'Den Haag' }));
+  await keurSchoolGoed(sch.schoolCode);
   // afgewezen personeelslid is weg
   const afw = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Onbekende', rol: 'leraar' }));
   await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: afw.personeelId, akkoord: false });

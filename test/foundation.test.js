@@ -500,7 +500,11 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   assert.equal(ok.status, 200);
   const st = await json(await raw('/supplier/state', {}, login.token));
   const soll = st.state.applications.find(a => a.name === 'Sam de Jong');
-  assert.ok(soll && soll.viaRTF === true, 'sollicitatie staat bij de partner met RTF-markering');
+  assert.ok(soll, 'sollicitatie staat bij de partner');
+  // de werkgever mag NIET zien dat het een RTFoundation-sollicitant is: die
+  // verschijnt als een gewoon RTG-lid, met hetzelfde cv en dezelfde markering
+  assert.equal(soll.viaRTF, undefined, 'de foundation-herkomst is onzichtbaar voor de werkgever');
+  assert.equal(soll.viaRTG, true, 'de sollicitant lijkt op een gewoon RTG-lid');
   assert.ok(soll.cv && soll.cv.skills.includes('samenwerken'), 'het cv reist mee');
 
   // een gesloten vacature levert geen sollicitatie meer op

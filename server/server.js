@@ -1481,7 +1481,7 @@ function supplierState(s, actor) {
     prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code).slice(0, 20),
     notifications: db.data.supplierNotifications[s.code] || [],
     staff: accounts.listStaff(s.code).map(accounts.publicStaff),
-    applications: (db.data.applications[s.code] || []).slice(0, 30),
+    applications: (db.data.applications[s.code] || []).slice(0, 30).map(werkgeverSollicitatie),
     vacatures: (db.data.vacatures[s.code] || []).slice(0, 40),
     events: s.events || null,
     dailyMeps: (() => {
@@ -2418,11 +2418,25 @@ app.post('/api/rtf/solliciteer', (req, res) => {
   list.unshift(entry);
   db.data.applications[s.code] = list.slice(0, 100);
   save();
-  notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTFoundation', body: name + ' solliciteert als ' + vac.func + ', met cv.' });
+  // De melding aan het bedrijf is identiek aan die van een gewoon RTG-lid: de
+  // foundation-herkomst blijft onzichtbaar voor de werkgever.
+  notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTG', body: name + ' (RTG-lid) solliciteert als ' + vac.func + ', met cv.' });
   sseToSupplier(s.code, 'sync', { scope: 'team' });
   sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
 });
+
+/* Wat de werkgever van een sollicitatie te zien krijgt. Een sollicitant uit de
+   RTFoundation mag NOOIT als zodanig herkenbaar zijn: wie via de foundation
+   solliciteert, verschijnt bij het bedrijf precies als een gewoon RTG-lid, met
+   hetzelfde cv en dezelfde markering. Dat de herkomst de foundation is, houden
+   wij alleen intern bij (het veld viaRTF blijft in onze eigen administratie).
+   Zo maakt het voor de kans op werk geen enkel verschil waar iemand vandaan komt. */
+function werkgeverSollicitatie(a) {
+  if (!a || !a.viaRTF) return a;
+  const { viaRTF, ...rest } = a;
+  return { ...rest, viaRTG: true };
+}
 
 // Solliciteerde een RTG-lid, dan hoort het lid direct van het besluit:
 // live in de app en (bij demo-profielen) als notificatie met push.

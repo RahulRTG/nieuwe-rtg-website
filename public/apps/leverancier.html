@@ -3227,7 +3227,7 @@
     const decided = (state.applications || []).filter(x => x.status !== 'nieuw').slice(0, 4);
     html += '<div class="card"><div class="tt-h">'+T('ap.h','Sollicitaties')+(apps.length?' <i class="gc-unread">'+apps.length+'</i>':'')+'</div>';
     const apCv = x => {
-      if ((!x.viaRTG && !x.viaRTF) || !x.cv) return '';
+      if (!x.viaRTG || !x.cv) return '';
       const c = x.cv, parts = [];
       if (c.headline) parts.push('<b style="color:var(--txt);">'+c.headline+'</b>');
       if (c.experience && c.experience.length) parts.push(c.experience.slice(0,3).join(' · '));
@@ -3239,7 +3239,6 @@
     html += apps.length ? apps.map(x =>
       '<div class="tk-row" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+
       (x.viaRTG?' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</i>':'')+
-      (x.viaRTF?' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:#7ecb8f;border:1px solid #7ecb8f;border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTF</i>':'')+
       '</b><span>'+x.contact+(x.note?' · "'+x.note.slice(0,60)+'"':'')+' · '+timeAgo(x.at)+'</span></div>'+
       (a.manager ? '<button class="obtn primary" data-aphire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-apno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button>' : '')+
       apCv(x)+

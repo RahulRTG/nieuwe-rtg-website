@@ -813,6 +813,7 @@
         <div class="card" id="homePay"></div>
         <div class="card" id="homeSalon"></div>
         <div class="card" id="homeCv"></div>
+        <div class="card" id="homeFoundation"></div>
       </div>
 
       <div class="view" data-view="reizen">
@@ -1131,6 +1132,7 @@
      likes:78, liked:false, comments:[]}
   ];
   let creatorLikes = 320;
+  let rtf = { gekoppeld: [], meldingen: [] }; // RTFoundation-gezinnen die dit lid als oppas/familie koppelde
 
   /* ---------- backend-koppeling ---------- */
 
@@ -1161,6 +1163,7 @@
     if (state.posts) posts = state.posts;
     if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
     if (state.myApplications) myApps = state.myApplications;
+    if (state.foundation) rtf = state.foundation;
   }
 
   // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
@@ -2385,6 +2388,49 @@
       '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
     document.querySelectorAll('#content [data-goto]').forEach(b =>
       b.addEventListener('click', () => openTab(b.dataset.goto)));
+    renderFoundation();
+  }
+
+  /* ---------- RTFoundation: als oppas/opa/oma een gezin volgen ---------- */
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function renderFoundation(){
+    const el = $('#homeFoundation'); if (!el) return;
+    if (!user || !user.account){ el.style.display='none'; return; }
+    el.style.display='';
+    const m = (rtf.meldingen || []), g = (rtf.gekoppeld || []);
+    const ongelezen = m.filter(x=>!x.gelezen).length;
+    let html = '<div class="label">RTFoundation'+(ongelezen?' · <span style="color:var(--gold)">'+ongelezen+' nieuw</span>':'')+'</div>';
+    if (!g.length){
+      html += '<div class="big" style="font-size:1.05rem;line-height:1.4;">Ben je oppas, opa of oma?</div>'+
+        '<div class="meta" style="margin:.3rem 0 .7rem;">Volg een RTFoundation-gezin met je pas, dan krijg je hun meldingen hier, zonder een extra app.</div>'+
+        '<button class="go" id="rtfKoppelBtn">Koppel een gezin →</button>';
+    } else {
+      html += '<div class="meta" style="margin-bottom:.6rem;">Je volgt: '+g.map(x=>esc(x.gezinNaam)+' (als '+esc(x.profielNaam)+')').join(', ')+'.</div>';
+      html += m.length
+        ? '<div id="rtfMeld">'+m.slice(0,8).map(x=>
+            '<div style="padding:.55rem .7rem;border:1px solid var(--line);border-radius:12px;margin-bottom:.4rem;'+(x.gelezen?'opacity:.6;':'')+(x.soort==='hulp'?'border-color:#B4574E;':'')+'">'+
+            '<div style="font-size:.72rem;color:var(--muted);">'+(x.soort==='hulp'?'🆘 ':'')+esc(x.gezin)+' · '+esc(x.van||'')+'</div>'+
+            '<div style="font-size:.9rem;line-height:1.4;margin-top:.15rem;white-space:pre-wrap;">'+esc(x.tekst)+'</div></div>').join('')+'</div>'
+        : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier.</div>';
+      html += '<button class="go" id="rtfKoppelBtn" style="margin-top:.3rem;">Nog een gezin koppelen →</button>';
+    }
+    el.innerHTML = html;
+    const kb = $('#rtfKoppelBtn'); if (kb) kb.addEventListener('click', rtfKoppelStart);
+    if (ongelezen) API.call('/rtf/meldingen/gelezen').catch(()=>{});
+  }
+  async function rtfKoppelStart(){
+    const code = prompt('Vul de gezinscode in die je van het gezin kreeg:');
+    if (!code) return;
+    try {
+      const d = await API.call('/rtf/profielen', { code: code.trim().toUpperCase() });
+      const namen = d.profielen.map((p,i)=> (i+1)+'. '+p.naam + (p.gekoppeld?' (al gekoppeld)':'')).join('\n');
+      const keuze = prompt('Gezin "'+d.gezinNaam+'". Welk profiel ben jij?\n'+namen+'\n\nTyp het nummer:');
+      const idx = parseInt(keuze,10)-1;
+      if (isNaN(idx) || !d.profielen[idx]) return;
+      const r = await API.call('/rtf/koppel', { code: code.trim().toUpperCase(), profielId: d.profielen[idx].id });
+      toast('Gekoppeld aan '+r.gezinNaam+'. Je krijgt hun meldingen nu hier.');
+      await refreshState(); renderFoundation();
+    } catch(e){ toast(e.message || 'Koppelen lukte niet.'); }
   }
 
   /* ---------- reizen ---------- */

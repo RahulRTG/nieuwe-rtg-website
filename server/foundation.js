@@ -373,7 +373,7 @@ const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
 function schoonAvatar(v) { const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim(); return s ? Array.from(s).slice(0, 2).join('') : '🙂'; }
 function schoonKleur(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? v : KLEUREN[0]; }
 
-function pubProfiel(p) { return { id: p.id, naam: p.naam, rol: p.rol, avatar: p.avatar, kleur: p.kleur, heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder', gast: p.rol === 'gast' }; }
+function pubProfiel(p) { return { id: p.id, naam: p.naam, rol: p.rol, avatar: p.avatar, kleur: p.kleur, heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder', gast: p.rol === 'gast', gekoppeld: !!p.koppel }; }
 function pubGezin(g) { return { code: g.code, naam: g.naam }; }
 function gezinVan(req, res) {
   const code = String((req.body && req.body.code) || req.params.code || '').toUpperCase();
@@ -436,8 +436,7 @@ router.get('/gezin/:code/mij', (req, res) => {
   const ongelezen = (g.berichten || []).filter(b => berichtVoorMij(b, p.id) && b.van !== p.id && !(b.gelezenDoor || []).includes(p.id)).length;
   const adult = ['beheerder', 'ouder'].includes(p.rol);
   const wisVerzoek = (g.wisVerzoek && adult) ? { doorNaam: g.wisVerzoek.doorNaam, vanMij: g.wisVerzoek.door === p.id, at: g.wisVerzoek.at } : null;
-  const koppeling = g.koppeling ? { tier: g.koppeling.tier, tierNaam: g.koppeling.tierNaam, codenaam: g.koppeling.codenaam } : null;
-  res.json({ gezin: pubGezin(g), profiel: pubProfiel(p), profielen: Object.values(g.profielen).map(pubProfiel), ongelezen, wisVerzoek, koppeling });
+  res.json({ gezin: pubGezin(g), profiel: pubProfiel(p), profielen: Object.values(g.profielen).map(pubProfiel), ongelezen, wisVerzoek });
 });
 
 router.post('/gezin/profiel/maak', (req, res) => {
@@ -495,6 +494,7 @@ router.post('/gezin/bericht', (req, res) => {
   const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar, soort, tekst: encS(tekst), at: nu(), gelezenDoor: [p.id] };
   if (!g.berichten) g.berichten = [];
   g.berichten.unshift(b); g.berichten = g.berichten.slice(0, 200); save();
+  bezorgAanGasten(g, b); // gekoppelde oppas/familie krijgt dit ook in de RTG-app
   res.json({ ok: true, bericht: Object.assign({}, b, { tekst }) });
 });
 
@@ -806,32 +806,57 @@ router.post('/gezin/wissen/intrekken', (req, res) => {
   res.json({ ok: true });
 });
 
-/* De RTG-, Lifestyle- of Business Pass koppelen aan het gezin. De beheerder logt
-   met zijn RTG-account in om te bewijzen dat de Pass van hem is; we bewaren alleen
-   het niveau en de codenaam, geen persoonsgegevens. Zo weet de foundation dat een
-   lid dit gezin steunt. */
+/* Een oppas, opa/oma of familielid (gastprofiel) met een RTG-, Lifestyle- of
+   Business Pass kan dit gezin in zijn eigen RTG-app koppelen. Vanaf dan komen de
+   meldingen voor dat gastprofiel ook binnen in de RTG-app, zodat hij deze app
+   niet hoeft te installeren. Het koppelen zelf gebeurt in de RTG-app (die de
+   eigenaar via zijn account bewijst); deze functies worden daarvandaan gebruikt.
+   We bewaren alleen het account-id, het pasniveau en de codenaam. */
 const TIERNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
-router.post('/gezin/koppel', (req, res) => {
-  const g = gezinVan(req, res); if (!g) return;
-  if (!beheerderVan(g, req, res)) return;
-  const bucket = 'koppel:' + ipVan(req);
-  if (teVaak(res, bucket)) return;
-  let accounts; try { accounts = require('./accounts'); } catch (e) { return res.status(500).json({ error: 'Koppelen kan nu niet.' }); }
-  const u = accounts.findByLogin(req.body.login);
-  if (!u || !accounts.verifyPassword(String(req.body.wachtwoord || ''), u.password_hash)) {
-    misluktePoging(bucket, 8, 10);
-    return res.status(403).json({ error: 'Deze inloggegevens kloppen niet. Gebruik je RTG-gebruikersnaam of e-mail en wachtwoord.' });
+function gastProfielen(code) {
+  const g = G()[String(code || '').toUpperCase()];
+  if (!g) return null;
+  return { gezinNaam: g.naam, profielen: Object.values(g.profielen).filter(p => p.rol === 'gast').map(p => ({ id: p.id, naam: p.naam, avatar: p.avatar, kleur: p.kleur, gekoppeld: !!p.koppel })) };
+}
+function linkGast({ code, profielId, userId, tier, codenaam }) {
+  const g = G()[String(code || '').toUpperCase()];
+  if (!g) return { error: 'Dit gezin kennen we niet. Klopt de gezinscode?', status: 404 };
+  const p = g.profielen[String(profielId || '')];
+  if (!p) return { error: 'Dit profiel bestaat niet meer.', status: 404 };
+  if (p.rol !== 'gast') return { error: 'Alleen een oppas- of familieprofiel kan aan een RTG-pas gekoppeld worden.', status: 403 };
+  p.koppel = { userId, tier, tierNaam: TIERNAAM[tier] || 'RTG Pass', codenaam: codenaam || 'lid', at: nu() };
+  save();
+  return { ok: true, gezinNaam: g.naam, profielNaam: p.naam, tierNaam: p.koppel.tierNaam };
+}
+function unlinkGast({ userId, code, profielId }) {
+  let n = 0;
+  for (const g of Object.values(G())) for (const p of Object.values(g.profielen || {})) {
+    if (p.koppel && p.koppel.userId === userId && (!code || g.code === String(code).toUpperCase()) && (!profielId || p.id === profielId)) { delete p.koppel; n++; }
   }
-  goedePoging(bucket);
-  g.koppeling = { tier: u.tier, tierNaam: TIERNAAM[u.tier] || 'RTG Pass', codenaam: u.codename || 'Lid', at: nu() }; save();
-  res.json({ ok: true, koppeling: { tier: g.koppeling.tier, tierNaam: g.koppeling.tierNaam, codenaam: g.koppeling.codenaam } });
-});
-router.post('/gezin/koppel/los', (req, res) => {
-  const g = gezinVan(req, res); if (!g) return;
-  if (!beheerderVan(g, req, res)) return;
-  delete g.koppeling; save();
-  res.json({ ok: true });
-});
+  if (n) save();
+  return { ok: true, verwijderd: n };
+}
+function gekoppeldeGezinnen(userId) {
+  const uit = [];
+  for (const g of Object.values(G())) for (const p of Object.values(g.profielen || {})) {
+    if (p.koppel && p.koppel.userId === userId) uit.push({ code: g.code, gezinNaam: g.naam, profielId: p.id, profielNaam: p.naam });
+  }
+  return uit;
+}
+// bezorg een gezinsmelding ook in de RTG-app van gekoppelde gasten
+function bezorgAanGasten(g, bericht) {
+  let accounts; try { accounts = require('./accounts'); } catch (e) { return; }
+  const ontvangers = Object.values(g.profielen).filter(p => p.rol === 'gast' && p.koppel && p.koppel.userId && (bericht.naar === 'allen' || bericht.naar === p.id));
+  for (const p of ontvangers) {
+    try {
+      const md = accounts.getMemberState(p.koppel.userId) || {};
+      if (!Array.isArray(md.foundationMeldingen)) md.foundationMeldingen = [];
+      md.foundationMeldingen.unshift({ id: rid(4), at: nu(), gezin: g.naam, profielNaam: p.naam, van: bericht.vanNaam, tekst: decS(bericht.tekst), soort: bericht.soort, gelezen: false });
+      md.foundationMeldingen = md.foundationMeldingen.slice(0, 40);
+      accounts.saveMemberState(p.koppel.userId, md);
+    } catch (e) { /* een gekoppelde gast minder bereikt: niet fataal */ }
+  }
+}
 
 /* gezinsagenda: samen plannen. Het gezin voegt toe; iedereen (ook de oppas) mag
    de planning zien, zodat een oppas weet wat er die dag speelt. */
@@ -918,4 +943,4 @@ router.get('/gezin/:code/klussen', (req, res) => {
 
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
-module.exports = { router };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen };

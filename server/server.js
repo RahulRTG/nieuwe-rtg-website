@@ -98,7 +98,8 @@ app.use(express.json({ limit: '8mb' }));
 // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
 // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
 // draait mee op dezelfde database en failover.
-app.use('/api/foundation', require('./foundation').router);
+const rtf = require('./foundation');
+app.use('/api/foundation', rtf.router);
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -628,6 +629,10 @@ function stateFor(sess, lang) {
     state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
     state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
     state.myApplications = myApplications(sess.key);
+    // RTFoundation: gezinnen die dit lid als oppas/familie koppelde + hun meldingen
+    if (sess.account) {
+      state.foundation = { gekoppeld: rtf.gekoppeldeGezinnen(sess.account.id), meldingen: md.foundationMeldingen || [] };
+    }
     // leeftijd uit het paspoort: het lid ziet de eigen groep; partners nooit
     const lft = leeftijdVan(geborenVan(sess));
     if (lft != null) { state.user.leeftijd = lft; state.user.leeftijdsgroep = leeftijdsgroepVan(lft); }
@@ -861,6 +866,40 @@ app.post('/api/notifications', auth, (req, res) => {
 app.post('/api/notifications/read', auth, (req, res) => {
   (db.data.notifications[req.session.tier] || []).forEach(n => n.read = true);
   save();
+  res.json({ ok: true });
+});
+
+/* ---------- RTFoundation-koppeling: een lid (oppas, opa/oma, familie) koppelt
+   met zijn RTG-pas een gezinsprofiel, zodat de meldingen uit dat gezin hier in
+   de RTG-app binnenkomen. Zo hoeft hij de RTFoundation-app niet te installeren. */
+function eisAccount(req, res) {
+  if (!req.session.account) { res.status(403).json({ error: 'Log in met je eigen RTG-account om een gezin te koppelen.' }); return false; }
+  return true;
+}
+app.post('/api/rtf/profielen', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const info = rtf.gastProfielen(req.body.code);
+  if (!info) return res.status(404).json({ error: 'Dit gezin kennen we niet. Klopt de gezinscode?' });
+  if (!info.profielen.length) return res.status(404).json({ error: 'Dit gezin heeft nog geen oppas- of familieprofiel om te koppelen. Vraag de ouder er een aan te maken.' });
+  res.json(info);
+});
+app.post('/api/rtf/koppel', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const u = req.session.account;
+  const r = rtf.linkGast({ code: req.body.code, profielId: req.body.profielId, userId: u.id, tier: u.tier, codenaam: u.codename });
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json({ ok: true, gezinNaam: r.gezinNaam, profielNaam: r.profielNaam, tierNaam: r.tierNaam });
+});
+app.post('/api/rtf/ontkoppel', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  rtf.unlinkGast({ userId: req.session.account.id, code: req.body.code, profielId: req.body.profielId });
+  res.json({ ok: true });
+});
+app.post('/api/rtf/meldingen/gelezen', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const md = accounts.getMemberState(req.session.account.id) || {};
+  (md.foundationMeldingen || []).forEach(m => { m.gelezen = true; });
+  accounts.saveMemberState(req.session.account.id, md);
   res.json({ ok: true });
 });
 

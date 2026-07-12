@@ -314,18 +314,36 @@ test('twee volwassenen: verwijderen vraagt toestemming van de tweede', async () 
   assert.ok((await json(await api('/gezin/wissen', { code: g2.code, token: g2.token, pin: '5656' }))).verwijderd);
 });
 
-test('Pass koppelen: het demo-lid Rahul kan aan het gezin worden gekoppeld', async () => {
-  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Steun', naam: 'Ma', pin: '2323' }));
-  // verkeerde inloggegevens falen
-  assert.equal((await api('/gezin/koppel', { code: g.code, token: g.token, login: 'Rahul', wachtwoord: 'fout' })).status, 403);
-  // het demo-account (Rahul / Imran, business) koppelt wel
-  const ok = await api('/gezin/koppel', { code: g.code, token: g.token, login: 'Rahul', wachtwoord: 'Imran' });
-  assert.equal(ok.status, 200);
-  assert.equal((await json(ok)).koppeling.tier, 'business');
-  const mij = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token));
-  assert.equal(mij.koppeling.tierNaam, 'Business Pass');
-  // ontkoppelen kan
-  assert.equal((await api('/gezin/koppel/los', { code: g.code, token: g.token })).status, 200);
+test('oppas met RTG-pas: koppelt zijn gastprofiel en krijgt de gezinsmeldingen in de RTG-app', async () => {
+  // een echt RTG-account aanmaken (de oppas/opa), met token
+  const reg = await json(await (await fetch(BASE + '/api/auth/register', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Opa Jan', email: 'opa' + Date.now() + '@voorbeeld.test', phone: '0612345678', password: 'geheim123', geboortedatum: '1958-04-10', tier: 'lifestyle' })
+  })));
+  const rtgToken = reg.token;
+  const rtgCall = (pad, body) => fetch(BASE + '/api' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + rtgToken }, body: JSON.stringify(body || {}) });
+
+  // gezin met een gastprofiel voor opa
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam Steun', naam: 'Ma', pin: '2323' }));
+  const gast = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Opa', rol: 'gast' }));
+
+  // opa ziet de gastprofielen en koppelt het zijne vanuit zijn RTG-app
+  const prof = await json(await rtgCall('/rtf/profielen', { code: g.code }));
+  assert.ok(prof.profielen.some(p => p.naam === 'Opa'));
+  const kop = await rtgCall('/rtf/koppel', { code: g.code, profielId: gast.profiel.id });
+  assert.equal(kop.status, 200);
+
+  // de beheerder stuurt een oproep aan iedereen -> komt in opa's RTG-app binnen
+  await api('/gezin/bericht', { code: g.code, token: g.token, naar: 'allen', soort: 'reis', tekst: 'We gaan misschien op reis!' });
+  const st = await json(await rtgCall('/state', {}));
+  assert.ok(st.state.foundation, 'de RTG-app-state bevat foundation');
+  assert.equal(st.state.foundation.gekoppeld.length, 1);
+  assert.ok(st.state.foundation.meldingen.some(x => /op reis/.test(x.tekst) && x.gezin === 'Fam Steun'), 'de melding staat in de RTG-app');
+
+  // ontkoppelen kan, daarna geen nieuwe meldingen meer
+  assert.equal((await rtgCall('/rtf/ontkoppel', { code: g.code, profielId: gast.profiel.id })).status, 200);
+  const st2 = await json(await rtgCall('/state', {}));
+  assert.equal(st2.state.foundation.gekoppeld.length, 0);
 });
 
 test('gezinsagenda en klusjes: plannen samen en sterren verdienen', async () => {

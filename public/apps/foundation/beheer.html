@@ -78,15 +78,9 @@
   </div>
 
   <div class="kaart blok">
-    <h2>Je RTG-, Lifestyle- of Business Pass koppelen</h2>
-    <div class="h">Ben je lid van Rahul Travel Group? Koppel je Pass aan jullie gezin. Zo weet de foundation dat een lid dit gezin steunt. We bewaren alleen het niveau en je codenaam, geen persoonsgegevens.</div>
-    <div id="koppelStatus"></div>
-    <div id="koppelForm">
-      <input class="veld" id="kpLogin" placeholder="RTG-gebruikersnaam of e-mail" style="margin-bottom:.5rem;" autocomplete="username">
-      <input class="veld" id="kpPass" placeholder="RTG-wachtwoord" type="password" style="margin-bottom:.5rem;" autocomplete="current-password">
-      <div class="fout" id="kpFout"></div>
-      <button class="knop" id="kpDoe">Pass koppelen</button>
-    </div>
+    <h2>Oppas of familie met een RTG-pas</h2>
+    <div class="h">Heeft een oppas, opa of oma een RTG-, Lifestyle- of Business-pas? Dan hoeven zij deze app niet te installeren. Ze koppelen dit gezin in hun eigen RTG-app met jullie gezinscode (<b id="uCode2"></b>) en hun oppasprofiel, en krijgen de meldingen daar binnen. Maak eerst een profiel met de rol "Oppas of familie" aan.</div>
+    <div id="koppelUitleg" class="h" style="margin-top:.4rem;"></div>
   </div>
 
   <div class="kaart blok">
@@ -168,12 +162,15 @@ async function laad(){
   function knop(id, tekst){ const b=document.createElement('button'); b.textContent=tekst; b.onclick=()=>{ naarWie=id; [...nk.children].forEach(c=>c.classList.toggle('aan', c===b)); }; return b; }
   const allen=knop('allen','Iedereen'); allen.classList.add('aan'); nk.appendChild(allen);
   d.profielen.filter(p=> p.id!==d.profiel.id).forEach(p=> nk.appendChild(knop(p.id, p.naam)));
-  // Pass-koppeling
-  if (d.koppeling){
-    $('#koppelForm').style.display='none';
-    $('#koppelStatus').innerHTML = '<div class="prow"><span class="av" style="background:var(--goud);color:#1a1710">✅</span><div><div class="nm">'+esc(d.koppeling.tierNaam||'RTG Pass')+'</div><div class="rl">'+esc(d.koppeling.codenaam||'lid')+'</div></div><div class="sp"><button class="knop grijs klein" id="kpLos">Ontkoppelen</button></div></div>';
-    $('#kpLos').onclick = async ()=>{ try{ await api('/gezin/koppel/los', { code:s.code, token:s.token }); laad(); }catch(e){ alert(e.message); } };
-  } else { $('#koppelForm').style.display='block'; $('#koppelStatus').innerHTML=''; }
+  // oppas/familie met RTG-pas: gezinscode tonen en welke gasten al gekoppeld zijn
+  $('#uCode2').textContent = s.code;
+  const gasten = d.profielen.filter(p=>p.gast);
+  const gekoppeld = gasten.filter(p=>p.gekoppeld);
+  $('#koppelUitleg').innerHTML = !gasten.length
+    ? 'Er is nog geen oppas- of familieprofiel. Voeg er hierboven een toe.'
+    : (gekoppeld.length
+      ? '📲 Gekoppeld aan de RTG-app: ' + gekoppeld.map(p=>esc(p.naam)).join(', ') + '.'
+      : 'Nog geen van de oppas/familie-profielen is gekoppeld. Zij doen dat zelf in hun RTG-app.');
   // openstaand verzoek om te verwijderen
   const adults = d.profielen.filter(p=> p.beheerder || p.rol==='ouder').length;
   if (d.wisVerzoek && !d.wisVerzoek.vanMij){
@@ -261,14 +258,6 @@ $('#wDoe').onclick=async()=>{
     alert('Je verzoek is ingediend. Een tweede volwassene moet het nog goedkeuren.');
     laad();
   }catch(e){ $('#wFout').textContent = e.message; }
-};
-
-$('#kpDoe').onclick=async()=>{
-  $('#kpFout').textContent='';
-  try{
-    await api('/gezin/koppel', { code:s.code, token:s.token, login:$('#kpLogin').value.trim(), wachtwoord:$('#kpPass').value });
-    $('#kpLogin').value=''; $('#kpPass').value=''; laad();
-  }catch(e){ $('#kpFout').textContent = e.message; }
 };
 
 laad();

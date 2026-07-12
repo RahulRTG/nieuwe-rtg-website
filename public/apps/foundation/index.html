@@ -283,8 +283,6 @@ async function start(){
     const d = await Sessie.ophalen();
     if (d && d.profiel){
       Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel.rol);
-      // gekoppelde Pass
-      if (d.koppeling){ $('#hPass').innerHTML = '✅ Gekoppeld aan een '+esc(d.koppeling.tierNaam||'RTG Pass')+' ('+esc(d.koppeling.codenaam||'lid')+')'; $('#hPass').hidden=false; }
       // openstaand verzoek om alles te verwijderen
       if (d.wisVerzoek){
         if (d.wisVerzoek.vanMij){

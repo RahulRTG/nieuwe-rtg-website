@@ -15,7 +15,9 @@
   "shortcuts": [
     { "name": "Leren", "url": "/apps/foundation/leren.html" },
     { "name": "CV-maker", "url": "/apps/foundation/cv.html" },
-    { "name": "Even rust", "url": "/apps/foundation/rust.html" },
+    { "name": "Geldmaatje", "url": "/apps/foundation/geld.html" },
+    { "name": "Hulpwijzer", "url": "/apps/foundation/hulpwijzer.html" },
+    { "name": "Onze dromen", "url": "/apps/foundation/dromen.html" },
     { "name": "Op reis", "url": "/apps/foundation/reis.html" }
   ]
 }

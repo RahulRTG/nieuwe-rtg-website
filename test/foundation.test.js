@@ -143,6 +143,46 @@ test('het gezin: aanmaken, profiel toevoegen, kiezen met pincode, en een reis-op
   assert.equal((await api('/gezin/profiel/verwijder', { code: g.code, token: g.token, profielId: beheerders[0].id })).status, 400);
 });
 
+test('samen vooruit: een spaardoel vullen tot het gehaald is, en een droom aanmoedigen', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Groei', naam: 'Ouder', pin: '3690' }));
+  const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Tim', rol: 'kind' }));
+  const kt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+
+  // spaardoel maken en samen vullen
+  const doel = await json(await api('/gezin/spaardoel/maak', { code: g.code, token: g.token, naam: 'Een fiets', doel: 100 }));
+  assert.equal(doel.doel.nu, 0);
+  // een leeg bedrag telt niet
+  assert.equal((await api('/gezin/spaardoel/bijdrage', { code: g.code, token: kt, doelId: doel.doel.id, bedrag: 0 })).status, 400);
+  await api('/gezin/spaardoel/bijdrage', { code: g.code, token: kt, doelId: doel.doel.id, bedrag: 60 });
+  const laatste = await json(await api('/gezin/spaardoel/bijdrage', { code: g.code, token: g.token, doelId: doel.doel.id, bedrag: 50 }));
+  assert.ok(laatste.doel.klaar, 'het doel is gehaald');
+  assert.ok(laatste.gevierd, 'net gehaald geeft een feestje');
+  // een kind kan geen spaardoel verwijderen, de beheerder wel
+  assert.equal((await api('/gezin/spaardoel/verwijder', { code: g.code, token: kt, doelId: doel.doel.id })).status, 403);
+
+  // dromenbord: kind plaatst, ouder moedigt aan
+  const droom = await json(await api('/gezin/droom/maak', { code: g.code, token: kt, tekst: 'Ik wil leren zwemmen' }));
+  const m = await json(await api('/gezin/droom/moedig', { code: g.code, token: g.token, droomId: droom.droom.id }));
+  assert.equal(m.aantal, 1);
+  assert.ok(m.aangemoedigd);
+  // eigenaar vinkt hem af als gehaald
+  const af = await json(await api('/gezin/droom/behaald', { code: g.code, token: kt, droomId: droom.droom.id }));
+  assert.ok(af.droom.behaald);
+  // iemand anders (geen eigenaar/beheerder) kan de droom niet weghalen: hier heeft de ouder wel beheerderrecht, dus test met een tweede kind
+  const kind2 = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'San', rol: 'kind' }));
+  const k2 = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind2.profiel.id }))).token;
+  assert.equal((await api('/gezin/droom/verwijder', { code: g.code, token: k2, droomId: droom.droom.id })).status, 403);
+
+  // gezinshulp-AI werkt voor een ingelogd profiel, niet zonder token
+  const hulp = await api('/hulp/ai', { code: g.code, token: kt, kind: 'hulp', messages: [{ role: 'user', content: 'Ik heb hulp nodig met eten' }] });
+  assert.equal(hulp.status, 200);
+  assert.ok((await json(hulp)).text.length > 5);
+  assert.equal((await api('/hulp/ai', { code: g.code, token: 'nep', kind: 'geld', messages: [{ role: 'user', content: 'hoi' }] })).status, 403);
+  // de bespaartip en gesprekskaart laden
+  assert.ok((await json(await fetch(BASE + '/api/foundation/bespaartip'))).tip.length > 5);
+  assert.ok((await json(await fetch(BASE + '/api/foundation/gesprekskaart'))).kaart.length > 5);
+});
+
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {
   const L = await les();
   const goed = await api('/ai', { code: L.code, token: L.sToken, messages: [{ role: 'user', content: 'Help met breuken' }] });

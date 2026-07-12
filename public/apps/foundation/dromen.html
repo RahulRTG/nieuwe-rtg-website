@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Onze dromen</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .maak{padding:1rem 1.1rem;margin-bottom:1.3rem;}
+  .maak .rijveld{display:flex;gap:.5rem;}
+  .maak textarea{flex:1;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .7rem;}
+  .droom{padding:.9rem 1rem;margin-bottom:.7rem;position:relative;border-left:4px solid var(--goud);}
+  .droom .wie{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--zacht);margin-bottom:.35rem;}
+  .droom .av{width:1.6rem;height:1.6rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;}
+  .droom .tk{font-size:1rem;line-height:1.45;}
+  .droom .acties{display:flex;gap:.5rem;align-items:center;margin-top:.7rem;flex-wrap:wrap;}
+  .moedig{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;display:inline-flex;align-items:center;gap:.35rem;}
+  .moedig.aan{background:#2a2417;border-color:var(--goud);color:var(--goud2);}
+  .mini{background:transparent;color:var(--zacht);font-size:.82rem;padding:.35rem .3rem;}
+  .mini:hover{color:var(--goud);}
+  .droom.behaald{border-left-color:var(--groen);opacity:.92;}
+  .droom.behaald .tk{text-decoration:line-through;text-decoration-color:var(--groen);}
+  .vlag{color:var(--groen);font-weight:700;font-size:.85rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.4rem 0 1rem;}
+  .kaartblok{padding:1.2rem;margin-top:1.6rem;text-align:center;}
+  .kaartblok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
+  .kaartblok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;}
+  .praat{font-family:var(--serif);font-size:1.25rem;line-height:1.4;min-height:2.4em;display:flex;align-items:center;justify-content:center;padding:.4rem 0;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>⭐ Onze dromen</h1>
+  <div class="intro">Schrijf op wat je wilt bereiken, groot of klein. Het gezin moedigt elkaar aan, en samen vieren we wat lukt. Want dromen mag, en waarmaken kan.</div>
+
+  <div class="kaart maak">
+    <div class="rijveld">
+      <textarea class="veld" id="nTekst" rows="1" placeholder="Mijn droom of doel is..." maxlength="240"></textarea>
+      <button class="knop" id="nMaak">Plaats</button>
+    </div>
+    <div class="fout" id="nFout"></div>
+  </div>
+
+  <div id="open"></div>
+  <div id="behaaldSec" hidden>
+    <h2 class="sec">🏆 Gevierd en gehaald</h2>
+    <div id="behaald"></div>
+  </div>
+
+  <div class="kaart kaartblok">
+    <h2>Gesprekskaart voor aan tafel</h2>
+    <div class="h">Even samen praten? Trek een kaart en beantwoord hem om de beurt.</div>
+    <div class="praat" id="praat">...</div>
+    <button class="knop grijs klein" id="nogKaart" style="margin-top:.6rem;">Nieuwe kaart</button>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+
+function kaartHtml(d){
+  return '<div class="kaart droom'+(d.behaald?' behaald':'')+'" style="border-left-color:'+(d.behaald?'':(d.kleur||'#C9A24B'))+'">'+
+    '<div class="wie"><span class="av" style="background:'+(d.kleur||'#C9A24B')+'">'+(d.vanAvatar||'🙂')+'</span>'+esc(d.vanNaam)+(d.vanMij?' (jij)':'')+'</div>'+
+    '<div class="tk">'+esc(d.tekst)+'</div>'+
+    '<div class="acties">'+
+      '<button class="moedig'+(d.aangemoedigd?' aan':'')+'" data-moedig="'+d.id+'">👏 <span>'+d.aantal+'</span></button>'+
+      ((d.vanMij||Sessie.isBeheerder()) && !d.behaald ? '<button class="mini" data-behaald="'+d.id+'">✓ Gehaald!</button>' : '')+
+      (d.behaald && (d.vanMij||Sessie.isBeheerder()) ? '<span class="vlag">Gehaald 🎉</span> <button class="mini" data-terug="'+d.id+'">Terugzetten</button>' : '')+
+      ((d.vanMij||Sessie.isBeheerder()) ? '<button class="mini" data-del="'+d.id+'">Weg</button>' : '')+
+    '</div></div>';
+}
+async function laad(){
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/dromen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const dromen = d.dromen || [];
+    const open = dromen.filter(x=>!x.behaald), klaar = dromen.filter(x=>x.behaald);
+    $('#open').innerHTML = open.length ? open.map(kaartHtml).join('') : '<div class="leeg">Nog geen dromen. Wees de eerste; klein mag ook.</div>';
+    $('#behaaldSec').hidden = !klaar.length;
+    $('#behaald').innerHTML = klaar.map(kaartHtml).join('');
+    document.querySelectorAll('[data-moedig]').forEach(b=> b.onclick=()=> moedig(b.dataset.moedig));
+    document.querySelectorAll('[data-behaald]').forEach(b=> b.onclick=()=> behaald(b.dataset.behaald, true));
+    document.querySelectorAll('[data-terug]').forEach(b=> b.onclick=()=> behaald(b.dataset.terug, false));
+    document.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=> verwijder(b.dataset.del));
+  }catch(e){ $('#open').innerHTML='<div class="leeg">Kon de dromen niet laden.</div>'; }
+}
+$('#nMaak').onclick = async ()=>{
+  $('#nFout').textContent='';
+  try{ await api('/gezin/droom/maak', { code:s.code, token:s.token, tekst:$('#nTekst').value }); $('#nTekst').value=''; laad(); }
+  catch(e){ $('#nFout').textContent = e.message; }
+};
+async function moedig(id){ try{ await api('/gezin/droom/moedig', { code:s.code, token:s.token, droomId:id }); laad(); }catch(e){ alert(e.message); } }
+async function behaald(id, val){
+  try{ await api('/gezin/droom/behaald', { code:s.code, token:s.token, droomId:id, behaald:val }); if(val){ try{ if(navigator.vibrate) navigator.vibrate([60,40,60]); }catch(e){} } laad(); }
+  catch(e){ alert(e.message); }
+}
+async function verwijder(id){ if(!confirm('Deze droom weghalen?')) return; try{ await api('/gezin/droom/verwijder', { code:s.code, token:s.token, droomId:id }); laad(); }catch(e){ alert(e.message); } }
+
+async function kaart(){ try{ const d = await fetch('/api/foundation/gesprekskaart').then(r=>r.json()); $('#praat').textContent = d.kaart; }catch(e){} }
+$('#nogKaart').onclick = kaart;
+
+laad(); kaart();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

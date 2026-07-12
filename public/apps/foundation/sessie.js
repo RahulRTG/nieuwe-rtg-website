@@ -16,6 +16,8 @@
     wisProfiel: function () { var s = lees(); if (s) { delete s.token; delete s.profiel; localStorage.setItem(KEY, JSON.stringify(s)); } },
     uitloggen: function () { localStorage.removeItem(KEY); },
     naam: function () { var s = lees(); return (s && s.profiel && s.profiel.naam) || ''; },
+    // gebruik boven aan een tool-pagina: geen sessie -> terug naar de inlog
+    eisProfiel: function () { if (!Sessie.actief()) { location.href = 'index.html'; return false; } return true; },
     isBeheerder: function () { var s = lees(); return !!(s && s.profiel && s.profiel.beheerder); },
     // controleer bij de server of het token nog klopt; geeft { gezin, profiel, profielen, ongelezen } of null
     ophalen: function () {
@@ -91,6 +93,7 @@
       '.sb-av{width:1.8rem;height:1.8rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}' +
       '.sb-nm{font-size:.9rem;font-weight:600;max-width:7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
       '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
+      '.sb-menu[hidden],.sb-berichten[hidden]{display:none;}' +
       '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:8px;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--goud);}' +
       '.sb-berichten{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.5rem;width:min(92vw,22rem);max-height:70vh;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
       '.sb-leeg{color:var(--zacht);font-size:.85rem;padding:.8rem;text-align:center;}' +

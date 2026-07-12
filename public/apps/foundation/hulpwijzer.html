@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Hulpwijzer</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .cats{display:flex;flex-direction:column;gap:.7rem;}
+  .cat{padding:1rem 1.1rem;}
+  .cat summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.7rem;font-weight:600;font-size:1.02rem;}
+  .cat summary::-webkit-details-marker{display:none;}
+  .cat summary .ic{font-size:1.5rem;}
+  .cat summary .pijl{margin-left:auto;color:var(--zacht);transition:transform .15s;}
+  .cat[open] summary .pijl{transform:rotate(90deg);}
+  .cat .body{margin-top:.8rem;display:flex;flex-direction:column;gap:.7rem;}
+  .hulp{background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;padding:.7rem .9rem;}
+  .hulp b{color:var(--goud);}
+  .hulp p{color:var(--zacht);font-size:.88rem;line-height:1.45;margin-top:.2rem;}
+  .blok{padding:1.2rem;margin:1.3rem 0;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
+  .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
+  .chat{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;margin-bottom:.7rem;}
+  .b{padding:.6rem .8rem;border-radius:12px;max-width:85%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
+  .b.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
+  .b.ai{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
+  .rijveld{display:flex;gap:.5rem;}
+  .rijveld .veld{flex:1;}
+  .nood{font-size:.82rem;color:var(--zacht);line-height:1.5;margin-top:.6rem;text-align:center;}
+  .nood b{color:var(--txt);}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🧭 Hulpwijzer</h1>
+  <div class="intro">Je hoeft het niet alleen te doen. Hieronder staat waar je in Nederland gratis hulp kunt vinden. Alles kosteloos aanvragen; schamen hoeft nooit.</div>
+
+  <div class="cats" id="cats"></div>
+
+  <div class="kaart blok">
+    <h2>Weet je niet waar te beginnen?</h2>
+    <div class="h">Vertel kort wat je nodig hebt, dan wijst Meike je de juiste, gratis plek.</div>
+    <div class="chat" id="chat"><div class="b ai">Hoi, ik ben Meike. Waar kan ik je bij helpen? Denk aan eten, kleding, hulp voor de kinderen, of hulp met geld en post.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Ik heb hulp nodig met..." maxlength="1000"></textarea>
+      <button class="knop" id="stuur">Vraag</button>
+    </div>
+    <div class="nood"><b>Nood of gevaar? Bel 112.</b> Zit je heel diep of denk je aan zelfmoord? Bel gratis en dag en nacht 113 (of 0800-0113).</div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+
+const CATS = [
+  { ic:'🍲', titel:'Eten', items:[
+    ['Voedselbank','Gratis voedselpakketten als je even niet rondkomt. Aanmelden kan via voedselbankennederland.nl of je gemeente; er wordt vertrouwelijk gekeken of je in aanmerking komt.'],
+    ['Buurtmaaltijden','Veel buurthuizen en kerken koken goedkope of gratis maaltijden waar iedereen welkom is. Vraag bij je wijkcentrum.']
+  ]},
+  { ic:'👕', titel:'Kleding en spullen', items:[
+    ['Kledingbank','Gratis kleding voor het hele gezin. Zoek op "kledingbank" met je plaatsnaam, of vraag je gemeente.'],
+    ['Stichting Leergeld','Betaalt mee aan schoolspullen, een fiets, laptop, zwemles en meer voor kinderen. Kijk op leergeld.nl.'],
+    ['Kringloop en weggeefgroepen','Voor goedkope meubels en spullen. Op Facebook zijn er in bijna elke plaats weggeefgroepen.']
+  ]},
+  { ic:'💶', titel:'Geld, toeslagen en post', items:[
+    ['Toeslagen','Check op toeslagen.nl of je recht hebt op zorgtoeslag, huurtoeslag of het kindgebonden budget. Aanvragen is gratis.'],
+    ['Gemeente: bijzondere bijstand en energietoeslag','Je gemeente heeft potjes voor extra kosten en een energietoeslag. Bel of mail de gemeente en vraag ernaar.'],
+    ['Kwijtschelding','Vaak hoef je gemeente- en waterschapsbelasting niet te betalen als je weinig inkomen hebt. Vraag om kwijtschelding.'],
+    ['SchuldHulpMaatje','Gratis, vertrouwelijke hulp bij schulden en post die je niet meer overziet. Kijk op schuldhulpmaatje.nl.']
+  ]},
+  { ic:'🧒', titel:'Voor de kinderen', items:[
+    ['Jeugdfonds Sport & Cultuur','Betaalt de contributie voor sport, muziek, dans of tekenen. Je vraagt het aan via een leerkracht of hulpverlener; jeugdfondssportencultuur.nl.'],
+    ['Nationaal Fonds Kinderhulp','Helpt met dingen die niet lukken: een bed, een verjaardag, een dagje uit. Kijk op kinderhulp.nl.'],
+    ['Stichting Jarige Job','Een gratis verjaardagsbox zodat elk kind zijn verjaardag kan vieren.']
+  ]},
+  { ic:'💚', titel:'Steun en gezondheid', items:[
+    ['Je huisarts','Ook voor stress, somberheid of zorgen. De huisarts helpt of verwijst je door, en kent de weg.'],
+    ['MIND Korrelatie','Gratis, anonieme hulp bij psychische vragen, chat of bel via mindkorrelatie.nl.'],
+    ['113 Zelfmoordpreventie','Als je het echt niet meer ziet zitten: bel gratis 0800-0113, dag en nacht.']
+  ]},
+  { ic:'📚', titel:'Leren en werk', items:[
+    ['De Bibliotheek','Vaak gratis of heel goedkoop lidmaatschap, gratis internet, cursussen en hulp bij lezen, taal en de computer.'],
+    ['Gemeente en UWV','Voor hulp bij het vinden van werk, een uitkering of een opleiding. Vraag naar een klantmanager.'],
+    ['Deze app','De cv-maker en het lesbord in de RTFoundation-app helpen je verder met leren en werk zoeken.']
+  ]}
+];
+$('#cats').innerHTML = CATS.map(c=>
+  '<details class="kaart cat"><summary><span class="ic">'+c.ic+'</span>'+esc(c.titel)+'<span class="pijl">›</span></summary>'+
+  '<div class="body">'+c.items.map(([t,d])=>'<div class="hulp"><b>'+esc(t)+'</b><p>'+esc(d)+'</p></div>').join('')+'</div></details>'
+).join('');
+
+const gesprek = [];
+async function vraag(){
+  const t = $('#vraag').value.trim(); if(!t) return;
+  $('#vraag').value='';
+  const chat = $('#chat');
+  chat.insertAdjacentHTML('beforeend', '<div class="b ik">'+esc(t)+'</div>');
+  gesprek.push({ role:'user', content:t });
+  const wacht = document.createElement('div'); wacht.className='b ai'; wacht.textContent='Meike denkt mee...'; chat.appendChild(wacht); chat.scrollTop=chat.scrollHeight;
+  try{
+    const d = await api('/hulp/ai', { code:s.code, token:s.token, kind:'hulp', messages:gesprek });
+    wacht.textContent = d.text; gesprek.push({ role:'assistant', content:d.text });
+  }catch(e){ wacht.textContent = 'Sorry, dat lukte even niet. Probeer het zo nog eens.'; }
+  chat.scrollTop = chat.scrollHeight;
+}
+$('#stuur').onclick = vraag;
+$('#vraag').addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); vraag(); } });
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

@@ -449,6 +449,163 @@ router.post('/gezin/bericht/gelezen', (req, res) => {
   res.json({ ok: true });
 });
 
+/* ---------- samen vooruit: spaardoelen, dromenbord en gezinshulp. Alles hangt
+   aan het gezin en is gedeeld, zodat het gezin het samen beleeft en elkaar
+   aanmoedigt. ---------- */
+function sessieVan(req, res) {
+  const g = gezinVan(req, res); if (!g) return null;
+  const p = profielVan(g, (req.body && req.body.token) || req.query.token);
+  if (!p) { res.status(403).json({ error: 'Log opnieuw in bij je gezin.' }); return null; }
+  return { g, p };
+}
+const getal = (v, max = 1e7) => { let n = Number(v); if (!isFinite(n)) n = 0; n = Math.round(n * 100) / 100; return Math.max(-max, Math.min(max, n)); };
+
+/* spaardoelen: het gezin spaart samen naar iets moois */
+router.post('/gezin/spaardoel/maak', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const naam = schoon(req.body.naam, 60);
+  const doel = getal(req.body.doel);
+  if (!naam) return res.status(400).json({ error: 'Geef je spaardoel een naam.' });
+  if (doel <= 0) return res.status(400).json({ error: 'Vul een bedrag in om naartoe te sparen.' });
+  if (!s.g.spaardoelen) s.g.spaardoelen = [];
+  if (s.g.spaardoelen.length >= 30) return res.status(400).json({ error: 'Je hebt al veel doelen. Rond er eerst een af.' });
+  const d = { id: rid(3), naam, doel, nu: 0, klaar: false, door: s.p.id, bijdragen: [], at: nu() };
+  s.g.spaardoelen.unshift(d); save();
+  res.json({ ok: true, doel: d });
+});
+router.post('/gezin/spaardoel/bijdrage', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const d = (s.g.spaardoelen || []).find(x => x.id === req.body.doelId);
+  if (!d) return res.status(404).json({ error: 'Dit spaardoel bestaat niet meer.' });
+  const bedrag = getal(req.body.bedrag);
+  if (!bedrag) return res.status(400).json({ error: 'Vul een bedrag in.' });
+  d.nu = Math.max(0, Math.round((d.nu + bedrag) * 100) / 100);
+  d.bijdragen.unshift({ van: s.p.id, vanNaam: s.p.naam, bedrag, at: nu() });
+  d.bijdragen = d.bijdragen.slice(0, 100);
+  const netKlaar = !d.klaar && d.nu >= d.doel;
+  d.klaar = d.nu >= d.doel;
+  save();
+  res.json({ ok: true, doel: d, gevierd: netKlaar });
+});
+router.post('/gezin/spaardoel/verwijder', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  if (s.p.rol !== 'beheerder') return res.status(403).json({ error: 'Alleen de beheerder kan een spaardoel verwijderen.' });
+  s.g.spaardoelen = (s.g.spaardoelen || []).filter(x => x.id !== req.body.doelId); save();
+  res.json({ ok: true });
+});
+router.get('/gezin/:code/spaardoelen', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  res.json({ spaardoelen: (s.g.spaardoelen || []) });
+});
+
+/* dromenbord: ieder een doel of droom, en we moedigen elkaar aan */
+router.post('/gezin/droom/maak', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const tekst = schoon(req.body.tekst, 240);
+  if (!tekst) return res.status(400).json({ error: 'Schrijf je droom of doel op.' });
+  if (!s.g.dromen) s.g.dromen = [];
+  if (s.g.dromen.length >= 200) s.g.dromen = s.g.dromen.slice(0, 199);
+  const d = { id: rid(3), van: s.p.id, vanNaam: s.p.naam, vanAvatar: s.p.avatar, kleur: s.p.kleur, tekst, aanmoedigingen: [], behaald: false, at: nu() };
+  s.g.dromen.unshift(d); save();
+  res.json({ ok: true, droom: d });
+});
+router.post('/gezin/droom/moedig', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const d = (s.g.dromen || []).find(x => x.id === req.body.droomId);
+  if (!d) return res.status(404).json({ error: 'Deze droom bestaat niet meer.' });
+  d.aanmoedigingen = d.aanmoedigingen || [];
+  const i = d.aanmoedigingen.indexOf(s.p.id);
+  if (i >= 0) d.aanmoedigingen.splice(i, 1); else d.aanmoedigingen.push(s.p.id);
+  save();
+  res.json({ ok: true, aantal: d.aanmoedigingen.length, aangemoedigd: i < 0 });
+});
+router.post('/gezin/droom/behaald', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const d = (s.g.dromen || []).find(x => x.id === req.body.droomId);
+  if (!d) return res.status(404).json({ error: 'Deze droom bestaat niet meer.' });
+  if (d.van !== s.p.id && s.p.rol !== 'beheerder') return res.status(403).json({ error: 'Alleen wie de droom heeft, of de beheerder, kan dit afvinken.' });
+  d.behaald = req.body.behaald === false ? false : true;
+  d.behaaldAt = d.behaald ? nu() : null;
+  save();
+  res.json({ ok: true, droom: d });
+});
+router.post('/gezin/droom/verwijder', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const d = (s.g.dromen || []).find(x => x.id === req.body.droomId);
+  if (!d) return res.status(404).json({ error: 'Deze droom bestaat niet meer.' });
+  if (d.van !== s.p.id && s.p.rol !== 'beheerder') return res.status(403).json({ error: 'Alleen wie de droom heeft, of de beheerder, kan hem weghalen.' });
+  s.g.dromen = s.g.dromen.filter(x => x.id !== req.body.droomId); save();
+  res.json({ ok: true });
+});
+router.get('/gezin/:code/dromen', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  res.json({ dromen: (s.g.dromen || []).map(d => ({ id: d.id, van: d.van, vanNaam: d.vanNaam, vanAvatar: d.vanAvatar, kleur: d.kleur, tekst: d.tekst, aantal: (d.aanmoedigingen || []).length, aangemoedigd: (d.aanmoedigingen || []).includes(s.p.id), vanMij: d.van === s.p.id, behaald: !!d.behaald, at: d.at })) });
+});
+
+/* gezinshulp-AI: een warme helper voor geldvragen en het vinden van gratis hulp */
+const HULP_SYS = {
+  geld: 'Je bent "Meike", een warme, praktische geldmaatje in de gratis app van de RTFoundation, voor gezinnen in Nederland met weinig geld. ' +
+    'Geef concrete, haalbare tips om rond te komen, te besparen en te sparen: goedkoop en gezond koken, energie besparen, tweedehands, en welke regelingen er zijn ' +
+    '(zorgtoeslag, huurtoeslag, kindgebonden budget, energietoeslag, bijzondere bijstand via de gemeente, kwijtschelding gemeentebelasting, Stichting Leergeld, Jeugdfonds Sport & Cultuur). ' +
+    'Zeg er altijd bij dat aanvragen gratis is en dat de gemeente of Belastingdienst helpt. Nooit oordelen, altijd bemoedigen. Kort, eenvoudig Nederlands, max ~120 woorden.',
+  hulp: 'Je bent "Meike", een warme wegwijzer in de gratis app van de RTFoundation, voor gezinnen in Nederland die hulp zoeken. ' +
+    'Wijs mensen vriendelijk de weg naar gratis hulp: eten (Voedselbank), kleding en spullen (Kledingbank, Stichting Leergeld voor schoolspullen en fiets), ' +
+    'geld en schulden (gemeente, Schuldhulpmaatje, sociaal raadslieden), kinderen (Jeugdfonds Sport & Cultuur, Nationaal Fonds Kinderhulp, Leergeld), ' +
+    'gezondheid en steun (huisarts, 113 Zelfmoordpreventie bij nood, MIND Korrelatie), leren en werk (Bibliotheek, gemeente, UWV). ' +
+    'Vraag kort door wat iemand nodig heeft en noem 1 tot 3 concrete plekken. Nooit oordelen. Kort, eenvoudig Nederlands, max ~120 woorden.'
+};
+const HULP_DEMO = {
+  geld: 'Fijn dat je het vraagt. Kleine stappen helpen echt: kook een paar vaste, goedkope maaltijden, zet de verwarming een graadje lager en check of je recht hebt op zorgtoeslag of het kindgebonden budget. Aanvragen is gratis; de gemeente helpt je erbij. Wil je dat ik met een van deze meedenk?',
+  hulp: 'Je staat er niet alleen voor. Vertel me kort wat je nodig hebt: eten, kleding, hulp voor de kinderen, of hulp met geld en post? Dan wijs ik je de juiste, gratis plek. Voor eten is er de Voedselbank; voor school en sport zijn er Stichting Leergeld en het Jeugdfonds.'
+};
+router.post('/hulp/ai', async (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const kind = req.body.kind === 'hulp' ? 'hulp' : 'geld';
+  const clean = (Array.isArray(req.body.messages) ? req.body.messages : [])
+    .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .map(m => ({ role: m.role, content: m.content.slice(0, 1500) })).slice(-10);
+  while (clean.length && clean[0].role !== 'user') clean.shift();
+  if (!clean.length) return res.json({ text: HULP_DEMO[kind] });
+  if (!anthropic) return res.json({ text: HULP_DEMO[kind], demo: true });
+  try {
+    const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 420, system: HULP_SYS[kind], messages: clean });
+    res.json({ text: (r.content || []).map(b => b.text || '').join('').trim() || HULP_DEMO[kind] });
+  } catch (e) { res.json({ text: HULP_DEMO[kind], demo: true }); }
+});
+
+const BESPAARTIPS = [
+  'Maak een boodschappenlijst en ga niet met honger naar de winkel: je koopt zo veel minder onnodige dingen.',
+  'Kook een keer per week een grote pan (soep, stamppot, rijst met groente) en vries porties in. Goedkoop en klaar op drukke dagen.',
+  'Check ieder jaar op toeslagen.nl of je recht hebt op zorgtoeslag, huurtoeslag of het kindgebonden budget. Aanvragen is gratis.',
+  'Vraag bij je gemeente naar bijzondere bijstand en de energietoeslag. Veel mensen die er recht op hebben, vragen het niet aan.',
+  'Zet de verwarming een graadje lager en doe een trui aan. Een dekentje op de bank scheelt echt op de energierekening.',
+  'Huismerk in de supermarkt is vaak hetzelfde als het dure merk, maar veel goedkoper. Durf te ruilen.',
+  'Kijk voor kleding, speelgoed en spullen eerst tweedehands: kringloop, Marktplaats of een weggeefgroep in de buurt.',
+  'Heb je kinderen op school of sport? Stichting Leergeld en het Jeugdfonds Sport & Cultuur betalen mee. Vraag ernaar, het is gratis.',
+  'Zeg abonnementen op die je niet gebruikt. Zet ze een maand stil en kijk of je ze mist.',
+  'Betaal met contant of een aparte pas voor boodschappen. Als het op is, is het op; zo hou je grip.'
+];
+router.get('/bespaartip', (req, res) => {
+  const dag = Math.floor(Date.now() / 86400000);
+  res.json({ tip: BESPAARTIPS[dag % BESPAARTIPS.length], nog: BESPAARTIPS[Math.floor(Math.random() * BESPAARTIPS.length)] });
+});
+
+const GESPREKSKAARTEN = [
+  'Wat was vandaag het fijnste moment van je dag?',
+  'Waar ben je de laatste tijd trots op geworden?',
+  'Als je een dag alles mocht doen wat je wilt, wat zou je dan doen?',
+  'Wie heeft jou deze week geholpen, en hoe?',
+  'Wat zou je later willen worden of doen? Waarom?',
+  'Waar word jij blij van, ook al kost het niks?',
+  'Wat wil je nog leren, en wie kan je daarbij helpen?',
+  'Waar zijn we als gezin goed in samen?',
+  'Wat is iets liefs dat iemand ooit tegen je heeft gezegd?',
+  'Als we samen een klein feestje geven, wat doen we dan?',
+  'Wat is een moeilijk moment geweest, en wat heeft je er doorheen geholpen?',
+  'Voor wie zou je iets liefs willen doen, en wat?'
+];
+router.get('/gesprekskaart', (req, res) => res.json({ kaart: GESPREKSKAARTEN[Math.floor(Math.random() * GESPREKSKAARTEN.length)] }));
+
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
 module.exports = { router };

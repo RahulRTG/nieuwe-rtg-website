@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Geldmaatje</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.2rem;margin-bottom:1.2rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
+  .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
+  .doel{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.9rem 1rem;margin-bottom:.7rem;}
+  .doel .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;}
+  .doel .naam{font-weight:600;}
+  .doel .bedrag{font-size:.85rem;color:var(--zacht);white-space:nowrap;}
+  .balk{height:.7rem;background:#231f18;border-radius:999px;overflow:hidden;margin:.6rem 0;}
+  .balk i{display:block;height:100%;background:linear-gradient(90deg,var(--goud),var(--goud2));border-radius:999px;transition:width .4s;}
+  .doel.klaar .balk i{background:linear-gradient(90deg,var(--groen),#7cc389);}
+  .doel .acties{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .doel .acties input{width:5.5rem;}
+  .klaarbadge{color:var(--groen);font-weight:700;font-size:.85rem;}
+  .rijveld{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .rijveld .veld{flex:1;min-width:8rem;}
+  .tip{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.8rem 1rem;line-height:1.5;font-size:.92rem;}
+  .chat{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;margin-bottom:.7rem;}
+  .b{padding:.6rem .8rem;border-radius:12px;max-width:85%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
+  .b.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
+  .b.ai{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.88rem;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>💶 Geldmaatje</h1>
+  <div class="intro">Samen sparen naar iets moois, slimme bespaartips, en een maatje dat met je meedenkt over geld. Alles gratis en zonder oordeel.</div>
+
+  <div class="kaart blok">
+    <h2>Ons spaarpotje</h2>
+    <div class="h">Spaar samen als gezin naar een doel. Iedereen kan er iets bij doen; de balk vult zich vanzelf.</div>
+    <div id="doelen"><div class="leeg">Laden...</div></div>
+    <div style="margin-top:1rem;" class="rijveld">
+      <input class="veld" id="nDoel" placeholder="Waar sparen we naartoe? (bijv. een fiets)" maxlength="60">
+      <input class="veld" id="nBedrag" style="max-width:8rem;" inputmode="decimal" placeholder="Bedrag €">
+    </div>
+    <div class="fout" id="dFout"></div>
+    <button class="knop" id="dMaak" style="margin-top:.6rem;">Spaardoel toevoegen</button>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Bespaartip van de dag</h2>
+    <div class="tip" id="tip">...</div>
+    <button class="knop grijs klein" id="nogTip" style="margin-top:.7rem;">Nog een tip</button>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Vraag het je geldmaatje</h2>
+    <div class="h">Meike denkt met je mee: goedkoop koken, energie besparen, en welke toeslagen of regelingen er voor jou zijn. Aanvragen is altijd gratis.</div>
+    <div class="chat" id="chat"><div class="b ai" id="start">Hoi, ik ben Meike. Vertel me waar je mee zit rond geld, dan denk ik met je mee. Bijvoorbeeld: "hoe kook ik goedkoper?" of "op welke toeslagen heb ik recht?"</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Typ je vraag..." maxlength="1000"></textarea>
+      <button class="knop" id="stuur">Vraag</button>
+    </div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const api = window.Sessie ? Sessie.api : null;
+if (!window.Sessie || !Sessie.eisProfiel()) { /* redirect gebeurt in eisProfiel */ }
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+const euro = n => '€ ' + (Math.round(n*100)/100).toLocaleString('nl-NL', {minimumFractionDigits:0, maximumFractionDigits:2});
+
+async function laadDoelen(){
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/spaardoelen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const box = $('#doelen');
+    if (!d.spaardoelen || !d.spaardoelen.length){ box.innerHTML = '<div class="leeg">Nog geen spaardoel. Begin er hieronder een; klein mag ook.</div>'; return; }
+    box.innerHTML = d.spaardoelen.map(x=>{
+      const pct = Math.min(100, Math.round((x.nu / x.doel) * 100));
+      return '<div class="doel'+(x.klaar?' klaar':'')+'">'+
+        '<div class="kop"><span class="naam">'+esc(x.naam)+'</span><span class="bedrag">'+euro(x.nu)+' / '+euro(x.doel)+'</span></div>'+
+        '<div class="balk"><i style="width:'+pct+'%"></i></div>'+
+        (x.klaar ? '<div class="klaarbadge">🎉 Gehaald! Wat een teamwork.</div>' :
+        '<div class="acties"><input class="veld klein" data-b="'+x.id+'" inputmode="decimal" placeholder="€ erbij"><button class="knop klein" data-add="'+x.id+'">Erbij</button>'+
+        (Sessie.isBeheerder()?'<button class="knop grijs klein" data-del="'+x.id+'">Weg</button>':'')+'</div>')+
+        '</div>';
+    }).join('');
+    box.querySelectorAll('[data-add]').forEach(b=> b.onclick=()=> bijdrage(b.dataset.add, box.querySelector('[data-b="'+b.dataset.add+'"]')));
+    box.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=> verwijder(b.dataset.del));
+  }catch(e){ $('#doelen').innerHTML='<div class="leeg">Kon de doelen niet laden.</div>'; }
+}
+async function bijdrage(id, inp){
+  const bedrag = Number(String(inp.value).replace(',','.'));
+  if (!bedrag){ inp.focus(); return; }
+  try{ const r = await api('/gezin/spaardoel/bijdrage', { code:s.code, token:s.token, doelId:id, bedrag }); inp.value=''; await laadDoelen(); if (r.gevierd) vier(); }
+  catch(e){ alert(e.message); }
+}
+async function verwijder(id){ if(!confirm('Dit spaardoel weghalen?')) return; try{ await api('/gezin/spaardoel/verwijder', { code:s.code, token:s.token, doelId:id }); laadDoelen(); }catch(e){ alert(e.message); } }
+$('#dMaak').onclick = async ()=>{
+  $('#dFout').textContent='';
+  const doel = Number(String($('#nBedrag').value).replace(',','.'));
+  try{ await api('/gezin/spaardoel/maak', { code:s.code, token:s.token, naam:$('#nDoel').value, doel }); $('#nDoel').value=''; $('#nBedrag').value=''; laadDoelen(); }
+  catch(e){ $('#dFout').textContent = e.message; }
+};
+function vier(){ try{ if(navigator.vibrate) navigator.vibrate([60,40,60]); }catch(e){} alert('🎉 Jullie hebben het gehaald! Zet gerust een nieuw doel; jullie kunnen dit.'); }
+
+async function tip(){ try{ const d = await fetch('/api/foundation/bespaartip').then(r=>r.json()); $('#tip').textContent = d.tip; $('#nogTip')._nog = d.nog; }catch(e){} }
+$('#nogTip').onclick = ()=>{ if($('#nogTip')._nog){ $('#tip').textContent = $('#nogTip')._nog; } tip(); };
+
+/* geldmaatje-chat */
+const gesprek = [];
+async function vraag(){
+  const t = $('#vraag').value.trim(); if(!t) return;
+  $('#vraag').value='';
+  const chat = $('#chat');
+  chat.insertAdjacentHTML('beforeend', '<div class="b ik">'+esc(t)+'</div>');
+  gesprek.push({ role:'user', content:t });
+  const wacht = document.createElement('div'); wacht.className='b ai'; wacht.textContent='Meike denkt mee...'; chat.appendChild(wacht); chat.scrollTop=chat.scrollHeight;
+  try{
+    const d = await api('/hulp/ai', { code:s.code, token:s.token, kind:'geld', messages:gesprek });
+    wacht.textContent = d.text; gesprek.push({ role:'assistant', content:d.text });
+  }catch(e){ wacht.textContent = 'Sorry, dat lukte even niet. Probeer het zo nog eens.'; }
+  chat.scrollTop = chat.scrollHeight;
+}
+$('#stuur').onclick = vraag;
+$('#vraag').addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); vraag(); } });
+
+laadDoelen(); tip();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

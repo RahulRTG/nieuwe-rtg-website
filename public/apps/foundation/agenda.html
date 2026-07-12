@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Gezinsagenda</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.7rem;}
+  .rijveld{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .rijveld .veld{flex:1;min-width:8rem;}
+  .datumtijd{display:flex;gap:.5rem;}
+  .datumtijd .veld{flex:1;}
+  select.veld{appearance:none;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .dag{margin-bottom:1.1rem;}
+  .dagkop{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--goud);font-weight:700;margin-bottom:.4rem;}
+  .item{display:flex;align-items:center;gap:.7rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .9rem;margin-bottom:.4rem;}
+  .item.voorbij{opacity:.5;}
+  .item .tijd{font-weight:700;color:var(--goud2);white-space:nowrap;min-width:3rem;}
+  .item .tijd.leeg{color:var(--zacht);font-weight:400;font-size:.8rem;}
+  .item .tk{flex:1;}
+  .item .wie{font-size:.78rem;color:var(--zacht);}
+  .item .del{background:transparent;color:var(--zacht);font-size:1.1rem;padding:.1rem .3rem;}
+  .item .del:hover{color:var(--rood);}
+  .leeg{color:var(--zacht);font-size:.9rem;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>📅 Gezinsagenda</h1>
+  <div class="intro">Plan samen: afspraken, verjaardagen, ophaalmomenten en wie waar moet zijn. Zo weet iedereen, ook een oppas, wat er die dag speelt.</div>
+
+  <div class="kaart blok" id="maakBlok">
+    <h2>Zet iets in de agenda</h2>
+    <input class="veld" id="aTitel" placeholder="Wat? (bijv. Tim naar voetbal)" maxlength="80" style="margin-bottom:.5rem;">
+    <div class="datumtijd" style="margin-bottom:.5rem;">
+      <input class="veld" id="aDatum" type="date">
+      <input class="veld" id="aTijd" type="time">
+    </div>
+    <select class="veld" id="aWie" style="margin-bottom:.5rem;"><option value="">Voor het hele gezin</option></select>
+    <div class="fout" id="aFout"></div>
+    <button class="knop" id="aDoe">Toevoegen</button>
+  </div>
+
+  <div id="lijst"><div class="leeg">Laden...</div></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+let magBewerken = true;
+
+const DAGEN = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+const MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+function datumLabel(d){
+  const dt = new Date(d+'T00:00:00'); const vandaag = new Date(); vandaag.setHours(0,0,0,0);
+  const morgen = new Date(vandaag); morgen.setDate(morgen.getDate()+1);
+  if (dt.getTime()===vandaag.getTime()) return 'Vandaag';
+  if (dt.getTime()===morgen.getTime()) return 'Morgen';
+  return DAGEN[dt.getDay()]+' '+dt.getDate()+' '+MAANDEN[dt.getMonth()];
+}
+async function laad(){
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/agenda?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    magBewerken = d.magBewerken;
+    $('#maakBlok').style.display = magBewerken ? 'block' : 'none';
+    const box = $('#lijst');
+    if (!d.agenda || !d.agenda.length){ box.innerHTML = '<div class="leeg">Nog niets gepland. '+(magBewerken?'Zet hierboven het eerste punt neer.':'')+'</div>'; return; }
+    const perDag = {};
+    d.agenda.forEach(a=>{ (perDag[a.datum] = perDag[a.datum] || []).push(a); });
+    box.innerHTML = Object.keys(perDag).sort().map(datum=>
+      '<div class="dag"><div class="dagkop">'+esc(datumLabel(datum))+'</div>'+
+      perDag[datum].map(a=>
+        '<div class="item'+(a.voorbij?' voorbij':'')+'">'+
+        '<span class="tijd'+(a.tijd?'':' leeg')+'">'+(a.tijd||'hele dag')+'</span>'+
+        '<span class="tk">'+esc(a.titel)+(a.wieNaam?'<span class="wie"> · '+esc(a.wieNaam)+'</span>':'')+'</span>'+
+        (magBewerken?'<button class="del" data-del="'+a.id+'" title="Weghalen">×</button>':'')+
+        '</div>').join('')+'</div>'
+    ).join('');
+    box.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=> verwijder(b.dataset.del));
+  }catch(e){ $('#lijst').innerHTML='<div class="leeg">Kon de agenda niet laden.</div>'; }
+}
+async function verwijder(id){ try{ await api('/gezin/agenda/verwijder', { code:s.code, token:s.token, itemId:id }); laad(); }catch(e){ alert(e.message); } }
+
+$('#aDoe').onclick = async ()=>{
+  $('#aFout').textContent='';
+  try{
+    await api('/gezin/agenda', { code:s.code, token:s.token, titel:$('#aTitel').value, datum:$('#aDatum').value, tijd:$('#aTijd').value, wie:$('#aWie').value });
+    $('#aTitel').value=''; $('#aTijd').value=''; laad();
+  }catch(e){ $('#aFout').textContent = e.message; }
+};
+
+// wie-keuze vullen uit de profielen
+(async ()=>{
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    (d.profielen||[]).forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.naam; $('#aWie').appendChild(o); });
+  }catch(e){}
+  $('#aDatum').value = new Date().toISOString().slice(0,10);
+  laad();
+})();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

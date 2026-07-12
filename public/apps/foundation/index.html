@@ -63,6 +63,9 @@
   #balk{position:sticky;top:0;background:var(--bg);z-index:30;}
   h3.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.8rem 0 .8rem;}
   h3.sec:first-of-type{margin-top:.6rem;}
+  .passband{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;background:#241f16;border:1px solid var(--goud);color:var(--goud2);border-radius:999px;padding:.35rem .9rem;font-size:.82rem;font-weight:600;}
+  .wisbanner{background:#2a1512;border:1px solid var(--rood);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:.6rem;line-height:1.5;font-size:.9rem;}
+  .wisbanner a{color:var(--goud2);font-weight:700;text-decoration:none;}
 </style>
 </head>
 <body>
@@ -97,9 +100,11 @@
 
 <!-- 3. De hub: ingelogd (rol-bewust) -->
 <section id="vHub" class="wrap" hidden>
+  <div id="hWisBanner" class="wisbanner" hidden></div>
   <div class="hero" style="padding-top:.4rem;">
     <div class="logo" id="hWelkom">Welkom terug</div>
     <div class="deck" id="hDeck">Alles hier is en blijft kosteloos. Hieronder staat wat bij jou past.</div>
+    <div id="hPass" class="passband" hidden></div>
   </div>
 
   <h3 class="sec">Voor iedereen</h3>
@@ -123,6 +128,11 @@
       <div class="ic">📍</div><h2>Veilig thuis</h2>
       <p>Laat je gezin weten waar je bent en dat het goed gaat. Jij bepaalt zelf of je je locatie deelt, en kunt altijd stoppen.</p>
       <span class="cta">Deel dat je veilig bent →</span>
+    </a>
+    <a class="kaart tile" href="agenda.html">
+      <div class="ic">📅</div><h2>Gezinsagenda</h2>
+      <p>Plan samen: afspraken, verjaardagen en ophaalmomenten. Iedereen, ook een oppas, ziet in één oogopslag wat er die dag speelt.</p>
+      <span class="cta">Plan samen →</span>
     </a>
     <a class="kaart tile" href="oppasinfo.html">
       <div class="ic">📋</div><h2>Belangrijke info</h2>
@@ -164,6 +174,11 @@
         <p>Maak in een paar minuten een verzorgd cv om werk te vinden. Sla het op je toestel op en print het gratis.</p>
         <span class="cta">Maak je cv →</span>
       </a>
+      <a class="kaart tile" href="klusjes.html">
+        <div class="ic">🧹</div><h2>Klusjes en sterren</h2>
+        <p>Zet klusjes klaar voor de kinderen en keur ze goed. Ze verdienen sterren, leren verantwoordelijkheid en worden er trots van.</p>
+        <span class="cta">Beheer de klusjes →</span>
+      </a>
       <a class="kaart tile" href="reis.html">
         <div class="ic">✈️</div><h2>Op reis met de foundation</h2>
         <p>De foundation stuurt gezinnen die het zwaar hebben op vakantie. Vraag het aan of draag een gezin voor, discreet en gratis.</p>
@@ -179,6 +194,11 @@
         <div class="ic">🛡️</div><h2>Sterker dan pesten</h2>
         <p>Word je gepest of voel je je rot? Hier lees je wat je kunt doen, praat je met een lief maatje, en vertel je het je gezin met één knop.</p>
         <span class="cta">Je staat er niet alleen voor →</span>
+      </a>
+      <a class="kaart tile" href="klusjes.html">
+        <div class="ic">🧹</div><h2>Klusjes en sterren</h2>
+        <p>Help mee in huis en verdien sterren. Tik een klusje aan als het gedaan is; jouw sterrensaldo groeit en je wordt er trots van.</p>
+        <span class="cta">Verdien sterren →</span>
       </a>
       <a class="kaart tile" href="cv.html">
         <div class="ic">📄</div><h2>Je eerste cv</h2>
@@ -261,7 +281,36 @@ async function start(){
   if (s && s.token && hash !== '#profielen'){
     // controleer token; toon hub
     const d = await Sessie.ophalen();
-    if (d && d.profiel){ Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel.rol); toon('vHub'); return; }
+    if (d && d.profiel){
+      Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel.rol);
+      // gekoppelde Pass
+      if (d.koppeling){ $('#hPass').innerHTML = '✅ Gekoppeld aan een '+esc(d.koppeling.tierNaam||'RTG Pass')+' ('+esc(d.koppeling.codenaam||'lid')+')'; $('#hPass').hidden=false; }
+      // openstaand verzoek om alles te verwijderen
+      if (d.wisVerzoek){
+        if (d.wisVerzoek.vanMij){
+          $('#hWisBanner').innerHTML = 'Je verzoek om alle gegevens te verwijderen wacht op toestemming van een tweede volwassene.';
+        } else {
+          $('#hWisBanner').innerHTML =
+            '<b>'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens van het gezin verwijderen.</b> Geef je toestemming?'+
+            '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;align-items:center;">'+
+            (d.profiel.heeftPin?'<input id="wbPin" class="veld" style="max-width:9rem;padding:.5rem .7rem;" inputmode="numeric" maxlength="6" type="password" placeholder="Jouw pincode">':'')+
+            '<button class="knop rood klein" id="wbJa">Ja, verwijderen</button>'+
+            '<button class="knop grijs klein" id="wbNee">Nee, afwijzen</button>'+
+            '<span id="wbFout" style="color:var(--rood);font-size:.82rem;"></span></div>';
+          $('#wbJa').onclick = async ()=>{
+            try{ const r = await Sessie.api('/gezin/wissen/bevestig', { code:Sessie.huidig().code, token:Sessie.huidig().token, pin: ($('#wbPin')?$('#wbPin').value.trim():'') });
+              if (r.verwijderd){ Sessie.uitloggen(); alert('De gegevens van jullie gezin zijn verwijderd.'); location.href='index.html'; }
+            }catch(e){ $('#wbFout').textContent = e.message; }
+          };
+          $('#wbNee').onclick = async ()=>{
+            try{ await Sessie.api('/gezin/wissen/intrekken', { code:Sessie.huidig().code, token:Sessie.huidig().token, pin: ($('#wbPin')?$('#wbPin').value.trim():'') }); location.reload(); }
+            catch(e){ $('#wbFout').textContent = e.message; }
+          };
+        }
+        $('#hWisBanner').hidden=false;
+      }
+      toon('vHub'); return;
+    }
     Sessie.wisProfiel();
   }
   if (s && s.code){ // gezin bekend: toon profielkiezer

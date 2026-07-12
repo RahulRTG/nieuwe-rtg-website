@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Klusjes en sterren</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.7rem;}
+  .ranglijst{display:flex;flex-direction:column;gap:.5rem;}
+  .ster{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .9rem;}
+  .ster .av{width:2.2rem;height:2.2rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+  .ster .nm{font-weight:600;}
+  .ster .aantal{margin-left:auto;font-weight:700;color:var(--goud2);white-space:nowrap;}
+  .klus{display:flex;align-items:center;gap:.7rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:.5rem;}
+  .klus .tk{flex:1;}
+  .klus .tk b{display:block;}
+  .klus .tk span{font-size:.8rem;color:var(--zacht);}
+  .klus .pts{font-weight:700;color:var(--goud2);white-space:nowrap;}
+  .klus.gedaan{border-color:var(--goud);}
+  .klus.goedgekeurd{opacity:.6;}
+  .knoppen{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .rijveld{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem;}
+  .rijveld .veld{flex:1;min-width:7rem;}
+  select.veld{appearance:none;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;}
+  .wachtlabel{font-size:.75rem;color:var(--goud);font-weight:700;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🧹 Klusjes en sterren</h1>
+  <div class="intro" id="intro">Help mee in huis en verdien sterren. Samen zorgen we voor elkaar, en jij wordt er sterker en trotser van.</div>
+
+  <div class="kaart blok" id="rangBlok">
+    <h2>⭐ Sterren van het gezin</h2>
+    <div class="ranglijst" id="ranglijst"><div class="leeg">Nog geen sterren verdiend.</div></div>
+  </div>
+
+  <div class="kaart blok" id="maakBlok" style="display:none;">
+    <h2>Nieuw klusje klaarzetten</h2>
+    <input class="veld" id="kTitel" placeholder="Welk klusje? (bijv. tafel dekken)" maxlength="80" style="margin-bottom:.5rem;">
+    <div class="rijveld">
+      <select class="veld" id="kVoor"><option value="iedereen">Voor iedereen</option></select>
+      <select class="veld" id="kSterren"></select>
+    </div>
+    <div class="fout" id="kFout"></div>
+    <button class="knop" id="kDoe">Klusje toevoegen</button>
+  </div>
+
+  <div class="kaart blok">
+    <h2 id="klusKop">Klusjes</h2>
+    <div id="klussen"><div class="leeg">Laden...</div></div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+let magBeheren=false, mijnId='';
+
+for (let i=1;i<=10;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i+' ⭐'; $('#kSterren').appendChild(o); }
+
+async function laad(){
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/klussen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    magBeheren = d.magBeheren; mijnId = d.mijnId;
+    $('#maakBlok').style.display = magBeheren ? 'block' : 'none';
+    if (!magBeheren) $('#intro').textContent = 'Help mee in huis en verdien sterren! Tik een klusje aan als je het gedaan hebt; een ouder keurt het goed en de sterren zijn van jou.';
+    // ranglijst
+    $('#ranglijst').innerHTML = (d.sterren && d.sterren.length)
+      ? d.sterren.map(x=> '<div class="ster"><span class="av" style="background:'+x.kleur+'">'+x.avatar+'</span><span class="nm">'+esc(x.naam)+'</span><span class="aantal">'+x.sterren+' ⭐</span></div>').join('')
+      : '<div class="leeg">Nog geen sterren verdiend. Begin met een klusje!</div>';
+    // klussen
+    const box = $('#klussen');
+    const zichtbaar = (d.klussen||[]).filter(k=> magBeheren || k.voor==='iedereen' || k.voor===mijnId || k.door);
+    if (!zichtbaar.length){ box.innerHTML = '<div class="leeg">'+(magBeheren?'Nog geen klusjes. Zet er hierboven een klaar.':'Nog geen klusjes voor jou. Kom straks terug!')+'</div>'; return; }
+    box.innerHTML = zichtbaar.map(k=>{
+      let acties='';
+      if (k.status==='open' && !isGastRol()) acties = '<button class="knop groen klein" data-gedaan="'+k.id+'">Gedaan!</button>';
+      else if (k.status==='gedaan'){
+        acties = '<span class="wachtlabel">'+esc(k.door||'')+' wacht op goedkeuring</span>';
+        if (magBeheren) acties = '<button class="knop groen klein" data-keur="'+k.id+'">Goedkeuren</button><button class="knop grijs klein" data-afkeur="'+k.id+'">Nog niet</button>';
+      } else if (k.status==='goedgekeurd'){ acties = '<span class="wachtlabel">✓ '+esc(k.door||'')+'</span>'; }
+      const del = magBeheren ? '<button class="knop grijs klein" data-del="'+k.id+'">×</button>' : '';
+      return '<div class="klus '+k.status+'"><span class="tk"><b>'+esc(k.titel)+'</b><span>voor '+esc(k.voorNaam)+'</span></span><span class="pts">'+k.sterren+' ⭐</span><span class="knoppen">'+acties+del+'</span></div>';
+    }).join('');
+    box.querySelectorAll('[data-gedaan]').forEach(b=> b.onclick=()=> doe('/gezin/klus/gedaan', { klusId:b.dataset.gedaan }));
+    box.querySelectorAll('[data-keur]').forEach(b=> b.onclick=()=> doe('/gezin/klus/keur', { klusId:b.dataset.keur, goed:true }));
+    box.querySelectorAll('[data-afkeur]').forEach(b=> b.onclick=()=> doe('/gezin/klus/keur', { klusId:b.dataset.afkeur, goed:false }));
+    box.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=> doe('/gezin/klus/verwijder', { klusId:b.dataset.del }));
+  }catch(e){ $('#klussen').innerHTML='<div class="leeg">Kon de klusjes niet laden.</div>'; }
+}
+function isGastRol(){ const h=Sessie.huidig(); return !!(h&&h.profiel&&h.profiel.gast); }
+async function doe(pad, extra){ try{ await api(pad, Object.assign({ code:s.code, token:s.token }, extra)); laad(); }catch(e){ alert(e.message); } }
+
+$('#kDoe').onclick = async ()=>{
+  $('#kFout').textContent='';
+  try{ await api('/gezin/klus', { code:s.code, token:s.token, titel:$('#kTitel').value, sterren:$('#kSterren').value, voor:$('#kVoor').value }); $('#kTitel').value=''; laad(); }
+  catch(e){ $('#kFout').textContent = e.message; }
+};
+
+(async ()=>{
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    (d.profielen||[]).filter(p=>!p.gast).forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.naam; $('#kVoor').appendChild(o); });
+  }catch(e){}
+  laad();
+})();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

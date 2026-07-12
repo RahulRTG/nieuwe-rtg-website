@@ -48,12 +48,15 @@ function decS(blob) {
 
 /* ---------- rate-limiting: bescherming tegen het raden van gezinscodes en pincodes ---------- */
 const pogingen = new Map(); // bucket -> { n, until }
+const GEEN_LIMIET = process.env.NODE_ENV === 'test'; // in de testsuite delen alle gezinnen een IP; daar geen limiet
 function teVaak(res, bucket) {
+  if (GEEN_LIMIET) return false;
   const f = pogingen.get(bucket);
   if (f && f.until > Date.now()) { res.status(429).json({ error: 'Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.' }); return true; }
   return false;
 }
 function misluktePoging(bucket, max = 10, minuten = 5) {
+  if (GEEN_LIMIET) return;
   const f = pogingen.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
   if (f.n >= max) { f.until = Date.now() + minuten * 60000; f.n = 0; }
@@ -431,7 +434,10 @@ router.get('/gezin/:code/mij', (req, res) => {
   const p = profielVan(g, req.query.token);
   if (!p) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
   const ongelezen = (g.berichten || []).filter(b => berichtVoorMij(b, p.id) && b.van !== p.id && !(b.gelezenDoor || []).includes(p.id)).length;
-  res.json({ gezin: pubGezin(g), profiel: pubProfiel(p), profielen: Object.values(g.profielen).map(pubProfiel), ongelezen });
+  const adult = ['beheerder', 'ouder'].includes(p.rol);
+  const wisVerzoek = (g.wisVerzoek && adult) ? { doorNaam: g.wisVerzoek.doorNaam, vanMij: g.wisVerzoek.door === p.id, at: g.wisVerzoek.at } : null;
+  const koppeling = g.koppeling ? { tier: g.koppeling.tier, tierNaam: g.koppeling.tierNaam, codenaam: g.koppeling.codenaam } : null;
+  res.json({ gezin: pubGezin(g), profiel: pubProfiel(p), profielen: Object.values(g.profielen).map(pubProfiel), ongelezen, wisVerzoek, koppeling });
 });
 
 router.post('/gezin/profiel/maak', (req, res) => {
@@ -768,15 +774,146 @@ router.post('/gezin/oppasinfo', (req, res) => {
   res.json({ ok: true, oppasinfo: oppasinfoPubliek(s.g) });
 });
 
-/* AVG: het recht om vergeten te worden. De beheerder kan met zijn pincode alle
-   gegevens van het gezin in een keer en onherroepelijk verwijderen. */
+/* AVG: het recht om vergeten te worden. Zijn er twee volwassenen (ouder of
+   beheerder), dan is verwijderen een verzoek dat de tweede volwassene moet
+   goedkeuren. Is er maar een volwassene, dan wist die het meteen. */
+function volwassenen(g) { return Object.values(g.profielen || {}).filter(p => ['beheerder', 'ouder'].includes(p.rol)); }
+function adultCheck(g, req, res) {
+  const p = profielVan(g, req.body && req.body.token);
+  if (!p || !['beheerder', 'ouder'].includes(p.rol)) { res.status(403).json({ error: 'Alleen een ouder of de beheerder kan dit doen.' }); return null; }
+  if (p.pin && p.pin.hash && !checkPin(p.pin, req.body.pin)) { res.status(403).json({ error: 'De pincode klopt niet.' }); return null; }
+  return p;
+}
 router.post('/gezin/wissen', (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
-  const p = profielVan(g, req.body && req.body.token);
-  if (!p || p.rol !== 'beheerder') return res.status(403).json({ error: 'Alleen de beheerder kan het gezin wissen.' });
-  if (!checkPin(p.pin, req.body.pin)) return res.status(403).json({ error: 'De pincode klopt niet.' });
+  const p = adultCheck(g, req, res); if (!p) return;
+  if (volwassenen(g).length <= 1) { delete G()[g.code]; save(); return res.json({ ok: true, verwijderd: true }); }
+  g.wisVerzoek = { door: p.id, doorNaam: p.naam, at: nu() }; save();
+  res.json({ ok: true, wachtOpToestemming: true });
+});
+router.post('/gezin/wissen/bevestig', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  if (!g.wisVerzoek) return res.status(400).json({ error: 'Er is geen verzoek om te verwijderen.' });
+  const p = adultCheck(g, req, res); if (!p) return;
+  if (g.wisVerzoek.door === p.id) return res.status(403).json({ error: 'De tweede volwassene moet toestemming geven, niet degene die het verzoek deed.' });
   delete G()[g.code]; save();
+  res.json({ ok: true, verwijderd: true });
+});
+router.post('/gezin/wissen/intrekken', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  const p = adultCheck(g, req, res); if (!p) return;
+  delete g.wisVerzoek; save();
   res.json({ ok: true });
+});
+
+/* De RTG-, Lifestyle- of Business Pass koppelen aan het gezin. De beheerder logt
+   met zijn RTG-account in om te bewijzen dat de Pass van hem is; we bewaren alleen
+   het niveau en de codenaam, geen persoonsgegevens. Zo weet de foundation dat een
+   lid dit gezin steunt. */
+const TIERNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
+router.post('/gezin/koppel', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  if (!beheerderVan(g, req, res)) return;
+  const bucket = 'koppel:' + ipVan(req);
+  if (teVaak(res, bucket)) return;
+  let accounts; try { accounts = require('./accounts'); } catch (e) { return res.status(500).json({ error: 'Koppelen kan nu niet.' }); }
+  const u = accounts.findByLogin(req.body.login);
+  if (!u || !accounts.verifyPassword(String(req.body.wachtwoord || ''), u.password_hash)) {
+    misluktePoging(bucket, 8, 10);
+    return res.status(403).json({ error: 'Deze inloggegevens kloppen niet. Gebruik je RTG-gebruikersnaam of e-mail en wachtwoord.' });
+  }
+  goedePoging(bucket);
+  g.koppeling = { tier: u.tier, tierNaam: TIERNAAM[u.tier] || 'RTG Pass', codenaam: u.codename || 'Lid', at: nu() }; save();
+  res.json({ ok: true, koppeling: { tier: g.koppeling.tier, tierNaam: g.koppeling.tierNaam, codenaam: g.koppeling.codenaam } });
+});
+router.post('/gezin/koppel/los', (req, res) => {
+  const g = gezinVan(req, res); if (!g) return;
+  if (!beheerderVan(g, req, res)) return;
+  delete g.koppeling; save();
+  res.json({ ok: true });
+});
+
+/* gezinsagenda: samen plannen. Het gezin voegt toe; iedereen (ook de oppas) mag
+   de planning zien, zodat een oppas weet wat er die dag speelt. */
+router.post('/gezin/agenda', (req, res) => {
+  const s = familieVan(req, res); if (!s) return;
+  const titel = schoon(req.body.titel, 80);
+  if (!titel) return res.status(400).json({ error: 'Waar gaat het agendapunt over?' });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.datum || '')) return res.status(400).json({ error: 'Kies een datum.' });
+  const tijd = /^\d{2}:\d{2}$/.test(req.body.tijd || '') ? req.body.tijd : '';
+  const wie = req.body.wie && s.g.profielen[req.body.wie] ? req.body.wie : '';
+  if (!s.g.agenda) s.g.agenda = [];
+  if (s.g.agenda.length >= 200) return res.status(400).json({ error: 'De agenda is vol. Haal eerst iets weg.' });
+  const item = { id: rid(3), titel, datum: req.body.datum, tijd, wie, door: s.p.id, at: nu() };
+  s.g.agenda.push(item); save();
+  res.json({ ok: true, item });
+});
+router.post('/gezin/agenda/verwijder', (req, res) => {
+  const s = familieVan(req, res); if (!s) return;
+  s.g.agenda = (s.g.agenda || []).filter(a => a.id !== req.body.itemId); save();
+  res.json({ ok: true });
+});
+router.get('/gezin/:code/agenda', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const vandaag = new Date().toISOString().slice(0, 10);
+  const items = (s.g.agenda || [])
+    .map(a => ({ id: a.id, titel: a.titel, datum: a.datum, tijd: a.tijd, wie: a.wie, wieNaam: a.wie && s.g.profielen[a.wie] ? s.g.profielen[a.wie].naam : '', voorbij: a.datum < vandaag, vandaag: a.datum === vandaag }))
+    .sort((a, b) => (a.datum + (a.tijd || '99:99')).localeCompare(b.datum + (b.tijd || '99:99')));
+  res.json({ agenda: items, magBewerken: !isGast(s.p) });
+});
+
+/* klusjes en sterren: kinderen verdienen sterren met klusjes. Een ouder zet ze
+   klaar en keurt ze goed; zo leren kinderen verantwoordelijkheid en groeit hun
+   sterrensaldo (dat mooi aansluit op het spaarpotje). */
+function magKlus(s) { return ['beheerder', 'ouder'].includes(s.p.rol); }
+router.post('/gezin/klus', (req, res) => {
+  const s = familieVan(req, res); if (!s) return;
+  if (!magKlus(s)) return res.status(403).json({ error: 'Alleen een ouder of de beheerder kan klusjes klaarzetten.' });
+  const titel = schoon(req.body.titel, 80);
+  if (!titel) return res.status(400).json({ error: 'Wat is het klusje?' });
+  const sterren = Math.max(1, Math.min(20, Math.round(Number(req.body.sterren) || 1)));
+  const voor = req.body.voor && s.g.profielen[req.body.voor] ? req.body.voor : 'iedereen';
+  if (!s.g.klussen) s.g.klussen = [];
+  if (s.g.klussen.length >= 100) return res.status(400).json({ error: 'Er staan al veel klusjes. Rond er eerst een paar af.' });
+  const k = { id: rid(3), titel, sterren, voor, status: 'open', doorPid: '', at: nu() };
+  s.g.klussen.unshift(k); save();
+  res.json({ ok: true, klus: k });
+});
+router.post('/gezin/klus/gedaan', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  if (isGast(s.p)) return res.status(403).json({ error: 'Een oppas kan geen klusjes afvinken.' });
+  const k = (s.g.klussen || []).find(x => x.id === req.body.klusId);
+  if (!k) return res.status(404).json({ error: 'Klusje niet gevonden.' });
+  if (k.voor !== 'iedereen' && k.voor !== s.p.id) return res.status(403).json({ error: 'Dit klusje is voor iemand anders.' });
+  if (k.status === 'goedgekeurd') return res.status(400).json({ error: 'Dit klusje is al afgerond.' });
+  k.status = 'gedaan'; k.doorPid = s.p.id; save();
+  res.json({ ok: true });
+});
+router.post('/gezin/klus/keur', (req, res) => {
+  const s = familieVan(req, res); if (!s) return;
+  if (!magKlus(s)) return res.status(403).json({ error: 'Alleen een ouder of de beheerder kan een klusje goedkeuren.' });
+  const k = (s.g.klussen || []).find(x => x.id === req.body.klusId);
+  if (!k) return res.status(404).json({ error: 'Klusje niet gevonden.' });
+  if (k.status !== 'gedaan') return res.status(400).json({ error: 'Dit klusje is nog niet gedaan.' });
+  if (req.body.goed === false) { k.status = 'open'; k.doorPid = ''; }
+  else { k.status = 'goedgekeurd'; if (!s.g.sterren) s.g.sterren = {}; s.g.sterren[k.doorPid] = (s.g.sterren[k.doorPid] || 0) + k.sterren; }
+  save();
+  res.json({ ok: true });
+});
+router.post('/gezin/klus/verwijder', (req, res) => {
+  const s = familieVan(req, res); if (!s) return;
+  if (!magKlus(s)) return res.status(403).json({ error: 'Alleen een ouder of de beheerder kan dit.' });
+  s.g.klussen = (s.g.klussen || []).filter(x => x.id !== req.body.klusId); save();
+  res.json({ ok: true });
+});
+router.get('/gezin/:code/klussen', (req, res) => {
+  const s = familieVan(req, res); if (!s) return;
+  const naamVan = pid => (s.g.profielen[pid] ? s.g.profielen[pid].naam : '');
+  const klussen = (s.g.klussen || []).map(k => ({ id: k.id, titel: k.titel, sterren: k.sterren, voor: k.voor, voorNaam: k.voor === 'iedereen' ? 'iedereen' : naamVan(k.voor), status: k.status, door: k.doorPid ? naamVan(k.doorPid) : '', vanMij: k.doorPid === s.p.id }));
+  const sterren = Object.entries(s.g.sterren || {}).filter(([pid]) => s.g.profielen[pid])
+    .map(([pid, n]) => ({ pid, naam: s.g.profielen[pid].naam, avatar: s.g.profielen[pid].avatar, kleur: s.g.profielen[pid].kleur, sterren: n }))
+    .sort((a, b) => b.sterren - a.sterren);
+  res.json({ klussen, sterren, magBeheren: magKlus(s), mijnId: s.p.id });
 });
 
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));

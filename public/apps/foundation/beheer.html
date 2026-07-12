@@ -78,15 +78,27 @@
   </div>
 
   <div class="kaart blok">
+    <h2>Je RTG-, Lifestyle- of Business Pass koppelen</h2>
+    <div class="h">Ben je lid van Rahul Travel Group? Koppel je Pass aan jullie gezin. Zo weet de foundation dat een lid dit gezin steunt. We bewaren alleen het niveau en je codenaam, geen persoonsgegevens.</div>
+    <div id="koppelStatus"></div>
+    <div id="koppelForm">
+      <input class="veld" id="kpLogin" placeholder="RTG-gebruikersnaam of e-mail" style="margin-bottom:.5rem;" autocomplete="username">
+      <input class="veld" id="kpPass" placeholder="RTG-wachtwoord" type="password" style="margin-bottom:.5rem;" autocomplete="current-password">
+      <div class="fout" id="kpFout"></div>
+      <button class="knop" id="kpDoe">Pass koppelen</button>
+    </div>
+  </div>
+
+  <div class="kaart blok">
     <h2>Gegevens en privacy</h2>
     <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--goud)">privacy en veiligheid</a>-pagina.</div>
     <button class="knop rood" id="wisAlles">Alle gegevens van ons gezin verwijderen</button>
-    <div class="h" style="margin:.6rem 0 0;">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
+    <div class="h" id="wisUitleg" style="margin:.6rem 0 0;">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
   </div>
 </div>
 
 <dialog id="dlgWis"><div class="kaart modal">
-  <h3>Alles verwijderen?</h3>
+  <h3 id="dlgWisTitel">Alles verwijderen?</h3>
   <div class="sub" style="color:var(--zacht);font-size:.88rem;margin-bottom:1rem;line-height:1.45;">Hiermee verdwijnt alles van jullie gezin voorgoed: profielen, spaardoelen, dromen, berichten, locaties en de gezinsinfo. Vul je pincode in om te bevestigen.</div>
   <input class="veld" id="wPin" placeholder="Jouw pincode" inputmode="numeric" maxlength="6" type="password">
   <div class="fout" id="wFout"></div>
@@ -156,6 +168,30 @@ async function laad(){
   function knop(id, tekst){ const b=document.createElement('button'); b.textContent=tekst; b.onclick=()=>{ naarWie=id; [...nk.children].forEach(c=>c.classList.toggle('aan', c===b)); }; return b; }
   const allen=knop('allen','Iedereen'); allen.classList.add('aan'); nk.appendChild(allen);
   d.profielen.filter(p=> p.id!==d.profiel.id).forEach(p=> nk.appendChild(knop(p.id, p.naam)));
+  // Pass-koppeling
+  if (d.koppeling){
+    $('#koppelForm').style.display='none';
+    $('#koppelStatus').innerHTML = '<div class="prow"><span class="av" style="background:var(--goud);color:#1a1710">✅</span><div><div class="nm">'+esc(d.koppeling.tierNaam||'RTG Pass')+'</div><div class="rl">'+esc(d.koppeling.codenaam||'lid')+'</div></div><div class="sp"><button class="knop grijs klein" id="kpLos">Ontkoppelen</button></div></div>';
+    $('#kpLos').onclick = async ()=>{ try{ await api('/gezin/koppel/los', { code:s.code, token:s.token }); laad(); }catch(e){ alert(e.message); } };
+  } else { $('#koppelForm').style.display='block'; $('#koppelStatus').innerHTML=''; }
+  // openstaand verzoek om te verwijderen
+  const adults = d.profielen.filter(p=> p.beheerder || p.rol==='ouder').length;
+  if (d.wisVerzoek && !d.wisVerzoek.vanMij){
+    $('#wisAlles').textContent = 'Toestemming geven om alles te verwijderen';
+    $('#wisAlles').dataset.mode = 'bevestig';
+    $('#wisUitleg').innerHTML = '<b style="color:var(--rood)">'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens verwijderen.</b> Geef jij toestemming, of <a href="#" id="wisWeiger" style="color:var(--goud)">wijs het verzoek af</a>.';
+    $('#wisWeiger').onclick = async (e)=>{ e.preventDefault(); try{ await api('/gezin/wissen/intrekken', { code:s.code, token:s.token }); laad(); }catch(err){ alert(err.message); } };
+  } else if (d.wisVerzoek && d.wisVerzoek.vanMij){
+    $('#wisAlles').textContent = 'Verzoek intrekken';
+    $('#wisAlles').dataset.mode = 'intrekken';
+    $('#wisUitleg').textContent = 'Je verzoek wacht op toestemming van een tweede volwassene. Je kunt het intrekken.';
+  } else {
+    $('#wisAlles').textContent = 'Alle gegevens van ons gezin verwijderen';
+    $('#wisAlles').dataset.mode = 'wissen';
+    $('#wisUitleg').textContent = adults >= 2
+      ? 'Er zijn twee volwassenen. Verwijderen vraagt daarom de toestemming van de ander. Dit verwijdert het hele gezin en kan niet ongedaan worden gemaakt.'
+      : 'Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.';
+  }
 }
 
 function bewerk(p){
@@ -204,15 +240,35 @@ async function stuur(soort){
 $('#bStuur').onclick=()=>stuur('bericht');
 $('#bReis').onclick=()=>stuur('reis');
 
-$('#wisAlles').onclick=()=>{ $('#wPin').value=''; $('#wFout').textContent=''; $('#dlgWis').showModal(); };
+$('#wisAlles').onclick=async ()=>{
+  const mode = $('#wisAlles').dataset.mode || 'wissen';
+  if (mode === 'intrekken'){ try{ await api('/gezin/wissen/intrekken', { code:s.code, token:s.token }); laad(); }catch(e){ alert(e.message); } return; }
+  $('#wPin').value=''; $('#wFout').textContent='';
+  $('#dlgWis').dataset.mode = mode;
+  $('#wDoe').textContent = mode === 'bevestig' ? 'Ja, ik geef toestemming' : 'Definitief verwijderen';
+  $('#dlgWisTitel') && ($('#dlgWisTitel').textContent = mode === 'bevestig' ? 'Toestemming geven?' : 'Alles verwijderen?');
+  $('#dlgWis').showModal();
+};
 $('#wDoe').onclick=async()=>{
   $('#wFout').textContent='';
+  const mode = $('#dlgWis').dataset.mode || 'wissen';
+  const pad = mode === 'bevestig' ? '/gezin/wissen/bevestig' : '/gezin/wissen';
   try{
-    await api('/gezin/wissen', { code:s.code, token:s.token, pin:$('#wPin').value.trim() });
-    Sessie.uitloggen();
-    alert('Alle gegevens van jullie gezin zijn verwijderd.');
-    location.href='index.html';
+    const r = await api(pad, { code:s.code, token:s.token, pin:$('#wPin').value.trim() });
+    if (r.verwijderd){ Sessie.uitloggen(); alert('Alle gegevens van jullie gezin zijn verwijderd.'); location.href='index.html'; return; }
+    // verzoek ingediend, wacht op tweede volwassene
+    $('#dlgWis').close();
+    alert('Je verzoek is ingediend. Een tweede volwassene moet het nog goedkeuren.');
+    laad();
   }catch(e){ $('#wFout').textContent = e.message; }
+};
+
+$('#kpDoe').onclick=async()=>{
+  $('#kpFout').textContent='';
+  try{
+    await api('/gezin/koppel', { code:s.code, token:s.token, login:$('#kpLogin').value.trim(), wachtwoord:$('#kpPass').value });
+    $('#kpLogin').value=''; $('#kpPass').value=''; laad();
+  }catch(e){ $('#kpFout').textContent = e.message; }
 };
 
 laad();

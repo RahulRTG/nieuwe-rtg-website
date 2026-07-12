@@ -289,6 +289,74 @@ test('privacy: gevoelige data ligt versleuteld op schijf en het gezin kan alles 
   assert.equal((await api('/gezin/inloggen', { code: g.code })).status, 404);
 });
 
+test('twee volwassenen: verwijderen vraagt toestemming van de tweede', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Samen', naam: 'Ouder A', pin: '1212' }));
+  // tweede volwassene toevoegen (ouder) met eigen pin
+  const b = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Ouder B', rol: 'ouder', pin: '3434' }));
+  const bt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: b.profiel.id, pin: '3434' }))).token;
+
+  // A vraagt verwijderen aan: dat wist niet meteen, maar wacht op toestemming
+  const verzoek = await json(await api('/gezin/wissen', { code: g.code, token: g.token, pin: '1212' }));
+  assert.ok(verzoek.wachtOpToestemming && !verzoek.verwijderd);
+  // A kan niet zelf bevestigen
+  assert.equal((await api('/gezin/wissen/bevestig', { code: g.code, token: g.token, pin: '1212' })).status, 403);
+  // B ziet het verzoek en bevestigt met zijn pin
+  const mijB = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + bt));
+  assert.equal(mijB.wisVerzoek.doorNaam, 'Ouder A');
+  assert.equal(mijB.wisVerzoek.vanMij, false);
+  const weg = await api('/gezin/wissen/bevestig', { code: g.code, token: bt, pin: '3434' });
+  assert.equal(weg.status, 200);
+  assert.equal((await api('/gezin/inloggen', { code: g.code })).status, 404);
+
+  // met maar een volwassene wist het wel meteen
+  const g2 = await json(await api('/gezin/maak', { gezinsnaam: 'Alleen', naam: 'Solo', pin: '5656' }));
+  await api('/gezin/profiel/maak', { code: g2.code, token: g2.token, naam: 'Kind', rol: 'kind' });
+  assert.ok((await json(await api('/gezin/wissen', { code: g2.code, token: g2.token, pin: '5656' }))).verwijderd);
+});
+
+test('Pass koppelen: het demo-lid Rahul kan aan het gezin worden gekoppeld', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Steun', naam: 'Ma', pin: '2323' }));
+  // verkeerde inloggegevens falen
+  assert.equal((await api('/gezin/koppel', { code: g.code, token: g.token, login: 'Rahul', wachtwoord: 'fout' })).status, 403);
+  // het demo-account (Rahul / Imran, business) koppelt wel
+  const ok = await api('/gezin/koppel', { code: g.code, token: g.token, login: 'Rahul', wachtwoord: 'Imran' });
+  assert.equal(ok.status, 200);
+  assert.equal((await json(ok)).koppeling.tier, 'business');
+  const mij = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token));
+  assert.equal(mij.koppeling.tierNaam, 'Business Pass');
+  // ontkoppelen kan
+  assert.equal((await api('/gezin/koppel/los', { code: g.code, token: g.token })).status, 200);
+});
+
+test('gezinsagenda en klusjes: plannen samen en sterren verdienen', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Actief', naam: 'Pap', pin: '8989' }));
+  const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Loes', rol: 'kind' }));
+  const kt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const gast = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Opa', rol: 'gast' }));
+  const gt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: gast.profiel.id }))).token;
+
+  // agenda: ouder plant, gast mag lezen maar niet toevoegen
+  assert.equal((await api('/gezin/agenda', { code: g.code, token: g.token, titel: 'Loes naar voetbal', datum: '2026-08-01', tijd: '17:00' })).status, 200);
+  assert.equal((await api('/gezin/agenda', { code: g.code, token: gt, titel: 'stiekem', datum: '2026-08-01' })).status, 403);
+  const agGast = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/agenda?token=' + gt));
+  assert.ok(agGast.agenda.some(a => a.titel === 'Loes naar voetbal'));
+  assert.equal(agGast.magBewerken, false);
+
+  // klusjes: ouder zet klaar, kind doet, ouder keurt goed -> sterren
+  const klus = await json(await api('/gezin/klus', { code: g.code, token: g.token, titel: 'Tafel dekken', sterren: 3, voor: kind.profiel.id }));
+  // een kind kan geen klus klaarzetten, een gast geen klus afvinken
+  assert.equal((await api('/gezin/klus', { code: g.code, token: kt, titel: 'nee', sterren: 1 })).status, 403);
+  assert.equal((await api('/gezin/klus/gedaan', { code: g.code, token: gt, klusId: klus.klus.id })).status, 403);
+  // kind vinkt af, ouder keurt goed
+  assert.equal((await api('/gezin/klus/gedaan', { code: g.code, token: kt, klusId: klus.klus.id })).status, 200);
+  assert.equal((await api('/gezin/klus/keur', { code: g.code, token: g.token, klusId: klus.klus.id, goed: true })).status, 200);
+  const kl = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/klussen?token=' + g.token));
+  assert.equal(kl.sterren.find(x => x.naam === 'Loes').sterren, 3);
+  assert.equal(kl.klussen[0].status, 'goedgekeurd');
+  // een gast mag de klusjes niet inzien
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + g.code + '/klussen?token=' + gt)).status, 403);
+});
+
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {
   const L = await les();
   const goed = await api('/ai', { code: L.code, token: L.sToken, messages: [{ role: 'user', content: 'Help met breuken' }] });

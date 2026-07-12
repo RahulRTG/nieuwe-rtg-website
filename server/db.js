@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const seed = require('./seed');
+const kluis = require('./kluis'); // versleuteling-at-rest (met RTG_ENC_KEY)
 
 // De datamap is instelbaar met RTG_DATA_DIR (handig voor tests en om data en
 // sleutels op productie los van de app-schijf te zetten). Standaard server/data.
@@ -57,12 +58,16 @@ function sqliteInit() {
   kvdb.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER)');
   kvdb.exec("INSERT INTO meta(k,v) VALUES('ver',0) ON CONFLICT(k) DO NOTHING");
 }
+// De opgeslagen waarde is (met RTG_ENC_KEY) versleuteld; in het geheugen en in
+// laatsteJson houden we altijd de leesbare JSON aan, alleen op schijf staat cijfer.
+const uitStore = v => kluis.ontsleutel(v);       // ruwe kolomwaarde -> leesbare JSON
+const naarStore = j => kluis.versleutel(j);      // leesbare JSON -> op te slaan waarde
 function loadSqlite() {
   sqliteInit();
   const rows = kvdb.prepare('SELECT key, val, ver FROM kv').all();
   if (!rows.length) return null;
   const data = {};
-  for (const r of rows) { data[r.key] = JSON.parse(r.val); laatsteJson.set(r.key, r.val); toegepast.set(r.key, r.ver); }
+  for (const r of rows) { const j = uitStore(r.val); data[r.key] = JSON.parse(j); laatsteJson.set(r.key, j); toegepast.set(r.key, r.ver); }
   return data;
 }
 
@@ -145,13 +150,13 @@ function saveSqlite() {
       // in plaats van hun wijzigingen te overschrijven.
       if (rij && rij.ver > (toegepast.get(k) || 0)) {
         const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
-        const samen = merge3(base, db.data[k], JSON.parse(rij.val));
+        const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)));
         db.data[k] = samen;
         j = JSON.stringify(samen);
       }
       bump.run();
       const v = huidig.get().v;
-      up.run(k, j, v);
+      up.run(k, naarStore(j), v);
       laatsteJson.set(k, j);
       toegepast.set(k, v);
     }
@@ -175,14 +180,15 @@ function pollSqlite() {
     for (const r of rows) {
       if (r.ver <= (toegepast.get(r.key) || 0)) continue;
       const baseJson = laatsteJson.get(r.key);
+      const hunJson = uitStore(r.val);
       const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[r.key]) !== baseJson;
       if (lokaalOpenstaand) {
         // wij hebben nog niet-opgeslagen wijzigingen: samenvoegen en die niet
         // als "opgeslagen" markeren, zodat de eerstvolgende save ze wegschrijft.
-        db.data[r.key] = merge3(JSON.parse(baseJson), db.data[r.key], JSON.parse(r.val));
+        db.data[r.key] = merge3(JSON.parse(baseJson), db.data[r.key], JSON.parse(hunJson));
       } else {
-        db.data[r.key] = JSON.parse(r.val);
-        laatsteJson.set(r.key, r.val);
+        db.data[r.key] = JSON.parse(hunJson);
+        laatsteJson.set(r.key, hunJson);
       }
       toegepast.set(r.key, r.ver);
       if (r.key === 'sessions') sessieGewijzigd = true;
@@ -206,7 +212,7 @@ function laadUitBackup() {
     if (!fs.existsSync(bdir)) return null;
     for (const d of fs.readdirSync(bdir).sort().reverse()) {
       const f = path.join(bdir, d, 'db.json');
-      if (fs.existsSync(f)) { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) {} }
+      if (fs.existsSync(f)) { try { return JSON.parse(kluis.ontsleutel(fs.readFileSync(f, 'utf8'))); } catch (e) {} }
     }
   } catch (e) {}
   return null;
@@ -217,8 +223,12 @@ function load() {
     db.data = loadSqlite();
     if (!db.data) { db.data = seed(); save(); }
   } else if (fs.existsSync(DB_FILE)) {
+    const ruw = fs.readFileSync(DB_FILE, 'utf8');
+    let tekst;
+    try { tekst = kluis.ontsleutel(ruw); }
+    catch (e) { throw new Error('db.json kan niet ontsleuteld worden; klopt RTG_ENC_KEY? (' + e.message + ')'); }
     try {
-      db.data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      db.data = JSON.parse(tekst);
     } catch (e) {
       // corrupte db.json (bijv. na een stroomstoring midden in een schrijf):
       // val terug op de nieuwste backup in plaats van met lege data te starten.
@@ -248,7 +258,8 @@ function save() {
     // Atomisch wegschrijven: eerst een tijdelijk bestand, dan hernoemen.
     // Valt de server midden in een save uit, dan blijft het oude bestand heel.
     const tmp = DB_FILE + '.tmp';
-    fs.writeFileSync(tmp, JSON.stringify(db.data, null, 2), { mode: 0o600 });
+    const uit = kluis.AAN ? kluis.versleutel(JSON.stringify(db.data)) : JSON.stringify(db.data, null, 2);
+    fs.writeFileSync(tmp, uit, { mode: 0o600 });
     fs.renameSync(tmp, DB_FILE);
     besloten(DB_FILE);
     spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis (lees-replica's)
@@ -261,7 +272,7 @@ function spiegelNaarRedis() {
   if (!rPub) return;
   versie++;
   const v = versie;
-  rPub.set('rtg:db', JSON.stringify(db.data)).then(() => rPub.publish('rtg:db:versie', String(v))).catch(() => {});
+  rPub.set('rtg:db', kluis.versleutel(JSON.stringify(db.data))).then(() => rPub.publish('rtg:db:versie', String(v))).catch(() => {});
 }
 
 /* Start de gedeelde data. Roep dit na load() aan, zodra de kern zijn
@@ -283,14 +294,14 @@ async function startGedeeld() {
     if (v <= versie) return; // eigen of oudere wijziging: negeren
     try {
       const raw = await rPub.get('rtg:db');
-      if (raw) { db.data = JSON.parse(raw); versie = v; if (externCb) externCb(); }
+      if (raw) { db.data = JSON.parse(kluis.ontsleutel(raw)); versie = v; if (externCb) externCb(); }
     } catch (e) {}
   });
   if (db.writable) {
     spiegelNaarRedis();                          // schrijver deelt zijn huidige data
   } else {
     const raw = await rPub.get('rtg:db');
-    if (raw) { db.data = JSON.parse(raw); if (externCb) externCb(); }
+    if (raw) { db.data = JSON.parse(kluis.ontsleutel(raw)); if (externCb) externCb(); }
   }
   console.log('[db] gedeelde data via Redis actief, rol:', db.writable ? 'schrijver' : 'lezer');
   return true;

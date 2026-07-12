@@ -141,7 +141,8 @@ app.post('/api/verify/upload', express.json({ limit: '6mb' }), auth, (req, res) 
   try { fs.chmodSync(UPLOAD_DIR, 0o700); } catch (e) {}
   const ext = m[1] === 'jpeg' ? 'jpg' : m[1];
   const fname = req.session.account.id + '-' + Date.now() + '.' + ext;
-  fs.writeFileSync(path.join(UPLOAD_DIR, fname), buf, { mode: 0o600 });
+  // met RTG_ENC_KEY wordt het identiteitsbewijs versleuteld op schijf gezet
+  fs.writeFileSync(path.join(UPLOAD_DIR, fname), require('../kluis').versleutelBuf(buf), { mode: 0o600 });
   accounts.setVerification(req.session.account.id, 'pending', fname);
   res.json({ ok: true, status: 'pending' });
 });

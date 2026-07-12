@@ -206,7 +206,11 @@ app.get('/api/office/doc', (req, res) => {
   const file = path.basename(String(req.query.file || '')); // geen padtraversal
   const full = path.join(UPLOAD_DIR, file);
   if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return res.status(404).end();
-  res.sendFile(full);
+  // het identiteitsbewijs staat (met RTG_ENC_KEY) versleuteld op schijf: hier ontsleutelen
+  let buf;
+  try { buf = require('../kluis').ontsleutelBuf(fs.readFileSync(full)); } catch (e) { return res.status(500).end(); }
+  const ext = (file.split('.').pop() || '').toLowerCase();
+  res.type(ext === 'jpg' ? 'jpeg' : ext).end(buf);
 });
 
 app.post('/api/office/conversations', officeAuth, (req, res) => res.json({ conversations: conciergeInbox() }));

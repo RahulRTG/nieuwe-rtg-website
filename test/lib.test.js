@@ -53,3 +53,34 @@ test('db.merge3: gelijktijdige wijzigingen in dezelfde collectie worden samengev
   const nested = merge3({ g: { profielen: { p1: 1 } } }, { g: { profielen: { p1: 1, p2: 2 } } }, { g: { profielen: { p1: 1, p3: 3 } } });
   assert.deepEqual(nested.g.profielen, { p1: 1, p2: 2, p3: 3 });
 });
+
+test('kluis: versleuteling-at-rest is omkeerbaar, merkt geknoei, en laat plaintext door', () => {
+  // met sleutel in een apart proces (RTG_ENC_KEY zet je via de omgeving)
+  const { execFileSync } = require('node:child_process');
+  const script = `
+    process.env.RTG_ENC_KEY = 'a'.repeat(64);
+    delete require.cache[require.resolve('${require('path').join(__dirname, '..', 'server', 'kluis.js').replace(/\\\\/g, '/')}')];
+    const k = require('${require('path').join(__dirname, '..', 'server', 'kluis.js').replace(/\\\\/g, '/')}');
+    const geheim = JSON.stringify({ chat: 'hallo', pin: 1234 });
+    const enc = k.versleutel(geheim);
+    const out = {
+      aan: k.AAN,
+      versleuteld: enc.startsWith('RTGENC1:') && !enc.includes('hallo'),
+      rondrit: k.ontsleutel(enc) === geheim,
+      plaintextDoor: k.ontsleutel(geheim) === geheim,  // niet-versleutelde waarde blijft
+    };
+    // geknoei moet opvallen (GCM-tag)
+    try { k.ontsleutel(enc.slice(0, -3) + 'AAA'); out.knoeiGemerkt = false; } catch (e) { out.knoeiGemerkt = true; }
+    // binaire variant
+    const b = Buffer.from([1,2,3,4,5]);
+    out.bufRondrit = Buffer.compare(k.ontsleutelBuf(k.versleutelBuf(b)), b) === 0;
+    process.stdout.write(JSON.stringify(out));
+  `;
+  const res = JSON.parse(execFileSync(process.execPath, ['-e', script]).toString());
+  assert.equal(res.aan, true);
+  assert.equal(res.versleuteld, true, 'de opgeslagen waarde bevat geen plaintext');
+  assert.equal(res.rondrit, true, 'ontsleutelen geeft exact het origineel terug');
+  assert.equal(res.plaintextDoor, true, 'niet-versleutelde waarde laat je ongemoeid (migratie)');
+  assert.equal(res.knoeiGemerkt, true, 'aangepaste cijfertekst wordt geweigerd');
+  assert.equal(res.bufRondrit, true, 'binaire versleuteling (KYC) is omkeerbaar');
+});

@@ -71,6 +71,23 @@ Corrupte `db.json` valt bij het laden terug op de nieuwste dagbackup; een
 onverwachte datavorm stopt het opstarten (niet over goede data heen schrijven);
 schema-versie toegevoegd. Optionele off-site backup naar `RTG_BACKUP_DIR`.
 
+## Privacy op schijf  (aangepakt)
+- **Bestandsrechten**: de datamap is 0700 en alle databestanden (db.json,
+  store.db, de dagbackups en het geuploade identiteitsbewijs) zijn 0600, dus
+  alleen de proceseigenaar kan ze lezen.
+- **Versleuteling-at-rest** (`server/kluis.js`): met `RTG_ENC_KEY` in de omgeving
+  wordt alles wat naar schijf (en naar de Redis-mirror) gaat versleuteld met
+  AES-256-GCM: de hele db bij de JSON-opslag, elke collectie bij de
+  SQLite-opslag, en de KYC-documenten. Een gestolen schijf of backup is dan
+  onleesbaar zonder de sleutel; geknoei valt op (GCM-tag). Zonder sleutel
+  verandert er niets, en bestaande plaintext-data blijft laden (geleidelijke
+  migratie: nieuwe schrijfacties zijn versleuteld). Staat er versleutelde data en
+  ontbreekt de sleutel, dan weigert de server te starten in plaats van stil met
+  lege data te beginnen. Bewaar de sleutel BUITEN de datamap.
+  Getest: op schijf staat cijfertekst (geen plaintext), herstart met dezelfde
+  sleutel laadt de data, een foute sleutel wordt geweigerd, en de multi-writer
+  merge werkt ook met versleuteling aan.
+
 ---
 
 Alle wijzigingen draaien met de bestaande testsuite groen (52 tests), plus

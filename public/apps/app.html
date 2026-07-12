@@ -643,6 +643,14 @@
   .menu-scrim.open{display:block;}
   .menu-sheet{position:absolute;left:0;right:0;bottom:0;z-index:81;background:var(--bg);border-top:1px solid var(--line);border-radius:20px 20px 0 0;max-height:88%;display:none;flex-direction:column;}
   .menu-sheet.open{display:flex;}
+  /* RTG Zakelijk (Business Pass) */
+  .zak-tab{background:none;border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.85rem;color:var(--muted);font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .zak-tab.active{background:var(--gold);border-color:var(--gold);color:#000;}
+  .zak-kaart{border:1px solid var(--line);border-radius:14px;padding:0.85rem 1rem;margin-top:0.7rem;}
+  .zak-chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;font-size:0.66rem;color:var(--muted);margin:0.25rem 0.25rem 0 0;}
+  .zak-chip.klik{cursor:pointer;}
+  .zak-chip.mijn{border-color:var(--gold);color:var(--gold);}
+  .zak-open{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7EE0A3;border:1px solid #2a5c3f;border-radius:999px;padding:0.15rem 0.5rem;}
 
   /* ---- Salon-connecties: vrienden, dm en bellen ---- */
   .sc-bar{margin:0 0 1.1rem;}
@@ -856,6 +864,7 @@
         <h2 data-i18n="app.v.salon">De Salon.</h2>
         <p class="sub" data-i18n="app.v.salon.sub">Posts verschijnen 7 dagen na verblijf, voor uw veiligheid.</p>
         <div class="sc-bar" id="socialBar"></div>
+        <div id="zakLauncher" style="display:none;"></div>
         <div id="feed"></div>
       </div>
 
@@ -927,6 +936,21 @@
       <div class="field"><label data-i18n="cv.about">Over u (kort)</label><textarea id="cvAbout" style="min-height:70px;"></textarea></div>
     </div>
     <div class="ms-foot"><button class="ms-order" id="cvSave" data-i18n="cv.save">Bewaar mijn cv</button></div>
+  </div>
+
+  <!-- RTG Zakelijk: het professionele netwerk van de Business Pass -->
+  <div id="zak-scrim" class="menu-scrim"></div>
+  <div id="zak-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b data-i18n="zak.h">RTG Zakelijk</b><span data-i18n="zak.sub">Het professionele netwerk van de Business Pass</span></div>
+      <button class="ms-close" id="zakClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div style="display:flex;gap:0.4rem;padding:0.6rem 1.1rem 0;">
+      <button class="zak-tab active" data-zaktab="feed" data-i18n="zak.tab.feed">Feed</button>
+      <button class="zak-tab" data-zaktab="netwerk" data-i18n="zak.tab.net">Netwerk</button>
+      <button class="zak-tab" data-zaktab="profiel" data-i18n="zak.tab.prof">Mijn profiel</button>
+    </div>
+    <div class="ms-body" id="zakBody"></div>
   </div>
 
   <!-- gastchat met een partner (roomservice, eigenaar) -->
@@ -3257,10 +3281,155 @@
   $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
   $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
 
+  /* ---------- RTG Zakelijk: het professionele netwerk van de Business Pass ---------- */
+  let zakView = 'feed';
+  function zakOpen(){ $('#zak-scrim').classList.add('open'); $('#zak-sheet').classList.add('open'); zakRender(); }
+  function zakDicht(){ $('#zak-scrim').classList.remove('open'); $('#zak-sheet').classList.remove('open'); }
+  $('#zakClose').addEventListener('click', zakDicht);
+  $('#zak-scrim').addEventListener('click', zakDicht);
+  document.querySelectorAll('.zak-tab').forEach(b => b.addEventListener('click', () => {
+    zakView = b.dataset.zaktab;
+    document.querySelectorAll('.zak-tab').forEach(x => x.classList.toggle('active', x === b));
+    zakRender();
+  }));
+
+  const zakStatusKnop = (p) =>
+    p.status === 'verbonden' ? '<span class="zak-open" style="color:var(--gold);border-color:var(--gold);">✓ ' + T('zak.verbonden','Verbonden') + '</span>'
+    : p.status === 'aangevraagd' ? '<span class="zak-chip">' + T('zak.wacht','Aangevraagd') + '</span>'
+    : p.status === 'wacht-op-u' ? '<span class="zak-chip mijn">' + T('zak.wachtu','Accepteer in Contacten') + '</span>'
+    : '<button class="go js-zcon" data-key="' + escT(p.key) + '" style="padding:0.25rem 0.7rem;font-size:0.68rem;">+ ' + T('zak.verbind','Verbind') + '</button>';
+
+  function zakProfielKaart(p){
+    const skills = (p.vaardigheden || []).map(v =>
+      '<span class="zak-chip' + (p.status === 'verbonden' ? ' klik js-zaanb' : '') + (v.doorMij ? ' mijn' : '') + '"' +
+      ' data-key="' + escT(p.key) + '" data-v="' + escT(v.naam) + '">' + escT(v.naam) + (v.aanbevolen ? ' · ' + v.aanbevolen + ' 👍' : '') + '</span>').join('');
+    return '<div class="zak-kaart">' +
+      '<div style="display:flex;align-items:center;gap:0.6rem;">' +
+        '<div style="flex:1;min-width:0;"><b>' + escT(p.naam) + '</b>' +
+        (p.openVoorWerk ? ' <span class="zak-open">' + T('zak.open','open voor werk') + '</span>' : '') +
+        '<div style="font-size:0.74rem;color:var(--muted);">' + escT(p.kop) +
+        (p.sector ? ' · ' + escT(p.sector) : '') + (p.plaats ? ' · ' + escT(p.plaats) : '') + '</div>' +
+        '<div style="font-size:0.62rem;color:var(--soft);">' + T('zak.codenaam','codenaam') + ' ' + escT(p.codenaam) + '</div></div>' +
+        zakStatusKnop(p) + '</div>' +
+      (p.bio ? '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.45rem;line-height:1.5;">' + escT(p.bio) + '</div>' : '') +
+      ((p.ervaring || []).length ? '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.4rem;">' + p.ervaring.map(escT).join('<br>') + '</div>' : '') +
+      (skills ? '<div style="margin-top:0.35rem;">' + skills +
+        (p.status === 'verbonden' ? '<div style="font-size:0.6rem;color:var(--soft);margin-top:0.25rem;">' + T('zak.tikskill','Tik een vaardigheid aan om hem aan te bevelen.') + '</div>' : '') + '</div>' : '') +
+      '</div>';
+  }
+
+  async function zakRender(){
+    const body = $('#zakBody');
+    body.innerHTML = '<div style="color:var(--soft);font-size:0.8rem;padding:1rem 0;">…</div>';
+    try {
+      if (zakView === 'feed'){
+        const d = await API.call('/zakelijk/feed');
+        body.innerHTML =
+          '<div class="zak-kaart"><textarea id="zakPostTekst" placeholder="' + T('zak.postph','Deel een inzicht, vraag of mijlpaal met het netwerk…') + '" style="width:100%;min-height:64px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.8rem;"></textarea>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.45rem;">' +
+          '<span style="font-size:0.62rem;color:var(--soft);">' + (d.mijnProfiel ? T('zak.alsprof','U post onder uw professionele naam.') : T('zak.eerstprof','Maak eerst uw profiel aan (tab Mijn profiel).')) + '</span>' +
+          '<button class="go" id="zakPost" style="padding:0.35rem 0.9rem;font-size:0.7rem;">' + T('zak.plaats','Plaats') + '</button></div></div>' +
+          (d.posts.length ? d.posts.map(x =>
+            '<div class="zak-kaart"><div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="font-size:0.82rem;">' + escT(x.naam) + '</b>' +
+            '<span style="font-size:0.64rem;color:var(--soft);">' + escT(x.kop) + ' · ' + timeAgo(x.at) + '</span>' +
+            (x.openVoorWerk ? '<span class="zak-open">' + T('zak.open','open voor werk') + '</span>' : '') + '</div>' +
+            '<div style="font-size:0.8rem;line-height:1.55;margin-top:0.35rem;white-space:pre-wrap;">' + escT(x.tekst) + '</div>' +
+            '<div style="display:flex;gap:0.9rem;margin-top:0.5rem;font-size:0.7rem;color:var(--muted);">' +
+            '<button class="js-zlike" data-id="' + x.id + '" style="background:none;border:none;color:' + (x.mijnLike ? 'var(--gold)' : 'var(--muted)') + ';font-family:inherit;cursor:pointer;">👍 ' + x.likes + '</button>' +
+            '<span>💬 ' + x.reactiesTotaal + '</span></div>' +
+            x.reacties.map(r => '<div style="font-size:0.72rem;margin-top:0.35rem;color:var(--muted);"><b style="color:var(--txt);">' + escT(r.naam) + '</b> ' + escT(r.tekst) + '</div>').join('') +
+            '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input class="js-zretxt" data-id="' + x.id + '" placeholder="' + T('zak.reageer','Reageer…') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.75rem;color:var(--txt);font-family:inherit;font-size:0.72rem;">' +
+            '<button class="js-zre" data-id="' + x.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.68rem;cursor:pointer;">↩</button></div></div>').join('')
+          : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.leeg','Nog geen posts. Wees de eerste: deel waar u aan werkt.') + '</div>');
+        $('#zakPost').addEventListener('click', async () => {
+          try { await API.call('/zakelijk/post', { tekst: $('#zakPostTekst').value }); zakRender(); }
+          catch(e){ if (e.status === 409){ zakView = 'profiel'; document.querySelectorAll('.zak-tab').forEach(x => x.classList.toggle('active', x.dataset.zaktab === 'profiel')); zakRender(); } toast(e.message); }
+        });
+        body.querySelectorAll('.js-zlike').forEach(b => b.addEventListener('click', async () => {
+          try { await API.call('/zakelijk/like', { id: b.dataset.id }); zakRender(); } catch(e){ toast(e.message); }
+        }));
+        body.querySelectorAll('.js-zre').forEach(b => b.addEventListener('click', async () => {
+          const inp = body.querySelector('.js-zretxt[data-id="' + b.dataset.id + '"]');
+          try { await API.call('/zakelijk/reactie', { id: b.dataset.id, tekst: inp.value }); zakRender(); } catch(e){ toast(e.message); }
+        }));
+      } else if (zakView === 'netwerk'){
+        const zoek = async (q) => {
+          const d = await API.call('/zakelijk/gids', { q });
+          $('#zakGids').innerHTML = d.resultaten.length ? d.resultaten.map(zakProfielKaart).join('')
+            : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.geen','Geen profielen gevonden. Leden verschijnen hier zodra ze hun zakelijke profiel aanzetten.') + '</div>';
+          $('#zakGids').querySelectorAll('.js-zcon').forEach(b => b.addEventListener('click', async () => {
+            try { const r = await API.call('/zakelijk/connect', { key: b.dataset.key }); toast(r.status === 'aangevraagd' ? T('zak.gevraagd','Verzoek gestuurd. De ander accepteert in Contacten.') : r.status); zoek($('#zakZoek').value); }
+            catch(e){ toast(e.message); }
+          }));
+          $('#zakGids').querySelectorAll('.js-zaanb').forEach(ch => ch.addEventListener('click', async () => {
+            try { const r = await API.call('/zakelijk/aanbevelen', { key: ch.dataset.key, vaardigheid: ch.dataset.v });
+              toast(r.aanbevolen ? T('zak.aanbevolen','Aanbevolen') + ': ' + ch.dataset.v : T('zak.ingetrokken','Aanbeveling ingetrokken.')); zoek($('#zakZoek').value); }
+            catch(e){ toast(e.message); }
+          }));
+        };
+        body.innerHTML = '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;">' +
+          '<input id="zakZoek" placeholder="' + T('zak.zoekph','Zoek op naam, sector of vaardigheid…') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0.5rem 0.85rem;color:var(--txt);font-family:inherit;font-size:0.76rem;">' +
+          '<button class="go" id="zakZoekGo" style="padding:0.35rem 0.9rem;font-size:0.7rem;">' + T('zak.zoek','Zoek') + '</button></div><div id="zakGids"></div>';
+        $('#zakZoekGo').addEventListener('click', () => zoek($('#zakZoek').value));
+        $('#zakZoek').addEventListener('keydown', e => { if (e.key === 'Enter') zoek(e.target.value); });
+        zoek('');
+      } else {
+        const d = await API.call('/zakelijk/profiel');
+        const p = d.profiel || {};
+        const veld = (label, id, val, ph) => '<div class="field"><label>' + label + '</label><input id="' + id + '" value="' + escT(val || '') + '"' + (ph ? ' placeholder="' + ph + '"' : '') + '></div>';
+        body.innerHTML =
+          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.6rem;line-height:1.5;">' + T('zak.uitleg','Uw profiel is pas zichtbaar in de gids als u het bewaart. U kiest zelf welke naam u zakelijk gebruikt.') + '</div>' +
+          (d.cvSuggestie ? '<button id="zakUitCv" class="zak-chip klik" style="margin-top:0.5rem;">📄 ' + T('zak.uitcv','Vul aan vanuit mijn RTG-cv') + '</button>' : '') +
+          veld(T('zak.naam','Professionele naam'), 'zakNaam', p.naam, T('zak.naamph','Standaard: uw codenaam')) +
+          veld(T('zak.kop','Kop'), 'zakKop', p.kop, T('zak.kopph','Bijv. Oprichter, Fotograaf, Jurist')) +
+          veld(T('zak.sector','Sector'), 'zakSector', p.sector) +
+          veld(T('zak.plaats2','Plaats'), 'zakPlaats', p.plaats) +
+          '<div class="field"><label>' + T('zak.bio','Over u') + '</label><textarea id="zakBio" style="min-height:70px;">' + escT(p.bio || '') + '</textarea></div>' +
+          veld(T('zak.skills','Vaardigheden (komma’s)'), 'zakSkills', (p.vaardigheden || []).map(v => v.naam).join(', ')) +
+          '<div class="field"><label>' + T('zak.erv','Ervaring (een regel per rol)') + '</label><textarea id="zakErv" style="min-height:80px;">' + escT((p.ervaring || []).join('\n')) + '</textarea></div>' +
+          '<label style="display:flex;align-items:center;gap:0.4rem;font-size:0.76rem;margin-top:0.4rem;"><input type="checkbox" id="zakOpenWerk"' + (p.openVoorWerk ? ' checked' : '') + '> ' + T('zak.openwerk','Open voor werk of opdrachten') + '</label>' +
+          '<label style="display:flex;align-items:center;gap:0.4rem;font-size:0.76rem;margin-top:0.3rem;"><input type="checkbox" id="zakZicht"' + (d.zichtbaar !== false ? ' checked' : '') + '> ' + T('zak.zicht','Zichtbaar in de gids') + '</label>' +
+          '<button class="ms-order" id="zakBewaar" style="margin-top:0.8rem;width:100%;">' + T('zak.bewaar','Bewaar mijn profiel') + '</button>';
+        if (d.cvSuggestie) $('#zakUitCv').addEventListener('click', () => {
+          const s = d.cvSuggestie;
+          if (!$('#zakKop').value && s.kop) $('#zakKop').value = s.kop;
+          if (!$('#zakSkills').value && s.vaardigheden.length) $('#zakSkills').value = s.vaardigheden.join(', ');
+          if (!$('#zakErv').value && s.ervaring.length) $('#zakErv').value = s.ervaring.join('\n');
+          if (!$('#zakBio').value && s.bio) $('#zakBio').value = s.bio;
+          toast(T('zak.cvok','Aangevuld vanuit uw cv. Controleer en bewaar.'));
+        });
+        $('#zakBewaar').addEventListener('click', async () => {
+          try {
+            await API.call('/zakelijk/profiel/zet', {
+              naam: $('#zakNaam').value, kop: $('#zakKop').value, sector: $('#zakSector').value,
+              plaats: $('#zakPlaats').value, bio: $('#zakBio').value,
+              vaardigheden: $('#zakSkills').value.split(',').map(s => s.trim()).filter(Boolean),
+              ervaring: $('#zakErv').value.split('\n').map(s => s.trim()).filter(Boolean),
+              openVoorWerk: $('#zakOpenWerk').checked, zichtbaar: $('#zakZicht').checked
+            });
+            toast(T('zak.bewaard','Profiel bewaard.'));
+          } catch(e){ toast(e.message); }
+        });
+      }
+    } catch(e){
+      body.innerHTML = '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + escT(e.message) + '</div>';
+    }
+  }
+
   /* ---------- salon ---------- */
 
   function renderSalon(){
     const isGuest = user && user.tier === 'guest';
+    // RTG Zakelijk: de ingang staat alleen aan voor de Business Pass
+    const zakL = $('#zakLauncher');
+    if (user && user.tier === 'business'){
+      zakL.style.display = 'block';
+      zakL.innerHTML = '<button id="zakOpenBtn" style="display:flex;align-items:center;gap:0.7rem;width:100%;text-align:left;background:none;border:1px solid var(--gold);border-radius:14px;padding:0.75rem 1rem;margin-bottom:0.8rem;color:var(--txt);font-family:inherit;cursor:pointer;">' +
+        '<span style="font-size:1.2rem;">💼</span><span style="flex:1;"><b style="font-size:0.85rem;">' + T('zak.h','RTG Zakelijk') + '</b>' +
+        '<span style="display:block;font-size:0.68rem;color:var(--muted);">' + T('zak.launch','Uw professionele netwerk: profiel, gids, feed en aanbevelingen.') + '</span></span>' +
+        '<span style="color:var(--gold);">›</span></button>';
+      $('#zakOpenBtn').addEventListener('click', zakOpen);
+    } else { zakL.style.display = 'none'; }
     $('#feed').innerHTML = posts.map(p => {
       const engage = canEngage(p);
       // gratis gebruikers (zonder pas) liken/reageren niet bij particulieren
@@ -3531,6 +3700,23 @@ window.I18N = { en: {
   'live.door':'Open the door', 'live.dooropen':'is open. It locks itself after', 'live.sec':'seconds.',
   'app.pc.sub':'Direct contact, under your codename', 'app.pc.ph':'Type a message', 'app.pc.send':'Send',
   'app.pc.empty':'Ask the team directly. Room service, a request to the owner, or just arranging something.',
+  'zak.h':'RTG Business Network', 'zak.sub':'The professional network of the Business Pass',
+  'zak.tab.feed':'Feed', 'zak.tab.net':'Network', 'zak.tab.prof':'My profile',
+  'zak.launch':'Your professional network: profile, directory, feed and endorsements.',
+  'zak.verbonden':'Connected', 'zak.wacht':'Requested', 'zak.wachtu':'Accept in Contacts', 'zak.verbind':'Connect',
+  'zak.open':'open to work', 'zak.codenaam':'codename', 'zak.tikskill':'Tap a skill to endorse it.',
+  'zak.postph':'Share an insight, question or milestone with the network…',
+  'zak.alsprof':'You post under your professional name.', 'zak.eerstprof':'Create your profile first (My profile tab).',
+  'zak.plaats':'Post', 'zak.leeg':'No posts yet. Be the first: share what you are working on.',
+  'zak.reageer':'Reply…', 'zak.zoekph':'Search by name, sector or skill…', 'zak.zoek':'Search',
+  'zak.geen':'No profiles found. Members appear here once they switch on their business profile.',
+  'zak.gevraagd':'Request sent. They accept in Contacts.', 'zak.aanbevolen':'Endorsed', 'zak.ingetrokken':'Endorsement withdrawn.',
+  'zak.uitleg':'Your profile only appears in the directory after you save it. You choose the name you use professionally.',
+  'zak.uitcv':'Fill in from my RTG resume', 'zak.naam':'Professional name', 'zak.naamph':'Default: your codename',
+  'zak.kop':'Headline', 'zak.kopph':'E.g. Founder, Photographer, Lawyer', 'zak.sector':'Sector', 'zak.plaats2':'City',
+  'zak.bio':'About you', 'zak.skills':'Skills (commas)', 'zak.erv':'Experience (one line per role)',
+  'zak.openwerk':'Open to work or assignments', 'zak.zicht':'Visible in the directory',
+  'zak.bewaar':'Save my profile', 'zak.bewaard':'Profile saved.', 'zak.cvok':'Filled in from your resume. Review and save.',
   'cv.h':'Your RTG resume', 'cv.sub':'Build once, apply everywhere',
   'cv.name':'Your name', 'cv.contact':'Phone or email', 'cv.headline':'Desired position', 'cv.headline.ph':'E.g. Service or Reception',
   'cv.exp':'Work experience (one line per job)', 'cv.exp.ph':'Service at De Zwaan (2022-2025)\nRunner at Hotel Astoria (2020-2022)',

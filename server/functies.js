@@ -39,6 +39,8 @@ const FUNCTIES = [
     uitleg: 'Vriendschapsverzoeken en de vriendengraaf tussen leden.', paden: ['/api/member/connect'] },
   { id: 'member-werk', categorie: 'Leden (RTG-app)', naam: 'Vacatures & solliciteren (leden)', standaard: true,
     uitleg: 'Leden solliciteren met hun cv op vacatures bij partners.', paden: ['/api/member/apply'] },
+  { id: 'zakelijk', categorie: 'Leden (RTG-app)', naam: 'RTG Zakelijk (professioneel netwerk)', standaard: true,
+    uitleg: 'De LinkedIn-laag van de Business Pass: zakelijk profiel, gids, verbinden, feed en aanbevelingen.', paden: ['/api/zakelijk'] },
 
   // ---- Sociaal (De Salon) ----
   { id: 'social', categorie: 'Sociaal (De Salon)', naam: 'Sociale laag (RTG + RTF)', standaard: true,

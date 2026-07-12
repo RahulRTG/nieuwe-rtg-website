@@ -767,6 +767,7 @@
       <button class="gate-btn t-rtg" data-login="rtg"><span class="dot"></span><span><b>K. Kiss</b><span>RTG Pass · codenaam Amberen Vos</span></span></button>
       <button class="gate-btn t-lifestyle" data-login="lifestyle"><span class="dot"></span><span><b>F. Johanna</b><span>Lifestyle Pass · codenaam Gouden Ibis</span></span></button>
       <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>R. Imran</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
+      <button class="gate-btn t-guest" data-login="guest"><span class="dot" style="background:var(--soft);"></span><span><b data-i18n="gate.guest">Gratis, zonder pas</b><span data-i18n="gate.guest.s">Betaal bij partners, bekijk De Salon en solliciteer</span></span></button>
     </div>
     <p class="note" data-i18n-html="gate.note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
   </div>
@@ -1720,10 +1721,11 @@
 
   function renderAll(){
     $('#codeChipTxt').textContent = user.codename;
+    // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
+    const guest = user.tier === 'guest';
+    ['reizen','betalen','ai'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
     renderHome();
-    renderTrip();
-    renderPay();
-    renderAI();
+    if (!guest){ renderTrip(); renderPay(); renderAI(); }
     renderSalon();
     renderTerPlaatse();
     loadCv();
@@ -2536,6 +2538,8 @@
 
   function renderHome(){
     renderVerifyBanner();
+    // gratis gebruiker (zonder pas): beperkte, veilige startpagina
+    if (user.tier === 'guest'){ renderHomeGuest(); return; }
     const first = user.full.split(' ')[0];
     $('#homeGreeting').textContent = T('app.welcome','Welkom,') + ' ' + first + '.';
     $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
@@ -2577,6 +2581,29 @@
     document.querySelectorAll('#content [data-goto]').forEach(b =>
       b.addEventListener('click', () => openTab(b.dataset.goto)));
     renderContacts();
+    renderFoundation();
+  }
+
+  // Startpagina voor de gratis gebruiker (zonder pas): betalen bij partners,
+  // De Salon bekijken en solliciteren. Geen ledenkaart, reis of betalingen.
+  function renderHomeGuest(){
+    $('#homeGreeting').textContent = T('app.welcome','Welkom,') + '.';
+    $('#homeSub').textContent = T('app.guestsub','Gratis, zonder pas');
+    $('#codecard').innerHTML =
+      '<div class="label">'+T('app.guest.k','Gratis account')+'</div>'+
+      '<div class="cn" style="font-size:1.35rem;">'+T('app.guest.title','Zonder pas')+'</div>'+
+      '<div style="font-size:0.82rem;color:var(--muted);line-height:1.55;margin-top:0.7rem;">'+T('app.guest.body','Je kunt bij RTG-partners betalen via de app, de foto’s in De Salon bekijken en solliciteren op vacatures met je cv. Liken en reageren bij leden hoort bij een pas.')+'</div>'+
+      '<button class="go" data-goto="terplaatse" style="margin-top:0.9rem;">'+T('app.guest.pay','Betaal bij een partner')+' →</button>';
+    ['#homeTrip','#homePay'].forEach(id=>{ const e=$(id); if(e) e.style.display='none'; });
+    const salon = $('#homeSalon');
+    if (salon){ salon.style.display='';
+      salon.innerHTML = '<div class="label">'+T('app.thesalon','De Salon')+'</div>'+
+        '<div class="big" style="font-size:1.1rem;">'+T('app.guest.salon','Bekijk de foto’s')+'</div>'+
+        '<div class="meta" style="margin:.2rem 0 .7rem;">'+T('app.guest.salonsub','Ontdek wat leden en partners delen.')+'</div>'+
+        '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
+    }
+    document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
+    const c = $('#homeContacts'); if (c) c.style.display='none';
     renderFoundation();
   }
 
@@ -3090,8 +3117,11 @@
   /* ---------- salon ---------- */
 
   function renderSalon(){
+    const isGuest = user && user.tier === 'guest';
     $('#feed').innerHTML = posts.map(p => {
       const engage = canEngage(p);
+      // gratis gebruikers (zonder pas) liken/reageren niet bij particulieren
+      const mayLike = !(isGuest && !p.partner);
       const visual = p.photo
         ? '<div class="visual"><img src="' + p.photo + '" alt=""><span class="place">' + escT(p.place) + '</span></div>'
         : '<div class="visual ' + (p.visual || 'v-partner') + '"><span class="place">' + escT(p.place) + '</span></div>';
@@ -3134,7 +3164,7 @@
         '<div class="body">' + msgHTML(p.text, p.lang) + '</div>' +
         deal + poll +
         '<div class="acts">' +
-          '<button class="pa js-like' + (p.liked ? ' liked' : '') + '">♥ <span class="lc">' + p.likes + '</span></button>' +
+          '<button class="pa js-like' + (p.liked ? ' liked' : '') + '"' + (mayLike ? '' : ' disabled') + '>♥ <span class="lc">' + p.likes + '</span></button>' +
           '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>' + T('app.salon.comment','Reageren') + ' (' + p.comments.length + ')</button>' +
           '<button class="pa js-share" title="' + T('sal.deel','Delen met een connectie') + '">↗</button>' +
         '</div>' +
@@ -3149,6 +3179,8 @@
     document.querySelectorAll('.post').forEach(el => {
       const post = posts.find(p => p.id === Number(el.dataset.post));
       el.querySelector('.js-like').addEventListener('click', ev => {
+        // zonder pas kun je berichten van leden wel zien, maar niet liken
+        if (user && user.tier === 'guest' && !post.partner){ toast(T('sal.guestlike','Zonder pas bekijk je de Salon; liken en reageren bij leden is voor leden.')); return; }
         post.liked = !post.liked;
         post.likes += post.liked ? 1 : -1;
         ev.currentTarget.classList.toggle('liked', post.liked);
@@ -3317,6 +3349,13 @@ window.I18N = { en: {
   'gate.title':'The app.<br>Your membership, <em>always</em> with you.',
   'gate.deck':'Bookings, one-tap payment, your personal AI and The Salon, and your account runs on your codename, not your real name.',
   'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
+  'gate.guest':'Free, no pass', 'gate.guest.s':'Pay at partners, browse The Salon and apply for jobs',
+  'app.guestsub':'Free, no pass', 'app.guest.k':'Free account', 'app.guest.title':'No pass',
+  'app.guest.body':'You can pay at RTG partners in the app, browse the photos in The Salon and apply for vacancies with your CV. Liking and replying to members is part of a pass.',
+  'app.guest.pay':'Pay at a partner', 'app.guest.salon':'Browse the photos', 'app.guest.salonsub':'See what members and partners share.',
+  'sal.guestlike':'Without a pass you can browse The Salon; liking and replying to members is for members.',
+  'cv.st.invited':'invited', 'vac.overal':'Anywhere', 'vac.k':'Work and vacancies', 'vac.leeg':'No open vacancies that suit you right now. Check back later.',
+  'vac.verstuurd':'sent', 'vac.sol':'Apply', 'cv.chat':'Chat', 'cv.chat.ph':'Message (e.g. Can I come by Thursday at 3pm?)', 'cv.chat.send':'Send', 'cv.chat.leeg':'No messages yet. Suggest a time to come by.', 'cv.chat.title':'Chat with the employer',
   'gate.name':'Your name', 'gate.email':'Email address', 'gate.phone':'Mobile number (WhatsApp)', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
   'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.forgotsent':'If this email is known, we will send a reset link.',

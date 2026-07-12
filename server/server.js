@@ -610,6 +610,9 @@ function stateFor(sess, lang) {
     };
   });
   const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0, creatorLikes: 0, lang };
+  // Ook gratis gebruikers (zonder pas) mogen solliciteren en hun sollicitaties
+  // met status terugzien; de rest van het ledenpaneel blijft voor leden.
+  state.myApplications = myApplications(sess.key);
   if (sess.tier !== 'guest') {
     // Echte accounts hebben hun eigen boekingen/betalingen; demo-sessies delen
     // de vaste demo-inhoud.
@@ -653,7 +656,6 @@ function stateFor(sess, lang) {
     }
     state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
     state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
-    state.myApplications = myApplications(sess.key);
     // RTFoundation: gezinnen die dit lid als oppas/familie koppelde + hun meldingen
     if (sess.account) {
       state.foundation = { gekoppeld: rtf.gekoppeldeGezinnen(sess.account.id), meldingen: md.foundationMeldingen || [] };
@@ -1165,7 +1167,10 @@ app.post('/api/pay', auth, (req, res) => {
 app.post('/api/like', auth, (req, res) => {
   const post = db.data.posts.find(p => p.id === Number(req.body.postId));
   if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
-  // Liken mag iedereen, ook zonder pas.
+  // Gratis gebruikers (zonder pas) bekijken de Salon, maar liken en reageren niet
+  // bij particulieren. Berichten van partners mogen ze wel waarderen.
+  if (req.session.tier === 'guest' && !post.partner)
+    return res.status(403).json({ error: 'Zonder pas bekijk je de Salon, maar liken en reageren bij leden is voor leden. Solliciteren en betalen bij partners kan wel.' });
   if (req.body.liked) post.likedBy[req.session.key] = true;
   else delete post.likedBy[req.session.key];
   save();
@@ -2392,7 +2397,7 @@ function meldWerkgever(chat, tekst) {
 
 // RTG-lid: mijn sollicitatiechats
 app.post('/api/member/apply/chats', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  // ook gratis gebruikers chatten met de werkgever over hun sollicitatie
   const uit = Object.values(db.data.applyChats)
     .filter(c => c.applicant.kind === 'rtg' && c.applicant.key === req.session.key)
     .map(c => { const l = c.berichten[c.berichten.length - 1]; return { id: c.id, bedrijf: c.bedrijf, func: c.func, laatste: l ? l.tekst : null, laatsteVan: l ? l.van : null, at: l ? l.at : c.at }; })
@@ -3303,7 +3308,7 @@ app.post('/api/cv/get', auth, (req, res) => {
   res.json({ cv, ready: cvReady(cv) });
 });
 app.post('/api/cv/save', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  // ook gratis gebruikers maken een cv om te kunnen solliciteren
   const b = req.body || {};
   const cv = {
     name: String(b.name || '').trim().slice(0, 60),
@@ -3325,7 +3330,7 @@ app.post('/api/cv/save', auth, (req, res) => {
 // RTFoundation, gefilterd op de paspoortleeftijd van het lid, met de landenlijst
 // om ook in het buitenland te zoeken.
 app.post('/api/member/vacatures', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  // vacatures bekijken en solliciteren mag ook zonder pas
   const lft = leeftijdVan(geborenVan(req.session));
   const land = typeof req.body.land === 'string' && LANDEN[req.body.land] ? req.body.land : null;
   const alle = openVacatures(lft);
@@ -3340,7 +3345,7 @@ app.post('/api/member/vacatures', auth, (req, res) => {
 // op een gestructureerde vacature (vacatureId) is de nieuwe, gelijke weg; het
 // oude vrije functieveld blijft werken voor open sollicitaties.
 app.post('/api/member/apply', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  // solliciteren mag ook zonder pas: het cv is de sleutel, niet de Pass
   const s = findSupplier(req.body.supplierCode);
   if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
   const cv = db.data.cvs[req.session.key];
@@ -4785,7 +4790,7 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
 
 // bestelling plaatsen (restaurant/bar/club), klant verschijnt onder codenaam
 app.post('/api/order', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  // betalen bij partners mag ook zonder pas (gratis gebruiker)
   const s = findSupplier(req.body.supplierCode);
   if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
   if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen bestellingen aan.' });

@@ -105,15 +105,17 @@ test('leeftijdslaag: registratie leidt de leeftijdsgroep uit de geboortedatum af
   assert.equal(r2.status, 400);
 });
 
-test('De Salon: een gast mag liken maar niet reageren; een lid wel', async () => {
+test('De Salon: een gast (gratis) bekijkt wel, maar liket en reageert niet bij particulieren; een lid wel', async () => {
   const gast = await (await api('/login', { tier: 'guest' })).json();
-  // Liken mag iedereen.
+  // Zonder pas geen like op een particulier-post (post 1 is een ledenpost).
   const like = await api('/like', { postId: 1, liked: true }, gast.token);
-  assert.equal(like.status, 200);
+  assert.equal(like.status, 403, 'gast liket geen particulier');
   // Reageren zonder pas mag niet.
   const reactie = await api('/comment', { postId: 1, text: 'Hallo' }, gast.token);
   assert.equal(reactie.status, 403, 'gast kan niet reageren');
-  // Een Business-lid mag wel reageren op een RTG-post.
+  // Een RTG-lid mag wel liken en reageren op een RTG-post.
+  const rtg = await (await api('/login', { tier: 'rtg' })).json();
+  assert.equal((await api('/like', { postId: 1, liked: true }, rtg.token)).status, 200);
   const biz = await (await api('/login', { tier: 'business' })).json();
   const ok = await api('/comment', { postId: 1, text: 'Mooi!' }, biz.token);
   assert.equal(ok.status, 200);

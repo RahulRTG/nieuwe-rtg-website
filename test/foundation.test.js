@@ -555,6 +555,39 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   assert.ok(!lijst2.vacatures.find(v => v.id === vacId));
 });
 
+test('gratis gebruiker zonder pas: betalen bij partners en solliciteren mag, liken bij particulieren niet', async () => {
+  const supLogin = await json(await raw('/supplier/login', { username: 'rahul', password: 'Imran' }));
+  const supCode = supLogin.state.supplier.code;
+  const vac = await json(await raw('/supplier/vacature', { func: 'Corvee', soort: 'bijbaan', minLeeftijd: 16 }, supLogin.token));
+  const vacId = vac.vacatures[0].id;
+  // een partner plaatst een Salon-post (die mag een gast wel waarderen)
+  const pp = await json(await raw('/supplier/salon/post', { text: 'Kom langs op ons terras!' }, supLogin.token));
+  const partnerPostId = pp.postId;
+
+  // gratis gebruiker (zonder pas)
+  const g = await json(await raw('/login', { tier: 'guest' }));
+  const gtok = g.token;
+
+  // cv maken en solliciteren mag zonder pas
+  assert.equal((await raw('/cv/save', { name: 'Gratis Gebruiker', contact: 'gg@v.test', skills: 'inzet' }, gtok)).status, 200);
+  const vlijst = await json(await raw('/member/vacatures', {}, gtok));
+  assert.ok(vlijst.vacatures.some(v => v.id === vacId), 'gast ziet de vacatures');
+  assert.equal((await raw('/member/apply', { supplierCode: supCode, vacatureId: vacId }, gtok)).status, 200, 'gast mag solliciteren');
+  const st = (await json(await raw('/state', {}, gtok))).state;
+  assert.ok((st.myApplications || []).some(a => a.func === 'Corvee'), 'gast ziet de eigen sollicitatie met status');
+
+  // liken/reageren bij een particulier mag NIET
+  const particulier = (st.posts || []).find(p => !p.partner);
+  assert.ok(particulier, 'er is een particulier-post');
+  assert.equal((await raw('/like', { postId: particulier.id, liked: true }, gtok)).status, 403, 'gast liket geen particulier');
+  assert.equal((await raw('/comment', { postId: particulier.id, text: 'hoi' }, gtok)).status, 403, 'gast reageert niet bij een particulier');
+  // een partner-post waarderen mag wel
+  assert.equal((await raw('/like', { postId: partnerPostId, liked: true }, gtok)).status, 200, 'gast mag een partner-post liken');
+  // betalen bij een partner is niet geblokkeerd voor gasten (geen 403 wegens "geen lid")
+  const order = await raw('/order', { supplierCode: supCode, items: [{ id: 'zzz', qty: 1 }] }, gtok);
+  assert.notEqual(order.status, 403, 'gast wordt bij bestellen niet als niet-lid geweigerd');
+});
+
 test('sollicitatiechat: na uitnodigen praten sollicitant en werkgever samen', async () => {
   const login = await json(await raw('/supplier/login', { username: 'rahul', password: 'Imran' }));
   const supCode = login.state.supplier.code;

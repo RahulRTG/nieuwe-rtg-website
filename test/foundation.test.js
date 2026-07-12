@@ -218,6 +218,33 @@ test('rol-hulp: kind deelt locatie en stuurt een hulpvraag, en de coaches werken
   assert.equal((await api('/hulp/ai', { code: g.code, token: 'nep', kind: 'opvoeden', messages: [{ role: 'user', content: 'hoi' }] })).status, 403);
 });
 
+test('gastrol: een oppas/familielid mag meehelpen maar niet bij de privezaken', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Open Huis', naam: 'Mam', pin: '1470' }));
+  const gast = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oma', rol: 'gast' }));
+  assert.ok(gast.profiel.gast === true, 'de gastvlag staat aan');
+  const gt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: gast.profiel.id }))).token;
+
+  // WEL: berichten sturen en lezen (contact met het gezin)
+  assert.equal((await api('/gezin/bericht', { code: g.code, token: gt, naar: 'allen', tekst: 'Ik ben er, alles rustig' })).status, 200);
+  const ber = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/berichten?token=' + gt));
+  assert.ok(ber.berichten.some(b => b.tekst === 'Ik ben er, alles rustig'));
+  // WEL: locatie delen en het overzicht zien (weten waar de kinderen zijn)
+  assert.equal((await api('/gezin/locatie', { code: g.code, token: gt, status: 'op school' })).status, 200);
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + g.code + '/locaties?token=' + gt)).status, 200);
+
+  // NIET: geld, dromen en de persoonlijke coaches
+  assert.equal((await api('/gezin/spaardoel/maak', { code: g.code, token: gt, naam: 'stiekem', doel: 10 })).status, 403);
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + g.code + '/spaardoelen?token=' + gt)).status, 403);
+  assert.equal((await api('/gezin/droom/maak', { code: g.code, token: gt, tekst: 'stiekem' })).status, 403);
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + g.code + '/dromen?token=' + gt)).status, 403);
+  assert.equal((await api('/hulp/ai', { code: g.code, token: gt, kind: 'geld', messages: [{ role: 'user', content: 'hoi' }] })).status, 403);
+
+  // een gewoon gezinslid mag dit wel, ter controle
+  const lid = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Broer', rol: 'gezinslid' }));
+  const lt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: lid.profiel.id }))).token;
+  assert.equal((await api('/gezin/spaardoel/maak', { code: g.code, token: lt, naam: 'fiets', doel: 50 })).status, 200);
+});
+
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {
   const L = await les();
   const goed = await api('/ai', { code: L.code, token: L.sToken, messages: [{ role: 'user', content: 'Help met breuken' }] });

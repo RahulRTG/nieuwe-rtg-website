@@ -75,7 +75,7 @@
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) {}
+if (!window.Sessie || !Sessie.eisFamilie()) {}
 Sessie.balk($('#balk'), { terug:'index.html' });
 
 const MKEY = 'rtf_stemming_' + (Sessie.huidig().profiel.id || 'ik');

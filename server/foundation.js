@@ -300,7 +300,10 @@ function nieuweGezinscode() {
   let c; do { c = Array.from({ length: 6 }, () => LETTERS[crypto.randomInt(LETTERS.length)]).join(''); } while (G()[c]);
   return c;
 }
-const ROLLEN = ['beheerder', 'ouder', 'kind', 'gezinslid'];
+const ROLLEN = ['beheerder', 'ouder', 'kind', 'gezinslid', 'gast'];
+// een gast (oppas, opa/oma of familielid) helpt mee, maar mag niet bij de
+// privezaken van het gezin (geld, mentale steun, dromen, cv, reisaanvraag).
+const isGast = p => p && p.rol === 'gast';
 const KLEUREN = ['#C9A24B', '#5FA56A', '#6AA6C9', '#B4574E', '#B07AC0', '#D08A3E'];
 function hashPin(pin) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -316,7 +319,7 @@ const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
 function schoonAvatar(v) { const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim(); return s ? Array.from(s).slice(0, 2).join('') : '🙂'; }
 function schoonKleur(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? v : KLEUREN[0]; }
 
-function pubProfiel(p) { return { id: p.id, naam: p.naam, rol: p.rol, avatar: p.avatar, kleur: p.kleur, heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder' }; }
+function pubProfiel(p) { return { id: p.id, naam: p.naam, rol: p.rol, avatar: p.avatar, kleur: p.kleur, heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder', gast: p.rol === 'gast' }; }
 function pubGezin(g) { return { code: g.code, naam: g.naam }; }
 function gezinVan(req, res) {
   const code = String((req.body && req.body.code) || req.params.code || '').toUpperCase();
@@ -458,11 +461,17 @@ function sessieVan(req, res) {
   if (!p) { res.status(403).json({ error: 'Log opnieuw in bij je gezin.' }); return null; }
   return { g, p };
 }
+// voor privezaken van het gezin: een gast (oppas/opa/oma/familie) wordt geweigerd.
+function familieVan(req, res) {
+  const s = sessieVan(req, res); if (!s) return null;
+  if (isGast(s.p)) { res.status(403).json({ error: 'Dit hoort bij de privezaken van het gezin. Als oppas of familie heb je hier geen toegang toe.' }); return null; }
+  return s;
+}
 const getal = (v, max = 1e7) => { let n = Number(v); if (!isFinite(n)) n = 0; n = Math.round(n * 100) / 100; return Math.max(-max, Math.min(max, n)); };
 
 /* spaardoelen: het gezin spaart samen naar iets moois */
 router.post('/gezin/spaardoel/maak', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   const naam = schoon(req.body.naam, 60);
   const doel = getal(req.body.doel);
   if (!naam) return res.status(400).json({ error: 'Geef je spaardoel een naam.' });
@@ -474,7 +483,7 @@ router.post('/gezin/spaardoel/maak', (req, res) => {
   res.json({ ok: true, doel: d });
 });
 router.post('/gezin/spaardoel/bijdrage', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   const d = (s.g.spaardoelen || []).find(x => x.id === req.body.doelId);
   if (!d) return res.status(404).json({ error: 'Dit spaardoel bestaat niet meer.' });
   const bedrag = getal(req.body.bedrag);
@@ -488,19 +497,19 @@ router.post('/gezin/spaardoel/bijdrage', (req, res) => {
   res.json({ ok: true, doel: d, gevierd: netKlaar });
 });
 router.post('/gezin/spaardoel/verwijder', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   if (s.p.rol !== 'beheerder') return res.status(403).json({ error: 'Alleen de beheerder kan een spaardoel verwijderen.' });
   s.g.spaardoelen = (s.g.spaardoelen || []).filter(x => x.id !== req.body.doelId); save();
   res.json({ ok: true });
 });
 router.get('/gezin/:code/spaardoelen', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   res.json({ spaardoelen: (s.g.spaardoelen || []) });
 });
 
 /* dromenbord: ieder een doel of droom, en we moedigen elkaar aan */
 router.post('/gezin/droom/maak', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   const tekst = schoon(req.body.tekst, 240);
   if (!tekst) return res.status(400).json({ error: 'Schrijf je droom of doel op.' });
   if (!s.g.dromen) s.g.dromen = [];
@@ -510,7 +519,7 @@ router.post('/gezin/droom/maak', (req, res) => {
   res.json({ ok: true, droom: d });
 });
 router.post('/gezin/droom/moedig', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   const d = (s.g.dromen || []).find(x => x.id === req.body.droomId);
   if (!d) return res.status(404).json({ error: 'Deze droom bestaat niet meer.' });
   d.aanmoedigingen = d.aanmoedigingen || [];
@@ -520,7 +529,7 @@ router.post('/gezin/droom/moedig', (req, res) => {
   res.json({ ok: true, aantal: d.aanmoedigingen.length, aangemoedigd: i < 0 });
 });
 router.post('/gezin/droom/behaald', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   const d = (s.g.dromen || []).find(x => x.id === req.body.droomId);
   if (!d) return res.status(404).json({ error: 'Deze droom bestaat niet meer.' });
   if (d.van !== s.p.id && s.p.rol !== 'beheerder') return res.status(403).json({ error: 'Alleen wie de droom heeft, of de beheerder, kan dit afvinken.' });
@@ -530,7 +539,7 @@ router.post('/gezin/droom/behaald', (req, res) => {
   res.json({ ok: true, droom: d });
 });
 router.post('/gezin/droom/verwijder', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   const d = (s.g.dromen || []).find(x => x.id === req.body.droomId);
   if (!d) return res.status(404).json({ error: 'Deze droom bestaat niet meer.' });
   if (d.van !== s.p.id && s.p.rol !== 'beheerder') return res.status(403).json({ error: 'Alleen wie de droom heeft, of de beheerder, kan hem weghalen.' });
@@ -538,7 +547,7 @@ router.post('/gezin/droom/verwijder', (req, res) => {
   res.json({ ok: true });
 });
 router.get('/gezin/:code/dromen', (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   res.json({ dromen: (s.g.dromen || []).map(d => ({ id: d.id, van: d.van, vanNaam: d.vanNaam, vanAvatar: d.vanAvatar, kleur: d.kleur, tekst: d.tekst, aantal: (d.aanmoedigingen || []).length, aangemoedigd: (d.aanmoedigingen || []).includes(s.p.id), vanMij: d.van === s.p.id, behaald: !!d.behaald, at: d.at })) });
 });
 
@@ -579,7 +588,7 @@ const HULP_DEMO = {
 };
 const AI_KINDS = Object.keys(HULP_SYS);
 router.post('/hulp/ai', async (req, res) => {
-  const s = sessieVan(req, res); if (!s) return;
+  const s = familieVan(req, res); if (!s) return;
   const kind = AI_KINDS.includes(req.body.kind) ? req.body.kind : 'geld';
   const clean = (Array.isArray(req.body.messages) ? req.body.messages : [])
     .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')

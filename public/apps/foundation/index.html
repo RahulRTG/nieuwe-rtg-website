@@ -109,7 +109,7 @@
       <p>Een live digitaal schoolbord en een eigen schrift met AI-bijleshulp. Zodat dure bijles thuis niet meer nodig is.</p>
       <span class="cta">Open het lesbord →</span>
     </a>
-    <a class="kaart tile" href="dromen.html">
+    <a class="kaart tile" id="tileDromen" href="dromen.html">
       <div class="ic">⭐</div><h2>Onze dromen</h2>
       <p>Zet je doelen op het bord, moedig elkaar aan en vier samen wat lukt. Plus een gesprekskaart voor aan tafel.</p>
       <span class="cta">Droom en groei samen →</span>
@@ -229,9 +229,13 @@ let mAv = '👑', mKl = KLEUREN[0], pinProfiel = null;
 function toon(id){ ['vWelkom','vProfielen','vHub'].forEach(v => $('#'+v).hidden = (v!==id)); }
 function toonRol(rol){
   const kind = rol === 'kind';
-  $('#secOuder').hidden = kind;
+  const gast = rol === 'gast';
+  $('#secOuder').hidden = kind || gast;
   $('#secKind').hidden = !kind;
-  $('#hDeck').textContent = kind
+  $('#tileDromen').style.display = gast ? 'none' : ''; // dromen blijven binnen het gezin
+  $('#hDeck').textContent = gast
+    ? 'Fijn dat je meehelpt. Hier vind je wat je nodig hebt om er te zijn voor de kinderen: weten waar ze zijn, contact met het gezin, en samen leren of even rust. De privezaken van het gezin blijven privé.'
+    : kind
     ? 'Fijn dat je er bent. Hieronder staat wat er voor jou is: leren, dromen, even rust en hulp als je die nodig hebt.'
     : 'Alles hier is en blijft kosteloos. Hieronder staat wat bij jou past: hulp voor je gezin, voor de kinderen en voor jou.';
 }
@@ -278,7 +282,7 @@ async function profielen(code){
     toon('vProfielen');
   }catch(e){ alert(e.message); Sessie.uitloggen(); toon('vWelkom'); }
 }
-function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid'}[p.rol]||''); }
+function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid',gast:'Oppas of familie'}[p.rol]||''); }
 
 async function kies(code, p){
   if (p.heeftPin){ pinProfiel = { code, id: p.id, naam: p.naam }; $('#pinTitel').textContent='Hoi '+p.naam; $('#pinIn').value=''; $('#pinFout').textContent=''; $('#dlgPin').showModal(); setTimeout(()=>$('#pinIn').focus(),50); return; }

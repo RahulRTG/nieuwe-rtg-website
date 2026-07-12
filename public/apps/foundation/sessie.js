@@ -18,6 +18,9 @@
     naam: function () { var s = lees(); return (s && s.profiel && s.profiel.naam) || ''; },
     // gebruik boven aan een tool-pagina: geen sessie -> terug naar de inlog
     eisProfiel: function () { if (!Sessie.actief()) { location.href = 'index.html'; return false; } return true; },
+    // privezaken van het gezin: gasten (oppas/opa/oma/familie) worden teruggestuurd
+    isGast: function () { var s = lees(); return !!(s && s.profiel && s.profiel.gast); },
+    eisFamilie: function () { if (!Sessie.actief() || Sessie.isGast()) { location.href = 'index.html'; return false; } return true; },
     isBeheerder: function () { var s = lees(); return !!(s && s.profiel && s.profiel.beheerder); },
     // controleer bij de server of het token nog klopt; geeft { gezin, profiel, profielen, ongelezen } of null
     ophalen: function () {

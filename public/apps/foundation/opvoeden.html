@@ -55,7 +55,7 @@
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) {}
+if (!window.Sessie || !Sessie.eisFamilie()) {}
 Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 

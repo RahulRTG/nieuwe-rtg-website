@@ -42,6 +42,7 @@
   .modal{width:min(92vw,25rem);padding:1.5rem;}
   .modal h3{font-family:var(--serif);font-weight:500;font-size:1.2rem;margin-bottom:.9rem;}
   .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
+  .rolhint{background:var(--paneel2);border:1px solid var(--lijn);border-radius:8px;padding:.6rem .8rem;font-size:.8rem;color:var(--zacht);line-height:1.45;margin:-.3rem 0 .7rem;}
 </style>
 </head>
 <body>
@@ -87,8 +88,10 @@
     <option value="kind">Kind</option>
     <option value="ouder">Ouder</option>
     <option value="gezinslid">Gezinslid</option>
+    <option value="gast">Oppas of familie (beperkte toegang)</option>
     <option value="beheerder">Beheerder</option>
   </select>
+  <div class="rolhint" id="rolhint" hidden>Een oppas, opa/oma of familielid ziet alleen het broodnodige: waar de kinderen zijn, contact met het gezin, en samen leren of even rust. De privezaken van het gezin (geld, steun, dromen) blijven verborgen.</div>
   <input class="veld" id="dPin" placeholder="Pincode (leeg = geen)" inputmode="numeric" maxlength="6">
   <div class="fout" id="dFout"></div>
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="dDoe">Opslaan</button></div>
@@ -106,8 +109,9 @@ const s = Sessie.huidig();
 if (!s || !s.token){ location.href='index.html'; }
 
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
-function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid'}[p.rol]||''); }
+function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid',gast:'Oppas of familie'}[p.rol]||''); }
 
+$('#dRol').addEventListener('change', ()=>{ $('#rolhint').hidden = $('#dRol').value !== 'gast'; });
 (function(){
   const av=$('#dAv'); AVATARS.forEach(a=>{ const b=document.createElement('button'); b.textContent=a; b.onclick=()=>{ dAv=a; [...av.children].forEach(c=>c.classList.toggle('aan',c.textContent===a)); }; av.appendChild(b); });
   const kl=$('#dKl'); KLEUREN.forEach(c=>{ const b=document.createElement('button'); b.style.background=c; b.onclick=()=>{ dKl=c; [...kl.children].forEach(x=>x.classList.toggle('aan',x.style.background===b.style.background)); }; kl.appendChild(b); });
@@ -141,7 +145,7 @@ async function laad(){
 
 function bewerk(p){
   bewerkId=p.id; $('#dTitel').textContent='Profiel bewerken';
-  $('#dNaam').value=p.naam; dAv=p.avatar; dKl=p.kleur; $('#dRol').value=p.rol; $('#dPin').value='';
+  $('#dNaam').value=p.naam; dAv=p.avatar; dKl=p.kleur; $('#dRol').value=p.rol; $('#dPin').value=''; $('#rolhint').hidden = p.rol!=='gast';
   [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
   [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
   $('#dPin').placeholder = p.heeftPin ? 'Pincode wijzigen (leeg = laten staan)' : 'Pincode (leeg = geen)';
@@ -149,7 +153,7 @@ function bewerk(p){
 }
 $('#bNieuw').onclick=()=>{
   bewerkId=null; $('#dTitel').textContent='Profiel toevoegen';
-  $('#dNaam').value=''; dAv='🙂'; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dPin').value=''; $('#dPin').placeholder='Pincode (leeg = geen)';
+  $('#dNaam').value=''; dAv='🙂'; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dPin').value=''; $('#dPin').placeholder='Pincode (leeg = geen)'; $('#rolhint').hidden=true;
   [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
   [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
   $('#dFout').textContent=''; $('#dlg').showModal();

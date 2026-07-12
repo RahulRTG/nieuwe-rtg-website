@@ -2599,12 +2599,19 @@ const kern = {
   trustVan, unlockDoor, urenVan, validDept, verbActief, verhaalBekijken, verhaalPlaatsen, verhalenVoor,
   webpush, weekdagFactor, werkgeverSollicitatie, zijnVrienden
 };
-require('./routes/social')(kern);
-require('./routes/supplier')(kern);
-require('./routes/office')(kern);
-require('./routes/staff')(kern);
-require('./routes/auth')(kern);
-require('./routes/member')(kern);
+/* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
+   geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen
+   die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar
+   het juiste domeinproces. De infra-endpoints (health, stream, push, cluster,
+   translate) en de foundation-mount zitten in de kern en draaien altijd mee. */
+const ALLE_DOMEINEN = ['auth', 'member', 'supplier', 'office', 'staff', 'social'];
+const gekozenDomeinen = (process.env.RTG_DOMAINS || ALLE_DOMEINEN.join(','))
+  .split(',').map(s => s.trim()).filter(Boolean);
+for (const naam of gekozenDomeinen) {
+  if (!ALLE_DOMEINEN.includes(naam)) { console.warn('[start] onbekend domein overgeslagen:', naam); continue; }
+  require('./routes/' + naam)(kern);
+}
+console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* ---------- afsluiters: nette 404 en centrale foutafhandeling ---------- */
 

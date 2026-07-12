@@ -1,11 +1,15 @@
 /* Domein "auth" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { PERSONAS, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, schoon, sessions, stateFor, tooManyTries } = kern;
+  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, schoon, sessions, stateFor, tooManyTries } = kern;
+  // Demo-inlog (snelle pas-login zonder wachtwoord, en het demo-account) alleen
+  // buiten productie of met RTG_DEMO=1. Echte leden loggen in via /api/auth/login.
+  const DEMO = !PRODUCTION || process.env.RTG_DEMO === '1';
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
   if (hasCred(req.body)) {
+    if (!DEMO) return res.status(403).json({ error: 'Demo-inlog is uitgeschakeld. Log in met je account.' });
     const bucket = 'demo:' + req.ip;
     if (tooManyTries(res, bucket)) return;
     if (!checkCred(req.body.username, req.body.password)) {
@@ -14,6 +18,9 @@ app.post('/api/login', (req, res) => {
     }
     loginFails.delete(bucket);
     tier = 'business'; // het demo-account is een volledig lidmaatschap
+  } else if (tier !== 'guest' && !DEMO) {
+    // een pas-tier zonder wachtwoord is alleen voor de demo; gast blijft publiek
+    return res.status(403).json({ error: 'Log in met je account.' });
   }
   if (!PERSONAS[tier]) return res.status(400).json({ error: 'Onbekende pas.' });
   const token = crypto.randomBytes(24).toString('hex');

@@ -39,8 +39,11 @@ function appUrl(req) {
 
 load();
 accounts.init();
+// Demo-modus: alleen buiten productie, of expliciet met RTG_DEMO=1. Zo staan de
+// demo-inlog en het demo-account (Rahul/Imran) nooit per ongeluk open op productie.
+const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
 // Demo-account zodat Rahul/Imran ook via de echte accountlogin werkt.
-if (accounts.count() === 0) {
+if (DEMO && accounts.count() === 0) {
   const u = accounts.createUser({ username: 'Rahul', email: 'rahul@rtg.example', password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran', phone: '+31612345678' });
   accounts.saveMemberState(u.id, memberTemplate());
   accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
@@ -2379,7 +2382,10 @@ function guestsFor(code) {
 /* ================= BACKOFFICE (RTG) =================
    De backoffice ziet alle binnenkomende dynamische prijzen, bestellingen en
    ritten live. Demo-toegang met een vaste code. */
-const OFFICE_CODE = process.env.OFFICE_CODE || 'RTG-OFFICE';
+// In productie mag de demo-backofficecode ('RTG-OFFICE') nooit werken: zonder een
+// eigen OFFICE_CODE wordt hij onraadbaar willekeurig, zodat de deur dichtblijft
+// tot er een echte code is gezet. Buiten productie houden we de demo-code.
+const OFFICE_CODE = process.env.OFFICE_CODE || (PRODUCTION ? crypto.randomBytes(18).toString('hex') : 'RTG-OFFICE');
 
 
 function officeAuth(req, res, next) {

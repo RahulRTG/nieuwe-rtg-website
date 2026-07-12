@@ -1,0 +1,20 @@
+{
+  "name": "RTG Business Pass, zakelijk reizen en netwerken",
+  "short_name": "RTG Business",
+  "id": "/apps/pas-business",
+  "description": "RTG Business Pass, zakelijk reizen en netwerken",
+  "lang": "nl",
+  "start_url": "/apps/app.html?pas=business",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/pas-business.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

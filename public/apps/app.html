@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>RTG, de app</title>
-<link rel="manifest" href="/manifests/leden.webmanifest">
+<link rel="manifest" id="manifestLink" href="/manifests/leden.webmanifest">
 <link rel="icon" href="/icons/leden.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1253,6 +1253,21 @@
       if (b.dataset.login === 'guest'){ regTier = 'guest'; showGateForm('register'); updateRegKop(); }
       else login(b.dataset.login);
     }));
+
+  /* ---------- eigen app per pas ----------
+     Elke pas heeft zijn eigen ingang (pas-gast/rtg/lifestyle/business.html) die
+     hier binnenkomt met ?pas=. Dan wordt dit DE app van die pas: het manifest
+     (eigen naam en icoon op het beginscherm) wisselt mee en de poort toont
+     alleen het eigen demoprofiel. Zonder ?pas= blijft dit de brede leden-app. */
+  const vastePas = new URLSearchParams(location.search).get('pas');
+  if (vastePas && ['guest','rtg','lifestyle','business'].includes(vastePas)){
+    const mf = { guest:'pas-gast', rtg:'pas-rtg', lifestyle:'pas-lifestyle', business:'pas-business' }[vastePas];
+    const ml = document.getElementById('manifestLink');
+    if (ml) ml.href = '/manifests/' + mf + '.webmanifest';
+    document.title = { guest:'RTG Gratis', rtg:'RTG Pass', lifestyle:'RTG Lifestyle Pass', business:'RTG Business Pass' }[vastePas];
+    document.querySelectorAll('[data-login]').forEach(b => { if (b.dataset.login !== vastePas) b.style.display = 'none'; });
+    regTier = vastePas === 'guest' ? 'guest' : vastePas;
+  }
 
   const loginForm = document.getElementById('loginForm');
   if (loginForm) loginForm.addEventListener('submit', e => {

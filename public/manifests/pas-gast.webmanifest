@@ -1,0 +1,20 @@
+{
+  "name": "RTG Gratis, bestellen en solliciteren zonder pas",
+  "short_name": "RTG Gratis",
+  "id": "/apps/pas-gast",
+  "description": "RTG Gratis, bestellen en solliciteren zonder pas",
+  "lang": "nl",
+  "start_url": "/apps/app.html?pas=guest",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/pas-gast.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -2749,7 +2749,7 @@ function backupData() {
     const day = new Date().toISOString().slice(0, 10);
     const dir = path.join(BACKUP_DIR, day);
     fs.mkdirSync(dir, { recursive: true });
-    for (const f of ['db.json', 'rtg.db']) {
+    for (const f of ['db.json', 'rtg.db', 'store.db']) {
       const from = path.join(DATA_DIR, f);
       if (fs.existsSync(from)) fs.copyFileSync(from, path.join(dir, f));
     }
@@ -2762,7 +2762,7 @@ function backupData() {
     if (process.env.RTG_BACKUP_DIR) {
       const off = path.join(process.env.RTG_BACKUP_DIR, day);
       fs.mkdirSync(off, { recursive: true });
-      for (const f of ['db.json', 'rtg.db']) {
+      for (const f of ['db.json', 'rtg.db', 'store.db']) {
         const from = path.join(DATA_DIR, f);
         if (fs.existsSync(from)) fs.copyFileSync(from, path.join(off, f));
       }

@@ -21,6 +21,45 @@ const db = { data: null, writable: process.env.RTG_ROL !== 'standby' };
 const REDIS_URL = process.env.REDIS_URL;
 let rPub = null, rSub = null, versie = 0, externCb = null;
 
+/* Opslagmotor. Standaard 'json' (een db.json-bestand, zoals altijd). Met
+   RTG_STORE=sqlite bewaart de server elke top-level collectie als een rij in een
+   SQLite-database (WAL, transactioneel, meerdere processen tegelijk veilig) en
+   schrijft hij alleen de collecties die veranderd zijn weg. Dat schaalt veel
+   beter dan telkens een heel JSON-bestand herschrijven. De data in het geheugen
+   (db.data) blijft precies hetzelfde, dus de rest van de app merkt er niets van. */
+const STORE = process.env.RTG_STORE || 'json';
+let kvdb = null;
+const laatsteJson = new Map(); // collectie -> laatst weggeschreven JSON (om ongewijzigde over te slaan)
+function sqliteInit() {
+  if (kvdb) return;
+  const { DatabaseSync } = require('node:sqlite');
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  kvdb = new DatabaseSync(path.join(DATA_DIR, 'store.db'));
+  kvdb.exec('PRAGMA journal_mode=WAL');
+  kvdb.exec('PRAGMA synchronous=NORMAL');
+  kvdb.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT)');
+}
+function loadSqlite() {
+  sqliteInit();
+  const rows = kvdb.prepare('SELECT key, val FROM kv').all();
+  if (!rows.length) return null;
+  const data = {};
+  for (const r of rows) { data[r.key] = JSON.parse(r.val); laatsteJson.set(r.key, r.val); }
+  return data;
+}
+function saveSqlite() {
+  sqliteInit();
+  const up = kvdb.prepare('INSERT INTO kv(key,val) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val');
+  kvdb.exec('BEGIN');
+  try {
+    for (const k of Object.keys(db.data)) {
+      const j = JSON.stringify(db.data[k]);
+      if (laatsteJson.get(k) !== j) { up.run(k, j); laatsteJson.set(k, j); } // alleen gewijzigde collecties
+    }
+    kvdb.exec('COMMIT');
+  } catch (e) { try { kvdb.exec('ROLLBACK'); } catch (x) {} throw e; }
+}
+
 // Zoek de nieuwste bruikbare dagbackup (server maakt die in DATA_DIR/backups).
 function laadUitBackup() {
   try {
@@ -35,7 +74,10 @@ function laadUitBackup() {
 }
 
 function load() {
-  if (fs.existsSync(DB_FILE)) {
+  if (STORE === 'sqlite') {
+    db.data = loadSqlite();
+    if (!db.data) { db.data = seed(); save(); }
+  } else if (fs.existsSync(DB_FILE)) {
     try {
       db.data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     } catch (e) {
@@ -59,12 +101,16 @@ function load() {
 
 function save() {
   if (!db.writable) return;
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  // Atomisch wegschrijven: eerst een tijdelijk bestand, dan hernoemen.
-  // Valt de server midden in een save uit, dan blijft het oude bestand heel.
-  const tmp = DB_FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(db.data, null, 2));
-  fs.renameSync(tmp, DB_FILE);
+  if (STORE === 'sqlite') {
+    saveSqlite();
+  } else {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    // Atomisch wegschrijven: eerst een tijdelijk bestand, dan hernoemen.
+    // Valt de server midden in een save uit, dan blijft het oude bestand heel.
+    const tmp = DB_FILE + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(db.data, null, 2));
+    fs.renameSync(tmp, DB_FILE);
+  }
   spiegelNaarRedis();
 }
 

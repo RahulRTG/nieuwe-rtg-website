@@ -270,6 +270,26 @@ router.get('/tip', (req, res) => {
   res.json({ tip: TIPS[dag % TIPS.length], nog: TIPS[Math.floor(Math.random() * TIPS.length)] });
 });
 
-router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, ai: anthropic ? 'claude' : 'demo' }));
+/* ---------- op reis met de foundation: aanvraag of voordracht ---------- */
+router.post('/reis/aanvraag', (req, res) => {
+  const a = {
+    id: rid(4),
+    soort: req.body.soort === 'voordracht' ? 'voordracht' : 'aanvraag',
+    naam: schoon(req.body.naam, 60),
+    contact: schoon(req.body.contact, 90),
+    gezin: schoon(req.body.gezin, 300),
+    waarom: schoon(req.body.waarom, 1500),
+    at: nu(), status: 'nieuw'
+  };
+  if (!a.naam || !a.contact) return res.status(400).json({ error: 'Vul je naam in en hoe we contact kunnen opnemen (telefoon of e-mail).' });
+  if (!a.waarom) return res.status(400).json({ error: 'Vertel kort waarom; dat helpt de foundation echt.' });
+  if (!F().reisAanvragen) F().reisAanvragen = [];
+  F().reisAanvragen.unshift(a);
+  F().reisAanvragen = F().reisAanvragen.slice(0, 1000);
+  save();
+  res.json({ ok: true });
+});
+
+router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
 module.exports = { router };

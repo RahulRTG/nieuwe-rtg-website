@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Even rust</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  body{height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+  .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--goud);}
+  .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
+  .seg{display:flex;gap:.4rem;justify-content:center;padding:.7rem;}
+  .seg button{background:#1c1a16;color:var(--zacht);border-radius:999px;padding:.45rem 1rem;font-size:.85rem;}
+  .seg button.aan{background:var(--goud);color:#1a1710;font-weight:700;}
+  .view{flex:1;position:relative;overflow:hidden;}
+  .tab{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1.2rem;gap:1rem;overflow:auto;}
+  .tab.aan{display:flex;}
+  /* adem */
+  .ademkring{width:220px;height:220px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;
+    background:radial-gradient(circle at 50% 40%, rgba(201,162,75,.35), rgba(201,162,75,.05));
+    border:2px solid rgba(201,162,75,.5);transition:transform 4s ease-in-out;transform:scale(.6);color:var(--txt);}
+  .ademfase{font-family:var(--serif);font-size:1.3rem;}
+  .ademsub{color:var(--zacht);font-size:.85rem;max-width:24rem;text-align:center;}
+  /* teken */
+  .tekenbox{width:100%;max-width:40rem;flex:1;position:relative;background:#12110F;border:1px solid var(--lijn);border-radius:16px;overflow:hidden;min-height:0;}
+  .tekenbox canvas{position:absolute;inset:0;width:100%;height:100%;}
+  .tekentools{display:flex;gap:.5rem;align-items:center;justify-content:center;flex-wrap:wrap;}
+  .kl{width:1.7rem;height:1.7rem;border-radius:50%;border:2px solid rgba(255,255,255,.2);}
+  .kl.aan{border-color:#fff;transform:scale(1.15);}
+  /* kaart */
+  .bemkaart{max-width:30rem;text-align:center;padding:2rem;font-family:var(--serif);font-size:1.5rem;line-height:1.4;}
+  .bemkaart .em{font-size:2.4rem;display:block;margin-bottom:.8rem;}
+</style>
+</head>
+<body>
+<div class="topnav"><span class="brand">RT<b>Foundation</b></span><a href="index.html">← Alle hulp</a></div>
+<div class="seg">
+  <button data-t="adem" class="aan">🫧 Adem</button>
+  <button data-t="teken">🎨 Teken</button>
+  <button data-t="kaart">💛 Bemoediging</button>
+</div>
+
+<div class="view">
+  <div class="tab aan" id="tab-adem">
+    <div class="ademkring" id="kring"><div><div class="ademfase" id="fase">Klaar?</div></div></div>
+    <div class="ademsub" id="ademsub">Adem rustig mee met de cirkel. In als hij groter wordt, vasthouden, en uit als hij kleiner wordt. Een paar minuten helpt je hoofd tot rust.</div>
+    <button class="knop" id="ademStart">Begin</button>
+  </div>
+
+  <div class="tab" id="tab-teken">
+    <div class="tekentools">
+      <span class="kl aan" data-kl="#C9A24B" style="background:#C9A24B"></span>
+      <span class="kl" data-kl="#6FB1E6" style="background:#6FB1E6"></span>
+      <span class="kl" data-kl="#5FA56A" style="background:#5FA56A"></span>
+      <span class="kl" data-kl="#E0796F" style="background:#E0796F"></span>
+      <span class="kl" data-kl="#ffffff" style="background:#fff"></span>
+      <button class="knop klein grijs" id="tekenWis">Leeg</button>
+    </div>
+    <div class="tekenbox"><canvas id="doodle"></canvas></div>
+    <div class="ademsub">Teken vrij, zonder doel. Krassen, kleuren, vormen, wat je maar wilt. Alleen voor jou.</div>
+  </div>
+
+  <div class="tab" id="tab-kaart">
+    <div class="kaart bemkaart" id="bemkaart"><span class="em">💛</span><span id="bemtekst">…</span></div>
+    <button class="knop" id="bemVolgende">Nog een</button>
+  </div>
+</div>
+
+<script src="tekenen.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+document.querySelectorAll('.seg button').forEach(b=> b.addEventListener('click', ()=>{
+  document.querySelectorAll('.seg button').forEach(x=>x.classList.remove('aan')); b.classList.add('aan');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('aan')); $('#tab-'+b.dataset.t).classList.add('aan');
+  if(b.dataset.t==='teken' && doodle) setTimeout(()=>doodle.resize(),30);
+  if(b.dataset.t!=='adem') stopAdem();
+}));
+
+/* ---- ademhaling (box breathing 4-4-4-4) ---- */
+let ademTimer=null;
+const fasen=[['Adem in','.6','1'],['Houd vast','1','1'],['Adem uit','1','.6'],['Houd vast','.6','.6']];
+function stapAdem(i){
+  const [tekst,van,naar]=fasen[i];
+  $('#fase').textContent=tekst;
+  $('#kring').style.transform='scale('+naar+')';
+  ademTimer=setTimeout(()=>stapAdem((i+1)%fasen.length), 4000);
+}
+function startAdem(){ stopAdem(); $('#ademStart').textContent='Stop'; $('#kring').style.transform='scale(.6)'; setTimeout(()=>stapAdem(0),50); }
+function stopAdem(){ if(ademTimer){ clearTimeout(ademTimer); ademTimer=null; } $('#ademStart').textContent='Begin'; $('#fase').textContent='Klaar?'; $('#kring').style.transform='scale(.6)'; }
+$('#ademStart').addEventListener('click', ()=> ademTimer ? stopAdem() : startAdem());
+
+/* ---- vrij tekenen ---- */
+let doodle=null;
+setTimeout(()=>{ doodle=new TekenBord($('#doodle'),{background:'#12110F',kleur:'#C9A24B'}); doodle.kleur='#C9A24B'; doodle.dikte=6; },40);
+document.querySelectorAll('[data-kl]').forEach(b=> b.addEventListener('click', ()=>{ document.querySelectorAll('[data-kl]').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); if(doodle) doodle.kleur=b.dataset.kl; }));
+$('#tekenWis').addEventListener('click', ()=> doodle && doodle.clear());
+
+/* ---- bemoediging ---- */
+const kaarten=[
+  'Je bent meer waard dan wat er op je bankrekening staat.',
+  'Vandaag hoef je het niet perfect te doen. Gewoon proberen is al genoeg.',
+  'Moeilijke tijden duren niet eeuwig. Sterke mensen wel.',
+  'Je hoeft het niet alleen te doen. Hulp vragen is dapper.',
+  'Elke kleine stap vooruit telt, ook als niemand het ziet.',
+  'Je doet het beter dan je denkt. Echt.',
+  'Rust nemen is geen luiheid, het is opladen.',
+  'Waar je vandaan komt bepaalt niet waar je heen gaat.',
+  'Je bent belangrijk voor de mensen om je heen, precies zoals je bent.',
+  'Morgen is een nieuwe kans. En overmorgen weer.',
+  'Trots zijn op een kleine overwinning mag altijd.',
+  'Je bent niet je zorgen. Die gaan voorbij, jij blijft.'
+];
+let vorige=-1;
+function nieuweKaart(){ let i; do{ i=Math.floor(Math.random()*kaarten.length); }while(i===vorige && kaarten.length>1); vorige=i; $('#bemtekst').textContent=kaarten[i]; }
+$('#bemVolgende').addEventListener('click', nieuweKaart); nieuweKaart();
+
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

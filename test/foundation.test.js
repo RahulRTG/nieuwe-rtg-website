@@ -96,6 +96,16 @@ test('XSS-preventie: HTML in een naam wordt ontdaan van < en >', async () => {
   assert.ok(!/[<>]/.test(info.les.vak), 'vak zonder < of >, kreeg: ' + info.les.vak);
 });
 
+test('op reis met de foundation: een aanvraag wordt bewaard, onvolledig geweigerd', async () => {
+  // onvolledig (geen contact) wordt geweigerd
+  assert.equal((await api('/reis/aanvraag', { naam: 'Fatima', waarom: 'zwaar jaar' })).status, 400);
+  // volledige aanvraag lukt
+  const r = await api('/reis/aanvraag', { soort: 'aanvraag', naam: 'Fatima', contact: 'fatima@voorbeeld.test', gezin: '2 volwassenen, 3 kinderen', waarom: 'Na een zwaar jaar zou even weg heel veel betekenen.' });
+  assert.equal(r.status, 200);
+  const h = await json(await fetch(BASE + '/api/foundation/health'));
+  assert.ok(h.aanvragen >= 1, 'de aanvraag is bewaard');
+});
+
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {
   const L = await les();
   const goed = await api('/ai', { code: L.code, token: L.sToken, messages: [{ role: 'user', content: 'Help met breuken' }] });

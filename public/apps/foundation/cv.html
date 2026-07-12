@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · CV-maker</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);position:sticky;top:0;background:var(--bg);z-index:5;}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--goud);}
+  .topnav .sp{margin-left:auto;}
+  .topnav a.home{color:var(--zacht);text-decoration:none;font-size:.85rem;margin-right:.4rem;}
+  .cvapp{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;max-width:70rem;margin:0 auto;padding:1.2rem;}
+  @media(max-width:820px){.cvapp{grid-template-columns:1fr;}.preview-col{display:none;}.cvapp.toon-preview .form-col{display:none;}.cvapp.toon-preview .preview-col{display:block;}}
+  .sec{margin-bottom:1rem;padding:1rem;}
+  .sec h3{font-size:.95rem;font-family:var(--serif);font-weight:500;margin-bottom:.6rem;display:flex;align-items:center;}
+  .sec h3 .add{margin-left:auto;font-size:.78rem;color:var(--goud);background:none;font-weight:600;}
+  .veld{margin-bottom:.5rem;}
+  textarea.veld{min-height:4rem;resize:vertical;}
+  .twee{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+  .blok{border:1px solid var(--lijn);border-radius:12px;padding:.7rem;margin-bottom:.6rem;position:relative;}
+  .blok .del{position:absolute;top:.4rem;right:.5rem;background:none;color:var(--zacht);font-size:1.1rem;}
+  .hint{color:var(--zacht);font-size:.78rem;margin-top:-.2rem;margin-bottom:.5rem;}
+  /* ---- cv-voorbeeld (print) ---- */
+  .cvpaper{background:#fff;color:#1a1a1a;border-radius:12px;padding:2.2rem 2rem;font-size:.9rem;line-height:1.5;min-height:60vh;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+  .cvpaper h1{font-family:var(--serif);font-size:1.9rem;margin:0 0 .1rem;color:#111;}
+  .cvpaper .role{color:#7a6a1e;font-weight:600;font-size:1rem;margin-bottom:.5rem;}
+  .cvpaper .contact{font-size:.82rem;color:#555;border-bottom:2px solid #d9c98a;padding-bottom:.7rem;margin-bottom:.9rem;}
+  .cvpaper h2{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:#7a6a1e;margin:1.1rem 0 .45rem;border-bottom:1px solid #eee;padding-bottom:.2rem;}
+  .cvpaper .item{margin-bottom:.6rem;}
+  .cvpaper .item .t{font-weight:700;}
+  .cvpaper .item .m{color:#666;font-size:.8rem;}
+  .cvpaper .chips{display:flex;flex-wrap:wrap;gap:.35rem;}
+  .cvpaper .chip{background:#f3eecf;color:#5c4f10;border-radius:999px;padding:.15rem .6rem;font-size:.78rem;}
+  .cvpaper .profiel{white-space:pre-wrap;}
+  .prevbar{display:none;}
+  @media(max-width:820px){.prevbar{display:flex;gap:.5rem;padding:.6rem 1rem;position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--lijn);}}
+  @media print{
+    body *{visibility:hidden;}
+    .cvpaper,.cvpaper *{visibility:visible;}
+    .cvpaper{position:absolute;left:0;top:0;width:100%;box-shadow:none;border-radius:0;padding:1.5cm;}
+  }
+</style>
+</head>
+<body>
+<div class="topnav">
+  <span class="brand">RT<b>Foundation</b></span>
+  <span class="sp"></span>
+  <a class="home" href="index.html">← Alle hulp</a>
+  <button class="knop klein grijs" id="btnWis">Leegmaken</button>
+  <button class="knop klein" id="btnPrint">Print / Opslaan als PDF</button>
+</div>
+
+<div class="cvapp" id="cvapp">
+  <div class="form-col">
+    <div class="hint" style="padding:0 1rem;">Alles wat je invult wordt automatisch op dit toestel bewaard en blijft privé. Rechts zie je je cv meteen verschijnen.</div>
+
+    <div class="kaart sec">
+      <h3>Wie ben je</h3>
+      <input class="veld" data-f="naam" placeholder="Voor- en achternaam">
+      <input class="veld" data-f="functie" placeholder="Wat je zoekt of bent (bijv. Medewerker bediening)">
+      <div class="twee">
+        <input class="veld" data-f="telefoon" placeholder="Telefoon">
+        <input class="veld" data-f="email" placeholder="E-mail">
+      </div>
+      <div class="twee">
+        <input class="veld" data-f="woonplaats" placeholder="Woonplaats">
+        <input class="veld" data-f="geboren" placeholder="Geboortejaar (optioneel)">
+      </div>
+    </div>
+
+    <div class="kaart sec">
+      <h3>Over jou</h3>
+      <textarea class="veld" data-f="profiel" placeholder="Een paar zinnen over wie je bent en wat je goed kunt. Bijvoorbeeld: 'Ik werk hard, ben op tijd en leer snel.'"></textarea>
+    </div>
+
+    <div class="kaart sec">
+      <h3>Werkervaring <button class="add" data-add="werk">+ Toevoegen</button></h3>
+      <div class="hint">Ook vrijwilligerswerk, klusjes of stages tellen mee.</div>
+      <div id="werkLijst"></div>
+    </div>
+
+    <div class="kaart sec">
+      <h3>Opleiding <button class="add" data-add="opleiding">+ Toevoegen</button></h3>
+      <div id="opleidingLijst"></div>
+    </div>
+
+    <div class="kaart sec">
+      <h3>Vaardigheden</h3>
+      <input class="veld" data-f="skills" placeholder="Bijv. samenwerken, rijbewijs B, netjes werken (komma's ertussen)">
+    </div>
+    <div class="kaart sec">
+      <h3>Talen</h3>
+      <input class="veld" data-f="talen" placeholder="Bijv. Nederlands, Arabisch, Engels">
+    </div>
+    <div class="kaart sec">
+      <h3>Hobby's (optioneel)</h3>
+      <input class="veld" data-f="hobbys" placeholder="Bijv. voetbal, koken, tekenen">
+    </div>
+  </div>
+
+  <div class="preview-col">
+    <div class="cvpaper" id="cvpaper"></div>
+  </div>
+</div>
+
+<div class="prevbar">
+  <button class="knop grijs" style="flex:1;" id="btnBewerk">Bewerken</button>
+  <button class="knop" style="flex:1;" id="btnBekijk">Bekijk cv</button>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY = 'rtf_cv';
+let cv = { velden:{}, werk:[], opleiding:[] };
+try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) cv=Object.assign(cv,s); }catch(e){}
+
+function bewaar(){ try{ localStorage.setItem(KEY, JSON.stringify(cv)); }catch(e){} }
+
+/* ---- velden ---- */
+document.querySelectorAll('[data-f]').forEach(inp=>{
+  const f=inp.dataset.f; if(cv.velden[f]!=null) inp.value=cv.velden[f];
+  inp.addEventListener('input', ()=>{ cv.velden[f]=inp.value; bewaar(); render(); });
+});
+
+/* ---- repeat-blokken ---- */
+function tekenBlokken(soort){
+  const lijst = cv[soort], box = $('#'+soort+'Lijst');
+  const velden = soort==='werk'
+    ? [['functie','Functie of taak'],['bedrijf','Waar (bedrijf/organisatie)'],['periode','Periode (bijv. 2022 - 2024)'],['beschrijving','Wat deed je? (kort)']]
+    : [['opleiding','Opleiding of cursus'],['school','School'],['periode','Periode']];
+  box.innerHTML = lijst.map((it,i)=>
+    '<div class="blok"><button class="del" data-del="'+soort+'" data-i="'+i+'">×</button>'+
+    velden.map(([k,ph])=> (k==='beschrijving'
+      ? '<textarea class="veld" data-b="'+soort+'" data-i="'+i+'" data-k="'+k+'" placeholder="'+ph+'">'+esc(it[k]||'')+'</textarea>'
+      : '<input class="veld" data-b="'+soort+'" data-i="'+i+'" data-k="'+k+'" placeholder="'+ph+'" value="'+esc(it[k]||'')+'">')).join('')+
+    '</div>').join('') || '<div class="hint">Nog niets. Klik op + Toevoegen.</div>';
+  box.querySelectorAll('[data-b]').forEach(inp=> inp.addEventListener('input', ()=>{ cv[inp.dataset.b][Number(inp.dataset.i)][inp.dataset.k]=inp.value; bewaar(); render(); }));
+  box.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{ cv[b.dataset.del].splice(Number(b.dataset.i),1); bewaar(); tekenBlokken(b.dataset.del); render(); }));
+}
+document.querySelectorAll('[data-add]').forEach(b=> b.addEventListener('click', ()=>{ const s=b.dataset.add; cv[s].push({}); bewaar(); tekenBlokken(s); render(); }));
+
+/* ---- cv-voorbeeld ---- */
+function chips(str){ return String(str||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>'<span class="chip">'+esc(x)+'</span>').join(''); }
+function render(){
+  const v=cv.velden;
+  const contact=[v.telefoon,v.email,v.woonplaats,(v.geboren?('geb. '+v.geboren):'')].map(x=>String(x||'').trim()).filter(Boolean).map(esc).join('  ·  ');
+  let h='';
+  h+='<h1>'+(esc(v.naam)||'Jouw naam')+'</h1>';
+  if(v.functie) h+='<div class="role">'+esc(v.functie)+'</div>';
+  h+='<div class="contact">'+(contact||'telefoon · e-mail · woonplaats')+'</div>';
+  if(v.profiel) h+='<h2>Over mij</h2><div class="profiel">'+esc(v.profiel)+'</div>';
+  if(cv.werk.some(w=>w.functie||w.bedrijf)){ h+='<h2>Werkervaring</h2>'; for(const w of cv.werk){ if(!(w.functie||w.bedrijf||w.beschrijving))continue; h+='<div class="item"><div class="t">'+esc(w.functie||'')+(w.bedrijf?' · '+esc(w.bedrijf):'')+'</div>'+(w.periode?'<div class="m">'+esc(w.periode)+'</div>':'')+(w.beschrijving?'<div>'+esc(w.beschrijving)+'</div>':'')+'</div>'; } }
+  if(cv.opleiding.some(o=>o.opleiding||o.school)){ h+='<h2>Opleiding</h2>'; for(const o of cv.opleiding){ if(!(o.opleiding||o.school))continue; h+='<div class="item"><div class="t">'+esc(o.opleiding||'')+'</div><div class="m">'+[o.school,o.periode].filter(Boolean).map(esc).join(' · ')+'</div></div>'; } }
+  if(v.skills) h+='<h2>Vaardigheden</h2><div class="chips">'+chips(v.skills)+'</div>';
+  if(v.talen) h+='<h2>Talen</h2><div class="chips">'+chips(v.talen)+'</div>';
+  if(v.hobbys) h+='<h2>Hobby\'s</h2><div class="chips">'+chips(v.hobbys)+'</div>';
+  $('#cvpaper').innerHTML=h;
+}
+
+$('#btnPrint').addEventListener('click', ()=> window.print());
+$('#btnWis').addEventListener('click', ()=>{ if(confirm('Je hele cv leegmaken?')){ cv={velden:{},werk:[],opleiding:[]}; bewaar(); location.reload(); } });
+$('#btnBekijk') && $('#btnBekijk').addEventListener('click', ()=> $('#cvapp').classList.add('toon-preview'));
+$('#btnBewerk') && $('#btnBewerk').addEventListener('click', ()=> $('#cvapp').classList.remove('toon-preview'));
+
+tekenBlokken('werk'); tekenBlokken('opleiding'); render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

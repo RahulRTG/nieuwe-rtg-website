@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Op reis</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--goud);}
+  .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
+  .wrap{max-width:40rem;margin:0 auto;padding:1.6rem 1.2rem 3rem;}
+  .hero{text-align:center;margin-bottom:1.4rem;}
+  .kick{margin-bottom:.6rem;}
+  .logo{font-family:var(--serif);font-size:2rem;font-weight:500;line-height:1.15;}
+  .logo b{color:var(--goud);}
+  .deck{color:var(--zacht);line-height:1.55;margin-top:.7rem;}
+  .stappen{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin:1.2rem 0;}
+  @media(max-width:520px){.stappen{grid-template-columns:1fr;}}
+  .stap{padding:.9rem;text-align:center;}
+  .stap .n{color:var(--goud);font-family:var(--serif);font-size:1.2rem;}
+  .stap p{color:var(--zacht);font-size:.82rem;line-height:1.4;margin-top:.2rem;}
+  .kies{display:flex;gap:.5rem;margin-bottom:1rem;}
+  .kies button{flex:1;background:#1c1a16;color:var(--zacht);border-radius:12px;padding:.7rem;font-size:.9rem;border:1px solid var(--lijn);}
+  .kies button.aan{background:var(--goud);color:#1a1710;font-weight:700;border-color:var(--goud);}
+  .form .veld{margin-bottom:.7rem;}
+  textarea.veld{min-height:5rem;resize:vertical;}
+  label.lab{display:block;font-size:.82rem;color:var(--zacht);margin-bottom:.25rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .discreet{font-size:.8rem;color:var(--zacht);line-height:1.5;border-top:1px solid var(--lijn);padding-top:1rem;margin-top:1rem;}
+  .klaar{text-align:center;padding:2.5rem 1rem;}
+  .klaar .em{font-size:3rem;}
+  .klaar h2{font-family:var(--serif);font-weight:500;font-size:1.5rem;margin:.6rem 0;}
+  .klaar p{color:var(--zacht);line-height:1.55;max-width:28rem;margin:0 auto;}
+</style>
+</head>
+<body>
+<div class="topnav"><span class="brand">RT<b>Foundation</b></span><a href="index.html">← Alle hulp</a></div>
+<div class="wrap" id="wrap">
+  <div class="hero">
+    <div class="kick">Op reis met de foundation</div>
+    <div class="logo">Iedereen verdient <b>even weg</b>.</div>
+    <div class="deck">De RTFoundation stuurt gezinnen die het zwaar hebben op vakantie, volwaardig en persoonlijk, precies zoals we dat voor onze leden doen. Geen loterij, geen camera's, geen tegenprestatie. Gewoon rust en een mooie herinnering.</div>
+  </div>
+
+  <div class="stappen">
+    <div class="kaart stap"><div class="n">1</div><p>Je vraagt het aan, of draagt een gezin voor.</p></div>
+    <div class="kaart stap"><div class="n">2</div><p>De foundation neemt discreet en persoonlijk contact op.</p></div>
+    <div class="kaart stap"><div class="n">3</div><p>Wij regelen de reis, tegen nettoprijs via RTG. Het gezin gaat gewoon op vakantie.</p></div>
+  </div>
+
+  <div class="kies">
+    <button data-soort="aanvraag" class="aan">Voor mij / mijn gezin</button>
+    <button data-soort="voordracht">Een gezin voordragen</button>
+  </div>
+
+  <div class="form">
+    <label class="lab" id="labNaam">Jouw naam</label>
+    <input class="veld" id="fNaam" maxlength="60" placeholder="Voor- en achternaam">
+    <label class="lab">Hoe kunnen we contact opnemen? (telefoon of e-mail)</label>
+    <input class="veld" id="fContact" maxlength="90" placeholder="Telefoon of e-mail">
+    <label class="lab" id="labGezin">Over het gezin (aantal personen, leeftijden kinderen)</label>
+    <input class="veld" id="fGezin" maxlength="200" placeholder="Bijv. 2 volwassenen en 3 kinderen (4, 8 en 11)">
+    <label class="lab" id="labWaarom">Vertel kort waarom</label>
+    <textarea class="veld" id="fWaarom" maxlength="1500" placeholder="Wat maakt het nu zwaar, en wat zou een paar dagen weg betekenen? Een paar zinnen is genoeg."></textarea>
+    <div class="fout" id="fout"></div>
+    <button class="knop" id="verstuur" style="width:100%;">Versturen naar de foundation</button>
+  </div>
+
+  <div class="discreet">Discreet en veilig. Je gegevens gaan alleen naar de RTFoundation om contact met je op te nemen, nergens anders heen. Je hoeft je nergens voor te schamen: hulp vragen is sterk.</div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let soort='aanvraag';
+document.querySelectorAll('.kies button').forEach(b=> b.addEventListener('click', ()=>{
+  document.querySelectorAll('.kies button').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); soort=b.dataset.soort;
+  const vd = soort==='voordracht';
+  $('#labNaam').textContent = vd ? 'Jouw naam' : 'Jouw naam';
+  $('#labGezin').textContent = vd ? 'Over het gezin dat je voordraagt' : 'Over jouw gezin (aantal personen, leeftijden kinderen)';
+  $('#labWaarom').textContent = vd ? 'Waarom verdient dit gezin dit?' : 'Vertel kort waarom';
+}));
+
+$('#verstuur').addEventListener('click', async ()=>{
+  $('#fout').textContent='';
+  const body={ soort, naam:$('#fNaam').value, contact:$('#fContact').value, gezin:$('#fGezin').value, waarom:$('#fWaarom').value };
+  if(!body.naam.trim() || !body.contact.trim()){ $('#fout').textContent='Vul je naam in en hoe we contact kunnen opnemen.'; return; }
+  if(!body.waarom.trim()){ $('#fout').textContent='Vertel kort waarom, dat helpt de foundation echt.'; return; }
+  $('#verstuur').disabled=true; $('#verstuur').textContent='Versturen…';
+  try{
+    const r=await fetch('/api/foundation/reis/aanvraag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.');
+    $('#wrap').innerHTML='<div class="klaar"><span class="em">✈️</span><h2>Verstuurd, dankjewel.</h2>'+
+      '<p>De RTFoundation heeft je bericht ontvangen en neemt persoonlijk en discreet contact met je op. Er zit geen haast of druk bij, we nemen de tijd. Sterkte, en tot snel.</p>'+
+      '<p style="margin-top:1.4rem;"><a class="knop grijs" href="index.html">Terug naar alle hulp</a></p></div>';
+  }catch(e){ $('#fout').textContent=e.message; $('#verstuur').disabled=false; $('#verstuur').textContent='Versturen naar de foundation'; }
+});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

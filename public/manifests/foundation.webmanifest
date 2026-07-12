@@ -1,8 +1,8 @@
 {
-  "name": "RTFoundation Leren, gratis les en schrift",
+  "name": "RTFoundation, gratis hulp om vooruit te komen",
   "short_name": "RTFoundation",
   "id": "/apps/foundation",
-  "description": "Gratis live schoolbord en leerling-schrift met bijleshulp, mogelijk gemaakt door de RTFoundation",
+  "description": "Gratis onderwijs, een cv-maker, ontspanning en de kans op een vakantie, voor gezinnen met weinig geld. Mogelijk gemaakt door de RTFoundation.",
   "lang": "nl",
   "start_url": "/apps/foundation/",
   "scope": "/apps/foundation/",
@@ -10,11 +10,12 @@
   "background_color": "#0C0C0B",
   "theme_color": "#0C0C0B",
   "icons": [
-    {
-      "src": "/icons/foundation.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
+    { "src": "/icons/foundation.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Leren", "url": "/apps/foundation/leren.html" },
+    { "name": "CV-maker", "url": "/apps/foundation/cv.html" },
+    { "name": "Even rust", "url": "/apps/foundation/rust.html" },
+    { "name": "Op reis", "url": "/apps/foundation/reis.html" }
   ]
 }

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Leren</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--goud);}
+  .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
+  .wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;gap:1.4rem;min-height:calc(100vh - 3.4rem);}
+  .kick{margin-top:.4rem;}
+  .logo{font-family:var(--serif);font-size:2.3rem;font-weight:500;letter-spacing:-.01em;text-align:center;}
+  .logo b{color:var(--goud);font-weight:600;}
+  .deck{color:var(--zacht);text-align:center;max-width:34rem;line-height:1.55;}
+  .keuze{display:grid;grid-template-columns:1fr 1fr;gap:1rem;width:100%;max-width:44rem;}
+  @media(max-width:560px){.keuze{grid-template-columns:1fr;}}
+  .rol{padding:1.6rem;text-align:center;transition:transform .12s,border-color .12s;}
+  .rol:hover{transform:translateY(-3px);border-color:var(--goud);}
+  .rol .ic{font-size:2.6rem;}
+  .rol h2{margin:.6rem 0 .3rem;font-size:1.25rem;font-family:var(--serif);font-weight:500;}
+  .rol p{color:var(--zacht);font-size:.9rem;line-height:1.45;margin-bottom:1rem;}
+  dialog{border:none;background:transparent;color:var(--txt);}
+  dialog::backdrop{background:rgba(4,4,3,.75);}
+  .modal{width:min(92vw,26rem);padding:1.6rem;}
+  .modal h3{font-size:1.2rem;margin-bottom:1rem;font-family:var(--serif);font-weight:500;}
+  .modal .veld{margin-bottom:.8rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
+  .codebig{text-transform:uppercase;letter-spacing:.35em;text-align:center;font-size:1.3rem;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="topnav"><span class="brand">RT<b>Foundation</b></span><a href="index.html">← Alle hulp</a></div>
+<div class="wrap">
+  <div class="kick">Leren</div>
+  <div class="logo">Gratis <b>leren</b> voor ieder kind</div>
+  <div class="deck">Een live digitaal schoolbord en een eigen schrift met bijleshulp, kosteloos. Zodat thuis geen bijles of dure boeken meer nodig zijn.</div>
+  <div class="keuze">
+    <div class="kaart rol" id="rolDocent">
+      <div class="ic">🧑‍🏫</div><h2>Ik geef les</h2>
+      <p>Docent, ouder of vrijwilliger: start een les en krijg een lescode. Wat je op het bord schrijft, zien alle leerlingen live.</p>
+      <button class="knop">Nieuwe les starten</button>
+    </div>
+    <div class="kaart rol" id="rolLeerling">
+      <div class="ic">🎒</div><h2>Ik ga leren</h2>
+      <p>Doe mee met de lescode en open je eigen schrift met bijleshulp Bram ernaast.</p>
+      <button class="knop groen">Meedoen met een les</button>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlgDocent"><div class="kaart modal">
+  <h3>Nieuwe les</h3>
+  <input class="veld" id="dVak" placeholder="Vak of onderwerp (bijv. Rekenen)" maxlength="40">
+  <input class="veld" id="dNaam" placeholder="Jouw naam (begeleider)" maxlength="40">
+  <div class="fout" id="dFout"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="dStart">Start les</button></div>
+</div></dialog>
+
+<dialog id="dlgLeerling"><div class="kaart modal">
+  <h3>Meedoen met een les</h3>
+  <input class="veld codebig" id="lCode" placeholder="LESCODE" maxlength="6" autocapitalize="characters">
+  <input class="veld" id="lNaam" placeholder="Jouw naam of bijnaam" maxlength="40">
+  <div class="fout" id="lFout"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop groen" id="lJoin">Doe mee</button></div>
+</div></dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+async function api(p, b){ const r = await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})}); const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }
+$('#rolDocent').addEventListener('click', ()=> $('#dlgDocent').showModal());
+$('#rolLeerling').addEventListener('click', ()=> $('#dlgLeerling').showModal());
+document.querySelectorAll('[data-sluit]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
+$('#dStart').addEventListener('click', async ()=>{
+  $('#dFout').textContent='';
+  try{ const d = await api('/les/maak', { vak: $('#dVak').value, naam: $('#dNaam').value }); localStorage.setItem('rtf_docent', JSON.stringify({ code:d.code, token:d.token })); location.href = 'bord.html?code='+d.code+'&t='+encodeURIComponent(d.token); }
+  catch(e){ $('#dFout').textContent = e.message; }
+});
+$('#lJoin').addEventListener('click', async ()=>{
+  $('#lFout').textContent='';
+  const code = $('#lCode').value.trim().toUpperCase();
+  try{ const d = await api('/les/join', { code, naam: $('#lNaam').value }); localStorage.setItem('rtf_leerling', JSON.stringify({ code, token:d.token, naam:d.naam })); location.href = 'schrift.html?code='+code+'&t='+encodeURIComponent(d.token); }
+  catch(e){ $('#lFout').textContent = e.message; }
+});
+$('#lCode').addEventListener('input', e=> e.target.value = e.target.value.toUpperCase());
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

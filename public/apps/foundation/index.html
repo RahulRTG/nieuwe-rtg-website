@@ -3,99 +3,73 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTFoundation · Leren</title>
+<title>RTFoundation</title>
 <meta name="theme-color" content="#0C0C0B">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
 <style>
-  .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;gap:1.4rem;}
-  .kick{margin-top:1rem;}
-  .logo{font-family:var(--serif);font-size:2.5rem;font-weight:500;letter-spacing:-.01em;text-align:center;}
+  .wrap{max-width:52rem;margin:0 auto;padding:1.6rem 1.2rem 3rem;}
+  .hero{text-align:center;padding:1.4rem 0 1.8rem;}
+  .kick{margin-bottom:.7rem;}
+  .logo{font-family:var(--serif);font-size:2.4rem;font-weight:500;letter-spacing:-.01em;line-height:1.1;}
   .logo b{color:var(--goud);font-weight:600;}
-  .deck{color:var(--zacht);text-align:center;max-width:34rem;line-height:1.55;}
-  .keuze{display:grid;grid-template-columns:1fr 1fr;gap:1rem;width:100%;max-width:44rem;}
-  @media(max-width:560px){.keuze{grid-template-columns:1fr;}}
-  .rol{padding:1.6rem;text-align:center;transition:transform .12s,border-color .12s;}
-  .rol:hover{transform:translateY(-3px);border-color:var(--goud);}
-  .rol .ic{font-size:2.6rem;}
-  .rol h2{margin:.6rem 0 .3rem;font-size:1.25rem;font-family:var(--serif);font-weight:500;}
-  .rol p{color:var(--zacht);font-size:.9rem;line-height:1.45;margin-bottom:1rem;}
-  .gratis{font-size:.82rem;color:var(--zacht);text-align:center;max-width:34rem;line-height:1.5;border-top:1px solid var(--lijn);padding-top:1.1rem;margin-top:.4rem;}
+  .deck{color:var(--zacht);max-width:36rem;margin:.9rem auto 0;line-height:1.55;}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  @media(max-width:560px){.tiles{grid-template-columns:1fr;}}
+  .tile{display:flex;flex-direction:column;gap:.5rem;padding:1.5rem;text-decoration:none;color:var(--txt);transition:transform .12s,border-color .12s;position:relative;overflow:hidden;}
+  .tile:hover{transform:translateY(-3px);border-color:var(--goud);}
+  .tile .ic{font-size:2.4rem;}
+  .tile h2{font-family:var(--serif);font-weight:500;font-size:1.35rem;}
+  .tile p{color:var(--zacht);font-size:.9rem;line-height:1.45;}
+  .tile .cta{margin-top:auto;color:var(--goud);font-size:.85rem;font-weight:600;padding-top:.4rem;}
+  .gratis{margin-top:1.6rem;text-align:center;font-size:.85rem;color:var(--zacht);line-height:1.55;border-top:1px solid var(--lijn);padding-top:1.2rem;}
   .gratis b{color:var(--goud);}
-  dialog{border:none;background:transparent;color:var(--txt);}
-  dialog::backdrop{background:rgba(4,4,3,.75);}
-  .modal{width:min(92vw,26rem);padding:1.6rem;}
-  .modal h3{font-size:1.2rem;margin-bottom:1rem;font-family:var(--serif);font-weight:500;}
-  .modal .veld{margin-bottom:.8rem;}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
-  .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
-  .codebig{text-transform:uppercase;letter-spacing:.35em;text-align:center;font-size:1.3rem;font-weight:700;}
+  .foot{text-align:center;margin-top:1.4rem;font-size:.8rem;}
+  .foot a{color:var(--zacht);text-decoration:none;}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="kick">RTFoundation</div>
-  <div class="logo">Gratis <b>leren</b> voor ieder kind</div>
-  <div class="deck">Een live digitaal schoolbord en een eigen schrift met bijleshulp, kosteloos. Voor gezinnen met weinig geld, zodat thuis geen bijles of dure boeken meer nodig zijn. Mogelijk gemaakt door de leden van Rahul Travel Group.</div>
-  <div class="keuze">
-    <div class="kaart rol" id="rolDocent">
-      <div class="ic">🧑‍🏫</div><h2>Ik geef les</h2>
-      <p>Docent, ouder of vrijwilliger: start een les en krijg een lescode. Wat je op het bord schrijft, zien alle leerlingen live.</p>
-      <button class="knop">Nieuwe les starten</button>
-    </div>
-    <div class="kaart rol" id="rolLeerling">
-      <div class="ic">🎒</div><h2>Ik ga leren</h2>
-      <p>Doe mee met de lescode en open je eigen schrift met bijleshulp Bram ernaast.</p>
-      <button class="knop groen">Meedoen met een les</button>
-    </div>
+  <div class="hero">
+    <div class="kick">RTFoundation</div>
+    <div class="logo">Gratis hulp om <b>vooruit</b> te komen</div>
+    <div class="deck">Voor gezinnen met weinig geld. Alles hier is en blijft kosteloos: onderwijs, een sterk cv, even rust, en de kans op een echte vakantie. Mogelijk gemaakt door de leden van Rahul Travel Group.</div>
   </div>
-  <div class="gratis"><b>Altijd gratis.</b> Geen account, geen lidmaatschap, geen kosten. De RTFoundation wordt betaald uit de bijdragen van RTG-leden, zodat leren voor ieder kind bereikbaar is.</div>
+
+  <div class="tiles">
+    <a class="kaart tile" href="leren.html">
+      <div class="ic">📚</div>
+      <h2>Leren</h2>
+      <p>Een live digitaal schoolbord en een eigen schrift met AI-bijleshulp. Zodat dure bijles thuis niet meer nodig is.</p>
+      <span class="cta">Open het lesbord →</span>
+    </a>
+    <a class="kaart tile" href="cv.html">
+      <div class="ic">📄</div>
+      <h2>CV-maker</h2>
+      <p>Maak in een paar minuten een verzorgd cv om werk te vinden. Sla het op je toestel op en print het gratis.</p>
+      <span class="cta">Maak je cv →</span>
+    </a>
+    <a class="kaart tile" href="rust.html">
+      <div class="ic">🌿</div>
+      <h2>Even rust</h2>
+      <p>Adem tot rust, teken vrij om te ontspannen, en lees een bemoedigende kaart. Een rustig hoekje voor het hele gezin.</p>
+      <span class="cta">Neem even rust →</span>
+    </a>
+    <a class="kaart tile" href="reis.html">
+      <div class="ic">✈️</div>
+      <h2>Op reis met de foundation</h2>
+      <p>De foundation stuurt gezinnen die het zwaar hebben op vakantie. Vraag het aan of draag een gezin voor, discreet en gratis.</p>
+      <span class="cta">Vraag een reis aan →</span>
+    </a>
+  </div>
+
+  <div class="gratis"><b>Altijd gratis, geen account, geen kleine lettertjes.</b> De RTFoundation wordt betaald uit de bijdragen van RTG-leden. Bij elke reis die een lid maakt, komt hulp voor een ander gezin dichterbij.</div>
+  <div class="foot"><a href="/site/rtfoundation.html">Over de RTFoundation →</a></div>
 </div>
 
-<dialog id="dlgDocent"><div class="kaart modal">
-  <h3>Nieuwe les</h3>
-  <input class="veld" id="dVak" placeholder="Vak of onderwerp (bijv. Rekenen)" maxlength="40">
-  <input class="veld" id="dNaam" placeholder="Jouw naam (begeleider)" maxlength="40">
-  <div class="fout" id="dFout"></div>
-  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="dStart">Start les</button></div>
-</div></dialog>
-
-<dialog id="dlgLeerling"><div class="kaart modal">
-  <h3>Meedoen met een les</h3>
-  <input class="veld codebig" id="lCode" placeholder="LESCODE" maxlength="6" autocapitalize="characters">
-  <input class="veld" id="lNaam" placeholder="Jouw naam of bijnaam" maxlength="40">
-  <div class="fout" id="lFout"></div>
-  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop groen" id="lJoin">Doe mee</button></div>
-</div></dialog>
-
 <script>
-const $ = s => document.querySelector(s);
-async function api(p, b){ const r = await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})}); const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }
-
-$('#rolDocent').addEventListener('click', ()=> $('#dlgDocent').showModal());
-$('#rolLeerling').addEventListener('click', ()=> $('#dlgLeerling').showModal());
-document.querySelectorAll('[data-sluit]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
-
-$('#dStart').addEventListener('click', async ()=>{
-  $('#dFout').textContent='';
-  try{
-    const d = await api('/les/maak', { vak: $('#dVak').value, naam: $('#dNaam').value });
-    localStorage.setItem('rtf_docent', JSON.stringify({ code:d.code, token:d.token }));
-    location.href = 'bord.html?code='+d.code+'&t='+encodeURIComponent(d.token);
-  }catch(e){ $('#dFout').textContent = e.message; }
-});
-$('#lJoin').addEventListener('click', async ()=>{
-  $('#lFout').textContent='';
-  const code = $('#lCode').value.trim().toUpperCase();
-  try{
-    const d = await api('/les/join', { code, naam: $('#lNaam').value });
-    localStorage.setItem('rtf_leerling', JSON.stringify({ code, token:d.token, naam:d.naam }));
-    location.href = 'schrift.html?code='+code+'&t='+encodeURIComponent(d.token);
-  }catch(e){ $('#lFout').textContent = e.message; }
-});
-$('#lCode').addEventListener('input', e=> e.target.value = e.target.value.toUpperCase());
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>

@@ -109,7 +109,7 @@ const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':
 const q = new URLSearchParams(location.search);
 let CODE=(q.get('code')||'').toUpperCase(), TOKEN=q.get('t')||'', NAAM='';
 if(!CODE||!TOKEN){ try{ const d=JSON.parse(localStorage.getItem('rtf_leerling')||'null'); if(d){CODE=d.code;TOKEN=d.token;NAAM=d.naam;} }catch(e){} }
-if(!CODE||!TOKEN){ location.href='index.html'; }
+if(!CODE||!TOKEN){ location.href='leren.html'; }
 
 async function api(p,b){ const r=await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
 async function get(p){ const r=await fetch('/api/foundation'+p+(p.includes('?')?'&':'?')+'token='+encodeURIComponent(TOKEN)); return r.json(); }

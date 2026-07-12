@@ -58,6 +58,7 @@
 
 <script src="sessie.js"></script>
 <script src="gezin-rt.js"></script>
+<script src="/apps/translate.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) {}
@@ -103,7 +104,12 @@ async function openGesprek(id){
 }
 function voegBericht(m){
   const mij = m.vanMij!==undefined ? m.vanMij : (m.van===s.profiel.id);
-  const div=document.createElement('div'); div.className='b '+(mij?'ik':'jij'); div.textContent=m.tekst;
+  const div=document.createElement('div'); div.className='b '+(mij?'ik':'jij');
+  // berichten van een ander worden automatisch naar het Nederlands vertaald,
+  // met een knopje om het origineel te zien. Zo begrijpt iedereen elkaar, ook
+  // als een familielid in een andere taal schrijft.
+  if (mij || !window.Vertaal) div.textContent=m.tekst;
+  else Vertaal.vul(div, m.tekst, 'nl');
   $('#berichten').appendChild(div); scrollNaarBeneden();
 }
 function scrollNaarBeneden(){ const b=$('#berichten'); b.scrollTop=b.scrollHeight; }

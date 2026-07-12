@@ -13,7 +13,7 @@ const SHELL = [
   '/apps/foundation/agenda.html', '/apps/foundation/klusjes.html',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html', '/apps/foundation/sessie.js',
-  '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/geo.js',
+  '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/geo.js', '/apps/translate.js',
   '/manifests/foundation.webmanifest', '/icons/foundation.svg'
 ];
 

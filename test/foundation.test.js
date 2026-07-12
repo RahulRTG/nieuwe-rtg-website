@@ -453,6 +453,19 @@ function raw(pad, body, token) {
   });
 }
 
+test('automatisch vertalen: bericht komt in de taal van de lezer, beide kanten op', async () => {
+  // Nederlands naar Engels (vaste seed-zin) en Engels naar Nederlands (woordniveau)
+  const nl2en = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'Snackbar dicht, telefoon uit, ik ben even niemands baas.', to: 'en' }) })));
+  assert.equal(nl2en.translated, true);
+  assert.match(nl2en.text, /Snack bar closed/);
+  const en2nl = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'hello, thanks for the message', to: 'nl' }) })));
+  assert.equal(en2nl.translated, true);
+  assert.match(en2nl.text, /hallo|bedankt/);
+  // al in de doeltaal: niets te vertalen
+  const zelfde = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'hello there', to: 'en' }) })));
+  assert.equal(zelfde.translated, false);
+});
+
 test('leeftijdsgroepen: vijf groepen op profielen, mag-solliciteren vanaf 16', async () => {
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Groepen', naam: 'Ouder', pin: '1357', groep: 'volw' }));
   // beheerder is volwassen en mag solliciteren

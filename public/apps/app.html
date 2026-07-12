@@ -1044,6 +1044,7 @@
 
 <script src="/shared/realtime.js"></script>
 <script src="/apps/geo.js"></script>
+<script src="/apps/translate.js"></script>
 <script src="/apps/foundation/gezin-rt.js"></script>
 <script>
 (function(){
@@ -1423,17 +1424,28 @@
       const d = await API.call('/member/dm', { withKey: dmWith });
       $('#dmBody').innerHTML = (d.messages || []).map(m => dmBubbel(m)).join('') ||
         '<div style="font-size:0.78rem;color:var(--soft);text-align:center;margin:auto 0;">' + T('sal.dm.leeg','Nog geen berichten. Zeg hallo.') + '</div>';
+      vertaalBubbels($('#dmBody'));
       $('#dmBody').scrollTop = 999999;
     } catch(e){ toast(e.message); }
+  }
+  // Vertaal binnenkomende berichten naar de gekozen taal van de lezer. Alleen
+  // berichten van de ander (.xlate) worden vertaald; eigen berichten niet.
+  function vertaalBubbels(root){
+    if (!root || !window.Vertaal) return;
+    root.querySelectorAll('.xlate:not([data-vt])').forEach(function(el){
+      el.setAttribute('data-vt','1');
+      Vertaal.vul(el, el.textContent, lang());
+    });
   }
   function dmBubbel(m){
     const mijn = m.from === social.me;
     const tijd = new Date(m.at).toLocaleTimeString(lang()==='en'?'en-GB':'nl-NL',{hour:'2-digit',minute:'2-digit'});
-    return '<div class="dm-m' + (mijn ? ' mine' : '') + '">' + escT(m.text) +
+    const txt = mijn ? escT(m.text) : '<span class="xlate">' + escT(m.text) + '</span>';
+    return '<div class="dm-m' + (mijn ? ' mine' : '') + '">' + txt +
       (m.post ? '<div class="dm-post"><b>↗ ' + escT(m.post.author) + ' · ' + escT(m.post.place) + '</b>' + escT(m.post.text) + '…</div>' : '') +
       '<span class="tijd">' + tijd + '</span></div>';
   }
-  function dmToevoegen(m){ const b = $('#dmBody'); b.insertAdjacentHTML('beforeend', dmBubbel(m)); b.scrollTop = 999999; }
+  function dmToevoegen(m){ const b = $('#dmBody'); b.insertAdjacentHTML('beforeend', dmBubbel(m)); vertaalBubbels(b); b.scrollTop = 999999; }
   async function stuurDm(){
     const text = $('#dmInput').value.trim();
     if (!text || !dmWith) return;
@@ -2589,7 +2601,7 @@
     box.querySelectorAll('[data-bel]').forEach(function(b){ b.onclick=function(){ GezinRT.bel(b.dataset.bel,false); }; });
     box.querySelectorAll('[data-video]').forEach(function(b){ b.onclick=function(){ GezinRT.bel(b.dataset.video,true); }; });
   }
-  function grtMsgHtml(m){ var mij=m.vanMij; return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:80%;padding:.4rem .7rem;border-radius:12px;'+(mij?'background:var(--gold);color:#1a1710;':'background:var(--card2,#1B1817);border:1px solid var(--line);')+'white-space:pre-wrap;">'+esc(m.tekst)+'</div>'; }
+  function grtMsgHtml(m){ var mij=m.vanMij; var inner = mij ? esc(m.tekst) : '<span class="xlate">'+esc(m.tekst)+'</span>'; return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:80%;padding:.4rem .7rem;border-radius:12px;'+(mij?'background:var(--gold);color:#1a1710;':'background:var(--card2,#1B1817);border:1px solid var(--line);')+'white-space:pre-wrap;">'+inner+'</div>'; }
   function scrollGrt(){ var m=$('#grtMsgs'); if(m) m.scrollTop=m.scrollHeight; }
   async function openGrtThread(id, lid){
     grtActief=id; var t=$('#grtThread'); t.style.display='';
@@ -2598,10 +2610,11 @@
       '<div id="grtMsgs" style="max-height:14rem;overflow:auto;display:flex;flex-direction:column;gap:.3rem;">'+(d.berichten||[]).map(grtMsgHtml).join('')+'</div>'+
       '<div style="display:flex;gap:.5rem;margin-top:.5rem;"><input id="grtIn" placeholder="Bericht..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.5rem .7rem;color:var(--txt);"><button class="go" id="grtStuur">Stuur</button></div>';
     $('#grtStuur').onclick=grtStuur; $('#grtIn').addEventListener('keydown',function(e){ if(e.key==='Enter') grtStuur(); });
+    vertaalBubbels($('#grtMsgs'));
     scrollGrt();
   }
   async function grtStuur(){ var inp=$('#grtIn'); if(!inp) return; var t=(inp.value||'').trim(); if(!t||!grtActief) return; inp.value=''; try{ var r=await GezinRT.stuur(grtActief,t); var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:r.bericht.tekst,vanMij:true})); scrollGrt(); } }catch(e){ toast(e.message); } }
-  function onGrtChat(m){ if(grtActief && m.van===grtActief){ var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:m.tekst,vanMij:false})); scrollGrt(); } } }
+  function onGrtChat(m){ if(grtActief && m.van===grtActief){ var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:m.tekst,vanMij:false})); vertaalBubbels(el); scrollGrt(); } } }
   const telHref = t => 'tel:' + String(t||'').replace(/[^0-9+]/g,'');
   function geleden(iso){ const s=Math.floor((Date.now()-new Date(iso).getTime())/1000); if(s<60)return 'net nu'; if(s<3600)return Math.floor(s/60)+' min geleden'; if(s<86400)return Math.floor(s/3600)+' uur geleden'; return Math.floor(s/86400)+' dag(en) geleden'; }
   function datumKort(d){ try{ const dt=new Date(d+'T00:00:00'); const vd=new Date(); vd.setHours(0,0,0,0); const mo=new Date(vd); mo.setDate(mo.getDate()+1); if(dt.getTime()===vd.getTime())return 'Vandaag'; if(dt.getTime()===mo.getTime())return 'Morgen'; return dt.toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }

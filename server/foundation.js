@@ -1108,6 +1108,47 @@ router.post('/gezin/bel', (req, res) => {
   res.json({ ok: true });
 });
 
+/* ---------- sollicitaties vanuit de RTFoundation ----------
+   De server (server.js) handelt het echte solliciteren af (bij de partner), maar
+   controleert eerst hier of het gezin-token klopt en bewaart daarna een
+   verwijzing bij het gezin, zodat de sollicitant in de app zijn eigen
+   sollicitaties met live status terugziet. */
+function verifieerProfiel(code, token) {
+  const g = G()[String(code || '').toUpperCase()];
+  if (!g) return null;
+  const p = profielVan(g, token);
+  if (!p) return null;
+  return { g, p, gast: isGast(p) };
+}
+function bewaarSollicitatie(code, profielId, ref) {
+  const g = G()[String(code || '').toUpperCase()];
+  if (!g) return false;
+  if (!Array.isArray(g.sollicitaties)) g.sollicitaties = [];
+  g.sollicitaties.unshift(Object.assign({ profielId, at: nu() }, ref));
+  g.sollicitaties = g.sollicitaties.slice(0, 100);
+  save();
+  return true;
+}
+// heeft dit profiel al op deze vacature gesolliciteerd?
+function alGesolliciteerd(code, profielId, vacatureId) {
+  const g = G()[String(code || '').toUpperCase()];
+  if (!g || !Array.isArray(g.sollicitaties)) return false;
+  return g.sollicitaties.some(s => s.profielId === profielId && s.vacatureId === vacatureId);
+}
+// de eigen sollicitaties van het ingelogde profiel, met de actuele status uit de
+// partneradministratie (db.data.applications).
+router.post('/gezin/sollicitaties', (req, res) => {
+  const s = familieVan(req, res); if (!s) return;
+  const lijst = (s.g.sollicitaties || []).filter(x => x.profielId === s.p.id).map(x => {
+    let status = 'nieuw';
+    const apps = (db.data.applications && db.data.applications[x.supplierCode]) || [];
+    const a = apps.find(y => y.id === x.appId);
+    if (a) status = a.status; else if (x.appId) status = 'onbekend';
+    return { bedrijf: x.bedrijf, func: x.func, land: x.land || null, landNaam: x.landNaam || null, at: x.at, status };
+  });
+  res.json({ sollicitaties: lijst });
+});
+
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, berichtVanGast };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd };

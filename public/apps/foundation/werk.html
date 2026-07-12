@@ -31,6 +31,16 @@
   .vac .acties{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .vac .verstuurd{color:var(--groen,#7ecb8f);font-size:.88rem;font-weight:600;}
   .leeg{color:var(--zacht);text-align:center;padding:2rem 1rem;line-height:1.5;}
+  .mijn{display:flex;flex-direction:column;gap:.5rem;}
+  .msoll{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;}
+  .msoll .mt{flex:1;min-width:0;}
+  .msoll .mt b{display:block;font-size:.92rem;}
+  .msoll .mt span{font-size:.78rem;color:var(--zacht);}
+  .pil{font-size:.72rem;font-weight:700;border-radius:999px;padding:.2rem .6rem;white-space:nowrap;}
+  .pil.nieuw{background:#2a2a1a;color:#d8c86a;border:1px solid #6a5f2a;}
+  .pil.aangenomen{background:#12241a;color:#7ecb8f;border:1px solid #2f6a45;}
+  .pil.afgewezen{background:#2a1512;color:#e88;border:1px solid #6a2f2a;}
+  .pil.onbekend{background:var(--paneel);color:var(--zacht);border:1px solid var(--lijn);}
   .jong{background:#181712;border:1px solid var(--lijn);border-radius:12px;padding:1.1rem;color:var(--zacht);line-height:1.5;}
   .jong b{color:var(--txt);}
 </style>
@@ -52,6 +62,11 @@
       <button class="knop grijs klein" id="gpsBtn" type="button" style="padding:.4rem .7rem;">📍 Toon afstand</button>
       <span id="cvStatus" class="cvstatus"></span>
     </div>
+    <div id="mijnBlok" hidden>
+      <h2 style="font-family:var(--serif);font-weight:500;font-size:1.15rem;margin:.4rem 0 .6rem;">Mijn sollicitaties</h2>
+      <div class="mijn" id="mijn"></div>
+    </div>
+    <h2 id="alleKop" style="font-family:var(--serif);font-weight:500;font-size:1.15rem;margin:1.2rem 0 .6rem;" hidden>Alle vacatures</h2>
     <div class="lijst" id="lijst"><div class="leeg">Vacatures laden...</div></div>
   </div>
 </div>
@@ -130,6 +145,21 @@ async function laad(){
   } catch(e){ $('#lijst').innerHTML = '<div class="leeg">Kon de vacatures even niet laden. Probeer het zo nog eens.</div>'; }
 }
 
+const STATUS = { nieuw:['In behandeling','nieuw'], aangenomen:['Aangenomen 🎉','aangenomen'], afgewezen:['Helaas afgewezen','afgewezen'], onbekend:['Afgerond','onbekend'] };
+async function laadMijn(){
+  try {
+    const d = await api('/gezin/sollicitaties', { code: s.code, token: s.token });
+    const lijst = d.sollicitaties || [];
+    if (!lijst.length){ $('#mijnBlok').hidden = true; $('#alleKop').hidden = true; return; }
+    $('#mijnBlok').hidden = false; $('#alleKop').hidden = false;
+    $('#mijn').innerHTML = lijst.map(x=>{
+      const st = STATUS[x.status] || STATUS.onbekend;
+      const waar = [x.bedrijf, x.landNaam].filter(Boolean).join(' · ');
+      return '<div class="msoll"><div class="mt"><b>'+esc(x.func)+'</b><span>'+esc(waar)+'</span></div><span class="pil '+st[1]+'">'+esc(st[0])+'</span></div>';
+    }).join('');
+  } catch(e){ $('#mijnBlok').hidden = true; $('#alleKop').hidden = true; }
+}
+
 function teken(){
   const verz = verzonden();
   if (!vacatures.length){
@@ -167,9 +197,10 @@ async function solliciteer(btn){
   const lft = Math.max(16, parseInt($('#lft').value,10) || 16);
   btn.disabled = true; btn.textContent = 'Versturen...';
   try {
-    await rtfApi('/solliciteer', { supplierCode: btn.dataset.code, vacatureId: btn.dataset.sol, leeftijd: lft, cv });
+    await rtfApi('/solliciteer', { code: s.code, token: s.token, supplierCode: btn.dataset.code, vacatureId: btn.dataset.sol, leeftijd: lft, cv });
     markeerVerzonden(btn.dataset.sol);
     teken();
+    laadMijn();
   } catch(e){
     btn.disabled = false; btn.textContent = 'Solliciteer met mijn cv';
     if (e && e.needCv) { if (confirm('Maak eerst je cv af. Nu naar de cv-maker?')) location.href='cv.html'; }
@@ -207,6 +238,7 @@ Sessie.ophalen().then(d=>{
   $('#gpsBtn').addEventListener('click', vraagGps);
   if (Geo.heeft()){ Geo.positie().then(p=>{ if(p){ mijnPlek = p; $('#gpsBtn').textContent = '📍 Dichtstbij eerst'; teken(); } }); }
   laad();
+  laadMijn();
 });
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});

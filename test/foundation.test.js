@@ -498,29 +498,44 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   const welLijst = await json(await raw('/rtf/vacatures', { leeftijd: 16, land: gevonden.land }));
   assert.ok(welLijst.vacatures.some(v => v.id === vacId), 'landfilter toont het juiste land');
 
-  // onder de 16 kan niet solliciteren
-  const teJong = await raw('/rtf/solliciteer', { supplierCode: supCode, vacatureId: vacId, leeftijd: 14, cv: { name: 'Jon', contact: 'j@v.test', skills: ['netjes'] } });
+  // een gezin met token: solliciteren vereist een geldig gezin-token
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Werkfam', naam: 'Ouder', pin: '2020', groep: 'volw' }));
+  const zonderToken = await raw('/rtf/solliciteer', { supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'X', contact: 'x@v.test', skills: ['x'] } });
+  assert.equal(zonderToken.status, 403, 'zonder gezin-token geen sollicitatie');
+
+  // onder de 16 kan niet solliciteren (met geldig token)
+  const teJong = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 14, cv: { name: 'Jon', contact: 'j@v.test', skills: ['netjes'] } });
   assert.equal(teJong.status, 403);
 
   // zonder afgerond cv lukt het niet
-  const geenCv = await raw('/rtf/solliciteer', { supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam' } });
+  const geenCv = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam' } });
   assert.equal(geenCv.status, 409);
 
-  // met cv lukt het en de partner ziet de sollicitatie met RTF-markering en cv
-  const ok = await raw('/rtf/solliciteer', { supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam de Jong', contact: 'sam@v.test', headline: 'Leergierig', experience: ['Vrijwilliger buurthuis'], skills: ['samenwerken', 'netjes'], about: 'Ik leer snel.' } });
+  // met cv lukt het en de partner ziet de sollicitatie met cv
+  const ok = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam de Jong', contact: 'sam@v.test', headline: 'Leergierig', experience: ['Vrijwilliger buurthuis'], skills: ['samenwerken', 'netjes'], about: 'Ik leer snel.' } });
   assert.equal(ok.status, 200);
   const st = await json(await raw('/supplier/state', {}, login.token));
   const soll = st.state.applications.find(a => a.name === 'Sam de Jong');
   assert.ok(soll, 'sollicitatie staat bij de partner');
   // de werkgever mag NIET zien dat het een RTFoundation-sollicitant is: die
-  // verschijnt als een gewoon RTG-lid, met hetzelfde cv en dezelfde markering
+  // verschijnt als een gewoon RTG-lid, met hetzelfde cv en dezelfde markering,
+  // en interne velden (sessiesleutel) lekken niet
   assert.equal(soll.viaRTF, undefined, 'de foundation-herkomst is onzichtbaar voor de werkgever');
   assert.equal(soll.viaRTG, true, 'de sollicitant lijkt op een gewoon RTG-lid');
+  assert.equal(soll.key, undefined, 'interne sessiesleutel lekt niet naar de werkgever');
   assert.ok(soll.cv && soll.cv.skills.includes('samenwerken'), 'het cv reist mee');
+
+  // dubbel solliciteren op dezelfde vacature wordt geweerd
+  const dubbel = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam de Jong', contact: 'sam@v.test', skills: ['samenwerken'] } });
+  assert.equal(dubbel.status, 409, 'geen dubbele sollicitatie');
+
+  // "Mijn sollicitaties" toont de eigen sollicitatie met status
+  const mijn = await json(await api('/gezin/sollicitaties', { code: g.code, token: g.token }));
+  assert.ok(mijn.sollicitaties.some(x => x.func === 'Afwasser' && x.status === 'nieuw'), 'eigen sollicitatie met status zichtbaar');
 
   // een gesloten vacature levert geen sollicitatie meer op
   await raw('/supplier/vacature/verwijder', { id: vacId, action: 'sluit' }, login.token);
-  const dicht = await raw('/rtf/solliciteer', { supplierCode: supCode, vacatureId: vacId, leeftijd: 20, cv: { name: 'Ander', contact: 'a@v.test', skills: ['x'] } });
+  const dicht = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 20, cv: { name: 'Ander', contact: 'a@v.test', skills: ['x'] } });
   assert.equal(dicht.status, 404);
   // en de gesloten vacature staat niet meer in de RTF-lijst
   const lijst2 = await json(await raw('/rtf/vacatures', { leeftijd: 20 }));

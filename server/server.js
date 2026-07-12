@@ -2400,9 +2400,17 @@ app.post('/api/rtf/vacatures', (req, res) => {
 
 /* Een RTF-lid solliciteert met het cv uit de RTFoundation-cv-maker. Het cv is
    verplicht vanaf 16 jaar; jonger dan 16 kan niet solliciteren. Het bedrijf
-   ziet de sollicitatie in dezelfde lijst als alle andere, met de RTF-markering. */
+   ziet de sollicitatie in dezelfde lijst als alle andere, zonder RTF-markering.
+   We controleren het gezin-token (lichte beveiliging + terugkoppeling), remmen
+   spam af en weren dubbele sollicitaties. */
 app.post('/api/rtf/solliciteer', (req, res) => {
   const b = req.body || {};
+  const bucket = 'rtfsoll:' + req.ip;
+  if (tooManyTries(res, bucket)) return;
+  // gezin-token: het profiel moet kloppen en mag geen gast zijn (privezaak)
+  const sess = rtf.verifieerProfiel(b.code, b.token);
+  if (!sess) { noteFailedTry(bucket); return res.status(403).json({ error: 'Log opnieuw in bij je gezin om te solliciteren.' }); }
+  if (sess.gast) return res.status(403).json({ error: 'Als oppas of familielid solliciteer je niet namens het gezin.' });
   const lft = parseInt(b.leeftijd, 10);
   if (!Number.isFinite(lft) || lft < 16)
     return res.status(403).json({ error: 'Solliciteren kan vanaf 16 jaar. Jongere gezinsleden vinden in de app juist leer- en groeitips.' });
@@ -2412,12 +2420,15 @@ app.post('/api/rtf/solliciteer', (req, res) => {
   if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
   if (lft < vac.minLeeftijd)
     return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn.' });
+  if (rtf.alGesolliciteerd(b.code, sess.p.id, vac.id))
+    return res.status(409).json({ error: 'Je hebt al op deze vacature gesolliciteerd. Je ziet de status bij "Mijn sollicitaties".' });
   const cv = b.cv || {};
   const name = String(cv.name || '').trim().slice(0, 60);
   const contact = String(cv.contact || '').trim().slice(0, 80);
   const heeftInhoud = (Array.isArray(cv.experience) && cv.experience.length) || (Array.isArray(cv.skills) && cv.skills.length) || (cv.about || '').trim();
   if (!name || !contact || !heeftInhoud)
     return res.status(409).json({ error: 'Maak eerst je cv af in de RTF-app (naam, contact en werk of vaardigheden). Daarmee solliciteer je in een tik.', needCv: true });
+  const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     name, func: vac.func, contact,
@@ -2435,6 +2446,8 @@ app.post('/api/rtf/solliciteer', (req, res) => {
   const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
   list.unshift(entry);
   db.data.applications[s.code] = list.slice(0, 100);
+  // verwijzing bij het gezin, voor "Mijn sollicitaties" met live status
+  rtf.bewaarSollicitatie(b.code, sess.p.id, { appId: entry.id, supplierCode: s.code, vacatureId: vac.id, func: vac.func, bedrijf: s.name, land: landCode, landNaam: LANDEN[landCode].naam });
   save();
   // De melding aan het bedrijf is identiek aan die van een gewoon RTG-lid: de
   // foundation-herkomst blijft onzichtbaar voor de werkgever.
@@ -2451,9 +2464,12 @@ app.post('/api/rtf/solliciteer', (req, res) => {
    wij alleen intern bij (het veld viaRTF blijft in onze eigen administratie).
    Zo maakt het voor de kans op werk geen enkel verschil waar iemand vandaan komt. */
 function werkgeverSollicitatie(a) {
-  if (!a || !a.viaRTF) return a;
-  const { viaRTF, ...rest } = a;
-  return { ...rest, viaRTG: true };
+  if (!a) return a;
+  // interne velden verlaten nooit onze administratie richting de werkgever:
+  // de RTFoundation-herkomst, de sessiesleutel en de gezinsverwijzing
+  const { viaRTF, key, rtf, ...rest } = a;
+  if (viaRTF) rest.viaRTG = true; // RTF-sollicitant lijkt op een gewoon RTG-lid
+  return rest;
 }
 
 // Solliciteerde een RTG-lid, dan hoort het lid direct van het besluit:
@@ -3183,25 +3199,54 @@ app.post('/api/cv/save', auth, (req, res) => {
   res.json({ ok: true, cv, ready: cvReady(cv) });
 });
 
-// RTG-lid solliciteert bij een partner; kan pas met een afgerond cv
+// De openstaande vacatures voor een ingelogd lid: dezelfde vacatures als in de
+// RTFoundation, gefilterd op de paspoortleeftijd van het lid, met de landenlijst
+// om ook in het buitenland te zoeken.
+app.post('/api/member/vacatures', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const lft = leeftijdVan(geborenVan(req.session));
+  const land = typeof req.body.land === 'string' && LANDEN[req.body.land] ? req.body.land : null;
+  const alle = openVacatures(lft);
+  const landen = [];
+  for (const v of alle) if (!landen.some(l => l.code === v.land)) landen.push({ code: v.land, naam: v.landNaam });
+  landen.sort((a, b) => a.naam.localeCompare(b.naam));
+  const zichtbaar = land ? alle.filter(v => v.land === land) : alle;
+  res.json({ vacatures: zichtbaar.slice(0, 100), landen, leeftijd: lft, magSolliciteren: lft == null || lft >= 16 });
+});
+
+// RTG-lid solliciteert bij een partner; kan pas met een afgerond cv. Solliciteren
+// op een gestructureerde vacature (vacatureId) is de nieuwe, gelijke weg; het
+// oude vrije functieveld blijft werken voor open sollicitaties.
 app.post('/api/member/apply', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const s = findSupplier(req.body.supplierCode);
   if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
   const cv = db.data.cvs[req.session.key];
   if (!cvReady(cv)) return res.status(409).json({ error: 'Maak eerst uw cv af in de cv-builder; daarmee solliciteert u bij elke RTG-partner in een tik.', needCv: true });
-  const func = String(req.body.func || '').trim().slice(0, 40);
-  if (!func) return res.status(400).json({ error: 'Kies een functie.' });
+  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+  let func, vacatureId = null;
+  if (req.body.vacatureId) {
+    const vac = (db.data.vacatures[s.code] || []).find(v => v.id === req.body.vacatureId && v.open);
+    if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
+    const lft = leeftijdVan(geborenVan(req.session));
+    if (lft != null && lft < vac.minLeeftijd)
+      return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn.' });
+    if (list.some(a => a.key === req.session.key && a.vacatureId === vac.id))
+      return res.status(409).json({ error: 'U hebt al op deze vacature gesolliciteerd. De status ziet u bij uw sollicitaties.' });
+    func = vac.func; vacatureId = vac.id;
+  } else {
+    func = String(req.body.func || '').trim().slice(0, 40);
+    if (!func) return res.status(400).json({ error: 'Kies een functie.' });
+  }
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     name: cv.name, func, contact: cv.contact,
     note: String(req.body.note || '').trim().slice(0, 400),
-    viaRTG: true, codename, key: req.session.key,
+    viaRTG: true, codename, key: req.session.key, vacatureId,
     cv: { headline: cv.headline, experience: cv.experience, skills: cv.skills, languages: cv.languages, about: cv.about },
     status: 'nieuw', at: new Date().toISOString()
   };
-  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
   list.unshift(entry);
   db.data.applications[s.code] = list.slice(0, 100);
   save();

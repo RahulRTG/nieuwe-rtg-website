@@ -1,0 +1,32 @@
+/* RTFoundation-lesapp, service worker: maakt de app installeerbaar en laat hem
+   offline openen. Pagina's en scripts zijn network-first (een update komt direct
+   door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
+   gaan altijd naar het netwerk. */
+const CACHE = 'rtf-leren-v1';
+const SHELL = [
+  '/apps/foundation/', '/apps/foundation/index.html',
+  '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
+  '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css',
+  '/manifests/foundation.webmanifest', '/icons/foundation.svg'
+];
+
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {}));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.pathname.startsWith('/api/')) return; // API + SSE altijd live
+  e.respondWith(
+    fetch(e.request).then(res => {
+      if (res && res.ok && url.origin === location.origin) {
+        const kopie = res.clone(); caches.open(CACHE).then(c => c.put(e.request, kopie));
+      }
+      return res;
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/apps/foundation/')))
+  );
+});

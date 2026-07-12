@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Bord</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
 <style>
   body{height:100vh;overflow:hidden;}
@@ -176,6 +180,7 @@ async function bekijkSchrift(sid, naam){
 KlasLive.verbind(CODE, 'docent', TOKEN, { presentie: d => toonLeerlingen(d.leerlingen||[]), inzending: () => opgavenOphalen() });
 opgavenOphalen();
 get('/les/'+CODE).then(d=> toonAgenda((d.les&&d.les.agenda)||[])).catch(()=>{});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>

@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Leren</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
 <style>
   .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;gap:1.4rem;}
@@ -92,6 +96,7 @@ $('#lJoin').addEventListener('click', async ()=>{
   }catch(e){ $('#lFout').textContent = e.message; }
 });
 $('#lCode').addEventListener('input', e=> e.target.value = e.target.value.toUpperCase());
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>

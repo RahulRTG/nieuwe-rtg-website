@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Schrift</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
 <style>
   body{height:100vh;overflow:hidden;display:flex;flex-direction:column;}
@@ -198,6 +202,7 @@ KlasLive.verbind(CODE,'leerling',TOKEN,{
   agenda: d => toonAgenda(d.agenda||[])
 });
 $('#liveDot').classList.add('aan'); $('#liveTxt').textContent='live';
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 window.addEventListener('beforeunload', ()=>{ try{ vangHuidigeTekening(); navigator.sendBeacon && navigator.sendBeacon('/api/foundation/schrift/opslaan', new Blob([JSON.stringify({code:CODE,token:TOKEN,pages})],{type:'application/json'})); }catch(e){} });
 </script>
 </body>

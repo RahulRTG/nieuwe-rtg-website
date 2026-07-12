@@ -1,6 +1,6 @@
-/* Integratietest: de functieschakelaars op de technische pagina schakelen echt
-   gedrag. De eigenaar zet een functie uit -> de bijbehorende API geeft 503; weer
-   aan -> de API werkt weer. Draait tegen een echte server in een tijdelijke map.
+/* Integratietest: functieschakelaars met bevestiging. Een schakelactie maakt
+   een AANVRAAG; er verandert pas iets nadat de eigenaar (Rahul) accepteert.
+   Weigeren laat alles zoals het was. Draait tegen een echte server.
    Draai los: node --experimental-sqlite --test test/techniek-functies.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -19,6 +19,14 @@ function post(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
   return fetch(BASE + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) });
+}
+// hulp: dien een aanvraag in en laat de eigenaar hem meteen accepteren
+async function schakelMetAkkoord(body) {
+  const vz = await (await post('/api/techniek/functie', body, techToken)).json();
+  assert.equal(vz.status, 'wacht', 'de schakelactie wordt eerst een aanvraag');
+  const b = await (await post('/api/techniek/functie/besluit', { verzoekId: vz.verzoekId }, techToken)).json();
+  assert.equal(b.status, 'akkoord');
+  return b;
 }
 
 test.before(async () => {
@@ -40,41 +48,64 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('functie uit -> 503 op de bewaakte API; weer aan -> werkt', async () => {
+test('schakelen maakt een aanvraag; pas na accepteren gaat de functie echt om', async () => {
   // een school aanmelden lukt normaal
   assert.equal((await post('/api/foundation/school/school/maak', { naam: 'Testschool', plaats: 'Utrecht' })).status, 200);
 
-  // de eigenaar zet RTF School uit
-  const uit = await (await post('/api/techniek/functie', { id: 'foundation-school', aan: false }, techToken)).json();
-  assert.ok(uit.ok);
-  assert.equal(uit.functies.flatMap(g => g.functies).find(f => f.id === 'foundation-school').aan, false);
+  // de aanvraag "RTF School uit" verandert nog NIETS
+  const vz = await (await post('/api/techniek/functie', { id: 'foundation-school', aan: false }, techToken)).json();
+  assert.equal(vz.status, 'wacht');
+  assert.ok(vz.verzoekId);
+  assert.equal((await post('/api/foundation/school/school/maak', { naam: 'Nog gewoon open' })).status, 200,
+    'zolang de eigenaar niet accepteert blijft de functie aan');
 
-  // nu geeft het schoolkanaal 503, met de functienaam erbij
-  const r = await post('/api/foundation/school/school/maak', { naam: 'Nog een school' });
+  // de aanvraag staat op het bord (status-endpoint)
+  const st = await (await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })).json();
+  assert.ok(st.verzoeken.some(v => v.vid === vz.verzoekId && v.status === 'wacht'));
+
+  // de eigenaar accepteert -> nu geeft het schoolkanaal 503
+  const b = await (await post('/api/techniek/functie/besluit', { verzoekId: vz.verzoekId }, techToken)).json();
+  assert.equal(b.status, 'akkoord');
+  const r = await post('/api/foundation/school/school/maak', { naam: 'Nu dicht' });
   assert.equal(r.status, 503);
-  const j = await r.json();
-  assert.equal(j.functie, 'foundation-school');
+  assert.equal((await r.json()).functie, 'foundation-school');
 
-  // de rest van de onderwijs-app blijft gewoon werken (ander pad, niet dezelfde functie)
+  // dezelfde aanvraag kan geen tweede keer behandeld worden
+  assert.equal((await post('/api/techniek/functie/besluit', { verzoekId: vz.verzoekId }, techToken)).status, 409);
+
+  // de rest van de onderwijs-app bleef gewoon werken
   assert.notEqual((await post('/api/foundation/gezin/maak', { gezinsnaam: 'Fam', naam: 'Ouder', pin: '1234' })).status, 503);
 
-  // de eigenaar zet hem weer aan -> werkt weer
-  await post('/api/techniek/functie', { id: 'foundation-school', aan: true }, techToken);
-  assert.equal((await post('/api/foundation/school/school/maak', { naam: 'Derde school' })).status, 200);
+  // weer aan (aanvraag + akkoord) -> werkt weer
+  await schakelMetAkkoord({ id: 'foundation-school', aan: true });
+  assert.equal((await post('/api/foundation/school/school/maak', { naam: 'Weer open' })).status, 200);
 });
 
-test('alleen de eigenaar mag schakelen; techniek zelf blijft altijd bereikbaar', async () => {
-  // zonder token: geen toegang tot de schakelaar
-  assert.equal((await post('/api/techniek/functie', { id: 'betalen', aan: false })).status, 401);
+test('weigeren laat alles zoals het was; dubbel schakelen is "ongewijzigd"', async () => {
+  const vz = await (await post('/api/techniek/functie', { id: 'betalen', aan: false }, techToken)).json();
+  assert.equal(vz.status, 'wacht');
+  const b = await (await post('/api/techniek/functie/besluit', { verzoekId: vz.verzoekId, akkoord: false }, techToken)).json();
+  assert.equal(b.status, 'geweigerd');
+  // betalen staat nog gewoon aan (geen 503 door de functieschakelaar)
+  assert.notEqual((await post('/api/betaal/checkout', {})).status, 503);
+  // iets aanzetten dat al aan staat: geen aanvraag nodig
+  const nop = await (await post('/api/techniek/functie', { id: 'betalen', aan: true }, techToken)).json();
+  assert.equal(nop.status, 'ongewijzigd');
+});
 
-  // zet het hele platform uit via "alles"
-  await post('/api/techniek/functie', { alles: true, aan: false }, techToken);
-  // een gewone API is nu dicht ...
+test('alleen de eigenaar besluit; techniek blijft altijd bereikbaar', async () => {
+  // zonder token: geen aanvraag kunnen doen
+  assert.equal((await post('/api/techniek/functie', { id: 'betalen', aan: false })).status, 401);
+  // zonder token: zeker geen besluit
+  assert.equal((await post('/api/techniek/functie/besluit', { verzoekId: 'x' })).status, 401);
+
+  // hele platform uit via aanvraag + akkoord
+  await schakelMetAkkoord({ alles: true, aan: false });
   assert.equal((await post('/api/foundation/gezin/maak', { gezinsnaam: 'X', naam: 'Y', pin: '1234' })).status, 503);
-  // ... maar de technische pagina blijft bereikbaar, zodat je alles weer aan kunt zetten
+  // maar de technische pagina blijft bereikbaar om alles weer aan te zetten
   assert.equal((await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })).status, 200);
   // alles weer aan
-  const weer = await (await post('/api/techniek/functie', { alles: true, aan: true }, techToken)).json();
+  const weer = await schakelMetAkkoord({ alles: true, aan: true });
   assert.ok(weer.functies.flatMap(g => g.functies).every(f => f.aan));
   assert.notEqual((await post('/api/foundation/gezin/maak', { gezinsnaam: 'Z', naam: 'W', pin: '1234' })).status, 503);
 });

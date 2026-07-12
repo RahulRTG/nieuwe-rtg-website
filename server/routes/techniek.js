@@ -10,7 +10,7 @@ const functies = require('../functies');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
-  const { app, accounts, anthropic, betaal, db, save, sessions, DATA_DIR, fs, path } = kern;
+  const { app, accounts, anthropic, betaal, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path } = kern;
   const OWNER_EMAIL = process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example';
 
   function staat() {
@@ -75,11 +75,15 @@ module.exports = (kern) => {
     const t = staat();
     const zeker = Object.keys(t.zekeringen).map(id => ({ id, ...t.zekeringen[id] }));
     const cat = functies.catalogus(t.functies);
+    const verzoeken = t.functieVerzoeken || [];
     const uit = {
       eigenaar: isEigenaar(req.techUser), naam: accounts.realNameOf(req.techUser),
       checks, zekeringen: zeker,
       functies: cat,
       functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),
+      // open aanvragen bovenaan, daarna de laatst behandelde (audit-spoor)
+      verzoeken: verzoeken.filter(v => v.status === 'wacht')
+        .concat(verzoeken.filter(v => v.status !== 'wacht').slice(-8).reverse()),
       samenvatting: {
         ok: checks.filter(c => c.status === 'ok').length,
         waarschuwing: checks.filter(c => c.status === 'waarschuwing').length,
@@ -104,23 +108,68 @@ module.exports = (kern) => {
     res.json({ ok: true, id: req.body.id, aan: z.aan });
   });
 
-  /* Functieschakelaars aan/uit zetten (alleen de eigenaar). Drie vormen:
+  /* Functieschakelaars: NIETS gaat direct om. Elke aan/uit-wijziging wordt een
+     AANVRAAG die de eigenaar (Rahul) eerst moet accepteren of weigeren; hij
+     krijgt er een melding van in zijn account (push + e-mail). Drie vormen:
      - één functie:      { id, aan }
      - hele categorie:   { categorie, aan }
      - alles:            { alles: true, aan }
-     Zo kun je het systeem functie voor functie openzetten, of in één klik een
-     hele categorie (of alles) aan/uit. */
-  app.post('/api/techniek/functie', techAuth, eigenaarAlleen, (req, res) => {
+     Iedereen met toegang tot deze pagina mag een aanvraag doen; alleen de
+     eigenaar besluit. Ook de eigenaar zelf bevestigt zijn eigen aanvraag, zodat
+     er nooit iets per ongeluk in één klik omgaat. */
+  app.post('/api/techniek/functie', techAuth, (req, res) => {
     const t = staat();
     const aan = req.body.aan !== false && req.body.aan !== 'false';
-    let doelwit = [];
-    if (req.body.alles) doelwit = functies.FUNCTIES;
-    else if (req.body.categorie) doelwit = functies.FUNCTIES.filter(f => f.categorie === req.body.categorie);
-    else if (req.body.id) { const f = functies.OP_ID[req.body.id]; if (!f) return res.status(404).json({ error: 'Onbekende functie.' }); doelwit = [f]; }
-    else return res.status(400).json({ error: 'Geef id, categorie of alles op.' });
-    for (const f of doelwit) t.functies[f.id] = { aan };
+    let doelwit, label;
+    if (req.body.alles) { doelwit = functies.FUNCTIES; label = 'Hele platform ' + (aan ? 'AAN' : 'UIT'); }
+    else if (req.body.categorie) {
+      doelwit = functies.FUNCTIES.filter(f => f.categorie === req.body.categorie);
+      if (!doelwit.length) return res.status(404).json({ error: 'Onbekende categorie.' });
+      label = req.body.categorie + ': alles ' + (aan ? 'AAN' : 'UIT');
+    } else if (req.body.id) {
+      const f = functies.OP_ID[req.body.id];
+      if (!f) return res.status(404).json({ error: 'Onbekende functie.' });
+      doelwit = [f]; label = f.naam + ' ' + (aan ? 'AAN' : 'UIT');
+    } else return res.status(400).json({ error: 'Geef id, categorie of alles op.' });
+    // alleen wat er echt zou veranderen komt in de aanvraag
+    const wijzigingen = doelwit.filter(f => functies.functieAan(f.id, t.functies) !== aan).map(f => ({ id: f.id, aan }));
+    if (!wijzigingen.length) return res.json({ ok: true, status: 'ongewijzigd', functies: functies.catalogus(t.functies) });
+    if (!Array.isArray(t.functieVerzoeken)) t.functieVerzoeken = [];
+    const vz = {
+      vid: crypto.randomBytes(6).toString('hex'), label, wijzigingen,
+      doorId: req.techUser.id, doorNaam: accounts.realNameOf(req.techUser),
+      at: new Date().toISOString(), status: 'wacht'
+    };
+    t.functieVerzoeken.push(vz);
+    t.functieVerzoeken = t.functieVerzoeken.slice(-100); // audit-staart begrensd
     save();
-    res.json({ ok: true, aangepast: doelwit.length, functies: functies.catalogus(t.functies) });
+    // melding naar de eigenaar: bevestigen of weigeren
+    const o = eigenaarUser();
+    if (o) {
+      try { sendPushToUser(o.id, { icon: '🔔', title: 'Bevestiging nodig: functieschakelaar', body: vz.label + ' (aangevraagd door ' + vz.doorNaam + '). Open de technische pagina om te accepteren of te weigeren.' }); } catch (e) {}
+      try { mail.send(accounts.emailOf(o), 'Bevestiging nodig: ' + vz.label,
+        'Beste ' + accounts.realNameOf(o) + ',\n\nEr staat een wijziging van de functieschakelaars klaar:\n\n  ' + vz.label +
+        ' (' + vz.wijzigingen.length + ' functie(s))\n  Aangevraagd door: ' + vz.doorNaam + '\n\n' +
+        'Niets is nog veranderd. Open de technische pagina en accepteer of weiger de aanvraag.\n\nRahul Travel Group'); } catch (e) {}
+    }
+    res.json({ ok: true, status: 'wacht', verzoekId: vz.vid, label: vz.label, aantal: vz.wijzigingen.length });
+  });
+
+  // Het besluit van de eigenaar: accepteren (dan gaat de wijziging pas echt om)
+  // of weigeren (er verandert niets).
+  app.post('/api/techniek/functie/besluit', techAuth, eigenaarAlleen, (req, res) => {
+    const t = staat();
+    const vz = (t.functieVerzoeken || []).find(v => v.vid === String(req.body.verzoekId || ''));
+    if (!vz) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
+    if (vz.status !== 'wacht') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
+    if (req.body.akkoord === false) vz.status = 'geweigerd';
+    else {
+      for (const w of vz.wijzigingen) t.functies[w.id] = { aan: w.aan };
+      vz.status = 'akkoord';
+    }
+    vz.besluitAt = new Date().toISOString();
+    save();
+    res.json({ ok: true, status: vz.status, functies: functies.catalogus(t.functies) });
   });
 
   // Iemand handmatig toegang geven of intrekken (alleen de eigenaar).

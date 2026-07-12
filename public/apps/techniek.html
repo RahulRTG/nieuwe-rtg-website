@@ -118,11 +118,15 @@
     </div>
 
     <div id="tabFuncties" role="tabpanel" aria-labelledby="tabBtnFuncties" hidden>
+      <div id="verzoekBlok" hidden>
+        <div class="sec">Wachtend op bevestiging van de eigenaar</div>
+        <div class="kaart" id="verzoeken" style="margin-bottom:1rem;"></div>
+      </div>
       <div class="kaart" style="margin-bottom:1rem;">
         <div class="fn" style="border-top:none;">
           <div class="mid">
             <div class="naam">Alle functies in één keer</div>
-            <div class="muted">Zet het hele systeem in één klik aan of uit, of gebruik hieronder de knoppen per functie om alles rustig een voor een open te zetten.</div>
+            <div class="muted">Elke wijziging wordt eerst een aanvraag: de eigenaar krijgt een melding en moet accepteren of weigeren voordat er iets omgaat.</div>
           </div>
           <div style="display:flex;gap:.4rem;flex-shrink:0;">
             <button class="knop grijs klein" id="bAllesAan">Alles aan</button>
@@ -235,25 +239,56 @@
   $('#tabBtnStatus').addEventListener('click', function(){ toonTab('status'); });
   $('#tabBtnFuncties').addEventListener('click', function(){ toonTab('functies'); });
 
-  /* ---------- functieschakelaars ---------- */
-  function zetFunctie(body, melding){
+  /* ---------- functieschakelaars: alles loopt via een aanvraag ---------- */
+  var wachtendeIds = {}; // functie-id -> true als er een open aanvraag op zit
+  function zetFunctie(body){
     api('/api/techniek/functie', { method:'POST', body:body })
-      .then(function(){ toast(melding); laad(); })
+      .then(function(d){
+        if (d.status === 'ongewijzigd') toast('Niets te wijzigen: dit staat al zo.');
+        else toast('Aanvraag aangemaakt. De eigenaar moet dit eerst accepteren.');
+        laad();
+      })
       .catch(function(e){ toast(e.message); });
   }
   function functieRij(f){
+    var wacht = !!wachtendeIds[f.id];
     var schakel = el('button',{class:'schakel '+(f.aan?'aan':'uit'),
-      'aria-label':(f.aan?'Zet uit: ':'Zet aan: ')+f.naam,
-      onclick:function(){ zetFunctie({ id:f.id, aan:!f.aan }, f.naam+(f.aan?' uit.':' aan.')); }},
+      'aria-label':(f.aan?'Vraag uitzetten aan: ':'Vraag aanzetten aan: ')+f.naam,
+      disabled: wacht || null,
+      onclick:function(){ zetFunctie({ id:f.id, aan:!f.aan }); }},
       f.aan?'AAN':'UIT');
     return el('div',{class:'fn'},
       el('div',{class:'mid'},
-        el('div',{class:'naam'}, f.naam),
+        el('div',{class:'naam'}, f.naam, wacht ? el('span',{class:'code'}, 'aanvraag wacht') : null),
         el('div',{class:'muted'}, f.uitleg||'')),
       schakel);
   }
+  function verzoekRij(v){
+    var wanneer = new Date(v.at).toLocaleString('nl-NL');
+    var mid = el('div',{class:'mid'},
+      el('div',{class:'naam'}, v.label, el('span',{class:'code'}, v.wijzigingen.length+' functie(s)')),
+      el('div',{class:'muted'}, 'aangevraagd door '+v.doorNaam+' op '+wanneer));
+    if (v.status !== 'wacht'){
+      return el('div',{class:'zeker'},
+        el('span',{class:'badge '+(v.status==='akkoord'?'aan':'uit')}, v.status==='akkoord'?'GEACCEPTEERD':'GEWEIGERD'), mid);
+    }
+    var acties;
+    if (eigenaar){
+      acties = el('div',{style:{display:'flex',gap:'.4rem',flexShrink:0}},
+        el('button',{class:'knop klein', onclick:function(){ besluit(v.vid, true); }}, 'Accepteren'),
+        el('button',{class:'knop rood klein', onclick:function(){ besluit(v.vid, false); }}, 'Weigeren'));
+    } else {
+      acties = el('span',{class:'badge uit'}, 'WACHT OP EIGENAAR');
+    }
+    return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'WACHT'), mid, acties);
+  }
+  function besluit(vid, akkoord){
+    api('/api/techniek/functie/besluit', { method:'POST', body:{ verzoekId:vid, akkoord:akkoord } })
+      .then(function(d){ toast(d.status==='akkoord'?'Geaccepteerd en doorgevoerd.':'Geweigerd; er is niets veranderd.'); laad(); })
+      .catch(function(e){ toast(e.message); });
+  }
   function categorieBlok(g){
-    var aanAlle = function(aan){ return function(){ zetFunctie({ categorie:g.categorie, aan:aan }, g.categorie+(aan?' volledig aan.':' volledig uit.')); }; };
+    var aanAlle = function(aan){ return function(){ zetFunctie({ categorie:g.categorie, aan:aan }); }; };
     return el('div', null,
       el('div',{class:'catkop'},
         el('h2', null, g.categorie),
@@ -262,10 +297,10 @@
           el('button',{class:'knop grijs klein', onclick:aanAlle(false)}, 'Alles uit'))),
       el('div',{class:'kaart'}, g.functies.map(functieRij)));
   }
-  $('#bAllesAan').addEventListener('click', function(){ zetFunctie({ alles:true, aan:true }, 'Alle functies aan.'); });
+  $('#bAllesAan').addEventListener('click', function(){ zetFunctie({ alles:true, aan:true }); });
   $('#bAllesUit').addEventListener('click', function(){
-    if (!confirm('Weet je het zeker? Dit zet ALLE functionaliteiten van het hele platform uit. De technische pagina blijft bereikbaar zodat je ze weer aan kunt zetten.')) return;
-    zetFunctie({ alles:true, aan:false }, 'Alle functies uit.');
+    if (!confirm('Weet je het zeker? Dit maakt een aanvraag om ALLE functionaliteiten uit te zetten. Er verandert pas iets nadat de eigenaar de aanvraag accepteert.')) return;
+    zetFunctie({ alles:true, aan:false });
   });
 
   function laad(){
@@ -281,12 +316,19 @@
       if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));
       $('#toegangBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#toegangLijst'), (d.toegang&&d.toegang.length)? d.toegang.map(toegangRij) : el('div',{class:'muted'},'Nog niemand extra toegelaten.'));
-      // functies-tab alleen voor de eigenaar
-      $('#tabBtnFuncties').hidden = !d.eigenaar;
-      var uitLabel = d.functiesUit ? ('Functies aan/uit · '+d.functiesUit+' uit') : 'Functies aan/uit';
+      // functies-tab: iedereen met toegang kan aanvragen; alleen de eigenaar besluit
+      $('#tabBtnFuncties').hidden = false;
+      var verzoeken = d.verzoeken || [];
+      var open = verzoeken.filter(function(v){ return v.status==='wacht'; });
+      wachtendeIds = {};
+      open.forEach(function(v){ (v.wijzigingen||[]).forEach(function(w){ wachtendeIds[w.id]=true; }); });
+      var uitLabel = 'Functies aan/uit';
+      if (open.length) uitLabel += ' · '+open.length+' wacht';
+      else if (d.functiesUit) uitLabel += ' · '+d.functiesUit+' uit';
       $('#tabBtnFuncties').textContent = uitLabel;
-      if (d.eigenaar && d.functies) vervang($('#functies'), d.functies.map(categorieBlok));
-      if (!d.eigenaar) toonTab('status');
+      $('#verzoekBlok').hidden = !verzoeken.length;
+      if (verzoeken.length) vervang($('#verzoeken'), verzoeken.map(verzoekRij));
+      if (d.functies) vervang($('#functies'), d.functies.map(categorieBlok));
     }).catch(function(e){
       if (/401|403|Log in|toegang/i.test(e.message)){ token=null; sessionStorage.removeItem('techToken'); toonLogin(); }
       else toast(e.message);

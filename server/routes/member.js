@@ -1,0 +1,1025 @@
+/* Domein "member" (aparte module op de gedeelde kern). Alleen de routes;
+   de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
+module.exports = (kern) => {
+  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, findSupplier, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept } = kern;
+
+app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
+
+app.post('/api/rtf/profielen', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const info = rtf.gastProfielen(req.body.code);
+  if (!info) return res.status(404).json({ error: 'Dit gezin kennen we niet. Klopt de gezinscode?' });
+  if (!info.profielen.length) return res.status(404).json({ error: 'Dit gezin heeft nog geen oppas- of familieprofiel om te koppelen. Vraag de ouder er een aan te maken.' });
+  res.json(info);
+});
+
+app.post('/api/rtf/koppel', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const u = req.session.account;
+  const r = rtf.linkGast({ code: req.body.code, profielId: req.body.profielId, userId: u.id, tier: u.tier, codenaam: u.codename });
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json({ ok: true, gezinNaam: r.gezinNaam, profielNaam: r.profielNaam, tierNaam: r.tierNaam });
+});
+
+app.post('/api/rtf/ontkoppel', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  rtf.unlinkGast({ userId: req.session.account.id, code: req.body.code, profielId: req.body.profielId });
+  res.json({ ok: true });
+});
+
+app.post('/api/rtf/meldingen/gelezen', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const md = accounts.getMemberState(req.session.account.id) || {};
+  (md.foundationMeldingen || []).forEach(m => { m.gelezen = true; });
+  accounts.saveMemberState(req.session.account.id, md);
+  res.json({ ok: true });
+});
+
+app.post('/api/rtf/overzicht', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  res.json({ gezinnen: rtf.gastOverzicht(req.session.account.id) });
+});
+
+app.post('/api/rtf/kanaal', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const info = rtf.kanaalInfo(req.session.account.id, req.body.code);
+  if (!info) return res.status(403).json({ error: 'Je bent niet aan dit gezin gekoppeld.' });
+  res.json(info);
+});
+
+app.post('/api/rtf/bericht', auth, (req, res) => {
+  if (!eisAccount(req, res)) return;
+  const r = rtf.berichtVanGast({ userId: req.session.account.id, code: req.body.code, tekst: req.body.tekst });
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json({ ok: true });
+});
+
+app.post('/api/pay', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  // Echte accounts betalen hun eigen facturen; demo-sessies de gedeelde demo.
+  const own = !!req.session.account;
+  const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;
+  const invoices = md.invoices || [];
+  let targets;
+  if (req.body.all) {
+    targets = invoices.filter(i => i.status === 'open');
+    if (!targets.length) return res.status(409).json({ error: 'Er staat niets open.' });
+  } else {
+    const inv = invoices.find(i => i.id === req.body.invoiceId);
+    if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
+    if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
+    targets = [inv];
+  }
+  let foundation = 0;
+  for (const inv of targets) {
+    inv.status = 'paid';
+    inv.date = 'Zojuist betaald';
+    foundation += Math.round(inv.bijdrage * 0.3);
+    for (const item of (md.trip ? md.trip.items : [])) {
+      if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
+    }
+  }
+  if (own) accounts.saveMemberState(req.session.account.id, md);
+  else save();
+  // ander open scherm van hetzelfde lid meteen bijwerken
+  broadcastSync([req.session.tier], 'payments');
+  res.json({ ok: true, foundation, state: stateFor(req.session, req.body.lang) });
+});
+
+app.post('/api/like', auth, (req, res) => {
+  const post = db.data.posts.find(p => p.id === Number(req.body.postId));
+  if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
+  // Gratis gebruikers (zonder pas) bekijken de Salon, maar liken en reageren niet
+  // bij particulieren. Berichten van partners mogen ze wel waarderen.
+  if (req.session.tier === 'guest' && !post.partner)
+    return res.status(403).json({ error: 'Zonder pas bekijk je de Salon, maar liken en reageren bij leden is voor leden. Solliciteren en betalen bij partners kan wel.' });
+  if (req.body.liked) post.likedBy[req.session.key] = true;
+  else delete post.likedBy[req.session.key];
+  save();
+  const likes = post.baseLikes + Object.keys(post.likedBy).length;
+  // alle open Salon-schermen de nieuwe like-telling laten zien
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  // de eigenaar van de post een notificatie geven (niet bij eigen like)
+  const ownerTier = AUTHOR_TIER[post.author];
+  if (req.body.liked && ownerTier && ownerTier !== req.session.tier) {
+    notify(ownerTier, { icon: '♥', title: 'Nieuwe like', body: PERSONAS[req.session.tier].full + ' vindt uw post over ' + post.place + ' mooi.', scope: 'salon' });
+  }
+  res.json({ ok: true, likes });
+});
+
+app.post('/api/comment', auth, (req, res) => {
+  const post = db.data.posts.find(p => p.id === Number(req.body.postId));
+  if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
+  if (!canEngage(req.session, post)) {
+    return res.status(403).json({ error: engageError(req.session.tier) });
+  }
+  const text = String(req.body.text || '').trim().slice(0, 500);
+  if (!text) return res.status(400).json({ error: 'Lege reactie.' });
+  // Echte leden verschijnen in De Salon onder hun codenaam, nooit hun echte naam.
+  const who = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
+  const clang = req.body.lang === 'en' ? 'en' : 'nl';
+  const comment = { who, tier: req.session.tier, text, lang: clang };
+  post.comments.push(comment);
+  registerContact(req.session, post);
+  save();
+  // alle Salon-schermen tonen de nieuwe reactie live
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  // de eigenaar van de post krijgt een notificatie (niet bij eigen reactie)
+  const ownerTier = AUTHOR_TIER[post.author];
+  if (ownerTier && ownerTier !== req.session.tier) {
+    notify(ownerTier, { icon: '💬', title: 'Nieuwe reactie', body: who + ': “' + text.slice(0, 80) + '”', scope: 'salon' });
+  }
+  res.json({ ok: true, comment });
+});
+
+app.post('/api/dm', auth, (req, res) => {
+  const post = db.data.posts.find(p => p.id === Number(req.body.postId));
+  if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
+  if (!canEngage(req.session, post)) {
+    return res.status(403).json({ error: engageError(req.session.tier) });
+  }
+  const text = String(req.body.text || '').trim().slice(0, 1000);
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  registerContact(req.session, post);
+  const fromName = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
+  db.data.dms.push({
+    from: fromName,
+    fromTier: req.session.tier,
+    to: post.author,
+    text,
+    lang: req.body.lang === 'en' ? 'en' : 'nl',
+    at: new Date().toISOString()
+  });
+  save();
+  // de ontvanger krijgt een notificatie/push van het privébericht
+  const ownerTier = AUTHOR_TIER[post.author];
+  if (ownerTier && ownerTier !== req.session.tier) {
+    notify(ownerTier, { icon: '✉', title: 'Nieuw bericht in De Salon', body: fromName + ' stuurde u een bericht.', scope: 'salon' });
+  }
+  res.json({ ok: true });
+});
+
+app.post('/api/partnertrips', (req, res) => {
+  let staffRate = null;
+  if (req.body.staffCode) {
+    const p = findStaffPartner(req.body.staffCode);
+    if (p) staffRate = p.staff.serviceRate;
+  }
+  res.json({ trips: db.data.partnerTrips.map(t => publicTrip(t, staffRate, req.body.lang)) });
+});
+
+app.post('/api/book', (req, res) => {
+  const trip = db.data.partnerTrips.find(t => t.id === req.body.tripId);
+  if (!trip) return res.status(404).json({ error: 'Reis niet gevonden.' });
+
+  let partner = null;
+  let rate = db.data.partnerService;
+  let channel = 'klant';
+  if (req.body.staffCode) {
+    partner = findStaffPartner(req.body.staffCode);
+    if (!partner) return res.status(404).json({ error: 'Deze personeelscode kennen we niet.' });
+    rate = partner.staff.serviceRate;
+    channel = 'personeel';
+  } else if (req.body.code) {
+    partner = findPartner(req.body.code);
+    if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });
+  }
+
+  const name = String(req.body.name || '').trim().slice(0, 120);
+  const email = String(req.body.email || '').trim().slice(0, 200);
+  if (!name || !email.includes('@')) return res.status(400).json({ error: 'Vul een naam en geldig e-mailadres in.' });
+
+  // Interne administratie: verdeling wordt opgeslagen, nooit meegestuurd.
+  const service = Math.round(trip.netto * rate);
+  const total = trip.netto + service;
+  const partnerCut = partner ? Math.round(service * partner.share) : 0;
+  const ref = 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+  db.data.bookings.push({
+    ref, tripId: trip.id, channel, name, email,
+    partnerCode: partner ? partner.code : null,
+    netto: trip.netto, service, total, partnerCut, rtgCut: service - partnerCut,
+    at: new Date().toISOString()
+  });
+  save();
+  res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total });
+});
+
+app.post('/api/salon/volg', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.code);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  s.salon = s.salon || { bio: '', volgers: [], sinds: new Date().toISOString() };
+  const i = s.salon.volgers.indexOf(req.session.key);
+  if (i >= 0) s.salon.volgers.splice(i, 1);
+  else s.salon.volgers.push(req.session.key);
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true, volgIk: i < 0, volgers: s.salon.volgers.length });
+});
+
+app.post('/api/salon/deal/claim', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const p = db.data.posts.find(x => x.id === Number(req.body.postId));
+  if (!p || !p.deal) return res.status(404).json({ error: 'Aanbieding niet gevonden.' });
+  if (p.deal.geldigTot && p.deal.geldigTot < new Date().toISOString().slice(0, 10))
+    return res.status(410).json({ error: 'Deze aanbieding is verlopen.' });
+  const al = p.deal.claims.find(c => c.key === req.session.key);
+  if (al) return res.json({ ok: true, code: al.code, alGeclaimd: true });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const claim = { key: req.session.key, codename, code: 'RTG-D-' + crypto.randomBytes(3).toString('hex').toUpperCase(), at: new Date().toISOString(), used: false };
+  p.deal.claims.push(claim);
+  save();
+  notifySupplier(p.partnerCode, { icon: '🎁', title: 'Aanbieding geclaimd', body: codename + ' claimde "' + p.deal.titel + '" (' + p.deal.claims.length + 'x totaal).' });
+  res.json({ ok: true, code: claim.code });
+});
+
+app.post('/api/salon/poll/stem', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const p = db.data.posts.find(x => x.id === Number(req.body.postId));
+  if (!p || !p.poll) return res.status(404).json({ error: 'Poll niet gevonden.' });
+  if (p.poll.opties.some(o => o.stemmen.includes(req.session.key))) return res.status(409).json({ error: 'U heeft al gestemd.' });
+  const i = Number(req.body.optie);
+  if (!p.poll.opties[i]) return res.status(400).json({ error: 'Onbekende optie.' });
+  p.poll.opties[i].stemmen.push(req.session.key);
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true });
+});
+
+app.post('/api/live/door', auth, (req, res) => {
+  const L = db.data.live[req.session.key];
+  if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
+  const dest = L.destCode ? findSupplier(L.destCode) : null;
+  if (!dest || !(dest.doors || []).length) return res.status(404).json({ error: 'Deze bestemming heeft geen digitale deuren.' });
+  if (!optieAan(dest, 'deurenGast')) return res.status(409).json({ error: dest.name + ' heeft de digitale gastsleutel op dit moment uitstaan. Meld u bij de receptie.' });
+  if (!L.arrived) return res.status(409).json({ error: 'De deur opent pas als u bent aangekomen.' });
+  const door = dest.doors[0];
+  unlockDoor(dest, door, L.codename);
+  logActivity(dest.code, { name: L.codename }, 'gast opende "' + door.name + '" via de app');
+  notifySupplier(dest.code, { icon: '🔓', title: 'Deur geopend', body: L.codename + ' heeft "' + door.name + '" geopend via de app.' });
+  res.json({ ok: true, door: { name: door.name, relockSec: DOOR_RELOCK_MS / 1000 } });
+});
+
+app.post('/api/partner/chat/send', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  if (!optieAan(s, 'gastchat')) return res.status(409).json({ error: s.name + ' heeft de gastchat op dit moment uitstaan.' });
+  const text = String(req.body.text || '').trim().slice(0, 500);
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  const dept = validDept(s, String(req.body.dept || ''));
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const chat = getChat(s, req.session.key, codename, req.session.tier, dept);
+  chat.codename = codename;
+  chat.messages.push({ from: 'guest', who: codename, text, lang: req.body.lang === 'en' ? 'en' : 'nl', at: new Date().toISOString() });
+  chat.messages = chat.messages.slice(-120);
+  chat.unreadPartner += 1;
+  chat.lastAt = new Date().toISOString();
+  save();
+  notifySupplier(s.code, { icon: '💬', title: codename + ' → ' + dept, body: text.slice(0, 90) });
+  sseToSupplier(s.code, 'sync', { scope: 'gchat' });
+  sseToCustomer(req.session.key, 'sync', { scope: 'gchat' });
+  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ ok: true, messages }));
+});
+
+app.post('/api/partner/chat/history', auth, (req, res) => {
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const dept = validDept(s, String(req.body.dept || ''));
+  const chat = db.data.guestChats[chatKeyOf(s.code, req.session.key, dept)];
+  if (chat && chat.unreadGuest) { chat.unreadGuest = 0; save(); }
+  const to = req.body.lang === 'en' ? 'en' : 'nl';
+  trChat(chat ? chat.messages : [], to).then(messages => res.json({ messages, dept }));
+});
+
+app.post('/api/member/apply/chats', auth, (req, res) => {
+  // ook gratis gebruikers chatten met de werkgever over hun sollicitatie
+  const uit = Object.values(db.data.applyChats)
+    .filter(c => c.applicant.kind === 'rtg' && c.applicant.key === req.session.key)
+    .map(c => { const l = c.berichten[c.berichten.length - 1]; return { id: c.id, bedrijf: c.bedrijf, func: c.func, laatste: l ? l.tekst : null, laatsteVan: l ? l.van : null, at: l ? l.at : c.at }; })
+    .sort((x, y) => (y.at || '').localeCompare(x.at || ''));
+  res.json({ chats: uit });
+});
+
+app.post('/api/member/apply/chat', auth, (req, res) => {
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
+  res.json({ chat: applyChatPubliek(chat) });
+});
+
+app.post('/api/member/apply/chat/send', auth, (req, res) => {
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
+  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text);
+  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
+  meldWerkgever(chat, m.tekst);
+  res.json({ chat: applyChatPubliek(chat) });
+});
+
+app.post('/api/rtf/apply/chat', (req, res) => {
+  const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
+  if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
+    return res.status(404).json({ error: 'Chat niet gevonden.' });
+  res.json({ chat: applyChatPubliek(chat) });
+});
+
+app.post('/api/rtf/apply/chat/send', (req, res) => {
+  const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
+  if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
+    return res.status(404).json({ error: 'Chat niet gevonden.' });
+  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text);
+  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
+  meldWerkgever(chat, m.tekst);
+  res.json({ chat: applyChatPubliek(chat) });
+});
+
+app.post('/api/rtf/vacatures', (req, res) => {
+  const lft = parseInt(req.body && req.body.leeftijd, 10);
+  const minOk = Number.isFinite(lft) ? lft : null;
+  const land = req.body && typeof req.body.land === 'string' && LANDEN[req.body.land] ? req.body.land : null;
+  const alle = openVacatures(minOk); // zonder landfilter, om de landenlijst te vullen
+  const landen = [];
+  for (const v of alle) if (!landen.some(l => l.code === v.land)) landen.push({ code: v.land, naam: v.landNaam });
+  landen.sort((a, b) => a.naam.localeCompare(b.naam));
+  const zichtbaar = land ? alle.filter(v => v.land === land) : alle;
+  res.json({ vacatures: zichtbaar.slice(0, 100), landen, magSolliciteren: minOk == null || minOk >= 16 });
+});
+
+app.post('/api/rtf/solliciteer', (req, res) => {
+  const b = req.body || {};
+  const bucket = 'rtfsoll:' + req.ip;
+  if (tooManyTries(res, bucket)) return;
+  // gezin-token: het profiel moet kloppen en mag geen gast zijn (privezaak)
+  const sess = rtf.verifieerProfiel(b.code, b.token);
+  if (!sess) { noteFailedTry(bucket); return res.status(403).json({ error: 'Log opnieuw in bij je gezin om te solliciteren.' }); }
+  if (sess.gast) return res.status(403).json({ error: 'Als oppas of familielid solliciteer je niet namens het gezin.' });
+  const lft = parseInt(b.leeftijd, 10);
+  if (!Number.isFinite(lft) || lft < 16)
+    return res.status(403).json({ error: 'Solliciteren kan vanaf 16 jaar. Jongere gezinsleden vinden in de app juist leer- en groeitips.' });
+  const s = findSupplier(b.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
+  const vac = (db.data.vacatures[s.code] || []).find(v => v.id === b.vacatureId && v.open);
+  if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
+  if (lft < vac.minLeeftijd)
+    return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn.' });
+  if (rtf.alGesolliciteerd(b.code, sess.p.id, vac.id))
+    return res.status(409).json({ error: 'Je hebt al op deze vacature gesolliciteerd. Je ziet de status bij "Mijn sollicitaties".' });
+  const cv = b.cv || {};
+  const name = String(cv.name || '').trim().slice(0, 60);
+  const contact = String(cv.contact || '').trim().slice(0, 80);
+  const heeftInhoud = (Array.isArray(cv.experience) && cv.experience.length) || (Array.isArray(cv.skills) && cv.skills.length) || (cv.about || '').trim();
+  if (!name || !contact || !heeftInhoud)
+    return res.status(409).json({ error: 'Maak eerst je cv af in de RTF-app (naam, contact en werk of vaardigheden). Daarmee solliciteer je in een tik.', needCv: true });
+  const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    name, func: vac.func, contact,
+    note: String(b.note || '').trim().slice(0, 400),
+    viaRTF: true, rtf: { code: String(b.code).toUpperCase(), profielId: sess.p.id },
+    cv: {
+      headline: String(cv.headline || '').slice(0, 80),
+      experience: (Array.isArray(cv.experience) ? cv.experience : []).slice(0, 12).map(x => String(x).slice(0, 120)),
+      skills: (Array.isArray(cv.skills) ? cv.skills : []).slice(0, 15).map(x => String(x).slice(0, 40)),
+      languages: (Array.isArray(cv.languages) ? cv.languages : []).slice(0, 8).map(x => String(x).slice(0, 30)),
+      about: String(cv.about || '').slice(0, 400)
+    },
+    status: 'nieuw', at: new Date().toISOString()
+  };
+  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+  list.unshift(entry);
+  db.data.applications[s.code] = list.slice(0, 100);
+  // verwijzing bij het gezin, voor "Mijn sollicitaties" met live status
+  rtf.bewaarSollicitatie(b.code, sess.p.id, { appId: entry.id, supplierCode: s.code, vacatureId: vac.id, func: vac.func, bedrijf: s.name, land: landCode, landNaam: LANDEN[landCode].naam });
+  save();
+  // De melding aan het bedrijf is identiek aan die van een gewoon RTG-lid: de
+  // foundation-herkomst blijft onzichtbaar voor de werkgever.
+  notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTG', body: name + ' (RTG-lid) solliciteert als ' + vac.func + ', met cv.' });
+  sseToSupplier(s.code, 'sync', { scope: 'team' });
+  sseToOffice('sync', { scope: 'team' });
+  res.json({ ok: true });
+});
+
+app.post('/api/privacy/export', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const key = req.session.key;
+  const chats = {};
+  for (const [k, msgs] of Object.entries(db.data.guestChats || {})) {
+    if (k.split('|')[1] === key) chats[k] = msgs;
+  }
+  const likes = db.data.posts.filter(p => p.likedBy && p.likedBy[key]).map(p => ({ postId: p.id, author: p.author }));
+  const state = stateFor(req.session, req.body.lang);
+  res.json({
+    exportedAt: new Date().toISOString(),
+    note: 'Alle gegevens die RTG over u bewaart, onder uw codenaam (pseudonimisering).',
+    profile: state.user,
+    cv: db.data.cvs[key] || null,
+    applications: myApplications(key),
+    invoices: state.invoices || [],
+    trip: state.trip || null,
+    live: db.data.live[key] || null,
+    orders: db.data.orders.filter(o => (o.customerKey || o.customerTier) === key),
+    guestChats: chats,
+    likedPosts: likes,
+    notifications: db.data.notifications[key] || []
+  });
+});
+
+app.post('/api/privacy/delete', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const key = req.session.key;
+  // cv en live-locatie weg, chats weg, likes weg
+  delete db.data.cvs[key];
+  delete db.data.live[key];
+  for (const k of Object.keys(db.data.guestChats || {})) if (k.split('|')[1] === key) delete db.data.guestChats[k];
+  for (const p of db.data.posts) if (p.likedBy) delete p.likedBy[key];
+  // sollicitaties anonimiseren: het bedrijf houdt zijn administratie,
+  // maar zonder iets dat naar deze persoon herleidbaar is
+  for (const list of Object.values(db.data.applications || {})) {
+    for (const a of list) if (a.key === key) {
+      a.name = '(op verzoek verwijderd)'; a.contact = ''; a.note = '';
+      a.cv = null; a.codename = null; a.key = null;
+    }
+  }
+  // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
+  if (db.data.notifications[key]) db.data.notifications[key] = [];
+  // echt account: verwijder het account zelf, inclusief documentupload
+  if (req.session.account) {
+    const doc = accounts.deleteUser(req.session.account.id);
+    if (doc) { try { fs.unlinkSync(path.join(UPLOAD_DIR, path.basename(doc))); } catch (e) {} }
+  }
+  // alle sessies van dit lid uitloggen
+  for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  res.json({ ok: true });
+});
+
+app.post('/api/event/rsvp', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  const e = s && (s.events || []).find(x => x.id === req.body.eventId && x.published);
+  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  if (!optieAan(s, 'events')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen event-aanmeldingen aan.' });
+  const qty = Math.min(8, Math.max(1, parseInt(req.body.qty, 10) || 1));
+  const taken = (e.guests || []).reduce((n, g) => n + g.qty, 0);
+  if (e.guests.some(g => g.key === req.session.key)) return res.status(409).json({ error: 'U staat al op de gastenlijst.' });
+  if (taken + qty > e.capacity) return res.status(409).json({ error: 'Dit event is vol.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  e.guests.push({ key: req.session.key, codename, qty, at: new Date().toISOString(), checkedIn: false });
+  save();
+  notifySupplier(s.code, { icon: '\uD83C\uDF9F', title: 'Aanmelding voor ' + e.name, body: codename + ', ' + qty + ' pers.' });
+  notify(req.session.tier, { icon: '\uD83C\uDF9F', title: s.name, body: 'U staat op de gastenlijst van ' + e.name + ' (' + e.date + (e.time ? ', ' + e.time : '') + '), ' + qty + ' pers. Uw codenaam is uw toegang.', scope: 'events' });
+  sseToSupplier(s.code, 'sync', { scope: 'events' });
+  sseToOffice('sync', { scope: 'events' });
+  res.json({ ok: true, spotsLeft: Math.max(0, e.capacity - taken - qty) });
+});
+
+app.post('/api/partner/apply', (req, res) => {
+  const b = req.body || {};
+  // schoon(): strip < en > uit vrije tekst. De bedrijfsnaam en plaats komen later
+  // in andermans schermen (De Salon, backoffice), dus nooit als opmaak laten landen.
+  const company = schoon(b.company, 80);
+  const type = String(b.type || '').trim();
+  const city = schoon(b.city, 60);
+  const contactName = schoon(b.contactName, 60);
+  const email = String(b.email || '').trim().toLowerCase().slice(0, 80);
+  const phone = String(b.phone || '').trim().slice(0, 30);
+  const note = schoon(b.note, 500);
+  if (!db.data.supplierTypes[type]) return res.status(400).json({ error: 'Kies een geldig type bedrijf.' });
+  if (!company || !city || !contactName) return res.status(400).json({ error: 'Vul de bedrijfsnaam, plaats en contactpersoon in.' });
+  // juridisch vereist: uitdrukkelijk akkoord met de partnervoorwaarden,
+  // inclusief de verwerkersafspraken en het verplichte Salon-account
+  if (req.body.akkoord !== true) return res.status(400).json({ error: 'Ga akkoord met de partnervoorwaarden (inclusief de verwerkersafspraken) om een partnerplek aan te vragen.' });
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
+  if (db.data.partnerApplications.some(a => a.status === 'nieuw' && a.email === email && a.company.toLowerCase() === company.toLowerCase()))
+    return res.status(409).json({ error: 'Deze aanvraag staat al open. We nemen contact met u op.' });
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    company, type, city, contactName, email, phone, note,
+    // vastlegging van het akkoord (bewijs): wat en wanneer
+    akkoord: { partnervoorwaarden: true, verwerkersafspraken: true, at: new Date().toISOString() },
+    status: 'nieuw', at: new Date().toISOString()
+  };
+  db.data.partnerApplications.unshift(entry);
+  db.data.partnerApplications = db.data.partnerApplications.slice(0, 200);
+  save();
+  mail.send(email, 'Uw partner-aanvraag bij Rahul Travel Group',
+    'Beste ' + contactName + ',\n\nWe hebben uw aanvraag voor ' + company + ' (' + city + ') ontvangen. ' +
+    'We beoordelen elke partner persoonlijk en komen binnen twee werkdagen bij u terug.\n\nRahul Travel Group');
+  sseToOffice('sync', { scope: 'team' });
+  res.json({ ok: true });
+});
+
+app.post('/api/cv/get', auth, (req, res) => {
+  const cv = db.data.cvs[req.session.key] || null;
+  res.json({ cv, ready: cvReady(cv) });
+});
+
+app.post('/api/cv/save', auth, (req, res) => {
+  // ook gratis gebruikers maken een cv om te kunnen solliciteren
+  const b = req.body || {};
+  const cv = {
+    name: String(b.name || '').trim().slice(0, 60),
+    contact: String(b.contact || '').trim().slice(0, 80),
+    headline: String(b.headline || '').trim().slice(0, 80),
+    experience: String(b.experience || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 12),
+    skills: String(b.skills || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 15),
+    languages: String(b.languages || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 8),
+    about: String(b.about || '').trim().slice(0, 400),
+    updatedAt: new Date().toISOString()
+  };
+  if (!cv.name || !cv.contact) return res.status(400).json({ error: 'Vul minimaal uw naam en contactgegevens in.' });
+  db.data.cvs[req.session.key] = cv;
+  save();
+  res.json({ ok: true, cv, ready: cvReady(cv) });
+});
+
+app.post('/api/member/vacatures', auth, (req, res) => {
+  // vacatures bekijken en solliciteren mag ook zonder pas
+  const lft = leeftijdVan(geborenVan(req.session));
+  const land = typeof req.body.land === 'string' && LANDEN[req.body.land] ? req.body.land : null;
+  const alle = openVacatures(lft);
+  const landen = [];
+  for (const v of alle) if (!landen.some(l => l.code === v.land)) landen.push({ code: v.land, naam: v.landNaam });
+  landen.sort((a, b) => a.naam.localeCompare(b.naam));
+  const zichtbaar = land ? alle.filter(v => v.land === land) : alle;
+  res.json({ vacatures: zichtbaar.slice(0, 100), landen, leeftijd: lft, magSolliciteren: lft == null || lft >= 16 });
+});
+
+app.post('/api/member/apply', auth, (req, res) => {
+  // solliciteren mag ook zonder pas: het cv is de sleutel, niet de Pass
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const cv = db.data.cvs[req.session.key];
+  if (!cvReady(cv)) return res.status(409).json({ error: 'Maak eerst uw cv af in de cv-builder; daarmee solliciteert u bij elke RTG-partner in een tik.', needCv: true });
+  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
+  let func, vacatureId = null;
+  if (req.body.vacatureId) {
+    const vac = (db.data.vacatures[s.code] || []).find(v => v.id === req.body.vacatureId && v.open);
+    if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
+    const lft = leeftijdVan(geborenVan(req.session));
+    if (lft != null && lft < vac.minLeeftijd)
+      return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn.' });
+    if (list.some(a => a.key === req.session.key && a.vacatureId === vac.id))
+      return res.status(409).json({ error: 'U hebt al op deze vacature gesolliciteerd. De status ziet u bij uw sollicitaties.' });
+    func = vac.func; vacatureId = vac.id;
+  } else {
+    func = String(req.body.func || '').trim().slice(0, 40);
+    if (!func) return res.status(400).json({ error: 'Kies een functie.' });
+  }
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const entry = {
+    id: crypto.randomBytes(4).toString('hex'),
+    name: cv.name, func, contact: cv.contact,
+    note: String(req.body.note || '').trim().slice(0, 400),
+    viaRTG: true, codename, key: req.session.key, vacatureId,
+    cv: { headline: cv.headline, experience: cv.experience, skills: cv.skills, languages: cv.languages, about: cv.about },
+    status: 'nieuw', at: new Date().toISOString()
+  };
+  list.unshift(entry);
+  db.data.applications[s.code] = list.slice(0, 100);
+  save();
+  notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTG', body: cv.name + ' (RTG-lid) solliciteert als ' + func + ', met cv.' });
+  sseToSupplier(s.code, 'sync', { scope: 'team' });
+  sseToOffice('sync', { scope: 'team' });
+  res.json({ ok: true });
+});
+
+app.post('/api/booking/request', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  if (!s || !caps.includes('services')) return res.status(404).json({ error: 'Geen zelfstandige professional gevonden.' });
+  if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen boekingen aan.' });
+  const dienst = (s.services || []).find(x => x.id === req.body.serviceId);
+  if (!dienst) return res.status(404).json({ error: 'Deze dienst bestaat niet (meer).' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak
+  const lftB = leeftijdVan(geborenVan(req.session));
+  const vooraf = optieAan(s, 'betaalVooraf') || (lftB != null && lftB < 18);
+  const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
+  const wanneer = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d + (/^\d{2}:\d{2}$/.test(u) ? ' ' + u : '') : null;
+  const boeking = {
+    ref: 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    supplierCode: s.code, supplierName: s.name,
+    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    service: { id: dienst.id, name: dienst.name, soort: dienst.soort || 'dienst', duurMin: dienst.duurMin || null },
+    price: dienst.price,
+    wanneer, note: schoon(req.body.note, 140),
+    betaalMoment: vooraf ? 'vooraf' : 'achteraf',
+    status: vooraf ? 'wacht-op-betaling' : 'aangevraagd',
+    paid: false, at: new Date().toISOString()
+  };
+  db.data.boekingen.unshift(boeking);
+  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  save();
+  if (!vooraf) {
+    notifySupplier(s.code, { icon: '🗓️', title: 'Nieuwe boeking (betaling achteraf)', body: codename + ': ' + dienst.name + (wanneer ? ' · ' + wanneer : '') + ' · € ' + dienst.price });
+    sseToSupplier(s.code, 'sync', { scope: 'orders' });
+    sseToOffice('sync', { scope: 'orders' });
+  }
+  res.json({ ok: true, boeking });
+});
+
+app.post('/api/booking/pay', auth, (req, res) => {
+  const b = db.data.boekingen.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
+  if (!b) return res.status(404).json({ error: 'Boeking niet gevonden.' });
+  if (b.paid) return res.status(409).json({ error: 'Al betaald.' });
+  if (b.status === 'wacht-op-betaling' && Date.now() - new Date(b.at) > 30 * 60000)
+    return res.status(410).json({ error: 'Deze aanvraag is verlopen. Boek opnieuw.' });
+  b.paid = true;
+  b.paidAt = new Date().toISOString();
+  if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
+  save();
+  notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
+  sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true, boeking: b });
+});
+
+app.post('/api/bookings/mine', auth, (req, res) => {
+  const mijn = db.data.boekingen.filter(b => (b.customerKey || b.customerTier) === req.session.key);
+  res.json({ boekingen: mijn.slice(0, 25), total: mijn.length });
+});
+
+app.post('/api/giftcard/buy', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const bedrag = Math.round(Number(req.body.bedrag));
+  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const kaart = { code: gcCode(), supplierCode: s.code, supplierName: s.name, bedrag, saldo: bedrag,
+    kocht: codename, customerKey: req.session.key, at: new Date().toISOString(), verzilveringen: [] };
+  db.data.giftcards.unshift(kaart);
+  db.data.giftcards = db.data.giftcards.slice(0, 20000);
+  save();
+  notifySupplier(s.code, { icon: '🎁', title: 'Cadeaukaart verkocht', body: codename + ' kocht via de app een cadeaukaart van € ' + bedrag + '.' });
+  sseToSupplier(s.code, 'sync', { scope: 'pos' });
+  res.json({ ok: true, kaart });
+});
+
+app.post('/api/giftcards/mine', auth, (req, res) => {
+  res.json({ kaarten: (db.data.giftcards || []).filter(g => g.customerKey === req.session.key).slice(0, 20) });
+});
+
+app.post('/api/member/zzp', auth, (req, res) => {
+  if (req.session.tier !== 'business') return res.status(403).json({ error: 'De zzp-belastingtool is onderdeel van de Business Pass.' });
+  const landCode = ZZP[req.body.land] ? req.body.land : 'NL';
+  const Z = ZZP[landCode];
+  const winst = Math.max(0, Math.min(5000000, Math.round(Number(req.body.winst) || 0)));
+  if (!winst) return res.status(400).json({ error: 'Vul uw verwachte jaarwinst in.' });
+  const out = { land: landCode, landNaam: LANDEN[landCode].naam, regime: Z.regime, winst, posten: [], regels: Z.regels.slice(), indicatie: true, peiljaar: FISCAAL_PEILJAAR };
+  let belasting = 0, belastbaar = winst;
+  if (landCode === 'NL') {
+    const uren = req.body.urencriterium !== false;
+    const za = uren ? Math.min(Z.zelfstandigenaftrek, winst) : 0;
+    const sa = uren && req.body.starter ? Z.startersaftrek : 0;
+    const rest = Math.max(0, winst - za - sa);
+    const mkb = centen(rest * Z.mkbVrijstelling);
+    belastbaar = centen(rest - mkb);
+    out.posten.push(za ? { label: 'Zelfstandigenaftrek', bedrag: -za }
+                       : { label: 'Zelfstandigenaftrek (urencriterium niet gehaald)', bedrag: 0 });
+    if (sa) out.posten.push({ label: 'Startersaftrek', bedrag: -sa });
+    out.posten.push({ label: 'MKB-winstvrijstelling (12,7%)', bedrag: -mkb });
+    let vorige = 0, ib = 0;
+    for (const [grens, tarief] of Z.schijven) {
+      const deel = Math.max(0, Math.min(belastbaar, grens) - vorige);
+      ib += deel * tarief;
+      vorige = grens;
+      if (belastbaar <= grens) break;
+    }
+    const ahk = Math.max(0, Z.ahk.max - Math.max(0, belastbaar - Z.ahk.afbouwVanaf) * Z.ahk.afbouw);
+    const ak = Math.max(0, Z.arbeidskorting.max - Math.max(0, belastbaar - Z.arbeidskorting.afbouwVanaf) * Z.arbeidskorting.afbouw);
+    const korting = Math.min(ib, ahk + ak);
+    belasting = Math.max(0, centen(ib - korting));
+    out.posten.push({ label: 'Inkomstenbelasting (schijven)', bedrag: centen(ib) });
+    out.posten.push({ label: 'Heffingskortingen (indicatie)', bedrag: -centen(korting) });
+    if (winst < Z.korGrens) out.regels.unshift('Met deze omzet komt u waarschijnlijk in aanmerking voor de KOR (btw-vrijstelling): minder administratie, geen btw-aangifte.');
+  } else {
+    belasting = centen(winst * Z.simpel);
+    out.posten.push({ label: 'Indicatieve heffing (~' + Math.round(Z.simpel * 100) + '% effectief, incl. sociale lasten)', bedrag: belasting });
+  }
+  out.belastbaar = centen(belastbaar);
+  out.belasting = belasting;
+  out.netto = centen(winst - belasting);
+  out.reserveerPct = Math.max(20, Math.min(50, Math.round(belasting / winst * 100) + 5));
+  out.perMaand = centen(belasting / 12);
+  out.regels.push('Indicatieve berekening op basis van de tarieven van ' + FISCAAL_PEILJAAR + '; controleer jaarlijks en raadpleeg voor uw aangifte een fiscalist.');
+  res.json(out);
+});
+
+app.post('/api/member/accountant', auth, async (req, res) => {
+  if (req.session.tier !== 'business') return res.status(403).json({ error: 'De AI-boekhouder is onderdeel van de Business Pass.' });
+  const landCode = LANDEN[req.body.land] ? req.body.land : 'NL';
+  const L = LANDEN[landCode];
+  const vraag = String(req.body.question || '').trim().slice(0, 400);
+  if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
+  const key = req.session.key;
+  const horeca = db.data.orders.filter(o => (o.customerKey || o.customerTier) === key && o.paid).reduce((x, o) => x + o.total, 0);
+  const vervoer = db.data.rides.filter(r => (r.customerKey || r.customerTier) === key && r.paid).reduce((x, r) => x + (r.quote || 0), 0);
+  let answer = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 450,
+        system: 'Je bent de AI-boekhouder van de RTG Business Pass. Het lid reist zakelijk; het gekozen land is ' + L.naam + '. ' +
+          'Aftrekregels daar: horeca: ' + L.zakelijk.horeca + ' logies: ' + L.zakelijk.logies + ' vervoer: ' + L.zakelijk.vervoer + ' jet: ' + L.zakelijk.jet + ' ' +
+          'Voor zelfstandigen geldt daar het regime ' + ZZP[landCode].regime + ': ' + ZZP[landCode].regels.join(' ') + ' Er is een zzp-rekentool in de app voor een indicatie van belasting en nettowinst. ' +
+          'Uitgaven via RTG: horeca € ' + horeca + ', vervoer € ' + vervoer + '. Facturen staan boekhoudklaar in het portaal met afboekcode en btw-specificatie. ' +
+          'Antwoord in het Nederlands, maximaal 120 woorden, praktisch. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
+        messages: [{ role: 'user', content: vraag }]
+      });
+      answer = msg.content[0].text;
+    } catch (err) { answer = null; }
+  }
+  if (!answer) {
+    const v = vraag.toLowerCase();
+    if (/zzp|zelfstandig|eenmanszaak|freelan|kor\b|urencriterium|autonomo|micro-?entre|freiberuf/.test(v))
+      answer = 'Voor zelfstandigen in ' + L.naam + ' (' + ZZP[landCode].regime + '): ' + ZZP[landCode].regels.join(' ') + ' Gebruik de zzp-rekentool hieronder voor een indicatie van uw belasting, nettowinst en hoeveel u maandelijks opzij zet.';
+    else if (/hotel|overnacht|logies|slapen/.test(v)) answer = L.naam + ': ' + L.zakelijk.logies;
+    else if (/taxi|vervoer|rit|jet|vlieg/.test(v)) answer = L.naam + ': ' + L.zakelijk.vervoer + ' ' + L.zakelijk.jet + ' Via RTG gaf u € ' + vervoer + ' uit aan vervoer.';
+    else if (/eten|diner|restaurant|horeca|lunch|terugvorder|aftrek|btw/.test(v)) answer = L.naam + ': ' + L.zakelijk.horeca + ' Via RTG gaf u € ' + horeca + ' uit in de horeca. Uw facturen staan boekhoudklaar in het portaal, met afboekcode en btw-specificatie.';
+    else answer = 'Voor ' + L.naam + ' geldt: ' + L.zakelijk.horeca + ' ' + L.zakelijk.logies + ' ' + L.zakelijk.vervoer + ' Vraag me gerust naar een specifieke uitgave.';
+    answer += ' Dit is voorlichting, geen bindend fiscaal advies.';
+  }
+  res.json({ answer, land: landCode, landen: Object.entries(LANDEN).map(([k, v2]) => ({ code: k, naam: v2.naam })), ai: !!anthropic });
+});
+
+app.post('/api/suppliers', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const city = req.body.city;
+  const list = db.data.suppliers.filter(s => !city || s.city === city).map(s => publicSupplier(s, req.body.lang));
+  res.json({ suppliers: list, city: db.data.trip.dest });
+});
+
+app.post('/api/order', auth, (req, res) => {
+  // betalen bij partners mag ook zonder pas (gratis gebruiker)
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
+  if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen bestellingen aan.' });
+  const wanted = Array.isArray(req.body.items) ? req.body.items : [];
+  const items = [];
+  let total = 0;
+  for (const w of wanted) {
+    const m = (s.menu || []).find(x => x.id === w.id);
+    const qty = Math.min(20, Math.max(1, parseInt(w.qty, 10) || 1));
+    // ledenprijsgarantie: reken nooit meer dan de publieke prijs, ook al zou
+    // de menuprijs door een fout hoger staan (extra vangnet na het opslaan)
+    if (m) { const unit = ledenPrijs(m.publiekePrijs, m.price); items.push({ id: m.id, name: m.name, qty, price: unit }); total += unit * qty; }
+  }
+  if (!items.length) return res.status(400).json({ error: 'Geen geldige gerechten gekozen.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  // leeftijd uit het paspoort: alcohol (bar-items) alleen boven de grens van
+  // het land van de zaak; de partner ziet enkel dat de leeftijd geverifieerd is
+  const lft = leeftijdVan(geborenVan(req.session));
+  const metAlcohol = items.some(it => { const m = (s.menu || []).find(x => x.id === it.id); return m && m.station === 'bar'; });
+  if (metAlcohol && lft != null) {
+    const a = alcoholGrensVan(s);
+    if (lft < a.grens) return res.status(403).json({ error: 'Alcohol is in ' + a.land + ' vanaf ' + a.grens + ' jaar; je leeftijd is via je paspoort geverifieerd. Kies iets zonder alcohol.' });
+  }
+  // de zaak kiest het betaalmoment: vooraf (standaard, pas zichtbaar na
+  // afrekenen) of achteraf (direct zichtbaar, betalen via de app volgt);
+  // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak
+  const vooraf = optieAan(s, 'betaalVooraf') || (lft != null && lft < 18);
+  const order = {
+    ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    pickup: pickupCode(),
+    supplierCode: s.code, supplierName: s.name, type: s.type,
+    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    items, total,
+    table: schoon(req.body.table, 24),
+    allergyNote: schoon(req.body.allergyNote, 200),
+    tagSalon: !!req.body.tagSalon,
+    betaalMoment: vooraf ? 'vooraf' : 'achteraf',
+    leeftijdOk: metAlcohol && lft != null ? true : undefined,
+    status: vooraf ? 'wacht-op-betaling' : 'nieuw', paid: false, at: new Date().toISOString()
+  };
+  db.data.orders.unshift(order);
+  save();
+  if (!vooraf) {
+    notifySupplier(s.code, { icon: '\u{1F6CE}️', title: 'Nieuwe bestelling (betaling achteraf)', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+    sseToSupplier(s.code, 'sync', { scope: 'orders' });
+    sseToOffice('sync', { scope: 'orders' });
+  }
+  res.json({ ok: true, order });
+});
+
+app.post('/api/order/pay', auth, (req, res) => {
+  const o = db.data.orders.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
+  // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
+  if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return res.status(410).json({ error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' });
+  o.paid = true;
+  o.paidAt = new Date().toISOString();
+  if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
+  save();
+  // nu pas hoort de zaak ervan: betaald = definitief
+  notifySupplier(o.supplierCode, { icon: '\u{1F6CE}\uFE0F', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
+  sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true, order: o });
+});
+
+app.post('/api/orders/mine', auth, (req, res) => {
+  // schaalvast: de laatste 25 bestellingen plus het eerlijke totaal
+  const mijn = db.data.orders.filter(o => (o.customerKey || o.customerTier) === req.session.key);
+  res.json({ orders: mijn.slice(0, 25), total: mijn.length });
+});
+
+app.post('/api/live/start', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const key = req.session.key;
+  const destCode = req.body.destCode ? String(req.body.destCode).trim().toUpperCase() : null;
+  const dest = destCode ? findSupplier(destCode) : null;
+  const mode = ['walking', 'driving', 'flying'].includes(req.body.mode) ? req.body.mode : 'driving';
+  // Startpositie: meegegeven, anders het hotel op de bestemming, anders vlakbij de bestemming.
+  let start = (Number.isFinite(+req.body.lat) && Number.isFinite(+req.body.lng)) ? { lat: +req.body.lat, lng: +req.body.lng } : null;
+  if (!start) { const hotel = db.data.suppliers.find(s => s.type === 'hotel' && s.city === db.data.trip.dest); if (hotel && hotel.loc) start = { lat: hotel.loc.lat, lng: hotel.loc.lng }; }
+  if (!start && dest && dest.loc) start = { lat: dest.loc.lat + 0.012, lng: dest.loc.lng - 0.014 };
+  db.data.live[key] = {
+    key, tier: req.session.tier, codename: liveCodename(req.session),
+    active: true, mode, destCode,
+    lat: start ? start.lat : null, lng: start ? start.lng : null,
+    updatedAt: new Date().toISOString(), startedAt: new Date().toISOString(), arrived: false
+  };
+  save();
+  if (dest) notifySupplier(dest.code, { icon: '📍', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
+  pushLive(key);
+  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
+});
+
+app.post('/api/live/update', auth, (req, res) => {
+  const key = req.session.key;
+  const L = db.data.live[key];
+  if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
+  const lat = Number(req.body.lat), lng = Number(req.body.lng);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) { L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); }
+  // automatische aankomst binnen ~150 m van de bestemming
+  const dest = L.destCode ? findSupplier(L.destCode) : null;
+  if (dest && dest.loc && !L.arrived) {
+    const d = haversine({ lat: L.lat, lng: L.lng }, dest.loc);
+    if (d != null && d < 150) {
+      L.arrived = true;
+      notifySupplier(dest.code, { icon: '🎉', title: 'Gast gearriveerd', body: L.codename + ' is bij u aangekomen.' });
+      notify(L.tier, { icon: '📍', title: 'Aangekomen', body: 'U bent bij ' + dest.name + '.', scope: 'live' });
+    }
+  }
+  save();
+  pushLive(key);
+  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
+});
+
+app.post('/api/live/stop', auth, (req, res) => {
+  const key = req.session.key;
+  const L = db.data.live[key];
+  if (L) { L.active = false; save(); pushLive(key); }
+  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
+});
+
+app.post('/api/live/state', auth, (req, res) => {
+  res.json({ live: liveStateFor(req.session.key, req.body.lang) });
+});
+
+app.post('/api/ride/request', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  if (!s || !caps.includes('rides')) return res.status(404).json({ error: 'Geen vervoerspartner gevonden.' });
+  if (!optieAan(s, 'ritten')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen ritaanvragen aan.' });
+  // leeftijd uit het paspoort: privejets boek je vanaf 18 jaar
+  const lftR = leeftijdVan(geborenVan(req.session));
+  if (s.type === 'jet' && lftR != null && lftR < 18)
+    return res.status(403).json({ error: 'Privejets boek je vanaf 18 jaar. Een taxi regelen we graag voor je.' });
+  const dest = req.body.toCode ? findSupplier(req.body.toCode) : null;
+  const codename = liveCodename(req.session);
+  // slimme offerte: afstand uit de live-locatie en de bestemming, anders een
+  // realistisch stadsgemiddelde; prijs volgt het tarief van de vervoerder
+  const pax = Math.min(9, Math.max(1, Number(req.body.passengers) || 1));
+  const koffers = Math.min(9, Math.max(0, Number(req.body.luggage) || 0));
+  const L = db.data.live[req.session.key];
+  const van = (L && Number.isFinite(L.lat)) ? { lat: L.lat, lng: L.lng } : (s.loc || null);
+  const naar = dest && dest.loc ? dest.loc : null;
+  let km = s.type === 'jet' ? 350 : 9;
+  const meters = haversine(van, naar);
+  if (meters != null && meters > 200) km = Math.max(1, meters / 1000);
+  const t = (s.settings && s.settings.tarief) || {};
+  const quote = Math.round(Math.max(t.minimum || 0, (t.start || 0) + (t.perKm || 2.5) * km));
+  const ride = {
+    ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    supplierCode: s.code, supplierName: s.name, type: s.type,
+    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    from: schoon(req.body.from || 'Huidige locatie', 80),
+    to: schoon(req.body.to || (dest && dest.name) || '', 80),
+    toCode: dest ? dest.code : null,
+    when: schoon(req.body.when || 'Zo snel mogelijk', 40),
+    // vooruit plannen: datum en tijd geven een geplande rit (taxi en jet)
+    plannedFor: (() => {
+      const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+      const iso = d + 'T' + (/^\d{2}:\d{2}$/.test(u) ? u : '12:00') + ':00';
+      return isNaN(new Date(iso)) ? null : iso;
+    })(),
+    passengers: pax, luggage: koffers, note: schoon(req.body.note, 140),
+    km: Math.round(km * 10) / 10, quote,
+    driver: null, vehicle: null,
+    // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf;
+    // jeugdleden (15-17) betalen altijd vooraf
+    betaalMoment: (optieAan(s, 'betaalVooraf') || (lftR != null && lftR < 18)) ? 'vooraf' : 'achteraf',
+    status: (optieAan(s, 'betaalVooraf') || (lftR != null && lftR < 18)) && quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
+    paid: quote === 0, at: new Date().toISOString()
+  };
+  if (ride.plannedFor) ride.when = 'Gepland: ' + ride.plannedFor.slice(0, 16).replace('T', ' ');
+  db.data.rides.unshift(ride);
+  save();
+  if (ride.status === 'aangevraagd') {
+    notifySupplier(s.code, { icon: '\u{1F697}', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
+    sseToSupplier(s.code, 'sync', { scope: 'orders' });
+    sseToOffice('sync', { scope: 'orders' });
+  }
+  pushLive(req.session.key);
+  res.json({ ok: true, ride });
+});
+
+app.post('/api/ride/pay', auth, (req, res) => {
+  const r = db.data.rides.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
+  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
+  if (r.paid) return res.status(409).json({ error: 'Al betaald.' });
+  // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
+  if (r.status === 'wacht-op-betaling' && Date.now() - new Date(r.at) > 30 * 60000) return res.status(410).json({ error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' });
+  r.paid = true;
+  r.paidAt = new Date().toISOString();
+  if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
+  save();
+  notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? '\u2708\uFE0F' : '\u{1F697}', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
+  sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  pushLive(req.session.key);
+  res.json({ ok: true, ride: r });
+});
+
+app.post('/api/ai', auth, async (req, res) => {
+  if (req.session.tier === 'guest') {
+    return res.status(403).json({ error: 'De persoonlijke AI is exclusief voor leden.' });
+  }
+  // Alleen role/content overnemen, geschiedenis begrensd op de laatste 12 beurten.
+  const history = (Array.isArray(req.body.messages) ? req.body.messages : [])
+    .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }))
+    .slice(-12);
+  // De Claude API vereist dat het gesprek met een user-beurt begint; de
+  // proactieve opener van de AI staat vooraan als assistant, knip die eraf.
+  while (history.length && history[0].role !== 'user') history.shift();
+  if (!history.length || history[history.length - 1].role !== 'user') {
+    return res.status(400).json({ error: 'Geen vraag ontvangen.' });
+  }
+
+  if (anthropic) {
+    try {
+      const response = await anthropic.messages.create({
+        model: 'claude-opus-4-8',
+        max_tokens: 1024,
+        system: aiSystemPrompt(req.session.tier),
+        messages: history
+      });
+      const reply = response.content
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('\n')
+        .trim();
+      return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'claude' });
+    } catch (e) {
+      console.error('Claude API-fout, val terug op demo-antwoord:', e.message);
+    }
+  }
+  res.json({ reply: cannedAnswer(history[history.length - 1].content), source: 'demo' });
+});
+
+app.post('/api/chat/history', auth, (req, res) => {
+  if (!req.session.account) return res.json({ messages: [], mode: 'butler', demo: true });
+  res.json({
+    messages: convOf(req.session.account.id),
+    mode: req.session.tier === 'rtg' ? 'butler' : 'concierge',
+    phone: accounts.phoneOf(req.session.account)
+  });
+});
+
+app.post('/api/chat/send', auth, async (req, res) => {
+  if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
+  const text = String(req.body.text || '').trim();
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+  await memberSays(req.session.account, text, 'app');
+  res.json({ ok: true, messages: convOf(req.session.account.id), mode: req.session.tier === 'rtg' ? 'butler' : 'concierge' });
+});
+
+app.post('/api/partner', (req, res) => {
+  const partner = findPartner(req.body.code);
+  if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });
+  res.json({ partner: publicPartner(partner) });
+});
+};

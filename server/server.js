@@ -720,127 +720,16 @@ app.post('/api/cluster/:actie', (req, res) => {
   res.json({ ok: true, active: db.writable });
 });
 
-app.post('/api/login', (req, res) => {
-  let tier = String(req.body.tier || '');
-  if (hasCred(req.body)) {
-    const bucket = 'demo:' + req.ip;
-    if (tooManyTries(res, bucket)) return;
-    if (!checkCred(req.body.username, req.body.password)) {
-      noteFailedTry(bucket);
-      return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
-    }
-    loginFails.delete(bucket);
-    tier = 'business'; // het demo-account is een volledig lidmaatschap
-  }
-  if (!PERSONAS[tier]) return res.status(400).json({ error: 'Onbekende pas.' });
-  const token = crypto.randomBytes(24).toString('hex');
-  const sess = { tier, key: tier === 'guest' ? 'guest-' + token.slice(0, 8) : tier };
-  rememberSession(token, sess);
-  res.json({ token, state: stateFor(sess, req.body.lang) });
-});
 
-app.post('/api/logout', auth, (req, res) => {
-  for (const [token, sess] of sessions) if (sess === req.session) forgetSession(token);
-  res.json({ ok: true });
-});
 
 /* ---------- echte accounts (registreren / inloggen) ---------- */
 
-app.post('/api/auth/register', (req, res) => {
-  // schoon(): de echte naam wordt o.a. in de backoffice (KYC) getoond; geen opmaak.
-  const name = schoon(req.body.name, 80);
-  const email = String(req.body.email || '').trim().toLowerCase();
-  const phone = String(req.body.phone || '').trim().slice(0, 30);
-  const password = String(req.body.password || '');
-  if (!name) return res.status(400).json({ error: 'Vul uw naam in.' });
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
-  if (phone.replace(/\D/g, '').length < 8) return res.status(400).json({ error: 'Vul een geldig mobiel nummer in (voor uw WhatsApp-lijn).' });
-  if (password.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
-  // de pas wordt met paspoort aangevraagd: geboortedatum is verplicht en
-  // bepaalt de leeftijdsgroep (15-17 alleen met toestemming van ouder/voogd)
-  const geboren = String(req.body.geboortedatum || '').slice(0, 10);
-  const lftNieuw = leeftijdVan(geboren);
-  if (lftNieuw == null) return res.status(400).json({ error: 'Vul uw geboortedatum in zoals in uw paspoort.' });
-  if (lftNieuw < 15) return res.status(400).json({ error: 'Het RTG-lidmaatschap kan vanaf 15 jaar.' });
-  if (lftNieuw > 120) return res.status(400).json({ error: 'Controleer uw geboortedatum.' });
-  if (accounts.findByLogin(email)) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
-  let user;
-  try {
-    user = accounts.createUser({ email, username: req.body.username || null, password, tier: req.body.tier, realName: name, phone });
-  } catch (e) {
-    return res.status(409).json({ error: 'Dit account bestaat al.' });
-  }
-  const mdNieuw = memberTemplate();
-  mdNieuw.geboren = geboren;
-  accounts.saveMemberState(user.id, mdNieuw);
-  // bevestigingsmail met een echte, werkende link
-  const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
-  const verifyUrl = appUrl(req) + '/apps/portaal.html?verify=' + vtok;
-  mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
-    'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl);
-  const token = accounts.issueToken(user.id);
-  const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
-  res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true, ...(mail.configured ? {} : { devVerifyUrl: verifyUrl }) });
-});
 
-app.post('/api/auth/verify-email', (req, res) => {
-  const u = accounts.verifyActionToken(req.body.token, 'verify-email');
-  if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen bevestigingslink.' });
-  accounts.setEmailVerified(u.id);
-  res.json({ ok: true });
-});
 
-app.post('/api/auth/resend', auth, (req, res) => {
-  if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
-  const u = req.session.account;
-  const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
-  const url = appUrl(req) + '/apps/portaal.html?verify=' + vtok;
-  mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
-  res.json({ ok: true, ...(mail.configured ? {} : { devVerifyUrl: url }) });
-});
 
-app.post('/api/auth/forgot', (req, res) => {
-  const email = String(req.body.email || '').trim();
-  const u = email ? accounts.findByLogin(email) : null;
-  let devResetUrl;
-  if (u) {
-    const tok = accounts.createReset(u.id);
-    const url = appUrl(req) + '/apps/portaal.html?reset=' + tok;
-    mail.send(accounts.emailOf(u) || email, 'Wachtwoord herstellen bij Rahul Travel Group',
-      'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url);
-    if (!mail.configured) devResetUrl = url;
-  }
-  // Altijd hetzelfde antwoord: niet verklappen of een e-mailadres bestaat.
-  res.json({ ok: true, ...(devResetUrl ? { devResetUrl } : {}) });
-});
 
-app.post('/api/auth/reset', (req, res) => {
-  const u = accounts.findByReset(req.body.token);
-  if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen herstel-link.' });
-  const pw = String(req.body.password || '');
-  if (pw.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
-  accounts.setPassword(u.id, pw);
-  res.json({ ok: true });
-});
 
-app.post('/api/auth/login', (req, res) => {
-  const login = req.body.login || req.body.email || req.body.username;
-  const bucket = 'auth:' + req.ip + ':' + String(login || '').toLowerCase().slice(0, 60);
-  if (tooManyTries(res, bucket)) return;
-  const user = accounts.findByLogin(login);
-  if (!user || !accounts.verifyPassword(req.body.password, user.password_hash)) {
-    noteFailedTry(bucket);
-    return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
-  }
-  loginFails.delete(bucket);
-  const token = accounts.issueToken(user.id);
-  const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
-  res.json({ token, state: stateFor(sess, req.body.lang) });
-});
 
-app.post('/api/auth/me', auth, (req, res) => {
-  res.json({ user: req.session.account ? accounts.publicUser(req.session.account) : stateFor(req.session, req.body.lang).user });
-});
 
 /* ---------- identiteitsverificatie (tegen nepaccounts) ----------
    Een lid uploadt een foto van zijn identiteitsbewijs; RTG keurt die goed in de
@@ -852,25 +741,8 @@ app.post('/api/auth/me', auth, (req, res) => {
    het zo kort mogelijk, en gebruik bij voorkeur een gecertificeerde KYC-dienst. */
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 
-app.post('/api/verify/upload', express.json({ limit: '6mb' }), auth, (req, res) => {
-  if (!req.session.account) return res.status(403).json({ error: 'Verificatie is voor echte accounts.' });
-  const m = /^data:image\/(png|jpe?g|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(req.body.image || ''));
-  if (!m) return res.status(400).json({ error: 'Upload een foto (JPG, PNG of WebP) van uw identiteitsbewijs.' });
-  const buf = Buffer.from(m[2], 'base64');
-  if (buf.length > 5 * 1024 * 1024) return res.status(413).json({ error: 'Bestand te groot (max 5 MB).' });
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-  const ext = m[1] === 'jpeg' ? 'jpg' : m[1];
-  const fname = req.session.account.id + '-' + Date.now() + '.' + ext;
-  fs.writeFileSync(path.join(UPLOAD_DIR, fname), buf);
-  accounts.setVerification(req.session.account.id, 'pending', fname);
-  res.json({ ok: true, status: 'pending' });
-});
 
-app.post('/api/verify/status', auth, (req, res) => {
-  res.json({ status: req.session.account ? req.session.account.verified : 'n/a' });
-});
 
-app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
 
 /* Live-verbinding. EventSource kan geen Authorization-header sturen, dus het
    token gaat als query-parameter. */
@@ -913,52 +785,10 @@ function eisAccount(req, res) {
   if (!req.session.account) { res.status(403).json({ error: 'Log in met je eigen RTG-account om een gezin te koppelen.' }); return false; }
   return true;
 }
-app.post('/api/rtf/profielen', auth, (req, res) => {
-  if (!eisAccount(req, res)) return;
-  const info = rtf.gastProfielen(req.body.code);
-  if (!info) return res.status(404).json({ error: 'Dit gezin kennen we niet. Klopt de gezinscode?' });
-  if (!info.profielen.length) return res.status(404).json({ error: 'Dit gezin heeft nog geen oppas- of familieprofiel om te koppelen. Vraag de ouder er een aan te maken.' });
-  res.json(info);
-});
-app.post('/api/rtf/koppel', auth, (req, res) => {
-  if (!eisAccount(req, res)) return;
-  const u = req.session.account;
-  const r = rtf.linkGast({ code: req.body.code, profielId: req.body.profielId, userId: u.id, tier: u.tier, codenaam: u.codename });
-  if (r.error) return res.status(r.status || 400).json({ error: r.error });
-  res.json({ ok: true, gezinNaam: r.gezinNaam, profielNaam: r.profielNaam, tierNaam: r.tierNaam });
-});
-app.post('/api/rtf/ontkoppel', auth, (req, res) => {
-  if (!eisAccount(req, res)) return;
-  rtf.unlinkGast({ userId: req.session.account.id, code: req.body.code, profielId: req.body.profielId });
-  res.json({ ok: true });
-});
-app.post('/api/rtf/meldingen/gelezen', auth, (req, res) => {
-  if (!eisAccount(req, res)) return;
-  const md = accounts.getMemberState(req.session.account.id) || {};
-  (md.foundationMeldingen || []).forEach(m => { m.gelezen = true; });
-  accounts.saveMemberState(req.session.account.id, md);
-  res.json({ ok: true });
-});
 // alle gast-gegevens (belangrijke info, agenda, waar iedereen is) van de
 // gezinnen waaraan dit lid gekoppeld is, om in de RTG-app te lezen
-app.post('/api/rtf/overzicht', auth, (req, res) => {
-  if (!eisAccount(req, res)) return;
-  res.json({ gezinnen: rtf.gastOverzicht(req.session.account.id) });
-});
 // het chat-/belkanaal van een gekoppeld gezin (profieltoken + leden) voor de RTG-app
-app.post('/api/rtf/kanaal', auth, (req, res) => {
-  if (!eisAccount(req, res)) return;
-  const info = rtf.kanaalInfo(req.session.account.id, req.body.code);
-  if (!info) return res.status(403).json({ error: 'Je bent niet aan dit gezin gekoppeld.' });
-  res.json(info);
-});
 // terugberichten naar het gezin (bijv. de oppas antwoordt op een oproep)
-app.post('/api/rtf/bericht', auth, (req, res) => {
-  if (!eisAccount(req, res)) return;
-  const r = rtf.berichtVanGast({ userId: req.session.account.id, code: req.body.code, tekst: req.body.tekst });
-  if (r.error) return res.status(r.status || 400).json({ error: r.error });
-  res.json({ ok: true });
-});
 
 /* ================= SALON-CONNECTIES =================
    Leden voegen elkaar toe op codenaam, sturen elkaar berichten, delen
@@ -1173,110 +1003,9 @@ app.post('/api/push/subscribe', auth, (req, res) => {
 /* Eén tik betaalt: één factuur ({invoiceId}) of alles wat openstaat ({all:true}).
    De echte Face ID-/Apple Pay-verificatie gebeurt op het toestel; de server
    verwerkt de betaling in één aanroep. */
-app.post('/api/pay', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  // Echte accounts betalen hun eigen facturen; demo-sessies de gedeelde demo.
-  const own = !!req.session.account;
-  const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;
-  const invoices = md.invoices || [];
-  let targets;
-  if (req.body.all) {
-    targets = invoices.filter(i => i.status === 'open');
-    if (!targets.length) return res.status(409).json({ error: 'Er staat niets open.' });
-  } else {
-    const inv = invoices.find(i => i.id === req.body.invoiceId);
-    if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
-    if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
-    targets = [inv];
-  }
-  let foundation = 0;
-  for (const inv of targets) {
-    inv.status = 'paid';
-    inv.date = 'Zojuist betaald';
-    foundation += Math.round(inv.bijdrage * 0.3);
-    for (const item of (md.trip ? md.trip.items : [])) {
-      if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
-    }
-  }
-  if (own) accounts.saveMemberState(req.session.account.id, md);
-  else save();
-  // ander open scherm van hetzelfde lid meteen bijwerken
-  broadcastSync([req.session.tier], 'payments');
-  res.json({ ok: true, foundation, state: stateFor(req.session, req.body.lang) });
-});
 
-app.post('/api/like', auth, (req, res) => {
-  const post = db.data.posts.find(p => p.id === Number(req.body.postId));
-  if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
-  // Gratis gebruikers (zonder pas) bekijken de Salon, maar liken en reageren niet
-  // bij particulieren. Berichten van partners mogen ze wel waarderen.
-  if (req.session.tier === 'guest' && !post.partner)
-    return res.status(403).json({ error: 'Zonder pas bekijk je de Salon, maar liken en reageren bij leden is voor leden. Solliciteren en betalen bij partners kan wel.' });
-  if (req.body.liked) post.likedBy[req.session.key] = true;
-  else delete post.likedBy[req.session.key];
-  save();
-  const likes = post.baseLikes + Object.keys(post.likedBy).length;
-  // alle open Salon-schermen de nieuwe like-telling laten zien
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  // de eigenaar van de post een notificatie geven (niet bij eigen like)
-  const ownerTier = AUTHOR_TIER[post.author];
-  if (req.body.liked && ownerTier && ownerTier !== req.session.tier) {
-    notify(ownerTier, { icon: '♥', title: 'Nieuwe like', body: PERSONAS[req.session.tier].full + ' vindt uw post over ' + post.place + ' mooi.', scope: 'salon' });
-  }
-  res.json({ ok: true, likes });
-});
 
-app.post('/api/comment', auth, (req, res) => {
-  const post = db.data.posts.find(p => p.id === Number(req.body.postId));
-  if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
-  if (!canEngage(req.session, post)) {
-    return res.status(403).json({ error: engageError(req.session.tier) });
-  }
-  const text = String(req.body.text || '').trim().slice(0, 500);
-  if (!text) return res.status(400).json({ error: 'Lege reactie.' });
-  // Echte leden verschijnen in De Salon onder hun codenaam, nooit hun echte naam.
-  const who = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
-  const clang = req.body.lang === 'en' ? 'en' : 'nl';
-  const comment = { who, tier: req.session.tier, text, lang: clang };
-  post.comments.push(comment);
-  registerContact(req.session, post);
-  save();
-  // alle Salon-schermen tonen de nieuwe reactie live
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  // de eigenaar van de post krijgt een notificatie (niet bij eigen reactie)
-  const ownerTier = AUTHOR_TIER[post.author];
-  if (ownerTier && ownerTier !== req.session.tier) {
-    notify(ownerTier, { icon: '💬', title: 'Nieuwe reactie', body: who + ': “' + text.slice(0, 80) + '”', scope: 'salon' });
-  }
-  res.json({ ok: true, comment });
-});
 
-app.post('/api/dm', auth, (req, res) => {
-  const post = db.data.posts.find(p => p.id === Number(req.body.postId));
-  if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
-  if (!canEngage(req.session, post)) {
-    return res.status(403).json({ error: engageError(req.session.tier) });
-  }
-  const text = String(req.body.text || '').trim().slice(0, 1000);
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  registerContact(req.session, post);
-  const fromName = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
-  db.data.dms.push({
-    from: fromName,
-    fromTier: req.session.tier,
-    to: post.author,
-    text,
-    lang: req.body.lang === 'en' ? 'en' : 'nl',
-    at: new Date().toISOString()
-  });
-  save();
-  // de ontvanger krijgt een notificatie/push van het privébericht
-  const ownerTier = AUTHOR_TIER[post.author];
-  if (ownerTier && ownerTier !== req.session.tier) {
-    notify(ownerTier, { icon: '✉', title: 'Nieuw bericht in De Salon', body: fromName + ' stuurde u een bericht.', scope: 'salon' });
-  }
-  res.json({ ok: true });
-});
 
 /* Vertaal een bericht naar de taal van de ontvanger. Iedereen schrijft in de
    eigen taal; de lezer krijgt het in de zijne (en andersom). */
@@ -1324,70 +1053,8 @@ function publicTrip(t, staffRate, lang) {
   return out;
 }
 
-app.post('/api/partner', (req, res) => {
-  const partner = findPartner(req.body.code);
-  if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });
-  res.json({ partner: publicPartner(partner) });
-});
 
-app.post('/api/staff', (req, res) => {
-  let partner;
-  if (hasCred(req.body)) {
-    if (!checkCred(req.body.username, req.body.password))
-      return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
-    partner = db.data.partners.find(p => p.staff) || null;
-  } else {
-    partner = findStaffPartner(req.body.staffCode);
-  }
-  if (!partner) return res.status(404).json({ error: 'Deze personeelscode kennen we niet.' });
-  // De personeelscode gaat mee terug zodat de inlog verder werkt zoals de code-invoer.
-  res.json({ ok: true, partner: publicPartner(partner), staffCode: partner.staff ? partner.staff.code : null });
-});
 
-app.post('/api/partnertrips', (req, res) => {
-  let staffRate = null;
-  if (req.body.staffCode) {
-    const p = findStaffPartner(req.body.staffCode);
-    if (p) staffRate = p.staff.serviceRate;
-  }
-  res.json({ trips: db.data.partnerTrips.map(t => publicTrip(t, staffRate, req.body.lang)) });
-});
-
-app.post('/api/book', (req, res) => {
-  const trip = db.data.partnerTrips.find(t => t.id === req.body.tripId);
-  if (!trip) return res.status(404).json({ error: 'Reis niet gevonden.' });
-
-  let partner = null;
-  let rate = db.data.partnerService;
-  let channel = 'klant';
-  if (req.body.staffCode) {
-    partner = findStaffPartner(req.body.staffCode);
-    if (!partner) return res.status(404).json({ error: 'Deze personeelscode kennen we niet.' });
-    rate = partner.staff.serviceRate;
-    channel = 'personeel';
-  } else if (req.body.code) {
-    partner = findPartner(req.body.code);
-    if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });
-  }
-
-  const name = String(req.body.name || '').trim().slice(0, 120);
-  const email = String(req.body.email || '').trim().slice(0, 200);
-  if (!name || !email.includes('@')) return res.status(400).json({ error: 'Vul een naam en geldig e-mailadres in.' });
-
-  // Interne administratie: verdeling wordt opgeslagen, nooit meegestuurd.
-  const service = Math.round(trip.netto * rate);
-  const total = trip.netto + service;
-  const partnerCut = partner ? Math.round(service * partner.share) : 0;
-  const ref = 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase();
-  db.data.bookings.push({
-    ref, tripId: trip.id, channel, name, email,
-    partnerCode: partner ? partner.code : null,
-    netto: trip.netto, service, total, partnerCut, rtgCut: service - partnerCut,
-    at: new Date().toISOString()
-  });
-  save();
-  res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total });
-});
 
 /* ================= LEVERANCIER-KANAAL =================
    Eén app voor alle leverancierstypes. Communiceert live (SSE) met de
@@ -1557,73 +1224,10 @@ function supplierState(s, actor) {
 
 // Bescherming tegen PIN-raden: na 5 foute pogingen een minuut wachten.
 const pinFails = new Map(); // 'CODE:staffId' -> { n, until }
-app.post('/api/supplier/login', (req, res) => {
-  let s, actor;
-  if (req.body.staffId != null) {
-    // Persoonlijke personeelslogin met PIN, binnen het bedrijfsaccount.
-    s = findSupplier(req.body.code);
-    if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
-    const fk = s.code + ':' + req.body.staffId;
-    const fail = pinFails.get(fk);
-    if (fail && fail.until > Date.now())
-      return res.status(429).json({ error: 'Te veel foute pogingen. Wacht een minuut en probeer het opnieuw.' });
-    const staff = accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
-    if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) {
-      const n = ((fail && fail.n) || 0) + 1;
-      pinFails.set(fk, n >= 5 ? { n: 0, until: Date.now() + 60000 } : { n, until: 0 });
-      return res.status(401).json({ error: 'Onjuiste PIN.' });
-    }
-    pinFails.delete(fk);
-    actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
-  } else if (hasCred(req.body)) {
-    const bucket = 'sup:' + req.ip;
-    if (tooManyTries(res, bucket)) return;
-    if (!checkCred(req.body.username, req.body.password)) {
-      noteFailedTry(bucket);
-      return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
-    }
-    loginFails.delete(bucket);
-    s = findSupplier(DEMO_SUPPLIER);
-    actor = { name: 'Beheer', role: 'manager', manager: true };
-  } else {
-    // Geen anonieme toegang meer met alleen de bedrijfscode: iedereen logt in op
-    // de eigen naam met een persoonlijke pincode (of het bedrijfsaccount met
-    // gebruikersnaam en wachtwoord). Zo staat elke handeling op een persoon.
-    return res.status(401).json({ error: 'Kies wie u bent en voer uw persoonlijke pincode in.' });
-  }
-  if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
-  const token = crypto.randomBytes(24).toString('hex');
-  rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager });
-  logActivity(s.code, actor, actor.name + ' logde in');
-  res.json({ token, state: supplierState(s, actor) });
-});
 
 // Roster van het bedrijf (voor het personeel-inlogscherm; geen PINs).
-app.post('/api/supplier/roster', (req, res) => {
-  const s = findSupplier(req.body.code);
-  if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
-  res.json({ supplier: { code: s.code, name: s.name, type: s.type }, staff: accounts.listStaff(s.code).map(accounts.publicStaff) });
-});
 
 // Manager voegt personeel toe (krijgt een PIN) of verwijdert het.
-app.post('/api/supplier/staff/add', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
-  const name = schoon(req.body.name, 60);
-  if (!name) return res.status(400).json({ error: 'Vul een naam in.' });
-  const pin = accounts.makePin();
-  const staff = accounts.createStaff({ supplierCode: req.supplier.code, name, role: req.body.role === 'manager' ? 'manager' : 'staff', func: String(req.body.func || '').slice(0, 40) || null, pin });
-  logActivity(req.supplier.code, req.actor, req.actor.name + ' voegde ' + name + ' toe aan het team');
-  res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
-});
-app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel verwijderen.' });
-  const st = accounts.getStaffById(Number(req.body.staffId));
-  if (st && String(st.supplier_code).toUpperCase() === req.supplier.code) {
-    accounts.deactivateStaff(st.id);
-    logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team');
-  }
-  res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
-});
 
 /* ---- sector-slimmigheden ----
    Ophaalcodes voor bars/restaurants, kamerbeheer voor hotels, een eigen
@@ -1638,27 +1242,6 @@ function pickupCode() {
 }
 
 // ---- kamers (hotel/appartement): aan/uit, toevoegen, verwijderen ----
-app.post('/api/supplier/room/add', supplierAuth, (req, res) => {
-  if (!Array.isArray(req.supplier.rooms)) return res.status(400).json({ error: 'Kamers zijn er alleen voor hotels en appartementen.' });
-  const name = schoon(req.body.name, 60);
-  const price = Math.max(0, Number(req.body.price) || 0);
-  if (!name || !price) return res.status(400).json({ error: 'Vul een kamernaam en prijs in.' });
-  const room = { id: crypto.randomBytes(3).toString('hex'), name, desc: String(req.body.desc || '').slice(0, 120), price, available: true, hk: { status: 'schoon' } };
-  req.supplier.rooms.push(room);
-  save();
-  logActivity(req.supplier.code, req.actor, 'voegde kamer "' + name + '" toe');
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  res.json({ ok: true, rooms: req.supplier.rooms });
-});
-app.post('/api/supplier/room/toggle', supplierAuth, (req, res) => {
-  const room = (req.supplier.rooms || []).find(r => r.id === req.body.id);
-  if (!room) return res.status(404).json({ error: 'Kamer niet gevonden.' });
-  room.available = !room.available;
-  save();
-  logActivity(req.supplier.code, req.actor, 'zette kamer "' + room.name + '" ' + (room.available ? 'aan' : 'uit'));
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  res.json({ ok: true, rooms: req.supplier.rooms });
-});
 /* ---- housekeeping: status per kamer ----
    schoon / vuil / bezig / bezet / defect. Defect maakt de kamer direct
    onboekbaar en zet automatisch een klus voor onderhoud klaar. */
@@ -1690,127 +1273,15 @@ function setRoomHk(s, room, status, note, actor) {
   broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
   sseToSupplier(s.code, 'sync', { scope: 'rooms' });
 }
-app.post('/api/supplier/room/hk', supplierAuth, (req, res) => {
-  const room = (req.supplier.rooms || []).find(r => r.id === req.body.id);
-  if (!room) return res.status(404).json({ error: 'Kamer niet gevonden.' });
-  const status = String(req.body.status || '');
-  if (!HK_STATUSES.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
-  setRoomHk(req.supplier, room, status, String(req.body.note || '').trim().slice(0, 140), req.actor);
-  res.json({ ok: true, rooms: req.supplier.rooms });
-});
 
 // ---- klussen (onderhoud): melden, oppakken, afronden ----
-app.post('/api/supplier/ticket/add', supplierAuth, (req, res) => {
-  const text = String(req.body.text || '').trim().slice(0, 160);
-  if (!text) return res.status(400).json({ error: 'Omschrijf de klus.' });
-  const t = addTicket(req.supplier.code, req.actor, text, String(req.body.room || '').slice(0, 60) || null);
-  save();
-  logActivity(req.supplier.code, req.actor, 'meldde een klus: ' + text.slice(0, 60));
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
-  res.json({ ok: true, ticket: t });
-});
-app.post('/api/supplier/ticket/status', supplierAuth, (req, res) => {
-  const t = (db.data.tickets[req.supplier.code] || []).find(x => x.id === req.body.id);
-  if (!t) return res.status(404).json({ error: 'Klus niet gevonden.' });
-  const status = ['open', 'bezig', 'klaar'].includes(req.body.status) ? req.body.status : 'open';
-  t.status = status;
-  if (status === 'bezig') { t.by = req.actor.name; }
-  if (status === 'klaar') { t.doneBy = req.actor.name; t.doneAt = new Date().toISOString(); }
-  save();
-  logActivity(req.supplier.code, req.actor, (status === 'klaar' ? 'rondde een klus af: ' : status === 'bezig' ? 'pakte een klus op: ' : 'heropende een klus: ') + t.text.slice(0, 60));
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
-  res.json({ ok: true, ticket: t });
-});
 
 // ---- gevonden voorwerpen ----
-app.post('/api/supplier/lost/add', supplierAuth, (req, res) => {
-  const item = String(req.body.item || '').trim().slice(0, 100);
-  if (!item) return res.status(400).json({ error: 'Omschrijf het voorwerp.' });
-  const entry = {
-    id: crypto.randomBytes(4).toString('hex'),
-    item, room: String(req.body.room || '').slice(0, 60) || null,
-    storage: String(req.body.storage || '').trim().slice(0, 80) || null,
-    status: 'bewaard', by: req.actor.name, at: new Date().toISOString()
-  };
-  const list = db.data.lostfound[req.supplier.code] = (db.data.lostfound[req.supplier.code] || []);
-  list.unshift(entry);
-  db.data.lostfound[req.supplier.code] = list.slice(0, 120);
-  save();
-  logActivity(req.supplier.code, req.actor, 'registreerde een gevonden voorwerp: ' + item + (entry.room ? ' (' + entry.room + ')' : ''));
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
-  res.json({ ok: true, entry });
-});
-app.post('/api/supplier/lost/done', supplierAuth, (req, res) => {
-  const e = (db.data.lostfound[req.supplier.code] || []).find(x => x.id === req.body.id);
-  if (e) {
-    e.status = 'opgehaald'; e.doneBy = req.actor.name; e.doneAt = new Date().toISOString();
-    save();
-    logActivity(req.supplier.code, req.actor, 'gaf een gevonden voorwerp mee: ' + e.item);
-    sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
-  }
-  res.json({ ok: true });
-});
 
-app.post('/api/supplier/room/remove', supplierAuth, (req, res) => {
-  const i = (req.supplier.rooms || []).findIndex(r => r.id === req.body.id);
-  if (i >= 0) {
-    logActivity(req.supplier.code, req.actor, 'verwijderde kamer "' + req.supplier.rooms[i].name + '"');
-    req.supplier.rooms.splice(i, 1);
-    save();
-    broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  }
-  res.json({ ok: true, rooms: req.supplier.rooms || [] });
-});
 
 // ---- fotopagina: foto's die gasten zien bij de partner ----
-app.post('/api/supplier/photo/add', express.json({ limit: '6mb' }), supplierAuth, (req, res) => {
-  const img = String(req.body.image || '');
-  if (!/^data:image\/(jpeg|png|webp);base64,/.test(img)) return res.status(400).json({ error: 'Alleen JPG, PNG of WebP.' });
-  if (img.length > 1.5 * 1024 * 1024) return res.status(413).json({ error: 'Foto te groot (max ~1 MB).' });
-  req.supplier.photos = req.supplier.photos || [];
-  if (req.supplier.photos.length >= 6) return res.status(409).json({ error: 'Maximaal 6 foto\'s. Verwijder er eerst een.' });
-  req.supplier.photos.push(img);
-  save();
-  logActivity(req.supplier.code, req.actor, 'plaatste een foto op de pagina');
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  res.json({ ok: true, count: req.supplier.photos.length });
-});
-app.post('/api/supplier/photo/remove', supplierAuth, (req, res) => {
-  const i = parseInt(req.body.index, 10);
-  if (req.supplier.photos && i >= 0 && i < req.supplier.photos.length) {
-    req.supplier.photos.splice(i, 1);
-    save();
-    logActivity(req.supplier.code, req.actor, 'verwijderde een foto van de pagina');
-    broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  }
-  res.json({ ok: true, count: (req.supplier.photos || []).length });
-});
 
 // ---- rechtstreeks publiceren op De Salon (als RTG-partner) ----
-app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAuth, (req, res) => {
-  const text = String(req.body.text || '').trim().slice(0, 600);
-  if (!text) return res.status(400).json({ error: 'Schrijf eerst een tekst.' });
-  let photo = null;
-  const pi = parseInt(req.body.photoIndex, 10);
-  if (Number.isInteger(pi) && req.supplier.photos && req.supplier.photos[pi]) photo = req.supplier.photos[pi];
-  else if (typeof req.body.image === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(req.body.image) && req.body.image.length <= 1.5 * 1024 * 1024) photo = req.body.image;
-  const post = {
-    id: Date.now(),
-    author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
-    place: req.supplier.city, visual: null, photo,
-    text, lang: req.body.lang === 'en' ? 'en' : 'nl',
-    at: new Date().toISOString(),
-    baseLikes: 0, likedBy: {}, comments: []
-  };
-  db.data.posts.unshift(post);
-  db.data.posts = db.data.posts.slice(0, 60);
-  save();
-  logActivity(req.supplier.code, req.actor, 'publiceerde op De Salon');
-  salonNaarVolgers(req.supplier, text);
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  sseToOffice('sync', { scope: 'salon' });
-  res.json({ ok: true, postId: post.id });
-});
 
 /* ---- De Salon voor bedrijven: volgers, aanbiedingen, polls en cijfers ----
    Het Salon-profiel is een verplicht onderdeel van elk partnerschap; deze
@@ -1824,169 +1295,21 @@ function salonNaarVolgers(s, tekst) {
 }
 
 // lid volgt of ontvolgt een zaak
-app.post('/api/salon/volg', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const s = findSupplier(req.body.code);
-  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
-  s.salon = s.salon || { bio: '', volgers: [], sinds: new Date().toISOString() };
-  const i = s.salon.volgers.indexOf(req.session.key);
-  if (i >= 0) s.salon.volgers.splice(i, 1);
-  else s.salon.volgers.push(req.session.key);
-  save();
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  res.json({ ok: true, volgIk: i < 0, volgers: s.salon.volgers.length });
-});
 
 // exclusieve member-aanbieding plaatsen (klantbinding: claimen met een code)
-app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  const titel = schoon(req.body.titel, 80);
-  const text = schoon(req.body.text, 400);
-  if (!titel || !text) return res.status(400).json({ error: 'Geef de aanbieding een titel en een tekst.' });
-  const geldigTot = /^\d{4}-\d{2}-\d{2}$/.test(String(req.body.geldigTot || '')) ? req.body.geldigTot : null;
-  const post = {
-    id: Date.now(),
-    author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
-    place: req.supplier.city, visual: null, photo: null,
-    text, lang: 'nl', at: new Date().toISOString(), baseLikes: 0, likedBy: {}, comments: [],
-    deal: { titel, geldigTot, claims: [] }
-  };
-  db.data.posts.unshift(post);
-  db.data.posts = db.data.posts.slice(0, 60);
-  save();
-  logActivity(req.supplier.code, req.actor, 'zette een aanbieding op De Salon: "' + titel + '"');
-  salonNaarVolgers(req.supplier, '🎁 ' + titel);
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  res.json({ ok: true, postId: post.id });
-});
 
 // lid claimt een aanbieding en krijgt een persoonlijke code voor aan de kassa
-app.post('/api/salon/deal/claim', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const p = db.data.posts.find(x => x.id === Number(req.body.postId));
-  if (!p || !p.deal) return res.status(404).json({ error: 'Aanbieding niet gevonden.' });
-  if (p.deal.geldigTot && p.deal.geldigTot < new Date().toISOString().slice(0, 10))
-    return res.status(410).json({ error: 'Deze aanbieding is verlopen.' });
-  const al = p.deal.claims.find(c => c.key === req.session.key);
-  if (al) return res.json({ ok: true, code: al.code, alGeclaimd: true });
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  const claim = { key: req.session.key, codename, code: 'RTG-D-' + crypto.randomBytes(3).toString('hex').toUpperCase(), at: new Date().toISOString(), used: false };
-  p.deal.claims.push(claim);
-  save();
-  notifySupplier(p.partnerCode, { icon: '🎁', title: 'Aanbieding geclaimd', body: codename + ' claimde "' + p.deal.titel + '" (' + p.deal.claims.length + 'x totaal).' });
-  res.json({ ok: true, code: claim.code });
-});
 
 // de zaak verzilvert een claimcode aan de kassa
-app.post('/api/supplier/salon/deal/redeem', supplierAuth, (req, res) => {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  for (const p of db.data.posts) {
-    if (!p.deal || p.partnerCode !== req.supplier.code) continue;
-    const claim = p.deal.claims.find(c => c.code === code);
-    if (claim) {
-      if (claim.used) return res.status(409).json({ error: 'Deze code is al verzilverd.' });
-      claim.used = true;
-      claim.usedAt = new Date().toISOString();
-      save();
-      logActivity(req.supplier.code, req.actor, 'verzilverde aanbiedingscode ' + code + ' (' + claim.codename + ')');
-      return res.json({ ok: true, titel: p.deal.titel, codename: claim.codename });
-    }
-  }
-  res.status(404).json({ error: 'Deze code kennen we hier niet.' });
-});
 
 // poll plaatsen: vraag de leden wat zij willen (marketinginzicht)
-app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  const vraag = schoon(req.body.vraag, 140);
-  const opties = (Array.isArray(req.body.opties) ? req.body.opties : []).map(o => schoon(o, 60)).filter(Boolean).slice(0, 4);
-  if (!vraag || opties.length < 2) return res.status(400).json({ error: 'Geef een vraag en minstens twee opties.' });
-  const post = {
-    id: Date.now(),
-    author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
-    place: req.supplier.city, visual: null, photo: null,
-    text: vraag, lang: 'nl', at: new Date().toISOString(), baseLikes: 0, likedBy: {}, comments: [],
-    poll: { vraag, opties: opties.map(t2 => ({ tekst: t2, stemmen: [] })) }
-  };
-  db.data.posts.unshift(post);
-  db.data.posts = db.data.posts.slice(0, 60);
-  save();
-  logActivity(req.supplier.code, req.actor, 'zette een poll op De Salon');
-  salonNaarVolgers(req.supplier, '📊 ' + vraag);
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  res.json({ ok: true, postId: post.id });
-});
 
-app.post('/api/salon/poll/stem', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const p = db.data.posts.find(x => x.id === Number(req.body.postId));
-  if (!p || !p.poll) return res.status(404).json({ error: 'Poll niet gevonden.' });
-  if (p.poll.opties.some(o => o.stemmen.includes(req.session.key))) return res.status(409).json({ error: 'U heeft al gestemd.' });
-  const i = Number(req.body.optie);
-  if (!p.poll.opties[i]) return res.status(400).json({ error: 'Onbekende optie.' });
-  p.poll.opties[i].stemmen.push(req.session.key);
-  save();
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  res.json({ ok: true });
-});
 
 // het bedrijfsprofiel: bio instellen en de marketingcijfers van de zaak
-app.post('/api/supplier/salon/bio', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  req.supplier.salon = req.supplier.salon || { bio: '', volgers: [], sinds: new Date().toISOString() };
-  req.supplier.salon.bio = schoon(req.body.bio, 200);
-  save();
-  logActivity(req.supplier.code, req.actor, 'werkte het Salon-profiel bij');
-  res.json({ ok: true, salon: { bio: req.supplier.salon.bio, volgers: req.supplier.salon.volgers.length } });
-});
 
-app.post('/api/supplier/salon/stats', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  const s = req.supplier;
-  const eigen = db.data.posts.filter(p => p.partnerCode === s.code);
-  const likes = eigen.reduce((n, p) => n + p.baseLikes + Object.keys(p.likedBy).length, 0);
-  const reacties = eigen.reduce((n, p) => n + p.comments.length, 0);
-  res.json({
-    volgers: (s.salon && s.salon.volgers.length) || 0,
-    bio: (s.salon && s.salon.bio) || '',
-    posts: eigen.length, likes, reacties,
-    deals: eigen.filter(p => p.deal).map(p => ({
-      titel: p.deal.titel, geldigTot: p.deal.geldigTot,
-      claims: p.deal.claims.length, verzilverd: p.deal.claims.filter(c => c.used).length
-    })),
-    polls: eigen.filter(p => p.poll).map(p => ({
-      vraag: p.poll.vraag,
-      opties: p.poll.opties.map(o => ({ tekst: o.tekst, stemmen: o.stemmen.length }))
-    }))
-  });
-});
 
 // ---- kassa: verkopen registreren, per sector (bon, kamer, rit) ----
 const POS_METHODS = ['pin', 'contant', 'kamer'];
-app.post('/api/supplier/pos/sale', supplierAuth, (req, res) => {
-  const total = Number(req.body.total);
-  if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
-  const method = POS_METHODS.includes(req.body.method) ? req.body.method : 'pin';
-  const items = Array.isArray(req.body.items)
-    ? req.body.items.slice(0, 40).map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
-    : null;
-  const sale = {
-    id: crypto.randomBytes(4).toString('hex'),
-    bon: pickupCode(),
-    actor: req.actor.name,
-    desc: String(req.body.desc || '').slice(0, 140),
-    room: req.body.room ? String(req.body.room).slice(0, 60) : null,
-    items, total, method,
-    at: new Date().toISOString()
-  };
-  const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
-  list.unshift(sale);
-  db.data.posSales[req.supplier.code] = list.slice(0, 300);
-  save();
-  logActivity(req.supplier.code, req.actor, 'rekende € ' + total + ' af (' + method + (sale.room ? ', ' + sale.room : '') + ')');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
-  res.json({ ok: true, sale });
-});
 
 // dagoverzicht (Z-rapport): ontvangen vandaag, per betaalmethode en medewerker.
 // Kamerlasten tellen pas mee als omzet bij het uitchecken (anders dubbel).
@@ -2016,130 +1339,13 @@ function posDay(code) {
 // ---- RTG-ophaalcode innen aan de kassa ----
 // De gast toont het oplichtende scherm; het personeel slaat de code aan.
 // De bestelling wordt gekoppeld, zo nodig betaald en als uitgegeven gemarkeerd.
-app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  if (!code) return res.status(400).json({ error: 'Voer een ophaalcode in.' });
-  const o = db.data.orders.find(x => x.supplierCode === req.supplier.code && x.pickup === code);
-  if (!o) return res.status(404).json({ error: 'Onbekende code voor dit bedrijf.' });
-  if (o.refunded || o.status === 'geweigerd') return res.status(409).json({ error: 'Deze bestelling is geannuleerd.' });
-  if (o.status === 'geserveerd') return res.status(409).json({ error: 'Code ' + code + ' is al uitgegeven.' });
-  const wasPaid = o.paid;
-  let sale = null;
-  if (!o.paid) {
-    // afrekenen via RTG-lidmaatschap; komt als omzet in het dagoverzicht
-    o.paid = true;
-    sale = {
-      id: crypto.randomBytes(4).toString('hex'),
-      bon: pickupCode(),
-      actor: req.actor.name,
-      desc: 'RTG-code ' + code + ' (' + o.ref + ')',
-      room: null,
-      items: o.items, total: o.total, method: 'rtg',
-      at: new Date().toISOString()
-    };
-    const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
-    list.unshift(sale);
-    db.data.posSales[req.supplier.code] = list.slice(0, 300);
-  }
-  o.status = 'geserveerd';
-  save();
-  logActivity(req.supplier.code, req.actor, 'gaf bestelling ' + o.ref + ' uit op code ' + code + (wasPaid ? '' : ' en rekende € ' + o.total + ' af (RTG)'));
-  broadcastSync([o.customerTier], 'orders');
-  sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
-  notify(o.customerTier, { icon: '✨', title: req.supplier.name, body: 'Uw bestelling is uitgegeven. Veel plezier.', scope: 'orders' });
-  res.json({ ok: true, order: { ref: o.ref, codename: o.customerCodename, items: o.items, total: o.total, wasPaid }, sale });
-});
 
 // ---- uitchecken: alle open kamerlasten van een kamer in één keer afrekenen ----
-app.post('/api/supplier/pos/checkout', supplierAuth, (req, res) => {
-  const room = String(req.body.room || '').slice(0, 60);
-  const method = ['pin', 'contant'].includes(req.body.method) ? req.body.method : 'pin';
-  const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
-  const open = list.filter(s => s.method === 'kamer' && !s.settled && s.room === room);
-  if (!open.length) return res.status(404).json({ error: 'Geen open kamerlasten voor deze kamer.' });
-  let total = 0;
-  for (const s of open) { s.settled = true; total += s.total; }
-  const sale = {
-    id: crypto.randomBytes(4).toString('hex'),
-    bon: pickupCode(),
-    actor: req.actor.name,
-    desc: 'Check-out ' + room + ' (' + open.length + ' post(en))',
-    room, items: null, total, method,
-    at: new Date().toISOString()
-  };
-  list.unshift(sale);
-  db.data.posSales[req.supplier.code] = list.slice(0, 300);
-  // na het uitchecken staat de kamer automatisch op "vuil" voor housekeeping
-  const rm = (req.supplier.rooms || []).find(r => r.name === room);
-  if (rm) rm.hk = { status: 'vuil', by: 'Systeem (check-out)', at: new Date().toISOString() };
-  save();
-  logActivity(req.supplier.code, req.actor, 'checkte ' + room + ' uit: € ' + total + ' (' + method + ')');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
-  res.json({ ok: true, sale });
-});
 
 /* ---- minibar-telling: personeel telt per kamer, kosten gaan automatisch
    op de kamerrekening en de aanvulling staat meteen op papier ---- */
-app.post('/api/supplier/minibar/count', supplierAuth, (req, res) => {
-  if (!Array.isArray(req.supplier.minibar)) return res.status(400).json({ error: 'Minibar is er alleen voor hotels en appartementen.' });
-  const room = String(req.body.room || '').slice(0, 60);
-  if (!room) return res.status(400).json({ error: 'Kies een kamer.' });
-  const wanted = Array.isArray(req.body.items) ? req.body.items : [];
-  const items = [];
-  let total = 0;
-  for (const w of wanted) {
-    const m = req.supplier.minibar.find(x => x.id === w.id);
-    const qty = Math.min(20, Math.max(0, parseInt(w.qty, 10) || 0));
-    if (m && qty > 0) { items.push({ name: m.name, qty, price: m.price }); total += m.price * qty; }
-  }
-  const entry = {
-    id: crypto.randomBytes(4).toString('hex'),
-    room, actor: req.actor.name, items, total,
-    at: new Date().toISOString()
-  };
-  const list = db.data.minibarCounts[req.supplier.code] = (db.data.minibarCounts[req.supplier.code] || []);
-  list.unshift(entry);
-  db.data.minibarCounts[req.supplier.code] = list.slice(0, 300);
-  // verbruik automatisch als kamerlast op de rekening (komt mee bij check-out)
-  if (total > 0) {
-    const sale = {
-      id: crypto.randomBytes(4).toString('hex'),
-      bon: pickupCode(),
-      actor: req.actor.name,
-      desc: 'Minibar: ' + items.map(i => i.qty + 'x ' + i.name).join(', '),
-      room, items, total, method: 'kamer',
-      at: new Date().toISOString()
-    };
-    const sales = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
-    sales.unshift(sale);
-    db.data.posSales[req.supplier.code] = sales.slice(0, 300);
-  }
-  save();
-  logActivity(req.supplier.code, req.actor, 'telde de minibar van ' + room + (total > 0 ? ': € ' + total + ' verbruik, aanvullen: ' + items.map(i => i.qty + 'x ' + i.name).join(', ') : ': niets gebruikt'));
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
-  res.json({ ok: true, entry, charged: total });
-});
 
 // catalogusbeheer: artikelen toevoegen of verwijderen
-app.post('/api/supplier/minibar/item/add', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return; // de minibar-catalogus is voor het management
-  if (!Array.isArray(req.supplier.minibar)) return res.status(400).json({ error: 'Minibar is er alleen voor hotels en appartementen.' });
-  const name = schoon(req.body.name, 60);
-  const price = Math.max(0, Number(req.body.price) || 0);
-  if (!name || !price) return res.status(400).json({ error: 'Vul een artikel en prijs in.' });
-  req.supplier.minibar.push({ id: crypto.randomBytes(3).toString('hex'), name, price });
-  save();
-  logActivity(req.supplier.code, req.actor, 'zette "' + name + '" in de minibar-catalogus');
-  res.json({ ok: true, minibar: req.supplier.minibar });
-});
-app.post('/api/supplier/minibar/item/remove', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return; // de minibar-catalogus is voor het management
-  const i = (req.supplier.minibar || []).findIndex(x => x.id === req.body.id);
-  if (i >= 0) { req.supplier.minibar.splice(i, 1); save(); }
-  res.json({ ok: true, minibar: req.supplier.minibar || [] });
-});
 
 /* ---- slimme deuren (appartementen): op afstand openen via de app ----
    Openen is tijdelijk: na 10 seconden vergrendelt de deur zichzelf weer,
@@ -2161,37 +1367,8 @@ function unlockDoor(s, door, who) {
   }, DOOR_RELOCK_MS);
 }
 
-app.post('/api/supplier/door/toggle', supplierAuth, (req, res) => {
-  const door = (req.supplier.doors || []).find(d => d.id === req.body.id);
-  if (!door) return res.status(404).json({ error: 'Deur niet gevonden.' });
-  if (door.locked) {
-    unlockDoor(req.supplier, door, req.actor.name);
-    logActivity(req.supplier.code, req.actor, 'opende "' + door.name + '" op afstand');
-  } else {
-    door.locked = true;
-    door.lastBy = req.actor.name;
-    door.lastAt = new Date().toISOString();
-    save();
-    logActivity(req.supplier.code, req.actor, 'vergrendelde "' + door.name + '"');
-    sseToSupplier(req.supplier.code, 'sync', { scope: 'doors' });
-  }
-  res.json({ ok: true, doors: req.supplier.doors });
-});
 
 // De gearriveerde gast opent de voordeur vanuit de leden-app (digitale sleutel).
-app.post('/api/live/door', auth, (req, res) => {
-  const L = db.data.live[req.session.key];
-  if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
-  const dest = L.destCode ? findSupplier(L.destCode) : null;
-  if (!dest || !(dest.doors || []).length) return res.status(404).json({ error: 'Deze bestemming heeft geen digitale deuren.' });
-  if (!optieAan(dest, 'deurenGast')) return res.status(409).json({ error: dest.name + ' heeft de digitale gastsleutel op dit moment uitstaan. Meld u bij de receptie.' });
-  if (!L.arrived) return res.status(409).json({ error: 'De deur opent pas als u bent aangekomen.' });
-  const door = dest.doors[0];
-  unlockDoor(dest, door, L.codename);
-  logActivity(dest.code, { name: L.codename }, 'gast opende "' + door.name + '" via de app');
-  notifySupplier(dest.code, { icon: '🔓', title: 'Deur geopend', body: L.codename + ' heeft "' + door.name + '" geopend via de app.' });
-  res.json({ ok: true, door: { name: door.name, relockSec: DOOR_RELOCK_MS / 1000 } });
-});
 
 /* ---- gastchat: rechtstreeks appen met roomservice of de eigenaar ----
    Een gesprek per lid per partner, op codenaam. De gast begint vanuit de
@@ -2237,108 +1414,22 @@ async function trChat(messages, to) {
 }
 
 // gast stuurt een bericht aan een partner (per afdeling een eigen gesprek)
-app.post('/api/partner/chat/send', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const s = findSupplier(req.body.supplierCode);
-  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
-  if (!optieAan(s, 'gastchat')) return res.status(409).json({ error: s.name + ' heeft de gastchat op dit moment uitstaan.' });
-  const text = String(req.body.text || '').trim().slice(0, 500);
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  const dept = validDept(s, String(req.body.dept || ''));
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  const chat = getChat(s, req.session.key, codename, req.session.tier, dept);
-  chat.codename = codename;
-  chat.messages.push({ from: 'guest', who: codename, text, lang: req.body.lang === 'en' ? 'en' : 'nl', at: new Date().toISOString() });
-  chat.messages = chat.messages.slice(-120);
-  chat.unreadPartner += 1;
-  chat.lastAt = new Date().toISOString();
-  save();
-  notifySupplier(s.code, { icon: '💬', title: codename + ' → ' + dept, body: text.slice(0, 90) });
-  sseToSupplier(s.code, 'sync', { scope: 'gchat' });
-  sseToCustomer(req.session.key, 'sync', { scope: 'gchat' });
-  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ ok: true, messages }));
-});
 
 // gast opent het gesprek met een afdeling (en markeert het als gelezen)
-app.post('/api/partner/chat/history', auth, (req, res) => {
-  const s = findSupplier(req.body.supplierCode);
-  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
-  const dept = validDept(s, String(req.body.dept || ''));
-  const chat = db.data.guestChats[chatKeyOf(s.code, req.session.key, dept)];
-  if (chat && chat.unreadGuest) { chat.unreadGuest = 0; save(); }
-  const to = req.body.lang === 'en' ? 'en' : 'nl';
-  trChat(chat ? chat.messages : [], to).then(messages => res.json({ messages, dept }));
-});
 
 // personeel antwoordt (onder eigen naam, uit het persoonlijke account)
-app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
-  const chat = db.data.guestChats[String(req.body.key || '')];
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
-  const text = String(req.body.text || '').trim().slice(0, 500);
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  chat.messages.push({ from: 'partner', who: req.actor.name, text, lang: req.body.lang === 'en' ? 'en' : 'nl', at: new Date().toISOString() });
-  chat.messages = chat.messages.slice(-120);
-  chat.unreadGuest += 1;
-  chat.lastAt = new Date().toISOString();
-  save();
-  logActivity(req.supplier.code, req.actor, 'antwoordde ' + chat.codename + ' (' + (chat.dept || 'Team') + ')');
-  notify(chat.tier, { icon: '💬', title: req.supplier.name + (chat.dept ? ' · ' + chat.dept : ''), body: text.slice(0, 90), scope: 'gchat' });
-  sseToCustomer(chat.customerKey, 'sync', { scope: 'gchat' });
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
-  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ ok: true, messages }));
-});
 
 // personeel opent een gesprek (en markeert het als gelezen)
-app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
-  const chat = db.data.guestChats[String(req.body.key || '')];
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
-  if (chat.unreadPartner) { chat.unreadPartner = 0; save(); }
-  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ messages, codename: chat.codename }));
-});
 
 /* ---- verbinding maken met een gast (hotel/appartement) ----
    Het hotel ziet welke leden nu live onderweg zijn en kan verbinden: de gast
    krijgt een melding, het hotel verschijnt in het onderweg-scherm van de
    gast, en het hotel volgt de aankomst live (positie en ETA). */
-app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
-  const codename = String(req.body.codename || '').trim();
-  const key = Object.keys(db.data.live).find(k => db.data.live[k].active && db.data.live[k].codename === codename);
-  if (!key) return res.status(404).json({ error: 'Deze gast is nu niet live onderweg.' });
-  const L = db.data.live[key];
-  L.connected = [...new Set([...(L.connected || []), req.supplier.code])];
-  save();
-  logActivity(req.supplier.code, req.actor, 'verbond met gast ' + codename);
-  notify(L.tier, { icon: '🤝', title: req.supplier.name, body: 'Volgt uw aankomst om alles voor u klaar te zetten.', scope: 'live' });
-  pushLive(key);
-  res.json({ ok: true, guests: guestsFor(req.supplier.code) });
-});
 
 /* ---- solliciteren: bij elk bedrijf op dezelfde manier ----
    Openbaar formulier per bedrijf; de manager ziet de sollicitatie in de app
    en neemt aan (dan ontstaat direct een personeelsaccount met pincode) of
    wijst af. Zo wordt personeel zoeken voor elk bedrijf gelijk en simpel. */
-app.post('/api/supplier/apply', (req, res) => {
-  const s = findSupplier(req.body.code);
-  if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
-  const name = schoon(req.body.name, 60);
-  const func = String(req.body.func || '').trim().slice(0, 40);
-  const contact = String(req.body.contact || '').trim().slice(0, 80);
-  const note = String(req.body.note || '').trim().slice(0, 400);
-  if (!name || !func || !contact) return res.status(400).json({ error: 'Vul uw naam, de functie en een telefoonnummer of e-mailadres in.' });
-  const entry = {
-    id: crypto.randomBytes(4).toString('hex'),
-    name, func, contact, note, status: 'nieuw',
-    at: new Date().toISOString()
-  };
-  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
-  list.unshift(entry);
-  db.data.applications[s.code] = list.slice(0, 100);
-  save();
-  notifySupplier(s.code, { icon: '📝', title: 'Nieuwe sollicitatie', body: name + ' solliciteert als ' + func + '.' });
-  sseToSupplier(s.code, 'sync', { scope: 'team' });
-  sseToOffice('sync', { scope: 'team' });
-  res.json({ ok: true });
-});
 /* ---- chat tussen sollicitant en werkgever ----
    Zodra de werkgever een sollicitant uitnodigt of aanneemt, komen beiden in een
    chat om samen een afspraak te maken (langskomen, eerste werkdag). Werkt voor
@@ -2376,60 +1467,8 @@ function chatStuur(chat, van, wie, tekst) {
   return bericht;
 }
 
-app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const a = (db.data.applications[req.supplier.code] || []).find(x => x.id === req.body.id);
-  if (!a) return res.status(404).json({ error: 'Sollicitatie niet gevonden.' });
-  if (req.body.action === 'uitnodigen') {
-    // uitnodigen voor een gesprek: open de chat, nog geen personeelsaccount
-    a.status = 'uitgenodigd';
-    const chat = ensureApplyChat(req.supplier.code, a);
-    if (!chat) return res.status(400).json({ error: 'Deze sollicitant heeft geen app-account; neem contact op via het opgegeven telefoonnummer of e-mailadres.' });
-    if (!chat.berichten.length) chatStuur(chat, 'werkgever', req.supplier.name, 'Hallo ' + a.name + ', leuk dat je wilt komen werken als ' + a.func + '. Wanneer kun je langskomen voor een kennismaking?');
-    save();
-    logActivity(req.supplier.code, req.actor, 'nodigde ' + a.name + ' uit voor een gesprek');
-    sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
-    notifyApplicant(a, req.supplier);
-    return res.json({ ok: true, chat: applyChatPubliek(chat) });
-  }
-  if (req.body.action === 'aannemen') {
-    const pin = accounts.makePin();
-    const staff = accounts.createStaff({ supplierCode: req.supplier.code, name: a.name, role: 'staff', func: a.func, pin });
-    a.status = 'aangenomen';
-    ensureApplyChat(req.supplier.code, a); // ook aangenomen sollicitanten kunnen chatten om af te spreken
-    save();
-    logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
-    sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
-    sseToOffice('sync', { scope: 'team' });
-    notifyApplicant(a, req.supplier);
-    return res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
-  }
-  a.status = 'afgewezen';
-  save();
-  logActivity(req.supplier.code, req.actor, 'wees de sollicitatie van ' + a.name + ' af');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
-  notifyApplicant(a, req.supplier);
-  res.json({ ok: true });
-});
 
 // werkgever leest/schrijft in de sollicitatiechat
-app.post('/api/supplier/apply/chat', supplierAuth, (req, res) => {
-  const chat = db.data.applyChats[String(req.body.id || '')];
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  res.json({ chat: applyChatPubliek(chat) });
-});
-app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const chat = db.data.applyChats[String(req.body.id || '')];
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  const m = chatStuur(chat, 'werkgever', req.supplier.name, req.body.text);
-  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
-  // de sollicitant krijgt een seintje
-  const app = (db.data.applications[req.supplier.code] || []).find(x => x.id === chat.id);
-  if (app && app.key && db.data.notifications[app.key])
-    notify(app.key, { icon: '💬', title: 'Bericht van ' + chat.bedrijf, body: m.tekst.slice(0, 80) });
-  res.json({ chat: applyChatPubliek(chat) });
-});
 
 // een bericht van de sollicitant laat de werkgever meteen iets weten
 function meldWerkgever(chat, tekst) {
@@ -2437,91 +1476,14 @@ function meldWerkgever(chat, tekst) {
 }
 
 // RTG-lid: mijn sollicitatiechats
-app.post('/api/member/apply/chats', auth, (req, res) => {
-  // ook gratis gebruikers chatten met de werkgever over hun sollicitatie
-  const uit = Object.values(db.data.applyChats)
-    .filter(c => c.applicant.kind === 'rtg' && c.applicant.key === req.session.key)
-    .map(c => { const l = c.berichten[c.berichten.length - 1]; return { id: c.id, bedrijf: c.bedrijf, func: c.func, laatste: l ? l.tekst : null, laatsteVan: l ? l.van : null, at: l ? l.at : c.at }; })
-    .sort((x, y) => (y.at || '').localeCompare(x.at || ''));
-  res.json({ chats: uit });
-});
-app.post('/api/member/apply/chat', auth, (req, res) => {
-  const chat = db.data.applyChats[String(req.body.id || '')];
-  if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  res.json({ chat: applyChatPubliek(chat) });
-});
-app.post('/api/member/apply/chat/send', auth, (req, res) => {
-  const chat = db.data.applyChats[String(req.body.id || '')];
-  if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text);
-  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
-  meldWerkgever(chat, m.tekst);
-  res.json({ chat: applyChatPubliek(chat) });
-});
 
 // RTFoundation-lid: mijn sollicitatiechat (met gezin-token)
-app.post('/api/rtf/apply/chat', (req, res) => {
-  const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
-  if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
-  const chat = db.data.applyChats[String(req.body.id || '')];
-  if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
-    return res.status(404).json({ error: 'Chat niet gevonden.' });
-  res.json({ chat: applyChatPubliek(chat) });
-});
-app.post('/api/rtf/apply/chat/send', (req, res) => {
-  const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
-  if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
-  const chat = db.data.applyChats[String(req.body.id || '')];
-  if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
-    return res.status(404).json({ error: 'Chat niet gevonden.' });
-  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text);
-  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
-  meldWerkgever(chat, m.tekst);
-  res.json({ chat: applyChatPubliek(chat) });
-});
 
 /* ---- vacatures: het bedrijf plaatst openstaande functies ----
    Deze vacatures verschijnen ook in de RTFoundation, zodat leden van arme
    gezinnen (vanaf 16 jaar, met een verplicht cv) er in een tik op solliciteren.
    De leeftijdsgrens sluit aan op de RTF-leeftijdsgroepen: standaard 16 jaar. */
 const VAC_SOORTEN = ['bijbaan', 'fulltime', 'parttime', 'stage', 'vrijwilliger', 'vakantiewerk'];
-app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const b = req.body || {};
-  const func = String(b.func || '').trim().slice(0, 60);
-  if (!func) return res.status(400).json({ error: 'Geef de functie een naam.' });
-  let minLeeftijd = parseInt(b.minLeeftijd, 10);
-  if (!Number.isFinite(minLeeftijd) || minLeeftijd < 16) minLeeftijd = 16; // solliciteren mag vanaf 16
-  if (minLeeftijd > 99) minLeeftijd = 99;
-  const soort = VAC_SOORTEN.includes(b.soort) ? b.soort : 'bijbaan';
-  const list = db.data.vacatures[req.supplier.code] = (db.data.vacatures[req.supplier.code] || []);
-  const bestaand = b.id ? list.find(v => v.id === b.id) : null;
-  const vac = bestaand || { id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString() };
-  vac.func = func;
-  vac.omschrijving = String(b.omschrijving || '').trim().slice(0, 500);
-  vac.plaats = String(b.plaats || '').trim().slice(0, 60);
-  vac.uren = String(b.uren || '').trim().slice(0, 40);
-  vac.soort = soort;
-  vac.minLeeftijd = minLeeftijd;
-  vac.open = b.open !== false;
-  if (!bestaand) { list.unshift(vac); db.data.vacatures[req.supplier.code] = list.slice(0, 40); }
-  save();
-  logActivity(req.supplier.code, req.actor, (bestaand ? 'wijzigde de vacature ' : 'plaatste een vacature ') + func);
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
-  res.json({ ok: true, vacatures: (db.data.vacatures[req.supplier.code] || []).slice(0, 40) });
-});
-app.post('/api/supplier/vacature/verwijder', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const list = db.data.vacatures[req.supplier.code] || [];
-  const i = list.findIndex(v => v.id === req.body.id);
-  if (i < 0) return res.status(404).json({ error: 'Vacature niet gevonden.' });
-  const soort = req.body.action === 'sluit' || req.body.action === 'open';
-  if (soort) { list[i].open = req.body.action === 'open'; }
-  else { list.splice(i, 1); }
-  save();
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
-  res.json({ ok: true, vacatures: list.slice(0, 40) });
-});
 
 /* ---- vacatures voor de RTFoundation ----
    Openbare lijst met alle openstaande vacatures over alle partners heen. De
@@ -2554,76 +1516,12 @@ function openVacatures(minLeeftijd, land) {
   uit.sort((a, b) => (b.at || '').localeCompare(a.at || ''));
   return uit;
 }
-app.post('/api/rtf/vacatures', (req, res) => {
-  const lft = parseInt(req.body && req.body.leeftijd, 10);
-  const minOk = Number.isFinite(lft) ? lft : null;
-  const land = req.body && typeof req.body.land === 'string' && LANDEN[req.body.land] ? req.body.land : null;
-  const alle = openVacatures(minOk); // zonder landfilter, om de landenlijst te vullen
-  const landen = [];
-  for (const v of alle) if (!landen.some(l => l.code === v.land)) landen.push({ code: v.land, naam: v.landNaam });
-  landen.sort((a, b) => a.naam.localeCompare(b.naam));
-  const zichtbaar = land ? alle.filter(v => v.land === land) : alle;
-  res.json({ vacatures: zichtbaar.slice(0, 100), landen, magSolliciteren: minOk == null || minOk >= 16 });
-});
 
 /* Een RTF-lid solliciteert met het cv uit de RTFoundation-cv-maker. Het cv is
    verplicht vanaf 16 jaar; jonger dan 16 kan niet solliciteren. Het bedrijf
    ziet de sollicitatie in dezelfde lijst als alle andere, zonder RTF-markering.
    We controleren het gezin-token (lichte beveiliging + terugkoppeling), remmen
    spam af en weren dubbele sollicitaties. */
-app.post('/api/rtf/solliciteer', (req, res) => {
-  const b = req.body || {};
-  const bucket = 'rtfsoll:' + req.ip;
-  if (tooManyTries(res, bucket)) return;
-  // gezin-token: het profiel moet kloppen en mag geen gast zijn (privezaak)
-  const sess = rtf.verifieerProfiel(b.code, b.token);
-  if (!sess) { noteFailedTry(bucket); return res.status(403).json({ error: 'Log opnieuw in bij je gezin om te solliciteren.' }); }
-  if (sess.gast) return res.status(403).json({ error: 'Als oppas of familielid solliciteer je niet namens het gezin.' });
-  const lft = parseInt(b.leeftijd, 10);
-  if (!Number.isFinite(lft) || lft < 16)
-    return res.status(403).json({ error: 'Solliciteren kan vanaf 16 jaar. Jongere gezinsleden vinden in de app juist leer- en groeitips.' });
-  const s = findSupplier(b.supplierCode);
-  if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
-  const vac = (db.data.vacatures[s.code] || []).find(v => v.id === b.vacatureId && v.open);
-  if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
-  if (lft < vac.minLeeftijd)
-    return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn.' });
-  if (rtf.alGesolliciteerd(b.code, sess.p.id, vac.id))
-    return res.status(409).json({ error: 'Je hebt al op deze vacature gesolliciteerd. Je ziet de status bij "Mijn sollicitaties".' });
-  const cv = b.cv || {};
-  const name = String(cv.name || '').trim().slice(0, 60);
-  const contact = String(cv.contact || '').trim().slice(0, 80);
-  const heeftInhoud = (Array.isArray(cv.experience) && cv.experience.length) || (Array.isArray(cv.skills) && cv.skills.length) || (cv.about || '').trim();
-  if (!name || !contact || !heeftInhoud)
-    return res.status(409).json({ error: 'Maak eerst je cv af in de RTF-app (naam, contact en werk of vaardigheden). Daarmee solliciteer je in een tik.', needCv: true });
-  const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
-  const entry = {
-    id: crypto.randomBytes(4).toString('hex'),
-    name, func: vac.func, contact,
-    note: String(b.note || '').trim().slice(0, 400),
-    viaRTF: true, rtf: { code: String(b.code).toUpperCase(), profielId: sess.p.id },
-    cv: {
-      headline: String(cv.headline || '').slice(0, 80),
-      experience: (Array.isArray(cv.experience) ? cv.experience : []).slice(0, 12).map(x => String(x).slice(0, 120)),
-      skills: (Array.isArray(cv.skills) ? cv.skills : []).slice(0, 15).map(x => String(x).slice(0, 40)),
-      languages: (Array.isArray(cv.languages) ? cv.languages : []).slice(0, 8).map(x => String(x).slice(0, 30)),
-      about: String(cv.about || '').slice(0, 400)
-    },
-    status: 'nieuw', at: new Date().toISOString()
-  };
-  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
-  list.unshift(entry);
-  db.data.applications[s.code] = list.slice(0, 100);
-  // verwijzing bij het gezin, voor "Mijn sollicitaties" met live status
-  rtf.bewaarSollicitatie(b.code, sess.p.id, { appId: entry.id, supplierCode: s.code, vacatureId: vac.id, func: vac.func, bedrijf: s.name, land: landCode, landNaam: LANDEN[landCode].naam });
-  save();
-  // De melding aan het bedrijf is identiek aan die van een gewoon RTG-lid: de
-  // foundation-herkomst blijft onzichtbaar voor de werkgever.
-  notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTG', body: name + ' (RTG-lid) solliciteert als ' + vac.func + ', met cv.' });
-  sseToSupplier(s.code, 'sync', { scope: 'team' });
-  sseToOffice('sync', { scope: 'team' });
-  res.json({ ok: true });
-});
 
 /* Wat de werkgever van een sollicitatie te zien krijgt. Een sollicitant uit de
    RTFoundation mag NOOIT als zodanig herkenbaar zijn: wie via de foundation
@@ -2665,110 +1563,11 @@ function notifyApplicant(a, supplier) {
 /* ---- AVG-rechten: inzage en vergetelheid, rechtstreeks vanuit de app ----
    Export levert alles wat op deze persoon herleidbaar is in een JSON;
    verwijderen wist of anonimiseert het en logt alle sessies van dit lid uit. */
-app.post('/api/privacy/export', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const key = req.session.key;
-  const chats = {};
-  for (const [k, msgs] of Object.entries(db.data.guestChats || {})) {
-    if (k.split('|')[1] === key) chats[k] = msgs;
-  }
-  const likes = db.data.posts.filter(p => p.likedBy && p.likedBy[key]).map(p => ({ postId: p.id, author: p.author }));
-  const state = stateFor(req.session, req.body.lang);
-  res.json({
-    exportedAt: new Date().toISOString(),
-    note: 'Alle gegevens die RTG over u bewaart, onder uw codenaam (pseudonimisering).',
-    profile: state.user,
-    cv: db.data.cvs[key] || null,
-    applications: myApplications(key),
-    invoices: state.invoices || [],
-    trip: state.trip || null,
-    live: db.data.live[key] || null,
-    orders: db.data.orders.filter(o => (o.customerKey || o.customerTier) === key),
-    guestChats: chats,
-    likedPosts: likes,
-    notifications: db.data.notifications[key] || []
-  });
-});
 
-app.post('/api/privacy/delete', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const key = req.session.key;
-  // cv en live-locatie weg, chats weg, likes weg
-  delete db.data.cvs[key];
-  delete db.data.live[key];
-  for (const k of Object.keys(db.data.guestChats || {})) if (k.split('|')[1] === key) delete db.data.guestChats[k];
-  for (const p of db.data.posts) if (p.likedBy) delete p.likedBy[key];
-  // sollicitaties anonimiseren: het bedrijf houdt zijn administratie,
-  // maar zonder iets dat naar deze persoon herleidbaar is
-  for (const list of Object.values(db.data.applications || {})) {
-    for (const a of list) if (a.key === key) {
-      a.name = '(op verzoek verwijderd)'; a.contact = ''; a.note = '';
-      a.cv = null; a.codename = null; a.key = null;
-    }
-  }
-  // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
-  if (db.data.notifications[key]) db.data.notifications[key] = [];
-  // echt account: verwijder het account zelf, inclusief documentupload
-  if (req.session.account) {
-    const doc = accounts.deleteUser(req.session.account.id);
-    if (doc) { try { fs.unlinkSync(path.join(UPLOAD_DIR, path.basename(doc))); } catch (e) {} }
-  }
-  // alle sessies van dit lid uitloggen
-  for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
-  save();
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
-  res.json({ ok: true });
-});
 
 /* ---- events: het Kantoor maakt ze, leden melden zich aan, de deur checkt in ---- */
-app.post('/api/supplier/event', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const s = req.supplier;
-  if (!Array.isArray(s.events)) return res.status(400).json({ error: 'Events zijn er voor restaurants, bars en clubs.' });
-  const a = String(req.body.action || '');
-  if (a === 'add') {
-    const name = String((req.body.event || {}).name || '').trim().slice(0, 80);
-    const date = String((req.body.event || {}).date || '').slice(0, 10);
-    if (!name || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ error: 'Vul minimaal een naam en datum in.' });
-    const e = {
-      id: crypto.randomBytes(4).toString('hex'),
-      name, date,
-      time: String((req.body.event || {}).time || '').slice(0, 5),
-      desc: String((req.body.event || {}).desc || '').trim().slice(0, 200),
-      capacity: Math.min(2000, Math.max(1, parseInt((req.body.event || {}).capacity, 10) || 50)),
-      price: Math.max(0, Number((req.body.event || {}).price) || 0),
-      published: false, guests: [], runsheet: [],
-      catering: { mode: 'geen', itemIds: [], note: '' }, allergies: [],
-      at: new Date().toISOString()
-    };
-    s.events.unshift(e);
-    s.events = s.events.slice(0, 40);
-    logActivity(s.code, req.actor, 'maakte event "' + name + '" aan');
-  } else {
-    const e = s.events.find(x => x.id === req.body.id);
-    if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-    if (a === 'publish') { e.published = !e.published; logActivity(s.code, req.actor, (e.published ? 'publiceerde' : 'haalde offline') + ' event "' + e.name + '"'); }
-    else if (a === 'remove') { s.events = s.events.filter(x => x.id !== req.body.id); logActivity(s.code, req.actor, 'verwijderde event "' + e.name + '"'); }
-    else return res.status(400).json({ error: 'Onbekende actie.' });
-  }
-  save();
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'events');
-  sseToSupplier(s.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, events: s.events });
-});
 
 // aan de deur: gast afvinken (elke medewerker mag dit, op eigen naam)
-app.post('/api/supplier/event/checkin', supplierAuth, (req, res) => {
-  const e = (req.supplier.events || []).find(x => x.id === req.body.eventId);
-  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-  const g = (e.guests || []).find(x => x.key === req.body.key);
-  if (!g) return res.status(404).json({ error: 'Gast niet gevonden.' });
-  g.checkedIn = !g.checkedIn;
-  save();
-  logActivity(req.supplier.code, req.actor, (g.checkedIn ? 'checkte ' : 'zette check-in terug voor ') + g.codename + ' in bij "' + e.name + '"');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, event: e });
-});
 
 /* ---- het draaiboek: wie doet wat en wanneer, per werkplek ----
    De manager vult het in het Kantoor (handmatig, geplakt of door de AI
@@ -2792,37 +1591,8 @@ function runKey(t) { const [h, m] = String(t).split(':').map(Number); return ((h
 function sortRunsheet(e) { e.runsheet.sort((a, b) => ((b.daysBefore || 0) - (a.daysBefore || 0)) || (runKey(a.time) - runKey(b.time))); }
 
 // handmatig: regel toevoegen of verwijderen (Kantoor)
-app.post('/api/supplier/event/runsheet', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
-  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-  e.runsheet = e.runsheet || [];
-  if (req.body.action === 'add') {
-    const it = req.body.item || {};
-    if (!String(it.text || '').trim()) return res.status(400).json({ error: 'Omschrijf wat er moet gebeuren.' });
-    e.runsheet.push(runItem(it.time, it.station, it.text, it.daysBefore));
-    if (e.runsheet.length > 60) e.runsheet = e.runsheet.slice(0, 60);
-    sortRunsheet(e);
-  } else if (req.body.action === 'remove') {
-    e.runsheet = e.runsheet.filter(x => x.id !== req.body.itemId);
-  } else return res.status(400).json({ error: 'Onbekende actie.' });
-  save();
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, event: e });
-});
 
 // afvinken op de werkvloer (elke medewerker, op eigen naam)
-app.post('/api/supplier/event/runsheet/done', supplierAuth, (req, res) => {
-  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
-  const it = e && (e.runsheet || []).find(x => x.id === req.body.itemId);
-  if (!it) return res.status(404).json({ error: 'Regel niet gevonden.' });
-  it.done = !it.done;
-  it.doneBy = it.done ? req.actor.name : null;
-  save();
-  if (it.done) logActivity(req.supplier.code, req.actor, 'vinkte af: ' + it.time + ' ' + it.text + ' (' + e.name + ')');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, event: e });
-});
 
 // AI-hulp: een draaiboek voorstellen, of geplakte/geuploade tekst omzetten
 function fallbackRunsheet(e) {
@@ -2864,72 +1634,13 @@ function parseRunsheetText(text) {
   }
   return items;
 }
-app.post('/api/supplier/event/runsheet/ai', supplierAuth, async (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
-  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-  const mode = req.body.mode === 'import' ? 'import' : 'suggest';
-  let items = null;
-  if (anthropic) {
-    try {
-      const prompt = mode === 'import'
-        ? 'Zet dit geplakte draaiboek om naar JSON. Bron:\n' + String(req.body.text || '').slice(0, 4000)
-        : 'Stel een professioneel horeca-draaiboek op voor dit event: "' + e.name + '" op ' + e.date + (e.time ? ' om ' + e.time : '') + (e.desc ? ' (' + e.desc + ')' : '') + ', capaciteit ' + e.capacity + '.';
-      const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 1200,
-        system: 'Je bent een horeca-draaiboekplanner. Antwoord UITSLUITEND met een JSON-array van objecten {"time":"HH:MM","station":"keuken|bar|bediening|party|alle","text":"..."}. Maximaal 20 regels, Nederlands, praktisch en concreet. party = de party manager/deur.',
-        messages: [{ role: 'user', content: prompt }]
-      });
-      const raw = (msg.content[0].text.match(/\[[\s\S]*\]/) || [null])[0];
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr) && arr.length) items = arr.slice(0, 20).map(x => runItem(x.time, x.station, x.text));
-    } catch (err) { items = null; }
-  }
-  if (!items) items = mode === 'import' ? parseRunsheetText(req.body.text) : fallbackRunsheet(e);
-  if (!items.length) return res.status(400).json({ error: 'Geen bruikbare regels gevonden. Zet per regel een tijd en een taak.' });
-  e.runsheet = [...(e.runsheet || []), ...items].slice(0, 60);
-  sortRunsheet(e);
-  save();
-  logActivity(req.supplier.code, req.actor, (mode === 'import' ? 'importeerde' : 'liet de AI een') + ' draaiboek ' + (mode === 'import' ? 'voor' : 'opstellen voor') + ' "' + e.name + '" (' + items.length + ' regels)');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, event: e, added: items.length, ai: !!anthropic });
-});
 
 /* ---- event-keuken: menukeuze, allergenen met vervangend gerecht, en de
    mise en place die dagen vooruit wordt georganiseerd ---- */
 
 // menukeuze: vast menu (gerechten van de kaart) of a la carte (Kantoor)
-app.post('/api/supplier/event/catering', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
-  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-  const mode = ['menu', 'alacarte', 'geen'].includes(req.body.mode) ? req.body.mode : 'geen';
-  const ids = Array.isArray(req.body.itemIds) ? req.body.itemIds.filter(id => (req.supplier.menu || []).some(m => m.id === id)).slice(0, 20) : [];
-  e.catering = { mode, itemIds: mode === 'menu' ? ids : [], note: String(req.body.note || '').slice(0, 200) };
-  save();
-  logActivity(req.supplier.code, req.actor, 'stelde de eventkeuken in voor "' + e.name + '" (' + (mode === 'menu' ? ids.length + ' gangen' : mode) + ')');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, event: e });
-});
 
 // allergenen registreren; per allergeen kan een vervangend gerecht worden bedacht
-app.post('/api/supplier/event/allergy', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
-  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-  e.allergies = e.allergies || [];
-  if (req.body.action === 'add') {
-    const allergen = String(req.body.allergen || '').trim().toLowerCase().slice(0, 30);
-    if (!allergen) return res.status(400).json({ error: 'Vul het allergeen in.' });
-    if (e.allergies.some(a => a.allergen === allergen)) return res.status(409).json({ error: 'Dit allergeen staat er al.' });
-    e.allergies.push({ id: crypto.randomBytes(3).toString('hex'), allergen, count: Math.min(500, Math.max(1, parseInt(req.body.count, 10) || 1)), alternative: null });
-  } else if (req.body.action === 'remove') {
-    e.allergies = e.allergies.filter(a => a.id !== req.body.allergyId);
-  } else return res.status(400).json({ error: 'Onbekende actie.' });
-  save();
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, event: e });
-});
 
 // gerechten die het event serveert (vast menu, of de hele keukenkaart bij a la carte)
 function cateringDishes(s, e) {
@@ -2958,118 +1669,12 @@ const ALT_IDEE = {
   ei: ['binding met aquafaba', 'zonder ei'],
   sesam: ['topping van geroosterde quinoa', 'sesamvrij']
 };
-app.post('/api/supplier/event/allergy/alt', supplierAuth, async (req, res) => {
-  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
-  const al = e && (e.allergies || []).find(a => a.id === req.body.allergyId);
-  if (!al) return res.status(404).json({ error: 'Allergeen niet gevonden.' });
-  const dishes = cateringDishes(req.supplier, e);
-  const geraakt = dishes.filter(d => (d.allergens || []).some(x => String(x).toLowerCase().includes(al.allergen)));
-  let alt = null;
-  if (anthropic) {
-    try {
-      const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 400,
-        system: 'Je bent een chef-kok. Antwoord UITSLUITEND met JSON: {"name":"...","desc":"..."}. Bedenk een volwaardig vervangend gerecht in de stijl van de kaart, veilig voor het allergeen, kort en concreet in het Nederlands.',
-        messages: [{ role: 'user', content: 'Allergeen: ' + al.allergen + '. Getroffen gerecht(en): ' + (geraakt.map(d => d.name + ' (' + (d.desc || '') + ')').join('; ') || 'onbekend') + '. Keuken: ' + req.supplier.name + '.' }]
-      });
-      alt = JSON.parse((msg.content[0].text.match(/\{[\s\S]*\}/) || ['{}'])[0]);
-      if (!alt.name) alt = null;
-    } catch (err) { alt = null; }
-  }
-  if (!alt) {
-    const idee = ALT_IDEE[al.allergen] || ['aangepaste bereiding zonder ' + al.allergen, 'veilig voor ' + al.allergen];
-    const basis = geraakt[0] ? geraakt[0].name : 'het hoofdgerecht';
-    alt = { name: basis + ', variant zonder ' + al.allergen, desc: 'Zelfde opbouw als ' + basis.toLowerCase() + ', met ' + idee[0] + '; ' + idee[1] + '.' };
-  }
-  al.alternative = { name: String(alt.name).slice(0, 80), desc: String(alt.desc || '').slice(0, 200) };
-  save();
-  logActivity(req.supplier.code, req.actor, 'vervangend gerecht voor ' + al.allergen + ': "' + al.alternative.name + '" (' + e.name + ')');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, event: e, alternative: al.alternative, ai: !!anthropic });
-});
 
 // de MEP-organisator: bouwt de complete mise en place voor het keukenteam,
 // dagen vooruit, op basis van menu, aantallen en allergenen (keukenscherm/Kantoor)
-app.post('/api/supplier/event/mep', supplierAuth, async (req, res) => {
-  const e = (req.supplier.events || []).find(x => x.id === req.body.id);
-  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-  const dishes = cateringDishes(req.supplier, e);
-  if (!dishes.length && (!e.catering || e.catering.mode !== 'alacarte'))
-    return res.status(409).json({ error: 'Stel eerst de eventkeuken in (vast menu of a la carte) in het Kantoor.' });
-  const covers = eventCovers(e);
-  let items = null;
-  if (anthropic) {
-    try {
-      const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 1400,
-        system: 'Je bent een sous-chef die de mise en place plant. Antwoord UITSLUITEND met een JSON-array van {"daysBefore":0-3,"time":"HH:MM","task":"..."}. Maximaal 18 taken, Nederlands, concreet met aantallen. daysBefore 2 = twee dagen voor het event.',
-        messages: [{ role: 'user', content: 'Event: ' + e.name + ' op ' + e.date + ', ' + covers + ' couverts. Gerechten: ' + (dishes.map(d => d.name).join('; ') || 'a la carte van de kaart') + '. Allergenen: ' + ((e.allergies || []).map(a => a.allergen + ' (' + a.count + 'x' + (a.alternative ? ', vervanger: ' + a.alternative.name : '') + ')').join('; ') || 'geen') + '.' }]
-      });
-      const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
-      if (Array.isArray(arr) && arr.length) items = arr.slice(0, 18).map(x => runItem(x.time, 'keuken', x.task, x.daysBefore, true));
-    } catch (err) { items = null; }
-  }
-  if (!items) {
-    items = [
-      runItem('10:00', 'keuken', 'Bestellingen plaatsen en voorraad controleren voor ' + e.name + ' (' + covers + ' couverts)', 2, true),
-      runItem('15:00', 'keuken', 'Fonds, sauzen en marinades opzetten die tijd nodig hebben', 2, true),
-      runItem('09:00', 'keuken', 'Levering ontvangen en controleren op kwaliteit en aantallen', 1, true),
-      runItem('11:00', 'keuken', 'Koeling indelen per gang, bakken labelen met datum en gerecht', 1, true)
-    ];
-    for (const d of dishes.slice(0, 8)) {
-      items.push(runItem('13:00', 'keuken', 'Mise en place ' + d.name + ': snijwerk, portioneren (' + covers + ')', 1, true));
-      items.push(runItem('14:00', 'keuken', 'Verse afwerking en garnituur ' + d.name + ', proeven met de chef', 0, true));
-    }
-    if (e.catering && e.catering.mode === 'alacarte')
-      items.push(runItem('12:00', 'keuken', 'Parstock per station aanvullen voor a la carte (' + covers + ' couverts verwacht)', 1, true));
-    for (const a of (e.allergies || [])) {
-      items.push(runItem('12:00', 'keuken', 'Vervangend gerecht ' + (a.alternative ? '"' + a.alternative.name + '"' : 'voor ' + a.allergen) + ' voorbereiden, ' + a.count + 'x, strikt gescheiden werken (' + a.allergen + ')', 1, true));
-      items.push(runItem('16:00', 'keuken', 'Aparte uitgifte klaarzetten voor gasten met ' + a.allergen + ' (' + a.count + 'x), pan en snijplank apart', 0, true));
-    }
-    items.push(runItem('10:00', 'keuken', 'MEP-briefing keukenteam: taken verdelen, tijden en allergenen doorspreken', 0, true));
-  }
-  // eerdere automatische MEP weggooien zodat opnieuw organiseren geen dubbels geeft
-  e.runsheet = (e.runsheet || []).filter(x => !x.mep);
-  e.runsheet = [...e.runsheet, ...items].slice(0, 90);
-  sortRunsheet(e);
-  save();
-  logActivity(req.supplier.code, req.actor, 'organiseerde de mise en place voor "' + e.name + '" (' + items.length + ' taken, ' + covers + ' couverts)');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, event: e, added: items.length, covers, ai: !!anthropic });
-});
 
 /* ---- recept/bereidingswijze per gerecht: uitklapbaar op de bon, zodat ook
    nieuwe mensen weten wat ze maken en hoe. De AI schrijft hem desgewenst. ---- */
-app.post('/api/supplier/menu/recipe', supplierAuth, async (req, res) => {
-  const m = (req.supplier.menu || []).find(x => x.id === req.body.itemId);
-  if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
-  let recept = null;
-  if (anthropic) {
-    try {
-      const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 700,
-        system: 'Je bent een chef-kok die werkinstructies schrijft voor nieuwe keukenkrachten. Antwoord in het Nederlands, platte tekst, maximaal 10 korte genummerde stappen: mise en place, bereiding, afwerking en bord. Concreet, geen inleiding.',
-        messages: [{ role: 'user', content: 'Gerecht: ' + m.name + (m.desc ? ' (' + m.desc + ')' : '') + '. Keuken: ' + req.supplier.name + '. Allergenen: ' + ((m.allergens || []).join(', ') || 'geen') + '.' }]
-      });
-      recept = String(msg.content[0].text || '').trim().slice(0, 1500);
-    } catch (err) { recept = null; }
-  }
-  if (!recept) {
-    recept = '1. Mise en place: alle ingredienten voor ' + m.name + ' afwegen en klaarzetten.\n' +
-      (m.desc ? '2. Basis: ' + m.desc + '\n' : '2. Basis volgens de huisreceptuur van ' + req.supplier.name + '.\n') +
-      '3. Bereiden op de eigen sectie (' + (m.sectie || 'warm') + '); tussentijds proeven.\n' +
-      ((m.allergens || []).length ? '4. LET OP allergenen: ' + m.allergens.join(', ') + '. Bij een allergie-bon strikt gescheiden werken.\n' : '') +
-      '5. Afwerking en garnituur; bord vegen.\n' +
-      '6. Doorgeven aan de pas; chef proeft steekproefsgewijs.\n' +
-      '(Laat de manager dit recept aanscherpen in het Kantoor, of zet een ANTHROPIC_API_KEY voor een uitgewerkt recept.)';
-  }
-  m.recept = recept;
-  save();
-  logActivity(req.supplier.code, req.actor, 'zette het recept van ' + m.name + ' op de bon');
-  // bewust geen sync-broadcast: het scherm dat het recept opvroeg werkt zijn
-  // eigen menukopie bij, andere schermen zien het bij hun eerstvolgende refresh
-  res.json({ ok: true, recept, ai: !!anthropic });
-});
 
 /* ---- de keukenhulp: AI-coach die zegt wat er nu moet gebeuren ----
    Kijkt naar alle open bonnen: voorrang voor oude bonnen, dezelfde gerechten
@@ -3127,33 +1732,6 @@ function coachRules(s, open, lang) {
                   : '\uD83E\uDE91 ' + t + ' heeft ' + os.length + ' bonnen (' + os.map(o => o.pickup).join(', ') + '): stem de kanten af zodat de tafel in \u00e9\u00e9n keer uitgaat.');
   return lines.slice(0, 6);
 }
-app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
-  const s = req.supplier;
-  const lang = req.body.lang === 'en' ? 'en' : 'nl';
-  const open = db.data.orders.filter(o => o.supplierCode === s.code && ['nieuw', 'in bereiding'].includes(o.status) && sectiesForOrder(s, o).length);
-  if (!open.length) return res.json({ ok: true, lines: [], ai: !!anthropic });
-  const hash = crypto.createHash('sha1').update(lang + JSON.stringify(open.map(o => [o.ref, o.status, o.table, o.secties, Math.floor((Date.now() - new Date(o.at)) / 300000)]))).digest('hex');
-  const cached = coachCache.get(s.code);
-  if (cached && cached.hash === hash) return res.json({ ok: true, lines: cached.lines, ai: !!anthropic, cached: true });
-  let lines = null;
-  if (anthropic) {
-    try {
-      const beeld = open.map(o => ({ bon: o.pickup, tafel: o.table || null, min: Math.round((Date.now() - new Date(o.at)) / 60000), items: o.items.map(i => i.qty + 'x ' + i.name), kanten: o.secties || {} }));
-      const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 600,
-        system: lang === 'en'
-          ? 'You are a sous-chef running the line. Reply ONLY with a JSON array of at most 6 short English instructions (strings): what to fire now, what to batch, which table leaves together, who gets priority.'
-          : 'Je bent een sous-chef die de lijn aanstuurt. Antwoord UITSLUITEND met een JSON-array van maximaal 6 korte Nederlandse aanwijzingen (strings): wat nu maken, wat batchen, welke tafel samen uitgaat, wie voorrang krijgt.',
-        messages: [{ role: 'user', content: JSON.stringify(beeld) }]
-      });
-      const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
-      if (Array.isArray(arr) && arr.length) lines = arr.slice(0, 6).map(x => String(x).slice(0, 160));
-    } catch (err) { lines = null; }
-  }
-  if (!lines) lines = coachRules(s, open, lang);
-  coachCache.set(s.code, { hash, lines, at: Date.now() });
-  res.json({ ok: true, lines, ai: !!anthropic });
-});
 
 /* ---- dagelijkse mise en place (a la carte, geen event) ----
    De keuken voorspelt de dag: verwachte couverts uit de verkoophistorie van de
@@ -3165,101 +1743,9 @@ function weekdagFactor(d) {
   if (wd === 0) return [1.0, 'zondag, gemiddeld'];
   return [0.85, 'doordeweeks, rustiger'];
 }
-app.post('/api/supplier/mep/daily', supplierAuth, async (req, res) => {
-  const s = req.supplier;
-  if (!s.dailyMeps) return res.status(400).json({ error: 'De dagelijkse mise en place is er voor restaurants, bars en clubs.' });
-  const menu = (s.menu || []).filter(m => m.station !== 'bar');
-  if (!menu.length) return res.status(409).json({ error: 'Zet eerst gerechten op de kaart; daar rekent de voorspelling mee.' });
-  const dagen = req.body.day === 'morgen' ? 1 : 0;
-  const doel = new Date(Date.now() + dagen * 86400000);
-  const date = doel.toISOString().slice(0, 10);
-  const [factor, factorLabel] = weekdagFactor(doel);
 
-  // historie: bestellingen van de afgelopen 21 dagen
-  const sinds = Date.now() - 21 * 86400000;
-  const hist = db.data.orders.filter(o => o.supplierCode === s.code && new Date(o.at).getTime() >= sinds && !['geweigerd', 'terugbetaald'].includes(o.status));
-  const perGerecht = {}; let histQty = 0; const histDagen = new Set();
-  for (const o of hist) {
-    histDagen.add(String(o.at).slice(0, 10));
-    for (const it of (o.items || [])) {
-      const m = menu.find(x => x.id === it.id);
-      if (m) { perGerecht[m.id] = (perGerecht[m.id] || 0) + it.qty; histQty += it.qty; }
-    }
-  }
-  const stoelen = (s.tables || []).reduce((n, t) => n + (t.seats || 0), 0) || 24;
-  const basis = Math.round(stoelen * 2 * factor);                 // twee zittingen
-  const histGem = histDagen.size ? Math.round((histQty / histDagen.size) * factor) : 0;
-  const covers = Math.max(basis, histGem);
-  const portions = menu.map(m => {
-    const aandeel = histQty ? (perGerecht[m.id] || 0) / histQty : 1 / menu.length;
-    return { name: m.name, n: Math.max(5, Math.ceil((covers * aandeel) / 5) * 5) };
-  });
-
-  let tasks = null;
-  if (anthropic) {
-    try {
-      const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 900,
-        system: 'Je bent een sous-chef. Antwoord UITSLUITEND met een JSON-array van {"time":"HH:MM","task":"..."}. Maximaal 10 taken voor de dagelijkse a la carte mise en place, Nederlands, concreet met aantallen.',
-        messages: [{ role: 'user', content: 'Verwacht: ' + covers + ' couverts (' + factorLabel + '). Porties: ' + portions.map(p => p.name + ' ' + p.n + 'x').join('; ') + '.' }]
-      });
-      const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
-      if (Array.isArray(arr) && arr.length) tasks = arr.slice(0, 10).map(x => ({ id: crypto.randomBytes(3).toString('hex'), time: /^\d{2}:\d{2}$/.test(x.time) ? x.time : '12:00', task: String(x.task).slice(0, 160), done: false, doneBy: null }));
-    } catch (err) { tasks = null; }
-  }
-  if (!tasks) {
-    const t = (time, task) => ({ id: crypto.randomBytes(3).toString('hex'), time, task, done: false, doneBy: null });
-    tasks = [
-      t('09:00', 'Voorraad naast de voorspelling leggen (' + covers + ' couverts, ' + factorLabel + ') en bijbestellen'),
-      t('10:30', 'Koeling checken, alles labelen; parstock per station bepalen'),
-      ...portions.slice(0, 8).map(p => t('13:00', 'MEP ' + p.name + ': ' + p.n + ' porties (snijwerk, sauzen, portioneren)')),
-      t('15:30', 'Garnituren en verse afwerking klaarzetten per station'),
-      t('16:30', 'Lijn-check met de chef: proeven, aantallen aftekenen, briefing service')
-    ];
-  }
-  s.dailyMeps[date] = { date, covers, factorLabel, portions, tasks, by: req.actor.name, at: new Date().toISOString() };
-  // oude dagen opruimen
-  const gisteren = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  for (const k of Object.keys(s.dailyMeps)) if (k < gisteren) delete s.dailyMeps[k];
-  save();
-  logActivity(s.code, req.actor, 'voorspelde de mise en place voor ' + date + ' (' + covers + ' couverts)');
-  sseToSupplier(s.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, plan: s.dailyMeps[date], histDagen: histDagen.size, ai: !!anthropic });
-});
-
-app.post('/api/supplier/mep/daily/done', supplierAuth, (req, res) => {
-  const plan = s => (s.dailyMeps || {})[req.body.date];
-  const p = plan(req.supplier);
-  const it = p && (p.tasks || []).find(x => x.id === req.body.taskId);
-  if (!it) return res.status(404).json({ error: 'Taak niet gevonden.' });
-  it.done = !it.done;
-  it.doneBy = it.done ? req.actor.name : null;
-  save();
-  if (it.done) logActivity(req.supplier.code, req.actor, 'vinkte af: ' + it.time + ' ' + it.task.slice(0, 60));
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
-  res.json({ ok: true, plan: p });
-});
 
 // lid meldt zich aan voor een gepubliceerd event
-app.post('/api/event/rsvp', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const s = findSupplier(req.body.supplierCode);
-  const e = s && (s.events || []).find(x => x.id === req.body.eventId && x.published);
-  if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-  if (!optieAan(s, 'events')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen event-aanmeldingen aan.' });
-  const qty = Math.min(8, Math.max(1, parseInt(req.body.qty, 10) || 1));
-  const taken = (e.guests || []).reduce((n, g) => n + g.qty, 0);
-  if (e.guests.some(g => g.key === req.session.key)) return res.status(409).json({ error: 'U staat al op de gastenlijst.' });
-  if (taken + qty > e.capacity) return res.status(409).json({ error: 'Dit event is vol.' });
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  e.guests.push({ key: req.session.key, codename, qty, at: new Date().toISOString(), checkedIn: false });
-  save();
-  notifySupplier(s.code, { icon: '\uD83C\uDF9F', title: 'Aanmelding voor ' + e.name, body: codename + ', ' + qty + ' pers.' });
-  notify(req.session.tier, { icon: '\uD83C\uDF9F', title: s.name, body: 'U staat op de gastenlijst van ' + e.name + ' (' + e.date + (e.time ? ', ' + e.time : '') + '), ' + qty + ' pers. Uw codenaam is uw toegang.', scope: 'events' });
-  sseToSupplier(s.code, 'sync', { scope: 'events' });
-  sseToOffice('sync', { scope: 'events' });
-  res.json({ ok: true, spotsLeft: Math.max(0, e.capacity - taken - qty) });
-});
 
 /* ---- partner-onboarding: bedrijven melden zichzelf aan ----
    Publiek formulier -> aanvraag in de backoffice -> bij goedkeuring maakt de
@@ -3272,157 +1758,20 @@ function makeSupplierCode(name) {
   return code;
 }
 
-app.post('/api/partner/apply', (req, res) => {
-  const b = req.body || {};
-  // schoon(): strip < en > uit vrije tekst. De bedrijfsnaam en plaats komen later
-  // in andermans schermen (De Salon, backoffice), dus nooit als opmaak laten landen.
-  const company = schoon(b.company, 80);
-  const type = String(b.type || '').trim();
-  const city = schoon(b.city, 60);
-  const contactName = schoon(b.contactName, 60);
-  const email = String(b.email || '').trim().toLowerCase().slice(0, 80);
-  const phone = String(b.phone || '').trim().slice(0, 30);
-  const note = schoon(b.note, 500);
-  if (!db.data.supplierTypes[type]) return res.status(400).json({ error: 'Kies een geldig type bedrijf.' });
-  if (!company || !city || !contactName) return res.status(400).json({ error: 'Vul de bedrijfsnaam, plaats en contactpersoon in.' });
-  // juridisch vereist: uitdrukkelijk akkoord met de partnervoorwaarden,
-  // inclusief de verwerkersafspraken en het verplichte Salon-account
-  if (req.body.akkoord !== true) return res.status(400).json({ error: 'Ga akkoord met de partnervoorwaarden (inclusief de verwerkersafspraken) om een partnerplek aan te vragen.' });
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
-  if (db.data.partnerApplications.some(a => a.status === 'nieuw' && a.email === email && a.company.toLowerCase() === company.toLowerCase()))
-    return res.status(409).json({ error: 'Deze aanvraag staat al open. We nemen contact met u op.' });
-  const entry = {
-    id: crypto.randomBytes(4).toString('hex'),
-    company, type, city, contactName, email, phone, note,
-    // vastlegging van het akkoord (bewijs): wat en wanneer
-    akkoord: { partnervoorwaarden: true, verwerkersafspraken: true, at: new Date().toISOString() },
-    status: 'nieuw', at: new Date().toISOString()
-  };
-  db.data.partnerApplications.unshift(entry);
-  db.data.partnerApplications = db.data.partnerApplications.slice(0, 200);
-  save();
-  mail.send(email, 'Uw partner-aanvraag bij Rahul Travel Group',
-    'Beste ' + contactName + ',\n\nWe hebben uw aanvraag voor ' + company + ' (' + city + ') ontvangen. ' +
-    'We beoordelen elke partner persoonlijk en komen binnen twee werkdagen bij u terug.\n\nRahul Travel Group');
-  sseToOffice('sync', { scope: 'team' });
-  res.json({ ok: true });
-});
 
-app.post('/api/office/partner/decide', officeAuth, (req, res) => {
-  const a = db.data.partnerApplications.find(x => x.id === req.body.id);
-  if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
-  if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
-  if (req.body.action === 'goedkeuren') {
-    const code = makeSupplierCode(a.company);
-    const s = { code, name: a.company, type: a.type, city: a.city, loc: null, rate: 0.12, menu: [] };
-    ensureSupplierDefaults(s);
-    db.data.suppliers.push(s);
-    const pin = accounts.makePin();
-    accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager', func: 'Beheer', pin });
-    a.status = 'goedgekeurd'; a.code = code;
-    save();
-    const url = appUrl(req);
-    mail.send(a.email, 'Welkom als partner van Rahul Travel Group',
-      'Beste ' + a.contactName + ',\n\n' + a.company + ' is goedgekeurd als RTG-partner.\n\n' +
-      'Uw leverancierscode: ' + code + '\nUw manager-PIN: ' + pin + ' (op naam van ' + a.contactName + ')\n\n' +
-      'Open de partner-app op ' + url + '/apps/partners.html, kies uw bedrijf via de code, ' +
-      'log in als management met uw PIN en stel uw pagina, menukaart en team in.\n\n' +
-      'Uw bedrijfsaccount op De Salon is direct aangemaakt; dit is een vast onderdeel van elk RTG-partnerschap. ' +
-      'Via Kantoor, Marketing stelt u uw profiel in, plaatst u berichten, aanbiedingen en polls, en ziet u uw volgers en cijfers.\n\nRahul Travel Group');
-    sseToOffice('sync', { scope: 'team' });
-    return res.json({ ok: true, code, pin });
-  }
-  a.status = 'afgewezen';
-  save();
-  mail.send(a.email, 'Uw partner-aanvraag bij Rahul Travel Group',
-    'Beste ' + a.contactName + ',\n\nNa beoordeling kunnen we ' + a.company + ' op dit moment helaas geen partnerplek aanbieden.\n\nRahul Travel Group');
-  sseToOffice('sync', { scope: 'team' });
-  res.json({ ok: true });
-});
 
 /* ---- cv-builder (leden-app): het cv is de sleutel tot solliciteren ---- */
 function cvReady(cv) {
   return !!(cv && cv.name && cv.contact && ((cv.experience || []).length || (cv.skills || []).length));
 }
-app.post('/api/cv/get', auth, (req, res) => {
-  const cv = db.data.cvs[req.session.key] || null;
-  res.json({ cv, ready: cvReady(cv) });
-});
-app.post('/api/cv/save', auth, (req, res) => {
-  // ook gratis gebruikers maken een cv om te kunnen solliciteren
-  const b = req.body || {};
-  const cv = {
-    name: String(b.name || '').trim().slice(0, 60),
-    contact: String(b.contact || '').trim().slice(0, 80),
-    headline: String(b.headline || '').trim().slice(0, 80),
-    experience: String(b.experience || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 12),
-    skills: String(b.skills || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 15),
-    languages: String(b.languages || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 8),
-    about: String(b.about || '').trim().slice(0, 400),
-    updatedAt: new Date().toISOString()
-  };
-  if (!cv.name || !cv.contact) return res.status(400).json({ error: 'Vul minimaal uw naam en contactgegevens in.' });
-  db.data.cvs[req.session.key] = cv;
-  save();
-  res.json({ ok: true, cv, ready: cvReady(cv) });
-});
 
 // De openstaande vacatures voor een ingelogd lid: dezelfde vacatures als in de
 // RTFoundation, gefilterd op de paspoortleeftijd van het lid, met de landenlijst
 // om ook in het buitenland te zoeken.
-app.post('/api/member/vacatures', auth, (req, res) => {
-  // vacatures bekijken en solliciteren mag ook zonder pas
-  const lft = leeftijdVan(geborenVan(req.session));
-  const land = typeof req.body.land === 'string' && LANDEN[req.body.land] ? req.body.land : null;
-  const alle = openVacatures(lft);
-  const landen = [];
-  for (const v of alle) if (!landen.some(l => l.code === v.land)) landen.push({ code: v.land, naam: v.landNaam });
-  landen.sort((a, b) => a.naam.localeCompare(b.naam));
-  const zichtbaar = land ? alle.filter(v => v.land === land) : alle;
-  res.json({ vacatures: zichtbaar.slice(0, 100), landen, leeftijd: lft, magSolliciteren: lft == null || lft >= 16 });
-});
 
 // RTG-lid solliciteert bij een partner; kan pas met een afgerond cv. Solliciteren
 // op een gestructureerde vacature (vacatureId) is de nieuwe, gelijke weg; het
 // oude vrije functieveld blijft werken voor open sollicitaties.
-app.post('/api/member/apply', auth, (req, res) => {
-  // solliciteren mag ook zonder pas: het cv is de sleutel, niet de Pass
-  const s = findSupplier(req.body.supplierCode);
-  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
-  const cv = db.data.cvs[req.session.key];
-  if (!cvReady(cv)) return res.status(409).json({ error: 'Maak eerst uw cv af in de cv-builder; daarmee solliciteert u bij elke RTG-partner in een tik.', needCv: true });
-  const list = db.data.applications[s.code] = (db.data.applications[s.code] || []);
-  let func, vacatureId = null;
-  if (req.body.vacatureId) {
-    const vac = (db.data.vacatures[s.code] || []).find(v => v.id === req.body.vacatureId && v.open);
-    if (!vac) return res.status(404).json({ error: 'Deze vacature staat niet meer open.' });
-    const lft = leeftijdVan(geborenVan(req.session));
-    if (lft != null && lft < vac.minLeeftijd)
-      return res.status(403).json({ error: 'Voor deze vacature moet je minstens ' + vac.minLeeftijd + ' jaar zijn.' });
-    if (list.some(a => a.key === req.session.key && a.vacatureId === vac.id))
-      return res.status(409).json({ error: 'U hebt al op deze vacature gesolliciteerd. De status ziet u bij uw sollicitaties.' });
-    func = vac.func; vacatureId = vac.id;
-  } else {
-    func = String(req.body.func || '').trim().slice(0, 40);
-    if (!func) return res.status(400).json({ error: 'Kies een functie.' });
-  }
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  const entry = {
-    id: crypto.randomBytes(4).toString('hex'),
-    name: cv.name, func, contact: cv.contact,
-    note: String(req.body.note || '').trim().slice(0, 400),
-    viaRTG: true, codename, key: req.session.key, vacatureId,
-    cv: { headline: cv.headline, experience: cv.experience, skills: cv.skills, languages: cv.languages, about: cv.about },
-    status: 'nieuw', at: new Date().toISOString()
-  };
-  list.unshift(entry);
-  db.data.applications[s.code] = list.slice(0, 100);
-  save();
-  notifySupplier(s.code, { icon: '📝', title: 'Sollicitatie via RTG', body: cv.name + ' (RTG-lid) solliciteert als ' + func + ', met cv.' });
-  sseToSupplier(s.code, 'sync', { scope: 'team' });
-  sseToOffice('sync', { scope: 'team' });
-  res.json({ ok: true });
-});
 
 /* ---- beheer: alleen managers/chefs passen instellingen, tafels en menu aan ---- */
 function managerOnly(req, res) {
@@ -3506,127 +1855,13 @@ function optieAan(s, naam) {
   return !s.settings || !s.settings.opties || s.settings.opties[naam] !== false;
 }
 
-app.post('/api/supplier/settings', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const st = req.supplier.settings = req.supplier.settings || { ordersOpen: true, reservationsOpen: true };
-  const changed = [];
-  if (typeof req.body.ordersOpen === 'boolean' && st.ordersOpen !== req.body.ordersOpen) { st.ordersOpen = req.body.ordersOpen; changed.push('bestellingen ' + (st.ordersOpen ? 'open' : 'dicht')); }
-  if (typeof req.body.reservationsOpen === 'boolean' && st.reservationsOpen !== req.body.reservationsOpen) { st.reservationsOpen = req.body.reservationsOpen; changed.push('reserveringen ' + (st.reservationsOpen ? 'open' : 'dicht')); }
-  if (req.body.opties && typeof req.body.opties === 'object') {
-    st.opties = st.opties || {};
-    for (const k of Object.keys(ZAAK_OPTIES)) {
-      if (typeof req.body.opties[k] === 'boolean' && st.opties[k] !== req.body.opties[k]) {
-        st.opties[k] = req.body.opties[k];
-        changed.push(ZAAK_OPTIES[k] + ' ' + (req.body.opties[k] ? 'aan' : 'uit'));
-      }
-    }
-  }
-  // boekhouding: het land bepaalt de tarieven en regels, het uurloon de personeelskosten
-  if (typeof req.body.land === 'string' && LANDEN[req.body.land] && st.land !== req.body.land) {
-    st.land = req.body.land;
-    changed.push('het land op ' + LANDEN[req.body.land].naam);
-  }
-  if (req.body.uurloon != null) {
-    const u = Number(req.body.uurloon);
-    if (Number.isFinite(u) && u >= 0 && u <= 500) { st.uurloon = Math.round(u * 100) / 100; changed.push('het uurloon bij'); }
-  }
-  // vervoerders: het tarief dat elke nieuwe rit direct een vaste prijs geeft
-  if (req.body.tarief && typeof req.body.tarief === 'object') {
-    const t = st.tarief = st.tarief || {};
-    for (const k of ['start', 'perKm', 'minimum']) {
-      const v = Number(req.body.tarief[k]);
-      if (Number.isFinite(v) && v >= 0 && v <= 100000) t[k] = Math.round(v * 100) / 100;
-    }
-    changed.push('het tarief bij');
-  }
-  save();
-  if (changed.length) logActivity(req.supplier.code, req.actor, 'zette ' + changed.join(' en '));
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'settings' });
-  res.json({ ok: true, settings: st });
-});
 
 // ---- tafelindeling (horeca): status door iedereen, indeling door de manager ----
 const TABLE_STATUSES = ['vrij', 'bezet', 'gereserveerd', 'dicht'];
-app.post('/api/supplier/table/status', supplierAuth, (req, res) => {
-  const t = (req.supplier.tables || []).find(x => x.id === req.body.id);
-  if (!t) return res.status(404).json({ error: 'Tafel niet gevonden.' });
-  const status = String(req.body.status || '');
-  if (!TABLE_STATUSES.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
-  t.status = status;
-  save();
-  logActivity(req.supplier.code, req.actor, 'zette ' + t.name + ' op "' + status + '"');
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'tables' });
-  res.json({ ok: true, tables: req.supplier.tables });
-});
-app.post('/api/supplier/table/add', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const name = String(req.body.name || '').trim().slice(0, 40);
-  const seats = Math.min(20, Math.max(1, parseInt(req.body.seats, 10) || 2));
-  if (!name) return res.status(400).json({ error: 'Geef de tafel een naam.' });
-  req.supplier.tables = req.supplier.tables || [];
-  req.supplier.tables.push({ id: crypto.randomBytes(3).toString('hex'), name, seats, status: 'vrij' });
-  save();
-  logActivity(req.supplier.code, req.actor, 'voegde ' + name + ' toe (' + seats + ' pers.)');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'tables' });
-  res.json({ ok: true, tables: req.supplier.tables });
-});
-app.post('/api/supplier/table/remove', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const i = (req.supplier.tables || []).findIndex(x => x.id === req.body.id);
-  if (i >= 0) {
-    logActivity(req.supplier.code, req.actor, 'verwijderde ' + req.supplier.tables[i].name);
-    req.supplier.tables.splice(i, 1);
-    save();
-    sseToSupplier(req.supplier.code, 'sync', { scope: 'tables' });
-  }
-  res.json({ ok: true, tables: req.supplier.tables || [] });
-});
 
 // ---- team oproepen: een collega of het hele bedrijf, gericht via SSE ----
-app.post('/api/supplier/team/buzz', supplierAuth, (req, res) => {
-  const all = req.body.all === true;
-  const target = req.body.staffId == null ? null : Number(req.body.staffId);
-  let name = 'Beheer';
-  if (!all && target != null) {
-    const st = accounts.getStaffById(target);
-    if (!st || String(st.supplier_code).toUpperCase() !== req.supplier.code) return res.status(404).json({ error: 'Teamlid niet gevonden.' });
-    name = st.name;
-  }
-  let reached = 0;
-  for (const c of sseClients) {
-    if (c.sup !== req.supplier.code) continue;
-    if (all) {
-      // iedereen behalve de oproeper zelf
-      if (c.staffId === (req.actor.staffId != null ? req.actor.staffId : null)) continue;
-      sseSend(c.res, 'buzz', { from: req.actor.name, all: true }); reached++;
-    } else if (target == null ? c.staffId == null : c.staffId === target) {
-      sseSend(c.res, 'buzz', { from: req.actor.name }); reached++;
-    }
-  }
-  logActivity(req.supplier.code, req.actor, all ? 'riep het hele team op (tril)' : 'riep ' + name + ' op (tril)');
-  res.json({ ok: true, reached, name: all ? 'het hele team' : name });
-});
 
 // ---- security-alarm: melding met locatie naar het hele bedrijf en RTG ----
-app.post('/api/supplier/security', supplierAuth, (req, res) => {
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
-  const loc = (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng }
-    : (req.supplier.loc ? { lat: req.supplier.loc.lat, lng: req.supplier.loc.lng } : null);
-  const alarm = {
-    from: req.actor.name,
-    company: req.supplier.name,
-    note: String(req.body.note || '').trim().slice(0, 140),
-    loc, label: req.supplier.loc ? req.supplier.loc.label : null,
-    at: new Date().toISOString()
-  };
-  logActivity(req.supplier.code, req.actor, 'SECURITY-ALARM' + (alarm.note ? ': ' + alarm.note : '') + (loc ? ' (locatie gedeeld)' : ''));
-  notifySupplier(req.supplier.code, { icon: '🚨', title: 'NOODOPROEP ' + req.actor.name, body: (alarm.note || 'Directe assistentie nodig.') + (alarm.label ? ' Locatie: ' + alarm.label : '') });
-  for (const c of sseClients) if (c.sup === req.supplier.code) sseSend(c.res, 'alarm', alarm);
-  sseToOffice('notify', { icon: '🚨', title: 'Noodoproep bij ' + req.supplier.name, body: req.actor.name + (alarm.note ? ': ' + alarm.note : ' vraagt directe assistentie.') + (loc ? ' Locatie: ' + (alarm.label || lat.toFixed ? loc.lat.toFixed(4) + ', ' + loc.lng.toFixed(4) : '') : '') });
-  res.json({ ok: true, alarm });
-});
 
 /* ---- personeelszaken: klok, verlof/ziek en de vertrouwenslijn ----
    Kennis en kunde in de zak van elk staflid: administratie die het bedrijf en
@@ -3648,75 +1883,12 @@ function klokVan(code, staffId) {
 }
 
 // in- of uitklokken met een tik
-app.post('/api/staff/clock', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const lijst = db.data.klok[req.supplier.code] = db.data.klok[req.supplier.code] || [];
-  const open = lijst.find(e => e.staffId === req.actor.staffId && !e.out);
-  let actie;
-  if (open) { open.out = new Date().toISOString(); actie = 'uit'; }
-  else { lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), staffId: req.actor.staffId, name: req.actor.name, in: new Date().toISOString(), out: null }); actie = 'in'; }
-  db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
-  save();
-  logActivity(req.supplier.code, req.actor, 'klokte ' + actie);
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
-  res.json({ ok: true, actie, klok: klokVan(req.supplier.code, req.actor.staffId) });
-});
 
 // eigen personeelszaken in een keer: klok, verlof en de vertrouwenslijn
-app.post('/api/staff/mine', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  res.json({
-    klok: klokVan(req.supplier.code, req.actor.staffId),
-    verlof: (db.data.verlof[req.supplier.code] || []).filter(v => v.staffId === req.actor.staffId).slice(0, 10),
-    trust: trustVan(req.supplier.code, req.actor.staffId)
-  });
-});
 
 // verlof aanvragen of ziekmelden
-app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const soort = req.body.soort === 'ziek' ? 'ziek' : 'verlof';
-  const van = schoon(req.body.van, 10), tot = schoon(req.body.tot, 10);
-  const geldig = d => /^\d{4}-\d{2}-\d{2}$/.test(d);
-  if (soort === 'verlof' && (!geldig(van) || !geldig(tot) || tot < van))
-    return res.status(400).json({ error: 'Kies een geldige begin- en einddatum.' });
-  const lijst = db.data.verlof[req.supplier.code] = db.data.verlof[req.supplier.code] || [];
-  const entry = {
-    id: crypto.randomBytes(4).toString('hex'),
-    staffId: req.actor.staffId, name: req.actor.name, soort,
-    van: soort === 'ziek' ? new Date().toISOString().slice(0, 10) : van,
-    tot: soort === 'ziek' ? null : tot,
-    reden: schoon(req.body.reden, 140),
-    status: soort === 'ziek' ? 'gemeld' : 'nieuw',
-    at: new Date().toISOString()
-  };
-  lijst.unshift(entry);
-  db.data.verlof[req.supplier.code] = lijst.slice(0, 2000);
-  save();
-  if (soort === 'ziek') {
-    logActivity(req.supplier.code, req.actor, 'meldde zich ziek');
-    notifySupplier(req.supplier.code, { icon: '🤒', title: 'Ziekmelding', body: req.actor.name + ' heeft zich ziek gemeld. Denk aan de bezetting van vandaag.' });
-  } else {
-    logActivity(req.supplier.code, req.actor, 'vroeg verlof aan (' + entry.van + ' t/m ' + entry.tot + ')');
-    notifySupplier(req.supplier.code, { icon: '🌴', title: 'Verlofaanvraag', body: req.actor.name + ': ' + entry.van + ' t/m ' + entry.tot + (entry.reden ? ' · ' + entry.reden : '') });
-  }
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });
-  res.json({ ok: true, entry });
-});
 
 // manager beslist over een verlofaanvraag
-app.post('/api/supplier/leave/decide', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  const v = (db.data.verlof[req.supplier.code] || []).find(x => x.id === req.body.id);
-  if (!v) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
-  if (v.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
-  v.status = req.body.action === 'goedkeuren' ? 'goedgekeurd' : 'afgewezen';
-  v.decidedBy = req.actor.name;
-  save();
-  logActivity(req.supplier.code, req.actor, (v.status === 'goedgekeurd' ? 'keurde verlof goed van ' : 'wees verlof af van ') + v.name);
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });
-  res.json({ ok: true, entry: v });
-});
 
 /* Vertrouwenslijn: rechtstreeks en vertrouwelijk contact met de
    vertrouwenspersoon van RTG. De werkgever ziet hier niets van: geen
@@ -3725,275 +1897,25 @@ function trustVan(code, staffId) {
   const t = db.data.trustLine.find(x => x.code === code && x.staffId === staffId);
   return t ? { anon: t.anon, messages: t.messages.slice(-30) } : { anon: false, messages: [] };
 }
-app.post('/api/staff/trust/send', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const text = schoon(req.body.text, 800);
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  let t = db.data.trustLine.find(x => x.code === req.supplier.code && x.staffId === req.actor.staffId);
-  if (!t) {
-    t = { id: crypto.randomBytes(4).toString('hex'), code: req.supplier.code, company: req.supplier.name,
-          staffId: req.actor.staffId, anon: !!req.body.anon, name: req.actor.name, messages: [], open: true, lastAt: null };
-    db.data.trustLine.unshift(t);
-    db.data.trustLine = db.data.trustLine.slice(0, 2000);
-  }
-  if (req.body.anon != null) t.anon = !!req.body.anon;
-  t.messages.push({ from: 'staff', text, at: new Date().toISOString() });
-  t.messages = t.messages.slice(-60);
-  t.open = true;
-  t.lastAt = new Date().toISOString();
-  save();
-  // bewust GEEN logActivity en GEEN notifySupplier: dit blijft buiten de werkgever om
-  sseToOffice('sync', { scope: 'trust' });
-  res.json({ ok: true, trust: trustVan(req.supplier.code, req.actor.staffId) });
-});
-app.post('/api/staff/trust/thread', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  res.json({ trust: trustVan(req.supplier.code, req.actor.staffId) });
-});
 
 // backoffice: de vertrouwenspersoon leest en antwoordt
-app.post('/api/office/trust', officeAuth, (req, res) => {
-  res.json({ threads: db.data.trustLine.slice(0, 40).map(t => ({
-    id: t.id, company: t.company, anon: t.anon,
-    name: t.anon ? 'Anoniem' : t.name,
-    open: t.open, lastAt: t.lastAt,
-    messages: t.messages.slice(-30)
-  })) });
-});
-app.post('/api/office/trust/reply', officeAuth, (req, res) => {
-  const t = db.data.trustLine.find(x => x.id === req.body.id);
-  if (!t) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
-  const text = schoon(req.body.text, 800);
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  t.messages.push({ from: 'rtg', text, at: new Date().toISOString() });
-  t.messages = t.messages.slice(-60);
-  t.open = false;
-  t.lastAt = new Date().toISOString();
-  save();
-  // alleen een seintje om te verversen; de inhoud gaat uitsluitend via de persoonlijke login
-  sseToSupplier(t.code, 'sync', { scope: 'trust' });
-  res.json({ ok: true });
-});
 
 /* ---- eigen backoffice per leverancier ----
    Elk bedrijf zijn eigen controlecentrum: dagcijfers, weektrend, toppers en
    een actiecentrum, met dezelfde patronen als de RTG-backoffice maar dan
    uitsluitend over de eigen zaak. */
-app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  const s = req.supplier;
-  const en = req.body.lang === 'en';
-  const nu = Date.now();
-  const dag = iso => String(iso || '').slice(0, 10);
-  const vandaag = new Date().toISOString().slice(0, 10);
-  const orders = db.data.orders.filter(o => o.supplierCode === s.code && o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald');
-  const ritten = db.data.rides.filter(r => r.supplierCode === s.code && r.paid && r.status !== 'geweigerd');
-  const boekingen = db.data.boekingen.filter(b => b.supplierCode === s.code && b.paid && b.status !== 'geweigerd');
-  // kassaverkopen zonder dubbeltellingen: RTG-codes zijn al app-omzet,
-  // kamerlasten tellen pas bij het uitchecken
-  const kassa = (db.data.posSales[s.code] || []).filter(v => v.method !== 'rtg' && v.method !== 'kamer');
-  const week = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(nu - i * 86400000).toISOString().slice(0, 10);
-    week.push({
-      date: d,
-      label: new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short' }),
-      omzet: orders.filter(o => dag(o.paidAt || o.at) === d).reduce((x, o) => x + (o.total || 0), 0)
-        + ritten.filter(r => dag(r.paidAt || r.at) === d).reduce((x, r) => x + (r.quote || 0), 0)
-        + boekingen.filter(b => dag(b.paidAt || b.at) === d).reduce((x, b) => x + (b.price || 0), 0)
-        + kassa.filter(v => dag(v.at) === d).reduce((x, v) => x + (v.total || 0), 0),
-      aantal: orders.filter(o => dag(o.paidAt || o.at) === d).length
-        + ritten.filter(r => dag(r.paidAt || r.at) === d).length
-        + boekingen.filter(b => dag(b.paidAt || b.at) === d).length
-        + kassa.filter(v => dag(v.at) === d).length
-    });
-  }
-  // toppers: wat verkoopt het best, app, kassa en boekingen samen
-  const teller = {};
-  const telItems = lijst => { for (const it of (lijst || [])) { if (!it.name) continue; const t = teller[it.name] = teller[it.name] || { naam: it.name, aantal: 0, omzet: 0 }; t.aantal += it.qty || 1; t.omzet += (it.price || 0) * (it.qty || 1); } };
-  for (const o of orders) telItems(o.items);
-  for (const v of kassa) telItems(v.items);
-  for (const b of boekingen) { const t2 = teller[b.service.name] = teller[b.service.name] || { naam: b.service.name, aantal: 0, omzet: 0 }; t2.aantal += 1; t2.omzet += b.price || 0; }
-  const toppers = Object.values(teller).sort((a, b) => b.omzet - a.omzet).slice(0, 8);
-  // actiecentrum van de zaak
-  const alerts = [];
-  const minGeleden = iso => Math.round((nu - new Date(iso)) / 60000);
-  for (const o of db.data.orders) {
-    if (o.supplierCode !== s.code || !o.paid || o.status !== 'nieuw') continue;
-    const m = minGeleden(o.paidAt || o.at);
-    if (m >= 10) alerts.push({ level: 'rood', text: en
-      ? 'Order ' + o.ref + ' has been untouched for ' + m + ' min (' + o.customerCodename + ').'
-      : 'Bestelling ' + o.ref + ' staat al ' + m + ' min onaangeroerd (' + o.customerCodename + ').' });
-  }
-  for (const r of db.data.rides) {
-    if (r.supplierCode !== s.code || !r.paid || r.status !== 'aangevraagd' || r.driver) continue;
-    const straks = r.plannedFor && (new Date(r.plannedFor) - nu) > 45 * 60000;
-    if (!straks && minGeleden(r.paidAt || r.at) >= 10)
-      alerts.push({ level: 'rood', text: en ? 'Ride ' + r.ref + ' is still waiting for a driver.' : 'Rit ' + r.ref + ' wacht nog op een chauffeur.' });
-    else if (straks && (new Date(r.plannedFor) - nu) < 24 * 3600000)
-      alerts.push({ level: 'amber', text: en
-        ? 'Scheduled ride ' + r.ref + ' (' + String(r.plannedFor).slice(0, 16).replace('T', ' ') + ') has no driver yet.'
-        : 'Geplande rit ' + r.ref + ' (' + String(r.plannedFor).slice(0, 16).replace('T', ' ') + ') heeft nog geen chauffeur.' });
-  }
-  for (const b of db.data.boekingen) {
-    if (b.supplierCode !== s.code || !b.paid || b.status !== 'aangevraagd') continue;
-    if (minGeleden(b.paidAt || b.at) >= 30) alerts.push({ level: 'amber', text: en
-      ? 'Booking ' + b.ref + ' (' + b.service.name + ') is still waiting for your confirmation.'
-      : 'Boeking ' + b.ref + ' (' + b.service.name + ') wacht nog op uw bevestiging.' });
-  }
-  const verlofN = (db.data.verlof[s.code] || []).filter(v => v.status === 'nieuw').length;
-  if (verlofN) alerts.push({ level: 'amber', text: en ? verlofN + ' leave request(s) await your decision (HR & team).' : verlofN + ' verlofaanvraag/aanvragen wachten op uw besluit (HR & team).' });
-  const sollN = (db.data.applications[s.code] || []).filter(a => a.status === 'nieuw').length;
-  if (sollN) alerts.push({ level: 'info', text: en ? sollN + ' open application(s) (HR & team).' : sollN + ' open sollicitatie(s) (HR & team).' });
-  const chatsN = Object.values(db.data.guestChats).filter(c => c.supplierCode === s.code && c.unreadPartner).length;
-  if (chatsN) alerts.push({ level: 'amber', text: en ? chatsN + ' guest chat(s) waiting for a reply.' : chatsN + ' gastchat(s) wachten op een antwoord.' });
-  const klussenN = (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length;
-  if (klussenN) alerts.push({ level: 'info', text: en ? klussenN + ' open job(s) or maintenance.' : klussenN + ' open klus(sen) of onderhoud.' });
-  const vuilN = (s.rooms || []).filter(r => r.hk && r.hk.status === 'vuil').length;
-  if (vuilN) alerts.push({ level: 'amber', text: en ? vuilN + ' room(s) still to clean.' : vuilN + ' kamer(s) nog schoon te maken.' });
-  const volg = { rood: 0, amber: 1, info: 2 };
-  alerts.sort((a, b) => volg[a.level] - volg[b.level]);
-  const kassaVandaag = kassa.filter(v => dag(v.at) === vandaag).reduce((x, v) => x + (v.total || 0), 0);
-  const stats = {
-    omzetVandaag: week[6].omzet,
-    transactiesVandaag: week[6].aantal,
-    kassaVandaag,
-    omzetWeek: week.reduce((x, d2) => x + d2.omzet, 0),
-    binnenNu: [...new Set((db.data.klok[s.code] || []).filter(e => e.in.slice(0, 10) === vandaag && !e.out).map(e => e.name))].length,
-    openActies: alerts.length
-  };
-  // dagbriefing in gewone taal, altijd uit de echte cijfers
-  const eurF = n => '€ ' + Number(n).toLocaleString(en ? 'en-US' : 'nl-NL');
-  const zin = [];
-  zin.push(en
-    ? 'Today ' + s.name + ' processed ' + stats.transactiesVandaag + ' transaction(s) for ' + eurF(stats.omzetVandaag) + ' (of which ' + eurF(kassaVandaag) + ' at the register); this week stands at ' + eurF(stats.omzetWeek) + '.'
-    : 'Vandaag verwerkte ' + s.name + ' ' + stats.transactiesVandaag + ' transactie(s), goed voor ' + eurF(stats.omzetVandaag) + ' (waarvan ' + eurF(kassaVandaag) + ' via de kassa); de week staat op ' + eurF(stats.omzetWeek) + '.');
-  if (toppers[0]) zin.push(en
-    ? 'Best seller: ' + toppers[0].naam + ' (' + toppers[0].aantal + 'x, ' + eurF(toppers[0].omzet) + ').'
-    : 'Topper: ' + toppers[0].naam + ' (' + toppers[0].aantal + 'x, ' + eurF(toppers[0].omzet) + ').');
-  zin.push(stats.binnenNu
-    ? (en ? stats.binnenNu + ' colleague(s) are clocked in right now.' : stats.binnenNu + ' collega(s) zijn nu ingeklokt.')
-    : (en ? 'Nobody is clocked in right now.' : 'Er is nu niemand ingeklokt.'));
-  const rood = alerts.filter(a => a.level === 'rood').length;
-  zin.push(rood
-    ? (en ? rood + ' item(s) are stuck; see the action list.' : rood + ' zaak/zaken lopen vast; zie de actielijst.')
-    : alerts.length
-      ? (en ? 'Nothing is stuck; ' + alerts.length + ' routine item(s) remain.' : 'Niets loopt vast; nog ' + alerts.length + ' routinepunt(en).')
-      : (en ? 'Everything is running smoothly.' : 'Alles loopt.'));
-  zin.push(en ? 'RTG charges 0% commission: this revenue is fully yours.' : 'RTG rekent 0% commissie: deze omzet is volledig van u.');
-  res.json({ stats, week, toppers, alerts: alerts.slice(0, 12), briefing: zin.join(' ') });
-});
 
 /* ---- zzp-boekingen: diensten en producten van zelfstandige professionals ----
    Leden boeken met datum en tijd; de zelfstandige bevestigt, levert en rondt
    af. Betalen-eerst geldt hier net zo (tenzij de zaak achteraf kiest). */
 const BOEK_KETEN = ['aangevraagd', 'bevestigd', 'afgerond'];
 
-app.post('/api/booking/request', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const s = findSupplier(req.body.supplierCode);
-  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
-  if (!s || !caps.includes('services')) return res.status(404).json({ error: 'Geen zelfstandige professional gevonden.' });
-  if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen boekingen aan.' });
-  const dienst = (s.services || []).find(x => x.id === req.body.serviceId);
-  if (!dienst) return res.status(404).json({ error: 'Deze dienst bestaat niet (meer).' });
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak
-  const lftB = leeftijdVan(geborenVan(req.session));
-  const vooraf = optieAan(s, 'betaalVooraf') || (lftB != null && lftB < 18);
-  const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
-  const wanneer = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d + (/^\d{2}:\d{2}$/.test(u) ? ' ' + u : '') : null;
-  const boeking = {
-    ref: 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-    supplierCode: s.code, supplierName: s.name,
-    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
-    service: { id: dienst.id, name: dienst.name, soort: dienst.soort || 'dienst', duurMin: dienst.duurMin || null },
-    price: dienst.price,
-    wanneer, note: schoon(req.body.note, 140),
-    betaalMoment: vooraf ? 'vooraf' : 'achteraf',
-    status: vooraf ? 'wacht-op-betaling' : 'aangevraagd',
-    paid: false, at: new Date().toISOString()
-  };
-  db.data.boekingen.unshift(boeking);
-  db.data.boekingen = db.data.boekingen.slice(0, 50000);
-  save();
-  if (!vooraf) {
-    notifySupplier(s.code, { icon: '🗓️', title: 'Nieuwe boeking (betaling achteraf)', body: codename + ': ' + dienst.name + (wanneer ? ' · ' + wanneer : '') + ' · € ' + dienst.price });
-    sseToSupplier(s.code, 'sync', { scope: 'orders' });
-    sseToOffice('sync', { scope: 'orders' });
-  }
-  res.json({ ok: true, boeking });
-});
 
-app.post('/api/booking/pay', auth, (req, res) => {
-  const b = db.data.boekingen.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
-  if (!b) return res.status(404).json({ error: 'Boeking niet gevonden.' });
-  if (b.paid) return res.status(409).json({ error: 'Al betaald.' });
-  if (b.status === 'wacht-op-betaling' && Date.now() - new Date(b.at) > 30 * 60000)
-    return res.status(410).json({ error: 'Deze aanvraag is verlopen. Boek opnieuw.' });
-  b.paid = true;
-  b.paidAt = new Date().toISOString();
-  if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
-  save();
-  notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
-  sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, boeking: b });
-});
 
-app.post('/api/bookings/mine', auth, (req, res) => {
-  const mijn = db.data.boekingen.filter(b => (b.customerKey || b.customerTier) === req.session.key);
-  res.json({ boekingen: mijn.slice(0, 25), total: mijn.length });
-});
 
 // de zelfstandige bevestigt, rondt af of weigert (alleen vooruit in de keten)
-app.post('/api/supplier/booking/status', supplierAuth, (req, res) => {
-  const b = db.data.boekingen.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!b) return res.status(404).json({ error: 'Boeking niet gevonden.' });
-  if (b.status === 'wacht-op-betaling') return res.status(409).json({ error: 'Deze boeking is nog niet betaald.' });
-  const status = String(req.body.status || '');
-  if (status !== 'geweigerd') {
-    if (!BOEK_KETEN.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
-    if (BOEK_KETEN.indexOf(status) <= BOEK_KETEN.indexOf(b.status)) return res.status(409).json({ error: 'Deze boeking is al ' + b.status + '.' });
-  } else if (b.status === 'afgerond') {
-    return res.status(409).json({ error: 'Deze boeking is al afgerond.' });
-  }
-  b.status = status;
-  if (status === 'afgerond') b.finishedAt = new Date().toISOString();
-  save();
-  const MELDING = { bevestigd: 'Uw afspraak is bevestigd.', afgerond: 'Dank u wel; uw afspraak is afgerond.', geweigerd: 'Uw aanvraag kon helaas niet worden bevestigd.' };
-  notify(b.customerTier, { icon: '🗓️', title: req.supplier.name, body: MELDING[status] + (b.wanneer && status === 'bevestigd' ? ' (' + b.wanneer + ')' : ''), scope: 'orders' });
-  sseToCustomer(b.customerKey || b.customerTier, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, 'zette boeking ' + b.ref + ' op "' + status + '"');
-  res.json({ ok: true, boeking: b });
-});
 
 // dienstenbeheer: de zelfstandige is baas over het eigen aanbod
-app.post('/api/supplier/service', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor de eigenaar.' });
-  const s = req.supplier;
-  s.services = s.services || [];
-  const a = String(req.body.action || '');
-  if (a === 'add') {
-    const name = schoon(req.body.name, 80);
-    const price = Math.round(Number(req.body.price) * 100) / 100;
-    if (!name || !(price > 0)) return res.status(400).json({ error: 'Geef de dienst een naam en een prijs.' });
-    s.services.push({
-      id: 'sv' + Date.now().toString(36),
-      name, desc: schoon(req.body.desc, 140), price,
-      duurMin: Number(req.body.duurMin) > 0 ? Math.round(Number(req.body.duurMin)) : null,
-      soort: req.body.soort === 'product' ? 'product' : 'dienst'
-    });
-  } else if (a === 'remove') {
-    s.services = s.services.filter(x => x.id !== req.body.id);
-  } else return res.status(400).json({ error: 'Onbekende actie.' });
-  save();
-  logActivity(s.code, req.actor, 'werkte het aanbod bij');
-  sseToSupplier(s.code, 'sync', { scope: 'settings' });
-  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
-  res.json({ ok: true, services: s.services });
-});
 
 /* ---- cadeaukaarten ----
    Kopen via de leden-app (Face ID) of verkopen aan de kassa; innen door de
@@ -4001,53 +1923,9 @@ app.post('/api/supplier/service', supplierAuth, (req, res) => {
    saldo is een verplichting op de balans), de btw hoort bij de inwisseling. */
 const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCase();
 
-app.post('/api/giftcard/buy', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const s = findSupplier(req.body.supplierCode);
-  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
-  const bedrag = Math.round(Number(req.body.bedrag));
-  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  const kaart = { code: gcCode(), supplierCode: s.code, supplierName: s.name, bedrag, saldo: bedrag,
-    kocht: codename, customerKey: req.session.key, at: new Date().toISOString(), verzilveringen: [] };
-  db.data.giftcards.unshift(kaart);
-  db.data.giftcards = db.data.giftcards.slice(0, 20000);
-  save();
-  notifySupplier(s.code, { icon: '🎁', title: 'Cadeaukaart verkocht', body: codename + ' kocht via de app een cadeaukaart van € ' + bedrag + '.' });
-  sseToSupplier(s.code, 'sync', { scope: 'pos' });
-  res.json({ ok: true, kaart });
-});
 
-app.post('/api/giftcards/mine', auth, (req, res) => {
-  res.json({ kaarten: (db.data.giftcards || []).filter(g => g.customerKey === req.session.key).slice(0, 20) });
-});
 
-app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
-  const bedrag = Math.round(Number(req.body.bedrag));
-  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-  const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
-    kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
-  db.data.giftcards.unshift(kaart);
-  db.data.giftcards = db.data.giftcards.slice(0, 20000);
-  save();
-  logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
-  res.json({ ok: true, kaart });
-});
 
-app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  const g = (db.data.giftcards || []).find(x => x.code === code && x.supplierCode === req.supplier.code);
-  if (!g) return res.status(404).json({ error: 'Deze cadeaukaart kennen we hier niet.' });
-  const bedrag = Math.round(Number(req.body.bedrag) * 100) / 100;
-  if (!(bedrag > 0)) return res.status(400).json({ error: 'Geen geldig bedrag.' });
-  if (bedrag > g.saldo) return res.status(409).json({ error: 'Onvoldoende saldo: er staat nog € ' + g.saldo + ' op deze kaart.' });
-  g.saldo = Math.round((g.saldo - bedrag) * 100) / 100;
-  g.verzilveringen = g.verzilveringen || [];
-  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor: req.actor.name });
-  save();
-  logActivity(req.supplier.code, req.actor, 'inde € ' + bedrag + ' van cadeaukaart ' + g.code + ' (rest € ' + g.saldo + ')');
-  res.json({ ok: true, saldo: g.saldo, kaart: { code: g.code, saldo: g.saldo } });
-});
 
 /* ---- de boekhouding van de zaak: btw per genre, personeelskosten, cadeaukaarten ---- */
 function centen(n) { return Math.round(n * 100) / 100; }
@@ -4122,10 +2000,6 @@ function financeVoor(s) {
   };
 }
 
-app.post('/api/supplier/finance', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  res.json(financeVoor(req.supplier));
-});
 
 // AI-boekhouder van de zaak: kent het land, de regels en de eigen cijfers
 function cannedBoekhouder(vraag, fin, L) {
@@ -4141,29 +2015,6 @@ function cannedBoekhouder(vraag, fin, L) {
   return 'Uw maand in ' + L.naam + ': af te dragen btw € ' + fin.btwTotaal + ', personeelskosten € ' + fin.personeel.totaal + ' (' + fin.personeel.uren + ' uur), cadeaukaarten € ' + fin.giftcards.open + ' open. Vraag me naar btw, personeelskosten, cadeaukaarten of aangiftetermijnen. Dit is voorlichting, geen bindend fiscaal advies.';
 }
 
-app.post('/api/supplier/accountant', supplierAuth, async (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  const vraag = String(req.body.question || '').trim().slice(0, 400);
-  if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
-  const fin = financeVoor(req.supplier);
-  const L = LANDEN[fin.land];
-  let answer = null;
-  if (anthropic) {
-    try {
-      const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 500,
-        system: 'Je bent de AI-boekhouder van RTG voor ' + req.supplier.name + ' (' + req.supplier.type + ') in ' + L.naam + '. ' +
-          'Regels: ' + fin.regels.join(' ') + ' Zakelijke aftrek: ' + Object.values(L.zakelijk).join(' ') + ' ' +
-          'Cijfers deze maand: btw ' + JSON.stringify(fin.btw) + ', af te dragen € ' + fin.btwTotaal + '; personeel ' + JSON.stringify(fin.personeel) + '; cadeaukaarten ' + JSON.stringify(fin.giftcards) + '. ' +
-          'Antwoord in het Nederlands, maximaal 130 woorden, praktisch en concreet. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
-        messages: [{ role: 'user', content: vraag }]
-      });
-      answer = msg.content[0].text;
-    } catch (err) { answer = null; }
-  }
-  if (!answer) answer = cannedBoekhouder(vraag, fin, L);
-  res.json({ answer, land: fin.land, ai: !!anthropic });
-});
 
 /* ---- zzp-belastingtool (Business Pass) ----
    Indicatieve berekening voor zelfstandigen per land. Nederland volledig
@@ -4197,89 +2048,8 @@ const ZZP = {
       'Nationale inkomstenbelasting 5% tot 45%, plus ~10% lokale inkomstenbelasting.'] }
 };
 
-app.post('/api/member/zzp', auth, (req, res) => {
-  if (req.session.tier !== 'business') return res.status(403).json({ error: 'De zzp-belastingtool is onderdeel van de Business Pass.' });
-  const landCode = ZZP[req.body.land] ? req.body.land : 'NL';
-  const Z = ZZP[landCode];
-  const winst = Math.max(0, Math.min(5000000, Math.round(Number(req.body.winst) || 0)));
-  if (!winst) return res.status(400).json({ error: 'Vul uw verwachte jaarwinst in.' });
-  const out = { land: landCode, landNaam: LANDEN[landCode].naam, regime: Z.regime, winst, posten: [], regels: Z.regels.slice(), indicatie: true, peiljaar: FISCAAL_PEILJAAR };
-  let belasting = 0, belastbaar = winst;
-  if (landCode === 'NL') {
-    const uren = req.body.urencriterium !== false;
-    const za = uren ? Math.min(Z.zelfstandigenaftrek, winst) : 0;
-    const sa = uren && req.body.starter ? Z.startersaftrek : 0;
-    const rest = Math.max(0, winst - za - sa);
-    const mkb = centen(rest * Z.mkbVrijstelling);
-    belastbaar = centen(rest - mkb);
-    out.posten.push(za ? { label: 'Zelfstandigenaftrek', bedrag: -za }
-                       : { label: 'Zelfstandigenaftrek (urencriterium niet gehaald)', bedrag: 0 });
-    if (sa) out.posten.push({ label: 'Startersaftrek', bedrag: -sa });
-    out.posten.push({ label: 'MKB-winstvrijstelling (12,7%)', bedrag: -mkb });
-    let vorige = 0, ib = 0;
-    for (const [grens, tarief] of Z.schijven) {
-      const deel = Math.max(0, Math.min(belastbaar, grens) - vorige);
-      ib += deel * tarief;
-      vorige = grens;
-      if (belastbaar <= grens) break;
-    }
-    const ahk = Math.max(0, Z.ahk.max - Math.max(0, belastbaar - Z.ahk.afbouwVanaf) * Z.ahk.afbouw);
-    const ak = Math.max(0, Z.arbeidskorting.max - Math.max(0, belastbaar - Z.arbeidskorting.afbouwVanaf) * Z.arbeidskorting.afbouw);
-    const korting = Math.min(ib, ahk + ak);
-    belasting = Math.max(0, centen(ib - korting));
-    out.posten.push({ label: 'Inkomstenbelasting (schijven)', bedrag: centen(ib) });
-    out.posten.push({ label: 'Heffingskortingen (indicatie)', bedrag: -centen(korting) });
-    if (winst < Z.korGrens) out.regels.unshift('Met deze omzet komt u waarschijnlijk in aanmerking voor de KOR (btw-vrijstelling): minder administratie, geen btw-aangifte.');
-  } else {
-    belasting = centen(winst * Z.simpel);
-    out.posten.push({ label: 'Indicatieve heffing (~' + Math.round(Z.simpel * 100) + '% effectief, incl. sociale lasten)', bedrag: belasting });
-  }
-  out.belastbaar = centen(belastbaar);
-  out.belasting = belasting;
-  out.netto = centen(winst - belasting);
-  out.reserveerPct = Math.max(20, Math.min(50, Math.round(belasting / winst * 100) + 5));
-  out.perMaand = centen(belasting / 12);
-  out.regels.push('Indicatieve berekening op basis van de tarieven van ' + FISCAAL_PEILJAAR + '; controleer jaarlijks en raadpleeg voor uw aangifte een fiscalist.');
-  res.json(out);
-});
 
 // AI-boekhouder voor het Business Pass-lid: wat is per land terug te vorderen
-app.post('/api/member/accountant', auth, async (req, res) => {
-  if (req.session.tier !== 'business') return res.status(403).json({ error: 'De AI-boekhouder is onderdeel van de Business Pass.' });
-  const landCode = LANDEN[req.body.land] ? req.body.land : 'NL';
-  const L = LANDEN[landCode];
-  const vraag = String(req.body.question || '').trim().slice(0, 400);
-  if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
-  const key = req.session.key;
-  const horeca = db.data.orders.filter(o => (o.customerKey || o.customerTier) === key && o.paid).reduce((x, o) => x + o.total, 0);
-  const vervoer = db.data.rides.filter(r => (r.customerKey || r.customerTier) === key && r.paid).reduce((x, r) => x + (r.quote || 0), 0);
-  let answer = null;
-  if (anthropic) {
-    try {
-      const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 450,
-        system: 'Je bent de AI-boekhouder van de RTG Business Pass. Het lid reist zakelijk; het gekozen land is ' + L.naam + '. ' +
-          'Aftrekregels daar: horeca: ' + L.zakelijk.horeca + ' logies: ' + L.zakelijk.logies + ' vervoer: ' + L.zakelijk.vervoer + ' jet: ' + L.zakelijk.jet + ' ' +
-          'Voor zelfstandigen geldt daar het regime ' + ZZP[landCode].regime + ': ' + ZZP[landCode].regels.join(' ') + ' Er is een zzp-rekentool in de app voor een indicatie van belasting en nettowinst. ' +
-          'Uitgaven via RTG: horeca € ' + horeca + ', vervoer € ' + vervoer + '. Facturen staan boekhoudklaar in het portaal met afboekcode en btw-specificatie. ' +
-          'Antwoord in het Nederlands, maximaal 120 woorden, praktisch. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
-        messages: [{ role: 'user', content: vraag }]
-      });
-      answer = msg.content[0].text;
-    } catch (err) { answer = null; }
-  }
-  if (!answer) {
-    const v = vraag.toLowerCase();
-    if (/zzp|zelfstandig|eenmanszaak|freelan|kor\b|urencriterium|autonomo|micro-?entre|freiberuf/.test(v))
-      answer = 'Voor zelfstandigen in ' + L.naam + ' (' + ZZP[landCode].regime + '): ' + ZZP[landCode].regels.join(' ') + ' Gebruik de zzp-rekentool hieronder voor een indicatie van uw belasting, nettowinst en hoeveel u maandelijks opzij zet.';
-    else if (/hotel|overnacht|logies|slapen/.test(v)) answer = L.naam + ': ' + L.zakelijk.logies;
-    else if (/taxi|vervoer|rit|jet|vlieg/.test(v)) answer = L.naam + ': ' + L.zakelijk.vervoer + ' ' + L.zakelijk.jet + ' Via RTG gaf u € ' + vervoer + ' uit aan vervoer.';
-    else if (/eten|diner|restaurant|horeca|lunch|terugvorder|aftrek|btw/.test(v)) answer = L.naam + ': ' + L.zakelijk.horeca + ' Via RTG gaf u € ' + horeca + ' uit in de horeca. Uw facturen staan boekhoudklaar in het portaal, met afboekcode en btw-specificatie.';
-    else answer = 'Voor ' + L.naam + ' geldt: ' + L.zakelijk.horeca + ' ' + L.zakelijk.logies + ' ' + L.zakelijk.vervoer + ' Vraag me gerust naar een specifieke uitgave.';
-    answer += ' Dit is voorlichting, geen bindend fiscaal advies.';
-  }
-  res.json({ answer, land: landCode, landen: Object.entries(LANDEN).map(([k, v2]) => ({ code: k, naam: v2.naam })), ai: !!anthropic });
-});
 
 /* ---- AI-assistent voor de leverancier-app ----
    Begrijpt vragen EN voert acties uit: kamers op status zetten, deuren
@@ -4295,116 +2065,6 @@ function aiFindDoor(s, ql) {
          (s.doors || []).find(d => d.name.toLowerCase().split(/[ (]+/).some(w => w.length > 3 && ql.includes(w))) ||
          ((ql.includes('deur') || ql.includes('door')) ? (s.doors || [])[0] : null);
 }
-app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
-  const s = req.supplier;
-  const q = String(req.body.q || '').trim().slice(0, 300);
-  if (!q) return res.status(400).json({ error: 'Stel een vraag.' });
-  const ql = q.toLowerCase();
-  const A = (reply, did) => res.json({ reply, did: !!did });
-
-  // ---- acties ----
-  // kamerstatus: "zet <kamer> op schoon/vuil/bezig/bezet" of "meld <kamer> defect: reden"
-  const hkWord = { schoon:'schoon', clean:'schoon', vuil:'vuil', dirty:'vuil', bezig:'bezig', bezet:'bezet', occupied:'bezet', defect:'defect', kapot:'defect', stuk:'defect' };
-  const hkHit = Object.keys(hkWord).find(w => ql.includes(w));
-  const room = aiFindRoom(s, ql);
-  if (room && hkHit && /\b(zet|meld|maak|markeer|set|mark|is)\b/.test(ql)) {
-    const status = hkWord[hkHit];
-    const note = (q.split(/[:,]/)[1] || '').trim().slice(0, 140);
-    setRoomHk(s, room, status, status === 'defect' ? (note || 'gemeld via AI') : '', req.actor);
-    return A(status === 'defect'
-      ? room.name + ' staat op defect: uit de verkoop en er staat een klus klaar voor onderhoud.'
-      : room.name + ' staat nu op "' + status + '".', true);
-  }
-  // deuren: "open de voordeur" / "vergrendel machiya 1"
-  if (/\b(open|vergrendel|lock|sluit)\b/.test(ql) && (s.doors || []).length) {
-    const door = aiFindDoor(s, ql);
-    if (door) {
-      if (/\b(vergrendel|lock|sluit)\b/.test(ql)) {
-        door.locked = true; door.lastBy = req.actor.name; door.lastAt = new Date().toISOString(); save();
-        logActivity(s.code, req.actor, 'vergrendelde "' + door.name + '" via de AI-assistent');
-        sseToSupplier(s.code, 'sync', { scope: 'doors' });
-        return A(door.name + ' is vergrendeld.', true);
-      }
-      unlockDoor(s, door, req.actor.name);
-      logActivity(s.code, req.actor, 'opende "' + door.name + '" via de AI-assistent');
-      return A(door.name + ' is open en vergrendelt zichzelf over 10 seconden.', true);
-    }
-  }
-  // klus melden: "meld klus: lamp kapot" / "nieuwe klus ..."
-  const klusMatch = q.match(/(?:meld(?:\s+een)?\s+klus|nieuwe\s+klus|new\s+job)[:\s]+(.{3,})/i);
-  if (klusMatch) {
-    const t = addTicket(s.code, req.actor, klusMatch[1].trim(), room ? room.name : null);
-    save();
-    logActivity(s.code, req.actor, 'meldde een klus via de AI-assistent: ' + t.text.slice(0, 50));
-    sseToSupplier(s.code, 'sync', { scope: 'rooms' });
-    return A('Klus genoteerd' + (t.room ? ' voor ' + t.room : '') + ': "' + t.text + '". Onderhoud ziet hem in de klussenlijst.', true);
-  }
-
-  // ---- vragen ----
-  if (/(omzet|dagtotaal|z.rapport|verdiend|revenue|kassa)/.test(ql)) {
-    const p = posDay(s.code);
-    const methods = Object.entries(p.byMethod).map(([m, v]) => m + ' € ' + v).join(', ');
-    const open = Object.entries(p.openRooms || {}).map(([r, v]) => r + ' € ' + v.total).join(', ');
-    return A('Vandaag ontvangen: € ' + p.total + ' over ' + p.count + ' bon(nen)' + (methods ? ' (' + methods + ')' : '') +
-      (open ? '. Nog open op kamers: ' + open + '.' : '.'));
-  }
-  if (/(vuil|schoon|status|kamers?\b).*(kamer|room|status)|welke kamers/.test(ql) && (s.rooms || []).length) {
-    const lines = s.rooms.map(r => r.name + ': ' + ((r.hk && r.hk.status) || 'schoon') + (r.available ? '' : ' (uit de verkoop)'));
-    return A('Kamerstatus. ' + lines.join('. ') + '.');
-  }
-  if (/(klus|onderhoud|jobs?|tickets?)/.test(ql)) {
-    const open = (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar');
-    return A(open.length
-      ? 'Er staan ' + open.length + ' klus(sen) open: ' + open.map(t => t.text + (t.room ? ' (' + t.room + ')' : '') + (t.status === 'bezig' ? ', wordt opgepakt' : '')).join('; ') + '.'
-      : 'Er zijn geen openstaande klussen.');
-  }
-  if (/(onderweg|gast(en)?\b|eta|guests?)/.test(ql)) {
-    const g = guestsFor(s.code);
-    return A(g.length
-      ? g.map(x => x.codename + (x.arrived ? ' is gearriveerd' : x.etaMin != null ? ' arriveert over ~' + x.etaMin + ' min' : ' is onderweg')).join('. ') + '.'
-      : 'Er is nu geen gast live onderweg naar u.');
-  }
-  if (/(bericht|chat|onbeantwoord|messages?)/.test(ql)) {
-    const chats = Object.values(db.data.guestChats).filter(c => c.supplierCode === s.code && c.unreadPartner > 0);
-    return A(chats.length
-      ? 'U heeft ' + chats.reduce((n, c) => n + c.unreadPartner, 0) + ' onbeantwoord(e) bericht(en): ' + chats.map(c => c.codename + ' (' + (c.dept || 'Team') + '): "' + c.messages[c.messages.length - 1].text.slice(0, 40) + '"').join('; ') + '.'
-      : 'Alle gastberichten zijn beantwoord.');
-  }
-  if (/(minibar)/.test(ql) && Array.isArray(s.minibar)) {
-    const today = new Date().toISOString().slice(0, 10);
-    const counted = [...new Set((db.data.minibarCounts[s.code] || []).filter(e => e.at.slice(0, 10) === today).map(e => e.room))];
-    const todo = (s.rooms || []).map(r => r.name).filter(n => !counted.includes(n));
-    return A(todo.length ? 'Nog te tellen: ' + todo.join(', ') + '.' : 'Alle minibars zijn vandaag geteld.');
-  }
-  if (/(bestelling|orders?|bon(nen)?\b)/.test(ql)) {
-    const open = db.data.orders.filter(o => o.supplierCode === s.code && !['geserveerd', 'geweigerd', 'terugbetaald'].includes(o.status));
-    return A(open.length
-      ? open.length + ' open bestelling(en): ' + open.map(o => o.customerCodename + ' € ' + o.total + ' (' + o.status + ', code ' + o.pickup + ')').join('; ') + '.'
-      : 'Er zijn geen open bestellingen.');
-  }
-  if (/(rooster|dienst|schedule|shift)/.test(ql)) {
-    const wk = scheduleFor(s.code);
-    const today = wk.days[0];
-    return A('Vandaag: ' + today.staff.map(x => x.name + ' ' + x.shift).join('; ') + '. Het volledige rooster staat in de personeels-app.');
-  }
-
-  // vrije vraag: Claude met bedrijfscontext, anders hulptekst
-  if (anthropic) {
-    try {
-      const p = posDay(s.code);
-      const ctx = 'Bedrijf: ' + s.name + ' (' + s.type + ', ' + s.city + '). Vandaag ontvangen: € ' + p.total + '. ' +
-        'Kamers: ' + (s.rooms || []).map(r => r.name + '=' + ((r.hk && r.hk.status) || 'schoon')).join(', ') + '. ' +
-        'Open klussen: ' + (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length + '.';
-      const response = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 300,
-        system: 'Je bent de AI-assistent van een RTG-partner. Antwoord kort en concreet in de taal van de vraag. Context: ' + ctx,
-        messages: [{ role: 'user', content: q }]
-      });
-      return A(response.content[0].text);
-    } catch (e) { /* val terug op hulptekst */ }
-  }
-  return A('Dat begrijp ik nog niet helemaal. U kunt mij bijvoorbeeld vragen: "dagomzet", "welke kamers zijn vuil", "zet Riverside suite op schoon", "meld Garden kamer defect: douche lekt", "open de voordeur", "meld klus: lamp vervangen", "wie is er onderweg", "onbeantwoorde berichten", "welke minibars nog tellen" of "open bestellingen".');
-});
 
 /* ---- weekrooster: deterministisch gegenereerd per personeelslid ---- */
 const SHIFT_NAMES = ['Ochtend 07:00-15:00', 'Avond 15:00-23:00', 'Vrij'];
@@ -4428,97 +2088,15 @@ function scheduleFor(code) {
   }
   return { days, shifts: SHIFT_NAMES };
 }
-app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
 
 // Interne teamchat binnen het bedrijf (tekst of spraakmemo).
-app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
-  const text = String(req.body.text || '').trim().slice(0, 500);
-  let audio = null;
-  if (typeof req.body.audio === 'string' && /^data:audio\//.test(req.body.audio) && req.body.audio.length <= 2 * 1024 * 1024)
-    audio = req.body.audio;
-  if (!text && !audio) return res.status(400).json({ error: 'Leeg bericht.' });
-  const list = db.data.supplierTeam[req.supplier.code] = (db.data.supplierTeam[req.supplier.code] || []);
-  list.push({ who: req.actor.name, role: req.actor.role, text: text || (audio ? '' : text), audio, at: new Date().toISOString() });
-  // walkie-talkie: spraakmemo's klinken direct bij iedereen die de app open heeft
-  if (audio) {
-    for (const c of sseClients) {
-      if (c.sup !== req.supplier.code) continue;
-      if (c.staffId === (req.actor.staffId != null ? req.actor.staffId : null)) continue;
-      sseSend(c.res, 'ptt', { from: req.actor.name, audio });
-    }
-  }
-  db.data.supplierTeam[req.supplier.code] = list.slice(-100);
-  save();
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
-  res.json({ ok: true });
-});
 
-app.get('/api/supplier/stream', (req, res) => {
-  const sess = sessionFor(req.query.token);
-  if (!sess || sess.role !== 'supplier') return res.status(401).end();
-  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
-  res.write('retry: 3000\n\n');
-  const client = { sup: sess.code, staffId: sess.staffId != null ? sess.staffId : null, res };
-  sseClients.push(client);
-  sseSend(res, 'hello', { unread: (db.data.supplierNotifications[sess.code] || []).filter(n => !n.read) });
-  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
-  req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
-});
 
-app.post('/api/supplier/state', supplierAuth, (req, res) => res.json({ state: supplierState(req.supplier, req.actor) }));
 
-app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
-  (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => n.read = true);
-  save();
-  res.json({ ok: true });
-});
 
 // ---- dynamische prijs aan RTG (backoffice) ----
-app.post('/api/supplier/price', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return; // dynamische prijzen naar RTG zijn management
-  const service = String(req.body.service || '').trim().slice(0, 120);
-  const price = Number(req.body.price);
-  if (!service || !(price > 0)) return res.status(400).json({ error: 'Vul een dienst en geldige prijs in.' });
-  const entry = {
-    id: crypto.randomBytes(4).toString('hex'),
-    supplierCode: req.supplier.code, supplierName: req.supplier.name, type: req.supplier.type,
-    service, price, at: new Date().toISOString()
-  };
-  db.data.supplierPrices.unshift(entry);
-  db.data.supplierPrices = db.data.supplierPrices.slice(0, 200);
-  save();
-  // backoffice ziet het live binnenkomen
-  sseToOffice('sync', { scope: 'prices' });
-  sseToOffice('notify', { icon: '💶', title: 'Nieuwe dynamische prijs', body: req.supplier.name + ': ' + service + ', € ' + price });
-  logActivity(req.supplier.code, req.actor, 'gaf een prijs door: ' + service + ' (€ ' + price + ')');
-  res.json({ ok: true, entry });
-});
 
 // ---- menukaart bijwerken (restaurant/bar/club) ----
-app.post('/api/supplier/menu', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return; // de kaart en de prijzen zijn voor het management
-  if (!Array.isArray(req.body.menu)) return res.status(400).json({ error: 'Menu ontbreekt.' });
-  req.supplier.menu = req.body.menu.slice(0, 100).map(m => {
-    // ledenprijsgarantie: de publieke prijs is het plafond; als er geen aparte
-    // publieke prijs is meegegeven, is de opgegeven prijs meteen de publieke.
-    const publiek = Math.max(0, Number(m.publiekePrijs != null ? m.publiekePrijs : m.price) || 0);
-    return {
-    id: String(m.id || crypto.randomBytes(3).toString('hex')),
-    cat: schoon(m.cat || 'Overig', 40),
-    name: schoon(m.name, 80),
-    desc: schoon(m.desc, 200),
-    publiekePrijs: publiek,
-    price: ledenPrijs(publiek, m.price),
-    allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
-    station: m.station === 'bar' ? 'bar' : 'keuken',
-    sectie: ['warm', 'koud', 'snack', 'dessert'].includes(m.sectie) ? m.sectie : 'warm',
-    recept: String(m.recept || '').slice(0, 1500)
-    };
-  });
-  save();
-  logActivity(req.supplier.code, req.actor, 'werkte de menukaart bij');
-  res.json({ ok: true, menu: req.supplier.menu });
-});
 
 // Welke werkplekken (keuken/bar) heeft deze bestelling nodig?
 function stationsForOrder(s, o) {
@@ -4541,112 +2119,16 @@ function sectiesForOrder(s, o) {
 }
 
 // tafel op een bon zetten of aanpassen (bediening, keuken)
-app.post('/api/supplier/order/table', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
-  o.table = String(req.body.table || '').slice(0, 24);
-  save();
-  logActivity(req.supplier.code, req.actor, 'zette ' + o.ref + ' op ' + (o.table || 'geen tafel'));
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
-  res.json({ ok: true, order: o });
-});
 
 // keukensectie (warme kant, koude kant, snacks, dessert) meldt bezig of klaar
-app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
-  const sectie = String(req.body.sectie || '');
-  if (!['warm', 'koud', 'snack', 'dessert'].includes(sectie)) return res.status(400).json({ error: 'Onbekende sectie.' });
-  const phase = req.body.phase === 'klaar' ? 'klaar' : 'bezig';
-  o.secties = o.secties || {};
-  o.secties[sectie] = phase;
-  if (o.status === 'nieuw') o.status = 'in bereiding';
-  const nodig = sectiesForOrder(req.supplier, o);
-  const wasKlaar = o.status === 'klaar';
-  if (nodig.length && nodig.every(x => o.secties[x] === 'klaar')) {
-    o.stations = o.stations || {};
-    o.stations.keuken = 'klaar';                            // de hele keuken is klaar
-    const stNodig = stationsForOrder(req.supplier, o);
-    if (stNodig.every(st => o.stations[st] === 'klaar')) o.status = 'klaar';
-  }
-  save();
-  broadcastSync([o.customerTier], 'orders');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  if (o.status === 'klaar' && !wasKlaar)
-    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, sectie + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
-  res.json({ ok: true, order: o });
-});
 
 // ---- werkplekken: keuken- en barscherm melden hun deel bezig of klaar ----
-app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
-  const station = req.body.station === 'bar' ? 'bar' : 'keuken';
-  const phase = req.body.phase === 'klaar' ? 'klaar' : 'bezig';
-  o.stations = o.stations || {};
-  o.stations[station] = phase;
-  if (o.status === 'nieuw') o.status = 'in bereiding';
-  const needed = stationsForOrder(req.supplier, o);
-  const wasKlaar = o.status === 'klaar';
-  if (needed.every(st => o.stations[st] === 'klaar')) o.status = 'klaar';
-  save();
-  broadcastSync([o.customerTier], 'orders');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  if (o.status === 'klaar' && !wasKlaar)
-    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, (station === 'bar' ? 'bar' : 'keuken') + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
-  res.json({ ok: true, order: o });
-});
 
 // ---- leverancier werkt orderstatus bij → klant live op de hoogte ----
-app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
-  const allowed = ['nieuw', 'in bereiding', 'klaar', 'geserveerd', 'geweigerd'];
-  const status = String(req.body.status || '');
-  if (!allowed.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
-  o.status = status;
-  save();
-  broadcastSync([o.customerTier], 'orders');
-  sseToOffice('sync', { scope: 'orders' });
-  notify(o.customerTier, { icon: '🍽️', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, 'zette ' + o.ref + ' op "' + status + '"');
-  res.json({ ok: true, order: o });
-});
 
 // ---- leverancier stort terug → klant krijgt melding ----
-app.post('/api/supplier/refund', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return; // geld terugstorten is een management-handeling
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
-  if (!o.paid) return res.status(409).json({ error: 'Deze bestelling is niet betaald.' });
-  o.paid = false;
-  o.refunded = true;
-  o.status = 'terugbetaald';
-  save();
-  logActivity(req.supplier.code, req.actor, 'stortte € ' + o.total + ' terug (' + o.ref + ')');
-  broadcastSync([o.customerTier], 'orders');
-  sseToOffice('sync', { scope: 'orders' });
-  notify(o.customerTier, { icon: '↩️', title: req.supplier.name + ', terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
-  res.json({ ok: true, order: o });
-});
 
 // ---- leverancier deelt live locatie → klanten met actieve rit/bestelling ----
-app.post('/api/supplier/location', supplierAuth, (req, res) => {
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
-  if (Number.isFinite(lat) && Number.isFinite(lng)) {
-    req.supplier.loc = { lat, lng, label: String(req.body.label || req.supplier.loc.label || '').slice(0, 80) };
-    save();
-    logActivity(req.supplier.code, req.actor, 'deelde de live locatie');
-  }
-  // klanten met een actieve rit bij deze leverancier live bijwerken
-  const rides = db.data.rides.filter(r => r.supplierCode === req.supplier.code && r.status !== 'gearriveerd');
-  for (const r of rides) { broadcastSync([r.customerTier], 'orders'); sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' }); }
-  res.json({ ok: true, loc: req.supplier.loc });
-});
 
 // ---- vervoerspartner werkt de ritstatus bij → lid live op de hoogte ----
 /* Ritstatus: een vaste, logische keten met nette meldingen naar de gast.
@@ -4675,23 +2157,6 @@ function ritVerder(req, res, r, status) {
   logActivity(req.supplier.code, req.actor, 'zette rit ' + r.ref + ' op "' + status + '"');
   res.json({ ok: true, ride: r });
 }
-app.post('/api/supplier/ride/status', supplierAuth, (req, res) => {
-  const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
-  if (r.status === 'wacht-op-betaling') return res.status(409).json({ error: 'Deze rit is nog niet betaald.' });
-  let status = String(req.body.status || '');
-  if (RIT_LEGACY[status]) status = RIT_LEGACY[status];
-  if (status !== 'geweigerd') {
-    if (!RIT_KETEN.includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
-    // de keten mag alleen vooruit (overslaan mag, teruggaan niet)
-    const nu = RIT_KETEN.indexOf(RIT_LEGACY[r.status] || r.status);
-    const straks = RIT_KETEN.indexOf(status);
-    if (straks <= nu) return res.status(409).json({ error: 'Deze rit is al ' + r.status + '.' });
-  } else if (['aan-boord', 'afgerond'].includes(RIT_LEGACY[r.status] || r.status)) {
-    return res.status(409).json({ error: 'Een lopende of afgeronde rit kan niet meer geweigerd worden.' });
-  }
-  ritVerder(req, res, r, status);
-});
 
 /* Slimme toewijzing: de eerste vrije chauffeur en een passend, vrij voertuig. */
 function ritBezetting(code) {
@@ -4701,210 +2166,26 @@ function ritBezetting(code) {
     bezetteVoertuigen: new Set(actief.filter(r => r.vehicle).map(r => r.vehicle.id))
   };
 }
-app.post('/api/supplier/ride/suggest', supplierAuth, (req, res) => {
-  const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
-  const { drukkeChauffeurs, bezetteVoertuigen } = ritBezetting(req.supplier.code);
-  const staff = accounts.listStaff(req.supplier.code);
-  const rijders = staff.filter(m => /chauffeur|piloot|pilot|crew|centrale|operations/i.test(m.func || ''));
-  const pool = rijders.length ? rijders : staff;
-  const chauffeur = pool.find(m => !drukkeChauffeurs.has(m.id)) || null;
-  const voertuig = (req.supplier.fleet || []).find(v => v.active && v.seats >= (r.passengers || 1) && !bezetteVoertuigen.has(v.id))
-    || (req.supplier.fleet || []).find(v => v.active && !bezetteVoertuigen.has(v.id)) || null;
-  res.json({ ok: true,
-    staffId: chauffeur ? chauffeur.id : null, staffName: chauffeur ? chauffeur.name : null,
-    vehicleId: voertuig ? voertuig.id : null, vehicleName: voertuig ? voertuig.name : null });
-});
 
 /* Toewijzen: het kantoor wijst toe, of een chauffeur neemt de rit zelf. */
-app.post('/api/supplier/ride/assign', supplierAuth, (req, res) => {
-  const r = db.data.rides.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
-  if (r.status === 'wacht-op-betaling') return res.status(409).json({ error: 'Deze rit is nog niet betaald.' });
-  if (['afgerond', 'geweigerd'].includes(RIT_LEGACY[r.status] || r.status)) return res.status(409).json({ error: 'Deze rit is al afgerond.' });
-  const staff = accounts.listStaff(req.supplier.code);
-  const wilZelf = req.body.self === true;
-  const staffId = wilZelf ? req.actor.staffId : Number(req.body.staffId);
-  const m = staff.find(x => x.id === staffId);
-  if (!m) return res.status(404).json({ error: 'Deze medewerker kennen we niet.' });
-  if (!wilZelf && !req.actor.manager && req.actor.staffId !== staffId)
-    return res.status(403).json({ error: 'Alleen een manager wijst ritten aan anderen toe.' });
-  const v = (req.supplier.fleet || []).find(x => x.id === String(req.body.vehicleId || '')) || null;
-  r.driver = { staffId: m.id, name: m.name };
-  r.vehicle = v ? { id: v.id, name: v.name, plate: v.plate, seats: v.seats } : null;
-  if ((RIT_LEGACY[r.status] || r.status) === 'aangevraagd') r.status = 'geaccepteerd';
-  save();
-  broadcastSync([r.customerTier], 'orders');
-  sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' });
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  notify(r.customerTier, { icon: r.type === 'jet' ? '✈️' : '🚗', title: req.supplier.name,
-    body: m.name.split(' ')[0] + ' komt u halen' + (v ? ' in de ' + v.name + ' (' + v.plate + ')' : '') + '.', scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, 'wees rit ' + r.ref + ' toe aan ' + m.name + (v ? ' met ' + v.name : ''));
-  res.json({ ok: true, ride: r });
-});
 
 /* Vlootbeheer (kantoor, alleen management) */
 // Ritgeschiedenis, schaalvast: gepagineerd en doorzoekbaar, met het omzettotaal
 // over de volledige historie (dus ook wat niet op deze pagina staat).
-app.post('/api/supplier/ride/history', supplierAuth, (req, res) => {
-  const q = String(req.body.q || '').trim().toLowerCase().slice(0, 60);
-  const alle = db.data.rides
-    .filter(r => r.supplierCode === req.supplier.code && (r.status === 'afgerond' || r.status === 'gearriveerd'))
-    .filter(r => !q || [r.customerCodename, r.ref, r.from, r.to, r.driver && r.driver.name, r.vehicle && r.vehicle.name].join(' ').toLowerCase().includes(q))
-    .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));
-  const per = 25;
-  const pages = Math.max(1, Math.ceil(alle.length / per));
-  const page = Math.min(pages, Math.max(1, Number(req.body.page) || 1));
-  res.json({
-    items: alle.slice((page - 1) * per, page * per),
-    total: alle.length, page, pages,
-    omzet: alle.reduce((s2, r) => s2 + (r.quote || 0), 0)
-  });
-});
 
 // Volledige ritgeschiedenis als CSV, op de server opgebouwd zodat de export
 // compleet is hoe groot de historie ook wordt (token via query voor de download).
-app.get('/api/supplier/rides.csv', (req, res) => {
-  const sess = sessionFor(String(req.query.token || ''));
-  if (!sess || sess.role !== 'supplier') return res.status(401).end();
-  const alle = db.data.rides
-    .filter(r => r.supplierCode === sess.code && (r.status === 'afgerond' || r.status === 'gearriveerd'))
-    .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));
-  const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="ritten-' + sess.code.toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.csv"');
-  res.write('\uFEFF' + ['datum', 'referentie', 'gast', 'van', 'naar', 'km', 'personen', 'prijs', 'chauffeur', 'voertuig'].join(';') + '\n');
-  for (const r of alle) {
-    res.write([
-      String(r.finishedAt || r.at).slice(0, 16).replace('T', ' '), r.ref, r.customerCodename,
-      r.from || '', r.to || '', r.km || '', r.passengers || 1,
-      (r.quote || 0).toFixed(2).replace('.', ','),
-      r.driver ? r.driver.name : '', r.vehicle ? r.vehicle.name : ''
-    ].map(esc).join(';') + '\n');
-  }
-  res.end();
-});
 
-app.post('/api/supplier/fleet', supplierAuth, (req, res) => {
-  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  const s = req.supplier;
-  s.fleet = s.fleet || [];
-  const a = String(req.body.action || '');
-  if (a === 'add') {
-    const name = schoon(req.body.name, 50), plate = schoon(req.body.plate, 16);
-    if (!name) return res.status(400).json({ error: 'Geef het voertuig een naam.' });
-    s.fleet.push({ id: 'v' + Date.now().toString(36), name, plate, seats: Math.min(20, Math.max(1, Number(req.body.seats) || 4)), active: true });
-  } else if (a === 'remove') {
-    s.fleet = s.fleet.filter(v => v.id !== req.body.id);
-  } else if (a === 'toggle') {
-    const v = s.fleet.find(x => x.id === req.body.id);
-    if (v) v.active = !v.active;
-  } else return res.status(400).json({ error: 'Onbekende actie.' });
-  save();
-  sseToSupplier(s.code, 'sync', { scope: 'settings' });
-  logActivity(s.code, req.actor, 'werkte de vloot bij');
-  res.json({ ok: true, fleet: s.fleet });
-});
 
 /* ================= KLANTZIJDE (leden-app) ================= */
 
 // leveranciers voor de huidige stad/reis van het lid
-app.post('/api/suppliers', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const city = req.body.city;
-  const list = db.data.suppliers.filter(s => !city || s.city === city).map(s => publicSupplier(s, req.body.lang));
-  res.json({ suppliers: list, city: db.data.trip.dest });
-});
 
-app.post('/api/supplier/menu/get', auth, (req, res) => {
-  const s = findSupplier(req.body.code);
-  if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
-  const lang = req.body.lang;
-  const menu = (s.menu || []).map(m => ({ ...m, name: i18n.localize(m.name, lang), desc: i18n.localize(m.desc, lang), cat: i18n.localize(m.cat, lang) }));
-  // leeftijdsinfo voor de bestelflow: mag dit lid hier alcohol bestellen?
-  const aInfo = alcoholGrensVan(s);
-  const lftM = leeftijdVan(geborenVan(req.session));
-  res.json({ supplier: publicSupplier(s, lang), menu,
-    alcohol: { grens: aInfo.grens, land: aInfo.land, geverifieerd: lftM != null, mag: lftM == null || lftM >= aInfo.grens } });
-});
 
 // bestelling plaatsen (restaurant/bar/club), klant verschijnt onder codenaam
-app.post('/api/order', auth, (req, res) => {
-  // betalen bij partners mag ook zonder pas (gratis gebruiker)
-  const s = findSupplier(req.body.supplierCode);
-  if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
-  if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen bestellingen aan.' });
-  const wanted = Array.isArray(req.body.items) ? req.body.items : [];
-  const items = [];
-  let total = 0;
-  for (const w of wanted) {
-    const m = (s.menu || []).find(x => x.id === w.id);
-    const qty = Math.min(20, Math.max(1, parseInt(w.qty, 10) || 1));
-    // ledenprijsgarantie: reken nooit meer dan de publieke prijs, ook al zou
-    // de menuprijs door een fout hoger staan (extra vangnet na het opslaan)
-    if (m) { const unit = ledenPrijs(m.publiekePrijs, m.price); items.push({ id: m.id, name: m.name, qty, price: unit }); total += unit * qty; }
-  }
-  if (!items.length) return res.status(400).json({ error: 'Geen geldige gerechten gekozen.' });
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-  // leeftijd uit het paspoort: alcohol (bar-items) alleen boven de grens van
-  // het land van de zaak; de partner ziet enkel dat de leeftijd geverifieerd is
-  const lft = leeftijdVan(geborenVan(req.session));
-  const metAlcohol = items.some(it => { const m = (s.menu || []).find(x => x.id === it.id); return m && m.station === 'bar'; });
-  if (metAlcohol && lft != null) {
-    const a = alcoholGrensVan(s);
-    if (lft < a.grens) return res.status(403).json({ error: 'Alcohol is in ' + a.land + ' vanaf ' + a.grens + ' jaar; je leeftijd is via je paspoort geverifieerd. Kies iets zonder alcohol.' });
-  }
-  // de zaak kiest het betaalmoment: vooraf (standaard, pas zichtbaar na
-  // afrekenen) of achteraf (direct zichtbaar, betalen via de app volgt);
-  // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak
-  const vooraf = optieAan(s, 'betaalVooraf') || (lft != null && lft < 18);
-  const order = {
-    ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-    pickup: pickupCode(),
-    supplierCode: s.code, supplierName: s.name, type: s.type,
-    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
-    items, total,
-    table: schoon(req.body.table, 24),
-    allergyNote: schoon(req.body.allergyNote, 200),
-    tagSalon: !!req.body.tagSalon,
-    betaalMoment: vooraf ? 'vooraf' : 'achteraf',
-    leeftijdOk: metAlcohol && lft != null ? true : undefined,
-    status: vooraf ? 'wacht-op-betaling' : 'nieuw', paid: false, at: new Date().toISOString()
-  };
-  db.data.orders.unshift(order);
-  save();
-  if (!vooraf) {
-    notifySupplier(s.code, { icon: '\u{1F6CE}️', title: 'Nieuwe bestelling (betaling achteraf)', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
-    sseToSupplier(s.code, 'sync', { scope: 'orders' });
-    sseToOffice('sync', { scope: 'orders' });
-  }
-  res.json({ ok: true, order });
-});
 
 // bestelling betalen (Face ID op het toestel)
-app.post('/api/order/pay', auth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
-  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
-  if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
-  // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
-  if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return res.status(410).json({ error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' });
-  o.paid = true;
-  o.paidAt = new Date().toISOString();
-  if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
-  save();
-  // nu pas hoort de zaak ervan: betaald = definitief
-  notifySupplier(o.supplierCode, { icon: '\u{1F6CE}\uFE0F', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
-  sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, order: o });
-});
 
-app.post('/api/orders/mine', auth, (req, res) => {
-  // schaalvast: de laatste 25 bestellingen plus het eerlijke totaal
-  const mijn = db.data.orders.filter(o => (o.customerKey || o.customerTier) === req.session.key);
-  res.json({ orders: mijn.slice(0, 25), total: mijn.length });
-});
 
 /* ================= LIVE REIS (onderweg) =================
    Koppelt een reizend lid en al zijn partners realtime. Het lid deelt zijn
@@ -5009,157 +2290,20 @@ function guestsFor(code) {
 }
 
 // Lid start "onderweg" naar een bestemming (optioneel een partner).
-app.post('/api/live/start', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const key = req.session.key;
-  const destCode = req.body.destCode ? String(req.body.destCode).trim().toUpperCase() : null;
-  const dest = destCode ? findSupplier(destCode) : null;
-  const mode = ['walking', 'driving', 'flying'].includes(req.body.mode) ? req.body.mode : 'driving';
-  // Startpositie: meegegeven, anders het hotel op de bestemming, anders vlakbij de bestemming.
-  let start = (Number.isFinite(+req.body.lat) && Number.isFinite(+req.body.lng)) ? { lat: +req.body.lat, lng: +req.body.lng } : null;
-  if (!start) { const hotel = db.data.suppliers.find(s => s.type === 'hotel' && s.city === db.data.trip.dest); if (hotel && hotel.loc) start = { lat: hotel.loc.lat, lng: hotel.loc.lng }; }
-  if (!start && dest && dest.loc) start = { lat: dest.loc.lat + 0.012, lng: dest.loc.lng - 0.014 };
-  db.data.live[key] = {
-    key, tier: req.session.tier, codename: liveCodename(req.session),
-    active: true, mode, destCode,
-    lat: start ? start.lat : null, lng: start ? start.lng : null,
-    updatedAt: new Date().toISOString(), startedAt: new Date().toISOString(), arrived: false
-  };
-  save();
-  if (dest) notifySupplier(dest.code, { icon: '📍', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
-  pushLive(key);
-  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
-});
 
 // Lid deelt een nieuwe positie; partners en backoffice zien het live.
-app.post('/api/live/update', auth, (req, res) => {
-  const key = req.session.key;
-  const L = db.data.live[key];
-  if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
-  if (Number.isFinite(lat) && Number.isFinite(lng)) { L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); }
-  // automatische aankomst binnen ~150 m van de bestemming
-  const dest = L.destCode ? findSupplier(L.destCode) : null;
-  if (dest && dest.loc && !L.arrived) {
-    const d = haversine({ lat: L.lat, lng: L.lng }, dest.loc);
-    if (d != null && d < 150) {
-      L.arrived = true;
-      notifySupplier(dest.code, { icon: '🎉', title: 'Gast gearriveerd', body: L.codename + ' is bij u aangekomen.' });
-      notify(L.tier, { icon: '📍', title: 'Aangekomen', body: 'U bent bij ' + dest.name + '.', scope: 'live' });
-    }
-  }
-  save();
-  pushLive(key);
-  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
-});
 
-app.post('/api/live/stop', auth, (req, res) => {
-  const key = req.session.key;
-  const L = db.data.live[key];
-  if (L) { L.active = false; save(); pushLive(key); }
-  res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
-});
 
-app.post('/api/live/state', auth, (req, res) => {
-  res.json({ live: liveStateFor(req.session.key, req.body.lang) });
-});
 
 // Lid vraagt een rit aan bij een vervoerspartner (taxi/jet).
-app.post('/api/ride/request', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const s = findSupplier(req.body.supplierCode);
-  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
-  if (!s || !caps.includes('rides')) return res.status(404).json({ error: 'Geen vervoerspartner gevonden.' });
-  if (!optieAan(s, 'ritten')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen ritaanvragen aan.' });
-  // leeftijd uit het paspoort: privejets boek je vanaf 18 jaar
-  const lftR = leeftijdVan(geborenVan(req.session));
-  if (s.type === 'jet' && lftR != null && lftR < 18)
-    return res.status(403).json({ error: 'Privejets boek je vanaf 18 jaar. Een taxi regelen we graag voor je.' });
-  const dest = req.body.toCode ? findSupplier(req.body.toCode) : null;
-  const codename = liveCodename(req.session);
-  // slimme offerte: afstand uit de live-locatie en de bestemming, anders een
-  // realistisch stadsgemiddelde; prijs volgt het tarief van de vervoerder
-  const pax = Math.min(9, Math.max(1, Number(req.body.passengers) || 1));
-  const koffers = Math.min(9, Math.max(0, Number(req.body.luggage) || 0));
-  const L = db.data.live[req.session.key];
-  const van = (L && Number.isFinite(L.lat)) ? { lat: L.lat, lng: L.lng } : (s.loc || null);
-  const naar = dest && dest.loc ? dest.loc : null;
-  let km = s.type === 'jet' ? 350 : 9;
-  const meters = haversine(van, naar);
-  if (meters != null && meters > 200) km = Math.max(1, meters / 1000);
-  const t = (s.settings && s.settings.tarief) || {};
-  const quote = Math.round(Math.max(t.minimum || 0, (t.start || 0) + (t.perKm || 2.5) * km));
-  const ride = {
-    ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-    supplierCode: s.code, supplierName: s.name, type: s.type,
-    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
-    from: schoon(req.body.from || 'Huidige locatie', 80),
-    to: schoon(req.body.to || (dest && dest.name) || '', 80),
-    toCode: dest ? dest.code : null,
-    when: schoon(req.body.when || 'Zo snel mogelijk', 40),
-    // vooruit plannen: datum en tijd geven een geplande rit (taxi en jet)
-    plannedFor: (() => {
-      const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
-      const iso = d + 'T' + (/^\d{2}:\d{2}$/.test(u) ? u : '12:00') + ':00';
-      return isNaN(new Date(iso)) ? null : iso;
-    })(),
-    passengers: pax, luggage: koffers, note: schoon(req.body.note, 140),
-    km: Math.round(km * 10) / 10, quote,
-    driver: null, vehicle: null,
-    // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf;
-    // jeugdleden (15-17) betalen altijd vooraf
-    betaalMoment: (optieAan(s, 'betaalVooraf') || (lftR != null && lftR < 18)) ? 'vooraf' : 'achteraf',
-    status: (optieAan(s, 'betaalVooraf') || (lftR != null && lftR < 18)) && quote > 0 ? 'wacht-op-betaling' : 'aangevraagd',
-    paid: quote === 0, at: new Date().toISOString()
-  };
-  if (ride.plannedFor) ride.when = 'Gepland: ' + ride.plannedFor.slice(0, 16).replace('T', ' ');
-  db.data.rides.unshift(ride);
-  save();
-  if (ride.status === 'aangevraagd') {
-    notifySupplier(s.code, { icon: '\u{1F697}', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
-    sseToSupplier(s.code, 'sync', { scope: 'orders' });
-    sseToOffice('sync', { scope: 'orders' });
-  }
-  pushLive(req.session.key);
-  res.json({ ok: true, ride });
-});
 
 // rit betalen: hiermee wordt hij definitief en gaat hij naar de vervoerder
-app.post('/api/ride/pay', auth, (req, res) => {
-  const r = db.data.rides.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
-  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
-  if (r.paid) return res.status(409).json({ error: 'Al betaald.' });
-  // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
-  if (r.status === 'wacht-op-betaling' && Date.now() - new Date(r.at) > 30 * 60000) return res.status(410).json({ error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' });
-  r.paid = true;
-  r.paidAt = new Date().toISOString();
-  if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
-  save();
-  notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? '\u2708\uFE0F' : '\u{1F697}', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
-  sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  pushLive(req.session.key);
-  res.json({ ok: true, ride: r });
-});
 
 /* ================= BACKOFFICE (RTG) =================
    De backoffice ziet alle binnenkomende dynamische prijzen, bestellingen en
    ritten live. Demo-toegang met een vaste code. */
 const OFFICE_CODE = process.env.OFFICE_CODE || 'RTG-OFFICE';
 
-app.post('/api/office/login', (req, res) => {
-  const bucket = 'office:' + req.ip;
-  if (tooManyTries(res, bucket)) return;
-  if (String(req.body.code || '').trim().toUpperCase() !== OFFICE_CODE) {
-    noteFailedTry(bucket);
-    return res.status(401).json({ error: 'Onjuiste backoffice-code.' });
-  }
-  loginFails.delete(bucket);
-  const token = crypto.randomBytes(24).toString('hex');
-  rememberSession(token, { role: 'office' });
-  res.json({ token, state: officeState() });
-});
 
 function officeAuth(req, res, next) {
   const header = req.get('authorization') || '';
@@ -5279,120 +2423,16 @@ function officeState() {
 
 // De volledige tijdlijn van bestellingen en ritten: gepagineerd en doorzoekbaar
 // over alles wat er ooit was, niet alleen de laatste zestig regels.
-app.post('/api/office/timeline', officeAuth, (req, res) => {
-  const q = String(req.body.q || '').trim().toLowerCase().slice(0, 60);
-  const past = tekst => !q || tekst.toLowerCase().includes(q);
-  const alles = db.data.orders
-    .filter(o => o.status !== 'wacht-op-betaling' && past([o.supplierName, o.customerCodename, o.ref, o.status].join(' ')))
-    .map(o => ({ soort: 'order', at: o.at, ref: o.ref, supplierName: o.supplierName, customerCodename: o.customerCodename,
-      status: o.status, paid: !!o.paid, bedrag: o.total || 0, sub: o.items.reduce((n, i) => n + i.qty, 0) + ' item(s)' }))
-    .concat(db.data.rides
-      .filter(r => r.status !== 'wacht-op-betaling' && past([r.supplierName, r.customerCodename, r.ref, r.from, r.to, r.status].join(' ')))
-      .map(r => ({ soort: r.type === 'jet' ? 'jet' : 'taxi', at: r.at, ref: r.ref, supplierName: r.supplierName, customerCodename: r.customerCodename,
-        status: r.status, paid: !!r.paid, bedrag: r.quote || 0, sub: (r.from || '') + ' → ' + (r.to || '?'), when: r.plannedFor ? r.when : null })))
-    .concat(db.data.boekingen
-      .filter(b => b.status !== 'wacht-op-betaling' && past([b.supplierName, b.customerCodename, b.ref, b.service.name, b.status].join(' ')))
-      .map(b => ({ soort: 'dienst', at: b.at, ref: b.ref, supplierName: b.supplierName, customerCodename: b.customerCodename,
-        status: b.status, paid: !!b.paid, bedrag: b.price || 0, sub: b.service.name, when: b.wanneer || null })));
-  alles.sort((a, b) => String(b.at).localeCompare(String(a.at)));
-  const per = 25;
-  const pages = Math.max(1, Math.ceil(alles.length / per));
-  const page = Math.min(pages, Math.max(1, Number(req.body.page) || 1));
-  res.json({ items: alles.slice((page - 1) * per, page * per), total: alles.length, page, pages });
-});
 
 // Volledige export voor de boekhouding, op de server opgebouwd.
-app.get('/api/office/export.csv', (req, res) => {
-  const sess = sessionFor(String(req.query.token || ''));
-  if (!sess || sess.role !== 'office') return res.status(401).end();
-  const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');
-  res.write('\uFEFF' + ['datum', 'soort', 'partner', 'gast', 'omschrijving', 'status', 'betaald', 'bedrag'].join(';') + '\n');
-  for (const o of db.data.orders) {
-    if (o.status === 'wacht-op-betaling') continue;
-    res.write([String(o.at).slice(0, 16).replace('T', ' '), 'bestelling', o.supplierName, o.customerCodename,
-      o.items.map(i => i.qty + 'x ' + i.name).join(', '), o.status, o.paid ? 'ja' : 'nee',
-      (o.total || 0).toFixed(2).replace('.', ',')].map(esc).join(';') + '\n');
-  }
-  for (const r of db.data.rides) {
-    if (r.status === 'wacht-op-betaling') continue;
-    res.write([String(r.at).slice(0, 16).replace('T', ' '), r.type === 'jet' ? 'jetrit' : 'taxirit', r.supplierName, r.customerCodename,
-      (r.from || '') + ' naar ' + (r.to || '?'), r.status, r.paid ? 'ja' : 'nee',
-      (r.quote || 0).toFixed(2).replace('.', ',')].map(esc).join(';') + '\n');
-  }
-  for (const b of db.data.boekingen) {
-    if (b.status === 'wacht-op-betaling') continue;
-    res.write([String(b.at).slice(0, 16).replace('T', ' '), 'boeking', b.supplierName, b.customerCodename,
-      b.service.name + (b.wanneer ? ' (' + b.wanneer + ')' : ''), b.status, b.paid ? 'ja' : 'nee',
-      (b.price || 0).toFixed(2).replace('.', ',')].map(esc).join(';') + '\n');
-  }
-  res.end();
-});
 
-app.get('/api/office/stream', (req, res) => {
-  const sess = sessionFor(req.query.token);
-  if (!sess || sess.role !== 'office') return res.status(401).end();
-  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
-  res.write('retry: 3000\n\n');
-  const client = { office: true, res };
-  sseClients.push(client);
-  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
-  req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
-});
 
-app.post('/api/office/state', officeAuth, (req, res) => res.json({ state: officeState() }));
 
 // Backoffice port een partner: een vriendelijke herinnering bij een blijven-liggen
 // bestelling of rit. Maximaal een keer per tien minuten per regel.
-app.post('/api/office/nudge', officeAuth, (req, res) => {
-  const kind = req.body.kind === 'ride' ? 'ride' : 'order';
-  const lijst = kind === 'ride' ? db.data.rides : db.data.orders;
-  const x = lijst.find(i => i.ref === req.body.ref);
-  if (!x) return res.status(404).json({ error: 'Niet gevonden.' });
-  if (x.nudgedAt && Date.now() - new Date(x.nudgedAt) < 10 * 60000)
-    return res.status(409).json({ error: 'Er is net al een herinnering gestuurd. Geef de zaak even de tijd.' });
-  x.nudgedAt = new Date().toISOString();
-  save();
-  notifySupplier(x.supplierCode, { icon: '⏰', title: 'Herinnering van RTG',
-    body: (kind === 'ride' ? 'Rit ' : 'Bestelling ') + x.ref + ' van ' + x.customerCodename + ' wacht nog op actie. Kunt u er even naar kijken?' });
-  sseToSupplier(x.supplierCode, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true });
-});
 
 // Dagbriefing: een leesbare samenvatting van de dag, opgebouwd uit de echte
 // cijfers (geen AI-sleutel nodig, dus altijd beschikbaar en altijd juist).
-app.post('/api/office/briefing', officeAuth, (req, res) => {
-  const en = req.body.lang === 'en';
-  const st = officeState();
-  const s = st.stats;
-  const eurF = n => '€ ' + Number(n).toLocaleString(en ? 'en-US' : 'nl-NL');
-  const zinnen = [];
-  zinnen.push(en
-    ? 'Today the partners processed ' + s.aantalVandaag + ' paid order(s) and ride(s) for ' + eurF(s.omzetVandaag) + ' in net revenue; this week stands at ' + eurF(s.omzetWeek) + '.'
-    : 'Vandaag verwerkten de partners ' + s.aantalVandaag + ' betaalde bestelling(en) en rit(ten), goed voor ' + eurF(s.omzetVandaag) + ' nettomzet; de week staat op ' + eurF(s.omzetWeek) + '.');
-  const top = (st.performance || []).find(p => p.omzet > 0);
-  if (top) zinnen.push(en
-    ? 'Best performing partner: ' + top.name + ' (' + eurF(top.omzet) + ', ' + top.aantal + ' transaction(s)).'
-    : 'Best presterende partner: ' + top.name + ' (' + eurF(top.omzet) + ', ' + top.aantal + ' transactie(s)).');
-  zinnen.push(en
-    ? (s.liveNu ? s.liveNu + ' member(s) are on the move right now.' : 'No members are on the move at the moment.')
-    : (s.liveNu ? s.liveNu + ' lid/leden zijn nu onderweg.' : 'Er is nu niemand onderweg.'));
-  const rood = (st.alerts || []).filter(a => a.level === 'rood').length;
-  const rest = (st.alerts || []).length - rood;
-  if (rood) zinnen.push(en
-    ? rood + ' item(s) are stuck and need immediate attention; see the action centre.'
-    : rood + ' zaak/zaken lopen vast en vragen nu aandacht; zie het actiecentrum.');
-  else if (rest) zinnen.push(en
-    ? 'Nothing is stuck; ' + rest + ' routine item(s) are waiting in the action centre.'
-    : 'Niets loopt vast; er wachten nog ' + rest + ' routinepunt(en) in het actiecentrum.');
-  else zinnen.push(en ? 'The action centre is empty: everything is running smoothly.' : 'Het actiecentrum is leeg: alles loopt.');
-  zinnen.push(en
-    ? 'The RTFoundation received ' + eurF(s.foundation) + ' so far (30% of paid member contributions).'
-    : 'De RTFoundation ontving tot nu toe ' + eurF(s.foundation) + ' (30% van de betaalde ledenbijdragen).');
-  res.json({ briefing: zinnen.join(' ') });
-});
 
 /* Backoffice: identiteitsverificaties beoordelen. */
 function pendingVerifications() {
@@ -5402,33 +2442,9 @@ function pendingVerifications() {
     tier: u.tier, doc: u.id_doc, at: u.created_at
   }));
 }
-app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications() }));
 
-app.post('/api/office/verify', officeAuth, (req, res) => {
-  const user = accounts.getUserById(Number(req.body.userId));
-  if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
-  const status = req.body.decision === 'approve' ? 'verified' : 'rejected';
-  accounts.setVerification(user.id, status);
-  mail.send(accounts.emailOf(user), status === 'verified' ? 'Uw identiteit is geverifieerd' : 'Uw verificatie is afgewezen',
-    'Beste ' + accounts.realNameOf(user) + ',\n\n' +
-    (status === 'verified' ? 'Uw identiteit is geverifieerd. U kunt nu in een tik boeken.' :
-     'We konden uw document niet goedkeuren. Probeer het opnieuw met een duidelijkere foto.') +
-    '\n\nRahul Travel Group');
-  notify(user.tier, { icon: status === 'verified' ? '✅' : '⚠',
-    title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
-    body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
-  res.json({ ok: true, status, pending: pendingVerifications() });
-});
 
 // Het geüploade document bekijken (alleen backoffice; token via query voor <img>).
-app.get('/api/office/doc', (req, res) => {
-  const sess = sessionFor(req.query.token);
-  if (!sess || sess.role !== 'office') return res.status(401).end();
-  const file = path.basename(String(req.query.file || '')); // geen padtraversal
-  const full = path.join(UPLOAD_DIR, file);
-  if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return res.status(404).end();
-  res.sendFile(full);
-});
 
 /* ---------- persoonlijke AI ---------- */
 
@@ -5475,42 +2491,6 @@ function cannedAnswer(q) {
   return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Ibiza kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.';
 }
 
-app.post('/api/ai', auth, async (req, res) => {
-  if (req.session.tier === 'guest') {
-    return res.status(403).json({ error: 'De persoonlijke AI is exclusief voor leden.' });
-  }
-  // Alleen role/content overnemen, geschiedenis begrensd op de laatste 12 beurten.
-  const history = (Array.isArray(req.body.messages) ? req.body.messages : [])
-    .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
-    .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }))
-    .slice(-12);
-  // De Claude API vereist dat het gesprek met een user-beurt begint; de
-  // proactieve opener van de AI staat vooraan als assistant, knip die eraf.
-  while (history.length && history[0].role !== 'user') history.shift();
-  if (!history.length || history[history.length - 1].role !== 'user') {
-    return res.status(400).json({ error: 'Geen vraag ontvangen.' });
-  }
-
-  if (anthropic) {
-    try {
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-8',
-        max_tokens: 1024,
-        system: aiSystemPrompt(req.session.tier),
-        messages: history
-      });
-      const reply = response.content
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('\n')
-        .trim();
-      return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'claude' });
-    } catch (e) {
-      console.error('Claude API-fout, val terug op demo-antwoord:', e.message);
-    }
-  }
-  res.json({ reply: cannedAnswer(history[history.length - 1].content), source: 'demo' });
-});
 
 /* ================= GEKOPPELD GESPREK: WhatsApp + app in één thread =================
    Elk lid heeft één doorlopend gesprek. Of ze nu via WhatsApp of in de app
@@ -5557,22 +2537,7 @@ async function memberSays(user, text, channel) {
   if (user.tier !== 'rtg') sseToOffice('sync', { scope: 'concierge' });
 }
 
-app.post('/api/chat/history', auth, (req, res) => {
-  if (!req.session.account) return res.json({ messages: [], mode: 'butler', demo: true });
-  res.json({
-    messages: convOf(req.session.account.id),
-    mode: req.session.tier === 'rtg' ? 'butler' : 'concierge',
-    phone: accounts.phoneOf(req.session.account)
-  });
-});
 
-app.post('/api/chat/send', auth, async (req, res) => {
-  if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
-  const text = String(req.body.text || '').trim();
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  await memberSays(req.session.account, text, 'app');
-  res.json({ ok: true, messages: convOf(req.session.account.id), mode: req.session.tier === 'rtg' ? 'butler' : 'concierge' });
-});
 
 /* Inkomend WhatsApp-bericht. In productie de door Meta ondertekende webhook;
    hier een eenvoudige { from, text } om de koppeling te demonstreren. */
@@ -5602,32 +2567,44 @@ function conciergeInbox() {
     })
     .sort((a, b) => (b.needsConcierge - a.needsConcierge) || (new Date(b.lastAt) - new Date(a.lastAt)));
 }
-app.post('/api/office/conversations', officeAuth, (req, res) => res.json({ conversations: conciergeInbox() }));
 
-app.post('/api/office/reply', officeAuth, (req, res) => {
-  const u = accounts.getUserById(Number(req.body.userId));
-  if (!u) return res.status(404).json({ error: 'Account niet gevonden.' });
-  const text = String(req.body.text || '').trim();
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  const md = accounts.getMemberState(u.id) || {};
-  md.conversation = md.conversation || [];
-  md.conversation.push({ from: 'concierge', text: text.slice(0, 1000), at: new Date().toISOString(), channel: 'concierge' });
-  md.needsConcierge = false;
-  accounts.saveMemberState(u.id, md);
-  broadcastSync([u.tier], 'chat');
-  notify(u.tier, { icon: '💬', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
-  // In productie gaat dit antwoord ook via WhatsApp naar accounts.phoneOf(u).
-  res.json({ ok: true, conversations: conciergeInbox() });
-});
 
 /* ---------- domeinmodules: aparte routers op de gedeelde kern ----------
    Elk domein is een los bestand dat zijn routes op dezelfde app registreert en
    uitsluitend via deze kern met de gedeelde data en realtime praat. Zo kan een
    domein later als eigen proces draaien zonder de routecode te veranderen. */
 const kern = {
-  app, express, auth, geenGast, db, save, rtf, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
+  AI_TONE, ALT_IDEE, AUTHOR_TIER, BOEK_KETEN, CLUSTER_KEY, DATA_DIR, DEMO_PASS, DEMO_SUPPLIER,
+  DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN, OFFICE_CODE, PERSONAS,
+  POS_METHODS, PRODUCTION, RIT_KETEN, RIT_LEGACY, RIT_MELDING, RUN_STATIONS, SHIFT_NAMES, SNAP_TTL,
+  STAFF_SEED, STORY_TTL, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN, ZAAK_OPTIES, ZZP,
+  accounts, addContact, addTicket, aiFindDoor, aiFindRoom, aiSystemPrompt, alcoholGrensVan, anthropic,
+  app, appUrl, applyChatPubliek, auth, broadcastSync, canEngage, cannedAnswer, cannedBoekhouder,
+  cateringDishes, centen, chatApplicant, chatKeyOf, chatStuur, checkCred, coachCache, coachRules,
+  codeExists, codenaamVan, conciergeInbox, connectedSupplierCodes, connectieTussen, convOf, crypto, cvReady,
+  db, deptsFor, dirTouch, dmSleutel, eisAccount, engageError, ensureApplyChat, ensureSupplierDefaults,
+  etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, findPartner, findStaffPartner, findSupplier,
+  forgetSession, fs, gcCode, geborenVan, geenGast, geldigeFoto, generateAiReply, getChat,
+  guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, isKindHandle, isRtf,
+  klokVan, ledenPrijs, leeftijdVan, leeftijdsgroepVan, liveCodename, liveStateFor, load, logActivity,
+  loginFails, mail, makeSupplierCode, managerOnly, meldWerkgever, memberSays, memberTemplate, myApplications,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, opschonenSnaps,
+  optieAan, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner,
+  publicSupplier, publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder,
+  rtf, runItem, runKey, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder,
+  sendPush, sendPushToUser, sessionFor, sessions, setRoomHk, snapOpenen, snapSturen, snapsVoor,
+  socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, socialVerbind, socialZoek,
+  soortVan, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor,
+  stationsForOrder, statusVan, supplierAuth, supplierState, toRad, tokenHash, tooManyTries, trChat,
+  trustVan, unlockDoor, urenVan, validDept, verbActief, verhaalBekijken, verhaalPlaatsen, verhalenVoor,
+  webpush, weekdagFactor, werkgeverSollicitatie, zijnVrienden
 };
 require('./routes/social')(kern);
+require('./routes/supplier')(kern);
+require('./routes/office')(kern);
+require('./routes/staff')(kern);
+require('./routes/auth')(kern);
+require('./routes/member')(kern);
 
 /* ---------- afsluiters: nette 404 en centrale foutafhandeling ---------- */
 

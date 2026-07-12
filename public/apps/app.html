@@ -1595,7 +1595,8 @@
     $('#csTijd').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
   }
   let iceConfig = null;
-  async function haalIce(){ if (iceConfig) return iceConfig; try { iceConfig = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
+  // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
+  async function haalIce(){ try { iceConfig = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
   function maakPc(){
     const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls:'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(t => pc.addTrack(t, call.stream));
@@ -1606,7 +1607,8 @@
     };
     pc.onconnectionstatechange = () => {
       if (pc.connectionState === 'connected' && call && !call.t0){ call.t0 = Date.now(); call.timer = setInterval(belTimer, 1000); }
-      if (['failed', 'closed'].includes(pc.connectionState)) eindeGesprek(false);
+      if (pc.connectionState === 'failed'){ toast(T('sal.belmislukt','Verbinding mislukt. Op een streng netwerk lukt bellen soms niet.')); eindeGesprek(false); }
+      else if (pc.connectionState === 'closed') eindeGesprek(false);
     };
     call.pc = pc;
     window.__rtgCall = () => call; // voor tests

@@ -2757,6 +2757,16 @@ function backupData() {
     const days = fs.readdirSync(BACKUP_DIR).sort();
     for (const d of days.slice(0, Math.max(0, days.length - 14)))
       fs.rmSync(path.join(BACKUP_DIR, d), { recursive: true, force: true });
+    // extra kopie naar een tweede schijf/mount (RTG_BACKUP_DIR), zodat een
+    // backup ook een crash van de app-schijf overleeft.
+    if (process.env.RTG_BACKUP_DIR) {
+      const off = path.join(process.env.RTG_BACKUP_DIR, day);
+      fs.mkdirSync(off, { recursive: true });
+      for (const f of ['db.json', 'rtg.db']) {
+        const from = path.join(DATA_DIR, f);
+        if (fs.existsSync(from)) fs.copyFileSync(from, path.join(off, f));
+      }
+    }
   } catch (e) { console.warn('[backup] mislukt:', e.message); }
 }
 

@@ -50,7 +50,8 @@
   function tijdTik() { if (!call) return; var s = Math.round((Date.now() - call.t0) / 1000); var el = document.getElementById('grt-tijd'); if (el) el.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
   function pakMedia(video) { return navigator.mediaDevices.getUserMedia({ audio: true, video: video ? { facingMode: 'user' } : false }).catch(function () { return null; }); }
   var iceConfig = null;
-  function haalIce() { if (iceConfig) return Promise.resolve(iceConfig); return fetch('/api/ice').then(function (r) { return r.json(); }).then(function (d) { iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
+  // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
+  function haalIce() { return fetch('/api/ice').then(function (r) { return r.json(); }).then(function (d) { iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
   function maakPc() {
     var pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(function (t) { pc.addTrack(t, call.stream); });

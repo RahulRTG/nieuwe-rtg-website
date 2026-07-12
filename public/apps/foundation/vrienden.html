@@ -362,7 +362,9 @@ function meld(t){ const el=$('#melding'); el.textContent=t; el.style.opacity='1'
 // ---- bellen (WebRTC; server is alleen signaleringskanaal) ----
 let call=null, inkomend=null, iceConfig=null;
 function belSein(toKey, kind, extra){ return soc('/call', Object.assign({ toKey, kind }, extra||{})).catch(()=>{}); }
-async function haalIce(){ if(iceConfig) return iceConfig; try{ iceConfig=(await (await fetch('/api/ice')).json()).iceServers; }catch(e){ iceConfig=[{urls:'stun:stun.l.google.com:19302'}]; } return iceConfig; }
+// Elke oproep verse ICE-servers halen: een TURN-server met kort geldige
+// inloggegevens werkt dan altijd (die roteren elke keer).
+async function haalIce(){ try{ iceConfig=(await (await fetch('/api/ice')).json()).iceServers; }catch(e){ iceConfig=[{urls:'stun:stun.l.google.com:19302'}]; } return iceConfig; }
 async function pakMedia(video){ try{ return await navigator.mediaDevices.getUserMedia({ audio:true, video: video?{facingMode:'user'}:false }); }catch(e){ meld('Geen toegang tot microfoon of camera.'); return null; } }
 function belUI(open){ $('#belOv').classList.toggle('open', !!open); if(!open){ $('#belRemote').srcObject=null; $('#belLocal').srcObject=null; } }
 function belTimer(){ if(!call) return; const n=Math.round((Date.now()-call.t0)/1000); $('#belTijd').textContent=Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
@@ -372,7 +374,7 @@ function maakPc(){
   call.stream.getTracks().forEach(t=> pc.addTrack(t, call.stream));
   pc.onicecandidate=ev=>{ if(ev.candidate && call) belSein(call.met,'ice',{payload:ev.candidate}); };
   pc.ontrack=ev=>{ const v=$('#belRemote'); if(v.srcObject!==ev.streams[0]) v.srcObject=ev.streams[0]; };
-  pc.onconnectionstatechange=()=>{ if(pc.connectionState==='connected'&&call&&!call.t0){ call.t0=Date.now(); call.timer=setInterval(belTimer,1000); $('#belTijd').textContent='0:00'; } if(['failed','closed'].includes(pc.connectionState)) eindeBel(false); };
+  pc.onconnectionstatechange=()=>{ if(pc.connectionState==='connected'&&call&&!call.t0){ call.t0=Date.now(); call.timer=setInterval(belTimer,1000); $('#belTijd').textContent='0:00'; } if(pc.connectionState==='failed'){ meld('Verbinding mislukt. Op een streng netwerk lukt bellen soms niet.'); eindeBel(false); } else if(pc.connectionState==='closed') eindeBel(false); };
   call.pc=pc; return pc;
 }
 async function belStart(key, cn, video){

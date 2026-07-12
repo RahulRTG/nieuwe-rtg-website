@@ -21,13 +21,40 @@ const db = { data: null, writable: process.env.RTG_ROL !== 'standby' };
 const REDIS_URL = process.env.REDIS_URL;
 let rPub = null, rSub = null, versie = 0, externCb = null;
 
+// Zoek de nieuwste bruikbare dagbackup (server maakt die in DATA_DIR/backups).
+function laadUitBackup() {
+  try {
+    const bdir = path.join(DATA_DIR, 'backups');
+    if (!fs.existsSync(bdir)) return null;
+    for (const d of fs.readdirSync(bdir).sort().reverse()) {
+      const f = path.join(bdir, d, 'db.json');
+      if (fs.existsSync(f)) { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) {} }
+    }
+  } catch (e) {}
+  return null;
+}
+
 function load() {
   if (fs.existsSync(DB_FILE)) {
-    db.data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    try {
+      db.data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    } catch (e) {
+      // corrupte db.json (bijv. na een stroomstoring midden in een schrijf):
+      // val terug op de nieuwste backup in plaats van met lege data te starten.
+      db.data = laadUitBackup();
+      if (!db.data) throw new Error('db.json is onleesbaar en er is geen bruikbare backup.');
+      console.warn('[db] db.json was corrupt; nieuwste backup teruggezet.');
+    }
   } else {
     db.data = seed();
     save();
   }
+  // Vormcontrole: liever stoppen dan met een kapot model draaien en het
+  // (via save) over de goede data heen schrijven.
+  if (!db.data || typeof db.data !== 'object' || Array.isArray(db.data)) {
+    throw new Error('db.data heeft een onverwachte vorm; opstarten gestopt om data niet te overschrijven.');
+  }
+  if (db.data.__schema == null) db.data.__schema = 1;
 }
 
 function save() {

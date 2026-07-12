@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Steun voor jou</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.2rem;margin-bottom:1.2rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
+  .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
+  .moods{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .moods button{flex:1;min-width:4rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .3rem;font-size:1.6rem;transition:border-color .12s,transform .12s;}
+  .moods button:hover{border-color:var(--goud);transform:translateY(-2px);}
+  .moods button.aan{border-color:var(--goud);background:#241f16;}
+  .moods .lb{display:block;font-size:.66rem;color:var(--zacht);margin-top:.25rem;}
+  .reactie{margin-top:.9rem;line-height:1.55;font-size:.95rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.8rem 1rem;}
+  .verloop{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.8rem;}
+  .verloop span{font-size:1.1rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:8px;padding:.2rem .4rem;}
+  .knoprij{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem;}
+  .noodkaart{background:#1a1512;border:1px solid var(--rood);border-radius:12px;padding:1rem 1.1rem;line-height:1.55;font-size:.92rem;}
+  .noodkaart b{color:#e9a;}
+  .privaat{font-size:.8rem;color:var(--zacht);margin-top:.6rem;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>💚 Steun voor jou</h1>
+  <div class="intro">Jij zorgt voor iedereen, maar jij telt ook. Neem hier even een moment voor jezelf: kijk hoe het met je gaat, praat je hart even leeg, en weet waar je terecht kunt.</div>
+
+  <div class="kaart blok">
+    <h2>Hoe gaat het echt met jou?</h2>
+    <div class="h">Tik aan wat past. Dit blijft privé op je eigen toestel; niemand anders ziet het.</div>
+    <div class="moods" id="moods">
+      <button data-m="4"><div>😄</div><span class="lb">goed</span></button>
+      <button data-m="3"><div>🙂</div><span class="lb">oké</span></button>
+      <button data-m="2"><div>😐</div><span class="lb">gaat wel</span></button>
+      <button data-m="1"><div>😔</div><span class="lb">zwaar</span></button>
+      <button data-m="0"><div>😢</div><span class="lb">moeilijk</span></button>
+    </div>
+    <div class="reactie" id="reactie" hidden></div>
+    <div class="verloop" id="verloop"></div>
+    <div class="privaat" id="privaat"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Even je hart luchten</h2>
+    <div class="h">Nora is een luisterend oor. Geen therapeut, wel altijd rustig en zonder oordeel. Wat je typt wordt niet bewaard.</div>
+    <div class="chat" id="chat"><div class="b ai">Hoi, fijn dat je er even voor jezelf bent. Vertel me hoe het met je gaat; ik luister. Je hoeft niks moois te maken van je woorden.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Typ wat er in je omgaat..." maxlength="1000"></textarea>
+      <button class="knop" id="stuur">Deel</button>
+    </div>
+    <div class="knoprij" style="margin-top:.8rem;"><a class="knop grijs klein" href="rust.html">🌿 Even ademen</a></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Wanneer het te veel wordt</h2>
+    <div class="noodkaart">
+      <p>Je hoeft het niet alleen te dragen. Praat met je <b>huisarts</b>; die helpt of verwijst je door, ook bij stress en somberheid.</p>
+      <p style="margin-top:.6rem;">Even iemand nodig? Bel of chat gratis en anoniem met <b>MIND Korrelatie</b> (mindkorrelatie.nl).</p>
+      <p style="margin-top:.6rem;">Zie je het echt niet meer zitten? Bel dag en nacht, gratis: <b>113 Zelfmoordpreventie, 0800-0113</b>. Bij direct gevaar: <b>112</b>.</p>
+    </div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug:'index.html' });
+
+const MKEY = 'rtf_stemming_' + (Sessie.huidig().profiel.id || 'ik');
+const EMO = ['😢','😔','😐','🙂','😄'];
+const REACTIES = {
+  4:'Wat fijn dat het goed gaat. Geniet ervan, en gun jezelf dit moment.',
+  3:'Mooi, oké is echt goed genoeg. Doe vandaag iets kleins dat jij fijn vindt.',
+  2:'Gaat wel mag er zijn. Wees mild voor jezelf; niet alles hoeft vandaag te lukken.',
+  1:'Dat het zwaar is, betekent dat je veel draagt. Adem even, en vraag gerust iemand om hulp; dat is sterk.',
+  0:'Wat rot dat het moeilijk is. Je bent niet alleen. Praat er vandaag over met iemand die je vertrouwt, of met je huisarts.'
+};
+function laadVerloop(){
+  let log=[]; try{ log=JSON.parse(localStorage.getItem(MKEY)||'[]'); }catch(e){}
+  $('#verloop').innerHTML = log.slice(-14).map(x=>'<span title="'+x.d+'">'+EMO[x.m]+'</span>').join('');
+  $('#privaat').textContent = log.length ? ('Je hebt de laatste tijd '+log.length+' keer ingecheckt. Alleen jij ziet dit.') : '';
+}
+$('#moods').querySelectorAll('button').forEach(b=>{
+  b.onclick=()=>{
+    const m=Number(b.dataset.m);
+    $('#moods').querySelectorAll('button').forEach(x=>x.classList.toggle('aan',x===b));
+    $('#reactie').textContent = REACTIES[m]; $('#reactie').hidden=false;
+    let log=[]; try{ log=JSON.parse(localStorage.getItem(MKEY)||'[]'); }catch(e){}
+    log.push({ m, d:new Date().toISOString().slice(0,10) }); log=log.slice(-60);
+    try{ localStorage.setItem(MKEY, JSON.stringify(log)); }catch(e){}
+    laadVerloop();
+  };
+});
+laadVerloop();
+
+Sessie.coach({ kind:'steun', chat:$('#chat'), input:$('#vraag'), knop:$('#stuur'), wacht:'Nora luistert...' });
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

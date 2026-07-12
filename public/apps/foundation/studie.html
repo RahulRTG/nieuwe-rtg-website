@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Verder leren</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.2rem;margin-bottom:1.2rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
+  .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
+  .wegen{display:flex;flex-direction:column;gap:.7rem;}
+  .weg{background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;padding:.8rem 1rem;}
+  .weg b{color:var(--goud);}
+  .weg p{color:var(--zacht);font-size:.88rem;line-height:1.45;margin-top:.2rem;}
+  .knoprij{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🎓 Verder leren voor jou</h1>
+  <div class="intro">Jij mag ook groeien. Verder leren maakt je sterker, vergroot je kansen op werk, en geeft je kinderen het mooiste voorbeeld: dat leren nooit ophoudt. Hier vind je gratis en goedkope wegen, en een coach die met je meedenkt.</div>
+
+  <div class="kaart blok">
+    <h2>Gratis en goedkope wegen</h2>
+    <div class="h">In Nederland kun je veel gratis of bijna gratis leren. Een paar plekken om te beginnen:</div>
+    <div class="wegen">
+      <div class="weg"><b>Het Taalhuis en de Bibliotheek</b><p>Gratis hulp met taal, rekenen, lezen en de computer of telefoon. Handig voor werk, post en formulieren. Vraag ernaar in je bibliotheek.</p></div>
+      <div class="weg"><b>Gratis online cursussen</b><p>Er zijn veel gratis lessen online over van alles: van typen tot boekhouden. Begin klein, een half uur per keer.</p></div>
+      <div class="weg"><b>Mbo in deeltijd of een certificaat</b><p>Je kunt vaak in deeltijd een opleiding of los certificaat halen, ook naast je gezin. Informeer bij een mbo of het UWV.</p></div>
+      <div class="weg"><b>Rijbewijs of vakdiploma via de gemeente</b><p>Soms betaalt de gemeente of het UWV mee aan een rijbewijs, een certificaat (zoals heftruck of VCA) of een omscholing als het je aan werk helpt. Vraag naar een klantmanager.</p></div>
+      <div class="weg"><b>Inburgering en NT2</b><p>Nog niet zo lang in Nederland? De gemeente helpt met inburgeringslessen en Nederlands leren, vaak kosteloos.</p></div>
+    </div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Vraag het je studiecoach</h2>
+    <div class="h">Nora denkt met je mee: wat zou je willen kunnen of worden, en welke gratis stap past daarbij?</div>
+    <div class="chat" id="chat"><div class="b ai">Hoi, ik ben Nora. Wat zou je graag willen leren, of wat voor werk zou je willen doen? Dan zoeken we samen een haalbare, betaalbare weg. Klein beginnen mag altijd.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Ik zou graag..." maxlength="1000"></textarea>
+      <button class="knop" id="stuur">Vraag</button>
+    </div>
+    <div class="knoprij" style="margin-top:.9rem;">
+      <a class="knop grijs klein" href="cv.html">📄 Werk aan je cv</a>
+      <a class="knop grijs klein" href="dromen.html">⭐ Zet het als doel</a>
+    </div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug:'index.html' });
+Sessie.coach({ kind:'studie', chat:$('#chat'), input:$('#vraag'), knop:$('#stuur'), wacht:'Nora denkt mee...' });
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

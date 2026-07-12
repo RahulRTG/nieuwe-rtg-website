@@ -14,10 +14,10 @@
   ],
   "shortcuts": [
     { "name": "Leren", "url": "/apps/foundation/leren.html" },
-    { "name": "CV-maker", "url": "/apps/foundation/cv.html" },
-    { "name": "Geldmaatje", "url": "/apps/foundation/geld.html" },
-    { "name": "Hulpwijzer", "url": "/apps/foundation/hulpwijzer.html" },
     { "name": "Onze dromen", "url": "/apps/foundation/dromen.html" },
-    { "name": "Op reis", "url": "/apps/foundation/reis.html" }
+    { "name": "Veilig thuis", "url": "/apps/foundation/veilig.html" },
+    { "name": "Opvoedhulp", "url": "/apps/foundation/opvoeden.html" },
+    { "name": "Geldmaatje", "url": "/apps/foundation/geld.html" },
+    { "name": "Sterker dan pesten", "url": "/apps/foundation/pesten.html" }
   ]
 }

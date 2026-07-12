@@ -183,6 +183,41 @@ test('samen vooruit: een spaardoel vullen tot het gehaald is, en een droom aanmo
   assert.ok((await json(await fetch(BASE + '/api/foundation/gesprekskaart'))).kaart.length > 5);
 });
 
+test('rol-hulp: kind deelt locatie en stuurt een hulpvraag, en de coaches werken per rol', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Zorg', naam: 'Pap', pin: '4820' }));
+  const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Lot', rol: 'kind' }));
+  const kt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+
+  // kind deelt status + locatie; ouder ziet het
+  const loc = await api('/gezin/locatie', { code: g.code, token: kt, status: 'op school', lat: 52.37, lon: 4.9 });
+  assert.equal(loc.status, 200);
+  const lijst = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/locaties?token=' + g.token));
+  const vanLot = lijst.locaties.find(l => l.naam === 'Lot');
+  assert.ok(vanLot && vanLot.lat === 52.37 && vanLot.status === 'op school');
+  // een rare lat wordt niet opgeslagen als coordinaat, wel de status
+  await api('/gezin/locatie', { code: g.code, token: kt, status: 'onderweg', lat: 999, lon: 4.9 });
+  const lijst2 = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/locaties?token=' + g.token));
+  assert.equal(lijst2.locaties.find(l => l.naam === 'Lot').lat, undefined);
+  // stoppen met delen haalt de locatie weg
+  await api('/gezin/locatie/stop', { code: g.code, token: kt });
+  const lijst3 = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/locaties?token=' + g.token));
+  assert.ok(!lijst3.locaties.find(l => l.naam === 'Lot'));
+
+  // kind stuurt een hulpvraag (soort hulp) die de ouder bij zijn berichten ziet
+  await api('/gezin/bericht', { code: g.code, token: kt, naar: 'allen', soort: 'hulp', tekst: 'Ik wil praten' });
+  const ber = await json(await fetch(BASE + '/api/foundation/gezin/' + g.code + '/berichten?token=' + g.token));
+  assert.ok(ber.berichten.some(b => b.soort === 'hulp' && b.tekst === 'Ik wil praten'));
+
+  // de rol-coaches geven antwoord voor een ingelogd profiel
+  for (const kindsoort of ['opvoeden', 'steun', 'studie', 'pesten']) {
+    const r = await api('/hulp/ai', { code: g.code, token: kt, kind: kindsoort, messages: [{ role: 'user', content: 'hoi, help me' }] });
+    assert.equal(r.status, 200, kindsoort + ' antwoordt');
+    assert.ok((await json(r)).text.length > 5);
+  }
+  // zonder geldig token geen coach
+  assert.equal((await api('/hulp/ai', { code: g.code, token: 'nep', kind: 'opvoeden', messages: [{ role: 'user', content: 'hoi' }] })).status, 403);
+});
+
 test('AI-bijles: alleen voor wie meedoet, en de tip laadt', async () => {
   const L = await les();
   const goed = await api('/ai', { code: L.code, token: L.sToken, messages: [{ role: 'user', content: 'Help met breuken' }] });

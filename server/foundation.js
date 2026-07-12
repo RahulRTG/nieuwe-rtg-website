@@ -420,7 +420,7 @@ router.post('/gezin/bericht', (req, res) => {
   const tekst = schoon(req.body.tekst, 800);
   if (!tekst) return res.status(400).json({ error: 'Schrijf een bericht.' });
   const naar = req.body.naar && g.profielen[req.body.naar] ? req.body.naar : 'allen';
-  const soort = req.body.soort === 'reis' ? 'reis' : 'bericht';
+  const soort = ['reis', 'hulp'].includes(req.body.soort) ? req.body.soort : 'bericht';
   const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar, soort, tekst, at: nu(), gelezenDoor: [p.id] };
   if (!g.berichten) g.berichten = [];
   g.berichten.unshift(b); g.berichten = g.berichten.slice(0, 200); save();
@@ -542,7 +542,7 @@ router.get('/gezin/:code/dromen', (req, res) => {
   res.json({ dromen: (s.g.dromen || []).map(d => ({ id: d.id, van: d.van, vanNaam: d.vanNaam, vanAvatar: d.vanAvatar, kleur: d.kleur, tekst: d.tekst, aantal: (d.aanmoedigingen || []).length, aangemoedigd: (d.aanmoedigingen || []).includes(s.p.id), vanMij: d.van === s.p.id, behaald: !!d.behaald, at: d.at })) });
 });
 
-/* gezinshulp-AI: een warme helper voor geldvragen en het vinden van gratis hulp */
+/* gezinshulp-AI: warme coaches, elk met een eigen rol. Voor ouders en voor kids. */
 const HULP_SYS = {
   geld: 'Je bent "Meike", een warme, praktische geldmaatje in de gratis app van de RTFoundation, voor gezinnen in Nederland met weinig geld. ' +
     'Geef concrete, haalbare tips om rond te komen, te besparen en te sparen: goedkoop en gezond koken, energie besparen, tweedehands, en welke regelingen er zijn ' +
@@ -552,15 +552,35 @@ const HULP_SYS = {
     'Wijs mensen vriendelijk de weg naar gratis hulp: eten (Voedselbank), kleding en spullen (Kledingbank, Stichting Leergeld voor schoolspullen en fiets), ' +
     'geld en schulden (gemeente, Schuldhulpmaatje, sociaal raadslieden), kinderen (Jeugdfonds Sport & Cultuur, Nationaal Fonds Kinderhulp, Leergeld), ' +
     'gezondheid en steun (huisarts, 113 Zelfmoordpreventie bij nood, MIND Korrelatie), leren en werk (Bibliotheek, gemeente, UWV). ' +
-    'Vraag kort door wat iemand nodig heeft en noem 1 tot 3 concrete plekken. Nooit oordelen. Kort, eenvoudig Nederlands, max ~120 woorden.'
+    'Vraag kort door wat iemand nodig heeft en noem 1 tot 3 concrete plekken. Nooit oordelen. Kort, eenvoudig Nederlands, max ~120 woorden.',
+  opvoeden: 'Je bent "Nora", een warme, ervaren opvoedcoach in de gratis app van de RTFoundation, voor ouders en verzorgers, vaak met weinig geld en veel op hun bord. ' +
+    'Help met alledaagse opvoedvragen: driftbuien, grenzen stellen, schermtijd, huiswerk en motivatie, ruzie tussen kinderen, slapen, en praten over gevoelens of pesten. ' +
+    'Geef 1 tot 3 concrete, liefdevolle stappen die vandaag te doen zijn. Oordeel nooit over de ouder; benoem dat het zwaar kan zijn en dat om hulp vragen sterk is. ' +
+    'Bij zorgen over veiligheid of geweld: wijs vriendelijk naar het Centrum voor Jeugd en Gezin, de huisarts of Veilig Thuis (0800-2000). Kort, eenvoudig Nederlands, max ~130 woorden.',
+  steun: 'Je bent "Nora", een warm en rustig luisterend oor in de gratis app van de RTFoundation, voor ouders en verzorgers die het zwaar hebben. ' +
+    'Je bent geen therapeut en stelt geen diagnose. Luister, erken het gevoel, en geef een of twee kleine, haalbare dingen die kunnen helpen (even ademen, iets voor jezelf, iemand bellen). ' +
+    'Moedig aan om steun te zoeken bij de huisarts, MIND Korrelatie, of het eigen netwerk. Bij tekenen van crisis of gedachten aan zelfmoord: verwijs rustig en direct naar 113 (0800-0113, gratis, dag en nacht) of 112. ' +
+    'Warm, zonder oordeel, max ~120 woorden.',
+  studie: 'Je bent "Nora", een bemoedigende loopbaan- en studiecoach in de gratis app van de RTFoundation, voor volwassenen die verder willen leren, vaak met weinig geld. ' +
+    'Denk mee over gratis en goedkope wegen: het Taalhuis en de Bibliotheek (taal, rekenen, digitale vaardigheden), gratis online cursussen, mbo in deeltijd, inburgering, een rijbewijs of vakdiploma via de gemeente of UWV, en omscholing. ' +
+    'Koppel het aan hun droom en de cv-maker in deze app. Geef 1 tot 3 concrete stappen. Nooit oordelen, altijd hoopvol. Kort, eenvoudig Nederlands, max ~130 woorden.',
+  pesten: 'Je bent "Sam", een lieve, rustige maatje in de gratis app van de RTFoundation, en je praat met een kind of tiener dat gepest wordt of zich rot voelt. ' +
+    'Luister goed, zeg dat het niet zijn of haar schuld is, en dat het slim en dapper is om erover te praten. Geef een of twee kleine, concrete dingen: het tegen een volwassene die je vertrouwt zeggen (ouder, juf of meester), samen optrekken met een vriend, en het opschrijven. ' +
+    'Moedig altijd aan om het aan een ouder of leerkracht te vertellen, en noem de Kindertelefoon (0800-0432, gratis en anoniem). Bij gevaar: zeg dat ze meteen een volwassene erbij halen of 112 bellen. ' +
+    'Heel warm, simpel, kindvriendelijk, korte zinnen, max ~110 woorden. Geef nooit het advies om terug te pesten of geweld te gebruiken.'
 };
 const HULP_DEMO = {
   geld: 'Fijn dat je het vraagt. Kleine stappen helpen echt: kook een paar vaste, goedkope maaltijden, zet de verwarming een graadje lager en check of je recht hebt op zorgtoeslag of het kindgebonden budget. Aanvragen is gratis; de gemeente helpt je erbij. Wil je dat ik met een van deze meedenk?',
-  hulp: 'Je staat er niet alleen voor. Vertel me kort wat je nodig hebt: eten, kleding, hulp voor de kinderen, of hulp met geld en post? Dan wijs ik je de juiste, gratis plek. Voor eten is er de Voedselbank; voor school en sport zijn er Stichting Leergeld en het Jeugdfonds.'
+  hulp: 'Je staat er niet alleen voor. Vertel me kort wat je nodig hebt: eten, kleding, hulp voor de kinderen, of hulp met geld en post? Dan wijs ik je de juiste, gratis plek. Voor eten is er de Voedselbank; voor school en sport zijn er Stichting Leergeld en het Jeugdfonds.',
+  opvoeden: 'Wat fijn dat je meedenkt over je kind; dat je het vraagt zegt al genoeg. Vertel me kort wat er speelt, bijvoorbeeld driftbuien, huiswerk of schermtijd, dan geef ik een paar liefdevolle stappen die vandaag te doen zijn. En weet: het zwaar hebben betekent niet dat je het verkeerd doet.',
+  steun: 'Fijn dat je dit even deelt. Jij doet er ook toe, niet alleen als ouder. Vertel me hoe het echt met je gaat; ik luister. En als het te veel wordt, praat er dan over met je huisarts of bel MIND Korrelatie. Bij hele donkere gedachten: bel gratis 113, dag en nacht.',
+  studie: 'Wat goed dat je verder wilt leren; daar word je sterker van en het geeft je kinderen een mooi voorbeeld. Vertel me wat je zou willen kunnen of worden, dan zoeken we samen een gratis of goedkope weg, via de Bibliotheek, het Taalhuis, een online cursus of de gemeente. Klein beginnen mag.',
+  pesten: 'Hoi, fijn dat je het durft te zeggen. Wat er ook gebeurt: het is niet jouw schuld. Vertel me maar wat er is, ik luister. En het is heel dapper en slim om het ook aan een volwassene te vertellen die je vertrouwt, zoals je vader, moeder, juf of meester. Je kunt ook gratis bellen met de Kindertelefoon: 0800-0432.'
 };
+const AI_KINDS = Object.keys(HULP_SYS);
 router.post('/hulp/ai', async (req, res) => {
   const s = sessieVan(req, res); if (!s) return;
-  const kind = req.body.kind === 'hulp' ? 'hulp' : 'geld';
+  const kind = AI_KINDS.includes(req.body.kind) ? req.body.kind : 'geld';
   const clean = (Array.isArray(req.body.messages) ? req.body.messages : [])
     .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
     .map(m => ({ role: m.role, content: m.content.slice(0, 1500) })).slice(-10);
@@ -605,6 +625,38 @@ const GESPREKSKAARTEN = [
   'Voor wie zou je iets liefs willen doen, en wat?'
 ];
 router.get('/gesprekskaart', (req, res) => res.json({ kaart: GESPREKSKAARTEN[Math.floor(Math.random() * GESPREKSKAARTEN.length)] }));
+
+/* veilig thuis: een kind (of ieder gezinslid) deelt zijn status en, als het wil,
+   zijn locatie met het gezin. Alleen de laatste plek wordt bewaard, en delen
+   kan altijd worden gestopt. */
+const STATUSSEN = ['veilig thuis', 'onderweg', 'op school', 'bij een vriend', 'naar huis'];
+router.post('/gezin/locatie', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const status = STATUSSEN.includes(req.body.status) ? req.body.status : schoon(req.body.status, 40) || 'onderweg';
+  const rec = { pid: s.p.id, naam: s.p.naam, avatar: s.p.avatar, kleur: s.p.kleur, status, at: nu() };
+  if (req.body.lat != null && req.body.lon != null) {
+    const lat = Number(req.body.lat), lon = Number(req.body.lon);
+    if (isFinite(lat) && isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+      rec.lat = Math.round(lat * 1e5) / 1e5; rec.lon = Math.round(lon * 1e5) / 1e5;
+    }
+  }
+  if (!s.g.locaties) s.g.locaties = {};
+  s.g.locaties[s.p.id] = rec; save();
+  res.json({ ok: true, locatie: rec });
+});
+router.post('/gezin/locatie/stop', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  if (s.g.locaties) delete s.g.locaties[s.p.id]; save();
+  res.json({ ok: true });
+});
+router.get('/gezin/:code/locaties', (req, res) => {
+  const s = sessieVan(req, res); if (!s) return;
+  const alle = Object.values(s.g.locaties || {})
+    .filter(l => s.g.profielen[l.pid]) // alleen bestaande profielen
+    .sort((a, b) => (b.at || '').localeCompare(a.at || ''))
+    .map(l => Object.assign({}, l, { vanMij: l.pid === s.p.id }));
+  res.json({ locaties: alle, ikDeel: !!(s.g.locaties && s.g.locaties[s.p.id]) });
+});
 
 router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F().lessen).length, gezinnen: Object.keys(G()).length, aanvragen: (F().reisAanvragen || []).length, ai: anthropic ? 'claude' : 'demo' }));
 

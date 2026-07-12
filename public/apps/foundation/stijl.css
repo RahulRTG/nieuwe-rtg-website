@@ -26,3 +26,10 @@ input,textarea,select{font-family:inherit;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#3a352d;}
 .dot.aan{background:var(--groen);box-shadow:0 0 8px rgba(95,165,106,.7);}
 .kick{font-size:0.7rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--goud);font-weight:700;}
+/* gedeelde AI-chat (coach-pagina's) */
+.chat{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;margin-bottom:.7rem;}
+.chat .b{padding:.6rem .8rem;border-radius:12px;max-width:88%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
+.chat .b.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
+.chat .b.ai{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
+.rijveld{display:flex;gap:.5rem;}
+.rijveld .veld{flex:1;}

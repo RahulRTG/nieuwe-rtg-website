@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Opvoedhulp</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.2rem;margin-bottom:1.2rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
+  .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
+  .onderwerpen{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;}
+  .onderwerpen button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.45rem .85rem;font-size:.88rem;}
+  .onderwerpen button:hover{border-color:var(--goud);}
+  .tips{display:flex;flex-direction:column;gap:.7rem;}
+  .tipk{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.8rem 1rem;}
+  .tipk b{color:var(--goud);display:block;margin-bottom:.25rem;}
+  .tipk p{line-height:1.5;font-size:.92rem;}
+  .veilignote{font-size:.82rem;color:var(--zacht);line-height:1.5;margin-top:.8rem;}
+  .veilignote b{color:var(--txt);}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🧸 Opvoedhulp</h1>
+  <div class="intro">Opvoeden is het mooiste en soms het zwaarste werk dat er is. Hier vind je rustige, praktische hulp bij alledaagse situaties, en een coach die met je meedenkt. Zonder oordeel.</div>
+
+  <div class="kaart blok">
+    <h2>Waar loop je tegenaan?</h2>
+    <div class="h">Kies een onderwerp voor een paar concrete tips, of vraag het hieronder aan de coach.</div>
+    <div class="onderwerpen" id="onderwerpen"></div>
+    <div class="tips" id="tips"><div class="h">Kies hierboven een onderwerp.</div></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Vraag het je opvoedcoach</h2>
+    <div class="h">Nora denkt met je mee over jouw situatie. Vertel gerust wat er speelt.</div>
+    <div class="chat" id="chat"><div class="b ai">Hoi, ik ben Nora. Vertel me wat er speelt met je kind, dan denk ik met je mee. Er is geen domme vraag, en het zwaar hebben betekent niet dat je het verkeerd doet.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Bijvoorbeeld: mijn kind wil niet naar bed..." maxlength="1000"></textarea>
+      <button class="knop" id="stuur">Vraag</button>
+    </div>
+    <div class="veilignote"><b>Maak je je zorgen over de veiligheid van je kind of jezelf?</b> Praat met je huisarts of het Centrum voor Jeugd en Gezin, of bel gratis Veilig Thuis: 0800-2000.</div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+
+const ONDERWERPEN = {
+  'Driftbuien': [
+    ['Blijf zelf rustig','Een boze bui is geen ongehoorzaamheid, maar te veel gevoel dat er even uit moet. Adem zelf rustig; jouw kalmte werkt aanstekelijk.'],
+    ['Benoem het gevoel','"Je bent boos omdat we weg moeten." Als een kind zich begrepen voelt, zakt de bui sneller.'],
+    ['Wacht en troost','Praat niet te veel tijdens de bui. Blijf dichtbij en bied troost als het zakt. Napraten kan later.']
+  ],
+  'Schermtijd': [
+    ['Maak duidelijke afspraken','Spreek samen af hoelang en wanneer. Een zichtbare timer helpt beter dan steeds "nog even".'],
+    ['Doe zelf mee','Kijk of speel af en toe samen. Zo weet je wat je kind ziet en wordt het een gezamenlijk moment.'],
+    ['Schermvrije plekken','Houd de eettafel en de slaapkamer schermvrij. Rust voor het slapen helpt iedereen.']
+  ],
+  'Huiswerk en motivatie': [
+    ['Klein en vast','Korte blokjes van 15 tot 20 minuten op een vaste plek werken beter dan lang doorgaan.'],
+    ['Prijs de inzet','Zeg "wat knap dat je doorzet", niet alleen "wat een goed cijfer". Dat houdt de moed erin.'],
+    ['Gebruik de lesapp','In de RTFoundation-app zit een gratis lesbord en schrift met bijleshulp Bram. Samen leren mag.']
+  ],
+  'Ruzie tussen kinderen': [
+    ['Wees scheidsrechter, geen rechter','Help ze zelf een oplossing bedenken in plaats van te bepalen wie schuld heeft.'],
+    ['Geef ieder aandacht','Ruzie is soms vragen om aandacht. Een paar minuten samen met ieder kind doet wonderen.']
+  ],
+  'Slapen': [
+    ['Een vast ritueel','Elke avond dezelfde volgorde: opruimen, wassen, verhaaltje. Voorspelbaarheid geeft rust.'],
+    ['Rustig afbouwen','Zet schermen een uur voor bed uit en dim het licht. Het lijf komt zo tot rust.']
+  ],
+  'Praten over gevoelens': [
+    ['Vraag open','"Hoe was je dag echt?" op een rustig moment, bijvoorbeeld in de auto of tijdens het koken.'],
+    ['Luister zonder te oordelen','Soms wil een kind gewoon gehoord worden, geen oplossing. Herhaal wat je hoort.'],
+    ['Let op pesten','Stille of verdrietige kinderen kunnen gepest worden. In deze app zit "Sterker dan pesten" voor de kids.']
+  ]
+};
+const ob = $('#onderwerpen');
+Object.keys(ONDERWERPEN).forEach(k=>{
+  const b=document.createElement('button'); b.textContent=k;
+  b.onclick=()=>{ $('#tips').innerHTML = ONDERWERPEN[k].map(([t,d])=>'<div class="tipk"><b>'+esc(t)+'</b><p>'+esc(d)+'</p></div>').join(''); };
+  ob.appendChild(b);
+});
+
+Sessie.coach({ kind:'opvoeden', chat:$('#chat'), input:$('#vraag'), knop:$('#stuur'), wacht:'Nora denkt mee...' });
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

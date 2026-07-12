@@ -28,6 +28,25 @@
         .catch(function () { return null; });
     },
     api: api,
+    // herbruikbare AI-coach-chat. opts: { kind, chat, input, knop, wacht }
+    coach: function (opts) {
+      var s = lees(); if (!s) return;
+      var gesprek = [];
+      function esc2(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+      function verstuur() {
+        var t = (opts.input.value || '').trim(); if (!t) return;
+        opts.input.value = '';
+        opts.chat.insertAdjacentHTML('beforeend', '<div class="b ik">' + esc2(t) + '</div>');
+        gesprek.push({ role: 'user', content: t });
+        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = opts.wacht || 'Even denken...';
+        opts.chat.appendChild(w); opts.chat.scrollTop = opts.chat.scrollHeight;
+        api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek })
+          .then(function (d) { w.textContent = d.text; gesprek.push({ role: 'assistant', content: d.text }); opts.chat.scrollTop = opts.chat.scrollHeight; })
+          .catch(function () { w.textContent = 'Sorry, dat lukte even niet. Probeer het zo nog eens.'; });
+      }
+      opts.knop.addEventListener('click', verstuur);
+      opts.input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); verstuur(); } });
+    },
     // Balk bovenin met "ingelezen als", een belletje voor berichten en (voor de
     // beheerder) een knop naar Gezin beheren. plaats: een element om in te vullen.
     balk: function (el, opties) {
@@ -73,10 +92,11 @@
         var lijst = (d.berichten || []);
         if (!lijst.length) { box.innerHTML = '<div class="sb-leeg">Nog geen berichten. Je gezin kan hier iets achterlaten.</div>'; return; }
         box.innerHTML = lijst.map(function (b) {
-          var reis = b.soort === 'reis' ? '<a class="sb-reisknop" href="reis.html">✈️ Naar de reis</a>' : '';
+          var extra = b.soort === 'reis' ? '<a class="sb-reisknop" href="reis.html">✈️ Naar de reis</a>' : '';
+          var kop = b.soort === 'hulp' ? '<div class="sb-hulplabel">🆘 Vraagt om hulp</div>' : '';
           var wie = b.vanMij ? 'Jij' : esc(b.vanNaam);
           var aan = b.naar === 'allen' ? '' : '<span class="sb-aan"> aan ' + esc(b.naarNaam) + '</span>';
-          return '<div class="sb-b ' + (b.soort === 'reis' ? 'reis' : '') + '"><div class="sb-bkop">' + (b.vanAvatar || '') + ' <b>' + wie + '</b>' + aan + '</div><div class="sb-btxt">' + esc(b.tekst) + '</div>' + reis + '</div>';
+          return '<div class="sb-b ' + (b.soort || '') + '">' + kop + '<div class="sb-bkop">' + (b.vanAvatar || '') + ' <b>' + wie + '</b>' + aan + '</div><div class="sb-btxt">' + esc(b.tekst) + '</div>' + extra + '</div>';
         }).join('');
         api('/gezin/bericht/gelezen', { code: s.code, token: s.token }).then(function () { var t = el.querySelector('#sbTel'); if (t) t.hidden = true; }).catch(function () {});
       }).catch(function () { box.innerHTML = '<div class="sb-leeg">Kon berichten niet laden.</div>'; });
@@ -89,6 +109,7 @@
       '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
       '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;}' +
       '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:999px;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
+      '.sb-tel[hidden]{display:none;}' +
       '.sb-prof{display:flex;align-items:center;gap:.45rem;background:transparent;color:var(--txt);}' +
       '.sb-av{width:1.8rem;height:1.8rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}' +
       '.sb-nm{font-size:.9rem;font-weight:600;max-width:7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
@@ -99,6 +120,8 @@
       '.sb-leeg{color:var(--zacht);font-size:.85rem;padding:.8rem;text-align:center;}' +
       '.sb-b{padding:.6rem .7rem;border-radius:10px;background:var(--paneel2);margin-bottom:.4rem;}' +
       '.sb-b.reis{border:1px solid var(--goud);}' +
+      '.sb-b.hulp{border:1px solid var(--rood);background:#2a1512;}' +
+      '.sb-hulplabel{color:#e88;font-weight:700;font-size:.78rem;margin-bottom:.25rem;}' +
       '.sb-bkop{font-size:.78rem;color:var(--zacht);margin-bottom:.2rem;}.sb-bkop b{color:var(--txt);}' +
       '.sb-btxt{font-size:.92rem;line-height:1.4;white-space:pre-wrap;}' +
       '.sb-reisknop{display:inline-block;margin-top:.5rem;background:var(--goud);color:#1a1710;font-weight:700;font-size:.82rem;text-decoration:none;padding:.35rem .7rem;border-radius:8px;}';

@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-hulp-v17';
+const CACHE = 'rtf-hulp-v18';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html',
   '/apps/foundation/leren.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
@@ -13,7 +13,7 @@ const SHELL = [
   '/apps/foundation/agenda.html', '/apps/foundation/klusjes.html',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/vrienden.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html', '/apps/foundation/sessie.js',
-  '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/geo.js', '/apps/translate.js',
+  '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',
   '/manifests/foundation.webmanifest', '/icons/foundation.svg'
 ];
 

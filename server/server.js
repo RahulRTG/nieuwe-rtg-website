@@ -143,27 +143,16 @@ const PERSONAS = {
    privejet, altijd vooraf betalen), 18-21 (alcohol volgt de landsgrens van de
    zaak, bijvoorbeeld 20 in Japan) en 21+. Partners zien nooit de
    geboortedatum, hooguit dat de leeftijd geverifieerd is. */
-function leeftijdVan(geboren) {
-  if (!geboren || !/^\d{4}-\d{2}-\d{2}$/.test(String(geboren))) return null;
-  const g = new Date(geboren);
-  if (isNaN(g)) return null;
-  const nu = new Date();
-  let j = nu.getFullYear() - g.getFullYear();
-  if (nu.getMonth() < g.getMonth() || (nu.getMonth() === g.getMonth() && nu.getDate() < g.getDate())) j--;
-  return j;
-}
+// Zuivere leeftijdshulp zit nu in server/lib/leeftijd.js.
+const leeftijdlib = require('./lib/leeftijd');
+const leeftijdVan = leeftijdlib.leeftijdVan;
+const leeftijdsgroepVan = leeftijdlib.leeftijdsgroepVan;
 function geborenVan(sess) {
   if (!sess) return null;
   // een echt account (ook de gratis laag) heeft een paspoort-geboortedatum
   if (sess.account) return (accounts.getMemberState(sess.account.id) || {}).geboren || null;
   if (sess.tier === 'guest') return null; // anonieme demo-gast heeft geen paspoort
   return (PERSONAS[sess.tier] || {}).geboren || null;
-}
-function leeftijdsgroepVan(lft) {
-  if (lft == null) return null;
-  if (lft < 18) return '15-17';
-  if (lft <= 21) return '18-21';
-  return '21+';
 }
 // de alcoholgrens volgt het land van de zaak (LANDEN staat verderop)
 function alcoholGrensVan(s) {
@@ -2302,19 +2291,11 @@ function ritBezetting(code) {
    het lid aankomt, weet de taxi precies waar en wanneer op te halen, en ziet
    het lid live waar zijn vervoer is. Alles op codenaam, nooit op echte naam. */
 
-function toRad(d) { return d * Math.PI / 180; }
-function haversine(a, b) {
-  if (!a || !b || !Number.isFinite(a.lat) || !Number.isFinite(b.lat)) return null;
-  const R = 6371000;
-  const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
-  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
-  return Math.round(2 * R * Math.asin(Math.sqrt(s)));
-}
-function etaMinutes(meters, mode) {
-  if (meters == null) return null;
-  const kmh = mode === 'walking' ? 4.8 : mode === 'flying' ? 700 : 26; // lopen / vliegen / rijden in de stad
-  return Math.max(1, Math.round((meters / 1000) / kmh * 60));
-}
+// Geo-rekenhulp zit nu in een eigen, zuivere module (server/lib/geo.js).
+const geo = require('./lib/geo');
+const toRad = geo.toRad;
+const haversine = geo.haversine;
+const etaMinutes = geo.etaMinutes;
 function sseToCustomer(key, event, data) {
   bus.publish('sse', { doel: 'key', match: key, event, data, id: nextSseId() });
 }

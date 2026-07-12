@@ -148,6 +148,7 @@
 
 <input type="file" id="fotoIn" accept="image/*" style="display:none;">
 
+<script src="/apps/util.js"></script>
 <script src="sessie.js"></script>
 <script src="/apps/translate.js"></script>
 <script>
@@ -155,8 +156,9 @@ const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) {}
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
-function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function initcn(cn){ return String(cn||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+// gedeelde, veilige helpers uit /apps/util.js
+const esc = Util.escapeHTML;
+const initcn = Util.initialen;
 // social-endpoints lopen via /api/rtf/social met het gezin-token
 function soc(pad, body){
   return fetch('/api/rtf/social'+pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })

@@ -8,6 +8,7 @@
     "single": "node --experimental-sqlite server/server.js",
     "gateway": "node server/poort.js",
     "nood": "node server/nood.js",
+    "check": "node scripts/check.js",
     "test": "node --experimental-sqlite --test test/*.test.js"
   },
   "dependencies": {

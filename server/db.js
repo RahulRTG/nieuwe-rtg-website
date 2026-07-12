@@ -23,12 +23,19 @@ let rPub = null, rSub = null, versie = 0, externCb = null;
 
 /* Opslagmotor. Standaard 'json' (een db.json-bestand, zoals altijd). Met
    RTG_STORE=sqlite bewaart de server elke top-level collectie als een rij in een
-   SQLite-database (WAL, transactioneel, meerdere processen tegelijk veilig) en
-   schrijft hij alleen de collecties die veranderd zijn weg. Dat schaalt veel
-   beter dan telkens een heel JSON-bestand herschrijven. De data in het geheugen
-   (db.data) blijft precies hetzelfde, dus de rest van de app merkt er niets van. */
+   SQLite-database (WAL, transactioneel). Dat schaalt veel beter dan telkens een
+   heel JSON-bestand herschrijven, en het is de basis voor ECHT losse schrijvende
+   servers: meerdere processen delen hetzelfde store.db-bestand en schrijven
+   tegelijk. Elke collectie krijgt een oplopend versienummer; een korte
+   achtergrondpoll haalt de collecties op die een ander proces heeft gewijzigd.
+   Zo kan de leden-server zijn eigen collecties schrijven terwijl de
+   leverancier-server de zijne schrijft, zonder elkaar te overschrijven, en zien
+   ze elkaars data live. (Binnen EEN collectie serialiseert SQLite de schrijvers;
+   geef een collectie dus aan een domein.) De data in het geheugen (db.data)
+   blijft precies gelijk, dus de rest van de app merkt er niets van. */
 const STORE = process.env.RTG_STORE || 'json';
 let kvdb = null;
+const toegepast = new Map();   // collectie -> versienummer dat dit proces al toegepast heeft
 const laatsteJson = new Map(); // collectie -> laatst weggeschreven JSON (om ongewijzigde over te slaan)
 function sqliteInit() {
   if (kvdb) return;
@@ -37,27 +44,70 @@ function sqliteInit() {
   kvdb = new DatabaseSync(path.join(DATA_DIR, 'store.db'));
   kvdb.exec('PRAGMA journal_mode=WAL');
   kvdb.exec('PRAGMA synchronous=NORMAL');
-  kvdb.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT)');
+  kvdb.exec('PRAGMA busy_timeout=5000'); // wacht kort als een ander proces net schrijft
+  kvdb.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT, ver INTEGER NOT NULL DEFAULT 0)');
+  kvdb.exec('CREATE INDEX IF NOT EXISTS idx_kv_ver ON kv(ver)');
+  kvdb.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER)');
+  kvdb.exec("INSERT INTO meta(k,v) VALUES('ver',0) ON CONFLICT(k) DO NOTHING");
 }
 function loadSqlite() {
   sqliteInit();
-  const rows = kvdb.prepare('SELECT key, val FROM kv').all();
+  const rows = kvdb.prepare('SELECT key, val, ver FROM kv').all();
   if (!rows.length) return null;
   const data = {};
-  for (const r of rows) { data[r.key] = JSON.parse(r.val); laatsteJson.set(r.key, r.val); }
+  for (const r of rows) { data[r.key] = JSON.parse(r.val); laatsteJson.set(r.key, r.val); toegepast.set(r.key, r.ver); }
   return data;
 }
 function saveSqlite() {
   sqliteInit();
-  const up = kvdb.prepare('INSERT INTO kv(key,val) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val');
-  kvdb.exec('BEGIN');
+  const gewijzigd = [];
+  for (const k of Object.keys(db.data)) {
+    const j = JSON.stringify(db.data[k]);
+    if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
+  }
+  if (!gewijzigd.length) return;
+  const bump = kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'");
+  const huidig = kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'");
+  const up = kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver');
+  kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat het versienummer klopt
   try {
-    for (const k of Object.keys(db.data)) {
-      const j = JSON.stringify(db.data[k]);
-      if (laatsteJson.get(k) !== j) { up.run(k, j); laatsteJson.set(k, j); } // alleen gewijzigde collecties
+    for (const [k, j] of gewijzigd) {
+      bump.run();
+      const v = huidig.get().v;
+      up.run(k, j, v);
+      laatsteJson.set(k, j);
+      toegepast.set(k, v);
     }
     kvdb.exec('COMMIT');
   } catch (e) { try { kvdb.exec('ROLLBACK'); } catch (x) {} throw e; }
+}
+// Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
+// en zet ze in db.data. Zo blijven losse domeinprocessen bij elkaar in de pas.
+function pollSqlite() {
+  if (!kvdb) return;
+  try {
+    // per collectie kijken of een ANDER proces een nieuwere versie schreef dan wij
+    // al toepasten (een globale hoogwatergrens zou een lager genummerde wijziging
+    // van een ander proces missen zodra wij zelf iets hoger schreven).
+    const rows = kvdb.prepare('SELECT key, val, ver FROM kv').all();
+    let sessieGewijzigd = false;
+    for (const r of rows) {
+      if (r.ver <= (toegepast.get(r.key) || 0)) continue;
+      db.data[r.key] = JSON.parse(r.val);
+      laatsteJson.set(r.key, r.val);
+      toegepast.set(r.key, r.ver);
+      if (r.key === 'sessions') sessieGewijzigd = true;
+    }
+    if (sessieGewijzigd && externCb) externCb();
+  } catch (e) {}
+}
+let pollTimer = null;
+// Start de kruisproces-synchronisatie (alleen bij de SQLite-opslag).
+function startSqliteSync() {
+  if (STORE !== 'sqlite' || pollTimer) return;
+  sqliteInit();
+  pollTimer = setInterval(pollSqlite, Number(process.env.RTG_POLL_MS || 750));
+  if (pollTimer.unref) pollTimer.unref();
 }
 
 // Zoek de nieuwste bruikbare dagbackup (server maakt die in DATA_DIR/backups).
@@ -102,6 +152,7 @@ function load() {
 function save() {
   if (!db.writable) return;
   if (STORE === 'sqlite') {
+    // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
     saveSqlite();
   } else {
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -110,8 +161,8 @@ function save() {
     const tmp = DB_FILE + '.tmp';
     fs.writeFileSync(tmp, JSON.stringify(db.data, null, 2));
     fs.renameSync(tmp, DB_FILE);
+    spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis (lees-replica's)
   }
-  spiegelNaarRedis();
 }
 
 // Zet de huidige data (met een oplopend versienummer) in Redis en seint de
@@ -127,6 +178,7 @@ function spiegelNaarRedis() {
    onExternalChange-hook heeft gezet. De schrijver deelt zijn data als startpunt;
    een lezer leest de verse data uit Redis en luistert daarna op wijzigingen. */
 async function startGedeeld() {
+  if (STORE === 'sqlite') return false; // SQLite deelt via de poll, niet via de Redis-mirror
   if (!REDIS_URL) return false;
   let redis;
   try { redis = require('redis'); } catch (e) { console.warn('[db] redis ontbreekt, alleen lokale data.'); return false; }
@@ -158,4 +210,4 @@ async function startGedeeld() {
 // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.
 function onExternalChange(cb) { externCb = cb; }
 
-module.exports = { db, load, save, DATA_DIR, startGedeeld, onExternalChange };
+module.exports = { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChange };

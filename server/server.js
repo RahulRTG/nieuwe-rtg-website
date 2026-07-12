@@ -19,7 +19,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { db, load, save, DATA_DIR, startGedeeld, onExternalChange } = require('./db');
+const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChange } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const mail = require('./mail');
@@ -2754,8 +2754,10 @@ function backupData() {
 /* ---------- start ---------- */
 
 initRealtime();
-// Gedeelde data via Redis aanzetten (alleen als REDIS_URL gezet is; anders lokaal).
+// Gedeelde data via Redis aanzetten (JSON-opslag, lees-replica's).
 startGedeeld().catch(e => console.warn('[db] gedeelde data mislukt:', e.message));
+// Kruisproces-synchronisatie voor de SQLite-opslag (echt losse schrijvende servers).
+startSqliteSync();
 backupData();
 setInterval(backupData, 24 * 60 * 60 * 1000);
 

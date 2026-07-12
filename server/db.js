@@ -39,7 +39,8 @@ function beslotenMap(d) { try { fs.mkdirSync(d, { recursive: true, mode: 0o700 }
    ze elkaars data live. (Binnen EEN collectie serialiseert SQLite de schrijvers;
    geef een collectie dus aan een domein.) De data in het geheugen (db.data)
    blijft precies gelijk, dus de rest van de app merkt er niets van. */
-const STORE = process.env.RTG_STORE || 'json';
+const DATABASE_URL = process.env.DATABASE_URL || process.env.PG_URL || null;
+const STORE = process.env.RTG_STORE || (DATABASE_URL ? 'postgres' : 'json');
 let kvdb = null;
 const toegepast = new Map();   // collectie -> versienummer dat dit proces al toegepast heeft
 const laatsteJson = new Map(); // collectie -> laatst weggeschreven JSON (om ongewijzigde over te slaan)
@@ -218,8 +219,77 @@ function laadUitBackup() {
   return null;
 }
 
+/* ---------- PostgreSQL (write-behind cache) ----------
+   Zie server/pg.js. Postgres is de gedeelde, duurzame waarheid; het geheugen
+   blijft de werkkopie en een lokale snapshot (DB_FILE) dient als warme cache en
+   fallback als Postgres even wegvalt. */
+let pg = null, pgKlaar = false, pgVuil = false, pgFlushBezig = false, pgFlushTimer = null, pgPoll = null, pgVeilig = null;
+const pgLog = { warn: (m, v) => console.warn('[pg]', m, v || '') };
+
+function schrijfLokaleSnapshot() {
+  beslotenMap(DATA_DIR);
+  const uit = kluis.AAN ? kluis.versleutel(JSON.stringify(db.data)) : JSON.stringify(db.data, null, 2);
+  schrijfDuurzaam(DB_FILE, uit, 0o600);
+  besloten(DB_FILE);
+}
+function schrijfLokaleSnapshotStil() { try { schrijfLokaleSnapshot(); } catch (e) {} }
+function leesLokaleSnapshot() {
+  try {
+    if (!fs.existsSync(DB_FILE)) return null;
+    return JSON.parse(kluis.ontsleutel(fs.readFileSync(DB_FILE, 'utf8')));
+  } catch (e) { return laadUitBackup(); }
+}
+function planFlush() {
+  pgVuil = true;
+  if (pgFlushTimer || !pgKlaar) return;
+  pgFlushTimer = setTimeout(flushNu, Number(process.env.PG_FLUSH_MS || 150));
+  if (pgFlushTimer.unref) pgFlushTimer.unref();
+}
+async function flushNu() {
+  pgFlushTimer = null;
+  if (!pg || !pgKlaar || pgFlushBezig || !db.writable || !pgVuil) return;
+  pgVuil = false; pgFlushBezig = true;
+  try { await pg.flush(db.data); schrijfLokaleSnapshotStil(); }
+  catch (e) { pgVuil = true; console.warn('[pg] flush mislukt:', e.message); }
+  finally { pgFlushBezig = false; if (pgVuil && pgKlaar) planFlush(); }
+}
+/* Start de Postgres-koppeling: schema klaarzetten, de gedeelde data ophalen
+   (Postgres wint bij het opstarten), en daarna live meeluisteren op wijzigingen
+   van andere instances (LISTEN/NOTIFY) met een poll als vangnet. */
+async function startPostgres() {
+  if (STORE !== 'postgres') return false;
+  pg = require('./pg').maakPg({ merge3, kluis, log: pgLog, url: DATABASE_URL });
+  await pg.schema();
+  const pgData = await pg.laadAlles();
+  if (pgData) {
+    db.data = pgData; // Postgres is de gedeelde waarheid
+    if (db.data.__schema == null) db.data.__schema = 1;
+    schrijfLokaleSnapshotStil();
+    if (externCb) externCb();
+  } else if (db.writable) {
+    await pg.flush(db.data); // lege database: onze seed/snapshot erin
+  }
+  pgKlaar = true;
+  await pg.luister(() => { pg.haalNieuwer(db.data, externCb).then(schrijfLokaleSnapshotStil).catch(() => {}); });
+  pgPoll = setInterval(() => pg.haalNieuwer(db.data, externCb).catch(() => {}), Number(process.env.RTG_POLL_MS || 2000));
+  if (pgPoll.unref) pgPoll.unref();
+  pgVeilig = setInterval(() => { if (pgVuil) flushNu(); }, 1000);
+  if (pgVeilig.unref) pgVeilig.unref();
+  if (pgVuil) planFlush();
+  console.log('[db] PostgreSQL-opslag actief, rol:', db.writable ? 'schrijver' : 'lezer');
+  return true;
+}
+// Laatste flush bij het afsluiten, zodat niets in de write-behind blijft hangen.
+async function flushBijAfsluiten() {
+  if (STORE !== 'postgres' || !pg || !db.writable) return;
+  try { await pg.flush(db.data); } catch (e) {}
+}
+
 function load() {
-  if (STORE === 'sqlite') {
+  if (STORE === 'postgres') {
+    // Warme cache / fallback; de echte gedeelde data komt via startPostgres().
+    db.data = leesLokaleSnapshot() || seed();
+  } else if (STORE === 'sqlite') {
     db.data = loadSqlite();
     if (!db.data) { db.data = seed(); save(); }
   } else if (fs.existsSync(DB_FILE)) {
@@ -270,7 +340,13 @@ function schrijfDuurzaam(doel, data, mode) {
 
 function save() {
   if (!db.writable) return;
-  if (STORE === 'sqlite') {
+  if (STORE === 'postgres') {
+    // Duurzaam lokaal wegschrijven (snapshot/fallback) + async flush naar
+    // Postgres plannen (write-behind, gecoalesceerd). Zo blijft save() synchroon
+    // en snel, terwijl Postgres de gedeelde, duurzame waarheid wordt.
+    schrijfLokaleSnapshotStil();
+    planFlush();
+  } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
     saveSqlite();
   } else {
@@ -328,4 +404,4 @@ async function startGedeeld() {
 // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.
 function onExternalChange(cb) { externCb = cb; }
 
-module.exports = { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChange, merge3, schrijfDuurzaam };
+module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, merge3, schrijfDuurzaam };

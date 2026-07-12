@@ -15,6 +15,7 @@ services:
       NODE_ENV: production
       PORT: 3000
       REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://rtg:${POSTGRES_PASSWORD:-rtg}@postgres:5432/rtg
       # de rest komt uit .env (RTG_ENC_KEY, APP_URL, STRIPE_SECRET_KEY, ...)
       RTG_ENC_KEY: ${RTG_ENC_KEY:-}
       APP_URL: ${APP_URL:-}
@@ -27,6 +28,7 @@ services:
       - rtg-data:/app/server/data
     depends_on:
       - redis
+      - postgres
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/api/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
       interval: 30s
@@ -41,6 +43,22 @@ services:
     volumes:
       - rtg-redis:/data
 
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rtg
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rtg}
+      POSTGRES_DB: rtg
+    volumes:
+      - rtg-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rtg"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   rtg-data:
   rtg-redis:
+  rtg-pg:

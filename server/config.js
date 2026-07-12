@@ -39,6 +39,7 @@ function valideer(env) {
 
     // 4. Aanbevolen, maar niet blokkerend.
     if (!env.APP_URL) waarschuwingen.push('APP_URL niet gezet: links in e-mails vallen terug op de Host-header.');
+    if (!env.DATABASE_URL && env.RTG_STORE !== 'sqlite') waarschuwingen.push('DATABASE_URL niet gezet: de gedeelde data draait op een lokaal bestand. Voor productie/meerdere instances wordt PostgreSQL aangeraden.');
     if (!env.REDIS_URL) waarschuwingen.push('REDIS_URL niet gezet: realtime werkt alleen binnen één proces (niet over meerdere instances).');
     if (!env.SENTRY_DSN) waarschuwingen.push('SENTRY_DSN niet gezet: geen externe fout-tracking.');
     if (!env.SMTP_URL && !env.SMTP_HOST) waarschuwingen.push('Geen SMTP ingesteld: e-mail (herstel-links, bevestigingen) wordt niet echt verstuurd.');

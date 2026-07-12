@@ -19,7 +19,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, onExternalChange } = require('./db');
+const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const mail = require('./mail');
@@ -2627,6 +2627,8 @@ initRealtime();
 startGedeeld().catch(e => console.warn('[db] gedeelde data mislukt:', e.message));
 // Kruisproces-synchronisatie voor de SQLite-opslag (echt losse schrijvende servers).
 startSqliteSync();
+// PostgreSQL-opslag aanzetten (gedeelde, duurzame database over meerdere instances).
+startPostgres().catch(e => log.uitzondering(e instanceof Error ? e : new Error(String(e)), { bron: 'startPostgres' }));
 // Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
 // opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke bezoekers.
 setInterval(() => {
@@ -2663,6 +2665,9 @@ const server = app.listen(PORT, () => {
 for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
   console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
   try { save(); } catch (e) {}
-  server.close(() => process.exit(0));
+  // Bij Postgres: nog een laatste flush zodat niets in de write-behind hangt.
+  Promise.resolve(flushBijAfsluiten()).catch(() => {}).finally(() => {
+    server.close(() => process.exit(0));
+  });
   setTimeout(() => process.exit(0), 3000).unref();
 });

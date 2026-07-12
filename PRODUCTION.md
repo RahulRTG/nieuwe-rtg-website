@@ -38,6 +38,7 @@ geen versleutelingssleutel, standaard-geheimen). Dat is bewust, zie
 |---|---|
 | `NODE_ENV=production` | Zet demo uit, https-redirect + HSTS aan |
 | `RTG_ENC_KEY` | Versleuteling-at-rest. 64 hex-tekens (`openssl rand -hex 32`). Zonder dit weigert de start, tenzij je bewust `RTG_ALLOW_PLAINTEXT=1` zet |
+| `DATABASE_URL` | PostgreSQL voor de gedeelde data (aanbevolen voor productie en meerdere instances). Leeg = lokaal bestand |
 | `APP_URL` | Correcte links in e-mails |
 | `REDIS_URL` | Nodig zodra je meer dan één instance draait (realtime over instances) |
 
@@ -55,10 +56,16 @@ Volledige lijst met uitleg: `.env.example`.
   met stack; optionele Sentry-koppeling via `SENTRY_DSN`.
 - **Fail-fast configuratie** — `server/config.js` stopt de start bij een
   onveilige productie-instelling.
-- **Data-duurzaamheid** — schrijven gaat atomisch (tmp + rename) én duurzaam
-  (`fsync` op bestand en map), plus dagelijkse back-ups met retentie en een
-  tweede-schijf-kopie (`RTG_BACKUP_DIR`). Herstelt automatisch uit de nieuwste
-  back-up als het hoofdbestand corrupt is.
+- **Opslag** — de gedeelde data draait op **PostgreSQL** (`DATABASE_URL`):
+  transacties, row-locks en `LISTEN/NOTIFY` voor live cross-instance-updates,
+  met dezelfde 3-weg-merge zodat gelijktijdige schrijvers elkaar niet
+  overschrijven. Een lokale snapshot dient als warme cache en fallback als
+  Postgres even wegvalt. Zonder `DATABASE_URL` valt de app terug op een lokaal
+  bestand (of `RTG_STORE=sqlite`).
+- **Data-duurzaamheid** — lokaal wegschrijven gaat atomisch (tmp + rename) én
+  duurzaam (`fsync` op bestand en map), plus dagelijkse back-ups met retentie en
+  een tweede-schijf-kopie (`RTG_BACKUP_DIR`). Herstelt automatisch uit de
+  nieuwste back-up als het hoofdbestand corrupt is.
 - **Betaal-naad** — `server/betaal.js`: idempotente betalingen (geen
   dubbele afschrijving bij herhaling) en webhook-verificatie met handtekening.
   Zonder Stripe-key draait de demo-provider.
@@ -72,6 +79,7 @@ Volledige lijst met uitleg: `.env.example`.
 ## 5. Go-live checklist
 
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
+- [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
 - [ ] TLS-termination (reverse proxy / load balancer) vóór de app; `trust proxy` staat aan
 - [ ] Redis draait en `REDIS_URL` is gezet (bij >1 instance)
 - [ ] `SENTRY_DSN` gezet en er komt een testfout binnen
@@ -92,10 +100,12 @@ Dit is het deel dat je niet in dit repo kunt afvinken:
    een derde geverifieerd. Doe dit vóór je echt geld en persoonsgegevens raakt.
 2. **Echte betaalcertificering.** De naad staat klaar, maar PCI-scope,
    terugboekingen, refunds, boekhouding en reconciliatie zijn nog werk.
-3. **Database onder last.** De JSON/SQLite-laag met eigen merge is knap, maar
-   niet bewezen voor grote volumes. Voor echte schaal: migreer de opslaglaag naar
-   PostgreSQL (de opslag zit al achter één interface, dus dit is te doen) en
-   draai load-tests.
+3. **Database onder last.** De opslag draait nu op PostgreSQL (transacties,
+   row-locks, LISTEN/NOTIFY, item-merge bij gelijktijdige schrijvers), en dat is
+   met tests bewezen voor correctheid en multi-writer. Wat nog rest: load-tests
+   op productievolume, afstemmen van pool/connlimits, en een read-replica-/
+   backup-strategie voor Postgres zelf. (De accounts-tabel draait nog op SQLite;
+   die kan als vervolgstap mee naar Postgres.)
 4. **Kinderen en moderatie (het zwaarst).** De RTFoundation richt zich op
    minderjarigen, met chat, snaps en (video)bellen. Dat vereist: echte moderatie
    (mensen + tooling, niet alleen block/report), leeftijdsverificatie, een DPIA,

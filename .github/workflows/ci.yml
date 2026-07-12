@@ -9,6 +9,18 @@ jobs:
   test:
     name: Tests, checks en build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rtgtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s
+          --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -18,8 +30,15 @@ jobs:
       - run: npm ci
       - name: Codeafspraken (check.js)
         run: npm run check
-      - name: Unit- en integratietests
+      # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
+      # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
+      - name: Unit- en integratietests (json-opslag)
         run: npm test
+      # De PostgreSQL-opslag apart, met DATABASE_URL alleen voor deze stap.
+      - name: PostgreSQL-integratietest
+        run: node --test test/pg.test.js
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)

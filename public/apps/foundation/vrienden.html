@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Contacten</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
+  .mijncn{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:1rem;font-size:.9rem;}
+  .mijncn b{color:var(--goud);}
+  .stories{display:flex;gap:.7rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .story{flex:0 0 auto;text-align:center;width:4.2rem;cursor:pointer;}
+  .story .ring{width:3.4rem;height:3.4rem;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--paneel2);border:2px solid var(--goud);}
+  .story.gezien .ring{border-color:var(--lijn);}
+  .story .nm{font-size:.65rem;color:var(--zacht);margin-top:.25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .zoekrij{display:flex;gap:.5rem;margin-bottom:.6rem;}
+  .zoekrij .veld{flex:1;}
+  .lijst{display:flex;flex-direction:column;gap:.5rem;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;}
+  .rij .av{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--paneel);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;}
+  .rij .nm{flex:1;min-width:0;font-weight:600;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;}
+  .rij .nm small{display:block;font-weight:400;color:var(--zacht);font-size:.72rem;}
+  .mini{padding:.3rem .6rem;font-size:.78rem;border-radius:999px;}
+  .sec{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--zacht);margin:1.2rem 0 .5rem;}
+  .leeg{color:var(--zacht);font-size:.85rem;padding:.4rem 0;}
+  .badge{background:var(--rood);color:#fff;border-radius:999px;font-size:.62rem;font-weight:700;padding:.05rem .4rem;margin-left:.3rem;}
+  /* overlays */
+  .ov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;}
+  .ov.open{display:flex;}
+  .ovkaart{background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:16px;width:min(100%,40rem);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
+  .ovkop{display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;border-bottom:1px solid var(--lijn);}
+  .ovkop b{flex:1;}
+  .ovx{background:none;border:none;color:var(--zacht);font-size:1.3rem;cursor:pointer;}
+  .msgs{flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;min-height:12rem;}
+  .bel{align-self:flex-start;max-width:82%;padding:.45rem .75rem;border-radius:12px;background:var(--paneel2);border:1px solid var(--lijn);white-space:pre-wrap;}
+  .bel.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
+  .invoer{display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--lijn);}
+  .invoer .veld{flex:1;}
+  .snapfull{max-width:100%;max-height:70vh;border-radius:10px;}
+  .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--goud);cursor:pointer;opacity:.75;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>👋 Contacten</h1>
+  <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam.</div>
+  <div class="mijncn" id="mijncn"></div>
+
+  <div class="stories" id="stories"></div>
+
+  <div class="sec">Vriend toevoegen</div>
+  <div class="zoekrij">
+    <input class="veld" id="zoek" placeholder="Zoek op codenaam (bijv. Gouden Vos)" maxlength="40">
+    <button class="knop" id="zoekBtn">Zoek</button>
+  </div>
+  <div class="lijst" id="zoekRes"></div>
+
+  <div id="teKeurenBlok" hidden>
+    <div class="sec">Goed te keuren (voor je kind)</div>
+    <div class="lijst" id="teKeuren"></div>
+  </div>
+
+  <div id="verzoekenBlok" hidden>
+    <div class="sec">Verzoeken voor jou</div>
+    <div class="lijst" id="verzoeken"></div>
+  </div>
+
+  <div class="sec">Mijn vrienden</div>
+  <div class="lijst" id="vrienden"><div class="leeg">Laden...</div></div>
+</div>
+
+<!-- chat -->
+<div class="ov" id="chatOv"><div class="ovkaart">
+  <div class="ovkop"><b id="chatWie"></b><button class="ovx" id="chatX">✕</button></div>
+  <div class="msgs" id="chatMsgs"></div>
+  <div class="invoer">
+    <button class="knop grijs" id="snapBtn" title="Stuur een snap">📷</button>
+    <input class="veld" id="chatIn" placeholder="Bericht...">
+    <button class="knop" id="chatSend">Stuur</button>
+  </div>
+</div></div>
+
+<!-- snap kijker -->
+<div class="ov" id="snapOv"><div class="ovkaart" style="background:#000;">
+  <div class="ovkop" style="border-color:#222;"><b id="snapVan"></b><button class="ovx" id="snapX">✕</button></div>
+  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="snapImg" alt=""><div id="snapTxt" style="color:#fff;margin-top:.6rem;"></div><div style="color:#888;font-size:.75rem;margin-top:.6rem;">Deze snap verdwijnt zodra je sluit.</div></div>
+</div></div>
+
+<!-- verhaal kijker -->
+<div class="ov" id="storyOv"><div class="ovkaart" style="background:#000;">
+  <div class="ovkop" style="border-color:#222;"><b id="storyVan"></b><button class="ovx" id="storyX">✕</button></div>
+  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="storyImg" alt=""><div id="storyTxt" style="color:#fff;margin-top:.6rem;"></div></div>
+</div></div>
+
+<input type="file" id="fotoIn" accept="image/*" style="display:none;">
+
+<script src="sessie.js"></script>
+<script src="/apps/translate.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function initcn(cn){ return String(cn||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+// social-endpoints lopen via /api/rtf/social met het gezin-token
+function soc(pad, body){
+  return fetch('/api/rtf/social'+pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })
+    .then(r => r.json().catch(()=>({})).then(d => { if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }));
+}
+
+let mij = { beheerder:false, kind:false, codenaam:'' };
+let mijnHandle = null;
+
+async function laad(){
+  let d; try{ d = await soc('/connections'); }catch(e){ $('#vrienden').innerHTML='<div class="leeg">Kon contacten niet laden.</div>'; return; }
+  mij = { beheerder:!!d.beheerder, kind:!!d.kind, codenaam:d.codename };
+  mijnHandle = d.me;
+  $('#mijncn').innerHTML = 'Jouw codenaam: <b>'+esc(d.codename)+'</b><br><span style="color:var(--zacht);font-size:.8rem;">Geef deze aan iemand die jou wil toevoegen.</span>';
+  // vrienden
+  const cs = d.connections||[];
+  $('#vrienden').innerHTML = cs.length ? cs.map(c=>
+    '<div class="rij"><span class="av">'+initcn(c.codename)+'</span><div class="nm">'+esc(c.codename)+(c.unread?'<span class="badge">'+c.unread+'</span>':'')+
+    '<small>'+(c.tier==='rtf'?'RTFoundation':'RTG')+(c.last?' · '+esc(c.last):'')+'</small></div>'+
+    '<button class="knop mini" data-chat="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'">Chat</button>'+
+    '<button class="knop grijs mini" data-snap="'+esc(c.key)+'" data-cn="'+esc(c.codename)+'">📷</button></div>'
+  ).join('') : '<div class="leeg">Nog geen vrienden. Zoek hierboven op codenaam.</div>';
+  $('#vrienden').querySelectorAll('[data-chat]').forEach(b=> b.addEventListener('click', ()=> openChat(b.dataset.chat, b.dataset.cn)));
+  $('#vrienden').querySelectorAll('[data-snap]').forEach(b=> b.addEventListener('click', ()=> kiesSnap(b.dataset.snap, b.dataset.cn)));
+  // verzoeken (niet voor kinderen)
+  const reqs = d.requests||[];
+  $('#verzoekenBlok').hidden = !reqs.length;
+  $('#verzoeken').innerHTML = reqs.map(r=>
+    '<div class="rij"><span class="av">'+initcn(r.codename)+'</span><div class="nm">'+esc(r.codename)+'<small>wil je vriend zijn</small></div>'+
+    '<button class="knop mini" data-ja="'+esc(r.key)+'">Accepteer</button><button class="knop grijs mini" data-nee="'+esc(r.key)+'">✕</button></div>'
+  ).join('');
+  $('#verzoeken').querySelectorAll('[data-ja]').forEach(b=> b.addEventListener('click', async()=>{ try{ await soc('/respond',{key:b.dataset.ja,action:'accept'}); laad(); }catch(e){ alert(e.message); } }));
+  $('#verzoeken').querySelectorAll('[data-nee]').forEach(b=> b.addEventListener('click', async()=>{ try{ await soc('/respond',{key:b.dataset.nee,action:'decline'}); laad(); }catch(e){ alert(e.message); } }));
+  // te keuren (beheerder)
+  const tk = d.teKeuren||[];
+  $('#teKeurenBlok').hidden = !(mij.beheerder && tk.length);
+  $('#teKeuren').innerHTML = tk.map(t=>
+    '<div class="rij"><span class="av">'+initcn(t.ander)+'</span><div class="nm">'+esc(t.ander)+'<small>wil bevriend zijn met '+esc(t.kind)+' ('+(t.richting==='uit'?'jouw kind vroeg dit':'verzoek aan jouw kind')+')</small></div>'+
+    '<button class="knop mini" data-goja="'+esc(t.kindHandle)+'|'+esc(t.anderKey)+'">Goedkeuren</button><button class="knop grijs mini" data-gonee="'+esc(t.kindHandle)+'|'+esc(t.anderKey)+'">Weiger</button></div>'
+  ).join('');
+  $('#teKeuren').querySelectorAll('[data-goja]').forEach(b=> b.addEventListener('click', ()=> keur(b.dataset.goja, true)));
+  $('#teKeuren').querySelectorAll('[data-gonee]').forEach(b=> b.addEventListener('click', ()=> keur(b.dataset.gonee, false)));
+  laadStories(); laadSnaps();
+}
+async function keur(pair, akkoord){
+  const [kindHandle, anderKey] = pair.split('|');
+  try{ await soc('/goedkeuren', { kindHandle, anderKey, akkoord }); laad(); }catch(e){ alert(e.message); }
+}
+
+// ---- zoeken ----
+async function zoek(){
+  const q = $('#zoek').value.trim(); if(q.length<2){ return; }
+  let d; try{ d = await soc('/find', { q }); }catch(e){ return; }
+  $('#zoekRes').innerHTML = (d.results||[]).map(r=>{
+    const knop = r.status==='verbonden' ? '<span style="color:var(--groen,#7ecb8f);font-size:.78rem;">✓ vriend</span>'
+      : r.status==='aangevraagd' ? '<span style="color:var(--zacht);font-size:.78rem;">aangevraagd</span>'
+      : r.status==='wacht-op-ouder' ? '<span style="color:var(--zacht);font-size:.78rem;">wacht op ouder</span>'
+      : r.status==='wacht-op-u' ? '<button class="knop mini" data-ja="'+esc(r.key)+'">Accepteer</button>'
+      : '<button class="knop mini" data-vz="'+esc(r.key)+'">Verzoek</button>';
+    return '<div class="rij"><span class="av">'+initcn(r.codename)+'</span><div class="nm">'+esc(r.codename)+'<small>'+(r.tier==='rtf'?'RTFoundation':'RTG')+'</small></div>'+knop+'</div>';
+  }).join('') || '<div class="leeg">Geen codenaam gevonden. Let op hoofdletters en spatie.</div>';
+  $('#zoekRes').querySelectorAll('[data-vz]').forEach(b=> b.addEventListener('click', async()=>{ try{ const r=await soc('/connect',{key:b.dataset.vz}); alert(r.status==='wacht-op-ouder'?'Verzoek verstuurd. Een ouder moet het nog goedkeuren.':'Verzoek verstuurd.'); zoek(); laad(); }catch(e){ alert(e.message); } }));
+  $('#zoekRes').querySelectorAll('[data-ja]').forEach(b=> b.addEventListener('click', async()=>{ try{ await soc('/respond',{key:b.dataset.ja,action:'accept'}); zoek(); laad(); }catch(e){ alert(e.message); } }));
+}
+$('#zoekBtn').addEventListener('click', zoek);
+$('#zoek').addEventListener('keydown', e=>{ if(e.key==='Enter') zoek(); });
+
+// ---- chat ----
+let chatMet=null, chatCn='';
+function chatBel(m){
+  const ik = m.from === mijnHandle;
+  const div = document.createElement('div'); div.className='bel'+(ik?' ik':'');
+  if (ik || !window.Vertaal) div.textContent = m.text;
+  else Vertaal.vul(div, m.text, 'nl');
+  return div;
+}
+async function openChat(key, cn){
+  chatMet=key; chatCn=cn; $('#chatWie').textContent=cn; $('#chatOv').classList.add('open');
+  await laadChat();
+}
+async function laadChat(){
+  let d; try{ d = await soc('/dm', { withKey: chatMet }); }catch(e){ return; }
+  const box=$('#chatMsgs'); box.innerHTML='';
+  (d.messages||[]).forEach(m=> box.appendChild(chatBel(m)));
+  box.scrollTop=box.scrollHeight;
+}
+$('#chatX').addEventListener('click', ()=> $('#chatOv').classList.remove('open'));
+$('#chatSend').addEventListener('click', chatStuur);
+$('#chatIn').addEventListener('keydown', e=>{ if(e.key==='Enter') chatStuur(); });
+async function chatStuur(){
+  const t=$('#chatIn').value.trim(); if(!t||!chatMet) return; $('#chatIn').value='';
+  try{ const d=await soc('/dm/send',{ toKey:chatMet, text:t }); const box=$('#chatMsgs'); box.innerHTML=''; (d.messages||[]).forEach(m=> box.appendChild(chatBel(m))); box.scrollTop=box.scrollHeight; }
+  catch(e){ alert(e.message); }
+}
+$('#snapBtn').addEventListener('click', ()=> kiesSnap(chatMet, chatCn));
+
+// ---- snaps versturen ----
+let snapNaar=null, storyMode=false;
+function kiesSnap(key, cn){ snapNaar=key; storyMode=false; $('#fotoIn').click(); }
+function kiesStory(){ storyMode=true; snapNaar=null; $('#fotoIn').click(); }
+$('#fotoIn').addEventListener('change', async e=>{
+  const file = e.target.files[0]; e.target.value=''; if(!file) return;
+  const foto = await verklein(file); if(!foto){ alert('Kon de foto niet lezen.'); return; }
+  const tekst = prompt('Tekst bij je '+(storyMode?'verhaal':'snap')+' (mag leeg):','') || '';
+  try{
+    if (storyMode){ await soc('/story/post', { foto, tekst }); alert('Je verhaal staat er 24 uur op.'); laadStories(); }
+    else { await soc('/snap/send', { toKey: snapNaar, foto, tekst }); alert('Snap verstuurd. Hij verdwijnt zodra je vriend hem bekijkt.'); }
+  }catch(err){ alert(err.message); }
+});
+// foto verkleinen naar ~kleine jpeg zodat hij klein blijft
+function verklein(file){
+  return new Promise(res=>{
+    const img=new Image(); const rd=new FileReader();
+    rd.onload=()=>{ img.onload=()=>{ const max=1000; let {width:w,height:h}=img; if(w>max||h>max){ const r=Math.min(max/w,max/h); w=Math.round(w*r); h=Math.round(h*r);} const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h); res(cv.toDataURL('image/jpeg',0.7)); }; img.onerror=()=>res(null); img.src=rd.result; };
+    rd.onerror=()=>res(null); rd.readAsDataURL(file);
+  });
+}
+
+// ---- snaps ontvangen ----
+async function laadSnaps(){
+  let d; try{ d = await soc('/snaps'); }catch(e){ return; }
+  // toon binnengekomen snaps bovenaan de vriendenlijst als knoppen
+  const snaps = d.snaps||[];
+  if (!snaps.length) return;
+  const el = document.createElement('div'); el.className='lijst'; el.style.marginBottom='.6rem';
+  el.innerHTML = '<div class="sec" style="margin-top:0;">Nieuwe snaps</div>' + snaps.map(sn=>
+    '<div class="rij"><span class="av">📷</span><div class="nm">'+esc(sn.van)+'<small>stuurde je een snap</small></div><button class="knop mini" data-opensnap="'+esc(sn.id)+'">Bekijk</button></div>'
+  ).join('');
+  $('#vrienden').parentNode.insertBefore(el, $('#vrienden').previousElementSibling);
+  el.querySelectorAll('[data-opensnap]').forEach(b=> b.addEventListener('click', ()=> openSnap(b.dataset.opensnap)));
+}
+async function openSnap(id){
+  let d; try{ d = await soc('/snap/view', { id }); }catch(e){ alert(e.message); return; }
+  $('#snapVan').textContent = 'Snap van '+d.van; $('#snapImg').src = d.foto; $('#snapTxt').textContent = d.tekst||'';
+  $('#snapOv').classList.add('open');
+}
+$('#snapX').addEventListener('click', ()=>{ $('#snapOv').classList.remove('open'); $('#snapImg').src=''; laad(); });
+
+// ---- verhalen ----
+async function laadStories(){
+  let d; try{ d = await soc('/stories'); }catch(e){ return; }
+  const st = d.stories||[];
+  let html = '<div class="story" id="storyPlus"><div class="ring">＋</div><div class="nm">Jouw verhaal</div></div>';
+  html += st.map(v=> '<div class="story'+(v.gezien?' gezien':'')+'" data-story="'+esc(v.id)+'"><div class="ring">'+initcn(v.van)+'</div><div class="nm">'+esc(v.vanMij?'Jij':v.van)+'</div></div>').join('');
+  $('#stories').innerHTML = html;
+  $('#storyPlus').addEventListener('click', kiesStory);
+  $('#stories').querySelectorAll('[data-story]').forEach(b=> b.addEventListener('click', ()=> openStory(b.dataset.story)));
+}
+async function openStory(id){
+  let d; try{ d = await soc('/story/view', { id }); }catch(e){ alert(e.message); return; }
+  $('#storyVan').textContent = 'Verhaal van '+d.van; $('#storyImg').src = d.foto; $('#storyTxt').textContent = d.tekst||'';
+  $('#storyOv').classList.add('open');
+}
+$('#storyX').addEventListener('click', ()=>{ $('#storyOv').classList.remove('open'); $('#storyImg').src=''; laadStories(); });
+
+laad();
+setInterval(()=>{ if(!document.querySelector('.ov.open')) laad(); }, 12000);
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

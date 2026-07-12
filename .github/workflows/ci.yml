@@ -34,9 +34,11 @@ jobs:
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       - name: Unit- en integratietests (json-opslag)
         run: npm test
-      # De PostgreSQL-opslag én -accounts apart, met DATABASE_URL alleen voor deze stap.
-      - name: PostgreSQL-integratietests (opslag + accounts)
-        run: node --test test/pg.test.js test/pgaccounts.test.js
+      # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
+      # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
+      # kv-tabel en zouden elkaar bij parallel draaien resetten.
+      - name: PostgreSQL-integratietests (opslag + accounts + chaos)
+        run: node --test --test-concurrency=1 test/pg.test.js test/pgaccounts.test.js test/chaos.pg.test.js
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef

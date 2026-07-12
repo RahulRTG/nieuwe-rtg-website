@@ -71,6 +71,12 @@ function maakPg({ merge3, kluis, log, url }) {
       const client = await pool.connect();
       try {
         await client.query('BEGIN');
+        // Transactie-brede advisory lock per collectie. Cruciaal: bij de ALLEREERSTE
+        // schrijf bestaat de rij nog niet, en dan zou "SELECT ... FOR UPDATE" niets
+        // vergrendelen -- twee gelijktijdige schrijvers zouden dan allebei "geen rij"
+        // zien, de merge overslaan en elkaars insert overschrijven (verloren update).
+        // De advisory lock serialiseert schrijvers naar dezelfde collectie, rij of niet.
+        await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
         const huidig = await client.query('SELECT val, ver FROM kv WHERE key = $1 FOR UPDATE', [k]);
         let j = jOns;
         if (huidig.rows.length && Number(huidig.rows[0].ver) > (toegepast.get(k) || 0)) {

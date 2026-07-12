@@ -106,6 +106,33 @@ app.use('/api/foundation', rtf.router);
 // een gezinsmelding voor een gekoppelde oppas/familie ook als telefoonmelding (web-push)
 rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch (e) {} });
 
+/* Strengere CSP voor de app-pagina's: geen 'unsafe-inline' voor scripts, maar
+   een per-antwoord nonce. We lezen het .html-bestand, geven elke <script> die
+   nonce mee en zetten de CSP navenant. De apps gebruiken addEventListener (geen
+   inline on-handlers), dus dit werkt zonder ze om te bouwen en sluit de deur
+   voor ingespoten scripts. Uit te zetten met RTG_CSP_NONCE=0. Losse statische
+   pagina's (bijv. 404) vallen terug op de gewone CSP hierboven. */
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
+app.use((req, res, next) => {
+  if (!CSP_NONCE || req.method !== 'GET') return next();
+  let rel = req.path;
+  if (rel.endsWith('/')) rel += 'index.html';
+  if (!rel.endsWith('.html')) return next();
+  const bestand = path.join(PUBLIC_DIR, rel);
+  if (!bestand.startsWith(PUBLIC_DIR + path.sep)) return next(); // geen path traversal
+  fs.readFile(bestand, 'utf8', (err, html) => {
+    if (err) return next(); // bestaat niet: laat de statische laag/404 het doen
+    const nonce = crypto.randomBytes(16).toString('base64');
+    html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
+    res.set('Content-Security-Policy',
+      "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+      "font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
+      "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
+    res.type('html').send(html);
+  });
+});
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 /* ---------- Claude API (optioneel) ---------- */

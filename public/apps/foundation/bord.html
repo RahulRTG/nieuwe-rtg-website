@@ -109,7 +109,7 @@
 <dialog id="dlgSchrift"><div class="kaart modal">
   <div style="display:flex;align-items:center;margin-bottom:.6rem;">
     <h3 id="svNaam" style="font-size:1.1rem;">Schrift</h3>
-    <button class="knop grijs klein" style="margin-left:auto;" onclick="document.getElementById('dlgSchrift').close()">Sluiten</button>
+    <button class="knop grijs klein" style="margin-left:auto;" data-sluit="dlgSchrift">Sluiten</button>
   </div>
   <div id="svBody"></div>
 </div></dialog>
@@ -119,6 +119,8 @@
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// sluit-knoppen zonder inline handler (past bij een strengere CSP)
+document.querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', () => { const d = document.getElementById(b.dataset.sluit); if (d && d.close) d.close(); }));
 const q = new URLSearchParams(location.search);
 let CODE = (q.get('code')||'').toUpperCase(), TOKEN = q.get('t')||'';
 if(!CODE || !TOKEN){ try{ const d=JSON.parse(localStorage.getItem('rtf_docent')||'null'); if(d){CODE=d.code;TOKEN=d.token;} }catch(e){} }

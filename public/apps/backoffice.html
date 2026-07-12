@@ -204,7 +204,7 @@
   </div>
   <div class="doc-scrim" id="docScrim"><img id="docImg" alt="Document"></div>
   <div class="doc-scrim conv-scrim" id="convScrim">
-    <div class="conv-card" onclick="event.stopPropagation()">
+    <div class="conv-card" data-stop>
       <div class="conv-head"><b id="convWho"></b><button id="convClose" class="vbtn">✕</button></div>
       <div class="conv-body" id="convBody"></div>
       <form class="conv-reply" id="convReply">
@@ -219,6 +219,8 @@
 (function(){
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
+  // klik binnen de kaart niet naar de achtergrond laten lekken (zonder inline handler)
+  document.querySelectorAll('[data-stop]').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
   // Escapet tekst die als HTML-inhoud in het scherm belandt (namen, plaatsen,
   // diensten, sollicitaties), zodat door leden/partners ingevoerde tekst nooit

@@ -1144,7 +1144,8 @@ router.post('/gezin/sollicitaties', (req, res) => {
     const apps = (db.data.applications && db.data.applications[x.supplierCode]) || [];
     const a = apps.find(y => y.id === x.appId);
     if (a) status = a.status; else if (x.appId) status = 'onbekend';
-    return { bedrijf: x.bedrijf, func: x.func, land: x.land || null, landNaam: x.landNaam || null, at: x.at, status };
+    const chat = (db.data.applyChats && db.data.applyChats[x.appId]) ? x.appId : null;
+    return { bedrijf: x.bedrijf, func: x.func, land: x.land || null, landNaam: x.landNaam || null, at: x.at, status, chatId: chat };
   });
   res.json({ sollicitaties: lijst });
 });

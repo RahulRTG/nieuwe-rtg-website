@@ -708,6 +708,51 @@
 
   let toastTimer;
   function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3000); }
+
+  // ---- sollicitatiechat: samen met de kandidaat een afspraak maken ----
+  let apChatId = null, apChatTimer = null;
+  function escT(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function ensureApChatEl(){
+    let ov = document.getElementById('apchat'); if (ov) return ov;
+    ov = document.createElement('div'); ov.id='apchat';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;';
+    ov.innerHTML='<div style="background:var(--bg,#12100f);border:1px solid var(--line,#2a2622);border-radius:16px 16px 0 0;width:min(100%,34rem);max-height:80vh;display:flex;flex-direction:column;">'+
+      '<div style="display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;border-bottom:1px solid var(--line,#2a2622);"><b id="apchatWie" style="flex:1;"></b><button id="apchatX" style="background:none;border:none;color:var(--soft,#9a938c);font-size:1.2rem;cursor:pointer;">✕</button></div>'+
+      '<div id="apchatMsgs" style="flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>'+
+      '<div style="display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--line,#2a2622);"><input id="apchatIn" placeholder="'+T('ap.chat.ph','Bericht (bijv. Kun je donderdag om 15u?)')+'" style="flex:1;background:var(--card2,#1b1817);border:1px solid var(--line,#2a2622);border-radius:12px;padding:.55rem .8rem;color:var(--txt,#fff);"><button id="apchatSend" class="obtn primary">'+T('ap.chat.send','Stuur')+'</button></div>'+
+      '</div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#apchatX').addEventListener('click', closeApChat);
+    ov.addEventListener('click', e=>{ if(e.target===ov) closeApChat(); });
+    ov.querySelector('#apchatSend').addEventListener('click', sendApChat);
+    ov.querySelector('#apchatIn').addEventListener('keydown', e=>{ if(e.key==='Enter') sendApChat(); });
+    return ov;
+  }
+  function apMsgHtml(m){
+    const mij = m.van==='werkgever';
+    const inner = mij ? escT(m.tekst) : '<span class="xlate">'+escT(m.tekst)+'</span>';
+    return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:80%;padding:.45rem .75rem;border-radius:12px;'+(mij?'background:var(--gold,#C9A24B);color:#1a1710;':'background:var(--card2,#1b1817);border:1px solid var(--line,#2a2622);')+'white-space:pre-wrap;">'+inner+'</div>';
+  }
+  function apVertaal(root){ if(!root||!window.Vertaal) return; const to=(window.RTGi18n?RTGi18n.lang:'nl'); root.querySelectorAll('.xlate:not([data-vt])').forEach(el=>{ el.setAttribute('data-vt','1'); Vertaal.vul(el, el.textContent, to); }); }
+  async function laadApChat(){
+    if (!apChatId) return;
+    try { const d = await API.call('/supplier/apply/chat', { id: apChatId });
+      const box = document.getElementById('apchatMsgs'); if(!box) return;
+      box.innerHTML = (d.chat.berichten||[]).map(apMsgHtml).join('') || '<div style="color:var(--soft,#9a938c);text-align:center;margin:auto;font-size:.85rem;">'+T('ap.chat.leeg','Nog geen berichten. Stel een afspraak voor.')+'</div>';
+      apVertaal(box); box.scrollTop = box.scrollHeight;
+    } catch(e){}
+  }
+  function openApChat(id, wie){
+    apChatId = id; const ov = ensureApChatEl();
+    ov.querySelector('#apchatWie').textContent = (wie||T('ap.chat.title','Chat met kandidaat'));
+    ov.style.display='flex'; laadApChat();
+    clearInterval(apChatTimer); apChatTimer = setInterval(laadApChat, 4000);
+  }
+  function closeApChat(){ apChatId=null; clearInterval(apChatTimer); const ov=document.getElementById('apchat'); if(ov) ov.style.display='none'; }
+  async function sendApChat(){
+    const inp = document.getElementById('apchatIn'); const t=(inp.value||'').trim(); if(!t||!apChatId) return; inp.value='';
+    try { await API.call('/supplier/apply/chat/send', { id: apChatId, text: t }); laadApChat(); } catch(e){ toast(e.message); }
+  }
   function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const ago=T('t.ago',' geleden'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min')+ago; const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur')+ago; return Math.round(h/24)+T('t.days',' dag(en)')+ago; }
   function has(cap){ return S && S.caps && S.caps.includes(cap); }
 
@@ -3240,11 +3285,16 @@
       '<div class="tk-row" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+
       (x.viaRTG?' <i style="font-style:normal;font-size:0.58rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</i>':'')+
       '</b><span>'+x.contact+(x.note?' · "'+x.note.slice(0,60)+'"':'')+' · '+timeAgo(x.at)+'</span></div>'+
-      (a.manager ? '<button class="obtn primary" data-aphire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-apno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button>' : '')+
+      (a.manager ? '<button class="obtn" data-apinvite="'+x.id+'">'+T('ap.invite','Uitnodigen')+'</button><button class="obtn primary" data-aphire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-apno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button>' : '')+
       apCv(x)+
       '</div>'
     ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.5rem 0;">'+T('ap.none','Geen open sollicitaties. Kandidaten solliciteren via het startscherm van deze app, RTG-leden via de leden-app met hun cv.')+'</div>';
-    html += decided.map(x => '<div class="tk-row done"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+x.status+'</span></div></div>').join('');
+    html += decided.map(x => {
+      const kanChat = x.status === 'uitgenodigd' || x.status === 'aangenomen';
+      const stLabel = x.status === 'uitgenodigd' ? T('ap.st.invited','uitgenodigd') : x.status === 'aangenomen' ? T('ap.st.hired','aangenomen') : T('ap.st.rejected','afgewezen');
+      return '<div class="tk-row done" style="flex-wrap:wrap;"><div class="tk-t"><b>'+x.name+' · '+x.func+'</b><span>'+stLabel+'</span></div>'+
+        (kanChat && a.manager ? '<button class="obtn primary" data-apchat="'+x.id+'" data-apname="'+encodeURIComponent(x.name)+'">💬 '+T('ap.chat','Chat')+'</button>' : '')+'</div>';
+    }).join('');
     html += '</div>';
 
     // activiteit
@@ -3287,6 +3337,12 @@
     document.querySelectorAll('[data-apno]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/apply/decide', { id: b.dataset.apno, action: 'afwijzen' }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
     }));
+    document.querySelectorAll('[data-apinvite]').forEach(b => b.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/apply/decide', { id: b.dataset.apinvite, action: 'uitnodigen' });
+        toast('💬 '+T('ap.invited','Uitgenodigd. Maak samen een afspraak in de chat.'));
+        await refresh(); openTab('team'); openApChat(b.dataset.apinvite, d.chat && d.chat.metWie); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-apchat]').forEach(b => b.addEventListener('click', () => openApChat(b.dataset.apchat, decodeURIComponent(b.dataset.apname||''))));
     const vacAdd = $('#vacAdd'); if (vacAdd) vacAdd.addEventListener('click', async () => {
       const func = $('#vacFunc').value.trim();
       if (!func) { toast(T('vac.needfunc','Geef de functie een naam.')); return; }
@@ -3576,6 +3632,9 @@ window.I18N = { en: {
   'vac.func':'Position (e.g. dishwasher)', 'vac.plaats':'Location', 'vac.uren':'Hours (e.g. 8-16h/week)', 'vac.oms':'Short description',
   'vac.plaatsbtn':'Post vacancy', 'vac.needfunc':'Give the position a name.', 'vac.geplaatst':'Vacancy posted and visible in RTFoundation.',
   'vac.soort.bijbaan':'Side job', 'vac.soort.vakantiewerk':'Holiday work', 'vac.soort.parttime':'Part-time', 'vac.soort.fulltime':'Full-time', 'vac.soort.stage':'Internship', 'vac.soort.vrijwilliger':'Volunteer',
+  'ap.invite':'Invite', 'ap.invited':'Invited. Arrange a meeting together in the chat.', 'ap.chat':'Chat',
+  'ap.st.invited':'invited', 'ap.st.hired':'hired', 'ap.st.rejected':'rejected',
+  'ap.chat.ph':'Message (e.g. Can you come Thursday at 3pm?)', 'ap.chat.send':'Send', 'ap.chat.leeg':'No messages yet. Suggest a time.', 'ap.chat.title':'Chat with candidate',
   'st.h':'Workstations', 'st.keuken':'Kitchen display', 'st.keuken.s':'Order tickets, bump buttons, allergies writ large',
   'st.bar':'Bar display', 'st.bar.s':'Mark drinks ready, pickup codes writ large',
   'st.bediening':'Service station', 'st.bediening.s':'Serving, tables and the PDA in one place',
@@ -3762,6 +3821,7 @@ window.I18N = { en: {
   'team.fillname':'Enter a name.', 'team.added':'Added. PIN: ', 'team.removed':'Removed from the team.'
 } };
 </script>
+<script src="/apps/translate.js"></script>
 <script src="/shared/i18n.js"></script>
 </body>
 </html>

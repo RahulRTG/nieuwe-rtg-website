@@ -554,3 +554,40 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   const lijst2 = await json(await raw('/rtf/vacatures', { leeftijd: 20 }));
   assert.ok(!lijst2.vacatures.find(v => v.id === vacId));
 });
+
+test('sollicitatiechat: na uitnodigen praten sollicitant en werkgever samen', async () => {
+  const login = await json(await raw('/supplier/login', { username: 'rahul', password: 'Imran' }));
+  const supCode = login.state.supplier.code;
+  const vac = await json(await raw('/supplier/vacature', { func: 'Bezorger', soort: 'bijbaan', minLeeftijd: 16 }, login.token));
+  const vacId = vac.vacatures[0].id;
+
+  // RTG-lid met cv solliciteert op de vacature
+  const now = Date.now();
+  const reg = await json(await raw('/auth/register', { name: 'Lid Chat', email: 'c' + now + '@v.test', phone: '0612345678', password: 'geheim123', geboortedatum: '2000-01-01', tier: 'rtg' }));
+  const tok = reg.token;
+  await raw('/cv/save', { name: 'Lid Chat', contact: 'c' + now + '@v.test', skills: 'netjes', experience: 'vrijwilliger' }, tok);
+  assert.equal((await raw('/member/apply', { supplierCode: supCode, vacatureId: vacId }, tok)).status, 200);
+
+  // werkgever vindt de sollicitatie en nodigt uit voor een gesprek
+  const st = await json(await raw('/supplier/state', {}, login.token));
+  const app = st.state.applications.find(a => a.name === 'Lid Chat');
+  assert.ok(app);
+  const uit = await json(await raw('/supplier/apply/decide', { id: app.id, action: 'uitnodigen' }, login.token));
+  assert.ok(uit.chat && uit.chat.berichten.length >= 1, 'chat opent met een eerste bericht van de werkgever');
+
+  // het lid ziet de chat en het openingsbericht, en antwoordt
+  const chats = await json(await raw('/member/apply/chats', {}, tok));
+  assert.ok(chats.chats.some(c => c.id === app.id), 'de sollicitant ziet de chat');
+  const gelezen = await json(await raw('/member/apply/chat', { id: app.id }, tok));
+  assert.ok(gelezen.chat.berichten.some(m => m.van === 'werkgever'), 'openingsbericht van de werkgever');
+  const antwoord = await json(await raw('/member/apply/chat/send', { id: app.id, text: 'Ik kan morgen om 15u langskomen.' }, tok));
+  assert.ok(antwoord.chat.berichten.some(m => m.van === 'sollicitant' && /15u/.test(m.tekst)), 'het antwoord van de sollicitant staat erin');
+
+  // de werkgever ziet het antwoord
+  const wz = await json(await raw('/supplier/apply/chat', { id: app.id }, login.token));
+  assert.ok(wz.chat.berichten.some(m => m.van === 'sollicitant' && /15u/.test(m.tekst)));
+
+  // een ander lid kan deze chat niet lezen
+  const reg2 = await json(await raw('/auth/register', { name: 'Vreemde', email: 'v' + now + '@v.test', phone: '0612345679', password: 'geheim123', geboortedatum: '2000-01-01', tier: 'rtg' }));
+  assert.equal((await raw('/member/apply/chat', { id: app.id }, reg2.token)).status, 404, 'geen toegang tot andermans chat');
+});

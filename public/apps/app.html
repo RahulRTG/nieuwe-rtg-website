@@ -1653,7 +1653,7 @@
     else if (scope === 'orders'){ renderTerPlaatse(); }
     else if (scope === 'live'){ renderLive(); }
     else if (scope === 'gchat'){ if (pchat) loadPChat(); }
-    else if (scope === 'apply'){ renderCvCard(); }
+    else if (scope === 'apply'){ renderCvCard(); if (apChatId) laadApplyChat(); }
     else if (scope === 'chat'){ if (user.account) renderChat(); }
     else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
   }
@@ -2254,14 +2254,17 @@
         ? '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">✓ '+T('cv.card.ready','Uw cv staat klaar. Solliciteer bij elke RTG-partner in een tik, via Ter plaatse.')+'</div>'
         : '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('cv.card.build','Maak eenmalig uw cv met de cv-builder en solliciteer daarna bij elke RTG-partner op dezelfde manier.')+'</div>')+
       (myApps.length ? '<div style="margin-top:0.9rem;display:flex;flex-direction:column;gap:0.45rem;">'+myApps.map(a => {
-        const kleur = a.status==='aangenomen' ? '#4CAF7D' : a.status==='afgewezen' ? 'var(--burgundy)' : 'var(--gold)';
-        const label = a.status==='aangenomen' ? T('cv.st.hired','aangenomen') : a.status==='afgewezen' ? T('cv.st.rejected','afgewezen') : T('cv.st.new','in behandeling');
+        const kleur = a.status==='aangenomen' ? '#4CAF7D' : a.status==='afgewezen' ? 'var(--burgundy)' : a.status==='uitgenodigd' ? '#4CAF7D' : 'var(--gold)';
+        const label = a.status==='aangenomen' ? T('cv.st.hired','aangenomen') : a.status==='afgewezen' ? T('cv.st.rejected','afgewezen') : a.status==='uitgenodigd' ? T('cv.st.invited','uitgenodigd') : T('cv.st.new','in behandeling');
         return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;font-size:0.78rem;color:var(--muted);">'+
           '<span>'+a.company+' · '+a.func+'</span>'+
-          '<span style="flex-shrink:0;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:'+kleur+';border:1px solid '+kleur+';border-radius:999px;padding:0.15rem 0.55rem;">'+label+'</span></div>';
+          '<span style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">'+
+          (a.chatId ? '<button class="chatb" style="width:auto;padding:0.2rem 0.55rem;font-size:0.7rem;" data-apchat="'+a.chatId+'" data-apco="'+encodeURIComponent(a.company)+'">💬 '+T('cv.chat','Chat')+'</button>' : '')+
+          '<span style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:'+kleur+';border:1px solid '+kleur+';border-radius:999px;padding:0.15rem 0.55rem;">'+label+'</span></span></div>';
       }).join('')+'</div>' : '')+
       '<button class="vbtn" style="margin-top:0.8rem;" id="cvOpen">'+(myCvReady?T('cv.card.edit','Bewerk mijn cv'):T('cv.card.make','Maak mijn cv'))+'</button>';
     $('#cvOpen').addEventListener('click', openCvSheet);
+    el.querySelectorAll('[data-apchat]').forEach(b => b.addEventListener('click', () => openApplyChat(b.dataset.apchat, decodeURIComponent(b.dataset.apco||''))));
   }
   function openCvSheet(){
     const c = myCv || {};
@@ -2361,6 +2364,51 @@
       toast(e.message);
       if (/cv/i.test(e.message)) openCvSheet();
     }
+  }
+
+  /* ---------- chat met de werkgever (na uitnodigen/aannemen) ----------
+     De sollicitant en de werkgever maken hier samen een afspraak om langs te
+     komen. Berichten worden automatisch naar de gekozen taal vertaald. */
+  let apChatId = null, apChatTimer = null;
+  function apMsgHtml(m){
+    const mij = m.van === 'sollicitant';
+    const inner = mij ? escT(m.tekst) : '<span class="xlate">' + escT(m.tekst) + '</span>';
+    return '<div class="dm-m' + (mij ? ' mine' : '') + '">' + inner + '</div>';
+  }
+  function ensureApChatEl(){
+    let ov = document.getElementById('apchat'); if (ov) return ov;
+    ov = document.createElement('div'); ov.id='apchat';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;';
+    ov.innerHTML='<div style="background:var(--bg,#0C0C0B);border:1px solid var(--line);border-radius:16px 16px 0 0;width:min(100%,34rem);height:78vh;display:flex;flex-direction:column;">'+
+      '<div style="display:flex;align-items:center;gap:.6rem;padding:.9rem 1rem;border-bottom:1px solid var(--line);"><b id="apchatWie" style="flex:1;"></b><button id="apchatX" style="background:none;border:none;color:var(--soft);font-size:1.3rem;">✕</button></div>'+
+      '<div id="apchatMsgs" class="dm-body" style="flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>'+
+      '<div style="display:flex;gap:.5rem;padding:.8rem 1rem;border-top:1px solid var(--line);"><input id="apchatIn" placeholder="'+T('cv.chat.ph','Bericht (bijv. Kan ik donderdag om 15u langskomen?)')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.6rem .85rem;color:var(--txt,#fff);"><button id="apchatSend" class="vbtn" style="width:auto;padding:.5rem 1rem;">'+T('cv.chat.send','Stuur')+'</button></div>'+
+      '</div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#apchatX').addEventListener('click', closeApplyChat);
+    ov.addEventListener('click', e=>{ if(e.target===ov) closeApplyChat(); });
+    ov.querySelector('#apchatSend').addEventListener('click', sendApplyChat);
+    ov.querySelector('#apchatIn').addEventListener('keydown', e=>{ if(e.key==='Enter') sendApplyChat(); });
+    return ov;
+  }
+  async function laadApplyChat(){
+    if (!apChatId) return;
+    try { const d = await API.call('/member/apply/chat', { id: apChatId });
+      const box = document.getElementById('apchatMsgs'); if(!box) return;
+      box.innerHTML = (d.chat.berichten||[]).map(apMsgHtml).join('') || '<div style="color:var(--soft);text-align:center;margin:auto;font-size:0.82rem;">'+T('cv.chat.leeg','Nog geen berichten. Stel een moment voor om langs te komen.')+'</div>';
+      vertaalBubbels(box); box.scrollTop = box.scrollHeight;
+    } catch(e){}
+  }
+  function openApplyChat(id, bedrijf){
+    apChatId = id; const ov = ensureApChatEl();
+    ov.querySelector('#apchatWie').textContent = bedrijf || T('cv.chat.title','Chat met de werkgever');
+    ov.style.display='flex'; laadApplyChat();
+    clearInterval(apChatTimer); apChatTimer = setInterval(laadApplyChat, 4000);
+  }
+  function closeApplyChat(){ apChatId=null; clearInterval(apChatTimer); const ov=document.getElementById('apchat'); if(ov) ov.style.display='none'; }
+  async function sendApplyChat(){
+    const inp = document.getElementById('apchatIn'); const t=(inp.value||'').trim(); if(!t||!apChatId) return; inp.value='';
+    try { await API.call('/member/apply/chat/send', { id: apChatId, text: t }); laadApplyChat(); } catch(e){ toast(e.message); }
   }
 
   /* ---------- gastchat met een partner ---------- */

@@ -420,6 +420,7 @@ function initRealtime() {
   if (!db.data.klok) db.data.klok = {};                            // in- en uitkloktijden per bedrijf
   if (!db.data.applications) db.data.applications = {};            // sollicitaties per bedrijf
   if (!db.data.vacatures) db.data.vacatures = {};                  // openstaande vacatures per bedrijf (ook zichtbaar in de RTFoundation)
+  if (!db.data.applyChats) db.data.applyChats = {};                // chat tussen sollicitant en werkgever (na uitnodigen/aannemen)
   if (!db.data.cvs) db.data.cvs = {};                               // cv per lid (cv-builder in de leden-app)
   if (webpush) {
     if (!db.data.vapid) {
@@ -669,7 +670,10 @@ function myApplications(key) {
   const out = [];
   for (const [code, list] of Object.entries(db.data.applications || {})) {
     const s = findSupplier(code);
-    for (const a of list) if (a.key === key) out.push({ company: s ? s.name : code, func: a.func, status: a.status, at: a.at });
+    for (const a of list) if (a.key === key) {
+      const chat = (db.data.applyChats || {})[a.id];
+      out.push({ company: s ? s.name : code, func: a.func, status: a.status, at: a.at, chatId: chat ? a.id : null });
+    }
   }
   return out.sort((x, y) => new Date(y.at) - new Date(x.at)).slice(0, 10);
 }
@@ -2289,14 +2293,64 @@ app.post('/api/supplier/apply', (req, res) => {
   sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
 });
+/* ---- chat tussen sollicitant en werkgever ----
+   Zodra de werkgever een sollicitant uitnodigt of aanneemt, komen beiden in een
+   chat om samen een afspraak te maken (langskomen, eerste werkdag). Werkt voor
+   RTG-leden en RTFoundation-leden; de app vertaalt de berichten automatisch naar
+   ieders eigen taal. Een anonieme sollicitant (zonder account) krijgt e-mail. */
+function chatApplicant(a) {
+  if (a.viaRTF && a.rtf) return { kind: 'rtf', gezinCode: a.rtf.code, profielId: a.rtf.profielId, naam: a.name };
+  if (a.key) return { kind: 'rtg', key: a.key, naam: a.name };
+  return null; // anoniem: geen in-app chat
+}
+function ensureApplyChat(supplierCode, a) {
+  if (db.data.applyChats[a.id]) return db.data.applyChats[a.id];
+  const applicant = chatApplicant(a);
+  if (!applicant) return null;
+  const s = findSupplier(supplierCode);
+  const chat = { id: a.id, supplierCode, func: a.func, bedrijf: s ? s.name : supplierCode, applicant, berichten: [], at: new Date().toISOString() };
+  db.data.applyChats[a.id] = chat;
+  return chat;
+}
+function applyChatPubliek(chat) {
+  return { id: chat.id, func: chat.func, bedrijf: chat.bedrijf, metWie: chat.applicant.naam,
+    berichten: (chat.berichten || []).map(m => ({ van: m.van, wie: m.wie, tekst: m.tekst, at: m.at })) };
+}
+// stuur een chatbericht; 'van' is 'werkgever' of 'sollicitant'
+function chatStuur(chat, van, wie, tekst) {
+  const t = String(tekst || '').trim().slice(0, 1000);
+  if (!t) return null;
+  const bericht = { van, wie: String(wie || '').slice(0, 60), tekst: t, at: new Date().toISOString() };
+  chat.berichten.push(bericht);
+  chat.berichten = chat.berichten.slice(-200);
+  save();
+  // live seintje naar de andere kant
+  sseToSupplier(chat.supplierCode, 'sync', { scope: 'team' });
+  if (chat.applicant.kind === 'rtg' && chat.applicant.key) sseToCustomer(chat.applicant.key, 'sync', { scope: 'apply' });
+  return bericht;
+}
+
 app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const a = (db.data.applications[req.supplier.code] || []).find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Sollicitatie niet gevonden.' });
+  if (req.body.action === 'uitnodigen') {
+    // uitnodigen voor een gesprek: open de chat, nog geen personeelsaccount
+    a.status = 'uitgenodigd';
+    const chat = ensureApplyChat(req.supplier.code, a);
+    if (!chat) return res.status(400).json({ error: 'Deze sollicitant heeft geen app-account; neem contact op via het opgegeven telefoonnummer of e-mailadres.' });
+    if (!chat.berichten.length) chatStuur(chat, 'werkgever', req.supplier.name, 'Hallo ' + a.name + ', leuk dat je wilt komen werken als ' + a.func + '. Wanneer kun je langskomen voor een kennismaking?');
+    save();
+    logActivity(req.supplier.code, req.actor, 'nodigde ' + a.name + ' uit voor een gesprek');
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+    notifyApplicant(a, req.supplier);
+    return res.json({ ok: true, chat: applyChatPubliek(chat) });
+  }
   if (req.body.action === 'aannemen') {
     const pin = accounts.makePin();
     const staff = accounts.createStaff({ supplierCode: req.supplier.code, name: a.name, role: 'staff', func: a.func, pin });
     a.status = 'aangenomen';
+    ensureApplyChat(req.supplier.code, a); // ook aangenomen sollicitanten kunnen chatten om af te spreken
     save();
     logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
     sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
@@ -2310,6 +2364,74 @@ app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
   notifyApplicant(a, req.supplier);
   res.json({ ok: true });
+});
+
+// werkgever leest/schrijft in de sollicitatiechat
+app.post('/api/supplier/apply/chat', supplierAuth, (req, res) => {
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
+  res.json({ chat: applyChatPubliek(chat) });
+});
+app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
+  const m = chatStuur(chat, 'werkgever', req.supplier.name, req.body.text);
+  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
+  // de sollicitant krijgt een seintje
+  const app = (db.data.applications[req.supplier.code] || []).find(x => x.id === chat.id);
+  if (app && app.key && db.data.notifications[app.key])
+    notify(app.key, { icon: '💬', title: 'Bericht van ' + chat.bedrijf, body: m.tekst.slice(0, 80) });
+  res.json({ chat: applyChatPubliek(chat) });
+});
+
+// een bericht van de sollicitant laat de werkgever meteen iets weten
+function meldWerkgever(chat, tekst) {
+  notifySupplier(chat.supplierCode, { icon: '💬', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80) });
+}
+
+// RTG-lid: mijn sollicitatiechats
+app.post('/api/member/apply/chats', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const uit = Object.values(db.data.applyChats)
+    .filter(c => c.applicant.kind === 'rtg' && c.applicant.key === req.session.key)
+    .map(c => { const l = c.berichten[c.berichten.length - 1]; return { id: c.id, bedrijf: c.bedrijf, func: c.func, laatste: l ? l.tekst : null, laatsteVan: l ? l.van : null, at: l ? l.at : c.at }; })
+    .sort((x, y) => (y.at || '').localeCompare(x.at || ''));
+  res.json({ chats: uit });
+});
+app.post('/api/member/apply/chat', auth, (req, res) => {
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
+  res.json({ chat: applyChatPubliek(chat) });
+});
+app.post('/api/member/apply/chat/send', auth, (req, res) => {
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
+  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text);
+  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
+  meldWerkgever(chat, m.tekst);
+  res.json({ chat: applyChatPubliek(chat) });
+});
+
+// RTFoundation-lid: mijn sollicitatiechat (met gezin-token)
+app.post('/api/rtf/apply/chat', (req, res) => {
+  const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
+  if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
+    return res.status(404).json({ error: 'Chat niet gevonden.' });
+  res.json({ chat: applyChatPubliek(chat) });
+});
+app.post('/api/rtf/apply/chat/send', (req, res) => {
+  const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
+  if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+  const chat = db.data.applyChats[String(req.body.id || '')];
+  if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
+    return res.status(404).json({ error: 'Chat niet gevonden.' });
+  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text);
+  if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
+  meldWerkgever(chat, m.tekst);
+  res.json({ chat: applyChatPubliek(chat) });
 });
 
 /* ---- vacatures: het bedrijf plaatst openstaande functies ----
@@ -2433,7 +2555,7 @@ app.post('/api/rtf/solliciteer', (req, res) => {
     id: crypto.randomBytes(4).toString('hex'),
     name, func: vac.func, contact,
     note: String(b.note || '').trim().slice(0, 400),
-    viaRTF: true,
+    viaRTF: true, rtf: { code: String(b.code).toUpperCase(), profielId: sess.p.id },
     cv: {
       headline: String(cv.headline || '').slice(0, 80),
       experience: (Array.isArray(cv.experience) ? cv.experience : []).slice(0, 12).map(x => String(x).slice(0, 120)),

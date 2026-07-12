@@ -73,6 +73,7 @@
 
 <script src="sessie.js"></script>
 <script src="/apps/geo.js"></script>
+<script src="/apps/translate.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) {}
@@ -145,7 +146,7 @@ async function laad(){
   } catch(e){ $('#lijst').innerHTML = '<div class="leeg">Kon de vacatures even niet laden. Probeer het zo nog eens.</div>'; }
 }
 
-const STATUS = { nieuw:['In behandeling','nieuw'], aangenomen:['Aangenomen 🎉','aangenomen'], afgewezen:['Helaas afgewezen','afgewezen'], onbekend:['Afgerond','onbekend'] };
+const STATUS = { nieuw:['In behandeling','nieuw'], uitgenodigd:['Uitgenodigd 💬','aangenomen'], aangenomen:['Aangenomen 🎉','aangenomen'], afgewezen:['Helaas afgewezen','afgewezen'], onbekend:['Afgerond','onbekend'] };
 async function laadMijn(){
   try {
     const d = await api('/gezin/sollicitaties', { code: s.code, token: s.token });
@@ -155,10 +156,52 @@ async function laadMijn(){
     $('#mijn').innerHTML = lijst.map(x=>{
       const st = STATUS[x.status] || STATUS.onbekend;
       const waar = [x.bedrijf, x.landNaam].filter(Boolean).join(' · ');
-      return '<div class="msoll"><div class="mt"><b>'+esc(x.func)+'</b><span>'+esc(waar)+'</span></div><span class="pil '+st[1]+'">'+esc(st[0])+'</span></div>';
+      return '<div class="msoll"><div class="mt"><b>'+esc(x.func)+'</b><span>'+esc(waar)+'</span></div>'+
+        (x.chatId ? '<button class="knop grijs klein" style="padding:.35rem .7rem;" data-chat="'+esc(x.chatId)+'" data-bedrijf="'+esc(x.bedrijf)+'">💬 Chat</button>' : '')+
+        '<span class="pil '+st[1]+'">'+esc(st[0])+'</span></div>';
     }).join('');
+    $('#mijn').querySelectorAll('[data-chat]').forEach(b=> b.addEventListener('click', ()=> openChat(b.dataset.chat, b.dataset.bedrijf)));
   } catch(e){ $('#mijnBlok').hidden = true; $('#alleKop').hidden = true; }
 }
+
+/* Chat met de werkgever: samen een afspraak maken om langs te komen. Berichten
+   worden automatisch naar het Nederlands vertaald. */
+let chatId = null, chatTimer = null;
+function chatMsgHtml(m){
+  const mij = m.van === 'sollicitant';
+  const inner = mij ? esc(m.tekst) : '<span class="xlate">'+esc(m.tekst)+'</span>';
+  return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:82%;padding:.45rem .75rem;border-radius:12px;'+(mij?'background:var(--goud);color:#1a1710;':'background:var(--paneel2);border:1px solid var(--lijn);')+'white-space:pre-wrap;">'+inner+'</div>';
+}
+function vertaalChat(root){ if(!root||!window.Vertaal) return; root.querySelectorAll('.xlate:not([data-vt])').forEach(el=>{ el.setAttribute('data-vt','1'); Vertaal.vul(el, el.textContent, 'nl'); }); }
+function ensureChatEl(){
+  let ov = document.getElementById('rtfchat'); if (ov) return ov;
+  ov = document.createElement('div'); ov.id='rtfchat';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;';
+  ov.innerHTML='<div style="background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:16px 16px 0 0;width:min(100%,40rem);height:78vh;display:flex;flex-direction:column;">'+
+    '<div style="display:flex;align-items:center;gap:.6rem;padding:.9rem 1rem;border-bottom:1px solid var(--lijn);"><b id="rcWie" style="flex:1;"></b><button id="rcX" style="background:none;border:none;color:var(--zacht);font-size:1.3rem;">✕</button></div>'+
+    '<div id="rcMsgs" style="flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>'+
+    '<div style="display:flex;gap:.5rem;padding:.8rem 1rem;border-top:1px solid var(--lijn);"><input id="rcIn" placeholder="Bericht (bijv. Kan ik donderdag om 15u langskomen?)" style="flex:1;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .85rem;color:var(--txt);"><button class="knop" id="rcSend" style="width:auto;">Stuur</button></div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  ov.querySelector('#rcX').addEventListener('click', sluitChat);
+  ov.addEventListener('click', e=>{ if(e.target===ov) sluitChat(); });
+  ov.querySelector('#rcSend').addEventListener('click', stuurChat);
+  ov.querySelector('#rcIn').addEventListener('keydown', e=>{ if(e.key==='Enter') stuurChat(); });
+  return ov;
+}
+async function laadChat(){
+  if (!chatId) return;
+  try { const d = await rtfApi2('/apply/chat', { id: chatId });
+    const box = document.getElementById('rcMsgs'); if(!box) return;
+    box.innerHTML = (d.chat.berichten||[]).map(chatMsgHtml).join('') || '<div style="color:var(--zacht);text-align:center;margin:auto;font-size:.85rem;">Nog geen berichten. Stel een moment voor om langs te komen.</div>';
+    vertaalChat(box); box.scrollTop = box.scrollHeight;
+  } catch(e){}
+}
+function openChat(id, bedrijf){ chatId=id; const ov=ensureChatEl(); ov.querySelector('#rcWie').textContent = bedrijf||'Chat met de werkgever'; ov.style.display='flex'; laadChat(); clearInterval(chatTimer); chatTimer=setInterval(laadChat, 4000); }
+function sluitChat(){ chatId=null; clearInterval(chatTimer); const ov=document.getElementById('rtfchat'); if(ov) ov.style.display='none'; }
+async function stuurChat(){ const inp=document.getElementById('rcIn'); const t=(inp.value||'').trim(); if(!t||!chatId) return; inp.value=''; try{ await rtfApi2('/apply/chat/send', { id: chatId, text: t }); laadChat(); }catch(e){ alert(e.message); } }
+// de chat-endpoints hebben het gezin-token nodig
+function rtfApi2(pad, body){ return rtfApi(pad, Object.assign({ code: s.code, token: s.token }, body||{})); }
 
 function teken(){
   const verz = verzonden();

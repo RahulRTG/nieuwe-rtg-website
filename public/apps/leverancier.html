@@ -37,6 +37,9 @@
   a{color:inherit;text-decoration:none;}
   input,textarea,select{font-family:'Inter',sans-serif;}
 
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   #shell{width:100%;max-width:460px;min-height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;}
   @media (min-width:540px){body{background:#201d1c;padding:2.5rem 0;}#shell{min-height:880px;max-height:920px;border-radius:38px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 90px -30px rgba(0,0,0,0.8);}}
 
@@ -458,9 +461,10 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#content">Naar de inhoud</a>
 <div id="shell">
 
-  <div id="gate">
+  <div id="gate" role="main" aria-label="Inloggen">
     <div class="badge">RTG Partners</div>
     <h1 data-i18n-html="gate.title">De leverancier-<em>app</em>.</h1>
     <p class="deck" data-i18n="gate.deck">Eén app voor hotels, taxi's, privéjets, appartementen, restaurants, bars en clubs. Ontvang RTG-gasten, deel uw menu, beheer bestellingen en ritten, live verbonden met de gast en de RTG-backoffice.</p>
@@ -474,7 +478,7 @@
     <p class="free" data-i18n-html="gate.free"><b>Demo-account:</b> gebruikersnaam Rahul, wachtwoord Imran. <b>Gratis te gebruiken:</b> als partner betaalt u niets voor de app. In ruil levert u RTG uw beste dynamische prijs, die u zelf in de app doorgeeft.</p>
   </div>
 
-  <div id="staffPick">
+  <div id="staffPick" role="dialog" aria-label="Kies gebruiker">
     <button class="sp-back" id="spBack" data-i18n="sp.back">← Terug</button>
     <div class="sp-biz" id="spBiz"></div>
     <h2 data-i18n="sp.who">Wie ben je?</h2>
@@ -491,7 +495,7 @@
   </div>
 
   <div id="app">
-    <div class="topbar">
+    <div class="topbar" role="banner">
       <div class="who"><span class="ic" id="supIcon"></span><div><b id="supName"></b><span id="supType"></span></div></div>
       <button class="actor-chip" id="actorChip" aria-label="Wissel gebruiker"><span class="av" id="actorAv"></span><span class="nm" id="actorName"></span></button>
       <button class="bell" id="bell" aria-label="Meldingen">
@@ -506,7 +510,7 @@
       <div class="notif-list" id="notifList"></div>
     </aside>
 
-    <div class="content" id="content">
+    <div class="content" id="content" role="main">
       <div class="view" data-view="home">
         <h2 id="homeH">Vandaag.</h2>
         <p class="sub" id="homeSub"></p>
@@ -610,7 +614,7 @@
       </div>
     </div>
 
-    <div class="tabbar" id="tabbar"></div>
+    <div class="tabbar" id="tabbar" role="navigation" aria-label="Hoofdmenu"></div>
     <div id="station">
       <div class="st-head">
         <div class="t"><b id="stBiz"></b><span id="stLabel"></span></div>

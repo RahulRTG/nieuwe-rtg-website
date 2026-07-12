@@ -1342,7 +1342,9 @@
   function snelBel(key, naam, video){ dmWith = key; dmNaam = naam; beginGesprek(video); }
   function renderContacts(){
     const el = $('#homeContacts'); if (!el) return;
-    if (!socialOK || !user || user.tier === 'guest'){ el.style.display='none'; return; }
+    // ook een gratis account (met paspoort) chat met vrienden; alleen een
+    // anonieme demo-gast zonder account niet
+    if (!socialOK || !user || (user.tier === 'guest' && !user.account)){ el.style.display='none'; return; }
     el.style.display='';
     const conns = social.connections || [], reqs = social.requests || [];
     const totUnread = conns.reduce((n,c)=> n + (c.unread||0), 0);
@@ -2622,8 +2624,10 @@
         '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
-    ['#homeContacts','#homeFoundation'].forEach(id=>{ const e=$(id); if(e) e.style.display='none'; });
+    const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
     const gtab = $('#tabGezin'); if (gtab) gtab.style.display='none';
+    // een gratis account (met paspoort) kan vrienden toevoegen en met hen chatten
+    if (user.account) loadSocial(); else { const c = $('#homeContacts'); if (c) c.style.display='none'; }
   }
   // Betaalgeschiedenis van de gratis gebruiker: wat is besteld en betaald.
   async function loadGuestHistory(){

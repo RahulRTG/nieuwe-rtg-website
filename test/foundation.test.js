@@ -570,6 +570,38 @@ test('gratis account met paspoort: bestellen, betalen en de betaalgeschiedenis t
   assert.ok(mine.orders.some(o => o.ref === order.order.ref && o.paid), 'de betaalde bestelling staat in de geschiedenis');
 });
 
+test('gratis account chat met een bevriend lid; een anonieme gast niet', async () => {
+  const now = Date.now();
+  const g = await json(await raw('/auth/register', { name: 'Gratis Vriend', email: 'gv' + now + '@v.test', phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'guest' }));
+  const m = await json(await raw('/auth/register', { name: 'RTG Vriend', email: 'rv' + now + '@v.test', phone: '06' + String(now + 11).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
+  const gTok = g.token, mTok = m.token, gCn = g.state.user.codename, mCn = m.state.user.codename;
+  // allebei even in de codenaam-gids (elke ingelogde call doet dat)
+  await raw('/member/connections', {}, gTok); await raw('/member/connections', {}, mTok);
+  // het gratis account vindt het lid en stuurt een vriendschapsverzoek
+  const found = await json(await raw('/member/find', { q: mCn.split(' ')[0] }, gTok));
+  const hit = (found.results || []).find(x => x.codename === mCn);
+  assert.ok(hit, 'gratis account vindt het lid in de gids');
+  assert.equal((await raw('/member/connect', { key: hit.key }, gTok)).status, 200, 'gratis account stuurt een verzoek');
+  // het lid accepteert
+  const reqs = await json(await raw('/member/connections', {}, mTok));
+  const req = (reqs.requests || []).find(x => x.codename === gCn);
+  assert.ok(req, 'het lid ziet het verzoek van het gratis account');
+  await raw('/member/connect/respond', { key: req.key, action: 'accept' }, mTok);
+  // nu zijn ze vrienden en kan het gratis account chatten
+  const gConns = await json(await raw('/member/connections', {}, gTok));
+  const vriend = (gConns.connections || []).find(x => x.codename === mCn);
+  assert.ok(vriend, 'ze zijn nu vrienden');
+  assert.equal((await raw('/member/dm/send', { toKey: vriend.key, text: 'Hoi vriend!' }, gTok)).status, 200, 'gratis account chat met de vriend');
+  // het lid leest het bericht van het gratis account
+  const mConns = await json(await raw('/member/connections', {}, mTok));
+  const gVriend = (mConns.connections || []).find(x => x.codename === gCn);
+  const thread = await json(await raw('/member/dm', { withKey: gVriend.key }, mTok));
+  assert.ok((thread.messages || []).some(x => /Hoi vriend/.test(x.text)), 'het lid ziet het bericht');
+  // een anonieme gast (zonder account) mag niet in de sociale laag
+  const anon = await json(await raw('/login', { tier: 'guest' }));
+  assert.equal((await raw('/member/connections', {}, anon.token)).status, 403, 'anonieme gast zonder account chat niet');
+});
+
 test('gratis gebruiker zonder pas: betalen bij partners en solliciteren mag, liken bij particulieren niet', async () => {
   const supLogin = await json(await raw('/supplier/login', { username: 'rahul', password: 'Imran' }));
   const supCode = supLogin.state.supplier.code;

@@ -519,7 +519,10 @@ function schoon(v, n) {
    zodra een lid iets doet; zo kunnen leden elkaar op codenaam vinden
    zonder dat er ooit een echte naam over de lijn gaat. */
 function dirTouch(sess) {
-  if (!sess || sess.tier === 'guest' || !db.data.memberDir) return;
+  // echte accounts (ook de gratis laag) staan in de codenaam-gids en kunnen
+  // elkaar vinden; alleen een anonieme demo-gast zonder account niet
+  if (!sess || !db.data.memberDir) return;
+  if (sess.tier === 'guest' && !sess.account) return;
   const cn = liveCodename(sess);
   const cur = db.data.memberDir[sess.key];
   if (!cur || cur.codename !== cn || cur.tier !== sess.tier) {
@@ -965,7 +968,9 @@ function connectieTussen(a, b) {
   return db.data.connections.find(c => (c.a === a && c.b === b) || (c.a === b && c.b === a));
 }
 function geenGast(req, res) {
-  if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return true; }
+  // vrienden toevoegen, chatten en bellen kan met elk echt account, ook de
+  // gratis laag (met paspoort). Alleen een anonieme demo-gast zonder account niet.
+  if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten.' }); return true; }
   return false;
 }
 

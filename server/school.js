@@ -22,32 +22,59 @@ module.exports = (ctx) => {
     if (!f.klassen) f.klassen = {};
     return f.klassen;
   }
-  // leraar-accounts: een leraar heeft een eigen token en kan MEERDERE klassen hebben
-  function L() {
+  /* scholen: de wortel van alles. EERST meldt een school zich aan (directie
+     krijgt een beheer-token), DAN melden leraren en overig personeel zich bij
+     die school (en wachten op goedkeuring van de directie), en pas daarna
+     kunnen goedgekeurde leraren klassen maken waar gezinnen hun kinderen aan
+     koppelen. */
+  function S() {
     const f = F();
-    if (!f.leraren) f.leraren = {};
-    return f.leraren;
+    if (!f.scholen) f.scholen = {};
+    return f.scholen;
   }
   const klasCode = () => { let c; do { c = crypto.randomBytes(3).toString('hex').toUpperCase(); } while (K()[c]); return c; };
+  const schoolCode = () => { let c; do { c = 'S' + crypto.randomBytes(3).toString('hex').toUpperCase().slice(0, 5); } while (S()[c]); return c; };
 
-  /* leraar-authenticatie: klascode + token. Het token mag het eigen token van de
-     klas zijn (losse klas, oude stijl) of het account-token van de leraar die de
-     klas bezit; zo opent een leraar al zijn klassen met een sleutel. */
+  // directie-authenticatie: schoolcode + beheer-token
+  function schoolVan(req, res) {
+    const sch = S()[String(req.body.schoolCode || '').trim().toUpperCase()];
+    if (!sch || sch.token !== String(req.body.beheerToken || '')) {
+      res.status(403).json({ error: 'Onbekende school of verkeerd beheer-token.' });
+      return null;
+    }
+    return sch;
+  }
+  // personeels-authenticatie: schoolcode + personeel-token (status telt apart)
+  function personeelVan(req, res) {
+    const sch = S()[String(req.body.schoolCode || '').trim().toUpperCase()];
+    const tok = String(req.body.personeelToken || '');
+    const p = sch && tok ? Object.values(sch.personeel || {}).find(x => x.token === tok) : null;
+    if (!p) { res.status(403).json({ error: 'Onbekende school of verkeerd personeel-token.' }); return null; }
+    return { sch, p };
+  }
+
+  /* klas-authenticatie: klascode + token. Toegestaan zijn:
+     - het eigen klas-token (oudere, losse klassen blijven zo leesbaar);
+     - het personeel-token van de leraar die de klas geeft (mits actief);
+     - het beheer-token van de school (de directie kan bij alle klassen). */
   function klasVan(req, res) {
     const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
-    const tok = String(req.body.leraarToken || '');
-    const acc = k && k.leraarId ? L()[k.leraarId] : null;
-    if (!k || !tok || (k.token !== tok && !(acc && acc.token === tok))) {
-      res.status(403).json({ error: 'Onbekende klas of verkeerd leraar-token.' });
+    const tok = String(req.body.leraarToken || req.body.personeelToken || req.body.beheerToken || '');
+    let mag = false;
+    if (k && tok) {
+      if (k.token === tok) mag = true;
+      const sch = k.schoolCode ? S()[k.schoolCode] : null;
+      if (sch) {
+        if (sch.token === tok) mag = true; // directie
+        const p = Object.values(sch.personeel || {}).find(x => x.token === tok);
+        if (p && p.status === 'actief' && p.id === k.leraarId) mag = true; // de eigen leraar
+      }
+    }
+    if (!mag) {
+      res.status(403).json({ error: 'Onbekende klas of verkeerd token.' });
       return null;
     }
     return k;
-  }
-  function accountVan(req, res) {
-    const tok = String(req.body.leraarToken || '');
-    const acc = tok ? Object.values(L()).find(a => a.token === tok) : null;
-    if (!acc) { res.status(403).json({ error: 'Onbekend leraar-token. Maak eerst een leraar-account.' }); return null; }
-    return acc;
   }
   // gezins-authenticatie (ouder of kind), zoals overal in de foundation
   function gezinSessie(req, res) {
@@ -61,54 +88,96 @@ module.exports = (ctx) => {
     return (k.leerlingen || []).find(l => l.sleutel === leerlingSleutel(g.code, profielId));
   }
 
-  /* ---------- leraar-account: een leraar, meerdere klassen ---------- */
-  router.post('/school/leraar/maak', (req, res) => {
+  /* ---------- stap 1: de SCHOOL meldt zich aan ----------
+     De aanmelder (directie/administratie) krijgt de schoolcode (om aan het
+     personeel te geven) en het beheer-token (de sleutel van de school). */
+  router.post('/school/school/maak', (req, res) => {
+    const naam = schoon(req.body.naam, 80);
+    const plaats = schoon(req.body.plaats, 60);
+    if (!naam) return res.status(400).json({ error: 'Vul de naam van de school in.' });
+    const code = schoolCode();
+    S()[code] = { code, naam, plaats: plaats || null, token: rid(16), at: nu(), personeel: {} };
+    save();
+    res.json({ ok: true, schoolCode: code, beheerToken: S()[code].token, naam });
+  });
+
+  /* ---------- stap 2: PERSONEEL meldt zich aan bij de school ----------
+     Een leraar of ondersteuner meldt zich met de schoolcode en wacht daarna op
+     goedkeuring van de directie. Pas na goedkeuring kan een leraar klassen maken. */
+  router.post('/school/personeel/aanmeld', (req, res) => {
+    const sch = S()[String(req.body.schoolCode || '').trim().toUpperCase()];
+    if (!sch) return res.status(404).json({ error: 'Deze schoolcode kennen we niet. Vraag hem na bij de school.' });
     const naam = schoon(req.body.naam, 60);
-    const school = schoon(req.body.school, 80);
     if (!naam) return res.status(400).json({ error: 'Vul je naam in.' });
+    const rol = req.body.rol === 'ondersteuning' ? 'ondersteuning' : 'leraar';
     const id = rid(6);
-    L()[id] = { id, naam, school: school || null, token: rid(16), at: nu() };
+    sch.personeel[id] = { id, naam, rol, token: rid(16), status: 'wacht', at: nu() };
     save();
-    res.json({ ok: true, leraarId: id, leraarToken: L()[id].token, naam, school: school || null });
+    res.json({ ok: true, personeelId: id, personeelToken: sch.personeel[id].token, status: 'wacht',
+      school: { naam: sch.naam, plaats: sch.plaats } });
   });
 
-  // een nieuwe klas onder het leraar-account (de leraar opent hem met zijn account-token)
-  router.post('/school/leraar/klas/maak', (req, res) => {
-    const acc = accountVan(req, res); if (!acc) return;
-    const naam = schoon(req.body.naam, 60);
-    if (!naam) return res.status(400).json({ error: 'Geef de klas een naam.' });
-    const code = klasCode();
-    K()[code] = { code, naam, leraar: acc.naam, school: acc.school, leraarId: acc.id, token: rid(16), at: nu(),
-      leerlingen: [], rooster: [], huiswerk: [], cijfers: [], mededelingen: [], absenties: [], berichten: {}, berichtenOuders: {} };
-    save();
-    res.json({ ok: true, code, naam });
+  // personeelslid: waar sta ik? (wacht/actief) + mijn klassen als ik leraar ben
+  router.post('/school/personeel/status', (req, res) => {
+    const pv = personeelVan(req, res); if (!pv) return;
+    const { sch, p } = pv;
+    const klassen = p.status === 'actief' && p.rol === 'leraar'
+      ? Object.values(K()).filter(k => k.schoolCode === sch.code && k.leraarId === p.id).map(klasSamenvatting)
+      : [];
+    res.json({ ok: true, naam: p.naam, rol: p.rol, status: p.status, school: { naam: sch.naam, plaats: sch.plaats, code: sch.code }, klassen });
   });
 
-  // het multi-klas-dashboard: alle klassen van deze leraar met een samenvatting
-  router.post('/school/leraar/overzicht', (req, res) => {
-    const acc = accountVan(req, res); if (!acc) return;
-    const klassen = Object.values(K()).filter(k => k.leraarId === acc.id).map(k => ({
-      code: k.code, naam: k.naam,
+  /* ---------- directie: overzicht en personeelsbesluiten ---------- */
+  function klasSamenvatting(k) {
+    return {
+      code: k.code, naam: k.naam, leraar: k.leraar,
       leerlingen: (k.leerlingen || []).length,
       openAbsenties: (k.absenties || []).filter(a => !a.afgehandeld).length,
       huiswerk: (k.huiswerk || []).length,
       berichten: Object.values(k.berichten || {}).reduce((n, d) => n + d.length, 0)
         + Object.values(k.berichtenOuders || {}).reduce((n, d) => n + d.length, 0)
-    }));
-    res.json({ ok: true, naam: acc.naam, school: acc.school, klassen });
+    };
+  }
+  router.post('/school/school/overzicht', (req, res) => {
+    const sch = schoolVan(req, res); if (!sch) return;
+    res.json({
+      ok: true, schoolCode: sch.code, naam: sch.naam, plaats: sch.plaats,
+      personeel: Object.values(sch.personeel || {}).map(p => ({ id: p.id, naam: p.naam, rol: p.rol, status: p.status, at: p.at })),
+      klassen: Object.values(K()).filter(k => k.schoolCode === sch.code).map(klasSamenvatting)
+    });
+  });
+  router.post('/school/personeel/besluit', (req, res) => {
+    const sch = schoolVan(req, res); if (!sch) return;
+    const p = (sch.personeel || {})[String(req.body.personeelId || '')];
+    if (!p) return res.status(404).json({ error: 'Dit personeelslid is niet gevonden.' });
+    if (req.body.akkoord === false) delete sch.personeel[p.id];
+    else p.status = 'actief';
+    save();
+    res.json({ ok: true });
   });
 
-  /* ---------- leraar: losse klas aanmaken (oude stijl, zonder account) ---------- */
-  router.post('/school/klas/maak', (req, res) => {
+  /* ---------- stap 3: een GOEDGEKEURDE leraar maakt klassen ---------- */
+  router.post('/school/leraar/klas/maak', (req, res) => {
+    const pv = personeelVan(req, res); if (!pv) return;
+    const { sch, p } = pv;
+    if (p.status !== 'actief') return res.status(403).json({ error: 'De school moet je aanmelding eerst goedkeuren.' });
+    if (p.rol !== 'leraar') return res.status(403).json({ error: 'Alleen een leraar maakt klassen.' });
     const naam = schoon(req.body.naam, 60);
-    const leraar = schoon(req.body.leraar, 60);
-    const school = schoon(req.body.school, 80);
-    if (!naam || !leraar) return res.status(400).json({ error: 'Vul de klasnaam en jouw naam in.' });
+    if (!naam) return res.status(400).json({ error: 'Geef de klas een naam.' });
     const code = klasCode();
-    K()[code] = { code, naam, leraar, school: school || null, token: rid(16), at: nu(),
+    K()[code] = { code, naam, leraar: p.naam, school: sch.naam, schoolCode: sch.code, leraarId: p.id, token: rid(16), at: nu(),
       leerlingen: [], rooster: [], huiswerk: [], cijfers: [], mededelingen: [], absenties: [], berichten: {}, berichtenOuders: {} };
     save();
-    res.json({ ok: true, code, leraarToken: K()[code].token, naam, leraar });
+    res.json({ ok: true, code, naam });
+  });
+
+  // de klassen van deze leraar (het multi-klas-dashboard)
+  router.post('/school/leraar/overzicht', (req, res) => {
+    const pv = personeelVan(req, res); if (!pv) return;
+    const { sch, p } = pv;
+    if (p.status !== 'actief') return res.status(403).json({ error: 'De school moet je aanmelding eerst goedkeuren.' });
+    const klassen = Object.values(K()).filter(k => k.schoolCode === sch.code && k.leraarId === p.id).map(klasSamenvatting);
+    res.json({ ok: true, naam: p.naam, school: sch.naam, klassen });
   });
 
   // gewogen gemiddelde van een lijst cijfers (of null zonder cijfers)

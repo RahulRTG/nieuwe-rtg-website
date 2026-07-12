@@ -38,15 +38,22 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-// hulp: een klas + een gezin met een gekoppeld kind
+/* hulp: de volledige keten school -> leraar (goedgekeurd) -> klas -> gezin met
+   gekoppeld kind. Dit is de verplichte volgorde: eerst de school, dan het
+   personeel, dan pas de kinderen. */
 async function opzet(naam) {
-  const klas = await json(await api('/school/klas/maak', { naam: 'Groep 8', leraar: 'Juf ' + naam, school: 'De Regenboog' }));
+  const sch = await json(await api('/school/school/maak', { naam: 'De Regenboog ' + naam, plaats: 'Utrecht' }));
+  const p = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Juf ' + naam, rol: 'leraar' }));
+  await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: p.personeelId, akkoord: true });
+  const kl = await json(await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 8' }));
+  // het personeel-token van de leraar opent zijn klas (klasVan accepteert het)
+  const klas = { code: kl.code, leraarToken: p.personeelToken };
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam ' + naam, naam: 'Ouder ' + naam, pin: '1234' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind ' + naam, rol: 'kind', groep: 'kind' }));
   const kindToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
   const kop = await json(await api('/school/koppel', { code: g.code, token: g.token, klasCode: klas.code, profielId: kind.profiel.id }));
   assert.ok(kop.ok, 'koppelen lukt');
-  return { klas, g, kindId: kind.profiel.id, kindToken, sleutel: g.code + ':' + kind.profiel.id };
+  return { sch, klas, g, kindId: kind.profiel.id, kindToken, sleutel: g.code + ':' + kind.profiel.id };
 }
 const lr = (klas, pad, body) => api(pad, Object.assign({ klasCode: klas.code, leraarToken: klas.leraarToken }, body || {}));
 
@@ -149,20 +156,45 @@ test('mededeling van de leraar bereikt het gezin', async () => {
   assert.ok(mijn.school[0].mededelingen.some(m => /ouderavond/.test(m.tekst)));
 });
 
-test('leraar-account: meerdere klassen onder een token, met overzicht', async () => {
-  const acc = await json(await api('/school/leraar/maak', { naam: 'Meester Bram', school: 'De Regenboog' }));
-  assert.ok(acc.leraarToken);
-  const k1 = await json(await api('/school/leraar/klas/maak', { leraarToken: acc.leraarToken, naam: 'Groep 7' }));
-  const k2 = await json(await api('/school/leraar/klas/maak', { leraarToken: acc.leraarToken, naam: 'Groep 8' }));
-  // het account-token opent BEIDE klassen
-  assert.equal((await api('/school/klas', { klasCode: k1.code, leraarToken: acc.leraarToken })).status, 200);
-  assert.equal((await api('/school/klas', { klasCode: k2.code, leraarToken: acc.leraarToken })).status, 200);
-  // een verkeerd token niet
+test('school eerst: personeel wacht op goedkeuring; pas daarna klassen maken', async () => {
+  const sch = await json(await api('/school/school/maak', { naam: 'Het Kompas', plaats: 'Rotterdam' }));
+  assert.ok(sch.schoolCode && sch.beheerToken);
+  // een leraar meldt zich aan: status wacht
+  const p = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Meester Bram', rol: 'leraar' }));
+  assert.equal(p.status, 'wacht');
+  // VOOR goedkeuring: geen klas kunnen maken en geen overzicht
+  assert.equal((await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 7' })).status, 403);
+  assert.equal((await api('/school/leraar/overzicht', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken })).status, 403);
+  // de directie ziet de aanmelding en keurt goed
+  const ov0 = await json(await api('/school/school/overzicht', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken }));
+  assert.equal(ov0.personeel.length, 1);
+  assert.equal(ov0.personeel[0].status, 'wacht');
+  await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: p.personeelId, akkoord: true });
+  // NA goedkeuring: twee klassen onder een personeel-token, met overzicht
+  const k1 = await json(await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 7' }));
+  const k2 = await json(await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 8' }));
+  assert.equal((await api('/school/klas', { klasCode: k1.code, leraarToken: p.personeelToken })).status, 200);
+  assert.equal((await api('/school/klas', { klasCode: k2.code, leraarToken: p.personeelToken })).status, 200);
   assert.equal((await api('/school/klas', { klasCode: k1.code, leraarToken: 'fout' })).status, 403);
-  // het overzicht toont beide klassen met samenvatting
-  const ov = await json(await api('/school/leraar/overzicht', { leraarToken: acc.leraarToken }));
+  const ov = await json(await api('/school/leraar/overzicht', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken }));
   assert.equal(ov.klassen.length, 2);
-  assert.ok(ov.klassen.every(k => 'leerlingen' in k && 'openAbsenties' in k));
+  // de DIRECTIE kan met het beheer-token bij elke klas van de school
+  assert.equal((await api('/school/klas', { klasCode: k1.code, beheerToken: sch.beheerToken })).status, 200);
+});
+
+test('personeel: afwijzen verwijdert de aanmelding; ondersteuning maakt geen klassen; leraar van school A niet bij school B', async () => {
+  const sch = await json(await api('/school/school/maak', { naam: 'De Klimop', plaats: 'Den Haag' }));
+  // afgewezen personeelslid is weg
+  const afw = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Onbekende', rol: 'leraar' }));
+  await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: afw.personeelId, akkoord: false });
+  assert.equal((await api('/school/personeel/status', { schoolCode: sch.schoolCode, personeelToken: afw.personeelToken })).status, 403);
+  // ondersteuning wordt goedgekeurd maar maakt geen klassen
+  const ond = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Conciërge Piet', rol: 'ondersteuning' }));
+  await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: ond.personeelId, akkoord: true });
+  assert.equal((await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: ond.personeelToken, naam: 'X' })).status, 403);
+  // een leraar van een ANDERE school komt niet in de klassen van deze school
+  const B = await opzet('Grens2');
+  assert.equal((await api('/school/klas', { klasCode: B.klas.code, beheerToken: sch.beheerToken })).status, 403, 'beheer-token van school A opent geen klas van school B');
 });
 
 test('privekanaal ouders <-> leraar: het kind kan er niet bij, de gezinsdraad wel', async () => {

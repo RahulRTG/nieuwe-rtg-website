@@ -61,7 +61,7 @@
       <div class="sec">Kind koppelen aan een klas</div>
       <div class="kaart blok">
         <input class="veld" id="kopCode" placeholder="Klascode (van de leraar)" maxlength="8" autocapitalize="characters">
-        <select class="veld" id="kopKind"></select>
+        <select class="veld" id="kopKind" aria-label="Welk kind koppel je"></select>
         <button class="knop" id="kopDoe">Koppelen</button>
         <div class="mini" id="kopFout" style="color:var(--rood);min-height:1rem;"></div>
       </div>
@@ -73,21 +73,27 @@
   <section id="vLeraar" hidden>
     <div class="sec">Leraaromgeving</div>
     <div class="kaart blok" id="lrInlog">
-      <b>Leraar-account</b>
-      <div class="mini" style="margin:.3rem 0 .6rem;">Eén account, al je klassen. Maak een account of log in met je leraar-token.</div>
-      <input class="veld" id="acNaam" placeholder="Jouw naam (bijv. Juf Anke)" maxlength="60">
-      <input class="veld" id="acSchool" placeholder="School (optioneel)" maxlength="80">
-      <button class="knop" id="acMaak">Account aanmaken</button>
-      <div style="display:flex;gap:.5rem;margin-top:.7rem;">
-        <input class="veld" id="acToken" placeholder="Leraar-token" style="margin-bottom:0;flex:1;">
-        <button class="knop grijs" id="acOpen">Inloggen</button>
-      </div>
+      <b>1. School aanmelden</b>
+      <div class="mini" style="margin:.3rem 0 .6rem;">De school gaat voorop: de directie meldt de school aan en krijgt de schoolcode (voor het personeel) en het beheer-token.</div>
+      <input class="veld" id="scNaam" placeholder="Naam van de school" maxlength="80">
+      <input class="veld" id="scPlaats" placeholder="Plaats" maxlength="60">
+      <button class="knop" id="scMaak">School aanmelden</button>
       <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
-      <b>Losse klas openen</b>
-      <div class="mini" style="margin:.3rem 0 .6rem;">Voor een klas zonder account (oude stijl): klascode + klas-token.</div>
-      <input class="veld" id="lrCode" placeholder="Klascode" maxlength="8" autocapitalize="characters">
-      <input class="veld" id="lrToken" placeholder="Klas-token">
-      <button class="knop grijs" id="lrOpen">Open klas</button>
+      <b>2. Werken bij een school</b>
+      <div class="mini" style="margin:.3rem 0 .6rem;">Leraar of ondersteuning? Meld je aan met de schoolcode; de directie keurt je aanmelding goed.</div>
+      <input class="veld" id="psCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters">
+      <input class="veld" id="psNaam" placeholder="Jouw naam (bijv. Juf Anke)" maxlength="60">
+      <select class="veld" id="psRol" aria-label="Jouw rol op school">
+        <option value="leraar">Leraar</option>
+        <option value="ondersteuning">Ondersteuning (conciërge, IB, administratie)</option>
+      </select>
+      <button class="knop" id="psMeld">Aanmelden bij de school</button>
+      <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
+      <b>Inloggen</b>
+      <div class="mini" style="margin:.3rem 0 .6rem;">Met je schoolcode en je token (beheer of personeel).</div>
+      <input class="veld" id="inCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters">
+      <input class="veld" id="inToken" placeholder="Beheer- of personeel-token">
+      <button class="knop grijs" id="inDoe">Inloggen</button>
       <div class="mini" id="lrFout" style="color:var(--rood);min-height:1rem;"></div>
     </div>
     <div id="lrOverzicht" hidden></div>
@@ -127,7 +133,11 @@ function toon(view){
   $('#vGezin').hidden = view !== 'gezin';
   $('#vLeraar').hidden = view !== 'leraar';
 }
-$('#naarLeraar').addEventListener('click', ()=>{ toon('leraar'); const a = bewaardAccount(); if (a) laadOverzicht(a.token); });
+$('#naarLeraar').addEventListener('click', ()=>{
+  toon('leraar');
+  const d = lees(LS_DIR), p = lees(LS_PERS);
+  if (d) laadDirectie(d.code, d.token); else if (p) laadPersoneel(p.code, p.token);
+});
 $('#terugGezin').addEventListener('click', ()=> { toon('gezin'); });
 
 /* ---------- gezinsweergave ---------- */
@@ -251,68 +261,127 @@ $('#chatStuur').addEventListener('click', ()=>{ const t = $('#chatIn').value.tri
 $('#chatIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('#chatStuur').click(); });
 
 /* ---------- leraaromgeving ---------- */
-const LS = 'rtfSchoolLeraar';        // losse klas (oude stijl)
-const LS_ACC = 'rtfSchoolAccount';   // leraar-account (meerdere klassen)
-function bewaardeKlas(){ try{ return JSON.parse(localStorage.getItem(LS) || 'null'); }catch(e){ return null; } }
-function bewaardAccount(){ try{ return JSON.parse(localStorage.getItem(LS_ACC) || 'null'); }catch(e){ return null; } }
-$('#lrCode').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
+const LS_DIR = 'rtfSchoolDirectie';   // { code, token } van de directie
+const LS_PERS = 'rtfSchoolPersoneel'; // { code, token } van een personeelslid
+const lees = k => { try{ return JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){ return null; } };
+for (const id of ['psCode', 'inCode']) $('#'+id).addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
 
-// leraar-account: aanmaken, inloggen en het multi-klas-overzicht
-$('#acMaak').addEventListener('click', async ()=>{
+// stap 1: de school meldt zich aan (directie)
+$('#scMaak').addEventListener('click', async ()=>{
   $('#lrFout').textContent = '';
   try{
-    const d = await api('/school/leraar/maak', { naam: $('#acNaam').value, school: $('#acSchool').value });
-    localStorage.setItem(LS_ACC, JSON.stringify({ token: d.leraarToken }));
-    alert('Account aangemaakt.\n\nJouw leraar-token (bewaar goed, dit is je sleutel):\n' + d.leraarToken);
-    laadOverzicht(d.leraarToken);
+    const d = await api('/school/school/maak', { naam: $('#scNaam').value, plaats: $('#scPlaats').value });
+    localStorage.setItem(LS_DIR, JSON.stringify({ code: d.schoolCode, token: d.beheerToken }));
+    alert('School aangemeld.\n\nSchoolcode voor je personeel: ' + d.schoolCode + '\nBeheer-token (bewaar goed): ' + d.beheerToken);
+    laadDirectie(d.schoolCode, d.beheerToken);
   }catch(e){ $('#lrFout').textContent = e.message; }
 });
-$('#acOpen').addEventListener('click', ()=> laadOverzicht($('#acToken').value.trim()));
-$('#lrOpen').addEventListener('click', ()=> laadLeraar($('#lrCode').value.trim(), $('#lrToken').value.trim()));
-
-async function laadOverzicht(token){
+// stap 2: personeel meldt zich aan bij de school
+$('#psMeld').addEventListener('click', async ()=>{
   $('#lrFout').textContent = '';
+  try{
+    const d = await api('/school/personeel/aanmeld', { schoolCode: $('#psCode').value.trim(), naam: $('#psNaam').value, rol: $('#psRol').value });
+    localStorage.setItem(LS_PERS, JSON.stringify({ code: $('#psCode').value.trim(), token: d.personeelToken }));
+    alert('Aangemeld bij ' + d.school.naam + '.\n\nJouw personeel-token (bewaar goed): ' + d.personeelToken + '\n\nDe directie moet je aanmelding nog goedkeuren.');
+    laadPersoneel($('#psCode').value.trim(), d.personeelToken);
+  }catch(e){ $('#lrFout').textContent = e.message; }
+});
+// inloggen: probeer eerst als directie, anders als personeel
+$('#inDoe').addEventListener('click', async ()=>{
+  $('#lrFout').textContent = '';
+  const code = $('#inCode').value.trim(), token = $('#inToken').value.trim();
+  try{ await api('/school/school/overzicht', { schoolCode: code, beheerToken: token });
+    localStorage.setItem(LS_DIR, JSON.stringify({ code, token })); return laadDirectie(code, token); }catch(e){}
+  try{ await api('/school/personeel/status', { schoolCode: code, personeelToken: token });
+    localStorage.setItem(LS_PERS, JSON.stringify({ code, token })); return laadPersoneel(code, token); }catch(e){}
+  $('#lrFout').textContent = 'Onbekende schoolcode of token.';
+});
+
+// directie-dashboard: personeel goedkeuren en alle klassen van de school
+async function laadDirectie(code, token){
   let d;
-  try{ d = await api('/school/leraar/overzicht', { leraarToken: token }); }
+  try{ d = await api('/school/school/overzicht', { schoolCode: code, beheerToken: token }); }
   catch(e){ $('#lrFout').textContent = e.message; return; }
-  localStorage.setItem(LS_ACC, JSON.stringify({ token }));
   $('#lrInlog').hidden = true; $('#lrDash').hidden = true;
   const ov = $('#lrOverzicht'); ov.hidden = false;
+  const wachtend = d.personeel.filter(p => p.status === 'wacht');
+  const actief = d.personeel.filter(p => p.status === 'actief');
   vervang(ov,
     E('div',{class:'kaart blok'},
-      E('div',{class:'kop'}, E('b', null, d.naam + (d.school ? ' · ' + d.school : '')),
-        E('span',{class:'sub'}, d.klassen.length + ' klas(sen)')),
+      E('div',{class:'kop'}, E('b', null, d.naam + (d.plaats ? ' · ' + d.plaats : '')),
+        E('span',{class:'sub'}, 'schoolcode voor personeel: ' + d.schoolCode)),
+      E('div',{class:'mini', style:{marginTop:'.3rem'}}, actief.length + ' personeelslid/-leden actief · ' + d.klassen.length + ' klas(sen)'),
+      E('div',{class:'knoprij'},
+        E('button',{class:'knop grijs klein', onclick:()=>{ localStorage.removeItem(LS_DIR); ov.hidden = true; $('#lrInlog').hidden = false; }}, 'Uitloggen'))),
+    wachtend.length ? [E('div',{class:'sec'}, 'Aanmeldingen (wachten op jou)'),
+      E('div',{class:'kaart blok'}, wachtend.map(p => E('div',{class:'rij'},
+        E('div',{class:'mid'}, p.naam, E('small', null, p.rol)),
+        E('button',{class:'knop mini', onclick:async()=>{ try{ await api('/school/personeel/besluit', { schoolCode: code, beheerToken: token, personeelId: p.id, akkoord: true }); laadDirectie(code, token); }catch(e){ alert(e.message); } }}, 'Goedkeuren'),
+        E('button',{class:'knop grijs mini', onclick:async()=>{ try{ await api('/school/personeel/besluit', { schoolCode: code, beheerToken: token, personeelId: p.id, akkoord: false }); laadDirectie(code, token); }catch(e){ alert(e.message); } }}, 'Weiger'))))] : null,
+    E('div',{class:'sec'}, 'Personeel'),
+    E('div',{class:'kaart blok'}, actief.length ? actief.map(p => E('div',{class:'rij'},
+      E('div',{class:'mid'}, p.naam, E('small', null, p.rol)))) : E('div',{class:'leeg'}, 'Nog geen goedgekeurd personeel. Deel de schoolcode: ' + d.schoolCode)),
+    E('div',{class:'sec'}, 'Klassen'),
+    E('div',{class:'kaart blok'}, d.klassen.length ? d.klassen.map(k => E('div',{class:'rij'},
+      E('div',{class:'mid'}, k.naam + ' · ' + k.leraar,
+        E('small', null, k.leerlingen + ' leerling(en)' + (k.openAbsenties ? ' · ' + k.openAbsenties + ' open ziekmelding(en)' : ''))),
+      E('button',{class:'knop grijs mini', onclick:()=>laadLeraar(k.code, token, ()=>laadDirectie(code, token))}, 'Open')))
+      : E('div',{class:'leeg'}, 'Nog geen klassen. Goedgekeurde leraren maken ze zelf aan.')));
+}
+
+// personeels-dashboard: wachten op goedkeuring, of (leraar) de eigen klassen
+async function laadPersoneel(code, token){
+  let d;
+  try{ d = await api('/school/personeel/status', { schoolCode: code, personeelToken: token }); }
+  catch(e){ $('#lrFout').textContent = e.message; localStorage.removeItem(LS_PERS); return; }
+  $('#lrInlog').hidden = true; $('#lrDash').hidden = true;
+  const ov = $('#lrOverzicht'); ov.hidden = false;
+  const uitlog = E('button',{class:'knop grijs klein', onclick:()=>{ localStorage.removeItem(LS_PERS); ov.hidden = true; $('#lrInlog').hidden = false; }}, 'Uitloggen');
+  if (d.status !== 'actief'){
+    vervang(ov, E('div',{class:'kaart blok'},
+      E('b', null, 'Wachten op goedkeuring'),
+      E('div',{class:'mini', style:{margin:'.3rem 0 .6rem'}}, 'Je aanmelding bij ' + d.school.naam + ' wacht op de directie. Vraag het even na als het lang duurt.'),
+      E('div',{class:'knoprij'}, E('button',{class:'knop klein', onclick:()=>laadPersoneel(code, token)}, 'Vernieuwen'), uitlog)));
+    return;
+  }
+  if (d.rol !== 'leraar'){
+    vervang(ov, E('div',{class:'kaart blok'},
+      E('b', null, 'Welkom, ' + d.naam),
+      E('div',{class:'mini', style:{margin:'.3rem 0 .6rem'}}, 'Je bent goedgekeurd als ondersteuning bij ' + d.school.naam + '.'),
+      E('div',{class:'knoprij'}, uitlog)));
+    return;
+  }
+  vervang(ov,
+    E('div',{class:'kaart blok'},
+      E('div',{class:'kop'}, E('b', null, d.naam + ' · ' + d.school.naam), E('span',{class:'sub'}, d.klassen.length + ' klas(sen)')),
       E('div',{class:'knoprij'},
         E('button',{class:'knop klein', onclick:async()=>{
           const naam = prompt('Naam van de nieuwe klas (bijv. Groep 7):', ''); if (!naam) return;
-          try{ const r = await api('/school/leraar/klas/maak', { leraarToken: token, naam });
-            alert('Klas aangemaakt. Klascode voor de ouders: ' + r.code); laadOverzicht(token); }
+          try{ const r = await api('/school/leraar/klas/maak', { schoolCode: code, personeelToken: token, naam });
+            alert('Klas aangemaakt. Klascode voor de ouders: ' + r.code); laadPersoneel(code, token); }
           catch(e){ alert(e.message); }
-        }}, '➕ Nieuwe klas'),
-        E('button',{class:'knop grijs klein', onclick:()=>{ localStorage.removeItem(LS_ACC); ov.hidden = true; $('#lrInlog').hidden = false; }}, 'Uitloggen'))),
+        }}, '➕ Nieuwe klas'), uitlog)),
     d.klassen.length ? d.klassen.map(k => E('div',{class:'kaart blok'},
       E('div',{class:'kop'}, E('b', null, k.naam), E('span',{class:'sub'}, 'code ' + k.code)),
       E('div',{class:'mini', style:{margin:'.3rem 0 .5rem'}},
-        k.leerlingen + ' leerling(en) · ' + k.huiswerk + ' huiswerk · ' + k.berichten + ' bericht(en)' +
-        (k.openAbsenties ? ' · ' : ''),
+        k.leerlingen + ' leerling(en) · ' + k.huiswerk + ' huiswerk · ' + k.berichten + ' bericht(en)' + (k.openAbsenties ? ' · ' : ''),
         k.openAbsenties ? E('b',{style:{color:'var(--rood)'}}, k.openAbsenties + ' open ziekmelding(en)') : null),
-      E('button',{class:'knop klein', onclick:()=>laadLeraar(k.code, token, true)}, 'Open klas')))
+      E('button',{class:'knop klein', onclick:()=>laadLeraar(k.code, token, ()=>laadPersoneel(code, token))}, 'Open klas')))
       : E('div',{class:'leeg'}, 'Nog geen klassen. Maak je eerste klas aan.'));
 }
 
-async function laadLeraar(code, token, vanAccount){
+async function laadLeraar(code, token, terug){
   $('#lrFout').textContent = '';
   let d;
   try{ d = await api('/school/klas', { klasCode: code, leraarToken: token }); }
   catch(e){ $('#lrFout').textContent = e.message; return; }
-  if (!vanAccount) localStorage.setItem(LS, JSON.stringify({ code, token }));
   $('#lrInlog').hidden = true; $('#lrOverzicht').hidden = true;
-  const her = ()=> laadLeraar(code, token, vanAccount);
+  const her = ()=> laadLeraar(code, token, terug);
   const lrApi = (pad, body) => api(pad, Object.assign({ klasCode: code, leraarToken: token }, body||{}));
 
   const dash = E('div', null,
-    vanAccount ? E('div',{class:'mini', style:{marginBottom:'.5rem'}},
-      E('a',{onclick:()=>{ $('#lrDash').hidden = true; laadOverzicht(token); }}, '← Al mijn klassen')) : null,
+    terug ? E('div',{class:'mini', style:{marginBottom:'.5rem'}},
+      E('a',{onclick:()=>{ $('#lrDash').hidden = true; terug(); }}, '← Terug naar het overzicht')) : null,
     E('div',{class:'kaart blok'},
       E('div',{class:'kop'}, E('b', null, d.naam + (d.school ? ' · ' + d.school : '')),
         E('span',{class:'sub'}, 'klascode voor ouders: ' + d.code)),
@@ -399,10 +468,10 @@ async function laadLeraar(code, token, vanAccount){
 }
 
 /* ---------- start ---------- */
-const acc = bewaardAccount();
-const bewaard = bewaardeKlas();
+const dirOpgeslagen = lees(LS_DIR);
+const persOpgeslagen = lees(LS_PERS);
 if (s && s.token) laadGezin();
-else { toon('leraar'); if (acc) laadOverzicht(acc.token); else if (bewaard) laadLeraar(bewaard.code, bewaard.token); }
+else { toon('leraar'); if (dirOpgeslagen) laadDirectie(dirOpgeslagen.code, dirOpgeslagen.token); else if (persOpgeslagen) laadPersoneel(persOpgeslagen.code, persOpgeslagen.token); }
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>

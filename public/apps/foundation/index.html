@@ -67,10 +67,18 @@
   .passband{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;background:#241f16;border:1px solid var(--goud);color:var(--goud2);border-radius:999px;padding:.35rem .9rem;font-size:.82rem;font-weight:600;}
   .wisbanner{background:#2a1512;border:1px solid var(--rood);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:.6rem;line-height:1.5;font-size:.9rem;}
   .wisbanner a{color:var(--goud2);font-weight:700;text-decoration:none;}
+  /* Toegankelijkheid: sla-over-link, alleen zichtbaar bij toetsenbordfocus */
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--goud);color:#0C0C0B;
+    padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;
+    transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--goud);outline-offset:2px;}
 </style>
 </head>
 <body>
-<div id="balk"></div>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<header id="balk"></header>
+<main id="hoofd" tabindex="-1">
 
 <!-- 1. Welkom: nog geen gezin -->
 <section id="vWelkom" class="wrap" hidden>
@@ -227,6 +235,7 @@
   <div class="gratis"><b>Altijd gratis, geen kleine lettertjes.</b> De RTFoundation wordt betaald uit de bijdragen van RTG-leden. Bij elke reis die een lid maakt, komt hulp voor een ander gezin dichterbij.</div>
   <div class="foot"><a href="/site/rtfoundation.html">Over de RTFoundation →</a> &nbsp;·&nbsp; <a href="privacy.html">Privacy en veiligheid →</a></div>
 </section>
+</main>
 
 <!-- gezin aanmaken -->
 <dialog id="dlgMaak"><div class="kaart modal">

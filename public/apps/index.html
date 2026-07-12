@@ -12,7 +12,7 @@
 <style>
   :root{
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
-    --txt:#F4F1EC; --muted:rgba(244,241,236,0.55); --soft:rgba(244,241,236,0.38);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.70); --soft:rgba(244,241,236,0.62);
     --burgundy:#C23A5E; --gold:#A98F1C;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -31,10 +31,15 @@
   a.app span{display:block;font-size:0.7rem;color:var(--soft);margin-top:0.15rem;line-height:1.4;}
   .home{display:inline-block;margin-top:2.6rem;font-size:0.8rem;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;}
   .home:hover{color:var(--gold);}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;
+    border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 </style>
 </head>
 <body>
-<div class="wrap">
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<main class="wrap" id="hoofd" tabindex="-1">
   <span class="badge">Rahul Travel Group</span>
   <h1 data-i18n-html="hub.title">Alle apps, <em>op een rij</em>.</h1>
   <p class="deck" data-i18n="hub.deck">Elk genre zijn eigen app, allemaal live verbonden met dezelfde RTG-backend: leden, personeel, werkgevers en elke sector apart.</p>
@@ -79,7 +84,7 @@
   <a class="home" href="/index.html" data-i18n="hub.home">← Naar de website</a>
   <a class="home" href="/site/partner-worden.html" style="margin-left:1rem;" data-i18n="hub.partnerworden">Partner worden</a>
   <a class="home" href="/site/privacy.html" style="margin-left:1rem;" data-i18n="hub.privacy">Privacy</a>
-</div>
+</main>
 <script>
 window.I18N = { en: {
   'hub.title':'All apps, <em>in one place</em>.',

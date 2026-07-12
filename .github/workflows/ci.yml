@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, 'claude/**' ]
+  pull_request:
+
+jobs:
+  test:
+    name: Tests, checks en build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Codeafspraken (check.js)
+        run: npm run check
+      - name: Unit- en integratietests
+        run: npm test
+      - name: Frontend-build (minify + service-worker-cache)
+        run: npm run build
+      - name: Build is idempotent (geen ongecommitte wijziging aan de bron)
+        run: git diff --exit-code -- public server scripts
+
+  a11y:
+    name: Toegankelijkheid (axe)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Playwright + Chromium
+        run: |
+          npm i --no-save playwright@^1.49.0
+          npx playwright install --with-deps chromium
+      - name: Axe-scan van de vlaggenschip-schermen
+        run: node scripts/a11y.js
+        env:
+          A11Y_STRICT: '1'

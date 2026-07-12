@@ -9,6 +9,8 @@
     "gateway": "node server/poort.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
+    "a11y": "node scripts/a11y.js",
+    "build": "node scripts/build.js",
     "test": "node --experimental-sqlite --test test/*.test.js"
   },
   "dependencies": {
@@ -19,5 +21,9 @@
   },
   "optionalDependencies": {
     "redis": "^6.1.0"
+  },
+  "devDependencies": {
+    "axe-core": "^4.12.1",
+    "terser": "^5.49.0"
   }
 }

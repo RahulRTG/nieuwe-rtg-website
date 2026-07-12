@@ -63,5 +63,28 @@ loop(path.join(ROOT, 'public'), /^sw\.js$/, f => {
 });
 if (!shellFout) ok('service-worker-shells kloppen');
 
+console.log('5) statische toegankelijkheid (altijd, ook zonder browser)');
+// a) elke pagina heeft een taal; b) elke <img> heeft alt; deze gelden overal.
+let a11y = 0;
+loop(path.join(ROOT, 'public'), /\.html$/, f => {
+  const s = fs.readFileSync(f, 'utf8');
+  const rel = path.relative(ROOT, f);
+  const htmlTag = s.match(/<html\b[^>]*>/i);
+  if (htmlTag && !/\blang\s*=/.test(htmlTag[0])) { a11y++; fout('ontbrekend lang-attribuut op <html> in ' + rel); }
+  const imgs = s.match(/<img\b[^>]*>/gi) || [];
+  for (const img of imgs) if (!/\balt\s*=/.test(img)) { a11y++; fout('<img> zonder alt in ' + rel); }
+});
+// c) de vlaggenschip-schermen moeten een sla-over-link en een main-landmark hebben.
+const VLAGGENSCHIP = ['apps/index.html', 'apps/app.html', 'apps/portaal.html',
+  'apps/foundation/index.html', 'apps/foundation/vrienden.html'];
+for (const rel of VLAGGENSCHIP) {
+  const p = path.join(ROOT, 'public', rel);
+  if (!fs.existsSync(p)) continue;
+  const s = fs.readFileSync(p, 'utf8');
+  if (!/class="skip"/.test(s)) { a11y++; fout('geen sla-over-link (class="skip") in ' + rel); }
+  if (!/<main\b/i.test(s) && !/role="main"/.test(s)) { a11y++; fout('geen main-landmark in ' + rel); }
+}
+if (!a11y) ok('taal, alt-teksten, skip-links en landmarks aanwezig');
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

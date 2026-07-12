@@ -19,8 +19,8 @@
     --card2:#1B1817;
     --line:rgba(255,255,255,0.09);
     --txt:#F4F1EC;
-    --muted:rgba(244,241,236,0.55);
-    --soft:rgba(244,241,236,0.38);
+    --muted:rgba(244,241,236,0.70);
+    --soft:rgba(244,241,236,0.62);
     --burgundy:#C23A5E;
     --burgundy-deep:#7F1634;
     --gold:#A98F1C;
@@ -42,6 +42,10 @@
   button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
   a{color:inherit;text-decoration:none;}
 
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold,#C9A24B);color:#0C0C0B;
+    padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold,#C9A24B);outline-offset:2px;}
   #shell{
     width:100%;
     max-width:430px;
@@ -733,10 +737,11 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#content">Naar de inhoud</a>
 <div id="shell">
 
   <!-- login -->
-  <div id="gate">
+  <div id="gate" role="main" aria-label="Inloggen">
     <div class="logo">Rahul Travel Group</div>
     <div class="tagline">Experience the Elite Class</div>
     <h1 data-i18n-html="gate.title">De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
@@ -775,7 +780,7 @@
 
   <!-- app -->
   <div id="app">
-    <div class="topbar">
+    <div class="topbar" role="banner">
       <div class="brand">RTG<small>de app</small></div>
       <div style="display:flex;align-items:center;gap:0.6rem;">
         <button class="bell" id="bell" aria-label="Meldingen">
@@ -803,7 +808,7 @@
     </div>
     <div class="notif-scrim" id="notifScrim"></div>
 
-    <div class="content" id="content">
+    <div class="content" id="content" role="main">
 
       <div class="view" data-view="home">
         <h2 id="homeGreeting">Welkom.</h2>
@@ -874,7 +879,7 @@
 
     </div>
 
-    <div class="tabbar" id="tabbar">
+    <div class="tabbar" id="tabbar" role="navigation" aria-label="Hoofdmenu">
       <button data-tab="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span data-i18n="app.tab.home">Home</span></button>
       <button data-tab="reizen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-6-8 4-2 6-2-5-8 1z"/></svg><span data-i18n="app.tab.trips">Reizen</span></button>
       <button data-tab="betalen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg><span data-i18n="app.tab.pay">Betalen</span></button>

@@ -16,11 +16,11 @@
     --burgundy:#7F1634;
     --burgundy-bright:#9E1C40;
     --burgundy-on-dark:#C23A5E;
-    --gold:#857007;
+    --gold:#7A6706;
     --gold-bright:#A98F1C;
     --line:#DEDBD5;
     --grey:#4D4A45;
-    --grey-soft:#8A8680;
+    --grey-soft:#6E6A62;
     --paper:#F7F5F1;
     --green:#2E6B4F;
   }
@@ -221,6 +221,11 @@
   .tier-chip.t-lifestyle .dot{background:var(--gold-bright);}
   .tier-chip.t-business .dot{background:var(--black);}
   .tier-chip.t-guest .dot{background:var(--grey-soft);}
+
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold,#C9A24B);color:#0C0C0B;
+    padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold,#C9A24B);outline-offset:2px;}
 
   /* ---------- gate (login) ---------- */
 
@@ -989,6 +994,7 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#portalMain">Naar de inhoud</a>
 
 <header>
   <div class="wrap">
@@ -1015,7 +1021,7 @@
 </aside>
 
 <!-- ========== GATE ========== -->
-<section id="gate">
+<section id="gate" role="main" aria-label="Inloggen">
   <div class="wrap">
     <div class="gate-head">
       <span class="kicker" data-i18n="gate.kicker">Ledenportaal</span>
@@ -1084,9 +1090,10 @@
 
 <!-- ========== PORTAL ========== -->
 <div id="portal">
-  <nav class="portal-nav">
+  <nav class="portal-nav" aria-label="Portaalmenu">
     <div class="wrap" id="tabBar"></div>
   </nav>
+  <main id="portalMain" tabindex="-1">
 
   <!-- overview -->
   <section class="panel" data-panel="overzicht">
@@ -1166,6 +1173,7 @@
       <div class="feed" id="feed"></div>
     </div>
   </section>
+  </main>
 </div>
 
 <div id="toast"></div>

@@ -148,7 +148,7 @@ function huidigePagina(){
   if(!p){ box.innerHTML='<div class="mini">Nog geen bladzijde. Maak er een met T (typen) of ✎ (tekenen).</div>'; $('#pgTitel').value=''; return; }
   $('#pgTitel').value = p.titel||'';
   if(p.type==='tekst'){ box.innerHTML='<textarea class="schrijf" id="schrijf" placeholder="Schrijf hier…"></textarea>'; const ta=$('#schrijf'); ta.value=p.inhoud||''; ta.addEventListener('input', ()=>{ p.inhoud=ta.value; markDirty(); }); }
-  else if(p.type==='foto'){ box.innerHTML='<img src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" style="width:100%;border-radius:12px;background:#12110F;">'; }
+  else if(p.type==='foto'){ box.innerHTML='<img alt="Foto in je schrift" src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" style="width:100%;border-radius:12px;background:#12110F;">'; }
   else { box.innerHTML='<div class="tekencanvasbox"><canvas id="schrijfcanvas"></canvas></div>'; $('#tekentools').style.display='flex';
     setTimeout(()=>{ tekenbord=new TekenBord($('#schrijfcanvas'), { background:'#12110F', kleur:'#111111', onStroke:()=>markDirty() }); tekenbord.kleur='#111111'; tekenbord.dikte=5; tekenbord.setStrokes(p.strokes||[]); },20); }
 }

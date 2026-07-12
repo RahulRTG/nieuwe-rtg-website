@@ -147,8 +147,8 @@
         animation:rtgLangIn .35s cubic-bezier(.2,.8,.2,1);}
       @keyframes rtgLangIn{from{opacity:0;transform:translateY(14px) scale(.97);}to{opacity:1;transform:none;}}
       .rtg-lang-globe{font-size:2.4rem;line-height:1;}
-      .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.7rem;margin:1rem 0 0.15rem;letter-spacing:-0.01em;}
-      .rtg-lang-card p{color:#8A8680;font-size:0.9rem;margin:0 0 1.6rem;}
+      .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.7rem;margin:1rem 0 0.15rem;letter-spacing:-0.01em;color:#0C0C0B;}
+      .rtg-lang-card p{color:#66625B;font-size:0.9rem;margin:0 0 1.6rem;}
       .rtg-lang-opts{display:flex;flex-direction:column;gap:0.7rem;}
       .rtg-lang-opt{display:flex;align-items:center;gap:0.9rem;width:100%;text-align:left;cursor:pointer;
         background:#fff;border:1px solid #DEDBD5;border-radius:13px;padding:0.95rem 1.1rem;

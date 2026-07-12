@@ -58,11 +58,16 @@
   .belk{width:3.2rem;height:3.2rem;border-radius:50%;border:none;font-size:1.2rem;cursor:pointer;background:#333;color:#fff;}
   .belk.op{background:var(--rood,#d33);}
   #melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;z-index:10001;font-size:.85rem;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .2s;pointer-events:none;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--goud,#C9A24B);color:#0C0C0B;padding:.5rem .9rem;
+    border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--goud,#C9A24B);outline-offset:2px;}
 </style>
 </head>
 <body>
-<div id="balk"></div>
-<div class="wrap">
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<header id="balk"></header>
+<main class="wrap" id="hoofd" tabindex="-1">
   <h1>👋 Contacten</h1>
   <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam.</div>
   <div class="mijncn" id="mijncn"></div>
@@ -93,7 +98,7 @@
 
   <div class="sec">Mijn vrienden</div>
   <div class="lijst" id="vrienden"><div class="leeg">Laden...</div></div>
-</div>
+</main>
 
 <!-- chat -->
 <div class="ov" id="chatOv"><div class="ovkaart">

@@ -51,5 +51,67 @@
     }
   }
 
-  w.Util = { escapeHTML: escapeHTML, initialen: initialen, tekst: tekst, el: el, vervang: vervang };
+  /* Klein reactief componentraamwerk. mount(container, render) tekent meteen en
+     geeft een teken-functie terug; roep die na een wijziging aan en het scherm
+     bouwt zichzelf opnieuw op uit el(). store(begin) is een piepklein
+     reactief geheugen dat na set() alle gekoppelde mounts opnieuw tekent. */
+  function mount(container, render) {
+    function teken() { if (container) vervang(container, render()); }
+    teken();
+    return teken;
+  }
+  function store(begin) {
+    var staat = begin || {}, kijkers = [];
+    return {
+      get: function (k) { return k == null ? staat : staat[k]; },
+      set: function (nieuw) { for (var k in nieuw) staat[k] = nieuw[k]; kijkers.forEach(function (f) { f(staat); }); },
+      koppel: function (f) { kijkers.push(f); return f; }
+    };
+  }
+
+  /* Toegankelijkheid ---------------------------------------------------------
+     toast(): een korte melding die schermlezers voorlezen (aria-live). */
+  var liveEl = null;
+  function toast(bericht, soort) {
+    if (!liveEl) {
+      liveEl = el('div', { id: 'util-live', role: 'status', 'aria-live': 'polite',
+        style: { position: 'fixed', left: '50%', bottom: '1.4rem', transform: 'translateX(-50%)', zIndex: 10002,
+          background: '#222', color: '#fff', padding: '.6rem 1rem', borderRadius: '10px', fontSize: '.85rem',
+          boxShadow: '0 4px 20px rgba(0,0,0,.4)', opacity: '0', transition: 'opacity .2s', pointerEvents: 'none', maxWidth: '90vw' } });
+      document.body.appendChild(liveEl);
+    }
+    tekst(liveEl, bericht);
+    liveEl.style.opacity = '1';
+    clearTimeout(liveEl._t);
+    liveEl._t = setTimeout(function () { liveEl.style.opacity = '0'; }, (soort === 'lang' ? 5000 : 2800));
+  }
+
+  /* dialoog(el): maakt een overlay/dialog toegankelijk: focus gaat erin, blijft
+     erin (focus-trap), Escape sluit, en de focus keert terug naar waar hij was.
+     Roep aan bij openen; geeft een sluit-functie terug. */
+  function focusbaar(root) {
+    return [].slice.call(root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])'))
+      .filter(function (e) { return e.offsetParent !== null; });
+  }
+  function dialoog(root, opSluit) {
+    var vorige = document.activeElement;
+    root.setAttribute('role', root.getAttribute('role') || 'dialog');
+    root.setAttribute('aria-modal', 'true');
+    var eersten = focusbaar(root);
+    if (eersten[0]) eersten[0].focus();
+    function toets(e) {
+      if (e.key === 'Escape') { sluit(); if (opSluit) opSluit(); return; }
+      if (e.key !== 'Tab') return;
+      var f = focusbaar(root); if (!f.length) return;
+      var eerste = f[0], laatste = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === eerste) { e.preventDefault(); laatste.focus(); }
+      else if (!e.shiftKey && document.activeElement === laatste) { e.preventDefault(); eerste.focus(); }
+    }
+    root.addEventListener('keydown', toets);
+    function sluit() { root.removeEventListener('keydown', toets); if (vorige && vorige.focus) try { vorige.focus(); } catch (e) {} }
+    return sluit;
+  }
+
+  w.Util = { escapeHTML: escapeHTML, initialen: initialen, tekst: tekst, el: el, vervang: vervang,
+    mount: mount, store: store, toast: toast, dialoog: dialoog };
 })(window);

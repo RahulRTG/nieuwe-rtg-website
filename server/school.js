@@ -22,16 +22,32 @@ module.exports = (ctx) => {
     if (!f.klassen) f.klassen = {};
     return f.klassen;
   }
+  // leraar-accounts: een leraar heeft een eigen token en kan MEERDERE klassen hebben
+  function L() {
+    const f = F();
+    if (!f.leraren) f.leraren = {};
+    return f.leraren;
+  }
   const klasCode = () => { let c; do { c = crypto.randomBytes(3).toString('hex').toUpperCase(); } while (K()[c]); return c; };
 
-  // leraar-authenticatie: klascode + leraar-token
+  /* leraar-authenticatie: klascode + token. Het token mag het eigen token van de
+     klas zijn (losse klas, oude stijl) of het account-token van de leraar die de
+     klas bezit; zo opent een leraar al zijn klassen met een sleutel. */
   function klasVan(req, res) {
     const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
-    if (!k || k.token !== String(req.body.leraarToken || '')) {
+    const tok = String(req.body.leraarToken || '');
+    const acc = k && k.leraarId ? L()[k.leraarId] : null;
+    if (!k || !tok || (k.token !== tok && !(acc && acc.token === tok))) {
       res.status(403).json({ error: 'Onbekende klas of verkeerd leraar-token.' });
       return null;
     }
     return k;
+  }
+  function accountVan(req, res) {
+    const tok = String(req.body.leraarToken || '');
+    const acc = tok ? Object.values(L()).find(a => a.token === tok) : null;
+    if (!acc) { res.status(403).json({ error: 'Onbekend leraar-token. Maak eerst een leraar-account.' }); return null; }
+    return acc;
   }
   // gezins-authenticatie (ouder of kind), zoals overal in de foundation
   function gezinSessie(req, res) {
@@ -45,7 +61,44 @@ module.exports = (ctx) => {
     return (k.leerlingen || []).find(l => l.sleutel === leerlingSleutel(g.code, profielId));
   }
 
-  /* ---------- leraar: klas aanmaken en inzien ---------- */
+  /* ---------- leraar-account: een leraar, meerdere klassen ---------- */
+  router.post('/school/leraar/maak', (req, res) => {
+    const naam = schoon(req.body.naam, 60);
+    const school = schoon(req.body.school, 80);
+    if (!naam) return res.status(400).json({ error: 'Vul je naam in.' });
+    const id = rid(6);
+    L()[id] = { id, naam, school: school || null, token: rid(16), at: nu() };
+    save();
+    res.json({ ok: true, leraarId: id, leraarToken: L()[id].token, naam, school: school || null });
+  });
+
+  // een nieuwe klas onder het leraar-account (de leraar opent hem met zijn account-token)
+  router.post('/school/leraar/klas/maak', (req, res) => {
+    const acc = accountVan(req, res); if (!acc) return;
+    const naam = schoon(req.body.naam, 60);
+    if (!naam) return res.status(400).json({ error: 'Geef de klas een naam.' });
+    const code = klasCode();
+    K()[code] = { code, naam, leraar: acc.naam, school: acc.school, leraarId: acc.id, token: rid(16), at: nu(),
+      leerlingen: [], rooster: [], huiswerk: [], cijfers: [], mededelingen: [], absenties: [], berichten: {}, berichtenOuders: {} };
+    save();
+    res.json({ ok: true, code, naam });
+  });
+
+  // het multi-klas-dashboard: alle klassen van deze leraar met een samenvatting
+  router.post('/school/leraar/overzicht', (req, res) => {
+    const acc = accountVan(req, res); if (!acc) return;
+    const klassen = Object.values(K()).filter(k => k.leraarId === acc.id).map(k => ({
+      code: k.code, naam: k.naam,
+      leerlingen: (k.leerlingen || []).length,
+      openAbsenties: (k.absenties || []).filter(a => !a.afgehandeld).length,
+      huiswerk: (k.huiswerk || []).length,
+      berichten: Object.values(k.berichten || {}).reduce((n, d) => n + d.length, 0)
+        + Object.values(k.berichtenOuders || {}).reduce((n, d) => n + d.length, 0)
+    }));
+    res.json({ ok: true, naam: acc.naam, school: acc.school, klassen });
+  });
+
+  /* ---------- leraar: losse klas aanmaken (oude stijl, zonder account) ---------- */
   router.post('/school/klas/maak', (req, res) => {
     const naam = schoon(req.body.naam, 60);
     const leraar = schoon(req.body.leraar, 60);
@@ -53,23 +106,38 @@ module.exports = (ctx) => {
     if (!naam || !leraar) return res.status(400).json({ error: 'Vul de klasnaam en jouw naam in.' });
     const code = klasCode();
     K()[code] = { code, naam, leraar, school: school || null, token: rid(16), at: nu(),
-      leerlingen: [], rooster: [], huiswerk: [], cijfers: [], mededelingen: [], absenties: [], berichten: {} };
+      leerlingen: [], rooster: [], huiswerk: [], cijfers: [], mededelingen: [], absenties: [], berichten: {}, berichtenOuders: {} };
     save();
     res.json({ ok: true, code, leraarToken: K()[code].token, naam, leraar });
   });
 
+  // gewogen gemiddelde van een lijst cijfers (of null zonder cijfers)
+  function gemiddelde(cijfers) {
+    let som = 0, w = 0;
+    for (const c of cijfers) { som += c.cijfer * (c.weging || 1); w += (c.weging || 1); }
+    return w ? Math.round((som / w) * 10) / 10 : null;
+  }
+
   router.post('/school/klas', (req, res) => {
     const k = klasVan(req, res); if (!k) return;
+    const naamVan = (sleutel) => { const l = (k.leerlingen || []).find(x => x.sleutel === sleutel); return l ? l.naam : sleutel; };
+    const alle = k.cijfers || [];
     res.json({
-      code: k.code, naam: k.naam, leraar: k.leraar, school: k.school,
-      leerlingen: (k.leerlingen || []).map(l => ({ sleutel: l.sleutel, naam: l.naam, at: l.at })),
-      rooster: k.rooster, huiswerk: k.huiswerk, mededelingen: k.mededelingen,
+      code: k.code, naam: k.naam, leraar: k.leraar, school: k.school, leraarAccount: !!k.leraarId,
+      // per leerling het gewogen gemiddelde: de leraar ziet in een oogopslag wie aandacht nodig heeft
+      leerlingen: (k.leerlingen || []).map(l => ({ sleutel: l.sleutel, naam: l.naam, at: l.at,
+        gemiddelde: gemiddelde(alle.filter(c => c.leerling === l.sleutel)) })),
+      klasGemiddelde: gemiddelde(alle),
+      rooster: k.rooster,
+      // bij het huiswerk ook WIE het af heeft (namen), niet alleen hoeveel
+      huiswerk: (k.huiswerk || []).map(h => Object.assign({}, h, { afNamen: (h.afDoor || []).map(naamVan) })),
+      mededelingen: k.mededelingen,
       cijfers: k.cijfers,
       absenties: (k.absenties || []).filter(a => !a.afgehandeld),
       berichten: Object.entries(k.berichten || {}).map(([sleutel, m]) => {
-        const l = (k.leerlingen || []).find(x => x.sleutel === sleutel);
         const laatste = m[m.length - 1];
-        return { sleutel, naam: l ? l.naam : sleutel, laatste: laatste ? laatste.tekst : null, laatsteAt: laatste ? laatste.at : null, aantal: m.length };
+        const prive = ((k.berichtenOuders || {})[sleutel] || []).length;
+        return { sleutel, naam: naamVan(sleutel), laatste: laatste ? laatste.tekst : null, laatsteAt: laatste ? laatste.at : null, aantal: m.length, prive };
       })
     });
   });
@@ -204,44 +272,71 @@ module.exports = (ctx) => {
     const vandaag = nu().slice(0, 10);
     if ((k.absenties || []).some(a => a.leerling === l.sleutel && a.at.slice(0, 10) === vandaag && !a.afgehandeld))
       return res.status(409).json({ error: 'Dit kind is vandaag al ziek gemeld.' });
-    k.absenties.push({ id: rid(4), leerling: l.sleutel, naam: l.naam, reden: schoon(req.body.reden, 200) || 'ziek',
-      doorNaam: schoon(s.p.naam, 60), at: nu(), afgehandeld: false });
+    k.absenties.push({ id: rid(4), leerling: l.sleutel, naam: l.naam, soort: 'ziek', bron: 'ouder',
+      reden: schoon(req.body.reden, 200) || 'ziek', doorNaam: schoon(s.p.naam, 60), at: nu(), afgehandeld: false });
     k.absenties = k.absenties.slice(-500);
     save();
     res.json({ ok: true });
   });
 
-  /* ---------- berichten: leraar <-> gezin (per leerling één draad) ----------
-     Bewust GEEN privékanaal met het kind: de draad hoort bij het gezin, dus de
-     ouder leest altijd mee. Het kind mag wel meelezen en schrijven. */
-  function draad(k, sleutel) { k.berichten = k.berichten || {}; return (k.berichten[sleutel] = k.berichten[sleutel] || []); }
+  /* ---------- berichten: twee kanalen per leerling ----------
+     1. 'gezin'  - de gezinsdraad: het kind leest en praat mee, de ouder ziet
+        alles. Bewust GEEN privekanaal leraar-kind.
+     2. 'ouders' - het privekanaal ouders <-> leraar, voor gevoelige zaken OVER
+        het kind (gedrag, thuissituatie, zorg). Het kind kan hier niet bij;
+        alleen een ouder/verzorger leest en schrijft mee. */
+  function draad(k, sleutel, kanaal) {
+    if (kanaal === 'ouders') { k.berichtenOuders = k.berichtenOuders || {}; return (k.berichtenOuders[sleutel] = k.berichtenOuders[sleutel] || []); }
+    k.berichten = k.berichten || {};
+    return (k.berichten[sleutel] = k.berichten[sleutel] || []);
+  }
+  const kanaalVan = (req) => (req.body.kanaal === 'ouders' ? 'ouders' : 'gezin');
   router.post('/school/bericht/gezin', (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
     const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
     if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
+    const kanaal = kanaalVan(req);
+    // het privekanaal is alleen voor ouders/verzorgers; het kind komt er niet in
+    if (kanaal === 'ouders' && !s.beheerder) return res.status(403).json({ error: 'Dit is het privekanaal van je ouders met de leraar.' });
     const profielId = s.beheerder && req.body.profielId ? String(req.body.profielId) : s.p.id;
     const l = leerlingVan(k, s.g, profielId);
     if (!l) return res.status(403).json({ error: 'Dit kind zit niet in deze klas.' });
-    const d = draad(k, l.sleutel);
+    const d = draad(k, l.sleutel, kanaal);
     const tekst = schoon(req.body.tekst, 500);
     if (tekst) {
-      d.push({ van: 'gezin', naam: schoon(s.p.naam, 60), tekst, at: nu() });
+      d.push({ van: kanaal === 'ouders' ? 'ouder' : 'gezin', naam: schoon(s.p.naam, 60), tekst, at: nu() });
       if (d.length > 200) d.splice(0, d.length - 200);
       save();
     }
-    res.json({ ok: true, berichten: d.slice(-60), leraar: k.leraar });
+    res.json({ ok: true, kanaal, berichten: d.slice(-60), leraar: k.leraar });
   });
   router.post('/school/bericht/leraar', (req, res) => {
     const k = klasVan(req, res); if (!k) return;
     const l = (k.leerlingen || []).find(x => x.sleutel === String(req.body.leerling || ''));
     if (!l) return res.status(404).json({ error: 'Deze leerling zit niet in jouw klas.' });
-    const d = draad(k, l.sleutel);
+    const kanaal = kanaalVan(req);
+    const d = draad(k, l.sleutel, kanaal);
     const tekst = schoon(req.body.tekst, 500);
     if (tekst) {
       d.push({ van: 'leraar', naam: k.leraar, tekst, at: nu() });
       if (d.length > 200) d.splice(0, d.length - 200);
       save();
     }
-    res.json({ ok: true, berichten: d.slice(-60) });
+    res.json({ ok: true, kanaal, berichten: d.slice(-60) });
+  });
+
+  /* ---------- absentie door de LERAAR: te laat of afwezig zonder melding ----------
+     Het gezin ziet dit meteen in het eigen overzicht; geen briefje meer nodig. */
+  router.post('/school/absentie/meld', (req, res) => {
+    const k = klasVan(req, res); if (!k) return;
+    const l = (k.leerlingen || []).find(x => x.sleutel === String(req.body.leerling || ''));
+    if (!l) return res.status(404).json({ error: 'Deze leerling zit niet in jouw klas.' });
+    const soort = req.body.soort === 'te-laat' ? 'te-laat' : 'afwezig';
+    k.absenties.push({ id: rid(4), leerling: l.sleutel, naam: l.naam, soort, bron: 'leraar',
+      reden: schoon(req.body.notitie, 200) || (soort === 'te-laat' ? 'te laat gekomen' : 'afwezig zonder melding'),
+      doorNaam: k.leraar, at: nu(), afgehandeld: false });
+    k.absenties = k.absenties.slice(-500);
+    save();
+    res.json({ ok: true });
   });
 };

@@ -148,3 +148,63 @@ test('mededeling van de leraar bereikt het gezin', async () => {
   const mijn = await json(await api('/school/mijn', { code: g.code, token: g.token }));
   assert.ok(mijn.school[0].mededelingen.some(m => /ouderavond/.test(m.tekst)));
 });
+
+test('leraar-account: meerdere klassen onder een token, met overzicht', async () => {
+  const acc = await json(await api('/school/leraar/maak', { naam: 'Meester Bram', school: 'De Regenboog' }));
+  assert.ok(acc.leraarToken);
+  const k1 = await json(await api('/school/leraar/klas/maak', { leraarToken: acc.leraarToken, naam: 'Groep 7' }));
+  const k2 = await json(await api('/school/leraar/klas/maak', { leraarToken: acc.leraarToken, naam: 'Groep 8' }));
+  // het account-token opent BEIDE klassen
+  assert.equal((await api('/school/klas', { klasCode: k1.code, leraarToken: acc.leraarToken })).status, 200);
+  assert.equal((await api('/school/klas', { klasCode: k2.code, leraarToken: acc.leraarToken })).status, 200);
+  // een verkeerd token niet
+  assert.equal((await api('/school/klas', { klasCode: k1.code, leraarToken: 'fout' })).status, 403);
+  // het overzicht toont beide klassen met samenvatting
+  const ov = await json(await api('/school/leraar/overzicht', { leraarToken: acc.leraarToken }));
+  assert.equal(ov.klassen.length, 2);
+  assert.ok(ov.klassen.every(k => 'leerlingen' in k && 'openAbsenties' in k));
+});
+
+test('privekanaal ouders <-> leraar: het kind kan er niet bij, de gezinsdraad wel', async () => {
+  const { klas, g, kindId, kindToken } = await opzet('Gg');
+  // de ouder schrijft prive; de leraar antwoordt prive
+  await api('/school/bericht/gezin', { code: g.code, token: g.token, klasCode: klas.code, profielId: kindId, kanaal: 'ouders', tekst: 'Ik maak me zorgen om de thuissituatie.' });
+  const kd = await json(await lr(klas, '/school/klas'));
+  const sleutel = g.code + ':' + kindId;
+  await lr(klas, '/school/bericht/leraar', { leerling: sleutel, kanaal: 'ouders', tekst: 'Laten we bellen. Dit blijft tussen ons.' });
+  // het KIND wordt geweigerd op het privekanaal (lezen en schrijven)
+  assert.equal((await api('/school/bericht/gezin', { code: g.code, token: kindToken, klasCode: klas.code, kanaal: 'ouders' })).status, 403);
+  assert.equal((await api('/school/bericht/gezin', { code: g.code, token: kindToken, klasCode: klas.code, kanaal: 'ouders', tekst: 'mag ik meelezen?' })).status, 403);
+  // de ouder ziet de prive-draad wel volledig
+  const prive = await json(await api('/school/bericht/gezin', { code: g.code, token: g.token, klasCode: klas.code, profielId: kindId, kanaal: 'ouders' }));
+  assert.equal(prive.berichten.length, 2);
+  // en de gezinsdraad blijft gescheiden en voor het kind toegankelijk
+  const gezinsDraad = await json(await api('/school/bericht/gezin', { code: g.code, token: kindToken, klasCode: klas.code }));
+  assert.equal(gezinsDraad.berichten.length, 0, 'de prive-berichten lekken niet naar de gezinsdraad');
+});
+
+test('leraar meldt te laat/afwezig; de ouder ziet het meteen', async () => {
+  const { klas, g, sleutel } = await opzet('Hh');
+  await lr(klas, '/school/absentie/meld', { leerling: sleutel, soort: 'te-laat', notitie: '10 minuten' });
+  const mijn = await json(await api('/school/mijn', { code: g.code, token: g.token }));
+  const a = mijn.school[0].absenties.find(x => x.soort === 'te-laat');
+  assert.ok(a, 'de ouder ziet de te-laat-melding');
+  assert.equal(a.bron, 'leraar');
+  assert.match(a.reden, /10 minuten/);
+});
+
+test('analytics: gemiddelden per leerling en klas, en huiswerk-namen', async () => {
+  const { klas, g, sleutel } = await opzet('Ii');
+  await lr(klas, '/school/cijfer/geef', { leerling: sleutel, vak: 'Rekenen', cijfer: 8, weging: 1 });
+  await lr(klas, '/school/cijfer/geef', { leerling: sleutel, vak: 'Taal', cijfer: 6, weging: 3 });
+  const kd = await json(await lr(klas, '/school/klas'));
+  // gewogen: (8*1 + 6*3) / 4 = 6.5
+  assert.equal(kd.leerlingen[0].gemiddelde, 6.5);
+  assert.equal(kd.klasGemiddelde, 6.5);
+  // huiswerk-namen: wie het af heeft, met naam
+  await lr(klas, '/school/huiswerk/maak', { titel: 'Sommen', vak: 'Rekenen' });
+  const hw = (await json(await lr(klas, '/school/klas'))).huiswerk[0];
+  await api('/school/huiswerk/af', { code: g.code, token: g.token, klasCode: klas.code, profielId: sleutel.split(':')[1], huiswerkId: hw.id });
+  const na = await json(await lr(klas, '/school/klas'));
+  assert.ok(na.huiswerk[0].afNamen.some(n => /Kind Ii/.test(n)), 'de leraar ziet de naam van wie het af heeft');
+});

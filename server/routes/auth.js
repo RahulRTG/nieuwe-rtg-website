@@ -6,6 +6,18 @@ module.exports = (kern) => {
   // buiten productie of met RTG_DEMO=1. Echte leden loggen in via /api/auth/login.
   const DEMO = !PRODUCTION || process.env.RTG_DEMO === '1';
 
+  /* Elke pas heeft zijn eigen app (app.html?pas=...). De inloggegevens werken
+     echt alleen in de app van de eigen pas: een Business-account komt de
+     Lifestyle-app niet in, en andersom. De gratis laag (gast) heeft geen eigen
+     app en speelt mee in de RTG-app, met minder functies. Zonder pasApp (de
+     brede leden-app) werkt elke pas. */
+  function pasAppOk(pasApp, tier) {
+    if (!['rtg', 'lifestyle', 'business'].includes(pasApp)) return true; // brede app
+    if (pasApp === 'rtg') return tier === 'rtg' || tier === 'guest';
+    return tier === pasApp;
+  }
+  const PAS_FOUT = 'Deze inloggegevens horen bij een andere pas. Open de app van uw eigen pas via rtg.example/apps.';
+
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
   if (hasCred(req.body)) {
@@ -23,6 +35,7 @@ app.post('/api/login', (req, res) => {
     return res.status(403).json({ error: 'Log in met je account.' });
   }
   if (!PERSONAS[tier]) return res.status(400).json({ error: 'Onbekende pas.' });
+  if (!pasAppOk(String(req.body.pasApp || ''), tier)) return res.status(403).json({ error: PAS_FOUT });
   const token = crypto.randomBytes(24).toString('hex');
   const sess = { tier, key: tier === 'guest' ? 'guest-' + token.slice(0, 8) : tier };
   rememberSession(token, sess);
@@ -57,6 +70,8 @@ app.post('/api/auth/register', (req, res) => {
   if (lftNieuw < 15) return res.status(400).json({ error: 'Het RTG-lidmaatschap kan vanaf 15 jaar.' });
   if (lftNieuw > 120) return res.status(400).json({ error: 'Controleer uw geboortedatum.' });
   if (accounts.findByLogin(email)) return res.status(409).json({ error: 'Er bestaat al een account met dit e-mailadres.' });
+  // in een pas-app registreer je alleen een account van die pas (gratis mag in de RTG-app)
+  if (!pasAppOk(String(req.body.pasApp || ''), String(req.body.tier || 'rtg'))) return res.status(403).json({ error: PAS_FOUT });
   let user;
   try {
     user = accounts.createUser({ email, username: req.body.username || null, password, tier: req.body.tier, realName: name, phone });
@@ -126,6 +141,8 @@ app.post('/api/auth/login', (req, res) => {
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket);
+  // juiste gegevens, maar de verkeerde pas-app: netjes doorverwijzen
+  if (!pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
   const token = accounts.issueToken(user.id);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
   res.json({ token, state: stateFor(sess, req.body.lang) });

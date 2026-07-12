@@ -1255,18 +1255,23 @@
     }));
 
   /* ---------- eigen app per pas ----------
-     Elke pas heeft zijn eigen ingang (pas-gast/rtg/lifestyle/business.html) die
-     hier binnenkomt met ?pas=. Dan wordt dit DE app van die pas: het manifest
-     (eigen naam en icoon op het beginscherm) wisselt mee en de poort toont
-     alleen het eigen demoprofiel. Zonder ?pas= blijft dit de brede leden-app. */
-  const vastePas = new URLSearchParams(location.search).get('pas');
-  if (vastePas && ['guest','rtg','lifestyle','business'].includes(vastePas)){
-    const mf = { guest:'pas-gast', rtg:'pas-rtg', lifestyle:'pas-lifestyle', business:'pas-business' }[vastePas];
+     Elke betaalde pas heeft zijn eigen ingang (pas-rtg/lifestyle/business.html)
+     die hier binnenkomt met ?pas=. Dan wordt dit DE app van die pas: het
+     manifest (eigen naam en icoon op het beginscherm) wisselt mee, de poort
+     toont alleen de eigen ingang, en de server weigert inloggegevens van een
+     andere pas. De gratis laag heeft GEEN eigen app: die speelt mee in de
+     RTG-app, met minder functies. Zonder ?pas= blijft dit de brede leden-app. */
+  let vastePas = new URLSearchParams(location.search).get('pas');
+  if (vastePas === 'guest') vastePas = 'rtg'; // gratis speelt in de RTG-app
+  if (!['rtg','lifestyle','business'].includes(vastePas)) vastePas = null;
+  if (vastePas){
     const ml = document.getElementById('manifestLink');
-    if (ml) ml.href = '/manifests/' + mf + '.webmanifest';
-    document.title = { guest:'RTG Gratis', rtg:'RTG Pass', lifestyle:'RTG Lifestyle Pass', business:'RTG Business Pass' }[vastePas];
-    document.querySelectorAll('[data-login]').forEach(b => { if (b.dataset.login !== vastePas) b.style.display = 'none'; });
-    regTier = vastePas === 'guest' ? 'guest' : vastePas;
+    if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';
+    document.title = { rtg:'RTG Pass', lifestyle:'RTG Lifestyle Pass', business:'RTG Business Pass' }[vastePas];
+    // in de RTG-app mag ook de gratis ingang (minder functies); elders alleen de eigen pas
+    const mag = vastePas === 'rtg' ? ['rtg','guest'] : [vastePas];
+    document.querySelectorAll('[data-login]').forEach(b => { if (!mag.includes(b.dataset.login)) b.style.display = 'none'; });
+    regTier = vastePas;
   }
 
   const loginForm = document.getElementById('loginForm');
@@ -1305,8 +1310,8 @@
       if (API.enabled){
         try {
           const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier })
-            : await API.call('/auth/login', { login: cred.u, password: cred.p });
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: vastePas || undefined })
+            : await API.call('/auth/login', { login: cred.u, password: cred.p, pasApp: vastePas || undefined });
           API.token = data.token;
           applyState(data.state);           // user = het echte account
           tier = user.tier;
@@ -1321,7 +1326,7 @@
       user = {...PERSONAS[tier]};
       if (API.enabled){
         try {
-          const data = await API.call('/login', {tier});
+          const data = await API.call('/login', {tier, pasApp: vastePas || undefined});
           API.token = data.token;
           applyState(data.state);
         } catch (e) { API.enabled = false; }

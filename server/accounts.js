@@ -144,7 +144,9 @@ function makeCodename() {
 
 /* ---------- gebruikers ---------- */
 function createUser({ email, username, password, tier, realName, phone }) {
-  tier = ['rtg', 'lifestyle', 'business'].includes(tier) ? tier : 'rtg';
+  // 'guest' is de gratis (bestel/betaal) laag: een echt account met paspoort,
+  // maar zonder betaalde pas. rtg/lifestyle/business zijn de betaalde passen.
+  tier = ['rtg', 'lifestyle', 'business', 'guest'].includes(tier) ? tier : 'rtg';
   const info = db.prepare(
     `INSERT INTO users (email_hash, username, password_hash, tier, codename, enc_name, enc_email, enc_phone, phone_hash, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`

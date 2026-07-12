@@ -747,6 +747,7 @@
       <button type="submit" data-i18n="gate.signin">Inloggen</button>
     </form>
     <form class="login-form" id="regForm" style="display:none;">
+      <div id="regKop" style="font-size:0.82rem;color:var(--muted);line-height:1.5;margin-bottom:0.2rem;"></div>
       <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
       <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
       <input id="rgPhone" type="tel" placeholder="Mobiel nummer (WhatsApp)" data-i18n-ph="gate.phone" autocomplete="tel">
@@ -1204,8 +1205,23 @@
 
   /* ---------- login & tabs ---------- */
 
+  // De gratis (bestel/betaal) laag is alleen te gebruiken na registratie met een
+  // paspoort. De gratis-knop opent daarom het registratieformulier, niet een
+  // anonieme sessie. De betaalde passen (demo) loggen wel direct in.
+  let regTier = 'rtg';
+  function updateRegKop(){
+    const el = $('#regKop'); if (!el) return;
+    el.textContent = regTier === 'guest'
+      ? T('gate.reg.free','Gratis account met paspoort: bestel en betaal bij partners, bekijk De Salon en solliciteer. Geen betaalde pas.')
+      : T('gate.reg.paid','Maak uw RTG-account aan. Aanmelden gebeurt met uw paspoort (geboortedatum).');
+    const btn = $('#regForm button[type="submit"]');
+    if (btn) btn.textContent = regTier === 'guest' ? T('gate.reg.freebtn','Gratis account aanmaken') : T('gate.createacc','Account aanmaken');
+  }
   document.querySelectorAll('[data-login]').forEach(b =>
-    b.addEventListener('click', () => login(b.dataset.login)));
+    b.addEventListener('click', () => {
+      if (b.dataset.login === 'guest'){ regTier = 'guest'; showGateForm('register'); updateRegKop(); }
+      else login(b.dataset.login);
+    }));
 
   const loginForm = document.getElementById('loginForm');
   if (loginForm) loginForm.addEventListener('submit', e => {
@@ -1215,7 +1231,7 @@
   const regForm = document.getElementById('regForm');
   if (regForm) regForm.addEventListener('submit', e => {
     e.preventDefault();
-    login(null, { register: true, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, geboortedatum: $('#rgGeb').value, p: $('#rgPass').value });
+    login(null, { register: true, tier: regTier, name: $('#rgName').value, u: $('#rgEmail').value, phone: $('#rgPhone').value, geboortedatum: $('#rgGeb').value, p: $('#rgPass').value });
   });
   const toReg = document.getElementById('toReg'), toLogin = document.getElementById('toLogin'), toForgot = document.getElementById('toForgot');
   function showGateForm(which){
@@ -1226,7 +1242,7 @@
     if (toForgot) toForgot.style.display = which==='login' ? '' : 'none';
     if (toLogin) toLogin.style.display = which==='login' ? 'none' : '';
   }
-  if (toReg) toReg.addEventListener('click', () => showGateForm('register'));
+  if (toReg) toReg.addEventListener('click', () => { regTier = 'rtg'; showGateForm('register'); updateRegKop(); });
   if (toForgot) toForgot.addEventListener('click', () => showGateForm('forgot'));
   if (toLogin) toLogin.addEventListener('click', () => showGateForm('login'));
   const forgotForm = document.getElementById('forgotForm');
@@ -1243,7 +1259,7 @@
       if (API.enabled){
         try {
           const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p })
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier })
             : await API.call('/auth/login', { login: cred.u, password: cred.p });
           API.token = data.token;
           applyState(data.state);           // user = het echte account
@@ -1651,7 +1667,7 @@
     } catch (e) { return; }
     if (scope === 'payments'){ renderPay(); renderHome(); renderTrip(); }
     else if (scope === 'salon'){ renderSalon(); renderHome(); }
-    else if (scope === 'orders'){ renderTerPlaatse(); }
+    else if (scope === 'orders'){ renderTerPlaatse(); if (user.tier === 'guest') loadGuestHistory(); }
     else if (scope === 'live'){ renderLive(); }
     else if (scope === 'gchat'){ if (pchat) loadPChat(); }
     else if (scope === 'apply'){ renderCvCard(); if (apChatId) laadApplyChat(); }
@@ -2594,7 +2610,10 @@
       '<div class="cn" style="font-size:1.35rem;">'+T('app.guest.title','Zonder pas')+'</div>'+
       '<div style="font-size:0.82rem;color:var(--muted);line-height:1.55;margin-top:0.7rem;">'+T('app.guest.body','Je kunt bij RTG-partners betalen via de app, de foto’s in De Salon bekijken en solliciteren op vacatures met je cv. Liken en reageren bij leden hoort bij een pas.')+'</div>'+
       '<button class="go" data-goto="terplaatse" style="margin-top:0.9rem;">'+T('app.guest.pay','Betaal bij een partner')+' →</button>';
-    ['#homeTrip','#homePay'].forEach(id=>{ const e=$(id); if(e) e.style.display='none'; });
+    const trip = $('#homeTrip'); if (trip) trip.style.display='none';
+    // de gratis app is een bestel/betaal-app: toon de betaalgeschiedenis
+    const pay = $('#homePay'); if (pay){ pay.style.display=''; pay.innerHTML = '<div class="label">'+T('app.guest.history','Mijn bestellingen en betalingen')+'</div><div class="meta">'+T('app.loading','Laden...')+'</div>'; }
+    loadGuestHistory();
     const salon = $('#homeSalon');
     if (salon){ salon.style.display='';
       salon.innerHTML = '<div class="label">'+T('app.thesalon','De Salon')+'</div>'+
@@ -2603,8 +2622,34 @@
         '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
-    const c = $('#homeContacts'); if (c) c.style.display='none';
-    renderFoundation();
+    ['#homeContacts','#homeFoundation'].forEach(id=>{ const e=$(id); if(e) e.style.display='none'; });
+    const gtab = $('#tabGezin'); if (gtab) gtab.style.display='none';
+  }
+  // Betaalgeschiedenis van de gratis gebruiker: wat is besteld en betaald.
+  async function loadGuestHistory(){
+    const el = $('#homePay'); if (!el) return;
+    let orders = [];
+    try { orders = (await API.call('/orders/mine')).orders || []; } catch(e){}
+    const betaald = orders.filter(o => o.paid);
+    const som = betaald.reduce((s,o) => s + o.total, 0);
+    const open = orders.filter(o => !o.paid);
+    el.innerHTML = '<div class="label">'+T('app.guest.history','Mijn bestellingen en betalingen')+'</div>'+
+      (orders.length
+        ? '<div class="big" style="font-size:1.05rem;">'+eur(som)+' <span style="font-size:0.7rem;color:var(--soft);font-weight:400;">'+T('app.guest.paid','betaald')+'</span></div>'+
+          '<div class="meta" style="margin:.2rem 0 .6rem;">'+betaald.length+' '+T('app.guest.paidorders','betaalde bestelling(en)')+(open.length?(' · '+open.length+' '+T('app.guest.open','open')):'')+'</div>'+
+          '<div style="display:flex;flex-direction:column;gap:.45rem;">'+orders.slice(0,6).map(o=>{
+            const kleur = o.paid ? 'var(--green,#4CAF7D)' : 'var(--gold)';
+            const st = o.paid ? T('app.guest.ok','betaald') : T('app.guest.te','te betalen');
+            return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;font-size:0.78rem;color:var(--muted);">'+
+              '<span>'+escT(o.supplierName)+' · '+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('app.items','item(s)')+' · '+timeAgo(o.at)+'</span>'+
+              '<span style="flex-shrink:0;white-space:nowrap;">'+eur(o.total)+' · <span style="color:'+kleur+';">'+st+'</span>'+
+              (o.paid?'':' <button class="pa" data-guestpay="'+o.ref+'" style="padding:.12rem .5rem;font-size:0.66rem;margin-left:.2rem;">'+T('app.guest.paynow','betaal')+'</button>')+'</span></div>';
+          }).join('')+'</div>'
+        : '<div class="meta">'+T('app.guest.none','Je hebt nog niets besteld. Betaal bij een partner via Ter plaatse.')+'</div>');
+    el.querySelectorAll('[data-guestpay]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/order/pay', { ref: b.dataset.guestpay }); toast(T('app.guest.paid2','Betaald.')); loadGuestHistory(); }
+      catch(e){ toast(e.message); }
+    }));
   }
 
   /* ---------- RTFoundation: eigen gezinsruimte voor gekoppelde oppas/opa/oma ---------- */

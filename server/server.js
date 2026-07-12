@@ -150,8 +150,10 @@ function leeftijdVan(geboren) {
   return j;
 }
 function geborenVan(sess) {
-  if (!sess || sess.tier === 'guest') return null;
+  if (!sess) return null;
+  // een echt account (ook de gratis laag) heeft een paspoort-geboortedatum
   if (sess.account) return (accounts.getMemberState(sess.account.id) || {}).geboren || null;
+  if (sess.tier === 'guest') return null; // anonieme demo-gast heeft geen paspoort
   return (PERSONAS[sess.tier] || {}).geboren || null;
 }
 function leeftijdsgroepVan(lft) {

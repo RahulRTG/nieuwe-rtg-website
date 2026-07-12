@@ -555,6 +555,21 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   assert.ok(!lijst2.vacatures.find(v => v.id === vacId));
 });
 
+test('gratis account met paspoort: bestellen, betalen en de betaalgeschiedenis terugzien', async () => {
+  const now = Date.now();
+  const reg = await json(await raw('/auth/register', { name: 'Gratis Lid', email: 'gr' + now + '@v.test', phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '2000-01-01', tier: 'guest' }));
+  assert.ok(reg.token, 'gratis registratie met paspoort geeft een token');
+  assert.equal(reg.state.user.tier, 'guest', 'het is een gratis (guest) account, geen betaalde pas');
+  const gtok = reg.token;
+  // bestellen en betalen bij een partner
+  const order = await json(await raw('/order', { supplierCode: 'KIKUNOI', items: [{ id: 'm2', qty: 1 }] }, gtok));
+  assert.ok(order.order && order.order.ref, 'gratis account plaatst een bestelling');
+  assert.equal((await raw('/order/pay', { ref: order.order.ref }, gtok)).status, 200, 'gratis account betaalt');
+  // de betaalgeschiedenis blijft bewaard bij het account
+  const mine = await json(await raw('/orders/mine', {}, gtok));
+  assert.ok(mine.orders.some(o => o.ref === order.order.ref && o.paid), 'de betaalde bestelling staat in de geschiedenis');
+});
+
 test('gratis gebruiker zonder pas: betalen bij partners en solliciteren mag, liken bij particulieren niet', async () => {
   const supLogin = await json(await raw('/supplier/login', { username: 'rahul', password: 'Imran' }));
   const supCode = supLogin.state.supplier.code;

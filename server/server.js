@@ -19,7 +19,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { db, load, save, DATA_DIR } = require('./db');
+const { db, load, save, DATA_DIR, startGedeeld, onExternalChange } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const mail = require('./mail');
@@ -254,6 +254,29 @@ const AUTHOR_TIER = {
 
 const sseClients = []; // { tier, res }
 
+/* Realtime-bus: zonder REDIS_URL in-proces (huidig gedrag), met REDIS_URL via
+   Redis pub/sub zodat live-events ook gebruikers op een ander domeinproces
+   bereiken. Elke sseTo*-functie publiceert; elk proces levert de events af aan
+   zijn eigen open verbindingen. */
+const bus = require('./bus').maakBus();
+function leverSse(m) {
+  for (const c of sseClients) {
+    let raak = false;
+    if (m.doel === 'key') raak = c.key === m.match;
+    else if (m.doel === 'sup') raak = c.sup === m.match;
+    else if (m.doel === 'office') raak = !!c.office;
+    else if (m.doel === 'tier') raak = m.match.includes(c.tier);
+    if (raak) sseSend(c.res, m.event, m.data);
+  }
+}
+bus.subscribe('sse', leverSse);
+// Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
+// vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
+onExternalChange(() => {
+  if (!db.data || !db.data.sessions) return;
+  for (const [t, s] of Object.entries(db.data.sessions)) sessions.set(t, s);
+});
+
 /* Alles wat elk partnerbedrijf standaard nodig heeft; wordt gebruikt voor
    bestaande bedrijven (migratie bij opstarten) en voor nieuwe partners die
    via de onboarding worden goedgekeurd. */
@@ -442,8 +465,7 @@ function sseSend(res, event, data) {
 
 // stuur een sync-signaal naar één of meer tiers (open schermen herladen data)
 function broadcastSync(tiers, scope) {
-  const set = new Set(tiers);
-  for (const c of sseClients) if (set.has(c.tier)) sseSend(c.res, 'sync', { scope });
+  bus.publish('sse', { doel: 'tier', match: [...tiers], event: 'sync', data: { scope } });
 }
 
 // notificeer één tier: opslaan, naar open schermen sturen én web-push
@@ -453,7 +475,7 @@ function notify(tier, note) {
   db.data.notifications[tier].unshift(n);
   db.data.notifications[tier] = db.data.notifications[tier].slice(0, 40);
   save();
-  for (const c of sseClients) if (c.tier === tier) sseSend(c.res, 'notify', n);
+  bus.publish('sse', { doel: 'tier', match: [tier], event: 'notify', data: n });
   sendPush(tier, n);
   return n;
 }
@@ -1063,10 +1085,10 @@ function publicTrip(t, staffRate, lang) {
 
 // SSE-routering naar een specifieke leverancier of naar de backoffice
 function sseToSupplier(code, event, data) {
-  for (const c of sseClients) if (c.sup === code) sseSend(c.res, event, data);
+  bus.publish('sse', { doel: 'sup', match: code, event, data });
 }
 function sseToOffice(event, data) {
-  for (const c of sseClients) if (c.office) sseSend(c.res, event, data);
+  bus.publish('sse', { doel: 'office', event, data });
 }
 
 function notifySupplier(code, note) {
@@ -2207,7 +2229,7 @@ function etaMinutes(meters, mode) {
   return Math.max(1, Math.round((meters / 1000) / kmh * 60));
 }
 function sseToCustomer(key, event, data) {
-  for (const c of sseClients) if (c.key === key) sseSend(c.res, event, data);
+  bus.publish('sse', { doel: 'key', match: key, event, data });
 }
 function liveCodename(session) {
   return session.account ? session.account.codename : PERSONAS[session.tier].codename;
@@ -2649,6 +2671,8 @@ function backupData() {
 /* ---------- start ---------- */
 
 initRealtime();
+// Gedeelde data via Redis aanzetten (alleen als REDIS_URL gezet is; anders lokaal).
+startGedeeld().catch(e => console.warn('[db] gedeelde data mislukt:', e.message));
 backupData();
 setInterval(backupData, 24 * 60 * 60 * 1000);
 

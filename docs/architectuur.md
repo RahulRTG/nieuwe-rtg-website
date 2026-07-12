@@ -68,21 +68,60 @@ node server/poort.js
 
 Alles zonder eigen upstream valt terug op `RTG_UP_DEFAULT` (het hoofdproces).
 
-## Belangrijk: van modules naar écht losse servers
+## Gedeelde data en realtime over losse processen (Redis)
 
-De code is nu modulair en per domein opstartbaar, maar de domeinen delen nog het
-geheugen van de kern: één db-bestand en één in-proces SSE-lijst. Daarom hoort er
-op dit moment precies **één** proces naar de data te schrijven (net als bij het
-failover-trio in `server/trio.js`).
+De twee dingen die losse processen deelden zaten in het geheugen van de kern:
+de data (`db.data`) en de realtime-lijst (SSE). Allebei hebben nu een gedeelde
+variant via Redis, aan te zetten met één omgevingsvariabele. Zonder `REDIS_URL`
+werkt alles zoals altijd (één proces, lokaal `db.json`, in-proces SSE).
 
-Voor echt losse, schrijvende servers is nog nodig:
+### Realtime-bus (`server/bus.js`)
 
-1. **Gedeelde database** met vergrendeling in plaats van het lokale JSON-bestand
-   (bijv. Postgres), zodat meerdere processen tegelijk veilig kunnen schrijven.
-2. **Gedeelde realtime-bus** (bijv. Redis pub/sub) achter `sseToCustomer` en
-   vrienden, zodat een snap of belsignaal ook een gebruiker bereikt die met een
-   ander domeinproces verbonden is. Cross-app bellen/snaps/chat hangen hieraan.
+`sseToCustomer` / `sseToSupplier` / `sseToOffice` / `broadcastSync` / `notify`
+publiceren nu op een bus in plaats van rechtstreeks op de lokale verbindingen.
 
-Omdat alle domeinen alleen via de kern met de gedeelde staat praten, verandert
-er in de domeinmodules niets als die twee lagen later worden vervangen: alleen
-de kern krijgt dan een gedeelde in plaats van een in-proces implementatie.
+- **Zonder `REDIS_URL`:** in-proces (een `EventEmitter`), synchroon en identiek
+  aan vroeger.
+- **Met `REDIS_URL`:** Redis pub/sub. Elk proces levert het event af aan zijn
+  eigen open verbindingen. Zo bereikt een snap, belsignaal of melding ook een
+  gebruiker die met een ánder domeinproces verbonden is. Cross-app bellen,
+  snaps en chat blijven dus werken als de domeinen los draaien.
+
+### Gedeelde data (`server/db.js`)
+
+Met `REDIS_URL` spiegelt de schrijver elke `save()` naar Redis (met een oplopend
+versienummer) en lezen de andere processen die verse data live mee. De
+sessie-index wordt na een externe wijziging opnieuw gevuld, zodat een
+lezersproces tokens kent die de schrijver net aanmaakte.
+
+Er schrijft nog steeds precies **één** proces (`db.writable`), net als bij het
+failover-trio. Zet de lezers met `RTG_ROL=standby`. Dit dekt het gangbare beeld:
+één schrijver plus meerdere lees-/realtime-processen per domein, achter de
+gateway.
+
+```
+# schrijver (alle domeinen of een subset), bewaart en deelt de data
+REDIS_URL=redis://127.0.0.1:6379 PORT=3010 node server/server.js
+
+# los leverancier-proces dat meeleest en dezelfde realtime deelt
+REDIS_URL=redis://127.0.0.1:6379 RTG_ROL=standby RTG_DOMAINS=supplier \
+  PORT=3003 node server/server.js
+
+# gateway ervoor
+RTG_UP_DEFAULT=http://127.0.0.1:3010 \
+RTG_UP_SUPPLIER=http://127.0.0.1:3003 node server/poort.js
+```
+
+Getest met een echte `redis-server` en twee processen: de vriendschap die de
+schrijver maakt ziet de lezer, en een belsignaal dat op de schrijver ontstaat
+bereikt een SSE-verbinding op de lezer.
+
+### De laatste stap: meerdere schrijvers
+
+Wil je dat elk domein zijn eigen data ook zelfstandig **schrijft** (in plaats van
+één schrijver), dan moet `db.data` van één groot JSON-document naar een echte
+database met rijen en transacties (bijv. Postgres), zodat twee processen
+tegelijk verschillende delen kunnen bijwerken zonder elkaar te overschrijven.
+Omdat alle domeinen alleen via de kern (`db`, `save`, de bus) met de gedeelde
+staat praten, verandert er in de domeinmodules niets: alleen `server/db.js`
+krijgt dan een relationele in plaats van een blob-implementatie.

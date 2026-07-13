@@ -81,6 +81,35 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
   });
 });
 
+test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwijnt weer',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto(base + '/apps/personeel.html', { waitUntil: 'load' });
+    // offline -> de banner schuift in beeld met een melding
+    await context.setOffline(true);
+    await page.waitForFunction(() => {
+      const b = document.getElementById('rtg-net-banner');
+      return !!(b && /translateY\(0/.test(b.style.transform) && b.textContent.length > 0);
+    }, undefined, { timeout: 8000 });
+    // weer online -> de banner schuift weg
+    await context.setOffline(false);
+    await page.waitForFunction(() => {
+      const b = document.getElementById('rtg-net-banner');
+      return !!(b && /-100/.test(b.style.transform));
+    }, undefined, { timeout: 8000 });
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await bootTest({

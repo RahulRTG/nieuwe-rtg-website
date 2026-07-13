@@ -917,6 +917,8 @@ app.post('/api/ride/request', auth, (req, res) => {
   const s = findSupplier(req.body.supplierCode);
   const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
   if (!s || !caps.includes('rides')) return res.status(404).json({ error: 'Geen vervoerspartner gevonden.' });
+  // activiteitenzaken rijden alleen hun eigen transfers: die regel je via je ticket
+  if (s.type === 'activiteit') return res.status(409).json({ error: 'De transfer van ' + s.name + ' regel je via je ticket (Ter plaatse, Mijn tickets).' });
   if (!optieAan(s, 'ritten')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen ritaanvragen aan.' });
   // leeftijd uit het paspoort: privejets boek je vanaf 18 jaar
   const lftR = leeftijdVan(geborenVan(req.session));
@@ -1167,9 +1169,63 @@ app.post('/api/tickets/mijn', auth, (req, res) => {
   const mijn = db.data.boekingen
     .filter(b => b.kind === 'ticket' && (b.customerKey || b.customerTier) === req.session.key && b.status !== 'geweigerd' && b.paid)
     .slice(0, 20)
-    .map(b => ({ ref: b.ref, code: b.code, supplierName: b.supplierName, naam: b.service.name,
-      datum: b.datum, tijd: b.tijd, personen: b.personen, prijs: b.price,
-      gebruikt: !!b.checkin, checkin: b.checkin || null }));
+    .map(b => {
+      const zaak = findSupplier(b.supplierCode);
+      const rit = db.data.rides.find(r => r.ticketRef === b.ref && !['afgerond', 'geweigerd'].includes(r.status));
+      return { ref: b.ref, code: b.code, supplierName: b.supplierName, naam: b.service.name,
+        datum: b.datum, tijd: b.tijd, personen: b.personen, prijs: b.price,
+        gebruikt: !!b.checkin, checkin: b.checkin || null,
+        // de eigen transferdienst van de zaak, en de lopende rit met chauffeur
+        transferAan: !!(zaak && zaak.transfer && zaak.transfer.aan),
+        transferPrijs: zaak && zaak.transfer ? (zaak.transfer.prijs || 0) : 0,
+        transfer: rit ? { ref: rit.ref, status: rit.status, prijs: rit.quote || 0, paid: !!rit.paid,
+          chauffeur: rit.driver ? rit.driver.name : null, etaMin: rit.pickupEtaMin || null } : null };
+    });
   res.json({ tickets: mijn });
+});
+
+/* De transfer van een activiteitenzaak: alleen met een geldig (betaald, nog
+   niet gebruikt) ticket. De rit gaat de gewone rittenmachinerie in: de
+   chauffeur van de zaak neemt hem op naam aan, de klant ziet wie er komt
+   (en andersom), en de zaak ziet alles in de eigen app. */
+app.post('/api/transfer/aanvraag', auth, (req, res) => {
+  const t = db.data.boekingen.find(b => b.kind === 'ticket' && b.ref === String(req.body.ticketRef || '') &&
+    (b.customerKey || b.customerTier) === req.session.key);
+  if (!t) return res.status(404).json({ error: 'Ticket niet gevonden.' });
+  if (!t.paid) return res.status(409).json({ error: 'Betaal eerst het ticket; dan regelen we de transfer.' });
+  if (t.checkin) return res.status(409).json({ error: 'Dit ticket is al gebruikt.' });
+  if (t.datum < new Date().toISOString().slice(0, 10)) return res.status(409).json({ error: 'Dit ticket is verlopen.' });
+  const s = findSupplier(t.supplierCode);
+  if (!s || !s.transfer || !s.transfer.aan)
+    return res.status(409).json({ error: (s ? s.name : 'Deze zaak') + ' heeft geen eigen transferdienst.' });
+  if (db.data.rides.some(r => r.ticketRef === t.ref && !['afgerond', 'geweigerd'].includes(r.status)))
+    return res.status(409).json({ error: 'Er staat al een transfer voor dit ticket.' });
+  const prijs = s.transfer.prijs || 0;
+  const codename = liveCodename(req.session);
+  const ride = {
+    ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    supplierCode: s.code, supplierName: s.name, type: 'transfer',
+    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    from: schoon(req.body.van || 'Huidige locatie', 80),
+    to: s.name, toCode: s.code,
+    when: t.tijd + ' \u00B7 ' + t.service.name,
+    plannedFor: t.datum + 'T' + t.tijd + ':00',
+    passengers: t.personen || 1, luggage: 0,
+    note: schoon(req.body.note, 140),
+    km: null, quote: prijs, ticketRef: t.ref,
+    driver: null, vehicle: null,
+    betaalMoment: 'vooraf',
+    // prijs 0 = inclusief bij het ticket: meteen definitief, geen betaalstap
+    status: prijs > 0 ? 'wacht-op-betaling' : 'aangevraagd',
+    paid: prijs === 0, at: new Date().toISOString()
+  };
+  db.data.rides.unshift(ride);
+  save();
+  if (ride.status === 'aangevraagd') {
+    notifySupplier(s.code, { icon: '\u{1F690}', title: 'Transferaanvraag', body: codename + ': ophalen ' + ride.from + ' voor ' + t.service.name + ' ' + t.tijd + ' \u00B7 ' + (t.personen || 1) + 'p' + (prijs ? ' \u00B7 \u20AC ' + prijs : ' \u00B7 inclusief') });
+    sseToSupplier(s.code, 'sync', { scope: 'orders' });
+    sseToOffice('sync', { scope: 'orders' });
+  }
+  res.json({ ok: true, ride }); // met een prijs: afrekenen via /api/ride/pay
 });
 };

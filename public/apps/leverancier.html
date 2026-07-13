@@ -2820,6 +2820,20 @@
           '<span id="tkGast-'+i+'" style="display:none;">'+sl.gasten.map(g => '<br>'+(g.binnen?'\u2705':'\u25CB')+' '+esc(g.codename)+' \u00B7 '+g.personen+'p \u00B7 '+g.code).join('')+'</span></div>' : '')+
         '</div>').join('')
       : '<div class="empty">'+T('tk2.leeg','Nog geen tijdsloten. '+(canEdit?'Voeg hieronder een activiteit toe.':''))+'</div>')+'</div>';
+    // de eigen transferdienst (chauffeurs van de zaak rijden; ritten in de Ritten-tab)
+    const tr = state.transfer;
+    if (tr){
+      html += '<div class="card"><div class="tt-h">'+T('tk2.transfer','Eigen transferdienst')+'</div>'+
+        '<div style="margin-top:0.5rem;font-size:0.85rem;color:'+(tr.aan?'var(--green)':'var(--soft)')+';">'+
+        (tr.aan ? '\u25CF '+T('tk2.tr.aan','Aan: gasten met een ticket vragen de transfer aan; uw chauffeurs zien de ritten in de Ritten-tab en op de PDA.')
+                : '\u25CB '+T('tk2.tr.uit','Uit.'))+'</div>'+
+        '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--muted);">'+T('tk2.tr.prijs','Prijs per rit:')+' <b style="color:var(--gold);">'+(tr.prijs ? eur(tr.prijs) : T('tk2.tr.incl','inclusief bij het ticket (\u20AC 0)'))+'</b></div>'+
+        (canEdit ? '<div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;flex-wrap:wrap;">'+
+          '<button class="obtn'+(tr.aan?'':' primary')+'" data-traan="'+(tr.aan?'0':'1')+'">'+(tr.aan?T('tk2.tr.zetuit','Zet uit'):T('tk2.tr.zetaan','Zet aan'))+'</button>'+
+          '<input id="trPrijs" type="number" inputmode="decimal" value="'+(tr.prijs||0)+'" style="width:6rem;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.7rem;color:var(--txt);outline:none;">'+
+          '<button class="obtn" id="trPrijsZet">'+T('tk2.tr.prijszet','Prijs opslaan')+'</button>'+
+          '<span style="font-size:0.68rem;color:var(--soft);">'+T('tk2.tr.nul','0 = inclusief')+'</span></div>' : '')+'</div>';
+    }
     // aanbodbeheer (manager)
     const acts = state.activiteiten || [];
     html += '<div class="card"><div class="tt-h">'+T('tk2.aanbod','Aanbod')+' ('+acts.length+')</div>'+
@@ -2845,6 +2859,13 @@
         $('#tkCode').value = '';
         laadProgramma();
       } catch(e){ uit.innerHTML = '<span style="color:var(--burgundy);">\u26D4 '+esc(e.message)+'</span>'; }
+    });
+    document.querySelectorAll('[data-traan]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/transfer', { aan: k.dataset.traan === '1' }); await refresh(); openTab('tickets'); } catch(e){ toast(e.message); }
+    }));
+    const trZet = document.getElementById('trPrijsZet');
+    if (trZet) trZet.addEventListener('click', async () => {
+      try { await API.call('/supplier/transfer', { prijs: Number($('#trPrijs').value) }); toast(T('tk2.tr.ok','De transferprijs staat vast.')); await refresh(); openTab('tickets'); } catch(e){ toast(e.message); }
     });
     document.querySelectorAll('[data-tkg]').forEach(k => k.addEventListener('click', () => {
       const g = document.getElementById('tkGast-' + k.dataset.tkg);

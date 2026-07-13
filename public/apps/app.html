@@ -1943,11 +1943,11 @@
     if (scope === 'payments'){ renderPay(); renderHome(); renderTrip(); }
     else if (scope === 'salon'){ renderSalon(); renderHome(); }
     else if (scope === 'orders'){ renderTerPlaatse(); if (user.tier === 'guest') loadGuestHistory(); }
-    else if (scope === 'live'){ renderLive(); }
-    else if (scope === 'gchat'){ if (pchat) loadPChat(); }
+        else if (scope === 'gchat'){ if (pchat) loadPChat(); }
     else if (scope === 'apply'){ renderCvCard(); if (apChatId) laadApplyChat(); }
     else if (scope === 'chat'){ if (user.account) renderChat(); }
     else if (scope === 'tickets'){ laadTickets(); }
+    else if (scope === 'live'){ renderLive(); laadTickets(); }
     else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
   }
 
@@ -2045,7 +2045,27 @@
         : '<div style="margin-top:0.5rem;text-align:center;background:rgba(208,172,87,0.12);border:1px dashed rgba(208,172,87,0.5);border-radius:12px;padding:0.55rem;">'+
           '<span style="font-size:1.3rem;letter-spacing:0.35em;color:var(--gold);font-weight:700;">'+esc(t.code)+'</span>'+
           '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.2rem;">'+T('tk.laatzien','Laat deze code zien aan de deur')+'</div></div>')+
+      // de eigen transferdienst van de zaak: aanvragen, of live zien wie er komt
+      (t.transfer
+        ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted);">\uD83D\uDE90 '+T('tk.tr','Transfer')+': <b style="color:var(--txt);">'+
+          ({ 'wacht-op-betaling': T('tk.tr.betalen','nog betalen'), 'aangevraagd': T('tk.tr.aangevraagd','aangevraagd'), 'geaccepteerd': T('tk.tr.geacc','bevestigd'), 'onderweg': T('tk.tr.onderweg','onderweg naar u') }[t.transfer.status] || t.transfer.status)+'</b>'+
+          (t.transfer.chauffeur ? ' \u00B7 '+esc(t.transfer.chauffeur) : '')+(t.transfer.etaMin ? ' \u00B7 \u23F1 '+t.transfer.etaMin+' min' : '')+
+          (t.transfer.prijs ? ' \u00B7 '+eur(t.transfer.prijs) : ' \u00B7 '+T('tk.tr.incl','inclusief'))+'</div>'
+        : (t.transferAan && !t.gebruikt
+          ? '<div style="margin-top:0.55rem;display:flex;gap:0.4rem;">'+
+            '<input id="trVan-'+t.ref+'" placeholder="'+T('tk.tr.vanph','Ophaaladres')+'" style="flex:1;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;">'+
+            '<button class="bz-btn" data-trvraag="'+t.ref+'" data-trprijs="'+t.transferPrijs+'">\uD83D\uDE90 '+(t.transferPrijs ? eur(t.transferPrijs) : T('tk.tr.gratis','Gratis'))+'</button></div>'
+          : ''))+
       '</div>').join('');
+    document.querySelectorAll('[data-trvraag]').forEach(b => b.addEventListener('click', async () => {
+      const veld = document.getElementById('trVan-' + b.dataset.trvraag);
+      try {
+        const r = await API.call('/transfer/aanvraag', { ticketRef: b.dataset.trvraag, van: veld ? veld.value : '' });
+        if (Number(b.dataset.trprijs) > 0) await API.call('/ride/pay', { ref: r.ride.ref });
+        toast(T('tk.tr.ok','Transfer aangevraagd. U ziet hier wie u komt halen.'));
+        laadTickets();
+      } catch(e){ toast(e.message); }
+    }));
     renderTkAanbod();
   }
   function renderTkAanbod(){

@@ -1968,4 +1968,24 @@ app.post('/api/supplier/ticket/checkin', supplierAuth, (req, res) => {
   sseToSupplier(s.code, 'sync', { scope: 'tickets' });
   res.json({ ok: true, ticket: { naam: t.service.name, tijd: t.tijd, personen: t.personen || 1, codename: t.customerCodename } });
 });
+
+/* De eigen transferdienst van een activiteitenzaak: chauffeurs van de zaak
+   halen gasten op; prijs 0 = inclusief bij het ticket, anders het afgesproken
+   vaste bedrag per rit. De ritten zelf lopen via de gewone rittenmachinerie. */
+app.post('/api/supplier/transfer', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const s = req.supplier;
+  if (s.type !== 'activiteit') return res.status(409).json({ error: 'De transferdienst is voor activiteitenzaken.' });
+  if (!s.transfer || typeof s.transfer !== 'object') s.transfer = { aan: false, prijs: 0 };
+  if (req.body.aan != null) s.transfer.aan = !!req.body.aan;
+  if (req.body.prijs != null) {
+    const p = Number(req.body.prijs);
+    if (!(p >= 0) || p > 1000) return res.status(400).json({ error: 'Geef een prijs tussen 0 (inclusief) en 1000 op.' });
+    s.transfer.prijs = Math.round(p);
+  }
+  save();
+  logActivity(s.code, req.actor, 'zette de transferdienst ' + (s.transfer.aan ? 'aan (\u20AC ' + s.transfer.prijs + ')' : 'uit'));
+  sseToSupplier(s.code, 'sync', { scope: 'tickets' });
+  res.json({ ok: true, transfer: s.transfer });
+});
 };

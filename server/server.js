@@ -472,6 +472,9 @@ function ensureSupplierDefaults(s) {
   // bezorg-assortiment voeren, los van de menukaart ter plaatse.
   if (!s.bezorg || typeof s.bezorg !== 'object') s.bezorg = { aan: false, ophalen: true, bezorgen: true, producten: [] };
   if (s.type === 'activiteit' && !Array.isArray(s.activiteiten)) s.activiteiten = [];
+  // de eigen transferdienst: prijs 0 = inclusief bij het ticket, anders het
+  // afgesproken vaste bedrag per rit
+  if (s.type === 'activiteit' && (!s.transfer || typeof s.transfer !== 'object')) s.transfer = { aan: false, prijs: 0 };
   if (!Array.isArray(s.bezorg.producten)) s.bezorg.producten = [];
   if (!Array.isArray(s.photos)) s.photos = [];
   if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
@@ -616,7 +619,10 @@ function initRealtime() {
   // tijdsloten en capaciteit; personeel (gids/security/balie) checkt de
   // entreecode af aan de deur, op eigen naam
   if (!db.data.supplierTypes.activiteit)
-    db.data.supplierTypes.activiteit = { label: 'Activiteiten & musea', icon: '\u{1F39F}\uFE0F', caps: ['tickets', 'location', 'pricing'] };
+    db.data.supplierTypes.activiteit = { label: 'Activiteiten & musea', icon: '\u{1F39F}\uFE0F', caps: ['tickets', 'rides', 'location', 'pricing'] };
+  // eigen transferdienst: activiteitenzaken rijden ook (migratie voor bestaande kasten)
+  if (db.data.supplierTypes.activiteit && !db.data.supplierTypes.activiteit.caps.includes('rides'))
+    db.data.supplierTypes.activiteit.caps.push('rides');
   if (!db.data.suppliers.find(s => s.code === 'ESVEDRA')) {
     db.data.suppliers.push({
       code: 'ESVEDRA', name: 'Es Vedra Cruises', type: 'activiteit', city: 'Ibiza',
@@ -1258,6 +1264,7 @@ function supplierState(s, actor) {
   return {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate, vak: s.vak || null },
     activiteiten: s.activiteiten || null,
+    transfer: s.type === 'activiteit' ? (s.transfer || { aan: false, prijs: 0 }) : null,
     // de ophaal/bezorgdienst: alleen voor horeca en zelfstandigen
     bezorg: magBezorgen(s) ? {
       aan: !!(s.bezorg && s.bezorg.aan),

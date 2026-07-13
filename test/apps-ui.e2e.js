@@ -152,6 +152,8 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
     await page.waitForSelector('#app.active', { timeout: 15000 });
     await page.click('[data-tab="meer"]');
+    // a11y: de aangeklikte tab meldt zich als actief aan de schermlezer
+    assert.equal(await page.getAttribute('[data-tab="meer"]', 'aria-current'), 'page', 'de actieve tab heeft aria-current');
     await page.click('[data-goto2="orders"]');
 
     // de betaalde bestelling staat op het scherm

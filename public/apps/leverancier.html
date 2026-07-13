@@ -2386,13 +2386,23 @@
     $('#tabbar').innerHTML = MAIN_TABS.map((k,i) =>
       '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+T('tab.'+k, TABDEF[k].label)+'</button>'
     ).join('');
-    document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
+    document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab, true)));
   }
-  function openTab(tab){
+  function openTab(tab, focusView){
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
     const hi = MAIN_TABS.includes(tab) ? tab : 'meer';
-    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab===hi));
+    document.querySelectorAll('.tabbar button').forEach(b => {
+      const on = b.dataset.tab===hi;
+      b.classList.toggle('active', on);
+      if (on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); // schermlezer meldt de actieve tab
+    });
     $('#content').scrollTop = 0;
+    // Alleen bij een echte klik de focus naar de nieuwe weergave verplaatsen, zodat
+    // toetsenbord- en schermlezergebruikers meelopen (niet bij programmatische wissels).
+    if (focusView){
+      const v = document.querySelector('.view[data-view="'+tab+'"]');
+      if (v){ v.setAttribute('tabindex','-1'); v.focus({ preventScroll: true }); }
+    }
   }
   // ---- vastgoed: de slimme makelaars-backoffice ----
   let vg = null;

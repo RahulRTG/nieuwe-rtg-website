@@ -2003,13 +2003,23 @@
   });
 
   document.querySelectorAll('.tabbar button').forEach(b =>
-    b.addEventListener('click', () => openTab(b.dataset.tab)));
+    b.addEventListener('click', () => openTab(b.dataset.tab, true)));
   $('#codeChip').addEventListener('click', () => { openTab('home'); toggleWhy(true); });
 
-  function openTab(tab){
+  function openTab(tab, focusView){
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));
-    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.tabbar button').forEach(b => {
+      const on = b.dataset.tab === tab;
+      b.classList.toggle('active', on);
+      if (on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); // schermlezer meldt de actieve tab
+    });
     $('#content').scrollTop = 0;
+    // Alleen bij een echte klik de focus naar de nieuwe weergave verplaatsen, zodat
+    // toetsenbord- en schermlezergebruikers meelopen (niet bij programmatische wissels).
+    if (focusView){
+      const v = document.querySelector('.view[data-view="'+tab+'"]');
+      if (v){ v.setAttribute('tabindex','-1'); v.focus({ preventScroll: true }); }
+    }
   }
 
   function renderAll(){

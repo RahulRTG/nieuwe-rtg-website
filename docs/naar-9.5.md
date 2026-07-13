@@ -71,9 +71,11 @@ gebruikt.
 ## 7. Diepere toegankelijkheid
 Axe is groen (0 serious/critical), maar dat dekt geen focusbeheer of toetsenbord.
 
-- [x] PDA: focus naar de nieuwe view bij een echte tabklik + aria-current op de actieve tab.
+- [x] PDA, leden- en leverancier-app: focus naar de nieuwe view bij een echte
+  tabklik + aria-current op de actieve tab (e2e bewijst aria-current).
 - [~] `role`/`tabindex` op de PDA-views; keydown op custom controls elders nog open.
-- [ ] `prefers-reduced-motion` respecteren.
+- [x] `prefers-reduced-motion` respecteren (globaal via i18n.js, 0.01ms zodat
+  transitionend/animationend blijven werken).
 
 ## 8. Testdekking verbreden
 - [x] Scherm-tests: PDA-training, PDA-aandacht, boot van leverancier/lid/backoffice,

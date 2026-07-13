@@ -167,6 +167,15 @@
       .rtg-lang-switch:hover{background:#7F1634;border-color:#7F1634;}
       .rtg-sw-globe{font-size:0.9rem;}
       @media print{.rtg-lang-switch{display:none;}}
+      /* Toegankelijkheid: wie in het systeem "beperk beweging" aan heeft, krijgt
+         geen animaties of lange overgangen. 0.01ms i.p.v. 0 zodat code die op
+         transitionend/animationend wacht gewoon blijft doorlopen. */
+      @media (prefers-reduced-motion: reduce){
+        *,*::before,*::after{
+          animation-duration:.01ms!important;animation-iteration-count:1!important;
+          transition-duration:.01ms!important;scroll-behavior:auto!important;
+        }
+      }
       `;
       document.head.appendChild(s);
     },

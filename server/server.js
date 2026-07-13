@@ -109,7 +109,8 @@ const STAFF_SEED = {
   // activiteiten: beheer plus de mensen aan de deur en op de boot
   ESVEDRA: [['Marta Salas', 'manager', 'Beheer'], ['Joel Ferrer', 'staff', 'Gids']],
   MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']],
-  ISLAREN: [['Carmen Vidal', 'manager', 'Beheer'], ['Pau Riera', 'staff', 'Balie']]
+  ISLAREN: [['Carmen Vidal', 'manager', 'Beheer'], ['Pau Riera', 'staff', 'Balie']],
+  IBIZALIV: [['Sofia Marin', 'manager', 'Makelaar'], ['Bram Kessler', 'staff', 'Bezichtigingen']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -477,6 +478,7 @@ function ensureSupplierDefaults(s) {
   // afgesproken vaste bedrag per rit
   if (s.type === 'activiteit' && (!s.transfer || typeof s.transfer !== 'object')) s.transfer = { aan: false, prijs: 0 };
   if (s.type === 'verhuur' && !Array.isArray(s.autos)) s.autos = [];
+  if (s.type === 'vastgoed' && !Array.isArray(s.panden)) s.panden = [];
   if (!Array.isArray(s.bezorg.producten)) s.bezorg.producten = [];
   if (!Array.isArray(s.photos)) s.photos = [];
   if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
@@ -677,6 +679,36 @@ function initRealtime() {
   // contracten: elke zaak kan een contract (verhuur/personeel/algemeen) opstellen
   // en aan een lid of personeelslid sturen; beide partijen tekenen digitaal
   if (!db.data.contracten) db.data.contracten = [];
+  // het vastgoed-genre: makelaars bieden hun aanbod aan, gericht aan gekozen
+  // leden (via de Salon of prive), met biedingen, bezichtigingen en keyless
+  // toegang, en snelle contracten via het contractsysteem
+  if (!db.data.supplierTypes.vastgoed)
+    db.data.supplierTypes.vastgoed = { label: 'Vastgoed & makelaar', icon: '\u{1F3E1}', caps: ['vastgoed', 'location', 'pricing'] };
+  if (!db.data.suppliers.find(s => s.code === 'IBIZALIV')) {
+    db.data.suppliers.push({
+      code: 'IBIZALIV', name: 'Ibiza Living Estates', type: 'vastgoed', city: 'Ibiza',
+      loc: { lat: 38.906, lng: 1.433, label: 'Vara de Rey, Ibiza' }, rate: 0.03,
+      menu: [], photos: [],
+      panden: [
+        { id: 'p1', titel: 'Villa Can Blau, zeezicht', soort: 'villa', transactie: 'koop', prijs: 3450000,
+          plaats: 'Cala Jondal, Ibiza', adres: 'Carrer de Cala Jondal 8', slaapkamers: 5, badkamers: 4, oppervlakte: 420, perceel: 1800,
+          tuin: true, zwembad: true, garage: 2, energielabel: 'A', status: 'beschikbaar',
+          omschrijving: 'Moderne villa met infinity pool, gastenverblijf en panoramisch zeezicht over Es Vedra.', fotos: [], keyless: true },
+        { id: 'p2', titel: 'Penthouse Marina Botafoch', soort: 'appartement', transactie: 'koop', prijs: 1290000,
+          plaats: 'Marina Botafoch, Ibiza', adres: 'Passeig Joan Carles I 21', slaapkamers: 3, badkamers: 2, oppervlakte: 165, perceel: 0,
+          tuin: false, zwembad: true, garage: 1, energielabel: 'B', status: 'beschikbaar',
+          omschrijving: 'Penthouse met dakterras, gemeenschappelijk zwembad en jachthavenzicht.', fotos: [], keyless: true },
+        { id: 'p3', titel: 'Finca met olijfgaard', soort: 'woning', transactie: 'huur', prijs: 8500,
+          plaats: 'Santa Gertrudis, Ibiza', adres: 'Cami de Sa Vinya 4', slaapkamers: 4, badkamers: 3, oppervlakte: 300, perceel: 12000,
+          tuin: true, zwembad: true, garage: 0, energielabel: 'C', status: 'beschikbaar',
+          omschrijving: 'Authentieke finca, per maand te huur, midden in het groen met eigen olijfgaard.', fotos: [], keyless: false }
+      ]
+    });
+  }
+  if (!db.data.vastgoedAanbod) db.data.vastgoedAanbod = [];   // { ref, supplierCode, pandId, aanKeys:[], publiek, at }
+  if (!db.data.bezichtigingen) db.data.bezichtigingen = [];   // { ref, supplierCode, pandId, key, codename, wens, status, moment, keyless, at }
+  if (!db.data.biedingen) db.data.biedingen = [];             // { ref, supplierCode, pandId, key, codename, bedrag, status, tegenbod, at }
+
   // Salon-connecties: leden vinden elkaar op codenaam, chatten en bellen 1-op-1
   if (!db.data.connections) db.data.connections = [];              // { a, b, requestedBy, status, at }
   if (!db.data.memberChats) db.data.memberChats = {};              // 'sleutelA|sleutelB' -> { messages, read }
@@ -1308,6 +1340,7 @@ function supplierState(s, actor) {
     activiteiten: s.activiteiten || null,
     transfer: s.type === 'activiteit' ? (s.transfer || { aan: false, prijs: 0 }) : null,
     autos: s.type === 'verhuur' ? (s.autos || []) : null,
+    panden: s.type === 'vastgoed' ? (s.panden || []) : null,
     // de ophaal/bezorgdienst: alleen voor horeca en zelfstandigen
     bezorg: magBezorgen(s) ? {
       aan: !!(s.bezorg && s.bezorg.aan),

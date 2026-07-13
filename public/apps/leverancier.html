@@ -565,6 +565,11 @@
         <p class="sub" data-i18n="sup.v.huur.sub">Uw vloot, de lopende huren en de vastgelegde staat (foto's voor en na).</p>
         <div id="huurWrap"></div>
       </div>
+      <div class="view" data-view="vastgoed">
+        <h2 data-i18n="sup.v.vg">Vastgoed</h2>
+        <p class="sub" data-i18n="sup.v.vg.sub">Uw portefeuille, gericht aanbieden, biedingen en bezichtigingen met keyless toegang.</p>
+        <div id="vgWrap"></div>
+      </div>
       <div class="view" data-view="minibar">
         <h2 data-i18n="sup.v.minibar">Minibar</h2>
         <p class="sub" data-i18n="sup.v.minibar.sub">Tel per kamer wat is gebruikt. Het verbruik gaat automatisch op de kamerrekening en de aanvullijst staat klaar.</p>
@@ -675,7 +680,8 @@
     { code:'KAITO',   name:'Studio Milan', type:'Zelfstandig', icon:'🏋️', sub:'Health & wellness · Ibiza' },
     { code:'ESVEDRA', name:'Es Vedra Cruises', type:'Activiteit', icon:'⛵', sub:'Tours & cruises · Ibiza' },
     { code:'MACE',    name:'MACE Museum Eivissa', type:'Activiteit', icon:'🏛️', sub:'Museum · Ibiza' },
-    { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'🚗', sub:'Autoverhuur · Ibiza' }
+    { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'🚗', sub:'Autoverhuur · Ibiza' },
+    { code:'IBIZALIV', name:'Ibiza Living Estates', type:'Vastgoed', icon:'🏡', sub:'Makelaar · Ibiza' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -689,6 +695,7 @@
     zzp:         { label:'RTG Zelfstandig', labelEn:'RTG Independent', codes:['AYAKA','KAITO'], icon:'🧑‍🎨' },
     activiteiten:{ label:'RTG Activiteiten', labelEn:'RTG Experiences', codes:['ESVEDRA','MACE'], icon:'🎟️' },
     autoverhuur: { label:'RTG Autoverhuur', labelEn:'RTG Car Rental', codes:['ISLAREN'], icon:'🚗' },
+    vastgoed:    { label:'RTG Vastgoed', labelEn:'RTG Real Estate', codes:['IBIZALIV'], icon:'🏡' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG'],    icon:'🚘', legacy:true }
@@ -705,6 +712,7 @@
     kassa:    { label:'Kassa',     svg:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M7 13h2M11 13h2M15 13h2M7 16.5h2M11 16.5h2M15 16.5h2"/>' },
     bezorg:   { label:'Bezorgen',  svg:'<circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/><path d="M4 12h4"/>' },
     tickets:  { label:'Tickets',   svg:'<path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H6a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M12 6v2M12 11v2M12 16v2"/>', cap:'tickets' },
+    vastgoed: { label:'Vastgoed',  svg:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>', cap:'vastgoed' },
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
@@ -818,7 +826,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -828,7 +836,8 @@
     taxi:       ['Taxi centrale','Chauffeur'],
     jet:        ['Operations','Crew','Piloot'],
     activiteit: ['Gids','Security','Ticketbalie'],
-    verhuur:    ['Balie','Monteur','Schoonmaak']
+    verhuur:    ['Balie','Monteur','Schoonmaak'],
+    vastgoed:   ['Makelaar','Bezichtigingen','Backoffice']
   };
   let pickCode = null, gateRoster = null, pendingStation = null;
   const spH2 = () => document.querySelector('#staffPick h2');
@@ -2389,6 +2398,114 @@
     document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab===hi));
     $('#content').scrollTop = 0;
   }
+  // ---- vastgoed: de slimme makelaars-backoffice ----
+  let vg = null;
+  const PAND_ST = { 'beschikbaar':'beschikbaar', 'onder-optie':'onder optie', 'verkocht':'verkocht', 'verhuurd':'verhuurd' };
+  async function laadVastgoed(){
+    if (!has('vastgoed') || !API.live) return;
+    try { vg = await API.call('/supplier/vastgoed/overzicht', {}); } catch(e){ vg = { stats:{}, panden:[], aanbiedingen:[], bezichtigingen:[], biedingen:[] }; }
+    renderVastgoed();
+  }
+  const geld = n => '\u20AC ' + Number(n||0).toLocaleString('nl-NL');
+  function renderVastgoed(){
+    const el = $('#vgWrap'); if (!el) return;
+    if (!has('vastgoed')){ el.innerHTML = ''; return; }
+    if (!vg){ el.innerHTML = '<div class="empty">\u2026</div>'; laadVastgoed(); return; }
+    const canEdit = actor().manager;
+    const st = vg.stats || {};
+    const sel = 'style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"';
+    let html = '';
+    // dashboard
+    html += '<div class="card"><div class="tt-h">'+T('vg.dash','Portefeuille')+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:0.6rem;">'+
+      [[st.beschikbaar||0, T('vg.beschikbaar','beschikbaar')],[st.onderOptie||0, T('vg.optie','onder optie')],[st.verkocht||0, T('vg.verkocht','verkocht/verhuurd')],
+       [st.openBezichtigingen||0, T('vg.bez','open bezichtigingen')],[st.openBiedingen||0, T('vg.bod','open biedingen')],[st.totaal||0, T('vg.totaal','panden')]]
+      .map(c => '<div style="background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.6rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:var(--gold);">'+c[0]+'</div><div style="font-size:0.64rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.06em;">'+c[1]+'</div></div>').join('')+
+      '</div><div style="margin-top:0.6rem;font-size:0.78rem;color:var(--muted);">'+T('vg.waarde','Portefeuillewaarde (koop):')+' <b style="color:var(--gold);">'+geld(st.portefeuille)+'</b></div></div>';
+    // open biedingen
+    const openBod = (vg.biedingen||[]).filter(b => b.status === 'open');
+    if (openBod.length) html += '<div class="card"><div class="tt-h">\uD83D\uDCB0 '+T('vg.biedingen','Biedingen')+' ('+openBod.length+')</div>'+
+      openBod.map(b => '<div class="mitem"><div class="r1"><span class="nm">'+esc(b.codename)+' \u00B7 '+esc(b.pand)+'</span><span class="pr">'+geld(b.bedrag)+'</span></div>'+
+        (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><button class="obtn primary" data-bod="'+b.ref+'" data-actie="accepteren">'+T('vg.accept','Accepteren')+'</button>'+
+        '<button class="obtn" data-bod="'+b.ref+'" data-actie="tegenbod">'+T('vg.tegen','Tegenbod')+'</button>'+
+        '<button class="obtn" data-bod="'+b.ref+'" data-actie="afwijzen">'+T('vg.afwijs','Afwijzen')+'</button></div>':'')+'</div>').join('')+'</div>';
+    // open bezichtigingen
+    const openBez = (vg.bezichtigingen||[]).filter(b => b.status === 'aangevraagd');
+    if (openBez.length) html += '<div class="card"><div class="tt-h">\uD83D\uDC41\uFE0F '+T('vg.bezichtigingen','Bezichtigingen')+' ('+openBez.length+')</div>'+
+      openBez.map(b => '<div class="mitem"><div class="r1"><span class="nm">'+esc(b.codename)+' \u00B7 '+esc(b.pand)+'</span></div>'+
+        (b.wens?'<div class="ds">'+T('vg.wens','wens')+': '+esc(b.wens)+'</div>':'')+
+        '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;"><button class="obtn primary" data-bezbev="'+b.ref+'">'+T('vg.bevestig','Bevestig + keyless')+'</button>'+
+        '<button class="obtn" data-bezafw="'+b.ref+'">'+T('vg.afwijs','Afwijzen')+'</button></div></div>').join('')+'</div>';
+    // panden
+    html += '<div class="card"><div class="tt-h">'+T('vg.panden','Panden')+' ('+(vg.panden||[]).length+')</div>'+
+      (vg.panden||[]).map(p => '<div class="mitem"><div class="r1"><span class="nm">'+esc(p.titel)+'</span><span class="pr">'+geld(p.prijs)+(p.transactie==='huur'?'/mnd':'')+'</span></div>'+
+        '<div class="ds">'+esc(p.soort)+' \u00B7 '+esc(p.plaats||'')+' \u00B7 \uD83D\uDECF\uFE0F'+(p.slaapkamers||0)+' \u00B7 \uD83D\uDEC1'+(p.badkamers||0)+' \u00B7 '+(p.oppervlakte||0)+'m\u00B2'+(p.keyless?' \u00B7 \uD83D\uDD13 keyless':'')+' \u00B7 '+T('vg.st.'+p.status, PAND_ST[p.status]||p.status)+' \u00B7 \uD83D\uDCF7'+((p.fotos||[]).length)+'</div>'+
+        (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+          '<button class="obtn primary" data-vgaanbod="'+p.id+'" data-titel="'+escAttr(p.titel)+'">'+T('vg.aanbieden','Aanbieden')+'</button>'+
+          '<button class="obtn" data-vgfoto="'+p.id+'">\uD83D\uDCF7 '+T('vg.foto','Foto')+'</button>'+
+          '<button class="obtn" data-vgcontract="'+p.id+'" data-titel="'+escAttr(p.titel)+'">\uD83D\uDCDD '+T('vg.contract','Contract')+'</button>'+
+          '<button class="rr-del" data-vgdel="'+p.id+'">\u2715</button></div>':'')+'</div>').join('')+
+      (canEdit ? '<details style="margin-top:1rem;"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('vg.nieuw','Pand toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
+        '<div class="field"><label>'+T('vg.f.titel','Titel')+'</label><input id="vgTitel" placeholder="Villa met zeezicht"></div>'+
+        '<div style="display:flex;gap:0.5rem;"><div class="field" style="flex:1;"><label>'+T('vg.f.soort','Soort')+'</label><select id="vgSoort" '+sel+'><option value="woning">woning</option><option value="appartement">appartement</option><option value="villa">villa</option><option value="commercieel">commercieel</option><option value="grond">grond</option></select></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('vg.f.trans','Koop/huur')+'</label><select id="vgTrans" '+sel+'><option value="koop">koop</option><option value="huur">huur (p/mnd)</option></select></div></div>'+
+        '<div style="display:flex;gap:0.5rem;"><div class="field" style="flex:2;"><label>'+T('vg.f.plaats','Plaats')+'</label><input id="vgPlaats"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('vg.f.prijs','Prijs \u20AC')+'</label><input id="vgPrijs" type="number" inputmode="numeric"></div></div>'+
+        '<div style="display:flex;gap:0.5rem;"><div class="field" style="flex:1;"><label>'+T('vg.f.slk','Slaapk.')+'</label><input id="vgSlk" type="number" value="3"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('vg.f.bdk','Badk.')+'</label><input id="vgBdk" type="number" value="2"></div>'+
+        '<div class="field" style="flex:1;"><label>m\u00B2</label><input id="vgOpp" type="number"></div></div>'+
+        '<div class="field"><label>'+T('vg.f.oms','Omschrijving')+'</label><textarea id="vgOms" rows="2" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem;color:var(--txt);outline:none;font-family:inherit;"></textarea></div>'+
+        '<label class="field" style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="vgKeyless" checked style="accent-color:var(--gold);"> '+T('vg.f.keyless','Keyless toegang mogelijk')+'</label>'+
+        '<button class="obtn primary" id="vgAdd">'+T('vg.f.voeg','Toevoegen')+'</button></div></details>' : '')+'</div>'+
+      '<input type="file" id="vgFile" accept="image/*" style="display:none;">';
+    el.innerHTML = html;
+    // acties
+    document.querySelectorAll('[data-bod]').forEach(k => k.addEventListener('click', async () => {
+      const body = { ref: k.dataset.bod, actie: k.dataset.actie };
+      if (k.dataset.actie === 'tegenbod'){ const t = prompt(T('vg.q.tegen','Tegenbod in euro?')); if (!t) return; body.tegenbod = Number(t); }
+      try { await API.call('/supplier/bod/beslis', body); await laadVastgoed(); openTab('vastgoed'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-bezbev]').forEach(k => k.addEventListener('click', async () => {
+      const m = prompt(T('vg.q.moment','Datum en tijd van de bezichtiging (JJJJ-MM-DD UU:MM):'), new Date(Date.now()+86400000).toISOString().slice(0,16).replace('T',' '));
+      if (!m) return;
+      try { await API.call('/supplier/bezichtiging/beslis', { ref: k.dataset.bezbev, actie: 'bevestigen', moment: m.replace(' ','T') }); toast(T('vg.bevok','Bevestigd; keyless staat klaar als het pand keyless is.')); await laadVastgoed(); openTab('vastgoed'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-bezafw]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/bezichtiging/beslis', { ref: k.dataset.bezafw, actie: 'afwijzen' }); await laadVastgoed(); openTab('vastgoed'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-vgaanbod]').forEach(k => k.addEventListener('click', async () => {
+      const wie = prompt(T('vg.q.aan','Aanbieden aan wie? Typ codenamen (komma\'s), of laat leeg voor PUBLIEK:'));
+      if (wie === null) return;
+      const body = { pandId: k.dataset.vgaanbod };
+      if (wie.trim()) body.codenamen = wie.split(','); else { body.publiek = true; body.salon = confirm(T('vg.q.salon','Ook op De Salon plaatsen voor uw volgers?')); }
+      try { const r = await API.call('/supplier/aanbieding', body); toast(T('vg.aanbok','Aangeboden aan ')+(r.aanbieding.publiek?T('vg.iedereen','iedereen'):(r.aanbieding.aan+' lid/leden'))+(r.aanbieding.nietGevonden.length?' ('+T('vg.nietgev','niet gevonden')+': '+r.aanbieding.nietGevonden.join(', ')+')':'')); await laadVastgoed(); openTab('vastgoed'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-vgcontract]').forEach(k => k.addEventListener('click', () => {
+      openTab('contract');
+      setTimeout(() => { const t = document.getElementById('ctTitel'); if (t){ t.value = T('vg.koopc','Koopovereenkomst ')+k.dataset.titel; const so = document.getElementById('ctSoort'); if (so){ so.value='algemeen'; } } }, 200);
+      toast(T('vg.contracttip','Vul de codenaam van de koper in en verstuur het contract.'));
+    }));
+    document.querySelectorAll('[data-vgfoto]').forEach(k => k.addEventListener('click', () => {
+      const file = document.getElementById('vgFile');
+      file.onchange = () => { if (!file.files[0]) return; fotoKlein(file.files[0], async (d) => {
+        try { await API.call('/supplier/pand/foto', { id: k.dataset.vgfoto, foto: d }); toast(T('vg.fotook','Foto toegevoegd.')); await laadVastgoed(); openTab('vastgoed'); } catch(e){ toast(e.message); }
+      }); file.value=''; };
+      file.click();
+    }));
+    document.querySelectorAll('[data-vgdel]').forEach(k => k.addEventListener('click', async () => {
+      if (!confirm(T('vg.delvraag','Dit pand verwijderen?'))) return;
+      try { await API.call('/supplier/pand', { id: k.dataset.vgdel, weg: true }); await laadVastgoed(); openTab('vastgoed'); } catch(e){ toast(e.message); }
+    }));
+    const add = document.getElementById('vgAdd');
+    if (add) add.addEventListener('click', async () => {
+      const g = id => $(id) ? $(id).value : undefined;
+      try { await API.call('/supplier/pand', { titel: g('#vgTitel'), soort: g('#vgSoort'), transactie: g('#vgTrans'), plaats: g('#vgPlaats'),
+        prijs: Number(g('#vgPrijs')), slaapkamers: Number(g('#vgSlk')), badkamers: Number(g('#vgBdk')), oppervlakte: Number(g('#vgOpp')),
+        omschrijving: g('#vgOms'), keyless: $('#vgKeyless') ? $('#vgKeyless').checked : true });
+        toast(T('vg.addok','Het pand staat in uw portefeuille.')); await laadVastgoed(); openTab('vastgoed'); } catch(e){ toast(e.message); }
+    });
+  }
+
   // ---- contracten: opstellen en ondertekenen ----
   let contracten = null;
   const CON_ST = { 'wacht': 'wacht op handtekening(en)', 'getekend': 'volledig getekend', 'geweigerd': 'geweigerd' };
@@ -2466,7 +2583,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderVastgoed(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -3833,6 +3950,7 @@
     el.classList.add('on');
   }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   async function addStaff(){
     const name = ($('#ttName').value||'').trim();
     const role = $('#ttRole').value;

@@ -691,6 +691,10 @@ function sendPush(tier, note) {
 function eigenaarAccount() {
   try { return accounts.findByLogin(process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example'); } catch (e) { return null; }
 }
+/* De archiefkast: houdt de levende kast klein door afgeronde tickets ouder
+   dan een afgesloten kwartaal naar append-only maandbestanden te verhuizen. */
+const archief = require('./archief')({ db, save, DATA_DIR });
+
 const beveilig = require('./beveiliging')({
   db, save,
   notifyOwner: (note) => {
@@ -2491,7 +2495,8 @@ function officeState() {
     // totalen over de volledige data, zodat de schermen eerlijk blijven
     // vertellen hoeveel er echt is, hoe groot de lijsten ook worden
     totals: {
-      orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').length,
+      // levend plus archief: het totaal blijft eerlijk, hoe oud tickets ook worden
+      orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').length + archief.stat().aantal,
       rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').length,
       leden: Object.keys(db.data.memberDir || {}).length,
       partners: db.data.suppliers.length,
@@ -2657,7 +2662,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, beveilig, eigenaar,
+  ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, eigenaar,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
@@ -2690,6 +2695,17 @@ for (const naam of gekozenDomeinen) {
   require('./routes/' + naam)(kern);
 }
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
+
+/* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet
+   alleen het office-domein dit, zodat niet twee processen tegelijk aan de
+   orders-collectie trekken. */
+if (gekozenDomeinen.includes('office')) {
+  try { archief.archiveerNu(); } catch (e) { console.warn('[archief] ronde mislukt:', e.message); }
+  const archiefTimer = setInterval(() => {
+    try { archief.archiveerNu(); } catch (e) { console.warn('[archief] ronde mislukt:', e.message); }
+  }, 3600000);
+  if (archiefTimer.unref) archiefTimer.unref();
+}
 
 /* ---------- afsluiters: nette 404 en centrale foutafhandeling ---------- */
 

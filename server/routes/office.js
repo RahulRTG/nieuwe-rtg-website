@@ -1,7 +1,7 @@
 /* Domein "office" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries } = kern;
+  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries } = kern;
 
   // backoffice-toegang via een query-token (stream/export/doc): een echte
   // office-sessie, OF de eigenaar met zijn eigen accountlogin.
@@ -138,6 +138,12 @@ app.get('/api/office/export.csv', (req, res) => {
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');
   res.write('\uFEFF' + ['datum', 'soort', 'partner', 'gast', 'omschrijving', 'status', 'betaald', 'bedrag'].join(';') + '\n');
+  // de boekhouding blijft compleet: gearchiveerde tickets (oudste eerst) tellen mee
+  for (const o of archief.leesAlles()) {
+    res.write([String(o.at).slice(0, 16).replace('T', ' '), 'bestelling', o.supplierName, o.customerCodename,
+      (o.items || []).map(i => i.qty + 'x ' + i.name).join(', '), o.status, o.paid ? 'ja' : 'nee',
+      (o.total || 0).toFixed(2).replace('.', ',')].map(esc).join(';') + '\n');
+  }
   for (const o of db.data.orders) {
     if (o.status === 'wacht-op-betaling') continue;
     res.write([String(o.at).slice(0, 16).replace('T', ' '), 'bestelling', o.supplierName, o.customerCodename,

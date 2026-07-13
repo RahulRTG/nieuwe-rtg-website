@@ -94,6 +94,12 @@ Volledige lijst met uitleg: `.env.example`.
 - **Security** — https-redirect + HSTS, strikte CSP (met per-antwoord nonce voor
   scripts), `nosniff`/`DENY`/referrer/permissions-headers, token-hashing,
   sessieverloop, rate-limits, AVG-rechten (inzage + verwijderen).
+- **Archiefkast** - afgeronde tickets ouder dan `RTG_ARCHIEF_DAGEN`
+  (standaard 92, een afgesloten kwartaal) verhuizen automatisch naar
+  append-only maandbestanden in `RTG_DATA_DIR/archief`. De levende kast
+  blijft daardoor klein en snel; de boekhoud-export en de backoffice-totalen
+  tellen het archief gewoon mee, en er raakt nooit iets zoek (eerst duurzaam
+  naar schijf, dan pas uit de levende kast).
 - **Inlogpieken** - wachtwoord-hashing (scrypt) rekent asynchroon in de
   libuv-threadpool naast de server; server.js zet `UV_THREADPOOL_SIZE`
   standaard op het aantal CPU-kernen (minimaal 4). Gemeten op een

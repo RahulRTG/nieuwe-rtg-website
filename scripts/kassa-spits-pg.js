@@ -42,6 +42,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kpg-'));
 const DATABASE_URL = process.env.DATABASE_URL || 'postgres://rtg:rtg@127.0.0.1:5432/rtg';
 const RESTAURANTS = Number(process.env.PG_RESTAURANTS || 10000000);
 const MEMBERS = Number(process.env.PG_MEMBERS || 60);
+const KASSA_GASTEN = Number(process.env.KASSA_GASTEN || 60); // hoeveel gasten de keukens voeden (rest doet video+GPS)
 const DUUR_MS = Number(process.env.PG_DUUR || 60000);
 // ruimere opslag-/flush-vensters: onder een zware schrijfgolf coalesceren we
 // meer per ronde (de datastore serialiseert per save de kast, dus minder vaak = beter)
@@ -49,7 +50,7 @@ const ENV = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: '
 
 let child = null;
 const cleanup = () => { try { if (child) child.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} };
-setTimeout(() => { console.log('\nHARD TIMEOUT'); cleanup(); process.exit(1); }, 900000);
+setTimeout(() => { console.log('\nHARD TIMEOUT'); cleanup(); process.exit(1); }, Number(process.env.PG_HARDSTOP || 900000));
 
 const kop = t => console.log('\n\x1b[1m' + t + '\x1b[0m');
 const rij = (l, v) => console.log('  ' + String(l).padEnd(38) + v);
@@ -181,7 +182,7 @@ const KEUKENS = ['KIKUNOI', 'PONTO'];
   // Een deel van de gasten voedt de keukens (bonnen groeien de orders-collectie,
   // die per save geserialiseerd wordt, dus begrensd houden); ALLE gasten doen wel
   // mee aan de videogesprekken en GPS hieronder.
-  for (const a of actors.slice(0, Math.min(actors.length, 60))) taken.push((async () => {
+  for (const a of actors.slice(0, Math.min(actors.length, KASSA_GASTEN))) taken.push((async () => {
     while (bezig()) {
       const code = KEUKENS[a.i % KEUKENS.length];
       const o = await api('gast-bestelt', '/api/order', { supplierCode: code, items: BASKET, table: 'Tafel ' + (1 + a.i % 40) }, a.token);

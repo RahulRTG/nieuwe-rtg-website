@@ -313,11 +313,15 @@
   let pdContracten = [];
   let aandacht = null;   // gasten die aandacht vragen + te lang stille tafels
   let netwerk = [];      // verbindingen met andere zaken (personeelsnetwerk)
+  let trainData = null;  // training & tips: tip van de dag, rol-tips, eigen tips
+  let coachAntwoord = null; // laatste antwoord van de AI-coach
+  let tipsOpen = false;     // toon de volledige tip-lijst
   async function laadZaken(){
     try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
     try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }
     try { aandacht = await API.call('/supplier/aandacht', {}); } catch(e){ aandacht = null; }
     try { netwerk = (await API.call('/supplier/net/lijst', {})).verbindingen || []; } catch(e){ netwerk = []; }
+    try { trainData = await API.call('/supplier/training', {}); } catch(e){ trainData = null; }
   }
 
   // Blijf ingelogd: met een bewaard token direct naar Vandaag, zonder PIN.
@@ -445,6 +449,35 @@
     { t: 'Bewusteloos, maar ademt', i: '😴', s: ['Leg de persoon op de zij (stabiele zijligging), hoofd iets achterover.', 'Bel 112.', 'Blijf de ademhaling controleren tot er hulp is.'] },
     { t: 'Hartaanval of beroerte', i: '🚑', s: ['Hartaanval: drukkende pijn op de borst, uitstraling naar arm of kaak, zweten. Bel 112 en laat halfzittend rusten.', 'Beroerte, denk aan FAST: Face (scheve mond), Arm (uitvalt), Speech (verwarde spraak), Time: bel direct 112.', 'Noteer hoe laat de klachten begonnen; het ziekenhuis heeft dat nodig.'] }
   ];
+  // Training & tips: micro-learning in de PDA. Rol-bewuste tips, een tip van de
+  // dag, een AI-coach en (voor de manager) eigen huistips van de zaak.
+  function trainingKaart(){
+    if (!trainData) return '';
+    const t = trainData;
+    const tvd = t.tipVanDeDag;
+    const alle = t.tips || [];
+    const eigen = t.eigen || [];
+    return '<div class="card"><div class="k">🎓 '+T('pd.tr.h','Training & tips')+
+      (t.func ? ' <span style="font-weight:500;color:var(--soft);font-size:0.72rem;">'+esc(t.func)+'</span>' : '')+'</div>'+
+      (tvd ? '<div style="margin-top:0.6rem;padding:0.7rem 0.8rem;border-radius:12px;background:linear-gradient(135deg,rgba(197,160,89,0.16),rgba(197,160,89,0.05));border:1px solid rgba(197,160,89,0.3);">'+
+        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">'+T('pd.tr.tvd','Tip van de dag')+'</div>'+
+        '<b style="display:block;margin-top:0.25rem;font-size:0.9rem;">'+esc(tvd.t)+'</b>'+
+        '<span style="display:block;margin-top:0.2rem;font-size:0.8rem;line-height:1.5;color:var(--muted);">'+esc(tvd.s)+'</span></div>' : '')+
+      '<div class="compose" style="padding:0.7rem 0 0;"><input id="coachVraag" placeholder="'+T('pd.tr.ask','Vraag de coach... bijv. hoe stel ik een wijn voor?')+'"><button id="coachGo">'+T('pd.tr.coach','Vraag')+'</button></div>'+
+      (coachAntwoord ? '<div style="margin-top:0.55rem;padding:0.65rem 0.8rem;border-radius:12px;background:var(--panel2,rgba(255,255,255,0.04));border:1px solid var(--line,rgba(255,255,255,0.08));">'+
+        '<div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+(coachAntwoord.bron==='ai'?T('pd.tr.ai','AI-coach'):T('pd.tr.bib','Uit de tips'))+'</div>'+
+        '<span style="display:block;margin-top:0.25rem;font-size:0.82rem;line-height:1.55;">'+esc(coachAntwoord.antwoord)+'</span></div>' : '')+
+      (alle.length ? '<button class="abtn ghost" id="tipsToggle" style="width:100%;margin-top:0.6rem;">'+(tipsOpen?'▲ '+T('pd.tr.hide','Verberg de tips'):'▼ '+T('pd.tr.all','Alle tips voor mijn rol')+' ('+alle.length+')')+'</button>' : '')+
+      (tipsOpen ? '<div style="margin-top:0.5rem;display:flex;flex-direction:column;gap:0.4rem;">'+alle.map(x =>
+        '<div class="task" style="align-items:flex-start;"><span class="ic">💡</span><div class="t"><b>'+esc(x.t)+'</b><span style="line-height:1.5;">'+esc(x.s)+'</span></div>'+
+        (t.kanBeheren && eigen.some(e => e.t === x.t) ? '<button class="abtn ghost" data-tiprm="'+esc(x.t)+'" style="flex:0 0 auto;padding:0.25rem 0.5rem;font-size:0.7rem;">✕</button>' : '')+
+        '</div>').join('')+'</div>' : '')+
+      (t.kanBeheren ? '<div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px solid var(--line,rgba(255,255,255,0.08));">'+
+        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin-bottom:0.4rem;">'+T('pd.tr.own','Eigen huistip toevoegen')+'</div>'+
+        '<input id="tipTitel" placeholder="'+T('pd.tr.title','Titel, bijv. Onze wijn-aanpak')+'" style="width:100%;margin-bottom:0.4rem;">'+
+        '<div class="compose" style="padding:0;"><input id="tipTekst" placeholder="'+T('pd.tr.text','De tip in een of twee zinnen...')+'"><button id="tipAdd">'+T('pd.tr.add','Voeg toe')+'</button></div></div>' : '')+
+      '</div>';
+  }
   function renderHulp(){
     const gids = EHBO_GIDS();
     const tr = (zaken && zaken.trust) || { anon: false, messages: [] };
@@ -456,6 +489,7 @@
       gemeld: [T('pd.vl.zm','gemeld'), 'var(--green)']
     };
     $('#hulpWrap').innerHTML =
+      trainingKaart()+
       '<div class="card"><div class="k">🩹 '+T('pd.eh.h','EHBO, direct bij de hand')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">'+
         '<a href="tel:112" class="abtn" style="text-decoration:none;text-align:center;flex:1;">📞 '+T('pd.eh.112','Bel 112')+'</a>'+
@@ -543,6 +577,33 @@
         await laadZaken(); renderHulp(); openTab('hulp');
       } catch(e){ toast(e.message); }
     });
+    const cg = document.getElementById('coachGo');
+    if (cg) cg.addEventListener('click', async () => {
+      const inp = document.getElementById('coachVraag');
+      const vraag = (inp.value || '').trim();
+      if (!vraag) return;
+      cg.disabled = true; cg.textContent = '...';
+      try { coachAntwoord = await API.call('/supplier/coach', { vraag }); }
+      catch(e){ toast(e.message); }
+      renderHulp(); openTab('hulp');
+    });
+    const tt = document.getElementById('tipsToggle');
+    if (tt) tt.addEventListener('click', () => { tipsOpen = !tipsOpen; renderHulp(); openTab('hulp'); });
+    const ta = document.getElementById('tipAdd');
+    if (ta) ta.addEventListener('click', async () => {
+      const titel = (document.getElementById('tipTitel').value || '').trim();
+      const tekst = (document.getElementById('tipTekst').value || '').trim();
+      if (!titel || !tekst){ toast(T('pd.tr.leeg','Geef een titel en een tekst.')); return; }
+      try {
+        await API.call('/supplier/training/add', { titel, tekst });
+        toast('🎓 '+T('pd.tr.added','Huistip toegevoegd voor het team.'));
+        tipsOpen = true; await laadZaken(); renderHulp(); openTab('hulp');
+      } catch(e){ toast(e.message); }
+    });
+    document.querySelectorAll('[data-tiprm]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/training/remove', { titel: b.dataset.tiprm }); await laadZaken(); renderHulp(); openTab('hulp'); }
+      catch(e){ toast(e.message); }
+    }));
   }
 
   // Ritten: chauffeurs en crew van vervoerspartners (taxi en jet) werken hun

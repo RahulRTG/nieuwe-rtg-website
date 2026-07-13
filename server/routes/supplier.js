@@ -1,5 +1,6 @@
 /* Domein "supplier" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
+const training = require('../training');
 module.exports = (kern) => {
   const { ALT_IDEE, BOEK_KETEN, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, broadcastSync, cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor } = kern;
 
@@ -1696,6 +1697,82 @@ app.post('/api/supplier/aandacht/klaar', supplierAuth, (req, res) => {
   if (it) { it.klaar = true; it.klaarDoor = req.actor.name; it.klaarAt = new Date().toISOString(); save();
     logActivity(req.supplier.code, req.actor, 'hielp een gast die om aandacht vroeg' + (it.tafel ? ' (' + it.tafel + ')' : '')); }
   res.json({ ok: true });
+});
+
+/* ============================================================================
+   Training & tips in de PDA: micro-learning voor het personeel. Rol-bewuste
+   tips uit de bibliotheek, een tip van de dag, eigen tips van de zaak, en een
+   AI-coach (met terugval op de bibliotheek). Zo blijft elk teamlid groeien.
+   ========================================================================== */
+function actorFunc(req) {
+  const st = req.actor && req.actor.staffId ? accounts.getStaffById(req.actor.staffId) : null;
+  return (st && st.func) || (req.actor && req.actor.manager ? 'Beheer' : '');
+}
+function eigenTips(code) {
+  return ((db.data.training || {})[code] || []).filter(t => t && t.t);
+}
+app.post('/api/supplier/training', supplierAuth, (req, res) => {
+  const func = actorFunc(req);
+  const role = req.actor.role;
+  const eigen = eigenTips(req.supplier.code);
+  // De eigen tips van de zaak staan vooraan; daarna de rol-tips uit de bibliotheek.
+  const bib = training.tipsVoor(func, role);
+  const gezien = new Set(eigen.map(t => t.t));
+  const tips = eigen.concat(bib.filter(t => !gezien.has(t.t)));
+  const vandaag = eigen.length
+    ? eigen[Math.floor(Date.now() / 86400000) % eigen.length]
+    : training.tipVanDeDag(func, role);
+  res.json({ func: func || null, kanBeheren: !!req.actor.manager, tipVanDeDag: vandaag, tips, eigen });
+});
+
+app.post('/api/supplier/training/add', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return; // eigen tips beheren is voor het management
+  const t = schoon(req.body.titel, 80);
+  const s = schoon(req.body.tekst, 400);
+  if (!t || !s) return res.status(400).json({ error: 'Geef een titel en een tekst.' });
+  db.data.training = db.data.training || {};
+  const arr = db.data.training[req.supplier.code] = db.data.training[req.supplier.code] || [];
+  if (arr.some(x => x.t === t)) return res.status(409).json({ error: 'Er is al een tip met deze titel.' });
+  arr.push({ t, s, door: req.actor.name, at: new Date().toISOString() });
+  save();
+  logActivity(req.supplier.code, req.actor, 'voegde een trainingstip toe: ' + t);
+  res.json({ ok: true, eigen: eigenTips(req.supplier.code) });
+});
+
+app.post('/api/supplier/training/remove', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const t = String(req.body.titel || '');
+  const arr = (db.data.training || {})[req.supplier.code] || [];
+  const i = arr.findIndex(x => x.t === t);
+  if (i < 0) return res.status(404).json({ error: 'Tip niet gevonden.' });
+  arr.splice(i, 1); save();
+  res.json({ ok: true, eigen: eigenTips(req.supplier.code) });
+});
+
+app.post('/api/supplier/coach', supplierAuth, async (req, res) => {
+  const vraag = schoon(req.body.vraag, 300);
+  if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
+  const func = actorFunc(req);
+  const eigen = eigenTips(req.supplier.code);
+  const bib = training.tipsVoor(func, req.actor.role);
+  const terugval = training.coachTip(vraag, func, req.actor.role);
+  if (anthropic) {
+    try {
+      const context = eigen.concat(bib).slice(0, 20).map(t => '- ' + t.t + ': ' + t.s).join('\n');
+      const msg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001', max_tokens: 300,
+        system: 'Je bent een vriendelijke, ervaren horeca- en service-coach voor het personeel van een topzaak (5-sterren-hotel, Michelin-niveau). '
+          + 'Antwoord in het Nederlands, kort en praktisch (maximaal 4 zinnen), concreet en bemoedigend. '
+          + 'De functie van het teamlid is: ' + (func || 'onbekend') + '. '
+          + 'Gebruik waar passend deze huistips van de zaak:\n' + (context || '(geen)'),
+        messages: [{ role: 'user', content: vraag }]
+      });
+      const antwoord = (msg.content || []).filter(b => b.type === 'text').map(b => b.text).join(' ').trim();
+      if (antwoord) return res.json({ antwoord, bron: 'ai', tip: terugval });
+    } catch (e) { /* val terug op de bibliotheek */ }
+  }
+  res.json({ antwoord: terugval ? terugval.s : 'Blijf vriendelijk, aandachtig en een stap voor op de wens van de gast.',
+    bron: 'bibliotheek', tip: terugval });
 });
 
 app.post('/api/supplier/refund', supplierAuth, (req, res) => {

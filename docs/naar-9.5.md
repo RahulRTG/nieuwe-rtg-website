@@ -29,8 +29,9 @@ componentframework (`util.js`) dwingt escaping af maar wordt door ~4 van de apps
 gebruikt.
 
 - [x] Referentie: PDA-trainingskaart gebouwd met `Util.el` (geen `esc()` meer).
-- [~] renderOrders (leverancier) + home-kaarten + het conciergegesprek (leden)
-  naar Util.el, elk met e2e; overige hete render-functies nog open.
+- [x] renderOrders (leverancier) + home-kaarten (reis/betalen) + de codenaam-kaart
+  + het conciergegesprek + de partnerchat (leden) naar Util.el, elk met e2e.
+- [ ] overige hete render-functies (Salon is al veilig via esc, deprio) nog open.
 - [ ] `check.js`-regel die `innerHTML +=` met een niet-ge-escapete variabele markeert.
 
 ## 3. Stille fouten wegnemen (beleving)

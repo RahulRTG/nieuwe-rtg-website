@@ -77,6 +77,13 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
         password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
       assert.ok(reg.token, 'lid-registratie geeft een token');
       return { rtg_member_token: reg.token };
+    },
+    // de startpagina toont de eigen gegevens (begroeting, codenaam, eerstvolgende reis)
+    na: async (page) => {
+      await page.waitForSelector('#homeGreeting', { timeout: 5000 });
+      assert.match(await page.textContent('#homeGreeting'), /Welkom/i, 'de begroeting staat er');
+      assert.ok((await page.textContent('#codecard .cn')).trim().length > 0, 'de codenaam staat op de kaart');
+      assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');
     }
   });
 });

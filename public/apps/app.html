@@ -1153,6 +1153,7 @@
 <script src="/apps/geo.js"></script>
 <script src="/apps/translate.js"></script>
 <script src="/apps/foundation/gezin-rt.js"></script>
+<script src="/apps/util.js"></script>
 <script src="/shared/appshell.js"></script>
 <script>
 (function(){
@@ -3286,17 +3287,22 @@
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
 
-    $('#homeTrip').innerHTML =
-      '<div class="label">'+T('app.nexttrip','Eerstvolgende reis')+'</div>' +
-      '<div class="big">' + trip.dest + '</div>' +
-      '<div class="meta">' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen') + '</div>' +
-      '<button class="go" data-goto="reizen">'+T('app.viewtrip','Bekijk uw reis')+' →</button>';
-    $('#homePay').innerHTML = open.length
-      ? '<div class="label">'+T('app.outstanding','Openstaand')+'</div><div class="big accent">' + eur(openSum) + '</div>' +
-        '<div class="meta">' + open.length + ' ' + (open.length === 1 ? T('app.payment','betaling') : T('app.payments','betalingen')) + ' · ' + T('app.onetapfid','één tik met Face ID') + '</div>' +
-        '<button class="go" data-goto="betalen">'+T('app.paynow','Nu betalen')+' →</button>'
-      : '<div class="label">'+T('app.payments.cap','Betalingen')+'</div><div class="big" style="color:var(--green);">'+T('app.allsettled','Alles voldaan')+'</div>' +
-        '<div class="meta">'+T('app.nothingopen','Er staat niets open.')+'</div>';
+    // Deze twee kaarten met Util.el: tekst structureel veilig, data-goto blijft
+    // (de globale [data-goto]-binding onderaan pakt de knoppen op).
+    const E = Util.el;
+    Util.vervang($('#homeTrip'),
+      E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
+      E('div', { class: 'big' }, trip.dest),
+      E('div', { class: 'meta' }, trip.dates + ' · ' + T('app.in', 'over') + ' ' + trip.days + ' ' + T('app.days', 'dagen')),
+      E('button', { class: 'go', dataset: { goto: 'reizen' } }, T('app.viewtrip', 'Bekijk uw reis') + ' →'));
+    Util.vervang($('#homePay'), open.length
+      ? [E('div', { class: 'label' }, T('app.outstanding', 'Openstaand')),
+         E('div', { class: 'big accent' }, eur(openSum)),
+         E('div', { class: 'meta' }, open.length + ' ' + (open.length === 1 ? T('app.payment', 'betaling') : T('app.payments', 'betalingen')) + ' · ' + T('app.onetapfid', 'één tik met Face ID')),
+         E('button', { class: 'go', dataset: { goto: 'betalen' } }, T('app.paynow', 'Nu betalen') + ' →')]
+      : [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
+         E('div', { class: 'big', style: { color: 'var(--green)' } }, T('app.allsettled', 'Alles voldaan')),
+         E('div', { class: 'meta' }, T('app.nothingopen', 'Er staat niets open.'))]);
     $('#homeSalon').innerHTML =
       '<div class="label">'+T('app.thesalon','De Salon')+'</div>' +
       '<div class="big gold">' + nfmt(creatorLikes) + '</div>' +

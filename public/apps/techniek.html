@@ -118,6 +118,19 @@
         <div class="sec">Waar u bewust geen inzage heeft (juridisch)</div>
         <div class="kaart" id="grenzen"></div>
       </div>
+      <div id="archiefBlok" hidden>
+        <div class="sec">Archiefkast (live-venster)</div>
+        <div class="kaart">
+          <div class="muted" id="archiefInfo" style="font-size:.82rem;"></div>
+          <div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;align-items:center;">
+            <label class="muted" style="font-size:.8rem;">Afgeronde tickets ouder dan</label>
+            <input class="veld" id="archiefDagen" type="number" inputmode="numeric" min="1" max="3650" style="width:6rem;margin-bottom:0;">
+            <span class="muted" style="font-size:.8rem;">dagen archiveren</span>
+            <button class="knop" id="archiefZet">Toepassen</button>
+          </div>
+          <div class="muted" style="font-size:.72rem;margin-top:.5rem;">Kleiner venster = kleinere levende kast = sneller onder zware belasting. De boekhouding en export tellen het archief altijd mee.</div>
+        </div>
+      </div>
       <div id="toegangBlok" hidden>
         <div class="sec">Toegang beheren</div>
         <div class="kaart">
@@ -230,6 +243,14 @@
       .catch(function(e){ toast(e.message); });
   }
 
+  document.addEventListener('click', function(ev){
+    if (ev.target && ev.target.id === 'archiefZet'){
+      var n = Number($('#archiefDagen').value);
+      api('/api/techniek/archief', { method:'POST', body:{ dagen:n } })
+        .then(function(r){ toast(r.verplaatst + ' verhuisd \u00B7 nu ' + r.levend.toLocaleString('nl-NL') + ' levend.'); laad(); })
+        .catch(function(e){ toast(e.message); });
+    }
+  });
   function toegangRij(t){
     var knop = el('button',{class:'knop grijs klein', onclick:function(){
       api('/api/techniek/toegang', { method:'POST', body:{ email:t.email, actie:'intrek' } }).then(function(){ toast('Toegang ingetrokken.'); laad(); }).catch(function(e){ toast(e.message); });
@@ -365,6 +386,11 @@
       vervang($('#checks'), d.checks.map(checkRij));
       $('#zekeringBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));
+      $('#archiefBlok').hidden = !(d.eigenaar && d.archief);
+      if (d.eigenaar && d.archief){
+        Util.tekst($('#archiefInfo'), 'Nu ' + d.archief.dagen + ' dagen \u00B7 ' + d.archief.levend.toLocaleString('nl-NL') + ' levend \u00B7 ' + d.archief.gearchiveerd.toLocaleString('nl-NL') + ' gearchiveerd');
+        if (document.activeElement !== $('#archiefDagen')) $('#archiefDagen').value = d.archief.dagen;
+      }
       $('#grenzenBlok').hidden = !(d.eigenaar && d.grenzen && d.grenzen.length);
       if (d.eigenaar && d.grenzen) vervang($('#grenzen'), d.grenzen.map(function(g){
         return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'DICHT'), el('div',{class:'mid'}, el('div',{class:'muted'}, g))); }));

@@ -16,7 +16,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-arch-'));
 let child;
 
 const DAGEN_100 = new Date(Date.now() - 100 * 86400000).toISOString();
-const GISTEREN = new Date(Date.now() - 86400000).toISOString();
+const GISTEREN = new Date(Date.now() - 2 * 86400000).toISOString();
 const ORDER = (ref, at, status) => ({
   ref, pickup: 'AB' + ref.slice(-2), supplierCode: 'KIKUNOI', supplierName: 'Sal de Mar', type: 'restaurant',
   customerTier: 'rtg', customerKey: 'user-999', customerCodename: 'Zilveren Valk T',
@@ -38,6 +38,7 @@ function boot() {
   })();
 }
 const stop = () => new Promise(r => { child.once('exit', r); child.kill('SIGTERM'); });
+const json = r => r.json();
 
 async function ownerToken() {
   const r = await fetch(BASE + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -113,4 +114,30 @@ test('een herstart archiveert niet dubbel', async () => {
   const maand = DAGEN_100.slice(0, 7);
   const regels = fs.readFileSync(path.join(TMP, 'archief', 'orders-' + maand + '.jsonl'), 'utf8').trim().split('\n');
   assert.equal(regels.filter(r => r.includes('RTG-O-OUDKLAAR')).length, 1, 'het ticket staat maar een keer in het archief');
+});
+
+test('de archiefgrens is instelbaar op de technische pagina, zonder herstart', async () => {
+  const tok = await ownerToken();
+  // het verse (2 dagen oude, afgeronde) ticket is nu nog levend
+  const tech0 = await json(await fetch(BASE + '/api/techniek/inloggen', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', wachtwoord: 'Imran' }) }));
+  const status0 = await json(await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + tech0.token } }));
+  assert.ok(status0.archief && status0.archief.dagen >= 90, 'de standaardgrens is ruim');
+  const levend0 = status0.archief.levend;
+  // zet de grens op 1 dag: het 2-dagen-oude afgeronde ticket verhuist meteen mee
+  const r = await json(await fetch(BASE + '/api/techniek/archief', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tech0.token },
+    body: JSON.stringify({ dagen: 1 }) }));
+  assert.equal(r.dagen, 1);
+  assert.ok(r.verplaatst >= 1, 'het verse-maar-afgeronde ticket is nu gearchiveerd');
+  assert.ok(r.levend < levend0, 'de levende kast is kleiner geworden');
+  // maar het totaal (levend + archief) blijft kloppen: niets verloren
+  const st = await officeState(tok);
+  assert.equal(st.totals.orders, 3);
+  // de instelling overleeft een herstart (staat in db.data.techniek)
+  await stop();
+  await boot();
+  const tech1 = await json(await fetch(BASE + '/api/techniek/inloggen', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', wachtwoord: 'Imran' }) }));
+  const status1 = await json(await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + tech1.token } }));
+  assert.equal(status1.archief.dagen, 1, 'de ingestelde grens is bewaard');
 });

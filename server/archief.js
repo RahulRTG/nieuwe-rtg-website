@@ -27,10 +27,27 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = function maakArchief({ db, save, DATA_DIR }) {
-  const DAGEN = Math.max(7, Number(process.env.RTG_ARCHIEF_DAGEN || 92));
+  // De archiefgrens (dagen) is instelbaar: een runtime-waarde die de eigenaar
+  // op de technische pagina zet (db.data.techniek.archiefDagen) wint, anders de
+  // omgevingsvariabele, anders 92. Minimaal 1 dag, zodat de lopende dag altijd
+  // levend blijft. Zo kun je het live-venster bijstellen zonder herstart.
+  const STANDAARD = Math.max(1, Number(process.env.RTG_ARCHIEF_DAGEN || 92));
   const MAP = path.join(DATA_DIR, 'archief');
   const KLAAR = { geserveerd: 1, geweigerd: 1, terugbetaald: 1, bezorgd: 1, opgehaald: 1 };
   const NUL = { aantal: 0, omzetBetaald: 0, perZaak: {}, perMaand: {} };
+
+  function dagen() {
+    const t = db.data.techniek && Number(db.data.techniek.archiefDagen);
+    return Number.isFinite(t) && t >= 1 ? Math.min(3650, Math.round(t)) : STANDAARD;
+  }
+  function zetDagen(n) {
+    const v = Math.min(3650, Math.max(1, Math.round(Number(n))));
+    if (!Number.isFinite(v)) return dagen();
+    db.data.techniek = db.data.techniek || {};
+    db.data.techniek.archiefDagen = v;
+    save();
+    return v;
+  }
 
   /* Alleen-lezen zicht op de tellerstaat: muteert db.data niet, zodat
      leesroutes (backoffice-totalen) geen schrijfwerk veroorzaken. */
@@ -40,7 +57,7 @@ module.exports = function maakArchief({ db, save, DATA_DIR }) {
 
   function archiveerNu() {
     if (!db.writable) return { verplaatst: 0 };
-    const grens = Date.now() - DAGEN * 86400000;
+    const grens = Date.now() - dagen() * 86400000;
     const blijven = [], weg = [];
     for (const o of db.data.orders || []) {
       (KLAAR[o.status] && new Date(o.at).getTime() < grens ? weg : blijven).push(o);
@@ -76,7 +93,7 @@ module.exports = function maakArchief({ db, save, DATA_DIR }) {
     }
     db.data.orders = blijven;
     save();
-    console.log('[archief] ' + weg.length + ' afgeronde tickets (ouder dan ' + DAGEN +
+    console.log('[archief] ' + weg.length + ' afgeronde tickets (ouder dan ' + dagen() +
       ' dagen) verhuisd naar het archief; ' + blijven.length + ' levend, ' + s.aantal + ' totaal in het archief.');
     return { verplaatst: weg.length };
   }
@@ -97,5 +114,5 @@ module.exports = function maakArchief({ db, save, DATA_DIR }) {
     }
   }
 
-  return { archiveerNu, stat, leesAlles, MAP, DAGEN };
+  return { archiveerNu, stat, leesAlles, MAP, dagen, zetDagen };
 };

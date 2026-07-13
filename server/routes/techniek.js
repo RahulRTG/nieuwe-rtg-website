@@ -11,7 +11,7 @@ const eigenaar = require('../eigenaar');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
-  const { app, accounts, anthropic, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path } = kern;
+  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path } = kern;
   const OWNER_EMAIL = eigenaar.OWNER_EMAIL;
 
   function staat() {
@@ -113,6 +113,8 @@ module.exports = (kern) => {
       uit.toegang = t.toegang.map(id => { const u = accounts.getUserById(id); return { id, naam: u ? accounts.realNameOf(u) : '?', email: u ? accounts.emailOf(u) : null }; });
       // de juridische grenzen: waar zelfs de eigenaar bewust GEEN inzage heeft
       uit.grenzen = eigenaar.GRENZEN;
+      // de archiefkast: instelbare live-vensterbreedte en de huidige verdeling
+      uit.archief = archief ? { dagen: archief.dagen(), levend: (db.data.orders || []).length, gearchiveerd: archief.stat().aantal } : null;
     }
     res.json(uit);
   });
@@ -210,6 +212,15 @@ module.exports = (kern) => {
   });
 
   // Iemand handmatig toegang geven of intrekken (alleen de eigenaar).
+  // De archiefgrens (live-venster in dagen) instellen; draait meteen een ronde.
+  app.post('/api/techniek/archief', techAuth, eigenaarAlleen, (req, res) => {
+    if (!archief) return res.status(409).json({ error: 'De archiefkast draait niet in dit proces.' });
+    const dagen = archief.zetDagen(req.body.dagen);
+    let verplaatst = 0;
+    try { verplaatst = archief.archiveerNu().verplaatst; } catch (e) {}
+    res.json({ ok: true, dagen, verplaatst, levend: (db.data.orders || []).length, gearchiveerd: archief.stat().aantal });
+  });
+
   app.post('/api/techniek/toegang', techAuth, eigenaarAlleen, (req, res) => {
     const t = staat();
     const doel = accounts.findByLogin(req.body.email);

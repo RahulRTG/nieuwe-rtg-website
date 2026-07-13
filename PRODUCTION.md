@@ -94,6 +94,11 @@ Volledige lijst met uitleg: `.env.example`.
 - **Security** — https-redirect + HSTS, strikte CSP (met per-antwoord nonce voor
   scripts), `nosniff`/`DENY`/referrer/permissions-headers, token-hashing,
   sessieverloop, rate-limits, AVG-rechten (inzage + verwijderen).
+- **Inlogpieken** - wachtwoord-hashing (scrypt) rekent asynchroon in de
+  libuv-threadpool naast de server; `UV_THREADPOOL_SIZE` staat standaard op 16
+  (server.js en Docker-image). Gemeten op een miljoen-leden database met 100
+  gelijktijdige logins: de site blijft vlot terwijl de logins doorstromen.
+  Meer piekcapaciteit per instance: verhoog `UV_THREADPOOL_SIZE`.
 - **Graceful shutdown** — `SIGTERM`/`SIGINT` schrijven data weg en sluiten netjes.
 - **Failover** — drie-server-cluster met poortwachter (`server/trio.js`).
 - **Toegankelijkheid** — alle vlaggenschip-schermen axe-schoon (CI bewaakt dit).

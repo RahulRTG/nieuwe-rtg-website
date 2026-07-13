@@ -15,6 +15,13 @@ if (!process.execArgv.some(a => a.includes('experimental-sqlite'))) {
   process.exit(r.status == null ? 1 : r.status);
 }
 
+/* Wachtwoord-hashing (scrypt) rekent in de libuv-threadpool, die standaard
+   maar 4 draden heeft: bij een inlogpiek wordt die pool de flessenhals.
+   16 draden geeft ~4x meer gelijktijdige logins per instance. Dit moet
+   gezet zijn VOOR het eerste asynchrone crypto/fs-werk, dus hier bovenaan;
+   een expliciete UV_THREADPOOL_SIZE uit de omgeving wint altijd. */
+if (!process.env.UV_THREADPOOL_SIZE) process.env.UV_THREADPOOL_SIZE = '16';
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');

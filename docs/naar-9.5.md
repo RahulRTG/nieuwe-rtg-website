@@ -88,7 +88,11 @@ Axe is groen (0 serious/critical), maar dat dekt geen focusbeheer of toetsenbord
 - [x] Scherm-tests: PDA-training, PDA-aandacht, boot van leverancier/lid/backoffice,
   offline-banner (`npm run e2e`, 6 tests).
 - [x] Interactie-e2e voor de kassa (bestellen+betalen -> Orders -> in bereiding).
-- [ ] Contracttests voor de belangrijkste API-antwoorden.
+- [x] Contracttests voor de belangrijkste API-antwoorden (`test/api-contract.test.js`):
+  de vorm van /api/state (user/trip/invoices/posts), /api/supplier/state
+  (supplier/orders/menu/settings), /api/office/state (overzichten + totals) en de
+  token-antwoorden van login/register liggen vast, zodat een refactor geen veld
+  stilletjes kan weglaten.
 
 ## 9. Schaal (bewuste keuze, geen code-fix)
 Bekende plafonds: single-proces ~1.400–1.700 req/s en het JSON-snapshot-plafond

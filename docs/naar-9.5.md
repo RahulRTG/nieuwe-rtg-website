@@ -71,11 +71,13 @@ gebruikt.
 ## 6. Inline styles → klassen
 `app.html` 396 en `leverancier.html` 353 inline `style="…"`-attributen.
 
-- [~] Terugkerende patronen naar utility-klassen: `.fineprint` (leden, was 6x
-  inline) en `.softline` (leverancier, was 10x) eruit; exacte hele-stijl-matches
-  op klasseloze `<div>`s, dus gedragsbehoudend. Grotere sweep vraagt een
-  visuele-diff-vangnet (anders kans op subtiele regressies).
-- [ ] Scheelt bytes na minify en maakt thema-/merkwijzigingen veilig.
+- [x] Terugkerende patronen naar utility-klassen, met visuele-diff-vangnet:
+  leden `.fineprint/.soft-sm/.soft-sm-grow/.grow-min` (20 inline weg),
+  leverancier `.softline/.row-gap/.row-mid-gap/.note-soft/.txt-md/.soft-xs`
+  (51 inline weg). Exacte hele-stijl-matches op elementen zonder eigen class.
+  Bewijs: leverancier-screenshot byte-voor-byte identiek voor/na; leden-utilities
+  computed-style identiek aan de vervangen inline (deterministische DOM-check).
+- [x] Scheelt bytes na minify en maakt thema-/merkwijzigingen veilig.
 
 ## 7. Diepere toegankelijkheid
 Axe is groen (0 serious/critical), maar dat dekt geen focusbeheer of toetsenbord.

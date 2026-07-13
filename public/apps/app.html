@@ -774,6 +774,10 @@
   #toast.show{opacity:1;transform:translate(-50%, 0);}
   /* Utility: terugkerende "fijne uitleg"-regel (was 6x inline). */
   .fineprint{font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;}
+  /* Utilities uit herhaalde inline-stijlen (identieke regels, dus gelijk beeld). */
+  .soft-sm{font-size:0.72rem;color:var(--soft);}
+  .soft-sm-grow{flex:1;font-size:0.72rem;color:var(--soft);}
+  .grow-min{flex:1;min-width:0;}
 </style>
 </head>
 <body>
@@ -1062,21 +1066,21 @@
     </div>
     <div class="ms-body" style="padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.7rem;">
       <div style="display:flex;gap:0.6rem;">
-        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.pax">Personen</span>
+        <label class="soft-sm-grow"><span data-i18n="ride.pax">Personen</span>
           <select id="ridePax" class="ms-note" style="margin-top:0.3rem;"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
         </label>
-        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.bag">Koffers</span>
+        <label class="soft-sm-grow"><span data-i18n="ride.bag">Koffers</span>
           <select id="rideBag" class="ms-note" style="margin-top:0.3rem;"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option></select>
         </label>
       </div>
       <div style="display:flex;gap:0.6rem;">
-        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.plan">Wanneer</span>
+        <label class="soft-sm-grow"><span data-i18n="ride.plan">Wanneer</span>
           <select id="ridePlan" class="ms-note" style="margin-top:0.3rem;"><option value="nu" data-i18n="ride.nu">Nu</option><option value="later" data-i18n="ride.later">Op een tijd</option></select>
         </label>
-        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.datum">Datum</span>
+        <label class="soft-sm-grow"><span data-i18n="ride.datum">Datum</span>
           <input id="rideDatum" type="date" class="ms-note" style="margin-top:0.3rem;">
         </label>
-        <label style="flex:1;font-size:0.72rem;color:var(--soft);"><span data-i18n="ride.tijd">Tijd</span>
+        <label class="soft-sm-grow"><span data-i18n="ride.tijd">Tijd</span>
           <input id="rideTijd" type="time" class="ms-note" style="margin-top:0.3rem;">
         </label>
       </div>
@@ -1537,7 +1541,7 @@
     reqs.forEach(r => {
       html += '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+
         '<span class="sc-av" style="width:2rem;height:2rem;">'+initCN(r.codename)+'</span>'+
-        '<div style="flex:1;min-width:0;"><b>'+escT(r.codename)+'</b><div class="meta">wil verbinden</div></div>'+
+        '<div class="grow-min"><b>'+escT(r.codename)+'</b><div class="meta">wil verbinden</div></div>'+
         '<button class="go" style="padding:.2rem .6rem;" data-cja="'+escT(r.key)+'">Accepteer</button>'+
         '<button class="go" style="background:transparent;color:var(--muted);padding:.2rem .4rem;" data-cnee="'+escT(r.key)+'">✕</button></div>';
     });
@@ -2089,12 +2093,12 @@
     if (!tkPartners.length){ el.innerHTML = ''; return; }
     let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('tk.kop','Activiteiten, tours en musea')+'</div>';
     for (const p of tkPartners){
-      html += '<div class="card"><b>'+esc(p.name)+'</b> <span style="font-size:0.72rem;color:var(--soft);">\u00B7 '+esc(p.city||'')+'</span>';
+      html += '<div class="card"><b>'+esc(p.name)+'</b> <span class="soft-sm">\u00B7 '+esc(p.city||'')+'</span>';
       for (const a of p.activiteiten){
         const open = tkOpen === p.code + ':' + a.id;
         html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
           '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="flex:1;"><div style="font-size:0.88rem;">'+esc(a.name)+'</div>'+
-          (a.desc?'<div style="font-size:0.72rem;color:var(--soft);">'+esc(a.desc)+(a.duur?' \u00B7 '+esc(a.duur):'')+'</div>':'')+'</div>'+
+          (a.desc?'<div class="soft-sm">'+esc(a.desc)+(a.duur?' \u00B7 '+esc(a.duur):'')+'</div>':'')+'</div>'+
           '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(a.prijs)+' p.p.</span></div>';
         if (open){
           const k = tkKeuze;
@@ -2224,7 +2228,7 @@
     let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('vh.kop','Autoverhuur, RTG-veilig')+'</div>'+
       '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.5rem;">'+T('vh.uitleg','Vaste prijs vooraf betaald. Staat vastgelegd met foto\'s voor en na. SOS-knop en RTG als scheidsrechter.')+'</div>';
     for (const p of vhPartners){
-      html += '<div class="card"><b>'+esc(p.name)+'</b> <span style="font-size:0.72rem;color:var(--soft);">\u00B7 '+esc(p.city||'')+'</span>';
+      html += '<div class="card"><b>'+esc(p.name)+'</b> <span class="soft-sm">\u00B7 '+esc(p.city||'')+'</span>';
       for (const a of p.autos){
         const open = vhOpen === p.code + ':' + a.id;
         html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
@@ -2407,7 +2411,7 @@
     }
     el.innerHTML = bzPartners.map(p =>
       '<button class="card" style="display:block;width:100%;text-align:left;cursor:pointer;" data-bzkies="'+p.code+'">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;"><b>'+esc(p.name)+'</b><span style="font-size:0.72rem;color:var(--soft);">'+esc(p.city||'')+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;"><b>'+esc(p.name)+'</b><span class="soft-sm">'+esc(p.city||'')+'</span></div>'+
       '<div style="margin-top:0.3rem;font-size:0.76rem;color:var(--muted);">'+(p.bezorgen?'\uD83D\uDEF5 '+T('bz.kan.bez','bezorgen'):'')+(p.bezorgen&&p.ophalen?' \u00B7 ':'')+(p.ophalen?'\uD83E\uDDFA '+T('bz.kan.oph','ophalen'):'')+' \u00B7 '+p.producten.length+' '+T('bz.prod','producten')+'</div></button>'
     ).join('');
     document.querySelectorAll('[data-bzkies]').forEach(b => b.addEventListener('click', () => {
@@ -2426,7 +2430,7 @@
       '<div class="card"><b>'+esc(p.name)+'</b>'+
       p.producten.map(x =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.7rem;">'+
-        '<div style="flex:1;"><div style="font-size:0.88rem;">'+esc(x.name)+'</div>'+(x.desc?'<div style="font-size:0.72rem;color:var(--soft);">'+esc(x.desc)+'</div>':'')+'</div>'+
+        '<div style="flex:1;"><div style="font-size:0.88rem;">'+esc(x.name)+'</div>'+(x.desc?'<div class="soft-sm">'+esc(x.desc)+'</div>':'')+'</div>'+
         '<span style="color:var(--gold);font-size:0.82rem;">'+eur(x.price)+'</span>'+
         '<span style="display:flex;align-items:center;gap:0.45rem;">'+
         '<button class="bz-btn" data-bzmin="'+x.id+'" style="padding:0.2rem 0.7rem;">\u2212</button><b>'+(bzMand[x.id]||0)+'</b><button class="bz-btn" data-bzplus="'+x.id+'" style="padding:0.2rem 0.7rem;">+</button></span></div>'
@@ -3452,7 +3456,7 @@
     const byId={}; chats.forEach(c=> byId[c.id]=c);
     box.innerHTML='<div class="label">💬 Chat en bellen</div>'+
       '<div class="meta" style="margin-bottom:.4rem;">Bericht of (video)bel het gezin in de app.</div>'+
-      kan.leden.map(function(l){ var c=byId[l.id]||{}; return '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><span style="width:2rem;height:2rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+(l.avatar||'🙂')+'</span><div style="flex:1;min-width:0;"><b>'+esc(l.naam)+'</b>'+(c.ongelezen?' <span style="color:var(--burgundy);">('+c.ongelezen+')</span>':'')+(c.laatste?'<div class="meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(c.laatste)+'</div>':'')+'</div><button class="go" style="padding:.2rem .5rem;" data-chat="'+l.id+'">Chat</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-bel="'+l.id+'">📞</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-video="'+l.id+'">🎥</button></div>'; }).join('')+
+      kan.leden.map(function(l){ var c=byId[l.id]||{}; return '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><span style="width:2rem;height:2rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+(l.avatar||'🙂')+'</span><div class="grow-min"><b>'+esc(l.naam)+'</b>'+(c.ongelezen?' <span style="color:var(--burgundy);">('+c.ongelezen+')</span>':'')+(c.laatste?'<div class="meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(c.laatste)+'</div>':'')+'</div><button class="go" style="padding:.2rem .5rem;" data-chat="'+l.id+'">Chat</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-bel="'+l.id+'">📞</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-video="'+l.id+'">🎥</button></div>'; }).join('')+
       '<div id="grtThread" style="display:none;margin-top:.7rem;"></div>';
     box.querySelectorAll('[data-chat]').forEach(function(b){ b.onclick=function(){ openGrtThread(b.dataset.chat, kan.leden.find(function(x){return x.id===b.dataset.chat;})); }; });
     box.querySelectorAll('[data-bel]').forEach(function(b){ b.onclick=function(){ GezinRT.bel(b.dataset.bel,false); }; });
@@ -3922,7 +3926,7 @@
       ' data-key="' + escT(p.key) + '" data-v="' + escT(v.naam) + '">' + escT(v.naam) + (v.aanbevolen ? ' · ' + v.aanbevolen + ' 👍' : '') + '</span>').join('');
     return '<div class="zak-kaart">' +
       '<div style="display:flex;align-items:center;gap:0.6rem;">' +
-        '<div style="flex:1;min-width:0;"><b>' + escT(p.naam) + '</b>' +
+        '<div class="grow-min"><b>' + escT(p.naam) + '</b>' +
         (p.pas ? ' <span style="font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.08rem 0.4rem;vertical-align:middle;">' + (TIER_LABEL[p.pas] || p.pas) + '</span>' : '') +
         (p.openVoorWerk ? ' <span class="zak-open">' + T('zak.open','open voor werk') + '</span>' : '') +
         '<div style="font-size:0.74rem;color:var(--muted);">' + escT(p.kop) +
@@ -4001,7 +4005,7 @@
           const d = await API.call('/zakelijk/kansen', { q: $('#kansZoek').value, soort: $('#kansSoortF').value || undefined });
           const kaart = (k) => '<div class="zak-kaart">' +
             '<div style="display:flex;gap:0.5rem;align-items:baseline;"><span>' + (SOORT_ICO[k.soort] || k.icon || '✨') + '</span>' +
-            '<div style="flex:1;min-width:0;"><b style="font-size:0.84rem;">' + escT(k.titel) + '</b>' +
+            '<div class="grow-min"><b style="font-size:0.84rem;">' + escT(k.titel) + '</b>' +
             (!k.open ? ' <span class="zak-chip">' + T('zak.k.dicht','vervuld') + '</span>' : '') +
             '<div style="font-size:0.66rem;color:var(--soft);">' +
             (k.bron === 'partner' ? T('zak.k.partner','Vacature bij RTG-partner') : escT(k.naam) + (k.kop ? ' · ' + escT(k.kop) : '')) +

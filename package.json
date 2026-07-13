@@ -15,7 +15,8 @@
     "check": "node scripts/check.js",
     "a11y": "node scripts/a11y.js",
     "build": "node scripts/build.js",
-    "test": "node --experimental-sqlite --test test/*.test.js"
+    "test": "node --experimental-sqlite --test test/*.test.js",
+    "e2e": "node --experimental-sqlite --test test/*.e2e.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

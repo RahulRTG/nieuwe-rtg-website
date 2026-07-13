@@ -66,3 +66,5 @@ jobs:
         run: node scripts/a11y.js
         env:
           A11Y_STRICT: '1'
+      - name: Scherm-tests (PDA in de browser)
+        run: npm run e2e

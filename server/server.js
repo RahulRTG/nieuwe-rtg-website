@@ -31,7 +31,8 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal } = require('./db');
+const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
@@ -825,6 +826,10 @@ function dirTouch(sess) {
   if (!cur || cur.codename !== cn || cur.tier !== sess.tier) {
     if (!cur && _ledenAantalCache != null) _ledenAantalCache++; // nieuw lid: teller ophogen
     db.data.memberDir[sess.key] = { codename: cn, tier: sess.tier };
+    // Met Postgres: het lid ook naar de geindexeerde ledengids (member_dir)
+    // schrijven, zodat de gids buiten het geheugen kan groeien en het ledental
+    // O(1) blijft. db.data.memberDir blijft de snelle cache voor de app.
+    if (ledenGidsActief()) ledenGidsZet(sess.key, cn, sess.tier).catch(() => {});
     save();
   }
 }
@@ -835,6 +840,10 @@ function dirTouch(sess) {
 // nieuw lid (zie dirTouch) en verversen alleen bij een externe datawijziging.
 let _ledenAantalCache = null;
 function ledenAantal() {
+  // Met Postgres komt het ledental uit de geindexeerde gids (O(1), telt ook de
+  // leden die niet in het geheugen staan). Zonder Postgres: de onderhouden
+  // lokale teller.
+  if (ledenGidsActief()) return ledenGidsAantal();
   if (_ledenAantalCache == null) _ledenAantalCache = Object.keys(db.data.memberDir || {}).length;
   return _ledenAantalCache;
 }

@@ -106,6 +106,12 @@ Bekende plafonds: single-proces ~1.400–1.700 req/s en het JSON-snapshot-plafon
   miljoenen"): bekende plafonds, horizontaal uitschalen achter de poortwachter
   met Redis + Postgres overal aan, gedeelde geheimen, en de procesindeling-
   keuzes (vloot / trio / containers).
+- [x] Ledengids (codenaam/pas per lid) naar een geindexeerde Postgres-tabel
+  (`member_dir`), net als het zaken-grootboek: per-key lookup, omgekeerd zoeken
+  op codenaam en een O(1) telling buiten het geheugen. Uit de 65M-schaaltest
+  bleek de in-memory `memberDir` ~11 GB en de telling O(N); dit haalt beide weg.
+  Geverifieerd tegen een echte Postgres (`test/leden-gids-pg.test.js`, met
+  DATABASE_URL); zonder Postgres blijft de in-memory gids ongewijzigd.
 - [ ] Virtualisatie van zeer lange lijsten in de backoffice (open, puur
   front-end; server is al gepagineerd met eerlijke totalen).
 

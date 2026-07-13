@@ -295,6 +295,72 @@ function grootAantal() {
   return grootN;
 }
 
+/* ---- Ledengids (member_dir) -----------------------------------------------
+   De codenaam/pas-gids per lid (sleutel -> {codename, tier}) is bij miljoenen
+   leden geen array/object in het geheugen: dat kost gigabytes en zou de hele
+   kast als EEN string moeten serialiseren. Daarom staan de leden hier als
+   GEINDEXEERDE RIJEN in Postgres (key = primaire sleutel, codename_lower voor
+   zoeken), met een kleine cache van de actieve leden. Zo passen tientallen
+   miljoenen leden zonder ze ooit allemaal in het geheugen te laden. Zonder
+   Postgres is dit inert en gebruikt de app db.data.memberDir zoals voorheen. */
+let ledenPool = null;
+const ledenCache = new Map();      // key -> { codename, tier } of null (niet gevonden)
+let ledenN = 0, ledenNAt = 0;
+async function ververLedenN() {
+  if (!ledenPool) return 0;
+  try { const r = await ledenPool.query('SELECT count(*)::bigint AS c FROM member_dir'); ledenN = Number(r.rows[0].c); ledenNAt = Date.now(); } catch (e) {}
+  return ledenN;
+}
+async function laadLid(key) {
+  try {
+    const r = await ledenPool.query('SELECT codename, tier FROM member_dir WHERE key = $1', [key]);
+    const row = r.rows[0];
+    if (ledenCache.size > 100000) ledenCache.clear();          // begrensde cache van actieve leden
+    ledenCache.set(key, row ? { codename: row.codename, tier: row.tier } : null);
+  } catch (e) { ledenCache.delete(key); }
+}
+function ledenGidsActief() { return !!ledenPool; }
+// Synchroon opzoeken: uit de cache, of null terwijl we hem asynchroon inladen
+// (de volgende keer zit hij in de cache). Zo blijven de bestaande synchrone
+// lezers werken zoals de app verwacht.
+function ledenGidsHaal(key) {
+  if (!ledenPool) return undefined;
+  if (ledenCache.has(key)) return ledenCache.get(key);
+  ledenCache.set(key, null);          // voorkom een storm van gelijke queries
+  laadLid(key);
+  return null;
+}
+function ledenGidsAantal() {
+  if (ledenPool && Date.now() - ledenNAt > 10000) { ledenNAt = Date.now(); ververLedenN().catch(() => {}); }
+  return ledenN;
+}
+// Nieuw of gewijzigd lid: cache meteen bijwerken (zodat een lezer direct na een
+// schrijf het juiste antwoord krijgt) en de rij in Postgres upserten.
+async function ledenGidsZet(key, codename, tier) {
+  if (!ledenPool) return;
+  ledenCache.set(key, { codename, tier });
+  try {
+    const r = await ledenPool.query(
+      'INSERT INTO member_dir(key, codename, tier, codename_lower) VALUES($1,$2,$3,$4) ' +
+      'ON CONFLICT(key) DO UPDATE SET codename=$2, tier=$3, codename_lower=$4 RETURNING (xmax=0) AS nieuw',
+      [key, codename, tier, String(codename || '').toLowerCase()]);
+    if (r.rows[0] && r.rows[0].nieuw) ledenN++;
+  } catch (e) {}
+}
+// Omgekeerd opzoeken (codenaam -> sleutel), geindexeerd i.p.v. een scan.
+async function ledenGidsKeyVanCodenaam(codename) {
+  if (!ledenPool) return null;
+  try { const r = await ledenPool.query('SELECT key FROM member_dir WHERE codename = $1 LIMIT 1', [codename]); return r.rows[0] ? r.rows[0].key : null; } catch (e) { return null; }
+}
+// Zoeken op (deel van) een codenaam, geindexeerd en begrensd.
+async function ledenGidsZoek(qLower, limit) {
+  if (!ledenPool) return [];
+  try {
+    const r = await ledenPool.query('SELECT key, codename, tier FROM member_dir WHERE codename_lower LIKE $1 LIMIT $2', ['%' + String(qLower || '') + '%', limit || 20]);
+    return r.rows.map(row => ({ key: row.key, codename: row.codename, tier: row.tier }));
+  } catch (e) { return []; }
+}
+
 async function startPostgres() {
   if (STORE !== 'postgres') return false;
   pg = require('./pg').maakPg({ merge3, kluis, log: pgLog, url: DATABASE_URL });
@@ -302,6 +368,13 @@ async function startPostgres() {
   // het grootboek van bulk-zaken (geindexeerd, buiten het geheugen)
   grootPool = pg.pool;
   try { await grootPool.query('CREATE TABLE IF NOT EXISTS suppliers_big(code text PRIMARY KEY, name text, type text, city text)'); await ververGrootN(); } catch (e) { pgLog && pgLog.warn && pgLog.warn('[db] grootboek init mislukt: ' + e.message); }
+  // de ledengids: geindexeerde rijen buiten het geheugen (zie boven)
+  ledenPool = pg.pool;
+  try {
+    await ledenPool.query('CREATE TABLE IF NOT EXISTS member_dir(key text PRIMARY KEY, codename text, tier text, codename_lower text)');
+    await ledenPool.query('CREATE INDEX IF NOT EXISTS member_dir_codename_lower ON member_dir(codename_lower)');
+    await ververLedenN();
+  } catch (e) { ledenPool = null; pgLog && pgLog.warn && pgLog.warn('[db] ledengids init mislukt: ' + e.message); }
   const pgData = await pg.laadAlles();
   if (pgData) {
     db.data = pgData; // Postgres is de gedeelde waarheid
@@ -502,4 +575,5 @@ async function startGedeeld() {
 // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.
 function onExternalChange(cb) { externCb = cb; }
 
-module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, pgPing, onExternalChange, merge3, schrijfDuurzaam, grootSupplierSync, grootAantal };
+module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, pgPing, onExternalChange, merge3, schrijfDuurzaam, grootSupplierSync, grootAantal,
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek };

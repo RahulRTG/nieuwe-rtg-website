@@ -69,7 +69,7 @@ Axe is groen (0 serious/critical), maar dat dekt geen focusbeheer of toetsenbord
 ## 8. Testdekking verbreden
 - [x] Scherm-tests: PDA-training, PDA-aandacht, boot van leverancier/lid/backoffice,
   offline-banner (`npm run e2e`, 6 tests).
-- [ ] Interactie-e2e voor de kassa/KDS (order → keuken → klaar).
+- [x] Interactie-e2e voor de kassa (bestellen+betalen -> Orders -> in bereiding).
 - [ ] Contracttests voor de belangrijkste API-antwoorden.
 
 ## 9. Schaal (bewuste keuze, geen code-fix)

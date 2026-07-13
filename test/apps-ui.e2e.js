@@ -81,6 +81,63 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
   });
 });
 
+test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt doorgezet',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    // manager-token + een keukengerecht op de kaart
+    const roster = await api(base, '/api/supplier/roster', { code: 'KIKUNOI' });
+    const man = roster.staff.find(x => x.role === 'manager');
+    const login = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: man.id, pin: '1234' });
+    assert.ok(login.token, 'manager-login geeft een token');
+    const authHead = tok => ({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok });
+    await fetch(base + '/api/supplier/menu', { method: 'POST', headers: authHead(login.token),
+      body: JSON.stringify({ menu: [{ id: 'ramen', name: 'Ramen', price: 12, station: 'keuken', cat: 'Warm' }] }) });
+
+    // een lid bestelt aan tafel 3 en betaalt (dan pas ziet de zaak het)
+    const reg = await api(base, '/api/auth/register', { name: 'Kassa Lid', email: 'kassa@x.nl', phone: '0612345001',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    const ord = await (await fetch(base + '/api/order', { method: 'POST', headers: authHead(reg.token),
+      body: JSON.stringify({ supplierCode: 'KIKUNOI', items: [{ id: 'ramen', qty: 1 }], table: 'Tafel 3' }) })).json();
+    assert.ok(ord.order && ord.order.ref, 'de bestelling is aangemaakt');
+    const betaald = await (await fetch(base + '/api/order/pay', { method: 'POST', headers: authHead(reg.token),
+      body: JSON.stringify({ ref: ord.order.ref }) })).json();
+    assert.ok(betaald.ok, 'de bestelling is betaald');
+    const ref = ord.order.ref;
+
+    // de leverancier opent de app en gaat via Meer naar Orders
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    page.on('pageerror', e => fouten.push(e.message));
+    await page.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); }, login.token);
+    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
+    await page.waitForSelector('#app.active', { timeout: 15000 });
+    await page.click('[data-tab="meer"]');
+    await page.click('[data-goto2="orders"]');
+
+    // de betaalde bestelling staat op het scherm
+    const kaart = page.locator('.order[data-ref="' + ref + '"]');
+    await kaart.waitFor({ timeout: 10000 });
+    assert.match(await kaart.textContent(), /Tafel 3|Ramen/, 'de tafel/het gerecht staat op de bon');
+
+    // doorzetten naar 'in bereiding' (de keuken pakt hem op)
+    await kaart.locator('.js-next').first().click();
+    await page.waitForFunction(r => {
+      const el = document.querySelector('.order[data-ref="' + r + '"]');
+      return !!(el && /in bereiding/.test(el.textContent));
+    }, ref, { timeout: 15000 });
+
+    assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwijnt weer',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   const TMP = verseDataDir();

@@ -288,6 +288,33 @@ app.post('/api/live/door', auth, (req, res) => {
   res.json({ ok: true, door: { name: door.name, relockSec: DOOR_RELOCK_MS / 1000 } });
 });
 
+/* De gast vraagt zelf om aandacht (roept de bediening) bij een zaak. Belandt als
+   prioriteit op het scherm van het personeel (PDA) en de zaak-backoffice, zodat
+   niemand ooit hoeft te wachten of te zwaaien. Service op 5-sterrenniveau. */
+app.post('/api/aandacht', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  if (!s) return res.status(404).json({ error: 'Zaak niet gevonden.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const a = db.data.aandacht = db.data.aandacht || {};
+  const lijst = a[s.code] = a[s.code] || [];
+  // niet spammen: een openstaand verzoek van dezelfde gast telt als één
+  const bestaand = lijst.find(x => !x.klaar && x.key === req.session.key);
+  const redenen = { rekening: 'Vraagt om de rekening', bestellen: 'Wil bestellen', hulp: 'Vraagt om hulp' };
+  const reden = redenen[req.body.reden] || schoon(req.body.reden, 120) || 'Vraagt om aandacht';
+  if (bestaand) { bestaand.reden = reden; bestaand.at = new Date().toISOString(); }
+  else {
+    lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), key: req.session.key, codename,
+      tafel: schoon(req.body.table, 24), reden, at: new Date().toISOString(), klaar: false });
+    a[s.code] = lijst.slice(0, 300);
+  }
+  save();
+  notifySupplier(s.code, { icon: '\u{1F514}', title: 'Gast vraagt aandacht' + (req.body.table ? ' · ' + schoon(req.body.table, 24) : ''), body: codename + ': ' + reden });
+  sseToSupplier(s.code, 'sync', { scope: 'orders' });
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true });
+});
+
 app.post('/api/partner/chat/send', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const s = findSupplier(req.body.supplierCode);

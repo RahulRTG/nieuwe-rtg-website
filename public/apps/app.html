@@ -410,6 +410,15 @@
   .wa-badge{display:block;font-size:0.6rem;letter-spacing:0.04em;opacity:0.75;margin-bottom:0.25rem;}
   .chips{display:flex;gap:0.5rem;overflow-x:auto;margin-top:1rem;padding-bottom:0.3rem;scrollbar-width:none;}
   .chips::-webkit-scrollbar{display:none;}
+  /* bestellen (ophaal/bezorgdienst) */
+  .bz-btn{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:0.5rem 1rem;font-size:0.8rem;cursor:pointer;font-family:inherit;}
+  .bz-btn.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
+  .bz-btn:disabled{opacity:0.5;}
+  .bz-veld{margin-top:0.8rem;}
+  .bz-veld label{display:block;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-bottom:0.35rem;}
+  .bz-veld input{width:100%;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.9rem;color:var(--txt);outline:none;font-family:inherit;}
+  .bz-groot{display:block;width:100%;background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.85rem 1rem;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .bz-groot:disabled{opacity:0.45;}
   .chip{
     flex-shrink:0;
     border:1px solid var(--line);
@@ -2016,7 +2025,7 @@
   }
 
   /* ---------- bestellen: de ophaal/bezorgdienst ---------- */
-  let bzPartners = [], bzZaak = null, bzMand = {}, bzLevering = 'bezorgen', bzGeo = null, bzVolgTimer = null;
+  let bzPartners = [], bzZaak = null, bzMand = {}, bzLevering = 'bezorgen', bzGeo = null, bzAdresW = '';
   async function laadBestellen(){
     if (!API.live) return;
     try { bzPartners = (await API.call('/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
@@ -2073,22 +2082,24 @@
     const p = bzZaak;
     const n = Object.values(bzMand).reduce((a,b)=>a+b,0);
     el.innerHTML =
-      '<button class="obtn" id="bzTerug" style="margin-bottom:0.8rem;">\u2039 '+T('bz.terug','Alle partners')+'</button>'+
+      '<button class="bz-btn" id="bzTerug" style="margin-bottom:0.8rem;">\u2039 '+T('bz.terug','Alle partners')+'</button>'+
       '<div class="card"><b>'+esc(p.name)+'</b>'+
       p.producten.map(x =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.7rem;">'+
         '<div style="flex:1;"><div style="font-size:0.88rem;">'+esc(x.name)+'</div>'+(x.desc?'<div style="font-size:0.72rem;color:var(--soft);">'+esc(x.desc)+'</div>':'')+'</div>'+
         '<span style="color:var(--gold);font-size:0.82rem;">'+eur(x.price)+'</span>'+
         '<span style="display:flex;align-items:center;gap:0.45rem;">'+
-        '<button class="obtn" data-bzmin="'+x.id+'" style="padding:0.2rem 0.7rem;">\u2212</button><b>'+(bzMand[x.id]||0)+'</b><button class="obtn" data-bzplus="'+x.id+'" style="padding:0.2rem 0.7rem;">+</button></span></div>'
+        '<button class="bz-btn" data-bzmin="'+x.id+'" style="padding:0.2rem 0.7rem;">\u2212</button><b>'+(bzMand[x.id]||0)+'</b><button class="bz-btn" data-bzplus="'+x.id+'" style="padding:0.2rem 0.7rem;">+</button></span></div>'
       ).join('')+'</div>'+
       '<div class="card">'+
       '<div style="display:flex;gap:0.5rem;">'+
-      (p.bezorgen?'<button class="obtn'+(bzLevering==='bezorgen'?' primary':'')+'" data-bzlev="bezorgen">\uD83D\uDEF5 '+T('bz.kan.bez','bezorgen')+'</button>':'')+
-      (p.ophalen?'<button class="obtn'+(bzLevering==='ophalen'?' primary':'')+'" data-bzlev="ophalen">\uD83E\uDDFA '+T('bz.kan.oph','ophalen')+'</button>':'')+'</div>'+
-      (bzLevering==='bezorgen' ? '<div class="field" style="margin-top:0.8rem;"><label>'+T('bz.adres','Bezorgadres')+'</label><input id="bzAdres" placeholder="'+T('bz.adresph','Straat, nummer, plaats')+'"></div>'+
-        '<button class="obtn" id="bzHier" style="margin-top:0.3rem;">\uD83D\uDCCD '+(bzGeo?T('bz.hierok','Locatie gedeeld voor de ETA'):T('bz.hier','Deel mijn locatie voor een live ETA'))+'</button>' : '')+
-      '<button class="bigbtn" id="bzBestel" style="margin-top:1rem;"'+(n?'':' disabled')+'>'+T('bz.bestel','Bestel en betaal')+(n?' \u00B7 '+eur(bzTotaal()):'')+'</button></div>';
+      (p.bezorgen?'<button class="bz-btn'+(bzLevering==='bezorgen'?' on':'')+'" data-bzlev="bezorgen">\uD83D\uDEF5 '+T('bz.kan.bez','bezorgen')+'</button>':'')+
+      (p.ophalen?'<button class="bz-btn'+(bzLevering==='ophalen'?' on':'')+'" data-bzlev="ophalen">\uD83E\uDDFA '+T('bz.kan.oph','ophalen')+'</button>':'')+'</div>'+
+      (bzLevering==='bezorgen' ? '<div class="bz-veld"><label>'+T('bz.adres','Bezorgadres')+'</label><input id="bzAdres" value="'+escAttr(bzAdresW)+'" placeholder="'+T('bz.adresph','Straat, nummer, plaats')+'"></div>'+
+        '<button class="bz-btn'+(bzGeo?' on':'')+'" id="bzHier" style="margin-top:0.5rem;">\uD83D\uDCCD '+(bzGeo?T('bz.hierok','Locatie gedeeld voor de ETA'):T('bz.hier','Deel mijn locatie voor een live ETA'))+'</button>' : '')+
+      '<button class="bz-groot" id="bzBestel" style="margin-top:1rem;"'+(n?'':' disabled')+'>'+T('bz.bestel','Bestel en betaal')+(n?' \u00B7 '+eur(bzTotaal()):'')+'</button></div>';
+    const adresIn = document.getElementById('bzAdres');
+    if (adresIn) adresIn.addEventListener('input', () => { bzAdresW = adresIn.value; });
     $('#bzTerug').addEventListener('click', () => { bzZaak = null; renderBestellen(); });
     document.querySelectorAll('[data-bzplus]').forEach(b => b.addEventListener('click', () => { bzMand[b.dataset.bzplus]=(bzMand[b.dataset.bzplus]||0)+1; renderBzZaak(); }));
     document.querySelectorAll('[data-bzmin]').forEach(b => b.addEventListener('click', () => { const k=b.dataset.bzmin; if (bzMand[k]) bzMand[k]--; if (!bzMand[k]) delete bzMand[k]; renderBzZaak(); }));
@@ -2104,7 +2115,7 @@
       if (!items.length) return;
       try {
         const b = await API.call('/bezorg/bestel', { supplierCode: p.code, levering: bzLevering, items,
-          adres: bzLevering === 'bezorgen' ? ($('#bzAdres') ? $('#bzAdres').value : '') : undefined,
+          adres: bzLevering === 'bezorgen' ? bzAdresW : undefined,
           lat: bzGeo ? bzGeo.lat : undefined, lng: bzGeo ? bzGeo.lng : undefined });
         await API.call('/order/pay', { ref: b.order.ref });
         toast(bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.'));

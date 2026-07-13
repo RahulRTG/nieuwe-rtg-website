@@ -2,6 +2,8 @@
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
   const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept } = kern;
+  // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
+  const liveSaveAt = new Map();
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
 
@@ -888,15 +890,21 @@ app.post('/api/live/update', auth, (req, res) => {
   if (Number.isFinite(lat) && Number.isFinite(lng)) { L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); }
   // automatische aankomst binnen ~150 m van de bestemming
   const dest = L.destCode ? findSupplier(L.destCode) : null;
+  let aangekomen = false;
   if (dest && dest.loc && !L.arrived) {
     const d = haversine({ lat: L.lat, lng: L.lng }, dest.loc);
     if (d != null && d < 150) {
-      L.arrived = true;
+      L.arrived = true; aangekomen = true;
       notifySupplier(dest.code, { icon: '🎉', title: 'Gast gearriveerd', body: L.codename + ' is bij u aangekomen.' });
       notify(L.tier, { icon: '📍', title: 'Aangekomen', body: 'U bent bij ' + dest.name + '.', scope: 'live' });
     }
   }
-  save();
+  // De live locatie is vluchtig en komt vele keren per minuut per lid binnen; een
+  // durende opslag PER ping zou de datastore overbelasten (elke save serialiseert
+  // de hele kast). We sturen de positie altijd live via SSE door, maar bewaren
+  // hooguit eens per 3 s per lid, en meteen bij een echte statuswijziging (aankomst).
+  const nu = Date.now();
+  if (aangekomen || nu - (liveSaveAt.get(key) || 0) > 3000) { liveSaveAt.set(key, nu); save(); }
   pushLive(key);
   res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
 });

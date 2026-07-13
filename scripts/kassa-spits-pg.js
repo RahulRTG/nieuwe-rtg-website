@@ -43,7 +43,9 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgres://rtg:rtg@127.0.0.1:5
 const RESTAURANTS = Number(process.env.PG_RESTAURANTS || 10000000);
 const MEMBERS = Number(process.env.PG_MEMBERS || 60);
 const DUUR_MS = Number(process.env.PG_DUUR || 60000);
-const ENV = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', RTG_STORE: 'postgres', DATABASE_URL };
+// ruimere opslag-/flush-vensters: onder een zware schrijfgolf coalesceren we
+// meer per ronde (de datastore serialiseert per save de kast, dus minder vaak = beter)
+const ENV = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', RTG_STORE: 'postgres', DATABASE_URL, RTG_SAVE_MS: process.env.RTG_SAVE_MS || '1000', PG_FLUSH_MS: process.env.PG_FLUSH_MS || '1000' };
 
 let child = null;
 const cleanup = () => { try { if (child) child.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} };
@@ -175,8 +177,11 @@ const KEUKENS = ['KIKUNOI', 'PONTO'];
   actors.forEach(a => luister(a.token));
 
   const taken = [];
-  // gasten bestellen (een bon die alle keukenschermen raakt) + betalen
-  for (const a of actors) taken.push((async () => {
+  // gasten bestellen (een bon die alle keukenschermen raakt) + betalen.
+  // Een deel van de gasten voedt de keukens (bonnen groeien de orders-collectie,
+  // die per save geserialiseerd wordt, dus begrensd houden); ALLE gasten doen wel
+  // mee aan de videogesprekken en GPS hieronder.
+  for (const a of actors.slice(0, Math.min(actors.length, 60))) taken.push((async () => {
     while (bezig()) {
       const code = KEUKENS[a.i % KEUKENS.length];
       const o = await api('gast-bestelt', '/api/order', { supplierCode: code, items: BASKET, table: 'Tafel ' + (1 + a.i % 40) }, a.token);

@@ -54,9 +54,16 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
   assert.equal((await haal("/api/ready")).status, 200, 'en meldt zich klaar voor verkeer');
   assert.equal((await haal("/")).status, 200, "de website wordt geserveerd");
 
-  // demo is ECHT dicht: geen pas-login zonder wachtwoord, geen demo-account
+  // demo is ECHT dicht op ELK portaal: geen pas-login zonder wachtwoord, en het
+  // universele demo-account (naam/wachtwoord) werkt op geen enkele ingang meer
   assert.equal((await post('/api/login', { tier: 'business' })).status, 403, 'demo-pas-login is dicht');
-  assert.equal((await post('/api/login', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet');
+  assert.equal((await post('/api/login', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (leden)');
+  assert.equal((await post('/api/supplier/login', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (leveranciers)');
+  assert.equal((await post('/api/staff', { username: 'Rahul', password: 'Imran' })).status, 403, 'het demo-account bestaat niet (personeel)');
+
+  // en kaal http wordt onherroepelijk naar https gestuurd
+  const kaal = await fetch(BASE + '/api/health', { redirect: 'manual' });
+  assert.equal(kaal.status, 301, 'onbeveiligd http wordt doorgestuurd naar https');
 
   // echte registratie en inlog werken gewoon
   const reg = await post('/api/auth/register', { name: 'Eerste Lid', email: 'lid@echtdomein.nl', phone: '0612345678',

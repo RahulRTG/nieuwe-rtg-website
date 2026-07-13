@@ -1,7 +1,7 @@
 /* Domein "staff" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, notifySupplier, publicPartner, save, schoon, sseToOffice, sseToSupplier, supplierAuth, trustVan } = kern;
+  const { DEMO, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, notifySupplier, publicPartner, save, schoon, sseToOffice, sseToSupplier, supplierAuth, trustVan } = kern;
 
 app.post('/api/staff/clock', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
@@ -87,6 +87,7 @@ app.post('/api/staff/trust/thread', supplierAuth, (req, res) => {
 app.post('/api/staff', (req, res) => {
   let partner;
   if (hasCred(req.body)) {
+    if (!DEMO) return res.status(403).json({ error: 'Demo-inlog is uitgeschakeld. Gebruik uw personeelscode.' });
     if (!checkCred(req.body.username, req.body.password))
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
     partner = db.data.partners.find(p => p.staff) || null;

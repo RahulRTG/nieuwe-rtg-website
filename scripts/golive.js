@@ -51,6 +51,13 @@ const goed = (t) => uit.push(['✓', t, false]);
   if (env.RTG_OWNER_EMAIL && env.RTG_OWNER_EMAIL !== 'rahul@rtg.example')
     goed('Eigenaar van de technische pagina: ' + env.RTG_OWNER_EMAIL);
 
+  // 6. de demo-inlog: het universele demo-account (naam/wachtwoord) mag in
+  //    productie niet meer werken. Het is uit zodra NODE_ENV=production, tenzij
+  //    iemand hem bewust met RTG_DEMO=1 weer aanzet (de config-keuring hierboven
+  //    blokkeert dat geval al). Hier bevestigen we alleen dat hij uitstaat.
+  if (process.env.RTG_DEMO !== '1')
+    goed('Demo-inlog (universeel account) staat uit in productie; leden loggen in via hun account, personeel met pincode.');
+
   // afdrukken, blokkers eerst
   uit.sort((a, b) => (b[2] ? 1 : 0) - (a[2] ? 1 : 0));
   console.log('\n=== RTG go-live-keuring ===\n');

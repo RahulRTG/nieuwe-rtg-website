@@ -311,9 +311,13 @@
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
   let zaken = null;
   let pdContracten = [];
+  let aandacht = null;   // gasten die aandacht vragen + te lang stille tafels
+  let netwerk = [];      // verbindingen met andere zaken (personeelsnetwerk)
   async function laadZaken(){
     try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
     try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }
+    try { aandacht = await API.call('/supplier/aandacht', {}); } catch(e){ aandacht = null; }
+    try { netwerk = (await API.call('/supplier/net/lijst', {})).verbindingen || []; } catch(e){ netwerk = []; }
   }
 
   // Blijf ingelogd: met een bewaard token direct naar Vandaag, zonder PIN.
@@ -369,6 +373,19 @@
       (tasks.length ? tasks.slice(0,6).map(t=>'<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(t.b)+'</b><span>'+esc(t.s)+'</span></div></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--green);">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+
       (tasks.length>6?'<div style="margin-top:0.5rem;font-size:0.74rem;color:var(--soft);">+'+(tasks.length-6)+' '+T('pd.more','meer onder Taken')+'</div>':'')+'</div>';
+    // Service op sterrenniveau: gasten die aandacht vragen en te lang stille
+    // tafels staan bovenaan, zodat niemand ooit wordt vergeten.
+    const A = (aandacht && aandacht.aandacht) || [], TT = (aandacht && aandacht.traagTafels) || [];
+    if (A.length || TT.length){
+      let h = '<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">'+T('pd.attn','Aandacht gevraagd')+' ('+(A.length+TT.length)+')</div>';
+      h += A.map(a => '<div class="task"><span class="ic">🔔</span><div class="t"><b>'+esc(a.reden)+(a.tafel?' · '+esc(a.tafel):'')+'</b><span>'+esc(a.codename)+' · '+timeAgo(a.at)+'</span></div><button class="abtn" data-aankl="'+a.id+'">'+T('pd.help','Help')+'</button></div>').join('');
+      h += TT.map(t => '<div class="task"><span class="ic">⏳</span><div class="t"><b>'+esc(t.tafel||t.ref)+'</b><span>'+esc(t.codename)+' · '+t.minuten+' min '+T('pd.waiting','zonder aandacht')+'</span></div></div>').join('');
+      h += '</div>';
+      $('#todayWrap').insertAdjacentHTML('afterbegin', h);
+      document.querySelectorAll('[data-aankl]').forEach(b => b.addEventListener('click', async () => {
+        try { await API.call('/supplier/aandacht/klaar', { id:b.dataset.aankl }); toast(T('pd.helped','Gast geholpen.')); await refresh(); openTab('vandaag'); } catch(e){ toast(e.message); }
+      }));
+    }
     const kb = document.getElementById('klokBtn');
     if (kb) kb.addEventListener('click', async () => {
       kb.disabled = true;
@@ -734,7 +751,17 @@
         (m.audio?'<audio controls src="'+m.audio+'" style="width:190px;max-width:100%;height:34px;"></audio>':esc(m.text))+'</div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.nochat','Nog geen berichten.')+'</div>')+
       '</div><div class="compose"><button class="micbtn" id="tmMic">🎤</button><input id="tmMsg" placeholder="'+T('pd.msgph','Bericht aan het team')+'"><button id="tmSend">'+T('pd.send','Stuur')+'</button></div></div>'+
       '<div class="card"><div class="k">'+T('pd.activity','Wie deed wat')+'</div>'+
-      (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);padding:0.4rem 0;">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>';
+      (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);padding:0.4rem 0;">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>'+
+      // Aparte ruimte: het personeelsnetwerk met andere zaken (met toestemming).
+      '<div class="card"><div class="k">'+T('pd.net','Netwerk met andere zaken')+'</div>'+
+      '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.4rem;">'+T('pd.net.sub','Aparte ruimte. Alleen zaken die uw manager heeft verbonden.')+'</div>'+
+      (netwerk.length ? netwerk.map(v => {
+        if (v.status==='akkoord') return '<div class="task"><span class="ic">🤝</span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.open','tik om te chatten')+'</span></div><button class="abtn ghost" data-netopen="'+v.code+'">💬</button></div>';
+        if (v.inkomend) return '<div class="task"><span class="ic">📥</span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span style="font-size:0.7rem;color:var(--soft);">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';
+        return '<div class="task"><span class="ic">📤</span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.wait','wacht op akkoord')+'</span></div></div>';
+      }).join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.none','Nog geen verbindingen.')+'</div>')+
+      (me.role==='manager' ? '<div class="compose" style="margin-top:0.5rem;"><input id="netCode" placeholder="'+T('pd.net.code','Bedrijfscode')+'" style="text-transform:uppercase;"><button id="netAdd">'+T('pd.net.connect','Verbind')+'</button></div>' : '')+
+      '<div id="netChat"></div></div>';
     const send = async () => {
       const inp = $('#tmMsg'); const text = (inp.value||'').trim(); if (!text) return;
       inp.value = '';
@@ -752,6 +779,37 @@
       catch(e){ toast(e.message); }
     }));
     $('#tmMic').addEventListener('click', () => toggleMemo($('#tmMic')));
+    // personeelsnetwerk: verbinden, goedkeuren en chatten in de aparte ruimte
+    const na = document.getElementById('netAdd');
+    if (na) na.addEventListener('click', async () => {
+      const c = (document.getElementById('netCode').value||'').trim().toUpperCase(); if (!c) return;
+      try { const d = await API.call('/supplier/net/verzoek', { code:c }); toast(d.status==='akkoord'?T('pd.net.linked','Verbonden.'):T('pd.net.sent','Verzoek verstuurd.')); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
+    });
+    document.querySelectorAll('[data-netja]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/net/beslis', { code:b.dataset.netja, actie:'akkoord' }); toast(T('pd.net.linked','Verbonden.')); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-netopen]').forEach(b => b.addEventListener('click', async () => {
+      netOpen = b.dataset.netopen;
+      try { netBerichten = (await API.call('/supplier/net/gesprek', { code:netOpen })).berichten || []; } catch(e){ netBerichten = []; }
+      renderNetChat();
+    }));
+    renderNetChat();
+  }
+  let netOpen = null, netBerichten = [];
+  function renderNetChat(){
+    const box = document.getElementById('netChat'); if (!box) return;
+    if (!netOpen){ box.innerHTML = ''; return; }
+    const naam = (netwerk.find(v => v.code === netOpen) || {}).naam || netOpen;
+    box.innerHTML = '<div class="k" style="margin-top:0.7rem;">'+esc(naam)+'</div><div class="chat">'+
+      (netBerichten.length ? netBerichten.map(m => '<div class="msg '+(m.code===code?'me':'other')+'"><span class="who">'+esc(m.naam+' · '+m.door)+'</span>'+esc(m.tekst)+'</div>').join('')
+        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.nomsg','Nog geen berichten.')+'</div>')+
+      '</div><div class="compose"><input id="netMsg" placeholder="'+T('pd.net.msgph','Bericht')+'"><button id="netSend">'+T('pd.send','Stuur')+'</button></div>';
+    const doSend = async () => {
+      const i = document.getElementById('netMsg'); const t = (i.value||'').trim(); if (!t) return; i.value = '';
+      try { await API.call('/supplier/net/bericht', { code:netOpen, tekst:t }); netBerichten = (await API.call('/supplier/net/gesprek', { code:netOpen })).berichten || []; renderNetChat(); } catch(e){ toast(e.message); }
+    };
+    document.getElementById('netSend').addEventListener('click', doSend);
+    document.getElementById('netMsg').addEventListener('keydown', e => { if (e.key==='Enter') doSend(); });
   }
 
   // spraakmemo opnemen en versturen

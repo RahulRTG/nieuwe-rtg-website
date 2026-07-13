@@ -22,6 +22,7 @@ const crypto = require('crypto');
 const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
+const eigenaar = require('./eigenaar');
 const mail = require('./mail');
 const logboek = require('./log');
 const log = logboek.log;
@@ -75,7 +76,7 @@ accounts.init();
 const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
 // Demo-account zodat Rahul/Imran ook via de echte accountlogin werkt.
 if (DEMO && accounts.count() === 0) {
-  const u = accounts.createUser({ username: 'Rahul', email: 'rahul@rtg.example', password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran', phone: '+31612345678' });
+  const u = accounts.createUser({ username: 'Roellie', email: require('./eigenaar').OWNER_EMAIL, password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Roellie I', phone: '+31612345678' });
   accounts.saveMemberState(u.id, memberTemplate());
   accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
 }
@@ -183,8 +184,7 @@ app.use((req, res, next) => {
   try {
     const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || req.query.token;
     const u = tok ? accounts.verifyToken(tok) : null;
-    const owner = accounts.findByLogin(process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example');
-    if (u && owner && u.id === owner.id) return next(); // de eigenaar mag er wel bij
+    if (eigenaar.isEigenaar(accounts, u)) return next(); // de eigenaar mag er wel bij
   } catch (e) {}
   if (p.startsWith('/api/')) return res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' });
   next();
@@ -2362,8 +2362,10 @@ function officeAuth(req, res, next) {
   const header = req.get('authorization') || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
   const sess = token && sessionFor(token);
-  if (!sess || sess.role !== 'office') return res.status(401).json({ error: 'Geen backoffice-sessie.' });
-  next();
+  if (sess && sess.role === 'office') return next();
+  // de eigenaar komt ook met zijn eigen accountlogin binnen (geen aparte code nodig)
+  try { if (token && eigenaar.isEigenaar(accounts, accounts.verifyToken(token))) { req.eigenaar = true; return next(); } } catch (e) {}
+  return res.status(401).json({ error: 'Geen backoffice-sessie.' });
 }
 
 function officeState() {
@@ -2641,7 +2643,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, beveilig,
+  ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, beveilig, eigenaar,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,

@@ -114,6 +114,10 @@
         <div class="sec">Zekeringen</div>
         <div class="kaart" id="zekeringen"></div>
       </div>
+      <div id="grenzenBlok" hidden>
+        <div class="sec">Waar u bewust geen inzage heeft (juridisch)</div>
+        <div class="kaart" id="grenzen"></div>
+      </div>
       <div id="toegangBlok" hidden>
         <div class="sec">Toegang beheren</div>
         <div class="kaart">
@@ -361,6 +365,9 @@
       vervang($('#checks'), d.checks.map(checkRij));
       $('#zekeringBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));
+      $('#grenzenBlok').hidden = !(d.eigenaar && d.grenzen && d.grenzen.length);
+      if (d.eigenaar && d.grenzen) vervang($('#grenzen'), d.grenzen.map(function(g){
+        return el('div',{class:'zeker'}, el('span',{class:'badge uit'}, 'DICHT'), el('div',{class:'mid'}, el('div',{class:'muted'}, g))); }));
       $('#toegangBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#toegangLijst'), (d.toegang&&d.toegang.length)? d.toegang.map(toegangRij) : el('div',{class:'muted'},'Nog niemand extra toegelaten.'));
       // functies-tab: iedereen met toegang kan aanvragen; alleen de eigenaar besluit

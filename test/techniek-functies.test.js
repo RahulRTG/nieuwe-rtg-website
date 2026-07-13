@@ -12,7 +12,7 @@ const path = require('path');
 const PORT = 3800 + Math.floor(Math.random() * 80);
 const BASE = 'http://127.0.0.1:' + PORT;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-func-'));
-const OWNER = 'rahul@rtg.example'; // standaard-eigenaar (RTG_OWNER_EMAIL)
+const OWNER = 'roellie.i@gmail.com'; // standaard-eigenaar (RTG_OWNER_EMAIL)
 let child, techToken;
 
 function post(pad, body, token) {

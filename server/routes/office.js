@@ -1,7 +1,15 @@
 /* Domein "office" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, broadcastSync, conciergeInbox, crypto, db, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries } = kern;
+  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries } = kern;
+
+  // backoffice-toegang via een query-token (stream/export/doc): een echte
+  // office-sessie, OF de eigenaar met zijn eigen accountlogin.
+  const officeQueryMag = (token) => {
+    const sess = sessionFor(String(token || ''));
+    if (sess && sess.role === 'office') return true;
+    try { return eigenaar.isEigenaar(accounts, accounts.verifyToken(String(token || ''))); } catch (e) { return false; }
+  };
 
 app.post('/api/office/partner/decide', officeAuth, (req, res) => {
   const a = db.data.partnerApplications.find(x => x.id === req.body.id);
@@ -125,8 +133,7 @@ app.post('/api/office/timeline', officeAuth, (req, res) => {
 });
 
 app.get('/api/office/export.csv', (req, res) => {
-  const sess = sessionFor(String(req.query.token || ''));
-  if (!sess || sess.role !== 'office') return res.status(401).end();
+  if (!officeQueryMag(req.query.token)) return res.status(401).end();
   const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');
@@ -153,8 +160,7 @@ app.get('/api/office/export.csv', (req, res) => {
 });
 
 app.get('/api/office/stream', (req, res) => {
-  const sess = sessionFor(req.query.token);
-  if (!sess || sess.role !== 'office') return res.status(401).end();
+  if (!officeQueryMag(req.query.token)) return res.status(401).end();
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
   res.write('retry: 3000\n\n');
   const client = { office: true, res };
@@ -231,8 +237,7 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
 });
 
 app.get('/api/office/doc', (req, res) => {
-  const sess = sessionFor(req.query.token);
-  if (!sess || sess.role !== 'office') return res.status(401).end();
+  if (!officeQueryMag(req.query.token)) return res.status(401).end();
   const file = path.basename(String(req.query.file || '')); // geen padtraversal
   const full = path.join(UPLOAD_DIR, file);
   if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return res.status(404).end();

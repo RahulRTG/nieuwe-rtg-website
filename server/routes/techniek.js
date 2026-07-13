@@ -7,11 +7,12 @@
    storing een diagnose en herstelstappen geeft. */
 const techniek = require('../techniek');
 const functies = require('../functies');
+const eigenaar = require('../eigenaar');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
   const { app, accounts, anthropic, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path } = kern;
-  const OWNER_EMAIL = process.env.RTG_OWNER_EMAIL || 'rahul@rtg.example';
+  const OWNER_EMAIL = eigenaar.OWNER_EMAIL;
 
   function staat() {
     if (!db.data.techniek) db.data.techniek = {};
@@ -110,6 +111,8 @@ module.exports = (kern) => {
     };
     if (isEigenaar(req.techUser)) {
       uit.toegang = t.toegang.map(id => { const u = accounts.getUserById(id); return { id, naam: u ? accounts.realNameOf(u) : '?', email: u ? accounts.emailOf(u) : null }; });
+      // de juridische grenzen: waar zelfs de eigenaar bewust GEEN inzage heeft
+      uit.grenzen = eigenaar.GRENZEN;
     }
     res.json(uit);
   });

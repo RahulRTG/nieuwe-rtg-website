@@ -307,7 +307,10 @@
     position:relative;
     overflow:hidden;
   }
-  .codecard .label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--soft);}
+  /* de codenaam-kaart is in ELK thema een donkere "fysieke pas"; de tekst
+     erop blijft dus altijd licht, los van het (licht/donker) app-thema */
+  .codecard, .codecard .cn{color:#F4F1EC;}
+  .codecard .label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,241,236,0.62);}
   .codecard .cn{
     font-family:'Bodoni Moda',serif;
     font-size:2rem;
@@ -321,24 +324,24 @@
     align-items:flex-end;
     gap:1rem;
   }
-  .codecard .mrow{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
-  .codecard .mrow b{display:block;font-size:0.78rem;color:var(--muted);font-weight:500;margin-top:0.2rem;letter-spacing:0.08em;}
+  .codecard .mrow{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(244,241,236,0.62);}
+  .codecard .mrow b{display:block;font-size:0.78rem;color:rgba(244,241,236,0.85);font-weight:500;margin-top:0.2rem;letter-spacing:0.08em;}
   .codecard svg{background:#fff;padding:4px;width:58px;height:58px;border-radius:6px;display:block;}
   .codecard .why{
     margin-top:1.2rem;
-    border-top:1px solid var(--line);
+    border-top:1px solid rgba(255,255,255,0.12);
     padding-top:1rem;
     font-size:0.78rem;
-    color:var(--muted);
+    color:rgba(244,241,236,0.72);
     line-height:1.55;
     display:none;
   }
   .codecard .why.open{display:block;}
-  .codecard .why b{color:var(--txt);}
+  .codecard .why b{color:#F4F1EC;}
   .codecard .whybtn{
     margin-top:1rem;
     background:none;border:none;padding:0;
-    font-size:0.74rem;font-weight:600;color:var(--burgundy);
+    font-size:0.74rem;font-weight:600;color:#E36385;
   }
 
   /* lijsten */

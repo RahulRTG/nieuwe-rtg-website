@@ -3272,30 +3272,33 @@
     // gratis gebruiker (zonder pas): beperkte, veilige startpagina
     if (user.tier === 'guest'){ renderHomeGuest(); return; }
     const first = user.full.split(' ')[0];
+    const E = Util.el; // componentframework voor de kaarten hieronder
     $('#homeGreeting').textContent = T('app.welcome','Welkom,') + ' ' + first + '.';
     $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
 
-    $('#codecard').innerHTML =
-      '<div class="label">'+T('app.cc.label','Uw codenaam, uw identiteit in onze systemen')+'</div>' +
-      '<div class="cn">' + user.codename + '</div>' +
-      '<div class="row">' +
-        '<div>' +
-          '<div class="mrow">'+T('app.cc.membernr','Lidnummer')+'<b>' + user.number + '</b></div>' +
-          '<div class="mrow" style="margin-top:0.55rem;">'+T('app.cc.pass','Pas')+'<b>' + TIER_LABEL[user.tier] + '</b></div>' +
-          (user.leeftijdsgroep ? '<div class="mrow" style="margin-top:0.55rem;">'+T('app.cc.age','Leeftijd')+'<b>' + user.leeftijdsgroep + ' \u00b7 ' + T('app.cc.ageok','paspoort') + '</b></div>' : '') +
-        '</div>' + qrSvg(user.number.length * 7919) +
-      '</div>' +
-      '<button class="whybtn" id="whyBtn">'+T('app.cc.why','Waarom een codenaam?')+' →</button>' +
-      '<div class="why"><b>'+T('app.cc.why.h','Uw echte naam staat niet in onze reisdata.')+'</b> ' +
-        T('app.cc.why.b','Reserveringen, betalingen en Salon-activiteit staan op uw codenaam. Uw echte naam ligt in een gescheiden, versleutelde kluis en wordt pas bij ticketing en check-in eenmalig gekoppeld. Zou reisdata ooit gestolen worden, dan heeft de aanvaller nooit de juiste naam bij uw reizen.')+'</div>';
-    $('#whyBtn').addEventListener('click', () => toggleWhy());
+    // De codecard met Util.el: codenaam, lidnummer en leeftijdsgroep gaan
+    // structureel als tekstknoop. De QR is gegenereerd (geen gebruikerstekst) en
+    // blijft als kant-en-klare SVG in een eigen container.
+    const qr = E('div');
+    qr.innerHTML = qrSvg(user.number.length * 7919);
+    Util.vervang($('#codecard'),
+      E('div', { class: 'label' }, T('app.cc.label', 'Uw codenaam, uw identiteit in onze systemen')),
+      E('div', { class: 'cn' }, user.codename),
+      E('div', { class: 'row' },
+        E('div', {},
+          E('div', { class: 'mrow' }, T('app.cc.membernr', 'Lidnummer'), E('b', {}, user.number)),
+          E('div', { class: 'mrow', style: { marginTop: '0.55rem' } }, T('app.cc.pass', 'Pas'), E('b', {}, TIER_LABEL[user.tier])),
+          user.leeftijdsgroep ? E('div', { class: 'mrow', style: { marginTop: '0.55rem' } }, T('app.cc.age', 'Leeftijd'), E('b', {}, user.leeftijdsgroep + ' \u00b7 ' + T('app.cc.ageok', 'paspoort'))) : null),
+        qr),
+      E('button', { class: 'whybtn', id: 'whyBtn', onclick: () => toggleWhy() }, T('app.cc.why', 'Waarom een codenaam?') + ' \u2192'),
+      E('div', { class: 'why' }, E('b', {}, T('app.cc.why.h', 'Uw echte naam staat niet in onze reisdata.')),
+        ' ' + T('app.cc.why.b', 'Reserveringen, betalingen en Salon-activiteit staan op uw codenaam. Uw echte naam ligt in een gescheiden, versleutelde kluis en wordt pas bij ticketing en check-in eenmalig gekoppeld. Zou reisdata ooit gestolen worden, dan heeft de aanvaller nooit de juiste naam bij uw reizen.')));
 
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
 
     // Deze twee kaarten met Util.el: tekst structureel veilig, data-goto blijft
     // (de globale [data-goto]-binding onderaan pakt de knoppen op).
-    const E = Util.el;
     Util.vervang($('#homeTrip'),
       E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
       E('div', { class: 'big' }, trip.dest),

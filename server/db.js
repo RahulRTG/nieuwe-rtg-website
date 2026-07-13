@@ -195,7 +195,7 @@ function pollSqlite() {
       if (r.key === 'sessions') sessieGewijzigd = true;
     }
     if (sessieGewijzigd && externCb) externCb();
-  } catch (e) {}
+  } catch (e) { console.warn('[db] sqlite-sync mislukt:', e.message); }
 }
 let pollTimer = null;
 // Start de kruisproces-synchronisatie (alleen bij de SQLite-opslag).
@@ -213,9 +213,12 @@ function laadUitBackup() {
     if (!fs.existsSync(bdir)) return null;
     for (const d of fs.readdirSync(bdir).sort().reverse()) {
       const f = path.join(bdir, d, 'db.json');
-      if (fs.existsSync(f)) { try { return JSON.parse(kluis.ontsleutel(fs.readFileSync(f, 'utf8'))); } catch (e) {} }
+      if (fs.existsSync(f)) {
+        try { const data = JSON.parse(kluis.ontsleutel(fs.readFileSync(f, 'utf8'))); console.warn('[db] hersteld uit dagbackup:', f); return data; }
+        catch (e) { console.warn('[db] backup onbruikbaar (' + f + '):', e.message); }
+      }
     }
-  } catch (e) {}
+  } catch (e) { console.warn('[db] backupmap onleesbaar:', e.message); }
   return null;
 }
 
@@ -237,7 +240,12 @@ function leesLokaleSnapshot() {
   try {
     if (!fs.existsSync(DB_FILE)) return null;
     return JSON.parse(kluis.ontsleutel(fs.readFileSync(DB_FILE, 'utf8')));
-  } catch (e) { return laadUitBackup(); }
+  } catch (e) {
+    // Een corrupte of onleesbare snapshot mag niet geruisloos verdwijnen: dan
+    // valt de app stil terug op een backup (of leeg) zonder dat iemand het merkt.
+    console.warn('[db] snapshot onleesbaar (' + DB_FILE + '):', e.message, '- val terug op backup');
+    return laadUitBackup();
+  }
 }
 function planFlush() {
   pgVuil = true;

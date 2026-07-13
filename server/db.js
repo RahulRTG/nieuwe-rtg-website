@@ -256,10 +256,52 @@ async function flushNu() {
 /* Start de Postgres-koppeling: schema klaarzetten, de gedeelde data ophalen
    (Postgres wint bij het opstarten), en daarna live meeluisteren op wijzigingen
    van andere instances (LISTEN/NOTIFY) met een poll als vangnet. */
+/* ---- Grootboek van zaken (suppliers_big) ----------------------------------
+   Voor een echt enorme catalogus (miljoenen restaurants) is een array in het
+   geheugen geen optie: de kast wordt bij elke save als EEN string geserialiseerd
+   (>512 MB kan V8 niet) en zou gigabytes RAM kosten. Daarom staan de bulk-zaken
+   als GEINDEXEERDE RIJEN in Postgres (code = primaire sleutel) en worden ze op
+   aanvraag opgezocht, met een kleine cache. Zo passen miljoenen zaken zonder ze
+   ooit allemaal in het geheugen te laden. De demo-/actieve zaken blijven gewoon
+   in db.data.suppliers (klein, snel, ongewijzigd). Zonder Postgres is dit inert. */
+let grootPool = null;
+const grootCache = new Map();      // code -> zaak-object of null (niet gevonden)
+let grootN = 0, grootNAt = 0;
+async function ververGrootN() {
+  if (!grootPool) return 0;
+  try { const r = await grootPool.query('SELECT count(*)::bigint AS c FROM suppliers_big'); grootN = Number(r.rows[0].c); grootNAt = Date.now(); } catch (e) {}
+  return grootN;
+}
+async function laadGroot(code) {
+  try {
+    const r = await grootPool.query('SELECT code, name, type, city FROM suppliers_big WHERE code = $1', [code]);
+    const row = r.rows[0];
+    if (grootCache.size > 5000) grootCache.clear();            // kleine LRU: gewoon legen bij vol
+    grootCache.set(code, row ? { code: row.code, name: row.name, type: row.type, city: row.city, menu: [], rate: 0.12 } : null);
+  } catch (e) { grootCache.delete(code); }
+}
+// Synchronoon zoeken in het grootboek: uit de cache, of null terwijl we hem
+// asynchroon inladen (de volgende keer zit hij in de cache). Zo blijft
+// findSupplier synchroon zoals de hele app verwacht.
+function grootSupplierSync(code) {
+  if (!grootPool) return null;
+  if (grootCache.has(code)) return grootCache.get(code);
+  grootCache.set(code, null);        // voorkom een storm van gelijke queries
+  laadGroot(code);
+  return null;
+}
+function grootAantal() {
+  if (grootPool && Date.now() - grootNAt > 10000) { grootNAt = Date.now(); ververGrootN().catch(() => {}); }
+  return grootN;
+}
+
 async function startPostgres() {
   if (STORE !== 'postgres') return false;
   pg = require('./pg').maakPg({ merge3, kluis, log: pgLog, url: DATABASE_URL });
   await pg.schema();
+  // het grootboek van bulk-zaken (geindexeerd, buiten het geheugen)
+  grootPool = pg.pool;
+  try { await grootPool.query('CREATE TABLE IF NOT EXISTS suppliers_big(code text PRIMARY KEY, name text, type text, city text)'); await ververGrootN(); } catch (e) { pgLog && pgLog.warn && pgLog.warn('[db] grootboek init mislukt: ' + e.message); }
   const pgData = await pg.laadAlles();
   if (pgData) {
     db.data = pgData; // Postgres is de gedeelde waarheid
@@ -460,4 +502,4 @@ async function startGedeeld() {
 // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.
 function onExternalChange(cb) { externCb = cb; }
 
-module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, pgPing, onExternalChange, merge3, schrijfDuurzaam };
+module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, pgPing, onExternalChange, merge3, schrijfDuurzaam, grootSupplierSync, grootAantal };

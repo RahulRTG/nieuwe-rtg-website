@@ -31,7 +31,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange } = require('./db');
+const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
@@ -1300,7 +1300,10 @@ function supplierIndex() {
   return _supIndex;
 }
 function findSupplier(code) {
-  return supplierIndex().get(String(code || '').trim().toUpperCase()) || null;
+  const c = String(code || '').trim().toUpperCase();
+  // eerst de kleine, actieve kast in het geheugen (O(1)); anders het grootboek
+  // in Postgres (miljoenen bulk-zaken, op aanvraag ingeladen met cache).
+  return supplierIndex().get(c) || grootSupplierSync(c) || null;
 }
 function supplierAuth(req, res, next) {
   const header = req.get('authorization') || '';
@@ -2617,16 +2620,16 @@ function officeState() {
      bouwen we alleen prestaties voor zaken die vandaag/deze week echt iets
      deden. O(orders + ritten + actieve zaken). */
   const perCode = new Map();
-  const aggCode = code => { let a = perCode.get(code); if (!a) { a = { omzet: 0, aantal: 0, openNu: 0, dur: 0, durN: 0 }; perCode.set(code, a); } return a; };
-  for (const o of betaaldeOrders) { const a = aggCode(o.supplierCode); a.omzet += (o.total || 0); a.aantal += 1; }
-  for (const r of betaaldeRitten) { const a = aggCode(r.supplierCode); a.omzet += (r.quote || 0); a.aantal += 1; if (r.finishedAt) { a.dur += (new Date(r.finishedAt) - new Date(r.at)) / 60000; a.durN += 1; } }
-  for (const o of db.data.orders) if (o.paid && (o.status === 'nieuw' || o.status === 'in bereiding')) aggCode(o.supplierCode).openNu += 1;
-  for (const r of db.data.rides) if (r.paid && !['afgerond', 'gearriveerd', 'geweigerd', 'wacht-op-betaling'].includes(r.status)) aggCode(r.supplierCode).openNu += 1;
-  const performance = [...perCode.entries()].map(([code, a]) => {
-    const s = findSupplier(code) || {};
-    return { code, name: s.name || code, type: s.type || '', omzet: a.omzet, aantal: a.aantal, openNu: a.openNu,
-      gemMin: a.durN ? Math.round(a.dur / a.durN) : null };
-  }).sort((a, b) => b.omzet - a.omzet);
+  // naam/type uit het order/rit-record zelf halen (die staan erop), zodat we
+  // NIET per code findSupplier hoeven te doen: bij miljoenen bulk-zaken zou dat
+  // het grootboek overspoelen met losse queries.
+  const aggCode = (code, naam, type) => { let a = perCode.get(code); if (!a) { a = { naam: naam || code, type: type || '', omzet: 0, aantal: 0, openNu: 0, dur: 0, durN: 0 }; perCode.set(code, a); } return a; };
+  for (const o of betaaldeOrders) { const a = aggCode(o.supplierCode, o.supplierName, o.type); a.omzet += (o.total || 0); a.aantal += 1; }
+  for (const r of betaaldeRitten) { const a = aggCode(r.supplierCode, r.supplierName, r.type); a.omzet += (r.quote || 0); a.aantal += 1; if (r.finishedAt) { a.dur += (new Date(r.finishedAt) - new Date(r.at)) / 60000; a.durN += 1; } }
+  for (const o of db.data.orders) if (o.paid && (o.status === 'nieuw' || o.status === 'in bereiding')) aggCode(o.supplierCode, o.supplierName, o.type).openNu += 1;
+  for (const r of db.data.rides) if (r.paid && !['afgerond', 'gearriveerd', 'geweigerd', 'wacht-op-betaling'].includes(r.status)) aggCode(r.supplierCode, r.supplierName, r.type).openNu += 1;
+  const performance = [...perCode.entries()].map(([code, a]) => ({ code, name: a.naam, type: a.type, omzet: a.omzet, aantal: a.aantal, openNu: a.openNu,
+    gemMin: a.durN ? Math.round(a.dur / a.durN) : null })).sort((a, b) => b.omzet - a.omzet);
   // actiecentrum: alles wat nu een oog van RTG nodig heeft, belangrijkste eerst
   const alerts = [];
   // open SOS van huurders: altijd rood en bovenaan, tot de zaak hem afhandelt
@@ -2696,7 +2699,8 @@ function officeState() {
       orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').length + archief.stat().aantal,
       rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').length,
       leden: Object.keys(db.data.memberDir || {}).length,
-      partners: db.data.suppliers.length,
+      // actieve zaken in het geheugen plus de bulk-zaken in het grootboek (Postgres)
+      partners: db.data.suppliers.length + (grootAantal ? grootAantal() : 0),
       live: live.length
     }
   };

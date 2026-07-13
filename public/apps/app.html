@@ -918,6 +918,7 @@
         <h2 data-i18n="app.v.tp">Ter plaatse.</h2>
         <p class="sub" id="tpSub">Bestel, betaal en reserveer bij RTG-partners op uw bestemming.</p>
         <div id="livePanel"></div>
+        <div id="conMijn"></div>
         <div id="tkMijn"></div>
         <div id="vhMijn"></div>
         <div id="myOrders"></div>
@@ -1950,6 +1951,7 @@
     else if (scope === 'chat'){ if (user.account) renderChat(); }
     else if (scope === 'tickets'){ laadTickets(); }
     else if (scope === 'huur'){ laadVerhuur(); }
+    else if (scope === 'contract'){ laadContracten(); }
     else if (scope === 'live'){ renderLive(); laadTickets(); }
     else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
   }
@@ -2026,6 +2028,7 @@
     laadBestellen();
     laadTickets();
     laadVerhuur();
+    laadContracten();
     loadCv();
     loadVacatures();
     openTab('home');
@@ -2151,7 +2154,9 @@
       '<div class="card" style="border-color:rgba(91,185,140,0.35);">'+
       '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);">\uD83D\uDE97 '+T('vh.m.kop','Huurauto')+' \u00B7 '+esc(h.supplierName)+'</div>'+
       '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(h.auto)+'</b>'+(h.kenteken?' ('+esc(h.kenteken)+')':'')+' \u00B7 '+h.van+' \u2192 '+h.tot+' \u00B7 '+eur(h.prijs)+'</div>'+
-      '<div style="margin-top:0.3rem;font-size:0.78rem;color:var(--muted);">'+(VH_ST[h.status]||h.status)+' \u00B7 \uD83D\uDCF7 '+T('vh.m.voor','voor')+' '+h.fotosVoor+' \u00B7 '+T('vh.m.na','na')+' '+h.fotosNa+'</div>'+
+      (h.spec ? '<div style="margin-top:0.25rem;font-size:0.72rem;color:var(--soft);">'+esc(h.spec.categorie||'')+' \u00B7 '+(h.spec.transmissie==='automaat'?T('vh.aut','automaat'):T('vh.hand','handgesch.'))+' \u00B7 \uD83D\uDC65'+(h.spec.stoelen||'-')+' \u00B7 '+(h.spec.kmPerDag?h.spec.kmPerDag+' km/'+T('vh.dag','dag'):T('vh.onbeperkt','onbeperkt km'))+(h.borg?' \u00B7 '+T('vh.borg','borg')+' '+eur(h.borg):'')+'</div>' : '')+
+      '<div style="margin-top:0.3rem;font-size:0.78rem;color:var(--muted);">'+(VH_ST[h.status]||h.status)+' \u00B7 \uD83D\uDCF7 '+T('vh.m.voor','voor')+' '+h.fotosVoor+' \u00B7 '+T('vh.m.na','na')+' '+h.fotosNa+(h.uitgifte?' \u00B7 '+h.uitgifte.kmStart+' km':'')+'</div>'+
+      (h.inname ? '<div style="margin-top:0.25rem;font-size:0.78rem;color:'+(h.inname.meerkosten>0?'var(--gold)':'var(--green)')+';">'+(h.inname.meerkosten>0 ? T('vh.m.meer','Meerkosten')+': '+eur(h.inname.meerkosten)+' ('+h.inname.gereden+' km)' : '\u2713 '+h.inname.gereden+' km \u00B7 '+T('vh.m.geenmeer','geen meerkosten, borg vrij'))+'</div>' : '')+
       (h.status !== 'afgerond' ?
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.55rem;">'+
         (h.status === 'aangevraagd' ? '<button class="bz-btn" data-vhf="'+h.ref+'" data-fase="voor">\uD83D\uDCF7 '+T('vh.m.fotovoor','Staat vastleggen (voor)')+'</button>' : '')+
@@ -2214,8 +2219,10 @@
       for (const a of p.autos){
         const open = vhOpen === p.code + ':' + a.id;
         html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="font-size:0.88rem;">'+esc(a.name)+(a.plate?' <span style="font-size:0.68rem;color:var(--soft);">'+esc(a.plate)+'</span>':'')+'</div>'+
-          '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(a.dagprijs)+'/'+T('vh.dag','dag')+'</span></div>';
+          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="font-size:0.88rem;">'+(a.icoon||'\uD83D\uDE97')+' '+esc(a.name)+'</div>'+
+          '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(a.dagprijs)+'/'+T('vh.dag','dag')+'</span></div>'+
+          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+esc(a.categorie||'')+' \u00B7 '+(a.transmissie==='automaat'?T('vh.aut','automaat'):T('vh.hand','handgesch.'))+' \u00B7 '+esc(a.brandstof||'')+' \u00B7 \uD83D\uDC65'+(a.stoelen||'-')+' \u00B7 \uD83E\uDDF3'+(a.bagage||0)+(a.airco?' \u00B7 \u2744\uFE0F':'')+
+          ' \u00B7 '+(a.kmPerDag?a.kmPerDag+' km/'+T('vh.dag','dag'):T('vh.onbeperkt','onbeperkt km'))+' \u00B7 '+T('vh.borg','borg')+' '+eur(a.borg||0)+'</div>';
         if (open){
           html += '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+
             '<div class="bz-veld" style="flex:1;margin-top:0;"><label>'+T('vh.van','Ophalen')+'</label><input type="date" id="vhVan" value="'+vhKeuze.van+'"></div>'+
@@ -2247,6 +2254,37 @@
         laadVerhuur();
       } catch(e){ toast(e.message); }
     });
+  }
+
+  /* ---------- contracten: digitaal ondertekenen ---------- */
+  async function laadContracten(){
+    if (!API.live) return;
+    let lijst = [];
+    try { lijst = (await API.call('/contracten/mijn')).contracten || []; } catch(e){}
+    const el = $('#conMijn'); if (!el) return;
+    const open = lijst.filter(c => c.status !== 'geweigerd');
+    if (!open.length){ el.innerHTML = ''; return; }
+    el.innerHTML = open.map(c =>
+      '<div class="card" style="border-color:'+(c.getekendDoorMij?'rgba(91,185,140,0.4)':'rgba(208,172,87,0.5)')+';">'+
+      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:'+(c.getekendDoorMij?'var(--green)':'var(--gold)')+';">\uD83D\uDCDD '+esc(c.supplierName)+' \u00B7 '+T('con.'+c.soort, c.soort)+'</div>'+
+      '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(c.titel)+'</b></div>'+
+      (c.velden && c.velden.length ? '<div style="margin-top:0.2rem;font-size:0.76rem;color:var(--muted);">'+c.velden.map(v=>esc(v.label)+': '+esc(v.waarde)).join(' \u00B7 ')+'</div>' : '')+
+      '<details style="margin-top:0.4rem;"><summary style="cursor:pointer;font-size:0.74rem;color:var(--gold);">'+T('con.lees','Lees de voorwaarden')+'</summary><div style="font-size:0.8rem;color:var(--muted);white-space:pre-wrap;margin-top:0.35rem;">'+escT(c.tekst)+'</div></details>'+
+      (c.getekendDoorMij
+        ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--green);">\u2705 '+(c.status==='getekend'?T('con.klaar','Getekend door beide partijen.'):T('con.wacht','U tekende; de zaak tekent nog.'))+'</div>'
+        : '<div style="margin-top:0.6rem;display:flex;gap:0.5rem;"><button class="bz-groot" style="flex:1;" data-conteken="'+c.ref+'">'+T('con.teken','Ondertekenen')+'</button><button class="bz-btn" data-conweiger="'+c.ref+'">'+T('con.weiger','Weiger')+'</button></div>')+
+      '</div>').join('');
+    document.querySelectorAll('[data-conteken]').forEach(b => b.addEventListener('click', async () => {
+      const naam = prompt(T('con.tekenvraag','Typ uw naam om digitaal te ondertekenen. Zo gaat u akkoord met de voorwaarden.'));
+      if (!naam) return;
+      try { await API.call('/contract/teken', { ref: b.dataset.conteken, naam, akkoord: true }); toast(T('con.tekenok','Getekend. Bedankt!')); laadContracten(); }
+      catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-conweiger]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm(T('con.weigervraag','Dit contract weigeren?'))) return;
+      try { await API.call('/contract/weiger', { ref: b.dataset.conweiger }); toast(T('con.weigerok','Geweigerd.')); laadContracten(); }
+      catch(e){ toast(e.message); }
+    }));
   }
 
   /* ---------- bestellen: de ophaal/bezorgdienst ---------- */

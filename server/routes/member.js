@@ -1263,6 +1263,10 @@ app.post('/api/huur/boek', auth, (req, res) => {
     return res.status(400).json({ error: 'Kies een periode vanaf vandaag; inleveren na de ophaaldag.' });
   const dagen = Math.round((new Date(tot) - new Date(van)) / 86400000);
   if (dagen > 30) return res.status(400).json({ error: 'Huren kan tot 30 dagen aaneen.' });
+  // minimumleeftijd van de auto: uit het paspoort geverifieerd, geen zelfrapportage
+  const lftH = leeftijdVan(geborenVan(req.session));
+  if (auto.minLeeftijd && lftH != null && lftH < auto.minLeeftijd)
+    return res.status(403).json({ error: auto.name + ' verhuren we vanaf ' + auto.minLeeftijd + ' jaar; uw leeftijd is via uw paspoort geverifieerd.' });
   // dubbele boekingen: de auto is van een gast, niet van twee
   const nu = Date.now();
   const bezet = db.data.boekingen.some(b => b.kind === 'huur' && b.supplierCode === s.code && b.autoId === auto.id &&
@@ -1295,8 +1299,15 @@ app.post('/api/huur/mijn', auth, (req, res) => {
     .map(b => {
       const f = db.data.huurFotos[b.ref] || { voor: [], na: [] };
       const loc = db.data.huurLocaties[b.ref] || null;
+      const zaak = findSupplier(b.supplierCode);
+      const auto = zaak ? (zaak.autos || []).find(a => a.id === b.autoId) : null;
       return { ref: b.ref, supplierName: b.supplierName, auto: b.autoNaam, kenteken: b.kenteken,
         van: b.van, tot: b.tot, dagen: b.dagen, prijs: b.price, status: b.status,
+        borg: auto ? (auto.borg || 0) : 0, spec: auto ? {
+          categorie: auto.categorie, transmissie: auto.transmissie, brandstof: auto.brandstof,
+          stoelen: auto.stoelen, deuren: auto.deuren, airco: auto.airco, bagage: auto.bagage,
+          kmPerDag: auto.kmPerDag, meerKm: auto.meerKm, icoon: auto.icoon || '\uD83D\uDE97' } : null,
+        uitgifte: b.uitgifte || null, inname: b.inname || null,
         fotosVoor: f.voor.length, fotosNa: f.na.length, sos: (b.sos || []).length,
         locatieAan: !!(loc && loc.aan) };
     });
@@ -1351,5 +1362,42 @@ app.post('/api/huur/locatie', auth, (req, res) => {
   save();
   sseToSupplier(h.supplierCode, 'sync', { scope: 'huur' });
   res.json({ ok: true, aan: L.aan });
+});
+
+/* ================== contracten: het lid tekent digitaal ================== */
+app.post('/api/contracten/mijn', auth, (req, res) => {
+  const mijn = db.data.contracten
+    .filter(c => c.partij.kind === 'lid' && c.partij.key === req.session.key)
+    .slice(0, 50)
+    .map(c => ({ ref: c.ref, soort: c.soort, supplierName: c.supplierName, titel: c.titel, tekst: c.tekst,
+      velden: c.velden || [], status: c.status, getekendDoorMij: !!c.tekenPartij, getekendDoorZaak: !!c.tekenZaak,
+      at: c.at }));
+  res.json({ contracten: mijn });
+});
+
+app.post('/api/contract/teken', auth, (req, res) => {
+  const c = db.data.contracten.find(x => x.ref === String(req.body.ref || '') && x.partij.kind === 'lid' && x.partij.key === req.session.key);
+  if (!c) return res.status(404).json({ error: 'Contract niet gevonden.' });
+  if (c.status === 'geweigerd') return res.status(409).json({ error: 'Dit contract is al geweigerd.' });
+  if (c.tekenPartij) return res.status(409).json({ error: 'U heeft dit contract al ondertekend.' });
+  const naam = schoon(req.body.naam, 60);
+  if (!naam || req.body.akkoord !== true) return res.status(400).json({ error: 'Typ uw naam en vink akkoord aan om te tekenen.' });
+  c.tekenPartij = { naam, at: new Date().toISOString() };
+  if (c.tekenZaak && c.tekenPartij) c.status = 'getekend';
+  save();
+  notifySupplier(c.supplierCode, { icon: '\u2713', title: 'Contract getekend', body: c.partij.codename + ' tekende: ' + c.titel });
+  sseToSupplier(c.supplierCode, 'sync', { scope: 'contract' });
+  res.json({ ok: true, status: c.status });
+});
+
+app.post('/api/contract/weiger', auth, (req, res) => {
+  const c = db.data.contracten.find(x => x.ref === String(req.body.ref || '') && x.partij.kind === 'lid' && x.partij.key === req.session.key);
+  if (!c) return res.status(404).json({ error: 'Contract niet gevonden.' });
+  if (c.tekenPartij) return res.status(409).json({ error: 'U heeft dit contract al ondertekend.' });
+  c.status = 'geweigerd';
+  save();
+  notifySupplier(c.supplierCode, { icon: '\u2715', title: 'Contract geweigerd', body: c.partij.codename + ' weigerde: ' + c.titel });
+  sseToSupplier(c.supplierCode, 'sync', { scope: 'contract' });
+  res.json({ ok: true });
 });
 };

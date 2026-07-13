@@ -660,14 +660,23 @@ function initRealtime() {
       loc: { lat: 38.912, lng: 1.442, label: 'Ibiza-stad, haven' }, rate: 0.12,
       menu: [], photos: [],
       autos: [
-        { id: 'c1', name: 'Fiat 500 Cabrio', plate: 'IB-501-C', dagprijs: 49, actief: true },
-        { id: 'c2', name: 'Mini Cooper Cabrio', plate: 'IB-207-M', dagprijs: 69, actief: true },
-        { id: 'c3', name: 'Jeep Wrangler', plate: 'IB-330-J', dagprijs: 95, actief: true }
+        { id: 'c1', name: 'Fiat 500 Cabrio', plate: 'IB-501-C', dagprijs: 49, actief: true,
+          categorie: 'Compact cabrio', transmissie: 'handgeschakeld', brandstof: 'benzine', stoelen: 4, deuren: 2,
+          airco: true, bagage: 1, kmPerDag: 200, meerKm: 0.25, borg: 300, minLeeftijd: 21, icoon: '\uD83D\uDE97' },
+        { id: 'c2', name: 'Mini Cooper Cabrio', plate: 'IB-207-M', dagprijs: 69, actief: true,
+          categorie: 'Premium cabrio', transmissie: 'automaat', brandstof: 'benzine', stoelen: 4, deuren: 2,
+          airco: true, bagage: 2, kmPerDag: 250, meerKm: 0.30, borg: 500, minLeeftijd: 23, icoon: '\uD83D\uDE99' },
+        { id: 'c3', name: 'Jeep Wrangler', plate: 'IB-330-J', dagprijs: 95, actief: true,
+          categorie: 'SUV 4x4', transmissie: 'automaat', brandstof: 'diesel', stoelen: 5, deuren: 4,
+          airco: true, bagage: 3, kmPerDag: 0, meerKm: 0, borg: 800, minLeeftijd: 25, icoon: '\uD83D\uDE99' }
       ]
     });
   }
   if (!db.data.huurFotos) db.data.huurFotos = {};       // ref -> { voor: [], na: [] } (los van de boeking: fotodata blijft uit de staat)
   if (!db.data.huurLocaties) db.data.huurLocaties = {}; // ref -> { aan, lat, lng, at } (vrijwillig gedeeld door de huurder)
+  // contracten: elke zaak kan een contract (verhuur/personeel/algemeen) opstellen
+  // en aan een lid of personeelslid sturen; beide partijen tekenen digitaal
+  if (!db.data.contracten) db.data.contracten = [];
   // Salon-connecties: leden vinden elkaar op codenaam, chatten en bellen 1-op-1
   if (!db.data.connections) db.data.connections = [];              // { a, b, requestedBy, status, at }
   if (!db.data.memberChats) db.data.memberChats = {};              // 'sleutelA|sleutelB' -> { messages, read }
@@ -813,6 +822,16 @@ function dirTouch(sess) {
     db.data.memberDir[sess.key] = { codename: cn, tier: sess.tier };
     save();
   }
+}
+
+/* Een lid opzoeken op codenaam (voor contracten, uitnodigingen): de gids
+   koppelt de sleutel aan de codenaam, nooit aan een echte naam. */
+function keyVanCodenaam(codenaam) {
+  const c = String(codenaam || '').trim().toLowerCase();
+  if (!c) return null;
+  for (const [key, v] of Object.entries(db.data.memberDir || {}))
+    if (String(v.codename || '').trim().toLowerCase() === c) return { key, tier: v.tier, codename: v.codename };
+  return null;
 }
 
 /* ---------- Salon-rechten (server-side afgedwongen) ----------
@@ -2784,7 +2803,7 @@ const kern = {
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
-  entreeCode, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
+  entreeCode, keyVanCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,

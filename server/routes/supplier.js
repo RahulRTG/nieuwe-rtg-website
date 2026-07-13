@@ -1,7 +1,7 @@
 /* Domein "supplier" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { ALT_IDEE, BOEK_KETEN, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, broadcastSync, cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor } = kern;
+  const { ALT_IDEE, BOEK_KETEN, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, broadcastSync, cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor } = kern;
 
 app.post('/api/supplier/login', async (req, res) => {
   let s, actor;
@@ -2017,7 +2017,21 @@ app.post('/api/supplier/auto', supplierAuth, (req, res) => {
   const dagprijs = Number(req.body.dagprijs);
   if (!name) return res.status(400).json({ error: 'Geef de auto een naam.' });
   if (!(dagprijs > 0) || dagprijs > 5000) return res.status(400).json({ error: 'Geef een geldige dagprijs op.' });
-  const velden = { name, plate: schoon(req.body.plate, 12), dagprijs: Math.round(dagprijs), actief: true };
+  const keuze = (v, opties, standaard) => opties.includes(v) ? v : standaard;
+  const getal = (v, min, max, standaard) => { const n = Number(v); return Number.isFinite(n) && n >= min && n <= max ? Math.round(n) : standaard; };
+  const velden = {
+    name, plate: schoon(req.body.plate, 12), dagprijs: Math.round(dagprijs), actief: true,
+    categorie: schoon(req.body.categorie, 40) || 'Personenauto',
+    transmissie: keuze(req.body.transmissie, ['handgeschakeld', 'automaat'], 'handgeschakeld'),
+    brandstof: keuze(req.body.brandstof, ['benzine', 'diesel', 'elektrisch', 'hybride'], 'benzine'),
+    stoelen: getal(req.body.stoelen, 1, 9, 5), deuren: getal(req.body.deuren, 2, 5, 4),
+    airco: req.body.airco !== false, bagage: getal(req.body.bagage, 0, 9, 2),
+    kmPerDag: getal(req.body.kmPerDag, 0, 2000, 0), // 0 = onbeperkt
+    meerKm: Math.min(5, Math.max(0, Number(req.body.meerKm) || 0)),
+    borg: getal(req.body.borg, 0, 5000, 0),
+    minLeeftijd: getal(req.body.minLeeftijd, 18, 30, 21),
+    icoon: schoon(req.body.icoon, 4) || '\uD83D\uDE97'
+  };
   if (req.body.id) {
     const a = s.autos.find(x => x.id === req.body.id);
     if (!a) return res.status(404).json({ error: 'Auto niet gevonden.' });
@@ -2043,8 +2057,11 @@ app.post('/api/supplier/huur/overzicht', supplierAuth, (req, res) => {
     .map(b => {
       const f = db.data.huurFotos[b.ref] || { voor: [], na: [] };
       const loc = db.data.huurLocaties[b.ref] || null;
+      const auto = (s.autos || []).find(a => a.id === b.autoId) || null;
       return { ref: b.ref, codename: b.customerCodename, auto: b.autoNaam, kenteken: b.kenteken,
         van: b.van, tot: b.tot, dagen: b.dagen, prijs: b.price, status: b.status,
+        borg: auto ? auto.borg : 0, spec: auto,
+        uitgifte: b.uitgifte || null, inname: b.inname || null,
         fotosVoor: f.voor.length, fotosNa: f.na.length,
         sos: (b.sos || []).filter(x => !x.ok), sosAfgehandeld: (b.sos || []).filter(x => x.ok).length,
         locatie: loc && loc.aan && Number.isFinite(loc.lat) ? { lat: loc.lat, lng: loc.lng, at: loc.at } : null };
@@ -2092,11 +2109,29 @@ app.post('/api/supplier/huur/status', supplierAuth, (req, res) => {
     if (h.status !== 'aangevraagd') return res.status(409).json({ error: 'Deze huur is niet klaar voor uitgifte.' });
     if (!h.paid) return res.status(409).json({ error: 'Nog niet betaald.' });
     if (!f.voor.length) return res.status(409).json({ error: 'Eerst de staat vastleggen: minstens een voor-foto (klant of balie).' });
+    // km-stand en tankniveau bij uitgifte vastleggen (het startpunt, onbetwistbaar)
+    const kmStart = Number(req.body.kmStart);
+    if (!Number.isFinite(kmStart) || kmStart < 0) return res.status(400).json({ error: 'Vul de km-stand bij uitgifte in.' });
+    h.uitgifte = { kmStart: Math.round(kmStart), tankStart: Math.min(8, Math.max(0, parseInt(req.body.tankStart, 10) || 8)), door: req.actor.name, at: new Date().toISOString() };
   } else if (status === 'afgerond') {
     if (h.status !== 'lopend') return res.status(409).json({ error: 'Deze huur loopt niet.' });
     if (!f.na.length) return res.status(409).json({ error: 'Eerst de staat bij inname vastleggen: minstens een na-foto.' });
+    const kmEind = Number(req.body.kmEind);
+    if (!Number.isFinite(kmEind) || (h.uitgifte && kmEind < h.uitgifte.kmStart))
+      return res.status(400).json({ error: 'Vul de km-stand bij inname in (niet lager dan bij uitgifte).' });
+    const tankEind = Math.min(8, Math.max(0, parseInt(req.body.tankEind, 10) || 8));
+    // transparante meerkosten: extra km boven de vrije km, en het tankverschil
+    const auto = (s.autos || []).find(a => a.id === h.autoId) || {};
+    const gereden = h.uitgifte ? Math.round(kmEind) - h.uitgifte.kmStart : 0;
+    const vrij = (auto.kmPerDag || 0) * (h.dagen || 1);
+    const extraKm = (auto.kmPerDag && gereden > vrij) ? gereden - vrij : 0;
+    const kmKosten = Math.round(extraKm * (auto.meerKm || 0) * 100) / 100;
+    const tankTekort = h.uitgifte ? Math.max(0, h.uitgifte.tankStart - tankEind) : 0; // in achtsten
+    const tankKosten = Math.round(tankTekort / 8 * 60 * 100) / 100; // ~60 euro voor een volle tank
+    h.inname = { kmEind: Math.round(kmEind), tankEind, gereden, extraKm, kmKosten, tankTekort, tankKosten,
+      meerkosten: Math.round((kmKosten + tankKosten) * 100) / 100, door: req.actor.name, at: new Date().toISOString() };
     h.finishedAt = new Date().toISOString();
-    delete db.data.huurLocaties[h.ref]; // huur klaar: locatie meteen weg
+    delete db.data.huurLocaties[h.ref];
   } else if (status === 'geweigerd') {
     if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager annuleert een huur.' });
     if (h.status === 'lopend') return res.status(409).json({ error: 'Een lopende huur annuleer je niet; rond hem af met na-foto\'s.' });
@@ -2106,8 +2141,8 @@ app.post('/api/supplier/huur/status', supplierAuth, (req, res) => {
   save();
   logActivity(s.code, req.actor, (status === 'lopend' ? 'gaf ' : status === 'afgerond' ? 'nam in: ' : 'annuleerde ') + (h.autoNaam || h.ref) + ' (' + h.customerCodename + ')');
   notify(h.customerTier, { icon: '\u{1F697}', title: s.name,
-    body: status === 'lopend' ? 'Goede reis! De staat is vastgelegd met ' + f.voor.length + ' foto(\u2019s).'
-      : status === 'afgerond' ? 'Ingeleverd en afgerond. De staat is vastgelegd met ' + f.na.length + ' foto(\u2019s). Dank u wel!'
+    body: status === 'lopend' ? 'Goede reis! De staat is vastgelegd met ' + f.voor.length + ' foto(\u2019s) en ' + h.uitgifte.kmStart + ' km op de teller.'
+      : status === 'afgerond' ? 'Ingeleverd. ' + (h.inname.meerkosten > 0 ? 'Meerkosten: \u20AC ' + h.inname.meerkosten + ' (' + h.inname.extraKm + ' extra km, tank).' : 'Geen meerkosten. Uw borg wordt vrijgegeven.') + ' Dank u wel!'
       : 'De huur is geannuleerd.', scope: 'orders' });
   sseToCustomer(h.customerKey || h.customerTier, 'sync', { scope: 'huur' });
   sseToOffice('sync', { scope: 'orders' });
@@ -2126,5 +2161,90 @@ app.post('/api/supplier/huur/sos-ok', supplierAuth, (req, res) => {
   logActivity(s.code, req.actor, 'handelde de SOS van ' + h.customerCodename + ' af');
   sseToOffice('sync', { scope: 'orders' });
   res.json({ ok: true, afgehandeld: n });
+});
+
+/* ================== contracten: opstellen en ondertekenen ==================
+   Elke zaak kan een contract maken (verhuur, personeel of algemeen), gericht
+   aan een lid (op codenaam) of aan een eigen personeelslid (staffId). Beide
+   partijen tekenen digitaal: getypte naam + akkoord + tijdstempel. Eenmaal
+   getekend verandert er niets meer aan de tekst: dat is het bewijs. */
+function contractPubliek(c) {
+  return { ref: c.ref, soort: c.soort, supplierCode: c.supplierCode, supplierName: c.supplierName,
+    titel: c.titel, tekst: c.tekst, velden: c.velden || [],
+    partij: c.partij.kind === 'lid' ? { kind: 'lid', codename: c.partij.codename } : { kind: 'staff', naam: c.partij.naam },
+    status: c.status, tekenZaak: c.tekenZaak || null, tekenPartij: c.tekenPartij || null,
+    huurRef: c.huurRef || null, at: c.at };
+}
+
+app.post('/api/supplier/contract/maak', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const s = req.supplier;
+  const soort = ['verhuur', 'personeel', 'algemeen'].includes(req.body.soort) ? req.body.soort : 'algemeen';
+  const titel = schoon(req.body.titel, 80);
+  const tekst = schoon(req.body.tekst, 4000);
+  if (!titel) return res.status(400).json({ error: 'Geef het contract een titel.' });
+  if (!tekst || tekst.length < 20) return res.status(400).json({ error: 'Zet de voorwaarden in het contract (minstens een paar regels).' });
+  const velden = (Array.isArray(req.body.velden) ? req.body.velden : []).slice(0, 20)
+    .map(v => ({ label: schoon(v.label, 40), waarde: schoon(v.waarde, 120) })).filter(v => v.label);
+  // ontvanger: een lid op codenaam, of een eigen personeelslid
+  let partij;
+  if (req.body.staffId != null) {
+    const m = accounts.getStaffById(Number(req.body.staffId));
+    if (!m || String(m.supplier_code).toUpperCase() !== s.code) return res.status(404).json({ error: 'Dit personeelslid kennen we niet bij uw zaak.' });
+    partij = { kind: 'staff', staffId: m.id, naam: m.name };
+  } else {
+    const lid = keyVanCodenaam(req.body.codenaam);
+    if (!lid) return res.status(404).json({ error: 'Geen lid gevonden met die codenaam. Vraag de klant naar de exacte codenaam uit de app.' });
+    partij = { kind: 'lid', key: lid.key, codename: lid.codename };
+  }
+  let huurRef = null;
+  if (soort === 'verhuur' && req.body.huurRef) {
+    const h = db.data.boekingen.find(b => b.kind === 'huur' && b.ref === String(req.body.huurRef) && b.supplierCode === s.code);
+    if (h) { huurRef = h.ref; if (partij.kind === 'lid' && !req.body.codenaam) partij = { kind: 'lid', key: h.customerKey, codename: h.customerCodename }; }
+  }
+  const c = {
+    ref: 'RTG-C-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    soort, supplierCode: s.code, supplierName: s.name, titel, tekst, velden, partij, huurRef,
+    status: 'wacht', tekenZaak: null, tekenPartij: null, at: new Date().toISOString()
+  };
+  db.data.contracten.unshift(c);
+  db.data.contracten = db.data.contracten.slice(0, 20000);
+  save();
+  logActivity(s.code, req.actor, 'stelde een contract op (' + soort + ') voor ' + (partij.codename || partij.naam));
+  if (partij.kind === 'lid') { notify(partij.key, { icon: '\u{1F4DD}', title: s.name + ' \u2013 contract', body: titel + ': klaar om te ondertekenen in uw app.', scope: 'contract' }); sseToCustomer(partij.key, 'sync', { scope: 'contract' }); }
+  sseToSupplier(s.code, 'sync', { scope: 'contract' });
+  res.json({ ok: true, contract: contractPubliek(c) });
+});
+
+app.post('/api/supplier/contracten', supplierAuth, (req, res) => {
+  const s = req.supplier;
+  // managers zien alle contracten van de zaak; personeel alleen dat van henzelf
+  const lijst = db.data.contracten.filter(c => c.supplierCode === s.code &&
+    (req.actor.manager || (c.partij.kind === 'staff' && c.partij.staffId === req.actor.staffId)))
+    .slice(0, 200).map(contractPubliek);
+  res.json({ contracten: lijst });
+});
+
+/* Ondertekenen vanuit de zaak-app of de PDA: een manager tekent namens de
+   zaak; het aangeschreven personeelslid tekent zijn eigen kant. */
+app.post('/api/supplier/contract/teken', supplierAuth, (req, res) => {
+  const s = req.supplier;
+  const c = db.data.contracten.find(x => x.ref === String(req.body.ref || '') && x.supplierCode === s.code);
+  if (!c) return res.status(404).json({ error: 'Contract niet gevonden.' });
+  if (c.status === 'geweigerd') return res.status(409).json({ error: 'Dit contract is geweigerd.' });
+  const naam = schoon(req.body.naam, 60);
+  if (!naam || req.body.akkoord !== true) return res.status(400).json({ error: 'Typ uw naam en vink akkoord aan om te tekenen.' });
+  const zijde = (c.partij.kind === 'staff' && c.partij.staffId === req.actor.staffId) ? 'partij' : (req.actor.manager ? 'zaak' : null);
+  if (!zijde) return res.status(403).json({ error: 'Dit contract staat niet op uw naam.' });
+  if (zijde === 'zaak' && c.tekenZaak) return res.status(409).json({ error: 'De zaak heeft al getekend.' });
+  if (zijde === 'partij' && c.tekenPartij) return res.status(409).json({ error: 'U heeft al getekend.' });
+  const teken = { naam, at: new Date().toISOString() };
+  if (zijde === 'zaak') c.tekenZaak = teken; else c.tekenPartij = teken;
+  if (c.tekenZaak && c.tekenPartij) c.status = 'getekend';
+  save();
+  logActivity(s.code, req.actor, 'tekende contract ' + c.ref);
+  if (c.partij.kind === 'lid') sseToCustomer(c.partij.key, 'sync', { scope: 'contract' });
+  sseToSupplier(s.code, 'sync', { scope: 'contract' });
+  res.json({ ok: true, contract: contractPubliek(c) });
 });
 };

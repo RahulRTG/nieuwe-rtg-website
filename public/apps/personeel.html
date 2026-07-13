@@ -307,8 +307,10 @@
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
   let zaken = null;
+  let pdContracten = [];
   async function laadZaken(){
     try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
+    try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }
   }
 
   // Blijf ingelogd: met een bewaard token direct naar Vandaag, zonder PIN.
@@ -461,12 +463,30 @@
       (vl.length ? '<div style="margin-top:0.6rem;">'+vl.map(v =>
         '<div class="task"><span class="ic">'+(v.soort === 'ziek' ? '🤒' : '🌴')+'</span><div class="t"><b>'+(v.soort === 'ziek' ? T('pd.ad.zm','Ziekmelding')+' '+v.van : v.van+' t/m '+(v.tot || ''))+'</b><span>'+esc(v.reden || '')+'</span></div>'+
         '<span style="font-size:0.64rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:'+(VST[v.status] || [v.status, 'var(--soft)'])[1]+';">'+(VST[v.status] || [v.status])[0]+'</span></div>').join('')+'</div>' : '')+
-      '</div>';
+      '</div>'+
+
+      (() => { const mijnCon = (pdContracten||[]).filter(c => c.partij.kind === 'staff' && c.partij.naam === me.name);
+        return mijnCon.length ? '<div class="card"><div class="k">\uD83D\uDCDD '+T('pd.ct.h','Mijn contracten')+'</div>'+
+        mijnCon.map(c => {
+          const ikGetekend = !!c.tekenPartij, zaakGetekend = !!c.tekenZaak;
+          return '<div class="task" style="flex-direction:column;align-items:stretch;"><div class="t"><b>'+esc(c.titel)+'</b><span>'+T('pd.ct.'+c.soort, c.soort)+' \u00B7 '+(zaakGetekend?'\u2705':'\u25CB')+' '+T('pd.ct.zaak','zaak')+' / '+(ikGetekend?'\u2705':'\u25CB')+' '+T('pd.ct.ik','ik')+'</span></div>'+
+          (c.velden && c.velden.length ? '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.2rem;">'+c.velden.map(v=>esc(v.label)+': '+esc(v.waarde)).join(' \u00B7 ')+'</div>' : '')+
+          '<details style="margin-top:0.3rem;"><summary style="cursor:pointer;font-size:0.72rem;color:var(--gold);">'+T('pd.ct.lees','Voorwaarden')+'</summary><div style="font-size:0.76rem;color:var(--muted);white-space:pre-wrap;margin-top:0.3rem;">'+esc(c.tekst)+'</div></details>'+
+          (!ikGetekend && c.status !== 'geweigerd' ? '<button class="abtn" data-ctteken="'+c.ref+'" style="margin-top:0.5rem;">'+T('pd.ct.teken','Ondertekenen')+'</button>' : (ikGetekend ? '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--green);">\u2705 '+T('pd.ct.getekend','U tekende dit contract.')+'</div>' : ''))+
+          '</div>';
+        }).join('')+'</div>' : '';
+      })();
 
     document.querySelectorAll('[data-eh]').forEach(el => el.addEventListener('click', () => {
       const i = Number(el.dataset.eh);
       hulpOpen = hulpOpen === i ? null : i;
       renderHulp();
+    }));
+    document.querySelectorAll('[data-ctteken]').forEach(b => b.addEventListener('click', async () => {
+      const naam = prompt(T('pd.ct.tekenvraag','Typ uw naam om digitaal te ondertekenen:'));
+      if (!naam) return;
+      try { await API.call('/supplier/contract/teken', { ref: b.dataset.ctteken, naam, akkoord: true }); toast(T('pd.ct.tekenok','Ondertekend.')); await laadZaken(); renderHulp(); }
+      catch(e){ toast(e.message); }
     }));
     const ea = document.getElementById('ehboAlarm');
     if (ea) ea.addEventListener('click', () => sendSOS('EHBO nodig', '🩹 '+T('pd.eh.gestuurd','EHBO-alarm verstuurd. Het team is gealarmeerd.')));

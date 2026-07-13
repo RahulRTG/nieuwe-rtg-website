@@ -63,7 +63,7 @@ test('boeken: vaste dagprijs, en dubbel boeken van dezelfde auto kan niet', asyn
 });
 
 test('uitgeven kan NIET zonder voor-foto; met foto wel (de kern tegen schimmig verhuren)', async () => {
-  const geenFoto = await api('/api/supplier/huur/status', { ref: huur.ref, status: 'lopend' }, balieToken);
+  const geenFoto = await api('/api/supplier/huur/status', { ref: huur.ref, status: 'lopend', kmStart: 24500 }, balieToken);
   assert.equal(geenFoto.status, 409);
   assert.match((await geenFoto.json()).error, /voor-foto/);
   // de huurder legt de staat vast, en de balie ook
@@ -71,7 +71,9 @@ test('uitgeven kan NIET zonder voor-foto; met foto wel (de kern tegen schimmig v
   assert.equal((await api('/api/supplier/huur/foto', { ref: huur.ref, fase: 'voor', foto: FOTO }, balieToken)).status, 200);
   // na-foto's kunnen nu nog niet (de huur loopt nog niet)
   assert.equal((await api('/api/huur/foto', { ref: huur.ref, fase: 'na', foto: FOTO }, lidToken)).status, 409);
-  const uit = await json(await api('/api/supplier/huur/status', { ref: huur.ref, status: 'lopend' }, balieToken));
+  // uitgeven zonder km-stand kan niet (het startpunt moet vast)
+  assert.equal((await api('/api/supplier/huur/status', { ref: huur.ref, status: 'lopend' }, balieToken)).status, 400);
+  const uit = await json(await api('/api/supplier/huur/status', { ref: huur.ref, status: 'lopend', kmStart: 24500, tankStart: 8 }, balieToken));
   assert.equal(uit.huur.status, 'lopend');
   const f = await json(await api('/api/supplier/huur/fotos', { ref: huur.ref }, balieToken));
   assert.equal(f.fotos.voor.length, 2, 'beide partijen hebben vastgelegd');
@@ -102,10 +104,14 @@ test('live locatie: vrijwillig aan, zichtbaar voor de zaak, en uit = meteen weg'
 });
 
 test('inleveren kan NIET zonder na-foto; met foto rondt hij af', async () => {
-  const geenFoto = await api('/api/supplier/huur/status', { ref: huur.ref, status: 'afgerond' }, balieToken);
+  const geenFoto = await api('/api/supplier/huur/status', { ref: huur.ref, status: 'afgerond', kmEind: 25200 }, balieToken);
   assert.equal(geenFoto.status, 409);
   assert.equal((await api('/api/huur/foto', { ref: huur.ref, fase: 'na', foto: FOTO }, lidToken)).status, 200);
-  const af = await json(await api('/api/supplier/huur/status', { ref: huur.ref, status: 'afgerond' }, balieToken));
+  const geenKm = await api('/api/supplier/huur/status', { ref: huur.ref, status: 'afgerond' }, balieToken);
+  assert.equal(geenKm.status, 400, 'inleveren vereist ook de eind-km');
+  // 700 km gereden op een Fiat 500 (200 km/dag vrij, 3 dagen = 600 vrij): 100 extra x 0,25 = 25 euro
+  // plus een halfvolle tank terug (4/8 tekort van 8): ~30 euro
+  const af = await json(await api('/api/supplier/huur/status', { ref: huur.ref, status: 'afgerond', kmEind: 25200, tankEind: 4 }, balieToken));
   assert.equal(af.huur.status, 'afgerond');
   // het lid ziet de afgeronde huur met de fototellers
   const mijn = await json(await api('/api/huur/mijn', {}, lidToken));
@@ -113,6 +119,13 @@ test('inleveren kan NIET zonder na-foto; met foto rondt hij af', async () => {
   assert.equal(m.status, 'afgerond');
   assert.equal(m.fotosVoor, 2);
   assert.equal(m.fotosNa, 1);
+  // transparante afrekening zichtbaar bij zaak: 100 extra km x 0,25 = 25 euro
+  const ov = await json(await api('/api/supplier/huur/overzicht', {}, balieToken));
+  const h = ov.huren.find(x => x.ref === huur.ref);
+  assert.equal(h.inname.gereden, 700);
+  assert.equal(h.inname.extraKm, 100);
+  assert.equal(h.inname.kmKosten, 25);
+  assert.ok(h.inname.tankKosten > 0, 'een niet-volle tank levert transparante brandstofkosten');
 });
 
 test('annuleren is een management-handeling, en een lopende huur annuleer je niet', async () => {

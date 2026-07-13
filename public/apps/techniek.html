@@ -146,6 +146,19 @@
           <div class="muted" style="font-size:.72rem;margin-top:.5rem;">Kleiner venster = kleinere levende kast = sneller onder zware belasting. De boekhouding en export tellen het archief altijd mee.</div>
         </div>
       </div>
+      <div id="moderniseerBlok" hidden>
+        <div class="sec">Modernisering: vraag de AI om een update</div>
+        <div class="kaart">
+          <div class="muted" style="font-size:.82rem;">Beschrijf in gewone taal wat u wilt vernieuwen, verbeteren of moderniseren. De AI geeft een veilig plan. Er gaat <b>niets live</b> naar de gasten: het wordt een voorstel (pull request) dat u eerst goedkeurt. Privacy en beveiliging blijven de strengste norm.</div>
+          <textarea class="veld" id="modVraag" placeholder="Bijv.: moderniseer de betaalpagina, of scherp de beveiliging van de inlog verder aan&hellip;" aria-label="Moderniseringsverzoek" style="min-height:3.4rem;resize:vertical;margin-top:.6rem;"></textarea>
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+            <button class="knop" id="bMod">Vraag de AI</button>
+            <span class="muted" id="modBron" style="font-size:.72rem;"></span>
+          </div>
+          <div class="advies" id="modPlan" hidden></div>
+          <div id="modHist" style="margin-top:.7rem;"></div>
+        </div>
+      </div>
       <div id="toegangBlok" hidden>
         <div class="sec">Toegang beheren</div>
         <div class="kaart">
@@ -289,6 +302,29 @@
     api('/api/techniek/toegang', { method:'POST', body:{ email:$('#grantEmail').value.trim(), actie:'verleen' } })
       .then(function(){ $('#grantEmail').value=''; toast('Toegang gegeven.'); laad(); })
       .catch(function(e){ $('#grantFout').textContent = e.message; });
+  });
+
+  /* ---------- modernisering: de eigenaar vraagt de AI om een update ---------- */
+  function modRij(m){
+    return el('div',{class:'zeker'},
+      el('span',{class:'badge uit'}, 'VOORSTEL'),
+      el('div',{class:'mid'},
+        el('div',{class:'naam'}, m.verzoek),
+        el('div',{class:'muted', style:{fontSize:'.72rem'}}, new Date(m.at).toLocaleString('nl-NL') + (m.door ? ' · ' + m.door : ''))));
+  }
+  $('#bMod').addEventListener('click', function(){
+    var v = $('#modVraag').value.trim(); if(!v){ toast('Beschrijf eerst kort uw verzoek.'); return; }
+    var b = $('#bMod'); b.disabled = true; Util.tekst(b, 'AI denkt na…');
+    api('/api/techniek/moderniseer', { method:'POST', body:{ verzoek:v } })
+      .then(function(d){
+        b.disabled = false; Util.tekst(b, 'Vraag de AI');
+        $('#modPlan').hidden = false; Util.tekst($('#modPlan'), d.plan || '');
+        Util.tekst($('#modBron'), d.bron === 'ai' ? 'AI-advies' : 'ingebouwd advies');
+        $('#modVraag').value = '';
+        toast('Vastgelegd als voorstel. Gasten merken er niets van.');
+        laad();
+      })
+      .catch(function(e){ b.disabled = false; Util.tekst(b, 'Vraag de AI'); toast(e.message); });
   });
 
   /* ---------- tabbladen ---------- */
@@ -524,6 +560,11 @@
       if (d.eigenaar && d.archief){
         Util.tekst($('#archiefInfo'), 'Nu ' + d.archief.dagen + ' dagen \u00B7 ' + d.archief.levend.toLocaleString('nl-NL') + ' levend \u00B7 ' + d.archief.gearchiveerd.toLocaleString('nl-NL') + ' gearchiveerd');
         if (document.activeElement !== $('#archiefDagen')) $('#archiefDagen').value = d.archief.dagen;
+      }
+      $('#moderniseerBlok').hidden = !d.eigenaar;
+      if (d.eigenaar){
+        var ms = d.moderniseringen || [];
+        vervang($('#modHist'), ms.length ? ms.map(modRij) : el('div',{class:'muted', style:{fontSize:'.75rem'}}, 'Nog geen moderniseringsverzoeken.'));
       }
       $('#grenzenBlok').hidden = !(d.eigenaar && d.grenzen && d.grenzen.length);
       if (d.eigenaar && d.grenzen) vervang($('#grenzen'), d.grenzen.map(function(g){

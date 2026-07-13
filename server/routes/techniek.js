@@ -119,6 +119,8 @@ module.exports = (kern) => {
       uit.grenzen = eigenaar.GRENZEN;
       // de archiefkast: instelbare live-vensterbreedte en de huidige verdeling
       uit.archief = archief ? { dagen: archief.dagen(), levend: (db.data.orders || []).length, gearchiveerd: archief.stat().aantal } : null;
+      // de moderniseringsverzoeken die de eigenaar zelf via de AI heeft gevraagd
+      uit.moderniseringen = (t.moderniseringen || []).slice(-8).reverse();
     }
     res.json(uit);
   });
@@ -246,6 +248,44 @@ module.exports = (kern) => {
     if (!antwoord) antwoord = lokaal.uitleg;
     voorstel = functies.valideerVoorstel(voorstel);
     res.json({ antwoord, voorstel, bron });
+  });
+
+  /* De eigenaar vraagt ZELF om een update/modernisering, in gewone taal. De AI
+     geeft een concreet, veilig plan. NIETS gaat live naar de gasten: het verzoek
+     wordt vastgelegd als voorstel dat via de veilige stroom (Claude stelt voor via
+     een pull request, de eigenaar keurt goed) wordt uitgevoerd, precies volgens
+     docs/automatische-modernisering.md. Zo merkt de gast er nooit iets van. */
+  app.post('/api/techniek/moderniseer', techAuth, eigenaarAlleen, async (req, res) => {
+    const t = staat();
+    const verzoek = String(req.body.verzoek || '').slice(0, 800).trim();
+    if (!verzoek) return res.status(400).json({ error: 'Beschrijf kort wat u wilt vernieuwen of verbeteren.' });
+    let plan = null, bron = 'ingebouwd';
+    if (anthropic && !(t.zekeringen.ai && t.zekeringen.ai.aan === false)) {
+      try {
+        const prompt = 'Je bent de technische adviseur van het RTG-platform (Node.js/Express). De EIGENAAR vraagt om een ' +
+          'update of modernisering. Geef in het Nederlands een KORT, concreet en VEILIG plan (maximaal 8 bondige bullets): ' +
+          'wat te wijzigen, waarom, en de impact op beveiliging en privacy. Cruciaal: er gaat NIETS live naar de gasten; dit ' +
+          'wordt een pull request die de eigenaar eerst goedkeurt, en de volledige testsuite plus de huisstijlcheck moeten ' +
+          'groen zijn. Privacy en security blijven de strengste norm; de juridische grenzen en de kinderbescherming blijven ' +
+          'onaantastbaar. Verzoek van de eigenaar: "' + verzoek + '"';
+        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 700, messages: [{ role: 'user', content: prompt }] });
+        plan = (r.content && r.content[0] && r.content[0].text) || null;
+        bron = 'ai';
+      } catch (e) { plan = null; bron = 'ingebouwd'; }
+    }
+    if (!plan) plan = 'Uw verzoek is vastgelegd als moderniseringsvoorstel. Het wordt via de veilige stroom uitgevoerd:\n' +
+      '- Claude stelt de wijziging voor als pull request; u keurt hem goed. Er wordt nooit zonder uw akkoord samengevoegd.\n' +
+      '- De volledige testsuite en de huisstijlcheck moeten groen zijn voordat er iets wordt voorgesteld.\n' +
+      '- Privacy en beveiliging blijven de strengste norm; de juridische grenzen en de kinderbescherming blijven onaantastbaar.\n' +
+      '- Gasten merken er niets van: er gaat nooit iets live zonder uw goedkeuring.\n\n(Zet ANTHROPIC_API_KEY voor een AI-advies op maat.)';
+    if (!Array.isArray(t.moderniseringen)) t.moderniseringen = [];
+    const item = { id: crypto.randomBytes(6).toString('hex'), verzoek, plan, door: accounts.realNameOf(req.techUser), at: new Date().toISOString(), status: 'aangevraagd' };
+    t.moderniseringen.push(item);
+    t.moderniseringen = t.moderniseringen.slice(-50); // audit-staart begrensd
+    save();
+    // de eigenaar krijgt ook een melding in zijn account (spoor + herinnering)
+    try { sendPushToUser(req.techUser.id, { icon: '\u{1F6E0}️', title: 'Moderniseringsverzoek vastgelegd', body: 'Claude verwerkt dit veilig als voorstel (pull request) dat u goedkeurt. Gasten merken er niets van.' }); } catch (e) {}
+    res.json({ ok: true, id: item.id, plan, bron, aantal: t.moderniseringen.length });
   });
 
   /* Beveiligingsmelding(en) afhandelen: de eigenaar bevestigt dat hij ze heeft

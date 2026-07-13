@@ -90,3 +90,16 @@ test('de AI-hulp geeft een bruikbaar voorstel in gewone taal', async () => {
   assert.ok(Array.isArray(d.voorstel) && d.voorstel.some(w => w.id === 'social' && w.doelgroep === 'lifestyle' && w.aan === false),
     'het voorstel zet de sociale laag uit voor Lifestyle');
 });
+
+test('de eigenaar vraagt de AI zelf om een update; het wordt veilig vastgelegd', async () => {
+  // een gewoon lid (geen technische toegang) mag dit niet
+  assert.equal((await api('/api/techniek/moderniseer', { verzoek: 'iets' }, rtgToken)).status, 403);
+  // de eigenaar vraagt om een modernisering
+  const d = await json(await api('/api/techniek/moderniseer', { verzoek: 'moderniseer de betaalpagina en scherp de beveiliging aan' }, techToken));
+  assert.ok(d.ok && d.plan, 'er komt een veilig plan terug');
+  assert.match(d.plan, /goedkeur|voorstel|pull request|gasten/i, 'het plan benadrukt de veilige, gast-vrije stroom');
+  // het verzoek staat op het statusbord als voorstel (audit)
+  const st = await json(await (await fetch(BASE + '/api/techniek/status', { headers: { Authorization: 'Bearer ' + techToken } })));
+  assert.ok(Array.isArray(st.moderniseringen) && st.moderniseringen.some(m => /betaalpagina/.test(m.verzoek)),
+    'het moderniseringsverzoek is vastgelegd');
+});

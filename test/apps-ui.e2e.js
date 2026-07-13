@@ -88,6 +88,35 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
   });
 });
 
+test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const reg = await api(base, '/api/auth/register', { name: 'Lid EN', email: 'appen@x.nl', phone: '0612345799',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    assert.ok(reg.token, 'lid-registratie geeft een token');
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    page.on('pageerror', e => fouten.push(e.message));
+    await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'en'); }, reg.token);
+    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
+    await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
+    await page.waitForSelector('#homeGreeting', { timeout: 5000 });
+    // de begroeting is via T('app.welcome',...) uit het EN-woordenboek gekomen
+    const greet = await page.textContent('#homeGreeting');
+    assert.match(greet, /Welcome/i, 'de begroeting is in het Engels');
+    assert.doesNotMatch(greet, /Welkom/i, 'er staat geen Nederlands meer in de begroeting');
+    assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt doorgezet',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   const TMP = verseDataDir();

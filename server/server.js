@@ -336,38 +336,12 @@ function alcoholGrensVan(s) {
 // db.json zodat ingelogde gebruikers een serverherstart overleven.
 // Alleen de hash wordt bewaard: wie db.json in handen krijgt, heeft daarmee
 // nog geen bruikbare tokens. Sessies verlopen na 30 dagen zonder gebruik.
-const sessions = new Map();
-const TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-function tokenHash(token) { return crypto.createHash('sha256').update(String(token)).digest('hex'); }
-function rememberSession(token, sess) {
-  sess.at = new Date().toISOString();
-  const h = tokenHash(token);
-  sessions.set(h, sess);
-  db.data.sessions[h] = sess;
-  const toks = Object.keys(db.data.sessions);
-  if (toks.length > 400) {
-    toks.sort((a, b) => new Date(db.data.sessions[a].at || 0) - new Date(db.data.sessions[b].at || 0));
-    for (const t of toks.slice(0, toks.length - 400)) { delete db.data.sessions[t]; sessions.delete(t); }
-  }
-  save();
-}
-// hash is de map-sleutel (zie rememberSession); aanroepers geven de hash door
-function forgetSession(hash) {
-  sessions.delete(hash);
-  if (db.data.sessions) { delete db.data.sessions[hash]; save(); }
-}
-// Centrale sessie-opzoeking: hasht het token, controleert het verloop en
-// schuift het venster op bij actief gebruik (hooguit eens per uur wegschrijven).
-function sessionFor(token) {
-  if (!token) return null;
-  const h = tokenHash(token);
-  const sess = sessions.get(h);
-  if (!sess) return null;
-  const age = Date.now() - new Date(sess.at || 0).getTime();
-  if (age > TOKEN_TTL_MS) { forgetSession(h); return null; }
-  if (age > 60 * 60 * 1000) { sess.at = new Date().toISOString(); save(); }
-  return sess;
-}
+// De sessie-opslag (Map + hash + remember/forget/lookup) zit in een
+// maak…(state)-fabriek; de Map komt terug zodat het herstel-/migratiepad in
+// initRealtime er ongewijzigd op blijft werken.
+const { maakSessies } = require('./kern/sessies');
+const { sessions, tokenHash, rememberSession, forgetSession, sessionFor, TOKEN_TTL_MS } =
+  maakSessies({ db, save, crypto });
 
 /* Inlogpogingen afremmen: per bron en doel hooguit tien mislukkingen,
    daarna vijf minuten wachten. Geldt voor wachtwoorden en toegangscodes. */

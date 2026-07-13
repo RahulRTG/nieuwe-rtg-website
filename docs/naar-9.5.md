@@ -50,8 +50,12 @@ gebruikt.
 - [x] `server/kern/afgeleid.js`: publicPartner, weekdagFactor, cvReady + de
   btw-splitsing (btwSplit) eruit, los getest (`test/kern-afgeleid.test.js`).
   Geo (`server/lib/geo.js`) en leeftijd (`server/lib/leeftijd.js`) waren al los.
-- [ ] Groepeer de resterende staat-dragende helpers (sessies, SSE) in eigen
-  modules met een duidelijke `maak…(state)`-fabriek.
+- [x] Sessie-opslag naar `server/kern/sessies.js` als `maakSessies({db,save,crypto})`-
+  fabriek (Map + hash + remember/forget/lookup). Herstel-/migratiepad in
+  initRealtime blijft op de teruggegeven Map werken; nieuwe test bewijst dat een
+  lid na een serverherstart ingelogd blijft (`test/sessie-herstart.test.js`).
+- [ ] SSE-clients/-buffer eventueel ook naar een eigen `maak…(state)`-module
+  (grotere ingreep; nu bewust nog niet gedaan).
 - [ ] Groepeer de staat-dragende helpers (sessies, SSE) in eigen modules met een
   duidelijke `maak…(state)`-fabriek.
 

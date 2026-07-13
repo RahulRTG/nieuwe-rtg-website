@@ -112,7 +112,69 @@ Volledige lijst met uitleg: `.env.example`.
 - **Failover** — drie-server-cluster met poortwachter (`server/trio.js`).
 - **Toegankelijkheid** — alle vlaggenschip-schermen axe-schoon (CI bewaakt dit).
 
-## 5. Go-live checklist
+## 5. Schalen naar miljoenen
+
+Eerlijk over de plafonds en hoe je eroverheen komt. De kern van het advies:
+**één proces schaal je verticaal tot een grens; daarna schaal je horizontaal
+achter de poortwachter, met Postgres en Redis overal aan.**
+
+### Bekende plafonds van één proces
+- **Doorvoer** — een enkel Node-proces haalt in de praktijk ~1.400–1.700
+  req/s voor de gewone JSON-endpoints (afhankelijk van de machine). Dat is
+  ruim voor een enkele zaak of stad, maar niet voor miljoenen gelijktijdige
+  gebruikers op één proces.
+- **Geheugen-snapshot** — de lokale-bestand-modus houdt de levende data in
+  het geheugen. Dat plafond is bewust gemitigeerd: afgeronde tickets verhuizen
+  naar het **archief** (append-only maandbestanden, zie §4) en de bulk-zaken
+  staan in het **Postgres-grootboek**, zodat de levende kast klein blijft en de
+  totalen tóch eerlijk over alles tellen. Voor echte schaal is de
+  lokale-bestand-modus echter niet bedoeld: zet `DATABASE_URL`.
+- **Rekenpieken (login)** — scrypt is puur rekenwerk; de piekcapaciteit per
+  instance schaalt met de CPU-kernen (zie §4). Meer capaciteit = meer/zwaardere
+  instances.
+
+### Horizontaal uitschalen (de route naar miljoenen)
+1. **Postgres overal aan.** Zet `DATABASE_URL`; gedeelde data én accounts
+   draaien dan op PostgreSQL met transacties, row-locks, `LISTEN/NOTIFY` en de
+   3-weg-merge tegen gelijktijdige schrijvers. Zonder dit heeft elke instance
+   zijn eigen snapshot en lopen de instances uit elkaar.
+2. **Redis-bus overal aan.** Zet `REDIS_URL`. Realtime-events (SSE) gaan dan
+   over Redis pub/sub, zodat een gebruiker op instance A een event ziet dat op
+   instance B is veroorzaakt. Zonder Redis werkt realtime alleen binnen één
+   proces.
+3. **Deel de gedeelde geheimen.** Bij meerdere instances moeten
+   `RTG_VAULT_KEY`, `RTG_SECRET_KEY` (en `RTG_ENC_KEY`) op alle instances
+   gelijk zijn, anders kan de ene instance de versleutelde naam/e-mail van de
+   andere niet lezen en kloppen e-mail-login-hash en sessietokens niet (zie §4).
+4. **Zet er meer instances achter een load balancer.** De app is stateless
+   tussen requests (sessie zit in Postgres, niet in procesgeheugen), dus je kunt
+   naar believen instances bijzetten. TLS-termination en `trust proxy` vóór de
+   app (zie checklist). Sticky sessions zijn niet nodig; alleen voor de
+   SSE-verbinding is een langlevende connectie handig, maar de Redis-bus levert
+   events naar de juiste instance ongeacht waar de gebruiker hangt.
+5. **Kies de procesindeling die past.**
+   - **Vloot-modus** (`npm run vloot`, §2): één machine, per domein een proces,
+     foutisolatie + herstart per groep. Goede eerste stap.
+   - **Trio/failover** (`server/trio.js`, §4): drie servers met poortwachter en
+     automatische overname voor beschikbaarheid.
+   - **Kubernetes/containers**: het Docker-image (§1) draait ongewijzigd;
+     schaal per domein-deployment met de Redis-bus en Postgres als gedeelde laag.
+
+### Wat hierna nog rest (bewuste keuzes, geen code-blokkade)
+- **Load-tests op productievolume** en het afstemmen van Postgres pool-/
+  connectielimieten en een read-replica-/backup-strategie voor Postgres zelf
+  (zie ook §7).
+- **Lijst-virtualisatie in de backoffice.** De API's zijn al gepagineerd en
+  geven eerlijke totalen los van de paginagrootte, dus de server schaalt. Voor
+  extreem lange lijsten in het kantoorscherm is client-side virtualisatie
+  (alleen de zichtbare rijen in de DOM) nog een open, puur front-end
+  verbetering; functioneel is er geen blokkade.
+- **CDN voor statische assets.** De build hasht bestandsnamen en de
+  service-worker cachet ze al; een CDN vóór de app haalt die last verder weg.
+
+---
+
+## 6. Go-live checklist
 
 De eerste twee stappen zijn geautomatiseerd:
 
@@ -143,7 +205,7 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 
 ---
 
-## 6. Wat code NIET oplost, en vóór een echte lancering moet (eerlijk)
+## 7. Wat code NIET oplost, en vóór een echte lancering moet (eerlijk)
 
 Dit is het deel dat je niet in dit repo kunt afvinken:
 

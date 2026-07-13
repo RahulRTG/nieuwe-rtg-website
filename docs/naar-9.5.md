@@ -102,9 +102,12 @@ Axe is groen (0 serious/critical), maar dat dekt geen focusbeheer of toetsenbord
 Bekende plafonds: single-proces ~1.400–1.700 req/s en het JSON-snapshot-plafond
 (gemitigeerd door het grootboek).
 
-- [ ] In `PRODUCTION.md` expliciet documenteren: horizontaal uitschalen achter de
-  poortwachter + Redis/Postgres overal aan voor echte miljoenen.
-- [ ] Virtualisatie van zeer lange lijsten in de backoffice.
+- [x] In `PRODUCTION.md` expliciet gedocumenteerd (nieuwe §5 "Schalen naar
+  miljoenen"): bekende plafonds, horizontaal uitschalen achter de poortwachter
+  met Redis + Postgres overal aan, gedeelde geheimen, en de procesindeling-
+  keuzes (vloot / trio / containers).
+- [ ] Virtualisatie van zeer lange lijsten in de backoffice (open, puur
+  front-end; server is al gepagineerd met eerlijke totalen).
 
 ## Aanbevolen volgorde
 1. app-shell (#1) — betaalt zich terug bij elke volgende stap.

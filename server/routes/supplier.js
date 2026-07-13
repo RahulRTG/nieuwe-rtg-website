@@ -1711,6 +1711,11 @@ function actorFunc(req) {
 function eigenTips(code) {
   return ((db.data.training || {})[code] || []).filter(t => t && t.t);
 }
+// Voortgang: welke tips heeft dit teamlid al gelezen? Per zaak, per persoon.
+function gelezenLijst(code, staffId) {
+  if (!staffId) return [];
+  return (((db.data.trainGelezen || {})[code] || {})[String(staffId)]) || [];
+}
 app.post('/api/supplier/training', supplierAuth, (req, res) => {
   const func = actorFunc(req);
   const role = req.actor.role;
@@ -1722,7 +1727,22 @@ app.post('/api/supplier/training', supplierAuth, (req, res) => {
   const vandaag = eigen.length
     ? eigen[Math.floor(Date.now() / 86400000) % eigen.length]
     : training.tipVanDeDag(func, role);
-  res.json({ func: func || null, kanBeheren: !!req.actor.manager, tipVanDeDag: vandaag, tips, eigen });
+  const gelezen = gelezenLijst(req.supplier.code, req.actor.staffId).filter(t => tips.some(x => x.t === t));
+  res.json({ func: func || null, kanBeheren: !!req.actor.manager, tipVanDeDag: vandaag, tips, eigen, gelezen });
+});
+
+// Een tip als gelezen markeren (of terugdraaien): zo ziet iedereen de voortgang.
+app.post('/api/supplier/training/gelezen', supplierAuth, (req, res) => {
+  const titel = String(req.body.titel || '');
+  if (!titel) return res.status(400).json({ error: 'Welke tip?' });
+  if (!req.actor.staffId) return res.status(200).json({ gelezen: [] }); // bedrijfslogin heeft geen persoon
+  db.data.trainGelezen = db.data.trainGelezen || {};
+  const perZaak = db.data.trainGelezen[req.supplier.code] = db.data.trainGelezen[req.supplier.code] || {};
+  const key = String(req.actor.staffId);
+  const set = new Set(perZaak[key] || []);
+  if (req.body.uit) set.delete(titel); else set.add(titel);
+  perZaak[key] = [...set]; save();
+  res.json({ gelezen: perZaak[key] });
 });
 
 app.post('/api/supplier/training/add', supplierAuth, (req, res) => {
@@ -1755,7 +1775,20 @@ app.post('/api/supplier/coach', supplierAuth, async (req, res) => {
   const func = actorFunc(req);
   const eigen = eigenTips(req.supplier.code);
   const bib = training.tipsVoor(func, req.actor.role);
-  const terugval = training.coachTip(vraag, func, req.actor.role);
+  // Context van een concrete tafel/bestelling: allergie en wensen tellen mee.
+  let orderCtx = '', tafel = null;
+  if (req.body.ref) {
+    const o = (db.data.orders || []).find(x => x.ref === String(req.body.ref) && x.supplierCode === req.supplier.code);
+    if (o) {
+      tafel = o.table || null;
+      const items = (o.items || []).map(i => (i.qty > 1 ? i.qty + 'x ' : '') + i.name).join(', ');
+      orderCtx = [tafel ? 'Tafel: ' + tafel : null, o.customerCodename ? 'Gast: ' + o.customerCodename : null,
+        items ? 'Bestelling: ' + items : null, o.allergyNote ? 'ALLERGIE: ' + o.allergyNote : null,
+        o.note ? 'Opmerking: ' + o.note : null].filter(Boolean).join('. ');
+    }
+  }
+  // Voor de terugval de allergie mee in de trefwoorden, zodat de juiste tip bovenkomt.
+  const terugval = training.coachTip(vraag + ' ' + orderCtx, func, req.actor.role);
   if (anthropic) {
     try {
       const context = eigen.concat(bib).slice(0, 20).map(t => '- ' + t.t + ': ' + t.s).join('\n');
@@ -1763,16 +1796,18 @@ app.post('/api/supplier/coach', supplierAuth, async (req, res) => {
         model: 'claude-haiku-4-5-20251001', max_tokens: 300,
         system: 'Je bent een vriendelijke, ervaren horeca- en service-coach voor het personeel van een topzaak (5-sterren-hotel, Michelin-niveau). '
           + 'Antwoord in het Nederlands, kort en praktisch (maximaal 4 zinnen), concreet en bemoedigend. '
+          + 'Bij een allergie ben je stellig over veilige bereiding en dubbelcheck. '
           + 'De functie van het teamlid is: ' + (func || 'onbekend') + '. '
+          + (orderCtx ? 'Situatie aan tafel: ' + orderCtx + '. ' : '')
           + 'Gebruik waar passend deze huistips van de zaak:\n' + (context || '(geen)'),
         messages: [{ role: 'user', content: vraag }]
       });
       const antwoord = (msg.content || []).filter(b => b.type === 'text').map(b => b.text).join(' ').trim();
-      if (antwoord) return res.json({ antwoord, bron: 'ai', tip: terugval });
+      if (antwoord) return res.json({ antwoord, bron: 'ai', tip: terugval, tafel });
     } catch (e) { /* val terug op de bibliotheek */ }
   }
   res.json({ antwoord: terugval ? terugval.s : 'Blijf vriendelijk, aandachtig en een stap voor op de wens van de gast.',
-    bron: 'bibliotheek', tip: terugval });
+    bron: 'bibliotheek', tip: terugval, tafel });
 });
 
 app.post('/api/supplier/refund', supplierAuth, (req, res) => {

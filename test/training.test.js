@@ -45,7 +45,7 @@ test('bibliotheek: de coach kiest een passende tip bij de vraag', () => {
 const PORT = 4720 + Math.floor(Math.random() * 60);
 const BASE = 'http://127.0.0.1:' + PORT;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-train-'));
-let child, kikMan, kikStaf;
+let child, kikMan, kikStaf, lidToken;
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -67,6 +67,9 @@ test.before(async () => {
   for (let i = 0; i < 100; i++) { try { const r = await fetch(BASE + '/api/health'); if (r.ok) break; } catch (e) {} await new Promise(r => setTimeout(r, 100)); }
   kikMan = await login('KIKUNOI', 'manager');
   kikStaf = await login('KIKUNOI', 'staff');
+  const reg = await json(await api('/api/auth/register', { name: 'Gast Lid', email: 'train@x.nl', phone: '0612345731',
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }));
+  lidToken = reg.token;
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -105,4 +108,31 @@ test('PDA: de coach geeft altijd een bruikbaar antwoord', async () => {
   const d = await json(await api('/api/supplier/coach', { vraag: 'Hoe breng ik de rekening netjes?' }, kikStaf));
   assert.ok(d.antwoord && d.antwoord.length > 5, 'er komt een antwoord');
   assert.ok(d.bron === 'ai' || d.bron === 'bibliotheek', 'de bron is bekend');
+});
+
+test('PDA: de coach kent de context van een concrete tafel (allergie mee)', async () => {
+  // de manager zet een keukengerecht op de kaart
+  assert.equal((await api('/api/supplier/menu', { menu: [{ id: 'ramen', name: 'Ramen', price: 12, station: 'keuken', cat: 'Warm' }] }, kikMan)).status, 200);
+  // een gast bestelt aan tafel met een allergie-notitie
+  const ord = await json(await api('/api/order', { supplierCode: 'KIKUNOI', items: [{ id: 'ramen', qty: 1 }], table: 'Tafel 9', allergyNote: 'noten' }, lidToken));
+  assert.ok(ord.order && ord.order.ref, 'de bestelling is aangemaakt');
+  // de coach krijgt de tafel als context mee en echoot de tafel terug
+  const c = await json(await api('/api/supplier/coach', { vraag: 'Waar moet ik op letten?', ref: ord.order.ref }, kikStaf));
+  assert.equal(c.tafel, 'Tafel 9', 'de coach herkent de tafel');
+  assert.ok(c.antwoord && c.antwoord.length > 5, 'er komt een bruikbaar antwoord');
+});
+
+test('PDA: voortgang; een gelezen tip blijft bewaard en kan terug', async () => {
+  const d0 = await json(await api('/api/supplier/training', {}, kikStaf));
+  const titel = d0.tips[0].t;
+  assert.ok(!(d0.gelezen || []).includes(titel), 'nog niet gelezen');
+  // markeer als gelezen
+  const g = await json(await api('/api/supplier/training/gelezen', { titel }, kikStaf));
+  assert.ok(g.gelezen.includes(titel), 'staat nu op gelezen');
+  // en het blijft bewaard bij een volgende blik
+  const d1 = await json(await api('/api/supplier/training', {}, kikStaf));
+  assert.ok(d1.gelezen.includes(titel), 'de voortgang is bewaard');
+  // terugdraaien kan ook
+  const u = await json(await api('/api/supplier/training/gelezen', { titel, uit: true }, kikStaf));
+  assert.ok(!u.gelezen.includes(titel), 'weer op ongelezen');
 });

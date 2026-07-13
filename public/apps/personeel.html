@@ -316,6 +316,8 @@
   let trainData = null;  // training & tips: tip van de dag, rol-tips, eigen tips
   let coachAntwoord = null; // laatste antwoord van de AI-coach
   let tipsOpen = false;     // toon de volledige tip-lijst
+  let coachRef = null;      // coaching voor een concrete tafel/bestelling
+  let coachRefTafel = null; // leesbare naam van die tafel
   async function laadZaken(){
     try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
     try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }
@@ -383,11 +385,16 @@
     if (A.length || TT.length){
       let h = '<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">'+T('pd.attn','Aandacht gevraagd')+' ('+(A.length+TT.length)+')</div>';
       h += A.map(a => '<div class="task"><span class="ic">🔔</span><div class="t"><b>'+esc(a.reden)+(a.tafel?' · '+esc(a.tafel):'')+'</b><span>'+esc(a.codename)+' · '+timeAgo(a.at)+'</span></div><button class="abtn" data-aankl="'+a.id+'">'+T('pd.help','Help')+'</button></div>').join('');
-      h += TT.map(t => '<div class="task"><span class="ic">⏳</span><div class="t"><b>'+esc(t.tafel||t.ref)+'</b><span>'+esc(t.codename)+' · '+t.minuten+' min '+T('pd.waiting','zonder aandacht')+'</span></div></div>').join('');
+      h += TT.map(t => '<div class="task"><span class="ic">⏳</span><div class="t"><b>'+esc(t.tafel||t.ref)+'</b><span>'+esc(t.codename)+' · '+t.minuten+' min '+T('pd.waiting','zonder aandacht')+'</span></div><button class="abtn ghost" data-coachref="'+esc(t.ref)+'" data-coachtafel="'+esc(t.tafel||t.ref)+'" title="'+T('pd.tr.coachtable','Vraag de coach over deze tafel')+'">🎓</button></div>').join('');
       h += '</div>';
       $('#todayWrap').insertAdjacentHTML('afterbegin', h);
       document.querySelectorAll('[data-aankl]').forEach(b => b.addEventListener('click', async () => {
         try { await API.call('/supplier/aandacht/klaar', { id:b.dataset.aankl }); toast(T('pd.helped','Gast geholpen.')); await refresh(); openTab('vandaag'); } catch(e){ toast(e.message); }
+      }));
+      document.querySelectorAll('[data-coachref]').forEach(b => b.addEventListener('click', () => {
+        coachRef = b.dataset.coachref; coachRefTafel = b.dataset.coachtafel; coachAntwoord = null;
+        renderHulp(); openTab('hulp');
+        const inp = document.getElementById('coachVraag'); if (inp) inp.focus();
       }));
     }
     const kb = document.getElementById('klokBtn');
@@ -457,21 +464,33 @@
     const tvd = t.tipVanDeDag;
     const alle = t.tips || [];
     const eigen = t.eigen || [];
+    const gelezen = t.gelezen || [];
+    const totaal = alle.length, klaar = gelezen.filter(g => alle.some(x => x.t === g)).length;
+    const pct = totaal ? Math.round(klaar / totaal * 100) : 0;
     return '<div class="card"><div class="k">🎓 '+T('pd.tr.h','Training & tips')+
       (t.func ? ' <span style="font-weight:500;color:var(--soft);font-size:0.72rem;">'+esc(t.func)+'</span>' : '')+'</div>'+
       (tvd ? '<div style="margin-top:0.6rem;padding:0.7rem 0.8rem;border-radius:12px;background:linear-gradient(135deg,rgba(197,160,89,0.16),rgba(197,160,89,0.05));border:1px solid rgba(197,160,89,0.3);">'+
         '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">'+T('pd.tr.tvd','Tip van de dag')+'</div>'+
         '<b style="display:block;margin-top:0.25rem;font-size:0.9rem;">'+esc(tvd.t)+'</b>'+
         '<span style="display:block;margin-top:0.2rem;font-size:0.8rem;line-height:1.5;color:var(--muted);">'+esc(tvd.s)+'</span></div>' : '')+
-      '<div class="compose" style="padding:0.7rem 0 0;"><input id="coachVraag" placeholder="'+T('pd.tr.ask','Vraag de coach... bijv. hoe stel ik een wijn voor?')+'"><button id="coachGo">'+T('pd.tr.coach','Vraag')+'</button></div>'+
+      (totaal ? '<div style="margin-top:0.6rem;"><div style="display:flex;justify-content:space-between;font-size:0.66rem;color:var(--soft);"><span>'+T('pd.tr.prog','Voortgang')+'</span><span>'+klaar+' / '+totaal+' '+T('pd.tr.read','gelezen')+'</span></div>'+
+        '<div style="height:7px;border-radius:99px;background:var(--line,rgba(255,255,255,0.1));margin-top:0.3rem;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--gold),#e6c874);border-radius:99px;transition:width .35s;"></div></div>'+
+        (totaal && klaar >= totaal ? '<div style="margin-top:0.3rem;font-size:0.7rem;color:var(--green);">🎉 '+T('pd.tr.allread','Alle tips gelezen. Topper!')+'</div>' : '')+'</div>' : '')+
+      (coachRef ? '<div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--gold);">🎓 '+T('pd.tr.ctx','Coaching voor')+' '+esc(coachRefTafel||coachRef)+
+        ' <button id="coachClr" class="abtn ghost" style="padding:0.1rem 0.4rem;font-size:0.68rem;line-height:1;">✕</button></div>' : '')+
+      '<div class="compose" style="padding:0.55rem 0 0;"><input id="coachVraag" placeholder="'+(coachRef?T('pd.tr.askctx','Vraag over deze tafel... bijv. waar let ik op?'):T('pd.tr.ask','Vraag de coach... bijv. hoe stel ik een wijn voor?'))+'"><button id="coachGo">'+T('pd.tr.coach','Vraag')+'</button></div>'+
       (coachAntwoord ? '<div style="margin-top:0.55rem;padding:0.65rem 0.8rem;border-radius:12px;background:var(--panel2,rgba(255,255,255,0.04));border:1px solid var(--line,rgba(255,255,255,0.08));">'+
-        '<div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+(coachAntwoord.bron==='ai'?T('pd.tr.ai','AI-coach'):T('pd.tr.bib','Uit de tips'))+'</div>'+
+        '<div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+(coachAntwoord.bron==='ai'?T('pd.tr.ai','AI-coach'):T('pd.tr.bib','Uit de tips'))+(coachAntwoord.tafel?' · '+esc(coachAntwoord.tafel):'')+'</div>'+
         '<span style="display:block;margin-top:0.25rem;font-size:0.82rem;line-height:1.55;">'+esc(coachAntwoord.antwoord)+'</span></div>' : '')+
       (alle.length ? '<button class="abtn ghost" id="tipsToggle" style="width:100%;margin-top:0.6rem;">'+(tipsOpen?'▲ '+T('pd.tr.hide','Verberg de tips'):'▼ '+T('pd.tr.all','Alle tips voor mijn rol')+' ('+alle.length+')')+'</button>' : '')+
-      (tipsOpen ? '<div style="margin-top:0.5rem;display:flex;flex-direction:column;gap:0.4rem;">'+alle.map(x =>
-        '<div class="task" style="align-items:flex-start;"><span class="ic">💡</span><div class="t"><b>'+esc(x.t)+'</b><span style="line-height:1.5;">'+esc(x.s)+'</span></div>'+
-        (t.kanBeheren && eigen.some(e => e.t === x.t) ? '<button class="abtn ghost" data-tiprm="'+esc(x.t)+'" style="flex:0 0 auto;padding:0.25rem 0.5rem;font-size:0.7rem;">✕</button>' : '')+
-        '</div>').join('')+'</div>' : '')+
+      (tipsOpen ? '<div style="margin-top:0.5rem;display:flex;flex-direction:column;gap:0.4rem;">'+alle.map(x => {
+        const g = gelezen.includes(x.t);
+        return '<div class="task" style="align-items:flex-start;'+(g?'opacity:0.7;':'')+'">'+
+          '<button class="ic" data-tipread="'+esc(x.t)+'" aria-label="'+(g?T('pd.tr.unread','Markeer als ongelezen'):T('pd.tr.mark','Markeer als gelezen'))+'" style="cursor:pointer;background:none;border:none;font-size:1.1rem;">'+(g?'✅':'⬜')+'</button>'+
+          '<div class="t"><b>'+esc(x.t)+'</b><span style="line-height:1.5;">'+esc(x.s)+'</span></div>'+
+          (t.kanBeheren && eigen.some(e => e.t === x.t) ? '<button class="abtn ghost" data-tiprm="'+esc(x.t)+'" style="flex:0 0 auto;padding:0.25rem 0.5rem;font-size:0.7rem;">✕</button>' : '')+
+          '</div>';
+      }).join('')+'</div>' : '')+
       (t.kanBeheren ? '<div style="margin-top:0.7rem;padding-top:0.6rem;border-top:1px solid var(--line,rgba(255,255,255,0.08));">'+
         '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin-bottom:0.4rem;">'+T('pd.tr.own','Eigen huistip toevoegen')+'</div>'+
         '<input id="tipTitel" placeholder="'+T('pd.tr.title','Titel, bijv. Onze wijn-aanpak')+'" style="width:100%;margin-bottom:0.4rem;">'+
@@ -583,10 +602,18 @@
       const vraag = (inp.value || '').trim();
       if (!vraag) return;
       cg.disabled = true; cg.textContent = '...';
-      try { coachAntwoord = await API.call('/supplier/coach', { vraag }); }
+      try { coachAntwoord = await API.call('/supplier/coach', coachRef ? { vraag, ref: coachRef } : { vraag }); }
       catch(e){ toast(e.message); }
       renderHulp(); openTab('hulp');
     });
+    const cc = document.getElementById('coachClr');
+    if (cc) cc.addEventListener('click', () => { coachRef = null; coachRefTafel = null; renderHulp(); openTab('hulp'); });
+    document.querySelectorAll('[data-tipread]').forEach(b => b.addEventListener('click', async () => {
+      const titel = b.dataset.tipread;
+      const uit = (trainData.gelezen || []).includes(titel);
+      try { const d = await API.call('/supplier/training/gelezen', { titel, uit }); if (trainData) trainData.gelezen = d.gelezen; renderHulp(); openTab('hulp'); }
+      catch(e){ toast(e.message); }
+    }));
     const tt = document.getElementById('tipsToggle');
     if (tt) tt.addEventListener('click', () => { tipsOpen = !tipsOpen; renderHulp(); openTab('hulp'); });
     const ta = document.getElementById('tipAdd');

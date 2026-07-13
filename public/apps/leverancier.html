@@ -655,6 +655,7 @@
   <div id="toast"></div>
 </div>
 
+<script src="/apps/util.js"></script>
 <script src="/shared/appshell.js"></script>
 <script>
 (function(){
@@ -2656,32 +2657,38 @@
   // ---- orders ----
   const NEXT = { 'nieuw':'in bereiding', 'in bereiding':'klaar', 'klaar':'geserveerd' };
   function pillClass(st){ return st==='nieuw'?'nieuw':st==='in bereiding'?'bereiding':(st==='klaar'||st==='geserveerd')?'klaar':''; }
+  // Met het componentframework (Util.el): tekst (gast-codenaam, gerechtnamen,
+  // allergie) wordt structureel als tekstknoop gezet -> altijd veilig, en elke
+  // knop draagt zijn eigen handler (geen losse her-binding meer).
+  function orderKaart(o){
+    const E = Util.el;
+    return E('div', { class: 'order', dataset: { ref: o.ref } },
+      E('div', { class: 'top' },
+        E('div', {},
+          E('div', { class: 'who' }, T('sup.guest', 'Gast') + ' ', E('span', { class: 'cn' }, o.customerCodename)),
+          E('div', { class: 'ref' }, o.ref + ' · ' + timeAgo(o.at)),
+          (o.pickup && !['geserveerd', 'geweigerd', 'terugbetaald'].includes(o.status))
+            ? E('div', { class: 'pickup' }, T('sup.pickup', 'Ophaalcode') + ' ', E('b', {}, o.pickup)) : null),
+        E('div', { style: { textAlign: 'right' } },
+          E('div', { class: 'amt' }, eur(o.total)),
+          E('div', { style: { marginTop: '0.3rem' } }, E('span', { class: 'pill ' + pillClass(o.status) }, tStatus(o.status))))),
+      E('ul', {}, o.items.map(i => E('li', {}, E('span', {}, i.qty + '× ' + i.name), E('span', {}, eur(i.price * i.qty))))),
+      o.guestArrived ? E('div', { class: 'enroute here' }, '🎉 ' + T('sup.guesthere', 'Gast is gearriveerd. Serveer nu.'))
+        : (o.guestEtaMin != null ? E('div', { class: 'enroute' }, '📍 ' + T('sup.guesteta', 'Gast onderweg, arriveert over ~') + o.guestEtaMin + ' ' + T('sup.min', 'min') + '. ' + T('sup.readyontime', 'Zet op tijd klaar.')) : null),
+      o.allergyNote ? E('div', { class: 'allergy' }, '⚠ ' + T('sup.allergy', 'Allergie:') + ' ' + o.allergyNote) : null,
+      o.tagSalon ? E('div', { class: 'salon' }, '✦ ' + T('sup.wantssalon', 'Gast wil dit taggen voor De Salon')) : null,
+      E('div', { class: 'acts' },
+        E('span', { class: 'pill ' + (o.paid ? 'betaald' : 'onbetaald') },
+          o.refunded ? T('sup.refunded', 'terugbetaald') : (o.paid ? '✓ ' + T('bo.paid', 'betaald') : T('sup.notpaid', 'nog niet betaald'))),
+        NEXT[o.status] ? E('button', { class: 'obtn primary js-next', onclick: () => setStatus(o.ref, NEXT[o.status]) }, T('sup.markas', 'Markeer:') + ' ' + tStatus(NEXT[o.status])) : null,
+        o.status === 'nieuw' ? E('button', { class: 'obtn warn js-reject', onclick: () => setStatus(o.ref, 'geweigerd') }, T('sup.reject', 'Weiger')) : null,
+        (o.paid && !o.refunded) ? E('button', { class: 'obtn warn js-refund', onclick: () => refund(o.ref) }, T('sup.refund', 'Terugstorten')) : null));
+  }
   function renderOrders(){
     const list = state.orders || [];
-    $('#orderList').innerHTML = list.length ? list.map(o =>
-      '<div class="order" data-ref="'+o.ref+'">'+
-        '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+o.customerCodename+'</span></div><div class="ref">'+o.ref+' · '+timeAgo(o.at)+'</div>'+
-          (o.pickup && !['geserveerd','geweigerd','terugbetaald'].includes(o.status) ? '<div class="pickup">'+T('sup.pickup','Ophaalcode')+' <b>'+o.pickup+'</b></div>' : '')+'</div>'+
-          '<div style="text-align:right;"><div class="amt">'+eur(o.total)+'</div><div style="margin-top:0.3rem;"><span class="pill '+pillClass(o.status)+'">'+tStatus(o.status)+'</span></div></div></div>'+
-        '<ul>'+o.items.map(i=>'<li><span>'+i.qty+'× '+i.name+'</span><span>'+eur(i.price*i.qty)+'</span></li>').join('')+'</ul>'+
-        (o.guestArrived?'<div class="enroute here">🎉 '+T('sup.guesthere','Gast is gearriveerd. Serveer nu.')+'</div>':(o.guestEtaMin!=null?'<div class="enroute">📍 '+T('sup.guesteta','Gast onderweg, arriveert over ~')+o.guestEtaMin+' '+T('sup.min','min')+'. '+T('sup.readyontime','Zet op tijd klaar.')+'</div>':''))+
-        (o.allergyNote?'<div class="allergy">⚠ '+T('sup.allergy','Allergie:')+' '+o.allergyNote+'</div>':'')+
-        (o.tagSalon?'<div class="salon">✦ '+T('sup.wantssalon','Gast wil dit taggen voor De Salon')+'</div>':'')+
-        '<div class="acts">'+
-          '<span class="pill '+(o.paid?'betaald':'onbetaald')+'">'+(o.refunded?T('sup.refunded','terugbetaald'):o.paid?'✓ '+T('bo.paid','betaald'):T('sup.notpaid','nog niet betaald'))+'</span>'+
-          (NEXT[o.status]?'<button class="obtn primary js-next">'+T('sup.markas','Markeer:')+' '+tStatus(NEXT[o.status])+'</button>':'')+
-          (o.status==='nieuw'?'<button class="obtn warn js-reject">'+T('sup.reject','Weiger')+'</button>':'')+
-          (o.paid&&!o.refunded?'<button class="obtn warn js-refund">'+T('sup.refund','Terugstorten')+'</button>':'')+
-        '</div>'+
-      '</div>'
-    ).join('') : '<div class="empty">'+T('sup.noorders','Nog geen bestellingen. Zodra een RTG-gast bij u bestelt, verschijnt het hier, live.')+'</div>';
-    document.querySelectorAll('.order').forEach(el => {
-      const ref = el.dataset.ref;
-      const o = list.find(x=>x.ref===ref);
-      const nb = el.querySelector('.js-next'); if (nb) nb.addEventListener('click', ()=>setStatus(ref, NEXT[o.status]));
-      const rj = el.querySelector('.js-reject'); if (rj) rj.addEventListener('click', ()=>setStatus(ref,'geweigerd'));
-      const rf = el.querySelector('.js-refund'); if (rf) rf.addEventListener('click', ()=>refund(ref));
-    });
+    const wrap = $('#orderList');
+    if (!list.length){ Util.vervang(wrap, Util.el('div', { class: 'empty' }, T('sup.noorders', 'Nog geen bestellingen. Zodra een RTG-gast bij u bestelt, verschijnt het hier, live.'))); return; }
+    Util.vervang(wrap, list.map(orderKaart));
   }
   async function setStatus(ref, status){
     try { await API.call('/supplier/order/status', {ref, status}); toast(T('sup.status','Status:')+' '+tStatus(status)); await refresh(); }

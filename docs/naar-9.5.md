@@ -24,8 +24,8 @@ componentframework (`util.js`) dwingt escaping af maar wordt door ~4 van de apps
 gebruikt.
 
 - [x] Referentie: PDA-trainingskaart gebouwd met `Util.el` (geen `esc()` meer).
-- [ ] Migreer de hete render-functies van `app.html` (94× innerHTML) en
-  `leverancier.html` (68×) naar `Util.el`.
+- [~] leverancier.html: renderOrders naar Util.el (gedekt door de kassa-e2e);
+  overige hete render-functies van app.html/leverancier.html nog open.
 - [ ] `check.js`-regel die `innerHTML +=` met een niet-ge-escapete variabele markeert.
 
 ## 3. Stille fouten wegnemen (beleving)

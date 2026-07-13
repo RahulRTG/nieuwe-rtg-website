@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>RTG, de app</title>
 <link rel="manifest" id="manifestLink" href="/manifests/pas-rtg.webmanifest">
-<link rel="icon" href="/icons/leden.svg" type="image/svg+xml">
+<link rel="icon" href="/icons/pas-rtg.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -782,6 +782,7 @@
       <button type="submit" data-i18n="gate.sendreset">Stuur herstel-link</button>
     </form>
     <form class="login-form" id="resetForm" style="display:none;">
+      <input id="rsCode" inputmode="numeric" maxlength="6" placeholder="Code van uw telefoon (6 cijfers)" data-i18n-ph="gate.smscode" autocomplete="one-time-code">
       <input id="rsPass" type="password" placeholder="Nieuw wachtwoord" data-i18n-ph="gate.newpass2" autocomplete="new-password">
       <button type="submit" data-i18n="gate.doreset">Stel nieuw wachtwoord in</button>
     </form>
@@ -806,6 +807,9 @@
         <button class="bell" id="bell" aria-label="Meldingen">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
           <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
+        </button>
+        <button class="bell" id="boBtn" aria-label="Mijn backoffice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.09a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.03z"/></svg>
         </button>
         <button class="code-chip" id="codeChip"><span class="cdot"></span><span id="codeChipTxt"></span></button>
       </div>
@@ -964,6 +968,16 @@
       <button class="zak-tab" data-zaktab="profiel" data-i18n="zak.tab.prof">Mijn profiel</button>
     </div>
     <div class="ms-body" id="zakBody"></div>
+  </div>
+
+  <!-- Mijn backoffice: de slimme accountkamer van elke pas -->
+  <div id="bo-scrim" class="menu-scrim"></div>
+  <div id="bo-sheet" class="menu-sheet">
+    <div class="ms-head">
+      <div><b data-i18n="bo2.h">Mijn backoffice</b><span id="boSub"></span></div>
+      <button class="ms-close" id="boClose" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ms-body" id="boBody"></div>
   </div>
 
   <!-- gastchat met een partner (roomservice, eigenaar) -->
@@ -1336,7 +1350,7 @@
   if (resetForm) resetForm.addEventListener('submit', async e => {
     e.preventDefault();
     try {
-      await API.call('/auth/reset', { token: resetToken, password: $('#rsPass').value });
+      await API.call('/auth/reset', { token: resetToken, code: $('#rsCode').value, password: $('#rsPass').value });
       toast(T('gate.resetok','Wachtwoord aangepast. Log in met uw nieuwe wachtwoord.'));
       showGateForm('login');
     } catch (e2){ toast(e2.message || 'Herstel mislukt.'); }
@@ -3563,6 +3577,91 @@
     }
   }
 
+  /* ---------- Mijn backoffice: de slimme accountkamer van elke pas ---------- */
+  function boOpen(){ $('#bo-scrim').classList.add('open'); $('#bo-sheet').classList.add('open'); boRender(); }
+  function boDicht(){ $('#bo-scrim').classList.remove('open'); $('#bo-sheet').classList.remove('open'); }
+  $('#boBtn').addEventListener('click', boOpen);
+  $('#boClose').addEventListener('click', boDicht);
+  $('#bo-scrim').addEventListener('click', boDicht);
+  const naarTab = (naam) => { boDicht(); const b = document.querySelector('#tabbar [data-tab="' + naam + '"]'); if (b) b.click(); };
+
+  async function boRender(){
+    const body = $('#boBody');
+    $('#boSub').textContent = (TIER_LABEL[user.tier] || '') + ' · ' + (user.codename || user.name || '');
+    const kaart = (titel, inhoud) => '<div class="zak-kaart"><b style="font-size:0.8rem;">' + titel + '</b>' + inhoud + '</div>';
+    const rij = (l, w) => '<div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-top:0.4rem;"><span style="color:var(--muted);">' + l + '</span><b>' + w + '</b></div>';
+    const knopje = (id, tekst) => '<button id="' + id + '" style="margin-top:0.55rem;margin-right:0.4rem;background:none;border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.85rem;color:var(--txt);font-family:inherit;font-size:0.7rem;cursor:pointer;">' + tekst + '</button>';
+
+    // de slimme cijfers: wat er open staat komt bovenaan, met een knop erbij
+    const open = invoices.filter(i => i.status === 'open');
+    const betaald = invoices.filter(i => i.status === 'paid');
+    const totaalBetaald = betaald.reduce((s, i) => s + (i.netto || 0) + (i.bijdrage || 0), 0);
+    const fonds = betaald.reduce((s, i) => s + Math.round((i.bijdrage || 0) * 0.3), 0);
+    const acties = [];
+    if (open.length) acties.push('💳 ' + open.length + ' ' + T('bo2.open','openstaande factuur/facturen; betaal in één tik via Betalen.'));
+    if (user.account && user.emailVerified === false) acties.push('✉️ ' + T('bo2.mailniet','Uw e-mailadres is nog niet bevestigd.'));
+    if (user.account && user.verified && user.verified !== 'verified') acties.push('🪪 ' + T('bo2.kyc','Verifieer uw identiteit om in één tik te boeken.'));
+
+    let html = '';
+    if (acties.length) html += kaart('⚡ ' + T('bo2.acties','Nu aandacht nodig'),
+      acties.map(a => '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + a + '</div>').join('') +
+      (open.length ? knopje('boNaarBetalen', T('bo2.betaalnu','Naar Betalen')) : ''));
+    else html += kaart('✓ ' + T('bo2.alsklaar','Alles op orde'), '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;">' + T('bo2.geen','Geen openstaande zaken op uw account.') + '</div>');
+
+    html += kaart('📊 ' + T('bo2.cijfers','Mijn cijfers'),
+      rij(T('bo2.betaald','Betaald via RTG'), eur(totaalBetaald)) +
+      rij(T('bo2.facturen','Facturen'), betaald.length + ' ' + T('bo2.voldaan','voldaan') + (open.length ? ' · ' + open.length + ' open' : '')) +
+      rij('RTFoundation', eur(fonds) + ' ' + T('bo2.viamij','via mijn bijdragen')) +
+      (myApps && myApps.length ? rij(T('bo2.sollicitaties','Sollicitaties'), String(myApps.length)) : ''));
+
+    if (user.account){
+      html += kaart('🔐 ' + T('bo2.beveiliging','Beveiliging'),
+        rij(T('bo2.lidsinds','Lid sinds'), user.since || '') +
+        rij(T('bo2.email','E-mail bevestigd'), user.emailVerified === false ? T('bo2.nee','nee') : T('bo2.ja','ja')) +
+        '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.5rem;line-height:1.5;">' + T('bo2.2fa','Wachtwoord vergeten? Dat herstelt u via de website in twee stappen: een link per e-mail plus een code op uw telefoon.') + '</div>' +
+        '<div style="display:flex;gap:0.4rem;margin-top:0.55rem;flex-wrap:wrap;">' +
+        '<input id="boWwHuidig" type="password" placeholder="' + T('bo2.huidig','Huidig wachtwoord') + '" autocomplete="current-password" style="flex:1;min-width:9rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.65rem;color:var(--txt);font-family:inherit;font-size:0.76rem;">' +
+        '<input id="boWwNieuw" type="password" placeholder="' + T('bo2.nieuw','Nieuw wachtwoord') + '" autocomplete="new-password" style="flex:1;min-width:9rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.65rem;color:var(--txt);font-family:inherit;font-size:0.76rem;">' +
+        '</div>' + knopje('boWwZet', T('bo2.wijzig','Wijzig wachtwoord')) +
+        (user.emailVerified === false ? knopje('boVerstuur', T('bo2.verstuur','Stuur bevestigingsmail opnieuw')) : ''));
+    } else {
+      html += kaart('🔐 ' + T('bo2.beveiliging','Beveiliging'),
+        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.demo','U gebruikt een demoprofiel. Met een echt account beheert u hier uw wachtwoord en tweestapsherstel.') + '</div>');
+    }
+
+    // pas-specifiek: elke pas zijn eigen slimme snelkoppelingen
+    if (user.tier === 'business'){
+      html += kaart('💼 ' + T('bo2.vb','Voor uw Business Pass'),
+        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.vb.s','Uw facturen zijn boekhoudklaar. De AI-boekhouder en de zzp-belastingtool staan onder Betalen; uw netwerk onder Salon.') + '</div>' +
+        knopje('boNaarBoekhouder', '📚 ' + T('bo2.boekhouder','AI-boekhouder')) + knopje('boNaarZakelijk', '💼 RTG Zakelijk'));
+    } else if (user.tier === 'lifestyle'){
+      html += kaart('🌙 ' + T('bo2.vl','Voor uw Lifestyle Pass'),
+        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.vl.s','Uw concierge denkt vooruit onder AI; uw professionele netwerk staat onder Salon.') + '</div>' +
+        knopje('boNaarAi', '✨ ' + T('bo2.concierge','Concierge')) + knopje('boNaarZakelijk', '💼 RTG Zakelijk'));
+    } else {
+      html += kaart('🎫 ' + T('bo2.vr','Voor uw pas'),
+        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.vr.s','Boeken, betalen, vrienden en De Salon zitten in uw pas. Lifestyle en Business voegen de concierge, de AI-boekhouder en RTG Zakelijk toe.') + '</div>');
+    }
+    body.innerHTML = html;
+
+    const bind = (id, fn) => { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); };
+    bind('boNaarBetalen', () => naarTab('betalen'));
+    bind('boNaarBoekhouder', () => naarTab('betalen'));
+    bind('boNaarAi', () => naarTab('ai'));
+    bind('boNaarZakelijk', () => { boDicht(); naarTab('salon'); setTimeout(() => { const z = document.getElementById('zakOpenBtn'); if (z) z.click(); }, 150); });
+    bind('boVerstuur', async () => {
+      try { const d = await API.call('/auth/resend'); toast(T('bo2.gestuurd','Bevestigingsmail verstuurd.')); if (d.devVerifyUrl) console.log('verify:', d.devVerifyUrl); }
+      catch(e){ toast(e.message); }
+    });
+    bind('boWwZet', async () => {
+      try {
+        await API.call('/auth/password', { huidig: $('#boWwHuidig').value, nieuw: $('#boWwNieuw').value });
+        $('#boWwHuidig').value = ''; $('#boWwNieuw').value = '';
+        toast(T('bo2.gewijzigd','Wachtwoord gewijzigd.'));
+      } catch(e){ toast(e.message); }
+    });
+  }
+
   /* ---------- salon ---------- */
 
   function renderSalon(){
@@ -3819,6 +3918,21 @@ window.I18N = { en: {
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
   'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.forgotsent':'If this email is known, we will send a reset link.',
   'gate.newpass2':'New password', 'gate.doreset':'Set new password', 'gate.resetok':'Password changed. Sign in with your new password.',
+  'gate.smscode':'Code from your phone (6 digits)',
+  'bo2.h':'My back office', 'bo2.acties':'Needs your attention', 'bo2.alsklaar':'All in order',
+  'bo2.geen':'Nothing outstanding on your account.', 'bo2.open':'outstanding invoice(s); pay in one tap via Payments.',
+  'bo2.mailniet':'Your email address has not been confirmed yet.', 'bo2.kyc':'Verify your identity to book in one tap.',
+  'bo2.betaalnu':'Go to Payments', 'bo2.cijfers':'My numbers', 'bo2.betaald':'Paid via RTG',
+  'bo2.facturen':'Invoices', 'bo2.voldaan':'paid', 'bo2.viamij':'through my contributions', 'bo2.sollicitaties':'Job applications',
+  'bo2.beveiliging':'Security', 'bo2.lidsinds':'Member since', 'bo2.email':'Email confirmed', 'bo2.ja':'yes', 'bo2.nee':'no',
+  'bo2.2fa':'Forgot your password? You recover it on the website in two steps: a link by email plus a code on your phone.',
+  'bo2.huidig':'Current password', 'bo2.nieuw':'New password', 'bo2.wijzig':'Change password',
+  'bo2.verstuur':'Resend confirmation email', 'bo2.gestuurd':'Confirmation email sent.', 'bo2.gewijzigd':'Password changed.',
+  'bo2.demo':'You are using a demo profile. With a real account you manage your password and two-step recovery here.',
+  'bo2.vb':'For your Business Pass', 'bo2.vb.s':'Your invoices are accounting-ready. The AI bookkeeper and freelance tax tool live under Payments; your network under Salon.',
+  'bo2.boekhouder':'AI bookkeeper', 'bo2.vl':'For your Lifestyle Pass',
+  'bo2.vl.s':'Your concierge thinks ahead under AI; your professional network lives under Salon.', 'bo2.concierge':'Concierge',
+  'bo2.vr':'For your pass', 'bo2.vr.s':'Booking, payments, friends and The Salon come with your pass. Lifestyle and Business add the concierge, the AI bookkeeper and RTG Business Network.',
   'gate.kies':'Every pass has its own app. Choose yours:',
   'gate.kies.rtg':'The membership; also free to use without a pass',
   'gate.kies.life':'With concierge and RTG Business Network',

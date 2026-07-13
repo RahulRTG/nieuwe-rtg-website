@@ -281,6 +281,7 @@ async function startPostgres() {
 }
 // Laatste flush bij het afsluiten, zodat niets in de write-behind blijft hangen.
 async function flushBijAfsluiten() {
+  if (db.writable && saveVuil) { try { schrijfSnapshotNu(); } catch (e) {} }
   if (STORE !== 'postgres' || !pg || !db.writable) return;
   try { await pg.flush(db.data); } catch (e) {}
 }
@@ -346,24 +347,55 @@ function schrijfDuurzaam(doel, data, mode) {
   try { const dfd = fs.openSync(path.dirname(doel), 'r'); try { fs.fsyncSync(dfd); } finally { fs.closeSync(dfd); } } catch (e) {}
 }
 
+/* Write-behind voor het volledige-snapshot-schrijven (JSON-opslag en de lokale
+   snapshot in Postgres-modus). Het serialiseren van de HELE datastore is O(alle
+   data): bij een grote kast (honderdduizenden tickets) kostte elke mutatie
+   tientallen tot honderden ms synchroon, en onder spitsdruk stapelde dat op tot
+   seconden wachtrij voor de hele server. Daarom: de eerste save schrijft nog
+   steeds DIRECT (zelfde duurzaamheid voor losse acties), maar een burst wordt
+   gecoalesceerd tot een flush per venster. Het venster reguleert zichzelf: nooit
+   vaker dan eens per RTG_SAVE_MS en nooit meer dan ~25% van de tijd aan het
+   schrijven (4x de laatst gemeten flushduur). Bij een harde crash kan zo
+   hooguit een venster aan mutaties verloren gaan; SIGTERM/SIGINT flushen altijd
+   eerst (zie flushBijAfsluiten). Voor echt grote datasets is Postgres of
+   RTG_STORE=sqlite de juiste opslag; dit houdt de JSON-modus eerlijk overeind.*/
+const SAVE_MS = Number(process.env.RTG_SAVE_MS || 250);
+let saveTimer = null, saveVuil = false, saveDuur = 0, saveKlaar = 0;
+function schrijfSnapshotNu() {
+  saveVuil = false;
+  const t0 = Date.now();
+  try {
+    beslotenMap(DATA_DIR);
+    // compact (geen pretty-print): bij grote data scheelt dat ~40% tijd en ruimte
+    const uit = kluis.AAN ? kluis.versleutel(JSON.stringify(db.data)) : JSON.stringify(db.data);
+    schrijfDuurzaam(DB_FILE, uit, 0o600);
+    besloten(DB_FILE);
+    if (STORE !== 'postgres') spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis
+  } catch (e) { console.warn('[db] snapshot schrijven mislukt:', e.message); }
+  saveDuur = Date.now() - t0;
+  saveKlaar = Date.now();
+}
+function planSnapshot() {
+  saveVuil = true;
+  if (saveTimer) return;
+  const venster = Math.max(SAVE_MS, saveDuur * 4);
+  const sinds = Date.now() - saveKlaar;
+  if (sinds >= venster) return schrijfSnapshotNu(); // losse actie: meteen, net als vroeger
+  saveTimer = setTimeout(() => { saveTimer = null; if (saveVuil) schrijfSnapshotNu(); }, venster - sinds);
+  if (saveTimer.unref) saveTimer.unref();
+}
 function save() {
   if (!db.writable) return;
   if (STORE === 'postgres') {
-    // Duurzaam lokaal wegschrijven (snapshot/fallback) + async flush naar
-    // Postgres plannen (write-behind, gecoalesceerd). Zo blijft save() synchroon
-    // en snel, terwijl Postgres de gedeelde, duurzame waarheid wordt.
-    schrijfLokaleSnapshotStil();
+    // Lokale snapshot (warme cache/fallback) gecoalesceerd + async flush naar
+    // Postgres plannen (write-behind). Postgres is de duurzame waarheid.
+    planSnapshot();
     planFlush();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
     saveSqlite();
   } else {
-    beslotenMap(DATA_DIR);
-    // Atomisch + duurzaam wegschrijven (zie schrijfDuurzaam).
-    const uit = kluis.AAN ? kluis.versleutel(JSON.stringify(db.data)) : JSON.stringify(db.data, null, 2);
-    schrijfDuurzaam(DB_FILE, uit, 0o600);
-    besloten(DB_FILE);
-    spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis (lees-replica's)
+    planSnapshot();
   }
 }
 

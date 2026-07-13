@@ -12,9 +12,9 @@ toast uit. Doel: één gedeelde laag, zodat elke app zich identiek gedraagt.
 
 - [x] Gedeelde verbindingslaag `public/shared/verbinding.js` (offline-banner +
   `RTGNet.fout` + `RTGNet.haal`), ingesloten in alle flagship-apps.
-- [ ] `public/shared/appshell.js`: canonieke `API`-factory + `bootSession()`
+- [x] `public/shared/appshell.js`: canonieke `API`-factory (RTGApp.maakAPI) + `bootSession()`
   ({tokenKey, statePad, onState}) + realtime-wiring.
-- [ ] Migreer `personeel.html` (rijkste e2e-dekking) als referentie.
+- [x] Migreer `personeel.html` (rijkste e2e-dekking) als referentie.
 - [ ] Migreer `app.html`, `leverancier.html`, `backoffice.html` (elk gedekt door
   een e2e-boot-test die login + geen JS-fouten bewijst).
 

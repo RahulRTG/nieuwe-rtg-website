@@ -208,6 +208,7 @@
 </div>
 
 <script src="/apps/util.js"></script>
+<script src="/shared/appshell.js"></script>
 <script>
 (function(){
   const $ = s => document.querySelector(s);
@@ -235,15 +236,9 @@
     IBIZALIV:{ name:'Ibiza Living Estates', icon:'🏡' }
   };
 
-  const API = {
-    token: null,
-    async call(path, body){
-      const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(this.token?{'Authorization':'Bearer '+this.token}:{})}, body: JSON.stringify(Object.assign({ lang: (window.RTGi18n ? RTGi18n.lang : 'nl') }, body||{})) });
-      const data = await res.json().catch(()=>({}));
-      if (!res.ok) throw new Error(data.error||'Fout');
-      return data;
-    }
-  };
+  // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
+  // zodat alle apps zich identiek gedragen.
+  const API = RTGApp.maakAPI();
 
   let state = null, me = null, code = null, week = null;
   let toastTimer;

@@ -1,7 +1,7 @@
 /* Domein "member" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, findSupplier, magBezorgen, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept } = kern;
+  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept } = kern;
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
 
@@ -1117,5 +1117,59 @@ app.post('/api/bezorg/volg', auth, (req, res) => {
     positie: o.status === 'onderweg' && pos ? { lat: pos.lat, lng: pos.lng, at: pos.at } : null,
     etaMin: o.status === 'onderweg' ? (o.etaMin || null) : null
   });
+});
+
+/* ================== tickets: activiteiten, tours en musea ==================
+   Tijdsloten met capaciteit; betalen vooraf via de bestaande boekingstroom
+   (/api/booking/pay). Het ticket krijgt een entreecode die het personeel aan
+   de deur op eigen naam afvinkt. */
+app.post('/api/tickets/aanbod', auth, (req, res) => {
+  const partners = db.data.suppliers
+    .filter(s => ((db.data.supplierTypes[s.type] || {}).caps || []).includes('tickets') && (s.activiteiten || []).length)
+    .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null, activiteiten: s.activiteiten.slice(0, 30) }));
+  res.json({ partners });
+});
+
+app.post('/api/ticket/koop', auth, (req, res) => {
+  const s = findSupplier(req.body.supplierCode);
+  const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
+  if (!s || !caps.includes('tickets')) return res.status(404).json({ error: 'Geen activiteitenpartner gevonden.' });
+  const act = (s.activiteiten || []).find(a => a.id === req.body.activiteitId);
+  if (!act) return res.status(404).json({ error: 'Deze activiteit bestaat niet (meer).' });
+  const datum = String(req.body.datum || '');
+  const tijd = String(req.body.tijd || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < new Date().toISOString().slice(0, 10))
+    return res.status(400).json({ error: 'Kies een datum vanaf vandaag.' });
+  if (!(act.tijden || []).includes(tijd)) return res.status(400).json({ error: 'Kies een tijdslot van deze activiteit.' });
+  const personen = Math.min(10, Math.max(1, parseInt(req.body.personen, 10) || 1));
+  const bezet = ticketsVoorSlot(s.code, act.id, datum, tijd).reduce((n, t) => n + (t.personen || 1), 0);
+  if (bezet + personen > act.capaciteit)
+    return res.status(409).json({ error: 'Dit tijdslot heeft nog ' + Math.max(0, act.capaciteit - bezet) + ' plek(ken). Kies een ander slot.' });
+  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  const ticket = {
+    ref: 'RTG-T-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    kind: 'ticket', code: entreeCode(),
+    supplierCode: s.code, supplierName: s.name,
+    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    service: { id: act.id, name: act.name, soort: 'ticket' },
+    activiteitId: act.id, datum, tijd, personen,
+    price: (act.prijs || 0) * personen,
+    wanneer: datum + ' ' + tijd,
+    betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
+  };
+  db.data.boekingen.unshift(ticket);
+  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  save();
+  res.json({ ok: true, ticket }); // afrekenen via /api/booking/pay
+});
+
+app.post('/api/tickets/mijn', auth, (req, res) => {
+  const mijn = db.data.boekingen
+    .filter(b => b.kind === 'ticket' && (b.customerKey || b.customerTier) === req.session.key && b.status !== 'geweigerd' && b.paid)
+    .slice(0, 20)
+    .map(b => ({ ref: b.ref, code: b.code, supplierName: b.supplierName, naam: b.service.name,
+      datum: b.datum, tijd: b.tijd, personen: b.personen, prijs: b.price,
+      gebruikt: !!b.checkin, checkin: b.checkin || null }));
+  res.json({ tickets: mijn });
 });
 };

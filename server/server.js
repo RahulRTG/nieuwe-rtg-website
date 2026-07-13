@@ -105,7 +105,10 @@ const STAFF_SEED = {
   JETAG: [['Sophie Bakker', 'manager', 'Operations'], ['Lucas de Jong', 'staff', 'Crew']],
   // zelfstandigen: eenmanszaken, dus alleen een eigenaar met beheer-rechten
   AYAKA: [['Livia Bergkamp', 'manager', 'Goudsmid']],
-  KAITO: [['Milan de Wit', 'manager', 'Personal trainer']]
+  KAITO: [['Milan de Wit', 'manager', 'Personal trainer']],
+  // activiteiten: beheer plus de mensen aan de deur en op de boot
+  ESVEDRA: [['Marta Salas', 'manager', 'Beheer'], ['Joel Ferrer', 'staff', 'Gids']],
+  MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -468,6 +471,7 @@ function ensureSupplierDefaults(s) {
   // De ophaal/bezorgdienst: horeca en zelfstandigen kunnen een eigen
   // bezorg-assortiment voeren, los van de menukaart ter plaatse.
   if (!s.bezorg || typeof s.bezorg !== 'object') s.bezorg = { aan: false, ophalen: true, bezorgen: true, producten: [] };
+  if (s.type === 'activiteit' && !Array.isArray(s.activiteiten)) s.activiteiten = [];
   if (!Array.isArray(s.bezorg.producten)) s.bezorg.producten = [];
   if (!Array.isArray(s.photos)) s.photos = [];
   if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
@@ -605,6 +609,33 @@ function initRealtime() {
         { id: 's1', name: 'Personal training, privesessie', desc: 'In de hotelgym of buiten, incl. programma op maat', price: 110, duurMin: 60, soort: 'dienst' },
         { id: 's2', name: 'Sportmassage, 60 minuten', desc: 'Op de kamer; tafel en olien inbegrepen', price: 95, duurMin: 60, soort: 'dienst' },
         { id: 's3', name: 'Voedingsplan op maat, per week', desc: 'Afgestemd op reisschema en de keukens onderweg', price: 150, soort: 'product' }
+      ]
+    });
+  }
+  // het activiteiten-genre: tours, musea en experiences verkopen tickets met
+  // tijdsloten en capaciteit; personeel (gids/security/balie) checkt de
+  // entreecode af aan de deur, op eigen naam
+  if (!db.data.supplierTypes.activiteit)
+    db.data.supplierTypes.activiteit = { label: 'Activiteiten & musea', icon: '\u{1F39F}\uFE0F', caps: ['tickets', 'location', 'pricing'] };
+  if (!db.data.suppliers.find(s => s.code === 'ESVEDRA')) {
+    db.data.suppliers.push({
+      code: 'ESVEDRA', name: 'Es Vedra Cruises', type: 'activiteit', city: 'Ibiza',
+      loc: { lat: 38.867, lng: 1.196, label: 'Cala d\'Hort, Ibiza' }, rate: 0.14,
+      menu: [], photos: [],
+      activiteiten: [
+        { id: 'a1', name: 'Sunset cruise met cava', desc: 'Twee uur varen langs Es Vedra, cava en tapas aan boord.', prijs: 79, capaciteit: 24, duur: '2 uur', tijden: ['17:30', '19:30'] },
+        { id: 'a2', name: 'Snorkeltocht drie baaien', desc: 'Kleine boot, maximaal tien gasten, materiaal inbegrepen.', prijs: 55, capaciteit: 10, duur: '3 uur', tijden: ['10:00', '14:00'] }
+      ]
+    });
+  }
+  if (!db.data.suppliers.find(s => s.code === 'MACE')) {
+    db.data.suppliers.push({
+      code: 'MACE', name: 'MACE Museum Eivissa', type: 'activiteit', city: 'Ibiza',
+      loc: { lat: 38.907, lng: 1.436, label: 'Dalt Vila, Ibiza' }, rate: 0.12,
+      menu: [], photos: [],
+      activiteiten: [
+        { id: 'a1', name: 'Entree museum', desc: 'Hedendaagse kunst in het hart van Dalt Vila.', prijs: 12, capaciteit: 80, duur: 'vrij bezoek', tijden: ['10:00', '12:00', '14:00', '16:00'] },
+        { id: 'a2', name: 'Rondleiding met gids', desc: 'Een uur langs de hoogtepunten, kleine groep.', prijs: 24, capaciteit: 15, duur: '1 uur', tijden: ['11:00', '15:00'] }
       ]
     });
   }
@@ -1226,6 +1257,7 @@ function supplierState(s, actor) {
   const zichtBoekingen = alleBoekingen.filter(b => !BOEK_KLAAR[b.status] || String(b.finishedAt || b.at).slice(0, 10) === vandaag).slice(0, 80);
   return {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate, vak: s.vak || null },
+    activiteiten: s.activiteiten || null,
     // de ophaal/bezorgdienst: alleen voor horeca en zelfstandigen
     bezorg: magBezorgen(s) ? {
       aan: !!(s.bezorg && s.bezorg.aan),
@@ -1328,6 +1360,24 @@ const pinFails = new Map(); // 'CODE:staffId' -> { n, until }
 function magBezorgen(s) {
   const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
   return caps.includes('orders') || s.type === 'zzp';
+}
+/* Tickets (activiteiten/musea) leven als boekingen met soort 'ticket', zodat
+   betalen, boekhouding, timeline en export automatisch meedoen. Deze helper
+   geeft de tickets van een tijdslot; verlopen onbetaalde (ouder dan 30 min)
+   tellen niet mee voor de capaciteit. */
+function ticketsVoorSlot(code, activiteitId, datum, tijd) {
+  const nu = Date.now();
+  return db.data.boekingen.filter(b => b.kind === 'ticket' && b.supplierCode === code &&
+    b.activiteitId === activiteitId && b.datum === datum && b.tijd === tijd &&
+    b.status !== 'geweigerd' &&
+    (b.paid || (nu - new Date(b.at).getTime()) < 30 * 60000));
+}
+function entreeCode() {
+  // zes tekens, zonder verwarrende 0/O/1/I: makkelijk voor te lezen aan de deur
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for (let i = 0; i < 6; i++) c += A[crypto.randomInt(A.length)];
+  return c;
 }
 function pickupCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -2692,7 +2742,7 @@ const kern = {
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
-  magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier,
+  entreeCode, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,

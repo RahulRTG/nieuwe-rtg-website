@@ -918,7 +918,9 @@
         <h2 data-i18n="app.v.tp">Ter plaatse.</h2>
         <p class="sub" id="tpSub">Bestel, betaal en reserveer bij RTG-partners op uw bestemming.</p>
         <div id="livePanel"></div>
+        <div id="tkMijn"></div>
         <div id="myOrders"></div>
+        <div id="tkAanbod"></div>
         <div id="afsprakenList"></div>
         <div id="supplierList"></div>
       </div>
@@ -1945,6 +1947,7 @@
     else if (scope === 'gchat'){ if (pchat) loadPChat(); }
     else if (scope === 'apply'){ renderCvCard(); if (apChatId) laadApplyChat(); }
     else if (scope === 'chat'){ if (user.account) renderChat(); }
+    else if (scope === 'tickets'){ laadTickets(); }
     else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
   }
 
@@ -2018,10 +2021,87 @@
     renderSalon();
     renderTerPlaatse();
     laadBestellen();
+    laadTickets();
     loadCv();
     loadVacatures();
     openTab('home');
     if ((rtf.gekoppeld || []).length) ensurePush(false); // stil vernieuwen als het al aan staat
+  }
+
+  /* ---------- tickets: activiteiten, tours en musea ---------- */
+  let tkPartners = [], tkOpen = null, tkKeuze = null;
+  async function laadTickets(){
+    if (!API.live) return;
+    try { tkPartners = (await API.call('/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
+    let mijn = [];
+    try { mijn = (await API.call('/tickets/mijn')).tickets || []; } catch(e){}
+    const mijnEl = $('#tkMijn');
+    if (mijnEl) mijnEl.innerHTML = mijn.filter(t => !t.gebruikt || t.datum >= new Date().toISOString().slice(0, 10)).map(t =>
+      '<div class="card" style="border-color:rgba(208,172,87,0.35);">'+
+      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">\uD83C\uDF9F\uFE0F '+T('tk.ticket','Ticket')+' \u00B7 '+esc(t.supplierName)+'</div>'+
+      '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(t.naam)+'</b> \u00B7 '+t.datum+' '+t.tijd+' \u00B7 '+t.personen+'p</div>'+
+      (t.gebruikt
+        ? '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--green);">\u2705 '+T('tk.gebruikt','Binnen; ingecheckt door ')+esc(t.checkin.door)+'</div>'
+        : '<div style="margin-top:0.5rem;text-align:center;background:rgba(208,172,87,0.12);border:1px dashed rgba(208,172,87,0.5);border-radius:12px;padding:0.55rem;">'+
+          '<span style="font-size:1.3rem;letter-spacing:0.35em;color:var(--gold);font-weight:700;">'+esc(t.code)+'</span>'+
+          '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.2rem;">'+T('tk.laatzien','Laat deze code zien aan de deur')+'</div></div>')+
+      '</div>').join('');
+    renderTkAanbod();
+  }
+  function renderTkAanbod(){
+    const el = $('#tkAanbod'); if (!el) return;
+    if (!tkPartners.length){ el.innerHTML = ''; return; }
+    let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('tk.kop','Activiteiten, tours en musea')+'</div>';
+    for (const p of tkPartners){
+      html += '<div class="card"><b>'+esc(p.name)+'</b> <span style="font-size:0.72rem;color:var(--soft);">\u00B7 '+esc(p.city||'')+'</span>';
+      for (const a of p.activiteiten){
+        const open = tkOpen === p.code + ':' + a.id;
+        html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
+          '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="flex:1;"><div style="font-size:0.88rem;">'+esc(a.name)+'</div>'+
+          (a.desc?'<div style="font-size:0.72rem;color:var(--soft);">'+esc(a.desc)+(a.duur?' \u00B7 '+esc(a.duur):'')+'</div>':'')+'</div>'+
+          '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(a.prijs)+' p.p.</span></div>';
+        if (open){
+          const k = tkKeuze;
+          const dagen = [];
+          for (let d = 0; d < 7; d++){ const dt = new Date(Date.now() + d * 86400000).toISOString().slice(0, 10); dagen.push(dt); }
+          html += '<div style="margin-top:0.5rem;">'+
+            '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;">'+dagen.map(d =>
+              '<button class="bz-btn'+(k.datum===d?' on':'')+'" data-tkd="'+d+'">'+(d===dagen[0]?T('tk.vandaag','vandaag'):d.slice(8)+'/'+d.slice(5,7))+'</button>').join('')+'</div>'+
+            '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.45rem;">'+(a.tijden||[]).map(t2 =>
+              '<button class="bz-btn'+(k.tijd===t2?' on':'')+'" data-tkt="'+t2+'">'+t2+'</button>').join('')+'</div>'+
+            '<div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.55rem;">'+
+            '<span style="font-size:0.78rem;color:var(--muted);">'+T('tk.personen','Personen')+'</span>'+
+            '<button class="bz-btn" data-tkp="-1" style="padding:0.2rem 0.7rem;">\u2212</button><b>'+k.personen+'</b><button class="bz-btn" data-tkp="1" style="padding:0.2rem 0.7rem;">+</button></div>'+
+            '<button class="bz-groot" id="tkKoop" style="margin-top:0.7rem;"'+(k.tijd?'':' disabled')+'>'+T('tk.koop','Koop tickets')+' \u00B7 '+eur(a.prijs * k.personen)+'</button></div>';
+        } else {
+          html += '<button class="bz-btn" data-tkopen="'+p.code+':'+a.id+'" style="margin-top:0.45rem;">'+T('tk.kies','Kies datum en tijd')+'</button>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    el.innerHTML = html;
+    document.querySelectorAll('[data-tkopen]').forEach(b => b.addEventListener('click', () => {
+      tkOpen = b.dataset.tkopen;
+      tkKeuze = { datum: new Date().toISOString().slice(0, 10), tijd: null, personen: 2 };
+      renderTkAanbod();
+    }));
+    document.querySelectorAll('[data-tkd]').forEach(b => b.addEventListener('click', () => { tkKeuze.datum = b.dataset.tkd; renderTkAanbod(); }));
+    document.querySelectorAll('[data-tkt]').forEach(b => b.addEventListener('click', () => { tkKeuze.tijd = b.dataset.tkt; renderTkAanbod(); }));
+    document.querySelectorAll('[data-tkp]').forEach(b => b.addEventListener('click', () => {
+      tkKeuze.personen = Math.min(10, Math.max(1, tkKeuze.personen + Number(b.dataset.tkp))); renderTkAanbod();
+    }));
+    const koop = document.getElementById('tkKoop');
+    if (koop) koop.addEventListener('click', async () => {
+      const [code, actId] = tkOpen.split(':');
+      try {
+        const t = await API.call('/ticket/koop', { supplierCode: code, activiteitId: actId, datum: tkKeuze.datum, tijd: tkKeuze.tijd, personen: tkKeuze.personen });
+        await API.call('/booking/pay', { ref: t.ticket.ref });
+        toast(T('tk.ok','Betaald! Uw entreecode: ') + t.ticket.code);
+        tkOpen = null; tkKeuze = null;
+        laadTickets();
+      } catch(e){ toast(e.message); }
+    });
   }
 
   /* ---------- bestellen: de ophaal/bezorgdienst ---------- */

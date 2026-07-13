@@ -181,6 +181,11 @@
         <p class="sub" data-i18n="pd.v.bezorgen.sub">Uw ritten op naam, met GPS, navigatie en snelle hulp onderweg.</p>
         <div id="bezorgenWrap"></div>
       </div>
+      <div class="view" data-view="entree">
+        <h2 data-i18n="pd.v.entree">Entree</h2>
+        <p class="sub" data-i18n="pd.v.entree.sub">Het programma van vandaag en de entree-check, op uw naam.</p>
+        <div id="entreeWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -193,6 +198,7 @@
       <button data-tab="taken"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span data-i18n="pd.t.taken">Taken</span></button>
       <button data-tab="hulp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span data-i18n="pd.t.hulp">Hulp</span></button>
       <button data-tab="ritten" id="tabRitten" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M7.5 20v1M16.5 20v1"/></svg><span data-i18n="pd.t.ritten">Ritten</span></button>
+      <button data-tab="entree" id="tabEntree" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H6a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M12 6v2M12 11v2M12 16v2"/></svg><span data-i18n="pd.t.entree">Entree</span></button>
       <button data-tab="bezorgen" id="tabBezorgen" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/></svg><span data-i18n="pd.t.bezorgen">Bezorgen</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
@@ -212,13 +218,15 @@
     { id:'horeca',  icon:'🍽️', nl:'Horeca',  en:'Hospitality', sub:'Restaurants, bars, clubs', codes:['KIKUNOI','PONTO'] },
     { id:'verblijf',icon:'🏨', nl:'Verblijf', en:'Stays', sub:'Hotels en appartementen', codes:['HOSHI','SAKURA'] },
     { id:'vervoer', icon:'🚘', nl:'Vervoer', en:'Transport', sub:'Taxi\'s en privéjets', codes:['MKKX','JETAG'] },
-    { id:'zzp', icon:'🧑‍🎨', nl:'Zelfstandig', en:'Independent', sub:'Mode, health, en meer', codes:['AYAKA','KAITO'] }
+    { id:'zzp', icon:'🧑‍🎨', nl:'Zelfstandig', en:'Independent', sub:'Mode, health, en meer', codes:['AYAKA','KAITO'] },
+    { id:'activiteiten', icon:'🎟️', nl:'Activiteiten', en:'Experiences', sub:'Tours, musea, experiences', codes:['ESVEDRA','MACE'] }
   ];
   const BEDRIJVEN = {
     KIKUNOI:{ name:'Sal de Mar', icon:'🍽️' }, PONTO:{ name:'Sunset Ibiza', icon:'🍸' },
     HOSHI:{ name:'Aguamarina Ibiza', icon:'🏨' }, SAKURA:{ name:'Villa Bahia Ibiza', icon:'🏡' },
     MKKX:{ name:'Ibiza Executive Cars', icon:'🚘' }, JETAG:{ name:'Aria Private Aviation', icon:'✈️' },
-    AYAKA:{ name:'Atelier Marfil', icon:'🧑‍🎨' }, KAITO:{ name:'Studio Milan', icon:'🏋️' }
+    AYAKA:{ name:'Atelier Marfil', icon:'🧑‍🎨' }, KAITO:{ name:'Studio Milan', icon:'🏋️' },
+    ESVEDRA:{ name:'Es Vedra Cruises', icon:'⛵' }, MACE:{ name:'MACE Museum Eivissa', icon:'🏛️' }
   };
 
   const API = {
@@ -292,7 +300,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -646,6 +654,47 @@
         uit.textContent = r.reply || vast[sleutel];
       } catch(e){ uit.textContent = vast[sleutel]; }
     }));
+  }
+
+  /* ---- entree: programma van vandaag + check-in op eigen naam ---- */
+  let pdProgramma = null;
+  const heeftEntree = () => !!(state && state.supplier && (state.supplier.caps || []).includes('tickets'));
+  async function laadEntree(){
+    if (!heeftEntree()) return;
+    try { pdProgramma = await API.call('/supplier/programma', {}); } catch(e){ pdProgramma = { datum: '', slots: [] }; }
+    renderEntree();
+  }
+  function renderEntree(){
+    const tabBtn = document.getElementById('tabEntree');
+    if (tabBtn) tabBtn.style.display = heeftEntree() ? '' : 'none';
+    const wrap = $('#entreeWrap');
+    if (!wrap) return;
+    if (!heeftEntree()){ wrap.innerHTML = ''; return; }
+    if (!pdProgramma){ wrap.innerHTML = '<div class="card">\u2026</div>'; laadEntree(); return; }
+    const slots = pdProgramma.slots || [];
+    const totBinnen = slots.reduce((n, x) => n + x.binnen, 0);
+    const totVerkocht = slots.reduce((n, x) => n + x.verkocht, 0);
+    wrap.innerHTML =
+      '<div class="card"><div class="k">'+T('pd.e.check','Entree-check')+'</div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+
+      '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
+      '<button class="abtn" id="pdCheck">'+T('pd.e.binnen','Binnen')+'</button></div>'+
+      '<div id="pdCheckUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);"></div></div>'+
+      '<div class="card"><div class="k">'+T('pd.e.prog','Programma vandaag')+' \u00B7 '+totBinnen+'/'+totVerkocht+' '+T('pd.e.binnen2','binnen')+'</div>'+
+      (slots.length ? slots.map(x =>
+        '<div class="task"><span class="ic">'+(x.binnen>=x.verkocht&&x.verkocht?'\u2705':'\uD83C\uDF9F\uFE0F')+'</span><div class="t"><b>'+x.tijd+' \u00B7 '+esc(x.naam)+'</b>'+
+        '<span>'+x.binnen+'/'+x.verkocht+' '+T('pd.e.binnen2','binnen')+' \u00B7 '+T('pd.e.verkocht','verkocht')+' '+x.verkocht+'/'+x.capaciteit+'</span></div></div>'
+      ).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.e.leeg','Vandaag geen tijdsloten.')+'</div>')+'</div>';
+    const c = document.getElementById('pdCheck');
+    if (c) c.addEventListener('click', async () => {
+      const uit = document.getElementById('pdCheckUit');
+      try {
+        const r = await API.call('/supplier/ticket/checkin', { code: $('#pdCode').value });
+        uit.innerHTML = '<b style="color:var(--green);">\u2705 '+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>';
+        $('#pdCode').value = '';
+        laadEntree();
+      } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }
+    });
   }
 
   function renderTeam(){

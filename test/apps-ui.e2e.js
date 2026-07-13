@@ -145,6 +145,44 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
   }
 });
 
+test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const reg = await api(base, '/api/auth/register', { name: 'Chat Lid', email: 'chat@x.nl', phone: '0612345002',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    assert.ok(reg.token, 'lid-registratie geeft een token');
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    page.on('pageerror', e => fouten.push(e.message));
+    await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); }, reg.token);
+    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
+    await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
+
+    // naar het AI/concierge-scherm en een bericht met een XSS-payload sturen
+    await page.click('[data-tab="ai"]');
+    const payload = '<img src=x onerror="window.__xss=1">';
+    await page.fill('#askInput', payload);
+    await page.click('#askBtn');
+    await page.waitForSelector('#chat .bubble.user', { timeout: 10000 });
+    await page.waitForTimeout(400); // geef een (eventuele) onerror de tijd om te vuren
+
+    // de payload staat als TEKST in de bubbel, niet als uitgevoerd element
+    assert.equal(await page.evaluate(() => document.querySelectorAll('#chat img').length), 0, 'de payload is niet als <img> uitgevoerd');
+    assert.ok(!(await page.evaluate(() => window.__xss)), 'er is geen script uitgevoerd');
+    assert.match(await page.textContent('#chat'), /onerror/, 'het bericht staat leesbaar als tekst');
+    assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwijnt weer',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   const TMP = verseDataDir();

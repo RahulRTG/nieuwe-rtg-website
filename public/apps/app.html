@@ -3829,15 +3829,17 @@
       bubble(concierge ? T('chat.concierge.hi','Goedendag. Schrijf ons hier of via WhatsApp; uw concierge helpt u persoonlijk.') : aiOpener(), 'ai');
       return;
     }
-    chat.innerHTML = msgs.map(m => {
-      const who = m.from === 'member' ? 'user' : 'ai';
-      const wa = m.channel === 'whatsapp' ? '<span class="wa-badge">📱 WhatsApp</span>' : '';
-      return '<div class="bubble ' + who + '">' + wa + escHtml(m.text) + '</div>';
-    }).join('');
+    // Met Util.el: de berichttekst (van de gast of de concierge) gaat structureel
+    // als tekstknoop, dus altijd veilig ge-escaped, geen escHtml-discipline nodig.
+    const E = Util.el;
+    const bubbels = msgs.map(m => E('div', { class: 'bubble ' + (m.from === 'member' ? 'user' : 'ai') },
+      m.channel === 'whatsapp' ? E('span', { class: 'wa-badge' }, '📱 WhatsApp') : null,
+      m.text));
     const last = msgs[msgs.length - 1];
     if (concierge && last && last.from === 'member'){
-      chat.innerHTML += '<div class="bubble ai pending">' + T('chat.concierge.pending','Uw concierge is ingelicht en reageert zo.') + '</div>';
+      bubbels.push(E('div', { class: 'bubble ai pending' }, T('chat.concierge.pending', 'Uw concierge is ingelicht en reageert zo.')));
     }
+    Util.vervang(chat, bubbels);
     $('#content').scrollTop = $('#content').scrollHeight;
   }
   async function renderChat(){

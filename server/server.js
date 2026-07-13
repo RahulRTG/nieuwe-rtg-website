@@ -396,49 +396,19 @@ const AUTHOR_TIER = {
   'Rahul Imran': 'business'
 };
 
-const sseClients = []; // { tier, res }
-
 /* Realtime-bus: zonder REDIS_URL in-proces (huidig gedrag), met REDIS_URL via
    Redis pub/sub zodat live-events ook gebruikers op een ander domeinproces
    bereiken. Elke sseTo*-functie publiceert; elk proces levert de events af aan
    zijn eigen open verbindingen. */
 const bus = require('./bus').maakBus();
 
-/* Betrouwbaarheid: persoonlijke events (dm, snap, belsignaal) krijgen een
-   oplopend id en worden kort bewaard per ontvanger. Verbreekt een verbinding
-   even (mobiel netwerk, Redis-hik), dan stuurt EventSource bij het herstellen
-   zijn laatste id mee (Last-Event-ID) en spelen we de gemiste events opnieuw af.
-   Zo gaat een oproep- of chatsignaal niet stil verloren. */
-const SSE_BUFFER_TTL = 2 * 60 * 1000; // twee minuten terugspelen is ruim genoeg
-const sseBuffer = new Map();          // key -> [{ id, event, data, at }]
-let _sseMs = 0, _sseSeq = 0;
-function nextSseId() { const t = Date.now(); if (t > _sseMs) { _sseMs = t; _sseSeq = 0; } else { _sseSeq++; } return _sseMs * 1000 + _sseSeq; }
-function bufferEvent(key, id, event, data) {
-  const nu = Date.now();
-  let lijst = sseBuffer.get(key);
-  if (!lijst) { lijst = []; sseBuffer.set(key, lijst); }
-  lijst.push({ id, event, data, at: nu });
-  // opschonen: hooguit 50 per ontvanger en niets ouder dan de TTL
-  const vers = lijst.filter(e => nu - e.at < SSE_BUFFER_TTL);
-  sseBuffer.set(key, vers.slice(-50));
-}
-function speelOpnieuw(res, key, sinds) {
-  const lijst = sseBuffer.get(key);
-  if (!lijst || !sinds) return;
-  for (const e of lijst) if (e.id > sinds) sseSend(res, e.event, e.data, e.id);
-}
-function leverSse(m) {
-  if (m.doel === 'key' && m.id) bufferEvent(m.match, m.id, m.event, m.data);
-  for (const c of sseClients) {
-    let raak = false;
-    if (m.doel === 'key') raak = c.key === m.match;
-    else if (m.doel === 'sup') raak = c.sup === m.match;
-    else if (m.doel === 'office') raak = !!c.office;
-    else if (m.doel === 'tier') raak = m.match.includes(c.tier);
-    if (raak) sseSend(c.res, m.event, m.data, m.doel === 'key' ? m.id : undefined);
-  }
-}
-bus.subscribe('sse', leverSse);
+/* De realtime-afleverlaag (open verbindingen + terugspeelbuffer + id-teller)
+   zit in een maak…(state)-fabriek; de fabriek abonneert leverSse zelf op de bus
+   en geeft dezelfde clients-array/buffer-Map terug, zodat de routes en het
+   onderhoudslus er ongewijzigd op werken. */
+const { maakSse } = require('./kern/sse');
+const { sseClients, sseBuffer, nextSseId, bufferEvent, speelOpnieuw, leverSse, sseSend, ruimBuffer, SSE_BUFFER_TTL } =
+  maakSse({ bus });
 // Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
 // vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
 onExternalChange(() => {
@@ -745,12 +715,6 @@ function initRealtime() {
     }
     webpush.setVapidDetails('mailto:leden@rahultravelgroup.example', db.data.vapid.publicKey, db.data.vapid.privateKey);
   }
-}
-
-function sseSend(res, event, data, id) {
-  if (id != null) res.write('id: ' + id + '\n');
-  res.write('event: ' + event + '\n');
-  res.write('data: ' + JSON.stringify(data) + '\n\n');
 }
 
 // stuur een sync-signaal naar één of meer tiers (open schermen herladen data)
@@ -2827,7 +2791,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, _sseMs, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, eigenaar,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, eigenaar,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
@@ -2934,10 +2898,7 @@ setInterval(() => {
   const nu = Date.now();
   for (const [k, f] of loginFails) if (f.until < nu) loginFails.delete(k);
   for (const [k, f] of pinFails) if (f.until < nu) pinFails.delete(k);
-  for (const [k, lijst] of sseBuffer) {
-    const vers = lijst.filter(e => nu - e.at < SSE_BUFFER_TTL);
-    if (!vers.length) sseBuffer.delete(k); else if (vers.length !== lijst.length) sseBuffer.set(k, vers);
-  }
+  ruimBuffer();
 }, 5 * 60 * 1000).unref();
 backupData();
 setInterval(backupData, 24 * 60 * 60 * 1000);

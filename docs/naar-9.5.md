@@ -54,8 +54,10 @@ gebruikt.
   fabriek (Map + hash + remember/forget/lookup). Herstel-/migratiepad in
   initRealtime blijft op de teruggegeven Map werken; nieuwe test bewijst dat een
   lid na een serverherstart ingelogd blijft (`test/sessie-herstart.test.js`).
-- [ ] SSE-clients/-buffer eventueel ook naar een eigen `maak…(state)`-module
-  (grotere ingreep; nu bewust nog niet gedaan).
+- [x] SSE-afleverlaag naar `server/kern/sse.js` als `maakSse({bus})`-fabriek
+  (open verbindingen + terugspeelbuffer + id-teller + bus-abonnement). Geeft
+  dezelfde clients-array/buffer-Map terug zodat routes en onderhoudslus
+  ongewijzigd werken; volledige e2e (SSE-gedreven kassa + PDA-aandacht) groen.
 - [ ] Groepeer de staat-dragende helpers (sessies, SSE) in eigen modules met een
   duidelijke `maak…(state)`-fabriek.
 

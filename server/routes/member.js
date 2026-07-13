@@ -928,10 +928,10 @@ app.post('/api/ride/request', auth, (req, res) => {
   // activiteitenzaken rijden alleen hun eigen transfers: die regel je via je ticket
   if (s.type === 'activiteit') return res.status(409).json({ error: 'De transfer van ' + s.name + ' regel je via je ticket (Ter plaatse, Mijn tickets).' });
   if (!optieAan(s, 'ritten')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen ritaanvragen aan.' });
-  // leeftijd uit het paspoort: privejets boek je vanaf 18 jaar
+  // leeftijd uit het paspoort: privejets en helikopters boek je vanaf 18 jaar
   const lftR = leeftijdVan(geborenVan(req.session));
-  if (s.type === 'jet' && lftR != null && lftR < 18)
-    return res.status(403).json({ error: 'Privejets boek je vanaf 18 jaar. Een taxi regelen we graag voor je.' });
+  if ((s.type === 'jet' || s.type === 'helikopter') && lftR != null && lftR < 18)
+    return res.status(403).json({ error: (s.type === 'helikopter' ? 'Helikoptervluchten' : 'Privejets') + ' boek je vanaf 18 jaar. Een taxi regelen we graag voor je.' });
   const dest = req.body.toCode ? findSupplier(req.body.toCode) : null;
   const codename = liveCodename(req.session);
   // slimme offerte: afstand uit de live-locatie en de bestemming, anders een
@@ -941,7 +941,7 @@ app.post('/api/ride/request', auth, (req, res) => {
   const L = db.data.live[req.session.key];
   const van = (L && Number.isFinite(L.lat)) ? { lat: L.lat, lng: L.lng } : (s.loc || null);
   const naar = dest && dest.loc ? dest.loc : null;
-  let km = s.type === 'jet' ? 350 : 9;
+  let km = s.type === 'jet' ? 350 : (s.type === 'helikopter' ? 60 : 9);
   const meters = haversine(van, naar);
   if (meters != null && meters > 200) km = Math.max(1, meters / 1000);
   const t = (s.settings && s.settings.tarief) || {};

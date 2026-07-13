@@ -676,6 +676,7 @@
     { code:'SAKURA',  name:'Villa Bahia Ibiza', type:'Appartement', icon:'🏡', sub:'Appartement · Ibiza' },
     { code:'MKKX',    name:'Ibiza Executive Cars', type:'Taxi',  icon:'🚘', sub:'Taxi · Ibiza' },
     { code:'JETAG',   name:'Aria Private Aviation', type:'Privéjet', icon:'✈️', sub:'Privéjet · Amsterdam' },
+    { code:'IBIZAIR', name:'Ibiza Sky Charter', type:'Helikopter', icon:'🚁', sub:'Helikopter transfers · Ibiza' },
     { code:'AYAKA',   name:'Atelier Marfil', type:'Zelfstandig', icon:'🧑‍🎨', sub:'Sieraden & goudsmid · Ibiza' },
     { code:'KAITO',   name:'Studio Milan', type:'Zelfstandig', icon:'🏋️', sub:'Health & wellness · Ibiza' },
     { code:'ESVEDRA', name:'Es Vedra Cruises', type:'Activiteit', icon:'⛵', sub:'Tours & cruises · Ibiza' },
@@ -692,13 +693,14 @@
     appartement: { label:'RTG Appartement', labelEn:'RTG Apartment',  codes:['SAKURA'],  icon:'🏡' },
     taxi:        { label:'RTG Taxi',        labelEn:'RTG Taxi',       codes:['MKKX'],    icon:'🚘' },
     privejet:    { label:'RTG Privéjet',    labelEn:'RTG Private Jet', codes:['JETAG'],  icon:'✈️' },
+    helikopter:  { label:'RTG Helikopter',  labelEn:'RTG Helicopter',  codes:['IBIZAIR'], icon:'🚁' },
     zzp:         { label:'RTG Zelfstandig', labelEn:'RTG Independent', codes:['AYAKA','KAITO'], icon:'🧑‍🎨' },
     activiteiten:{ label:'RTG Activiteiten', labelEn:'RTG Experiences', codes:['ESVEDRA','MACE'], icon:'🎟️' },
     autoverhuur: { label:'RTG Autoverhuur', labelEn:'RTG Car Rental', codes:['ISLAREN'], icon:'🚗' },
     vastgoed:    { label:'RTG Vastgoed', labelEn:'RTG Real Estate', codes:['IBIZALIV'], icon:'🏡' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
-    vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG'],    icon:'🚘', legacy:true }
+    vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }
   };
   const SECTOR = (new URLSearchParams(location.search).get('sector') || '').toLowerCase();
   const SDEF = SECTOR_DEF[SECTOR] || null;
@@ -826,7 +828,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -835,6 +837,7 @@
     apartment:  ['Beheer','Housekeeping','Onderhoud'],
     taxi:       ['Taxi centrale','Chauffeur'],
     jet:        ['Operations','Crew','Piloot'],
+    helikopter: ['Operations','Piloot','Crew','Grondpersoneel'],
     activiteit: ['Gids','Security','Ticketbalie'],
     verhuur:    ['Balie','Monteur','Schoonmaak'],
     vastgoed:   ['Makelaar','Bezichtigingen','Backoffice']

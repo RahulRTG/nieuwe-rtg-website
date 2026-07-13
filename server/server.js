@@ -110,7 +110,8 @@ const STAFF_SEED = {
   ESVEDRA: [['Marta Salas', 'manager', 'Beheer'], ['Joel Ferrer', 'staff', 'Gids']],
   MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']],
   ISLAREN: [['Carmen Vidal', 'manager', 'Beheer'], ['Pau Riera', 'staff', 'Balie']],
-  IBIZALIV: [['Sofia Marin', 'manager', 'Makelaar'], ['Bram Kessler', 'staff', 'Bezichtigingen']]
+  IBIZALIV: [['Sofia Marin', 'manager', 'Makelaar'], ['Bram Kessler', 'staff', 'Bezichtigingen']],
+  IBIZAIR: [['Nadia Fischer', 'manager', 'Operations'], ['Tomas Weller', 'staff', 'Piloot']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -686,6 +687,29 @@ function initRealtime() {
         { id: 'c3', name: 'Jeep Wrangler', plate: 'IB-330-J', dagprijs: 95, actief: true,
           categorie: 'SUV 4x4', transmissie: 'automaat', brandstof: 'diesel', stoelen: 5, deuren: 4,
           airco: true, bagage: 3, kmPerDag: 0, meerKm: 0, borg: 800, minLeeftijd: 25, icoon: '\uD83D\uDE99' }
+      ]
+    });
+  }
+  // het helikopter-genre: premium transfers en scenic vluchten met eigen
+  // helikopters en piloten. Verloopt via dezelfde ritketen (aanvraag, toewijzen,
+  // onderweg, gearriveerd) met slimme toewijzing van piloot en toestel; 18+ zoals
+  // de privejet, en de piloot bevestigt weer en helipad voor het opstijgen.
+  if (!db.data.supplierTypes.helikopter)
+    db.data.supplierTypes.helikopter = { label: 'Helikopter transfers', icon: '\u{1F681}', caps: ['rides', 'fleet', 'location', 'pricing'] };
+  if (!db.data.suppliers.find(s => s.code === 'IBIZAIR')) {
+    db.data.suppliers.push({
+      code: 'IBIZAIR', name: 'Ibiza Sky Charter', type: 'helikopter', city: 'Ibiza',
+      loc: { lat: 38.872, lng: 1.373, label: 'Aeropuerto de Ibiza, helipad' }, rate: 0.1,
+      menu: [], photos: [],
+      settings: { tarief: { start: 900, perKm: 28, minimum: 1200 }, ritten: true, betaalVooraf: true },
+      fleet: [
+        { id: 'h1', name: 'Airbus H125 Ecureuil', model: 'H125', plate: 'EC-IBZ', seats: 5, active: true, thuisbasis: 'Ibiza Airport', bereikKm: 600, icoon: '\u{1F681}' },
+        { id: 'h2', name: 'Bell 429', model: 'B429', plate: 'EC-SKY', seats: 6, active: true, thuisbasis: 'Marina Botafoch', bereikKm: 720, icoon: '\u{1F681}' }
+      ],
+      helipads: [
+        { id: 'p-air', naam: 'Ibiza Airport helipad', plaats: 'Sant Josep' },
+        { id: 'p-mar', naam: 'Marina Botafoch', plaats: 'Ibiza-stad' },
+        { id: 'p-form', naam: 'Formentera (La Savina)', plaats: 'Formentera' }
       ]
     });
   }

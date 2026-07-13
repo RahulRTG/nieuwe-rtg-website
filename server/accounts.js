@@ -84,6 +84,13 @@ function init() {
   add('verified', "TEXT NOT NULL DEFAULT 'unverified'"); add('id_doc', 'TEXT'); add('member_state', 'TEXT');
   add('email_verified', 'INTEGER NOT NULL DEFAULT 0'); add('reset_hash', 'TEXT'); add('reset_expires', 'INTEGER');
 
+  // Inloggen op gebruikersnaam gebeurt hoofdletter-ongevoelig (lower(username)).
+  // De UNIQUE-index op username is hoofdlettergevoelig en kan die zoekopdracht
+  // niet bedienen, dus zonder deze expressie-index scant elke gebruikersnaam-login
+  // (en elke MISLUKTE login, die door de e-mail-tak heen valt) de hele tabel. Bij
+  // een miljoen leden is dat ~170 ms per poging; met de index blijft het < 1 ms.
+  try { db.exec('CREATE INDEX IF NOT EXISTS idx_users_lower_username ON users(lower(username))'); } catch (e) {}
+
   // Personeelsaccounts binnen een leverancier-bedrijfsaccount (PIN-login).
   db.exec(`CREATE TABLE IF NOT EXISTS supplier_staff (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,6 +102,8 @@ function init() {
     created_at TEXT NOT NULL
   )`);
   try { db.exec('ALTER TABLE supplier_staff ADD COLUMN func TEXT'); } catch (e) { /* kolom bestaat al */ }
+  // Personeel wordt altijd per bedrijf opgevraagd (listStaff/verifyStaffPin).
+  try { db.exec('CREATE INDEX IF NOT EXISTS idx_staff_supplier ON supplier_staff(supplier_code)'); } catch (e) {}
 
   SECRET = loadKey(SECRET_FILE, 'RTG_SECRET_KEY');
   VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');

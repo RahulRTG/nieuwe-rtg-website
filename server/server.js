@@ -819,17 +819,22 @@ function auth(req, res, next) {
 function dirTouch(sess) {
   // echte accounts (ook de gratis laag) staan in de codenaam-gids en kunnen
   // elkaar vinden; alleen een anonieme demo-gast zonder account niet
-  if (!sess || !db.data.memberDir) return;
+  if (!sess) return;
   if (sess.tier === 'guest' && !sess.account) return;
   const cn = liveCodename(sess);
+  // Met Postgres gaat het lid naar de geindexeerde ledengids (member_dir) en
+  // NIET naar db.data.memberDir: zo groeit de gids buiten het geheugen en staan
+  // er bij miljoenen leden geen miljoenen rijen in het proces.
+  if (ledenGidsActief()) {
+    const cur = ledenGidsHaal(sess.key);
+    if (!cur || cur.codename !== cn || cur.tier !== sess.tier) ledenGidsZet(sess.key, cn, sess.tier).catch(() => {});
+    return;
+  }
+  if (!db.data.memberDir) return;
   const cur = db.data.memberDir[sess.key];
   if (!cur || cur.codename !== cn || cur.tier !== sess.tier) {
     if (!cur && _ledenAantalCache != null) _ledenAantalCache++; // nieuw lid: teller ophogen
     db.data.memberDir[sess.key] = { codename: cn, tier: sess.tier };
-    // Met Postgres: het lid ook naar de geindexeerde ledengids (member_dir)
-    // schrijven, zodat de gids buiten het geheugen kan groeien en het ledental
-    // O(1) blijft. db.data.memberDir blijft de snelle cache voor de app.
-    if (ledenGidsActief()) ledenGidsZet(sess.key, cn, sess.tier).catch(() => {});
     save();
   }
 }
@@ -848,14 +853,41 @@ function ledenAantal() {
   return _ledenAantalCache;
 }
 
+// Eenpuntstoegang tot de ledengids. Met Postgres komt een lid uit de
+// geindexeerde tabel (cache + backfill), zonder Postgres uit db.data.memberDir.
+// Zo hoeft de gids bij miljoenen leden niet in het geheugen te staan, terwijl de
+// lezers hetzelfde blijven aanroepen.
+function gidsHaal(key) {
+  if (ledenGidsActief()) return ledenGidsHaal(key) || null;
+  return db.data.memberDir[key] || null;
+}
+// Zoeken op (deel van) een codenaam. Met Postgres geindexeerd; anders een scan
+// over het geheugen. exact=true eist een exacte codenaam.
+async function gidsZoekCodenaam(q, exact) {
+  const ql = String(q || '').trim().toLowerCase();
+  if (!ql) return [];
+  if (ledenGidsActief()) {
+    const rows = await ledenGidsZoek(ql, 50);
+    return exact ? rows.filter(r => String(r.codename || '').toLowerCase() === ql) : rows;
+  }
+  const out = [];
+  for (const [key, m] of Object.entries(db.data.memberDir || {})) {
+    const cl = String(m.codename || '').toLowerCase();
+    if (cl && (exact ? cl === ql : cl.includes(ql))) out.push({ key, codename: m.codename, tier: m.tier });
+  }
+  return out;
+}
+
 /* Een lid opzoeken op codenaam (voor contracten, uitnodigingen): de gids
-   koppelt de sleutel aan de codenaam, nooit aan een echte naam. */
-function keyVanCodenaam(codenaam) {
-  const c = String(codenaam || '').trim().toLowerCase();
+   koppelt de sleutel aan de codenaam, nooit aan een echte naam. Async: met
+   Postgres een geindexeerde opzoeking i.p.v. een scan door het geheugen. */
+async function keyVanCodenaam(codenaam) {
+  const c = String(codenaam || '').trim();
   if (!c) return null;
-  for (const [key, v] of Object.entries(db.data.memberDir || {}))
-    if (String(v.codename || '').trim().toLowerCase() === c) return { key, tier: v.tier, codename: v.codename };
-  return null;
+  // een exacte codenaam-treffer; met Postgres geindexeerd. We nemen codenaam en
+  // pas rechtstreeks uit de treffer (geen tweede opzoeking, dus geen cache-miss).
+  const treffers = await gidsZoekCodenaam(c, true);
+  return treffers.length ? { key: treffers[0].key, tier: treffers[0].tier, codename: treffers[0].codename } : null;
 }
 
 /* ---------- Salon-rechten (server-side afgedwongen) ----------
@@ -1149,7 +1181,7 @@ function eisAccount(req, res) {
    alleen het signaleringskanaal en ziet nooit beeld of geluid). */
 
 // De sociale kern (vrienden, veiligheid, snaps) zit in server/kern/sociaal.js.
-const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto });
+const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam });
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
 } = sociaal;
@@ -1509,7 +1541,7 @@ function setRoomHk(s, room, status, note, actor) {
 function salonNaarVolgers(s, tekst) {
   // volgers krijgen een melding zodra hun zaak iets nieuws plaatst
   const volgers = (s.salon && s.salon.volgers) || [];
-  const tiers = [...new Set(volgers.map(k => (db.data.memberDir[k] || {}).tier).filter(Boolean))];
+  const tiers = [...new Set(volgers.map(k => (gidsHaal(k) || {}).tier).filter(Boolean))];
   for (const tier of tiers) notify(tier, { icon: '✦', title: 'De Salon · ' + s.name, body: String(tekst).slice(0, 90), scope: 'salon' });
   for (const k of volgers) sseToCustomer(k, 'sync', { scope: 'salon' });
 }
@@ -2823,7 +2855,7 @@ const kern = {
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
-  entreeCode, keyVanCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
+  entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,

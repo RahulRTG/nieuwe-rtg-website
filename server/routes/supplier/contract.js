@@ -15,7 +15,7 @@ function contractPubliek(c) {
     huurRef: c.huurRef || null, at: c.at };
 }
 
-app.post('/api/supplier/contract/maak', supplierAuth, (req, res) => {
+app.post('/api/supplier/contract/maak', supplierAuth, async (req, res) => {
   if (!managerOnly(req, res)) return;
   const s = req.supplier;
   const soort = ['verhuur', 'personeel', 'algemeen'].includes(req.body.soort) ? req.body.soort : 'algemeen';
@@ -32,7 +32,7 @@ app.post('/api/supplier/contract/maak', supplierAuth, (req, res) => {
     if (!m || String(m.supplier_code).toUpperCase() !== s.code) return res.status(404).json({ error: 'Dit personeelslid kennen we niet bij uw zaak.' });
     partij = { kind: 'staff', staffId: m.id, naam: m.name };
   } else {
-    const lid = keyVanCodenaam(req.body.codenaam);
+    const lid = await keyVanCodenaam(req.body.codenaam);
     if (!lid) return res.status(404).json({ error: 'Geen lid gevonden met die codenaam. Vraag de klant naar de exacte codenaam uit de app.' });
     partij = { kind: 'lid', key: lid.key, codename: lid.codename };
   }

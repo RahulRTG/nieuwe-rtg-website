@@ -4,7 +4,7 @@
    te lezen en te testen is. Krijgt de gedeelde kern-onderdelen mee en praat
    nergens rechtstreeks met de buitenwereld. */
 module.exports = (core) => {
-  const { db, save, sseToCustomer, rtf, crypto } = core;
+  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam } = core;
 
 function dmSleutel(a, b) { return [a, b].sort().join('|'); }
 function connectieTussen(a, b) {
@@ -12,12 +12,12 @@ function connectieTussen(a, b) {
 }
 
 const isRtf = h => typeof h === 'string' && h.startsWith('rtf:');
-function codeExists(handle) { return isRtf(handle) ? !!rtf.profielInfoVanHandle(handle) : !!db.data.memberDir[handle]; }
+function codeExists(handle) { return isRtf(handle) ? !!rtf.profielInfoVanHandle(handle) : !!gidsHaal(handle); }
 function codenaamVan(handle) {
   if (isRtf(handle)) { const i = rtf.profielInfoVanHandle(handle); return i ? i.codenaam : handle; }
-  return (db.data.memberDir[handle] || {}).codename || handle;
+  return (gidsHaal(handle) || {}).codename || handle;
 }
-function soortVan(handle) { return isRtf(handle) ? 'rtf' : ((db.data.memberDir[handle] || {}).tier || 'rtg'); }
+function soortVan(handle) { return isRtf(handle) ? 'rtf' : ((gidsHaal(handle) || {}).tier || 'rtg'); }
 function isKindHandle(handle) { if (isRtf(handle)) { const i = rtf.profielInfoVanHandle(handle); return !!(i && i.kind); } return false; }
 /* Beschermd (15 of jonger, of rol kind): de open vriendenlaag is dicht. Zo'n
    profiel is onvindbaar in het zoeken, kan zelf geen verzoeken sturen en kan
@@ -81,15 +81,26 @@ function statusVan(mij, c) {
   return c.requestedBy === mij ? 'aangevraagd' : 'wacht-op-u';
 }
 // zoek op codenaam over beide werelden
-function socialZoek(mij, q) {
+async function socialZoek(mij, q) {
   q = String(q || '').trim().toLowerCase();
   if (q.length < 2) return [];
   const seen = new Set([mij]);
-  const handles = [];
-  for (const [key, m] of Object.entries(db.data.memberDir)) { if (!seen.has(key) && m.codename && m.codename.toLowerCase().includes(q)) { seen.add(key); handles.push(key); } }
+  const uit = [];
+  // leden op codenaam: geindexeerd via de ledengids (met Postgres), anders een
+  // scan. We nemen codenaam en pas rechtstreeks uit de treffer (geen tweede
+  // opzoeking, dus geen cache-miss die de sleutel als codenaam zou tonen).
+  for (const m of await gidsZoekCodenaam(q, false)) {
+    if (seen.has(m.key)) continue; seen.add(m.key);
+    uit.push({ key: m.key, codename: m.codename, tier: m.tier, status: statusVan(mij, connectieTussen(mij, m.key)) });
+  }
   // beschermde profielen (15 of jonger) zijn onvindbaar: niemand kan ze opzoeken
-  for (const sp of rtf.socialProfielen()) { if (!sp.beschermd && !seen.has(sp.handle) && sp.codenaam.toLowerCase().includes(q)) { seen.add(sp.handle); handles.push(sp.handle); } }
-  return handles.slice(0, 10).map(h => ({ key: h, codename: codenaamVan(h), tier: soortVan(h), status: statusVan(mij, connectieTussen(mij, h)) }));
+  for (const sp of rtf.socialProfielen()) {
+    if (!sp.beschermd && !seen.has(sp.handle) && sp.codenaam.toLowerCase().includes(q)) {
+      seen.add(sp.handle);
+      uit.push({ key: sp.handle, codename: codenaamVan(sp.handle), tier: soortVan(sp.handle), status: statusVan(mij, connectieTussen(mij, sp.handle)) });
+    }
+  }
+  return uit.slice(0, 10);
 }
 /* vriendschapsverzoek van 'mij' naar 'naar'. doorOuder=true betekent: een
    ouder/verzorger doet dit namens zijn beschermde kind (via ouderVerbind); dan
@@ -120,7 +131,7 @@ function socialVerbind(mij, naar, doorOuder) {
 /* Een ouder/verzorger voegt een contact toe voor zijn beschermde kind: het enige
    kanaal waarlangs een beschermd profiel nieuwe vrienden krijgt. De andere kant
    moet nog wel zelf accepteren (of, als die ook beschermd is, diens ouder). */
-function ouderVerbind(gezinCode, kidHandle, doel) {
+async function ouderVerbind(gezinCode, kidHandle, doel) {
   const sp = rtf.socialProfielen().find(x => x.handle === kidHandle && x.gezinCode === gezinCode);
   if (!sp) return { status: 403, error: 'Dit is geen profiel van jouw gezin.' };
   // doel mag een handle zijn of een exacte codenaam (zo typt een ouder gewoon de codenaam over)
@@ -128,7 +139,7 @@ function ouderVerbind(gezinCode, kidHandle, doel) {
   if (!codeExists(naar)) {
     const q = naar.toLowerCase();
     const kandidaten = [];
-    for (const [key, m] of Object.entries(db.data.memberDir)) if (m.codename && m.codename.toLowerCase() === q) kandidaten.push(key);
+    for (const m of await gidsZoekCodenaam(q, true)) kandidaten.push(m.key);
     // exacte codenaam mag ook een beschermd profiel zijn: twee gezinnen kunnen zo
     // hun kinderen verbinden (codenaam offline uitgewisseld), en de ouder van het
     // andere kind moet daarna alsnog akkoord geven (voogdWacht).

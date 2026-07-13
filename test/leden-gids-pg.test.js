@@ -58,6 +58,29 @@ test('Postgres-ledengids: een nieuw lid landt in de gids en telt mee in de kanto
       if (na < voor + 1) await wacht(200);
     }
     assert.ok(na >= voor + 1, 'het nieuwe lid telt mee in de kantoor-totalen (uit de Postgres-gids): ' + voor + ' -> ' + na);
+
+    // READ-PAD: een tweede lid zoekt het eerste op codenaam. Dit gaat via de
+    // geindexeerde ledengids (socialZoek -> ledenGidsZoek in Postgres), niet via
+    // een scan door het geheugen.
+    const codename = st.state.user.codename;
+    const uniek2 = (Date.now() + 1).toString().slice(-8);
+    const regB = await api(base, '/api/auth/register', { name: 'Zoek Lid', email: 'zoek' + uniek2 + '@x.nl',
+      phone: '06' + uniek2, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    assert.ok(regB.token, 'tweede lid geregistreerd');
+    // eerst B's sessie laten oplossen (account-spiegel kan achterlopen)
+    let stB = null;
+    for (let i = 0; i < 25 && !(stB && stB.state && stB.state.user); i++) {
+      stB = await api(base, '/api/state', {}, regB.token);
+      if (!(stB && stB.state && stB.state.user)) await wacht(200);
+    }
+    assert.ok(stB && stB.state && stB.state.user, 'het tweede lid is ingelogd');
+    let gevonden = false;
+    for (let i = 0; i < 30 && !gevonden; i++) {
+      const zoek = await api(base, '/api/member/find', { q: codename }, regB.token);
+      gevonden = Array.isArray(zoek.results) && zoek.results.some(r => r.codename === codename);
+      if (!gevonden) await wacht(200);
+    }
+    assert.ok(gevonden, 'het eerste lid is op codenaam vindbaar via de Postgres-gids: ' + codename);
   } finally {
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

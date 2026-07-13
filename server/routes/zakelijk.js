@@ -13,7 +13,7 @@
    op de codenaam plus een zelfgekozen professionele naam. Niemand komt in de
    gids zonder er zelf voor te kiezen. */
 module.exports = (kern) => {
-  const { app, auth, crypto, db, save, schoon, liveCodename, openVacatures,
+  const { app, auth, crypto, db, save, schoon, liveCodename, openVacatures, gidsHaal,
     socialVerbind, connectieTussen, statusVan, zijnVrienden, verbActief, codenaamVan, sseToCustomer } = kern;
 
   function Z() {
@@ -34,7 +34,7 @@ module.exports = (kern) => {
     next();
   }
   const mijnProfiel = (req) => Z().profielen[req.session.key] || null;
-  const pasVan = (key) => (db.data.memberDir[key] || {}).tier || null;
+  const pasVan = (key) => (gidsHaal(key) || {}).tier || null;
 
   // actieve connecties van een lid; daarmee tellen we gedeelde connecties
   // ("via wie ken ik deze persoon"), het netwerkgevoel van de gids

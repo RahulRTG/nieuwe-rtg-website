@@ -350,7 +350,7 @@ async function ledenGidsZet(key, codename, tier) {
 // Omgekeerd opzoeken (codenaam -> sleutel), geindexeerd i.p.v. een scan.
 async function ledenGidsKeyVanCodenaam(codename) {
   if (!ledenPool) return null;
-  try { const r = await ledenPool.query('SELECT key FROM member_dir WHERE codename = $1 LIMIT 1', [codename]); return r.rows[0] ? r.rows[0].key : null; } catch (e) { return null; }
+  try { const r = await ledenPool.query('SELECT key FROM member_dir WHERE codename_lower = $1 LIMIT 1', [String(codename || '').trim().toLowerCase()]); return r.rows[0] ? r.rows[0].key : null; } catch (e) { return null; }
 }
 // Zoeken op (deel van) een codenaam, geindexeerd en begrensd.
 async function ledenGidsZoek(qLower, limit) {

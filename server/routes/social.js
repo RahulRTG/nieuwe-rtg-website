@@ -6,9 +6,9 @@ module.exports = (kern) => {
   const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
 
 // leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam)
-app.post('/api/member/find', auth, (req, res) => {
+app.post('/api/member/find', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  res.json({ results: socialZoek(req.session.key, req.body.q) });
+  res.json({ results: await socialZoek(req.session.key, req.body.q) });
 });
 
 // verzoek sturen (mag ook naar een RTF-codenaam)
@@ -129,10 +129,10 @@ function rtfSociaal(req, res) {
 }
 // Beschermd profiel (15 of jonger): zoeken en zelf verzoeken sturen staat dicht;
 // de ouder/verzorger voegt vrienden toe via /api/rtf/social/oudervoeg.
-app.post('/api/rtf/social/find', (req, res) => {
+app.post('/api/rtf/social/find', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
-  res.json({ results: socialZoek(s.handle, req.body.q) });
+  res.json({ results: await socialZoek(s.handle, req.body.q) });
 });
 app.post('/api/rtf/social/connect', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
@@ -143,10 +143,10 @@ app.post('/api/rtf/social/connect', (req, res) => {
 });
 // Een ouder/beheerder voegt een contact toe voor een beschermd kind van zijn gezin
 // (op exacte codenaam). De andere kant moet daarna nog gewoon zelf accepteren.
-app.post('/api/rtf/social/oudervoeg', (req, res) => {
+app.post('/api/rtf/social/oudervoeg', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder voegt contacten toe voor een kind.' });
-  const r = ouderVerbind(s.g.code, String(req.body.kindHandle || ''), String(req.body.codenaam || ''));
+  const r = await ouderVerbind(s.g.code, String(req.body.kindHandle || ''), String(req.body.codenaam || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
 });

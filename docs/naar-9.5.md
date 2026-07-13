@@ -110,8 +110,12 @@ Bekende plafonds: single-proces ~1.400–1.700 req/s en het JSON-snapshot-plafon
   (`member_dir`), net als het zaken-grootboek: per-key lookup, omgekeerd zoeken
   op codenaam en een O(1) telling buiten het geheugen. Uit de 65M-schaaltest
   bleek de in-memory `memberDir` ~11 GB en de telling O(N); dit haalt beide weg.
-  Geverifieerd tegen een echte Postgres (`test/leden-gids-pg.test.js`, met
-  DATABASE_URL); zonder Postgres blijft de in-memory gids ongewijzigd.
+  Met Postgres schrijft dirTouch niet meer naar `db.data.memberDir` en gaan ook
+  alle LEESpaden via de gids (salon-tier, zakelijk pasVan, sociaal
+  codeExists/soort/codenaam, codenaam-zoeken en keyVanCodenaam) — dus bij
+  miljoenen leden staat er niets meer in het geheugen. Geverifieerd tegen een
+  echte Postgres (`test/leden-gids-pg.test.js`, incl. codenaam-zoeken);
+  zonder Postgres blijft de in-memory gids exact ongewijzigd (218 tests groen).
 - [ ] Virtualisatie van zeer lange lijsten in de backoffice (open, puur
   front-end; server is al gepagineerd met eerlijke totalen).
 

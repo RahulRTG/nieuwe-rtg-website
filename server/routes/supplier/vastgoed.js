@@ -74,7 +74,7 @@ app.post('/api/supplier/pand/foto', express.json({ limit: '1.5mb' }), supplierAu
 
 /* Aanbieden: kies specifieke leden (op codenaam), of publiek/naar de volgers.
    Gerichte leden krijgen een melding en zien het pand prive in hun app. */
-app.post('/api/supplier/aanbieding', supplierAuth, (req, res) => {
+app.post('/api/supplier/aanbieding', supplierAuth, async (req, res) => {
   if (!managerOnly(req, res)) return;
   const s = req.supplier;
   if (!isVastgoed(s, res)) return;
@@ -83,7 +83,7 @@ app.post('/api/supplier/aanbieding', supplierAuth, (req, res) => {
   const codenamen = Array.isArray(req.body.codenamen) ? req.body.codenamen : String(req.body.codenamen || '').split(',');
   const aanKeys = [], nietGevonden = [];
   for (const cn of codenamen.map(x => String(x).trim()).filter(Boolean)) {
-    const lid = keyVanCodenaam(cn);
+    const lid = await keyVanCodenaam(cn);
     if (lid) aanKeys.push(lid.key); else nietGevonden.push(cn);
   }
   const publiek = !!req.body.publiek;

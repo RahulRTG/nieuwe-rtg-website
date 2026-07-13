@@ -75,8 +75,10 @@ accounts.init();
 // demo-inlog en het demo-account (Rahul/Imran) nooit per ongeluk open op productie.
 const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
 // Demo-account zodat Rahul/Imran ook via de echte accountlogin werkt.
+// Sync-varianten: de seed draait voor 'listen', dus blokkeren kan geen kwaad
+// en zodra de poort opengaat bestaan de accounts gegarandeerd (geen race in tests).
 if (DEMO && accounts.count() === 0) {
-  const u = accounts.createUser({ username: 'Roellie', email: require('./eigenaar').OWNER_EMAIL, password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Roellie I', phone: '+31612345678' });
+  const u = accounts.createUserSync({ username: 'Roellie', email: require('./eigenaar').OWNER_EMAIL, password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Roellie I', phone: '+31612345678' });
   accounts.saveMemberState(u.id, memberTemplate());
   accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
 }
@@ -95,7 +97,7 @@ const STAFF_SEED = {
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
-    people.forEach(([name, role, func], i) => accounts.createStaff({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+    people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
   }
 }
 

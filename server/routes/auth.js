@@ -55,7 +55,7 @@ app.post('/api/logout', auth, (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/auth/register', (req, res) => {
+app.post('/api/auth/register', async (req, res) => {
   // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
   // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
   // technische pagina.
@@ -82,7 +82,7 @@ app.post('/api/auth/register', (req, res) => {
   if (!pasAppOk(String(req.body.pasApp || ''), String(req.body.tier || 'rtg'))) return res.status(403).json({ error: PAS_FOUT });
   let user;
   try {
-    user = accounts.createUser({ email, username: req.body.username || null, password, tier: req.body.tier, realName: name, phone });
+    user = await accounts.createUser({ email, username: req.body.username || null, password, tier: req.body.tier, realName: name, phone });
   } catch (e) {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
@@ -148,7 +148,7 @@ app.post('/api/auth/forgot', (req, res) => {
   res.json({ ok: true, tweestaps: true, ...(devResetUrl ? { devResetUrl, devCode } : {}) });
 });
 
-app.post('/api/auth/reset', (req, res) => {
+app.post('/api/auth/reset', async (req, res) => {
   const u = accounts.findByReset(req.body.token);
   if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen herstel-link.' });
   // tweede stap: de code van de telefoon moet kloppen
@@ -169,29 +169,29 @@ app.post('/api/auth/reset', (req, res) => {
   if (pw.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
   delete herstel2fa()[u.id];
   save();
-  accounts.setPassword(u.id, pw);
+  await accounts.setPassword(u.id, pw);
   res.json({ ok: true });
 });
 
 /* Wachtwoord wijzigen vanuit de eigen backoffice: altijd met het huidige
    wachtwoord als bevestiging. */
-app.post('/api/auth/password', auth, (req, res) => {
+app.post('/api/auth/password', auth, async (req, res) => {
   if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
   const u = req.session.account;
-  if (!accounts.verifyPassword(String(req.body.huidig || ''), u.password_hash))
+  if (!await accounts.verifyPassword(String(req.body.huidig || ''), u.password_hash))
     return res.status(403).json({ error: 'Het huidige wachtwoord klopt niet.' });
   const nieuw = String(req.body.nieuw || '');
   if (nieuw.length < 6) return res.status(400).json({ error: 'Het nieuwe wachtwoord moet minstens 6 tekens zijn.' });
-  accounts.setPassword(u.id, nieuw);
+  await accounts.setPassword(u.id, nieuw);
   res.json({ ok: true });
 });
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   const login = req.body.login || req.body.email || req.body.username;
   const bucket = 'auth:' + req.ip + ':' + String(login || '').toLowerCase().slice(0, 60);
   if (tooManyTries(res, bucket)) return;
   const user = accounts.findByLogin(login);
-  if (!user || !accounts.verifyPassword(req.body.password, user.password_hash)) {
+  if (!user || !await accounts.verifyPassword(req.body.password, user.password_hash)) {
     noteFailedTry(bucket);
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }

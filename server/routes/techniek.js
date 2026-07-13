@@ -69,9 +69,9 @@ module.exports = (kern) => {
 
   // Inloggen op de technische pagina: gewone accountgegevens, maar de toegang
   // wordt hier meteen gecontroleerd (anders 403, ook met geldig wachtwoord).
-  app.post('/api/techniek/inloggen', (req, res) => {
+  app.post('/api/techniek/inloggen', async (req, res) => {
     const user = accounts.findByLogin(req.body.login);
-    if (!user || !accounts.verifyPassword(String(req.body.wachtwoord || ''), user.password_hash)) {
+    if (!user || !await accounts.verifyPassword(String(req.body.wachtwoord || ''), user.password_hash)) {
       if (beveilig) beveilig.meld('tech-login-mislukt', 'waarschuwing',
         'Mislukte inlogpoging op de technische pagina (login: ' + String(req.body.login || '').slice(0, 40) + ').',
         { bron: req.ip });

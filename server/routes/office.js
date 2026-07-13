@@ -11,7 +11,7 @@ module.exports = (kern) => {
     try { return eigenaar.isEigenaar(accounts, accounts.verifyToken(String(token || ''))); } catch (e) { return false; }
   };
 
-app.post('/api/office/partner/decide', officeAuth, (req, res) => {
+app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
   const a = db.data.partnerApplications.find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
   if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
@@ -21,7 +21,7 @@ app.post('/api/office/partner/decide', officeAuth, (req, res) => {
     ensureSupplierDefaults(s);
     db.data.suppliers.push(s);
     const pin = accounts.makePin();
-    accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager', func: 'Beheer', pin });
+    await accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager', func: 'Beheer', pin });
     a.status = 'goedgekeurd'; a.code = code;
     save();
     const url = appUrl(req);

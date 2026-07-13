@@ -72,6 +72,20 @@ if (process.env.ANTHROPIC_API_KEY) {
 }
 
 const router = express.Router();
+/* Zelfde foutisolatie als in server.js: de app-omhulling dekt alleen app.get/post,
+   niet deze router. Een (async) fout in een handler wordt netjes next(err). */
+for (const metode of ['get', 'post', 'put', 'delete', 'patch', 'all']) {
+  const orig = router[metode].bind(router);
+  router[metode] = (...args) => orig(...args.map(f => {
+    if (typeof f !== 'function') return f;
+    return (req, res, next) => {
+      try {
+        const r = f(req, res, next);
+        if (r && typeof r.catch === 'function') r.catch(next);
+      } catch (e) { next(e); }
+    };
+  }));
+}
 router.use(express.json({ limit: '4mb' }));
 
 function F() {
@@ -380,13 +394,15 @@ function schoonGroep(v) { return GROEPEN.includes(v) ? v : null; }
 // privezaken van het gezin (geld, mentale steun, dromen, cv, reisaanvraag).
 const isGast = p => p && p.rol === 'gast';
 const KLEUREN = ['#C9A24B', '#5FA56A', '#6AA6C9', '#B4574E', '#B07AC0', '#D08A3E'];
-function hashPin(pin) {
+const scryptAsync = (pin, salt, len) => new Promise((resolve, reject) =>
+  crypto.scrypt(String(pin), salt, len, (err, key) => err ? reject(err) : resolve(key)));
+async function hashPin(pin) {
   const salt = crypto.randomBytes(16).toString('hex');
-  return { salt, hash: crypto.scryptSync(String(pin), salt, 32).toString('hex') };
+  return { salt, hash: (await scryptAsync(pin, salt, 32)).toString('hex') };
 }
-function checkPin(rec, pin) {
+async function checkPin(rec, pin) {
   if (!rec || !rec.hash) return false;
-  let h; try { h = crypto.scryptSync(String(pin), rec.salt, 32); } catch (e) { return false; }
+  let h; try { h = await scryptAsync(pin, rec.salt, 32); } catch (e) { return false; }
   const b = Buffer.from(rec.hash, 'hex');
   return h.length === b.length && crypto.timingSafeEqual(h, b);
 }
@@ -462,7 +478,7 @@ function beheerderVan(g, req, res) {
 }
 function berichtVoorMij(b, pid) { return b.naar === 'allen' || b.naar === pid || b.van === pid; }
 
-router.post('/gezin/maak', (req, res) => {
+router.post('/gezin/maak', async (req, res) => {
   const bucket = 'maak:' + ipVan(req);
   if (teVaak(res, bucket)) return;
   misluktePoging(bucket, 8, 30); // hooguit 8 nieuwe gezinnen per adres per half uur
@@ -474,7 +490,7 @@ router.post('/gezin/maak', (req, res) => {
   const code = nieuweGezinscode();
   const pid = rid(4);
   const profiel = { id: pid, naam: beheerder, rol: 'beheerder', avatar: schoonAvatar(req.body.avatar) || '👑',
-    kleur: schoonKleur(req.body.kleur), pin: hashPin(req.body.pin), groep: schoonGroep(req.body.groep) || 'volw', token: rid(24), at: nu() };
+    kleur: schoonKleur(req.body.kleur), pin: await hashPin(req.body.pin), groep: schoonGroep(req.body.groep) || 'volw', token: rid(24), at: nu() };
   const g = { id: rid(4), code, naam, at: nu(), profielen: { [pid]: profiel }, berichten: [] };
   G()[code] = g; save();
   res.json({ code, token: profiel.token, profiel: pubProfiel(profiel), gezin: pubGezin(g) });
@@ -488,14 +504,14 @@ router.post('/gezin/inloggen', (req, res) => {
   res.json({ gezin: pubGezin(g), profielen: Object.values(g.profielen).map(pubProfiel) });
 });
 
-router.post('/gezin/profiel/kies', (req, res) => {
+router.post('/gezin/profiel/kies', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
   const p = g.profielen[String(req.body.profielId || '')];
   if (!p) return res.status(404).json({ error: 'Dit profiel bestaat niet meer.' });
   const bucket = 'pin:' + g.code + ':' + p.id;
   if (p.pin && p.pin.hash) {
     if (teVaak(res, bucket)) return;
-    if (!checkPin(p.pin, req.body.pin)) { misluktePoging(bucket, 6, 5); return res.status(403).json({ error: 'De pincode klopt niet.' }); }
+    if (!await checkPin(p.pin, req.body.pin)) { misluktePoging(bucket, 6, 5); return res.status(403).json({ error: 'De pincode klopt niet.' }); }
     goedePoging(bucket);
   }
   res.json({ token: p.token, profiel: pubProfiel(p), gezin: pubGezin(g) });
@@ -511,7 +527,7 @@ router.get('/gezin/:code/mij', (req, res) => {
   res.json({ gezin: pubGezin(g), profiel: pubProfiel(p), profielen: Object.values(g.profielen).map(pubProfiel), ongelezen, wisVerzoek });
 });
 
-router.post('/gezin/profiel/maak', (req, res) => {
+router.post('/gezin/profiel/maak', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
   if (!beheerderVan(g, req, res)) return;
   const naam = schoon(req.body.naam, 40);
@@ -520,12 +536,12 @@ router.post('/gezin/profiel/maak', (req, res) => {
   const rol = ROLLEN.includes(req.body.rol) ? req.body.rol : 'kind';
   const p = { id: rid(4), naam, rol, avatar: schoonAvatar(req.body.avatar), kleur: schoonKleur(req.body.kleur), token: rid(24), at: nu() };
   const g0 = schoonGroep(req.body.groep); if (g0) p.groep = g0;
-  if (req.body.pin) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers, of laat hem leeg.' }); p.pin = hashPin(req.body.pin); }
+  if (req.body.pin) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers, of laat hem leeg.' }); p.pin = await hashPin(req.body.pin); }
   g.profielen[p.id] = p; save();
   res.json({ profiel: pubProfiel(p) });
 });
 
-router.post('/gezin/profiel/wijzig', (req, res) => {
+router.post('/gezin/profiel/wijzig', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
   if (!beheerderVan(g, req, res)) return;
   const p = g.profielen[String(req.body.profielId || '')];
@@ -540,7 +556,7 @@ router.post('/gezin/profiel/wijzig', (req, res) => {
     p.rol = req.body.rol;
   }
   if (req.body.pin === '') { delete p.pin; }
-  else if (req.body.pin != null) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers.' }); p.pin = hashPin(req.body.pin); }
+  else if (req.body.pin != null) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers.' }); p.pin = await hashPin(req.body.pin); }
   save();
   res.json({ profiel: pubProfiel(p) });
 });
@@ -852,30 +868,30 @@ router.post('/gezin/oppasinfo', (req, res) => {
    beheerder), dan is verwijderen een verzoek dat de tweede volwassene moet
    goedkeuren. Is er maar een volwassene, dan wist die het meteen. */
 function volwassenen(g) { return Object.values(g.profielen || {}).filter(p => ['beheerder', 'ouder'].includes(p.rol)); }
-function adultCheck(g, req, res) {
+async function adultCheck(g, req, res) {
   const p = profielVan(g, req.body && req.body.token);
   if (!p || !['beheerder', 'ouder'].includes(p.rol)) { res.status(403).json({ error: 'Alleen een ouder of de beheerder kan dit doen.' }); return null; }
-  if (p.pin && p.pin.hash && !checkPin(p.pin, req.body.pin)) { res.status(403).json({ error: 'De pincode klopt niet.' }); return null; }
+  if (p.pin && p.pin.hash && !await checkPin(p.pin, req.body.pin)) { res.status(403).json({ error: 'De pincode klopt niet.' }); return null; }
   return p;
 }
-router.post('/gezin/wissen', (req, res) => {
+router.post('/gezin/wissen', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
-  const p = adultCheck(g, req, res); if (!p) return;
+  const p = await adultCheck(g, req, res); if (!p) return;
   if (volwassenen(g).length <= 1) { delete G()[g.code]; save(); return res.json({ ok: true, verwijderd: true }); }
   g.wisVerzoek = { door: p.id, doorNaam: p.naam, at: nu() }; save();
   res.json({ ok: true, wachtOpToestemming: true });
 });
-router.post('/gezin/wissen/bevestig', (req, res) => {
+router.post('/gezin/wissen/bevestig', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
   if (!g.wisVerzoek) return res.status(400).json({ error: 'Er is geen verzoek om te verwijderen.' });
-  const p = adultCheck(g, req, res); if (!p) return;
+  const p = await adultCheck(g, req, res); if (!p) return;
   if (g.wisVerzoek.door === p.id) return res.status(403).json({ error: 'De tweede volwassene moet toestemming geven, niet degene die het verzoek deed.' });
   delete G()[g.code]; save();
   res.json({ ok: true, verwijderd: true });
 });
-router.post('/gezin/wissen/intrekken', (req, res) => {
+router.post('/gezin/wissen/intrekken', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
-  const p = adultCheck(g, req, res); if (!p) return;
+  const p = await adultCheck(g, req, res); if (!p) return;
   delete g.wisVerzoek; save();
   res.json({ ok: true });
 });

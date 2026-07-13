@@ -19,8 +19,8 @@ accounts.init();
 
 test.after(() => { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
-test('identiteitskluis: echte naam versleuteld, codenaam operationeel', () => {
-  const u = accounts.createUser({ email: 'kluis@voorbeeld.test', password: 'geheim12', tier: 'rtg', realName: 'Echte Naam', phone: '+31611112222' });
+test('identiteitskluis: echte naam versleuteld, codenaam operationeel', async () => {
+  const u = await accounts.createUser({ email: 'kluis@voorbeeld.test', password: 'geheim12', tier: 'rtg', realName: 'Echte Naam', phone: '+31611112222' });
   // De ruwe databaserij bevat GEEN leesbare naam of e-mail.
   const rij = accounts.getUserById(u.id);
   assert.ok(rij.enc_name && rij.enc_name !== 'Echte Naam', 'naam moet versleuteld staan');
@@ -36,24 +36,24 @@ test('identiteitskluis: echte naam versleuteld, codenaam operationeel', () => {
   assert.equal(pub.enc_name, undefined);
 });
 
-test('wachtwoord: scrypt-verificatie klopt en weigert fout wachtwoord', () => {
-  const u = accounts.createUser({ email: 'pw@voorbeeld.test', password: 'JuistWachtwoord9', tier: 'rtg', realName: 'Piet' });
+test('wachtwoord: scrypt-verificatie klopt en weigert fout wachtwoord', async () => {
+  const u = await accounts.createUser({ email: 'pw@voorbeeld.test', password: 'JuistWachtwoord9', tier: 'rtg', realName: 'Piet' });
   const rij = accounts.getUserById(u.id);
-  assert.equal(accounts.verifyPassword('JuistWachtwoord9', rij.password_hash), true);
-  assert.equal(accounts.verifyPassword('foutwachtwoord', rij.password_hash), false);
+  assert.equal(await accounts.verifyPassword('JuistWachtwoord9', rij.password_hash), true);
+  assert.equal(await accounts.verifyPassword('foutwachtwoord', rij.password_hash), false);
   // De hash mag nooit het wachtwoord in leesbare vorm bevatten.
   assert.ok(!String(rij.password_hash).includes('JuistWachtwoord9'));
 });
 
-test('e-mail-login vindt het account via de hash, niet via leesbare tekst', () => {
-  const u = accounts.createUser({ email: 'Zoek.Mij@Voorbeeld.test', password: 'geheim12', tier: 'business', realName: 'Zoeker' });
+test('e-mail-login vindt het account via de hash, niet via leesbare tekst', async () => {
+  const u = await accounts.createUser({ email: 'Zoek.Mij@Voorbeeld.test', password: 'geheim12', tier: 'business', realName: 'Zoeker' });
   // Hoofdletterongevoelig, want de hash normaliseert naar lowercase.
   const gevonden = accounts.findByLogin('zoek.mij@voorbeeld.test');
   assert.ok(gevonden && gevonden.id === u.id);
 });
 
-test('sessietoken: geldig token geeft de gebruiker terug, geknoeid token niet', () => {
-  const u = accounts.createUser({ email: 'tok@voorbeeld.test', password: 'geheim12', tier: 'rtg', realName: 'Tokenlid' });
+test('sessietoken: geldig token geeft de gebruiker terug, geknoeid token niet', async () => {
+  const u = await accounts.createUser({ email: 'tok@voorbeeld.test', password: 'geheim12', tier: 'rtg', realName: 'Tokenlid' });
   const token = accounts.issueToken(u.id);
   const terug = accounts.verifyToken(token);
   assert.ok(terug && terug.id === u.id, 'geldig token geeft de juiste gebruiker');
@@ -61,8 +61,8 @@ test('sessietoken: geldig token geeft de gebruiker terug, geknoeid token niet', 
   assert.equal(accounts.verifyToken('onzin'), null);
 });
 
-test('actietoken is gebonden aan zijn doel', () => {
-  const u = accounts.createUser({ email: 'act@voorbeeld.test', password: 'geheim12', tier: 'rtg', realName: 'Actielid' });
+test('actietoken is gebonden aan zijn doel', async () => {
+  const u = await accounts.createUser({ email: 'act@voorbeeld.test', password: 'geheim12', tier: 'rtg', realName: 'Actielid' });
   const tok = accounts.issueActionToken(u.id, 'verify-email', 60000);
   const ok = accounts.verifyActionToken(tok, 'verify-email');
   assert.ok(ok && ok.id === u.id);

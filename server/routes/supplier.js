@@ -3,7 +3,7 @@
 module.exports = (kern) => {
   const { ALT_IDEE, BOEK_KETEN, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, broadcastSync, cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor } = kern;
 
-app.post('/api/supplier/login', (req, res) => {
+app.post('/api/supplier/login', async (req, res) => {
   let s, actor;
   if (req.body.staffId != null) {
     // Persoonlijke personeelslogin met PIN, binnen het bedrijfsaccount.
@@ -13,7 +13,7 @@ app.post('/api/supplier/login', (req, res) => {
     const fail = pinFails.get(fk);
     if (fail && fail.until > Date.now())
       return res.status(429).json({ error: 'Te veel foute pogingen. Wacht een minuut en probeer het opnieuw.' });
-    const staff = accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
+    const staff = await accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
     if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) {
       const n = ((fail && fail.n) || 0) + 1;
       pinFails.set(fk, n >= 5 ? { n: 0, until: Date.now() + 60000 } : { n, until: 0 });
@@ -50,12 +50,12 @@ app.post('/api/supplier/roster', (req, res) => {
   res.json({ supplier: { code: s.code, name: s.name, type: s.type }, staff: accounts.listStaff(s.code).map(accounts.publicStaff) });
 });
 
-app.post('/api/supplier/staff/add', supplierAuth, (req, res) => {
+app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
   const name = schoon(req.body.name, 60);
   if (!name) return res.status(400).json({ error: 'Vul een naam in.' });
   const pin = accounts.makePin();
-  const staff = accounts.createStaff({ supplierCode: req.supplier.code, name, role: req.body.role === 'manager' ? 'manager' : 'staff', func: String(req.body.func || '').slice(0, 40) || null, pin });
+  const staff = await accounts.createStaff({ supplierCode: req.supplier.code, name, role: req.body.role === 'manager' ? 'manager' : 'staff', func: String(req.body.func || '').slice(0, 40) || null, pin });
   logActivity(req.supplier.code, req.actor, req.actor.name + ' voegde ' + name + ' toe aan het team');
   res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
 });
@@ -528,7 +528,7 @@ app.post('/api/supplier/apply', (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
+app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
   if (!managerOnly(req, res)) return;
   const a = (db.data.applications[req.supplier.code] || []).find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Sollicitatie niet gevonden.' });
@@ -546,7 +546,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, (req, res) => {
   }
   if (req.body.action === 'aannemen') {
     const pin = accounts.makePin();
-    const staff = accounts.createStaff({ supplierCode: req.supplier.code, name: a.name, role: 'staff', func: a.func, pin });
+    const staff = await accounts.createStaff({ supplierCode: req.supplier.code, name: a.name, role: 'staff', func: a.func, pin });
     a.status = 'aangenomen';
     ensureApplyChat(req.supplier.code, a); // ook aangenomen sollicitanten kunnen chatten om af te spreken
     save();

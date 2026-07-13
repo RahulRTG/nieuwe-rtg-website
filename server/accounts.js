@@ -236,18 +236,32 @@ function phoneHash(phone) {
   return n ? crypto.createHmac('sha256', VAULT).update(n).digest('hex') : null;
 }
 
-/* ---------- wachtwoorden (scrypt + salt, tijd-veilige vergelijking) ---------- */
-function hashPassword(pw) {
+/* ---------- wachtwoorden (scrypt + salt, tijd-veilige vergelijking) ----------
+   scrypt is bewust zwaar (dat is de bescherming), maar de synchrone variant
+   blokkeert de HELE server tijdens het rekenen: bij 100 gelijktijdige logins
+   stond alles seconden stil. De asynchrone variant rekent in de threadpool
+   naast de server, zodat andere verzoeken gewoon doorlopen. De Sync-varianten
+   blijven bestaan voor het opstarten (seed) en tests: eenmalig blokkeren voor
+   'listen' is prima en houdt de boot deterministisch. */
+const scryptAsync = (pw, salt, len) => new Promise((resolve, reject) =>
+  crypto.scrypt(pw, salt, len, (err, key) => err ? reject(err) : resolve(key)));
+
+function hashPasswordSync(pw) {
   const salt = crypto.randomBytes(16);
   const hash = crypto.scryptSync(String(pw), salt, 64);
   return salt.toString('hex') + ':' + hash.toString('hex');
 }
-function verifyPassword(pw, stored) {
+async function hashPassword(pw) {
+  const salt = crypto.randomBytes(16);
+  const hash = await scryptAsync(String(pw), salt, 64);
+  return salt.toString('hex') + ':' + hash.toString('hex');
+}
+async function verifyPassword(pw, stored) {
   const parts = String(stored || '').split(':');
   if (parts.length !== 2) return false;
   const salt = Buffer.from(parts[0], 'hex');
   const expected = Buffer.from(parts[1], 'hex');
-  const actual = crypto.scryptSync(String(pw), salt, 64);
+  const actual = await scryptAsync(String(pw), salt, 64);
   return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
 }
 
@@ -256,14 +270,22 @@ function makeCodename() {
 }
 
 /* ---------- gebruikers ---------- */
-function createUser({ email, username, password, tier, realName, phone }) {
+/* createUser is asynchroon (scrypt in de threadpool); createUserSync bestaat
+   voor het opstart-seed en tests, waar blokkeren geen kwaad kan. */
+async function createUser(gegevens) {
+  return schrijfUser(gegevens, await hashPassword(gegevens.password));
+}
+function createUserSync(gegevens) {
+  return schrijfUser(gegevens, hashPasswordSync(gegevens.password));
+}
+function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
   // 'guest' is de gratis (bestel/betaal) laag: een echt account met paspoort,
   // maar zonder betaalde pas. rtg/lifestyle/business zijn de betaalde passen.
   tier = ['rtg', 'lifestyle', 'business', 'guest'].includes(tier) ? tier : 'rtg';
   const vals = [
     email ? emailHash(email) : null,
     username || null,
-    hashPassword(password),
+    passwordHash,
     tier,
     makeCodename(),
     enc(realName),
@@ -358,9 +380,9 @@ function findByReset(token) {
   if (!u || !u.reset_expires || u.reset_expires < Date.now()) return null;
   return u;
 }
-function setPassword(userId, password) {
+async function setPassword(userId, password) {
   db.prepare('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
-    .run(hashPassword(password), userId);
+    .run(await hashPassword(password), userId);
   markUser(userId);
   return getUserById(userId);
 }
@@ -414,8 +436,14 @@ function conversations() {
 }
 
 /* ---------- leverancier-personeel (PIN-accounts binnen een bedrijf) ---------- */
-function createStaff({ supplierCode, name, pin, role, func }) {
-  const vals = [String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), hashPassword(String(pin)), role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString()];
+async function createStaff(gegevens) {
+  return schrijfStaff(gegevens, await hashPassword(String(gegevens.pin)));
+}
+function createStaffSync(gegevens) {
+  return schrijfStaff(gegevens, hashPasswordSync(String(gegevens.pin)));
+}
+function schrijfStaff({ supplierCode, name, role, func }, pinHash) {
+  const vals = [String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), pinHash, role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString()];
   const kolommen = 'supplier_code, name, pin_hash, role, func, created_at';
   const id = nieuwId();
   let newId;
@@ -432,7 +460,7 @@ function createStaff({ supplierCode, name, pin, role, func }) {
 function getStaffById(id) { return db.prepare('SELECT * FROM supplier_staff WHERE id = ? AND active = 1').get(id) || null; }
 function listStaff(code) { return db.prepare('SELECT * FROM supplier_staff WHERE supplier_code = ? AND active = 1 ORDER BY (role=\'manager\') DESC, id').all(String(code || '').toUpperCase()); }
 function countStaff(code) { return db.prepare('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
-function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && verifyPassword(String(pin), s.pin_hash)) ? s : null; }
+async function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && await verifyPassword(String(pin), s.pin_hash)) ? s : null; }
 function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); markStaff(id); }
 function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
@@ -450,8 +478,8 @@ function deleteUser(id) {
 
 module.exports = {
   init, startPostgres, onExternalChange, flushBijAfsluiten,
-  createUser, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
-  createStaff, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, makePin, deleteUser,
+  createUser, createUserSync, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
+  createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, makePin, deleteUser,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword

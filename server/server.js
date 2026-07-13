@@ -39,6 +39,7 @@ const mail = require('./mail');
 const logboek = require('./log');
 const log = logboek.log;
 const betaal = require('./betaal');
+const { schoon, ledenPrijs, centen, entreeCode, pickupCode } = require('./kern/util');
 
 /* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
    pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
@@ -478,11 +479,6 @@ onExternalChange(() => {
    referentie (het plafond); de ledenprijs wordt daar altijd op afgekapt. Dit
    wordt op drie plekken afgedwongen: bij het normaliseren van een menukaart,
    bij het opslaan ervan, en nog eens bij het plaatsen van een bestelling. */
-function ledenPrijs(publiek, ledenprijs) {
-  const p = Math.max(0, Number(publiek) || 0);
-  const l = Math.max(0, Number(ledenprijs != null ? ledenprijs : publiek) || 0);
-  return Math.min(l, p);
-}
 
 function ensureSupplierDefaults(s) {
   if (!Array.isArray(s.menu)) s.menu = [];
@@ -875,9 +871,6 @@ function auth(req, res, next) {
 /* Schoonmaakhulp voor vrije tekstvelden: knipt op lengte en haalt < en >
    weg, zodat door gebruikers ingevoerde namen en berichten nooit als
    opmaak in andermans scherm kunnen belanden. */
-function schoon(v, n) {
-  return String(v == null ? '' : v).replace(/[<>]/g, '').slice(0, n || 120).trim();
-}
 
 /* Ledengids voor Salon-connecties: sleutel -> codenaam. Wordt bijgehouden
    zodra een lid iets doet; zo kunnen leden elkaar op codenaam vinden
@@ -1510,19 +1503,6 @@ function ticketsVoorSlot(code, activiteitId, datum, tijd) {
     b.activiteitId === activiteitId && b.datum === datum && b.tijd === tijd &&
     b.status !== 'geweigerd' &&
     (b.paid || (nu - new Date(b.at).getTime()) < 30 * 60000));
-}
-function entreeCode() {
-  // zes tekens, zonder verwarrende 0/O/1/I: makkelijk voor te lezen aan de deur
-  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let c = '';
-  for (let i = 0; i < 6; i++) c += A[crypto.randomInt(A.length)];
-  return c;
-}
-function pickupCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let c = '';
-  for (let i = 0; i < 4; i++) c += chars[crypto.randomInt(chars.length)];
-  return c;
 }
 
 // ---- kamers (hotel/appartement): aan/uit, toevoegen, verwijderen ----
@@ -2212,7 +2192,6 @@ const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCa
 
 
 /* ---- de boekhouding van de zaak: btw per genre, personeelskosten, cadeaukaarten ---- */
-function centen(n) { return Math.round(n * 100) / 100; }
 const FIN_CAT = { eten: 'Eten (keuken)', drank: 'Dranken (bar)', logies: 'Logies', vervoer: 'Personenvervoer', jet: 'Internationaal vervoer', dienst: 'Diensten & producten' };
 
 function financeVoor(s) {

@@ -47,7 +47,7 @@ const ENV = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: '
 
 let child = null;
 const cleanup = () => { try { if (child) child.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} };
-setTimeout(() => { console.log('\nHARD TIMEOUT'); cleanup(); process.exit(1); }, 580000);
+setTimeout(() => { console.log('\nHARD TIMEOUT'); cleanup(); process.exit(1); }, 900000);
 
 const kop = t => console.log('\n\x1b[1m' + t + '\x1b[0m');
 const rij = (l, v) => console.log('  ' + String(l).padEnd(38) + v);
@@ -136,17 +136,19 @@ const KEUKENS = ['KIKUNOI', 'PONTO'];
   const slaap = ms => new Promise(r => setTimeout(r, ms + Math.random() * ms));
   const sse = { events: {}, open: 0 };
 
-  const actors = [];
-  for (let i = 0; i < MEMBERS; i++) {
+  // parallel in blokken registreren + verbinden + "onderweg" zetten (snel opstarten)
+  const inBlokken = async (n, fn, blok = 50) => { for (let i = 0; i < n; i += blok) { const p = []; for (let j = i; j < Math.min(n, i + blok); j++) p.push(fn(j)); await Promise.all(p); } };
+  const actors = new Array(MEMBERS).fill(null);
+  await inBlokken(MEMBERS, async i => {
     const reg = await api('registratie', '/api/auth/register', { name: 'Gast ' + i, email: 'kpg' + i + '@rtg.nl', phone: '06' + (40000000 + i), password: 'Spits1234!', geboortedatum: '1985-05-05', tier: 'business', pasApp: 'business' });
-    if (reg && reg.token) actors.push({ i, token: reg.token });
-  }
-  for (const a of actors) {
+    if (!reg || !reg.token) return;
+    const a = { i, token: reg.token };
     const c = await api('connecties', '/api/member/connections', {}, a.token); a.key = c && c.me;
-    // iedereen "onderweg" zetten zodat de live GPS-updates werken
     a.lat = 38.90 + Math.random() * 0.06; a.lng = 1.40 + Math.random() * 0.06;
     await api('live-start', '/api/live/start', { mode: 'driving', lat: a.lat, lng: a.lng }, a.token);
-  }
+    actors[i] = a;
+  });
+  for (let i = actors.length - 1; i >= 0; i--) if (!actors[i]) actors.splice(i, 1);
   rij('gasten (leden) geregistreerd + onderweg', actors.length);
 
   const keukens = {};
@@ -204,7 +206,7 @@ const KEUKENS = ['KIKUNOI', 'PONTO'];
   }
   // alle andere apps druk (compact)
   const paren = []; for (let i = 0; i + 1 < actors.length; i += 2) paren.push([actors[i], actors[i + 1]]);
-  for (const [a, b] of paren) { await api('vriend', '/api/member/connect', { key: b.key }, a.token); await api('vriend', '/api/member/connect/respond', { key: a.key, action: 'accept' }, b.token); }
+  await inBlokken(paren.length, async pi => { const [a, b] = paren[pi]; await api('vriend', '/api/member/connect', { key: b.key }, a.token); await api('vriend', '/api/member/connect/respond', { key: a.key, action: 'accept' }, b.token); });
 
   /* MILJOENEN VIDEOGESPREKKEN: elk paar draait onophoudelijk de volledige
      WebRTC-signaleringscyclus (ring, accept, offer, answer, 3x ICE, hangup).

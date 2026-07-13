@@ -62,8 +62,8 @@ gebruikt.
 ## 7. Diepere toegankelijkheid
 Axe is groen (0 serious/critical), maar dat dekt geen focusbeheer of toetsenbord.
 
-- [ ] Focus verplaatsen naar de nieuwe view bij tabwissel.
-- [ ] `role`/`tabindex`/keydown op custom controls (chips, vinkjes).
+- [x] PDA: focus naar de nieuwe view bij een echte tabklik + aria-current op de actieve tab.
+- [~] `role`/`tabindex` op de PDA-views; keydown op custom controls elders nog open.
 - [ ] `prefers-reduced-motion` respecteren.
 
 ## 8. Testdekking verbreden

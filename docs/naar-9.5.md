@@ -19,6 +19,11 @@ toast uit. Doel: één gedeelde laag, zodat elke app zich identiek gedraagt.
   (elk gedekt door een e2e-boot-test die login + geen JS-fouten bewijst).
 
 ## 2. Escaping structureel (veiligheid)
+
+Opgemerkt en gedicht: renderPChat (leden-partnerchat) zette de afzendernaam (m.who)
+ongefilterd in de HTML -> nu Util.el (structureel veilig). Interactie-e2e voor de
+partnerchat is uitgesteld (city-gefilterde lijst + gastchat-toggle maken de opzet
+broos); geverifieerd met check + a11y (pagina laadt schoon).
 115 handmatige `esc()`-aanroepen = 115 plekken om te vergeten. Het
 componentframework (`util.js`) dwingt escaping af maar wordt door ~4 van de apps
 gebruikt.

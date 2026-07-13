@@ -3173,14 +3173,20 @@
     renderPChat(msgs);
   }
   function renderPChat(msgs){
-    $('#pcBody').innerHTML = msgs.length ? msgs.map(m =>
-      '<div class="pc-msg ' + (m.from === 'guest' ? 'me' : 'them') + '">' +
-        (m.from === 'partner' ? '<span class="who">' + m.who + '</span>' : '') +
-        m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
-        (m.orig ? '<span style="display:block;margin-top:0.25rem;font-size:0.66rem;opacity:0.55;font-style:italic;">' + m.orig.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>' : '') +
-        '<time>' + timeAgo(m.at) + '</time></div>'
-    ).join('') : '<div class="pc-empty">' + T('app.pc.empty','Stel uw vraag rechtstreeks aan het team. Roomservice, een verzoek aan de eigenaar, of gewoon even iets regelen.') + '</div>';
-    const b = $('#pcBody'); b.scrollTop = b.scrollHeight;
+    // Met Util.el: zowel de naam van de afzender (m.who) als de berichttekst gaan
+    // structureel als tekstknoop. Dat sluit een gat: de oude versie zette m.who
+    // ongefilterd in de HTML en escapete de tekst maar deels.
+    const E = Util.el, body = $('#pcBody');
+    if (!msgs.length){
+      Util.vervang(body, E('div', { class: 'pc-empty' }, T('app.pc.empty', 'Stel uw vraag rechtstreeks aan het team. Roomservice, een verzoek aan de eigenaar, of gewoon even iets regelen.')));
+      return;
+    }
+    Util.vervang(body, msgs.map(m => E('div', { class: 'pc-msg ' + (m.from === 'guest' ? 'me' : 'them') },
+      m.from === 'partner' ? E('span', { class: 'who' }, m.who) : null,
+      m.text,
+      m.orig ? E('span', { style: { display: 'block', marginTop: '0.25rem', fontSize: '0.66rem', opacity: '0.55', fontStyle: 'italic' } }, m.orig) : null,
+      E('time', {}, timeAgo(m.at)))));
+    body.scrollTop = body.scrollHeight;
   }
   async function sendPChat(){
     const inp = $('#pcInput');

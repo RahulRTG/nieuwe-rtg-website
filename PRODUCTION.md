@@ -95,10 +95,13 @@ Volledige lijst met uitleg: `.env.example`.
   scripts), `nosniff`/`DENY`/referrer/permissions-headers, token-hashing,
   sessieverloop, rate-limits, AVG-rechten (inzage + verwijderen).
 - **Inlogpieken** - wachtwoord-hashing (scrypt) rekent asynchroon in de
-  libuv-threadpool naast de server; `UV_THREADPOOL_SIZE` staat standaard op 16
-  (server.js en Docker-image). Gemeten op een miljoen-leden database met 100
-  gelijktijdige logins: de site blijft vlot terwijl de logins doorstromen.
-  Meer piekcapaciteit per instance: verhoog `UV_THREADPOOL_SIZE`.
+  libuv-threadpool naast de server; server.js zet `UV_THREADPOOL_SIZE`
+  standaard op het aantal CPU-kernen (minimaal 4). Gemeten op een
+  miljoen-leden database met 100 gelijktijdige logins: de site blijft vlot
+  terwijl de logins doorstromen. scrypt is puur rekenwerk, dus de
+  piekcapaciteit per instance schaalt met de kernen van de machine;
+  meer draden dan kernen levert niets op. Meer capaciteit = zwaardere
+  machine of meer instances (vloot/trio).
 - **Graceful shutdown** — `SIGTERM`/`SIGINT` schrijven data weg en sluiten netjes.
 - **Failover** — drie-server-cluster met poortwachter (`server/trio.js`).
 - **Toegankelijkheid** — alle vlaggenschip-schermen axe-schoon (CI bewaakt dit).

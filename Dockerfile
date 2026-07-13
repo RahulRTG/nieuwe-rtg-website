@@ -5,9 +5,9 @@ FROM node:22-slim
 # Alleen productie-afhankelijkheden; de dev-tools (terser, axe) horen niet in de
 # runtime-image. npm ci is reproduceerbaar op basis van de lockfile.
 ENV NODE_ENV=production
-# Meer draden voor scrypt (wachtwoord-hashing) bij inlogpieken; server.js zet
-# dezelfde standaard, maar in de image is hij expliciet en overschrijfbaar.
-ENV UV_THREADPOOL_SIZE=16
+# Threadpool voor scrypt (wachtwoord-hashing): server.js zet hem standaard op
+# het aantal CPU-kernen van de host. Alleen expliciet zetten als je wilt afwijken:
+#   docker run -e UV_THREADPOOL_SIZE=8 ...
 WORKDIR /app
 
 COPY package.json package-lock.json ./

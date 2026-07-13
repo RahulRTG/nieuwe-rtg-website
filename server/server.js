@@ -16,11 +16,16 @@ if (!process.execArgv.some(a => a.includes('experimental-sqlite'))) {
 }
 
 /* Wachtwoord-hashing (scrypt) rekent in de libuv-threadpool, die standaard
-   maar 4 draden heeft: bij een inlogpiek wordt die pool de flessenhals.
-   16 draden geeft ~4x meer gelijktijdige logins per instance. Dit moet
-   gezet zijn VOOR het eerste asynchrone crypto/fs-werk, dus hier bovenaan;
-   een expliciete UV_THREADPOOL_SIZE uit de omgeving wint altijd. */
-if (!process.env.UV_THREADPOOL_SIZE) process.env.UV_THREADPOOL_SIZE = '16';
+   maar 4 draden heeft, ongeacht de machine. scrypt is puur rekenwerk, dus de
+   juiste maat is: evenveel draden als CPU-kernen (gemeten: op een 4-kernen
+   machine brengt meer dan 4 niets, op een 16-kernen machine wel ~4x meer
+   gelijktijdige logins). Dit moet gezet zijn VOOR het eerste asynchrone
+   crypto/fs-werk, dus hier bovenaan; een expliciete UV_THREADPOOL_SIZE uit
+   de omgeving wint altijd. */
+if (!process.env.UV_THREADPOOL_SIZE) {
+  const kernen = require('os').availableParallelism();
+  process.env.UV_THREADPOOL_SIZE = String(Math.max(4, kernen));
+}
 
 const express = require('express');
 const path = require('path');

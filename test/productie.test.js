@@ -29,9 +29,22 @@ test('config: onveilige productie geeft blokkerende fouten', () => {
 test('config: veilige productie is foutloos', () => {
   const r = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
     APP_URL: 'https://x', DATABASE_URL: 'postgresql://x', RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
-    REDIS_URL: 'r', SENTRY_DSN: 's', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k' });
+    REDIS_URL: 'r', SENTRY_DSN: 's', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k',
+    RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
   assert.equal(r.fouten.length, 0);
   assert.equal(r.waarschuwingen.length, 0);
+});
+
+test('config: het voorbeeld-eigenaarsadres blokkeert de productiestart', () => {
+  // met het voorbeeldadres zou iedereen die het registreert eigenaar van de
+  // technische pagina worden; ontbreken of default = harde fout
+  const zonder = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64) });
+  assert.ok(zonder.fouten.some(f => /RTG_OWNER_EMAIL/.test(f)));
+  const standaard = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'rahul@rtg.example' });
+  assert.ok(standaard.fouten.some(f => /RTG_OWNER_EMAIL/.test(f)));
+  // en een te korte backoffice-code ook
+  const zwak = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'e@x.nl', OFFICE_CODE: 'kort' });
+  assert.ok(zwak.fouten.some(f => /OFFICE_CODE/.test(f)));
 });
 
 test('config: ontbrekende enc-key mag met bewuste opt-out', () => {

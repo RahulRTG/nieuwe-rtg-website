@@ -20,6 +20,11 @@ module.exports = (kern) => {
   const PAS_FOUT = 'Deze inloggegevens horen bij een andere pas. Open de app van uw eigen pas via rtg.example/apps.';
   // e-maillinks (bevestigen/herstellen) landen in de pas-app van het account
   const pasAppVan = (tier) => tier === 'lifestyle' || tier === 'business' ? tier : 'rtg';
+  /* Zonder SMTP geven we buiten productie de link/code in het antwoord terug
+     (dev-velden), zodat lokaal en in tests de hele flow werkt. In PRODUCTIE
+     nooit: anders zou een aanvrager de herstel-link en telefooncode van een
+     ander account zo in het antwoord krijgen. */
+  const DEV_VELDEN = !PRODUCTION && !mail.configured;
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
@@ -91,7 +96,7 @@ app.post('/api/auth/register', (req, res) => {
     'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl);
   const token = accounts.issueToken(user.id);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
-  res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true, ...(mail.configured ? {} : { devVerifyUrl: verifyUrl }) });
+  res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true, ...(DEV_VELDEN ? { devVerifyUrl: verifyUrl } : {}) });
 });
 
 app.post('/api/auth/verify-email', (req, res) => {
@@ -107,7 +112,7 @@ app.post('/api/auth/resend', auth, (req, res) => {
   const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
   const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&verify=' + vtok;
   mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
-  res.json({ ok: true, ...(mail.configured ? {} : { devVerifyUrl: url }) });
+  res.json({ ok: true, ...(DEV_VELDEN ? { devVerifyUrl: url } : {}) });
 });
 
 /* Wachtwoord vergeten: tweestapsverificatie via de website. Stap 1 is de
@@ -137,7 +142,7 @@ app.post('/api/auth/forgot', (req, res) => {
     const tel = accounts.phoneOf(u) || 'onbekend';
     mail.send('whatsapp:' + tel, 'Uw RTG-herstelcode',
       'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
-    if (!mail.configured) { devResetUrl = url; devCode = code; }
+    if (DEV_VELDEN) { devResetUrl = url; devCode = code; }
   }
   // Altijd hetzelfde antwoord: niet verklappen of een e-mailadres bestaat.
   res.json({ ok: true, tweestaps: true, ...(devResetUrl ? { devResetUrl, devCode } : {}) });

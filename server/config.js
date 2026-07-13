@@ -36,6 +36,13 @@ function valideer(env) {
       fouten.push('DEMO_PASS staat nog op de standaardwaarde.');
     if (env.RTG_CLUSTER_KEY && env.RTG_CLUSTER_KEY.length < 16)
       fouten.push('RTG_CLUSTER_KEY is te kort om de failover-endpoints te beschermen.');
+    // De eigenaar van de technische pagina wordt op e-mailadres herkend. Met het
+    // voorbeeldadres zou IEDEREEN die dat adres registreert eigenaar worden
+    // (zekeringen, functieschakelaars, beveiligingsmeldingen). Hard blokkeren.
+    if (!env.RTG_OWNER_EMAIL || env.RTG_OWNER_EMAIL === 'rahul@rtg.example')
+      fouten.push('RTG_OWNER_EMAIL ontbreekt of staat op het voorbeeldadres: wie dat adres registreert zou eigenaar van de technische pagina worden. Zet het echte e-mailadres van de eigenaar.');
+    if (env.OFFICE_CODE && env.OFFICE_CODE.length < 8)
+      fouten.push('OFFICE_CODE is te kort; gebruik minstens 8 tekens (of laat hem weg voor een willekeurige code).');
 
     // 4. Aanbevolen, maar niet blokkerend.
     if (!env.APP_URL) waarschuwingen.push('APP_URL niet gezet: links in e-mails vallen terug op de Host-header.');

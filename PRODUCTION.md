@@ -100,6 +100,21 @@ Volledige lijst met uitleg: `.env.example`.
 
 ## 5. Go-live checklist
 
+De eerste twee stappen zijn geautomatiseerd:
+
+```bash
+npm run sleutels   # maakt alle geheimen in een keer (.env-blok)
+npm run golive     # keurt de omgeving: exitcode 0 = klaar om live te gaan
+```
+
+De keuring beoordeelt de configuratie op productieniveau, probeert PostgreSQL
+echt te bereiken en somt blokkerende punten op. De testsuite bevat bovendien
+een generale repetitie (`test/golive.test.js`) die de server echt in
+productiestand start en bewijst: onveilige start geweigerd, demo dicht, geen
+dev-lekken, registratie/eigenaar/backoffice werken.
+
+- [ ] `npm run golive` geeft exitcode 0 op de productiemachine
+- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar (verplicht; het voorbeeldadres blokkeert de start)
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
 - [ ] TLS-termination (reverse proxy / load balancer) vóór de app; `trust proxy` staat aan

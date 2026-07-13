@@ -8,6 +8,8 @@
     "single": "node --experimental-sqlite server/server.js",
     "gateway": "node server/poort.js",
     "vloot": "node server/vloot.js",
+    "sleutels": "node scripts/sleutels.js",
+    "golive": "node scripts/golive.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
     "a11y": "node scripts/a11y.js",

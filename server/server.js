@@ -45,6 +45,8 @@ const { publicPartner, weekdagFactor, cvReady, btwSplit } = require('./kern/afge
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP, maakFiscaal } = require('./kern/fiscaal');
 const { RUN_STATIONS, ALT_IDEE, coachCache, maakEvents } = require('./kern/events');
 const { maakLive } = require('./kern/live');
+const { RIT_KETEN, RIT_LEGACY, RIT_MELDING, maakVervoer } = require('./kern/vervoer');
+const { VAC_SOORTEN, maakWerk } = require('./kern/werk');
 
 /* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
    pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
@@ -1668,25 +1670,12 @@ function validDept(s, dept) {
   return list.includes(dept) ? dept : list[0];
 }
 
-/* Elk gastgesprek is meertalig: ieder schrijft in de eigen taal en de
-   ontvanger leest het in de zijne. Vertalingen worden per bericht gecachet. */
-async function trChat(messages, to) {
-  const out = [];
-  for (const m of messages) {
-    const from = m.lang || 'nl';
-    if (from === to || !m.text) { out.push({ ...m, orig: null }); continue; }
-    m.tr = m.tr || {};
-    if (!m.tr[to]) {
-      try {
-        const r = await i18n.translate(m.text, to, from);
-        m.tr[to] = (r && typeof r === 'object') ? (r.text || m.text) : String(r || m.text);
-        save();
-      } catch (e) { m.tr[to] = m.text; }
-    }
-    out.push({ ...m, text: m.tr[to], orig: m.text, tr: undefined });
-  }
-  return out;
-}
+/* De werk-laag (vacatures, sollicitatiechat en chatvertaling) staat in
+   server/kern/werk.js. VAC_SOORTEN komt daar rechtstreeks vandaan; de functies
+   dragen db, i18n, mail, LANDEN en de leverancier-/realtime-helpers.
+   findSupplier, sseToSupplier, notifySupplier en notify zijn hoisted functies. */
+const { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, chatStuur, meldWerkgever, openVacatures, werkgeverSollicitatie, notifyApplicant } =
+  maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify });
 
 // gast stuurt een bericht aan een partner (per afdeling een eigen gesprek)
 
@@ -1705,135 +1694,12 @@ async function trChat(messages, to) {
    Openbaar formulier per bedrijf; de manager ziet de sollicitatie in de app
    en neemt aan (dan ontstaat direct een personeelsaccount met pincode) of
    wijst af. Zo wordt personeel zoeken voor elk bedrijf gelijk en simpel. */
-/* ---- chat tussen sollicitant en werkgever ----
-   Zodra de werkgever een sollicitant uitnodigt of aanneemt, komen beiden in een
-   chat om samen een afspraak te maken (langskomen, eerste werkdag). Werkt voor
-   RTG-leden en RTFoundation-leden; de app vertaalt de berichten automatisch naar
-   ieders eigen taal. Een anonieme sollicitant (zonder account) krijgt e-mail. */
-function chatApplicant(a) {
-  if (a.viaRTF && a.rtf) return { kind: 'rtf', gezinCode: a.rtf.code, profielId: a.rtf.profielId, naam: a.name };
-  if (a.key) return { kind: 'rtg', key: a.key, naam: a.name };
-  return null; // anoniem: geen in-app chat
-}
-function ensureApplyChat(supplierCode, a) {
-  if (db.data.applyChats[a.id]) return db.data.applyChats[a.id];
-  const applicant = chatApplicant(a);
-  if (!applicant) return null;
-  const s = findSupplier(supplierCode);
-  const chat = { id: a.id, supplierCode, func: a.func, bedrijf: s ? s.name : supplierCode, applicant, berichten: [], at: new Date().toISOString() };
-  db.data.applyChats[a.id] = chat;
-  return chat;
-}
-function applyChatPubliek(chat) {
-  return { id: chat.id, func: chat.func, bedrijf: chat.bedrijf, metWie: chat.applicant.naam,
-    berichten: (chat.berichten || []).map(m => ({ van: m.van, wie: m.wie, tekst: m.tekst, at: m.at })) };
-}
-// stuur een chatbericht; 'van' is 'werkgever' of 'sollicitant'
-function chatStuur(chat, van, wie, tekst) {
-  const t = String(tekst || '').trim().slice(0, 1000);
-  if (!t) return null;
-  const bericht = { van, wie: String(wie || '').slice(0, 60), tekst: t, at: new Date().toISOString() };
-  chat.berichten.push(bericht);
-  chat.berichten = chat.berichten.slice(-200);
-  save();
-  // live seintje naar de andere kant
-  sseToSupplier(chat.supplierCode, 'sync', { scope: 'team' });
-  if (chat.applicant.kind === 'rtg' && chat.applicant.key) sseToCustomer(chat.applicant.key, 'sync', { scope: 'apply' });
-  return bericht;
-}
-
-
-// werkgever leest/schrijft in de sollicitatiechat
-
-// een bericht van de sollicitant laat de werkgever meteen iets weten
-function meldWerkgever(chat, tekst) {
-  notifySupplier(chat.supplierCode, { icon: '💬', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80) });
-}
-
-// RTG-lid: mijn sollicitatiechats
-
-// RTFoundation-lid: mijn sollicitatiechat (met gezin-token)
-
-/* ---- vacatures: het bedrijf plaatst openstaande functies ----
-   Deze vacatures verschijnen ook in de RTFoundation, zodat leden van arme
-   gezinnen (vanaf 16 jaar, met een verplicht cv) er in een tik op solliciteren.
-   De leeftijdsgrens sluit aan op de RTF-leeftijdsgroepen: standaard 16 jaar. */
-const VAC_SOORTEN = ['bijbaan', 'fulltime', 'parttime', 'stage', 'vrijwilliger', 'vakantiewerk'];
-
-/* ---- vacatures voor de RTFoundation ----
-   Openbare lijst met alle openstaande vacatures over alle partners heen. De
-   RTF-app filtert op de leeftijdsgroep van het profiel (vanaf 16 jaar). */
-function openVacatures(minLeeftijd, land) {
-  const uit = [];
-  for (const [code, list] of Object.entries(db.data.vacatures || {})) {
-    const s = findSupplier(code);
-    if (!s) continue;
-    const t = db.data.supplierTypes[s.type] || {};
-    const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
-    if (land && landCode !== land) continue;
-    for (const v of list) {
-      if (!v.open) continue;
-      if (minLeeftijd != null && v.minLeeftijd > minLeeftijd) continue;
-      uit.push({
-        id: v.id, supplierCode: code, bedrijf: s.name, soort: v.soort,
-        type: s.type || null, typeLabel: t.label || null, icon: t.icon || '🏢',
-        func: v.func, omschrijving: v.omschrijving, plaats: v.plaats, uren: v.uren,
-        minLeeftijd: v.minLeeftijd, at: v.at,
-        // land van het bedrijf: RTG is internationaal, dus je solliciteert ook
-        // gerust in het buitenland
-        land: landCode, landNaam: LANDEN[landCode].naam,
-        // locatie van het bedrijf, zodat de app de afstand kan tonen
-        loc: s.loc ? { lat: s.loc.lat, lng: s.loc.lng, label: s.loc.label } : null,
-        stad: s.city || null
-      });
-    }
-  }
-  uit.sort((a, b) => (b.at || '').localeCompare(a.at || ''));
-  return uit;
-}
-
-/* Een RTF-lid solliciteert met het cv uit de RTFoundation-cv-maker. Het cv is
-   verplicht vanaf 16 jaar; jonger dan 16 kan niet solliciteren. Het bedrijf
-   ziet de sollicitatie in dezelfde lijst als alle andere, zonder RTF-markering.
-   We controleren het gezin-token (lichte beveiliging + terugkoppeling), remmen
-   spam af en weren dubbele sollicitaties. */
-
-/* Wat de werkgever van een sollicitatie te zien krijgt. Een sollicitant uit de
-   RTFoundation mag NOOIT als zodanig herkenbaar zijn: wie via de foundation
-   solliciteert, verschijnt bij het bedrijf precies als een gewoon RTG-lid, met
-   hetzelfde cv en dezelfde markering. Dat de herkomst de foundation is, houden
-   wij alleen intern bij (het veld viaRTF blijft in onze eigen administratie).
-   Zo maakt het voor de kans op werk geen enkel verschil waar iemand vandaan komt. */
-function werkgeverSollicitatie(a) {
-  if (!a) return a;
-  // interne velden verlaten nooit onze administratie richting de werkgever:
-  // de RTFoundation-herkomst, de sessiesleutel en de gezinsverwijzing
-  const { viaRTF, key, rtf, ...rest } = a;
-  if (viaRTF) rest.viaRTG = true; // RTF-sollicitant lijkt op een gewoon RTG-lid
-  return rest;
-}
-
-// Solliciteerde een RTG-lid, dan hoort het lid direct van het besluit:
-// live in de app en (bij demo-profielen) als notificatie met push.
-function notifyApplicant(a, supplier) {
-  const hired = a.status === 'aangenomen';
-  // e-mail werkt voor iedereen met een e-mailadres als contact, ook zonder RTG-account
-  if (/@/.test(a.contact || '')) {
-    mail.send(a.contact, hired ? 'U bent aangenomen bij ' + supplier.name : 'Uw sollicitatie bij ' + supplier.name,
-      'Beste ' + a.name + ',\n\n' + supplier.name + ' heeft uw sollicitatie als ' + a.func +
-      (hired ? ' geaccepteerd. Het bedrijf neemt contact met u op over uw eerste werkdag.' : ' helaas afgewezen.') +
-      '\n\nRahul Travel Group');
-  }
-  if (!a.key) return;
-  if (db.data.notifications[a.key]) {
-    notify(a.key, {
-      icon: hired ? '🎉' : '📝',
-      title: hired ? 'U bent aangenomen!' : 'Sollicitatie afgerond',
-      body: supplier.name + ' heeft uw sollicitatie als ' + a.func + (hired ? ' geaccepteerd. Het bedrijf neemt contact met u op.' : ' helaas afgewezen.')
-    });
-  }
-  sseToCustomer(a.key, 'sync', { scope: 'apply' });
-}
+/* De sollicitatie- en vacaturelogica (chatApplicant, ensureApplyChat,
+   applyChatPubliek, chatStuur, meldWerkgever, openVacatures,
+   werkgeverSollicitatie, notifyApplicant) staat in server/kern/werk.js en is
+   hierboven al opgezet via maakWerk(). VAC_SOORTEN komt uit dezelfde module.
+   Privacy: wie via de RTFoundation solliciteert, is voor de werkgever niet als
+   zodanig herkenbaar (werkgeverSollicitatie verwijdert de interne velden). */
 
 /* ---- AVG-rechten: inzage en vergetelheid, rechtstreeks vanuit de app ----
    Export levert alles wat op deze persoon herleidbaar is in een JSON;
@@ -2067,41 +1933,13 @@ function sectiesForOrder(s, o) {
 // ---- leverancier deelt live locatie → klanten met actieve rit/bestelling ----
 
 // ---- vervoerspartner werkt de ritstatus bij → lid live op de hoogte ----
-/* Ritstatus: een vaste, logische keten met nette meldingen naar de gast.
-   Oude statusnamen (rijdt/gearriveerd) blijven werken voor bestaande data. */
-const RIT_KETEN = ['aangevraagd', 'geaccepteerd', 'onderweg', 'aangekomen', 'aan-boord', 'afgerond'];
-const RIT_LEGACY = { rijdt: 'aan-boord', gearriveerd: 'afgerond' };
-const RIT_MELDING = {
-  geaccepteerd: 'Uw rit is bevestigd.',
-  onderweg: 'Uw chauffeur is onderweg naar u.',
-  aangekomen: 'Uw chauffeur staat voor.',
-  'aan-boord': 'Goede reis!',
-  afgerond: 'U bent gearriveerd. Dank voor het reizen met RTG.',
-  geweigerd: 'De rit kon helaas niet worden aangenomen.'
-};
-function ritVerder(req, res, r, status) {
-  r.status = status;
-  const gastLoc = (() => { const L = db.data.live[r.customerKey || r.customerTier]; return L && Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null; })();
-  if (status === 'onderweg') r.pickupEtaMin = etaMinutes(haversine(req.supplier.loc, gastLoc), 'driving') || 6;
-  if (status === 'aan-boord') { r.boardedAt = new Date().toISOString(); r.dropEtaMin = r.km ? etaMinutes(r.km * 1000, r.type === 'jet' ? 'flying' : 'driving') : 12; }
-  if (status === 'afgerond') r.finishedAt = new Date().toISOString();
-  save();
-  broadcastSync([r.customerTier], 'orders');
-  sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'live' });
-  sseToOffice('sync', { scope: 'orders' });
-  notify(r.customerTier, { icon: r.type === 'jet' ? '✈️' : '🚗', title: req.supplier.name, body: RIT_MELDING[status] || ('Uw rit is nu: ' + status + '.'), scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, 'zette rit ' + r.ref + ' op "' + status + '"');
-  res.json({ ok: true, ride: r });
-}
-
-/* Slimme toewijzing: de eerste vrije chauffeur en een passend, vrij voertuig. */
-function ritBezetting(code) {
-  const actief = db.data.rides.filter(r => r.supplierCode === code && ['geaccepteerd', 'onderweg', 'aangekomen', 'aan-boord'].includes(RIT_LEGACY[r.status] || r.status));
-  return {
-    drukkeChauffeurs: new Set(actief.filter(r => r.driver).map(r => r.driver.staffId)),
-    bezetteVoertuigen: new Set(actief.filter(r => r.vehicle).map(r => r.vehicle.id))
-  };
-}
+/* De vervoerslaag (ritstatusketen + slimme toewijzing) staat in
+   server/kern/vervoer.js. RIT_KETEN/RIT_LEGACY/RIT_MELDING komen daar
+   rechtstreeks vandaan; ritVerder en ritBezetting dragen db + de realtime-
+   helpers. logActivity, broadcastSync, notify en de SSE-routers zijn al gezet. */
+const { ritVerder, ritBezetting } = maakVervoer({
+  db, etaMinutes, haversine, save, broadcastSync, sseToCustomer, sseToOffice, notify, logActivity
+});
 
 /* Toewijzen: het kantoor wijst toe, of een chauffeur neemt de rit zelf. */
 

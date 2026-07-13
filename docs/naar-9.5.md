@@ -45,10 +45,13 @@ gebruikt.
 ## 4. server.js opknippen (laatste god-file)
 `server.js` was 3032 regels met 114 top-level helpers.
 
-- [~] `server/kern/util.js`: zuivere hulpjes (schoon, ledenPrijs, centen,
+- [x] `server/kern/util.js`: zuivere hulpjes (schoon, ledenPrijs, centen,
   entree/pickupCode) eruit, los getest (`test/kern-util.test.js`).
-- [ ] Verplaats verdere zuivere groepen (opmaak, prijs/btw, geo-afgeleiden) naar
-  `server/kern/`.
+- [x] `server/kern/afgeleid.js`: publicPartner, weekdagFactor, cvReady + de
+  btw-splitsing (btwSplit) eruit, los getest (`test/kern-afgeleid.test.js`).
+  Geo (`server/lib/geo.js`) en leeftijd (`server/lib/leeftijd.js`) waren al los.
+- [ ] Groepeer de resterende staat-dragende helpers (sessies, SSE) in eigen
+  modules met een duidelijke `maak…(state)`-fabriek.
 - [ ] Groepeer de staat-dragende helpers (sessies, SSE) in eigen modules met een
   duidelijke `maak…(state)`-fabriek.
 

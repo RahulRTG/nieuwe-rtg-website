@@ -40,6 +40,7 @@ const logboek = require('./log');
 const log = logboek.log;
 const betaal = require('./betaal');
 const { schoon, ledenPrijs, centen, entreeCode, pickupCode } = require('./kern/util');
+const { publicPartner, weekdagFactor, cvReady, btwSplit } = require('./kern/afgeleid');
 
 /* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
    pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
@@ -1262,10 +1263,6 @@ function findStaffPartner(staffCode) {
   return db.data.partners.find(p => p.staff && p.staff.code === staffCode) || null;
 }
 
-function publicPartner(p) {
-  return { code: p.code, name: p.name, type: p.type, handle: p.handle, hasStaff: !!p.staff };
-}
-
 function publicTrip(t, staffRate, lang) {
   const out = {
     id: t.id, dest: t.dest, visual: t.visual, title: i18n.localize(t.title, lang),
@@ -2001,12 +1998,6 @@ function coachRules(s, open, lang) {
    De keuken voorspelt de dag: verwachte couverts uit de verkoophistorie van de
    afgelopen drie weken, de tafelcapaciteit en de weekdag; per gerecht een
    portie-aantal en een MEP-takenlijst voor het team. */
-function weekdagFactor(d) {
-  const wd = d.getDay(); // 0 = zondag
-  if (wd === 5 || wd === 6) return [1.25, 'vrijdag/zaterdag, druk'];
-  if (wd === 0) return [1.0, 'zondag, gemiddeld'];
-  return [0.85, 'doordeweeks, rustiger'];
-}
 
 
 // lid meldt zich aan voor een gepubliceerd event
@@ -2025,9 +2016,6 @@ function makeSupplierCode(name) {
 
 
 /* ---- cv-builder (leden-app): het cv is de sleutel tot solliciteren ---- */
-function cvReady(cv) {
-  return !!(cv && cv.name && cv.contact && ((cv.experience || []).length || (cv.skills || []).length));
-}
 
 // De openstaande vacatures voor een ingelogd lid: dezelfde vacatures als in de
 // RTFoundation, gefilterd op de paspoortleeftijd van het lid, met de landenlijst
@@ -2231,8 +2219,7 @@ function financeVoor(s) {
   const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
   const btw = Object.entries(potten).map(([cat, omzet]) => {
     const t = L.tarieven[cat] != null ? L.tarieven[cat] : L.tarieven.standaard;
-    const grondslag = centen(omzet / (1 + t / 100));
-    return { cat, label: FIN_CAT[cat] || cat, tarief: t, omzet: centen(omzet), grondslag, btw: centen(omzet - grondslag) };
+    return { cat, label: FIN_CAT[cat] || cat, ...btwSplit(omzet, t) };
   }).sort((a, b) => b.omzet - a.omzet);
   // personeelskosten uit de klokuren van deze maand
   const uurloon = (s.settings && Number(s.settings.uurloon)) || 16;

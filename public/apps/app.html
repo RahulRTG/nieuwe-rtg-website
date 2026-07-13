@@ -27,6 +27,24 @@
     --green:#4C9A75;
   }
 
+  /* Per-pas thema, gekozen op het beginscherm-icoon van de website.
+     RTG = het bordeauxrode webthema, Lifestyle = het parelmoeren webthema,
+     Business = het klassieke donkere thema. RTG en Lifestyle kunnen terug naar
+     klassiek (data-pas-thema="standaard"). Alles loopt via CSS-variabelen, dus
+     één attribuut op <html> kleurt de hele app om. */
+  :root[data-pas-thema="bordeaux"]{
+    --bg:#1E0912; --card:#2B0E1B; --card2:#371425;
+    --line:rgba(255,255,255,0.11);
+    --txt:#F7ECEF; --muted:rgba(247,236,239,0.74); --soft:rgba(247,236,239,0.60);
+    --burgundy:#E36385; --burgundy-deep:#C23A5E; --gold:#D0AC57; --green:#5BB98C;
+  }
+  :root[data-pas-thema="parelmoer"]{
+    --bg:#ECE6DD; --card:#F7F3EC; --card2:#FCFAF5;
+    --line:rgba(30,20,24,0.12);
+    --txt:#241A1E; --muted:rgba(36,26,30,0.68); --soft:rgba(36,26,30,0.52);
+    --burgundy:#8A1B3B; --burgundy-deep:#7F1634; --gold:#7C6A0C; --green:#2F7256;
+  }
+
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
   body{
@@ -1303,6 +1321,7 @@
     document.querySelectorAll('[data-login]').forEach(b => { if (!mag.includes(b.dataset.login)) b.style.display = 'none'; });
     regTier = vastePas;
   } else {
+
     // keuzescherm: alles van de poort dicht, alleen de drie pas-apps
     document.title = 'RTG, kies uw pas-app';
     const ml = document.getElementById('manifestLink');
@@ -1313,6 +1332,33 @@
     const kp = document.getElementById('kiesPas');
     if (kp){ kp.hidden = false; kp.style.display = 'flex'; }
   }
+
+  /* ---------- pas-thema (kleuren van de website) ----------
+     RTG krijgt het bordeauxrode thema, Lifestyle het parelmoeren thema,
+     Business blijft klassiek donker. RTG en Lifestyle mogen terug naar
+     klassiek; die keuze onthouden we per pas in localStorage. */
+  const THEMA_STANDAARD = { rtg: 'bordeaux', lifestyle: 'parelmoer', business: 'standaard' };
+  function pasThemaKey(){ return 'rtg_pas_thema_' + (vastePas || 'rtg'); }
+  function pasThemaHuidig(){
+    if (!vastePas || vastePas === 'business') return 'standaard'; // Business: geen keuze
+    let t = null; try { t = localStorage.getItem(pasThemaKey()); } catch(e){}
+    return t || THEMA_STANDAARD[vastePas] || 'standaard';
+  }
+  function pasThemaToepassen(){
+    const t = pasThemaHuidig();
+    const el = document.documentElement;
+    if (t === 'standaard') el.removeAttribute('data-pas-thema');
+    else el.setAttribute('data-pas-thema', t);
+    // de systeem-themakleur (statusbalk) meelaten kleuren
+    const kleur = { bordeaux: '#1E0912', parelmoer: '#ECE6DD' }[t] || '#0C0C0B';
+    const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', kleur);
+  }
+  function pasThemaZet(t){
+    try { localStorage.setItem(pasThemaKey(), t); } catch(e){}
+    pasThemaToepassen();
+  }
+  // meteen toepassen, ook op het beginscherm
+  pasThemaToepassen();
 
   const loginForm = document.getElementById('loginForm');
   if (loginForm) loginForm.addEventListener('submit', e => {
@@ -3629,6 +3675,16 @@
         '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.demo','U gebruikt een demoprofiel. Met een echt account beheert u hier uw wachtwoord en tweestapsherstel.') + '</div>');
     }
 
+    // weergave: RTG en Lifestyle kunnen tussen het pas-thema en klassiek donker
+    if (vastePas === 'rtg' || vastePas === 'lifestyle'){
+      const pasNaam = vastePas === 'rtg' ? T('bo2.thema.bordeaux','Bordeaux (RTG)') : T('bo2.thema.parel','Parelmoer (Lifestyle)');
+      const nu = pasThemaHuidig();
+      const knop = (val, tekst) => '<button class="js-thema" data-thema="' + val + '" style="margin-top:0.5rem;margin-right:0.4rem;border-radius:999px;padding:0.4rem 0.85rem;font-family:inherit;font-size:0.7rem;cursor:pointer;border:1px solid ' + (nu===val?'var(--gold)':'var(--line)') + ';background:' + (nu===val?'var(--gold)':'none') + ';color:' + (nu===val?'#000':'var(--txt)') + ';">' + tekst + '</button>';
+      html += kaart('🎨 ' + T('bo2.weergave','Weergave'),
+        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.weergave.s','Kies het kleurthema van deze app.') + '</div>' +
+        knop(THEMA_STANDAARD[vastePas], pasNaam) + knop('standaard', T('bo2.thema.klassiek','Klassiek (donker)')));
+    }
+
     // pas-specifiek: elke pas zijn eigen slimme snelkoppelingen
     if (user.tier === 'business'){
       html += kaart('💼 ' + T('bo2.vb','Voor uw Business Pass'),
@@ -3649,6 +3705,7 @@
     bind('boNaarBoekhouder', () => naarTab('betalen'));
     bind('boNaarAi', () => naarTab('ai'));
     bind('boNaarZakelijk', () => { boDicht(); naarTab('salon'); setTimeout(() => { const z = document.getElementById('zakOpenBtn'); if (z) z.click(); }, 150); });
+    body.querySelectorAll('.js-thema').forEach(b => b.addEventListener('click', () => { pasThemaZet(b.dataset.thema); boRender(); }));
     bind('boVerstuur', async () => {
       try { const d = await API.call('/auth/resend'); toast(T('bo2.gestuurd','Bevestigingsmail verstuurd.')); if (d.devVerifyUrl) console.log('verify:', d.devVerifyUrl); }
       catch(e){ toast(e.message); }
@@ -3919,6 +3976,8 @@ window.I18N = { en: {
   'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.forgotsent':'If this email is known, we will send a reset link.',
   'gate.newpass2':'New password', 'gate.doreset':'Set new password', 'gate.resetok':'Password changed. Sign in with your new password.',
   'gate.smscode':'Code from your phone (6 digits)',
+  'bo2.weergave':'Appearance', 'bo2.weergave.s':'Choose the colour theme of this app.',
+  'bo2.thema.bordeaux':'Bordeaux (RTG)', 'bo2.thema.parel':'Mother-of-pearl (Lifestyle)', 'bo2.thema.klassiek':'Classic (dark)',
   'bo2.h':'My back office', 'bo2.acties':'Needs your attention', 'bo2.alsklaar':'All in order',
   'bo2.geen':'Nothing outstanding on your account.', 'bo2.open':'outstanding invoice(s); pay in one tap via Payments.',
   'bo2.mailniet':'Your email address has not been confirmed yet.', 'bo2.kyc':'Verify your identity to book in one tap.',

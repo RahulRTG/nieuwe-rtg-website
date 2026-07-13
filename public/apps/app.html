@@ -1031,6 +1031,11 @@
       <button class="ms-close" id="pcClose" aria-label="Sluiten">✕</button>
     </div>
     <div class="pc-depts" id="pcDepts"></div>
+    <div class="pc-depts" id="pcAttn" style="padding-top:0.35rem;">
+      <button data-attn="hulp">🔔 <span data-i18n="app.attn.roep">Roep de bediening</span></button>
+      <button data-attn="rekening">🧾 <span data-i18n="app.attn.rekening">De rekening</span></button>
+      <button data-attn="bestellen">🍽️ <span data-i18n="app.attn.bestellen">Ik wil bestellen</span></button>
+    </div>
     <div class="ms-body pc-body" id="pcBody"></div>
     <div class="pc-foot">
       <input id="pcInput" placeholder="Typ een bericht" data-i18n-ph="app.pc.ph" autocomplete="off">
@@ -3200,6 +3205,12 @@
   $('#pchat-scrim').addEventListener('click', closePChat);
   $('#pcSend').addEventListener('click', sendPChat);
   $('#pcInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendPChat(); });
+  // De gast vraagt zelf om aandacht: het team krijgt meteen een prioriteitsmelding.
+  document.querySelectorAll('#pcAttn [data-attn]').forEach(b => b.addEventListener('click', async () => {
+    if (!pchat) return;
+    try { await API.call('/aandacht', { supplierCode: pchat.code, reden: b.dataset.attn }); toast(T('app.attn.ok','Het team is gewaarschuwd en komt eraan.')); }
+    catch(e){ toast(e.message); }
+  }));
 
   /* ---------- oplichtend ophaalcode-scherm ---------- */
   function showGlow(o){

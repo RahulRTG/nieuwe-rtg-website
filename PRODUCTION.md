@@ -30,6 +30,23 @@ De server **weigert te starten** als productie onveilig is ingesteld (demo aan,
 geen versleutelingssleutel, standaard-geheimen). Dat is bewust, zie
 `server/config.js`.
 
+### Vloot-modus: elke app zijn eigen proces (foutisolatie)
+
+```bash
+DATABASE_URL=postgres://... REDIS_URL=redis://... npm run vloot
+```
+
+`server/vloot.js` start het platform als losse processen achter de
+poortwachter: **leden** (auth, member, social, zakelijk), **partners**
+(supplier, staff), **kantoor** (office, techniek) en **rtf** (kern +
+foundation). Crasht een groep, dan geeft de gateway alleen voor dat domein
+een 502 en herstart de vloot hem automatisch met oplopende wachttijd; de
+andere apps merken er niets van. Indeling aanpassen kan met
+`RTG_VLOOT_GROEPEN`. Voor productie zijn PostgreSQL en de Redis-bus
+verplicht (anders heeft elk proces zijn eigen data-snapshot). Daarnaast is
+elke route-handler omhuld: een (async) bug in een route geeft die ene
+aanvraag een nette 500 en raakt de rest van het proces nooit.
+
 ---
 
 ## 3. Verplichte configuratie in productie

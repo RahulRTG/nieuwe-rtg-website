@@ -7,6 +7,7 @@
     "start": "node server/trio.js",
     "single": "node --experimental-sqlite server/server.js",
     "gateway": "node server/poort.js",
+    "vloot": "node server/vloot.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
     "a11y": "node scripts/a11y.js",

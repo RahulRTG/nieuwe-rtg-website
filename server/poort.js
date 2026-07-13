@@ -23,12 +23,15 @@ const DEFAULT_UP = (process.env.RTG_UP_DEFAULT || 'http://127.0.0.1:3010').repla
 // padprefix -> upstream. Alleen ingevulde upstreams wijken af van de default.
 const ROUTES = [
   ['/api/supplier', process.env.RTG_UP_SUPPLIER],
+  ['/api/partner',  process.env.RTG_UP_SUPPLIER],
   ['/api/office',   process.env.RTG_UP_OFFICE],
   ['/api/staff',    process.env.RTG_UP_STAFF],
   ['/api/auth',     process.env.RTG_UP_AUTH],
   ['/api/member',   process.env.RTG_UP_MEMBER],
   ['/api/live',     process.env.RTG_UP_MEMBER],
   ['/api/rtf/social', process.env.RTG_UP_SOCIAL],
+  ['/api/techniek', process.env.RTG_UP_TECHNIEK],
+  ['/api/zakelijk', process.env.RTG_UP_ZAKELIJK],
   ['/api/foundation', process.env.RTG_UP_FOUNDATION]
 ].filter(([, up]) => up).map(([p, up]) => [p, up.replace(/\/$/, '')]);
 

@@ -99,6 +99,26 @@ for (const [code, people] of Object.entries(STAFF_SEED)) {
 }
 
 const app = express();
+
+/* ---------- foutisolatie per verzoek ----------
+   Een bug in EEN route mag nooit het proces (en dus alle andere apps) raken.
+   Express 4 vangt een gegooide fout in een async handler niet zelf op: het
+   verzoek blijft hangen en de fout wordt een unhandledRejection. Daarom
+   omhullen we elke route-handler: een (async) fout wordt netjes next(err),
+   de centrale foutafhandelaar geeft die ENE aanvraag een 500, en de rest
+   van het systeem merkt er niets van. */
+for (const methode of ['get', 'post', 'put', 'delete', 'patch', 'all']) {
+  const orig = app[methode].bind(app);
+  app[methode] = (...args) => orig(...args.map(f => {
+    if (typeof f !== 'function') return f; // paden en opties ongemoeid laten
+    return (req, res, next) => {
+      try {
+        const r = f(req, res, next);
+        if (r && typeof r.catch === 'function') r.catch(next);
+      } catch (e) { next(e); }
+    };
+  }));
+}
 app.disable('x-powered-by');
 const PRODUCTION = process.env.NODE_ENV === 'production';
 app.set('trust proxy', 1); // achter een reverse proxy (hosting) klopt req.secure dan
@@ -874,8 +894,18 @@ function myApplications(key) {
 app.get('/api/health', (req, res) => res.json({
   ok: true, ai: anthropic ? 'claude' : 'demo',
   server: Number(process.env.RTG_SERVER || 1), active: db.writable,
+  domeinen: process.env.RTG_DOMAINS || 'alle',
   pid: process.pid, up: Math.round(process.uptime())
 }));
+
+/* Alleen in de testsuite: twee opzettelijke storingen om de foutisolatie te
+   BEWIJZEN. /api/test/bug gooit een async fout (die ene aanvraag krijgt 500,
+   het proces leeft door); /api/test/crash laat dit proces echt sterven (de
+   vloot-toezichthouder moet hem herstarten, de andere apps merken niets). */
+if (process.env.NODE_ENV === 'test') {
+  app.post('/api/test/bug', async () => { throw new Error('opzettelijke testbug'); });
+  app.post('/api/test/crash', (req, res) => { res.json({ ok: true, doei: true }); setTimeout(() => process.exit(1), 50); });
+}
 
 // Readiness: mag deze instance verkeer krijgen? Controleert dat de datalaag
 // echt bruikbaar is (kan lezen). Een standby- of half-gestarte server geeft 503,
@@ -2638,7 +2668,7 @@ Object.assign(kern, sociaal); // de sociale kern-helpers erbij
    translate) en de foundation-mount zitten in de kern en draaien altijd mee. */
 const ALLE_DOMEINEN = ['auth', 'member', 'supplier', 'office', 'staff', 'social', 'techniek', 'zakelijk'];
 const gekozenDomeinen = (process.env.RTG_DOMAINS || ALLE_DOMEINEN.join(','))
-  .split(',').map(s => s.trim()).filter(Boolean);
+  .split(',').map(s => s.trim()).filter(s => s && s !== '-'); // '-' = bewust geen domeinen (vloot)
 for (const naam of gekozenDomeinen) {
   if (!ALLE_DOMEINEN.includes(naam)) { console.warn('[start] onbekend domein overgeslagen:', naam); continue; }
   require('./routes/' + naam)(kern);

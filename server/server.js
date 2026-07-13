@@ -108,7 +108,8 @@ const STAFF_SEED = {
   KAITO: [['Milan de Wit', 'manager', 'Personal trainer']],
   // activiteiten: beheer plus de mensen aan de deur en op de boot
   ESVEDRA: [['Marta Salas', 'manager', 'Beheer'], ['Joel Ferrer', 'staff', 'Gids']],
-  MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']]
+  MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']],
+  ISLAREN: [['Carmen Vidal', 'manager', 'Beheer'], ['Pau Riera', 'staff', 'Balie']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -475,6 +476,7 @@ function ensureSupplierDefaults(s) {
   // de eigen transferdienst: prijs 0 = inclusief bij het ticket, anders het
   // afgesproken vaste bedrag per rit
   if (s.type === 'activiteit' && (!s.transfer || typeof s.transfer !== 'object')) s.transfer = { aan: false, prijs: 0 };
+  if (s.type === 'verhuur' && !Array.isArray(s.autos)) s.autos = [];
   if (!Array.isArray(s.bezorg.producten)) s.bezorg.producten = [];
   if (!Array.isArray(s.photos)) s.photos = [];
   if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
@@ -645,6 +647,27 @@ function initRealtime() {
       ]
     });
   }
+  // het autoverhuur-genre: eerlijk huren tegenover de schimmige verhuurders.
+  // De staat van de auto wordt VOOR en NA de huur met foto's vastgelegd (door
+  // beide partijen, onveranderbaar), er is een SOS-knop tijdens de huur, en de
+  // huurder kan vrijwillig zijn live locatie delen. Vaste dagprijs, geen
+  // verrassingen aan de balie.
+  if (!db.data.supplierTypes.verhuur)
+    db.data.supplierTypes.verhuur = { label: 'Autoverhuur', icon: '\u{1F697}', caps: ['huur', 'location', 'pricing'] };
+  if (!db.data.suppliers.find(s => s.code === 'ISLAREN')) {
+    db.data.suppliers.push({
+      code: 'ISLAREN', name: 'Isla Rent Ibiza', type: 'verhuur', city: 'Ibiza',
+      loc: { lat: 38.912, lng: 1.442, label: 'Ibiza-stad, haven' }, rate: 0.12,
+      menu: [], photos: [],
+      autos: [
+        { id: 'c1', name: 'Fiat 500 Cabrio', plate: 'IB-501-C', dagprijs: 49, actief: true },
+        { id: 'c2', name: 'Mini Cooper Cabrio', plate: 'IB-207-M', dagprijs: 69, actief: true },
+        { id: 'c3', name: 'Jeep Wrangler', plate: 'IB-330-J', dagprijs: 95, actief: true }
+      ]
+    });
+  }
+  if (!db.data.huurFotos) db.data.huurFotos = {};       // ref -> { voor: [], na: [] } (los van de boeking: fotodata blijft uit de staat)
+  if (!db.data.huurLocaties) db.data.huurLocaties = {}; // ref -> { aan, lat, lng, at } (vrijwillig gedeeld door de huurder)
   // Salon-connecties: leden vinden elkaar op codenaam, chatten en bellen 1-op-1
   if (!db.data.connections) db.data.connections = [];              // { a, b, requestedBy, status, at }
   if (!db.data.memberChats) db.data.memberChats = {};              // 'sleutelA|sleutelB' -> { messages, read }
@@ -1265,6 +1288,7 @@ function supplierState(s, actor) {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate, vak: s.vak || null },
     activiteiten: s.activiteiten || null,
     transfer: s.type === 'activiteit' ? (s.transfer || { aan: false, prijs: 0 }) : null,
+    autos: s.type === 'verhuur' ? (s.autos || []) : null,
     // de ophaal/bezorgdienst: alleen voor horeca en zelfstandigen
     bezorg: magBezorgen(s) ? {
       aan: !!(s.bezorg && s.bezorg.aan),
@@ -2521,6 +2545,17 @@ function officeState() {
   }).sort((a, b) => b.omzet - a.omzet);
   // actiecentrum: alles wat nu een oog van RTG nodig heeft, belangrijkste eerst
   const alerts = [];
+  // open SOS van huurders: altijd rood en bovenaan, tot de zaak hem afhandelt
+  for (const h of db.data.boekingen) {
+    if (h.kind !== 'huur' || !Array.isArray(h.sos)) continue;
+    for (const sos of h.sos) {
+      if (sos.ok) continue;
+      alerts.push({ level: 'rood', kind: 'sos', ref: h.ref, supplierCode: h.supplierCode,
+        text: 'SOS van ' + h.customerCodename + ' (' + h.supplierName + ', ' + (h.autoNaam || 'huurauto') + '): ' +
+          String(sos.bericht || 'noodsignaal').slice(0, 120) +
+          (Number.isFinite(sos.lat) ? ' \u00B7 locatie bekend' : '') });
+    }
+  }
   const minGeleden = iso => Math.round((nu - new Date(iso)) / 60000);
   for (const o of db.data.orders) {
     if (!o.paid || o.status !== 'nieuw') continue;

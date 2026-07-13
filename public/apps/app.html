@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>RTG, de app</title>
-<link rel="manifest" id="manifestLink" href="/manifests/leden.webmanifest">
+<link rel="manifest" id="manifestLink" href="/manifests/pas-rtg.webmanifest">
 <link rel="icon" href="/icons/leden.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -754,6 +754,14 @@
     <div class="tagline">Experience the Elite Class</div>
     <h1 data-i18n-html="gate.title">De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
     <p class="deck" data-i18n="gate.deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, en uw account draait op uw codenaam, niet op uw echte naam.</p>
+    <!-- geen brede app meer: zonder ?pas= is dit alleen een keuzescherm dat
+         doorverwijst naar de app van uw eigen pas -->
+    <div id="kiesPas" class="gate-list" hidden>
+      <p class="gate-or" style="margin-top:0;" data-i18n="gate.kies">Elke pas heeft zijn eigen app. Kies de uwe:</p>
+      <a class="gate-btn t-rtg" href="?pas=rtg" style="text-decoration:none;"><span class="dot"></span><span><b>RTG Pass</b><span data-i18n="gate.kies.rtg">Het lidmaatschap; ook gratis te gebruiken zonder pas</span></span></a>
+      <a class="gate-btn t-lifestyle" href="?pas=lifestyle" style="text-decoration:none;"><span class="dot"></span><span><b>Lifestyle Pass</b><span data-i18n="gate.kies.life">Met concierge en RTG Zakelijk</span></span></a>
+      <a class="gate-btn t-business" href="?pas=business" style="text-decoration:none;"><span class="dot"></span><span><b>Business Pass</b><span data-i18n="gate.kies.bus">Zakelijk reizen, AI-boekhouder en RTG Zakelijk</span></span></a>
+    </div>
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
       <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
@@ -1258,16 +1266,20 @@
       else login(b.dataset.login);
     }));
 
-  /* ---------- eigen app per pas ----------
+  /* ---------- eigen app per pas, geen brede app ----------
      Elke betaalde pas heeft zijn eigen ingang (pas-rtg/lifestyle/business.html)
      die hier binnenkomt met ?pas=. Dan wordt dit DE app van die pas: het
      manifest (eigen naam en icoon op het beginscherm) wisselt mee, de poort
      toont alleen de eigen ingang, en de server weigert inloggegevens van een
      andere pas. De gratis laag heeft GEEN eigen app: die speelt mee in de
-     RTG-app, met minder functies. Zonder ?pas= blijft dit de brede leden-app. */
-  let vastePas = new URLSearchParams(location.search).get('pas');
+     RTG-app, met minder functies. ZONDER ?pas= bestaat er geen brede app
+     meer: dan is dit alleen een keuzescherm dat naar de pas-apps verwijst. */
+  const zoekParams = new URLSearchParams(location.search);
+  let vastePas = zoekParams.get('pas');
   if (vastePas === 'guest') vastePas = 'rtg'; // gratis speelt in de RTG-app
   if (!['rtg','lifestyle','business'].includes(vastePas)) vastePas = null;
+  // vangnet voor oude e-maillinks zonder pas: die landen in de RTG-app
+  if (!vastePas && (zoekParams.get('verify') || zoekParams.get('reset'))) vastePas = 'rtg';
   if (vastePas){
     const ml = document.getElementById('manifestLink');
     if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';
@@ -1276,6 +1288,16 @@
     const mag = vastePas === 'rtg' ? ['rtg','guest'] : [vastePas];
     document.querySelectorAll('[data-login]').forEach(b => { if (!mag.includes(b.dataset.login)) b.style.display = 'none'; });
     regTier = vastePas;
+  } else {
+    // keuzescherm: alles van de poort dicht, alleen de drie pas-apps
+    document.title = 'RTG, kies uw pas-app';
+    const ml = document.getElementById('manifestLink');
+    if (ml) ml.remove(); // een keuzescherm installeer je niet als app
+    ['#loginForm','#regForm','#forgotForm','#resetForm','#toReg','#toForgot','#toLogin']
+      .forEach(sel => { const e = $(sel); if (e) e.style.display = 'none'; });
+    document.querySelectorAll('#gate .gate-or, #gate .gate-list, #gate .note').forEach(e => { e.style.display = 'none'; });
+    const kp = document.getElementById('kiesPas');
+    if (kp){ kp.hidden = false; kp.style.display = 'flex'; }
   }
 
   const loginForm = document.getElementById('loginForm');
@@ -1371,13 +1393,17 @@
   }
 
   // Blijf ingelogd: met een bewaard token slaat de app het startscherm over.
+  // Alleen in een pas-app (het keuzescherm logt nooit in), en alleen als de
+  // bewaarde sessie ook echt bij deze pas hoort.
   async function restoreSession(){
-    if (!API.enabled) return;
+    if (!API.enabled || !vastePas) return;
     let t = null; try { t = localStorage.getItem('rtg_member_token'); } catch(e){}
     if (!t) return;
     API.token = t;
     try {
       applyState((await API.call('/state')).state);
+      const magHier = vastePas === 'rtg' ? ['rtg','guest'] : [vastePas];
+      if (!magHier.includes(user.tier)) { API.token = null; return; } // andere pas: poort tonen
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
@@ -3793,6 +3819,10 @@ window.I18N = { en: {
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
   'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.forgotsent':'If this email is known, we will send a reset link.',
   'gate.newpass2':'New password', 'gate.doreset':'Set new password', 'gate.resetok':'Password changed. Sign in with your new password.',
+  'gate.kies':'Every pass has its own app. Choose yours:',
+  'gate.kies.rtg':'The membership; also free to use without a pass',
+  'gate.kies.life':'With concierge and RTG Business Network',
+  'gate.kies.bus':'Business travel, AI bookkeeper and RTG Business Network',
   'gate.verified':'Your email address has been confirmed.', 'gate.verifyfail':'Confirmation link invalid or expired.',
   'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
   'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',

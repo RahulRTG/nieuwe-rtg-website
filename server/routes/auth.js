@@ -9,14 +9,17 @@ module.exports = (kern) => {
   /* Elke pas heeft zijn eigen app (app.html?pas=...). De inloggegevens werken
      echt alleen in de app van de eigen pas: een Business-account komt de
      Lifestyle-app niet in, en andersom. De gratis laag (gast) heeft geen eigen
-     app en speelt mee in de RTG-app, met minder functies. Zonder pasApp (de
-     brede leden-app) werkt elke pas. */
+     app en speelt mee in de RTG-app, met minder functies. Er is geen brede
+     leden-app meer; zonder pasApp (directe API-koppelingen en tests) blijft
+     elke pas werken. */
   function pasAppOk(pasApp, tier) {
     if (!['rtg', 'lifestyle', 'business'].includes(pasApp)) return true; // brede app
     if (pasApp === 'rtg') return tier === 'rtg' || tier === 'guest';
     return tier === pasApp;
   }
   const PAS_FOUT = 'Deze inloggegevens horen bij een andere pas. Open de app van uw eigen pas via rtg.example/apps.';
+  // e-maillinks (bevestigen/herstellen) landen in de pas-app van het account
+  const pasAppVan = (tier) => tier === 'lifestyle' || tier === 'business' ? tier : 'rtg';
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
@@ -83,7 +86,7 @@ app.post('/api/auth/register', (req, res) => {
   accounts.saveMemberState(user.id, mdNieuw);
   // bevestigingsmail met een echte, werkende link
   const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
-  const verifyUrl = appUrl(req) + '/apps/app.html?verify=' + vtok;
+  const verifyUrl = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(user.tier) + '&verify=' + vtok;
   mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
     'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl);
   const token = accounts.issueToken(user.id);
@@ -102,7 +105,7 @@ app.post('/api/auth/resend', auth, (req, res) => {
   if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
   const u = req.session.account;
   const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
-  const url = appUrl(req) + '/apps/app.html?verify=' + vtok;
+  const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&verify=' + vtok;
   mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
   res.json({ ok: true, ...(mail.configured ? {} : { devVerifyUrl: url }) });
 });
@@ -113,7 +116,7 @@ app.post('/api/auth/forgot', (req, res) => {
   let devResetUrl;
   if (u) {
     const tok = accounts.createReset(u.id);
-    const url = appUrl(req) + '/apps/app.html?reset=' + tok;
+    const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&reset=' + tok;
     mail.send(accounts.emailOf(u) || email, 'Wachtwoord herstellen bij Rahul Travel Group',
       'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url);
     if (!mail.configured) devResetUrl = url;

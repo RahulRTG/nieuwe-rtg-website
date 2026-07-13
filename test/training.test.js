@@ -10,6 +10,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { startServer } = require('./helper');
 const training = require('../server/training');
 
 test('bibliotheek: eigen rol-tips plus algemene basis, zonder dubbelingen', () => {
@@ -42,8 +43,7 @@ test('bibliotheek: de coach kiest een passende tip bij de vraag', () => {
 });
 
 // ---- Endpoint-tests met een draaiende server -----------------------------
-const PORT = 4720 + Math.floor(Math.random() * 60);
-const BASE = 'http://127.0.0.1:' + PORT;
+let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-train-'));
 let child, kikMan, kikStaf, lidToken;
 
@@ -60,11 +60,7 @@ async function login(code, rol) {
 }
 
 test.before(async () => {
-  child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '' },
-    stdio: ['ignore', 'ignore', 'inherit']
-  });
-  for (let i = 0; i < 100; i++) { try { const r = await fetch(BASE + '/api/health'); if (r.ok) break; } catch (e) {} await new Promise(r => setTimeout(r, 100)); }
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   kikMan = await login('KIKUNOI', 'manager');
   kikStaf = await login('KIKUNOI', 'staff');
   const reg = await json(await api('/api/auth/register', { name: 'Gast Lid', email: 'train@x.nl', phone: '0612345731',

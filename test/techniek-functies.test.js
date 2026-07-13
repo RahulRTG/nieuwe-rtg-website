@@ -8,9 +8,9 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { startServer } = require('./helper');
 
-const PORT = 3800 + Math.floor(Math.random() * 80);
-const BASE = 'http://127.0.0.1:' + PORT;
+let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-func-'));
 const OWNER = 'roellie.i@gmail.com'; // standaard-eigenaar (RTG_OWNER_EMAIL)
 let child, techToken;
@@ -30,14 +30,7 @@ async function schakelMetAkkoord(body) {
 }
 
 test.before(async () => {
-  child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '' },
-    stdio: ['ignore', 'ignore', 'inherit']
-  });
-  for (let i = 0; i < 100; i++) {
-    try { const r = await fetch(BASE + '/api/health'); if (r.ok) break; } catch (e) {}
-    await new Promise(r => setTimeout(r, 100));
-  }
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   // in demo-modus is het eigenaarsaccount (Rahul/Imran) al geseed; log daarmee in
   const login = await (await post('/api/techniek/inloggen', { login: OWNER, wachtwoord: 'Imran' })).json();
   assert.ok(login.token && login.eigenaar, 'de eigenaar kan inloggen op de technische pagina');

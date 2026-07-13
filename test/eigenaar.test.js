@@ -8,10 +8,10 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { startServer } = require('./helper');
 const eigenaar = require('../server/eigenaar');
 
-const PORT = 4380 + Math.floor(Math.random() * 60);
-const BASE = 'http://127.0.0.1:' + PORT;
+let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-eig-'));
 let child, ownerToken;
 
@@ -28,14 +28,7 @@ test('eigenaar.js: de eigenaar staat op roellie.i@gmail.com (of RTG_OWNER_EMAIL)
 });
 
 test.before(async () => {
-  child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', RTG_OWNER_EMAIL: '' },
-    stdio: ['ignore', 'ignore', 'inherit']
-  });
-  for (let i = 0; i < 100; i++) {
-    try { const r = await fetch(BASE + '/api/health'); if (r.ok) break; } catch (e) {}
-    await new Promise(r => setTimeout(r, 100));
-  }
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_OWNER_EMAIL: '' } }));
   // de eigenaar logt in met zijn eigen account (geseed op roellie.i@gmail.com / Imran)
   const login = await json(await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' }));
   assert.ok(login.token, 'de eigenaar kan inloggen met zijn account');

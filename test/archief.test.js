@@ -9,9 +9,11 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { vrijePoort } = require('./helper');
 
-const PORT = 4450 + Math.floor(Math.random() * 60);
-const BASE = 'http://127.0.0.1:' + PORT;
+// archief herstart de server meermaals (bewijs van persistentie), dus houden we
+// een vaste vrije poort aan zodat BASE klopt over herstarts heen.
+let PORT, BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-arch-'));
 let child;
 
@@ -51,6 +53,8 @@ async function officeState(token) {
 }
 
 test.before(async () => {
+  PORT = await vrijePoort();
+  BASE = 'http://127.0.0.1:' + PORT;
   // 1) een verse kast maken, dan drie soorten tickets erin leggen
   await boot();
   await new Promise(r => setTimeout(r, 500));

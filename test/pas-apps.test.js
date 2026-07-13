@@ -8,9 +8,9 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { startServer } = require('./helper');
 
-const PORT = 4040 + Math.floor(Math.random() * 80);
-const BASE = 'http://127.0.0.1:' + PORT;
+let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pasapp-'));
 let child;
 
@@ -23,15 +23,7 @@ async function registreer(naam, email, tier) {
 }
 
 test.before(async () => {
-  child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '' },
-    stdio: ['ignore', 'ignore', 'inherit']
-  });
-  for (let i = 0; i < 100; i++) {
-    try { const r = await fetch(BASE + '/api/health'); if (r.ok) return; } catch (e) {}
-    await new Promise(r => setTimeout(r, 100));
-  }
-  throw new Error('server startte niet op tijd');
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

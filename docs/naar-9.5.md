@@ -65,7 +65,10 @@ gebruikt.
 ## 6. Inline styles → klassen
 `app.html` 396 en `leverancier.html` 353 inline `style="…"`-attributen.
 
-- [ ] Terugkerende patronen naar utility-klassen (`.stack`, `.pill`, `.muted`).
+- [~] Terugkerende patronen naar utility-klassen: `.fineprint` (leden, was 6x
+  inline) en `.softline` (leverancier, was 10x) eruit; exacte hele-stijl-matches
+  op klasseloze `<div>`s, dus gedragsbehoudend. Grotere sweep vraagt een
+  visuele-diff-vangnet (anders kans op subtiele regressies).
 - [ ] Scheelt bytes na minify en maakt thema-/merkwijzigingen veilig.
 
 ## 7. Diepere toegankelijkheid

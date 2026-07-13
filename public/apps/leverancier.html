@@ -458,6 +458,8 @@
 
   #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:#fff;color:#000;font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
+  /* Utility: terugkerende zachte lijstregel (was 10x inline). */
+  .softline{font-size:0.82rem;color:var(--soft);padding:0.6rem 0;}
 </style>
 </head>
 <body>
@@ -2803,7 +2805,7 @@
   function renderPrice(){
     const h = state.prices || [];
     $('#prHistory').innerHTML = '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin-bottom:0.3rem;">'+T('sup.pricehist','Eerder doorgegeven')+'</div>' +
-      (h.length ? h.slice(0,8).map(p=>'<div class="price-row"><span class="s">'+p.service+'<br><span style="font-size:0.66rem;color:var(--soft);">'+timeAgo(p.at)+'</span></span><span class="p">'+eur(p.price)+'</span></div>').join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('sup.noprices','Nog geen prijzen doorgegeven.')+'</div>');
+      (h.length ? h.slice(0,8).map(p=>'<div class="price-row"><span class="s">'+p.service+'<br><span style="font-size:0.66rem;color:var(--soft);">'+timeAgo(p.at)+'</span></span><span class="p">'+eur(p.price)+'</span></div>').join('') : '<div class="softline">'+T('sup.noprices','Nog geen prijzen doorgegeven.')+'</div>');
   }
   $('#prSend').addEventListener('click', async () => {
     const service = $('#prService').value.trim();
@@ -2928,7 +2930,7 @@
       ? p.sales.map(s=>'<div class="pos-sale"><div><b>'+(s.desc||((s.items||[]).map(i=>i.qty+'× '+i.name).join(', '))||T('pos.sale','Verkoop'))+'</b>'+
           '<span>'+s.bon+' · '+s.actor+(s.room?' · '+s.room:'')+' · '+timeAgo(s.at)+'</span></div>'+
           '<div class="amt">'+eur(s.total)+'<span class="m">'+methodLabel(s.method)+'</span></div></div>').join('')
-      : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('pos.nosales','Nog geen verkopen vandaag.')+'</div>';
+      : '<div class="softline">'+T('pos.nosales','Nog geen verkopen vandaag.')+'</div>';
     return html + '</div>';
   }
 
@@ -3304,7 +3306,7 @@
           '<button class="hk-chip hk-'+s+(hk===s?' on':'')+'" data-hk="'+r.id+'" data-hkst="'+s+'">'+tHk(s)+'</button>').join('')+'</div>'+
         (hkDefectFor===r.id ? '<div class="tt-add" style="width:100%;"><input id="hkNote" placeholder="'+T('hk.noteph','Wat is er kapot?')+'"><button id="hkNoteOk">'+T('hk.report','Meld defect')+'</button></div>' : '')+
       '</div>';
-    }).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>';
+    }).join('') : '<div class="softline">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>';
     html += '<div class="tt-add" style="flex-wrap:wrap;">'+
       '<input id="rmName" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;min-width:120px;">'+
       '<input id="rmPrice" type="number" inputmode="decimal" placeholder="€" style="flex:1;min-width:70px;">'+
@@ -3501,7 +3503,7 @@
     html += kept.length ? kept.map(l =>
       '<div class="tk-row"><div class="tk-t"><b>' + l.item + '</b><span>' + (l.room ? l.room + ' · ' : '') + (l.storage ? T('lf.at','ligt bij') + ' ' + l.storage + ' · ' : '') + l.by + ' · ' + timeAgo(l.at) + '</span></div>' +
       '<button class="obtn" data-lf="' + l.id + '">' + T('lf.picked','Opgehaald') + '</button></div>'
-    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">' + T('lf.none','Niets in bewaring.') + '</div>';
+    ).join('') : '<div class="softline">' + T('lf.none','Niets in bewaring.') + '</div>';
     html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="lfItem" placeholder="' + T('lf.itemph','Voorwerp, bijv. zonnebril') + '" style="flex:2;min-width:120px;">' +
       '<input id="lfStorage" placeholder="' + T('lf.storageph','Bewaarplek') + '" style="flex:1;min-width:90px;">' +
       '<select id="lfRoom" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="">' + T('lf.noroom','Elders') + '</option>' + roomOpts + '</select>' +
@@ -3539,7 +3541,7 @@
             (d.lastBy?' · '+T('door.lastby','laatst:')+' '+d.lastBy+(d.lastAt?', '+timeAgo(d.lastAt):''):'')+'</span></div>'+
           '<button class="obtn'+(d.locked?' primary':' warn')+'" data-door="'+d.id+'">'+(d.locked?T('door.openbtn','Open 10 sec'):T('door.lockbtn','Vergrendel nu'))+'</button>'+
         '</div>'
-      ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('door.none','Nog geen digitale deuren gekoppeld.')+'</div>')+
+      ).join('') : '<div class="softline">'+T('door.none','Nog geen digitale deuren gekoppeld.')+'</div>')+
       '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('door.note','Elke opening komt in de activiteitenfeed: wie, welke deur, wanneer. Gearriveerde gasten kunnen de voordeur zelf openen via hun app.')+'</div>'+
     '</div>';
     el.querySelectorAll('[data-door]').forEach(b => b.addEventListener('click', async () => {
@@ -3580,14 +3582,14 @@
         (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>'
           : g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>'
           : '<span class="ge">'+T('sup.enrouteshort','onderweg')+'</span>')+'</div>'
-      ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('gst.none','Nog geen verbonden gasten.')+'</div>')+'</div>';
+      ).join('') : '<div class="softline">'+T('gst.none','Nog geen verbonden gasten.')+'</div>')+'</div>';
 
     html += '<div class="card"><div class="tt-h">'+T('gst.nearby','Nu onderweg (nog niet verbonden)')+'</div>'+
       (nearby.length ? nearby.map(g =>
         '<div class="guest-row"><span class="cn">'+g.codename+'</span>'+
         '<div style="display:flex;align-items:center;gap:0.6rem;">'+(g.dest?'<span class="ge">'+T('gst.to','naar')+' '+g.dest+'</span>':'')+
         '<button class="obtn primary" data-connect="'+g.codename.replace(/"/g,'&quot;')+'">'+T('gst.connect','Verbind')+'</button></div></div>'
-      ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('gst.nonearby','Er is nu niemand live onderweg.')+'</div>')+
+      ).join('') : '<div class="softline">'+T('gst.nonearby','Er is nu niemand live onderweg.')+'</div>')+
       '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('gst.note','Verbinden meldt het bij de gast: u volgt de aankomst om alles klaar te zetten. U ziet daarna live de positie en aankomsttijd.')+'</div></div>';
 
     el.innerHTML = html;
@@ -3610,7 +3612,7 @@
           '<span class="gt"><b>' + c.codename + ' <em class="gc-dept">' + c.dept + '</em>' + (c.unread ? ' <i class="gc-unread">' + c.unread + '</i>' : '') + '</b>' +
           '<span>' + (c.lastFrom === 'partner' ? T('gc.you','U: ') : '') + c.last + ' · ' + timeAgo(c.lastAt) + '</span></span>' +
         '</button>'
-      ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">' + T('gc.none','Nog geen gesprekken. Berichten van gasten verschijnen hier live.') + '</div>') + '</div>';
+      ).join('') : '<div class="softline">' + T('gc.none','Nog geen gesprekken. Berichten van gasten verschijnen hier live.') + '</div>') + '</div>';
       el.querySelectorAll('[data-gchat]').forEach(b => b.addEventListener('click', () => { gchatKey = b.dataset.gchat; renderGChat(); openTab('gchat'); }));
       return;
     }
@@ -3759,7 +3761,7 @@
       const rm = (a.manager && !you) ? '<button class="tt-rm" data-rm="'+m.id+'">'+T('team.remove','Verwijder')+'</button>' : '';
       const tag = you ? '<span class="you">'+T('team.you','jij')+'</span>' : '';
       return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+(m.func? m.func+' · ':'')+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+buzz+rm+'</div>';
-    }).join('') || '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
+    }).join('') || '<div class="softline">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
     if (a.manager){
       html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="ttName" placeholder="'+T('team.name','Naam')+'" style="flex:2;min-width:110px;"><input id="ttFunc" placeholder="'+T('team.func','Functie')+'" style="flex:1;min-width:90px;"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.add','Toevoegen')+'</button></div>';
       if (lastPin) html += '<div class="tt-pinbox">'+T('team.pinintro','Pincode voor')+' '+lastPin.name+': <b>'+lastPin.pin+'</b><br>'+T('team.pinnote','Noteer deze code. Hiermee logt deze persoon in op zijn eigen account. De code is later niet meer te zien.')+'</div>';
@@ -3822,7 +3824,7 @@
     html += '<div class="card"><div class="tt-h">'+T('team.activity','Wie deed wat')+'</div>';
     html += activity.length ? activity.map(e =>
       '<div class="tt-act"><span class="aw">'+e.who+'</span><span class="ax">'+e.text+'</span><time>'+timeAgo(e.at)+'</time></div>'
-    ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.6rem 0;">'+T('team.noactivity','Nog geen activiteit vastgelegd.')+'</div>';
+    ).join('') : '<div class="softline">'+T('team.noactivity','Nog geen activiteit vastgelegd.')+'</div>';
     html += '</div>';
 
     // interne chat

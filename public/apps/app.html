@@ -772,6 +772,8 @@
     z-index:70;max-width:86%;text-align:center;
   }
   #toast.show{opacity:1;transform:translate(-50%, 0);}
+  /* Utility: terugkerende "fijne uitleg"-regel (was 6x inline). */
+  .fineprint{font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;}
 </style>
 </head>
 <body>
@@ -4131,7 +4133,7 @@
 
     let html = '';
     if (acties.length) html += kaart('⚡ ' + T('bo2.acties','Nu aandacht nodig'),
-      acties.map(a => '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + a + '</div>').join('') +
+      acties.map(a => '<div class="fineprint">' + a + '</div>').join('') +
       (open.length ? knopje('boNaarBetalen', T('bo2.betaalnu','Naar Betalen')) : ''));
     else html += kaart('✓ ' + T('bo2.alsklaar','Alles op orde'), '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;">' + T('bo2.geen','Geen openstaande zaken op uw account.') + '</div>');
 
@@ -4153,7 +4155,7 @@
         (user.emailVerified === false ? knopje('boVerstuur', T('bo2.verstuur','Stuur bevestigingsmail opnieuw')) : ''));
     } else {
       html += kaart('🔐 ' + T('bo2.beveiliging','Beveiliging'),
-        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.demo','U gebruikt een demoprofiel. Met een echt account beheert u hier uw wachtwoord en tweestapsherstel.') + '</div>');
+        '<div class="fineprint">' + T('bo2.demo','U gebruikt een demoprofiel. Met een echt account beheert u hier uw wachtwoord en tweestapsherstel.') + '</div>');
     }
 
     // weergave: RTG en Lifestyle kunnen tussen het pas-thema en klassiek donker
@@ -4162,22 +4164,22 @@
       const nu = pasThemaHuidig();
       const knop = (val, tekst) => '<button class="js-thema" data-thema="' + val + '" style="margin-top:0.5rem;margin-right:0.4rem;border-radius:999px;padding:0.4rem 0.85rem;font-family:inherit;font-size:0.7rem;cursor:pointer;border:1px solid ' + (nu===val?'var(--gold)':'var(--line)') + ';background:' + (nu===val?'var(--gold)':'none') + ';color:' + (nu===val?'#000':'var(--txt)') + ';">' + tekst + '</button>';
       html += kaart('🎨 ' + T('bo2.weergave','Weergave'),
-        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.weergave.s','Kies het kleurthema van deze app.') + '</div>' +
+        '<div class="fineprint">' + T('bo2.weergave.s','Kies het kleurthema van deze app.') + '</div>' +
         knop(THEMA_STANDAARD[vastePas], pasNaam) + knop('standaard', T('bo2.thema.klassiek','Klassiek (donker)')));
     }
 
     // pas-specifiek: elke pas zijn eigen slimme snelkoppelingen
     if (user.tier === 'business'){
       html += kaart('💼 ' + T('bo2.vb','Voor uw Business Pass'),
-        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.vb.s','Uw facturen zijn boekhoudklaar. De AI-boekhouder en de zzp-belastingtool staan onder Betalen; uw netwerk onder Salon.') + '</div>' +
+        '<div class="fineprint">' + T('bo2.vb.s','Uw facturen zijn boekhoudklaar. De AI-boekhouder en de zzp-belastingtool staan onder Betalen; uw netwerk onder Salon.') + '</div>' +
         knopje('boNaarBoekhouder', '📚 ' + T('bo2.boekhouder','AI-boekhouder')) + knopje('boNaarZakelijk', '💼 RTG Zakelijk'));
     } else if (user.tier === 'lifestyle'){
       html += kaart('🌙 ' + T('bo2.vl','Voor uw Lifestyle Pass'),
-        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.vl.s','Uw concierge denkt vooruit onder AI; uw professionele netwerk staat onder Salon.') + '</div>' +
+        '<div class="fineprint">' + T('bo2.vl.s','Uw concierge denkt vooruit onder AI; uw professionele netwerk staat onder Salon.') + '</div>' +
         knopje('boNaarAi', '✨ ' + T('bo2.concierge','Concierge')) + knopje('boNaarZakelijk', '💼 RTG Zakelijk'));
     } else {
       html += kaart('🎫 ' + T('bo2.vr','Voor uw pas'),
-        '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;line-height:1.5;">' + T('bo2.vr.s','Boeken, betalen, vrienden en De Salon zitten in uw pas. Lifestyle en Business voegen de concierge, de AI-boekhouder en RTG Zakelijk toe.') + '</div>');
+        '<div class="fineprint">' + T('bo2.vr.s','Boeken, betalen, vrienden en De Salon zitten in uw pas. Lifestyle en Business voegen de concierge, de AI-boekhouder en RTG Zakelijk toe.') + '</div>');
     }
     body.innerHTML = html;
 

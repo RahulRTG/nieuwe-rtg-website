@@ -34,6 +34,7 @@ const ROOT = require('path').join(__dirname, '..');
 const PORT = 4060, BASE = 'http://127.0.0.1:' + PORT;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spits-'));
 const TICKETS = Number(process.env.SPITS_TICKETS || 1000000);
+const ACTORS = Number(process.env.SPITS_ACTORS || 40);
 const DUUR_MS = Number(process.env.SPITS_DUUR || 70000);
 const ENV = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '' };
 
@@ -137,16 +138,16 @@ const stopServer = () => new Promise(r => {
 
   /* actoren registreren (echte accounts, business-pas) */
   const actors = [];
-  for (let i = 0; i < 24; i++) {
+  for (let i = 0; i < ACTORS; i++) {
     const reg = await api('registratie', '/api/auth/register', {
       name: 'Spits Lid ' + i, email: 'spits' + i + '@rtg.nl', phone: '06' + (20000000 + i),
-      password: 'Spits1234!', geboortedatum: '1992-05-05', tier: 'business', pasApp: 'business'
+      password: 'Spits1234!', geboortedatum: '1985-05-05', tier: 'business', pasApp: 'business'
     });
     if (reg && reg.token) actors.push({ i, token: reg.token });
   }
   for (const a of actors) {
     const c = await api('connecties', '/api/member/connections', {}, a.token);
-    a.key = c && c.me;
+    a.key = c && c.me; a.codename = c && c.codename;
   }
   rij('actoren geregistreerd', actors.length + ' leden');
 
@@ -282,7 +283,108 @@ const stopServer = () => new Promise(r => {
     }
   })());
 
-  einde = Date.now() + DUUR_MS; // setup klaar: NU begint het spitsuur echt
+  /* ---- SETUP voor de nieuwe genres ---- */
+  // activiteiten (Es Vedra): dienst klaar; transferdienst aan
+  const rosterA = await api('roster', '/api/supplier/roster', { code: 'ESVEDRA' });
+  const manA = rosterA && rosterA.staff.find(x => x.role === 'manager');
+  const gidsA = rosterA && rosterA.staff.find(x => x.role !== 'manager');
+  const manATok = manA && (await api('login', '/api/supplier/login', { code: 'ESVEDRA', staffId: manA.id, pin: '1234' })).token;
+  const gidsATok = gidsA && (await api('login', '/api/supplier/login', { code: 'ESVEDRA', staffId: gidsA.id, pin: '5678' })).token;
+  if (manATok) await api('transfer', '/api/supplier/transfer', { aan: true, prijs: 0 }, manATok);
+  // autoverhuur (Isla Rent): balie
+  const rosterV = await api('roster', '/api/supplier/roster', { code: 'ISLAREN' });
+  const balieV = rosterV && rosterV.staff.find(x => x.role !== 'manager');
+  const balieVTok = balieV && (await api('login', '/api/supplier/login', { code: 'ISLAREN', staffId: balieV.id, pin: '5678' })).token;
+  // vastgoed (Ibiza Living): makelaar biedt de villa gericht aan alle spits-leden
+  const rosterM = await api('roster', '/api/supplier/roster', { code: 'IBIZALIV' });
+  const manM = rosterM && rosterM.staff.find(x => x.role === 'manager');
+  const manMTok = manM && (await api('login', '/api/supplier/login', { code: 'IBIZALIV', staffId: manM.id, pin: '1234' })).token;
+  if (manMTok) await api('vg-aanbod', '/api/supplier/aanbieding', { pandId: 'p1', publiek: true }, manMTok);
+
+  const VANDAAG = new Date().toISOString().slice(0, 10);
+  const DFUT = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const FOTO2 = 'data:image/jpeg;base64,' + crypto.randomBytes(300).toString('base64');
+
+  /* 8) activiteiten: tickets kopen + betalen + transfer aanvragen */
+  for (const a of actors.slice(12, 22)) taken.push((async () => {
+    while (bezig()) {
+      const t = await api('ticket-koop', '/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a1', datum: VANDAAG, tijd: '17:30', personen: 1 }, a.token);
+      if (t && t.ticket) {
+        await api('ticket-betaal', '/api/booking/pay', { ref: t.ticket.ref }, a.token);
+        await api('transfer-aanvraag', '/api/transfer/aanvraag', { ticketRef: t.ticket.ref, van: 'Hotel' }, a.token);
+      }
+      await api('mijn-tickets2', '/api/tickets/mijn', {}, a.token);
+      await slaap(300);
+    }
+  })());
+  /* de gids checkt tickets in en neemt transfers aan */
+  if (gidsATok) taken.push((async () => {
+    while (bezig()) {
+      const pr = await api('programma', '/api/supplier/programma', {}, gidsATok);
+      const slot = pr && (pr.slots || []).find(x => x.gasten && x.gasten.some(g => !g.binnen));
+      if (slot) { const g = slot.gasten.find(x => !x.binnen); if (g) await api('checkin', '/api/supplier/ticket/checkin', { code: g.code }, gidsATok); }
+      await slaap(400);
+    }
+  })());
+
+  /* 9) autoverhuur: auto boeken + betalen + foto vastleggen */
+  for (const a of actors.slice(22, 30)) taken.push((async () => {
+    while (bezig()) {
+      const car = ['c1', 'c2', 'c3'][a.i % 3];
+      const h = await api('huur-boek', '/api/huur/boek', { supplierCode: 'ISLAREN', autoId: car, van: DFUT, tot: new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10) }, a.token);
+      if (h && h.huur) {
+        await api('huur-betaal', '/api/booking/pay', { ref: h.huur.ref }, a.token);
+        await api('huur-foto', '/api/huur/foto', { ref: h.huur.ref, fase: 'voor', foto: FOTO2 }, a.token);
+      }
+      await api('huur-mijn', '/api/huur/mijn', {}, a.token);
+      await slaap(500);
+    }
+  })());
+
+  /* 10) vastgoed: aanbod bekijken, interesse + bod, keyless-poging */
+  for (const a of actors.slice(0, 20)) taken.push((async () => {
+    let deed = false;
+    while (bezig()) {
+      const d = await api('vg-aanbod2', '/api/vastgoed/aanbod', {}, a.token);
+      if (d && d.panden && d.panden.length && !deed) {
+        await api('vg-interesse', '/api/vastgoed/interesse', { supplierCode: 'IBIZALIV', pandId: d.panden[0].id, wens: 'weekend' }, a.token);
+        await api('vg-bod', '/api/vastgoed/bod', { supplierCode: 'IBIZALIV', pandId: d.panden[0].id, bedrag: 3000000 + a.i * 1000 }, a.token);
+        deed = true;
+      }
+      await slaap(700);
+    }
+  })());
+  /* de makelaar behandelt biedingen en bezichtigingen live */
+  if (manMTok) taken.push((async () => {
+    while (bezig()) {
+      const ov = await api('vg-overzicht', '/api/supplier/vastgoed/overzicht', {}, manMTok);
+      const bod = ov && (ov.biedingen || []).find(x => x.status === 'open');
+      if (bod) await api('vg-bod-beslis', '/api/supplier/bod/beslis', { ref: bod.ref, actie: 'tegenbod', tegenbod: 3400000 }, manMTok);
+      const bez = ov && (ov.bezichtigingen || []).find(x => x.status === 'aangevraagd');
+      if (bez) await api('vg-bez-beslis', '/api/supplier/bezichtiging/beslis', { ref: bez.ref, actie: 'bevestigen', moment: new Date(Date.now() - 60000).toISOString().slice(0, 16) }, manMTok);
+      await slaap(500);
+    }
+  })());
+
+  /* 11) contracten: de makelaar stuurt contracten, leden tekenen */
+  if (manMTok) taken.push((async () => {
+    let i = 0;
+    while (bezig()) {
+      const a = actors[i % actors.length]; i++;
+      if (a.codename) await api('contract-maak', '/api/supplier/contract/maak', { soort: 'algemeen', titel: 'Afspraak ' + i, codenaam: a.codename, tekst: 'Dit is een afspraak tussen de partijen conform de RTG-voorwaarden en gebruiken.' }, manMTok);
+      await slaap(600);
+    }
+  })());
+  for (const a of actors.slice(0, 20)) taken.push((async () => {
+    while (bezig()) {
+      const c = await api('contract-mijn', '/api/contracten/mijn', {}, a.token);
+      const open = c && (c.contracten || []).find(x => x.status === 'wacht' && !x.getekendDoorMij);
+      if (open) await api('contract-teken', '/api/contract/teken', { ref: open.ref, naam: 'Spits Lid', akkoord: true }, a.token);
+      await slaap(500);
+    }
+  })());
+
+    einde = Date.now() + DUUR_MS; // setup klaar: NU begint het spitsuur echt
   rij('spitsuur gestart', 'alle stromen tegelijk, ' + (DUUR_MS / 1000) + ' s');
   await Promise.all(taken);
   sseAborts.forEach(a => a.abort());

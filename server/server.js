@@ -1285,8 +1285,22 @@ function notifySupplier(code, note) {
   return n;
 }
 
+/* Leverancier opzoeken op code. Met miljoenen zaken in de kast is een lineaire
+   scan (Array.find) per verzoek te duur: elke kassahandeling, elke bestelling
+   en elke inlog zoekt een zaak op. Daarom een index (code -> zaak) die zichzelf
+   herbouwt zodra het aantal zaken verandert (nieuwe partner erbij). Zo is elke
+   opzoeking O(1), ook bij miljoenen restaurants. */
+let _supIndex = null, _supIndexLen = -1;
+function supplierIndex() {
+  if (!_supIndex || _supIndexLen !== db.data.suppliers.length) {
+    _supIndex = new Map();
+    for (const s of db.data.suppliers) _supIndex.set(s.code, s);
+    _supIndexLen = db.data.suppliers.length;
+  }
+  return _supIndex;
+}
 function findSupplier(code) {
-  return db.data.suppliers.find(s => s.code === String(code || '').trim().toUpperCase()) || null;
+  return supplierIndex().get(String(code || '').trim().toUpperCase()) || null;
 }
 function supplierAuth(req, res, next) {
   const header = req.get('authorization') || '';
@@ -2597,18 +2611,21 @@ function officeState() {
     omzetWeek: week.reduce((s2, d) => s2 + d.omzet, 0),
     foundation: fonds, liveNu: live.length
   };
-  const performance = db.data.suppliers.map(s => {
-    const or = betaaldeOrders.filter(o => o.supplierCode === s.code);
-    const ri = betaaldeRitten.filter(r => r.supplierCode === s.code);
-    const openNu = db.data.orders.filter(o => o.supplierCode === s.code && o.paid && (o.status === 'nieuw' || o.status === 'in bereiding')).length
-      + db.data.rides.filter(r => r.supplierCode === s.code && r.paid && !['afgerond', 'gearriveerd', 'geweigerd', 'wacht-op-betaling'].includes(r.status)).length;
-    const duur = ri.filter(r => r.finishedAt).map(r => (new Date(r.finishedAt) - new Date(r.at)) / 60000);
-    return {
-      code: s.code, name: s.name, type: s.type,
-      omzet: or.reduce((x, o) => x + (o.total || 0), 0) + ri.reduce((x, r) => x + (r.quote || 0), 0),
-      aantal: or.length + ri.length, openNu,
-      gemMin: duur.length ? Math.round(duur.reduce((x, y) => x + y, 0) / duur.length) : null
-    };
+  /* Partnerprestaties: NIET per zaak over alle orders filteren (dat is
+     O(zaken x orders) en loopt met miljoenen restaurants volledig vast).
+     In plaats daarvan tellen we de orders/ritten EEN keer op per code, en
+     bouwen we alleen prestaties voor zaken die vandaag/deze week echt iets
+     deden. O(orders + ritten + actieve zaken). */
+  const perCode = new Map();
+  const aggCode = code => { let a = perCode.get(code); if (!a) { a = { omzet: 0, aantal: 0, openNu: 0, dur: 0, durN: 0 }; perCode.set(code, a); } return a; };
+  for (const o of betaaldeOrders) { const a = aggCode(o.supplierCode); a.omzet += (o.total || 0); a.aantal += 1; }
+  for (const r of betaaldeRitten) { const a = aggCode(r.supplierCode); a.omzet += (r.quote || 0); a.aantal += 1; if (r.finishedAt) { a.dur += (new Date(r.finishedAt) - new Date(r.at)) / 60000; a.durN += 1; } }
+  for (const o of db.data.orders) if (o.paid && (o.status === 'nieuw' || o.status === 'in bereiding')) aggCode(o.supplierCode).openNu += 1;
+  for (const r of db.data.rides) if (r.paid && !['afgerond', 'gearriveerd', 'geweigerd', 'wacht-op-betaling'].includes(r.status)) aggCode(r.supplierCode).openNu += 1;
+  const performance = [...perCode.entries()].map(([code, a]) => {
+    const s = findSupplier(code) || {};
+    return { code, name: s.name || code, type: s.type || '', omzet: a.omzet, aantal: a.aantal, openNu: a.openNu,
+      gemMin: a.durN ? Math.round(a.dur / a.durN) : null };
   }).sort((a, b) => b.omzet - a.omzet);
   // actiecentrum: alles wat nu een oog van RTG nodig heeft, belangrijkste eerst
   const alerts = [];
@@ -2665,7 +2682,9 @@ function officeState() {
     rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').slice(0, 60),
     live: live.slice(0, 40),
     applications: applications.slice(0, 40),
-    suppliers: db.data.suppliers.map(publicSupplier),
+    // de zaken-lijst is begrensd (het echte aantal staat in totals.partners);
+    // een rauwe dump van miljoenen zaken zou het antwoord onbruikbaar maken
+    suppliers: db.data.suppliers.slice(0, 1000).map(publicSupplier),
     partnerApplications: (db.data.partnerApplications || []).slice(0, 40),
     pendingSchools: wachtScholen.map(s => ({ code: s.code, naam: s.naam, plaats: s.plaats, at: s.at,
       personeel: Object.keys(s.personeel || {}).length })).slice(0, 40),

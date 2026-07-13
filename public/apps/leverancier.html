@@ -2375,7 +2375,13 @@
     renderActor();
     if (stationMode){ renderStation(); return; }
     renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
-    if (!document.querySelector('.tabbar button.active')) openTab('home');
+    // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
+    // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
+    // en blijft het overzicht leeg bij de eerste render.
+    if (!document.querySelector('.view.active')){
+      const knop = document.querySelector('.tabbar button.active');
+      openTab(knop ? knop.dataset.tab : 'home');
+    }
   }
 
   function actor(){ return (state && state.actor) || { name:'Beheer', role:'manager', manager:true }; }

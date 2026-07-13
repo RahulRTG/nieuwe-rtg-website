@@ -2,7 +2,7 @@
    is en offline opent. API-verkeer gaat altijd naar het netwerk.
    Pagina's en scripts zijn network-first: een update op de server komt
    direct door, de cache is alleen het vangnet zonder verbinding. */
-const CACHE = 'rtg-app-97ce80d7';
+const CACHE = 'rtg-app-86a0fcf2';
 const SHELL = ['/apps/app.html', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {

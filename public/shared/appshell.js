@@ -8,9 +8,12 @@
   function maakAPI(opties) {
     opties = opties || {};
     var prefix = opties.prefix || '/api';
+    var foutTekst = opties.foutTekst || 'Fout';
     return {
+      // enabled: alleen echt praten met de server op http(s); token maakt 'live'.
+      enabled: (typeof location !== 'undefined') && (location.protocol === 'http:' || location.protocol === 'https:'),
       token: null,
-      enabled: true,
+      get live() { return this.enabled && !!this.token; },
       async call(pad, body) {
         var headers = { 'Content-Type': 'application/json' };
         if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
@@ -20,7 +23,8 @@
           body: JSON.stringify(Object.assign({ lang: lang }, body || {}))
         });
         var data = await res.json().catch(function () { return {}; });
-        if (!res.ok) throw new Error(data.error || 'Fout');
+        // de HTTP-status gaat mee op de fout, zodat aanroepers erop kunnen sturen.
+        if (!res.ok) throw Object.assign(new Error(data.error || foutTekst), { status: res.status });
         return data;
       }
     };

@@ -655,6 +655,7 @@
   <div id="toast"></div>
 </div>
 
+<script src="/shared/appshell.js"></script>
 <script>
 (function(){
   const $ = s => document.querySelector(s);
@@ -732,17 +733,8 @@
     team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' }
   };
 
-  const API = {
-    enabled: location.protocol === 'http:' || location.protocol === 'https:',
-    token: null,
-    get live(){ return this.enabled && !!this.token; },
-    async call(path, body){
-      const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(this.token?{'Authorization':'Bearer '+this.token}:{})}, body: JSON.stringify(Object.assign({ lang: (window.RTGi18n ? RTGi18n.lang : 'nl') }, body||{})) });
-      const data = await res.json().catch(()=>({}));
-      if (!res.ok) throw Object.assign(new Error(data.error||'API-fout'), {status:res.status});
-      return data;
-    }
-  };
+  // API-client uit de gedeelde app-shell (public/shared/appshell.js).
+  const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
 
   let S = null;          // supplier
   let state = null;      // dashboard state

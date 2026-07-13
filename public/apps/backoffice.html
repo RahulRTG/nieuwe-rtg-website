@@ -228,6 +228,7 @@
   </div>
 </main>
 
+<script src="/shared/appshell.js"></script>
 <script>
 (function(){
   const $ = s => document.querySelector(s);
@@ -243,16 +244,12 @@
   const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded',
     'aangevraagd':'requested', 'geaccepteerd':'accepted', 'onderweg':'en route', 'aangekomen':'at pickup', 'aan-boord':'on board', 'rijdt':'on board', 'afgerond':'completed', 'gearriveerd':'completed' };
   const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
-  let token = null, state = null, source = null;
+  // API-client uit de gedeelde app-shell (public/shared/appshell.js).
+  const API = RTGApp.maakAPI();
+  let state = null, source = null;
   let tl = null, tlPage = 1, tlTimer = null;
-  const enabled = location.protocol === 'http:' || location.protocol === 'https:';
-
-  async function call(path, body){
-    const res = await fetch('/api' + path, { method:'POST', headers:{'Content-Type':'application/json', ...(token?{'Authorization':'Bearer '+token}:{})}, body: JSON.stringify(body||{}) });
-    const d = await res.json().catch(()=>({}));
-    if (!res.ok) throw new Error(d.error||'Fout');
-    return d;
-  }
+  const enabled = API.enabled;
+  const call = (path, body) => API.call(path, body);
   function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const ago=T('t.ago',' geleden'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min')+ago; const h=Math.round(m/60); if(h<24)return h+T('t.h',' u')+ago; return Math.round(h/24)+T('t.d',' d')+ago; }
 
   $('#loginBtn').addEventListener('click', login);
@@ -262,9 +259,9 @@
     if (!enabled){ alert('Start de RTG-server (npm start) om de backoffice te gebruiken.'); return; }
     try {
       const d = await call('/office/login', { code: $('#code').value.trim() });
-      token = d.token; state = d.state;
+      API.token = d.token; state = d.state;
     } catch(e){ alert(e.message); return; }
-    try { localStorage.setItem('rtg_office_token', token); } catch(e){}
+    try { localStorage.setItem('rtg_office_token', API.token); } catch(e){}
     enterApp();
   }
 
@@ -285,12 +282,12 @@
     if (!enabled) return;
     let t = null; try { t = localStorage.getItem('rtg_office_token'); } catch(e){}
     if (!t) return;
-    token = t;
+    API.token = t;
     try {
       state = (await call('/office/state')).state;
       enterApp();
     } catch(e){
-      token = null;
+      API.token = null;
       try { localStorage.removeItem('rtg_office_token'); } catch(e2){}
     }
   })();
@@ -311,7 +308,7 @@
     $('#verify').querySelectorAll('.vrow').forEach(row => {
       const id = Number(row.dataset.id);
       row.querySelector('[data-doc]').addEventListener('click', e => {
-        $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(token)+'&file='+encodeURIComponent(e.target.dataset.doc);
+        $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(API.token)+'&file='+encodeURIComponent(e.target.dataset.doc);
         $('#docScrim').classList.add('open');
       });
       row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve'));
@@ -537,7 +534,7 @@
 
   function stream(){
     if (!window.EventSource) return;
-    try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(token)); } catch(e){ return; }
+    try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
     source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadConcierge(); loadTrust(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
   }
@@ -566,7 +563,7 @@
   // export voor de boekhouding: de server bouwt het volledige bestand,
   // hoe groot de historie ook is
   $('#csvBtn').addEventListener('click', () => {
-    if (token) window.open('/api/office/export.csv?token=' + encodeURIComponent(token), '_blank');
+    if (API.token) window.open('/api/office/export.csv?token=' + encodeURIComponent(API.token), '_blank');
   });
 
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });

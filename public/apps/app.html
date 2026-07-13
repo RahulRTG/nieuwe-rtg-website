@@ -1153,6 +1153,7 @@
 <script src="/apps/geo.js"></script>
 <script src="/apps/translate.js"></script>
 <script src="/apps/foundation/gezin-rt.js"></script>
+<script src="/shared/appshell.js"></script>
 <script>
 (function(){
   const $ = s => document.querySelector(s);
@@ -1261,21 +1262,8 @@
   // Zakelijke rekening voor handmatige overboekingen (tot de betaalprovider live is).
   const RTG_IBAN = 'NL62 INGB 0111 1775 88';
 
-  const API = {
-    enabled: location.protocol === 'http:' || location.protocol === 'https:',
-    token: null,
-    get live(){ return this.enabled && !!this.token; },
-    async call(path, body){
-      const res = await fetch('/api' + path, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json', ...(this.token ? {'Authorization':'Bearer '+this.token} : {})},
-        body: JSON.stringify(Object.assign({ lang: (window.RTGi18n ? RTGi18n.lang : 'nl') }, body || {}))
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw Object.assign(new Error(data.error || 'API-fout'), {status: res.status});
-      return data;
-    }
-  };
+  // API-client uit de gedeelde app-shell (public/shared/appshell.js).
+  const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
 
   function applyState(state){
     if (!state) return;

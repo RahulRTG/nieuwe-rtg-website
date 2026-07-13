@@ -176,6 +176,11 @@
         <p class="sub" data-i18n="pd.v.ritten.sub">Uw rit, open aanvragen en uw verdiensten van vandaag.</p>
         <div id="rittenWrap"></div>
       </div>
+      <div class="view" data-view="bezorgen">
+        <h2 data-i18n="pd.v.bezorgen">Bezorgen</h2>
+        <p class="sub" data-i18n="pd.v.bezorgen.sub">Uw ritten op naam, met GPS, navigatie en snelle hulp onderweg.</p>
+        <div id="bezorgenWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -188,6 +193,7 @@
       <button data-tab="taken"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span data-i18n="pd.t.taken">Taken</span></button>
       <button data-tab="hulp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span data-i18n="pd.t.hulp">Hulp</span></button>
       <button data-tab="ritten" id="tabRitten" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M7.5 20v1M16.5 20v1"/></svg><span data-i18n="pd.t.ritten">Ritten</span></button>
+      <button data-tab="bezorgen" id="tabBezorgen" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/></svg><span data-i18n="pd.t.bezorgen">Bezorgen</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
   </div>
@@ -286,7 +292,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -539,6 +545,106 @@
         toast(T('pd.r.genomen','De rit is van u.') + (s.vehicleName ? ' · ' + s.vehicleName : ''));
         await refresh(); openTab('ritten');
       } catch(e){ toast(e.message); }
+    }));
+  }
+
+  /* ---- bezorgen: ritten op naam, GPS, navigatie en AI-hulp ---- */
+  let gpsWatch = null, gpsLaatst = 0, gpsPos = null;
+  const heeftBezorg = () => !!(state && state.bezorg && state.bezorg.bezorgen);
+  function kaartLink(o){
+    if (o.geo && Number.isFinite(o.geo.lat)) return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + o.geo.lat + ',' + o.geo.lng;
+    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(o.adres || '');
+  }
+  function afstandNaar(o){
+    if (!gpsPos || !o.geo || !Number.isFinite(o.geo.lat)) return null;
+    const R = 6371000, rad = d => d * Math.PI / 180;
+    const dLat = rad(o.geo.lat - gpsPos.lat), dLng = rad(o.geo.lng - gpsPos.lng);
+    const a = Math.sin(dLat/2)**2 + Math.cos(rad(gpsPos.lat)) * Math.cos(rad(o.geo.lat)) * Math.sin(dLng/2)**2;
+    return Math.round(2 * R * Math.asin(Math.sqrt(a)));
+  }
+  async function gpsStuur(lat, lng){
+    if (Date.now() - gpsLaatst < 8000) return; // hooguit elke 8 s naar de server
+    gpsLaatst = Date.now();
+    try { await API.call('/supplier/bezorg/gps', { lat, lng }); } catch(e){}
+  }
+  function gpsAanUit(){
+    if (gpsWatch != null){ navigator.geolocation.clearWatch(gpsWatch); gpsWatch = null; renderBezorgen(); return; }
+    if (!navigator.geolocation){ toast(T('pd.bz.geengps','Dit apparaat deelt geen GPS.')); return; }
+    gpsWatch = navigator.geolocation.watchPosition(p => {
+      gpsPos = { lat: p.coords.latitude, lng: p.coords.longitude };
+      gpsStuur(gpsPos.lat, gpsPos.lng);
+    }, () => toast(T('pd.bz.gpsfout','GPS staat uit of is geweigerd.')), { enableHighAccuracy: true, maximumAge: 5000 });
+    renderBezorgen();
+  }
+  function renderBezorgen(){
+    const tabBtn = document.getElementById('tabBezorgen');
+    if (tabBtn) tabBtn.style.display = heeftBezorg() ? '' : 'none';
+    const wrap = $('#bezorgenWrap');
+    if (!wrap) return;
+    if (!heeftBezorg()){ wrap.innerHTML = ''; return; }
+    const alle = (state.bezorg && state.bezorg.lopend) || [];
+    const mijn = alle.filter(o => o.levering === 'bezorgen' && o.bezorger && o.bezorger.staffId === me.staffId && !['bezorgd','opgehaald'].includes(o.status));
+    const vrij = alle.filter(o => o.levering === 'bezorgen' && !o.bezorger);
+    const mijnKlaar = mijn.filter(o => o.status === 'klaar').map(o => o.ref);
+    const rij = (o, extra) => {
+      const m = afstandNaar(o);
+      return '<div class="task"><span class="ic">'+(o.status==='onderweg'?'\uD83D\uDEF5':'\uD83D\uDCE6')+'</span><div class="t">'+
+        '<b>'+esc(o.customerCodename)+' \u00B7 '+esc(o.status)+(o.etaMin?' \u00B7 '+o.etaMin+' min':'')+'</b>'+
+        '<span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' \u00B7 \uD83D\uDCCD '+esc(o.adres||'')+(m!=null?' \u00B7 '+(m<1000?m+' m':(m/1000).toFixed(1)+' km'):'')+'</span>'+
+        '<span><a href="'+kaartLink(o)+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">\uD83D\uDDFA\uFE0F '+T('pd.bz.nav','Navigeer')+'</a></span></div>'+(extra||'')+'</div>';
+    };
+    wrap.innerHTML =
+      '<div class="card"><div class="k">'+T('pd.bz.gps','Live GPS')+'</div>'+
+      '<div class="task"><span class="ic">\uD83D\uDEF0\uFE0F</span><div class="t"><b>'+(gpsWatch!=null?T('pd.bz.gpsaan','U deelt uw positie; de klant ziet u rijden.'):T('pd.bz.gpsuit','GPS staat uit.'))+'</b>'+
+      '<span>'+T('pd.bz.gpsuitleg','Alleen tijdens uw rit; stopt zodra u hem uitzet.')+'</span></div>'+
+      '<button class="abtn" id="pdGps">'+(gpsWatch!=null?T('pd.bz.stop','Stop'):T('pd.bz.start','Start'))+'</button></div></div>'+
+      '<div class="card"><div class="k">'+T('pd.bz.mijn','Mijn rit')+' ('+mijn.length+')</div>'+
+      (mijn.length ? mijn.map(o => rij(o,
+          o.status==='onderweg' ? '<button class="abtn" data-pdbz="'+o.ref+'" data-st="bezorgd">'+T('pd.bz.bezorgd','Bezorgd')+'</button>' : ''
+        )).join('') +
+        (mijnKlaar.length ? '<button class="abtn" id="pdVertrek" style="margin-top:0.6rem;">\uD83D\uDEF5 '+T('pd.bz.vertrek','Vertrek')+' ('+mijnKlaar.length+')</button>' : '')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenmijn','Geen rit op uw naam. Neem hieronder leveringen aan.')+'</div>')+'</div>'+
+      '<div class="card"><div class="k">'+T('pd.bz.vrij','Klaar om mee te nemen')+' ('+vrij.length+')</div>'+
+      (vrij.length ? vrij.map(o =>
+        '<label class="task" style="cursor:pointer;"><input type="checkbox" class="pdbzkies" value="'+o.ref+'" style="margin-right:0.4rem;accent-color:var(--gold);"'+(o.status==='klaar'?'':' ')+'>'+
+        '<div class="t"><b>'+esc(o.customerCodename)+' \u00B7 '+esc(o.status)+'</b><span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' \u00B7 \uD83D\uDCCD '+esc(o.adres||'')+'</span></div></label>'
+      ).join('') + '<button class="abtn" id="pdNeem" style="margin-top:0.6rem;">'+T('pd.bz.neem','Neem geselecteerde ritten (op uw naam)')+'</button>'
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenvrij','Niets klaar om mee te nemen. Nieuwe leveringen verschijnen hier live.')+'</div>')+'</div>'+
+      '<div class="card"><div class="k">'+T('pd.bz.ai','Snelle hulp (AI)')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
+      [[T('pd.bz.ai1','Adres klopt niet'),'Het bezorgadres lijkt niet te kloppen, wat doe ik?'],
+       [T('pd.bz.ai2','Gast doet niet open'),'De gast doet niet open bij de bezorging, wat doe ik?'],
+       [T('pd.bz.ai3','Ik heb vertraging'),'Ik heb vertraging met de bezorging, wat doe ik?'],
+       [T('pd.bz.ai4','Bestelling beschadigd'),'De bestelling is onderweg beschadigd, wat doe ik?']]
+      .map(c => '<button class="abtn" data-pdbzai="'+esc(c[1])+'">'+c[0]+'</button>').join('')+'</div>'+
+      '<div id="pdBzAiUit" style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);"></div></div>';
+    const g = document.getElementById('pdGps'); if (g) g.addEventListener('click', gpsAanUit);
+    const v = document.getElementById('pdVertrek'); if (v) v.addEventListener('click', async () => {
+      try { await API.call('/supplier/bezorg/status', { refs: mijnKlaar, status: 'onderweg' }); if (gpsWatch == null) gpsAanUit(); await refresh(); openTab('bezorgen'); } catch(e){ toast(e.message); }
+    });
+    const n = document.getElementById('pdNeem'); if (n) n.addEventListener('click', async () => {
+      const refs = [...document.querySelectorAll('.pdbzkies:checked')].map(x => x.value);
+      if (!refs.length) { toast(T('pd.bz.kies','Vink eerst een of meer leveringen aan.')); return; }
+      try { const r = await API.call('/supplier/bezorg/neem', { refs }); toast(r.genomen.length + ' ' + T('pd.bz.opnaam','rit(ten) op uw naam.')); await refresh(); openTab('bezorgen'); } catch(e){ toast(e.message); }
+    });
+    document.querySelectorAll('[data-pdbz]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/bezorg/status', { ref: b.dataset.pdbz, status: b.dataset.st }); await refresh(); openTab('bezorgen'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-pdbzai]').forEach(b => b.addEventListener('click', async () => {
+      const uit = document.getElementById('pdBzAiUit');
+      uit.textContent = '\u2026';
+      // eerst de AI van de zaak; lukt dat niet, dan het vaste bezorgprotocol
+      const vast = {
+        'adres': T('pd.bz.p1','Bel of chat de gast via de zaak; klopt het adres echt niet, overleg dan met de zaak en lever niet zomaar ergens af.'),
+        'open': T('pd.bz.p2','Bel aan, wacht 2 minuten, bel de gast via de zaak. Geen gehoor? Terug naar de zaak; nooit onbeheerd achterlaten.'),
+        'vertraging': T('pd.bz.p3','Meld het de zaak; de klant ziet uw GPS en ETA al live. Veilig rijden gaat voor snelheid.'),
+        'beschadigd': T('pd.bz.p4','Niet afleveren. Meld het de zaak; die regelt een nieuwe bereiding of terugbetaling met de klant.')
+      };
+      const sleutel = /adres/i.test(b.dataset.pdbzai) ? 'adres' : /open/i.test(b.dataset.pdbzai) ? 'open' : /vertraging/i.test(b.dataset.pdbzai) ? 'vertraging' : 'beschadigd';
+      try {
+        const r = await API.call('/supplier/ai', { q: b.dataset.pdbzai });
+        uit.textContent = r.reply || vast[sleutel];
+      } catch(e){ uit.textContent = vast[sleutel]; }
     }));
   }
 

@@ -29,7 +29,7 @@ const path = require('path');
 module.exports = function maakArchief({ db, save, DATA_DIR }) {
   const DAGEN = Math.max(7, Number(process.env.RTG_ARCHIEF_DAGEN || 92));
   const MAP = path.join(DATA_DIR, 'archief');
-  const KLAAR = { geserveerd: 1, geweigerd: 1, terugbetaald: 1 };
+  const KLAAR = { geserveerd: 1, geweigerd: 1, terugbetaald: 1, bezorgd: 1, opgehaald: 1 };
   const NUL = { aantal: 0, omzetBetaald: 0, perZaak: {}, perMaand: {} };
 
   /* Alleen-lezen zicht op de tellerstaat: muteert db.data niet, zodat
@@ -69,7 +69,7 @@ module.exports = function maakArchief({ db, save, DATA_DIR }) {
       const z = s.perZaak[o.supplierCode] = s.perZaak[o.supplierCode] || { aantal: 0, omzetBetaald: 0 };
       const pm = s.perMaand[m] = s.perMaand[m] || { aantal: 0, omzetBetaald: 0 };
       s.aantal += 1; z.aantal += 1; pm.aantal += 1;
-      if (o.paid && o.status === 'geserveerd') {
+      if (o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald') {
         const bedrag = o.total || 0;
         s.omzetBetaald += bedrag; z.omzetBetaald += bedrag; pm.omzetBetaald += bedrag;
       }

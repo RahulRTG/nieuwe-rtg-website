@@ -465,6 +465,10 @@ function ledenPrijs(publiek, ledenprijs) {
 
 function ensureSupplierDefaults(s) {
   if (!Array.isArray(s.menu)) s.menu = [];
+  // De ophaal/bezorgdienst: horeca en zelfstandigen kunnen een eigen
+  // bezorg-assortiment voeren, los van de menukaart ter plaatse.
+  if (!s.bezorg || typeof s.bezorg !== 'object') s.bezorg = { aan: false, ophalen: true, bezorgen: true, producten: [] };
+  if (!Array.isArray(s.bezorg.producten)) s.bezorg.producten = [];
   if (!Array.isArray(s.photos)) s.photos = [];
   if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
   if (s.type === 'apartment' && !Array.isArray(s.doors)) s.doors = [];
@@ -1210,7 +1214,7 @@ function publicSupplier(s, lang) {
 function supplierState(s, actor) {
   const t = db.data.supplierTypes[s.type] || {};
   const vandaag = new Date().toISOString().slice(0, 10);
-  const ORDER_KLAAR = { 'geserveerd': 1, 'geweigerd': 1, 'terugbetaald': 1 };
+  const ORDER_KLAAR = { 'geserveerd': 1, 'geweigerd': 1, 'terugbetaald': 1, 'bezorgd': 1, 'opgehaald': 1 };
   const alleOrders = db.data.orders.filter(o => o.supplierCode === s.code && o.status !== 'wacht-op-betaling');
   const zichtOrders = alleOrders.filter(o => !ORDER_KLAAR[o.status] || String(o.at).slice(0, 10) === vandaag).slice(0, 80);
   const RIDE_KLAAR = { 'afgerond': 1, 'gearriveerd': 1, 'geweigerd': 1 };
@@ -1222,6 +1226,15 @@ function supplierState(s, actor) {
   const zichtBoekingen = alleBoekingen.filter(b => !BOEK_KLAAR[b.status] || String(b.finishedAt || b.at).slice(0, 10) === vandaag).slice(0, 80);
   return {
     supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate, vak: s.vak || null },
+    // de ophaal/bezorgdienst: alleen voor horeca en zelfstandigen
+    bezorg: magBezorgen(s) ? {
+      aan: !!(s.bezorg && s.bezorg.aan),
+      ophalen: !s.bezorg || s.bezorg.ophalen !== false,
+      bezorgen: !s.bezorg || s.bezorg.bezorgen !== false,
+      producten: (s.bezorg && s.bezorg.producten) || [],
+      lopend: alleOrders.filter(o => o.levering && !ORDER_KLAAR[o.status]).slice(0, 40),
+      vandaagKlaar: alleOrders.filter(o => o.levering && (o.status === 'bezorgd' || o.status === 'opgehaald') && String(o.finishedAt || o.at).slice(0, 10) === vandaag).length
+    } : null,
     services: s.services || null,
     boekingen: zichtBoekingen,
     rooms: s.rooms || null,
@@ -1310,6 +1323,12 @@ const pinFails = new Map(); // 'CODE:staffId' -> { n, until }
    fotopagina voor elke partner en rechtstreeks publiceren op De Salon. */
 
 // korte, ondubbelzinnige ophaalcode (geen 0/O, 1/I)
+/* Welke zaken mogen een ophaal/bezorgdienst voeren: horeca (orders-caps)
+   en zelfstandigen. Hotels/vervoer hebben hun eigen kanalen al. */
+function magBezorgen(s) {
+  const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
+  return caps.includes('orders') || s.type === 'zzp';
+}
 function pickupCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let c = '';
@@ -2289,7 +2308,7 @@ function connectedSupplierCodes(key) {
   if (L && L.destCode) set.add(L.destCode);
   if (L) for (const c of (L.connected || [])) set.add(c);
   for (const o of db.data.orders)
-    if ((o.customerKey || o.customerTier) === key && !['terugbetaald', 'geserveerd', 'geweigerd'].includes(o.status)) set.add(o.supplierCode);
+    if ((o.customerKey || o.customerTier) === key && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status)) set.add(o.supplierCode);
   for (const r of db.data.rides)
     if ((r.customerKey || r.customerTier) === key && !['gearriveerd', 'afgerond', 'geweigerd'].includes(r.status)) set.add(r.supplierCode);
   return [...set];
@@ -2312,7 +2331,7 @@ function liveStateFor(key, lang) {
     const s = findSupplier(code); if (!s) return null;
     const t = db.data.supplierTypes[s.type] || {};
     const dist = me && s.loc ? haversine(me, s.loc) : null;
-    const order = db.data.orders.find(o => (o.customerKey || o.customerTier) === key && o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd'].includes(o.status));
+    const order = db.data.orders.find(o => (o.customerKey || o.customerTier) === key && o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status));
     const ride = db.data.rides.find(r => (r.customerKey || r.customerTier) === key && r.supplierCode === code && r.status !== 'gearriveerd' && r.status !== 'geweigerd');
     return {
       code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
@@ -2345,7 +2364,7 @@ function guestsFor(code) {
     if (!connectedSupplierCodes(key).includes(code)) continue;
     const me = Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
     const dist = me && s && s.loc ? haversine(me, s.loc) : null;
-    const order = db.data.orders.find(o => (o.customerKey || o.customerTier) === key && o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd'].includes(o.status));
+    const order = db.data.orders.find(o => (o.customerKey || o.customerTier) === key && o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status));
     const ride = db.data.rides.find(r => (r.customerKey || r.customerTier) === key && r.supplierCode === code && r.status !== 'gearriveerd' && r.status !== 'geweigerd');
     out.push({
       codename: L.codename, distance: dist, etaMin: etaMinutes(dist, L.mode),
@@ -2673,7 +2692,7 @@ const kern = {
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
-  parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier,
+  magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,

@@ -26,6 +26,7 @@
       this.onChange = opts.onChange || null;
       this.onSocial = opts.onSocial || null;
       this.onCall = opts.onCall || null;
+      this.onBezorg = opts.onBezorg || null;
       try {
         const r = await fetch('/api/notifications', {
           method: 'POST',
@@ -60,6 +61,10 @@
       // bellen en videobellen: WebRTC-signalen tussen leden
       this.source.addEventListener('call', e => {
         if (this.onCall) this.onCall(JSON.parse(e.data));
+      });
+      // de ophaal/bezorgdienst: bezorger, GPS/ETA en statusstappen
+      this.source.addEventListener('bezorg', e => {
+        if (this.onBezorg) this.onBezorg(JSON.parse(e.data));
       });
     },
 

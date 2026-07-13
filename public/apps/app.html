@@ -914,6 +914,12 @@
         <div id="supplierList"></div>
       </div>
 
+      <div class="view" data-view="bestellen">
+        <h2 data-i18n="app.v.bz">Bestellen.</h2>
+        <p class="sub" data-i18n="app.v.bz.sub">Laat bezorgen of haal op bij RTG-partners, en volg uw bezorger live.</p>
+        <div id="bzMijn"></div>
+        <div id="bzInhoud"></div>
+      </div>
       <div class="view" data-view="gezin">
         <h2>Je gezinsruimte.</h2>
         <p class="sub" id="gezinSub">De RTFoundation-gezinnen die je als oppas of familie volgt.</p>
@@ -929,6 +935,7 @@
       <button data-tab="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span data-i18n="app.tab.home">Home</span></button>
       <button data-tab="reizen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-6-8 4-2 6-2-5-8 1z"/></svg><span data-i18n="app.tab.trips">Reizen</span></button>
       <button data-tab="betalen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg><span data-i18n="app.tab.pay">Betalen</span></button>
+      <button data-tab="bestellen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/><path d="M6.5 17.5h6.5l2.2-6.5H19"/><path d="M12.5 7h3.5l1.6 4"/></svg><span data-i18n="app.tab.bestellen">Bestellen</span></button>
       <button data-tab="ai"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg><span data-i18n="app.tab.ai">AI</span></button>
       <button data-tab="salon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="10.5" r="2.4"/><path d="M3.5 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><path d="M14.5 18.5c.5-2.2 1.6-3.4 3.4-3.4 1.4 0 2.6.8 3.1 2.4"/></svg><span data-i18n="app.tab.salon">Salon</span></button>
       <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="app.tab.tp">Ter plaatse</span></button>
@@ -1450,7 +1457,7 @@
     $('#app').classList.add('active');
     renderAll();
     if (API.live && window.RTGRealtime){
-      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal });
+      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg });
     }
     loadSocial();
   }
@@ -1470,7 +1477,7 @@
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
-      if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal });
+      if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg });
       loadSocial();
     } catch(e){
       API.token = null;
@@ -2001,10 +2008,110 @@
     if (!guest){ renderTrip(); renderPay(); renderAI(); }
     renderSalon();
     renderTerPlaatse();
+    laadBestellen();
     loadCv();
     loadVacatures();
     openTab('home');
     if ((rtf.gekoppeld || []).length) ensurePush(false); // stil vernieuwen als het al aan staat
+  }
+
+  /* ---------- bestellen: de ophaal/bezorgdienst ---------- */
+  let bzPartners = [], bzZaak = null, bzMand = {}, bzLevering = 'bezorgen', bzGeo = null, bzVolgTimer = null;
+  async function laadBestellen(){
+    if (!API.live) return;
+    try { bzPartners = (await API.call('/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
+    renderBestellen();
+    laadBzMijn();
+  }
+  async function laadBzMijn(){
+    const el = $('#bzMijn'); if (!el || !API.live) return;
+    let mijn = [];
+    try { mijn = ((await API.call('/orders/mine')).orders || []).filter(o => o.levering && !['bezorgd','opgehaald','geweigerd','terugbetaald','wacht-op-betaling'].includes(o.status)); } catch(e){}
+    if (!mijn.length){ el.innerHTML = ''; return; }
+    el.innerHTML = mijn.map(o => {
+      const st = { 'nieuw': T('bz.m.nieuw','ontvangen door de zaak'), 'in bereiding': T('bz.m.bereid','wordt bereid'),
+        'klaar': o.levering === 'ophalen' ? T('bz.m.haal','klaar om op te halen') : T('bz.m.wachtb','klaar, wacht op de bezorger'),
+        'onderweg': T('bz.m.weg','onderweg naar u') }[o.status] || o.status;
+      return '<div class="card" style="border-color:rgba(194,58,94,0.35);" data-bzvolg="'+o.ref+'">'+
+        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);display:flex;align-items:center;gap:0.4rem;"><span class="livedot"></span>'+esc(o.supplierName)+' \u00B7 '+(o.levering==='ophalen'?T('bz.m.ophalen','ophalen'):T('bz.m.bezorgen','bezorging'))+'</div>'+
+        '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+st+'</b><span id="bzEta-'+o.ref+'">'+(o.status==='onderweg'&&o.etaMin?' \u00B7 \u23F1 '+o.etaMin+' min':'')+'</span></div>'+
+        '<div style="margin-top:0.3rem;font-size:0.78rem;color:var(--muted);">'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+
+        (o.levering==='ophalen' ? ' \u00B7 '+T('bz.m.code','code')+' <b style="color:var(--gold);">'+o.pickup+'</b>' : (o.bezorger?' \u00B7 \uD83D\uDEF5 '+esc(o.bezorger.name):''))+'</div></div>';
+    }).join('');
+  }
+  function opBezorg(d){
+    // live: status, bezorger of GPS/ETA veranderd
+    if (d.kind === 'gps'){
+      const el = document.getElementById('bzEta-' + d.ref);
+      if (el && d.etaMin) el.textContent = ' \u00B7 \u23F1 ' + d.etaMin + ' min';
+      return;
+    }
+    laadBzMijn();
+    if (d.kind === 'status' && (d.status === 'bezorgd' || d.status === 'opgehaald')) toast(T('bz.m.klaar2','Eet smakelijk! Uw bestelling is er.'));
+  }
+  function renderBestellen(){
+    const el = $('#bzInhoud'); if (!el) return;
+    if (bzZaak) return renderBzZaak();
+    if (!bzPartners.length){
+      el.innerHTML = '<div class="card"><div style="font-size:0.85rem;color:var(--muted);">'+T('bz.geen','Nog geen partners met een bezorgdienst op uw bestemming. Zodra een zaak de dienst opent, staat hij hier.')+'</div></div>';
+      return;
+    }
+    el.innerHTML = bzPartners.map(p =>
+      '<button class="card" style="display:block;width:100%;text-align:left;cursor:pointer;" data-bzkies="'+p.code+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;"><b>'+esc(p.name)+'</b><span style="font-size:0.72rem;color:var(--soft);">'+esc(p.city||'')+'</span></div>'+
+      '<div style="margin-top:0.3rem;font-size:0.76rem;color:var(--muted);">'+(p.bezorgen?'\uD83D\uDEF5 '+T('bz.kan.bez','bezorgen'):'')+(p.bezorgen&&p.ophalen?' \u00B7 ':'')+(p.ophalen?'\uD83E\uDDFA '+T('bz.kan.oph','ophalen'):'')+' \u00B7 '+p.producten.length+' '+T('bz.prod','producten')+'</div></button>'
+    ).join('');
+    document.querySelectorAll('[data-bzkies]').forEach(b => b.addEventListener('click', () => {
+      bzZaak = bzPartners.find(p => p.code === b.dataset.bzkies); bzMand = {};
+      bzLevering = bzZaak.bezorgen ? 'bezorgen' : 'ophalen';
+      renderBzZaak();
+    }));
+  }
+  function bzTotaal(){ return (bzZaak.producten||[]).reduce((t,p) => t + (bzMand[p.id]||0) * p.price, 0); }
+  function renderBzZaak(){
+    const el = $('#bzInhoud'); if (!el) return;
+    const p = bzZaak;
+    const n = Object.values(bzMand).reduce((a,b)=>a+b,0);
+    el.innerHTML =
+      '<button class="obtn" id="bzTerug" style="margin-bottom:0.8rem;">\u2039 '+T('bz.terug','Alle partners')+'</button>'+
+      '<div class="card"><b>'+esc(p.name)+'</b>'+
+      p.producten.map(x =>
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.7rem;">'+
+        '<div style="flex:1;"><div style="font-size:0.88rem;">'+esc(x.name)+'</div>'+(x.desc?'<div style="font-size:0.72rem;color:var(--soft);">'+esc(x.desc)+'</div>':'')+'</div>'+
+        '<span style="color:var(--gold);font-size:0.82rem;">'+eur(x.price)+'</span>'+
+        '<span style="display:flex;align-items:center;gap:0.45rem;">'+
+        '<button class="obtn" data-bzmin="'+x.id+'" style="padding:0.2rem 0.7rem;">\u2212</button><b>'+(bzMand[x.id]||0)+'</b><button class="obtn" data-bzplus="'+x.id+'" style="padding:0.2rem 0.7rem;">+</button></span></div>'
+      ).join('')+'</div>'+
+      '<div class="card">'+
+      '<div style="display:flex;gap:0.5rem;">'+
+      (p.bezorgen?'<button class="obtn'+(bzLevering==='bezorgen'?' primary':'')+'" data-bzlev="bezorgen">\uD83D\uDEF5 '+T('bz.kan.bez','bezorgen')+'</button>':'')+
+      (p.ophalen?'<button class="obtn'+(bzLevering==='ophalen'?' primary':'')+'" data-bzlev="ophalen">\uD83E\uDDFA '+T('bz.kan.oph','ophalen')+'</button>':'')+'</div>'+
+      (bzLevering==='bezorgen' ? '<div class="field" style="margin-top:0.8rem;"><label>'+T('bz.adres','Bezorgadres')+'</label><input id="bzAdres" placeholder="'+T('bz.adresph','Straat, nummer, plaats')+'"></div>'+
+        '<button class="obtn" id="bzHier" style="margin-top:0.3rem;">\uD83D\uDCCD '+(bzGeo?T('bz.hierok','Locatie gedeeld voor de ETA'):T('bz.hier','Deel mijn locatie voor een live ETA'))+'</button>' : '')+
+      '<button class="bigbtn" id="bzBestel" style="margin-top:1rem;"'+(n?'':' disabled')+'>'+T('bz.bestel','Bestel en betaal')+(n?' \u00B7 '+eur(bzTotaal()):'')+'</button></div>';
+    $('#bzTerug').addEventListener('click', () => { bzZaak = null; renderBestellen(); });
+    document.querySelectorAll('[data-bzplus]').forEach(b => b.addEventListener('click', () => { bzMand[b.dataset.bzplus]=(bzMand[b.dataset.bzplus]||0)+1; renderBzZaak(); }));
+    document.querySelectorAll('[data-bzmin]').forEach(b => b.addEventListener('click', () => { const k=b.dataset.bzmin; if (bzMand[k]) bzMand[k]--; if (!bzMand[k]) delete bzMand[k]; renderBzZaak(); }));
+    document.querySelectorAll('[data-bzlev]').forEach(b => b.addEventListener('click', () => { bzLevering = b.dataset.bzlev; renderBzZaak(); }));
+    const hier = document.getElementById('bzHier');
+    if (hier) hier.addEventListener('click', () => {
+      if (!navigator.geolocation) return toast(T('bz.geengps','Dit apparaat deelt geen locatie.'));
+      navigator.geolocation.getCurrentPosition(pos => { bzGeo = { lat: pos.coords.latitude, lng: pos.coords.longitude }; renderBzZaak(); },
+        () => toast(T('bz.gpsfout','Locatie delen is geweigerd; de ETA blijft dan een schatting.')));
+    });
+    $('#bzBestel').addEventListener('click', async () => {
+      const items = Object.entries(bzMand).map(([id, qty]) => ({ id, qty }));
+      if (!items.length) return;
+      try {
+        const b = await API.call('/bezorg/bestel', { supplierCode: p.code, levering: bzLevering, items,
+          adres: bzLevering === 'bezorgen' ? ($('#bzAdres') ? $('#bzAdres').value : '') : undefined,
+          lat: bzGeo ? bzGeo.lat : undefined, lng: bzGeo ? bzGeo.lng : undefined });
+        await API.call('/order/pay', { ref: b.order.ref });
+        toast(bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.'));
+        bzZaak = null; bzMand = {};
+        renderBestellen(); laadBzMijn();
+      } catch(e){ toast(e.message); }
+    });
   }
 
   /* ---------- ter plaatse: bestellen bij RTG-partners ---------- */

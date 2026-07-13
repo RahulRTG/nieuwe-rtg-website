@@ -550,6 +550,11 @@
         <p class="sub" data-i18n="sup.v.kassa.sub">Afrekenen, bonnen en het dagoverzicht, per medewerker bijgehouden.</p>
         <div id="kassaWrap"></div>
       </div>
+      <div class="view" data-view="bezorg">
+        <h2 data-i18n="sup.v.bezorg">Bezorgen &amp; ophalen</h2>
+        <p class="sub" data-i18n="sup.v.bezorg.sub">Uw eigen assortiment om te laten bezorgen of ophalen, met ritten op naam.</p>
+        <div id="bezorgWrap"></div>
+      </div>
       <div class="view" data-view="minibar">
         <h2 data-i18n="sup.v.minibar">Minibar</h2>
         <p class="sub" data-i18n="sup.v.minibar.sub">Tel per kamer wat is gebruikt. Het verbruik gaat automatisch op de kamerrekening en de aanvullijst staat klaar.</p>
@@ -678,6 +683,7 @@
     menu:     { label:'Menu',      svg:'<path d="M4 3v18M8 3v6a2 2 0 0 1-4 0M18 3c-2 0-3 2-3 5s1 4 3 4v9"/>', cap:'menu' },
     price:    { label:'Prijs',     svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 2-2.5 1.5-2.5 3.5M12 16v.5"/>', cap:'pricing' },
     kassa:    { label:'Kassa',     svg:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M7 13h2M11 13h2M15 13h2M7 16.5h2M11 16.5h2M15 16.5h2"/>' },
+    bezorg:   { label:'Bezorgen',  svg:'<circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/><path d="M4 12h4"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
     tafels:   { label:'Tafels',    svg:'<circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>', cap:'menu' },
@@ -2361,7 +2367,7 @@
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
-    const keys = Object.keys(TABDEF).filter(k => !MAIN_TABS.includes(k) && (!TABDEF[k].cap || has(TABDEF[k].cap)));
+    const keys = Object.keys(TABDEF).filter(k => !MAIN_TABS.includes(k) && (!TABDEF[k].cap || has(TABDEF[k].cap)) && (k !== 'bezorg' || !!(state && state.bezorg)));
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
     ).join('') + '</div>';
@@ -2374,7 +2380,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -2775,6 +2781,80 @@
   const HK_LABEL_EN = { schoon:'Clean', vuil:'Dirty', bezig:'In progress', bezet:'Occupied', defect:'Out of order' };
   const tHk = s => (lang() === 'en' ? (HK_LABEL_EN[s] || s) : (HK_LABEL[s] || s));
   let hkDefectFor = null; // kamer-id waarvoor de defect-notitie openstaat
+  // ---- de ophaal/bezorgdienst van de zaak ----
+  const BZ_ST = { 'nieuw':'nieuw', 'in bereiding':'in bereiding', 'klaar':'klaar', 'onderweg':'onderweg' };
+  function renderBezorg(){
+    const el = $('#bezorgWrap'); if (!el) return;
+    const b = state && state.bezorg;
+    if (!b){ el.innerHTML = ''; return; }
+    const canEdit = actor().manager;
+    let html = '';
+    // dienststatus + schakelaars
+    html += '<div class="card"><div class="tt-h">'+T('bz.dienst','De dienst')+'</div>'+
+      '<div style="margin-top:0.5rem;font-size:0.85rem;color:'+(b.aan?'var(--green)':'var(--soft)')+';">'+
+      (b.aan ? '\u25CF ' + T('bz.open','Open: leden kunnen bestellen.') : '\u25CB ' + T('bz.dicht','Gesloten: leden zien u niet in de bestellijst.'))+'</div>'+
+      (canEdit ? '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;">'+
+        '<button class="obtn'+(b.aan?'':' primary')+'" data-bzaan="'+(b.aan?'0':'1')+'">'+(b.aan?T('bz.zetdicht','Dienst sluiten'):T('bz.zetopen','Dienst openen'))+'</button>'+
+        '<button class="obtn" data-bzk="ophalen" data-bzv="'+(b.ophalen?'0':'1')+'">'+(b.ophalen?'\u2713 ':'')+T('bz.ophalen','Ophalen')+'</button>'+
+        '<button class="obtn" data-bzk="bezorgen" data-bzv="'+(b.bezorgen?'0':'1')+'">'+(b.bezorgen?'\u2713 ':'')+T('bz.bezorgen','Bezorgen')+'</button>'+
+      '</div>' : '')+
+      '<div style="margin-top:0.6rem;font-size:0.78rem;color:var(--soft);">'+T('bz.vandaag','Vandaag afgerond:')+' <b>'+(b.vandaagKlaar||0)+'</b></div></div>';
+    // lopende leveringen met statusknoppen
+    const lopend = b.lopend || [];
+    html += '<div class="card"><div class="tt-h">'+T('bz.lopend','Lopende leveringen')+' ('+lopend.length+')</div>'+
+      (lopend.length ? lopend.map(o => {
+        const wie = o.bezorger ? ' \u00B7 \uD83D\uDEF5 ' + esc(o.bezorger.name) : '';
+        const eta = o.etaMin ? ' \u00B7 ' + o.etaMin + ' min' : '';
+        let knop = '';
+        if (o.status === 'nieuw') knop = '<button class="obtn" data-bzord="'+o.ref+'" data-st="in bereiding">'+T('bz.bereiden','In bereiding')+'</button>';
+        else if (o.status === 'in bereiding') knop = '<button class="obtn" data-bzord="'+o.ref+'" data-st="klaar">'+T('bz.klaar','Klaar')+'</button>';
+        else if (o.status === 'klaar' && o.levering === 'ophalen') knop = '<button class="obtn primary" data-bzlev="'+o.ref+'" data-st="opgehaald">'+T('bz.opgehaald','Opgehaald')+'</button>';
+        else if (o.status === 'klaar' && o.levering === 'bezorgen') knop = o.bezorger ? '<button class="obtn primary" data-bzlev="'+o.ref+'" data-st="onderweg">'+T('bz.vertrek','Onderweg')+'</button>' : '<span style="font-size:0.72rem;color:var(--soft);">'+T('bz.wachtbez','wacht op een bezorger (PDA)')+'</span>';
+        else if (o.status === 'onderweg') knop = '<button class="obtn primary" data-bzlev="'+o.ref+'" data-st="bezorgd">'+T('bz.bezorgd','Bezorgd')+'</button>';
+        return '<div class="mitem"><div class="r1"><span class="nm">'+(o.levering==='bezorgen'?'\uD83D\uDEF5':'\uD83E\uDDFA')+' '+esc(o.customerCodename)+' \u00B7 '+T('bz.st.'+o.status, BZ_ST[o.status]||o.status)+wie+eta+'</span><span class="pr">'+eur(o.total)+'</span></div>'+
+          '<div class="ds">'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+(o.levering==='bezorgen'&&o.adres?' \u00B7 \uD83D\uDCCD '+esc(o.adres):' \u00B7 '+T('bz.code','code')+' <b>'+o.pickup+'</b>')+'</div>'+
+          (knop?'<div style="margin-top:0.5rem;">'+knop+'</div>':'')+'</div>';
+      }).join('') : '<div class="empty">'+T('bz.geen','Nog geen lopende leveringen. Betaalde bestellingen verschijnen hier live.')+'</div>')+'</div>';
+    // assortiment
+    const prods = b.producten || [];
+    html += '<div class="card"><div class="tt-h">'+T('bz.assort','Assortiment')+' ('+prods.length+')</div>'+
+      (prods.length ? prods.map(p =>
+        '<div class="mitem"><div class="r1"><span class="nm">'+esc(p.name)+'</span><span style="display:flex;align-items:center;gap:0.5rem;"><span class="pr">'+eur(p.price)+'</span>'+
+        (canEdit?'<button class="rr-del" data-bzdel="'+p.id+'">\u2715</button>':'')+'</span></div>'+
+        (p.desc?'<div class="ds">'+esc(p.desc)+'</div>':'')+'</div>'
+      ).join('') : '<div class="empty">'+T('bz.leeg','Nog geen producten. Voeg ze hieronder toe; dan kan de dienst open.')+'</div>')+
+      (canEdit ? '<div style="margin-top:1rem;">'+
+        '<div class="field"><label>'+T('bz.f.naam','Product')+'</label><input id="bzName" placeholder="'+T('bz.f.naamph','Bijv. paella om mee te nemen')+'"></div>'+
+        '<div style="display:flex;gap:0.5rem;"><div class="field" style="flex:2;"><label>'+T('bz.f.desc','Omschrijving')+'</label><input id="bzDesc" placeholder="'+T('bz.f.descph','Kort en duidelijk')+'"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('bz.f.prijs','Prijs (\u20AC)')+'</label><input id="bzPrice" type="number" inputmode="decimal" placeholder="24"></div></div>'+
+        '<button class="obtn primary" id="bzAdd">'+T('bz.f.voeg','Toevoegen')+'</button></div>' : '')+'</div>';
+    el.innerHTML = html;
+    // acties
+    document.querySelectorAll('[data-bzaan]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/bezorg/instellingen', { aan: k.dataset.bzaan === '1' }); await refresh(); openTab('bezorg'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-bzk]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/bezorg/instellingen', { [k.dataset.bzk]: k.dataset.bzv === '1' }); await refresh(); openTab('bezorg'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-bzord]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/order/status', { ref: k.dataset.bzord, status: k.dataset.st }); await refresh(); openTab('bezorg'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-bzlev]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/bezorg/status', { ref: k.dataset.bzlev, status: k.dataset.st }); await refresh(); openTab('bezorg'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-bzdel]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/bezorg/product', { id: k.dataset.bzdel, weg: true }); await refresh(); openTab('bezorg'); } catch(e){ toast(e.message); }
+    }));
+    const voeg = document.getElementById('bzAdd');
+    if (voeg) voeg.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/bezorg/product', { name: $('#bzName').value, desc: $('#bzDesc').value, price: Number($('#bzPrice').value) });
+        toast(T('bz.f.ok','Het product staat in het assortiment.'));
+        await refresh(); openTab('bezorg');
+      } catch(e){ toast(e.message); }
+    });
+  }
+
   function renderRooms(){
     const el = $('#roomsWrap'); if (!el) return;
     const rooms = state.rooms;

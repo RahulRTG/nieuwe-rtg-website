@@ -66,6 +66,21 @@
   .schakel{border:1px solid var(--line);border-radius:999px;padding:.3rem .8rem;font-weight:700;font-size:.72rem;cursor:pointer;font-family:inherit;flex-shrink:0;min-width:5.4rem;}
   .schakel.aan{background:#12321f;color:#7EE0A3;border-color:#1f5637;}
   .schakel.uit{background:#3a1420;color:#F4B8C6;border-color:var(--rood);}
+  .schakel:disabled{opacity:.5;cursor:default;}
+  .chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:0 0 1rem;}
+  .chip{display:inline-flex;align-items:center;gap:.35rem;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:.4rem .75rem;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;}
+  .chip[aria-pressed="true"]{color:#0C0C0B;background:var(--gold);border-color:var(--gold);}
+  .chip .dot{width:.6rem;height:.6rem;border-radius:50%;flex-shrink:0;}
+  .pills{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+  .pill{display:inline-flex;align-items:center;gap:.3rem;border:1px solid var(--line);border-radius:999px;padding:.22rem .55rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;background:var(--card2);color:var(--muted);}
+  .pill.aan{background:#12321f;color:#7EE0A3;border-color:#1f5637;}
+  .pill.uit{background:#3a1420;color:#F4B8C6;border-color:var(--rood);}
+  .pill:disabled{opacity:.5;cursor:default;}
+  .pill .dot{width:.5rem;height:.5rem;border-radius:50%;}
+  .aibox textarea{min-height:3.2rem;resize:vertical;}
+  .voorstelrij{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-top:1px solid var(--line);font-size:.82rem;}
+  .voorstelrij:first-child{border-top:none;}
+  .voorstelrij .tag{font-size:.68rem;font-weight:700;padding:.12rem .45rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);}
 </style>
 </head>
 <body>
@@ -93,7 +108,7 @@
     </header>
     <div class="tabs" role="tablist" id="tabbar">
       <button class="tab" role="tab" id="tabBtnStatus" aria-selected="true" aria-controls="tabStatus">Statusbord</button>
-      <button class="tab" role="tab" id="tabBtnFuncties" aria-selected="false" aria-controls="tabFuncties" hidden>Functies aan/uit</button>
+      <button class="tab" role="tab" id="tabBtnFuncties" aria-selected="false" aria-controls="tabFuncties" hidden>Controlekamer</button>
     </div>
 
     <div id="tabStatus" role="tabpanel" aria-labelledby="tabBtnStatus">
@@ -149,18 +164,30 @@
         <div class="sec">Wachtend op bevestiging van de eigenaar</div>
         <div class="kaart" id="verzoeken" style="margin-bottom:1rem;"></div>
       </div>
-      <div class="kaart" style="margin-bottom:1rem;">
-        <div class="fn" style="border-top:none;">
-          <div class="mid">
-            <div class="naam">Alle functies in één keer</div>
-            <div class="muted">Elke wijziging wordt eerst een aanvraag: de eigenaar krijgt een melding en moet accepteren of weigeren voordat er iets omgaat.</div>
-          </div>
-          <div style="display:flex;gap:.4rem;flex-shrink:0;">
-            <button class="knop grijs klein" id="bAllesAan">Alles aan</button>
-            <button class="knop rood klein" id="bAllesUit">Alles uit</button>
-          </div>
+      <div class="kaart aibox" style="margin-bottom:1rem;">
+        <div class="naam">AI-hulp voor de controlekamer</div>
+        <div class="muted" style="margin:.15rem 0 .6rem;">Vraag iets of geef een instructie in gewone taal, bijvoorbeeld: &bdquo;zet de sociale laag uit voor Lifestyle&rdquo; of &bdquo;wat doet de kassa-schakelaar?&rdquo;. De AI stelt de wijziging voor; niets gaat automatisch om.</div>
+        <textarea class="veld" id="aiVraag" placeholder="Typ je vraag of instructie&hellip;" aria-label="Vraag of instructie voor de AI"></textarea>
+        <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+          <button class="knop" id="bAiVraag">Vraag de AI</button>
+          <span class="muted" id="aiBron" style="font-size:.72rem;"></span>
+        </div>
+        <div class="advies" id="aiAntwoord" hidden></div>
+        <div id="aiVoorstelBlok" hidden style="margin-top:.6rem;">
+          <div class="muted" style="font-size:.75rem;margin-bottom:.2rem;">Voorgestelde wijzigingen:</div>
+          <div id="aiVoorstel"></div>
+          <button class="knop klein" id="bAiVoorstel" style="margin-top:.5rem;">Deze wijzigingen aanvragen</button>
         </div>
       </div>
+
+      <div class="chips" id="dgChips" role="group" aria-label="Filter op doelgroep"></div>
+
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem;">
+        <input class="veld" id="fnZoek" placeholder="Zoek een functie of app&hellip;" aria-label="Zoek een functie of app" style="flex:1;margin-bottom:0;min-width:11rem;">
+        <button class="knop grijs klein" id="bAllesAan">Alles aan</button>
+        <button class="knop rood klein" id="bAllesUit">Alles uit</button>
+      </div>
+      <div class="muted" id="ctxUitleg" style="font-size:.76rem;margin-bottom:.8rem;"></div>
       <div id="functies"></div>
     </div>
   </div>
@@ -274,8 +301,17 @@
   $('#tabBtnStatus').addEventListener('click', function(){ toonTab('status'); });
   $('#tabBtnFuncties').addEventListener('click', function(){ toonTab('functies'); });
 
-  /* ---------- functieschakelaars: alles loopt via een aanvraag ---------- */
-  var wachtendeIds = {}; // functie-id -> true als er een open aanvraag op zit
+  /* ---------- controlekamer: functies per doelgroep, alles via een aanvraag ---------- */
+  var wachtend = {};         // sleutel id|doelgroep -> open aanvraag
+  var catData = [];          // laatste catalogus
+  var doelgroepenMeta = [];  // doelgroep-meta (chips/pillen)
+  var actieveDg = null;      // null = overzicht; anders een doelgroep-id
+  var zoekterm = '';
+
+  function sleutel(id, dg){ return id + '|' + (dg||''); }
+  function isWacht(id, dg){ return !!wachtend[sleutel(id, dg)]; }
+  function dgMeta(id){ for (var i=0;i<doelgroepenMeta.length;i++) if (doelgroepenMeta[i].id===id) return doelgroepenMeta[i]; return { id:id, naam:id, emoji:'•', kleur:'#888' }; }
+
   function zetFunctie(body){
     api('/api/techniek/functie', { method:'POST', body:body })
       .then(function(d){
@@ -285,17 +321,44 @@
       })
       .catch(function(e){ toast(e.message); });
   }
+
+  // een pil voor een doelgroep binnen een functie (overzicht-weergave)
+  function pil(f, d){
+    var geblokkeerd = isWacht(f.id, d.id) || !f.aan;
+    var m = dgMeta(d.id);
+    return el('button',{class:'pill '+(d.aan?'aan':'uit'), disabled: geblokkeerd||null,
+      'aria-label':(d.aan?'Uitzetten voor ':'Aanzetten voor ')+m.naam+': '+f.naam,
+      onclick:function(){ zetFunctie({ id:f.id, doelgroep:d.id, aan:!d.aan }); }},
+      el('span',{class:'dot', style:{background:m.kleur}}), m.naam);
+  }
+
   function functieRij(f){
-    var wacht = !!wachtendeIds[f.id];
-    var schakel = el('button',{class:'schakel '+(f.aan?'aan':'uit'),
-      'aria-label':(f.aan?'Vraag uitzetten aan: ':'Vraag aanzetten aan: ')+f.naam,
-      disabled: wacht || null,
-      onclick:function(){ zetFunctie({ id:f.id, aan:!f.aan }); }},
-      f.aan?'AAN':'UIT');
+    if (actieveDg){
+      var dEntry = null;
+      for (var i=0;i<f.doelgroepen.length;i++) if (f.doelgroepen[i].id===actieveDg) dEntry=f.doelgroepen[i];
+      if (!dEntry) return null; // deze functie bedient deze doelgroep niet
+      var aan1 = dEntry.aan, wacht1 = isWacht(f.id, actieveDg);
+      var schakel1 = el('button',{class:'schakel '+(aan1?'aan':'uit'), disabled: wacht1||null,
+        'aria-label':(aan1?'Uitzetten':'Aanzetten')+' voor '+dgMeta(actieveDg).naam+': '+f.naam,
+        onclick:function(){ zetFunctie({ id:f.id, doelgroep:actieveDg, aan:!aan1 }); }}, aan1?'AAN':'UIT');
+      return el('div',{class:'fn'},
+        el('div',{class:'mid'},
+          el('div',{class:'naam'}, f.naam,
+            !f.aan ? el('span',{class:'code'}, 'globaal uit') : null,
+            wacht1 ? el('span',{class:'code'}, 'aanvraag wacht') : null),
+          el('div',{class:'muted'}, f.uitleg||'')),
+        schakel1);
+    }
+    // overzicht: globale schakel + doelgroep-pillen (alleen als >1 doelgroep)
+    var wachtG = isWacht(f.id, null);
+    var schakel = el('button',{class:'schakel '+(f.aan?'aan':'uit'), disabled: wachtG||null,
+      'aria-label':(f.aan?'Globaal uitzetten: ':'Globaal aanzetten: ')+f.naam,
+      onclick:function(){ zetFunctie({ id:f.id, aan:!f.aan }); }}, f.aan?'AAN':'UIT');
     return el('div',{class:'fn'},
       el('div',{class:'mid'},
-        el('div',{class:'naam'}, f.naam, wacht ? el('span',{class:'code'}, 'aanvraag wacht') : null),
-        el('div',{class:'muted'}, f.uitleg||'')),
+        el('div',{class:'naam'}, f.naam, wachtG ? el('span',{class:'code'}, 'aanvraag wacht') : null),
+        el('div',{class:'muted'}, f.uitleg||''),
+        (f.doelgroepen && f.doelgroepen.length>1) ? el('div',{class:'pills'}, f.doelgroepen.map(function(d){ return pil(f,d); })) : null),
       schakel);
   }
   function verzoekRij(v){
@@ -323,19 +386,90 @@
       .catch(function(e){ toast(e.message); });
   }
   function categorieBlok(g){
-    var aanAlle = function(aan){ return function(){ zetFunctie({ categorie:g.categorie, aan:aan }); }; };
+    var rijen = g.functies.map(functieRij).filter(Boolean);
+    if (!rijen.length) return null;
+    var bulk = function(aan){ return function(){ var b={ categorie:g.categorie, aan:aan }; if(actieveDg) b.doelgroep=actieveDg; zetFunctie(b); }; };
     return el('div', null,
       el('div',{class:'catkop'},
         el('h2', null, g.categorie),
         el('div',{style:{display:'flex',gap:'.4rem'}},
-          el('button',{class:'knop grijs klein', onclick:aanAlle(true)}, 'Alles aan'),
-          el('button',{class:'knop grijs klein', onclick:aanAlle(false)}, 'Alles uit'))),
-      el('div',{class:'kaart'}, g.functies.map(functieRij)));
+          el('button',{class:'knop grijs klein', onclick:bulk(true)}, 'Alles aan'),
+          el('button',{class:'knop grijs klein', onclick:bulk(false)}, 'Alles uit'))),
+      el('div',{class:'kaart'}, rijen));
   }
-  $('#bAllesAan').addEventListener('click', function(){ zetFunctie({ alles:true, aan:true }); });
+
+  /* ---------- doelgroep-filter (chips) + zoeken ---------- */
+  function chip(id, label, kleur){
+    var actief = actieveDg===id;
+    var kids = [];
+    if (kleur) kids.push(el('span',{class:'dot', style:{background:kleur}}));
+    kids.push(label);
+    return el('button',{class:'chip', 'aria-pressed':actief?'true':'false',
+      onclick:function(){ actieveDg=id; tekenChips(); updBulk(); tekenFuncties(); }}, kids);
+  }
+  function tekenChips(){
+    var chips = [ chip(null, 'Overzicht', null) ];
+    doelgroepenMeta.forEach(function(d){ chips.push(chip(d.id, d.emoji+' '+d.naam, d.kleur)); });
+    vervang($('#dgChips'), chips);
+  }
+  function past(f){
+    if (actieveDg && !(f.doelgroepen||[]).some(function(d){ return d.id===actieveDg; })) return false;
+    if (zoekterm){ var s=(f.naam+' '+(f.uitleg||'')).toLowerCase(); if (s.indexOf(zoekterm)<0) return false; }
+    return true;
+  }
+  function tekenFuncties(){
+    var groepen = catData.map(function(g){ return { categorie:g.categorie, functies:g.functies.filter(past) }; })
+                         .filter(function(g){ return g.functies.length; });
+    var blokken = groepen.map(categorieBlok).filter(Boolean);
+    vervang($('#functies'), blokken.length ? blokken : el('div',{class:'muted', style:{padding:'.6rem 0'}}, 'Geen functies gevonden voor deze filter.'));
+    if (actieveDg){ var m=dgMeta(actieveDg); Util.tekst($('#ctxUitleg'), m.naam+' · '+(m.uitleg||'')+' Wijzigingen hier gelden alleen voor deze doelgroep.'); }
+    else Util.tekst($('#ctxUitleg'), 'Overzicht: de grote knop zet een functie globaal aan of uit; de gekleurde pillen sturen per doelgroep bij (bijv. wel voor RTG-leden, niet voor Lifestyle).');
+  }
+  function updBulk(){
+    var suffix = actieveDg ? (' voor '+dgMeta(actieveDg).naam) : '';
+    Util.tekst($('#bAllesAan'), 'Alles aan'+suffix);
+    Util.tekst($('#bAllesUit'), 'Alles uit'+suffix);
+  }
+  $('#fnZoek').addEventListener('input', function(){ zoekterm=this.value.trim().toLowerCase(); tekenFuncties(); });
+  $('#bAllesAan').addEventListener('click', function(){ var b={ alles:true, aan:true }; if(actieveDg) b.doelgroep=actieveDg; zetFunctie(b); });
   $('#bAllesUit').addEventListener('click', function(){
-    if (!confirm('Weet je het zeker? Dit maakt een aanvraag om ALLE functionaliteiten uit te zetten. Er verandert pas iets nadat de eigenaar de aanvraag accepteert.')) return;
-    zetFunctie({ alles:true, aan:false });
+    var wat = actieveDg ? ('alles voor '+dgMeta(actieveDg).naam) : 'ALLE functionaliteiten';
+    if (!confirm('Weet je het zeker? Dit maakt een aanvraag om '+wat+' uit te zetten. Er verandert pas iets nadat de eigenaar de aanvraag accepteert.')) return;
+    var b={ alles:true, aan:false }; if(actieveDg) b.doelgroep=actieveDg; zetFunctie(b);
+  });
+
+  /* ---------- AI-hulp voor de controlekamer ---------- */
+  var aiVoorstelData = [];
+  function voorstelRij(w){
+    var m = w.doelgroep ? dgMeta(w.doelgroep) : null;
+    return el('div',{class:'voorstelrij'},
+      el('span',{class:'tag', style:{color:w.aan?'#7EE0A3':'#F4B8C6'}}, w.aan?'AAN':'UIT'),
+      el('span',{style:{flex:'1',minWidth:'0'}}, w.naam||w.id),
+      el('span',{class:'muted'}, m ? (m.emoji+' '+m.naam) : 'globaal'));
+  }
+  $('#bAiVraag').addEventListener('click', function(){
+    var v=$('#aiVraag').value.trim(); if(!v){ toast('Typ eerst een vraag of instructie.'); return; }
+    var b=$('#bAiVraag'); b.disabled=true; Util.tekst(b,'AI denkt na…');
+    api('/api/techniek/functie/ai', { method:'POST', body:{ vraag:v } })
+      .then(function(d){
+        b.disabled=false; Util.tekst(b,'Vraag de AI');
+        $('#aiAntwoord').hidden=false; Util.tekst($('#aiAntwoord'), d.antwoord||'');
+        Util.tekst($('#aiBron'), d.bron==='ai' ? 'AI-antwoord' : 'ingebouwde taal-hulp');
+        aiVoorstelData = d.voorstel||[];
+        if (aiVoorstelData.length){ $('#aiVoorstelBlok').hidden=false; vervang($('#aiVoorstel'), aiVoorstelData.map(voorstelRij)); }
+        else $('#aiVoorstelBlok').hidden=true;
+      })
+      .catch(function(e){ b.disabled=false; Util.tekst(b,'Vraag de AI'); toast(e.message); });
+  });
+  $('#bAiVoorstel').addEventListener('click', function(){
+    if(!aiVoorstelData.length) return;
+    var lijst = aiVoorstelData.slice();
+    (function volgende(i){
+      if (i>=lijst.length){ toast(lijst.length+' aanvraag(-vragen) ingediend. De eigenaar accepteert ze nog.'); laad(); return; }
+      api('/api/techniek/functie', { method:'POST', body:{ id:lijst[i].id, doelgroep:lijst[i].doelgroep||undefined, aan:lijst[i].aan } })
+        .then(function(){ volgende(i+1); }).catch(function(){ volgende(i+1); });
+    })(0);
+    $('#aiVoorstelBlok').hidden=true; aiVoorstelData=[];
   });
 
   /* ---------- beveiliging (inbraakdetectie) ---------- */
@@ -400,15 +534,19 @@
       $('#tabBtnFuncties').hidden = false;
       var verzoeken = d.verzoeken || [];
       var open = verzoeken.filter(function(v){ return v.status==='wacht'; });
-      wachtendeIds = {};
-      open.forEach(function(v){ (v.wijzigingen||[]).forEach(function(w){ wachtendeIds[w.id]=true; }); });
-      var uitLabel = 'Functies aan/uit';
-      if (open.length) uitLabel += ' · '+open.length+' wacht';
-      else if (d.functiesUit) uitLabel += ' · '+d.functiesUit+' uit';
+      wachtend = {};
+      open.forEach(function(v){ (v.wijzigingen||[]).forEach(function(w){ wachtend[sleutel(w.id, w.doelgroep||null)]=true; }); });
+      var uitLabel = 'Controlekamer', extra = [];
+      if (open.length) extra.push(open.length+' wacht');
+      if (d.functiesUit) extra.push(d.functiesUit+' globaal uit');
+      if (d.doelgroepUit) extra.push(d.doelgroepUit+' per doelgroep');
+      if (extra.length) uitLabel += ' · '+extra.join(' · ');
       $('#tabBtnFuncties').textContent = uitLabel;
       $('#verzoekBlok').hidden = !verzoeken.length;
       if (verzoeken.length) vervang($('#verzoeken'), verzoeken.map(verzoekRij));
-      if (d.functies) vervang($('#functies'), d.functies.map(categorieBlok));
+      catData = d.functies || [];
+      doelgroepenMeta = d.doelgroepen || [];
+      tekenChips(); updBulk(); tekenFuncties();
     }).catch(function(e){
       if (/401|403|Log in|toegang/i.test(e.message)){ token=null; sessionStorage.removeItem('techToken'); toonLogin(); }
       else toast(e.message);

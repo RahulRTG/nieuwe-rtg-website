@@ -70,3 +70,50 @@ test('functies: catalogus geeft categorieën met de juiste aan/uit-stand', () =>
   // categorieën in de vaste volgorde
   assert.equal(cat[0].categorie, functies.CATEGORIEEN[0]);
 });
+
+test('doelgroep: een functie kan uit voor de ene doelgroep en aan voor de andere', () => {
+  // de sociale laag uit voor Lifestyle, maar aan voor RTG
+  const staat = { social: { perDoelgroep: { lifestyle: false } } };
+  assert.equal(functies.functieAanVoor('social', 'lifestyle', staat), false);
+  assert.equal(functies.functieAanVoor('social', 'rtg', staat), true);
+  // het pad is dicht voor een Lifestyle-lid, vrij voor een RTG-lid
+  assert.ok(functies.padGeblokkeerd('/api/rtf/social/zoek', staat, 'lifestyle'));
+  assert.equal(functies.padGeblokkeerd('/api/rtf/social/zoek', staat, 'rtg'), null);
+  // zonder doelgroep (achterwaarts compatibel) telt alleen de globale stand: vrij
+  assert.equal(functies.padGeblokkeerd('/api/rtf/social/zoek', staat), null);
+});
+
+test('doelgroep: globaal uit wint van elke per-doelgroep-stand', () => {
+  const staat = { social: { aan: false, perDoelgroep: { rtg: true } } };
+  assert.equal(functies.functieAanVoor('social', 'rtg', staat), false);
+  assert.ok(functies.padGeblokkeerd('/api/rtf/social/zoek', staat, 'rtg'));
+});
+
+test('doelgroep: de doelgroep van een verzoek volgt pad of pas', () => {
+  assert.equal(functies.doelgroepVanVerzoek('/api/supplier/order', null), 'leverancier');
+  assert.equal(functies.doelgroepVanVerzoek('/api/staff/rooster', null), 'personeel');
+  assert.equal(functies.doelgroepVanVerzoek('/api/office/state', null), 'intern');
+  assert.equal(functies.doelgroepVanVerzoek('/api/foundation/mijn', null), 'foundation');
+  // gedeeld ledenpad: de pas bepaalt de doelgroep
+  assert.equal(functies.doelgroepVanVerzoek('/api/member/dm', { tier: 'business' }), 'business');
+  assert.equal(functies.doelgroepVanVerzoek('/api/member/dm', { tier: 'rtg' }), 'rtg');
+  assert.equal(functies.doelgroepVanVerzoek('/api/member/dm', null), null);
+});
+
+test('AI-taalhulp: "zet de sociale laag uit voor lifestyle" levert een correct voorstel', () => {
+  const { voorstel } = functies.duidVoorstel('zet de sociale laag uit voor lifestyle', {});
+  assert.ok(voorstel.some(w => w.id === 'social' && w.doelgroep === 'lifestyle' && w.aan === false),
+    'het voorstel zet social uit voor lifestyle');
+  // niet voor andere doelgroepen
+  assert.ok(!voorstel.some(w => w.doelgroep === 'rtg'));
+});
+
+test('AI-taalhulp: valideerVoorstel weert onbekende functies en verkeerde doelgroepen', () => {
+  const uit = functies.valideerVoorstel([
+    { id: 'social', doelgroep: 'lifestyle', aan: false }, // ok
+    { id: 'bestaatniet', doelgroep: 'rtg', aan: false },  // onbekende functie
+    { id: 'supplier', doelgroep: 'rtg', aan: false }       // rtg hoort niet bij supplier
+  ]);
+  assert.equal(uit.length, 1);
+  assert.equal(uit[0].id, 'social');
+});

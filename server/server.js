@@ -220,8 +220,23 @@ app.use((req, res, next) => {
   if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
   const staat = db.data && db.data.techniek && db.data.techniek.functies;
   if (!staat) return next(); // niets uitgezet: alles staat aan
-  const dicht = functies.padGeblokkeerd(p, staat);
-  if (dicht) return res.status(503).json({ error: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.', functie: dicht.id, naam: dicht.naam });
+  // De doelgroep van dit verzoek: uit het pad (leverancier/personeel/intern/
+  // foundation) of uit de pas van het ingelogde lid (RTG/Lifestyle/Business).
+  let user = null;
+  try {
+    const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
+    if (tok) user = accounts.verifyToken(tok);
+  } catch (e) {}
+  const doelgroep = functies.doelgroepVanVerzoek(p, user);
+  const dicht = functies.padGeblokkeerd(p, staat, doelgroep);
+  if (dicht) {
+    const globaalUit = !functies.functieAan(dicht.id, staat);
+    return res.status(503).json({
+      error: globaalUit ? 'Deze functie is tijdelijk uitgeschakeld door de beheerder.'
+        : 'Deze functie is voor jouw profiel uitgeschakeld door de beheerder.',
+      functie: dicht.id, naam: dicht.naam, doelgroep: doelgroep || undefined
+    });
+  }
   next();
 });
 

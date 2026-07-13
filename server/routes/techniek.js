@@ -98,7 +98,11 @@ module.exports = (kern) => {
       eigenaar: isEigenaar(req.techUser), naam: accounts.realNameOf(req.techUser),
       checks, zekeringen: zeker,
       functies: cat,
+      doelgroepen: functies.DOELGROEPEN,
       functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),
+      // extra beperkingen die alleen voor bepaalde doelgroepen gelden (functie
+      // staat globaal aan, maar voor >=1 doelgroep uit)
+      doelgroepUit: cat.reduce((n, g) => n + g.functies.reduce((m, f) => m + (f.aan ? f.doelgroepen.filter(d => !d.aan).length : 0), 0), 0),
       // open aanvragen bovenaan, daarna de laatst behandelde (audit-spoor)
       verzoeken: verzoeken.filter(v => v.status === 'wacht')
         .concat(verzoeken.filter(v => v.status !== 'wacht').slice(-8).reverse()),
@@ -143,19 +147,27 @@ module.exports = (kern) => {
   app.post('/api/techniek/functie', techAuth, (req, res) => {
     const t = staat();
     const aan = req.body.aan !== false && req.body.aan !== 'false';
+    // optioneel: richt de wijziging op een specifieke doelgroep (bijv. wel voor
+    // de RTG-leden, niet voor de Lifestyle-leden). Leeg = de globale schakelaar.
+    const dg = req.body.doelgroep ? String(req.body.doelgroep) : null;
+    if (dg && !functies.DOELGROEP_IDS.includes(dg)) return res.status(400).json({ error: 'Onbekende doelgroep.' });
+    const dgNaam = dg ? (functies.DOELGROEPEN.find(d => d.id === dg) || {}).naam : null;
+    const suffix = (aan ? 'AAN' : 'UIT') + (dgNaam ? ' voor ' + dgNaam : '');
     let doelwit, label;
-    if (req.body.alles) { doelwit = functies.FUNCTIES; label = 'Hele platform ' + (aan ? 'AAN' : 'UIT'); }
+    if (req.body.alles) { doelwit = functies.FUNCTIES; label = 'Hele platform ' + suffix; }
     else if (req.body.categorie) {
       doelwit = functies.FUNCTIES.filter(f => f.categorie === req.body.categorie);
       if (!doelwit.length) return res.status(404).json({ error: 'Onbekende categorie.' });
-      label = req.body.categorie + ': alles ' + (aan ? 'AAN' : 'UIT');
+      label = req.body.categorie + ': alles ' + suffix;
     } else if (req.body.id) {
       const f = functies.OP_ID[req.body.id];
       if (!f) return res.status(404).json({ error: 'Onbekende functie.' });
-      doelwit = [f]; label = f.naam + ' ' + (aan ? 'AAN' : 'UIT');
+      doelwit = [f]; label = f.naam + ' ' + suffix;
     } else return res.status(400).json({ error: 'Geef id, categorie of alles op.' });
+    // bij een doelgroep: alleen functies die die doelgroep ook echt bedienen
+    if (dg) doelwit = doelwit.filter(f => (f.doelgroepen || []).includes(dg));
     // alleen wat er echt zou veranderen komt in de aanvraag
-    const wijzigingen = doelwit.filter(f => functies.functieAan(f.id, t.functies) !== aan).map(f => ({ id: f.id, aan }));
+    const wijzigingen = doelwit.filter(f => functies.functieAanVoor(f.id, dg, t.functies) !== aan).map(f => ({ id: f.id, aan, doelgroep: dg }));
     if (!wijzigingen.length) return res.json({ ok: true, status: 'ongewijzigd', functies: functies.catalogus(t.functies) });
     if (!Array.isArray(t.functieVerzoeken)) t.functieVerzoeken = [];
     const vz = {
@@ -187,12 +199,53 @@ module.exports = (kern) => {
     if (vz.status !== 'wacht') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
     if (req.body.akkoord === false) vz.status = 'geweigerd';
     else {
-      for (const w of vz.wijzigingen) t.functies[w.id] = { aan: w.aan };
+      for (const w of vz.wijzigingen) {
+        const cur = t.functies[w.id] = t.functies[w.id] || {};
+        if (w.doelgroep) { cur.perDoelgroep = cur.perDoelgroep || {}; cur.perDoelgroep[w.doelgroep] = w.aan; }
+        else cur.aan = w.aan;
+      }
       vz.status = 'akkoord';
     }
     vz.besluitAt = new Date().toISOString();
     save();
     res.json({ ok: true, status: vz.status, functies: functies.catalogus(t.functies) });
+  });
+
+  /* AI-hulp voor de controlekamer: de eigenaar stelt in gewone taal een vraag
+     of geeft een instructie ("zet de sociale laag uit voor Lifestyle"). De AI
+     antwoordt kort EN stelt concrete wijzigingen voor. Er gaat niets automatisch
+     om: het voorstel loopt daarna gewoon via de aanvraag/bevestigingsstroom.
+     Zonder AI-sleutel werkt een ingebouwde Nederlandse taal-hulp als terugval. */
+  app.post('/api/techniek/functie/ai', techAuth, async (req, res) => {
+    if (staat().zekeringen.ai && staat().zekeringen.ai.aan === false)
+      return res.status(503).json({ error: 'De AI-zekering staat uit.' });
+    const vraag = String(req.body.vraag || '').slice(0, 500);
+    if (!vraag.trim()) return res.status(400).json({ error: 'Stel een vraag of geef een instructie.' });
+    const t = staat();
+    const lokaal = functies.duidVoorstel(vraag, t.functies);
+    let antwoord = null, voorstel = lokaal.voorstel, bron = 'ingebouwd';
+    if (anthropic) {
+      try {
+        const catTekst = functies.FUNCTIES.map(f => '- ' + f.id + ' ("' + f.naam + '", categorie ' + f.categorie +
+          ', doelgroepen: ' + (f.doelgroepen || []).join('/') + ')').join('\n');
+        const dgTekst = functies.DOELGROEPEN.map(d => d.id + ' = ' + d.naam).join(', ');
+        const prompt = 'Je bent de assistent van de controlekamer van het RTG-platform. De eigenaar kan functies globaal ' +
+          'of per doelgroep aan- of uitzetten.\nDoelgroepen: ' + dgTekst + '.\nBeschikbare functies:\n' + catTekst +
+          '\n\nVraag of instructie van de eigenaar: "' + vraag + '"\n\n' +
+          'Antwoord kort in het Nederlands (maximaal 4 zinnen). Vraagt de instructie om een wijziging, geef daarna EEN codeblok:\n' +
+          '```json\n{"voorstel":[{"id":"<functie-id>","doelgroep":"<doelgroep-id of null>","aan":true}]}\n```\n' +
+          'Gebruik uitsluitend bestaande id\'s uit de lijst; laat doelgroep leeg (null) voor een globale wijziging. Geen codeblok als er niets te wijzigen valt.';
+        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 700, messages: [{ role: 'user', content: prompt }] });
+        const tekst = (r.content && r.content[0] && r.content[0].text) || '';
+        antwoord = tekst.replace(/```json[\s\S]*?```/g, '').trim();
+        const m = tekst.match(/```json\s*([\s\S]*?)```/);
+        if (m) { try { const j = JSON.parse(m[1]); if (j && Array.isArray(j.voorstel)) voorstel = j.voorstel; } catch (e) {} }
+        bron = 'ai';
+      } catch (e) { antwoord = null; bron = 'ingebouwd'; }
+    }
+    if (!antwoord) antwoord = lokaal.uitleg;
+    voorstel = functies.valideerVoorstel(voorstel);
+    res.json({ antwoord, voorstel, bron });
   });
 
   /* Beveiligingsmelding(en) afhandelen: de eigenaar bevestigt dat hij ze heeft

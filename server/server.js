@@ -412,6 +412,7 @@ const { sseClients, sseBuffer, nextSseId, bufferEvent, speelOpnieuw, leverSse, s
 // Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
 // vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
 onExternalChange(() => {
+  _ledenAantalCache = null; // externe wijziging: ledental opnieuw bepalen
   if (!db.data || !db.data.sessions) return;
   for (const [t, s] of Object.entries(db.data.sessions)) sessions.set(t, s);
 });
@@ -822,9 +823,20 @@ function dirTouch(sess) {
   const cn = liveCodename(sess);
   const cur = db.data.memberDir[sess.key];
   if (!cur || cur.codename !== cn || cur.tier !== sess.tier) {
+    if (!cur && _ledenAantalCache != null) _ledenAantalCache++; // nieuw lid: teller ophogen
     db.data.memberDir[sess.key] = { codename: cn, tier: sess.tier };
     save();
   }
+}
+
+// Goedkoop ledental voor de kantoor-totalen. Object.keys(memberDir).length is
+// O(N) en materialiseert een array van alle sleutels: bij miljoenen leden kost
+// dat seconden per kantoorverzoek. We cachen het aantal, hogen het op bij een
+// nieuw lid (zie dirTouch) en verversen alleen bij een externe datawijziging.
+let _ledenAantalCache = null;
+function ledenAantal() {
+  if (_ledenAantalCache == null) _ledenAantalCache = Object.keys(db.data.memberDir || {}).length;
+  return _ledenAantalCache;
 }
 
 /* Een lid opzoeken op codenaam (voor contracten, uitnodigingen): de gids
@@ -2626,7 +2638,7 @@ function officeState() {
       // levend plus archief: het totaal blijft eerlijk, hoe oud tickets ook worden
       orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').length + archief.stat().aantal,
       rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').length,
-      leden: Object.keys(db.data.memberDir || {}).length,
+      leden: ledenAantal(),
       // actieve zaken in het geheugen plus de bulk-zaken in het grootboek (Postgres)
       partners: db.data.suppliers.length + (grootAantal ? grootAantal() : 0),
       live: live.length

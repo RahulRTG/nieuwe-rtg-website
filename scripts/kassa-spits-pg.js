@@ -21,7 +21,7 @@ const fs = require('fs'), os = require('os'), path = require('path'), crypto = r
 const http = require('http');
 const { finished } = require('stream/promises');
 
-const agent = new http.Agent({ keepAlive: true, maxSockets: 512 });
+const agent = new http.Agent({ keepAlive: true, maxSockets: 1024 });
 function verzoek(pad, { method = 'POST', token, body } = {}) {
   return new Promise((resolve, reject) => {
     const data = method === 'GET' ? null : JSON.stringify(body || {});
@@ -141,8 +141,13 @@ const KEUKENS = ['KIKUNOI', 'PONTO'];
     const reg = await api('registratie', '/api/auth/register', { name: 'Gast ' + i, email: 'kpg' + i + '@rtg.nl', phone: '06' + (40000000 + i), password: 'Spits1234!', geboortedatum: '1985-05-05', tier: 'business', pasApp: 'business' });
     if (reg && reg.token) actors.push({ i, token: reg.token });
   }
-  for (const a of actors) { const c = await api('connecties', '/api/member/connections', {}, a.token); a.key = c && c.me; }
-  rij('gasten (leden) geregistreerd', actors.length);
+  for (const a of actors) {
+    const c = await api('connecties', '/api/member/connections', {}, a.token); a.key = c && c.me;
+    // iedereen "onderweg" zetten zodat de live GPS-updates werken
+    a.lat = 38.90 + Math.random() * 0.06; a.lng = 1.40 + Math.random() * 0.06;
+    await api('live-start', '/api/live/start', { mode: 'driving', lat: a.lat, lng: a.lng }, a.token);
+  }
+  rij('gasten (leden) geregistreerd + onderweg', actors.length);
 
   const keukens = {};
   for (const code of KEUKENS) {
@@ -200,17 +205,33 @@ const KEUKENS = ['KIKUNOI', 'PONTO'];
   // alle andere apps druk (compact)
   const paren = []; for (let i = 0; i + 1 < actors.length; i += 2) paren.push([actors[i], actors[i + 1]]);
   for (const [a, b] of paren) { await api('vriend', '/api/member/connect', { key: b.key }, a.token); await api('vriend', '/api/member/connect/respond', { key: a.key, action: 'accept' }, b.token); }
-  const FOTO = 'data:image/jpeg;base64,' + crypto.randomBytes(8000).toString('base64');
-  for (const [a, b] of paren.slice(0, 12)) taken.push((async () => {
+
+  /* MILJOENEN VIDEOGESPREKKEN: elk paar draait onophoudelijk de volledige
+     WebRTC-signaleringscyclus (ring, accept, offer, answer, 3x ICE, hangup).
+     Geen pauze: zo hard als de server aankan. Elk signaal wordt live via SSE
+     naar de tegenpartij gestuurd. */
+  for (const [a, b] of paren) taken.push((async () => {
     while (bezig()) {
-      await api('dm', '/api/member/dm/send', { toKey: b.key, text: 'Kom je ook?' }, a.token);
-      await api('bellen', '/api/member/call', { toKey: b.key, kind: 'ring', video: true }, a.token);
-      await api('bellen', '/api/member/call', { toKey: a.key, kind: 'accept', video: true }, b.token);
-      await api('bellen', '/api/member/call', { toKey: b.key, kind: 'hangup' }, a.token);
-      await api('snap', '/api/member/snap/send', { toKey: b.key, foto: FOTO, tekst: 'proost' }, a.token);
-      await slaap(250);
+      await api('videobellen', '/api/member/call', { toKey: b.key, kind: 'ring', video: true }, a.token);
+      await api('videobellen', '/api/member/call', { toKey: a.key, kind: 'accept', video: true }, b.token);
+      await api('videobellen', '/api/member/call', { toKey: b.key, kind: 'offer', video: true, payload: { sdp: 'v=0 demo-offer' } }, a.token);
+      await api('videobellen', '/api/member/call', { toKey: a.key, kind: 'answer', video: true, payload: { sdp: 'v=0 demo-answer' } }, b.token);
+      for (let k = 0; k < 3; k++) await api('videobellen', '/api/member/call', { toKey: b.key, kind: 'ice', payload: { candidate: 'cand:' + k } }, a.token);
+      await api('videobellen', '/api/member/call', { toKey: b.key, kind: 'hangup' }, a.token);
     }
   })());
+
+  /* MILJOENEN GPS-UPDATES: elk lid stuurt onophoudelijk zijn live locatie door
+     (de zaak en de backoffice zien hem live bewegen op de kaart). */
+  for (const a of actors) taken.push((async () => {
+    while (bezig()) {
+      a.lat += (Math.random() - 0.5) * 0.001; a.lng += (Math.random() - 0.5) * 0.001;
+      await api('gps', '/api/live/update', { lat: a.lat, lng: a.lng }, a.token);
+    }
+  })());
+
+  // wat lichte sociale ruis eromheen (DM), zodat "alles" tegelijk draait
+  for (const [a, b] of paren.slice(0, 20)) taken.push((async () => { while (bezig()) { await api('dm', '/api/member/dm/send', { toKey: b.key, text: 'Kom je ook?' }, a.token); await slaap(400); } })());
   for (const a of actors.slice(0, 8)) await api('zakelijk-profiel', '/api/zakelijk/profiel/zet', { naam: 'Gast ' + a.i, kop: 'Ondernemer', sector: 'Horeca', vaardigheden: ['Gastvrijheid'] }, a.token);
   for (const a of actors.slice(0, 8)) taken.push((async () => { while (bezig()) { await api('zakelijk', '/api/zakelijk/feed', {}, a.token); await slaap(600); } })());
   taken.push((async () => { const tech = await api('techniek', '/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' }); while (bezig()) { await api('backoffice', '/api/office/state', {}, ownerToken); if (tech) await api('techniek', '/api/techniek/status', null, tech.token, 'GET'); await slaap(2500); } })());
@@ -247,7 +268,10 @@ const KEUKENS = ['KIKUNOI', 'PONTO'];
     console.log('  ' + n.padEnd(18) + String(s.n).padStart(7) + 'x  ok=' + String(s.ok).padStart(7) + '  err=' + String(s.err).padStart(4) + '  p50=' + String(pct(s.lat, 50)).padStart(5) + 'ms  p95=' + String(pct(s.lat, 95)).padStart(5) + 'ms' + (s.fouten.length ? '   << ' + s.fouten[0] : ''));
   }
   const gb = stromen['gast-bestelt'] || { ok: 0 }, dg = stromen['doorgeef'] || { ok: 0 }, ks = stromen['keukenscherm'] || { ok: 0 };
-  kop('Kassa/keuken-doorstroom + gezondheid');
+  kop('De golf: video, GPS en kassa');
+  const vb = stromen['videobellen'] || { ok: 0, n: 0 }, gps = stromen['gps'] || { ok: 0, n: 0 };
+  rij('videobel-signalen (WebRTC)', vb.ok.toLocaleString('nl-NL') + '  (ring/accept/offer/answer/ICE/hangup)');
+  rij('GPS-locatie-updates', gps.ok.toLocaleString('nl-NL'));
   rij('bonnen besteld / geserveerd', gb.ok + ' / ' + dg.ok);
   rij('keukensectie-meldingen', ks.ok);
   rij('gezondheids-sonde p50/p99', pct(sonde, 50) + ' / ' + pct(sonde, 99) + ' ms');

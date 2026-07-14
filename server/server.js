@@ -1418,11 +1418,12 @@ app.post('/api/translate', async (req, res) => {
 
 /* ---------- partnerkanaal: boeken zonder pas ----------
    Publieke endpoints (geen login): partner opzoeken, reizen ophalen en
-   boeken via een partnercode. De service (15% boven nettoprijs) wordt
-   gedeeld tussen partner en RTG. */
+   boeken via een partnercode. RTG verdient niets aan een boeking; de gast
+   betaalt de nettoprijs en een eventuele service gaat volledig naar de
+   partner. RTG's enige inkomsten zijn de abonnementen. */
 
-/* De klant ziet alleen totaalprijzen. Nettoprijs, service en de verdeling
-   tussen partner en RTG blijven interne administratie (db.json). */
+/* De klant ziet alleen totaalprijzen. Nettoprijs en service blijven interne
+   administratie (db.json); RTG's aandeel is per definitie nul. */
 
 function findPartner(code) {
   code = String(code || '').trim().toUpperCase();

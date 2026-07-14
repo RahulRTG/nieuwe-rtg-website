@@ -3537,8 +3537,8 @@
           (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>':(g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>':'<span class="ge">'+T('sup.enrouteshort','onderweg')+'</span>'))+
         '</div>').join('')+'</div>';
     }
-    extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.yourprice','Uw dynamische prijs aan RTG')+'</div>'+
-      '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('sup.pricebody','U levert RTG uw beste prijs; RTG brengt de gasten. Uw huidige marge-afspraak:')+' <b style="color:var(--gold);">'+Math.round((S.rate||0)*100)+'%</b>.</div>'+
+    extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.yourprice','Uw prijs voor RTG-leden')+'</div>'+
+      '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('sup.pricebody','U levert RTG-leden uw beste prijs; RTG brengt de gasten en rekent 0% commissie. U houdt 100% van elke boeking.')+'</div>'+
       '<button class="obtn primary" style="margin-top:0.8rem;" data-goto="price">'+T('sup.newprice','Nieuwe prijs doorgeven')+'</button></div>';
     if (has('menu')) extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.menu','Menukaart')+'</div><div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+(state.menu||[]).length+' '+T('sup.dishesvisible','gerechten zichtbaar voor gasten.')+'</div><button class="obtn" style="margin-top:0.8rem;" data-goto="menu">'+T('sup.viewmenu','Bekijk menu')+'</button></div>';
     $('#homeExtra').innerHTML = extra;
@@ -5150,8 +5150,8 @@ window.I18N = { en: {
   'sup.needserver':'Start the server (npm start) to use the supplier app.',
   'sup.hello':'Good day,', 'sup.connected':'connected with RTG',
   'sup.openorders':'Open orders', 'sup.bookings':'Bookings', 'sup.received':'Received',
-  'sup.yourprice':'Your dynamic price to RTG',
-  'sup.pricebody':'You supply RTG your best price; RTG brings the guests. Your current margin agreement:',
+  'sup.yourprice':'Your price for RTG members',
+  'sup.pricebody':'You give RTG members your best price; RTG brings the guests and charges 0% commission. You keep 100% of every booking.',
   'sup.newprice':'Submit a new price', 'sup.menu':'Menu', 'sup.dishesvisible':'dishes visible to guests.', 'sup.viewmenu':'View menu',
   'sup.guest':'Guest', 'sup.allergy':'Allergy:', 'sup.wantssalon':'Guest wants to tag this for The Salon',
   'sup.refunded':'refunded', 'sup.notpaid':'not paid yet', 'sup.markas':'Mark as:', 'sup.reject':'Decline', 'sup.refund':'Refund',

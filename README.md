@@ -159,7 +159,7 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 
 ## Partnerkanaal
 
-Niet-leden boeken via **site/boeken.html**, bereikbaar via een partnerlink zoals `/site/boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs, service en de commissieverdeling tussen partner en RTG zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`.
+Niet-leden boeken via **site/boeken.html**, bereikbaar via een partnerlink zoals `/site/boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs en service zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen.
 
 ## Documentatie
 

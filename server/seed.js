@@ -141,8 +141,9 @@ module.exports = function seed() {
       club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'location', 'pricing'] }
     },
 
-    /* Voorbeeldleveranciers (demo-inlogcodes). serviceRate = de dynamische
-       marge die de leverancier aan RTG biedt, intern, nooit aan de klant. */
+    /* Voorbeeldleveranciers (demo-inlogcodes). rate = de dynamische prijs die
+       de leverancier aan RTG-leden biedt (intern, nooit aan de klant getoond).
+       RTG rekent 0% commissie: de partner houdt 100% van elke boeking. */
     suppliers: [
       {
         code: 'HOSHI', name: 'Aguamarina Ibiza', type: 'hotel', city: 'Ibiza',

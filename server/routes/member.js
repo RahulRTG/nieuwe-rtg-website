@@ -241,14 +241,16 @@ app.post('/api/book', (req, res) => {
   if (!name || !email.includes('@')) return res.status(400).json({ error: 'Vul een naam en geldig e-mailadres in.' });
 
   // Interne administratie: verdeling wordt opgeslagen, nooit meegestuurd.
+  // RTG verdient niets aan een boeking; een eventuele service gaat volledig
+  // naar de partner. rtgCut is per definitie 0 (inkomsten komen uit abonnementen).
   const service = Math.round(trip.netto * rate);
   const total = trip.netto + service;
-  const partnerCut = partner ? Math.round(service * partner.share) : 0;
+  const partnerCut = service;
   const ref = 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase();
   db.data.bookings.push({
     ref, tripId: trip.id, channel, name, email,
     partnerCode: partner ? partner.code : null,
-    netto: trip.netto, service, total, partnerCut, rtgCut: service - partnerCut,
+    netto: trip.netto, service, total, partnerCut, rtgCut: 0,
     at: new Date().toISOString()
   });
   save();

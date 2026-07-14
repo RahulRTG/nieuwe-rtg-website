@@ -128,6 +128,8 @@ const STAFF_SEED = {
   ISLAREN: [['Carmen Vidal', 'manager', 'Beheer'], ['Pau Riera', 'staff', 'Balie']],
   IBIZALIV: [['Sofia Marin', 'manager', 'Makelaar'], ['Bram Kessler', 'staff', 'Bezichtigingen']],
   IBIZAIR: [['Nadia Fischer', 'manager', 'Operations'], ['Tomas Weller', 'staff', 'Piloot']],
+  // charter: een vlootbeheerder en een schipper aan boord
+  AZUL: [['Nerea Costa', 'manager', 'Charterbeheer'], ['Marco Silva', 'staff', 'Schipper']],
   // mode & retail: een store manager en een verkoper/stylist op de winkelvloer
   MAISON: [['Camille Moreau', 'manager', 'Store manager'], ['Théo Blanc', 'staff', 'Verkoop & styling']]
 };
@@ -466,6 +468,7 @@ function ensureSupplierDefaults(s) {
   // afgesproken vaste bedrag per rit
   if (s.type === 'activiteit' && (!s.transfer || typeof s.transfer !== 'object')) s.transfer = { aan: false, prijs: 0 };
   if (s.type === 'verhuur' && !Array.isArray(s.autos)) s.autos = [];
+  if (s.type === 'charter' && !Array.isArray(s.boten)) s.boten = [];
   if (s.type === 'vastgoed' && !Array.isArray(s.panden)) s.panden = [];
   if (!Array.isArray(s.bezorg.producten)) s.bezorg.producten = [];
   if (!Array.isArray(s.photos)) s.photos = [];
@@ -706,6 +709,35 @@ function initRealtime() {
   }
   if (!db.data.huurFotos) db.data.huurFotos = {};       // ref -> { voor: [], na: [] } (los van de boeking: fotodata blijft uit de staat)
   if (!db.data.huurLocaties) db.data.huurLocaties = {}; // ref -> { aan, lat, lng, at } (vrijwillig gedeeld door de huurder)
+  // het charter-genre: boten en jachten verhuren, met of zonder schipper. Zelfde
+  // eerlijke mechaniek als autoverhuur (vaste prijs vooraf, staat met foto's voor
+  // en na, borg, SOS en live positie op het water), aangevuld met vaartuig-specifieke
+  // zaken: motoruren, brandstof, ligplaats, en bemand (crewed) of bareboat varen.
+  if (!db.data.supplierTypes.charter)
+    db.data.supplierTypes.charter = { label: 'Boten & jachten', icon: '\u{26F5}', caps: ['charter', 'location', 'pricing'] };
+  if (!db.data.suppliers.find(s => s.code === 'AZUL')) {
+    const vaartuig = (id, o) => Object.assign({ id, actief: true, type: 'Motorjacht', lengte: 12, bouwjaar: 2022,
+      gasten: 8, hutten: 2, slaapplaatsen: 4, brandstof: 'diesel', snelheidKn: 25, ligplaats: 'Marina Botafoch',
+      dagprijs: 900, borg: 2000, skipperVerplicht: false, skipperPrijsPerDag: 300, vaarbewijsVereist: true,
+      icoon: '\u{1F6E5}️', foto: null }, o);
+    db.data.suppliers.push({
+      code: 'AZUL', name: 'Azul Yacht Charter', type: 'charter', city: 'Ibiza',
+      loc: { lat: 38.918, lng: 1.449, label: 'Marina Botafoch, Ibiza' }, rate: 0.12,
+      menu: [], photos: [],
+      boten: [
+        vaartuig('b1', { naam: 'Serenidad', type: 'Motorjacht', lengte: 16, gasten: 12, hutten: 3, slaapplaatsen: 6,
+          snelheidKn: 32, dagprijs: 1850, borg: 3500, skipperVerplicht: true, skipperPrijsPerDag: 380 }),
+        vaartuig('b2', { naam: 'Tramontana', type: 'Zeiljacht', lengte: 13, gasten: 8, hutten: 3, slaapplaatsen: 6,
+          snelheidKn: 9, dagprijs: 680, borg: 1500, skipperVerplicht: false, skipperPrijsPerDag: 260 }),
+        vaartuig('b3', { naam: 'Levante', type: 'RIB', lengte: 9, gasten: 10, hutten: 0, slaapplaatsen: 0,
+          brandstof: 'benzine', snelheidKn: 42, dagprijs: 520, borg: 1200, skipperVerplicht: false, skipperPrijsPerDag: 240 }),
+        vaartuig('b4', { naam: 'Aura', type: 'Catamaran', lengte: 14, gasten: 12, hutten: 4, slaapplaatsen: 8,
+          snelheidKn: 12, dagprijs: 1300, borg: 2800, skipperVerplicht: true, skipperPrijsPerDag: 320 })
+      ]
+    });
+  }
+  if (!db.data.charterFotos) db.data.charterFotos = {};   // ref -> { voor: [], na: [] }
+  if (!db.data.charterLocaties) db.data.charterLocaties = {}; // ref -> { aan, lat, lng, at } (positie op het water)
   // contracten: elke zaak kan een contract (verhuur/personeel/algemeen) opstellen
   // en aan een lid of personeelslid sturen; beide partijen tekenen digitaal
   if (!db.data.contracten) db.data.contracten = [];

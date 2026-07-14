@@ -584,6 +584,11 @@
         <p class="sub" data-i18n="sup.v.retail.sub">Uw collecties, artikelen met varianten, voorraad en drops, en het clienteling-dossier van uw klanten.</p>
         <div id="retailWrap"></div>
       </div>
+      <div class="view" data-view="charter">
+        <h2 data-i18n="sup.v.charter">Charter</h2>
+        <p class="sub" data-i18n="sup.v.charter.sub">Uw vloot boten en jachten, de lopende charters met de staat (foto's voor en na), motoruren en brandstof, en de SOS op zee.</p>
+        <div id="charterWrap"></div>
+      </div>
       <div class="view" data-view="paspoort">
         <h2 data-i18n="sup.v.paspoort">Identiteit &amp; leeftijd</h2>
         <p class="sub" data-i18n="sup.v.paspoort.sub">Controleer de identiteit of leeftijd achter een codenaam. De gast krijgt een melding en kan een ID-kaart of paspoort weigeren; alleen de ja/nee-bevestiging is altijd beschikbaar.</p>
@@ -704,7 +709,8 @@
     { code:'MACE',    name:'MACE Museum Eivissa', type:'Activiteit', icon:'🏛️', sub:'Museum · Ibiza' },
     { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'🚗', sub:'Autoverhuur · Ibiza' },
     { code:'IBIZALIV', name:'Ibiza Living Estates', type:'Vastgoed', icon:'🏡', sub:'Makelaar · Ibiza' },
-    { code:'MAISON',  name:'Maison Solène', type:'Mode', icon:'🛍️', sub:'Modehuis · Ibiza' }
+    { code:'MAISON',  name:'Maison Solène', type:'Mode', icon:'🛍️', sub:'Modehuis · Ibiza' },
+    { code:'AZUL',    name:'Azul Yacht Charter', type:'Charter', icon:'⛵', sub:'Boten & jachten · Ibiza' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -739,6 +745,7 @@
     vastgoed: { label:'Vastgoed',  svg:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>', cap:'vastgoed' },
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
+    charter:  { label:'Charter',   svg:'<path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/><path d="M3 20c1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0"/>', cap:'charter' },
     paspoort: { label:'Identiteit', svg:'<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="10" r="2.4"/><path d="M8 16c0.5-2 2.2-3 4-3s3.5 1 4 3"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
@@ -843,7 +850,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -2992,7 +2999,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderVastgoed(); renderRetail(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -3651,6 +3658,118 @@
         borg: Number(g('#vhBorg')), minLeeftijd: Number(g('#vhLft')), kmPerDag: Number(g('#vhKm')),
         meerKm: Number(g('#vhMeerkm')), airco: $('#vhAirco') ? $('#vhAirco').checked : true });
         toast(T('vh.f.ok','De auto staat in de vloot.')); await refresh(); openTab('huur'); } catch(e){ toast(e.message); }
+    });
+  }
+
+  // ---- charter: boten en jachten ----
+  let charters = null;
+  async function laadCharters(){
+    if (!has('charter') || !API.live) return;
+    try { charters = (await API.call('/supplier/charter/overzicht')).charters; } catch(e){ charters = []; }
+    renderCharter();
+  }
+  const CHARTER_ST = { 'aangevraagd': 'geboekt, klaar om uit te varen', 'lopend': 'onderweg op zee', 'afgerond': 'afgerond' };
+  const BOOT_TYPES = ['Motorjacht','Zeiljacht','Catamaran','RIB','Sloep'];
+  function renderCharter(){
+    const el = $('#charterWrap'); if (!el) return;
+    if (!has('charter')){ el.innerHTML = ''; return; }
+    if (charters === null){ el.innerHTML = '<div class="empty">…</div>'; laadCharters(); return; }
+    const canEdit = actor().manager;
+    const selCss = 'style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"';
+    let html = '';
+    // lopende en geboekte charters
+    html += '<div class="card"><div class="tt-h">'+T('ch.charters','Charters')+' ('+charters.length+')</div>'+
+      (charters.length ? charters.map(c => {
+        let knop = '';
+        if (c.status === 'aangevraagd') knop =
+          '<button class="obtn" data-chfoto="'+c.ref+'" data-fase="voor">📷 '+T('ch.fotovoor','Voor-foto')+' ('+c.fotosVoor+')</button> '+
+          '<button class="obtn primary" data-chst="'+c.ref+'" data-st="lopend">'+T('ch.uitvaren','Uitvaren')+'</button>';
+        else if (c.status === 'lopend') knop =
+          '<button class="obtn" data-chfoto="'+c.ref+'" data-fase="na">📷 '+T('ch.fotona','Na-foto')+' ('+c.fotosNa+')</button> '+
+          '<button class="obtn primary" data-chst="'+c.ref+'" data-st="afgerond">'+T('ch.teruggeven','Teruggeven en afronden')+'</button>';
+        return '<div class="mitem">'+
+          (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.8rem;">🚨 <b>SOS:</b> '+esc(c.sos[0].bericht)+
+            (Number.isFinite(c.sos[0].lat) ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('ch.kaart','kaart')+'</a>' : '')+
+            ' <button class="obtn" data-chsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;font-size:0.7rem;">'+T('ch.sosok','Afgehandeld')+'</button></div>' : '')+
+          '<div class="r1"><span class="nm">'+esc(c.codename)+' · '+esc(c.boot)+' ('+esc(c.type)+')</span><span class="pr">'+eur(c.prijs)+'</span></div>'+
+          '<div class="ds">'+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('ch.gasten','gasten')+' · ':'')+(c.metSkipper?'⚓ '+T('ch.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.bareboat','bareboat'))+' · '+T('ch.st.'+c.status, CHARTER_ST[c.status]||c.status)+
+          ' · 📷 '+c.fotosVoor+'/'+c.fotosNa+(c.borg?' · '+T('ch.borg','borg')+' '+eur(c.borg):'')+
+          (c.uitvaart ? ' · '+c.uitvaart.urenStart+' '+T('ch.uur','mu') : '')+
+          (c.locatie ? ' · <a style="color:var(--gold);" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+c.locatie.lat+','+c.locatie.lng+'">📍 '+T('ch.live','live positie')+'</a>' : '')+'</div>'+
+          (c.teruggave ? '<div class="ds" style="color:'+(c.teruggave.meerkosten>0?'var(--gold)':'var(--green)')+';">'+
+            (c.teruggave.meerkosten>0 ? T('ch.meer','Meerkosten')+': '+eur(c.teruggave.meerkosten)+' ('+c.teruggave.gevaren+' '+T('ch.uur','mu')+(c.teruggave.brandstofKosten>0?', '+T('ch.brandstof','brandstof')+' '+eur(c.teruggave.brandstofKosten):'')+')'
+              : '✓ '+c.teruggave.gevaren+' '+T('ch.uur','mu')+', '+T('ch.geenmeer','geen meerkosten, borg vrij'))+'</div>' : '')+
+          (knop ? '<div style="margin-top:0.5rem;">'+knop+'</div>' : '')+'</div>';
+      }).join('') : '<div class="empty">'+T('ch.geen','Nog geen charters. Betaalde boekingen verschijnen hier live.')+'</div>')+'</div>';
+    // de vloot
+    const boten = state.boten || [];
+    html += '<div class="card"><div class="tt-h">'+T('ch.vloot','Vloot')+' ('+boten.filter(b=>b.actief!==false).length+')</div>'+
+      boten.filter(b => b.actief !== false).map(b =>
+        '<div class="mitem"><div class="r1"><span class="nm">'+(b.icoon||'🛥️')+' '+esc(b.naam)+'</span><span class="row-mid-gap"><span class="pr">'+eur(b.dagprijs)+'/'+T('ch.dag','dag')+'</span>'+
+        (canEdit?'<button class="rr-del" data-chdel="'+b.id+'">✕</button>':'')+'</span></div>'+
+        '<div class="ds">'+esc(b.type||'')+' · '+(b.lengte||0)+'m · 👥 '+(b.gasten||0)+(b.hutten?' · 🛏️ '+b.hutten+' '+T('ch.hutten','hutten'):'')+' · '+esc(b.brandstof||'')+' · '+(b.snelheidKn||0)+' kn · '+esc(b.ligplaats||'')+
+        ' · '+T('ch.borg','borg')+' '+eur(b.borg||0)+' · '+(b.skipperVerplicht?'⚓ '+T('ch.skipperv','schipper verplicht'):(b.vaarbewijsVereist?T('ch.vaarbewijs','vaarbewijs vereist'):T('ch.vrij','vrij te huren')))+
+        (b.skipperPrijsPerDag?' (+'+eur(b.skipperPrijsPerDag)+'/'+T('ch.dag','dag')+')':'')+'</div></div>').join('')+
+      (canEdit ? '<details style="margin-top:1rem;"><summary style="cursor:pointer;font-size:0.82rem;color:var(--gold);">'+T('ch.f.nieuw','Vaartuig toevoegen')+'</summary><div style="margin-top:0.8rem;">'+
+        '<div class="row-gap"><div class="field" style="flex:2;"><label>'+T('ch.f.naam','Naam')+'</label><input id="chNaam" placeholder="Serenidad"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.type','Type')+'</label><select id="chType" '+selCss+'>'+BOOT_TYPES.map(t=>'<option>'+t+'</option>').join('')+'</select></div></div>'+
+        '<div class="row-gap">'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.lengte','Lengte (m)')+'</label><input id="chLengte" type="number" inputmode="decimal" value="14"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.gasten','Gasten')+'</label><input id="chGasten" type="number" inputmode="numeric" value="10"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.hutten','Hutten')+'</label><input id="chHutten" type="number" inputmode="numeric" value="2"></div></div>'+
+        '<div class="row-gap">'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.brand','Brandstof')+'</label><select id="chBrand" '+selCss+'><option value="diesel">diesel</option><option value="benzine">benzine</option><option value="elektrisch">elektrisch</option><option value="geen">geen</option></select></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.snelheid','Snelheid (kn)')+'</label><input id="chSnelheid" type="number" inputmode="numeric" value="24"></div></div>'+
+        '<div class="field"><label>'+T('ch.f.ligplaats','Ligplaats')+'</label><input id="chLig" placeholder="Marina Botafoch"></div>'+
+        '<div class="row-gap">'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.prijs','€/dag')+'</label><input id="chPrijs" type="number" inputmode="numeric"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.borg','Borg €')+'</label><input id="chBorg" type="number" inputmode="numeric" value="2000"></div>'+
+        '<div class="field" style="flex:1;"><label>'+T('ch.f.skipperprijs','Schipper €/dag')+'</label><input id="chSkPrijs" type="number" inputmode="numeric" value="300"></div></div>'+
+        '<label class="field" style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="chSkV" style="accent-color:var(--gold);"> '+T('ch.f.skipperv','Schipper verplicht')+'</label>'+
+        '<label class="field" style="display:flex;align-items:center;gap:0.4rem;"><input type="checkbox" id="chVb" checked style="accent-color:var(--gold);"> '+T('ch.f.vaarbewijs','Vaarbewijs vereist bij bareboat')+'</label>'+
+        '<button class="obtn primary" id="chAdd">'+T('ch.f.voeg','Toevoegen')+'</button></div></details>' : '')+'</div>'+
+      '<input type="file" id="chFile" accept="image/*" capture="environment" style="display:none;">';
+    el.innerHTML = html;
+    document.querySelectorAll('[data-chst]').forEach(k => k.addEventListener('click', async () => {
+      const body = { ref: k.dataset.chst, status: k.dataset.st };
+      if (k.dataset.st === 'lopend'){
+        const uren = prompt(T('ch.q.urenstart','Motorurenstand bij uitvaren?')); if (uren == null) return;
+        body.urenStart = Number(uren);
+        body.brandstofStart = Number(prompt(T('ch.q.brandstart','Brandstofniveau bij uitvaren in achtsten (8 = vol)?'), '8'));
+      } else if (k.dataset.st === 'afgerond'){
+        const uren = prompt(T('ch.q.ureneind','Motorurenstand bij teruggave?')); if (uren == null) return;
+        body.urenEind = Number(uren);
+        body.brandstofEind = Number(prompt(T('ch.q.brandeind','Brandstofniveau bij teruggave in achtsten (8 = vol)?'), '8'));
+      }
+      try { await API.call('/supplier/charter/status', body); await laadCharters(); openTab('charter'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-chsosok]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/charter/sos-ok', { ref: k.dataset.chsosok }); await laadCharters(); openTab('charter'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-chfoto]').forEach(k => k.addEventListener('click', () => {
+      const file = document.getElementById('chFile');
+      file.onchange = () => {
+        if (!file.files[0]) return;
+        fotoKlein(file.files[0], async (dataUrl) => {
+          try { await API.call('/supplier/charter/foto', { ref: k.dataset.chfoto, fase: k.dataset.fase, foto: dataUrl });
+            toast(T('ch.foto.ok','De staat is vastgelegd.')); await laadCharters(); openTab('charter'); }
+          catch(e){ toast(e.message); }
+        });
+        file.value = '';
+      };
+      file.click();
+    }));
+    document.querySelectorAll('[data-chdel]').forEach(k => k.addEventListener('click', async () => {
+      try { await API.call('/supplier/boot', { id: k.dataset.chdel, weg: true }); await refresh(); openTab('charter'); } catch(e){ toast(e.message); }
+    }));
+    const voeg = document.getElementById('chAdd');
+    if (voeg) voeg.addEventListener('click', async () => {
+      const g = id => $(id) ? $(id).value : undefined;
+      try { await API.call('/supplier/boot', { naam: g('#chNaam'), type: g('#chType'), lengte: Number(g('#chLengte')),
+        gasten: Number(g('#chGasten')), hutten: Number(g('#chHutten')), brandstof: g('#chBrand'), snelheidKn: Number(g('#chSnelheid')),
+        ligplaats: g('#chLig'), dagprijs: Number(g('#chPrijs')), borg: Number(g('#chBorg')), skipperPrijsPerDag: Number(g('#chSkPrijs')),
+        skipperVerplicht: $('#chSkV') ? $('#chSkV').checked : false, vaarbewijsVereist: $('#chVb') ? $('#chVb').checked : true });
+        toast(T('ch.f.ok','Het vaartuig staat in de vloot.')); await refresh(); openTab('charter'); } catch(e){ toast(e.message); }
     });
   }
 
@@ -4445,7 +4564,7 @@
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
-    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (paspoortData) laadPaspoort(); });
+    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); });
     source.addEventListener('notify', e => {
       const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
       if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }
@@ -4913,7 +5032,24 @@ window.I18N = { en: {
   'pn.niveau.bevestiging':'Yes/no', 'pn.niveau.idkaart':'ID card', 'pn.niveau.paspoort':'Passport',
   'pn.st.aangevraagd':'requested', 'pn.st.goedgekeurd':'approved', 'pn.st.geweigerd':'refused',
   'pn.st.verlopen':'expired', 'pn.st.ingetrokken':'withdrawn', 'pn.st.ingediend':'submitted',
-  'pn.st.vrijgegeven':'released', 'pn.st.afgewezen':'declined'
+  'pn.st.vrijgegeven':'released', 'pn.st.afgewezen':'declined',
+  // --- Charter (boten & jachten, leverancier) ---
+  'tab.charter':'Charter', 'sup.v.charter':'Charter',
+  'sup.v.charter.sub':'Your fleet of boats and yachts, ongoing charters with the recorded condition (photos before and after), engine hours and fuel, and the SOS at sea.',
+  'ch.charters':'Charters', 'ch.fotovoor':'Before photo', 'ch.uitvaren':'Set sail', 'ch.fotona':'After photo',
+  'ch.teruggeven':'Return and finish', 'ch.kaart':'map', 'ch.sosok':'Handled', 'ch.gasten':'guests',
+  'ch.metskipper':'with skipper', 'ch.bareboat':'bareboat', 'ch.borg':'deposit', 'ch.uur':'eng.hrs', 'ch.live':'live position',
+  'ch.meer':'Extra charges', 'ch.brandstof':'fuel', 'ch.geenmeer':'no extra charges, deposit released',
+  'ch.geen':'No charters yet. Paid bookings appear here live.', 'ch.vloot':'Fleet', 'ch.dag':'day', 'ch.hutten':'cabins',
+  'ch.skipperv':'skipper required', 'ch.vaarbewijs':'licence required', 'ch.vrij':'free to charter',
+  'ch.f.nieuw':'Add vessel', 'ch.f.naam':'Name', 'ch.f.type':'Type', 'ch.f.lengte':'Length (m)', 'ch.f.gasten':'Guests',
+  'ch.f.hutten':'Cabins', 'ch.f.brand':'Fuel', 'ch.f.snelheid':'Speed (kn)', 'ch.f.ligplaats':'Berth', 'ch.f.prijs':'€/day',
+  'ch.f.borg':'Deposit €', 'ch.f.skipperprijs':'Skipper €/day', 'ch.f.skipperv':'Skipper required',
+  'ch.f.vaarbewijs':'Licence required for bareboat', 'ch.f.voeg':'Add',
+  'ch.q.urenstart':'Engine hours at departure?', 'ch.q.brandstart':'Fuel level at departure in eighths (8 = full)?',
+  'ch.q.ureneind':'Engine hours at return?', 'ch.q.brandeind':'Fuel level at return in eighths (8 = full)?',
+  'ch.foto.ok':'The condition has been recorded.', 'ch.f.ok':'The vessel is in the fleet.',
+  'ch.st.aangevraagd':'booked, ready to sail', 'ch.st.lopend':'out at sea', 'ch.st.afgerond':'finished'
 } };
 </script>
 <script src="/apps/translate.js"></script>

@@ -191,6 +191,11 @@
         <p class="sub" data-i18n="pd.v.winkel.sub">Voorraad opzoeken, een klant erbij pakken, apart leggen, paskamer en de mobiele kassa.</p>
         <div id="winkelWrap"></div>
       </div>
+      <div class="view" data-view="vaart">
+        <h2 data-i18n="pd.v.vaart">Vaart</h2>
+        <p class="sub" data-i18n="pd.v.vaart.sub">De charters van vandaag: de staat vastleggen, uitvaren en teruggeven, en de SOS op zee.</p>
+        <div id="vaartWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -205,6 +210,7 @@
       <button data-tab="ritten" id="tabRitten" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M7.5 20v1M16.5 20v1"/></svg><span data-i18n="pd.t.ritten">Ritten</span></button>
       <button data-tab="entree" id="tabEntree" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H6a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M12 6v2M12 11v2M12 16v2"/></svg><span data-i18n="pd.t.entree">Entree</span></button>
       <button data-tab="winkel" id="tabWinkel" style="display:none;"><svg viewBox="0 0 24 24"><path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/></svg><span data-i18n="pd.t.winkel">Vloer</span></button>
+      <button data-tab="vaart" id="tabVaart" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/></svg><span data-i18n="pd.t.vaart">Vaart</span></button>
       <button data-tab="bezorgen" id="tabBezorgen" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/></svg><span data-i18n="pd.t.bezorgen">Bezorgen</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
@@ -230,7 +236,8 @@
     { id:'activiteiten', icon:'🎟️', nl:'Activiteiten', en:'Experiences', sub:'Tours, musea, experiences', codes:['ESVEDRA','MACE'] },
     { id:'verhuur', icon:'🚗', nl:'Autoverhuur', en:'Car rental', sub:'Vloot, uitgifte, inname', codes:['ISLAREN'] },
     { id:'vastgoed', icon:'🏡', nl:'Vastgoed', en:'Real estate', sub:'Makelaar, bezichtigingen', codes:['IBIZALIV'] },
-    { id:'mode', icon:'🛍️', nl:'Mode & retail', en:'Fashion & retail', sub:'Modehuizen, merken, winkels', codes:['MAISON'] }
+    { id:'mode', icon:'🛍️', nl:'Mode & retail', en:'Fashion & retail', sub:'Modehuizen, merken, winkels', codes:['MAISON'] },
+    { id:'charter', icon:'⛵', nl:'Boten & jachten', en:'Boats & yachts', sub:'Charters, schippers, op zee', codes:['AZUL'] }
   ];
   const BEDRIJVEN = {
     KIKUNOI:{ name:'Sal de Mar', icon:'🍽️' }, PONTO:{ name:'Sunset Ibiza', icon:'🍸' },
@@ -241,7 +248,8 @@
     ESVEDRA:{ name:'Es Vedra Cruises', icon:'⛵' }, MACE:{ name:'MACE Museum Eivissa', icon:'🏛️' },
     ISLAREN:{ name:'Isla Rent Ibiza', icon:'🚗' },
     IBIZALIV:{ name:'Ibiza Living Estates', icon:'🏡' },
-    MAISON:{ name:'Maison Solène', icon:'🛍️' }
+    MAISON:{ name:'Maison Solène', icon:'🛍️' },
+    AZUL:{ name:'Azul Yacht Charter', icon:'⛵' }
   };
 
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
@@ -309,7 +317,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -814,7 +822,6 @@
   let winkelKlant = null;   // geopend klantdossier op de vloer
   let winkelCart = [];      // mobiele kassa: [{vsku, naam, kleur, maat, price, aantal}]
   const heeftRetail = () => !!(state && state.supplier && (state.supplier.caps || []).includes('retail'));
-  const eur = n => '€ ' + Number(n||0).toLocaleString('nl-NL');
   async function laadWinkel(){
     if (!heeftRetail()) return;
     try { pdRetail = (await API.call('/supplier/retail', {})).retail; } catch(e){ pdRetail = { artikelen:[], paskamer:[], apart:[], klanten:[], stats:{} }; }
@@ -960,6 +967,68 @@
         laadEntree();
       } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }
     });
+  }
+
+  // ---- vaart (charter): de schipper handelt de charters van vandaag af ----
+  let pdCharters = null;
+  const heeftCharter = () => !!(state && state.supplier && (state.supplier.caps || []).includes('charter'));
+  const VAART_ST = { 'aangevraagd':'klaar om uit te varen', 'lopend':'op zee', 'afgerond':'afgerond' };
+  async function laadVaart(){
+    if (!heeftCharter()) return;
+    try { pdCharters = (await API.call('/supplier/charter/overzicht', {})).charters; } catch(e){ pdCharters = []; }
+    renderVaart();
+  }
+  function renderVaart(){
+    const tabBtn = document.getElementById('tabVaart');
+    if (tabBtn) tabBtn.style.display = heeftCharter() ? '' : 'none';
+    const wrap = $('#vaartWrap');
+    if (!wrap) return;
+    if (!heeftCharter()){ wrap.innerHTML = ''; return; }
+    if (!pdCharters){ wrap.innerHTML = '<div class="card">…</div>'; laadVaart(); return; }
+    wrap.innerHTML = pdCharters.length ? pdCharters.map(c => {
+      let knop = '';
+      if (c.status === 'aangevraagd') knop =
+        '<button class="abtn ghost" data-cvfoto="'+c.ref+'" data-fase="voor">📷 '+T('pd.va.voor','Voor-foto')+' ('+c.fotosVoor+')</button> '+
+        '<button class="abtn" data-cvst="'+c.ref+'" data-st="lopend">'+T('pd.va.uitvaren','Uitvaren')+'</button>';
+      else if (c.status === 'lopend') knop =
+        '<button class="abtn ghost" data-cvfoto="'+c.ref+'" data-fase="na">📷 '+T('pd.va.na','Na-foto')+' ('+c.fotosNa+')</button> '+
+        '<button class="abtn" data-cvst="'+c.ref+'" data-st="afgerond">'+T('pd.va.terug','Teruggeven')+'</button>';
+      return '<div class="card">'+
+        (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy,#C23A5E);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.82rem;">🚨 <b>SOS:</b> '+esc(c.sos[0].bericht)+
+          (Number.isFinite(c.sos[0].lat)?' · <a style="color:var(--gold,#C99A2E);" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('pd.va.kaart','kaart')+'</a>':'')+
+          ' <button class="abtn" data-cvsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;">'+T('pd.va.sosok','Afgehandeld')+'</button></div>':'')+
+        '<div class="k">'+esc(c.boot)+' · '+esc(c.type)+'</div>'+
+        '<div style="font-size:0.85rem;margin-top:0.3rem;">'+esc(c.codename)+' · '+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('pd.va.gasten','gasten')+' · ':'')+(c.metSkipper?'⚓ '+T('pd.va.metskipper','met schipper'):T('pd.va.bareboat','bareboat'))+' · '+T('pd.va.st.'+c.status, VAART_ST[c.status]||c.status)+'</div>'+
+        (c.teruggave ? '<div style="font-size:0.8rem;margin-top:0.2rem;color:'+(c.teruggave.meerkosten>0?'var(--amber,#C99A2E)':'var(--green,#4C9A75)')+';">'+(c.teruggave.meerkosten>0?T('pd.va.meer','Meerkosten')+' '+eur(c.teruggave.meerkosten):'✓ '+T('pd.va.geenmeer','geen meerkosten'))+'</div>':'')+
+        (knop?'<div style="margin-top:0.6rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+knop+'</div>':'')+
+        '</div>';
+    }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:0.85rem;">'+T('pd.va.geen','Geen charters vandaag.')+'</div>';
+    wrap.querySelectorAll('[data-cvst]').forEach(b => b.addEventListener('click', async () => {
+      const body = { ref: b.dataset.cvst, status: b.dataset.st };
+      if (b.dataset.st === 'lopend'){
+        const uren = prompt(T('pd.va.qurenstart','Motorurenstand bij uitvaren?')); if (uren == null) return;
+        body.urenStart = Number(uren); body.brandstofStart = Number(prompt(T('pd.va.qbrandstart','Brandstof bij uitvaren in achtsten (8 = vol)?'), '8'));
+      } else if (b.dataset.st === 'afgerond'){
+        const uren = prompt(T('pd.va.qureneind','Motorurenstand bij teruggave?')); if (uren == null) return;
+        body.urenEind = Number(uren); body.brandstofEind = Number(prompt(T('pd.va.qbrandeind','Brandstof bij teruggave in achtsten (8 = vol)?'), '8'));
+      }
+      try { await API.call('/supplier/charter/status', body); toast(T('pd.va.ok','Bijgewerkt.')); await laadVaart(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-cvsosok]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/charter/sos-ok', { ref: b.dataset.cvsosok }); toast(T('pd.va.sosafg','SOS afgehandeld.')); await laadVaart(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-cvfoto]').forEach(b => b.addEventListener('click', () => {
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
+      inp.onchange = () => { const file = inp.files[0]; if (!file) return; const r = new FileReader();
+        r.onload = () => { const img = new Image(); img.onload = async () => {
+          const cv = document.createElement('canvas'); const sc = Math.min(1, 1000 / Math.max(img.width, img.height));
+          cv.width = img.width * sc; cv.height = img.height * sc; cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          try { await API.call('/supplier/charter/foto', { ref: b.dataset.cvfoto, fase: b.dataset.fase, foto: cv.toDataURL('image/jpeg', 0.7) });
+            toast(T('pd.va.fotook','De staat is vastgelegd.')); await laadVaart(); } catch(e){ toast(e.message); } };
+          img.src = r.result; };
+        r.readAsDataURL(file); };
+      inp.click();
+    }));
   }
 
   function renderTeam(){
@@ -1151,7 +1220,7 @@
     if (!window.EventSource) return;
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
-      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); });
+      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); });
       src.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
       src.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
       src.addEventListener('alarm', e => { const d=JSON.parse(e.data); if (d.from !== me.name) showAlarm(d); });
@@ -1265,7 +1334,17 @@ window.I18N = { en: {
   'pd.w.klantph':"Member's codename or key", 'pd.w.open':'Open', 'pd.w.aankopen':'purchases',
   'pd.w.voorraad':'stock', 'pd.w.legapart':'Aside', 'pd.w.niets':'Nothing found.',
   'pd.w.verkocht':'Sold', 'pd.w.gebracht':'Delivered.', 'pd.w.eerstklant':'Pull up a customer first.',
-  'pd.w.apartok':'Put aside for the customer.'
+  'pd.w.apartok':'Put aside for the customer.',
+  // --- Vaart (charter, PDA) ---
+  'pd.t.vaart':'Sailing', 'pd.v.vaart':'Sailing',
+  'pd.v.vaart.sub':"Today's charters: record the condition, set sail and return, and the SOS at sea.",
+  'pd.va.voor':'Before photo', 'pd.va.na':'After photo', 'pd.va.uitvaren':'Set sail', 'pd.va.terug':'Return',
+  'pd.va.kaart':'map', 'pd.va.sosok':'Handled', 'pd.va.gasten':'guests', 'pd.va.metskipper':'with skipper',
+  'pd.va.bareboat':'bareboat', 'pd.va.meer':'Extra charges', 'pd.va.geenmeer':'no extra charges',
+  'pd.va.geen':'No charters today.', 'pd.va.ok':'Updated.', 'pd.va.sosafg':'SOS handled.', 'pd.va.fotook':'The condition has been recorded.',
+  'pd.va.qurenstart':'Engine hours at departure?', 'pd.va.qbrandstart':'Fuel at departure in eighths (8 = full)?',
+  'pd.va.qureneind':'Engine hours at return?', 'pd.va.qbrandeind':'Fuel at return in eighths (8 = full)?',
+  'pd.va.st.aangevraagd':'ready to sail', 'pd.va.st.lopend':'at sea', 'pd.va.st.afgerond':'finished'
 } };
 </script>
 <script src="/shared/i18n.js"></script>

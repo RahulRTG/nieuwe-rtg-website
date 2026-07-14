@@ -227,6 +227,7 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
       activiteiten: s.activiteiten || null,
       transfer: s.type === 'activiteit' ? (s.transfer || { aan: false, prijs: 0 }) : null,
       autos: s.type === 'verhuur' ? (s.autos || []) : null,
+      boten: s.type === 'charter' ? (s.boten || []) : null,
       panden: s.type === 'vastgoed' ? (s.panden || []) : null,
       // de ophaal/bezorgdienst: alleen voor horeca en zelfstandigen
       bezorg: magBezorgen(s) ? {

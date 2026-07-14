@@ -530,6 +530,7 @@
       '<div class="b"><div class="l">'+T('bo.weekrev','Weekomzet')+'</div><div class="v g">'+eur(st2.omzetWeek||0)+'</div></div>' +
       '<div class="b"><div class="l">RTFoundation</div><div class="v g">'+eur(st2.foundation||0)+'</div></div>' +
       (st2.fondsAfdracht ? '<div class="b"><div class="l">'+T('bo.rtfteStorten','RTF af te dragen')+'</div><div class="v'+(st2.fondsAfdracht.teStorten>0 && !st2.fondsAfdracht.iban?' a':' g')+'">'+eur(st2.fondsAfdracht.teStorten||0)+'</div><div class="sub">'+(st2.fondsAfdracht.iban?(T('bo.rtfNaar','naar')+' '+escHtml(st2.fondsAfdracht.iban)):T('bo.rtfGeenIban','IBAN nog niet ingesteld'))+'</div></div>' : '') +
+      (st2.muntOntvangst && st2.muntOntvangst.aan ? '<div class="b"><div class="l">'+T('bo.munt','Munten (in euro)')+'</div><div class="v g">'+eur(st2.muntOntvangst.ontvangen||0)+'</div>'+(st2.muntOntvangst.wacht?'<div class="sub">'+st2.muntOntvangst.wacht+' '+T('bo.muntWacht','openstaand')+'</div>':'')+'</div>' : '') +
       '<div class="b"><div class="l">'+T('bo.actions','Open acties')+'</div><div class="v'+(alerts.some(a=>a.level==='rood')?' a':'')+'">'+alerts.length+'</div></div>';
 
     // actiecentrum: vastgelopen zaken bovenaan, met een herinneringsknop
@@ -742,6 +743,7 @@ window.I18N = { en: {
   'bo.sc.approve':'Approve', 'bo.sc.reject':'Reject',
   'bo.nosc':'No school registrations waiting. Schools sign up via the RTFoundation app; approve them here before they can add staff and classes.',
   'bo.rtfteStorten':'RTF to transfer', 'bo.rtfNaar':'to', 'bo.rtfGeenIban':'IBAN not set yet',
+  'bo.munt':'Coins (in euro)', 'bo.muntWacht':'pending',
   'panel.actie':'Action centre', 'bo.brief':'Daily briefing', 'panel.perf':'Partner performance', 'panel.week':'Revenue per day',
   'bo.zoekph':'Search by guest, partner, reference or place…', 'bo.csv':'CSV',
   'bo.livenu':'On the move', 'bo.today':'Today', 'bo.weekrev':'Week revenue', 'bo.actions':'Open actions',

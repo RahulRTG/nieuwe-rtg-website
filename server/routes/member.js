@@ -14,7 +14,7 @@ module.exports = (kern) => {
     ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer,
     mbAanvraag, mbMijn,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
-    zorgContact, fonds,
+    zorgContact, fonds, munten,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -143,6 +143,31 @@ app.post('/api/pay', auth, async (req, res) => {
   const antwoord = { ok: true, foundation, provider, state: stateFor(req.session, req.body.lang) };
   if (intents.length) { antwoord.pending = true; antwoord.intents = intents; } // wachten op kaartbevestiging
   res.json(antwoord);
+});
+
+/* Met munten betalen. RTG accepteert cryptomunten voor zijn eigen diensten en
+   zet ze via een vergunninghoudende aanbieder meteen om naar euro's; RTG houdt
+   zelf nooit crypto vast. Staat de acceptatie uit, dan is dit niet beschikbaar. */
+app.get('/api/munt/opties', (req, res) => res.json(munten.opties()));
+
+app.post('/api/munt/verzoek', auth, async (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  if (!munten.aan()) return res.status(503).json({ error: 'Betalen met munten is niet beschikbaar.' });
+  const own = !!req.session.account;
+  const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;
+  const inv = (md.invoices || []).find(i => i.id === req.body.invoiceId);
+  if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
+  if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
+  const euroCenten = Math.max(1, Math.round((inv.bijdrage || 0) * 100));
+  const wie = own ? ('acc:' + req.session.account.id) : ('sess:' + req.session.tier);
+  try {
+    const verzoek = await munten.maakVerzoek({
+      euroCenten, munt: req.body.munt, referentie: String(inv.id),
+      idempotentieSleutel: wie + ':muntinv:' + inv.id + ':' + String(req.body.munt || '').toLowerCase(),
+      context: { soort: 'factuur', wie, invoiceId: inv.id, own, accountId: own ? req.session.account.id : null }
+    });
+    res.json({ ok: true, verzoek });
+  } catch (e) { res.status(400).json({ error: e.message || 'Kon geen munt-adres maken.' }); }
 });
 
 app.post('/api/like', auth, (req, res) => {

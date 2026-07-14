@@ -81,10 +81,23 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       iban: (process.env.RTF_IBAN || '').trim(),
       begunstigde: (process.env.RTF_BEGUNSTIGDE || 'Stichting RTFoundation').trim()
     };
+    // Munt-ontvangsten (crypto meteen omgezet naar euro): hoeveel is er in euro
+    // binnengekomen en staat er nog open? Alleen relevant als acceptatie aanstaat.
+    const muntRijen = Array.isArray(db.data.muntOntvangsten) ? db.data.muntOntvangsten : [];
+    let muntEuroCenten = 0, muntWacht = 0;
+    for (const r of muntRijen) {
+      if (r.status === 'ontvangen') muntEuroCenten += (r.settledEuroCenten || r.euroCenten || 0);
+      else muntWacht++;
+    }
+    const muntOntvangst = {
+      aan: process.env.MUNT_AAN === '1',
+      aantal: muntRijen.length, wacht: muntWacht,
+      ontvangen: Math.round(muntEuroCenten) / 100
+    };
     const stats = {
       omzetVandaag: week[6].omzet, aantalVandaag: week[6].aantal,
       omzetWeek: week.reduce((s2, d) => s2 + d.omzet, 0),
-      foundation: fonds, fondsAfdracht, liveNu: live.length
+      foundation: fonds, fondsAfdracht, muntOntvangst, liveNu: live.length
     };
     /* Partnerprestaties: NIET per zaak over alle orders filteren (dat is
        O(zaken x orders) en loopt met miljoenen restaurants volledig vast).

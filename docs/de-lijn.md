@@ -66,7 +66,14 @@ nooit je eigen encryptie, hashing of toevalsbron.**
 **2. Echt geld en identiteit — achter een naad.** Stripe verplaatst het echte
 geld; wij bouwden de *naad* eromheen, niet de PCI-afhandeling. Zo houden we
 controle over de logica zonder de aansprakelijkheid van kaartgegevens naar ons
-toe te trekken.
+toe te trekken. Hetzelfde geldt voor **cryptomunten** (`server/muntbetaal.js`):
+we accepteren munten voor onze eigen diensten en zetten ze meteen om naar euro's
+via een vergunninghoudende aanbieder. De *ontvanger*, de gelockte koers, de
+idempotentie en het grootboek zijn van ons; de custody, de on-chain afhandeling
+en de conversie liggen bij die aanbieder. Zelf wallets of sleutels beheren zou
+regel 1 breken (eigen crypto is verboden) en zou ons bovendien tot een
+vergunningplichtige crypto-dienstverlener (CASP) maken. Door meteen naar euro om
+te zetten blijven we een handelaar die munten accepteert, geen wisselkantoor.
 
 **3. De vier runtime-fundamenten.** Bewust klein gehouden:
 

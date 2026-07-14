@@ -56,6 +56,10 @@ function valideer(env) {
     if (!env.SMTP_URL && !env.SMTP_HOST) waarschuwingen.push('Geen SMTP ingesteld: e-mail (herstel-links, bevestigingen) wordt niet echt verstuurd.');
     if (!env.STRIPE_SECRET_KEY) waarschuwingen.push('STRIPE_SECRET_KEY niet gezet: betalingen draaien in demo-stand (geen echt geld).');
     if (!env.RTF_IBAN) waarschuwingen.push('RTF_IBAN niet gezet: de 30%-afdracht aan de RTFoundation wordt wel per betaling geboekt en gereserveerd (status "te_storten"), maar nog niet uitbetaald. Vul het foundation-IBAN zodra het bekend is.');
+    if (env.MUNT_AAN === '1' && !env.MUNT_PROVIDER_KEY)
+      fouten.push('MUNT_AAN=1 zonder MUNT_PROVIDER_KEY: crypto-acceptatie zou aanstaan zonder vergunninghoudende aanbieder om te ontvangen en om te zetten. Zet de provider, of laat MUNT_AAN uit.');
+    if (env.MUNT_AAN === '1' && !env.MUNT_WEBHOOK_SECRET)
+      waarschuwingen.push('MUNT_WEBHOOK_SECRET niet gezet terwijl munt-acceptatie aanstaat: de munt-webhook is dan niet te vertrouwen. Zet een secret.');
   } else {
     // Buiten productie: alleen zachte hints, nooit blokkeren.
     if (!env.RTG_ENC_KEY) waarschuwingen.push('RTG_ENC_KEY niet gezet: versleuteling-at-rest is uit (prima voor lokaal, niet voor productie).');

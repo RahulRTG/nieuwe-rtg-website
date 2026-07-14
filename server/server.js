@@ -61,6 +61,8 @@ const { maakAutoverkoop } = require('./kern/autoverkoop');
 const { maakBeveiliging } = require('./kern/beveiliging');
 const { maakDirectpay } = require('./kern/directpay');
 const { maakFonds } = require('./kern/fonds');
+const { maakMunten } = require('./kern/munten');
+const muntbetaal = require('./muntbetaal');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -219,6 +221,27 @@ app.post('/api/betaal/webhook', express.raw({ type: '*/*', limit: '1mb' }), (req
     // oppakken; we loggen de gebeurtenis zodat ze traceerbaar is.
     log.info('betaal-webhook', { type: (evt && evt.type) || 'onbekend', id: evt && evt.id });
   } catch (e) { log.uitzondering(e, { bron: 'betaal-webhook' }); }
+  res.json({ ok: true });
+});
+
+/* Munt-webhook: de munt-aanbieder bevestigt hier dat de munten binnen zijn en
+   omgezet naar euro. Net als de betaal-webhook: ruwe body, handtekening over de
+   onbewerkte bytes. Een bevestigde ontvangst settelt de bijbehorende factuur. */
+app.post('/api/munt/webhook', express.raw({ type: '*/*', limit: '1mb' }), async (req, res) => {
+  let evt;
+  try {
+    evt = muntbetaal.verifieerWebhook(req.body, req.get('x-munt-signature'));
+  } catch (e) {
+    log.warn('munt-webhook geweigerd', { fout: e.message, id: req.id });
+    return res.status(400).json({ error: 'Ongeldige handtekening.' });
+  }
+  try {
+    if (evt && (evt.status === 'ontvangen' || evt.type === 'ontvangst.voltooid') && evt.id) {
+      const entry = munten.bevestig({ id: evt.id, euroCenten: evt.euroCenten });
+      if (entry && !entry.herhaald) await settleMuntFactuur(entry);
+    }
+    log.info('munt-webhook', { id: evt && evt.id, status: evt && evt.status });
+  } catch (e) { log.uitzondering(e, { bron: 'munt-webhook' }); }
   res.json({ ok: true });
 });
 
@@ -1732,6 +1755,50 @@ const {
    via de betaal-naad als uitbetaling ingepland. */
 const fonds = maakFonds({ db, save, betaal, log, env: process.env });
 
+/* Munt-ontvangst (server/muntbetaal.js + kern/munten.js): RTG accepteert
+   cryptomunten voor zijn eigen diensten en zet ze via een vergunninghoudende
+   aanbieder meteen om naar euro's. Durende idempotentie zodat een herhaald
+   verzoek na een herstart hetzelfde adres teruggeeft. */
+if (!db.data.muntIdem || typeof db.data.muntIdem !== 'object') db.data.muntIdem = { _keys: [] };
+if (!Array.isArray(db.data.muntIdem._keys)) db.data.muntIdem._keys = [];
+muntbetaal.koppelStore({
+  get: (k) => (k === '_keys' ? undefined : db.data.muntIdem[k]),
+  set: (k, v) => {
+    if (k === '_keys') return;
+    if (!(k in db.data.muntIdem)) {
+      db.data.muntIdem._keys.push(k);
+      if (db.data.muntIdem._keys.length > 50000) {
+        for (const weg of db.data.muntIdem._keys.splice(0, db.data.muntIdem._keys.length - 50000))
+          delete db.data.muntIdem[weg];
+      }
+    }
+    db.data.muntIdem[k] = v;
+    try { save(); } catch (e) { /* het geheugen-resultaat blijft geldig */ }
+  }
+});
+const munten = maakMunten({ db, save, muntbetaal });
+
+/* Een bevestigde munt-ontvangst settelt de bijbehorende factuur langs de gewone
+   weg: gemarkeerd als betaald, en voor abonnementen de 30%-afdracht aan de
+   RTFoundation geboekt. Zo maakt het niet uit of een lid met kaart of met munten
+   betaalt: de rest van het systeem ziet hetzelfde. */
+async function settleMuntFactuur(entry) {
+  const ctx = entry && entry.context;
+  if (!ctx || ctx.soort !== 'factuur') return;
+  const md = ctx.own ? accounts.getMemberState(ctx.accountId) : db.data;
+  if (!md) return;
+  const inv = (md.invoices || []).find(i => i.id === ctx.invoiceId);
+  if (!inv || inv.status === 'paid') return;
+  inv.status = 'paid';
+  inv.date = 'Betaald met ' + String(entry.munt || '').toUpperCase();
+  inv.betaalId = entry.id;
+  if (fonds.isAbonnement(inv.desc)) {
+    try { await fonds.boekAfdracht({ invoiceId: inv.id, wie: ctx.wie, bijdrage: inv.bijdrage, betaalId: entry.id, omschrijving: inv.desc }); }
+    catch (e) { /* de afdracht mag de settlement nooit blokkeren */ }
+  }
+  if (ctx.own) accounts.saveMemberState(ctx.accountId, md); else save();
+}
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -2085,6 +2152,8 @@ const kern = {
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten,
   // de RTFoundation-afdracht (kern/fonds.js)
   fonds,
+  // de munt-ontvangst (kern/munten.js + server/muntbetaal.js)
+  munten, muntbetaal,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

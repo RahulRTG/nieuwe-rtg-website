@@ -1778,6 +1778,17 @@
       } else {
         const f = finData;
         if (finMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+finMsg+'</div>'; }
+        // De onderste streep bovenaan: wat blijft er deze maand over? Omzet min de
+        // af te dragen btw en de loonkosten. RTG houdt niets in (0% commissie).
+        const omzetMaand = (f.btw || []).reduce((s2, r) => s2 + (r.omzet || 0), 0);
+        const loonTot = (f.personeel && f.personeel.totaal) || 0;
+        const nettoOver = Math.round((omzetMaand - (f.btwTotaal || 0) - loonTot) * 100) / 100;
+        html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);"><h3>💶 '+T('fn.netto','Wat u overhoudt')+' ('+f.maand+')</h3>'+
+          '<div class="st-row"><span>'+T('fn.omzetmaand','Omzet deze maand')+'<span class="sub">'+T('fn.nulcom','RTG rekent 0% commissie')+'</span></span><b>'+eur(omzetMaand)+'</b></div>'+
+          '<div class="st-row"><span>'+T('fn.minbtw','Af te dragen btw')+'</span><b style="color:var(--burgundy);">- '+eur(f.btwTotaal || 0)+'</b></div>'+
+          '<div class="st-row"><span>'+T('fn.minloon','Loonkosten')+'</span><b style="color:var(--burgundy);">- '+eur(loonTot)+'</b></div>'+
+          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.overhoudt','Blijft over (indicatie)')+'</b></span><b style="color:var(--gold);font-size:1.05rem;">'+eur(nettoOver)+'</b></div>'+
+          '<div class="tkc-who">'+T('fn.netto.s','Indicatie vóór inkoop, huur en overige kosten. Uw omzet is volledig van u; RTG houdt niets in.')+'</div></div>';
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>🌍 '+T('fn.land','Land & uurloon')+'</h3>'+
           '<div class="tkc-who">'+T('fn.land.s','Het land bepaalt de btw-tarieven, werkgeverslasten en aangifteregels; het uurloon voedt de personeelskosten.')+'</div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">'+
@@ -5343,6 +5354,9 @@ window.I18N = { en: {
   'sw.events':'Event sign-ups', 'sw.events.s':'Members can sign up for your events',
   'sw.aan':'On', 'sw.uit':'Off', 'sw.apppay':'Paying via the app', 'sw.apppay.s':'A fixed part of every RTG partnership', 'sw.altijd':'Always on',
   'kt.fin':'Accounting', 'fn.land':'Country & hourly wage',
+  'fn.netto':'What you keep', 'fn.omzetmaand':'Revenue this month', 'fn.nulcom':'RTG charges 0% commission',
+  'fn.minbtw':'VAT to remit', 'fn.minloon':'Staff costs', 'fn.overhoudt':'Left over (indication)',
+  'fn.netto.s':'Indication before purchasing, rent and other costs. Your revenue is fully yours; RTG keeps nothing.',
   'fn.land.s':'The country sets the VAT rates, employer costs and filing rules; the hourly wage feeds the staff costs.',
   'fn.save':'Save', 'fn.btw':'VAT this month', 'fn.omzet':'revenue', 'fn.grondslag':'base', 'fn.geenomzet':'No revenue yet this month.',
   'fn.afdragen':'VAT to remit', 'fn.personeel':'Staff costs', 'fn.uren':'Clocked hours', 'fn.uur':'hours',

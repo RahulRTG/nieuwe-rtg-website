@@ -63,7 +63,7 @@ test.before(async () => {
 test.after(() => stop(srv && srv.child));
 
 test('e2e: munt-verzoek voor een factuur, webhook betaalt hem en de RTF-afdracht loopt mee', async () => {
-  const opties = (await api(base, '/api/munt/opties', {}, null, 'GET')).body;
+  const opties = (await api(base, '/api/munt/opties', {})).body;
   assert.equal(opties.aan, true, 'acceptatie staat aan');
   assert.ok(opties.munten.some(m => m.munt === 'usdc'), 'usdc wordt aangeboden');
 

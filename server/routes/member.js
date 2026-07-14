@@ -148,7 +148,7 @@ app.post('/api/pay', auth, async (req, res) => {
 /* Met munten betalen. RTG accepteert cryptomunten voor zijn eigen diensten en
    zet ze via een vergunninghoudende aanbieder meteen om naar euro's; RTG houdt
    zelf nooit crypto vast. Staat de acceptatie uit, dan is dit niet beschikbaar. */
-app.get('/api/munt/opties', (req, res) => res.json(munten.opties()));
+app.post('/api/munt/opties', (req, res) => res.json(munten.opties()));
 
 app.post('/api/munt/verzoek', auth, async (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });

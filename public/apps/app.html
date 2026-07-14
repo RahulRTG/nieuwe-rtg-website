@@ -1275,6 +1275,14 @@
 
   // Zakelijke rekening voor handmatige overboekingen (tot de betaalprovider live is).
   const RTG_IBAN = 'NL62 INGB 0111 1775 88';
+  // Munt-ontvangst (crypto): opties komen eenmalig van de server; staat de
+  // acceptatie uit, dan blijft alles zoals het was (geen munt-knoppen).
+  let muntOpties = null;
+  async function laadMuntOpties(){
+    if (muntOpties || !API.enabled) return muntOpties;
+    try { muntOpties = await API.call('/munt/opties'); } catch(e){ muntOpties = { aan: false, munten: [] }; }
+    return muntOpties;
+  }
 
   // API-client uit de gedeelde app-shell (public/shared/appshell.js).
   const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
@@ -4110,6 +4118,76 @@
     }, 1100);
   }
 
+  /* ---------- betalen met munten (crypto) ----------
+     Kies een munt, ontvang het exacte bedrag en een adres. RTG zet de munten via
+     een vergunninghoudende aanbieder meteen om naar euro; wij houden zelf geen
+     crypto vast. Zodra het netwerk bevestigt, zetten we de factuur op betaald. */
+  let muntPoll = null;
+  function muntStop(){ if (muntPoll){ clearInterval(muntPoll); muntPoll = null; } }
+  function openMuntSheet(invId, euroAmount){
+    muntStop();
+    let ov = document.getElementById('munt-ov');
+    if (!ov){ ov = document.createElement('div'); ov.id = 'munt-ov';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:130;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;justify-content:center;';
+      document.body.appendChild(ov);
+      ov.addEventListener('click', e => { if (e.target === ov){ muntStop(); ov.remove(); } });
+    }
+    const munten = (muntOpties && muntOpties.munten) || [];
+    const naam = { btc:'Bitcoin', eth:'Ethereum', usdc:'USD Coin', usdt:'Tether' };
+    ov.innerHTML = '<div style="width:100%;max-width:460px;background:var(--bg);border-radius:20px 20px 0 0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem;">' +
+      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;"><b style="font-size:1rem;">◈ ' + T('munt.title','Betaal met munten') + '</b>' +
+        '<button id="muntX" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;">✕</button></div>' +
+      '<div style="font-size:0.78rem;color:var(--soft);margin-bottom:0.8rem;">' + T('munt.bedrag','Te betalen') + ': <b style="color:var(--txt);">' + eur(euroAmount) + '</b>. ' + T('munt.omzet','RTG zet uw munten meteen om naar euro.') + '</div>' +
+      '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.2rem;">' +
+        munten.map(m => '<button class="js-muntpick" data-munt="' + m.munt + '" style="flex:1;min-width:5rem;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:0.6rem;font-family:inherit;cursor:pointer;"><b style="text-transform:uppercase;">' + m.munt + '</b><br><span style="font-size:0.62rem;color:var(--soft);">' + (naam[m.munt] || m.munt) + '</span></button>').join('') +
+      '</div>' +
+      '<div id="muntDetail"></div></div>';
+    ov.querySelector('#muntX').addEventListener('click', () => { muntStop(); ov.remove(); });
+    ov.querySelectorAll('.js-muntpick').forEach(b => b.addEventListener('click', () => muntVraag(invId, b.dataset.munt, euroAmount)));
+  }
+
+  async function muntVraag(invId, munt, euroAmount){
+    const det = document.getElementById('muntDetail');
+    if (det) det.innerHTML = '<div style="font-size:0.8rem;color:var(--soft);padding:0.6rem 0;">' + T('munt.laden','Adres aanmaken…') + '</div>';
+    let vz;
+    try { vz = (await API.call('/munt/verzoek', { invoiceId: invId, munt })).verzoek; }
+    catch(e){ if (det) det.innerHTML = '<div style="font-size:0.8rem;color:var(--burgundy);padding:0.6rem 0;">' + (e.message || T('munt.fout','Kon geen adres maken.')) + '</div>'; return; }
+    if (!det) return;
+    const dot = '<span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;flex-shrink:0;"></span>';
+    det.innerHTML =
+      '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1rem;margin-top:0.6rem;">' +
+        '<div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">' + T('munt.stuur','Stuur exact') + '</div>' +
+        '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.5rem;color:var(--gold);margin:0.15rem 0 0.1rem;">' + vz.bedragMunt + ' <span style="text-transform:uppercase;font-size:1rem;">' + munt + '</span></div>' +
+        '<div style="font-size:0.66rem;color:var(--muted);">≈ ' + eur((vz.euroCenten || 0) / 100) + ' · ' + T('munt.koers','koers vastgezet') + '</div>' +
+        '<div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.7rem;">' + T('munt.adres','Naar dit adres') + '</div>' +
+        '<div style="display:flex;align-items:center;gap:0.4rem;margin-top:0.2rem;">' +
+          '<code style="flex:1;font-size:0.66rem;word-break:break-all;color:var(--txt);background:rgba(0,0,0,0.15);border-radius:8px;padding:0.4rem 0.5rem;">' + escT(vz.adres) + '</code>' +
+          '<button id="muntCopy" style="flex-shrink:0;background:none;border:1px solid var(--line);border-radius:999px;padding:0.3rem 0.6rem;font-size:0.62rem;color:var(--muted);cursor:pointer;">' + T('munt.kopieer','Kopieer') + '</button>' +
+        '</div>' +
+        '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);display:flex;align-items:center;gap:0.4rem;">' + dot + T('munt.wacht','Wachten op bevestiging van het netwerk…') + '</div>' +
+      '</div>';
+    const cp = document.getElementById('muntCopy');
+    if (cp) cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(vz.adres); toast(T('munt.gekopieerd','Adres gekopieerd.')); } catch(e){ toast(vz.adres); } });
+    // Poll op de factuurstatus: de aanbieder-webhook zet de factuur op betaald na
+    // conversie. In demo blijft dit staan tot een echte ontvangst binnenkomt.
+    muntStop();
+    let n = 0;
+    muntPoll = setInterval(async () => {
+      n++;
+      try {
+        applyState((await API.call('/state')).state);
+        const inv = (invoices || []).find(i => i.id === invId);
+        if (inv && inv.status === 'paid'){
+          muntStop();
+          const o = document.getElementById('munt-ov'); if (o) o.remove();
+          toast('◈ ' + T('munt.ontvangen','Betaald met munten. Dank u.'));
+          renderPay(); renderHome();
+        }
+      } catch(e){}
+      if (n > 150) muntStop(); // na ~10 minuten stoppen met pollen
+    }, 4000);
+  }
+
   /* ---------- rechtstreeks betalen aan een partner (Face ID) ----------
      Overal in de app: één bedrag, Face ID, geld gaat direct naar de partner.
      Bereikbaar vanuit de Salon en vanuit de AI/concierge. */
@@ -4160,6 +4238,10 @@
   function renderPay(){
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+    // Munt-opties eenmalig laden; zodra bekend, deze weergave opnieuw tekenen
+    // (dan verschijnen de munt-knoppen). Verandert niets als acceptatie uit staat.
+    if (muntOpties === null && API.live) { laadMuntOpties().then(() => renderPay()); }
+    const muntAan = !!(muntOpties && muntOpties.aan && user && user.tier !== 'guest');
     // Business Pass: de volledige, boekhoudklare specificatie onder elke factuur
     // (incl. afboekcode en btw). RTG en Lifestyle houden de rustige weergave.
     const eurC = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -4181,18 +4263,42 @@
         '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.5rem;font-size:0.64rem;">RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · ' + RTG_IBAN + '</div>' +
       '</div>';
     };
-    $('#payList').innerHTML = invoices.map(inv => {
+    // Financiën in één oogopslag: openstaand, dit jaar betaald, en de eigen
+    // bijdrage aan de RTFoundation. Voor elke pas, rustig en zonder uitleg.
+    const isContrib = d => /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(d || '');
+    const paidInv = invoices.filter(i => i.status === 'paid');
+    const betaaldSom = paidInv.reduce((s,i) => s + i.netto + i.bijdrage, 0);
+    const rtfBij = paidInv.filter(i => isContrib(i.desc)).reduce((s,i) => s + Math.round(i.bijdrage / 1.21 * 0.3 * 100) / 100, 0);
+    const rtfKomt = open.filter(i => isContrib(i.desc)).reduce((s,i) => s + Math.round(i.bijdrage / 1.21 * 0.3 * 100) / 100, 0);
+    const btwSom = paidInv.reduce((s,i) => s + (i.btw || 0), 0);
+    const tegel = (l, v, klas) => '<div style="flex:1;min-width:6.5rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;">' +
+      '<div style="font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">' + l + '</div>' +
+      '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.15rem;margin-top:0.15rem;' + (klas === 'g' ? 'color:var(--gold);' : '') + '">' + v + '</div></div>';
+    const finKaart = '<div style="margin-bottom:0.9rem;">' +
+      '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);margin:0 0 0.5rem;">' + T('fin.title','Uw financiën') + '</div>' +
+      '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">' +
+        tegel(T('fin.open','Openstaand'), eur(openSum)) +
+        tegel(T('fin.paid','Betaald'), eur(betaaldSom)) +
+        tegel(T('fin.rtf','Naar de RTFoundation'), eur(rtfBij), 'g') +
+        (user.tier === 'business' ? tegel(T('fin.vat','Btw betaald'), eur(btwSom)) : '') +
+      '</div>' +
+      (rtfKomt > 0 ? '<div style="margin-top:0.5rem;font-size:0.72rem;color:var(--muted);">' + T('fin.rtfnext','Van uw openstaande bijdrage gaat') + ' <b style="color:var(--gold);">' + eur(rtfKomt) + '</b> ' + T('fin.rtfnext2','naar de RTFoundation.') + '</div>' : '') +
+    '</div>';
+    $('#payList').innerHTML = finKaart + invoices.map(inv => {
       const total = inv.netto + inv.bijdrage;
       return '<div class="rowitem">' +
         '<div class="t"><b>' + inv.desc + '</b><span>' + inv.id + ' · ' + inv.date + '</span></div>' +
         '<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:0.45rem;">' +
           '<span class="amount">' + eur(total) + '</span>' +
           (inv.status === 'open'
-            ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>'
+            ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>' +
+              (muntAan ? '<button class="js-munt" data-inv="' + inv.id + '" data-amt="' + total + '" style="background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '')
             : '<span class="pill paid">'+T('app.paid','Betaald')+'</span>') +
         '</div>' +
       '</div>' + bizSpec(inv);
     }).join('');
+    document.querySelectorAll('.js-munt').forEach(b =>
+      b.addEventListener('click', () => openMuntSheet(b.dataset.inv, Number(b.dataset.amt))));
     $('#payAllWrap').innerHTML = (open.length
       ? '<button class="btn-pay payall" id="payAll">' + FID + T('app.payall','Betaal alles') + ', ' + eur(openSum) + '</button>'
       : '') +
@@ -5301,6 +5407,12 @@ window.I18N = { en: {
   'zzp.winst':'Annual profit', 'zzp.belastbaar':'Taxable (after deductions)', 'zzp.teBetalen':'To pay (indication)',
   'zzp.netto':'Net remaining', 'zzp.reserveer':'Set aside ~', 'zzp.opzij':'aside: about', 'zzp.pm':'per month',
   'zzp.disc':'Annual indication; this is guidance, not binding tax advice.',
+  'fin.title':'Your finances', 'fin.open':'Outstanding', 'fin.paid':'Paid', 'fin.rtf':'To the RTFoundation', 'fin.vat':'VAT paid',
+  'fin.rtfnext':'Of your outstanding contribution,', 'fin.rtfnext2':'goes to the RTFoundation.', 'fin.paycoins':'With coins',
+  'munt.title':'Pay with coins', 'munt.bedrag':'To pay', 'munt.omzet':'RTG converts your coins to euros immediately.',
+  'munt.laden':'Creating address…', 'munt.fout':'Could not create an address.', 'munt.stuur':'Send exactly',
+  'munt.koers':'rate locked', 'munt.adres':'To this address', 'munt.kopieer':'Copy', 'munt.gekopieerd':'Address copied.',
+  'munt.wacht':'Waiting for network confirmation…', 'munt.ontvangen':'Paid with coins. Thank you.',
   'boek.sub':'Services and products, fixed net price', 'app.tp.boek':'Book',
   'boek.noteph':'E.g. size, location or injury', 'boek.go':'Book and pay', 'boek.kies':'First pick a service or product.',
   'boek.betaald':'Booked and paid; you will hear as soon as it is confirmed.', 'boek.ok':'Request sent; you can pay afterwards.',

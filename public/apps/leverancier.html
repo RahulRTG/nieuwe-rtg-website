@@ -604,6 +604,11 @@
         <p class="sub" data-i18n="sup.v.vg.sub">Portefeuille, gericht aanbod, biedingen en bezichtigingen.</p>
         <div id="vgWrap"></div>
       </div>
+      <div class="view" data-view="boerderij">
+        <h2 data-i18n="sup.v.boer">Boerderij</h2>
+        <p class="sub" data-i18n="sup.v.boer.sub">Percelen, gewassen, dieren, taken en de AI-adviseur.</p>
+        <div id="boerWrap"></div>
+      </div>
       <div class="view" data-view="retail">
         <h2 data-i18n="sup.v.retail">Mode &amp; retail</h2>
         <p class="sub" data-i18n="sup.v.retail.sub">Collecties, voorraad, drops en het klantdossier.</p>
@@ -800,6 +805,7 @@
     bezorg:   { label:'Bezorgen',  svg:'<circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/><path d="M4 12h4"/>' },
     tickets:  { label:'Tickets',   svg:'<path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H6a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M12 6v2M12 11v2M12 16v2"/>', cap:'tickets' },
     vastgoed: { label:'Vastgoed',  svg:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>', cap:'vastgoed' },
+    boerderij:{ label:'Boerderij', svg:'<path d="M4 10l6-4 6 4"/><path d="M6 10v9h8v-9"/><path d="M14 13h6v6h-6z"/><path d="M9 19v-4h2v4"/>', cap:'boerderij' },
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     verkoop:  { label:'Verkoop',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M9.5 9.2l1.6 1.6 3-3"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
@@ -2745,6 +2751,108 @@
     });
   }
 
+  // ---- boerderij: de slimme boer-backoffice (percelen, dieren, taken, AI) ----
+  let boer = null;
+  const FASE_LBL = { 'leeg':'leeg', 'gezaaid':'net gezaaid', 'groeit':'groeit', 'te-oogsten':'oogstklaar', 'geoogst':'geoogst' };
+  const FASE_KL = { 'te-oogsten':'#7EE0A3', 'groeit':'var(--gold)', 'gezaaid':'#8FB8D8', 'geoogst':'var(--soft)', 'leeg':'var(--soft)' };
+  const URG_KL = { 'hoog':'#E0736A', 'midden':'var(--gold)', 'laag':'var(--soft)' };
+  async function laadBoerderij(){
+    if (!has('boerderij') || !API.live) return;
+    try { boer = await API.call('/supplier/boerderij/overzicht', {}); } catch(e){ boer = null; }
+    renderBoerderij();
+  }
+  function boerToe(r){ if (r && r.overzicht){ boer = r.overzicht; } else if (r && r.percelen){ boer = r; } renderBoerderij(); }
+  function renderBoerderij(){
+    const el = $('#boerWrap'); if (!el) return;
+    if (!has('boerderij')){ el.innerHTML = ''; return; }
+    if (!boer){ el.innerHTML = '<div class="empty">…</div>'; laadBoerderij(); return; }
+    const canEdit = actor().manager;
+    const o = boer, st = o.stats || {}, isDier = o.kind !== 'gewas', isGewas = o.kind !== 'dier';
+    const sel = 'style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;font-size:0.82rem;color:var(--txt);"';
+    let html = '';
+    // type + kiezer
+    html += '<div class="card"><div class="tt-h">'+T('boer.type','Soort boerderij')+'</div>'+
+      '<div style="margin-top:0.5rem;font-size:0.9rem;">'+(o.typeIcon||'🚜')+' <b>'+esc(o.typeLabel||T('boer.geen','nog niet gekozen'))+'</b></div>'+
+      (canEdit ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;">'+
+        o.types.map(t => '<button class="obtn'+(t.id===o.type?' primary':'')+'" data-btype="'+t.id+'">'+t.icon+' '+esc(t.label)+'</button>').join('')+'</div>' : '')+'</div>';
+    // Vandaag-briefing
+    const br = o.briefing || { punten:[] };
+    html += '<div class="card"><div class="tt-h">🌱 '+T('boer.vandaag','Vandaag')+' · '+esc(br.seizoenLabel||'')+'</div>'+
+      (br.punten.length ? br.punten.map(p => '<div class="mitem" style="border-left:3px solid '+(URG_KL[p.urgentie]||'var(--soft)')+';"><div class="ds" style="color:var(--txt);">'+esc(p.tekst)+'</div></div>').join('')
+        : '<div class="ds" style="margin-top:0.5rem;">'+T('boer.rustig','Niets dringends. Mooie dag om vooruit te werken.')+'</div>')+'</div>';
+    // stats
+    const tiles = [[st.percelen||0, T('boer.percelen','percelen')],[ (st.hectare||0)+' ha', T('boer.opp','oppervlak')],[st.teOogsten||0, T('boer.oogstklaar','oogstklaar')],[st.dieren||0, T('boer.dieren','dieren')]];
+    if (isDier){ tiles.push([st.melkPerDag||0, T('boer.melk','L melk/dag')]); tiles.push([st.eierenPerDag||0, T('boer.eieren','eieren/dag')]); tiles.push([(st.voerPerDag||0)+' kg', T('boer.voer','voer/dag')]); }
+    tiles.push([st.openTaken||0, T('boer.taken','open taken')]);
+    html += '<div class="card"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;">'+
+      tiles.map(c => '<div style="background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.6rem;text-align:center;"><div style="font-size:1.15rem;font-weight:700;color:var(--gold);">'+c[0]+'</div><div style="font-size:0.6rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.05em;">'+c[1]+'</div></div>').join('')+'</div></div>';
+    // percelen (gewasbedrijven)
+    if (isGewas){
+      html += '<div class="card"><div class="tt-h">'+T('boer.perc','Percelen')+' ('+(o.percelen||[]).length+')</div>'+
+        (o.percelen||[]).map(p => {
+          const bar = '<div style="height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:0.35rem;"><div style="height:100%;width:'+(p.voortgang||0)+'%;background:'+(FASE_KL[p.fase]||'var(--gold)')+';"></div></div>';
+          return '<div class="mitem"><div class="r1"><span class="nm">'+esc(p.naam)+'</span><span class="pr">'+(p.ha||0)+' ha</span></div>'+
+          '<div class="ds">'+(p.gewasLabel ? esc(p.gewasLabel)+' · <span style="color:'+(FASE_KL[p.fase]||'var(--soft)')+';">'+T('boer.fase.'+p.fase, FASE_LBL[p.fase]||p.fase)+'</span>'+(p.fase==='groeit'||p.fase==='gezaaid'?' · '+(p.restDagen)+' '+T('boer.dgn','dagen tot oogst'):'')+(p.opbrengst?' · '+p.opbrengst+' '+(p.eenheid||'kg'):'') : T('boer.braak','braak, nog niet ingezaaid'))+'</div>'+
+          (p.gewasLabel && p.fase!=='geoogst' ? bar : '')+
+          '<div style="margin-top:0.45rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+
+            (canEdit ? '<select data-zaaisel="'+p.id+'" '+sel+'><option value="">'+T('boer.zaaikies','zaai...')+'</option>'+o.gewaskeuze.map(g=>'<option value="'+g.id+'">'+esc(g.label)+'</option>').join('')+'</select>' : '')+
+            (p.gewasLabel && p.fase==='te-oogsten' ? '<button class="obtn primary" data-oogst="'+p.id+'">🌾 '+T('boer.oogsten','Oogsten')+'</button>' : '')+
+            (p.gewasLabel && p.fase!=='geoogst' ? '<button class="obtn" data-water="'+p.id+'">💧 '+T('boer.water','Water')+'</button>' : '')+
+            (canEdit ? '<button class="rr-del" data-percdel="'+p.id+'">✕</button>' : '')+
+          '</div></div>';
+        }).join('')+
+        (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;"><input id="boerPcNaam" placeholder="'+T('boer.pcnaam','Naam perceel')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><input id="boerPcHa" type="number" min="0" step="0.1" placeholder="ha" style="width:5rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><button class="obtn primary" id="boerPcAdd">+</button></div>' : '')+'</div>';
+    }
+    // dieren
+    if (isDier){
+      html += '<div class="card"><div class="tt-h">'+T('boer.dgroep','Dieren')+' ('+(o.dieren||[]).length+')</div>'+
+        (o.dieren||[]).map(d => '<div class="mitem"><div class="r1"><span class="nm">'+esc(d.soortLabel)+' × '+(d.aantal||0)+'</span><span class="pr">'+(d.dagopbrengst||0)+' '+(d.eenheid||'')+'/dag</span></div>'+
+          '<div class="ds">'+(d.stal?esc(d.stal)+' · ':'')+T('boer.voernodig','voer')+' '+(d.voerKgPerDag||0)+' kg/dag · '+T('boer.gezond','gezondheid')+': <span style="color:'+(d.gezondheid==='goed'?'#7EE0A3':d.gezondheid==='ziek'?'#E0736A':'var(--gold)')+';">'+esc(d.gezondheid)+'</span>'+(d.laatsteVoer?' · '+T('boer.gevoerd','gevoerd')+' '+timeAgo(d.laatsteVoer):'')+'</div>'+
+          '<div style="margin-top:0.45rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+
+            '<button class="obtn primary" data-voer="'+d.id+'">🌾 '+T('boer.voeren','Voeren')+'</button>'+
+            '<input type="number" min="0" data-opbin="'+d.id+'" placeholder="'+(d.eenheid||'')+'/dag" style="width:6rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.4rem 0.5rem;color:var(--txt);"><button class="obtn" data-opbset="'+d.id+'">'+T('boer.opbregistr','Opbrengst')+'</button>'+
+            (canEdit ? '<select data-gezond="'+d.id+'" '+sel+'><option value="goed"'+(d.gezondheid==='goed'?' selected':'')+'>'+T('boer.g.goed','goed')+'</option><option value="aandacht"'+(d.gezondheid==='aandacht'?' selected':'')+'>'+T('boer.g.aandacht','aandacht')+'</option><option value="ziek"'+(d.gezondheid==='ziek'?' selected':'')+'>'+T('boer.g.ziek','ziek')+'</option></select><button class="rr-del" data-dierdel="'+d.id+'">✕</button>' : '')+
+          '</div></div>').join('')+
+        (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><select id="boerDrSoort" '+sel+'>'+o.dierkeuze.map(g=>'<option value="'+g.id+'">'+esc(g.label)+'</option>').join('')+'</select><input id="boerDrAantal" type="number" min="0" placeholder="'+T('boer.aantal','aantal')+'" style="width:6rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><button class="obtn primary" id="boerDrAdd">+</button></div>' : '')+'</div>';
+    }
+    // takenbord
+    html += '<div class="card"><div class="tt-h">'+T('boer.takenbord','Takenbord')+'</div>'+
+      (o.taken||[]).map(t => '<div class="mitem" style="opacity:'+(t.klaar?'0.55':'1')+';"><div class="r1"><span class="nm">'+(t.klaar?'✓ ':'')+esc(t.wat)+'</span>'+(t.voor?'<span class="pr" style="color:'+(!t.klaar&&t.voor<new Date().toISOString().slice(0,10)?'#E0736A':'var(--soft)')+';">'+esc(t.voor)+'</span>':'')+'</div>'+
+        (t.waar?'<div class="ds">📍 '+esc(t.waar)+(t.door?' · '+esc(t.door):'')+'</div>':'')+
+        (!t.klaar ? '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;"><button class="obtn primary" data-taakklaar="'+t.id+'">'+T('boer.afronden','Afronden')+'</button>'+(canEdit?'<button class="rr-del" data-taakdel="'+t.id+'">✕</button>':'')+'</div>' : '')+'</div>').join('')+
+      (canEdit ? '<div style="display:flex;gap:0.4rem;margin-top:0.7rem;flex-wrap:wrap;"><input id="boerTkWat" placeholder="'+T('boer.tkwat','Nieuwe taak')+'" style="flex:1;min-width:9rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><input id="boerTkVoor" type="date" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"><button class="obtn primary" id="boerTkAdd">+</button></div>' : '')+'</div>';
+    // AI-adviseur
+    if (canEdit){
+      html += '<div class="card"><div class="tt-h">✨ '+T('boer.ai','AI-adviseur')+'</div>'+
+        '<p class="sub" style="margin-top:0.3rem;">'+T('boer.ai.sub','Vraag advies of geef een opdracht, bijv. "zaai tomaat op Kasblok 1" of "voeg 20 melkkoeien toe".')+'</p>'+
+        '<div id="boerAiOut" style="margin-top:0.5rem;"></div>'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="boerAiIn" placeholder="'+T('boer.ai.ph','Uw vraag of opdracht...')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);"><button class="obtn primary" id="boerAiGo">'+T('boer.ai.go','Vraag')+'</button></div></div>';
+    }
+    el.innerHTML = html;
+    // wiring
+    el.querySelectorAll('[data-btype]').forEach(b => b.addEventListener('click', async () => { try { boerToe(await API.call('/supplier/boerderij/type', { type: b.dataset.btype })); toast(T('boer.typeok','Boerderijtype ingesteld.')); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-zaaisel]').forEach(s2 => s2.addEventListener('change', async () => { if (!s2.value) return; try { const r = await API.call('/supplier/boerderij/zaai', { id: s2.dataset.zaaisel, gewas: s2.value }); toast(T('boer.zaaiok','Gezaaid. Oogst verwacht rond ')+r.oogstVerwacht); boerToe(r); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-oogst]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/oogst', { id: b.dataset.oogst }); toast(T('boer.oogstok','Geoogst: ')+r.opbrengst+' '+r.eenheid); boerToe(r); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-water]').forEach(b => b.addEventListener('click', async () => { try { boerToe(await API.call('/supplier/boerderij/water', { id: b.dataset.water })); toast(T('boer.waterok','Beregend.')); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-percdel]').forEach(b => b.addEventListener('click', async () => { try { boerToe(await API.call('/supplier/boerderij/perceel', { weg: true, id: b.dataset.percdel })); } catch(e){ toast(e.message); } }));
+    const pcAdd = $('#boerPcAdd'); if (pcAdd) pcAdd.addEventListener('click', async () => { const naam = $('#boerPcNaam').value.trim(); if (!naam) return; try { boerToe(await API.call('/supplier/boerderij/perceel', { naam, ha: Number($('#boerPcHa').value)||0 })); } catch(e){ toast(e.message); } });
+    el.querySelectorAll('[data-voer]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/voer', { id: b.dataset.voer }); toast(T('boer.voerok','Gevoerd ')+'('+r.voerKg+' kg).'); boerToe(r); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-opbset]').forEach(b => b.addEventListener('click', async () => { const inp = el.querySelector('[data-opbin="'+b.dataset.opbset+'"]'); const v = inp?Number(inp.value):0; try { boerToe(await API.call('/supplier/boerderij/opbrengst', { id: b.dataset.opbset, waarde: v })); toast(T('boer.opbok','Opbrengst vastgelegd.')); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-gezond]').forEach(s2 => s2.addEventListener('change', async () => { try { boerToe(await API.call('/supplier/boerderij/dier', { id: s2.dataset.gezond, gezondheid: s2.value })); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-dierdel]').forEach(b => b.addEventListener('click', async () => { try { boerToe(await API.call('/supplier/boerderij/dier', { weg: true, id: b.dataset.dierdel })); } catch(e){ toast(e.message); } }));
+    const drAdd = $('#boerDrAdd'); if (drAdd) drAdd.addEventListener('click', async () => { try { boerToe(await API.call('/supplier/boerderij/dier', { soort: $('#boerDrSoort').value, aantal: Number($('#boerDrAantal').value)||0 })); } catch(e){ toast(e.message); } });
+    el.querySelectorAll('[data-taakklaar]').forEach(b => b.addEventListener('click', async () => { try { boerToe(await API.call('/supplier/boerderij/taak/klaar', { id: b.dataset.taakklaar })); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-taakdel]').forEach(b => b.addEventListener('click', async () => { try { boerToe(await API.call('/supplier/boerderij/taak', { weg: true, id: b.dataset.taakdel })); } catch(e){ toast(e.message); } }));
+    const tkAdd = $('#boerTkAdd'); if (tkAdd) tkAdd.addEventListener('click', async () => { const wat = $('#boerTkWat').value.trim(); if (!wat) return; try { boerToe(await API.call('/supplier/boerderij/taak', { wat, voor: $('#boerTkVoor').value })); } catch(e){ toast(e.message); } });
+    const aiGo = $('#boerAiGo'); if (aiGo){
+      const doeAi = async () => { const vraag = $('#boerAiIn').value.trim(); if (!vraag) return; const out = $('#boerAiOut'); out.innerHTML = '<div class="ds">'+T('boer.aidenkt','Even denken...')+'</div>';
+        try { const r = await API.call('/supplier/boerderij/ai', { vraag }); out.innerHTML = '<div class="mitem"'+(r.gedaan?' style="border-left:3px solid #7EE0A3;"':'')+'><div class="ds" style="color:var(--txt);white-space:pre-wrap;">'+esc(r.antwoord)+'</div></div>'; $('#boerAiIn').value=''; if (r.overzicht){ boer = r.overzicht; } if (r.gedaan) renderBoerderij(); }
+        catch(e){ out.innerHTML = '<div class="ds" style="color:#E0736A;">'+esc(e.message)+'</div>'; } };
+      aiGo.addEventListener('click', doeAi);
+      const aiIn = $('#boerAiIn'); if (aiIn) aiIn.addEventListener('keydown', e => { if (e.key==='Enter') doeAi(); });
+    }
+  }
+
   // ---- retail / mode: de slimme merk-backoffice ----
   let retailData = null;         // volledige retail-toestand van de server
   let retailSec = 'overzicht';   // overzicht | catalogus | voorraad | clienteling
@@ -3585,7 +3693,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -5241,7 +5349,7 @@
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
-    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); });
+    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); });
     source.addEventListener('notify', e => {
       const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
       if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }

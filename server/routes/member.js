@@ -11,7 +11,8 @@ module.exports = (kern) => {
     salonZichtbaar, salonProfielCompleet,
     ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken, ontmoetHier, ontmoetStop,
     ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
-    ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer } = kern;
+    ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer,
+    mbAanvraag, mbMijn } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -1653,6 +1654,20 @@ app.post('/api/ontmoeten/signaal', auth, (req, res) => {
   const r = ontmoetSignaalKantoor(key, String(req.body.dateId || ''), req.body.payload || null);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
+});
+
+/* ================== veilig laten bezorgen door een modewinkel ==================
+   Een lid laat gekochte/apart-gelegde mode-artikelen thuisbezorgen. Veilig: een
+   bezorgcode die je alleen aan de echte koerier geeft, live volgen, en bij dure
+   stukken een ID-controle aan de deur (RTG-geverifieerd account vereist). */
+app.post('/api/mode/bezorg/aanvraag', auth, express.json({ limit: '1mb' }), (req, res) => {
+  const r = mbAanvraag(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), req.body.items,
+    { adres: req.body.adres, lat: req.body.lat, lng: req.body.lng });
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, bezorging: r.bezorging });
+});
+app.post('/api/mode/bezorg/mijn', auth, (req, res) => {
+  res.json({ bezorgingen: mbMijn(req.session.key) });
 });
 
 /* ================== boodschappen bij de groothandel/supermarkt ==================

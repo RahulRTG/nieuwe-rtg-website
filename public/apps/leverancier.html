@@ -583,6 +583,7 @@
         <h2 data-i18n="sup.v.retail">Mode &amp; retail</h2>
         <p class="sub" data-i18n="sup.v.retail.sub">Uw collecties, artikelen met varianten, voorraad en drops, en het clienteling-dossier van uw klanten.</p>
         <div id="retailWrap"></div>
+        <div id="modeBezorgWrap"></div>
       </div>
       <div class="view" data-view="charter">
         <h2 data-i18n="sup.v.charter">Charter</h2>
@@ -3115,6 +3116,45 @@
     } catch(e){ if (box) box.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; }
   }
 
+  // ---- mode-bezorging: veilig laten bezorgen, in een tik op te zetten ----
+  async function renderModeBezorg(){
+    const el = $('#modeBezorgWrap'); if (!el) return;
+    if (!has('retail')){ el.innerHTML = ''; return; }
+    let d; try { d = await API.call('/supplier/mode/bezorg/overzicht'); } catch(e){ el.innerHTML=''; return; }
+    const ins = d.instellingen || { aan:false };
+    let h = '<div class="st-sec" style="margin-top:1.4rem;">🛍️ '+T('mb.h','Veilige bezorgdienst')+'</div>';
+    h += '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;margin-bottom:0.8rem;">'+
+      '<label style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;"><input type="checkbox" id="mbAan"'+(ins.aan?' checked':'')+'> '+T('mb.aan','Bezorgen aan (met bezorgcode, foto-bewijs en live volgen)')+'</label>'+
+      '<div class="row-gap" style="margin-top:0.5rem;"><input id="mbKosten" class="st-in" type="number" step="0.5" placeholder="'+T('mb.kosten','Kosten €')+'" value="'+(ins.kosten!=null?ins.kosten:'')+'" style="flex:1;"><input id="mbGratis" class="st-in" type="number" placeholder="'+T('mb.gratis','Gratis vanaf €')+'" value="'+(ins.gratisVanaf!=null?ins.gratisVanaf:'')+'" style="flex:1;"><input id="mbId" class="st-in" type="number" placeholder="'+T('mb.idgrens','ID vanaf €')+'" value="'+(ins.waardegrensId!=null?ins.waardegrensId:'')+'" style="flex:1;"></div>'+
+      '<button id="mbSave" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.5rem;font-weight:600;font-family:inherit;">'+T('mb.opslaan','Opslaan')+'</button></div>';
+    // bezorgbord
+    h += '<div class="st-sec">'+T('mb.bord','Bezorgingen')+' · '+T('mb.omzet','omzet')+' '+eur(d.omzet||0)+'</div>';
+    h += (d.open||[]).length ? (d.open||[]).map(mbKaart).join('') : '<p class="sub">'+T('mb.geen','Geen open bezorgingen.')+'</p>';
+    if ((d.afgerond||[]).length) h += '<details style="margin-top:0.5rem;"><summary class="sub" style="cursor:pointer;">'+T('mb.afgerond','Afgerond')+' ('+d.afgerond.length+')</summary>'+d.afgerond.map(mbKaart).join('')+'</details>';
+    el.innerHTML = h;
+    const save = $('#mbSave'); if (save) save.addEventListener('click', async () => {
+      try { await API.call('/supplier/mode/bezorg/setup', { aan: $('#mbAan').checked, kosten:$('#mbKosten').value, gratisVanaf:$('#mbGratis').value, waardegrensId:$('#mbId').value }); toast(T('mb.opgeslagen','Bezorgdienst bijgewerkt.')); renderModeBezorg(); } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-mbneem]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/mode/bezorg/neem', { ref:b.dataset.mbneem }); renderModeBezorg(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-mbretour]').forEach(b => b.addEventListener('click', async () => { const r = prompt(T('mb.retourreden','Reden van retour?'),'Past niet'); if (r===null) return; try { await API.call('/supplier/mode/bezorg/retour', { ref:b.dataset.mbretour, reden:r }); renderModeBezorg(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-mbaf]').forEach(b => b.addEventListener('click', async () => {
+      const code = prompt(T('mb.vraagcode','Bezorgcode van de klant (uit de app):')); if (!code) return;
+      try { await API.call('/supplier/mode/bezorg/overhandig', { ref:b.dataset.mbaf, bezorgcode:code.trim(), idOk:true }); toast('✅ '+T('mb.afgeleverd','Veilig afgeleverd.')); renderModeBezorg(); } catch(e){ toast(e.message); }
+    }));
+  }
+  function mbKaart(b){
+    const done = ['afgeleverd','retour','geannuleerd'].includes(b.status);
+    return '<div style="border:1px solid '+(b.status==='onderweg'?'var(--gold)':'var(--line)')+';border-radius:12px;padding:0.7rem 0.85rem;margin-top:0.5rem;">'+
+      '<div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.85rem;">'+esc(b.codenaam)+' · '+eur(b.waarde)+(b.kosten?' + '+eur(b.kosten):'')+'</b>'+
+      '<span class="sub">'+esc(b.status)+(b.idVereist?' · 🪪':'')+'</span></div>'+
+      '<div class="sub">'+b.items.map(i=>i.aantal+'× '+esc(i.naam)+(i.maat?' ('+esc(i.maat)+')':'')).join(', ')+' · '+esc(b.adres)+'</div>'+
+      (b.koerier?'<div class="sub">'+T('mb.koerier','koerier')+': '+esc(b.koerier)+'</div>':'')+
+      (!done ? '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">'+
+        (b.status==='onderweg' ? '<button data-mbaf="'+b.ref+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('mb.afronden','Afronden (code)')+'</button>' :
+          '<button data-mbneem="'+b.ref+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('mb.aannemen','Aannemen')+'</button>')+
+        '<button data-mbretour="'+b.ref+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.75rem;">'+T('mb.retour','Retour')+'</button></div>' : '')+'</div>';
+  }
+
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
@@ -3131,7 +3171,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderGroothandel(); renderInkoop(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderModeBezorg(); renderGroothandel(); renderInkoop(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -5158,6 +5198,11 @@ window.I18N = { en: {
   'ink.ai':'AI reorder', 'ink.bestel':'Order', 'ink.geen':'No wholesaler available for purchasing.', 'ink.mijn':'My purchase orders',
   'ink.kies':'Enter at least one quantity.', 'ink.besteld':'Order placed.', 'ink.aidenkt':'The AI is checking your sales and mise-en-place…',
   'ink.aibevestig':'Place reorder', 'ink.aiok':'Reorder placed.',
+  'mb.h':'Safe delivery service', 'mb.aan':'Delivery on (with delivery code, photo proof and live tracking)',
+  'mb.kosten':'Fee €', 'mb.gratis':'Free from €', 'mb.idgrens':'ID from €', 'mb.opslaan':'Save', 'mb.opgeslagen':'Delivery service updated.',
+  'mb.bord':'Deliveries', 'mb.omzet':'revenue', 'mb.geen':'No open deliveries.', 'mb.afgerond':'Completed', 'mb.koerier':'courier',
+  'mb.aannemen':'Accept', 'mb.afronden':'Complete (code)', 'mb.retour':'Return', 'mb.retourreden':'Reason for return?',
+  'mb.vraagcode':'Delivery code from the customer (from the app):', 'mb.afgeleverd':'Delivered safely.',
   'tk2.aanbod':'Offering', 'tk2.cap':'cap.', 'tk2.f.naam':'Activity', 'tk2.f.naamph':'E.g. sunset cruise',
   'tk2.f.desc':'Description', 'tk2.f.prijs':'Price p.p. (€)', 'tk2.f.cap':'Capacity', 'tk2.f.duur':'Duration',
   'tk2.f.tijden':'Time slots (commas)', 'tk2.f.voeg':'Add', 'tk2.welkom':'welcome!',

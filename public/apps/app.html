@@ -3071,6 +3071,7 @@
     if ((data.supplier.caps || []).includes('retail')){
       try { menuState.retail = await API.call('/retail/catalogus', { supplierCode: code }); } catch(e){}
       try { menuState.retailMijn = await API.call('/retail/mijn', {}); } catch(e){}
+      try { menuState.modeBezorg = (await API.call('/mode/bezorg/mijn', {})).bezorgingen || []; } catch(e){ menuState.modeBezorg = []; }
     }
     renderMenuSheet();
     $('#menu-sheet').classList.add('open');
@@ -3226,7 +3227,14 @@
     // eigen apart-artikelen en stylingvoorstellen bij dit merk
     const apart = (mijn.apart || []).filter(a => a.supplierName === r.supplier.name);
     if (apart.length) html += '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">' + T('rt.m.apart','Voor u apart gelegd') + '</div>' +
-      apart.map(a => '<div style="font-size:0.82rem;margin-top:0.3rem;">' + esc(a.artikelNaam) + ' · ' + esc(a.kleur) + ', ' + esc(a.maat) + ' <span style="color:var(--soft);">(' + T('rt.m.tot','tot') + ' ' + esc(a.tot) + ')</span></div>').join('') + '</div>';
+      apart.map(a => '<div style="font-size:0.82rem;margin-top:0.3rem;">' + esc(a.artikelNaam) + ' · ' + esc(a.kleur) + ', ' + esc(a.maat) + ' <span style="color:var(--soft);">(' + T('rt.m.tot','tot') + ' ' + esc(a.tot) + ')</span></div>').join('') +
+      '<button class="rt-bezorg" style="margin-top:0.55rem;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem;font-weight:600;font-family:inherit;cursor:pointer;">🚚 ' + T('mb.laat','Veilig laten bezorgen') + '</button>' +
+      '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.3rem;">' + T('mb.veiliguitleg','Met bezorgcode, live volgen en pas-aan-de-deur. Dure stukken: ID aan de deur.') + '</div></div>';
+    // lopende bezorgingen van deze winkel
+    const bez = (menuState.modeBezorg || []).filter(b => b.supplierName === r.supplier.name && !['afgeleverd','retour','geannuleerd'].includes(b.status));
+    if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">🚚 ' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
+      '<div style="font-size:0.85rem;margin-top:0.3rem;">' + T('mb.code','Bezorgcode') + ': <b style="letter-spacing:0.2em;font-size:1.05rem;">' + esc(b.bezorgcode) + '</b></div>' +
+      '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + (b.koerier ? T('mb.koerieris','Koerier') + ': ' + esc(b.koerier) + (b.etaMin != null ? ' · ETA ' + b.etaMin + ' min' : '') : T('mb.geefcode','Geef deze code alleen aan de RTG-koerier aan de deur.')) + '</div></div>').join('');
     const styling = (mijn.styling || []).filter(v => v.supplierName === r.supplier.name);
     if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">✨ ' + esc(v.titel) + '</div>' +
       (v.bericht ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + esc(v.bericht) + '</div>' : '') +
@@ -3259,6 +3267,21 @@
   }
   function bindRetailMenu(){
     const code = menuState.supplier.code;
+    const bezBtn = document.querySelector('.rt-bezorg');
+    if (bezBtn) bezBtn.addEventListener('click', async () => {
+      const mijn = menuState.retailMijn || { apart: [] };
+      const items = (mijn.apart || []).filter(a => a.supplierName === menuState.supplier.name)
+        .map(a => ({ naam: a.artikelNaam, maat: a.maat, kleur: a.kleur, prijs: a.price || 0, aantal: 1 }));
+      if (!items.length) return toast(T('mb.geenitems','Geen apart-gelegde stukken om te bezorgen.'));
+      const adres = prompt(T('mb.vraagadres','Op welk adres bezorgen we?'));
+      if (!adres || !adres.trim()) return;
+      try {
+        const r = await API.call('/mode/bezorg/aanvraag', { supplierCode: code, adres: adres.trim(), items });
+        toast('🚚 ' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + r.bezorging.bezorgcode);
+        try { menuState.modeBezorg = (await API.call('/mode/bezorg/mijn', {})).bezorgingen || []; } catch(e){}
+        renderMenuSheet();
+      } catch(e){ toast(e.message); }
+    });
     document.querySelectorAll('[data-rfav]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/retail/wishlist', { code, artikelId: b.dataset.rfav });
@@ -5168,6 +5191,9 @@ window.I18N = { en: {
   'ont.tekenbevestig':'I am 18+ with a verified passport and agree to the safety contract: RTG office may see my live location until the meetup ends, and on SOS watch via the camera and call 112.',
   'bo.h':'Groceries', 'bo.sub':'Order from a wholesaler or supermarket and have it delivered.', 'bo.aantal':'Quantity',
   'bo.bestel':'Have delivered', 'bo.mijn':'My groceries', 'bo.kies':'Enter at least one quantity.', 'bo.ok':'Groceries ordered.',
+  'mb.laat':'Have delivered safely', 'mb.veiliguitleg':'With a delivery code, live tracking and try-at-the-door. High-value: ID at the door.',
+  'mb.onderweg':'Delivery', 'mb.code':'Delivery code', 'mb.koerieris':'Courier', 'mb.geefcode':'Give this code only to the RTG courier at the door.',
+  'mb.geenitems':'No reserved items to deliver.', 'mb.vraagadres':'What address should we deliver to?', 'mb.aangevraagd':'Delivery requested. Code:',
   'app.ms.18':'Alcohol: 18+ only; the venue may ask for ID.',
   'app.ms.18b':'the venue may ask for ID.',
   'app.ms.los':'You order directly from this venue: a separate contract, and your payment goes directly to the venue.',

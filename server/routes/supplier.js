@@ -1967,4 +1967,5 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
   require('./supplier/contract')(kern);
   require('./supplier/vastgoed')(kern);
   require('./supplier/groothandel')(kern);
+  require('./supplier/modebezorg')(kern);
 };

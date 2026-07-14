@@ -55,6 +55,7 @@ const { maakLid } = require('./kern/lid');
 const { MELDING_SCOPES, maakErvaring } = require('./kern/ervaring');
 const { RETAIL_MATEN, RETAIL_SEIZOENEN, maakRetail } = require('./kern/retail');
 const { maakGroothandel } = require('./kern/groothandel');
+const { maakModebezorg } = require('./kern/modebezorg');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -823,6 +824,7 @@ function initRealtime() {
       loc: { lat: 38.907, lng: 1.435, label: 'Carrer Bisbe Azara, Ibiza' }, rate: 0.10,
       menu: [], photos: [],
       settings: { retailDrempel: 3 },
+      modebezorg: { aan: true, straalKm: 15, kosten: 6.5, gratisVanaf: 150, waardegrensId: 250, retourAanDeur: true },
       collecties: [
         { id: c1, naam: 'Riviera', seizoen: 'SS', jaar: 2026, actief: true, at: new Date().toISOString() },
         { id: c2, naam: 'Atelier Noir', seizoen: 'AW', jaar: 2026, actief: true, at: new Date().toISOString() }
@@ -845,6 +847,7 @@ function initRealtime() {
     });
   }
   if (!db.data.retailApart) db.data.retailApart = [];
+  if (!Array.isArray(db.data.modeBezorg)) db.data.modeBezorg = [];   // veilige mode-bezorgingen
   // --- groothandel & markt: B2B naar horeca, boodschappen naar leden, doorverkoop ---
   if (!db.data.supplierTypes.groothandel)
     db.data.supplierTypes.groothandel = { label: 'Groothandel & markt', icon: '📦', caps: ['groothandel', 'bezorgen', 'location', 'pricing'] };
@@ -1606,6 +1609,18 @@ const {
   db, save, crypto, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, anthropic
 });
 
+/* Mode-bezorging (kern/modebezorg.js): een modewinkel zet in een tik een slimme,
+   veilige bezorgdienst op. Veilig voor beide kanten (bezorgcode, foto-bewijs,
+   geverifieerde koerier, live volgen, ID bij dure stukken, retour aan de deur)
+   en efficient (de koerier krijgt de kortste route). */
+const {
+  MODEBEZORG_KETEN, mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht,
+  mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn
+} = maakModebezorg({
+  db, save, crypto, findSupplier, accounts, notify, notifySupplier, sseToCustomer,
+  sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl
+});
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -1938,6 +1953,8 @@ const kern = {
   GROOTHANDEL_FUNCTIES, GROOTHANDEL_CATEGORIEEN, ghIsGroothandel, ghDefaults, ghFunctieAan,
   ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghMarkt, ghPlaatsBestelling,
   ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel,
+  // de mode-bezorging (kern/modebezorg.js)
+  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

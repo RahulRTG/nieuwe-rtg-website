@@ -4,7 +4,7 @@
    te lezen en te testen is. Krijgt de gedeelde kern-onderdelen mee en praat
    nergens rechtstreeks met de buitenwereld. */
 module.exports = (core) => {
-  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam } = core;
+  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media } = core;
 
 function dmSleutel(a, b) { return [a, b].sort().join('|'); }
 function connectieTussen(a, b) {
@@ -224,13 +224,22 @@ function socialGoedkeur(gezinCode, kidHandle, anderHandle, akkoord) {
 /* ---------- snaps en 24-uurs verhalen (Snapchat-achtig) ----------
    Een snap is een foto die je naar een vriend stuurt; die kan hem een keer
    bekijken en dan is hij weg. Een verhaal (story) is 24 uur zichtbaar voor al je
-   vrienden. Foto's zijn kleine data-URL's; alles verloopt vanzelf. */
+   vrienden. De foto's staan NIET als base64 in db.data maar als (versleutelde)
+   bestanden in de mediastore; in db.data blijft alleen een verwijzing (s.foto).
+   Zo groeit het werkgeheugen en elke db-snapshot niet mee met de foto's, en blijft
+   de kijk-een-keer-belofte hard: bij het openen leest de server het bestand,
+   geeft het eenmalig terug en gooit het weg. */
 const SNAP_TTL = 24 * 60 * 60 * 1000;   // een niet-bekeken snap verloopt na 24 uur
 const STORY_TTL = 24 * 60 * 60 * 1000;
 function geldigeFoto(s) { return typeof s === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(s) && s.length <= 900 * 1024; }
+// De foto-verwijzing van een snap/verhaal wissen (het bestand op schijf weg).
+function wisFoto(item) { if (item && item.foto && media) media.verwijder(item.foto); }
 function opschonenSnaps() {
   const nu = Date.now();
   const voor = db.data.snaps.length + db.data.stories.length;
+  const dodeSnaps = db.data.snaps.filter(s => s.bekeken || (nu - new Date(s.at).getTime()) >= SNAP_TTL);
+  const dodeStories = db.data.stories.filter(s => (nu - new Date(s.at).getTime()) >= STORY_TTL);
+  dodeSnaps.forEach(wisFoto); dodeStories.forEach(wisFoto);   // ook de bestanden opruimen
   db.data.snaps = db.data.snaps.filter(s => !s.bekeken && (nu - new Date(s.at).getTime()) < SNAP_TTL);
   db.data.stories = db.data.stories.filter(s => (nu - new Date(s.at).getTime()) < STORY_TTL);
   if (voor !== db.data.snaps.length + db.data.stories.length) save();
@@ -240,9 +249,13 @@ function snapSturen(van, naar, foto, tekst) {
   if (!zijnVrienden(van, naar)) return { status: 403, error: 'Je kunt alleen snappen naar een vriend.' };
   if (!sociaalRate(van, 'snap', 40, 5 * 60 * 1000)) return { status: 429, error: 'Rustig aan met snaps sturen.' };
   if (!geldigeFoto(foto)) return { status: 400, error: 'Kies een foto (max ~900 kB).' };
-  const snap = { id: crypto.randomBytes(5).toString('hex'), van, naar, foto, tekst: String(tekst || '').replace(/[<>]/g, '').slice(0, 120), at: new Date().toISOString(), bekeken: false };
+  // De foto als bestand bewaren; in db.data komt alleen de verwijzing.
+  const ref = media.bewaar(foto, 900 * 1024);
+  if (!ref) return { status: 400, error: 'De foto kon niet worden opgeslagen.' };
+  const snap = { id: crypto.randomBytes(5).toString('hex'), van, naar, foto: ref, tekst: String(tekst || '').replace(/[<>]/g, '').slice(0, 120), at: new Date().toISOString(), bekeken: false };
   db.data.snaps.push(snap);
-  db.data.snaps = db.data.snaps.slice(-2000);
+  // over de bovengrens? de oudste (weggeknipte) snaps ook van schijf halen
+  if (db.data.snaps.length > 2000) { db.data.snaps.slice(0, db.data.snaps.length - 2000).forEach(wisFoto); db.data.snaps = db.data.snaps.slice(-2000); }
   save();
   sseToCustomer(naar, 'social', { kind: 'snap', from: codenaamVan(van) });
   return { status: 200, ok: true };
@@ -253,22 +266,25 @@ function snapsVoor(mij) {
   return db.data.snaps.filter(s => s.naar === mij && !s.bekeken)
     .map(s => ({ id: s.id, van: codenaamVan(s.van), at: s.at, tekst: s.tekst }));
 }
-// een snap openen: geef de foto terug en markeer als bekeken (verdwijnt daarna)
+// een snap openen: lees het bestand, geef de foto eenmalig terug als data-URL en
+// gooi zowel de snap als het bestand meteen weg (kijk-een-keer).
 function snapOpenen(mij, id) {
   const s = db.data.snaps.find(x => x.id === id && x.naar === mij && !x.bekeken);
   if (!s) return { status: 404, error: 'Deze snap is er niet meer.' };
-  s.bekeken = true; s.bekekenAt = new Date().toISOString();
-  const foto = s.foto, tekst = s.tekst, van = codenaamVan(s.van);
-  // meteen weg: na bekijken bewaren we de foto niet
+  const foto = media.leesDataUrl(s.foto), tekst = s.tekst, van = codenaamVan(s.van);
+  wisFoto(s); // het bestand meteen weg: na bekijken bewaren we de foto niet
   db.data.snaps = db.data.snaps.filter(x => x.id !== id);
   save();
   return { status: 200, foto, tekst, van };
 }
 function verhaalPlaatsen(van, foto, tekst) {
   if (!geldigeFoto(foto)) return { status: 400, error: 'Kies een foto (max ~900 kB).' };
+  const ref = media.bewaar(foto, 900 * 1024);
+  if (!ref) return { status: 400, error: 'De foto kon niet worden opgeslagen.' };
+  db.data.stories.filter(s => s.van === van).forEach(wisFoto);   // oud verhaal-bestand weg
   db.data.stories = db.data.stories.filter(s => !(s.van === van)); // een verhaal per persoon tegelijk (het nieuwste)
-  db.data.stories.push({ id: crypto.randomBytes(5).toString('hex'), van, foto, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), kijkers: [] });
-  db.data.stories = db.data.stories.slice(-1000);
+  db.data.stories.push({ id: crypto.randomBytes(5).toString('hex'), van, foto: ref, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), kijkers: [] });
+  if (db.data.stories.length > 1000) { db.data.stories.slice(0, db.data.stories.length - 1000).forEach(wisFoto); db.data.stories = db.data.stories.slice(-1000); }
   save();
   return { status: 200, ok: true };
 }
@@ -284,7 +300,7 @@ function verhaalBekijken(mij, id) {
   const s = db.data.stories.find(x => x.id === id);
   if (!s || (s.van !== mij && !zijnVrienden(mij, s.van))) return { status: 404, error: 'Dit verhaal is er niet meer.' };
   if (!s.kijkers.includes(mij)) { s.kijkers.push(mij); save(); }
-  return { status: 200, foto: s.foto, tekst: s.tekst, van: codenaamVan(s.van), at: s.at };
+  return { status: 200, foto: media.leesDataUrl(s.foto), tekst: s.tekst, van: codenaamVan(s.van), at: s.at };
 }
 
   return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken };

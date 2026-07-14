@@ -6,7 +6,7 @@ module.exports = (kern) => {
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
     cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
-    zaakBoard, zaakZet, zaakFunctieAan, klantSalon,
+    zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten } = kern;
 
 // De Salon is verplicht: publiceren (post/folder/deal/poll) kan pas met een
@@ -199,7 +199,10 @@ app.post('/api/supplier/photo/add', express.json({ limit: '6mb' }), supplierAuth
   if (img.length > 1.5 * 1024 * 1024) return res.status(413).json({ error: 'Foto te groot (max ~1 MB).' });
   req.supplier.photos = req.supplier.photos || [];
   if (req.supplier.photos.length >= 6) return res.status(409).json({ error: 'Maximaal 6 foto\'s. Verwijder er eerst een.' });
-  req.supplier.photos.push(img);
+  // Bewaar de foto als bestand op schijf; in db.data komt alleen de /media-URL.
+  const ref = media.bewaarPubliek(img, 1.5 * 1024 * 1024);
+  if (!ref) return res.status(400).json({ error: 'Foto kon niet worden opgeslagen.' });
+  req.supplier.photos.push(ref);
   save();
   logActivity(req.supplier.code, req.actor, 'plaatste een foto op de pagina');
   broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
@@ -223,8 +226,10 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
   if (!text) return res.status(400).json({ error: 'Schrijf eerst een tekst.' });
   let photo = null;
   const pi = parseInt(req.body.photoIndex, 10);
+  // Een bestaande pagina-foto is al een /media-verwijzing; een nieuwe upload
+  // bewaren we als bestand en verwijzen we naar (nooit base64 in db.data).
   if (Number.isInteger(pi) && req.supplier.photos && req.supplier.photos[pi]) photo = req.supplier.photos[pi];
-  else if (typeof req.body.image === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(req.body.image) && req.body.image.length <= 1.5 * 1024 * 1024) photo = req.body.image;
+  else if (typeof req.body.image === 'string') photo = media.bewaarPubliek(req.body.image, 1.5 * 1024 * 1024);
   const post = {
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
@@ -310,8 +315,12 @@ app.post('/api/supplier/salon/bio', express.json({ limit: '2mb' }), supplierAuth
   const s = req.supplier;
   s.salon = s.salon || { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
   if (req.body.bio != null) s.salon.bio = schoon(req.body.bio, 200);
-  // een profielfoto (etalage-omslag) mag mee; leeg laten wist hem niet
-  if (typeof req.body.foto === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(req.body.foto) && req.body.foto.length <= 1.5 * 1024 * 1024) s.salon.foto = req.body.foto;
+  // een profielfoto (etalage-omslag) mag mee; leeg laten wist hem niet. De foto
+  // gaat als bestand naar de mediastore; in db.data staat alleen de /media-URL.
+  if (typeof req.body.foto === 'string' && req.body.foto.startsWith('data:image/')) {
+    const ref = media.bewaarPubliek(req.body.foto, 1.5 * 1024 * 1024);
+    if (ref) s.salon.foto = ref;
+  }
   save();
   logActivity(s.code, req.actor, 'werkte het Salon-profiel bij');
   res.json({ ok: true, salon: { bio: s.salon.bio, foto: s.salon.foto || null, volgers: s.salon.volgers.length }, compleet: salonProfielCompleet(s) });
@@ -345,9 +354,11 @@ app.post('/api/supplier/salon/folder', express.json({ limit: '8mb' }), supplierA
   if (!eisSalonProfiel(req, res)) return;
   const titel = schoon(req.body.titel, 80);
   if (!titel) return res.status(400).json({ error: 'Geef de folder een titel.' });
+  // elke folderfoto als bestand bewaren; in db.data alleen de /media-URL's
   const fotos = (Array.isArray(req.body.fotos) ? req.body.fotos : [])
-    .filter(f => typeof f === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(f) && f.length <= 1.5 * 1024 * 1024)
-    .slice(0, 8);
+    .slice(0, 8)
+    .map(f => media.bewaarPubliek(f, 1.5 * 1024 * 1024))
+    .filter(Boolean);
   const items = (Array.isArray(req.body.items) ? req.body.items : []).slice(0, 30).map(it => ({
     naam: schoon(it.naam, 80), prijs: it.prijs != null && it.prijs !== '' ? Math.max(0, Number(it.prijs) || 0) : null, tekst: schoon(it.tekst, 120)
   })).filter(it => it.naam);

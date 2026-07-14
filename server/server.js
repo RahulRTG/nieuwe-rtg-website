@@ -1320,6 +1320,20 @@ app.post('/api/cluster/:actie', (req, res) => {
    het zo kort mogelijk, en gebruik bij voorkeur een gecertificeerde KYC-dienst. */
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 
+/* Mediastore: Salon-foto's en snaps staan als losse (versleutelde) bestanden op
+   schijf, niet als base64 in db.data. Zo blijft het werkgeheugen en elke snapshot
+   klein, hoeveel er ook gepost wordt. De publieke Salon-foto's worden via de
+   /media-route uitgeserveerd; snaps komen alleen eenmalig als data-URL terug. */
+const media = require('./media').maakMedia({ dir: DATA_DIR });
+app.get('/media/:naam', (req, res) => media.serveer(req, res));
+// Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de
+// mediastore, zodat ook oude data het geheugen niet meer belast. Alleen de
+// schrijver migreert; idempotent, dus veilig bij elke start.
+if (db.writable) {
+  try { const n = media.migreerDb(db); if (n > 0) { save(); console.log('[media] ' + n + ' bestaande foto(s) naar de mediastore verplaatst.'); } }
+  catch (e) { console.warn('[media] migratie overgeslagen:', e.message); }
+}
+
 /* Een versleuteld geupload bestand (identiteitsbewijs/selfie) ontsleutelen en
    als data-URL teruggeven, zodat de paspoortlaag een goedgekeurde inzage kan
    tonen. Geen padtraversal: alleen de kale bestandsnaam telt. */
@@ -1392,7 +1406,7 @@ function eisAccount(req, res) {
    alleen het signaleringskanaal en ziet nooit beeld of geluid). */
 
 // De sociale kern (vrienden, veiligheid, snaps) zit in server/kern/sociaal.js.
-const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam });
+const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media });
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
 } = sociaal;
@@ -2127,7 +2141,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,

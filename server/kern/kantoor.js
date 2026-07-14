@@ -60,10 +60,31 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     const fonds = db.data.invoices
       .filter(i => (i.status === 'paid' || i.status === 'betaald') && /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(i.desc || ''))
       .reduce((s2, i) => s2 + Math.round((i.bijdrage || 0) / 1.21 * 0.3), 0);
+    // Het echte afdracht-grootboek (kern/fonds.js boekt hier per betaling): wat is
+    // al gereserveerd, en staat het klaar om uit te betalen of wacht het nog op
+    // het IBAN? Bedragen in centen -> euro's.
+    const afdrachten = Array.isArray(db.data.fondsAfdrachten) ? db.data.fondsAfdrachten : [];
+    let afTotaal = 0, afTeStorten = 0, afIngepland = 0, afGestort = 0;
+    for (const a of afdrachten) {
+      const c = a.centen || 0;
+      afTotaal += c;
+      if (a.status === 'gestort') afGestort += c;
+      else if (a.status === 'ingepland') afIngepland += c;
+      else afTeStorten += c;
+    }
+    const fondsAfdracht = {
+      aantal: afdrachten.length,
+      totaal: Math.round(afTotaal) / 100,
+      teStorten: Math.round(afTeStorten) / 100,
+      ingepland: Math.round(afIngepland) / 100,
+      gestort: Math.round(afGestort) / 100,
+      iban: (process.env.RTF_IBAN || '').trim(),
+      begunstigde: (process.env.RTF_BEGUNSTIGDE || 'Stichting RTFoundation').trim()
+    };
     const stats = {
       omzetVandaag: week[6].omzet, aantalVandaag: week[6].aantal,
       omzetWeek: week.reduce((s2, d) => s2 + d.omzet, 0),
-      foundation: fonds, liveNu: live.length
+      foundation: fonds, fondsAfdracht, liveNu: live.length
     };
     /* Partnerprestaties: NIET per zaak over alle orders filteren (dat is
        O(zaken x orders) en loopt met miljoenen restaurants volledig vast).

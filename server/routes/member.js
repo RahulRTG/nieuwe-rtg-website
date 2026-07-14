@@ -14,7 +14,7 @@ module.exports = (kern) => {
     ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer,
     mbAanvraag, mbMijn,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
-    zorgContact,
+    zorgContact, fonds,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -119,7 +119,15 @@ app.post('/api/pay', auth, async (req, res) => {
       inv.status = 'paid';
       inv.date = 'Zojuist betaald';
       inv.betaalId = uitslag.id;
-      if (/lidmaatschap|jaarbijdrage|maandbijdrage/i.test(inv.desc || '')) foundation += Math.round((inv.bijdrage || 0) / 1.21 * 0.3 * 100) / 100; // 30% van de abonnementsbijdrage (ex btw); boekingen dragen niets af
+      // Vaste 30%-afdracht aan de RTFoundation: bij elke bevestigde maandbetaling
+      // splitsen we het foundation-deel meteen af en zetten het (zodra het IBAN
+      // bekend is) als uitbetaling weg. Boekingen dragen niets af; alleen
+      // abonnementen. fonds.boekAfdracht is idempotent per factuur.
+      if (fonds.isAbonnement(inv.desc)) {
+        foundation += fonds.aandeelEuro(inv.bijdrage);
+        try { await fonds.boekAfdracht({ invoiceId: inv.id, wie, bijdrage: inv.bijdrage, betaalId: uitslag.id, omschrijving: inv.desc }); }
+        catch (e) { /* afdracht mag de betaling nooit blokkeren; ledger vangt het later op */ }
+      }
       for (const item of (md.trip ? md.trip.items : [])) {
         if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
       }

@@ -60,6 +60,7 @@ const { maakZaak } = require('./kern/zaak');
 const { maakAutoverkoop } = require('./kern/autoverkoop');
 const { maakBeveiliging } = require('./kern/beveiliging');
 const { maakDirectpay } = require('./kern/directpay');
+const { maakFonds } = require('./kern/fonds');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -1725,6 +1726,12 @@ const {
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten
 } = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity });
 
+/* De RTFoundation-afdracht (kern/fonds.js): van elke bevestigde maandbetaling
+   van een klant gaat automatisch 30% (ex btw) naar de foundation. De afdracht
+   wordt op het betaalmoment geboekt en, zodra het IBAN in de omgeving staat,
+   via de betaal-naad als uitbetaling ingepland. */
+const fonds = maakFonds({ db, save, betaal, log, env: process.env });
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -2076,6 +2083,8 @@ const kern = {
   // de directe-betaallaag (kern/directpay.js)
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten,
+  // de RTFoundation-afdracht (kern/fonds.js)
+  fonds,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

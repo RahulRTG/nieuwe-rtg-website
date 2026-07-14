@@ -63,6 +63,42 @@ async function maakBetaling(opdracht) {
   return res;
 }
 
+/* Start (of hervind) een uitbetaling naar een externe bankrekening (SEPA).
+   Gebruikt voor de vaste 30%-afdracht aan de RTFoundation: RTG ontvangt de
+   maandbetaling en betaalt het foundation-deel meteen door naar het IBAN.
+
+   - Zonder IBAN kan er niets weg: status 'te_storten' (gereserveerd, wacht op de
+     rekening). Zodra het IBAN bekend is, wordt de afdracht wel ingepland.
+   - Met Stripe en een IBAN zou hier een echte payout ontstaan; die staat achter
+     dezelfde naad zodat de rest van de code niet verandert als het live gaat.
+   - Idempotent op sleutel: dezelfde afdracht wordt nooit twee keer weggezet. */
+async function maakUitbetaling(opdracht) {
+  const { bedrag, valuta = 'eur', iban, begunstigde, referentie, idempotentieSleutel, omschrijving } = opdracht || {};
+  if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Bedrag moet een positief bedrag in centen zijn.');
+  const sleutel = 'uit:' + (idempotentieSleutel || referentie || crypto.randomUUID());
+
+  const bestaand = haalOp(sleutel);
+  if (bestaand) return Object.assign({}, bestaand, { herhaald: true });
+
+  let res;
+  if (!iban) {
+    // Geen bestemming bekend: reserveren, niet versturen.
+    res = { id: 'wacht_' + crypto.randomBytes(6).toString('hex'), status: 'te_storten', aanbieder: AANBIEDER, bedrag: Math.round(bedrag), valuta, referentie, iban: '' };
+  } else if (stripe) {
+    // In productie zou hier een Stripe-payout/transfer staan naar de bankrekening
+    // van de foundation. Achter de naad, zodat live gaan niets anders raakt.
+    const po = await stripe.payouts.create(
+      { amount: Math.round(bedrag), currency: valuta, description: omschrijving, metadata: { referentie: referentie || '', iban } },
+      { idempotencyKey: sleutel }
+    );
+    res = { id: po.id, status: po.status || 'ingepland', aanbieder: 'stripe', bedrag: Math.round(bedrag), valuta, referentie, iban };
+  } else {
+    res = { id: 'demo_uit_' + crypto.randomBytes(8).toString('hex'), status: 'ingepland', aanbieder: 'demo', bedrag: Math.round(bedrag), valuta, referentie, iban };
+  }
+  bewaar(sleutel, res);
+  return res;
+}
+
 /* Verifieer een inkomende provider-webhook en geef de gebeurtenis terug.
    - Stripe met secret: officiële handtekeningcontrole (gooit bij twijfel).
    - Demo met secret: HMAC-SHA256 over de ruwe body, constant-tijd vergeleken.
@@ -90,4 +126,4 @@ function tekenDemo(ruweBody) {
   return crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
 }
 
-module.exports = { AANBIEDER, maakBetaling, verifieerWebhook, koppelStore, tekenDemo, WEBHOOK_SECRET };
+module.exports = { AANBIEDER, maakBetaling, maakUitbetaling, verifieerWebhook, koppelStore, tekenDemo, WEBHOOK_SECRET };

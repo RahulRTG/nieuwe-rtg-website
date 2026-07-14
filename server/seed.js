@@ -126,6 +126,9 @@ module.exports = function seed() {
       }
     ],
     bookings: [],
+    // Grootboek van de 30%-afdrachten aan de RTFoundation (kern/fonds.js boekt
+    // hier per bevestigde maandbetaling; leeg tot de eerste betaling).
+    fondsAfdrachten: [],
 
     /* ---------- leveranciers ----------
        De leverancier-app is één app die zich aanpast aan het type. Elk type

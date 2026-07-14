@@ -741,6 +741,7 @@
   .ms-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
   .ms-head span{display:block;font-size:0.68rem;color:var(--soft);margin-top:0.15rem;}
   .ms-close{background:none;border:none;color:var(--muted);font-size:1rem;}
+  .pc-salon{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:0.25rem 0.7rem;font-size:0.72rem;font-weight:600;margin-left:auto;margin-right:0.5rem;white-space:nowrap;}
   .ms-body{flex:1;overflow-y:auto;padding:0.5rem 1.25rem 1rem;}
   .ms-cat{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin:1rem 0 0.4rem;}
   .ms-item{padding:0.8rem 0;border-bottom:1px solid var(--line);display:flex;gap:0.8rem;align-items:flex-start;}
@@ -1041,6 +1042,7 @@
   <div id="pchat-sheet" class="menu-sheet">
     <div class="ms-head">
       <div><b id="pcName"></b><span data-i18n="app.pc.sub">Rechtstreeks contact, op uw codenaam</span></div>
+      <button class="pc-salon" id="pcSalon" data-i18n="app.pc.salon">Bekijk Salon</button>
       <button class="ms-close" id="pcClose" aria-label="Sluiten">✕</button>
     </div>
     <div class="pc-depts" id="pcDepts"></div>
@@ -3626,6 +3628,8 @@
   }
   $('#pcClose').addEventListener('click', closePChat);
   $('#pchat-scrim').addEventListener('click', closePChat);
+  // vooraf al op elkaars Salon kijken: nooit vreemden van elkaar
+  $('#pcSalon').addEventListener('click', () => { if (pchat) openEtalage(pchat.code); });
   $('#pcSend').addEventListener('click', sendPChat);
   $('#pcInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendPChat(); });
   // De gast vraagt zelf om aandacht: het team krijgt meteen een prioriteitsmelding.

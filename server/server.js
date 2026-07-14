@@ -1577,7 +1577,7 @@ const { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, chatStuur, mel
    blijven hierboven. HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES en
    ZAAK_OPTIES komen als directe export uit dezelfde module. */
 const {
-  publicTrip, deptsFor, chatKeyOf, getChat, validDept, publicSupplier, magBezorgen,
+  publicTrip, deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen,
   ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor,
   makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor, supplierState
 } = maakLeverancier({
@@ -1968,6 +1968,7 @@ const kern = {
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, trChat, trustVan, unlockDoor, urenVan, validDept,
+  zorgContact, klantSalon,
   webpush, weekdagFactor, werkgeverSollicitatie,
   // de ervaring-laag (kern/ervaring.js)
   MELDING_SCOPES, reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,

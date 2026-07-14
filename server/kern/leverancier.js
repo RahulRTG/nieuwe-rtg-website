@@ -54,6 +54,43 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
     return list.includes(dept) ? dept : list[0];
   }
 
+  /* Zodra een klant in contact komt met een partner (boekt, bestelt, huurt,
+     koopt of gewoon de etalage bekijkt) openen we automatisch een chatlijn.
+     Zo zijn ze nooit vreemden: beiden kunnen elkaars Salon bekijken en direct
+     appen. Idempotent: de lijn wordt maar een keer aangemaakt. */
+  function zorgContact(s, customerKey, codename, tier) {
+    if (!s || !customerKey || String(customerKey).startsWith('rtf:')) return null;
+    const k = chatKeyOf(s.code, customerKey, 'Team');
+    const bestond = !!db.data.guestChats[k];
+    const chat = getChat(s, customerKey, codename || customerKey, tier || 'rtg', 'Team');
+    chat.open = true;
+    if (codename) chat.codename = codename;
+    if (tier) chat.tier = tier;
+    if (!bestond) {
+      chat.messages.push({ from: 'systeem', text: 'U heeft nu een open lijn met ' + s.name + '. Bekijk gerust elkaars Salon; zo bent u geen vreemden van elkaar.', at: new Date().toISOString() });
+      chat.lastAt = new Date().toISOString();
+      try { save(); } catch (e) {}
+      try { notify(tier || 'rtg', { icon: '💬', title: 'Open lijn met ' + s.name, body: 'U kunt nu direct met deze partner appen en elkaars Salon bekijken.', scope: 'gchat' }); } catch (e) {}
+      try { sseToCustomer(customerKey, 'sync', { scope: 'gchat' }); } catch (e) {}
+      try { sseToSupplier(s.code, 'sync', { scope: 'gchat' }); } catch (e) {}
+    }
+    return chat;
+  }
+
+  /* De Salon van een klant zoals de partner die ziet: privacy-first, dus alleen
+     de codenaam, de pas en de eigen Salon-posts van het lid (nooit de echte
+     naam). Zo kan de partner vooraf al kennismaken. */
+  function klantSalon(key) {
+    let codename = key, tier = 'rtg';
+    const dir = (db.data.memberDir || {})[key];
+    if (dir) { codename = dir.codename || key; tier = dir.tier || tier; }
+    // val terug op een lopende chat voor de codenaam als de gids hem niet kent
+    if (!dir) { for (const c of Object.values(db.data.guestChats || {})) if (c.customerKey === key) { codename = c.codename || codename; tier = c.tier || tier; break; } }
+    const posts = (db.data.posts || []).filter(p => !p.partner && p.author === codename)
+      .slice(0, 12).map(p => ({ text: String(p.text || '').slice(0, 200), place: p.place || '', photo: p.photo || null, at: p.at || null }));
+    return { codename, tier, posts };
+  }
+
   // publieke weergave van een leverancier (voor de klant)
   function publicSupplier(s, lang) {
     const t = db.data.supplierTypes[s.type] || {};
@@ -327,7 +364,7 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
   }
 
   return {
-    publicTrip, deptsFor, chatKeyOf, getChat, validDept, publicSupplier, magBezorgen,
+    publicTrip, deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen,
     ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor,
     makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor, supplierState
   };

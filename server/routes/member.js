@@ -13,9 +13,19 @@ module.exports = (kern) => {
     ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer,
     mbAanvraag, mbMijn,
-    avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals } = kern;
+    avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
+    zorgContact } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
+
+  /* Zodra een lid echt in contact komt met een partner (boekt, bestelt, huurt,
+     koopt, laat bezorgen of gaat de partner volgen) openen we automatisch een
+     open chatlijn. Zo zijn ze nooit vreemden en kunnen ze vooraf elkaars Salon
+     bekijken. Idempotent en stil voor gasten (die hebben geen ledenchat). */
+  const openLijn = (s, req) => {
+    if (!s || req.session.tier === 'guest') return;
+    try { zorgContact(s, req.session.key, liveCodename(req.session), req.session.tier); } catch (e) {}
+  };
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
 
@@ -251,7 +261,7 @@ app.post('/api/salon/volg', auth, (req, res) => {
   s.salon = s.salon || { bio: '', volgers: [], sinds: new Date().toISOString() };
   const i = s.salon.volgers.indexOf(req.session.key);
   if (i >= 0) s.salon.volgers.splice(i, 1);
-  else s.salon.volgers.push(req.session.key);
+  else { s.salon.volgers.push(req.session.key); openLijn(s, req); }
   save();
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
   res.json({ ok: true, volgIk: i < 0, volgers: s.salon.volgers.length });
@@ -263,6 +273,7 @@ app.post('/api/salon/profiel', auth, (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s || !salonZichtbaar(s)) return res.status(404).json({ error: 'Partner niet gevonden.' });
   const key = req.session.key;
+  openLijn(s, req); // vanaf nu geen vreemden meer: open lijn zodra je de Salon bekijkt
   const t = db.data.supplierTypes[s.type] || {};
   const eigen = db.data.posts.filter(p => p.partnerCode === s.code);
   const claimVan = p => (p.deal && (p.deal.claims || []).find(c => c.key === key)) || null;
@@ -737,6 +748,7 @@ app.post('/api/booking/pay', auth, (req, res) => {
   b.paidAt = new Date().toISOString();
   if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
   verdienPunten(req.session.key, (b.price || 0) - kortingB, b.supplierName);
+  openLijn(findSupplier(b.supplierCode), req);
   save();
   notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
   sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
@@ -905,6 +917,7 @@ app.post('/api/order', auth, (req, res) => {
     status: vooraf ? 'wacht-op-betaling' : 'nieuw', paid: false, at: new Date().toISOString()
   };
   db.data.orders.unshift(order);
+  openLijn(s, req);
   save();
   if (!vooraf) {
     notifySupplier(s.code, { icon: '\u{1F6CE}️', title: 'Nieuwe bestelling (betaling achteraf)', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
@@ -1385,6 +1398,7 @@ app.post('/api/huur/boek', auth, (req, res) => {
   };
   db.data.boekingen.unshift(huur);
   db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  openLijn(s, req);
   save();
   res.json({ ok: true, huur }); // afrekenen via /api/booking/pay: de prijs staat VAST
 });
@@ -1523,6 +1537,7 @@ app.post('/api/charter/boek', auth, (req, res) => {
   };
   db.data.boekingen.unshift(charter);
   db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  openLijn(s, req);
   save();
   res.json({ ok: true, charter }); // afrekenen via /api/booking/pay: de prijs staat VAST
 });
@@ -1667,12 +1682,14 @@ app.post('/api/verkoop/showroom', auth, (req, res) => {
 app.post('/api/verkoop/proefrit', auth, (req, res) => {
   const r = avProefrit(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), String(req.body.autoId || ''), req.body.wens);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  openLijn(findSupplier(req.body.supplierCode), req);
   res.json({ ok: true, deal: r.deal });
 });
 app.post('/api/verkoop/koop', auth, (req, res) => {
   const r = avKoop(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), String(req.body.autoId || ''),
     { bod: req.body.bod, inruil: req.body.inruil, concierge: req.body.concierge === true, adres: req.body.adres });
   if (r.error) return res.status(r.status).json({ error: r.error });
+  openLijn(findSupplier(req.body.supplierCode), req);
   res.json({ ok: true, deal: r.deal });
 });
 app.post('/api/verkoop/inruil', auth, (req, res) => {
@@ -1697,6 +1714,7 @@ app.post('/api/mode/bezorg/aanvraag', auth, express.json({ limit: '1mb' }), (req
   const r = mbAanvraag(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), req.body.items,
     { adres: req.body.adres, lat: req.body.lat, lng: req.body.lng });
   if (r.error) return res.status(r.status).json({ error: r.error });
+  openLijn(findSupplier(req.body.supplierCode), req);
   res.json({ ok: true, bezorging: r.bezorging });
 });
 app.post('/api/mode/bezorg/mijn', auth, (req, res) => {
@@ -1713,6 +1731,7 @@ app.post('/api/groothandel/bestel', auth, (req, res) => {
   const koper = { soort: 'lid', id: req.session.key, naam: liveCodename(req.session) };
   const r = ghPlaatsBestelling(String(req.body.groothandelCode || ''), koper, req.body.regels, { bezorgen: req.body.bezorgen !== false });
   if (r.error) return res.status(r.status).json({ error: r.error });
+  openLijn(findSupplier(req.body.groothandelCode), req);
   res.json({ ok: true, order: r.order });
 });
 app.post('/api/groothandel/mijn', auth, (req, res) => {

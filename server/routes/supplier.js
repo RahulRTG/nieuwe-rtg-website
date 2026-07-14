@@ -6,7 +6,7 @@ module.exports = (kern) => {
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
     cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
-    zaakBoard, zaakZet, zaakFunctieAan } = kern;
+    zaakBoard, zaakZet, zaakFunctieAan, klantSalon } = kern;
 
 // De Salon is verplicht: publiceren (post/folder/deal/poll) kan pas met een
 // compleet profiel (bio + foto). De bio/foto-endpoints zelf blijven altijd open.
@@ -576,6 +576,16 @@ app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   if (chat.unreadPartner) { chat.unreadPartner = 0; save(); }
   trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ messages, codename: chat.codename }));
+});
+
+/* De Salon van de klant zoals de partner die vooraf mag zien: privacy-first,
+   dus alleen de codenaam, de pas en de eigen Salon-posts (nooit de echte naam).
+   Zo bent u geen vreemden van elkaar. Alleen op te vragen als er echt een open
+   lijn met deze klant is (het gesprek moet bij deze zaak horen). */
+app.post('/api/supplier/klant/salon', supplierAuth, (req, res) => {
+  const chat = db.data.guestChats[String(req.body.key || '')];
+  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
+  res.json(klantSalon(chat.customerKey));
 });
 
 app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {

@@ -600,6 +600,11 @@
         <p class="sub" data-i18n="sup.v.inkoop.sub">Bestel voorraad bij een groothandel, of laat de AI op basis van uw verkoop en mise-en-place een bijbestelling voorstellen.</p>
         <div id="inkoopWrap"></div>
       </div>
+      <div class="view" data-view="boardroom">
+        <h2 data-i18n="sup.v.boardroom">Boardroom</h2>
+        <p class="sub" data-i18n="sup.v.boardroom.sub">Uw eigen schakelkast: zet functies aan of uit, en zie in een oogopslag uw HR en marketing.</p>
+        <div id="boardroomWrap"></div>
+      </div>
       <div class="view" data-view="paspoort">
         <h2 data-i18n="sup.v.paspoort">Identiteit &amp; leeftijd</h2>
         <p class="sub" data-i18n="sup.v.paspoort.sub">Controleer de identiteit of leeftijd achter een codenaam. De gast krijgt een melding en kan een ID-kaart of paspoort weigeren; alleen de ja/nee-bevestiging is altijd beschikbaar.</p>
@@ -759,6 +764,7 @@
     charter:  { label:'Charter',   svg:'<path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/><path d="M3 20c1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0"/>', cap:'charter' },
     groothandel:{ label:'Groothandel', svg:'<rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M3 8l2-4h14l2 4"/><path d="M10 12h4"/>', cap:'groothandel' },
     inkoop:   { label:'Inkoop',    svg:'<circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M2 3h3l2.2 12.3a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>', cap:'menu' },
+    boardroom:{ label:'Boardroom', svg:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 20h10M12 18v2"/><path d="M7 12l2.5-2.5L12 12l3-3 2 2"/>' },
     paspoort: { label:'Identiteit', svg:'<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="10" r="2.4"/><path d="M8 16c0.5-2 2.2-3 4-3s3.5 1 4 3"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
@@ -3155,6 +3161,38 @@
         '<button data-mbretour="'+b.ref+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.75rem;">'+T('mb.retour','Retour')+'</button></div>' : '')+'</div>';
   }
 
+  // ---- de eigen mini-boardroom van de zaak: functies + HR + marketing ----
+  async function renderZaakBoard(){
+    const el = $('#boardroomWrap'); if (!el) return;
+    let d; try { d = await API.call('/supplier/zaak/board'); } catch(e){ return; }
+    let h = '<div class="st-sec">'+T('zb.functies','Functies (aan/uit)')+'</div><div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">'+
+      (d.functies||[]).map(f => '<button class="js-zbf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--rood)')+';background:'+(f.aan?'#12321f':'#3a1420')+';color:'+(f.aan?'#7EE0A3':'#F4B8C6')+';border-radius:999px;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.aan?'● ':'○ ')+esc(f.naam)+'</button>').join('')+
+      '</div>';
+    // HR
+    const hr = d.hr || {};
+    h += '<div class="st-sec">👥 '+T('zb.hr','HR')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.6rem;">'+
+      zbCel(hr.teamAantal||0, T('zb.team','Team'))+zbCel(hr.ingeklokt||0, T('zb.ingeklokt','Ingeklokt'))+
+      zbCel(hr.openVerlof||0, T('zb.verlof','Verlof/ziek'), hr.openVerlof)+zbCel(hr.openSollicitaties||0, T('zb.soll','Sollicitaties'), hr.openSollicitaties)+
+      zbCel(hr.openVacatures||0, T('zb.vac','Vacatures'))+'</div>'+
+      '<button class="js-zbnaar" data-tab="team" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-size:0.75rem;font-family:inherit;margin-bottom:1rem;">'+T('zb.naarteam','Naar het team ›')+'</button>';
+    // Marketing
+    const mk = d.marketing || {};
+    h += '<div class="st-sec">📣 '+T('zb.marketing','Marketing (De Salon)')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
+      zbCel(mk.volgers||0, T('zb.volgers','Volgers'))+zbCel(mk.posts||0, T('zb.posts','Posts'))+
+      zbCel(mk.lopendeDeal?1:0, T('zb.deal','Actie'))+zbCel(mk.lopendePoll?1:0, T('zb.poll','Poll'))+'</div>'+
+      '<div class="sub" style="margin-bottom:0.4rem;">'+(mk.salonActief? (mk.bioIngevuld&&mk.fotoIngevuld ? '✓ '+T('zb.compleet','profiel compleet, zichtbaar voor leden') : '⚠️ '+T('zb.onvolledig','profiel onvolledig, nog niet zichtbaar')) : '○ '+T('zb.salonuit','Salon-marketing staat uit'))+'</div>'+
+      (mk.laatstePost? '<div class="sub">'+T('zb.laatste','Laatste post')+': '+esc(mk.laatstePost.text)+'</div>' : '')+
+      '<button class="js-zbnaar" data-tab="page" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-size:0.75rem;font-family:inherit;margin-top:0.5rem;">'+T('zb.naarsalon','Naar De Salon ›')+'</button>';
+    el.innerHTML = h;
+    el.querySelectorAll('.js-zbf').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/zaak/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); await refresh(); renderZaakBoard(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.js-zbnaar').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
+  }
+  function zbCel(n, label, waarschuw){
+    return '<div class="b" style="flex:1;min-width:4.5rem;"><div class="v'+(waarschuw?' a':'')+'">'+n+'</div><div class="l">'+label+'</div></div>';
+  }
+
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
@@ -3171,7 +3209,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderModeBezorg(); renderGroothandel(); renderInkoop(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderModeBezorg(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -5203,6 +5241,12 @@ window.I18N = { en: {
   'mb.bord':'Deliveries', 'mb.omzet':'revenue', 'mb.geen':'No open deliveries.', 'mb.afgerond':'Completed', 'mb.koerier':'courier',
   'mb.aannemen':'Accept', 'mb.afronden':'Complete (code)', 'mb.retour':'Return', 'mb.retourreden':'Reason for return?',
   'mb.vraagcode':'Delivery code from the customer (from the app):', 'mb.afgeleverd':'Delivered safely.',
+  'sup.v.boardroom':'Boardroom', 'tab.boardroom':'Boardroom',
+  'zb.functies':'Functions (on/off)', 'zb.hr':'HR', 'zb.team':'Team', 'zb.ingeklokt':'Clocked in', 'zb.verlof':'Leave/sick',
+  'zb.soll':'Applications', 'zb.vac':'Vacancies', 'zb.naarteam':'Go to the team ›',
+  'zb.marketing':'Marketing (The Salon)', 'zb.volgers':'Followers', 'zb.posts':'Posts', 'zb.deal':'Offer', 'zb.poll':'Poll',
+  'zb.compleet':'profile complete, visible to members', 'zb.onvolledig':'profile incomplete, not yet visible',
+  'zb.salonuit':'Salon marketing is off', 'zb.laatste':'Last post', 'zb.naarsalon':'Go to The Salon ›',
   'tk2.aanbod':'Offering', 'tk2.cap':'cap.', 'tk2.f.naam':'Activity', 'tk2.f.naamph':'E.g. sunset cruise',
   'tk2.f.desc':'Description', 'tk2.f.prijs':'Price p.p. (€)', 'tk2.f.cap':'Capacity', 'tk2.f.duur':'Duration',
   'tk2.f.tijden':'Time slots (commas)', 'tk2.f.voeg':'Add', 'tk2.welkom':'welcome!',

@@ -56,6 +56,7 @@ const { MELDING_SCOPES, maakErvaring } = require('./kern/ervaring');
 const { RETAIL_MATEN, RETAIL_SEIZOENEN, maakRetail } = require('./kern/retail');
 const { maakGroothandel } = require('./kern/groothandel');
 const { maakModebezorg } = require('./kern/modebezorg');
+const { maakZaak } = require('./kern/zaak');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -1621,6 +1622,11 @@ const {
   sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl
 });
 
+/* De eigen mini-boardroom per zaak (kern/zaak.js): elke leverancier zet zijn
+   eigen functies aan/uit en ziet een HR- en marketing-momentopname. */
+const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard } =
+  maakZaak({ db, save, accounts });
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -1955,6 +1961,8 @@ const kern = {
   ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel,
   // de mode-bezorging (kern/modebezorg.js)
   mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
+  // de eigen mini-boardroom per zaak (kern/zaak.js)
+  ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

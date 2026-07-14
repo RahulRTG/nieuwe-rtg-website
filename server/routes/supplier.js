@@ -5,15 +5,29 @@ module.exports = (kern) => {
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor } = kern;
+    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
+    zaakBoard, zaakZet, zaakFunctieAan } = kern;
 
 // De Salon is verplicht: publiceren (post/folder/deal/poll) kan pas met een
 // compleet profiel (bio + foto). De bio/foto-endpoints zelf blijven altijd open.
+// Bovendien kan de zaak zijn Salon-marketing in zijn eigen boardroom uitzetten.
 function eisSalonProfiel(req, res) {
+  if (!zaakFunctieAan(req.supplier, 'salon')) { res.status(409).json({ error: 'Salon-marketing staat uit in uw boardroom. Zet het aan om te publiceren.' }); return false; }
   if (salonProfielCompleet(req.supplier)) return true;
   res.status(409).json({ error: 'Vul eerst uw Salon-profiel in (een bio en een profielfoto). De Salon is de plek voor uw marketing, producten en folders.' });
   return false;
 }
+
+/* ---- de eigen mini-boardroom van de zaak: functies, HR en marketing ---- */
+app.post('/api/supplier/zaak/board', supplierAuth, (req, res) => {
+  res.json(zaakBoard(req.supplier));
+});
+app.post('/api/supplier/zaak/functie', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const r = zaakZet(req.supplier, String(req.body.id || ''), req.body.aan !== false);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, functies: r.functies });
+});
 
 app.post('/api/supplier/login', async (req, res) => {
   let s, actor;

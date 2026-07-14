@@ -10,7 +10,8 @@ module.exports = (kern) => {
     PASPOORT_NIVEAUS, paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn,
     salonZichtbaar, salonProfielCompleet,
     ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken, ontmoetHier, ontmoetStop,
-    ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState } = kern;
+    ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
+    ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -1650,6 +1651,27 @@ app.post('/api/ontmoeten/sos', auth, (req, res) => {
 app.post('/api/ontmoeten/signaal', auth, (req, res) => {
   const key = ontmoetKey(req, res); if (!key) return;
   const r = ontmoetSignaalKantoor(key, String(req.body.dateId || ''), req.body.payload || null);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true });
+});
+
+/* ================== boodschappen bij de groothandel/supermarkt ==================
+   Leden bestellen boodschappen bij een groothandel die de consument-functie
+   aan heeft staan, en laten die bezorgen of halen ze af. */
+app.post('/api/groothandel/markt', auth, (req, res) => {
+  res.json({ groothandels: ghMarkt('lid', { zoek: req.body.zoek, categorie: req.body.categorie }) });
+});
+app.post('/api/groothandel/bestel', auth, (req, res) => {
+  const koper = { soort: 'lid', id: req.session.key, naam: liveCodename(req.session) };
+  const r = ghPlaatsBestelling(String(req.body.groothandelCode || ''), koper, req.body.regels, { bezorgen: req.body.bezorgen !== false });
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, order: r.order });
+});
+app.post('/api/groothandel/mijn', auth, (req, res) => {
+  res.json({ bestellingen: ghMijnBestellingen({ soort: 'lid', id: req.session.key }) });
+});
+app.post('/api/groothandel/annuleer', auth, (req, res) => {
+  const r = ghAnnuleer({ soort: 'lid', id: req.session.key }, String(req.body.ref || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
 });

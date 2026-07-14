@@ -54,6 +54,7 @@ const { HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES, m
 const { maakLid } = require('./kern/lid');
 const { MELDING_SCOPES, maakErvaring } = require('./kern/ervaring');
 const { RETAIL_MATEN, RETAIL_SEIZOENEN, maakRetail } = require('./kern/retail');
+const { maakGroothandel } = require('./kern/groothandel');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -132,7 +133,9 @@ const STAFF_SEED = {
   // charter: een vlootbeheerder en een schipper aan boord
   AZUL: [['Nerea Costa', 'manager', 'Charterbeheer'], ['Marco Silva', 'staff', 'Schipper']],
   // mode & retail: een store manager en een verkoper/stylist op de winkelvloer
-  MAISON: [['Camille Moreau', 'manager', 'Store manager'], ['Théo Blanc', 'staff', 'Verkoop & styling']]
+  MAISON: [['Camille Moreau', 'manager', 'Store manager'], ['Théo Blanc', 'staff', 'Verkoop & styling']],
+  // groothandel: een inkoopmanager en een orderpicker/chauffeur
+  MERCABIZA: [['Rosa Bennasar', 'manager', 'Inkoop & beheer'], ['Joan Tur', 'staff', 'Orderpicking & bezorging']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -482,6 +485,7 @@ function ensureSupplierDefaults(s) {
   if (s.type === 'verhuur' && !Array.isArray(s.autos)) s.autos = [];
   if (s.type === 'charter' && !Array.isArray(s.boten)) s.boten = [];
   if (s.type === 'vastgoed' && !Array.isArray(s.panden)) s.panden = [];
+  if (s.type === 'groothandel' && (!s.groothandel || typeof s.groothandel !== 'object')) s.groothandel = { functies: {}, producten: [] };
   if (!Array.isArray(s.bezorg.producten)) s.bezorg.producten = [];
   if (!Array.isArray(s.photos)) s.photos = [];
   if ((s.type === 'hotel' || s.type === 'apartment') && !Array.isArray(s.rooms)) s.rooms = [];
@@ -827,6 +831,38 @@ function initRealtime() {
     });
   }
   if (!db.data.retailApart) db.data.retailApart = [];
+  // --- groothandel & markt: B2B naar horeca, boodschappen naar leden, doorverkoop ---
+  if (!db.data.supplierTypes.groothandel)
+    db.data.supplierTypes.groothandel = { label: 'Groothandel & markt', icon: '📦', caps: ['groothandel', 'bezorgen', 'location', 'pricing'] };
+  if (!Array.isArray(db.data.groothandelOrders)) db.data.groothandelOrders = [];
+  if (!db.data.suppliers.find(s => s.code === 'MERCABIZA')) {
+    const gp = (naam, categorie, eenheid, inkoop, cons, voorraad, minB, herkomst) => ({
+      id: crypto.randomBytes(4).toString('hex'), naam, categorie, eenheid,
+      inkoopPrijs: inkoop, consumentPrijs: cons, voorraad, minBestel: minB, btw: 9, herkomst: herkomst || '', allergenen: '', actief: true
+    });
+    db.data.suppliers.push({
+      code: 'MERCABIZA', name: 'Mercabiza Groothandel', type: 'groothandel', city: 'Ibiza',
+      loc: { lat: 38.906, lng: 1.421, label: "Poligono Montecristo, Ibiza" }, rate: 0.08,
+      menu: [], photos: [],
+      groothandel: {
+        functies: {},   // wordt met de standaard (alles aan) gevuld door de kern
+        producten: [
+          gp('Verse tonijn (loin)', 'Vlees & vis', 'kg', 22, 32, 40, 2, 'Middellandse Zee'),
+          gp('Zeebaars heel', 'Vlees & vis', 'kg', 14, 21, 30, 2, 'Spanje'),
+          gp('Iberico secreto', 'Vlees & vis', 'kg', 18, 27, 25, 2, 'Spanje'),
+          gp('Manchego 12 mnd', 'Zuivel', 'stuk', 9, 14, 60, 1, 'La Mancha'),
+          gp('Roomboter', 'Zuivel', 'pak', 3, 4.5, 120, 4, 'NL'),
+          gp('Trostomaten', 'Groente & fruit', 'kg', 2.2, 3.4, 90, 3, 'Almería'),
+          gp('Citroenen', 'Groente & fruit', 'net', 1.8, 2.9, 80, 2, 'Valencia'),
+          gp('Olijfolie extra vergine 5L', 'Droog & houdbaar', 'can', 28, 39, 45, 1, 'Andalusië'),
+          gp('Cava brut', 'Dranken', 'fles', 6, 11, 200, 6, 'Penedès'),
+          gp('Mineraalwater 1,5L', 'Dranken', 'krat', 4.5, 7, 150, 4, 'ES'),
+          gp('Diepvriesfriet 2,5kg', 'Diepvries', 'zak', 4.2, 6.5, 70, 3, 'NL'),
+          gp('Servetten (pak 500)', 'Non-food', 'pak', 5, 8, 100, 2, '')
+        ]
+      }
+    });
+  }
   if (!db.data.vastgoedAanbod) db.data.vastgoedAanbod = [];   // { ref, supplierCode, pandId, aanKeys:[], publiek, at }
   if (!db.data.bezichtigingen) db.data.bezichtigingen = [];   // { ref, supplierCode, pandId, key, codename, wens, status, moment, keyless, at }
   if (!db.data.biedingen) db.data.biedingen = [];             // { ref, supplierCode, pandId, key, codename, bedrag, status, tegenbod, at }
@@ -874,7 +910,8 @@ function initRealtime() {
     verhuur: 'Auto’s huren zonder verrassingen: vaste prijs en eerlijke staat.',
     charter: 'Boten en jachten charteren, met of zonder schipper, veilig op zee.',
     vastgoed: 'Exclusief vastgoed, discreet aangeboden aan RTG-leden.',
-    retail: 'Mode en accessoires uit onze nieuwste collecties.'
+    retail: 'Mode en accessoires uit onze nieuwste collecties.',
+    groothandel: 'Groothandel en versmarkt: aan horeca, leden en collega-groothandels, met AI-bijbestellen.'
   };
   const salonFotoVoor = (s) => {
     const t = db.data.supplierTypes[s.type] || {};
@@ -1543,6 +1580,18 @@ const {
   sseToSupplier, sseToOffice, ledenPrijs, gidsHaal, meldWachtlijst
 });
 
+/* De groothandel-/marktlaag (kern/groothandel.js): een brede B2B/B2C-marktplaats.
+   Een groothandel levert aan onze horeca (inkoopprijs), aan leden (boodschappen)
+   en aan andere groothandels, zet zijn eigen functies aan/uit, en de AI stelt op
+   basis van verkoop + mise-en-place een bijbestelling voor de horeca voor. */
+const {
+  GROOTHANDEL_FUNCTIES, GROOTHANDEL_CATEGORIEEN, ghIsGroothandel, ghDefaults, ghFunctieAan,
+  ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghMarkt, ghPlaatsBestelling,
+  ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel
+} = maakGroothandel({
+  db, save, crypto, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, anthropic
+});
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -1871,6 +1920,10 @@ const kern = {
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
   vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, voorraadZoek,
   retailStats, retailState, retailCatalogus,
+  // de groothandel-/marktlaag (kern/groothandel.js)
+  GROOTHANDEL_FUNCTIES, GROOTHANDEL_CATEGORIEEN, ghIsGroothandel, ghDefaults, ghFunctieAan,
+  ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghMarkt, ghPlaatsBestelling,
+  ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

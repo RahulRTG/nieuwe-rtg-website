@@ -64,10 +64,16 @@
       <li><b>Reizen en betalingen:</b> boekingen, facturen en betaalstatus, onder uw codenaam.</li>
       <li><b>Live-locatie (Onderweg):</b> alleen als u die zelf deelt, alleen tijdens de reis, alleen zichtbaar voor de partners waar u naartoe onderweg bent. Stopt u het delen, dan verdwijnt de locatie.</li>
       <li><b>Chats met partners:</b> uw berichten aan bijvoorbeeld de receptie of roomservice, inclusief automatische vertaling. Het origineel blijft altijd zichtbaar onder de vertaling.</li>
+      <li><b>Open lijn en uw Salon-profiel:</b> zodra u zaken doet met een partner ontstaat een open chatlijn; de partner ziet dan uw codenaam, uw pas en uw eigen Salon-posts, nooit uw echte naam.</li>
+      <li><b>Rechtstreekse betalingen:</b> uw directe betalingen en voldane betaalverzoeken, op codenaam; de partner is de ontvanger.</li>
+      <li><b>Ontmoetingen (alleen met uw opt-in, 18+):</b> tijdens een afgesproken ontmoeting deelt de app uw live-locatie met de RTG-backoffice tot de afspraak is afgerond. Drukt u op SOS, dan mogen camera en microfoon worden geactiveerd en schakelen wij de hulpdiensten in. Dit staat in het veiligheidscontract dat u beiden vooraf tekent.</li>
+      <li><b>Bezorging, verhuur en koop:</b> de bezorgcode en afleverfoto (bewijs), de met foto's vastgelegde staat bij verhuur en charter, digitale contracten en, alleen bij nood, de SOS-locatie. Boven de waardegrens van een winkel hoort een ID-controle aan de deur bij de levering.</li>
+      <li><b>Vrienden:</b> uw connecties, DM's, snaps en verhalen, op codenaam; snaps verdwijnen na het bekijken, verhalen na 24 uur.</li>
       <li><b>De Salon:</b> wat u zelf plaatst, liket of reageert, plus welke partners u volgt, welke aanbiedingen u claimt en waarop u stemt in polls, alles op codenaam. Posts van leden verschijnen pas 7 dagen na het verblijf, voor uw veiligheid. Partners zien van polls alleen aantallen; bij een geclaimde aanbieding ziet de partner uw codenaam en claimcode om te kunnen verzilveren.</li>
       <li><b>Cadeaukaarten:</b> de kaartcode, het saldo en de inwisselingen, bij u en bij de uitgevende partner.</li>
       <li><b>RTG-cv en sollicitaties:</b> alleen als u zelf een cv maakt en solliciteert bij een partner.</li>
       <li><b>Personeelsadministratie (personeels-app):</b> kloktijden, verlofaanvragen en ziekmeldingen van medewerkers van partners. Deze gegevens vormen de personeelsadministratie van de werkgever; RTG verwerkt ze in diens opdracht.</li>
+      <li><b>Beveiligingsteams (personeel):</b> de kloklocatie op post, checkpoints van rondes, incidentmeldingen met eventuele foto en de SOS-locatie; personeelsadministratie van de werkgever, door RTG verwerkt in diens opdracht.</li>
       <li><b>De vertrouwenslijn:</b> berichten van medewerkers aan de vertrouwenspersoon van RTG, desgewenst anoniem. Deze zijn <b>uitsluitend</b> zichtbaar voor de vertrouwenspersoon; de werkgever heeft er nooit inzage in en er verschijnt niets van in bedrijfslogboeken of meldingen.</li>
       <li><b>Nood- en EHBO-alarm:</b> drukt een medewerker op SOS of EHBO-alarm, dan wordt eenmalig de locatie meegestuurd (als die beschikbaar is) naar het eigen team en RTG, alleen om hulp te kunnen sturen.</li>
     </ul>
@@ -86,6 +92,7 @@
       <li>Wachtwoorden en personeels-PIN's worden gehasht met scrypt; inlogpogingen worden afgeremd tegen raden.</li>
       <li>De echte-namenkluis is versleuteld met een aparte sleutel die niet in de database staat.</li>
       <li>Alle verkeer gaat in productie over https, met beveiligingsheaders (CSP, HSTS, anti-framing) op elke pagina.</li>
+      <li>In productie staan de opgeslagen gegevens ook op schijf versleuteld (encryptie at rest), naast de aparte namenkluis.</li>
       <li>Er worden dagelijks back-ups gemaakt, die maximaal 14 dagen worden bewaard.</li>
     </ul>
 

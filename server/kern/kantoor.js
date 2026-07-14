@@ -21,7 +21,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
 
   function officeState() {
     // live overzicht: welke leden zijn nu onderweg, waarheen en met welke partners
-    const live = Object.keys(db.data.live).map(key => {
+    const live = Object.keys(db.data.live || {}).map(key => {
       const L = db.data.live[key];
       if (!L || !L.active) return null;
       const dest = L.destCode ? findSupplier(L.destCode) : null;

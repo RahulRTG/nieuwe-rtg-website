@@ -365,6 +365,11 @@ async function ledenGidsZoek(qLower, limit) {
   if (!ledenPool) return [];
   try {
     const r = await ledenPool.query('SELECT key, codename, tier FROM member_dir WHERE codename_lower LIKE $1 LIMIT $2', ['%' + String(qLower || '') + '%', limit || 20]);
+    // De gevonden leden meteen in de per-sleutel cache warmen: wie iemand net via
+    // de zoekindex vond en daarna op de sleutel opzoekt (codeExists bij verbinden
+    // of bellen) moet die synchroon terugvinden, niet op een koude cache stuiten.
+    if (ledenCache.size > 100000) ledenCache.clear();
+    for (const row of r.rows) ledenCache.set(row.key, { codename: row.codename, tier: row.tier });
     return r.rows.map(row => ({ key: row.key, codename: row.codename, tier: row.tier }));
   } catch (e) { return []; }
 }
@@ -385,7 +390,13 @@ async function startPostgres() {
   } catch (e) { ledenPool = null; pgLog && pgLog.warn && pgLog.warn('[db] ledengids init mislukt: ' + e.message); }
   const pgData = await pg.laadAlles();
   if (pgData) {
-    db.data = pgData; // Postgres is de gedeelde waarheid
+    // Postgres is de gedeelde waarheid en wint voor elke collectie die hij heeft.
+    // Maar bij twee instances op een VERSE database kan een lezer een partiele
+    // snapshot lezen terwijl de ander nog aan het flushen is; zonder backfill zou
+    // db.data dan een collectie (bijv. live) missen en zouden lezers crashen op
+    // Object.keys(undefined). Daarom vullen we ontbrekende collecties aan met de
+    // al geseede defaults; zodra de flush rond is, synchroniseert de rest vanzelf.
+    db.data = Object.assign(db.data || {}, pgData);
     if (db.data.__schema == null) db.data.__schema = 1;
     schrijfLokaleSnapshotStil();
     if (externCb) externCb();

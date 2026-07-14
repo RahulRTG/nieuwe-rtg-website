@@ -73,7 +73,7 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
   function guestsFor(code) {
     const out = [];
     const s = findSupplier(code);
-    for (const key of Object.keys(db.data.live)) {
+    for (const key of Object.keys(db.data.live || {})) {
       const L = db.data.live[key];
       if (!L || !L.active) continue;
       if (!connectedSupplierCodes(key).includes(code)) continue;

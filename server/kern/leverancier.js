@@ -252,7 +252,7 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
         .sort((a, b) => (b.lastAt || '').localeCompare(a.lastAt || ''))
         .slice(0, 30),
       // leden die nu live onderweg zijn maar nog niet met dit bedrijf verbonden
-      nearbyGuests: Object.values(db.data.live)
+      nearbyGuests: Object.values(db.data.live || {})
         .filter(L => L.active && !connectedSupplierCodes(L.key).includes(s.code))
         .slice(0, 12)
         .map(L => { const d = L.destCode ? findSupplier(L.destCode) : null; return { codename: L.codename, dest: d ? d.name : null }; }),

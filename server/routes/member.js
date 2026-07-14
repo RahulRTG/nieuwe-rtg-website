@@ -1,7 +1,11 @@
 /* Domein "member" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept } = kern;
+  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept,
+    reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview, reviewsVoor,
+    toggleFavoriet, favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits,
+    zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
+    voorkeurVan, zetVoorkeur } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -686,9 +690,13 @@ app.post('/api/booking/pay', auth, (req, res) => {
   if (b.paid) return res.status(409).json({ error: 'Al betaald.' });
   if (b.status === 'wacht-op-betaling' && Date.now() - new Date(b.at) > 30 * 60000)
     return res.status(410).json({ error: 'Deze aanvraag is verlopen. Boek opnieuw.' });
+  // punten-tegoed (RTG legt bij) en spaarpunten
+  const kortingB = pasTegoedToe(req.session.key, b.price || 0);
+  if (kortingB) b.puntenKorting = kortingB;
   b.paid = true;
   b.paidAt = new Date().toISOString();
   if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
+  verdienPunten(req.session.key, (b.price || 0) - kortingB, b.supplierName);
   save();
   notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
   sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
@@ -808,7 +816,8 @@ app.post('/api/member/accountant', auth, async (req, res) => {
 app.post('/api/suppliers', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const city = req.body.city;
-  const list = db.data.suppliers.filter(s => !city || s.city === city).map(s => publicSupplier(s, req.body.lang));
+  const list = db.data.suppliers.filter(s => !city || s.city === city)
+    .map(s => ({ ...publicSupplier(s, req.body.lang), favoriet: isFavoriet(req.session.key, s.code) }));
   res.json({ suppliers: list, city: db.data.trip.dest });
 });
 
@@ -870,9 +879,15 @@ app.post('/api/order/pay', auth, (req, res) => {
   if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
   if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return res.status(410).json({ error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' });
+  // fooi (gaat naar het team), punten-tegoed (RTG legt bij) en spaarpunten
+  const fooi = fooiUit(req.body, o.total);
+  if (fooi) o.fooi = fooi;
+  const korting = pasTegoedToe(req.session.key, o.total);
+  if (korting) o.puntenKorting = korting;
   o.paid = true;
   o.paidAt = new Date().toISOString();
   if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
+  verdienPunten(req.session.key, o.total - korting, o.supplierName);
   save();
   // nu pas hoort de zaak ervan: betaald = definitief
   notifySupplier(o.supplierCode, { icon: '\u{1F6CE}\uFE0F', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
@@ -1015,9 +1030,15 @@ app.post('/api/ride/pay', auth, (req, res) => {
   if (r.paid) return res.status(409).json({ error: 'Al betaald.' });
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
   if (r.status === 'wacht-op-betaling' && Date.now() - new Date(r.at) > 30 * 60000) return res.status(410).json({ error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' });
+  // fooi voor de chauffeur, punten-tegoed (RTG legt bij) en spaarpunten
+  const fooiR = fooiUit(req.body, r.quote);
+  if (fooiR) r.fooi = fooiR;
+  const kortingR = pasTegoedToe(req.session.key, r.quote);
+  if (kortingR) r.puntenKorting = kortingR;
   r.paid = true;
   r.paidAt = new Date().toISOString();
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
+  verdienPunten(req.session.key, r.quote - kortingR, r.supplierName);
   save();
   notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? '\u2708\uFE0F' : '\u{1F697}', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
   sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
@@ -1525,5 +1546,97 @@ app.post('/api/vastgoed/keyless', auth, (req, res) => {
   const s = findSupplier(b.supplierCode);
   notifySupplier(b.supplierCode, { icon: '\u{1F513}', title: 'Keyless geopend', body: b.codename + ' opende de deur voor de bezichtiging.' });
   res.json({ ok: true, code: b.keyless.code, tot: b.keyless.tot, relockSec: 8 });
+});
+
+/* ================= DE ERVARING-LAAG (kern/ervaring.js) =================
+   Tafelreserveringen, annuleren, reviews, favorieten, de reisagenda,
+   rekening splitsen, wachtlijsten, RTG-punten en meldingsvoorkeuren. */
+
+// tafel reserveren: het lid vraagt aan, de zaak beslist
+app.post('/api/reserveer', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = reserveerTafel(req.session, liveCodename(req.session), req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/reserveringen/mijn', auth, (req, res) => res.json({ reserveringen: mijnReserveringen(req.session.key) }));
+app.post('/api/reservering/annuleer', auth, (req, res) => {
+  const r = annuleerReservering(req.session.key, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+
+// annuleren door het lid: bestelling, rit of boeking (incl. tickets)
+app.post('/api/annuleer', auth, (req, res) => {
+  const r = annuleerItem(req.session, String(req.body.soort || ''), String(req.body.ref || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+
+// reviews: 1-5 sterren na een afgeronde dienst; publiek per partner opvraagbaar
+app.post('/api/review', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = plaatsReview(req.session, liveCodename(req.session), req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/reviews', auth, (req, res) => res.json(reviewsVoor(req.body.supplierCode)));
+
+// favorieten: mijn adressen
+app.post('/api/favoriet', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = toggleFavoriet(req.session.key, req.body.supplierCode);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/favorieten', auth, (req, res) => res.json({ favorieten: favorietenVan(req.session.key) }));
+
+// de reisagenda: alles met een datum, per dag gegroepeerd
+app.post('/api/agenda/mijn', auth, (req, res) => res.json(agendaVoor(req.session.key)));
+
+// rekening splitsen met verbonden vrienden (betaalverzoeken)
+app.post('/api/splits', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = maakSplits(req.session.key, liveCodename(req.session), String(req.body.ref || ''), req.body.metKeys);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/splitsen/mijn', auth, (req, res) => res.json({ splitsen: mijnSplitsen(req.session.key) }));
+app.post('/api/splits/betaal', auth, (req, res) => {
+  const r = betaalSplits(req.session.key, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+
+// wachtlijst voor een vol event of tijdslot
+app.post('/api/wachtlijst', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = zetOpWachtlijst(req.session, liveCodename(req.session), req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/wachtlijst/mijn', auth, (req, res) => res.json({ wachtlijst: mijnWachtlijst(req.session.key) }));
+
+// aanmelding voor een event intrekken (maakt de plek vrij voor de wachtlijst)
+app.post('/api/event/rsvp/annuleer', auth, (req, res) => {
+  const r = rsvpAnnuleer(req.session.key, req.body.supplierCode, req.body.eventId);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+
+// RTG-punten: saldo en historie, verzilveren naar tegoed
+app.post('/api/punten', auth, (req, res) => res.json(puntenVan(req.session.key)));
+app.post('/api/punten/verzilver', auth, (req, res) => {
+  const r = verzilverPunten(req.session.key, req.body.punten);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+
+// meldingsvoorkeuren: per scope aan of uit (afgedwongen in notify)
+app.post('/api/meldingen/voorkeur', auth, (req, res) => {
+  // demo-sessies hebben hun pas als sleutel, accounts hun eigen sleutel: notify
+  // gebruikt dezelfde, dus de voorkeur landt automatisch op het juiste doel
+  if (req.body.zet && typeof req.body.zet === 'object') return res.json({ voorkeur: zetVoorkeur(req.session.key, req.body.zet) });
+  res.json({ voorkeur: voorkeurVan(req.session.key) });
 });
 };

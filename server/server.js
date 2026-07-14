@@ -52,6 +52,7 @@ const { maakKantoor } = require('./kern/kantoor');
 const { SHIFT_NAMES, maakPersoneel } = require('./kern/personeel');
 const { HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES, maakLeverancier } = require('./kern/leverancier');
 const { maakLid } = require('./kern/lid');
+const { MELDING_SCOPES, maakErvaring } = require('./kern/ervaring');
 
 /* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
    pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
@@ -551,6 +552,16 @@ function initRealtime() {
   if (!db.data.minibarCounts) db.data.minibarCounts = {};          // minibartellingen per bedrijf
   if (!db.data.tickets) db.data.tickets = {};                      // klussen/onderhoud per bedrijf
   if (!db.data.lostfound) db.data.lostfound = {};                  // gevonden voorwerpen per bedrijf
+  // de ervaring-laag (kern/ervaring.js): reserveringen, reviews, favorieten,
+  // punten, splitsen, wachtlijsten en meldingsvoorkeuren
+  if (!db.data.reserveringen) db.data.reserveringen = [];          // tafelreserveringen
+  if (!db.data.reviews) db.data.reviews = [];                      // beoordelingen (1-5)
+  if (!db.data.reviewStats) db.data.reviewStats = {};              // code -> { som, aantal } (O(1)-gemiddelde)
+  if (!db.data.favorieten) db.data.favorieten = {};                // sleutel -> [leverancierscodes]
+  if (!db.data.punten) db.data.punten = {};                        // sleutel -> { saldo, tegoed, historie }
+  if (!db.data.splitsen) db.data.splitsen = [];                    // gesplitste rekeningen (betaalverzoeken)
+  if (!db.data.wachtlijsten) db.data.wachtlijsten = [];            // wachtlijsten voor volle events/tijdsloten
+  if (!db.data.meldingVoorkeur) db.data.meldingVoorkeur = {};      // sleutel/tier -> { scope: bool }
   // (kamers, instellingen en tafels zitten in ensureSupplierDefaults)
   // oudere databases: appartement-partner en doors-cap toevoegen
   if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
@@ -751,6 +762,10 @@ function broadcastSync(tiers, scope) {
 // notificeer één tier: opslaan, naar open schermen sturen én web-push
 function notify(tier, note) {
   const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
+  // meldingsvoorkeuren (kern/ervaring.js): een uitgezette scope wordt niet
+  // opgeslagen en niet gepusht; zonder voorkeur staat alles aan
+  const vk = (db.data.meldingVoorkeur || {})[tier];
+  if (n.scope && vk && vk[n.scope] === false) return n;
   db.data.notifications[tier] = (db.data.notifications[tier] || []);
   db.data.notifications[tier].unshift(n);
   db.data.notifications[tier] = db.data.notifications[tier].slice(0, 40);
@@ -1347,6 +1362,21 @@ const {
   etaMinutes, haversine, accounts, werkgeverSollicitatie
 });
 
+/* De ervaring-laag (kern/ervaring.js): tafelreserveringen, annuleren, reviews,
+   favorieten, fooi, de reisagenda, rekening splitsen, wachtlijsten, RTG-punten
+   en meldingsvoorkeuren. Draait na de leverancier- en sociaal-kern omdat hij
+   ticketsVoorSlot, optieAan en zijnVrienden meeneemt. */
+const {
+  reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
+  annuleerItem, plaatsReview, reviewsVoor, ratingVan, toggleFavoriet,
+  favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen,
+  betaalSplits, zetOpWachtlijst, mijnWachtlijst, meldWachtlijst, rsvpAnnuleer,
+  puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, voorkeurVan, zetVoorkeur
+} = maakErvaring({
+  db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
+  sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan
+});
+
 // gast stuurt een bericht aan een partner (per afdeling een eigen gesprek)
 
 // gast opent het gesprek met een afdeling (en markeert het als gelezen)
@@ -1666,7 +1696,13 @@ const kern = {
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, trChat, trustVan, unlockDoor, urenVan, validDept,
-  webpush, weekdagFactor, werkgeverSollicitatie
+  webpush, weekdagFactor, werkgeverSollicitatie,
+  // de ervaring-laag (kern/ervaring.js)
+  MELDING_SCOPES, reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
+  annuleerItem, plaatsReview, reviewsVoor, ratingVan, toggleFavoriet, favorietenVan, isFavoriet,
+  fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst,
+  meldWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
+  voorkeurVan, zetVoorkeur
 };
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld

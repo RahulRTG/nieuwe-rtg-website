@@ -58,7 +58,10 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
   function publicSupplier(s, lang) {
     const t = db.data.supplierTypes[s.type] || {};
     const loc = s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : s.loc;
+    // review-gemiddelde uit de lopende som (O(1), ook met miljoenen reviews)
+    const rs = (db.data.reviewStats || {})[s.code];
     return { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
+             rating: rs && rs.aantal ? { score: Math.round((rs.som / rs.aantal) * 10) / 10, aantal: rs.aantal } : null,
              city: s.city, caps: t.caps || [], loc, hasMenu: (s.menu || []).length > 0,
              depts: deptsFor(s),
              ordersOpen: !s.settings || s.settings.ordersOpen !== false,
@@ -153,7 +156,11 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
       r.total += s.total;
       r.count += 1;
     }
-    return { total, count: sales.length, byMethod, byActor, openRooms, sales: sales.slice(0, 25) };
+    // fooien van vandaag (uit app-betalingen: bestellingen en ritten): voor het team
+    let fooien = 0;
+    for (const o of db.data.orders) if (o.supplierCode === code && o.fooi && String(o.paidAt || '').slice(0, 10) === today) fooien += o.fooi;
+    for (const r of db.data.rides) if (r.supplierCode === code && r.fooi && String(r.paidAt || '').slice(0, 10) === today) fooien += r.fooi;
+    return { total, count: sales.length, byMethod, byActor, openRooms, fooien: Math.round(fooien * 100) / 100, sales: sales.slice(0, 25) };
   }
 
   /* Slimme deuren (appartementen): openen is tijdelijk; na 10 seconden
@@ -244,6 +251,20 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
       } : null,
       photos: s.photos || [],
       pos: posDay(s.code),
+      // tafelreserveringen: open aanvragen bovenaan, daarna komende bevestigde
+      reserveringen: (db.data.reserveringen || [])
+        .filter(r => r.supplierCode === s.code && ['aangevraagd', 'bevestigd'].includes(r.status) && r.datum >= vandaag)
+        .sort((a, b) => (a.status === b.status ? (a.datum + a.tijd).localeCompare(b.datum + b.tijd) : a.status === 'aangevraagd' ? -1 : 1))
+        .slice(0, 40),
+      // reviews: het lopende gemiddelde plus de recentste beoordelingen
+      reviews: (() => {
+        const rs = (db.data.reviewStats || {})[s.code];
+        return {
+          rating: rs && rs.aantal ? { score: Math.round((rs.som / rs.aantal) * 10) / 10, aantal: rs.aantal } : null,
+          recent: (db.data.reviews || []).filter(r => r.supplierCode === s.code).slice(0, 10)
+            .map(r => ({ codename: r.codename, score: r.score, tekst: r.tekst, at: r.at }))
+        };
+      })(),
       tickets: (db.data.tickets[s.code] || []).slice(0, 40),
       lostfound: (db.data.lostfound[s.code] || []).slice(0, 40),
       guestChats: Object.entries(db.data.guestChats)

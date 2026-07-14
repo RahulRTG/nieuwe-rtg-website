@@ -470,6 +470,13 @@
   #toast.show{opacity:1;transform:translate(-50%,0);}
   /* Utility: terugkerende zachte lijstregel (was 10x inline). */
   .softline{font-size:0.82rem;color:var(--soft);padding:0.6rem 0;}
+  /* Commandocentrum (beveiliging): knoppen en dienst-chips. */
+  .abtn{background:#fff;color:#000;border:none;border-radius:8px;padding:0.4rem 0.8rem;font-size:0.78rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .abtn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .bev-chip{display:inline-flex;align-items:center;gap:0.25rem;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.1rem 0.5rem;font-size:0.72rem;margin-right:0.2rem;}
+  .bev-chip.on{border-color:#1f5637;background:#12321f;color:#7EE0A3;}
+  .bev-chip a{color:var(--soft);cursor:pointer;font-size:0.68rem;}
+  .bev-plan{background:none;border:1px dashed var(--gold);color:var(--gold);border-radius:999px;padding:0.05rem 0.5rem;font-size:0.68rem;font-family:inherit;cursor:pointer;}
   /* Utilities uit herhaalde inline-stijlen (identieke regels, dus gelijk beeld). */
   .row-gap{display:flex;gap:0.5rem;}
   .row-mid-gap{display:flex;align-items:center;gap:0.5rem;}
@@ -619,6 +626,11 @@
         <h2 data-i18n="sup.v.boardroom">Boardroom</h2>
         <p class="sub" data-i18n="sup.v.boardroom.sub">Uw eigen schakelkast: zet functies aan of uit, en zie in een oogopslag uw HR en marketing.</p>
         <div id="boardroomWrap"></div>
+      </div>
+      <div class="view" data-view="beveiliging">
+        <h2 data-i18n="sup.v.bev">Commandocentrum</h2>
+        <p class="sub" data-i18n="sup.v.bev.sub">Uw rooster (de AI neemt het over), het budget, de posten, inzetaanvragen en incidenten. Alles in een oogopslag, en elke functie zelf aan of uit.</p>
+        <div id="bevWrap"></div>
       </div>
       <div class="view" data-view="paspoort">
         <h2 data-i18n="sup.v.paspoort">Identiteit &amp; leeftijd</h2>
@@ -781,6 +793,7 @@
     groothandel:{ label:'Groothandel', svg:'<rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M3 8l2-4h14l2 4"/><path d="M10 12h4"/>', cap:'groothandel' },
     inkoop:   { label:'Inkoop',    svg:'<circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M2 3h3l2.2 12.3a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>', cap:'menu' },
     boardroom:{ label:'Boardroom', svg:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 20h10M12 18v2"/><path d="M7 12l2.5-2.5L12 12l3-3 2 2"/>' },
+    beveiliging:{ label:'Commandocentrum', svg:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/>', cap:'beveiliging' },
     paspoort: { label:'Identiteit', svg:'<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="10" r="2.4"/><path d="M8 16c0.5-2 2.2-3 4-3s3.5 1 4 3"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
@@ -3272,6 +3285,136 @@
     return '<div class="b" style="flex:1;min-width:4.5rem;"><div class="v'+(waarschuw?' a':'')+'">'+n+'</div><div class="l">'+label+'</div></div>';
   }
 
+  /* ---- het beveiligings-commandocentrum ---- */
+  let bevDatum = null; // gekozen roosterdag
+  function bevVandaag(){ return new Date().toISOString().slice(0,10); }
+  async function renderBeveiliging(){
+    const el = $('#bevWrap'); if (!el) return;
+    if (!has('beveiliging')) { el.innerHTML=''; return; }
+    let cmd, roo;
+    if (!bevDatum) bevDatum = bevVandaag();
+    try { cmd = await API.call('/supplier/beveiliging/command'); } catch(e){ el.innerHTML='<div class="softline">'+esc(e.message)+'</div>'; return; }
+    try { roo = await API.call('/supplier/beveiliging/rooster', { van: bevDatum, dagen: 1 }); } catch(e){ roo = { dagen: [] }; }
+    const b = cmd.budget || {};
+    // 1) momentopname
+    let h = '<div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.8rem;">'+
+      zbCel(cmd.opDienst.length, T('bev.opdienst','Op dienst'))+
+      zbCel(cmd.team, T('bev.team','Bewakers'))+
+      zbCel(cmd.posten, T('bev.posten','Posten'))+
+      zbCel(cmd.openVandaag, T('bev.openvandaag','Open vandaag'), cmd.openVandaag)+
+      zbCel(cmd.openAanvragen, T('bev.aanvragen','Aanvragen'), cmd.openAanvragen)+
+      zbCel(cmd.incidentenOpen, T('bev.incidenten','Incidenten'), cmd.incidentenOpen)+'</div>';
+    if (cmd.sosActief) h += '<div class="card" style="border:1px solid var(--rood);background:#3a1420;color:#F4B8C6;margin-bottom:0.8rem;font-weight:600;">🆘 '+T('bev.sos','Actieve SOS! Een bewaker heeft de noodknop ingedrukt. Bekijk het incident en stuur bijstand.')+'</div>';
+    // 2) functies aan/uit
+    h += '<div class="st-sec">'+T('bev.func','Functies (aan/uit)')+'</div><div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">'+
+      (cmd.functies||[]).map(f => '<button class="js-bevf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--rood)')+';background:'+(f.aan?'#12321f':'#3a1420')+';color:'+(f.aan?'#7EE0A3':'#F4B8C6')+';border-radius:999px;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.aan?'● ':'○ ')+esc(f.naam)+'</button>').join('')+'</div>';
+    // 3) budget
+    if (b.budgetUren){
+      const kleur = b.overschrijding ? 'var(--rood)' : (b.pct>=85?'#E0A93A':'#7EE0A3');
+      h += '<div class="st-sec">💶 '+T('bev.budget','Budget & uren')+'</div>'+
+        '<div class="card" style="margin-bottom:1rem;">'+
+        '<div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;"><span>'+b.urenGepland+' / '+b.budgetUren+' '+T('bev.uur','uur')+' ('+b.maand+')</span><b>€ '+b.bestedBedrag+' / € '+b.budgetBedrag+'</b></div>'+
+        '<div style="height:8px;border-radius:99px;background:var(--card2);overflow:hidden;"><div style="height:100%;width:'+Math.min(100,b.pct)+'%;background:'+kleur+';"></div></div>'+
+        '<div class="sub" style="margin-top:0.4rem;">'+esc(b.advies)+'</div>'+
+        (b.perPost&&b.perPost.length? '<div class="sub" style="margin-top:0.4rem;">'+b.perPost.map(p=>esc(p.naam)+': '+p.uren+' u (€ '+p.bedrag+')').join(' · ')+'</div>':'')+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;"><input id="bevBudUren" type="number" min="0" placeholder="'+T('bev.buduren','budget-uren/mnd')+'" value="'+b.budgetUren+'" style="width:9rem;">'+
+        '<input id="bevBudTarief" type="number" min="0" placeholder="'+T('bev.tarief','tarief/uur')+'" value="'+b.tariefUur+'" style="width:8rem;">'+
+        '<button class="abtn" id="bevBudSave">'+T('bev.opslaan','Opslaan')+'</button></div>'+
+        '</div>';
+    }
+    // 4) rooster met AI-overname
+    h += '<div class="st-sec">📋 '+T('bev.rooster','Rooster')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;flex-wrap:wrap;">'+
+      '<input id="bevDag" type="date" value="'+bevDatum+'" style="width:11rem;">'+
+      '<button class="abtn" id="bevAI">✨ '+T('bev.ai','AI neemt het over')+'</button></div>';
+    const dag = roo.dagen && roo.dagen[0];
+    if (dag){
+      h += '<div class="card" style="margin-bottom:1rem;">'+ (dag.posten.length? dag.posten.map(p =>
+        '<div style="border-bottom:1px solid var(--line);padding:0.5rem 0;">'+
+          '<div style="display:flex;justify-content:space-between;"><b>'+esc(p.post)+'</b>'+(p.open?'<span style="color:var(--rood);font-size:0.72rem;">'+p.open+' '+T('bev.open','open')+'</span>':'<span style="color:#7EE0A3;font-size:0.72rem;">'+T('bev.gedekt','gedekt')+'</span>')+'</div>'+
+          p.shifts.map(sl => '<div class="sub" style="margin-top:0.2rem;">'+esc(sl.shift)+': '+
+            (sl.bezet.length? sl.bezet.map(d=>'<span class="bev-chip'+(d.status==='ingeklokt'?' on':'')+'">'+esc(d.guardNaam||'?')+(d.status==='ingeklokt'?' ●':'')+' <a data-schrap="'+d.id+'">✕</a></span>').join(' ') : '')+
+            (sl.open? ' <button class="bev-plan" data-post="'+p.postId+'" data-shift="'+sl.shiftId+'">+ '+T('bev.plan','plan')+'</button>':'')+
+          '</div>').join('')+
+        '</div>'
+      ).join('') : '<div class="softline">'+T('bev.geenpost','Nog geen posten. Voeg hieronder objecten toe.')+'</div>')+'</div>';
+    }
+    // 5) inzetaanvragen
+    h += '<div class="st-sec">🛡️ '+T('bev.inzet','Inzetaanvragen')+'</div>';
+    const open = (cmd.functies||[]).find(f=>f.id==='aanvragen' && f.aan);
+    h += '<div class="card" style="margin-bottom:1rem;"><div id="bevAvLijst"></div>'+
+      (open? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
+        '<input id="bevAvKlant" placeholder="'+T('bev.klant','klant')+'" style="width:8rem;">'+
+        '<input id="bevAvObject" placeholder="'+T('bev.object','object/locatie')+'" style="width:9rem;">'+
+        '<input id="bevAvDatum" type="date" value="'+bevDatum+'" style="width:10rem;">'+
+        '<input id="bevAvAantal" type="number" min="1" value="1" style="width:5rem;" title="'+T('bev.aantal','aantal bewakers')+'">'+
+        '<button class="abtn" id="bevAvAdd">'+T('bev.avadd','Aanvraag toevoegen')+'</button></div>':'')+
+      '</div>';
+    // 6) posten beheren
+    const posten = cmd.postenLijst || [];
+    h += '<div class="st-sec">📍 '+T('bev.postbeheer','Posten & objecten')+'</div>'+
+      '<div class="card" style="margin-bottom:1rem;">'+
+      (posten.length? posten.map(p => '<div style="border-bottom:1px solid var(--line);padding:0.35rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
+        '<span><b>'+esc(p.naam)+'</b>'+(p.klant?' · '+esc(p.klant):'')+' · '+(p.minMan||1)+' '+T('bev.man','man')+(p.orders?'<br><span class="sub">'+esc(p.orders)+'</span>':'')+'</span>'+
+        '<button class="abtn ghost" data-postweg="'+p.id+'">✕</button></div>').join('') : '<div class="softline">'+T('bev.geenpost2','Nog geen posten.')+'</div>')+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
+      '<input id="bevPostNaam" placeholder="'+T('bev.postnaam','postnaam')+'" style="width:9rem;">'+
+      '<input id="bevPostKlant" placeholder="'+T('bev.klant','klant')+'" style="width:8rem;">'+
+      '<input id="bevPostMin" type="number" min="1" value="1" style="width:5rem;" title="'+T('bev.min','min. bezetting')+'">'+
+      '<button class="abtn" id="bevPostAdd">'+T('bev.postadd','Post toevoegen')+'</button></div></div>';
+    // 7) incidenten
+    if (cmd.incidenten && cmd.incidenten.length){
+      h += '<div class="st-sec">🚨 '+T('bev.incs','Incidenten')+'</div><div class="card" style="margin-bottom:0.5rem;">'+
+        cmd.incidenten.map(x => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
+          '<span><b'+(x.ernst==='kritiek'||x.ernst==='hoog'?' style="color:var(--rood);"':'')+'>'+(x.sos?'🆘 ':'')+esc(x.soort)+'</b> · '+esc(x.post)+' · '+esc(x.guardNaam||'')+'<br><span class="sub">'+esc(x.tekst)+'</span></span>'+
+          '<button class="bev-inc" data-id="'+x.id+'" style="align-self:flex-start;">'+(x.status==='open'?T('bev.afh','Afhandelen'):T('bev.heropen','Heropen'))+'</button></div>').join('')+'</div>';
+    }
+    el.innerHTML = h;
+    // bindingen
+    el.querySelectorAll('.js-bevf').forEach(x => x.addEventListener('click', async () => {
+      try { await API.call('/supplier/beveiliging/functie', { id:x.dataset.id, aan: x.dataset.aan!=='true' }); renderBeveiliging(); } catch(e){ toast(e.message); }
+    }));
+    const bind = (id, fn) => { const e2=$('#'+id); if (e2) e2.addEventListener('click', fn); };
+    const dagInp = $('#bevDag'); if (dagInp) dagInp.addEventListener('change', () => { bevDatum = dagInp.value || bevVandaag(); renderBeveiliging(); });
+    bind('bevAI', async () => { try { const r = await API.call('/supplier/beveiliging/planauto', { datum: bevDatum }); toast(r.uitleg); renderBeveiliging(); } catch(e){ toast(e.message); } });
+    bind('bevBudSave', async () => { try { await API.call('/supplier/beveiliging/budget', { periodeUren: $('#bevBudUren').value, tariefUur: $('#bevBudTarief').value }); renderBeveiliging(); } catch(e){ toast(e.message); } });
+    bind('bevAvAdd', async () => { try { await API.call('/supplier/beveiliging/aanvraag', { klant:$('#bevAvKlant').value, object:$('#bevAvObject').value, datum:$('#bevAvDatum').value, aantal:$('#bevAvAantal').value }); renderBeveiliging(); } catch(e){ toast(e.message); } });
+    bind('bevPostAdd', async () => { try { await API.call('/supplier/beveiliging/post', { naam:$('#bevPostNaam').value, klant:$('#bevPostKlant').value, minMan:$('#bevPostMin').value }); renderBeveiliging(); } catch(e){ toast(e.message); } });
+    el.querySelectorAll('.bev-plan').forEach(x => x.addEventListener('click', async () => {
+      const gid = prompt(T('bev.wieplan','Welke bewaker? Typ de naam precies.')); if (!gid) return;
+      const staff = (state.staff||[]).find(m => m.name.toLowerCase() === gid.trim().toLowerCase());
+      if (!staff) { toast(T('bev.geenbewaker','Geen bewaker met die naam.')); return; }
+      try { await API.call('/supplier/beveiliging/dienst', { postId:x.dataset.post, shiftId:x.dataset.shift, datum:bevDatum, guardId:staff.id }); renderBeveiliging(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-schrap]').forEach(x => x.addEventListener('click', async () => {
+      try { await API.call('/supplier/beveiliging/dienst/weg', { id:x.dataset.schrap }); renderBeveiliging(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.bev-inc').forEach(x => x.addEventListener('click', async () => {
+      try { await API.call('/supplier/beveiliging/incident/beslis', { id:x.dataset.id }); renderBeveiliging(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-postweg]').forEach(x => x.addEventListener('click', async () => {
+      try { await API.call('/supplier/beveiliging/post/weg', { id:x.dataset.postweg }); renderBeveiliging(); } catch(e){ toast(e.message); }
+    }));
+    // de aanvragenlijst los inladen (eigen endpoint met open + afgerond)
+    bevLaadAanvragen();
+  }
+  async function bevLaadAanvragen(){
+    const el = $('#bevAvLijst'); if (!el) return;
+    let d; try { d = await API.call('/supplier/beveiliging/aanvragen'); } catch(e){ return; }
+    if (!d.open.length && !d.afgerond.length){ el.innerHTML = '<div class="softline">'+T('bev.geenav','Nog geen inzetaanvragen.')+'</div>'; return; }
+    el.innerHTML = d.open.map(a => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
+      '<span><b>'+esc(a.klant)+'</b> · '+esc(a.object)+' · '+esc(a.datum)+' · '+a.aantal+'× '+esc(a.shiftId)+'</span>'+
+      '<span style="display:flex;gap:0.3rem;"><button class="abtn" data-avplan="'+a.ref+'">'+T('bev.avplan','Inplannen')+'</button>'+
+      '<button class="abtn ghost" data-avweg="'+a.ref+'">'+T('bev.avweg','Afwijzen')+'</button></span></div>').join('')+
+      (d.afgerond.length? '<div class="sub" style="margin-top:0.4rem;">'+d.afgerond.slice(0,5).map(a=>esc(a.object)+' ('+esc(a.status)+')').join(' · ')+'</div>':'');
+    el.querySelectorAll('[data-avplan]').forEach(x => x.addEventListener('click', async () => {
+      try { const r = await API.call('/supplier/beveiliging/aanvraag/beslis', { ref:x.dataset.avplan, actie:'plan' }); toast(T('bev.ingepland','Ingepland en op het rooster gezet.')); renderBeveiliging(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-avweg]').forEach(x => x.addEventListener('click', async () => {
+      try { await API.call('/supplier/beveiliging/aanvraag/beslis', { ref:x.dataset.avweg, actie:'afwijzen' }); renderBeveiliging(); } catch(e){ toast(e.message); }
+    }));
+  }
+
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
@@ -3288,7 +3431,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.

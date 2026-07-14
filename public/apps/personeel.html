@@ -201,6 +201,11 @@
         <p class="sub" data-i18n="pd.v.verkoop.sub">De proefritten van vandaag en de auto's die klaarstaan om af te leveren.</p>
         <div id="verkoopWrap"></div>
       </div>
+      <div class="view" data-view="beveiliging">
+        <h2 data-i18n="pd.v.bev">Mijn dienst</h2>
+        <p class="sub" data-i18n="pd.v.bev.sub">Uw diensten en posten, inklokken op locatie, patrouillerondes, incidenten melden en de SOS-noodknop. Praat met het team via de walkie-talkie op de Team-tab.</p>
+        <div id="bevPdaWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -217,6 +222,7 @@
       <button data-tab="winkel" id="tabWinkel" style="display:none;"><svg viewBox="0 0 24 24"><path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/></svg><span data-i18n="pd.t.winkel">Vloer</span></button>
       <button data-tab="vaart" id="tabVaart" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/></svg><span data-i18n="pd.t.vaart">Vaart</span></button>
       <button data-tab="verkoop" id="tabVerkoop" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M9.5 12l1.4 1.4L14 10"/></svg><span data-i18n="pd.t.verkoop">Verkoop</span></button>
+      <button data-tab="beveiliging" id="tabBevPda" style="display:none;"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/></svg><span data-i18n="pd.t.bev">Dienst</span></button>
       <button data-tab="bezorgen" id="tabBezorgen" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/></svg><span data-i18n="pd.t.bezorgen">Bezorgen</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
@@ -243,7 +249,8 @@
     { id:'verhuur', icon:'🚗', nl:'Autoverhuur', en:'Car rental', sub:'Vloot, uitgifte, inname', codes:['ISLAREN'] },
     { id:'vastgoed', icon:'🏡', nl:'Vastgoed', en:'Real estate', sub:'Makelaar, bezichtigingen', codes:['IBIZALIV'] },
     { id:'mode', icon:'🛍️', nl:'Mode & retail', en:'Fashion & retail', sub:'Modehuizen, merken, winkels', codes:['MAISON'] },
-    { id:'charter', icon:'⛵', nl:'Boten & jachten', en:'Boats & yachts', sub:'Charters, schippers, op zee', codes:['AZUL'] }
+    { id:'charter', icon:'⛵', nl:'Boten & jachten', en:'Boats & yachts', sub:'Charters, schippers, op zee', codes:['AZUL'] },
+    { id:'beveiliging', icon:'🛡️', nl:'Beveiliging', en:'Security', sub:'Diensten, posten, rondes, SOS', codes:['AEGIS'] }
   ];
   const BEDRIJVEN = {
     KIKUNOI:{ name:'Sal de Mar', icon:'🍽️' }, PONTO:{ name:'Sunset Ibiza', icon:'🍸' },
@@ -255,7 +262,8 @@
     ISLAREN:{ name:'Isla Rent Ibiza', icon:'🚗' },
     IBIZALIV:{ name:'Ibiza Living Estates', icon:'🏡' },
     MAISON:{ name:'Maison Solène', icon:'🛍️' },
-    AZUL:{ name:'Azul Yacht Charter', icon:'⛵' }
+    AZUL:{ name:'Azul Yacht Charter', icon:'⛵' },
+    AEGIS:{ name:'Aegis Elite Security', icon:'🛡️' }
   };
 
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
@@ -323,7 +331,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -1071,6 +1079,85 @@
     }));
   }
 
+  /* ---- PDA beveiliging: mijn dienst, inklokken, rondes, incidenten, SOS ---- */
+  let pdBev = null;
+  const heeftBeveiliging = () => !!(state && state.supplier && state.supplier.type === 'beveiliging');
+  function bevPos(cb){ // GPS met korte time-out en veilige terugval
+    let klaar = false; const fire = (lat, lng) => { if (klaar) return; klaar = true; cb(lat, lng); };
+    if (navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(p => fire(p.coords.latitude, p.coords.longitude), () => fire(undefined, undefined), { timeout: 2500 });
+      setTimeout(() => fire(undefined, undefined), 3000);
+    } else fire(undefined, undefined);
+  }
+  async function laadBevPda(){
+    if (!heeftBeveiliging()) return;
+    try { pdBev = await API.call('/supplier/beveiliging/pda/diensten', {}); } catch(e){ pdBev = { diensten: [], ronde: null }; }
+    renderBevPda();
+  }
+  function renderBevPda(){
+    const tabBtn = document.getElementById('tabBevPda');
+    if (tabBtn) tabBtn.style.display = heeftBeveiliging() ? '' : 'none';
+    const wrap = $('#bevPdaWrap'); if (!wrap) return;
+    if (!heeftBeveiliging()){ wrap.innerHTML = ''; return; }
+    if (!pdBev){ wrap.innerHTML = '<div class="card">…</div>'; laadBevPda(); return; }
+    const ds = pdBev.diensten || [];
+    let h = '';
+    // 1) SOS-noodknop, altijd bovenaan
+    h += '<button class="abtn" id="bevSosBtn" style="width:100%;background:var(--rood);color:#fff;font-size:1rem;padding:0.8rem;margin-bottom:0.8rem;">🆘 '+T('pd.bev.sos','SOS · noodknop')+'</button>';
+    // 2) lopende ronde
+    if (pdBev.ronde){
+      const r = pdBev.ronde;
+      h += '<div class="card"><div class="k">🚶 '+T('pd.bev.ronde','Patrouilleronde')+' · '+esc(r.post)+'</div>'+
+        '<div style="font-size:0.82rem;margin:0.3rem 0;">'+(r.checkpoints.length? r.checkpoints.map(c=>'✓ '+esc(c.naam)).join(' · ') : T('pd.bev.nogcp','Nog geen checkpoints.'))+'</div>'+
+        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><input id="bevCpNaam" placeholder="'+T('pd.bev.cpnaam','checkpoint')+'" style="flex:1;min-width:7rem;">'+
+        '<button class="abtn" id="bevCpAdd">'+T('pd.bev.cpadd','Checkpoint')+'</button>'+
+        '<button class="abtn ghost" id="bevRondeKlaar">'+T('pd.bev.rondeklaar','Ronde klaar')+'</button></div></div>';
+    }
+    // 3) mijn diensten
+    h += '<div class="card"><div class="k">'+T('pd.bev.diensten','Mijn diensten')+'</div>';
+    h += ds.length ? ds.map(d => {
+      const ingeklokt = d.status === 'ingeklokt';
+      return '<div class="task"><span class="ic">'+(ingeklokt?'🟢':'📋')+'</span><div class="t"><b>'+esc(d.post)+'</b><span>'+esc(d.datum)+' · '+esc(d.shift)+(d.klant?' · '+esc(d.klant):'')+'</span></div>'+
+        (d.status==='afgerond' ? '<span style="font-size:0.72rem;color:var(--soft);">'+T('pd.bev.klaar','afgerond')+'</span>'
+          : ingeklokt ? '<button class="abtn ghost" data-bevuit="'+d.id+'">'+T('pd.bev.uit','Uitklokken')+'</button>'
+          : '<button class="abtn" data-bevin="'+d.id+'">'+T('pd.bev.in','Inklokken')+'</button>')+'</div>'+
+        (ingeklokt && !pdBev.ronde ? '<div style="text-align:right;margin-top:-0.3rem;"><button class="abtn ghost" data-bevronde="'+d.postId+'" style="font-size:0.7rem;">🚶 '+T('pd.bev.startronde','Start ronde')+'</button></div>' : '');
+    }).join('') : '<div style="font-size:0.85rem;color:var(--soft);">'+T('pd.bev.geendienst','Geen diensten ingepland.')+'</div>';
+    h += '</div>';
+    // 4) incident melden
+    h += '<div class="card"><div class="k">📋 '+T('pd.bev.incident','Incident melden')+'</div>'+
+      '<input id="bevIncSoort" placeholder="'+T('pd.bev.incsoort','soort (bijv. inbraakpoging)')+'" style="width:100%;margin-bottom:0.4rem;">'+
+      '<select id="bevIncErnst" style="width:100%;margin-bottom:0.4rem;"><option value="laag">'+T('pd.bev.laag','laag')+'</option><option value="midden" selected>'+T('pd.bev.midden','midden')+'</option><option value="hoog">'+T('pd.bev.hoog','hoog')+'</option><option value="kritiek">'+T('pd.bev.kritiek','kritiek')+'</option></select>'+
+      '<textarea id="bevIncTekst" placeholder="'+T('pd.bev.inctekst','wat is er gebeurd?')+'" style="width:100%;min-height:3rem;margin-bottom:0.4rem;"></textarea>'+
+      '<button class="abtn" id="bevIncSend" style="width:100%;">'+T('pd.bev.incsend','Melden')+'</button></div>';
+    wrap.innerHTML = h;
+    // bindingen
+    const bind = (id, fn) => { const e2 = document.getElementById(id); if (e2) e2.addEventListener('click', fn); };
+    bind('bevSosBtn', () => { if (!confirm(T('pd.bev.sosbev','SOS versturen? Het team en RTG-kantoor worden direct gealarmeerd.'))) return;
+      bevPos(async (lat, lng) => { try { await API.call('/supplier/beveiliging/pda/sos', { lat, lng }); toast('🆘 '+T('pd.bev.sosok','SOS verstuurd. Bijstand onderweg.')); } catch(e){ toast(e.message); } }); });
+    wrap.querySelectorAll('[data-bevin]').forEach(b => b.addEventListener('click', () => {
+      bevPos(async (lat, lng) => { try { await API.call('/supplier/beveiliging/pda/inklok', { id:b.dataset.bevin, lat, lng }); toast('🟢 '+T('pd.bev.inok','Ingeklokt op post.')); await laadBevPda(); } catch(e){ toast(e.message); } });
+    }));
+    wrap.querySelectorAll('[data-bevuit]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/beveiliging/pda/uitklok', { id:b.dataset.bevuit }); toast(T('pd.bev.uitok','Uitgeklokt.')); await laadBevPda(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-bevronde]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/beveiliging/pda/ronde/start', { postId:b.dataset.bevronde }); await laadBevPda(); } catch(e){ toast(e.message); }
+    }));
+    bind('bevCpAdd', () => { const naam = ($('#bevCpNaam')||{}).value || '';
+      bevPos(async (lat, lng) => { try { await API.call('/supplier/beveiliging/pda/ronde/checkpoint', { id: pdBev.ronde.id, naam, lat, lng }); await laadBevPda(); } catch(e){ toast(e.message); } }); });
+    bind('bevRondeKlaar', async () => { try { await API.call('/supplier/beveiliging/pda/ronde/klaar', { id: pdBev.ronde.id }); toast(T('pd.bev.rondeok','Ronde afgerond.')); await laadBevPda(); } catch(e){ toast(e.message); } });
+    bind('bevIncSend', () => {
+      const tekst = ($('#bevIncTekst')||{}).value || '';
+      if (!tekst.trim()) { toast(T('pd.bev.incleeg','Beschrijf het incident.')); return; }
+      const soort = ($('#bevIncSoort')||{}).value || '';
+      const ernst = ($('#bevIncErnst')||{}).value || 'midden';
+      const post = ds[0] ? ds[0].post : '';
+      const postId = ds.find(d => d.status==='ingeklokt') ? ds.find(d => d.status==='ingeklokt').postId : (ds[0]||{}).postId;
+      bevPos(async (lat, lng) => { try { await API.call('/supplier/beveiliging/pda/incident', { soort, ernst, tekst, post, postId, lat, lng }); toast('📋 '+T('pd.bev.incok','Incident gemeld.')); await laadBevPda(); } catch(e){ toast(e.message); } });
+    });
+  }
+
   function renderTeam(){
     const team = state.team || [];
     const act = (state.activity || []).slice(0, 10);
@@ -1260,7 +1347,7 @@
     if (!window.EventSource) return;
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
-      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); });
+      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); });
       src.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
       src.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
       src.addEventListener('alarm', e => { const d=JSON.parse(e.data); if (d.from !== me.name) showAlarm(d); });

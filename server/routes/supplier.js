@@ -1993,4 +1993,5 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
   require('./supplier/groothandel')(kern);
   require('./supplier/modebezorg')(kern);
   require('./supplier/autoverkoop')(kern);
+  require('./supplier/beveiliging')(kern);
 };

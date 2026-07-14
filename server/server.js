@@ -58,6 +58,7 @@ const { maakGroothandel } = require('./kern/groothandel');
 const { maakModebezorg } = require('./kern/modebezorg');
 const { maakZaak } = require('./kern/zaak');
 const { maakAutoverkoop } = require('./kern/autoverkoop');
+const { maakBeveiliging } = require('./kern/beveiliging');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -138,7 +139,10 @@ const STAFF_SEED = {
   // mode & retail: een store manager en een verkoper/stylist op de winkelvloer
   MAISON: [['Camille Moreau', 'manager', 'Store manager'], ['Théo Blanc', 'staff', 'Verkoop & styling']],
   // groothandel: een inkoopmanager en een orderpicker/chauffeur
-  MERCABIZA: [['Rosa Bennasar', 'manager', 'Inkoop & beheer'], ['Joan Tur', 'staff', 'Orderpicking & bezorging']]
+  MERCABIZA: [['Rosa Bennasar', 'manager', 'Inkoop & beheer'], ['Joan Tur', 'staff', 'Orderpicking & bezorging']],
+  // beveiliging: een operationeel leider (commandocentrum) en een ploeg bewakers voor de PDA
+  AEGIS: [['Viktor Novak', 'manager', 'Operationeel leider'], ['Samir Haddad', 'staff', 'Beveiliger'],
+    ['Elena Ruiz', 'staff', 'Beveiliger'], ['Marcus Kane', 'staff', 'Beveiliger'], ['Nadia Petrova', 'staff', 'Beveiliger']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -898,6 +902,29 @@ function initRealtime() {
       }
     });
   }
+  // --- beveiliging: een commandocentrum + PDA voor topbeveiligingsteams ---
+  if (!db.data.supplierTypes.beveiliging)
+    db.data.supplierTypes.beveiliging = { label: 'Beveiliging & security', icon: '🛡️', caps: ['beveiliging', 'location'] };
+  if (!Array.isArray(db.data.bevDiensten)) db.data.bevDiensten = [];
+  if (!Array.isArray(db.data.bevAanvragen)) db.data.bevAanvragen = [];
+  if (!Array.isArray(db.data.bevIncidenten)) db.data.bevIncidenten = [];
+  if (!Array.isArray(db.data.bevRondes)) db.data.bevRondes = [];
+  if (!db.data.suppliers.find(s => s.code === 'AEGIS')) {
+    db.data.suppliers.push({
+      code: 'AEGIS', name: 'Aegis Elite Security', type: 'beveiliging', city: 'Ibiza',
+      loc: { lat: 38.909, lng: 1.432, label: 'Passeig de Vara de Rey, Ibiza' }, rate: 0.10,
+      menu: [], photos: [],
+      beveiliging: {
+        functies: {},   // wordt met de standaard (alles aan) door de kern gevuld
+        budget: { periodeUren: 720, tariefUur: 55 },
+        posten: [
+          { id: crypto.randomBytes(4).toString('hex'), naam: 'Villa Cala Jondal', adres: 'Cala Jondal, Ibiza', klant: 'Privé-residentie', lat: 38.876, lng: 1.383, minMan: 2, shifts: ['dag', 'avond', 'nacht'], orders: 'Toegang alleen op gastenlijst. Ronde elk uur langs het strandhek.', actief: true },
+          { id: crypto.randomBytes(4).toString('hex'), naam: 'Marina Botafoch VIP', adres: 'Marina Botafoch, Ibiza', klant: 'Jachthaven', lat: 38.918, lng: 1.451, minMan: 1, shifts: ['avond', 'nacht'], orders: 'Steiger 3 t/m 7. Let op onbevoegden bij de jachten.', actief: true },
+          { id: crypto.randomBytes(4).toString('hex'), naam: 'Event Ushuaïa', adres: 'Platja d\'en Bossa, Ibiza', klant: 'Evenement', lat: 38.884, lng: 1.408, minMan: 3, shifts: ['avond', 'nacht'], orders: 'Fouilleren bij de hoofdingang. Backstage streng afgeschermd.', actief: true }
+        ]
+      }
+    });
+  }
   if (!db.data.vastgoedAanbod) db.data.vastgoedAanbod = [];   // { ref, supplierCode, pandId, aanKeys:[], publiek, at }
   if (!db.data.bezichtigingen) db.data.bezichtigingen = [];   // { ref, supplierCode, pandId, key, codename, wens, status, moment, keyless, at }
   if (!db.data.biedingen) db.data.biedingen = [];             // { ref, supplierCode, pandId, key, codename, bedrag, status, tegenbod, at }
@@ -1652,6 +1679,19 @@ const {
   avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox
 } = maakAutoverkoop({ db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice });
 
+/* De beveiligings-laag (kern/beveiliging.js): een commandocentrum + PDA voor de
+   meest geavanceerde beveiligingsteams. Rooster (met AI-overname), budget,
+   posten, inzetaanvragen, patrouillerondes, incidenten en een SOS-noodknop. */
+const {
+  BEVEILIGING_FUNCTIES, BEVEILIGING_SHIFTS, BEVEILIGING_ERNST,
+  bevIsBeveiliging, bevDefaults, bevFunctieAan, bevFunctieLijst, bevZetFunctie,
+  bevPosten, bevZetPost, bevVerwijderPost, bevBudget, bevZetBudget,
+  bevRooster, bevZetDienst, bevSchrapDienst, bevPlanAuto,
+  bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
+  bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
+  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand
+} = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine });
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -1992,6 +2032,14 @@ const kern = {
   // de autoverkoop-laag (kern/autoverkoop.js)
   AUTOVERKOOP_BRANDSTOF, avMagVerkopen, avZetAan, avZetAuto, avVerwijderAuto, avShowroom,
   avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox,
+  // de beveiligings-laag (kern/beveiliging.js)
+  BEVEILIGING_FUNCTIES, BEVEILIGING_SHIFTS, BEVEILIGING_ERNST,
+  bevIsBeveiliging, bevDefaults, bevFunctieAan, bevFunctieLijst, bevZetFunctie,
+  bevPosten, bevZetPost, bevVerwijderPost, bevBudget, bevZetBudget,
+  bevRooster, bevZetDienst, bevSchrapDienst, bevPlanAuto,
+  bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
+  bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
+  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

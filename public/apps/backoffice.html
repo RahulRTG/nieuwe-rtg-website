@@ -193,6 +193,13 @@
         <div class="rows" id="concierge"></div>
       </div>
     </div>
+    <div class="cols" style="margin-top:1.5rem;">
+      <div class="panel">
+        <h2 data-i18n="panel.incidenten">Paspoort-incidenten</h2>
+        <p class="sub" data-i18n="panel.incidenten.sub" style="margin:0 0 0.6rem;">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
+        <div class="rows" id="incidenten"></div>
+      </div>
+    </div>
     <div class="panel" style="margin-top:1.5rem;">
       <h2>🤝 <span data-i18n="panel.trust">Vertrouwenslijn</span></h2>
       <div class="rows" id="trustList"></div>
@@ -273,6 +280,7 @@
     laadTimeline();
     loadVerify();
     loadConcierge();
+    loadIncidenten();
     loadTrust();
     stream();
   }
@@ -302,6 +310,7 @@
         '<div class="vi"><div class="nm">'+escHtml(v.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.codename)+'</span></div>' +
           '<div class="sub">'+escHtml(v.email||'')+' · '+escHtml(v.tier)+'</div></div>' +
         '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
+        '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
       '</div>').join('') : '<div class="empty">'+T('bo.noverify','Geen openstaande verificaties.')+'</div>';
@@ -311,13 +320,36 @@
         $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(API.token)+'&file='+encodeURIComponent(e.target.dataset.doc);
         $('#docScrim').classList.add('open');
       });
-      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve'));
-      row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject'));
+      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve', row.querySelector('[data-face]').checked));
+      row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject', false));
     });
   }
-  async function decide(userId, decision){
-    try { await call('/office/verify', { userId, decision }); } catch(e){ alert(e.message); return; }
+  async function decide(userId, decision, faceMatch){
+    try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch }); } catch(e){ alert(e.message); return; }
     loadVerify();
+  }
+
+  // ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ----
+  async function loadIncidenten(){
+    const el = document.getElementById('incidenten'); if (!el) return;
+    let inc = [];
+    try { inc = (await call('/office/incidenten', { alleen: 'open' })).incidenten || []; } catch(e){ return; }
+    el.innerHTML = inc.length ? inc.map(i =>
+      '<div class="vrow" data-id="'+i.id+'">' +
+        '<div class="vi"><div class="nm">'+escHtml(i.codenaam||'\u2013')+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(i.supplierName)+' · '+escHtml(i.gevraagdNiveau)+'</span></div>' +
+          '<div class="sub">'+escHtml(i.reden)+'</div></div>' +
+        '<button class="vbtn ok" data-vrij>'+T('bo.release','Vrijgeven')+'</button>' +
+        '<button class="vbtn no" data-afw>'+T('bo.declineinc','Afwijzen')+'</button>' +
+      '</div>').join('') : '<div class="empty">'+T('bo.noinc','Geen openstaande incidenten.')+'</div>';
+    el.querySelectorAll('.vrow').forEach(row => {
+      const id = row.dataset.id;
+      row.querySelector('[data-vrij]').addEventListener('click', () => decideInc(id, 'vrijgeven'));
+      row.querySelector('[data-afw]').addEventListener('click', () => decideInc(id, 'afwijzen'));
+    });
+  }
+  async function decideInc(id, besluit){
+    try { await call('/office/incident/beslis', { id, besluit }); } catch(e){ alert(e.message); return; }
+    loadIncidenten();
   }
 
   let convData = [], convUser = null;
@@ -535,7 +567,7 @@
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
-    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadConcierge(); loadTrust(); });
+    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadConcierge(); loadIncidenten(); loadTrust(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
   }
 
@@ -579,6 +611,9 @@ window.I18N = { en: {
   'bo.mode.walking':'walking', 'bo.mode.driving':'driving', 'bo.mode.flying':'flying',
   'bo.nolive':'Nobody is on the move right now. As soon as a member puts a journey live, you will see here where they are and with which partners.',
   'bo.viewdoc':'Document', 'bo.approve':'Approve', 'bo.reject':'Reject', 'bo.noverify':'No pending verifications.',
+  'bo.face':'Face = passport', 'panel.incidenten':'Passport incidents',
+  'panel.incidenten.sub':'On an incident a partner demands an identity. Review, then release only if justified.',
+  'bo.release':'Release', 'bo.declineinc':'Decline', 'bo.noinc':'No open incidents.',
   'bo.waiting':'waiting', 'bo.open':'Open', 'bo.noconv':'No conversations yet.', 'bo.replyph':'Reply as concierge…', 'bo.send':'Send',
   'bo.partners':'Partners', 'bo.proposals':'Price proposals', 'bo.orders':'Orders', 'bo.revenue':'Revenue via partners',
   'bo.noprices':'No prices yet. As soon as a partner submits a dynamic price, it appears here live.',

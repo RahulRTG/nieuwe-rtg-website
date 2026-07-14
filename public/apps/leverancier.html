@@ -584,6 +584,11 @@
         <p class="sub" data-i18n="sup.v.retail.sub">Uw collecties, artikelen met varianten, voorraad en drops, en het clienteling-dossier van uw klanten.</p>
         <div id="retailWrap"></div>
       </div>
+      <div class="view" data-view="paspoort">
+        <h2 data-i18n="sup.v.paspoort">Identiteit &amp; leeftijd</h2>
+        <p class="sub" data-i18n="sup.v.paspoort.sub">Controleer de identiteit of leeftijd achter een codenaam. De gast krijgt een melding en kan een ID-kaart of paspoort weigeren; alleen de ja/nee-bevestiging is altijd beschikbaar.</p>
+        <div id="paspoortWrap"></div>
+      </div>
       <div class="view" data-view="minibar">
         <h2 data-i18n="sup.v.minibar">Minibar</h2>
         <p class="sub" data-i18n="sup.v.minibar.sub">Tel per kamer wat is gebruikt. Het verbruik gaat automatisch op de kamerrekening en de aanvullijst staat klaar.</p>
@@ -734,6 +739,7 @@
     vastgoed: { label:'Vastgoed',  svg:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>', cap:'vastgoed' },
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
+    paspoort: { label:'Identiteit', svg:'<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="10" r="2.4"/><path d="M8 16c0.5-2 2.2-3 4-3s3.5 1 4 3"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
     tafels:   { label:'Tafels',    svg:'<circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>', cap:'menu' },
@@ -2864,6 +2870,112 @@
     });
   }
 
+  // ---- identiteit & leeftijd: het gecontroleerde paspoortkanaal ----
+  let paspoortData = null;      // eigen verzoeken + incidenten
+  let paspoortBevestiging = null;  // laatste ja/nee-uitslag
+  let paspoortInzage = null;    // geopende inzage (id-kaart of scan)
+  async function laadPaspoort(){
+    if (!API.live) return;
+    try { paspoortData = await API.call('/supplier/paspoort/overzicht', {}); } catch(e){ paspoortData = { verzoeken:[], incidenten:[], niveaus:[] }; }
+    renderPaspoort();
+  }
+  function pnBadge(st){
+    const kleur = st==='goedgekeurd'?'var(--green)':st==='geweigerd'||st==='afgewezen'?'var(--burgundy)':st==='verlopen'||st==='ingetrokken'?'var(--soft)':'var(--amber)';
+    return '<span class="pill" style="color:'+kleur+';border-color:'+kleur+';">'+T('pn.st.'+st, st)+'</span>';
+  }
+  function renderPaspoort(){
+    const el = $('#paspoortWrap'); if (!el) return;
+    if (!paspoortData){ el.innerHTML = '<div class="empty">…</div>'; laadPaspoort(); return; }
+    const sel = 'style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"';
+    let html = '';
+    // aanvraagformulier
+    html += '<div class="card"><div class="tt-h">'+T('pn.vraag','Identiteit opvragen')+'</div>'+
+      '<div class="field"><label>'+T('pn.codenaam','Codenaam van de gast')+'</label><input id="pnCode" placeholder="'+T('pn.codeph','Bijv. Zilveren Valk 12')+'" autocomplete="off"></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">'+
+        '<div class="field" style="margin:0;"><label>'+T('pn.minleeftijd','Leeftijdseis (optioneel)')+'</label><input id="pnLeeftijd" type="number" placeholder="18" inputmode="numeric"></div>'+
+        '<div class="field" style="margin:0;"><label>'+T('pn.reden','Reden (optioneel)')+'</label><input id="pnReden" placeholder="'+T('pn.redenph','Bijv. leeftijdscontrole')+'"></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.8rem;">'+
+        '<button class="obtn primary" data-pnvraag="bevestiging">'+T('pn.jaNee','Ja/nee-check')+'</button>'+
+        '<button class="obtn" data-pnvraag="idkaart">'+T('pn.idkaart','ID-kaart vragen')+'</button>'+
+        '<button class="obtn" data-pnvraag="paspoort">'+T('pn.paspoort','Paspoort vragen')+'</button>'+
+      '</div>'+
+      '<div id="pnUitslag" style="margin-top:0.7rem;"></div></div>';
+    // geopende inzage
+    if (paspoortInzage) html += paspoortInzageKaart(paspoortInzage);
+    // lopende en afgehandelde verzoeken
+    const vz = paspoortData.verzoeken || [];
+    html += '<div class="card"><div class="tt-h">'+T('pn.verzoeken','Mijn verzoeken')+'</div>'+
+      (vz.length ? '<div style="margin-top:0.5rem;display:grid;gap:0.4rem;">'+vz.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.codenaam||'\u2013')+'</span>'+pnBadge(v.status)+'</div>'+
+        '<div class="ds">'+T('pn.niveau.'+v.niveau, v.niveau)+(v.incident?' · '+T('pn.viaIncident','via incident'):'')+(v.reden?' · '+esc(v.reden):'')+'</div>'+
+        (v.status==='goedgekeurd'?'<div style="margin-top:0.4rem;"><button class="obtn primary" data-pnbekijk="'+v.id+'">'+T('pn.bekijk','Inzage openen')+'</button>'+(v.vervalt?' <span class="ds">'+T('pn.tot','geldig tot')+' '+new Date(v.vervalt).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span>':'')+'</div>':'')+
+        '</div>').join('')+'</div>'
+        : '<div class="empty">'+T('pn.geenverzoek','Nog geen verzoeken.')+'</div>')+'</div>';
+    // incident melden
+    html += '<div class="card"><div class="tt-h">'+T('pn.incident','Incident: identiteit opeisen')+'</div>'+
+      '<p class="ds" style="margin:0.3rem 0;">'+T('pn.incidenttip','Alleen bij een echt incident. RTG-kantoor beoordeelt het verzoek en geeft de identiteit pas daarna vrij. Alles wordt gelogd.')+'</p>'+
+      '<div class="field"><label>'+T('pn.codenaam','Codenaam van de gast')+'</label><input id="pnIncCode" placeholder="'+T('pn.codeph','Bijv. Zilveren Valk 12')+'" autocomplete="off"></div>'+
+      '<div class="field"><label>'+T('pn.incReden','Wat is er gebeurd?')+'</label><textarea id="pnIncReden" rows="2" '+sel+' placeholder="'+T('pn.incRedenph','Beschrijf het incident (min. 10 tekens)')+'"></textarea></div>'+
+      '<div class="field"><label>'+T('pn.incNiveau','Gevraagd niveau')+'</label><select id="pnIncNiveau" '+sel+'><option value="idkaart">'+T('pn.niveau.idkaart','ID-kaart')+'</option><option value="paspoort">'+T('pn.niveau.paspoort','Paspoort')+'</option></select></div>'+
+      '<button class="obtn warn" id="pnIncMeld" style="margin-top:0.7rem;">'+T('pn.incMeld','Incident melden bij RTG')+'</button></div>';
+    // eigen incidenten
+    const inc = paspoortData.incidenten || [];
+    if (inc.length) html += '<div class="card"><div class="tt-h">'+T('pn.incidenten','Mijn incidenten')+'</div>'+
+      '<div style="margin-top:0.5rem;">'+inc.map(i => '<div class="mitem"><div class="r1"><span class="nm">'+esc(i.codenaam||'\u2013')+'</span>'+pnBadge(i.status)+'</div><div class="ds">'+esc(i.reden)+'</div></div>').join('')+'</div></div>';
+    el.innerHTML = html;
+    paspoortBind(el);
+  }
+  function paspoortInzageKaart(inh){
+    let body = '';
+    if (inh.niveau === 'bevestiging'){
+      body = '<div style="font-size:0.9rem;">'+(inh.geverifieerd?'✅ '+T('pn.geverifieerd','RTG-geverifieerd'):'⛔ '+T('pn.nietgeverifieerd','niet geverifieerd'))+
+        (inh.voldoetLeeftijd!=null?'<br>'+(inh.voldoetLeeftijd?'✅ '+T('pn.voldoet','voldoet aan de leeftijdseis'):'⛔ '+T('pn.voldoetniet','voldoet NIET aan de leeftijdseis')):'')+'</div>';
+    } else {
+      body = '<div style="display:flex;gap:0.8rem;">'+
+        (inh.foto?'<img src="'+esc(inh.foto)+'" alt="'+T('pn.pasfoto','Pasfoto')+'" style="width:80px;height:100px;object-fit:cover;border-radius:10px;flex-shrink:0;">':'')+
+        '<div><div style="font-weight:700;font-size:0.95rem;">'+esc(inh.naam||'')+'</div>'+
+        '<div class="ds">'+(inh.nationaliteit?esc(inh.nationaliteit)+' · ':'')+(inh.geboortedatum?esc(inh.geboortedatum):'')+(inh.leeftijd!=null?' ('+inh.leeftijd+')':'')+'</div>'+
+        '<div class="ds" style="margin-top:0.3rem;color:var(--green);">'+(inh.geverifieerd?'✅ '+T('pn.geverifieerd','RTG-geverifieerd'):'')+(inh.gezichtGecontroleerd?' · '+T('pn.gezicht','gezicht gecontroleerd'):'')+'</div></div></div>'+
+        (inh.scan?'<div style="margin-top:0.6rem;"><div class="tt-h">'+T('pn.scan','Paspoortscan')+'</div><img src="'+esc(inh.scan)+'" alt="'+T('pn.scan','Paspoortscan')+'" style="width:100%;border-radius:10px;margin-top:0.4rem;"></div>':'');
+    }
+    return '<div class="card" style="border-color:var(--gold);"><div class="tt-h" style="color:var(--gold);">'+T('pn.inzage','Inzage')+' · '+T('pn.niveau.'+inh.niveau, inh.niveau)+'</div><div style="margin-top:0.5rem;">'+body+'</div>'+
+      '<button class="obtn" id="pnSluit" style="margin-top:0.7rem;">'+T('pn.sluit','Sluiten')+'</button></div>';
+  }
+  function paspoortBind(el){
+    el.querySelectorAll('[data-pnvraag]').forEach(b => b.addEventListener('click', async () => {
+      const codenaam = ($('#pnCode').value||'').trim(); if (!codenaam) return toast(T('pn.geefcode','Vul een codenaam in.'));
+      const body = { codenaam, niveau: b.dataset.pnvraag };
+      const lft = $('#pnLeeftijd').value; if (lft) body.minLeeftijd = Number(lft);
+      const reden = $('#pnReden').value; if (reden) body.reden = reden;
+      try {
+        const r = await API.call('/supplier/paspoort/vraag', body);
+        const uit = $('#pnUitslag');
+        if (r.niveau === 'bevestiging'){
+          const be = r.bevestiging;
+          uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:12px;font-size:0.88rem;">'+
+            (be.geverifieerd?'✅ '+T('pn.geverifieerd','RTG-geverifieerd'):'⛔ '+T('pn.nietgeverifieerd','niet geverifieerd'))+
+            (be.voldoetLeeftijd!=null?' · '+(be.voldoetLeeftijd?'✅ '+be.minLeeftijd+'+':'⛔ '+T('pn.voldoetniet','voldoet niet')):'')+'</div>';
+        } else {
+          uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:12px;font-size:0.85rem;color:var(--amber);">⏳ '+T('pn.verstuurd','Verzoek verstuurd. De gast krijgt een melding en kan het goedkeuren of weigeren.')+'</div>';
+          await laadPaspoort();
+        }
+      } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-pnbekijk]').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await API.call('/supplier/paspoort/bekijk', { id: b.dataset.pnbekijk }); paspoortInzage = r.inhoud; renderPaspoort(); const c = $('#paspoortWrap'); if (c) c.scrollTop = 0; }
+      catch(e){ toast(e.message); await laadPaspoort(); }
+    }));
+    const sluit = el.querySelector('#pnSluit'); if (sluit) sluit.addEventListener('click', () => { paspoortInzage = null; renderPaspoort(); });
+    const incBtn = el.querySelector('#pnIncMeld');
+    if (incBtn) incBtn.addEventListener('click', async () => {
+      const codenaam = ($('#pnIncCode').value||'').trim(); const reden = ($('#pnIncReden').value||'').trim();
+      if (!codenaam) return toast(T('pn.geefcode','Vul een codenaam in.'));
+      if (reden.length < 10) return toast(T('pn.geefreden','Beschrijf het incident (min. 10 tekens).'));
+      try { await API.call('/supplier/paspoort/incident', { codenaam, reden, niveau: $('#pnIncNiveau').value }); toast(T('pn.incok','Incident gemeld. RTG beoordeelt het.')); $('#pnIncCode').value=''; $('#pnIncReden').value=''; await laadPaspoort(); }
+      catch(e){ toast(e.message); }
+    });
+  }
+
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
@@ -2880,7 +2992,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderVastgoed(); renderRetail(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderVastgoed(); renderRetail(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -4333,7 +4445,7 @@
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
-    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); });
+    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (paspoortData) laadPaspoort(); });
     source.addEventListener('notify', e => {
       const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
       if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }
@@ -4781,7 +4893,27 @@ window.I18N = { en: {
   'rt.gereleased':'Drop is live', 'rt.opwachtlijst':'notified on the waitlist', 'rt.colok':'Collection added.',
   'rt.colweg':'Remove this collection?', 'rt.artweg':'Remove this article?', 'rt.artwegok':'Article removed.',
   'rt.geefnaam':'Give the article a name.', 'rt.kiesmaat':'Pick at least one size.', 'rt.artok':'Article saved.',
-  'rt.matenok':'Sizes saved.', 'rt.kiesart':'Pick at least one article.', 'rt.stylok':'Proposal sent to the customer.'
+  'rt.matenok':'Sizes saved.', 'rt.kiesart':'Pick at least one article.', 'rt.stylok':'Proposal sent to the customer.',
+  // --- Identiteit & paspoort (leverancier) ---
+  'tab.paspoort':'Identity', 'sup.v.paspoort':'Identity & age',
+  'sup.v.paspoort.sub':'Verify the identity or age behind a codename. The guest is notified and can refuse an ID card or passport; only the yes/no confirmation is always available.',
+  'pn.vraag':'Request identity', 'pn.codenaam':'Guest codename', 'pn.codeph':'E.g. Silver Falcon 12',
+  'pn.minleeftijd':'Age requirement (optional)', 'pn.reden':'Reason (optional)', 'pn.redenph':'E.g. age check',
+  'pn.jaNee':'Yes/no check', 'pn.idkaart':'Request ID card', 'pn.paspoort':'Request passport',
+  'pn.verzoeken':'My requests', 'pn.geenverzoek':'No requests yet.', 'pn.bekijk':'Open view', 'pn.tot':'valid until',
+  'pn.viaIncident':'via incident', 'pn.incident':'Incident: demand identity',
+  'pn.incidenttip':'Only for a genuine incident. RTG reviews the request and only then releases the identity. Everything is logged.',
+  'pn.incReden':'What happened?', 'pn.incRedenph':'Describe the incident (min. 10 characters)', 'pn.incNiveau':'Requested level',
+  'pn.incMeld':'Report incident to RTG', 'pn.incidenten':'My incidents',
+  'pn.geverifieerd':'RTG-verified', 'pn.nietgeverifieerd':'not verified', 'pn.voldoet':'meets the age requirement',
+  'pn.voldoetniet':'does NOT meet the age requirement', 'pn.gezicht':'face checked', 'pn.pasfoto':'Passport photo',
+  'pn.scan':'Passport scan', 'pn.inzage':'View', 'pn.sluit':'Close',
+  'pn.verstuurd':'Request sent. The guest is notified and can approve or refuse.',
+  'pn.geefcode':'Enter a codename.', 'pn.geefreden':'Describe the incident (min. 10 characters).', 'pn.incok':'Incident reported. RTG will review it.',
+  'pn.niveau.bevestiging':'Yes/no', 'pn.niveau.idkaart':'ID card', 'pn.niveau.paspoort':'Passport',
+  'pn.st.aangevraagd':'requested', 'pn.st.goedgekeurd':'approved', 'pn.st.geweigerd':'refused',
+  'pn.st.verlopen':'expired', 'pn.st.ingetrokken':'withdrawn', 'pn.st.ingediend':'submitted',
+  'pn.st.vrijgegeven':'released', 'pn.st.afgewezen':'declined'
 } };
 </script>
 <script src="/apps/translate.js"></script>

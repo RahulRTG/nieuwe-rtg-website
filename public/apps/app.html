@@ -875,6 +875,8 @@
         <p class="sub" id="homeSub"></p>
         <div id="verifyBanner"></div>
         <input type="file" id="verifyFile" accept="image/*" style="display:none;">
+        <input type="file" id="selfieFile" accept="image/*" capture="user" style="display:none;">
+        <div id="paspoortInbox"></div>
         <div class="codecard" id="codecard"></div>
         <div class="card" id="homeTrip"></div>
         <div class="card" id="homePay"></div>
@@ -1955,7 +1957,8 @@
     else if (scope === 'contract'){ laadContracten(); }
     else if (scope === 'vastgoed'){ laadVastgoed(); }
     else if (scope === 'live'){ renderLive(); laadTickets(); }
-    else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); }
+    else if (scope === 'paspoort'){ laadPaspoortInbox(); }
+    else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); laadPaspoortInbox(); }
   }
 
   function timeAgo(iso){
@@ -3435,11 +3438,13 @@
     const v = user && user.account ? user.verified : null;
     if (!user || !user.account || v === 'verified'){ el.innerHTML = ''; return; }
     if (v === 'pending'){
-      el.innerHTML = '<div class="vbanner pending"><b>'+T('vf.pending.h','Verificatie in behandeling')+'</b><span>'+T('vf.pending.b','We controleren uw document. U kunt de app gewoon blijven gebruiken.')+'</span></div>';
+      el.innerHTML = '<div class="vbanner pending"><b>'+T('vf.pending.h','Verificatie in behandeling')+'</b><span>'+T('vf.pending.b','We controleren uw document. U kunt de app gewoon blijven gebruiken.')+'</span>'+
+        '<button class="vbtn" id="selfieStart" style="margin-top:0.5rem;">'+T('vf.selfie','Selfie toevoegen (gezichtscontrole)')+'</button></div>';
+      const sb = $('#selfieStart'); if (sb) sb.addEventListener('click', () => $('#selfieFile').click());
       return;
     }
     el.innerHTML = '<div class="vbanner"><b>'+T('vf.h','Verifieer uw identiteit, boek in één tik')+'</b>' +
-      '<span>'+T('vf.b','Eén foto van uw identiteitsbewijs. Zo weten we zeker dat u het bent, houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw document is alleen zichtbaar voor RTG.')+'</span>' +
+      '<span>'+T('vf.b','Eén foto van uw identiteitsbewijs plus een selfie. Zo weet RTG zeker dat u het bent (gezicht x paspoort), houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw gegevens zijn alleen zichtbaar voor RTG.')+'</span>' +
       '<button class="vbtn" id="verifyStart">'+T('vf.btn','Document uploaden')+'</button></div>';
     $('#verifyStart').addEventListener('click', () => $('#verifyFile').click());
   }
@@ -3457,10 +3462,57 @@
       reader.readAsDataURL(file);
       vf.value = '';
     });
+    const sf = document.getElementById('selfieFile');
+    if (sf) sf.addEventListener('change', () => {
+      const file = sf.files[0]; if (!file) return;
+      if (file.size > 5 * 1024 * 1024){ toast(T('vf.toobig','Bestand te groot (max 5 MB).')); sf.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try { await API.call('/verify/selfie', { image: reader.result }); toast(T('vf.selfieok','Selfie ontvangen. RTG controleert het gezicht bij uw paspoort.')); }
+        catch (e){ toast(e.message || 'Upload mislukt.'); }
+      };
+      reader.readAsDataURL(file);
+      sf.value = '';
+    });
   })();
+
+  /* ---- paspoortverzoeken: een partner vroeg uw identiteit op (u beslist) ---- */
+  let paspoortInboxData = null;
+  async function laadPaspoortInbox(){
+    if (!user || !user.account){ const el = $('#paspoortInbox'); if (el) el.innerHTML = ''; return; }
+    try { paspoortInboxData = await API.call('/paspoort/mijn', {}); } catch(e){ paspoortInboxData = null; }
+    renderPaspoortInbox();
+  }
+  function renderPaspoortInbox(){
+    const el = $('#paspoortInbox'); if (!el) return;
+    if (!user || !user.account){ el.innerHTML = ''; return; }
+    if (!paspoortInboxData){ laadPaspoortInbox(); return; }
+    const open = (paspoortInboxData.verzoeken || []).filter(v => v.status === 'aangevraagd');
+    const lopend = (paspoortInboxData.verzoeken || []).filter(v => v.status === 'goedgekeurd');
+    let html = '';
+    if (open.length) html += open.map(v => '<div class="vbanner" style="border-color:var(--gold,#c9a227);">' +
+      '<b>🪪 '+esc(v.supplierName)+' '+T('pi.vraagt','vraagt uw')+' '+T('pi.n.'+v.niveau, v.niveau)+'</b>' +
+      '<span>'+(v.reden?esc(v.reden)+' · ':'')+T('pi.uitleg','U beslist. Bij goedkeuren ziet de partner dit 10 minuten; daarna vervalt het vanzelf.')+'</span>' +
+      '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="vbtn" data-pigo="'+v.id+'">'+T('pi.goed','Goedkeuren')+'</button>' +
+      '<button class="vbtn" data-piweiger="'+v.id+'" style="background:none;border:1px solid var(--line);color:var(--txt);">'+T('pi.weiger','Weigeren')+'</button></div></div>').join('');
+    if (lopend.length) html += lopend.map(v => '<div class="vbanner pending"><b>'+esc(v.supplierName)+' · '+T('pi.n.'+v.niveau, v.niveau)+' '+T('pi.gedeeld','gedeeld')+'</b>' +
+      '<span>'+T('pi.lopend','De inzage loopt. U kunt hem intrekken.')+'</span>' +
+      '<button class="vbtn" data-pitrek="'+v.id+'" style="margin-top:0.4rem;background:none;border:1px solid var(--line);color:var(--txt);">'+T('pi.trek','Intrekken')+'</button></div>').join('');
+    el.innerHTML = html;
+    el.querySelectorAll('[data-pigo]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/paspoort/beslis', { id: b.dataset.pigo, akkoord: true }); toast(T('pi.goedok','Goedgekeurd.')); await laadPaspoortInbox(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-piweiger]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/paspoort/beslis', { id: b.dataset.piweiger, akkoord: false }); toast(T('pi.weigerok','Geweigerd.')); await laadPaspoortInbox(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-pitrek]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/paspoort/trek-in', { id: b.dataset.pitrek }); toast(T('pi.trekok','Ingetrokken.')); await laadPaspoortInbox(); } catch(e){ toast(e.message); }
+    }));
+  }
 
   function renderHome(){
     renderVerifyBanner();
+    laadPaspoortInbox();
     // gratis gebruiker (zonder pas): beperkte, veilige startpagina
     if (user.tier === 'guest'){ renderHomeGuest(); return; }
     const first = user.full.split(' ')[0];
@@ -4750,8 +4802,15 @@ window.I18N = { en: {
   'gate.kies.bus':'Business travel, AI bookkeeper and RTG Business Network',
   'gate.verified':'Your email address has been confirmed.', 'gate.verifyfail':'Confirmation link invalid or expired.',
   'vf.h':'Verify your identity, book in one tap', 'vf.btn':'Upload document', 'vf.sent':'Document received, we are reviewing it.', 'vf.toobig':'File too large (max 5 MB).',
-  'vf.b':'One photo of your ID. This confirms it is really you, keeps fake accounts out, and lets you book without any hassle afterwards. Your document is only visible to RTG.',
+  'vf.b':'One photo of your ID plus a selfie. This lets RTG confirm it is really you (face x passport), keeps fake accounts out, and lets you book without any hassle. Your data is only visible to RTG.',
   'vf.pending.h':'Verification in progress', 'vf.pending.b':'We are reviewing your document. You can keep using the app as normal.',
+  'vf.b':'One photo of your ID plus a selfie. This lets RTG confirm it is really you (face x passport), keeps fake accounts out, and lets you book without any hassle. Your data is only visible to RTG.',
+  'vf.selfie':'Add a selfie (face check)', 'vf.selfieok':'Selfie received. RTG checks the face against your passport.',
+  // --- Paspoortverzoeken (leden-app) ---
+  'pi.vraagt':'requests your', 'pi.n.bevestiging':'confirmation', 'pi.n.idkaart':'ID card', 'pi.n.paspoort':'passport',
+  'pi.uitleg':'You decide. If you approve, the partner sees this for 10 minutes; then it expires automatically.',
+  'pi.goed':'Approve', 'pi.weiger':'Refuse', 'pi.gedeeld':'shared', 'pi.lopend':'The view is active. You can withdraw it.',
+  'pi.trek':'Withdraw', 'pi.goedok':'Approved.', 'pi.weigerok':'Refused.', 'pi.trekok':'Withdrawn.',
   'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Add the app to your home screen →</a>',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
   'msg.from':'translated from', 'msg.orig':'show original', 'msg.showtrans':'show translation',

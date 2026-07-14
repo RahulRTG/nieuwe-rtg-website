@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vouwtelefoon-layout - RTG</title>
+<link rel="stylesheet" href="/apps/posture.css">
+<style>
+  :root { --bg:#0F0D0C; --paneel:#171412; --paneel2:#1E1A17; --lijn:#2A251F; --txt:#F3EFE9; --zacht:#B7ADA0; --goud:#C9A24B; }
+  * { box-sizing:border-box; }
+  html, body { height:100%; margin:0; }
+  body { background:var(--bg); color:var(--txt); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; display:flex; flex-direction:column; }
+  header { display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; padding:.7rem 1rem; border-bottom:1px solid var(--lijn); background:var(--paneel); }
+  header h1 { font-size:1rem; margin:0; font-weight:600; }
+  header .status { font-size:.72rem; color:var(--zacht); margin-left:auto; font-variant-numeric:tabular-nums; }
+  .sim { display:flex; gap:.4rem; padding:.5rem 1rem; border-bottom:1px solid var(--lijn); background:var(--paneel); flex-wrap:wrap; }
+  .sim span { font-size:.72rem; color:var(--zacht); align-self:center; margin-right:.2rem; }
+  .sim button { background:var(--paneel2); color:var(--txt); border:1px solid var(--lijn); border-radius:9px; padding:.4rem .7rem; font-size:.78rem; cursor:pointer; }
+  .sim button[aria-pressed="true"] { border-color:var(--goud); color:var(--goud); }
+  main { flex:1; min-height:0; padding:.7rem; }
+  /* de module levert de kolom-layout; hieronder alleen de chat-chroom */
+  .posture-split { gap:0; background:var(--paneel); border:1px solid var(--lijn); border-radius:14px; overflow:hidden; }
+  .pane-hinge { background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(201,162,75,.12) 6px,rgba(201,162,75,.12) 12px); border-inline:1px solid var(--lijn); }
+  .pane-list { border-right:1px solid var(--lijn); }
+  .pane-head { position:sticky; top:0; background:var(--paneel2); padding:.7rem .9rem; border-bottom:1px solid var(--lijn); font-weight:600; font-size:.9rem; display:flex; align-items:center; gap:.5rem; }
+  .pane-terug { background:none; border:1px solid var(--lijn); color:var(--txt); border-radius:8px; padding:.25rem .55rem; font-size:.8rem; cursor:pointer; }
+  .chat-item { display:flex; gap:.6rem; align-items:center; padding:.7rem .9rem; border-bottom:1px solid var(--lijn); cursor:pointer; background:none; border-left:0; border-right:0; border-top:0; width:100%; text-align:left; color:inherit; }
+  .chat-item:hover { background:var(--paneel2); }
+  .chat-item[aria-current="true"] { background:rgba(201,162,75,.10); }
+  .av { width:2.1rem; height:2.1rem; border-radius:50%; background:var(--goud); color:#1a1206; display:grid; place-items:center; font-weight:700; font-size:.8rem; flex-shrink:0; }
+  .chat-item .nm { font-size:.88rem; }
+  .chat-item .pv { font-size:.74rem; color:var(--zacht); }
+  .pane-detail { display:flex; flex-direction:column; }
+  .bubbels { flex:1; overflow:auto; padding:.9rem; display:flex; flex-direction:column; gap:.5rem; }
+  .bub { max-width:80%; padding:.5rem .75rem; border-radius:14px; font-size:.86rem; line-height:1.35; }
+  .bub.in { background:var(--paneel2); border-bottom-left-radius:4px; align-self:flex-start; }
+  .bub.uit { background:var(--goud); color:#1a1206; border-bottom-right-radius:4px; align-self:flex-end; }
+  .leeg { color:var(--zacht); font-size:.85rem; padding:1.2rem; text-align:center; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Vouwtelefoon-layout</h1>
+    <p class="status" id="status" aria-live="polite">layout: -</p>
+  </header>
+
+  <div class="sim" role="group" aria-label="Stand simuleren (voor test op een gewoon scherm)">
+    <span>Simuleer stand:</span>
+    <button type="button" data-sim="single" aria-pressed="false">Rechtop / dicht</button>
+    <button type="button" data-sim="book" aria-pressed="false">Book-fold</button>
+    <button type="button" data-sim="laptop" aria-pressed="false">Laptop</button>
+    <button type="button" data-sim="auto" aria-pressed="true">Auto (echt toestel)</button>
+  </div>
+
+  <main>
+    <div class="posture-split" data-posture-split id="split">
+      <section class="pane pane-list" aria-label="Gesprekken">
+        <div class="pane-head">Chats</div>
+        <div id="lijst"></div>
+      </section>
+      <div class="pane-hinge" aria-hidden="true"></div>
+      <section class="pane pane-detail" aria-label="Actief gesprek">
+        <div class="pane-head"><button type="button" class="pane-terug" id="terug">&larr; Terug</button><span id="detailNaam">Gesprek</span></div>
+        <div class="bubbels" id="bubbels"><p class="leeg">Kies links een gesprek.</p></div>
+      </section>
+    </div>
+  </main>
+
+<script src="/apps/posture.js"></script>
+<script>
+(function () {
+  var chats = [
+    { id:'gv', naam:'Gouden Vos', pv:'Zie ik je bij de gate?', bubbels:[['in','Hey! Al ingecheckt?'],['uit','Bijna, sta bij de bag drop.'],['in','Zie ik je bij de gate?']] },
+    { id:'zp', naam:'Zilveren Panter', pv:'Top, tot zo.', bubbels:[['uit','Taxi is besteld.'],['in','Top, tot zo.']] },
+    { id:'bh', naam:'Blauwe Havik', pv:'Foto komt eraan', bubbels:[['in','Wat een uitzicht hier.'],['in','Foto komt eraan']] }
+  ];
+  var lijst = document.getElementById('lijst');
+  var bubbels = document.getElementById('bubbels');
+  var detailNaam = document.getElementById('detailNaam');
+  var status = document.getElementById('status');
+  var actief = null;
+
+  function toonChat(c) {
+    actief = c.id;
+    detailNaam.textContent = c.naam;
+    bubbels.textContent = '';
+    c.bubbels.forEach(function (b) {
+      var d = document.createElement('div');
+      d.className = 'bub ' + b[0];
+      d.textContent = b[1];
+      bubbels.appendChild(d);
+    });
+    Array.prototype.forEach.call(lijst.children, function (el) {
+      el.setAttribute('aria-current', el.dataset.id === c.id ? 'true' : 'false');
+    });
+    // in de enkele-kolomsstand naar het detail schuiven; in twee kolommen doet dit niets
+    if (window.Posture) Posture.showDetail(true);
+  }
+
+  chats.forEach(function (c) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chat-item'; b.dataset.id = c.id; b.setAttribute('aria-current', 'false');
+    var av = document.createElement('span'); av.className = 'av';
+    av.textContent = c.naam.split(' ').map(function (x) { return x[0]; }).join('').slice(0, 2);
+    var txt = document.createElement('span');
+    var nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = c.naam;
+    var pv = document.createElement('div'); pv.className = 'pv'; pv.textContent = c.pv;
+    txt.appendChild(nm); txt.appendChild(pv);
+    b.appendChild(av); b.appendChild(txt);
+    b.addEventListener('click', function () { toonChat(c); });
+    lijst.appendChild(b);
+  });
+
+  document.getElementById('terug').addEventListener('click', function () {
+    if (window.Posture) Posture.showList();
+  });
+
+  // ---- de echte module: reageert op de Device Posture API + segment-queries ----
+  var split = document.getElementById('split');
+  function toonStatus(st) {
+    status.textContent = 'posture: ' + st.posture + '  |  layout: ' + st.layout + '  |  fold: ' + st.fold;
+  }
+  split.addEventListener('posturechange', function (e) { toonStatus(e.detail); });
+  if (window.Posture) toonStatus(Posture.init());
+
+  // ---- simulator: forceer de attributen zodat je het op een gewoon scherm ziet ----
+  var simKnoppen = document.querySelectorAll('[data-sim]');
+  function zetSim(mode) {
+    Array.prototype.forEach.call(simKnoppen, function (k) { k.setAttribute('aria-pressed', k.dataset.sim === mode ? 'true' : 'false'); });
+    if (mode === 'auto') { if (window.Posture) { Posture.init(); Posture.refresh(); } return; }
+    // handmatige override: schrijf de attributen die posture.css leest
+    split.setAttribute('data-posture', mode === 'single' ? 'continuous' : 'folded');
+    split.setAttribute('data-layout', mode === 'single' ? 'single' : 'dual');
+    split.setAttribute('data-fold', mode === 'single' ? 'none' : mode);
+    if (mode === 'book') { split.style.setProperty('--list-size', '42%'); split.style.setProperty('--fold-gap', '28px'); }
+    else if (mode === 'laptop') { split.style.setProperty('--list-size', '50%'); split.style.setProperty('--fold-gap', '0px'); }
+    else { split.style.removeProperty('--list-size'); split.style.removeProperty('--fold-gap'); }
+    if (mode === 'single' && !actief) split.removeAttribute('data-active');
+    toonStatus({ posture: mode === 'single' ? 'continuous' : 'folded', layout: mode === 'single' ? 'single' : 'dual', fold: mode === 'single' ? 'none' : mode });
+  }
+  Array.prototype.forEach.call(simKnoppen, function (k) {
+    k.addEventListener('click', function () { zetSim(k.dataset.sim); });
+  });
+})();
+</script>
+</body>
+</html>

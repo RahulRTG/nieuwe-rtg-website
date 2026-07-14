@@ -2094,7 +2094,7 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (PRODUCTION ? crypto.randomBytes(
    rechtstreeks vandaan; de functies dragen db, PERSONAS, de Claude-client,
    accounts en de realtime-helpers. broadcastSync en sseToOffice zijn hoisted. */
 const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, conciergeInbox } =
-  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice });
+  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
 const { officeAuth, officeState, pendingVerifications } = maakKantoor({

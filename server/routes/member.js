@@ -1242,19 +1242,22 @@ app.post('/api/ai', auth, async (req, res) => {
 
 app.post('/api/chat/history', auth, (req, res) => {
   if (!req.session.account) return res.json({ messages: [], mode: 'butler', demo: true });
-  res.json({
-    messages: convOf(req.session.account.id),
+  // het lid leest alles (ook concierge-antwoorden) in de eigen taal
+  trChat(convOf(req.session.account.id), talen.taalVan(req.body.lang)).then(messages => res.json({
+    messages,
     mode: req.session.tier === 'rtg' ? 'butler' : 'concierge',
     phone: accounts.phoneOf(req.session.account)
-  });
+  }));
 });
 
 app.post('/api/chat/send', auth, async (req, res) => {
   if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
   const text = String(req.body.text || '').trim();
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  await memberSays(req.session.account, text, 'app');
-  res.json({ ok: true, messages: convOf(req.session.account.id), mode: req.session.tier === 'rtg' ? 'butler' : 'concierge' });
+  const taal = talen.taalVan(req.body.lang);
+  await memberSays(req.session.account, text, 'app', taal);
+  const messages = await trChat(convOf(req.session.account.id), taal);
+  res.json({ ok: true, messages, mode: req.session.tier === 'rtg' ? 'butler' : 'concierge' });
 });
 
 /* ============ rechtstreeks betalen aan een leverancier (Face ID) ============

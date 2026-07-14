@@ -1,7 +1,7 @@
 /* Domein "office" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
+  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, talen, trChat, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
 
   /* Salon-ontmoetingen: het RTG-veiligheidsteam ziet de lopende afspraken met
      live-locatie, handelt SOS-en af en kan bij een SOS live meekijken (WebRTC). */
@@ -313,7 +313,15 @@ app.get('/api/office/doc', (req, res) => {
   res.type(ext === 'jpg' ? 'jpeg' : ext).end(buf);
 });
 
-app.post('/api/office/conversations', officeAuth, (req, res) => res.json({ conversations: conciergeInbox() }));
+/* De concierge-inbox, met elk ledenbericht vertaald naar de taal van de
+   kantoormedewerker: het lid schrijft in de eigen taal, het kantoor leest in de
+   zijne (zelfde per-bericht-cache als overal). */
+app.post('/api/office/conversations', officeAuth, async (req, res) => {
+  const to = talen.taalVan(req.body.lang);
+  const inbox = conciergeInbox();
+  for (const c of inbox) c.messages = await trChat(c.messages, to);
+  res.json({ conversations: inbox });
+});
 
 app.post('/api/office/reply', officeAuth, (req, res) => {
   const u = accounts.getUserById(Number(req.body.userId));
@@ -322,13 +330,15 @@ app.post('/api/office/reply', officeAuth, (req, res) => {
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
   const md = accounts.getMemberState(u.id) || {};
   md.conversation = md.conversation || [];
-  md.conversation.push({ from: 'concierge', text: text.slice(0, 1000), at: new Date().toISOString(), channel: 'concierge' });
+  md.conversation.push({ from: 'concierge', text: text.slice(0, 1000), lang: talen.taalVan(req.body.lang), at: new Date().toISOString(), channel: 'concierge' });
   md.needsConcierge = false;
   accounts.saveMemberState(u.id, md);
   broadcastSync([u.tier], 'chat');
   notify(u.tier, { icon: '💬', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
   // Het antwoord verschijnt in de app van het lid (met push-melding); RTG gebruikt
   // geen externe berichtenkanalen.
-  res.json({ ok: true, conversations: conciergeInbox() });
+  const inbox = conciergeInbox();
+  Promise.all(inbox.map(async c => { c.messages = await trChat(c.messages, talen.taalVan(req.body.lang)); }))
+    .then(() => res.json({ ok: true, conversations: inbox }));
 });
 };

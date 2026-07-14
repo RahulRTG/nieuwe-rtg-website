@@ -1208,8 +1208,12 @@ async function keyVanCodenaam(codenaam) {
 /* De leden-laag (contactregels, memberTemplate, de leden-app-state en de
    eigen sollicitaties) staat in server/kern/lid.js. findSupplier en geborenVan
    zijn hoisted functies en dus hier al bruikbaar. */
+/* Wereldtalen (server/talen.js): de Boardroom zet per taal een schakelaar aan of
+   uit; iedereen chat in de eigen taal en de ander leest alles in de zijne. Vroeg
+   opgezet zodat de leden-laag (en alles daarna) taalVan kan gebruiken. */
+const talen = maakTalen({ db, save });
 const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications } =
-  maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, leeftijdVan, leeftijdsgroepVan, geborenVan });
+  maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan });
 
 /* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
    -facturen. Hoisted en dus ook bruikbaar door de demo-seed hierboven (die vóór
@@ -1785,10 +1789,6 @@ muntbetaal.koppelStore({
   }
 });
 const munten = maakMunten({ db, save, muntbetaal });
-
-/* Wereldtalen (server/talen.js): de Boardroom zet per taal een schakelaar aan of
-   uit; iedereen chat in de eigen taal en de ander leest alles in de zijne. */
-const talen = maakTalen({ db, save });
 
 /* Een bevestigde munt-ontvangst settelt de bijbehorende factuur langs de gewone
    weg: gemarkeerd als betaald, en voor abonnementen de 30%-afdracht aan de

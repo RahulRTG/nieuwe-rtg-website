@@ -13,7 +13,7 @@
    op de codenaam plus een zelfgekozen professionele naam. Niemand komt in de
    gids zonder er zelf voor te kiezen. */
 module.exports = (kern) => {
-  const { app, auth, crypto, db, save, schoon, liveCodename, openVacatures, gidsHaal,
+  const { app, auth, crypto, db, save, schoon, liveCodename, openVacatures, gidsHaal, talen,
     socialVerbind, connectieTussen, statusVan, zijnVrienden, verbActief, codenaamVan, sseToCustomer } = kern;
 
   function Z() {
@@ -155,7 +155,7 @@ module.exports = (kern) => {
     const tekst = schoon(req.body.tekst, 600);
     if (!tekst) return res.status(400).json({ error: 'Schrijf eerst iets.' });
     const z = Z();
-    z.posts.unshift({ id: rid(), key: p.key, naam: p.naam, kop: p.kop, tekst, at: nu(), likes: [], reacties: [] });
+    z.posts.unshift({ id: rid(), key: p.key, naam: p.naam, kop: p.kop, tekst, lang: talen.taalVan(req.body.lang), at: nu(), likes: [], reacties: [] });
     z.posts = z.posts.slice(0, 500);
     save();
     res.json({ ok: true, id: z.posts[0].id });
@@ -167,7 +167,7 @@ module.exports = (kern) => {
     res.json({
       mijnProfiel: !!profielen[mij],
       posts: Z().posts.slice(0, 40).map(x => ({
-        id: x.id, key: x.key, naam: x.naam, kop: x.kop, tekst: x.tekst, at: x.at,
+        id: x.id, key: x.key, naam: x.naam, kop: x.kop, tekst: x.tekst, lang: x.lang || 'nl', at: x.at,
         likes: x.likes.length, mijnLike: x.likes.includes(mij),
         reacties: x.reacties.slice(-6), reactiesTotaal: x.reacties.length,
         openVoorWerk: !!(profielen[x.key] && profielen[x.key].openVoorWerk)
@@ -191,7 +191,7 @@ module.exports = (kern) => {
     if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
     const tekst = schoon(req.body.tekst, 300);
     if (!tekst) return res.status(400).json({ error: 'Schrijf eerst iets.' });
-    post.reacties.push({ naam: p.naam, key: p.key, tekst, at: nu() });
+    post.reacties.push({ naam: p.naam, key: p.key, tekst, lang: talen.taalVan(req.body.lang), at: nu() });
     if (post.reacties.length > 60) post.reacties.splice(0, post.reacties.length - 60);
     save();
     res.json({ ok: true, reacties: post.reacties.slice(-6), reactiesTotaal: post.reacties.length });

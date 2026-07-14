@@ -7,7 +7,7 @@
    (Lifestyle/Business) mogen elk RTG-lid aanspreken; een RTG-lid reageert alleen
    met andere RTG-leden, tenzij een hoger lid het contact eerst legde. */
 
-function maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, leeftijdVan, leeftijdsgroepVan, geborenVan }) {
+function maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan }) {
   function hasContact(higherFull, rtgFull) {
     return db.data.contacts.some(c => c.higher === higherFull && c.rtg === rtgFull);
   }
@@ -47,7 +47,10 @@ function maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, leeftijdVan,
   }
 
   function stateFor(sess, lang) {
-    lang = lang === 'en' ? 'en' : 'nl';
+    // Elke actieve wereldtaal mag; systeeminhoud (facturen, reis) lokaliseert naar
+    // Nederlands of de Engelse terugval (via localize). Berichten van leden houden
+    // hun originele tekst + auteurstaal en worden per kijker vertaald.
+    lang = talen ? talen.taalVan(lang) : (lang === 'en' ? 'en' : 'nl');
     // Echte accounts tonen hun eigen identiteit (naam, codenaam); demo-sessies
     // vallen terug op de vaste persona's.
     const persona = sess.account ? accounts.publicUser(sess.account) : PERSONAS[sess.tier];

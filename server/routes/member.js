@@ -7,7 +7,8 @@ module.exports = (kern) => {
     zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
     voorkeurVan, zetVoorkeur,
     retailCatalogus, wishlistToggle, mijnApart, mijnStyling, vraagPaskamer, retailIsRetail,
-    PASPOORT_NIVEAUS, paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn } = kern;
+    PASPOORT_NIVEAUS, paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn,
+    salonZichtbaar, salonProfielCompleet } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -249,6 +250,38 @@ app.post('/api/salon/volg', auth, (req, res) => {
   save();
   broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
   res.json({ ok: true, volgIk: i < 0, volgers: s.salon.volgers.length });
+});
+
+/* De publieke Salon-etalage van een partner: bio, foto's, folders, aanbiedingen
+   en polls op een plek. Hier leeft de marketing/producten, los van de leden-app. */
+app.post('/api/salon/profiel', auth, (req, res) => {
+  const s = findSupplier(req.body.code);
+  if (!s || !salonZichtbaar(s)) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const key = req.session.key;
+  const t = db.data.supplierTypes[s.type] || {};
+  const eigen = db.data.posts.filter(p => p.partnerCode === s.code);
+  const claimVan = p => (p.deal && (p.deal.claims || []).find(c => c.key === key)) || null;
+  const items = eigen.map(p => ({
+    id: p.id, at: p.at || null, text: p.text, photo: p.photo || null,
+    soort: p.folder ? 'folder' : p.deal ? 'deal' : p.poll ? 'poll' : 'post',
+    likes: p.baseLikes + Object.keys(p.likedBy || {}).length,
+    folder: p.folder ? { titel: p.folder.titel, fotos: p.folder.fotos || [], items: p.folder.items || [] } : null,
+    deal: p.deal ? { titel: p.deal.titel, geldigTot: p.deal.geldigTot || null, mijnCode: (claimVan(p) || {}).code || null } : null,
+    poll: p.poll ? { vraag: p.poll.vraag, totaal: p.poll.opties.reduce((n, o) => n + o.stemmen.length, 0),
+      opties: p.poll.opties.map(o => ({ tekst: o.tekst, stemmen: o.stemmen.length, mijn: o.stemmen.includes(key) })),
+      gestemd: p.poll.opties.some(o => o.stemmen.includes(key)) } : null
+  }));
+  res.json({
+    partner: {
+      code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city,
+      bio: (s.salon && s.salon.bio) || '', foto: (s.salon && s.salon.foto) || null,
+      photos: (s.photos || []).slice(0, 8),
+      volgers: (s.salon && s.salon.volgers.length) || 0, volgIk: !!(s.salon && s.salon.volgers.includes(key)),
+      sinds: (s.salon && s.salon.sinds) || null,
+      caps: t.caps || []
+    },
+    items
+  });
 });
 
 app.post('/api/salon/deal/claim', auth, (req, res) => {
@@ -818,7 +851,8 @@ app.post('/api/member/accountant', auth, async (req, res) => {
 app.post('/api/suppliers', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const city = req.body.city;
-  const list = db.data.suppliers.filter(s => !city || s.city === city)
+  // De Salon is verplicht: partners zonder compleet Salon-profiel tonen we niet
+  const list = db.data.suppliers.filter(s => (!city || s.city === city) && salonZichtbaar(s))
     .map(s => ({ ...publicSupplier(s, req.body.lang), favoriet: isFavoriet(req.session.key, s.code) }));
   res.json({ suppliers: list, city: db.data.trip.dest });
 });
@@ -1116,7 +1150,7 @@ app.post('/api/partner', (req, res) => {
    kassa, backoffice, boekhouding en archiefkast automatisch meedoen. */
 app.post('/api/bezorg/partners', auth, (req, res) => {
   const partners = db.data.suppliers
-    .filter(s => magBezorgen(s) && s.bezorg && s.bezorg.aan && s.bezorg.producten.length)
+    .filter(s => magBezorgen(s) && s.bezorg && s.bezorg.aan && s.bezorg.producten.length && salonZichtbaar(s))
     .map(s => ({ code: s.code, name: s.name, type: s.type, city: s.city, loc: s.loc || null,
       ophalen: s.bezorg.ophalen !== false, bezorgen: s.bezorg.bezorgen !== false,
       producten: s.bezorg.producten.slice(0, 60) }));
@@ -1185,7 +1219,7 @@ app.post('/api/bezorg/volg', auth, (req, res) => {
    de deur op eigen naam afvinkt. */
 app.post('/api/tickets/aanbod', auth, (req, res) => {
   const partners = db.data.suppliers
-    .filter(s => ((db.data.supplierTypes[s.type] || {}).caps || []).includes('tickets') && (s.activiteiten || []).length)
+    .filter(s => ((db.data.supplierTypes[s.type] || {}).caps || []).includes('tickets') && (s.activiteiten || []).length && salonZichtbaar(s))
     .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null, activiteiten: s.activiteiten.slice(0, 30) }));
   res.json({ partners });
 });
@@ -1304,7 +1338,7 @@ function huurFotos(ref) { return db.data.huurFotos[ref] = db.data.huurFotos[ref]
 
 app.post('/api/verhuur/aanbod', auth, (req, res) => {
   const partners = db.data.suppliers
-    .filter(s => s.type === 'verhuur' && (s.autos || []).some(a => a.actief !== false))
+    .filter(s => s.type === 'verhuur' && (s.autos || []).some(a => a.actief !== false) && salonZichtbaar(s))
     .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null,
       autos: (s.autos || []).filter(a => a.actief !== false).slice(0, 40) }));
   res.json({ partners });
@@ -1437,7 +1471,7 @@ function charterFotos(ref) { return db.data.charterFotos[ref] = db.data.charterF
 
 app.post('/api/charter/aanbod', auth, (req, res) => {
   const partners = db.data.suppliers
-    .filter(s => s.type === 'charter' && (s.boten || []).some(v => v.actief !== false))
+    .filter(s => s.type === 'charter' && (s.boten || []).some(v => v.actief !== false) && salonZichtbaar(s))
     .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null,
       boten: (s.boten || []).filter(v => v.actief !== false).slice(0, 40) }));
   res.json({ partners });
@@ -1605,7 +1639,7 @@ app.post('/api/vastgoed/aanbod', auth, (req, res) => {
   const key = req.session.key;
   const uit = [];
   for (const s of db.data.suppliers) {
-    if (s.type !== 'vastgoed') continue;
+    if (s.type !== 'vastgoed' || !salonZichtbaar(s)) continue;
     const aanb = db.data.vastgoedAanbod.filter(a => a.supplierCode === s.code && (a.publiek || a.aanKeys.includes(key)));
     const pandIds = new Set(aanb.map(a => a.pandId));
     const gericht = new Set(aanb.filter(a => a.aanKeys.includes(key)).map(a => a.pandId));

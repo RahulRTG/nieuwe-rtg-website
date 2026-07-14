@@ -199,6 +199,11 @@
         <p class="sub" data-i18n="panel.incidenten.sub" style="margin:0 0 0.6rem;">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
         <div class="rows" id="incidenten"></div>
       </div>
+      <div class="panel">
+        <h2 data-i18n="panel.salon">Salon-naleving</h2>
+        <p class="sub" data-i18n="panel.salon.sub" style="margin:0 0 0.6rem;">De Salon is verplicht. Partners zonder compleet profiel zijn niet zichtbaar voor leden.</p>
+        <div class="rows" id="salonNaleving"></div>
+      </div>
     </div>
     <div class="panel" style="margin-top:1.5rem;">
       <h2>🤝 <span data-i18n="panel.trust">Vertrouwenslijn</span></h2>
@@ -281,6 +286,7 @@
     loadVerify();
     loadConcierge();
     loadIncidenten();
+    loadSalonNaleving();
     loadTrust();
     stream();
   }
@@ -350,6 +356,19 @@
   async function decideInc(id, besluit){
     try { await call('/office/incident/beslis', { id, besluit }); } catch(e){ alert(e.message); return; }
     loadIncidenten();
+  }
+
+  // ---- Salon-naleving: welke partners hebben (g)een compleet profiel ----
+  async function loadSalonNaleving(){
+    const el = document.getElementById('salonNaleving'); if (!el) return;
+    let d;
+    try { d = await call('/office/salon-naleving', {}); } catch(e){ return; }
+    const kop = '<div class="vrow"><div class="vi"><div class="nm">'+d.compleet+' / '+d.totaal+' '+T('bo.saloncompleet','profielen compleet')+'</div>'+
+      '<div class="sub">'+(d.achter.length ? d.achter.length+' '+T('bo.salonachter','partner(s) nog niet zichtbaar voor leden') : T('bo.salonok','alle partners zijn zichtbaar'))+'</div></div></div>';
+    const rows = (d.partners || []).map(p =>
+      '<div class="vrow"><div class="vi"><div class="nm">'+(p.compleet?'✅':'⚠️')+' '+escHtml(p.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(p.type)+'</span></div>'+
+      '<div class="sub">'+(p.bio?'✓':'✗')+' bio · '+(p.foto?'✓':'✗')+' foto · '+p.items+' '+T('bo.salonitems','items')+' · '+p.volgers+' '+T('bo.salonvolgers','volgers')+'</div></div></div>').join('');
+    el.innerHTML = kop + rows;
   }
 
   let convData = [], convUser = null;
@@ -567,7 +586,7 @@
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
-    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadConcierge(); loadIncidenten(); loadTrust(); });
+    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadConcierge(); loadIncidenten(); loadSalonNaleving(); loadTrust(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
   }
 
@@ -614,6 +633,9 @@ window.I18N = { en: {
   'bo.face':'Face = passport', 'panel.incidenten':'Passport incidents',
   'panel.incidenten.sub':'On an incident a partner demands an identity. Review, then release only if justified.',
   'bo.release':'Release', 'bo.declineinc':'Decline', 'bo.noinc':'No open incidents.',
+  'panel.salon':'Salon compliance', 'panel.salon.sub':'The Salon is mandatory. Partners without a complete profile are not visible to members.',
+  'bo.saloncompleet':'profiles complete', 'bo.salonachter':'partner(s) not yet visible to members', 'bo.salonok':'all partners are visible',
+  'bo.salonitems':'items', 'bo.salonvolgers':'followers',
   'bo.waiting':'waiting', 'bo.open':'Open', 'bo.noconv':'No conversations yet.', 'bo.replyph':'Reply as concierge…', 'bo.send':'Send',
   'bo.partners':'Partners', 'bo.proposals':'Price proposals', 'bo.orders':'Orders', 'bo.revenue':'Revenue via partners',
   'bo.noprices':'No prices yet. As soon as a partner submits a dynamic price, it appears here live.',

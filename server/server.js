@@ -531,10 +531,23 @@ function ensureSupplierDefaults(s) {
       : { start: 15, perKm: 2.4, minimum: 25 };
   }
   // verplicht onderdeel van elk RTG-partnerschap: een bedrijfsaccount op De
-  // Salon, met volgers en marketinggereedschap (aanbiedingen, polls, cijfers)
-  if (!s.salon) s.salon = { bio: '', volgers: [], sinds: new Date().toISOString() };
+  // Salon, met volgers en marketinggereedschap (folders, aanbiedingen, polls)
+  if (!s.salon) s.salon = { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
   if (!Array.isArray(s.salon.volgers)) s.salon.volgers = [];
 }
+
+/* ---- De Salon is verplicht: elke partner doet zijn marketing, producten en
+   folders via De Salon (niet in de leden-app). Een partner met een onvolledig
+   Salon-profiel wordt NIET aan leden getoond en kan niets publiceren. Compleet =
+   een bio en minstens een profielfoto (of een foto op de bedrijfspagina). */
+function salonProfielCompleet(s) {
+  const bio = ((s.salon && s.salon.bio) || '').trim();
+  const heeftFoto = !!(s.salon && s.salon.foto) || (Array.isArray(s.photos) && s.photos.length > 0);
+  return bio.length >= 15 && heeftFoto;
+}
+function salonZichtbaar(s) { return salonProfielCompleet(s); }
+// hoeveel Salon-items (posts/folders/deals/polls) deze partner al plaatste
+function salonItemsVan(code) { return db.data.posts.filter(p => p.partnerCode === code).length; }
 
 function initRealtime() {
   if (!db.data.sessions) db.data.sessions = {};
@@ -738,6 +751,8 @@ function initRealtime() {
   }
   if (!db.data.charterFotos) db.data.charterFotos = {};   // ref -> { voor: [], na: [] }
   if (!db.data.charterLocaties) db.data.charterLocaties = {}; // ref -> { aan, lat, lng, at } (positie op het water)
+  // De Salon-verplichting voor de demo-partners wordt onderaan initRealtime gezet
+  // (na alle genre-seeds), zodat elke geseede partner een compleet profiel krijgt.
   // contracten: elke zaak kan een contract (verhuur/personeel/algemeen) opstellen
   // en aan een lid of personeelslid sturen; beide partijen tekenen digitaal
   if (!db.data.contracten) db.data.contracten = [];
@@ -829,6 +844,39 @@ function initRealtime() {
       save();
     }
     webpush.setVapidDetails('mailto:leden@rahultravelgroup.example', db.data.vapid.publicKey, db.data.vapid.privateKey);
+  }
+  // De Salon is verplicht: geef elke geseede partner een compleet profiel (bio +
+  // foto), zodat ze aan leden worden getoond. Dit draait NA alle genre-seeds,
+  // zodat ook vastgoed, retail en charter meelopen. Een echte partner vult dit
+  // zelf in via de leverancier-app.
+  const SALON_BIO = {
+    restaurant: 'Fijn dineren met verse, seizoensgebonden gerechten. Reserveer via De Salon.',
+    bar: 'Cocktails en sunset-sessies aan het water. Volg ons voor de line-up.',
+    hotel: 'Boutiquehotel met zeezicht, spa en persoonlijke service.',
+    apartment: 'Stijlvolle appartementen en villa’s met slimme deuren en privacy.',
+    taxi: 'Comfortabel privevervoer over het eiland, dag en nacht.',
+    jet: 'Privejets op maat, van transfer tot dagtrip, wereldwijd.',
+    helikopter: 'Scenic vluchten en snelle transfers per helikopter.',
+    zzp: 'Zelfstandig vakmanschap op afspraak, met oog voor detail.',
+    activiteit: 'Tours, cruises en experiences om het eiland te beleven.',
+    verhuur: 'Auto’s huren zonder verrassingen: vaste prijs en eerlijke staat.',
+    charter: 'Boten en jachten charteren, met of zonder schipper, veilig op zee.',
+    vastgoed: 'Exclusief vastgoed, discreet aangeboden aan RTG-leden.',
+    retail: 'Mode en accessoires uit onze nieuwste collecties.'
+  };
+  const salonFotoVoor = (s) => {
+    const t = db.data.supplierTypes[s.type] || {};
+    const kleur = ['#1b3a5b', '#5b2540', '#3a5b2e', '#5b4a1b', '#2e4a5b', '#4a2e5b'][(s.code.charCodeAt(0) + s.code.length) % 6];
+    const letters = s.name.replace(/[^A-Za-z ]/g, '').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'RTG';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200"><rect width="320" height="200" fill="' + kleur + '"/>' +
+      '<text x="160" y="118" font-family="Georgia,serif" font-size="64" fill="#ffffff" text-anchor="middle" opacity="0.92">' + letters + '</text>' +
+      '<text x="160" y="160" font-family="Arial,sans-serif" font-size="16" fill="#ffffff" text-anchor="middle" opacity="0.7">' + (t.label || '') + '</text></svg>';
+    return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
+  };
+  for (const s of db.data.suppliers) {
+    if (!s.salon) s.salon = { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
+    if (!s.salon.bio) s.salon.bio = SALON_BIO[s.type] || 'RTG-partner. Volg ons op De Salon voor aanbod en folders.';
+    if (!s.salon.foto && !(s.photos && s.photos.length)) s.salon.foto = salonFotoVoor(s);
   }
 }
 
@@ -1795,7 +1843,7 @@ const kern = {
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
-  runItem, runKey, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sendPush,
+  runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, trChat, trustVan, unlockDoor, urenVan, validDept,

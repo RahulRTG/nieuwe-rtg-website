@@ -1,7 +1,27 @@
 /* Domein "office" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, paspoortIncidenten, paspoortBeoordeel } = kern;
+  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan } = kern;
+
+  // Naleving van de Salon-verplichting: welke partners zijn (niet) zichtbaar
+  app.post('/api/office/salon-naleving', officeAuth, (req, res) => {
+    const lijst = db.data.suppliers.map(s => {
+      const t = db.data.supplierTypes[s.type] || {};
+      const bio = ((s.salon && s.salon.bio) || '').trim();
+      const heeftFoto = !!(s.salon && s.salon.foto) || (Array.isArray(s.photos) && s.photos.length > 0);
+      return {
+        code: s.code, name: s.name, type: t.label || s.type, city: s.city,
+        compleet: salonProfielCompleet(s), bio: bio.length >= 15, foto: heeftFoto,
+        items: salonItemsVan(s.code), volgers: (s.salon && s.salon.volgers.length) || 0
+      };
+    });
+    res.json({
+      totaal: lijst.length,
+      compleet: lijst.filter(x => x.compleet).length,
+      achter: lijst.filter(x => !x.compleet),
+      partners: lijst.sort((a, b) => (a.compleet === b.compleet ? 0 : a.compleet ? 1 : -1))
+    });
+  });
 
   // backoffice-toegang via een query-token (stream/export/doc): een echte
   // office-sessie, OF de eigenaar met zijn eigen accountlogin.

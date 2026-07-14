@@ -4652,6 +4652,49 @@
 
   /* ---------- salon ---------- */
 
+  // De publieke Salon-etalage van een partner: bio, foto's, folders, deals, polls
+  async function openEtalage(code){
+    let d;
+    try { d = await API.call('/salon/profiel', { code }); } catch(e){ toast(e.message); return; }
+    const p = d.partner;
+    let ov = document.getElementById('etalage-ov');
+    if (!ov){ ov = document.createElement('div'); ov.id = 'etalage-ov';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:120;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;justify-content:center;';
+      document.body.appendChild(ov);
+      ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+    }
+    const eur2 = n => '€ ' + Number(n||0).toLocaleString('nl-NL');
+    const items = d.items || [];
+    const html =
+      '<div style="width:100%;max-width:560px;max-height:88vh;overflow-y:auto;background:var(--bg);border-radius:20px 20px 0 0;border:1px solid var(--line);">' +
+      '<div style="position:relative;">' +
+        (p.foto ? '<img src="' + p.foto + '" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:20px 20px 0 0;">' : '<div style="height:80px;"></div>') +
+        '<button id="etaClose" style="position:absolute;top:0.7rem;right:0.7rem;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:999px;width:34px;height:34px;font-size:1rem;cursor:pointer;">✕</button>' +
+      '</div>' +
+      '<div style="padding:1rem 1.1rem 1.4rem;">' +
+        '<div style="display:flex;align-items:center;gap:0.6rem;"><b style="font-size:1.1rem;font-family:\'Bodoni Moda\',serif;">' + escT(p.name) + '</b>' +
+          '<button id="etaVolg" style="margin-left:auto;background:' + (p.volgIk ? 'var(--gold)' : 'none') + ';color:' + (p.volgIk ? '#000' : 'var(--gold)') + ';border:1px solid var(--gold);border-radius:999px;padding:0.3rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;">' + (p.volgIk ? '✓ ' + T('sal.volgt','Volgt') : '+ ' + T('sal.volg','Volg')) + '</button></div>' +
+        '<div style="font-size:0.74rem;color:var(--soft);margin-top:0.2rem;">' + (p.icon ? p.icon + ' ' : '') + escT(p.typeLabel || '') + ' · ' + escT(p.city || '') + ' · ' + p.volgers + ' ' + T('sal.volgers','volgers') + '</div>' +
+        (p.bio ? '<div style="font-size:0.86rem;margin-top:0.6rem;line-height:1.5;">' + escT(p.bio) + '</div>' : '') +
+        (items.length
+          ? items.map(it =>
+            '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.7rem;">' +
+            '<div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">' + (it.soort === 'folder' ? '📖 ' + T('sal.folder','Folder') : it.soort === 'deal' ? '🎁 ' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? '📊 Poll' : '📣 ' + T('sal.bericht','Bericht')) + '</div>' +
+            (it.folder ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.folder.titel) + '</div>' +
+              ((it.folder.fotos && it.folder.fotos.length) ? '<div style="display:flex;gap:0.4rem;overflow-x:auto;margin-top:0.45rem;">' + it.folder.fotos.map(f => '<img src="' + f + '" alt="" style="height:90px;border-radius:8px;flex-shrink:0;">').join('') + '</div>' : '') +
+              ((it.folder.items && it.folder.items.length) ? '<div style="margin-top:0.45rem;display:grid;gap:0.2rem;">' + it.folder.items.map(x => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(x.naam) + '</span>' + (x.prijs != null ? '<span style="color:var(--gold);">' + eur2(x.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '')
+              : (it.deal ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.deal.titel) + (it.deal.mijnCode ? ' · <span style="color:var(--gold);">' + it.deal.mijnCode + '</span>' : '') + '</div>'
+              : '<div style="font-size:0.85rem;margin-top:0.2rem;">' + escT(it.text || '') + '</div>')) +
+            '</div>').join('')
+          : '<div style="text-align:center;color:var(--soft);font-size:0.82rem;padding:1.4rem 0;">' + T('sal.etaleeg','Nog geen folders of aanbiedingen.') + '</div>') +
+      '</div></div>';
+    ov.innerHTML = html;
+    ov.querySelector('#etaClose').addEventListener('click', () => ov.remove());
+    ov.querySelector('#etaVolg').addEventListener('click', async () => {
+      try { await API.call('/salon/volg', { code }); await refreshState(); renderSalon(); openEtalage(code); } catch(e){ toast(e.message); }
+    });
+  }
+
   function renderSalon(){
     const isGuest = user && user.tier === 'guest';
     // RTG Zakelijk: de ingang staat aan voor de Lifestyle en Business Pass
@@ -4700,6 +4743,17 @@
               : '<button class="js-stem" data-optie="' + i + '" style="display:block;width:100%;margin-top:0.45rem;background:none;border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;color:var(--txt);font-size:0.78rem;font-family:inherit;text-align:left;cursor:pointer;">' + o.tekst + '</button>';
           }).join('') + '</div>'
         : '';
+      const folder = p.folder
+        ? '<div style="margin:0.6rem 1.1rem 0;border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;">' +
+          '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">📖 ' + T('sal.folder','Folder') + '</div>' +
+          '<div style="font-weight:600;font-size:0.9rem;margin-top:0.25rem;">' + escT(p.folder.titel) + '</div>' +
+          ((p.folder.fotos && p.folder.fotos.length) ? '<div style="display:flex;gap:0.4rem;overflow-x:auto;margin-top:0.5rem;">' + p.folder.fotos.map(f => '<img src="' + f + '" alt="" style="height:96px;border-radius:8px;flex-shrink:0;">').join('') + '</div>' : '') +
+          ((p.folder.items && p.folder.items.length) ? '<div style="margin-top:0.5rem;display:grid;gap:0.2rem;">' + p.folder.items.slice(0, 12).map(it => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(it.naam) + (it.tekst ? ' <span style="color:var(--soft);">· ' + escT(it.tekst) + '</span>' : '') + '</span>' + (it.prijs != null ? '<span style="color:var(--gold);white-space:nowrap;">' + eur(it.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '') +
+          '</div>'
+        : '';
+      const etalageBtn = p.partnerCode
+        ? '<button class="pa js-etalage" data-code="' + p.partnerCode + '" title="' + T('sal.etalage','Etalage') + '">🏬 ' + T('sal.etalage','Etalage') + '</button>'
+        : '';
       return '<article class="post" data-post="' + p.id + '">' +
         '<div class="head">' +
           '<div class="avatar a-' + p.tier + '">' + escT((p.author || ' ')[0]) + '</div>' +
@@ -4708,10 +4762,11 @@
         '</div>' +
         visual +
         '<div class="body">' + msgHTML(p.text, p.lang) + '</div>' +
-        deal + poll +
+        folder + deal + poll +
         '<div class="acts">' +
           '<button class="pa js-like' + (p.liked ? ' liked' : '') + '"' + (mayLike ? '' : ' disabled') + '>♥ <span class="lc">' + p.likes + '</span></button>' +
           '<button class="pa js-comm"' + (engage ? '' : ' disabled') + '>' + T('app.salon.comment','Reageren') + ' (' + p.comments.length + ')</button>' +
+          etalageBtn +
           '<button class="pa js-share" title="' + T('sal.deel','Delen met een connectie') + '">↗</button>' +
         '</div>' +
         '<div class="comments">' +
@@ -4753,6 +4808,8 @@
           renderSalon();
         } catch(e){ toast(e.message); }
       });
+      const etaBtn = el.querySelector('.js-etalage');
+      if (etaBtn) etaBtn.addEventListener('click', () => openEtalage(etaBtn.dataset.code));
       el.querySelectorAll('.js-stem').forEach(sb => sb.addEventListener('click', async () => {
         try {
           await API.call('/salon/poll/stem', { postId: post.id, optie: Number(sb.dataset.optie) });
@@ -4872,6 +4929,7 @@ window.I18N = { en: {
   'sal.deal':'Members only', 'sal.uwcode':'Your code', 'sal.toon':'show at the register',
   'sal.claim':'Claim this offer', 'sal.geclaimd':'times claimed', 'sal.claimok':'Claimed. Your code:',
   'sal.poll':'Poll', 'sal.stemmen':'vote(s)', 'app.salon.direct':'posted instantly',
+  'sal.folder':'Folder', 'sal.etalage':'Storefront', 'sal.bericht':'Post', 'sal.etaleeg':'No folders or offers yet.',
   'app.ms.18':'Alcohol: 18+ only; the venue may ask for ID.',
   'app.ms.18b':'the venue may ask for ID.',
   'app.ms.los':'You order directly from this venue: a separate contract, and your payment goes directly to the venue.',

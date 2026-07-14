@@ -76,7 +76,9 @@ function maakLid({ db, accounts, PERSONAS, findSupplier, i18n, rtf, leeftijdVan,
           totaal: p.poll.opties.reduce((n, o) => n + o.stemmen.length, 0),
           opties: p.poll.opties.map((o, i) => ({ tekst: o.tekst, stemmen: o.stemmen.length, mijn: o.stemmen.includes(sess.key) })),
           gestemd: p.poll.opties.some(o => o.stemmen.includes(sess.key))
-        } : null
+        } : null,
+        // folder (digitale brochure): titel, foto's en producten/hoogtepunten
+        folder: p.folder ? { titel: p.folder.titel, fotos: p.folder.fotos || [], items: p.folder.items || [] } : null
       };
     });
     const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0, creatorLikes: 0, lang };

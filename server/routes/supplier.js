@@ -5,7 +5,15 @@ module.exports = (kern) => {
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor } = kern;
+    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor } = kern;
+
+// De Salon is verplicht: publiceren (post/folder/deal/poll) kan pas met een
+// compleet profiel (bio + foto). De bio/foto-endpoints zelf blijven altijd open.
+function eisSalonProfiel(req, res) {
+  if (salonProfielCompleet(req.supplier)) return true;
+  res.status(409).json({ error: 'Vul eerst uw Salon-profiel in (een bio en een profielfoto). De Salon is de plek voor uw marketing, producten en folders.' });
+  return false;
+}
 
 app.post('/api/supplier/login', async (req, res) => {
   let s, actor;
@@ -195,6 +203,7 @@ app.post('/api/supplier/photo/remove', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAuth, (req, res) => {
+  if (!eisSalonProfiel(req, res)) return;
   const text = String(req.body.text || '').trim().slice(0, 600);
   if (!text) return res.status(400).json({ error: 'Schrijf eerst een tekst.' });
   let photo = null;
@@ -221,6 +230,7 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
 
 app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  if (!eisSalonProfiel(req, res)) return;
   const titel = schoon(req.body.titel, 80);
   const text = schoon(req.body.text, 400);
   if (!titel || !text) return res.status(400).json({ error: 'Geef de aanbieding een titel en een tekst.' });
@@ -260,6 +270,7 @@ app.post('/api/supplier/salon/deal/redeem', supplierAuth, (req, res) => {
 
 app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  if (!eisSalonProfiel(req, res)) return;
   const vraag = schoon(req.body.vraag, 140);
   const opties = (Array.isArray(req.body.opties) ? req.body.opties : []).map(o => schoon(o, 60)).filter(Boolean).slice(0, 4);
   if (!vraag || opties.length < 2) return res.status(400).json({ error: 'Geef een vraag en minstens twee opties.' });
@@ -279,13 +290,69 @@ app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
   res.json({ ok: true, postId: post.id });
 });
 
-app.post('/api/supplier/salon/bio', supplierAuth, (req, res) => {
+app.post('/api/supplier/salon/bio', express.json({ limit: '2mb' }), supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
-  req.supplier.salon = req.supplier.salon || { bio: '', volgers: [], sinds: new Date().toISOString() };
-  req.supplier.salon.bio = schoon(req.body.bio, 200);
+  const s = req.supplier;
+  s.salon = s.salon || { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
+  if (req.body.bio != null) s.salon.bio = schoon(req.body.bio, 200);
+  // een profielfoto (etalage-omslag) mag mee; leeg laten wist hem niet
+  if (typeof req.body.foto === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(req.body.foto) && req.body.foto.length <= 1.5 * 1024 * 1024) s.salon.foto = req.body.foto;
   save();
-  logActivity(req.supplier.code, req.actor, 'werkte het Salon-profiel bij');
-  res.json({ ok: true, salon: { bio: req.supplier.salon.bio, volgers: req.supplier.salon.volgers.length } });
+  logActivity(s.code, req.actor, 'werkte het Salon-profiel bij');
+  res.json({ ok: true, salon: { bio: s.salon.bio, foto: s.salon.foto || null, volgers: s.salon.volgers.length }, compleet: salonProfielCompleet(s) });
+});
+
+// de verplichte Salon-status: is het profiel compleet en welke stappen resten nog
+app.post('/api/supplier/salon/status', supplierAuth, (req, res) => {
+  const s = req.supplier;
+  const bio = ((s.salon && s.salon.bio) || '').trim();
+  const heeftFoto = !!(s.salon && s.salon.foto) || (Array.isArray(s.photos) && s.photos.length > 0);
+  const items = salonItemsVan(s.code);
+  const stappen = [
+    { id: 'bio', klaar: bio.length >= 15, tekst: 'Schrijf een bio (min. 15 tekens)' },
+    { id: 'foto', klaar: heeftFoto, tekst: 'Voeg een profielfoto of bedrijfsfoto toe' },
+    { id: 'item', klaar: items >= 1, tekst: 'Plaats uw eerste folder of bericht' }
+  ];
+  const gedaan = stappen.filter(x => x.klaar).length;
+  res.json({
+    compleet: salonProfielCompleet(s),               // vereist voor zichtbaarheid en publiceren
+    zichtbaar: salonProfielCompleet(s),
+    volledig: gedaan === stappen.length,             // ook de eerste folder geplaatst
+    percentage: Math.round(gedaan / stappen.length * 100),
+    stappen, items,
+    bio: bio, foto: (s.salon && s.salon.foto) || null, volgers: (s.salon && s.salon.volgers.length) || 0
+  });
+});
+
+// een folder (digitale brochure): titel + foto's + producten/hoogtepunten
+app.post('/api/supplier/salon/folder', express.json({ limit: '8mb' }), supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  if (!eisSalonProfiel(req, res)) return;
+  const titel = schoon(req.body.titel, 80);
+  if (!titel) return res.status(400).json({ error: 'Geef de folder een titel.' });
+  const fotos = (Array.isArray(req.body.fotos) ? req.body.fotos : [])
+    .filter(f => typeof f === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(f) && f.length <= 1.5 * 1024 * 1024)
+    .slice(0, 8);
+  const items = (Array.isArray(req.body.items) ? req.body.items : []).slice(0, 30).map(it => ({
+    naam: schoon(it.naam, 80), prijs: it.prijs != null && it.prijs !== '' ? Math.max(0, Number(it.prijs) || 0) : null, tekst: schoon(it.tekst, 120)
+  })).filter(it => it.naam);
+  if (!fotos.length && !items.length) return res.status(400).json({ error: 'Voeg minstens een foto of een product toe.' });
+  const post = {
+    id: Date.now(),
+    author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
+    place: req.supplier.city, visual: null, photo: fotos[0] || null,
+    text: schoon(req.body.tekst, 300) || titel, lang: req.body.lang === 'en' ? 'en' : 'nl',
+    at: new Date().toISOString(), baseLikes: 0, likedBy: {}, comments: [],
+    folder: { titel, fotos, items }
+  };
+  db.data.posts.unshift(post);
+  db.data.posts = db.data.posts.slice(0, 60);
+  save();
+  logActivity(req.supplier.code, req.actor, 'plaatste een folder op De Salon: "' + titel + '"');
+  salonNaarVolgers(req.supplier, '📖 ' + titel);
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+  sseToOffice('sync', { scope: 'salon' });
+  res.json({ ok: true, postId: post.id });
 });
 
 app.post('/api/supplier/salon/stats', supplierAuth, (req, res) => {

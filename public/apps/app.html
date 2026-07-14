@@ -945,6 +945,7 @@
         <p class="sub" data-i18n="app.v.bz.sub">Laat bezorgen of haal op bij RTG-partners, en volg uw bezorger live.</p>
         <div id="bzMijn"></div>
         <div id="bzInhoud"></div>
+        <div id="boodschappen"></div>
       </div>
       <div class="view" data-view="gezin">
         <h2>Je gezinsruimte.</h2>
@@ -1958,6 +1959,7 @@
     else if (scope === 'tickets'){ laadTickets(); }
     else if (scope === 'huur'){ laadVerhuur(); }
     else if (scope === 'charter'){ laadCharter(); }
+    else if (scope === 'groothandel'){ laadBoodschappen(); }
     else if (scope === 'contract'){ laadContracten(); }
     else if (scope === 'vastgoed'){ laadVastgoed(); }
     else if (scope === 'live'){ renderLive(); laadTickets(); }
@@ -2046,6 +2048,7 @@
     renderSalon();
     renderTerPlaatse();
     laadBestellen();
+    laadBoodschappen();
     laadTickets();
     laadVerhuur();
     laadCharter();
@@ -2508,6 +2511,36 @@
     try { bzPartners = (await API.call('/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
     renderBestellen();
     laadBzMijn();
+  }
+
+  // Boodschappen bij een groothandel/supermarkt (consumentprijs, met bezorging)
+  async function laadBoodschappen(){
+    const el = $('#boodschappen'); if (!el || !API.live) return;
+    if (user && user.tier === 'guest'){ el.innerHTML = ''; return; }
+    let markt, mijn;
+    try { markt = await API.call('/groothandel/markt'); mijn = await API.call('/groothandel/mijn'); } catch(e){ el.innerHTML = ''; return; }
+    const winkels = markt.groothandels || [];
+    if (!winkels.length && !(mijn.bestellingen||[]).length){ el.innerHTML = ''; return; }
+    let h = '<h3 style="margin:1.4rem 0 0.3rem;font-size:1rem;">🛒 ' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('bo.sub','Bestel bij een groothandel of supermarkt en laat bezorgen.') + '</p>';
+    for (const g of winkels){
+      h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">' +
+        '<b>' + escT(g.naam) + '</b><span class="sub"> · ' + escT(g.city||'') + '</span>' +
+        g.producten.slice(0,50).map(p => '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-top:1px solid var(--line);">' +
+          '<div style="flex:1;"><span style="font-size:0.85rem;">' + escT(p.naam) + '</span><span class="sub"> · € ' + p.prijs + '/' + escT(p.eenheid) + '</span></div>' +
+          '<input class="js-boq" data-code="' + g.code + '" data-pid="' + p.id + '" type="number" min="0" placeholder="0" aria-label="' + T('bo.aantal','Aantal') + '" style="width:3.6rem;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0.35rem;color:var(--txt);font-family:inherit;"></div>').join('') +
+        '<button class="js-bobestel" data-code="' + g.code + '" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.55rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('bo.bestel','Bezorgen') + '</button></div>';
+    }
+    if ((mijn.bestellingen||[]).length){
+      h += '<div class="sub" style="margin:0.6rem 0 0.3rem;">' + T('bo.mijn','Mijn boodschappen') + '</div>';
+      h += mijn.bestellingen.slice(0,10).map(o => '<div style="border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.35rem;"><div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.82rem;">' + escT(o.groothandelNaam) + ' · € ' + o.subtotaal + '</b><span class="sub">' + escT(o.status) + '</span></div></div>').join('');
+    }
+    el.innerHTML = h;
+    el.querySelectorAll('.js-bobestel').forEach(b => b.addEventListener('click', async () => {
+      const regels = [];
+      el.querySelectorAll('.js-boq[data-code="' + b.dataset.code + '"]').forEach(inp => { const a = Number(inp.value)||0; if (a>0) regels.push({ productId: inp.dataset.pid, aantal: a }); });
+      if (!regels.length) return toast(T('bo.kies','Vul minstens een aantal in.'));
+      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels }); toast('🛒 ' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+    }));
   }
   async function laadBzMijn(){
     const el = $('#bzMijn'); if (!el || !API.live) return;
@@ -5133,6 +5166,8 @@ window.I18N = { en: {
   'ont.match':'Match! Sign the contract to start.', 'ont.gestart':'Meetup started. RTG watches for your safety.',
   'ont.sosbericht':'I do not feel safe', 'ont.sosverstuurd':'SOS sent. RTG office is alerted and watching.',
   'ont.tekenbevestig':'I am 18+ with a verified passport and agree to the safety contract: RTG office may see my live location until the meetup ends, and on SOS watch via the camera and call 112.',
+  'bo.h':'Groceries', 'bo.sub':'Order from a wholesaler or supermarket and have it delivered.', 'bo.aantal':'Quantity',
+  'bo.bestel':'Have delivered', 'bo.mijn':'My groceries', 'bo.kies':'Enter at least one quantity.', 'bo.ok':'Groceries ordered.',
   'app.ms.18':'Alcohol: 18+ only; the venue may ask for ID.',
   'app.ms.18b':'the venue may ask for ID.',
   'app.ms.los':'You order directly from this venue: a separate contract, and your payment goes directly to the venue.',

@@ -589,6 +589,16 @@
         <p class="sub" data-i18n="sup.v.charter.sub">Uw vloot boten en jachten, de lopende charters met de staat (foto's voor en na), motoruren en brandstof, en de SOS op zee.</p>
         <div id="charterWrap"></div>
       </div>
+      <div class="view" data-view="groothandel">
+        <h2 data-i18n="sup.v.groothandel">Groothandel &amp; markt</h2>
+        <p class="sub" data-i18n="sup.v.groothandel.sub">Uw assortiment en prijzen, uw eigen functies (aan wie u levert, bezorgen, AI-bijbestellen), en de binnenkomende bestellingen.</p>
+        <div id="groothandelWrap"></div>
+      </div>
+      <div class="view" data-view="inkoop">
+        <h2 data-i18n="sup.v.inkoop">Inkoop bij de groothandel</h2>
+        <p class="sub" data-i18n="sup.v.inkoop.sub">Bestel voorraad bij een groothandel, of laat de AI op basis van uw verkoop en mise-en-place een bijbestelling voorstellen.</p>
+        <div id="inkoopWrap"></div>
+      </div>
       <div class="view" data-view="paspoort">
         <h2 data-i18n="sup.v.paspoort">Identiteit &amp; leeftijd</h2>
         <p class="sub" data-i18n="sup.v.paspoort.sub">Controleer de identiteit of leeftijd achter een codenaam. De gast krijgt een melding en kan een ID-kaart of paspoort weigeren; alleen de ja/nee-bevestiging is altijd beschikbaar.</p>
@@ -746,6 +756,8 @@
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
     charter:  { label:'Charter',   svg:'<path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/><path d="M3 20c1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0"/>', cap:'charter' },
+    groothandel:{ label:'Groothandel', svg:'<rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M3 8l2-4h14l2 4"/><path d="M10 12h4"/>', cap:'groothandel' },
+    inkoop:   { label:'Inkoop',    svg:'<circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M2 3h3l2.2 12.3a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>', cap:'menu' },
     paspoort: { label:'Identiteit', svg:'<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="10" r="2.4"/><path d="M8 16c0.5-2 2.2-3 4-3s3.5 1 4 3"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
@@ -2983,6 +2995,126 @@
     });
   }
 
+  // ---- groothandel: de groothandel beheert assortiment, functies en orders ----
+  let ghEdit = null;
+  async function renderGroothandel(){
+    const el = $('#groothandelWrap'); if (!el) return;
+    if (!has('groothandel')){ el.innerHTML = ''; return; }
+    let d; try { d = await API.call('/supplier/groothandel/overzicht'); } catch(e){ return; }
+    const cats = d.categorieen || [];
+    // functie-schakelaars
+    let h = '<div class="st-sec">'+T('gh.functies','Uw functies (aan/uit)')+'</div><div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">' +
+      (d.functies||[]).map(f => '<button class="js-ghf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--line)')+';background:'+(f.aan?'#12321f':'var(--card2)')+';color:'+(f.aan?'#7EE0A3':'var(--soft)')+';border-radius:999px;padding:0.32rem 0.7rem;font-size:0.72rem;font-weight:600;font-family:inherit;">'+esc(f.naam)+'</button>').join('') +
+      '</div>';
+    // binnenkomende orders
+    const ink = d.inkomend || { open:[], afgerond:[], omzet:0 };
+    h += '<div class="st-sec">'+T('gh.orders','Bestellingen')+' · '+T('gh.omzet','omzet')+' '+eur(ink.omzet||0)+'</div>';
+    h += ink.open.length ? ink.open.map(o => ghOrderKaart(o, true)).join('') : '<p class="sub">'+T('gh.geenorders','Geen openstaande bestellingen.')+'</p>';
+    if (ink.afgerond.length) h += '<details style="margin-top:0.6rem;"><summary class="sub" style="cursor:pointer;">'+T('gh.afgerond','Afgerond')+' ('+ink.afgerond.length+')</summary>'+ink.afgerond.map(o=>ghOrderKaart(o,false)).join('')+'</details>';
+    // assortiment
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('gh.assortiment','Assortiment')+' <button class="js-ghnew" style="float:right;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;font-family:inherit;">+ '+T('gh.nieuw','Nieuw product')+'</button></div>';
+    h += '<div id="ghForm"></div>';
+    h += '<div style="margin-top:0.5rem;">'+(d.producten||[]).map(p =>
+      '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-top:1px solid var(--line);">'+
+      '<div style="flex:1;"><b style="font-size:0.85rem;">'+esc(p.naam)+'</b><span class="sub"> · '+esc(p.categorie)+' · '+T('gh.per','per')+' '+esc(p.eenheid)+'</span>'+
+      '<div class="sub">'+T('gh.inkoop','inkoop')+' '+eur(p.inkoopPrijs)+' · '+T('gh.consument','consument')+' '+eur(p.consumentPrijs)+' · '+T('gh.voorraad','voorraad')+' '+p.voorraad+(p.actief?'':' · <span style="color:var(--gold);">'+T('gh.uit','uit')+'</span>')+'</div></div>'+
+      '<button class="js-ghedit" data-id="'+p.id+'" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.3rem 0.6rem;color:var(--txt);font-size:0.72rem;font-family:inherit;">'+T('gh.bewerk','Bewerk')+'</button></div>').join('');
+    el.innerHTML = h;
+    el.querySelectorAll('.js-ghf').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/groothandel/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); renderGroothandel(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-ghverder]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/groothandel/order/status', { ref:b.dataset.ghverder, actie:'verder' }); renderGroothandel(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-ghweiger]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/groothandel/order/status', { ref:b.dataset.ghweiger, actie:'weiger' }); renderGroothandel(); } catch(e){ toast(e.message); }
+    }));
+    const nw = el.querySelector('.js-ghnew'); if (nw) nw.addEventListener('click', () => { ghEdit = { }; ghForm(cats); });
+    el.querySelectorAll('.js-ghedit').forEach(b => b.addEventListener('click', () => { ghEdit = (d.producten||[]).find(p=>p.id===b.dataset.id) || {}; ghForm(cats); }));
+    if (ghEdit) ghForm(cats);
+  }
+  function ghOrderKaart(o, open){
+    const naam = o.klant ? (o.klant.naam || '') : '';
+    return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;margin-top:0.5rem;">'+
+      '<div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.85rem;">'+esc(naam)+' · '+eur(o.subtotaal)+'</b>'+
+      '<span class="sub">'+esc(o.soort)+(o.bron==='ai'?' · AI':'')+' · '+esc(o.status)+'</span></div>'+
+      '<div class="sub">'+o.regels.map(r=>r.aantal+'× '+esc(r.naam)).join(', ')+'</div>'+
+      (open ? '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><button data-ghverder="'+o.ref+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('gh.verder','Volgende stap')+'</button>'+
+        '<button data-ghweiger="'+o.ref+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.75rem;">'+T('gh.weiger','Weiger')+'</button></div>' : '')+'</div>';
+  }
+  function ghForm(cats){
+    const el = $('#ghForm'); if (!el) return; const p = ghEdit || {};
+    el.innerHTML = '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.8rem;margin-top:0.5rem;">'+
+      '<input id="ghNaam" class="st-in" placeholder="'+T('gh.f.naam','Productnaam')+'" value="'+esc(p.naam||'')+'" style="width:100%;margin-bottom:0.4rem;">'+
+      '<div class="row-gap"><select id="ghCat" class="st-in" style="flex:1;">'+cats.map(c=>'<option'+(p.categorie===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'+
+      '<input id="ghEen" class="st-in" placeholder="'+T('gh.f.eenheid','Eenheid')+'" value="'+esc(p.eenheid||'stuk')+'" style="flex:1;"></div>'+
+      '<div class="row-gap"><input id="ghIn" class="st-in" type="number" step="0.01" placeholder="'+T('gh.f.inkoop','Inkoopprijs')+'" value="'+(p.inkoopPrijs!=null?p.inkoopPrijs:'')+'" style="flex:1;"><input id="ghCon" class="st-in" type="number" step="0.01" placeholder="'+T('gh.f.consument','Consumentprijs')+'" value="'+(p.consumentPrijs!=null?p.consumentPrijs:'')+'" style="flex:1;"></div>'+
+      '<div class="row-gap"><input id="ghVoor" class="st-in" type="number" placeholder="'+T('gh.f.voorraad','Voorraad')+'" value="'+(p.voorraad!=null?p.voorraad:'')+'" style="flex:1;"><input id="ghMin" class="st-in" type="number" placeholder="'+T('gh.f.min','Min. bestel')+'" value="'+(p.minBestel!=null?p.minBestel:1)+'" style="flex:1;"></div>'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><button id="ghSave" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gh.opslaan','Opslaan')+'</button>'+
+      '<button id="ghCancel" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.45rem 0.8rem;color:var(--soft);font-family:inherit;">'+T('gh.annuleer','Annuleer')+'</button></div></div>';
+    $('#ghCancel').addEventListener('click', () => { ghEdit = null; renderGroothandel(); });
+    $('#ghSave').addEventListener('click', async () => {
+      const body = { id:p.id, naam:$('#ghNaam').value.trim(), categorie:$('#ghCat').value, eenheid:$('#ghEen').value.trim(),
+        inkoopPrijs:$('#ghIn').value, consumentPrijs:$('#ghCon').value, voorraad:$('#ghVoor').value, minBestel:$('#ghMin').value };
+      try { await API.call('/supplier/groothandel/product', body); ghEdit = null; toast(T('gh.opgeslagen','Product opgeslagen.')); renderGroothandel(); } catch(e){ toast(e.message); }
+    });
+  }
+
+  // ---- inkoop: een horecazaak koopt in bij een groothandel (met AI-bijbestellen) ----
+  let inkVoorstel = null;
+  async function renderInkoop(){
+    const el = $('#inkoopWrap'); if (!el) return;
+    if (!has('menu')){ el.innerHTML = ''; return; }
+    let markt, mijn;
+    try { markt = await API.call('/supplier/inkoop/markt'); mijn = await API.call('/supplier/inkoop/mijn'); } catch(e){ return; }
+    let h = '';
+    for (const g of (markt.groothandels||[])){
+      h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">'+
+        '<div style="display:flex;gap:0.5rem;align-items:center;"><b style="flex:1;">'+esc(g.naam)+'</b>'+
+        '<button class="js-inkai" data-code="'+g.code+'" style="background:var(--card2);border:1px solid var(--gold);border-radius:8px;padding:0.3rem 0.6rem;color:var(--gold);font-size:0.72rem;font-weight:600;font-family:inherit;">✨ '+T('ink.ai','AI-bijbestellen')+'</button></div>'+
+        '<div id="inkai-'+g.code+'"></div>'+
+        g.producten.slice(0,60).map(p => '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-top:1px solid var(--line);">'+
+          '<div style="flex:1;"><span style="font-size:0.83rem;">'+esc(p.naam)+'</span><span class="sub"> · '+eur(p.prijs)+'/'+esc(p.eenheid)+'</span></div>'+
+          '<input class="st-in js-inkq" data-code="'+g.code+'" data-pid="'+p.id+'" type="number" min="0" placeholder="0" style="width:4rem;text-align:center;"></div>').join('')+
+        '<button class="js-inkbestel" data-code="'+g.code+'" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.5rem;font-weight:600;font-family:inherit;">'+T('ink.bestel','Bestellen')+'</button></div>';
+    }
+    if (!(markt.groothandels||[]).length) h += '<p class="sub">'+T('ink.geen','Geen groothandel beschikbaar voor inkoop.')+'</p>';
+    // mijn bestellingen
+    if ((mijn.bestellingen||[]).length){
+      h += '<div class="st-sec">'+T('ink.mijn','Mijn inkooporders')+'</div>';
+      h += mijn.bestellingen.slice(0,20).map(o => '<div style="border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.75rem;margin-bottom:0.4rem;"><div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.82rem;">'+esc(o.groothandelNaam)+' · '+eur(o.subtotaal)+'</b><span class="sub">'+esc(o.status)+(o.bron==='ai'?' · AI':'')+'</span></div><div class="sub">'+o.regels.map(r=>r.aantal+'× '+esc(r.naam)).join(', ')+'</div></div>').join('');
+    }
+    el.innerHTML = h;
+    el.querySelectorAll('.js-inkbestel').forEach(b => b.addEventListener('click', () => inkBestel(b.dataset.code, false)));
+    el.querySelectorAll('.js-inkai').forEach(b => b.addEventListener('click', () => inkAi(b.dataset.code)));
+  }
+  function inkRegels(code){
+    const regels = [];
+    document.querySelectorAll('.js-inkq[data-code="'+code+'"]').forEach(inp => { const a = Number(inp.value)||0; if (a>0) regels.push({ productId: inp.dataset.pid, aantal: a }); });
+    return regels;
+  }
+  async function inkBestel(code){
+    const regels = inkRegels(code);
+    if (!regels.length) return toast(T('ink.kies','Vul minstens een aantal in.'));
+    try { await API.call('/supplier/inkoop/bestel', { groothandelCode: code, regels }); toast(T('ink.besteld','Bestelling geplaatst.')); renderInkoop(); } catch(e){ toast(e.message); }
+  }
+  async function inkAi(code){
+    const box = $('#inkai-'+code); if (box) box.innerHTML = '<p class="sub">'+T('ink.aidenkt','De AI kijkt naar uw verkoop en mise-en-place…')+'</p>';
+    try {
+      const v = await API.call('/supplier/inkoop/ai', { groothandelCode: code });
+      inkVoorstel = v;
+      if (!box) return;
+      if (!v.regels.length){ box.innerHTML = '<p class="sub">'+esc(v.uitleg)+'</p>'; return; }
+      box.innerHTML = '<div style="border:1px solid var(--gold);border-radius:10px;padding:0.6rem;margin:0.5rem 0;">'+
+        '<div class="sub" style="margin-bottom:0.35rem;">'+esc(v.uitleg)+'</div>'+
+        v.regels.map(r=>'<div class="sub">'+r.aantal+'× '+esc(r.naam)+' · '+eur(r.prijs)+' <span style="opacity:0.7;">('+esc(r.reden)+')</span></div>').join('')+
+        '<button class="js-inkaiok" data-code="'+code+'" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('ink.aibevestig','Bijbestelling plaatsen')+'</button></div>';
+      box.querySelector('.js-inkaiok').addEventListener('click', async () => {
+        try { await API.call('/supplier/inkoop/ai-bevestig', { groothandelCode: code, regels: v.regels.map(r=>({productId:r.productId, aantal:r.aantal})) }); toast(T('ink.aiok','Bijbestelling geplaatst.')); renderInkoop(); } catch(e){ toast(e.message); }
+      });
+    } catch(e){ if (box) box.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; }
+  }
+
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
@@ -2999,7 +3131,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderRetail(); renderGroothandel(); renderInkoop(); renderPaspoort(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -5017,6 +5149,15 @@ window.I18N = { en: {
   'tk2.tr.aan':'On: guests with a ticket request the transfer; your drivers see the rides in the Rides tab and on the PDA.',
   'tk2.tr.uit':'Off.', 'tk2.tr.prijs':'Price per ride:', 'tk2.tr.incl':'included with the ticket (€ 0)',
   'tk2.tr.zetuit':'Turn off', 'tk2.tr.zetaan':'Turn on', 'tk2.tr.prijszet':'Save price', 'tk2.tr.nul':'0 = included',
+  'sup.v.groothandel':'Wholesale & market', 'sup.v.inkoop':'Buy from wholesaler', 'tab.groothandel':'Wholesale', 'tab.inkoop':'Purchasing',
+  'gh.functies':'Your functions (on/off)', 'gh.orders':'Orders', 'gh.omzet':'revenue', 'gh.geenorders':'No open orders.',
+  'gh.afgerond':'Completed', 'gh.assortiment':'Assortment', 'gh.nieuw':'New product', 'gh.per':'per', 'gh.inkoop':'buy',
+  'gh.consument':'consumer', 'gh.voorraad':'stock', 'gh.uit':'off', 'gh.bewerk':'Edit', 'gh.verder':'Next step', 'gh.weiger':'Decline',
+  'gh.f.naam':'Product name', 'gh.f.eenheid':'Unit', 'gh.f.inkoop':'Buy price', 'gh.f.consument':'Consumer price',
+  'gh.f.voorraad':'Stock', 'gh.f.min':'Min. order', 'gh.opslaan':'Save', 'gh.annuleer':'Cancel', 'gh.opgeslagen':'Product saved.',
+  'ink.ai':'AI reorder', 'ink.bestel':'Order', 'ink.geen':'No wholesaler available for purchasing.', 'ink.mijn':'My purchase orders',
+  'ink.kies':'Enter at least one quantity.', 'ink.besteld':'Order placed.', 'ink.aidenkt':'The AI is checking your sales and mise-en-place…',
+  'ink.aibevestig':'Place reorder', 'ink.aiok':'Reorder placed.',
   'tk2.aanbod':'Offering', 'tk2.cap':'cap.', 'tk2.f.naam':'Activity', 'tk2.f.naamph':'E.g. sunset cruise',
   'tk2.f.desc':'Description', 'tk2.f.prijs':'Price p.p. (€)', 'tk2.f.cap':'Capacity', 'tk2.f.duur':'Duration',
   'tk2.f.tijden':'Time slots (commas)', 'tk2.f.voeg':'Add', 'tk2.welkom':'welcome!',

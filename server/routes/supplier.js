@@ -2092,6 +2092,7 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
   require('./supplier/charter')(kern);
   require('./supplier/contract')(kern);
   require('./supplier/vastgoed')(kern);
+  require('./supplier/boerderij')(kern);
   require('./supplier/groothandel')(kern);
   require('./supplier/modebezorg')(kern);
   require('./supplier/autoverkoop')(kern);

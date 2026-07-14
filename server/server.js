@@ -140,6 +140,8 @@ const STAFF_SEED = {
   MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']],
   ISLAREN: [['Carmen Vidal', 'manager', 'Beheer'], ['Pau Riera', 'staff', 'Balie']],
   IBIZALIV: [['Sofia Marin', 'manager', 'Makelaar'], ['Bram Kessler', 'staff', 'Bezichtigingen']],
+  // boerderij: een bedrijfsleider en twee knechten voor het land en de dieren
+  CANFERRER: [['Aina Torres', 'manager', 'Bedrijfsleider'], ['Marc Prats', 'staff', 'Veehouderij'], ['Lucia Roig', 'staff', 'Akker & kas']],
   IBIZAIR: [['Nadia Fischer', 'manager', 'Operations'], ['Tomas Weller', 'staff', 'Piloot']],
   // charter: een vlootbeheerder en een schipper aan boord
   AZUL: [['Nerea Costa', 'manager', 'Charterbeheer'], ['Marco Silva', 'staff', 'Schipper']],
@@ -953,6 +955,35 @@ function initRealtime() {
       }
     });
   }
+  // --- boerderij: boeren en tuinders met een slim bedrijfssysteem + AI-adviseur ---
+  if (!db.data.supplierTypes.boerderij)
+    db.data.supplierTypes.boerderij = { label: 'Boerderij & landbouw', icon: '\u{1F69C}', caps: ['boerderij', 'location', 'pricing'] };
+  if (!db.data.suppliers.find(s => s.code === 'CANFERRER')) {
+    const dag = n => new Date(Date.now() - n * 86400000).toISOString();
+    db.data.suppliers.push({
+      code: 'CANFERRER', name: 'Finca Can Ferrer', type: 'boerderij', city: 'Ibiza',
+      loc: { lat: 39.033, lng: 1.435, label: 'Santa Agnes de Corona, Ibiza' }, rate: 0.05,
+      menu: [], photos: [],
+      boerderij: {
+        type: 'gemengd', opgezet: true, instel: {},
+        percelen: [
+          { id: 'pc-tarwe', naam: 'Bovenveld', ha: 6.5, gewas: 'tarwe', gezaaidOp: dag(200), oogstVerwacht: new Date(Date.now() + 40 * 86400000).toISOString().slice(0, 10), geoogstOp: null, opbrengst: 0 },
+          { id: 'pc-mais', naam: 'Rivierakker', ha: 4, gewas: 'mais', gezaaidOp: dag(155), oogstVerwacht: new Date(Date.now() - 5 * 86400000).toISOString().slice(0, 10), geoogstOp: null, opbrengst: 0 },
+          { id: 'pc-kas', naam: 'Kasblok 1', ha: 0.8, gewas: 'tomaat', gezaaidOp: dag(40), oogstVerwacht: new Date(Date.now() + 50 * 86400000).toISOString().slice(0, 10), geoogstOp: null, opbrengst: 0, laatsteWater: dag(3) },
+          { id: 'pc-braak', naam: 'Onderveld', ha: 3.2, gewas: null, gezaaidOp: null, oogstVerwacht: null, geoogstOp: null, opbrengst: 0 }
+        ],
+        dieren: [
+          { id: 'dr-koe', soort: 'melkkoe', aantal: 42, stal: 'Stal A', gezondheid: 'goed', laatsteVoer: dag(1) },
+          { id: 'dr-kip', soort: 'legkip', aantal: 180, stal: 'Kippenren', gezondheid: 'goed' },
+          { id: 'dr-schaap', soort: 'schaap', aantal: 25, stal: 'Weide zuid', gezondheid: 'aandacht' }
+        ],
+        taken: [
+          { id: 'tk-1', wat: 'Rivierakker maisoogst starten', waar: 'Rivierakker', voor: new Date().toISOString().slice(0, 10), klaar: false, at: dag(2) },
+          { id: 'tk-2', wat: 'Dierenarts bellen voor de schapen', waar: 'Weide zuid', voor: new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10), klaar: false, at: dag(1) }
+        ]
+      }
+    });
+  }
   if (!db.data.vastgoedAanbod) db.data.vastgoedAanbod = [];   // { ref, supplierCode, pandId, aanKeys:[], publiek, at }
   if (!db.data.bezichtigingen) db.data.bezichtigingen = [];   // { ref, supplierCode, pandId, key, codename, wens, status, moment, keyless, at }
   if (!db.data.biedingen) db.data.biedingen = [];             // { ref, supplierCode, pandId, key, codename, bedrag, status, tegenbod, at }
@@ -1413,6 +1444,9 @@ const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto
 // Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
 // account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
 const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon });
+// De slimme boerderij-laag (kern/boerderij.js): boerderijtypes, percelen+gewassen,
+// dieren, takenbord, seizoensbriefing en een AI-adviseur die ook dingen doet.
+const boerderij = require('./kern/boerderij').maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon });
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
 } = sociaal;
@@ -2147,7 +2181,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,

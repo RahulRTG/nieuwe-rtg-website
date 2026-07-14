@@ -62,6 +62,18 @@
   .voorstelrij:first-child{border-top:none;}
   .voorstelrij .tag{font-size:.68rem;font-weight:700;padding:.12rem .45rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);}
   .aibox textarea{min-height:3.2rem;resize:vertical;}
+  details.fijn{margin-top:.5rem;}
+  details.fijn summary{cursor:pointer;font-size:.74rem;color:var(--soft);font-weight:600;list-style:none;}
+  details.fijn summary::-webkit-details-marker{display:none;}
+  details.fijn summary::before{content:'⚙ ';}
+  details.fijn[open] summary{color:var(--gold);}
+  .fijnlabel{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.5rem 0 .1rem;}
+  .minipill{display:inline-flex;align-items:center;gap:.3rem;border:1px solid var(--line);border-radius:999px;padding:.24rem .6rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;background:var(--card2);color:var(--muted);}
+  .minipill.aan{background:#12321f;color:#7EE0A3;border-color:#1f5637;}
+  .minipill.uit{background:#3a1420;color:#F4B8C6;border-color:var(--rood);}
+  .minipill:disabled{opacity:.55;cursor:default;}
+  .minipill .x{background:none;border:none;color:inherit;cursor:pointer;font-size:.9rem;line-height:1;padding:0 0 0 .1rem;}
+  .minisel{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:.4rem .5rem;color:var(--txt);font-family:inherit;font-size:.8rem;}
   .toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
 </style>
 </head>
@@ -130,7 +142,7 @@
   var $ = function(s){ return document.querySelector(s); };
   var el = Util.el, vervang = Util.vervang;
   var token = sessionStorage.getItem('techToken') || null;
-  var eigenaar = false, laatsteVoorstel = [];
+  var eigenaar = false, laatsteVoorstel = [], LANDEN = [];
 
   function toast(t){ var e=$('#toast'); Util.tekst(e,t); e.style.opacity='1'; clearTimeout(e._t); e._t=setTimeout(function(){e.style.opacity='0';},2200); }
 
@@ -196,11 +208,53 @@
     return el('div',{class:'tel'}, el('div',{class:'n', style:{color:kleur}}, String(n)), el('div',{class:'l'}, label));
   }
 
+  function zetAs(body, melding){
+    api('/api/boardroom/zet', body).then(function(){ if(melding) toast(melding); laad(); }).catch(function(e){ toast(e.message); });
+  }
+  // Fijn afstellen: dezelfde functie gericht uit voor een pas, land of persoon.
+  function fijnPaneel(f){
+    var body = el('div',{style:{padding:'.2rem 0 .4rem'}});
+    // per pas (doelgroep)
+    if ((f.doelgroepen||[]).length){
+      var chips = el('div',{style:{display:'flex',flexWrap:'wrap',gap:'.35rem',margin:'.4rem 0'}});
+      f.doelgroepen.forEach(function(dg){
+        chips.appendChild(el('button',{class:'minipill '+(dg.aan?'aan':'uit'), disabled:!eigenaar, onclick:function(){
+          zetAs({ id:f.id, doelgroep:dg.id, aan: !dg.aan }, f.naam+' voor '+dg.naam+(dg.aan?' uit':' aan'));
+        }}, dg.emoji+' '+dg.naam+(dg.aan?'':' (uit)')));
+      });
+      body.appendChild(el('div',null, el('div',{class:'fijnlabel'}, 'Per pas / doelgroep'), chips));
+    }
+    // per land
+    var landActief = el('div',{style:{display:'flex',flexWrap:'wrap',gap:'.35rem',margin:'.3rem 0'}});
+    (f.landUit||[]).forEach(function(code){
+      landActief.appendChild(el('span',{class:'minipill uit'}, code + ' ',
+        eigenaar ? el('button',{class:'x', onclick:function(){ zetAs({ id:f.id, land:code, aan:true }, 'Land '+code+' weer aan'); }}, '×') : null));
+    });
+    var landSel = el('select',{class:'minisel', 'aria-label':'Kies een land'});
+    landSel.appendChild(el('option',{value:''}, 'Kies land…'));
+    LANDEN.forEach(function(l){ landSel.appendChild(el('option',{value:l.code}, l.naam+' ('+l.code+')')); });
+    var landRij = el('div',{style:{display:'flex',gap:'.4rem',alignItems:'center',flexWrap:'wrap'}}, landSel,
+      el('button',{class:'knop grijs klein', disabled:!eigenaar, onclick:function(){ if(landSel.value) zetAs({ id:f.id, land:landSel.value, aan:false }, 'Uit in '+landSel.value); }}, 'Zet uit in dit land'));
+    body.appendChild(el('div',null, el('div',{class:'fijnlabel'}, 'Per land'), landActief, landRij));
+    // per persoon
+    var persActief = el('div',{style:{display:'flex',flexWrap:'wrap',gap:'.35rem',margin:'.3rem 0'}});
+    (f.persoonUit||[]).forEach(function(p){
+      persActief.appendChild(el('span',{class:'minipill uit'}, (p.label||p.key)+' ',
+        eigenaar ? el('button',{class:'x', onclick:function(){ zetAs({ id:f.id, persoon:p.key, aan:true }, 'Weer aan voor deze persoon'); }}, '×') : null));
+    });
+    var persInp = el('input',{class:'veld', style:{marginBottom:0,maxWidth:'16rem'}, placeholder:'Codenaam of e-mail', 'aria-label':'Codenaam of e-mail van een persoon'});
+    var persRij = el('div',{style:{display:'flex',gap:'.4rem',alignItems:'center',flexWrap:'wrap'}}, persInp,
+      el('button',{class:'knop grijs klein', disabled:!eigenaar, onclick:function(){ if(persInp.value.trim()) zetAs({ id:f.id, persoon:persInp.value.trim(), aan:false }, 'Uit voor deze persoon'); }}, 'Zet uit voor deze persoon'));
+    body.appendChild(el('div',null, el('div',{class:'fijnlabel'}, 'Per persoon'), persActief, persRij));
+    return el('details',{class:'fijn'}, el('summary', null, 'Fijn afstellen (pas / land / persoon)'), body);
+  }
+
   function functieRij(f){
     var mid = el('div',{class:'mid'},
       el('div',null, el('span',{class:'naam'}, f.naam)),
       el('div',{class:'uitleg'}, f.uitleg || ''),
-      f.storing ? el('div',{class:'uitleg', style:{color:'#E6B84E'}}, '⚠ Storing: ' + (f.storing.reden||'')) : null
+      f.storing ? el('div',{class:'uitleg', style:{color:'#E6B84E'}}, '⚠ Storing: ' + (f.storing.reden||'')) : null,
+      fijnPaneel(f)
     );
     var schakel = el('button',{class:'schakel '+(f.aan?'aan':'uit'), disabled: !eigenaar, onclick:function(){
       api('/api/boardroom/zet', { id:f.id, aan: !f.aan }).then(function(){ toast(f.naam+(f.aan?' uit':' aan')); laad(); }).catch(function(e){ toast(e.message); });
@@ -216,6 +270,7 @@
   function laad(){
     api('/api/boardroom/status').then(function(d){
       eigenaar = !!d.eigenaar;
+      LANDEN = d.landen || [];
       $('#alleenLezen').hidden = eigenaar;
       $('#bReset').disabled = !eigenaar;
       var s = d.samenvatting || {};

@@ -92,6 +92,9 @@ app.post('/api/auth/register', async (req, res) => {
   // Gebruikt o.a. door Salon-ontmoetingen voor de "naar de vrouw"-regel.
   const g = String(req.body.geslacht || '').toLowerCase();
   if (g === 'v' || g === 'm' || g === 'x') mdNieuw.geslacht = g;
+  // land (2-letter code) van het lid: stuurt o.a. de Boardroom "per land"-regels
+  const ln = String(req.body.land || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+  if (ln.length === 2) mdNieuw.land = ln;
   accounts.saveMemberState(user.id, mdNieuw);
   // bevestigingsmail met een echte, werkende link
   const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);

@@ -20,10 +20,19 @@
    (RTG, Lifestyle, Business).
 
    De stand staat in db.data.techniek.functies:
-     { id: { aan, perDoelgroep: { lifestyle:false, ... } } }
+     { id: { aan, storing, perDoelgroep:{lifestyle:false}, perLand:{NL:false}, perPersoon:{'user-12':false} } }
    Wat er niet in staat valt terug op de standaard (alles staat standaard AAN,
    zodat het platform draait zoals altijd tot je bewust iets omzet). Een
-   doelgroep zonder eigen stand volgt de globale aan/uit van de functie. */
+   doelgroep/land/persoon zonder eigen stand volgt de globale aan/uit.
+
+   DRIE FIJNE ASSEN naast globaal. Een functie kan globaal aan staan maar toch
+   gericht uit voor:
+   - een PAS (doelgroep: rtg/lifestyle/business, en leverancier/personeel/...),
+   - een LAND (landcode van het lid, bijv. NL/ES; alleen als het lid een land
+     heeft ingevuld),
+   - een PERSOON (een specifiek account, op sleutel 'user-<id>').
+   Elke expliciete `false` op welke as dan ook blokkeert; anders is de functie
+   beschikbaar. */
 
 // Volgorde van de categorieën zoals ze op het bord verschijnen.
 const CATEGORIEEN = [
@@ -202,15 +211,38 @@ function functieAanVoor(id, doelgroep, staat) {
   return true;
 }
 
-/* Kernvraag voor de middleware: is dit pad geblokkeerd (voor deze doelgroep)?
-   Geeft de blokkerende functie terug (met id/naam) of null als het pad vrij is.
-   Zonder doelgroep telt alleen de globale schakelaar (achterwaarts compatibel). */
-function padGeblokkeerd(pad, staat, doelgroep) {
+// Is deze functie beschikbaar voor een concreet verzoek? ctx = { doelgroep,
+// land, persoon }. Elke expliciete false (op welke as dan ook) blokkeert.
+// Geeft de reden terug: 'globaal' | 'pas' | 'land' | 'persoon' | null (vrij).
+function blokkadeReden(id, staat, ctx) {
+  if (!functieAan(id, staat)) return 'globaal';
+  const s = staat && staat[id];
+  if (!s) return null;
+  const c = ctx || {};
+  if (c.doelgroep && s.perDoelgroep && s.perDoelgroep[c.doelgroep] === false) return 'pas';
+  if (c.land && s.perLand && s.perLand[c.land] === false) return 'land';
+  if (c.persoon && s.perPersoon && s.perPersoon[c.persoon] === false) return 'persoon';
+  return null;
+}
+function functieBeschikbaar(id, staat, ctx) { return blokkadeReden(id, staat, ctx) === null; }
+// Staan er ergens land-regels? Zo niet, dan hoeft de middleware het land van het
+// lid niet op te zoeken (scheelt een opzoeking per verzoek).
+function heeftLandRegels(staat) {
+  if (!staat) return false;
+  for (const id of Object.keys(staat)) { const pl = staat[id] && staat[id].perLand; if (pl && Object.keys(pl).length) return true; }
+  return false;
+}
+
+/* Kernvraag voor de middleware: is dit pad geblokkeerd (voor dit verzoek)?
+   ctx = { doelgroep, land, persoon }. Geeft { functie, reden } terug of null.
+   Een simpele string als ctx wordt als doelgroep gelezen (achterwaarts compat). */
+function padGeblokkeerd(pad, staat, ctx) {
   const f = functieVoorPad(pad);
   if (!f) return null;                       // niet door een functie bewaakt -> altijd vrij
-  if (!functieAan(f.id, staat)) return f;    // globaal uit -> voor iedereen dicht
-  if (doelgroep && !functieAanVoor(f.id, doelgroep, staat)) return f; // per doelgroep dicht
-  return null;
+  if (typeof ctx === 'string') ctx = { doelgroep: ctx };
+  const reden = blokkadeReden(f.id, staat, ctx);
+  if (!reden) return null;
+  return { id: f.id, naam: f.naam, categorie: f.categorie, paden: f.paden, doelgroepen: f.doelgroepen, reden };
 }
 
 /* De doelgroep van een verzoek. Expliciete app-paden bepalen de doelgroep,
@@ -235,14 +267,22 @@ function doelgroepVanVerzoek(pad, user) {
 function catalogus(staat) {
   return CATEGORIEEN.map(cat => ({
     categorie: cat,
-    functies: FUNCTIES.filter(f => f.categorie === cat).map(f => ({
-      id: f.id, naam: f.naam, uitleg: f.uitleg, standaard: f.standaard, aan: functieAan(f.id, staat),
-      storing: functieStoring(f.id, staat), status: functieStatus(f.id, staat),
-      doelgroepen: (f.doelgroepen || []).map(dg => {
-        const meta = DOELGROEP_OP_ID[dg] || { id: dg, naam: dg, emoji: '•' };
-        return { id: dg, naam: meta.naam, emoji: meta.emoji, aan: functieAanVoor(f.id, dg, staat) };
-      })
-    }))
+    functies: FUNCTIES.filter(f => f.categorie === cat).map(f => {
+      const s = (staat && staat[f.id]) || {};
+      const perLand = s.perLand || {};
+      const perPersoon = s.perPersoon || {};
+      return {
+        id: f.id, naam: f.naam, uitleg: f.uitleg, standaard: f.standaard, aan: functieAan(f.id, staat),
+        storing: functieStoring(f.id, staat), status: functieStatus(f.id, staat),
+        doelgroepen: (f.doelgroepen || []).map(dg => {
+          const meta = DOELGROEP_OP_ID[dg] || { id: dg, naam: dg, emoji: '•' };
+          return { id: dg, naam: meta.naam, emoji: meta.emoji, aan: functieAanVoor(f.id, dg, staat) };
+        }),
+        // actieve beperkingen per land en per persoon (alleen wat expliciet uit staat)
+        landUit: Object.keys(perLand).filter(k => perLand[k] === false),
+        persoonUit: Object.keys(perPersoon).filter(k => perPersoon[k] === false)
+      };
+    })
   })).filter(g => g.functies.length);
 }
 
@@ -317,6 +357,7 @@ function duidVoorstel(vraag, staat) {
 
 module.exports = {
   FUNCTIES, CATEGORIEEN, OP_ID, DOELGROEPEN, DOELGROEP_IDS,
-  functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus, padGeblokkeerd, catalogus,
+  functieVoorPad, functieAan, functieAanVoor, functieBeschikbaar, functieStoring, functieStatus,
+  heeftLandRegels, blokkadeReden, padGeblokkeerd, catalogus,
   doelgroepVanVerzoek, tierNaarDoelgroep, valideerVoorstel, duidVoorstel
 };

@@ -11,7 +11,7 @@ const eigenaar = require('../eigenaar');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
-  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path } = kern;
+  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal } = kern;
   const OWNER_EMAIL = eigenaar.OWNER_EMAIL;
 
   function staat() {
@@ -288,30 +288,87 @@ module.exports = (kern) => {
     return { antwoord, voorstel: functies.valideerVoorstel(voorstel), bron };
   }
 
+  // Een persoon (voor per-persoon uitzetten) herleiden uit een sleutel, e-mail of
+  // codenaam. Geeft { key:'user-<id>', label } of null.
+  async function herleidPersoon(invoer) {
+    const s = String(invoer || '').trim();
+    if (!s) return null;
+    if (/^user-\d+$/.test(s)) {
+      const u = accounts.getUserById(Number(s.slice(5)));
+      return u ? { key: s, label: accounts.realNameOf(u) + ' · ' + (u.codename || '') } : null;
+    }
+    const u = accounts.findByLogin(s);
+    if (u) return { key: 'user-' + u.id, label: accounts.realNameOf(u) + ' · ' + (u.codename || '') };
+    // op codenaam (via de ledengids; kan async zijn met Postgres)
+    try {
+      const key = keyVanCodenaam ? await keyVanCodenaam(s) : null;
+      if (key && /^user-\d+$/.test(key)) { const u2 = accounts.getUserById(Number(key.slice(5))); if (u2) return { key, label: accounts.realNameOf(u2) + ' · ' + s }; }
+    } catch (e) {}
+    return null;
+  }
+  // een leesbaar label voor een persoonssleutel op het bord
+  function persoonLabel(key) {
+    const m = /^user-(\d+)$/.exec(String(key || ''));
+    if (!m) return key;
+    const u = accounts.getUserById(Number(m[1]));
+    return u ? (accounts.realNameOf(u) + ' · ' + (u.codename || '')) : key;
+  }
+  const landenLijst = () => Object.entries(LANDEN || {}).map(([code, v]) => ({ code, naam: (v && v.naam) || code }));
+
   // Het bord: alle functies met stoplicht-status, plus de telling en AI-stand.
   app.post('/api/boardroom/status', techAuth, (req, res) => {
     const t = staat();
     const cat = functies.catalogus(t.functies);
+    // labels bij de per-persoon-beperkingen zodat het bord namen toont i.p.v. sleutels
+    for (const g of cat) for (const f of g.functies) {
+      f.persoonUit = (f.persoonUit || []).map(k => ({ key: k, label: persoonLabel(k) }));
+    }
     res.json({
       eigenaar: isEigenaar(req.techUser), naam: accounts.realNameOf(req.techUser),
-      functies: cat, doelgroepen: functies.DOELGROEPEN,
+      functies: cat, doelgroepen: functies.DOELGROEPEN, landen: landenLijst(),
       samenvatting: boardroomTelling(cat),
       aiBeschikbaar: !!anthropic,
       aiAan: !(t.zekeringen.ai && t.zekeringen.ai.aan === false)
     });
   });
 
-  // Directe schakelaar (alleen de eigenaar): { id, aan } of { id, doelgroep, aan }.
-  app.post('/api/boardroom/zet', techAuth, eigenaarAlleen, (req, res) => {
+  // Persoon zoeken voor de per-persoon-schakelaar (eigenaar).
+  app.post('/api/boardroom/persoon', techAuth, eigenaarAlleen, async (req, res) => {
+    const p = await herleidPersoon(req.body.persoon);
+    if (!p) return res.status(404).json({ error: 'Geen account gevonden op die codenaam of e-mail.' });
+    res.json({ ok: true, key: p.key, label: p.label });
+  });
+
+  /* Directe schakelaar (alleen de eigenaar). Vier assen, meest specifiek wint:
+     - { id, persoon, aan }   -> per persoon (e-mail/codenaam/sleutel)
+     - { id, land, aan }      -> per land (2-letter code)
+     - { id, doelgroep, aan } -> per pas/doelgroep
+     - { id, aan }            -> globaal
+     Op een as (niet globaal) betekent aan=true: de beperking wordt verwijderd. */
+  app.post('/api/boardroom/zet', techAuth, eigenaarAlleen, async (req, res) => {
     const t = staat();
     const f = functies.OP_ID[req.body.id];
     if (!f) return res.status(404).json({ error: 'Onbekende functie.' });
     const aan = req.body.aan !== false && req.body.aan !== 'false';
-    const dg = req.body.doelgroep ? String(req.body.doelgroep) : null;
-    if (dg && !(f.doelgroepen || []).includes(dg)) return res.status(400).json({ error: 'Deze functie kent die doelgroep niet.' });
     const cur = t.functies[f.id] = t.functies[f.id] || {};
-    if (dg) { cur.perDoelgroep = cur.perDoelgroep || {}; cur.perDoelgroep[dg] = aan; }
-    else cur.aan = aan;
+    if (req.body.persoon) {
+      const p = await herleidPersoon(req.body.persoon);
+      if (!p) return res.status(404).json({ error: 'Geen account gevonden op die codenaam of e-mail.' });
+      cur.perPersoon = cur.perPersoon || {};
+      if (aan) delete cur.perPersoon[p.key]; else cur.perPersoon[p.key] = false;
+    } else if (req.body.land) {
+      const land = String(req.body.land).toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+      if (land.length !== 2) return res.status(400).json({ error: 'Geef een geldige landcode (2 letters).' });
+      cur.perLand = cur.perLand || {};
+      if (aan) delete cur.perLand[land]; else cur.perLand[land] = false;
+    } else if (req.body.doelgroep) {
+      const dg = String(req.body.doelgroep);
+      if (!(f.doelgroepen || []).includes(dg)) return res.status(400).json({ error: 'Deze functie kent die doelgroep niet.' });
+      cur.perDoelgroep = cur.perDoelgroep || {};
+      if (aan) delete cur.perDoelgroep[dg]; else cur.perDoelgroep[dg] = false;
+    } else {
+      cur.aan = aan;
+    }
     save();
     res.json({ ok: true, id: f.id, status: functies.functieStatus(f.id, t.functies) });
   });

@@ -250,13 +250,24 @@ app.use((req, res, next) => {
     if (tok) user = accounts.verifyToken(tok);
   } catch (e) {}
   const doelgroep = functies.doelgroepVanVerzoek(p, user);
-  const dicht = functies.padGeblokkeerd(p, staat, doelgroep);
+  // land van het lid (alleen opzoeken als er ergens land-regels staan) en de
+  // persoonssleutel (voor per-persoon uitschakelen): 'user-<id>'.
+  let land = null, persoon = null;
+  if (user) {
+    persoon = 'user-' + user.id;
+    if (functies.heeftLandRegels(staat)) {
+      try { const md = accounts.getMemberState(user.id) || {}; land = md.land || null; } catch (e) {}
+    }
+  }
+  const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, persoon });
   if (dicht) {
-    const globaalUit = !functies.functieAan(dicht.id, staat);
+    const zin = { globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
+      pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
+      land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
+      persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.' };
     return res.status(503).json({
-      error: globaalUit ? 'Deze functie is tijdelijk uitgeschakeld door de beheerder.'
-        : 'Deze functie is voor jouw profiel uitgeschakeld door de beheerder.',
-      functie: dicht.id, naam: dicht.naam, doelgroep: doelgroep || undefined
+      error: zin[dicht.reden] || zin.globaal,
+      functie: dicht.id, naam: dicht.naam, reden: dicht.reden, doelgroep: doelgroep || undefined
     });
   }
   next();

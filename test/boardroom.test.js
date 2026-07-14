@@ -18,7 +18,7 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-let srv, base, owner, lidToken;
+let srv, base, owner, lidToken, lidEmail, esToken;
 
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-board-'));
@@ -29,10 +29,15 @@ test.before(async () => {
   // en wachtwoord DEMO_PASS (standaard 'Imran'); daarmee loggen we in.
   const li = await api(base, '/api/techniek/inloggen', { login: OWNER, wachtwoord: 'Imran' });
   owner = li.body.token;
-  // een gewoon lid (geen eigenaar) voor de toegangstest
-  const reg = await api(base, '/api/auth/register', { name: 'Gewoon Lid', email: 'g' + u + '@x.nl',
+  // een gewoon lid (geen eigenaar, geen land) voor de toegangs- en per-pas-tests
+  lidEmail = 'g' + u + '@x.nl';
+  const reg = await api(base, '/api/auth/register', { name: 'Gewoon Lid', email: lidEmail,
     phone: '067' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   lidToken = reg.body.token;
+  // een lid met land ES voor de per-land-test
+  const regEs = await api(base, '/api/auth/register', { name: 'Lid Spanje', email: 'es' + u + '@x.nl',
+    phone: '068' + u, password: 'geheim123', geboortedatum: '1990-01-01', land: 'ES', tier: 'business', pasApp: 'business' });
+  esToken = regEs.body.token;
 });
 test.after(() => stop(srv && srv.child));
 
@@ -105,4 +110,40 @@ test('6. AI-hulp stelt een wijziging voor uit gewone taal', async () => {
 test('7. een gewoon lid heeft geen toegang tot de schakelaars', async () => {
   const zet = await api(base, '/api/boardroom/zet', { id: 'charter', aan: false }, lidToken);
   assert.ok(zet.status === 403 || zet.status === 401, 'geen toegang zonder eigenaarsrecht');
+});
+
+test('8. per pas: een functie uit voor Business blokkeert alleen die pas', async () => {
+  const zet = await api(base, '/api/boardroom/zet', { id: 'charter', doelgroep: 'business', aan: false }, owner);
+  assert.equal(zet.status, 200);
+  const geblokt = await api(base, '/api/charter/aanbod', { city: 'Ibiza' }, lidToken);
+  assert.equal(geblokt.status, 503);
+  assert.equal(geblokt.body.reden, 'pas');
+  // globaal staat charter nog aan (status blijft 'aan' op het bord)
+  await api(base, '/api/boardroom/reset', {}, owner);
+});
+
+test('9. per persoon: een functie uit voor een account blokkeert alleen die persoon', async () => {
+  const zet = await api(base, '/api/boardroom/zet', { id: 'retail', persoon: lidEmail, aan: false }, owner);
+  assert.equal(zet.status, 200);
+  const ik = await api(base, '/api/retail/catalogus', {}, lidToken);
+  assert.equal(ik.status, 503, 'de genoemde persoon is geblokkeerd');
+  assert.equal(ik.body.reden, 'persoon');
+  const ander = await api(base, '/api/retail/catalogus', {}, esToken);
+  assert.notEqual(ander.status, 503, 'een ander account is niet geblokkeerd');
+  // en het bord toont de persoonsbeperking met een label
+  const st = await api(base, '/api/boardroom/status', {}, owner);
+  const retail = st.body.functies.flatMap(g => g.functies).find(f => f.id === 'retail');
+  assert.ok(retail.persoonUit.length >= 1 && retail.persoonUit[0].label, 'persoonsbeperking met naam');
+  await api(base, '/api/boardroom/reset', {}, owner);
+});
+
+test('10. per land: een functie uit in ES blokkeert alleen leden uit ES', async () => {
+  const zet = await api(base, '/api/boardroom/zet', { id: 'tickets', land: 'ES', aan: false }, owner);
+  assert.equal(zet.status, 200);
+  const es = await api(base, '/api/tickets/aanbod', {}, esToken);
+  assert.equal(es.status, 503, 'lid uit ES is geblokkeerd');
+  assert.equal(es.body.reden, 'land');
+  const nl = await api(base, '/api/tickets/aanbod', {}, lidToken);
+  assert.notEqual(nl.status, 503, 'lid zonder land ES is niet geblokkeerd');
+  await api(base, '/api/boardroom/reset', {}, owner);
 });

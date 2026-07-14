@@ -64,6 +64,7 @@ const { maakFonds } = require('./kern/fonds');
 const { maakMunten } = require('./kern/munten');
 const muntbetaal = require('./muntbetaal');
 const factuur = require('./kern/factuur');
+const boekhoudkennis = require('./kern/boekhoudkennis');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -2165,6 +2166,8 @@ const kern = {
   munten, muntbetaal,
   // facturen/overzichten als download (kern/factuur.js)
   factuur,
+  // branchekennis voor de AI-boekhouder (kern/boekhoudkennis.js)
+  boekhoudkennis,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

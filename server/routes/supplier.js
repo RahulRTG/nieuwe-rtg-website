@@ -5,7 +5,7 @@ module.exports = (kern) => {
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
+    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, boekhoudkennis, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten } = kern;
 
@@ -1455,22 +1455,51 @@ app.post('/api/supplier/accountant', supplierAuth, async (req, res) => {
   if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
   const fin = financeVoor(req.supplier);
   const L = LANDEN[fin.land];
+  const profiel = boekhoudkennis.genreProfiel(req.supplier.type);
   let answer = null;
   if (anthropic) {
     try {
       const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 500,
-        system: 'Je bent de AI-boekhouder van RTG voor ' + req.supplier.name + ' (' + req.supplier.type + ') in ' + L.naam + '. ' +
-          'Regels: ' + fin.regels.join(' ') + ' Zakelijke aftrek: ' + Object.values(L.zakelijk).join(' ') + ' ' +
-          'Cijfers deze maand: btw ' + JSON.stringify(fin.btw) + ', af te dragen € ' + fin.btwTotaal + '; personeel ' + JSON.stringify(fin.personeel) + '; cadeaukaarten ' + JSON.stringify(fin.giftcards) + '. ' +
-          'Antwoord in het Nederlands, maximaal 130 woorden, praktisch en concreet. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
+        model: 'claude-sonnet-5', max_tokens: 550,
+        system: 'Je bent de AI-boekhouder van RTG voor ' + req.supplier.name + ' in ' + L.naam + '. Je kent de branche door en door en helpt de ondernemer concreet, met de eigen cijfers erbij. ' +
+          boekhoudkennis.systeemContext(req.supplier, fin, L.naam) + ' ' +
+          'Fiscale regels: ' + fin.regels.join(' ') + ' Zakelijke aftrek: ' + Object.values(L.zakelijk).join(' ') + ' ' +
+          'Antwoord in het Nederlands, maximaal 150 woorden, praktisch en concreet, met een getal of percentage waar het kan, en waar passend een concrete volgende stap. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
         messages: [{ role: 'user', content: vraag }]
       });
       answer = msg.content[0].text;
     } catch (err) { answer = null; }
   }
   if (!answer) answer = cannedBoekhouder(vraag, fin, L);
-  res.json({ answer, land: fin.land, ai: !!anthropic });
+  res.json({ answer, land: fin.land, genre: profiel.label, ai: !!anthropic });
+});
+
+/* Proactieve adviezen: de AI-boekhouder stuurt de ondernemer bij op de eigen
+   maandcijfers, branchegericht. Deterministisch (werkt zonder AI-sleutel); met
+   een sleutel voegen we een korte, persoonlijke inleiding toe. */
+app.post('/api/supplier/accountant/adviezen', supplierAuth, async (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
+  const fin = financeVoor(req.supplier);
+  const out = boekhoudkennis.adviezen(req.supplier, fin);
+  let intro = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 160,
+        system: 'Je bent de AI-boekhouder van RTG voor ' + req.supplier.name + ' (' + out.genre + '). Schrijf een korte, warme inleiding (maximaal 40 woorden) die de maand samenvat en de toon zet voor de adviezen hieronder. Nederlands, concreet, geen disclaimer.',
+        messages: [{ role: 'user', content: 'Cijfers: omzet € ' + out.omzet + ', btw € ' + out.btw + ', loon € ' + out.loon + ', blijft over € ' + out.netto + '. Vat kort samen.' }]
+      });
+      intro = msg.content[0].text;
+    } catch (err) { intro = null; }
+  }
+  res.json({ genre: out.genre, intro, adviezen: out.adviezen, cijfers: { omzet: out.omzet, btw: out.btw, loon: out.loon, netto: out.netto }, ai: !!anthropic });
+});
+
+/* De branchevragen die de AI-boekhouder voorstelt: genre-specifiek, zodat de
+   ondernemer meteen ziet wat hij kan vragen. */
+app.post('/api/supplier/accountant/vragen', supplierAuth, (req, res) => {
+  const profiel = boekhoudkennis.genreProfiel(req.supplier.type);
+  res.json({ genre: profiel.label, vragen: profiel.vragen });
 });
 
 app.post('/api/supplier/ai', supplierAuth, async (req, res) => {

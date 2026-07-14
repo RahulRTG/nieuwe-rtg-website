@@ -1834,11 +1834,14 @@
           '<button class="obtn" id="gcRedeem">'+T('fn.gcredeem','In te wisselen')+'</button></div></div>';
         html += '<div class="tkc"><h3>📜 '+T('fn.regels','Regels in ')+f.landNaam+'</h3>'+
           f.regels.map(r => '<div class="tkc-who" style="line-height:1.5;">• '+r+'</div>').join('')+'</div>';
-        html += '<div class="tkc"><h3>🤖 '+T('fn.ai','AI-boekhouder')+'</h3>'+
-          '<div class="tkc-who">'+T('fn.ai.s','Kent uw land, uw cijfers en de regels. Vraag naar btw, loonkosten, cadeaukaarten of aangiftetermijnen.')+'</div>'+
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤖 '+T('fn.ai','AI-boekhouder')+'</h3>'+
+          '<div class="tkc-who">'+T('fn.ai.s2','Kent uw branche, uw cijfers en de regels. Stel een vraag, of laat hem u proactief bijsturen met adviezen op uw eigen cijfers.')+'</div>'+
+          '<div id="accVragen" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.5rem 0;"></div>'+
           '<div class="row-gap"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" style="flex:1;">'+
           '<button class="obtn primary" id="accGo">'+T('fn.vraag','Vraag')+'</button></div>'+
-          '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;">'+accAntwoord+'</div></div>';
+          '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
+          '<button class="obtn" id="accAdvies" style="margin-top:0.6rem;">✨ '+T('fn.adviezen','Stuur mij bij, geef adviezen')+'</button>'+
+          '<div id="accAdv"></div></div>';
       }
     }
     if (kantoorSec === 'hr'){
@@ -2203,6 +2206,23 @@
       renderStation();
     });
     const aQ = el.querySelector('#accQ'); if (aQ) aQ.addEventListener('keydown', e => { if (e.key === 'Enter' && aG) aG.click(); });
+    // branchevragen als klikbare chips
+    const vBox = el.querySelector('#accVragen');
+    if (vBox) API.call('/supplier/accountant/vragen', {}).then(d => {
+      vBox.innerHTML = (d.vragen || []).map(q => '<button class="obtn js-accv" style="font-size:0.72rem;padding:0.3rem 0.7rem;">' + esc(q) + '</button>').join('');
+      vBox.querySelectorAll('.js-accv').forEach(b => b.addEventListener('click', () => { const q = el.querySelector('#accQ'); q.value = b.textContent; if (aG) aG.click(); }));
+    }).catch(() => {});
+    // proactieve adviezen op de eigen cijfers
+    const adv = el.querySelector('#accAdvies');
+    if (adv) adv.addEventListener('click', async () => {
+      const box = el.querySelector('#accAdv');
+      box.innerHTML = '<div class="tkc-who" style="margin-top:0.6rem;">' + T('fn.advbezig', 'Ik kijk naar uw cijfers…') + '</div>';
+      try {
+        const d = await API.call('/supplier/accountant/adviezen', {});
+        box.innerHTML = (d.intro ? '<div style="font-size:0.82rem;margin:0.6rem 0;line-height:1.6;">' + esc(d.intro) + '</div>' : '') +
+          (d.adviezen || []).map(a => '<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;"><b style="color:var(--gold);font-size:0.8rem;">' + esc(a.titel) + '</b><div style="font-size:0.8rem;color:var(--soft);margin-top:0.2rem;line-height:1.5;">' + esc(a.tekst) + '</div></div>').join('');
+      } catch(e){ box.innerHTML = '<div class="tkc-who">' + esc(e.message) + '</div>'; }
+    });
     // schakelaars van de zaak: elke functie aan of uit, direct doorgevoerd
     el.querySelectorAll('[data-kopt]').forEach(b => b.addEventListener('click', async () => {
       const k = b.dataset.kopt, v = b.dataset.val === '1';
@@ -5385,6 +5405,8 @@ window.I18N = { en: {
   'fn.regels':'Rules in ', 'fn.ai':'AI accountant',
   'fn.ai.s':'Knows your country, your figures and the rules. Ask about VAT, wage costs, gift cards or filing deadlines.',
   'fn.ai.ph':'E.g. how much VAT do I remit this month?', 'fn.vraag':'Ask',
+  'fn.ai.s2':'Knows your industry, your figures and the rules. Ask a question, or let it proactively steer you with advice on your own numbers.',
+  'fn.adviezen':'Steer me, give advice', 'fn.advbezig':'Looking at your figures…',
   'st.agenda':'Diary', 'st.agenda.s':'Your bookings: confirm, deliver and complete',
   'ag.open':'New requests', 'ag.bevestig':'Confirm', 'ag.weiger':'Decline',
   'ag.geenopen':'No new requests. Members book your services and products via the RTG app; paid means confirmed.',

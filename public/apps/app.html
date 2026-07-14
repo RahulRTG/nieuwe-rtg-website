@@ -907,7 +907,7 @@
 
       <div class="view" data-view="ai">
         <h2 id="aiTitle">Uw AI.</h2>
-        <p class="sub" data-i18n="app.v.ai.sub">De frictieloze vriend: hij signaleert, stelt voor, en één "ja" is genoeg.</p>
+        <p class="sub" data-i18n="app.v.ai.sub">Hij regelt het. Eén ja is genoeg.</p>
         <div class="chat" id="chat"></div>
         <div class="chips" id="chips"></div>
         <div class="askrow">
@@ -944,7 +944,7 @@
 
       <div class="view" data-view="bestellen">
         <h2 data-i18n="app.v.bz">Bestellen.</h2>
-        <p class="sub" data-i18n="app.v.bz.sub">Laat bezorgen of haal op bij RTG-partners, en volg uw bezorger live.</p>
+        <p class="sub" data-i18n="app.v.bz.sub">Bezorgen of ophalen bij RTG-partners, live gevolgd.</p>
         <div id="bzMijn"></div>
         <div id="bzInhoud"></div>
         <div id="boodschappen"></div>
@@ -2527,7 +2527,7 @@
     const autos = d.autos || [];
     const deals = (mijn.deals || []).filter(x => !['gereden','afgeleverd','afgewezen','geannuleerd'].includes(x.status));
     if (!autos.length && !deals.length){ el.innerHTML = ''; return; }
-    let h = '<h3 style="margin:1.6rem 0 0.3rem;font-size:1rem;">🚗 ' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('vk.sub','Exclusieve occasions. Vraag een proefrit of doe een bod, met inruil en concierge-aflevering.') + '</p>';
+    let h = '<h3 style="margin:1.6rem 0 0.3rem;font-size:1rem;">🚗 ' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('vk.sub','Exclusieve occasions. Proefrit, bod of inruil.') + '</p>';
     for (const d2 of deals){
       h += '<div style="border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">' + (d2.soort==='koop'?'🔑 '+T('vk.koop','Koop'):'🚗 '+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
         '<div style="font-size:0.86rem;margin-top:0.2rem;">' + escT(d2.autoNaam) + (d2.prijs?' · € ' + d2.prijs.toLocaleString('nl-NL'):'') + (d2.moment?' · ' + escT(d2.moment):'') + '</div>' +
@@ -2570,7 +2570,7 @@
     try { markt = await API.call('/groothandel/markt'); mijn = await API.call('/groothandel/mijn'); } catch(e){ el.innerHTML = ''; return; }
     const winkels = markt.groothandels || [];
     if (!winkels.length && !(mijn.bestellingen||[]).length){ el.innerHTML = ''; return; }
-    let h = '<h3 style="margin:1.4rem 0 0.3rem;font-size:1rem;">🛒 ' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('bo.sub','Bestel bij een groothandel of supermarkt en laat bezorgen.') + '</p>';
+    let h = '<h3 style="margin:1.4rem 0 0.3rem;font-size:1rem;">🛒 ' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('bo.sub','Bestel en laat bezorgen.') + '</p>';
     for (const g of winkels){
       h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">' +
         '<b>' + escT(g.naam) + '</b><span class="sub"> · ' + escT(g.city||'') + '</span>' +

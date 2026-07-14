@@ -67,10 +67,10 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
     if (codename) chat.codename = codename;
     if (tier) chat.tier = tier;
     if (!bestond) {
-      chat.messages.push({ from: 'systeem', text: 'U heeft nu een open lijn met ' + s.name + '. Bekijk gerust elkaars Salon; zo bent u geen vreemden van elkaar.', at: new Date().toISOString() });
+      chat.messages.push({ from: 'systeem', text: 'U heeft nu een open lijn met ' + s.name + '. Bekijk gerust elkaars Salon.', at: new Date().toISOString() });
       chat.lastAt = new Date().toISOString();
       try { save(); } catch (e) {}
-      try { notify(tier || 'rtg', { icon: '💬', title: 'Open lijn met ' + s.name, body: 'U kunt nu direct met deze partner appen en elkaars Salon bekijken.', scope: 'gchat' }); } catch (e) {}
+      try { notify(tier || 'rtg', { icon: '💬', title: 'Open lijn met ' + s.name, body: 'App direct en bekijk elkaars Salon.', scope: 'gchat' }); } catch (e) {}
       try { sseToCustomer(customerKey, 'sync', { scope: 'gchat' }); } catch (e) {}
       try { sseToSupplier(s.code, 'sync', { scope: 'gchat' }); } catch (e) {}
     }

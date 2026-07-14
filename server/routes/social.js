@@ -3,7 +3,9 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
+  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding } = kern;
+  // Een RTF-profiel als onboarding-sessie: de handle is de sleutel, tier 'rtf'.
+  const rtfOnbSess = (s) => ({ key: s.handle, tier: 'rtf', account: null });
 
 // leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam)
 app.post('/api/member/find', auth, async (req, res) => {
@@ -127,6 +129,24 @@ function rtfSociaal(req, res) {
   if (sess.gast) { res.status(403).json({ error: 'Als oppas of familielid doe je hier niet mee.' }); return null; }
   return sess;
 }
+
+/* Verplichte onboarding + contract voor RTF-leden: dezelfde platform-scope 'rtg',
+   maar met de RTF-handle als sleutel. RTF vraagt standaard de contactgegevens + het
+   contract (geen paspoort; dat is voor de reispas). */
+app.post('/api/rtf/onboarding/status', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  res.json(onboarding.status('rtg', rtfOnbSess(s)));
+});
+app.post('/api/rtf/onboarding/opslaan', express.json({ limit: '256kb' }), (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  res.json(onboarding.slaOp('rtg', rtfOnbSess(s), req.body.velden || {}));
+});
+app.post('/api/rtf/onboarding/teken', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  const r = onboarding.teken('rtg', rtfOnbSess(s), req.body.naam, req.body.akkoord === true);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
 // Beschermd profiel (15 of jonger): zoeken en zelf verzoeken sturen staat dicht;
 // de ouder/verzorger voegt vrienden toe via /api/rtf/social/oudervoeg.
 app.post('/api/rtf/social/find', async (req, res) => {

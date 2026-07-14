@@ -18,7 +18,10 @@
 // ook paspoort/geboortedatum/nationaliteit. De eigenaar kan dit met AI verschuiven
 // (bijv. paspoort ook voor gasten verplichten).
 const ALLE_WIE = ['guest', 'rtg', 'lifestyle', 'business', 'rtf'];
-const PAS_WIE = ['rtg', 'lifestyle', 'business', 'rtf'];
+// De pas-tiers reizen dus vragen we ook paspoort/geboortedatum/nationaliteit. RTF
+// (foundation-gezinnen, vaak minderjarig) en gasten niet standaard; de eigenaar kan
+// dat met AI verschuiven ("maak paspoort ook verplicht voor RTF/gasten").
+const PAS_WIE = ['rtg', 'lifestyle', 'business'];
 const VELD_TYPES = ['text', 'email', 'tel', 'date', 'land', 'nummer', 'kyc'];
 
 const DEFAULT_CONTRACT = `RTG-lidmaatschaps- en reisovereenkomst

@@ -73,6 +73,22 @@
     transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--goud);outline-offset:2px;}
+  /* Verplichte onboarding + contract: blokkeert de app tot alles rond is. */
+  #rtfOnb{position:fixed;inset:0;z-index:200;background:var(--bg,#0F0D0C);overflow-y:auto;padding:1.4rem 1.1rem 2rem;}
+  #rtfOnb[hidden]{display:none;}
+  .ronb-card{max-width:34rem;margin:0 auto;}
+  .ronb-card h1{font-family:var(--serif);font-weight:500;font-size:1.6rem;line-height:1.15;}
+  .ronb-deck{color:var(--zacht);margin:.5rem 0 1.1rem;line-height:1.5;font-size:.9rem;}
+  .ronb-lab{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.1rem 0 .5rem;}
+  .ronb-veld{display:block;margin-bottom:.7rem;}
+  .ronb-veld span{display:block;font-size:.8rem;color:var(--zacht);margin-bottom:.25rem;}
+  .ronb-veld input{width:100%;background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;padding:.6rem .7rem;color:var(--txt);font-family:inherit;font-size:.92rem;}
+  .ronb-contract{border:1px solid var(--lijn);border-radius:12px;background:var(--paneel2);padding:.7rem .9rem;}
+  .ronb-contract h2{font-family:var(--serif);font-weight:500;font-size:1.05rem;}
+  .ronb-tekst{max-height:14rem;overflow-y:auto;margin-top:.4rem;white-space:pre-wrap;font-size:.82rem;line-height:1.6;color:var(--zacht);}
+  .ronb-akk{display:flex;gap:.5rem;align-items:flex-start;margin:.9rem 0 .4rem;font-size:.86rem;}
+  .ronb-akk input{margin-top:.15rem;width:1.1rem;height:1.1rem;flex-shrink:0;}
+  #rtfOnbFout{color:var(--rood,#E06A80);font-size:.8rem;min-height:1rem;margin:.3rem 0;}
 </style>
 </head>
 <body>
@@ -274,6 +290,23 @@
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="pinDoe">Open profiel</button></div>
 </div></dialog>
 
+<!-- Verplichte onboarding + contract voor volwassen gezinsleden -->
+<div id="rtfOnb" role="dialog" aria-modal="true" aria-labelledby="rtfOnbTitel" hidden>
+  <div class="ronb-card">
+    <h1 id="rtfOnbTitel">Nog even dit, dan zijn jullie klaar</h1>
+    <p class="ronb-deck">Voor je gezin bij de RTFoundation hoort een korte intake en één overeenkomst. Vul je gegevens aan en teken; daarna staat alles voor jullie open. De RTFoundation blijft altijd gratis.</p>
+    <div class="ronb-lab">Jouw gegevens</div>
+    <div id="rtfOnbVelden"></div>
+    <div class="ronb-lab">De overeenkomst</div>
+    <div class="ronb-contract"><h2 id="rtfOnbCTitel"></h2><div class="ronb-tekst" id="rtfOnbCTekst"></div></div>
+    <label class="ronb-akk"><input type="checkbox" id="rtfOnbAkk"><span>Ik heb de overeenkomst gelezen en ga akkoord namens mijn gezin.</span></label>
+    <label class="ronb-veld"><span>Typ je volledige naam om digitaal te ondertekenen</span>
+      <input id="rtfOnbNaam" autocomplete="name"></label>
+    <div id="rtfOnbFout" role="alert"></div>
+    <button class="knop" id="rtfOnbDoe" type="button" style="width:100%;">Onderteken en ga verder</button>
+  </div>
+</div>
+
 <script src="sessie.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -339,7 +372,7 @@ async function start(){
     // controleer token; toon hub
     const d = await Sessie.ophalen();
     if (d && d.profiel){
-      Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel);
+      Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel); checkOnbRtf(d.profiel);
       // openstaand verzoek om alles te verwijderen
       if (d.wisVerzoek){
         if (d.wisVerzoek.vanMij){
@@ -429,6 +462,66 @@ $('#gDoe').addEventListener('click', async ()=>{
   const code = $('#gCode').value.trim().toUpperCase();
   try{ await api('/gezin/inloggen', { code }); $('#dlgLogin').close(); await profielen(code); }
   catch(e){ $('#gFout').textContent = e.message; }
+});
+
+// ---- verplichte onboarding + contract (alleen volwassen gezinsleden) ----
+let onbRtfBezig = false, onbRtfProfiel = null;
+async function onbApiRtf(path, body){
+  const s = Sessie.huidig() || {};
+  const r = await fetch('/api/rtf/onboarding' + path, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+  });
+  const d = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+}
+async function checkOnbRtf(profiel){
+  // gasten (oppas/familie) en kinderen tekenen niet; de volwassene doet dit voor het gezin
+  if (!profiel || profiel.rol === 'gast' || profiel.rol === 'kind') return;
+  onbRtfProfiel = profiel;
+  let st; try { st = await onbApiRtf('/status'); } catch(e){ return; }
+  if (!st || st.klaar){ const g0 = $('#rtfOnb'); if (g0) g0.hidden = true; return; }
+  tekenOnbRtf(st);
+}
+function tekenOnbRtf(st){
+  const g = $('#rtfOnb'); if (!g) return;
+  g.hidden = false;
+  const vBox = $('#rtfOnbVelden');
+  const huidig = {}; vBox.querySelectorAll('input[data-veld]').forEach(i => { if (i.value) huidig[i.dataset.veld] = i.value; });
+  vBox.textContent = '';
+  (st.velden || []).forEach(v => {
+    const wrap = document.createElement('label'); wrap.className = 'ronb-veld';
+    const sp = document.createElement('span'); sp.textContent = v.label + (v.ingevuld ? ' ✓' : ''); wrap.appendChild(sp);
+    const inp = document.createElement('input');
+    inp.type = v.type === 'email' ? 'email' : v.type === 'tel' ? 'tel' : v.type === 'date' ? 'date' : 'text';
+    inp.dataset.veld = v.id;
+    const voorInvul = v.id === 'naam' && onbRtfProfiel ? onbRtfProfiel.naam : '';
+    inp.value = huidig[v.id] != null ? huidig[v.id] : (v.waarde || voorInvul || '');
+    inp.autocomplete = ({ naam:'name', email:'email', telefoon:'tel', adres:'street-address', postcode:'postal-code', woonplaats:'address-level2', land:'country-name' })[v.id] || 'off';
+    wrap.appendChild(inp); vBox.appendChild(wrap);
+  });
+  $('#rtfOnbCTitel').textContent = st.contract.titel || '';
+  $('#rtfOnbCTekst').textContent = st.contract.tekst || '';
+  const ak = $('#rtfOnbAkk'); ak.checked = ak.checked || !!st.contract.ondertekend;
+  $('#rtfOnbFout').textContent = '';
+}
+$('#rtfOnbDoe').addEventListener('click', async () => {
+  if (onbRtfBezig) return;
+  const fout = $('#rtfOnbFout'); fout.textContent = '';
+  onbRtfBezig = true;
+  try {
+    const velden = {};
+    document.querySelectorAll('#rtfOnbVelden input[data-veld]').forEach(i => { if (i.value.trim()) velden[i.dataset.veld] = i.value.trim(); });
+    if (Object.keys(velden).length) { try { await onbApiRtf('/opslaan', { velden }); } catch(e){} }
+    const naam = ($('#rtfOnbNaam').value || '').trim();
+    const akkoord = $('#rtfOnbAkk').checked;
+    const r = await onbApiRtf('/teken', { naam, akkoord });
+    if (r.klaar){ $('#rtfOnb').hidden = true; onbRtfBezig = false; return; }
+    tekenOnbRtf(r);
+    fout.textContent = 'Nog niet compleet: vul de resterende velden in.';
+  } catch(e){ fout.textContent = e.message || 'Er ging iets mis.'; }
+  onbRtfBezig = false;
 });
 
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }

@@ -88,6 +88,27 @@ test('4. een nieuw lid krijgt automatisch de aangepaste eisen (noodcontact ontbr
   assert.ok(st.ontbrekend.includes('noodcontact'), 'en ontbreekt nog bij dit lid');
 });
 
+test('6. een RTF-gezinslid tekent hetzelfde platformcontract, maar zonder paspoort', async () => {
+  // een gezin aanmaken levert code + token voor de volwassen beheerder
+  const g = (await api(base, '/api/foundation/gezin/maak', { gezinsnaam: 'Gezin Test', naam: 'Sam Ouder', pin: '1234', avatar: '👑', kleur: '#C9A24B' })).body;
+  assert.ok(g.code && g.token, 'gezin aangemaakt met code en token');
+  const st = (await api(base, '/api/rtf/onboarding/status', { code: g.code, token: g.token })).body;
+  assert.equal(st.tier, 'rtf');
+  assert.equal(st.klaar, false, 'nog niet rond');
+  // RTF reist niet met een reispas: geen paspoort/geboortedatum/nationaliteit-eis
+  const ids = new Set(st.velden.map(v => v.id));
+  assert.ok(!ids.has('paspoort') && !ids.has('nationaliteit'), 'geen KYC/paspoort voor RTF');
+  assert.ok(ids.has('email') && ids.has('adres'), 'wel de gewone contactgegevens');
+  // alle (niet-KYC) velden invullen + tekenen maakt het rond; de eigenaar kan
+  // eerder velden hebben toegevoegd (bijv. noodcontact), dus vul dynamisch
+  const velden = {};
+  st.velden.forEach(v => { if (v.type !== 'kyc') velden[v.id] = v.id === 'email' ? 'sam@x.nl' : v.id === 'land' ? 'NL' : 'Sam Ouder'; });
+  await api(base, '/api/rtf/onboarding/opslaan', { code: g.code, token: g.token, velden });
+  const t = await api(base, '/api/rtf/onboarding/teken', { code: g.code, token: g.token, naam: 'Sam Ouder', akkoord: true });
+  assert.equal(t.status, 200);
+  assert.equal(t.body.klaar, true, 'na invullen + tekenen is de RTF-onboarding rond');
+});
+
 test('5. elke leverancier heeft een eigen scope die los AI-aanpasbaar is', async () => {
   const cfg = (await api(base, '/api/supplier/onboarding/config', {}, brand)).body;
   assert.ok(cfg.config && cfg.config.contract, 'leverancier heeft een eigen onboarding-config');

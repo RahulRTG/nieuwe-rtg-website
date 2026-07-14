@@ -528,6 +528,7 @@
       <div class="view" data-view="orders">
         <h2 data-i18n="sup.v.orders">Bestellingen</h2>
         <p class="sub" data-i18n="sup.v.orders.sub">Live van RTG-gasten. Werk de status bij of stort terug.</p>
+        <div id="resWrap"></div>
         <div id="orderList"></div>
       </div>
       <div class="view" data-view="rides">
@@ -2619,7 +2620,8 @@
     const open = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
     const revenue = (state.orders||[]).filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
     $('#homeH').textContent = T('sup.hello','Goedendag,') + ' ' + S.name.split(' ')[0] + '.';
-    $('#homeSub').textContent = tType(S.typeLabel) + ' · ' + T('sup.connected','verbonden met RTG');
+    const rating = state.reviews && state.reviews.rating;
+    $('#homeSub').textContent = tType(S.typeLabel) + (rating ? ' · ⭐ ' + rating.score + ' (' + rating.aantal + ' reviews)' : '') + ' · ' + T('sup.connected','verbonden met RTG');
     let stat = '';
     if (has('orders')) stat += '<div class="b"><div class="l">'+T('sup.openorders','Open orders')+'</div><div class="v a">'+open.length+'</div></div>';
     if (has('rides')) stat += '<div class="b"><div class="l">'+T('tab.rides','Ritten')+'</div><div class="v a">'+(state.rides||[]).length+'</div></div>';
@@ -2651,11 +2653,23 @@
     if (openTickets) todos.push({ icon:'🔧', txt: openTickets + ' ' + T('todo.tickets','open klus(sen)'), tab:'klussen' });
     const newApps = (state.applications || []).filter(x => x.status === 'nieuw').length;
     if (newApps) todos.push({ icon:'📝', txt: newApps + ' ' + T('todo.apps','nieuwe sollicitatie(s)'), tab:'team' });
+    const openRes = (state.reserveringen || []).filter(r => r.status === 'aangevraagd').length;
+    if (openRes) todos.push({ icon:'🪑', txt: openRes + ' ' + T('todo.res','open reservering(en) om te bevestigen'), tab:'orders' });
     extra += '<div class="card"><div class="tt-h">' + T('todo.h','Vandaag nog doen') + '</div>' +
       (todos.length ? todos.map(t =>
         '<button class="todo-row" data-goto="' + t.tab + '"><span>' + t.icon + '</span><b>' + t.txt + '</b><i>›</i></button>'
       ).join('') : '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--green);">✓ ' + T('todo.none','Alles is bij. Geen openstaande acties.') + '</div>') +
       '</div>';
+
+    // recente reviews van gasten (1-5 sterren, geplaatst na afronding)
+    const recentRevs = (state.reviews && state.reviews.recent) || [];
+    if (recentRevs.length){
+      extra += '<div class="card"><div class="tt-h">⭐ ' + T('rev.h','Recente reviews') + '</div>' +
+        recentRevs.slice(0,3).map(r =>
+          '<div style="margin-top:0.55rem;font-size:0.8rem;"><b>' + '★'.repeat(r.score) + '<span style="opacity:0.25;">' + '★'.repeat(5 - r.score) + '</span></b> <span class="cn">' + r.codename + '</span>' +
+          (r.tekst ? '<div style="color:var(--soft);font-size:0.76rem;margin-top:0.15rem;">' + r.tekst + '</div>' : '') + '</div>'
+        ).join('') + '</div>';
+    }
 
     const guests = (state.guests || []);
     if (guests.length){
@@ -2703,10 +2717,35 @@
         (o.paid && !o.refunded) ? E('button', { class: 'obtn warn js-refund', onclick: () => refund(o.ref) }, T('sup.refund', 'Terugstorten')) : null));
   }
   function renderOrders(){
+    renderReserveringen();
     const list = state.orders || [];
     const wrap = $('#orderList');
     if (!list.length){ Util.vervang(wrap, Util.el('div', { class: 'empty' }, T('sup.noorders', 'Nog geen bestellingen. Zodra een RTG-gast bij u bestelt, verschijnt het hier, live.'))); return; }
     Util.vervang(wrap, list.map(orderKaart));
+  }
+
+  // tafelreserveringen: open aanvragen bevestigen of weigeren, komende tafels zien
+  function renderReserveringen(){
+    const wrap = $('#resWrap');
+    if (!wrap) return;
+    const list = state.reserveringen || [];
+    if (!list.length){ wrap.innerHTML = ''; return; }
+    wrap.innerHTML = '<div class="card"><div class="tt-h">🪑 ' + T('res.h','Reserveringen') + '</div>' +
+      list.map(r =>
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;" data-res="' + r.id + '">' +
+          '<span><b class="cn">' + r.customerCodename + '</b> · ' + r.datum + ' ' + r.tijd + ' · ' + r.personen + 'p' + (r.notitie ? ' · 📝 ' + r.notitie : '') + '</span>' +
+          (r.status === 'aangevraagd'
+            ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="obtn primary js-resok">' + T('res.ok','Bevestig') + '</button><button class="obtn warn js-resnee">' + T('sup.reject','Weiger') + '</button></span>'
+            : '<span class="pill klaar" style="flex-shrink:0;">✓ ' + T('res.bevestigd','bevestigd') + '</span>') +
+        '</div>').join('') + '</div>';
+    wrap.querySelectorAll('[data-res]').forEach(el => {
+      const beslis = async action => {
+        try { await API.call('/supplier/reservering/beslis', { id: el.dataset.res, action }); toast(action === 'bevestig' ? '🪑 ' + T('res.oktoast','Reservering bevestigd; de gast hoort het meteen.') : T('res.neetoast','Reservering geweigerd.')); await refresh(); }
+        catch(e){ toast(e.message); }
+      };
+      const ok = el.querySelector('.js-resok'); if (ok) ok.addEventListener('click', () => beslis('bevestig'));
+      const nee = el.querySelector('.js-resnee'); if (nee) nee.addEventListener('click', () => beslis('weiger'));
+    });
   }
   async function setStatus(ref, status){
     try { await API.call('/supplier/order/status', {ref, status}); toast(T('sup.status','Status:')+' '+tStatus(status)); await refresh(); }
@@ -2928,7 +2967,8 @@
     let html = '<div class="card"><div class="tt-h">'+T('pos.today','Vandaag')+'</div>'+
       '<div class="pos-day"><b>'+eur(p.total)+'</b><span>'+p.count+' '+T('pos.bons','bon(nen)')+'</span></div>';
     const methods = Object.keys(p.byMethod);
-    if (methods.length) html += '<div class="pos-chips">'+methods.map(m=>'<span>'+methodLabel(m)+' '+eur(p.byMethod[m])+'</span>').join('')+'</div>';
+    if (methods.length) html += '<div class="pos-chips">'+methods.map(m=>'<span>'+methodLabel(m)+' '+eur(p.byMethod[m])+'</span>').join('')+(p.fooien?'<span>💛 '+T('pos.fooien','Fooien')+' '+eur(p.fooien)+'</span>':'')+'</div>';
+    else if (p.fooien) html += '<div class="pos-chips"><span>💛 '+T('pos.fooien','Fooien')+' '+eur(p.fooien)+'</span></div>';
     const actors = Object.keys(p.byActor);
     if (actors.length>1 || (actors.length===1 && actors[0]!==actor().name))
       html += '<div class="pos-chips actors">'+actors.map(a=>'<span>'+a+' '+eur(p.byActor[a])+'</span>').join('')+'</div>';
@@ -4081,6 +4121,9 @@ window.I18N = { en: {
   'pos.pin':'Card', 'pos.cash':'Cash', 'pos.room':'To the room', 'pos.toroom':'To the room',
   'pos.nomenu':'Add dishes to the menu first; they become your register keys here.',
   'pos.newbon':'New receipt', 'pos.total':'Total', 'pos.clear':'Clear', 'pos.paypin':'Checkout, card',
+  'pos.fooien':'Tips', 'res.h':'Reservations', 'res.ok':'Confirm', 'res.bevestigd':'confirmed',
+  'res.oktoast':'Reservation confirmed; the guest is notified instantly.', 'res.neetoast':'Reservation declined.',
+  'todo.res':'open reservation(s) to confirm', 'rev.h':'Recent reviews',
   'pos.charge':'Checkout or room charge', 'pos.roomlbl':'Room (optional)', 'pos.noroom':'No room, single sale',
   'pos.desc':'Description', 'pos.deschotel':'E.g. minibar, spa, room service', 'pos.amount':'Amount (€)',
   'pos.ridebill':'Charge a ride', 'pos.ride':'Ride', 'pos.descride':'E.g. airport to Cala Jondal',

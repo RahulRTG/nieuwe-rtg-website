@@ -2501,6 +2501,9 @@
               ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
               : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
               (o.pickup ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon ophaalcode') + '</button>' : '') +
+              (['nieuw','wacht-op-betaling'].includes(o.status) ? '<button class="mo-code js-oann">✕ ' + T('erv.annuleer','Annuleer') + '</button>' : '') +
+              (o.paid && !o.splitst ? '<button class="mo-code js-osplit">🤝 ' + T('erv.splits','Splits') + '</button>' : '') +
+              (['geserveerd','bezorgd','opgehaald'].includes(o.status) ? '<button class="mo-code js-orev">⭐ ' + T('erv.review','Beoordeel') + '</button>' : '') +
               (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ '+T('app.taggedsalon','getagd voor Salon')+'</span>' : '') +
             '</div></div>';
         }).join('')
@@ -2511,6 +2514,18 @@
       if (pb) pb.addEventListener('click', () => payOrder(o));
       const cb = el.querySelector('.js-ocode');
       if (cb) cb.addEventListener('click', () => showGlow(o));
+      const ab = el.querySelector('.js-oann');
+      if (ab) ab.addEventListener('click', async () => {
+        try {
+          const d = await API.call('/annuleer', { soort: 'order', ref: o.ref });
+          toast(d.terugbetaald ? '↩️ ' + T('erv.retour','U ontvangt') + ' ' + eur(d.terugbetaald) + ' ' + T('erv.terug','retour.') : T('erv.geannuleerd','Geannuleerd.'));
+          renderTerPlaatse();
+        } catch(e){ toast(e.message); }
+      });
+      const rb = el.querySelector('.js-orev');
+      if (rb) rb.addEventListener('click', () => reviewUI(el, o));
+      const sb = el.querySelector('.js-osplit');
+      if (sb) sb.addEventListener('click', () => splitsUI(el, o));
     });
 
     // partners: op afstand tonen en sorteren wanneer we de locatie weten
@@ -2522,10 +2537,12 @@
       const zzp = (s.services || []).length > 0;
       const viewable = s.hasMenu || rooms || photos;
       const afst = km!=null ? ' · 📍 ' + Geo.tekst(km) : '';
-      const sub = (s.vak ? s.vak : tType(s.typeLabel)) + ' · ' + s.city + (rooms ? ' · ' + rooms + ' ' + T('app.roomsfree','kamer(s) vrij') : '') + afst;
+      const ster = s.rating ? ' · ⭐ ' + s.rating.score : '';
+      const sub = (s.vak ? s.vak : tType(s.typeLabel)) + ster + ' · ' + s.city + (rooms ? ' · ' + rooms + ' ' + T('app.roomsfree','kamer(s) vrij') : '') + afst;
       return '<div class="sup-card">' +
         '<span class="ic">' + (s.icon || '📍') + '</span>' +
         '<div class="t"><b>' + s.name + '</b><span>' + sub + '</span></div>' +
+        '<button class="chatb js-fav" data-fav="' + s.code + '" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '❤️' : '🤍') + '</button>' +
         '<button class="chatb" data-chat="' + s.code + '" aria-label="Chat">💬</button>' +
         (zzp
           ? '<button class="go" data-boek="' + s.code + '">'+T('app.tp.boek','Boek')+'</button>'
@@ -2537,9 +2554,51 @@
     $('#supplierList').querySelectorAll('[data-chat]').forEach(b => b.addEventListener('click', () => openPChat(b.dataset.chat)));
     $('#supplierList').querySelectorAll('[data-menu]').forEach(b => b.addEventListener('click', () => openMenu(b.dataset.menu)));
     $('#supplierList').querySelectorAll('[data-boek]').forEach(b => b.addEventListener('click', () => openBoekSheet(b.dataset.boek)));
+    $('#supplierList').querySelectorAll('.js-fav').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/favoriet', { supplierCode: b.dataset.fav });
+        b.textContent = d.favoriet ? '❤️' : '🤍';
+        toast(d.favoriet ? '❤️ ' + T('fav.on','Bewaard bij mijn adressen.') : T('fav.off','Uit mijn adressen gehaald.'));
+      } catch(e){ toast(e.message); }
+    }));
     // eenmalig de locatie ophalen zodat partners op afstand worden getoond en gesorteerd
     if (window.Geo && !mijnPlek && !renderTerPlaatse._gps){ renderTerPlaatse._gps = true; Geo.positie().then(p => { if (p) renderTerPlaatse(); }); }
     renderAfspraken();
+  }
+
+  // review: de actie-rij wordt vijf sterren; een tik plaatst de beoordeling
+  function reviewUI(el, o){
+    const acts = el.querySelector('.acts');
+    acts.innerHTML = '<span style="font-size:0.72rem;color:var(--soft);align-self:center;">' + T('erv.hoewas','Hoe was het?') + '</span>' +
+      [1,2,3,4,5].map(n => '<button class="mo-code js-star" data-n="' + n + '" aria-label="' + n + ' ' + T('erv.sterren','sterren') + '">' + '⭐'.repeat(1) + n + '</button>').join('');
+    acts.querySelectorAll('.js-star').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await API.call('/review', { soort: 'order', ref: o.ref, score: Number(b.dataset.n) });
+        toast('⭐ ' + T('erv.bedanktreview','Dank voor uw beoordeling.'));
+        renderTerPlaatse();
+      } catch(e){ toast(e.message); renderTerPlaatse(); }
+    }));
+  }
+
+  // splitsen: kies verbonden vrienden; ieder krijgt een betaalverzoek voor een gelijk deel
+  async function splitsUI(el, o){
+    let cons = [];
+    try { cons = (await API.call('/member/connections')).connections || []; } catch(e){}
+    if (!cons.length){ toast(T('erv.geenvrienden','Voeg eerst vrienden toe via de Salon om te kunnen splitsen.')); return; }
+    const acts = el.querySelector('.acts');
+    acts.innerHTML = '<div style="width:100%;">' +
+      '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.35rem;">' + T('erv.splitsmet','Splits gelijk met:') + '</div>' +
+      cons.slice(0,8).map(c => '<label style="display:inline-flex;align-items:center;gap:0.3rem;margin:0 0.6rem 0.4rem 0;font-size:0.78rem;"><input type="checkbox" class="js-splid" value="' + c.key + '"> ' + c.codename + '</label>').join('') +
+      '<button class="mo-pay js-splgo" style="width:100%;margin-top:0.2rem;">🤝 ' + T('erv.stuurverzoek','Stuur betaalverzoeken') + '</button></div>';
+    acts.querySelector('.js-splgo').addEventListener('click', async () => {
+      const metKeys = [...acts.querySelectorAll('.js-splid:checked')].map(x => x.value);
+      if (!metKeys.length){ toast(T('erv.kiesvriend','Kies minstens een vriend.')); return; }
+      try {
+        const d = await API.call('/splits', { ref: o.ref, metKeys });
+        toast('🤝 ' + T('erv.verzoekweg','Betaalverzoeken verstuurd:') + ' ' + eur(d.splits.delen[0].bedrag) + ' ' + T('erv.pp','p.p.'));
+        renderTerPlaatse();
+      } catch(e){ toast(e.message); }
+    });
   }
 
   // mijn afspraken bij zelfstandigen: status volgen en achteraf betalen
@@ -2852,6 +2911,20 @@
     const s = menuState.supplier;
     // fotostrip + kamers van de partner (hotels, of elke partner met foto's)
     let head = '';
+    // rating + favoriet-hart + tafel reserveren (de ervaring-laag)
+    head += '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.2rem 0 0.6rem;">' +
+      (s.rating ? '<span style="font-size:0.8rem;">⭐ <b>' + s.rating.score + '</b> <span style="color:var(--soft);font-size:0.7rem;">(' + s.rating.aantal + ')</span></span>' : '<span style="font-size:0.72rem;color:var(--soft);">' + T('erv.nogGeenReviews','Nog geen reviews') + '</span>') +
+      '<button id="msFav" style="margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.85rem;" aria-label="' + T('fav.aria','Favoriet') + '">' + (s.favoriet ? '❤️ ' + T('fav.bewaard','Bewaard') : '🤍 ' + T('fav.bewaar','Bewaar')) + '</button></div>';
+    if ((s.tableNames || []).length && s.reservationsOpen !== false){
+      const morgen = new Date(Date.now() + 86400000).toISOString().slice(0,10);
+      head += '<div class="ms-cat">🪑 ' + T('erv.reserveer.h','Tafel reserveren') + '</div>' +
+        '<div style="display:flex;gap:0.4rem;align-items:center;padding:0.2rem 0 0.9rem;flex-wrap:wrap;">' +
+        '<input type="date" id="rsvDatum" value="' + morgen + '" min="' + new Date().toISOString().slice(0,10) + '" style="flex:2;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);" aria-label="' + T('erv.datum','Datum') + '">' +
+        '<input type="time" id="rsvTijd" value="20:00" style="flex:1;min-width:84px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);" aria-label="' + T('erv.tijd','Tijd') + '">' +
+        '<select id="rsvPers" style="flex:1;min-width:70px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.5rem;font-size:0.8rem;color:var(--txt);" aria-label="' + T('erv.personen','Personen') + '">' +
+        [1,2,3,4,5,6,8,10].map(n => '<option' + (n===2?' selected':'') + '>' + n + '</option>').join('') + '</select>' +
+        '<button class="vbtn" id="rsvGo">' + T('erv.reserveer','Reserveer') + '</button></div>';
+    }
     if (s.photos && s.photos.length)
       head += '<div class="ms-photos">' + s.photos.map(p => '<img src="' + p + '" alt="">').join('') + '</div>';
     if (s.rooms && s.rooms.length){
@@ -2875,7 +2948,8 @@
           (e.desc ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + e.desc + '</div>' : '') +
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;gap:0.6rem;">' +
           '<span style="font-size:0.72rem;color:' + (e.spotsLeft > 0 ? 'var(--soft)' : 'var(--burgundy)') + ';">' + (e.spotsLeft > 0 ? e.spotsLeft + ' ' + T('ev.spots','plekken vrij') : T('ev.full','Vol')) + (e.price ? ' \u00b7 ' + eur(e.price) + ' p.p.' : ' \u00b7 ' + T('ev.free','gratis')) + '</span>' +
-          (e.spotsLeft > 0 ? '<button class="vbtn" data-rsvp="' + e.id + '">' + T('ev.join','Zet mij op de lijst') + '</button>' : '') +
+          (e.spotsLeft > 0 ? '<button class="vbtn" data-rsvp="' + e.id + '">' + T('ev.join','Zet mij op de lijst') + '</button>'
+            : '<button class="vbtn" data-wl="' + e.id + '">⏳ ' + T('erv.wachtlijst','Wachtlijst') + '</button>') +
           '</div></div>'
         ).join('')
       : '';
@@ -2905,6 +2979,29 @@
         await openMenu(menuState.supplier.code); // sheet ververst: plekken en knop kloppen weer
       } catch(e){ toast(e.message); }
     }));
+    // vol event: op de wachtlijst; bij een vrijgekomen plek krijgt u meteen bericht
+    document.querySelectorAll('[data-wl]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/wachtlijst', { supplierCode: menuState.supplier.code, eventId: b.dataset.wl });
+        toast('⏳ ' + T('erv.wlok','U staat op de wachtlijst (nr. ') + d.positie + '). ' + T('erv.wlbericht','Bij een vrije plek hoort u het meteen.'));
+      } catch(e){ toast(e.message); }
+    }));
+    // favoriet-hart + tafel reserveren
+    const favB = $('#msFav');
+    if (favB) favB.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/favoriet', { supplierCode: s.code });
+        menuState.supplier.favoriet = d.favoriet;
+        renderMenuSheet();
+      } catch(e){ toast(e.message); }
+    });
+    const rsvGo = $('#rsvGo');
+    if (rsvGo) rsvGo.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/reserveer', { supplierCode: s.code, datum: $('#rsvDatum').value, tijd: $('#rsvTijd').value, personen: Number($('#rsvPers').value) });
+        toast('🪑 ' + T('erv.reserveerok','Reservering aangevraagd voor') + ' ' + d.reservering.datum + ' ' + d.reservering.tijd + '. ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
+      } catch(e){ toast(e.message); }
+    });
     $('#msBody').querySelectorAll('.ms-item').forEach(el => {
       const id = el.dataset.id;
       const plus = el.querySelector('.js-plus'), min = el.querySelector('.js-minus');
@@ -2925,6 +3022,12 @@
         tafels.map(t => '<option' + (menuState.table === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' : '') +
       '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
       '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> ' + T('app.ms.tag','Tag dit voor De Salon (7 dagen na verblijf)') + '</label>' +
+      '<select class="ms-note" id="msFooi" style="margin-top:0.4rem;" aria-label="' + T('erv.fooi','Fooi') + '">' +
+        '<option value="0">' + T('erv.fooi.geen','Geen fooi') + '</option>' +
+        '<option value="p5"' + (menuState.fooi==='p5'?' selected':'') + '>' + T('erv.fooi.team','Fooi voor het team') + ': 5%</option>' +
+        '<option value="p10"' + (menuState.fooi==='p10'?' selected':'') + '>' + T('erv.fooi.team','Fooi voor het team') + ': 10%</option>' +
+        '<option value="e5"' + (menuState.fooi==='e5'?' selected':'') + '>' + T('erv.fooi.team','Fooi voor het team') + ': € 5</option>' +
+      '</select>' +
       '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">' + T('app.ms.los','U bestelt rechtstreeks bij deze zaak: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de zaak.') + '</div>' +
       ((menuState.supplier.hasMenu !== false && (menuState.menu || []).some(x => x.station === 'bar'))
         ? '<div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;">🔞 ' +
@@ -2936,6 +3039,8 @@
     if (mt) mt.addEventListener('change', e => menuState.table = e.target.value);
     $('#msNote').addEventListener('input', e => menuState.note = e.target.value);
     $('#msTag').addEventListener('change', e => menuState.tag = e.target.checked);
+    const mf = $('#msFooi');
+    if (mf) mf.addEventListener('change', e => menuState.fooi = e.target.value);
     const ob = $('#msOrder');
     if (count) ob.addEventListener('click', placeOrder);
   }
@@ -2951,7 +3056,7 @@
     $('#menu-scrim').classList.remove('open');
     if (d.order.status === 'wacht-op-betaling'){
       // betalen-eerst: de bestelling is pas definitief na directe betaling
-      payOrder(d.order);
+      payOrder(d.order, menuState.fooi);
     } else {
       // deze zaak koos betaling achteraf: de bestelling loopt al, afrekenen kan zo
       toast('🛎️ ' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalachteraf','Betalen kan achteraf via Bestellingen.'));
@@ -2959,11 +3064,15 @@
     renderTerPlaatse();
   }
 
-  function payOrder(o){
-    payWithFaceId(eur(o.total), async () => {
-      await API.call('/order/pay', { ref: o.ref });
+  function payOrder(o, fooiKeus){
+    // fooi voor het team: percentage of vast bedrag, gekozen in de bestelbon
+    const fooi = fooiKeus === 'p5' ? Math.round(o.total * 5) / 100
+      : fooiKeus === 'p10' ? Math.round(o.total * 10) / 100
+      : fooiKeus === 'e5' ? 5 : 0;
+    payWithFaceId(eur(o.total + fooi), async () => {
+      await API.call('/order/pay', { ref: o.ref, fooi });
       return o;
-    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.', after: () => renderTerPlaatse() });
+    }, { message: () => T('app.paidto','Betaald aan') + ' ' + o.supplierName + '.' + (fooi ? ' 💛 ' + eur(fooi) + ' ' + T('erv.fooivoorteam','fooi voor het team.') : ''), after: () => renderTerPlaatse() });
   }
 
   $('#msClose').addEventListener('click', () => { $('#menu-sheet').classList.remove('open'); $('#menu-scrim').classList.remove('open'); });
@@ -3561,6 +3670,31 @@
         '<div class="t"><b>' + it.title + '</b><span>' + it.when + ' · ' + it.sub + '</span></div>' +
         '<span class="pill ' + (it.status === 'paid' ? 'paid' : it.status === 'req' ? 'req' : 'open') + '">' + tLbl(it.label) + '</span>' +
       '</div>').join('');
+    renderAgenda();
+  }
+
+  /* de reisagenda: alles met een datum (tafels, tickets, ritten, events)
+     automatisch samengevoegd tot een dagprogramma onder de reis */
+  const AGENDA_ICO = { reservering: '🪑', ticket: '🎟', boeking: '🗓', rit: '🚗', event: '🎉' };
+  async function renderAgenda(){
+    if (!API.live) return;
+    let wrap = $('#agendaWrap');
+    if (!wrap){
+      wrap = document.createElement('div');
+      wrap.id = 'agendaWrap';
+      $('#tripList').insertAdjacentElement('afterend', wrap);
+    }
+    let dagen = [];
+    try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch(e){ return; }
+    if (!dagen.length){ wrap.innerHTML = ''; return; }
+    const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang() === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+    wrap.innerHTML = '<div class="sec-label" style="margin-top:1.2rem;">📅 ' + T('erv.agenda','Mijn programma') + '</div>' +
+      dagen.map(d =>
+        '<div style="font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin:0.7rem 0 0.35rem;">' + dagNaam(d.datum) + '</div>' +
+        d.items.map(it =>
+          '<div class="rowitem"><div class="t"><b>' + (AGENDA_ICO[it.soort] || '·') + ' ' + it.titel + '</b><span>' + (it.tijd || T('erv.heledag','hele dag')) + ' · ' + tStatus(it.status) + '</span></div></div>'
+        ).join('')
+      ).join('');
   }
 
   /* ---------- betalen (Face ID) ---------- */
@@ -3678,6 +3812,70 @@
     });
     renderGiftcards();
     renderBoekhouder();
+    renderPunten();
+  }
+
+  /* RTG-punten + open betaalverzoeken (gesplitste rekeningen) + meldingsvoorkeuren */
+  async function renderPunten(){
+    if (!API.live || user.tier === 'guest') return;
+    let wrap = $('#puntenWrap');
+    if (!wrap){
+      wrap = document.createElement('div');
+      wrap.id = 'puntenWrap';
+      $('#payAllWrap').insertAdjacentElement('afterend', wrap);
+    }
+    let p = null, splitsen = [], vk = null;
+    try {
+      [p, splitsen, vk] = await Promise.all([
+        API.call('/punten').catch(() => null),
+        API.call('/splitsen/mijn').then(d => d.splitsen || []).catch(() => []),
+        API.call('/meldingen/voorkeur').then(d => d.voorkeur).catch(() => null)
+      ]);
+    } catch(e){ return; }
+    const kaart = inhoud => '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.1rem;">' + inhoud + '</div>';
+    let html = '';
+    // punten: saldo, tegoed en verzilveren
+    if (p) html += kaart(
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.8rem;">' +
+        '<div><b style="font-size:0.86rem;">✦ ' + T('erv.punten','RTG-punten') + '</b>' +
+        '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">' + p.saldo + ' ' + T('erv.puntensaldo','punten') + (p.tegoed ? ' · € ' + p.tegoed + ' ' + T('erv.tegoed','tegoed (verrekent automatisch)') : '') + '</div>' +
+        '<div style="font-size:0.64rem;color:var(--soft);margin-top:0.2rem;">' + T('erv.puntenuitleg','1 punt per € 10; 100 punten = € 10 tegoed. RTG legt bij, de zaak ontvangt alles.') + '</div></div>' +
+        (p.saldo >= 100 ? '<button class="vbtn" id="pzGo">' + T('erv.verzilver','Verzilver 100') + '</button>' : '') +
+      '</div>');
+    // open betaalverzoeken: mijn deel van gesplitste rekeningen
+    const mijnKey = user.id != null ? 'user-' + user.id : user.tier;
+    const echteOpen = splitsen.filter(s => s.delen.some(d2 => !d2.paid)).slice(0, 6);
+    if (echteOpen.length) html += kaart(
+      '<b style="font-size:0.86rem;">🤝 ' + T('erv.verzoeken','Gesplitste rekeningen') + '</b>' +
+      echteOpen.map(s => {
+        const mijnDeel = s.delen.find(d2 => d2.key === mijnKey && !d2.paid);
+        return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.78rem;">' +
+          '<span>' + s.supplierName + ' · ' + eur(s.totaal) + ' · ' + s.delen.filter(d2 => d2.paid).length + '/' + s.delen.length + ' ' + T('erv.betaald','betaald') + '</span>' +
+          (mijnDeel
+            ? '<button class="vbtn js-splpay" data-id="' + s.id + '" data-amt="' + mijnDeel.bedrag + '">' + T('erv.betaaldeel','Betaal mijn deel') + '</button>'
+            : '<span style="color:var(--soft);font-size:0.68rem;">' + T('erv.wachtop','wacht op vrienden') + '</span>') +
+        '</div>';
+      }).join(''));
+    // meldingsvoorkeuren: per soort aan of uit
+    if (vk) html += kaart(
+      '<b style="font-size:0.86rem;">🔔 ' + T('erv.meldingen','Meldingen') + '</b>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:0.5rem 1rem;margin-top:0.55rem;">' +
+      [['orders', T('erv.m.orders','Bestellingen')], ['events', T('erv.m.events','Events')], ['salon', 'De Salon'], ['live', T('erv.m.live','Onderweg')], ['wachtlijst', T('erv.wachtlijst','Wachtlijst')]].map(([k, l]) =>
+        '<label style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.76rem;"><input type="checkbox" class="js-vk" data-scope="' + k + '"' + (vk[k] !== false ? ' checked' : '') + '> ' + l + '</label>'
+      ).join('') + '</div>');
+    wrap.innerHTML = html;
+    const pz = $('#pzGo');
+    if (pz) pz.addEventListener('click', async () => {
+      try { const d = await API.call('/punten/verzilver', { punten: 100 }); toast('✦ ' + T('erv.verzilverd','Verzilverd:') + ' € ' + d.tegoed + ' ' + T('erv.tegoedkort','tegoed.')); renderPunten(); }
+      catch(e){ toast(e.message); }
+    });
+    wrap.querySelectorAll('.js-splpay').forEach(b => b.addEventListener('click', () =>
+      payWithFaceId(eur(Number(b.dataset.amt)), async () => { await API.call('/splits/betaal', { id: b.dataset.id }); return null; },
+        { message: () => T('erv.deelbetaald','Uw deel is betaald.'), after: () => renderPunten() })));
+    wrap.querySelectorAll('.js-vk').forEach(c => c.addEventListener('change', async () => {
+      try { await API.call('/meldingen/voorkeur', { zet: { [c.dataset.scope]: c.checked } }); }
+      catch(e){ toast(e.message); }
+    }));
   }
 
   // cadeaukaarten: kopen met Face ID, cadeau doen, inwisselen bij de zaak op code
@@ -4553,6 +4751,21 @@ window.I18N = { en: {
   'cv.workat':'Work at', 'cv.apply':'Apply', 'cv.applied':'Application sent, with your RTG resume attached.',
   'ev.h':'Events', 'ev.spots':'spots left', 'ev.full':'Full', 'ev.free':'free',
   'ev.join':'Put me on the list', 'ev.joined':'You are on the guest list. Your code name is your entry.',
+  'fav.aria':'Favourite', 'fav.on':'Saved to my places.', 'fav.off':'Removed from my places.', 'fav.bewaard':'Saved', 'fav.bewaar':'Save',
+  'erv.annuleer':'Cancel', 'erv.splits':'Split', 'erv.review':'Rate', 'erv.retour':'You will receive', 'erv.terug':'back.', 'erv.geannuleerd':'Cancelled.',
+  'erv.hoewas':'How was it?', 'erv.sterren':'stars', 'erv.bedanktreview':'Thank you for your review.', 'erv.nogGeenReviews':'No reviews yet',
+  'erv.geenvrienden':'Add friends via the Salon first to split bills.', 'erv.splitsmet':'Split equally with:', 'erv.stuurverzoek':'Send payment requests',
+  'erv.kiesvriend':'Pick at least one friend.', 'erv.verzoekweg':'Payment requests sent:', 'erv.pp':'each',
+  'erv.reserveer.h':'Reserve a table', 'erv.reserveer':'Reserve', 'erv.datum':'Date', 'erv.tijd':'Time', 'erv.personen':'Guests',
+  'erv.reserveerok':'Reservation requested for', 'erv.zaakbevestigt':'The venue will confirm shortly.',
+  'erv.wachtlijst':'Waiting list', 'erv.wlok':'You are on the waiting list (no. ', 'erv.wlbericht':'We will tell you the moment a spot opens up.',
+  'erv.fooi':'Tip', 'erv.fooi.geen':'No tip', 'erv.fooi.team':'Tip for the team', 'erv.fooivoorteam':'tip for the team.',
+  'erv.agenda':'My itinerary', 'erv.heledag':'all day',
+  'erv.punten':'RTG points', 'erv.puntensaldo':'points', 'erv.tegoed':'credit (applies automatically)',
+  'erv.puntenuitleg':'1 point per EUR 10; 100 points = EUR 10 credit. RTG covers it, the venue receives the full amount.',
+  'erv.verzilver':'Redeem 100', 'erv.verzilverd':'Redeemed:', 'erv.tegoedkort':'credit.',
+  'erv.verzoeken':'Split bills', 'erv.betaald':'paid', 'erv.wachtop':'waiting for friends', 'erv.betaaldeel':'Pay my share', 'erv.deelbetaald':'Your share is paid.',
+  'erv.meldingen':'Notifications', 'erv.m.orders':'Orders', 'erv.m.events':'Events', 'erv.m.live':'On the move',
   'cv.st.hired':'hired', 'cv.st.rejected':'not selected', 'cv.st.new':'under review', 'app.logout':'Sign out',
   'app.priv.export':'Download my data', 'app.priv.delete':'Delete my data',
   'app.priv.note':'Your GDPR rights: access and erasure, no forms needed. Deleting wipes your resume, chats, likes and location and signs you out everywhere.',

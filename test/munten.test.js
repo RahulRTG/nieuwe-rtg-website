@@ -105,3 +105,24 @@ test('e2e: munt-verzoek voor een factuur, webhook betaalt hem en de RTF-afdracht
   const os3 = (await api(base, '/api/office/state', {}, office)).body.state.stats;
   assert.equal(os3.muntOntvangst.aantal, 1, 'idempotent: nog steeds een ontvangst');
 });
+
+test('e2e: rechtstreeks een partner betalen met munten crediteert de leverancier', async () => {
+  const winkel = (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+  const supCode = (await api(base, '/api/supplier/state', {}, winkel)).body.state.supplier.code;
+  const voor = (await api(base, '/api/supplier/ontvangsten', {}, winkel)).body.som || 0;
+
+  const lid = (await api(base, '/api/login', { tier: 'business' })).body.token;
+  const vz = await api(base, '/api/munt/direct', { supplierCode: supCode, bedrag: 45, munt: 'usdc', omschrijving: 'Styling' }, lid);
+  assert.equal(vz.status, 200);
+  const verzoek = vz.body.verzoek;
+  assert.equal(verzoek.euroCenten, 4500);
+
+  const evtBody = JSON.stringify({ id: verzoek.id, status: 'ontvangen', euroCenten: verzoek.euroCenten });
+  const wh = await fetch(base + '/api/munt/webhook', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-munt-signature': muntbetaal.tekenDemo(evtBody) }, body: evtBody
+  });
+  assert.equal(wh.status, 200);
+
+  const na = (await api(base, '/api/supplier/ontvangsten', {}, winkel)).body.som || 0;
+  assert.equal(na - voor, 4500, 'de leverancier is met het euro-bedrag gecrediteerd');
+});

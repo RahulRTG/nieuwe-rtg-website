@@ -1275,6 +1275,8 @@
 
   // Zakelijke rekening voor handmatige overboekingen (tot de betaalprovider live is).
   const RTG_IBAN = 'NL62 INGB 0111 1775 88';
+  // Filters voor de facturenlijst (jaar en soort).
+  let payFilterJaar = 'alle', payFilterType = 'alle';
   // Munt-ontvangst (crypto): opties komen eenmalig van de server; staat de
   // acceptatie uit, dan blijft alles zoals het was (geen munt-knoppen).
   let muntOpties = null;
@@ -4135,7 +4137,8 @@
      crypto vast. Zodra het netwerk bevestigt, zetten we de factuur op betaald. */
   let muntPoll = null;
   function muntStop(){ if (muntPoll){ clearInterval(muntPoll); muntPoll = null; } }
-  function openMuntSheet(invId, euroAmount){
+  // cfg: { euro, titel, maak: async(munt)=>verzoek, klaar?: async()=>bool }
+  function openMuntSheet(cfg){
     muntStop();
     let ov = document.getElementById('munt-ov');
     if (!ov){ ov = document.createElement('div'); ov.id = 'munt-ov';
@@ -4146,24 +4149,24 @@
     const munten = (muntOpties && muntOpties.munten) || [];
     const naam = { btc:'Bitcoin', eth:'Ethereum', usdc:'USD Coin', usdt:'Tether' };
     ov.innerHTML = '<div style="width:100%;max-width:460px;background:var(--bg);border-radius:20px 20px 0 0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem;">' +
-      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;"><b style="font-size:1rem;">◈ ' + T('munt.title','Betaal met munten') + '</b>' +
+      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;"><b style="font-size:1rem;">◈ ' + escT(cfg.titel || T('munt.title','Betaal met munten')) + '</b>' +
         '<button id="muntX" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;">✕</button></div>' +
-      '<div style="font-size:0.78rem;color:var(--soft);margin-bottom:0.8rem;">' + T('munt.bedrag','Te betalen') + ': <b style="color:var(--txt);">' + eur(euroAmount) + '</b>. ' + T('munt.omzet','RTG zet uw munten meteen om naar euro.') + '</div>' +
+      '<div style="font-size:0.78rem;color:var(--soft);margin-bottom:0.8rem;">' + T('munt.bedrag','Te betalen') + ': <b style="color:var(--txt);">' + eur(cfg.euro) + '</b>. ' + T('munt.omzet','RTG zet uw munten meteen om naar euro.') + '</div>' +
       '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.2rem;">' +
         munten.map(m => '<button class="js-muntpick" data-munt="' + m.munt + '" style="flex:1;min-width:5rem;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:0.6rem;font-family:inherit;cursor:pointer;"><b style="text-transform:uppercase;">' + m.munt + '</b><br><span style="font-size:0.62rem;color:var(--soft);">' + (naam[m.munt] || m.munt) + '</span></button>').join('') +
       '</div>' +
       '<div id="muntDetail"></div></div>';
     ov.querySelector('#muntX').addEventListener('click', () => { muntStop(); ov.remove(); });
-    ov.querySelectorAll('.js-muntpick').forEach(b => b.addEventListener('click', () => muntVraag(invId, b.dataset.munt, euroAmount)));
+    ov.querySelectorAll('.js-muntpick').forEach(b => b.addEventListener('click', () => muntVraag(cfg, b.dataset.munt)));
   }
 
-  async function muntVraag(invId, munt, euroAmount){
+  async function muntVraag(cfg, munt){
     const det = document.getElementById('muntDetail');
     if (det) det.innerHTML = '<div style="font-size:0.8rem;color:var(--soft);padding:0.6rem 0;">' + T('munt.laden','Adres aanmaken…') + '</div>';
     let vz;
-    try { vz = (await API.call('/munt/verzoek', { invoiceId: invId, munt })).verzoek; }
+    try { vz = await cfg.maak(munt); }
     catch(e){ if (det) det.innerHTML = '<div style="font-size:0.8rem;color:var(--burgundy);padding:0.6rem 0;">' + (e.message || T('munt.fout','Kon geen adres maken.')) + '</div>'; return; }
-    if (!det) return;
+    if (!det || !vz) return;
     const dot = '<span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;flex-shrink:0;"></span>';
     det.innerHTML =
       '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1rem;margin-top:0.6rem;">' +
@@ -4179,16 +4182,15 @@
       '</div>';
     const cp = document.getElementById('muntCopy');
     if (cp) cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(vz.adres); toast(T('munt.gekopieerd','Adres gekopieerd.')); } catch(e){ toast(vz.adres); } });
-    // Poll op de factuurstatus: de aanbieder-webhook zet de factuur op betaald na
-    // conversie. In demo blijft dit staan tot een echte ontvangst binnenkomt.
+    // Poll: de aanbieder-webhook bevestigt de ontvangst. In demo blijft dit staan
+    // tot een echte ontvangst binnenkomt.
+    if (typeof cfg.klaar !== 'function') return;
     muntStop();
     let n = 0;
     muntPoll = setInterval(async () => {
       n++;
       try {
-        applyState((await API.call('/state')).state);
-        const inv = (invoices || []).find(i => i.id === invId);
-        if (inv && inv.status === 'paid'){
+        if (await cfg.klaar()){
           muntStop();
           const o = document.getElementById('munt-ov'); if (o) o.remove();
           toast('◈ ' + T('munt.ontvangen','Betaald met munten. Dank u.'));
@@ -4219,17 +4221,32 @@
       '<label style="font-size:0.72rem;color:var(--soft);">' + T('dp.bedrag','Bedrag (€)') + '</label>' +
       '<input id="dpBedrag" type="number" inputmode="decimal" min="0.50" step="0.50" ' + (opts.bedrag ? 'value="' + opts.bedrag + '"' : '') + ' style="width:100%;font-size:1.3rem;padding:0.6rem 0.8rem;margin:0.25rem 0 0.7rem;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);">' +
       '<input id="dpNote" placeholder="' + T('dp.note','Waarvoor? (optioneel)') + '" ' + (opts.omschrijving ? 'value="' + escT(opts.omschrijving) + '"' : '') + ' style="width:100%;padding:0.55rem 0.8rem;margin-bottom:0.9rem;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);">' +
-      '<button id="dpPay" class="mo-pay" style="width:100%;justify-content:center;padding:0.8rem;">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button></div>';
+      '<button id="dpPay" class="mo-pay" style="width:100%;justify-content:center;padding:0.8rem;">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>' +
+      (muntOpties && muntOpties.aan ? '<button id="dpMunt" style="width:100%;margin-top:0.5rem;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.7rem;font-family:inherit;font-size:0.8rem;cursor:pointer;">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '') +
+      '</div>';
     ov.querySelector('#dpX').addEventListener('click', () => ov.remove());
-    ov.querySelector('#dpPay').addEventListener('click', () => {
+    const dpLees = () => {
       const bedrag = Math.round(Number(ov.querySelector('#dpBedrag').value) * 100) / 100;
-      if (!(bedrag >= 0.5)) { toast(T('dp.min','Kies een bedrag van minstens € 0,50.')); return; }
-      const note = (ov.querySelector('#dpNote').value || '').trim();
+      if (!(bedrag >= 0.5)) { toast(T('dp.min','Kies een bedrag van minstens € 0,50.')); return null; }
+      return { bedrag, note: (ov.querySelector('#dpNote').value || '').trim() };
+    };
+    ov.querySelector('#dpPay').addEventListener('click', () => {
+      const v = dpLees(); if (!v) return;
       ov.remove();
-      payWithFaceId(eur(bedrag), async () => {
-        const d = await API.call('/betaal/direct', { supplierCode: code, bedrag, omschrijving: note, bron: opts.bron || 'app', idem });
+      payWithFaceId(eur(v.bedrag), async () => {
+        const d = await API.call('/betaal/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, bron: opts.bron || 'app', idem });
         return d.betaling;
       }, { message: b => T('dp.betaald','Betaald aan') + ' ' + name + ': ' + eur((b.bedrag||0)/100), after: () => { if (opts.after) opts.after(); } });
+    });
+    const dm = ov.querySelector('#dpMunt');
+    if (dm) dm.addEventListener('click', () => {
+      const v = dpLees(); if (!v) return;
+      ov.remove();
+      openMuntSheet({
+        euro: v.bedrag, titel: name,
+        maak: async (munt) => (await API.call('/munt/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, munt })).verzoek,
+        klaar: async () => { const mine = (await API.call('/betaal/mijn')).betalingen || []; return mine.some(p => p.betaalwijze === 'munt' && p.supplierCode === code && Math.round(p.bedrag) === Math.round(v.bedrag * 100)); }
+      });
     });
   }
   // Een betaalverzoek van een partner met Face ID afrekenen.
@@ -4296,7 +4313,22 @@
       (rtfKomt > 0 ? '<div style="margin-top:0.5rem;font-size:0.72rem;color:var(--muted);">' + T('fin.rtfnext','Van uw openstaande bijdrage gaat') + ' <b style="color:var(--gold);">' + eur(rtfKomt) + '</b> ' + T('fin.rtfnext2','naar de RTFoundation.') + '</div>' : '') +
       (API.live ? '<button id="dlOverzicht" style="margin-top:0.6rem;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.35rem 0.85rem;font-size:0.68rem;font-family:inherit;cursor:pointer;">⤓ ' + T('fin.dloverzicht','Download factuuroverzicht (PDF)') + '</button>' : '') +
     '</div>';
-    $('#payList').innerHTML = finKaart + invoices.map(inv => {
+    // Filterbalk: op jaar en op soort. Handig zodra er meer facturen zijn.
+    const jaarVan = i => (String(i.date || '').match(/\d{4}/) || [''])[0];
+    const jaren = [...new Set(invoices.map(jaarVan).filter(Boolean))].sort().reverse();
+    const zichtbaar = invoices.filter(i =>
+      (payFilterJaar === 'alle' || jaarVan(i) === payFilterJaar) &&
+      (payFilterType === 'alle' || (payFilterType === 'abo' ? isContrib(i.desc) : !isContrib(i.desc))));
+    const chip = (actief, val, groep, label) => '<button class="js-payfilter" data-groep="' + groep + '" data-val="' + val + '" style="border:1px solid ' + (actief ? 'var(--gold)' : 'var(--line)') + ';color:' + (actief ? 'var(--gold)' : 'var(--soft)') + ';background:none;border-radius:999px;padding:0.25rem 0.7rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">' + label + '</button>';
+    const filterBar = (jaren.length > 1 || invoices.length > 3)
+      ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.7rem;align-items:center;">' +
+          chip(payFilterType === 'alle', 'alle', 'type', T('fin.f.alle','Alles')) +
+          chip(payFilterType === 'abo', 'abo', 'type', T('fin.f.abo','Abonnement')) +
+          chip(payFilterType === 'overig', 'overig', 'type', T('fin.f.overig','Overig')) +
+          (jaren.length > 1 ? '<span style="width:1px;height:1rem;background:var(--line);margin:0 0.2rem;"></span>' + chip(payFilterJaar === 'alle', 'alle', 'jaar', T('fin.f.jaren','Alle jaren')) + jaren.map(j => chip(payFilterJaar === j, j, 'jaar', j)).join('') : '') +
+        '</div>'
+      : '';
+    $('#payList').innerHTML = finKaart + filterBar + (zichtbaar.length ? '' : '<div style="color:var(--soft);font-size:0.8rem;padding:0.5rem 0;">' + T('fin.f.leeg','Geen facturen in deze selectie.') + '</div>') + zichtbaar.map(inv => {
       const total = inv.netto + inv.bijdrage;
       return '<div class="rowitem">' +
         '<div class="t"><b>' + inv.desc + '</b><span>' + inv.id + ' · ' + inv.date + '</span></div>' +
@@ -4311,11 +4343,19 @@
       '</div>' + bizSpec(inv);
     }).join('');
     document.querySelectorAll('.js-munt').forEach(b =>
-      b.addEventListener('click', () => openMuntSheet(b.dataset.inv, Number(b.dataset.amt))));
+      b.addEventListener('click', () => openMuntSheet({
+        euro: Number(b.dataset.amt), titel: T('munt.title','Betaal met munten'),
+        maak: async (munt) => (await API.call('/munt/verzoek', { invoiceId: b.dataset.inv, munt })).verzoek,
+        klaar: async () => { applyState((await API.call('/state')).state); const inv = (invoices || []).find(i => i.id === b.dataset.inv); return !!(inv && inv.status === 'paid'); }
+      })));
     document.querySelectorAll('.js-dlinv').forEach(b =>
       b.addEventListener('click', () => downloadPdf('/factuur', { invoiceId: b.dataset.inv }, 'RTG-factuur-' + b.dataset.inv + '.pdf')));
+    document.querySelectorAll('.js-payfilter').forEach(b => b.addEventListener('click', () => {
+      if (b.dataset.groep === 'type') payFilterType = b.dataset.val; else payFilterJaar = b.dataset.val;
+      renderPay();
+    }));
     const dlo = $('#dlOverzicht');
-    if (dlo) dlo.addEventListener('click', () => downloadPdf('/facturen/overzicht', {}, 'RTG-factuuroverzicht.pdf'));
+    if (dlo) dlo.addEventListener('click', () => downloadPdf('/facturen/overzicht', payFilterJaar !== 'alle' ? { jaar: payFilterJaar } : {}, 'RTG-factuuroverzicht' + (payFilterJaar !== 'alle' ? '-' + payFilterJaar : '') + '.pdf'));
     $('#payAllWrap').innerHTML = (open.length
       ? '<button class="btn-pay payall" id="payAll">' + FID + T('app.payall','Betaal alles') + ', ' + eur(openSum) + '</button>'
       : '') +
@@ -5427,6 +5467,7 @@ window.I18N = { en: {
   'fin.title':'Your finances', 'fin.open':'Outstanding', 'fin.paid':'Paid', 'fin.rtf':'To the RTFoundation', 'fin.vat':'VAT paid',
   'fin.rtfnext':'Of your outstanding contribution,', 'fin.rtfnext2':'goes to the RTFoundation.', 'fin.paycoins':'With coins',
   'fin.download':'Download invoice', 'fin.dloverzicht':'Download invoice overview (PDF)', 'fin.dlfout':'Download failed.',
+  'fin.f.alle':'All', 'fin.f.abo':'Membership', 'fin.f.overig':'Other', 'fin.f.jaren':'All years', 'fin.f.leeg':'No invoices in this selection.',
   'munt.title':'Pay with coins', 'munt.bedrag':'To pay', 'munt.omzet':'RTG converts your coins to euros immediately.',
   'munt.laden':'Creating address…', 'munt.fout':'Could not create an address.', 'munt.stuur':'Send exactly',
   'munt.koers':'rate locked', 'munt.adres':'To this address', 'munt.kopieer':'Copy', 'munt.gekopieerd':'Address copied.',

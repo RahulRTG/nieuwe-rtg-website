@@ -1747,7 +1747,7 @@ betaal.koppelStore({
    naar de leverancier (in productie een Stripe destination charge). */
 const {
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
-  dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten
+  dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten, dpRegistreerMunt
 } = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity });
 
 /* De RTFoundation-afdracht (kern/fonds.js): van elke bevestigde maandbetaling
@@ -1785,7 +1785,15 @@ const munten = maakMunten({ db, save, muntbetaal });
    betaalt: de rest van het systeem ziet hetzelfde. */
 async function settleMuntFactuur(entry) {
   const ctx = entry && entry.context;
-  if (!ctx || ctx.soort !== 'factuur') return;
+  if (!ctx) return;
+  // Een rechtstreekse betaling aan een partner met munten: de leverancier wordt
+  // gecrediteerd (het geld is al binnen en omgezet naar euro).
+  if (ctx.soort === 'direct') {
+    try { dpRegistreerMunt({ key: ctx.key, codename: ctx.codename, supplierCode: ctx.supplierCode, bedragCenten: entry.settledEuroCenten || entry.euroCenten, omschrijving: ctx.omschrijving }); }
+    catch (e) { /* de afdracht mag de settlement nooit blokkeren */ }
+    return;
+  }
+  if (ctx.soort !== 'factuur') return;
   const md = ctx.own ? accounts.getMemberState(ctx.accountId) : db.data;
   if (!md) return;
   const inv = (md.invoices || []).find(i => i.id === ctx.invoiceId);

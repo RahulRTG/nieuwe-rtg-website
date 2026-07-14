@@ -133,9 +133,35 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     return { status: 200, ok: true, betaling: publiek(b) };
   }
 
+  /* Een met munten (crypto) betaalde directe betaling vastleggen. Het geld is al
+     binnen en door de munt-aanbieder omgezet naar euro; hier alleen registreren
+     en de leverancier crediteren, zonder kaartafschrijving. */
+  function registreerMuntBetaling({ key, codename, supplierCode, bedragCenten, omschrijving }) {
+    ensure();
+    const s = findSupplier(supplierCode);
+    if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
+    const cent = centenVan(bedragCenten);
+    if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Bedrag te laag.' };
+    const b = {
+      ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
+      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling (munten)',
+      bron: 'app', providerId: null, aanbieder: 'munt', betaalwijze: 'munt', idem: null, at: nu()
+    };
+    db.data.directBetalingen.unshift(b);
+    db.data.directBetalingen = db.data.directBetalingen.slice(0, 200000);
+    const L = ledger(s.code); L.som += cent; L.aantal += 1;
+    save();
+    try { notifySupplier(s.code, { icon: '💸', title: 'Rechtstreeks betaald (munten)', body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
+    try { logActivity(s.code, { name: b.codename }, 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2) + ' met munten'); } catch (e) {}
+    try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
+    try { sseToCustomer(key, 'sync', { scope: 'betalingen' }); } catch (e) {}
+    try { sseToOffice('sync', { scope: 'ontvangsten' }); } catch (e) {}
+    return { status: 200, ok: true, betaling: publiek(b) };
+  }
+
   function publiek(b) {
     return { ref: b.ref, supplierCode: b.supplierCode, supplierName: b.supplierName, bedrag: b.bedrag,
-      omschrijving: b.omschrijving, bron: b.bron, codename: b.codename, at: b.at };
+      omschrijving: b.omschrijving, bron: b.bron, codename: b.codename, betaalwijze: b.betaalwijze || 'kaart', at: b.at };
   }
   function mijnBetalingen(key) {
     ensure();
@@ -219,7 +245,8 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     DP_MIN_CENTEN: MIN_CENTEN, DP_MAX_CENTEN: MAX_CENTEN,
     dpBetaalDirect: betaalDirect, dpMijnBetalingen: mijnBetalingen,
     dpVerzoekMaak: verzoekMaak, dpVerzoekenVoor: verzoekenVoor, dpBetaalVerzoek: betaalVerzoek,
-    dpVerzoekIntrek: verzoekIntrek, dpOntvangsten: ontvangsten
+    dpVerzoekIntrek: verzoekIntrek, dpOntvangsten: ontvangsten,
+    dpRegistreerMunt: registreerMuntBetaling
   };
 }
 

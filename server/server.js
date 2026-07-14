@@ -239,6 +239,20 @@ app.use((req, res, next) => {
    technische pagina zelf en de health/ready-checks blijven altijd bereikbaar,
    zodat de eigenaar alles weer aan kan zetten. */
 const functies = require('./functies');
+/* Landcode van een lid voor de "per land"-regels van de Boardroom: het bij
+   registratie gekozen land wint, anders leiden we het af uit de nationaliteit
+   op het geverifieerde paspoort (bijv. "Duitse" -> DE). */
+function natieNaarLand(nat) {
+  const s = String(nat || '').toLowerCase();
+  if (!s) return null;
+  if (/nederland|dutch|holland/.test(s)) return 'NL';
+  if (/belg/.test(s)) return 'BE';
+  if (/duits|german|deutsch/.test(s)) return 'DE';
+  if (/frans|french|franc/.test(s)) return 'FR';
+  if (/spaan|spanish|espa/.test(s)) return 'ES';
+  if (/japan/.test(s)) return 'JP';
+  return null;
+}
 app.use((req, res, next) => {
   const p = req.path;
   if (!p.startsWith('/api/')) return next();
@@ -259,7 +273,7 @@ app.use((req, res, next) => {
   if (user) {
     persoon = 'user-' + user.id;
     if (functies.heeftLandRegels(staat)) {
-      try { const md = accounts.getMemberState(user.id) || {}; land = md.land || null; } catch (e) {}
+      try { const md = accounts.getMemberState(user.id) || {}; land = md.land || natieNaarLand(md.nationaliteit) || null; } catch (e) {}
     }
   }
   const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, persoon });

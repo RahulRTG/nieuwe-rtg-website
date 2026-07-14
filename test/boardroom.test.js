@@ -10,6 +10,7 @@ const path = require('path');
 const { startServer, stop } = require('./helper');
 
 const OWNER = 'boardroom-owner@x.nl';
+const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -18,7 +19,7 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-let srv, base, owner, lidToken, lidEmail, esToken;
+let srv, base, owner, lidToken, lidEmail, esToken, deToken;
 
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-board-'));
@@ -38,6 +39,18 @@ test.before(async () => {
   const regEs = await api(base, '/api/auth/register', { name: 'Lid Spanje', email: 'es' + u + '@x.nl',
     phone: '068' + u, password: 'geheim123', geboortedatum: '1990-01-01', land: 'ES', tier: 'business', pasApp: 'business' });
   esToken = regEs.body.token;
+  // een Duits lid ZONDER landcode, maar met "Duitse" nationaliteit op het
+  // geverifieerde paspoort: de per-land-regel moet dit alsnog herkennen
+  const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const regDe = await api(base, '/api/auth/register', { name: 'Lid Duitsland', email: 'de' + u + '@x.nl',
+    phone: '069' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+  deToken = regDe.body.token;
+  const stDe = await api(base, '/api/state', {}, deToken);
+  await api(base, '/api/verify/upload', { image: PNG }, deToken);
+  await api(base, '/api/verify/selfie', { image: PNG }, deToken);
+  const pend = await api(base, '/api/office/verifications', {}, office);
+  const mijDe = (pend.body.pending || []).find(p => p.codename === stDe.body.state.user.codename);
+  await api(base, '/api/office/verify', { userId: mijDe.id, decision: 'approve', nationaliteit: 'Duitse' }, office);
 });
 test.after(() => stop(srv && srv.child));
 
@@ -145,5 +158,16 @@ test('10. per land: een functie uit in ES blokkeert alleen leden uit ES', async 
   assert.equal(es.body.reden, 'land');
   const nl = await api(base, '/api/tickets/aanbod', {}, lidToken);
   assert.notEqual(nl.status, 503, 'lid zonder land ES is niet geblokkeerd');
+  await api(base, '/api/boardroom/reset', {}, owner);
+});
+
+test('11. per land werkt ook op de paspoort-nationaliteit (Duitsland uit)', async () => {
+  const zet = await api(base, '/api/boardroom/zet', { id: 'tickets', land: 'DE', aan: false }, owner);
+  assert.equal(zet.status, 200);
+  const de = await api(base, '/api/tickets/aanbod', {}, deToken);
+  assert.equal(de.status, 503, 'Duits lid (via nationaliteit) is geblokkeerd');
+  assert.equal(de.body.reden, 'land');
+  const nl = await api(base, '/api/tickets/aanbod', {}, lidToken);
+  assert.notEqual(nl.status, 503, 'een niet-Duits lid mag wel');
   await api(base, '/api/boardroom/reset', {}, owner);
 });

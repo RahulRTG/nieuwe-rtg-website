@@ -71,3 +71,19 @@ test('e2e: een lid downloadt zijn factuur en een jaaroverzicht als PDF', async (
   const weg = await api(base, '/api/factuur', { invoiceId: inv.id }, gast);
   assert.equal(weg.status, 403);
 });
+
+test('e2e: een leverancier exporteert de boekhouding als PDF en CSV', async () => {
+  const zaak = (await (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).json()).token;
+  assert.ok(zaak, 'leverancier-login');
+
+  const pdf = await api(base, '/api/supplier/finance/export', { formaat: 'pdf' }, zaak);
+  assert.equal(pdf.status, 200);
+  assert.equal(pdf.headers.get('content-type'), 'application/pdf');
+  assert.ok(Buffer.from(await pdf.arrayBuffer()).toString('latin1').startsWith('%PDF-1.4'));
+
+  const csv = await api(base, '/api/supplier/finance/export', { formaat: 'csv' }, zaak);
+  assert.equal(csv.status, 200);
+  assert.match(csv.headers.get('content-type') || '', /text\/csv/);
+  const tekst = await csv.text();
+  assert.ok(/boekhoudoverzicht/i.test(tekst) && tekst.includes(';'), 'CSV met kop en scheidingsteken');
+});

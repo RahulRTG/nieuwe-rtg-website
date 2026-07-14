@@ -1646,6 +1646,17 @@
     mktBusy = false;
     renderStation();
   }
+  // Een bestand (PDF/CSV) ophalen met het token en als download aanbieden.
+  async function dlBestand(pad, body, filename){
+    if (!API.token) return;
+    try {
+      const res = await fetch('/api' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API.token }, body: JSON.stringify(body || {}) });
+      if (!res.ok) throw new Error('fout');
+      const url = URL.createObjectURL(await res.blob());
+      const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch(e){ toast(T('fn.dlfout','Exporteren lukte niet.')); }
+  }
   async function laadFinance(){
     if (finBusy) return;
     finBusy = true;
@@ -1788,7 +1799,10 @@
           '<div class="st-row"><span>'+T('fn.minbtw','Af te dragen btw')+'</span><b style="color:var(--burgundy);">- '+eur(f.btwTotaal || 0)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.minloon','Loonkosten')+'</span><b style="color:var(--burgundy);">- '+eur(loonTot)+'</b></div>'+
           '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.overhoudt','Blijft over (indicatie)')+'</b></span><b style="color:var(--gold);font-size:1.05rem;">'+eur(nettoOver)+'</b></div>'+
-          '<div class="tkc-who">'+T('fn.netto.s','Indicatie vóór inkoop, huur en overige kosten. Uw omzet is volledig van u; RTG houdt niets in.')+'</div></div>';
+          '<div class="tkc-who">'+T('fn.netto.s','Indicatie vóór inkoop, huur en overige kosten. Uw omzet is volledig van u; RTG houdt niets in.')+'</div>'+
+          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">'+
+          '<button class="obtn" id="fnPdf">⤓ '+T('fn.exportpdf','Overzicht (PDF)')+'</button>'+
+          '<button class="obtn" id="fnCsv">⤓ '+T('fn.exportcsv','Boekhouding (CSV)')+'</button></div></div>';
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>🌍 '+T('fn.land','Land & uurloon')+'</h3>'+
           '<div class="tkc-who">'+T('fn.land.s','Het land bepaalt de btw-tarieven, werkgeverslasten en aangifteregels; het uurloon voedt de personeelskosten.')+'</div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">'+
@@ -2161,6 +2175,8 @@
         await refresh();
       } catch(e){ toast(e.message); }
     });
+    const fnP = el.querySelector('#fnPdf'); if (fnP) fnP.addEventListener('click', () => dlBestand('/supplier/finance/export', { formaat: 'pdf' }, 'RTG-boekhouding.pdf'));
+    const fnC = el.querySelector('#fnCsv'); if (fnC) fnC.addEventListener('click', () => dlBestand('/supplier/finance/export', { formaat: 'csv' }, 'RTG-boekhouding.csv'));
     const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
@@ -5357,6 +5373,7 @@ window.I18N = { en: {
   'fn.netto':'What you keep', 'fn.omzetmaand':'Revenue this month', 'fn.nulcom':'RTG charges 0% commission',
   'fn.minbtw':'VAT to remit', 'fn.minloon':'Staff costs', 'fn.overhoudt':'Left over (indication)',
   'fn.netto.s':'Indication before purchasing, rent and other costs. Your revenue is fully yours; RTG keeps nothing.',
+  'fn.exportpdf':'Overview (PDF)', 'fn.exportcsv':'Accounting (CSV)', 'fn.dlfout':'Export failed.',
   'fn.land.s':'The country sets the VAT rates, employer costs and filing rules; the hourly wage feeds the staff costs.',
   'fn.save':'Save', 'fn.btw':'VAT this month', 'fn.omzet':'revenue', 'fn.grondslag':'base', 'fn.geenomzet':'No revenue yet this month.',
   'fn.afdragen':'VAT to remit', 'fn.personeel':'Staff costs', 'fn.uren':'Clocked hours', 'fn.uur':'hours',

@@ -8,7 +8,7 @@
 <title>RTG Partners, leverancier-app</title>
 <link rel="icon" id="favLink" href="/icons/partners.svg" type="image/svg+xml">
 <link rel="manifest" id="manifestLink" href="/manifests/partners.webmanifest">
-<link rel="apple-touch-icon" id="touchLink" href="/icons/partners.svg">
+<link rel="apple-touch-icon" id="touchLink" href="/icons/partners-192.png">
 <script>
 (function(){
   var sec = (new URLSearchParams(location.search).get('sector')||'').toLowerCase();
@@ -17,7 +17,7 @@
   if (['restaurant','bar','hotel','appartement','taxi','privejet'].indexOf(sec) >= 0){
     document.getElementById('manifestLink').href = '/manifests/'+sec+'.webmanifest';
     document.getElementById('favLink').href = '/icons/'+sec+'.svg';
-    document.getElementById('touchLink').href = '/icons/'+sec+'.svg';
+    document.getElementById('touchLink').href = '/icons/'+sec+'-192.png';
   }
 })();
 </script>

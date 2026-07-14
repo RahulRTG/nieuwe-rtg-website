@@ -9,6 +9,7 @@
 <title>RTG, de app</title>
 <link rel="manifest" id="manifestLink" href="/manifests/pas-rtg.webmanifest">
 <link rel="icon" href="/icons/pas-rtg.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" id="touchLink" href="/icons/pas-rtg-192.png">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <style>
   :root{
@@ -1368,6 +1369,8 @@
   if (vastePas){
     const ml = document.getElementById('manifestLink');
     if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';
+    const tl = document.getElementById('touchLink');
+    if (tl) tl.href = '/icons/pas-' + vastePas + '-192.png';
     document.title = { rtg:'RTG Pass', lifestyle:'RTG Lifestyle Pass', business:'RTG Business Pass' }[vastePas];
     // in de RTG-app mag ook de gratis ingang (minder functies); elders alleen de eigen pas
     const mag = vastePas === 'rtg' ? ['rtg','guest'] : [vastePas];

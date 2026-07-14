@@ -11,7 +11,7 @@ const eigenaar = require('../eigenaar');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
-  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal, talen } = kern;
+  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal, talen, onboarding } = kern;
   const OWNER_EMAIL = eigenaar.OWNER_EMAIL;
 
   function staat() {
@@ -343,6 +343,19 @@ module.exports = (kern) => {
     const r = talen.zet(req.body.code, req.body.aan !== false && req.body.aan !== 'false');
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
+  });
+
+  /* Platform-onboarding: de verplichte intake + het contract dat elk account
+     (gast, RTG, RTF, leverancier) tekent. De eigenaar leest en past dit aan --
+     met de hand of met AI in gewone taal. Scope 'rtg' = platformbreed. */
+  app.post('/api/boardroom/onboarding', techAuth, eigenaarAlleen, (req, res) => {
+    res.json({ config: onboarding.config('rtg'), ondertekenaars: onboarding.ondertekenaars('rtg').slice(0, 50), aiBeschikbaar: !!anthropic });
+  });
+  app.post('/api/boardroom/onboarding/ai', techAuth, eigenaarAlleen, async (req, res) => {
+    const opdracht = String(req.body.opdracht || '').slice(0, 1000);
+    if (opdracht.length < 3) return res.status(400).json({ error: 'Beschrijf wat u wilt aanpassen.' });
+    try { res.json(await onboarding.aiPasAan('rtg', opdracht)); }
+    catch (e) { res.status(500).json({ error: 'Aanpassen mislukte.' }); }
   });
 
   // Persoon zoeken voor de per-persoon-schakelaar (eigenaar).

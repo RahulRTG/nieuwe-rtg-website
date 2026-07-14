@@ -156,6 +156,21 @@
       </div>
     </div>
 
+    <div class="kaart" id="onbKaart" hidden style="margin-top:1.2rem;">
+      <div style="display:flex;align-items:center;gap:.5rem;">
+        <div style="flex:1;font-weight:600;">🪪 Onboarding &amp; contract</div>
+        <span class="cat-tel" id="onbSom"></span>
+        <button class="knop grijs klein" id="onbBeheer" type="button">Beheren</button>
+      </div>
+      <div id="onbBeheerBlok" hidden style="margin-top:.7rem;border-top:1px solid var(--line);padding-top:.7rem;">
+        <div class="muted" style="margin-bottom:.6rem;">De verplichte gegevens (paspoort, e-mail, telefoon, adres&hellip;) en het contract dat elk account tekent - gast, RTG, RTF en leverancier. Pas het aan met AI in gewone taal.</div>
+        <div style="display:flex;gap:.4rem;margin-bottom:.6rem;"><input class="veld" id="onbAiIn" placeholder="Bijv. maak paspoort ook verplicht voor gasten" style="flex:1;"><button class="knop klein" id="onbAiGo" type="button">Aanpassen</button></div>
+        <div class="muted" id="onbAiUit" style="font-size:.75rem;margin-bottom:.6rem;"></div>
+        <div id="onbVelden"></div>
+        <div id="onbContract" style="margin-top:.6rem;"></div>
+      </div>
+    </div>
+
     <p class="muted" id="alleenLezen" hidden style="margin-top:1rem;">Je kunt de status bekijken. Alleen de eigenaar kan schakelen, resetten of storingen melden.</p>
   </div>
 </main>
@@ -298,6 +313,8 @@
       LANDEN = d.landen || [];
       $('#alleenLezen').hidden = eigenaar;
       $('#bReset').disabled = !eigenaar;
+      $('#onbKaart').hidden = !eigenaar;
+      if (eigenaar) laadOnb();
       var s = d.samenvatting || {};
       vervang($('#tellers'),
         tellerKaart(s.aan||0, 'Aan (groen)', 'var(--groen)'),
@@ -381,6 +398,35 @@
     if (!b.hidden) $('#taalZoek').focus();
   });
   $('#taalZoek').addEventListener('input', tekenTalen);
+
+  /* Platform-onboarding + contract: de verplichte intake en het contract dat elk
+     account tekent. Lezen en aanpassen (met AI in gewone taal). */
+  var ONB = null;
+  var ONB_WIE = { guest:'gast', rtg:'RTG', lifestyle:'Lifestyle', business:'Business', rtf:'RTF' };
+  function laadOnb(){ api('/api/boardroom/onboarding').then(function(d){ ONB = d; tekenOnb(); }).catch(function(){}); }
+  function tekenOnb(){
+    if (!ONB || !ONB.config) return;
+    var c = ONB.config;
+    Util.tekst($('#onbSom'), c.velden.length + ' velden · contract v' + c.contract.versie);
+    var vB = $('#onbVelden'); vervang(vB, el('div',{class:'fijnlabel'}, 'Verplichte gegevens'));
+    c.velden.forEach(function(v){
+      vB.appendChild(el('div',{class:'muted', style:{fontSize:'.78rem',padding:'.12rem 0'}},
+        v.label + ' · ' + v.type + ' (' + (v.voorWie||[]).map(function(w){ return ONB_WIE[w]||w; }).join(', ') + ')'));
+    });
+    var cB = $('#onbContract');
+    vervang(cB, el('div',{class:'fijnlabel'}, c.contract.titel + ' (v' + c.contract.versie + ')'),
+      el('div',{style:{maxHeight:'12rem',overflow:'auto',whiteSpace:'pre-wrap',fontSize:'.75rem',lineHeight:'1.5',color:'var(--muted)',marginTop:'.3rem'}}, c.contract.tekst));
+  }
+  $('#onbBeheer').addEventListener('click', function(){ var b=$('#onbBeheerBlok'); b.hidden=!b.hidden; if(!b.hidden && !ONB) laadOnb(); });
+  $('#onbAiGo').addEventListener('click', function(){
+    var v = ($('#onbAiIn').value||'').trim();
+    if (v.length < 3){ toast('Beschrijf iets uitgebreider.'); return; }
+    Util.tekst($('#onbAiUit'), 'Bezig…');
+    api('/api/boardroom/onboarding/ai', { opdracht:v }).then(function(d){
+      ONB = { config:d.config, ondertekenaars:(ONB&&ONB.ondertekenaars)||[] }; tekenOnb();
+      Util.tekst($('#onbAiUit'), d.uitleg||'Aangepast.'); $('#onbAiIn').value='';
+    }).catch(function(e){ Util.tekst($('#onbAiUit'), e.message); });
+  });
 
   // bij openen: met een bewaard token direct het bord in, anders het login-scherm
   if (token) { toonBord(); laad(); } else { toonLogin(); }

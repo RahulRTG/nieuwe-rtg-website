@@ -142,6 +142,8 @@ const STAFF_SEED = {
   IBIZALIV: [['Sofia Marin', 'manager', 'Makelaar'], ['Bram Kessler', 'staff', 'Bezichtigingen']],
   // boerderij: een bedrijfsleider en twee knechten voor het land en de dieren
   CANFERRER: [['Aina Torres', 'manager', 'Bedrijfsleider'], ['Marc Prats', 'staff', 'Veehouderij'], ['Lucia Roig', 'staff', 'Akker & kas']],
+  // content creator: vaak solo; de creator zelf plus een editor
+  LUMINA: [['Nora Vidal', 'manager', 'Creator'], ['Tim Bakker', 'staff', 'Editor']],
   IBIZAIR: [['Nadia Fischer', 'manager', 'Operations'], ['Tomas Weller', 'staff', 'Piloot']],
   // charter: een vlootbeheerder en een schipper aan boord
   AZUL: [['Nerea Costa', 'manager', 'Charterbeheer'], ['Marco Silva', 'staff', 'Schipper']],
@@ -984,6 +986,36 @@ function initRealtime() {
       }
     });
   }
+  // --- content creators: influencers/videomakers met een carriere-app ---
+  if (!db.data.supplierTypes.creator)
+    db.data.supplierTypes.creator = { label: 'Content creator', icon: '\u{1F3AC}', caps: ['creator', 'location', 'pricing'] };
+  if (!db.data.suppliers.find(s => s.code === 'LUMINA')) {
+    db.data.suppliers.push({
+      code: 'LUMINA', name: 'Lumina Media', type: 'creator', city: 'Ibiza',
+      loc: { lat: 38.909, lng: 1.434, label: 'Ibiza' }, rate: 0.10, menu: [], photos: [],
+      creator: {
+        opgezet: true, niche: 'Reizen & lifestyle', bio: 'Ik maak cinematische reiscontent over Ibiza en het eiland-leven.',
+        platforms: [
+          { id: 'pf1', platform: 'instagram', handle: '@lumina.travels', volgers: 84000 },
+          { id: 'pf2', platform: 'tiktok', handle: '@luminatravels', volgers: 152000 },
+          { id: 'pf3', platform: 'youtube', handle: 'Lumina Media', volgers: 41000 }
+        ],
+        tarieven: [
+          { id: 'tr1', soort: 'reel', prijs: 850 },
+          { id: 'tr2', soort: 'video', prijs: 2400 },
+          { id: 'tr3', soort: 'story', prijs: 300 }
+        ],
+        portfolio: [
+          { id: 'po1', titel: 'Sunset sailing Ibiza', link: null, soort: 'video' },
+          { id: 'po2', titel: 'Beach club reel', link: null, soort: 'reel' }
+        ],
+        ideeen: [
+          { id: 'id1', tekst: 'Verborgen strandjes van Ibiza', status: 'productie', voor: new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10), script: null, at: new Date().toISOString() },
+          { id: 'id2', tekst: 'Een dag met een lokale visser', status: 'idee', voor: null, script: null, at: new Date().toISOString() }
+        ]
+      }
+    });
+  }
   if (!db.data.vastgoedAanbod) db.data.vastgoedAanbod = [];   // { ref, supplierCode, pandId, aanKeys:[], publiek, at }
   if (!db.data.bezichtigingen) db.data.bezichtigingen = [];   // { ref, supplierCode, pandId, key, codename, wens, status, moment, keyless, at }
   if (!db.data.biedingen) db.data.biedingen = [];             // { ref, supplierCode, pandId, key, codename, bedrag, status, tegenbod, at }
@@ -1447,6 +1479,9 @@ const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypt
 // De slimme boerderij-laag (kern/boerderij.js): boerderijtypes, percelen+gewassen,
 // dieren, takenbord, seizoensbriefing en een AI-adviseur die ook dingen doet.
 const boerderij = require('./kern/boerderij').maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon });
+// De content-creator-laag (kern/creator.js): carriere-profiel, platforms, tarieven,
+// portfolio, content-kalender en een AI content/script-helper.
+const creator = require('./kern/creator').maakCreator({ db, save, crypto, anthropic, schoon });
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
 } = sociaal;
@@ -2181,7 +2216,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij, creator,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,

@@ -126,15 +126,6 @@ test('bestellen en betalen: een order loopt van open naar betaald', async () => 
 });
 
 test('robuustheid: async-endpoints beantwoorden netjes en laten de server draaien', async () => {
-  // De WhatsApp-webhook is afgevangen: een bekend nummer wordt afgehandeld,
-  // een onbekend nummer netjes genegeerd, en niets laat de server crashen.
-  const bekend = await api('/whatsapp/webhook', { from: '+31612345678', text: 'hallo' });
-  assert.equal(bekend.status, 200);
-  const onbekend = await (await api('/whatsapp/webhook', { from: '+31600000001', text: 'hoi' })).json();
-  assert.equal(onbekend.matched, false, 'onbekend nummer wordt genegeerd');
-  const leeg = await api('/whatsapp/webhook', { from: '', text: '' });
-  assert.equal(leeg.status, 400);
-
   // De vertaal-endpoint valt netjes terug (geen crash) zonder AI-sleutel.
   const tr = await api('/translate', { text: 'Goedemorgen', to: 'en' });
   assert.equal(tr.status, 200);

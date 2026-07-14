@@ -68,7 +68,7 @@ app.post('/api/auth/register', async (req, res) => {
   const password = String(req.body.password || '');
   if (!name) return res.status(400).json({ error: 'Vul uw naam in.' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
-  if (phone.replace(/\D/g, '').length < 8) return res.status(400).json({ error: 'Vul een geldig mobiel nummer in (voor uw WhatsApp-lijn).' });
+  if (phone.replace(/\D/g, '').length < 8) return res.status(400).json({ error: 'Vul een geldig mobiel nummer in (voor herstel en meldingen).' });
   if (password.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
   // de pas wordt met paspoort aangevraagd: geboortedatum is verplicht en
   // bepaalt de leeftijdsgroep (15-17 alleen met toestemming van ouder/voogd)
@@ -116,9 +116,9 @@ app.post('/api/auth/resend', auth, (req, res) => {
 });
 
 /* Wachtwoord vergeten: tweestapsverificatie via de website. Stap 1 is de
-   herstel-link in de e-mail; stap 2 is een zescijferige code die naar de
-   telefoon van het account gaat (WhatsApp/SMS; zonder provider naar de
-   outbox). Pas met link EN code samen kan een nieuw wachtwoord worden gezet. */
+   herstel-link in de e-mail; stap 2 is een zescijferige code die per SMS naar de
+   telefoon van het account gaat (zonder provider naar de outbox). Pas met link
+   EN code samen kan een nieuw wachtwoord worden gezet. */
 function herstel2fa() {
   if (!db.data.herstel2fa) db.data.herstel2fa = {}; // userId -> { hash, tot, pogingen }
   return db.data.herstel2fa;
@@ -140,7 +140,7 @@ app.post('/api/auth/forgot', (req, res) => {
       'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url +
       '\n\nUit veiligheid sturen we ook een code naar uw telefoon; die vult u op de website in.');
     const tel = accounts.phoneOf(u) || 'onbekend';
-    mail.send('whatsapp:' + tel, 'Uw RTG-herstelcode',
+    mail.send('sms:' + tel, 'Uw RTG-herstelcode',
       'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
     if (DEV_VELDEN) { devResetUrl = url; devCode = code; }
   }
@@ -226,5 +226,25 @@ app.post('/api/verify/upload', express.json({ limit: '6mb' }), auth, (req, res) 
 
 app.post('/api/verify/status', auth, (req, res) => {
   res.json({ status: req.session.account ? req.session.account.verified : 'n/a' });
+});
+
+/* Een selfie voor de gezichtscontrole (selfie x paspoort). RTG matcht die bij de
+   beoordeling, zodat we zeker weten dat het paspoort bij de codenaam en bij de
+   persoon hoort. Versleuteld op schijf, net als het identiteitsbewijs. */
+app.post('/api/verify/selfie', express.json({ limit: '6mb' }), auth, (req, res) => {
+  if (!req.session.account) return res.status(403).json({ error: 'Verificatie is voor echte accounts.' });
+  const m = /^data:image\/(png|jpe?g|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(req.body.image || ''));
+  if (!m) return res.status(400).json({ error: 'Neem een duidelijke selfie (JPG, PNG of WebP).' });
+  const buf = Buffer.from(m[2], 'base64');
+  if (buf.length > 5 * 1024 * 1024) return res.status(413).json({ error: 'Bestand te groot (max 5 MB).' });
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true, mode: 0o700 });
+  try { fs.chmodSync(UPLOAD_DIR, 0o700); } catch (e) {}
+  const ext = m[1] === 'jpeg' ? 'jpg' : m[1];
+  const fname = req.session.account.id + '-selfie-' + Date.now() + '.' + ext;
+  fs.writeFileSync(path.join(UPLOAD_DIR, fname), require('../kluis').versleutelBuf(buf), { mode: 0o600 });
+  const md = accounts.getMemberState(req.session.account.id) || {};
+  md.selfie = fname;
+  accounts.saveMemberState(req.session.account.id, md);
+  res.json({ ok: true });
 });
 };

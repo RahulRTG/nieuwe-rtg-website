@@ -117,9 +117,7 @@ const FUNCTIES = [
 
   // ---- Personeel & integraties ----
   { id: 'staff', categorie: 'Personeel & integraties', naam: 'Personeels-app (PDA)', standaard: true, doelgroepen: ['personeel'],
-    uitleg: 'De personeels-app: rooster, klokken, verlof/ziek, taken, team en de vertrouwenspersoon.', paden: ['/api/staff'] },
-  { id: 'whatsapp', categorie: 'Personeel & integraties', naam: 'WhatsApp-integratie', standaard: true, doelgroepen: ['intern'],
-    uitleg: 'De WhatsApp-lijn (inkomende webhook en uitgaande berichten).', paden: ['/api/whatsapp'] }
+    uitleg: 'De personeels-app: rooster, klokken, verlof/ziek, taken, team en de vertrouwenspersoon.', paden: ['/api/staff'] }
 ];
 
 const OP_ID = Object.fromEntries(FUNCTIES.map(f => [f.id, f]));
@@ -188,7 +186,6 @@ function doelgroepVanVerzoek(pad, user) {
   if (pad.startsWith('/api/supplier') || pad.startsWith('/api/partner')) return 'leverancier';
   if (pad.startsWith('/api/staff')) return 'personeel';
   if (pad.startsWith('/api/office')) return 'intern';
-  if (pad.startsWith('/api/whatsapp')) return 'intern';
   if (pad.startsWith('/api/foundation')) return 'foundation';
   return user ? tierNaarDoelgroep(user.tier) : null;
 }

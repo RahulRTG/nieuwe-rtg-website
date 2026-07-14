@@ -223,7 +223,7 @@ function emailHash(email) {
   return crypto.createHmac('sha256', VAULT).update(String(email || '').trim().toLowerCase()).digest('hex');
 }
 // Normaliseer een telefoonnummer tot louter cijfers (met landcode) voor de hash,
-// zodat een inkomend WhatsApp-nummer aan het juiste account gekoppeld kan worden.
+// zodat een telefoonnummer aan het juiste account gekoppeld kan worden.
 function normalizePhone(phone) {
   let p = String(phone || '').replace(/[^\d+]/g, '');
   if (p.startsWith('00')) p = '+' + p.slice(2);
@@ -426,7 +426,7 @@ function listByVerification(status) {
   return db.prepare('SELECT * FROM users WHERE verified = ? ORDER BY created_at DESC').all(status);
 }
 
-/* Gesprekken (WhatsApp + app) per account, voor de concierge-inbox. */
+/* Gesprekken in de app per account, voor de concierge-inbox. */
 function conversations() {
   const rows = db.prepare('SELECT id, tier, codename, member_state FROM users WHERE member_state IS NOT NULL').all();
   return rows.map(r => {

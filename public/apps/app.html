@@ -807,7 +807,7 @@
       <div id="regKop" style="font-size:0.82rem;color:var(--muted);line-height:1.5;margin-bottom:0.2rem;"></div>
       <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
       <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
-      <input id="rgPhone" type="tel" placeholder="Mobiel nummer (WhatsApp)" data-i18n-ph="gate.phone" autocomplete="tel">
+      <input id="rgPhone" type="tel" placeholder="Mobiel nummer" data-i18n-ph="gate.phone" autocomplete="tel">
       <label style="display:block;font-size:0.68rem;color:var(--soft);margin:0.15rem 0 0.25rem;" data-i18n="gate.geb">Geboortedatum (zoals in uw paspoort; lidmaatschap vanaf 15 jaar)</label>
       <input id="rgGeb" type="date" autocomplete="bday">
       <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
@@ -4111,19 +4111,19 @@
     }
   }
 
-  /* ---------- gekoppeld gesprek (WhatsApp + app) voor echte accounts ---------- */
+  /* ---------- doorlopend gesprek in de app voor echte accounts ---------- */
   function renderChatMsgs(msgs, concierge){
     const chat = $('#chat');
     if (!msgs.length){
       chat.innerHTML = '';
-      bubble(concierge ? T('chat.concierge.hi','Goedendag. Schrijf ons hier of via WhatsApp; uw concierge helpt u persoonlijk.') : aiOpener(), 'ai');
+      bubble(concierge ? T('chat.concierge.hi','Goedendag. Schrijf ons hier in de app; uw concierge helpt u persoonlijk.') : aiOpener(), 'ai');
       return;
     }
     // Met Util.el: de berichttekst (van de gast of de concierge) gaat structureel
     // als tekstknoop, dus altijd veilig ge-escaped, geen escHtml-discipline nodig.
     const E = Util.el;
     const bubbels = msgs.map(m => E('div', { class: 'bubble ' + (m.from === 'member' ? 'user' : 'ai') },
-      m.channel === 'whatsapp' ? E('span', { class: 'wa-badge' }, '📱 WhatsApp') : null,
+      null,
       m.text));
     const last = msgs[msgs.length - 1];
     if (concierge && last && last.from === 'member'){
@@ -4137,8 +4137,8 @@
     $('#aiTitle').textContent = concierge ? T('chat.concierge.title','Uw concierge.') : T('ai.title.rtg','De Butler.');
     const deck = document.querySelector('.view[data-view="ai"] .sub');
     if (deck) deck.textContent = concierge
-      ? T('chat.concierge.deck','Uw persoonlijke concierge, hier én via WhatsApp. Eén gesprek, waar u ook schrijft.')
-      : T('chat.butler.deck','De Butler, hier én via WhatsApp. Eén gesprek, waar u ook schrijft.');
+      ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
+      : T('chat.butler.deck','De Butler, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
     $('#chips').innerHTML = '';
     if (!API.live){ $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); return; }
     try { const d = await API.call('/chat/history'); renderChatMsgs(d.messages, concierge); }
@@ -4723,7 +4723,7 @@ window.I18N = { en: {
   'sal.guestlike':'Without a pass you can browse The Salon; liking and replying to members is for members.',
   'cv.st.invited':'invited', 'vac.overal':'Anywhere', 'vac.k':'Work and vacancies', 'vac.leeg':'No open vacancies that suit you right now. Check back later.',
   'vac.verstuurd':'sent', 'vac.sol':'Apply', 'cv.chat':'Chat', 'cv.chat.ph':'Message (e.g. Can I come by Thursday at 3pm?)', 'cv.chat.send':'Send', 'cv.chat.leeg':'No messages yet. Suggest a time to come by.', 'cv.chat.title':'Chat with the employer',
-  'gate.name':'Your name', 'gate.email':'Email address', 'gate.phone':'Mobile number (WhatsApp)', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
+  'gate.name':'Your name', 'gate.email':'Email address', 'gate.phone':'Mobile number', 'gate.newpass':'Password (min. 6 characters)', 'gate.createacc':'Create account',
   'gate.toreg':'No account yet? Register', 'gate.tologin':'Already have an account? Sign in',
   'gate.forgot':'Forgot your password?', 'gate.sendreset':'Send reset link', 'gate.forgotsent':'If this email is known, we will send a reset link.',
   'gate.newpass2':'New password', 'gate.doreset':'Set new password', 'gate.resetok':'Password changed. Sign in with your new password.',
@@ -4944,9 +4944,9 @@ window.I18N = { en: {
   'ai.a.rest':'Your table at Sal de Mar (19 Jul, 21:00) is being requested, confirmation usually follows within 48 hours. Would you like a reserve list? I am thinking of a beach restaurant in Cala Jondal.',
   'ai.a.default':'I will come back to that today. In the meantime I can help with the packing list, documents, the weather or a day plan, just say the word.',
   'ai.title.rtg':'The Butler.', 'ai.title.life':'Your AI.', 'ai.title.biz':'Your executive AI.',
-  'chat.concierge.title':'Your concierge.', 'chat.butler.deck':'The Butler, here and on WhatsApp. One conversation, wherever you write.',
-  'chat.concierge.deck':'Your personal concierge, here and on WhatsApp. One conversation, wherever you write.',
-  'chat.concierge.hi':'Good day. Write to us here or on WhatsApp; your concierge will help you personally.',
+  'chat.concierge.title':'Your concierge.', 'chat.butler.deck':'The Butler, in your secure in-app line. One continuous conversation.',
+  'chat.concierge.deck':'Your personal concierge, in your secure in-app line. One continuous conversation.',
+  'chat.concierge.hi':'Good day. Write to us here in the app; your concierge will help you personally.',
   'chat.concierge.pending':'Your concierge has been notified and will reply shortly.',
   'app.salon.7days':'7 days after the stay', 'app.salon.comment':'Comment', 'app.salon.write':'Write a comment…', 'app.salon.post':'Post',
   'app.salon.rtgnote':'With the RTG Pass you comment with RTG members, or with whoever addresses you first.', 'app.salon.nocomment':'Commenting is not available here.',

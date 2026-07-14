@@ -1,7 +1,7 @@
 /* De persoonlijke AI-laag: de systeemprompt per pas ("de Butler" voor RTG),
    demo-antwoorden zonder API-sleutel, het echte Claude-antwoord, en de
-   doorlopende conversatie (app + WhatsApp in één thread). RTG wordt door de AI
-   beantwoord; Lifestyle en Business gaan naar de menselijke concierge.
+   doorlopende conversatie in de app. RTG wordt door de AI beantwoord; Lifestyle
+   en Business gaan naar de menselijke concierge.
 
    AI_TONE is pure data; de rest draagt state (db, accounts, de Claude-client en
    de realtime-helpers) en komt uit maakAi(state). */

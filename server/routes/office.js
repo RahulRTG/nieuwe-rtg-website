@@ -1,7 +1,7 @@
 /* Domein "office" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries } = kern;
+  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, paspoortIncidenten, paspoortBeoordeel } = kern;
 
   // backoffice-toegang via een query-token (stream/export/doc): een echte
   // office-sessie, OF de eigenaar met zijn eigen accountlogin.
@@ -231,6 +231,14 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
   if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
   const status = req.body.decision === 'approve' ? 'verified' : 'rejected';
   accounts.setVerification(user.id, status);
+  // gezichtscontrole (selfie x paspoort) en nationaliteit vastleggen bij goedkeuren:
+  // zo weten we dat het paspoort bij de codenaam en de persoon hoort (eis 5)
+  if (status === 'verified') {
+    const md = accounts.getMemberState(user.id) || {};
+    if (req.body.faceMatch !== undefined) md.faceMatch = req.body.faceMatch === true;
+    if (req.body.nationaliteit) md.nationaliteit = String(req.body.nationaliteit).slice(0, 40);
+    accounts.saveMemberState(user.id, md);
+  }
   mail.send(accounts.emailOf(user), status === 'verified' ? 'Uw identiteit is geverifieerd' : 'Uw verificatie is afgewezen',
     'Beste ' + accounts.realNameOf(user) + ',\n\n' +
     (status === 'verified' ? 'Uw identiteit is geverifieerd. U kunt nu in een tik boeken.' :
@@ -240,6 +248,17 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
     title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
     body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
   res.json({ ok: true, status, pending: pendingVerifications() });
+});
+
+/* ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ---- */
+app.post('/api/office/incidenten', officeAuth, (req, res) => {
+  res.json({ incidenten: paspoortIncidenten(req.body.alleen === 'open' ? 'open' : 'alle') });
+});
+app.post('/api/office/incident/beslis', officeAuth, (req, res) => {
+  const besluit = req.body.besluit === 'vrijgeven' ? 'vrijgeven' : 'afwijzen';
+  const r = paspoortBeoordeel(String(req.body.id || ''), besluit, req.actor && req.actor.name);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
 });
 
 app.get('/api/office/doc', (req, res) => {
@@ -268,7 +287,8 @@ app.post('/api/office/reply', officeAuth, (req, res) => {
   accounts.saveMemberState(u.id, md);
   broadcastSync([u.tier], 'chat');
   notify(u.tier, { icon: '💬', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
-  // In productie gaat dit antwoord ook via WhatsApp naar accounts.phoneOf(u).
+  // Het antwoord verschijnt in de app van het lid (met push-melding); RTG gebruikt
+  // geen externe berichtenkanalen.
   res.json({ ok: true, conversations: conciergeInbox() });
 });
 };

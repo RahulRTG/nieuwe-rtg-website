@@ -54,6 +54,7 @@ const { HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES, m
 const { maakLid } = require('./kern/lid');
 const { MELDING_SCOPES, maakErvaring } = require('./kern/ervaring');
 const { RETAIL_MATEN, RETAIL_SEIZOENEN, maakRetail } = require('./kern/retail');
+const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 
 /* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
    pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
@@ -571,6 +572,9 @@ function initRealtime() {
   if (!db.data.retailApart) db.data.retailApart = [];             // apart gelegde varianten per klant
   if (!db.data.paskamerVerzoeken) db.data.paskamerVerzoeken = []; // maat naar een paskamer brengen
   if (!db.data.stylingVoorstellen) db.data.stylingVoorstellen = []; // stylist -> app van de klant
+  if (!db.data.paspoortVerzoeken) db.data.paspoortVerzoeken = [];   // identiteitsverzoeken van partners
+  if (!db.data.paspoortIncidenten) db.data.paspoortIncidenten = []; // opgeeiste inzage bij incidenten (RTG beoordeelt)
+  if (!db.data.paspoortLog) db.data.paspoortLog = [];               // volledig audit-log van alle inzages
   // (kamers, instellingen en tafels zitten in ensureSupplierDefaults)
   // oudere databases: appartement-partner en doors-cap toevoegen
   if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
@@ -1093,6 +1097,20 @@ app.post('/api/cluster/:actie', (req, res) => {
    het zo kort mogelijk, en gebruik bij voorkeur een gecertificeerde KYC-dienst. */
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 
+/* Een versleuteld geupload bestand (identiteitsbewijs/selfie) ontsleutelen en
+   als data-URL teruggeven, zodat de paspoortlaag een goedgekeurde inzage kan
+   tonen. Geen padtraversal: alleen de kale bestandsnaam telt. */
+function leesUploadDataUrl(fname) {
+  try {
+    const file = path.basename(String(fname || ''));
+    const full = path.join(UPLOAD_DIR, file);
+    if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return null;
+    const buf = require('./kluis').ontsleutelBuf(fs.readFileSync(full));
+    const ext = (file.split('.').pop() || 'jpg').toLowerCase();
+    const mime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+    return 'data:' + mime + ';base64,' + buf.toString('base64');
+  } catch (e) { return null; }
+}
 
 
 
@@ -1433,6 +1451,20 @@ const {
   sseToSupplier, sseToOffice, ledenPrijs, gidsHaal, meldWachtlijst
 });
 
+/* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
+   en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
+   codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
+   weigering voor het lid, en RTG-beoordeelde vrijgave bij incidenten. */
+const {
+  mijnStatus: paspoortStatus, vraag: paspoortVraag, beslis: paspoortBeslis,
+  trekIn: paspoortTrekIn, bekijk: paspoortBekijk, dienIncidentIn: paspoortIncident,
+  beoordeelIncident: paspoortBeoordeel, mijnVerzoeken: paspoortMijn,
+  partnerVerzoeken: paspoortPartner, incidentenVoorOffice: paspoortIncidenten
+} = maakPaspoort({
+  db, save, crypto, accounts, notify, notifySupplier, sseToCustomer,
+  sseToSupplier, sseToOffice, leesUploadDataUrl, leeftijdVan
+});
+
 // gast stuurt een bericht aan een partner (per afdeling een eigen gesprek)
 
 // gast opent het gesprek met een afdeling (en markeert het als gelezen)
@@ -1702,29 +1734,12 @@ const { officeAuth, officeState, pendingVerifications } = maakKantoor({
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
 
-/* ================= GEKOPPELD GESPREK: WhatsApp + app in één thread =================
-   Elk lid heeft één doorlopend gesprek. Of ze nu via WhatsApp of in de app
-   schrijven, het komt in dezelfde thread. RTG Pass wordt beantwoord door de
-   Butler (AI); Lifestyle en Business gaan naar een menselijke concierge, die in
-   de backoffice antwoordt. In productie loopt WhatsApp via de WhatsApp Business
-   API (Meta/Twilio); hier is de webhook gesimuleerd. */
-
-/* Inkomend WhatsApp-bericht. In productie de door Meta ondertekende webhook;
-   hier een eenvoudige { from, text } om de koppeling te demonstreren. */
-app.post('/api/whatsapp/webhook', async (req, res) => {
-  const from = req.body.from || (((req.body.entry || [])[0]?.changes || [])[0]?.value?.messages || [])[0]?.from;
-  const text = req.body.text || (((req.body.entry || [])[0]?.changes || [])[0]?.value?.messages || [])[0]?.text?.body;
-  if (!from || !text) return res.status(400).json({ error: 'Nummer of tekst ontbreekt.' });
-  const user = accounts.findByPhone(from);
-  if (!user) return res.json({ ok: true, matched: false }); // onbekend nummer: negeren
-  try {
-    await memberSays(user, text, 'whatsapp');
-    res.json({ ok: true, matched: true });
-  } catch (e) {
-    console.error('[whatsapp]', e && e.message);
-    res.status(200).json({ ok: true, matched: true, deferred: true }); // webhook nooit laten falen
-  }
-});
+/* ================= DOORLOPEND GESPREK IN DE APP =================
+   Elk lid heeft één doorlopend gesprek, volledig binnen de beveiligde RTG-app.
+   RTG Pass wordt beantwoord door de Butler (AI); Lifestyle en Business gaan naar
+   een menselijke concierge, die in de backoffice antwoordt. Er zijn geen externe
+   berichtenkoppelingen (WhatsApp/Meta) meer: alle communicatie loopt via de app
+   en de push-/e-maillaag van RTG zelf. */
 
 /* ---------- domeinmodules: aparte routers op de gedeelde kern ----------
    Elk domein is een los bestand dat zijn routes op dezelfde app registreert en
@@ -1763,7 +1778,10 @@ const kern = {
   RETAIL_MATEN, RETAIL_SEIZOENEN, retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
   vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, voorraadZoek,
-  retailStats, retailState, retailCatalogus
+  retailStats, retailState, retailCatalogus,
+  PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
+  paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
+  paspoortPartner, paspoortIncidenten
 };
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld

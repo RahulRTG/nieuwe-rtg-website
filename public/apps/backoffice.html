@@ -364,7 +364,7 @@
     trustId = null;
     $('#convWho').textContent = c.codename + ' · ' + c.tier;
     $('#convBody').innerHTML = c.messages.map(m =>
-      '<div class="cmsg '+(m.from==='member'?'in':'out')+'">'+(m.channel==='whatsapp'?'<span class="wa">📱 WhatsApp</span>':'')+escHtml(m.text)+'</div>'
+      '<div class="cmsg '+(m.from==='member'?'in':'out')+'">'+escHtml(m.text)+'</div>'
     ).join('');
     $('#convScrim').classList.add('open');
     setTimeout(()=>{ const b=$('#convBody'); b.scrollTop=b.scrollHeight; }, 30);

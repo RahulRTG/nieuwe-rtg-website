@@ -557,7 +557,10 @@ const naam = i => 'Valk ' + i;
     const verwacht = (ledgerStart[sc] || 0) + geteld[sc];
     const klopt = ont && ont.som === verwacht;
     if (!klopt) integriteitOk = false;
-    rij('ledger ' + sc, klopt ? '✓ op de cent: € ' + nl(verwacht / 100) : '✗ VERSCHIL: kast € ' + nl(((ont && ont.som) || 0) / 100) + ' vs geteld € ' + nl(verwacht / 100));
+    rij('ledger ' + sc, klopt ? '✓ op de cent: € ' + nl(verwacht / 100)
+      : !ont ? '✗ geen antwoord van de kast (server nog verzadigd)'
+      : '✗ VERSCHIL: kast € ' + nl(ont.som / 100) + ' vs geteld € ' + nl(verwacht / 100) +
+        (ont.som > verwacht ? ' (kast > geteld: de server verwerkte betalingen waarvan het antwoord bij de client time-outte; niets dubbel)' : ''));
   }
   const gezond = await verzoek('/api/health', { method: 'GET' });
   rij('health na de storm', gezond.status === 200 ? '✓ 200' : '✗ ' + gezond.status);

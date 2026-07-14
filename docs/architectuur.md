@@ -1,5 +1,7 @@
 # Architectuur: gedeelde kern + aparte domeinmodules
 
+> Voor de filosofie achter de afhankelijkheden (wat we zelf bouwen en wat bewust niet), zie **de-lijn.md**.
+
 De backend is opgesplitst in een gedeelde kern en losse domeinmodules. Elke app
 en elke pas heeft zo een eigen, overzichtelijk bestand, terwijl de gedeelde data
 en realtime op een plek blijven.

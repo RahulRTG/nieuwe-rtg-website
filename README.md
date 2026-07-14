@@ -160,3 +160,10 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 ## Partnerkanaal
 
 Niet-leden boeken via **site/boeken.html**, bereikbaar via een partnerlink zoals `/site/boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs, service en de commissieverdeling tussen partner en RTG zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`.
+
+## Documentatie
+
+- **docs/de-lijn.md** — wat we zelf bouwen, wat bewust niet, en waarom (de filosofie achter de afhankelijkheden).
+- **docs/architectuur.md** — gedeelde kern + aparte domeinmodules, gateway en losse processen.
+- **docs/hardening.md** — beveiligings- en betrouwbaarheidskeuzes.
+- **PRODUCTION.md** / **LAUNCH.md** — runbook en livegang-checklist.

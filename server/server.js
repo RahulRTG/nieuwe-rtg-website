@@ -195,8 +195,8 @@ app.use((req, res, next) => {
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self)');
   res.set('Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-    "font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
+    "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
     "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
   next();
 });
@@ -326,8 +326,8 @@ app.use((req, res, next) => {
     const nonce = crypto.randomBytes(16).toString('base64');
     html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
     res.set('Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-      "font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
+      "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline'; " +
+      "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
       "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
     res.type('html').send(html);
   });

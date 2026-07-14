@@ -1283,6 +1283,17 @@
     try { muntOpties = await API.call('/munt/opties'); } catch(e){ muntOpties = { aan: false, munten: [] }; }
     return muntOpties;
   }
+  // Een PDF (factuur, overzicht) ophalen met het token en als download aanbieden.
+  async function downloadPdf(pad, body, filename){
+    if (!API.token) return;
+    try {
+      const res = await fetch('/api' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API.token }, body: JSON.stringify(body || {}) });
+      if (!res.ok) throw new Error('fout');
+      const url = URL.createObjectURL(await res.blob());
+      const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch(e){ toast(T('fin.dlfout','Downloaden lukte niet.')); }
+  }
 
   // API-client uit de gedeelde app-shell (public/shared/appshell.js).
   const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
@@ -4283,6 +4294,7 @@
         (user.tier === 'business' ? tegel(T('fin.vat','Btw betaald'), eur(btwSom)) : '') +
       '</div>' +
       (rtfKomt > 0 ? '<div style="margin-top:0.5rem;font-size:0.72rem;color:var(--muted);">' + T('fin.rtfnext','Van uw openstaande bijdrage gaat') + ' <b style="color:var(--gold);">' + eur(rtfKomt) + '</b> ' + T('fin.rtfnext2','naar de RTFoundation.') + '</div>' : '') +
+      (API.live ? '<button id="dlOverzicht" style="margin-top:0.6rem;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.35rem 0.85rem;font-size:0.68rem;font-family:inherit;cursor:pointer;">⤓ ' + T('fin.dloverzicht','Download factuuroverzicht (PDF)') + '</button>' : '') +
     '</div>';
     $('#payList').innerHTML = finKaart + invoices.map(inv => {
       const total = inv.netto + inv.bijdrage;
@@ -4294,11 +4306,16 @@
             ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>' +
               (muntAan ? '<button class="js-munt" data-inv="' + inv.id + '" data-amt="' + total + '" style="background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '')
             : '<span class="pill paid">'+T('app.paid','Betaald')+'</span>') +
+          (API.live ? '<button class="js-dlinv" data-inv="' + inv.id + '" style="background:none;border:none;color:var(--soft);font-size:0.66rem;font-family:inherit;cursor:pointer;padding:0.15rem 0;">⤓ ' + T('fin.download','Download factuur') + '</button>' : '') +
         '</div>' +
       '</div>' + bizSpec(inv);
     }).join('');
     document.querySelectorAll('.js-munt').forEach(b =>
       b.addEventListener('click', () => openMuntSheet(b.dataset.inv, Number(b.dataset.amt))));
+    document.querySelectorAll('.js-dlinv').forEach(b =>
+      b.addEventListener('click', () => downloadPdf('/factuur', { invoiceId: b.dataset.inv }, 'RTG-factuur-' + b.dataset.inv + '.pdf')));
+    const dlo = $('#dlOverzicht');
+    if (dlo) dlo.addEventListener('click', () => downloadPdf('/facturen/overzicht', {}, 'RTG-factuuroverzicht.pdf'));
     $('#payAllWrap').innerHTML = (open.length
       ? '<button class="btn-pay payall" id="payAll">' + FID + T('app.payall','Betaal alles') + ', ' + eur(openSum) + '</button>'
       : '') +
@@ -5409,6 +5426,7 @@ window.I18N = { en: {
   'zzp.disc':'Annual indication; this is guidance, not binding tax advice.',
   'fin.title':'Your finances', 'fin.open':'Outstanding', 'fin.paid':'Paid', 'fin.rtf':'To the RTFoundation', 'fin.vat':'VAT paid',
   'fin.rtfnext':'Of your outstanding contribution,', 'fin.rtfnext2':'goes to the RTFoundation.', 'fin.paycoins':'With coins',
+  'fin.download':'Download invoice', 'fin.dloverzicht':'Download invoice overview (PDF)', 'fin.dlfout':'Download failed.',
   'munt.title':'Pay with coins', 'munt.bedrag':'To pay', 'munt.omzet':'RTG converts your coins to euros immediately.',
   'munt.laden':'Creating address…', 'munt.fout':'Could not create an address.', 'munt.stuur':'Send exactly',
   'munt.koers':'rate locked', 'munt.adres':'To this address', 'munt.kopieer':'Copy', 'munt.gekopieerd':'Address copied.',

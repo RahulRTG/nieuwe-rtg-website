@@ -63,6 +63,7 @@ const { maakDirectpay } = require('./kern/directpay');
 const { maakFonds } = require('./kern/fonds');
 const { maakMunten } = require('./kern/munten');
 const muntbetaal = require('./muntbetaal');
+const factuur = require('./kern/factuur');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -2154,6 +2155,8 @@ const kern = {
   fonds,
   // de munt-ontvangst (kern/munten.js + server/muntbetaal.js)
   munten, muntbetaal,
+  // facturen/overzichten als download (kern/factuur.js)
+  factuur,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

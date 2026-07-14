@@ -14,7 +14,7 @@ module.exports = (kern) => {
     ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer,
     mbAanvraag, mbMijn,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
-    zorgContact, fonds, munten,
+    zorgContact, fonds, munten, factuur,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -168,6 +168,50 @@ app.post('/api/munt/verzoek', auth, async (req, res) => {
     });
     res.json({ ok: true, verzoek });
   } catch (e) { res.status(400).json({ error: e.message || 'Kon geen munt-adres maken.' }); }
+});
+
+/* Facturen downloaden. Elk lid kan zijn eigen factuur als PDF ophalen, en een
+   jaaroverzicht van alle facturen. Zelf gebouwd, zonder externe pakketten. */
+function ledenInvoices(req) {
+  const own = !!req.session.account;
+  const md = own ? (accounts.getMemberState(req.session.account.id) || memberTemplate()) : db.data;
+  return md.invoices || [];
+}
+
+app.post('/api/factuur', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const inv = ledenInvoices(req).find(i => i.id === req.body.invoiceId);
+  if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
+  const who = { codename: liveCodename(req.session), tier: req.session.tier };
+  const pdf = factuur.ledenFactuur(inv, who);
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename="RTG-factuur-' + String(inv.id).replace(/[^\w.-]/g, '') + '.pdf"');
+  res.send(pdf);
+});
+
+app.post('/api/facturen/overzicht', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const jaar = String(req.body.jaar || '').match(/\d{4}/) ? req.body.jaar : null;
+  const alle = ledenInvoices(req).filter(i => !jaar || String(i.date || '').includes(jaar));
+  const who = { codename: liveCodename(req.session), tier: req.session.tier };
+  const pasNaam = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' }[who.tier] || 'RTG';
+  let betaald = 0, open = 0, naarFonds = 0;
+  const rijen = [];
+  for (const i of alle) {
+    const tot = (i.netto || 0) + (i.bijdrage || 0);
+    if (i.status === 'paid') betaald += tot; else open += tot;
+    if (factuur.isContrib(i.desc)) naarFonds += Math.round((i.bijdrage || 0) / 1.21 * 0.3 * 100) / 100;
+    rijen.push({ label: (i.id || '') + '  ' + (i.desc || ''), waarde: factuur.euroTekst(tot) + '  ' + (i.status === 'paid' ? '(betaald)' : '(open)') });
+  }
+  rijen.push({ label: 'Totaal betaald', waarde: factuur.euroTekst(betaald), bold: true, streep: true });
+  rijen.push({ label: 'Totaal openstaand', waarde: factuur.euroTekst(open), bold: true });
+  rijen.push({ label: 'Bijgedragen aan de RTFoundation', waarde: factuur.euroTekst(naarFonds), bold: true });
+  const pdf = factuur.overzichtPdf(
+    { titel: 'Factuuroverzicht' + (jaar ? ' ' + jaar : ''), periode: jaar || '', opnaam: who.codename + '  .  ' + pasNaam },
+    rijen);
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename="RTG-factuuroverzicht' + (jaar ? '-' + jaar : '') + '.pdf"');
+  res.send(pdf);
 });
 
 app.post('/api/like', auth, (req, res) => {

@@ -53,6 +53,7 @@ const { SHIFT_NAMES, maakPersoneel } = require('./kern/personeel');
 const { HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES, maakLeverancier } = require('./kern/leverancier');
 const { maakLid } = require('./kern/lid');
 const { MELDING_SCOPES, maakErvaring } = require('./kern/ervaring');
+const { RETAIL_MATEN, RETAIL_SEIZOENEN, maakRetail } = require('./kern/retail');
 
 /* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
    pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
@@ -125,7 +126,9 @@ const STAFF_SEED = {
   MACE: [['Elena Costa', 'manager', 'Beheer'], ['Dani Ruiz', 'staff', 'Security']],
   ISLAREN: [['Carmen Vidal', 'manager', 'Beheer'], ['Pau Riera', 'staff', 'Balie']],
   IBIZALIV: [['Sofia Marin', 'manager', 'Makelaar'], ['Bram Kessler', 'staff', 'Bezichtigingen']],
-  IBIZAIR: [['Nadia Fischer', 'manager', 'Operations'], ['Tomas Weller', 'staff', 'Piloot']]
+  IBIZAIR: [['Nadia Fischer', 'manager', 'Operations'], ['Tomas Weller', 'staff', 'Piloot']],
+  // mode & retail: een store manager en een verkoper/stylist op de winkelvloer
+  MAISON: [['Camille Moreau', 'manager', 'Store manager'], ['Théo Blanc', 'staff', 'Verkoop & styling']]
 };
 for (const [code, people] of Object.entries(STAFF_SEED)) {
   if (accounts.countStaff(code) === 0) {
@@ -562,6 +565,12 @@ function initRealtime() {
   if (!db.data.splitsen) db.data.splitsen = [];                    // gesplitste rekeningen (betaalverzoeken)
   if (!db.data.wachtlijsten) db.data.wachtlijsten = [];            // wachtlijsten voor volle events/tijdsloten
   if (!db.data.meldingVoorkeur) db.data.meldingVoorkeur = {};      // sleutel/tier -> { scope: bool }
+  // de retail-/mode-laag (kern/retail.js): apart gelegde artikelen, paskamer-
+  // verzoeken en stylingvoorstellen (collecties, artikelen en clienteling staan
+  // op de leverancier zelf: s.collecties/s.artikelen/s.klanten)
+  if (!db.data.retailApart) db.data.retailApart = [];             // apart gelegde varianten per klant
+  if (!db.data.paskamerVerzoeken) db.data.paskamerVerzoeken = []; // maat naar een paskamer brengen
+  if (!db.data.stylingVoorstellen) db.data.stylingVoorstellen = []; // stylist -> app van de klant
   // (kamers, instellingen en tafels zitten in ensureSupplierDefaults)
   // oudere databases: appartement-partner en doors-cap toevoegen
   if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
@@ -722,6 +731,39 @@ function initRealtime() {
       ]
     });
   }
+  // --- retail/mode: modehuizen, merken en winkels ---
+  if (!db.data.supplierTypes.retail)
+    db.data.supplierTypes.retail = { label: 'Mode & retail', icon: '🛍️', caps: ['retail', 'location', 'pricing'] };
+  if (!db.data.suppliers.find(s => s.code === 'MAISON')) {
+    const c1 = crypto.randomBytes(4).toString('hex'), c2 = crypto.randomBytes(4).toString('hex');
+    const va = (sku, kleuren, maten, v) => { const out = []; for (const k of kleuren) for (const m of maten) out.push({ vsku: sku + '-' + k.slice(0, 3).toUpperCase() + '-' + m, kleur: k, maat: m, voorraad: v }); return out; };
+    db.data.suppliers.push({
+      code: 'MAISON', name: 'Maison Solène', type: 'retail', city: 'Ibiza',
+      loc: { lat: 38.907, lng: 1.435, label: 'Carrer Bisbe Azara, Ibiza' }, rate: 0.10,
+      menu: [], photos: [],
+      settings: { retailDrempel: 3 },
+      collecties: [
+        { id: c1, naam: 'Riviera', seizoen: 'SS', jaar: 2026, actief: true, at: new Date().toISOString() },
+        { id: c2, naam: 'Atelier Noir', seizoen: 'AW', jaar: 2026, actief: true, at: new Date().toISOString() }
+      ],
+      artikelen: [
+        { id: crypto.randomBytes(4).toString('hex'), sku: 'SOL-LIN01', naam: 'Linnen overhemd', collectieId: c1, categorie: 'Overhemden',
+          materiaal: '100% Europees linnen', omschrijving: 'Luchtig zomeroverhemd, mother-of-pearl knopen.', foto: null,
+          publiekePrijs: 320, price: 320, drop: null, at: new Date().toISOString(),
+          varianten: va('SOL-LIN01', ['Ecru', 'Zeeblauw'], ['S', 'M', 'L', 'XL'], 6) },
+        { id: crypto.randomBytes(4).toString('hex'), sku: 'SOL-SLIP', naam: 'Zijden slipdress', collectieId: c1, categorie: 'Jurken',
+          materiaal: 'Sandwashed zijde', omschrijving: 'Bias-cut jurk met verstelbare bandjes.', foto: null,
+          publiekePrijs: 690, price: 690, drop: null, at: new Date().toISOString(),
+          varianten: va('SOL-SLIP', ['Champagne', 'Onyx'], ['XS', 'S', 'M', 'L'], 4) },
+        { id: crypto.randomBytes(4).toString('hex'), sku: 'SOL-TRENCH', naam: 'Atelier trenchcoat', collectieId: c2, categorie: 'Jassen',
+          materiaal: 'Waterafstotend gabardine', omschrijving: 'Dubbele rij knopen, afneembare ceintuur.', foto: null,
+          publiekePrijs: 1450, price: 1450, drop: { datum: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10), tijd: '11:00', gereleased: false }, at: new Date().toISOString(),
+          varianten: va('SOL-TRENCH', ['Camel', 'Zwart'], ['S', 'M', 'L'], 2) }
+      ],
+      klanten: {}
+    });
+  }
+  if (!db.data.retailApart) db.data.retailApart = [];
   if (!db.data.vastgoedAanbod) db.data.vastgoedAanbod = [];   // { ref, supplierCode, pandId, aanKeys:[], publiek, at }
   if (!db.data.bezichtigingen) db.data.bezichtigingen = [];   // { ref, supplierCode, pandId, key, codename, wens, status, moment, keyless, at }
   if (!db.data.biedingen) db.data.biedingen = [];             // { ref, supplierCode, pandId, key, codename, bedrag, status, tegenbod, at }
@@ -1377,6 +1419,20 @@ const {
   sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan
 });
 
+/* De retail-/mode-laag (kern/retail.js): collecties, artikelen met varianten,
+   voorraad, clienteling, apart leggen, paskamerverzoeken, drops, mobiele kassa,
+   styling en analytics. Draait na de ervaring-kern omdat een drop-release de
+   wachtlijst (meldWachtlijst) afgaat. */
+const {
+  isRetail: retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
+  klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
+  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, verkoop: retailVerkoop,
+  voorraadZoek, retailStats, retailState, catalogus: retailCatalogus
+} = maakRetail({
+  db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
+  sseToSupplier, sseToOffice, ledenPrijs, gidsHaal, meldWachtlijst
+});
+
 // gast stuurt een bericht aan een partner (per afdeling een eigen gesprek)
 
 // gast opent het gesprek met een afdeling (en markeert het als gelezen)
@@ -1702,7 +1758,12 @@ const kern = {
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, toggleFavoriet, favorietenVan, isFavoriet,
   fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst,
   meldWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
-  voorkeurVan, zetVoorkeur
+  voorkeurVan, zetVoorkeur,
+  // de retail-/mode-laag (kern/retail.js)
+  RETAIL_MATEN, RETAIL_SEIZOENEN, retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
+  klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
+  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, voorraadZoek,
+  retailStats, retailState, retailCatalogus
 };
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld

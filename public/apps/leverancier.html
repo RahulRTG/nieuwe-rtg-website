@@ -579,6 +579,11 @@
         <p class="sub" data-i18n="sup.v.vg.sub">Uw portefeuille, gericht aanbieden, biedingen en bezichtigingen met keyless toegang.</p>
         <div id="vgWrap"></div>
       </div>
+      <div class="view" data-view="retail">
+        <h2 data-i18n="sup.v.retail">Mode &amp; retail</h2>
+        <p class="sub" data-i18n="sup.v.retail.sub">Uw collecties, artikelen met varianten, voorraad en drops, en het clienteling-dossier van uw klanten.</p>
+        <div id="retailWrap"></div>
+      </div>
       <div class="view" data-view="minibar">
         <h2 data-i18n="sup.v.minibar">Minibar</h2>
         <p class="sub" data-i18n="sup.v.minibar.sub">Tel per kamer wat is gebruikt. Het verbruik gaat automatisch op de kamerrekening en de aanvullijst staat klaar.</p>
@@ -693,7 +698,8 @@
     { code:'ESVEDRA', name:'Es Vedra Cruises', type:'Activiteit', icon:'⛵', sub:'Tours & cruises · Ibiza' },
     { code:'MACE',    name:'MACE Museum Eivissa', type:'Activiteit', icon:'🏛️', sub:'Museum · Ibiza' },
     { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'🚗', sub:'Autoverhuur · Ibiza' },
-    { code:'IBIZALIV', name:'Ibiza Living Estates', type:'Vastgoed', icon:'🏡', sub:'Makelaar · Ibiza' }
+    { code:'IBIZALIV', name:'Ibiza Living Estates', type:'Vastgoed', icon:'🏡', sub:'Makelaar · Ibiza' },
+    { code:'MAISON',  name:'Maison Solène', type:'Mode', icon:'🛍️', sub:'Modehuis · Ibiza' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -727,6 +733,7 @@
     tickets:  { label:'Tickets',   svg:'<path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H6a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M12 6v2M12 11v2M12 16v2"/>', cap:'tickets' },
     vastgoed: { label:'Vastgoed',  svg:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>', cap:'vastgoed' },
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
+    retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
     tafels:   { label:'Tafels',    svg:'<circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>', cap:'menu' },
@@ -830,7 +837,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -2582,6 +2589,281 @@
     });
   }
 
+  // ---- retail / mode: de slimme merk-backoffice ----
+  let retailData = null;         // volledige retail-toestand van de server
+  let retailSec = 'overzicht';   // overzicht | catalogus | voorraad | clienteling
+  let retailKlant = null;        // geopend klantdossier (clienteling)
+  let retailArtBewerk = null;    // id van het artikel dat bewerkt wordt (of 'nieuw')
+  const RSEC = [['overzicht','📈','Overzicht'],['catalogus','👗','Collecties'],['voorraad','📦','Voorraad'],['clienteling','💎','Klanten']];
+  async function laadRetail(){
+    if (!has('retail') || !API.live) return;
+    try { retailData = (await API.call('/supplier/retail', {})).retail; } catch(e){ retailData = { collecties:[], artikelen:[], apart:[], paskamer:[], styling:[], klanten:[], stats:{}, maten:[], seizoenen:[] }; }
+    renderRetail();
+  }
+  function rSelStyle(){ return 'style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"'; }
+  function retailSubnav(){
+    return '<div class="st-chips" style="display:flex;gap:0.4rem;overflow-x:auto;margin-bottom:0.9rem;-webkit-overflow-scrolling:touch;">'+
+      RSEC.map(s => { const on = retailSec===s[0]; return '<button data-rsec="'+s[0]+'" style="white-space:nowrap;border:1px solid '+(on?'var(--gold)':'var(--line)')+';background:var(--card2);color:'+(on?'var(--gold)':'var(--txt)')+';border-radius:999px;padding:0.5rem 0.9rem;font-size:0.74rem;font-weight:'+(on?'600':'500')+';">'+s[1]+' '+T('rt.sec.'+s[0], s[2])+'</button>'; }).join('')+'</div>';
+  }
+  function collNaam(cid){ const c = (retailData.collecties||[]).find(x => x.id===cid); return c ? (c.seizoen+' '+c.jaar+' · '+c.naam) : T('rt.los','Losse artikelen'); }
+  function renderRetail(){
+    const el = $('#retailWrap'); if (!el) return;
+    if (!has('retail')){ el.innerHTML = ''; return; }
+    if (!retailData){ el.innerHTML = '<div class="empty">…</div>'; laadRetail(); return; }
+    const canEdit = actor().manager;
+    let html = retailSubnav();
+    if (retailSec === 'overzicht') html += retailOverzicht(canEdit);
+    else if (retailSec === 'catalogus') html += retailCatalogusView(canEdit);
+    else if (retailSec === 'voorraad') html += retailVoorraadView();
+    else if (retailSec === 'clienteling') html += retailClienteling(canEdit);
+    el.innerHTML = html;
+    el.querySelectorAll('[data-rsec]').forEach(b => b.addEventListener('click', () => { retailSec = b.dataset.rsec; retailKlant = null; retailArtBewerk = null; renderRetail(); }));
+    retailBindActions(el, canEdit);
+  }
+  function retailOverzicht(canEdit){
+    const st = retailData.stats || {};
+    const kpi = (v,l) => '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.8rem;"><div style="font-size:1.25rem;font-weight:700;">'+v+'</div><div class="tt-h" style="margin-top:0.15rem;">'+l+'</div></div>';
+    let html = '<div class="card"><div class="tt-h">'+T('rt.vandaag','Vandaag')+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:0.6rem;">'+
+      kpi(geld(st.omzetVandaag||0), T('rt.omzet','omzet'))+kpi(st.bonnenVandaag||0, T('rt.bonnen','bonnen'))+kpi(st.klanten||0, T('rt.klanten','klanten'))+
+      kpi(st.artikelen||0, T('rt.artikelen','artikelen'))+kpi(st.voorraadTotaal||0, T('rt.voorraad','stuks voorraad'))+kpi((retailData.paskamer||[]).length+(retailData.apart||[]).length, T('rt.vloer','op de vloer'))+
+      '</div></div>';
+    // bestsellers
+    const bs = st.bestsellers || [];
+    html += '<div class="card"><div class="tt-h">'+T('rt.bestsellers','Bestsellers')+'</div>'+
+      (bs.length ? '<div style="margin-top:0.5rem;">'+bs.map((b,i) => '<div class="mitem"><div class="r1"><span class="nm">'+(i+1)+'. '+esc(b.naam)+'</span><span class="pr">'+b.aantal+'×</span></div></div>').join('') + '</div>'
+        : '<div class="empty">'+T('rt.geenverkoop','Nog geen verkopen vandaag.')+'</div>')+'</div>';
+    // sell-through per collectie (balkjes)
+    const sthr = st.sellThrough || [];
+    if (sthr.length) html += '<div class="card"><div class="tt-h">'+T('rt.sellthrough','Sell-through per collectie')+'</div>'+
+      '<div style="margin-top:0.5rem;display:grid;gap:0.6rem;">'+sthr.map(c =>
+        '<div><div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>'+esc(c.collectie)+'</span><span style="color:var(--gold);">'+c.pct+'%</span></div>'+
+        '<div style="height:7px;background:var(--card2);border-radius:999px;margin-top:0.3rem;overflow:hidden;"><div style="height:100%;width:'+c.pct+'%;background:var(--gold);"></div></div>'+
+        '<div class="tt-h" style="margin-top:0.2rem;">'+c.verkocht+' '+T('rt.verkocht','verkocht')+' · '+c.voorraad+' '+T('rt.opvoorraad','op voorraad')+'</div></div>').join('')+'</div></div>';
+    // lage voorraad / bijbestellen
+    const laag = st.laag || [];
+    html += '<div class="card"><div class="tt-h">'+T('rt.bijbestel','Bijbestellen (lage voorraad)')+'</div>'+
+      (laag.length ? '<div style="margin-top:0.5rem;">'+laag.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikel)+'</span><span class="pr" style="color:'+(v.voorraad<=0?'var(--burgundy)':'var(--amber)')+';">'+v.voorraad+'</span></div><div class="ds">'+esc(v.kleur)+' · '+T('rt.maat','maat')+' '+esc(v.maat)+' · '+esc(v.vsku)+'</div></div>').join('')+'</div>'
+        : '<div class="empty">'+T('rt.voorraadok','Alle maten ruim op voorraad.')+'</div>')+'</div>';
+    // open paskamerverzoeken (ook af te handelen vanuit de backoffice)
+    const pk = retailData.paskamer || [];
+    if (pk.length) html += '<div class="card"><div class="tt-h">'+T('rt.paskamer','Paskamerverzoeken')+'</div>'+
+      '<div style="margin-top:0.5rem;">'+pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikelNaam)+'</span><span class="pr">'+esc(v.maat)+'</span></div>'+
+        '<div class="ds">'+esc(v.codenaam||'Gast')+' · '+esc(v.kleur)+(v.paskamer?' · '+esc(v.paskamer):'')+'</div>'+
+        '<div style="margin-top:0.4rem;"><button class="obtn primary" data-rpkbreng="'+v.id+'">'+T('rt.breng','Breng gebracht')+'</button></div></div>').join('')+'</div></div>';
+    // artikelen met een aangekondigde drop (release)
+    if (canEdit){
+      const drops = (retailData.artikelen||[]).filter(a => a.drop && !a.drop.gereleased);
+      if (drops.length) html += '<div class="card"><div class="tt-h">'+T('rt.drops','Aangekondigde drops')+'</div>'+
+        '<div style="margin-top:0.5rem;">'+drops.map(a => '<div class="mitem"><div class="r1"><span class="nm">'+esc(a.naam)+'</span><span class="pr">'+esc(a.drop.datum)+' '+esc(a.drop.tijd)+'</span></div>'+
+          '<div style="margin-top:0.4rem;"><button class="obtn primary" data-rrelease="'+a.id+'">'+T('rt.release','Nu vrijgeven')+'</button></div></div>').join('')+'</div></div>';
+    }
+    return html;
+  }
+  function retailCatalogusView(canEdit){
+    let html = '';
+    // collecties
+    const cols = retailData.collecties || [];
+    html += '<div class="card"><div class="tt-h">'+T('rt.collecties','Collecties')+'</div>'+
+      (cols.length ? '<div style="margin-top:0.5rem;">'+cols.map(c => '<div class="mitem"><div class="r1"><span class="nm">'+esc(c.naam)+'</span><span class="pr">'+esc(c.seizoen)+' '+c.jaar+'</span></div>'+
+        (canEdit?'<div style="margin-top:0.4rem;"><button class="obtn warn" data-rcoldel="'+c.id+'">'+T('rt.verwijder','Verwijder')+'</button></div>':'')+'</div>').join('')+'</div>'
+        : '<div class="empty">'+T('rt.geencoll','Nog geen collecties.')+'</div>')+
+      (canEdit ? '<div style="margin-top:0.7rem;display:grid;grid-template-columns:1fr auto auto auto;gap:0.4rem;align-items:end;">'+
+        '<div class="field" style="margin:0;"><label>'+T('rt.f.collnaam','Naam')+'</label><input id="rColNaam" placeholder="'+T('rt.f.collnaamph','Bijv. Riviera')+'"></div>'+
+        '<div class="field" style="margin:0;"><label>'+T('rt.f.seizoen','Seizoen')+'</label><select id="rColSeiz" '+rSelStyle()+'>'+(retailData.seizoenen||['SS','AW']).map(s=>'<option>'+s+'</option>').join('')+'</select></div>'+
+        '<div class="field" style="margin:0;width:70px;"><label>'+T('rt.f.jaar','Jaar')+'</label><input id="rColJaar" type="number" value="'+(new Date().getFullYear())+'"></div>'+
+        '<button class="obtn primary" id="rColAdd">'+T('rt.f.voeg','Voeg toe')+'</button></div>' : '')+'</div>';
+    // artikelen
+    const arts = retailData.artikelen || [];
+    html += '<div class="card"><div class="tt-h">'+T('rt.artikelen2','Artikelen')+' ('+arts.length+')</div>'+
+      (arts.length ? '<div style="margin-top:0.5rem;display:grid;gap:0.5rem;">'+arts.map(a => {
+        const drop = a.drop && !a.drop.gereleased ? '<span class="pill" style="color:var(--gold);border-color:rgba(212,175,55,0.4);margin-left:0.3rem;">'+T('rt.drop','drop')+' '+esc(a.drop.datum)+'</span>' : '';
+        return '<div class="mitem"><div style="display:flex;gap:0.7rem;">'+
+          (a.foto ? '<img src="'+esc(a.foto)+'" alt="'+esc(a.naam)+'" style="width:52px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0;">' : '<div style="width:52px;height:64px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">👗</div>')+
+          '<div style="flex:1;min-width:0;"><div class="r1"><span class="nm">'+esc(a.naam)+drop+'</span><span class="pr">'+geld(a.price)+'</span></div>'+
+          '<div class="ds">'+esc(collNaam(a.collectieId))+' · '+esc(a.categorie||'')+'</div>'+
+          '<div class="ds">'+esc((a.varianten||[]).map(v=>v.kleur).filter((x,i,z)=>z.indexOf(x)===i).join(', '))+' · '+T('rt.totvoorraad','voorraad')+' '+(a.voorraad||0)+'</div>'+
+          (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;"><button class="obtn" data-rartedit="'+a.id+'">'+T('rt.bewerk','Bewerk')+'</button><button class="obtn warn" data-rartdel="'+a.id+'">'+T('rt.verwijder','Verwijder')+'</button></div>':'')+
+          '</div></div></div>';
+      }).join('')+'</div>' : '<div class="empty">'+T('rt.geenart','Nog geen artikelen.')+'</div>')+
+      (canEdit ? '<div style="margin-top:0.8rem;"><button class="obtn primary" id="rArtNieuw">'+T('rt.nieuwart','+ Nieuw artikel')+'</button></div>' : '')+'</div>';
+    // artikel-formulier
+    if (canEdit && retailArtBewerk) html += retailArtikelForm();
+    return html;
+  }
+  function retailArtikelForm(){
+    const a = retailArtBewerk === 'nieuw' ? null : (retailData.artikelen||[]).find(x => x.id === retailArtBewerk);
+    const maten = retailData.maten || ['XS','S','M','L','XL','XXL'];
+    const gekozenM = a ? [...new Set((a.varianten||[]).map(v=>v.maat))] : ['S','M','L'];
+    const kleuren = a ? [...new Set((a.varianten||[]).map(v=>v.kleur))].join(', ') : '';
+    return '<div class="card" id="rArtForm"><div class="tt-h">'+(a?T('rt.bewerkart','Artikel bewerken'):T('rt.nieuwart2','Nieuw artikel'))+'</div>'+
+      '<div class="field"><label>'+T('rt.f.naam','Naam')+'</label><input id="rArtNaam" value="'+esc(a?a.naam:'')+'" placeholder="'+T('rt.f.naamph','Bijv. Zijden slipdress')+'"></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">'+
+        '<div class="field"><label>'+T('rt.f.sku','SKU')+'</label><input id="rArtSku" value="'+esc(a?a.sku:'')+'" placeholder="'+T('rt.optioneel','optioneel')+'"></div>'+
+        '<div class="field"><label>'+T('rt.f.cat','Categorie')+'</label><input id="rArtCat" value="'+esc(a?a.categorie:'')+'" placeholder="'+T('rt.f.catph','Bijv. Jurken')+'"></div>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">'+
+        '<div class="field"><label>'+T('rt.f.materiaal','Materiaal')+'</label><input id="rArtMat" value="'+esc(a?a.materiaal:'')+'" placeholder="'+T('rt.f.materiaalph','Bijv. 100% zijde')+'"></div>'+
+        '<div class="field"><label>'+T('rt.f.prijs','Publieke prijs (€)')+'</label><input id="rArtPrijs" type="number" step="0.01" value="'+(a?a.publiekePrijs:'')+'"></div>'+
+      '</div>'+
+      '<div class="field"><label>'+T('rt.f.coll','Collectie')+'</label><select id="rArtColl" '+rSelStyle()+'>'+(retailData.collecties||[]).map(c=>'<option value="'+c.id+'"'+(a&&a.collectieId===c.id?' selected':'')+'>'+esc(c.seizoen+' '+c.jaar+' · '+c.naam)+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>'+T('rt.f.oms','Omschrijving')+'</label><textarea id="rArtOms" rows="2">'+esc(a?a.omschrijving:'')+'</textarea></div>'+
+      '<div class="field"><label>'+T('rt.f.kleuren','Kleuren (komma’s)')+'</label><input id="rArtKleuren" value="'+esc(kleuren)+'" placeholder="'+T('rt.f.kleurenph','Bijv. Zwart, Ivoor, Camel')+'"></div>'+
+      '<div class="field"><label>'+T('rt.f.maten','Maten')+'</label><div id="rArtMaten" style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
+        maten.map(m => '<button type="button" class="obtn rmaat'+(gekozenM.includes(m)?' primary':'')+'" data-rmaat="'+m+'">'+m+'</button>').join('')+'</div></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">'+
+        '<div class="field"><label>'+T('rt.f.startvoorraad','Startvoorraad p. maat')+'</label><input id="rArtVoorraad" type="number" value="'+(a?'':'8')+'" placeholder="'+T('rt.optioneel','optioneel')+'"></div>'+
+        '<div class="field"><label>'+T('rt.f.drop','Drop-datum')+'</label><input id="rArtDrop" type="date" value="'+esc(a&&a.drop?a.drop.datum:'')+'"></div>'+
+      '</div>'+
+      '<div class="field"><label>'+T('rt.f.foto','Foto')+'</label><label class="obtn" style="cursor:pointer;">📷 '+T('rt.f.kiesfoto','Kies foto')+'<input type="file" id="rArtFoto" accept="image/*" style="display:none;"></label> <span id="rArtFotoNaam" style="font-size:0.75rem;color:var(--muted);">'+(a&&a.foto?T('rt.fotoaanwezig','foto aanwezig'):'')+'</span></div>'+
+      '<div style="margin-top:0.8rem;display:flex;gap:0.5rem;"><button class="obtn primary" id="rArtBewaar">'+T('rt.bewaar','Bewaar artikel')+'</button><button class="obtn" id="rArtAnnuleer">'+T('rt.annuleer','Annuleer')+'</button></div></div>';
+  }
+  function retailVoorraadView(){
+    let html = '<div class="card"><div class="tt-h">'+T('rt.zoekvoorraad','Voorraad opzoeken')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="rZoek" placeholder="'+T('rt.zoekph','Naam, kleur of maat…')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.9rem;color:var(--txt);outline:none;"><button class="obtn primary" id="rZoekBtn">'+T('rt.zoek','Zoek')+'</button></div>'+
+      '<div id="rZoekUit" style="margin-top:0.6rem;"></div></div>';
+    // alle varianten met snelle bijstelknoppen
+    html += '<div class="card"><div class="tt-h">'+T('rt.allevoorraad','Alle voorraad')+'</div><div style="margin-top:0.5rem;">'+
+      (retailData.artikelen||[]).map(a => '<div style="margin-bottom:0.7rem;"><div style="font-size:0.85rem;font-weight:600;margin-bottom:0.3rem;">'+esc(a.naam)+'</div>'+
+        (a.varianten||[]).map(v => retailVariantRij(v)).join('')+'</div>').join('') + '</div></div>';
+    return html;
+  }
+  function retailVariantRij(v){
+    return '<div class="mitem" style="display:flex;align-items:center;gap:0.5rem;"><div style="flex:1;min-width:0;"><div class="nm">'+esc(v.kleur)+' · '+esc(v.maat)+'</div><div class="ds">'+esc(v.vsku)+'</div></div>'+
+      '<button class="obtn" data-rvmin="'+esc(v.vsku)+'">−</button>'+
+      '<span style="min-width:2ch;text-align:center;font-weight:700;color:'+(v.voorraad<=3?'var(--amber)':'var(--txt)')+';">'+v.voorraad+'</span>'+
+      '<button class="obtn" data-rvplus="'+esc(v.vsku)+'">+</button></div>';
+  }
+  function retailClienteling(canEdit){
+    if (retailKlant) return retailKlantDossier(canEdit);
+    const kl = retailData.klanten || [];
+    let html = '<div class="card"><div class="tt-h">'+T('rt.klantdossier','Clienteling')+' ('+kl.length+')</div>'+
+      '<p class="ds" style="margin:0.4rem 0 0.2rem;">'+T('rt.clienteltip','Het geheime wapen van elk modehuis: maten, verlanglijst, aankoophistorie en stylist-notities per klant.')+'</p>'+
+      (kl.length ? '<div style="margin-top:0.5rem;display:grid;gap:0.4rem;">'+kl.map(k => '<button class="mitem" data-rklant="'+esc(k.key)+'" style="text-align:left;width:100%;background:var(--card);border:1px solid var(--line);cursor:pointer;"><div class="r1"><span class="nm">'+esc(k.codenaam||k.key)+'</span><span class="pr">'+geld(k.besteedTotaal)+'</span></div><div class="ds">'+k.aankopen+' '+T('rt.aankopen','aankopen')+' · '+(k.wishlist?k.wishlist.length:0)+' '+T('rt.opverlang','op verlanglijst')+'</div></button>').join('')+'</div>'
+        : '<div class="empty">'+T('rt.geenklant','Nog geen klantdossiers. Ze ontstaan zodra u een klant erbij pakt op de vloer (PDA) of een verkoop op naam boekt.')+'</div>')+'</div>';
+    return html;
+  }
+  function retailKlantDossier(canEdit){
+    const k = retailKlant;
+    const maten = retailData.maten || [];
+    let html = '<div style="margin-bottom:0.6rem;"><button class="obtn" id="rKlantTerug">← '+T('rt.terug','Terug')+'</button></div>';
+    html += '<div class="card"><div class="r1"><span class="nm" style="font-size:1rem;">'+esc(k.codenaam||k.key)+'</span><span class="pr">'+geld(k.besteedTotaal)+'</span></div>'+
+      '<div class="ds">'+k.aankopen+' '+T('rt.aankopen','aankopen')+(k.sinds?' · '+T('rt.klantsinds','klant sinds')+' '+esc(String(k.sinds).slice(0,10)):'')+'</div></div>';
+    // maten + voorkeuren
+    html += '<div class="card"><div class="tt-h">'+T('rt.maten2','Maten & voorkeuren')+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.4rem;margin-top:0.5rem;">'+
+      ['Boven','Onder','Schoen','Jurk','Confectie'].map(cat => '<div class="field" style="margin:0;"><label>'+T('rt.mt.'+cat.toLowerCase(),cat)+'</label><input class="rMaatIn" data-rmaatcat="'+cat+'" value="'+esc((k.maten&&k.maten[cat])||'')+'" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem;font-size:0.85rem;color:var(--txt);outline:none;"></div>').join('')+'</div>'+
+      '<div class="field"><label>'+T('rt.voorkeuren','Voorkeuren')+'</label><textarea id="rVoorkeuren" rows="2">'+esc(k.voorkeuren||'')+'</textarea></div>'+
+      '<button class="obtn primary" id="rMatenBewaar">'+T('rt.bewaarmaten','Bewaar maten')+'</button></div>';
+    // verlanglijst
+    html += '<div class="card"><div class="tt-h">'+T('rt.verlanglijst','Verlanglijst')+'</div>'+
+      ((k.wishlist&&k.wishlist.length) ? '<div style="margin-top:0.5rem;display:grid;gap:0.4rem;">'+k.wishlist.map(w => '<div class="mitem"><div class="r1"><span class="nm">'+esc(w.naam)+'</span><span class="pr">'+geld(w.price)+'</span></div></div>').join('')+'</div>'
+        : '<div class="empty">'+T('rt.geenverlang','Nog niets op de verlanglijst.')+'</div>')+'</div>';
+    // historie
+    html += '<div class="card"><div class="tt-h">'+T('rt.historie','Aankoophistorie')+'</div>'+
+      ((k.historie&&k.historie.length) ? '<div style="margin-top:0.5rem;">'+k.historie.slice().reverse().map(h => '<div class="mitem"><div class="r1"><span class="nm">'+esc(h.naam)+'</span><span class="pr">'+geld(h.bedrag)+'</span></div><div class="ds">'+esc(String(h.at).slice(0,10))+'</div></div>').join('')+'</div>'
+        : '<div class="empty">'+T('rt.geenhist','Nog geen aankopen.')+'</div>')+'</div>';
+    // notities
+    html += '<div class="card"><div class="tt-h">'+T('rt.notities','Stylist-notities')+'</div>'+
+      ((k.notities&&k.notities.length) ? '<div style="margin-top:0.5rem;">'+k.notities.slice().reverse().map(n => '<div class="mitem"><div class="ds" style="color:var(--txt);">'+esc(n.tekst)+'</div><div class="ds">'+esc(n.door||'Team')+' · '+esc(String(n.at).slice(0,10))+'</div></div>').join('')+'</div>' : '')+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="rNotitie" placeholder="'+T('rt.notitieph','Nieuwe notitie…')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.85rem;color:var(--txt);outline:none;"><button class="obtn primary" id="rNotitieAdd">'+T('rt.voegtoe','Voeg toe')+'</button></div></div>';
+    // stylingvoorstel sturen
+    html += '<div class="card"><div class="tt-h">'+T('rt.styling','Stylingvoorstel sturen')+'</div>'+
+      '<p class="ds" style="margin:0.3rem 0;">'+T('rt.stylingtip','Kies artikelen; ze verschijnen als voorstel in de app van de klant.')+'</p>'+
+      '<div style="max-height:180px;overflow-y:auto;display:grid;gap:0.3rem;margin-top:0.4rem;">'+(retailData.artikelen||[]).map(a => '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;"><input type="checkbox" class="rStylPick" value="'+a.id+'"> '+esc(a.naam)+' · '+geld(a.price)+'</label>').join('')+'</div>'+
+      '<div class="field"><label>'+T('rt.stylingtitel','Titel')+'</label><input id="rStylTitel" value="'+T('rt.stylingtiteldef','Een selectie voor u')+'"></div>'+
+      '<div class="field"><label>'+T('rt.stylingbericht','Bericht')+'</label><input id="rStylBericht" placeholder="'+T('rt.stylingberichtph','Optioneel persoonlijk bericht')+'"></div>'+
+      '<button class="obtn primary" id="rStylStuur">'+T('rt.stuurstyling','Stuur voorstel')+'</button></div>';
+    return html;
+  }
+  function retailBindActions(el, canEdit){
+    el.querySelectorAll('[data-rpkbreng]').forEach(b => b.addEventListener('click', async () => {
+      const paskamer = prompt(T('rt.welkepaskamer','In welke paskamer? (optioneel)')) || '';
+      try { await API.call('/supplier/retail/paskamer/breng', { id: b.dataset.rpkbreng, paskamer }); toast(T('rt.gebracht','Gemarkeerd als gebracht.')); await laadRetail(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-rrelease]').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await API.call('/supplier/retail/drop/release', { artikelId: b.dataset.rrelease }); toast(T('rt.gereleased','Drop is live')+(r.bericht?' · '+r.bericht+' '+T('rt.opwachtlijst','op de wachtlijst geinformeerd'):'')); await laadRetail(); } catch(e){ toast(e.message); }
+    }));
+    // collecties
+    const colAdd = el.querySelector('#rColAdd');
+    if (colAdd) colAdd.addEventListener('click', async () => {
+      try { await API.call('/supplier/retail/collectie', { naam: $('#rColNaam').value, seizoen: $('#rColSeiz').value, jaar: Number($('#rColJaar').value) }); toast(T('rt.colok','Collectie toegevoegd.')); await laadRetail(); } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-rcoldel]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm(T('rt.colweg','Deze collectie verwijderen?'))) return;
+      try { await API.call('/supplier/retail/collectie', { action:'remove', id: b.dataset.rcoldel }); await laadRetail(); } catch(e){ toast(e.message); }
+    }));
+    // artikelen
+    const artNieuw = el.querySelector('#rArtNieuw');
+    if (artNieuw) artNieuw.addEventListener('click', () => { retailArtBewerk = 'nieuw'; renderRetail(); const f = $('#rArtForm'); if (f) f.scrollIntoView({ behavior:'smooth' }); });
+    el.querySelectorAll('[data-rartedit]').forEach(b => b.addEventListener('click', () => { retailArtBewerk = b.dataset.rartedit; renderRetail(); const f = $('#rArtForm'); if (f) f.scrollIntoView({ behavior:'smooth' }); }));
+    el.querySelectorAll('[data-rartdel]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm(T('rt.artweg','Dit artikel verwijderen?'))) return;
+      try { await API.call('/supplier/retail/artikel', { action:'remove', id: b.dataset.rartdel }); toast(T('rt.artwegok','Artikel verwijderd.')); retailArtBewerk = null; await laadRetail(); } catch(e){ toast(e.message); }
+    }));
+    // artikel-formulier
+    let artFotoData = null;
+    el.querySelectorAll('[data-rmaat]').forEach(b => b.addEventListener('click', () => b.classList.toggle('primary')));
+    const artFoto = el.querySelector('#rArtFoto');
+    if (artFoto) artFoto.addEventListener('change', () => { if (artFoto.files && artFoto.files[0]) fileToDataURL(artFoto.files[0], d => { artFotoData = d; const n = $('#rArtFotoNaam'); if (n) n.textContent = T('rt.fotogekozen','foto gekozen'); }); });
+    const artAnn = el.querySelector('#rArtAnnuleer');
+    if (artAnn) artAnn.addEventListener('click', () => { retailArtBewerk = null; renderRetail(); });
+    const artBewaar = el.querySelector('#rArtBewaar');
+    if (artBewaar) artBewaar.addEventListener('click', async () => {
+      const naam = $('#rArtNaam').value.trim();
+      if (!naam) return toast(T('rt.geefnaam','Geef het artikel een naam.'));
+      const maten = [...el.querySelectorAll('[data-rmaat].primary')].map(b => b.dataset.rmaat);
+      if (!maten.length) return toast(T('rt.kiesmaat','Kies minstens een maat.'));
+      const kleuren = $('#rArtKleuren').value.split(',').map(s => s.trim()).filter(Boolean);
+      if (!kleuren.length) kleuren.push('Zwart');
+      const start = Math.max(0, parseInt($('#rArtVoorraad').value, 10) || 0);
+      const bestaand = retailArtBewerk === 'nieuw' ? null : (retailData.artikelen||[]).find(x => x.id === retailArtBewerk);
+      const bestaandeV = {}; if (bestaand) (bestaand.varianten||[]).forEach(v => { bestaandeV[v.kleur+'|'+v.maat] = v.voorraad; });
+      const varianten = [];
+      for (const kl of kleuren) for (const m of maten) varianten.push({ kleur: kl, maat: m, voorraad: bestaand ? (bestaandeV[kl+'|'+m] != null ? bestaandeV[kl+'|'+m] : start) : start });
+      const dropDatum = $('#rArtDrop').value;
+      const artikel = { naam, sku: $('#rArtSku').value, categorie: $('#rArtCat').value, materiaal: $('#rArtMat').value,
+        omschrijving: $('#rArtOms').value, publiekePrijs: Number($('#rArtPrijs').value) || 0, collectieId: $('#rArtColl').value || null,
+        varianten, drop: dropDatum ? { datum: dropDatum, tijd: '10:00' } : null };
+      if (artFotoData) artikel.foto = artFotoData;
+      const body = { artikel }; if (bestaand) body.id = bestaand.id;
+      try { await API.call('/supplier/retail/artikel', body); toast(T('rt.artok','Artikel bewaard.')); retailArtBewerk = null; await laadRetail(); openTab('retail'); } catch(e){ toast(e.message); }
+    });
+    // voorraad
+    const zoekBtn = el.querySelector('#rZoekBtn');
+    const doeZoek = async () => {
+      try { const r = await API.call('/supplier/retail/zoek', { q: $('#rZoek').value }); const uit = $('#rZoekUit');
+        uit.innerHTML = r.resultaten.length ? r.resultaten.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikel)+'</span><span class="pr" style="color:'+(v.laag?'var(--amber)':'var(--txt)')+';">'+v.voorraad+'</span></div><div class="ds">'+esc(v.kleur)+' · '+T('rt.maat','maat')+' '+esc(v.maat)+' · '+geld(v.price)+'</div></div>').join('') : '<div class="empty">'+T('rt.nietsgevonden','Niets gevonden.')+'</div>';
+      } catch(e){ toast(e.message); }
+    };
+    if (zoekBtn) zoekBtn.addEventListener('click', doeZoek);
+    const zoekIn = el.querySelector('#rZoek'); if (zoekIn) zoekIn.addEventListener('keydown', e => { if (e.key === 'Enter') doeZoek(); });
+    const pasVoorraad = async (vsku, delta) => { try { await API.call('/supplier/retail/voorraad', { vsku, delta }); await laadRetail(); } catch(e){ toast(e.message); } };
+    el.querySelectorAll('[data-rvmin]').forEach(b => b.addEventListener('click', () => pasVoorraad(b.dataset.rvmin, -1)));
+    el.querySelectorAll('[data-rvplus]').forEach(b => b.addEventListener('click', () => pasVoorraad(b.dataset.rvplus, 1)));
+    // clienteling
+    el.querySelectorAll('[data-rklant]').forEach(b => b.addEventListener('click', async () => {
+      try { retailKlant = (await API.call('/supplier/retail/klant', { key: b.dataset.rklant })).klant; renderRetail(); } catch(e){ toast(e.message); }
+    }));
+    const klTerug = el.querySelector('#rKlantTerug'); if (klTerug) klTerug.addEventListener('click', () => { retailKlant = null; renderRetail(); });
+    const matBew = el.querySelector('#rMatenBewaar');
+    if (matBew) matBew.addEventListener('click', async () => {
+      const maten = {}; el.querySelectorAll('.rMaatIn').forEach(i => { if (i.value.trim()) maten[i.dataset.rmaatcat] = i.value.trim(); });
+      try { await API.call('/supplier/retail/klant/maten', { key: retailKlant.key, maten, voorkeuren: $('#rVoorkeuren').value }); toast(T('rt.matenok','Maten bewaard.')); retailKlant = (await API.call('/supplier/retail/klant', { key: retailKlant.key })).klant; renderRetail(); } catch(e){ toast(e.message); }
+    });
+    const notAdd = el.querySelector('#rNotitieAdd');
+    if (notAdd) notAdd.addEventListener('click', async () => {
+      const tekst = $('#rNotitie').value.trim(); if (!tekst) return;
+      try { await API.call('/supplier/retail/klant/notitie', { key: retailKlant.key, tekst }); retailKlant = (await API.call('/supplier/retail/klant', { key: retailKlant.key })).klant; renderRetail(); } catch(e){ toast(e.message); }
+    });
+    const stylStuur = el.querySelector('#rStylStuur');
+    if (stylStuur) stylStuur.addEventListener('click', async () => {
+      const artikelIds = [...el.querySelectorAll('.rStylPick:checked')].map(c => c.value);
+      if (!artikelIds.length) return toast(T('rt.kiesart','Kies minstens een artikel.'));
+      try { await API.call('/supplier/retail/styling', { key: retailKlant.key, artikelIds, titel: $('#rStylTitel').value, bericht: $('#rStylBericht').value }); toast(T('rt.stylok','Voorstel verstuurd naar de klant.')); renderRetail(); } catch(e){ toast(e.message); }
+    });
+  }
+
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
@@ -2598,7 +2880,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderVastgoed(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderVastgoed(); renderRetail(); renderContracten(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -4051,7 +4333,7 @@
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
-    source.addEventListener('sync', e => { refresh(); });
+    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); });
     source.addEventListener('notify', e => {
       const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
       if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }
@@ -4460,7 +4742,46 @@ window.I18N = { en: {
   'bz.code':'code', 'bz.geen':'No ongoing deliveries yet. Paid orders appear here live.', 'bz.assort':'Range',
   'bz.leeg':'No products yet. Add them below; then the service can open.', 'bz.f.naam':'Product',
   'bz.f.naamph':'E.g. paella to take away', 'bz.f.desc':'Description', 'bz.f.descph':'Short and clear',
-  'bz.f.prijs':'Price (€)', 'bz.f.voeg':'Add', 'bz.f.ok':'The product is in the range.'
+  'bz.f.prijs':'Price (€)', 'bz.f.voeg':'Add', 'bz.f.ok':'The product is in the range.',
+  // --- Retail / mode (leverancier) ---
+  'tab.retail':'Fashion', 'sup.v.retail':'Fashion & retail',
+  'sup.v.retail.sub':'Your collections, articles with variants, stock and drops, and the clienteling file for your customers.',
+  'rt.sec.overzicht':'Overview', 'rt.sec.catalogus':'Collections', 'rt.sec.voorraad':'Stock', 'rt.sec.clienteling':'Clients',
+  'rt.los':'Loose articles', 'rt.vandaag':'Today', 'rt.omzet':'revenue', 'rt.bonnen':'receipts', 'rt.klanten':'clients',
+  'rt.artikelen':'articles', 'rt.voorraad':'items in stock', 'rt.vloer':'on the floor',
+  'rt.bestsellers':'Bestsellers', 'rt.geenverkoop':'No sales yet today.',
+  'rt.sellthrough':'Sell-through per collection', 'rt.verkocht':'sold', 'rt.opvoorraad':'in stock',
+  'rt.bijbestel':'Reorder (low stock)', 'rt.maat':'size', 'rt.voorraadok':'All sizes amply in stock.',
+  'rt.paskamer':'Fitting-room requests', 'rt.breng':'Mark delivered', 'rt.drops':'Announced drops', 'rt.release':'Release now',
+  'rt.collecties':'Collections', 'rt.verwijder':'Remove', 'rt.geencoll':'No collections yet.',
+  'rt.f.collnaam':'Name', 'rt.f.collnaamph':'E.g. Riviera', 'rt.f.seizoen':'Season', 'rt.f.jaar':'Year', 'rt.f.voeg':'Add',
+  'rt.artikelen2':'Articles', 'rt.drop':'drop', 'rt.totvoorraad':'stock', 'rt.bewerk':'Edit', 'rt.geenart':'No articles yet.',
+  'rt.nieuwart':'+ New article', 'rt.bewerkart':'Edit article', 'rt.nieuwart2':'New article',
+  'rt.f.naam':'Name', 'rt.f.naamph':'E.g. Silk slip dress', 'rt.f.sku':'SKU', 'rt.optioneel':'optional',
+  'rt.f.cat':'Category', 'rt.f.catph':'E.g. Dresses', 'rt.f.materiaal':'Material', 'rt.f.materiaalph':'E.g. 100% silk',
+  'rt.f.prijs':'Public price (€)', 'rt.f.coll':'Collection', 'rt.f.oms':'Description',
+  'rt.f.kleuren':'Colours (commas)', 'rt.f.kleurenph':'E.g. Black, Ivory, Camel', 'rt.f.maten':'Sizes',
+  'rt.f.startvoorraad':'Start stock per size', 'rt.f.drop':'Drop date', 'rt.f.foto':'Photo', 'rt.f.kiesfoto':'Choose photo',
+  'rt.fotoaanwezig':'photo present', 'rt.fotogekozen':'photo chosen', 'rt.bewaar':'Save article', 'rt.annuleer':'Cancel',
+  'rt.zoekvoorraad':'Look up stock', 'rt.zoekph':'Name, colour or size…', 'rt.zoek':'Search',
+  'rt.allevoorraad':'All stock', 'rt.nietsgevonden':'Nothing found.',
+  'rt.klantdossier':'Clienteling', 'rt.clienteltip':'Every fashion house’s secret weapon: sizes, wishlist, purchase history and stylist notes per customer.',
+  'rt.aankopen':'purchases', 'rt.opverlang':'on wishlist',
+  'rt.geenklant':'No client files yet. They appear as soon as you pull up a customer on the floor (PDA) or ring up a sale in their name.',
+  'rt.terug':'Back', 'rt.klantsinds':'client since', 'rt.maten2':'Sizes & preferences',
+  'rt.mt.boven':'Top', 'rt.mt.onder':'Bottom', 'rt.mt.schoen':'Shoe', 'rt.mt.jurk':'Dress', 'rt.mt.confectie':'Suit',
+  'rt.voorkeuren':'Preferences', 'rt.bewaarmaten':'Save sizes',
+  'rt.verlanglijst':'Wishlist', 'rt.geenverlang':'Nothing on the wishlist yet.',
+  'rt.historie':'Purchase history', 'rt.geenhist':'No purchases yet.',
+  'rt.notities':'Stylist notes', 'rt.notitieph':'New note…', 'rt.voegtoe':'Add',
+  'rt.styling':'Send styling proposal', 'rt.stylingtip':'Pick articles; they appear as a proposal in the customer’s app.',
+  'rt.stylingtitel':'Title', 'rt.stylingtiteldef':'A selection for you', 'rt.stylingbericht':'Message',
+  'rt.stylingberichtph':'Optional personal message', 'rt.stuurstyling':'Send proposal',
+  'rt.welkepaskamer':'Which fitting room? (optional)', 'rt.gebracht':'Marked as delivered.',
+  'rt.gereleased':'Drop is live', 'rt.opwachtlijst':'notified on the waitlist', 'rt.colok':'Collection added.',
+  'rt.colweg':'Remove this collection?', 'rt.artweg':'Remove this article?', 'rt.artwegok':'Article removed.',
+  'rt.geefnaam':'Give the article a name.', 'rt.kiesmaat':'Pick at least one size.', 'rt.artok':'Article saved.',
+  'rt.matenok':'Sizes saved.', 'rt.kiesart':'Pick at least one article.', 'rt.stylok':'Proposal sent to the customer.'
 } };
 </script>
 <script src="/apps/translate.js"></script>

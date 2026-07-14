@@ -186,6 +186,11 @@
         <p class="sub" data-i18n="pd.v.entree.sub">Het programma van vandaag en de entree-check, op uw naam.</p>
         <div id="entreeWrap"></div>
       </div>
+      <div class="view" data-view="winkel">
+        <h2 data-i18n="pd.v.winkel">Winkelvloer</h2>
+        <p class="sub" data-i18n="pd.v.winkel.sub">Voorraad opzoeken, een klant erbij pakken, apart leggen, paskamer en de mobiele kassa.</p>
+        <div id="winkelWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -199,6 +204,7 @@
       <button data-tab="hulp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span data-i18n="pd.t.hulp">Hulp</span></button>
       <button data-tab="ritten" id="tabRitten" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M7.5 20v1M16.5 20v1"/></svg><span data-i18n="pd.t.ritten">Ritten</span></button>
       <button data-tab="entree" id="tabEntree" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H6a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M12 6v2M12 11v2M12 16v2"/></svg><span data-i18n="pd.t.entree">Entree</span></button>
+      <button data-tab="winkel" id="tabWinkel" style="display:none;"><svg viewBox="0 0 24 24"><path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/></svg><span data-i18n="pd.t.winkel">Vloer</span></button>
       <button data-tab="bezorgen" id="tabBezorgen" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/></svg><span data-i18n="pd.t.bezorgen">Bezorgen</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
@@ -223,7 +229,8 @@
     { id:'zzp', icon:'🧑‍🎨', nl:'Zelfstandig', en:'Independent', sub:'Mode, health, en meer', codes:['AYAKA','KAITO'] },
     { id:'activiteiten', icon:'🎟️', nl:'Activiteiten', en:'Experiences', sub:'Tours, musea, experiences', codes:['ESVEDRA','MACE'] },
     { id:'verhuur', icon:'🚗', nl:'Autoverhuur', en:'Car rental', sub:'Vloot, uitgifte, inname', codes:['ISLAREN'] },
-    { id:'vastgoed', icon:'🏡', nl:'Vastgoed', en:'Real estate', sub:'Makelaar, bezichtigingen', codes:['IBIZALIV'] }
+    { id:'vastgoed', icon:'🏡', nl:'Vastgoed', en:'Real estate', sub:'Makelaar, bezichtigingen', codes:['IBIZALIV'] },
+    { id:'mode', icon:'🛍️', nl:'Mode & retail', en:'Fashion & retail', sub:'Modehuizen, merken, winkels', codes:['MAISON'] }
   ];
   const BEDRIJVEN = {
     KIKUNOI:{ name:'Sal de Mar', icon:'🍽️' }, PONTO:{ name:'Sunset Ibiza', icon:'🍸' },
@@ -233,7 +240,8 @@
     AYAKA:{ name:'Atelier Marfil', icon:'🧑‍🎨' }, KAITO:{ name:'Studio Milan', icon:'🏋️' },
     ESVEDRA:{ name:'Es Vedra Cruises', icon:'⛵' }, MACE:{ name:'MACE Museum Eivissa', icon:'🏛️' },
     ISLAREN:{ name:'Isla Rent Ibiza', icon:'🚗' },
-    IBIZALIV:{ name:'Ibiza Living Estates', icon:'🏡' }
+    IBIZALIV:{ name:'Ibiza Living Estates', icon:'🏡' },
+    MAISON:{ name:'Maison Solène', icon:'🛍️' }
   };
 
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
@@ -301,7 +309,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -801,6 +809,120 @@
 
   /* ---- entree: programma van vandaag + check-in op eigen naam ---- */
   let pdProgramma = null;
+  // ---- winkelvloer (retail) ----
+  let pdRetail = null;      // retail-toestand van het merk (voorraad, paskamer, apart)
+  let winkelKlant = null;   // geopend klantdossier op de vloer
+  let winkelCart = [];      // mobiele kassa: [{vsku, naam, kleur, maat, price, aantal}]
+  const heeftRetail = () => !!(state && state.supplier && (state.supplier.caps || []).includes('retail'));
+  const eur = n => '€ ' + Number(n||0).toLocaleString('nl-NL');
+  async function laadWinkel(){
+    if (!heeftRetail()) return;
+    try { pdRetail = (await API.call('/supplier/retail', {})).retail; } catch(e){ pdRetail = { artikelen:[], paskamer:[], apart:[], klanten:[], stats:{} }; }
+    renderWinkel();
+  }
+  function winkelInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;font-size:0.95rem;color:var(--txt);outline:none;font-family:inherit;">'; }
+  function renderWinkel(){
+    const tabBtn = document.getElementById('tabWinkel');
+    if (tabBtn) tabBtn.style.display = heeftRetail() ? '' : 'none';
+    const wrap = $('#winkelWrap');
+    if (!wrap) return;
+    if (!heeftRetail()){ wrap.innerHTML = ''; return; }
+    if (!pdRetail){ wrap.innerHTML = '<div class="card">…</div>'; laadWinkel(); return; }
+    let html = '';
+    // mobiele kassa (bon)
+    const cartTot = winkelCart.reduce((n, r) => n + r.price * r.aantal, 0);
+    html += '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.w.kassa','Mobiele kassa')+
+      (winkelKlant?'<span style="color:var(--gold);font-size:0.66rem;">'+esc(winkelKlant.codenaam||winkelKlant.key)+'</span>':'')+'</div>'+
+      (winkelCart.length ? '<div style="margin-top:0.5rem;">'+winkelCart.map((r,i) => '<div class="task"><span class="ic">👕</span><div class="t"><b>'+esc(r.naam)+'</b><span>'+esc(r.kleur)+' · '+esc(r.maat)+' · '+eur(r.price)+' × '+r.aantal+'</span></div><button class="abtn ghost" data-wcartdel="'+i+'">✕</button></div>').join('')+
+        '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.6rem;font-size:1rem;"><span>'+T('pd.w.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
+        '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;"><button class="abtn" data-wbetaal="pin" style="flex:1;">'+T('pd.w.pin','Pin')+'</button><button class="abtn" data-wbetaal="contant" style="flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.w.contant','Contant')+'</button></div>'+
+        '<button class="abtn ghost" id="wCartLeeg" style="margin-top:0.5rem;width:100%;">'+T('pd.w.leeg','Bon leegmaken')+'</button></div>'
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.w.leegbon','Zoek een artikel en tik + om het op de bon te zetten.')+'</div>')+'</div>';
+    // voorraad opzoeken
+    html += '<div class="card"><div class="k">'+T('pd.w.zoek','Voorraad opzoeken')+'</div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wZoek', T('pd.w.zoekph','Naam, kleur of maat…'))+'<button class="abtn" id="wZoekBtn">'+T('pd.w.zoekbtn','Zoek')+'</button></div>'+
+      '<div id="wZoekUit" style="margin-top:0.5rem;"></div></div>';
+    // paskamerverzoeken
+    const pk = pdRetail.paskamer || [];
+    html += '<div class="card"><div class="k">'+T('pd.w.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
+      (pk.length ? pk.map(v => '<div class="task"><span class="ic">🚪</span><div class="t"><b>'+esc(v.artikelNaam)+' · '+esc(v.maat)+'</b><span>'+esc(v.codenaam||'Gast')+' · '+esc(v.kleur)+(v.paskamer?' · '+esc(v.paskamer):'')+'</span></div><button class="abtn" data-wbreng="'+v.id+'">'+T('pd.w.breng','Gebracht')+'</button></div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.w.geenpk','Geen open verzoeken.')+'</div>')+'</div>';
+    // apart gelegd
+    const ap = pdRetail.apart || [];
+    if (ap.length) html += '<div class="card"><div class="k">'+T('pd.w.apart','Apart gelegd')+' ('+ap.length+')</div>'+
+      ap.map(r => '<div class="task"><span class="ic">🛍</span><div class="t"><b>'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</b><span>'+esc(r.codenaam||r.key)+' · '+T('pd.w.tot','tot')+' '+esc(r.tot)+'</span></div></div>').join('')+'</div>';
+    // klant erbij pakken
+    html += '<div class="card"><div class="k">'+T('pd.w.klant','Klant erbij pakken')+'</div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wKlantKey', T('pd.w.klantph','Codenaam of sleutel van het lid'))+'<button class="abtn" id="wKlantBtn">'+T('pd.w.open','Open')+'</button></div>'+
+      '<div id="wKlantUit" style="margin-top:0.5rem;">'+(winkelKlant?winkelKlantKaart(winkelKlant):'')+'</div></div>';
+    wrap.innerHTML = html;
+    winkelBind(wrap);
+  }
+  function winkelKlantKaart(k){
+    const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
+    return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;">'+
+      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
+      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('pd.w.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
+      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
+      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;color:var(--txt);margin-top:0.35rem;">💛 '+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
+      '</div>';
+  }
+  function winkelBind(wrap){
+    // kassa
+    wrap.querySelectorAll('[data-wcartdel]').forEach(b => b.addEventListener('click', () => { winkelCart.splice(Number(b.dataset.wcartdel), 1); renderWinkel(); }));
+    const leeg = wrap.querySelector('#wCartLeeg'); if (leeg) leeg.addEventListener('click', () => { winkelCart = []; renderWinkel(); });
+    wrap.querySelectorAll('[data-wbetaal]').forEach(b => b.addEventListener('click', async () => {
+      if (!winkelCart.length) return;
+      const body = { method: b.dataset.wbetaal, regels: winkelCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
+      if (winkelKlant) body.klantKey = winkelKlant.key;
+      try {
+        const r = await API.call('/supplier/retail/verkoop', body);
+        toast('✅ '+T('pd.w.verkocht','Verkocht')+' · '+eur(r.sale.total));
+        winkelCart = [];
+        if (winkelKlant){ try { winkelKlant = (await API.call('/supplier/retail/klant', { key: winkelKlant.key })).klant; } catch(e){} }
+        await laadWinkel();
+      } catch(e){ toast(e.message); }
+    }));
+    // zoeken
+    const doeZoek = async () => {
+      const uit = wrap.querySelector('#wZoekUit');
+      try {
+        const r = await API.call('/supplier/retail/zoek', { q: wrap.querySelector('#wZoek').value });
+        uit.innerHTML = r.resultaten.length ? r.resultaten.map(v =>
+          '<div class="task"><span class="ic">'+(v.voorraad>0?'👕':'🚫')+'</span><div class="t"><b>'+esc(v.artikel)+'</b><span>'+esc(v.kleur)+' · '+esc(v.maat)+' · '+eur(v.price)+' · '+T('pd.w.voorraad','voorraad')+' '+v.voorraad+'</span></div>'+
+          '<div style="display:flex;gap:0.3rem;">'+
+          (v.voorraad>0?'<button class="abtn" data-wadd="'+esc(v.vsku)+'" data-wnaam="'+esc(v.artikel)+'" data-wkleur="'+esc(v.kleur)+'" data-wmaat="'+esc(v.maat)+'" data-wprice="'+v.price+'">+</button>':'')+
+          (v.voorraad>0?'<button class="abtn ghost" data-wapart="'+esc(v.vsku)+'">'+T('pd.w.legapart','Apart')+'</button>':'')+
+          '</div></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.w.niets','Niets gevonden.')+'</div>';
+        // knoppen in de resultaten binden
+        uit.querySelectorAll('[data-wadd]').forEach(b => b.addEventListener('click', () => {
+          const bestaand = winkelCart.find(r => r.vsku === b.dataset.wadd);
+          if (bestaand) bestaand.aantal++;
+          else winkelCart.push({ vsku: b.dataset.wadd, naam: b.dataset.wnaam, kleur: b.dataset.wkleur, maat: b.dataset.wmaat, price: Number(b.dataset.wprice), aantal: 1 });
+          renderWinkel();
+        }));
+        uit.querySelectorAll('[data-wapart]').forEach(b => b.addEventListener('click', async () => {
+          if (!winkelKlant) return toast(T('pd.w.eerstklant','Pak eerst een klant erbij.'));
+          try { await API.call('/supplier/retail/apart', { key: winkelKlant.key, vsku: b.dataset.wapart }); toast(T('pd.w.apartok','Apart gelegd voor de klant.')); await laadWinkel(); } catch(e){ toast(e.message); }
+        }));
+      } catch(e){ toast(e.message); }
+    };
+    const zb = wrap.querySelector('#wZoekBtn'); if (zb) zb.addEventListener('click', doeZoek);
+    const zi = wrap.querySelector('#wZoek'); if (zi) zi.addEventListener('keydown', e => { if (e.key === 'Enter') doeZoek(); });
+    // paskamer gebracht
+    wrap.querySelectorAll('[data-wbreng]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/retail/paskamer/breng', { id: b.dataset.wbreng }); toast(T('pd.w.gebracht','Gebracht.')); await laadWinkel(); } catch(e){ toast(e.message); }
+    }));
+    // klant openen
+    const kb = wrap.querySelector('#wKlantBtn');
+    const openKlant = async () => {
+      const key = wrap.querySelector('#wKlantKey').value.trim(); if (!key) return;
+      try { winkelKlant = (await API.call('/supplier/retail/klant', { key })).klant; renderWinkel(); }
+      catch(e){ toast(e.message); }
+    };
+    if (kb) kb.addEventListener('click', openKlant);
+    const ki = wrap.querySelector('#wKlantKey'); if (ki) ki.addEventListener('keydown', e => { if (e.key === 'Enter') openKlant(); });
+  }
   const heeftEntree = () => !!(state && state.supplier && (state.supplier.caps || []).includes('tickets'));
   async function laadEntree(){
     if (!heeftEntree()) return;
@@ -1029,7 +1151,7 @@
     if (!window.EventSource) return;
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
-      src.addEventListener('sync', () => refresh());
+      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); });
       src.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
       src.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
       src.addEventListener('alarm', e => { const d=JSON.parse(e.data); if (d.from !== me.name) showAlarm(d); });
@@ -1131,7 +1253,19 @@ window.I18N = { en: {
   'pd.net.sub':'Separate space. Only businesses your manager has connected.', 'pd.net.open':'tap to chat',
   'pd.net.inc':'wants to connect', 'pd.accept':'Accept', 'pd.net.mgr':'manager decides', 'pd.net.wait':'awaiting approval',
   'pd.net.none':'No connections yet.', 'pd.net.code':'Company code', 'pd.net.connect':'Connect', 'pd.net.linked':'Connected.',
-  'pd.net.sent':'Request sent.', 'pd.net.nomsg':'No messages yet.', 'pd.net.msgph':'Message'
+  'pd.net.sent':'Request sent.', 'pd.net.nomsg':'No messages yet.', 'pd.net.msgph':'Message',
+  // --- Winkelvloer (retail) ---
+  'pd.t.winkel':'Floor', 'pd.v.winkel':'Shop floor',
+  'pd.v.winkel.sub':'Look up stock, pull up a customer, put items aside, fitting room and the mobile register.',
+  'pd.w.kassa':'Mobile register', 'pd.w.totaal':'Total', 'pd.w.pin':'Card', 'pd.w.contant':'Cash',
+  'pd.w.leeg':'Clear receipt', 'pd.w.leegbon':'Search an article and tap + to add it to the receipt.',
+  'pd.w.zoek':'Look up stock', 'pd.w.zoekph':'Name, colour or size…', 'pd.w.zoekbtn':'Search',
+  'pd.w.paskamer':'Fitting-room requests', 'pd.w.breng':'Delivered', 'pd.w.geenpk':'No open requests.',
+  'pd.w.apart':'Put aside', 'pd.w.tot':'until', 'pd.w.klant':'Pull up a customer',
+  'pd.w.klantph':"Member's codename or key", 'pd.w.open':'Open', 'pd.w.aankopen':'purchases',
+  'pd.w.voorraad':'stock', 'pd.w.legapart':'Aside', 'pd.w.niets':'Nothing found.',
+  'pd.w.verkocht':'Sold', 'pd.w.gebracht':'Delivered.', 'pd.w.eerstklant':'Pull up a customer first.',
+  'pd.w.apartok':'Put aside for the customer.'
 } };
 </script>
 <script src="/shared/i18n.js"></script>

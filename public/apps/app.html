@@ -2898,9 +2898,14 @@
     let data;
     try { data = await API.call('/supplier/menu/get', { code }); }
     catch (e) { toast(e.message); return; }
-    menuState = { supplier: data.supplier, menu: data.menu, alcohol: data.alcohol || null, qty: {}, note: '', tag: false, table: '' };
+    menuState = { supplier: data.supplier, menu: data.menu, alcohol: data.alcohol || null, qty: {}, note: '', tag: false, table: '', retail: null, retailMijn: null };
     $('#msName').textContent = data.supplier.name;
     $('#msMeta').textContent = tType(data.supplier.typeLabel) + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
+    // mode-/retailpartner: haal de catalogus en de eigen apart/styling erbij
+    if ((data.supplier.caps || []).includes('retail')){
+      try { menuState.retail = await API.call('/retail/catalogus', { supplierCode: code }); } catch(e){}
+      try { menuState.retailMijn = await API.call('/retail/mijn', {}); } catch(e){}
+    }
     renderMenuSheet();
     $('#menu-sheet').classList.add('open');
     $('#menu-scrim').classList.add('open');
@@ -2953,8 +2958,9 @@
           '</div></div>'
         ).join('')
       : '';
+    const retailBlock = menuState.retail ? retailMenuBlock() : '';
     const cats = [...new Set(m.map(x => x.cat))];
-    $('#msBody').innerHTML = head + eventsBlock + applyBlock + cats.map(c =>
+    $('#msBody').innerHTML = head + retailBlock + eventsBlock + applyBlock + cats.map(c =>
       '<div class="ms-cat">' + c + '</div>' + m.filter(x => x.cat === c).map(x => {
         const q = menuState.qty[x.id] || 0;
         // alcohol op slot: onder de landsgrens (paspoortleeftijd) niet bestelbaar
@@ -3002,6 +3008,7 @@
         toast('🪑 ' + T('erv.reserveerok','Reservering aangevraagd voor') + ' ' + d.reservering.datum + ' ' + d.reservering.tijd + '. ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
       } catch(e){ toast(e.message); }
     });
+    if (menuState.retail) bindRetailMenu();
     $('#msBody').querySelectorAll('.ms-item').forEach(el => {
       const id = el.dataset.id;
       const plus = el.querySelector('.js-plus'), min = el.querySelector('.js-minus');
@@ -3043,6 +3050,66 @@
     if (mf) mf.addEventListener('change', e => menuState.fooi = e.target.value);
     const ob = $('#msOrder');
     if (count) ob.addEventListener('click', placeOrder);
+  }
+
+  // ---- mode-/retailcatalogus in de partner-sheet ----
+  function retailMenuBlock(){
+    const r = menuState.retail;
+    const mijn = menuState.retailMijn || { apart: [], styling: [] };
+    let html = '<div class="ms-cat">🛍 ' + T('rt.m.cat','Collectie') + '</div>';
+    // eigen apart-artikelen en stylingvoorstellen bij dit merk
+    const apart = (mijn.apart || []).filter(a => a.supplierName === r.supplier.name);
+    if (apart.length) html += '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">' + T('rt.m.apart','Voor u apart gelegd') + '</div>' +
+      apart.map(a => '<div style="font-size:0.82rem;margin-top:0.3rem;">' + esc(a.artikelNaam) + ' · ' + esc(a.kleur) + ', ' + esc(a.maat) + ' <span style="color:var(--soft);">(' + T('rt.m.tot','tot') + ' ' + esc(a.tot) + ')</span></div>').join('') + '</div>';
+    const styling = (mijn.styling || []).filter(v => v.supplierName === r.supplier.name);
+    if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">✨ ' + esc(v.titel) + '</div>' +
+      (v.bericht ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + esc(v.bericht) + '</div>' : '') +
+      '<div style="font-size:0.8rem;margin-top:0.3rem;">' + v.items.map(i => esc(i.naam)).join(' · ') + '</div><div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + T('rt.m.van','van') + ' ' + esc(v.van) + '</div></div>').join('');
+    // de artikelen
+    const now = Date.now();
+    html += (r.artikelen || []).map(a => {
+      const drop = a.drop && a.drop.releaseMs > now;
+      const bes = a.beschikbaar || [];
+      return '<div style="border:1px solid var(--line);border-radius:16px;padding:0.8rem;margin-bottom:0.7rem;" data-rart="' + escAttr(a.id) + '">' +
+        '<div style="display:flex;gap:0.8rem;">' +
+        (a.foto ? '<img src="' + escAttr(a.foto) + '" alt="' + escAttr(a.naam) + '" style="width:72px;height:92px;object-fit:cover;border-radius:10px;flex-shrink:0;">' : '<div style="width:72px;height:92px;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem;">👗</div>') +
+        '<div style="flex:1;min-width:0;">' +
+        '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.92rem;">' + esc(a.naam) + '</b>' +
+        '<button class="rt-fav" data-rfav="' + escAttr(a.id) + '" style="background:none;border:none;font-size:1.1rem;flex-shrink:0;cursor:pointer;" aria-label="' + T('rt.m.verlang','Verlanglijst') + '">' + (a.opWishlist ? '💛' : '🤍') + '</button></div>' +
+        '<div style="font-size:0.78rem;color:var(--soft);">' + esc(a.categorie || '') + (a.materiaal ? ' · ' + esc(a.materiaal) : '') + '</div>' +
+        (a.kleuren && a.kleuren.length ? '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.2rem;">' + a.kleuren.map(k => esc(k)).join(' · ') + '</div>' : '') +
+        '<div style="font-weight:600;margin-top:0.3rem;">' + eur(a.price) + '</div>' +
+        (drop ? '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.3rem;">⏳ ' + T('rt.m.drop','Drop') + ' ' + esc(a.drop.datum) + ' ' + esc(a.drop.tijd) + '</div>' : '') +
+        '</div></div>' +
+        (!drop && bes.length ? '<div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.6rem;flex-wrap:wrap;">' +
+          '<span style="font-size:0.72rem;color:var(--soft);">' + T('rt.m.paskamer','Vraag een maat in de paskamer:') + '</span>' +
+          '<select class="rt-maat" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.6rem;font-size:0.8rem;color:var(--txt);">' +
+          bes.map(v => '<option value="' + escAttr(v.vsku) + '">' + esc(v.kleur) + ' · ' + esc(v.maat) + '</option>').join('') + '</select>' +
+          '<button class="vbtn rt-pas" data-rpas="' + escAttr(a.id) + '">' + T('rt.m.vraag','Vraag') + '</button></div>'
+          : (drop ? '' : '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.5rem;">' + T('rt.m.uitverkocht','Tijdelijk uitverkocht.') + '</div>')) +
+        '</div>';
+    }).join('');
+    return html;
+  }
+  function bindRetailMenu(){
+    const code = menuState.supplier.code;
+    document.querySelectorAll('[data-rfav]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/retail/wishlist', { code, artikelId: b.dataset.rfav });
+        b.textContent = d.wishlist ? '💛' : '🤍';
+        const a = (menuState.retail.artikelen || []).find(x => x.id === b.dataset.rfav); if (a) a.opWishlist = d.wishlist;
+        toast(d.wishlist ? T('rt.m.opverlang','Op uw verlanglijst. De boetiek ziet het.') : T('rt.m.afverlang','Van uw verlanglijst gehaald.'));
+      } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-rpas]').forEach(b => b.addEventListener('click', async () => {
+      const card = b.closest('[data-rart]');
+      const sel = card ? card.querySelector('.rt-maat') : null;
+      if (!sel || !sel.value) return;
+      try {
+        await API.call('/retail/paskamer', { code, vsku: sel.value });
+        toast('🚪 ' + T('rt.m.pasok','Uw maat is aangevraagd. Een medewerker brengt hem naar de paskamer.'));
+      } catch(e){ toast(e.message); }
+    }));
   }
 
   async function placeOrder(){
@@ -4760,6 +4827,12 @@ window.I18N = { en: {
   'erv.reserveerok':'Reservation requested for', 'erv.zaakbevestigt':'The venue will confirm shortly.',
   'erv.wachtlijst':'Waiting list', 'erv.wlok':'You are on the waiting list (no. ', 'erv.wlbericht':'We will tell you the moment a spot opens up.',
   'erv.fooi':'Tip', 'erv.fooi.geen':'No tip', 'erv.fooi.team':'Tip for the team', 'erv.fooivoorteam':'tip for the team.',
+  // --- Mode-/retailcatalogus (leden-app) ---
+  'rt.m.cat':'Collection', 'rt.m.apart':'Put aside for you', 'rt.m.tot':'until', 'rt.m.van':'from',
+  'rt.m.drop':'Drop', 'rt.m.verlang':'Wishlist', 'rt.m.paskamer':'Request a size in the fitting room:',
+  'rt.m.vraag':'Request', 'rt.m.uitverkocht':'Temporarily sold out.',
+  'rt.m.opverlang':'On your wishlist. The boutique sees it.', 'rt.m.afverlang':'Removed from your wishlist.',
+  'rt.m.pasok':'Your size is requested. A staff member brings it to the fitting room.',
   'erv.agenda':'My itinerary', 'erv.heledag':'all day',
   'erv.punten':'RTG points', 'erv.puntensaldo':'points', 'erv.tegoed':'credit (applies automatically)',
   'erv.puntenuitleg':'1 point per EUR 10; 100 points = EUR 10 credit. RTG covers it, the venue receives the full amount.',

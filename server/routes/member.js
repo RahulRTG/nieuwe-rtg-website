@@ -5,7 +5,8 @@ module.exports = (kern) => {
     reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview, reviewsVoor,
     toggleFavoriet, favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits,
     zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
-    voorkeurVan, zetVoorkeur } = kern;
+    voorkeurVan, zetVoorkeur,
+    retailCatalogus, wishlistToggle, mijnApart, mijnStyling, vraagPaskamer, retailIsRetail } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -1631,6 +1632,32 @@ app.post('/api/punten/verzilver', auth, (req, res) => {
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);
 });
+
+/* ---- retail/mode: de catalogus van een modehuis, verlanglijst, apart en styling ---- */
+// de catalogus van een merk (collecties + artikelen met ledenprijs, drops, wishlist)
+app.post('/api/retail/catalogus', auth, (req, res) => {
+  const s = findSupplier(req.body.supplierCode);
+  if (!s || !retailIsRetail(s)) return res.status(404).json({ error: 'Modepartner niet gevonden.' });
+  res.json(retailCatalogus(s, req.session.key, req.body.lang));
+});
+// een artikel op de verlanglijst zetten of eraf halen
+app.post('/api/retail/wishlist', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = wishlistToggle(String(req.body.supplierCode || ''), req.session.key, String(req.body.artikelId || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+// een maat naar een paskamer laten brengen (in de winkel, vanuit de app)
+app.post('/api/retail/paskamer', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const s = findSupplier(req.body.supplierCode);
+  if (!s || !retailIsRetail(s)) return res.status(404).json({ error: 'Modepartner niet gevonden.' });
+  const r = vraagPaskamer(s, req.session.key, liveCodename(req.session), req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+// wat er voor mij apart ligt, en de stylingvoorstellen die ik kreeg
+app.post('/api/retail/mijn', auth, (req, res) => res.json({ apart: mijnApart(req.session.key), styling: mijnStyling(req.session.key) }));
 
 // meldingsvoorkeuren: per scope aan of uit (afgedwongen in notify)
 app.post('/api/meldingen/voorkeur', auth, (req, res) => {

@@ -20,7 +20,13 @@
            health en het bewijs dat een idempotente betaling ook NA de herstart
            niet dubbel afschrijft.
 
-   Draai: node scripts/orkaan.js   (STORE=sqlite; ~6-8 minuten) */
+   Draai: node scripts/orkaan.js   (STORE=sqlite; ~6-8 minuten)
+
+   Gevonden plafond (bewust gedocumenteerd): bij 3M gids-entries kost elke
+   save() van de embedded store seconden (de hele collectie wordt per save
+   geserialiseerd) en verdringt hij al het andere werk. Boven ~1,5M gids-
+   entries is de Postgres-ledengids de weg; de 10M-populatie zelf (activiteit
+   tot user-10.000.000) draait wel gewoon door de storm heen. */
 const { spawn } = require('child_process');
 const fs = require('fs'), os = require('os'), path = require('path'), crypto = require('crypto');
 const http = require('http');
@@ -45,6 +51,7 @@ const N_REVIEWS    = Number(process.env.ORKAAN_REVIEWS || 60000);
 const N_INCIDENTEN = Number(process.env.ORKAAN_INCIDENTEN || 40000);
 const DUUR_MS      = Number(process.env.ORKAAN_DUUR || 90000);
 const LEDEN_ACTORS = Number(process.env.ORKAAN_LEDEN || 96);
+const HARD_MS      = Number(process.env.ORKAAN_TIMEOUT || 880000);
 
 const ENV = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
   RTG_STORE: 'sqlite', NODE_OPTIONS: '--max-old-space-size=10240',
@@ -52,7 +59,7 @@ const ENV = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: '
 
 let child = null;
 const cleanup = () => { try { if (child) child.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} };
-setTimeout(() => { console.log('\nHARD TIMEOUT'); cleanup(); process.exit(1); }, 880000);
+setTimeout(() => { console.log('\nHARD TIMEOUT'); cleanup(); process.exit(1); }, HARD_MS);
 
 const kop = t => console.log('\n\x1b[1m' + t + '\x1b[0m');
 const rij = (l, v) => console.log('  ' + l.padEnd(40) + v);

@@ -6,7 +6,7 @@
    zijn positie. Aangevuld met vaartuig-specifieke zaken: motoruren en brandstof in
    plaats van km/tank, de ligplaats, en bemand (met schipper) of bareboat varen. */
 module.exports = (kern) => {
-  const { app, crypto, db, express, logActivity, managerOnly, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth } = kern;
+  const { app, crypto, db, express, logActivity, managerOnly, media, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth } = kern;
 
   const BOOT_TYPES = ['Motorjacht', 'Zeiljacht', 'Catamaran', 'RIB', 'Sloep'];
   function isCharter(s, res) {
@@ -105,7 +105,7 @@ module.exports = (kern) => {
     res.json({ fotos: db.data.charterFotos[c.ref] || { voor: [], na: [] } });
   });
 
-  app.post('/api/supplier/charter/foto', express.json({ limit: '1.5mb' }), supplierAuth, (req, res) => {
+  app.post('/api/supplier/charter/foto', express.json({ limit: '1.5mb' }), supplierAuth, async (req, res) => {
     const s = req.supplier;
     if (!isCharter(s, res)) return;
     const c = charterVan(s, req.body.ref);
@@ -118,7 +118,10 @@ module.exports = (kern) => {
       return res.status(400).json({ error: 'Stuur een foto (jpeg/png/webp, tot ~300 kB).' });
     const f = fotosVan(c.ref);
     if (f[fase].filter(x => x.door !== 'gast').length >= 8) return res.status(400).json({ error: 'Tot acht foto\'s per kant.' });
-    f[fase].push({ foto, door: req.actor.name, at: new Date().toISOString() });
+    // De foto naar de mediastore; in db.data komt alleen de /media-verwijzing.
+    const ref = await media.bewaarPubliek(foto, 400000);
+    if (!ref) return res.status(400).json({ error: 'De foto kon niet worden opgeslagen.' });
+    f[fase].push({ foto: ref, door: req.actor.name, at: new Date().toISOString() });
     save();
     sseToCustomer(c.customerKey || c.customerTier, 'sync', { scope: 'charter' });
     res.json({ ok: true, aantal: f[fase].length });

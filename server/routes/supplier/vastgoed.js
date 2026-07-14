@@ -1,6 +1,6 @@
 /* Domein "supplier" (deelmodule): vastgoed. Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, crypto, db, express, logActivity, keyVanCodenaam, managerOnly, notify, salonNaarVolgers, save, schoon, sseToCustomer, sseToSupplier, supplierAuth } = kern;
+  const { app, crypto, db, express, logActivity, keyVanCodenaam, managerOnly, media, notify, salonNaarVolgers, save, schoon, sseToCustomer, sseToSupplier, supplierAuth } = kern;
 
 /* ================== vastgoed: het makelaarskantoor ==================
    Panden aanbieden (gericht aan gekozen leden of publiek), biedingen,
@@ -56,7 +56,7 @@ app.post('/api/supplier/pand', supplierAuth, (req, res) => {
 });
 
 /* Een foto bij een pand (los opgeslagen, net als de huurfoto's). */
-app.post('/api/supplier/pand/foto', express.json({ limit: '1.5mb' }), supplierAuth, (req, res) => {
+app.post('/api/supplier/pand/foto', express.json({ limit: '1.5mb' }), supplierAuth, async (req, res) => {
   const s = req.supplier;
   if (!isVastgoed(s, res)) return;
   if (!managerOnly(req, res)) return;
@@ -66,7 +66,13 @@ app.post('/api/supplier/pand/foto', express.json({ limit: '1.5mb' }), supplierAu
   if (!/^data:image\/(jpeg|png|webp);base64,/.test(foto) || foto.length > 500000) return res.status(400).json({ error: 'Stuur een foto (tot ~400 kB).' });
   p.fotos = p.fotos || [];
   if (req.body.weg != null) { p.fotos.splice(Number(req.body.weg), 1); }
-  else { if (p.fotos.length >= 12) return res.status(400).json({ error: 'Tot 12 foto\'s per pand.' }); p.fotos.push(foto); }
+  else {
+    if (p.fotos.length >= 12) return res.status(400).json({ error: 'Tot 12 foto\'s per pand.' });
+    // De foto naar de mediastore; in db.data komt alleen de /media-verwijzing.
+    const ref = await media.bewaarPubliek(foto, 500000);
+    if (!ref) return res.status(400).json({ error: 'De foto kon niet worden opgeslagen.' });
+    p.fotos.push(ref);
+  }
   save();
   sseToSupplier(s.code, 'sync', { scope: 'vastgoed' });
   res.json({ ok: true, aantal: p.fotos.length });

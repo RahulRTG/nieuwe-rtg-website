@@ -15,7 +15,7 @@ module.exports = (kern) => {
     mbAanvraag, mbMijn,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
     zorgContact, fonds, munten, factuur, talen,
-    dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek } = kern;
+    dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -1558,7 +1558,7 @@ app.post('/api/huur/mijn', auth, (req, res) => {
 
 /* Foto's: de huurder legt de staat vast, voor de uitgifte en bij het
    inleveren. Eenmaal vastgelegd blijft een foto staan: dat is het bewijs. */
-app.post('/api/huur/foto', express.json({ limit: '1.5mb' }), auth, (req, res) => {
+app.post('/api/huur/foto', express.json({ limit: '1.5mb' }), auth, async (req, res) => {
   const h = mijnHuur(req, res); if (!h) return;
   const fase = req.body.fase === 'na' ? 'na' : 'voor';
   if (fase === 'voor' && h.status !== 'aangevraagd') return res.status(409).json({ error: 'Voor-foto\'s maak je voordat de auto is uitgegeven.' });
@@ -1568,7 +1568,10 @@ app.post('/api/huur/foto', express.json({ limit: '1.5mb' }), auth, (req, res) =>
     return res.status(400).json({ error: 'Stuur een foto (jpeg/png/webp, tot ~300 kB).' });
   const f = huurFotos(h.ref);
   if (f[fase].filter(x => x.door === 'huurder').length >= 8) return res.status(400).json({ error: 'Tot acht foto\'s per kant.' });
-  f[fase].push({ foto, door: 'huurder', at: new Date().toISOString() });
+  // De foto naar de mediastore; in db.data komt alleen de /media-verwijzing.
+  const ref = await media.bewaarPubliek(foto, 400000);
+  if (!ref) return res.status(400).json({ error: 'De foto kon niet worden opgeslagen.' });
+  f[fase].push({ foto: ref, door: 'huurder', at: new Date().toISOString() });
   save();
   sseToSupplier(h.supplierCode, 'sync', { scope: 'huur' });
   res.json({ ok: true, aantal: f[fase].length });
@@ -1696,7 +1699,7 @@ app.post('/api/charter/mijn', auth, (req, res) => {
   res.json({ charters: mijn });
 });
 
-app.post('/api/charter/foto', express.json({ limit: '1.5mb' }), auth, (req, res) => {
+app.post('/api/charter/foto', express.json({ limit: '1.5mb' }), auth, async (req, res) => {
   const c = mijnCharter(req, res); if (!c) return;
   const fase = req.body.fase === 'na' ? 'na' : 'voor';
   if (fase === 'voor' && c.status !== 'aangevraagd') return res.status(409).json({ error: 'Voor-foto\'s maakt u voordat u uitvaart.' });
@@ -1706,7 +1709,10 @@ app.post('/api/charter/foto', express.json({ limit: '1.5mb' }), auth, (req, res)
     return res.status(400).json({ error: 'Stuur een foto (jpeg/png/webp, tot ~300 kB).' });
   const f = charterFotos(c.ref);
   if (f[fase].filter(x => x.door === 'gast').length >= 8) return res.status(400).json({ error: 'Tot acht foto\'s per kant.' });
-  f[fase].push({ foto, door: 'gast', at: new Date().toISOString() });
+  // De foto naar de mediastore; in db.data komt alleen de /media-verwijzing.
+  const ref = await media.bewaarPubliek(foto, 400000);
+  if (!ref) return res.status(400).json({ error: 'De foto kon niet worden opgeslagen.' });
+  f[fase].push({ foto: ref, door: 'gast', at: new Date().toISOString() });
   save();
   sseToSupplier(c.supplierCode, 'sync', { scope: 'charter' });
   res.json({ ok: true, aantal: f[fase].length });

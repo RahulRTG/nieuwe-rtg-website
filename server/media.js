@@ -204,6 +204,10 @@ function maakMedia({ dir, env }) {
     for (const s of (db.data.suppliers || [])) {
       if (Array.isArray(s.photos)) { const out = []; for (const p of s.photos) out.push(await naarPubliek(p)); s.photos = out; }
       if (s.salon && s.salon.foto) s.salon.foto = await naarPubliek(s.salon.foto);
+      // vastgoed: de foto's per pand
+      for (const pand of (s.panden || [])) if (Array.isArray(pand.fotos)) { const out = []; for (const f of pand.fotos) out.push(await naarPubliek(f)); pand.fotos = out; }
+      // autoverkoop: de showroomfoto's per auto
+      if (s.verkoop && Array.isArray(s.verkoop.showroom)) for (const auto of s.verkoop.showroom) if (Array.isArray(auto.fotos)) { const out = []; for (const f of auto.fotos) out.push(await naarPubliek(f)); auto.fotos = out; }
     }
     for (const p of (db.data.posts || [])) {
       if (p.photo) p.photo = await naarPubliek(p.photo);
@@ -211,6 +215,12 @@ function maakMedia({ dir, env }) {
     }
     for (const s of (db.data.snaps || [])) if (s.foto) s.foto = await naarPrive(s.foto);
     for (const s of (db.data.stories || [])) if (s.foto) s.foto = await naarPrive(s.foto);
+    // verhuur- en charter-inspectiefoto's (voor/na), los per boeking
+    for (const map of [db.data.huurFotos, db.data.charterFotos]) {
+      for (const ref of Object.keys(map || {})) {
+        for (const fase of ['voor', 'na']) for (const item of ((map[ref] && map[ref][fase]) || [])) if (item && item.foto) item.foto = await naarPubliek(item.foto);
+      }
+    }
     return n;
   }
 

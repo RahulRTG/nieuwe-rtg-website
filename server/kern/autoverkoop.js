@@ -16,7 +16,7 @@ const KETEN_KOOP = { aangevraagd: 'aanvaard', aanvaard: 'getekend', getekend: 'a
 const KLAAR = { gereden: true, afgeleverd: true, afgewezen: true, geannuleerd: true };
 const BRANDSTOF = ['Benzine', 'Diesel', 'Hybride', 'Elektrisch'];
 
-function maakAutoverkoop({ db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice }) {
+function maakAutoverkoop({ db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, media }) {
   const id = (p) => (p || 'V') + crypto.randomBytes(4).toString('hex').toUpperCase();
   const nu = () => new Date().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
@@ -39,7 +39,7 @@ function maakAutoverkoop({ db, save, crypto, findSupplier, notify, notifySupplie
     ver(s).aan = aan !== false; save();
     return { status: 200, ok: true, aan: ver(s).aan };
   }
-  function zetAuto(s, data) {
+  async function zetAuto(s, data) {
     if (!isVerkoopBedrijf(s)) return { status: 409, error: 'Autoverkoop hoort bij een verhuur/autobedrijf.' };
     const v = ver(s);
     const merk = schoon(data.merk, 40);
@@ -58,7 +58,18 @@ function maakAutoverkoop({ db, save, crypto, findSupplier, notify, notifySupplie
     a.opties = Array.isArray(data.opties) ? data.opties.map(o => schoon(o, 40)).filter(Boolean).slice(0, 30) : (a.opties || []);
     a.garantieMnd = getal(data.garantieMnd, 0, 120, a.garantieMnd != null ? a.garantieMnd : 12);
     a.historie = schoon(data.historie, 400) || a.historie || '';
-    if (Array.isArray(data.fotos)) a.fotos = data.fotos.filter(f => typeof f === 'string' && /^data:image\//.test(f) && f.length < 900 * 1024).slice(0, 8);
+    if (Array.isArray(data.fotos)) {
+      // De showroomfoto's naar de mediastore; in db.data alleen /media-verwijzingen.
+      // Bestaande verwijzingen (geen data:-URL) blijven zoals ze zijn.
+      const uit = [];
+      for (const f of data.fotos.slice(0, 8)) {
+        if (typeof f !== 'string') continue;
+        if (media && media.isRef(f)) { uit.push(f); continue; }
+        const ref = media ? await media.bewaarPubliek(f, 900 * 1024) : null;
+        if (ref) uit.push(ref);
+      }
+      a.fotos = uit;
+    }
     if (!Array.isArray(a.fotos)) a.fotos = [];
     a.vip = data.vip === true;
     a.status = ['te koop', 'gereserveerd', 'verkocht'].includes(data.status) ? data.status : (a.status || 'te koop');

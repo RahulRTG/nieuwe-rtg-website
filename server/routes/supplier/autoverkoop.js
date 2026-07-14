@@ -14,9 +14,9 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json({ ok: true, aan: r.aan });
   });
-  app.post('/api/supplier/verkoop/auto', supplierAuth, express.json({ limit: '8mb' }), (req, res) => {
+  app.post('/api/supplier/verkoop/auto', supplierAuth, express.json({ limit: '8mb' }), async (req, res) => {
     if (!managerOnly(req, res)) return;
-    const r = avZetAuto(req.supplier, req.body || {});
+    const r = await avZetAuto(req.supplier, req.body || {});
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json({ ok: true, auto: r.auto, overzicht: avDealerInbox(req.supplier.code) });
   });

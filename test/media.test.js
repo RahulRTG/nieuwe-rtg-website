@@ -49,14 +49,22 @@ test('module: serveer streamt met het juiste type; migreer verplaatst bestaande 
   assert.equal(code, 400, 'geen directory-traversal');
 
   const db = { data: {
-    suppliers: [{ code: 'A', photos: [PNG, PNG], salon: { foto: PNG } }],
+    suppliers: [{ code: 'A', photos: [PNG, PNG], salon: { foto: PNG },
+      panden: [{ fotos: [PNG] }], verkoop: { showroom: [{ fotos: [PNG, PNG] }] } }],
     posts: [{ photo: PNG, folder: { fotos: [PNG] } }],
     snaps: [{ foto: PNG }],
-    stories: [{ foto: SVG }]
+    stories: [{ foto: SVG }],
+    huurFotos: { R1: { voor: [{ foto: PNG }], na: [] } },
+    charterFotos: { C1: { voor: [], na: [{ foto: PNG }] } }
   } };
   const n = await media.migreerDb(db);
-  assert.equal(n, 6, 'zes echte foto\'s verplaatst (svg-placeholder niet)');
+  // salon(2+1) + post(1+1) + snap(1) + pand(1) + showroom(2) + huur(1) + charter(1) = 11
+  assert.equal(n, 11, 'elf echte foto\'s verplaatst (svg-placeholder niet)');
   assert.ok(db.data.suppliers[0].photos.every(p => p.startsWith('/media/')), 'pagina-foto\'s zijn /media-URLs');
+  assert.ok(db.data.suppliers[0].panden[0].fotos[0].startsWith('/media/'), 'vastgoed-foto is een /media-URL');
+  assert.ok(db.data.suppliers[0].verkoop.showroom[0].fotos.every(f => f.startsWith('/media/')), 'showroomfoto\'s zijn /media-URLs');
+  assert.ok(db.data.huurFotos.R1.voor[0].foto.startsWith('/media/'), 'verhuur-inspectiefoto is een /media-URL');
+  assert.ok(db.data.charterFotos.C1.na[0].foto.startsWith('/media/'), 'charter-inspectiefoto is een /media-URL');
   assert.ok(!db.data.snaps[0].foto.startsWith('data:'), 'snap-foto is geen base64 meer');
   assert.equal(db.data.stories[0].foto, SVG, 'svg-placeholder blijft ongemoeid');
 });

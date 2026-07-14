@@ -971,6 +971,7 @@ function initRealtime() {
   if (!db.data.applications) db.data.applications = {};            // sollicitaties per bedrijf
   if (!db.data.vacatures) db.data.vacatures = {};                  // openstaande vacatures per bedrijf (ook zichtbaar in de RTFoundation)
   if (!db.data.applyChats) db.data.applyChats = {};                // chat tussen sollicitant en werkgever (na uitnodigen/aannemen)
+  if (!db.data.onboarding) db.data.onboarding = { scopes: {}, profielen: {} }; // verplichte intake + contract per scope (platform 'rtg' of leverancier-code)
   if (!db.data.snaps) db.data.snaps = [];                          // Snapchat-achtige snaps: foto die na bekijken verdwijnt
   if (!db.data.stories) db.data.stories = [];                      // 24-uurs verhalen, zichtbaar voor vrienden
   if (!db.data.blocks) db.data.blocks = [];                        // { door, doel, at } geblokkeerde codenamen (beide kanten dicht)
@@ -1409,6 +1410,9 @@ function eisAccount(req, res) {
 
 // De sociale kern (vrienden, veiligheid, snaps) zit in server/kern/sociaal.js.
 const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media });
+// Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
+// account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
+const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon });
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
 } = sociaal;
@@ -2143,7 +2147,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
@@ -2222,6 +2226,9 @@ for (const naam of gekozenDomeinen) {
   if (!ALLE_DOMEINEN.includes(naam)) { console.warn('[start] onbekend domein overgeslagen:', naam); continue; }
   require('./routes/' + naam)(kern);
 }
+// De verplichte onboarding + het contract raken leden, gasten, de eigenaar en
+// leveranciers; net als de infra-endpoints draait dit altijd mee.
+require('./routes/onboarding')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

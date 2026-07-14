@@ -481,6 +481,16 @@
   .note-soft{margin-top:0.7rem;font-size:0.72rem;color:var(--soft);}
   .txt-md{font-size:0.95rem;color:var(--txt);}
   .soft-xs{font-size:0.7rem;color:var(--soft);}
+  /* Rustig, inklapbaar functieblok (zelfde beeld als de RTG Boardroom): een rij
+     aan/uit-schakelaars vat zich samen tot "X/Y aan" en verschijnt alleen als er
+     iets uit staat of de gebruiker het blok opent. Zo blijven veel opties
+     overzichtelijk in plaats van een muur van knoppen. */
+  .func-kop{display:flex;align-items:center;gap:0.5rem;width:100%;text-align:left;background:none;border:none;padding:0.5rem 0;font-family:inherit;cursor:pointer;color:var(--txt);}
+  .func-kop .func-chev{color:var(--soft);font-size:0.7rem;width:0.9rem;flex-shrink:0;}
+  .func-kop .func-naam{flex:1;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);font-weight:700;}
+  .func-tel{font-size:0.68rem;font-weight:600;color:var(--soft);white-space:nowrap;}
+  .func-tel.let{color:var(--amber);}
+  .func-body{margin-bottom:1rem;}
 </style>
 </head>
 <body>
@@ -1757,11 +1767,12 @@
         if (caps2.includes('rides')) rijen.push(['ritten', T('sw.ritten','Ritaanvragen'), T('sw.ritten.s','Nieuwe ritten aannemen via de app'), optAan('ritten')]);
         if (caps2.includes('doors')) rijen.push(['deurenGast', T('sw.deuren','Digitale gastsleutel'), T('sw.deuren.s','Gearriveerde gasten openen zelf de voordeur'), optAan('deurenGast')]);
         if (horeca) rijen.push(['events', T('sw.events','Event-aanmeldingen'), T('sw.events.s','Leden kunnen zich aanmelden voor uw events'), optAan('events')]);
+        const swRows = rijen.map(r =>
+          '<div class="st-row"><span>'+r[1]+'<span class="sub">'+r[2]+'</span></span>'+
+          '<button class="obtn'+(r[3]?' primary':' warn')+'" data-kopt="'+r[0]+'" data-val="'+(r[3]?'0':'1')+'">'+(r[3]?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>').join('');
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>🎛 '+T('sw.h','Baas over uw zaak')+'</h3>'+
           '<div class="tkc-who">'+T('sw.s','Zet elke functie aan of uit wanneer u dat wilt. Alleen betalen via de app staat altijd aan; het moment (vooraf of achteraf) bepaalt u zelf.')+'</div>'+
-          rijen.map(r =>
-            '<div class="st-row"><span>'+r[1]+'<span class="sub">'+r[2]+'</span></span>'+
-            '<button class="obtn'+(r[3]?' primary':' warn')+'" data-kopt="'+r[0]+'" data-val="'+(r[3]?'0':'1')+'">'+(r[3]?T('sw.aan','Aan'):T('sw.uit','Uit'))+'</button></div>').join('')+
+          funcBlok(T('sw.blok','Schakelaars'), rijen.map(r => ({ aan: r[3] })), swRows)+
           '<div class="st-row"><span>'+T('sw.apppay','Betalen via de app')+'<span class="sub">'+T('sw.apppay.s','Vast onderdeel van elk RTG-partnerschap')+'</span></span>'+
           '<span class="pill klaar">'+T('sw.altijd','Altijd aan')+'</span></div></div>';
         const maxD = Math.max.apply(null, b.week.map(d => d.omzet).concat([1]));
@@ -2224,6 +2235,7 @@
       } catch(e){ box.innerHTML = '<div class="tkc-who">' + esc(e.message) + '</div>'; }
     });
     // schakelaars van de zaak: elke functie aan of uit, direct doorgevoerd
+    wireFuncBlok(el);
     el.querySelectorAll('[data-kopt]').forEach(b => b.addEventListener('click', async () => {
       const k = b.dataset.kopt, v = b.dataset.val === '1';
       b.disabled = true;
@@ -3084,9 +3096,10 @@
     let d; try { d = await API.call('/supplier/groothandel/overzicht'); } catch(e){ return; }
     const cats = d.categorieen || [];
     // functie-schakelaars
-    let h = '<div class="st-sec">'+T('gh.functies','Uw functies (aan/uit)')+'</div><div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">' +
+    const ghChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">' +
       (d.functies||[]).map(f => '<button class="js-ghf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--line)')+';background:'+(f.aan?'#12321f':'var(--card2)')+';color:'+(f.aan?'#7EE0A3':'var(--soft)')+';border-radius:999px;padding:0.32rem 0.7rem;font-size:0.72rem;font-weight:600;font-family:inherit;">'+esc(f.naam)+'</button>').join('') +
       '</div>';
+    let h = funcBlok(T('gh.functies','Uw functies (aan/uit)'), d.functies||[], ghChips);
     // binnenkomende orders
     const ink = d.inkomend || { open:[], afgerond:[], omzet:0 };
     h += '<div class="st-sec">'+T('gh.orders','Bestellingen')+' · '+T('gh.omzet','omzet')+' '+eur(ink.omzet||0)+'</div>';
@@ -3101,6 +3114,7 @@
       '<div class="sub">'+T('gh.inkoop','inkoop')+' '+eur(p.inkoopPrijs)+' · '+T('gh.consument','consument')+' '+eur(p.consumentPrijs)+' · '+T('gh.voorraad','voorraad')+' '+p.voorraad+(p.actief?'':' · <span style="color:var(--gold);">'+T('gh.uit','uit')+'</span>')+'</div></div>'+
       '<button class="js-ghedit" data-id="'+p.id+'" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.3rem 0.6rem;color:var(--txt);font-size:0.72rem;font-family:inherit;">'+T('gh.bewerk','Bewerk')+'</button></div>').join('');
     el.innerHTML = h;
+    wireFuncBlok(el);
     el.querySelectorAll('.js-ghf').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/groothandel/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); renderGroothandel(); } catch(e){ toast(e.message); }
     }));
@@ -3302,9 +3316,10 @@
   async function renderZaakBoard(){
     const el = $('#boardroomWrap'); if (!el) return;
     let d; try { d = await API.call('/supplier/zaak/board'); } catch(e){ return; }
-    let h = '<div class="st-sec">'+T('zb.functies','Functies (aan/uit)')+'</div><div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">'+
+    const zbChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
       (d.functies||[]).map(f => '<button class="js-zbf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--rood)')+';background:'+(f.aan?'#12321f':'#3a1420')+';color:'+(f.aan?'#7EE0A3':'#F4B8C6')+';border-radius:999px;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.aan?'● ':'○ ')+esc(f.naam)+'</button>').join('')+
       '</div>';
+    let h = funcBlok(T('zb.functies','Functies (aan/uit)'), d.functies||[], zbChips);
     // HR
     const hr = d.hr || {};
     h += '<div class="st-sec">👥 '+T('zb.hr','HR')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.6rem;">'+
@@ -3339,6 +3354,7 @@
         (ont.betalingen&&ont.betalingen.length? '<div class="sub" style="margin:0.4rem 0 0.3rem;">'+T('zb.recent','Recent binnen')+':</div>'+ont.betalingen.slice(0,6).map(b=>'<div style="display:flex;justify-content:space-between;gap:0.5rem;font-size:0.8rem;padding:0.2rem 0;"><span>'+esc(b.codename||'')+' · '+esc(b.omschrijving||'')+'</span><b>'+e2(b.bedrag)+'</b></div>').join(''):'');
     }
     el.innerHTML = h;
+    wireFuncBlok(el);
     el.querySelectorAll('.js-zbf').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/zaak/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); await refresh(); renderZaakBoard(); } catch(e){ toast(e.message); }
     }));
@@ -3356,6 +3372,31 @@
   }
   function zbCel(n, label, waarschuw){
     return '<div class="b" style="flex:1;min-width:4.5rem;"><div class="v'+(waarschuw?' a':'')+'">'+n+'</div><div class="l">'+label+'</div></div>';
+  }
+  /* Gedeeld met de Boardroom: vat een rij aan/uit-schakelaars samen tot een
+     rustige, inklapbare kop "titel · X/Y aan". Alleen open als er iets uit staat
+     (de uitzondering telt), of wanneer de gebruiker erop tikt. Zo lijken alle
+     schakelpanelen op elkaar en oogt veel opties nooit slordig. */
+  function funcBlok(titel, functies, chipsHTML){
+    const totaal = functies.length;
+    const aan = functies.filter(f => f.aan).length;
+    const uit = totaal - aan;
+    const afwijkt = uit > 0;
+    return '<button type="button" class="func-kop" data-funcblok>'+
+      '<span class="func-chev">'+(afwijkt?'▾':'▸')+'</span>'+
+      '<span class="func-naam">'+esc(titel)+'</span>'+
+      '<span class="func-tel'+(afwijkt?' let':'')+'">'+aan+'/'+totaal+' '+T('fb.aan','aan')+(uit?' · '+uit+' '+T('fb.uit','uit'):'')+'</span></button>'+
+      '<div class="func-body"'+(afwijkt?'':' hidden')+'>'+chipsHTML+'</div>';
+  }
+  /* Klap elk funcBlok in een container open/dicht (chevron mee). */
+  function wireFuncBlok(root){
+    if (!root) return;
+    root.querySelectorAll('[data-funcblok]').forEach(k => k.addEventListener('click', () => {
+      const body = k.nextElementSibling; if (!body) return;
+      const chev = k.querySelector('.func-chev');
+      const dicht = body.hidden; body.hidden = !dicht;
+      if (chev) chev.textContent = dicht ? '▾' : '▸';
+    }));
   }
 
   /* ---- het beveiligings-commandocentrum ---- */
@@ -3379,8 +3420,9 @@
       zbCel(cmd.incidentenOpen, T('bev.incidenten','Incidenten'), cmd.incidentenOpen)+'</div>';
     if (cmd.sosActief) h += '<div class="card" style="border:1px solid var(--rood);background:#3a1420;color:#F4B8C6;margin-bottom:0.8rem;font-weight:600;">🆘 '+T('bev.sos','Actieve SOS! Een bewaker heeft de noodknop ingedrukt. Bekijk het incident en stuur bijstand.')+'</div>';
     // 2) functies aan/uit
-    h += '<div class="st-sec">'+T('bev.func','Functies (aan/uit)')+'</div><div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">'+
+    const bevChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
       (cmd.functies||[]).map(f => '<button class="js-bevf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--rood)')+';background:'+(f.aan?'#12321f':'#3a1420')+';color:'+(f.aan?'#7EE0A3':'#F4B8C6')+';border-radius:999px;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.aan?'● ':'○ ')+esc(f.naam)+'</button>').join('')+'</div>';
+    h += funcBlok(T('bev.func','Functies (aan/uit)'), cmd.functies||[], bevChips);
     // 3) budget
     if (b.budgetUren){
       const kleur = b.overschrijding ? 'var(--rood)' : (b.pct>=85?'#E0A93A':'#7EE0A3');
@@ -3443,6 +3485,7 @@
           '<button class="bev-inc" data-id="'+x.id+'" style="align-self:flex-start;">'+(x.status==='open'?T('bev.afh','Afhandelen'):T('bev.heropen','Heropen'))+'</button></div>').join('')+'</div>';
     }
     el.innerHTML = h;
+    wireFuncBlok(el);
     // bindingen
     el.querySelectorAll('.js-bevf').forEach(x => x.addEventListener('click', async () => {
       try { await API.call('/supplier/beveiliging/functie', { id:x.dataset.id, aan: x.dataset.aan!=='true' }); renderBeveiliging(); } catch(e){ toast(e.message); }
@@ -5389,6 +5432,7 @@ window.I18N = { en: {
   'sw.deuren':'Digital guest key', 'sw.deuren.s':'Arrived guests open the front door themselves',
   'sw.events':'Event sign-ups', 'sw.events.s':'Members can sign up for your events',
   'sw.aan':'On', 'sw.uit':'Off', 'sw.apppay':'Paying via the app', 'sw.apppay.s':'A fixed part of every RTG partnership', 'sw.altijd':'Always on',
+  'sw.blok':'Switches', 'fb.aan':'on', 'fb.uit':'off',
   'kt.fin':'Accounting', 'fn.land':'Country & hourly wage',
   'fn.netto':'What you keep', 'fn.omzetmaand':'Revenue this month', 'fn.nulcom':'RTG charges 0% commission',
   'fn.minbtw':'VAT to remit', 'fn.minloon':'Staff costs', 'fn.overhoudt':'Left over (indication)',

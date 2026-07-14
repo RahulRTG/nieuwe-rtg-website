@@ -52,6 +52,11 @@ function valideer(env) {
     if (env.DATABASE_URL && !env.RTG_VAULT_KEY) waarschuwingen.push('RTG_VAULT_KEY niet gezet: bij meerdere instances kunnen ze elkaars versleutelde naam/e-mail niet ontsleutelen en klopt de e-mail-login-hash niet. Zet een gedeelde sleutel.');
     if (env.DATABASE_URL && !env.RTG_SECRET_KEY) waarschuwingen.push('RTG_SECRET_KEY niet gezet: sessietokens van de ene instance gelden dan niet op de andere.');
     if (!env.REDIS_URL) waarschuwingen.push('REDIS_URL niet gezet: realtime werkt alleen binnen één proces (niet over meerdere instances).');
+    // Media (Salon-foto's, snaps) op lokale schijf worden niet gedeeld tussen
+    // instances; bij meerdere instances is S3-compatibele opslag (of een gedeeld
+    // volume) nodig zodat elke server dezelfde foto's ziet.
+    if (env.DATABASE_URL && (env.RTG_MEDIA_BACKEND || '').toLowerCase() !== 's3')
+      waarschuwingen.push('RTG_MEDIA_BACKEND niet op "s3": Salon-foto\'s en snaps staan op de lokale schijf en worden niet tussen instances gedeeld. Zet S3-compatibele opslag (RTG_MEDIA_S3_*) of gebruik een gedeeld volume.');
     if (!env.SENTRY_DSN) waarschuwingen.push('SENTRY_DSN niet gezet: geen externe fout-tracking.');
     if (!env.SMTP_URL && !env.SMTP_HOST) waarschuwingen.push('Geen SMTP ingesteld: e-mail (herstel-links, bevestigingen) wordt niet echt verstuurd.');
     if (!env.STRIPE_SECRET_KEY) waarschuwingen.push('STRIPE_SECRET_KEY niet gezet: betalingen draaien in demo-stand (geen echt geld).');

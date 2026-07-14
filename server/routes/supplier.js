@@ -193,14 +193,14 @@ app.post('/api/supplier/room/remove', supplierAuth, (req, res) => {
   res.json({ ok: true, rooms: req.supplier.rooms || [] });
 });
 
-app.post('/api/supplier/photo/add', express.json({ limit: '6mb' }), supplierAuth, (req, res) => {
+app.post('/api/supplier/photo/add', express.json({ limit: '6mb' }), supplierAuth, async (req, res) => {
   const img = String(req.body.image || '');
   if (!/^data:image\/(jpeg|png|webp);base64,/.test(img)) return res.status(400).json({ error: 'Alleen JPG, PNG of WebP.' });
   if (img.length > 1.5 * 1024 * 1024) return res.status(413).json({ error: 'Foto te groot (max ~1 MB).' });
   req.supplier.photos = req.supplier.photos || [];
   if (req.supplier.photos.length >= 6) return res.status(409).json({ error: 'Maximaal 6 foto\'s. Verwijder er eerst een.' });
-  // Bewaar de foto als bestand op schijf; in db.data komt alleen de /media-URL.
-  const ref = media.bewaarPubliek(img, 1.5 * 1024 * 1024);
+  // Bewaar de foto in de mediastore (schijf of S3); in db.data komt alleen de /media-URL.
+  const ref = await media.bewaarPubliek(img, 1.5 * 1024 * 1024);
   if (!ref) return res.status(400).json({ error: 'Foto kon niet worden opgeslagen.' });
   req.supplier.photos.push(ref);
   save();
@@ -220,16 +220,16 @@ app.post('/api/supplier/photo/remove', supplierAuth, (req, res) => {
   res.json({ ok: true, count: (req.supplier.photos || []).length });
 });
 
-app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAuth, (req, res) => {
+app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAuth, async (req, res) => {
   if (!eisSalonProfiel(req, res)) return;
   const text = String(req.body.text || '').trim().slice(0, 600);
   if (!text) return res.status(400).json({ error: 'Schrijf eerst een tekst.' });
   let photo = null;
   const pi = parseInt(req.body.photoIndex, 10);
   // Een bestaande pagina-foto is al een /media-verwijzing; een nieuwe upload
-  // bewaren we als bestand en verwijzen we naar (nooit base64 in db.data).
+  // bewaren we in de mediastore en verwijzen we naar (nooit base64 in db.data).
   if (Number.isInteger(pi) && req.supplier.photos && req.supplier.photos[pi]) photo = req.supplier.photos[pi];
-  else if (typeof req.body.image === 'string') photo = media.bewaarPubliek(req.body.image, 1.5 * 1024 * 1024);
+  else if (typeof req.body.image === 'string') photo = await media.bewaarPubliek(req.body.image, 1.5 * 1024 * 1024);
   const post = {
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
@@ -310,15 +310,15 @@ app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
   res.json({ ok: true, postId: post.id });
 });
 
-app.post('/api/supplier/salon/bio', express.json({ limit: '2mb' }), supplierAuth, (req, res) => {
+app.post('/api/supplier/salon/bio', express.json({ limit: '2mb' }), supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
   const s = req.supplier;
   s.salon = s.salon || { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
   if (req.body.bio != null) s.salon.bio = schoon(req.body.bio, 200);
   // een profielfoto (etalage-omslag) mag mee; leeg laten wist hem niet. De foto
-  // gaat als bestand naar de mediastore; in db.data staat alleen de /media-URL.
+  // gaat naar de mediastore; in db.data staat alleen de /media-URL.
   if (typeof req.body.foto === 'string' && req.body.foto.startsWith('data:image/')) {
-    const ref = media.bewaarPubliek(req.body.foto, 1.5 * 1024 * 1024);
+    const ref = await media.bewaarPubliek(req.body.foto, 1.5 * 1024 * 1024);
     if (ref) s.salon.foto = ref;
   }
   save();
@@ -349,16 +349,17 @@ app.post('/api/supplier/salon/status', supplierAuth, (req, res) => {
 });
 
 // een folder (digitale brochure): titel + foto's + producten/hoogtepunten
-app.post('/api/supplier/salon/folder', express.json({ limit: '8mb' }), supplierAuth, (req, res) => {
+app.post('/api/supplier/salon/folder', express.json({ limit: '8mb' }), supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
   if (!eisSalonProfiel(req, res)) return;
   const titel = schoon(req.body.titel, 80);
   if (!titel) return res.status(400).json({ error: 'Geef de folder een titel.' });
-  // elke folderfoto als bestand bewaren; in db.data alleen de /media-URL's
-  const fotos = (Array.isArray(req.body.fotos) ? req.body.fotos : [])
-    .slice(0, 8)
-    .map(f => media.bewaarPubliek(f, 1.5 * 1024 * 1024))
-    .filter(Boolean);
+  // elke folderfoto naar de mediastore; in db.data alleen de /media-URL's
+  const fotos = [];
+  for (const f of (Array.isArray(req.body.fotos) ? req.body.fotos : []).slice(0, 8)) {
+    const ref = await media.bewaarPubliek(f, 1.5 * 1024 * 1024);
+    if (ref) fotos.push(ref);
+  }
   const items = (Array.isArray(req.body.items) ? req.body.items : []).slice(0, 30).map(it => ({
     naam: schoon(it.naam, 80), prijs: it.prijs != null && it.prijs !== '' ? Math.max(0, Number(it.prijs) || 0) : null, tekst: schoon(it.tekst, 120)
   })).filter(it => it.naam);

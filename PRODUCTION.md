@@ -146,6 +146,13 @@ achter de poortwachter, met Postgres en Redis overal aan.**
    `RTG_VAULT_KEY`, `RTG_SECRET_KEY` (en `RTG_ENC_KEY`) op alle instances
    gelijk zijn, anders kan de ene instance de versleutelde naam/e-mail van de
    andere niet lezen en kloppen e-mail-login-hash en sessietokens niet (zie §4).
+   **Ook de mediastore moet gedeeld zijn:** zet `RTG_MEDIA_BACKEND=s3` met
+   `RTG_MEDIA_S3_*` (AWS S3, Cloudflare R2, MinIO, Backblaze). Salon-foto's en
+   snaps staan dan als losse, versleutelde objecten in gedeelde objectopslag i.p.v.
+   base64 in de database of op de lokale schijf van één instance; een lokale
+   warme cache houdt veelgevraagde foto's snel. De `/media`-route mag achter een
+   CDN (de responses zijn `immutable`). Zonder S3 op meerdere instances ziet
+   alleen de instance die de foto ontving hem — de config-check waarschuwt hiervoor.
 4. **Zet er meer instances achter een load balancer.** De app is stateless
    tussen requests (sessie zit in Postgres, niet in procesgeheugen), dus je kunt
    naar believen instances bijzetten. TLS-termination en `trust proxy` vóór de

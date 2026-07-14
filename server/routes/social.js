@@ -90,29 +90,29 @@ app.post('/api/member/call', auth, (req, res) => {
 });
 
 /* ---------- snaps en verhalen: RTG-kant (auth) ---------- */
-app.post('/api/member/snap/send', express.json({ limit: '1.5mb' }), auth, (req, res) => {
+app.post('/api/member/snap/send', express.json({ limit: '1.5mb' }), auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = snapSturen(req.session.key, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
+  const r = await snapSturen(req.session.key, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
 });
 app.post('/api/member/snaps', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ snaps: snapsVoor(req.session.key) }); });
-app.post('/api/member/snap/view', auth, (req, res) => {
+app.post('/api/member/snap/view', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = snapOpenen(req.session.key, String(req.body.id || ''));
+  const r = await snapOpenen(req.session.key, String(req.body.id || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ foto: r.foto, tekst: r.tekst, van: r.van });
 });
-app.post('/api/member/story/post', express.json({ limit: '1.5mb' }), auth, (req, res) => {
+app.post('/api/member/story/post', express.json({ limit: '1.5mb' }), auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = verhaalPlaatsen(req.session.key, req.body.foto, req.body.tekst);
+  const r = await verhaalPlaatsen(req.session.key, req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
 });
 app.post('/api/member/stories', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ stories: verhalenVoor(req.session.key) }); });
-app.post('/api/member/story/view', auth, (req, res) => {
+app.post('/api/member/story/view', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = verhaalBekijken(req.session.key, String(req.body.id || ''));
+  const r = await verhaalBekijken(req.session.key, String(req.body.id || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ foto: r.foto, tekst: r.tekst, van: r.van, at: r.at });
 });
@@ -182,29 +182,29 @@ app.post('/api/rtf/social/goedkeuren', (req, res) => {
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
 });
-app.post('/api/rtf/social/snap/send', express.json({ limit: '1.5mb' }), (req, res) => {
+app.post('/api/rtf/social/snap/send', express.json({ limit: '1.5mb' }), async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = snapSturen(s.handle, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
+  const r = await snapSturen(s.handle, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
 });
 app.post('/api/rtf/social/snaps', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ snaps: snapsVoor(s.handle) }); });
-app.post('/api/rtf/social/snap/view', (req, res) => {
+app.post('/api/rtf/social/snap/view', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = snapOpenen(s.handle, String(req.body.id || ''));
+  const r = await snapOpenen(s.handle, String(req.body.id || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ foto: r.foto, tekst: r.tekst, van: r.van });
 });
-app.post('/api/rtf/social/story/post', express.json({ limit: '1.5mb' }), (req, res) => {
+app.post('/api/rtf/social/story/post', express.json({ limit: '1.5mb' }), async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = verhaalPlaatsen(s.handle, req.body.foto, req.body.tekst);
+  const r = await verhaalPlaatsen(s.handle, req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
 });
 app.post('/api/rtf/social/stories', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ stories: verhalenVoor(s.handle) }); });
-app.post('/api/rtf/social/story/view', (req, res) => {
+app.post('/api/rtf/social/story/view', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = verhaalBekijken(s.handle, String(req.body.id || ''));
+  const r = await verhaalBekijken(s.handle, String(req.body.id || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ foto: r.foto, tekst: r.tekst, van: r.van, at: r.at });
 });

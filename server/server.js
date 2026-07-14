@@ -1325,13 +1325,15 @@ const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
    klein, hoeveel er ook gepost wordt. De publieke Salon-foto's worden via de
    /media-route uitgeserveerd; snaps komen alleen eenmalig als data-URL terug. */
 const media = require('./media').maakMedia({ dir: DATA_DIR });
-app.get('/media/:naam', (req, res) => media.serveer(req, res));
+app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
 // Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de
 // mediastore, zodat ook oude data het geheugen niet meer belast. Alleen de
-// schrijver migreert; idempotent, dus veilig bij elke start.
+// schrijver migreert; idempotent, dus veilig bij elke start. Async (kan naar S3).
+console.log('[media] opslag-backend:', media.backendNaam);
 if (db.writable) {
-  try { const n = media.migreerDb(db); if (n > 0) { save(); console.log('[media] ' + n + ' bestaande foto(s) naar de mediastore verplaatst.'); } }
-  catch (e) { console.warn('[media] migratie overgeslagen:', e.message); }
+  media.migreerDb(db)
+    .then(n => { if (n > 0) { save(); console.log('[media] ' + n + ' bestaande foto(s) naar de mediastore verplaatst.'); } })
+    .catch(e => console.warn('[media] migratie overgeslagen:', e.message));
 }
 
 /* Een versleuteld geupload bestand (identiteitsbewijs/selfie) ontsleutelen en

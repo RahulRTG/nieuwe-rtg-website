@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Boardroom</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;
+    --muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--gold:#C9A24B;
+    --groen:#3BA55D;--oranje:#D6A32E;--rood:#D6455F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  a{color:var(--gold);}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .wrap{max-width:980px;margin:0 auto;padding:1.6rem 1.2rem 4rem;}
+  header.kop{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+  .kop h1{font-size:1.4rem;font-weight:600;letter-spacing:-.01em;}
+  .kop .sub{font-size:.8rem;color:var(--soft);}
+  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:10px;padding:.55rem .9rem;font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit;}
+  .knop.grijs{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .knop.rood{background:#3a1420;color:#F4B8C6;border:1px solid var(--rood);}
+  .knop.klein{padding:.35rem .6rem;font-size:.75rem;}
+  .veld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.7rem .8rem;color:var(--txt);font-family:inherit;font-size:.9rem;margin-bottom:.6rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;}
+  .login{max-width:22rem;margin:6vh auto 0;}
+  .login h1{font-size:1.3rem;margin-bottom:.3rem;}
+  .login p{color:var(--soft);font-size:.85rem;margin-bottom:1.1rem;}
+  .fout{color:var(--rood);font-size:.82rem;min-height:1.1rem;margin-top:.2rem;}
+  .telrij{display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;}
+  .tel{flex:1;min-width:7rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
+  .tel .n{font-size:1.5rem;font-weight:700;}
+  .tel .l{font-size:.72rem;color:var(--soft);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:.4rem;}
+  .actiebalk{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;}
+  .legenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.76rem;color:var(--soft);margin-bottom:1rem;}
+  .legenda span{display:inline-flex;align-items:center;gap:.4rem;}
+  .catkop{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.5rem 0 .3rem;}
+  .fn{display:flex;align-items:flex-start;gap:.8rem;padding:.8rem 0;border-top:1px solid var(--line);}
+  .fn:first-child{border-top:none;}
+  .fn .mid{flex:1;min-width:0;}
+  .fn .naam{font-weight:600;font-size:.92rem;}
+  .fn .uitleg{font-size:.78rem;color:var(--muted);margin-top:.15rem;}
+  .bol{width:.9rem;height:.9rem;border-radius:50%;flex-shrink:0;margin-top:.28rem;box-shadow:0 0 8px currentColor;}
+  .bol.aan{background:var(--groen);color:var(--groen);}
+  .bol.storing{background:var(--oranje);color:var(--oranje);}
+  .bol.uit{background:var(--rood);color:var(--rood);}
+  .acties{display:flex;flex-direction:column;gap:.4rem;align-items:flex-end;flex-shrink:0;}
+  .schakel{border:1px solid var(--line);border-radius:999px;padding:.32rem .85rem;font-weight:700;font-size:.72rem;cursor:pointer;font-family:inherit;min-width:5.4rem;text-align:center;}
+  .schakel.aan{background:#12321f;color:#7EE0A3;border-color:#1f5637;}
+  .schakel.uit{background:#3a1420;color:#F4B8C6;border-color:var(--rood);}
+  .schakel:disabled{opacity:.55;cursor:default;}
+  .ministoring{background:none;border:none;color:var(--soft);font-size:.68rem;cursor:pointer;font-family:inherit;text-decoration:underline;}
+  .ministoring.actief{color:var(--oranje);}
+  .ministoring:disabled{opacity:.5;cursor:default;text-decoration:none;}
+  .muted{color:var(--soft);font-size:.8rem;}
+  .advies{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.7rem .85rem;margin-top:.6rem;font-size:.82rem;white-space:pre-wrap;}
+  .voorstelrij{display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-top:1px solid var(--line);font-size:.82rem;}
+  .voorstelrij:first-child{border-top:none;}
+  .voorstelrij .tag{font-size:.68rem;font-weight:700;padding:.12rem .45rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);}
+  .aibox textarea{min-height:3.2rem;resize:vertical;}
+  .toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
+</style>
+</head>
+<body>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<main class="wrap" id="hoofd" tabindex="-1">
+  <section id="vLogin" class="kaart login" hidden>
+    <h1>RTG Boardroom</h1>
+    <p>Beveiligde schakelkast. Alleen de eigenaar en handmatig toegelaten personen kunnen inloggen.</p>
+    <input class="veld" id="liLogin" placeholder="E-mail of gebruikersnaam" autocomplete="username">
+    <input class="veld" id="liPass" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+    <button class="knop" id="bLogin" style="width:100%;">Inloggen</button>
+    <div class="fout" id="loginFout"></div>
+  </section>
+
+  <div id="vBord" hidden>
+    <header class="kop">
+      <div>
+        <h1>RTG Boardroom</h1>
+        <div class="sub">Alle functies van het platform, met status en schakelaar. <a href="/apps/techniek.html">Technische status ›</a></div>
+      </div>
+      <div style="display:flex;gap:.5rem;">
+        <button class="knop grijs klein" id="bVernieuw">Vernieuwen</button>
+        <button class="knop grijs klein" id="bUit">Uitloggen</button>
+      </div>
+    </header>
+
+    <div class="telrij" id="tellers"></div>
+
+    <div class="actiebalk">
+      <button class="knop rood" id="bReset">Alles resetten</button>
+      <button class="knop" id="bAiToggle">AI-hulp inschakelen</button>
+    </div>
+
+    <div class="kaart aibox" id="aiBox" hidden style="margin-bottom:1rem;">
+      <div style="font-weight:600;margin-bottom:.15rem;">AI-hulp</div>
+      <div class="muted" style="margin-bottom:.6rem;">Geef een instructie in gewone taal, bijvoorbeeld: &bdquo;zet de charter uit&rdquo; of &bdquo;zet de sociale laag uit voor Lifestyle&rdquo;. De AI stelt de wijziging voor; niets gaat automatisch om.</div>
+      <textarea class="veld" id="aiVraag" placeholder="Typ je instructie&hellip;" aria-label="Instructie voor de AI"></textarea>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <button class="knop" id="bAiVraag">Vraag de AI</button>
+        <span class="muted" id="aiBron" style="font-size:.72rem;"></span>
+      </div>
+      <div class="advies" id="aiAntwoord" hidden></div>
+      <div id="aiVoorstelBlok" hidden style="margin-top:.6rem;">
+        <div class="muted" style="margin-bottom:.2rem;">Voorgestelde wijzigingen:</div>
+        <div id="aiVoorstel"></div>
+        <button class="knop klein" id="bAiToepassen" style="margin-top:.5rem;">Deze wijzigingen toepassen</button>
+      </div>
+    </div>
+
+    <div class="legenda">
+      <span><span class="bol aan"></span> Groen = aan</span>
+      <span><span class="bol uit"></span> Rood = uit</span>
+      <span><span class="bol storing"></span> Oranje = storing</span>
+    </div>
+
+    <div id="bord"></div>
+    <p class="muted" id="alleenLezen" hidden style="margin-top:1rem;">Je kunt de status bekijken. Alleen de eigenaar kan schakelen, resetten of storingen melden.</p>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="/apps/util.js"></script>
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+  var el = Util.el, vervang = Util.vervang;
+  var token = sessionStorage.getItem('techToken') || null;
+  var eigenaar = false, laatsteVoorstel = [];
+
+  function toast(t){ var e=$('#toast'); Util.tekst(e,t); e.style.opacity='1'; clearTimeout(e._t); e._t=setTimeout(function(){e.style.opacity='0';},2200); }
+
+  function api(pad, body){
+    var h = { 'content-type':'application/json' };
+    if (token) h['authorization'] = 'Bearer ' + token;
+    return fetch(pad, { method:'POST', headers:h, body: body?JSON.stringify(body):'{}' })
+      .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error||('Fout '+r.status)); return j; }); });
+  }
+
+  function toonLogin(){ $('#vLogin').hidden=false; $('#vBord').hidden=true; }
+  function toonBord(){ $('#vLogin').hidden=true; $('#vBord').hidden=false; }
+
+  $('#bLogin').addEventListener('click', function(){
+    $('#loginFout').textContent='';
+    api('/api/techniek/inloggen', { login:$('#liLogin').value.trim(), wachtwoord:$('#liPass').value })
+      .then(function(d){ token=d.token; sessionStorage.setItem('techToken', token); laad(); toonBord(); })
+      .catch(function(e){ $('#loginFout').textContent = e.message; });
+  });
+  $('#liPass').addEventListener('keydown', function(e){ if(e.key==='Enter') $('#bLogin').click(); });
+  $('#bUit').addEventListener('click', function(){ token=null; sessionStorage.removeItem('techToken'); toonLogin(); });
+  $('#bVernieuw').addEventListener('click', laad);
+
+  $('#bReset').addEventListener('click', function(){
+    if (!eigenaar) return toast('Alleen de eigenaar kan resetten.');
+    if (!confirm('Alle functies terugzetten naar de standaard (alles aan, storingen weg)?')) return;
+    api('/api/boardroom/reset').then(function(){ toast('Alles gereset naar de standaard.'); laad(); }).catch(function(e){ toast(e.message); });
+  });
+
+  $('#bAiToggle').addEventListener('click', function(){
+    var b = $('#aiBox'); b.hidden = !b.hidden;
+    $('#bAiToggle').textContent = b.hidden ? 'AI-hulp inschakelen' : 'AI-hulp verbergen';
+    if (!b.hidden) $('#aiVraag').focus();
+  });
+  $('#bAiVraag').addEventListener('click', function(){
+    var v = $('#aiVraag').value.trim(); if (!v) return;
+    $('#bAiVraag').disabled = true; Util.tekst($('#bAiVraag'),'AI denkt na...');
+    api('/api/boardroom/ai', { vraag:v }).then(function(d){
+      $('#aiAntwoord').hidden=false; Util.tekst($('#aiAntwoord'), d.antwoord||'');
+      $('#aiBron').textContent = d.bron==='ai' ? 'via Claude' : 'ingebouwde taal-hulp';
+      laatsteVoorstel = d.voorstel||[];
+      var blok = $('#aiVoorstelBlok'), lijst = $('#aiVoorstel'); vervang(lijst);
+      if (laatsteVoorstel.length){
+        blok.hidden=false;
+        laatsteVoorstel.forEach(function(w){
+          lijst.appendChild(el('div',{class:'voorstelrij'},
+            el('span',{class:'tag', style:{color:w.aan?'#7EE0A3':'#F4B8C6'}}, w.aan?'AAN':'UIT'),
+            el('span',null, w.naam + (w.doelgroep?(' · '+w.doelgroep):' · globaal'))));
+        });
+        $('#bAiToepassen').style.display = eigenaar ? '' : 'none';
+      } else { blok.hidden=true; }
+    }).catch(function(e){ toast(e.message); })
+      .then(function(){ $('#bAiVraag').disabled=false; Util.tekst($('#bAiVraag'),'Vraag de AI'); });
+  });
+  $('#bAiToepassen').addEventListener('click', function(){
+    if (!laatsteVoorstel.length) return;
+    api('/api/boardroom/toepassen', { voorstel:laatsteVoorstel }).then(function(d){
+      toast(d.toegepast+' wijziging(en) toegepast.'); $('#aiVoorstelBlok').hidden=true; laatsteVoorstel=[]; laad();
+    }).catch(function(e){ toast(e.message); });
+  });
+
+  function tellerKaart(n, label, kleur){
+    return el('div',{class:'tel'}, el('div',{class:'n', style:{color:kleur}}, String(n)), el('div',{class:'l'}, label));
+  }
+
+  function functieRij(f){
+    var mid = el('div',{class:'mid'},
+      el('div',null, el('span',{class:'naam'}, f.naam)),
+      el('div',{class:'uitleg'}, f.uitleg || ''),
+      f.storing ? el('div',{class:'uitleg', style:{color:'#E6B84E'}}, '⚠ Storing: ' + (f.storing.reden||'')) : null
+    );
+    var schakel = el('button',{class:'schakel '+(f.aan?'aan':'uit'), disabled: !eigenaar, onclick:function(){
+      api('/api/boardroom/zet', { id:f.id, aan: !f.aan }).then(function(){ toast(f.naam+(f.aan?' uit':' aan')); laad(); }).catch(function(e){ toast(e.message); });
+    }}, f.aan ? 'AAN' : 'UIT');
+    var storingKnop = el('button',{class:'ministoring'+(f.storing?' actief':''), disabled: !eigenaar, onclick:function(){
+      if (f.storing){ api('/api/boardroom/storing', { id:f.id, storing:false }).then(function(){ toast('Storing hersteld.'); laad(); }).catch(function(e){ toast(e.message); }); }
+      else { var r = prompt('Wat is er mis met "'+f.naam+'"?','Storing gemeld'); if (r===null) return; api('/api/boardroom/storing', { id:f.id, storing:true, reden:r }).then(function(){ toast('Storing gemeld.'); laad(); }).catch(function(e){ toast(e.message); }); }
+    }}, f.storing ? 'Storing herstellen' : 'Storing melden');
+    var acties = el('div',{class:'acties'}, schakel, storingKnop);
+    return el('div',{class:'fn'}, el('div',{class:'bol '+f.status}), mid, acties);
+  }
+
+  function laad(){
+    api('/api/boardroom/status').then(function(d){
+      eigenaar = !!d.eigenaar;
+      $('#alleenLezen').hidden = eigenaar;
+      $('#bReset').disabled = !eigenaar;
+      var s = d.samenvatting || {};
+      vervang($('#tellers'),
+        tellerKaart(s.aan||0, 'Aan (groen)', 'var(--groen)'),
+        tellerKaart(s.uit||0, 'Uit (rood)', 'var(--rood)'),
+        tellerKaart(s.storing||0, 'Storing (oranje)', 'var(--oranje)'),
+        tellerKaart(s.totaal||0, 'Functies totaal', 'var(--txt)'));
+      if (!d.aiBeschikbaar){ $('#aiBron').textContent=''; }
+      var bord = $('#bord'); vervang(bord);
+      (d.functies||[]).forEach(function(g){
+        bord.appendChild(el('div',{class:'catkop'}, g.categorie));
+        var kaart = el('div',{class:'kaart', style:{padding:'.2rem 1.1rem'}});
+        g.functies.forEach(function(f){ kaart.appendChild(functieRij(f)); });
+        bord.appendChild(kaart);
+      });
+    }).catch(function(e){
+      if (/40[13]/.test(e.message) || /log in/i.test(e.message)) toonLogin();
+      else toast(e.message);
+    });
+  }
+
+  // bij openen: met een bewaard token direct het bord in, anders het login-scherm
+  if (token) { toonBord(); laad(); } else { toonLogin(); }
+})();
+</script>
+</body>
+</html>

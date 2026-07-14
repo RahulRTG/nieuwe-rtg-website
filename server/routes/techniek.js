@@ -250,6 +250,114 @@ module.exports = (kern) => {
     res.json({ antwoord, voorstel, bron });
   });
 
+  /* ================== RTG Boardroom ==================
+     Een complete stoplicht-schakelkast: elke functie van het platform met een
+     status (groen = aan, rood = uit, oranje = storing), een directe schakelaar
+     (alleen de eigenaar), een reset en AI-hulp. De aan/uit-stand wordt door de
+     functie-middleware echt gehandhaafd; "storing" is puur een statusvlag. */
+  function boardroomTelling(cat) {
+    let aan = 0, uit = 0, storing = 0;
+    for (const g of cat) for (const f of g.functies) {
+      if (f.status === 'uit') uit++; else if (f.status === 'storing') storing++; else aan++;
+    }
+    return { aan, uit, storing, totaal: aan + uit + storing };
+  }
+  // gedeelde AI-hulp: begrijp een instructie en stel wijzigingen voor (Claude of ingebouwd)
+  async function boardroomAi(vraag, t) {
+    const lokaal = functies.duidVoorstel(vraag, t.functies);
+    let antwoord = null, voorstel = lokaal.voorstel, bron = 'ingebouwd';
+    if (anthropic) {
+      try {
+        const catTekst = functies.FUNCTIES.map(f => '- ' + f.id + ' ("' + f.naam + '", categorie ' + f.categorie +
+          ', doelgroepen: ' + (f.doelgroepen || []).join('/') + ')').join('\n');
+        const dgTekst = functies.DOELGROEPEN.map(d => d.id + ' = ' + d.naam).join(', ');
+        const prompt = 'Je bent de assistent van de RTG Boardroom (de schakelkast van het platform). De eigenaar kan functies ' +
+          'globaal of per doelgroep aan- of uitzetten.\nDoelgroepen: ' + dgTekst + '.\nBeschikbare functies:\n' + catTekst +
+          '\n\nVraag of instructie: "' + vraag + '"\n\nAntwoord kort in het Nederlands (max 4 zinnen). Vraagt de instructie om een ' +
+          'wijziging, geef daarna EEN codeblok:\n```json\n{"voorstel":[{"id":"<functie-id>","doelgroep":"<doelgroep-id of null>","aan":true}]}\n```\n' +
+          'Gebruik uitsluitend bestaande id\'s; laat doelgroep leeg (null) voor een globale wijziging. Geen codeblok als er niets te wijzigen valt.';
+        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 700, messages: [{ role: 'user', content: prompt }] });
+        const tekst = (r.content && r.content[0] && r.content[0].text) || '';
+        antwoord = tekst.replace(/```json[\s\S]*?```/g, '').trim();
+        const m = tekst.match(/```json\s*([\s\S]*?)```/);
+        if (m) { try { const j = JSON.parse(m[1]); if (j && Array.isArray(j.voorstel)) voorstel = j.voorstel; } catch (e) {} }
+        bron = 'ai';
+      } catch (e) { antwoord = null; bron = 'ingebouwd'; }
+    }
+    if (!antwoord) antwoord = lokaal.uitleg;
+    return { antwoord, voorstel: functies.valideerVoorstel(voorstel), bron };
+  }
+
+  // Het bord: alle functies met stoplicht-status, plus de telling en AI-stand.
+  app.post('/api/boardroom/status', techAuth, (req, res) => {
+    const t = staat();
+    const cat = functies.catalogus(t.functies);
+    res.json({
+      eigenaar: isEigenaar(req.techUser), naam: accounts.realNameOf(req.techUser),
+      functies: cat, doelgroepen: functies.DOELGROEPEN,
+      samenvatting: boardroomTelling(cat),
+      aiBeschikbaar: !!anthropic,
+      aiAan: !(t.zekeringen.ai && t.zekeringen.ai.aan === false)
+    });
+  });
+
+  // Directe schakelaar (alleen de eigenaar): { id, aan } of { id, doelgroep, aan }.
+  app.post('/api/boardroom/zet', techAuth, eigenaarAlleen, (req, res) => {
+    const t = staat();
+    const f = functies.OP_ID[req.body.id];
+    if (!f) return res.status(404).json({ error: 'Onbekende functie.' });
+    const aan = req.body.aan !== false && req.body.aan !== 'false';
+    const dg = req.body.doelgroep ? String(req.body.doelgroep) : null;
+    if (dg && !(f.doelgroepen || []).includes(dg)) return res.status(400).json({ error: 'Deze functie kent die doelgroep niet.' });
+    const cur = t.functies[f.id] = t.functies[f.id] || {};
+    if (dg) { cur.perDoelgroep = cur.perDoelgroep || {}; cur.perDoelgroep[dg] = aan; }
+    else cur.aan = aan;
+    save();
+    res.json({ ok: true, id: f.id, status: functies.functieStatus(f.id, t.functies) });
+  });
+
+  // Storing melden of herstellen (oranje aan/uit): { id, storing:bool, reden }.
+  app.post('/api/boardroom/storing', techAuth, eigenaarAlleen, (req, res) => {
+    const t = staat();
+    const f = functies.OP_ID[req.body.id];
+    if (!f) return res.status(404).json({ error: 'Onbekende functie.' });
+    const cur = t.functies[f.id] = t.functies[f.id] || {};
+    if (req.body.storing === false || req.body.storing === 'false') cur.storing = null;
+    else cur.storing = { reden: String(req.body.reden || 'Handmatig gemeld').slice(0, 160), at: new Date().toISOString() };
+    save();
+    res.json({ ok: true, id: f.id, status: functies.functieStatus(f.id, t.functies) });
+  });
+
+  // Reset: alle functies terug naar de standaard (alles aan, storingen weg).
+  app.post('/api/boardroom/reset', techAuth, eigenaarAlleen, (req, res) => {
+    const t = staat();
+    t.functies = {};
+    save();
+    res.json({ ok: true, functies: functies.catalogus(t.functies), samenvatting: boardroomTelling(functies.catalogus(t.functies)) });
+  });
+
+  // AI-hulp: in gewone taal een voorstel laten maken (niets gaat automatisch om).
+  app.post('/api/boardroom/ai', techAuth, async (req, res) => {
+    const t = staat();
+    if (t.zekeringen.ai && t.zekeringen.ai.aan === false) return res.status(503).json({ error: 'De AI-zekering staat uit.' });
+    const vraag = String(req.body.vraag || '').slice(0, 500);
+    if (!vraag.trim()) return res.status(400).json({ error: 'Stel een vraag of geef een instructie.' });
+    res.json(await boardroomAi(vraag, t));
+  });
+
+  // Een AI-voorstel toepassen (alleen de eigenaar, in een tik).
+  app.post('/api/boardroom/toepassen', techAuth, eigenaarAlleen, (req, res) => {
+    const t = staat();
+    const wijz = functies.valideerVoorstel(req.body.voorstel);
+    for (const w of wijz) {
+      const cur = t.functies[w.id] = t.functies[w.id] || {};
+      if (w.doelgroep) { cur.perDoelgroep = cur.perDoelgroep || {}; cur.perDoelgroep[w.doelgroep] = w.aan; }
+      else cur.aan = w.aan;
+    }
+    save();
+    res.json({ ok: true, toegepast: wijz.length, functies: functies.catalogus(t.functies) });
+  });
+
   /* De eigenaar vraagt ZELF om een update/modernisering, in gewone taal. De AI
      geeft een concreet, veilig plan. NIETS gaat live naar de gasten: het verzoek
      wordt vastgelegd als voorstel dat via de veilige stroom (Claude stelt voor via

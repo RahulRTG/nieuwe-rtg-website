@@ -28,6 +28,7 @@
 // Volgorde van de categorieën zoals ze op het bord verschijnen.
 const CATEGORIEEN = [
   'Leden (RTG-app)',
+  'Genres & diensten',
   'Sociaal (De Salon)',
   'Partners (leveranciers)',
   'RTG-Backoffice',
@@ -71,7 +72,29 @@ const FUNCTIES = [
   { id: 'zakelijk', categorie: 'Leden (RTG-app)', naam: 'RTG Zakelijk (professioneel netwerk)', standaard: true, doelgroepen: ['lifestyle', 'business'],
     uitleg: 'De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.', paden: ['/api/zakelijk'] },
 
+  // ---- Genres & diensten (leden boeken/kopen per sector) ----
+  { id: 'bestellen', categorie: 'Genres & diensten', naam: 'Bestellen & bezorgen', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.', paden: ['/api/order', '/api/orders', '/api/bezorg'] },
+  { id: 'tickets', categorie: 'Genres & diensten', naam: 'Tickets & activiteiten', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Tickets kopen met tijdslot en een oplichtende entreecode.', paden: ['/api/tickets'] },
+  { id: 'verhuur', categorie: 'Genres & diensten', naam: 'Autoverhuur', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Auto huren met foto\'s voor/na, borg, SOS-knop en live locatie.', paden: ['/api/huur', '/api/verhuur'] },
+  { id: 'charter', categorie: 'Genres & diensten', naam: 'Boten & jachten (charter)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Vaartuigen charteren met schipper, borg, SOS op zee en live positie.', paden: ['/api/charter'] },
+  { id: 'vastgoed', categorie: 'Genres & diensten', naam: 'Vastgoed', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Panden bekijken, interesse tonen of bieden en keyless bezichtigen.', paden: ['/api/vastgoed'] },
+  { id: 'retail', categorie: 'Genres & diensten', naam: 'Mode & retail', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De modecatalogus: wishlist, apart leggen en de paskamer.', paden: ['/api/retail'] },
+  { id: 'onderweg', categorie: 'Genres & diensten', naam: 'Onderweg (live locatie)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Het live onderweg-scherm: positie, ETA en verbonden partners.', paden: ['/api/live'] },
+  { id: 'contracten', categorie: 'Genres & diensten', naam: 'Contracten (leden tekenen)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Digitale contracten die een lid in de app ondertekent.', paden: ['/api/contract', '/api/contracten'] },
+
   // ---- Sociaal (De Salon) ----
+  { id: 'salon', categorie: 'Sociaal (De Salon)', naam: 'De Salon (feed, volgen, deals)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.', paden: ['/api/salon'] },
+  { id: 'ontmoetingen', categorie: 'Sociaal (De Salon)', naam: 'Salon-ontmoetingen (in de buurt)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.', paden: ['/api/ontmoeten'] },
   { id: 'social', categorie: 'Sociaal (De Salon)', naam: 'Sociale laag (RTG + RTF)', standaard: true, doelgroepen: LEDEN_RTF,
     uitleg: 'De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam. De kinderbescherming (t/m 15 gesloten) blijft altijd gelden.', paden: ['/api/rtf/social'] },
   { id: 'rtf-contacten', categorie: 'Sociaal (De Salon)', naam: 'RTF contacten & familiekoppeling', standaard: true, doelgroepen: LEDEN_RTF,
@@ -114,6 +137,8 @@ const FUNCTIES = [
     uitleg: 'Betalingen (demo of Stripe). Uit = er kan tijdelijk niet betaald worden.', paden: ['/api/betaal'] },
   { id: 'verificatie', categorie: 'Betalen & verificatie', naam: 'Identiteitsverificatie (KYC)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.', paden: ['/api/verify'] },
+  { id: 'paspoort', categorie: 'Betalen & verificatie', naam: 'Paspoort delen (gecontroleerd)', standaard: true, doelgroepen: ['rtg', 'lifestyle', 'business', 'leverancier'],
+    uitleg: 'Het toestemmingsgestuurde kanaal waarlangs een partner een identiteit opvraagt (ja/nee, ID-kaart of scan), met melding en weigering voor het lid.', paden: ['/api/paspoort', '/api/supplier/paspoort'] },
 
   // ---- Personeel & integraties ----
   { id: 'staff', categorie: 'Personeel & integraties', naam: 'Personeels-app (PDA)', standaard: true, doelgroepen: ['personeel'],
@@ -149,6 +174,21 @@ function functieAan(id, staat) {
   if (!f) return true; // onbekende id blokkeert nooit
   const s = staat && staat[id];
   return s ? s.aan !== false : f.standaard;
+}
+
+// Een gemelde storing op deze functie (of null). Puur een statusvlag: het
+// blokkeert het verkeer niet (dat doet de aan/uit-schakelaar), maar kleurt de
+// functie oranje op het bord.
+function functieStoring(id, staat) {
+  const s = staat && staat[id];
+  return (s && s.storing) ? s.storing : null;
+}
+// De stoplicht-status van een functie: 'uit' (rood), 'storing' (oranje) of
+// 'aan' (groen). Uit wint van storing: een bewust uitgezette functie is rood.
+function functieStatus(id, staat) {
+  if (!functieAan(id, staat)) return 'uit';
+  if (functieStoring(id, staat)) return 'storing';
+  return 'aan';
 }
 
 // Staat deze functie aan voor een specifieke doelgroep? Globaal uit = overal uit.
@@ -197,6 +237,7 @@ function catalogus(staat) {
     categorie: cat,
     functies: FUNCTIES.filter(f => f.categorie === cat).map(f => ({
       id: f.id, naam: f.naam, uitleg: f.uitleg, standaard: f.standaard, aan: functieAan(f.id, staat),
+      storing: functieStoring(f.id, staat), status: functieStatus(f.id, staat),
       doelgroepen: (f.doelgroepen || []).map(dg => {
         const meta = DOELGROEP_OP_ID[dg] || { id: dg, naam: dg, emoji: '•' };
         return { id: dg, naam: meta.naam, emoji: meta.emoji, aan: functieAanVoor(f.id, dg, staat) };
@@ -276,6 +317,6 @@ function duidVoorstel(vraag, staat) {
 
 module.exports = {
   FUNCTIES, CATEGORIEEN, OP_ID, DOELGROEPEN, DOELGROEP_IDS,
-  functieVoorPad, functieAan, functieAanVoor, padGeblokkeerd, catalogus,
+  functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus, padGeblokkeerd, catalogus,
   doelgroepVanVerzoek, tierNaarDoelgroep, valideerVoorstel, duidVoorstel
 };

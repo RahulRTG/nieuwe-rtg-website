@@ -104,6 +104,31 @@ test('6. de AI-adviseur beantwoordt vragen en DOET opdrachten (zonder Claude-sle
   assert.ok(kippen >= 195, 'de kippen zijn erbij gezet (180 + 15)');
 });
 
+test('8. oogst vult de verkoopvoorraad en een product gaat de Salon in', async () => {
+  // nieuw perceel, zaaien, oogsten -> product verschijnt met voorraad
+  let o = (await api(base, '/api/supplier/boerderij/perceel', { naam: 'Verkoopakker', ha: 1 }, boer.token)).body;
+  const p = o.percelen.find(x => x.naam === 'Verkoopakker');
+  await api(base, '/api/supplier/boerderij/zaai', { id: p.id, gewas: 'aardappel' }, boer.token);
+  const oogst = await api(base, '/api/supplier/boerderij/oogst', { id: p.id }, boer.token);
+  o = oogst.body.overzicht;
+  const prod = o.producten.find(x => /aardappel/i.test(x.naam));
+  assert.ok(prod && prod.voorraad > 0, 'oogst kwam in de verkoopvoorraad');
+  assert.equal(prod.teKoop, false, 'zonder prijs nog niet te koop');
+  // prijs zetten
+  o = (await api(base, '/api/supplier/boerderij/product', { id: prod.id, prijs: 1.5 }, boer.token)).body;
+  assert.equal(o.producten.find(x => x.id === prod.id).teKoop, true, 'met prijs en voorraad te koop');
+  // in de Salon zetten -> er komt een partner-post met een deal in db.data.posts
+  const salon = await api(base, '/api/supplier/boerderij/naar-salon', { id: prod.id }, boer.token);
+  assert.equal(salon.status, 200);
+  assert.ok(salon.body.postId, 'er is een Salon-post aangemaakt');
+  assert.equal(salon.body.overzicht.producten.find(x => x.id === prod.id).inSalon, true, 'product staat als in-Salon gemarkeerd');
+  // zonder prijs weigeren
+  const geen = (await api(base, '/api/supplier/boerderij/product', { naam: 'Pompoenen', eenheid: 'stuk', voorraad: 10 }, boer.token)).body;
+  const pp = geen.producten.find(x => x.naam === 'Pompoenen');
+  const weiger = await api(base, '/api/supplier/boerderij/naar-salon', { id: pp.id }, boer.token);
+  assert.equal(weiger.status, 400, 'zonder prijs mag het niet de Salon in');
+});
+
 test('7. een ander boerderijtype kiezen stuurt de gewas-/dierkeuze', async () => {
   const o = (await api(base, '/api/supplier/boerderij/type', { type: 'wijngaard' }, boer.token)).body;
   assert.equal(o.type, 'wijngaard');

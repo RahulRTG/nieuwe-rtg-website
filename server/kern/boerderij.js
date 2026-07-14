@@ -87,8 +87,18 @@ function maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon }) {
     if (!Array.isArray(b.percelen)) b.percelen = [];
     if (!Array.isArray(b.dieren)) b.dieren = [];
     if (!Array.isArray(b.taken)) b.taken = [];
+    if (!Array.isArray(b.producten)) b.producten = [];
     if (!b.instel) b.instel = {};
     return b;
+  }
+
+  // Oogst en dieropbrengst vullen de winkelvoorraad: zoek een bestaand product op
+  // naam of maak er een aan (prijs 0 tot de boer die zet).
+  function voegAanVoorraad(b, naam, eenheid, aantal) {
+    if (!naam || !(aantal > 0)) return;
+    let p = b.producten.find(x => x.naam.toLowerCase() === String(naam).toLowerCase());
+    if (!p) { p = { id: id('pr'), naam: String(naam), eenheid: eenheid || 'kg', prijs: 0, voorraad: 0, bron: 'oogst' }; b.producten.push(p); }
+    p.voorraad = Math.round((p.voorraad || 0) + aantal);
   }
 
   function seizoen(d) {
@@ -192,9 +202,32 @@ function maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon }) {
       dierkeuze: t ? (t.dieren || Object.keys(DIEREN)).map(k => ({ id: k, label: DIEREN[k].label })) : Object.keys(DIEREN).map(k => ({ id: k, label: DIEREN[k].label })),
       percelen: b.percelen.map(perceelPubliek), dieren: b.dieren.map(dierPubliek),
       taken: b.taken.slice().sort((a, c) => (a.klaar - c.klaar) || String(a.voor || '').localeCompare(String(c.voor || ''))),
+      producten: b.producten.map(p => ({ id: p.id, naam: p.naam, eenheid: p.eenheid, prijs: p.prijs || 0, voorraad: p.voorraad || 0, bron: p.bron || 'handmatig', teKoop: !!(p.prijs > 0 && p.voorraad > 0), inSalon: !!p.inSalon })),
       stats: stats(b), briefing: briefing(s)
     };
   }
+
+  // Producten beheren (naam/prijs/voorraad/eenheid); oogst vult de voorraad zelf.
+  function zetProduct(s, data) {
+    const b = ensure(s);
+    if (data.weg) { b.producten = b.producten.filter(p => p.id !== data.id); save(); return { ok: true }; }
+    const naam = scho(data.naam, 60);
+    if (data.id) {
+      const p = b.producten.find(x => x.id === data.id);
+      if (!p) return { error: 'Product niet gevonden.' };
+      if (naam) p.naam = naam;
+      if (data.prijs != null) p.prijs = Math.round(getal(data.prijs, 1000000) * 100) / 100;
+      if (data.voorraad != null) p.voorraad = getal(data.voorraad, 100000000);
+      if (data.eenheid != null) p.eenheid = scho(data.eenheid, 12) || 'kg';
+      save(); return { ok: true };
+    }
+    if (!naam) return { error: 'Geef het product een naam.' };
+    if (b.producten.length >= 500) return { error: 'Tot 500 producten per bedrijf.' };
+    b.producten.push({ id: id('pr'), naam, eenheid: scho(data.eenheid, 12) || 'kg', prijs: Math.round(getal(data.prijs, 1000000) * 100) / 100, voorraad: getal(data.voorraad, 100000000), bron: 'handmatig' });
+    save(); return { ok: true };
+  }
+  function productVan(s, productId) { return ensure(s).producten.find(p => p.id === productId) || null; }
+  function markeerInSalon(s, productId) { const p = productVan(s, productId); if (p) { p.inSalon = true; save(); } return p; }
 
   /* ---- muterende acties (boer/manager) ---- */
   function kiesType(s, typeId) {
@@ -242,6 +275,7 @@ function maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon }) {
     const g = GEWASSEN[p.gewas];
     const opbrengst = kg != null && Number(kg) > 0 ? getal(kg, 100000000) : Math.round((p.ha || 0) * g.perHa);
     p.opbrengst = opbrengst; p.geoogstOp = nu();
+    voegAanVoorraad(b, g.label, g.eenheid, opbrengst); // oogst gaat de winkelvoorraad in
     save(); return { ok: true, opbrengst, eenheid: g.eenheid };
   }
   function zetDier(s, data) {
@@ -370,6 +404,7 @@ function maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon }) {
     isBoer, ensure, overzicht, briefing,
     kiesType, zetPerceel, zaaiPerceel, waterPerceel, oogstPerceel,
     zetDier, voerDier, opbrengstDier, zetTaak, rondTaak,
+    zetProduct, productVan, markeerInSalon,
     advies, perceelPubliek, dierPubliek
   };
 }

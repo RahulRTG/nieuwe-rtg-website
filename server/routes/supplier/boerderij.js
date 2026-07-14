@@ -3,7 +3,7 @@
    dieren, takenbord en een AI-adviseur die ook echt dingen doet. De logica zit
    in kern/boerderij.js; hier alleen de endpoints + rechten + realtime. */
 module.exports = (kern) => {
-  const { app, boerderij, logActivity, managerOnly, save, sseToSupplier, supplierAuth } = kern;
+  const { app, boerderij, broadcastSync, db, logActivity, managerOnly, save, salonNaarVolgers, sseToOffice, sseToSupplier, supplierAuth } = kern;
 
   function isBoer(s, res) {
     if (!boerderij.isBoer(s)) { res.status(409).json({ error: 'Dit is geen boerderij.' }); return false; }
@@ -106,6 +106,44 @@ module.exports = (kern) => {
     const r = boerderij.rondTaak(s, String(req.body.id || ''), req.actor && req.actor.name);
     if (r.error) return res.status(400).json(r);
     sync(s); res.json({ ok: true, overzicht: boerderij.overzicht(s) });
+  });
+
+  // producten beheren (manager); oogst vult de voorraad automatisch
+  app.post('/api/supplier/boerderij/product', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const s = req.supplier; if (!isBoer(s, res)) return;
+    const r = boerderij.zetProduct(s, req.body || {});
+    if (r.error) return res.status(400).json(r);
+    sync(s); res.json(boerderij.overzicht(s));
+  });
+
+  // een product te koop zetten in de Salon: als aanbieding met claimcodes, zodat
+  // leden het claimen en bij de boer ophalen. Hergebruikt de Salon-laag.
+  app.post('/api/supplier/boerderij/naar-salon', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const s = req.supplier; if (!isBoer(s, res)) return;
+    const p = boerderij.productVan(s, String(req.body.id || ''));
+    if (!p) return res.status(404).json({ error: 'Product niet gevonden.' });
+    if (!(p.prijs > 0)) return res.status(400).json({ error: 'Zet eerst een prijs op het product.' });
+    if (!(p.voorraad > 0)) return res.status(400).json({ error: 'Er is geen voorraad om te verkopen.' });
+    const titel = 'Vers van de boerderij: ' + p.naam;
+    const text = p.naam + ' rechtstreeks van ' + s.name + '. € ' + p.prijs + ' per ' + p.eenheid + ', zolang de voorraad strekt (' + p.voorraad + ' ' + p.eenheid + '). Claim in de Salon en haal op bij de boer.';
+    const post = {
+      id: Date.now(), author: s.name, tier: 'partner', partner: true, partnerCode: s.code,
+      place: s.city, visual: null, photo: null, text, lang: 'nl', at: new Date().toISOString(),
+      baseLikes: 0, likedBy: {}, comments: [], deal: { titel, geldigTot: null, claims: [] }
+    };
+    if (!Array.isArray(db.data.posts)) db.data.posts = [];
+    db.data.posts.unshift(post);
+    db.data.posts = db.data.posts.slice(0, 60);
+    boerderij.markeerInSalon(s, p.id);
+    save();
+    logActivity(s.code, req.actor, 'zette "' + p.naam + '" te koop in de Salon');
+    if (salonNaarVolgers) salonNaarVolgers(s, text);
+    if (broadcastSync) broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+    if (sseToOffice) sseToOffice('sync', { scope: 'salon' });
+    sync(s);
+    res.json({ ok: true, postId: post.id, overzicht: boerderij.overzicht(s) });
   });
 
   // de AI-adviseur: beantwoordt vragen en voert opdrachten uit (manager)

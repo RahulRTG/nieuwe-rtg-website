@@ -204,6 +204,11 @@
         <p class="sub" data-i18n="pd.v.bev.sub">Uw diensten, rondes, incidenten en de SOS-knop. De walkie-talkie staat op Team.</p>
         <div id="bevPdaWrap"></div>
       </div>
+      <div class="view" data-view="boer">
+        <h2 data-i18n="pd.v.boer">Op het land</h2>
+        <p class="sub" data-i18n="pd.v.boer.sub">De taken van vandaag, de oogst en het voeren, op uw naam.</p>
+        <div id="boerPdaWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -222,6 +227,7 @@
       <button data-tab="verkoop" id="tabVerkoop" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M9.5 12l1.4 1.4L14 10"/></svg><span data-i18n="pd.t.verkoop">Verkoop</span></button>
       <button data-tab="beveiliging" id="tabBevPda" style="display:none;"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/></svg><span data-i18n="pd.t.bev">Dienst</span></button>
       <button data-tab="bezorgen" id="tabBezorgen" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/></svg><span data-i18n="pd.t.bezorgen">Bezorgen</span></button>
+      <button data-tab="boer" id="tabBoer" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 10l6-4 6 4"/><path d="M6 10v9h8v-9"/><path d="M14 13h6v6h-6z"/><path d="M9 19v-4h2v4"/></svg><span data-i18n="pd.t.boer">Land</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
   </div>
@@ -248,7 +254,8 @@
     { id:'vastgoed', icon:'🏡', nl:'Vastgoed', en:'Real estate', sub:'Makelaar, bezichtigingen', codes:['IBIZALIV'] },
     { id:'mode', icon:'🛍️', nl:'Mode & retail', en:'Fashion & retail', sub:'Modehuizen, merken, winkels', codes:['MAISON'] },
     { id:'charter', icon:'⛵', nl:'Boten & jachten', en:'Boats & yachts', sub:'Charters, schippers, op zee', codes:['AZUL'] },
-    { id:'beveiliging', icon:'🛡️', nl:'Beveiliging', en:'Security', sub:'Diensten, posten, rondes, SOS', codes:['AEGIS'] }
+    { id:'beveiliging', icon:'🛡️', nl:'Beveiliging', en:'Security', sub:'Diensten, posten, rondes, SOS', codes:['AEGIS'] },
+    { id:'boerderij', icon:'🚜', nl:'Boerderij', en:'Farm', sub:'Land, kas, dieren en oogst', codes:['CANFERRER'] }
   ];
   const BEDRIJVEN = {
     KIKUNOI:{ name:'Sal de Mar', icon:'🍽️' }, PONTO:{ name:'Sunset Ibiza', icon:'🍸' },
@@ -261,7 +268,8 @@
     IBIZALIV:{ name:'Ibiza Living Estates', icon:'🏡' },
     MAISON:{ name:'Maison Solène', icon:'🛍️' },
     AZUL:{ name:'Azul Yacht Charter', icon:'⛵' },
-    AEGIS:{ name:'Aegis Elite Security', icon:'🛡️' }
+    AEGIS:{ name:'Aegis Elite Security', icon:'🛡️' },
+    CANFERRER:{ name:'Finca Can Ferrer', icon:'🚜' }
   };
 
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
@@ -329,7 +337,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -942,6 +950,52 @@
     if (kb) kb.addEventListener('click', openKlant);
     const ki = wrap.querySelector('#wKlantKey'); if (ki) ki.addEventListener('keydown', e => { if (e.key === 'Enter') openKlant(); });
   }
+
+  // ---- op het land (boerderij): de knecht doet de taken van vandaag ----
+  let pdBoer = null;
+  const heeftBoer = () => !!(state && state.supplier && (state.supplier.caps || []).includes('boerderij'));
+  async function laadBoer(){
+    if (!heeftBoer()) return;
+    try { pdBoer = (await API.call('/supplier/boerderij/overzicht', {})); } catch(e){ pdBoer = null; }
+    renderBoer();
+  }
+  function boerPdaToe(r){ if (r && r.overzicht) pdBoer = r.overzicht; renderBoer(); }
+  function renderBoer(){
+    const tabBtn = document.getElementById('tabBoer');
+    if (tabBtn) tabBtn.style.display = heeftBoer() ? '' : 'none';
+    const wrap = $('#boerPdaWrap'); if (!wrap) return;
+    if (!heeftBoer()){ wrap.innerHTML = ''; return; }
+    if (!pdBoer){ wrap.innerHTML = '<div class="card">…</div>'; laadBoer(); return; }
+    const o = pdBoer, vandaag = new Date().toISOString().slice(0,10);
+    let html = '';
+    // Vandaag-briefing (leesbaar samengevat voor de knecht)
+    const br = o.briefing || { punten:[] };
+    html += '<div class="card"><div class="k">🌱 '+T('pd.boer.vandaag','Vandaag op het land')+'</div>'+
+      (br.punten.length ? br.punten.map(p => '<div class="task"><span class="ic">'+(p.soort==='oogst'?'🌾':p.soort==='voer'?'🐄':p.soort==='water'?'💧':p.soort==='gezondheid'?'🩺':'📋')+'</span><div class="t"><b>'+esc(p.tekst)+'</b></div></div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.rustig','Niets dringends. Fijne dag.')+'</div>')+'</div>';
+    // Taken van vandaag / open
+    const open = (o.taken||[]).filter(t => !t.klaar);
+    html += '<div class="card"><div class="k">'+T('pd.boer.taken','Taken')+' ('+open.length+')</div>'+
+      (open.length ? open.map(t => '<div class="task"><span class="ic">'+((t.voor&&t.voor<vandaag)?'⏰':'📋')+'</span><div class="t"><b>'+esc(t.wat)+'</b><span>'+(t.waar?'📍 '+esc(t.waar):'')+(t.voor?' · '+esc(t.voor):'')+'</span></div><button class="abtn" data-btaak="'+t.id+'">'+T('pd.boer.klaar','Klaar')+'</button></div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.geentaak','Geen open taken.')+'</div>')+'</div>';
+    // Percelen: oogsten en water geven
+    const perc = (o.percelen||[]).filter(p => p.gewasLabel && p.fase !== 'geoogst');
+    if (perc.length) html += '<div class="card"><div class="k">'+T('pd.boer.perc','Percelen')+'</div>'+
+      perc.map(p => '<div class="task"><span class="ic">'+(p.fase==='te-oogsten'?'🌾':'🌱')+'</span><div class="t"><b>'+esc(p.naam)+' · '+esc(p.gewasLabel)+'</b><span>'+(p.fase==='te-oogsten'?T('pd.boer.oogstklaar','oogstklaar'):(p.restDagen+' '+T('pd.boer.dgn','dagen tot oogst')))+'</span></div>'+
+        (p.fase==='te-oogsten' ? '<button class="abtn" data-boogst="'+p.id+'">'+T('pd.boer.oogsten','Oogst')+'</button>' : '<button class="abtn" data-bwater="'+p.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);">💧</button>')+'</div>').join('')+'</div>';
+    // Dieren: voeren
+    const dr = (o.dieren||[]);
+    if (dr.length) html += '<div class="card"><div class="k">'+T('pd.boer.dieren','Dieren voeren')+'</div>'+
+      dr.map(d => { const gevoerd = d.laatsteVoer && d.laatsteVoer.slice(0,10)===vandaag;
+        return '<div class="task"><span class="ic">'+(d.soort==='melkkoe'?'🐄':d.soort==='legkip'?'🐔':d.soort==='varken'?'🐖':d.soort==='geit'?'🐐':'🐑')+'</span><div class="t"><b>'+esc(d.soortLabel)+' × '+d.aantal+'</b><span>'+(d.stal?esc(d.stal)+' · ':'')+d.voerKgPerDag+' kg '+T('pd.boer.voer','voer')+(gevoerd?' · ✓ '+T('pd.boer.gevoerd','gevoerd'):'')+'</span></div>'+
+        (gevoerd?'<span style="color:#7EE0A3;font-size:1.1rem;">✓</span>':'<button class="abtn" data-bvoer="'+d.id+'">🌾 '+T('pd.boer.voeren','Voeren')+'</button>')+'</div>'; }).join('')+'</div>';
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-btaak]').forEach(b => b.addEventListener('click', async () => { try { boerPdaToe(await API.call('/supplier/boerderij/taak/klaar', { id: b.dataset.btaak })); toast(T('pd.boer.klaarok','Taak afgerond.')); } catch(e){ toast(e.message); } }));
+    wrap.querySelectorAll('[data-boogst]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/oogst', { id: b.dataset.boogst }); toast(T('pd.boer.oogstok','Geoogst: ')+r.opbrengst+' '+r.eenheid); boerPdaToe(r); } catch(e){ toast(e.message); } }));
+    wrap.querySelectorAll('[data-bwater]').forEach(b => b.addEventListener('click', async () => { try { boerPdaToe(await API.call('/supplier/boerderij/water', { id: b.dataset.bwater })); toast(T('pd.boer.waterok','Beregend.')); } catch(e){ toast(e.message); } }));
+    wrap.querySelectorAll('[data-bvoer]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/voer', { id: b.dataset.bvoer }); toast(T('pd.boer.voerok','Gevoerd.')); boerPdaToe(r); } catch(e){ toast(e.message); } }));
+  }
+
   const heeftEntree = () => !!(state && state.supplier && (state.supplier.caps || []).includes('tickets'));
   async function laadEntree(){
     if (!heeftEntree()) return;

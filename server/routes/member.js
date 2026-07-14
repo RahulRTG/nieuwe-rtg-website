@@ -119,7 +119,7 @@ app.post('/api/pay', auth, async (req, res) => {
       inv.status = 'paid';
       inv.date = 'Zojuist betaald';
       inv.betaalId = uitslag.id;
-      foundation += Math.round((inv.bijdrage || 0) * 0.3);
+      if (/lidmaatschap|jaarbijdrage|maandbijdrage/i.test(inv.desc || '')) foundation += Math.round((inv.bijdrage || 0) / 1.21 * 0.3 * 100) / 100; // 30% van de abonnementsbijdrage (ex btw); boekingen dragen niets af
       for (const item of (md.trip ? md.trip.items : [])) {
         if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
       }

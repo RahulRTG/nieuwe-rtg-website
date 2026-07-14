@@ -55,9 +55,11 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
         aantal: dagOrders.length + dagRitten.length
       });
     }
+    // De RTFoundation krijgt 30% van de abonnementsbijdragen (ex btw); RTG
+    // verdient niets aan boekingen, dus die tellen hier niet mee.
     const fonds = db.data.invoices
-      .filter(i => i.status === 'paid' || i.status === 'betaald')
-      .reduce((s2, i) => s2 + Math.round((i.bijdrage || 0) * 0.3), 0);
+      .filter(i => (i.status === 'paid' || i.status === 'betaald') && /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(i.desc || ''))
+      .reduce((s2, i) => s2 + Math.round((i.bijdrage || 0) / 1.21 * 0.3), 0);
     const stats = {
       omzetVandaag: week[6].omzet, aantalVandaag: week[6].aantal,
       omzetWeek: week.reduce((s2, d) => s2 + d.omzet, 0),

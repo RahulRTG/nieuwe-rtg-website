@@ -14,10 +14,10 @@ module.exports = function seed() {
     ],
 
     invoices: [
-      { id: 'RTG-2026-0158', desc: 'Ibiza, Aguamarina, 3 nachten', netto: 1740, bijdrage: 150, status: 'open', date: 'Vervalt 28 juli 2026' },
-      { id: 'RTG-2026-0141', desc: 'Villa Bahia Ibiza, Cala Jondal, 4 nachten', netto: 2240, bijdrage: 180, status: 'open', date: 'Vervalt 15 augustus 2026' },
-      { id: 'RTG-2026-0093', desc: 'Privejet Schiphol - Ibiza (retour, gedeeld)', netto: 1460, bijdrage: 120, status: 'paid', date: 'Betaald op 2 mei 2026' },
-      { id: 'RTG-2025-0871', desc: 'Jaarbijdrage lidmaatschap 2026', netto: 0, bijdrage: 480, status: 'paid', date: 'Betaald op 4 januari 2026' }
+      { id: 'RTG-2026-0158', desc: 'Ibiza, Aguamarina, 3 nachten', netto: 1740, bijdrage: 0, status: 'paid', date: 'Betaald aan de partner op 12 juli 2026' },
+      { id: 'RTG-2026-0141', desc: 'Villa Bahia Ibiza, Cala Jondal, 4 nachten', netto: 2240, bijdrage: 0, status: 'paid', date: 'Betaald aan de partner op 3 juli 2026' },
+      { id: 'RTG-2026-0093', desc: 'Privejet Schiphol - Ibiza (retour, gedeeld)', netto: 1460, bijdrage: 0, status: 'paid', date: 'Betaald aan de partner op 2 mei 2026' },
+      { id: 'RTG-2026-0207', desc: 'Maandbijdrage lidmaatschap juli 2026', netto: 0, bijdrage: 78.65, status: 'open', date: 'Vervalt 1 augustus 2026' }
     ],
 
     trip: {
@@ -97,7 +97,7 @@ module.exports = function seed() {
        Niet-leden boeken via een partnerlink (boeken.html?via=CODE).
        Prijs = nettoprijs + service; de service wordt gedeeld tussen
        de partner (share van de service) en RTG. */
-    partnerService: 0.15,
+    partnerService: 0, // RTG rekent niets over boekingen; leden boeken tegen nettoprijs
     /* share = het deel van de service voor de partner, INTERN, wordt nooit
        aan de klant getoond. Bedrijfspartners kunnen een personeelskanaal
        hebben: eigen code, lager servicetarief (arbeidsvoorwaarde). */

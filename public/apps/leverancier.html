@@ -2053,7 +2053,7 @@
         '<div class="st-form"><input class="st-in" id="kPrS" placeholder="'+T('kt.service','Dienst, bijv. Luchthaven, centrum')+'">'+
         '<input class="st-in" id="kPrP" type="number" inputmode="decimal" placeholder="€">'+
         '<button class="bigbtn" id="kPrSend" style="margin-top:0.2rem;">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
-        '<div class="tkc-who">'+T('kt.pricenote','RTG-leden betalen uw nettoprijs plus de transparante bijdrage; u ontvangt altijd het volledige bedrag.')+'</div></div>';
+        '<div class="tkc-who">'+T('kt.pricenote','RTG-leden betalen uw nettoprijs; u ontvangt altijd het volledige bedrag, RTG rekent 0% commissie.')+'</div></div>';
       html += '<div class="tkc"><h3>'+T('sup.pricehist','Eerder doorgegeven')+'</h3>'+
         (h.length ? h.slice(0,10).map(p=>'<div class="st-row"><span>'+p.service+'<span class="sub">'+timeAgo(p.at)+'</span></span><b style="color:var(--gold);">'+eur(p.price)+'</b></div>').join('')
         : '<div class="tkc-who">'+T('sup.noprices','Nog geen prijzen doorgegeven.')+'</div>')+'</div>';

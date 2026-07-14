@@ -1482,6 +1482,9 @@ const boerderij = require('./kern/boerderij').maakBoerderij({ db, save, crypto, 
 // De content-creator-laag (kern/creator.js): carriere-profiel, platforms, tarieven,
 // portfolio, content-kalender en een AI content/script-helper.
 const creator = require('./kern/creator').maakCreator({ db, save, crypto, anthropic, schoon });
+// De samenwerkingslaag (kern/samenwerking.js): EGn knop tussen creators en
+// leveranciers, plus oproepen voor content creators.
+const samenwerking = require('./kern/samenwerking').maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon });
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken
 } = sociaal;
@@ -2216,7 +2219,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij, creator,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij, creator, samenwerking,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,

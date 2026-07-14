@@ -55,6 +55,7 @@ const { maakLid } = require('./kern/lid');
 const { MELDING_SCOPES, maakErvaring } = require('./kern/ervaring');
 const { RETAIL_MATEN, RETAIL_SEIZOENEN, maakRetail } = require('./kern/retail');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
+const { maakOntmoeting } = require('./kern/ontmoeting');
 
 /* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
    pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
@@ -1864,6 +1865,15 @@ const kern = {
   paspoortPartner, paspoortIncidenten
 };
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
+/* Salon-ontmoetingen (kern/ontmoeting.js): wederzijdse connecties die vlakbij
+   elkaar zijn kiezen samen een activiteit, tekenen een veiligheidscontract en
+   RTG-kantoor kijkt live mee tot de afspraak klaar is. Draait op de sociale
+   kern (connecties) en geo, dus na Object.assign(kern, sociaal). */
+Object.assign(kern, maakOntmoeting({
+  db, save, crypto, accounts, leeftijdVan, notify, sseToCustomer, sseToOffice,
+  connectieTussen: kern.connectieTussen, verbActief: kern.verbActief,
+  zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, haversine
+}));
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
    geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen
    die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar

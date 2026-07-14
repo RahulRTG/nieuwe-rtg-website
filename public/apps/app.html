@@ -918,6 +918,7 @@
         <h2 data-i18n="app.v.salon">De Salon.</h2>
         <p class="sub" data-i18n="app.v.salon.sub">Posts verschijnen 7 dagen na verblijf, voor uw veiligheid.</p>
         <div class="sc-bar" id="socialBar"></div>
+        <div id="ontmoetPaneel" style="display:none;"></div>
         <div id="zakLauncher" style="display:none;"></div>
         <div id="feed"></div>
       </div>
@@ -1476,7 +1477,7 @@
     $('#app').classList.add('active');
     renderAll();
     if (API.live && window.RTGRealtime){
-      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg });
+      RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
     }
     loadSocial();
   }
@@ -1496,7 +1497,7 @@
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
-      if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg });
+      if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
       loadSocial();
     } catch(e){
       API.token = null;
@@ -1961,7 +1962,8 @@
     else if (scope === 'vastgoed'){ laadVastgoed(); }
     else if (scope === 'live'){ renderLive(); laadTickets(); }
     else if (scope === 'paspoort'){ laadPaspoortInbox(); }
-    else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); laadPaspoortInbox(); }
+    else if (scope === 'ontmoeting'){ laadOntmoet(); }
+    else { renderPay(); renderHome(); renderTrip(); renderSalon(); renderTerPlaatse(); if (user.account) renderChat(); laadPaspoortInbox(); laadOntmoet(); }
   }
 
   function timeAgo(iso){
@@ -2051,6 +2053,7 @@
     laadVastgoed();
     loadCv();
     loadVacatures();
+    laadOntmoet();
     openTab('home');
     if ((rtf.gekoppeld || []).length) ensurePush(false); // stil vernieuwen als het al aan staat
   }
@@ -4850,6 +4853,194 @@
     });
   }
 
+  /* ================= Salon-ontmoetingen (wederzijdse connecties in de buurt) =
+     Elk lid zet dit zelf aan/uit. Aan: de app stuurt af en toe de positie mee;
+     een verbonden vriend die ook aanstaat en vlakbij is levert een voorstel op.
+     Beiden kiezen een activiteit (of niets = afwijzen); bij een match tekenen ze
+     een veiligheidscontract, waarna RTG-kantoor live meekijkt tot het klaar is.
+     Bij een SOS gaat de camera aan en kijkt kantoor mee (WebRTC). */
+  let ontmoetState = null, ontmoetTimer = null, ontmoetSosPc = null, ontmoetSosDate = null, ontmoetPending = null;
+
+  async function laadOntmoet(){
+    const el = $('#ontmoetPaneel'); if (!el) return;
+    if (!API.live || !user || !user.account){ el.style.display = 'none'; stopOntmoetTimer(); return; }
+    try { ontmoetState = await API.call('/ontmoeten/state'); }
+    catch(e){ el.style.display = 'none'; return; }
+    renderOntmoet();
+    beheerOntmoetTimer();
+  }
+  function stopOntmoetTimer(){ if (ontmoetTimer){ clearInterval(ontmoetTimer); ontmoetTimer = null; } }
+  // terwijl de functie aanstaat (of er een afspraak loopt) periodiek de positie sturen
+  function beheerOntmoetTimer(){
+    const s = ontmoetState;
+    const loopt = s && (s.aan || (s.dates && s.dates.some(d => d.status === 'actief' || d.status === 'noodgeval')));
+    if (loopt && !ontmoetTimer){ ontmoetTick(); ontmoetTimer = setInterval(ontmoetTick, 20000); }
+    else if (!loopt) stopOntmoetTimer();
+  }
+  function ontmoetPositie(){
+    return new Promise(res => {
+      if (!navigator.geolocation) return res(null);
+      navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude }), () => res(null), { maximumAge: 15000, timeout: 8000 });
+    });
+  }
+  async function ontmoetTick(){
+    const s = ontmoetState; if (!s) return;
+    const pos = await ontmoetPositie();
+    try {
+      if (s.aan){ const r = await API.call('/ontmoeten/hier', pos || {}); ontmoetState = r.state; renderOntmoet(); }
+      // live-positie voor lopende afspraken naar kantoor
+      for (const d of (ontmoetState.dates || [])) if (d.status === 'actief' || d.status === 'noodgeval'){
+        try { await API.call('/ontmoeten/hier-date', { dateId: d.id, lat: pos ? pos.lat : undefined, lng: pos ? pos.lng : undefined }); } catch(e){}
+      }
+    } catch(e){}
+  }
+
+  function ontmoetActBtns(voorstelId){
+    return (ontmoetState.activiteiten || []).map(a =>
+      '<button class="js-oa" data-v="' + voorstelId + '" data-a="' + a.id + '" style="flex:1;min-width:5.5rem;background:none;border:1px solid var(--gold);border-radius:12px;padding:0.6rem 0.4rem;color:var(--txt);font-family:inherit;cursor:pointer;text-align:center;">' +
+      '<span style="font-size:1.3rem;display:block;">' + a.icon + '</span><b style="font-size:0.78rem;">' + escT(a.label) + '</b>' +
+      '<span style="display:block;font-size:0.6rem;color:var(--muted);">' + escT(a.tekst) + '</span></button>').join('');
+  }
+  function renderOntmoet(){
+    const el = $('#ontmoetPaneel'); const s = ontmoetState;
+    if (!s){ el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    const kaart = (inner) => '<div style="border:1px solid var(--line);border-radius:16px;padding:0.9rem 1rem;margin-bottom:0.8rem;background:rgba(255,255,255,0.02);">' + inner + '</div>';
+    let h = '';
+    // kop met aan/uit
+    const uit = !s.aan;
+    h += '<div style="display:flex;align-items:flex-start;gap:0.7rem;">' +
+      '<span style="font-size:1.3rem;">🌟</span>' +
+      '<div style="flex:1;"><b style="font-size:0.9rem;">' + T('ont.titel','Ontmoetingen') + '</b>' +
+      '<span style="display:block;font-size:0.68rem;color:var(--muted);">' + T('ont.sub','Connecties die vlakbij zijn kunnen samen afspreken. Alleen jij bepaalt of dit aanstaat.') + '</span></div>' +
+      (s.mag
+        ? '<button id="ontToggle" role="switch" aria-checked="' + (s.aan ? 'true' : 'false') + '" style="flex-shrink:0;width:52px;height:30px;border-radius:999px;border:1px solid var(--gold);background:' + (s.aan ? 'var(--gold)' : 'none') + ';position:relative;cursor:pointer;" aria-label="' + T('ont.toggle','Ontmoetingen aan of uit') + '"><span style="position:absolute;top:3px;left:' + (s.aan ? '25px' : '3px') + ';width:22px;height:22px;border-radius:50%;background:' + (s.aan ? '#000' : 'var(--gold)') + ';transition:left .15s;"></span></button>'
+        : '') +
+      '</div>';
+    if (!s.mag){
+      h += '<div style="margin-top:0.6rem;font-size:0.72rem;color:var(--soft);border-top:1px solid var(--line);padding-top:0.6rem;">🔒 ' + escT(s.reden || T('ont.magniet','Nog niet beschikbaar.')) + '</div>';
+      el.innerHTML = kaart(h);
+      bindOntmoet();
+      return;
+    }
+    if (uit){
+      el.innerHTML = kaart(h);
+      bindOntmoet();
+      return;
+    }
+    // lopende afspraken (tekenen / actief / noodgeval)
+    let blokken = '';
+    for (const d of (s.dates || [])){
+      const metNaam = escT(d.met);
+      if (d.status === 'wacht-op-tekenen'){
+        blokken += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;">' +
+          '<b style="font-size:0.82rem;">' + d.icon + ' ' + escT(d.activiteitLabel) + ' ' + T('ont.met','met') + ' ' + metNaam + '</b>' +
+          '<div style="font-size:0.66rem;color:var(--muted);margin:0.3rem 0;">' + T('ont.tekenuitleg','Teken het veiligheidscontract om te starten. RTG-kantoor kijkt dan mee voor jullie veiligheid.') + '</div>' +
+          '<pre style="white-space:pre-wrap;font-family:inherit;font-size:0.64rem;color:var(--soft);background:rgba(0,0,0,0.15);border-radius:10px;padding:0.6rem;max-height:8rem;overflow:auto;">' + escT(d.contract) + '</pre>' +
+          '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">' +
+          (d.ikTekende
+            ? '<span style="flex:1;font-size:0.72rem;color:var(--gold);align-self:center;">✓ ' + T('ont.jijtekende','Jij tekende. ') + (d.anderTekende ? '' : T('ont.wachtander','Wachten op ') + metNaam) + '</span>'
+            : '<button class="js-oteken" data-d="' + d.id + '" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:999px;padding:0.55rem;font-weight:600;font-family:inherit;cursor:pointer;">✍️ ' + T('ont.teken','Contract tekenen') + '</button>') +
+          '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.55rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">' + T('ont.annuleer','Annuleren') + '</button>' +
+          '</div></div>';
+      } else if (d.status === 'actief' || d.status === 'noodgeval'){
+        const nood = d.status === 'noodgeval';
+        blokken += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;' + (nood ? 'background:rgba(220,40,40,0.08);border-radius:10px;padding:0.7rem;' : '') + '">' +
+          '<b style="font-size:0.82rem;">' + d.icon + ' ' + escT(d.activiteitLabel) + ' ' + T('ont.met','met') + ' ' + metNaam + '</b>' +
+          '<div style="font-size:0.64rem;color:var(--muted);margin:0.25rem 0 0.5rem;">🛰️ ' + T('ont.kijktmee','RTG-kantoor kijkt live mee voor jullie veiligheid, tot jullie afronden.') + '</div>' +
+          (nood ? '<div style="font-size:0.72rem;color:#ff8a8a;font-weight:600;margin-bottom:0.4rem;">🚨 ' + T('ont.noodloopt','Noodsignaal actief. Kantoor kijkt mee via je camera.') + '</div>' : '') +
+          '<div style="display:flex;gap:0.5rem;">' +
+          '<button class="js-osos" data-d="' + d.id + '" style="flex:1;background:#c62828;color:#fff;border:none;border-radius:999px;padding:0.6rem;font-weight:700;font-family:inherit;cursor:pointer;">🚨 ' + T('ont.sos','SOS') + '</button>' +
+          '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.6rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">🏁 ' + T('ont.afronden','Afronden') + '</button>' +
+          '</div></div>';
+      }
+    }
+    // open voorstellen
+    let voors = '';
+    for (const v of (s.voorstellen || [])){
+      const metNaam = escT(v.met);
+      voors += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;">' +
+        '<b style="font-size:0.82rem;">📍 ' + metNaam + ' ' + T('ont.indebuurt','is in de buurt') + '</b>';
+      if (v.mijnKeuze){
+        voors += '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.35rem;">✓ ' + T('ont.jijkoos','Jij koos') + ' ' + escT((s.activiteiten.find(a => a.id === v.mijnKeuze) || {}).label || v.mijnKeuze) + '. ' + T('ont.wachtkeuze','Wachten op de keuze van ') + metNaam + '.</div>';
+      } else {
+        voors += '<div style="font-size:0.66rem;color:var(--muted);margin:0.3rem 0;">' + T('ont.kiessamen','Kies samen. Niets doen betekent afwijzen.') + '</div>' +
+          '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">' + ontmoetActBtns(v.id) + '</div>' +
+          '<button class="js-oweiger" data-v="' + v.id + '" style="margin-top:0.4rem;background:none;border:none;color:var(--soft);font-size:0.68rem;font-family:inherit;cursor:pointer;text-decoration:underline;">' + T('ont.nietnu','Niet nu') + '</button>';
+      }
+      voors += '</div>';
+    }
+    if (!blokken && !voors) h += '<div style="margin-top:0.6rem;font-size:0.68rem;color:var(--muted);border-top:1px solid var(--line);padding-top:0.6rem;">' + T('ont.aanuitleg','Staat aan. Zodra een connectie vlakbij is, verschijnt hier een voorstel.') + '</div>';
+    el.innerHTML = kaart(h + blokken + voors);
+    bindOntmoet();
+  }
+  function bindOntmoet(){
+    const el = $('#ontmoetPaneel');
+    const tg = el.querySelector('#ontToggle');
+    if (tg) tg.addEventListener('click', async () => {
+      const aan = !(ontmoetState && ontmoetState.aan);
+      try { const r = await API.call('/ontmoeten/aan', { aan }); ontmoetState = r.state; renderOntmoet(); beheerOntmoetTimer(); }
+      catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('.js-oa').forEach(b => b.addEventListener('click', () => ontmoetKies(b.dataset.v, b.dataset.a)));
+    el.querySelectorAll('.js-oweiger').forEach(b => b.addEventListener('click', () => ontmoetKies(b.dataset.v, 'afwijzen')));
+    el.querySelectorAll('.js-oteken').forEach(b => b.addEventListener('click', () => ontmoetTeken(b.dataset.d)));
+    el.querySelectorAll('.js-ostop').forEach(b => b.addEventListener('click', () => ontmoetStop(b.dataset.d)));
+    el.querySelectorAll('.js-osos').forEach(b => b.addEventListener('click', () => ontmoetSos(b.dataset.d)));
+  }
+  async function ontmoetKies(voorstelId, keuze){
+    try { const r = await API.call('/ontmoeten/kies', { voorstelId, keuze }); ontmoetState = r.state;
+      if (r.status === 'gematcht') toast('🎉 ' + T('ont.match','Match! Teken het contract om te starten.'));
+      renderOntmoet();
+    } catch(e){ toast(e.message); }
+  }
+  async function ontmoetTeken(dateId){
+    if (!confirm(T('ont.tekenbevestig','Ik ben 18+ met een geverifieerd paspoort en ga akkoord met het veiligheidscontract: RTG-kantoor mag mijn live-locatie zien tot de afspraak klaar is, en bij SOS meekijken via de camera en 112 bellen.'))) return;
+    try { const r = await API.call('/ontmoeten/teken', { dateId }); ontmoetState = r.state; renderOntmoet(); beheerOntmoetTimer();
+      if (r.status === 'actief') toast('✅ ' + T('ont.gestart','Afspraak gestart. RTG kijkt mee voor jullie veiligheid.'));
+    } catch(e){ toast(e.message); }
+  }
+  async function ontmoetStop(dateId){
+    try { const r = await API.call('/ontmoeten/stop', { dateId }); ontmoetState = r.state; ontmoetSosStop(); renderOntmoet(); beheerOntmoetTimer(); }
+    catch(e){ toast(e.message); }
+  }
+  async function ontmoetSos(dateId){
+    const pos = await ontmoetPositie();
+    try {
+      await API.call('/ontmoeten/sos', { dateId, bericht: T('ont.sosbericht','Ik voel me niet veilig'), lat: pos ? pos.lat : undefined, lng: pos ? pos.lng : undefined });
+      toast('🚨 ' + T('ont.sosverstuurd','SOS verstuurd. RTG-kantoor is gewaarschuwd en kijkt mee.'));
+      ontmoetSosLive(dateId);         // camera + microfoon naar kantoor
+      try { window.location.href = 'tel:112'; } catch(e){}   // en direct de hulpdiensten
+      await laadOntmoet();
+    } catch(e){ toast(e.message); }
+  }
+  // WebRTC: stuur camera + microfoon naar RTG-kantoor (kantoor beantwoordt via SSE)
+  async function ontmoetSosLive(dateId){
+    if (ontmoetSosPc) return;
+    try {
+      await haalIce();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: 'environment' } });
+      const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
+      ontmoetSosPc = pc; ontmoetSosDate = dateId;
+      stream.getTracks().forEach(t => pc.addTrack(t, stream));
+      pc.onicecandidate = e => { if (e.candidate) API.call('/ontmoeten/signaal', { dateId, payload: { ice: e.candidate } }).catch(() => {}); };
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await API.call('/ontmoeten/signaal', { dateId, payload: { sdp: pc.localDescription } });
+    } catch(e){ /* camera geweigerd of niet beschikbaar: de SOS zelf is al binnen */ }
+  }
+  function ontmoetSosStop(){
+    if (ontmoetSosPc){ try { ontmoetSosPc.getSenders().forEach(s => s.track && s.track.stop()); ontmoetSosPc.close(); } catch(e){} ontmoetSosPc = null; ontmoetSosDate = null; }
+  }
+  // antwoord van RTG-kantoor op ons SOS-beeld (WebRTC-signaal)
+  async function opOntmoetSignaal(d){
+    if (!ontmoetSosPc || !d || d.dateId !== ontmoetSosDate || !d.payload) return;
+    try {
+      if (d.payload.sdp) await ontmoetSosPc.setRemoteDescription(new RTCSessionDescription(d.payload.sdp));
+      else if (d.payload.ice) await ontmoetSosPc.addIceCandidate(new RTCIceCandidate(d.payload.ice));
+    } catch(e){}
+  }
+
   /* ---------- taal gewijzigd: dynamische schermen opnieuw opbouwen ---------- */
   window.addEventListener('rtglang', async () => {
     if (!user) return;
@@ -4930,6 +5121,18 @@ window.I18N = { en: {
   'sal.claim':'Claim this offer', 'sal.geclaimd':'times claimed', 'sal.claimok':'Claimed. Your code:',
   'sal.poll':'Poll', 'sal.stemmen':'vote(s)', 'app.salon.direct':'posted instantly',
   'sal.folder':'Folder', 'sal.etalage':'Storefront', 'sal.bericht':'Post', 'sal.etaleeg':'No folders or offers yet.',
+  'ont.titel':'Meetups', 'ont.sub':'Connections nearby can meet up. Only you decide whether this is on.',
+  'ont.toggle':'Meetups on or off', 'ont.magniet':'Not available yet.',
+  'ont.met':'with', 'ont.indebuurt':'is nearby', 'ont.kiessamen':'Choose together. Doing nothing means declining.',
+  'ont.nietnu':'Not now', 'ont.jijkoos':'You chose', 'ont.wachtkeuze':'Waiting for the choice of ',
+  'ont.tekenuitleg':'Sign the safety contract to start. RTG office then watches for your safety.',
+  'ont.teken':'Sign contract', 'ont.jijtekende':'You signed. ', 'ont.wachtander':'Waiting for ',
+  'ont.annuleer':'Cancel', 'ont.kijktmee':'RTG office watches live for your safety until you finish.',
+  'ont.noodloopt':'Emergency active. Office is watching via your camera.',
+  'ont.sos':'SOS', 'ont.afronden':'Finish', 'ont.aanuitleg':'On. As soon as a connection is nearby, a proposal appears here.',
+  'ont.match':'Match! Sign the contract to start.', 'ont.gestart':'Meetup started. RTG watches for your safety.',
+  'ont.sosbericht':'I do not feel safe', 'ont.sosverstuurd':'SOS sent. RTG office is alerted and watching.',
+  'ont.tekenbevestig':'I am 18+ with a verified passport and agree to the safety contract: RTG office may see my live location until the meetup ends, and on SOS watch via the camera and call 112.',
   'app.ms.18':'Alcohol: 18+ only; the venue may ask for ID.',
   'app.ms.18b':'the venue may ask for ID.',
   'app.ms.los':'You order directly from this venue: a separate contract, and your payment goes directly to the venue.',

@@ -88,6 +88,10 @@ app.post('/api/auth/register', async (req, res) => {
   }
   const mdNieuw = memberTemplate();
   mdNieuw.geboren = geboren;
+  // geslacht zoals in het paspoort (v/m/x); pas betrouwbaar na RTG-verificatie.
+  // Gebruikt o.a. door Salon-ontmoetingen voor de "naar de vrouw"-regel.
+  const g = String(req.body.geslacht || '').toLowerCase();
+  if (g === 'v' || g === 'm' || g === 'x') mdNieuw.geslacht = g;
   accounts.saveMemberState(user.id, mdNieuw);
   // bevestigingsmail met een echte, werkende link
   const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);

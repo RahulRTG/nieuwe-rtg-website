@@ -206,8 +206,24 @@
       </div>
     </div>
     <div class="panel" style="margin-top:1.5rem;">
+      <h2>🌟 <span data-i18n="panel.ontmoet">Salon-ontmoetingen (veiligheid)</span></h2>
+      <p class="sub" data-i18n="panel.ontmoet.sub" style="margin:0 0 0.6rem;">Lopende afspraken met live-locatie. Bij een SOS kijkt u mee via de camera en belt u 112.</p>
+      <div class="rows" id="ontmoetOffice"></div>
+    </div>
+    <div class="panel" style="margin-top:1.5rem;">
       <h2>🤝 <span data-i18n="panel.trust">Vertrouwenslijn</span></h2>
       <div class="rows" id="trustList"></div>
+    </div>
+    <div id="ontLiveScrim" class="scrim" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;align-items:center;justify-content:center;">
+      <div style="width:min(94vw,640px);background:#111;border:1px solid var(--gold);border-radius:16px;padding:1rem;">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;">
+          <b style="flex:1;font-size:0.95rem;">🚨 <span id="ontLiveNaam">SOS</span></b>
+          <a id="ontBel112" href="tel:112" style="background:#c62828;color:#fff;border-radius:999px;padding:0.4rem 0.9rem;font-weight:700;text-decoration:none;">Bel 112</a>
+          <button id="ontLiveClose" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.8rem;color:var(--soft);cursor:pointer;">Sluiten</button>
+        </div>
+        <video id="ontLiveVid" autoplay playsinline style="width:100%;border-radius:12px;background:#000;"></video>
+        <div id="ontLiveStatus" style="font-size:0.75rem;color:var(--soft);margin-top:0.5rem;">Verbinden met de camera van het lid…</div>
+      </div>
     </div>
     <div class="cols" style="margin-top:1.5rem;">
       <div class="panel">
@@ -287,6 +303,7 @@
     loadConcierge();
     loadIncidenten();
     loadSalonNaleving();
+    loadOntmoetingen();
     loadTrust();
     stream();
   }
@@ -370,6 +387,73 @@
       '<div class="sub">'+(p.bio?'✓':'✗')+' bio · '+(p.foto?'✓':'✗')+' foto · '+p.items+' '+T('bo.salonitems','items')+' · '+p.volgers+' '+T('bo.salonvolgers','volgers')+'</div></div></div>').join('');
     el.innerHTML = kop + rows;
   }
+
+  // ---- Salon-ontmoetingen: lopende afspraken met live-locatie en SOS ----
+  async function loadOntmoetingen(){
+    const el = document.getElementById('ontmoetOffice'); if (!el) return;
+    let d;
+    try { d = await call('/office/ontmoetingen', {}); } catch(e){ return; }
+    if (!d.dates || !d.dates.length){ el.innerHTML = '<div class="empty">'+T('bo.ontgeen','Geen lopende afspraken.')+'</div>'; return; }
+    el.innerHTML = d.dates.map(dt => {
+      const nood = dt.sos && dt.sos.length;
+      const namen = dt.deelnemers.map(p => escHtml(p.codenaam) + (p.getekend ? ' ✓' : ' ⌛')).join(' · ');
+      const pos = dt.deelnemers.filter(p => p.pos).map(p => escHtml(p.codenaam) + ': ' + p.pos.lat.toFixed(4) + ', ' + p.pos.lng.toFixed(4)).join(' · ') || T('bo.ontgeenpos','nog geen locatie');
+      const status = dt.status === 'noodgeval' ? '🚨 '+T('bo.ontnood','NOODGEVAL') : dt.status === 'actief' ? '🛰️ '+T('bo.ontactief','loopt') : '⌛ '+T('bo.onttekenen','wacht op tekenen');
+      let sosBlok = '';
+      if (nood) sosBlok = dt.sos.map(s =>
+        '<div style="margin-top:0.4rem;background:rgba(220,40,40,0.12);border-radius:8px;padding:0.5rem 0.7rem;">'+
+        '<b style="color:#ff8a8a;">🚨 '+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
+        '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+        '<button class="vbtn ok" data-live="'+dt.id+'" data-naam="'+escHtml(s.door)+'">📹 '+T('bo.ontlive','Live meekijken')+'</button>'+
+        '<a class="vbtn" href="tel:112" style="text-decoration:none;background:#c62828;color:#fff;">'+T('bo.ont112','Bel 112')+'</a>'+
+        '<button class="vbtn" data-sosaf="'+dt.id+'" data-sosid="'+s.id+'">'+T('bo.ontsosaf','SOS afgehandeld')+'</button>'+
+        '</div></div>').join('');
+      return '<div class="vrow" style="'+(nood?'border:1px solid #c62828;border-radius:12px;':'')+'"><div class="vi" style="width:100%;">'+
+        '<div class="nm">'+dt.icon+' '+escHtml(dt.activiteitLabel)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+namen+'</span></div>'+
+        '<div class="sub">'+status+' · 📍 '+pos+'</div>'+ sosBlok +'</div></div>';
+    }).join('');
+    el.querySelectorAll('[data-sosaf]').forEach(b => b.addEventListener('click', async () => {
+      try { await call('/office/ontmoeting/sos-af', { dateId: b.dataset.sosaf, sosId: b.dataset.sosid }); loadOntmoetingen(); } catch(e){ alert(e.message); }
+    }));
+    el.querySelectorAll('[data-live]').forEach(b => b.addEventListener('click', () => ontLiveWacht(b.dataset.live, b.dataset.naam)));
+  }
+
+  /* Live meekijken bij een SOS: het lid stuurt een WebRTC-aanbod via de office-
+     stream ('ontmoeting-signaal'); wij openen het beeld en antwoorden terug. */
+  let ontPc = null, ontLiveDate = null, ontIce = null;
+  async function ontHaalIce(){ try { ontIce = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ ontIce = [{ urls:'stun:stun.l.google.com:19302' }]; } return ontIce; }
+  function ontLiveWacht(dateId, naam){
+    ontLiveDate = dateId;
+    $('#ontLiveNaam').textContent = '🚨 ' + naam;
+    $('#ontLiveStatus').textContent = T('bo.ontwacht','Wachten op het camerabeeld van het lid…');
+    $('#ontLiveVid').srcObject = null;
+    $('#ontLiveScrim').style.display = 'flex';
+  }
+  function ontLiveSluit(){
+    $('#ontLiveScrim').style.display = 'none';
+    if (ontPc){ try { ontPc.close(); } catch(e){} ontPc = null; }
+    ontLiveDate = null;
+  }
+  async function opOntSignaal(d){
+    if (!d || !d.payload || (ontLiveDate && d.dateId !== ontLiveDate)) return;
+    // een nieuw aanbod: open het scherm als dat nog niet openstaat
+    if (d.payload.sdp && d.payload.sdp.type === 'offer'){
+      ontLiveDate = d.dateId;
+      if ($('#ontLiveScrim').style.display !== 'flex'){ $('#ontLiveNaam').textContent = '🚨 ' + (d.codenaam||'SOS'); $('#ontLiveScrim').style.display = 'flex'; }
+      await ontHaalIce();
+      if (ontPc){ try { ontPc.close(); } catch(e){} }
+      ontPc = new RTCPeerConnection({ iceServers: ontIce || [{ urls:'stun:stun.l.google.com:19302' }] });
+      ontPc.ontrack = e => { $('#ontLiveVid').srcObject = e.streams[0]; $('#ontLiveStatus').textContent = T('bo.ontlivenu','Live beeld en geluid van het lid.'); };
+      ontPc.onicecandidate = e => { if (e.candidate) call('/office/ontmoeting/signaal', { dateId: d.dateId, naarKey: d.van, payload: { ice: e.candidate } }).catch(()=>{}); };
+      await ontPc.setRemoteDescription(new RTCSessionDescription(d.payload.sdp));
+      const ans = await ontPc.createAnswer();
+      await ontPc.setLocalDescription(ans);
+      await call('/office/ontmoeting/signaal', { dateId: d.dateId, naarKey: d.van, payload: { sdp: ontPc.localDescription } });
+    } else if (d.payload.ice && ontPc){
+      try { await ontPc.addIceCandidate(new RTCIceCandidate(d.payload.ice)); } catch(e){}
+    }
+  }
+  document.getElementById('ontLiveClose').addEventListener('click', ontLiveSluit);
 
   let convData = [], convUser = null;
   async function loadConcierge(){
@@ -586,8 +670,11 @@
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
-    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadConcierge(); loadIncidenten(); loadSalonNaleving(); loadTrust(); });
+    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadConcierge(); loadIncidenten(); loadSalonNaleving(); loadOntmoetingen(); loadTrust(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
+    // Salon-ontmoetingen: SOS-alarm en het live camerabeeld (WebRTC-signaal)
+    source.addEventListener('ontmoeting-sos', () => { loadOntmoetingen(); const p=$('#prices'); if(p) p.classList.add('flash'); });
+    source.addEventListener('ontmoeting-signaal', e => { try { opOntSignaal(JSON.parse(e.data)); } catch(err){} });
   }
 
   $('#docScrim').addEventListener('click', () => { $('#docScrim').classList.remove('open'); $('#docImg').src = ''; });
@@ -636,6 +723,10 @@ window.I18N = { en: {
   'panel.salon':'Salon compliance', 'panel.salon.sub':'The Salon is mandatory. Partners without a complete profile are not visible to members.',
   'bo.saloncompleet':'profiles complete', 'bo.salonachter':'partner(s) not yet visible to members', 'bo.salonok':'all partners are visible',
   'bo.salonitems':'items', 'bo.salonvolgers':'followers',
+  'panel.ontmoet':'Salon meetups (safety)', 'panel.ontmoet.sub':'Ongoing meetups with live location. On an SOS you watch via the camera and call 112.',
+  'bo.ontgeen':'No ongoing meetups.', 'bo.ontgeenpos':'no location yet', 'bo.ontnood':'EMERGENCY', 'bo.ontactief':'running',
+  'bo.onttekenen':'awaiting signature', 'bo.ontlive':'Watch live', 'bo.ont112':'Call 112', 'bo.ontsosaf':'SOS handled',
+  'bo.ontwacht':'Waiting for the member camera feed…', 'bo.ontlivenu':'Live video and audio from the member.',
   'bo.waiting':'waiting', 'bo.open':'Open', 'bo.noconv':'No conversations yet.', 'bo.replyph':'Reply as concierge…', 'bo.send':'Send',
   'bo.partners':'Partners', 'bo.proposals':'Price proposals', 'bo.orders':'Orders', 'bo.revenue':'Revenue via partners',
   'bo.noprices':'No prices yet. As soon as a partner submits a dynamic price, it appears here live.',

@@ -8,7 +8,9 @@ module.exports = (kern) => {
     voorkeurVan, zetVoorkeur,
     retailCatalogus, wishlistToggle, mijnApart, mijnStyling, vraagPaskamer, retailIsRetail,
     PASPOORT_NIVEAUS, paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn,
-    salonZichtbaar, salonProfielCompleet } = kern;
+    salonZichtbaar, salonProfielCompleet,
+    ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken, ontmoetHier, ontmoetStop,
+    ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -1588,6 +1590,68 @@ app.post('/api/charter/locatie', auth, (req, res) => {
   save();
   sseToSupplier(c.supplierCode, 'sync', { scope: 'charter' });
   res.json({ ok: true, aan: L.aan });
+});
+
+/* ================== Salon-ontmoetingen (wederzijdse connecties in de buurt) ==
+   Elk lid zet dit zelf aan of uit. Voorwaarde: 18+ met een geverifieerd
+   paspoort. Terwijl het aanstaat stuurt de app af en toe de positie mee; een
+   verbonden vriend die ook aanstaat en vlakbij is, levert een voorstel op.
+   Beiden kiezen (of doen niets = afwijzen); bij een match tekenen ze een
+   veiligheidscontract en kijkt RTG-kantoor live mee tot de afspraak klaar is. */
+function ontmoetKey(req, res) { if (!eisAccount(req, res)) return null; return req.session.key; }
+
+app.post('/api/ontmoeten/state', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  res.json(ontmoetMijnState(key));
+});
+app.post('/api/ontmoeten/aan', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  const r = ontmoetZet(key, req.body.aan === true);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, aan: r.aan, state: ontmoetMijnState(key) });
+});
+app.post('/api/ontmoeten/hier', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  const r = ontmoetPos(key, Number(req.body.lat), Number(req.body.lng));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, nieuwe: r.nieuwe, state: ontmoetMijnState(key) });
+});
+app.post('/api/ontmoeten/kies', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  const r = ontmoetKies(key, String(req.body.voorstelId || ''), String(req.body.keuze || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.status2, activiteit: r.activiteit || null, dateId: r.dateId || null, state: ontmoetMijnState(key) });
+});
+app.post('/api/ontmoeten/teken', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  const r = ontmoetTeken(key, String(req.body.dateId || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.status2, state: ontmoetMijnState(key) });
+});
+app.post('/api/ontmoeten/hier-date', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  const r = ontmoetHier(key, String(req.body.dateId || ''), Number(req.body.lat), Number(req.body.lng));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true });
+});
+app.post('/api/ontmoeten/stop', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  const r = ontmoetStop(key, String(req.body.dateId || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.status2, state: ontmoetMijnState(key) });
+});
+app.post('/api/ontmoeten/sos', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  const r = ontmoetSos(key, String(req.body.dateId || ''), req.body.bericht, Number(req.body.lat), Number(req.body.lng));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, sosId: r.sosId });
+});
+// WebRTC-signaal van het lid naar RTG-kantoor (live meekijken bij een SOS)
+app.post('/api/ontmoeten/signaal', auth, (req, res) => {
+  const key = ontmoetKey(req, res); if (!key) return;
+  const r = ontmoetSignaalKantoor(key, String(req.body.dateId || ''), req.body.payload || null);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true });
 });
 
 /* ================== contracten: het lid tekent digitaal ================== */

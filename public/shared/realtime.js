@@ -27,6 +27,7 @@
       this.onSocial = opts.onSocial || null;
       this.onCall = opts.onCall || null;
       this.onBezorg = opts.onBezorg || null;
+      this.onOntmoetSignaal = opts.onOntmoetSignaal || null;
       try {
         const r = await fetch('/api/notifications', {
           method: 'POST',
@@ -65,6 +66,10 @@
       // de ophaal/bezorgdienst: bezorger, GPS/ETA en statusstappen
       this.source.addEventListener('bezorg', e => {
         if (this.onBezorg) this.onBezorg(JSON.parse(e.data));
+      });
+      // Salon-ontmoetingen: WebRTC-signaal voor live meekijken bij een SOS
+      this.source.addEventListener('ontmoeting-signaal', e => {
+        if (this.onOntmoetSignaal) this.onOntmoetSignaal(JSON.parse(e.data));
       });
     },
 

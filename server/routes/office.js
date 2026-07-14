@@ -1,7 +1,24 @@
 /* Domein "office" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan } = kern;
+  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
+
+  /* Salon-ontmoetingen: het RTG-veiligheidsteam ziet de lopende afspraken met
+     live-locatie, handelt SOS-en af en kan bij een SOS live meekijken (WebRTC). */
+  app.post('/api/office/ontmoetingen', officeAuth, (req, res) => {
+    res.json(ontmoetKantoorState());
+  });
+  app.post('/api/office/ontmoeting/sos-af', officeAuth, (req, res) => {
+    const r = ontmoetSosAf(String(req.body.dateId || ''), String(req.body.sosId || ''), req.actor && req.actor.name);
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json({ ok: true, ontmoetingen: ontmoetKantoorState() });
+  });
+  // WebRTC-antwoord van kantoor naar het lid (live meekijken bij een SOS)
+  app.post('/api/office/ontmoeting/signaal', officeAuth, (req, res) => {
+    const r = ontmoetSignaalLid(String(req.body.dateId || ''), String(req.body.naarKey || ''), req.body.payload || null);
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json({ ok: true });
+  });
 
   // Naleving van de Salon-verplichting: welke partners zijn (niet) zichtbaar
   app.post('/api/office/salon-naleving', officeAuth, (req, res) => {
@@ -257,6 +274,9 @@ app.post('/api/office/verify', officeAuth, (req, res) => {
     const md = accounts.getMemberState(user.id) || {};
     if (req.body.faceMatch !== undefined) md.faceMatch = req.body.faceMatch === true;
     if (req.body.nationaliteit) md.nationaliteit = String(req.body.nationaliteit).slice(0, 40);
+    // geslacht uit het paspoort vastleggen (v/m/x); stuurt de "naar de vrouw"-regel bij ontmoetingen
+    const g = String(req.body.geslacht || '').toLowerCase();
+    if (g === 'v' || g === 'm' || g === 'x') md.geslacht = g;
     accounts.saveMemberState(user.id, md);
   }
   mail.send(accounts.emailOf(user), status === 'verified' ? 'Uw identiteit is geverifieerd' : 'Uw verificatie is afgewezen',

@@ -14,7 +14,8 @@ module.exports = (kern) => {
     ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer,
     mbAanvraag, mbMijn,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
-    zorgContact } = kern;
+    zorgContact,
+    dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -1153,6 +1154,32 @@ app.post('/api/chat/send', auth, async (req, res) => {
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
   await memberSays(req.session.account, text, 'app');
   res.json({ ok: true, messages: convOf(req.session.account.id), mode: req.session.tier === 'rtg' ? 'butler' : 'concierge' });
+});
+
+/* ============ rechtstreeks betalen aan een leverancier (Face ID) ============
+   Elk betalend lid rekent alles met Face ID af, via de AI en de Salon, en het
+   geld gaat rechtstreeks naar de leverancier. Alleen leden (geen gasten). */
+app.post('/api/betaal/direct', auth, async (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Rechtstreeks betalen is voor leden.' });
+  const cent = req.body.centen != null ? Math.round(Number(req.body.centen)) : Math.round(Number(req.body.bedrag) * 100);
+  const r = await dpBetaalDirect({ key: req.session.key, codename: liveCodename(req.session),
+    supplierCode: String(req.body.supplierCode || ''), bedragCenten: cent,
+    omschrijving: req.body.omschrijving, bron: req.body.bron, idem: req.body.idem });
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/betaal/verzoeken', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.json({ verzoeken: [] });
+  res.json({ verzoeken: dpVerzoekenVoor(liveCodename(req.session)) });
+});
+app.post('/api/betaal/verzoek/pay', auth, async (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Betalen is voor leden.' });
+  const r = await dpBetaalVerzoek({ key: req.session.key, codename: liveCodename(req.session), ref: String(req.body.ref || ''), idem: req.body.idem });
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/betaal/mijn', auth, (req, res) => {
+  res.json({ betalingen: dpMijnBetalingen(req.session.key) });
 });
 
 app.post('/api/partner', (req, res) => {

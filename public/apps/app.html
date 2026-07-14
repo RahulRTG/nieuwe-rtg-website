@@ -4112,6 +4112,53 @@
     }, 1100);
   }
 
+  /* ---------- rechtstreeks betalen aan een partner (Face ID) ----------
+     Overal in de app: één bedrag, Face ID, geld gaat direct naar de partner.
+     Bereikbaar vanuit de Salon en vanuit de AI/concierge. */
+  function betaalPartner(code, name, opts){
+    opts = opts || {};
+    const idem = 'dp-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    let ov = document.getElementById('dp-ov');
+    if (!ov){ ov = document.createElement('div'); ov.id = 'dp-ov';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:130;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;justify-content:center;';
+      document.body.appendChild(ov);
+      ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+    }
+    ov.innerHTML = '<div style="width:100%;max-width:460px;background:var(--bg);border-radius:20px 20px 0 0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem;">' +
+      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;"><b style="font-size:1rem;">' + FID_MINI + T('dp.title','Betaal direct') + '</b>' +
+        '<button id="dpX" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;">✕</button></div>' +
+      '<div style="font-size:0.8rem;color:var(--soft);margin-bottom:0.8rem;">' + T('dp.naar','Aan') + ' <b style="color:var(--txt);">' + escT(name) + '</b>. ' + T('dp.direct','Het bedrag gaat rechtstreeks naar de partner.') + '</div>' +
+      (opts.omschrijving ? '<div style="font-size:0.82rem;margin-bottom:0.6rem;">' + escT(opts.omschrijving) + '</div>' : '') +
+      '<label style="font-size:0.72rem;color:var(--soft);">' + T('dp.bedrag','Bedrag (€)') + '</label>' +
+      '<input id="dpBedrag" type="number" inputmode="decimal" min="0.50" step="0.50" ' + (opts.bedrag ? 'value="' + opts.bedrag + '"' : '') + ' style="width:100%;font-size:1.3rem;padding:0.6rem 0.8rem;margin:0.25rem 0 0.7rem;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);">' +
+      '<input id="dpNote" placeholder="' + T('dp.note','Waarvoor? (optioneel)') + '" ' + (opts.omschrijving ? 'value="' + escT(opts.omschrijving) + '"' : '') + ' style="width:100%;padding:0.55rem 0.8rem;margin-bottom:0.9rem;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);">' +
+      '<button id="dpPay" class="mo-pay" style="width:100%;justify-content:center;padding:0.8rem;">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button></div>';
+    ov.querySelector('#dpX').addEventListener('click', () => ov.remove());
+    ov.querySelector('#dpPay').addEventListener('click', () => {
+      const bedrag = Math.round(Number(ov.querySelector('#dpBedrag').value) * 100) / 100;
+      if (!(bedrag >= 0.5)) { toast(T('dp.min','Kies een bedrag van minstens € 0,50.')); return; }
+      const note = (ov.querySelector('#dpNote').value || '').trim();
+      ov.remove();
+      payWithFaceId(eur(bedrag), async () => {
+        const d = await API.call('/betaal/direct', { supplierCode: code, bedrag, omschrijving: note, bron: opts.bron || 'app', idem });
+        return d.betaling;
+      }, { message: b => T('dp.betaald','Betaald aan') + ' ' + name + ': ' + eur((b.bedrag||0)/100), after: () => { if (opts.after) opts.after(); } });
+    });
+  }
+  // Een betaalverzoek van een partner met Face ID afrekenen.
+  function betaalVerzoekPay(v){
+    payWithFaceId(eur((v.bedrag||0)/100), async () => {
+      const d = await API.call('/betaal/verzoek/pay', { ref: v.ref, idem: 'bv-' + v.ref });
+      return d.betaling;
+    }, { message: () => T('dp.verzoekbetaald','Betaalverzoek voldaan:') + ' ' + eur((v.bedrag||0)/100), after: () => { laadBetaalVerzoeken(); renderHome(); } });
+  }
+  // open betaalverzoeken ophalen (aan dit lid gericht)
+  let betaalVerzoeken = [];
+  async function laadBetaalVerzoeken(){
+    if (!user || user.tier === 'guest') { betaalVerzoeken = []; return; }
+    try { betaalVerzoeken = (await API.call('/betaal/verzoeken', {})).verzoeken || []; } catch(e){ betaalVerzoeken = []; }
+  }
+
   function renderPay(){
     const open = invoices.filter(i => i.status === 'open');
     const openSum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
@@ -4428,10 +4475,33 @@
     if (deck) deck.textContent = concierge
       ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
       : T('chat.butler.deck','De Butler, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
-    $('#chips').innerHTML = '';
+    // Vaste snelactie: alles regelen én afrekenen kan hier. Face ID, direct naar de partner.
+    if (user.tier !== 'guest'){
+      $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
+      const bc = $('#aiBetaalChip'); if (bc) bc.addEventListener('click', () => kiesPartnerEnBetaal('ai'));
+    } else { $('#chips').innerHTML = ''; }
     if (!API.live){ $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); return; }
     try { const d = await API.call('/chat/history'); renderChatMsgs(d.messages, concierge); }
     catch (e) { $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); }
+  }
+  // Kies een partner en reken direct met Face ID af (vanuit de AI/concierge).
+  function kiesPartnerEnBetaal(bron){
+    const lijst = (suppliers || []).slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    if (!lijst.length){ toast(T('dp.geenpartner','Nog geen partners om aan te betalen.')); return; }
+    let ov = document.getElementById('dp-pick'); if (ov) ov.remove();
+    ov = document.createElement('div'); ov.id = 'dp-pick';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:130;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;justify-content:center;';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+    ov.innerHTML = '<div style="width:100%;max-width:460px;max-height:80vh;overflow-y:auto;background:var(--bg);border-radius:20px 20px 0 0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem;">' +
+      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;"><b style="font-size:1rem;">' + T('dp.kiespartner','Aan welke partner?') + '</b><button id="dpPickX" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;">✕</button></div>' +
+      lijst.map(s => '<button class="js-dppick" data-code="' + s.code + '" style="display:flex;align-items:center;gap:0.6rem;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-bottom:0.4rem;color:var(--txt);font-family:inherit;cursor:pointer;"><span style="font-size:1.1rem;">' + (s.icon || '🏛️') + '</span><span><b style="font-size:0.86rem;">' + escT(s.name) + '</b><span style="display:block;font-size:0.68rem;color:var(--soft);">' + escT(s.typeLabel || '') + (s.city ? ' · ' + escT(s.city) : '') + '</span></span></button>').join('') +
+      '</div>';
+    ov.querySelector('#dpPickX').addEventListener('click', () => ov.remove());
+    ov.querySelectorAll('.js-dppick').forEach(b => b.addEventListener('click', () => {
+      const s = lijst.find(x => x.code === b.dataset.code); ov.remove();
+      betaalPartner(s.code, s.name, { bron });
+    }));
   }
   async function chatSend(q){
     if (!API.live){ bubble(q, 'user'); setTimeout(() => bubble(aiAnswer(q), 'ai'), 400); return; }
@@ -4767,6 +4837,9 @@
     let d;
     try { d = await API.call('/salon/profiel', { code }); } catch(e){ toast(e.message); return; }
     const p = d.partner;
+    await laadBetaalVerzoeken();
+    const vz = betaalVerzoeken.filter(v => v.supplierCode === code);
+    const kanBetalen = user && user.tier !== 'guest';
     let ov = document.getElementById('etalage-ov');
     if (!ov){ ov = document.createElement('div'); ov.id = 'etalage-ov';
       ov.style.cssText = 'position:fixed;inset:0;z-index:120;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;justify-content:center;';
@@ -4786,6 +4859,12 @@
           '<button id="etaVolg" style="margin-left:auto;background:' + (p.volgIk ? 'var(--gold)' : 'none') + ';color:' + (p.volgIk ? '#000' : 'var(--gold)') + ';border:1px solid var(--gold);border-radius:999px;padding:0.3rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;">' + (p.volgIk ? '✓ ' + T('sal.volgt','Volgt') : '+ ' + T('sal.volg','Volg')) + '</button></div>' +
         '<div style="font-size:0.74rem;color:var(--soft);margin-top:0.2rem;">' + (p.icon ? p.icon + ' ' : '') + escT(p.typeLabel || '') + ' · ' + escT(p.city || '') + ' · ' + p.volgers + ' ' + T('sal.volgers','volgers') + '</div>' +
         (p.bio ? '<div style="font-size:0.86rem;margin-top:0.6rem;line-height:1.5;">' + escT(p.bio) + '</div>' : '') +
+        (kanBetalen ? '<button id="etaBetaal" class="mo-pay" style="width:100%;justify-content:center;margin-top:0.8rem;padding:0.7rem;">' + FID_MINI + T('dp.betaaldirect','Betaal direct met Face ID') + '</button>' : '') +
+        (vz.length ? '<div style="margin-top:0.8rem;">' + vz.map(v =>
+          '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.5rem;background:var(--card);">' +
+          '<div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">' + FID_MINI + T('dp.verzoek','Betaalverzoek') + '</div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.3rem;"><span style="font-size:0.85rem;">' + escT(v.omschrijving || '') + '</span><b style="color:var(--gold);white-space:nowrap;">' + eur2((v.bedrag||0)/100) + '</b></div>' +
+          '<button class="mo-pay js-vzpay" data-vz="' + v.ref + '" style="width:100%;justify-content:center;margin-top:0.5rem;padding:0.6rem;">' + FID_MINI + T('dp.betaalverzoek','Betaal dit verzoek') + '</button></div>').join('') + '</div>' : '') +
         (items.length
           ? items.map(it =>
             '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.7rem;">' +
@@ -4803,6 +4882,12 @@
     ov.querySelector('#etaVolg').addEventListener('click', async () => {
       try { await API.call('/salon/volg', { code }); await refreshState(); renderSalon(); openEtalage(code); } catch(e){ toast(e.message); }
     });
+    const eb = ov.querySelector('#etaBetaal');
+    if (eb) eb.addEventListener('click', () => { ov.remove(); betaalPartner(code, p.name, { bron: 'salon' }); });
+    ov.querySelectorAll('.js-vzpay').forEach(b => b.addEventListener('click', () => {
+      const v = vz.find(x => x.ref === b.dataset.vz); if (!v) return;
+      ov.remove(); betaalVerzoekPay(v);
+    }));
   }
 
   function renderSalon(){

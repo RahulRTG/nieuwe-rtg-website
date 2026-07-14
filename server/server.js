@@ -59,6 +59,7 @@ const { maakModebezorg } = require('./kern/modebezorg');
 const { maakZaak } = require('./kern/zaak');
 const { maakAutoverkoop } = require('./kern/autoverkoop');
 const { maakBeveiliging } = require('./kern/beveiliging');
+const { maakDirectpay } = require('./kern/directpay');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -1692,6 +1693,14 @@ const {
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand
 } = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine });
 
+/* De directe-betaallaag (kern/directpay.js): elk betalend lid rekent alles met
+   Face ID af via de AI en de Salon, en het geld gaat rechtstreeks van de klant
+   naar de leverancier (in productie een Stripe destination charge). */
+const {
+  DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
+  dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten
+} = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity });
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -2040,6 +2049,9 @@ const kern = {
   bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
   bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
+  // de directe-betaallaag (kern/directpay.js)
+  DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
+  dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

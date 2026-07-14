@@ -6,7 +6,8 @@ module.exports = (kern) => {
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
     cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
-    zaakBoard, zaakZet, zaakFunctieAan, klantSalon } = kern;
+    zaakBoard, zaakZet, zaakFunctieAan, klantSalon,
+    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten } = kern;
 
 // De Salon is verplicht: publiceren (post/folder/deal/poll) kan pas met een
 // compleet profiel (bio + foto). De bio/foto-endpoints zelf blijven altijd open.
@@ -586,6 +587,25 @@ app.post('/api/supplier/klant/salon', supplierAuth, (req, res) => {
   const chat = db.data.guestChats[String(req.body.key || '')];
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   res.json(klantSalon(chat.customerKey));
+});
+
+/* Rechtstreekse ontvangsten: wat er direct van klanten binnenkwam, plus het
+   sturen en intrekken van betaalverzoeken (op codenaam). */
+app.post('/api/supplier/ontvangsten', supplierAuth, (req, res) => {
+  res.json(dpOntvangsten(req.supplier.code));
+});
+app.post('/api/supplier/betaalverzoek', supplierAuth, (req, res) => {
+  const cent = req.body.centen != null ? Math.round(Number(req.body.centen)) : Math.round(Number(req.body.bedrag) * 100);
+  const r = dpVerzoekMaak({ supplierCode: req.supplier.code, actorName: req.actor.name,
+    naarCodename: req.body.codename, bedragCenten: cent, omschrijving: req.body.omschrijving });
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  logActivity(req.supplier.code, req.actor, 'stuurde een betaalverzoek van € ' + (cent / 100).toFixed(2));
+  res.json(r);
+});
+app.post('/api/supplier/betaalverzoek/intrek', supplierAuth, (req, res) => {
+  const r = dpVerzoekIntrek(req.supplier.code, String(req.body.ref || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
 });
 
 app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {

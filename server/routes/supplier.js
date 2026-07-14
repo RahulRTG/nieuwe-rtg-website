@@ -1,11 +1,11 @@
 /* Domein "supplier" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, beslisReservering, isFavoriet, broadcastSync,
+  const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, boekhoudkennis, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
+    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten } = kern;
 
@@ -229,7 +229,7 @@ app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAut
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo,
-    text, lang: req.body.lang === 'en' ? 'en' : 'nl',
+    text, lang: talen.taalVan(req.body.lang),
     at: new Date().toISOString(),
     baseLikes: 0, likedBy: {}, comments: []
   };
@@ -356,7 +356,7 @@ app.post('/api/supplier/salon/folder', express.json({ limit: '8mb' }), supplierA
     id: Date.now(),
     author: req.supplier.name, tier: 'partner', partner: true, partnerCode: req.supplier.code,
     place: req.supplier.city, visual: null, photo: fotos[0] || null,
-    text: schoon(req.body.tekst, 300) || titel, lang: req.body.lang === 'en' ? 'en' : 'nl',
+    text: schoon(req.body.tekst, 300) || titel, lang: talen.taalVan(req.body.lang),
     at: new Date().toISOString(), baseLikes: 0, likedBy: {}, comments: [],
     folder: { titel, fotos, items }
   };
@@ -560,7 +560,7 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   const text = String(req.body.text || '').trim().slice(0, 500);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  chat.messages.push({ from: 'partner', who: req.actor.name, text, lang: req.body.lang === 'en' ? 'en' : 'nl', at: new Date().toISOString() });
+  chat.messages.push({ from: 'partner', who: req.actor.name, text, lang: talen.taalVan(req.body.lang), at: new Date().toISOString() });
   chat.messages = chat.messages.slice(-120);
   chat.unreadGuest += 1;
   chat.lastAt = new Date().toISOString();
@@ -569,14 +569,14 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
   notify(chat.tier, { icon: '💬', title: req.supplier.name + (chat.dept ? ' · ' + chat.dept : ''), body: text.slice(0, 90), scope: 'gchat' });
   sseToCustomer(chat.customerKey, 'sync', { scope: 'gchat' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
-  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ ok: true, messages }));
+  trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
 });
 
 app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
   const chat = db.data.guestChats[String(req.body.key || '')];
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   if (chat.unreadPartner) { chat.unreadPartner = 0; save(); }
-  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ messages, codename: chat.codename }));
+  trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ messages, codename: chat.codename }));
 });
 
 /* De Salon van de klant zoals de partner die vooraf mag zien: privacy-first,
@@ -658,7 +658,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     logActivity(req.supplier.code, req.actor, 'nodigde ' + a.name + ' uit voor een gesprek');
     sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
     notifyApplicant(a, req.supplier);
-    return res.json({ ok: true, chat: applyChatPubliek(chat) });
+    return applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ ok: true, chat: c }));
   }
   if (req.body.action === 'aannemen') {
     const pin = accounts.makePin();
@@ -683,20 +683,20 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
 app.post('/api/supplier/apply/chat', supplierAuth, (req, res) => {
   const chat = db.data.applyChats[String(req.body.id || '')];
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  res.json({ chat: applyChatPubliek(chat) });
+  applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 
 app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const chat = db.data.applyChats[String(req.body.id || '')];
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  const m = chatStuur(chat, 'werkgever', req.supplier.name, req.body.text);
+  const m = chatStuur(chat, 'werkgever', req.supplier.name, req.body.text, talen.taalVan(req.body.lang));
   if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
   // de sollicitant krijgt een seintje
   const app = (db.data.applications[req.supplier.code] || []).find(x => x.id === chat.id);
   if (app && app.key && db.data.notifications[app.key])
     notify(app.key, { icon: '💬', title: 'Bericht van ' + chat.bedrijf, body: m.tekst.slice(0, 80) });
-  res.json({ chat: applyChatPubliek(chat) });
+  applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 
 app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
@@ -990,7 +990,7 @@ app.post('/api/supplier/menu/recipe', supplierAuth, async (req, res) => {
 
 app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
   const s = req.supplier;
-  const lang = req.body.lang === 'en' ? 'en' : 'nl';
+  const lang = talen.taalVan(req.body.lang);
   const open = db.data.orders.filter(o => o.supplierCode === s.code && ['nieuw', 'in bereiding'].includes(o.status) && sectiesForOrder(s, o).length);
   if (!open.length) return res.json({ ok: true, lines: [], ai: !!anthropic });
   const hash = crypto.createHash('sha1').update(lang + JSON.stringify(open.map(o => [o.ref, o.status, o.table, o.secties, Math.floor((Date.now() - new Date(o.at)) / 300000)]))).digest('hex');

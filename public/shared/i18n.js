@@ -18,7 +18,11 @@
     nl: { label: 'Nederlands', native: 'Nederlands', flag: '🇳🇱' },
     en: { label: 'Engels', native: 'English', flag: '🇬🇧' }
   };
-  const SUPPORTED = Object.keys(LANGS);
+  /* Wereldtalen: de Boardroom bepaalt welke talen aanstaan; de kiezer toont ze
+     allemaal. UI-teksten vallen voor andere talen terug op Engels; chats en
+     berichten worden door de server echt per taal vertaald. */
+  let WERELD = null; // [{code, naam, en}] uit /api/talen
+  function supported() { return WERELD ? WERELD.map(t => t.code) : Object.keys(LANGS); }
   const orig = new WeakMap(); // element -> { text, html, ph }
 
   function detectDevice() {
@@ -26,15 +30,20 @@
       ? navigator.languages : [navigator.language || 'nl'];
     for (const raw of list) {
       const code = String(raw || '').toLowerCase().slice(0, 2);
-      if (SUPPORTED.includes(code)) return code;
+      if (supported().includes(code)) return code;
     }
-    return 'en'; // niet-Nederlandstalig toestel: standaard Engels
+    return 'en'; // geen match: standaard Engels
   }
 
   const RTGi18n = {
     lang: 'nl',
     chosen: false,
-    dict(lang) { return (window.I18N && window.I18N[lang]) || {}; },
+    // UI-woordenboek: eigen taal als die er is, anders Engels (internationale
+    // terugval); Nederlands staat gewoon in de HTML zelf.
+    dict(lang) {
+      const all = window.I18N || {};
+      return all[lang] || (lang !== 'nl' ? all.en : null) || {};
+    },
     t(key, fallback) {
       if (this.lang === 'nl') return fallback != null ? fallback : key;
       const v = this.dict(this.lang)[key];
@@ -42,7 +51,7 @@
     },
 
     apply(lang) {
-      if (!SUPPORTED.includes(lang)) lang = 'nl';
+      lang = /^[a-z]{2}$/.test(String(lang || '')) ? lang : 'nl';
       this.lang = lang;
       document.documentElement.setAttribute('lang', lang);
       const d = this.dict(lang);
@@ -82,16 +91,20 @@
 
     /* ---------- taalkeuze-venster ---------- */
     buildModal(recommended) {
-      if (document.getElementById('rtg-lang-modal')) return;
+      const oud = document.getElementById('rtg-lang-modal');
+      const stondOpen = oud && oud.classList.contains('open');
+      if (oud) oud.remove(); // opnieuw opbouwen zodra de wereldtalen binnen zijn
       const scrim = document.createElement('div');
       scrim.id = 'rtg-lang-modal';
       scrim.className = 'rtg-lang-scrim';
-      const opts = SUPPORTED.map(code => {
-        const l = LANGS[code];
+      const lijst = WERELD || Object.keys(LANGS).map(c => ({ code: c, naam: LANGS[c].native }));
+      const opts = lijst.map(t => {
+        const code = t.code;
+        const basis = LANGS[code];
         const rec = code === recommended;
         return '<button class="rtg-lang-opt' + (rec ? ' rec' : '') + '" data-lang="' + code + '">' +
-          '<span class="rtg-lang-flag">' + l.flag + '</span>' +
-          '<span class="rtg-lang-name">' + l.native + '</span>' +
+          '<span class="rtg-lang-flag">' + (basis ? basis.flag : '<span class="rtg-lang-code">' + code.toUpperCase() + '</span>') + '</span>' +
+          '<span class="rtg-lang-name">' + t.naam + '</span>' +
           (rec ? '<span class="rtg-lang-rec">aanbevolen · recommended</span>' : '') +
           '</button>';
       }).join('');
@@ -113,6 +126,7 @@
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') { this.set(this.lang); this.closeModal(); }
       });
+      if (stondOpen) scrim.classList.add('open');
     },
     openModal() { this.buildModal(this.lang); const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.add('open'); },
     closeModal() { const m = document.getElementById('rtg-lang-modal'); if (m) m.classList.remove('open'); },
@@ -149,7 +163,9 @@
       .rtg-lang-globe{font-size:2.4rem;line-height:1;}
       .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.7rem;margin:1rem 0 0.15rem;letter-spacing:-0.01em;color:#0C0C0B;}
       .rtg-lang-card p{color:#66625B;font-size:0.9rem;margin:0 0 1.6rem;}
-      .rtg-lang-opts{display:flex;flex-direction:column;gap:0.7rem;}
+      .rtg-lang-opts{display:flex;flex-direction:column;gap:0.7rem;max-height:52vh;overflow:auto;padding:2px;}
+      .rtg-lang-code{display:inline-block;min-width:2rem;font-size:0.62rem;font-weight:700;letter-spacing:0.06em;
+        color:#7F1634;border:1px solid rgba(127,22,52,0.35);border-radius:6px;padding:0.15rem 0.25rem;text-align:center;}
       .rtg-lang-opt{display:flex;align-items:center;gap:0.9rem;width:100%;text-align:left;cursor:pointer;
         background:#fff;border:1px solid #DEDBD5;border-radius:13px;padding:0.95rem 1.1rem;
         font-family:inherit;font-size:1rem;color:#0C0C0B;transition:border-color .18s,background .18s,transform .12s;}
@@ -180,12 +196,26 @@
       document.head.appendChild(s);
     },
 
+    /* De actieve wereldtalen ophalen (Boardroom-schakelaars). Faalt dit (bijv.
+       op de noodserver), dan blijven Nederlands en Engels gewoon werken. */
+    laadTalen() {
+      return fetch('/api/talen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+        .then(r => r.json())
+        .then(d => {
+          if (Array.isArray(d.talen) && d.talen.length >= 2) {
+            WERELD = d.talen;
+            this.buildModal(this.chosen ? this.lang : detectDevice()); // kiezer verversen met alle actieve talen
+          }
+        })
+        .catch(() => {});
+    },
+
     init() {
       this.injectStyles();
       let saved = null;
       try { saved = localStorage.getItem(STORE); } catch (e) {}
       const device = detectDevice();
-      if (saved && SUPPORTED.includes(saved)) {
+      if (saved && /^[a-z]{2}$/.test(saved)) {
         this.chosen = true;
         this.apply(saved);
       } else {
@@ -194,6 +224,7 @@
         this.openModal();
       }
       this.buildSwitch();
+      this.laadTalen();
     }
   };
 

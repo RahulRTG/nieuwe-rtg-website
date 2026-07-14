@@ -140,9 +140,11 @@ function detect(text) {
   return score(en) > score(nl) ? 'en' : 'nl';
 }
 
-/* Vaste seed-inhoud omzetten naar de bezoekerstaal (alleen NL -> EN). */
+/* Vaste seed-inhoud omzetten naar de bezoekerstaal. Het woordenboek is NL -> EN;
+   voor elke andere taal dan Nederlands tonen we de Engelse versie (de
+   internationale terugval; losse berichten worden wel echt vertaald). */
 function localize(text, lang) {
-  if (lang !== 'en' || text == null) return text;
+  if (!lang || lang === 'nl' || text == null) return text;
   return NL2EN[text] || text;
 }
 function localizeList(list, lang) {
@@ -162,8 +164,10 @@ function wordLevel(text, to) {
   return hit ? out : null;
 }
 
+const { naamEn, bestaat } = require('./talen');
+
 async function claudeTranslate(text, to) {
-  const target = to === 'en' ? 'English' : 'Dutch';
+  const target = to === 'nl' ? 'Dutch' : naamEn(to);
   const response = await anthropic.messages.create({
     model: 'claude-opus-4-8',
     max_tokens: 600,
@@ -174,20 +178,24 @@ async function claudeTranslate(text, to) {
   return response.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
 }
 
-/* Vertaal een los bericht naar de taal van de ontvanger. */
+/* Vertaal een los bericht naar de taal van de ontvanger. Elke taal uit het
+   wereldtalenregister (server/talen.js) mag als doel; welke talen AANstaan
+   bewaakt de aanroeper (talen.taalVan). Voor nl/en werkt het woordenboek ook
+   zonder AI; voor andere talen vertaalt de AI, en zonder AI-sleutel komt het
+   bericht onvertaald terug (translated:false), nooit kapot. */
 async function translate(text, to, from) {
   text = String(text || '');
-  to = to === 'en' ? 'en' : 'nl';
+  to = bestaat(to) ? String(to).toLowerCase() : 'nl';
   if (!text.trim()) return { text, translated: false, from: from || to };
-  from = (from === 'en' || from === 'nl') ? from : detect(text);
+  from = bestaat(from) ? String(from).toLowerCase() : detect(text);
   if (from === to) return { text, translated: false, from };
 
   const key = to + '|' + text;
   if (cache.has(key)) return { text: cache.get(key), translated: cache.get(key) !== text, from };
 
-  let out = to === 'en' ? NL2EN[text] : EN2NL[text];
+  let out = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
   if (!out && anthropic) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
-  if (!out) out = wordLevel(text, to);
+  if (!out && (to === 'en' || to === 'nl')) out = wordLevel(text, to);
   const result = out || text;
   cache.set(key, result);
   return { text: result, translated: result !== text, from };

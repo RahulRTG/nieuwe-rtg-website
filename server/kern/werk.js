@@ -47,11 +47,34 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     return { id: chat.id, func: chat.func, bedrijf: chat.bedrijf, metWie: chat.applicant.naam,
       berichten: (chat.berichten || []).map(m => ({ van: m.van, wie: m.wie, tekst: m.tekst, at: m.at })) };
   }
-  // stuur een chatbericht; 'van' is 'werkgever' of 'sollicitant'
-  function chatStuur(chat, van, wie, tekst) {
+  /* Als applyChatPubliek, maar elk bericht vertaald naar de taal van de kijker
+     (zelfde per-bericht-cache als trChat). Zo chatten werkgever en sollicitant
+     ieder in de eigen taal en leest de ander alles in de zijne. */
+  async function applyChatVertaald(chat, to) {
+    const pub = applyChatPubliek(chat);
+    const bron = chat.berichten || [];
+    pub.berichten = [];
+    for (const m of bron) {
+      const from = m.lang || 'nl';
+      if (from === to || !m.tekst) { pub.berichten.push({ van: m.van, wie: m.wie, tekst: m.tekst, at: m.at, orig: null }); continue; }
+      m.tr = m.tr || {};
+      if (!m.tr[to]) {
+        try {
+          const r = await i18n.translate(m.tekst, to, from);
+          m.tr[to] = (r && typeof r === 'object') ? (r.text || m.tekst) : String(r || m.tekst);
+          save();
+        } catch (e) { m.tr[to] = m.tekst; }
+      }
+      pub.berichten.push({ van: m.van, wie: m.wie, tekst: m.tr[to], orig: m.tekst, at: m.at });
+    }
+    return pub;
+  }
+  // stuur een chatbericht; 'van' is 'werkgever' of 'sollicitant'; lang = de
+  // taal waarin de schrijver typt (voor de vertaling naar de andere kant)
+  function chatStuur(chat, van, wie, tekst, lang) {
     const t = String(tekst || '').trim().slice(0, 1000);
     if (!t) return null;
-    const bericht = { van, wie: String(wie || '').slice(0, 60), tekst: t, at: new Date().toISOString() };
+    const bericht = { van, wie: String(wie || '').slice(0, 60), tekst: t, lang: lang || 'nl', at: new Date().toISOString() };
     chat.berichten.push(bericht);
     chat.berichten = chat.berichten.slice(-200);
     save();
@@ -128,7 +151,7 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     sseToCustomer(a.key, 'sync', { scope: 'apply' });
   }
 
-  return { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, chatStuur, meldWerkgever, openVacatures, werkgeverSollicitatie, notifyApplicant };
+  return { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, applyChatVertaald, chatStuur, meldWerkgever, openVacatures, werkgeverSollicitatie, notifyApplicant };
 }
 
 module.exports = { VAC_SOORTEN, maakWerk };

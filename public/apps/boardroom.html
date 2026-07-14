@@ -131,6 +131,16 @@
     </div>
 
     <div id="bord"></div>
+
+    <div class="kaart" id="talenKaart" style="margin-top:1.2rem;">
+      <div style="font-weight:600;margin-bottom:.15rem;">🌐 Wereldtalen</div>
+      <div class="muted" style="margin-bottom:.6rem;">Zet een taal aan en iedereen kan hem kiezen in de apps. Iedereen chat in de eigen taal; de ander leest alles in de zijne. Nederlands en Engels zijn de basis en blijven altijd aan.</div>
+      <input class="veld" id="taalZoek" placeholder="Zoek een taal&hellip;" aria-label="Zoek een taal" style="margin-bottom:.5rem;">
+      <div class="muted" id="taalTeller" style="font-size:.72rem;margin-bottom:.4rem;"></div>
+      <div id="talenGrid" style="display:flex;flex-wrap:wrap;gap:.35rem;"></div>
+      <div class="muted" id="taalAiHint" style="font-size:.72rem;margin-top:.5rem;" hidden>Let op: zonder AI-sleutel worden alleen Nederlands en Engels echt vertaald; andere talen tonen dan het origineel.</div>
+    </div>
+
     <p class="muted" id="alleenLezen" hidden style="margin-top:1rem;">Je kunt de status bekijken. Alleen de eigenaar kan schakelen, resetten of storingen melden.</p>
   </div>
 </main>
@@ -287,11 +297,45 @@
         g.functies.forEach(function(f){ kaart.appendChild(functieRij(f)); });
         bord.appendChild(kaart);
       });
+      laadTalen();
     }).catch(function(e){
       if (/40[13]/.test(e.message) || /log in/i.test(e.message)) toonLogin();
       else toast(e.message);
     });
   }
+
+  /* Wereldtalen: alle talen als schakelaar-chips, met zoekfilter. Aanzetten
+     maakt de taal kiesbaar in alle apps; iedereen leest chats in de eigen taal. */
+  var TALEN = [];
+  function laadTalen(){
+    api('/api/boardroom/talen').then(function(d){
+      TALEN = d.talen || [];
+      $('#taalAiHint').hidden = !!d.aiBeschikbaar;
+      tekenTalen();
+    }).catch(function(e){ toast(e.message); });
+  }
+  function tekenTalen(){
+    var zoek = ($('#taalZoek').value || '').toLowerCase();
+    var grid = $('#talenGrid'); vervang(grid);
+    var aan = 0, zichtbaar = 0;
+    TALEN.forEach(function(t){
+      if (t.aan) aan++;
+      if (zoek && (t.naam + ' ' + t.en + ' ' + t.code).toLowerCase().indexOf(zoek) === -1) return;
+      zichtbaar++;
+      grid.appendChild(el('button',{
+        class:'minipill ' + (t.aan ? 'aan' : 'uit'),
+        disabled: !eigenaar || t.basis,
+        title: t.en + (t.basis ? ' · basistaal, altijd aan' : ''),
+        onclick: function(){
+          api('/api/boardroom/taal', { code: t.code, aan: !t.aan }).then(function(){
+            toast(t.naam + (t.aan ? ' uit' : ' aan')); laadTalen();
+          }).catch(function(e){ toast(e.message); });
+        }
+      }, t.naam + (t.basis ? ' ✓' : (t.aan ? ' ✓' : ''))));
+    });
+    $('#taalTeller').textContent = aan + ' van ' + TALEN.length + ' talen aan' + (zoek ? ' · ' + zichtbaar + ' gevonden' : '');
+  }
+  $('#taalZoek').addEventListener('input', tekenTalen);
 
   // bij openen: met een bewaard token direct het bord in, anders het login-scherm
   if (token) { toonBord(); laad(); } else { toonLogin(); }

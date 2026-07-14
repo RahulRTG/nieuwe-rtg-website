@@ -1,7 +1,7 @@
 /* Domein "member" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept,
+  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept,
     reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview, reviewsVoor,
     toggleFavoriet, favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits,
     zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
@@ -14,7 +14,7 @@ module.exports = (kern) => {
     ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer,
     mbAanvraag, mbMijn,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
-    zorgContact, fonds, munten, factuur,
+    zorgContact, fonds, munten, factuur, talen,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -267,7 +267,7 @@ app.post('/api/comment', auth, (req, res) => {
   if (!text) return res.status(400).json({ error: 'Lege reactie.' });
   // Echte leden verschijnen in De Salon onder hun codenaam, nooit hun echte naam.
   const who = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
-  const clang = req.body.lang === 'en' ? 'en' : 'nl';
+  const clang = talen.taalVan(req.body.lang);
   const comment = { who, tier: req.session.tier, text, lang: clang };
   post.comments.push(comment);
   registerContact(req.session, post);
@@ -297,7 +297,7 @@ app.post('/api/dm', auth, (req, res) => {
     fromTier: req.session.tier,
     to: post.author,
     text,
-    lang: req.body.lang === 'en' ? 'en' : 'nl',
+    lang: talen.taalVan(req.body.lang),
     at: new Date().toISOString()
   });
   save();
@@ -483,7 +483,7 @@ app.post('/api/partner/chat/send', auth, (req, res) => {
   const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
   const chat = getChat(s, req.session.key, codename, req.session.tier, dept);
   chat.codename = codename;
-  chat.messages.push({ from: 'guest', who: codename, text, lang: req.body.lang === 'en' ? 'en' : 'nl', at: new Date().toISOString() });
+  chat.messages.push({ from: 'guest', who: codename, text, lang: talen.taalVan(req.body.lang), at: new Date().toISOString() });
   chat.messages = chat.messages.slice(-120);
   chat.unreadPartner += 1;
   chat.lastAt = new Date().toISOString();
@@ -491,7 +491,7 @@ app.post('/api/partner/chat/send', auth, (req, res) => {
   notifySupplier(s.code, { icon: '💬', title: codename + ' → ' + dept, body: text.slice(0, 90) });
   sseToSupplier(s.code, 'sync', { scope: 'gchat' });
   sseToCustomer(req.session.key, 'sync', { scope: 'gchat' });
-  trChat(chat.messages, req.body.lang === 'en' ? 'en' : 'nl').then(messages => res.json({ ok: true, messages }));
+  trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
 });
 
 app.post('/api/partner/chat/history', auth, (req, res) => {
@@ -500,7 +500,7 @@ app.post('/api/partner/chat/history', auth, (req, res) => {
   const dept = validDept(s, String(req.body.dept || ''));
   const chat = db.data.guestChats[chatKeyOf(s.code, req.session.key, dept)];
   if (chat && chat.unreadGuest) { chat.unreadGuest = 0; save(); }
-  const to = req.body.lang === 'en' ? 'en' : 'nl';
+  const to = talen.taalVan(req.body.lang);
   trChat(chat ? chat.messages : [], to).then(messages => res.json({ messages, dept }));
 });
 
@@ -516,16 +516,16 @@ app.post('/api/member/apply/chats', auth, (req, res) => {
 app.post('/api/member/apply/chat', auth, (req, res) => {
   const chat = db.data.applyChats[String(req.body.id || '')];
   if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  res.json({ chat: applyChatPubliek(chat) });
+  applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 
 app.post('/api/member/apply/chat/send', auth, (req, res) => {
   const chat = db.data.applyChats[String(req.body.id || '')];
   if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
-  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text);
+  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text, talen.taalVan(req.body.lang));
   if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
   meldWerkgever(chat, m.tekst);
-  res.json({ chat: applyChatPubliek(chat) });
+  applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 
 app.post('/api/rtf/apply/chat', (req, res) => {
@@ -534,7 +534,7 @@ app.post('/api/rtf/apply/chat', (req, res) => {
   const chat = db.data.applyChats[String(req.body.id || '')];
   if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
     return res.status(404).json({ error: 'Chat niet gevonden.' });
-  res.json({ chat: applyChatPubliek(chat) });
+  applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 
 app.post('/api/rtf/apply/chat/send', (req, res) => {
@@ -543,10 +543,10 @@ app.post('/api/rtf/apply/chat/send', (req, res) => {
   const chat = db.data.applyChats[String(req.body.id || '')];
   if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
     return res.status(404).json({ error: 'Chat niet gevonden.' });
-  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text);
+  const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text, talen.taalVan(req.body.lang));
   if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
   meldWerkgever(chat, m.tekst);
-  res.json({ chat: applyChatPubliek(chat) });
+  applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 
 app.post('/api/rtf/vacatures', (req, res) => {

@@ -132,6 +132,9 @@ module.exports = function seed() {
     // Grootboek van munt-ontvangsten (kern/munten.js; crypto meteen omgezet naar
     // euro via een vergunninghoudende aanbieder). Leeg tot de eerste ontvangst.
     muntOntvangsten: [],
+    // Wereldtalen: welke talen staan aan (Boardroom-schakelaars; server/talen.js).
+    // Nederlands en Engels zijn de basis en staan altijd aan.
+    talen: { actief: ['nl', 'en'] },
 
     /* ---------- leveranciers ----------
        De leverancier-app is één app die zich aanpast aan het type. Elk type

@@ -11,7 +11,7 @@ const eigenaar = require('../eigenaar');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
-  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal } = kern;
+  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal, talen } = kern;
   const OWNER_EMAIL = eigenaar.OWNER_EMAIL;
 
   function staat() {
@@ -330,6 +330,19 @@ module.exports = (kern) => {
       aiBeschikbaar: !!anthropic,
       aiAan: !(t.zekeringen.ai && t.zekeringen.ai.aan === false)
     });
+  });
+
+  /* Wereldtalen: alle talen met hun schakelaar-status. Aanzetten maakt de taal
+     kiesbaar in alle apps; iedereen chat in de eigen taal en de ander leest
+     alles in de zijne (vertaling per bericht, gecachet). NL en EN zijn de
+     basistalen en blijven altijd aan. */
+  app.post('/api/boardroom/talen', techAuth, (req, res) => {
+    res.json({ talen: talen.alle(), aiBeschikbaar: !!anthropic });
+  });
+  app.post('/api/boardroom/taal', techAuth, eigenaarAlleen, (req, res) => {
+    const r = talen.zet(req.body.code, req.body.aan !== false && req.body.aan !== 'false');
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
   });
 
   // Persoon zoeken voor de per-persoon-schakelaar (eigenaar).

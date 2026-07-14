@@ -65,6 +65,7 @@ const { maakMunten } = require('./kern/munten');
 const muntbetaal = require('./muntbetaal');
 const factuur = require('./kern/factuur');
 const boekhoudkennis = require('./kern/boekhoudkennis');
+const { maakTalen } = require('./talen');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -1432,8 +1433,8 @@ app.post('/api/push/subscribe', auth, (req, res) => {
    eigen taal; de lezer krijgt het in de zijne (en andersom). */
 app.post('/api/translate', async (req, res) => {
   const text = String(req.body.text || '').slice(0, 1500);
-  const to = req.body.to === 'en' ? 'en' : 'nl';
-  const from = (req.body.from === 'en' || req.body.from === 'nl') ? req.body.from : undefined;
+  const to = talen.taalVan(req.body.to); // elke actieve wereldtaal mag als doel
+  const from = req.body.from || undefined; // translate valideert tegen het register
   try {
     const out = await i18n.translate(text, to, from);
     res.json(out);
@@ -1441,6 +1442,11 @@ app.post('/api/translate', async (req, res) => {
     res.json({ text, translated: false });
   }
 });
+
+/* Wereldtalen: de actieve talen voor de taalkiezers in alle apps (publiek;
+   ook de inlogschermen tonen de kiezer al). De schakelaars zelf zitten in de
+   RTG Boardroom (/api/boardroom/talen). */
+app.post('/api/talen', (req, res) => res.json({ talen: talen.actieve() }));
 
 /* ---------- partnerkanaal: boeken zonder pas ----------
    Publieke endpoints (geen login): partner opzoeken, reizen ophalen en
@@ -1621,7 +1627,7 @@ const pinFails = new Map(); // 'CODE:staffId' -> { n, until }
    server/kern/werk.js. VAC_SOORTEN komt daar rechtstreeks vandaan; de functies
    dragen db, i18n, mail, LANDEN en de leverancier-/realtime-helpers.
    findSupplier, sseToSupplier, notifySupplier en notify zijn hoisted functies. */
-const { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, chatStuur, meldWerkgever, openVacatures, werkgeverSollicitatie, notifyApplicant } =
+const { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, applyChatVertaald, chatStuur, meldWerkgever, openVacatures, werkgeverSollicitatie, notifyApplicant } =
   maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify });
 
 /* De leverancier-laag (publieke weergave, dashboard/supplierState, kassa,
@@ -1779,6 +1785,10 @@ muntbetaal.koppelStore({
   }
 });
 const munten = maakMunten({ db, save, muntbetaal });
+
+/* Wereldtalen (server/talen.js): de Boardroom zet per taal een schakelaar aan of
+   uit; iedereen chat in de eigen taal en de ander leest alles in de zijne. */
+const talen = maakTalen({ db, save });
 
 /* Een bevestigde munt-ontvangst settelt de bijbehorende factuur langs de gewone
    weg: gemarkeerd als betaald, en voor abonnementen de 30%-afdracht aan de
@@ -2109,7 +2119,7 @@ const kern = {
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
   ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, eigenaar,
-  aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, auth, betaal, broadcastSync,
+  aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat,
@@ -2168,6 +2178,8 @@ const kern = {
   factuur,
   // branchekennis voor de AI-boekhouder (kern/boekhoudkennis.js)
   boekhoudkennis,
+  // wereldtalen (server/talen.js): actieve talen + taalVan voor alle chatpaden
+  talen,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

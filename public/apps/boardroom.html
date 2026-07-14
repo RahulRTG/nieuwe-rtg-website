@@ -39,6 +39,14 @@
   .legenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.76rem;color:var(--soft);margin-bottom:1rem;}
   .legenda span{display:inline-flex;align-items:center;gap:.4rem;}
   .catkop{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.5rem 0 .3rem;}
+  /* Slimme categorie-kop: klikbaar, met samenvatting rechts. Zo wordt een muur
+     van schakelaars een rustig overzicht dat alleen uitzonderingen openklapt. */
+  .cat-toggle{display:flex;align-items:center;gap:.5rem;width:100%;text-align:left;background:none;border:none;
+    cursor:pointer;font-family:inherit;padding:.2rem 0;}
+  .cat-toggle .cat-chev{color:var(--soft);font-size:.7rem;width:.9rem;flex-shrink:0;}
+  .cat-toggle .cat-naam{flex:1;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;}
+  .cat-tel{font-size:.68rem;font-weight:600;color:var(--soft);white-space:nowrap;}
+  .cat-tel.let{color:var(--oranje);}
   .fn{display:flex;align-items:flex-start;gap:.8rem;padding:.8rem 0;border-top:1px solid var(--line);}
   .fn:first-child{border-top:none;}
   .fn .mid{flex:1;min-width:0;}
@@ -133,12 +141,19 @@
     <div id="bord"></div>
 
     <div class="kaart" id="talenKaart" style="margin-top:1.2rem;">
-      <div style="font-weight:600;margin-bottom:.15rem;">🌐 Wereldtalen</div>
-      <div class="muted" style="margin-bottom:.6rem;">Zet een taal aan en iedereen kan hem kiezen in de apps. Iedereen chat in de eigen taal; de ander leest alles in de zijne. Nederlands en Engels zijn de basis en blijven altijd aan.</div>
-      <input class="veld" id="taalZoek" placeholder="Zoek een taal&hellip;" aria-label="Zoek een taal" style="margin-bottom:.5rem;">
-      <div class="muted" id="taalTeller" style="font-size:.72rem;margin-bottom:.4rem;"></div>
-      <div id="talenGrid" style="display:flex;flex-wrap:wrap;gap:.35rem;"></div>
-      <div class="muted" id="taalAiHint" style="font-size:.72rem;margin-top:.5rem;" hidden>Let op: zonder AI-sleutel worden alleen Nederlands en Engels echt vertaald; andere talen tonen dan het origineel.</div>
+      <div style="display:flex;align-items:center;gap:.5rem;">
+        <div style="flex:1;font-weight:600;">🌐 Wereldtalen</div>
+        <span class="cat-tel" id="taalSom"></span>
+        <button class="knop grijs klein" id="taalBeheer" type="button">Beheren</button>
+      </div>
+      <div id="taalActief" style="display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;"></div>
+      <div id="talenBeheer" hidden style="margin-top:.7rem;border-top:1px solid var(--line);padding-top:.7rem;">
+        <div class="muted" style="margin-bottom:.6rem;">Zet een taal aan en iedereen kan hem kiezen in de apps. Iedereen chat in de eigen taal; de ander leest alles in de zijne. Nederlands en Engels zijn de basis en blijven altijd aan.</div>
+        <input class="veld" id="taalZoek" placeholder="Zoek een taal&hellip;" aria-label="Zoek een taal" style="margin-bottom:.5rem;">
+        <div class="muted" id="taalTeller" style="font-size:.72rem;margin-bottom:.4rem;"></div>
+        <div id="talenGrid" style="display:flex;flex-wrap:wrap;gap:.35rem;"></div>
+        <div class="muted" id="taalAiHint" style="font-size:.72rem;margin-top:.5rem;" hidden>Let op: zonder AI-sleutel worden alleen Nederlands en Engels echt vertaald; andere talen tonen dan het origineel.</div>
+      </div>
     </div>
 
     <p class="muted" id="alleenLezen" hidden style="margin-top:1rem;">Je kunt de status bekijken. Alleen de eigenaar kan schakelen, resetten of storingen melden.</p>
@@ -292,9 +307,22 @@
       if (!d.aiBeschikbaar){ $('#aiBron').textContent=''; }
       var bord = $('#bord'); vervang(bord);
       (d.functies||[]).forEach(function(g){
-        bord.appendChild(el('div',{class:'catkop'}, g.categorie));
-        var kaart = el('div',{class:'kaart', style:{padding:'.2rem 1.1rem'}});
+        var aan = g.functies.filter(function(f){ return f.aan; }).length;
+        var storing = g.functies.filter(function(f){ return f.storing; }).length;
+        // Alleen categorieën met iets uit of een storing klappen vanzelf open;
+        // de rest blijft rustig dichtgevouwen tot een samenvatting.
+        var afwijkt = aan < g.functies.length || storing > 0;
+        var kaart = el('div',{class:'kaart', style:{padding:'.2rem 1.1rem', marginTop:'.3rem', display: afwijkt ? '' : 'none'}});
         g.functies.forEach(function(f){ kaart.appendChild(functieRij(f)); });
+        var chev = el('span',{class:'cat-chev'}, afwijkt ? '▾' : '▸');
+        var tel = el('span',{class:'cat-tel'+(afwijkt?' let':'')},
+          aan + '/' + g.functies.length + ' aan' + (storing ? ' · ' + storing + ' storing' : ''));
+        var kop = el('button',{class:'cat-toggle', type:'button', onclick:function(){
+          var dicht = kaart.style.display === 'none';
+          kaart.style.display = dicht ? '' : 'none';
+          chev.textContent = dicht ? '▾' : '▸';
+        }}, chev, el('span',{class:'cat-naam'}, g.categorie), tel);
+        bord.appendChild(kop);
         bord.appendChild(kaart);
       });
       laadTalen();
@@ -314,27 +342,44 @@
       tekenTalen();
     }).catch(function(e){ toast(e.message); });
   }
-  function tekenTalen(){
-    var zoek = ($('#taalZoek').value || '').toLowerCase();
-    var grid = $('#talenGrid'); vervang(grid);
-    var aan = 0, zichtbaar = 0;
-    TALEN.forEach(function(t){
-      if (t.aan) aan++;
-      if (zoek && (t.naam + ' ' + t.en + ' ' + t.code).toLowerCase().indexOf(zoek) === -1) return;
-      zichtbaar++;
-      grid.appendChild(el('button',{
-        class:'minipill ' + (t.aan ? 'aan' : 'uit'),
-        disabled: !eigenaar || t.basis,
-        title: t.en + (t.basis ? ' · basistaal, altijd aan' : ''),
-        onclick: function(){
-          api('/api/boardroom/taal', { code: t.code, aan: !t.aan }).then(function(){
-            toast(t.naam + (t.aan ? ' uit' : ' aan')); laadTalen();
-          }).catch(function(e){ toast(e.message); });
-        }
-      }, t.naam + (t.basis ? ' ✓' : (t.aan ? ' ✓' : ''))));
-    });
-    $('#taalTeller').textContent = aan + ' van ' + TALEN.length + ' talen aan' + (zoek ? ' · ' + zichtbaar + ' gevonden' : '');
+  function taalKnop(t){
+    return el('button',{
+      class:'minipill ' + (t.aan ? 'aan' : 'uit'),
+      disabled: !eigenaar || t.basis,
+      title: t.en + (t.basis ? ' · basistaal, altijd aan' : ''),
+      onclick: function(){
+        api('/api/boardroom/taal', { code: t.code, aan: !t.aan }).then(function(){
+          toast(t.naam + (t.aan ? ' uit' : ' aan')); laadTalen();
+        }).catch(function(e){ toast(e.message); });
+      }
+    }, t.naam + (t.basis || t.aan ? ' ✓' : ''));
   }
+  function tekenTalen(){
+    var aanLijst = TALEN.filter(function(t){ return t.aan; });
+    // Samenvatting: alleen de actieve talen als rustige chips; de volle lijst
+    // zit achter "Beheren", zodat 100+ talen niet als muur in beeld staan.
+    $('#taalSom').textContent = aanLijst.length + ' van ' + TALEN.length + ' aan';
+    var actief = $('#taalActief'); vervang(actief);
+    aanLijst.forEach(function(t){ actief.appendChild(taalKnop(t)); });
+    // De beheerlijst (met zoekfilter) alleen tekenen als hij openstaat.
+    if (!$('#talenBeheer').hidden){
+      var zoek = ($('#taalZoek').value || '').toLowerCase();
+      var grid = $('#talenGrid'); vervang(grid);
+      var zichtbaar = 0;
+      TALEN.forEach(function(t){
+        if (zoek && (t.naam + ' ' + t.en + ' ' + t.code).toLowerCase().indexOf(zoek) === -1) return;
+        zichtbaar++;
+        grid.appendChild(taalKnop(t));
+      });
+      $('#taalTeller').textContent = aanLijst.length + ' aan' + (zoek ? ' · ' + zichtbaar + ' gevonden' : ' · ' + TALEN.length + ' talen totaal');
+    }
+  }
+  $('#taalBeheer').addEventListener('click', function(){
+    var b = $('#talenBeheer'); b.hidden = !b.hidden;
+    $('#taalBeheer').textContent = b.hidden ? 'Beheren' : 'Klaar';
+    tekenTalen();
+    if (!b.hidden) $('#taalZoek').focus();
+  });
   $('#taalZoek').addEventListener('input', tekenTalen);
 
   // bij openen: met een bewaard token direct het bord in, anders het login-scherm

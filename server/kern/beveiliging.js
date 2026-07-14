@@ -167,10 +167,20 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
     const b = defaults(s);
     const start = /^\d{4}-\d{2}-\d{2}$/.test(String(van)) ? van : vandaag();
     const n = getal(dagen, 1, 31, 7);
+    // een prefilter over de dienstentabel in plaats van een volledige scan per
+    // dag: bij 31 dagen scheelt dat dertig keer door alle diensten lopen
+    const eind = new Date(new Date(start).getTime() + (n - 1) * 86400000).toISOString().slice(0, 10);
+    const perDag = new Map(); // datum -> diensten van deze zaak
+    for (const d of diensten()) {
+      if (d.supplierCode !== s.code || d.status === 'geannuleerd') continue;
+      if (d.datum < start || d.datum > eind) continue;
+      if (!perDag.has(d.datum)) perDag.set(d.datum, []);
+      perDag.get(d.datum).push(d);
+    }
     const dagenUit = [];
     for (let i = 0; i < n; i++) {
       const datum = new Date(new Date(start).getTime() + i * 86400000).toISOString().slice(0, 10);
-      const opDag = diensten().filter(d => d.supplierCode === s.code && d.datum === datum && d.status !== 'geannuleerd');
+      const opDag = perDag.get(datum) || [];
       const posten = b.posten.filter(p => p.actief !== false).map(p => {
         const shifts = (p.shifts && p.shifts.length ? p.shifts : BEV_SHIFTS.map(x => x.id)).map(sid => {
           const bezet = opDag.filter(d => d.postId === p.id && d.shiftId === sid);

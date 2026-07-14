@@ -22,7 +22,9 @@ const KLAAR = { afgeleverd: true, retour: true, geannuleerd: true };
 function maakModebezorg({ db, save, crypto, findSupplier, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl }) {
   const id = (p) => (p || 'MB') + crypto.randomBytes(4).toString('hex').toUpperCase();
   const nu = () => new Date().toISOString();
-  const pin = () => String(Math.floor(1000 + Math.random() * 9000));
+  // crypto-random: de bezorgcode is een veiligheidscode aan de deur en mag
+  // niet voorspelbaar zijn (Math.random is dat wel)
+  const pin = () => String(crypto.randomInt(1000, 10000));
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const getal = (v, min, max, st) => { const n = Number(v); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : st; };
   function lijst() { if (!Array.isArray(db.data.modeBezorg)) db.data.modeBezorg = []; return db.data.modeBezorg; }

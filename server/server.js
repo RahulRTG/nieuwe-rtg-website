@@ -1693,6 +1693,29 @@ const {
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand
 } = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine });
 
+/* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
+   maken: dezelfde idempotentiesleutel geeft ook NA een herstart hetzelfde
+   resultaat terug, zodat een netwerk-herhaling of dubbeltik nooit dubbel kan
+   afschrijven. Compact gehouden met een FIFO-cap; de sleutelvolgorde staat in
+   _keys (echte sleutels zijn geprefixt, dus botsen daar nooit mee). */
+if (!db.data.betaalIdem || typeof db.data.betaalIdem !== 'object') db.data.betaalIdem = { _keys: [] };
+if (!Array.isArray(db.data.betaalIdem._keys)) db.data.betaalIdem._keys = [];
+betaal.koppelStore({
+  get: (k) => (k === '_keys' ? undefined : db.data.betaalIdem[k]),
+  set: (k, v) => {
+    if (k === '_keys') return;
+    if (!(k in db.data.betaalIdem)) {
+      db.data.betaalIdem._keys.push(k);
+      if (db.data.betaalIdem._keys.length > 50000) {
+        for (const weg of db.data.betaalIdem._keys.splice(0, db.data.betaalIdem._keys.length - 50000))
+          delete db.data.betaalIdem[weg];
+      }
+    }
+    db.data.betaalIdem[k] = v;
+    try { save(); } catch (e) { /* het geheugen-resultaat blijft geldig */ }
+  }
+});
+
 /* De directe-betaallaag (kern/directpay.js): elk betalend lid rekent alles met
    Face ID af via de AI en de Salon, en het geld gaat rechtstreeks van de klant
    naar de leverancier (in productie een Stripe destination charge). */

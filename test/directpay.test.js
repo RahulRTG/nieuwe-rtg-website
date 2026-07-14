@@ -85,3 +85,25 @@ test('6. de betaalgeschiedenis van het lid toont de betalingen', async () => {
   assert.ok(mijn.body.betalingen.length >= 3, 'het lid ziet zijn eigen betalingen');
   assert.ok(mijn.body.betalingen.every(b => b.supplierName === 'Maison Solène'));
 });
+
+test('7. tempolimiet: hooguit 12 betaalpogingen per minuut, maar een idempotente retry blijft altijd werken', async () => {
+  // een vers lid, zodat de teller op nul begint
+  const u = (Date.now() + 7).toString().slice(-8);
+  const vers = (await api(base, '/api/auth/register', { name: 'Tempo Lid', email: 't' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
+  // eerste betaling met een vaste idem-sleutel (telt als poging 1)
+  const eerste = await api(base, '/api/betaal/direct', { supplierCode: 'MAISON', bedrag: 5, idem: 'vast' }, vers);
+  assert.equal(eerste.status, 200);
+  // elf unieke pogingen erbij: samen twaalf, dat mag nog net
+  for (let i = 0; i < 11; i++) {
+    const r = await api(base, '/api/betaal/direct', { supplierCode: 'MAISON', bedrag: 1, idem: 'u' + i }, vers);
+    assert.equal(r.status, 200, 'poging ' + (i + 2) + ' valt binnen de limiet');
+  }
+  // de dertiende NIEUWE poging wordt afgeremd
+  const teveel = await api(base, '/api/betaal/direct', { supplierCode: 'MAISON', bedrag: 1, idem: 'x13' }, vers);
+  assert.equal(teveel.status, 429, 'de dertiende poging binnen een minuut wordt geweigerd');
+  // maar de idempotente retry van de eerste betaling werkt gewoon (geen dubbele afschrijving)
+  const retry = await api(base, '/api/betaal/direct', { supplierCode: 'MAISON', bedrag: 5, idem: 'vast' }, vers);
+  assert.equal(retry.status, 200, 'een nette retry wordt nooit geblokkeerd');
+  assert.equal(retry.body.betaling.ref, eerste.body.betaling.ref, 'zelfde betaling, niet nog een keer afgeschreven');
+});

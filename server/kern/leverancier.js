@@ -86,8 +86,13 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
     if (dir) { codename = dir.codename || key; tier = dir.tier || tier; }
     // val terug op een lopende chat voor de codenaam als de gids hem niet kent
     if (!dir) { for (const c of Object.values(db.data.guestChats || {})) if (c.customerKey === key) { codename = c.codename || codename; tier = c.tier || tier; break; } }
-    const posts = (db.data.posts || []).filter(p => !p.partner && p.author === codename)
-      .slice(0, 12).map(p => ({ text: String(p.text || '').slice(0, 200), place: p.place || '', photo: p.photo || null, at: p.at || null }));
+    // early exit: we tonen er hooguit 12, dus nooit de hele feed doorlopen
+    const posts = [];
+    for (const p of (db.data.posts || [])) {
+      if (p.partner || p.author !== codename) continue;
+      posts.push({ text: String(p.text || '').slice(0, 200), place: p.place || '', photo: p.photo || null, at: p.at || null });
+      if (posts.length >= 12) break;
+    }
     return { codename, tier, posts };
   }
 

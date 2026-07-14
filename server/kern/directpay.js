@@ -37,6 +37,46 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
   }
   const centenVan = (v) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? n : NaN; };
 
+  /* O(1)-index op de idempotentiesleutel: het dubbeltik-antwoord hoeft niet
+     door tweehonderdduizend betalingen te scannen. Lui opgebouwd uit de
+     opgeslagen data, daarna bij elke insert bijgehouden. */
+  let idemIndex = null; // idemSleutel -> betaling
+  function idemZoek(sleutel) {
+    if (!idemIndex) {
+      idemIndex = new Map();
+      for (const b of ensure().directBetalingen) if (b.idem) idemIndex.set(b.idem, b);
+    }
+    return sleutel ? (idemIndex.get(sleutel) || null) : null;
+  }
+  function idemBewaar(b) {
+    if (!b.idem) return;
+    idemZoek(null); // index bestaat zeker
+    idemIndex.set(b.idem, b);
+    if (idemIndex.size > 250000) { idemIndex = null; idemZoek(null); } // hersynchroniseer met de gecapte lijst
+  }
+
+  /* Tempolimiet per lid: hooguit 12 betaalpogingen per minuut. Een herhaalde
+     idempotente tik telt niet mee (die geeft gewoon het bestaande resultaat
+     terug), dus een nette retry wordt nooit geblokkeerd. */
+  const RATE_MAX = 12, RATE_VENSTER_MS = 60000;
+  const betaalTempo = new Map(); // key -> [tijdstippen]
+  function tempoOk(key) {
+    const nu2 = Date.now();
+    const lijst = (betaalTempo.get(key) || []).filter(t => nu2 - t < RATE_VENSTER_MS);
+    if (lijst.length >= RATE_MAX) { betaalTempo.set(key, lijst); return false; }
+    lijst.push(nu2);
+    betaalTempo.set(key, lijst);
+    if (betaalTempo.size > 50000) betaalTempo.clear(); // bots de kaart bij extreem veel sleutels
+    return true;
+  }
+
+  // early-exit verzamelaar: nieuwste-eerst lijsten hoeven nooit verder dan max
+  function verzamel(arr, test, max, map) {
+    const uit = [];
+    for (const x of arr) { if (test(x)) { uit.push(map ? map(x) : x); if (uit.length >= max) break; } }
+    return uit;
+  }
+
   // de payout-teller van een leverancier: wat er rechtstreeks binnenkwam
   function ledger(code) {
     ensure();
@@ -56,9 +96,11 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     // idempotentie tegen dubbeltik: zelfde lid + zelfde idem = zelfde betaling
     const idemSleutel = idem ? ('dp:' + key + ':' + String(idem).slice(0, 60)) : null;
     if (idemSleutel) {
-      const al = db.data.directBetalingen.find(b => b.idem === idemSleutel);
+      const al = idemZoek(idemSleutel);
       if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
     }
+    // tempolimiet NA de idempotentie-check: retries blijven altijd mogelijk
+    if (!tempoOk(key)) return { status: 429, error: 'Even rustig aan: te veel betalingen kort na elkaar. Probeer het over een minuut opnieuw.' };
     let prov;
     try {
       prov = await betaal.maakBetaling({
@@ -80,6 +122,7 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     };
     db.data.directBetalingen.unshift(b);
     db.data.directBetalingen = db.data.directBetalingen.slice(0, 200000);
+    idemBewaar(b);
     const L = ledger(s.code); L.som += cent; L.aantal += 1;
     save();
     try { notifySupplier(s.code, { icon: '💸', title: 'Rechtstreeks betaald', body: b.codename + ' betaalde € ' + (cent / 100).toFixed(2) + (b.omschrijving ? ' · ' + b.omschrijving : '') }); } catch (e) {}
@@ -96,7 +139,8 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
   }
   function mijnBetalingen(key) {
     ensure();
-    return db.data.directBetalingen.filter(b => b.key === key).slice(0, 100).map(publiek);
+    // nieuwste-eerst met early exit: nooit verder scannen dan de 100 die we tonen
+    return verzamel(db.data.directBetalingen, b => b.key === key, 100, publiek);
   }
 
   /* De leverancier stuurt een betaalverzoek op codenaam (of open aan wie het
@@ -127,9 +171,11 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
   // open verzoeken die aan dit lid gericht zijn (op codenaam), nieuwste eerst
   function verzoekenVoor(codename) {
     ensure();
-    return db.data.betaalVerzoeken
-      .filter(v => v.status === 'open' && v.naarCodename && codename && v.naarCodename.toLowerCase() === String(codename).toLowerCase())
-      .slice(0, 40).map(verzoekPubliek);
+    if (!codename) return [];
+    const wie = String(codename).toLowerCase();
+    return verzamel(db.data.betaalVerzoeken,
+      v => v.status === 'open' && v.naarCodename && v.naarCodename.toLowerCase() === wie,
+      40, verzoekPubliek);
   }
   async function betaalVerzoek({ key, codename, ref, idem }) {
     ensure();
@@ -161,8 +207,8 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
   function ontvangsten(supplierCode) {
     ensure();
     const L = ledger(supplierCode);
-    const betalingen = db.data.directBetalingen.filter(b => b.supplierCode === supplierCode).slice(0, 60).map(publiek);
-    const verzoeken = db.data.betaalVerzoeken.filter(v => v.supplierCode === supplierCode).slice(0, 40).map(verzoekPubliek);
+    const betalingen = verzamel(db.data.directBetalingen, b => b.supplierCode === supplierCode, 60, publiek);
+    const verzoeken = verzamel(db.data.betaalVerzoeken, v => v.supplierCode === supplierCode, 40, verzoekPubliek);
     return {
       som: L.som, aantal: L.aantal, uitbetaald: L.uitbetaald, saldo: L.som - L.uitbetaald,
       betalingen, openVerzoeken: verzoeken.filter(v => v.status === 'open'), verzoeken

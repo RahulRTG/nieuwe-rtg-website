@@ -891,3 +891,11 @@ test('sollicitatiechat: na uitnodigen praten sollicitant en werkgever samen', as
   const reg2 = await json(await raw('/auth/register', { name: 'Vreemde', email: 'v' + now + '@v.test', phone: '0612345679', password: 'geheim123', geboortedatum: '2000-01-01', tier: 'rtg' }));
   assert.equal((await raw('/member/apply/chat', { id: app.id }, reg2.token)).status, 404, 'geen toegang tot andermans chat');
 });
+
+test('impact-momentopname: publiek en geaggregeerd, zonder namen', async () => {
+  const d = await json(await fetch(BASE + '/api/foundation/impact'));
+  assert.equal(typeof d.opgehaald, 'number', 'opgehaald bedrag');
+  assert.equal(typeof d.scholen, 'number', 'aantal scholen');
+  assert.equal(typeof d.gezinnen, 'number', 'aantal gezinnen');
+  assert.ok(d.boodschap && d.boodschap.length > 0, 'een warme boodschap');
+});

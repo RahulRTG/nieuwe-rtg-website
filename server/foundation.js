@@ -777,6 +777,23 @@ router.get('/bespaartip', (req, res) => {
   res.json({ tip: BESPAARTIPS[dag % BESPAARTIPS.length], nog: BESPAARTIPS[Math.floor(Math.random() * BESPAARTIPS.length)] });
 });
 
+/* Wat de bijdragen dóén: een warme, geaggregeerde momentopname voor de gezinnen.
+   Opgehaald = alles wat leden via hun abonnement aan de RTFoundation afdroegen
+   (het grootboek uit kern/fonds.js), plus het aantal aangesloten scholen en
+   gezinnen. Publiek en zonder namen; alleen totalen. */
+router.get('/impact', (req, res) => {
+  const f = F();
+  const afdrachten = Array.isArray(db.data.fondsAfdrachten) ? db.data.fondsAfdrachten : [];
+  const opgehaaldCenten = afdrachten.reduce((s, a) => s + (a.centen || 0), 0);
+  const scholen = f.scholen ? Object.values(f.scholen).filter(s => (s.status || 'actief') !== 'wacht').length : 0;
+  const gezinnen = f.gezinnen ? Object.keys(f.gezinnen).length : 0;
+  res.json({
+    opgehaald: Math.round(opgehaaldCenten) / 100,
+    scholen, gezinnen,
+    boodschap: 'Elke maand dat iemand lid is, spaart de RTFoundation mee voor gezinnen zoals dat van jou. Alles hier blijft kosteloos.'
+  });
+});
+
 const GESPREKSKAARTEN = [
   'Wat was vandaag het fijnste moment van je dag?',
   'Waar ben je de laatste tijd trots op geworden?',

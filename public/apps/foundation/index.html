@@ -114,6 +114,7 @@
     <div class="logo" id="hWelkom">Welkom terug</div>
     <div class="deck" id="hDeck">Alles hier is en blijft kosteloos. Hieronder staat wat bij jou past.</div>
     <div id="hPass" class="passband" hidden></div>
+    <div id="hImpact" class="kaart" style="margin-top:.7rem;padding:.7rem .6rem;" hidden></div>
   </div>
 
   <h3 class="sec">Voor iedereen</h3>
@@ -299,6 +300,26 @@ function toonRol(profiel){
     : kind
     ? 'Fijn dat je er bent. Hieronder staat wat er voor jou is: leren, dromen, even rust en hulp als je die nodig hebt.'
     : 'Alles hier is en blijft kosteloos. Hieronder staat wat bij jou past: hulp voor je gezin, voor de kinderen en voor jou.';
+  laadImpact();
+}
+
+// Wat de bijdragen samen doen: een warme momentopname (opgehaald, scholen, gezinnen).
+async function laadImpact(){
+  const box = document.getElementById('hImpact');
+  if (!box) return;
+  try {
+    const d = await fetch('/api/foundation/impact').then(r => r.json());
+    if (!d || (!d.opgehaald && !d.scholen && !d.gezinnen)) return;
+    const eur = n => '€ ' + Number(n || 0).toLocaleString('nl-NL', { maximumFractionDigits: 0 });
+    const tegel = (v, l) => '<div style="flex:1;min-width:4.5rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;">' + v + '</div><div style="font-size:.6rem;opacity:.7;letter-spacing:.06em;text-transform:uppercase;">' + l + '</div></div>';
+    box.innerHTML = '<div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;">' +
+      tegel(eur(d.opgehaald), 'samen opgehaald') +
+      (d.scholen ? tegel(d.scholen, d.scholen === 1 ? 'school' : 'scholen') : '') +
+      (d.gezinnen ? tegel(d.gezinnen, d.gezinnen === 1 ? 'gezin' : 'gezinnen') : '') +
+      '</div>' +
+      (d.boodschap ? '<div style="font-size:.72rem;opacity:.8;text-align:center;margin-top:.5rem;">' + esc(d.boodschap) + '</div>' : '');
+    box.hidden = false;
+  } catch(e){}
 }
 
 // avatar/kleur kiezers vullen

@@ -892,6 +892,7 @@
         <p class="sub" id="tripSub"></p>
         <div class="card" id="tripList"></div>
         <p class="sub" style="margin-top:1rem;" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Vraag het de AI, één bericht is genoeg.</p>
+        <div id="showroom"></div>
       </div>
 
       <div class="view" data-view="betalen">
@@ -1960,6 +1961,7 @@
     else if (scope === 'huur'){ laadVerhuur(); }
     else if (scope === 'charter'){ laadCharter(); }
     else if (scope === 'groothandel'){ laadBoodschappen(); }
+    else if (scope === 'verkoop'){ laadShowroom(); }
     else if (scope === 'contract'){ laadContracten(); }
     else if (scope === 'vastgoed'){ laadVastgoed(); }
     else if (scope === 'live'){ renderLive(); laadTickets(); }
@@ -2049,6 +2051,7 @@
     renderTerPlaatse();
     laadBestellen();
     laadBoodschappen();
+    laadShowroom();
     laadTickets();
     laadVerhuur();
     laadCharter();
@@ -2511,6 +2514,50 @@
     try { bzPartners = (await API.call('/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
     renderBestellen();
     laadBzMijn();
+  }
+
+  // De exclusieve autoshowroom: bekijken, proefrit, kopen (bod/inruil/concierge)
+  async function laadShowroom(){
+    const el = $('#showroom'); if (!el || !API.live) return;
+    if (user && user.tier === 'guest'){ el.innerHTML = ''; return; }
+    let d, mijn;
+    try { d = await API.call('/verkoop/showroom'); mijn = await API.call('/verkoop/mijn'); } catch(e){ el.innerHTML = ''; return; }
+    const autos = d.autos || [];
+    const deals = (mijn.deals || []).filter(x => !['gereden','afgeleverd','afgewezen','geannuleerd'].includes(x.status));
+    if (!autos.length && !deals.length){ el.innerHTML = ''; return; }
+    let h = '<h3 style="margin:1.6rem 0 0.3rem;font-size:1rem;">🚗 ' + T('vk.h','Autoshowroom') + '</h3><p class="sub" style="margin-bottom:0.6rem;">' + T('vk.sub','Exclusieve occasions. Vraag een proefrit of doe een bod, met inruil en concierge-aflevering.') + '</p>';
+    for (const d2 of deals){
+      h += '<div style="border:1px solid var(--gold);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">' + (d2.soort==='koop'?'🔑 '+T('vk.koop','Koop'):'🚗 '+T('vk.proefritk','Proefrit')) + ' · ' + escT(d2.status) + '</div>' +
+        '<div style="font-size:0.86rem;margin-top:0.2rem;">' + escT(d2.autoNaam) + (d2.prijs?' · € ' + d2.prijs.toLocaleString('nl-NL'):'') + (d2.moment?' · ' + escT(d2.moment):'') + '</div>' +
+        (d2.soort==='koop' && d2.status==='aanvaard' ? '<button class="js-vkteken" data-ref="' + d2.ref + '" style="margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.5rem 0.9rem;font-weight:600;font-family:inherit;cursor:pointer;">✍️ ' + T('vk.teken','Koopcontract tekenen') + '</button>' : '') + '</div>';
+    }
+    h += autos.slice(0,20).map(a => '<div style="border:1px solid var(--line);border-radius:16px;padding:0.85rem;margin-bottom:0.7rem;" data-av="' + a.id + '">' +
+      '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><b style="font-size:0.95rem;">' + (a.vip?'★ ':'') + escT(a.naam) + '</b><span style="font-weight:600;">€ ' + a.prijs.toLocaleString('nl-NL') + '</span></div>' +
+      '<div class="sub">' + a.km.toLocaleString('nl-NL') + ' km · ' + escT(a.brandstof) + ' · ' + escT(a.transmissie) + (a.vermogenPk?' · ' + a.vermogenPk + ' pk':'') + (a.garantieMnd?' · ' + a.garantieMnd + ' mnd garantie':'') + '</div>' +
+      (a.opties && a.opties.length ? '<div class="sub" style="margin-top:0.2rem;">' + a.opties.slice(0,4).map(escT).join(' · ') + '</div>' : '') +
+      '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;">' +
+      '<button class="js-vkproef" data-code="' + a.supplierCode + '" data-id="' + a.id + '" style="flex:1;background:none;border:1px solid var(--gold);border-radius:10px;padding:0.45rem;color:var(--gold);font-weight:600;font-family:inherit;cursor:pointer;">' + T('vk.proefritk','Proefrit') + '</button>' +
+      '<button class="js-vkkoop" data-code="' + a.supplierCode + '" data-id="' + a.id + '" data-prijs="' + a.prijs + '" data-naam="' + escAttr(a.naam) + '" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.45rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('vk.bodknop','Bod / kopen') + '</button>' +
+      '</div></div>').join('');
+    el.innerHTML = h;
+    el.querySelectorAll('.js-vkteken').forEach(b => b.addEventListener('click', async () => {
+      const naam = prompt(T('vk.tekennaam','Typ uw naam om het koopcontract te tekenen:')); if (!naam) return;
+      try { await API.call('/verkoop/teken', { ref: b.dataset.ref, naam }); toast('✍️ ' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.js-vkproef').forEach(b => b.addEventListener('click', async () => {
+      const wens = prompt(T('vk.wens','Wanneer wilt u proefrijden? (bv. zaterdagochtend)')) || '';
+      try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('🚗 ' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.js-vkkoop').forEach(b => b.addEventListener('click', async () => {
+      const bod = prompt(T('vk.bodvraag','Uw bod in € (leeg = vraagprijs):'), b.dataset.prijs);
+      if (bod === null) return;
+      const wilInruil = confirm(T('vk.inruilvraag','Wilt u een auto inruilen?'));
+      let inruil = null;
+      if (wilInruil){ const merk = prompt(T('vk.inmerk','Merk + model van uw inruilauto:')); if (merk){ const jaar = prompt(T('vk.injaar','Bouwjaar?'),''); const km = prompt(T('vk.inkm','Kilometerstand?'),''); inruil = { merk, model: '', jaar, km }; } }
+      const concierge = confirm(T('vk.concvraag','Concierge-aflevering op uw adres?'));
+      const adres = concierge ? (prompt(T('vk.adres','Afleveradres:')) || '') : '';
+      try { await API.call('/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres }); toast('🔑 ' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
+    }));
   }
 
   // Boodschappen bij een groothandel/supermarkt (consumentprijs, met bezorging)
@@ -5194,6 +5241,12 @@ window.I18N = { en: {
   'mb.laat':'Have delivered safely', 'mb.veiliguitleg':'With a delivery code, live tracking and try-at-the-door. High-value: ID at the door.',
   'mb.onderweg':'Delivery', 'mb.code':'Delivery code', 'mb.koerieris':'Courier', 'mb.geefcode':'Give this code only to the RTG courier at the door.',
   'mb.geenitems':'No reserved items to deliver.', 'mb.vraagadres':'What address should we deliver to?', 'mb.aangevraagd':'Delivery requested. Code:',
+  'vk.h':'Car showroom', 'vk.sub':'Exclusive pre-owned cars. Request a test drive or make an offer, with trade-in and concierge delivery.',
+  'vk.koop':'Purchase', 'vk.proefritk':'Test drive', 'vk.teken':'Sign purchase contract', 'vk.tekennaam':'Type your name to sign the purchase contract:',
+  'vk.getekend':'Signed. The dealer will deliver the car.', 'vk.wens':'When would you like to test drive? (e.g. Saturday morning)',
+  'vk.proefok':'Test drive requested. The dealer will schedule it.', 'vk.bodknop':'Offer / buy', 'vk.bodvraag':'Your offer in € (blank = asking price):',
+  'vk.inruilvraag':'Would you like to trade in a car?', 'vk.inmerk':'Make + model of your trade-in:', 'vk.injaar':'Year?', 'vk.inkm':'Mileage?',
+  'vk.concvraag':'Concierge delivery to your address?', 'vk.adres':'Delivery address:', 'vk.koopok':'Request sent. The dealer will be in touch.',
   'app.ms.18':'Alcohol: 18+ only; the venue may ask for ID.',
   'app.ms.18b':'the venue may ask for ID.',
   'app.ms.los':'You order directly from this venue: a separate contract, and your payment goes directly to the venue.',

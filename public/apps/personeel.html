@@ -196,6 +196,11 @@
         <p class="sub" data-i18n="pd.v.vaart.sub">De charters van vandaag: de staat vastleggen, uitvaren en teruggeven, en de SOS op zee.</p>
         <div id="vaartWrap"></div>
       </div>
+      <div class="view" data-view="verkoop">
+        <h2 data-i18n="pd.v.verkoop">Verkoop</h2>
+        <p class="sub" data-i18n="pd.v.verkoop.sub">De proefritten van vandaag en de auto's die klaarstaan om af te leveren.</p>
+        <div id="verkoopWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -211,6 +216,7 @@
       <button data-tab="entree" id="tabEntree" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H6a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M12 6v2M12 11v2M12 16v2"/></svg><span data-i18n="pd.t.entree">Entree</span></button>
       <button data-tab="winkel" id="tabWinkel" style="display:none;"><svg viewBox="0 0 24 24"><path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/></svg><span data-i18n="pd.t.winkel">Vloer</span></button>
       <button data-tab="vaart" id="tabVaart" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/></svg><span data-i18n="pd.t.vaart">Vaart</span></button>
+      <button data-tab="verkoop" id="tabVerkoop" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M9.5 12l1.4 1.4L14 10"/></svg><span data-i18n="pd.t.verkoop">Verkoop</span></button>
       <button data-tab="bezorgen" id="tabBezorgen" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/></svg><span data-i18n="pd.t.bezorgen">Bezorgen</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
@@ -317,7 +323,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -1031,6 +1037,40 @@
     }));
   }
 
+  // ---- autoverkoop op de PDA: proefritten inplannen/rijden en auto's afleveren ----
+  let pdVerkoop = null;
+  const heeftVerkoop = () => !!(state && state.supplier && state.supplier.type === 'verhuur');
+  async function laadVerkoop(){
+    if (!heeftVerkoop()) return;
+    try { pdVerkoop = await API.call('/supplier/verkoop/overzicht', {}); } catch(e){ pdVerkoop = { pda: [] }; }
+    renderVerkoop();
+  }
+  function renderVerkoop(){
+    const tabBtn = document.getElementById('tabVerkoop');
+    if (tabBtn) tabBtn.style.display = (heeftVerkoop() && pdVerkoop && pdVerkoop.aan) ? '' : 'none';
+    const wrap = $('#verkoopWrap'); if (!wrap) return;
+    if (!heeftVerkoop()){ wrap.innerHTML = ''; return; }
+    if (!pdVerkoop){ wrap.innerHTML = '<div class="card">…</div>'; laadVerkoop(); return; }
+    const lijst = pdVerkoop.pda || [];
+    wrap.innerHTML = lijst.length ? lijst.map(d => {
+      const koop = d.soort === 'koop';
+      const knop = koop
+        ? '<button class="abtn" data-vkaf="'+d.ref+'">'+T('pd.vk.aflever','Afgeleverd')+'</button>'
+        : '<button class="abtn" data-vkgereden="'+d.ref+'">'+T('pd.vk.gereden','Proefrit gereden')+'</button>';
+      return '<div class="card"><div class="k">'+(koop?'🔑 ':'🚗 ')+esc(d.autoNaam)+'</div>'+
+        '<div style="font-size:0.85rem;margin-top:0.3rem;">'+esc(d.codenaam)+' · '+(koop
+          ? (T('pd.vk.aflevering','aflevering')+(d.concierge?' · '+T('pd.vk.concierge','concierge')+' '+esc(d.adres||''):' · '+T('pd.vk.ophalen','ophalen'))+' · '+eur(d.prijs||0))
+          : (T('pd.vk.proefrit','proefrit')+(d.moment?' · '+esc(d.moment):'')))+'</div>'+
+        '<div style="margin-top:0.6rem;">'+knop+'</div></div>';
+    }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:0.85rem;">'+T('pd.vk.geen','Niets in te plannen of af te leveren.')+'</div>';
+    wrap.querySelectorAll('[data-vkgereden]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/verkoop/deal', { ref:b.dataset.vkgereden, actie:'gereden' }); toast(T('pd.vk.ok','Bijgewerkt.')); await laadVerkoop(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-vkaf]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/verkoop/deal', { ref:b.dataset.vkaf, actie:'afgeleverd' }); toast('✅ '+T('pd.vk.afgeleverd','Afgeleverd.')); await laadVerkoop(); } catch(e){ toast(e.message); }
+    }));
+  }
+
   function renderTeam(){
     const team = state.team || [];
     const act = (state.activity || []).slice(0, 10);
@@ -1337,6 +1377,9 @@ window.I18N = { en: {
   'pd.w.apartok':'Put aside for the customer.',
   // --- Vaart (charter, PDA) ---
   'pd.t.vaart':'Sailing', 'pd.v.vaart':'Sailing',
+  'pd.t.verkoop':'Sales', 'pd.v.verkoop':'Sales', 'pd.v.verkoop.sub':"Today's test drives and the cars ready for delivery.",
+  'pd.vk.aflever':'Delivered', 'pd.vk.gereden':'Test drive done', 'pd.vk.aflevering':'delivery', 'pd.vk.concierge':'concierge',
+  'pd.vk.ophalen':'pickup', 'pd.vk.proefrit':'test drive', 'pd.vk.geen':'Nothing to schedule or deliver.', 'pd.vk.ok':'Updated.', 'pd.vk.afgeleverd':'Delivered.',
   'pd.v.vaart.sub':"Today's charters: record the condition, set sail and return, and the SOS at sea.",
   'pd.va.voor':'Before photo', 'pd.va.na':'After photo', 'pd.va.uitvaren':'Set sail', 'pd.va.terug':'Return',
   'pd.va.kaart':'map', 'pd.va.sosok':'Handled', 'pd.va.gasten':'guests', 'pd.va.metskipper':'with skipper',

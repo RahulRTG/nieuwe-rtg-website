@@ -57,6 +57,7 @@ const { RETAIL_MATEN, RETAIL_SEIZOENEN, maakRetail } = require('./kern/retail');
 const { maakGroothandel } = require('./kern/groothandel');
 const { maakModebezorg } = require('./kern/modebezorg');
 const { maakZaak } = require('./kern/zaak');
+const { maakAutoverkoop } = require('./kern/autoverkoop');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
@@ -726,9 +727,25 @@ function initRealtime() {
         { id: 'c3', name: 'Jeep Wrangler', plate: 'IB-330-J', dagprijs: 95, actief: true,
           categorie: 'SUV 4x4', transmissie: 'automaat', brandstof: 'diesel', stoelen: 5, deuren: 4,
           airco: true, bagage: 3, kmPerDag: 0, meerKm: 0, borg: 800, minLeeftijd: 25, icoon: '\uD83D\uDE99' }
-      ]
+      ],
+      // 5-sterren autoverkoop: een exclusieve showroom naast de verhuur
+      verkoop: { aan: true, showroom: [
+        { id: 'v1', merk: 'Porsche', model: '911 Carrera S', jaar: 2023, km: 12400, prijs: 149500, brandstof: 'Benzine',
+          transmissie: 'PDK automaat', kleur: 'GT-zilver', vermogenPk: 450, opties: ['Sport Chrono', 'Panoramadak', 'Bose'],
+          garantieMnd: 24, historie: 'Volledige Porsche-onderhoudshistorie, eerste eigenaar, ongevalvrij.', fotos: [], vip: true, status: 'te koop' },
+        { id: 'v2', merk: 'Mercedes-Benz', model: 'G 400d AMG Line', jaar: 2022, km: 28900, prijs: 138000, brandstof: 'Diesel',
+          transmissie: 'Automaat', kleur: 'Obsidiaanzwart', vermogenPk: 330, opties: ['Burmester', 'Nachtpakket', 'Trekhaak'],
+          garantieMnd: 24, historie: 'Dealeronderhouden, tweede eigenaar.', fotos: [], vip: true, status: 'te koop' },
+        { id: 'v3', merk: 'Tesla', model: 'Model 3 Long Range', jaar: 2024, km: 8600, prijs: 46900, brandstof: 'Elektrisch',
+          transmissie: 'Automaat', kleur: 'Parelwit', vermogenPk: 498, opties: ['Autopilot', 'Trekhaak'],
+          garantieMnd: 36, historie: 'Fabrieksgarantie, als nieuw.', fotos: [], vip: false, status: 'te koop' },
+        { id: 'v4', merk: 'Volkswagen', model: 'Golf GTI', jaar: 2021, km: 41200, prijs: 32750, brandstof: 'Benzine',
+          transmissie: 'DSG', kleur: 'Tornado-rood', vermogenPk: 245, opties: ['Digital Cockpit', 'Trekhaak'],
+          garantieMnd: 12, historie: 'Nette staat, dealeronderhouden.', fotos: [], vip: false, status: 'te koop' }
+      ] }
     });
   }
+  if (!Array.isArray(db.data.verkoopDeals)) db.data.verkoopDeals = [];
   // het helikopter-genre: premium transfers en scenic vluchten met eigen
   // helikopters en piloten. Verloopt via dezelfde ritketen (aanvraag, toewijzen,
   // onderweg, gearriveerd) met slimme toewijzing van piloot en toestel; 18+ zoals
@@ -1627,6 +1644,14 @@ const {
 const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard } =
   maakZaak({ db, save, accounts });
 
+/* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
+   autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,
+   inruil en concierge-aflevering, en een digitaal koopcontract. */
+const {
+  AUTOVERKOOP_BRANDSTOF, avMagVerkopen, avZetAan, avZetAuto, avVerwijderAuto, avShowroom,
+  avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox
+} = maakAutoverkoop({ db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice });
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -1963,6 +1988,9 @@ const kern = {
   mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
+  // de autoverkoop-laag (kern/autoverkoop.js)
+  AUTOVERKOOP_BRANDSTOF, avMagVerkopen, avZetAan, avZetAuto, avVerwijderAuto, avShowroom,
+  avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten

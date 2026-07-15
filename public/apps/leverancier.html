@@ -418,12 +418,39 @@
   .st-sec{grid-column:1/-1;font-size:0.64rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin-top:0.5rem;}
   .st-empty{grid-column:1/-1;padding:2.6rem 1rem;text-align:center;color:var(--soft);font-size:0.9rem;}
   .tkc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem;display:flex;flex-direction:column;gap:0.5rem;}
-  .tkc.late{border-color:var(--burgundy);box-shadow:0 0 0 1px rgba(194,58,94,0.35);}
+  /* KDS-tijdbanden: groen (vers), amber (loopt op), rood (te laat); knippert door bij echt te laat */
+  .tkc.ok{border-top:4px solid #2E7D5B;}
+  .tkc.warn{border-top:4px solid #C99A2E;}
+  .tkc.late{border-top:4px solid #E5484D;border-color:#E5484D;box-shadow:0 0 0 1px rgba(229,72,77,0.3);}
+  .tkc.flash{animation:tkcflash 1.1s ease-in-out infinite;}
+  @keyframes tkcflash{0%,100%{box-shadow:0 0 0 1px rgba(229,72,77,0.3);}50%{box-shadow:0 0 0 5px rgba(229,72,77,0.55);}}
+  @media (prefers-reduced-motion: reduce){.tkc.flash{animation:none;}}
   .tkc.dim{opacity:0.55;}
   .tkc-top{display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;}
   .tkc-code{font-family:'Bodoni Moda',serif;font-size:1.45rem;color:var(--gold);letter-spacing:0.08em;}
-  .tkc-age{font-size:0.7rem;color:var(--soft);flex-shrink:0;}
-  .tkc.late .tkc-age{color:var(--burgundy);font-weight:600;}
+  .tkc-age{font-size:0.78rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--soft);flex-shrink:0;padding:0.14rem 0.5rem;border-radius:7px;background:var(--card2);}
+  .tkc.ok .tkc-age{color:#7BC79B;background:rgba(46,125,91,0.16);}
+  .tkc.warn .tkc-age{color:#E2B93B;background:rgba(201,154,46,0.16);}
+  .tkc.late .tkc-age{color:#FF8589;background:rgba(229,72,77,0.18);}
+  /* de statusbalk van de lijn: open bonnen, te laat, oudste */
+  .st-stats{grid-column:1/-1;display:flex;gap:0.5rem;flex-wrap:wrap;}
+  .st-stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.5rem 0.95rem;display:flex;flex-direction:column;min-width:86px;}
+  .st-stat b{font-family:'Bodoni Moda',serif;font-size:1.35rem;line-height:1.1;font-variant-numeric:tabular-nums;}
+  .st-stat span{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
+  .st-stat.rood b{color:#FF8589;}
+  .st-stat.groen b{color:#7BC79B;}
+  /* all day: totalen per gerecht over alle open bonnen, zoals op een echte lijn */
+  .allday{grid-column:1/-1;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;}
+  .allday .ad-h{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin-right:0.2rem;}
+  .allday .ad{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.75rem;font-size:0.8rem;}
+  .allday .ad b{color:var(--gold);margin-right:0.3rem;font-variant-numeric:tabular-nums;}
+  /* vuurplan-chips per kant: start nu, wacht, bezig, houd warm, naar de pas */
+  .vp{display:inline-flex;align-items:center;gap:0.3rem;border-radius:999px;padding:0.22rem 0.6rem;font-size:0.66rem;letter-spacing:0.05em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);}
+  .vp.nu{color:#7BC79B;border-color:rgba(46,125,91,0.55);}
+  .vp.wacht{color:#E2B93B;border-color:rgba(201,154,46,0.55);}
+  .vp.bezig{color:var(--gold);border-color:rgba(169,143,28,0.5);}
+  .vp.warm{color:#FF8589;border-color:rgba(229,72,77,0.55);}
+  .vp.pas{color:#7BC79B;border-color:rgba(46,125,91,0.55);}
   .tkc-who{font-size:0.7rem;color:var(--soft);}
   .tkc-items{display:flex;flex-direction:column;gap:0.3rem;font-size:0.98rem;line-height:1.4;}
   .tkc-items b{color:var(--gold);margin-right:0.45rem;}
@@ -933,6 +960,8 @@ window.I18N = { en: {
   'st.pda':'Open the full PDA', 'st.pda.s':'Schedule, tasks, team chat, walkie-talkie and SOS.',
   'st.calm':'All quiet. New orders appear here automatically.',
   'st.done':'Marked ready, waiting to be served', 'st.unpaid':'unpaid',
+  'kds.open':'Open tickets', 'kds.laat':'Late', 'kds.oudste':'Oldest ticket', 'kds.allday':'All day',
+  'vp.nu':'fire now', 'vp.wacht':'hold', 'vp.bezig':'cooking', 'vp.warm':'keep warm', 'vp.pas':'to the pass',
   'st.agever':'Age verified in the app (passport)',
   'st.b.klaar':'ready', 'st.b.bezig':'working',
   'menu.station':'Workstation', 'menu.keuken':'Kitchen', 'menu.stmoved':'Moved to the other station.',

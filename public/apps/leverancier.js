@@ -494,6 +494,68 @@
     const m = (state && state.menu || []).find(x => x.id === it.id);
     return m && m.station === 'bar' ? 'bar' : 'keuken';
   }
+
+  /* ---- het vuurplan: zelfde rekenregels als de servercoach ----
+     Nominale tijd per kant (prepMin op het gerecht wint); klaar telt 0,
+     bezig de halve tijd, niet gestart de volle tijd. De langzaamste kant
+     bepaalt het doel; de rest start precies zo laat dat alles tegelijk
+     warm op de pas ligt. */
+  const KTIJD = { warm: 12, koud: 6, snack: 8, dessert: 5 };
+  function sectieDuur(o, sec){
+    let t = KTIJD[sec] || 8;
+    (o.items||[]).forEach(it => {
+      const m = (state && state.menu || []).find(x => x.id === it.id);
+      if (m && m.station !== 'bar' && (m.sectie||'warm') === sec && m.prepMin) t = Math.max(t, m.prepMin);
+    });
+    return t;
+  }
+  function vuurplan(o){
+    const nodig = sectiesVanOrder(o);
+    const fase = o.secties || {};
+    const rest = {};
+    nodig.forEach(sec => { const t = sectieDuur(o, sec); rest[sec] = fase[sec]==='klaar' ? 0 : fase[sec]==='bezig' ? Math.ceil(t/2) : t; });
+    const doel = nodig.length ? Math.max.apply(null, nodig.map(s2 => rest[s2])) : 0;
+    const plan = {};
+    nodig.forEach(sec => {
+      if (fase[sec]==='klaar') plan[sec] = doel > 0 ? { doe:'warm', min:doel } : { doe:'pas', min:0 };
+      else if (fase[sec]==='bezig') plan[sec] = { doe:'bezig', min:rest[sec] };
+      else { const w = doel - rest[sec]; plan[sec] = w >= 2 ? { doe:'wacht', min:w } : { doe:'nu', min:0 }; }
+    });
+    return { doel, plan };
+  }
+  // KDS-tijdbanden: groen tot 6 min, amber tot 12, rood daarna, knipperen vanaf 18
+  function ageKlasse(a){ return a >= 18 ? ' late flash' : a >= 12 ? ' late' : a >= 6 ? ' warn' : ' ok'; }
+  function vpChip(sec, p){
+    if (!p) return '';
+    const lbl = { nu: T('vp.nu','start nu'), wacht: T('vp.wacht','wacht'), bezig: T('vp.bezig','bezig'), warm: T('vp.warm','houd warm'), pas: T('vp.pas','naar de pas') }[p.doe] || '';
+    const min = (p.doe==='wacht'||p.doe==='bezig'||p.doe==='warm') && p.min ? ' ~'+p.min+'m' : '';
+    return '<span class="vp '+p.doe+'">'+KSECTIES[sec][0]+' '+T('ks.'+sec, KSECTIES[sec][1])+' · '+lbl+min+'</span>';
+  }
+  // de statusbalk boven de bonnen: open, te laat, oudste
+  function stStats(list){
+    const ages = list.map(o => ageMin(o.at));
+    const laat = ages.filter(a => a >= 12).length;
+    const oudste = ages.length ? Math.max.apply(null, ages) : 0;
+    return '<div class="st-stats">'+
+      '<div class="st-stat"><b>'+list.length+'</b><span>'+T('kds.open','Open bonnen')+'</span></div>'+
+      '<div class="st-stat'+(laat?' rood':' groen')+'"><b>'+laat+'</b><span>'+T('kds.laat','Te laat')+'</span></div>'+
+      '<div class="st-stat"><b>'+oudste+'m</b><span>'+T('kds.oudste','Oudste bon')+'</span></div>'+
+    '</div>';
+  }
+  // de all-day-telling: totalen per gerecht over alle open bonnen, zoals op een echte lijn
+  function allDay(list, filt){
+    const per = {};
+    list.forEach(o => (o.items||[]).forEach(it => {
+      const sec = sectieOf(it); if (!sec) return;
+      if (filt && sec !== filt) return;
+      if ((o.secties||{})[sec] === 'klaar') return;
+      per[it.name] = (per[it.name]||0) + it.qty;
+    }));
+    const rows = Object.entries(per).sort((a,b) => b[1]-a[1]).slice(0, 14);
+    if (!rows.length) return '';
+    return '<div class="allday"><span class="ad-h">'+T('kds.allday','All day')+'</span>'+rows.map(r => '<span class="ad"><b>'+r[1]+'×</b>'+r[0]+'</span>').join('')+'</div>';
+  }
+  const opTijd = (a,b) => new Date(a.at) - new Date(b.at);
   function orderStations(o){
     const set = new Set();
     (o.items||[]).forEach(it => set.add(stationOf(it)));
@@ -538,7 +600,7 @@
     const items = (o.items||[]).filter(it => !st || stationOf(it) === st);
     const secIcon = it => (st === 'keuken' && sectieOf(it)) ? KSECTIES[sectieOf(it)][0] + ' ' : '';
     const a = ageMin(o.at);
-    const late = !opts.dim && a >= 10;
+    const tier = opts.dim ? '' : ageKlasse(a);
     const phase = (o.stations||{})[st];
     let act = '';
     if (opts.serve){
@@ -548,16 +610,16 @@
         (!phase ? '<button class="tkc-start" data-stgo="'+o.ref+'" data-phase="bezig">'+T('st.start','Start')+'</button>' : '')+
         '<button class="tkc-ready" data-stgo="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div>';
     }
-    return '<div class="tkc'+(late?' late':'')+(opts.dim?' dim':'')+'">'+
+    return '<div class="tkc'+tier+(opts.dim?' dim':'')+'">'+
       '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+a+' min</span></div>'+
       '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+(o.paid?'':' \u00b7 '+T('st.unpaid','onbetaald'))+'</div>'+
       '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+it.name+'</span>').join('')+'</div>'+
       (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
       (o.leeftijdOk?'<div class="tkc-alg" style="background:rgba(45,140,80,0.14);color:#2d8c50;">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
-      (st==='keuken'&&sectiesVanOrder(o).length>1?'<div class="st-badges">'+sectiesVanOrder(o).map(s2=>{
-        const p2=(o.secties||{})[s2]||'';
-        return '<span class="st-badge '+p2+'">'+KSECTIES[s2][0]+' '+T('ks.'+s2, KSECTIES[s2][1])+(p2?' \u00b7 '+(p2==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
-      }).join('')+'</div>':'')+
+      (st==='keuken'&&!opts.dim&&sectiesVanOrder(o).length?(function(){
+        const vp = vuurplan(o);
+        return '<div class="st-badges">'+sectiesVanOrder(o).map(s2 => vpChip(s2, vp.plan[s2])).join('')+'</div>';
+      })():'')+
       (opts.badges?'<div class="st-badges">'+orderStations(o).map(s2=>{
         const p=(o.stations||{})[s2]||'';
         return '<span class="st-badge '+p+'">'+(s2==='bar'?'\uD83C\uDF78':'\uD83D\uDD25')+' '+s2+(p?' \u00b7 '+(p==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
@@ -734,21 +796,25 @@
         if (keukenSectie !== 'chef' && keukenSectie !== 'pas'){
           const sec = keukenSectie;
           const mijn = live.filter(o => sectiesVanOrder(o).includes(sec));
-          const actief = mijn.filter(o => (o.secties||{})[sec] !== 'klaar');
+          const actief = mijn.filter(o => (o.secties||{})[sec] !== 'klaar').sort(opTijd);
           const klaarHier = mijn.filter(o => (o.secties||{})[sec] === 'klaar');
           const kaart = (o, dim) => {
             const items = (o.items||[]).filter(it => sectieOf(it) === sec);
-            const a = ageMin(o.at); const late = !dim && a >= 10;
+            const a = ageMin(o.at);
+            const tier = dim ? '' : ageKlasse(a);
             const fase = (o.secties||{})[sec];
-            return '<div class="tkc'+(late?' late':'')+(dim?' dim':'')+'">'+
+            const advies = dim ? null : vuurplan(o).plan[sec];
+            return '<div class="tkc'+tier+(dim?' dim':'')+'">'+
               '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+a+' min</span></div>'+
               '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+'</div>'+
               '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+it.name+'</span>').join('')+'</div>'+
               (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
+              (advies?'<div class="st-badges">'+vpChip(sec, advies)+'</div>':'')+
               (dim?'':'<div class="tkc-act">'+(!fase?'<button class="tkc-start" data-secgo="'+o.ref+'" data-phase="bezig">'+T('st.start','Start')+'</button>':'')+
                 '<button class="tkc-ready" data-secgo="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div>')+
             '</div>';
           };
+          html += stStats(actief) + allDay(actief, sec);
           html += actief.length ? actief.map(o=>kaart(o,false)).join('') : '<div class="st-empty">'+T('ks.calm','Niets voor deze kant. Nieuwe bestellingen met werk voor ')+T('ks.'+sec, KSECTIES[sec][1]).toLowerCase()+T('ks.calm2',' verschijnen hier vanzelf.')+'</div>';
           if (klaarHier.length){
             html += '<div class="st-sec">'+T('ks.done','Klaargemeld door deze kant')+'</div>';
@@ -760,8 +826,8 @@
         }
         if (keukenSectie === 'pas'){
           const keukenOrders = live.filter(o => sectiesVanOrder(o).length);
-          const bezig = keukenOrders.filter(o => (o.stations||{}).keuken !== 'klaar');
-          const opDePas = keukenOrders.filter(o => (o.stations||{}).keuken === 'klaar');
+          const bezig = keukenOrders.filter(o => (o.stations||{}).keuken !== 'klaar').sort(opTijd);
+          const opDePas = keukenOrders.filter(o => (o.stations||{}).keuken === 'klaar').sort(opTijd);
           const badge = o => '<div class="st-badges">'+sectiesVanOrder(o).map(s2=>{
             const p2=(o.secties||{})[s2]||'';
             return '<span class="st-badge '+p2+'">'+KSECTIES[s2][0]+' '+T('ks.'+s2, KSECTIES[s2][1])+(p2?' \u00b7 '+(p2==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
@@ -785,8 +851,10 @@
         }
       }
       const mine = live.filter(o => (o.items||[]).some(it => stationOf(it) === st));
-      const act = mine.filter(o => (o.stations||{})[st] !== 'klaar');
+      const act = mine.filter(o => (o.stations||{})[st] !== 'klaar').sort(opTijd);
       const done = mine.filter(o => (o.stations||{})[st] === 'klaar');
+      if (st === 'keuken' || st === 'bar') html += stStats(act);
+      if (st === 'keuken') html += allDay(act);
       html += act.length ? act.map(o => ticketCard(o, st, {})).join('') : '<div class="st-empty">'+T('st.calm','Rustig. Nieuwe bestellingen verschijnen hier vanzelf, met geluid van de bel in de app.')+'</div>';
       if (done.length){
         html += '<div class="st-sec">'+T('st.done','Klaargemeld, wacht op uitserveren')+'</div>';

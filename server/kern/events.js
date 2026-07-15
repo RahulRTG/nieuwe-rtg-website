@@ -26,6 +26,9 @@ const ALT_IDEE = {
 // gedeelde keukencoach-cache: code -> { hash, lines, at }
 const coachCache = new Map();
 
+// nominale bereidingstijd per keukenkant in minuten; prepMin op het gerecht wint
+const SECTIE_MIN = { warm: 12, koud: 6, snack: 8, dessert: 5 };
+
 function maakEvents({ crypto, sectiesForOrder }) {
   function runItem(time, station, text, daysBefore, mep) {
     return {
@@ -98,6 +101,41 @@ function maakEvents({ crypto, sectiesForOrder }) {
     return Math.max(aangemeld, Math.ceil(e.capacity * 0.6));
   }
 
+  /* Het vuurplan: wanneer moet elke kant van een bon starten zodat alles
+     tegelijk warm op de pas ligt. Rekent per kant met de nominale tijd (of
+     prepMin op het gerecht) en de fase die de kant al heeft: klaar telt 0,
+     bezig telt de halve tijd, niet gestart telt de volle tijd. De kant met
+     de langste resttijd bepaalt het doel; de rest wacht precies zo lang dat
+     iedereen samen bij nul uitkomt. */
+  function sectieTijd(s, o, sec) {
+    let t = SECTIE_MIN[sec] || 8;
+    for (const it of (o.items || [])) {
+      const m = (s.menu || []).find(x => x.id === it.id);
+      if (m && m.station !== 'bar' && (m.sectie || 'warm') === sec && m.prepMin) t = Math.max(t, m.prepMin);
+    }
+    return t;
+  }
+  function vuurplan(s, o) {
+    const nodig = sectiesForOrder(s, o);
+    const fase = o.secties || {};
+    const rest = {};
+    for (const sec of nodig) {
+      const t = sectieTijd(s, o, sec);
+      rest[sec] = fase[sec] === 'klaar' ? 0 : fase[sec] === 'bezig' ? Math.ceil(t / 2) : t;
+    }
+    const doel = nodig.length ? Math.max(...Object.values(rest)) : 0;
+    const plan = {};
+    for (const sec of nodig) {
+      if (fase[sec] === 'klaar') plan[sec] = doel > 0 ? { doe: 'warm', min: doel } : { doe: 'pas', min: 0 };
+      else if (fase[sec] === 'bezig') plan[sec] = { doe: 'bezig', min: rest[sec] };
+      else {
+        const wacht = doel - rest[sec];
+        plan[sec] = wacht >= 2 ? { doe: 'wacht', min: wacht } : { doe: 'nu', min: 0 };
+      }
+    }
+    return { doel, plan };
+  }
+
   /* De keukenhulp: AI-coach die zegt wat er nu moet gebeuren. Kijkt naar alle
      open bonnen: voorrang voor oude bonnen, dezelfde gerechten in een keer
      maken, en per tafel alles tegelijk laten uitgaan. */
@@ -134,16 +172,20 @@ function maakEvents({ crypto, sectiesForOrder }) {
     for (const p of Object.values(per)) if (p.bonnen.length >= 2)
       lines.push(en ? '🍳 Make ' + p.qty + '× ' + p.name + ' in one go (tickets ' + p.bonnen.join(', ') + ').'
                     : '🍳 Maak ' + p.qty + '× ' + p.name + ' in één keer (bonnen ' + p.bonnen.join(', ') + ').');
-    // 4. samen uitsturen: binnen een bon is een kant klaar terwijl een andere nog niet gestart is
+    // 4. het vuurplan: de kanten van een bon zo starten dat alles tegelijk
+    //    warm op de pas ligt, met concrete minuten per kant
     for (const o of open) {
-      const nodig = sectiesForOrder(s, o);
-      const klaarK = nodig.filter(x => (o.secties || {})[x] === 'klaar');
-      const nietGestart = nodig.filter(x => !(o.secties || {})[x]);
-      if (klaarK.length && nietGestart.length) {
-        const wie = o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '');
-        lines.push(en ? '⏱ Ticket ' + wie + ': ' + klaarK.join('/') + ' is done, start ' + nietGestart.join(' and ') + ' so everything leaves together.'
-                      : '⏱ Bon ' + wie + ': ' + klaarK.join('/') + ' is klaar, start ' + nietGestart.join(' en ') + ' zodat alles samen uitgaat.');
-      }
+      const { doel, plan } = vuurplan(s, o);
+      const wie = o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '');
+      const warm = Object.keys(plan).filter(k => plan[k].doe === 'warm');
+      const nu2 = Object.keys(plan).filter(k => plan[k].doe === 'nu');
+      const wacht = Object.keys(plan).filter(k => plan[k].doe === 'wacht');
+      if (warm.length)
+        lines.push(en ? '♨ Ticket ' + wie + ': ' + warm.join('/') + ' is done but the rest needs ~' + doel + ' min; keep it warm and close the gap.'
+                      : '♨ Bon ' + wie + ': ' + warm.join('/') + ' ligt klaar maar de rest heeft nog ~' + doel + ' min; houd warm en trek de kanten gelijk.');
+      else if (nu2.length && wacht.length)
+        lines.push(en ? '⏱ Ticket ' + wie + ': fire ' + nu2.join(' and ') + ' now, ' + wacht.map(k => k + ' in ~' + plan[k].min + ' min').join(' and ') + ', so the whole table leaves hot at once.'
+                      : '⏱ Bon ' + wie + ': start ' + nu2.join(' en ') + ' nu, ' + wacht.map(k => k + ' over ~' + plan[k].min + ' min').join(' en ') + ', dan gaat de hele tafel in een keer warm uit.');
     }
     // 5. tafels: meerdere bonnen voor dezelfde tafel gelijktrekken
     const perTafel = {};
@@ -154,7 +196,7 @@ function maakEvents({ crypto, sectiesForOrder }) {
     return lines.slice(0, 6);
   }
 
-  return { runItem, runKey, sortRunsheet, fallbackRunsheet, parseRunsheetText, cateringDishes, eventCovers, coachRules };
+  return { runItem, runKey, sortRunsheet, fallbackRunsheet, parseRunsheetText, cateringDishes, eventCovers, coachRules, vuurplan, sectieTijd };
 }
 
-module.exports = { RUN_STATIONS, ALT_IDEE, coachCache, maakEvents };
+module.exports = { RUN_STATIONS, ALT_IDEE, coachCache, SECTIE_MIN, maakEvents };

@@ -61,6 +61,14 @@
   .login-form button{background:#fff;color:#000;border:none;border-radius:999px;padding:0.95rem;font-size:0.86rem;font-weight:600;font-family:inherit;cursor:pointer;}
   .login-form button:active{opacity:0.85;}
   .gate-or{margin:1.6rem 0 0.75rem;font-size:0.64rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);}
+  .enroll-box{margin-top:1.4rem;border-top:1px solid var(--line);padding-top:1.2rem;}
+  .enroll-toggle{width:100%;background:var(--card);border:1px solid rgba(169,143,28,0.4);border-radius:13px;padding:0.9rem 1rem;color:var(--gold);font-size:0.82rem;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;}
+  .enroll-toggle:hover{border-color:var(--gold);}
+  .enroll-form{margin-top:0.9rem;}
+  .enroll-hint{font-size:0.72rem;color:var(--soft);line-height:1.5;margin-bottom:0.2rem;}
+  .enroll-msg{font-size:0.78rem;min-height:1rem;}
+  .enroll-msg.err{color:#E8637A;}
+  .enroll-msg.ok{color:#63C08A;}
 
   /* app */
   #app{display:none;flex:1;flex-direction:column;min-height:0;}
@@ -509,6 +517,20 @@
     <p class="gate-or" data-i18n="gate.or">of kies een demo-partner</p>
     <div class="gate-list" id="gateList"></div>
     <p class="free" data-i18n-html="gate.free"><b>Demo-account:</b> gebruikersnaam Rahul, wachtwoord Imran. <b>Gratis te gebruiken:</b> als partner betaalt u niets voor de app. In ruil levert u RTG uw beste dynamische prijs, die u zelf in de app doorgeeft.</p>
+
+    <div class="enroll-box">
+      <button type="button" class="enroll-toggle" id="enrollToggle" aria-expanded="false" data-i18n="enr.toggle">🎟️ Uitgenodigd door uw werkgever? Meld u aan</button>
+      <form class="login-form enroll-form" id="enrollForm" hidden>
+        <p class="enroll-hint" data-i18n="enr.hint">Alleen RTG-, Lifestyle- en Business-leden kunnen in de app werken. Uw werkgever geeft u een kassacode; vul die met de bedrijfsnaam in en bevestig met uw eigen RTG-inlog.</p>
+        <input id="enBedrijf" placeholder="Bedrijfsnaam" data-i18n-ph="enr.biz" autocomplete="organization">
+        <input id="enCode" placeholder="Kassacode" data-i18n-ph="enr.code" autocapitalize="characters" autocomplete="off">
+        <input id="enLogin" placeholder="Uw RTG e-mail of gebruikersnaam" data-i18n-ph="enr.login" autocomplete="username" autocapitalize="none">
+        <input id="enPass" type="password" placeholder="Uw RTG wachtwoord" data-i18n-ph="enr.pass" autocomplete="current-password">
+        <input id="enPin" placeholder="Kies een pincode (4-6 cijfers)" data-i18n-ph="enr.pin" inputmode="numeric" autocomplete="off" maxlength="6">
+        <button type="submit" data-i18n="enr.submit">Aanmelden bij mijn werkgever</button>
+        <div class="enroll-msg" id="enrollMsg" role="status" aria-live="polite"></div>
+      </form>
+    </div>
   </div>
 
   <div id="staffPick" role="dialog" aria-label="Kies gebruiker">
@@ -939,6 +961,37 @@
       e.preventDefault();
       login({ username: document.getElementById('liUser').value, password: document.getElementById('liPass').value }, true);
     });
+    const tog = document.getElementById('enrollToggle'), ef = document.getElementById('enrollForm');
+    if (tog && ef) tog.addEventListener('click', () => {
+      const open = ef.hasAttribute('hidden');
+      if (open) { ef.removeAttribute('hidden'); tog.setAttribute('aria-expanded', 'true'); document.getElementById('enBedrijf').focus(); }
+      else { ef.setAttribute('hidden', ''); tog.setAttribute('aria-expanded', 'false'); }
+    });
+    if (ef) ef.addEventListener('submit', enroll);
+  }
+
+  // Uitgenodigd door de werkgever: aanmelden met bedrijfsnaam + kassacode + eigen
+  // RTG-inlog. Alleen echte RTG/Lifestyle/Business-leden komen erin.
+  async function enroll(e){
+    e.preventDefault();
+    if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return; }
+    const msg = document.getElementById('enrollMsg');
+    const bedrijf = document.getElementById('enBedrijf').value.trim();
+    const kassacode = document.getElementById('enCode').value.trim();
+    const login2 = document.getElementById('enLogin').value.trim();
+    const password = document.getElementById('enPass').value;
+    const pin = document.getElementById('enPin').value.trim();
+    msg.className = 'enroll-msg';
+    msg.textContent = T('enr.busy','Bezig met aanmelden...');
+    try {
+      const r = await API.call('/supplier/staff/join', { bedrijf, kassacode, login: login2, password, pin });
+      msg.className = 'enroll-msg ok';
+      msg.textContent = T('enr.ok','Gelukt! U bent aangemeld. U wordt ingelogd...');
+      await login({ code: r.code, staffId: r.staffId, pin }, false, true);
+    } catch (err) {
+      msg.className = 'enroll-msg err';
+      msg.textContent = err.message || T('enr.fail','Aanmelden mislukt. Controleer de gegevens.');
+    }
   }
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
@@ -1898,12 +1951,14 @@
         (apps.length ? apps.map(x=>'<div class="st-row"><span>'+x.name+' \u00b7 '+x.func+(x.viaRTG?' \u00b7 RTG':'')+'<span class="sub">'+x.contact+'</span></span>'+
           '<span class="acts"><button class="obtn primary" data-khire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-kno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button></span></div>').join('')
         : '<div class="tkc-who">'+T('kt.noapps','Geen open sollicitaties.')+'</div>')+'</div>';
-      html += '<div class="tkc"><h3>'+T('kt.team','Team & pincodes')+'</h3>'+
-        (state.staff||[]).map(m=>'<div class="st-row"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+'</span></span>'+
+      html += '<div class="tkc"><h3>'+T('kt.team','Team & uitnodigingen')+'</h3>'+
+        (state.staff||[]).map(m=>'<div class="st-row"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
           '<span class="acts">'+(m.id!==actor().staffId?'<button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.remove','Verwijder')+'</button>':'')+'</span></div>').join('')+
-        '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name','Naam')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
+        '<div class="tkc-who" style="margin-top:0.55rem;line-height:1.5;">'+T('kt.invite.intro','Personeel is een RTG-, Lifestyle- of Business-lid. Nodig iemand uit; hij of zij meldt zich daarna zelf aan in de app met de bedrijfsnaam en de kassacode.')+'</div>'+
+        '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
-        '<button class="bigbtn" id="ktAdd" style="margin-top:0.2rem;">'+T('kt.add','Toevoegen, PIN verschijnt eenmalig')+'</button></div></div>';
+        '<button class="bigbtn" id="ktInvite" style="margin-top:0.2rem;">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button>'+
+        '<div id="ktInviteOut"></div></div></div>';
       html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
         '<button class="obtn" id="ktBuzz" style="margin-top:0.4rem;">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
       // personeelszaken: verlofaanvragen beslissen en zien wie er nu is ingeklokt
@@ -2300,11 +2355,17 @@
     el.querySelectorAll('[data-kdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/staff/remove', { staffId: b.dataset.kdel }); await refresh(); } catch(e){ toast(e.message); }
     }));
-    const ktAdd = el.querySelector('#ktAdd'); if (ktAdd) ktAdd.addEventListener('click', async () => {
-      const name = el.querySelector('#ktName').value.trim(); if(!name){ toast(T('kt.fillname','Vul een naam in.')); return; }
-      try { const d = await API.call('/supplier/staff/add', { name, func: el.querySelector('#ktFunc').value.trim(), role: el.querySelector('#ktRole').value });
-        kantoorMsg = '\u2705 <b>'+d.staff.name+'</b> \u00b7 PIN: <b style="color:var(--gold);">'+d.pin+'</b> ('+T('kt.pinonce','geef eenmalig door')+')';
-        await refresh(); } catch(e){ toast(e.message); }
+    const ktInvite = el.querySelector('#ktInvite'); if (ktInvite) ktInvite.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/staff/invite', { name: el.querySelector('#ktName').value.trim(), func: el.querySelector('#ktFunc').value.trim(), role: el.querySelector('#ktRole').value });
+        const out = el.querySelector('#ktInviteOut');
+        if (out) out.innerHTML = '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.8rem 0.9rem;margin-top:0.55rem;font-size:0.85rem;line-height:1.7;">'+
+          T('kt.invite.done','Uitnodiging klaar. Geef deze twee dingen door aan uw medewerker:')+'<br>'+
+          '<b>'+T('kt.invite.biz','Bedrijfsnaam')+':</b> '+escT(d.bedrijf)+'<br>'+
+          '<b>'+T('kt.invite.code','Kassacode')+':</b> <span style="font-family:monospace;font-size:1.25rem;letter-spacing:0.18em;color:var(--gold);">'+escT(d.invite.kassacode)+'</span><br>'+
+          '<span class="sub">'+T('kt.invite.note','Hij of zij meldt zich aan met een eigen RTG-account. De code is eenmalig en 30 dagen geldig.')+'</span></div>';
+        toast(T('kt.invite.toast','Kassacode aangemaakt.'));
+      } catch(e){ toast(e.message); }
     });
     const ktBuzz = el.querySelector('#ktBuzz'); if (ktBuzz) ktBuzz.addEventListener('click', async () => {
       try { await API.call('/supplier/team/buzz', { all: true }); toast(T('kt.buzzed','Iedereen opgeroepen.')); } catch(e){ toast(e.message); }
@@ -5811,8 +5872,19 @@ window.I18N = { en: {
   'ev.none':'No events yet. The manager creates them in The Office; members sign up via the member app.',
   'kt.hr':'HR & team', 'kt.keuken':'Kitchen', 'kt.bediening':'Service',
   'kt.sollicitaties':'Applications', 'kt.noapps':'No open applications.',
-  'kt.team':'Team & PINs', 'kt.staff':'Staff member', 'kt.remove':'Remove',
+  'kt.team':'Team & invitations', 'kt.staff':'Staff member', 'kt.remove':'Remove',
   'kt.name':'Name', 'kt.func':'Role (e.g. Service)', 'kt.add':'Add, PIN shows once',
+  'kt.name.opt':'Name (optional)', 'kt.lid':'RTG member',
+  'kt.invite.intro':'Staff are RTG, Lifestyle or Business members. Invite someone; they then sign up themselves in the app with the company name and the register code.',
+  'kt.invite':'Invite, register code appears', 'kt.invite.toast':'Register code created.',
+  'kt.invite.done':'Invitation ready. Give these two things to your employee:',
+  'kt.invite.biz':'Company name', 'kt.invite.code':'Register code',
+  'kt.invite.note':'They sign up with their own RTG account. The code is one-time and valid for 30 days.',
+  'enr.toggle':'🎟️ Invited by your employer? Sign up', 'enr.submit':'Sign up with my employer',
+  'enr.hint':'Only RTG, Lifestyle and Business members can work in the app. Your employer gives you a register code; enter it with the company name and confirm with your own RTG login.',
+  'enr.biz':'Company name', 'enr.code':'Register code', 'enr.login':'Your RTG email or username',
+  'enr.pass':'Your RTG password', 'enr.pin':'Choose a PIN (4-6 digits)',
+  'enr.busy':'Signing up...', 'enr.ok':'Done! You are signed up. Logging you in...', 'enr.fail':'Sign-up failed. Check the details.',
   'kt.oproep':'Call the whole team', 'kt.oproep.s':'Make every phone buzz, e.g. for a briefing.',
   'kt.buzzall':'Buzz everyone', 'kt.buzzed':'Everyone buzzed.',
   'kt.items':'items on the menu', 'kt.noitems':'Nothing on the menu for this station yet.',

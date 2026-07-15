@@ -102,6 +102,11 @@ function init() {
     created_at TEXT NOT NULL
   )`);
   try { db.exec('ALTER TABLE supplier_staff ADD COLUMN func TEXT'); } catch (e) { /* kolom bestaat al */ }
+  // Personeel is voortaan een RTG-lid: member_id koppelt het personeelsaccount
+  // aan het ledenaccount (users.id), member_tier bewaart de pas op moment van
+  // aanmelden. Oudere/geseede accounts hebben deze leeg (member_id NULL).
+  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN member_id INTEGER'); } catch (e) { /* bestaat al */ }
+  try { db.exec('ALTER TABLE supplier_staff ADD COLUMN member_tier TEXT'); } catch (e) { /* bestaat al */ }
   // Personeel wordt altijd per bedrijf opgevraagd (listStaff/verifyStaffPin).
   try { db.exec('CREATE INDEX IF NOT EXISTS idx_staff_supplier ON supplier_staff(supplier_code)'); } catch (e) {}
 
@@ -442,9 +447,10 @@ async function createStaff(gegevens) {
 function createStaffSync(gegevens) {
   return schrijfStaff(gegevens, hashPasswordSync(String(gegevens.pin)));
 }
-function schrijfStaff({ supplierCode, name, role, func }, pinHash) {
-  const vals = [String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), pinHash, role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString()];
-  const kolommen = 'supplier_code, name, pin_hash, role, func, created_at';
+function schrijfStaff({ supplierCode, name, role, func, memberId, memberTier }, pinHash) {
+  const vals = [String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), pinHash, role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString(),
+    memberId != null ? Number(memberId) : null, memberTier ? String(memberTier).slice(0, 20) : null];
+  const kolommen = 'supplier_code, name, pin_hash, role, func, created_at, member_id, member_tier';
   const id = nieuwId();
   let newId;
   if (id != null) {
@@ -462,7 +468,13 @@ function listStaff(code) { return db.prepare('SELECT * FROM supplier_staff WHERE
 function countStaff(code) { return db.prepare('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
 async function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && await verifyPassword(String(pin), s.pin_hash)) ? s : null; }
 function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); markStaff(id); }
-function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null } : null; }
+// Actief personeelsaccount van een lid binnen een bedrijf (voorkomt dubbel aanmelden).
+function staffByMember(supplierCode, memberId) {
+  if (memberId == null) return null;
+  return db.prepare('SELECT * FROM supplier_staff WHERE supplier_code = ? AND member_id = ? AND active = 1')
+    .get(String(supplierCode || '').toUpperCase(), Number(memberId)) || null;
+}
+function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null, lid: s.member_id != null } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
 /* AVG-vergetelheid: verwijdert het account definitief. Geeft de bestandsnaam
@@ -479,7 +491,7 @@ function deleteUser(id) {
 module.exports = {
   init, startPostgres, onExternalChange, flushBijAfsluiten,
   createUser, createUserSync, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
-  createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, publicStaff, makePin, deleteUser,
+  createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, staffByMember, publicStaff, makePin, deleteUser,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword

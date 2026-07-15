@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spelen</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/apps/foundation/stijl.css">
+<script src="/apps/foundation/palet.js"></script>
+<style>
+  .wrap{max-width:34rem;margin:0 auto;padding:1rem 1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .8rem;}
+  .sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .6rem;}
+  .spelgrid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+  .spelkaart{padding:1rem;text-align:center;cursor:pointer;transition:transform .12s,border-color .12s;}
+  .spelkaart:hover{transform:translateY(-2px);border-color:var(--goud);}
+  .spelkaart .ic{font-size:2rem;}
+  .spelkaart h2{font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-top:.3rem;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;margin-bottom:.5rem;}
+  .rij .nm{flex:1;min-width:0;font-size:.9rem;font-weight:600;}
+  .rij .nm small{display:block;font-weight:400;color:var(--zacht);font-size:.72rem;}
+  .beurtstip{width:9px;height:9px;border-radius:50%;background:var(--groen);box-shadow:0 0 8px rgba(95,165,106,.8);}
+  .blok{padding:1rem;margin-bottom:.8rem;}
+  .keuzerij{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0;}
+  .chip{background:var(--paneel2);border:2px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
+  .chip.aan{border-color:var(--goud);color:var(--goud2);}
+  .terug{color:var(--goud);cursor:pointer;font-size:.85rem;text-decoration:none;}
+  canvas.bord{width:100%;border-radius:12px;display:block;background:var(--paneel2);touch-action:none;}
+  .schaak{display:grid;grid-template-columns:repeat(8,1fr);border-radius:10px;overflow:hidden;border:1px solid var(--lijn);}
+  .schaak div{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(1.2rem,7vw,2.2rem);cursor:pointer;user-select:none;}
+  .schaak .l{background:#EAE0CC;} .schaak .d{background:#8A7355;}
+  .schaak .sel{outline:3px solid var(--goud);outline-offset:-3px;}
+  .schaak .kan{box-shadow:inset 0 0 0 100vmax rgba(95,165,106,.35);}
+  .wgrid{display:grid;grid-template-columns:repeat(15,1fr);gap:1px;background:var(--lijn);border-radius:8px;overflow:hidden;}
+  .wgrid div{aspect-ratio:1;background:var(--paneel2);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;text-transform:uppercase;cursor:pointer;}
+  .wgrid .p3W{background:#5a2323;} .wgrid .p2W{background:#4a3a20;} .wgrid .p3L{background:#1f3a4a;} .wgrid .p2L{background:#23404a;}
+  .wgrid .vast{background:#C9A24B;color:#1a1710;} .wgrid .nieuw{background:#e0bd6b;color:#1a1710;}
+  .rek{display:flex;gap:.4rem;justify-content:center;margin:.7rem 0;}
+  .rek button{width:2.4rem;height:2.6rem;border-radius:8px;background:#C9A24B;color:#1a1710;font-weight:800;font-size:1.1rem;text-transform:uppercase;border:2px solid transparent;}
+  .rek button.aan{border-color:#fff;transform:translateY(-3px);}
+  .rek button.op{opacity:.35;}
+  .knoprij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+  .knoprij .knop{flex:1;min-width:6rem;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--paneel);border:1px solid var(--goud);color:var(--txt);border-radius:999px;padding:.5rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50;}
+  .winbanner{padding:1rem;text-align:center;border:1px solid var(--goud);border-radius:14px;margin-bottom:.8rem;background:linear-gradient(135deg,#26200f,#1c1809);}
+  .winbanner b{color:var(--goud2);font-family:var(--serif);font-size:1.15rem;font-weight:500;}
+  .leeg{color:var(--zacht);font-size:.85rem;padding:.6rem 0;}
+  .kop2{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;}
+  .kop2 h1{flex:1;margin:0;}
+  .scorerij{display:flex;gap:.8rem;flex-wrap:wrap;margin:.4rem 0 .7rem;font-size:.85rem;}
+  .scorerij b{color:var(--goud2);}
+  .dobbel{font-size:2.6rem;text-align:center;margin:.4rem 0;min-height:3rem;}
+</style>
+</head>
+<body>
+<main class="wrap" id="hoofd">
+  <!-- lobby -->
+  <section id="vLobby">
+    <div class="kop2"><h1>🎲 Spelen</h1><a class="terug" id="terugApp">← terug</a></div>
+    <div class="spelgrid">
+      <div class="kaart spelkaart" data-spel="mejn"><div class="ic">🎲</div><h2>Mens erger je niet</h2></div>
+      <div class="kaart spelkaart" data-spel="schaak"><div class="ic">♞</div><h2>Schaken</h2></div>
+      <div class="kaart spelkaart" data-spel="woord"><div class="ic">🔤</div><h2>Woordduel</h2></div>
+      <div class="kaart spelkaart" data-spel="sneek"><div class="ic">🐍</div><h2>Sneek</h2></div>
+    </div>
+    <div id="uitnodigingen"></div>
+    <div class="sec">Jouw potjes</div>
+    <div id="potjes"><div class="leeg">Nog geen potjes. Kies hierboven een spel.</div></div>
+  </section>
+
+  <!-- nieuw potje -->
+  <section id="vNieuw" hidden>
+    <div class="kop2"><h1 id="nTitel">Nieuw potje</h1><a class="terug" data-terug>← terug</a></div>
+    <div class="kaart blok" id="nGrootteBlok" hidden>
+      <div class="sec" style="margin-top:0;">Met hoeveel?</div>
+      <div class="keuzerij" id="nGroottes"></div>
+    </div>
+    <div class="kaart blok">
+      <div class="sec" style="margin-top:0;">Tegen wie?</div>
+      <div class="keuzerij" id="nVrienden"><span class="leeg">Vrienden laden…</span></div>
+      <button class="knop" id="nStart" style="width:100%;margin-top:.4rem;">Nodig uit en start</button>
+      <div style="text-align:center;margin:.6rem 0 .1rem;color:var(--zacht);font-size:.8rem;">of</div>
+      <button class="knop grijs" id="nRandom" style="width:100%;">🎯 Random tegenstander</button>
+      <div class="leeg" id="nFout"></div>
+    </div>
+  </section>
+
+  <!-- potje spelen -->
+  <section id="vSpel" hidden>
+    <div class="kop2"><h1 id="sTitel">Potje</h1><a class="terug" data-terug>← terug</a></div>
+    <div id="sWin" hidden class="winbanner"></div>
+    <div class="scorerij" id="sSpelers"></div>
+    <div id="sMejn" hidden>
+      <canvas class="bord" id="mBord" width="440" height="440"></canvas>
+      <div class="dobbel" id="mDobbel"></div>
+      <div class="knoprij" id="mActies"></div>
+    </div>
+    <div id="sSchaak" hidden><div class="schaak" id="schBord"></div><div class="leeg" id="schInfo"></div></div>
+    <div id="sWoord" hidden>
+      <div class="wgrid" id="wBord"></div>
+      <div class="rek" id="wRek"></div>
+      <div class="knoprij">
+        <button class="knop" id="wSpeel">Speel woord</button>
+        <button class="knop grijs" id="wWis">Wis</button>
+        <button class="knop grijs" id="wPas">Pas</button>
+        <button class="knop grijs" id="wRuil">Ruil alles</button>
+      </div>
+      <div class="leeg" id="wInfo">Eer-systeem: echte woorden, zoals thuis aan tafel.</div>
+    </div>
+    <div class="knoprij"><button class="knop rood" id="sOpgeven" style="flex:0 1 auto;">Opgeven</button></div>
+  </section>
+
+  <!-- sneek -->
+  <section id="vSneek" hidden>
+    <div class="kop2"><h1>🐍 Sneek</h1><a class="terug" data-terug>← terug</a></div>
+    <canvas class="bord" id="snBord" width="340" height="340"></canvas>
+    <div class="knoprij"><button class="knop" id="snStart" style="width:100%;">Start (pijltjes of vegen)</button></div>
+    <div class="sec">Ranglijst onder vrienden</div>
+    <div id="snBordLijst"><div class="leeg">Nog geen scores.</div></div>
+  </section>
+</main>
+<div class="melding" id="melding"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function meld(t){ const el=$('#melding'); el.textContent=t; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(()=>{ el.style.opacity='0'; }, 2600); }
+
+/* Een pagina, twee werelden: een RTG-lid speelt met zijn Bearer-token, een
+   RTF-gezinslid met de gezinssessie. Dezelfde potjes, dezelfde vrienden. */
+const memberTok = localStorage.getItem('rtg_member_token');
+let rtfSess = null; try { rtfSess = JSON.parse(localStorage.getItem('rtf_sessie')||'null'); } catch(e){}
+if (!memberTok && !(rtfSess && rtfSess.token)) location.href = '/apps/foundation/index.html';
+async function api(actie, body){
+  const pad = memberTok ? '/api/member/spel/' + actie : '/api/rtf/spel/' + actie;
+  const opts = { method:'POST', headers:{'Content-Type':'application/json'} };
+  if (memberTok) opts.headers.Authorization = 'Bearer ' + memberTok;
+  else body = Object.assign({ code: rtfSess.code, token: rtfSess.token }, body||{});
+  opts.body = JSON.stringify(body||{});
+  const r = await fetch(pad, opts);
+  const d = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(d.error||'Er ging iets mis.');
+  return d;
+}
+async function vriendenLijst(){
+  if (memberTok){
+    const r = await fetch('/api/member/connections', { method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+memberTok}, body:'{}' });
+    return ((await r.json()).connections)||[];
+  }
+  const r = await fetch('/api/rtf/social/connections', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code: rtfSess.code, token: rtfSess.token }) });
+  return ((await r.json()).connections)||[];
+}
+$('#terugApp').href = memberTok ? '/apps/app.html?pas=rtg' : '/apps/foundation/index.html';
+
+/* ---------- weergaven ---------- */
+function toon(v){ ['vLobby','vNieuw','vSpel','vSneek'].forEach(x => $('#'+x).hidden = (x!==v)); if(v!=='vSpel'){ clearInterval(pollT); huidig=null; } }
+document.querySelectorAll('[data-terug]').forEach(a => a.addEventListener('click', ()=>{ toon('vLobby'); laadLobby(); }));
+
+/* ---------- lobby ---------- */
+const SPELNAAM = { mejn:'Mens erger je niet', schaak:'Schaken', woord:'Woordduel' };
+async function laadLobby(){
+  let d; try{ d = await api('mijn'); }catch(e){ return; }
+  const u = d.uitnodigingen||[];
+  $('#uitnodigingen').innerHTML = u.length ? '<div class="sec">Uitnodigingen</div>' + u.map(x =>
+    '<div class="rij"><div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>van '+esc(x.van)+' · met '+x.spelers.map(esc).join(', ')+'</small></div>'+
+    '<button class="knop mini" data-ja="'+esc(x.id)+'">Speel mee</button><button class="knop grijs mini" data-nee="'+esc(x.id)+'">✕</button></div>').join('') : '';
+  document.querySelectorAll('[data-ja]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('antwoord',{id:b.dataset.ja, akkoord:true}); laadLobby(); }catch(e){ meld(e.message); } }));
+  document.querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('antwoord',{id:b.dataset.nee, akkoord:false}); laadLobby(); }catch(e){ meld(e.message); } }));
+  const p = d.potjes||[];
+  $('#potjes').innerHTML = p.length ? p.map(x =>
+    '<div class="rij" style="cursor:pointer;" data-open="'+esc(x.id)+'">'+(x.ikAanZet?'<span class="beurtstip"></span>':'')+
+    '<div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>'+x.spelers.map(esc).join(' · ')+' · '+
+    (x.status==='klaar' ? (x.winnaar?'🏆 '+esc(x.winnaar):'gelijkspel') : x.status==='wacht' ? 'wacht op '+x.wachtOp+' speler(s)' : (x.ikAanZet?'jij bent aan zet!':'wacht op '+esc(x.aanZet)))+'</small></div><span>→</span></div>').join('')
+    : '<div class="leeg">Nog geen potjes. Kies hierboven een spel.</div>';
+  document.querySelectorAll('[data-open]').forEach(r => r.addEventListener('click', ()=> openPotje(r.dataset.open)));
+}
+
+/* ---------- nieuw potje ---------- */
+let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [];
+document.querySelectorAll('.spelkaart').forEach(k => k.addEventListener('click', ()=>{
+  if (k.dataset.spel === 'sneek'){ toon('vSneek'); laadSneekBord(); return; }
+  nSpel = k.dataset.spel; nGrootte = 2; nModus = 'vrij'; nGekozen = [];
+  $('#nTitel').textContent = SPELNAAM[nSpel];
+  $('#nGrootteBlok').hidden = nSpel !== 'mejn';
+  tekenGroottes(); tekenVrienden();
+  toon('vNieuw');
+}));
+function tekenGroottes(){
+  // 1-1, 1-2, 1-3 (vrij) en 2-2 (teams van twee)
+  const opties = [[2,'vrij','1 tegen 1'],[3,'vrij','met 3 spelers'],[4,'vrij','met 4 spelers'],[4,'teams','2 tegen 2']];
+  $('#nGroottes').innerHTML = opties.map(([g,m,l]) => '<button type="button" class="chip'+(nGrootte===g&&nModus===m?' aan':'')+'" data-g="'+g+'" data-m="'+m+'">'+l+'</button>').join('');
+  $('#nGroottes').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ nGrootte=Number(b.dataset.g); nModus=b.dataset.m; nGekozen=nGekozen.slice(0, nGrootte-1); tekenGroottes(); tekenVrienden(); }));
+}
+async function tekenVrienden(){
+  const max = nSpel==='mejn' ? nGrootte-1 : 1;
+  let vr = []; try{ vr = await vriendenLijst(); }catch(e){}
+  $('#nVrienden').innerHTML = vr.length ? vr.map(v => '<button type="button" class="chip'+(nGekozen.includes(v.key)?' aan':'')+'" data-k="'+esc(v.key)+'">'+esc(v.codename)+'</button>').join('')
+    : '<span class="leeg">Nog geen vrienden; speel random of voeg eerst vrienden toe.</span>';
+  $('#nVrienden').querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', ()=>{
+    const k = b.dataset.k;
+    nGekozen = nGekozen.includes(k) ? nGekozen.filter(x=>x!==k) : nGekozen.concat(k).slice(-max);
+    tekenVrienden();
+  }));
+  $('#nStart').textContent = 'Nodig uit en start' + (nGekozen.length ? ' ('+nGekozen.length+')' : '');
+}
+$('#nStart').addEventListener('click', async ()=>{
+  $('#nFout').textContent='';
+  try{
+    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen });
+    meld('Uitnodiging verstuurd. Het potje start zodra je vrienden meedoen.');
+    toon('vLobby'); laadLobby();
+  }catch(e){ $('#nFout').textContent = e.message; }
+});
+$('#nRandom').addEventListener('click', async ()=>{
+  $('#nFout').textContent='';
+  try{
+    const d = await api('random', { soort:nSpel, grootte:nGrootte });
+    if (d.gestart){ openPotje(d.id); } else { meld('Je staat in de rij ('+d.plek+' van '+d.nodig+'). Zodra het vol is, start het potje.'); toon('vLobby'); laadLobby(); }
+  }catch(e){ $('#nFout').textContent = e.message; }
+});
+
+/* ---------- een potje spelen (polling houdt het bord vers) ---------- */
+let huidig = null, pollT = null;
+async function openPotje(id){
+  try{ const d = await api('staat', { id }); huidig = d.potje; }catch(e){ meld(e.message); return; }
+  toon('vSpel'); tekenPotje();
+  clearInterval(pollT);
+  pollT = setInterval(async ()=>{
+    if (!huidig) return;
+    try{ const d = await api('staat', { id: huidig.id }); huidig = d.potje; tekenPotje(); }catch(e){}
+  }, 2500);
+}
+function tekenPotje(){
+  const p = huidig; if (!p) return;
+  $('#sTitel').textContent = p.naam;
+  $('#sSpelers').innerHTML = p.spelers.map((s,i)=>{
+    const kleur = MK[i]||'#fff';
+    const score = p.soort==='woord' && p.staat ? ' · '+p.staat.scores[i] : '';
+    return '<span'+(p.status==='bezig'&&p.beurt===i?' style="font-weight:700;"':'')+'><b style="color:'+kleur+'">●</b> '+esc(s)+(i===p.ik?' (jij)':'')+(p.modus==='teams'?' [team '+(p.teams[i]+1)+']':'')+score+'</span>';
+  }).join(' ');
+  $('#sWin').hidden = p.status !== 'klaar';
+  if (p.status==='klaar') $('#sWin').innerHTML = p.winnaar ? '🏆 <b>'+esc(p.winnaar)+'</b> wint dit potje!' : '<b>Gelijkspel.</b> Sterk van allebei.';
+  $('#sOpgeven').style.display = p.status==='bezig' ? '' : 'none';
+  $('#sMejn').hidden = p.soort!=='mejn'; $('#sSchaak').hidden = p.soort!=='schaak'; $('#sWoord').hidden = p.soort!=='woord';
+  if (p.status==='wacht'){ $('#sMejn').hidden=$('#sSchaak').hidden=$('#sWoord').hidden=true; return; }
+  if (p.soort==='mejn') tekenMejn(); else if (p.soort==='schaak') tekenSchaak(); else tekenWoord();
+}
+$('#sOpgeven').addEventListener('click', async ()=>{
+  if (!huidig || !confirm('Dit potje opgeven?')) return;
+  try{ await api('opgeven', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }catch(e){ meld(e.message); }
+});
+
+/* ---------- Mens erger je niet: het bord op canvas ---------- */
+const MK = ['#E05B5B','#5B8FE0','#5FA56A','#E0B24A'];
+const MPAD = [[0,4],[1,4],[2,4],[3,4],[4,4],[4,3],[4,2],[4,1],[4,0],[5,0],[6,0],[6,1],[6,2],[6,3],[6,4],[7,4],[8,4],[9,4],[10,4],[10,5],[10,6],[9,6],[8,6],[7,6],[6,6],[6,7],[6,8],[6,9],[6,10],[5,10],[4,10],[4,9],[4,8],[4,7],[4,6],[3,6],[2,6],[1,6],[0,6],[0,5]];
+const MTHUIS = [[[1,5],[2,5],[3,5],[4,5]],[[5,1],[5,2],[5,3],[5,4]],[[9,5],[8,5],[7,5],[6,5]],[[5,9],[5,8],[5,7],[5,6]]];
+const MHOK = [[[0,0],[1,0],[0,1],[1,1]],[[9,0],[10,0],[9,1],[10,1]],[[9,9],[10,9],[9,10],[10,10]],[[0,9],[1,9],[0,10],[1,10]]];
+function tekenMejn(){
+  const p = huidig, st = p.staat, cv = $('#mBord'), c = cv.getContext('2d'), cel = cv.width/11, rr = cel*0.38;
+  c.clearRect(0,0,cv.width,cv.height);
+  const stip = (col,row,vul,rand)=>{ c.beginPath(); c.arc(col*cel+cel/2, row*cel+cel/2, rr, 0, 7); c.fillStyle=vul; c.fill(); if(rand){ c.lineWidth=2.5; c.strokeStyle=rand; c.stroke(); } };
+  MPAD.forEach(([col,row],i)=> stip(col,row,'#1E1B18', i%10===0 ? MK[i/10] : 'rgba(255,255,255,.25)'));
+  MTHUIS.forEach((rijtje,sp)=> rijtje.forEach(([col,row])=> stip(col,row,'rgba(0,0,0,.35)', MK[sp])));
+  MHOK.forEach((hok,sp)=> hok.forEach(([col,row])=> stip(col,row,'rgba(0,0,0,.2)', sp < p.spelers.length ? MK[sp] : 'rgba(255,255,255,.08)')));
+  // pionnen
+  p.spelers.forEach((_,sp)=>{
+    (st.pionnen[sp]||[]).forEach((pos,i)=>{
+      let cr;
+      if (pos===-1) cr = MHOK[sp][i];
+      else if (pos>=100) cr = MTHUIS[sp][pos-100];
+      else cr = MPAD[pos];
+      const [col,row]=cr;
+      c.beginPath(); c.arc(col*cel+cel/2, row*cel+cel/2, rr*0.72, 0, 7);
+      c.fillStyle=MK[sp]; c.fill(); c.lineWidth=2; c.strokeStyle='#0C0C0B'; c.stroke();
+    });
+  });
+  // beurt en acties
+  const mijnBeurt = p.status==='bezig' && p.beurt===p.ik;
+  $('#mDobbel').textContent = st.dobbel ? '⚀⚁⚂⚃⚄⚅'[st.dobbel-1] : (mijnBeurt ? '' : '');
+  const acties = $('#mActies'); acties.innerHTML='';
+  if (p.status!=='bezig'){ return; }
+  if (!mijnBeurt){ acties.innerHTML = '<span class="leeg">'+esc(p.spelers[p.beurt])+' is aan zet…</span>'; return; }
+  if (st.mag==='gooi'){
+    const b=document.createElement('button'); b.className='knop'; b.textContent='🎲 Gooi';
+    b.onclick=async()=>{ try{ const d=await api('zet',{id:p.id, zet:{actie:'gooi'}}); if(d.geenZet) meld('Je gooide '+d.dobbel+' en kunt niets. '+(d.nogEens?'Een 6: gooi nog eens!':'De ander is aan de beurt.')); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+    acties.appendChild(b);
+  } else {
+    (st.zetten||[]).forEach(z=>{
+      const b=document.createElement('button'); b.className='knop';
+      b.textContent = '♟ pion '+(z.pion+1)+(z.doel===undefined?'':(z.doel>=100?' → thuis':' → veld'));
+      b.onclick=async()=>{ try{ await api('zet',{id:p.id, zet:{pion:z.pion}}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+      acties.appendChild(b);
+    });
+  }
+}
+
+/* ---------- Schaken ---------- */
+const SCH_TEKEN = { k:'♔', q:'♕', r:'♖', b:'♗', n:'♘', p:'♙', K:'♚', Q:'♛', R:'♜', B:'♝', N:'♞', P:'♟' };
+let schVan = null;
+function tekenSchaak(){
+  const p = huidig, st = p.staat, bord = st.bord;
+  const ikWit = p.ik === 0;
+  const el = $('#schBord'); el.innerHTML='';
+  for (let v = 0; v < 64; v++){
+    // wit kijkt vanaf onderen; zwart ziet het bord gedraaid
+    const veld = ikWit ? v : 63 - v;
+    const r = Math.floor(veld/8), k = veld%8;
+    const d = document.createElement('div');
+    d.className = ((r+k)%2 ? 'd' : 'l') + (schVan===veld ? ' sel' : '');
+    d.textContent = SCH_TEKEN[bord[veld]] || '';
+    d.addEventListener('click', ()=> schKlik(veld));
+    el.appendChild(d);
+  }
+  const mijnKleur = ikWit ? 'w' : 'z';
+  $('#schInfo').textContent = p.status!=='bezig' ? '' : (st.aanZet===mijnKleur ? 'Jij bent aan zet ('+(ikWit?'wit':'zwart')+').' : 'De ander denkt na…');
+}
+async function schKlik(veld){
+  const p = huidig; if (!p || p.status!=='bezig') return;
+  if (schVan===null){ schVan = veld; tekenSchaak(); return; }
+  const van = schVan; schVan = null;
+  if (van === veld){ tekenSchaak(); return; }
+  try{ await api('zet', { id: p.id, zet: { van, naar: veld } }); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }
+  catch(e){ meld(e.message); tekenSchaak(); }
+}
+
+/* ---------- Woordduel ---------- */
+const W_PREMIE = (()=>{ const q={}; const zet=(co,w)=>co.forEach(([r,k])=>{ q[r*15+k]=w; q[r*15+(14-k)]=w; q[(14-r)*15+k]=w; q[(14-r)*15+(14-k)]=w; });
+  zet([[0,0],[0,7]],'3W'); zet([[1,1],[2,2],[3,3],[4,4],[7,7]],'2W'); zet([[1,5],[5,1],[5,5]],'3L'); zet([[0,3],[2,6],[3,0],[6,6],[7,3],[6,2]],'2L'); return q; })();
+let wGelegd = [], wLetter = null;
+function tekenWoord(){
+  const p = huidig, st = p.staat;
+  const el = $('#wBord'); el.innerHTML='';
+  for (let i = 0; i < 225; i++){
+    const d = document.createElement('div');
+    const gelegd = wGelegd.find(t => t.i === i);
+    if (st.bord[i]){ d.className='vast'; d.textContent = st.bord[i]; }
+    else if (gelegd){ d.className='nieuw'; d.textContent = gelegd.letter; }
+    else { d.className = W_PREMIE[i] ? 'p'+W_PREMIE[i] : ''; d.textContent = i===112 ? '★' : (W_PREMIE[i]||''); }
+    d.addEventListener('click', ()=> wKlik(i));
+    el.appendChild(d);
+  }
+  const rek = (st.rek||[]).slice();
+  wGelegd.forEach(t => { const ri = rek.indexOf(t.letter); if (ri>=0) rek[ri] = null; });
+  $('#wRek').innerHTML = (st.rek||[]).map((l,i)=> '<button type="button" data-l="'+l+'" class="'+(rek[i]===null?'op':(wLetter===i?'aan':''))+'" data-i="'+i+'">'+l+'</button>').join('');
+  $('#wRek').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ if (b.classList.contains('op')) return; wLetter = Number(b.dataset.i); tekenWoord(); }));
+  const mijnBeurt = p.status==='bezig' && p.beurt===p.ik;
+  $('#wInfo').textContent = p.status!=='bezig' ? 'Eer-systeem: echte woorden, zoals thuis aan tafel.'
+    : (mijnBeurt ? 'Jij bent aan zet. Nog '+p.staat.zak+' letters in de zak.' : esc(p.spelers[p.beurt])+' is aan zet…');
+}
+function wKlik(i){
+  const p = huidig, st = p.staat;
+  const idx = wGelegd.findIndex(t => t.i === i);
+  if (idx >= 0){ wGelegd.splice(idx,1); tekenWoord(); return; }
+  if (st.bord[i] || wLetter===null) return;
+  wGelegd.push({ i, letter: st.rek[wLetter] });
+  wLetter = null; tekenWoord();
+}
+$('#wWis').addEventListener('click', ()=>{ wGelegd=[]; wLetter=null; tekenWoord(); });
+$('#wSpeel').addEventListener('click', async ()=>{
+  if (!huidig || !wGelegd.length) return;
+  try{ const d = await api('zet', { id: huidig.id, zet: { tegels: wGelegd } }); meld('+'+d.score+' punten!'); wGelegd=[]; const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }
+  catch(e){ meld(e.message); }
+});
+$('#wPas').addEventListener('click', async ()=>{ if(!huidig) return; try{ await api('zet',{id:huidig.id, zet:{pas:true}}); wGelegd=[]; const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } });
+$('#wRuil').addEventListener('click', async ()=>{ if(!huidig) return; try{ await api('zet',{id:huidig.id, zet:{pas:true, ruil:(huidig.staat.rek||[])}}); wGelegd=[]; meld('Nieuwe letters!'); const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } });
+
+/* ---------- Sneek: zelf spelen, ranglijst onder vrienden ---------- */
+const SN = { n: 17, slang: [], richting: [1,0], eten: null, timer: null, score: 0, dood: true };
+function snTeken(){
+  const cv=$('#snBord'), c=cv.getContext('2d'), cel=cv.width/SN.n;
+  c.clearRect(0,0,cv.width,cv.height);
+  if (SN.eten){ c.fillStyle='#E0B24A'; c.beginPath(); c.arc(SN.eten[0]*cel+cel/2, SN.eten[1]*cel+cel/2, cel*0.38, 0, 7); c.fill(); }
+  SN.slang.forEach(([x,y],i)=>{ c.fillStyle = i===0 ? '#5FA56A' : 'rgba(95,165,106,.75)'; c.fillRect(x*cel+1, y*cel+1, cel-2, cel-2); });
+  c.fillStyle='#EAE4D8'; c.font='14px sans-serif'; c.fillText('Score: '+SN.score, 8, 18);
+}
+function snEten(){ do { SN.eten=[Math.floor(Math.random()*SN.n), Math.floor(Math.random()*SN.n)]; } while (SN.slang.some(s=>s[0]===SN.eten[0]&&s[1]===SN.eten[1])); }
+function snStap(){
+  const kop=[SN.slang[0][0]+SN.richting[0], SN.slang[0][1]+SN.richting[1]];
+  if (kop[0]<0||kop[0]>=SN.n||kop[1]<0||kop[1]>=SN.n||SN.slang.some(s=>s[0]===kop[0]&&s[1]===kop[1])) return snDood();
+  SN.slang.unshift(kop);
+  if (SN.eten && kop[0]===SN.eten[0] && kop[1]===SN.eten[1]){ SN.score+=10; snEten(); } else SN.slang.pop();
+  snTeken();
+}
+async function snDood(){
+  clearInterval(SN.timer); SN.dood=true;
+  meld('Af! Score: '+SN.score);
+  try{ await api('sneek-score', { punten: SN.score }); laadSneekBord(); }catch(e){}
+}
+$('#snStart').addEventListener('click', ()=>{
+  SN.slang=[[8,8],[7,8],[6,8]]; SN.richting=[1,0]; SN.score=0; SN.dood=false; snEten(); snTeken();
+  clearInterval(SN.timer); SN.timer=setInterval(snStap, 130);
+});
+document.addEventListener('keydown', e=>{
+  if (SN.dood) return;
+  const R={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];
+  if (R && !(R[0]===-SN.richting[0]&&R[1]===-SN.richting[1])){ SN.richting=R; e.preventDefault(); }
+});
+let veegStart=null;
+$('#snBord').addEventListener('pointerdown', e=>{ veegStart=[e.clientX,e.clientY]; });
+$('#snBord').addEventListener('pointerup', e=>{
+  if (!veegStart || SN.dood) return;
+  const dx=e.clientX-veegStart[0], dy=e.clientY-veegStart[1]; veegStart=null;
+  const R = Math.abs(dx)>Math.abs(dy) ? [dx>0?1:-1,0] : [0,dy>0?1:-1];
+  if (!(R[0]===-SN.richting[0]&&R[1]===-SN.richting[1])) SN.richting=R;
+});
+async function laadSneekBord(){
+  try{
+    const d = await api('sneek-bord');
+    $('#snBordLijst').innerHTML = (d.bord||[]).length ? d.bord.map((r,i)=>
+      '<div class="rij"><div class="nm">'+(i+1)+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')+'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
+      : '<div class="leeg">Nog geen scores. Wees de eerste!</div>';
+  }catch(e){}
+}
+
+/* ---------- start ---------- */
+laadLobby();
+setInterval(()=>{ if (!$('#vLobby').hidden) laadLobby(); }, 8000);
+const qs = new URLSearchParams(location.search);
+if (qs.get('potje')) openPotje(qs.get('potje'));
+</script>
+</body>
+</html>

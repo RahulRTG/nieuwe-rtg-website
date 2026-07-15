@@ -2526,6 +2526,11 @@ const kern = {
   paspoortPartner, paspoortIncidenten
 };
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
+/* Spellen (kern/spellen.js): mens-erger-je-niet, schaken, woordduel en het
+   Sneek-scorebord op de vriendenlaag; RTF- en RTG-leden spelen tegen elkaar. */
+Object.assign(kern, require('./kern/spellen')({
+  db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer
+}));
 /* Salon-ontmoetingen (kern/ontmoeting.js): wederzijdse connecties die vlakbij
    elkaar zijn kiezen samen een activiteit, tekenen een veiligheidscontract en
    RTG-kantoor kijkt live mee tot de afspraak klaar is. Draait op de sociale
@@ -2554,6 +2559,7 @@ require('./routes/agenda')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/markt')(kern);
 require('./routes/borden')(kern);
+require('./routes/spellen')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

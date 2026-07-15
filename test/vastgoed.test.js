@@ -103,6 +103,13 @@ test('bod en tegenbod: makelaar behandelt het, pand gaat onder optie bij accepta
   assert.equal(acc.status, 'geaccepteerd');
   const ov = await json(await api('/api/supplier/vastgoed/overzicht', {}, managerToken));
   assert.equal(ov.panden.find(p => p.id === 'p1').status, 'onder-optie', 'het pand staat onder optie');
+  // een geaccepteerd bod maakt automatisch een (btw-vrije) koopfactuur voor beide partijen
+  const supF = await json(await api('/api/supplier/facturen/mijn', {}, managerToken));
+  const koop = supF.verkocht.find(f => f.totaal === 3350000);
+  assert.ok(koop, 'de makelaar heeft een koopfactuur van de geaccepteerde koopsom');
+  assert.equal(koop.btwBedrag, 0, 'vastgoed is btw-vrij op de koopsom');
+  const lidF = await json(await api('/api/facturen/mijn', {}, lidToken));
+  assert.ok(lidF.facturen.some(f => f.nummer === koop.nummer), 'de koper ontvangt dezelfde factuur');
 });
 
 test('publiek aanbod is voor iedereen zichtbaar; een nieuw pand kan de makelaar toevoegen', async () => {

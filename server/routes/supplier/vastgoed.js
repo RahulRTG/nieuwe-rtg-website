@@ -1,6 +1,6 @@
 /* Domein "supplier" (deelmodule): vastgoed. Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, crypto, db, express, logActivity, keyVanCodenaam, managerOnly, media, notify, salonNaarVolgers, save, schoon, sseToCustomer, sseToSupplier, supplierAuth } = kern;
+  const { app, crypto, db, express, facturatie, logActivity, keyVanCodenaam, managerOnly, media, notify, salonNaarVolgers, save, schoon, sseToCustomer, sseToSupplier, supplierAuth } = kern;
 
 /* ================== vastgoed: het makelaarskantoor ==================
    Panden aanbieden (gericht aan gekozen leden of publiek), biedingen,
@@ -176,7 +176,19 @@ app.post('/api/supplier/bod/beslis', supplierAuth, (req, res) => {
   if (!b) return res.status(404).json({ error: 'Bod niet gevonden.' });
   if (b.status !== 'open') return res.status(409).json({ error: 'Dit bod is al behandeld.' });
   const p = pandVan(s, b.pandId) || {};
-  if (req.body.actie === 'accepteren') { b.status = 'geaccepteerd'; if (pandVan(s, b.pandId)) pandVan(s, b.pandId).status = 'onder-optie'; }
+  if (req.body.actie === 'accepteren') {
+    b.status = 'geaccepteerd'; if (pandVan(s, b.pandId)) pandVan(s, b.pandId).status = 'onder-optie';
+    // automatische factuur van de transactie voor beide partijen; vastgoed is
+    // btw-vrij (bij overdracht geldt overdrachtsbelasting, geen btw op de koopsom).
+    if (facturatie && !b.gefactureerd) {
+      const koop = (p.transactie || 'koop') === 'huur';
+      facturatie.boek({ soort: koop ? 'huur' : 'verkoop', btw: 0, verkoperCode: s.code, verkoperNaam: s.name,
+        koper: { key: b.key, naam: b.codename, codenaam: b.codename },
+        regels: [{ omschrijving: (koop ? 'Huur ' : 'Aankoop ') + (p.titel || 'pand') + (koop ? ' (per maand)' : ''), aantal: 1, stuk: b.bedrag, btw: 0 }],
+        methode: 'via notaris/contract', ref: b.ref });
+      b.gefactureerd = true;
+    }
+  }
   else if (req.body.actie === 'afwijzen') { b.status = 'afgewezen'; }
   else if (req.body.actie === 'tegenbod') {
     const tb = Number(req.body.tegenbod);

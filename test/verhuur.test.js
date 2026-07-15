@@ -119,6 +119,13 @@ test('inleveren kan NIET zonder na-foto; met foto rondt hij af', async () => {
   assert.equal(h.inname.extraKm, 100);
   assert.equal(h.inname.kmKosten, 25);
   assert.ok(h.inname.tankKosten > 0, 'een niet-volle tank levert transparante brandstofkosten');
+  // automatische huurfactuur voor beide partijen (basishuur 147 + meerkosten)
+  const supF = await json(await api('/api/supplier/facturen/mijn', {}, balieToken));
+  const factuur = supF.verkocht.find(f => f.soort === 'huur');
+  assert.ok(factuur, 'de verhuurzaak heeft een huurfactuur');
+  assert.ok(factuur.totaal >= 147 + h.inname.meerkosten - 0.01, 'de factuur bevat de basishuur plus meerkosten');
+  const lidF = await json(await api('/api/facturen/mijn', {}, lidToken));
+  assert.ok(lidF.facturen.some(f => f.nummer === factuur.nummer), 'de huurder ontvangt dezelfde factuur');
 });
 
 test('annuleren is een management-handeling, en een lopende huur annuleer je niet', async () => {

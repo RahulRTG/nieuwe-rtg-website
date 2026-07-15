@@ -1,6 +1,6 @@
 /* Domein "supplier" (deelmodule): verhuur. Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, crypto, db, express, logActivity, managerOnly, media, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth } = kern;
+  const { app, crypto, db, express, facturatie, logActivity, managerOnly, media, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth } = kern;
 
 /* ================== autoverhuur: de zaak-kant ==================
    Vloot met vaste dagprijs, en de veiligheidsregels die schimmig verhuren
@@ -148,6 +148,14 @@ app.post('/api/supplier/huur/status', supplierAuth, (req, res) => {
       meerkosten: Math.round((kmKosten + tankKosten) * 100) / 100, door: req.actor.name, at: new Date().toISOString() };
     h.finishedAt = new Date().toISOString();
     delete db.data.huurLocaties[h.ref];
+    // automatische huurfactuur voor beide partijen: basishuur + eventuele meerkosten
+    if (facturatie && !h.gefactureerd) {
+      const regels = [{ omschrijving: (h.autoNaam || 'Huurauto') + ' · ' + (h.dagen || 1) + ' dag(en)', aantal: 1, stuk: h.price || 0 }];
+      if (h.inname.meerkosten > 0) regels.push({ omschrijving: 'Meerkosten (extra km/tank)', aantal: 1, stuk: h.inname.meerkosten });
+      facturatie.boek({ soort: 'huur', verkoperCode: s.code, verkoperNaam: s.name,
+        koper: { key: h.customerKey, naam: h.customerCodename, codenaam: h.customerCodename }, regels, methode: 'vooraf', ref: h.ref });
+      h.gefactureerd = true;
+    }
   } else if (status === 'geweigerd') {
     if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager annuleert een huur.' });
     if (h.status === 'lopend') return res.status(409).json({ error: 'Een lopende huur annuleer je niet; rond hem af met na-foto\'s.' });

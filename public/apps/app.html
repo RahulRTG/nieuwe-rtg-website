@@ -75,20 +75,27 @@
     position:relative;
     overflow:hidden; /* off-screen panelen (meldingen) mogen de mobiele viewport niet oprekken */
   }
-  /* op desktop: app-kader, zodat het concept als app leest.
-     Het kader vult de schermhoogte tot een maximum en krimpt mee op kortere
-     schermen (laptops), zodat het altijd volledig past en nooit afgekapt wordt. */
+  /* op desktop: schermvullende desktop-app. Het kader vult het hele scherm
+     (geen smal telefoonvenster meer); de app-chrome (koptekst, tabbalk) loopt
+     over de volle breedte en de leesinhoud centreert in een royale kolom via
+     een padding-truc, zodat een-koloms schermen prettig lezen en de bestaande
+     rasters (keuken, hubs, dashboards) uitwaaieren over de breedte. */
   @media (min-width:520px){
-    body{background:#201d1c;padding:2.5rem 0;align-items:center;min-height:100dvh;}
+    body{background:var(--bg);padding:0;align-items:stretch;min-height:100dvh;}
     #shell{
-      height:min(900px, calc(100dvh - 5rem));
+      max-width:none;
+      width:100%;
+      height:100dvh;
       min-height:0;
-      border-radius:40px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,0.1);
-      box-shadow:0 40px 90px -30px rgba(0,0,0,0.8);
+      border-radius:0;
+      border:none;
+      box-shadow:none;
     }
-    /* binnen het app-kader blijven de panelen in het kader */
+    .content,.topbar,.tabbar{
+      padding-left:max(1.5rem, calc((100% - 1100px) / 2));
+      padding-right:max(1.5rem, calc((100% - 1100px) / 2));
+    }
+    /* meldingenpaneel blijft binnen het scherm */
     .notif-panel{position:absolute;height:100%;}
     .notif-scrim{position:absolute;}
   }

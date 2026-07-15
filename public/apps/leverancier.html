@@ -27,6 +27,7 @@
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
     --txt:#F4F1EC; --muted:rgba(244,241,236,0.70); --soft:rgba(244,241,236,0.62);
     --burgundy:#C23A5E; --burgundy-deep:#7F1634; --gold:#A98F1C; --green:#4C9A75; --amber:#C99A2E;
+    --knop:#fff; --knop-txt:#000;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:#000;font-family:'Inter',sans-serif;color:var(--txt);display:flex;justify-content:center;-webkit-font-smoothing:antialiased;}
@@ -58,7 +59,7 @@
   .login-form{margin-top:1.75rem;display:flex;flex-direction:column;gap:0.6rem;}
   .login-form input{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:0.9rem 1rem;color:var(--txt);font-size:0.92rem;font-family:inherit;outline:none;}
   .login-form input:focus{border-color:var(--burgundy);}
-  .login-form button{background:#fff;color:#000;border:none;border-radius:999px;padding:0.95rem;font-size:0.86rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .login-form button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.95rem;font-size:0.86rem;font-weight:600;font-family:inherit;cursor:pointer;}
   .login-form button:active{opacity:0.85;}
   .gate-or{margin:1.6rem 0 0.75rem;font-size:0.64rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);}
   .enroll-box{margin-top:1.4rem;border-top:1px solid var(--line);padding-top:1.2rem;}
@@ -294,7 +295,7 @@
   .pill.onbetaald{color:var(--soft);}
   .order .acts{margin-top:0.85rem;display:flex;gap:0.5rem;flex-wrap:wrap;}
   .obtn{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:0.5rem 0.9rem;font-size:0.74rem;font-weight:500;}
-  .obtn.primary{background:#fff;color:#000;border-color:#fff;}
+  .obtn.primary{background:var(--knop);color:var(--knop-txt);border-color:var(--knop);}
   .obtn.warn{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
 
   .menu-cat{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin:1.1rem 0 0.5rem;}
@@ -310,7 +311,7 @@
   .field label{font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--soft);display:block;margin-bottom:0.4rem;}
   .field input,.field textarea{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;}
   .field textarea{min-height:70px;resize:vertical;}
-  .bigbtn{margin-top:1.1rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.95rem;font-size:0.86rem;font-weight:600;}
+  .bigbtn{margin-top:1.1rem;width:100%;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.95rem;font-size:0.86rem;font-weight:600;}
   .price-row{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 0;border-bottom:1px solid var(--line);font-size:0.85rem;}
   .price-row:last-child{border-bottom:none;}
   .price-row .s{color:var(--muted);}
@@ -374,7 +375,7 @@
   .tt-add{margin-top:0.8rem;display:flex;gap:0.5rem;}
   .tt-add input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;font-size:0.86rem;color:var(--txt);outline:none;}
   .tt-add select{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;}
-  .tt-add button{background:#fff;color:#000;border:none;border-radius:12px;padding:0 1rem;font-size:0.82rem;font-weight:600;}
+  .tt-add button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:12px;padding:0 1rem;font-size:0.82rem;font-weight:600;}
   .tt-pinbox{margin-top:0.8rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.35);border-radius:12px;padding:0.9rem 1rem;font-size:0.82rem;color:var(--txt);line-height:1.6;}
   .tt-pinbox b{color:var(--gold);font-family:'Bodoni Moda',serif;font-size:1.3rem;letter-spacing:0.15em;}
   .tt-act{display:flex;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--line);font-size:0.82rem;}
@@ -401,7 +402,7 @@
   .ks-post em{color:var(--gold);font-style:normal;font-weight:600;}
   .tt-compose{display:flex;gap:0.5rem;margin-top:0.9rem;}
   .tt-compose input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.88rem;color:var(--txt);outline:none;}
-  .tt-compose button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
+  .tt-compose button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
 
   /* ---- werkplekken: keuken-, bar- en bedieningsscherm ---- */
   #station{position:fixed;inset:0;z-index:60;background:#0A0A09;display:none;flex-direction:column;}
@@ -472,12 +473,12 @@
   .notif-item .tx span{font-size:0.78rem;color:var(--muted);}
   .notif-item .tx time{display:block;margin-top:0.2rem;font-size:0.66rem;color:var(--soft);}
 
-  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:#fff;color:#000;font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
+  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:var(--knop);color:var(--knop-txt);font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
   /* Utility: terugkerende zachte lijstregel (was 10x inline). */
   .softline{font-size:0.82rem;color:var(--soft);padding:0.6rem 0;}
   /* Commandocentrum (beveiliging): knoppen en dienst-chips. */
-  .abtn{background:#fff;color:#000;border:none;border-radius:8px;padding:0.4rem 0.8rem;font-size:0.78rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .abtn{background:var(--knop);color:var(--knop-txt);border:none;border-radius:8px;padding:0.4rem 0.8rem;font-size:0.78rem;font-weight:600;font-family:inherit;cursor:pointer;}
   .abtn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
   .bev-chip{display:inline-flex;align-items:center;gap:0.25rem;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.1rem 0.5rem;font-size:0.72rem;margin-right:0.2rem;}
   .bev-chip.on{border-color:#1f5637;background:#12321f;color:#7EE0A3;}
@@ -508,7 +509,7 @@
   <div id="gate" role="main" aria-label="Inloggen">
     <div class="badge">RTG Partners</div>
     <h1 data-i18n-html="gate.title">De leverancier-<em>app</em>.</h1>
-    <p class="deck" data-i18n="gate.deck">Eén app voor hotels, taxi's, privéjets, appartementen, restaurants, bars en clubs. Ontvang RTG-gasten, deel uw menu, beheer bestellingen en ritten, live verbonden met de gast en de RTG-backoffice.</p>
+    <p class="deck" data-i18n="gate.deck">Uw zaak, live verbonden met uw gasten en de RTG-backoffice.</p>
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
       <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
@@ -516,12 +517,12 @@
     </form>
     <p class="gate-or" data-i18n="gate.or">of kies een demo-partner</p>
     <div class="gate-list" id="gateList"></div>
-    <p class="free" data-i18n-html="gate.free"><b>Demo-account:</b> gebruikersnaam Rahul, wachtwoord Imran. <b>Gratis te gebruiken:</b> als partner betaalt u niets voor de app. In ruil levert u RTG uw beste dynamische prijs, die u zelf in de app doorgeeft.</p>
+    <p class="free" data-i18n-html="gate.free"><b>Demo:</b> Rahul / Imran. Gratis voor partners; u levert RTG uw beste dynamische prijs.</p>
 
     <div class="enroll-box">
       <button type="button" class="enroll-toggle" id="enrollToggle" aria-expanded="false" data-i18n="enr.toggle">🎟️ Uitgenodigd door uw werkgever? Meld u aan</button>
       <form class="login-form enroll-form" id="enrollForm" hidden>
-        <p class="enroll-hint" data-i18n="enr.hint">U werkt hier met uw eigen RTG-account; een gratis account is genoeg, een betaalde pas is niet nodig. Uw werkgever geeft u een kassacode; vul die met de bedrijfsnaam in en bevestig met uw eigen RTG-inlog.</p>
+        <p class="enroll-hint" data-i18n="enr.hint">Bedrijfsnaam + kassacode van uw werkgever, bevestigd met uw eigen RTG-account (gratis is genoeg).</p>
         <input id="enBedrijf" placeholder="Bedrijfsnaam" data-i18n-ph="enr.biz" autocomplete="organization">
         <input id="enCode" placeholder="Kassacode" data-i18n-ph="enr.code" autocapitalize="characters" autocomplete="off">
         <input id="enLogin" placeholder="Uw RTG e-mail of gebruikersnaam" data-i18n-ph="enr.login" autocomplete="username" autocapitalize="none">
@@ -778,6 +779,7 @@
   <div id="toast"></div>
 </div>
 
+<script src="/shared/thema.js"></script>
 <script src="/apps/util.js"></script>
 <script src="/shared/appshell.js"></script>
 <script>
@@ -1027,7 +1029,7 @@
   // Stap 1: de rol
   function renderRoles(){
     spH2().textContent = T('sp.roleq','Wie bent u?');
-    spDeck().textContent = T('sp.roledeck','Kies uw rol. Personeel logt in met de eigen pincode; alles wat u doet staat op uw naam.');
+    spDeck().textContent = T('sp.roledeck','Kies uw rol; u logt in met uw eigen pincode.');
     $('#spBack2') && $('#spBack2').remove();
     $('#spList').innerHTML = [
       ['personeel','👥',T('sp.r.staff','Personeel'),T('sp.r.staff.s','Bediening, keuken, receptie, chauffeurs...')],
@@ -1966,7 +1968,7 @@
           '<span class="acts">'+(m.id!==actor().staffId
             ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset code')+'</button><button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
             : '')+'</span></div>').join('')+
-        '<div class="tkc-who" style="margin-top:0.55rem;line-height:1.5;">'+T('kt.invite.intro','Personeel heeft een eigen RTG-account (het gratis account is genoeg). Nodig iemand uit; hij of zij meldt zich daarna zelf aan in de app met de bedrijfsnaam en de kassacode.')+'</div>'+
+        '<div class="tkc-who" style="margin-top:0.55rem;line-height:1.5;">'+T('kt.invite.intro','Nodig uit; de medewerker meldt zich zelf aan met bedrijfsnaam + kassacode en een eigen RTG-account.')+'</div>'+
         '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
         '<button class="bigbtn" id="ktInvite" style="margin-top:0.2rem;">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
@@ -1979,7 +1981,7 @@
               '<div class="st-row"><span><span style="font-family:monospace;letter-spacing:0.14em;color:var(--gold);">'+escT(i.kassacode)+'</span>'+
               '<span class="sub">'+(i.naam?escT(i.naam)+' \u00b7 ':'')+(i.func?escT(i.func)+' \u00b7 ':'')+(i.role==='manager'?'Manager \u00b7 ':'')+T('kt.geldigtot','geldig t/m')+' '+new Date(i.expires).toLocaleDateString()+'</span></span>'+
               '<span class="acts"><button class="obtn warn" data-kinv="'+escT(i.kassacode)+'">'+T('kt.intrek','Trek in')+'</button></span></div>').join('')
-            : '<div class="tkc-who">'+T('kt.geeninv','Geen open uitnodigingen. Elke code is eenmalig en verdwijnt hier zodra hij gebruikt of ingetrokken is.')+'</div>')
+            : '<div class="tkc-who">'+T('kt.geeninv','Geen open uitnodigingen.')+'</div>')
           : '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
         '<button class="obtn" id="ktBuzz" style="margin-top:0.4rem;">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
@@ -2393,7 +2395,7 @@
         kantoorMsg = T('kt.invite.done','Uitnodiging klaar. Geef deze twee dingen door aan uw medewerker:')+'<br>'+
           '<b>'+T('kt.invite.biz','Bedrijfsnaam')+':</b> '+escT(d.bedrijf)+'<br>'+
           '<b>'+T('kt.invite.code','Kassacode')+':</b> <span style="font-family:monospace;font-size:1.25rem;letter-spacing:0.18em;color:var(--gold);">'+escT(d.invite.kassacode)+'</span><br>'+
-          '<span class="sub">'+T('kt.invite.note','Hij of zij meldt zich aan met een eigen RTG-account. De code is eenmalig en 30 dagen geldig.')+'</span>';
+          '<span class="sub">'+T('kt.invite.note','Eenmalig, 30 dagen geldig.')+'</span>';
         toast(T('kt.invite.toast','Kassacode aangemaakt.'));
         invData = null; laadInvites();
       } catch(e){ toast(e.message); }
@@ -5482,7 +5484,7 @@
     }).join('') || '<div class="softline">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
     if (a.manager){
       html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="ttName" placeholder="'+T('team.name','Naam')+'" style="flex:2;min-width:110px;"><input id="ttFunc" placeholder="'+T('team.func','Functie')+'" style="flex:1;min-width:90px;"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.invite','Nodig uit')+'</button></div>';
-      if (lastPin) html += '<div class="tt-pinbox">'+T('team.invintro','Uitnodiging voor')+' '+escT(lastPin.name)+' · '+T('kt.invite.biz','Bedrijfsnaam')+': <b>'+escT(lastPin.bedrijf)+'</b> · '+T('kt.invite.code','Kassacode')+': <b>'+escT(lastPin.kassacode)+'</b><br>'+T('team.invnote','Geef deze door. Hij of zij meldt zich zelf aan in de app met een eigen RTG-account; de code is eenmalig.')+'</div>';
+      if (lastPin) html += '<div class="tt-pinbox">'+T('team.invintro','Uitnodiging voor')+' '+escT(lastPin.name)+' · '+T('kt.invite.biz','Bedrijfsnaam')+': <b>'+escT(lastPin.bedrijf)+'</b> · '+T('kt.invite.code','Kassacode')+': <b>'+escT(lastPin.kassacode)+'</b><br>'+T('team.invnote','Eenmalige code; aanmelden met eigen RTG-account.')+'</div>';
     }
     html += '</div>';
 
@@ -5755,9 +5757,9 @@
 <script>
 window.I18N = { en: {
   'gate.title':'The supplier <em>app</em>.',
-  'gate.deck':'One app for hotels, taxis, private jets, apartments, restaurants, bars and clubs. Welcome RTG guests, share your menu, manage orders and rides, live-connected with the guest and the RTG back office.',
+  'gate.deck':'Your business, live-connected with your guests and the RTG back office.',
   'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo partner',
-  'gate.free':'<b>Demo account:</b> username Rahul, password Imran. <b>Free to use:</b> as a partner you pay nothing for the app. In return you supply RTG your best dynamic price, which you submit in the app yourself.',
+  'gate.free':'<b>Demo:</b> Rahul / Imran. Free for partners; you supply RTG your best dynamic price.',
   'tab.home':'Overview', 'tab.orders':'Orders', 'tab.rides':'Rides', 'tab.menu':'Menu', 'tab.price':'Price', 'tab.location':'Location',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
   'login.bad':'Incorrect username or password.', 'login.failed':'Sign-in failed.',
@@ -5859,7 +5861,7 @@ window.I18N = { en: {
   'bh.note':'Closed = members instantly cannot order or reserve; the menu stays visible. Everything is logged.',
   'bh.more':'Manage further', 'bh.tips':'Edit the menu under Menu. Tables under Tables. Rooms and prices under Rooms. Staff and PINs under Team.',
   'bh.saved':'Saved, members see it immediately.',
-  'sp.roleq':'Who are you?', 'sp.roledeck':'Choose your role. Staff sign in with their own PIN; everything you do is on your name.',
+  'sp.roleq':'Who are you?', 'sp.roledeck':'Choose your role; you sign in with your own PIN.',
   'sp.r.staff':'Staff', 'sp.r.staff.s':'Service, kitchen, reception, drivers...',
   'sp.r.mgmt':'Management', 'sp.r.mgmt.s':'Managers and chefs, with admin rights',
   'sp.r.admin':'Administration', 'sp.r.admin.s':'The business account, full access',
@@ -5912,18 +5914,18 @@ window.I18N = { en: {
   'kt.name.opt':'Name (optional)', 'kt.lid':'RTG member',
   'kt.reset':'Reset code', 'kt.ontslag':'Dismiss', 'kt.resetdone':'Code reset for', 'kt.newpin':'new PIN',
   'kt.openinv':'Open register codes', 'kt.geldigtot':'valid until', 'kt.intrek':'Revoke',
-  'kt.geeninv':'No open invitations. Each code is one-time and disappears here once used or revoked.',
+  'kt.geeninv':'No open invitations.',
   'kt.ingetrokken':'Invitation revoked.', 'kt.hired.geef':'signs up themselves with company name',
   'team.invintro':'Invitation for', 'team.invite':'Invite', 'team.invited':'Invitation created. Register code: ',
-  'team.invnote':'Pass this on. They sign up themselves in the app with their own RTG account; the code is one-time.',
+  'team.invnote':'One-time code; sign up with your own RTG account.',
   'ap.hired2':'Hired. Register code: ',
-  'kt.invite.intro':'Staff have their own RTG account (the free account is enough). Invite someone; they then sign up themselves in the app with the company name and the register code.',
+  'kt.invite.intro':'Invite; the employee signs up with company name + register code and their own RTG account.',
   'kt.invite':'Invite, register code appears', 'kt.invite.toast':'Register code created.',
   'kt.invite.done':'Invitation ready. Give these two things to your employee:',
   'kt.invite.biz':'Company name', 'kt.invite.code':'Register code',
-  'kt.invite.note':'They sign up with their own RTG account. The code is one-time and valid for 30 days.',
+  'kt.invite.note':'One-time, valid for 30 days.',
   'enr.toggle':'🎟️ Invited by your employer? Sign up', 'enr.submit':'Sign up with my employer',
-  'enr.hint':'You work here with your own RTG account; a free account is enough, no paid pass needed. Your employer gives you a register code; enter it with the company name and confirm with your own RTG login.',
+  'enr.hint':'Company name + register code from your employer, confirmed with your own RTG account (free is enough).',
   'enr.biz':'Company name', 'enr.code':'Register code', 'enr.login':'Your RTG email or username',
   'enr.pass':'Your RTG password', 'enr.pin':'Choose a PIN (4 digits)',
   'enr.busy':'Signing up...', 'enr.ok':'Done! You are signed up. Logging you in...', 'enr.fail':'Sign-up failed. Check the details.',

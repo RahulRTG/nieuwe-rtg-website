@@ -24,6 +24,8 @@
     --burgundy-deep:#7F1634;
     --gold:#A98F1C;
     --green:#4C9A75;
+    --knop:#fff;
+    --knop-txt:#000;
   }
 
   /* Per-pas thema, gekozen op het beginscherm-icoon van de website.
@@ -141,7 +143,7 @@
   .login-form{margin-top:2.25rem;display:flex;flex-direction:column;gap:0.65rem;}
   .login-form input{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.95rem 1.1rem;color:var(--txt);font-size:0.95rem;font-family:inherit;outline:none;}
   .login-form input:focus{border-color:var(--burgundy);}
-  .login-form button{background:#fff;color:#000;border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
+  .login-form button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
   .login-form button:active{opacity:0.85;}
   .gate-or{margin:1.9rem 0 0.35rem;font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);text-align:center;}
   .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--gold);font-size:0.76rem;cursor:pointer;font-family:inherit;text-align:center;}
@@ -375,8 +377,8 @@
     display:inline-flex;
     align-items:center;
     gap:0.5rem;
-    background:#fff;
-    color:#000;
+    background:var(--knop);
+    color:var(--knop-txt);
     border:none;
     border-radius:999px;
     padding:0.65rem 1.2rem;
@@ -444,7 +446,7 @@
     outline:none;
   }
   .askrow button{
-    background:#fff;color:#000;border:none;border-radius:999px;
+    background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;
     padding:0 1.2rem;font-size:0.75rem;font-weight:600;
   }
 
@@ -511,7 +513,7 @@
     flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;
     padding:0.55rem 0.95rem;font-size:0.78rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;
   }
-  .cform button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 0.95rem;font-size:0.68rem;font-weight:600;}
+  .cform button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 0.95rem;font-size:0.68rem;font-weight:600;}
 
   /* tabbalk */
   .tabbar{
@@ -559,7 +561,7 @@
   .sup-card .t{flex:1;min-width:0;}
   .sup-card .t b{display:block;font-size:0.92rem;font-weight:600;}
   .sup-card .t span{font-size:0.72rem;color:var(--soft);}
-  .sup-card .go{background:#fff;color:#000;border:none;border-radius:999px;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
+  .sup-card .go{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
   .sup-card .go.ghost{background:none;color:var(--muted);border:1px solid var(--line);}
   .sec-label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 0.2rem;}
   .myorder{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.05rem;margin-top:0.7rem;}
@@ -572,7 +574,7 @@
   .mo-pill.bereiding{color:#C99A2E;border-color:rgba(201,154,46,0.4);}
   .mo-pill.klaar,.mo-pill.geserveerd{color:var(--green);border-color:rgba(76,154,117,0.4);}
   .myorder .acts{margin-top:0.7rem;display:flex;gap:0.5rem;align-items:center;}
-  .mo-pay{background:#fff;color:#000;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
+  .mo-pay{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
   .mo-pay svg{width:12px;height:12px;}
   .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
 
@@ -585,7 +587,7 @@
   .live-mode{display:flex;gap:0.4rem;margin-top:0.6rem;}
   .live-mode button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem;font-size:0.72rem;font-family:inherit;}
   .live-mode button.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
-  .live-go{margin-top:0.8rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.85rem;font-size:0.84rem;font-weight:600;font-family:inherit;}
+  .live-go{margin-top:0.8rem;width:100%;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.85rem;font-size:0.84rem;font-weight:600;font-family:inherit;}
 
   .live-panel{background:linear-gradient(150deg,#1c1414,#151312);border:1px solid rgba(194,58,94,0.35);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;overflow:hidden;}
   .live-top{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;}
@@ -613,7 +615,7 @@
   .live-partner .eta.arr .n{color:var(--green);font-size:0.9rem;}
   .live-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
   .live-acts button{flex:1;min-width:120px;border-radius:999px;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
-  .live-acts .prim{background:#fff;color:#000;border-color:#fff;}
+  .live-acts .prim{background:var(--knop);color:var(--knop-txt);border-color:#fff;}
   .live-acts .sec{background:var(--card2,#1B1817);color:var(--txt);}
   .live-acts .glowbtn{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border-color:#D9B96A;animation:doorglow 1.8s ease-in-out infinite;}
   @keyframes doorglow{0%,100%{box-shadow:0 0 0 0 rgba(217,185,106,0.4);}50%{box-shadow:0 0 18px 2px rgba(217,185,106,0.55);}}
@@ -635,7 +637,7 @@
   .pc-empty{padding:1.6rem 0.5rem;text-align:center;color:var(--soft);font-size:0.82rem;line-height:1.6;}
   .pc-foot{display:flex;gap:0.5rem;padding:0.8rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);border-top:1px solid var(--line);}
   .pc-foot input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;}
-  .pc-foot button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 1.2rem;font-size:0.84rem;font-weight:600;}
+  .pc-foot button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.2rem;font-size:0.84rem;font-weight:600;}
   .sup-card .chatb{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;width:36px;height:36px;font-size:0.95rem;flex-shrink:0;margin-right:0.4rem;}
 
   /* ---- oplichtend ophaalcode-scherm ---- */
@@ -758,14 +760,14 @@
   .ms-note{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;}
   .ms-tag{display:flex;align-items:center;gap:0.5rem;margin-top:0.7rem;font-size:0.8rem;color:var(--muted);}
   .ms-tag input{width:18px;height:18px;accent-color:var(--burgundy);}
-  .ms-order{margin-top:0.8rem;width:100%;background:#fff;color:#000;border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
+  .ms-order{margin-top:0.8rem;width:100%;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
   .ms-order:disabled{opacity:0.4;}
 
   #toast{
     position:absolute;
     bottom:calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
     left:50%;transform:translate(-50%, 16px);
-    background:#fff;color:#000;
+    background:var(--knop);color:var(--knop-txt);
     font-size:0.78rem;font-weight:500;
     padding:0.75rem 1.25rem;border-radius:999px;
     opacity:0;pointer-events:none;transition:all 0.3s ease;
@@ -1207,6 +1209,7 @@
 <script src="/apps/geo.js"></script>
 <script src="/apps/translate.js"></script>
 <script src="/apps/foundation/gezin-rt.js"></script>
+<script src="/shared/thema.js"></script>
 <script src="/apps/util.js"></script>
 <script src="/shared/appshell.js"></script>
 <script>
@@ -4576,7 +4579,7 @@
       '<div style="display:flex;gap:0.5rem;margin-top:0.7rem;flex-wrap:wrap;">' +
       '<select id="gcSup" style="flex:2;min-width:120px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;">' + opties + '</select>' +
       '<input id="gcAmt" type="number" placeholder="€ 50" style="flex:1;min-width:70px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;">' +
-      '<button id="gcBuy" style="background:#fff;color:#000;border:none;border-radius:999px;padding:0.6rem 1rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('gc.koop','Koop') + '</button></div></div>';
+      '<button id="gcBuy" style="background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.6rem 1rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('gc.koop','Koop') + '</button></div></div>';
     const kb = $('#gcBuy');
     if (kb) kb.addEventListener('click', () => {
       const bedrag = Math.round(Number($('#gcAmt').value));
@@ -4603,7 +4606,7 @@
       '<select id="bhLand" style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.55rem;color:var(--txt);font-family:inherit;">' +
       landen.map(l => '<option value="' + l[0] + '"' + (l[0] === land ? ' selected' : '') + '>' + l[1] + '</option>').join('') + '</select>' +
       '<input id="bhQ" placeholder="' + T('bh2.ph','Bijv. kan ik dit diner terugvorderen?') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.8rem;">' +
-      '<button id="bhGo" style="background:#fff;color:#000;border:none;border-radius:999px;padding:0.55rem 0.95rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('bh2.vraag','Vraag') + '</button></div>' +
+      '<button id="bhGo" style="background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.55rem 0.95rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('bh2.vraag','Vraag') + '</button></div>' +
       '<div id="bhA" style="display:none;margin-top:0.7rem;border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.78rem;line-height:1.6;color:var(--muted);"></div>' +
       // zzp-belastingtool: jaarwinst in, indicatie van aftrek, belasting en netto uit
       '<div style="margin-top:0.9rem;border-top:1px solid var(--line);padding-top:0.9rem;">' +
@@ -4611,7 +4614,7 @@
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('zzp.s','Voor zelfstandigen: vul uw verwachte jaarwinst in voor een indicatie van uw belasting, nettowinst en wat u maandelijks opzij zet. Het land volgt de keuze hierboven.') + '</div>' +
       '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">' +
       '<input id="zzpWinst" type="number" placeholder="' + T('zzp.winstph','Jaarwinst, bijv. 60000') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.8rem;">' +
-      '<button id="zzpGo" style="background:#fff;color:#000;border:none;border-radius:999px;padding:0.55rem 0.95rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('zzp.reken','Reken') + '</button></div>' +
+      '<button id="zzpGo" style="background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.55rem 0.95rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('zzp.reken','Reken') + '</button></div>' +
       '<div style="display:flex;gap:1rem;margin-top:0.5rem;font-size:0.72rem;color:var(--muted);flex-wrap:wrap;">' +
       '<label style="display:flex;align-items:center;gap:0.35rem;"><input type="checkbox" id="zzpUren" checked> ' + T('zzp.uren','Urencriterium (1.225 uur)') + '</label>' +
       '<label style="display:flex;align-items:center;gap:0.35rem;"><input type="checkbox" id="zzpStart"> ' + T('zzp.start','Startersaftrek') + '</label></div>' +
@@ -5258,7 +5261,7 @@
           '<div style="font-weight:600;font-size:0.9rem;margin-top:0.25rem;">' + p.deal.titel + '</div>' +
           (p.deal.mijnCode
             ? '<div style="margin-top:0.45rem;font-size:0.8rem;color:var(--gold);letter-spacing:0.08em;">' + T('sal.uwcode','Uw code') + ': <b>' + p.deal.mijnCode + '</b> <span style="color:var(--soft);font-size:0.68rem;">· ' + T('sal.toon','toon aan de kassa') + '</span></div>'
-            : '<button class="js-claim" style="margin-top:0.5rem;background:#fff;color:#000;border:none;border-radius:999px;padding:0.45rem 0.95rem;font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('sal.claim','Claim deze aanbieding') + '</button>') +
+            : '<button class="js-claim" style="margin-top:0.5rem;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.45rem 0.95rem;font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('sal.claim','Claim deze aanbieding') + '</button>') +
           '<div style="margin-top:0.35rem;font-size:0.62rem;color:var(--soft);">' + p.deal.claims + ' ' + T('sal.geclaimd','keer geclaimd') + '</div></div>'
         : '';
       const poll = p.poll

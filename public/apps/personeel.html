@@ -14,6 +14,7 @@
     --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
     --txt:#F4F1EC; --muted:rgba(244,241,236,0.70); --soft:rgba(244,241,236,0.62);
     --burgundy:#C23A5E; --burgundy-deep:#7F1634; --gold:#A98F1C; --green:#4C9A75; --amber:#C99A2E;
+    --knop:#fff; --knop-txt:#000;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:#000;font-family:'Inter',sans-serif;color:var(--txt);display:flex;justify-content:center;-webkit-font-smoothing:antialiased;}
@@ -42,7 +43,7 @@
   .pinrow{margin-top:1.4rem;display:flex;gap:0.6rem;}
   .pinrow input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:0.9rem 1rem;color:var(--txt);font-size:1.1rem;letter-spacing:0.4em;text-align:center;outline:none;}
   .pinrow input:focus{border-color:var(--burgundy);}
-  .pinrow button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 1.4rem;font-size:0.86rem;font-weight:600;}
+  .pinrow button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.4rem;font-size:0.86rem;font-weight:600;}
 
   /* app */
   #app{display:none;flex:1;flex-direction:column;min-height:0;}
@@ -66,7 +67,7 @@
   .task .t{flex:1;min-width:0;}
   .task .t b{display:block;font-size:0.86rem;font-weight:600;}
   .task .t span{font-size:0.7rem;color:var(--soft);}
-  .abtn{background:#fff;color:#000;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;white-space:nowrap;}
+  .abtn{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;white-space:nowrap;}
   .abtn.ghost{background:none;border:1px solid var(--line);color:var(--txt);}
   .pill{display:inline-block;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
   .pill.g{color:var(--green);border-color:rgba(76,154,117,0.4);}
@@ -88,7 +89,7 @@
   .msg.me .who{color:rgba(255,255,255,0.65);}
   .compose{display:flex;gap:0.5rem;margin-top:0.9rem;}
   .compose input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.88rem;color:var(--txt);outline:none;}
-  .compose button{background:#fff;color:#000;border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
+  .compose button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
   .act{display:flex;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;}
   .act:last-child{border-bottom:none;}
   .act b{color:var(--gold);font-weight:600;white-space:nowrap;}
@@ -125,7 +126,7 @@
   #buzzOverlay span{display:block;font-size:0.95rem;opacity:0.85;margin-top:0.2rem;}
   #buzzOverlay i{display:block;margin-top:2rem;font-style:normal;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;opacity:0.6;}
   .vlin{background:rgba(255,255,255,0.06);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.85rem;color-scheme:dark;outline:none;}
-  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:#fff;color:#000;font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
+  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:var(--knop);color:var(--knop-txt);font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
 </style>
 </head>
@@ -235,6 +236,7 @@
   <div id="toast"></div>
 </div>
 
+<script src="/shared/thema.js"></script>
 <script src="/apps/util.js"></script>
 <script src="/shared/appshell.js"></script>
 <script>
@@ -324,7 +326,7 @@
       '</div><div class="glist">' + (roster.staff||[]).map(m =>
       '<button class="gbtn" data-wie="'+m.id+'" data-nm="'+esc(m.name)+'"><span class="ic">'+(m.role==='manager'?'⭐':'👤')+'</span><span><b>'+m.name+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+'</span></span></button>'
     ).join('') + '</div>'+
-      '<div style="margin-top:0.8rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.nieuw','Nieuw in het team? U kunt hier pas inloggen nadat uw werkgever u heeft uitgenodigd en u zich met de bedrijfsnaam + kassacode hebt aangemeld in de leverancier-app. Daarna staat uw naam hierboven.')+'</div>';
+      '<div style="margin-top:0.8rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.nieuw','Nieuw? Vraag uw werkgever om een kassacode en meld u eenmalig aan in de leverancier-app.')+'</div>';
     $('#gbSwitch').addEventListener('click', () => {
       try { localStorage.removeItem('rtg_pda_bedrijf'); } catch(e){}
       stepSector();
@@ -1446,7 +1448,7 @@ window.I18N = { en: {
   'pd.deck':'Schedule, tasks, team chat and the work of your business. Pick your sector, your company and sign in with your PIN.',
   'pd.back':'Back', 'pd.choose':'Choose your company', 'pd.staff':'Staff member', 'pd.login':'Sign in',
   'pd.vast':'This PDA is set to this company', 'pd.switch':'Other company',
-  'pd.nieuw':'New to the team? You can only sign in here after your employer has invited you and you have signed up in the supplier app with the company name + register code. Your name will then appear above.',
+  'pd.nieuw':'New? Ask your employer for a register code and sign up once in the supplier app.',
   'pd.pinhint':'Demo: manager 1234, staff 5678.', 'pd.badpin':'Wrong PIN.', 'pd.needserver':'Start the server to sign in.',
   'pd.switch':'Switch', 'pd.v.today':'Today.', 'pd.v.rooster':'Schedule', 'pd.v.rooster.sub':'The next seven days, your shifts highlighted.',
   'pd.v.taken':'Tasks', 'pd.v.taken.sub':'Jobs, rooms and everything needing attention today.',

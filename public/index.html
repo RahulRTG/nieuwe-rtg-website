@@ -7,6 +7,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>Rahul Travel Group, Toegang tot wat gesloten is</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   :root{
     /* Zelfde donkere look als de apps (app-hub tokens) */
@@ -58,7 +59,7 @@
     overflow:hidden;
   }
 
-  .on-black{background:#080807;color:var(--black);}
+  .on-black{background:#080807;color:#F4F1EC;}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -100,7 +101,7 @@
     top:0;left:0;right:0;
     z-index:100;
     padding:1.1rem 0;
-    background:rgba(12,12,11,0.86);
+    background:var(--kap,rgba(12,12,11,0.86));
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
@@ -205,9 +206,9 @@
     border-radius:999px;
   }
   .btn:hover{
-    background:#fff;
-    border-color:var(--white);
-    color:#fff;
+    background:var(--knop-hover,#fff);
+    border-color:var(--knop-hover,#fff);
+    color:var(--white);
   }
   .btn-ghost{
     background:transparent;
@@ -215,9 +216,9 @@
     border-color:rgba(255,255,255,0.25);
   }
   .btn-ghost:hover{
-    background:#F4F1EC;
-    color:#0C0C0B;
-    border-color:#F4F1EC;
+    background:var(--black);
+    color:var(--white);
+    border-color:var(--black);
   }
   .btn-login{
     background:#7F1634;
@@ -324,7 +325,7 @@
     margin-top:4rem;
     }
   .pass-card{
-    background:var(--panel);
+    background:#141312;
     padding:3rem 2.25rem;
     display:flex;
     flex-direction:column;
@@ -332,8 +333,9 @@
     transition:background 0.3s ease;
     border:1px solid var(--line);
     border-radius:18px;
+    border-color:rgba(255,255,255,0.10);
   }
-  .pass-card:hover{background:#141312;border-color:var(--gold);}
+  .pass-card:hover{background:#141312;border-color:#C9A94E;}
   .pass-tag{
     font-size:0.75rem;
     letter-spacing:0.14em;
@@ -360,14 +362,14 @@
     display:block;
     margin-top:1rem;
     font-size:0.8rem;
-    color:var(--gold-bright, #C9A94E);
+    color:#C9A94E;
     letter-spacing:0.04em;
   }
   .pass-card .go{
     margin-top:1.75rem;
     font-size:0.85rem;
     letter-spacing:0.04em;
-    color:var(--black);
+    color:#F4F1EC;
     display:inline-flex;
     align-items:center;
     gap:0.5rem;
@@ -401,12 +403,13 @@
     margin-top:3rem;
   }
   .salon-card{
-    background:var(--panel);
+    background:#141312;
     border:1px solid var(--line);
     display:flex;
     flex-direction:column;
     border-radius:18px;
     overflow:hidden;
+    border-color:rgba(255,255,255,0.10);
   }
   .salon-visual{
     aspect-ratio:4/3;
@@ -425,13 +428,13 @@
   .v-gstaad{background:linear-gradient(160deg,#1A2230 0%,#3E5A7A 55%,#C9D6E4 100%);}
   .v-monaco{background:linear-gradient(160deg,#0A1024 0%,#1B2A6B 55%,#C9A24B 100%);}
   .salon-card .body{padding:1.25rem 1.4rem 1.5rem;flex:1;display:flex;flex-direction:column;}
-  .salon-card .body p{font-size:0.9rem;color:var(--grey);flex:1;}
+  .salon-card .body p{font-size:0.9rem;color:rgba(244,241,236,0.72);flex:1;}
   .salon-card .by{
     margin-top:1rem;
     font-size:0.7rem;
     letter-spacing:0.12em;
     text-transform:uppercase;
-    color:var(--grey-soft);
+    color:rgba(244,241,236,0.50);
   }
   .salon-note{
     margin-top:2rem;
@@ -627,7 +630,7 @@
   </div>
 </section>
 
-<section class="salon-strip" id="salon">
+<section class="salon-strip on-black" id="salon">
   <div class="wrap">
     <div class="folio" data-i18n="salon.folio">N° 03, Uit De Salon</div>
     <span class="kicker" data-i18n="salon.kicker">Door leden gedeeld</span>
@@ -688,7 +691,7 @@
 
 <footer>
   <div class="wrap">
-    <span>© 2026 RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89</span>
+    <span>© 2026 RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · <span data-palet-label></span></span>
     <span><a href="/site/download.html" data-i18n="footer.download">Download de app</a> · <a href="/site/boeken.html" data-i18n="footer.book">Boeken via een partner</a> · <a href="/site/partner-worden.html" data-i18n="footer.partner">Partner worden</a> · <a href="/site/privacy.html" data-i18n="footer.privacy">Privacy</a> · <a href="/site/voorwaarden.html" data-i18n="footer.terms">Voorwaarden</a></span>
   </div>
 </footer>
@@ -734,5 +737,6 @@ window.I18N = { en: {
 <script src="/shared/verbinding.js"></script>
 
 <script src="/shared/cookie.js"></script>
+<script src="/shared/seizoen.js" defer></script>
 </body>
 </html>

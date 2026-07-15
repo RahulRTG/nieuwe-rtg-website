@@ -6,6 +6,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>RTG Pass, Rahul Travel Group</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   :root{
     --white:#0C0C0B; --panel:#151312; --panel2:#1B1817;
@@ -52,7 +53,7 @@
     overflow:hidden;
   }
 
-  .on-black{background:#080807;color:var(--black);}
+  .on-black{background:#080807;color:#F4F1EC;}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -93,7 +94,7 @@
     top:0;left:0;right:0;
     z-index:100;
     padding:1.1rem 0;
-    background:rgba(12,12,11,0.86);
+    background:var(--kap,rgba(12,12,11,0.86));
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
@@ -179,8 +180,8 @@
     border-radius:999px;
   }
   .btn:hover{
-    background:#fff;
-    border-color:var(--white);
+    background:var(--knop-hover,#fff);
+    border-color:var(--knop-hover,#fff);
   }
   .btn-ghost{
     background:transparent;
@@ -193,45 +194,46 @@
     border-color:var(--black);
   }
   .on-black .btn-ghost{
-    color:var(--black);
-    border-color:rgba(255,255,255,0.35);
+    color:#F4F1EC;
+    border-color:rgba(255,255,255,0.3);
   }
   .on-black .btn-ghost:hover{
-    background:var(--black);
-    color:var(--white);
+    background:#F4F1EC;
+    color:#0C0C0B;
+    border-color:#F4F1EC;
   }
   .on-black .btn{
-    background:var(--black);
-    color:var(--white);
-    border-color:var(--black);
+    background:#F4F1EC;
+    color:#0C0C0B;
+    border-color:#F4F1EC;
   }
   .on-black .btn:hover{
     background:#fff;
-    color:var(--white);
+    color:#0C0C0B;
     border-color:#fff;
   }
 
   /* ---------- burgundy-dominant sections (RTG Pass signature) ---------- */
 
-  .on-burgundy{background:#7F1634;color:var(--black);}
-  .on-burgundy .folio{color:var(--black);}
+  .on-burgundy{background:#7F1634;color:#F4F1EC;}
+  .on-burgundy .folio{color:rgba(255,255,255,0.55);}
   .on-burgundy .folio::after{background:rgba(255,255,255,0.25);}
   .on-burgundy .kicker{color:#D0AC57;}
-  .on-burgundy .hero p.deck{color:var(--black);}
-  .on-burgundy .step .n{color:var(--black);}
-  .on-burgundy .step p{color:var(--black);}
+  .on-burgundy .hero p.deck{color:rgba(255,255,255,0.85);}
+  .on-burgundy .step .n{color:#F4F1EC;}
+  .on-burgundy .step p{color:rgba(255,255,255,0.8);}
   .on-burgundy .btn-ghost{
-    color:var(--black);
+    color:#F4F1EC;
     border-color:rgba(255,255,255,0.4);
   }
   .on-burgundy .btn-ghost:hover{
-    background:var(--black);
-    color:var(--white);
+    background:#F4F1EC;
+    color:#7F1634;
   }
   .on-burgundy .btn:hover{
-    background:var(--black);
-    color:var(--white);
-    border-color:var(--black);
+    background:#fff;
+    color:#7F1634;
+    border-color:#fff;
   }
   .on-burgundy .feat-card{color:var(--black);}
 
@@ -286,7 +288,7 @@
   }
   .butler-head p{
     margin-top:1.25rem;
-    color:var(--black);
+    color:rgba(255,255,255,0.7);
   }
 
   .butler{
@@ -296,6 +298,7 @@
     border:1px solid var(--line);
     border-radius:18px;
     overflow:hidden;
+    border-color:rgba(255,255,255,0.12);
   }
   .butler-bar{
     padding:1rem 1.5rem;
@@ -306,7 +309,7 @@
     font-size:0.8rem;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    color:var(--black);
+    color:#F4F1EC;
   }
   .butler-bar .dot{
     width:7px;height:7px;
@@ -332,7 +335,7 @@
   }
   .bubble.butler{
     background:#201f1c;
-    color:var(--black);
+    color:#F4F1EC;
     align-self:flex-start;
     border-left:2px solid var(--burgundy-on-dark);
   }
@@ -353,12 +356,13 @@
     text-align:left;
     background:transparent;
     border:1px solid var(--white);
-    color:var(--black);
+    color:#F4F1EC;
     font-family:'Inter',sans-serif;
     font-size:0.88rem;
     padding:0.75rem 1rem;
     cursor:pointer;
     transition:all 0.2s ease;
+    border-color:rgba(255,255,255,0.25);
   }
   .butler-options button:hover{
     border-color:var(--burgundy-on-dark);
@@ -378,7 +382,7 @@
   .butler-restart button{
     background:none;
     border:none;
-    color:var(--black);
+    color:rgba(255,255,255,0.6);
     font-size:0.8rem;
     letter-spacing:0.04em;
     text-decoration:underline;
@@ -423,7 +427,7 @@
   }
   .cta .deck{
     margin-top:1.5rem;
-    color:var(--black);
+    color:rgba(244,241,236,0.65);
     max-width:44ch;
     margin-left:auto;
     margin-right:auto;
@@ -503,7 +507,7 @@
   </div>
 </section>
 
-<section class="butler on-black" id="butler">
+<section class="on-black" id="butler">
   <div class="wrap">
     <div class="folio">N° 02, De Butler</div>
     <div class="butler-head">
@@ -662,5 +666,6 @@ window.I18N = { en: {
 } };
 </script>
 <script src="/shared/i18n.js"></script>
+<script src="/shared/seizoen.js" defer></script>
 </body>
 </html>

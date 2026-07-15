@@ -7,6 +7,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>Boeken via een partner, Rahul Travel Group</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   :root{
     --white:#0C0C0B; --panel:#151312; --panel2:#1B1817;
@@ -41,7 +42,7 @@
   .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.5rem, 4vw, 3rem);}
 
   section{position:relative;padding:clamp(4rem, 6.5vw, 6rem) 0;}
-  .on-black{background:#080807;color:var(--black);}
+  .on-black{background:#080807;color:#F4F1EC;}
 
   .folio{
     font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;
@@ -63,17 +64,17 @@
     border:1px solid var(--black);transition:all 0.25s ease;
     border-radius:999px;
   }
-  .btn:hover{background:#fff;border-color:var(--white);}
+  .btn:hover{background:var(--knop-hover,#fff);border-color:var(--knop-hover,#fff);}
   .btn-ghost{background:transparent;color:var(--black);border-color:rgba(255,255,255,0.25);}
-  .btn-ghost:hover{background:var(--black);color:var(--white);}
-  .on-black .btn{background:var(--black);color:var(--white);border-color:var(--black);}
-  .on-black .btn:hover{background:#fff;color:var(--white);border-color:#fff;}
+  .btn-ghost:hover{background:var(--black);color:var(--white);border-color:var(--black);}
+  .on-black .btn{background:#F4F1EC;color:#0C0C0B;border-color:#F4F1EC;}
+  .on-black .btn:hover{background:#fff;color:#0C0C0B;border-color:#fff;}
 
   /* ---------- nav ---------- */
 
   header{
     position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 0;
-    background:rgba(12,12,11,0.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+    background:var(--kap,rgba(12,12,11,0.86));backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
   }
   header .wrap{display:flex;align-items:center;justify-content:space-between;}
   .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
@@ -194,12 +195,12 @@
     display:grid;grid-template-columns:repeat(3,1fr);gap:0.9rem;
     margin-top:3rem;
   }
-  .split-cards .c{background:var(--panel);padding:2.25rem 2rem;border:1px solid var(--line);border-radius:18px;}
+  .split-cards .c{background:#141312;padding:2.25rem 2rem;border:1px solid var(--line);border-radius:18px;border-color:rgba(255,255,255,0.10);}
   .split-cards b{
     display:block;font-family:'Bodoni Moda',serif;font-weight:500;
     font-size:2.2rem;color:var(--burgundy-on-dark);
   }
-  .split-cards .c:nth-child(2) b{color:var(--gold-bright);}
+  .split-cards .c:nth-child(2) b{color:#C9A94E;}
   .split-cards .c:nth-child(3) b{color:rgba(255,255,255,0.85);}
   .split-cards span{
     display:block;margin-top:0.5rem;font-size:0.72rem;letter-spacing:0.12em;
@@ -638,5 +639,6 @@ window.I18N = { en: {
 </script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/cookie.js"></script>
+<script src="/shared/seizoen.js" defer></script>
 </body>
 </html>

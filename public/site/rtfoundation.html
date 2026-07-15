@@ -6,6 +6,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>RTFoundation, Samen sparen voor wie niet kan reizen</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   :root{
     --white:#0C0C0B; --panel:#151312; --panel2:#1B1817;
@@ -53,7 +54,7 @@
     overflow:hidden;
   }
 
-  .on-black{background:#080807;color:var(--black);}
+  .on-black{background:#080807;color:#F4F1EC;}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -94,11 +95,11 @@
     transition:all 0.25s ease;
     border-radius:999px;
   }
-  .btn:hover{background:#fff;border-color:var(--white);}
+  .btn:hover{background:var(--knop-hover,#fff);border-color:var(--knop-hover,#fff);}
   .btn-ghost{background:transparent;color:var(--black);border-color:rgba(255,255,255,0.25);}
-  .btn-ghost:hover{background:var(--black);color:var(--white);}
-  .on-black .btn{background:var(--black);color:var(--white);border-color:var(--black);}
-  .on-black .btn:hover{background:#fff;color:var(--white);border-color:#fff;}
+  .btn-ghost:hover{background:var(--black);color:var(--white);border-color:var(--black);}
+  .on-black .btn{background:#F4F1EC;color:#0C0C0B;border-color:#F4F1EC;}
+  .on-black .btn:hover{background:#fff;color:#0C0C0B;border-color:#fff;}
 
   /* ---------- nav ---------- */
 
@@ -107,7 +108,7 @@
     top:0;left:0;right:0;
     z-index:100;
     padding:1.1rem 0;
-    background:rgba(12,12,11,0.86);
+    background:var(--kap,rgba(12,12,11,0.86));
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
@@ -234,10 +235,11 @@
     margin-top:3.5rem;
   }
   .compare .col{
-    background:var(--panel);
+    background:#141312;
     padding:2.5rem 2.25rem;
     border:1px solid var(--line);
     border-radius:18px;
+    border-color:rgba(255,255,255,0.10);
   }
   .compare .col.rtg{background:#160A0F;border-radius:18px;}
   .compare .label{
@@ -270,18 +272,19 @@
     gap:0.9rem;
     }
   .stat-row .stat{
-    background:var(--panel);
+    background:#141312;
     padding:1.75rem;
     text-align:center;
     border:1px solid var(--line);
     border-radius:18px;
+    border-color:rgba(255,255,255,0.10);
   }
   .stat-row b{
     display:block;
     font-family:'Bodoni Moda',serif;
     font-weight:500;
     font-size:1.9rem;
-    color:var(--gold-bright);
+    color:#C9A94E;
   }
   .stat-row span{
     font-size:0.72rem;
@@ -487,5 +490,6 @@ window.I18N = { en: {
 } };
 </script>
 <script src="/shared/i18n.js"></script>
+<script src="/shared/seizoen.js" defer></script>
 </body>
 </html>

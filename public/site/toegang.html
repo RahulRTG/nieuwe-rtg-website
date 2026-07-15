@@ -7,6 +7,7 @@
 <title>Toegang, Rahul Travel Group</title>
 <meta name="description" content="Log in of open de app: voor leden, partners (leveranciers) en personeel van partnerbedrijven.">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   :root{--white:#0C0C0B; --panel:#151312; --panel2:#1B1817;--black:#F4F1EC;--burgundy:#C23A5E;--burgundy-on-dark:#C23A5E;--gold:#A98F1C;--gold-bright:#C9A94E;--line:rgba(255,255,255,0.09);--grey:rgba(244,241,236,0.72);--grey-soft:rgba(244,241,236,0.50);--paper:#100F0E;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -18,7 +19,7 @@
   .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
   .kicker{font-size:0.8rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--burgundy);font-weight:600;margin-bottom:1rem;display:block;}
 
-  header{position:sticky;top:0;z-index:100;padding:1.1rem 0;background:rgba(12,12,11,0.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  header{position:sticky;top:0;z-index:100;padding:1.1rem 0;background:var(--kap,rgba(12,12,11,0.86));backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
   header .wrap{display:flex;align-items:center;justify-content:space-between;}
   .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
   .brandmark .bm-block{background:#7F1634;color:#F4F1EC;font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;letter-spacing:0.05em;padding:0.5rem 1.05rem;line-height:1;}
@@ -42,10 +43,10 @@
   .role p{margin-top:1rem;font-size:0.9rem;color:var(--grey);flex:1;}
   .role .actions{margin-top:1.5rem;display:flex;flex-direction:column;gap:0.6rem;}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:0.55rem;padding:0.85rem 1.4rem;background:var(--black);color:var(--white);font-size:0.82rem;letter-spacing:0.03em;font-weight:600;border:1px solid var(--black);border-radius:999px;transition:all 0.22s;}
-  .btn:hover{background:#7F1634;border-color:#F4F1EC;}
+  .btn:hover{background:var(--knop-hover,#fff);border-color:var(--knop-hover,#fff);}
   .btn svg{width:15px;height:15px;}
   .btn-ghost{background:transparent;color:var(--black);}
-  .btn-ghost:hover{background:var(--black);color:var(--white);}
+  .btn-ghost:hover{background:var(--black);color:var(--white);border-color:var(--black);}
   @media (max-width:860px){.role-grid{grid-template-columns:1fr;}.role{min-height:auto;}}
 
   .office{margin-top:2.5rem;border:1px dashed var(--line);border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;}
@@ -178,5 +179,6 @@ window.I18N = { en: {
 </script>
 <script src="/shared/i18n.js"></script>
 
+<script src="/shared/seizoen.js" defer></script>
 </body>
 </html>

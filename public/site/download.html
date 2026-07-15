@@ -10,6 +10,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icon.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   :root{
     --white:#0C0C0B; --panel:#151312; --panel2:#1B1817;
@@ -33,7 +34,7 @@
   button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
   .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.5rem, 4vw, 3rem);}
   section{position:relative;padding:clamp(4.5rem, 8vw, 7rem) 0;}
-  .on-black{background:#080807;color:var(--black);}
+  .on-black{background:#080807;color:#F4F1EC;}
 
   .kicker{font-size:0.8rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--burgundy);font-weight:600;margin-bottom:1.25rem;display:block;}
   .on-black .kicker{color:var(--burgundy-on-dark);}
@@ -43,17 +44,17 @@
   .on-black .folio::after{background:rgba(255,255,255,0.14);}
 
   .btn{display:inline-flex;align-items:center;gap:0.6rem;padding:0.85rem 1.7rem;background:var(--black);color:var(--white);font-size:0.85rem;letter-spacing:0.01em;font-weight:600;border:1px solid var(--black);transition:all 0.25s ease;border-radius:999px;}
-  .btn:hover{background:#fff;border-color:var(--white);}
+  .btn:hover{background:var(--knop-hover,#fff);border-color:var(--knop-hover,#fff);}
   .btn svg{width:17px;height:17px;}
   .btn-ghost{background:transparent;color:var(--black);}
-  .btn-ghost:hover{background:var(--black);color:var(--white);}
-  .on-black .btn{background:var(--black);color:var(--white);border-color:var(--black);}
-  .on-black .btn:hover{background:#fff;color:var(--white);border-color:#fff;}
-  .on-black .btn-ghost{background:transparent;color:var(--black);border-color:rgba(255,255,255,0.4);}
-  .on-black .btn-ghost:hover{background:var(--black);color:var(--white);}
+  .btn-ghost:hover{background:var(--black);color:var(--white);border-color:var(--black);}
+  .on-black .btn{background:#F4F1EC;color:#0C0C0B;border-color:#F4F1EC;}
+  .on-black .btn:hover{background:#fff;color:#0C0C0B;border-color:#fff;}
+  .on-black .btn-ghost{background:transparent;color:#F4F1EC;border-color:rgba(255,255,255,0.3);}
+  .on-black .btn-ghost:hover{background:#F4F1EC;color:#0C0C0B;border-color:#F4F1EC;}
 
   /* nav */
-  header{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 0;background:rgba(12,12,11,0.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  header{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 0;background:var(--kap,rgba(12,12,11,0.86));backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
   header .wrap{display:flex;align-items:center;justify-content:space-between;}
   .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
   .brandmark .bm-block{background:#7F1634;color:#F4F1EC;font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;letter-spacing:0.05em;padding:0.5rem 1.05rem;line-height:1;}
@@ -466,5 +467,6 @@ window.I18N = { en: {
 </script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/cookie.js"></script>
+<script src="/shared/seizoen.js" defer></script>
 </body>
 </html>

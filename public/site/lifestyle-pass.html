@@ -7,6 +7,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>Lifestyle Pass, Rahul Travel Group</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   :root{
     --white:#0C0C0B; --panel:#151312; --panel2:#1B1817;
@@ -53,7 +54,7 @@
     overflow:hidden;
   }
 
-  .on-black{background:#080807;color:var(--black);}
+  .on-black{background:#080807;color:#F4F1EC;}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -94,7 +95,7 @@
     top:0;left:0;right:0;
     z-index:100;
     padding:1.1rem 0;
-    background:rgba(12,12,11,0.86);
+    background:var(--kap,rgba(12,12,11,0.86));
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
@@ -180,8 +181,8 @@
     border-radius:999px;
   }
   .btn:hover{
-    background:#fff;
-    border-color:var(--white);
+    background:var(--knop-hover,#fff);
+    border-color:var(--knop-hover,#fff);
   }
   .btn-ghost{
     background:transparent;
@@ -194,21 +195,22 @@
     border-color:var(--black);
   }
   .on-black .btn-ghost{
-    color:var(--black);
-    border-color:rgba(255,255,255,0.35);
+    color:#F4F1EC;
+    border-color:rgba(255,255,255,0.3);
   }
   .on-black .btn-ghost:hover{
-    background:var(--black);
-    color:var(--white);
+    background:#F4F1EC;
+    color:#0C0C0B;
+    border-color:#F4F1EC;
   }
   .on-black .btn{
-    background:var(--black);
-    color:var(--white);
-    border-color:var(--black);
+    background:#F4F1EC;
+    color:#0C0C0B;
+    border-color:#F4F1EC;
   }
   .on-black .btn:hover{
     background:#fff;
-    color:var(--white);
+    color:#0C0C0B;
     border-color:#fff;
   }
 
@@ -275,7 +277,7 @@
   }
   .example-head p{
     margin-top:1.25rem;
-    color:rgba(255,255,255,0.6);
+    color:rgba(255,255,255,0.7);
   }
 
   .example{
@@ -295,7 +297,7 @@
     font-size:0.8rem;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    color:rgba(255,255,255,0.5);
+    color:#F4F1EC;
   }
   .example-bar .dot{
     width:7px;height:7px;
@@ -315,7 +317,7 @@
   }
   .bubble.concierge{
     background:#201f1c;
-    color:var(--black);
+    color:#F4F1EC;
     align-self:flex-start;
     border-left:2px solid var(--burgundy-on-dark);
   }
@@ -328,7 +330,7 @@
     text-align:center;
     margin-top:1.5rem;
     font-size:0.8rem;
-    color:rgba(255,255,255,0.4);
+    color:rgba(255,255,255,0.5);
     font-style:italic;
   }
 
@@ -370,7 +372,7 @@
   }
   .cta .deck{
     margin-top:1.5rem;
-    color:rgba(255,255,255,0.55);
+    color:rgba(244,241,236,0.65);
     max-width:44ch;
     margin-left:auto;
     margin-right:auto;
@@ -452,7 +454,7 @@
   </div>
 </section>
 
-<section class="butler on-black" id="voorbeeld">
+<section class="on-black" id="voorbeeld">
   <div class="wrap">
     <div class="folio">N° 02, Een voorbeeld</div>
     <div class="example-head">
@@ -526,5 +528,6 @@ window.I18N = { en: {
 </script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/cookie.js"></script>
+<script src="/shared/seizoen.js" defer></script>
 </body>
 </html>

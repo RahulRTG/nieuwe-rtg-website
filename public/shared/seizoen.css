@@ -1,0 +1,102 @@
+/* Het 4x4-palet van de website: vier seizoenen x vier zonstanden = zestien
+   paletten, in de geest van Porsche (precisie, techniek, diep zwart) en
+   Chanel (ivoor, zwart, een enkel juweel van een accent).
+
+   Het seizoen kiest de accentkleur en de metaaltint:
+     lente = camelia, zomer = azuur, herfst = cognac, winter = staal.
+   De zonstand kiest de grond: bij ochtend- en middaglicht draait de site
+   naar ivoor met zwarte inkt (couture bij daglicht), bij avond en nacht
+   naar diep zwart (de motorkap). Het wijnrood (#7F1634) van het logoblok
+   en de primaire knoppen is het vaste merkanker en draait nooit mee.
+
+   shared/seizoen.js zet data-seizoen en data-dagdeel op <html> aan de hand
+   van de kalender en de zonnestand; zonder JavaScript blijft de gewone
+   donkere huisstijl staan. Secties met .on-black blijven in elk palet
+   diep zwart: het contrastblok is juist het handschrift. */
+
+/* ---- seizoenen: accent, metaal en de grondtinten ---- */
+:root[data-seizoen="lente"]{
+  --s-accent:#96284B; --s-accent-hel:#D16584;
+  --s-metaal:#8A7434; --s-metaal-hel:#C9B37E;
+  --s-ochtend:#F4F2EA; --s-middag:#F9F7F0; --s-paneel-licht:#FEFDF9;
+  --s-avond:#12130E; --s-paneel-avond:#1B1C15;
+  --s-nacht:#0A0C09; --s-paneel-nacht:#12140F;
+  --s-band-licht:#ECE9DC; --s-band-donker:#0F100C;
+}
+:root[data-seizoen="zomer"]{
+  --s-accent:#23677C; --s-accent-hel:#5FA3B5;
+  --s-metaal:#8A6D2F; --s-metaal-hel:#D3AC57;
+  --s-ochtend:#F6F2E5; --s-middag:#FAF7EC; --s-paneel-licht:#FFFEF8;
+  --s-avond:#171310; --s-paneel-avond:#201A14;
+  --s-nacht:#090C11; --s-paneel-nacht:#10141B;
+  --s-band-licht:#EFE9D8; --s-band-donker:#120F0C;
+}
+:root[data-seizoen="herfst"]{
+  --s-accent:#9A5220; --s-accent-hel:#C98A50;
+  --s-metaal:#7E5A2E; --s-metaal-hel:#C08A4E;
+  --s-ochtend:#F5F0E6; --s-middag:#F8F4EB; --s-paneel-licht:#FEFBF5;
+  --s-avond:#161009; --s-paneel-avond:#1F1810;
+  --s-nacht:#0C0A08; --s-paneel-nacht:#14110D;
+  --s-band-licht:#EDE6D8; --s-band-donker:#110D08;
+}
+:root[data-seizoen="winter"]{
+  --s-accent:#46617A; --s-accent-hel:#8FA6BC;
+  --s-metaal:#6E7681; --s-metaal-hel:#B9BEC5;
+  --s-ochtend:#F2F3F4; --s-middag:#F7F8F9; --s-paneel-licht:#FDFDFE;
+  --s-avond:#0F1114; --s-paneel-avond:#171A1E;
+  --s-nacht:#07090C; --s-paneel-nacht:#0F1216;
+  --s-band-licht:#E9EBED; --s-band-donker:#0B0D10;
+}
+
+/* ---- zonstanden: de grond en de inkt ---- */
+/* daglicht: ivoor, zwarte inkt, zwarte pillen (couture) */
+:root[data-dagdeel="ochtend"], :root[data-dagdeel="middag"]{
+  --white:var(--s-ochtend,#F4F2EA);
+  --panel:var(--s-paneel-licht,#FEFDF9);
+  --panel2:#FFFFFF;
+  --black:#1A1512;
+  --line:rgba(26,21,18,0.14);
+  --grey:rgba(26,21,18,0.70);
+  --grey-soft:rgba(26,21,18,0.48);
+  --burgundy:var(--s-accent,#96284B);
+  --burgundy-bright:var(--s-accent,#96284B);
+  --gold:var(--s-metaal,#8A7434);
+  --gold-bright:var(--s-metaal,#8A7434);
+  --paper:var(--s-band-licht,#ECE9DC);
+  --kap:rgba(249,247,240,0.90);
+  --knop-hover:#000;
+}
+:root[data-dagdeel="middag"]{
+  --white:var(--s-middag,#F9F7F0);
+}
+/* avond en nacht: de vertrouwde donkere huisstijl, getint door het seizoen */
+:root[data-dagdeel="avond"], :root[data-dagdeel="nacht"]{
+  --white:var(--s-avond,#14110E);
+  --panel:var(--s-paneel-avond,#1C1712);
+  --panel2:#221C16;
+  --black:#F4F1EC;
+  --line:rgba(255,255,255,0.09);
+  --grey:rgba(244,241,236,0.72);
+  --grey-soft:rgba(244,241,236,0.50);
+  --burgundy:var(--s-accent-hel,#D16584);
+  --burgundy-bright:var(--s-accent-hel,#D16584);
+  --gold:var(--s-metaal-hel,#C9B37E);
+  --gold-bright:var(--s-metaal-hel,#C9B37E);
+  --paper:var(--s-band-donker,#100F0E);
+  --kap:rgba(12,12,11,0.86);
+  --knop-hover:#fff;
+}
+:root[data-dagdeel="nacht"]{
+  --white:var(--s-nacht,#0A0C09);
+  --panel:var(--s-paneel-nacht,#12140F);
+  --panel2:#171A14;
+}
+/* het heldere accent op de vaste zwarte contrastblokken */
+:root[data-dagdeel]{
+  --burgundy-on-dark:var(--s-accent-hel,#C23A5E);
+}
+
+/* de wisseling van het licht verloopt zacht, als een zonsondergang */
+:root[data-dagdeel] body{
+  transition:background-color 0.8s ease, color 0.8s ease;
+}

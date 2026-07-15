@@ -166,9 +166,13 @@ const STAFF_SEED = {
   ORODOR: [['Esteban Oro', 'manager', 'Meester-juwelier'], ['Lia Costa', 'staff', 'Salon & taxatie']],
   LIENZO: [['Valeria Pinto', 'manager', 'Galeriehouder'], ['Hugo Ram', 'staff', 'Exposities & entree']]
 };
-for (const [code, people] of Object.entries(STAFF_SEED)) {
-  if (accounts.countStaff(code) === 0) {
-    people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+// demopersoneel bestaat alleen in demostand; in productie komt personeel
+// uitsluitend via de eigen zaak binnen (uitnodiging + eigen pincode)
+if (DEMO) {
+  for (const [code, people] of Object.entries(STAFF_SEED)) {
+    if (accounts.countStaff(code) === 0) {
+      people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+    }
   }
 }
 
@@ -1279,6 +1283,22 @@ function initRealtime() {
     if (!s.salon) s.salon = { bio: '', foto: null, volgers: [], sinds: new Date().toISOString() };
     if (!s.salon.bio) s.salon.bio = SALON_BIO[s.type] || 'RTG-partner. Volg ons op De Salon voor aanbod en folders.';
     if (!s.salon.foto && !(s.photos && s.photos.length)) s.salon.foto = salonFotoVoor(s);
+  }
+
+  /* Livegang-schoonmaak: in productie (zonder RTG_DEMO) horen de demozaken
+     niet in de catalogus, ook niet als de database ooit als demo begon. De
+     lijst dekt alle geseede partners; echte partners (via de aanvraag met
+     Business Pass) blijven onaangeroerd. */
+  if (!DEMO) {
+    const DEMO_ZAKEN = ['KIKUNOI', 'PONTO', 'HOSHI', 'SAKURA', 'MKKX', 'JETAG', 'IBIZAIR',
+      'AYAKA', 'KAITO', 'ESVEDRA', 'MACE', 'ISLAREN', 'IBIZALIV', 'MAISON', 'MERCABIZA',
+      'AZUL', 'AEGIS', 'CANFERRER', 'LUMINA',
+      'VORA', 'BRISA', 'FUEGO', 'LUNARA', 'MOTOISLA', 'FESTA', 'SERENA', 'ORODOR', 'LIENZO'];
+    const voor = db.data.suppliers.length;
+    db.data.suppliers = db.data.suppliers.filter(s => !DEMO_ZAKEN.includes(s.code));
+    // en de bijbehorende voorbeeldposts uit De Salon (de zes geseede verhalen)
+    db.data.posts = (db.data.posts || []).filter(p => !(typeof p.id === 'number' && p.id >= 1 && p.id <= 6));
+    if (db.data.suppliers.length !== voor) save();
   }
 }
 

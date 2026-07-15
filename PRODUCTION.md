@@ -209,6 +209,10 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] `npm run check` en `npm test` groen in CI; image bouwt
 - [ ] Logs komen ergens terecht (Loki/CloudWatch/Datadog)
 - [ ] Uptime-/health-monitor prikt op `/api/ready`
+- [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; de keuring waarschuwt zolang hij ontbreekt)
+- [ ] Inlog-auditlog gecontroleerd na de eerste inlog (RTG HQ, kaart "Inlogactiviteit")
+- [ ] Rate-limiter bevestigd: in productie geeft de API boven 300 verzoeken/minuut/IP een 429 (test/livegang.test.js bewijst dit)
+- [ ] Schone start bevestigd: in productie zonder `RTG_DEMO` zijn er geen demozaken, geen demopersoneel en geen voorbeeldposts; ook een database die als demo begon wordt bij de start opgeschoond (test/livegang.test.js)
 
 ---
 

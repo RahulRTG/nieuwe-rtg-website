@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTFoundation · Buurtplaats</title>
+<title>RTFoundation · De Passage</title>
 <meta name="theme-color" content="#0C0C0B">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
@@ -80,7 +80,7 @@
 <body>
 <div id="balk"></div>
 <div class="wrap">
-  <h1>🏷️ Buurtplaats</h1>
+  <h1>🏷️ De Passage</h1>
   <div class="intro">Koop en verkoop tweedehands spullen, dichtbij en veilig. Ook zaken bieden hier aan.</div>
 
   <div class="veiligbalk">
@@ -146,7 +146,7 @@
       <input type="file" id="pFotos" accept="image/*" multiple style="font-size:.85rem;color:var(--zacht);">
       <div class="fotorij" id="pFotoVoor"></div>
       <label class="akkoord"><input type="checkbox" id="pAkkoord"><span>Ik plaats alleen wat is toegestaan, houd het netjes en respectvol, en ga akkoord met de <a href="veilig.html" style="color:var(--goud2);text-decoration:underline;">huisregels</a>.</span></label>
-      <button type="button" class="knop" id="pPlaatsBtn" style="width:100%;">Plaats op de buurtplaats</button>
+      <button type="button" class="knop" id="pPlaatsBtn" style="width:100%;">Plaats in De Passage</button>
     </div>
   </div>
 
@@ -351,7 +351,7 @@
     const m = $('#plaatsMelding');
     rapi('/plaats', body).then(r => {
       m.className = 'melding ok';
-      m.textContent = r.waarschuwing ? 'Geplaatst. Let op: ' + r.waarschuwing : 'Geplaatst! Je advertentie staat nu op de buurtplaats.';
+      m.textContent = r.waarschuwing ? 'Geplaatst. Let op: ' + r.waarschuwing : 'Geplaatst! Je advertentie staat nu in De Passage.';
       $('#pTitel').value = ''; $('#pOms').value = ''; $('#pPrijs').value = ''; $('#pPlaats').value = ''; $('#pAkkoord').checked = false; fotos = []; tekenFotos(); $('#pAiUit').textContent = '';
       setTimeout(() => { toon('mijn'); laadMijn(); }, 900);
     }).catch(e => { m.className = 'melding fout'; m.textContent = e.message; });

@@ -35,16 +35,19 @@
     coach: function (opts) {
       var s = lees(); if (!s) return;
       var gesprek = [];
+      var NM = { vrouw: 'Mila', man: 'Sem', nonbinair: 'Robin' };
+      function buddyKeuze() { try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { return 'vrouw'; } }
+      // de leeftijdsgroep stuurt taal en niveau van de AI; van het profiel, anders de app-ingang
+      function groepVan() { try { return (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || ''; } catch (e) { return ''; } }
       function esc2(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
       function verstuur() {
         var t = (opts.input.value || '').trim(); if (!t) return;
         opts.input.value = '';
         opts.chat.insertAdjacentHTML('beforeend', '<div class="b ik">' + esc2(t) + '</div>');
         gesprek.push({ role: 'user', content: t });
-        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = opts.wacht || 'Even denken...';
+        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = (NM[buddyKeuze()] || 'Je buddy') + ' denkt mee...';
         opts.chat.appendChild(w); opts.chat.scrollTop = opts.chat.scrollHeight;
-        var buddy; try { buddy = localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { buddy = 'vrouw'; }
-        api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek, buddy: buddy })
+        api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek, buddy: buddyKeuze(), groep: groepVan() })
           .then(function (d) { w.textContent = d.text; gesprek.push({ role: 'assistant', content: d.text }); opts.chat.scrollTop = opts.chat.scrollHeight; })
           .catch(function () { w.textContent = 'Sorry, dat lukte even niet. Probeer het zo nog eens.'; });
       }

@@ -297,9 +297,9 @@ router.post('/agenda/verwijder', (req, res) => {
 });
 
 /* ---------- AI-bijles "Bram" + tips ---------- */
-const SYSTEM = 'Je bent "Bram", een warme, geduldige bijleshulp voor kinderen en jongeren (10-16 jaar) in de gratis onderwijs-app van de RTFoundation. ' +
-  'Veel van hen hebben thuis geen bijles of hulp; jij bent er wel. Help met begrijpen, niet met spieken: leg stap voor stap uit, geef een hint en een klein voorbeeld, ' +
-  'en laat de leerling de laatste stap zelf zetten. Schrijf kort, bemoedigend en in eenvoudig Nederlands (max ~110 woorden). Nooit betuttelend, altijd hoopvol.';
+const SYSTEM = 'Je bent een warme, geduldige bijleshulp voor leerlingen van elke leeftijd in de gratis onderwijs-app van de RTFoundation. ' +
+  'Help met begrijpen, niet met spieken: leg stap voor stap uit, geef een hint en een klein voorbeeld, ' +
+  'en laat de leerling de laatste stap zelf zetten. Schrijf kort, bemoedigend en in helder Nederlands (max ~110 woorden). Nooit betuttelend, altijd hoopvol.';
 const DEMO = [
   'Goeie vraag! Zet eerst op een rij wat je al weet. Welke stap snap je nog niet? Dan pakken we die er samen uit. Knip het probleem in kleine stukjes, dat maakt het makkelijker.',
   'Denk eerst: wat wordt gevraagd, en wat heb je nodig? Schrijf de gegevens op. Probeer daarna een voorbeeld met kleine getallen; werkt je aanpak daar, dan werkt hij meestal ook groot.',
@@ -329,7 +329,8 @@ router.post('/ai', async (req, res) => {
   if (!clean.length) return res.json({ text: 'Stel je vraag maar, dan denk ik met je mee.' });
   if (!anthropic) return res.json({ text: DEMO[Math.floor(Math.random() * DEMO.length)], demo: true });
   try {
-    const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 400, system: SYSTEM, messages: clean });
+    const bb = kiesBuddy(req.body.buddy);
+    const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 400, system: 'Je heet ' + bb.naam + ' en bent ' + bb.wie + '. ' + SYSTEM + leeftijdInstr(req.body.groep), messages: clean });
     res.json({ text: (r.content || []).map(b => b.text || '').join('').trim() || DEMO[0] });
   } catch (e) { res.json({ text: DEMO[Math.floor(Math.random() * DEMO.length)], demo: true }); }
 });
@@ -758,6 +759,21 @@ function buddySys(kind, g) {
   const b = kiesBuddy(g);
   return HULP_SYS[kind].replace(/^Je bent "[^"]+"/, 'Je bent ' + b.naam + ' (' + b.wie + ')');
 }
+/* De leeftijdslaag: dezelfde tool voelt anders per leeftijdsgroep. Elke AI
+   krijgt te horen met wie die praat, zodat taal, voorbeelden en niveau
+   verschillen tussen een kind, een tiener, een jongvolwassene en een
+   volwassene. Zo zijn de tools echt verschillend per groep. */
+const LEEFTIJD = {
+  mini:   { wie: 'een peuter of kleuter (0 tot 4 jaar), samen met een ouder', hoe: 'Richt je uitleg op de ouder: speels, heel eenvoudig, met een spelletje of liedje.' },
+  kind:   { wie: 'een kind (5 tot 11 jaar)', hoe: 'Gebruik korte zinnen, simpele woorden en concrete voorbeelden uit hun wereld. Maak het speels en moedig aan.' },
+  tiener: { wie: 'een tiener (12 tot 15 jaar)', hoe: 'Praat respectvol en op ooghoogte, iets uitdagender, en koppel het aan hun eigen wereld (school, vrienden, games).' },
+  jong:   { wie: 'een jongvolwassene (16 tot 21 jaar)', hoe: 'Praat volwassen en direct, koppel aan studie, werk, geld en zelfstandig worden.' },
+  volw:   { wie: 'een volwassene', hoe: 'Praat gelijkwaardig en praktisch, gericht op het echte leven en concrete stappen.' }
+};
+function leeftijdInstr(g) {
+  const l = LEEFTIJD[g];
+  return l ? ' Je praat met ' + l.wie + '. ' + l.hoe + ' Pas taal, voorbeelden en niveau daarop aan.' : '';
+}
 router.post('/hulp/ai', async (req, res) => {
   const s = familieVan(req, res); if (!s) return;
   const kind = AI_KINDS.includes(req.body.kind) ? req.body.kind : 'geld';
@@ -768,7 +784,7 @@ router.post('/hulp/ai', async (req, res) => {
   if (!clean.length) return res.json({ text: HULP_DEMO[kind] });
   if (!anthropic) return res.json({ text: HULP_DEMO[kind], demo: true });
   try {
-    const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 420, system: buddySys(kind, req.body.buddy), messages: clean });
+    const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 420, system: buddySys(kind, req.body.buddy) + leeftijdInstr(req.body.groep), messages: clean });
     res.json({ text: (r.content || []).map(b => b.text || '').join('').trim() || HULP_DEMO[kind] });
   } catch (e) { res.json({ text: HULP_DEMO[kind], demo: true }); }
 });

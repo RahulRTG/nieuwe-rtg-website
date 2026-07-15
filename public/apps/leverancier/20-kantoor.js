@@ -1,6 +1,16 @@
   /* ---- het Kantoor: de eigenaar/manager past hier alles aan ---- */
   let kantoorSec = 'bo', kantoorMsg = '';
   let kantoorEdit = null;   // gerecht dat open staat in de kaart-bewerker
+  // de AI-bedrijfsagent: vaste leverancier, inkoopvoorstellen en het AI-weekrooster
+  let agentData = null, agentMarkt = null, agentBusy = false;
+  async function laadAgent(){
+    if (agentBusy) return;
+    agentBusy = true;
+    try { agentData = (await API.call('/supplier/agent', {})).agent; } catch(e){ agentData = { voorstellen: [], error: e.message }; }
+    try { if (!agentMarkt) agentMarkt = (await API.call('/supplier/inkoop/markt', {})).groothandels || []; } catch(e){ agentMarkt = agentMarkt || []; }
+    agentBusy = false;
+    renderStation();
+  }
   // eigen backoffice van de zaak: dagcijfers, weektrend, toppers en actiecentrum
   let boData = null, boBusy = false;
   async function laadBackoffice(){
@@ -233,6 +243,17 @@
       }
     }
     if (kantoorSec === 'hr'){
+      // het AI-weekrooster: voorstel op de verwachte drukte, de gemachtigde stelt vast
+      if (!agentData) laadAgent();
+      const rp = agentData && agentData.rooster;
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗓 '+T('ag2.rooster','AI-weekrooster')+'</h3>'+
+        '<div class="tkc-who">'+T('ag2.rooster.deck','De AI plant de week op de verwachte drukte per dag: drukke dagen iedereen op de vloer, rustige dagen om de beurt vrij.')+'</div>'+
+        (rp ? rp.days.map(d=>'<div class="st-row"><span><b>'+d.label+'</b> <span class="sub">'+d.date+'</span></span>'+
+            '<span class="sub" style="text-align:right;">'+d.staff.map(m=>m.name.split(' ')[0]+': '+m.shift.split(' ')[0]).join(' · ')+'</span></div>').join('')+
+          (rp.status==='voorstel'
+            ? '<div class="tkc-act"><button class="tkc-ready" id="agRoosterOk">✔ '+T('ag2.rooster.ok','Stel vast')+'</button><button class="obtn warn" id="agRoosterNee" style="margin-left:0.5rem;">'+T('ag2.nee','Wijs af')+'</button></div>'
+            : '<div class="tkc-who">✔ '+T('ag2.rooster.vast','Vastgesteld; het rooster in de PDA volgt dit plan.')+'</div>')
+        : '<div class="tkc-act"><button class="tkc-start" id="agRooster">✨ '+T('ag2.rooster.stel','Stel het weekrooster voor')+'</button></div>')+'</div>';
       const apps = (state.applications||[]).filter(x=>x.status==='nieuw');
       html += '<div class="tkc"><h3>'+T('kt.sollicitaties','Sollicitaties')+(apps.length?' ('+apps.length+')':'')+'</h3>'+
         (apps.length ? apps.map(x=>'<div class="st-row"><span>'+x.name+' \u00b7 '+x.func+(x.viaRTG?' \u00b7 RTG':'')+'<span class="sub">'+x.contact+'</span></span>'+
@@ -301,6 +322,32 @@
         : '<div class="tkc-who">'+T('kt.noitems','Nog niets op de kaart voor deze werkplek.')+'</div>')+
         '<div class="st-form"><input class="st-in" id="ktMn" placeholder="'+T('menu.name','Naam')+'"><div class="row-gap"><input class="st-in" id="ktMc" placeholder="'+T('menu.cat','Categorie')+'" style="flex:2;"><input class="st-in" id="ktMp" type="number" inputmode="decimal" placeholder="\u20ac" style="flex:1;"></div>'+
         '<button class="bigbtn" id="ktMAdd" style="margin-top:0.2rem;">'+T('kt.addcard','Zet op de kaart bij ')+(stn==='bar'?'de bar':T('kt.dekitchen','de keuken'))+'</button></div></div>';
+      if (stn === 'keuken'){
+        // de AI-inkoop: vaste leverancier koppelen, voorstellen goedkeuren of aanpassen
+        if (!agentData){
+          html += '<div class="tkc" style="grid-column:1/-1;"><h3>\ud83e\udde0 '+T('ag2.h','AI-inkoop')+'</h3><div class="tkc-who">\u2026</div></div>';
+          laadAgent();
+        } else {
+          const A = agentData;
+          html += '<div class="tkc" style="grid-column:1/-1;"><h3>\ud83e\udde0 '+T('ag2.h','AI-inkoop')+'</h3>'+
+            '<div class="tkc-who">'+T('ag2.deck','De AI stelt de inkoop voor op de verkoop, de mise en place en de verwachte drukte. De gemachtigde keurt goed, past aan of wijst af; pas dan wordt er echt besteld bij de vaste leverancier.')+'</div>'+
+            '<div class="row-gap"><select class="st-in" id="agGh" style="flex:2;"><option value="">'+T('ag2.kies','Kies een vaste leverancier...')+'</option>'+
+              (agentMarkt||[]).map(g=>'<option value="'+g.code+'"'+(A.partnerCode===g.code?' selected':'')+'>'+g.name+'</option>').join('')+'</select>'+
+              '<label style="display:flex;align-items:center;gap:0.35rem;font-size:0.72rem;color:var(--muted);"><input type="checkbox" id="agAuto"'+(A.auto?' checked':'')+'>'+T('ag2.auto','automatisch na de MEP-voorspelling')+'</label></div>'+
+            '<div class="tkc-act"><button class="tkc-start" id="agKoppel">'+T('ag2.koppel','Koppel')+'</button>'+
+            (A.partnerCode?'<button class="tkc-ready" id="agStel">\u2728 '+T('ag2.stel','Stel inkoop voor')+'</button>':'')+'</div>'+
+            (A.voorstellen||[]).slice(0,3).map(v=>{
+              const wacht = v.status === 'wacht-op-goedkeuring';
+              return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem;margin-top:0.5rem;">'+
+                '<div class="tkc-top"><span style="font-weight:600;">'+(v.groothandelNaam||'')+' \u00b7 \u20ac '+v.totaal+'</span><span class="tkc-age">'+(wacht?'\u23f3 '+T('ag2.wacht','wacht op de gemachtigde'):v.status+(v.ref?' \u00b7 '+v.ref:''))+'</span></div>'+
+                '<div class="tkc-who">'+v.uitleg+'</div>'+
+                (v.regels||[]).slice(0,10).map(r=>'<div class="st-row"><span>'+r.naam+'<span class="sub">'+(r.reden||'')+' \u00b7 \u20ac '+r.prijs+' / '+(r.eenheid||'st')+'</span></span>'+
+                  (wacht?'<input class="st-in" style="width:4.5rem;flex:none;" type="number" min="1" value="'+r.aantal+'" data-agr="'+v.id+'" data-pid="'+r.productId+'">':'<span class="sub">'+r.aantal+'\u00d7</span>')+'</div>').join('')+
+                (wacht?'<div class="tkc-act"><button class="tkc-ready" data-agok="'+v.id+'">\u2714 '+T('ag2.ok','Keur goed en bestel')+'</button><button class="obtn warn" data-agnee="'+v.id+'" style="margin-left:0.5rem;">'+T('ag2.nee','Wijs af')+'</button></div>':'')+
+              '</div>';
+            }).join('')+'</div>';
+        }
+      }
     }
     if (kantoorSec === 'bediening'){
       const st2 = state.settings || {};
@@ -728,6 +775,30 @@
       if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
       const item = { id: 'm'+Date.now().toString(36), cat: el.querySelector('#ktMc').value.trim()||T('menu.other','Overig'), name, desc:'', price, allergens:[], station: kantoorSec };
       try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); await refresh(); } catch(e){ toast(e.message); }
+    });
+    // de AI-bedrijfsagent: koppelen, inkoop voorstellen, goedkeuren/aanpassen/afwijzen, rooster
+    const agK = el.querySelector('#agKoppel'); if (agK) agK.addEventListener('click', async () => {
+      try { await API.call('/supplier/agent/koppel', { groothandelCode: el.querySelector('#agGh').value, auto: el.querySelector('#agAuto').checked }); agentData = null; toast(T('ag2.gekoppeld','Vaste leverancier bijgewerkt.')); renderStation(); } catch(e){ toast(e.message); }
+    });
+    const agS = el.querySelector('#agStel'); if (agS) agS.addEventListener('click', async () => {
+      try { await API.call('/supplier/agent/voorstel', {}); agentData = null; renderStation(); } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-agok]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.agok;
+      const regels = [...el.querySelectorAll('[data-agr="'+id+'"]')].map(inp => ({ productId: inp.dataset.pid, aantal: inp.value }));
+      try { const d = await API.call('/supplier/agent/beslis', { id, actie: 'akkoord', regels }); toast('✔ '+T('ag2.besteld','Besteld bij de leverancier')+(d.order?' ('+d.order.ref+')':'')); agentData = null; renderStation(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-agnee]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/agent/beslis', { id: b.dataset.agnee, actie: 'afwijzen' }); agentData = null; renderStation(); } catch(e){ toast(e.message); }
+    }));
+    const agR = el.querySelector('#agRooster'); if (agR) agR.addEventListener('click', async () => {
+      try { await API.call('/supplier/rooster/voorstel', {}); agentData = null; renderStation(); } catch(e){ toast(e.message); }
+    });
+    const agRok = el.querySelector('#agRoosterOk'); if (agRok) agRok.addEventListener('click', async () => {
+      try { await API.call('/supplier/rooster/beslis', { actie: 'akkoord' }); agentData = null; toast(T('ag2.rooster.vastok','Weekrooster vastgesteld.')); renderStation(); } catch(e){ toast(e.message); }
+    });
+    const agRnee = el.querySelector('#agRoosterNee'); if (agRnee) agRnee.addEventListener('click', async () => {
+      try { await API.call('/supplier/rooster/beslis', { actie: 'afwijzen' }); agentData = null; renderStation(); } catch(e){ toast(e.message); }
     });
     el.querySelectorAll('[data-ktoggle]').forEach(b => b.addEventListener('click', async () => {
       const k = b.dataset.ktoggle, cur = (state.settings||{})[k] !== false;

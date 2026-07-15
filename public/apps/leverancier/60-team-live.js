@@ -306,6 +306,14 @@
     source.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
     source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); if (fact) laadFacturen(); laadAgendaSup(); });
+    // de keuken praat met de bediening: bon compleet op de pas -> belletje op
+    // elk open scherm van de zaak (bedieningspost, kassa, kantoor)
+    source.addEventListener('pas', e => {
+      try {
+        const d = JSON.parse(e.data || '{}');
+        toast('🛎️ ' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));
+      } catch(err){}
+    });
     source.addEventListener('notify', e => {
       const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
       if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }

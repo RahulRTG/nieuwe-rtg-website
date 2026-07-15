@@ -1312,6 +1312,10 @@ app.post('/api/supplier/mep/daily', supplierAuth, async (req, res) => {
   save();
   logActivity(s.code, req.actor, 'voorspelde de mise en place voor ' + date + ' (' + covers + ' couverts)');
   sseToSupplier(s.code, 'sync', { scope: 'events' });
+  // automatisch inkopen: staat de AI-agent op auto met een vaste leverancier,
+  // dan ligt er direct na de voorspelling een inkoopvoorstel klaar voor de
+  // gemachtigde (er wordt nooit besteld zonder goedkeuring)
+  if (s.agent && s.agent.auto && s.agent.partnerCode) kern.agentVoorstel(s, 'AI-agent (na de MEP-voorspelling)');
   res.json({ ok: true, plan: s.dailyMeps[date], histDagen: histDagen.size, ai: !!anthropic });
 });
 
@@ -1967,6 +1971,7 @@ app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
   if (o.status === 'nieuw') o.status = 'in bereiding';
   const nodig = sectiesForOrder(req.supplier, o);
   const wasKlaar = o.status === 'klaar';
+  const keukenWasKlaar = (o.stations || {}).keuken === 'klaar';
   if (nodig.length && nodig.every(x => o.secties[x] === 'klaar')) {
     o.stations = o.stations || {};
     o.stations.keuken = 'klaar';                            // de hele keuken is klaar
@@ -1976,6 +1981,10 @@ app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
   save();
   broadcastSync([o.customerTier], 'orders');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  // de keuken praat met de bediening: bon compleet op de pas -> live belletje
+  // op de bedieningspost, de PDA en de kassa (zelfde SSE-kanaal van de zaak)
+  if (!keukenWasKlaar && (o.stations || {}).keuken === 'klaar')
+    sseToSupplier(req.supplier.code, 'pas', { ref: o.ref, pickup: o.pickup, table: o.table || null });
   sseToOffice('sync', { scope: 'orders' });
   if (o.status === 'klaar' && !wasKlaar)
     notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
@@ -1989,6 +1998,7 @@ app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
   const station = req.body.station === 'bar' ? 'bar' : 'keuken';
   const phase = req.body.phase === 'klaar' ? 'klaar' : 'bezig';
   o.stations = o.stations || {};
+  const keukenWasKlaar = o.stations.keuken === 'klaar';
   o.stations[station] = phase;
   if (o.status === 'nieuw') o.status = 'in bereiding';
   const needed = stationsForOrder(req.supplier, o);
@@ -1997,6 +2007,9 @@ app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
   save();
   broadcastSync([o.customerTier], 'orders');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  // de keuken praat met de bediening: bon op de pas -> live belletje
+  if (!keukenWasKlaar && o.stations.keuken === 'klaar')
+    sseToSupplier(req.supplier.code, 'pas', { ref: o.ref, pickup: o.pickup, table: o.table || null });
   sseToOffice('sync', { scope: 'orders' });
   if (o.status === 'klaar' && !wasKlaar)
     notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
@@ -2325,6 +2338,7 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
 
 
   // domein-deelmodules (aparte bestanden, zelfde gedeelde kern)
+  require('./supplier/agent')(kern);
   require('./supplier/pda')(kern);
   require('./supplier/bezorg')(kern);
   require('./supplier/tickets')(kern);

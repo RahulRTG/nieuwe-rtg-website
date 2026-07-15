@@ -1284,6 +1284,14 @@
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
       src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); });
+      // de keuken praat met de bediening: bon compleet op de pas -> belletje op de PDA
+      src.addEventListener('pas', e => {
+        try {
+          const d = JSON.parse(e.data || '{}');
+          toast('🛎️ ' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));
+          if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
+        } catch(err){}
+      });
       src.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
       src.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
       src.addEventListener('alarm', e => { const d=JSON.parse(e.data); if (d.from !== me.name) showAlarm(d); });

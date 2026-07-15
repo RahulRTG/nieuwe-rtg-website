@@ -30,19 +30,24 @@ function maakPersoneel({ db, accounts }) {
 
   function scheduleFor(code) {
     const staff = accounts.listStaff(code).map(accounts.publicStaff);
+    // een door de gemachtigde vastgesteld AI-weekrooster (kern/agent.js) wint
+    // van het standaardpatroon
+    const sup = db.data.suppliers.find(x => x.code === code);
+    const vast = (sup && sup.roosterVast) || {};
     const days = [];
     const now = new Date();
     const dayNames = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
     for (let d = 0; d < 7; d++) {
       const date = new Date(now.getTime() + d * 86400000);
+      const dstr = date.toISOString().slice(0, 10);
       const doy = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
       days.push({
-        date: date.toISOString().slice(0, 10),
+        date: dstr,
         label: (d === 0 ? 'Vandaag' : d === 1 ? 'Morgen' : dayNames[date.getDay()]),
         staff: staff.map((m, i) => ({
           id: m.id, name: m.name, role: m.role,
           // managers vaker overdag; iedereen om de paar dagen vrij
-          shift: SHIFT_NAMES[(m.id * 3 + doy + (m.role === 'manager' ? 0 : i)) % 3]
+          shift: (vast[dstr] && vast[dstr][m.id]) || SHIFT_NAMES[(m.id * 3 + doy + (m.role === 'manager' ? 0 : i)) % 3]
         }))
       });
     }

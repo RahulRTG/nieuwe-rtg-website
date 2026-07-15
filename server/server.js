@@ -1845,6 +1845,15 @@ const {
   db, save, crypto, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, anthropic
 });
 
+/* De AI-bedrijfsagent (kern/agent.js): vaste leverancier koppelen, AI-inkoop-
+   voorstellen op verkoop + mise en place + verwachte drukte, en het AI-week-
+   rooster; de gemachtigde (manager) keurt goed, past aan of wijst af. */
+const { maakAgent } = require('./kern/agent');
+const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis } = maakAgent({
+  db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling,
+  accounts, weekdagFactor, SHIFT_NAMES, save, logActivity
+});
+
 /* Mode-bezorging (kern/modebezorg.js): een modewinkel zet in een tik een slimme,
    veilige bezorgdienst op. Veilig voor beide kanten (bezorgcode, foto-bewijs,
    geverifieerde koerier, live volgen, ID bij dure stukken, retour aan de deur)
@@ -2305,6 +2314,7 @@ const kern = {
   GROOTHANDEL_FUNCTIES, GROOTHANDEL_CATEGORIEEN, ghIsGroothandel, ghDefaults, ghFunctieAan,
   ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghMarkt, ghPlaatsBestelling,
   ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel,
+  agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis,
   // de mode-bezorging (kern/modebezorg.js)
   mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   // de eigen mini-boardroom per zaak (kern/zaak.js)

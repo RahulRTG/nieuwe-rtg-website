@@ -1924,7 +1924,7 @@ const {
    ticketsVoorSlot, optieAan en zijnVrienden meeneemt. */
 const {
   reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
-  annuleerItem, plaatsReview, reviewsVoor, ratingVan, toggleFavoriet,
+  annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet,
   favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen,
   betaalSplits, zetOpWachtlijst, mijnWachtlijst, meldWachtlijst, rsvpAnnuleer,
   puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, voorkeurVan, zetVoorkeur
@@ -2415,7 +2415,7 @@ const kern = {
   webpush, weekdagFactor, werkgeverSollicitatie,
   // de ervaring-laag (kern/ervaring.js)
   MELDING_SCOPES, reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
-  annuleerItem, plaatsReview, reviewsVoor, ratingVan, toggleFavoriet, favorietenVan, isFavoriet,
+  annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet, favorietenVan, isFavoriet,
   fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst,
   meldWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
   voorkeurVan, zetVoorkeur,

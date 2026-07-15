@@ -178,8 +178,22 @@ function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, 
   function reviewsVoor(code) {
     const c = String(code || '').trim().toUpperCase();
     const recent = (db.data.reviews || []).filter(r => r.supplierCode === c).slice(0, 20)
-      .map(r => ({ codename: r.codename, score: r.score, tekst: r.tekst, at: r.at }));
+      .map(r => ({ codename: r.codename, score: r.score, tekst: r.tekst, at: r.at, reactie: r.reactie || null }));
     return { rating: ratingVan(c), reviews: recent };
+  }
+
+  /* de zaak reageert op een review: een keer, zichtbaar voor iedereen die de
+     reviews bekijkt, en de gast krijgt er een nette melding van */
+  function reviewReageer(s, reviewId, tekst) {
+    const r = (db.data.reviews || []).find(x => x.id === reviewId && x.supplierCode === s.code);
+    if (!r) return { status: 404, error: 'Review niet gevonden.' };
+    tekst = String(tekst || '').replace(/[<>]/g, '').trim().slice(0, 400);
+    if (!tekst) return { status: 400, error: 'Schrijf eerst een reactie.' };
+    r.reactie = { tekst, at: nu() };
+    save();
+    notify(r.key, { icon: '💬', title: r.supplierName + ' reageerde op uw review', body: tekst.slice(0, 120), scope: 'orders' });
+    sseToSupplier(s.code, 'sync', { scope: 'reviews' });
+    return { ok: true, review: { id: r.id, reactie: r.reactie } };
   }
   function ratingVan(code) {
     const st = (db.data.reviewStats || {})[code];
@@ -411,7 +425,7 @@ function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, 
   return {
     reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
     annuleerItem,
-    plaatsReview, reviewsVoor, ratingVan,
+    plaatsReview, reviewsVoor, ratingVan, reviewReageer,
     toggleFavoriet, favorietenVan, isFavoriet,
     fooiUit,
     agendaVoor,

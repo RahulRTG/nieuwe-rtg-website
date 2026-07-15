@@ -114,6 +114,8 @@
     meer:     { label:'Meer',      svg:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>' },
     contract: { label:'Contracten', svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/><path d="M14.5 18.5l1.5 1.5 3-3"/>' },
     borden:   { label:'Borden',     svg:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 8v8M12.5 8v5M17 8v3"/>' },
+    reviews:  { label:'Reviews',    svg:'<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.3l6.1-.7z"/>' },
+    voorraad: { label:'Voorraad',   svg:'<path d="M3 8l9-5 9 5v11a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19z"/><path d="M3 8h18M9 12h6"/>' },
     onboarding: { label:'Onboarding', svg:'<path d="M16 11a4 4 0 1 0-8 0"/><circle cx="12" cy="7" r="3"/><path d="M4 21c0-4 3.5-7 8-7 1.4 0 2.7 0.3 3.8 0.8"/><path d="M15.5 19l1.8 1.8 3.2-3.6"/>' },
     page:     { label:'Pagina',    svg:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6"/>' },
     team:     { label:'Team',       svg:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/>' }
@@ -3814,7 +3816,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -5424,6 +5426,74 @@
       teamleden: () => (state && state.staff || []).map(m => ({ id: m.id, name: m.name })),
       kanBeheren: () => { const a = actor(); return !!(a.manager || a.role === 'manager' || !a.staffId); },
       T, toast
+    });
+  }
+
+  /* ---- Reviews & reputatie: reageren op elke gastreview, met AI-concept ---- */
+  function renderReviews(){
+    const el = $('#reviewsWrap'); if (!el) return;
+    const rating = state && state.reviews && state.reviews.rating;
+    const revs = (state && state.reviews && state.reviews.recent) || [];
+    let h = '<div class="card"><div class="tt-h">⭐ '+T('rev2.score','Uw reputatie')+'</div>'+
+      '<div style="margin-top:0.4rem;font-size:1.4rem;font-family:\'Bodoni Moda\',serif;">'+
+      (rating ? rating.score+' <span style="font-size:0.8rem;color:var(--soft);">/ 5 · '+rating.aantal+' '+T('rev2.stuks','review(s)')+'</span>' : T('rev2.geen','Nog geen reviews'))+'</div>'+
+      '<div class="softline" style="margin-top:0.3rem;">'+T('rev2.deck','Een snel, persoonlijk antwoord weegt zwaar: gasten lezen mee, en de schrijver krijgt uw reactie direct als melding.')+'</div></div>';
+    h += revs.length ? revs.map(r =>
+      '<div class="card">'+
+      '<div class="tt-top" style="display:flex;justify-content:space-between;gap:0.5rem;"><b>'+'⭐'.repeat(r.score)+'<span style="opacity:0.25;">'+'⭐'.repeat(5-r.score)+'</span> · '+esc(r.codename||'gast')+'</b><time style="color:var(--soft);font-size:0.7rem;">'+timeAgo(r.at)+'</time></div>'+
+      (r.tekst ? '<div style="margin-top:0.35rem;font-size:0.86rem;">'+esc(r.tekst)+'</div>' : '')+
+      (r.reactie
+        ? '<div style="margin-top:0.5rem;border-left:3px solid var(--gold);padding:0.4rem 0.7rem;font-size:0.82rem;"><b style="color:var(--gold);">'+T('rev2.uw','Uw reactie')+'</b> · '+timeAgo(r.reactie.at)+'<br>'+esc(r.reactie.tekst)+'</div>'
+        : '<div class="tt-compose" style="margin-top:0.5rem;"><input id="rv-'+r.id+'" placeholder="'+T('rev2.ph','Schrijf een persoonlijke reactie...')+'">'+
+          '<button class="obtn ghost" data-rvai="'+r.id+'">✨</button><button data-rvsend="'+r.id+'">'+T('team.send','Stuur')+'</button></div>')+
+      '</div>').join('')
+      : '<div class="card softline">'+T('rev2.leeg','Nog geen reviews. Na elke afgeronde dienst kan de gast er een achterlaten.')+'</div>';
+    el.innerHTML = h;
+    el.querySelectorAll('[data-rvai]').forEach(b => b.addEventListener('click', async () => {
+      b.textContent = '…';
+      try { const d = await API.call('/supplier/review/concept', { id: b.dataset.rvai }); const inp = $('#rv-'+b.dataset.rvai); if (inp) inp.value = d.concept; }
+      catch(e){ toast(e.message); }
+      b.textContent = '✨';
+    }));
+    el.querySelectorAll('[data-rvsend]').forEach(b => b.addEventListener('click', async () => {
+      const inp = $('#rv-'+b.dataset.rvsend);
+      if (!inp || !inp.value.trim()) return;
+      try { await API.call('/supplier/review/reageer', { id: b.dataset.rvsend, tekst: inp.value.trim() }); toast('💬 '+T('rev2.ok','Reactie geplaatst; de gast krijgt een melding.')); await refresh(); }
+      catch(e){ toast(e.message); }
+    }));
+  }
+
+  /* ---- Voorraad: de lichte inventaris, iedereen telt mee ---- */
+  function renderVoorraad(){
+    const el = $('#voorraadWrap'); if (!el) return;
+    const vs = (state && state.voorraad) || [];
+    const mgr = (() => { const a = actor(); return !!(a.manager || a.role === 'manager' || !a.staffId); })();
+    const laag = vs.filter(v => v.min > 0 && v.aantal <= v.min);
+    let h = '';
+    if (laag.length) h += '<div class="card" style="border-left:4px solid var(--rood,#E5484D);"><div class="tt-h">📉 '+T('vr.laag','Bijna op')+'</div>'+
+      '<div style="margin-top:0.3rem;font-size:0.84rem;">'+laag.map(v=>esc(v.naam)+' ('+v.aantal+' '+esc(v.eenheid)+')').join(' · ')+'</div>'+
+      '<div class="softline" style="margin-top:0.3rem;">'+T('vr.laag.s','Tip: zet ze op de AI-inkooplijst in het Kantoor, of bestel direct bij de groothandel.')+'</div></div>';
+    h += '<div class="card">'+(vs.length ? vs.map(v =>
+      '<div class="st-row" style="align-items:center;"><span'+(v.min>0&&v.aantal<=v.min?' style="color:#FF8589;"':'')+'>'+esc(v.naam)+
+        '<span class="sub">'+T('vr.min','minimum')+' '+v.min+' '+esc(v.eenheid)+'</span></span>'+
+      '<span style="display:flex;gap:0.4rem;align-items:center;flex-shrink:0;">'+
+        '<button class="obtn ghost" data-vmin="'+v.id+'">−</button><b style="min-width:3.2rem;text-align:center;">'+v.aantal+' '+esc(v.eenheid)+'</b><button class="obtn ghost" data-vplus="'+v.id+'">＋</button>'+
+        (mgr?'<button class="obtn warn" data-vweg="'+v.id+'">🗑</button>':'')+'</span></div>').join('')
+      : '<div class="softline">'+T('vr.leeg','Nog geen voorraaditems. Het management zet hieronder de lijst op.')+'</div>')+'</div>';
+    if (mgr) h += '<div class="card"><div class="tt-h">'+T('vr.nieuw','Nieuw item')+'</div>'+
+      '<div class="row-gap" style="margin-top:0.5rem;"><input class="st-in" id="vrNaam" placeholder="'+T('vr.naam','Naam, bijv. Cava brut')+'" style="flex:2;">'+
+      '<input class="st-in" id="vrAantal" type="number" min="0" placeholder="'+T('vr.aantal','aantal')+'" style="flex:1;">'+
+      '<input class="st-in" id="vrMin" type="number" min="0" placeholder="'+T('vr.mindr','min.')+'" style="flex:1;">'+
+      '<input class="st-in" id="vrEenheid" placeholder="'+T('vr.eenheid','eenheid (fles, kg...)')+'" style="flex:1;"></div>'+
+      '<button class="bigbtn" id="vrAdd" style="margin-top:0.5rem;">'+T('vr.voeg','Zet op de lijst')+'</button></div>';
+    el.innerHTML = h;
+    const zet = async body => { try { await API.call('/supplier/voorraad/zet', body); await refresh(); } catch(e){ toast(e.message); } };
+    el.querySelectorAll('[data-vplus]').forEach(b => b.addEventListener('click', () => zet({ id: b.dataset.vplus, delta: 1 })));
+    el.querySelectorAll('[data-vmin]').forEach(b => b.addEventListener('click', () => zet({ id: b.dataset.vmin, delta: -1 })));
+    el.querySelectorAll('[data-vweg]').forEach(b => b.addEventListener('click', () => zet({ id: b.dataset.vweg, weg: true })));
+    const va = $('#vrAdd'); if (va) va.addEventListener('click', () => {
+      const naam = $('#vrNaam').value.trim(); if (!naam) return;
+      zet({ naam, aantal: Number($('#vrAantal').value)||0, min: Number($('#vrMin').value)||0, eenheid: $('#vrEenheid').value.trim() });
     });
   }
 

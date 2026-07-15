@@ -2448,6 +2448,7 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
 
   // domein-deelmodules (aparte bestanden, zelfde gedeelde kern)
   require('./supplier/agent')(kern);
+  require('./supplier/tools')(kern);
   require('./supplier/pda')(kern);
   require('./supplier/bezorg')(kern);
   require('./supplier/tickets')(kern);

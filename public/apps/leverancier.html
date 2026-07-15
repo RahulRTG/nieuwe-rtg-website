@@ -798,6 +798,16 @@
         <div class="ai-thread" id="aiThread"></div>
         <div class="tt-compose" style="margin-top:0.8rem;"><input id="aiInput" placeholder="Bijv. zet Riverside suite op schoon" data-i18n-ph="ai.ph" autocomplete="off"><button id="aiSend" data-i18n="team.send">Stuur</button></div>
       </div>
+      <div class="view" data-view="reviews">
+        <h2 data-i18n="sup.v.rev">Reviews &amp; reputatie</h2>
+        <p class="sub" data-i18n="sup.v.rev.sub">Elke gastreview met een persoonlijk antwoord, desgewenst met een AI-concept. De gast krijgt uw reactie als melding.</p>
+        <div id="reviewsWrap"></div>
+      </div>
+      <div class="view" data-view="voorraad">
+        <h2 data-i18n="sup.v.voor">Voorraad</h2>
+        <p class="sub" data-i18n="sup.v.voor.sub">De lichte inventaris van de zaak: iedereen telt mee, en onder het minimum gaat er vanzelf een melding uit.</p>
+        <div id="voorraadWrap"></div>
+      </div>
       <div class="view" data-view="borden">
         <h2 data-i18n="sup.v.borden">Borden</h2>
         <p class="sub" data-i18n="sup.v.borden.sub">Het werkbord van de zaak: lijsten en kaarten, per bord met de collega's die u kiest. Iedereen ziet wijzigingen live.</p>
@@ -973,6 +983,17 @@ window.I18N = { en: {
   'st.tables':'Tables, tap to cycle', 'st.more':'More',
   'st.pda':'Open the full PDA', 'st.pda.s':'Schedule, tasks, team chat, video calling and SOS.',
   'sup.v.borden':'Boards', 'sup.v.borden.sub':'Your business workboard: lists and cards, each board with the colleagues you choose. Everyone sees changes live.',
+  'sup.v.rev':'Reviews & reputation', 'sup.v.rev.sub':'Every guest review with a personal reply, with an AI draft if you like. The guest gets your reply as a notification.',
+  'sup.v.voor':'Stock', 'sup.v.voor.sub':'The light inventory of your business: everyone counts along, and below the minimum a notification goes out automatically.',
+  'tab.reviews':'Reviews', 'tab.voorraad':'Stock',
+  'rev2.score':'Your reputation', 'rev2.stuks':'review(s)', 'rev2.geen':'No reviews yet',
+  'rev2.deck':'A quick, personal reply carries weight: guests read along, and the writer gets your reply as a notification.',
+  'rev2.uw':'Your reply', 'rev2.ph':'Write a personal reply...', 'rev2.ok':'Reply posted; the guest gets a notification.',
+  'rev2.leeg':'No reviews yet. After every completed service the guest can leave one.',
+  'vr.laag':'Running low', 'vr.laag.s':'Tip: put them on the AI purchasing list in the Office, or order from the wholesaler directly.',
+  'vr.min':'minimum', 'vr.leeg':'No stock items yet. Management sets up the list below.',
+  'vr.nieuw':'New item', 'vr.naam':'Name, e.g. Cava brut', 'vr.aantal':'quantity', 'vr.mindr':'min.',
+  'vr.eenheid':'unit (bottle, kg...)', 'vr.voeg':'Add to the list',
   'ag2.kies2':'Add a wholesaler...', 'ag2.koppel2':'Link', 'ag2.weg':'unlink', 'ag2.los':'Wholesaler unlinked.',
   'ag2.multi':'The AI compares the linked wholesalers per order and picks the best coverage and price.',
   'zb.bel':'Tax tool', 'zb.bel.s':'Enter the expected annual profit for an indication of the tax, the net profit and what to set aside monthly. The country of your business is the starting point.',

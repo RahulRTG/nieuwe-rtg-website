@@ -289,6 +289,7 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
       tables: s.tables || null,
       settings: s.settings || { ordersOpen: true, reservationsOpen: true },
       fleet: s.fleet || null,
+      voorraad: s.voorraad || [],
       minibar: Array.isArray(s.minibar) ? {
         catalog: s.minibar,
         countedToday: [...new Set((db.data.minibarCounts[s.code] || []).filter(e => e.at.slice(0, 10) === new Date().toISOString().slice(0, 10)).map(e => e.room))],
@@ -307,7 +308,7 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
         return {
           rating: rs && rs.aantal ? { score: Math.round((rs.som / rs.aantal) * 10) / 10, aantal: rs.aantal } : null,
           recent: (db.data.reviews || []).filter(r => r.supplierCode === s.code).slice(0, 10)
-            .map(r => ({ codename: r.codename, score: r.score, tekst: r.tekst, at: r.at }))
+            .map(r => ({ id: r.id, codename: r.codename, score: r.score, tekst: r.tekst, at: r.at, reactie: r.reactie || null }))
         };
       })(),
       tickets: (db.data.tickets[s.code] || []).slice(0, 40),

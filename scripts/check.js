@@ -17,7 +17,7 @@ function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
     const vol = path.join(dir, naam);
     const st = fs.statSync(vol);
-    if (st.isDirectory()) { if (!/node_modules|\.git|data/.test(naam)) loop(vol, filter, fn); }
+    if (st.isDirectory()) { if (!/node_modules|\.git|data|dist/.test(naam)) loop(vol, filter, fn); }
     else if (filter.test(naam)) fn(vol);
   }
 }

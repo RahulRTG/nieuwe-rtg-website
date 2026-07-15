@@ -11,10 +11,16 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+# Eerst alle afhankelijkheden (incl. terser) zodat de frontend-build kan draaien,
+# daarna de dev-tools weer wegsnoeien voor een slanke runtime-image.
+RUN npm ci && npm cache clean --force
 
 # De rest van de broncode.
 COPY . .
+
+# Frontend-build: minify de serveerbare JS naar public/dist/min en stempel de
+# service-worker caches. Daarna de dev-afhankelijkheden verwijderen.
+RUN npm run build && npm prune --omit=dev
 
 # Data en back-ups op een volume, zodat ze een herbouw van de container
 # overleven. De niet-root gebruiker 'node' moet erin kunnen schrijven.

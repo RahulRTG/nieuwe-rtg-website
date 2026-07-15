@@ -372,7 +372,8 @@ app.use((req, res, next) => {
 const zlib = require('zlib');
 const PUBLIC_DIR_STATIC = path.join(__dirname, '..', 'public');
 const GZIP_TYPE = { '.js': 'application/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json' };
-const gzipCache = new Map(); // absoluut pad -> { mtimeMs, gz }
+const MIN_DIR_STATIC = path.join(PUBLIC_DIR_STATIC, 'dist', 'min');
+const gzipCache = new Map(); // absoluut pad -> { mtimeMs, minMtimeMs, gz }
 app.get(/\.(?:js|css|svg|json|webmanifest)$/, (req, res, next) => {
   if (req.headers.range) return next(); // range-verzoeken: laat express.static het doen
   if (!/\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) return next();
@@ -383,9 +384,25 @@ app.get(/\.(?:js|css|svg|json|webmanifest)$/, (req, res, next) => {
   const type = GZIP_TYPE[path.extname(bestand)]; if (!type) return next();
   let st; try { st = fs.statSync(bestand); } catch (e) { return next(); }
   if (!st.isFile()) return next();
+  // Is er een verse geminificeerde versie (npm run build)? Dan die serveren,
+  // anders de bron. Vers = gebouwd na de laatste bronwijziging (mtime-controle),
+  // zodat een lokaal bewerkt bronbestand nooit een oude minify uitserveert.
+  let minPad = null, minMtimeMs = 0;
+  if (type.indexOf('javascript') !== -1) {
+    const kandidaat = path.join(MIN_DIR_STATIC, rel);
+    if (kandidaat.startsWith(MIN_DIR_STATIC)) {
+      try {
+        const mst = fs.statSync(kandidaat);
+        if (mst.isFile() && mst.mtimeMs >= st.mtimeMs) { minPad = kandidaat; minMtimeMs = mst.mtimeMs; }
+      } catch (e) { /* geen minify aanwezig: bron gebruiken */ }
+    }
+  }
   let hit = gzipCache.get(bestand);
-  if (!hit || hit.mtimeMs !== st.mtimeMs) {
-    try { hit = { mtimeMs: st.mtimeMs, gz: zlib.gzipSync(fs.readFileSync(bestand), { level: 6 }) }; }
+  if (!hit || hit.mtimeMs !== st.mtimeMs || hit.minMtimeMs !== minMtimeMs) {
+    try {
+      const bron = fs.readFileSync(minPad || bestand);
+      hit = { mtimeMs: st.mtimeMs, minMtimeMs, gz: zlib.gzipSync(bron, { level: 6 }) };
+    }
     catch (e) { return next(); }
     if (gzipCache.size > 300) gzipCache.clear();
     gzipCache.set(bestand, hit);

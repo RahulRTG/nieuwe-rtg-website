@@ -14,6 +14,47 @@ const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 const sha = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
 
+// Loop public/ af en verzamel alle serveerbare .js-bestanden. De service-workers
+// en de dist-map slaan we over: een SW laten we bewust ongemoeid, en dist is de
+// uitvoer zelf.
+function verzamelJs(dir, uit) {
+  for (const naam of fs.readdirSync(dir)) {
+    const p = path.join(dir, naam);
+    const st = fs.statSync(p);
+    if (st.isDirectory()) {
+      if (naam === 'dist') continue;
+      verzamelJs(p, uit);
+    } else if (naam.endsWith('.js') && naam !== 'sw.js') {
+      uit.push(p);
+    }
+  }
+  return uit;
+}
+
+// Minify elke serveerbare .js naar public/dist/min/<zelfde-pad>. De server
+// serveert dit bestand transparant op de originele URL zolang het verser is dan
+// de bron (mtime-controle), en valt anders terug op de bron. Geen hash in de
+// naam: de service-worker en de cache-headers regelen de versiebeheersing al.
+async function minifyServe() {
+  const bronnen = verzamelJs(PUB, []);
+  const minRoot = path.join(PUB, 'dist', 'min');
+  fs.rmSync(minRoot, { recursive: true, force: true }); // stale entries opruimen
+  let voor = 0, na = 0, aantal = 0;
+  for (const f of bronnen) {
+    const code = fs.readFileSync(f, 'utf8');
+    let min;
+    try {
+      const res = await minify(code, { compress: true, mangle: true });
+      min = res.code || code;
+    } catch (e) { min = code; } // kan het niet gecomprimeerd worden, dan de bron
+    const doel = path.join(minRoot, path.relative(PUB, f));
+    fs.mkdirSync(path.dirname(doel), { recursive: true });
+    fs.writeFileSync(doel, min);
+    voor += Buffer.byteLength(code); na += Buffer.byteLength(min); aantal++;
+  }
+  console.log(`[build] serveerbaar geminificeerd: ${aantal} bestanden, ${voor} -> ${na} bytes (${Math.round((1 - na / voor) * 100)}% kleiner)`);
+}
+
 async function minifyGedeeld() {
   const bronnen = ['apps/util.js', 'apps/translate.js', 'apps/geo.js', 'shared/realtime.js', 'apps/foundation/sessie.js']
     .map((p) => path.join(PUB, p)).filter((f) => fs.existsSync(f));
@@ -57,6 +98,7 @@ function stempelServiceWorkers() {
 
 (async () => {
   await minifyGedeeld();
+  await minifyServe();
   stempelServiceWorkers();
   console.log('[build] klaar.');
 })().catch((e) => { console.error('[build] mislukt:', e); process.exit(1); });

@@ -121,7 +121,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -619,6 +619,103 @@
         const r = await API.call('/supplier/ai', { q: b.dataset.pdbzai });
         uit.textContent = r.reply || vast[sleutel];
       } catch(e){ uit.textContent = vast[sleutel]; }
+    }));
+  }
+
+  /* ---- de keuken op zak: uw kant van de lijn, live met het keukenscherm ----
+     Zelfde rekenregels als het KDS en de servercoach: nominale tijd per kant
+     (prepMin op het gerecht wint), klaar telt 0, bezig de halve tijd, niet
+     gestart de volle tijd; de langzaamste kant bepaalt wanneer de rest start,
+     zodat de hele tafel tegelijk warm uitgaat. Elke actie hier staat direct
+     op het keukenscherm en andersom (SSE-sync). */
+  const PDA_KANTEN = { warm:['🔥','Warme kant'], koud:['❄️','Koude kant'], snack:['🍟','Snacks'], dessert:['🍰','Desserts'], pas:['🍽️','De pas'] };
+  const PDA_KTIJD = { warm: 12, koud: 6, snack: 8, dessert: 5 };
+  let pdaKant = (() => { try { return localStorage.getItem('rtg_pda_kant') || 'warm'; } catch(e){ return 'warm'; } })();
+  const heeftKeuken = () => !!(state && (state.menu||[]).some(m => m.station !== 'bar'));
+  const pkSectieOf = it => { const m = (state.menu||[]).find(x => x.id === it.id); return (m && m.station !== 'bar') ? (m.sectie || 'warm') : null; };
+  const pkSecties = o => [...new Set((o.items||[]).map(pkSectieOf).filter(Boolean))];
+  const pkAge = iso => Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000));
+  function pkDuur(o, sec){
+    let t = PDA_KTIJD[sec] || 8;
+    (o.items||[]).forEach(it => { const m = (state.menu||[]).find(x => x.id === it.id);
+      if (m && m.station !== 'bar' && (m.sectie||'warm') === sec && m.prepMin) t = Math.max(t, m.prepMin); });
+    return t;
+  }
+  function pkPlan(o){
+    const nodig = pkSecties(o), fase = o.secties || {}, rest = {};
+    nodig.forEach(sec => { const t = pkDuur(o, sec); rest[sec] = fase[sec]==='klaar' ? 0 : fase[sec]==='bezig' ? Math.ceil(t/2) : t; });
+    const doel = nodig.length ? Math.max.apply(null, nodig.map(s2 => rest[s2])) : 0;
+    const plan = {};
+    nodig.forEach(sec => {
+      if (fase[sec]==='klaar') plan[sec] = doel > 0 ? { doe:'warm', min:doel } : { doe:'pas', min:0 };
+      else if (fase[sec]==='bezig') plan[sec] = { doe:'bezig', min:rest[sec] };
+      else { const w = doel - rest[sec]; plan[sec] = w >= 2 ? { doe:'wacht', min:w } : { doe:'nu', min:0 }; }
+    });
+    return { doel, plan };
+  }
+  function renderKeuken(){
+    const tabBtn = document.getElementById('tabKeuken');
+    if (tabBtn) tabBtn.style.display = heeftKeuken() ? '' : 'none';
+    const wrap = $('#keukenWrap'); if (!wrap) return;
+    if (!heeftKeuken()){ wrap.innerHTML = ''; return; }
+    const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status) && pkSecties(o).length);
+    // kant kiezen = inloggen op dat station; de keuze blijft op dit toestel staan
+    let html = '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+Object.keys(PDA_KANTEN).map(k =>
+      '<button class="abtn'+(pdaKant===k?'':' ghost')+'" data-pkkant="'+k+'">'+PDA_KANTEN[k][0]+' '+T('ks.'+k, PDA_KANTEN[k][1])+'</button>').join('')+'</div>';
+    if (pdaKant === 'pas'){
+      const opDePas = live.filter(o => (o.stations||{}).keuken === 'klaar').sort((a,b) => new Date(a.at)-new Date(b.at));
+      const bezig = live.filter(o => (o.stations||{}).keuken !== 'klaar');
+      html += '<div class="card"><div class="k">'+T('ks.pas.klaar','Op de pas, samenstellen en doorgeven')+' ('+opDePas.length+')</div>'+
+        (opDePas.length ? opDePas.map(o => '<div class="task"><span class="ic">🛎️</span><div class="t"><b>'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span>'+(o.items||[]).filter(it=>pkSectieOf(it)).map(it=>it.qty+'× '+esc(it.name)).join(', ')+'</span></div><span style="font-size:0.72rem;color:var(--soft);">'+pkAge(o.at)+'m</span></div>').join('')
+          : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('ks.pas.leeg','Nog niets op de pas. Zodra alle kanten klaar zijn, komt de bestelling hier binnen.')+'</div>')+'</div>';
+      if (bezig.length) html += '<div class="card"><div class="k">'+T('ks.pas.bezig','In de maak, per kant')+' ('+bezig.length+')</div>'+
+        bezig.map(o => '<div class="task"><span class="ic">🔥</span><div class="t"><b>'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span>'+pkSecties(o).map(s2 => PDA_KANTEN[s2][0]+' '+((o.secties||{})[s2]||T('pd.k.wacht','wacht'))).join(' · ')+'</span></div><span style="font-size:0.72rem;color:var(--soft);">'+pkAge(o.at)+'m</span></div>').join('')+'</div>';
+    } else {
+      const sec = pdaKant;
+      const mijn = live.filter(o => pkSecties(o).includes(sec) && (o.secties||{})[sec] !== 'klaar').sort((a,b) => new Date(a.at)-new Date(b.at));
+      const laat = mijn.filter(o => pkAge(o.at) >= 12).length;
+      // all day voor deze kant, net als op het grote scherm
+      const per = {};
+      mijn.forEach(o => (o.items||[]).forEach(it => { if (pkSectieOf(it) === sec) per[it.name] = (per[it.name]||0) + it.qty; }));
+      const allday = Object.entries(per).sort((a,b) => b[1]-a[1]).slice(0, 8);
+      html += '<div class="card" style="display:flex;gap:1.2rem;align-items:center;"><div><b style="font-size:1.3rem;">'+mijn.length+'</b><span style="display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('kds.open','Open bonnen')+'</span></div>'+
+        '<div><b style="font-size:1.3rem;color:'+(laat?'#FF8589':'#7BC79B')+';">'+laat+'</b><span style="display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('kds.laat','Te laat')+'</span></div>'+
+        (allday.length?'<div style="flex:1;font-size:0.72rem;color:var(--soft);">'+T('kds.allday','All day')+': '+allday.map(r => r[1]+'× '+esc(r[0])).join(', ')+'</div>':'')+'</div>';
+      html += mijn.length ? mijn.map(o => {
+        const a = pkAge(o.at);
+        const p = pkPlan(o).plan[sec];
+        const adv = p ? ({ nu: '▶ '+T('vp.nu','start nu'), wacht: '⏳ '+T('vp.wacht','wacht')+' ~'+p.min+'m', bezig: '🔥 '+T('vp.bezig','bezig'), warm: '♨ '+T('vp.warm','houd warm'), pas: '✓ '+T('vp.pas','naar de pas') })[p.doe] : '';
+        const fase = (o.secties||{})[sec];
+        const items = (o.items||[]).filter(it => pkSectieOf(it) === sec);
+        return '<div class="card" style="border-left:4px solid '+(a>=12?'#E5484D':a>=6?'#C99A2E':'#2E7D5B')+';">'+
+          '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
+          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;"><b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
+          (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">⚠ '+esc(o.allergyNote)+'</div>':'')+
+          (adv?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+adv+'</div>':'')+
+          '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost" data-pkgo="'+o.ref+'" data-phase="bezig" style="flex:1;">'+T('st.start','Start')+'</button>':'')+
+          '<button class="abtn" data-pkgo="'+o.ref+'" data-phase="klaar" style="flex:1;">'+T('st.ready','Klaar')+'</button></div></div>';
+      }).join('') : '<div class="card" style="color:var(--soft);font-size:0.85rem;">'+T('pd.k.leeg','Niets voor deze kant. Nieuwe bonnen verschijnen hier vanzelf, live met het keukenscherm.')+'</div>';
+    }
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-pkkant]').forEach(b => b.addEventListener('click', () => {
+      pdaKant = b.dataset.pkkant;
+      try { localStorage.setItem('rtg_pda_kant', pdaKant); } catch(e){}
+      renderKeuken();
+    }));
+    wrap.querySelectorAll('[data-pkgo]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/order/sectie', { ref: b.dataset.pkgo, sectie: pdaKant, phase: b.dataset.phase }); toast(b.dataset.phase==='klaar'?T('pd.k.klaar','Kant klaargemeld; het keukenscherm ziet het direct.'):T('pd.k.gestart','Gestart.')); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-pkdish]').forEach(d => d.addEventListener('click', async () => {
+      // gerechtenkennis op zak: tik op het gerecht voor de bereidingswijze
+      const open = d.nextElementSibling && d.nextElementSibling.classList.contains('pk-kennis');
+      wrap.querySelectorAll('.pk-kennis').forEach(x => x.remove());
+      if (open) return;
+      const div = document.createElement('div');
+      div.className = 'pk-kennis';
+      div.style.cssText = 'white-space:pre-line;font-size:0.78rem;color:var(--soft);background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.75rem;margin:0.25rem 0 0.4rem;line-height:1.55;';
+      div.textContent = T('ds.laden','De AI-chef schrijft...');
+      d.insertAdjacentElement('afterend', div);
+      try { const k = await API.call('/supplier/menu/kennis', { itemId: d.dataset.pkdish, soort: 'bereiding' }); div.textContent = k.tekst; } catch(e){ div.textContent = e.message; }
     }));
   }
 

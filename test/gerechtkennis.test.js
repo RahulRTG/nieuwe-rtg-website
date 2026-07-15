@@ -11,7 +11,7 @@ const { startServer } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kennis-'));
-let child, lidToken, kokToken;
+let child, lidToken, kokToken, managerToken;
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -27,7 +27,9 @@ test.before(async () => {
   lidToken = reg.token;
   const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));
   const kok = roster.staff.find(x => x.role !== 'manager');
+  const man = roster.staff.find(x => x.role === 'manager');
   kokToken = (await json(await api('/api/supplier/login', { code: 'KIKUNOI', staffId: kok.id, pin: '5678' }))).token;
+  managerToken = (await json(await api('/api/supplier/login', { code: 'KIKUNOI', staffId: man.id, pin: '1234' }))).token;
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -54,6 +56,19 @@ test('kennis: allergenen noemen het allergeen met een volwaardige vervanger', as
 test('kennis: een onbekende soort of onbekend gerecht wordt geweigerd', async () => {
   assert.equal((await api('/api/supplier/menu/kennis', { itemId: 'm1', soort: 'horoscoop' }, kokToken)).status, 400);
   assert.equal((await api('/api/supplier/menu/kennis', { itemId: 'bestaat-niet', soort: 'recept' }, kokToken)).status, 404);
+});
+
+test('kaart bewerken: vuurplan-minuten, 86 en de opgebouwde kennis overleven het opslaan', async () => {
+  // de chef zet een eigen bereidingstijd en de kok heeft al kennis opgebouwd (vorige tests)
+  const st = await json(await api('/api/supplier/state', {}, managerToken));
+  const menu = st.state.menu.map(m => m.id === 'm2' ? { ...m, prepMin: 25, sectie: 'warm' } : m);
+  const opgeslagen = await json(await api('/api/supplier/menu', { menu }, managerToken));
+  const m2 = opgeslagen.menu.find(x => x.id === 'm2');
+  assert.equal(m2.prepMin, 25);                       // het vuurplan rekent nu met 25 min
+  const m1 = opgeslagen.menu.find(x => x.id === 'm1');
+  assert.ok(m1.kennis && m1.kennis.bereiding, 'de opgebouwde kennis blijft op het gerecht staan');
+  // alleen het management mag de kaart bewerken
+  assert.equal((await api('/api/supplier/menu', { menu }, kokToken)).status, 403);
 });
 
 test('86: uitverkocht melden blokkeert het bestellen; opheffen maakt het weer vrij', async () => {

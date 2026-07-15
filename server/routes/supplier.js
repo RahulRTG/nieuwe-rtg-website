@@ -1931,6 +1931,13 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
     station: m.station === 'bar' ? 'bar' : 'keuken',
     sectie: ['warm', 'koud', 'snack', 'dessert'].includes(m.sectie) ? m.sectie : 'warm',
+    // het vuurplan: eigen bereidingstijd in minuten (0 of leeg = nominale tijd per kant)
+    prepMin: Math.min(90, Math.max(0, parseInt(m.prepMin, 10) || 0)) || undefined,
+    // 86 en de opgebouwde gerechtenkennis overleven het bewerken van de kaart
+    uitverkocht: !!m.uitverkocht || undefined,
+    kennis: m.kennis && typeof m.kennis === 'object'
+      ? Object.fromEntries(Object.entries(m.kennis).filter(([k]) => ['recept', 'bereiding', 'allergenen', 'pairing'].includes(k)).map(([k, v]) => [k, String(v).slice(0, 1500)]))
+      : undefined,
     recept: String(m.recept || '').slice(0, 1500)
     };
   });

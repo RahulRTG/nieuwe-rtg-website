@@ -1040,6 +1040,7 @@
 
   /* ---- het Kantoor: de eigenaar/manager past hier alles aan ---- */
   let kantoorSec = 'bo', kantoorMsg = '';
+  let kantoorEdit = null;   // gerecht dat open staat in de kaart-bewerker
   // eigen backoffice van de zaak: dagcijfers, weektrend, toppers en actiecentrum
   let boData = null, boBusy = false;
   async function laadBackoffice(){
@@ -1319,9 +1320,24 @@
     if (kantoorSec === 'keuken' || kantoorSec === 'bar'){
       const stn = kantoorSec;
       const items = (state.menu||[]).filter(m=>(m.station==='bar')===(stn==='bar'));
+      const KANTEN = { warm:'Warme kant', koud:'Koude kant', snack:'Snacks', dessert:'Desserts' };
+      // de kaart-bewerker: de chef past alles per gerecht aan, ook het vuurplan
+      const bewerker = x => '<div class="st-form" data-kedit-form="'+x.id+'" style="border:1px solid var(--line);border-radius:12px;padding:0.7rem;margin:0.3rem 0 0.5rem;">'+
+        '<input class="st-in" data-kf="name" value="'+escT(x.name)+'" placeholder="'+T('menu.name','Naam')+'">'+
+        '<div class="row-gap"><input class="st-in" data-kf="cat" value="'+escT(x.cat||'')+'" placeholder="'+T('menu.cat','Categorie')+'" style="flex:2;"><input class="st-in" data-kf="price" type="number" inputmode="decimal" value="'+x.price+'" placeholder="\u20ac" style="flex:1;"></div>'+
+        '<input class="st-in" data-kf="desc" value="'+escT(x.desc||'')+'" placeholder="'+T('kt.m.desc','Omschrijving (voor gast en keuken)')+'">'+
+        (stn==='keuken'
+          ? '<div class="row-gap"><select class="st-in" data-kf="sectie" style="flex:2;">'+Object.keys(KANTEN).map(k=>'<option value="'+k+'"'+((x.sectie||'warm')===k?' selected':'')+'>'+T('ks.'+k, KANTEN[k])+'</option>').join('')+'</select>'+
+            '<input class="st-in" data-kf="prepMin" type="number" inputmode="numeric" value="'+(x.prepMin||'')+'" placeholder="'+T('kt.m.vuur','vuurplan-min')+'" style="flex:1;" title="'+T('kt.m.vuur.t','Bereidingstijd in minuten voor het vuurplan; leeg = de standaardtijd van de kant')+'"></div>'
+          : '')+
+        '<input class="st-in" data-kf="allergens" value="'+escT((x.allergens||[]).join(', '))+'" placeholder="'+T('kt.m.alg','Allergenen, met komma ertussen')+'">'+
+        '<div class="row-gap"><button class="bigbtn" data-ksave="'+x.id+'" style="flex:1;">'+T('kt.m.save','Opslaan')+'</button>'+
+        '<button class="obtn" data-kedit="'+x.id+'">'+T('kt.m.klaar','Klaar')+'</button></div></div>';
       html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(stn==='bar'?'\uD83C\uDF78 Bar':'\uD83D\uDD25 '+T('kt.keuken','Keuken'))+' \u00b7 '+items.length+' '+T('kt.items','items op de kaart')+'</h3>'+
-        (items.length ? items.map(x=>'<div class="st-row"><span>'+x.name+'<span class="sub">'+x.cat+' \u00b7 '+eur(x.price)+'</span></span>'+
-          '<span class="acts"><button class="obtn" data-kst="'+x.id+'">\u21c4 '+(stn==='bar'?T('kt.tokeuken','naar keuken'):T('kt.tobar','naar bar'))+'</button><button class="obtn warn" data-kmdel="'+x.id+'">\u2715</button></span></div>').join('')
+        (items.length ? items.map(x=>'<div class="st-row"><span>'+x.name+(x.uitverkocht?' <b style="color:#FF8589;">86</b>':'')+
+          '<span class="sub">'+x.cat+' \u00b7 '+eur(x.price)+(stn==='keuken'?' \u00b7 '+T('ks.'+(x.sectie||'warm'), KANTEN[x.sectie||'warm'])+(x.prepMin?' \u00b7 \uD83D\uDD25 '+x.prepMin+' min':''):'')+'</span></span>'+
+          '<span class="acts"><button class="obtn'+(kantoorEdit===x.id?' primary':'')+'" data-kedit="'+x.id+'">\u270E</button><button class="obtn" data-kst="'+x.id+'">\u21c4 '+(stn==='bar'?T('kt.tokeuken','naar keuken'):T('kt.tobar','naar bar'))+'</button><button class="obtn warn" data-kmdel="'+x.id+'">\u2715</button></span></div>'+
+          (kantoorEdit===x.id ? bewerker(x) : '')).join('')
         : '<div class="tkc-who">'+T('kt.noitems','Nog niets op de kaart voor deze werkplek.')+'</div>')+
         '<div class="st-form"><input class="st-in" id="ktMn" placeholder="'+T('menu.name','Naam')+'"><div class="row-gap"><input class="st-in" id="ktMc" placeholder="'+T('menu.cat','Categorie')+'" style="flex:2;"><input class="st-in" id="ktMp" type="number" inputmode="decimal" placeholder="\u20ac" style="flex:1;"></div>'+
         '<button class="bigbtn" id="ktMAdd" style="margin-top:0.2rem;">'+T('kt.addcard','Zet op de kaart bij ')+(stn==='bar'?'de bar':T('kt.dekitchen','de keuken'))+'</button></div></div>';
@@ -1720,6 +1736,29 @@
     el.querySelectorAll('[data-kst]').forEach(b => b.addEventListener('click', async () => {
       const menu = (state.menu||[]).map(x => x.id === b.dataset.kst ? { ...x, station: x.station === 'bar' ? 'keuken' : 'bar' } : x);
       try { await API.call('/supplier/menu', { menu }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // de kaart-bewerker openen/sluiten en opslaan (alles per gerecht, ook het vuurplan)
+    el.querySelectorAll('[data-kedit]').forEach(b => b.addEventListener('click', () => {
+      kantoorEdit = kantoorEdit === b.dataset.kedit ? null : b.dataset.kedit;
+      renderStation();
+    }));
+    el.querySelectorAll('[data-ksave]').forEach(b => b.addEventListener('click', async () => {
+      const form = el.querySelector('[data-kedit-form="'+b.dataset.ksave+'"]'); if (!form) return;
+      const v = k => { const inp = form.querySelector('[data-kf="'+k+'"]'); return inp ? inp.value : null; };
+      const menu = (state.menu||[]).map(x => {
+        if (x.id !== b.dataset.ksave) return x;
+        const naam = (v('name')||'').trim();
+        return { ...x,
+          name: naam || x.name,
+          cat: (v('cat')||'').trim() || x.cat,
+          price: Number(v('price')) > 0 ? Number(v('price')) : x.price,
+          desc: (v('desc')||'').trim(),
+          sectie: v('sectie') != null ? v('sectie') : x.sectie,
+          prepMin: v('prepMin') != null ? (parseInt(v('prepMin'), 10) || 0) : x.prepMin,
+          allergens: v('allergens') != null ? v('allergens').split(',').map(a=>a.trim()).filter(Boolean) : x.allergens
+        };
+      });
+      try { await API.call('/supplier/menu', { menu }); kantoorEdit = null; toast(T('kt.m.saved','Kaart bijgewerkt; het vuurplan rekent er direct mee.')); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kmdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/menu', { menu: (state.menu||[]).filter(x=>x.id!==b.dataset.kmdel) }); await refresh(); } catch(e){ toast(e.message); }

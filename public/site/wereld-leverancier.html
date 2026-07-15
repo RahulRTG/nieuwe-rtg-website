@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>De reis van de leverancier, Rahul Travel Group</title>
+<meta name="description" content="Van Business Pass tot eigen backoffice: zo rust RTG een zaak volledig uit, met kassa, personeel, AI en 0% commissie.">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
+<style>
+  :root{
+    --white:#0C0C0B; --panel:#151312; --panel2:#1B1817; --black:#F4F1EC;
+    --burgundy:#C23A5E; --burgundy-bright:#D14E6E; --burgundy-on-dark:#C23A5E;
+    --gold:#A98F1C; --line:rgba(255,255,255,0.09);
+    --grey:rgba(244,241,236,0.72); --grey-soft:rgba(244,241,236,0.50);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-0.01em;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
+  section{position:relative;padding:clamp(4rem,7vw,6rem) 0;overflow:hidden;}
+  .on-black{background:var(--contra,#080807);color:#F4F1EC;}
+  .folio{font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--grey-soft);display:flex;align-items:center;gap:0.75rem;margin-bottom:2.5rem;}
+  .folio::after{content:"";flex:1;height:1px;background:var(--line);}
+  .on-black .folio{color:rgba(255,255,255,0.45);}
+  .on-black .folio::after{background:rgba(255,255,255,0.14);}
+  .kicker{font-size:0.8rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--burgundy);font-weight:600;margin-bottom:1.25rem;display:block;}
+  .on-black .kicker{color:var(--burgundy-on-dark);}
+  .btn{display:inline-block;padding:0.85rem 1.7rem;background:var(--black);color:var(--white);font-size:0.9rem;letter-spacing:0.01em;font-weight:600;border:1px solid var(--black);border-radius:999px;transition:all 0.25s ease;}
+  .btn:hover{background:var(--knop-hover,#fff);border-color:var(--knop-hover,#fff);}
+  .btn-ghost{background:transparent;color:var(--black);border-color:rgba(255,255,255,0.25);}
+  .btn-ghost:hover{background:var(--black);color:var(--white);border-color:var(--black);}
+  .btn-anker{background:var(--anker,#7F1634);color:#F4F1EC;border-color:var(--anker,#7F1634);}
+  .btn-anker:hover{background:var(--anker-hover,#9E1C40);color:#F4F1EC;border-color:var(--anker-hover,#9E1C40);}
+  .on-black .btn{background:#F4F1EC;color:#0C0C0B;border-color:#F4F1EC;}
+  .on-black .btn:hover{background:#fff;color:#0C0C0B;border-color:#fff;}
+  .on-black .btn-ghost{background:transparent;color:#F4F1EC;border-color:rgba(255,255,255,0.3);}
+  .on-black .btn-ghost:hover{background:#F4F1EC;color:#0C0C0B;border-color:#F4F1EC;}
+  header{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 0;background:var(--kap,rgba(12,12,11,0.86));backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;}
+  .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
+  .brandmark .bm-block{background:var(--anker,#7F1634);color:#F4F1EC;font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;letter-spacing:0.05em;padding:0.5rem 1.05rem;line-height:1;}
+  .brandmark .bm-tagline{margin-top:0.45rem;font-size:0.58rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--gold);padding-left:0.15rem;}
+  nav ul{list-style:none;display:flex;gap:2rem;}
+  nav a{font-size:0.85rem;color:var(--grey);transition:color 0.2s;}
+  nav a:hover{color:var(--burgundy);}
+  .hero{padding-top:clamp(7.5rem,11vw,9.5rem);padding-bottom:clamp(3.5rem,6vw,5rem);}
+  .hero-inner{max-width:820px;}
+  .hero h1{font-size:clamp(2.2rem,4.4vw,3.4rem);line-height:1.05;}
+  .hero h1 em{color:var(--burgundy);font-style:italic;}
+  .hero .deck{margin-top:1.75rem;font-size:clamp(1rem,1.5vw,1.2rem);color:var(--grey);max-width:56ch;}
+  .stappen{display:flex;flex-direction:column;gap:0.9rem;margin-top:3rem;}
+  .stap{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:2rem 2.1rem;display:grid;grid-template-columns:5rem 1fr;gap:1.5rem;align-items:start;}
+  .stap .n{font-family:'Bodoni Moda',serif;font-style:italic;font-size:2rem;color:var(--burgundy);line-height:1;}
+  .stap h3{font-size:1.25rem;margin-bottom:0.5rem;}
+  .stap p{color:var(--grey);font-size:0.95rem;max-width:64ch;}
+  .stap .detail{margin-top:0.8rem;font-size:0.82rem;color:var(--grey-soft);font-style:italic;}
+  @media (max-width:640px){.stap{grid-template-columns:1fr;gap:0.6rem;}}
+  .tussen h2{font-size:clamp(1.8rem,3vw,2.4rem);line-height:1.15;max-width:24ch;}
+  .tussen p{margin-top:1.25rem;color:rgba(244,241,236,0.65);max-width:56ch;}
+  .acties{margin-top:2.5rem;display:flex;gap:0.9rem;flex-wrap:wrap;}
+  .cta{text-align:center;}
+  .cta h2{font-size:clamp(2rem,4vw,3rem);max-width:18ch;margin:0 auto;line-height:1.08;}
+  .cta .deck{margin-top:1.5rem;color:rgba(255,255,255,0.55);max-width:46ch;margin-left:auto;margin-right:auto;}
+  .cta .acties{justify-content:center;display:inline-flex;}
+  footer{padding:2.5rem 0;border-top:1px solid var(--line);}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;color:var(--grey-soft);flex-wrap:wrap;gap:1rem;}
+  @media (max-width:600px){nav ul{gap:1.1rem;}nav a{font-size:0.75rem;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="/index.html" class="brandmark">
+      <span class="bm-block">Rahul Travel Group</span>
+      <span class="bm-tagline" data-i18n="brand.tag">De reis van de leverancier</span>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="/index.html" data-i18n="nav.home">Home</a></li>
+        <li><a href="/site/wereld-klant.html" data-i18n="nav.klant">Klanten</a></li>
+        <li><a href="/site/systemen.html" data-i18n="nav.tech">Techniek</a></li>
+        <li><a href="/site/partner-worden.html" data-i18n="nav.partner">Partner worden</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-inner">
+    <span class="kicker" data-i18n="hero.kicker">Hoofdstuk voor de leverancier</span>
+    <h1 data-i18n-html="hero.title">Uw zaak draait op ons systeem, en het blijft <em>uw</em> zaak.</h1>
+    <p class="deck" data-i18n="hero.deck">Zes stappen van sleutel tot cijfers. Elke sector krijgt dezelfde gereedschapskist in dezelfde huisstijl: wie één RTG-app kent, kent ze allemaal.</p>
+  </div>
+</section>
+
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="folio" data-i18n="reis.folio">N° 01, De reis</div>
+
+    <div class="stappen">
+      <div class="stap">
+        <span class="n">01</span>
+        <div>
+          <h3 data-i18n="s1.h">De sleutel</h3>
+          <p data-i18n="s1.p">De toegang tot het leveranciersplatform begint bij een Business Pass: pas als minstens één persoon in uw bedrijf er een heeft, geeft RTG een bedrijfscode uit. Zo weten alle partijen in onze wereld met wie ze zakendoen.</p>
+        </div>
+      </div>
+      <div class="stap">
+        <span class="n">02</span>
+        <div>
+          <h3 data-i18n="s2.h">Uw eigen app</h3>
+          <p data-i18n="s2.p">Restaurant, hotel, taxi, privéjet, beachclub, juwelier, boerderij, galerie: elke sector heeft een eigen app met eigen gereedschap, en toch voelt alles hetzelfde. Uw team hoeft maar één taal te leren.</p>
+        </div>
+      </div>
+      <div class="stap">
+        <span class="n">03</span>
+        <div>
+          <h3 data-i18n="s3.h">De werkvloer</h3>
+          <p data-i18n="s3.p">Een volledige kassa op maat van uw sector, met Z-rapport, ophaalcodes en kamerrekeningen. In de keuken hangen de schermen van koud, warm, snack, dessert, chef en pas; de bar en de bediening hebben hun eigen post. Een bestelling verschijnt live, zonder verversen.</p>
+        </div>
+      </div>
+      <div class="stap">
+        <span class="n">04</span>
+        <div>
+          <h3 data-i18n="s4.h">Uw mensen</h3>
+          <p data-i18n="s4.p">Eén personeels-app voor alle functies: rooster, klok, taken, teamchat en walkie-talkie. Van sollicitatie tot digitaal getekend contract, met een eigen PIN per medewerker, EHBO-kennis en een vertrouwenspersoon binnen handbereik.</p>
+        </div>
+      </div>
+      <div class="stap">
+        <span class="n">05</span>
+        <div>
+          <h3 data-i18n="s5.h">Slim gereedschap</h3>
+          <p data-i18n="s5.p">Een AI-assistent die meewerkt: inkoop voorstellen, roosters vullen, reviews beantwoorden. Borden voor projecten waar collega's samen aan werken, voorraad die zelf meldt dat hij laag staat, een belastingtool per land en meerdere groothandels naast elkaar.</p>
+        </div>
+      </div>
+      <div class="stap">
+        <span class="n">06</span>
+        <div>
+          <h3 data-i18n="s6.h">Uw cijfers</h3>
+          <p data-i18n="s6.p">Een eigen backoffice met dagcijfers, weektrend en toppers, een actiecentrum dat vertelt wat vandaag aandacht vraagt, en facturen die automatisch en tweezijdig worden geboekt. U bent de baas; het systeem doet het schrijfwerk.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tussen on-black">
+  <div class="wrap">
+    <div class="folio" data-i18n="tussen.folio">N° 02, Het model</div>
+    <span class="kicker" data-i18n="tussen.kicker">Nul procent commissie</span>
+    <h2 data-i18n="tussen.title">U rekent leden nooit meer dan uw eigen prijs.</h2>
+    <p data-i18n="tussen.p">RTG rekent geen commissie over uw omzet. De commissie die u elders zou afdragen, geeft u hier aan uw gasten: dat is de ledenprijsgarantie. Leden bestellen en betalen in de app, rechtstreeks aan u, en u ziet alles live binnenkomen.</p>
+    <div class="acties">
+      <a href="/site/partner-worden.html" class="btn" data-i18n="tussen.cta">Partner worden</a>
+      <a href="/site/business-pass.html" class="btn btn-ghost" data-i18n="tussen.pass">Over de Business Pass</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta on-black" style="padding-top:0;">
+  <div class="wrap">
+    <span class="kicker" data-i18n="cta.kicker">Zelf draaien</span>
+    <h2 data-i18n="cta.title">Open de zaak van uw dromen in de demo.</h2>
+    <p class="deck" data-i18n="cta.deck">Alle sector-apps staan aan, met kassa, keukenschermen en personeel. Kijk rond alsof het al van u is.</p>
+    <div class="acties">
+      <a href="/apps/leverancier.html" class="btn" data-i18n="cta.app">Open de leverancier-app</a>
+      <a href="/apps/" class="btn btn-ghost" data-i18n="cta.alle">Alle apps</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Rahul Travel Group</span>
+    <span><a href="/index.html" data-i18n="nav.home">Home</a> · <a href="/site/wereld-klant.html" data-i18n="nav.klant">Klanten</a> · <a href="/site/systemen.html" data-i18n="nav.tech">Techniek</a> · <a href="/site/partnervoorwaarden.html" data-i18n="footer.pv">Partnervoorwaarden</a></span>
+  </div>
+</footer>
+
+<script>
+window.I18N = { en: {
+  'brand.tag':'The supplier journey', 'nav.home':'Home', 'nav.klant':'Customers', 'nav.tech':'Technology', 'nav.partner':'Become a partner',
+  'hero.kicker':'The supplier chapter',
+  'hero.title':'Your business runs on our system, and it remains <em>your</em> business.',
+  'hero.deck':'Six steps from key to figures. Every sector gets the same toolbox in the same house style: know one RTG app and you know them all.',
+  'reis.folio':'N° 01, The journey',
+  's1.h':'The key', 's1.p':'Access to the supplier platform starts with a Business Pass: only when at least one person in your company holds one does RTG issue a company code. That way everyone in our world knows who they are dealing with.',
+  's2.h':'Your own app', 's2.p':'Restaurant, hotel, taxi, private jet, beach club, jeweller, farm, gallery: every sector has its own app with its own tools, and yet everything feels the same. Your team only has to learn one language.',
+  's3.h':'The shop floor', 's3.p':'A complete till tailored to your sector, with Z-report, pickup codes and room bills. In the kitchen hang the screens for cold, hot, snack, dessert, chef and pass; the bar and the service have their own stations. An order appears live, without refreshing.',
+  's4.h':'Your people', 's4.p':'One staff app for every role: rota, clock, tasks, team chat and walkie-talkie. From application to digitally signed contract, with a personal PIN per employee, first-aid knowledge and a confidant within reach.',
+  's5.h':'Smart tools', 's5.p':'An AI assistant that works along: proposing purchases, filling rotas, replying to reviews. Boards for projects colleagues work on together, stock that reports itself when low, a tax tool per country and multiple wholesalers side by side.',
+  's6.h':'Your figures', 's6.p':'Your own back office with daily figures, weekly trend and top sellers, an action centre that tells you what needs attention today, and invoices booked automatically on both sides. You are the boss; the system does the paperwork.',
+  'tussen.folio':'N° 02, The model', 'tussen.kicker':'Zero percent commission',
+  'tussen.title':'You never charge members more than your own price.',
+  'tussen.p':'RTG takes no commission on your turnover. The commission you would pay elsewhere, you give to your guests here: that is the member price guarantee. Members order and pay in the app, directly to you, and you watch everything come in live.',
+  'tussen.cta':'Become a partner', 'tussen.pass':'About the Business Pass',
+  'cta.kicker':'Run it yourself', 'cta.title':'Open the business of your dreams in the demo.',
+  'cta.deck':'All sector apps are on, with till, kitchen screens and staff. Look around as if it were already yours.',
+  'cta.app':'Open the supplier app', 'cta.alle':'All apps'
+} };
+</script>
+<script src="/shared/i18n.js"></script>
+<script src="/shared/seizoen.js" defer></script>
+</body>
+</html>

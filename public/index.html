@@ -2,10 +2,10 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="Rahul Travel Group. Toegang tot wat gesloten is: reizen tegen inkoopprijs, zonder tussenlagen.">
+<meta name="description" content="Stap in de wereld van RTG: een ecosysteem van apps voor klanten, leveranciers en de RTFoundation. Systemen, techniek en een goed doel, als een geheel.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
-<title>Rahul Travel Group, Toegang tot wat gesloten is</title>
+<title>Rahul Travel Group, Stap in onze wereld</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/seizoen.css" rel="stylesheet">
 <style>
@@ -51,7 +51,7 @@
     padding:0 clamp(1.5rem, 4vw, 3rem);
   }
 
-  /* ---------- shared section chrome ---------- */
+  /* ---------- gedeeld sectie-chroom ---------- */
 
   section{
     position:relative;
@@ -181,7 +181,7 @@
     margin-top:2rem;
     font-size:clamp(1.05rem, 1.6vw, 1.25rem);
     color:var(--grey);
-    max-width:540px;
+    max-width:600px;
     margin-left:auto;
     margin-right:auto;
   }
@@ -230,8 +230,12 @@
     color:#F4F1EC;
     border-color:var(--anker-hover,#9E1C40);
   }
+  .on-black .btn{background:#F4F1EC;color:#0C0C0B;border-color:#F4F1EC;}
+  .on-black .btn:hover{background:#fff;color:#0C0C0B;border-color:#fff;}
+  .on-black .btn-ghost{background:transparent;color:#F4F1EC;border-color:rgba(255,255,255,0.3);}
+  .on-black .btn-ghost:hover{background:#F4F1EC;color:#0C0C0B;border-color:#F4F1EC;}
 
-  /* ---------- manifesto ---------- */
+  /* ---------- manifest ---------- */
 
   .manifesto .wrap{
     max-width:760px;
@@ -261,219 +265,103 @@
     text-transform:uppercase;
   }
 
-  /* ---------- intel ---------- */
+  /* ---------- hoofdstukken ---------- */
 
-  .intel-grid{
-    display:grid;
-    grid-template-columns:1.1fr 1fr;
-    gap:5rem;
-    align-items:start;
-  }
-  .intel h2{
+  .hoofdstuk h2{
     font-size:clamp(1.8rem, 3vw, 2.4rem);
-    line-height:1.1;
-    max-width:12ch;
+    line-height:1.12;
+    max-width:22ch;
   }
-  .intel-copy{
-    margin-top:1.75rem;
-    color:var(--grey);
-    max-width:46ch;
-  }
-  .intel-list{
-    list-style:none;
-    display:flex;
-    flex-direction:column;
-    gap:2.25rem;
-  }
-  .intel-list li{
-    padding-left:2rem;
-    position:relative;
-    border-top:1px solid var(--line);
-    padding-top:1.5rem;
-  }
-  .intel-list li:first-child{border-top:none;padding-top:0;}
-  .intel-list .n{
-    position:absolute;
-    left:0;
-    top:1.5rem;
-    font-family:'Bodoni Moda',serif;
-    font-style:italic;
-    color:var(--burgundy);
-    font-size:1.1rem;
-  }
-  .intel-list li:first-child .n{top:0;}
-  .intel-list h3{
-    font-size:1.1rem;
-    font-weight:500;
-    margin-bottom:0.5rem;
-  }
-  .intel-list p{
-    color:var(--grey);
-    font-size:0.95rem;
-  }
-
-  @media (max-width:860px){
-    .intel-grid{grid-template-columns:1fr;gap:3rem;}
-  }
-
-  /* ---------- passes ---------- */
-
-  .passes-grid{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:0.9rem;
-    margin-top:4rem;
-    }
-  .pass-card{
-    background:var(--contra-paneel,#141312);
-    padding:3rem 2.25rem;
-    display:flex;
-    flex-direction:column;
-    min-height:260px;
-    transition:background 0.3s ease;
-    border:1px solid var(--line);
-    border-radius:18px;
-    border-color:rgba(255,255,255,0.10);
-  }
-  .pass-card:hover{background:var(--contra-paneel,#141312);border-color:#C9A94E;}
-  .pass-tag{
-    font-size:0.75rem;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--burgundy-on-dark);
-    margin-bottom:1.5rem;
-  }
-  .pass-card h3{
-    font-size:1.7rem;
-    margin-bottom:1rem;
-  }
-  .pass-card p{
-    color:rgba(255,255,255,0.62);
-    font-size:0.95rem;
-    flex:1;
-  }
-  .pass-card .tone{
-    font-size:0.8rem;
-    color:rgba(255,255,255,0.4);
-    margin-top:2rem;
-    font-style:italic;
-  }
-  .pass-card .price{
-    display:block;
-    margin-top:1rem;
-    font-size:0.8rem;
-    color:#C9A94E;
-    letter-spacing:0.04em;
-  }
-  .pass-card .go{
-    margin-top:1.75rem;
-    font-size:0.85rem;
-    letter-spacing:0.04em;
-    color:#F4F1EC;
-    display:inline-flex;
-    align-items:center;
-    gap:0.5rem;
-  }
-  .pass-card .go .arrow{
-    transition:transform 0.25s ease;
-  }
-  .pass-card:hover .go .arrow{transform:translateX(4px);}
-
-  @media (max-width:860px){
-    .passes-grid{grid-template-columns:1fr;}
-  }
-
-  /* ---------- uit de salon ---------- */
-
-  .salon-strip{background:var(--contra,#100F0E);}
-  .salon-strip h2{
-    font-size:clamp(1.8rem, 3vw, 2.4rem);
-    line-height:1.1;
-    max-width:18ch;
-  }
-  .salon-copy{
+  .hoofdstuk .intro{
     margin-top:1.5rem;
     color:var(--grey);
-    max-width:52ch;
+    max-width:56ch;
   }
-  .salon-cards{
+  .on-black .intro{color:rgba(244,241,236,0.65);}
+  .hoofdstuk .acties{
+    margin-top:2.5rem;
+    display:flex;
+    gap:0.9rem;
+    flex-wrap:wrap;
+  }
+
+  /* lichte kaarten (op de grond van de pagina) */
+  .kaarten{
     display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:1.5rem;
+    grid-template-columns:repeat(4,1fr);
+    gap:0.9rem;
     margin-top:3rem;
   }
-  .salon-card{
-    background:var(--contra-paneel,#141312);
+  .kaart{
+    background:var(--panel);
     border:1px solid var(--line);
-    display:flex;
-    flex-direction:column;
     border-radius:18px;
-    overflow:hidden;
+    padding:1.75rem 1.6rem;
+  }
+  .kaart .ic{font-size:1.6rem;display:block;margin-bottom:0.9rem;}
+  .kaart h3{font-size:1.08rem;margin-bottom:0.5rem;}
+  .kaart p{font-size:0.88rem;color:var(--grey);}
+  @media (max-width:1000px){.kaarten{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.kaarten{grid-template-columns:1fr;}}
+
+  /* donkere kaarten (op de zwarte contrastblokken) */
+  .kaarten .kaart.donker{
+    background:var(--contra-paneel,#141312);
     border-color:rgba(255,255,255,0.10);
   }
-  .salon-visual{
-    aspect-ratio:4/3;
-    display:flex;
-    align-items:flex-end;
-    padding:1.25rem;
-    color:#fff;
+  .kaart.donker h3{color:#F4F1EC;}
+  .kaart.donker p{color:rgba(244,241,236,0.66);}
+
+  /* stat-rij (techniek) */
+  .statrij{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:0.9rem;
+    margin-top:3rem;
   }
-  .salon-visual .place{
+  .stat-blokje{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:1.9rem 1.5rem;
+    text-align:center;
+  }
+  .stat-blokje .n{
     font-family:'Bodoni Moda',serif;
-    font-style:italic;
-    font-size:1.6rem;
-    text-shadow:0 2px 18px rgba(0,0,0,0.35);
+    font-size:clamp(1.9rem, 3vw, 2.6rem);
+    line-height:1;
+    color:var(--burgundy);
+    display:block;
   }
-  .v-ibiza{background:linear-gradient(160deg,#0B2A3A 0%,#1E7A8C 55%,#F2A65A 100%);}
-  .v-gstaad{background:linear-gradient(160deg,#1A2230 0%,#3E5A7A 55%,#C9D6E4 100%);}
-  .v-monaco{background:linear-gradient(160deg,#0A1024 0%,#1B2A6B 55%,#C9A24B 100%);}
-  .salon-card .body{padding:1.25rem 1.4rem 1.5rem;flex:1;display:flex;flex-direction:column;}
-  .salon-card .body p{font-size:0.9rem;color:rgba(244,241,236,0.72);flex:1;}
-  .salon-card .by{
-    margin-top:1rem;
-    font-size:0.7rem;
-    letter-spacing:0.12em;
+  .stat-blokje .l{
+    margin-top:0.75rem;
+    font-size:0.72rem;
+    letter-spacing:0.1em;
     text-transform:uppercase;
-    color:rgba(244,241,236,0.50);
-  }
-  .salon-note{
-    margin-top:2rem;
-    font-size:0.8rem;
     color:var(--grey-soft);
-    font-style:italic;
-    max-width:64ch;
+    display:block;
   }
-  @media (max-width:860px){
-    .salon-cards{grid-template-columns:1fr;}
-  }
+  @media (max-width:1000px){.statrij{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.statrij{grid-template-columns:1fr;}}
 
-  /* ---------- foundation ---------- */
-
+  /* foundation */
   .foundation-inner{
     display:grid;
     grid-template-columns:0.9fr 1.1fr;
     gap:5rem;
     align-items:center;
   }
-  .foundation h2{
-    font-size:clamp(1.8rem, 3vw, 2.4rem);
-    line-height:1.12;
-  }
-  .foundation-copy{
-    margin-top:1.5rem;
-    color:var(--grey);
-    max-width:46ch;
-  }
   .stat-block{
     text-align:center;
     padding:3rem 1.5rem;
-    border:1px solid var(--line);
+    border:1px solid rgba(255,255,255,0.14);
     border-radius:18px;
+    background:var(--contra-paneel,#141312);
   }
   .stat-number{
     font-family:'Bodoni Moda',serif;
     font-size:clamp(3rem, 5.5vw, 4.2rem);
-    color:var(--burgundy);
+    color:var(--burgundy-on-dark);
     line-height:1;
   }
   .stat-label{
@@ -481,12 +369,53 @@
     font-size:0.8rem;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    color:var(--grey-soft);
+    color:rgba(244,241,236,0.5);
   }
-
   @media (max-width:860px){
     .foundation-inner{grid-template-columns:1fr;gap:3rem;}
   }
+
+  /* passen (compact) */
+  .pas-rij{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:0.9rem;
+    margin-top:3rem;
+  }
+  .pas-kaart{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:1.9rem 1.7rem;
+    display:flex;
+    flex-direction:column;
+    transition:border-color 0.2s ease, transform 0.2s ease;
+  }
+  .pas-kaart:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .pas-kaart .tag{
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--burgundy);
+    margin-bottom:1rem;
+  }
+  .pas-kaart h3{font-size:1.35rem;margin-bottom:0.5rem;}
+  .pas-kaart .prijs{
+    font-size:0.8rem;
+    color:var(--grey-soft);
+    flex:1;
+  }
+  .pas-kaart .go{
+    margin-top:1.5rem;
+    font-size:0.85rem;
+    color:var(--black);
+    display:inline-flex;
+    align-items:center;
+    gap:0.5rem;
+  }
+  .pas-kaart .go .arrow{transition:transform 0.25s ease;}
+  .pas-kaart:hover .go .arrow{transform:translateX(4px);}
+  @media (max-width:860px){.pas-rij{grid-template-columns:1fr;}}
 
   /* ---------- cta ---------- */
 
@@ -502,7 +431,7 @@
   .cta .deck{
     margin-top:1.5rem;
     color:rgba(255,255,255,0.55);
-    max-width:44ch;
+    max-width:46ch;
     margin-left:auto;
     margin-right:auto;
   }
@@ -510,6 +439,8 @@
     margin-top:2.75rem;
     display:inline-flex;
     gap:1rem;
+    flex-wrap:wrap;
+    justify-content:center;
   }
 
   /* ---------- footer ---------- */
@@ -546,11 +477,11 @@
     </a>
     <nav>
       <ul>
-        <li><a href="#passen" data-i18n="nav.passes">Passen</a></li>
+        <li><a href="#klant" data-i18n="nav.klant">Voor klanten</a></li>
+        <li><a href="#leverancier" data-i18n="nav.leverancier">Voor leveranciers</a></li>
+        <li><a href="/site/systemen.html" data-i18n="nav.techniek">Techniek</a></li>
         <li><a href="#foundation" data-i18n="nav.foundation">Foundation</a></li>
-        <li><a href="#over" data-i18n="nav.about">Over RTG</a></li>
-        <li><a href="/apps/" data-i18n="nav.demo">Demo</a></li>
-        <li><a href="/site/download.html" data-i18n="nav.app">App</a></li>
+        <li><a href="#passen" data-i18n="nav.passes">Passen</a></li>
         <li class="nav-cta"><a href="/apps/" class="nav-login" data-i18n="nav.opendemo">Open de demo</a></li>
       </ul>
     </nav>
@@ -559,132 +490,191 @@
 
 <section class="hero on-white">
   <div class="wrap hero-inner">
-    <span class="kicker" data-i18n="hero.kicker">Membership</span>
-    <h1 data-i18n-html="hero.title">Toegang tot wat <span class="accent">gesloten</span> is.</h1>
-    <p class="deck" data-i18n="hero.deck">Loop door het hele platform als demo. Alle apps, alle functies. Alleen echt betalen en bestellen zijn uit.</p>
+    <span class="kicker" data-i18n="hero.kicker">Welkom in onze wereld</span>
+    <h1 data-i18n-html="hero.title">Stap in de wereld <span class="accent">achter</span> de pas.</h1>
+    <p class="deck" data-i18n="hero.deck">RTG is geen website met aanbiedingen, maar een ecosysteem van meer dan veertig apps die als één systeem samenwerken: voor de klant die reist, de leverancier die ontvangt en de foundation die meespaart. Loop mee, de deur staat open.</p>
     <div class="hero-cta">
-      <a href="/apps/" class="btn btn-login" data-i18n="hero.opendemo">Open de demo</a>
-      <a href="#passen" class="btn" data-i18n="hero.passes">Bekijk de passen</a>
-      <a href="#over" class="btn btn-ghost" data-i18n="hero.about">Wat is RTG</a>
+      <a href="/site/wereld-klant.html" class="btn btn-login" data-i18n="hero.klant">De reis van de klant</a>
+      <a href="/site/wereld-leverancier.html" class="btn" data-i18n="hero.leverancier">De reis van de leverancier</a>
+      <a href="/apps/" class="btn btn-ghost" data-i18n="hero.demo">Open de demo</a>
     </div>
   </div>
 </section>
 
 <section class="manifesto on-black" id="over">
   <div class="wrap">
-    <div class="folio" data-i18n="manifest.folio">N° 01, Manifest</div>
+    <div class="folio" data-i18n="manifest.folio">N° 01, Het idee</div>
     <div class="flow">
-      <p class="lede" data-i18n-html="manifest.lede"><span class="dropcap">G</span>een korting. Inkoopprijs.</p>
+      <p class="lede" data-i18n-html="manifest.lede"><span class="dropcap">W</span>ij bouwden geen app. Wij bouwden een wereld: één systeem waarin klant, zaak en goed doel dezelfde taal spreken.</p>
     </div>
+    <div class="signature" data-i18n="manifest.sign">Van eerste gesprek tot laatste zonsondergang</div>
   </div>
 </section>
 
-<section class="intel on-white">
-  <div class="wrap intel-grid">
-    <div>
-      <span class="kicker" data-i18n="intel.kicker">Hoe het werkt</span>
-      <h2 data-i18n="intel.title">Eén inkoopmodel, drie passen.</h2>
-    </div>
-    <ul class="intel-list">
-      <li>
-        <span class="n">01</span>
-        <h3 data-i18n="intel.1.h">Inkoopprijs als basis</h3>
-      </li>
-      <li>
-        <span class="n">02</span>
-        <h3 data-i18n="intel.2.h">Eén vaste bijdrage</h3>
-      </li>
-      <li>
-        <span class="n">03</span>
-        <h3 data-i18n="intel.3.h">30% naar de RTFoundation</h3>
-      </li>
-    </ul>
-  </div>
-</section>
-
-<section class="passes on-black" id="passen">
+<section class="hoofdstuk on-white" id="klant">
   <div class="wrap">
-    <div class="folio" data-i18n="passes.folio">N° 02, De drie passen</div>
-    <h2 style="font-size:clamp(1.8rem, 3vw, 2.4rem); max-width:20ch;" data-i18n="passes.title">Drie passen.</h2>
+    <div class="folio" data-i18n="klant.folio">N° 02, De klant</div>
+    <span class="kicker" data-i18n="klant.kicker">Reizen zonder wrijving</span>
+    <h2 data-i18n="klant.title">U reist onder een codenaam.</h2>
+    <p class="intro" data-i18n="klant.intro">Vanaf het eerste gesprek met de Butler tot de sleutel van de villa: alles gebeurt in één app. Geen formulieren, geen tussenpersonen, geen verrassingen op de rekening.</p>
 
-    <div class="passes-grid">
-      <div class="pass-card">
-        <span class="pass-tag" data-i18n="pass.rtg.tag">Instap</span>
+    <div class="kaarten">
+      <div class="kaart">
+        <span class="ic" aria-hidden="true">🎭</span>
+        <h3 data-i18n="klant.k1.h">Codenaam &amp; privacy</h3>
+        <p data-i18n="klant.k1.p">U reist als "Amberen Vos". Partners zien wat nodig is om u koninklijk te ontvangen, en niets meer.</p>
+      </div>
+      <div class="kaart">
+        <span class="ic" aria-hidden="true">📲</span>
+        <h3 data-i18n="klant.k2.h">Eén app als voordeur</h3>
+        <p data-i18n="klant.k2.p">Uw pas, betalen met één tik, boeken, roomservice-chat en een persoonlijke AI die u al kent.</p>
+      </div>
+      <div class="kaart">
+        <span class="ic" aria-hidden="true">🛰️</span>
+        <h3 data-i18n="klant.k3.h">Live onderweg</h3>
+        <p data-i18n="klant.k3.p">Uw chauffeur op de kaart, deuren die opengaan met uw telefoon en codes die oplichten bij de entree.</p>
+      </div>
+      <div class="kaart">
+        <span class="ic" aria-hidden="true">🖼️</span>
+        <h3 data-i18n="klant.k4.h">De Salon</h3>
+        <p data-i18n="klant.k4.p">Het besloten netwerk van leden: delen, berichten en videobellen. Uw foto's zijn onze enige campagne.</p>
+      </div>
+    </div>
+
+    <div class="acties">
+      <a href="/site/wereld-klant.html" class="btn btn-login" data-i18n="klant.cta">De hele reis van de klant</a>
+      <a href="#passen" class="btn btn-ghost" data-i18n="klant.passen">Bekijk de passen</a>
+    </div>
+  </div>
+</section>
+
+<section class="hoofdstuk on-black" id="leverancier">
+  <div class="wrap">
+    <div class="folio" data-i18n="lev.folio">N° 03, De leverancier</div>
+    <span class="kicker" data-i18n="lev.kicker">Uw zaak, compleet uitgerust</span>
+    <h2 data-i18n="lev.title">Eén app die uw hele zaak draagt.</h2>
+    <p class="intro" data-i18n="lev.intro">Van restaurant tot privéjet, van boerderij tot galerie: elke sector krijgt een eigen app in dezelfde huisstijl. Wie één RTG-app kent, kent ze allemaal.</p>
+
+    <div class="kaarten">
+      <div class="kaart donker">
+        <span class="ic" aria-hidden="true">🧾</span>
+        <h3 data-i18n="lev.k1.h">Kassa &amp; werkvloer</h3>
+        <p data-i18n="lev.k1.p">Een kassa op maat van uw sector, keukenschermen van koud tot pas, barscherm en bedieningspost. Alles live.</p>
+      </div>
+      <div class="kaart donker">
+        <span class="ic" aria-hidden="true">👥</span>
+        <h3 data-i18n="lev.k2.h">Uw mensen</h3>
+        <p data-i18n="lev.k2.p">Eén personeels-app met rooster, klok, taken, teamchat en walkie-talkie. Van sollicitatie tot getekend contract.</p>
+      </div>
+      <div class="kaart donker">
+        <span class="ic" aria-hidden="true">🤖</span>
+        <h3 data-i18n="lev.k3.h">AI die meewerkt</h3>
+        <p data-i18n="lev.k3.p">Een assistent die niet alleen antwoordt maar ook doet: inkoop voorstellen, roosters vullen, reviews beantwoorden.</p>
+      </div>
+      <div class="kaart donker">
+        <span class="ic" aria-hidden="true">📊</span>
+        <h3 data-i18n="lev.k4.h">Eigen backoffice</h3>
+        <p data-i18n="lev.k4.p">Dagcijfers en weektrend, borden voor projecten, automatische facturen en een belastingtool per land.</p>
+      </div>
+    </div>
+
+    <div class="acties">
+      <a href="/site/wereld-leverancier.html" class="btn" data-i18n="lev.cta">De hele reis van de leverancier</a>
+      <a href="/site/partner-worden.html" class="btn btn-ghost" data-i18n="lev.partner">Partner worden</a>
+    </div>
+  </div>
+</section>
+
+<section class="hoofdstuk on-white" id="systemen">
+  <div class="wrap">
+    <div class="folio" data-i18n="tech.folio">N° 04, De techniek</div>
+    <span class="kicker" data-i18n="tech.kicker">Gebouwd als een uurwerk</span>
+    <h2 data-i18n="tech.title">Alles live, alles één systeem.</h2>
+    <p class="intro" data-i18n="tech.intro">Een bestelling verschijnt zonder verversen op het keukenscherm. Elke app werkt op elk beeldscherm, van telefoon tot vouwtoestel tot desktop. En zelfs deze site leeft: het kleurenpalet draait mee met de zon en het seizoen.</p>
+
+    <div class="statrij">
+      <div class="stat-blokje">
+        <span class="n">40+</span>
+        <span class="l" data-i18n="tech.s1">apps, één huisstijl</span>
+      </div>
+      <div class="stat-blokje">
+        <span class="n">3</span>
+        <span class="l" data-i18n="tech.s2">servers, automatische overname</span>
+      </div>
+      <div class="stat-blokje">
+        <span class="n">10 mln</span>
+        <span class="l" data-i18n="tech.s3">handelingen in één stresstest</span>
+      </div>
+      <div class="stat-blokje">
+        <span class="n">2FA</span>
+        <span class="l" data-i18n="tech.s4">beveiligd als een bank</span>
+      </div>
+    </div>
+
+    <div class="acties">
+      <a href="/site/systemen.html" class="btn btn-login" data-i18n="tech.cta">Onder de motorkap</a>
+    </div>
+  </div>
+</section>
+
+<section class="foundation on-black" id="foundation">
+  <div class="wrap">
+    <div class="folio" data-i18n="found.folio">N° 05, De foundation</div>
+    <div class="foundation-inner">
+      <div class="stat-block">
+        <div class="stat-number">30%</div>
+        <div class="stat-label" data-i18n="found.statlabel">van elk abonnement naar de RTFoundation</div>
+      </div>
+      <div>
+        <span class="kicker">RTFoundation</span>
+        <h2 style="font-size:clamp(1.8rem, 3vw, 2.4rem);line-height:1.12;" data-i18n="found.title">Een wereld die teruggeeft.</h2>
+        <p class="intro" data-i18n="found.copy">Van elk abonnement gaat automatisch dertig procent naar de RTFoundation: gratis gezinsapps voor school, leren en veilig thuis, en gezinnen die er zelf niet aan toekomen, gaan discreet mee op reis. Geen loterij, geen camera's, gewoon een vakantie.</p>
+        <div class="acties">
+          <a href="/site/rtfoundation.html" class="btn btn-ghost" data-i18n="found.cta">Lees over de Foundation</a>
+          <a href="/apps/foundation/" class="btn btn-ghost" data-i18n="found.app">Open de gratis app</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hoofdstuk on-white" id="passen">
+  <div class="wrap">
+    <div class="folio" data-i18n="pas.folio">N° 06, De toegang</div>
+    <span class="kicker" data-i18n="pas.kicker">Drie sleutels tot dezelfde wereld</span>
+    <h2 data-i18n="pas.title">Kies uw pas.</h2>
+
+    <div class="pas-rij">
+      <a class="pas-kaart" href="/site/rtg-pass.html">
+        <span class="tag" data-i18n="pas.rtg.tag">Instap</span>
         <h3>RTG Pass</h3>
-        <span class="price" style="flex:1;" data-i18n="pass.rtg.price">€ 65 p/mnd ex btw · minimaal 12 maanden</span>
-        <a href="/site/rtg-pass.html" class="go" data-i18n-html="pass.rtg.go">RTG Pass <span class="arrow">→</span></a>
-      </div>
-      <div class="pass-card">
-        <span class="pass-tag" data-i18n="pass.life.tag">Concierge</span>
+        <span class="prijs" data-i18n="pas.rtg.prijs">€ 65 p/mnd ex btw · minimaal 12 maanden</span>
+        <span class="go" data-i18n-html="pas.rtg.go">RTG Pass <span class="arrow">→</span></span>
+      </a>
+      <a class="pas-kaart" href="/site/lifestyle-pass.html">
+        <span class="tag" data-i18n="pas.life.tag">Concierge</span>
         <h3>Lifestyle Pass</h3>
-        <span class="price" style="flex:1;" data-i18n="pass.life.price">€ 20.000 p/mnd ex btw · minimaal 12 maanden</span>
-        <a href="/site/lifestyle-pass.html" class="go" data-i18n-html="pass.life.go">Lifestyle Pass <span class="arrow">→</span></a>
-      </div>
-      <div class="pass-card">
-        <span class="pass-tag" data-i18n="pass.biz.tag">Zakelijk</span>
+        <span class="prijs" data-i18n="pas.life.prijs">€ 20.000 p/mnd ex btw · minimaal 12 maanden</span>
+        <span class="go" data-i18n-html="pas.life.go">Lifestyle Pass <span class="arrow">→</span></span>
+      </a>
+      <a class="pas-kaart" href="/site/business-pass.html">
+        <span class="tag" data-i18n="pas.biz.tag">Zakelijk</span>
         <h3>Business Pass</h3>
-        <span class="price" style="flex:1;" data-i18n="pass.biz.price">Prijs op maat · dezelfde condities · minimaal 12 maanden</span>
-        <a href="/site/business-pass.html" class="go" data-i18n-html="pass.biz.go">Business Pass <span class="arrow">→</span></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="salon-strip on-black" id="salon">
-  <div class="wrap">
-    <div class="folio" data-i18n="salon.folio">N° 03, Uit De Salon</div>
-    <span class="kicker" data-i18n="salon.kicker">Door leden gedeeld</span>
-    <h2 data-i18n="salon.title">Onze leden zijn onze fotografen.</h2>
-
-    <div class="salon-cards">
-      <div class="salon-card">
-        <div class="salon-visual v-ibiza"><span class="place">Ibiza</span></div>
-        <div class="body">
-          <p data-i18n="salon.q1">"Met de hele vriendengroep neergestreken: de helft in het hotel aan zee, wij in de villa boven Cala Jondal. Samen reizen zonder gedoe."</p>
-          <div class="by">Katja Kiss · RTG Pass</div>
-        </div>
-      </div>
-      <div class="salon-card">
-        <div class="salon-visual v-gstaad"><span class="place">Gstaad</span></div>
-        <div class="body">
-          <p data-i18n="salon.q2">"Wij oude rotten trekken de bergen in terwijl de jeugd op Ibiza ligt. Chalet, open haard, morgen de piste op. Op je 69e mag dat."</p>
-          <div class="by">Fleur Johanna · Lifestyle Pass</div>
-        </div>
-      </div>
-      <div class="salon-card">
-        <div class="salon-visual v-monaco"><span class="place">Monaco</span></div>
-        <div class="body">
-          <p data-i18n="salon.q3">"Aankomen op codenaam en toch als vanouds ontvangen worden in Monaco, dat is nieuw. Eerst de jachthaven, dan het casino."</p>
-          <div class="by">Dani da Cruz Carvalho · Business Pass</div>
-        </div>
-      </div>
-    </div>
-
-    <a href="/apps/app.html" class="btn btn-ghost" style="margin-top:2.5rem;" data-i18n="salon.cta">Bekijk De Salon</a>
-  </div>
-</section>
-
-<section class="foundation on-white" id="foundation">
-  <div class="wrap foundation-inner">
-    <div class="stat-block">
-      <div class="stat-number">30%</div>
-      <div class="stat-label" data-i18n="found.statlabel">van elk abonnement naar liefdadigheid</div>
-    </div>
-    <div>
-      <span class="kicker">RTFoundation</span>
-      <h2 data-i18n="found.title">Reizen dat structureel iets teruggeeft.</h2>
-      <a href="/site/rtfoundation.html" class="btn btn-ghost" style="margin-top:2rem;" data-i18n="found.cta">Lees over de Foundation</a>
+        <span class="prijs" data-i18n="pas.biz.prijs">Prijs op maat · dezelfde condities · ook de sleutel voor leveranciers</span>
+        <span class="go" data-i18n-html="pas.biz.go">Business Pass <span class="arrow">→</span></span>
+      </a>
     </div>
   </div>
 </section>
 
 <section class="cta on-black">
   <div class="wrap">
-    <span class="kicker" data-i18n="cta.kicker">Begin</span>
-    <h2 data-i18n="cta.title">Toegang claim je zelf.</h2>
-    <div class="cta-actions" style="margin-top:2.75rem;">
+    <span class="kicker" data-i18n="cta.kicker">De deur staat open</span>
+    <h2 data-i18n="cta.title">Loop vandaag nog door onze wereld.</h2>
+    <p class="deck" data-i18n="cta.deck">De volledige demo staat aan: elke app, elke functie, elk scherm. Alleen echt betalen en bestellen zijn uit.</p>
+    <div class="cta-actions">
       <a href="/apps/" class="btn" data-i18n="cta.opendemo">Open de demo</a>
-      <a href="#passen" class="btn btn-ghost" data-i18n="cta.passes">Bekijk de passen</a>
+      <a href="/site/toegang.html" class="btn btn-ghost" data-i18n="cta.toegang">Waar wilt u naar binnen?</a>
     </div>
   </div>
 </section>
@@ -698,37 +688,53 @@
 
 <script>
 window.I18N = { en: {
-  'nav.passes':'Memberships', 'nav.foundation':'Foundation', 'nav.about':'About RTG',
-  'nav.demo':'Demo', 'nav.app':'App', 'nav.opendemo':'Open the demo',
-  'hero.kicker':'Membership',
-  'hero.title':'Access to what is <span class="accent">closed</span>.',
-  'hero.deck':'Walk through the whole platform as a demo. Every app, every function. Only real payments and orders are switched off.',
-  'hero.opendemo':'Open the demo', 'hero.passes':'View the memberships', 'hero.about':'What is RTG',
-  'manifest.folio':'N° 01, Manifesto',
-  'manifest.lede':'<span class="dropcap">N</span>o discount. Wholesale.',
-  'intel.kicker':'How it works',
-  'intel.title':'One model, three memberships.',
-  'intel.1.h':'Wholesale price as the basis',
-  'intel.2.h':'One fixed contribution',
-  'intel.3.h':'30% to the RTFoundation',
-  'passes.folio':'N° 02, The three memberships',
-  'passes.title':'Three memberships.',
-  'pass.rtg.tag':'Entry', 'pass.rtg.go':'RTG Pass <span class="arrow">→</span>',
-  'pass.life.tag':'Concierge', 'pass.life.go':'Lifestyle Pass <span class="arrow">→</span>',
-  'pass.biz.tag':'Business', 'pass.biz.go':'Business Pass <span class="arrow">→</span>',
-  'pass.rtg.price':'\u20ac 65 p/m ex VAT \u00b7 12 months minimum', 'pass.life.price':'\u20ac 20,000 p/m ex VAT \u00b7 12 months minimum', 'pass.biz.price':'Bespoke pricing \u00b7 same conditions \u00b7 12 months minimum',
-  'salon.folio':'N° 03, From The Salon', 'salon.kicker':'Shared by members',
-  'salon.title':'Our members are our photographers.',
-  'salon.copy':'Every image on this site comes from The Salon, the private network of RTG members. No campaigns, no stock photos, journeys as they were truly experienced. Those who share are rewarded with priority, discounts and complimentary services.',
-  'salon.q1':'"The whole group landed together: half of us in the seaside hotel, we in the villa above Cala Jondal. Travelling together without any hassle."',
-  'salon.q2':'"We old hands head for the mountains while the youngsters lie on Ibiza. Chalet, open fire, tomorrow the slopes. At 69 you are allowed."',
-  'salon.q3':'"Arriving on a codename and still being received as ever in Monaco, that is new. First the marina, then the casino."',
-  'salon.cta':'See The Salon',
-  'found.statlabel':'of every contribution goes to charity',
-  'found.title':'Travel that gives back, structurally.',
-  'found.cta':'Read about the Foundation',
-  'cta.kicker':'Begin', 'cta.title':'Access is yours to claim.',
-  'cta.opendemo':'Open the demo', 'cta.passes':'View the memberships',
+  'nav.klant':'For customers', 'nav.leverancier':'For suppliers', 'nav.techniek':'Technology',
+  'nav.foundation':'Foundation', 'nav.passes':'Memberships', 'nav.opendemo':'Open the demo',
+  'hero.kicker':'Welcome to our world',
+  'hero.title':'Step into the world <span class="accent">behind</span> the pass.',
+  'hero.deck':'RTG is not a website with offers but an ecosystem of more than forty apps working as one system: for the customer who travels, the supplier who welcomes and the foundation that saves along. Walk with us, the door is open.',
+  'hero.klant':'The customer journey', 'hero.leverancier':'The supplier journey', 'hero.demo':'Open the demo',
+  'manifest.folio':'N° 01, The idea',
+  'manifest.lede':'<span class="dropcap">W</span>e did not build an app. We built a world: one system in which customer, business and charity speak the same language.',
+  'manifest.sign':'From first conversation to last sunset',
+  'klant.folio':'N° 02, The customer', 'klant.kicker':'Travel without friction',
+  'klant.title':'You travel under a codename.',
+  'klant.intro':'From the first conversation with the Butler to the key of the villa: everything happens in one app. No forms, no middlemen, no surprises on the bill.',
+  'klant.k1.h':'Codename & privacy', 'klant.k1.p':'You travel as "Amber Fox". Partners see what is needed to receive you royally, and nothing more.',
+  'klant.k2.h':'One app as the front door', 'klant.k2.p':'Your pass, one-tap payments, bookings, room-service chat and a personal AI that already knows you.',
+  'klant.k3.h':'Live en route', 'klant.k3.p':'Your driver on the map, doors that open with your phone and codes that light up at the entrance.',
+  'klant.k4.h':'The Salon', 'klant.k4.p':'The private members network: sharing, messaging and video calls. Your photos are our only campaign.',
+  'klant.cta':'The full customer journey', 'klant.passen':'View the memberships',
+  'lev.folio':'N° 03, The supplier', 'lev.kicker':'Your business, fully equipped',
+  'lev.title':'One app that carries your whole business.',
+  'lev.intro':'From restaurant to private jet, from farm to gallery: every sector gets its own app in the same house style. Know one RTG app and you know them all.',
+  'lev.k1.h':'Till & shop floor', 'lev.k1.p':'A till tailored to your sector, kitchen screens from cold to pass, a bar screen and a service station. All live.',
+  'lev.k2.h':'Your people', 'lev.k2.p':'One staff app with rota, clock, tasks, team chat and walkie-talkie. From application to signed contract.',
+  'lev.k3.h':'AI that works along', 'lev.k3.p':'An assistant that does not just answer but acts: proposing purchases, filling rotas, replying to reviews.',
+  'lev.k4.h':'Your own back office', 'lev.k4.p':'Daily figures and weekly trend, boards for projects, automatic invoices and a tax tool per country.',
+  'lev.cta':'The full supplier journey', 'lev.partner':'Become a partner',
+  'tech.folio':'N° 04, The technology', 'tech.kicker':'Built like a timepiece',
+  'tech.title':'Everything live, everything one system.',
+  'tech.intro':'An order appears on the kitchen screen without refreshing. Every app works on every screen, from phone to foldable to desktop. Even this site is alive: the colour palette turns with the sun and the season.',
+  'tech.s1':'apps, one house style', 'tech.s2':'servers, automatic failover',
+  'tech.s3':'operations in a single stress test', 'tech.s4':'secured like a bank',
+  'tech.cta':'Under the bonnet',
+  'found.folio':'N° 05, The foundation',
+  'found.statlabel':'of every membership goes to the RTFoundation',
+  'found.title':'A world that gives back.',
+  'found.copy':'Thirty percent of every membership goes automatically to the RTFoundation: free family apps for school, learning and a safe home, and families who cannot afford it travel along, discreetly. No lottery, no cameras, just a holiday.',
+  'found.cta':'Read about the Foundation', 'found.app':'Open the free app',
+  'pas.folio':'N° 06, The access', 'pas.kicker':'Three keys to the same world',
+  'pas.title':'Choose your membership.',
+  'pas.rtg.tag':'Entry', 'pas.rtg.prijs':'€ 65 p/m ex VAT · 12 months minimum',
+  'pas.rtg.go':'RTG Pass <span class="arrow">→</span>',
+  'pas.life.tag':'Concierge', 'pas.life.prijs':'€ 20,000 p/m ex VAT · 12 months minimum',
+  'pas.life.go':'Lifestyle Pass <span class="arrow">→</span>',
+  'pas.biz.tag':'Business', 'pas.biz.prijs':'Bespoke pricing · same conditions · also the key for suppliers',
+  'pas.biz.go':'Business Pass <span class="arrow">→</span>',
+  'cta.kicker':'The door is open', 'cta.title':'Walk through our world today.',
+  'cta.deck':'The full demo is on: every app, every function, every screen. Only real payments and orders are switched off.',
+  'cta.opendemo':'Open the demo', 'cta.toegang':'Where would you like to go in?',
   'footer.download':'Download the app', 'footer.book':'Book via a partner',
   'footer.partner':'Become a partner', 'footer.privacy':'Privacy', 'footer.terms':'Terms'
 } };

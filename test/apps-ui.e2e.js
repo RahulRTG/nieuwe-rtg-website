@@ -81,7 +81,11 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
     // de startpagina toont de eigen gegevens (begroeting, codenaam, eerstvolgende reis)
     na: async (page) => {
       await page.waitForSelector('#homeGreeting', { timeout: 5000 });
-      assert.match(await page.textContent('#homeGreeting'), /Welkom/i, 'de begroeting staat er');
+      // de begroeting spreekt de taal van de pas: RTG als vriend, Business
+      // zakelijk ("Alles onder controle"), Lifestyle als concierge
+      assert.match(await page.textContent('#homeGreeting'),
+        /Welkom|goed je te zien|Alles onder controle|Alles staat voor u klaar/i,
+        'de begroeting staat er');
       assert.ok((await page.textContent('#codecard .cn')).trim().length > 0, 'de codenaam staat op de kaart');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');
     }

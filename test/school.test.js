@@ -59,8 +59,11 @@ async function opzet(naam) {
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam ' + naam, naam: 'Ouder ' + naam, pin: '1234' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind ' + naam, rol: 'kind', groep: 'kind' }));
   const kindToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  // de ouder nodigt uit; het kind accepteert zelf (dat is de afspraak)
   const kop = await json(await api('/school/koppel', { code: g.code, token: g.token, klasCode: klas.code, profielId: kind.profiel.id }));
-  assert.ok(kop.ok, 'koppelen lukt');
+  assert.ok(kop.ok && kop.uitgenodigd, 'de ouder verstuurt een uitnodiging');
+  const acc = await json(await api('/school/uitnodiging/antwoord', { code: g.code, token: kindToken, klasCode: klas.code, akkoord: true }));
+  assert.ok(acc.ok && acc.geaccepteerd, 'het kind accepteert de uitnodiging');
   return { sch, klas, g, kindId: kind.profiel.id, kindToken, sleutel: g.code + ':' + kind.profiel.id };
 }
 const lr = (klas, pad, body) => api(pad, Object.assign({ klasCode: klas.code, leraarToken: klas.leraarToken }, body || {}));
@@ -69,8 +72,10 @@ test('klas maken, koppelen en het mijn-school-overzicht', async () => {
   const { klas, g, kindId, kindToken } = await opzet('Aa');
   // verkeerde token komt er niet in
   assert.equal((await api('/school/klas', { klasCode: klas.code, leraarToken: 'fout' })).status, 403);
-  // een kind kan niet zelf (zichzelf of een ander) aan een klas koppelen
-  assert.equal((await api('/school/koppel', { code: g.code, token: kindToken, klasCode: klas.code, profielId: kindId })).status, 403);
+  // een kind kan geen ANDER profiel aansluiten, en zichzelf niet dubbel
+  const ander = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Broertje Aa', rol: 'kind', groep: 'kind' }));
+  assert.equal((await api('/school/koppel', { code: g.code, token: kindToken, klasCode: klas.code, profielId: ander.profiel.id })).status, 403);
+  assert.equal((await api('/school/koppel', { code: g.code, token: kindToken, klasCode: klas.code, profielId: kindId })).status, 409);
   // de leraar ziet de leerling
   const kd = await json(await lr(klas, '/school/klas'));
   assert.equal(kd.leerlingen.length, 1);
@@ -79,6 +84,50 @@ test('klas maken, koppelen en het mijn-school-overzicht', async () => {
   assert.equal(mijn.school.length, 1);
   assert.equal(mijn.school[0].klas.code, klas.code);
   assert.equal(mijn.school[0].kind.profielId, kindId);
+});
+
+test('uitnodigen: het kind beslist zelf, en aansluiten zonder ouder kan ook', async () => {
+  const sch = await json(await api('/school/school/maak', { naam: 'De Vrije Keuze', plaats: 'Zwolle' }));
+  await keurSchoolGoed(sch.schoolCode);
+  const p = await json(await api('/school/personeel/aanmeld', { schoolCode: sch.schoolCode, naam: 'Juf Keuze', rol: 'leraar' }));
+  await api('/school/personeel/besluit', { schoolCode: sch.schoolCode, beheerToken: sch.beheerToken, personeelId: p.personeelId, akkoord: true });
+  const kl = await json(await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 6' }));
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam Keuze', naam: 'Ouder Keuze', pin: '1234' }));
+  const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind Keuze', rol: 'kind', groep: 'kind' }));
+  const kindToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+
+  // 1. de ouder nodigt uit: nog GEEN leerling, wel een uitnodiging voor het kind
+  const kop = await json(await api('/school/koppel', { code: g.code, token: g.token, klasCode: kl.code, profielId: kind.profiel.id }));
+  assert.ok(kop.uitgenodigd, 'de ouder verstuurt een uitnodiging, geen koppeling');
+  let kd = await json(await api('/school/klas', { klasCode: kl.code, leraarToken: p.personeelToken }));
+  assert.equal(kd.leerlingen.length, 0, 'zonder acceptatie ziet de leraar het kind niet');
+  // dubbel uitnodigen kan niet
+  assert.equal((await api('/school/koppel', { code: g.code, token: g.token, klasCode: kl.code, profielId: kind.profiel.id })).status, 409);
+  // het kind ziet de uitnodiging en WEIGERT
+  let mijnKind = await json(await api('/school/mijn', { code: g.code, token: kindToken }));
+  assert.equal(mijnKind.uitnodigingen.length, 1);
+  assert.ok(mijnKind.uitnodigingen[0].voorMij);
+  await api('/school/uitnodiging/antwoord', { code: g.code, token: kindToken, klasCode: kl.code, akkoord: false });
+  kd = await json(await api('/school/klas', { klasCode: kl.code, leraarToken: p.personeelToken }));
+  assert.equal(kd.leerlingen.length, 0, 'geweigerd is geweigerd');
+
+  // 2. de ouder nodigt opnieuw uit; nu accepteert het kind
+  await api('/school/koppel', { code: g.code, token: g.token, klasCode: kl.code, profielId: kind.profiel.id });
+  const acc = await json(await api('/school/uitnodiging/antwoord', { code: g.code, token: kindToken, klasCode: kl.code, akkoord: true }));
+  assert.ok(acc.geaccepteerd);
+  kd = await json(await api('/school/klas', { klasCode: kl.code, leraarToken: p.personeelToken }));
+  assert.equal(kd.leerlingen.length, 1, 'na acceptatie is het kind leerling');
+
+  // 3. een tweede kind sluit ZICHZELF aan, zonder ouder: eigen keuze telt meteen
+  const kind2 = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind Solo', rol: 'kind', groep: 'tiener' }));
+  const kind2Token = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind2.profiel.id }))).token;
+  const zelf = await json(await api('/school/koppel', { code: g.code, token: kind2Token, klasCode: kl.code }));
+  assert.ok(zelf.ok && !zelf.uitgenodigd, 'zelf aansluiten werkt direct');
+  kd = await json(await api('/school/klas', { klasCode: kl.code, leraarToken: p.personeelToken }));
+  assert.equal(kd.leerlingen.length, 2);
+  // en het kind ziet de klas met het eigen token, zonder dat een ouder iets deed
+  const mijnSolo = await json(await api('/school/mijn', { code: g.code, token: kind2Token }));
+  assert.ok(mijnSolo.school.some(x => x.klas.code === kl.code && x.kind.profielId === kind2.profiel.id));
 });
 
 test('rooster, huiswerk opgeven en afvinken, en de AI-brugvelden', async () => {
@@ -110,6 +159,9 @@ test('cijfers: het gezin ziet alleen de cijfers van het eigen kind', async () =>
   const g2 = await json(await api('/gezin/maak', { gezinsnaam: 'Fam Cc2', naam: 'Ouder Cc2', pin: '5678' }));
   const kind2 = await json(await api('/gezin/profiel/maak', { code: g2.code, token: g2.token, naam: 'Kind Cc2', rol: 'kind', groep: 'kind' }));
   await api('/school/koppel', { code: g2.code, token: g2.token, klasCode: A.klas.code, profielId: kind2.profiel.id });
+  // het kind accepteert de uitnodiging zelf
+  const kind2Token = (await json(await api('/gezin/profiel/kies', { code: g2.code, profielId: kind2.profiel.id }))).token;
+  await api('/school/uitnodiging/antwoord', { code: g2.code, token: kind2Token, klasCode: A.klas.code, akkoord: true });
 
   await lr(A.klas, '/school/cijfer/geef', { leerling: A.sleutel, vak: 'Rekenen', cijfer: 8.5, omschrijving: 'Toets H4' });
   await lr(A.klas, '/school/cijfer/geef', { leerling: g2.code + ':' + kind2.profiel.id, vak: 'Rekenen', cijfer: 6, omschrijving: 'Toets H4' });

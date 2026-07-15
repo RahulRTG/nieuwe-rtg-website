@@ -143,8 +143,8 @@
   <div class="buddy kaart" id="buddyKaart">
     <div class="buddy-t">Jouw AI-buddy<span class="buddy-nm" id="buddyNm"></span></div>
     <div class="buddy-keuze">
-      <button type="button" class="buddy-b" data-buddy="vrouw"><span>👩</span>Mila</button>
-      <button type="button" class="buddy-b" data-buddy="man"><span>👨</span>Sem</button>
+      <button type="button" class="buddy-b" data-buddy="vrouw"><span>👩</span>Amber</button>
+      <button type="button" class="buddy-b" data-buddy="man"><span>👨</span>Fayaz</button>
       <button type="button" class="buddy-b" data-buddy="nonbinair"><span>🧑</span>Robin</button>
     </div>
   </div>
@@ -569,12 +569,12 @@ function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;',
 /* De AI-buddy: iedereen kiest zelf hoe die klinkt (vrouw, man of non-binair).
    De keuze staat op dit toestel en reist mee naar elke coach. */
 (function(){
-  const NM = { vrouw:'Mila', man:'Sem', nonbinair:'Robin' };
+  const NM = { vrouw:'Amber', man:'Fayaz', nonbinair:'Robin' };
   function huidig(){ try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch(e){ return 'vrouw'; } }
   function verf(){
     const c = huidig();
     document.querySelectorAll('.buddy-b').forEach(b => b.classList.toggle('aan', b.dataset.buddy === c));
-    const nm = $('#buddyNm'); if (nm) nm.textContent = ' · ' + (NM[c] || 'Mila');
+    const nm = $('#buddyNm'); if (nm) nm.textContent = ' · ' + (NM[c] || 'Amber');
   }
   document.querySelectorAll('.buddy-b').forEach(b => b.addEventListener('click', () => {
     try { localStorage.setItem('rtf_buddy', b.dataset.buddy); } catch(e){}

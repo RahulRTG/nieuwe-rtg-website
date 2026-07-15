@@ -56,13 +56,15 @@
 
   <!-- gezinsweergave -->
   <section id="vGezin" hidden>
+    <div id="uitnodigingen"></div>
     <div id="schoolLijst"></div>
     <div id="koppelBlok" hidden>
-      <div class="sec">Kind koppelen aan een klas</div>
+      <div class="sec" id="kopTitel">Kind uitnodigen voor een klas</div>
       <div class="kaart blok">
+        <div class="mini" id="kopUitleg" style="margin-bottom:.5rem;"></div>
         <input class="veld" id="kopCode" placeholder="Klascode (van de leraar)" maxlength="8" autocapitalize="characters">
-        <select class="veld" id="kopKind" aria-label="Welk kind koppel je"></select>
-        <button class="knop" id="kopDoe">Koppelen</button>
+        <select class="veld" id="kopKind" aria-label="Welk kind nodig je uit"></select>
+        <button class="knop" id="kopDoe">Uitnodigen</button>
         <div class="mini" id="kopFout" style="color:var(--rood);min-height:1rem;"></div>
       </div>
     </div>
@@ -148,18 +150,44 @@ async function laadGezin(){
   let d;
   try { d = await gezinApi('/school/mijn'); } catch(e){ vervang($('#schoolLijst'), E('div',{class:'leeg'}, e.message)); return; }
   ouder = !!d.ouder;
-  $('#koppelBlok').hidden = !ouder;
+  // iedereen kan aansluiten: de ouder nodigt een kind uit, een kind sluit zichzelf aan
+  $('#koppelBlok').hidden = false;
+  $('#kopTitel').textContent = ouder ? 'Kind uitnodigen voor een klas' : 'Sluit je aan bij je klas';
+  $('#kopUitleg').textContent = ouder
+    ? 'Jij nodigt uit, je kind accepteert zelf. Zo beslist iedereen mee.'
+    : 'Vraag de klascode aan je leraar en sluit jezelf aan. Een ouder is niet nodig.';
+  $('#kopDoe').textContent = ouder ? 'Uitnodigen' : 'Aansluiten';
+  $('#kopKind').hidden = !ouder;
   if (ouder) vulKindKeuze();
+  toonUitnodigingen(d.uitnodigingen || []);
   const lijst = d.school || [];
   if (!lijst.length){
     vervang($('#schoolLijst'), E('div',{class:'kaart blok'},
       E('b', null, 'Nog geen klas gekoppeld'),
       E('div',{class:'mini', style:{marginTop:'.3rem'}}, ouder
-        ? 'Vraag de klascode aan de leraar en koppel je kind hieronder.'
-        : 'Vraag je ouder of verzorger om je te koppelen met de klascode van je leraar.')));
+        ? 'Vraag de klascode aan de leraar en nodig je kind hieronder uit.'
+        : 'Vraag de klascode aan je leraar en sluit jezelf hieronder aan.')));
     return;
   }
   vervang($('#schoolLijst'), lijst.map(kaartVoor));
+}
+/* open uitnodigingen: het kind beslist zelf; de ouder ziet wat er nog wacht */
+function toonUitnodigingen(lijst){
+  vervang($('#uitnodigingen'), lijst.map(u => {
+    const kaart = E('div',{class:'kaart blok', style:{borderColor:'var(--goud)'}},
+      E('b', null, '✉️ Uitnodiging: ' + u.klas.naam + (u.klas.school ? ' · ' + u.klas.school : '')),
+      E('div',{class:'mini', style:{marginTop:'.3rem'}}, u.voorMij
+        ? (u.door || 'Je ouder') + ' nodigt je uit voor deze klas van ' + u.klas.leraar + '. Jij beslist.'
+        : 'Wacht op antwoord van ' + u.kind.naam + '.'));
+    if (u.voorMij) kaart.appendChild(E('div',{class:'knoprij', style:{marginTop:'.6rem'}},
+      E('button',{class:'knop klein', onclick:()=>antwoordUitnodiging(u, true)}, '✓ Ik doe mee'),
+      E('button',{class:'knop grijs klein', onclick:()=>antwoordUitnodiging(u, false)}, 'Nee, bedankt')));
+    return kaart;
+  }));
+}
+async function antwoordUitnodiging(u, akkoord){
+  try{ await gezinApi('/school/uitnodiging/antwoord', { klasCode: u.klas.code, akkoord }); laadGezin(); }
+  catch(e){ alert(e.message); }
 }
 function kaartVoor(x){
   const open = (x.huiswerk||[]).filter(h => !h.af);
@@ -232,8 +260,12 @@ $('#kopCode').addEventListener('input', e => e.target.value = e.target.value.toU
 $('#kopDoe').addEventListener('click', async ()=>{
   $('#kopFout').textContent = '';
   try{
-    await gezinApi('/school/koppel', { klasCode: $('#kopCode').value.trim(), profielId: $('#kopKind').value });
-    $('#kopCode').value = ''; laadGezin();
+    const body = { klasCode: $('#kopCode').value.trim() };
+    if (ouder) body.profielId = $('#kopKind').value; // een kind sluit zichzelf aan
+    const d = await gezinApi('/school/koppel', body);
+    $('#kopCode').value = '';
+    if (d.uitgenodigd) alert('Uitnodiging verstuurd. Je kind ziet hem in de School-tegel en beslist zelf.');
+    laadGezin();
   }catch(e){ $('#kopFout').textContent = e.message; }
 });
 

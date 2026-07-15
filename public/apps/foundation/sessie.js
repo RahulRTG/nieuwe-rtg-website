@@ -35,7 +35,7 @@
     coach: function (opts) {
       var s = lees(); if (!s) return;
       var gesprek = [];
-      var NM = { vrouw: 'Mila', man: 'Sem', nonbinair: 'Robin' };
+      var NM = { vrouw: 'Amber', man: 'Fayaz', nonbinair: 'Robin' };
       function buddyKeuze() { try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { return 'vrouw'; } }
       // de leeftijdsgroep stuurt taal en niveau van de AI; van het profiel, anders de app-ingang
       function groepVan() { try { return (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || ''; } catch (e) { return ''; } }

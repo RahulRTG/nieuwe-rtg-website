@@ -296,7 +296,7 @@ router.post('/agenda/verwijder', (req, res) => {
   res.json({ ok: true, agenda: les.agenda });
 });
 
-/* ---------- AI-bijles "Bram" + tips ---------- */
+/* ---------- AI-bijles (de gekozen buddy) + tips ---------- */
 const SYSTEM = 'Je bent een warme, geduldige bijleshulp voor leerlingen van elke leeftijd in de gratis onderwijs-app van de RTFoundation. ' +
   'Help met begrijpen, niet met spieken: leg stap voor stap uit, geef een hint en een klein voorbeeld, ' +
   'en laat de leerling de laatste stap zelf zetten. Schrijf kort, bemoedigend en in helder Nederlands (max ~110 woorden). Nooit betuttelend, altijd hoopvol.';
@@ -310,7 +310,7 @@ const TIPS = [
   'Leer in blokjes van 20 minuten. Eén blokje starten is veel makkelijker dan "alles" in één keer.',
   'Slaap is je geheime studietruc: uitgerust leer je sneller en beter.',
   'Fouten maken hoort erbij. Een fout laat precies zien wat je nog kunt leren, dat is goud waard.',
-  'Vraag om hulp als je vastloopt. Dat is niet zwak, dat is slim. Bram staat altijd voor je klaar.',
+  'Vraag om hulp als je vastloopt. Dat is niet zwak, dat is slim. Je buddy staat altijd voor je klaar.',
   'Beweeg elke dag even, al is het maar een rondje lopen. Je hersenen werken beter na wat beweging.',
   'Zet je telefoon tijdens het leren in een andere kamer. Je concentreert je zo veel makkelijker.',
   'Vier je kleine successen. Een som af? Een bladzijde klaar? Dat mag je best even goed voelen.',
@@ -750,8 +750,8 @@ const AI_KINDS = Object.keys(HULP_SYS);
    met een eigen naam. De buddy blijft dezelfde persoon door alle coaches heen;
    we vervangen alleen de vaste naam in de systeemprompt door de gekozen buddy. */
 const BUDDY = {
-  vrouw:     { naam: 'Mila',  wie: 'een vrouw' },
-  man:       { naam: 'Sem',   wie: 'een man' },
+  vrouw:     { naam: 'Amber', wie: 'een vrouw' },
+  man:       { naam: 'Fayaz', wie: 'een man' },
   nonbinair: { naam: 'Robin', wie: 'non-binair' }
 };
 function kiesBuddy(g) { return BUDDY[g] || BUDDY.vrouw; }

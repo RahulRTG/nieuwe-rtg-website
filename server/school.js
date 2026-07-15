@@ -222,19 +222,49 @@ module.exports = (ctx) => {
     });
   });
 
-  /* ---------- ouder: kind koppelen aan een klas ---------- */
+  /* ---------- aansluiten bij een klas ----------
+     De ouder zit erbij, maar beslist niet OVER het kind: een ouder stuurt een
+     UITNODIGING en het kind accepteert (of weigert) die zelf. Een kind kan
+     zich ook zonder ouder aansluiten met de klascode; dat is de eigen keuze
+     en telt dus meteen. */
   router.post('/school/koppel', (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
-    if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder of verzorger koppelt een kind aan een klas.' });
     const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
     if (!k) return res.status(404).json({ error: 'Deze klascode kennen we niet. Vraag hem na bij de leraar.' });
-    const kind = s.g.profielen[req.body.profielId];
+    const profielId = String(req.body.profielId || s.p.id);
+    const kind = s.g.profielen[profielId];
     if (!kind) return res.status(404).json({ error: 'Dat profiel bestaat niet in jouw gezin.' });
     const sleutel = leerlingSleutel(s.g.code, kind.id);
     if ((k.leerlingen || []).some(l => l.sleutel === sleutel)) return res.status(409).json({ error: 'Dit kind zit al in deze klas.' });
-    k.leerlingen.push({ sleutel, gezinCode: s.g.code, profielId: kind.id, naam: schoon(kind.naam, 60), at: nu() });
+    k.uitnodigingen = k.uitnodigingen || [];
+    if (!s.beheerder) {
+      // een kind sluit alleen ZICHZELF aan; eigen keuze, dus meteen actief
+      if (profielId !== s.p.id) return res.status(403).json({ error: 'Je kunt alleen jezelf aansluiten bij een klas.' });
+      k.uitnodigingen = k.uitnodigingen.filter(u => u.sleutel !== sleutel);
+      k.leerlingen.push({ sleutel, gezinCode: s.g.code, profielId: kind.id, naam: schoon(kind.naam, 60), at: nu() });
+      save();
+      return res.json({ ok: true, klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school } });
+    }
+    // de ouder nodigt uit; het kind accepteert de uitnodiging zelf
+    if (k.uitnodigingen.some(u => u.sleutel === sleutel)) return res.status(409).json({ error: 'Er staat al een uitnodiging voor dit kind klaar.' });
+    k.uitnodigingen.push({ sleutel, gezinCode: s.g.code, profielId: kind.id, naam: schoon(kind.naam, 60), door: schoon(s.p.naam, 60), at: nu() });
     save();
-    res.json({ ok: true, klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school } });
+    res.json({ ok: true, uitgenodigd: true, klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school } });
+  });
+
+  // het kind beslist zelf over de uitnodiging van de ouder
+  router.post('/school/uitnodiging/antwoord', (req, res) => {
+    const s = gezinSessie(req, res); if (!s) return;
+    const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
+    if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
+    const sleutel = leerlingSleutel(s.g.code, s.p.id);
+    const idx = (k.uitnodigingen || []).findIndex(u => u.sleutel === sleutel);
+    if (idx < 0) return res.status(404).json({ error: 'Er staat geen uitnodiging voor je klaar bij deze klas.' });
+    const u = k.uitnodigingen.splice(idx, 1)[0];
+    if (req.body.akkoord === true)
+      k.leerlingen.push({ sleutel, gezinCode: u.gezinCode, profielId: u.profielId, naam: u.naam, at: nu() });
+    save();
+    res.json({ ok: true, geaccepteerd: req.body.akkoord === true, klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school } });
   });
 
   /* ---------- leraar: rooster, huiswerk, cijfers, mededelingen ---------- */
@@ -319,7 +349,18 @@ module.exports = (ctx) => {
         });
       }
     }
-    res.json({ ok: true, school: uit, ouder: s.beheerder });
+    // open uitnodigingen: het kind ziet die van zichzelf (om te beslissen),
+    // de ouder ziet welke er nog op een antwoord van het kind wachten
+    const uitnodigingen = [];
+    for (const k of Object.values(K())) {
+      for (const u of (k.uitnodigingen || [])) {
+        if (u.gezinCode !== s.g.code || !mijnIds.includes(u.profielId)) continue;
+        uitnodigingen.push({ klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school },
+          kind: { profielId: u.profielId, naam: u.naam }, door: u.door, at: u.at,
+          voorMij: u.profielId === s.p.id });
+      }
+    }
+    res.json({ ok: true, school: uit, ouder: s.beheerder, uitnodigingen });
   });
 
   // huiswerk afvinken (kind of ouder), en weer terugzetten

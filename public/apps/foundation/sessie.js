@@ -43,7 +43,8 @@
         gesprek.push({ role: 'user', content: t });
         var w = document.createElement('div'); w.className = 'b ai'; w.textContent = opts.wacht || 'Even denken...';
         opts.chat.appendChild(w); opts.chat.scrollTop = opts.chat.scrollHeight;
-        api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek })
+        var buddy; try { buddy = localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { buddy = 'vrouw'; }
+        api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek, buddy: buddy })
           .then(function (d) { w.textContent = d.text; gesprek.push({ role: 'assistant', content: d.text }); opts.chat.scrollTop = opts.chat.scrollHeight; })
           .catch(function () { w.textContent = 'Sorry, dat lukte even niet. Probeer het zo nog eens.'; });
       }

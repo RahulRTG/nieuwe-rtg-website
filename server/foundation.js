@@ -745,6 +745,19 @@ const HULP_DEMO = {
   pesten: 'Hoi, fijn dat je het durft te zeggen. Wat er ook gebeurt: het is niet jouw schuld. Vertel me maar wat er is, ik luister. En het is heel dapper en slim om het ook aan een volwassene te vertellen die je vertrouwt, zoals je vader, moeder, juf of meester. Je kunt ook gratis bellen met de Kindertelefoon: 0800-0432.'
 };
 const AI_KINDS = Object.keys(HULP_SYS);
+/* De AI-buddy: iedereen kiest zelf hoe die klinkt (vrouw, man of non-binair)
+   met een eigen naam. De buddy blijft dezelfde persoon door alle coaches heen;
+   we vervangen alleen de vaste naam in de systeemprompt door de gekozen buddy. */
+const BUDDY = {
+  vrouw:     { naam: 'Mila',  wie: 'een vrouw' },
+  man:       { naam: 'Sem',   wie: 'een man' },
+  nonbinair: { naam: 'Robin', wie: 'non-binair' }
+};
+function kiesBuddy(g) { return BUDDY[g] || BUDDY.vrouw; }
+function buddySys(kind, g) {
+  const b = kiesBuddy(g);
+  return HULP_SYS[kind].replace(/^Je bent "[^"]+"/, 'Je bent ' + b.naam + ' (' + b.wie + ')');
+}
 router.post('/hulp/ai', async (req, res) => {
   const s = familieVan(req, res); if (!s) return;
   const kind = AI_KINDS.includes(req.body.kind) ? req.body.kind : 'geld';
@@ -755,7 +768,7 @@ router.post('/hulp/ai', async (req, res) => {
   if (!clean.length) return res.json({ text: HULP_DEMO[kind] });
   if (!anthropic) return res.json({ text: HULP_DEMO[kind], demo: true });
   try {
-    const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 420, system: HULP_SYS[kind], messages: clean });
+    const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 420, system: buddySys(kind, req.body.buddy), messages: clean });
     res.json({ text: (r.content || []).map(b => b.text || '').join('').trim() || HULP_DEMO[kind] });
   } catch (e) { res.json({ text: HULP_DEMO[kind], demo: true }); }
 });
@@ -790,7 +803,7 @@ router.get('/impact', (req, res) => {
   res.json({
     opgehaald: Math.round(opgehaaldCenten) / 100,
     scholen, gezinnen,
-    boodschap: 'Elke maand dat iemand lid is, spaart de RTFoundation mee voor gezinnen zoals dat van jou. Alles hier blijft kosteloos.'
+    boodschap: 'Elke maand dat iemand RTG-lid is, groeit de RTFoundation mee. Zo blijft alles hier gratis, voor iedereen.'
   });
 });
 

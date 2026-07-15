@@ -30,6 +30,16 @@
   .tile .cta{margin-top:auto;color:var(--goud);font-size:.85rem;font-weight:600;padding-top:.4rem;}
   .gratis{margin-top:1.6rem;text-align:center;font-size:.85rem;color:var(--zacht);line-height:1.55;border-top:1px solid var(--lijn);padding-top:1.2rem;}
   .gratis b{color:var(--goud);}
+  /* AI-buddy-kiezer */
+  .buddy{padding:.9rem 1rem;margin:.2rem 0 1.5rem;}
+  .buddy-t{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin-bottom:.6rem;}
+  .buddy-nm{color:var(--goud);margin-left:.5rem;text-transform:none;letter-spacing:0;font-weight:600;}
+  .buddy-keuze{display:flex;gap:.6rem;}
+  .buddy-b{flex:1;background:var(--paneel2);border:2px solid var(--lijn);border-radius:12px;padding:.55rem;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:.2rem;font-size:.85rem;cursor:pointer;transition:border-color .12s,transform .12s;}
+  .buddy-b span{font-size:1.5rem;}
+  .buddy-b.aan{border-color:var(--goud);transform:translateY(-2px);}
+  /* rustige sectiekop voor de hulp-tools: aanwezig, maar niet pontificaal */
+  .sec.stil{color:var(--zacht);font-weight:600;opacity:.85;margin-top:2.4rem;}
   .foot{text-align:center;margin-top:1.4rem;font-size:.8rem;}
   .foot a{color:var(--zacht);text-decoration:none;}
   /* welkom + profielkiezer */
@@ -130,46 +140,27 @@
     <div id="hImpact" class="kaart" style="margin-top:.7rem;padding:.7rem .6rem;" hidden></div>
   </div>
 
-  <h3 class="sec">Voor iedereen</h3>
+  <div class="buddy kaart" id="buddyKaart">
+    <div class="buddy-t">Jouw AI-buddy<span class="buddy-nm" id="buddyNm"></span></div>
+    <div class="buddy-keuze">
+      <button type="button" class="buddy-b" data-buddy="vrouw"><span>👩</span>Mila</button>
+      <button type="button" class="buddy-b" data-buddy="man"><span>👨</span>Sem</button>
+      <button type="button" class="buddy-b" data-buddy="nonbinair"><span>🧑</span>Robin</button>
+    </div>
+  </div>
+
+  <h3 class="sec">Leren en groeien</h3>
   <div class="tiles">
     <a class="kaart tile" href="leren.html">
       <div class="ic">📚</div><h2>Leren</h2>
-      <span class="cta">→</span>
-    </a>
-    <a class="kaart tile" id="tileDromen" href="dromen.html" data-grp="kind tiener jong volw">
-      <div class="ic">⭐</div><h2>Onze dromen</h2>
-      <span class="cta">→</span>
-    </a>
-    <a class="kaart tile" href="rust.html">
-      <div class="ic">🌿</div><h2>Even rust</h2>
-      <span class="cta">→</span>
-    </a>
-    <a class="kaart tile" href="veilig.html">
-      <div class="ic">📍</div><h2>Veilig thuis</h2>
       <span class="cta">→</span>
     </a>
     <a class="kaart tile" href="school.html" data-grp="kind tiener jong volw">
       <div class="ic">🏫</div><h2>School</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="agenda.html">
-      <div class="ic">📅</div><h2>Gezinsagenda</h2>
-      <span class="cta">→</span>
-    </a>
-    <a class="kaart tile" href="contact.html">
-      <div class="ic">💬</div><h2>Contact</h2>
-      <span class="cta">→</span>
-    </a>
-    <a class="kaart tile" href="vrienden.html" data-grp="kind tiener jong volw">
-      <div class="ic">👋</div><h2>Contacten</h2>
-      <span class="cta">→</span>
-    </a>
-    <a class="kaart tile" href="markt.html" data-grp="jong volw">
-      <div class="ic">🏷️</div><h2>De Salon</h2>
-      <span class="cta">→</span>
-    </a>
-    <a class="kaart tile" href="oppasinfo.html" data-grp="jong volw">
-      <div class="ic">📋</div><h2>Belangrijke info</h2>
+    <a class="kaart tile" id="tileDromen" href="dromen.html" data-grp="kind tiener jong volw">
+      <div class="ic">⭐</div><h2>Onze dromen</h2>
       <span class="cta">→</span>
     </a>
     <a class="kaart tile" id="tileWerk" href="werk.html" hidden data-grp="jong volw">
@@ -182,27 +173,47 @@
     </a>
   </div>
 
+  <h3 class="sec">Elke dag</h3>
+  <div class="tiles">
+    <a class="kaart tile" href="agenda.html">
+      <div class="ic">📅</div><h2>Gezinsagenda</h2>
+      <span class="cta">→</span>
+    </a>
+    <a class="kaart tile" href="vrienden.html" data-grp="kind tiener jong volw">
+      <div class="ic">👋</div><h2>Contacten</h2>
+      <span class="cta">→</span>
+    </a>
+    <a class="kaart tile" href="contact.html">
+      <div class="ic">💬</div><h2>Contact</h2>
+      <span class="cta">→</span>
+    </a>
+    <a class="kaart tile" href="markt.html" data-grp="jong volw">
+      <div class="ic">🏷️</div><h2>De Salon</h2>
+      <span class="cta">→</span>
+    </a>
+    <a class="kaart tile" href="oppasinfo.html" data-grp="jong volw">
+      <div class="ic">📋</div><h2>Belangrijke info</h2>
+      <span class="cta">→</span>
+    </a>
+  </div>
+
+  <h3 class="sec stil">Ook hier voor je, als je het nodig hebt</h3>
+  <div class="tiles">
+    <a class="kaart tile" href="rust.html">
+      <div class="ic">🌿</div><h2>Even rust</h2>
+      <span class="cta">→</span>
+    </a>
+    <a class="kaart tile" href="veilig.html">
+      <div class="ic">📍</div><h2>Veilig thuis</h2>
+      <span class="cta">→</span>
+    </a>
+  </div>
+
   <div id="secOuder" hidden>
-    <h3 class="sec">Voor ouders en verzorgers</h3>
+    <h3 class="sec">Verder komen, voor jou als ouder</h3>
     <div class="tiles">
-      <a class="kaart tile" href="opvoeden.html">
-        <div class="ic">🧸</div><h2>Opvoedhulp</h2>
-        <span class="cta">→</span>
-      </a>
-      <a class="kaart tile" href="steun.html">
-        <div class="ic">💚</div><h2>Steun voor jou</h2>
-        <span class="cta">→</span>
-      </a>
       <a class="kaart tile" href="studie.html">
         <div class="ic">🎓</div><h2>Verder leren voor jou</h2>
-        <span class="cta">→</span>
-      </a>
-      <a class="kaart tile" href="geld.html">
-        <div class="ic">💶</div><h2>Geldmaatje</h2>
-        <span class="cta">→</span>
-      </a>
-      <a class="kaart tile" href="hulpwijzer.html">
-        <div class="ic">🧭</div><h2>Hulpwijzer</h2>
         <span class="cta">→</span>
       </a>
       <a class="kaart tile" href="cv.html">
@@ -215,6 +226,25 @@
       </a>
       <a class="kaart tile" href="reis.html">
         <div class="ic">✈️</div><h2>Op reis met de foundation</h2>
+        <span class="cta">→</span>
+      </a>
+    </div>
+    <h3 class="sec stil">Ook voor jou, als je het nodig hebt</h3>
+    <div class="tiles">
+      <a class="kaart tile" href="opvoeden.html">
+        <div class="ic">🧸</div><h2>Opvoedhulp</h2>
+        <span class="cta">→</span>
+      </a>
+      <a class="kaart tile" href="steun.html">
+        <div class="ic">💚</div><h2>Steun voor jou</h2>
+        <span class="cta">→</span>
+      </a>
+      <a class="kaart tile" href="geld.html">
+        <div class="ic">💶</div><h2>Geldmaatje</h2>
+        <span class="cta">→</span>
+      </a>
+      <a class="kaart tile" href="hulpwijzer.html">
+        <div class="ic">🧭</div><h2>Hulpwijzer</h2>
         <span class="cta">→</span>
       </a>
     </div>
@@ -536,6 +566,23 @@ $('#rtfOnbDoe').addEventListener('click', async () => {
 });
 
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+/* De AI-buddy: iedereen kiest zelf hoe die klinkt (vrouw, man of non-binair).
+   De keuze staat op dit toestel en reist mee naar elke coach. */
+(function(){
+  const NM = { vrouw:'Mila', man:'Sem', nonbinair:'Robin' };
+  function huidig(){ try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch(e){ return 'vrouw'; } }
+  function verf(){
+    const c = huidig();
+    document.querySelectorAll('.buddy-b').forEach(b => b.classList.toggle('aan', b.dataset.buddy === c));
+    const nm = $('#buddyNm'); if (nm) nm.textContent = ' · ' + (NM[c] || 'Mila');
+  }
+  document.querySelectorAll('.buddy-b').forEach(b => b.addEventListener('click', () => {
+    try { localStorage.setItem('rtf_buddy', b.dataset.buddy); } catch(e){}
+    verf();
+  }));
+  verf();
+})();
+
 window.addEventListener('hashchange', start);
 start();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});

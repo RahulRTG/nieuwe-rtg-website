@@ -1490,6 +1490,28 @@
   const invParam = new URLSearchParams(location.search).get('invite');
   if (invParam && API.enabled) initInvite(invParam.trim().toUpperCase());
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+  /* Demo-hub: automatische login vanuit index.html (?demo, met ?b=branche).
+     Horeca → KIKUNOI als bedrijfsaccount (volledige keuken/KDS); verblijf →
+     Hoshinoya, vervoer → Kyoto Executive Cars, via de manager-PIN 1234. */
+  (function demoAutoLogin(){
+    if (invParam) return;                         // uitnodiging heeft voorrang
+    const q = new URLSearchParams(location.search);
+    if (!q.has('demo') || !API.enabled) return;
+    const COMPANY = { verblijf:'HOSHI', vervoer:'MKKX' };
+    window.addEventListener('load', async () => {
+      const code = COMPANY[branch];
+      if (code){
+        try {
+          const roster = await API.call('/supplier/roster', { code });
+          const mgr = (roster.staff||[]).find(s => s.role==='manager') || (roster.staff||[])[0];
+          if (mgr && await login({ code, staffId: mgr.id, pin:'1234' }, false, true)) return;
+        } catch(e){}
+      }
+      // Horeca en terugval: bedrijfsaccount (Rahul / Imran) → volledige KDS.
+      login({ username:'Rahul', password:'Imran' }, true);
+    });
+  })();
 })();
 </script>
 <script>
@@ -1610,5 +1632,7 @@ window.I18N = { en: {
 } };
 </script>
 <script src="/shared/i18n.js"></script>
+<script src="/shared/thema.js"></script>
+<script src="/shared/demo.js"></script>
 </body>
 </html>

@@ -2457,6 +2457,19 @@
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
+
+  /* Demo-hub: automatische login vanuit index.html.
+     ?demo → demo-account (Rahul / Imran); ?demo=<pas> → die voorbeeldpersona. */
+  (function demoAutoLogin(){
+    const q = new URLSearchParams(location.search);
+    if (!q.has('demo')) return;
+    const d = q.get('demo');
+    const tier = ['rtg','lifestyle','business','guest'].includes(d) ? d : null;
+    window.addEventListener('load', () => {
+      if (tier) login(tier);
+      else login(null, { u: 'rahul', p: 'Imran' });
+    });
+  })();
 })();
 </script>
 <script>
@@ -2559,5 +2572,7 @@ window.I18N = { en: {
 } };
 </script>
 <script src="/shared/i18n.js"></script>
+<script src="/shared/thema.js"></script>
+<script src="/shared/demo.js"></script>
 </body>
 </html>

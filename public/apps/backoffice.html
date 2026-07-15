@@ -290,6 +290,16 @@
   $('#docScrim').addEventListener('click', () => { $('#docScrim').classList.remove('open'); $('#docImg').src = ''; });
 
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
+
+  /* Demo-hub: automatische login vanuit index.html (?demo) met de demo-code. */
+  (function demoAutoLogin(){
+    const q = new URLSearchParams(location.search);
+    if (!q.has('demo') || !enabled) return;
+    window.addEventListener('load', () => {
+      const inp = $('#code'); if (inp) inp.value = 'RTG-OFFICE';
+      login();
+    });
+  })();
 })();
 </script>
 <script>
@@ -311,5 +321,7 @@ window.I18N = { en: {
 } };
 </script>
 <script src="/shared/i18n.js"></script>
+<script src="/shared/thema.js"></script>
+<script src="/shared/demo.js"></script>
 </body>
 </html>

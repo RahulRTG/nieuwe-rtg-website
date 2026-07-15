@@ -118,6 +118,11 @@ const sessions = new Map();
 const DEMO_USER = (process.env.DEMO_USER || 'rahul').trim().toLowerCase();
 const DEMO_PASS = process.env.DEMO_PASS || 'Imran';
 const DEMO_SUPPLIER = process.env.DEMO_SUPPLIER || 'KIKUNOI';
+/* Pure demo-modus (standaard aan): betalingen, bestellingen en boekingen zijn
+   simulaties. De flows werken volledig zodat je alles kunt bekijken, maar er
+   gaat nooit echt geld of een echte order de deur uit — de client toont een
+   zichtbaar DEMO-label. Zet DEMO_MODE=off voor een "productie"-achtige run. */
+const DEMO = process.env.DEMO_MODE !== 'off';
 function hasCred(body) { return !!body && (body.username != null || body.password != null); }
 function checkCred(username, password) {
   return String(username || '').trim().toLowerCase() === DEMO_USER && String(password || '') === DEMO_PASS;
@@ -480,7 +485,23 @@ function stateFor(sess, lang) {
 
 /* ---------- endpoints ---------- */
 
-app.get('/api/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claude' : 'demo' }));
+app.get('/api/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claude' : 'demo', demo: DEMO }));
+
+/* Demo schoonvegen: alle gesimuleerde bestellingen, ritten, boekingen, live-
+   posities en dynamische prijzen terug naar leeg. Handig om de rondleiding
+   opnieuw te beginnen. Raakt geen accounts, posts of seed-inhoud. */
+app.post('/api/demo/reset', (req, res) => {
+  if (!DEMO) return res.status(403).json({ error: 'Alleen in demo-modus.' });
+  db.data.orders = [];
+  db.data.rides = [];
+  db.data.bookings = [];
+  db.data.supplierPrices = [];
+  db.data.live = {};
+  save();
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true });
+});
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
@@ -695,7 +716,7 @@ app.post('/api/pay', auth, (req, res) => {
   else save();
   // ander open scherm van hetzelfde lid meteen bijwerken
   broadcastSync([req.session.tier], 'payments');
-  res.json({ ok: true, foundation, state: stateFor(req.session, req.body.lang) });
+  res.json({ ok: true, demo: DEMO, foundation, state: stateFor(req.session, req.body.lang) });
 });
 
 /* De Salon levert de content: uitgelichte posts (met beeld) zijn het
@@ -1005,7 +1026,7 @@ app.post('/api/book', (req, res) => {
     at: new Date().toISOString()
   });
   save();
-  res.json({ ok: true, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total });
+  res.json({ ok: true, demo: DEMO, ref, trip: { title: trip.title, dest: trip.dest }, partner: partner ? partner.name : null, total });
 });
 
 /* ================= LEVERANCIER-KANAAL =================
@@ -1689,7 +1710,7 @@ app.post('/api/order', auth, (req, res) => {
   notifySupplier(s.code, { icon: '🛎️', title: 'Nieuwe bestelling', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
   sseToSupplier(s.code, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, order });
+  res.json({ ok: true, demo: DEMO, order });
 });
 
 // Betalen: volledig, gedeeld in gelijke delen, of precies de eigen
@@ -1732,7 +1753,7 @@ app.post('/api/order/pay', auth, (req, res) => {
   });
   sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, order: o, betaald: bedrag, fooi, rest: Math.max(0, Math.round((o.total - totaalBetaald) * 100) / 100) });
+  res.json({ ok: true, demo: DEMO, order: o, betaald: bedrag, fooi, rest: Math.max(0, Math.round((o.total - totaalBetaald) * 100) / 100) });
 });
 
 app.post('/api/orders/mine', auth, (req, res) => {
@@ -2192,7 +2213,7 @@ app.post('/api/ride/request', auth, (req, res) => {
   sseToSupplier(s.code, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   pushLive(req.session.key);
-  res.json({ ok: true, ride });
+  res.json({ ok: true, demo: DEMO, ride });
 });
 
 /* ================= BACKOFFICE (RTG) =================

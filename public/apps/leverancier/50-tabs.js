@@ -837,9 +837,11 @@
     html += rooms.length ? rooms.map(r => {
       const hk = (r.hk && r.hk.status) || 'schoon';
       return '<div class="room-row'+(r.available?'':' off')+'" style="flex-wrap:wrap;">'+
-        '<div class="rr-t"><b>'+r.name+' <span class="hk-pill hk-'+hk+'">'+tHk(hk)+'</span></b>'+
+        '<div class="rr-t"><b>'+r.name+' <span class="hk-pill hk-'+hk+'">'+tHk(hk)+'</span>'+
+          (r.vroegVrij ? ' <span class="hk-pill hk-schoon">🛎 '+T('hk.vroegvrij','vroege check-in')+'</span>' : '')+'</b>'+
           '<span>'+(r.desc||'')+' · '+eur(r.price)+' '+T('sup.pernight','p.n.')+
           (r.hk && r.hk.by ? ' · '+r.hk.by+(r.hk.at?', '+timeAgo(r.hk.at):'') : '')+
+          (r.vroegVrij ? ' · 🛎 '+T('hk.vroegvrij2','vrijgegeven door housekeeping')+' ('+r.vroegVrij.door+')' : '')+
           (hk==='defect' && r.hk.note ? ' · ⚠ '+r.hk.note : '')+'</span></div>'+
         '<button class="rr-toggle'+(r.available?' on':'')+'" data-rtoggle="'+r.id+'" aria-label="aan/uit"><span></span></button>'+
         '<button class="rr-del" data-rdel="'+r.id+'">✕</button>'+

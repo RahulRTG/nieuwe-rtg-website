@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<title>RTG Housekeeping, kamers en klussen</title>
+<link rel="icon" href="/icons/hotel.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifests/housekeeping.webmanifest">
+<link rel="apple-touch-icon" href="/icons/hotel-192.png">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.09);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.70); --soft:rgba(244,241,236,0.62);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; --amber:#C99A2E;
+    --knop:#fff; --knop-txt:#000;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:#000;font-family:'Inter',sans-serif;color:var(--txt);display:flex;justify-content:center;-webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
+  input,select{font-family:'Inter',sans-serif;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  #shell{width:100%;max-width:460px;min-height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  /* op desktop: schermvullend, leesinhoud in een royale kolom */
+  @media (min-width:540px){body{background:var(--bg);padding:0;align-items:stretch;min-height:100dvh;}#shell{max-width:none;width:100%;height:100dvh;min-height:0;}.content,.topbar,.tabbar{padding-left:max(1.4rem, calc((100% - 1100px) / 2));padding-right:max(1.4rem, calc((100% - 1100px) / 2));}}
+
+  /* stappen-gate */
+  #gate{flex:1;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 1.75rem 3rem;}
+  #gate .badge{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+  #gate h1{font-size:1.9rem;line-height:1.12;margin-top:1.4rem;}
+  #gate h1 em{color:var(--burgundy);font-style:italic;}
+  #gate .deck{margin-top:0.8rem;font-size:0.86rem;color:var(--muted);line-height:1.6;}
+  .glist{margin-top:1.8rem;display:flex;flex-direction:column;gap:0.6rem;}
+  .gbtn{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:0.95rem 1.1rem;text-align:left;display:flex;align-items:center;gap:0.9rem;}
+  .gbtn:active{background:var(--card2);}
+  .gbtn .ic{font-size:1.4rem;}
+  .gbtn b{display:block;font-size:0.92rem;font-weight:600;}
+  .gbtn span{font-size:0.72rem;color:var(--soft);}
+  .gback{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:0.82rem;margin-bottom:1rem;padding:0;}
+  .pinrow{margin-top:1.4rem;display:flex;gap:0.6rem;}
+  .pinrow input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:0.9rem 1rem;color:var(--txt);font-size:1.1rem;letter-spacing:0.4em;text-align:center;outline:none;}
+  .pinrow input:focus{border-color:var(--burgundy);}
+  .pinrow button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.4rem;font-size:0.86rem;font-weight:600;}
+
+  /* app */
+  #app{display:none;flex:1;flex-direction:column;min-height:0;}
+  #app.active{display:flex;}
+  .topbar{padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.4rem 0.9rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);}
+  .topbar .who b{display:block;font-size:0.94rem;font-weight:600;}
+  .topbar .who span{font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);}
+  .switch{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.7rem;color:var(--muted);}
+  .content{flex:1;overflow-y:auto;padding:1.3rem 1.4rem calc(env(safe-area-inset-bottom,0px) + 6rem);}
+  .view{display:none;}
+  .view.active{display:block;}
+  .view h2{font-size:1.5rem;}
+  .view .sub{margin-top:0.3rem;font-size:0.82rem;color:var(--soft);}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-top:0.9rem;}
+  .card .k{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);font-weight:600;}
+  .abtn{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
+  .abtn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .abtn.warn{background:none;border:1px solid rgba(229,72,77,0.5);color:#FF8589;}
+  .hin{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;font-size:0.9rem;color:var(--txt);outline:none;}
+  .row{display:flex;gap:0.5rem;margin-top:0.5rem;}
+  .task{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
+  .task:last-child{border-bottom:none;}
+  .task .t{flex:1;min-width:0;}
+  .task .t b{display:block;font-size:0.9rem;font-weight:600;}
+  .task .t span{display:block;font-size:0.74rem;color:var(--soft);}
+  /* kamerkaarten: status als kleurband, grote tikdoelen */
+  .kamer{border-left:4px solid var(--line);}
+  .kamer.vuil{border-left-color:#E5484D;}
+  .kamer.bezig{border-left-color:var(--amber);}
+  .kamer.schoon{border-left-color:var(--green);}
+  .kamer.defect{border-left-color:#E5484D;background:rgba(229,72,77,0.06);}
+  .kamer.bezet{border-left-color:var(--line);opacity:0.75;}
+  .hkchip{display:inline-flex;align-items:center;gap:0.3rem;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;font-size:0.64rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+  .hkchip.groen{color:#7BC79B;border-color:rgba(76,154,117,0.5);}
+  .hkchip.rood{color:#FF8589;border-color:rgba(229,72,77,0.5);}
+  .hkchip.amber{color:#E2B93B;border-color:rgba(201,154,46,0.5);}
+  .stat{display:flex;gap:1.1rem;align-items:center;}
+  .stat b{font-family:'Bodoni Moda',serif;font-size:1.35rem;font-variant-numeric:tabular-nums;}
+  .stat span{display:block;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);}
+  .mbrow{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;padding:0.4rem 0;}
+  .mbrow .q{display:flex;align-items:center;gap:0.6rem;}
+  .mbrow .q button{width:2rem;height:2rem;border-radius:50%;background:var(--card2);border:1px solid var(--line);font-size:1rem;}
+  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:rgba(12,12,11,0.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;padding:0.55rem 0.4rem calc(env(safe-area-inset-bottom,0px) + 0.55rem);}
+  .tabbar button{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:0.25rem;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--soft);}
+  .tabbar button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .tabbar button.active{color:var(--txt);}
+  .tabbar button.active svg{stroke:var(--burgundy);}
+  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:var(--knop);color:var(--knop-txt);font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<div id="shell">
+  <div id="gate" role="main"></div>
+  <div id="app">
+    <header class="topbar">
+      <div class="who"><b id="wieNaam">·</b><span id="wieZaak" data-i18n="hk.app">Housekeeping</span></div>
+      <button class="switch" id="switchBtn" data-i18n="hk.wissel">Wissel</button>
+    </header>
+    <main class="content" id="hoofd" tabindex="-1">
+      <div class="view active" data-view="kamers">
+        <h2 data-i18n="hk.v.kamers">Kamers</h2>
+        <p class="sub" data-i18n="hk.v.kamers.sub">De AI zet de kamers in de slimste volgorde; een tik per stap.</p>
+        <div id="kamersWrap"></div>
+      </div>
+      <div class="view" data-view="klussen">
+        <h2 data-i18n="hk.v.klussen">Klussen &amp; gevonden</h2>
+        <p class="sub" data-i18n="hk.v.klussen.sub">Melden, oppakken, afronden. En gevonden voorwerpen veilig registreren.</p>
+        <div id="klussenWrap"></div>
+      </div>
+      <div class="view" data-view="meer">
+        <h2 data-i18n="hk.v.meer">Meer</h2>
+        <p class="sub" data-i18n="hk.v.meer.sub">Inklokken, het team en de volledige PDA.</p>
+        <div id="meerWrap"></div>
+      </div>
+    </main>
+    <nav class="tabbar" aria-label="Tabbladen">
+      <button data-tab="kamers" class="active"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg><span data-i18n="hk.t.kamers">Kamers</span></button>
+      <button data-tab="klussen"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.3-2.3z"/></svg><span data-i18n="hk.t.klussen">Klussen</span></button>
+      <button data-tab="meer"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span data-i18n="hk.t.meer">Meer</span></button>
+    </nav>
+    <div id="toast" role="status"></div>
+  </div>
+</div>
+<script>
+window.I18N = { en: {
+  'hk.app':'Housekeeping', 'hk.wissel':'Switch',
+  'hk.v.kamers':'Rooms', 'hk.v.kamers.sub':'The AI puts the rooms in the smartest order; one tap per step.',
+  'hk.v.klussen':'Jobs & found', 'hk.v.klussen.sub':'Report, pick up, finish. And register found items safely.',
+  'hk.v.meer':'More', 'hk.v.meer.sub':'Clock in, the team and the full PDA.',
+  'hk.t.kamers':'Rooms', 'hk.t.klussen':'Jobs', 'hk.t.meer':'More',
+  'hk.gast':'guest(s) on the way, first in ~', 'hk.gast2':'make sure a clean room is ready',
+  'hk.vuil':'Dirty', 'hk.bezig':'Cleaning', 'hk.schoon':'Clean', 'hk.vrij':'Released', 'hk.defect':'Out of order', 'hk.bezet':'Occupied',
+  'hk.start':'Start', 'hk.klaar':'Clean', 'hk.geefvrij':'Release for early check-in', 'hk.vrijaf':'Withdraw release',
+  'hk.checkout':'Check-out (dirty)', 'hk.defectmeld':'Report defect', 'hk.defectq':'What is broken?',
+  'hk.vrijchip':'free for early check-in',
+  'hk.minibar':'Minibar', 'hk.boek':'Charge to the room', 'hk.geboekt':'Charged to the room.',
+  'hk.klus.ph':'Describe the job...', 'hk.klus.meld':'Report job', 'hk.klus.open':'Open jobs',
+  'hk.pak':'Pick up', 'hk.rond':'Done', 'hk.geenklus':'No open jobs.',
+  'hk.lf':'Found item', 'hk.lf.item':'What did you find?', 'hk.lf.plek':'Storage place', 'hk.lf.meld':'Register',
+  'hk.lf.recent':'Recently registered',
+  'hk.klok':'Clock', 'hk.in':'Clock in', 'hk.uit':'Clock out', 'hk.binnen':'Clocked in',
+  'hk.nietin':'Not clocked in', 'hk.pda':'Open the full PDA', 'hk.pda.s':'Schedule, team chat, walkie-talkie and SOS.',
+  'hk.uitlog':'Log out on this device',
+  'hk.title':'The floor in your <em>pocket</em>.', 'hk.deck':'Rooms, jobs, minibar and found items. One tap per step; the front desk sees everything live.',
+  'hk.badge':'RTG Housekeeping', 'hk.kies':'Pick your hotel', 'hk.wie':'Who are you?', 'hk.pin':'Your PIN code',
+  'hk.geenkamers':'No rooms for this business.', 'hk.terug':'back', 'hk.prio':'Priority',
+  'hk.vuilcnt':'room(s) dirty', 'hk.vrijtoast':'Released; the front desk sees it instantly.',
+  'hk.klusok':'Job reported.', 'hk.lfok':'Registered.', 'hk.geenk':'no room',
+  't.now':'just now', 't.min':' min', 't.hour':' h', 't.days':' d'
+} };
+</script>
+<script src="/shared/appshell.js"></script>
+<script src="/apps/housekeeping.js"></script>
+<script src="/shared/i18n.js"></script>
+<script src="/shared/thema.js"></script>
+<script src="/shared/verbinding.js"></script>
+</body>
+</html>

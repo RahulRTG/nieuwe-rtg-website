@@ -257,6 +257,23 @@ app.post('/api/supplier/room/hk', supplierAuth, (req, res) => {
   res.json({ ok: true, rooms: req.supplier.rooms });
 });
 
+/* Kamer is vrij: de overschot-techniek voor het hotel. Housekeeping geeft
+   een schone kamer vrij voor vroege check-in; de receptie ziet het direct
+   en de gasten-AI kan erop sturen. Elke andere hk-status haalt de vrijgave
+   vanzelf weg. */
+app.post('/api/supplier/room/vrij', supplierAuth, (req, res) => {
+  const room = (req.supplier.rooms || []).find(r => r.id === req.body.id);
+  if (!room) return res.status(404).json({ error: 'Kamer niet gevonden.' });
+  if (!room.hk || room.hk.status !== 'schoon') return res.status(409).json({ error: 'Alleen een schone kamer kan vrijgegeven worden.' });
+  room.vroegVrij = req.body.op === false ? undefined : { at: new Date().toISOString(), door: req.actor.name };
+  if (!room.vroegVrij) delete room.vroegVrij;
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'rooms' });
+  if (room.vroegVrij) notifySupplier(req.supplier.code, { icon: '\u{1F6CE}️', title: 'Vroege check-in mogelijk', body: room.name + ' is schoon en vrijgegeven door ' + req.actor.name + '.' });
+  logActivity(req.supplier.code, req.actor, (room.vroegVrij ? 'gaf ' : 'trok de vrijgave in van ') + room.name + (room.vroegVrij ? ' vrij voor vroege check-in' : ''));
+  res.json({ ok: true, rooms: req.supplier.rooms });
+});
+
 app.post('/api/supplier/ticket/add', supplierAuth, (req, res) => {
   const text = String(req.body.text || '').trim().slice(0, 160);
   if (!text) return res.status(400).json({ error: 'Omschrijf de klus.' });

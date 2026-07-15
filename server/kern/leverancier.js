@@ -154,6 +154,8 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
   function setRoomHk(s, room, status, note, actor) {
     const wasDefect = room.hk && room.hk.status === 'defect';
     room.hk = { status, note: status === 'defect' ? note : '', by: actor.name, at: new Date().toISOString() };
+    // elke statuswissel haalt de vroege-check-in-vrijgave weg (die hoort bij schoon)
+    if (status !== 'schoon') delete room.vroegVrij;
     if (status === 'defect') {
       // direct uit de verkoop en een klus voor onderhoud
       if (room.available) { room.available = false; room.hkDisabledAvail = true; }

@@ -72,6 +72,7 @@
       <p style="margin:0;" data-i18n="pw.actie.laat">Slaat u onze uitnodiging af, of meldt u zich pas na de sluitingsdatum aan (deze wordt nog aangekondigd)? Dan geldt het reguliere instaptarief: eenmalig &euro; 10.000 entree en &euro; 500 vaste contributie per jaar, plus een jaarlijkse doorbelasting van de werkelijke onderhoudskosten van het platform (servers, energie, voorschotten en dergelijke), gespecificeerd op de factuur en zonder maximum.</p>
     </div>
 
+    <p style="border:1px solid var(--gold,#A98F1C);border-radius:12px;padding:0.8rem 1rem;font-size:0.85rem;line-height:1.55;margin-bottom:1rem;" data-i18n-html="pw.paseis">🎫 <b>Toegangseis:</b> een partnerplek is er alleen voor bedrijven waar minstens een persoon een Business Pass heeft. Log op dit apparaat in op de Business Pass-app; zonder Business Pass geeft RTG geen bedrijfscode uit.</p>
     <form id="paForm">
       <div>
         <label for="paCompany" data-i18n="pw.company">Bedrijfsnaam</label>
@@ -149,12 +150,17 @@
     const msg = $('#paMsg');
     msg.className = 'msg';
     try {
+      // de toegangseis: de aanvraag gaat mee met de Business Pass-sessie van
+      // dit apparaat; zonder Business Pass geeft de server geen code uit
+      let passToken = '';
+      try { passToken = localStorage.getItem('rtg_member_token') || ''; } catch (e2) {}
       const res = await fetch('/api/partner/apply', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           company: $('#paCompany').value, type: $('#paType').value, city: $('#paCity').value,
           contactName: $('#paName').value, email: $('#paEmail').value, phone: $('#paPhone').value, note: $('#paNote').value,
-          akkoord: document.getElementById('paAkkoord').checked === true
+          akkoord: document.getElementById('paAkkoord').checked === true,
+          passToken
         })
       });
       const d = await res.json().catch(() => ({}));
@@ -179,6 +185,7 @@ window.I18N = { en: {
   'pw.prijs':'<b>0% commission, with a member price guarantee</b>: you never charge members more than your own public price. The commission you would pay elsewhere goes to your guests here. RTG says nothing about your other sales channels.',
   'pw.title':'Become a partner, <em>without the hassle</em>.',
   'pw.deck':'RTG members travel at net prices and pay through the app. As a partner you get a complete system for free: register, orders, reservations, staff management with schedules and video calling, your own AI assistant and a live connection with your guests on the move.',
+  'pw.paseis':'🎫 <b>Entry requirement:</b> a partner spot is only available to businesses where at least one person holds a Business Pass. Sign in to the Business Pass app on this device; without a Business Pass RTG issues no company code.',
   'pw.company':'Company name', 'pw.type':'Type of business', 'pw.city':'City',
   'pw.contact':'Contact person', 'pw.phone':'Phone (optional)', 'pw.email':'Email address',
   'pw.note':'Tell us briefly about your business (optional)', 'pw.send':'Request a partner spot',

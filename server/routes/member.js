@@ -1,7 +1,7 @@
 /* Domein "member" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept,
+  const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessionFor, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept,
     reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview, reviewsVoor,
     toggleFavoriet, favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits,
     zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
@@ -692,6 +692,14 @@ app.post('/api/event/rsvp', auth, (req, res) => {
 
 app.post('/api/partner/apply', (req, res) => {
   const b = req.body || {};
+  /* De toegangseis: een partnerplek (en dus een bedrijfscode) is er alleen
+     voor bedrijven waar minstens een persoon een Business Pass heeft. De
+     aanvrager bewijst dat met zijn eigen ingelogde pas: zonder geldige
+     Business Pass-sessie geen aanvraag, en dus geen code. */
+  const passToken = String(b.passToken || (req.headers.authorization || '').replace(/^Bearer\s+/i, '') || '');
+  const passSess = passToken ? sessionFor(passToken) : null;
+  if (!passSess || passSess.tier !== 'business')
+    return res.status(403).json({ error: 'Zonder Business Pass geen bedrijfscode: een partnerplek vraagt u aan met een actieve Business Pass. Log op dit apparaat in op de Business Pass-app en probeer het opnieuw.' });
   // schoon(): strip < en > uit vrije tekst. De bedrijfsnaam en plaats komen later
   // in andermans schermen (De Salon, backoffice), dus nooit als opmaak laten landen.
   const company = schoon(b.company, 80);
@@ -714,6 +722,8 @@ app.post('/api/partner/apply', (req, res) => {
     company, type, city, contactName, email, phone, note,
     // vastlegging van het akkoord (bewijs): wat en wanneer
     akkoord: { partnervoorwaarden: true, verwerkersafspraken: true, at: new Date().toISOString() },
+    // het Business Pass-bewijs: zonder dit keurt het kantoor niets goed
+    businessPass: { key: passSess.key, at: new Date().toISOString() },
     status: 'nieuw', at: new Date().toISOString()
   };
   db.data.partnerApplications.unshift(entry);

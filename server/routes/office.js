@@ -53,6 +53,10 @@ app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
   if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
   if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
   if (req.body.action === 'goedkeuren') {
+    // de toegangseis geldt ook hier: geen Business Pass-bewijs bij de
+    // aanvraag, dan gaat er geen bedrijfscode de deur uit
+    if (!a.businessPass || !a.businessPass.key)
+      return res.status(409).json({ error: 'Deze aanvraag heeft geen Business Pass-bewijs; zonder Business Pass geen bedrijfscode. Vraag de aanvrager de aanvraag opnieuw te doen met een actieve Business Pass.' });
     const code = makeSupplierCode(a.company);
     const s = { code, name: a.company, type: a.type, city: a.city, loc: null, rate: 0.12, menu: [] };
     ensureSupplierDefaults(s);

@@ -1,7 +1,45 @@
 /* Domein "staff" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { DEMO, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, notifySupplier, publicPartner, save, schoon, sseToOffice, sseToSupplier, supplierAuth, trustVan } = kern;
+  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseToOffice, sseToSupplier, supplierAuth, trustVan } = kern;
+
+/* Het urenoverzicht voor de zaak: wie is er nu binnen, wie werkte wanneer en
+   hoelang (vandaag en deze week). Elke medewerker klokt via de PDA; het
+   management ziet hier het complete beeld. */
+app.post('/api/staff/klok/overzicht', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const lijst = db.data.klok[req.supplier.code] || [];
+  const rows = accounts.listStaff(req.supplier.code).map(accounts.publicStaff).map(m => {
+    const mijn = lijst.filter(e => e.staffId === m.id);
+    const laatste = mijn[0] || null;
+    return {
+      id: m.id, name: m.name, func: m.func || '', role: m.role,
+      binnen: !!mijn.find(e => !e.out),
+      laatsteIn: laatste ? laatste.in : null, laatsteUit: laatste ? laatste.out : null,
+      ...klokVan(req.supplier.code, m.id)
+    };
+  });
+  res.json({ ok: true, rows });
+});
+
+/* Collega's bellen: alleen wie is ingeklokt is bereikbaar. Het belsignaal
+   loopt over het eigen kanaal van de zaak (SSE); het toestel van de collega
+   rinkelt en neemt aan of wijst af. */
+app.post('/api/staff/bel', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
+  const naar = parseInt(req.body.staffId, 10);
+  if (!naar || naar === req.actor.staffId) return res.status(400).json({ error: 'Kies een collega.' });
+  const lijst = db.data.klok[req.supplier.code] || [];
+  if (!lijst.find(e => e.staffId === naar && !e.out)) return res.status(409).json({ error: 'Deze collega is niet ingeklokt en dus niet bereikbaar.' });
+  sseToSupplier(req.supplier.code, 'bel', { van: req.actor.name, vanId: req.actor.staffId, naar });
+  logActivity(req.supplier.code, req.actor, 'belde een ingeklokte collega');
+  res.json({ ok: true });
+});
+app.post('/api/staff/bel/antwoord', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
+  sseToSupplier(req.supplier.code, 'bel-antwoord', { vanId: parseInt(req.body.vanId, 10), naam: req.actor.name, naarId: req.actor.staffId, akkoord: req.body.akkoord !== false });
+  res.json({ ok: true });
+});
 
 app.post('/api/staff/clock', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });

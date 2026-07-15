@@ -3,6 +3,15 @@
   let kantoorEdit = null;   // gerecht dat open staat in de kaart-bewerker
   // de AI-bedrijfsagent: vaste leverancier, inkoopvoorstellen en het AI-weekrooster
   let agentData = null, agentMarkt = null, agentBusy = false;
+  // de urenregistratie: iedereen klokt via de PDA, het kantoor ziet het beeld
+  let klokOverzicht = null, klokBusy = false;
+  async function laadKlok(){
+    if (klokBusy) return;
+    klokBusy = true;
+    try { klokOverzicht = (await API.call('/staff/klok/overzicht', {})).rows; } catch(e){ klokOverzicht = []; }
+    klokBusy = false;
+    renderStation();
+  }
   async function laadAgent(){
     if (agentBusy) return;
     agentBusy = true;
@@ -254,6 +263,16 @@
             ? '<div class="tkc-act"><button class="tkc-ready" id="agRoosterOk">✔ '+T('ag2.rooster.ok','Stel vast')+'</button><button class="obtn warn" id="agRoosterNee" style="margin-left:0.5rem;">'+T('ag2.nee','Wijs af')+'</button></div>'
             : '<div class="tkc-who">✔ '+T('ag2.rooster.vast','Vastgesteld; het rooster in de PDA volgt dit plan.')+'</div>')
         : '<div class="tkc-act"><button class="tkc-start" id="agRooster">✨ '+T('ag2.rooster.stel','Stel het weekrooster voor')+'</button></div>')+'</div>';
+      // urenregistratie: wie is binnen, wie werkte wanneer en hoelang
+      if (!klokOverzicht) laadKlok();
+      const tijd = iso => new Date(iso).toLocaleString(lang()==='en'?'en-GB':'nl-NL', { weekday:'short', hour:'2-digit', minute:'2-digit' });
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>⏱ '+T('kt.uren','Urenregistratie')+'</h3>'+
+        '<div class="tkc-who">'+T('kt.uren.deck','Iedereen klokt via de PDA; hier staat precies wie wanneer en hoelang werkt.')+'</div>'+
+        (klokOverzicht && klokOverzicht.length ? klokOverzicht.map(r =>
+          '<div class="st-row"><span>'+(r.binnen?'🟢 ':'⚪ ')+r.name+'<span class="sub">'+(r.func||(r.role==='manager'?'Manager':''))+
+            (r.laatsteIn?' · '+T('kt.uren.in','in ')+tijd(r.laatsteIn)+(r.laatsteUit?' · '+T('kt.uren.uit','uit ')+tijd(r.laatsteUit):' · '+T('kt.uren.nu','nu binnen')):' · '+T('kt.uren.nooit','nog niet geklokt'))+'</span></span>'+
+          '<span class="sub" style="text-align:right;font-variant-numeric:tabular-nums;">'+T('kt.uren.vandaag','vandaag ')+r.vandaagUren+'u<br>'+T('kt.uren.week','week ')+r.weekUren+'u</span></div>').join('')
+        : '<div class="tkc-who">…</div>')+'</div>';
       const apps = (state.applications||[]).filter(x=>x.status==='nieuw');
       html += '<div class="tkc"><h3>'+T('kt.sollicitaties','Sollicitaties')+(apps.length?' ('+apps.length+')':'')+'</h3>'+
         (apps.length ? apps.map(x=>'<div class="st-row"><span>'+x.name+' \u00b7 '+x.func+(x.viaRTG?' \u00b7 RTG':'')+'<span class="sub">'+x.contact+'</span></span>'+

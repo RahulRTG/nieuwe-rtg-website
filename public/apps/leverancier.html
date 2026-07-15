@@ -521,7 +521,7 @@
     <div class="enroll-box">
       <button type="button" class="enroll-toggle" id="enrollToggle" aria-expanded="false" data-i18n="enr.toggle">🎟️ Uitgenodigd door uw werkgever? Meld u aan</button>
       <form class="login-form enroll-form" id="enrollForm" hidden>
-        <p class="enroll-hint" data-i18n="enr.hint">Alleen RTG-, Lifestyle- en Business-leden kunnen in de app werken. Uw werkgever geeft u een kassacode; vul die met de bedrijfsnaam in en bevestig met uw eigen RTG-inlog.</p>
+        <p class="enroll-hint" data-i18n="enr.hint">U werkt hier met uw eigen RTG-account; een gratis account is genoeg, een betaalde pas is niet nodig. Uw werkgever geeft u een kassacode; vul die met de bedrijfsnaam in en bevestig met uw eigen RTG-inlog.</p>
         <input id="enBedrijf" placeholder="Bedrijfsnaam" data-i18n-ph="enr.biz" autocomplete="organization">
         <input id="enCode" placeholder="Kassacode" data-i18n-ph="enr.code" autocapitalize="characters" autocomplete="off">
         <input id="enLogin" placeholder="Uw RTG e-mail of gebruikersnaam" data-i18n-ph="enr.login" autocomplete="username" autocapitalize="none">
@@ -1966,7 +1966,7 @@
           '<span class="acts">'+(m.id!==actor().staffId
             ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset code')+'</button><button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
             : '')+'</span></div>').join('')+
-        '<div class="tkc-who" style="margin-top:0.55rem;line-height:1.5;">'+T('kt.invite.intro','Personeel is een RTG-, Lifestyle- of Business-lid. Nodig iemand uit; hij of zij meldt zich daarna zelf aan in de app met de bedrijfsnaam en de kassacode.')+'</div>'+
+        '<div class="tkc-who" style="margin-top:0.55rem;line-height:1.5;">'+T('kt.invite.intro','Personeel heeft een eigen RTG-account (het gratis account is genoeg). Nodig iemand uit; hij of zij meldt zich daarna zelf aan in de app met de bedrijfsnaam en de kassacode.')+'</div>'+
         '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
         '<button class="bigbtn" id="ktInvite" style="margin-top:0.2rem;">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
@@ -5917,13 +5917,13 @@ window.I18N = { en: {
   'team.invintro':'Invitation for', 'team.invite':'Invite', 'team.invited':'Invitation created. Register code: ',
   'team.invnote':'Pass this on. They sign up themselves in the app with their own RTG account; the code is one-time.',
   'ap.hired2':'Hired. Register code: ',
-  'kt.invite.intro':'Staff are RTG, Lifestyle or Business members. Invite someone; they then sign up themselves in the app with the company name and the register code.',
+  'kt.invite.intro':'Staff have their own RTG account (the free account is enough). Invite someone; they then sign up themselves in the app with the company name and the register code.',
   'kt.invite':'Invite, register code appears', 'kt.invite.toast':'Register code created.',
   'kt.invite.done':'Invitation ready. Give these two things to your employee:',
   'kt.invite.biz':'Company name', 'kt.invite.code':'Register code',
   'kt.invite.note':'They sign up with their own RTG account. The code is one-time and valid for 30 days.',
   'enr.toggle':'🎟️ Invited by your employer? Sign up', 'enr.submit':'Sign up with my employer',
-  'enr.hint':'Only RTG, Lifestyle and Business members can work in the app. Your employer gives you a register code; enter it with the company name and confirm with your own RTG login.',
+  'enr.hint':'You work here with your own RTG account; a free account is enough, no paid pass needed. Your employer gives you a register code; enter it with the company name and confirm with your own RTG login.',
   'enr.biz':'Company name', 'enr.code':'Register code', 'enr.login':'Your RTG email or username',
   'enr.pass':'Your RTG password', 'enr.pin':'Choose a PIN (4 digits)',
   'enr.busy':'Signing up...', 'enr.ok':'Done! You are signed up. Logging you in...', 'enr.fail':'Sign-up failed. Check the details.',

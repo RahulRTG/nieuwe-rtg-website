@@ -101,13 +101,12 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
   res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
 });
 
-/* ---- personeel = RTG-lid: uitnodigen (kassacode) en zelf aanmelden ----
-   Nieuw personeel is voortaan altijd een RTG-, Lifestyle- of Business-lid. Een
-   manager nodigt iemand uit en krijgt een eenmalige kassacode; de medewerker
-   meldt zich pas daarna zelf aan met de bedrijfsnaam en die kassacode, en
-   bewijst met de eigen RTG-inlog dat het een lid is. Zo kan niemand zonder
-   uitnodiging bij een bedrijf, en werkt alleen een echt lid in de app. */
-const LID_TIERS = ['rtg', 'lifestyle', 'business'];
+/* ---- personeel = RTG-account: uitnodigen (kassacode) en zelf aanmelden ----
+   Nieuw personeel heeft altijd een eigen RTG-account; een betaalde pas is niet
+   nodig, het gratis account is genoeg. Een manager nodigt iemand uit en krijgt
+   een eenmalige kassacode; de medewerker meldt zich pas daarna zelf aan met de
+   bedrijfsnaam en die kassacode, en bewijst met de eigen RTG-inlog dat het
+   account echt is. Zo kan niemand zonder uitnodiging bij een bedrijf. */
 const KASSA_ALFABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // zonder verwarrende tekens
 function maakKassacode() {
   let c = '';
@@ -197,14 +196,11 @@ app.post('/api/supplier/staff/join', async (req, res) => {
   const pin = String(req.body.pin || '').trim();
   if (!bedrijf || !kassacode) { noteFailedTry(bucket); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
   if (!/^\d{4}$/.test(pin)) return res.status(400).json({ error: 'Kies een pincode van 4 cijfers voor uw dagelijkse inlog.' });
-  // 1) bewijs dat u een RTG-lid bent
+  // 1) bewijs dat u een eigen RTG-account hebt (een betaalde pas is niet nodig)
   const lid = accounts.findByLogin(req.body.login);
   if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
     noteFailedTry(bucket);
     return res.status(401).json({ error: 'Onjuiste RTG-inloggegevens. Meld u aan met uw eigen RTG-account.' });
-  }
-  if (!LID_TIERS.includes(lid.tier)) {
-    return res.status(403).json({ error: 'Alleen leden met een RTG-, Lifestyle- of Business-pas kunnen in de leverancier-app werken.' });
   }
   // 2) het bedrijf moet bestaan en de kassacode moet erbij horen (eenmalig)
   const s = findSupplierByName(bedrijf);

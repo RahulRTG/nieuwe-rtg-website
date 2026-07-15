@@ -1,8 +1,8 @@
-/* Personeel = RTG-lid, met uitnodiging. Een manager nodigt uit en krijgt een
-   eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de
-   bedrijfsnaam + kassacode + eigen RTG-inlog. Alleen RTG/Lifestyle/Business
-   leden komen erin; een gast niet, een verkeerde code niet, en tweemaal met
-   dezelfde code lukt niet.
+/* Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt
+   een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de
+   bedrijfsnaam + kassacode + eigen RTG-inlog. Elk echt account is genoeg (ook
+   het gratis gast-account, een betaalde pas is niet nodig); zonder geldige
+   uitnodiging komt niemand erin, en tweemaal met dezelfde code lukt niet.
    Draai: node --experimental-sqlite --test test/staffinvite.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -53,13 +53,16 @@ test('zonder geldige uitnodiging kom je er niet in (verkeerde kassacode)', async
   assert.equal(r.status, 403);
 });
 
-test('een niet-lid (gast) kan zich niet aanmelden, ook niet met een geldige code', async () => {
-  // een gast-account (geen betaalde pas)
+test('een gratis account (gast, zonder betaalde pas) mag ook werken, met een eigen uitnodiging', async () => {
   const gast = await json(await api('/api/auth/register', { name: 'Gast Persoon', email: 'gast@x.nl', phone: '0612345671',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'guest', pasApp: 'rtg' }));
   assert.ok(gast.token, 'de gast is aangemaakt');
-  const r = await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: global.__code, login: 'gast@x.nl', password: 'geheim123', pin: '2468' });
-  assert.equal(r.status, 403, 'een gast is geen RTG-lid');
+  // zonder uitnodiging blijft de deur dicht
+  assert.equal((await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: 'XXXXXX', login: 'gast@x.nl', password: 'geheim123', pin: '2468' })).status, 403);
+  // met een eigen kassacode komt het gratis account er wel in: een pas is niet nodig
+  const inv = await json(await api('/api/supplier/staff/invite', { name: 'Gast Persoon', func: 'Afwas' }, managerToken));
+  const r = await json(await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: inv.invite.kassacode, login: 'gast@x.nl', password: 'geheim123', pin: '2468' }));
+  assert.ok(r.ok && r.staffId, 'het gratis account is genoeg om te werken');
 });
 
 test('verkeerde RTG-inlog wordt geweigerd', async () => {

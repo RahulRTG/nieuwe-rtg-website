@@ -29,12 +29,25 @@
     border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .demo{display:flex;align-items:center;gap:0.7rem;background:var(--card);border:1px solid var(--line);
+    border-left:3px solid var(--gold);border-radius:12px;padding:0.85rem 1rem;margin:0.9rem 0 0.3rem;}
+  .demo .dot{width:0.55rem;height:0.55rem;border-radius:50%;background:var(--gold);flex-shrink:0;
+    box-shadow:0 0 0 4px rgba(169,143,28,0.18);}
+  .demo p{font-size:0.82rem;line-height:1.45;color:var(--soft);}
+  .demo b{color:var(--txt);font-weight:600;}
+  .lead{color:var(--soft);font-size:0.9rem;margin-top:0.4rem;}
 </style>
 </head>
 <body>
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <main class="wrap" id="hoofd" tabindex="-1">
   <h1>RTG Apps</h1>
+  <p class="lead" data-i18n="hub.lead">Loop door het hele platform. Kies een app en probeer alles.</p>
+
+  <div class="demo" role="note">
+    <span class="dot" aria-hidden="true"></span>
+    <p data-i18n-html="hub.demo"><b>Demo.</b> Alle functies werken. Alleen echt betalen, echte bestellingen en de RTG Boardroom zijn uit. Wissel linksonder tussen licht en donker.</p>
+  </div>
 
   <h2 data-i18n="hub.members">Leden</h2>
   <div class="grid">
@@ -112,10 +125,13 @@ window.I18N = { en: {
   'hub.g.eten':'Food & drink', 'hub.g.verblijf':'Stay', 'hub.g.vervoer':'Transport',
   'hub.g.beleven':'Experiences', 'hub.g.handel':'Retail & trade',
   'hub.bo':'Back office', 'hub.tech':'Tech',
-  'hub.partnerworden':'Become a partner', 'hub.privacy':'Privacy', 'hub.home':'Website'
+  'hub.partnerworden':'Become a partner', 'hub.privacy':'Privacy', 'hub.home':'Website',
+  'hub.lead':'Walk through the whole platform. Pick an app and try everything.',
+  'hub.demo':'<b>Demo.</b> Every function works. Only real payments, real orders and the RTG Boardroom are switched off. Toggle light and dark at the bottom left.'
 } };
 </script>
 <script src="/shared/i18n.js"></script>
+<script src="/shared/thema.js"></script>
 <script src="/shared/verbinding.js"></script>
 </body>
 </html>

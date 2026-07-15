@@ -843,6 +843,40 @@
             '</div>';
           };
           html += stStats(actief) + allDay(actief, sec);
+          // de bezetting: wie staat er op deze kant; het scherm rekent per kok
+          const koks = ((state.lijn||{})[sec]) || [];
+          const ikSta = koks.some(k => k.id === actor().staffId);
+          const perKok = koks.length ? Math.ceil(actief.length / koks.length) : actief.length;
+          html += '<div class="allday"><span class="ad-h">👥 '+T('lijn.h','Bezetting')+'</span>'+
+            (koks.length ? '<span class="ad">'+koks.map(k=>k.name.split(' ')[0]).join(', ')+' · <b>'+perKok+'</b> '+T('lijn.perkok','bon(nen) p.p.')+'</span>' : '<span class="ad">'+T('lijn.leeg','Niemand aangemeld')+'</span>')+
+            '<button class="obtn'+(ikSta?' primary':'')+'" data-lijnaan="'+sec+'">'+(ikSta?'✔ '+T('lijn.af','Aangemeld, tik om af te melden'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
+          // maak nu: wat deze kant NU in een keer maakt, gebundeld over de bonnen
+          const nuPer = {};
+          actief.forEach(o => {
+            const p = vuurplan(o).plan[sec];
+            if (!p || (p.doe !== 'nu' && p.doe !== 'bezig')) return;
+            (o.items||[]).forEach(it => { if (sectieOf(it) === sec){ const r = nuPer[it.name] = nuPer[it.name] || { n:0, bonnen:[] }; r.n += it.qty; r.bonnen.push(o.pickup); } });
+          });
+          const nuRows = Object.entries(nuPer).sort((a,b)=>b[1].n-a[1].n);
+          if (nuRows.length)
+            html += '<div class="tkc" style="grid-column:1/-1;border-top:4px solid #2E7D5B;"><h3>🔥 '+T('lijn.maaknu','Maak nu, in een keer')+'</h3>'+
+              nuRows.map(([naam,r])=>'<div class="st-row"><span><b style="color:var(--gold);">'+r.n+'×</b> '+naam+'<span class="sub">'+T('lijn.bonnen','bonnen ')+[...new Set(r.bonnen)].join(', ')+'</span></span></div>').join('')+'</div>';
+          // tussendoor: slim gebruik van de wachttijd (voorbereiden, MEP, de lijn)
+          const straks = {};
+          actief.forEach(o => {
+            const p = vuurplan(o).plan[sec];
+            if (!p || p.doe !== 'wacht') return;
+            (o.items||[]).forEach(it => { if (sectieOf(it) === sec){ const r = straks[it.name] = straks[it.name] || { n:0, min:p.min }; r.n += it.qty; r.min = Math.min(r.min, p.min); } });
+          });
+          const straksRows = Object.entries(straks).sort((a,b)=>a[1].min-b[1].min).slice(0,6);
+          const dmsK = (state.dailyMeps||{})[new Date().toISOString().slice(0,10)];
+          const mepOpen = dmsK ? (dmsK.tasks||[]).filter(x=>!x.done).slice(0,3) : [];
+          if (straksRows.length || mepOpen.length || !actief.length)
+            html += '<div class="tkc" style="grid-column:1/-1;"><h3>⏳ '+T('lijn.tussendoor','Tussendoor')+'</h3>'+
+              straksRows.map(([naam,r])=>'<div class="st-row"><span>'+T('lijn.zetklaar','Zet vast klaar: ')+'<b>'+r.n+'×</b> '+naam+'<span class="sub">'+T('lijn.startover','start over ~')+r.min+' min</span></span></div>').join('')+
+              mepOpen.map(x=>'<div class="st-row"><span><b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.5rem;">'+x.time+'</b>'+x.task+'<span class="sub">'+T('lijn.mep','mise en place van vandaag')+'</span></span></div>').join('')+
+              (!straksRows.length && !mepOpen.length ? '<div class="tkc-who">'+T('lijn.hygiene','Rustig moment: werkbank afnemen, koeling en parstock checken, garnituur bijvullen.')+'</div>' : '')+
+            '</div>';
           html += actief.length ? actief.map(o=>kaart(o,false)).join('') : '<div class="st-empty">'+T('ks.calm','Niets voor deze kant. Nieuwe bestellingen met werk voor ')+T('ks.'+sec, KSECTIES[sec][1]).toLowerCase()+T('ks.calm2',' verschijnen hier vanzelf.')+'</div>';
           if (klaarHier.length){
             html += '<div class="st-sec">'+T('ks.done','Klaargemeld door deze kant')+'</div>';
@@ -1019,6 +1053,9 @@
       const t = prompt(T('st.tblq','Welke tafel? (leeg = geen tafel)'), b.dataset.cur || '');
       if (t === null) return;
       try { await API.call('/supplier/order/table', { ref: b.dataset.settbl, table: t.trim() }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-lijnaan]').forEach(b => b.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/lijn', { sectie: b.dataset.lijnaan }); toast(d.aangemeld ? '👥 '+T('lijn.aant','Aangemeld op deze kant.') : T('lijn.aftoast','Afgemeld van deze kant.')); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-ksel]').forEach(b => b.addEventListener('click', () => {
       keukenSectie = b.dataset.ksel;

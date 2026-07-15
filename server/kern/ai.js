@@ -13,6 +13,7 @@ const AI_TONE = {
 };
 
 const { naamEn } = require('../talen');
+const { dagContext } = require('./context');
 
 function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n }) {
   function aiSystemPrompt(tier, lang) {
@@ -25,6 +26,8 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
       : 'The member reads and writes in ' + naamEn(lang) + '. Answer ONLY in ' + naamEn(lang) + ', concise (max ~120 words), no frills. Keep the same courteous, formal register.';
     return [
       'Je bent de exclusieve persoonlijke reis-AI van Rahul Travel Group (RTG), een membership-reisclub die tegen inkoopprijs boekt en 30% van elke ledenbijdrage aan de RTFoundation doneert.',
+      // de dagcontext: elke AI denkt aan tijd, seizoen en temperatuur
+      dagContext().zin + ' Weeg dat mee in adviezen (kleding, terras of binnen, dagplanning, seizoensgerechten).',
       AI_TONE[tier] || AI_TONE.rtg,
       'Je bent de frictieloze vriend van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay), verwijs daarnaar, vraag nooit om betaalgegevens.',
       'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig je kort dat het geregeld is en noem je wat je vervolgens in de gaten houdt.',

@@ -203,6 +203,16 @@ function maakEvents({ crypto, sectiesForOrder }) {
     for (const [t, os] of Object.entries(perTafel)) if (os.length >= 2)
       lines.push(en ? '🪑 ' + t + ' has ' + os.length + ' tickets (' + os.map(o => o.pickup).join(', ') + '): line up the sections so the table leaves in one go.'
                     : '🪑 ' + t + ' heeft ' + os.length + ' bonnen (' + os.map(o => o.pickup).join(', ') + '): stem de kanten af zodat de tafel in één keer uitgaat.');
+    // 6. de bezetting: veel open werk op een kant met weinig aangemelde koks
+    const lijn = s.lijn || {};
+    const perKant = {};
+    for (const o of open) for (const sec of sectiesForOrder(s, o)) if ((o.secties || {})[sec] !== 'klaar') perKant[sec] = (perKant[sec] || 0) + 1;
+    for (const [sec, n2] of Object.entries(perKant)) {
+      const koks = (lijn[sec] || []).length;
+      if (n2 >= 4 && koks <= 1)
+        lines.push(en ? '👥 The ' + sec + ' side has ' + n2 + ' open tickets with ' + (koks || 'no') + ' cook(s) signed in: jump in or sign someone in.'
+                      : '👥 De kant ' + sec + ' heeft ' + n2 + ' open bonnen met ' + (koks || 'geen') + ' aangemelde kok(s): spring bij of meld iemand aan.');
+    }
     return lines.slice(0, 6);
   }
 

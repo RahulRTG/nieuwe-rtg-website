@@ -5,6 +5,8 @@
    (manager) keurt goed, past aan of wijst af. Pas bij akkoord wordt de
    bestelling echt bij de gekoppelde groothandel geplaatst. */
 
+const { dagContext } = require('./context');
+
 function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity }) {
   const agentVan = s => (s.agent = s.agent || { partnerCode: null, auto: false, voorstellen: [], rooster: null });
 
@@ -40,14 +42,16 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
     const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
     const plan = dms[morgen] || dms[new Date().toISOString().slice(0, 10)];
     const stoelen = (s.tables || []).reduce((n, t) => n + (t.seats || 0), 0) || 24;
-    const factor = plan ? Math.max(0.6, Math.min(2, plan.covers / (stoelen * 2))) : 1;
+    // de dagcontext weegt mee: seizoen en temperatuur sturen de aantallen
+    const ctx = dagContext();
+    const factor = (plan ? Math.max(0.6, Math.min(2, plan.covers / (stoelen * 2))) : 1) * ctx.factor;
     const regels = basis.regels.map(r => ({ ...r, aantal: Math.max(1, Math.round(r.aantal * factor)) }));
     const totaal = Math.round(regels.reduce((n, r) => n + r.aantal * r.prijs, 0) * 100) / 100;
     const v = {
       id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString(), soort: 'inkoop',
       groothandelCode: a.partnerCode, groothandelNaam: basis.groothandelNaam,
       regels: regels.slice(0, 40), totaal,
-      uitleg: basis.uitleg + (plan ? ' Aantallen geschaald op de verwachte drukte (' + plan.covers + ' couverts, factor ' + factor.toFixed(1) + ').' : ''),
+      uitleg: basis.uitleg + (plan ? ' Aantallen geschaald op de verwachte drukte (' + plan.covers + ' couverts, factor ' + factor.toFixed(1) + ').' : '') + ' ' + ctx.zin,
       status: 'wacht-op-goedkeuring', door: wie || 'AI-agent', ref: null
     };
     a.voorstellen.push(v);

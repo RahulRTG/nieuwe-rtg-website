@@ -707,6 +707,23 @@
       html += '<div class="card" style="display:flex;gap:1.2rem;align-items:center;"><div><b style="font-size:1.3rem;">'+mijn.length+'</b><span style="display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('kds.open','Open bonnen')+'</span></div>'+
         '<div><b style="font-size:1.3rem;color:'+(laat?'#FF8589':'#7BC79B')+';">'+laat+'</b><span style="display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('kds.laat','Te laat')+'</span></div>'+
         (allday.length?'<div style="flex:1;font-size:0.72rem;color:var(--soft);">'+T('kds.allday','All day')+': '+allday.map(r => r[1]+'× '+esc(r[0])).join(', ')+'</div>':'')+'</div>';
+      // de bezetting van deze kant: aanmelden = het scherm rekent met jou mee
+      const koks = ((state.lijn||{})[sec]) || [];
+      const ikSta = me && koks.some(k => k.id === me.staffId);
+      const perKok = koks.length ? Math.ceil(mijn.length / koks.length) : mijn.length;
+      html += '<div class="card" style="display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;"><span style="font-size:0.8rem;">👥 '+
+        (koks.length ? esc(koks.map(k=>k.name.split(' ')[0]).join(', '))+' · <b>'+perKok+'</b> '+T('lijn.perkok','bon(nen) p.p.') : T('lijn.leeg','Niemand aangemeld'))+'</span>'+
+        '<button class="abtn'+(ikSta?'':' ghost')+'" data-pklijn style="margin-left:auto;">'+(ikSta?'✔ '+T('lijn.af2','Aangemeld'):T('lijn.aan','Meld je aan op deze kant'))+'</button></div>';
+      // maak nu: in een keer maken, gebundeld over de bonnen
+      const nuPer = {};
+      mijn.forEach(o => {
+        const p2 = pkPlan(o).plan[sec];
+        if (!p2 || (p2.doe !== 'nu' && p2.doe !== 'bezig')) return;
+        (o.items||[]).forEach(it => { if (pkSectieOf(it) === sec){ nuPer[it.name] = (nuPer[it.name]||0) + it.qty; } });
+      });
+      const nuRows = Object.entries(nuPer).sort((a,b)=>b[1]-a[1]).slice(0,6);
+      if (nuRows.length) html += '<div class="card" style="border-left:4px solid #2E7D5B;"><div class="k">🔥 '+T('lijn.maaknu','Maak nu, in een keer')+'</div>'+
+        '<div style="margin-top:0.4rem;font-size:0.9rem;">'+nuRows.map(r=>'<b style="color:var(--gold);">'+r[1]+'×</b> '+esc(r[0])).join(' · ')+'</div></div>';
       html += mijn.length ? mijn.map(o => {
         const a = pkAge(o.at);
         const p = pkPlan(o).plan[sec];
@@ -729,6 +746,10 @@
       try { localStorage.setItem('rtg_pda_kant', pdaKant); } catch(e){}
       renderKeuken();
     }));
+    // aanmelden op deze kant: het scherm en de coach rekenen met de bezetting
+    const lijnBtn = wrap.querySelector('[data-pklijn]'); if (lijnBtn) lijnBtn.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/lijn', { sectie: pdaKant }); toast(d.aangemeld ? '👥 '+T('lijn.aant','Aangemeld op deze kant.') : T('lijn.aftoast','Afgemeld van deze kant.')); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
+    });
     // de gekozen personen: pas-meldingen (tril + toast) per toestel aan of uit
     const bel = wrap.querySelector('[data-pkbel]'); if (bel) bel.addEventListener('click', () => {
       pdaPasBel = !pdaPasBel;

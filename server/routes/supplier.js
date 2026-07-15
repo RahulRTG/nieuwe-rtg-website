@@ -8,6 +8,8 @@ module.exports = (kern) => {
     cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten } = kern;
+  // de dagcontext: tijd, seizoen en temperatuur, voor elke AI in dit domein
+  const { dagContext } = require('../kern/context');
 
 // De Salon is verplicht: publiceren (post/folder/deal/poll) kan pas met een
 // compleet profiel (bio + foto). De bio/foto-endpoints zelf blijven altijd open.
@@ -1198,7 +1200,7 @@ app.post('/api/supplier/menu/kennis', supplierAuth, async (req, res) => {
     try {
       const msg = await anthropic.messages.create({
         model: 'claude-sonnet-5', max_tokens: 700, system: def.sys,
-        messages: [{ role: 'user', content: 'Gerecht: ' + m.name + (m.desc ? ' (' + m.desc + ')' : '') + '. Keuken: ' + req.supplier.name + '. Sectie: ' + (m.sectie || 'warm') + '. Allergenen: ' + ((m.allergens || []).join(', ') || 'geen') + '.' }]
+        messages: [{ role: 'user', content: 'Gerecht: ' + m.name + (m.desc ? ' (' + m.desc + ')' : '') + '. Keuken: ' + req.supplier.name + '. Sectie: ' + (m.sectie || 'warm') + '. Allergenen: ' + ((m.allergens || []).join(', ') || 'geen') + '. ' + dagContext().zin }]
       });
       tekst = String(msg.content[0].text || '').trim().slice(0, 1500);
     } catch (err) { tekst = null; }
@@ -1239,9 +1241,9 @@ app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
       const beeld = open.map(o => ({ bon: o.pickup, tafel: o.table || null, min: Math.round((Date.now() - new Date(o.at)) / 60000), items: o.items.map(i => i.qty + 'x ' + i.name), kanten: o.secties || {} }));
       const msg = await anthropic.messages.create({
         model: 'claude-sonnet-5', max_tokens: 600,
-        system: lang === 'en'
-          ? 'You are a sous-chef running the line. Mission: every table leaves in ONE go with HOT food; no plate waits under the pass. Cook times: warm ~12 min, snack ~8, koud ~6, dessert ~5 (a station marked "bezig" is roughly halfway). Reply ONLY with a JSON array of at most 6 short English instructions (strings): what to fire now, what to hold and for how many minutes, what to batch, which table leaves together, who gets priority.'
-          : 'Je bent een sous-chef die de lijn aanstuurt. Missie: elke tafel gaat in EEN keer met WARM eten uit; geen bord staat te wachten onder de pas. Bereidingstijden: warm ~12 min, snack ~8, koud ~6, dessert ~5 (een kant op "bezig" is ongeveer halverwege). Antwoord UITSLUITEND met een JSON-array van maximaal 6 korte Nederlandse aanwijzingen (strings): wat nu afvuren, wat vasthouden en hoeveel minuten, wat batchen, welke tafel samen uitgaat, wie voorrang krijgt.',
+        system: (lang === 'en'
+          ? 'You are a sous-chef running the line. Mission: every table leaves in ONE go with HOT food; no plate waits under the pass. Cook times: warm ~12 min, snack ~8, koud ~6, dessert ~5, bar ~4 (a station marked "bezig" is roughly halfway). Reply ONLY with a JSON array of at most 6 short English instructions (strings): what to fire now, what to hold and for how many minutes, what to batch, which table leaves together, who gets priority. ' + dagContext().zinEn + ' Weigh that in (terrace weather, hot versus cold dishes, quiet or busy hours).'
+          : 'Je bent een sous-chef die de lijn aanstuurt. Missie: elke tafel gaat in EEN keer met WARM eten uit; geen bord staat te wachten onder de pas. Bereidingstijden: warm ~12 min, snack ~8, koud ~6, dessert ~5, bar ~4 (een kant op "bezig" is ongeveer halverwege). Antwoord UITSLUITEND met een JSON-array van maximaal 6 korte Nederlandse aanwijzingen (strings): wat nu afvuren, wat vasthouden en hoeveel minuten, wat batchen, welke tafel samen uitgaat, wie voorrang krijgt. ' + dagContext().zin + ' Weeg dat mee (terrasweer, warme versus koude kaart, rustige of drukke uren).'),
         messages: [{ role: 'user', content: JSON.stringify(beeld) }]
       });
       const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
@@ -1261,7 +1263,11 @@ app.post('/api/supplier/mep/daily', supplierAuth, async (req, res) => {
   const dagen = req.body.day === 'morgen' ? 1 : 0;
   const doel = new Date(Date.now() + dagen * 86400000);
   const date = doel.toISOString().slice(0, 10);
-  const [factor, factorLabel] = weekdagFactor(doel);
+  const [wkFactor, wkLabel] = weekdagFactor(doel);
+  // de dagcontext weegt mee: warme avonden lopen vol (terras), gure dagen niet
+  const ctx = dagContext(doel);
+  const factor = Math.round(wkFactor * ctx.factor * 100) / 100;
+  const factorLabel = wkLabel + ', ' + ctx.seizoen + ' ~' + ctx.temperatuurC + '°C';
 
   // historie: bestellingen van de afgelopen 21 dagen
   const sinds = Date.now() - 21 * 86400000;
@@ -1288,8 +1294,8 @@ app.post('/api/supplier/mep/daily', supplierAuth, async (req, res) => {
     try {
       const msg = await anthropic.messages.create({
         model: 'claude-sonnet-5', max_tokens: 900,
-        system: 'Je bent een sous-chef. Antwoord UITSLUITEND met een JSON-array van {"time":"HH:MM","task":"..."}. Maximaal 10 taken voor de dagelijkse a la carte mise en place, Nederlands, concreet met aantallen.',
-        messages: [{ role: 'user', content: 'Verwacht: ' + covers + ' couverts (' + factorLabel + '). Porties: ' + portions.map(p => p.name + ' ' + p.n + 'x').join('; ') + '.' }]
+        system: 'Je bent een sous-chef. Antwoord UITSLUITEND met een JSON-array van {"time":"HH:MM","task":"..."}. Maximaal 10 taken voor de dagelijkse a la carte mise en place, Nederlands, concreet met aantallen. Weeg het seizoen en het weer mee (houdbaarheid, koeling, terrasdrukte, seizoensgarnituur).',
+        messages: [{ role: 'user', content: 'Verwacht: ' + covers + ' couverts (' + factorLabel + '). ' + ctx.zin + ' Porties: ' + portions.map(p => p.name + ' ' + p.n + 'x').join('; ') + '.' }]
       });
       const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
       if (Array.isArray(arr) && arr.length) tasks = arr.slice(0, 10).map(x => ({ id: crypto.randomBytes(3).toString('hex'), time: /^\d{2}:\d{2}$/.test(x.time) ? x.time : '12:00', task: String(x.task).slice(0, 160), done: false, doneBy: null }));
@@ -1958,6 +1964,25 @@ app.post('/api/supplier/order/table', supplierAuth, (req, res) => {
   logActivity(req.supplier.code, req.actor, 'zette ' + o.ref + ' op ' + (o.table || 'geen tafel'));
   sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
   res.json({ ok: true, order: o });
+});
+
+/* De lijnbezetting: meld je aan op een kant (warm, koud, snacks, desserts,
+   pas of bar). De schermen rekenen met het aantal aangemelde koks: werklast
+   per kok, batchgrootte en het advies van de coach. Een kok staat op een
+   kant tegelijk; nog een keer tikken meldt af. */
+app.post('/api/supplier/lijn', supplierAuth, (req, res) => {
+  const sectie = String(req.body.sectie || '');
+  if (!['warm', 'koud', 'snack', 'dessert', 'pas', 'bar'].includes(sectie)) return res.status(400).json({ error: 'Onbekende kant.' });
+  const s = req.supplier;
+  s.lijn = s.lijn || {};
+  const ik = { id: req.actor.staffId, name: req.actor.name };
+  const stond = (s.lijn[sectie] || []).some(x => x.id === ik.id);
+  for (const k of Object.keys(s.lijn)) s.lijn[k] = (s.lijn[k] || []).filter(x => x.id !== ik.id);
+  if (!stond) (s.lijn[sectie] = s.lijn[sectie] || []).push(ik);
+  save();
+  logActivity(s.code, req.actor, stond ? 'meldde zich af van de kant ' + sectie : 'meldde zich aan op de kant ' + sectie);
+  sseToSupplier(s.code, 'sync', { scope: 'orders' });
+  res.json({ ok: true, lijn: s.lijn, aangemeld: !stond });
 });
 
 app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {

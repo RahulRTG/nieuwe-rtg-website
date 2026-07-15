@@ -72,6 +72,7 @@
     <h1>De backoffice, <em>op zak</em>.</h1>
     <p class="deck">Het actiecentrum, de dagcijfers, de vertrouwenslijn en de partneraanvragen van RTG, als handige app naast de grote backoffice. Log in met de backoffice-code.</p>
     <div class="pinrow"><input id="hqCode" value="RTG-OFFICE" aria-label="Backoffice-code"><button id="hqGo">Inloggen</button></div>
+    <div class="pinrow" style="margin-top:0.6rem;"><input id="hqTotp" placeholder="2FA-code (alleen als ingesteld)" inputmode="numeric" maxlength="6" autocomplete="one-time-code" aria-label="Tweede factor"></div>
     <div id="hqFout" style="margin-top:0.7rem;font-size:0.78rem;color:#FF8589;min-height:1rem;"></div>
   </div>
   <div id="app">
@@ -142,6 +143,20 @@
     document.querySelectorAll('[data-nudge]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/nudge', { ref: b.dataset.nudge, kind: b.dataset.kind }); toast('⏰ Herinnering gestuurd.'); refresh(); } catch(e){ toast(e.message); }
     }));
+    laadSecurityLog();
+  }
+  // het inlog-auditlog: wie logde waar in (of probeerde dat), bank-stijl
+  async function laadSecurityLog(){
+    let d; try { d = await api('/securitylog'); } catch(e){ return; }
+    const log = (d.log || []).slice(0, 12);
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = '<div class="k">🔐 Inlogactiviteit (audit)</div>'+
+      (log.length ? log.map(x => '<div style="display:flex;justify-content:space-between;gap:0.5rem;font-size:0.76rem;padding:0.3rem 0;border-bottom:1px solid var(--line);">'+
+        '<span>'+(x.ok?'🟢':'🔴')+' '+esc(x.kanaal)+(x.wie?' · '+esc(x.wie):'')+'</span>'+
+        '<span style="color:var(--soft);">'+esc((x.ip||'').replace(/^::ffff:/,''))+' · '+new Date(x.at).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span></div>').join('')
+      : '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--soft);">Nog geen inlogactiviteit vastgelegd.</div>');
+    $('#vandaagWrap').appendChild(el);
   }
   async function renderTrust(){
     let d; try { d = await api('/trust'); } catch(e){ return; }
@@ -188,7 +203,7 @@
   $('#hqGo').addEventListener('click', async () => {
     $('#hqFout').textContent='';
     try {
-      const r = await fetch('/api/office/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code: $('#hqCode').value }) });
+      const r = await fetch('/api/office/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code: $('#hqCode').value, totp: $('#hqTotp').value.trim() }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error||'Inloggen mislukt.');
       token = d.token; state = d.state;

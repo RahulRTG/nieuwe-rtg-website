@@ -23,4 +23,14 @@ function codeUit(lengte) { let c = ''; for (let i = 0; i < lengte; i++) c += LEE
 function entreeCode() { return codeUit(6); }
 function pickupCode() { return codeUit(4); }
 
-module.exports = { schoon, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR };
+/* Tijd-veilige vergelijking van geheimen (codes, wachtwoorden): een gewone
+   !== lekt via de reactietijd hoeveel tekens al kloppen. We hashen beide
+   kanten naar vaste lengte en vergelijken in constante tijd, zoals banken
+   dat doen. */
+function veiligGelijk(a, b) {
+  const ha = crypto.createHash('sha256').update(String(a == null ? '' : a)).digest();
+  const hb = crypto.createHash('sha256').update(String(b == null ? '' : b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
+
+module.exports = { schoon, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk };

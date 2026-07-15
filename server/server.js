@@ -40,7 +40,8 @@ const mail = require('./mail');
 const logboek = require('./log');
 const log = logboek.log;
 const betaal = require('./betaal');
-const { schoon, ledenPrijs, centen, entreeCode, pickupCode } = require('./kern/util');
+const { schoon, ledenPrijs, centen, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
+const { totpOk } = require('./kern/totp');
 const { publicPartner, weekdagFactor, cvReady, btwSplit } = require('./kern/afgeleid');
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP, maakFiscaal } = require('./kern/fiscaal');
 const { RUN_STATIONS, ALT_IDEE, coachCache, maakEvents } = require('./kern/events');
@@ -263,6 +264,26 @@ app.post('/api/munt/webhook', express.raw({ type: '*/*', limit: '1mb' }), async 
 });
 
 app.use(express.json({ limit: '8mb' }));
+
+/* ---------- rem op de deur (rate-limiter) ----------
+   In productie (of met RTG_RATELIMIT=1) mag een IP maximaal 300 API-verzoeken
+   per minuut; daarboven 429. Ruim genoeg voor elk normaal gebruik, en het
+   haalt de scherpte van scripts en scrapers. De live-streams (SSE) tellen
+   niet mee: dat zijn langlopende verbindingen, geen verzoeken. */
+const rateBakken = new Map();
+if (PRODUCTION || process.env.RTG_RATELIMIT === '1') {
+  app.use((req, res, next) => {
+    if (!req.path.startsWith('/api/') || req.path.endsWith('/stream')) return next();
+    const nu = Date.now();
+    const b = rateBakken.get(req.ip) || { vanaf: nu, n: 0 };
+    if (nu - b.vanaf > 60000) { b.vanaf = nu; b.n = 0; }
+    b.n += 1;
+    rateBakken.set(req.ip, b);
+    if (b.n > 300) return res.status(429).json({ error: 'Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.' });
+    next();
+  });
+  setInterval(() => { const nu = Date.now(); for (const [ip, b] of rateBakken) if (nu - b.vanaf > 120000) rateBakken.delete(ip); }, 60000).unref();
+}
 
 /* Hoofdzekering: staat de onderhouds-zekering uit (gesprongen), dan is de app in
    onderhoud. Alle API's geven dan 503, behalve de technische pagina en de
@@ -521,8 +542,22 @@ const DEMO_USER = (process.env.DEMO_USER || 'rahul').trim().toLowerCase();
 const DEMO_PASS = process.env.DEMO_PASS || 'Imran';
 const DEMO_SUPPLIER = process.env.DEMO_SUPPLIER || 'KIKUNOI';
 function hasCred(body) { return !!body && (body.username != null || body.password != null); }
+// tijd-veilig vergeleken: een gewone !== lekt via de reactietijd hoeveel klopt
 function checkCred(username, password) {
-  return String(username || '').trim().toLowerCase() === DEMO_USER && String(password || '') === DEMO_PASS;
+  const userOk = veiligGelijk(String(username || '').trim().toLowerCase(), DEMO_USER);
+  const passOk = veiligGelijk(String(password || ''), DEMO_PASS);
+  return userOk && passOk;
+}
+
+/* ---------- het inlog-auditlog ----------
+   Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd
+   log: wie, waar vandaan, wanneer. Zo is een aanval of een gestolen code
+   achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ. */
+function logInlog(kanaal, ok, wie, req) {
+  const lijst = db.data.securityLog = db.data.securityLog || [];
+  lijst.unshift({ at: new Date().toISOString(), kanaal, ok: !!ok, wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '') });
+  if (lijst.length > 5000) lijst.length = 5000;
+  save();
 }
 
 /* ---------- live updates (SSE) + notificaties + web-push ----------
@@ -2410,7 +2445,7 @@ const kern = {
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
-  toRad, tokenHash, tooManyTries, trChat, trustVan, unlockDoor, urenVan, validDept,
+  toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   zorgContact, klantSalon,
   webpush, weekdagFactor, werkgeverSollicitatie,
   // de ervaring-laag (kern/ervaring.js)

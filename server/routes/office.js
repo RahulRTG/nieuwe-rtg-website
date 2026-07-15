@@ -1,7 +1,7 @@
 /* Domein "office" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, talen, trChat, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
+  const { OFFICE_CODE, UPLOAD_DIR, accounts, app, appUrl, archief, broadcastSync, conciergeInbox, crypto, db, eigenaar, ensureSupplierDefaults, fs, loginFails, mail, makeSupplierCode, noteFailedTry, notify, notifySupplier, officeAuth, officeState, path, talen, trChat, pendingVerifications, rememberSession, save, schoon, sessionFor, sseClients, sseToOffice, sseToSupplier, tooManyTries, totpOk, veiligGelijk, logInlog, paspoortIncidenten, paspoortBeoordeel, salonProfielCompleet, salonItemsVan, ontmoetKantoorState, ontmoetSosAf, ontmoetSignaalLid } = kern;
 
   /* Salon-ontmoetingen: het RTG-veiligheidsteam ziet de lopende afspraken met
      live-locatie, handelt SOS-en af en kan bij een SOS live meekijken (WebRTC). */
@@ -141,14 +141,30 @@ app.post('/api/office/trust/reply', officeAuth, (req, res) => {
 app.post('/api/office/login', (req, res) => {
   const bucket = 'office:' + req.ip;
   if (tooManyTries(res, bucket)) return;
-  if (String(req.body.code || '').trim().toUpperCase() !== OFFICE_CODE) {
+  // tijd-veilig vergeleken: de reactietijd verraadt niets over de code
+  if (!veiligGelijk(String(req.body.code || '').trim().toUpperCase(), OFFICE_CODE)) {
     noteFailedTry(bucket);
+    logInlog('office', false, null, req);
     return res.status(401).json({ error: 'Onjuiste backoffice-code.' });
   }
+  /* de tweede factor (TOTP, zoals bij de bank): staat OFFICE_TOTP_SECRET in
+     de omgeving, dan is de code alleen niet genoeg; er moet ook een geldige
+     zescijferige authenticator-code bij */
+  if (process.env.OFFICE_TOTP_SECRET && !totpOk(process.env.OFFICE_TOTP_SECRET, req.body.totp)) {
+    noteFailedTry(bucket);
+    logInlog('office-2fa', false, null, req);
+    return res.status(401).json({ error: 'Tweede factor vereist: voer de zescijferige code uit uw authenticator-app in.' });
+  }
   loginFails.delete(bucket);
+  logInlog('office', true, 'backoffice', req);
   const token = crypto.randomBytes(24).toString('hex');
   rememberSession(token, { role: 'office' });
   res.json({ token, state: officeState() });
+});
+
+/* het inlog-auditlog: elke poging op elk kanaal, alleen voor het kantoor */
+app.post('/api/office/securitylog', officeAuth, (req, res) => {
+  res.json({ log: (db.data.securityLog || []).slice(0, 200) });
 });
 
 app.post('/api/office/timeline', officeAuth, (req, res) => {

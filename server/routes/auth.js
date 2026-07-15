@@ -1,7 +1,7 @@
 /* Domein "auth" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries } = kern;
+  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog } = kern;
   // Demo-inlog (snelle pas-login zonder wachtwoord, en het demo-account) alleen
   // buiten productie of met RTG_DEMO=1. Echte leden loggen in via /api/auth/login.
   const DEMO = !PRODUCTION || process.env.RTG_DEMO === '1';
@@ -34,9 +34,11 @@ app.post('/api/login', (req, res) => {
     if (tooManyTries(res, bucket)) return;
     if (!checkCred(req.body.username, req.body.password)) {
       noteFailedTry(bucket);
+      logInlog('lid', false, req.body.username, req);
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
     }
     loginFails.delete(bucket);
+    logInlog('lid', true, req.body.username, req);
     tier = 'business'; // het demo-account is een volledig lidmaatschap
   } else if (tier !== 'guest' && !DEMO) {
     // een pas-tier zonder wachtwoord is alleen voor de demo; gast blijft publiek

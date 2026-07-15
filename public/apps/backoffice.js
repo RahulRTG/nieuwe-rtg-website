@@ -26,7 +26,7 @@
   async function login(){
     if (!enabled){ alert('Start de RTG-server (npm start) om de backoffice te gebruiken.'); return; }
     try {
-      const d = await call('/office/login', { code: $('#code').value.trim() });
+      const d = await call('/office/login', { code: $('#code').value.trim(), totp: ($('#totp') ? $('#totp').value.trim() : '') });
       API.token = d.token; state = d.state;
     } catch(e){ alert(e.message); return; }
     try { localStorage.setItem('rtg_office_token', API.token); } catch(e){}

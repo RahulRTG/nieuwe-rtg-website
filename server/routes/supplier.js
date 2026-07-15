@@ -7,7 +7,7 @@ module.exports = (kern) => {
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
     cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
-    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten } = kern;
+    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog } = kern;
   // de dagcontext: tijd, seizoen en temperatuur, voor elke AI in dit domein
   const { dagContext } = require('../kern/context');
 
@@ -46,9 +46,11 @@ app.post('/api/supplier/login', async (req, res) => {
     if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) {
       const n = ((fail && fail.n) || 0) + 1;
       pinFails.set(fk, n >= 5 ? { n: 0, until: Date.now() + 60000 } : { n, until: 0 });
+      logInlog('zaak', false, s.code + '#' + req.body.staffId, req);
       return res.status(401).json({ error: 'Onjuiste PIN.' });
     }
     pinFails.delete(fk);
+    logInlog('zaak', true, s.code + ' · ' + staff.name, req);
     actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
   } else if (hasCred(req.body)) {
     if (!DEMO) return res.status(403).json({ error: 'Demo-inlog is uitgeschakeld. Log in op uw naam met uw persoonlijke pincode.' });

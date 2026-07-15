@@ -40,7 +40,7 @@
       return;
     }
     el.innerHTML = '<div class="vbanner"><b>'+T('vf.h','Verifieer uw identiteit, boek in één tik')+'</b>' +
-      '<span>'+T('vf.b','Eén foto van uw identiteitsbewijs plus een selfie. Zo weet RTG zeker dat u het bent (gezicht x paspoort), houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw gegevens zijn alleen zichtbaar voor RTG.')+'</span>' +
+      '<span>'+T('vf.b','Eén foto van de voorkant van uw paspoort plus een selfie. Zo weet RTG zeker dat u het bent (gezicht x paspoort), houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw gegevens zijn alleen zichtbaar voor RTG.')+'</span>' +
       '<button class="vbtn" id="verifyStart">'+T('vf.btn','Document uploaden')+'</button></div>';
     $('#verifyStart').addEventListener('click', () => $('#verifyFile').click());
   }

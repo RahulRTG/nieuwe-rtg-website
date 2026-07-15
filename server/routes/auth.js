@@ -219,7 +219,7 @@ app.post('/api/auth/me', auth, (req, res) => {
 app.post('/api/verify/upload', express.json({ limit: '6mb' }), auth, (req, res) => {
   if (!req.session.account) return res.status(403).json({ error: 'Verificatie is voor echte accounts.' });
   const m = /^data:image\/(png|jpe?g|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(req.body.image || ''));
-  if (!m) return res.status(400).json({ error: 'Upload een foto (JPG, PNG of WebP) van uw identiteitsbewijs.' });
+  if (!m) return res.status(400).json({ error: 'Upload een foto (JPG, PNG of WebP) van de voorkant van uw paspoort.' });
   const buf = Buffer.from(m[2], 'base64');
   if (buf.length > 5 * 1024 * 1024) return res.status(413).json({ error: 'Bestand te groot (max 5 MB).' });
   // Identiteitsbewijs: alleen de eigenaar van het proces mag erbij (map 0700, bestand 0600).

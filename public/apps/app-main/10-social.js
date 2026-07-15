@@ -104,7 +104,7 @@
         const l = document.createElement('div');
         const b = document.createElement('b'); b.textContent = v.label; l.appendChild(b);
         const s = document.createElement('span'); s.className='sub';
-        s.textContent = v.ingevuld ? T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.') : T('onb.kyc.upl','Upload een foto van uw paspoort of ID-kaart.');
+        s.textContent = v.ingevuld ? T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.') : T('onb.kyc.upl','Upload een foto van de voorkant van uw paspoort.');
         l.appendChild(s); d.appendChild(l);
         if (v.ingevuld){ const st2 = document.createElement('span'); st2.className='st'; st2.style.color='#7EE0A3'; st2.textContent='✓'; d.appendChild(st2); }
         else { const btn = document.createElement('button'); btn.type='button'; btn.className='onb-btn ghost'; btn.textContent=T('onb.kyc.knop','Uploaden');

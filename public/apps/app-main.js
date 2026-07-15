@@ -530,7 +530,7 @@
         const l = document.createElement('div');
         const b = document.createElement('b'); b.textContent = v.label; l.appendChild(b);
         const s = document.createElement('span'); s.className='sub';
-        s.textContent = v.ingevuld ? T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.') : T('onb.kyc.upl','Upload een foto van uw paspoort of ID-kaart.');
+        s.textContent = v.ingevuld ? T('onb.kyc.ok','Ontvangen, wordt gecontroleerd.') : T('onb.kyc.upl','Upload een foto van de voorkant van uw paspoort.');
         l.appendChild(s); d.appendChild(l);
         if (v.ingevuld){ const st2 = document.createElement('span'); st2.className='st'; st2.style.color='#7EE0A3'; st2.textContent='✓'; d.appendChild(st2); }
         else { const btn = document.createElement('button'); btn.type='button'; btn.className='onb-btn ghost'; btn.textContent=T('onb.kyc.knop','Uploaden');
@@ -2662,7 +2662,7 @@
       return;
     }
     el.innerHTML = '<div class="vbanner"><b>'+T('vf.h','Verifieer uw identiteit, boek in één tik')+'</b>' +
-      '<span>'+T('vf.b','Eén foto van uw identiteitsbewijs plus een selfie. Zo weet RTG zeker dat u het bent (gezicht x paspoort), houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw gegevens zijn alleen zichtbaar voor RTG.')+'</span>' +
+      '<span>'+T('vf.b','Eén foto van de voorkant van uw paspoort plus een selfie. Zo weet RTG zeker dat u het bent (gezicht x paspoort), houden we nepaccounts buiten, en boekt u daarna zonder gedoe. Uw gegevens zijn alleen zichtbaar voor RTG.')+'</span>' +
       '<button class="vbtn" id="verifyStart">'+T('vf.btn','Document uploaden')+'</button></div>';
     $('#verifyStart').addEventListener('click', () => $('#verifyFile').click());
   }

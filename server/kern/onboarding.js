@@ -52,7 +52,7 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
       { id: 'land', label: 'Land', type: 'land', voorWie: [...ALLE_WIE] },
       { id: 'geboortedatum', label: 'Geboortedatum', type: 'date', voorWie: [...PAS_WIE] },
       { id: 'nationaliteit', label: 'Nationaliteit', type: 'text', voorWie: [...PAS_WIE] },
-      { id: 'paspoort', label: 'Paspoort of ID-kaart', type: 'kyc', voorWie: [...PAS_WIE] }
+      { id: 'paspoort', label: 'Voorkant van je paspoort', type: 'kyc', voorWie: [...PAS_WIE] }
     ];
   }
   function standaardScope() {
@@ -64,6 +64,13 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
     if (!db.data.onboarding.scopes) db.data.onboarding.scopes = {};
     if (!db.data.onboarding.profielen) db.data.onboarding.profielen = {};
     if (!db.data.onboarding.scopes.rtg) db.data.onboarding.scopes.rtg = standaardScope();
+    // Migratie: de paspoort-controle vraagt nu expliciet de voorkant van het
+    // paspoort. Bestaande scopes met het oude standaardlabel schuiven mee; een
+    // eigen aangepast label van de eigenaar laten we staan.
+    for (const sc of Object.values(db.data.onboarding.scopes)) {
+      const p = sc && sc.velden && sc.velden.find(v => v.id === 'paspoort');
+      if (p && p.label === 'Paspoort of ID-kaart') p.label = 'Voorkant van je paspoort';
+    }
     return db.data.onboarding;
   }
   // Een scope ophalen; onbekende leverancier-scope krijgt een eigen standaardset

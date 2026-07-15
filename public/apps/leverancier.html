@@ -619,6 +619,11 @@
         <p class="sub" data-i18n="sup.v.sw.sub">Werk met EGn knop samen: creators en leveranciers vinden elkaar.</p>
         <div id="swWrap"></div>
       </div>
+      <div class="view" data-view="facturen">
+        <h2 data-i18n="sup.v.fact">Facturen</h2>
+        <p class="sub" data-i18n="sup.v.fact.sub">Elke verkoop wordt automatisch gefactureerd. Download de PDF of maak er een met AI.</p>
+        <div id="factWrap"></div>
+      </div>
       <div class="view" data-view="retail">
         <h2 data-i18n="sup.v.retail">Mode &amp; retail</h2>
         <p class="sub" data-i18n="sup.v.retail.sub">Collecties, voorraad, drops en het klantdossier.</p>
@@ -820,6 +825,7 @@
     boerderij:{ label:'Boerderij', svg:'<path d="M4 10l6-4 6 4"/><path d="M6 10v9h8v-9"/><path d="M14 13h6v6h-6z"/><path d="M9 19v-4h2v4"/>', cap:'boerderij' },
     creator:  { label:'Creator',   svg:'<rect x="3" y="5" width="13" height="14" rx="2"/><path d="M16 9l5-3v12l-5-3"/>', cap:'creator' },
     samenwerking:{ label:'Samenwerken', svg:'<path d="M9 11l2 2 4-4"/><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="M7 10v4a3 3 0 0 0 3 3h4"/>' },
+    facturen: { label:'Facturen',  svg:'<path d="M6 2h9l3 3v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h4"/>' },
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     verkoop:  { label:'Verkoop',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M9.5 9.2l1.6 1.6 3-3"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
@@ -3026,6 +3032,53 @@
     const opP = $('#swOpPlaats'); if (opP) opP.addEventListener('click', async () => { const titel = $('#swOpTitel').value.trim(); if (!titel) return; try { await API.call('/supplier/samenwerking/oproep', { titel, omschrijving: $('#swOpOms').value, soort: $('#swOpSoort').value, budget: Number($('#swOpBudget').value)||0 }); toast(T('sw.oproepok','Oproep geplaatst; creators zien het.')); laadSamenwerking(); } catch(e){ toast(e.message); } });
   }
 
+  // ---- facturen: automatisch bij elke verkoop, plus de AI-factuurtool ----
+  let fact = null, factAiAntwoord = '';   // het laatste AI-antwoord blijft staan over herbouw heen
+  async function laadFacturen(){
+    if (!API.live) return;
+    try { fact = await API.call('/supplier/facturen/mijn', {}); } catch(e){ fact = { verkocht:[], gekocht:[], stats:{} }; }
+    renderFacturen();
+  }
+  function factRij(f, kant){
+    return '<div class="mitem"><div class="r1"><span class="nm">'+esc(f.nummer)+' · '+esc(kant==='in'?f.verkoper:f.koper)+'</span><span class="pr">'+geld(f.totaal)+'</span></div>'+
+      '<div class="ds">'+esc(f.datum)+' · '+T('fact.soort.'+f.soort, f.soort)+' · '+T('fact.btw','btw')+' '+geld(f.btwBedrag)+(f.methode?' · '+esc(f.methode):'')+'</div>'+
+      '<div style="margin-top:0.35rem;"><button class="obtn" data-factpdf="'+f.id+'" data-nr="'+escAttr(f.nummer)+'">⬇ PDF</button></div></div>';
+  }
+  function renderFacturen(){
+    const el = $('#factWrap'); if (!el) return;
+    if (!fact){ el.innerHTML = '<div class="empty">…</div>'; laadFacturen(); return; }
+    const canEdit = actor().manager, st = fact.stats || {};
+    let html = '';
+    html += '<div class="card"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">'+
+      [[st.verkocht||0, T('fact.verkocht','verkoopfacturen')],[geld(st.omzet||0), T('fact.omzet','omzet')],[geld(st.btwAfdracht||0), T('fact.btwaf','btw')]]
+      .map(c => '<div style="background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.6rem;text-align:center;"><div style="font-size:1.05rem;font-weight:700;color:var(--gold);">'+c[0]+'</div><div style="font-size:0.6rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.05em;">'+c[1]+'</div></div>').join('')+'</div></div>';
+    if (canEdit){
+      html += '<div class="card"><div class="tt-h">✨ '+T('fact.ai','AI-factuurtool')+'</div>'+
+        '<p class="sub" style="margin-top:0.3rem;">'+T('fact.ai.sub','Vraag iets, of maak een factuur in gewone taal: "maak een factuur voor [codenaam], 3 uur advies a 90 euro".')+'</p>'+
+        '<div id="factAiOut" style="margin-top:0.5rem;"></div>'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="factAiIn" placeholder="'+T('fact.ai.ph','Vraag of opdracht...')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);"><button class="obtn primary" id="factAiGo">'+T('fact.ai.go','Vraag')+'</button></div></div>';
+    }
+    html += '<div class="card"><div class="tt-h">'+T('fact.uit','Verstuurde facturen')+' ('+(fact.verkocht||[]).length+')</div>'+
+      ((fact.verkocht||[]).length ? (fact.verkocht||[]).slice(0,60).map(f => factRij(f,'uit')).join('') : '<div class="ds" style="margin-top:0.5rem;">'+T('fact.geenuit','Nog geen facturen. Bij elke kassaverkoop komt hier automatisch een factuur.')+'</div>')+'</div>';
+    if ((fact.gekocht||[]).length) html += '<div class="card"><div class="tt-h">'+T('fact.in','Ontvangen facturen')+' ('+fact.gekocht.length+')</div>'+
+      fact.gekocht.slice(0,60).map(f => factRij(f,'in')).join('')+'</div>';
+    el.innerHTML = html;
+    // het laatste AI-antwoord terugzetten, zodat een tussentijdse herbouw (bijv.
+    // door de sync-SSE van de nieuwe factuur) het niet wegveegt
+    const outHerstel = $('#factAiOut'); if (outHerstel && factAiAntwoord) outHerstel.innerHTML = factAiAntwoord;
+    el.querySelectorAll('[data-factpdf]').forEach(b => b.addEventListener('click', () => dlBestand('/supplier/facturen/pdf', { id: b.dataset.factpdf }, (b.dataset.nr||'factuur')+'.pdf')));
+    const aiGo = $('#factAiGo'); if (aiGo){
+      const doe = async () => { const opdracht = $('#factAiIn').value.trim(); if (!opdracht) return; factAiAntwoord = '<div class="ds">…</div>'; const out = $('#factAiOut'); out.innerHTML = factAiAntwoord;
+        try { const r = await API.call('/supplier/facturen/ai', { opdracht });
+          factAiAntwoord = '<div class="mitem"'+(r.gedaan?' style="border-left:3px solid #7EE0A3;"':'')+'><div class="ds" style="color:var(--txt);white-space:pre-wrap;">'+esc(r.antwoord)+'</div></div>';
+          if (r.overzicht){ fact = r.overzicht; }
+          renderFacturen(); }
+        catch(e){ factAiAntwoord = '<div class="ds" style="color:#E0736A;">'+esc(e.message)+'</div>'; const o2 = $('#factAiOut'); if (o2) o2.innerHTML = factAiAntwoord; } };
+      aiGo.addEventListener('click', doe);
+      const i2 = $('#factAiIn'); if (i2) i2.addEventListener('keydown', e => { if (e.key==='Enter') doe(); });
+    }
+  }
+
   // ---- retail / mode: de slimme merk-backoffice ----
   let retailData = null;         // volledige retail-toestand van de server
   let retailSec = 'overzicht';   // overzicht | catalogus | voorraad | clienteling
@@ -3918,7 +3971,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -5574,7 +5627,7 @@
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
-    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); laadAgendaSup(); });
+    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); if (fact) laadFacturen(); laadAgendaSup(); });
     source.addEventListener('notify', e => {
       const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
       if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }

@@ -1966,6 +1966,20 @@ app.post('/api/supplier/order/table', supplierAuth, (req, res) => {
   res.json({ ok: true, order: o });
 });
 
+/* Spoed van de bediening: een gerecht (of een hele bon) krijgt rustig
+   voorrang. Bewust geen bel of flits richting de keuken: de bon sorteert
+   bovenaan, krijgt een kalme spoedmarkering en de coach noemt hem een keer. */
+app.post('/api/supplier/order/spoed', supplierAuth, (req, res) => {
+  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  if (req.body.op && ['klaar', 'geserveerd', 'geweigerd'].includes(o.status)) return res.status(409).json({ error: 'Deze bon is al klaar.' });
+  o.spoed = req.body.op ? { at: new Date().toISOString(), door: req.actor.name, itemId: String(req.body.itemId || '') || null } : null;
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  logActivity(req.supplier.code, req.actor, (o.spoed ? 'vroeg spoed op ' : 'trok de spoed in van ') + o.ref);
+  res.json({ ok: true, order: o });
+});
+
 /* De lijnbezetting: meld je aan op een kant (warm, koud, snacks, desserts,
    pas of bar). De schermen rekenen met het aantal aangemelde koks: werklast
    per kok, batchgrootte en het advies van de coach. Een kok staat op een

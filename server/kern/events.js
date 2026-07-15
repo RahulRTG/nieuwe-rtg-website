@@ -143,6 +143,8 @@ function maakEvents({ crypto, sectiesForOrder }) {
         plan[k] = wacht >= 2 ? { doe: 'wacht', min: wacht } : { doe: 'nu', min: 0 };
       }
     }
+    // spoed van de bediening: niets houdt nog in, alles start nu
+    if (o.spoed) for (const k of alle) if (plan[k].doe === 'wacht') plan[k] = { doe: 'nu', min: 0 };
     return { doel, plan };
   }
 
@@ -155,6 +157,12 @@ function maakEvents({ crypto, sectiesForOrder }) {
     const nu = Date.now();
     const age = o => Math.round((nu - new Date(o.at)) / 60000);
     const tafel = o => o.table ? o.table : null;
+    // 0. spoed van de bediening: rustig, maar als eerste
+    for (const o of open) if (o.spoed) {
+      const wie = o.pickup + (tafel(o) ? ' (' + tafel(o) + ')' : '');
+      lines.push(en ? '⚡ Ticket ' + wie + ': service asked for a rush' + (o.spoed.itemId ? ' on one dish' : '') + '; take it along first.'
+                    : '⚡ Bon ' + wie + ': de bediening vraagt spoed' + (o.spoed.itemId ? ' op een gerecht' : '') + '; pak deze als eerste mee.');
+    }
     // 1. voorrang: oudste onaangeroerde bon
     const vers = open.filter(o => !Object.keys(o.secties || {}).length && !Object.keys(o.stations || {}).length);
     if (vers.length) {

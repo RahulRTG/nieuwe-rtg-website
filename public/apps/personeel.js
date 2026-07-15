@@ -671,6 +671,8 @@
   }
   // pas-meldingen (tril + toast) per toestel aan of uit: de gekozen personen
   let pdaPasBel = (() => { try { return localStorage.getItem('rtg_pda_pasbel') !== 'uit'; } catch(e){ return true; } })();
+  // pings gaan alleen naar wie echt ingeklokt is: niet ingeklokt = geen tril
+  const ikBinnen = () => !!(me && state && state.klok && (state.klok.binnen || []).includes(me.name));
   function renderKeuken(){
     const tabBtn = document.getElementById('tabKeuken');
     if (tabBtn) tabBtn.style.display = heeftKeuken() ? '' : 'none';
@@ -680,9 +682,10 @@
     // kant kiezen = inloggen op dat station; de keuze blijft op dit toestel staan
     let html = '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+Object.keys(PDA_KANTEN).map(k =>
       '<button class="abtn'+(pdaKant===k?'':' ghost')+'" data-pkkant="'+k+'">'+PDA_KANTEN[k][0]+' '+T('ks.'+k, PDA_KANTEN[k][1])+'</button>').join('')+
-      '<button class="abtn'+(pdaPasBel?'':' ghost')+'" data-pkbel style="margin-left:auto;">'+(pdaPasBel?'🔔':'🔕')+' '+T('pd.k.pasbel','Pas-bel')+'</button></div>';
+      '<button class="abtn'+(pdaPasBel?'':' ghost')+'" data-pkbel style="margin-left:auto;">'+(pdaPasBel?'🔔':'🔕')+' '+T('pd.k.pasbel','Pas-bel')+'</button>'+
+      (ikBinnen()?'':'<span style="flex-basis:100%;font-size:0.68rem;color:var(--soft);">⏱ '+T('pd.k.nietin','Niet ingeklokt: pings staan uit tot je inklokt (tab Vandaag).')+'</span>')+'</div>';
     if (pdaKant === 'pas'){
-      const opDePas = live.filter(o => (o.stations||{}).keuken === 'klaar').sort((a,b) => new Date(a.pasAt||a.at)-new Date(b.pasAt||b.at));
+      const opDePas = live.filter(o => (o.stations||{}).keuken === 'klaar').sort((a,b) => ((b.spoed?1:0)-(a.spoed?1:0)) || (new Date(a.pasAt||a.at)-new Date(b.pasAt||b.at)));
       const bezig = live.filter(o => (o.stations||{}).keuken !== 'klaar');
       // staat alles van een tafel op de pas, dan kan de hele tafel in een keer uit
       const tafels = {};
@@ -698,7 +701,7 @@
         bezig.map(o => '<div class="task"><span class="ic">🔥</span><div class="t"><b>'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span>'+pkSecties(o).map(s2 => PDA_KANTEN[s2][0]+' '+((o.secties||{})[s2]||T('pd.k.wacht','wacht'))).join(' · ')+'</span></div><span style="font-size:0.72rem;color:var(--soft);">'+pkAge(o.at)+'m</span></div>').join('')+'</div>';
     } else {
       const sec = pdaKant;
-      const mijn = live.filter(o => pkSecties(o).includes(sec) && (o.secties||{})[sec] !== 'klaar').sort((a,b) => new Date(a.at)-new Date(b.at));
+      const mijn = live.filter(o => pkSecties(o).includes(sec) && (o.secties||{})[sec] !== 'klaar').sort((a,b) => ((b.spoed?1:0)-(a.spoed?1:0)) || (new Date(a.at)-new Date(b.at)));
       const laat = mijn.filter(o => pkAge(o.at) >= 12).length;
       // all day voor deze kant, net als op het grote scherm
       const per = {};
@@ -732,7 +735,7 @@
         const items = (o.items||[]).filter(it => pkSectieOf(it) === sec);
         return '<div class="card" style="border-left:4px solid '+(a>=12?'#E5484D':a>=6?'#C99A2E':'#2E7D5B')+';">'+
           '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
-          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;"><b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
+          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'⚡ ':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
           (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">⚠ '+esc(o.allergyNote)+'</div>':'')+
           pkGast(o)+
           (adv?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+adv+'</div>':'')+
@@ -1342,7 +1345,7 @@
       // de keuken praat met de bediening: bon compleet op de pas -> belletje op de PDA,
       // maar alleen op toestellen waar de pas-bel aanstaat (de gekozen personen)
       src.addEventListener('pas', e => {
-        if (!pdaPasBel) return;
+        if (!pdaPasBel || !ikBinnen()) return;
         try {
           const d = JSON.parse(e.data || '{}');
           toast('🛎️ ' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));

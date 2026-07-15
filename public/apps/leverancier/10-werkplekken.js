@@ -58,7 +58,8 @@
     let doel = alle.length ? Math.max.apply(null, alle.map(k => rest[k])) : 0;
     // de deurhost-koppeling: deelt de gast zijn reis (GPS), dan mikt het
     // vuurplan op de aankomst, zodat alles warm klaarstaat als de gast zit
-    if (!o.guestArrived && Number.isFinite(o.guestEtaMin) && o.guestEtaMin > doel) doel = o.guestEtaMin;
+    // (behalve bij spoed: dan telt alleen de kooktijd)
+    if (!o.spoed && !o.guestArrived && Number.isFinite(o.guestEtaMin) && o.guestEtaMin > doel) doel = o.guestEtaMin;
     const plan = {};
     alle.forEach(k => {
       const f = faseVan(k);
@@ -66,8 +67,13 @@
       else if (f==='bezig') plan[k] = { doe:'bezig', min:rest[k] };
       else { const w = doel - rest[k]; plan[k] = w >= 2 ? { doe:'wacht', min:w } : { doe:'nu', min:0 }; }
     });
+    // spoed van de bediening: niets houdt nog in, alles start nu
+    if (o.spoed) alle.forEach(k => { if (plan[k].doe === 'wacht') plan[k] = { doe:'nu', min:0 }; });
     return { doel, plan };
   }
+  // spoedbonnen bovenaan, daarna de oudste eerst; het spoedmerkje per gerecht
+  const spoedEerst = (a,b) => ((b.spoed?1:0) - (a.spoed?1:0)) || opTijd(a,b);
+  const spoedMerk = (o, it) => (o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id)) ? '⚡ ' : '';
   // KDS-tijdbanden: groen tot 6 min, amber tot 12, rood daarna, knipperen vanaf 18
   function ageKlasse(a){ return a >= 18 ? ' late flash' : a >= 12 ? ' late' : a >= 6 ? ' warn' : ' ok'; }
   function vpChip(sec, p){
@@ -239,12 +245,46 @@
     const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
     let html = '';
     if (stationMode === 'bediening'){
-      const serve = live.filter(o => o.status === 'klaar');
-      const making = live.filter(o => o.status !== 'klaar');
-      html += '<div class="st-sec">'+T('st.toserve','Uit te serveren')+' ('+serve.length+')</div>';
-      html += serve.length ? serve.map(o => ticketCard(o, null, { serve:true })).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
+      /* De bedieningspas: wat kan er NU gelopen worden en waarheen. Spoed en
+         het langst wachtende eerst; de bestemming (tafel of ophaalcode) staat
+         groot; de tafelklok bundelt complete tafels in een loop. */
+      const serve = live.filter(o => o.status === 'klaar')
+        .sort((a,b) => ((b.spoed?1:0)-(a.spoed?1:0)) || (new Date(a.pasAt||a.at) - new Date(b.pasAt||b.at)));
+      const making = live.filter(o => o.status !== 'klaar').sort(spoedEerst);
+      // wie is er echt ingeklokt: de pas weet op wie hij kan rekenen
+      const binnen = (state.klok && state.klok.binnen) || [];
+      html += '<div class="allday"><span class="ad-h">\uD83D\uDC65 '+T('bp.binnen','Ingeklokt')+'</span>'+
+        (binnen.length ? '<span class="ad">'+binnen.join(', ')+'</span>' : '<span class="ad">'+T('bp.niemand','Niemand ingeklokt')+'</span>')+'</div>';
+      const tafelsKlaar = {};
+      serve.forEach(o => { if (o.table) (tafelsKlaar[o.table] = tafelsKlaar[o.table] || []).push(o); });
+      const loop = Object.keys(tafelsKlaar).filter(t => !making.some(o => (o.table||'') === t));
+      if (loop.length)
+        html += '<div class="allday" role="status"><span class="ad-h">\uD83E\uDE91 '+T('pas.compleet','Tafel compleet')+'</span>'+
+          loop.map(t => '<span class="ad"><b>'+t+'</b>'+tafelsKlaar[t].map(o=>o.pickup).join(', ')+' \u00b7 '+T('bp.eenloop','pak alles in een loop')+'</span>').join('')+'</div>';
+      html += '<div class="st-sec">'+T('bp.h','Bedieningspas, klaar om te lopen')+' ('+serve.length+')</div>';
+      html += serve.length ? serve.map(o => {
+        const pa = ageMin(o.pasAt || o.at);
+        return '<div class="tkc'+pasKlasse(pa)+'">'+
+          '<div class="tkc-top"><span class="tkc-code">'+(o.table?'\uD83E\uDE91 '+o.table:'\uD83D\uDCE6 '+o.pickup)+'</span><span class="tkc-age">'+pa+' '+T('pas.op','min op de pas')+'</span></div>'+
+          '<div class="tkc-who">'+(o.table?T('bp.naar','breng naar de tafel'):T('bp.ophaal','ophaalbestelling, code ')+o.pickup)+' \u00b7 '+o.customerCodename+(o.spoed?' \u00b7 \u26A1 '+T('spoed.chip','Spoed'):'')+'</div>'+
+          '<div class="tkc-items">'+(o.items||[]).map(it=>'<span><b>'+it.qty+'\u00D7</b>'+it.name+'</span>').join('')+'</div>'+
+          gastRegel(o)+
+          (o.allergyNote?'<div class="tkc-alg">\u26A0 '+o.allergyNote+'</div>':'')+
+          '<div class="tkc-act"><button class="tkc-serve" data-stserve="'+o.ref+'">'+T('st.served','Geserveerd')+'</button></div></div>';
+      }).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
       html += '<div class="st-sec">'+T('st.making','In de maak')+' ('+making.length+')</div>';
-      html += making.length ? making.map(o => ticketCard(o, null, { dim:false, badges:true }).replace('</div>$','') .replace(/<\/div>$/, '<div class="tkc-act"><button class="tkc-start" data-settbl="'+o.ref+'" data-cur="'+(o.table||'')+'">\uD83E\uDE91 '+(o.table?o.table+' \u00b7 '+T('st.tblwissel','wijzig'):T('st.tblset','Tafel kiezen'))+'</button></div></div>')).join('') : '<div class="st-empty">'+T('st.nomaking','Geen lopende bestellingen.')+'</div>';
+      html += making.length ? making.map(o => {
+        const vp = vuurplan(o);
+        return '<div class="tkc'+(o.spoed?' warn':'')+'">'+
+          '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
+          (o.spoed?'<div class="tkc-who">\u26A1 '+T('spoed.aan','Spoed gevraagd')+(o.spoed.door?' \u00b7 '+o.spoed.door:'')+'</div>':'')+
+          '<div class="tkc-items">'+(o.items||[]).map(it=>'<span>'+spoedMerk(o,it)+'<b>'+it.qty+'\u00D7</b>'+it.name+
+            (!o.spoed?' <button class="mn-station" data-spoed="'+o.ref+'" data-item="'+it.id+'" title="'+T('spoed.t','Vraag dit gerecht rustig met spoed aan')+'">\u26A1</button>':'')+'</span>').join('')+'</div>'+
+          '<div class="st-badges">'+Object.entries(vp.plan).map(([k,p])=>vpChip(k,p)).join('')+'</div>'+
+          gastRegel(o)+
+          '<div class="tkc-act"><button class="tkc-start" data-settbl="'+o.ref+'" data-cur="'+(o.table||'')+'">\uD83E\uDE91 '+(o.table?o.table+' \u00b7 '+T('st.tblwissel','wijzig'):T('st.tblset','Tafel kiezen'))+'</button>'+
+          (o.spoed?'<button class="obtn" data-spoedaf="'+o.ref+'" style="margin-left:0.5rem;">'+T('spoed.af','Spoed intrekken')+'</button>':'')+'</div></div>';
+      }).join('') : '<div class="st-empty">'+T('st.nomaking','Geen lopende bestellingen.')+'</div>';
       html += runsheetStrip('bediening');
       const tables = state.tables || [];
       if (tables.length){
@@ -358,7 +398,7 @@
         if (keukenSectie !== 'chef' && keukenSectie !== 'pas'){
           const sec = keukenSectie;
           const mijn = live.filter(o => sectiesVanOrder(o).includes(sec));
-          const actief = mijn.filter(o => (o.secties||{})[sec] !== 'klaar').sort(opTijd);
+          const actief = mijn.filter(o => (o.secties||{})[sec] !== 'klaar').sort(spoedEerst);
           const klaarHier = mijn.filter(o => (o.secties||{})[sec] === 'klaar');
           const kaart = (o, dim) => {
             const items = (o.items||[]).filter(it => sectieOf(it) === sec);
@@ -422,7 +462,7 @@
         }
         if (keukenSectie === 'pas'){
           const keukenOrders = live.filter(o => sectiesVanOrder(o).length);
-          const bezig = keukenOrders.filter(o => (o.stations||{}).keuken !== 'klaar').sort(opTijd);
+          const bezig = keukenOrders.filter(o => (o.stations||{}).keuken !== 'klaar').sort(spoedEerst);
           const opDePas = keukenOrders.filter(o => (o.stations||{}).keuken === 'klaar')
             .sort((a,b) => new Date(a.pasAt||a.at) - new Date(b.pasAt||b.at));
           const badge = o => '<div class="st-badges">'+Object.entries(vuurplan(o).plan).map(([s2,p]) => vpChip(s2, p)).join('')+'</div>';
@@ -456,7 +496,7 @@
         }
       }
       const mine = live.filter(o => (o.items||[]).some(it => stationOf(it) === st));
-      const act = mine.filter(o => (o.stations||{})[st] !== 'klaar').sort(opTijd);
+      const act = mine.filter(o => (o.stations||{})[st] !== 'klaar').sort(spoedEerst);
       const done = mine.filter(o => (o.stations||{})[st] === 'klaar');
       if (st === 'keuken' || st === 'bar') html += stStats(act);
       if (st === 'keuken') html += allDay(act);
@@ -587,6 +627,13 @@
       const t = prompt(T('st.tblq','Welke tafel? (leeg = geen tafel)'), b.dataset.cur || '');
       if (t === null) return;
       try { await API.call('/supplier/order/table', { ref: b.dataset.settbl, table: t.trim() }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // spoed van de bediening: rustig doorgeven of intrekken
+    el.querySelectorAll('[data-spoed]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/order/spoed', { ref: b.dataset.spoed, itemId: b.dataset.item, op: true }); toast('⚡ '+T('spoed.toast','Spoed doorgegeven; de keuken ziet het rustig bovenaan.')); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-spoedaf]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/order/spoed', { ref: b.dataset.spoedaf, op: false }); await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-lijnaan]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/lijn', { sectie: b.dataset.lijnaan }); toast(d.aangemeld ? '👥 '+T('lijn.aant','Aangemeld op deze kant.') : T('lijn.aftoast','Afgemeld van deze kant.')); await refresh(); } catch(e){ toast(e.message); }

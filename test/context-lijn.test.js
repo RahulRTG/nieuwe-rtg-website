@@ -58,6 +58,25 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
+test('spoed: de bediening vraagt rustig voorrang op een gerecht en trekt hem weer in', async () => {
+  const u = Date.now().toString().slice(-8);
+  const lid = (await json(await api('/api/auth/register', { name: 'Spoed Lid', email: 's' + u + '@x.nl', phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }))).token;
+  const ord = await json(await api('/api/order', { supplierCode: 'KIKUNOI', items: [{ id: 'm1', qty: 1 }] }, lid));
+  const ref = ord.order.ref;
+  await api('/api/order/pay', { ref }, lid);  // betalen-eerst: dan pas ziet de keuken hem
+  // spoed op een gerecht: kalm veld op de bon, geen aparte bel
+  const z = await json(await api('/api/supplier/order/spoed', { ref, itemId: 'm1', op: true }, kokToken));
+  assert.equal(z.order.spoed.itemId, 'm1');
+  const st = await json(await api('/api/supplier/state', {}, kokToken));
+  assert.ok(st.state.orders.find(o => o.ref === ref).spoed, 'elk scherm ziet de spoedmarkering');
+  // intrekken kan net zo rustig
+  const weg = await json(await api('/api/supplier/order/spoed', { ref, op: false }, kokToken));
+  assert.equal(weg.order.spoed, null);
+  // een onbestaande bon wordt geweigerd
+  assert.equal((await api('/api/supplier/order/spoed', { ref: 'nee', op: true }, kokToken)).status, 404);
+});
+
 test('lijnbezetting: aanmelden, verkassen en afmelden per kant', async () => {
   // kok 1 meldt zich aan op warm; kok 2 ook: twee koks op de kant
   const a1 = await json(await api('/api/supplier/lijn', { sectie: 'warm' }, kokToken));

@@ -211,6 +211,15 @@ app.use((req, res, next) => {
   next();
 });
 
+/* Het schild voor de voordeur (kern/schild.js): applicatie-WAF + DDoS-rem.
+   Altijd aan; localhost (health-checks, tests, poortwachter) slaat hij over.
+   Treffers en bans landen als melding op het beveiligingsbord (techniek). */
+const schild = require('./kern/schild').maakSchild({
+  meld: (type, ernst, tekst, meta) => { if (beveilig) beveilig.meld(type, ernst, tekst, meta); },
+  logboek: log
+});
+app.use(schild.middleware);
+
 /* Security-headers op elk antwoord. De CSP staat inline scripts/styles toe
    (de apps zijn bewust self-contained), maar verbiedt elk ander extern
    verkeer dan de Google Fonts en blokkeert framing en MIME-sniffing. */

@@ -293,10 +293,21 @@ app.get('/api/push/key', (req, res) => {
    (symmetrische NAT) is een TURN-server nodig om het beeld er altijd doorheen te
    krijgen. Zet die aan met de omgevingsvariabelen TURN_URL/TURN_USER/TURN_PASS.
    Zie docs/turn-server.md voor de volledige productie-opzet. */
+/* TURN: het relais dat (video)bellen ook door strenge firewalls en 4G-NAT
+   heen laat werken. Voorkeursroute: TURN_SECRET (coturn "use-auth-secret"),
+   dan maakt de server per aanvraag KORTLEVENDE inloggegevens (1 uur geldig,
+   HMAC over het verloopmoment) in plaats van een vast wachtwoord dat op
+   straat kan komen. Vast TURN_USER/TURN_PASS blijft werken als terugval. */
 function iceServers() {
   const list = [{ urls: (process.env.STUN_URL || 'stun:stun.l.google.com:19302').split(',').map(s => s.trim()) }];
-  if (process.env.TURN_URL && process.env.TURN_USER && process.env.TURN_PASS) {
-    list.push({ urls: process.env.TURN_URL.split(',').map(s => s.trim()), username: process.env.TURN_USER, credential: process.env.TURN_PASS });
+  const urls = process.env.TURN_URL ? process.env.TURN_URL.split(',').map(s => s.trim()) : null;
+  if (urls && process.env.TURN_SECRET) {
+    const nodeCrypto = require('crypto');
+    const username = Math.floor(Date.now() / 1000 + 3600) + ':rtg';
+    const credential = nodeCrypto.createHmac('sha1', process.env.TURN_SECRET).update(username).digest('base64');
+    list.push({ urls, username, credential });
+  } else if (urls && process.env.TURN_USER && process.env.TURN_PASS) {
+    list.push({ urls, username: process.env.TURN_USER, credential: process.env.TURN_PASS });
   }
   return list;
 }

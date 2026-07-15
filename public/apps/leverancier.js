@@ -26,7 +26,20 @@
     { code:'ISLAREN', name:'Isla Rent Ibiza', type:'Autoverhuur', icon:'🚗', sub:'Autoverhuur · Ibiza' },
     { code:'IBIZALIV', name:'Ibiza Living Estates', type:'Vastgoed', icon:'🏡', sub:'Makelaar · Ibiza' },
     { code:'MAISON',  name:'Maison Solène', type:'Mode', icon:'🛍️', sub:'Modehuis · Ibiza' },
-    { code:'AZUL',    name:'Azul Yacht Charter', type:'Charter', icon:'⛵', sub:'Boten & jachten · Ibiza' }
+    { code:'AZUL',    name:'Azul Yacht Charter', type:'Charter', icon:'⛵', sub:'Boten & jachten · Ibiza' },
+    { code:'MERCABIZA', name:'Mercabiza', type:'Groothandel', icon:'📦', sub:'Groothandel & versmarkt · Ibiza' },
+    { code:'AEGIS',   name:'Aegis Elite Security', type:'Beveiliging', icon:'🛡️', sub:'Beveiliging · Ibiza' },
+    { code:'CANFERRER', name:'Finca Can Ferrer', type:'Boerderij', icon:'🚜', sub:'Boerderij · Ibiza' },
+    { code:'LUMINA',  name:'Lumina Media', type:'Creator', icon:'🎬', sub:'Content creators · Ibiza' },
+    { code:'VORA',    name:'Vora Beach Club', type:'Beachclub', icon:'🏖️', sub:'Beachclub · Cala Nova' },
+    { code:'BRISA',   name:'Cafe Brisa', type:'Koffie', icon:'☕', sub:'Koffie & patisserie · Ibiza-stad' },
+    { code:'FUEGO',   name:'Chef Fuego', type:'Privéchef', icon:'👨‍🍳', sub:'Privéchef & catering · op locatie' },
+    { code:'LUNARA',  name:'Casa Lunara', type:'Villa\'s', icon:'🌴', sub:'Villa\'s & fincas · Es Cubells' },
+    { code:'MOTOISLA', name:'Moto Isla', type:'Tweewielers', icon:'🛵', sub:'Scooters, motoren & quads · Ibiza' },
+    { code:'FESTA',   name:'Festa Ibiza Events', type:'Events', icon:'🎪', sub:'Events & festivals · Cala Comte' },
+    { code:'SERENA',  name:'Serena Spa', type:'Wellness', icon:'🧖', sub:'Wellness & spa · Santa Eularia' },
+    { code:'ORODOR',  name:'Casa d\'Oro', type:'Juwelier', icon:'💎', sub:'Juwelier & horloges · Dalt Vila' },
+    { code:'LIENZO',  name:'Galeria Lienzo', type:'Galerie', icon:'🖼️', sub:'Kunst & galerie · Dalt Vila' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -48,6 +61,15 @@
     groothandel: { label:'RTG Groothandel', labelEn:'RTG Wholesale', codes:['MERCABIZA'], icon:'📦' },
     charter:     { label:'RTG Charter', labelEn:'RTG Charter', codes:['AZUL'], icon:'⛵' },
     beveiliging: { label:'RTG Beveiliging', labelEn:'RTG Security', codes:['AEGIS'], icon:'🛡️' },
+    beachclub:   { label:'RTG Beachclub', labelEn:'RTG Beach Club', codes:['VORA'], icon:'🏖️' },
+    koffie:      { label:'RTG Koffie & Patisserie', labelEn:'RTG Coffee & Patisserie', codes:['BRISA'], icon:'☕' },
+    chef:        { label:'RTG Privéchef & Catering', labelEn:'RTG Private Chef & Catering', codes:['FUEGO'], icon:'👨‍🍳' },
+    villa:       { label:"RTG Villa's & Fincas", labelEn:'RTG Villas & Fincas', codes:['LUNARA'], icon:'🌴' },
+    tweewielers: { label:'RTG Tweewielers & Quads', labelEn:'RTG Two-wheelers & Quads', codes:['MOTOISLA'], icon:'🛵' },
+    events:      { label:'RTG Events & Festivals', labelEn:'RTG Events & Festivals', codes:['FESTA'], icon:'🎪' },
+    wellness:    { label:'RTG Wellness & Spa', labelEn:'RTG Wellness & Spa', codes:['SERENA'], icon:'🧖' },
+    juwelier:    { label:'RTG Juwelier', labelEn:'RTG Jeweller', codes:['ORODOR'], icon:'💎' },
+    galerie:     { label:'RTG Kunst & Galerie', labelEn:'RTG Art & Gallery', codes:['LIENZO'], icon:'🖼️' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }

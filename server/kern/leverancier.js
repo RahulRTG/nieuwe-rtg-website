@@ -270,7 +270,7 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
       supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate, vak: s.vak || null },
       activiteiten: s.activiteiten || null,
       transfer: s.type === 'activiteit' ? (s.transfer || { aan: false, prijs: 0 }) : null,
-      autos: s.type === 'verhuur' ? (s.autos || []) : null,
+      autos: (s.type === 'verhuur' || s.type === 'tweewielers') ? (s.autos || []) : null,
       boten: s.type === 'charter' ? (s.boten || []) : null,
       panden: s.type === 'vastgoed' ? (s.panden || []) : null,
       // de ophaal/bezorgdienst: alleen voor horeca en zelfstandigen

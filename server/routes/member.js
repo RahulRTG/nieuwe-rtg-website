@@ -1452,7 +1452,7 @@ function huurFotos(ref) { return db.data.huurFotos[ref] = db.data.huurFotos[ref]
 
 app.post('/api/verhuur/aanbod', auth, (req, res) => {
   const partners = db.data.suppliers
-    .filter(s => s.type === 'verhuur' && (s.autos || []).some(a => a.actief !== false) && salonZichtbaar(s))
+    .filter(s => (s.type === 'verhuur' || s.type === 'tweewielers') && (s.autos || []).some(a => a.actief !== false) && salonZichtbaar(s))
     .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null,
       autos: (s.autos || []).filter(a => a.actief !== false).slice(0, 40) }));
   res.json({ partners });
@@ -1460,7 +1460,7 @@ app.post('/api/verhuur/aanbod', auth, (req, res) => {
 
 app.post('/api/huur/boek', auth, (req, res) => {
   const s = findSupplier(req.body.supplierCode);
-  if (!s || s.type !== 'verhuur') return res.status(404).json({ error: 'Geen verhuurpartner gevonden.' });
+  if (!s || (s.type !== 'verhuur' && s.type !== 'tweewielers')) return res.status(404).json({ error: 'Geen verhuurpartner gevonden.' });
   const auto = (s.autos || []).find(a => a.id === req.body.autoId && a.actief !== false);
   if (!auto) return res.status(404).json({ error: 'Deze auto is niet (meer) beschikbaar.' });
   const van = String(req.body.van || ''), tot = String(req.body.tot || '');

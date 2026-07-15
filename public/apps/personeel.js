@@ -5,14 +5,14 @@
   const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
 
   const SECTORS = [
-    { id:'horeca',  icon:'🍽️', nl:'Horeca',  en:'Hospitality', sub:'Restaurants, bars, clubs', codes:['KIKUNOI','PONTO'] },
-    { id:'verblijf',icon:'🏨', nl:'Verblijf', en:'Stays', sub:'Hotels en appartementen', codes:['HOSHI','SAKURA'] },
+    { id:'horeca',  icon:'🍽️', nl:'Horeca',  en:'Hospitality', sub:'Restaurants, bars, beachclubs, koffie', codes:['KIKUNOI','PONTO','VORA','BRISA','FUEGO'] },
+    { id:'verblijf',icon:'🏨', nl:'Verblijf', en:'Stays', sub:'Hotels, appartementen, villa\'s', codes:['HOSHI','SAKURA','LUNARA'] },
     { id:'vervoer', icon:'🚘', nl:'Vervoer', en:'Transport', sub:'Taxi\'s, privéjets en helikopters', codes:['MKKX','JETAG','IBIZAIR'] },
-    { id:'zzp', icon:'🧑‍🎨', nl:'Zelfstandig', en:'Independent', sub:'Mode, health, en meer', codes:['AYAKA','KAITO'] },
-    { id:'activiteiten', icon:'🎟️', nl:'Activiteiten', en:'Experiences', sub:'Tours, musea, experiences', codes:['ESVEDRA','MACE'] },
-    { id:'verhuur', icon:'🚗', nl:'Autoverhuur', en:'Car rental', sub:'Vloot, uitgifte, inname', codes:['ISLAREN'] },
+    { id:'zzp', icon:'🧑‍🎨', nl:'Zelfstandig', en:'Independent', sub:'Mode, health, wellness en meer', codes:['AYAKA','KAITO','SERENA'] },
+    { id:'activiteiten', icon:'🎟️', nl:'Activiteiten', en:'Experiences', sub:'Tours, musea, events, galeries', codes:['ESVEDRA','MACE','FESTA','LIENZO'] },
+    { id:'verhuur', icon:'🚗', nl:'Verhuur', en:'Rentals', sub:'Auto\'s, scooters, motoren, quads', codes:['ISLAREN','MOTOISLA'] },
     { id:'vastgoed', icon:'🏡', nl:'Vastgoed', en:'Real estate', sub:'Makelaar, bezichtigingen', codes:['IBIZALIV'] },
-    { id:'mode', icon:'🛍️', nl:'Mode & retail', en:'Fashion & retail', sub:'Modehuizen, merken, winkels', codes:['MAISON'] },
+    { id:'mode', icon:'🛍️', nl:'Mode & retail', en:'Fashion & retail', sub:'Modehuizen, juweliers, winkels', codes:['MAISON','ORODOR'] },
     { id:'charter', icon:'⛵', nl:'Boten & jachten', en:'Boats & yachts', sub:'Charters, schippers, op zee', codes:['AZUL'] },
     { id:'beveiliging', icon:'🛡️', nl:'Beveiliging', en:'Security', sub:'Diensten, posten, rondes, SOS', codes:['AEGIS'] },
     { id:'boerderij', icon:'🚜', nl:'Boerderij', en:'Farm', sub:'Land, kas, dieren en oogst', codes:['CANFERRER'] },
@@ -31,7 +31,12 @@
     AZUL:{ name:'Azul Yacht Charter', icon:'⛵' },
     AEGIS:{ name:'Aegis Elite Security', icon:'🛡️' },
     CANFERRER:{ name:'Finca Can Ferrer', icon:'🚜' },
-    LUMINA:{ name:'Lumina Media', icon:'🎬' }
+    LUMINA:{ name:'Lumina Media', icon:'🎬' },
+    VORA:{ name:'Vora Beach Club', icon:'🏖️' }, BRISA:{ name:'Cafe Brisa', icon:'☕' },
+    FUEGO:{ name:'Chef Fuego', icon:'👨‍🍳' }, LUNARA:{ name:'Casa Lunara', icon:'🌴' },
+    MOTOISLA:{ name:'Moto Isla', icon:'🛵' }, FESTA:{ name:'Festa Ibiza Events', icon:'🎪' },
+    SERENA:{ name:'Serena Spa', icon:'🧖' }, ORODOR:{ name:"Casa d'Oro", icon:'💎' },
+    LIENZO:{ name:'Galeria Lienzo', icon:'🖼️' }
   };
 
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),

@@ -7,7 +7,8 @@ module.exports = (kern) => {
    onmogelijk maken: uitgeven kan pas MET voor-foto's, afronden pas MET
    na-foto's, en alles blijft vastgelegd met RTG als scheidsrechter. */
 function isVerhuur(s, res) {
-  if (s.type !== 'verhuur') { res.status(409).json({ error: 'Dit is geen verhuurzaak.' }); return false; }
+  // auto's en tweewielers (scooters, motoren, quads) delen dezelfde veilige verhuurmotor
+  if (s.type !== 'verhuur' && s.type !== 'tweewielers') { res.status(409).json({ error: 'Dit is geen verhuurzaak.' }); return false; }
   return true;
 }
 function huurVan(s, ref) {

@@ -23,7 +23,7 @@ function maakAutoverkoop({ db, save, crypto, findSupplier, notify, notifySupplie
   const getal = (v, min, max, st) => { const n = Number(v); return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : st; };
   function deals() { if (!Array.isArray(db.data.verkoopDeals)) db.data.verkoopDeals = []; return db.data.verkoopDeals; }
 
-  function isVerkoopBedrijf(s) { return s && s.type === 'verhuur'; }
+  function isVerkoopBedrijf(s) { return s && (s.type === 'verhuur' || s.type === 'tweewielers'); }
   function ver(s) {
     if (!s.verkoop || typeof s.verkoop !== 'object') s.verkoop = {};
     if (typeof s.verkoop.aan !== 'boolean') s.verkoop.aan = false;

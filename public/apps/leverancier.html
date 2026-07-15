@@ -648,8 +648,8 @@
         <div id="factWrap"></div>
       </div>
       <div class="view" data-view="rtfmarkt">
-        <h2 data-i18n="sup.v.mkt">De Passage</h2>
-        <p class="sub" data-i18n="sup.v.mkt.sub">Verkoop opruiming, overstock of tweedehands inventaris in De Passage van de RTFoundation. Gezinnen zien uw aanbod met een zaak-badge.</p>
+        <h2 data-i18n="sup.v.mkt">De Salon · RTFoundation</h2>
+        <p class="sub" data-i18n="sup.v.mkt.sub">Verkoop opruiming, overstock of tweedehands inventaris in De Salon van de RTFoundation. Gezinnen zien uw aanbod met een zaak-badge.</p>
         <div id="mktWrap"></div>
       </div>
       <div class="view" data-view="retail">
@@ -859,7 +859,7 @@
     creator:  { label:'Creator',   svg:'<rect x="3" y="5" width="13" height="14" rx="2"/><path d="M16 9l5-3v12l-5-3"/>', cap:'creator' },
     samenwerking:{ label:'Samenwerken', svg:'<path d="M9 11l2 2 4-4"/><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="M7 10v4a3 3 0 0 0 3 3h4"/>' },
     facturen: { label:'Facturen',  svg:'<path d="M6 2h9l3 3v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h4"/>' },
-    rtfmarkt: { label:'De Passage', svg:'<path d="M4 7h16l-1 4a3 3 0 0 1-3 2.4H8A3 3 0 0 1 5 11z"/><path d="M4 7 6 3h12l2 4"/><path d="M6 13v7h12v-7"/>' },
+    rtfmarkt: { label:'De Salon · RTF', svg:'<path d="M4 7h16l-1 4a3 3 0 0 1-3 2.4H8A3 3 0 0 1 5 11z"/><path d="M4 7 6 3h12l2 4"/><path d="M6 13v7h12v-7"/>' },
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     verkoop:  { label:'Verkoop',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M9.5 9.2l1.6 1.6 3-3"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
@@ -3183,7 +3183,7 @@
     }
   }
 
-  // ---- De Passage: de zaak verkoopt (optioneel) op de gezinsmarktplaats ----
+  // ---- De Salon: de zaak verkoopt (optioneel) op de gezinsmarktplaats ----
   let rtfmData = null, rtfmCats = [], rtfmStaatVar = 'gebruikt', rtfmBusy = false;
   async function laadRtfm(){
     if (rtfmBusy) return; rtfmBusy = true;
@@ -3213,7 +3213,7 @@
         '</div>'+
         '<div id="mktAiUit" class="sub" style="margin-top:0.35rem;color:var(--gold);"></div>'+
         '<label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.8rem;color:var(--soft);margin:0.6rem 0;"><input type="checkbox" id="mktAkkoord" style="margin-top:0.2rem;"><span>'+T('mkt.akkoord','Ik bied alleen toegestane waar aan en houd het netjes en respectvol.')+'</span></label>'+
-        '<button class="obtn primary" id="mktPlaatsBtn" style="width:100%;">'+T('mkt.plaatsbtn','Zet in De Passage')+'</button>'+
+        '<button class="obtn primary" id="mktPlaatsBtn" style="width:100%;">'+T('mkt.plaatsbtn','Zet in De Salon')+'</button>'+
         '<div id="mktMelding" class="sub" style="margin-top:0.4rem;"></div></div>';
     }
     const ads = rtfmData.ads || [];
@@ -3238,7 +3238,7 @@
       const m = $('#mktMelding');
       try {
         const r = await API.call('/supplier/markt/plaats', { akkoord:$('#mktAkkoord').checked, titel:$('#mktTitel').value.trim(), beschrijving:$('#mktOms').value.trim(), categorie:$('#mktCat').value, staat:$('#mktStaat').value, prijs:Number($('#mktPrijs').value)||0, plaats:$('#mktPlaats').value.trim(), levering:['ophalen'] });
-        m.style.color = '#7EE0A3'; m.textContent = r.waarschuwing ? T('mkt.let','Geplaatst. Let op: ')+r.waarschuwing : T('mkt.gedaan','Geplaatst in De Passage.');
+        m.style.color = '#7EE0A3'; m.textContent = r.waarschuwing ? T('mkt.let','Geplaatst. Let op: ')+r.waarschuwing : T('mkt.gedaan','Geplaatst in De Salon.');
         rtfmData = null; laadRtfm();
       } catch(e){ m.style.color = '#E0736A'; m.textContent = e.message; }
     });

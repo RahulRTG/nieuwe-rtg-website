@@ -244,6 +244,63 @@
   // meteen toepassen, ook op het beginscherm
   pasThemaToepassen();
 
+  /* ---------- de stem van de pas (tone of voice) ----------
+     Dezelfde vriend als op de website, maar in de taal van de pas:
+     RTG (65 euro per maand) praat als de jetset-vriend (je), Business
+     zakelijker en strakker, Lifestyle (20.000 per maand ex btw) als de
+     concierge (u). De kleuren van de pas blijven ongemoeid; alleen de
+     woorden draaien mee. In het Engels wint de i18n-laag: dan doet
+     stem() niets en blijven de vertaalde teksten staan. */
+  function pasStem(){
+    const s = document.documentElement.getAttribute('data-stem') || vastePas;
+    return s === 'lifestyle' || s === 'business' ? s : 'rtg';
+  }
+  function stem(rtg, business, lifestyle){
+    if (lang() === 'en') return null;
+    const s = pasStem();
+    return s === 'business' ? business : s === 'lifestyle' ? lifestyle : rtg;
+  }
+  const STEMKOPPEN = [
+    ['gate.title', true,
+      'Zo, daar ben je.<br>Je pas, <em>altijd</em> op zak.',
+      'Welkom.<br>Zaken, <em>strak</em> geregeld.',
+      'Welkom thuis.<br>Uw wereld, <em>altijd</em> bij de hand.'],
+    ['gate.deck', false,
+      'Boeken, betalen met één tik, je eigen AI en De Salon. Alles draait op je codenaam, niet op je echte naam. Zo hoort het.',
+      'Reizen, betalingen en je AI-boekhouder in één app, alles op codenaam. Efficiënt, discreet, zonder gedoe.',
+      'Uw reizen, uw concierge en De Salon, verzameld in één stille app. Alles op uw codenaam; uw echte naam blijft van u.'],
+    ['app.v.trip', false, 'Jouw reis.', 'Je reizen.', 'Uw reis.'],
+    ['app.v.trip.note', false,
+      'Wijzigen of toevoegen? Eén berichtje aan je AI is genoeg.',
+      'Wijzigen of toevoegen? Meld het je AI; het staat direct in de agenda.',
+      'Een wens? Fluister het uw AI; het wordt geregeld.'],
+    ['app.v.pay.sub', false,
+      'Eén tik, Face ID. Alles op je codenaam, zoals het hoort.',
+      'Eén tik, Face ID. Elke betaling strak geboekt, op codenaam.',
+      'Eén tik, Face ID. Uw betalingen dragen uw codenaam, niet uw naam.'],
+    ['app.v.ai.sub', false,
+      'Hij regelt het. Eén ja is genoeg.',
+      'Hij regelt het en boekt het meteen in. Eén ja is genoeg.',
+      'Uw wens is aan één woord genoeg.'],
+    ['app.v.salon.sub', false,
+      'Posts verschijnen 7 dagen na verblijf, voor je veiligheid.',
+      'Posts verschijnen 7 dagen na verblijf, voor je veiligheid.',
+      'Uw posts verschijnen 7 dagen na verblijf, voor uw veiligheid.']
+  ];
+  function stemKoppen(){
+    if (lang() === 'en') return;
+    const i = pasStem() === 'business' ? 1 : pasStem() === 'lifestyle' ? 2 : 0;
+    STEMKOPPEN.forEach(rij => {
+      const el = document.querySelector('[data-i18n="' + rij[0] + '"], [data-i18n-html="' + rij[0] + '"]');
+      if (!el) return;
+      if (rij[1]) el.innerHTML = rij[2 + i]; else el.textContent = rij[2 + i];
+    });
+    const ai = document.getElementById('aiTitle');
+    if (ai) ai.textContent = ['Jouw AI.', 'Je AI.', 'Uw AI.'][i];
+  }
+  // meteen: de poort spreekt de taal van de gekozen ingang (?pas=...)
+  stemKoppen();
+
   const loginForm = document.getElementById('loginForm');
   if (loginForm) loginForm.addEventListener('submit', e => {
     e.preventDefault();

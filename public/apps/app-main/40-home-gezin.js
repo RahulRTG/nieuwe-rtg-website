@@ -113,7 +113,14 @@
     if (user.tier === 'guest'){ renderHomeGuest(); return; }
     const first = user.full.split(' ')[0];
     const E = Util.el; // componentframework voor de kaarten hieronder
-    $('#homeGreeting').textContent = T('app.welcome','Welkom,') + ' ' + first + '.';
+    // de stem volgt de pas van het ingelogde lid (niet alleen de ingang)
+    document.documentElement.setAttribute('data-stem', user.tier);
+    stemKoppen();
+    $('#homeGreeting').textContent = stem(
+      'Ha ' + first + ', goed je te zien.',
+      'Dag ' + first + '. Alles onder controle.',
+      'Welkom terug, ' + first + '. Alles staat voor u klaar.'
+    ) || (T('app.welcome','Welkom,') + ' ' + first + '.');
     $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
 
     // De codecard met Util.el: codenaam, lidnummer en leeftijdsgroep gaan
@@ -122,7 +129,11 @@
     const qr = E('div');
     qr.innerHTML = qrSvg(user.number.length * 7919);
     Util.vervang($('#codecard'),
-      E('div', { class: 'label' }, T('app.cc.label', 'Uw codenaam, uw identiteit in onze systemen')),
+      E('div', { class: 'label' }, stem(
+        'Je codenaam, je identiteit in onze wereld',
+        'Je codenaam, de identiteit van de zaak onderweg',
+        'Uw codenaam, uw identiteit in onze wereld'
+      ) || T('app.cc.label', 'Uw codenaam, uw identiteit in onze systemen')),
       E('div', { class: 'cn' }, user.codename),
       E('div', { class: 'row' },
         E('div', {},
@@ -143,7 +154,7 @@
       E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
       E('div', { class: 'big' }, trip.dest),
       E('div', { class: 'meta' }, trip.dates + ' · ' + T('app.in', 'over') + ' ' + trip.days + ' ' + T('app.days', 'dagen')),
-      E('button', { class: 'go', dataset: { goto: 'reizen' } }, T('app.viewtrip', 'Bekijk uw reis') + ' →'));
+      E('button', { class: 'go', dataset: { goto: 'reizen' } }, (stem('Bekijk je reis', 'Naar je reizen', 'Bekijk uw reis') || T('app.viewtrip', 'Bekijk uw reis')) + ' →'));
     Util.vervang($('#homePay'), open.length
       ? [E('div', { class: 'label' }, T('app.outstanding', 'Openstaand')),
          E('div', { class: 'big accent' }, eur(openSum)),
@@ -166,7 +177,9 @@
   // Startpagina voor de gratis gebruiker (zonder pas): betalen bij partners,
   // De Salon bekijken en solliciteren. Geen ledenkaart, reis of betalingen.
   function renderHomeGuest(){
-    $('#homeGreeting').textContent = T('app.welcome','Welkom,') + '.';
+    document.documentElement.setAttribute('data-stem', 'rtg');
+    stemKoppen();
+    $('#homeGreeting').textContent = stem('Ha, fijn dat je er bent.', '', '') || (T('app.welcome','Welkom,') + '.');
     $('#homeSub').textContent = T('app.guestsub','Gratis, zonder pas');
     $('#codecard').innerHTML =
       '<div class="label">'+T('app.guest.k','Gratis account')+'</div>'+

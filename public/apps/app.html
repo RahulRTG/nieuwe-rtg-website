@@ -822,15 +822,15 @@
   <div id="gate" role="main" aria-label="Inloggen">
     <div class="logo">Rahul Travel Group</div>
     <div class="tagline">Experience the Elite Class</div>
-    <h1 data-i18n-html="gate.title">De app.<br>Uw pas, <em>altijd</em> op zak.</h1>
-    <p class="deck" data-i18n="gate.deck">Boekingen, betalen met één tik, uw persoonlijke AI en De Salon, en uw account draait op uw codenaam, niet op uw echte naam.</p>
+    <h1 data-i18n-html="gate.title">Zo, daar ben je.<br>Je pas, <em>altijd</em> op zak.</h1>
+    <p class="deck" data-i18n="gate.deck">Boeken, betalen met één tik, je eigen AI en De Salon. Alles draait op je codenaam, niet op je echte naam. Zo hoort het.</p>
     <!-- geen brede app meer: zonder ?pas= is dit alleen een keuzescherm dat
          doorverwijst naar de app van uw eigen pas -->
     <div id="kiesPas" class="gate-list" hidden>
       <p class="gate-or" style="margin-top:0;" data-i18n="gate.kies">Elke pas heeft zijn eigen app. Kies de uwe:</p>
-      <a class="gate-btn t-rtg" href="?pas=rtg" style="text-decoration:none;"><span class="dot"></span><span><b>RTG Pass</b><span data-i18n="gate.kies.rtg">Het lidmaatschap; ook gratis te gebruiken zonder pas</span></span></a>
-      <a class="gate-btn t-lifestyle" href="?pas=lifestyle" style="text-decoration:none;"><span class="dot"></span><span><b>Lifestyle Pass</b><span data-i18n="gate.kies.life">Met concierge en RTG Zakelijk</span></span></a>
-      <a class="gate-btn t-business" href="?pas=business" style="text-decoration:none;"><span class="dot"></span><span><b>Business Pass</b><span data-i18n="gate.kies.bus">Zakelijk reizen, AI-boekhouder en RTG Zakelijk</span></span></a>
+      <a class="gate-btn t-rtg" href="?pas=rtg" style="text-decoration:none;"><span class="dot"></span><span><b>RTG Pass</b><span data-i18n="gate.kies.rtg">Het lidmaatschap, € 65 per maand; ook gratis te proberen</span></span></a>
+      <a class="gate-btn t-lifestyle" href="?pas=lifestyle" style="text-decoration:none;"><span class="dot"></span><span><b>Lifestyle Pass</b><span data-i18n="gate.kies.life">Uw eigen concierge, € 20.000 per maand ex btw</span></span></a>
+      <a class="gate-btn t-business" href="?pas=business" style="text-decoration:none;"><span class="dot"></span><span><b>Business Pass</b><span data-i18n="gate.kies.bus">Zakelijk reizen en de AI-boekhouder; prijs op maat</span></span></a>
     </div>
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
@@ -839,10 +839,10 @@
     </form>
     <form class="login-form" id="regForm" style="display:none;">
       <div id="regKop" style="font-size:0.82rem;color:var(--muted);line-height:1.5;margin-bottom:0.2rem;"></div>
-      <input id="rgName" placeholder="Uw naam" data-i18n-ph="gate.name" autocapitalize="words">
+      <input id="rgName" placeholder="Je naam" data-i18n-ph="gate.name" autocapitalize="words">
       <input id="rgEmail" type="email" placeholder="E-mailadres" data-i18n-ph="gate.email" autocomplete="email" autocapitalize="none">
       <input id="rgPhone" type="tel" placeholder="Mobiel nummer" data-i18n-ph="gate.phone" autocomplete="tel">
-      <label style="display:block;font-size:0.68rem;color:var(--soft);margin:0.15rem 0 0.25rem;" data-i18n="gate.geb">Geboortedatum (zoals in uw paspoort; lidmaatschap vanaf 15 jaar)</label>
+      <label style="display:block;font-size:0.68rem;color:var(--soft);margin:0.15rem 0 0.25rem;" data-i18n="gate.geb">Geboortedatum (zoals in je paspoort; lidmaatschap vanaf 15 jaar)</label>
       <input id="rgGeb" type="date" autocomplete="bday">
       <input id="rgPass" type="password" placeholder="Wachtwoord (min. 6 tekens)" data-i18n-ph="gate.newpass" autocomplete="new-password">
       <button type="submit" data-i18n="gate.createacc">Account aanmaken</button>
@@ -852,7 +852,7 @@
       <button type="submit" data-i18n="gate.sendreset">Stuur herstel-link</button>
     </form>
     <form class="login-form" id="resetForm" style="display:none;">
-      <input id="rsCode" inputmode="numeric" maxlength="6" placeholder="Code van uw telefoon (6 cijfers)" data-i18n-ph="gate.smscode" autocomplete="one-time-code">
+      <input id="rsCode" inputmode="numeric" maxlength="6" placeholder="Code van je telefoon (6 cijfers)" data-i18n-ph="gate.smscode" autocomplete="one-time-code">
       <input id="rsPass" type="password" placeholder="Nieuw wachtwoord" data-i18n-ph="gate.newpass2" autocomplete="new-password">
       <button type="submit" data-i18n="gate.doreset">Stel nieuw wachtwoord in</button>
     </form>
@@ -866,19 +866,19 @@
       <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>R. Imran</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
       <button class="gate-btn t-guest" data-login="guest"><span class="dot" style="background:var(--soft);"></span><span><b data-i18n="gate.guest">Gratis, zonder pas</b><span data-i18n="gate.guest.s">Betaal bij partners, bekijk De Salon en solliciteer</span></span></button>
     </div>
-    <p class="note" data-i18n-html="gate.note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op uw beginscherm →</a></p>
+    <p class="note" data-i18n-html="gate.note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op je beginscherm →</a></p>
   </div>
 
   <!-- verplichte onboarding + contract (blokkeert de app tot alles rond is) -->
   <div id="onbGate" role="dialog" aria-modal="true" aria-labelledby="onbTitel" hidden>
     <div class="onb-card">
-      <h1 id="onbTitel">Nog even dit, dan reist u mee</h1>
-      <p class="onb-deck">Uw RTG-pas is bedoeld om te reizen. Vul uw gegevens aan en teken de overeenkomst; daarna staat de hele app voor u open.</p>
+      <h1 id="onbTitel">Nog even dit, dan gaan we op reis</h1>
+      <p class="onb-deck">Je pas is bedoeld om te reizen. Vul je gegevens aan en teken de overeenkomst; daarna staat de hele wereld voor je open.</p>
       <div id="onbVelden"></div>
       <div class="onb-sec">De overeenkomst</div>
       <div class="onb-contract"><h2 id="onbCTitel"></h2><div class="onb-tekst" id="onbCTekst"></div></div>
       <label class="onb-akkoord"><input type="checkbox" id="onbAkkoord"><span id="onbAkkoordTxt">Ik heb de overeenkomst gelezen en ga akkoord.</span></label>
-      <label class="onb-veld"><span id="onbNaamLbl">Typ uw volledige naam om digitaal te ondertekenen</span>
+      <label class="onb-veld"><span id="onbNaamLbl">Typ je volledige naam om digitaal te ondertekenen</span>
         <input id="onbNaam" autocomplete="name"></label>
       <div class="onb-fout" id="onbFout" role="alert"></div>
       <button class="onb-btn" id="onbKlaar" type="button">Onderteken en ga verder</button>
@@ -914,7 +914,7 @@
           <button id="privExport" style="flex:1;background:none;border:1px solid var(--line);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--soft);" data-i18n="app.priv.export">Download mijn gegevens</button>
           <button id="privDelete" style="flex:1;background:none;border:1px solid rgba(194,58,94,0.4);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--burgundy);" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
         </div>
-        <div style="font-size:0.6rem;color:var(--soft);line-height:1.5;" data-i18n="app.priv.note">Uw AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist uw cv, chats, likes en locatie en logt u overal uit.</div>
+        <div style="font-size:0.6rem;color:var(--soft);line-height:1.5;" data-i18n="app.priv.note">Je AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist je cv, chats, likes en locatie en logt je overal uit.</div>
       </div>
     </div>
     <div class="notif-scrim" id="notifScrim"></div>
@@ -939,16 +939,16 @@
       </div>
 
       <div class="view" data-view="reizen">
-        <h2 data-i18n="app.v.trip">Uw reis.</h2>
+        <h2 data-i18n="app.v.trip">Jouw reis.</h2>
         <p class="sub" id="tripSub"></p>
         <div class="card" id="tripList"></div>
-        <p class="sub" style="margin-top:1rem;" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Vraag het de AI, één bericht is genoeg.</p>
+        <p class="sub" style="margin-top:1rem;" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Eén berichtje aan je AI is genoeg.</p>
         <div id="showroom"></div>
       </div>
 
       <div class="view" data-view="betalen">
         <h2 data-i18n="app.v.pay">Betalen.</h2>
-        <p class="sub" data-i18n="app.v.pay.sub">Eén tik, Face ID. Uw betalingen staan op uw codenaam.</p>
+        <p class="sub" data-i18n="app.v.pay.sub">Eén tik, Face ID. Alles op je codenaam, zoals het hoort.</p>
         <div class="card" id="payList"></div>
         <div id="payAllWrap"></div>
         <div id="bhWrap"></div>
@@ -956,7 +956,7 @@
       </div>
 
       <div class="view" data-view="ai">
-        <h2 id="aiTitle">Uw AI.</h2>
+        <h2 id="aiTitle">Jouw AI.</h2>
         <p class="sub" data-i18n="app.v.ai.sub">Hij regelt het. Eén ja is genoeg.</p>
         <div class="chat" id="chat"></div>
         <div class="chips" id="chips"></div>
@@ -968,7 +968,7 @@
 
       <div class="view" data-view="salon">
         <h2 data-i18n="app.v.salon">De Salon.</h2>
-        <p class="sub" data-i18n="app.v.salon.sub">Posts verschijnen 7 dagen na verblijf, voor uw veiligheid.</p>
+        <p class="sub" data-i18n="app.v.salon.sub">Posts verschijnen 7 dagen na verblijf, voor je veiligheid.</p>
         <div class="sc-bar" id="socialBar"></div>
         <div id="ontmoetPaneel" style="display:none;"></div>
         <div id="zakLauncher" style="display:none;"></div>
@@ -977,7 +977,7 @@
 
       <div class="view" data-view="terplaatse">
         <h2 data-i18n="app.v.tp">Ter plaatse.</h2>
-        <p class="sub" id="tpSub">Bestel, betaal en reserveer bij RTG-partners op uw bestemming.</p>
+        <p class="sub" id="tpSub">Bestel, betaal en reserveer bij RTG-partners op je bestemming.</p>
         <div id="livePanel"></div>
         <div id="vgMijn"></div>
         <div id="conMijn"></div>
@@ -1046,17 +1046,17 @@
   <div id="cv-scrim" class="menu-scrim"></div>
   <div id="cv-sheet" class="menu-sheet">
     <div class="ms-head">
-      <div><b data-i18n="cv.h">Uw RTG-cv</b><span data-i18n="cv.sub">Eenmaal maken, overal mee solliciteren</span></div>
+      <div><b data-i18n="cv.h">Je RTG-cv</b><span data-i18n="cv.sub">Eenmaal maken, overal mee solliciteren</span></div>
       <button class="ms-close" id="cvClose" aria-label="Sluiten">✕</button>
     </div>
     <div class="ms-body" id="cvBody">
-      <div class="field" style="margin-top:0.6rem;"><label data-i18n="cv.name">Uw naam</label><input id="cvName"></div>
+      <div class="field" style="margin-top:0.6rem;"><label data-i18n="cv.name">Je naam</label><input id="cvName"></div>
       <div class="field"><label data-i18n="cv.contact">Telefoon of e-mail</label><input id="cvContact"></div>
       <div class="field"><label data-i18n="cv.headline">Gewenste functie</label><input id="cvHeadline" placeholder="Bijv. Bediening of Receptie" data-i18n-ph="cv.headline.ph"></div>
       <div class="field"><label data-i18n="cv.exp">Werkervaring (een regel per baan)</label><textarea id="cvExp" style="min-height:90px;" placeholder="Bediening bij De Zwaan (2022-2025)&#10;Runner bij Hotel Astoria (2020-2022)" data-i18n-ph="cv.exp.ph"></textarea></div>
       <div class="field"><label data-i18n="cv.skills">Vaardigheden (komma's)</label><input id="cvSkills" placeholder="wijnkennis, kassa, gastvrijheid" data-i18n-ph="cv.skills.ph"></div>
       <div class="field"><label data-i18n="cv.lang">Talen (komma's)</label><input id="cvLang" placeholder="Nederlands, Engels"></div>
-      <div class="field"><label data-i18n="cv.about">Over u (kort)</label><textarea id="cvAbout" style="min-height:70px;"></textarea></div>
+      <div class="field"><label data-i18n="cv.about">Over jou (kort)</label><textarea id="cvAbout" style="min-height:70px;"></textarea></div>
     </div>
     <div class="ms-foot"><button class="ms-order" id="cvSave" data-i18n="cv.save">Bewaar mijn cv</button></div>
   </div>
@@ -1091,7 +1091,7 @@
   <div id="pchat-scrim" class="menu-scrim"></div>
   <div id="pchat-sheet" class="menu-sheet">
     <div class="ms-head">
-      <div><b id="pcName"></b><span data-i18n="app.pc.sub">Rechtstreeks contact, op uw codenaam</span></div>
+      <div><b id="pcName"></b><span data-i18n="app.pc.sub">Rechtstreeks contact, op je codenaam</span></div>
       <button class="pc-salon" id="pcSalon" data-i18n="app.pc.salon">Bekijk Salon</button>
       <button class="ms-close" id="pcClose" aria-label="Sluiten">✕</button>
     </div>
@@ -1144,7 +1144,7 @@
         </label>
       </div>
       <input id="rideNote" class="ms-note" placeholder="Bijv. kinderzitje, voor de zij-ingang" data-i18n-ph="ride.noteph">
-      <div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;" data-i18n="ride.los">U boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de vervoerder.</div>
+      <div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;" data-i18n="ride.los">Je boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en je betaling gaat rechtstreeks naar de vervoerder.</div>
       <button class="ms-order" id="rideGo" data-i18n="ride.go">Vraag de rit aan</button>
     </div>
   </div>

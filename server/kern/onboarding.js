@@ -92,7 +92,12 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
       case 'geboortedatum': return md.geboren || null;
       case 'land': return md.land || null;
       case 'nationaliteit': return md.nationaliteit || null;
-      case 'paspoort': return (acc && ['pending', 'approved', 'geverifieerd', 'verified'].includes(acc.verified)) ? 'ingediend' : null;
+      // Demo-sessies zonder account kunnen geen identiteitsbewijs uploaden
+      // (de upload eist een echt account); daar telt het veld als voldaan,
+      // anders zou de demo eeuwig voor de onboarding-poort blijven staan.
+      case 'paspoort': return acc
+        ? (['pending', 'approved', 'geverifieerd', 'verified'].includes(acc.verified) ? 'ingediend' : null)
+        : 'demo-sessie';
       default: return null;
     }
   }

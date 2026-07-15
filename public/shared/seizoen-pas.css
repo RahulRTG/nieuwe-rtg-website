@@ -1,0 +1,68 @@
+/* Het 4x4-palet voor de passen in de leden-app: vier seizoenen x vier
+   zonstanden geven elke pas een verschuivende ondertoon, terwijl de
+   identiteit van de pas blijft staan (RTG bordeaux, Lifestyle parelmoer,
+   Business klassiek) en de licht/donker-keuze van het lid heilig is.
+
+   Werking: shared/seizoen.js zet data-seizoen en data-dagdeel op <html>;
+   dit blad mengt per combinatie een seizoenstint in de basisvlakken
+   (--bg, --card, --card2) van het actieve thema. Accenten (bordeaux,
+   goud) draaien bewust NIET mee: dat is de handtekening van de pas.
+   Zonder JavaScript verandert er niets. */
+
+/* de tint van het seizoen */
+:root[data-seizoen="lente"]{ --sp-tint:#6E9A46; }   /* jong blad */
+:root[data-seizoen="zomer"]{ --sp-tint:#2E7A96; }   /* azuur */
+:root[data-seizoen="herfst"]{ --sp-tint:#B0662E; }  /* cognac */
+:root[data-seizoen="winter"]{ --sp-tint:#5E7A9E; }  /* staal */
+
+/* de zonstand: hoe warm en hoe sterk de tint meemengt
+   (--sp-d/-k voor donkere vlakken, --sp-dl/-kl voor lichte vlakken) */
+:root[data-dagdeel="ochtend"]{
+  --sp-d:color-mix(in oklab, #ffffff 20%, var(--sp-tint,#7F1634)); --sp-k:12%;
+  --sp-dl:color-mix(in oklab, #ffffff 55%, var(--sp-tint,#7F1634)); --sp-kl:14%;
+}
+:root[data-dagdeel="middag"]{
+  --sp-d:color-mix(in oklab, #ffffff 10%, var(--sp-tint,#7F1634)); --sp-k:8%;
+  --sp-dl:color-mix(in oklab, #ffffff 65%, var(--sp-tint,#7F1634)); --sp-kl:10%;
+}
+:root[data-dagdeel="avond"]{
+  --sp-d:var(--sp-tint,#7F1634); --sp-k:14%;
+  --sp-dl:color-mix(in oklab, #ffffff 42%, var(--sp-tint,#7F1634)); --sp-kl:16%;
+}
+:root[data-dagdeel="nacht"]{
+  --sp-d:color-mix(in oklab, #000000 32%, var(--sp-tint,#7F1634)); --sp-k:10%;
+  --sp-dl:color-mix(in oklab, #ffffff 30%, var(--sp-tint,#7F1634)); --sp-kl:12%;
+}
+
+/* Business / klassiek donker (geen pas-thema, geen lichte weergave) */
+:root[data-seizoen][data-dagdeel]:not([data-thema="licht"]):not([data-pas-thema]){
+  --bg:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #0C0C0B);
+  --card:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #151312);
+  --card2:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #1B1817);
+}
+
+/* RTG / bordeaux (donker): de wijn blijft, het licht draait erdoorheen */
+:root[data-seizoen][data-dagdeel][data-pas-thema="bordeaux"]:not([data-thema="licht"]){
+  --bg:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #1E0912);
+  --card:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #2B0E1B);
+  --card2:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #371425);
+}
+
+/* Lifestyle / parelmoer (licht van zichzelf): pastelmenging */
+:root[data-seizoen][data-dagdeel][data-pas-thema="parelmoer"]:not([data-thema="licht"]){
+  --bg:color-mix(in oklab, var(--sp-dl) var(--sp-kl,10%), #ECE6DD);
+  --card:color-mix(in oklab, var(--sp-dl) var(--sp-kl,10%), #F7F3EC);
+  --card2:color-mix(in oklab, var(--sp-dl) var(--sp-kl,10%), #FCFAF5);
+}
+
+/* de lichte weergave (weergaveknop), voor alle passen: ivoor met de tint */
+:root[data-seizoen][data-dagdeel][data-thema="licht"]{
+  --bg:color-mix(in oklab, var(--sp-dl) var(--sp-kl,10%), #FBFAF7);
+  --card:color-mix(in oklab, var(--sp-dl) calc(var(--sp-kl,10%) / 2), #FFFFFF);
+  --card2:color-mix(in oklab, var(--sp-dl) var(--sp-kl,10%), #F3F0E9);
+}
+
+/* het licht wisselt zacht, als de zon zelf */
+:root[data-dagdeel] #shell{
+  transition:background-color 0.8s ease;
+}

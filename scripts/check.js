@@ -86,5 +86,9 @@ for (const rel of VLAGGENSCHIP) {
 }
 if (!a11y) ok('taal, alt-teksten, skip-links en landmarks aanwezig');
 
+console.log('\n6) gebundelde app-scripts gelijk aan hun losse delen');
+try { require('./bundel').controleer(); ok('leverancier.js en app-main.js komen overeen met public/apps/<naam>/'); }
+catch (e) { fout(e.message); }
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

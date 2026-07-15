@@ -9,9 +9,14 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { minify } = require('terser');
+const { bundels, schrijfBundels } = require('./bundel');
 
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
+
+// De mappen met losse delen van de grote app-scripts: die worden gebundeld en
+// niet zelf uitgeserveerd, dus overslaan bij het minificeren.
+const DEEL_MAPPEN = new Set(Object.values(bundels).map((m) => path.join(PUB, m)));
 const sha = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
 
 // Loop public/ af en verzamel alle serveerbare .js-bestanden. De service-workers
@@ -22,7 +27,7 @@ function verzamelJs(dir, uit) {
     const p = path.join(dir, naam);
     const st = fs.statSync(p);
     if (st.isDirectory()) {
-      if (naam === 'dist') continue;
+      if (naam === 'dist' || DEEL_MAPPEN.has(p)) continue;
       verzamelJs(p, uit);
     } else if (naam.endsWith('.js') && naam !== 'sw.js') {
       uit.push(p);
@@ -97,6 +102,8 @@ function stempelServiceWorkers() {
 }
 
 (async () => {
+  const gebundeld = schrijfBundels();
+  console.log('[build] gebundeld: ' + (gebundeld.length ? gebundeld.join(', ') : 'bundels al actueel'));
   await minifyGedeeld();
   await minifyServe();
   stempelServiceWorkers();

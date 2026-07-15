@@ -798,6 +798,11 @@
         <div class="ai-thread" id="aiThread"></div>
         <div class="tt-compose" style="margin-top:0.8rem;"><input id="aiInput" placeholder="Bijv. zet Riverside suite op schoon" data-i18n-ph="ai.ph" autocomplete="off"><button id="aiSend" data-i18n="team.send">Stuur</button></div>
       </div>
+      <div class="view" data-view="borden">
+        <h2 data-i18n="sup.v.borden">Borden</h2>
+        <p class="sub" data-i18n="sup.v.borden.sub">Het werkbord van de zaak: lijsten en kaarten, per bord met de collega's die u kiest. Iedereen ziet wijzigingen live.</p>
+        <div id="bordenWrap"></div>
+      </div>
       <div class="view" data-view="meer">
         <h2 data-i18n="sup.v.meer">Alle functies</h2>
         <p class="sub" data-i18n="sup.v.meer.sub">Alles op een rij.</p>
@@ -824,6 +829,7 @@
 <script src="/shared/thema.js"></script>
 <script src="/apps/util.js"></script>
 <script src="/shared/appshell.js"></script>
+<script src="/shared/borden.js"></script>
 <script src="/apps/leverancier.js"></script>
 <script>
 window.I18N = { en: {
@@ -966,6 +972,14 @@ window.I18N = { en: {
   'st.making':'In the making', 'st.nomaking':'No open orders.',
   'st.tables':'Tables, tap to cycle', 'st.more':'More',
   'st.pda':'Open the full PDA', 'st.pda.s':'Schedule, tasks, team chat, video calling and SOS.',
+  'sup.v.borden':'Boards', 'sup.v.borden.sub':'Your business workboard: lists and cards, each board with the colleagues you choose. Everyone sees changes live.',
+  'tab.borden':'Boards',
+  'bd.nieuw':'New board', 'bd.leeg':'No boards yet. Create the first board for your team or project.',
+  'bd.kaart':'Card', 'bd.lijst':'List', 'bd.groep':'Group (empty = whole team):', 'bd.weg':'Delete board',
+  'bd.laat':'overdue', 'bd.links':'move left', 'bd.rechts':'move right',
+  'bd.naamq':'Name of the board?', 'bd.wegq':'Delete this board and all its cards?', 'bd.lijstq':'Name of the list?',
+  'bd.kaartq':'What needs to be done?', 'bd.titelq':'Title:', 'bd.notq':'Note (may be empty):',
+  'bd.dueq':'Deadline (YYYY-MM-DD, empty = none):', 'bd.wieq':'Who is on it? Numbers separated by commas:\n',
   'st.calm':'All quiet. New orders appear here automatically.',
   'st.done':'Marked ready, waiting to be served', 'st.unpaid':'unpaid',
   'kds.open':'Open tickets', 'kds.laat':'Late', 'kds.oudste':'Oldest ticket', 'kds.allday':'All day',

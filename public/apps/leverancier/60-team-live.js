@@ -239,6 +239,23 @@
     catch(e){ toast(e.message); }
   }
 
+  /* ---- Borden: het gedeelde werkbord van de zaak (shared/borden.js) ----
+     Dezelfde module draait ook in de PDA en de Business Pass, zodat het bord
+     overal identiek werkt. */
+  let bordenUI = null;
+  function renderBorden(){
+    const wrap = $('#bordenWrap');
+    if (!wrap || !window.BordenUI) return;
+    if (bordenUI) { bordenUI.refresh(); return; }
+    bordenUI = BordenUI.mount(wrap, {
+      laad: () => API.call('/supplier/borden'),
+      doe: b => API.call('/supplier/bord', b),
+      teamleden: () => (state && state.staff || []).map(m => ({ id: m.id, name: m.name })),
+      kanBeheren: () => { const a = actor(); return !!(a.manager || a.role === 'manager' || !a.staffId); },
+      T, toast
+    });
+  }
+
   // ---- meldingen ----
   function renderBell(){
     const unread = notifs.filter(n=>!n.read).length;

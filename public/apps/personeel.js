@@ -121,7 +121,22 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderBorden(); renderTeam(); }
+
+  /* ---- Borden: hetzelfde werkbord als in de leverancier-app (shared/borden.js) ---- */
+  let pdBordenUI = null;
+  function renderBorden(){
+    const wrap = $('#pdBordenWrap');
+    if (!wrap || !window.BordenUI) return;
+    if (pdBordenUI) { pdBordenUI.refresh(); return; }
+    pdBordenUI = BordenUI.mount(wrap, {
+      laad: () => API.call('/supplier/borden'),
+      doe: b => API.call('/supplier/bord', b),
+      teamleden: () => (state && state.staff || []).map(m => ({ id: m.id, name: m.name })),
+      kanBeheren: () => !!(me && me.role === 'manager'),
+      T, toast
+    });
+  }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn

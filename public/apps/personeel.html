@@ -237,6 +237,11 @@
         <p class="sub" data-i18n="pd.v.boer.sub">De taken van vandaag, de oogst en het voeren, op uw naam.</p>
         <div id="boerPdaWrap"></div>
       </div>
+      <div class="view" data-view="borden">
+        <h2 data-i18n="pd.v.borden">Borden</h2>
+        <p class="sub" data-i18n="pd.v.borden.sub">Het werkbord van de zaak: uw groepen, lijsten en kaarten, live met iedereen.</p>
+        <div id="pdBordenWrap"></div>
+      </div>
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
@@ -258,6 +263,7 @@
       <button data-tab="beveiliging" id="tabBevPda" style="display:none;"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/></svg><span data-i18n="pd.t.bev">Dienst</span></button>
       <button data-tab="bezorgen" id="tabBezorgen" style="display:none;"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M6.5 17h6.5l2.2-6.5H19"/><path d="M12.5 6.5H16l1.8 4"/></svg><span data-i18n="pd.t.bezorgen">Bezorgen</span></button>
       <button data-tab="boer" id="tabBoer" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 10l6-4 6 4"/><path d="M6 10v9h8v-9"/><path d="M14 13h6v6h-6z"/><path d="M9 19v-4h2v4"/></svg><span data-i18n="pd.t.boer">Land</span></button>
+      <button data-tab="borden"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 8v8M12.5 8v5M17 8v3"/></svg><span data-i18n="pd.t.borden">Borden</span></button>
       <button data-tab="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17 14c2.6 0.6 4 2.7 4 6"/></svg><span data-i18n="pd.t.team">Team</span></button>
     </div>
   </div>
@@ -269,6 +275,7 @@
 <script src="/apps/util.js"></script>
 <script src="/shared/appshell.js"></script>
 <script src="/shared/teamcall.js"></script>
+<script src="/shared/borden.js"></script>
 <script src="/apps/personeel.js"></script>
 <script>
 window.I18N = { en: {
@@ -281,6 +288,14 @@ window.I18N = { en: {
   'pd.switch':'Switch', 'pd.v.today':'Today.', 'pd.v.rooster':'Schedule', 'pd.v.rooster.sub':'The next seven days, your shifts highlighted.',
   'pd.v.taken':'Tasks', 'pd.v.taken.sub':'Jobs, rooms and everything needing attention today.',
   'pd.v.team':'Team', 'pd.v.team.sub':'Internal chat and who did what.',
+  'pd.v.borden':'Boards', 'pd.v.borden.sub':'Your business workboard: your groups, lists and cards, live with everyone.',
+  'pd.t.borden':'Boards',
+  'bd.nieuw':'New board', 'bd.leeg':'No boards yet. Create the first board for your team or project.',
+  'bd.kaart':'Card', 'bd.lijst':'List', 'bd.groep':'Group (empty = whole team):', 'bd.weg':'Delete board',
+  'bd.laat':'overdue', 'bd.links':'move left', 'bd.rechts':'move right',
+  'bd.naamq':'Name of the board?', 'bd.wegq':'Delete this board and all its cards?', 'bd.lijstq':'Name of the list?',
+  'bd.kaartq':'What needs to be done?', 'bd.titelq':'Title:', 'bd.notq':'Note (may be empty):',
+  'bd.dueq':'Deadline (YYYY-MM-DD, empty = none):', 'bd.wieq':'Who is on it? Numbers separated by commas:\n',
   'pd.t.today':'Today', 'pd.t.rooster':'Schedule', 'pd.t.taken':'Tasks', 'pd.t.team':'Team', 'pd.t.ritten':'Rides', 'pd.t.hulp':'Help',
   'pd.t.keuken':'Kitchen', 'pd.v.keuken':'Kitchen', 'pd.v.keuken.sub':'Your side of the line, live with the kitchen screen.',
   'ks.warm':'Hot side', 'ks.koud':'Cold side', 'ks.snack':'Snacks', 'ks.dessert':'Desserts', 'ks.pas':'The pass',

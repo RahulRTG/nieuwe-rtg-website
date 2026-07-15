@@ -2375,6 +2375,7 @@ require('./routes/onboarding')(kern);
 require('./routes/agenda')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/markt')(kern);
+require('./routes/borden')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

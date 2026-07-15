@@ -401,6 +401,7 @@
   }
 
   // Business Pass: de AI-boekhouder die per land weet wat terug te vorderen is
+  let lidBordenUI = null;
   function renderBoekhouder(){
     const wrap = $('#bhWrap');
     if (!wrap) return;
@@ -427,7 +428,22 @@
       '<div style="display:flex;gap:1rem;margin-top:0.5rem;font-size:0.72rem;color:var(--muted);flex-wrap:wrap;">' +
       '<label style="display:flex;align-items:center;gap:0.35rem;"><input type="checkbox" id="zzpUren" checked> ' + T('zzp.uren','Urencriterium (1.225 uur)') + '</label>' +
       '<label style="display:flex;align-items:center;gap:0.35rem;"><input type="checkbox" id="zzpStart"> ' + T('zzp.start','Startersaftrek') + '</label></div>' +
-      '<div id="zzpRes" style="display:none;margin-top:0.7rem;border:1px solid var(--line);border-radius:12px;padding:0.8rem 0.95rem;font-size:0.76rem;line-height:1.7;color:var(--muted);"></div></div></div>';
+      '<div id="zzpRes" style="display:none;margin-top:0.7rem;border:1px solid var(--line);border-radius:12px;padding:0.8rem 0.95rem;font-size:0.76rem;line-height:1.7;color:var(--muted);"></div></div></div>' +
+      // Borden: dezelfde werkbord-module als de zaken gebruiken (shared/borden.js)
+      '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;">' +
+      '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">📋 ' + T('bd2.h','Borden · uw projecten') + '</div>' +
+      '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('bd2.s','Hetzelfde werkbord als in de RTG-bedrijfsapps: lijsten en kaarten voor uw eigen projecten en administratie.') + '</div>' +
+      '<div id="lidBordenWrap"></div></div>';
+    if (window.BordenUI){
+      if (lidBordenUI) lidBordenUI = null; // het element is zojuist opnieuw opgebouwd
+      lidBordenUI = BordenUI.mount($('#lidBordenWrap'), {
+        laad: () => API.call('/member/borden'),
+        doe: b => API.call('/member/bord', b),
+        teamleden: null,
+        kanBeheren: () => true,
+        T, toast
+      });
+    }
     const go = $('#bhGo');
     if (go) go.addEventListener('click', async () => {
       const q = $('#bhQ').value.trim();

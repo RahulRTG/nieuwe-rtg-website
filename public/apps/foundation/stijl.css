@@ -39,3 +39,57 @@ input,textarea,select{font-family:inherit;}
 @media (min-width:900px){
   body .wrap{max-width:min(68rem, calc(100% - 5rem));}
 }
+
+/* --- Het 4x4-palet van de RTFoundation ---------------------------------
+   De kleur van het scherm hangt af van drie dingen: de leeftijdsgroep
+   (data-rtf-groep, gezet door palet.js), het seizoen en het dagdeel
+   (data-seizoen/data-dagdeel, gezet door shared/seizoen.js). Leeftijd
+   bepaalt de eigen grond en hoe sterk de kleur meekleurt; seizoen en
+   dagdeel kiezen samen de dagkleur die er doorheen wast. Het goud en de
+   serif blijven staan: dat is de handtekening van de RTFoundation.
+   Zonder JavaScript blijft de vaste donkere huisstijl gewoon staan. */
+
+/* de kleur van de dag: zestien tinten, vier per seizoen, een per dagdeel */
+:root[data-seizoen="lente"][data-dagdeel="ochtend"]{ --rtf-kleur:#E08AA8; }
+:root[data-seizoen="lente"][data-dagdeel="middag"]{ --rtf-kleur:#86B85C; }
+:root[data-seizoen="lente"][data-dagdeel="avond"]{ --rtf-kleur:#E0B24A; }
+:root[data-seizoen="lente"][data-dagdeel="nacht"]{ --rtf-kleur:#8E7FC4; }
+:root[data-seizoen="zomer"][data-dagdeel="ochtend"]{ --rtf-kleur:#E6C64A; }
+:root[data-seizoen="zomer"][data-dagdeel="middag"]{ --rtf-kleur:#4FA3D4; }
+:root[data-seizoen="zomer"][data-dagdeel="avond"]{ --rtf-kleur:#E67A5C; }
+:root[data-seizoen="zomer"][data-dagdeel="nacht"]{ --rtf-kleur:#3E6FB0; }
+:root[data-seizoen="herfst"][data-dagdeel="ochtend"]{ --rtf-kleur:#94AE6E; }
+:root[data-seizoen="herfst"][data-dagdeel="middag"]{ --rtf-kleur:#E0A038; }
+:root[data-seizoen="herfst"][data-dagdeel="avond"]{ --rtf-kleur:#DE8A5C; }
+:root[data-seizoen="herfst"][data-dagdeel="nacht"]{ --rtf-kleur:#9A5C86; }
+:root[data-seizoen="winter"][data-dagdeel="ochtend"]{ --rtf-kleur:#7FB4D2; }
+:root[data-seizoen="winter"][data-dagdeel="middag"]{ --rtf-kleur:#8FA0B4; }
+:root[data-seizoen="winter"][data-dagdeel="avond"]{ --rtf-kleur:#C77E92; }
+:root[data-seizoen="winter"][data-dagdeel="nacht"]{ --rtf-kleur:#6E63B8; }
+
+/* de zonstand rendert de dagkleur: ochtend licht, avond vol, nacht diep */
+:root[data-dagdeel="ochtend"]{ --rtf-d:color-mix(in oklab, #ffffff 18%, var(--rtf-kleur,#C9A24B)); }
+:root[data-dagdeel="middag"]{ --rtf-d:color-mix(in oklab, #ffffff 8%, var(--rtf-kleur,#C9A24B)); }
+:root[data-dagdeel="avond"]{ --rtf-d:var(--rtf-kleur,#C9A24B); }
+:root[data-dagdeel="nacht"]{ --rtf-d:color-mix(in oklab, #000000 24%, var(--rtf-kleur,#C9A24B)); }
+
+/* de leeftijd: eigen grond en eigen wasdiepte.
+   jong kind = meer kleur, ouder = ingetogener */
+:root[data-rtf-groep="mini"]{ --rtf-g1:#15100E; --rtf-g2:#1C1613; --rtf-g3:#120D0B; --rtf-k:17%; }
+:root[data-rtf-groep="kind"]{ --rtf-g1:#0F130E; --rtf-g2:#161B14; --rtf-g3:#0D110C; --rtf-k:25%; }
+:root[data-rtf-groep="tiener"]{ --rtf-g1:#0E0F15; --rtf-g2:#15161E; --rtf-g3:#0C0D13; --rtf-k:21%; }
+:root[data-rtf-groep="jong"]{ --rtf-g1:#0B1213; --rtf-g2:#12191A; --rtf-g3:#0A0F10; --rtf-k:18%; }
+:root[data-rtf-groep="volw"]{ --rtf-g1:#0C0C0B; --rtf-g2:#151412; --rtf-g3:#100F0E; --rtf-k:13%; }
+
+/* de dagkleur wast door de grond van de leeftijd */
+:root[data-rtf-groep][data-seizoen][data-dagdeel]{
+  --bg:color-mix(in oklab, var(--rtf-d) var(--rtf-k,16%), var(--rtf-g1,#0C0C0B));
+  --paneel:color-mix(in oklab, var(--rtf-d) var(--rtf-k,16%), var(--rtf-g2,#151412));
+  --paneel2:color-mix(in oklab, var(--rtf-d) var(--rtf-k,16%), var(--rtf-g3,#100F0E));
+  --bord:color-mix(in oklab, var(--rtf-d) var(--rtf-k,16%), #12110F);
+}
+
+/* het licht wisselt zacht, als de zon zelf */
+:root[data-dagdeel] body{ transition:background-color .8s ease; }
+:root[data-dagdeel] .kaart,
+:root[data-dagdeel] .tile{ transition:background-color .8s ease,border-color .12s; }

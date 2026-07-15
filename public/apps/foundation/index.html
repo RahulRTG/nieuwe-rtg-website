@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="/icons/foundation-192.png">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
 <style>
   .wrap{max-width:52rem;margin:0 auto;padding:1.2rem 1.2rem 3rem;}
   .hero{text-align:center;padding:1rem 0 1.4rem;}
@@ -323,6 +324,8 @@ function toonRol(profiel){
   $('#secKind').hidden = !kind;
   // de leeftijdsbril: de groep van het profiel wint, anders die van de app-ingang
   const groep = profiel.groep || appGroep();
+  // ook de kleuren volgen de leeftijd van het profiel
+  if (groep) document.documentElement.setAttribute('data-rtf-groep', groep);
   document.querySelectorAll('.tile[data-grp]').forEach(t => {
     t.style.display = (!groep || t.dataset.grp.split(' ').includes(groep)) ? '' : 'none';
   });

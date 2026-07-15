@@ -368,7 +368,7 @@ const naam = i => 'Valk ' + i;
   }
   rij('leden-actoren geregistreerd', String(leden.length));
   const zaakToks = {};
-  for (const code of ['KIKUNOI', 'PONTO', 'HOSHI', 'MKKX', 'ESVEDRA', 'ISLAREN', 'AZUL', 'MAISON', 'MERCABIZA', 'AEGIS']) {
+  for (const code of ['KIKUNOI', 'PONTO', 'HOSHI', 'MKKX', 'ESVEDRA', 'ISLAREN', 'AZUL', 'MAISON', 'MERCABIZA', 'AEGIS', 'VORA', 'MOTOISLA', 'SERENA']) {
     const ro = await api('setup', '/api/supplier/roster', { code });
     const mg = ro && ro.staff.find(s => s.role === 'manager');
     const lg = mg && await api('setup', '/api/supplier/login', { code, staffId: mg.id, pin: '1234' });
@@ -489,7 +489,36 @@ const naam = i => 'Valk ' + i;
         await api('gastchat-zaak', '/api/supplier/klant/salon', { key: chats[0].key }, zaakToks.KIKUNOI);
       }
     }, 1, 2500),
-    ...lus('walkie', async () => { await api('walkie', '/api/supplier/team/message', { text: 'Orkaancheck ' + rnd(100) }, zaakToks.HOSHI); }, 1, 2000),
+    ...lus('teamchat', async () => { await api('teamchat', '/api/supplier/team/message', { text: 'Orkaancheck ' + rnd(100) }, zaakToks.HOSHI); }, 1, 2000),
+
+    // ---- de nieuwe lagen: borden, voorraad, reviews-reactie, nieuwe sectoren, HQ-audit ----
+    ...lus('borden', async () => {
+      const alle = await api('borden', '/api/supplier/borden', {}, zaakToks.HOSHI);
+      let b = alle && alle.borden && alle.borden[0];
+      if (!b) { const mk = await api('borden', '/api/supplier/bord', { actie: 'maak', naam: 'Orkaanbord' }, zaakToks.HOSHI); b = mk && mk.bord; }
+      if (!b || !b.lijsten || b.lijsten.length < 2) return;
+      const k = await api('borden', '/api/supplier/bord', { actie: 'kaart', id: b.id, lijstId: b.lijsten[0].id, titel: 'Orkaantaak ' + rnd(1e5) }, zaakToks.HOSHI);
+      if (k && k.kaart) await api('borden', '/api/supplier/bord', { actie: 'kaart-zet', id: b.id, kaartId: k.kaart.id, naarLijstId: b.lijsten[1].id }, zaakToks.HOSHI);
+    }, 2, 1200),
+    ...lus('voorraad', async () => {
+      const v = await api('voorraad', '/api/supplier/voorraad', {}, zaakToks.PONTO);
+      const it = v && v.voorraad && v.voorraad[0];
+      if (!it) await api('voorraad', '/api/supplier/voorraad/zet', { naam: 'Orkaan-cava', aantal: 500, min: 5, eenheid: 'fles' }, zaakToks.PONTO);
+      else await api('voorraad', '/api/supplier/voorraad/zet', { id: it.id, delta: rnd(2) ? 1 : -1 }, zaakToks.PONTO);
+    }, 2, 1000),
+    ...lus('review-reactie', async () => {
+      const st = await api('review-reactie', '/api/supplier/state', {}, zaakToks.KIKUNOI);
+      const rv = st && st.state && st.state.reviews && (st.state.reviews.recent || []).find(r => r.id && !r.reactie);
+      if (rv) await api('review-reactie', '/api/supplier/review/reageer', { id: rv.id, tekst: 'Dank u wel, tot snel!' }, zaakToks.KIKUNOI);
+    }, 1, 2500),
+    ...lus('beachclub', async () => {
+      const l = lid();
+      const o = await api('beachclub', '/api/order', { supplierCode: 'VORA', items: [{ id: 'v1', qty: 1 }] }, l.token);
+      if (o && o.order) await api('beachclub', '/api/order/pay', { ref: o.order.ref }, l.token);
+    }, 2, 1400),
+    ...lus('tweewielers', async () => { await api('tweewielers', '/api/verhuur/aanbod', {}, lid().token); }, 2, 1500),
+    ...lus('wellness-spa', async () => { await api('wellness-spa', '/api/salon/profiel', { code: 'SERENA' }, lid().token); }, 1, 2000),
+    ...lus('hq-audit', async () => { await api('hq-audit', '/api/office/securitylog', {}, offTok); }, 1, 3000),
     ...lus('kassa', async () => { await api('kassa', '/api/supplier/pos/sale', { total: 10 + rnd(90), method: 'pin', desc: 'Orkaanbon' }, zaakToks.PONTO); }, 1, 2000),
     ...lus('modekoerier', async () => {
       const rt = await api('modekoerier', '/api/supplier/mode/bezorg/route', { lat: 38.907, lng: 1.435 }, maisonTok);

@@ -1575,11 +1575,16 @@
           const A = agentData;
           html += '<div class="tkc" style="grid-column:1/-1;"><h3>\ud83e\udde0 '+T('ag2.h','AI-inkoop')+'</h3>'+
             '<div class="tkc-who">'+T('ag2.deck','De AI stelt de inkoop voor op de verkoop, de mise en place en de verwachte drukte. De gemachtigde keurt goed, past aan of wijst af; pas dan wordt er echt besteld bij de vaste leverancier.')+'</div>'+
-            '<div class="row-gap"><select class="st-in" id="agGh" style="flex:2;"><option value="">'+T('ag2.kies','Kies een vaste leverancier...')+'</option>'+
-              (agentMarkt||[]).map(g=>'<option value="'+g.code+'"'+(A.partnerCode===g.code?' selected':'')+'>'+g.name+'</option>').join('')+'</select>'+
+            // meerdere groothandels: elke gekoppelde staat als chip met een weg-knop
+            ((A.partners||[]).length ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.4rem;">'+
+              A.partners.map(p=>'<span style="display:inline-flex;align-items:center;gap:0.4rem;border:1px solid var(--gold);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.74rem;">\ud83d\udce6 '+p.naam+
+                '<button data-agweg="'+p.code+'" style="background:none;border:none;color:var(--soft);cursor:pointer;font-size:0.8rem;" title="'+T('ag2.weg','loskoppelen')+'">\u2715</button></span>').join('')+'</div>' : '')+
+            '<div class="row-gap"><select class="st-in" id="agGh" style="flex:2;"><option value="">'+T('ag2.kies2','Groothandel erbij...')+'</option>'+
+              (agentMarkt||[]).filter(g=>!(A.partners||[]).find(p=>p.code===g.code)).map(g=>'<option value="'+g.code+'">'+g.name+'</option>').join('')+'</select>'+
               '<label style="display:flex;align-items:center;gap:0.35rem;font-size:0.72rem;color:var(--muted);"><input type="checkbox" id="agAuto"'+(A.auto?' checked':'')+'>'+T('ag2.auto','automatisch na de MEP-voorspelling')+'</label></div>'+
-            '<div class="tkc-act"><button class="tkc-start" id="agKoppel">'+T('ag2.koppel','Koppel')+'</button>'+
-            (A.partnerCode?'<button class="tkc-ready" id="agStel">\u2728 '+T('ag2.stel','Stel inkoop voor')+'</button>':'')+'</div>'+
+            '<div class="tkc-act"><button class="tkc-start" id="agKoppel">'+T('ag2.koppel2','Koppel erbij')+'</button>'+
+            ((A.partners||[]).length?'<button class="tkc-ready" id="agStel">\u2728 '+T('ag2.stel','Stel inkoop voor')+'</button>':'')+'</div>'+
+            ((A.partners||[]).length>1?'<div class="tkc-who" style="margin-top:0.3rem;">'+T('ag2.multi','De AI vergelijkt de gekoppelde groothandels per bestelling en kiest de beste dekking en prijs.')+'</div>':'')+
             (A.voorstellen||[]).slice(0,3).map(v=>{
               const wacht = v.status === 'wacht-op-goedkeuring';
               return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem;margin-top:0.5rem;">'+
@@ -2024,6 +2029,9 @@
     const agK = el.querySelector('#agKoppel'); if (agK) agK.addEventListener('click', async () => {
       try { await API.call('/supplier/agent/koppel', { groothandelCode: el.querySelector('#agGh').value, auto: el.querySelector('#agAuto').checked }); agentData = null; toast(T('ag2.gekoppeld','Vaste leverancier bijgewerkt.')); renderStation(); } catch(e){ toast(e.message); }
     });
+    el.querySelectorAll('[data-agweg]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/agent/koppel', { groothandelCode: b.dataset.agweg, weg: true }); agentData = null; toast(T('ag2.los','Groothandel losgekoppeld.')); renderStation(); } catch(e){ toast(e.message); }
+    }));
     const agS = el.querySelector('#agStel'); if (agS) agS.addEventListener('click', async () => {
       try { await API.call('/supplier/agent/voorstel', {}); agentData = null; renderStation(); } catch(e){ toast(e.message); }
     });
@@ -3567,7 +3575,30 @@
           '<button class="js-zbnaar" data-tab="boerderij" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-size:0.75rem;font-family:inherit;margin-bottom:1rem;">'+T('zb.naarboer','Naar de boerderij ›')+'</button>';
       }
     }
+    // de belastingtool van de zaak: dezelfde motor als de Business Pass
+    h += '<div class="st-sec">🧮 '+T('zb.bel','Belastingtool')+'</div>'+
+      '<div class="sub" style="margin-bottom:0.4rem;">'+T('zb.bel.s','Vul de verwachte jaarwinst in voor een indicatie van de belasting, de nettowinst en wat u maandelijks opzij zet. Het land van de zaak is het vertrekpunt.')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
+      '<input id="zbBelWinst" type="number" min="1" placeholder="'+T('zb.bel.ph','jaarwinst €')+'" style="width:9rem;">'+
+      '<button class="abtn" id="zbBelGo">'+T('zb.bel.reken','Reken')+'</button></div>'+
+      '<div id="zbBelRes" style="display:none;border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.78rem;line-height:1.7;color:var(--muted);margin-bottom:0.8rem;"></div>';
     el.innerHTML = h;
+    const zbGo = el.querySelector('#zbBelGo');
+    if (zbGo) zbGo.addEventListener('click', async () => {
+      const box = el.querySelector('#zbBelRes');
+      box.style.display = 'block'; box.textContent = '…';
+      try {
+        const d2 = await API.call('/supplier/belasting', { winst: Number(el.querySelector('#zbBelWinst').value) });
+        const rij = (l, v, sterk) => '<div style="display:flex;justify-content:space-between;gap:0.8rem;"><span>'+l+'</span><span style="flex-shrink:0;'+(sterk?'color:var(--txt);font-weight:600;':'')+'">'+v+'</span></div>';
+        box.innerHTML = '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;">'+d2.regime+' · '+d2.landNaam+'</div>'+
+          rij(T('zb.bel.winst','Jaarwinst'), eur(d2.winst))+
+          d2.posten.map(p2 => rij(p2.label, (p2.bedrag<0?'- ':'')+eur(Math.abs(p2.bedrag)))).join('')+
+          rij(T('zb.bel.betalen','Te betalen (indicatie)'), eur(d2.belasting), true)+
+          rij(T('zb.bel.netto','Netto over'), eur(d2.netto), true)+
+          '<div style="margin-top:0.5rem;color:var(--gold);">💡 '+T('zb.bel.zet','Zet ~')+d2.reserveerPct+'% '+T('zb.bel.opzij','opzij: ongeveer')+' '+eur(d2.perMaand)+' '+T('zb.bel.pm','per maand')+'.</div>'+
+          '<div style="margin-top:0.4rem;font-size:0.64rem;color:var(--soft);">'+T('zb.bel.disc','Indicatie; dit is voorlichting, geen bindend fiscaal advies.')+'</div>';
+      } catch(e){ box.textContent = e.message; }
+    });
     wireFuncBlok(el);
     el.querySelectorAll('.js-zbf').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/zaak/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); await refresh(); renderZaakBoard(); } catch(e){ toast(e.message); }

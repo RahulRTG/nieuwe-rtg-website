@@ -886,47 +886,10 @@ app.post('/api/giftcards/mine', auth, (req, res) => {
 
 app.post('/api/member/zzp', auth, (req, res) => {
   if (req.session.tier !== 'business') return res.status(403).json({ error: 'De zzp-belastingtool is onderdeel van de Business Pass.' });
-  const landCode = ZZP[req.body.land] ? req.body.land : 'NL';
-  const Z = ZZP[landCode];
-  const winst = Math.max(0, Math.min(5000000, Math.round(Number(req.body.winst) || 0)));
-  if (!winst) return res.status(400).json({ error: 'Vul uw verwachte jaarwinst in.' });
-  const out = { land: landCode, landNaam: LANDEN[landCode].naam, regime: Z.regime, winst, posten: [], regels: Z.regels.slice(), indicatie: true, peiljaar: FISCAAL_PEILJAAR };
-  let belasting = 0, belastbaar = winst;
-  if (landCode === 'NL') {
-    const uren = req.body.urencriterium !== false;
-    const za = uren ? Math.min(Z.zelfstandigenaftrek, winst) : 0;
-    const sa = uren && req.body.starter ? Z.startersaftrek : 0;
-    const rest = Math.max(0, winst - za - sa);
-    const mkb = centen(rest * Z.mkbVrijstelling);
-    belastbaar = centen(rest - mkb);
-    out.posten.push(za ? { label: 'Zelfstandigenaftrek', bedrag: -za }
-                       : { label: 'Zelfstandigenaftrek (urencriterium niet gehaald)', bedrag: 0 });
-    if (sa) out.posten.push({ label: 'Startersaftrek', bedrag: -sa });
-    out.posten.push({ label: 'MKB-winstvrijstelling (12,7%)', bedrag: -mkb });
-    let vorige = 0, ib = 0;
-    for (const [grens, tarief] of Z.schijven) {
-      const deel = Math.max(0, Math.min(belastbaar, grens) - vorige);
-      ib += deel * tarief;
-      vorige = grens;
-      if (belastbaar <= grens) break;
-    }
-    const ahk = Math.max(0, Z.ahk.max - Math.max(0, belastbaar - Z.ahk.afbouwVanaf) * Z.ahk.afbouw);
-    const ak = Math.max(0, Z.arbeidskorting.max - Math.max(0, belastbaar - Z.arbeidskorting.afbouwVanaf) * Z.arbeidskorting.afbouw);
-    const korting = Math.min(ib, ahk + ak);
-    belasting = Math.max(0, centen(ib - korting));
-    out.posten.push({ label: 'Inkomstenbelasting (schijven)', bedrag: centen(ib) });
-    out.posten.push({ label: 'Heffingskortingen (indicatie)', bedrag: -centen(korting) });
-    if (winst < Z.korGrens) out.regels.unshift('Met deze omzet komt u waarschijnlijk in aanmerking voor de KOR (btw-vrijstelling): minder administratie, geen btw-aangifte.');
-  } else {
-    belasting = centen(winst * Z.simpel);
-    out.posten.push({ label: 'Indicatieve heffing (~' + Math.round(Z.simpel * 100) + '% effectief, incl. sociale lasten)', bedrag: belasting });
-  }
-  out.belastbaar = centen(belastbaar);
-  out.belasting = belasting;
-  out.netto = centen(winst - belasting);
-  out.reserveerPct = Math.max(20, Math.min(50, Math.round(belasting / winst * 100) + 5));
-  out.perMaand = centen(belasting / 12);
-  out.regels.push('Indicatieve berekening op basis van de tarieven van ' + FISCAAL_PEILJAAR + '; controleer jaarlijks en raadpleeg voor uw aangifte een fiscalist.');
+  // dezelfde berekening als de belastingtool van elke zaak (kern/fiscaal.js)
+  const out = require('../kern/fiscaal').zzpBerekening(req.body.land, req.body.winst,
+    { urencriterium: req.body.urencriterium, starter: req.body.starter });
+  if (out.error) return res.status(out.status || 400).json({ error: 'Vul uw verwachte jaarwinst in.' });
   res.json(out);
 });
 

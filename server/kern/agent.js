@@ -8,24 +8,39 @@
 const { dagContext } = require('./context');
 
 function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity }) {
-  const agentVan = s => (s.agent = s.agent || { partnerCode: null, auto: false, voorstellen: [], rooster: null });
+  const agentVan = s => {
+    const a = (s.agent = s.agent || { partnerCode: null, auto: false, voorstellen: [], rooster: null });
+    // een zaak kan meerdere groothandels hebben; oude databases (een enkele
+    // partnerCode) schuiven geruisloos door naar de lijst
+    if (!Array.isArray(a.partners)) a.partners = a.partnerCode ? [a.partnerCode] : [];
+    return a;
+  };
 
   function agentPubliek(s) {
     const a = agentVan(s);
-    const g = a.partnerCode ? findSupplier(a.partnerCode) : null;
-    return { partnerCode: a.partnerCode, partnerNaam: g ? g.name : null, auto: a.auto,
+    const partners = a.partners
+      .map(code => { const g = findSupplier(code); return g ? { code, naam: g.name } : null; })
+      .filter(Boolean);
+    return { partners,
+             partnerCode: partners.length ? partners[0].code : null,
+             partnerNaam: partners.length ? partners[0].naam : null,
+             auto: a.auto,
              voorstellen: a.voorstellen.slice(-10).reverse(), rooster: a.rooster };
   }
 
-  // de vaste leverancier koppelen (of loskoppelen met een lege code)
-  function agentKoppel(s, partnerCode, auto) {
+  // een groothandel koppelen (erbij) of loskoppelen (weg); auto geldt zaakbreed
+  function agentKoppel(s, partnerCode, auto, weg) {
+    const a = agentVan(s);
     if (partnerCode) {
       const g = findSupplier(partnerCode);
       if (!g || g.type !== 'groothandel') return { status: 404, error: 'Groothandel niet gevonden.' };
+      a.partners = weg ? a.partners.filter(c => c !== partnerCode)
+                       : [...new Set([...a.partners, partnerCode])].slice(0, 10);
+    } else if (weg) {
+      a.partners = [];
     }
-    const a = agentVan(s);
-    a.partnerCode = partnerCode || null;
-    a.auto = !!auto;
+    a.partnerCode = a.partners[0] || null;
+    if (auto != null) a.auto = !!auto;
     save();
     return { status: 200, ok: true, agent: agentPubliek(s) };
   }
@@ -35,9 +50,21 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
      de verwachte drukte uit de MEP-voorspelling. */
   function agentVoorstel(s, wie) {
     const a = agentVan(s);
-    if (!a.partnerCode) return { status: 409, error: 'Koppel eerst een vaste leverancier (groothandel) in het Kantoor.' };
-    const basis = ghBijbestelVoorstel(s, a.partnerCode);
-    if (basis.error) return basis;
+    if (!a.partners.length) return { status: 409, error: 'Koppel eerst een vaste leverancier (groothandel) in het Kantoor.' };
+    /* meerdere groothandels: de AI maakt per groothandel de bijbestellijst en
+       kiest de slimste (beste dekking; bij gelijke dekking de laagste prijs) */
+    let basis = null, basisCode = null;
+    for (const code of a.partners) {
+      const kand = ghBijbestelVoorstel(s, code);
+      if (kand.error) continue;
+      const beter = !basis
+        || kand.regels.length > basis.regels.length
+        || (kand.regels.length === basis.regels.length
+            && kand.regels.reduce((n, r) => n + r.aantal * r.prijs, 0) < basis.regels.reduce((n, r) => n + r.aantal * r.prijs, 0));
+      if (beter) { basis = kand; basisCode = code; }
+    }
+    if (!basis) return { status: 409, error: 'Geen van de gekoppelde groothandels heeft passende producten.' };
+    a.partnerCode = a.partners[0]; // compat: eerste blijft de weergave-partner
     const dms = s.dailyMeps || {};
     const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
     const plan = dms[morgen] || dms[new Date().toISOString().slice(0, 10)];
@@ -49,9 +76,11 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
     const totaal = Math.round(regels.reduce((n, r) => n + r.aantal * r.prijs, 0) * 100) / 100;
     const v = {
       id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString(), soort: 'inkoop',
-      groothandelCode: a.partnerCode, groothandelNaam: basis.groothandelNaam,
+      groothandelCode: basisCode, groothandelNaam: basis.groothandelNaam,
       regels: regels.slice(0, 40), totaal,
-      uitleg: basis.uitleg + (plan ? ' Aantallen geschaald op de verwachte drukte (' + plan.covers + ' couverts, factor ' + factor.toFixed(1) + ').' : '') + ' ' + ctx.zin,
+      uitleg: basis.uitleg
+        + (a.partners.length > 1 ? ' Gekozen uit ' + a.partners.length + ' gekoppelde groothandels (beste dekking en prijs): ' + basis.groothandelNaam + '.' : '')
+        + (plan ? ' Aantallen geschaald op de verwachte drukte (' + plan.covers + ' couverts, factor ' + factor.toFixed(1) + ').' : '') + ' ' + ctx.zin,
       status: 'wacht-op-goedkeuring', door: wie || 'AI-agent', ref: null
     };
     a.voorstellen.push(v);

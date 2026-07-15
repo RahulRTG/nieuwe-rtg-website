@@ -10,12 +10,23 @@ module.exports = (kern) => {
   // de agent-toestand: koppeling, voorstellen en het roostervoorstel
   app.post('/api/supplier/agent', supplierAuth, (req, res) => res.json({ agent: agentPubliek(req.supplier) }));
 
-  // de vaste leverancier koppelen (alleen de gemachtigde)
+  // groothandels koppelen of loskoppelen (alleen de gemachtigde); een zaak
+  // kan er meerdere hebben, de AI kiest per bestelling de slimste
   app.post('/api/supplier/agent/koppel', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const r = agentKoppel(req.supplier, String(req.body.groothandelCode || ''), req.body.auto);
+    const r = agentKoppel(req.supplier, String(req.body.groothandelCode || ''), req.body.auto, !!req.body.weg);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
+  });
+
+  // de belastingtool van de zaak: dezelfde indicatieve jaarberekening als de
+  // Business Pass, met het land van de zaak als vertrekpunt
+  app.post('/api/supplier/belasting', supplierAuth, (req, res) => {
+    const land = String(req.body.land || (req.supplier.settings && req.supplier.settings.land) || 'NL');
+    const out = require('../../kern/fiscaal').zzpBerekening(land, req.body.winst,
+      { urencriterium: req.body.urencriterium, starter: req.body.starter });
+    if (out.error) return res.status(out.status || 400).json({ error: out.error });
+    res.json(out);
   });
 
   // een inkoopvoorstel maken (elke medewerker mag het aanvragen; bestellen kan alleen de gemachtigde)

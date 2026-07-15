@@ -1881,20 +1881,9 @@ app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(schedule
 
 app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
   const text = String(req.body.text || '').trim().slice(0, 500);
-  let audio = null;
-  if (typeof req.body.audio === 'string' && /^data:audio\//.test(req.body.audio) && req.body.audio.length <= 2 * 1024 * 1024)
-    audio = req.body.audio;
-  if (!text && !audio) return res.status(400).json({ error: 'Leeg bericht.' });
+  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
   const list = db.data.supplierTeam[req.supplier.code] = (db.data.supplierTeam[req.supplier.code] || []);
-  list.push({ who: req.actor.name, role: req.actor.role, text: text || (audio ? '' : text), audio, at: new Date().toISOString() });
-  // walkie-talkie: spraakmemo's klinken direct bij iedereen die de app open heeft
-  if (audio) {
-    for (const c of sseClients) {
-      if (c.sup !== req.supplier.code) continue;
-      if (c.staffId === (req.actor.staffId != null ? req.actor.staffId : null)) continue;
-      sseSend(c.res, 'ptt', { from: req.actor.name, audio });
-    }
-  }
+  list.push({ who: req.actor.name, role: req.actor.role, text, at: new Date().toISOString() });
   db.data.supplierTeam[req.supplier.code] = list.slice(-100);
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });

@@ -69,17 +69,22 @@ test('intrekken kan ook met de hand, en een onbekende kamer wordt geweigerd', as
   assert.equal((await api('/api/supplier/room/vrij', { id: 'nee' }, hkToken)).status, 404);
 });
 
-test('bellen: alleen ingeklokte collega’s zijn bereikbaar', async () => {
-  // de manager is nog niet ingeklokt: bellen wordt netjes geweigerd
-  const dicht = await api('/api/staff/bel', { staffId: managerId }, hkToken);
+test('videobellen (WebRTC): alleen ingeklokte collega’s zijn bereikbaar', async () => {
+  // de manager is nog niet ingeklokt: aanbellen wordt netjes geweigerd
+  const dicht = await api('/api/staff/call', { kind: 'ring', staffId: managerId }, hkToken);
   assert.equal(dicht.status, 409);
   // de manager klokt in via de app en is dan bereikbaar
   await api('/api/staff/clock', {}, managerToken);
-  const open = await api('/api/staff/bel', { staffId: managerId }, hkToken);
+  const open = await api('/api/staff/call', { kind: 'ring', staffId: managerId }, hkToken);
   assert.equal(open.status, 200);
-  // jezelf bellen kan niet; het antwoord-kanaal werkt
-  assert.equal((await api('/api/staff/bel', { staffId: hkId }, hkToken)).status, 400);
-  assert.equal((await api('/api/staff/bel/antwoord', { vanId: hkId, akkoord: true }, managerToken)).status, 200);
+  // jezelf bellen kan niet, en een onbekend signaal wordt geweigerd
+  assert.equal((await api('/api/staff/call', { kind: 'ring', staffId: hkId }, hkToken)).status, 400);
+  assert.equal((await api('/api/staff/call', { kind: 'zomaar' }, hkToken)).status, 400);
+  // de signalen van het gesprek zelf (aannemen, offer/answer/ice, teamcall) gaan door
+  assert.equal((await api('/api/staff/call', { kind: 'accept', staffId: hkId }, managerToken)).status, 200);
+  assert.equal((await api('/api/staff/call', { kind: 'offer', staffId: managerId, payload: { type: 'offer', sdp: 'x' } }, hkToken)).status, 200);
+  assert.equal((await api('/api/staff/call', { kind: 'join', kamer: 'team' }, managerToken)).status, 200);
+  assert.equal((await api('/api/staff/call', { kind: 'hangup', staffId: managerId }, hkToken)).status, 200);
 });
 
 test('urenoverzicht: de zaak ziet precies wie wanneer en hoelang werkt (alleen management)', async () => {

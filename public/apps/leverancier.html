@@ -160,12 +160,9 @@
   .tbl-dicht{opacity:0.5;} .tbl-dicht i{color:var(--soft);}
   .tbl-del{position:absolute;top:4px;right:6px;font-style:normal;font-size:0.62rem;color:var(--soft);}
 
-  /* buzz + memo */
+  /* buzz */
   .tt-buzz{background:none;border:1px solid var(--line);border-radius:999px;width:34px;height:34px;font-size:0.9rem;flex-shrink:0;margin-right:0.3rem;}
   .tt-buzz:active{border-color:var(--gold);}
-  .tt-mic{background:var(--card2);border:1px solid var(--line);border-radius:999px;width:44px;height:44px;font-size:1rem;flex-shrink:0;}
-  .tt-mic.rec{background:var(--burgundy-deep);border-color:var(--burgundy);animation:recpulse 1s infinite;}
-  @keyframes recpulse{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 8px rgba(194,58,94,0);}}
   #buzzOverlay{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;background:rgba(127,22,52,0.96);cursor:pointer;}
   #buzzOverlay.on{display:flex;animation:bzshake 0.5s ease-in-out 0s 4;}
   @keyframes bzshake{0%,100%{transform:translateX(0);}20%{transform:translateX(-10px);}40%{transform:translateX(10px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
@@ -176,9 +173,6 @@
   #buzzOverlay span{display:block;font-size:0.95rem;opacity:0.85;margin-top:0.2rem;}
   #buzzOverlay i{display:block;margin-top:2rem;font-style:normal;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;opacity:0.6;}
 
-  #pttBar{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%) translateY(-60px);z-index:9997;background:var(--card2);border:1px solid var(--gold);color:var(--txt);border-radius:999px;padding:0.55rem 1.1rem;font-size:0.8rem;transition:transform 0.25s;white-space:nowrap;}
-  #pttBar.on{transform:translateX(-50%) translateY(0);}
-  #pttBar b{color:var(--gold);}
   #alarmOverlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(160,20,30,0.97);cursor:pointer;}
   #alarmOverlay.on{display:flex;animation:bzshake 0.4s ease-in-out 0s 6;}
   #alarmOverlay .bz{text-align:center;color:#fff;}
@@ -971,7 +965,7 @@ window.I18N = { en: {
   'st.toserve':'Ready to serve', 'st.noserve':'Nothing ready to serve. As soon as kitchen and bar are done, the order appears here.',
   'st.making':'In the making', 'st.nomaking':'No open orders.',
   'st.tables':'Tables, tap to cycle', 'st.more':'More',
-  'st.pda':'Open the full PDA', 'st.pda.s':'Schedule, tasks, team chat, walkie-talkie and SOS.',
+  'st.pda':'Open the full PDA', 'st.pda.s':'Schedule, tasks, team chat, video calling and SOS.',
   'st.calm':'All quiet. New orders appear here automatically.',
   'st.done':'Marked ready, waiting to be served', 'st.unpaid':'unpaid',
   'kds.open':'Open tickets', 'kds.laat':'Late', 'kds.oudste':'Oldest ticket', 'kds.allday':'All day',
@@ -1182,11 +1176,9 @@ window.I18N = { en: {
   'st.tblq':'Which table? (empty = no table)', 'st.tblset':'Pick table', 'st.tblwissel':'change',
   'todo.apps':'new application(s)', 'team.func':'Position',
   'team.buzz':'Call (buzz)', 'team.buzzed':'is being called.', 'team.buzzoff':'does not have the app open right now.',
-  'team.memo':'Voice memo', 'memo.no':'Recording is not available here.', 'memo.short':'Too short.', 'memo.long':'Memo too long (max ~1 minute).',
-  'memo.sent':'Voice memo sent.', 'memo.rec':'Recording... tap again to send.', 'memo.denied':'No microphone access.',
   'buzz.calls':'is calling you', 'buzz.close':'Tap to acknowledge',
   'team.buzzall':'Everyone', 'team.allbuzzed':'Whole team called', 'team.online':'online',
-  'ptt.speaks':'speaking', 'alarm.needs':'needs immediate assistance', 'alarm.noloc':'location unknown',
+  'alarm.needs':'needs immediate assistance', 'alarm.noloc':'location unknown',
   'tab.page':'Page', 'sup.v.page':'Your page', 'sup.v.page.sub':'Photos guests see, and publish straight to The Salon.',
   'sup.pickup':'Pickup code', 'sup.pernight':'p.n.',
   'sup.norooms':'No rooms yet. Add your first room.', 'sup.roomname':'Room name',

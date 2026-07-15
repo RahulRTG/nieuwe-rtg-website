@@ -240,19 +240,20 @@
       '<div style="display:flex;align-items:center;gap:0.7rem;margin-top:0.5rem;"><span style="font-size:0.9rem;">'+(binnenNu?'🟢 '+T('hk.binnen','Ingeklokt'):'⚪ '+T('hk.nietin','Niet ingeklokt'))+'</span>'+
       '<button class="abtn" id="klokBtn" style="margin-left:auto;">'+(binnenNu?T('hk.uit','Klok uit'):T('hk.in','Klok in'))+'</button></div>'+
       '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.5rem;">'+T('hk.klok.deck','Inklokken via de app: zo ziet de zaak precies wie wanneer en hoelang werkt.')+'</div></div>'+
-      (collegas.length ? '<div class="card"><div class="k">📞 '+T('hk.bel','Collega bellen')+'</div>'+
+      (collegas.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">📹 '+T('hk.bel','Collega bellen')+'<button class="abtn" id="hkTeamCall" style="font-size:0.66rem;">📹 '+T('tc.team','Teamcall')+'</button></div>'+
         collegas.map(m => {
           const in2 = !!(state.klok && (state.klok.binnen || []).includes(m.name));
           return '<div class="task"><div class="t"><b>'+esc(m.name)+'</b><span>'+(in2?'🟢 '+T('hk.binnen','Ingeklokt'):'⚪ '+T('hk.nietin','Niet ingeklokt'))+'</span></div>'+
-            (in2?'<button class="abtn" data-bel="'+m.id+'" data-naam="'+esc(m.name)+'">📞</button>':'')+'</div>';
+            (in2?'<button class="abtn" data-bel="'+m.id+'" data-naam="'+esc(m.name)+'">📹</button>':'')+'</div>';
         }).join('')+'</div>' : '')+
       '<a class="card" style="display:block;text-decoration:none;color:inherit;" href="/apps/personeel.html"><div class="k">📱 '+T('hk.pda','Open de volledige PDA')+'</div>'+
-      '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--soft);">'+T('hk.pda.s','Rooster, teamchat, walkie-talkie en SOS.')+'</div></a>'+
+      '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--soft);">'+T('hk.pda.s','Rooster, teamchat, videobellen en SOS.')+'</div></a>'+
       '<button class="abtn warn" id="uitlog" style="width:100%;margin-top:0.9rem;">'+T('hk.uitlog','Uitloggen op dit toestel')+'</button>';
     const kb = $('#klokBtn'); if (kb) kb.addEventListener('click', async () => {
       try { await API.call('/staff/clock', {}); await refresh(); } catch(e){ toast(e.message); }
     });
     wrap.querySelectorAll('[data-bel]').forEach(b => b.addEventListener('click', () => belStart(parseInt(b.dataset.bel, 10), b.dataset.naam)));
+    const tcBtn = $('#hkTeamCall'); if (tcBtn) tcBtn.addEventListener('click', () => window.TeamCall && TeamCall.groep());
     const ul = $('#uitlog'); if (ul) ul.addEventListener('click', () => {
       try { localStorage.removeItem('rtg_hk_token'); localStorage.removeItem('rtg_hk_code'); } catch(e){}
       location.reload();
@@ -271,31 +272,9 @@
     try { localStorage.removeItem('rtg_hk_token'); localStorage.removeItem('rtg_hk_code'); } catch(e){}
     location.reload();
   });
-  /* ---- collega's bellen: belsignaal over het zaak-kanaal (zelfde als de PDA) ---- */
-  let belTimer = null;
-  function belOverlay(html){
-    let el = document.getElementById('hkBel');
-    if (!el){ el = document.createElement('div'); el.id = 'hkBel'; el.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;padding:2rem;'; document.body.appendChild(el); }
-    el.innerHTML = '<div style="background:var(--card);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:1.6rem;max-width:320px;width:100%;text-align:center;">'+html+'</div>';
-    return el;
-  }
-  function belSluit(){ const el = document.getElementById('hkBel'); if (el) el.remove(); clearInterval(belTimer); belTimer = null; }
-  function belVerbonden(naam){
-    let sec = 0;
-    const el = belOverlay('<div style="font-size:2rem;">📞</div><b style="display:block;margin-top:0.4rem;">'+esc(naam)+'</b>'+
-      '<div id="belTijd" style="font-size:0.9rem;color:var(--soft);margin-top:0.3rem;font-variant-numeric:tabular-nums;">0:00</div>'+
-      '<button class="abtn warn" id="belOp" style="margin-top:1rem;width:100%;">'+T('hk.bel.op','Ophangen')+'</button>');
-    clearInterval(belTimer);
-    belTimer = setInterval(() => { sec++; const t = document.getElementById('belTijd'); if (t) t.textContent = Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }, 1000);
-    el.querySelector('#belOp').addEventListener('click', belSluit);
-  }
-  async function belStart(staffId, naam){
-    try { await API.call('/staff/bel', { staffId }); } catch(e){ toast(e.message); return; }
-    const el = belOverlay('<div style="font-size:2rem;">📞</div><b style="display:block;margin-top:0.4rem;">'+esc(naam)+'</b>'+
-      '<div style="font-size:0.85rem;color:var(--soft);margin-top:0.3rem;">'+T('hk.bel.gaat','Gaat over...')+'</div>'+
-      '<button class="abtn ghost" id="belStop" style="margin-top:1rem;width:100%;">'+T('hk.bel.stop','Stop')+'</button>');
-    el.querySelector('#belStop').addEventListener('click', belSluit);
-  }
+  /* ---- (video)bellen met ingeklokte collega's: echte WebRTC (shared/teamcall.js) ---- */
+  if (window.TeamCall) TeamCall.init({ API, mij: () => me, T, toast });
+  function belStart(staffId, naam){ if (window.TeamCall) TeamCall.bel(staffId, naam); }
 
   function startStream(){
     if (!window.EventSource) return;
@@ -303,26 +282,7 @@
     try { src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
     src.addEventListener('sync', () => refresh());
     src.addEventListener('notify', () => refresh());
-    src.addEventListener('bel', e => {
-      try {
-        const d = JSON.parse(e.data || '{}');
-        if (!me || d.naar !== me.staffId) return;
-        if (navigator.vibrate) navigator.vibrate([200, 80, 200, 80, 200]);
-        const el = belOverlay('<div style="font-size:2rem;">📞</div><b style="display:block;margin-top:0.4rem;">'+esc(d.van)+'</b>'+
-          '<div style="font-size:0.85rem;color:var(--soft);margin-top:0.3rem;">'+T('hk.bel.in','belt je...')+'</div>'+
-          '<div style="display:flex;gap:0.6rem;margin-top:1rem;"><button class="abtn" id="belJa" style="flex:1;">'+T('hk.bel.aan','Neem aan')+'</button><button class="abtn warn" id="belNee" style="flex:1;">'+T('hk.bel.weiger','Weiger')+'</button></div>');
-        el.querySelector('#belJa').addEventListener('click', async () => { try { await API.call('/staff/bel/antwoord', { vanId: d.vanId, akkoord: true }); } catch(err){} belVerbonden(d.van); });
-        el.querySelector('#belNee').addEventListener('click', async () => { try { await API.call('/staff/bel/antwoord', { vanId: d.vanId, akkoord: false }); } catch(err){} belSluit(); });
-      } catch(err){}
-    });
-    src.addEventListener('bel-antwoord', e => {
-      try {
-        const d = JSON.parse(e.data || '{}');
-        if (!me || d.vanId !== me.staffId) return;
-        if (d.akkoord) belVerbonden(d.naam);
-        else { belSluit(); toast(T('hk.bel.nee','Niet aangenomen.')); }
-      } catch(err){}
-    });
+    if (window.TeamCall) src.addEventListener('rtc', TeamCall.event);
   }
 
   restoreSession().then(ok => { if (!ok) stepZaak(); });

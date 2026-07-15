@@ -678,34 +678,10 @@
   // pings gaan alleen naar wie echt ingeklokt is: niet ingeklokt = geen tril
   const ikBinnen = () => !!(me && state && state.klok && (state.klok.binnen || []).includes(me.name));
 
-  /* ---- collega's bellen: alleen wie is ingeklokt is bereikbaar ----
-     Het belsignaal loopt over het eigen kanaal van de zaak (SSE): het
-     toestel van de collega rinkelt en neemt aan of wijst af. */
-  let belTimer = null;
-  function belOverlay(html){
-    let el = document.getElementById('pdBel');
-    if (!el){ el = document.createElement('div'); el.id = 'pdBel'; el.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;padding:2rem;'; document.body.appendChild(el); }
-    el.innerHTML = '<div style="background:var(--card,#151312);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:1.6rem;max-width:320px;width:100%;text-align:center;">'+html+'</div>';
-    return el;
-  }
-  function belSluit(){ const el = document.getElementById('pdBel'); if (el) el.remove(); clearInterval(belTimer); belTimer = null; }
-  function belVerbonden(naam){
-    let sec = 0;
-    const el = belOverlay('<div style="font-size:2rem;">📞</div><b style="display:block;margin-top:0.4rem;">'+esc(naam)+'</b>'+
-      '<div id="belTijd" style="font-size:0.9rem;color:var(--soft,#999);margin-top:0.3rem;font-variant-numeric:tabular-nums;">0:00</div>'+
-      '<div style="font-size:0.7rem;color:var(--soft,#999);margin-top:0.5rem;">'+T('pd.bel.demo','Demo-verbinding; spraak gaat via de walkie-talkie in Teamchat.')+'</div>'+
-      '<button class="abtn warn" id="belOp" style="margin-top:1rem;width:100%;">'+T('pd.bel.op','Ophangen')+'</button>');
-    clearInterval(belTimer);
-    belTimer = setInterval(() => { sec++; const t = document.getElementById('belTijd'); if (t) t.textContent = Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }, 1000);
-    el.querySelector('#belOp').addEventListener('click', belSluit);
-  }
-  async function belStart(staffId, naam){
-    try { await API.call('/staff/bel', { staffId }); } catch(e){ toast(e.message); return; }
-    const el = belOverlay('<div style="font-size:2rem;">📞</div><b style="display:block;margin-top:0.4rem;">'+esc(naam)+'</b>'+
-      '<div style="font-size:0.85rem;color:var(--soft,#999);margin-top:0.3rem;">'+T('pd.bel.gaat','Gaat over...')+'</div>'+
-      '<button class="abtn ghost" id="belStop" style="margin-top:1rem;width:100%;">'+T('pd.bel.stop','Stop')+'</button>');
-    el.querySelector('#belStop').addEventListener('click', belSluit);
-  }
+  /* ---- (video)bellen met ingeklokte collega's: echte WebRTC ----
+     De gespreks-UI en de verbindingen zitten in shared/teamcall.js; hier
+     alleen de koppeling met de eigen login en het SSE-kanaal. */
+  if (window.TeamCall) TeamCall.init({ API, mij: () => me, T, toast });
   function renderKeuken(){
     const tabBtn = document.getElementById('tabKeuken');
     if (tabBtn) tabBtn.style.display = heeftKeuken() ? '' : 'none';
@@ -1199,7 +1175,7 @@
     const act = (state.activity || []).slice(0, 10);
     const staff = (state.staff || []).filter(m => m.id !== me.staffId);
     $('#teamWrap').innerHTML =
-      (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">📢 '+T('pd.buzzall','Iedereen')+'</button></div>'+
+      (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<span style="display:flex;gap:0.4rem;"><button class="abtn" id="teamCall" style="font-size:0.66rem;">📹 '+T('pd.teamcall','Teamcall')+'</button><button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">📢 '+T('pd.buzzall','Iedereen')+'</button></span></div>'+
         staff.map(m=>{
           const in2 = !!(state.klok && (state.klok.binnen||[]).includes(m.name));
           return '<div class="task"><span class="ic">'+(m.role==='manager'?'⭐':'👤')+'</span><div class="t"><b>'+esc(m.name)+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+(in2?' · 🟢 '+T('pd.ingeklokt','ingeklokt'):'')+'</span></div>'+
@@ -1209,7 +1185,7 @@
       '<div class="card"><div class="k">'+T('pd.chat','Teamchat')+'</div><div class="chat">'+
       (team.length ? team.map(m=>'<div class="msg '+(m.who===me.name?'me':'other')+'"><span class="who">'+esc(m.who)+'</span>'+
         (m.audio?'<audio controls src="'+m.audio+'" style="width:190px;max-width:100%;height:34px;"></audio>':esc(m.text))+'</div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.nochat','Nog geen berichten.')+'</div>')+
-      '</div><div class="compose"><button class="micbtn" id="tmMic">🎤</button><input id="tmMsg" placeholder="'+T('pd.msgph','Bericht aan het team')+'"><button id="tmSend">'+T('pd.send','Stuur')+'</button></div></div>'+
+      '</div><div class="compose"><input id="tmMsg" placeholder="'+T('pd.msgph','Bericht aan het team')+'"><button id="tmSend">'+T('pd.send','Stuur')+'</button></div></div>'+
       '<div class="card"><div class="k">'+T('pd.activity','Wie deed wat')+'</div>'+
       (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);padding:0.4rem 0;">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>'+
       // Aparte ruimte: het personeelsnetwerk met andere zaken (met toestemming).
@@ -1229,17 +1205,17 @@
     };
     $('#tmSend').addEventListener('click', send);
     $('#tmMsg').addEventListener('keydown', e => { if (e.key==='Enter') send(); });
+    const tc = document.getElementById('teamCall'); if (tc) tc.addEventListener('click', () => window.TeamCall && TeamCall.groep());
     const ba = document.getElementById('buzzAll'); if (ba) ba.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { all: true }); toast('📢 '+T('pd.allbuzzed','Hele team opgeroepen')+' ('+d.reached+').'); }
       catch(e){ toast(e.message); }
     });
-    document.querySelectorAll('[data-belm]').forEach(b => b.addEventListener('click', () => belStart(parseInt(b.dataset.belm, 10), b.dataset.naam)));
+    document.querySelectorAll('[data-belm]').forEach(b => b.addEventListener('click', () => window.TeamCall && TeamCall.bel(parseInt(b.dataset.belm, 10), b.dataset.naam)));
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
         toast(d.reached ? '📳 '+d.name+' '+T('pd.buzzed','wordt opgeroepen.') : d.name+' '+T('pd.buzzoff','heeft de app nu niet open.')); }
       catch(e){ toast(e.message); }
     }));
-    $('#tmMic').addEventListener('click', () => toggleMemo($('#tmMic')));
     // personeelsnetwerk: verbinden, goedkeuren en chatten in de aparte ruimte
     const na = document.getElementById('netAdd');
     if (na) na.addEventListener('click', async () => {
@@ -1273,35 +1249,6 @@
     document.getElementById('netMsg').addEventListener('keydown', e => { if (e.key==='Enter') doSend(); });
   }
 
-  // spraakmemo opnemen en versturen
-  let memoRec = null;
-  async function toggleMemo(btn){
-    if (memoRec){ memoRec.stop(); return; }
-    if (!navigator.mediaDevices || !window.MediaRecorder){ toast(T('pd.memono','Opnemen is hier niet beschikbaar.')); return; }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const chunks = [];
-      memoRec = new MediaRecorder(stream);
-      memoRec.ondataavailable = e => chunks.push(e.data);
-      memoRec.onstop = () => {
-        stream.getTracks().forEach(t => t.stop());
-        btn.classList.remove('rec');
-        memoRec = null;
-        const blob = new Blob(chunks, { type: chunks[0] && chunks[0].type || 'audio/webm' });
-        if (blob.size < 200) return;
-        if (blob.size > 1.4*1024*1024){ toast(T('pd.memolong','Memo te lang.')); return; }
-        const reader = new FileReader();
-        reader.onload = async () => {
-          try { await API.call('/supplier/team/message', { audio: reader.result }); toast(T('pd.memosent','Spraakmemo verstuurd.')); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
-        };
-        reader.readAsDataURL(blob);
-      };
-      memoRec.start();
-      btn.classList.add('rec');
-      toast(T('pd.memorec','Opnemen... tik nogmaals om te versturen.'));
-    } catch(e){ toast(T('pd.memodenied','Geen toegang tot de microfoon.')); }
-  }
-
   // opgeroepen worden: trilscherm
   function showBuzz(from){
     if (navigator.vibrate) navigator.vibrate([300,120,300,120,600]);
@@ -1317,16 +1264,6 @@
     setTimeout(() => el.classList.remove('on'), 8000);
   }
 
-  function playPtt(from, audio){
-    if (navigator.vibrate) navigator.vibrate(150);
-    let bar = document.getElementById('pttBar');
-    if (!bar){ bar = document.createElement('div'); bar.id = 'pttBar'; document.getElementById('shell').appendChild(bar); }
-    bar.innerHTML = '🔊 <b>'+esc(from)+'</b> '+T('pd.speaks','spreekt');
-    bar.classList.add('on');
-    try { const a = new Audio(audio); a.play().catch(()=>{}); a.onended = () => bar.classList.remove('on'); } catch(e){}
-    setTimeout(() => bar.classList.remove('on'), 15000);
-    refresh();
-  }
   function showAlarm(d){
     if (navigator.vibrate) navigator.vibrate([500,150,500,150,800]);
     let el = document.getElementById('alarmOverlay');
@@ -1401,30 +1338,10 @@
         } catch(err){}
       });
       src.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
-      src.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
       src.addEventListener('alarm', e => { const d=JSON.parse(e.data); if (d.from !== me.name) showAlarm(d); });
       src.addEventListener('notify', () => refresh());
-      // bellen: rinkelen als een ingeklokte collega jou belt
-      src.addEventListener('bel', e => {
-        try {
-          const d = JSON.parse(e.data || '{}');
-          if (!me || d.naar !== me.staffId) return;
-          if (navigator.vibrate) navigator.vibrate([200, 80, 200, 80, 200]);
-          const el = belOverlay('<div style="font-size:2rem;">📞</div><b style="display:block;margin-top:0.4rem;">'+esc(d.van)+'</b>'+
-            '<div style="font-size:0.85rem;color:var(--soft,#999);margin-top:0.3rem;">'+T('pd.bel.in','belt je...')+'</div>'+
-            '<div style="display:flex;gap:0.6rem;margin-top:1rem;"><button class="abtn" id="belJa" style="flex:1;">'+T('pd.bel.aan','Neem aan')+'</button><button class="abtn warn" id="belNee" style="flex:1;">'+T('pd.bel.weiger','Weiger')+'</button></div>');
-          el.querySelector('#belJa').addEventListener('click', async () => { try { await API.call('/staff/bel/antwoord', { vanId: d.vanId, akkoord: true }); } catch(err){} belVerbonden(d.van); });
-          el.querySelector('#belNee').addEventListener('click', async () => { try { await API.call('/staff/bel/antwoord', { vanId: d.vanId, akkoord: false }); } catch(err){} belSluit(); });
-        } catch(err){}
-      });
-      src.addEventListener('bel-antwoord', e => {
-        try {
-          const d = JSON.parse(e.data || '{}');
-          if (!me || d.vanId !== me.staffId) return;
-          if (d.akkoord) belVerbonden(d.naam);
-          else { belSluit(); toast(T('pd.bel.nee','Niet aangenomen.')); }
-        } catch(err){}
-      });
+      // echt (video)bellen: alle WebRTC-signalen gaan naar de teamcall-module
+      if (window.TeamCall) src.addEventListener('rtc', TeamCall.event);
     } catch(e){}
   }
 

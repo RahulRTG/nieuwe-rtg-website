@@ -126,11 +126,9 @@
     // interne chat
     html += '<div class="card"><div class="tt-h" style="margin-bottom:0.6rem;">'+T('team.chat','Interne teamchat')+'</div><div class="tt-chat" id="ttChat">';
     html += team.length ? team.map(m =>
-      '<div class="tt-msg '+(m.who===a.name?'me':'other')+'"><span class="who">'+m.who+'</span>'+
-      (m.audio ? '<audio controls src="'+m.audio+'" style="width:200px;max-width:100%;height:34px;"></audio>' : esc(m.text))+
-      '<time>'+timeAgo(m.at)+'</time></div>'
+      '<div class="tt-msg '+(m.who===a.name?'me':'other')+'"><span class="who">'+m.who+'</span>'+esc(m.text)+'<time>'+timeAgo(m.at)+'</time></div>'
     ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.4rem 0;">'+T('team.nochat','Nog geen berichten. Stuur je team een bericht.')+'</div>';
-    html += '</div><div class="tt-compose"><button class="tt-mic" id="ttMic" title="'+T('team.memo','Spraakmemo')+'">🎤</button><input id="ttMsg" placeholder="'+T('team.msgph','Bericht aan het team')+'"><button id="ttSend">'+T('team.send','Stuur')+'</button></div></div>';
+    html += '</div><div class="tt-compose"><input id="ttMsg" placeholder="'+T('team.msgph','Bericht aan het team')+'"><button id="ttSend">'+T('team.send','Stuur')+'</button></div></div>';
 
     $('#teamWrap').innerHTML = html;
 
@@ -183,38 +181,7 @@
     const addBtn = $('#ttAdd'); if (addBtn) addBtn.addEventListener('click', addStaff);
     const send = $('#ttSend'); if (send) send.addEventListener('click', sendTeam);
     const msg = $('#ttMsg'); if (msg) msg.addEventListener('keydown', e => { if (e.key==='Enter') sendTeam(); });
-    const mic = $('#ttMic'); if (mic) mic.addEventListener('click', () => toggleMemo(mic));
     const chat = $('#ttChat'); if (chat) chat.scrollTop = chat.scrollHeight;
-  }
-
-  // ---- spraakmemo: opnemen en als teamchat-bericht versturen ----
-  let memoRec = null;
-  async function toggleMemo(btn){
-    if (memoRec){ memoRec.stop(); return; }
-    if (!navigator.mediaDevices || !window.MediaRecorder){ toast(T('memo.no','Opnemen is hier niet beschikbaar.')); return; }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const chunks = [];
-      memoRec = new MediaRecorder(stream);
-      memoRec.ondataavailable = e => chunks.push(e.data);
-      memoRec.onstop = () => {
-        stream.getTracks().forEach(t => t.stop());
-        btn.classList.remove('rec');
-        memoRec = null;
-        const blob = new Blob(chunks, { type: chunks[0] && chunks[0].type || 'audio/webm' });
-        if (blob.size < 200){ toast(T('memo.short','Te kort.')); return; }
-        if (blob.size > 1.4 * 1024 * 1024){ toast(T('memo.long','Memo te lang (max ~1 minuut).')); return; }
-        const reader = new FileReader();
-        reader.onload = async () => {
-          try { await API.call('/supplier/team/message', { audio: reader.result }); toast(T('memo.sent','Spraakmemo verstuurd.')); await refresh(); openTab('team'); }
-          catch(e){ toast(e.message); }
-        };
-        reader.readAsDataURL(blob);
-      };
-      memoRec.start();
-      btn.classList.add('rec');
-      toast(T('memo.rec','Opnemen... tik nogmaals om te versturen.'));
-    } catch(e){ toast(T('memo.denied','Geen toegang tot de microfoon.')); }
   }
 
   // ---- opgeroepen worden: trilscherm ----
@@ -230,18 +197,6 @@
     el.innerHTML = '<div class="bz"><div class="bz-ic">📳</div><b>'+esc(from)+'</b><span>'+T('buzz.calls','roept u op')+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
     setTimeout(() => el.classList.remove('on'), 8000);
-  }
-
-  // walkie-talkie: binnenkomende spraakmemo direct afspelen
-  function playPtt(from, audio){
-    if (navigator.vibrate) navigator.vibrate(150);
-    let bar = document.getElementById('pttBar');
-    if (!bar){ bar = document.createElement('div'); bar.id = 'pttBar'; document.getElementById('shell').appendChild(bar); }
-    bar.innerHTML = '🔊 <b>'+esc(from)+'</b> '+T('ptt.speaks','spreekt');
-    bar.classList.add('on');
-    try { const a = new Audio(audio); a.play().catch(()=>{}); a.onended = () => bar.classList.remove('on'); } catch(e){}
-    setTimeout(() => bar.classList.remove('on'), 15000);
-    refresh();
   }
 
   // security-alarm: schermvullend, met locatie
@@ -303,7 +258,6 @@
     try { source = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
     source.addEventListener('hello', e => { const d=JSON.parse(e.data); notifs = d.unread||[]; renderBell(); });
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
-    source.addEventListener('ptt', e => { const d=JSON.parse(e.data); playPtt(d.from, d.audio); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
     source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); if (fact) laadFacturen(); laadAgendaSup(); });
     // de keuken praat met de bediening: bon compleet op de pas -> belletje op

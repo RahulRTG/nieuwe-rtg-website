@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Marktplaats</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<style>
+  .wrap{max-width:46rem;margin:0 auto;padding:1.1rem 1.1rem 4rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:.9rem;}
+  .tabs{display:flex;gap:.4rem;margin:.2rem 0 1rem;overflow-x:auto;}
+  .tabs button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;padding:.5rem .95rem;font-size:.86rem;font-weight:600;white-space:nowrap;}
+  .tabs button.aan{background:var(--goud);color:#1a1710;border-color:var(--goud);}
+  .veiligbalk{display:flex;gap:.6rem;align-items:flex-start;background:#181510;border:1px solid #3a3320;border-radius:12px;padding:.7rem .85rem;margin-bottom:1rem;font-size:.85rem;line-height:1.5;color:var(--zacht);}
+  .veiligbalk b{color:var(--goud2);}
+  .filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+  .filters .veld{flex:1;min-width:8rem;padding:.6rem .8rem;font-size:.9rem;}
+  .filters .veld.klein{max-width:6.5rem;flex:0 0 auto;}
+  .rooster{display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:.8rem;}
+  .ad{background:var(--paneel);border:1px solid var(--lijn);border-radius:14px;overflow:hidden;text-align:left;display:flex;flex-direction:column;color:inherit;}
+  .ad .foto{aspect-ratio:1;background:var(--paneel2) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#4a453c;}
+  .ad .body{padding:.6rem .7rem .8rem;display:flex;flex-direction:column;gap:.2rem;}
+  .ad .titel{font-size:.9rem;font-weight:600;line-height:1.25;}
+  .ad .prijs{font-family:var(--serif);font-size:1.05rem;color:var(--goud2);}
+  .ad .plaats{font-size:.76rem;color:var(--zacht);}
+  .mini-badge{display:inline-flex;align-items:center;gap:.25rem;font-size:.68rem;font-weight:700;border-radius:999px;padding:.08rem .45rem;width:fit-content;}
+  .mini-badge.gezin{background:#12241a;color:#7ecb8f;border:1px solid #2f6a45;}
+  .mini-badge.zaak{background:#1a1c2a;color:#8aa0e0;border:1px solid #35406a;}
+  .mini-badge.let{background:#2a1512;color:#e88;border:1px solid #6a2f2a;}
+  .leeg{color:var(--zacht);text-align:center;padding:2.5rem 1rem;line-height:1.6;grid-column:1/-1;}
+  /* detail + formulier */
+  .paneel{background:var(--paneel);border:1px solid var(--lijn);border-radius:16px;padding:1.1rem;margin-bottom:1rem;}
+  .terug{background:none;color:var(--zacht);font-size:.9rem;padding:.3rem 0;margin-bottom:.5rem;}
+  .detail .fotos{display:flex;gap:.5rem;overflow-x:auto;margin-bottom:.8rem;}
+  .detail .fotos img{height:11rem;border-radius:12px;border:1px solid var(--lijn);}
+  .detail .fotoleeg{height:8rem;border-radius:12px;border:1px solid var(--lijn);background:var(--paneel2);display:flex;align-items:center;justify-content:center;font-size:2.4rem;color:#4a453c;margin-bottom:.8rem;}
+  .detail h2{font-family:var(--serif);font-weight:500;font-size:1.4rem;margin:.1rem 0;}
+  .detail .prijsgroot{font-family:var(--serif);font-size:1.6rem;color:var(--goud2);margin:.1rem 0 .4rem;}
+  .detail .meta{display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0;}
+  .detail .meta span{background:var(--paneel2);border:1px solid var(--lijn);border-radius:999px;padding:.15rem .6rem;font-size:.78rem;color:var(--zacht);}
+  .detail .oms{color:var(--txt);line-height:1.55;white-space:pre-wrap;margin:.6rem 0;}
+  .waarschuw{background:#2a1512;border:1px solid #6a2f2a;color:#f0a;border-radius:12px;padding:.7rem .85rem;font-size:.85rem;line-height:1.5;margin:.6rem 0;color:#e8a;}
+  .veiligtips{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .85rem;font-size:.83rem;line-height:1.55;color:var(--zacht);margin:.6rem 0;}
+  .veiligtips b{color:var(--goud2);}
+  .veiligtips ul{margin:.3rem 0 0 1rem;}
+  .acties{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+  label.vl{display:block;font-size:.82rem;color:var(--zacht);margin:.7rem 0 .25rem;}
+  textarea.veld{min-height:5rem;resize:vertical;line-height:1.5;}
+  .rij{display:flex;gap:.5rem;}
+  .rij .veld{flex:1;}
+  .chips{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;padding:.4rem .8rem;font-size:.84rem;}
+  .chip.aan{background:var(--goud);color:#1a1710;border-color:var(--goud);}
+  .aihint{font-size:.8rem;color:var(--goud2);margin-top:.3rem;line-height:1.45;}
+  .fotorij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.4rem;}
+  .fotorij .mini{width:4rem;height:4rem;border-radius:10px;object-fit:cover;border:1px solid var(--lijn);}
+  .akkoord{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem;color:var(--zacht);line-height:1.45;margin:.8rem 0;}
+  .akkoord input{margin-top:.2rem;}
+  /* chat */
+  .chatlijst{display:flex;flex-direction:column;gap:.5rem;}
+  .chatrow{display:flex;gap:.6rem;align-items:center;padding:.7rem .85rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;text-align:left;color:inherit;width:100%;}
+  .chatrow .ct{flex:1;min-width:0;}
+  .chatrow .ct b{display:block;font-size:.9rem;}
+  .chatrow .ct span{font-size:.78rem;color:var(--zacht);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .melding{margin:.5rem 0;font-size:.85rem;}
+  .melding.ok{color:var(--groen);}
+  .melding.fout{color:var(--rood);}
+  .mijnkop{display:flex;justify-content:space-between;align-items:center;gap:.6rem;}
+  .statuspil{font-size:.72rem;font-weight:700;border-radius:999px;padding:.15rem .55rem;}
+  .statuspil.te-koop{background:#12241a;color:#7ecb8f;border:1px solid #2f6a45;}
+  .statuspil.gereserveerd{background:#2a2a1a;color:#d8c86a;border:1px solid #6a5f2a;}
+  .statuspil.verkocht{background:var(--paneel2);color:var(--zacht);border:1px solid var(--lijn);}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🏷️ Marktplaats</h1>
+  <div class="intro">Koop en verkoop tweedehands spullen, dichtbij en veilig. Ook zaken bieden hier aan.</div>
+
+  <div class="veiligbalk">
+    <span style="font-size:1.1rem;">🛡️</span>
+    <div><b>Veilig en met respect.</b> Spreek af op een openbare plek, betaal nooit vooruit en houd het gesprek in de app. Verboden waar en kwetsende taal horen hier niet. Twijfel je? Meld of blokkeer.</div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button data-tab="ontdek" class="aan">Ontdekken</button>
+    <button data-tab="plaats">Plaatsen</button>
+    <button data-tab="mijn">Mijn spullen</button>
+    <button data-tab="berichten">Berichten</button>
+  </div>
+
+  <!-- ONTDEKKEN -->
+  <div id="vOntdek">
+    <div class="filters">
+      <input class="veld" id="fq" placeholder="🔎 Waar zoek je naar?">
+      <select class="veld klein" id="fcat"><option value="">Alles</option></select>
+      <input class="veld klein" id="fplaats" placeholder="Plaats">
+      <input class="veld klein" id="fmax" type="number" inputmode="numeric" placeholder="€ max">
+    </div>
+    <div class="rooster" id="rooster"><div class="leeg">Aanbod laden...</div></div>
+  </div>
+
+  <!-- DETAIL -->
+  <div id="vDetail" hidden></div>
+
+  <!-- PLAATSEN -->
+  <div id="vPlaats" hidden>
+    <div class="paneel detail">
+      <div id="plaatsMelding" class="melding"></div>
+      <label class="vl" for="pTitel">Wat bied je aan?</label>
+      <input class="veld" id="pTitel" maxlength="80" placeholder="Bijv. Houten kinderfietsje">
+      <label class="vl" for="pCat">Categorie <button type="button" class="knop grijs klein" id="pAiCat" style="float:right;">AI: raad categorie</button></label>
+      <select class="veld" id="pCat"></select>
+      <label class="vl">Staat</label>
+      <div class="chips" id="pStaat">
+        <button type="button" class="chip aan" data-staat="gebruikt">Gebruikt</button>
+        <button type="button" class="chip" data-staat="zgan">Zo goed als nieuw</button>
+        <button type="button" class="chip" data-staat="nieuw">Nieuw</button>
+      </div>
+      <label class="vl" for="pOms">Omschrijving <button type="button" class="knop grijs klein" id="pAiOms" style="float:right;">AI: schrijf voor mij</button></label>
+      <textarea class="veld" id="pOms" maxlength="2000" placeholder="Vertel kort wat je aanbiedt, de staat en of het opgehaald of verzonden kan worden."></textarea>
+      <div class="rij" style="margin-top:.7rem;">
+        <div style="flex:1;">
+          <label class="vl" for="pPrijs" style="margin-top:0;">Vraagprijs (€)</label>
+          <input class="veld" id="pPrijs" type="number" inputmode="numeric" min="0" placeholder="0 = gratis / t.e.a.b.">
+        </div>
+        <div style="flex:1;">
+          <label class="vl" for="pPlaats" style="margin-top:0;">Plaats</label>
+          <input class="veld" id="pPlaats" maxlength="40" placeholder="Bijv. Ibiza">
+        </div>
+      </div>
+      <button type="button" class="knop grijs klein" id="pAiPrijs" style="margin-top:.5rem;">AI: stel een eerlijke prijs voor</button>
+      <div id="pAiUit" class="aihint"></div>
+      <label class="vl">Ophalen of verzenden</label>
+      <div class="chips" id="pLevering">
+        <button type="button" class="chip aan" data-lev="ophalen">Ophalen</button>
+        <button type="button" class="chip" data-lev="verzenden">Verzenden</button>
+      </div>
+      <label class="vl">Foto's (optioneel)</label>
+      <input type="file" id="pFotos" accept="image/*" multiple style="font-size:.85rem;color:var(--zacht);">
+      <div class="fotorij" id="pFotoVoor"></div>
+      <label class="akkoord"><input type="checkbox" id="pAkkoord"><span>Ik plaats alleen wat is toegestaan, houd het netjes en respectvol, en ga akkoord met de <a href="veilig.html" style="color:var(--goud2);text-decoration:underline;">huisregels</a>.</span></label>
+      <button type="button" class="knop" id="pPlaatsBtn" style="width:100%;">Plaats op de marktplaats</button>
+    </div>
+  </div>
+
+  <!-- MIJN SPULLEN -->
+  <div id="vMijn" hidden>
+    <div id="mijnLijst"><div class="leeg">Laden...</div></div>
+  </div>
+
+  <!-- BERICHTEN -->
+  <div id="vBerichten" hidden>
+    <div id="postvak" class="chatlijst"><div class="leeg">Laden...</div></div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="vChat" hidden></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s);
+  if (!window.Sessie || !Sessie.eisFamilie()) return;
+  Sessie.balk($('#balk'), { terug: 'index.html' });
+  const s = Sessie.huidig();
+  const beschermd = !!(s.profiel && s.profiel.beschermd);
+  const kindNb = !!(s.profiel && s.profiel.kind);
+  function rapi(pad, body) { return Sessie.api('/markt' + pad, Object.assign({ code: s.code, token: s.token }, body || {})); }
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function eur(n) { return Number(n) > 0 ? '€ ' + Number(n).toLocaleString('nl-NL') : 'Gratis / t.e.a.b.'; }
+  function badge(v) {
+    if (v.badge === 'zaak') return '<span class="mini-badge zaak">🏢 Zaak</span>';
+    if (v.badge === 'gezin') return '<span class="mini-badge gezin">✓ Gezin</span>';
+    return '';
+  }
+
+  const views = ['ontdek', 'plaats', 'mijn', 'berichten', 'detail', 'chat'];
+  function toon(v) {
+    $('#vOntdek').hidden = v !== 'ontdek';
+    $('#vPlaats').hidden = v !== 'plaats';
+    $('#vMijn').hidden = v !== 'mijn';
+    $('#vBerichten').hidden = v !== 'berichten';
+    $('#vDetail').hidden = v !== 'detail';
+    $('#vChat').hidden = v !== 'chat';
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('aan', b.dataset.tab === v));
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => {
+    const t = b.dataset.tab;
+    if (t === 'plaats' && beschermd) { alert('Verkopen is voor de veiligheid alleen voor volwassenen in het gezin. Je kunt wel rondkijken.'); return; }
+    toon(t);
+    if (t === 'ontdek') laadLijst();
+    if (t === 'mijn') laadMijn();
+    if (t === 'berichten') laadPostvak();
+  }));
+  // kinderen: verkopen/berichten verbergen (kijken mag)
+  if (beschermd) {
+    document.querySelector('[data-tab="plaats"]').style.display = 'none';
+    document.querySelector('[data-tab="berichten"]').style.display = 'none';
+    document.querySelector('[data-tab="mijn"]').style.display = 'none';
+  }
+
+  /* ---------- ontdekken / lijst ---------- */
+  let categorieen = [];
+  function vulCategorien() {
+    const opts = '<option value="">Alles</option>' + categorieen.map(c => '<option value="' + c + '">' + catNaam(c) + '</option>').join('');
+    $('#fcat').innerHTML = opts;
+    $('#pCat').innerHTML = categorieen.map(c => '<option value="' + c + '">' + catNaam(c) + '</option>').join('');
+  }
+  function catNaam(c) {
+    return ({ kleding: 'Kleding', kids: 'Kids & baby', wonen: 'Wonen', elektronica: 'Elektronica', 'vrije-tijd': 'Vrije tijd', tuin: 'Tuin', vervoer: 'Vervoer', boeken: 'Boeken', sport: 'Sport', overig: 'Overig' }[c]) || c;
+  }
+  let zoekTimer;
+  function laadLijst() {
+    const body = { q: $('#fq').value.trim(), categorie: $('#fcat').value, plaats: $('#fplaats').value.trim() };
+    const max = $('#fmax').value.trim(); if (max) body.max = Number(max);
+    rapi('/lijst', body).then(d => {
+      if (!categorieen.length && d.categorieen) { categorieen = d.categorieen; vulCategorien(); }
+      const r = $('#rooster');
+      if (!d.ads || !d.ads.length) { r.innerHTML = '<div class="leeg">Nog niets gevonden. Verruim je zoekopdracht, of plaats zelf iets moois.</div>'; return; }
+      r.innerHTML = d.ads.map(a =>
+        '<a class="ad" data-id="' + a.id + '" href="#">' +
+        '<div class="foto"' + (a.fotos[0] ? ' style="background-image:url(' + esc(a.fotos[0]) + ')"' : '') + '>' + (a.fotos[0] ? '' : '📦') + '</div>' +
+        '<div class="body">' +
+        (a.gemarkeerd ? '<span class="mini-badge let">⚠ Let op</span>' : '') +
+        '<span class="titel">' + esc(a.titel) + '</span>' +
+        '<span class="prijs">' + eur(a.prijs) + '</span>' +
+        '<span class="plaats">' + (a.plaats ? esc(a.plaats) + ' · ' : '') + '</span>' +
+        badge(a.verkoper) +
+        '</div></a>'
+      ).join('');
+      r.querySelectorAll('.ad').forEach(el => el.addEventListener('click', e => { e.preventDefault(); openDetail(el.dataset.id); }));
+    }).catch(() => { $('#rooster').innerHTML = '<div class="leeg">Kon het aanbod niet laden.</div>'; });
+  }
+  ['#fq', '#fplaats', '#fmax'].forEach(sel => $(sel).addEventListener('input', () => { clearTimeout(zoekTimer); zoekTimer = setTimeout(laadLijst, 350); }));
+  $('#fcat').addEventListener('change', laadLijst);
+
+  /* ---------- detail ---------- */
+  function openDetail(id) {
+    rapi('/detail', { id }).then(d => {
+      const a = d.ad;
+      const fotos = a.fotos && a.fotos.length
+        ? '<div class="fotos">' + a.fotos.map(f => '<img src="' + esc(f) + '" alt="foto van ' + esc(a.titel) + '">').join('') + '</div>'
+        : '<div class="fotoleeg">📦</div>';
+      const waarsch = (a.gemarkeerd && a.veiligheid && a.veiligheid.length)
+        ? '<div class="waarschuw">⚠ ' + a.veiligheid.map(esc).join('<br>') + '</div>' : '';
+      const eigen = a.mijn;
+      $('#vDetail').innerHTML =
+        '<button type="button" class="terug" id="dTerug">← Terug naar het aanbod</button>' +
+        '<div class="paneel detail">' + fotos +
+        badge(a.verkoper) + ' <span style="color:var(--zacht);font-size:.85rem;">' + esc(a.verkoper.naam) + '</span>' +
+        '<h2>' + esc(a.titel) + '</h2>' +
+        '<div class="prijsgroot">' + eur(a.prijs) + '</div>' +
+        '<div class="meta"><span>' + catNaam(a.categorie) + '</span><span>' + ({ nieuw: 'Nieuw', zgan: 'Zo goed als nieuw', gebruikt: 'Gebruikt' }[a.staat] || a.staat) + '</span>' +
+        (a.plaats ? '<span>📍 ' + esc(a.plaats) + '</span>' : '') + '<span>' + (a.levering || []).map(l => l === 'verzenden' ? '📦 Verzenden' : '🤝 Ophalen').join(' · ') + '</span></div>' +
+        waarsch +
+        '<div class="oms">' + esc(a.beschrijving) + '</div>' +
+        '<div class="veiligtips"><b>Veilig afspreken</b><ul>' +
+        '<li>Spreek af op een openbare, drukke plek en neem iemand mee.</li>' +
+        '<li>Betaal pas als je het spullen in handen hebt. Nooit vooruit.</li>' +
+        '<li>Houd het gesprek hier in de app.</li></ul></div>' +
+        (eigen
+          ? '<div class="acties"><span class="statuspil ' + a.status + '">' + a.status + '</span></div>'
+          : (beschermd
+            ? '<div class="veiligtips">Vraag een volwassene in je gezin om te reageren op deze advertentie.</div>'
+            : '<div class="acties">' +
+              '<button type="button" class="knop" id="dReageer">Stuur een bericht</button>' +
+              '<button type="button" class="knop grijs" id="dMeld">⚑ Melden</button>' +
+              '<button type="button" class="knop grijs" id="dBlok">Blokkeer verkoper</button></div>' +
+              '<div id="dReageerVak" hidden style="margin-top:.7rem;">' +
+              '<textarea class="veld" id="dBericht" placeholder="Hoi, is dit nog beschikbaar?"></textarea>' +
+              '<button type="button" class="knop" id="dVerstuur" style="margin-top:.5rem;">Verstuur</button>' +
+              '<div id="dReageerMeld" class="melding"></div></div>')) +
+        '</div>';
+      toon('detail');
+      $('#dTerug').addEventListener('click', () => { toon('ontdek'); });
+      if (!eigen && !beschermd) {
+        $('#dReageer').addEventListener('click', () => { $('#dReageerVak').hidden = false; $('#dBericht').focus(); });
+        $('#dVerstuur').addEventListener('click', () => {
+          const tekst = $('#dBericht').value.trim(); if (!tekst) return;
+          rapi('/reageer', { id: a.id, tekst }).then(r => {
+            if (r.tip) { $('#dReageerMeld').className = 'melding fout'; $('#dReageerMeld').textContent = r.tip; }
+            openChat(r.chat.id);
+          }).catch(e => { $('#dReageerMeld').className = 'melding fout'; $('#dReageerMeld').textContent = e.message; });
+        });
+        $('#dMeld').addEventListener('click', () => {
+          const reden = prompt('Waarom meld je deze advertentie?') || '';
+          rapi('/meld', { id: a.id, reden }).then(r => { alert(r.verborgen ? 'Bedankt. De advertentie is verborgen voor beoordeling.' : 'Bedankt voor je melding, we kijken ernaar.'); toon('ontdek'); laadLijst(); }).catch(e => alert(e.message));
+        });
+        $('#dBlok').addEventListener('click', () => {
+          if (!confirm('Deze verkoper blokkeren? Je ziet zijn advertenties dan niet meer.')) return;
+          rapi('/blokkeer', { soort: a.verkoper.soort, doelId: a.verkoper.id }).then(() => { alert('Geblokkeerd.'); toon('ontdek'); laadLijst(); }).catch(e => alert(e.message));
+        });
+      }
+    }).catch(e => alert(e.message));
+  }
+
+  /* ---------- plaatsen ---------- */
+  let staat = 'gebruikt', levering = ['ophalen'], fotos = [];
+  $('#pStaat').querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    staat = c.dataset.staat; $('#pStaat').querySelectorAll('.chip').forEach(x => x.classList.toggle('aan', x === c));
+  }));
+  $('#pLevering').querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    const l = c.dataset.lev; c.classList.toggle('aan');
+    levering = [...$('#pLevering').querySelectorAll('.chip.aan')].map(x => x.dataset.lev);
+    if (!levering.length) { c.classList.add('aan'); levering = [l]; }
+  }));
+  $('#pFotos').addEventListener('change', e => {
+    const files = [...e.target.files].slice(0, 6 - fotos.length);
+    files.forEach(f => {
+      const r = new FileReader();
+      r.onload = () => { if (fotos.length < 6) { fotos.push(r.result); tekenFotos(); } };
+      r.readAsDataURL(f);
+    });
+  });
+  function tekenFotos() {
+    $('#pFotoVoor').innerHTML = fotos.map((f, i) => '<img class="mini" src="' + esc(f) + '" data-i="' + i + '" alt="voorbeeld">').join('');
+    $('#pFotoVoor').querySelectorAll('.mini').forEach(im => im.addEventListener('click', () => { fotos.splice(Number(im.dataset.i), 1); tekenFotos(); }));
+  }
+  $('#pAiCat').addEventListener('click', () => {
+    const titel = $('#pTitel').value.trim(); if (!titel) { $('#pAiUit').textContent = 'Vul eerst een titel in.'; return; }
+    rapi('/ai', { soort: 'categorie', titel }).then(r => { if (r.categorie) { $('#pCat').value = r.categorie; $('#pAiUit').textContent = 'AI koos: ' + catNaam(r.categorie) + '.'; } });
+  });
+  $('#pAiOms').addEventListener('click', () => {
+    const titel = $('#pTitel').value.trim(); if (!titel) { $('#pAiUit').textContent = 'Vul eerst een titel in.'; return; }
+    $('#pAiOms').textContent = 'Bezig...';
+    rapi('/ai', { soort: 'beschrijving', titel, beschrijving: $('#pOms').value.trim(), categorie: $('#pCat').value, staat, levering }).then(r => {
+      if (r.tekst) $('#pOms').value = r.tekst; $('#pAiOms').textContent = 'AI: schrijf voor mij';
+    }).catch(() => { $('#pAiOms').textContent = 'AI: schrijf voor mij'; });
+  });
+  $('#pAiPrijs').addEventListener('click', () => {
+    rapi('/ai', { soort: 'prijs', titel: $('#pTitel').value.trim(), categorie: $('#pCat').value, staat }).then(r => {
+      if (r.prijs && !$('#pPrijs').value) $('#pPrijs').value = r.prijs.midden;
+      $('#pAiUit').textContent = r.tekst || '';
+    });
+  });
+  $('#pPlaatsBtn').addEventListener('click', () => {
+    const body = {
+      titel: $('#pTitel').value.trim(), beschrijving: $('#pOms').value.trim(), categorie: $('#pCat').value,
+      staat, prijs: Number($('#pPrijs').value) || 0, plaats: $('#pPlaats').value.trim(), levering, fotos,
+      akkoord: $('#pAkkoord').checked
+    };
+    const m = $('#plaatsMelding');
+    rapi('/plaats', body).then(r => {
+      m.className = 'melding ok';
+      m.textContent = r.waarschuwing ? 'Geplaatst. Let op: ' + r.waarschuwing : 'Geplaatst! Je advertentie staat nu op de marktplaats.';
+      $('#pTitel').value = ''; $('#pOms').value = ''; $('#pPrijs').value = ''; $('#pPlaats').value = ''; $('#pAkkoord').checked = false; fotos = []; tekenFotos(); $('#pAiUit').textContent = '';
+      setTimeout(() => { toon('mijn'); laadMijn(); }, 900);
+    }).catch(e => { m.className = 'melding fout'; m.textContent = e.message; });
+  });
+
+  /* ---------- mijn spullen ---------- */
+  function laadMijn() {
+    rapi('/mijn', {}).then(d => {
+      const el = $('#mijnLijst');
+      if (!d.ads || !d.ads.length) { el.innerHTML = '<div class="leeg">Je hebt nog niets geplaatst. Ga naar "Plaatsen" om te beginnen.</div>'; return; }
+      el.innerHTML = d.ads.map(a =>
+        '<div class="paneel" style="padding:.8rem 1rem;">' +
+        '<div class="mijnkop"><b>' + esc(a.titel) + '</b><span class="statuspil ' + a.status + '">' + a.status + '</span></div>' +
+        '<div style="color:var(--zacht);font-size:.85rem;margin:.2rem 0 .5rem;">' + eur(a.prijs) + (a.meldingen ? ' · ' + a.meldingen + ' melding(en)' : '') + '</div>' +
+        '<div class="acties">' +
+        (a.status !== 'verkocht' ? '<button type="button" class="knop grijs klein" data-res="' + a.id + '">Gereserveerd</button><button type="button" class="knop groen klein" data-verk="' + a.id + '">Verkocht</button>' : '<button type="button" class="knop grijs klein" data-heropen="' + a.id + '">Opnieuw te koop</button>') +
+        '<button type="button" class="knop rood klein" data-del="' + a.id + '">Verwijder</button></div></div>'
+      ).join('');
+      el.querySelectorAll('[data-res]').forEach(b => b.addEventListener('click', () => setStatus(b.dataset.res, 'gereserveerd')));
+      el.querySelectorAll('[data-verk]').forEach(b => b.addEventListener('click', () => setStatus(b.dataset.verk, 'verkocht')));
+      el.querySelectorAll('[data-heropen]').forEach(b => b.addEventListener('click', () => setStatus(b.dataset.heropen, 'te-koop')));
+      el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+        if (!confirm('Deze advertentie verwijderen?')) return;
+        rapi('/verwijder', { id: b.dataset.del }).then(laadMijn);
+      }));
+    });
+  }
+  function setStatus(id, status) { rapi('/status', { id, status }).then(laadMijn); }
+
+  /* ---------- berichten / chat ---------- */
+  function laadPostvak() {
+    rapi('/postvak', {}).then(d => {
+      const el = $('#postvak');
+      if (!d.postvak || !d.postvak.length) { el.innerHTML = '<div class="leeg">Nog geen berichten. Reageer op een advertentie om een gesprek te starten.</div>'; return; }
+      el.innerHTML = d.postvak.map(c =>
+        '<button type="button" class="chatrow" data-chat="' + c.id + '"><span style="font-size:1.4rem;">💬</span>' +
+        '<div class="ct"><b>' + esc(c.adTitel) + '</b><span>' + esc(c.metNaam) + ': ' + esc(c.laatste) + '</span></div>' +
+        '<span class="mini-badge ' + (c.rol === 'verkoper' ? 'gezin' : 'zaak') + '">' + (c.rol === 'verkoper' ? 'Verkoop' : 'Koop') + '</span></button>'
+      ).join('');
+      el.querySelectorAll('[data-chat]').forEach(b => b.addEventListener('click', () => openChat(b.dataset.chat)));
+    });
+  }
+  function openChat(chatId) {
+    rapi('/chat', { chatId }).then(r => tekenChat(chatId, r.chat)).catch(e => alert(e.message));
+  }
+  function tekenChat(chatId, chat) {
+    function render(c) {
+      $('#vChat').innerHTML =
+        '<button type="button" class="terug" id="cTerug">← Terug naar berichten</button>' +
+        '<div class="paneel"><h2 style="font-family:var(--serif);font-weight:500;font-size:1.2rem;margin:0 0 .1rem;">' + esc(c.adTitel || '') + '</h2>' +
+        '<div style="color:var(--zacht);font-size:.85rem;margin-bottom:.6rem;">met ' + esc(c.metNaam || '') + '</div>' +
+        '<div class="chat" id="cBerichten">' + (c.berichten || []).map(b =>
+          '<div class="b ' + (b.mijn ? 'ik' : 'ai') + '">' + esc(b.tekst) + (b.let ? '<br><span style="font-size:.72rem;opacity:.8;">⚠ let op: nooit vooruit betalen</span>' : '') + '</div>'
+        ).join('') + '</div>' +
+        '<div class="rijveld"><input class="veld" id="cInput" placeholder="Typ een bericht..."><button type="button" class="knop" id="cSend">Stuur</button></div>' +
+        '<div id="cTip" class="melding fout"></div></div>';
+      toon('chat');
+      const berEl = $('#cBerichten'); berEl.scrollTop = berEl.scrollHeight;
+      $('#cTerug').addEventListener('click', () => { toon('berichten'); laadPostvak(); });
+      function stuur() {
+        const tekst = $('#cInput').value.trim(); if (!tekst) return;
+        $('#cInput').value = '';
+        rapi('/antwoord', { chatId, tekst }).then(r => {
+          if (r.tip) $('#cTip').textContent = r.tip; else $('#cTip').textContent = '';
+          render(r.chat);
+        }).catch(e => $('#cTip').textContent = e.message);
+      }
+      $('#cSend').addEventListener('click', stuur);
+      $('#cInput').addEventListener('keydown', e => { if (e.key === 'Enter') stuur(); });
+    }
+    render(chat || { adTitel: '', metNaam: '', berichten: [] });
+  }
+
+  // start
+  laadLijst();
+})();
+</script>
+<script src="/apps/foundation/realtime.js"></script>
+</body>
+</html>

@@ -647,6 +647,11 @@
         <p class="sub" data-i18n="sup.v.fact.sub">Elke verkoop wordt automatisch gefactureerd. Download de PDF of maak er een met AI.</p>
         <div id="factWrap"></div>
       </div>
+      <div class="view" data-view="rtfmarkt">
+        <h2 data-i18n="sup.v.mkt">RTF Marktplaats</h2>
+        <p class="sub" data-i18n="sup.v.mkt.sub">Verkoop opruiming, overstock of tweedehands inventaris op de marktplaats van de RTFoundation. Gezinnen zien uw aanbod met een zaak-badge.</p>
+        <div id="mktWrap"></div>
+      </div>
       <div class="view" data-view="retail">
         <h2 data-i18n="sup.v.retail">Mode &amp; retail</h2>
         <p class="sub" data-i18n="sup.v.retail.sub">Collecties, voorraad, drops en het klantdossier.</p>
@@ -854,6 +859,7 @@
     creator:  { label:'Creator',   svg:'<rect x="3" y="5" width="13" height="14" rx="2"/><path d="M16 9l5-3v12l-5-3"/>', cap:'creator' },
     samenwerking:{ label:'Samenwerken', svg:'<path d="M9 11l2 2 4-4"/><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="M7 10v4a3 3 0 0 0 3 3h4"/>' },
     facturen: { label:'Facturen',  svg:'<path d="M6 2h9l3 3v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h4"/>' },
+    rtfmarkt: { label:'Marktplaats', svg:'<path d="M4 7h16l-1 4a3 3 0 0 1-3 2.4H8A3 3 0 0 1 5 11z"/><path d="M4 7 6 3h12l2 4"/><path d="M6 13v7h12v-7"/>' },
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     verkoop:  { label:'Verkoop',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M9.5 9.2l1.6 1.6 3-3"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
@@ -3177,6 +3183,70 @@
     }
   }
 
+  // ---- RTF Marktplaats: de zaak verkoopt (optioneel) op de gezinsmarktplaats ----
+  let rtfmData = null, rtfmCats = [], rtfmStaatVar = 'gebruikt', rtfmBusy = false;
+  async function laadRtfm(){
+    if (rtfmBusy) return; rtfmBusy = true;
+    try { rtfmData = await API.call('/supplier/markt/mijn', {}); if (rtfmData.categorieen) rtfmCats = rtfmData.categorieen; }
+    catch(e){ rtfmData = { ads: [], postvak: [] }; }
+    rtfmBusy = false; renderRtfMarkt();
+  }
+  function rtfmCatNaam(c){ return ({kleding:'Kleding',kids:'Kids & baby',wonen:'Wonen',elektronica:'Elektronica','vrije-tijd':'Vrije tijd',tuin:'Tuin',vervoer:'Vervoer',boeken:'Boeken',sport:'Sport',overig:'Overig'}[c])||c; }
+  function renderRtfMarkt(){
+    const el = $('#mktWrap'); if (!el) return;
+    if (!rtfmData){ el.innerHTML = '<div class="empty">…</div>'; laadRtfm(); return; }
+    const canEdit = actor().manager;
+    let html = '';
+    if (canEdit){
+      html += '<div class="card"><div class="tt-h">➕ '+T('mkt.plaats','Plaats een advertentie')+'</div>'+
+        '<input id="mktTitel" placeholder="'+T('mkt.titel','Titel, bijv. Etalagepop tweedehands')+'" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);margin-top:0.5rem;">'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap;">'+
+          '<select id="mktCat" style="flex:1;min-width:8rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);">'+rtfmCats.map(c=>'<option value="'+c+'">'+rtfmCatNaam(c)+'</option>').join('')+'</select>'+
+          '<select id="mktStaat" style="flex:1;min-width:8rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);"><option value="gebruikt">Gebruikt</option><option value="zgan">Zo goed als nieuw</option><option value="nieuw">Nieuw</option></select>'+
+          '<input id="mktPrijs" type="number" inputmode="numeric" placeholder="€" style="width:5.5rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);">'+
+        '</div>'+
+        '<textarea id="mktOms" placeholder="'+T('mkt.oms','Omschrijving')+'" style="width:100%;min-height:4rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);margin-top:0.4rem;"></textarea>'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap;">'+
+          '<input id="mktPlaats" placeholder="'+T('mkt.plaatsnaam','Plaats')+'" style="flex:1;min-width:6rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);">'+
+          '<button class="obtn" id="mktAiOms">✨ '+T('mkt.aioms','AI-omschrijving')+'</button>'+
+          '<button class="obtn" id="mktAiPrijs">✨ '+T('mkt.aiprijs','AI-prijs')+'</button>'+
+        '</div>'+
+        '<div id="mktAiUit" class="sub" style="margin-top:0.35rem;color:var(--gold);"></div>'+
+        '<label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.8rem;color:var(--soft);margin:0.6rem 0;"><input type="checkbox" id="mktAkkoord" style="margin-top:0.2rem;"><span>'+T('mkt.akkoord','Ik bied alleen toegestane waar aan en houd het netjes en respectvol.')+'</span></label>'+
+        '<button class="obtn primary" id="mktPlaatsBtn" style="width:100%;">'+T('mkt.plaatsbtn','Zet op de RTF-marktplaats')+'</button>'+
+        '<div id="mktMelding" class="sub" style="margin-top:0.4rem;"></div></div>';
+    }
+    const ads = rtfmData.ads || [];
+    html += '<div class="card"><div class="tt-h">'+T('mkt.mijn','Mijn advertenties')+' ('+ads.length+')</div>'+
+      (ads.length ? ads.map(a =>
+        '<div class="mitem" style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;"><div><b>'+esc(a.titel)+'</b><div class="ds">'+(a.prijs>0?'€ '+a.prijs:'Gratis')+' · '+a.status+(a.meldingen?' · '+a.meldingen+' melding(en)':'')+'</div></div>'+
+        '<div style="display:flex;gap:0.3rem;">'+(canEdit?(a.status!=='verkocht'?'<button class="obtn" data-mktverk="'+a.id+'">'+T('mkt.verkocht','Verkocht')+'</button>':'<button class="obtn" data-mktheropen="'+a.id+'">'+T('mkt.heropen','Te koop')+'</button>')+'<button class="obtn warn" data-mktdel="'+a.id+'">'+T('mkt.del','Verwijder')+'</button>':'')+'</div></div>'
+      ).join('') : '<div class="ds" style="margin-top:0.5rem;">'+T('mkt.geen','Nog niets geplaatst. Zet uw eerste advertentie hierboven.')+'</div>')+'</div>';
+    const pv = rtfmData.postvak || [];
+    if (pv.length) html += '<div class="card"><div class="tt-h">'+T('mkt.berichten','Berichten')+' ('+pv.length+')</div>'+
+      pv.map(c => '<div class="mitem"><b>'+esc(c.adTitel)+'</b><div class="ds">'+esc(c.metNaam)+': '+esc(c.laatste)+'</div></div>').join('')+'</div>';
+    el.innerHTML = html;
+    const uit = $('#mktAiUit');
+    const aiOms = $('#mktAiOms'); if (aiOms) aiOms.addEventListener('click', async () => {
+      const titel = $('#mktTitel').value.trim(); if (!titel){ uit.textContent = T('mkt.eerst','Vul eerst een titel in.'); return; }
+      try { const r = await API.call('/supplier/markt/ai', { soort:'beschrijving', titel, beschrijving:$('#mktOms').value.trim(), categorie:$('#mktCat').value, staat:$('#mktStaat').value }); if (r.tekst) $('#mktOms').value = r.tekst; } catch(e){}
+    });
+    const aiPr = $('#mktAiPrijs'); if (aiPr) aiPr.addEventListener('click', async () => {
+      try { const r = await API.call('/supplier/markt/ai', { soort:'prijs', titel:$('#mktTitel').value.trim(), categorie:$('#mktCat').value, staat:$('#mktStaat').value }); if (r.prijs && !$('#mktPrijs').value) $('#mktPrijs').value = r.prijs.midden; uit.textContent = r.tekst||''; } catch(e){}
+    });
+    const plaatsBtn = $('#mktPlaatsBtn'); if (plaatsBtn) plaatsBtn.addEventListener('click', async () => {
+      const m = $('#mktMelding');
+      try {
+        const r = await API.call('/supplier/markt/plaats', { akkoord:$('#mktAkkoord').checked, titel:$('#mktTitel').value.trim(), beschrijving:$('#mktOms').value.trim(), categorie:$('#mktCat').value, staat:$('#mktStaat').value, prijs:Number($('#mktPrijs').value)||0, plaats:$('#mktPlaats').value.trim(), levering:['ophalen'] });
+        m.style.color = '#7EE0A3'; m.textContent = r.waarschuwing ? T('mkt.let','Geplaatst. Let op: ')+r.waarschuwing : T('mkt.gedaan','Geplaatst op de RTF-marktplaats.');
+        rtfmData = null; laadRtfm();
+      } catch(e){ m.style.color = '#E0736A'; m.textContent = e.message; }
+    });
+    el.querySelectorAll('[data-mktverk]').forEach(b => b.addEventListener('click', async () => { await API.call('/supplier/markt/status', { id:b.dataset.mktverk, status:'verkocht' }).catch(()=>{}); rtfmData=null; laadRtfm(); }));
+    el.querySelectorAll('[data-mktheropen]').forEach(b => b.addEventListener('click', async () => { await API.call('/supplier/markt/status', { id:b.dataset.mktheropen, status:'te-koop' }).catch(()=>{}); rtfmData=null; laadRtfm(); }));
+    el.querySelectorAll('[data-mktdel]').forEach(b => b.addEventListener('click', async () => { if(!confirm(T('mkt.delc','Deze advertentie verwijderen?')))return; await API.call('/supplier/markt/verwijder', { id:b.dataset.mktdel }).catch(()=>{}); rtfmData=null; laadRtfm(); }));
+  }
+
   // ---- retail / mode: de slimme merk-backoffice ----
   let retailData = null;         // volledige retail-toestand van de server
   let retailSec = 'overzicht';   // overzicht | catalogus | voorraad | clienteling
@@ -4069,7 +4139,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.

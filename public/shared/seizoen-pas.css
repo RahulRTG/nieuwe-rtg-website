@@ -10,10 +10,30 @@
    Zonder JavaScript verandert er niets. */
 
 /* de tint van het seizoen */
-:root[data-seizoen="lente"]{ --sp-tint:#6E9A46; --sp-pastel:#A3C487; }   /* jong blad / pistache */
-:root[data-seizoen="zomer"]{ --sp-tint:#2E7A96; --sp-pastel:#7BB6DB; }   /* azuur / poederblauw */
-:root[data-seizoen="herfst"]{ --sp-tint:#B0662E; --sp-pastel:#E0AB80; }  /* cognac / perzik */
-:root[data-seizoen="winter"]{ --sp-tint:#5E7A9E; --sp-pastel:#A5A4CE; }  /* staal / lila */
+:root[data-seizoen="lente"]{ --sp-tint:#6E9A46; }   /* jong blad */
+:root[data-seizoen="zomer"]{ --sp-tint:#2E7A96; }   /* azuur */
+:root[data-seizoen="herfst"]{ --sp-tint:#B0662E; }  /* cognac */
+:root[data-seizoen="winter"]{ --sp-tint:#5E7A9E; }  /* staal */
+
+/* Lifestyle: zestien pastellen, vier per seizoen, een per dagdeel.
+   Elke rij vertelt de dag in dat seizoen: het licht van de ochtend,
+   de klaarte van de middag, de gloed van de avond, de rust van de nacht. */
+:root[data-seizoen="lente"][data-dagdeel="ochtend"]{ --sp-pastel:#E2A8BE; } /* bloesem */
+:root[data-seizoen="lente"][data-dagdeel="middag"]{ --sp-pastel:#A3C487; }  /* pistache */
+:root[data-seizoen="lente"][data-dagdeel="avond"]{ --sp-pastel:#E4C078; }   /* boterbloem */
+:root[data-seizoen="lente"][data-dagdeel="nacht"]{ --sp-pastel:#A6A0CE; }   /* seringen */
+:root[data-seizoen="zomer"][data-dagdeel="ochtend"]{ --sp-pastel:#E7D584; } /* citroen */
+:root[data-seizoen="zomer"][data-dagdeel="middag"]{ --sp-pastel:#7BB6DB; }  /* poederblauw */
+:root[data-seizoen="zomer"][data-dagdeel="avond"]{ --sp-pastel:#E69579; }   /* koraal */
+:root[data-seizoen="zomer"][data-dagdeel="nacht"]{ --sp-pastel:#8A9AC6; }   /* zeenacht */
+:root[data-seizoen="herfst"][data-dagdeel="ochtend"]{ --sp-pastel:#AABB8E; } /* salie */
+:root[data-seizoen="herfst"][data-dagdeel="middag"]{ --sp-pastel:#E2B45E; }  /* amber */
+:root[data-seizoen="herfst"][data-dagdeel="avond"]{ --sp-pastel:#E0A379; }   /* perzik */
+:root[data-seizoen="herfst"][data-dagdeel="nacht"]{ --sp-pastel:#B28FA6; }   /* pruim */
+:root[data-seizoen="winter"][data-dagdeel="ochtend"]{ --sp-pastel:#A5C4DA; } /* ijsblauw */
+:root[data-seizoen="winter"][data-dagdeel="middag"]{ --sp-pastel:#B5BFCC; }  /* zilver */
+:root[data-seizoen="winter"][data-dagdeel="avond"]{ --sp-pastel:#D5A0AB; }   /* oudroze */
+:root[data-seizoen="winter"][data-dagdeel="nacht"]{ --sp-pastel:#A5A4CE; }   /* lila */
 
 /* de zonstand: hoe warm en hoe sterk de tint meemengt
    (--sp-d/-k voor donkere vlakken, --sp-dl/-kl voor lichte vlakken) */

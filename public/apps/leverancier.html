@@ -526,7 +526,7 @@
         <input id="enCode" placeholder="Kassacode" data-i18n-ph="enr.code" autocapitalize="characters" autocomplete="off">
         <input id="enLogin" placeholder="Uw RTG e-mail of gebruikersnaam" data-i18n-ph="enr.login" autocomplete="username" autocapitalize="none">
         <input id="enPass" type="password" placeholder="Uw RTG wachtwoord" data-i18n-ph="enr.pass" autocomplete="current-password">
-        <input id="enPin" placeholder="Kies een pincode (4-6 cijfers)" data-i18n-ph="enr.pin" inputmode="numeric" autocomplete="off" maxlength="6">
+        <input id="enPin" placeholder="Kies een pincode (4 cijfers)" data-i18n-ph="enr.pin" inputmode="numeric" autocomplete="off" maxlength="4">
         <button type="submit" data-i18n="enr.submit">Aanmelden bij mijn werkgever</button>
         <div class="enroll-msg" id="enrollMsg" role="status" aria-live="polite"></div>
       </form>
@@ -1734,6 +1734,16 @@
     boBusy = false;
     renderStation();
   }
+  // open uitnodigingen (kassacodes) van het team, voor de HR-sectie
+  let invData = null, invBusy = false;
+  async function laadInvites(){
+    if (invBusy) return;
+    invBusy = true;
+    try { invData = await API.call('/supplier/staff/invites', {}); }
+    catch(e){ invData = { invites: [] }; }
+    invBusy = false;
+    renderStation();
+  }
   // boekhouding: btw per genre, personeelskosten en cadeaukaarten, per land
   let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
   // Salon-bedrijfsprofiel: volgers, aanbiedingen, polls en cijfers
@@ -1952,13 +1962,25 @@
           '<span class="acts"><button class="obtn primary" data-khire="'+x.id+'">'+T('ap.hire','Aannemen')+'</button><button class="obtn warn" data-kno="'+x.id+'">'+T('ap.reject','Afwijzen')+'</button></span></div>').join('')
         : '<div class="tkc-who">'+T('kt.noapps','Geen open sollicitaties.')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.team','Team & uitnodigingen')+'</h3>'+
-        (state.staff||[]).map(m=>'<div class="st-row"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
-          '<span class="acts">'+(m.id!==actor().staffId?'<button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.remove','Verwijder')+'</button>':'')+'</span></div>').join('')+
+        (state.staff||[]).map(m=>'<div class="st-row" style="flex-wrap:wrap;"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
+          '<span class="acts">'+(m.id!==actor().staffId
+            ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset code')+'</button><button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
+            : '')+'</span></div>').join('')+
         '<div class="tkc-who" style="margin-top:0.55rem;line-height:1.5;">'+T('kt.invite.intro','Personeel is een RTG-, Lifestyle- of Business-lid. Nodig iemand uit; hij of zij meldt zich daarna zelf aan in de app met de bedrijfsnaam en de kassacode.')+'</div>'+
         '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
-        '<button class="bigbtn" id="ktInvite" style="margin-top:0.2rem;">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button>'+
-        '<div id="ktInviteOut"></div></div></div>';
+        '<button class="bigbtn" id="ktInvite" style="margin-top:0.2rem;">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
+      // open kassacodes: teruglezen en intrekken
+      if (!invData) laadInvites();
+      const openInv = (invData && invData.invites) || [];
+      html += '<div class="tkc"><h3>\ud83c\udf9f '+T('kt.openinv','Open kassacodes')+(openInv.length?' ('+openInv.length+')':'')+'</h3>'+
+        (invData
+          ? (openInv.length ? openInv.map(i =>
+              '<div class="st-row"><span><span style="font-family:monospace;letter-spacing:0.14em;color:var(--gold);">'+escT(i.kassacode)+'</span>'+
+              '<span class="sub">'+(i.naam?escT(i.naam)+' \u00b7 ':'')+(i.func?escT(i.func)+' \u00b7 ':'')+(i.role==='manager'?'Manager \u00b7 ':'')+T('kt.geldigtot','geldig t/m')+' '+new Date(i.expires).toLocaleDateString()+'</span></span>'+
+              '<span class="acts"><button class="obtn warn" data-kinv="'+escT(i.kassacode)+'">'+T('kt.intrek','Trek in')+'</button></span></div>').join('')
+            : '<div class="tkc-who">'+T('kt.geeninv','Geen open uitnodigingen. Elke code is eenmalig en verdwijnt hier zodra hij gebruikt of ingetrokken is.')+'</div>')
+          : '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
         '<button class="obtn" id="ktBuzz" style="margin-top:0.4rem;">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
       // personeelszaken: verlofaanvragen beslissen en zien wie er nu is ingeklokt
@@ -2243,7 +2265,7 @@
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
       try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = '✅ '+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }
@@ -2346,8 +2368,18 @@
     });
     el.querySelectorAll('[data-khire]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/apply/decide', { id: b.dataset.khire, action: 'aannemen' });
-        kantoorMsg = '\u2705 '+T('kt.hired','Aangenomen.')+' <b>'+d.staff.name+'</b> \u00b7 PIN: <b style="color:var(--gold);">'+d.pin+'</b> ('+T('kt.pinonce','geef eenmalig door')+')';
+        kantoorMsg = '\u2705 '+T('kt.hired','Aangenomen.')+' <b>'+escT(d.invite.naam)+'</b> '+T('kt.hired.geef','meldt zich zelf aan met bedrijfsnaam')+' <b>'+escT(d.bedrijf)+'</b> + '+T('kt.invite.code','Kassacode')+' <b style="color:var(--gold);font-family:monospace;letter-spacing:0.14em;">'+escT(d.invite.kassacode)+'</b>';
+        invData = null;
         await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kreset]').forEach(b => b.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/staff/reset-pin', { staffId: b.dataset.kreset });
+        kantoorMsg = '\ud83d\udd11 '+T('kt.resetdone','Code gereset voor')+' <b>'+escT(d.staff.name)+'</b> \u00b7 '+T('kt.newpin','nieuwe pincode')+': <b style="color:var(--gold);">'+escT(d.pin)+'</b> ('+T('kt.pinonce','geef eenmalig door')+')';
+        await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-kinv]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/staff/invite/intrek', { kassacode: b.dataset.kinv });
+        invData = null; toast(T('kt.ingetrokken','Uitnodiging ingetrokken.')); renderStation(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kno]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/apply/decide', { id: b.dataset.kno, action: 'afwijzen' }); await refresh(); } catch(e){ toast(e.message); }
@@ -2358,13 +2390,12 @@
     const ktInvite = el.querySelector('#ktInvite'); if (ktInvite) ktInvite.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/staff/invite', { name: el.querySelector('#ktName').value.trim(), func: el.querySelector('#ktFunc').value.trim(), role: el.querySelector('#ktRole').value });
-        const out = el.querySelector('#ktInviteOut');
-        if (out) out.innerHTML = '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.8rem 0.9rem;margin-top:0.55rem;font-size:0.85rem;line-height:1.7;">'+
-          T('kt.invite.done','Uitnodiging klaar. Geef deze twee dingen door aan uw medewerker:')+'<br>'+
+        kantoorMsg = T('kt.invite.done','Uitnodiging klaar. Geef deze twee dingen door aan uw medewerker:')+'<br>'+
           '<b>'+T('kt.invite.biz','Bedrijfsnaam')+':</b> '+escT(d.bedrijf)+'<br>'+
           '<b>'+T('kt.invite.code','Kassacode')+':</b> <span style="font-family:monospace;font-size:1.25rem;letter-spacing:0.18em;color:var(--gold);">'+escT(d.invite.kassacode)+'</span><br>'+
-          '<span class="sub">'+T('kt.invite.note','Hij of zij meldt zich aan met een eigen RTG-account. De code is eenmalig en 30 dagen geldig.')+'</span></div>';
+          '<span class="sub">'+T('kt.invite.note','Hij of zij meldt zich aan met een eigen RTG-account. De code is eenmalig en 30 dagen geldig.')+'</span>';
         toast(T('kt.invite.toast','Kassacode aangemaakt.'));
+        invData = null; laadInvites();
       } catch(e){ toast(e.message); }
     });
     const ktBuzz = el.querySelector('#ktBuzz'); if (ktBuzz) ktBuzz.addEventListener('click', async () => {
@@ -5432,7 +5463,7 @@
   }
 
   // ---- team ----
-  let lastPin = null; // laatst gegenereerde pincode, eenmalig getoond aan de manager
+  let lastPin = null; // laatst gemaakte uitnodiging (kassacode), eenmalig getoond aan de manager
   function renderTeam(){
     const a = actor();
     const staff = state.staff || [];
@@ -5450,8 +5481,8 @@
       return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+(m.func? m.func+' · ':'')+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+buzz+rm+'</div>';
     }).join('') || '<div class="softline">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
     if (a.manager){
-      html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="ttName" placeholder="'+T('team.name','Naam')+'" style="flex:2;min-width:110px;"><input id="ttFunc" placeholder="'+T('team.func','Functie')+'" style="flex:1;min-width:90px;"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.add','Toevoegen')+'</button></div>';
-      if (lastPin) html += '<div class="tt-pinbox">'+T('team.pinintro','Pincode voor')+' '+lastPin.name+': <b>'+lastPin.pin+'</b><br>'+T('team.pinnote','Noteer deze code. Hiermee logt deze persoon in op zijn eigen account. De code is later niet meer te zien.')+'</div>';
+      html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="ttName" placeholder="'+T('team.name','Naam')+'" style="flex:2;min-width:110px;"><input id="ttFunc" placeholder="'+T('team.func','Functie')+'" style="flex:1;min-width:90px;"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.invite','Nodig uit')+'</button></div>';
+      if (lastPin) html += '<div class="tt-pinbox">'+T('team.invintro','Uitnodiging voor')+' '+escT(lastPin.name)+' · '+T('kt.invite.biz','Bedrijfsnaam')+': <b>'+escT(lastPin.bedrijf)+'</b> · '+T('kt.invite.code','Kassacode')+': <b>'+escT(lastPin.kassacode)+'</b><br>'+T('team.invnote','Geef deze door. Hij of zij meldt zich zelf aan in de app met een eigen RTG-account; de code is eenmalig.')+'</div>';
     }
     html += '</div>';
 
@@ -5539,8 +5570,8 @@
     document.querySelectorAll('[data-aphire]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/apply/decide', { id: b.dataset.aphire, action: 'aannemen' });
-        lastPin = { name: d.staff.name, pin: d.pin };
-        toast(T('ap.hired','Aangenomen. Pincode: ') + d.pin);
+        lastPin = { name: d.invite.naam, kassacode: d.invite.kassacode, bedrijf: d.bedrijf };
+        toast(T('ap.hired2','Aangenomen. Kassacode: ') + d.invite.kassacode);
         await refresh(); openTab('team');
       } catch(e){ toast(e.message); }
     }));
@@ -5654,10 +5685,14 @@
   function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   async function addStaff(){
     const name = ($('#ttName').value||'').trim();
+    const func = ($('#ttFunc') && $('#ttFunc').value || '').trim();
     const role = $('#ttRole').value;
-    if (!name){ toast(T('team.fillname','Vul een naam in.')); return; }
-    try { const d = await API.call('/supplier/staff/add', { name, role }); lastPin = { name: d.staff.name, pin: d.pin }; toast(T('team.added','Toegevoegd. Pincode: ')+d.pin); await refresh(); openTab('team'); }
-    catch(e){ toast(e.message); }
+    try {
+      const d = await API.call('/supplier/staff/invite', { name, func, role });
+      lastPin = { name: d.invite.naam || name || T('kt.staff','Medewerker'), kassacode: d.invite.kassacode, bedrijf: d.bedrijf };
+      toast(T('team.invited','Uitnodiging gemaakt. Kassacode: ')+d.invite.kassacode);
+      await refresh(); openTab('team');
+    } catch(e){ toast(e.message); }
   }
   async function removeStaff(id){
     try { await API.call('/supplier/staff/remove', { staffId: id }); toast(T('team.removed','Verwijderd uit het team.')); await refresh(); openTab('team'); }
@@ -5875,6 +5910,13 @@ window.I18N = { en: {
   'kt.team':'Team & invitations', 'kt.staff':'Staff member', 'kt.remove':'Remove',
   'kt.name':'Name', 'kt.func':'Role (e.g. Service)', 'kt.add':'Add, PIN shows once',
   'kt.name.opt':'Name (optional)', 'kt.lid':'RTG member',
+  'kt.reset':'Reset code', 'kt.ontslag':'Dismiss', 'kt.resetdone':'Code reset for', 'kt.newpin':'new PIN',
+  'kt.openinv':'Open register codes', 'kt.geldigtot':'valid until', 'kt.intrek':'Revoke',
+  'kt.geeninv':'No open invitations. Each code is one-time and disappears here once used or revoked.',
+  'kt.ingetrokken':'Invitation revoked.', 'kt.hired.geef':'signs up themselves with company name',
+  'team.invintro':'Invitation for', 'team.invite':'Invite', 'team.invited':'Invitation created. Register code: ',
+  'team.invnote':'Pass this on. They sign up themselves in the app with their own RTG account; the code is one-time.',
+  'ap.hired2':'Hired. Register code: ',
   'kt.invite.intro':'Staff are RTG, Lifestyle or Business members. Invite someone; they then sign up themselves in the app with the company name and the register code.',
   'kt.invite':'Invite, register code appears', 'kt.invite.toast':'Register code created.',
   'kt.invite.done':'Invitation ready. Give these two things to your employee:',
@@ -5883,7 +5925,7 @@ window.I18N = { en: {
   'enr.toggle':'🎟️ Invited by your employer? Sign up', 'enr.submit':'Sign up with my employer',
   'enr.hint':'Only RTG, Lifestyle and Business members can work in the app. Your employer gives you a register code; enter it with the company name and confirm with your own RTG login.',
   'enr.biz':'Company name', 'enr.code':'Register code', 'enr.login':'Your RTG email or username',
-  'enr.pass':'Your RTG password', 'enr.pin':'Choose a PIN (4-6 digits)',
+  'enr.pass':'Your RTG password', 'enr.pin':'Choose a PIN (4 digits)',
   'enr.busy':'Signing up...', 'enr.ok':'Done! You are signed up. Logging you in...', 'enr.fail':'Sign-up failed. Check the details.',
   'kt.oproep':'Call the whole team', 'kt.oproep.s':'Make every phone buzz, e.g. for a briefing.',
   'kt.buzzall':'Buzz everyone', 'kt.buzzed':'Everyone buzzed.',

@@ -467,6 +467,12 @@ function getStaffById(id) { return db.prepare('SELECT * FROM supplier_staff WHER
 function listStaff(code) { return db.prepare('SELECT * FROM supplier_staff WHERE supplier_code = ? AND active = 1 ORDER BY (role=\'manager\') DESC, id').all(String(code || '').toUpperCase()); }
 function countStaff(code) { return db.prepare('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
 async function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && await verifyPassword(String(pin), s.pin_hash)) ? s : null; }
+// Manager reset: geef een teamlid een nieuwe pincode (bij vergeten of misbruik).
+async function setStaffPin(id, pin) {
+  db.prepare('UPDATE supplier_staff SET pin_hash = ? WHERE id = ?').run(await hashPassword(String(pin)), id);
+  markStaff(id);
+  return getStaffById(id);
+}
 function deactivateStaff(id) { db.prepare('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); markStaff(id); }
 // Actief personeelsaccount van een lid binnen een bedrijf (voorkomt dubbel aanmelden).
 function staffByMember(supplierCode, memberId) {
@@ -491,7 +497,7 @@ function deleteUser(id) {
 module.exports = {
   init, startPostgres, onExternalChange, flushBijAfsluiten,
   createUser, createUserSync, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
-  createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin, deactivateStaff, staffByMember, publicStaff, makePin, deleteUser,
+  createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin, setStaffPin, deactivateStaff, staffByMember, publicStaff, makePin, deleteUser,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword

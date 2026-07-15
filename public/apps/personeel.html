@@ -255,7 +255,8 @@
     { id:'mode', icon:'🛍️', nl:'Mode & retail', en:'Fashion & retail', sub:'Modehuizen, merken, winkels', codes:['MAISON'] },
     { id:'charter', icon:'⛵', nl:'Boten & jachten', en:'Boats & yachts', sub:'Charters, schippers, op zee', codes:['AZUL'] },
     { id:'beveiliging', icon:'🛡️', nl:'Beveiliging', en:'Security', sub:'Diensten, posten, rondes, SOS', codes:['AEGIS'] },
-    { id:'boerderij', icon:'🚜', nl:'Boerderij', en:'Farm', sub:'Land, kas, dieren en oogst', codes:['CANFERRER'] }
+    { id:'boerderij', icon:'🚜', nl:'Boerderij', en:'Farm', sub:'Land, kas, dieren en oogst', codes:['CANFERRER'] },
+    { id:'creator', icon:'🎬', nl:'Creators', en:'Creators', sub:'Content, planning, samenwerkingen', codes:['LUMINA'] }
   ];
   const BEDRIJVEN = {
     KIKUNOI:{ name:'Sal de Mar', icon:'🍽️' }, PONTO:{ name:'Sunset Ibiza', icon:'🍸' },
@@ -269,7 +270,8 @@
     MAISON:{ name:'Maison Solène', icon:'🛍️' },
     AZUL:{ name:'Azul Yacht Charter', icon:'⛵' },
     AEGIS:{ name:'Aegis Elite Security', icon:'🛡️' },
-    CANFERRER:{ name:'Finca Can Ferrer', icon:'🚜' }
+    CANFERRER:{ name:'Finca Can Ferrer', icon:'🚜' },
+    LUMINA:{ name:'Lumina Media', icon:'🎬' }
   };
 
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
@@ -282,7 +284,19 @@
   function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min'); const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur'); return Math.round(h/24)+T('t.days',' dg'); }
   function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-  /* ---------- stappen-gate: sector -> bedrijf -> wie -> pincode ---------- */
+  /* ---------- stappen-gate: sector -> bedrijf -> wie -> pincode ----------
+     De PDA staat vast op een bedrijf: na de eerste keuze onthoudt het apparaat
+     het bedrijf en opent hij direct op het eigen team. Inloggen kan alleen wie
+     door de werkgever is uitgenodigd en zich heeft aangemeld (dan sta je in het
+     team), met de eigen pincode. */
+  function pdaBedrijf(){
+    try { const c = localStorage.getItem('rtg_pda_bedrijf'); return (c && BEDRIJVEN[c]) ? c : null; } catch(e){ return null; }
+  }
+  function stepStart(){
+    const vast = pdaBedrijf();
+    if (vast) stepWie(null, vast);
+    else stepSector();
+  }
   function stepSector(){
     $('#gateStep').innerHTML = '<div class="glist">' + SECTORS.map(s =>
       '<button class="gbtn" data-sec="'+s.id+'"><span class="ic">'+s.icon+'</span><span><b>'+(lang()==='en'?s.en:s.nl)+'</b><span>'+s.sub+'</span></span></button>'
@@ -301,10 +315,20 @@
     let roster = { staff: [] };
     try { roster = await API.call('/supplier/roster', { code: c }); }
     catch(e){ toast(T('pd.needserver','Start de server om in te loggen.')); return; }
-    $('#gateStep').innerHTML = '<button class="gback" id="gb2">← '+T('pd.back','Terug')+'</button><div class="glist">' + (roster.staff||[]).map(m =>
+    // dit apparaat staat nu vast op dit bedrijf
+    try { localStorage.setItem('rtg_pda_bedrijf', c); } catch(e){}
+    $('#gateStep').innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-bottom:0.3rem;">'+
+        '<div style="font-size:0.9rem;"><b>'+BEDRIJVEN[c].icon+' '+esc(BEDRIJVEN[c].name)+'</b><div style="font-size:0.68rem;color:var(--soft);">'+T('pd.vast','Deze PDA staat op dit bedrijf')+'</div></div>'+
+        '<button class="gback" id="gbSwitch" style="margin:0;">'+T('pd.switch','Ander bedrijf')+'</button>'+
+      '</div><div class="glist">' + (roster.staff||[]).map(m =>
       '<button class="gbtn" data-wie="'+m.id+'" data-nm="'+esc(m.name)+'"><span class="ic">'+(m.role==='manager'?'⭐':'👤')+'</span><span><b>'+m.name+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+'</span></span></button>'
-    ).join('') + '</div>';
-    $('#gb2').addEventListener('click', () => stepBedrijf(secId));
+    ).join('') + '</div>'+
+      '<div style="margin-top:0.8rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.nieuw','Nieuw in het team? U kunt hier pas inloggen nadat uw werkgever u heeft uitgenodigd en u zich met de bedrijfsnaam + kassacode hebt aangemeld in de leverancier-app. Daarna staat uw naam hierboven.')+'</div>';
+    $('#gbSwitch').addEventListener('click', () => {
+      try { localStorage.removeItem('rtg_pda_bedrijf'); } catch(e){}
+      stepSector();
+    });
     document.querySelectorAll('[data-wie]').forEach(b => b.addEventListener('click', () => stepPin(secId, c, Number(b.dataset.wie), b.dataset.nm)));
   }
   function stepPin(secId, c, staffId, nm){
@@ -363,6 +387,9 @@
     let t = null, c = null;
     try { t = localStorage.getItem('rtg_pda_token'); c = localStorage.getItem('rtg_pda_code'); } catch(e){}
     if (!t || !c || !BEDRIJVEN[c]) return;
+    // de PDA staat vast op een bedrijf: een sessie van een ander bedrijf herstellen we niet
+    const vast = pdaBedrijf();
+    if (vast && vast !== c){ try { localStorage.removeItem('rtg_pda_token'); localStorage.removeItem('rtg_pda_code'); } catch(e){} return; }
     API.token = t;
     try {
       const st = (await API.call('/supplier/state')).state;
@@ -1407,9 +1434,9 @@
     } catch(e){}
   }
 
-  window.addEventListener('rtglang', () => { if (state) renderAll(); else stepSector(); });
+  window.addEventListener('rtglang', () => { if (state) renderAll(); else stepStart(); });
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  stepSector();
+  stepStart();
   restoreSession();
 })();
 </script>
@@ -1418,6 +1445,8 @@ window.I18N = { en: {
   'pd.title':'Your shift, <em>in your pocket</em>.',
   'pd.deck':'Schedule, tasks, team chat and the work of your business. Pick your sector, your company and sign in with your PIN.',
   'pd.back':'Back', 'pd.choose':'Choose your company', 'pd.staff':'Staff member', 'pd.login':'Sign in',
+  'pd.vast':'This PDA is set to this company', 'pd.switch':'Other company',
+  'pd.nieuw':'New to the team? You can only sign in here after your employer has invited you and you have signed up in the supplier app with the company name + register code. Your name will then appear above.',
   'pd.pinhint':'Demo: manager 1234, staff 5678.', 'pd.badpin':'Wrong PIN.', 'pd.needserver':'Start the server to sign in.',
   'pd.switch':'Switch', 'pd.v.today':'Today.', 'pd.v.rooster':'Schedule', 'pd.v.rooster.sub':'The next seven days, your shifts highlighted.',
   'pd.v.taken':'Tasks', 'pd.v.taken.sub':'Jobs, rooms and everything needing attention today.',

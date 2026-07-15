@@ -80,6 +80,9 @@ app.post('/api/supplier/roster', (req, res) => {
 
 app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
+  // Nieuw personeel gaat via een uitnodiging (kassacode) en een eigen RTG-account;
+  // rechtstreeks toevoegen bestaat alleen nog in de demo.
+  if (!DEMO) return res.status(403).json({ error: 'Nieuw personeel meldt zich zelf aan: maak een uitnodiging (kassacode) en geef die samen met de bedrijfsnaam door.' });
   const name = schoon(req.body.name, 60);
   if (!name) return res.status(400).json({ error: 'Vul een naam in.' });
   const pin = accounts.makePin();
@@ -122,25 +125,58 @@ function findSupplierByName(naam) {
   return (db.data.suppliers || []).find(s => String(s.name || '').trim().toLowerCase() === n) || null;
 }
 
+// Eenmalige uitnodiging aanmaken (gedeeld door /staff/invite en het aannemen
+// van een sollicitant). Ruimt meteen verlopen/gebruikte codes op.
+function maakInvite(supplier, actor, { naam, role, func }) {
+  const lijst = invitesVan(supplier.code);
+  const nu = Date.now();
+  db.data.staffInvites[supplier.code] = lijst.filter(i => !i.used && i.expires > nu);
+  const inv = {
+    kassacode: maakKassacode(), naam: naam || null,
+    role: role === 'manager' ? 'manager' : 'staff', func: func || null,
+    door: actor.name, expires: nu + 30 * 86400000, // 30 dagen geldig
+    used: false, createdAt: new Date().toISOString()
+  };
+  db.data.staffInvites[supplier.code].push(inv);
+  save();
+  logActivity(supplier.code, actor, actor.name + ' nodigde een medewerker uit' + (inv.naam ? ' (' + inv.naam + ')' : ''));
+  return inv;
+}
+
 // Manager nodigt een medewerker uit: geeft een eenmalige kassacode terug.
 app.post('/api/supplier/staff/invite', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan medewerkers uitnodigen.' });
-  const naam = schoon(req.body.name, 60) || null;
-  const role = req.body.role === 'manager' ? 'manager' : 'staff';
-  const func = String(req.body.func || '').slice(0, 40) || null;
+  const inv = maakInvite(req.supplier, req.actor, {
+    naam: schoon(req.body.name, 60), role: req.body.role, func: String(req.body.func || '').slice(0, 40)
+  });
+  res.json({ ok: true, invite: { kassacode: inv.kassacode, naam: inv.naam, role: inv.role, func: inv.func, expires: inv.expires }, bedrijf: req.supplier.name });
+});
+
+// Manager trekt een open uitnodiging in (kassacode wordt onbruikbaar).
+app.post('/api/supplier/staff/invite/intrek', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan uitnodigingen intrekken.' });
+  const kassacode = String(req.body.kassacode || '').trim().toUpperCase();
   const lijst = invitesVan(req.supplier.code);
-  // ruim verlopen/gebruikte uitnodigingen op zodat de lijst kort blijft
-  const nu = Date.now();
-  db.data.staffInvites[req.supplier.code] = lijst.filter(i => !i.used && i.expires > nu);
-  const inv = {
-    kassacode: maakKassacode(), naam, role, func,
-    door: req.actor.name, expires: nu + 30 * 86400000, // 30 dagen geldig
-    used: false, createdAt: new Date().toISOString()
-  };
-  db.data.staffInvites[req.supplier.code].push(inv);
+  const idx = lijst.findIndex(i => i.kassacode === kassacode && !i.used);
+  if (idx < 0) return res.status(404).json({ error: 'Deze uitnodiging bestaat niet (meer).' });
+  lijst.splice(idx, 1);
   save();
-  logActivity(req.supplier.code, req.actor, req.actor.name + ' nodigde een medewerker uit' + (naam ? ' (' + naam + ')' : ''));
-  res.json({ ok: true, invite: { kassacode: inv.kassacode, naam, role, func, expires: inv.expires }, bedrijf: req.supplier.name });
+  logActivity(req.supplier.code, req.actor, req.actor.name + ' trok een uitnodiging in');
+  res.json({ ok: true });
+});
+
+// Manager reset de code van een collega (vergeten of misbruik): nieuwe pincode,
+// eenmalig getoond, om door te geven.
+app.post('/api/supplier/staff/reset-pin', supplierAuth, async (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan codes resetten.' });
+  const st = accounts.getStaffById(Number(req.body.staffId));
+  if (!st || String(st.supplier_code).toUpperCase() !== req.supplier.code)
+    return res.status(404).json({ error: 'Dit teamlid kennen we niet.' });
+  const pin = accounts.makePin();
+  await accounts.setStaffPin(st.id, pin);
+  logActivity(req.supplier.code, req.actor, req.actor.name + ' resette de code van ' + st.name);
+  try { notifySupplier(req.supplier.code, { kind: 'team', text: 'De code van ' + st.name + ' is gereset door ' + req.actor.name + '.' }); } catch (e) {}
+  res.json({ ok: true, staff: accounts.publicStaff(st), pin });
 });
 
 // Manager ziet de open uitnodigingen (om een kassacode opnieuw te tonen).
@@ -160,7 +196,7 @@ app.post('/api/supplier/staff/join', async (req, res) => {
   const kassacode = String(req.body.kassacode || '').trim().toUpperCase();
   const pin = String(req.body.pin || '').trim();
   if (!bedrijf || !kassacode) { noteFailedTry(bucket); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
-  if (!/^\d{4,6}$/.test(pin)) return res.status(400).json({ error: 'Kies een pincode van 4 tot 6 cijfers voor uw dagelijkse inlog.' });
+  if (!/^\d{4}$/.test(pin)) return res.status(400).json({ error: 'Kies een pincode van 4 cijfers voor uw dagelijkse inlog.' });
   // 1) bewijs dat u een RTG-lid bent
   const lid = accounts.findByLogin(req.body.login);
   if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
@@ -775,8 +811,9 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     return applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ ok: true, chat: c }));
   }
   if (req.body.action === 'aannemen') {
-    const pin = accounts.makePin();
-    const staff = await accounts.createStaff({ supplierCode: req.supplier.code, name: a.name, role: 'staff', func: a.func, pin });
+    // Aannemen maakt geen personeelsaccount meer aan: de nieuwe collega is een
+    // RTG-lid en meldt zich zelf aan met de bedrijfsnaam + deze kassacode.
+    const inv = maakInvite(req.supplier, req.actor, { naam: a.name, role: 'staff', func: a.func });
     a.status = 'aangenomen';
     ensureApplyChat(req.supplier.code, a); // ook aangenomen sollicitanten kunnen chatten om af te spreken
     save();
@@ -784,7 +821,10 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
     sseToOffice('sync', { scope: 'team' });
     notifyApplicant(a, req.supplier);
-    return res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
+    // krijgt de sollicitant meldingen in de app, dan sturen we de kassacode direct mee
+    if (a.key && db.data.notifications[a.key])
+      notify(a.key, { icon: '🎉', title: 'Aangenomen bij ' + req.supplier.name, body: 'Meld u aan in de leverancier-app met bedrijfsnaam "' + req.supplier.name + '" en kassacode ' + inv.kassacode + '.' });
+    return res.json({ ok: true, invite: { kassacode: inv.kassacode, naam: a.name, func: a.func }, bedrijf: req.supplier.name });
   }
   a.status = 'afgewezen';
   save();

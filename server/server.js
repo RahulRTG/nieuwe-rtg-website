@@ -364,6 +364,39 @@ app.use((req, res, next) => {
   });
 });
 
+/* Lichte gzip voor statische tekstassets (js/css/svg/json/webmanifest), met een
+   in-memory cache op pad + mtime. De grote app-scripts (leverancier.js ~5000
+   regels, app-main.js ~4400) gaan zo ~75% kleiner over de lijn, zonder extra
+   dependency (ingebouwde zlib) en zonder per-verzoek opnieuw te comprimeren.
+   Valt netjes terug op express.static bij range-verzoeken of onbekende paden. */
+const zlib = require('zlib');
+const PUBLIC_DIR_STATIC = path.join(__dirname, '..', 'public');
+const GZIP_TYPE = { '.js': 'application/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json' };
+const gzipCache = new Map(); // absoluut pad -> { mtimeMs, gz }
+app.get(/\.(?:js|css|svg|json|webmanifest)$/, (req, res, next) => {
+  if (req.headers.range) return next(); // range-verzoeken: laat express.static het doen
+  if (!/\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) return next();
+  let rel; try { rel = decodeURIComponent(req.path); } catch (e) { return next(); }
+  if (rel.indexOf('..') !== -1) return next();
+  const bestand = path.join(PUBLIC_DIR_STATIC, rel);
+  if (!bestand.startsWith(PUBLIC_DIR_STATIC)) return next();
+  const type = GZIP_TYPE[path.extname(bestand)]; if (!type) return next();
+  let st; try { st = fs.statSync(bestand); } catch (e) { return next(); }
+  if (!st.isFile()) return next();
+  let hit = gzipCache.get(bestand);
+  if (!hit || hit.mtimeMs !== st.mtimeMs) {
+    try { hit = { mtimeMs: st.mtimeMs, gz: zlib.gzipSync(fs.readFileSync(bestand), { level: 6 }) }; }
+    catch (e) { return next(); }
+    if (gzipCache.size > 300) gzipCache.clear();
+    gzipCache.set(bestand, hit);
+  }
+  res.setHeader('Content-Type', type);
+  res.setHeader('Content-Encoding', 'gzip');
+  res.setHeader('Vary', 'Accept-Encoding');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.end(hit.gz);
+});
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 /* ---------- Claude API (optioneel) ---------- */

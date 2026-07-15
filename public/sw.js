@@ -2,8 +2,8 @@
    is en offline opent. API-verkeer gaat altijd naar het netwerk.
    Pagina's en scripts zijn network-first: een update op de server komt
    direct door, de cache is alleen het vangnet zonder verbinding. */
-const CACHE = 'rtg-app-7a4850ff';
-const SHELL = ['/apps/app.html', '/manifest.webmanifest', '/icon.svg'];
+const CACHE = 'rtg-app-a522628e';
+const SHELL = ['/apps/app.html', '/apps/app-main.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));

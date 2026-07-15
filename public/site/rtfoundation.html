@@ -8,16 +8,16 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <style>
   :root{
-    --white:#FFFFFF;
-    --black:#0C0C0B;
-    --burgundy:#7F1634;
-    --burgundy-bright:#9E1C40;
+    --white:#0C0C0B; --panel:#151312; --panel2:#1B1817;
+    --black:#F4F1EC;
+    --burgundy:#C23A5E;
+    --burgundy-bright:#D14E6E;
     --burgundy-on-dark:#C23A5E;
-    --gold:#857007;
-    --gold-bright:#A98F1C;
-    --line:#DEDBD5;
-    --grey:#4D4A45;
-    --grey-soft:#8A8680;
+    --gold:#A98F1C;
+    --gold-bright:#C9A94E;
+    --line:rgba(255,255,255,0.09);
+    --grey:rgba(244,241,236,0.72);
+    --grey-soft:rgba(244,241,236,0.50);
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -53,7 +53,7 @@
     overflow:hidden;
   }
 
-  .on-black{background:var(--black);color:var(--white);}
+  .on-black{background:#080807;color:var(--black);}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -97,8 +97,8 @@
   .btn:hover{background:var(--burgundy);border-color:var(--burgundy);}
   .btn-ghost{background:transparent;color:var(--black);}
   .btn-ghost:hover{background:var(--black);color:var(--white);}
-  .on-black .btn{background:var(--white);color:var(--black);border-color:var(--white);}
-  .on-black .btn:hover{background:var(--burgundy-on-dark);color:var(--white);border-color:var(--burgundy-on-dark);}
+  .on-black .btn{background:var(--black);color:var(--white);border-color:var(--black);}
+  .on-black .btn:hover{background:var(--burgundy-on-dark);color:var(--black);border-color:var(--burgundy-on-dark);}
 
   /* ---------- nav ---------- */
 
@@ -107,7 +107,7 @@
     top:0;left:0;right:0;
     z-index:100;
     padding:1.1rem 0;
-    background:rgba(255,255,255,0.86);
+    background:rgba(12,12,11,0.86);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
@@ -199,7 +199,7 @@
     margin-top:3.5rem;
   }
   .step{
-    background:var(--white);
+    background:var(--panel);
     padding:2.25rem 1.75rem;
   }
   .step .n{
@@ -236,7 +236,7 @@
     margin-top:3.5rem;
   }
   .compare .col{
-    background:var(--black);
+    background:var(--panel);
     padding:2.5rem 2.25rem;
   }
   .compare .col.rtg{background:#160A0F;}
@@ -313,7 +313,7 @@
   .quiet-card{
     border:1px solid var(--line);
     padding:2.5rem 2.25rem;
-    background:#F7F5F1;
+    background:var(--panel);
   }
   .quiet-card h3{font-size:1.2rem;margin-bottom:0.75rem;}
   .quiet-card p{font-size:0.9rem;color:var(--grey);}

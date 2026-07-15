@@ -19,6 +19,8 @@
   .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--goud);border-radius:999px;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
   .tiles{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
   @media(max-width:560px){.tiles{grid-template-columns:1fr;}}
+  @media(min-width:900px){.tiles{grid-template-columns:repeat(3,1fr);}}
+  @media(min-width:1400px){.tiles{grid-template-columns:repeat(4,1fr);}}
   .tile{display:flex;flex-direction:column;gap:.5rem;padding:1.5rem;text-decoration:none;color:var(--txt);transition:transform .12s,border-color .12s;position:relative;overflow:hidden;}
   .tile:hover{transform:translateY(-3px);border-color:var(--goud);}
   .tile .ic{font-size:2.4rem;}

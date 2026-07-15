@@ -33,3 +33,9 @@ input,textarea,select{font-family:inherit;}
 .chat .b.ai{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
 .rijveld{display:flex;gap:.5rem;}
 .rijveld .veld{flex:1;}
+/* elk beeldscherm: op brede schermen wordt de smalle telefoonkolom een
+   royale desktopkolom (de paginastijlen zetten hun eigen max-width, dus
+   deze regel wint bewust op specificiteit); op de telefoon verandert er niets */
+@media (min-width:900px){
+  body .wrap{max-width:min(68rem, calc(100% - 5rem));}
+}

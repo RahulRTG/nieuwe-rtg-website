@@ -8,15 +8,15 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <style>
   :root{
-    --white:#FFFFFF;
-    --black:#0C0C0B;
-    --burgundy:#7F1634;
-    --burgundy-bright:#9E1C40;
+    --white:#0C0C0B; --panel:#151312; --panel2:#1B1817;
+    --black:#F4F1EC;
+    --burgundy:#C23A5E;
+    --burgundy-bright:#D14E6E;
     --burgundy-on-dark:#C23A5E;
-    --gold:#857007;
-    --line:#DEDBD5;
-    --grey:#4D4A45;
-    --grey-soft:#8A8680;
+    --gold:#A98F1C;
+    --line:rgba(255,255,255,0.09);
+    --grey:rgba(244,241,236,0.72);
+    --grey-soft:rgba(244,241,236,0.50);
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -52,7 +52,7 @@
     overflow:hidden;
   }
 
-  .on-black{background:var(--black);color:var(--white);}
+  .on-black{background:#080807;color:var(--black);}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -66,7 +66,7 @@
     gap:0.75rem;
     margin-bottom:2.5rem;
   }
-  .on-black .folio{color:var(--white);}
+  .on-black .folio{color:var(--black);}
   .folio::after{
     content:"";
     flex:1;
@@ -93,7 +93,7 @@
     top:0;left:0;right:0;
     z-index:100;
     padding:1.1rem 0;
-    background:rgba(255,255,255,0.86);
+    background:rgba(12,12,11,0.86);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
@@ -192,45 +192,45 @@
     border-color:var(--black);
   }
   .on-black .btn-ghost{
-    color:var(--white);
+    color:var(--black);
     border-color:rgba(255,255,255,0.35);
   }
   .on-black .btn-ghost:hover{
-    background:var(--white);
-    color:var(--black);
+    background:var(--black);
+    color:var(--white);
   }
   .on-black .btn{
-    background:var(--white);
-    color:var(--black);
-    border-color:var(--white);
+    background:var(--black);
+    color:var(--white);
+    border-color:var(--black);
   }
   .on-black .btn:hover{
     background:var(--burgundy-on-dark);
-    color:var(--white);
+    color:var(--black);
     border-color:var(--burgundy-on-dark);
   }
 
   /* ---------- burgundy-dominant sections (RTG Pass signature) ---------- */
 
-  .on-burgundy{background:var(--burgundy);color:var(--white);}
-  .on-burgundy .folio{color:var(--white);}
+  .on-burgundy{background:#4A0E20;color:var(--black);}
+  .on-burgundy .folio{color:var(--black);}
   .on-burgundy .folio::after{background:rgba(255,255,255,0.25);}
   .on-burgundy .kicker{color:var(--gold);}
-  .on-burgundy .hero p.deck{color:var(--white);}
-  .on-burgundy .step .n{color:var(--white);}
-  .on-burgundy .step p{color:var(--white);}
+  .on-burgundy .hero p.deck{color:var(--black);}
+  .on-burgundy .step .n{color:var(--black);}
+  .on-burgundy .step p{color:var(--black);}
   .on-burgundy .btn-ghost{
-    color:var(--white);
+    color:var(--black);
     border-color:rgba(255,255,255,0.4);
   }
   .on-burgundy .btn-ghost:hover{
-    background:var(--white);
-    color:var(--black);
+    background:var(--black);
+    color:var(--white);
   }
   .on-burgundy .btn:hover{
-    background:var(--white);
-    color:var(--black);
-    border-color:var(--white);
+    background:var(--black);
+    color:var(--white);
+    border-color:var(--black);
   }
   .on-burgundy .feat-card{color:var(--black);}
 
@@ -285,25 +285,25 @@
   }
   .butler-head p{
     margin-top:1.25rem;
-    color:var(--white);
+    color:var(--black);
   }
 
   .butler{
     max-width:560px;
     margin:0 auto;
     background:#151412;
-    border:1px solid var(--black);
+    border:1px solid var(--line);
   }
   .butler-bar{
     padding:1rem 1.5rem;
-    border-bottom:1px solid var(--black);
+    border-bottom:1px solid var(--white);
     display:flex;
     align-items:center;
     gap:0.75rem;
     font-size:0.8rem;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    color:var(--white);
+    color:var(--black);
   }
   .butler-bar .dot{
     width:7px;height:7px;
@@ -329,7 +329,7 @@
   }
   .bubble.butler{
     background:#201f1c;
-    color:var(--white);
+    color:var(--black);
     align-self:flex-start;
     border-left:2px solid var(--burgundy-on-dark);
   }
@@ -349,8 +349,8 @@
   .butler-options button{
     text-align:left;
     background:transparent;
-    border:1px solid var(--black);
-    color:var(--white);
+    border:1px solid var(--white);
+    color:var(--black);
     font-family:'Inter',sans-serif;
     font-size:0.88rem;
     padding:0.75rem 1rem;
@@ -375,7 +375,7 @@
   .butler-restart button{
     background:none;
     border:none;
-    color:var(--white);
+    color:var(--black);
     font-size:0.8rem;
     letter-spacing:0.04em;
     text-decoration:underline;
@@ -394,7 +394,7 @@
     border-bottom:1px solid var(--line);
   }
   .feat-card{
-    background:var(--white);
+    background:var(--panel);
     padding:2.5rem;
   }
   .feat-card h3{
@@ -421,7 +421,7 @@
   }
   .cta .deck{
     margin-top:1.5rem;
-    color:var(--white);
+    color:var(--black);
     max-width:44ch;
     margin-left:auto;
     margin-right:auto;

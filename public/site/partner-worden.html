@@ -9,8 +9,8 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <style>
   :root{
-    --white:#FFFFFF; --black:#0C0C0B; --burgundy:#7F1634; --burgundy-bright:#9E1C40;
-    --gold:#857007; --line:#DEDBD5; --grey:#4D4A45; --grey-soft:#8A8680;
+    --white:#0C0C0B; --panel:#151312; --panel2:#1B1817; --black:#F4F1EC; --burgundy:#C23A5E; --burgundy-bright:#D14E6E;
+    --gold:#A98F1C; --line:rgba(255,255,255,0.09); --grey:rgba(244,241,236,0.72); --grey-soft:rgba(244,241,236,0.50);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
@@ -39,8 +39,8 @@
   button{background:var(--black);color:var(--white);border:none;border-radius:999px;padding:1rem 2.2rem;font-size:0.95rem;font-weight:600;cursor:pointer;font-family:inherit;justify-self:start;}
   button:hover{background:var(--burgundy);}
   .msg{display:none;margin-top:1.4rem;padding:1rem 1.2rem;border-radius:12px;font-size:0.9rem;}
-  .msg.ok{display:block;background:#F2F7F1;border:1px solid #BFD8BC;color:#2E5A34;}
-  .msg.err{display:block;background:#FBF0F2;border:1px solid #E4B9C4;color:var(--burgundy);}
+  .msg.ok{display:block;background:#12211A;border:1px solid #2E5A34;color:#7EE0A3;}
+  .msg.err{display:block;background:#2A1218;border:1px solid #5E2233;color:var(--burgundy);}
   .note{margin-top:2.5rem;font-size:0.78rem;color:var(--grey-soft);max-width:34rem;}
   footer{border-top:1px solid var(--line);padding:2rem 0;font-size:0.78rem;color:var(--grey-soft);}
 </style>
@@ -65,7 +65,7 @@
       <div><span>🏷️</span><span data-i18n-html="pw.prijs"><b>0% commissie, met een ledenprijsgarantie</b>: u rekent leden nooit meer dan uw eigen publieke prijs. De commissie die u elders zou afdragen, geeft u hier aan uw gasten. Over uw andere verkoopkanalen zegt RTG niets.</span></div>
     </div>
 
-    <div style="border:1.5px solid var(--gold);border-radius:16px;padding:1.4rem 1.6rem;margin:2rem 0 2.2rem;background:#FCFBF7;">
+    <div style="border:1.5px solid var(--gold);border-radius:16px;padding:1.4rem 1.6rem;margin:2rem 0 2.2rem;background:var(--panel);">
       <div style="font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:600;" data-i18n="pw.actie.k">Founding-actie</div>
       <h2 style="font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;margin:0.5rem 0 0.6rem;" data-i18n="pw.actie.h">Nu aansluiten is gratis</h2>
       <p style="margin:0 0 0.6rem;" data-i18n="pw.actie.gratis">Meldt u zich nu zelf aan, of accepteert u onze uitnodiging? Dan is uw partnerschap gratis: geen entree, geen contributie, en blijvend 0% commissie.</p>

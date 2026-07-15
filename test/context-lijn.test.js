@@ -58,23 +58,29 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('spoed: de bediening vraagt rustig voorrang op een gerecht en trekt hem weer in', async () => {
-  const u = Date.now().toString().slice(-8);
-  const lid = (await json(await api('/api/auth/register', { name: 'Spoed Lid', email: 's' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }))).token;
-  const ord = await json(await api('/api/order', { supplierCode: 'KIKUNOI', items: [{ id: 'm1', qty: 1 }] }, lid));
-  const ref = ord.order.ref;
-  await api('/api/order/pay', { ref }, lid);  // betalen-eerst: dan pas ziet de keuken hem
-  // spoed op een gerecht: kalm veld op de bon, geen aparte bel
-  const z = await json(await api('/api/supplier/order/spoed', { ref, itemId: 'm1', op: true }, kokToken));
-  assert.equal(z.order.spoed.itemId, 'm1');
+test('spoedbon: een enkel gerecht komt als gewone bon op de lijn en telt gewoon mee', async () => {
+  // de bediening zet 2x gazpacho met spoed op de lijn voor tafel T1
+  const z = await json(await api('/api/supplier/order/spoed', { itemId: 'm1', qty: 2, table: 'T1' }, kokToken));
+  assert.ok(z.order.ref.startsWith('SP'));
+  assert.equal(z.order.items[0].qty, 2);
+  assert.equal(z.order.status, 'nieuw');                     // een gewone bon, geen apart kanaal
+  assert.ok(z.order.intern && z.order.spoed, 'als spoedbon herkenbaar, maar verder gewoon');
+  // elk scherm ziet hem als bon tussen de bonnen
   const st = await json(await api('/api/supplier/state', {}, kokToken));
-  assert.ok(st.state.orders.find(o => o.ref === ref).spoed, 'elk scherm ziet de spoedmarkering');
-  // intrekken kan net zo rustig
-  const weg = await json(await api('/api/supplier/order/spoed', { ref, op: false }, kokToken));
-  assert.equal(weg.order.spoed, null);
-  // een onbestaande bon wordt geweigerd
-  assert.equal((await api('/api/supplier/order/spoed', { ref: 'nee', op: true }, kokToken)).status, 404);
+  const bon = st.state.orders.find(o => o.ref === z.order.ref);
+  assert.ok(bon, 'de spoedbon staat tussen de gewone bonnen');
+  assert.equal(bon.table, 'T1');
+  // de kant meldt hem klaar via de gewone weg
+  const klaar = await json(await api('/api/supplier/order/sectie', { ref: z.order.ref, sectie: 'koud', phase: 'klaar' }, kokToken));
+  assert.equal(klaar.order.stations.keuken, 'klaar');
+  // intrekken kan alleen zolang hij niet klaar is
+  assert.equal((await api('/api/supplier/order/spoed', { ref: z.order.ref, op: false }, kokToken)).status, 409);
+  // een tweede spoedbon intrekken werkt wel
+  const z2 = await json(await api('/api/supplier/order/spoed', { itemId: 'm1' }, kokToken));
+  const weg = await json(await api('/api/supplier/order/spoed', { ref: z2.order.ref, op: false }, kokToken));
+  assert.equal(weg.order.status, 'geweigerd');
+  // een onbekend gerecht wordt geweigerd
+  assert.equal((await api('/api/supplier/order/spoed', { itemId: 'bestaat-niet' }, kokToken)).status, 404);
 });
 
 test('lijnbezetting: aanmelden, verkassen en afmelden per kant', async () => {

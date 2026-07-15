@@ -738,18 +738,27 @@
           (o.allergyNote?'<div class="tkc-alg">\u26A0 '+o.allergyNote+'</div>':'')+
           '<div class="tkc-act"><button class="tkc-serve" data-stserve="'+o.ref+'">'+T('st.served','Geserveerd')+'</button></div></div>';
       }).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
+      // de spoedbon: een enkel gerecht komt als gewone bon op de lijn en telt
+      // gewoon mee in de maak-nu- en all-day-tellingen; geen bel, geen flits
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>\u26A1 '+T('spoed.h','Spoedbon')+'</h3>'+
+        '<div class="tkc-who">'+T('spoed.deck','Gerecht gevallen of vergeten? Zet het als gewone bon op de lijn; de keuken ziet gewoon een bon erbij.')+'</div>'+
+        '<div class="row-gap"><select class="st-in" id="spGerecht" style="flex:2;">'+
+          (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
+        '<input class="st-in" id="spAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
+        '<select class="st-in" id="spTafel" style="flex:1;"><option value="">'+T('spoed.geentafel','geen tafel')+'</option>'+
+          (state.tables||[]).map(t=>'<option value="'+t.name+'">'+t.name+'</option>').join('')+'</select></div>'+
+        '<div class="tkc-act"><button class="tkc-ready" id="spGo">\u26A1 '+T('spoed.go','Zet op de lijn')+'</button></div></div>';
       html += '<div class="st-sec">'+T('st.making','In de maak')+' ('+making.length+')</div>';
       html += making.length ? making.map(o => {
         const vp = vuurplan(o);
-        return '<div class="tkc'+(o.spoed?' warn':'')+'">'+
+        return '<div class="tkc">'+
           '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
-          (o.spoed?'<div class="tkc-who">\u26A1 '+T('spoed.aan','Spoed gevraagd')+(o.spoed.door?' \u00b7 '+o.spoed.door:'')+'</div>':'')+
-          '<div class="tkc-items">'+(o.items||[]).map(it=>'<span>'+spoedMerk(o,it)+'<b>'+it.qty+'\u00D7</b>'+it.name+
-            (!o.spoed?' <button class="mn-station" data-spoed="'+o.ref+'" data-item="'+it.id+'" title="'+T('spoed.t','Vraag dit gerecht rustig met spoed aan')+'">\u26A1</button>':'')+'</span>').join('')+'</div>'+
+          (o.intern?'<div class="tkc-who">\u26A1 '+T('spoed.van','Spoedbon van ')+(o.spoed&&o.spoed.door?o.spoed.door:'')+'</div>':'')+
+          '<div class="tkc-items">'+(o.items||[]).map(it=>'<span>'+spoedMerk(o,it)+'<b>'+it.qty+'\u00D7</b>'+it.name+'</span>').join('')+'</div>'+
           '<div class="st-badges">'+Object.entries(vp.plan).map(([k,p])=>vpChip(k,p)).join('')+'</div>'+
           gastRegel(o)+
           '<div class="tkc-act"><button class="tkc-start" data-settbl="'+o.ref+'" data-cur="'+(o.table||'')+'">\uD83E\uDE91 '+(o.table?o.table+' \u00b7 '+T('st.tblwissel','wijzig'):T('st.tblset','Tafel kiezen'))+'</button>'+
-          (o.spoed?'<button class="obtn" data-spoedaf="'+o.ref+'" style="margin-left:0.5rem;">'+T('spoed.af','Spoed intrekken')+'</button>':'')+'</div></div>';
+          (o.intern?'<button class="obtn" data-spoedaf="'+o.ref+'" style="margin-left:0.5rem;">'+T('spoed.af','Intrekken')+'</button>':'')+'</div></div>';
       }).join('') : '<div class="st-empty">'+T('st.nomaking','Geen lopende bestellingen.')+'</div>';
       html += runsheetStrip('bediening');
       const tables = state.tables || [];
@@ -1094,10 +1103,14 @@
       if (t === null) return;
       try { await API.call('/supplier/order/table', { ref: b.dataset.settbl, table: t.trim() }); await refresh(); } catch(e){ toast(e.message); }
     }));
-    // spoed van de bediening: rustig doorgeven of intrekken
-    el.querySelectorAll('[data-spoed]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/order/spoed', { ref: b.dataset.spoed, itemId: b.dataset.item, op: true }); toast('⚡ '+T('spoed.toast','Spoed doorgegeven; de keuken ziet het rustig bovenaan.')); await refresh(); } catch(e){ toast(e.message); }
-    }));
+    // de spoedbon: als gewone bon op de lijn zetten, of intrekken
+    const spGo = el.querySelector('#spGo'); if (spGo) spGo.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/order/spoed', { itemId: el.querySelector('#spGerecht').value, qty: el.querySelector('#spAantal').value, table: el.querySelector('#spTafel').value });
+        toast('⚡ '+T('spoed.toast','Spoedbon staat op de lijn, als gewone bon.'));
+        await refresh();
+      } catch(e){ toast(e.message); }
+    });
     el.querySelectorAll('[data-spoedaf]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/order/spoed', { ref: b.dataset.spoedaf, op: false }); await refresh(); } catch(e){ toast(e.message); }
     }));

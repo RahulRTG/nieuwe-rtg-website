@@ -1966,17 +1966,40 @@ app.post('/api/supplier/order/table', supplierAuth, (req, res) => {
   res.json({ ok: true, order: o });
 });
 
-/* Spoed van de bediening: een gerecht (of een hele bon) krijgt rustig
-   voorrang. Bewust geen bel of flits richting de keuken: de bon sorteert
-   bovenaan, krijgt een kalme spoedmarkering en de coach noemt hem een keer. */
+/* De spoedbon van de bediening: een enkel gerecht komt als GEWONE bon op de
+   schermen (en telt dus gewoon mee in maak-nu en all day; in de drukte kijk
+   je toch alleen hoeveel je van iets moet maken). Bewust geen bel of flits;
+   de bon sorteert wel bovenaan. Intrekken kan zolang hij niet klaar is. */
 app.post('/api/supplier/order/spoed', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
-  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
-  if (req.body.op && ['klaar', 'geserveerd', 'geweigerd'].includes(o.status)) return res.status(409).json({ error: 'Deze bon is al klaar.' });
-  o.spoed = req.body.op ? { at: new Date().toISOString(), door: req.actor.name, itemId: String(req.body.itemId || '') || null } : null;
+  // intrekken: alleen eigen interne spoedbonnen
+  if (req.body.op === false) {
+    const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code && x.intern);
+    if (!o) return res.status(404).json({ error: 'Spoedbon niet gevonden.' });
+    if (['klaar', 'geserveerd'].includes(o.status)) return res.status(409).json({ error: 'Deze spoedbon is al klaar.' });
+    o.status = 'geweigerd';
+    save();
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+    logActivity(req.supplier.code, req.actor, 'trok spoedbon ' + o.ref + ' in');
+    return res.json({ ok: true, order: o });
+  }
+  const m = (req.supplier.menu || []).find(x => x.id === req.body.itemId);
+  if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
+  const qty = Math.min(10, Math.max(1, parseInt(req.body.qty, 10) || 1));
+  const o = {
+    ref: 'SP' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    supplierCode: req.supplier.code,
+    customerTier: null, customerKey: null,
+    customerCodename: 'naloop · ' + req.actor.name,
+    items: [{ id: m.id, name: m.name, qty, price: 0 }],
+    total: 0, paid: true, pickup: pickupCode(),
+    table: String(req.body.table || '').slice(0, 24) || null,
+    status: 'nieuw', at: new Date().toISOString(),
+    spoed: { at: new Date().toISOString(), door: req.actor.name }, intern: true
+  };
+  db.data.orders.push(o);
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, (o.spoed ? 'vroeg spoed op ' : 'trok de spoed in van ') + o.ref);
+  logActivity(req.supplier.code, req.actor, 'zette een spoedbon op de lijn: ' + qty + 'x ' + m.name + (o.table ? ' (' + o.table + ')' : ''));
   res.json({ ok: true, order: o });
 });
 
@@ -2026,7 +2049,7 @@ app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
   if (!keukenWasKlaar && (o.stations || {}).keuken === 'klaar')
     sseToSupplier(req.supplier.code, 'pas', { ref: o.ref, pickup: o.pickup, table: o.table || null });
   sseToOffice('sync', { scope: 'orders' });
-  if (o.status === 'klaar' && !wasKlaar)
+  if (o.status === 'klaar' && !wasKlaar && o.customerTier)
     notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
   logActivity(req.supplier.code, req.actor, sectie + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
   res.json({ ok: true, order: o });
@@ -2052,7 +2075,7 @@ app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
   if (!keukenWasKlaar && o.stations.keuken === 'klaar')
     sseToSupplier(req.supplier.code, 'pas', { ref: o.ref, pickup: o.pickup, table: o.table || null });
   sseToOffice('sync', { scope: 'orders' });
-  if (o.status === 'klaar' && !wasKlaar)
+  if (o.status === 'klaar' && !wasKlaar && o.customerTier)
     notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
   logActivity(req.supplier.code, req.actor, (station === 'bar' ? 'bar' : 'keuken') + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
   res.json({ ok: true, order: o });
@@ -2068,7 +2091,7 @@ app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
   save();
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
-  notify(o.customerTier, { icon: '🍽️', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
+  if (o.customerTier) notify(o.customerTier, { icon: '🍽️', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
   logActivity(req.supplier.code, req.actor, 'zette ' + o.ref + ' op "' + status + '"');
   res.json({ ok: true, order: o });
 });

@@ -121,7 +121,7 @@
     laadZaken().then(renderAll);
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderTeam(); }
   async function refresh(){ try { state = (await API.call('/supplier/state')).state; await laadZaken(); renderAll(); } catch(e){} }
 
   // eigen personeelszaken: kloktijden, verlofaanvragen en de vertrouwenslijn
@@ -247,11 +247,154 @@
       if (t.kind==='hk') act = '<button class="abtn" data-hk="'+t.id+'">'+T('pd.clean','Schoon')+'</button>';
       return '<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(t.b)+'</b><span>'+esc(t.s)+'</span></div>'+act+'</div>';
     }).join('') : '<div style="font-size:0.84rem;color:var(--green);padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
-    document.querySelectorAll('[data-tk]').forEach(b => b.addEventListener('click', async () => {
+    const tw = $('#takenWrap');
+    // melden hoort bij iedereen: een klus doorgeven en gevonden voorwerpen registreren
+    const kamers = (state && state.rooms || []).map(r => r.name);
+    const kamerSel = id => '<select class="hin" id="'+id+'" style="flex:1;"><option value="">'+T('hk.geenk','geen kamer')+'</option>'+kamers.map(k=>'<option>'+esc(k)+'</option>').join('')+'</select>';
+    tw.innerHTML += '<div class="card"><div class="k">🔧 '+T('hk.klus.meld','Meld klus')+'</div>'+
+      '<div class="row"><input class="hin" id="klusTekst" placeholder="'+T('hk.klus.ph','Omschrijf de klus...')+'" style="flex:2;">'+kamerSel('klusKamer')+'</div>'+
+      '<button class="abtn" id="klusMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.klus.meld','Meld klus')+'</button></div>';
+    const lf = (state && state.lostfound || []).slice(0, 6);
+    tw.innerHTML += '<div class="card"><div class="k">🧳 '+T('hk.lf','Gevonden voorwerp')+'</div>'+
+      '<div class="row"><input class="hin" id="lfItem" placeholder="'+T('hk.lf.item','Wat heb je gevonden?')+'" style="flex:2;">'+kamerSel('lfKamer')+'</div>'+
+      '<div class="row"><input class="hin" id="lfPlek" placeholder="'+T('hk.lf.plek','Bewaarplek')+'"></div>'+
+      '<button class="abtn" id="lfMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.lf.meld','Registreer')+'</button>'+
+      (lf.length ? '<div class="k" style="margin-top:0.8rem;">'+T('hk.lf.recent','Laatst geregistreerd')+'</div>'+
+        lf.map(x => '<div class="task"><div class="t"><b>'+esc(x.item)+'</b><span>'+(x.room?esc(x.room)+' · ':'')+(x.storage?esc(x.storage)+' · ':'')+timeAgo(x.at)+'</span></div></div>').join('') : '')+'</div>';
+    tw.querySelectorAll('[data-tk]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/ticket/status', { id:b.dataset.tk, status:b.dataset.st }); toast(b.dataset.st==='klaar'?T('pd.tickdone','Klus afgerond.'):T('pd.tickbusy','Opgepakt.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
     }));
-    document.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
+    tw.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/room/hk', { id:b.dataset.hk, status:'schoon' }); toast(T('pd.cleaned','Kamer staat op schoon.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    }));
+    const km = $('#klusMeld'); if (km) km.addEventListener('click', async () => {
+      const text = $('#klusTekst').value.trim(); if (!text) return;
+      try { await API.call('/supplier/ticket/add', { text, room: $('#klusKamer').value }); toast('🔧 '+T('hk.klusok','Klus gemeld.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    });
+    const lm = $('#lfMeld'); if (lm) lm.addEventListener('click', async () => {
+      const item = $('#lfItem').value.trim(); if (!item) return;
+      try { await API.call('/supplier/lost/add', { item, room: $('#lfKamer').value, storage: $('#lfPlek').value }); toast('🧳 '+T('hk.lfok','Geregistreerd.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    });
+  }
+
+  /* ---------- Kamers: het volledige housekeeping-bord in de PDA ----------
+     Alle PDA's leven in deze ene app. Voor zaken met kamers (hotel,
+     appartementen) is dit het kamerbord met een tik per stap, vroege
+     check-in vrijgeven en de minibar. Voor zaken zonder kamers
+     (schoonmaakbedrijven, zzp'ers) werkt dezelfde tab op opdrachten. */
+  const HK_ORDE = { defect: 0, vuil: 1, bezig: 2, schoon: 3, bezet: 4 };
+  const hkVan = r => (r.hk && r.hk.status) || (r.available ? 'schoon' : 'bezet');
+  const heeftKamers = () => !!(state && (state.rooms || []).length);
+  const heeftOpdrachten = () => !!(state && !(state.rooms || []).length && (state.boekingen || []).length);
+  let mbOpen = null;          // kamer waarvan de minibar-teller openstaat
+  let mbTel = {};             // minibar-aantallen van die kamer
+  function renderKamers(){
+    const tabBtn = $('#tabKamers');
+    const aan = heeftKamers() || heeftOpdrachten();
+    if (tabBtn){
+      tabBtn.style.display = aan ? '' : 'none';
+      const lbl = tabBtn.querySelector('span');
+      if (lbl) lbl.textContent = heeftKamers() ? T('pd.t.kamers','Kamers') : T('pd.t.opdr','Opdrachten');
+    }
+    const kop = document.querySelector('.view[data-view="kamers"] h2');
+    if (kop) kop.textContent = heeftKamers() ? T('pd.v.kamers','Kamers') : T('pd.t.opdr','Opdrachten');
+    const wrap = $('#kamersWrap'); if (!wrap || !state) return;
+    if (!aan){ wrap.innerHTML = ''; return; }
+    // zonder kamers (schoonmaakbedrijf, zzp) werkt de tab op opdrachten
+    if (!heeftKamers()) return renderOpdrachten(wrap);
+    const rooms = (state.rooms || []).slice().sort((a,b) => (HK_ORDE[hkVan(a)] ?? 9) - (HK_ORDE[hkVan(b)] ?? 9));
+    let html = '';
+    // de AI kijkt vooruit: gasten onderweg (GPS) bepalen de prioriteit
+    const onderweg = (state.guests || []).filter(g => g.heading && !g.arrived && Number.isFinite(g.etaMin));
+    const vuil = rooms.filter(r => hkVan(r) === 'vuil').length;
+    if (onderweg.length && vuil)
+      html += '<div class="card" style="border-left:4px solid var(--amber);"><div class="k">🧭 '+T('hk.prio','Prioriteit')+'</div>'+
+        '<div style="margin-top:0.35rem;font-size:0.86rem;">'+onderweg.length+' '+T('hk.gast','gast(en) onderweg, eerste over ~')+Math.min.apply(null, onderweg.map(g=>g.etaMin))+' min · '+vuil+' '+T('hk.vuilcnt','kamer(s) vuil')+'. '+T('hk.gast2','Zorg dat er een schone kamer klaarstaat.')+'</div></div>';
+    // de teller van de vloer
+    const n = s2 => rooms.filter(r => hkVan(r) === s2).length;
+    html += '<div class="card stat"><div><b style="color:#FF8589;">'+n('vuil')+'</b><span>'+T('hk.vuil','Vuil')+'</span></div>'+
+      '<div><b style="color:#E2B93B;">'+n('bezig')+'</b><span>'+T('hk.bezig','Bezig')+'</span></div>'+
+      '<div><b style="color:#7BC79B;">'+n('schoon')+'</b><span>'+T('hk.schoon','Schoon')+'</span></div>'+
+      '<div><b>'+rooms.filter(r=>r.vroegVrij).length+'</b><span>'+T('hk.vrij','Vrijgegeven')+'</span></div></div>';
+    html += rooms.map(r => {
+      const s2 = hkVan(r);
+      const chip = s2==='schoon' ? '<span class="hkchip groen">'+T('hk.schoon','Schoon')+'</span>'
+        : s2==='vuil' ? '<span class="hkchip rood">'+T('hk.vuil','Vuil')+'</span>'
+        : s2==='bezig' ? '<span class="hkchip amber">'+T('hk.bezig','Bezig')+'</span>'
+        : s2==='defect' ? '<span class="hkchip rood">⚠ '+T('hk.defect','Defect')+'</span>'
+        : '<span class="hkchip">'+T('hk.bezet','Bezet')+'</span>';
+      let acts = '';
+      if (s2 === 'vuil') acts = '<button class="abtn" data-khk="'+r.id+'" data-st="bezig">▶ '+T('hk.start','Start')+'</button>';
+      else if (s2 === 'bezig' || s2 === 'defect') acts = '<button class="abtn" data-khk="'+r.id+'" data-st="schoon">✓ '+T('hk.klaar','Schoon')+'</button>';
+      else if (s2 === 'schoon') acts = r.vroegVrij
+        ? '<button class="abtn ghost" data-vrij="'+r.id+'" data-op="uit">'+T('hk.vrijaf','Vrijgave intrekken')+'</button>'
+        : '<button class="abtn" data-vrij="'+r.id+'" data-op="aan">🛎 '+T('hk.geefvrij','Geef vrij voor vroege check-in')+'</button>';
+      return '<div class="card kamer '+s2+'">'+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;"><b style="font-size:0.98rem;">'+esc(r.name)+'</b>'+chip+'</div>'+
+        (r.hk && r.hk.at ? '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+timeAgo(r.hk.at)+(r.hk.by?' · '+esc(r.hk.by):'')+(r.hk.note?' · '+esc(r.hk.note):'')+'</div>' : '')+
+        (r.vroegVrij ? '<div style="font-size:0.74rem;color:#7BC79B;margin-top:0.3rem;">🛎 '+T('hk.vrijchip','vrij voor vroege check-in')+'</div>' : '')+
+        '<div class="row" style="flex-wrap:wrap;">'+acts+
+          (s2 !== 'vuil' && s2 !== 'defect' ? '<button class="abtn ghost" data-khk="'+r.id+'" data-st="vuil">'+T('hk.checkout','Check-out (vuil)')+'</button>' : '')+
+          (s2 !== 'defect' ? '<button class="abtn warn" data-defect="'+r.id+'">⚠ '+T('hk.defectmeld','Defect')+'</button>' : '')+
+          '<button class="abtn ghost" data-mb="'+r.id+'">🧃 '+T('hk.minibar','Minibar')+'</button></div>'+
+        (mbOpen === r.id ? minibarBlok(r) : '')+
+      '</div>';
+    }).join('');
+    wrap.innerHTML = html;
+    bindKamers(wrap);
+  }
+  /* opdrachten: de flow voor schoonmaakbedrijven en zzp'ers. Geen kamerbord
+     maar de eigen boekingen: bevestigen, op locatie werken en afronden. */
+  function renderOpdrachten(wrap){
+    const bs = state.boekingen || [];
+    const open = bs.filter(b => b.status === 'aangevraagd');
+    const komend = bs.filter(b => b.status === 'bevestigd');
+    const kaart = (b, acties) => '<div class="card kamer '+(b.status==='bevestigd'?'bezig':'vuil')+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;"><b style="font-size:0.98rem;">'+esc(b.service && b.service.name || 'Opdracht')+'</b>'+
+      '<span class="hkchip'+(b.status==='bevestigd'?' amber':' rood')+'">'+(b.status==='bevestigd'?T('hk.o.bevestigd','Ingepland'):T('hk.o.nieuw','Nieuw'))+'</span></div>'+
+      '<div style="font-size:0.78rem;color:var(--soft);margin-top:0.25rem;">'+esc(b.customerCodename||'')+(b.wanneer?' · '+esc(b.wanneer):'')+(b.price?' · '+eur(b.price):'')+'</div>'+
+      (b.note?'<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">📝 '+esc(b.note)+'</div>':'')+
+      '<div class="row" style="flex-wrap:wrap;">'+acties+'</div></div>';
+    let html = '<div class="card stat"><div><b style="color:#FF8589;">'+open.length+'</b><span>'+T('hk.o.nieuw','Nieuw')+'</span></div>'+
+      '<div><b style="color:#E2B93B;">'+komend.length+'</b><span>'+T('hk.o.bevestigd','Ingepland')+'</span></div></div>';
+    html += open.map(b => kaart(b, '<button class="abtn" data-bk="'+b.ref+'" data-st="bevestigd">✓ '+T('hk.o.bevestig','Bevestig')+'</button><button class="abtn warn" data-bk="'+b.ref+'" data-st="geweigerd">'+T('hk.o.weiger','Weiger')+'</button>')).join('');
+    html += komend.map(b => kaart(b, '<button class="abtn" data-bk="'+b.ref+'" data-st="afgerond">✓ '+T('hk.o.klaar','Rond af')+'</button>')).join('');
+    if (!open.length && !komend.length) html += '<div class="card">'+T('hk.o.leeg','Geen open opdrachten. Nieuwe boekingen verschijnen hier vanzelf.')+'</div>';
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-bk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.bk, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+  }
+  function minibarBlok(r){
+    const mb = (state.minibar && state.minibar.catalog) || [];
+    return '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.5rem;">'+
+      mb.map(x => '<div class="mbrow"><span style="font-size:0.86rem;">'+esc(x.name)+' <span style="color:var(--soft);font-size:0.74rem;">'+eur(x.price)+'</span></span>'+
+        '<span class="q"><button data-mbmin="'+x.id+'" aria-label="minder">−</button><b>'+(mbTel[x.id]||0)+'</b><button data-mbplus="'+x.id+'" aria-label="meer">+</button></span></div>').join('')+
+      '<button class="abtn" data-mbboek="'+esc(r.name)+'" style="width:100%;margin-top:0.4rem;">'+T('hk.boek','Boek op de kamer')+'</button></div>';
+  }
+  function bindKamers(wrap){
+    wrap.querySelectorAll('[data-khk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/room/hk', { id: b.dataset.khk, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-vrij]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/room/vrij', { id: b.dataset.vrij, op: b.dataset.op === 'aan' }); toast(b.dataset.op==='aan' ? '🛎 '+T('hk.vrijtoast','Vrijgegeven; de receptie ziet het direct.') : T('hk.vrijaf','Vrijgave intrekken')); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-defect]').forEach(b => b.addEventListener('click', async () => {
+      const note = prompt(T('hk.defectq','Wat is er kapot?'), '');
+      if (note === null) return;
+      try { await API.call('/supplier/room/hk', { id: b.dataset.defect, status: 'defect', note }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-mb]').forEach(b => b.addEventListener('click', () => {
+      mbOpen = mbOpen === b.dataset.mb ? null : b.dataset.mb;
+      mbTel = {};
+      renderKamers();
+    }));
+    wrap.querySelectorAll('[data-mbplus]').forEach(b => b.addEventListener('click', () => { mbTel[b.dataset.mbplus] = (mbTel[b.dataset.mbplus]||0)+1; renderKamers(); }));
+    wrap.querySelectorAll('[data-mbmin]').forEach(b => b.addEventListener('click', () => { mbTel[b.dataset.mbmin] = Math.max(0,(mbTel[b.dataset.mbmin]||0)-1); renderKamers(); }));
+    wrap.querySelectorAll('[data-mbboek]').forEach(b => b.addEventListener('click', async () => {
+      const items = Object.entries(mbTel).filter(([,q]) => q > 0).map(([id, qty]) => ({ id, qty }));
+      if (!items.length) return;
+      try { await API.call('/supplier/minibar/count', { room: b.dataset.mbboek, items }); mbOpen = null; mbTel = {}; toast('🧃 '+T('hk.geboekt','Geboekt op de kamer.')); await refresh(); } catch(e){ toast(e.message); }
     }));
   }
 

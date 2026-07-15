@@ -76,6 +76,27 @@
   .pill.a{color:var(--amber);border-color:rgba(201,154,46,0.4);}
   .pill.b{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
 
+  /* kamerbord (housekeeping in de PDA): status als kleurband, grote tikdoelen */
+  .abtn.warn{background:none;border:1px solid rgba(229,72,77,0.5);color:#FF8589;}
+  .hin{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;font-size:0.9rem;color:var(--txt);outline:none;}
+  .row{display:flex;gap:0.5rem;margin-top:0.5rem;}
+  .kamer{border-left:4px solid var(--line);}
+  .kamer.vuil{border-left-color:#E5484D;}
+  .kamer.bezig{border-left-color:var(--amber);}
+  .kamer.schoon{border-left-color:var(--green);}
+  .kamer.defect{border-left-color:#E5484D;background:rgba(229,72,77,0.06);}
+  .kamer.bezet{border-left-color:var(--line);opacity:0.75;}
+  .hkchip{display:inline-flex;align-items:center;gap:0.3rem;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;font-size:0.64rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+  .hkchip.groen{color:#7BC79B;border-color:rgba(76,154,117,0.5);}
+  .hkchip.rood{color:#FF8589;border-color:rgba(229,72,77,0.5);}
+  .hkchip.amber{color:#E2B93B;border-color:rgba(201,154,46,0.5);}
+  .stat{display:flex;gap:1.1rem;align-items:center;}
+  .stat b{font-family:'Bodoni Moda',serif;font-size:1.35rem;font-variant-numeric:tabular-nums;}
+  .stat span{display:block;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);}
+  .mbrow{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;padding:0.4rem 0;}
+  .mbrow .q{display:flex;align-items:center;gap:0.6rem;}
+  .mbrow .q button{width:2rem;height:2rem;border-radius:50%;background:var(--card2);border:1px solid var(--line);font-size:1rem;}
+
   .rooster-day{margin-top:0.9rem;}
   .rooster-day .dh{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;}
   .rrow{display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;border-radius:10px;font-size:0.84rem;}
@@ -166,6 +187,11 @@
         <p class="sub" data-i18n="pd.v.keuken.sub">Uw kant van de lijn, live met het keukenscherm.</p>
         <div id="keukenWrap"></div>
       </div>
+      <div class="view" data-view="kamers">
+        <h2 data-i18n="pd.v.kamers">Kamers</h2>
+        <p class="sub" data-i18n="pd.v.kamers.sub">Het kamerbord of uw opdrachten: een tik per stap, live met de receptie.</p>
+        <div id="kamersWrap"></div>
+      </div>
       <div class="view" data-view="hulp">
         <h2 data-i18n="pd.v.hulp">Hulp &amp; zaken</h2>
         <p class="sub" data-i18n="pd.v.hulp.sub">EHBO, de vertrouwenspersoon van RTG en uw eigen administratie.</p>
@@ -222,6 +248,7 @@
       <button data-tab="rooster"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span data-i18n="pd.t.rooster">Rooster</span></button>
       <button data-tab="taken"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span data-i18n="pd.t.taken">Taken</span></button>
       <button data-tab="keuken" id="tabKeuken" style="display:none;"><svg viewBox="0 0 24 24"><path d="M12 3c-2 2.5-5 3.6-5 7a5 5 0 0 0 10 0c0-3.4-3-4.5-5-7z"/><path d="M4 21h16"/></svg><span data-i18n="pd.t.keuken">Keuken</span></button>
+      <button data-tab="kamers" id="tabKamers" style="display:none;"><svg viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18M6 10V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/></svg><span data-i18n="pd.t.kamers">Kamers</span></button>
       <button data-tab="hulp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span data-i18n="pd.t.hulp">Hulp</span></button>
       <button data-tab="ritten" id="tabRitten" style="display:none;"><svg viewBox="0 0 24 24"><path d="M5 16l1.6-5.4A2 2 0 0 1 8.5 9h7a2 2 0 0 1 1.9 1.6L19 16"/><rect x="4" y="16" width="16" height="4" rx="1.5"/><path d="M7.5 20v1M16.5 20v1"/></svg><span data-i18n="pd.t.ritten">Ritten</span></button>
       <button data-tab="entree" id="tabEntree" style="display:none;"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H6a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M12 6v2M12 11v2M12 16v2"/></svg><span data-i18n="pd.t.entree">Entree</span></button>
@@ -274,6 +301,21 @@ window.I18N = { en: {
   'over.h':'Left on the pass', 'over.gebruikt':'Used', 'over.eerst':'use what is there first',
   'pd.ingeklokt':'clocked in',
   'pd.v.hulp':'Help & affairs', 'pd.v.hulp.sub':'First aid, the RTG confidential advisor and your own admin.',
+  // --- Kamers / opdrachten (housekeeping in de PDA) ---
+  'pd.v.kamers':'Rooms', 'pd.v.kamers.sub':'The room board or your assignments: one tap per step, live with the front desk.',
+  'pd.t.kamers':'Rooms', 'pd.t.opdr':'Jobs',
+  'hk.gast':'guest(s) on the way, first in ~', 'hk.gast2':'Make sure a clean room is ready.',
+  'hk.vuil':'Dirty', 'hk.bezig':'Cleaning', 'hk.schoon':'Clean', 'hk.vrij':'Released', 'hk.defect':'Out of order', 'hk.bezet':'Occupied',
+  'hk.start':'Start', 'hk.klaar':'Clean', 'hk.geefvrij':'Release for early check-in', 'hk.vrijaf':'Withdraw release',
+  'hk.checkout':'Check-out (dirty)', 'hk.defectmeld':'Report defect', 'hk.defectq':'What is broken?',
+  'hk.vrijchip':'free for early check-in', 'hk.prio':'Priority', 'hk.vuilcnt':'room(s) dirty',
+  'hk.vrijtoast':'Released; the front desk sees it instantly.',
+  'hk.minibar':'Minibar', 'hk.boek':'Charge to the room', 'hk.geboekt':'Charged to the room.',
+  'hk.klus.ph':'Describe the job...', 'hk.klus.meld':'Report job', 'hk.klusok':'Job reported.', 'hk.geenk':'no room',
+  'hk.lf':'Found item', 'hk.lf.item':'What did you find?', 'hk.lf.plek':'Storage place', 'hk.lf.meld':'Register',
+  'hk.lf.recent':'Recently registered', 'hk.lfok':'Registered.',
+  'hk.o.nieuw':'New', 'hk.o.bevestigd':'Scheduled', 'hk.o.bevestig':'Confirm', 'hk.o.weiger':'Decline',
+  'hk.o.klaar':'Done', 'hk.o.leeg':'No open jobs. New bookings appear here automatically.',
   'pd.k.vandaag':'Today', 'pd.k.week':'this week', 'pd.k.in':'Clock in', 'pd.k.uit':'Clock out',
   'pd.k.ingeklokt':'Clocked in. Have a good shift!', 'pd.k.uitgeklokt':'Clocked out. See you next shift.',
   'pd.eh.h':'First aid, right at hand', 'pd.eh.112':'Call 112', 'pd.eh.alarm':'First-aid team alert',

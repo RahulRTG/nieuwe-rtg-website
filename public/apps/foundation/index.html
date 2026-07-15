@@ -133,7 +133,7 @@
       <div class="ic">📚</div><h2>Leren</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" id="tileDromen" href="dromen.html">
+    <a class="kaart tile" id="tileDromen" href="dromen.html" data-grp="kind tiener jong volw">
       <div class="ic">⭐</div><h2>Onze dromen</h2>
       <span class="cta">→</span>
     </a>
@@ -145,7 +145,7 @@
       <div class="ic">📍</div><h2>Veilig thuis</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="school.html">
+    <a class="kaart tile" href="school.html" data-grp="kind tiener jong volw">
       <div class="ic">🏫</div><h2>School</h2>
       <span class="cta">→</span>
     </a>
@@ -157,19 +157,19 @@
       <div class="ic">💬</div><h2>Contact</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="vrienden.html">
+    <a class="kaart tile" href="vrienden.html" data-grp="kind tiener jong volw">
       <div class="ic">👋</div><h2>Contacten</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="markt.html">
+    <a class="kaart tile" href="markt.html" data-grp="jong volw">
       <div class="ic">🏷️</div><h2>De Salon</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="oppasinfo.html">
+    <a class="kaart tile" href="oppasinfo.html" data-grp="jong volw">
       <div class="ic">📋</div><h2>Belangrijke info</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" id="tileWerk" href="werk.html" hidden>
+    <a class="kaart tile" id="tileWerk" href="werk.html" hidden data-grp="jong volw">
       <div class="ic">💼</div><h2>Werk en vacatures</h2>
       <span class="cta">→</span>
     </a>
@@ -292,6 +292,26 @@ const AVATARS = ['🙂','😀','🦊','🐼','🐵','🦁','🐯','🐧','🦉',
 const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
 let mAv = '👑', mKl = KLEUREN[0], pinProfiel = null;
 
+/* Per leeftijdsgroep een eigen app: mini.html t/m volw.html zijn eigen
+   PWA-ingangen (eigen naam, icoon en manifest) die hier binnenkomen met de
+   groep onthouden. De hub zet dan de passende bril op: alleen de tegels van
+   die leeftijd, en de profielkiezer licht de passende profielen uit. Het
+   gezin en de inlog blijven een geheel. */
+const GROEP_APPS = {
+  mini:   { naam: 'RTF Mini',      emoji: '🧸', sub: '0 t/m 4 jaar, samen met papa of mama' },
+  kind:   { naam: 'RTF Kids',      emoji: '🎒', sub: '5 t/m 11 jaar' },
+  tiener: { naam: 'RTF Tiener',    emoji: '🛹', sub: '12 t/m 15 jaar' },
+  jong:   { naam: 'RTF Jong',      emoji: '🚀', sub: '16 t/m 21+ jaar' },
+  volw:   { naam: 'RTF Volwassen', emoji: '🧑', sub: 'voor ouders en verzorgers' }
+};
+function appGroep(){ try { const g = localStorage.getItem('rtf_app_groep'); return GROEP_APPS[g] ? g : null; } catch(e){ return null; } }
+(function(){
+  const ag = appGroep();
+  if (!ag) return;
+  document.title = GROEP_APPS[ag].naam;
+  document.querySelectorAll('.kick').forEach(k => { k.textContent = GROEP_APPS[ag].emoji + ' ' + GROEP_APPS[ag].naam; });
+})();
+
 function toon(id){ ['vWelkom','vProfielen','vHub'].forEach(v => $('#'+v).hidden = (v!==id)); }
 function toonRol(profiel){
   const rol = profiel.rol;
@@ -299,7 +319,12 @@ function toonRol(profiel){
   const gast = rol === 'gast';
   $('#secOuder').hidden = kind || gast;
   $('#secKind').hidden = !kind;
-  $('#tileDromen').style.display = gast ? 'none' : ''; // dromen blijven binnen het gezin
+  // de leeftijdsbril: de groep van het profiel wint, anders die van de app-ingang
+  const groep = profiel.groep || appGroep();
+  document.querySelectorAll('.tile[data-grp]').forEach(t => {
+    t.style.display = (!groep || t.dataset.grp.split(' ').includes(groep)) ? '' : 'none';
+  });
+  $('#tileDromen').style.display = gast || (groep && !$('#tileDromen').dataset.grp.split(' ').includes(groep)) ? 'none' : ''; // dromen blijven binnen het gezin
   // werk en vacatures: vanaf 16 jaar (leeftijdsgroep jong/volw), niet voor gasten
   $('#tileWerk').hidden = gast || !profiel.magSolliciteren;
   if (profiel.groepNaam && !gast){
@@ -388,9 +413,13 @@ async function profielen(code){
     Sessie.zet(Object.assign(Sessie.huidig()||{}, { code, gezin: d.gezin }));
     $('#pGezinNaam').textContent = d.gezin.naam;
     const grid = $('#pGrid'); grid.innerHTML='';
-    d.profielen.forEach(p=>{
+    // in een leeftijd-app staan de passende profielen vooraan, met een accent
+    const ag = appGroep();
+    const lijst = ag ? d.profielen.slice().sort((a,b)=>((b.groep===ag)-(a.groep===ag))) : d.profielen;
+    lijst.forEach(p=>{
+      const past = ag && p.groep === ag;
       const a = document.createElement('button'); a.className='prof';
-      a.innerHTML = '<span class="av" style="background:'+p.kleur+'">'+p.avatar+(p.heeftPin?'<span class="slot-pin">🔒</span>':'')+'</span><span class="nm">'+esc(p.naam)+'</span><span class="slot">'+rolTekst(p)+'</span>';
+      a.innerHTML = '<span class="av" style="background:'+p.kleur+(past?';border-color:var(--goud)':'')+'">'+p.avatar+(p.heeftPin?'<span class="slot-pin">🔒</span>':'')+'</span><span class="nm">'+esc(p.naam)+'</span><span class="slot">'+rolTekst(p)+(past?' · '+GROEP_APPS[ag].emoji:'')+'</span>';
       a.onclick = ()=> kies(code, p);
       grid.appendChild(a);
     });

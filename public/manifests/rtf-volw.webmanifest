@@ -1,0 +1,38 @@
+{
+  "name": "RTF Volwassen, de RTFoundation voor jouw leeftijd",
+  "short_name": "RTF Volwassen",
+  "id": "/apps/foundation/volw",
+  "description": "De RTFoundation-app voor voor ouders en verzorgers. Altijd gratis.",
+  "lang": "nl",
+  "start_url": "/apps/foundation/volw.html",
+  "scope": "/apps/foundation/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/foundation-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/foundation-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/foundation-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/rtf-volw.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

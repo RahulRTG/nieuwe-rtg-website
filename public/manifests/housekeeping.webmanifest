@@ -4,7 +4,7 @@
   "id": "/apps/housekeeping",
   "description": "RTG Housekeeping, kamers en klussen",
   "lang": "nl",
-  "start_url": "/apps/housekeeping.html",
+  "start_url": "/apps/personeel.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0C0C0B",

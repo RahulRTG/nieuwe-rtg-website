@@ -26,8 +26,9 @@ const ALT_IDEE = {
 // gedeelde keukencoach-cache: code -> { hash, lines, at }
 const coachCache = new Map();
 
-// nominale bereidingstijd per keukenkant in minuten; prepMin op het gerecht wint
-const SECTIE_MIN = { warm: 12, koud: 6, snack: 8, dessert: 5 };
+// nominale bereidingstijd per kant in minuten; prepMin op het gerecht wint.
+// De bar telt als eigen kant mee, zodat drankjes en eten samen uitgaan.
+const SECTIE_MIN = { warm: 12, koud: 6, snack: 8, dessert: 5, bar: 4 };
 
 function maakEvents({ crypto, sectiesForOrder }) {
   function runItem(time, station, text, daysBefore, mep) {
@@ -118,19 +119,28 @@ function maakEvents({ crypto, sectiesForOrder }) {
   function vuurplan(s, o) {
     const nodig = sectiesForOrder(s, o);
     const fase = o.secties || {};
+    const faseVan = k => k === 'bar' ? (o.stations || {}).bar : fase[k];
     const rest = {};
     for (const sec of nodig) {
       const t = sectieTijd(s, o, sec);
       rest[sec] = fase[sec] === 'klaar' ? 0 : fase[sec] === 'bezig' ? Math.ceil(t / 2) : t;
     }
-    const doel = nodig.length ? Math.max(...Object.values(rest)) : 0;
+    // de bar telt als eigen kant mee: drankjes gaan met de rest van de bon samen uit
+    const barNodig = (o.items || []).some(it => { const m = (s.menu || []).find(x => x.id === it.id); return m && m.station === 'bar'; });
+    if (barNodig) {
+      const bf = (o.stations || {}).bar;
+      rest.bar = bf === 'klaar' ? 0 : bf === 'bezig' ? Math.ceil(SECTIE_MIN.bar / 2) : SECTIE_MIN.bar;
+    }
+    const alle = Object.keys(rest);
+    const doel = alle.length ? Math.max(...alle.map(k => rest[k])) : 0;
     const plan = {};
-    for (const sec of nodig) {
-      if (fase[sec] === 'klaar') plan[sec] = doel > 0 ? { doe: 'warm', min: doel } : { doe: 'pas', min: 0 };
-      else if (fase[sec] === 'bezig') plan[sec] = { doe: 'bezig', min: rest[sec] };
+    for (const k of alle) {
+      const f = faseVan(k);
+      if (f === 'klaar') plan[k] = doel > 0 ? { doe: 'warm', min: doel } : { doe: 'pas', min: 0 };
+      else if (f === 'bezig') plan[k] = { doe: 'bezig', min: rest[k] };
       else {
-        const wacht = doel - rest[sec];
-        plan[sec] = wacht >= 2 ? { doe: 'wacht', min: wacht } : { doe: 'nu', min: 0 };
+        const wacht = doel - rest[k];
+        plan[k] = wacht >= 2 ? { doe: 'wacht', min: wacht } : { doe: 'nu', min: 0 };
       }
     }
     return { doel, plan };

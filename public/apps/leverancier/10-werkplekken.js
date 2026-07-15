@@ -46,14 +46,25 @@
   function vuurplan(o){
     const nodig = sectiesVanOrder(o);
     const fase = o.secties || {};
+    const faseVan = k => k === 'bar' ? (o.stations||{}).bar : fase[k];
     const rest = {};
     nodig.forEach(sec => { const t = sectieDuur(o, sec); rest[sec] = fase[sec]==='klaar' ? 0 : fase[sec]==='bezig' ? Math.ceil(t/2) : t; });
-    const doel = nodig.length ? Math.max.apply(null, nodig.map(s2 => rest[s2])) : 0;
+    // de bar telt als eigen kant mee: drankjes gaan met de rest van de bon samen uit
+    if ((o.items||[]).some(it => stationOf(it) === 'bar')){
+      const bf = (o.stations||{}).bar;
+      rest.bar = bf === 'klaar' ? 0 : bf === 'bezig' ? 2 : 4;
+    }
+    const alle = Object.keys(rest);
+    let doel = alle.length ? Math.max.apply(null, alle.map(k => rest[k])) : 0;
+    // de deurhost-koppeling: deelt de gast zijn reis (GPS), dan mikt het
+    // vuurplan op de aankomst, zodat alles warm klaarstaat als de gast zit
+    if (!o.guestArrived && Number.isFinite(o.guestEtaMin) && o.guestEtaMin > doel) doel = o.guestEtaMin;
     const plan = {};
-    nodig.forEach(sec => {
-      if (fase[sec]==='klaar') plan[sec] = doel > 0 ? { doe:'warm', min:doel } : { doe:'pas', min:0 };
-      else if (fase[sec]==='bezig') plan[sec] = { doe:'bezig', min:rest[sec] };
-      else { const w = doel - rest[sec]; plan[sec] = w >= 2 ? { doe:'wacht', min:w } : { doe:'nu', min:0 }; }
+    alle.forEach(k => {
+      const f = faseVan(k);
+      if (f==='klaar') plan[k] = doel > 0 ? { doe:'warm', min:doel } : { doe:'pas', min:0 };
+      else if (f==='bezig') plan[k] = { doe:'bezig', min:rest[k] };
+      else { const w = doel - rest[k]; plan[k] = w >= 2 ? { doe:'wacht', min:w } : { doe:'nu', min:0 }; }
     });
     return { doel, plan };
   }
@@ -61,10 +72,19 @@
   function ageKlasse(a){ return a >= 18 ? ' late flash' : a >= 12 ? ' late' : a >= 6 ? ' warn' : ' ok'; }
   function vpChip(sec, p){
     if (!p) return '';
+    const kant = KSECTIES[sec] || (sec === 'bar' ? ['🍸','Bar'] : ['·', sec]);
     const lbl = { nu: T('vp.nu','start nu'), wacht: T('vp.wacht','wacht'), bezig: T('vp.bezig','bezig'), warm: T('vp.warm','houd warm'), pas: T('vp.pas','naar de pas') }[p.doe] || '';
     const min = (p.doe==='wacht'||p.doe==='bezig'||p.doe==='warm') && p.min ? ' ~'+p.min+'m' : '';
-    return '<span class="vp '+p.doe+'">'+KSECTIES[sec][0]+' '+T('ks.'+sec, KSECTIES[sec][1])+' · '+lbl+min+'</span>';
+    return '<span class="vp '+p.doe+'">'+kant[0]+' '+T('ks.'+sec, kant[1])+' · '+lbl+min+'</span>';
   }
+  // de deurhost-regel op de bon: waar is de gast (GPS uit de leden-app)
+  function gastRegel(o){
+    if (o.guestArrived) return '<div class="tkc-who">✅ '+T('kds.gastin','De gast is binnen.')+'</div>';
+    if (Number.isFinite(o.guestEtaMin)) return '<div class="tkc-who">🧭 '+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
+    return '';
+  }
+  // hoe lang staat het al op de pas: sneller rood dan de bontijd (eten wordt koud)
+  function pasKlasse(a){ return a >= 6 ? ' late flash' : a >= 3 ? ' warn' : ' ok'; }
   // de statusbalk boven de bonnen: open, te laat, oudste
   function stStats(list){
     const ages = list.map(o => ageMin(o.at));
@@ -80,6 +100,12 @@
   function allDay(list, filt){
     const per = {};
     list.forEach(o => (o.items||[]).forEach(it => {
+      if (filt === 'bar'){
+        // de barkant: alle drankjes die nog gemaakt moeten worden
+        if (stationOf(it) !== 'bar' || (o.stations||{}).bar === 'klaar') return;
+        per[it.name] = (per[it.name]||0) + it.qty;
+        return;
+      }
       const sec = sectieOf(it); if (!sec) return;
       if (filt && sec !== filt) return;
       if ((o.secties||{})[sec] === 'klaar') return;
@@ -150,10 +176,12 @@
       '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+it.name+'</span>').join('')+'</div>'+
       (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
       (o.leeftijdOk?'<div class="tkc-alg" style="background:rgba(45,140,80,0.14);color:#2d8c50;">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
-      (st==='keuken'&&!opts.dim&&sectiesVanOrder(o).length?(function(){
+      ((st==='keuken'||st==='bar')&&!opts.dim?(function(){
         const vp = vuurplan(o);
-        return '<div class="st-badges">'+sectiesVanOrder(o).map(s2 => vpChip(s2, vp.plan[s2])).join('')+'</div>';
+        const kanten = Object.keys(vp.plan);
+        return kanten.length ? '<div class="st-badges">'+kanten.map(s2 => vpChip(s2, vp.plan[s2])).join('')+'</div>' : '';
       })():'')+
+      (opts.dim?'':gastRegel(o))+
       (opts.badges?'<div class="st-badges">'+orderStations(o).map(s2=>{
         const p=(o.stations||{})[s2]||'';
         return '<span class="st-badge '+p+'">'+(s2==='bar'?'\uD83C\uDF78':'\uD83D\uDD25')+' '+s2+(p?' \u00b7 '+(p==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
@@ -361,22 +389,31 @@
         if (keukenSectie === 'pas'){
           const keukenOrders = live.filter(o => sectiesVanOrder(o).length);
           const bezig = keukenOrders.filter(o => (o.stations||{}).keuken !== 'klaar').sort(opTijd);
-          const opDePas = keukenOrders.filter(o => (o.stations||{}).keuken === 'klaar').sort(opTijd);
-          const badge = o => '<div class="st-badges">'+sectiesVanOrder(o).map(s2=>{
-            const p2=(o.secties||{})[s2]||'';
-            return '<span class="st-badge '+p2+'">'+KSECTIES[s2][0]+' '+T('ks.'+s2, KSECTIES[s2][1])+(p2?' \u00b7 '+(p2==='klaar'?T('st.b.klaar','klaar'):T('st.b.bezig','bezig')):'')+'</span>';
-          }).join('')+'</div>';
+          const opDePas = keukenOrders.filter(o => (o.stations||{}).keuken === 'klaar')
+            .sort((a,b) => new Date(a.pasAt||a.at) - new Date(b.pasAt||b.at));
+          const badge = o => '<div class="st-badges">'+Object.entries(vuurplan(o).plan).map(([s2,p]) => vpChip(s2, p)).join('')+'</div>';
+          // de tafelklok van de pas: staat alles van een tafel op de pas, dan
+          // kan de hele tafel in een keer uit
+          const tafels = {};
+          opDePas.forEach(o => { if (o.table) (tafels[o.table] = tafels[o.table] || []).push(o); });
+          const compleet = Object.keys(tafels).filter(t => !bezig.some(o => (o.table||'') === t));
+          if (compleet.length)
+            html += '<div class="allday" role="status"><span class="ad-h">\uD83E\uDE91 '+T('pas.compleet','Tafel compleet')+'</span>'+
+              compleet.map(t => '<span class="ad"><b>'+t+'</b>'+tafels[t].map(o=>o.pickup).join(', ')+' \u00b7 '+T('pas.samen','stuur samen uit')+'</span>').join('')+'</div>';
           html += '<div class="st-sec">'+T('ks.pas.klaar','Op de pas, samenstellen en doorgeven')+' ('+opDePas.length+')</div>';
-          html += opDePas.length ? opDePas.map(o =>
-            '<div class="tkc"><div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
+          html += opDePas.length ? opDePas.map(o => {
+            const pa = ageMin(o.pasAt || o.at);
+            return '<div class="tkc'+pasKlasse(pa)+'"><div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+pa+' '+T('pas.op','min op de pas')+'</span></div>'+
             '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+(o.status==='klaar'?T('ks.pas.wacht','wacht op bediening'):T('ks.pas.bar','wacht nog op de bar'))+'</div>'+
             '<div class="tkc-items">'+(o.items||[]).filter(it=>sectieOf(it)).map(it=>'<span><b>'+it.qty+'\u00d7</b>'+KSECTIES[sectieOf(it)][0]+' '+it.name+'</span>').join('')+'</div>'+
-            (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+'</div>'
-          ).join('') : '<div class="st-empty">'+T('ks.pas.leeg','Nog niets op de pas. Zodra alle kanten klaar zijn, komt de bestelling hier binnen.')+'</div>';
+            gastRegel(o)+
+            (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+'</div>';
+          }).join('') : '<div class="st-empty">'+T('ks.pas.leeg','Nog niets op de pas. Zodra alle kanten klaar zijn, komt de bestelling hier binnen.')+'</div>';
           html += '<div class="st-sec">'+T('ks.pas.bezig','In de maak, per kant')+' ('+bezig.length+')</div>';
           html += bezig.map(o =>
             '<div class="tkc"><div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
             badge(o)+
+            gastRegel(o)+
             (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+'</div>'
           ).join('');
           el.innerHTML = html;
@@ -389,6 +426,7 @@
       const done = mine.filter(o => (o.stations||{})[st] === 'klaar');
       if (st === 'keuken' || st === 'bar') html += stStats(act);
       if (st === 'keuken') html += allDay(act);
+      if (st === 'bar') html += allDay(act, 'bar');
       html += act.length ? act.map(o => ticketCard(o, st, {})).join('') : '<div class="st-empty">'+T('st.calm','Rustig. Nieuwe bestellingen verschijnen hier vanzelf, met geluid van de bel in de app.')+'</div>';
       if (done.length){
         html += '<div class="st-sec">'+T('st.done','Klaargemeld, wacht op uitserveren')+'</div>';

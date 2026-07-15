@@ -50,6 +50,22 @@ test('vuurplan: alles klaar mag naar de pas', () => {
   assert.equal(plan.warm.doe, 'pas');
 });
 
+test('vuurplan: de bar telt mee en wacht op de warme kant', () => {
+  const o = { items: [{ id: 'steak', qty: 1 }, { id: 'gin', qty: 2 }], secties: {}, stations: {} };
+  const { doel, plan } = vuurplan(S, o);
+  assert.equal(doel, SECTIE_MIN.warm);
+  assert.equal(plan.bar.doe, 'wacht');                       // de gin-tonic komt pas vlak voor de steak
+  assert.equal(plan.bar.min, SECTIE_MIN.warm - SECTIE_MIN.bar);
+  assert.equal(plan.warm.doe, 'nu');
+});
+
+test('vuurplan: bar klaar terwijl de keuken nog bezig is betekent koud houden', () => {
+  const o = { items: [{ id: 'steak', qty: 1 }, { id: 'gin', qty: 1 }], secties: { warm: 'bezig' }, stations: { bar: 'klaar' } };
+  const { plan } = vuurplan(S, o);
+  assert.equal(plan.bar.doe, 'warm');                        // advies: houd vast tot de keuken er is
+  assert.equal(plan.warm.doe, 'bezig');
+});
+
 test('sectieTijd: prepMin op het gerecht wint van de nominale tijd', () => {
   const S2 = { menu: [{ id: 'wild', name: 'Wildragout', station: 'keuken', sectie: 'warm', prepMin: 25 }] };
   const o = { items: [{ id: 'wild', qty: 1 }] };

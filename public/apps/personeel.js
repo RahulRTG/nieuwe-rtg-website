@@ -643,16 +643,34 @@
   }
   function pkPlan(o){
     const nodig = pkSecties(o), fase = o.secties || {}, rest = {};
+    const faseVan = k => k === 'bar' ? (o.stations||{}).bar : fase[k];
     nodig.forEach(sec => { const t = pkDuur(o, sec); rest[sec] = fase[sec]==='klaar' ? 0 : fase[sec]==='bezig' ? Math.ceil(t/2) : t; });
-    const doel = nodig.length ? Math.max.apply(null, nodig.map(s2 => rest[s2])) : 0;
+    // de bar telt mee, zodat drankjes en eten samen uitgaan
+    if ((o.items||[]).some(it => { const m = (state.menu||[]).find(x => x.id === it.id); return m && m.station === 'bar'; })){
+      const bf = (o.stations||{}).bar;
+      rest.bar = bf === 'klaar' ? 0 : bf === 'bezig' ? 2 : 4;
+    }
+    const alle = Object.keys(rest);
+    let doel = alle.length ? Math.max.apply(null, alle.map(k => rest[k])) : 0;
+    // deurhost: deelt de gast zijn reis (GPS), dan mikt het plan op de aankomst
+    if (!o.guestArrived && Number.isFinite(o.guestEtaMin) && o.guestEtaMin > doel) doel = o.guestEtaMin;
     const plan = {};
-    nodig.forEach(sec => {
-      if (fase[sec]==='klaar') plan[sec] = doel > 0 ? { doe:'warm', min:doel } : { doe:'pas', min:0 };
-      else if (fase[sec]==='bezig') plan[sec] = { doe:'bezig', min:rest[sec] };
-      else { const w = doel - rest[sec]; plan[sec] = w >= 2 ? { doe:'wacht', min:w } : { doe:'nu', min:0 }; }
+    alle.forEach(k => {
+      const f = faseVan(k);
+      if (f==='klaar') plan[k] = doel > 0 ? { doe:'warm', min:doel } : { doe:'pas', min:0 };
+      else if (f==='bezig') plan[k] = { doe:'bezig', min:rest[k] };
+      else { const w = doel - rest[k]; plan[k] = w >= 2 ? { doe:'wacht', min:w } : { doe:'nu', min:0 }; }
     });
     return { doel, plan };
   }
+  // de deurhost-regel: waar is de gast (GPS uit de leden-app)
+  function pkGast(o){
+    if (o.guestArrived) return '<div style="font-size:0.74rem;color:#7BC79B;margin-bottom:0.4rem;">✅ '+T('kds.gastin','De gast is binnen.')+'</div>';
+    if (Number.isFinite(o.guestEtaMin)) return '<div style="font-size:0.74rem;color:var(--soft);margin-bottom:0.4rem;">🧭 '+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
+    return '';
+  }
+  // pas-meldingen (tril + toast) per toestel aan of uit: de gekozen personen
+  let pdaPasBel = (() => { try { return localStorage.getItem('rtg_pda_pasbel') !== 'uit'; } catch(e){ return true; } })();
   function renderKeuken(){
     const tabBtn = document.getElementById('tabKeuken');
     if (tabBtn) tabBtn.style.display = heeftKeuken() ? '' : 'none';
@@ -660,13 +678,21 @@
     if (!heeftKeuken()){ wrap.innerHTML = ''; return; }
     const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status) && pkSecties(o).length);
     // kant kiezen = inloggen op dat station; de keuze blijft op dit toestel staan
-    let html = '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+Object.keys(PDA_KANTEN).map(k =>
-      '<button class="abtn'+(pdaKant===k?'':' ghost')+'" data-pkkant="'+k+'">'+PDA_KANTEN[k][0]+' '+T('ks.'+k, PDA_KANTEN[k][1])+'</button>').join('')+'</div>';
+    let html = '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+Object.keys(PDA_KANTEN).map(k =>
+      '<button class="abtn'+(pdaKant===k?'':' ghost')+'" data-pkkant="'+k+'">'+PDA_KANTEN[k][0]+' '+T('ks.'+k, PDA_KANTEN[k][1])+'</button>').join('')+
+      '<button class="abtn'+(pdaPasBel?'':' ghost')+'" data-pkbel style="margin-left:auto;">'+(pdaPasBel?'🔔':'🔕')+' '+T('pd.k.pasbel','Pas-bel')+'</button></div>';
     if (pdaKant === 'pas'){
-      const opDePas = live.filter(o => (o.stations||{}).keuken === 'klaar').sort((a,b) => new Date(a.at)-new Date(b.at));
+      const opDePas = live.filter(o => (o.stations||{}).keuken === 'klaar').sort((a,b) => new Date(a.pasAt||a.at)-new Date(b.pasAt||b.at));
       const bezig = live.filter(o => (o.stations||{}).keuken !== 'klaar');
+      // staat alles van een tafel op de pas, dan kan de hele tafel in een keer uit
+      const tafels = {};
+      opDePas.forEach(o => { if (o.table) (tafels[o.table] = tafels[o.table] || []).push(o); });
+      const compleet = Object.keys(tafels).filter(t => !bezig.some(o => (o.table||'') === t));
+      if (compleet.length) html += '<div class="card" style="border-left:4px solid #2E7D5B;"><div class="k">🪑 '+T('pas.compleet','Tafel compleet')+'</div>'+
+        compleet.map(t => '<div style="margin-top:0.35rem;font-size:0.85rem;"><b>'+esc(t)+'</b> · '+tafels[t].map(o=>o.pickup).join(', ')+' · '+T('pas.samen','stuur samen uit')+'</div>').join('')+'</div>';
       html += '<div class="card"><div class="k">'+T('ks.pas.klaar','Op de pas, samenstellen en doorgeven')+' ('+opDePas.length+')</div>'+
-        (opDePas.length ? opDePas.map(o => '<div class="task"><span class="ic">🛎️</span><div class="t"><b>'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span>'+(o.items||[]).filter(it=>pkSectieOf(it)).map(it=>it.qty+'× '+esc(it.name)).join(', ')+'</span></div><span style="font-size:0.72rem;color:var(--soft);">'+pkAge(o.at)+'m</span></div>').join('')
+        (opDePas.length ? opDePas.map(o => { const pa = pkAge(o.pasAt || o.at);
+          return '<div class="task"><span class="ic">🛎️</span><div class="t"><b>'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span>'+(o.items||[]).filter(it=>pkSectieOf(it)).map(it=>it.qty+'× '+esc(it.name)).join(', ')+(Number.isFinite(o.guestEtaMin)&&!o.guestArrived?' · 🧭 ~'+o.guestEtaMin+'m':o.guestArrived?' · ✅':'')+'</span></div><span style="font-size:0.72rem;font-weight:700;color:'+(pa>=6?'#FF8589':pa>=3?'#E2B93B':'#7BC79B')+';">'+pa+'m</span></div>'; }).join('')
           : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('ks.pas.leeg','Nog niets op de pas. Zodra alle kanten klaar zijn, komt de bestelling hier binnen.')+'</div>')+'</div>';
       if (bezig.length) html += '<div class="card"><div class="k">'+T('ks.pas.bezig','In de maak, per kant')+' ('+bezig.length+')</div>'+
         bezig.map(o => '<div class="task"><span class="ic">🔥</span><div class="t"><b>'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span>'+pkSecties(o).map(s2 => PDA_KANTEN[s2][0]+' '+((o.secties||{})[s2]||T('pd.k.wacht','wacht'))).join(' · ')+'</span></div><span style="font-size:0.72rem;color:var(--soft);">'+pkAge(o.at)+'m</span></div>').join('')+'</div>';
@@ -691,6 +717,7 @@
           '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
           '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;"><b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
           (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">⚠ '+esc(o.allergyNote)+'</div>':'')+
+          pkGast(o)+
           (adv?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+adv+'</div>':'')+
           '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost" data-pkgo="'+o.ref+'" data-phase="bezig" style="flex:1;">'+T('st.start','Start')+'</button>':'')+
           '<button class="abtn" data-pkgo="'+o.ref+'" data-phase="klaar" style="flex:1;">'+T('st.ready','Klaar')+'</button></div></div>';
@@ -702,6 +729,13 @@
       try { localStorage.setItem('rtg_pda_kant', pdaKant); } catch(e){}
       renderKeuken();
     }));
+    // de gekozen personen: pas-meldingen (tril + toast) per toestel aan of uit
+    const bel = wrap.querySelector('[data-pkbel]'); if (bel) bel.addEventListener('click', () => {
+      pdaPasBel = !pdaPasBel;
+      try { localStorage.setItem('rtg_pda_pasbel', pdaPasBel ? 'aan' : 'uit'); } catch(e){}
+      toast(pdaPasBel ? '🔔 '+T('pd.k.belaan','Dit toestel krijgt pas-meldingen.') : '🔕 '+T('pd.k.beluit','Pas-meldingen staan uit op dit toestel.'));
+      renderKeuken();
+    });
     wrap.querySelectorAll('[data-pkgo]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/order/sectie', { ref: b.dataset.pkgo, sectie: pdaKant, phase: b.dataset.phase }); toast(b.dataset.phase==='klaar'?T('pd.k.klaar','Kant klaargemeld; het keukenscherm ziet het direct.'):T('pd.k.gestart','Gestart.')); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
     }));
@@ -1284,8 +1318,10 @@
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
       src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); });
-      // de keuken praat met de bediening: bon compleet op de pas -> belletje op de PDA
+      // de keuken praat met de bediening: bon compleet op de pas -> belletje op de PDA,
+      // maar alleen op toestellen waar de pas-bel aanstaat (de gekozen personen)
       src.addEventListener('pas', e => {
+        if (!pdaPasBel) return;
         try {
           const d = JSON.parse(e.data || '{}');
           toast('🛎️ ' + T('pas.klaar', 'Op de pas: bon ') + d.pickup + (d.table ? ' (' + d.table + ')' : ''));

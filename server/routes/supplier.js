@@ -1975,6 +1975,7 @@ app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
   if (nodig.length && nodig.every(x => o.secties[x] === 'klaar')) {
     o.stations = o.stations || {};
     o.stations.keuken = 'klaar';                            // de hele keuken is klaar
+    if (!keukenWasKlaar) o.pasAt = new Date().toISOString(); // vanaf nu staat het op de pas
     const stNodig = stationsForOrder(req.supplier, o);
     if (stNodig.every(st => o.stations[st] === 'klaar')) o.status = 'klaar';
   }
@@ -2000,6 +2001,7 @@ app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
   o.stations = o.stations || {};
   const keukenWasKlaar = o.stations.keuken === 'klaar';
   o.stations[station] = phase;
+  if (station === 'keuken' && phase === 'klaar' && !keukenWasKlaar) o.pasAt = new Date().toISOString();
   if (o.status === 'nieuw') o.status = 'in bereiding';
   const needed = stationsForOrder(req.supplier, o);
   const wasKlaar = o.status === 'klaar';

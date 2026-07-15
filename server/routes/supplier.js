@@ -1138,6 +1138,93 @@ app.post('/api/supplier/menu/recipe', supplierAuth, async (req, res) => {
   res.json({ ok: true, recept, ai: !!anthropic });
 });
 
+/* De gerechtenkennis op het keukenscherm: tik op een gerecht en vraag het
+   recept, de bereidingswijze, de allergenen met vervangers of een drank-
+   suggestie op. Elke soort wordt een keer gemaakt (Claude waar mogelijk,
+   anders een vakkundige fallback) en daarna op het gerecht bewaard. */
+const KENNIS_SOORTEN = {
+  recept: {
+    sys: 'Je bent een chef-kok die werkinstructies schrijft voor nieuwe keukenkrachten. Antwoord in het Nederlands, platte tekst, maximaal 10 korte genummerde stappen: mise en place, bereiding, afwerking en bord. Concreet, geen inleiding.',
+    val: (s, m) => '1. Mise en place: alle ingredienten voor ' + m.name + ' afwegen en klaarzetten.\n' +
+      (m.desc ? '2. Basis: ' + m.desc + '\n' : '2. Basis volgens de huisreceptuur van ' + s.name + '.\n') +
+      '3. Bereiden op de eigen sectie (' + (m.sectie || 'warm') + '); tussentijds proeven.\n' +
+      ((m.allergens || []).length ? '4. LET OP allergenen: ' + m.allergens.join(', ') + '. Bij een allergie-bon strikt gescheiden werken.\n' : '') +
+      '5. Afwerking en garnituur; bord vegen.\n6. Doorgeven aan de pas; chef proeft steekproefsgewijs.'
+  },
+  bereiding: {
+    sys: 'Je bent een sous-chef die de bereidingswijze uitlegt aan de kok op de sectie. Antwoord in het Nederlands, platte tekst, maximaal 8 genummerde stappen met concrete temperaturen, tijden en garingspunten (pan, oven, kerntemperatuur). Sluit af met een regel over de valkuil van dit gerecht. Geen inleiding.',
+    val: (s, m) => {
+      const tijd = { warm: 12, snack: 8, koud: 6, dessert: 5 }[m.sectie || 'warm'] || 8;
+      return '1. Sectie ' + (m.sectie || 'warm') + ', richttijd ~' + tijd + ' min per uitgifte.\n' +
+        '2. Werkplek en pannen voorverwarmen; gereedschap klaar.\n' +
+        (m.desc ? '3. Kern: ' + m.desc + '\n' : '3. Volg de huisbereiding van ' + s.name + '.\n') +
+        '4. Garing checken (kleur, kern, textuur) voor het doorgeven.\n' +
+        '5. Warm doorgeven aan de pas; niet laten staan.\n' +
+        'Valkuil: te vroeg starten; kijk naar het vuurplan op de bon zodat de tafel samen uitgaat.';
+    }
+  },
+  allergenen: {
+    sys: 'Je bent een chef-kok en allergenenexpert. Antwoord in het Nederlands, platte tekst, maximaal 8 regels: welke allergenen dit gerecht bevat, hoe kruisbesmetting op de lijn voorkomen wordt, en per allergeen een volwaardig vervangend ingredient of variant. Geen inleiding.',
+    val: (s, m) => {
+      const al = m.allergens || [];
+      if (!al.length) return 'Geen geregistreerde allergenen voor ' + m.name + '.\nBij een allergie-bon toch altijd doorvragen en strikt gescheiden werken: schone snijplank, schoon gereedschap, aparte pan.';
+      return al.map(a => {
+        const idee = ALT_IDEE[a];
+        return '⚠ ' + a + (idee ? ': vervang met ' + idee[0] + ' (' + idee[1] + ').' : ': overleg met de chef over een vervanger.');
+      }).join('\n') + '\nAltijd: schone snijplank, schoon gereedschap, aparte pan; de allergie-bon gaat als laatste check langs de pas.';
+    }
+  },
+  pairing: {
+    sys: 'Je bent een sommelier. Antwoord in het Nederlands, platte tekst, maximaal 6 regels: twee wijnsuggesties (per glas), een cocktail of mocktail en een alcoholvrij alternatief bij dit gerecht, elk met een korte reden. Geen inleiding.',
+    val: (s, m) => {
+      const bar = (s.menu || []).filter(x => x.station === 'bar').slice(0, 3);
+      return (bar.length ? 'Van de eigen kaart: ' + bar.map(b => b.name).join(', ') + '.\n' : '') +
+        'Wit en fris bij lichte en koude gerechten; rond en rood bij ' + ((m.sectie || 'warm') === 'warm' ? 'dit warme gerecht' : 'de warme kant') + '.\n' +
+        'Alcoholvrij: huisgemaakte citrus-tonic of verse munt-gember.';
+    }
+  }
+};
+app.post('/api/supplier/menu/kennis', supplierAuth, async (req, res) => {
+  const m = (req.supplier.menu || []).find(x => x.id === req.body.itemId);
+  if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
+  const soort = String(req.body.soort || '');
+  const def = KENNIS_SOORTEN[soort];
+  if (!def) return res.status(400).json({ error: 'Onbekende kennissoort.' });
+  m.kennis = m.kennis || {};
+  const bestaand = soort === 'recept' ? (m.recept || m.kennis.recept) : m.kennis[soort];
+  if (bestaand && !req.body.opnieuw) return res.json({ ok: true, tekst: bestaand, cached: true, ai: !!anthropic });
+  let tekst = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 700, system: def.sys,
+        messages: [{ role: 'user', content: 'Gerecht: ' + m.name + (m.desc ? ' (' + m.desc + ')' : '') + '. Keuken: ' + req.supplier.name + '. Sectie: ' + (m.sectie || 'warm') + '. Allergenen: ' + ((m.allergens || []).join(', ') || 'geen') + '.' }]
+      });
+      tekst = String(msg.content[0].text || '').trim().slice(0, 1500);
+    } catch (err) { tekst = null; }
+  }
+  if (!tekst) tekst = def.val(req.supplier, m);
+  m.kennis[soort] = tekst;
+  if (soort === 'recept') m.recept = tekst;
+  save();
+  logActivity(req.supplier.code, req.actor, 'vroeg ' + soort + ' van ' + m.name + ' op');
+  res.json({ ok: true, tekst, ai: !!anthropic });
+});
+
+/* 86: een gerecht is op. Elke keukenkracht mag het melden; het bestellen
+   wordt per direct geblokkeerd en alle schermen zien het. Weer beschikbaar
+   melden kan net zo snel. */
+app.post('/api/supplier/menu/86', supplierAuth, (req, res) => {
+  const m = (req.supplier.menu || []).find(x => x.id === req.body.itemId);
+  if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
+  m.uitverkocht = !!req.body.op;
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  logActivity(req.supplier.code, req.actor, (m.uitverkocht ? 'meldde 86 (uitverkocht): ' : 'meldde weer beschikbaar: ') + m.name);
+  res.json({ ok: true, uitverkocht: m.uitverkocht });
+});
+
 app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
   const s = req.supplier;
   const lang = talen.taalVan(req.body.lang);

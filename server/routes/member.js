@@ -987,6 +987,8 @@ app.post('/api/order', auth, (req, res) => {
   for (const w of wanted) {
     const m = (s.menu || []).find(x => x.id === w.id);
     const qty = Math.min(20, Math.max(1, parseInt(w.qty, 10) || 1));
+    // 86 van het keukenscherm: een uitverkocht gerecht is per direct niet te bestellen
+    if (m && m.uitverkocht) return res.status(409).json({ error: m.name + ' is helaas uitverkocht (86 gemeld door de keuken).' });
     // ledenprijsgarantie: reken nooit meer dan de publieke prijs, ook al zou
     // de menuprijs door een fout hoger staan (extra vangnet na het opslaan)
     if (m) { const unit = ledenPrijs(m.publiekePrijs, m.price); items.push({ id: m.id, name: m.name, qty, price: unit }); total += unit * qty; }

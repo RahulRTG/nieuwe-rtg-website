@@ -444,6 +444,20 @@
   .allday .ad-h{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin-right:0.2rem;}
   .allday .ad{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.75rem;font-size:0.8rem;}
   .allday .ad b{color:var(--gold);margin-right:0.3rem;font-variant-numeric:tabular-nums;}
+  /* het gerechtenmenu: tik op een gerecht voor recept, bereiding, allergenen, drank en 86 */
+  #dishSheet .ds-scrim{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,0.55);}
+  #dishSheet .ds-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:81;width:min(560px,92vw);max-height:82vh;overflow-y:auto;background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:1.1rem;display:flex;flex-direction:column;gap:0.8rem;}
+  #dishSheet .ds-top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.8rem;}
+  #dishSheet .ds-top b{font-size:1.05rem;}
+  #dishSheet .ds-desc{display:block;font-size:0.78rem;color:var(--soft);margin-top:0.15rem;}
+  #dishSheet .ds-algs{display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.45rem;}
+  #dishSheet .ds-alg{font-size:0.64rem;letter-spacing:0.05em;text-transform:uppercase;border:1px solid rgba(229,72,77,0.5);color:#FF8589;border-radius:999px;padding:0.18rem 0.55rem;}
+  #dishSheet .ds-alg.ok{border-color:rgba(46,125,91,0.5);color:#7BC79B;}
+  #dishSheet .ds-acts{display:flex;gap:0.4rem;flex-wrap:wrap;}
+  #dishSheet .ds-acts button{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.5rem 0.9rem;font-size:0.78rem;color:var(--muted);}
+  #dishSheet .ds-acts button.aan{border-color:var(--gold);color:var(--gold);}
+  #dishSheet .ds-86{font-size:0.78rem;color:#FF8589;border:1px dashed rgba(229,72,77,0.5);border-radius:10px;padding:0.5rem 0.7rem;}
+  #dishSheet .ds-body{white-space:pre-line;font-size:0.85rem;line-height:1.6;color:var(--txt);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 0.95rem;min-height:5rem;}
   /* vuurplan-chips per kant: start nu, wacht, bezig, houd warm, naar de pas */
   .vp{display:inline-flex;align-items:center;gap:0.3rem;border-radius:999px;padding:0.22rem 0.6rem;font-size:0.66rem;letter-spacing:0.05em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);}
   .vp.nu{color:#7BC79B;border-color:rgba(46,125,91,0.55);}
@@ -962,6 +976,10 @@ window.I18N = { en: {
   'st.done':'Marked ready, waiting to be served', 'st.unpaid':'unpaid',
   'kds.open':'Open tickets', 'kds.laat':'Late', 'kds.oudste':'Oldest ticket', 'kds.allday':'All day',
   'vp.nu':'fire now', 'vp.wacht':'hold', 'vp.bezig':'cooking', 'vp.warm':'keep warm', 'vp.pas':'to the pass',
+  'ds.recept':'Recipe', 'ds.bereiding':'Preparation', 'ds.allergenen':'Allergens and swaps', 'ds.pairing':'Drink pairing',
+  'ds.86':'86, sold out', 'ds.86off':'Lift the 86', 'ds.86nu':'This dish is on 86: members cannot order it right now.',
+  'ds.sluit':'Close', 'ds.laden':'The AI chef is writing...', 'ds.kies':'Pick an option above.',
+  'ds.noalg':'no registered allergens', 'ds.weerbeschikbaar':'is available again',
   'st.agever':'Age verified in the app (passport)',
   'st.b.klaar':'ready', 'st.b.bezig':'working',
   'menu.station':'Workstation', 'menu.keuken':'Kitchen', 'menu.stmoved':'Moved to the other station.',

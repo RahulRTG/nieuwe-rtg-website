@@ -2102,13 +2102,16 @@
         const q = menuState.qty[x.id] || 0;
         // alcohol op slot: onder de landsgrens (paspoortleeftijd) niet bestelbaar
         const slot = x.station === 'bar' && menuState.alcohol && menuState.alcohol.mag === false;
-        return '<div class="ms-item" data-id="' + x.id + '">' +
+        // 86 van het keukenscherm: uitverkocht, dus even niet te bestellen
+        const op86 = !!x.uitverkocht;
+        return '<div class="ms-item" data-id="' + x.id + '"' + (op86 ? ' style="opacity:0.5;"' : '') + '>' +
           '<div class="info"><div class="nm">' + x.name + '</div>' +
             (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
             (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + tAlg(a) + '</span>').join('') + '</div>' : '') +
           '</div>' +
           '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +
-            (slot ? '<div class="qty" style="opacity:0.55;font-size:0.64rem;justify-content:center;">🔞 ' + menuState.alcohol.grens + '+</div>'
+            (op86 ? '<div class="qty" style="opacity:0.7;font-size:0.64rem;justify-content:center;">' + T('menu.86','uitverkocht') + '</div>'
+              : slot ? '<div class="qty" style="opacity:0.55;font-size:0.64rem;justify-content:center;">🔞 ' + menuState.alcohol.grens + '+</div>'
               : '<div class="qty"><button class="js-minus">−</button><b>' + q + '</b><button class="js-plus">+</button></div>') +
           '</div></div>';
       }).join('')

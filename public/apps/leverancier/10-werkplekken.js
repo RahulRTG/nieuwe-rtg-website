@@ -455,32 +455,62 @@
         d.lines.map(l=>'<div style="font-size:0.9rem;line-height:1.6;padding:0.2rem 0;">'+l+'</div>').join('')+'</div>';
     } catch(e){ box.style.display = 'none'; }
   }
-  // recept uitrollen onder het gerecht; nog geen recept? Dan schrijft de AI er een.
-  async function toggleRecept(span){
-    const bestaand = span.parentElement.querySelector('.rcp-open[data-for="'+span.dataset.rcp+'"]');
-    if (bestaand){ bestaand.remove(); return; }
-    const m = (state.menu||[]).find(x => x.id === span.dataset.rcp);
-    const div = document.createElement('div');
-    div.className = 'rcp-open';
-    div.dataset.for = span.dataset.rcp;
-    div.style.cssText = 'grid-column:1/-1;white-space:pre-line;font-size:0.78rem;color:var(--muted);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.8rem;margin:0.2rem 0 0.3rem;line-height:1.6;';
-    if (m && m.recept){
-      div.textContent = m.recept;
-      span.insertAdjacentElement('afterend', div);
-    } else {
-      div.textContent = T('rcp.making','Nog geen recept; de AI schrijft er nu een...');
-      span.insertAdjacentElement('afterend', div);
+  /* Het gerechtenmenu: tik op een gerecht en kies recept, bereidingswijze,
+     allergenen met vervangers, een dranksuggestie of een 86-melding
+     (uitverkocht; leden kunnen het per direct niet meer bestellen). */
+  function sluitDish(){ const d = document.getElementById('dishSheet'); if (d) d.remove(); }
+  function dishSheet(itemId){
+    sluitDish();
+    const m = (state.menu||[]).find(x => x.id === itemId); if (!m) return;
+    const host = $('#station') || document.body;
+    const wrap = document.createElement('div');
+    wrap.id = 'dishSheet';
+    const alg = (m.allergens||[]).length
+      ? m.allergens.map(a => '<span class="ds-alg">⚠ '+a+'</span>').join('')
+      : '<span class="ds-alg ok">'+T('ds.noalg','geen allergenen geregistreerd')+'</span>';
+    const icoon = KSECTIES[m.sectie||'warm'] && m.station !== 'bar' ? KSECTIES[m.sectie||'warm'][0]+' ' : (m.station==='bar'?'🍸 ':'');
+    wrap.innerHTML = '<div class="ds-scrim"></div>'+
+      '<div class="ds-card" role="dialog" aria-modal="true" aria-label="'+m.name+'">'+
+        '<div class="ds-top"><div><b>'+icoon+m.name+'</b>'+
+          (m.desc?'<span class="ds-desc">'+m.desc+'</span>':'')+
+          '<div class="ds-algs">'+alg+'</div></div>'+
+          '<button class="st-exit" data-dsluit>'+T('ds.sluit','Sluit')+'</button></div>'+
+        '<div class="ds-acts">'+
+          '<button data-dsk="recept">📖 '+T('ds.recept','Recept')+'</button>'+
+          '<button data-dsk="bereiding">👨‍🍳 '+T('ds.bereiding','Bereidingswijze')+'</button>'+
+          '<button data-dsk="allergenen">⚠️ '+T('ds.allergenen','Allergenen en vervangers')+'</button>'+
+          '<button data-dsk="pairing">🍷 '+T('ds.pairing','Dranksuggestie')+'</button>'+
+          '<button data-ds86'+(m.uitverkocht?' class="aan"':'')+'>⛔ '+(m.uitverkocht?T('ds.86off','86 opheffen'):T('ds.86','86, uitverkocht'))+'</button>'+
+        '</div>'+
+        (m.uitverkocht?'<div class="ds-86">'+T('ds.86nu','Dit gerecht staat op 86: leden kunnen het nu niet bestellen.')+'</div>':'')+
+        '<div class="ds-body" id="dsBody">'+T('ds.kies','Kies hierboven wat je wilt zien.')+'</div>'+
+      '</div>';
+    host.appendChild(wrap);
+    wrap.querySelector('.ds-scrim').addEventListener('click', sluitDish);
+    wrap.querySelector('[data-dsluit]').addEventListener('click', sluitDish);
+    wrap.querySelectorAll('[data-dsk]').forEach(b => b.addEventListener('click', async () => {
+      const body = wrap.querySelector('#dsBody');
+      wrap.querySelectorAll('[data-dsk]').forEach(x => x.classList.toggle('aan', x === b));
+      body.textContent = T('ds.laden','De AI-chef schrijft...');
       try {
-        const d = await API.call('/supplier/menu/recipe', { itemId: span.dataset.rcp });
-        div.textContent = d.recept;
-        if (m) m.recept = d.recept;
-      } catch(e){ div.textContent = e.message; }
-    }
+        const d = await API.call('/supplier/menu/kennis', { itemId, soort: b.dataset.dsk });
+        body.textContent = d.tekst;
+        if (b.dataset.dsk === 'recept') m.recept = d.tekst;
+      } catch(e){ body.textContent = e.message; }
+    }));
+    wrap.querySelector('[data-ds86]').addEventListener('click', async () => {
+      try {
+        const d = await API.call('/supplier/menu/86', { itemId, op: !m.uitverkocht });
+        m.uitverkocht = d.uitverkocht;
+        toast(m.uitverkocht ? '⛔ 86: '+m.name : '✅ '+m.name+' '+T('ds.weerbeschikbaar','is weer beschikbaar'));
+        dishSheet(itemId);
+      } catch(e){ toast(e.message); }
+    });
   }
 
   function bindStation(el){
     if (stationMode === 'keuken') loadCoach(el);
-    el.querySelectorAll('.rcp-item').forEach(s2 => s2.addEventListener('click', () => toggleRecept(s2)));
+    el.querySelectorAll('.rcp-item').forEach(s2 => s2.addEventListener('click', () => dishSheet(s2.dataset.rcp)));
     el.querySelectorAll('[data-settbl]').forEach(b => b.addEventListener('click', async () => {
       const t = prompt(T('st.tblq','Welke tafel? (leeg = geen tafel)'), b.dataset.cur || '');
       if (t === null) return;

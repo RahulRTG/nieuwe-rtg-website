@@ -40,7 +40,7 @@ async function bootTest(opts) {
     page.on('pageerror', e => paginaFouten.push(e.message));
     await page.addInitScript((kv) => {
       for (const k in kv) localStorage.setItem(k, kv[k]);
-      localStorage.setItem('rtg_lang', 'nl');
+      localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, keys);
     await page.goto(base + opts.pad, { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
@@ -101,7 +101,7 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
     const page = await browser.newPage();
     const fouten = [];
     page.on('pageerror', e => fouten.push(e.message));
-    await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'en'); }, reg.token);
+    await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'en'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
     await page.waitForSelector('#homeGreeting', { timeout: 5000 });
@@ -148,7 +148,7 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     const page = await browser.newPage();
     const fouten = [];
     page.on('pageerror', e => fouten.push(e.message));
-    await page.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); }, login.token);
+    await page.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, login.token);
     await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
     await page.waitForSelector('#app.active', { timeout: 15000 });
     await page.click('[data-tab="meer"]');
@@ -190,7 +190,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     const page = await browser.newPage();
     const fouten = [];
     page.on('pageerror', e => fouten.push(e.message));
-    await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); }, reg.token);
+    await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 

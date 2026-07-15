@@ -9,15 +9,18 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <style>
   :root{
-    --white:#FFFFFF;
-    --black:#0C0C0B;
-    --burgundy:#7F1634;
-    --burgundy-bright:#9E1C40;
+    /* Zelfde donkere look als de apps (app-hub tokens) */
+    --white:#0C0C0B;            /* basisvlak, donker */
+    --panel:#151312;            /* kaarten, net als in de apps */
+    --panel2:#1B1817;
+    --black:#F4F1EC;            /* inkt, nu licht */
+    --burgundy:#C23A5E;
+    --burgundy-bright:#D14E6E;
     --burgundy-on-dark:#C23A5E;
-    --gold:#857007;
-    --line:#DEDBD5;
-    --grey:#4D4A45;
-    --grey-soft:#8A8680;
+    --gold:#A98F1C;
+    --line:rgba(255,255,255,0.09);
+    --grey:rgba(244,241,236,0.72);
+    --grey-soft:rgba(244,241,236,0.50);
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -55,7 +58,7 @@
     overflow:hidden;
   }
 
-  .on-black{background:var(--black);color:var(--white);}
+  .on-black{background:#080807;color:var(--black);}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -97,7 +100,7 @@
     top:0;left:0;right:0;
     z-index:100;
     padding:1.1rem 0;
-    background:rgba(255,255,255,0.86);
+    background:rgba(12,12,11,0.86);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
@@ -192,55 +195,39 @@
   .btn{
     display:inline-block;
     padding:0.95rem 2.1rem;
-    background:var(--black);
-    color:var(--white);
+    background:var(--gold);
+    color:#0C0C0B;
     font-size:0.85rem;
     letter-spacing:0.05em;
     text-transform:uppercase;
     font-weight:600;
-    border:1px solid var(--black);
+    border:1px solid var(--gold);
     transition:all 0.25s ease;
   }
   .btn:hover{
     background:var(--burgundy);
     border-color:var(--burgundy);
+    color:#fff;
   }
   .btn-ghost{
     background:transparent;
-    color:var(--black);
+    color:#F4F1EC;
+    border-color:var(--line);
   }
   .btn-ghost:hover{
-    background:var(--black);
-    color:var(--white);
-    border-color:var(--black);
+    background:#F4F1EC;
+    color:#0C0C0B;
+    border-color:#F4F1EC;
   }
   .btn-login{
     background:var(--burgundy);
-    color:var(--white);
+    color:#fff;
     border-color:var(--burgundy);
   }
   .btn-login:hover{
-    background:var(--black);
-    color:var(--white);
-    border-color:var(--black);
-  }
-  .on-black .btn-ghost{
-    color:var(--white);
-    border-color:rgba(255,255,255,0.35);
-  }
-  .on-black .btn-ghost:hover{
-    background:var(--white);
-    color:var(--black);
-  }
-  .on-black .btn{
-    background:var(--white);
-    color:var(--black);
-    border-color:var(--white);
-  }
-  .on-black .btn:hover{
-    background:var(--burgundy-on-dark);
-    color:var(--white);
-    border-color:var(--burgundy-on-dark);
+    background:var(--gold);
+    color:#0C0C0B;
+    border-color:var(--gold);
   }
 
   /* ---------- manifesto ---------- */
@@ -340,7 +327,7 @@
     border-bottom:1px solid rgba(255,255,255,0.14);
   }
   .pass-card{
-    background:var(--black);
+    background:var(--panel);
     padding:3rem 2.25rem;
     display:flex;
     flex-direction:column;
@@ -397,7 +384,7 @@
 
   /* ---------- uit de salon ---------- */
 
-  .salon-strip{background:#F7F5F1;}
+  .salon-strip{background:#100F0E;}
   .salon-strip h2{
     font-size:clamp(2rem, 3.6vw, 2.9rem);
     line-height:1.1;
@@ -415,7 +402,7 @@
     margin-top:3rem;
   }
   .salon-card{
-    background:var(--white);
+    background:var(--panel);
     border:1px solid var(--line);
     display:flex;
     flex-direction:column;

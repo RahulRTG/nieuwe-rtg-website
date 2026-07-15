@@ -49,7 +49,7 @@
 
   section{
     position:relative;
-    padding:clamp(6rem, 12vw, 11rem) 0;
+    padding:clamp(4.5rem, 8vw, 7rem) 0;
     overflow:hidden;
   }
 
@@ -84,21 +84,21 @@
 
   .btn{
     display:inline-block;
-    padding:0.95rem 2.1rem;
+    padding:0.85rem 1.7rem;
     background:var(--black);
     color:var(--white);
-    font-size:0.85rem;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
+    font-size:0.9rem;
+    letter-spacing:0.01em;
     font-weight:600;
     border:1px solid var(--black);
     transition:all 0.25s ease;
+    border-radius:999px;
   }
-  .btn:hover{background:var(--burgundy);border-color:var(--burgundy);}
-  .btn-ghost{background:transparent;color:var(--black);}
+  .btn:hover{background:#fff;border-color:var(--white);}
+  .btn-ghost{background:transparent;color:var(--black);border-color:rgba(255,255,255,0.25);}
   .btn-ghost:hover{background:var(--black);color:var(--white);}
   .on-black .btn{background:var(--black);color:var(--white);border-color:var(--black);}
-  .on-black .btn:hover{background:var(--burgundy-on-dark);color:var(--black);border-color:var(--burgundy-on-dark);}
+  .on-black .btn:hover{background:#fff;color:var(--white);border-color:#fff;}
 
   /* ---------- nav ---------- */
 
@@ -118,8 +118,8 @@
   }
   .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
   .brandmark .bm-block{
-    background:var(--burgundy);
-    color:var(--white);
+    background:#7F1634;
+    color:#F4F1EC;
     font-family:'Bodoni Moda',serif;
     font-weight:500;
     font-size:1.05rem;
@@ -148,12 +148,12 @@
   /* ---------- hero ---------- */
 
   .hero{
-    padding-top:clamp(9rem, 16vw, 13rem);
-    padding-bottom:clamp(7rem, 12vw, 10rem);
+    padding-top:clamp(7.5rem, 11vw, 9.5rem);
+    padding-bottom:clamp(4.5rem, 8vw, 6.5rem);
   }
   .hero-inner{text-align:center;max-width:880px;margin:0 auto;}
   .hero h1{
-    font-size:clamp(2.6rem, 6vw, 5rem);
+    font-size:clamp(2.3rem, 4.6vw, 3.7rem);
     line-height:1.04;
   }
   .hero h1 .accent{color:var(--burgundy);font-style:italic;}
@@ -186,21 +186,21 @@
   /* ---------- hoe het werkt ---------- */
 
   .how h2{
-    font-size:clamp(2rem, 3.6vw, 2.9rem);
+    font-size:clamp(1.8rem, 3vw, 2.4rem);
     line-height:1.12;
     max-width:20ch;
   }
   .steps-grid{
     display:grid;
     grid-template-columns:repeat(4, 1fr);
-    gap:1px;
-    background:var(--line);
-    border:1px solid var(--line);
+    gap:0.9rem;
     margin-top:3.5rem;
   }
   .step{
     background:var(--panel);
     padding:2.25rem 1.75rem;
+    border:1px solid var(--line);
+    border-radius:18px;
   }
   .step .n{
     font-family:'Bodoni Moda',serif;
@@ -218,7 +218,7 @@
   /* ---------- geen euro verspild ---------- */
 
   .maths h2{
-    font-size:clamp(2rem, 3.6vw, 2.9rem);
+    font-size:clamp(1.8rem, 3vw, 2.4rem);
     line-height:1.12;
     max-width:18ch;
   }
@@ -230,16 +230,16 @@
   .compare{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:1px;
-    background:rgba(255,255,255,0.14);
-    border:1px solid rgba(255,255,255,0.14);
+    gap:0.9rem;
     margin-top:3.5rem;
   }
   .compare .col{
     background:var(--panel);
     padding:2.5rem 2.25rem;
+    border:1px solid var(--line);
+    border-radius:18px;
   }
-  .compare .col.rtg{background:#160A0F;}
+  .compare .col.rtg{background:#160A0F;border-radius:18px;}
   .compare .label{
     font-size:0.72rem;
     letter-spacing:0.14em;
@@ -249,7 +249,7 @@
   }
   .compare .big{
     font-family:'Bodoni Moda',serif;
-    font-size:clamp(2.4rem, 5vw, 3.6rem);
+    font-size:clamp(2.1rem, 4vw, 3rem);
     line-height:1;
   }
   .compare .col.rtg .big{color:var(--burgundy-on-dark);}
@@ -267,15 +267,14 @@
   .stat-row{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:1px;
-    background:rgba(255,255,255,0.14);
-    border:1px solid rgba(255,255,255,0.14);
-    border-top:none;
-  }
+    gap:0.9rem;
+    }
   .stat-row .stat{
-    background:var(--black);
+    background:var(--panel);
     padding:1.75rem;
     text-align:center;
+    border:1px solid var(--line);
+    border-radius:18px;
   }
   .stat-row b{
     display:block;
@@ -304,7 +303,7 @@
     align-items:center;
   }
   .nominate h2{
-    font-size:clamp(2rem, 3.6vw, 2.9rem);
+    font-size:clamp(1.8rem, 3vw, 2.4rem);
     line-height:1.12;
   }
   .nominate-copy{margin-top:1.5rem;color:var(--grey);max-width:50ch;}
@@ -314,6 +313,7 @@
     border:1px solid var(--line);
     padding:2.5rem 2.25rem;
     background:var(--panel);
+    border-radius:18px;
   }
   .quiet-card h3{font-size:1.2rem;margin-bottom:0.75rem;}
   .quiet-card p{font-size:0.9rem;color:var(--grey);}
@@ -375,7 +375,8 @@
 <section class="manifesto on-black">
   <div class="wrap">
     <div class="folio">N° 01, Waarom</div>
-    <div class="signature">, Het uitgangspunt van de foundation</div>
+    <p class="lede">Reizen verbindt. Daarom spaart elk RTG-lidmaatschap automatisch mee voor gezinnen die er zelf niet aan toekomen.</p>
+    <div class="signature">Het uitgangspunt van de foundation</div>
   </div>
 </section>
 

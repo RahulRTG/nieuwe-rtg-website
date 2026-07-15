@@ -42,13 +42,13 @@
   .on-black .folio{color:rgba(255,255,255,0.45);}
   .on-black .folio::after{background:rgba(255,255,255,0.14);}
 
-  .btn{display:inline-flex;align-items:center;gap:0.6rem;padding:0.95rem 2rem;background:var(--black);color:var(--white);font-size:0.85rem;letter-spacing:0.04em;font-weight:600;border:1px solid var(--black);transition:all 0.25s ease;border-radius:999px;}
-  .btn:hover{background:var(--burgundy);border-color:var(--burgundy);}
+  .btn{display:inline-flex;align-items:center;gap:0.6rem;padding:0.85rem 1.7rem;background:var(--black);color:var(--white);font-size:0.85rem;letter-spacing:0.01em;font-weight:600;border:1px solid var(--black);transition:all 0.25s ease;border-radius:999px;}
+  .btn:hover{background:#fff;border-color:var(--white);}
   .btn svg{width:17px;height:17px;}
   .btn-ghost{background:transparent;color:var(--black);}
   .btn-ghost:hover{background:var(--black);color:var(--white);}
   .on-black .btn{background:var(--black);color:var(--white);border-color:var(--black);}
-  .on-black .btn:hover{background:var(--burgundy-on-dark);color:var(--black);border-color:var(--burgundy-on-dark);}
+  .on-black .btn:hover{background:#fff;color:var(--white);border-color:#fff;}
   .on-black .btn-ghost{background:transparent;color:var(--black);border-color:rgba(255,255,255,0.4);}
   .on-black .btn-ghost:hover{background:var(--black);color:var(--white);}
 
@@ -56,16 +56,16 @@
   header{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 0;background:rgba(12,12,11,0.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
   header .wrap{display:flex;align-items:center;justify-content:space-between;}
   .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
-  .brandmark .bm-block{background:var(--burgundy);color:var(--white);font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;letter-spacing:0.05em;padding:0.5rem 1.05rem;line-height:1;}
+  .brandmark .bm-block{background:#7F1634;color:#F4F1EC;font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;letter-spacing:0.05em;padding:0.5rem 1.05rem;line-height:1;}
   .brandmark .bm-tagline{margin-top:0.45rem;font-size:0.58rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--gold);padding-left:0.15rem;}
   nav ul{list-style:none;display:flex;gap:2.25rem;}
   nav a{font-size:0.85rem;color:var(--grey);transition:color 0.2s ease;}
   nav a:hover{color:var(--burgundy);}
 
   /* hero */
-  .hero{background:var(--paper);padding-top:clamp(8rem,14vw,11rem);}
+  .hero{background:var(--paper);padding-top:clamp(7rem,10vw,9rem);}
   .hero-inner{display:grid;grid-template-columns:1.05fr 0.95fr;gap:4rem;align-items:center;}
-  .hero h1{font-size:clamp(2.4rem,5vw,4.2rem);line-height:1.04;}
+  .hero h1{font-size:clamp(2.2rem,4.2vw,3.3rem);line-height:1.04;}
   .hero h1 em{color:var(--burgundy);font-style:italic;}
   .hero .deck{margin-top:1.5rem;font-size:clamp(1.05rem,1.5vw,1.25rem);color:var(--grey);max-width:46ch;}
   .cta-row{margin-top:2.25rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;}
@@ -112,9 +112,9 @@
 
   /* install stappen */
   .steps{background:var(--white);}
-  .steps h2{font-size:clamp(1.9rem,3.4vw,2.7rem);line-height:1.12;max-width:20ch;}
-  .plat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:3rem;}
-  .plat{background:var(--panel);padding:2.25rem 2rem;}
+  .steps h2{font-size:clamp(1.75rem,2.9vw,2.3rem);line-height:1.12;max-width:20ch;}
+  .plat-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-top:3rem;}
+  .plat{background:var(--panel);padding:2.25rem 2rem;border:1px solid var(--line);border-radius:18px;}
   .plat h3{font-size:1.2rem;display:flex;align-items:center;gap:0.6rem;}
   .plat h3 svg{width:20px;height:20px;}
   .plat ol{margin-top:1.25rem;padding-left:0;list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:0.9rem;}
@@ -125,7 +125,7 @@
 
   /* features */
   .feat{background:var(--paper);}
-  .feat h2{font-size:clamp(1.9rem,3.4vw,2.7rem);line-height:1.12;max-width:22ch;}
+  .feat h2{font-size:clamp(1.75rem,2.9vw,2.3rem);line-height:1.12;max-width:22ch;}
   .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
   .feat-card{background:var(--white);border:1px solid var(--line);padding:1.75rem;}
   .feat-card .ic{width:40px;height:40px;border-radius:50%;background:var(--paper);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--burgundy);margin-bottom:1rem;}

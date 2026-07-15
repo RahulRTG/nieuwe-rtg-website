@@ -49,7 +49,7 @@
 
   section{
     position:relative;
-    padding:clamp(6rem, 12vw, 11rem) 0;
+    padding:clamp(4.5rem, 8vw, 7rem) 0;
     overflow:hidden;
   }
 
@@ -109,8 +109,8 @@
     align-items:flex-start;
   }
   .brandmark .bm-block{
-    background:var(--burgundy);
-    color:var(--white);
+    background:#7F1634;
+    color:#F4F1EC;
     font-family:'Bodoni Moda',serif;
     font-weight:500;
     font-size:1.05rem;
@@ -143,14 +143,14 @@
   /* ---------- hero ---------- */
 
   .hero{
-    padding-top:clamp(9rem, 16vw, 13rem);
-    padding-bottom:clamp(6rem, 10vw, 8rem);
+    padding-top:clamp(7.5rem, 11vw, 9.5rem);
+    padding-bottom:clamp(4rem, 7vw, 5.5rem);
   }
   .hero-inner{
     max-width:820px;
   }
   .hero h1{
-    font-size:clamp(2.6rem, 6vw, 5rem);
+    font-size:clamp(2.3rem, 4.6vw, 3.7rem);
     line-height:1.03;
     max-width:16ch;
   }
@@ -168,24 +168,25 @@
   }
   .btn{
     display:inline-block;
-    padding:0.95rem 2.1rem;
+    padding:0.85rem 1.7rem;
     background:var(--black);
     color:var(--white);
-    font-size:0.85rem;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
+    font-size:0.9rem;
+    letter-spacing:0.01em;
     font-weight:600;
     border:1px solid var(--black);
     transition:all 0.25s ease;
     cursor:pointer;
+    border-radius:999px;
   }
   .btn:hover{
-    background:var(--burgundy);
-    border-color:var(--burgundy);
+    background:#fff;
+    border-color:var(--white);
   }
   .btn-ghost{
     background:transparent;
     color:var(--black);
+    border-color:rgba(255,255,255,0.25);
   }
   .btn-ghost:hover{
     background:var(--black);
@@ -206,9 +207,9 @@
     border-color:var(--black);
   }
   .on-black .btn:hover{
-    background:var(--burgundy-on-dark);
-    color:var(--black);
-    border-color:var(--burgundy-on-dark);
+    background:#fff;
+    color:var(--white);
+    border-color:#fff;
   }
   .on-black .hero p.deck{color:rgba(255,255,255,0.75);}
 
@@ -239,7 +240,7 @@
   .steps-grid{
     display:grid;
     grid-template-columns:repeat(3, 1fr);
-    gap:3.5rem;
+    gap:2.5rem;
     margin-top:3.5rem;
   }
   .step .n{
@@ -273,7 +274,7 @@
     margin:0 auto 3.5rem;
   }
   .hybride-head h2{
-    font-size:clamp(2rem, 3.6vw, 2.9rem);
+    font-size:clamp(1.8rem, 3vw, 2.4rem);
   }
   .hybride-head p{
     margin-top:1.25rem;
@@ -283,14 +284,13 @@
   .hybride-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:1px;
-    background:rgba(255,255,255,0.14);
-    border-top:1px solid rgba(255,255,255,0.14);
-    border-bottom:1px solid rgba(255,255,255,0.14);
-  }
+    gap:0.9rem;
+    }
   .hybride-col{
-    background:var(--black);
+    background:var(--panel);
     padding:2.75rem 2.5rem;
+    border:1px solid var(--line);
+    border-radius:18px;
   }
   .hybride-col .tag{
     font-size:0.75rem;
@@ -334,16 +334,15 @@
   .feat-grid{
     display:grid;
     grid-template-columns:repeat(2, 1fr);
-    gap:1px;
-    background:var(--line);
+    gap:0.9rem;
     margin-top:3.5rem;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
-  }
+    }
   .feat-card{
     background:var(--panel);
     color:var(--black);
     padding:2.5rem;
+    border:1px solid var(--line);
+    border-radius:18px;
   }
   .feat-card h3{
     font-size:1.15rem;
@@ -362,7 +361,7 @@
 
   .cta{text-align:center;}
   .cta h2{
-    font-size:clamp(2.2rem, 5vw, 3.6rem);
+    font-size:clamp(2rem, 4vw, 3rem);
     max-width:18ch;
     margin:0 auto;
     line-height:1.08;
@@ -502,7 +501,7 @@
   </div>
 </section>
 
-<section class="on-black" style="padding:clamp(4rem,8vw,7rem) 0;">
+<section class="on-black" style="padding:clamp(3.5rem,6vw,5.5rem) 0;">
   <div class="wrap" style="max-width:760px;">
     <span class="kicker">Het lidmaatschap</span>
     <h2 style="margin-top:0.8rem;font-size:clamp(1.8rem,3.4vw,2.6rem);">Prijs op maat.</h2>

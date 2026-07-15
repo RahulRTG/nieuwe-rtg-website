@@ -3,7 +3,7 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding } = kern;
+  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding } = kern;
   // Een RTF-profiel als onboarding-sessie: de handle is de sleutel, tier 'rtf'.
   const rtfOnbSess = (s) => ({ key: s.handle, tier: 'rtf', account: null });
 
@@ -96,7 +96,7 @@ app.post('/api/member/snap/send', express.json({ limit: '1.5mb' }), auth, async 
   if (geenGast(req, res)) return;
   const r = await snapSturen(req.session.key, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true });
+  res.json({ ok: true, vuurtje: r.vuurtje || 0 });
 });
 app.post('/api/member/snaps', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ snaps: snapsVoor(req.session.key) }); });
 app.post('/api/member/snap/view', auth, async (req, res) => {
@@ -107,10 +107,12 @@ app.post('/api/member/snap/view', auth, async (req, res) => {
 });
 app.post('/api/member/story/post', express.json({ limit: '1.5mb' }), auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = await verhaalPlaatsen(req.session.key, req.body.foto, req.body.tekst);
+  const r = await verhaalPlaatsen(req.session.key, req.body.foto, req.body.tekst, req.body.opdracht === true);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
 });
+// de snap-opdracht van vandaag (voor iedereen dezelfde)
+app.post('/api/member/snap/opdracht', auth, (req, res) => { res.json({ opdracht: dagOpdracht() }); });
 app.post('/api/member/stories', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ stories: verhalenVoor(req.session.key) }); });
 app.post('/api/member/story/view', auth, async (req, res) => {
   if (geenGast(req, res)) return;
@@ -206,7 +208,7 @@ app.post('/api/rtf/social/snap/send', express.json({ limit: '1.5mb' }), async (r
   const s = rtfSociaal(req, res); if (!s) return;
   const r = await snapSturen(s.handle, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true });
+  res.json({ ok: true, vuurtje: r.vuurtje || 0 });
 });
 app.post('/api/rtf/social/snaps', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ snaps: snapsVoor(s.handle) }); });
 app.post('/api/rtf/social/snap/view', async (req, res) => {
@@ -217,10 +219,11 @@ app.post('/api/rtf/social/snap/view', async (req, res) => {
 });
 app.post('/api/rtf/social/story/post', express.json({ limit: '1.5mb' }), async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = await verhaalPlaatsen(s.handle, req.body.foto, req.body.tekst);
+  const r = await verhaalPlaatsen(s.handle, req.body.foto, req.body.tekst, req.body.opdracht === true);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true });
 });
+app.post('/api/rtf/social/opdracht', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ opdracht: dagOpdracht() }); });
 app.post('/api/rtf/social/stories', (req, res) => { const s = rtfSociaal(req, res); if (!s) return; res.json({ stories: verhalenVoor(s.handle) }); });
 app.post('/api/rtf/social/story/view', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;

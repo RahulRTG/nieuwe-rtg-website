@@ -507,6 +507,21 @@ test('cross-app vrienden: RTF en RTG vinden elkaar op codenaam, chatten, snappen
   assert.equal((await raw('/rtf/social/story/post', { code: g.code, token: g.token, foto, tekst: 'ons verhaal' })).status, 200);
   const stories = await json(await raw('/member/stories', {}, rtgTok));
   assert.ok(stories.stories.some(s => s.van === ouderCn), 'de RTG-vriend ziet het verhaal van de RTF-vriend');
+
+  // VUURTJE: RTG snapte al vandaag; snapt de ouder terug, dan telt de dag
+  assert.equal((await raw('/rtf/social/snap/send', { code: g.code, token: g.token, toKey: verzoek.key, foto, tekst: 'terug' })).status, 200);
+  const oc2 = await json(await raw('/rtf/social/connections', { code: g.code, token: g.token }));
+  assert.equal((oc2.connections.find(c => c.key === verzoek.key) || {}).vuurtje, 1, 'beide kanten snapten vandaag: het vuurtje staat op 1');
+  const rc2 = await json(await raw('/member/connections', {}, rtgTok));
+  assert.equal((rc2.connections.find(c => c.key === ouderKey) || {}).vuurtje, 1, 'de RTG-kant ziet hetzelfde vuurtje');
+
+  // DAG-OPDRACHT: er is elke dag een opdracht, en een inzending draagt de badge
+  const op = await json(await raw('/rtf/social/opdracht', { code: g.code, token: g.token }));
+  assert.ok(op.opdracht && op.opdracht.tekst && op.opdracht.emoji, 'er is elke dag een snap-opdracht');
+  assert.equal((await raw('/rtf/social/story/post', { code: g.code, token: g.token, foto, tekst: 'gedaan!', opdracht: true })).status, 200);
+  const st2 = await json(await raw('/member/stories', {}, rtgTok));
+  const inzending = st2.stories.find(s => s.van === ouderCn);
+  assert.ok(inzending && inzending.opdracht && inzending.opdracht.includes(op.opdracht.tekst), 'het verhaal draagt de dag-opdracht als badge');
 });
 
 // open een SSE-kanaal en wacht op een benoemd event (voor de belsignalen)

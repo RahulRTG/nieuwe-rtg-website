@@ -172,7 +172,7 @@ function socialConnecties(mij) {
     const laatst = chat && chat.messages.length ? chat.messages[chat.messages.length - 1] : null;
     const gelezen = chat && chat.read && chat.read[mij] ? chat.read[mij] : '';
     const unread = chat ? chat.messages.filter(m => m.from !== mij && m.at > gelezen).length : 0;
-    return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
+    return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt, vuurtje: streakVan(mij, ander) };
   }).sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
   const requests = db.data.connections.filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isBeschermdHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at }));
   return { connections: conns, requests };
@@ -244,6 +244,53 @@ function opschonenSnaps() {
   db.data.stories = db.data.stories.filter(s => (nu - new Date(s.at).getTime()) < STORY_TTL);
   if (voor !== db.data.snaps.length + db.data.stories.length) save();
 }
+/* ---------- vuurtjes: de snap-streak per vriendenpaar ----------
+   Snappen jullie allebei op dezelfde dag, dan telt die dag; elke
+   aaneengesloten dag groeit het vuurtje. Een dag missen dooft het. */
+function streaks() { if (!db.data.streaks) db.data.streaks = {}; return db.data.streaks; }
+const streakSleutel = (a, b) => [a, b].sort().join('|');
+const dagVan = (t) => new Date(t || Date.now()).toISOString().slice(0, 10);
+function streakBijwerken(van, naar) {
+  const st = streaks();
+  const s = st[streakSleutel(van, naar)] || (st[streakSleutel(van, naar)] = { count: 0, laatste: null, dag: null, kanten: [] });
+  const vandaag = dagVan();
+  if (s.dag !== vandaag) { s.dag = vandaag; s.kanten = []; }
+  if (!s.kanten.includes(van)) s.kanten.push(van);
+  if (s.kanten.length === 2 && s.laatste !== vandaag) {
+    s.count = (s.laatste === dagVan(Date.now() - 86400000)) ? s.count + 1 : 1;
+    s.laatste = vandaag;
+  }
+}
+function streakVan(a, b) {
+  const s = streaks()[streakSleutel(a, b)];
+  if (!s || !s.laatste) return 0;
+  // na een gemiste dag is het vuurtje gedoofd
+  return (s.laatste === dagVan() || s.laatste === dagVan(Date.now() - 86400000)) ? s.count : 0;
+}
+
+/* ---------- de dag-opdracht: elke dag een snap-uitdaging voor iedereen ---------- */
+const OPDRACHTEN = [
+  { emoji: '💛', tekst: 'iets geels' }, { emoji: '🌅', tekst: 'je uitzicht van nu' },
+  { emoji: '🍳', tekst: 'je ontbijt of lunch' }, { emoji: '👟', tekst: 'je schoenen van vandaag' },
+  { emoji: '🌿', tekst: 'iets dat groeit' }, { emoji: '📚', tekst: 'wat je aan het leren bent' },
+  { emoji: '😄', tekst: 'iets dat je aan het lachen maakte' }, { emoji: '🎨', tekst: 'de mooiste kleur om je heen' },
+  { emoji: '💧', tekst: 'iets met water' }, { emoji: '🐾', tekst: 'een dier (of iets dat erop lijkt)' },
+  { emoji: '🔺', tekst: 'een driehoek in het wild' }, { emoji: '☁️', tekst: 'de lucht van dit moment' },
+  { emoji: '🤝', tekst: 'iets dat je samen doet' }, { emoji: '🏠', tekst: 'je favoriete plek thuis' },
+  { emoji: '🎵', tekst: 'waar jij muziek van krijgt' }, { emoji: '🧦', tekst: 'de gekste sok die je vindt' },
+  { emoji: '🌳', tekst: 'de oudste boom die je ziet' }, { emoji: '✍️', tekst: 'je eigen handschrift' },
+  { emoji: '🪞', tekst: 'een spiegelbeeld (niet van jezelf)' }, { emoji: '🍎', tekst: 'iets gezonds' },
+  { emoji: '🔤', tekst: 'de eerste letter van je naam, ergens gevonden' }, { emoji: '🌙', tekst: 'iets dat bij de avond hoort' },
+  { emoji: '🧩', tekst: 'iets dat precies past' }, { emoji: '🚲', tekst: 'iets met wielen' },
+  { emoji: '🌈', tekst: 'drie kleuren in een beeld' }, { emoji: '⏰', tekst: 'hoe laat het is, zonder klok' },
+  { emoji: '🫶', tekst: 'iets waar je dankbaar voor bent' }, { emoji: '🔍', tekst: 'iets heel kleins, heel dichtbij' }
+];
+function dagOpdracht() {
+  const dag = dagVan();
+  let h = 0; for (const c of dag) h = ((h * 31) + c.charCodeAt(0)) >>> 0;
+  return Object.assign({ dag }, OPDRACHTEN[h % OPDRACHTEN.length]);
+}
+
 async function snapSturen(van, naar, foto, tekst) {
   if (isGeblokkeerd(van, naar)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
   if (!zijnVrienden(van, naar)) return { status: 403, error: 'Je kunt alleen snappen naar een vriend.' };
@@ -256,9 +303,10 @@ async function snapSturen(van, naar, foto, tekst) {
   db.data.snaps.push(snap);
   // over de bovengrens? de oudste (weggeknipte) snaps ook van schijf halen
   if (db.data.snaps.length > 2000) { db.data.snaps.slice(0, db.data.snaps.length - 2000).forEach(wisFoto); db.data.snaps = db.data.snaps.slice(-2000); }
+  streakBijwerken(van, naar); // het vuurtje groeit als jullie allebei vandaag snappen
   save();
   sseToCustomer(naar, 'social', { kind: 'snap', from: codenaamVan(van) });
-  return { status: 200, ok: true };
+  return { status: 200, ok: true, vuurtje: streakVan(van, naar) };
 }
 // binnengekomen snaps voor 'mij' (alleen dat er een is, nog niet de foto)
 function snapsVoor(mij) {
@@ -277,13 +325,15 @@ async function snapOpenen(mij, id) {
   save();
   return { status: 200, foto, tekst, van };
 }
-async function verhaalPlaatsen(van, foto, tekst) {
+async function verhaalPlaatsen(van, foto, tekst, metOpdracht) {
   if (!geldigeFoto(foto)) return { status: 400, error: 'Kies een foto (max ~900 kB).' };
   const ref = await media.bewaar(foto, 900 * 1024);
   if (!ref) return { status: 400, error: 'De foto kon niet worden opgeslagen.' };
   db.data.stories.filter(s => s.van === van).forEach(wisFoto);   // oud verhaal-bestand weg
   db.data.stories = db.data.stories.filter(s => !(s.van === van)); // een verhaal per persoon tegelijk (het nieuwste)
-  db.data.stories.push({ id: crypto.randomBytes(5).toString('hex'), van, foto: ref, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), kijkers: [] });
+  // meedoen met de dag-opdracht: het verhaal draagt de opdracht van vandaag als badge
+  const opdracht = metOpdracht === true ? dagOpdracht() : null;
+  db.data.stories.push({ id: crypto.randomBytes(5).toString('hex'), van, foto: ref, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), kijkers: [], opdracht: opdracht ? opdracht.emoji + ' ' + opdracht.tekst : null });
   if (db.data.stories.length > 1000) { db.data.stories.slice(0, db.data.stories.length - 1000).forEach(wisFoto); db.data.stories = db.data.stories.slice(-1000); }
   save();
   return { status: 200, ok: true };
@@ -293,15 +343,15 @@ function verhalenVoor(mij) {
   opschonenSnaps();
   return db.data.stories.filter(s => s.van === mij || zijnVrienden(mij, s.van))
     .sort((a, b) => String(b.at).localeCompare(String(a.at)))
-    .map(s => ({ id: s.id, van: codenaamVan(s.van), vanMij: s.van === mij, at: s.at, gezien: s.kijkers.includes(mij) }));
+    .map(s => ({ id: s.id, van: codenaamVan(s.van), vanMij: s.van === mij, at: s.at, gezien: s.kijkers.includes(mij), opdracht: s.opdracht || null }));
 }
 async function verhaalBekijken(mij, id) {
   opschonenSnaps();
   const s = db.data.stories.find(x => x.id === id);
   if (!s || (s.van !== mij && !zijnVrienden(mij, s.van))) return { status: 404, error: 'Dit verhaal is er niet meer.' };
   if (!s.kijkers.includes(mij)) { s.kijkers.push(mij); save(); }
-  return { status: 200, foto: await media.leesDataUrl(s.foto), tekst: s.tekst, van: codenaamVan(s.van), at: s.at };
+  return { status: 200, foto: await media.leesDataUrl(s.foto), tekst: s.tekst, van: codenaamVan(s.van), at: s.at, opdracht: s.opdracht || null };
 }
 
-  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken };
+  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, streakVan };
 };

@@ -45,6 +45,22 @@
   .invoer{display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--lijn);}
   .invoer .veld{flex:1;}
   .snapfull{max-width:100%;max-height:70vh;border-radius:10px;}
+  /* vuurtje (snap-streak) en dag-opdracht */
+  .vuurchip{background:#241f16;color:var(--goud2);border-radius:999px;padding:.05rem .45rem;font-size:.72rem;font-weight:700;margin-left:.35rem;white-space:nowrap;}
+  .opkaart{display:flex;align-items:center;gap:.7rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:14px;padding:.7rem .9rem;margin:.4rem 0 .8rem;}
+  .opkaart .em{font-size:1.6rem;}
+  .opkaart .tx{flex:1;font-size:.9rem;line-height:1.35;}
+  .opkaart .tx b{color:var(--goud);}
+  .opkaart .tx small{display:block;color:var(--zacht);font-size:.72rem;margin-top:.15rem;}
+  /* snap-studio */
+  .studio-cv{width:100%;border-radius:12px;display:block;touch-action:none;background:#111;}
+  .strij{display:flex;gap:.4rem;align-items:center;margin-top:.5rem;flex-wrap:wrap;}
+  .stchip{background:#26221d;color:#fff;border-radius:999px;padding:.3rem .7rem;font-size:.78rem;border:2px solid transparent;cursor:pointer;}
+  .stchip.aan{border-color:var(--goud);color:var(--goud2);}
+  .stkleur{width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;}
+  .stkleur.aan{border-color:#fff;transform:scale(1.12);}
+  .stemoji{font-size:1.2rem;background:#26221d;border-radius:9px;width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;}
+  .stemoji.aan{border-color:var(--goud);}
   .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--goud);cursor:pointer;opacity:.75;}
   /* bellen */
   .ovkop .belk-kop{background:none;border:none;font-size:1.15rem;cursor:pointer;padding:0 .1rem;}
@@ -73,6 +89,7 @@
   <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam.</div>
   <div class="mijncn" id="mijncn"></div>
 
+  <div id="opdrachtKaart"></div>
   <div class="stories" id="stories"></div>
 
   <div id="zoekBlok">
@@ -134,7 +151,7 @@
 <!-- verhaal kijker -->
 <div class="ov" id="storyOv"><div class="ovkaart" style="background:#000;">
   <div class="ovkop" style="border-color:#222;"><b id="storyVan"></b><button class="ovx" id="storyX">✕</button></div>
-  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="storyImg" alt=""><div id="storyTxt" style="color:#fff;margin-top:.6rem;"></div></div>
+  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="storyImg" alt=""><div id="storyTxt" style="color:#fff;margin-top:.6rem;"></div><div id="storyOpdracht" style="color:var(--goud2);font-size:.8rem;margin-top:.4rem;"></div></div>
 </div></div>
 
 <!-- belscherm -->
@@ -162,6 +179,18 @@
   </div>
 </div></div>
 
+<!-- snap-studio: tekenen, stickers en filters voor je snap of verhaal -->
+<div class="ov" id="studioOv" aria-label="Snap-studio"><div class="ovkaart" style="background:#0d0c0b;max-width:30rem;">
+  <div class="ovkop"><b id="studioTitel">Snap-studio</b><button class="ovx" id="studioX" aria-label="Sluiten">✕</button></div>
+  <div style="padding:.7rem;overflow-y:auto;">
+    <canvas class="studio-cv" id="stCv" aria-label="Bewerk je foto"></canvas>
+    <div class="strij" id="stFilters" role="group" aria-label="Filters"></div>
+    <div class="strij"><span style="color:var(--zacht);font-size:.8rem;">✏️</span><span id="stKleuren" style="display:flex;gap:.4rem;"></span><span style="flex:1;"></span><button class="stchip" id="stWis" type="button">↶ wis laatste</button></div>
+    <div class="strij" id="stEmojis" role="group" aria-label="Stickers"></div>
+    <input class="veld" id="stTekst" placeholder="Tekst erbij (mag leeg)" maxlength="120" style="margin-top:.5rem;">
+    <button class="knop" id="stStuur" type="button" style="width:100%;margin-top:.55rem;">Versturen</button>
+  </div>
+</div></div>
 <input type="file" id="fotoIn" accept="image/*" style="display:none;">
 
 <script src="/apps/util.js"></script>
@@ -199,6 +228,7 @@ async function laad(){
   vervang($('#vrienden'), cs.length ? cs.map(c=> E('div',{class:'rij'},
     E('span',{class:'av'}, initcn(c.codename)),
     E('div',{class:'nm'}, c.codename, c.unread ? E('span',{class:'badge'}, c.unread) : null,
+      c.vuurtje ? E('span',{class:'vuurchip', title:'Jullie vuurtje: '+c.vuurtje+' dagen op rij gesnapt'}, seizoenVuur()+' '+c.vuurtje) : null,
       E('small', null, (c.tier==='rtf'?'RTFoundation':'RTG') + (c.last?' · '+c.last:''))),
     E('button',{class:'knop mini', onclick:()=>openChat(c.key,c.codename)}, 'Chat'),
     E('button',{class:'knop grijs mini', onclick:()=>kiesSnap(c.key,c.codename)}, '📷'),
@@ -226,6 +256,7 @@ async function laad(){
   // ouder-meekijk: de contacten van elk kind
   renderMeekijk(d.kinderen||[]);
   laadStories(); laadSnaps();
+  if (!opdrachtVandaag) laadOpdracht(); // de dag-opdracht een keer per sessie laden
 }
 async function keur(pair, akkoord){
   const [kindHandle, anderKey] = pair.split('|');
@@ -329,19 +360,104 @@ $('#snapBtn').addEventListener('click', ()=> kiesSnap(chatMet, chatCn));
 $('#chatBel').addEventListener('click', ()=>{ if(chatMet) belStart(chatMet, chatCn, false); });
 $('#chatVideo').addEventListener('click', ()=>{ if(chatMet) belStart(chatMet, chatCn, true); });
 
-// ---- snaps versturen ----
-let snapNaar=null, storyMode=false;
-function kiesSnap(key, cn){ snapNaar=key; storyMode=false; $('#fotoIn').click(); }
-function kiesStory(){ storyMode=true; snapNaar=null; $('#fotoIn').click(); }
+// ---- snaps versturen: via de snap-studio ----
+let snapNaar=null, snapCn='', storyMode=false, opdrachtMode=false;
+function kiesSnap(key, cn){ snapNaar=key; snapCn=cn||''; storyMode=false; opdrachtMode=false; $('#fotoIn').click(); }
+function kiesStory(metOpdracht){ storyMode=true; opdrachtMode=metOpdracht===true; snapNaar=null; $('#fotoIn').click(); }
 $('#fotoIn').addEventListener('change', async e=>{
   const file = e.target.files[0]; e.target.value=''; if(!file) return;
   const foto = await verklein(file); if(!foto){ alert('Kon de foto niet lezen.'); return; }
-  const tekst = prompt('Tekst bij je '+(storyMode?'verhaal':'snap')+' (mag leeg):','') || '';
+  stOpen(foto);
+});
+
+/* ---- de snap-studio: tekenen, stickers en filters op je foto ----
+   Het filter "Dagkleur" legt de kleur van vandaag (het 4x4-palet) over je
+   foto, zodat elke snap de tint van het moment draagt. */
+const ST = { img:null, ops:[], filter:'dag', pen:'#F2E7C9', modus:'pen', emoji:null };
+const ST_FILTERS = [['geen','Geen'],['dag','Dagkleur'],['warm','Warm'],['zw','Zwart-wit']];
+const ST_KLEUREN = ['#F2E7C9','#E05B5B','#5FA56A','#5B8FE0','#111111'];
+const ST_EMOJIS = ['😄','😍','🔥','⭐','🎉','💛','🦊','👑'];
+function dagkleur(){ return (getComputedStyle(document.documentElement).getPropertyValue('--dag-kleur')||'').trim() || '#C9A24B'; }
+function seizoenVuur(){ return ({lente:'🌸',zomer:'🔥',herfst:'🍂',winter:'❄️'})[document.documentElement.getAttribute('data-seizoen')] || '🔥'; }
+function stTeken(){
+  const cv=$('#stCv'), ctx=cv.getContext('2d'); if(!ST.img) return;
+  ctx.save();
+  ctx.filter = ST.filter==='warm' ? 'sepia(.45) saturate(1.25)' : ST.filter==='zw' ? 'grayscale(1) contrast(1.05)' : 'none';
+  ctx.drawImage(ST.img, 0, 0, cv.width, cv.height);
+  ctx.restore();
+  if (ST.filter==='dag'){ ctx.save(); ctx.globalAlpha=.28; ctx.globalCompositeOperation='overlay'; ctx.fillStyle=dagkleur(); ctx.fillRect(0,0,cv.width,cv.height); ctx.restore(); }
+  for (const op of ST.ops){
+    if (op.t==='l'){ ctx.save(); ctx.strokeStyle=op.k; ctx.lineWidth=Math.max(3,cv.width/90); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.beginPath(); op.p.forEach((pt,i)=> i?ctx.lineTo(pt[0],pt[1]):ctx.moveTo(pt[0],pt[1])); ctx.stroke(); ctx.restore(); }
+    else { ctx.save(); ctx.font=Math.round(cv.width/7)+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(op.e, op.x, op.y); ctx.restore(); }
+  }
+}
+function stChips(){
+  $('#stFilters').innerHTML = ST_FILTERS.map(f=> '<button type="button" class="stchip'+(ST.filter===f[0]?' aan':'')+'" data-f="'+f[0]+'">'+f[1]+'</button>').join('');
+  $('#stFilters').querySelectorAll('[data-f]').forEach(b=> b.addEventListener('click', ()=>{ ST.filter=b.dataset.f; stChips(); stTeken(); }));
+  $('#stKleuren').innerHTML = ST_KLEUREN.map(k=> '<button type="button" class="stkleur'+(ST.modus==='pen'&&ST.pen===k?' aan':'')+'" data-k="'+k+'" style="background:'+k+'" aria-label="Penkleur"></button>').join('');
+  $('#stKleuren').querySelectorAll('[data-k]').forEach(b=> b.addEventListener('click', ()=>{ ST.pen=b.dataset.k; ST.modus='pen'; ST.emoji=null; stChips(); }));
+  $('#stEmojis').innerHTML = ST_EMOJIS.map(em=> '<button type="button" class="stemoji'+(ST.modus==='sticker'&&ST.emoji===em?' aan':'')+'" data-e="'+em+'">'+em+'</button>').join('');
+  $('#stEmojis').querySelectorAll('[data-e]').forEach(b=> b.addEventListener('click', ()=>{ ST.emoji=b.dataset.e; ST.modus='sticker'; stChips(); }));
+}
+function stOpen(dataUrl){
+  const img=new Image();
+  img.onload=()=>{
+    ST.img=img; ST.ops=[]; ST.filter='dag'; ST.modus='pen';
+    const cv=$('#stCv'); cv.width=img.width; cv.height=img.height;
+    stChips(); stTeken();
+    $('#studioTitel').textContent = storyMode ? (opdrachtMode?'📸 Dag-opdracht':'Jouw verhaal (24 uur)') : 'Snap voor '+(snapCn||'je vriend');
+    $('#stTekst').value = (opdrachtMode && opdrachtVandaag) ? opdrachtVandaag.emoji+' '+opdrachtVandaag.tekst : '';
+    $('#studioOv').classList.add('open');
+  };
+  img.src=dataUrl;
+}
+// tekenen en stickers plakken met de vinger of muis
+(function(){
+  const cv=$('#stCv'); let lijn=null;
+  const punt=ev=>{ const r=cv.getBoundingClientRect(); return [ (ev.clientX-r.left)*(cv.width/r.width), (ev.clientY-r.top)*(cv.height/r.height) ]; };
+  cv.addEventListener('pointerdown', ev=>{
+    if(!ST.img) return; ev.preventDefault();
+    if (ST.modus==='sticker' && ST.emoji){ const [x,y]=punt(ev); ST.ops.push({t:'s',e:ST.emoji,x,y}); stTeken(); return; }
+    lijn={t:'l',k:ST.pen,p:[punt(ev)]}; ST.ops.push(lijn); cv.setPointerCapture(ev.pointerId);
+  });
+  cv.addEventListener('pointermove', ev=>{ if(lijn){ lijn.p.push(punt(ev)); stTeken(); } });
+  cv.addEventListener('pointerup', ()=>{ lijn=null; });
+})();
+$('#stWis').addEventListener('click', ()=>{ ST.ops.pop(); stTeken(); });
+$('#studioX').addEventListener('click', ()=> $('#studioOv').classList.remove('open'));
+$('#stStuur').addEventListener('click', async ()=>{
+  if(!ST.img) return;
+  const foto=$('#stCv').toDataURL('image/jpeg',0.72);
+  const tekst=$('#stTekst').value.trim();
   try{
-    if (storyMode){ await soc('/story/post', { foto, tekst }); alert('Je verhaal staat er 24 uur op.'); laadStories(); }
-    else { await soc('/snap/send', { toKey: snapNaar, foto, tekst }); alert('Snap verstuurd. Hij verdwijnt zodra je vriend hem bekijkt.'); }
+    if (storyMode){
+      await soc('/story/post', { foto, tekst, opdracht: opdrachtMode===true });
+      $('#studioOv').classList.remove('open');
+      meld(opdrachtMode ? 'Je doet mee met de dag-opdracht! 🎉' : 'Je verhaal staat er 24 uur op.');
+      laadStories();
+    } else {
+      const d=await soc('/snap/send', { toKey: snapNaar, foto, tekst });
+      $('#studioOv').classList.remove('open');
+      meld(d.vuurtje>0 ? 'Snap verstuurd · jullie vuurtje: '+seizoenVuur()+' '+d.vuurtje : 'Snap verstuurd. Hij verdwijnt na het bekijken.');
+      laad();
+    }
   }catch(err){ alert(err.message); }
 });
+
+/* ---- de dag-opdracht: elke dag dezelfde uitdaging voor iedereen ---- */
+let opdrachtVandaag=null;
+async function laadOpdracht(){
+  try{ opdrachtVandaag=(await soc('/opdracht')).opdracht; }catch(e){ return; }
+  if(!opdrachtVandaag) return;
+  const el=$('#opdrachtKaart');
+  el.innerHTML='';
+  const kaart=E('div',{class:'opkaart'},
+    E('span',{class:'em'}, opdrachtVandaag.emoji),
+    E('div',{class:'tx'}, E('b', null, 'Dag-opdracht: '), 'snap '+opdrachtVandaag.tekst,
+      E('small', null, 'Elke dag een nieuwe, voor iedereen dezelfde. Jouw inzending staat 24 uur in je verhaal.')),
+    E('button',{class:'knop mini', onclick:()=>kiesStory(true)}, '📸 Doe mee'));
+  el.appendChild(kaart);
+}
 // foto verkleinen naar ~kleine jpeg zodat hij klein blijft
 function verklein(file){
   return new Promise(res=>{
@@ -377,14 +493,15 @@ async function laadStories(){
   let d; try{ d = await soc('/stories'); }catch(e){ return; }
   const st = d.stories||[];
   let html = '<div class="story" id="storyPlus"><div class="ring">＋</div><div class="nm">Jouw verhaal</div></div>';
-  html += st.map(v=> '<div class="story'+(v.gezien?' gezien':'')+'" data-story="'+esc(v.id)+'"><div class="ring">'+initcn(v.van)+'</div><div class="nm">'+esc(v.vanMij?'Jij':v.van)+'</div></div>').join('');
+  html += st.map(v=> '<div class="story'+(v.gezien?' gezien':'')+'" data-story="'+esc(v.id)+'"'+(v.opdracht?' title="'+esc(v.opdracht)+'"':'')+'><div class="ring">'+initcn(v.van)+'</div><div class="nm">'+(v.opdracht?'📸 ':'')+esc(v.vanMij?'Jij':v.van)+'</div></div>').join('');
   $('#stories').innerHTML = html;
-  $('#storyPlus').addEventListener('click', kiesStory);
+  $('#storyPlus').addEventListener('click', ()=>kiesStory(false));
   $('#stories').querySelectorAll('[data-story]').forEach(b=> b.addEventListener('click', ()=> openStory(b.dataset.story)));
 }
 async function openStory(id){
   let d; try{ d = await soc('/story/view', { id }); }catch(e){ alert(e.message); return; }
   $('#storyVan').textContent = 'Verhaal van '+d.van; $('#storyImg').src = d.foto; $('#storyTxt').textContent = d.tekst||'';
+  $('#storyOpdracht').textContent = d.opdracht ? '✅ Deed mee met de dag-opdracht: '+d.opdracht : '';
   $('#storyOv').classList.add('open');
 }
 $('#storyX').addEventListener('click', ()=>{ $('#storyOv').classList.remove('open'); $('#storyImg').src=''; laadStories(); });

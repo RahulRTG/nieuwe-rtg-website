@@ -184,23 +184,19 @@ const stopServer = () => new Promise(r => {
   const sse = { events: {}, open: 0 };
   let keukenKlaar = 0, keukenGeserveerd = 0; // doorstroomtellers
 
-  /* leden registreren (echte accounts, business-pas), in parallelle groepen zodat
-     de opstart niet seconden per lid kost */
+  /* leden registreren (echte accounts, business-pas) */
   const actors = [];
-  for (let start = 0; start < LEDEN; start += 20) {
-    const groep = await Promise.all(Array.from({ length: Math.min(20, LEDEN - start) }, (_, k) => {
-      const i = start + k;
-      return api('registratie', '/api/auth/register', {
-        name: 'Keuken Lid ' + i, email: 'keuken' + i + '@rtg.nl', phone: '06' + (40000000 + i),
-        password: 'Keuken1234!', geboortedatum: '1985-05-05', tier: 'business', pasApp: 'business'
-      }).then(reg => (reg && reg.token) ? { i, token: reg.token } : null);
-    }));
-    for (const a of groep) if (a) actors.push(a);
+  for (let i = 0; i < LEDEN; i++) {
+    const reg = await api('registratie', '/api/auth/register', {
+      name: 'Keuken Lid ' + i, email: 'keuken' + i + '@rtg.nl', phone: '06' + (40000000 + i),
+      password: 'Keuken1234!', geboortedatum: '1985-05-05', tier: 'business', pasApp: 'business'
+    });
+    if (reg && reg.token) actors.push({ i, token: reg.token });
   }
-  await Promise.all(actors.map(async a => {
+  for (const a of actors) {
     const c = await api('connecties', '/api/member/connections', {}, a.token);
     a.key = c && c.me; a.codename = c && c.codename;
-  }));
+  }
   rij('leden geregistreerd', actors.length + ' leden');
 
   /* koks: staf-logins bij de twee horecazaken (manager 1234, staf 5678) */

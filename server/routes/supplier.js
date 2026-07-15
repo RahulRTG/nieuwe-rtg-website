@@ -5,7 +5,7 @@ module.exports = (kern) => {
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
     legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
+    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten } = kern;
 
@@ -425,6 +425,15 @@ app.post('/api/supplier/pos/sale', supplierAuth, (req, res) => {
   save();
   logActivity(req.supplier.code, req.actor, 'rekende € ' + total + ' af (' + method + (sale.room ? ', ' + sale.room : '') + ')');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
+  // automatische factuur voor beide partijen; de koper wordt gekoppeld als er een
+  // RTG-codenaam bij de betaling zat, anders krijgt alleen de zaak de bon.
+  const factuurRegels = items && items.length
+    ? items.map(i => ({ omschrijving: i.name || 'Artikel', aantal: i.qty, stuk: i.price || (total / items.reduce((n, x) => n + x.qty, 0)) }))
+    : [{ omschrijving: sale.desc || 'Verkoop', aantal: 1, stuk: total }];
+  facturatie.boekMetCodenaam({
+    soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
+    koper: { naam: req.body.codenaam || sale.room || 'Kasklant' }, regels: factuurRegels, methode: method, ref: sale.id
+  }, req.body.codenaam).catch(() => {});
   res.json({ ok: true, sale });
 });
 
@@ -1871,7 +1880,15 @@ app.post('/api/supplier/retail/verkoop', supplierAuth, (req, res) => {
   if (!eisRetail(req, res)) return;
   const r = retailVerkoop(req.supplier, req.body, req.actor);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  logActivity(req.supplier.code, req.actor, 'verkocht ' + r.sale.items.reduce((n, i) => n + i.qty, 0) + ' stuk(s) · € ' + r.sale.total); res.json(r);
+  logActivity(req.supplier.code, req.actor, 'verkocht ' + r.sale.items.reduce((n, i) => n + i.qty, 0) + ' stuk(s) · € ' + r.sale.total);
+  // automatische factuur voor beide partijen (koper gekoppeld via codenaam)
+  facturatie.boekMetCodenaam({
+    soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
+    koper: { naam: req.body.codenaam || 'Klant' },
+    regels: (r.sale.items || []).map(i => ({ omschrijving: i.naam || i.name || 'Artikel', aantal: i.qty, stuk: i.price || i.prijs })),
+    methode: r.sale.method || 'pin', ref: r.sale.id
+  }, req.body.codenaam || (r.sale.klant && r.sale.klant.codenaam)).catch(() => {});
+  res.json(r);
 });
 
 /* ================= PASPOORT / IDENTITEIT (kern/paspoort.js) =================

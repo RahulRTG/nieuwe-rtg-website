@@ -109,6 +109,51 @@ function ledenFactuur(inv, who) {
   return pdf({ regels, lijnen });
 }
 
+/* Een transactiefactuur tussen twee partijen (verkoper -> koper/huurder), zoals
+   de facturatielaag die maakt bij elke verkoop/dienst/verhuur. EGn nette bon die
+   beide partijen downloaden. f is de opgeslagen factuur (zie kern/facturatie.js). */
+function transactieFactuur(f) {
+  const regels = [];
+  const lijnen = [];
+  const R = (x, y, text, size, font) => regels.push({ x, y, text, size, font });
+  const soortLabel = { verkoop: 'Verkoopfactuur', dienst: 'Dienstfactuur', huur: 'Huurfactuur' }[f.soort] || 'Factuur';
+  R(56, 64, RTG.naam.toUpperCase(), 18, 'F2');
+  R(56, 82, soortLabel + ' via RTG', 11, 'F1');
+  R(400, 64, 'Factuurnummer', 9, 'F1');
+  R(400, 78, f.nummer || '-', 12, 'F2');
+  R(400, 96, 'Datum: ' + (f.datum || '-'), 9, 'F1');
+  if (f.methode) R(400, 110, 'Betaling: ' + f.methode, 9, 'F1');
+  lijnen.push({ x1: 56, y1: 128, x2: 539, y2: 128, w: 0.8 });
+  R(56, 150, 'Van (verkoper)', 9, 'F1');
+  R(56, 164, f.verkoper.naam || '-', 12, 'F2');
+  R(300, 150, 'Aan (koper)', 9, 'F1');
+  R(300, 164, (f.koper.naam || '-') + (f.koper.codenaam ? '  .  ' + f.koper.codenaam : ''), 12, 'F2');
+  // regels
+  R(56, 210, 'Omschrijving', 9, 'F2');
+  R(330, 210, 'Aantal', 9, 'F2');
+  R(390, 210, 'Stuk', 9, 'F2');
+  R(470, 210, 'Bedrag', 9, 'F2');
+  lijnen.push({ x1: 56, y1: 218, x2: 539, y2: 218, w: 0.5 });
+  let y = 238;
+  for (const r of (f.regels || []).slice(0, 22)) {
+    R(56, y, String(r.omschrijving || '-').slice(0, 46), 10, 'F1');
+    R(330, y, String(r.aantal), 10, 'F1');
+    R(390, y, euroTekst(r.stuk), 10, 'F1');
+    R(470, y, euroTekst(r.incl != null ? r.incl : r.aantal * r.stuk), 10, 'F1');
+    y += 18;
+  }
+  lijnen.push({ x1: 56, y1: y - 2, x2: 539, y2: y - 2, w: 0.5 });
+  y += 14;
+  const spec = (l, v, bold) => { R(330, y, l, 10, bold ? 'F2' : 'F1'); R(470, y, v, 10, bold ? 'F2' : 'F1'); y += 20; };
+  spec('Subtotaal (excl. btw)', euroTekst(f.subtotaal));
+  spec('Btw', euroTekst(f.btwBedrag));
+  spec('Totaal', euroTekst(f.totaal), true);
+  lijnen.push({ x1: 56, y1: 792, x2: 539, y2: 792, w: 0.5 });
+  R(56, 808, RTG.naam + '  .  bemiddelaar  .  ' + RTG.kvk + '  .  ' + RTG.btwnr, 8, 'F1');
+  R(56, 820, 'Deze factuur is via het RTG-platform tot stand gekomen tussen de bovengenoemde partijen.', 8, 'F1');
+  return pdf({ regels, lijnen });
+}
+
 /* Een omzet-/boekhoudoverzicht (bijv. voor een leverancier of de eigen zaak).
    kop: {titel, periode, opnaam}. rijen: [{label, waarde}]. Geeft een PDF-Buffer. */
 function overzichtPdf(kop, rijen) {
@@ -142,4 +187,4 @@ function csv(rijen) {
   return rijen.map(r => r.map(veld).join(';')).join('\r\n') + '\r\n';
 }
 
-module.exports = { pdf, ledenFactuur, overzichtPdf, csv, euroTekst, isContrib, RTG };
+module.exports = { pdf, ledenFactuur, transactieFactuur, overzichtPdf, csv, euroTekst, isContrib, RTG };

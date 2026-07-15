@@ -42,7 +42,7 @@
   .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.5rem, 4vw, 3rem);}
 
   section{position:relative;padding:clamp(4rem, 6.5vw, 6rem) 0;}
-  .on-black{background:#080807;color:#F4F1EC;}
+  .on-black{background:var(--contra,#080807);color:#F4F1EC;}
 
   .folio{
     font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;
@@ -79,7 +79,7 @@
   header .wrap{display:flex;align-items:center;justify-content:space-between;}
   .brandmark{display:inline-flex;flex-direction:column;align-items:flex-start;}
   .brandmark .bm-block{
-    background:#7F1634;color:#F4F1EC;font-family:'Bodoni Moda',serif;
+    background:var(--anker,#7F1634);color:#F4F1EC;font-family:'Bodoni Moda',serif;
     font-weight:500;font-size:1.05rem;letter-spacing:0.05em;padding:0.5rem 1.05rem;line-height:1;
   }
   .brandmark .bm-tagline{
@@ -113,7 +113,7 @@
   }
   .partner-card .avatar{
     width:52px;height:52px;border-radius:50%;
-    background:#7F1634;color:#fff;
+    background:var(--anker,#7F1634);color:#fff;
     font-family:'Bodoni Moda',serif;font-size:1.3rem;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
@@ -195,7 +195,7 @@
     display:grid;grid-template-columns:repeat(3,1fr);gap:0.9rem;
     margin-top:3rem;
   }
-  .split-cards .c{background:#141312;padding:2.25rem 2rem;border:1px solid var(--line);border-radius:18px;border-color:rgba(255,255,255,0.10);}
+  .split-cards .c{background:var(--contra-paneel,#141312);padding:2.25rem 2rem;border:1px solid var(--line);border-radius:18px;border-color:rgba(255,255,255,0.10);}
   .split-cards b{
     display:block;font-family:'Bodoni Moda',serif;font-weight:500;
     font-size:2.2rem;color:var(--burgundy-on-dark);

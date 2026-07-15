@@ -15,6 +15,10 @@
    diep zwart: het contrastblok is juist het handschrift. */
 
 /* ---- seizoenen: accent, metaal en de grondtinten ---- */
+/* --contra* zijn de vaste zwarte contrastblokken en hun kaarten: altijd
+   donker, maar getint door het seizoen. --anker* is het gevulde merkvlak
+   (logoblok, primaire knoppen, de wijnsecties): per seizoen een eigen
+   diepe juweelkleur, zodat het palet door de hele site loopt. */
 :root[data-seizoen="lente"]{
   --s-accent:#96284B; --s-accent-hel:#D16584;
   --s-metaal:#8A7434; --s-metaal-hel:#C9B37E;
@@ -22,6 +26,8 @@
   --s-avond:#12130E; --s-paneel-avond:#1B1C15;
   --s-nacht:#0A0C09; --s-paneel-nacht:#12140F;
   --s-band-licht:#ECE9DC; --s-band-donker:#0F100C;
+  --contra:#0A0C09; --contra-paneel:#151710; --contra-paneel2:#1D2016;
+  --anker:#7F1634; --anker-hover:#9E1C40; --anker-diep:#160A0F; --anker-metaal:#D0AC57;
 }
 :root[data-seizoen="zomer"]{
   --s-accent:#23677C; --s-accent-hel:#5FA3B5;
@@ -30,6 +36,8 @@
   --s-avond:#171310; --s-paneel-avond:#201A14;
   --s-nacht:#090C11; --s-paneel-nacht:#10141B;
   --s-band-licht:#EFE9D8; --s-band-donker:#120F0C;
+  --contra:#0A0D12; --contra-paneel:#12161E; --contra-paneel2:#1A1F28;
+  --anker:#1E4A57; --anker-hover:#276073; --anker-diep:#0B161B; --anker-metaal:#D3AC57;
 }
 :root[data-seizoen="herfst"]{
   --s-accent:#9A5220; --s-accent-hel:#C98A50;
@@ -38,6 +46,8 @@
   --s-avond:#161009; --s-paneel-avond:#1F1810;
   --s-nacht:#0C0A08; --s-paneel-nacht:#14110D;
   --s-band-licht:#EDE6D8; --s-band-donker:#110D08;
+  --contra:#0D0A07; --contra-paneel:#17120C; --contra-paneel2:#201913;
+  --anker:#6E3A14; --anker-hover:#8A4A1C; --anker-diep:#180E05; --anker-metaal:#C08A4E;
 }
 :root[data-seizoen="winter"]{
   --s-accent:#46617A; --s-accent-hel:#8FA6BC;
@@ -46,6 +56,8 @@
   --s-avond:#0F1114; --s-paneel-avond:#171A1E;
   --s-nacht:#07090C; --s-paneel-nacht:#0F1216;
   --s-band-licht:#E9EBED; --s-band-donker:#0B0D10;
+  --contra:#07090C; --contra-paneel:#101318; --contra-paneel2:#171B21;
+  --anker:#33465C; --anker-hover:#415A76; --anker-diep:#0C121A; --anker-metaal:#B9BEC5;
 }
 
 /* ---- zonstanden: de grond en de inkt ---- */
@@ -56,8 +68,8 @@
   --panel2:#FFFFFF;
   --black:#1A1512;
   --line:rgba(26,21,18,0.14);
-  --grey:rgba(26,21,18,0.70);
-  --grey-soft:rgba(26,21,18,0.48);
+  --grey:rgba(26,21,18,0.78);
+  --grey-soft:rgba(26,21,18,0.64);
   --burgundy:var(--s-accent,#96284B);
   --burgundy-bright:var(--s-accent,#96284B);
   --gold:var(--s-metaal,#8A7434);
@@ -94,6 +106,14 @@
 /* het heldere accent op de vaste zwarte contrastblokken */
 :root[data-dagdeel]{
   --burgundy-on-dark:var(--s-accent-hel,#C23A5E);
+}
+
+/* de app-hub gebruikt eigen tokennamen; koppel ze aan hetzelfde palet */
+:root[data-dagdeel]{
+  --bg:var(--white);
+  --card:var(--panel);
+  --txt:var(--black);
+  --soft:var(--grey-soft);
 }
 
 /* de wisseling van het licht verloopt zacht, als een zonsondergang */

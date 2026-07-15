@@ -6,15 +6,16 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>Pagina niet gevonden, Rahul Travel Group</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:#0C0C0B;color:#F4F1EC;font-family:'Inter',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;}
-  .code{font-family:'Bodoni Moda',serif;font-size:clamp(5rem,18vw,9rem);font-weight:500;color:#C23A5E;line-height:1;}
+  body{background:var(--white,#0C0C0B);color:var(--black,#F4F1EC);font-family:'Inter',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;}
+  .code{font-family:'Bodoni Moda',serif;font-size:clamp(5rem,18vw,9rem);font-weight:500;color:var(--burgundy,#C23A5E);line-height:1;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.5rem;margin-top:0.8rem;}
-  p{margin-top:0.8rem;font-size:0.9rem;color:rgba(244,241,236,0.70);max-width:26rem;}
+  p{margin-top:0.8rem;font-size:0.9rem;color:var(--grey,rgba(244,241,236,0.70));max-width:26rem;}
   .links{margin-top:2rem;display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap;}
-  a{color:#F4F1EC;text-decoration:none;border:1px solid rgba(255,255,255,0.15);border-radius:999px;padding:0.7rem 1.4rem;font-size:0.82rem;}
-  a:hover{border-color:#A98F1C;color:#A98F1C;}
+  a{color:var(--black,#F4F1EC);text-decoration:none;border:1px solid var(--line,rgba(255,255,255,0.15));border-radius:999px;padding:0.7rem 1.4rem;font-size:0.82rem;}
+  a:hover{border-color:var(--gold,#A98F1C);color:var(--gold,#A98F1C);}
 </style>
 </head>
 <body>
@@ -28,5 +29,6 @@
     <a href="/apps/leden.html">De leden-app</a>
   </div>
 </div>
+<script src="/shared/seizoen.js" defer></script>
 </body>
 </html>

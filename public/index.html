@@ -59,7 +59,7 @@
     overflow:hidden;
   }
 
-  .on-black{background:#080807;color:#F4F1EC;}
+  .on-black{background:var(--contra,#080807);color:#F4F1EC;}
   .on-white{background:var(--white);color:var(--black);}
 
   .folio{
@@ -116,7 +116,7 @@
     align-items:flex-start;
   }
   .brandmark .bm-block{
-    background:#7F1634;
+    background:var(--anker,#7F1634);
     color:#F4F1EC;
     font-family:'Bodoni Moda',serif;
     font-weight:500;
@@ -148,7 +148,7 @@
   }
   nav a:hover{color:var(--burgundy);}
   nav a.nav-login{
-    background:#7F1634;
+    background:var(--anker,#7F1634);
     color:#F4F1EC;
     padding:0.6rem 1.35rem;
     border-radius:999px;
@@ -221,14 +221,14 @@
     border-color:var(--black);
   }
   .btn-login{
-    background:#7F1634;
+    background:var(--anker,#7F1634);
     color:#F4F1EC;
-    border-color:#7F1634;
+    border-color:var(--anker,#7F1634);
   }
   .btn-login:hover{
-    background:#9E1C40;
+    background:var(--anker-hover,#9E1C40);
     color:#F4F1EC;
-    border-color:#9E1C40;
+    border-color:var(--anker-hover,#9E1C40);
   }
 
   /* ---------- manifesto ---------- */
@@ -325,7 +325,7 @@
     margin-top:4rem;
     }
   .pass-card{
-    background:#141312;
+    background:var(--contra-paneel,#141312);
     padding:3rem 2.25rem;
     display:flex;
     flex-direction:column;
@@ -335,7 +335,7 @@
     border-radius:18px;
     border-color:rgba(255,255,255,0.10);
   }
-  .pass-card:hover{background:#141312;border-color:#C9A94E;}
+  .pass-card:hover{background:var(--contra-paneel,#141312);border-color:#C9A94E;}
   .pass-tag{
     font-size:0.75rem;
     letter-spacing:0.14em;
@@ -385,7 +385,7 @@
 
   /* ---------- uit de salon ---------- */
 
-  .salon-strip{background:#100F0E;}
+  .salon-strip{background:var(--contra,#100F0E);}
   .salon-strip h2{
     font-size:clamp(1.8rem, 3vw, 2.4rem);
     line-height:1.1;
@@ -403,7 +403,7 @@
     margin-top:3rem;
   }
   .salon-card{
-    background:#141312;
+    background:var(--contra-paneel,#141312);
     border:1px solid var(--line);
     display:flex;
     flex-direction:column;

@@ -1,98 +1,90 @@
 /* Het 4x4-palet voor de passen in de leden-app: vier seizoenen x vier
-   zonstanden geven elke pas een verschuivende ondertoon, terwijl de
-   identiteit van de pas blijft staan (RTG bordeaux, Lifestyle parelmoer,
-   Business klassiek) en de licht/donker-keuze van het lid heilig is.
+   zonstanden geven zestien dagkleuren. Elke pas rendert dezelfde
+   dagkleur in zijn eigen materiaal: Lifestyle als pastel op parelmoer,
+   RTG als was over de bordeaux, Business als was over het klassieke
+   zwart. De identiteit blijft staan en de accenten (goud, bordeaux)
+   draaien bewust NIET mee: dat is de handtekening van de pas. De
+   licht/donker-keuze van het lid is heilig.
 
    Werking: shared/seizoen.js zet data-seizoen en data-dagdeel op <html>;
-   dit blad mengt per combinatie een seizoenstint in de basisvlakken
-   (--bg, --card, --card2) van het actieve thema. Accenten (bordeaux,
-   goud) draaien bewust NIET mee: dat is de handtekening van de pas.
-   Zonder JavaScript verandert er niets. */
+   dit blad kiest de dagkleur en mengt die in de basisvlakken (--bg,
+   --card, --card2) van het actieve thema. Zonder JavaScript verandert
+   er niets. */
 
-/* de tint van het seizoen */
-:root[data-seizoen="lente"]{ --sp-tint:#6E9A46; }   /* jong blad */
-:root[data-seizoen="zomer"]{ --sp-tint:#2E7A96; }   /* azuur */
-:root[data-seizoen="herfst"]{ --sp-tint:#B0662E; }  /* cognac */
-:root[data-seizoen="winter"]{ --sp-tint:#5E7A9E; }  /* staal */
+/* De kleur van de dag: zestien tinten, vier per seizoen, een per
+   dagdeel. Elke rij vertelt de dag in dat seizoen. */
+:root[data-seizoen="lente"][data-dagdeel="ochtend"]{ --sp-kleur:#E08AA8; } /* bloesem */
+:root[data-seizoen="lente"][data-dagdeel="middag"]{ --sp-kleur:#86B85C; }  /* pistache */
+:root[data-seizoen="lente"][data-dagdeel="avond"]{ --sp-kleur:#E0B24A; }   /* boterbloem */
+:root[data-seizoen="lente"][data-dagdeel="nacht"]{ --sp-kleur:#8E7FC4; }   /* seringen */
+:root[data-seizoen="zomer"][data-dagdeel="ochtend"]{ --sp-kleur:#E6C64A; } /* citroen */
+:root[data-seizoen="zomer"][data-dagdeel="middag"]{ --sp-kleur:#4FA3D4; }  /* poederblauw */
+:root[data-seizoen="zomer"][data-dagdeel="avond"]{ --sp-kleur:#E67A5C; }   /* koraal */
+:root[data-seizoen="zomer"][data-dagdeel="nacht"]{ --sp-kleur:#3E6FB0; }   /* zeenacht */
+:root[data-seizoen="herfst"][data-dagdeel="ochtend"]{ --sp-kleur:#94AE6E; }/* salie */
+:root[data-seizoen="herfst"][data-dagdeel="middag"]{ --sp-kleur:#E0A038; } /* amber */
+:root[data-seizoen="herfst"][data-dagdeel="avond"]{ --sp-kleur:#DE8A5C; }  /* perzik */
+:root[data-seizoen="herfst"][data-dagdeel="nacht"]{ --sp-kleur:#9A5C86; }  /* pruim */
+:root[data-seizoen="winter"][data-dagdeel="ochtend"]{ --sp-kleur:#7FB4D2; }/* ijsblauw */
+:root[data-seizoen="winter"][data-dagdeel="middag"]{ --sp-kleur:#8FA0B4; } /* zilver */
+:root[data-seizoen="winter"][data-dagdeel="avond"]{ --sp-kleur:#C77E92; }  /* oudroze */
+:root[data-seizoen="winter"][data-dagdeel="nacht"]{ --sp-kleur:#6E63B8; }  /* lila */
 
-/* Lifestyle: zestien pastellen, vier per seizoen, een per dagdeel.
-   Elke rij vertelt de dag in dat seizoen: het licht van de ochtend,
-   de klaarte van de middag, de gloed van de avond, de rust van de nacht. */
-:root[data-seizoen="lente"][data-dagdeel="ochtend"]{ --sp-pastel:#E2A8BE; } /* bloesem */
-:root[data-seizoen="lente"][data-dagdeel="middag"]{ --sp-pastel:#A3C487; }  /* pistache */
-:root[data-seizoen="lente"][data-dagdeel="avond"]{ --sp-pastel:#E4C078; }   /* boterbloem */
-:root[data-seizoen="lente"][data-dagdeel="nacht"]{ --sp-pastel:#A6A0CE; }   /* seringen */
-:root[data-seizoen="zomer"][data-dagdeel="ochtend"]{ --sp-pastel:#E7D584; } /* citroen */
-:root[data-seizoen="zomer"][data-dagdeel="middag"]{ --sp-pastel:#7BB6DB; }  /* poederblauw */
-:root[data-seizoen="zomer"][data-dagdeel="avond"]{ --sp-pastel:#E69579; }   /* koraal */
-:root[data-seizoen="zomer"][data-dagdeel="nacht"]{ --sp-pastel:#8A9AC6; }   /* zeenacht */
-:root[data-seizoen="herfst"][data-dagdeel="ochtend"]{ --sp-pastel:#AABB8E; } /* salie */
-:root[data-seizoen="herfst"][data-dagdeel="middag"]{ --sp-pastel:#E2B45E; }  /* amber */
-:root[data-seizoen="herfst"][data-dagdeel="avond"]{ --sp-pastel:#E0A379; }   /* perzik */
-:root[data-seizoen="herfst"][data-dagdeel="nacht"]{ --sp-pastel:#B28FA6; }   /* pruim */
-:root[data-seizoen="winter"][data-dagdeel="ochtend"]{ --sp-pastel:#A5C4DA; } /* ijsblauw */
-:root[data-seizoen="winter"][data-dagdeel="middag"]{ --sp-pastel:#B5BFCC; }  /* zilver */
-:root[data-seizoen="winter"][data-dagdeel="avond"]{ --sp-pastel:#D5A0AB; }   /* oudroze */
-:root[data-seizoen="winter"][data-dagdeel="nacht"]{ --sp-pastel:#A5A4CE; }   /* lila */
-
-/* de zonstand: hoe warm en hoe sterk de tint meemengt
-   (--sp-d/-k voor donkere vlakken, --sp-dl/-kl voor lichte vlakken) */
+/* De zonstand bepaalt hoe de dagkleur wordt gerenderd.
+   --sp-d/-k : de was over de donkere passen (RTG, Business)
+   --sp-p/-pk: de pastel voor Lifestyle en voor de lichte weergave */
 :root[data-dagdeel="ochtend"]{
-  --sp-d:color-mix(in oklab, #ffffff 20%, var(--sp-tint,#7F1634)); --sp-k:12%;
-  --sp-dl:color-mix(in oklab, #ffffff 55%, var(--sp-tint,#7F1634)); --sp-kl:14%;
-  --sp-p:color-mix(in oklab, #ffffff 45%, var(--sp-pastel,#D9C6CE)); --sp-pk:62%;
+  --sp-d:color-mix(in oklab, #ffffff 18%, var(--sp-kleur,#7F1634)); --sp-k:20%;
+  --sp-p:color-mix(in oklab, #ffffff 46%, var(--sp-kleur,#D9C6CE)); --sp-pk:70%;
 }
 :root[data-dagdeel="middag"]{
-  --sp-d:color-mix(in oklab, #ffffff 10%, var(--sp-tint,#7F1634)); --sp-k:8%;
-  --sp-dl:color-mix(in oklab, #ffffff 65%, var(--sp-tint,#7F1634)); --sp-kl:10%;
-  --sp-p:color-mix(in oklab, #ffffff 50%, var(--sp-pastel,#D9C6CE)); --sp-pk:58%;
+  --sp-d:color-mix(in oklab, #ffffff 8%, var(--sp-kleur,#7F1634)); --sp-k:22%;
+  --sp-p:color-mix(in oklab, #ffffff 52%, var(--sp-kleur,#D9C6CE)); --sp-pk:66%;
 }
 :root[data-dagdeel="avond"]{
-  --sp-d:var(--sp-tint,#7F1634); --sp-k:14%;
-  --sp-dl:color-mix(in oklab, #ffffff 42%, var(--sp-tint,#7F1634)); --sp-kl:16%;
-  --sp-p:color-mix(in oklab, #ffffff 34%, var(--sp-pastel,#D9C6CE)); --sp-pk:65%;
+  --sp-d:var(--sp-kleur,#7F1634); --sp-k:20%;
+  --sp-p:color-mix(in oklab, #ffffff 38%, var(--sp-kleur,#D9C6CE)); --sp-pk:72%;
 }
 :root[data-dagdeel="nacht"]{
-  --sp-d:color-mix(in oklab, #000000 32%, var(--sp-tint,#7F1634)); --sp-k:10%;
-  --sp-dl:color-mix(in oklab, #ffffff 30%, var(--sp-tint,#7F1634)); --sp-kl:12%;
-  --sp-p:color-mix(in oklab, #8E8C96 22%, color-mix(in oklab, #ffffff 42%, var(--sp-pastel,#D9C6CE))); --sp-pk:55%;
+  --sp-d:color-mix(in oklab, #000000 28%, var(--sp-kleur,#7F1634)); --sp-k:16%;
+  --sp-p:color-mix(in oklab, #6F6D78 16%, color-mix(in oklab, #ffffff 40%, var(--sp-kleur,#D9C6CE))); --sp-pk:64%;
 }
 
 /* Business / klassiek donker (geen pas-thema, geen lichte weergave) */
 :root[data-seizoen][data-dagdeel]:not([data-thema="licht"]):not([data-pas-thema]){
-  --bg:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #0C0C0B);
-  --card:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #151312);
-  --card2:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #1B1817);
+  --bg:color-mix(in oklab, var(--sp-d) var(--sp-k,18%), #0C0C0B);
+  --card:color-mix(in oklab, var(--sp-d) var(--sp-k,18%), #151312);
+  --card2:color-mix(in oklab, var(--sp-d) var(--sp-k,18%), #1B1817);
 }
 
-/* RTG / bordeaux (donker): de wijn blijft, het licht draait erdoorheen */
+/* RTG / bordeaux (donker): de wijn blijft, de dagkleur trekt erdoorheen */
 :root[data-seizoen][data-dagdeel][data-pas-thema="bordeaux"]:not([data-thema="licht"]){
-  --bg:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #1E0912);
-  --card:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #2B0E1B);
-  --card2:color-mix(in oklab, var(--sp-d) var(--sp-k,10%), #371425);
+  --bg:color-mix(in oklab, var(--sp-d) var(--sp-k,18%), #1E0912);
+  --card:color-mix(in oklab, var(--sp-d) var(--sp-k,18%), #2B0E1B);
+  --card2:color-mix(in oklab, var(--sp-d) var(--sp-k,18%), #371425);
 }
 
-/* Lifestyle / parelmoer: vier volwaardige pastellen. De achtergrond
-   draagt de pastel, de kaarten blijven parelmoer met een ademtocht
-   van dezelfde kleur, zodat tekst en goud rustig blijven staan. */
+/* Lifestyle / parelmoer: de pastel draagt de achtergrond en kleurt nu
+   ook de kaarten mee, zodat de dagkleur echt in het scherm terugkomt.
+   De parelmoer-basis blijft eronder liggen, zodat tekst en goud staan. */
 :root[data-seizoen][data-dagdeel][data-pas-thema="parelmoer"]:not([data-thema="licht"]){
-  --bg:color-mix(in oklab, var(--sp-p) var(--sp-pk,55%), #ECE6DD);
-  --card:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,55%) / 3), #F7F3EC);
-  --card2:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,55%) / 4), #FCFAF5);
+  --bg:color-mix(in oklab, var(--sp-p) var(--sp-pk,66%), #ECE6DD);
+  --card:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,66%) / 1.7), #F7F3EC);
+  --card2:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,66%) / 2.2), #FCFAF5);
 }
 
 /* Lifestyle in de lichte weergave: dezelfde pastel, zachter op ivoor */
 :root[data-seizoen][data-dagdeel][data-pas-thema="parelmoer"][data-thema="licht"]{
-  --bg:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,55%) / 2), #FBFAF7);
-  --card:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,55%) / 5), #FFFFFF);
-  --card2:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,55%) / 3), #F3F0E9);
+  --bg:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,66%) / 1.7), #FBFAF7);
+  --card:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,66%) / 3), #FFFFFF);
+  --card2:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,66%) / 2), #F3F0E9);
 }
 
-/* de lichte weergave (weergaveknop), voor alle passen: ivoor met de tint */
+/* Lichte weergave voor RTG en Business: ivoor met de dagkleur */
 :root[data-seizoen][data-dagdeel][data-thema="licht"]{
-  --bg:color-mix(in oklab, var(--sp-dl) var(--sp-kl,10%), #FBFAF7);
-  --card:color-mix(in oklab, var(--sp-dl) calc(var(--sp-kl,10%) / 2), #FFFFFF);
-  --card2:color-mix(in oklab, var(--sp-dl) var(--sp-kl,10%), #F3F0E9);
+  --bg:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,66%) / 2.2), #FBFAF7);
+  --card:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,66%) / 4), #FFFFFF);
+  --card2:color-mix(in oklab, var(--sp-p) calc(var(--sp-pk,66%) / 2.6), #F3F0E9);
 }
 
 /* het licht wisselt zacht, als de zon zelf */

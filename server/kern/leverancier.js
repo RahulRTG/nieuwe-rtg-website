@@ -322,6 +322,8 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
         .map(L => { const d = L.destCode ? findSupplier(L.destCode) : null; return { codename: L.codename, dest: d ? d.name : null }; }),
       menu: s.menu || [],
       lijn: s.lijn || {},
+      // wat over is op de pas (vers gefilterd: na twee uur telt het niet meer mee)
+      overschot: (s.overschot || []).filter(x => Date.now() - new Date(x.at) < 2 * 3600000),
       orders: zichtOrders.map(o => {
         const L = db.data.live[o.customerKey || o.customerTier];
         const enroute = L && L.active && connectedSupplierCodes(o.customerKey || o.customerTier).includes(s.code);

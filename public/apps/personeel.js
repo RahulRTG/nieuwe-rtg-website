@@ -669,6 +669,10 @@
     if (Number.isFinite(o.guestEtaMin)) return '<div style="font-size:0.74rem;color:var(--soft);margin-bottom:0.4rem;">🧭 '+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
     return '';
   }
+  // het overschot op de pas: wat er ligt hoef je niet te maken
+  const pkOverLijst = () => (state && state.overschot) || [];
+  const pkOverQty = naam => pkOverLijst().filter(x => x.name === naam).reduce((n,x) => n + x.qty, 0);
+  const pkMinOver = per => { Object.keys(per).forEach(n => { const ov = pkOverQty(n); if (ov){ per[n] = Math.max(0, per[n] - ov); if (!per[n]) delete per[n]; } }); return per; };
   // pas-meldingen (tril + toast) per toestel aan of uit: de gekozen personen
   let pdaPasBel = (() => { try { return localStorage.getItem('rtg_pda_pasbel') !== 'uit'; } catch(e){ return true; } })();
   // pings gaan alleen naar wie echt ingeklokt is: niet ingeklokt = geen tril
@@ -693,6 +697,8 @@
       const compleet = Object.keys(tafels).filter(t => !bezig.some(o => (o.table||'') === t));
       if (compleet.length) html += '<div class="card" style="border-left:4px solid #2E7D5B;"><div class="k">🪑 '+T('pas.compleet','Tafel compleet')+'</div>'+
         compleet.map(t => '<div style="margin-top:0.35rem;font-size:0.85rem;"><b>'+esc(t)+'</b> · '+tafels[t].map(o=>o.pickup).join(', ')+' · '+T('pas.samen','stuur samen uit')+'</div>').join('')+'</div>';
+      if (pkOverLijst().length) html += '<div class="card"><div class="k">🥡 '+T('over.h','Op de pas over')+'</div>'+
+        pkOverLijst().map(x=>'<div class="task"><div class="t"><b>'+x.qty+'× '+esc(x.name)+'</b><span>'+esc(x.door||'')+'</span></div><button class="abtn" data-pkover="'+x.id+'">'+T('over.gebruikt','Gebruikt')+'</button></div>').join('')+'</div>';
       html += '<div class="card"><div class="k">'+T('ks.pas.klaar','Op de pas, samenstellen en doorgeven')+' ('+opDePas.length+')</div>'+
         (opDePas.length ? opDePas.map(o => { const pa = pkAge(o.pasAt || o.at);
           return '<div class="task"><span class="ic">🛎️</span><div class="t"><b>'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span>'+(o.items||[]).filter(it=>pkSectieOf(it)).map(it=>it.qty+'× '+esc(it.name)).join(', ')+(Number.isFinite(o.guestEtaMin)&&!o.guestArrived?' · 🧭 ~'+o.guestEtaMin+'m':o.guestArrived?' · ✅':'')+'</span></div><span style="font-size:0.72rem;font-weight:700;color:'+(pa>=6?'#FF8589':pa>=3?'#E2B93B':'#7BC79B')+';">'+pa+'m</span></div>'; }).join('')
@@ -706,6 +712,7 @@
       // all day voor deze kant, net als op het grote scherm
       const per = {};
       mijn.forEach(o => (o.items||[]).forEach(it => { if (pkSectieOf(it) === sec) per[it.name] = (per[it.name]||0) + it.qty; }));
+      pkMinOver(per);
       const allday = Object.entries(per).sort((a,b) => b[1]-a[1]).slice(0, 8);
       html += '<div class="card" style="display:flex;gap:1.2rem;align-items:center;"><div><b style="font-size:1.3rem;">'+mijn.length+'</b><span style="display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('kds.open','Open bonnen')+'</span></div>'+
         '<div><b style="font-size:1.3rem;color:'+(laat?'#FF8589':'#7BC79B')+';">'+laat+'</b><span style="display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('kds.laat','Te laat')+'</span></div>'+
@@ -724,9 +731,12 @@
         if (!p2 || (p2.doe !== 'nu' && p2.doe !== 'bezig')) return;
         (o.items||[]).forEach(it => { if (pkSectieOf(it) === sec){ nuPer[it.name] = (nuPer[it.name]||0) + it.qty; } });
       });
+      pkMinOver(nuPer);
       const nuRows = Object.entries(nuPer).sort((a,b)=>b[1]-a[1]).slice(0,6);
       if (nuRows.length) html += '<div class="card" style="border-left:4px solid #2E7D5B;"><div class="k">🔥 '+T('lijn.maaknu','Maak nu, in een keer')+'</div>'+
         '<div style="margin-top:0.4rem;font-size:0.9rem;">'+nuRows.map(r=>'<b style="color:var(--gold);">'+r[1]+'×</b> '+esc(r[0])).join(' · ')+'</div></div>';
+      if (pkOverLijst().length) html += '<div class="card"><div class="k">🥡 '+T('over.h','Op de pas over')+'</div>'+
+        '<div style="margin-top:0.4rem;font-size:0.85rem;">'+pkOverLijst().map(x=>'<b style="color:var(--gold);">'+x.qty+'×</b> '+esc(x.name)).join(' · ')+' · <span style="color:var(--soft);">'+T('over.eerst','gebruik eerst wat er ligt')+'</span></div></div>';
       html += mijn.length ? mijn.map(o => {
         const a = pkAge(o.at);
         const p = pkPlan(o).plan[sec];
@@ -748,6 +758,9 @@
       pdaKant = b.dataset.pkkant;
       try { localStorage.setItem('rtg_pda_kant', pdaKant); } catch(e){}
       renderKeuken();
+    }));
+    wrap.querySelectorAll('[data-pkover]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/overschot', { op: 'gebruikt', id: b.dataset.pkover }); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
     }));
     // aanmelden op deze kant: het scherm en de coach rekenen met de bezetting
     const lijnBtn = wrap.querySelector('[data-pklijn]'); if (lijnBtn) lijnBtn.addEventListener('click', async () => {

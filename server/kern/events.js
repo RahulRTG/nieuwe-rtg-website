@@ -177,6 +177,19 @@ function maakEvents({ crypto, sectiesForOrder }) {
       lines.push(en ? '⚠ Ticket ' + wie + ' has been waiting ' + age(o) + ' min, give it priority.'
                     : '⚠ Bon ' + wie + ' wacht al ' + age(o) + ' min, geef voorrang.');
     }
+    // 2b. wat over is op de pas eerst gebruiken: te veel gemaakt is geen afval
+    const over = (s.overschot || []).filter(x => nu - new Date(x.at) < 2 * 3600000);
+    for (const ov of over) {
+      const bon = open.find(o => (o.items || []).some(it => it.id === ov.itemId));
+      if (bon) {
+        const wie = bon.pickup + (tafel(bon) ? ' (' + tafel(bon) + ')' : '');
+        lines.push(en ? '🥡 ' + ov.qty + 'x ' + ov.name + ' is left on the pass: use it for ticket ' + wie + ' instead of cooking new.'
+                      : '🥡 Er ligt nog ' + ov.qty + 'x ' + ov.name + ' op de pas: gebruik die voor bon ' + wie + ' in plaats van nieuw te maken.');
+      } else {
+        lines.push(en ? '🥡 On the pass: ' + ov.qty + 'x ' + ov.name + ' left over; work it into the next ticket or write it off.'
+                      : '🥡 Op de pas over: ' + ov.qty + 'x ' + ov.name + '; werk het weg in de eerstvolgende bon of schrijf af.');
+      }
+    }
     // 3. batchen: hetzelfde gerecht op meerdere bonnen tegelijk maken
     const per = {};
     for (const o of open) for (const it of (o.items || [])) {

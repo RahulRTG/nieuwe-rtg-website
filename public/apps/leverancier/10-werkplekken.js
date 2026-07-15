@@ -117,11 +117,47 @@
       if ((o.secties||{})[sec] === 'klaar') return;
       per[it.name] = (per[it.name]||0) + it.qty;
     }));
+    minOverschot(per);
     const rows = Object.entries(per).sort((a,b) => b[1]-a[1]).slice(0, 14);
     if (!rows.length) return '';
     return '<div class="allday"><span class="ad-h">'+T('kds.allday','All day')+'</span>'+rows.map(r => '<span class="ad"><b>'+r[1]+'×</b>'+r[0]+'</span>').join('')+'</div>';
   }
   const opTijd = (a,b) => new Date(a.at) - new Date(b.at);
+  /* ---- het overschot: te veel gemaakt is voorraad op de pas ----
+     De AI verrekent het overal: maak-nu en all day tellen het eraf, en de
+     coach zegt: gebruik eerst wat er ligt. */
+  const overschotLijst = () => (state && state.overschot) || [];
+  const overQty = naam => overschotLijst().filter(x => x.name === naam).reduce((n,x) => n + x.qty, 0);
+  // trek het overschot van de telling af (wat er ligt hoef je niet te maken)
+  function minOverschot(per){
+    Object.keys(per).forEach(n => {
+      const ov = overQty(n);
+      if (!ov) return;
+      if (typeof per[n] === 'number') per[n] = Math.max(0, per[n] - ov);
+      else per[n].n = Math.max(0, per[n].n - ov);
+      if ((typeof per[n] === 'number' ? per[n] : per[n].n) <= 0) delete per[n];
+    });
+    return per;
+  }
+  function overschotChips(){
+    const l = overschotLijst();
+    if (!l.length) return '';
+    return '<div class="allday"><span class="ad-h">🥡 '+T('over.h','Op de pas over')+'</span>'+
+      l.map(x => '<span class="ad"><b>'+x.qty+'×</b>'+x.name+'</span>').join('')+'</div>';
+  }
+  // de melder voor de pas-schermen: is over, gebruikt of afschrijven
+  function overschotBlok(){
+    const l = overschotLijst();
+    return '<div class="tkc" style="grid-column:1/-1;"><h3>🥡 '+T('over.h','Op de pas over')+'</h3>'+
+      '<div class="tkc-who">'+T('over.deck','Te veel gemaakt? Meld het hier; elk scherm telt het van de maaklijst af en de coach zegt: gebruik eerst wat er ligt.')+'</div>'+
+      '<div class="row-gap"><select class="st-in" id="ovGerecht" style="flex:2;">'+
+        (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
+      '<input class="st-in" id="ovAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
+      '<button class="tkc-start" id="ovBij" style="flex:1;border-radius:10px;">'+T('over.is','Is over')+'</button></div>'+
+      (l.length ? l.map(x => '<div class="st-row"><span><b style="color:var(--gold);">'+x.qty+'×</b> '+x.name+'<span class="sub">'+timeAgo(x.at)+' · '+(x.door||'')+'</span></span>'+
+        '<span class="acts"><button class="obtn primary" data-overgebruikt="'+x.id+'">'+T('over.gebruikt','Gebruikt')+'</button><button class="obtn warn" data-overweg="'+x.id+'">✕</button></span></div>').join('')
+      : '<div class="tkc-who">'+T('over.leeg','Er ligt nu niets over.')+'</div>')+'</div>';
+  }
   function orderStations(o){
     const set = new Set();
     (o.items||[]).forEach(it => set.add(stationOf(it)));
@@ -282,6 +318,7 @@
         '<select class="st-in" id="spTafel" style="flex:1;"><option value="">'+T('spoed.geentafel','geen tafel')+'</option>'+
           (state.tables||[]).map(t=>'<option value="'+t.name+'">'+t.name+'</option>').join('')+'</select></div>'+
         '<div class="tkc-act"><button class="tkc-ready" id="spGo">\u26A1 '+T('spoed.go','Zet op de lijn')+'</button></div></div>';
+      html += overschotBlok();
       html += '<div class="st-sec">'+T('st.making','In de maak')+' ('+making.length+')</div>';
       html += making.length ? making.map(o => {
         const vp = vuurplan(o);
@@ -425,7 +462,7 @@
                 '<button class="tkc-ready" data-secgo="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div>')+
             '</div>';
           };
-          html += stStats(actief) + allDay(actief, sec);
+          html += stStats(actief) + allDay(actief, sec) + overschotChips();
           // de bezetting: wie staat er op deze kant; het scherm rekent per kok
           const koks = ((state.lijn||{})[sec]) || [];
           const ikSta = koks.some(k => k.id === actor().staffId);
@@ -440,6 +477,7 @@
             if (!p || (p.doe !== 'nu' && p.doe !== 'bezig')) return;
             (o.items||[]).forEach(it => { if (sectieOf(it) === sec){ const r = nuPer[it.name] = nuPer[it.name] || { n:0, bonnen:[] }; r.n += it.qty; r.bonnen.push(o.pickup); } });
           });
+          minOverschot(nuPer);
           const nuRows = Object.entries(nuPer).sort((a,b)=>b[1].n-a[1].n);
           if (nuRows.length)
             html += '<div class="tkc" style="grid-column:1/-1;border-top:4px solid #2E7D5B;"><h3>🔥 '+T('lijn.maaknu','Maak nu, in een keer')+'</h3>'+
@@ -483,6 +521,7 @@
           if (compleet.length)
             html += '<div class="allday" role="status"><span class="ad-h">\uD83E\uDE91 '+T('pas.compleet','Tafel compleet')+'</span>'+
               compleet.map(t => '<span class="ad"><b>'+t+'</b>'+tafels[t].map(o=>o.pickup).join(', ')+' \u00b7 '+T('pas.samen','stuur samen uit')+'</span>').join('')+'</div>';
+          html += overschotBlok();
           html += '<div class="st-sec">'+T('ks.pas.klaar','Op de pas, samenstellen en doorgeven')+' ('+opDePas.length+')</div>';
           html += opDePas.length ? opDePas.map(o => {
             const pa = ageMin(o.pasAt || o.at);
@@ -509,7 +548,7 @@
       const done = mine.filter(o => (o.stations||{})[st] === 'klaar');
       if (st === 'keuken' || st === 'bar') html += stStats(act);
       if (st === 'keuken') html += allDay(act);
-      if (st === 'bar') html += allDay(act, 'bar');
+      if (st === 'bar') html += allDay(act, 'bar') + overschotChips() + overschotBlok();
       html += act.length ? act.map(o => ticketCard(o, st, {})).join('') : '<div class="st-empty">'+T('st.calm','Rustig. Nieuwe bestellingen verschijnen hier vanzelf, met geluid van de bel in de app.')+'</div>';
       if (done.length){
         html += '<div class="st-sec">'+T('st.done','Klaargemeld, wacht op uitserveren')+'</div>';
@@ -636,6 +675,16 @@
       const t = prompt(T('st.tblq','Welke tafel? (leeg = geen tafel)'), b.dataset.cur || '');
       if (t === null) return;
       try { await API.call('/supplier/order/table', { ref: b.dataset.settbl, table: t.trim() }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // het overschot: is over melden, gebruikt afboeken of afschrijven
+    const ovBij = el.querySelector('#ovBij'); if (ovBij) ovBij.addEventListener('click', async () => {
+      try { await API.call('/supplier/overschot', { op: 'erbij', itemId: el.querySelector('#ovGerecht').value, qty: el.querySelector('#ovAantal').value }); toast('🥡 '+T('over.toast','Gemeld; elk scherm telt het nu van de maaklijst af.')); await refresh(); } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('[data-overgebruikt]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/overschot', { op: 'gebruikt', id: b.dataset.overgebruikt }); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-overweg]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/overschot', { op: 'weg', id: b.dataset.overweg }); await refresh(); } catch(e){ toast(e.message); }
     }));
     // de spoedbon: als gewone bon op de lijn zetten, of intrekken
     const spGo = el.querySelector('#spGo'); if (spGo) spGo.addEventListener('click', async () => {

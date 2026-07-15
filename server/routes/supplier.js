@@ -2003,6 +2003,45 @@ app.post('/api/supplier/order/spoed', supplierAuth, (req, res) => {
   res.json({ ok: true, order: o });
 });
 
+/* Het overschot: te veel gemaakt is geen afval maar voorraad op de pas.
+   "Is over" melden kan op elk pas-scherm; de AI verrekent het overal
+   (maak-nu, all day en de coach: gebruik eerst wat er ligt). Generiek per
+   zaak, zodat elk genre dezelfde techniek kan gebruiken. Na twee uur
+   vervalt een melding vanzelf (voedselveiligheid). */
+const OVERSCHOT_TTL = 2 * 3600000;
+function overschotVers(s) {
+  s.overschot = (s.overschot || []).filter(x => Date.now() - new Date(x.at) < OVERSCHOT_TTL);
+  return s.overschot;
+}
+app.post('/api/supplier/overschot', supplierAuth, (req, res) => {
+  const s = req.supplier;
+  const lijst = overschotVers(s);
+  const op = String(req.body.op || 'erbij');
+  if (op === 'erbij') {
+    const m = (s.menu || []).find(x => x.id === req.body.itemId);
+    if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
+    const qty = Math.min(20, Math.max(1, parseInt(req.body.qty, 10) || 1));
+    const rij = lijst.find(x => x.itemId === m.id);
+    if (rij) { rij.qty += qty; rij.at = new Date().toISOString(); }
+    else lijst.push({ id: crypto.randomBytes(3).toString('hex'), itemId: m.id, name: m.name, qty, at: new Date().toISOString(), door: req.actor.name });
+    logActivity(s.code, req.actor, 'meldde over op de pas: ' + qty + 'x ' + m.name);
+  } else {
+    const rij = lijst.find(x => x.id === req.body.id || x.itemId === req.body.itemId);
+    if (!rij) return res.status(404).json({ error: 'Niets gevonden op de pas.' });
+    if (op === 'gebruikt') {
+      rij.qty -= 1;
+      if (rij.qty <= 0) s.overschot = lijst.filter(x => x !== rij);
+      logActivity(s.code, req.actor, 'gebruikte van de pas: ' + rij.name);
+    } else {
+      s.overschot = lijst.filter(x => x !== rij);
+      logActivity(s.code, req.actor, 'schreef af van de pas: ' + rij.qty + 'x ' + rij.name);
+    }
+  }
+  save();
+  sseToSupplier(s.code, 'sync', { scope: 'orders' });
+  res.json({ ok: true, overschot: s.overschot });
+});
+
 /* De lijnbezetting: meld je aan op een kant (warm, koud, snacks, desserts,
    pas of bar). De schermen rekenen met het aantal aangemelde koks: werklast
    per kok, batchgrootte en het advies van de coach. Een kok staat op een

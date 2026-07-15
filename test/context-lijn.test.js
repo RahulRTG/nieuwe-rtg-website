@@ -83,6 +83,28 @@ test('spoedbon: een enkel gerecht komt als gewone bon op de lijn en telt gewoon 
   assert.equal((await api('/api/supplier/order/spoed', { itemId: 'bestaat-niet' }, kokToken)).status, 404);
 });
 
+test('overschot: is over melden, de AI weet ervan, gebruiken en afschrijven', async () => {
+  // de pas meldt: 2x gazpacho over
+  const z = await json(await api('/api/supplier/overschot', { op: 'erbij', itemId: 'm1', qty: 2 }, kokToken));
+  assert.equal(z.overschot[0].qty, 2);
+  // elk scherm ziet het (en telt het van de maaklijst af)
+  const st = await json(await api('/api/supplier/state', {}, kokToken));
+  assert.equal(st.state.overschot[0].name, 'Gazpacho de sandia');
+  // de coach zegt: gebruik eerst wat er ligt (met een open bon op de lijn)
+  await api('/api/supplier/order/spoed', { itemId: 'm1', qty: 1 }, kokToken);
+  const coach = await json(await api('/api/supplier/kitchen/coach', {}, kokToken));
+  assert.ok((coach.lines || []).some(l => /op de pas/i.test(l) && /Gazpacho/i.test(l)), (coach.lines || []).join(' | '));
+  // een gebruikt, dan blijft er een over; nog een keer erbij telt op
+  const g = await json(await api('/api/supplier/overschot', { op: 'gebruikt', id: z.overschot[0].id }, kokToken));
+  assert.equal(g.overschot[0].qty, 1);
+  await api('/api/supplier/overschot', { op: 'erbij', itemId: 'm1', qty: 1 }, kokToken);
+  // afschrijven ruimt de rij op
+  const w = await json(await api('/api/supplier/overschot', { op: 'weg', id: z.overschot[0].id }, kokToken));
+  assert.equal(w.overschot.length, 0);
+  // een onbekend gerecht wordt geweigerd
+  assert.equal((await api('/api/supplier/overschot', { op: 'erbij', itemId: 'nee' }, kokToken)).status, 404);
+});
+
 test('lijnbezetting: aanmelden, verkassen en afmelden per kant', async () => {
   // kok 1 meldt zich aan op warm; kok 2 ook: twee koks op de kant
   const a1 = await json(await api('/api/supplier/lijn', { sectie: 'warm' }, kokToken));

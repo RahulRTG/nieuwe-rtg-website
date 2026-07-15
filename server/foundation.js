@@ -1314,6 +1314,31 @@ router.post('/markt/chat', (req, res) => {
   if (r.error) return res.status(r.status || 400).json(r);
   res.json(r);
 });
+// veilig samen betalen: prijs afspreken -> beide GPS bij elkaar -> factuur -> betalen
+router.post('/markt/deal/voorstel', (req, res) => {
+  if (!marktKlaar(res)) return;
+  const s = familieVan(req, res); if (!s) return;
+  if (!marktVolwassen(s, res)) return;
+  const r = markt.dealVoorstel(String(req.body.chatId || ''), marktPartij(s), req.body.bedrag);
+  if (r.error) return res.status(r.status || 400).json(r);
+  res.json(r);
+});
+router.post('/markt/deal/hier', (req, res) => {
+  if (!marktKlaar(res)) return;
+  const s = familieVan(req, res); if (!s) return;
+  if (!marktVolwassen(s, res)) return;
+  const r = markt.dealHier(String(req.body.chatId || ''), marktPartij(s), req.body.lat, req.body.lng);
+  if (r.error) return res.status(r.status || 400).json(r);
+  res.json(r);
+});
+router.post('/markt/deal/betaal', async (req, res) => {
+  if (!marktKlaar(res)) return;
+  const s = familieVan(req, res); if (!s) return;
+  if (!marktVolwassen(s, res)) return;
+  const r = await markt.dealBetaal(String(req.body.chatId || ''), marktPartij(s), String(req.body.methode || 'apple-pay'));
+  if (r.error) return res.status(r.status || 400).json(r);
+  res.json(r);
+});
 router.post('/markt/meld', (req, res) => {
   if (!marktKlaar(res)) return;
   const s = familieVan(req, res); if (!s) return;

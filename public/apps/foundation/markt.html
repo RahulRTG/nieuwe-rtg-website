@@ -397,6 +397,45 @@
   function openChat(chatId) {
     rapi('/chat', { chatId }).then(r => tekenChat(chatId, r.chat)).catch(e => alert(e.message));
   }
+  function dealBlok(c) {
+    const d = c.deal;
+    const verkoper = c.rol === 'verkoper';
+    if (!d) {
+      // nog geen deal: prijs afspreken
+      return '<div class="paneel" style="border-color:var(--goud);"><b>🤝 Veilig samen betalen</b>' +
+        '<div class="zacht" style="font-size:.83rem;line-height:1.5;margin:.3rem 0 .5rem;">Spreek een prijs af. Betalen kan pas als jullie samen zijn (locaties bij elkaar). Dan komt de factuur en betaal je via je account met Apple Pay.</div>' +
+        '<div class="rijveld"><input class="veld" id="dBedrag" type="number" inputmode="numeric" placeholder="€ prijs"><button type="button" class="knop" id="dAfspreek">Spreek prijs af</button></div></div>';
+    }
+    let h = '<div class="paneel" style="border-color:var(--goud);"><b>🤝 Deal: € ' + d.bedrag + '</b>';
+    if (d.betaald) {
+      return '<div class="paneel" style="border-color:var(--groen);"><b>✅ Betaald: € ' + d.bedrag + '</b>' +
+        '<div class="zacht" style="font-size:.83rem;margin-top:.3rem;">Via ' + (d.methode === 'apple-pay' ? 'Apple Pay' : d.methode) + '. Factuur ' + esc(d.factuur ? d.factuur.nummer : '') + '.</div></div>';
+    }
+    // status voor het samenkomen
+    h += '<div style="display:flex;gap:.6rem;margin:.5rem 0;font-size:.8rem;">' +
+      '<span class="' + (d.ikGedeeld ? '' : 'zacht') + '">' + (d.ikGedeeld ? '📍 jij bent er' : '○ jij: nog niet') + '</span>' +
+      '<span class="' + (d.anderGedeeld ? '' : 'zacht') + '">' + (d.anderGedeeld ? '📍 de ander is er' : '○ de ander: nog niet') + '</span></div>';
+    if (!d.samen) {
+      h += '<div class="zacht" style="font-size:.82rem;line-height:1.5;margin-bottom:.5rem;">Zijn jullie samen bij de overhandiging? Deel je locatie. Zodra beide locaties dichtbij zijn, komt de factuur vrij.' +
+        (d.ikGedeeld && d.anderGedeeld && d.afstand != null ? ' (nu ~' + d.afstand + ' m uit elkaar)' : '') + '</div>' +
+        '<button type="button" class="knop" id="dHier" style="width:100%;">📍 Ik ben hier (deel locatie)</button>';
+      if (verkoper) h += '<div class="zacht" style="font-size:.78rem;margin-top:.4rem;">De koper betaalt zodra jullie samen zijn.</div>';
+    } else {
+      // samen: factuur + betalen
+      h += '<div class="paneel" style="margin:.5rem 0;padding:.7rem .85rem;background:var(--paneel2);">' +
+        '<div style="font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht);">Factuur</div>' +
+        '<div style="display:flex;justify-content:space-between;margin-top:.2rem;"><span>' + esc(d.factuur ? d.factuur.nummer : '') + '</span><b>€ ' + d.bedrag + '</b></div>' +
+        '<div class="zacht" style="font-size:.8rem;margin-top:.2rem;">' + esc(c.adTitel || '') + '</div></div>';
+      if (d.magBetalen) {
+        h += '<button type="button" class="knop" id="dPay" style="width:100%;background:#000;color:#fff;"> Apple Pay · € ' + d.bedrag + '</button>' +
+          '<div class="zacht" style="font-size:.76rem;margin-top:.35rem;">Je betaalt rechtstreeks via je account aan de verkoper.</div>';
+      } else {
+        h += '<div class="zacht" style="font-size:.83rem;">Jullie zijn samen. De koper kan nu via Apple Pay betalen.</div>';
+      }
+    }
+    return h + '</div>';
+  }
+
   function tekenChat(chatId, chat) {
     function render(c) {
       $('#vChat').innerHTML =
@@ -404,10 +443,11 @@
         '<div class="paneel"><h2 style="font-family:var(--serif);font-weight:500;font-size:1.2rem;margin:0 0 .1rem;">' + esc(c.adTitel || '') + '</h2>' +
         '<div style="color:var(--zacht);font-size:.85rem;margin-bottom:.6rem;">met ' + esc(c.metNaam || '') + '</div>' +
         '<div class="chat" id="cBerichten">' + (c.berichten || []).map(b =>
-          '<div class="b ' + (b.mijn ? 'ik' : 'ai') + '">' + esc(b.tekst) + (b.let ? '<br><span style="font-size:.72rem;opacity:.8;">⚠ let op: nooit vooruit betalen</span>' : '') + '</div>'
+          '<div class="b ' + (b.mijn ? 'ik' : 'ai') + '"' + (b.systeem ? ' style="align-self:center;background:var(--paneel2);border:1px solid var(--goud);color:var(--goud2);font-size:.82rem;"' : '') + '>' + esc(b.tekst) + (b.let ? '<br><span style="font-size:.72rem;opacity:.8;">⚠ let op: nooit vooruit betalen</span>' : '') + '</div>'
         ).join('') + '</div>' +
         '<div class="rijveld"><input class="veld" id="cInput" placeholder="Typ een bericht..."><button type="button" class="knop" id="cSend">Stuur</button></div>' +
-        '<div id="cTip" class="melding fout"></div></div>';
+        '<div id="cTip" class="melding fout"></div></div>' +
+        dealBlok(c);
       toon('chat');
       const berEl = $('#cBerichten'); berEl.scrollTop = berEl.scrollHeight;
       $('#cTerug').addEventListener('click', () => { toon('berichten'); laadPostvak(); });
@@ -421,6 +461,27 @@
       }
       $('#cSend').addEventListener('click', stuur);
       $('#cInput').addEventListener('keydown', e => { if (e.key === 'Enter') stuur(); });
+      // deal-acties
+      const af = $('#dAfspreek'); if (af) af.addEventListener('click', () => {
+        const bedrag = Number($('#dBedrag').value) || 0;
+        rapi('/deal/voorstel', { chatId, bedrag }).then(r => render(r.chat)).catch(e => $('#cTip').textContent = e.message);
+      });
+      const hier = $('#dHier'); if (hier) hier.addEventListener('click', () => {
+        hier.textContent = 'Locatie ophalen...';
+        if (!navigator.geolocation) { $('#cTip').textContent = 'Je toestel deelt geen locatie.'; hier.textContent = '📍 Ik ben hier (deel locatie)'; return; }
+        navigator.geolocation.getCurrentPosition(pos => {
+          rapi('/deal/hier', { chatId, lat: pos.coords.latitude, lng: pos.coords.longitude })
+            .then(r => { if (!r.samen && r.afstand != null) $('#cTip').textContent = 'Nog ~' + r.afstand + ' m uit elkaar; kom dichterbij.'; render(r.chat); })
+            .catch(e => { $('#cTip').textContent = e.message; render(c); });
+        }, () => { $('#cTip').textContent = 'Kon je locatie niet ophalen. Sta locatie toe.'; hier.textContent = '📍 Ik ben hier (deel locatie)'; }, { enableHighAccuracy: true, timeout: 8000 });
+      });
+      const pay = $('#dPay'); if (pay) pay.addEventListener('click', () => {
+        pay.textContent = 'Bezig...';
+        rapi('/deal/betaal', { chatId, methode: 'apple-pay' }).then(r => {
+          if (r.inBehandeling) { $('#cTip').textContent = 'Betaling gestart; bevestig in Apple Pay.'; }
+          render(r.chat);
+        }).catch(e => { $('#cTip').textContent = e.message; pay.textContent = ' Apple Pay · € ' + (c.deal ? c.deal.bedrag : ''); });
+      });
     }
     render(chat || { adTitel: '', metNaam: '', berichten: [] });
   }

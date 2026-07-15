@@ -37,6 +37,27 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status || 400).json(r);
     res.json(r);
   });
+  app.post('/api/supplier/markt/chat', supplierAuth, (req, res) => {
+    const r = markt.chatOpen(String(req.body.chatId || ''), partij(req));
+    if (r.error) return res.status(r.status || 400).json(r);
+    res.json(r);
+  });
+  // veilig samen betalen (de zaak als verkoper deelt ook zijn locatie)
+  app.post('/api/supplier/markt/deal/voorstel', supplierAuth, (req, res) => {
+    const r = markt.dealVoorstel(String(req.body.chatId || ''), partij(req), req.body.bedrag);
+    if (r.error) return res.status(r.status || 400).json(r);
+    res.json(r);
+  });
+  app.post('/api/supplier/markt/deal/hier', supplierAuth, (req, res) => {
+    const r = markt.dealHier(String(req.body.chatId || ''), partij(req), req.body.lat, req.body.lng);
+    if (r.error) return res.status(r.status || 400).json(r);
+    res.json(r);
+  });
+  app.post('/api/supplier/markt/deal/betaal', supplierAuth, async (req, res) => {
+    const r = await markt.dealBetaal(String(req.body.chatId || ''), partij(req), String(req.body.methode || 'apple-pay'));
+    if (r.error) return res.status(r.status || 400).json(r);
+    res.json(r);
+  });
   app.post('/api/supplier/markt/ai', supplierAuth, async (req, res) => {
     const r = await markt.aiHelp(String(req.body.soort || 'beschrijving'), req.body || {});
     res.json(r);

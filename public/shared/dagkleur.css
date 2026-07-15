@@ -1,0 +1,25 @@
+/* De kleur van de dag, een bron voor de hele RTG-familie.
+
+   Zestien tinten: vier seizoenen x vier zonstanden. shared/seizoen.js zet
+   data-seizoen en data-dagdeel op <html>; dit blad kiest daarbij de
+   dagkleur (--dag-kleur). Elke app rendert die kleur in zijn eigen
+   materiaal: de leden-app (seizoen-pas.css) als pastel op parelmoer of als
+   was over de bordeaux, de RTFoundation (stijl.css) als was over de grond
+   van de leeftijd. Zo hoeft een tint nog maar op een plek te veranderen.
+   De website heeft bewust een eigen palet (shared/seizoen.css). */
+:root[data-seizoen="lente"][data-dagdeel="ochtend"]{ --dag-kleur:#E08AA8; } /* bloesem */
+:root[data-seizoen="lente"][data-dagdeel="middag"]{ --dag-kleur:#86B85C; }  /* pistache */
+:root[data-seizoen="lente"][data-dagdeel="avond"]{ --dag-kleur:#E0B24A; }   /* boterbloem */
+:root[data-seizoen="lente"][data-dagdeel="nacht"]{ --dag-kleur:#8E7FC4; }   /* seringen */
+:root[data-seizoen="zomer"][data-dagdeel="ochtend"]{ --dag-kleur:#E6C64A; } /* citroen */
+:root[data-seizoen="zomer"][data-dagdeel="middag"]{ --dag-kleur:#4FA3D4; }  /* poederblauw */
+:root[data-seizoen="zomer"][data-dagdeel="avond"]{ --dag-kleur:#E67A5C; }   /* koraal */
+:root[data-seizoen="zomer"][data-dagdeel="nacht"]{ --dag-kleur:#3E6FB0; }   /* zeenacht */
+:root[data-seizoen="herfst"][data-dagdeel="ochtend"]{ --dag-kleur:#94AE6E; }/* salie */
+:root[data-seizoen="herfst"][data-dagdeel="middag"]{ --dag-kleur:#E0A038; } /* amber */
+:root[data-seizoen="herfst"][data-dagdeel="avond"]{ --dag-kleur:#DE8A5C; }  /* perzik */
+:root[data-seizoen="herfst"][data-dagdeel="nacht"]{ --dag-kleur:#9A5C86; }  /* pruim */
+:root[data-seizoen="winter"][data-dagdeel="ochtend"]{ --dag-kleur:#7FB4D2; }/* ijsblauw */
+:root[data-seizoen="winter"][data-dagdeel="middag"]{ --dag-kleur:#8FA0B4; } /* zilver */
+:root[data-seizoen="winter"][data-dagdeel="avond"]{ --dag-kleur:#C77E92; }  /* oudroze */
+:root[data-seizoen="winter"][data-dagdeel="nacht"]{ --dag-kleur:#6E63B8; }  /* lila */

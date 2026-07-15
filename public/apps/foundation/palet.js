@@ -14,6 +14,10 @@
   } catch (e) {
     d.documentElement.setAttribute('data-rtf-groep', 'volw');
   }
+  var l = d.createElement('link');
+  l.rel = 'stylesheet';
+  l.href = '/shared/dagkleur.css';
+  d.head.appendChild(l);
   var s = d.createElement('script');
   s.src = '/shared/seizoen.js';
   s.defer = true;

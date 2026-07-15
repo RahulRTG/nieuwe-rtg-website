@@ -190,6 +190,10 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     const page = await browser.newPage();
     const fouten = [];
     page.on('pageerror', e => fouten.push(e.message));
+    // Deze test gaat over XSS-veiligheid in het conciergegesprek, niet over
+    // onboarding. Mock de onboarding-status op "klaar" zodat de verplichte
+    // onboarding-modal (die anders de app blokkeert) niet verschijnt.
+    await page.route('**/api/onboarding/status', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });

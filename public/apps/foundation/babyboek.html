@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Fotoboekje</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.6rem 0 .7rem;}
+  .blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0 .8rem;}
+  .mini{background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem;}
+  .kopkind{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;}
+  .kopkind .lft{color:var(--goud2);font-size:.9rem;}
+  textarea.veld{width:100%;min-height:5.5rem;line-height:1.5;}
+  .fotoknop{display:flex;gap:.5rem;align-items:center;margin-top:.5rem;flex-wrap:wrap;}
+  .fotoknop input[type=file]{display:none;}
+  .preview{max-width:9rem;border-radius:12px;display:block;}
+  .preview[hidden],.mini[hidden]{display:none;}
+  /* het boekje zelf: per dag een bladzijde-gevoel */
+  .dag{margin-bottom:1.2rem;}
+  .dag .datum{font-family:var(--serif);font-size:1.05rem;color:var(--goud2);margin-bottom:.5rem;}
+  .moment{padding:.9rem 1rem;margin-bottom:.6rem;}
+  .moment img{width:100%;border-radius:12px;display:block;margin-bottom:.6rem;}
+  .moment .tk{line-height:1.55;white-space:pre-wrap;}
+  .moment .wie{display:flex;align-items:center;gap:.4rem;color:var(--zacht);font-size:.78rem;margin-top:.5rem;}
+  .moment .wie .weg{margin-left:auto;}
+  /* gezinsnamen en momenten */
+  .chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.3rem 0 .5rem;}
+  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;display:inline-flex;gap:.4rem;align-items:center;}
+  .chip button{background:none;border:0;color:var(--zacht);cursor:pointer;padding:0;font-size:.85rem;}
+  .idee{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;margin-bottom:.5rem;}
+  .idee b{font-family:var(--serif);font-weight:500;}
+  .idee div{color:var(--zacht);font-size:.9rem;line-height:1.5;margin-top:.15rem;}
+  /* voor jou als ouder */
+  .adem{background:var(--paneel2);border-left:3px solid var(--groen,#5FA56A);border-radius:8px;padding:.8rem 1rem;line-height:1.55;font-size:.95rem;}
+  .links{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;}
+  .links a{background:var(--paneel2);border:1px solid var(--lijn);border-radius:999px;padding:.4rem .9rem;font-size:.85rem;color:var(--txt);text-decoration:none;}
+  .links a:hover{border-color:var(--goud);}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>📖 Fotoboekje</h1>
+  <p class="intro" id="intro">Elke dag een foto of een klein stukje over jullie kindje. Zo groeit er vanzelf een boekje vol eerste keertjes, voor later.</p>
+
+  <!-- eerste keer: het kindje voorstellen -->
+  <div class="kaart blok" id="kInstel" hidden>
+    <div style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.5rem;">Voor wie is dit boekje?</div>
+    <input class="veld" id="iNaam" placeholder="De naam van jullie kindje" maxlength="30">
+    <input class="veld" id="iGeboren" type="date" style="margin-top:.4rem;" aria-label="Geboortedatum (mag leeg)">
+    <button class="knop" id="iDoe" style="width:100%;margin-top:.5rem;">Begin het boekje</button>
+    <div class="fout" id="iFout"></div>
+  </div>
+
+  <!-- het boekje -->
+  <div id="vBoek" hidden>
+    <div class="kopkind">
+      <div style="font-family:var(--serif);font-size:1.25rem;" id="bNaam"></div>
+      <span class="lft" id="bLeeftijd"></span>
+      <button class="mini" id="bWijzig" title="Naam of geboortedatum aanpassen">✎</button>
+    </div>
+
+    <div class="kaart blok" style="margin-top:.8rem;">
+      <div style="color:var(--zacht);font-size:.82rem;margin-bottom:.4rem;" id="cVandaag"></div>
+      <textarea class="veld" id="cTekst" placeholder="Wat deed jullie kindje vandaag?"></textarea>
+      <div class="fotoknop">
+        <label class="knop grijs klein">📷 Kies een foto<input type="file" id="cFoto" accept="image/*"></label>
+        <img class="preview" id="cPreview" alt="Gekozen foto" hidden>
+        <button class="mini" id="cFotoWeg" hidden>✕ foto weg</button>
+      </div>
+      <button class="knop" id="cBewaar" style="width:100%;margin-top:.6rem;">In het boekje</button>
+      <div class="fout" id="cFout"></div>
+    </div>
+
+    <h2 class="sec">Het boekje</h2>
+    <div id="boek"><div class="leeg">Nog geen momentjes. Vandaag is een mooie dag om te beginnen.</div></div>
+
+    <h2 class="sec">Leuke momenten voor het hele gezin</h2>
+    <div class="kaart blok">
+      <div style="color:var(--zacht);font-size:.88rem;line-height:1.45;margin-bottom:.4rem;">Wie horen er allemaal bij jullie? Broertjes, zusjes, opa, oma; de hond mag ook. De buddy bedenkt er momenten bij waar iedereen in meedoet.</div>
+      <div class="chips" id="gChips"></div>
+      <div style="display:flex;gap:.5rem;">
+        <input class="veld" id="gNaam" style="flex:1;" placeholder="Naam erbij (bijv. opa Ties)" maxlength="30">
+        <button class="knop klein" id="gDoe">+</button>
+      </div>
+      <button class="knop" id="mDoe" style="width:100%;margin-top:.6rem;">✨ Bedenk momenten voor ons gezin</button>
+      <div id="mLijst"></div>
+      <div class="fout" id="mFout"></div>
+    </div>
+
+    <h2 class="sec">Voor jou, papa of mama</h2>
+    <div class="kaart blok">
+      <div class="adem" id="adem"></div>
+      <div style="color:var(--zacht);font-size:.88rem;line-height:1.45;margin:.8rem 0 .5rem;">Even je hart luchten of een vraag over slapen, huilen of voeding? Je buddy is er ook voor jou; geen oordeel, wel kleine stappen. Wat je typt wordt niet bewaard.</div>
+      <div class="chat" id="chat"><div class="b ai">Hoi. Een kleintje thuis is prachtig en zwaar tegelijk; allebei mag waar zijn. Hoe gaat het echt met jou?</div></div>
+      <div class="rijveld">
+        <textarea class="veld" id="vraag" rows="1" placeholder="Typ maar gewoon hoe het gaat..." maxlength="1000"></textarea>
+        <button class="knop klein" id="stuur">Stuur</button>
+      </div>
+      <div class="links">
+        <a href="rust.html">🌿 Even rust</a>
+        <a href="steun.html">💚 Steun voor jou</a>
+        <a href="opvoeden.html">🧸 Opvoedhulp</a>
+        <a href="hulpwijzer.html">🧭 Hulpwijzer</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const api = (actie, body) => fetch('/api/rtf/baby/' + actie, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+/* kleine troost, wisselt met de dag mee */
+const ADEM = [
+  'Je doet het goed. Niet perfect, en dat hoeft ook niet: goed genoeg is precies goed.',
+  'Vandaag hoeft alleen vandaag. De was mag wachten; een knuffel niet.',
+  'Even 3 keer diep ademhalen terwijl de fles warm wordt, telt ook als een momentje voor jezelf.',
+  'Om hulp vragen is geen zwakte; het is je kindje twee uitgeruste armen geven.',
+  'Slechte nachten zeggen niets over jou als ouder. Ze horen erbij, en ze gaan voorbij.',
+  'Jij bent voor jullie kindje niet een gewone dag; jij bent de hele wereld.'
+];
+$('#adem').textContent = '💛 ' + ADEM[Math.floor(Date.now() / 86400000) % ADEM.length];
+
+let B = null, mijnGezin = [];
+function toonBoek(d){
+  B = d; mijnGezin = d.gezin || [];
+  const ingesteld = !!d.kindNaam;
+  $('#kInstel').hidden = ingesteld;
+  $('#vBoek').hidden = !ingesteld;
+  if (!ingesteld) return;
+  $('#bNaam').textContent = '🧸 ' + d.kindNaam;
+  $('#bLeeftijd').textContent = d.leeftijd ? d.leeftijd + ' oud' : '';
+  $('#cVandaag').textContent = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+  $('#cTekst').placeholder = 'Wat deed ' + d.kindNaam + ' vandaag?';
+  // het boekje: per dag een bladzijde, nieuwste bovenaan
+  const perDag = {};
+  (d.entries || []).forEach(e => { (perDag[e.dag] = perDag[e.dag] || []).push(e); });
+  const dagen = Object.keys(perDag).sort().reverse();
+  $('#boek').innerHTML = dagen.length ? dagen.map(dag =>
+    '<div class="dag"><div class="datum">' + new Date(dag + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' +
+    perDag[dag].map(e =>
+      '<div class="kaart moment">' +
+      (e.foto ? '<img src="' + esc(e.foto) + '" alt="Foto van ' + esc(d.kindNaam) + '" loading="lazy">' : '') +
+      (e.tekst ? '<div class="tk">' + esc(e.tekst) + '</div>' : '') +
+      '<div class="wie"><span>' + esc(e.avatar || '🙂') + '</span><span>' + esc(e.van) + '</span>' +
+      (e.magWeg ? '<button class="mini weg" data-weg="' + e.id + '" title="Dit momentje weghalen">✕</button>' : '') +
+      '</div></div>').join('') + '</div>').join('')
+    : '<div class="leeg">Nog geen momentjes. Vandaag is een mooie dag om te beginnen.</div>';
+  $('#boek').querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Dit momentje uit het boekje halen?')) return;
+    try { await api('entry-weg', { id: b.dataset.weg }); laad(); } catch (e) {}
+  }));
+  // gezinsnamen
+  $('#gChips').innerHTML = mijnGezin.map(n => '<span class="chip">' + esc(n) + '<button data-naam="' + esc(n) + '" title="' + esc(n) + ' weghalen">✕</button></span>').join('');
+  $('#gChips').querySelectorAll('[data-naam]').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('gezin-zet', { namen: mijnGezin.filter(x => x !== b.dataset.naam) }); mijnGezin = r.gezin; laad(); } catch (e) {}
+  }));
+  toonMomenten(d.momenten);
+}
+function toonMomenten(m){
+  $('#mLijst').innerHTML = (m && m.items && m.items.length) ?
+    '<div style="margin-top:.7rem;">' + m.items.map(x => '<div class="idee"><b>' + esc(x.titel) + '</b><div>' + esc(x.hoe) + '</div></div>').join('') +
+    (m.demo ? '<div class="leeg" style="padding:0;">De buddy koos uit een vast setje (demo).</div>' : '') + '</div>' : '';
+}
+async function laad(){ try { toonBoek(await api('boek')); } catch (e) {} }
+
+/* kindje instellen of aanpassen */
+$('#iDoe').addEventListener('click', async () => {
+  $('#iFout').textContent = '';
+  try { await api('instellen', { kindNaam: $('#iNaam').value, geboren: $('#iGeboren').value }); laad(); }
+  catch (e) { $('#iFout').textContent = e.message; }
+});
+$('#bWijzig').addEventListener('click', () => {
+  $('#iNaam').value = B ? B.kindNaam : ''; $('#iGeboren').value = B ? (B.geboren || '') : '';
+  $('#kInstel').hidden = false; $('#vBoek').hidden = true;
+});
+
+/* een momentje schrijven; de foto wordt op het toestel verkleind voor het uploaden */
+let fotoData = null;
+$('#cFoto').addEventListener('change', () => {
+  const f = $('#cFoto').files && $('#cFoto').files[0];
+  if (!f) return;
+  const img = new Image();
+  img.onload = () => {
+    const max = 1280, sc = Math.min(1, max / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    fotoData = c.toDataURL('image/jpeg', 0.85);
+    $('#cPreview').src = fotoData; $('#cPreview').hidden = false; $('#cFotoWeg').hidden = false;
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(f);
+});
+$('#cFotoWeg').addEventListener('click', () => { fotoData = null; $('#cPreview').hidden = true; $('#cFotoWeg').hidden = true; $('#cFoto').value = ''; });
+$('#cBewaar').addEventListener('click', async () => {
+  $('#cFout').textContent = ''; $('#cBewaar').disabled = true;
+  try {
+    await api('entry-maak', { tekst: $('#cTekst').value, foto: fotoData });
+    $('#cTekst').value = ''; $('#cFotoWeg').click(); laad();
+  } catch (e) { $('#cFout').textContent = e.message; }
+  $('#cBewaar').disabled = false;
+});
+
+/* gezinsnamen en de momenten van de buddy */
+$('#gDoe').addEventListener('click', async () => {
+  const n = $('#gNaam').value.trim(); if (!n) return;
+  try { const r = await api('gezin-zet', { namen: mijnGezin.concat([n]) }); mijnGezin = r.gezin; $('#gNaam').value = ''; laad(); } catch (e) {}
+});
+$('#gNaam').addEventListener('keydown', e => { if (e.key === 'Enter') $('#gDoe').click(); });
+$('#mDoe').addEventListener('click', async () => {
+  $('#mFout').textContent = ''; $('#mDoe').disabled = true; $('#mDoe').textContent = '✨ Even denken…';
+  try { const r = await api('moment-ai'); toonMomenten(r.momenten); }
+  catch (e) { $('#mFout').textContent = e.message; }
+  $('#mDoe').disabled = false; $('#mDoe').textContent = '✨ Bedenk momenten voor ons gezin';
+});
+
+/* de buddy als kraam- en babycoach, voor de ouder zelf */
+Sessie.coach({ kind: 'baby', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
+
+laad();
+</script>
+</body>
+</html>

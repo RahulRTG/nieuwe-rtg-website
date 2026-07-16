@@ -187,6 +187,10 @@
 
   <h3 class="sec">Elke dag</h3>
   <div class="tiles">
+    <a class="kaart tile" id="tileBoekje" href="babyboek.html" data-grp="mini volw">
+      <div class="ic">📖</div><h2>Fotoboekje</h2>
+      <span class="cta">Elke dag een momentje →</span>
+    </a>
     <a class="kaart tile" href="agenda.html">
       <div class="ic">📅</div><h2>Gezinsagenda</h2>
       <span class="cta">→</span>
@@ -380,6 +384,7 @@ function toonRol(profiel){
     t.style.display = (!groep || t.dataset.grp.split(' ').includes(groep)) ? '' : 'none';
   });
   $('#tileDromen').style.display = gast || (groep && !$('#tileDromen').dataset.grp.split(' ').includes(groep)) ? 'none' : ''; // dromen blijven binnen het gezin
+  $('#tileBoekje').style.display = gast || (groep && !$('#tileBoekje').dataset.grp.split(' ').includes(groep)) ? 'none' : ''; // het fotoboekje is van het gezin zelf
   // werk en vacatures: vanaf 16 jaar (leeftijdsgroep jong/volw), niet voor gasten
   $('#tileWerk').hidden = gast || !profiel.magSolliciteren;
   if (profiel.groepNaam && !gast){

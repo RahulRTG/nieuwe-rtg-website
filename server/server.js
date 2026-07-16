@@ -2471,6 +2471,9 @@ Object.assign(kern, require('./kern/leren')({
   db, save, crypto, codenaamVan: kern.codenaamVan, zijnVrienden: kern.zijnVrienden, socialZoek: kern.socialZoek,
   isGeblokkeerd: kern.isGeblokkeerd, sociaalRate: kern.sociaalRate, sseToCustomer, anthropic, leeftijdInstr: rtf.leeftijdInstr
 }));
+/* Het babyboekje (kern/baby.js): het dagboek van de allerkleinsten, met
+   gezinsnamen en AI-gezinsmomenten; foto's gaan naar de mediastore. */
+Object.assign(kern, require('./kern/baby')({ save, crypto, media, anthropic }));
 /* Salon-ontmoetingen (kern/ontmoeting.js): wederzijdse connecties die vlakbij
    elkaar zijn kiezen samen een activiteit, tekenen een veiligheidscontract en
    RTG-kantoor kijkt live mee tot de afspraak klaar is. Draait op de sociale
@@ -2501,6 +2504,7 @@ require('./routes/markt')(kern);
 require('./routes/borden')(kern);
 require('./routes/spellen')(kern);
 require('./routes/leren')(kern);
+require('./routes/baby')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

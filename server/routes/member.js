@@ -908,25 +908,30 @@ app.post('/api/booking/request', auth, (req, res) => {
   res.json({ ok: true, boeking });
 });
 
-app.post('/api/booking/pay', auth, (req, res) => {
-  const b = db.data.boekingen.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
-  if (!b) return res.status(404).json({ error: 'Boeking niet gevonden.' });
-  if (b.paid) return res.status(409).json({ error: 'Al betaald.' });
+function betaalBoekingVoor(session, body) {
+  const b = db.data.boekingen.find(x => x.ref === body.ref && (x.customerKey || x.customerTier) === session.key);
+  if (!b) return { status: 404, error: 'Boeking niet gevonden.' };
+  if (b.paid) return { status: 409, error: 'Al betaald.' };
   if (b.status === 'wacht-op-betaling' && Date.now() - new Date(b.at) > 30 * 60000)
-    return res.status(410).json({ error: 'Deze aanvraag is verlopen. Boek opnieuw.' });
+    return { status: 410, error: 'Deze aanvraag is verlopen. Boek opnieuw.' };
   // punten-tegoed (RTG legt bij) en spaarpunten
-  const kortingB = pasTegoedToe(req.session.key, b.price || 0);
+  const kortingB = pasTegoedToe(session.key, b.price || 0);
   if (kortingB) b.puntenKorting = kortingB;
   b.paid = true;
   b.paidAt = new Date().toISOString();
   if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
-  verdienPunten(req.session.key, (b.price || 0) - kortingB, b.supplierName);
-  openLijn(findSupplier(b.supplierCode), req);
+  verdienPunten(session.key, (b.price || 0) - kortingB, b.supplierName);
+  openLijnVoor(findSupplier(b.supplierCode), session);
   save();
   notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
   sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, boeking: b });
+  return { ok: true, boeking: b };
+}
+app.post('/api/booking/pay', auth, (req, res) => {
+  const r = betaalBoekingVoor(req.session, req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
 });
 
 app.post('/api/bookings/mine', auth, (req, res) => {
@@ -1097,7 +1102,7 @@ function betaalOrderVoor(session, body) {
 
 
 // De Butler bestelt via exact dezelfde functies als de app-knoppen
-Object.assign(kern, { plaatsOrderVoor, betaalOrderVoor });
+Object.assign(kern, { plaatsOrderVoor, betaalOrderVoor, koopTicketVoor, betaalBoekingVoor, vraagRitVoor, betaalRitVoor });
 
 app.post('/api/order', auth, (req, res) => {
   const r = plaatsOrderVoor(req.session, req.body);
@@ -1263,25 +1268,25 @@ app.post('/api/live/state', auth, (req, res) => {
   res.json({ live: liveStateFor(req.session.key, req.body.lang) });
 });
 
-app.post('/api/ride/request', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const s = findSupplier(req.body.supplierCode);
+function vraagRitVoor(session, body) {
+  if (session.tier === 'guest') return { status: 403, error: 'Alleen voor leden.' };
+  const s = findSupplier(body.supplierCode);
   const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
-  if (!s || !caps.includes('rides')) return res.status(404).json({ error: 'Geen vervoerspartner gevonden.' });
+  if (!s || !caps.includes('rides')) return { status: 404, error: 'Geen vervoerspartner gevonden.' };
   // activiteitenzaken rijden alleen hun eigen transfers: die regel je via je ticket
-  if (s.type === 'activiteit') return res.status(409).json({ error: 'De transfer van ' + s.name + ' regel je via je ticket (Ter plaatse, Mijn tickets).' });
-  if (!optieAan(s, 'ritten')) return res.status(409).json({ error: s.name + ' neemt op dit moment geen ritaanvragen aan.' });
+  if (s.type === 'activiteit') return { status: 409, error: 'De transfer van ' + s.name + ' regel je via je ticket (Ter plaatse, Mijn tickets).' };
+  if (!optieAan(s, 'ritten')) return { status: 409, error: s.name + ' neemt op dit moment geen ritaanvragen aan.' };
   // leeftijd uit het paspoort: privejets en helikopters boek je vanaf 18 jaar
-  const lftR = leeftijdVan(geborenVan(req.session));
+  const lftR = leeftijdVan(geborenVan(session));
   if ((s.type === 'jet' || s.type === 'helikopter') && lftR != null && lftR < 18)
-    return res.status(403).json({ error: (s.type === 'helikopter' ? 'Helikoptervluchten' : 'Privejets') + ' boek je vanaf 18 jaar. Een taxi regelen we graag voor je.' });
-  const dest = req.body.toCode ? findSupplier(req.body.toCode) : null;
-  const codename = liveCodename(req.session);
+    return { status: 403, error: (s.type === 'helikopter' ? 'Helikoptervluchten' : 'Privejets') + ' boek je vanaf 18 jaar. Een taxi regelen we graag voor je.' };
+  const dest = body.toCode ? findSupplier(body.toCode) : null;
+  const codename = liveCodename(session);
   // slimme offerte: afstand uit de live-locatie en de bestemming, anders een
   // realistisch stadsgemiddelde; prijs volgt het tarief van de vervoerder
-  const pax = Math.min(9, Math.max(1, Number(req.body.passengers) || 1));
-  const koffers = Math.min(9, Math.max(0, Number(req.body.luggage) || 0));
-  const L = db.data.live[req.session.key];
+  const pax = Math.min(9, Math.max(1, Number(body.passengers) || 1));
+  const koffers = Math.min(9, Math.max(0, Number(body.luggage) || 0));
+  const L = db.data.live[session.key];
   const van = (L && Number.isFinite(L.lat)) ? { lat: L.lat, lng: L.lng } : (s.loc || null);
   const naar = dest && dest.loc ? dest.loc : null;
   let km = s.type === 'jet' ? 350 : (s.type === 'helikopter' ? 60 : 9);
@@ -1292,21 +1297,21 @@ app.post('/api/ride/request', auth, (req, res) => {
   const ride = {
     ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     supplierCode: s.code, supplierName: s.name, type: s.type,
-    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
-    from: schoon(req.body.from || 'Huidige locatie', 80),
-    to: schoon(req.body.to || (dest && dest.name) || '', 80),
+    customerTier: session.tier, customerKey: session.key, customerCodename: codename,
+    from: schoon(body.from || 'Huidige locatie', 80),
+    to: schoon(body.to || (dest && dest.name) || '', 80),
     toCode: dest ? dest.code : null,
-    when: schoon(req.body.when || 'Zo snel mogelijk', 40),
+    when: schoon(body.when || 'Zo snel mogelijk', 40),
     // vooruit plannen: datum en tijd geven een geplande rit (taxi en jet)
     plannedFor: (() => {
-      const d = schoon(req.body.date, 10), u = schoon(req.body.time, 5);
+      const d = schoon(body.date, 10), u = schoon(body.time, 5);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
       const iso = d + 'T' + (/^\d{2}:\d{2}$/.test(u) ? u : '12:00') + ':00';
       return isNaN(new Date(iso)) ? null : iso;
     })(),
-    passengers: pax, luggage: koffers, note: schoon(req.body.note, 140),
+    passengers: pax, luggage: koffers, note: schoon(body.note, 140),
     // de chauffeur weet het (alleen met toestemming): bijv. rolstoel of medicatie
-    zorg: zorgVoor(req.session.key),
+    zorg: zorgVoor(session.key),
     km: Math.round(km * 10) / 10, quote,
     driver: null, vehicle: null,
     // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf;
@@ -1323,31 +1328,41 @@ app.post('/api/ride/request', auth, (req, res) => {
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }
-  pushLive(req.session.key);
-  res.json({ ok: true, ride });
+  pushLive(session.key);
+  return { ok: true, ride };
+}
+app.post('/api/ride/request', auth, (req, res) => {
+  const r = vraagRitVoor(req.session, req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
 });
 
-app.post('/api/ride/pay', auth, (req, res) => {
-  const r = db.data.rides.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
-  if (!r) return res.status(404).json({ error: 'Rit niet gevonden.' });
-  if (r.paid) return res.status(409).json({ error: 'Al betaald.' });
+function betaalRitVoor(session, body) {
+  const r = db.data.rides.find(x => x.ref === body.ref && (x.customerKey || x.customerTier) === session.key);
+  if (!r) return { status: 404, error: 'Rit niet gevonden.' };
+  if (r.paid) return { status: 409, error: 'Al betaald.' };
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
-  if (r.status === 'wacht-op-betaling' && Date.now() - new Date(r.at) > 30 * 60000) return res.status(410).json({ error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' });
+  if (r.status === 'wacht-op-betaling' && Date.now() - new Date(r.at) > 30 * 60000) return { status: 410, error: 'Deze aanvraag is verlopen. Vraag de rit opnieuw aan.' };
   // fooi voor de chauffeur, punten-tegoed (RTG legt bij) en spaarpunten
-  const fooiR = fooiUit(req.body, r.quote);
+  const fooiR = fooiUit(body, r.quote);
   if (fooiR) r.fooi = fooiR;
-  const kortingR = pasTegoedToe(req.session.key, r.quote);
+  const kortingR = pasTegoedToe(session.key, r.quote);
   if (kortingR) r.puntenKorting = kortingR;
   r.paid = true;
   r.paidAt = new Date().toISOString();
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
-  verdienPunten(req.session.key, r.quote - kortingR, r.supplierName);
+  verdienPunten(session.key, r.quote - kortingR, r.supplierName);
   save();
   notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? '\u2708\uFE0F' : '\u{1F697}', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
   sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
-  pushLive(req.session.key);
-  res.json({ ok: true, ride: r });
+  pushLive(session.key);
+  return { ok: true, ride: r };
+}
+app.post('/api/ride/pay', auth, (req, res) => {
+  const r = betaalRitVoor(req.session, req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
 });
 
 app.post('/api/ai', auth, async (req, res) => {
@@ -1521,30 +1536,30 @@ app.post('/api/tickets/aanbod', auth, (req, res) => {
   res.json({ partners });
 });
 
-app.post('/api/ticket/koop', auth, (req, res) => {
-  const s = findSupplier(req.body.supplierCode);
+function koopTicketVoor(session, body) {
+  const s = findSupplier(body.supplierCode);
   const caps = s ? ((db.data.supplierTypes[s.type] || {}).caps || []) : [];
-  if (!s || !caps.includes('tickets')) return res.status(404).json({ error: 'Geen activiteitenpartner gevonden.' });
-  const act = (s.activiteiten || []).find(a => a.id === req.body.activiteitId);
-  if (!act) return res.status(404).json({ error: 'Deze activiteit bestaat niet (meer).' });
-  const datum = String(req.body.datum || '');
-  const tijd = String(req.body.tijd || '');
+  if (!s || !caps.includes('tickets')) return { status: 404, error: 'Geen activiteitenpartner gevonden.' };
+  const act = (s.activiteiten || []).find(a => a.id === body.activiteitId);
+  if (!act) return { status: 404, error: 'Deze activiteit bestaat niet (meer).' };
+  const datum = String(body.datum || '');
+  const tijd = String(body.tijd || '');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < new Date().toISOString().slice(0, 10))
-    return res.status(400).json({ error: 'Kies een datum vanaf vandaag.' });
-  if (!(act.tijden || []).includes(tijd)) return res.status(400).json({ error: 'Kies een tijdslot van deze activiteit.' });
-  const personen = Math.min(10, Math.max(1, parseInt(req.body.personen, 10) || 1));
+    return { status: 400, error: 'Kies een datum vanaf vandaag.' };
+  if (!(act.tijden || []).includes(tijd)) return { status: 400, error: 'Kies een tijdslot van deze activiteit.' };
+  const personen = Math.min(10, Math.max(1, parseInt(body.personen, 10) || 1));
   const bezet = ticketsVoorSlot(s.code, act.id, datum, tijd).reduce((n, t) => n + (t.personen || 1), 0);
   if (bezet + personen > act.capaciteit)
-    return res.status(409).json({ error: 'Dit tijdslot heeft nog ' + Math.max(0, act.capaciteit - bezet) + ' plek(ken). Kies een ander slot.' });
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+    return { status: 409, error: 'Dit tijdslot heeft nog ' + Math.max(0, act.capaciteit - bezet) + ' plek(ken). Kies een ander slot.' };
+  const codename = session.account ? session.account.codename : PERSONAS[session.tier].codename;
   const ticket = {
     ref: 'RTG-T-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     kind: 'ticket', code: entreeCode(),
     supplierCode: s.code, supplierName: s.name,
-    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    customerTier: session.tier, customerKey: session.key, customerCodename: codename,
     service: { id: act.id, name: act.name, soort: 'ticket' },
     activiteitId: act.id, datum, tijd, personen,
-    zorg: zorgVoor(req.session.key),
+    zorg: zorgVoor(session.key),
     price: (act.prijs || 0) * personen,
     wanneer: datum + ' ' + tijd,
     betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
@@ -1552,7 +1567,12 @@ app.post('/api/ticket/koop', auth, (req, res) => {
   db.data.boekingen.unshift(ticket);
   db.data.boekingen = db.data.boekingen.slice(0, 50000);
   save();
-  res.json({ ok: true, ticket }); // afrekenen via /api/booking/pay
+  return { ok: true, ticket }; // afrekenen via /api/booking/pay of de Butler
+}
+app.post('/api/ticket/koop', auth, (req, res) => {
+  const r = koopTicketVoor(req.session, req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
 });
 
 app.post('/api/tickets/mijn', auth, (req, res) => {

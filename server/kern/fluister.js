@@ -34,7 +34,7 @@
    object (het 24-uursblok) wordt eerst een voorstel dat u bevestigt met
    "ja" (of afblaast met "nee"). Een tafelreservering blijft direct:
    gratis en altijd annuleerbaar. */
-module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGebruik, zorgVoor, pay, kernRef }) => {
+module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering, assetGebruik, zorgVoor, pay, kernRef }) => {
   const nu = () => new Date().toISOString();
   // hetzelfde brein, een passend gezicht: De Butler voor leden, "uw
   // assistent" voor personeel en zaken
@@ -216,6 +216,26 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       return { tekst: 'Gedaan: ' + eur(w.centen) + ' aan ' + w.aan + ' gestuurd via een Tik. Uw saldo: ' + eur(r.saldo) + '.', gedaan: true };
     }
+    // tickets voor een activiteit: boeken en direct afrekenen, entreecode terug
+    if (w.soort === 'ticket' && sess && kernRef && kernRef.koopTicketVoor) {
+      const r = kernRef.koopTicketVoor(sess, { supplierCode: w.supplierCode, activiteitId: w.activiteitId, datum: w.datum, tijd: w.tijd, personen: w.personen });
+      if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
+      const b = kernRef.betaalBoekingVoor(sess, { ref: r.ticket.ref });
+      if (b.error) return { tekst: 'De tickets staan klaar (' + r.ticket.ref + '), maar het afrekenen lukte niet: ' + b.error, gedaan: true };
+      return { tekst: 'Geboekt en betaald: ' + w.oms + ' op ' + w.datum + ' om ' + w.tijd + ', samen ' + eur((r.ticket.price || 0) * 100) + '. Uw entreecode is ' + r.ticket.code + '; laat hem bij de deur oplichten.', gedaan: true };
+    }
+    // een rit: aanvragen en (bij vooraf betalen) de offerte direct voldoen
+    if (w.soort === 'rit' && sess && kernRef && kernRef.vraagRitVoor) {
+      const r = kernRef.vraagRitVoor(sess, { supplierCode: w.supplierCode, to: w.to, toCode: w.toCode, passengers: w.personen, date: w.datum, time: w.tijd });
+      if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
+      let slot = '';
+      if (r.ride.status === 'wacht-op-betaling') {
+        const b = kernRef.betaalRitVoor(sess, { ref: r.ride.ref });
+        if (b.error) return { tekst: 'De rit staat klaar (' + r.ride.ref + '), maar het afrekenen lukte niet: ' + b.error, gedaan: true };
+        slot = ' De offerte van ' + eur(r.ride.quote * 100) + ' is betaald;';
+      } else slot = ' Offerte: ' + eur(r.ride.quote * 100) + ' (' + r.ride.betaalMoment + ');';
+      return { tekst: 'Geregeld: een rit met ' + r.ride.supplierName + ' naar ' + (r.ride.to || 'uw bestemming') + ' voor ' + r.ride.passengers + '.' + slot + ' de chauffeur wordt nu toegewezen en u volgt hem live in Reizen.', gedaan: true };
+    }
     if (w.soort === 'klompjes' && pay) {
       let betaald = 0, mis = null;
       for (const id of w.ids || []) {
@@ -270,7 +290,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
     if (/\bwat (kun|kan) (je|jij|u)\b/i.test(q) || /^help[!?.]?$/i.test(q)) {
       const basis = 'Ik onthoud wat u vertelt ("onthoud dat..."), vertel precies wat ik weet ("wat weet je over mij"), wis alles op verzoek en geef seintjes bij alles wat nadert.';
       if (!sess) return { ok: true, antwoord: basis + ' Vraag me gerust naar de actuele stand van uw dienst.', pakte: true };
-      return { ok: true, antwoord: basis + ' En ik regel het ook: zoeken door het hele aanbod ("zoek sushi"), een tafel reserveren, bestellen en afrekenen ("bestel 2 sangria bij Sunset Ibiza"), uw 24-uursblok plannen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw "ja".', pakte: true };
+      return { ok: true, antwoord: basis + ' En ik regel het ook: zoeken door het hele aanbod ("zoek sushi"), uw dag plannen ("plan mijn dag"), een tafel reserveren of annuleren, bestellen en afrekenen ("bestel 2 sangria bij Sunset Ibiza"), tickets boeken ("boek 2 tickets voor de sunset cruise morgen"), een taxi of transfer regelen, uw 24-uursblok plannen, uw saldo opvragen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw "ja".', pakte: true };
     }
     /* ---- doen: Fluister voert het ook echt uit, alleen voor het lid zelf
        (sess reist alleen mee op de leden-route, nooit voor personeel).
@@ -292,6 +312,82 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
         p.wacht = null;
         save();
         return klaar('Goed, het gaat niet door. Het voorstel is van tafel.');
+      }
+      // "plan mijn dag": een echt dagprogramma uit het echte aanbod, met
+      // voor elk onderdeel de zin waarmee ik het meteen regel
+      if (/plan (mijn|de|m.n) dag|dagplan(ning)?\b/i.test(q)) {
+        const alle = db.data.suppliers || [];
+        const resto = alle.filter(x => x.type === 'restaurant');
+        const beach = alle.find(x => x.type === 'beachclub');
+        const actZaak = alle.find(x => (x.activiteiten || []).length);
+        const act = actZaak && actZaak.activiteiten[0];
+        const avond = alle.find(x => ['bar', 'club'].includes(x.type));
+        const topper = s => ((s && s.menu) || [])[0];
+        const regels = [];
+        if (beach) regels.push('10:00 ligbedden bij ' + beach.name);
+        if (resto[0] && topper(resto[0])) regels.push('13:00 lunch bij ' + resto[0].name + ' (bijv. ' + topper(resto[0]).name + ', ' + eur(Math.round((topper(resto[0]).price || 0) * 100)) + ')');
+        if (act) regels.push(((act.tijden || [])[0] || '16:00') + ' ' + act.name + ' bij ' + actZaak.name + ' (' + eur(Math.round((act.prijs || 0) * 100)) + ' p.p., zeg: "boek 2 tickets voor ' + act.name + ' morgen")');
+        if (resto[0]) regels.push('20:00 diner bij ' + resto[0].name + ' (zeg: "reserveer bij ' + resto[0].name + ' morgen om 20:00")');
+        if (avond && topper(avond)) regels.push('23:00 ' + avond.name + ' (' + topper(avond).name + ', ' + eur(Math.round((topper(avond).price || 0) * 100)) + ')');
+        const zorgNu = zorgVoor && zorgVoor(key);
+        return klaar('Mijn voorstel voor uw dag: ' + regels.join(' | ') + '.' +
+          (p.weetjes.length ? ' Ik hield rekening met uw weetjes.' : '') +
+          (zorgNu && (zorgNu.allergenen || []).length ? ' Uw allergenen (' + zorgNu.allergenen.join(', ') + ') reizen overal automatisch mee.' : '') +
+          ' Zeg het maar en ik regel elk onderdeel, van de tickets tot de taxi.');
+      }
+      // "wat is mijn saldo": de stand van RTG Pay, gewoon in het gesprek
+      if (pay && /\bsaldo\b/i.test(q)) {
+        const ov = pay.overzicht(codenaam);
+        return klaar('Uw RTG Pay-saldo is ' + eur(ov.saldo) + '. Te weinig voor een plan? Bij elke betaling laad ik automatisch bij.');
+      }
+      // "annuleer mijn reservering (bij Sal de Mar)": kost niets, dus direct
+      if (annuleerReservering && /^annuleer\b/i.test(q) && /reserver/i.test(q)) {
+        const naam = (q.match(/\bbij\s+(.+?)[.?!]?\s*$/i) || [])[1];
+        const mijnRes = (db.data.reserveringen || []).filter(r => r.customerKey === key && ['aangevraagd', 'bevestigd'].includes(r.status) &&
+          (!naam || (r.supplierName || '').toLowerCase().includes(naam.toLowerCase().trim())));
+        if (!mijnRes.length) return klaar('Ik zie geen lopende reservering' + (naam ? ' bij ' + naam : '') + ' om te annuleren.');
+        const r = annuleerReservering(key, mijnRes[0].id);
+        if (r.error) return klaar('Dat lukt niet: ' + r.error);
+        return klaar('Geannuleerd: ' + mijnRes[0].supplierName + ', ' + mijnRes[0].datum + ' om ' + mijnRes[0].tijd + '. De zaak weet het meteen.', true);
+      }
+      // "boek 2 tickets voor de sunset cruise morgen (om 19:00)": geld,
+      // dus eerst een voorstel; de entreecode komt na uw "ja"
+      if (kernRef && kernRef.koopTicketVoor && /\b(boek|koop|regel)\b/i.test(q) && /\b(tickets?|kaartjes?)\b/i.test(q)) {
+        let zaak = null, act = null;
+        const ql = q.toLowerCase();
+        for (const x of (db.data.suppliers || [])) {
+          for (const a of (x.activiteiten || [])) {
+            if ((a.name || '').toLowerCase().split(/[^a-z0-9]+/).some(wrd => wrd.length > 3 && ql.includes(wrd))) { zaak = x; act = a; break; }
+          }
+          if (act) break;
+        }
+        if (!act) return klaar('Voor welke activiteit? Bijvoorbeeld: ' + (db.data.suppliers || []).flatMap(x => (x.activiteiten || []).map(a => '"' + a.name + '" bij ' + x.name)).slice(0, 3).join(', ') + '.');
+        const datum = datumInZin(q);
+        if (!datum) return klaar('Voor welke dag? Zeg bijvoorbeeld: "boek 2 tickets voor ' + act.name + ' morgen".');
+        const tm = q.match(/(\d{1,2})[:.](\d{2})/);
+        const tijd = (tm && (act.tijden || []).includes(tm[1].padStart(2, '0') + ':' + tm[2])) ? tm[1].padStart(2, '0') + ':' + tm[2] : (act.tijden || [])[0];
+        const personen = parseInt((q.match(/(\d{1,2})\s*(tickets?|kaartjes?|personen|man)\b/i) || [])[1], 10) || 1;
+        const oms = personen + ' ticket(s) voor ' + act.name + ' bij ' + zaak.name;
+        p.wacht = { soort: 'ticket', supplierCode: zaak.code, activiteitId: act.id, datum, tijd, personen, oms, at: nu() };
+        save();
+        return klaar('Even checken: ' + oms + ' op ' + datum + ' om ' + tijd + ', samen ' + eur(Math.round((act.prijs || 0) * personen * 100)) + '. Ik boek en reken direct af via RTG Pay. Zeg "ja" en de entreecode komt eraan; "nee" en het gaat niet door.', false, true);
+      }
+      // "regel een taxi naar Sal de Mar (om 23:00, met 4 personen)": de
+      // offerte volgt het tarief van de vervoerder; betalen na uw "ja"
+      if (kernRef && kernRef.vraagRitVoor && /\b(regel|boek|bestel|vraag)\b/i.test(q) && /\b(taxi|auto|rit|chauffeur|wagen|transfer)\b/i.test(q)) {
+        const ql = q.toLowerCase();
+        const rijders = (db.data.suppliers || []).filter(x => ((db.data.supplierTypes[x.type] || {}).caps || []).includes('rides') && x.type !== 'activiteit');
+        const rijder = rijders.find(x => (x.name || '').toLowerCase().split(/\s+/).some(wrd => wrd.length > 3 && ql.includes(wrd))) ||
+          rijders.find(x => x.type === 'taxi') || rijders[0];
+        if (!rijder) return klaar('Ik zie nu geen vervoerspartner. Kijk anders even in Reizen.');
+        const best = (q.match(/\bnaar\s+(.+?)(?=\s+(?:om|op|voor|met|morgen|overmorgen|vandaag)\b|[.?!]?\s*$)/i) || [])[1];
+        const doel = best && (db.data.suppliers || []).find(x => (x.name || '').toLowerCase().includes(best.toLowerCase().trim()));
+        const personen = parseInt((q.match(/(\d{1,2})\s*(personen|man)\b/i) || [])[1], 10) || 1;
+        const tm = q.match(/(\d{1,2})[:.](\d{2})/);
+        const datum = datumInZin(q);
+        p.wacht = { soort: 'rit', supplierCode: rijder.code, to: best ? best.trim() : '', toCode: doel ? doel.code : null, personen, datum: datum || null, tijd: tm ? tm[1].padStart(2, '0') + ':' + tm[2] : null, at: nu() };
+        save();
+        return klaar('Even checken: een rit met ' + rijder.name + (best ? ' naar ' + best.trim() : '') + ' voor ' + personen + (datum ? ' (' + datum + (tm ? ' ' + tm[1].padStart(2, '0') + ':' + tm[2] : '') + ')' : ', zo snel mogelijk') + '? De prijs volgt het tarief van de vervoerder en reken ik direct af. Zeg "ja" en ik regel hem; "nee" en het gaat niet door.', false, true);
       }
       // "bestel 2 sangria en 1 bravas bij Sunset Ibiza": eten en drinken
       // wordt direct afgerekend via RTG Pay, dus boven de drempel

@@ -178,6 +178,45 @@ test('de Butler bestelt en rekent af: voorstel, "ja", ophaalcode en een echte or
   assert.ok(!mis.body.voorstel && /op de kaart/i.test(mis.body.antwoord));
 });
 
+test('tickets boeken in gewone taal: voorstel, "ja", entreecode', async () => {
+  const r = await api('fluister', { q: 'boek 2 tickets voor de sunset cruise morgen om 19:30' }, lid);
+  assert.ok(r.body.voorstel, 'tickets zijn geld: eerst een voorstel');
+  assert.ok(/Sunset cruise/i.test(r.body.antwoord) && /158,00/.test(r.body.antwoord), 'activiteit en totaal (2 x 79) staan er eerlijk bij');
+  const ja = await api('fluister', { q: 'ja' }, lid);
+  assert.ok(ja.body.gedaan && /entreecode/i.test(ja.body.antwoord));
+  const mijn = (await api('tickets/mijn', {}, lid)).body.tickets || [];
+  const t = mijn.find(x => x.supplierName === 'Es Vedra Cruises' && x.personen === 2);
+  assert.ok(t, 'het ticket staat echt in het systeem, betaald');
+});
+
+test('een rit regelen: voorstel, "ja", offerte en chauffeurtoewijzing', async () => {
+  const r = await api('fluister', { q: 'regel een taxi naar Sal de Mar met 2 personen' }, lid);
+  assert.ok(r.body.voorstel && /Ibiza Executive Cars/.test(r.body.antwoord));
+  const ja = await api('fluister', { q: 'ja' }, lid);
+  assert.ok(ja.body.gedaan, 'de rit is aangevraagd');
+  assert.ok(/Ibiza Executive Cars/.test(ja.body.antwoord) && /€/.test(ja.body.antwoord), 'vervoerder en offerte in het antwoord');
+});
+
+test('"plan mijn dag": een echt programma uit het echte aanbod', async () => {
+  const r = await api('fluister', { q: 'plan mijn dag' }, lid);
+  assert.ok(r.body.pakte);
+  assert.ok(/13:00/.test(r.body.antwoord) && /20:00/.test(r.body.antwoord), 'het plan heeft echte tijden');
+  assert.ok(/Sal de Mar/.test(r.body.antwoord), 'met echte zaken uit het aanbod');
+  assert.ok(/Sunset cruise|Snorkeltocht|museum/i.test(r.body.antwoord), 'en een echte activiteit');
+});
+
+test('saldo opvragen en een reservering annuleren, gewoon in het gesprek', async () => {
+  const saldo = await api('fluister', { q: 'wat is mijn saldo?' }, lid);
+  assert.ok(saldo.body.pakte && /saldo/i.test(saldo.body.antwoord) && /€/.test(saldo.body.antwoord));
+  // een reservering die er echt staat, gaat er met een zin ook weer af
+  const over = new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10);
+  await api('reserveer', { supplierCode: 'KIKUNOI', datum: over, tijd: '21:00', personen: 2 }, lid);
+  const weg = await api('fluister', { q: 'annuleer mijn reservering bij Sal de Mar' }, lid);
+  assert.ok(weg.body.gedaan && /Geannuleerd/i.test(weg.body.antwoord));
+  const nogEen = await api('fluister', { q: 'annuleer mijn reservering bij Sal de Mar' }, lid);
+  assert.ok(/geen lopende reservering/i.test(nogEen.body.antwoord), 'weg is echt weg');
+});
+
 test('"wat kun je": de Butler somt eerlijk zijn hele kunnen op', async () => {
   const r = await api('fluister', { q: 'wat kun je allemaal?' }, lid);
   assert.ok(r.body.pakte);

@@ -2687,7 +2687,7 @@ Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify,
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
 Object.assign(kern, require('./kern/fluister')({
   db, save, schoon, anthropic, notify,
-  reserveerTafel, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,
+  reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,
   // kernRef: voor vermogens die pas later op de kern komen (zoals bestellen,
   // dat in routes/member.js op de kern wordt gehangen)
   kernRef: kern

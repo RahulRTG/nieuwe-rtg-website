@@ -20,7 +20,7 @@
      twee keer het minimum. Een knop ervan maken (groothandel) komt in de
      volgende ronde van deze toren. */
 
-module.exports = ({ save, crypto, schoon, notifySupplier }) => {
+module.exports = ({ db, save, crypto, schoon, notifySupplier }) => {
   const nu = () => new Date().toISOString();
   const rond3 = x => Math.round(Number(x) * 1000) / 1000;
   const rond2 = x => Math.round(Number(x) * 100) / 100;
@@ -147,6 +147,62 @@ module.exports = ({ save, crypto, schoon, notifySupplier }) => {
     return { ok: true, artikel: a };
   }
 
+  /* De cirkel dicht: een geleverde groothandelsbestelling vult de voorraad
+     automatisch aan (matching op artikelnaam, hoofdletter-ongevoelig) en de
+     regelprijs wordt de nieuwe kostprijs. Aangeroepen vanuit de
+     groothandel-keten zodra een bestelling op "geleverd" komt. */
+  function leverBinnen(s, regels, bron) {
+    if (!s) return 0;
+    let geboekt = 0;
+    for (const r of (Array.isArray(regels) ? regels : [])) {
+      const a = artikelen(s).find(x => x.naam.toLowerCase() === String(r.naam || '').toLowerCase());
+      if (!a || !(r.aantal > 0)) continue;
+      const uit = levering(s, a.id, r.aantal, r.prijs, bron || 'groothandel');
+      if (uit.ok) geboekt++;
+    }
+    return geboekt;
+  }
+
+  /* Menu-engineering: verkoopvolume (kassabonnen + betaalde bestellingen)
+     maal de marge uit het recept, over de afgelopen weken. De klassieke
+     kwadranten: ster (marge en volume boven de mediaan), werkpaard (volume
+     hoog, marge laag), puzzel (marge hoog, volume laag), hond (allebei laag). */
+  function menuAnalyse(s, dagen) {
+    const periode = Math.max(1, Math.min(90, Number(dagen) || 21));
+    const sinds = Date.now() - periode * 86400000;
+    const per = {};
+    const telItems = items => {
+      for (const it of items || []) {
+        const m = menuItemVan(s, it.id || it.name);
+        if (m) per[m.id] = (per[m.id] || 0) + Math.max(1, parseInt(it.qty, 10) || 1);
+      }
+    };
+    for (const o of db.data.orders) if (o.supplierCode === s.code && o.paid && new Date(o.paidAt || o.at) >= sinds) telItems(o.items);
+    for (const v of db.data.posSales[s.code] || []) if (new Date(v.at) >= sinds) telItems(v.items);
+    const rijen = (Array.isArray(s.menu) ? s.menu : []).map(m => {
+      const verkocht = per[m.id] || 0;
+      const kost = kostprijsVan(s, m.id);
+      const prijs = Number(m.price) || 0;
+      const marge = rond2(prijs - kost);
+      return { id: m.id, naam: m.name, prijs, kostprijs: kost, marge, verkocht,
+        omzet: rond2(verkocht * prijs), brutowinst: rond2(verkocht * marge), heeftRecept: (recepten(s)[m.id] || []).length > 0 };
+    });
+    const mediaan = arr => { const x = [...arr].sort((a, b) => a - b); return x.length ? x[Math.floor(x.length / 2)] : 0; };
+    const mV = mediaan(rijen.map(r => r.verkocht));
+    const mM = mediaan(rijen.filter(r => r.heeftRecept).map(r => r.marge));
+    for (const r of rijen) {
+      const hoogV = r.verkocht >= mV && r.verkocht > 0;
+      const hoogM = r.heeftRecept ? r.marge >= mM : null;
+      r.klasse = hoogM === null ? 'onbekend' : (hoogV && hoogM) ? 'ster' : hoogV ? 'werkpaard' : hoogM ? 'puzzel' : 'hond';
+      r.advies = r.klasse === 'ster' ? 'Koester en geef het podium: dit is de chef-aanrader.'
+        : r.klasse === 'werkpaard' ? 'Loopt hard maar verdient weinig: kijk naar de prijs of de portiekost.'
+        : r.klasse === 'puzzel' ? 'Verdient goed maar verkoopt weinig: betere plek op de kaart, of laat de bediening hem noemen.'
+        : r.klasse === 'hond' ? 'Weinig verkoop en weinig marge: overweeg vervangen of van de kaart halen.'
+        : 'Zet een recept op dit gerecht, dan rekent de marge mee.';
+    }
+    return { ok: true, dagen: periode, rijen: rijen.sort((a, b) => b.brutowinst - a.brutowinst) };
+  }
+
   /* ---------- inkoopadvies en het totaaloverzicht ---------- */
   function inkoopadvies(s) {
     return artikelen(s)
@@ -192,5 +248,5 @@ module.exports = ({ save, crypto, schoon, notifySupplier }) => {
     };
   }
 
-  return { keuken: { overzicht, werkvloer, receptZet, receptOverzicht, boekVerkoopAf, telling, verspilling, levering, inkoopadvies, kostprijsVan } };
+  return { keuken: { overzicht, werkvloer, receptZet, receptOverzicht, boekVerkoopAf, telling, verspilling, levering, leverBinnen, menuAnalyse, inkoopadvies, kostprijsVan } };
 };

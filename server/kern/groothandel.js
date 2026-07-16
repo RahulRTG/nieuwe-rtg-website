@@ -34,7 +34,7 @@ const GH_KETEN = { aangevraagd: 'bevestigd', bevestigd: 'onderweg', onderweg: 'g
 const GH_KLAAR = { geleverd: true, geweigerd: true, geannuleerd: true };
 const CATEGORIEEN = ['Vers', 'Zuivel', 'Vlees & vis', 'Groente & fruit', 'Droog & houdbaar', 'Dranken', 'Diepvries', 'Non-food'];
 
-function maakGroothandel({ db, save, crypto, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, anthropic }) {
+function maakGroothandel({ db, save, crypto, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, anthropic, bijGeleverd }) {
   const id = (p) => (p || 'g') + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
@@ -178,6 +178,8 @@ function maakGroothandel({ db, save, crypto, findSupplier, notify, notifySupplie
     else return { status: 400, error: 'Onbekende actie.' };
     o.stappen.push({ status: o.status, at: nu(), door: (actor && actor.name) || null });
     save();
+    // geleverd bij een zaak: de keukenvoorraad van de klant vult zichzelf aan
+    if (o.status === 'geleverd' && o.klant.soort !== 'lid' && bijGeleverd) { try { bijGeleverd(o); } catch (e) {} }
     notifKlant(o, o.status === 'geweigerd' ? 'Bestelling geweigerd' : 'Bestelling: ' + o.status);
     sseToSupplier(groothandelCode, 'sync', { scope: 'groothandel' });
     sseToOffice('sync', { scope: 'groothandel' });

@@ -128,3 +128,58 @@ test('de betaalde gastbestelling boekt ook af (de tweede verkoopnaad)', async ()
   const lamNa = (await api('supplier/keuken')).body.artikelen.find(a => a.id === lam.id).aantal;
   assert.equal(lamNa, Math.round((lamVoor - 0.4) * 1000) / 1000, 'de gastbestelling boekte 0,4 kg lam af');
 });
+
+test('een knop: het inkoopadvies wordt een groothandelsbestelling en geleverd vult de voorraad', async () => {
+  // een artikel dat exact zo in het Mercabiza-assortiment staat, onder het minimum
+  const cava = (await api('supplier/voorraad/zet', { naam: 'Cava brut', aantal: 2, min: 6, eenheid: 'fles', kostprijs: 5 })).body.item;
+  const r = await api('supplier/keuken/bestel-advies', { groothandelCode: 'MERCABIZA' });
+  assert.equal(r.status, 200);
+  const regel = r.body.order.regels.find(x => x.naam === 'Cava brut');
+  assert.ok(regel, 'de cava staat op de bestelling');
+  assert.equal(regel.aantal, 10, 'aanvullen tot twee keer het minimum (12 - 2)');
+  assert.ok(r.body.nietGevonden.includes('Huiswijn wit'), 'wat niet in het assortiment staat komt terug als nietGevonden');
+  // de groothandel levert: manager Rosa logt in met haar pincode en loopt de keten
+  const roster = await api('supplier/roster', { code: 'MERCABIZA' });
+  const rosa = (roster.body.staff || []).find(x => x.role === 'manager');
+  assert.ok(rosa, 'de groothandel heeft een manager op het rooster');
+  const gh = await (await fetch(base + '/api/supplier/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'MERCABIZA', staffId: rosa.id, pin: '1234' })
+  })).json();
+  assert.ok(gh.token, 'de groothandel logt in');
+  for (let i = 0; i < 3; i++) {
+    assert.equal((await api('supplier/groothandel/order/status', { ref: r.body.order.ref, actie: 'verder' }, gh.token)).status, 200);
+  }
+  // geleverd: de voorraad vulde zichzelf aan en de inkoopprijs werd de kostprijs
+  const na = (await api('supplier/keuken')).body;
+  const c = na.artikelen.find(a => a.id === cava.id);
+  assert.equal(c.aantal, 12, '2 op de plank plus 10 geleverd');
+  assert.equal(c.kostprijs, 6, 'de regelprijs (inkoop) is de nieuwe kostprijs');
+  assert.ok(na.logboek.some(x => x.soort === 'levering' && /mercabiza/i.test(x.wie || '')), 'de levering staat herleidbaar in het logboek');
+});
+
+test('de dagafsluiting: Z-rapport met btw-splitsing en de boekhoudexport als CSV', async () => {
+  const r = await api('supplier/dagrapport', {});
+  assert.equal(r.status, 200);
+  assert.ok(r.body.bonnen >= 2, 'de kassabon en de gastbestelling tellen mee');
+  assert.ok(r.body.omzet >= 3 * menuItem.price, 'de omzet telt beide verkopen');
+  assert.ok(r.body.btw.length >= 1 && r.body.btw[0].btw > 0, 'de btw is gesplitst uit de omzet');
+  assert.ok(r.body.betaalwijzen.pin >= 2 * menuItem.price, 'de pinbon staat onder de betaalwijzen');
+  assert.ok(r.body.betaalwijzen.app >= menuItem.price, 'de app-bestelling ook');
+  const csv = await fetch(base + '/api/supplier/dagrapport.csv?token=' + token);
+  assert.equal(csv.status, 200);
+  const tekst = await csv.text();
+  assert.match(tekst, /Omzet /);
+  assert.match(tekst, /btw-tarief/);
+  assert.equal((await fetch(base + '/api/supplier/dagrapport.csv?token=fout')).status, 401, 'zonder geldige sessie geen export');
+});
+
+test('menu-engineering: volume maal marge, met een kwadrant en advies per gerecht', async () => {
+  const r = await api('supplier/keuken/menu-analyse', {});
+  assert.equal(r.status, 200);
+  const rij = r.body.rijen.find(x => x.id === menuItem.id);
+  assert.ok(rij.verkocht >= 3, 'twee over de kassa plus een gastbestelling');
+  assert.ok(['ster', 'werkpaard', 'puzzel', 'hond'].includes(rij.klasse), 'het gerecht met recept krijgt een kwadrant');
+  assert.ok(rij.advies.length > 10, 'met een advies erbij');
+  assert.ok(r.body.rijen.some(x => x.klasse === 'onbekend'), 'zonder recept geen marge-oordeel');
+});

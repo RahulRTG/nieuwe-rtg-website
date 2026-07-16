@@ -278,8 +278,27 @@
     else if (type==='hotel'||type==='apartment') html = kassaHotel();
     else html = kassaVervoer();
     html += kassaDay();
+    html += '<div id="zWrap"></div>';
     el.innerHTML = html;
     bindKassa(type);
+    laadZ();
+  }
+
+  /* De dagafsluiting (Z-rapport): omzet, bonnen, fooien en de btw-splitsing
+     van vandaag, met de boekhoudexport (journaalregels als CSV) eronder. */
+  async function laadZ(){
+    const el = $('#zWrap'); if (!el) return;
+    let r; try { r = await API.call('/supplier/dagrapport', {}); } catch(e){ return; }
+    el.innerHTML = '<div class="card"><div class="tt-h">🧾 '+T('pos.z','Dagafsluiting (Z-rapport)')+'</div>'+
+      '<div class="st-row"><span>'+T('pos.z.omzet','Omzet vandaag')+'</span><b>'+eur(r.omzet)+'</b></div>'+
+      '<div class="st-row"><span>'+T('pos.z.bonnen','Bonnen')+'</span><b>'+r.bonnen+'</b></div>'+
+      (r.fooien?'<div class="st-row"><span>'+T('pos.fooien','Fooien')+'</span><b>'+eur(r.fooien)+'</b></div>':'')+
+      (r.btw||[]).map(b => '<div class="st-row"><span>'+esc(b.label)+' · '+b.tarief+'% btw</span><b>'+eur(b.omzet)+' <span class="sub">'+T('pos.z.waarvanbtw','waarvan btw')+' '+eur(b.btw)+'</span></b></div>').join('')+
+      Object.entries(r.betaalwijzen||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.ontv','Ontvangsten')+' '+esc(w)+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
+      '<button class="bigbtn" id="zCsv" style="margin-top:0.5rem;">⬇ '+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
+      '<div class="softline" style="margin-top:0.3rem;">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
+    const k = el.querySelector('#zCsv');
+    if (k) k.addEventListener('click', () => { window.open('/api/supplier/dagrapport.csv?token='+encodeURIComponent(API.token)+'&datum='+r.datum, '_blank'); });
   }
 
   // horeca: tik gerechten aan, bon loopt op, afrekenen met PIN of contant

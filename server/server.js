@@ -2120,7 +2120,13 @@ const {
   ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghMarkt, ghPlaatsBestelling,
   ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel
 } = maakGroothandel({
-  db, save, crypto, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, anthropic
+  db, save, crypto, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, anthropic,
+  // geleverd bij een zaak: het keukenbrein boekt de regels als levering in
+  // (kern.keuken bestaat op aanroepmoment; de kern-bag wordt verderop gevuld)
+  bijGeleverd: (o) => {
+    const zaak = findSupplier(o.klant.id);
+    if (zaak && kern.keuken) kern.keuken.leverBinnen(zaak, o.regels, 'groothandel ' + o.groothandelNaam);
+  }
 });
 
 /* De AI-bedrijfsagent (kern/agent.js): vaste leverancier koppelen, AI-inkoop-
@@ -2397,7 +2403,7 @@ const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCa
 
 /* De fiscale rekenlaag komt uit kern/fiscaal.js en draagt db + de reken-helpers.
    financeVoor: de maandboekhouding van de zaak; cannedBoekhouder: de AI-antwoorden. */
-const { financeVoor, cannedBoekhouder } = maakFiscaal({ db, centen, btwSplit });
+const { financeVoor, cannedBoekhouder, dagrapport } = maakFiscaal({ db, centen, btwSplit });
 
 
 // AI-boekhouder voor het Business Pass-lid: wat is per land terug te vorderen
@@ -2563,7 +2569,7 @@ const kern = {
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat,
-  ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, findPartner, findStaffPartner,
+  ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, findPartner, findStaffPartner,
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
@@ -2658,7 +2664,7 @@ Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCode
 /* Het keukenbrein (kern/keuken.js): recepten per gerecht, automatische
    voorraad-afboeking bij elke verkoop, telling/verspilling/levering met
    logboek, marges en het inkoopadvies. */
-Object.assign(kern, require('./kern/keuken')({ save, crypto, schoon, notifySupplier }));
+Object.assign(kern, require('./kern/keuken')({ db, save, crypto, schoon, notifySupplier }));
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

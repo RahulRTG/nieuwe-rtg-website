@@ -178,7 +178,49 @@ function maakFiscaal({ db, centen, btwSplit }) {
     return 'Uw maand in ' + L.naam + ': af te dragen btw € ' + fin.btwTotaal + ', personeelskosten € ' + fin.personeel.totaal + ' (' + fin.personeel.uren + ' uur), cadeaukaarten € ' + fin.giftcards.open + ' open. Vraag me naar btw, personeelskosten, cadeaukaarten of aangiftetermijnen. Dit is voorlichting, geen bindend fiscaal advies.';
   }
 
-  return { financeVoor, cannedBoekhouder };
+  /* Het Z-rapport (dagafsluiting): omzet, bonnen, fooien, betaalwijzen en de
+     btw-splitsing van EEN dag, met dezelfde categorielogica als het
+     maandoverzicht. Voedt de dagafsluiting op de kassa en de
+     boekhoudexport (journaalregels als CSV). */
+  function dagrapport(s, datum) {
+    const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum || '')) ? String(datum) : new Date().toISOString().slice(0, 10);
+    const opDag = iso => String(iso || '').slice(0, 10) === dag;
+    const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
+    const L = LANDEN[landCode];
+    const caps = (db.data.supplierTypes[s.type] || {}).caps || [];
+    const basisCat = caps.includes('rides') ? (s.type === 'jet' ? 'jet' : 'vervoer') : caps.includes('rooms') ? 'logies' : 'eten';
+    const catVan = naam => { const m = (s.menu || []).find(x => x.name === naam); return m && m.station === 'bar' ? 'drank' : basisCat === 'eten' ? 'eten' : basisCat; };
+    const potten = {};
+    const betaalwijzen = {};
+    let bonnen = 0, fooien = 0, omzet = 0;
+    const tel = (cat, bedrag) => { if (bedrag > 0) potten[cat] = (potten[cat] || 0) + bedrag; };
+    for (const o of db.data.orders) {
+      if (o.supplierCode !== s.code || !o.paid || !opDag(o.paidAt || o.at)) continue;
+      bonnen++;
+      fooien += o.fooi || 0;
+      let t = 0;
+      for (const it of o.items || []) { const b = (it.price || 0) * (it.qty || 1); t += b; tel(catVan(it.name), b); }
+      omzet += t;
+      betaalwijzen.app = centen((betaalwijzen.app || 0) + t);
+    }
+    for (const v of db.data.posSales[s.code] || []) {
+      if (!opDag(v.at)) continue;
+      bonnen++;
+      omzet += v.total || 0;
+      const m = v.method || 'pin';
+      betaalwijzen[m] = centen((betaalwijzen[m] || 0) + (v.total || 0));
+      if (m === 'rtg' || m === 'kamer') continue; // interne verrekening: de btw loopt via de hoofdboeking
+      if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
+      else tel(basisCat, v.total || 0);
+    }
+    const btw = Object.entries(potten).map(([cat, o2]) => {
+      const t = L.tarieven[cat] != null ? L.tarieven[cat] : L.tarieven.standaard;
+      return { cat, label: FIN_CAT[cat] || cat, ...btwSplit(o2, t) };
+    }).sort((a, b) => b.omzet - a.omzet);
+    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, btw };
+  }
+
+  return { financeVoor, cannedBoekhouder, dagrapport };
 }
 
 /* De belastingtool: een indicatieve jaarberekening voor ondernemers, per

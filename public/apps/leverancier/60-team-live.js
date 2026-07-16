@@ -296,6 +296,7 @@
   async function renderVoorraad(){
     const el = $('#voorraadWrap'); if (!el) return;
     let d; try { d = await API.call('/supplier/keuken'); } catch(e){ return; }
+    let ma = null; try { ma = await API.call('/supplier/keuken/menu-analyse'); } catch(e){}
     const vs = d.artikelen || [];
     const mgr = (() => { const a = actor(); return !!(a.manager || a.role === 'manager' || !a.staffId); })();
     const geld = x => '€ ' + (Number(x)||0).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -304,7 +305,8 @@
     // het inkoopadvies: aanvullen tot twee keer het minimum
     if ((d.advies||[]).length) h += '<div class="card" style="border-left:4px solid var(--gold,#A98F1C);"><div class="tt-h">🛒 '+T('vr.advies','Inkoopadvies')+'</div>'+
       d.advies.map(a => '<div class="st-row"><span>'+esc(a.naam)+' <span class="sub">'+a.aantal+' '+esc(a.eenheid)+', min '+a.min+'</span></span><b>+ '+a.advies+' '+esc(a.eenheid)+(a.kosten?' <span class="sub">'+geld(a.kosten)+'</span>':'')+'</b></div>').join('')+
-      '<div class="softline" style="margin-top:0.3rem;">'+T('vr.advies.s','Bestellen kan bij de groothandel (Meer, Groothandel) of via de AI-inkooplijst in het Kantoor.')+'</div></div>';
+      (mgr?'<button class="bigbtn" id="vrBestel" style="margin-top:0.5rem;">🛒 '+T('vr.bestel','Bestel dit advies bij de groothandel')+'</button>':'')+
+      '<div class="softline" style="margin-top:0.3rem;">'+T('vr.advies.s','Geleverd = automatisch bijgeboekt, met de inkoopprijs als nieuwe kostprijs.')+'</div></div>';
     // de artikelen zelf, met kostprijs en de vloerhandelingen
     h += '<div class="card">'+(vs.length ? vs.map(v =>
       '<div class="st-row" style="align-items:center;"><span'+(v.min>0&&v.aantal<=v.min?' style="color:#FF8589;"':'')+'>'+esc(v.naam)+
@@ -324,6 +326,15 @@
         (r.regels.length?'<div class="sub">'+r.regels.map(x=>x.hoeveelheid+' '+esc(x.eenheid)+' '+esc(x.naam)).join(' · ')+'</div>':'')+
         '</div>').join('')+
       '<div class="softline" style="margin-top:0.3rem;">'+T('vr.rec.s','Elke kassabon en betaalde bestelling boekt de ingredienten automatisch af via het recept.')+'</div></div>';
+    // menu-engineering: volume maal marge, in de klassieke kwadranten
+    if (ma && (ma.rijen||[]).some(r => r.verkocht > 0 || r.heeftRecept)){
+      const KLASSE = { ster: ['⭐', '#D8B940'], werkpaard: ['🐴', '#69B98B'], puzzel: ['🧩', '#7FA6D9'], hond: ['🐕', '#FF8589'], onbekend: ['·', 'var(--soft)'] };
+      h += '<div class="card"><div class="tt-h">📊 '+T('vr.me','Menu-engineering')+' <span class="sub">('+ma.dagen+' '+T('vr.dagen','dagen')+')</span></div>'+
+        ma.rijen.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
+          '<div class="st-row"><span><b style="color:'+KLASSE[r.klasse][1]+';">'+KLASSE[r.klasse][0]+' '+esc(r.klasse)+'</b> '+esc(r.naam)+'</span>'+
+          '<span class="sub">'+r.verkocht+'× · '+T('vr.marge','marge')+' '+geld(r.marge)+' · '+T('vr.winst','winst')+' '+geld(r.brutowinst)+'</span></div>'+
+          '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+'</div>';
+    }
     // het logboek: elke beweging herleidbaar
     if ((d.logboek||[]).length) h += '<div class="card"><div class="tt-h">🧾 '+T('vr.log','Laatste bewegingen')+'</div>'+
       d.logboek.slice(0,8).map(l => '<div class="st-row"><span>'+esc(l.artikel)+' <span class="sub">'+esc(l.soort)+' · '+esc(l.oms||'')+' · '+esc(l.wie||'')+'</span></span><b'+(l.delta<0?' style="color:#FF8589;"':' style="color:#69B98B;"')+'>'+(l.delta>0?'+':'')+l.delta+'</b></div>').join('')+'</div>';
@@ -336,6 +347,23 @@
       '<button class="bigbtn" id="vrAdd" style="margin-top:0.5rem;">'+T('vr.voeg','Zet op de lijst')+'</button></div>';
     el.innerHTML = h;
     const doe = async (pad, body) => { try { await API.call(pad, body); renderVoorraad(); } catch(e){ toast(e.message); } };
+    // een knop: het advies wordt een echte groothandelsbestelling
+    const vb = el.querySelector('#vrBestel'); if (vb) vb.addEventListener('click', async () => {
+      try {
+        const markt = await API.call('/supplier/inkoop/markt', {});
+        const ghs = markt.groothandels || [];
+        if (!ghs.length){ toast(T('vr.geengh','Er is nog geen groothandel actief op het platform.')); return; }
+        let code = ghs[0].code;
+        if (ghs.length > 1){
+          const keuze = prompt(T('vr.welkegh','Welke groothandel? ') + ghs.map(g=>g.code+' ('+g.naam+')').join(', '), code);
+          if (!keuze) return;
+          code = keuze.trim().toUpperCase();
+        }
+        const r = await API.call('/supplier/keuken/bestel-advies', { groothandelCode: code });
+        toast('🛒 '+T('vr.besteld','Bestelling ')+r.order.ref+' '+T('vr.besteld2','geplaatst.')+(r.nietGevonden.length?' '+T('vr.nietgev','Niet in het assortiment: ')+r.nietGevonden.join(', '):''));
+        renderVoorraad();
+      } catch(e){ toast(e.message); }
+    });
     el.querySelectorAll('[data-vtel]').forEach(b => b.addEventListener('click', () => {
       const g = prompt(T('vr.telvraag','Wat is de getelde stand?')); if (g == null || g === '') return;
       doe('/supplier/keuken/telling', { artikelId: b.dataset.vtel, geteld: Number(String(g).replace(',', '.')) });

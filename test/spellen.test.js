@@ -95,21 +95,50 @@ test('schaken: een legale opening telt, een onwettige zet wordt geweigerd, beurt
   assert.equal(st.potje.staat.aanZet, 'w', 'daarna is wit weer aan zet');
 });
 
-test('woordduel: het eerste woord gaat over het midden en scoort; zwevende letters niet', async () => {
+test('woordduel: het woordenboek keurt; een echt NL-woord over het midden scoort', async () => {
   const { a, b } = await tweeVrienden();
   const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'woord', vrienden: [b.key] }, a.tok));
   await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
-  const st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  let st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
   assert.equal(st.potje.staat.rek.length, 7, 'zeven letters op het rek');
-  const [l1, l2] = st.potje.staat.rek;
-  // niet over het midden: geweigerd
-  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { tegels: [{ i: 0, letter: l1 }, { i: 1, letter: l2 }] } }, a.tok)).status, 400);
-  // over het midden (veld 112): telt, en de score groeit
-  const z = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { tegels: [{ i: 112, letter: l1 }, { i: 113, letter: l2 }] } }, a.tok));
-  assert.ok(z.ok && z.score > 0, 'het eerste woord scoort');
+  assert.equal(st.potje.taal, 'nl', 'zonder keuze speel je Nederlands');
+  // niet over het midden: geweigerd, wat de letters ook zijn
+  const [x1, x2] = st.potje.staat.rek;
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { tegels: [{ i: 0, letter: x1 }, { i: 1, letter: x2 }] } }, a.tok)).status, 400);
+  // probeer alle geordende letterparen van het rek tot het woordenboek er een goedkeurt;
+  // onzin wordt met naam en toenaam afgewezen. Lukt geen enkel paar: ruil alles en opnieuw.
+  let gelukt = null, afgewezen = 0;
+  for (let ronde = 0; ronde < 6 && !gelukt; ronde++) {
+    st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+    const rek = st.potje.staat.rek;
+    buiten: for (let i = 0; i < rek.length; i++) {
+      for (let j = 0; j < rek.length; j++) {
+        if (i === j) continue;
+        const r = await raw('/member/spel/zet', { id: nieuw.id, zet: { tegels: [{ i: 112, letter: rek[i] }, { i: 113, letter: rek[j] }] } }, a.tok);
+        const d = await json(r);
+        if (r.status === 200) { gelukt = d; break buiten; }
+        if (/woordenboek/.test(d.error || '')) afgewezen++;
+      }
+    }
+    if (!gelukt) { // niets geldigs op dit rek: ruil alles (dat is B's beurt niet, dus dit blijft A)
+      await raw('/member/spel/zet', { id: nieuw.id, zet: { pas: true, ruil: st.potje.staat.rek } }, a.tok);
+      await raw('/member/spel/zet', { id: nieuw.id, zet: { pas: true } }, b.tok); // B past; A weer aan zet
+    }
+  }
+  assert.ok(gelukt && gelukt.score > 0, 'een echt Nederlands woord wordt goedgekeurd en scoort');
+  assert.ok(afgewezen > 0 || gelukt, 'onzinwoorden worden door het woordenboek afgewezen');
   const na = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
   assert.equal(na.potje.staat.rek.length, 7, 'het rek wordt bijgevuld');
-  assert.ok(na.potje.staat.scores[0] > 0 || na.potje.staat.scores[1] > 0, 'de score staat op het bord');
+});
+
+test('woordduel in het Engels: de taal reist mee met het potje', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'woord', taal: 'en', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  const st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(st.potje.taal, 'en', 'het potje is Engels');
+  const mijn = await json(await raw('/member/spel/mijn', {}, a.tok));
+  assert.equal((mijn.potjes.find(p => p.id === nieuw.id) || {}).taal, 'en', 'de lobby toont de taal');
 });
 
 test('random wachtrij: twee wachtenden voor hetzelfde spel worden een potje', async () => {

@@ -76,6 +76,10 @@
       <div class="sec" style="margin-top:0;">Met hoeveel?</div>
       <div class="keuzerij" id="nGroottes"></div>
     </div>
+    <div class="kaart blok" id="nTaalBlok" hidden>
+      <div class="sec" style="margin-top:0;">In welke taal?</div>
+      <div class="keuzerij" id="nTalen"></div>
+    </div>
     <div class="kaart blok">
       <div class="sec" style="margin-top:0;">Tegen wie?</div>
       <div class="keuzerij" id="nVrienden"><span class="leeg">Vrienden laden…</span></div>
@@ -106,7 +110,7 @@
         <button class="knop grijs" id="wPas">Pas</button>
         <button class="knop grijs" id="wRuil">Ruil alles</button>
       </div>
-      <div class="leeg" id="wInfo">Eer-systeem: echte woorden, zoals thuis aan tafel.</div>
+      <div class="leeg" id="wInfo">Het woordenboek keurt elk woord.</div>
     </div>
     <div class="knoprij"><button class="knop rood" id="sOpgeven" style="flex:0 1 auto;">Opgeven</button></div>
   </section>
@@ -170,20 +174,21 @@ async function laadLobby(){
   const p = d.potjes||[];
   $('#potjes').innerHTML = p.length ? p.map(x =>
     '<div class="rij" style="cursor:pointer;" data-open="'+esc(x.id)+'">'+(x.ikAanZet?'<span class="beurtstip"></span>':'')+
-    '<div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>'+x.spelers.map(esc).join(' · ')+' · '+
+    '<div class="nm">'+esc(x.naam)+(x.soort==='woord'?(x.taal==='en'?' 🇬🇧':' 🇳🇱'):'')+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>'+x.spelers.map(esc).join(' · ')+' · '+
     (x.status==='klaar' ? (x.winnaar?'🏆 '+esc(x.winnaar):'gelijkspel') : x.status==='wacht' ? 'wacht op '+x.wachtOp+' speler(s)' : (x.ikAanZet?'jij bent aan zet!':'wacht op '+esc(x.aanZet)))+'</small></div><span>→</span></div>').join('')
     : '<div class="leeg">Nog geen potjes. Kies hierboven een spel.</div>';
   document.querySelectorAll('[data-open]').forEach(r => r.addEventListener('click', ()=> openPotje(r.dataset.open)));
 }
 
 /* ---------- nieuw potje ---------- */
-let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [];
+let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [], nTaal = 'nl';
 document.querySelectorAll('.spelkaart').forEach(k => k.addEventListener('click', ()=>{
   if (k.dataset.spel === 'sneek'){ toon('vSneek'); laadSneekBord(); return; }
-  nSpel = k.dataset.spel; nGrootte = 2; nModus = 'vrij'; nGekozen = [];
+  nSpel = k.dataset.spel; nGrootte = 2; nModus = 'vrij'; nGekozen = []; nTaal = 'nl';
   $('#nTitel').textContent = SPELNAAM[nSpel];
   $('#nGrootteBlok').hidden = nSpel !== 'mejn';
-  tekenGroottes(); tekenVrienden();
+  $('#nTaalBlok').hidden = nSpel !== 'woord';
+  tekenTalen(); tekenGroottes(); tekenVrienden();
   toon('vNieuw');
 }));
 function tekenGroottes(){
@@ -191,6 +196,11 @@ function tekenGroottes(){
   const opties = [[2,'vrij','1 tegen 1'],[3,'vrij','met 3 spelers'],[4,'vrij','met 4 spelers'],[4,'teams','2 tegen 2']];
   $('#nGroottes').innerHTML = opties.map(([g,m,l]) => '<button type="button" class="chip'+(nGrootte===g&&nModus===m?' aan':'')+'" data-g="'+g+'" data-m="'+m+'">'+l+'</button>').join('');
   $('#nGroottes').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ nGrootte=Number(b.dataset.g); nModus=b.dataset.m; nGekozen=nGekozen.slice(0, nGrootte-1); tekenGroottes(); tekenVrienden(); }));
+}
+function tekenTalen(){
+  $('#nTalen').innerHTML = [['nl','🇳🇱 Nederlands'],['en','🇬🇧 Engels']].map(([t,l]) =>
+    '<button type="button" class="chip'+(nTaal===t?' aan':'')+'" data-t="'+t+'">'+l+'</button>').join('');
+  $('#nTalen').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ nTaal=b.dataset.t; tekenTalen(); }));
 }
 async function tekenVrienden(){
   const max = nSpel==='mejn' ? nGrootte-1 : 1;
@@ -207,7 +217,7 @@ async function tekenVrienden(){
 $('#nStart').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
-    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen });
+    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, taal:nTaal });
     meld('Uitnodiging verstuurd. Het potje start zodra je vrienden meedoen.');
     toon('vLobby'); laadLobby();
   }catch(e){ $('#nFout').textContent = e.message; }
@@ -215,7 +225,7 @@ $('#nStart').addEventListener('click', async ()=>{
 $('#nRandom').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
-    const d = await api('random', { soort:nSpel, grootte:nGrootte });
+    const d = await api('random', { soort:nSpel, grootte:nGrootte, taal:nTaal });
     if (d.gestart){ openPotje(d.id); } else { meld('Je staat in de rij ('+d.plek+' van '+d.nodig+'). Zodra het vol is, start het potje.'); toon('vLobby'); laadLobby(); }
   }catch(e){ $('#nFout').textContent = e.message; }
 });
@@ -233,7 +243,7 @@ async function openPotje(id){
 }
 function tekenPotje(){
   const p = huidig; if (!p) return;
-  $('#sTitel').textContent = p.naam;
+  $('#sTitel').textContent = p.naam + (p.soort==='woord' ? (p.taal==='en' ? ' 🇬🇧' : ' 🇳🇱') : '');
   $('#sSpelers').innerHTML = p.spelers.map((s,i)=>{
     const kleur = MK[i]||'#fff';
     const score = p.soort==='woord' && p.staat ? ' · '+p.staat.scores[i] : '';
@@ -345,8 +355,8 @@ function tekenWoord(){
   $('#wRek').innerHTML = (st.rek||[]).map((l,i)=> '<button type="button" data-l="'+l+'" class="'+(rek[i]===null?'op':(wLetter===i?'aan':''))+'" data-i="'+i+'">'+l+'</button>').join('');
   $('#wRek').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ if (b.classList.contains('op')) return; wLetter = Number(b.dataset.i); tekenWoord(); }));
   const mijnBeurt = p.status==='bezig' && p.beurt===p.ik;
-  $('#wInfo').textContent = p.status!=='bezig' ? 'Eer-systeem: echte woorden, zoals thuis aan tafel.'
-    : (mijnBeurt ? 'Jij bent aan zet. Nog '+p.staat.zak+' letters in de zak.' : esc(p.spelers[p.beurt])+' is aan zet…');
+  $('#wInfo').textContent = p.status!=='bezig' ? 'Het woordenboek keurt elk woord.'
+    : (mijnBeurt ? 'Jij bent aan zet. Nog '+p.staat.zak+' letters in de zak. Het '+(p.taal==='en'?'Engelse':'Nederlandse')+' woordenboek keurt je woord.' : esc(p.spelers[p.beurt])+' is aan zet…');
 }
 function wKlik(i){
   const p = huidig, st = p.staat;

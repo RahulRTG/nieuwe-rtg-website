@@ -18,6 +18,7 @@
    random wachtrij per spel en groepsgrootte. Beurten gaan via polling plus
    een SSE-duwtje naar wie aan zet is. */
 module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }) => {
+  const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
   function S() {
@@ -263,8 +264,25 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
   }
 
   /* ================= Woordduel (wordfeud-achtig, eer-systeem) ================= */
-  const W_LETTERS = { a: [6, 1], b: [2, 3], c: [2, 5], d: [5, 2], e: [18, 1], f: [2, 4], g: [3, 3], h: [2, 4], i: [4, 1], j: [2, 4], k: [3, 3], l: [3, 3], m: [3, 3], n: [10, 1], o: [6, 1], p: [2, 3], q: [1, 10], r: [5, 2], s: [5, 2], t: [5, 2], u: [3, 4], v: [2, 4], w: [2, 5], x: [1, 8], y: [1, 8], z: [2, 4] };
-  const W_WAARDE = Object.fromEntries(Object.entries(W_LETTERS).map(([l, v]) => [l, v[1]]));
+  const W_TAtLEN = {
+    nl: { a: [6, 1], b: [2, 3], c: [2, 5], d: [5, 2], e: [18, 1], f: [2, 4], g: [3, 3], h: [2, 4], i: [4, 1], j: [2, 4], k: [3, 3], l: [3, 3], m: [3, 3], n: [10, 1], o: [6, 1], p: [2, 3], q: [1, 10], r: [5, 2], s: [5, 2], t: [5, 2], u: [3, 4], v: [2, 4], w: [2, 5], x: [1, 8], y: [1, 8], z: [2, 4] },
+    en: { a: [9, 1], b: [2, 3], c: [2, 3], d: [4, 2], e: [12, 1], f: [2, 4], g: [3, 2], h: [2, 4], i: [9, 1], j: [1, 8], k: [1, 5], l: [4, 1], m: [2, 3], n: [6, 1], o: [8, 1], p: [2, 3], q: [1, 10], r: [6, 1], s: [4, 1], t: [6, 1], u: [4, 1], v: [2, 4], w: [2, 4], x: [1, 8], y: [2, 4], z: [1, 10] }
+  };
+  const taalVanPotje = (p) => W_TAtLEN[p.taal] ? p.taal : 'nl';
+  const wLetters = (p) => W_TAtLEN[taalVanPotje(p)];
+  const wWaarde = (p, l) => (wLetters(p)[l] || [0, 0])[1];
+  /* Het woordenboek: echte NL- en EN-lijsten (server/woorden/*.txt.gz),
+     lui geladen en daarna in het geheugen. Ontbreekt een lijst, dan valt
+     dat potje terug op het eer-systeem in plaats van stuk te gaan. */
+  const WOORDENBOEK = {};
+  function woordenboek(taal) {
+    if (taal in WOORDENBOEK) return WOORDENBOEK[taal];
+    try {
+      const raw = zlib.gunzipSync(fs.readFileSync(path.join(__dirname, '..', 'woorden', taal + '.txt.gz')));
+      WOORDENBOEK[taal] = new Set(raw.toString('utf8').split('\n'));
+    } catch (e) { WOORDENBOEK[taal] = null; }
+    return WOORDENBOEK[taal];
+  }
   // premievelden (klassieke symmetrische indeling): 3W, 2W, 3L, 2L
   const W_PREMIE = (() => {
     const p = {};
@@ -277,7 +295,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
   })();
   function woordInit(potje) {
     const zak = [];
-    for (const [l, [n]] of Object.entries(W_LETTERS)) for (let i = 0; i < n; i++) zak.push(l);
+    for (const [l, [n]] of Object.entries(wLetters(potje))) for (let i = 0; i < n; i++) zak.push(l);
     for (let i = zak.length - 1; i > 0; i--) { const j = crypto.randomInt(0, i + 1); [zak[i], zak[j]] = [zak[j], zak[i]]; }
     const st = { bord: Array(225).fill(null), zak, rekken: {}, scores: {}, passes: 0 };
     for (const h of potje.spelers) { st.rekken[h] = zak.splice(0, 7); st.scores[h] = 0; }
@@ -324,17 +342,24 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     const nieuw = new Set(tegels.map(t => t.i));
     function woordScore(begin, stapje) {
       let start = begin; while (start - stapje >= 0 && proef[start - stapje] && (stapje === 1 ? Math.floor((start - stapje) / 15) === Math.floor(start / 15) : true)) start -= stapje;
-      let punten = 0, keer = 1, lengte = 0;
+      let punten = 0, keer = 1, woord = '';
       for (let i = start; i >= 0 && i < 225 && proef[i] && (stapje === 1 ? Math.floor(i / 15) === Math.floor(start / 15) : true); i += stapje) {
-        let w = W_WAARDE[proef[i]] || 0;
+        let w = wWaarde(potje, proef[i]);
         if (nieuw.has(i)) { const pr = W_PREMIE[i]; if (pr === '2L') w *= 2; if (pr === '3L') w *= 3; if (pr === '2W') keer *= 2; if (pr === '3W') keer *= 3; }
-        punten += w; lengte++;
+        punten += w; woord += proef[i];
       }
-      return lengte > 1 ? punten * keer : 0;
+      return woord.length > 1 ? { punten: punten * keer, woord } : null;
     }
-    let score = woordScore(posities[0], stap);
-    for (const t of tegels) { const kruis = woordScore(t.i, horizontaal ? 15 : 1); score += kruis; }
+    const gevormd = [];
+    const hoofd = woordScore(posities[0], stap);
+    if (hoofd) gevormd.push(hoofd);
+    // kruiswoorden staan altijd haaks op het hoofdwoord, dus dubbel tellen kan niet
+    for (const t of tegels) { const kruis = woordScore(t.i, horizontaal ? 15 : 1); if (kruis) gevormd.push(kruis); }
+    let score = gevormd.reduce((a, g) => a + g.punten, 0);
     if (score === 0) return { status: 400, error: 'Een woord is minstens twee letters.' };
+    // het woordenboek keurt elk gevormd woord (NL of EN, per potje gekozen)
+    const boek = woordenboek(taalVanPotje(potje));
+    if (boek) { const fout = gevormd.find(g => !boek.has(g.woord)); if (fout) return { status: 400, error: '"' + fout.woord.toUpperCase() + '" staat niet in het ' + (taalVanPotje(potje) === 'nl' ? 'Nederlandse' : 'Engelse') + ' woordenboek.' }; }
     if (tegels.length === 7) score += 40; // alle zeven letters: de bonus
     tegels.forEach(t => st.bord[t.i] = t.letter);
     st.rekken[h] = rek;
@@ -347,7 +372,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
   }
   function woordEinde(potje) {
     const st = potje.staat;
-    for (const h of potje.spelers) st.scores[h] -= st.rekken[h].reduce((a, l) => a + (W_WAARDE[l] || 0), 0);
+    for (const h of potje.spelers) st.scores[h] -= st.rekken[h].reduce((a, l) => a + wWaarde(potje, l), 0);
     const beste = potje.spelers.slice().sort((a, b) => st.scores[b] - st.scores[a]);
     potje.gelijk = st.scores[beste[0]] === st.scores[beste[1]];
     potje.winnaar = potje.gelijk ? null : codenaamVan(beste[0]);
@@ -360,7 +385,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     else if (potje.soort === 'schaak') schaakInit(potje);
     else woordInit(potje);
   }
-  function spelNieuw(mij, { soort, grootte, modus, vrienden }) {
+  function spelNieuw(mij, { soort, grootte, modus, vrienden, taal }) {
     opschonen();
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekend spel.' };
     const max = soort === 'mejn' ? Math.min(4, Math.max(2, Number(grootte) || 2)) : 2;
@@ -368,6 +393,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     if (!uitgenodigd.length) return { status: 400, error: 'Nodig minstens een vriend uit (of speel random).' };
     if (uitgenodigd.length > max - 1) return { status: 400, error: 'Te veel spelers voor dit spel.' };
     const potje = { id: rid(5), soort, grootte: max, modus: soort === 'mejn' && modus === 'teams' && max === 4 ? 'teams' : 'vrij',
+      taal: taal === 'en' ? 'en' : 'nl',
       teams: [0, 1, 0, 1], spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) };
     S().potjes[potje.id] = potje;
     save();
@@ -386,17 +412,18 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     p.spelers.forEach(sp => nudge(sp, p));
     return { status: 200, ok: true, gestart: p.status === 'bezig' };
   }
-  function spelRandom(mij, soort, grootte) {
+  function spelRandom(mij, soort, grootte, taal) {
     opschonen();
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekend spel.' };
     const max = soort === 'mejn' ? Math.min(4, Math.max(2, Number(grootte) || 2)) : 2;
-    const sleutel = soort + ':' + max;
+    const w_taal = taal === 'en' ? 'en' : 'nl';
+    const sleutel = soort + ':' + max + (soort === 'woord' ? ':' + w_taal : '');
     const w = S().wachtrij;
     w[sleutel] = (w[sleutel] || []).filter(x => x !== mij);
     w[sleutel].push(mij);
     if (w[sleutel].length >= max) {
       const spelers = w[sleutel].splice(0, max);
-      const potje = { id: rid(5), soort, grootte: max, modus: 'vrij', teams: [0, 1, 0, 1], spelers, uitgenodigd: [],
+      const potje = { id: rid(5), soort, grootte: max, modus: 'vrij', taal: w_taal, teams: [0, 1, 0, 1], spelers, uitgenodigd: [],
         status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'random' };
       S().potjes[potje.id] = potje;
       spelStart(potje);
@@ -411,7 +438,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     opschonen();
     const alle = Object.values(S().potjes);
     const mijnPotjes = alle.filter(p => p.spelers.includes(mij)).map(p => ({
-      id: p.id, soort: p.soort, naam: SOORTEN[p.soort], status: p.status, modus: p.modus,
+      id: p.id, soort: p.soort, naam: SOORTEN[p.soort], status: p.status, modus: p.modus, taal: p.taal || 'nl',
       spelers: p.spelers.map(codenaamVan), wachtOp: p.uitgenodigd.length,
       aanZet: p.status === 'bezig' ? codenaamVan(p.spelers[p.beurt]) : null, ikAanZet: p.status === 'bezig' && p.spelers[p.beurt] === mij,
       winnaar: p.winnaar, gelijk: !!p.gelijk, at: p.at
@@ -424,7 +451,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
   function spelStaat(mij, id) {
     const p = S().potjes[id];
     if (!p || !p.spelers.includes(mij)) return { status: 404, error: 'Dit potje bestaat niet (meer).' };
-    const uit = { id: p.id, soort: p.soort, naam: SOORTEN[p.soort], status: p.status, modus: p.modus, teams: p.teams.slice(0, p.spelers.length),
+    const uit = { id: p.id, soort: p.soort, naam: SOORTEN[p.soort], status: p.status, modus: p.modus, taal: p.taal || 'nl', teams: p.teams.slice(0, p.spelers.length),
       spelers: p.spelers.map(codenaamVan), ik: p.spelers.indexOf(mij), beurt: p.beurt, winnaar: p.winnaar, gelijk: !!p.gelijk };
     const st = p.staat;
     if (p.status !== 'wacht' && st) {

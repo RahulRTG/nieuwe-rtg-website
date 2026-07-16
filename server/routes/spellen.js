@@ -16,9 +16,9 @@ module.exports = (kern) => {
 
   // dezelfde acties voor beide werelden; alleen de identiteit verschilt
   const ACTIES = {
-    nieuw: (mij, b) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden }),
+    nieuw: (mij, b) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, taal: b.taal }),
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    random: (mij, b) => spelRandom(mij, String(b.soort || ''), b.grootte),
+    random: (mij, b) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal),
     mijn: (mij) => Object.assign({ status: 200 }, mijnSpellen(mij)),
     staat: (mij, b) => spelStaat(mij, String(b.id || '')),
     zet: (mij, b) => spelZet(mij, String(b.id || ''), b.zet),

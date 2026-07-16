@@ -202,11 +202,13 @@ $('#cFoto').addEventListener('change', () => {
   if (!f) return;
   const img = new Image();
   img.onload = () => {
-    const max = 1280, sc = Math.min(1, max / Math.max(img.width, img.height));
+    // op een trage (satelliet)verbinding gaat de foto kleiner over de lijn
+    const zuinig = window.Satelliet && Satelliet.actief();
+    const max = zuinig ? 800 : 1280, sc = Math.min(1, max / Math.max(img.width, img.height));
     const c = document.createElement('canvas');
     c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-    fotoData = c.toDataURL('image/jpeg', 0.85);
+    fotoData = c.toDataURL('image/jpeg', zuinig ? 0.72 : 0.85);
     $('#cPreview').src = fotoData; $('#cPreview').hidden = false; $('#cFotoWeg').hidden = false;
     URL.revokeObjectURL(img.src);
   };

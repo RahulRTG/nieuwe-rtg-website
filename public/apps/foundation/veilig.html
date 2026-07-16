@@ -68,6 +68,18 @@
     <button class="sos" id="sos">🆘 Stuur mijn gezin een hulpvraag</button>
     <div class="ok" id="sosOk" hidden>Je gezin heeft je hulpvraag gekregen. Blijf op een veilige, drukke plek als dat kan. Bij direct gevaar: bel 112.</div>
   </div>
+
+  <div class="kaart blok">
+    <h2>📡 Geen bereik? Noodbericht via satelliet</h2>
+    <div class="h">Nieuwere telefoons kunnen zonder bereik een sms via een satelliet sturen (buiten, met vrij zicht op de lucht). De app zet een zo kort mogelijk noodbericht voor je klaar, met de tijd en je locatie erin; je telefoon biedt de satellietweg zelf aan zodra er geen bereik is. Bij direct gevaar en gewoon bereik: bel altijd eerst 112.</div>
+    <button class="knop" id="nsMaak" style="width:100%;">Maak mijn noodbericht</button>
+    <div id="nsTekst" style="margin-top:.6rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;font-size:.95rem;line-height:1.5;word-break:break-word;" hidden></div>
+    <div id="nsKnoppen" style="display:flex;gap:.5rem;margin-top:.5rem;" hidden>
+      <a class="knop" id="nsSms" style="flex:1;text-align:center;text-decoration:none;">Open in Berichten</a>
+      <button class="knop grijs" id="nsKopie" style="flex:1;">Kopieer</button>
+    </div>
+    <div class="fout" id="nsFout" style="color:var(--rood);font-size:.85rem;min-height:1.1rem;"></div>
+  </div>
 </div>
 
 <script src="sessie.js"></script>
@@ -101,6 +113,24 @@ async function zet(status, metLocatie){
   catch(e){ $('#fout').textContent = e.message; }
 }
 $('#deelLoc').onclick = ()=> zet('onderweg', true);
+
+/* het satelliet-noodbericht: kort, met tijd en locatie; versturen doet je
+   telefoon zelf (via satelliet als er geen bereik is) */
+$('#nsMaak').addEventListener('click', async () => {
+  $('#nsFout').textContent = '';
+  if (!window.Satelliet || !Satelliet.noodtekst) { $('#nsFout').textContent = 'Nog even; de verbindingslaag laadt nog. Probeer het zo opnieuw.'; return; }
+  $('#nsMaak').disabled = true; $('#nsMaak').textContent = 'Even je locatie ophalen…';
+  const tekst = await Satelliet.noodtekst({ naam: (s.profiel && s.profiel.naam) || '' });
+  $('#nsTekst').textContent = tekst; $('#nsTekst').hidden = false;
+  $('#nsSms').href = 'sms:?&body=' + encodeURIComponent(tekst);
+  $('#nsKnoppen').hidden = false;
+  $('#nsMaak').disabled = false; $('#nsMaak').textContent = 'Maak mijn noodbericht opnieuw';
+});
+$('#nsKopie').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText($('#nsTekst').textContent); $('#nsKopie').textContent = 'Gekopieerd!'; }
+  catch (e) { $('#nsFout').textContent = 'Kopiëren lukte niet; houd de tekst ingedrukt om hem te kopiëren.'; }
+  setTimeout(() => { $('#nsKopie').textContent = 'Kopieer'; }, 1500);
+});
 $('#stopLoc').onclick = async ()=>{ try{ await api('/gezin/locatie/stop', { code:s.code, token:s.token }); $('#ok').textContent='Je deelt niets meer.'; laad(); }catch(e){ $('#fout').textContent=e.message; } };
 
 async function laad(){

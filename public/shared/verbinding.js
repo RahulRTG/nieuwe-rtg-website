@@ -126,8 +126,21 @@
       }, function (e) {
         if (timer) clearTimeout(timer);
         satMeet(Date.now() - start, true);
-        if (n >= maxPogingen || navigator.onLine === false) throw e;
-        return new Promise(function (klaar) { setTimeout(klaar, 1200 * n); }).then(function () { return poging(n + 1); });
+        if (n < maxPogingen && navigator.onLine !== false) {
+          return new Promise(function (klaar) { setTimeout(klaar, 1200 * n); }).then(function () { return poging(n + 1); });
+        }
+        // een veilig-uitstelbare schrijfactie zonder verbinding: in de wachtrij
+        if (methode === 'POST' && W_PADEN.indexOf(url.split('?')[0]) !== -1 &&
+            typeof (opties && opties.body) === 'string') {
+          var q = wachtrij();
+          q.push({ url: url, body: opties.body, at: Date.now() });
+          wachtrijZet(q);
+          fout(T('net.rij', 'Geen verbinding; het staat in de wachtrij en gaat vanzelf mee zodra er weer lijn is.'));
+          return new Response(JSON.stringify({ ok: true, uitgesteld: true }), {
+            status: 202, headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        throw e;
       });
     }
     return poging(1);
@@ -141,11 +154,73 @@
     return satBeurten[naam] % m === 0;
   }
 
-  // het balkje onderin: eerlijk zeggen dat de zuinige stand aanstaat
+  /* ---------- de offline-wachtrij ----------
+     Schrijfacties die veilig een keer later mogen aankomen (een notitie, een
+     dagboekmomentje, een afgevinkte leerstap) gaan bij een weggevallen
+     verbinding in een wachtrij op het toestel, en worden vanzelf verstuurd
+     zodra er weer lijn is. Alleen paden op deze lijst; een spelzet of een
+     betaling hoort hier nadrukkelijk NIET bij (die mag nooit dubbel of laat). */
+  var W_KEY = 'rtg_wachtrij';
+  var W_PADEN = [
+    '/api/rtf/leren/notitie', '/api/rtf/leren/schrijf-bewaar',
+    '/api/rtf/baby/entry-maak', '/api/rtf/baby/gezin-zet',
+    '/api/rtf/tiener/toets-stap'
+  ];
+  function wachtrij() { try { return JSON.parse(localStorage.getItem(W_KEY) || '[]'); } catch (e) { return []; } }
+  function wachtrijZet(q) { try { localStorage.setItem(W_KEY, JSON.stringify(q.slice(0, 50))); } catch (e) {} satTeken(); }
+  var wBezig = false;
+  function verstuurWachtrij() {
+    if (wBezig || navigator.onLine === false) return;
+    var q = wachtrij();
+    if (!q.length) return;
+    wBezig = true;
+    var item = q[0];
+    echteFetch(item.url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: item.body })
+      .then(function (r) {
+        wBezig = false;
+        // gelukt, of definitief geweigerd (4xx): allebei uit de wachtrij
+        if (r.ok || (r.status >= 400 && r.status < 500)) {
+          q = wachtrij(); q.shift(); wachtrijZet(q);
+          if (q.length) setTimeout(verstuurWachtrij, 800);
+          else {
+            fout(T('net.rijLeeg', 'Alles uit de wachtrij is alsnog verstuurd.'));
+            try { document.dispatchEvent(new CustomEvent('rtg-wachtrij-leeg')); } catch (e) {}
+          }
+        }
+      }, function () { wBezig = false; });
+  }
+  w.addEventListener('online', function () { setTimeout(verstuurWachtrij, 1500); });
+  setInterval(verstuurWachtrij, 30000);
+  setTimeout(verstuurWachtrij, 3000);
+
+  /* ---------- het satelliet-noodbericht ----------
+     Nieuwere telefoons versturen zonder bereik een sms via een satelliet. De
+     app maakt daarvoor een zo kort mogelijk bericht klaar met tijd en locatie;
+     versturen doet het toestel zelf (Berichten-app), wij duwen niets weg. */
+  function noodtekst(opts) {
+    opts = opts || {};
+    return new Promise(function (klaar) {
+      function bouw(pos) {
+        var d = new Date();
+        var t = 'SOS' + (opts.naam ? ' ' + String(opts.naam).slice(0, 20) : '') +
+          ' ' + d.getDate() + '/' + (d.getMonth() + 1) +
+          ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+        if (pos) t += ' locatie ' + pos.coords.latitude.toFixed(5) + ',' + pos.coords.longitude.toFixed(5);
+        t += ' - ' + (opts.wat || 'Ik heb hulp nodig. Dit bericht komt via satelliet, ik heb geen bereik.');
+        klaar(t.replace(/\s+/g, ' ').trim());
+      }
+      if (!navigator.geolocation) return bouw(null);
+      navigator.geolocation.getCurrentPosition(bouw, function () { bouw(null); }, { enableHighAccuracy: true, timeout: 8000 });
+    });
+  }
+
+  // het balkje onderin: eerlijk zeggen dat de zuinige stand aanstaat,
+  // en hoeveel er in de wachtrij op verbinding staat te wachten
   var satEl;
   function satTeken() {
     var aan = satActief();
-    if (!aan) { if (satEl) { satEl.remove(); satEl = null; } return; }
+    var rij = wachtrij().length;
+    if (!aan && !rij) { if (satEl) { satEl.remove(); satEl = null; } return; }
     if (!document.body) { document.addEventListener('DOMContentLoaded', satTeken); return; }
     if (!satEl) {
       satEl = document.createElement('div');
@@ -157,7 +232,7 @@
         'border-radius:999px;padding:.42rem .9rem;font:600 .78rem/1.2 system-ui,-apple-system,sans-serif;' +
         'box-shadow:0 4px 16px rgba(0,0,0,.35);max-width:92vw;';
       var tekst = document.createElement('span');
-      tekst.textContent = T('net.sat', '🛰 Trage verbinding: zuinige stand aan');
+      tekst.id = 'rtg-sat-tekst';
       var uit = document.createElement('button');
       uit.type = 'button';
       uit.textContent = '✕';
@@ -167,12 +242,18 @@
       satEl.appendChild(tekst); satEl.appendChild(uit);
       document.body.appendChild(satEl);
     }
+    var delen = [];
+    if (aan) delen.push(T('net.sat', '🛰 Trage verbinding: zuinige stand aan'));
+    if (rij) delen.push(T('net.rijTel', '📮 ') + rij + T('net.rijWacht', ' in de wachtrij'));
+    satEl.querySelector('#rtg-sat-tekst').textContent = delen.join(' · ');
   }
-  if (satActief()) satTeken();
+  if (satActief() || wachtrij().length) satTeken();
 
   w.Satelliet = {
     actief: satActief, stand: satStand, zetStand: satZet, beurt: satBeurt,
-    multiplier: function () { return satActief() ? 4 : 1; }
+    multiplier: function () { return satActief() ? 4 : 1; },
+    wachtrij: function () { return wachtrij().length; },
+    noodtekst: noodtekst
   };
 
   w.RTGNet = { toon: toonBanner, verberg: verbergBanner, fout: fout, haal: haal, status: status, satelliet: w.Satelliet };

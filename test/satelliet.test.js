@@ -77,4 +77,8 @@ test('de verbindingslaag met de satellietmodus staat voor elke app klaar', async
   const js = await r.text();
   assert.match(js, /Satelliet/, 'de satellietmodus zit erin');
   assert.match(js, /rtg_sat/, 'met de auto\\/aan\\/uit-stand');
+  assert.match(js, /rtg_wachtrij/, 'de offline-wachtrij zit erin');
+  assert.match(js, /noodtekst/, 'en het satelliet-noodbericht');
+  // de wachtrij herhaalt alleen veilig-uitstelbare schrijfacties; nooit een spelzet of betaling
+  assert.doesNotMatch(js, /W_PADEN = \[[^\]]*(spellen|munt|betaal)/, 'spelzetten en betalingen blijven erbuiten');
 });

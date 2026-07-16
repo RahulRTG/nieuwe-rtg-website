@@ -252,7 +252,7 @@
 
 <script>
 const $ = s => document.querySelector(s);
-const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function meld(t){ const el=$('#melding'); el.textContent=t; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(()=>{ el.style.opacity='0'; }, 2600); }
 
 /* Een pagina, twee werelden: een RTG-lid speelt met zijn Bearer-token, een
@@ -367,15 +367,27 @@ $('#nRandom').addEventListener('click', async ()=>{
 });
 
 /* ---------- een potje spelen (polling houdt het bord vers) ---------- */
-let huidig = null, pollT = null;
+let huidig = null, pollT = null, mgVelden = null;
 async function openPotje(id){
-  try{ const d = await api('staat', { id }); huidig = d.potje; }catch(e){ meld(e.message); return; }
+  // bij het openen reist het statische Magnaat-bord eenmalig mee; de polls
+  // daarna dragen alleen de dynamische staat
+  try{ const d = await api('staat', { id, velden: true }); huidig = d.potje; }catch(e){ meld(e.message); return; }
+  if (huidig.staat && huidig.staat.velden) mgVelden = huidig.staat.velden;
   toon('vSpel'); tekenPotje();
   clearInterval(pollT);
   pollT = setInterval(async ()=>{
     if (!huidig) return;
     try{ const d = await api('staat', { id: huidig.id }); huidig = d.potje; tekenPotje(); }catch(e){}
   }, 2500);
+}
+/* een zet spelen en meteen verversen: de server stuurt de nieuwe staat in
+   het zet-antwoord mee, dus een tweede staat-verzoek is niet nodig */
+async function speelZet(zet){
+  const d = await api('zet', { id: huidig.id, zet });
+  if (d.potje) huidig = d.potje;
+  else { const s = await api('staat', { id: huidig.id }); huidig = s.potje; }
+  tekenPotje();
+  return d;
 }
 function tekenPotje(){
   const p = huidig; if (!p) return;
@@ -431,13 +443,13 @@ function tekenMejn(){
   if (!mijnBeurt){ acties.innerHTML = '<span class="leeg">'+esc(p.spelers[p.beurt])+' is aan zet…</span>'; return; }
   if (st.mag==='gooi'){
     const b=document.createElement('button'); b.className='knop'; b.textContent='🎲 Gooi';
-    b.onclick=async()=>{ try{ const d=await api('zet',{id:p.id, zet:{actie:'gooi'}}); if(d.geenZet) meld('Je gooide '+d.dobbel+' en kunt niets. '+(d.nogEens?'Een 6: gooi nog eens!':'De ander is aan de beurt.')); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+    b.onclick=async()=>{ try{ const d=await speelZet({actie:'gooi'}); if(d.geenZet) meld('Je gooide '+d.dobbel+' en kunt niets. '+(d.nogEens?'Een 6: gooi nog eens!':'De ander is aan de beurt.')); }catch(e){ meld(e.message); } };
     acties.appendChild(b);
   } else {
     (st.zetten||[]).forEach(z=>{
       const b=document.createElement('button'); b.className='knop';
       b.textContent = '♟ pion '+(z.pion+1)+(z.doel===undefined?'':(z.doel>=100?' → thuis':' → veld'));
-      b.onclick=async()=>{ try{ await api('zet',{id:p.id, zet:{pion:z.pion}}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+      b.onclick=async()=>{ try{ await speelZet({pion:z.pion}); }catch(e){ meld(e.message); } };
       acties.appendChild(b);
     });
   }
@@ -468,7 +480,7 @@ async function schKlik(veld){
   if (schVan===null){ schVan = veld; tekenSchaak(); return; }
   const van = schVan; schVan = null;
   if (van === veld){ tekenSchaak(); return; }
-  try{ await api('zet', { id: p.id, zet: { van, naar: veld } }); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }
+  try{ await speelZet({ van, naar: veld }); }
   catch(e){ meld(e.message); tekenSchaak(); }
 }
 
@@ -499,12 +511,12 @@ function tekenPesten(){
 async function pSpeel(kaart, kleur){
   if (pRangVan(kaart)==='B' && !kleur){ pBoer = kaart; tekenPesten(); return; }
   pBoer = null;
-  try{ await api('zet', { id: huidig.id, zet: { kaart, kleur } }); const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }
+  try{ await speelZet({ kaart, kleur }); }
   catch(e){ meld(e.message); }
 }
 $('#pPak').addEventListener('click', async ()=>{
   if (!huidig) return;
-  try{ const d=await api('zet',{id:huidig.id, zet:{pak:true}}); meld('Je pakte '+d.gepakt+' kaart'+(d.gepakt>1?'en':'')+'.'); const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }
+  try{ const d=await speelZet({pak:true}); meld('Je pakte '+d.gepakt+' kaart'+(d.gepakt>1?'en':'')+'.'); }
   catch(e){ meld(e.message); }
 });
 $('#pStapel').addEventListener('click', ()=> $('#pPak').click());
@@ -544,11 +556,12 @@ function wKlik(i){
 $('#wWis').addEventListener('click', ()=>{ wGelegd=[]; wLetter=null; tekenWoord(); });
 $('#wSpeel').addEventListener('click', async ()=>{
   if (!huidig || !wGelegd.length) return;
-  try{ const d = await api('zet', { id: huidig.id, zet: { tegels: wGelegd } }); meld('+'+d.score+' punten!'); wGelegd=[]; const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }
-  catch(e){ meld(e.message); }
+  const tegels = wGelegd; wGelegd = [];
+  try{ const d = await speelZet({ tegels }); meld('+'+d.score+' punten!'); }
+  catch(e){ wGelegd = tegels; meld(e.message); tekenWoord(); }
 });
-$('#wPas').addEventListener('click', async ()=>{ if(!huidig) return; try{ await api('zet',{id:huidig.id, zet:{pas:true}}); wGelegd=[]; const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } });
-$('#wRuil').addEventListener('click', async ()=>{ if(!huidig) return; try{ await api('zet',{id:huidig.id, zet:{pas:true, ruil:(huidig.staat.rek||[])}}); wGelegd=[]; meld('Nieuwe letters!'); const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } });
+$('#wPas').addEventListener('click', async ()=>{ if(!huidig) return; wGelegd=[]; try{ await speelZet({pas:true}); }catch(e){ meld(e.message); } });
+$('#wRuil').addEventListener('click', async ()=>{ if(!huidig) return; wGelegd=[]; try{ await speelZet({pas:true, ruil:(huidig.staat.rek||[])}); meld('Nieuwe letters!'); }catch(e){ meld(e.message); } });
 
 /* ---------- Tetris: zelf spelen, ranglijst onder vrienden ---------- */
 const TT = { b:10, h:20, veld:[], stuk:null, x:0, y:0, rot:0, score:0, lijnen:0, timer:null, dood:true };
@@ -610,14 +623,16 @@ document.addEventListener('keydown', e=>{
   else if (e.key==='ArrowUp') ttZet(0,true); else if (e.key==='ArrowDown') ttZet(9); else return;
   e.preventDefault();
 });
-async function laadTetrisBord(){
+/* een ranglijst onder vrienden: dezelfde lijst voor Sneek, Tetris en Sudoku */
+async function laadRanglijst(spel, sel){
   try{
-    const d = await api('arcade-bord',{spel:'tetris'});
-    $('#ttBordLijst').innerHTML = (d.bord||[]).length ? d.bord.map((r,i)=>
+    const d = await api('arcade-bord', { spel });
+    $(sel).innerHTML = (d.bord||[]).length ? d.bord.map((r,i)=>
       '<div class="rij"><div class="nm">'+(i+1)+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')+'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
       : '<div class="leeg">Nog geen scores. Wees de eerste!</div>';
   }catch(e){}
 }
+const laadTetrisBord = () => laadRanglijst('tetris', '#ttBordLijst');
 
 /* ---------- Sneek: zelf spelen, ranglijst onder vrienden ---------- */
 const SN = { n: 17, slang: [], richting: [1,0], eten: null, timer: null, score: 0, dood: true };
@@ -658,14 +673,7 @@ $('#snBord').addEventListener('pointerup', e=>{
   const R = Math.abs(dx)>Math.abs(dy) ? [dx>0?1:-1,0] : [0,dy>0?1:-1];
   if (!(R[0]===-SN.richting[0]&&R[1]===-SN.richting[1])) SN.richting=R;
 });
-async function laadSneekBord(){
-  try{
-    const d = await api('sneek-bord');
-    $('#snBordLijst').innerHTML = (d.bord||[]).length ? d.bord.map((r,i)=>
-      '<div class="rij"><div class="nm">'+(i+1)+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')+'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
-      : '<div class="leeg">Nog geen scores. Wees de eerste!</div>';
-  }catch(e){}
-}
+const laadSneekBord = () => laadRanglijst('sneek', '#snBordLijst');
 
 /* ---------- Dammen ---------- */
 let damVan = null;
@@ -702,7 +710,7 @@ $('#damBord').addEventListener('click', async (e)=>{
   const i = r*10+k, zetten = p.staat.zetten||[];
   if (damVan!==null && zetten.some(z=>z.van===damVan && z.naar===i)){
     const van = damVan; damVan = null;
-    try{ const d = await api('zet',{id:p.id, zet:{van, naar:i}}); if (d.verder) meld('Doorslaan!'); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }
+    try{ const d = await speelZet({van, naar:i}); if (d.verder) meld('Doorslaan!'); }
     catch(err){ meld(err.message); tekenDam(); }
     return;
   }
@@ -793,11 +801,11 @@ $('#rNieuw').addEventListener('click', ()=>{
 });
 $('#rHerstel').addEventListener('click', ()=>{ rReset(); tekenRummi(); });
 $('#rSpeel').addEventListener('click', async ()=>{
-  try{ await api('zet',{id:huidig.id, zet:{tafel:rLokaal.tafel}}); rLokaal=null; const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }
+  try{ await speelZet({tafel:rLokaal.tafel}); }
   catch(e){ meld(e.message); }
 });
 $('#rPak').addEventListener('click', async ()=>{
-  try{ const d=await api('zet',{id:huidig.id, zet:{pak:true}}); rLokaal=null; if(d.einde) meld('De zak is leeg; het laagste rek wint.'); const s=await api('staat',{id:huidig.id}); huidig=s.potje; tekenPotje(); }
+  try{ const d=await speelZet({pak:true}); if(d.einde) meld('De zak is leeg; het laagste rek wint.'); }
   catch(e){ meld(e.message); }
 });
 
@@ -812,8 +820,12 @@ function mgCoord(veld){
 }
 function tekenMagnaat(){
   const p = huidig, st = p.staat, cv = $('#mgBord'), c = cv.getContext('2d'), cel = cv.width/11;
+  // het statische bord kwam eenmalig mee bij het openen; de polls zijn licht
+  if (st.velden) mgVelden = st.velden;
+  const velden = mgVelden || [];
+  if (!velden.length) return;
   c.clearRect(0,0,cv.width,cv.height);
-  st.velden.forEach((v,i)=>{
+  velden.forEach((v,i)=>{
     const [x,y] = mgCoord(i);
     c.fillStyle = 'rgba(255,255,255,.06)'; c.fillRect(x*cel+1, y*cel+1, cel-2, cel-2);
     if (v.t==='straat'){ c.fillStyle = MG_KLEUR[v.g]; c.fillRect(x*cel+1, y*cel+1, cel-2, 7); }
@@ -839,18 +851,18 @@ function tekenMagnaat(){
   $('#mgGeld').innerHTML = p.spelers.map((s,i)=>
     '<span'+(p.status==='bezig'&&p.beurt===i?' style="font-weight:700;"':'')+'><b style="color:'+MG_SP[i]+'">●</b> '+esc(s)+(i===p.ik?' (jij)':'')+': '+
     (st.failliet[i] ? '<s>failliet</s>' : st.geld[i]+(st.cel[i]?' ▦':''))+'</span>').join(' ');
-  $('#mgKaart').textContent = st.kaart || ('Je staat op: '+st.velden[st.posities[p.ik]].n);
+  $('#mgKaart').textContent = st.kaart || ('Je staat op: '+velden[st.posities[p.ik]].n);
   const acties = $('#mgActies'); acties.innerHTML='';
   const mijnBeurt = p.status==='bezig' && p.beurt===p.ik && !st.failliet[p.ik];
   if (mijnBeurt && st.mag==='gooi'){
     const b=document.createElement('button'); b.className='knop'; b.textContent='🎲 Gooi';
-    b.onclick=async()=>{ try{ const d=await api('zet',{id:p.id, zet:{actie:'gooi'}}); if(d.nogEens) meld('Dubbel! Je mag nog eens.'); if(d.naarCel) meld('Drie keer dubbel: de cel in.'); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+    b.onclick=async()=>{ try{ const d=await speelZet({actie:'gooi'}); if(d.nogEens) meld('Dubbel! Je mag nog eens.'); if(d.naarCel) meld('Drie keer dubbel: de cel in.'); }catch(e){ meld(e.message); } };
     acties.appendChild(b);
   } else if (mijnBeurt && st.mag==='koop' && st.koopVeld!=null){
-    const v = st.velden[st.koopVeld];
+    const v = velden[st.koopVeld];
     [['Koop '+v.n+' ('+v.p+')','koop','knop'],['Sla over','sla','knop grijs']].forEach(([tekst,actie,klas])=>{
       const b=document.createElement('button'); b.className=klas; b.textContent=tekst;
-      b.onclick=async()=>{ try{ await api('zet',{id:p.id, zet:{actie}}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+      b.onclick=async()=>{ try{ await speelZet({actie}); }catch(e){ meld(e.message); } };
       acties.appendChild(b);
     });
   } else if (p.status==='bezig' && !mijnBeurt){
@@ -859,21 +871,21 @@ function tekenMagnaat(){
   // jouw bezit: bouwen en verkopen
   const bezit = Object.keys(st.eigenaar).map(Number).filter(v => st.eigenaar[v] === p.ik);
   $('#mgBezit').innerHTML = bezit.length ? '<div class="sec">Jouw bezit</div>' + bezit.map(v=>{
-    const veld = st.velden[v], straat = veld.t==='straat';
+    const veld = velden[v], straat = veld.t==='straat';
     return '<div class="rij"><div class="nm">'+esc(veld.n)+(st.huizen[v]?' '+(st.huizen[v]>=5?'🏨':'🏠×'+st.huizen[v]):'')+'</div>'+
       (straat?'<button class="knop mini" data-bouw="'+v+'">+ huis ('+Math.round(veld.p/2)+')</button>':'')+
       '<button class="knop grijs mini" data-vk="'+v+'">verkoop</button></div>';
   }).join('') : '';
-  $('#mgBezit').querySelectorAll('[data-bouw]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api('zet',{id:p.id, zet:{actie:'bouw', veld:Number(b.dataset.bouw)}}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } }));
-  $('#mgBezit').querySelectorAll('[data-vk]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api('zet',{id:p.id, zet:{actie:'verkoop', veld:Number(b.dataset.vk)}}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } }));
+  $('#mgBezit').querySelectorAll('[data-bouw]').forEach(b=>b.addEventListener('click',async()=>{ try{ await speelZet({actie:'bouw', veld:Number(b.dataset.bouw)}); }catch(e){ meld(e.message); } }));
+  $('#mgBezit').querySelectorAll('[data-vk]').forEach(b=>b.addEventListener('click',async()=>{ try{ await speelZet({actie:'verkoop', veld:Number(b.dataset.vk)}); }catch(e){ meld(e.message); } }));
 }
 $('#mgBord').addEventListener('click', (e)=>{
-  const p = huidig; if (!p || !p.staat || !p.staat.velden) return;
+  const p = huidig; if (!p || !p.staat || !mgVelden) return;
   const cv=$('#mgBord'), rect=cv.getBoundingClientRect();
   const x=Math.floor((e.clientX-rect.left)/rect.width*11), y=Math.floor((e.clientY-rect.top)/rect.height*11);
-  const veld = p.staat.velden.findIndex((_,i)=>{ const [vx,vy]=mgCoord(i); return vx===x && vy===y; });
+  const veld = mgVelden.findIndex((_,i)=>{ const [vx,vy]=mgCoord(i); return vx===x && vy===y; });
   if (veld<0) return;
-  const v = p.staat.velden[veld], baas = p.staat.eigenaar[veld];
+  const v = mgVelden[veld], baas = p.staat.eigenaar[veld];
   meld(v.n + (v.p?' · prijs '+v.p:'') + (baas!=null ? ' · van '+(baas===p.ik?'jou':esc(p.spelers[baas]||'?')) : v.t==='straat'||v.t==='station'||v.t==='nut' ? ' · te koop' : ''));
 });
 
@@ -889,7 +901,7 @@ function tekenSeconden(){
   const acties = $('#scActies'); acties.innerHTML='';
   if (mijnBeurt && !st.bezig){
     const b=document.createElement('button'); b.className='knop'; b.textContent='⏱️ Pak een kaart (30 tellen)';
-    b.onclick=async()=>{ try{ await api('zet',{id:p.id, zet:{actie:'kaart'}}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+    b.onclick=async()=>{ try{ await speelZet({actie:'kaart'}); }catch(e){ meld(e.message); } };
     acties.appendChild(b);
   }
   if (mijnBeurt && st.bezig){
@@ -897,7 +909,7 @@ function tekenSeconden(){
     rij.innerHTML = '<span class="leeg" style="width:100%;text-align:center;">Hoeveel had je teamgenoot goed?</span>';
     for (let n=0;n<=5;n++){
       const b=document.createElement('button'); b.className='chip'; b.type='button'; b.textContent=n;
-      b.onclick=async()=>{ try{ await api('zet',{id:p.id, zet:{actie:'score', goed:n}}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+      b.onclick=async()=>{ try{ await speelZet({actie:'score', goed:n}); }catch(e){ meld(e.message); } };
       rij.appendChild(b);
     }
     acties.appendChild(rij);
@@ -924,7 +936,7 @@ function tekenWaarheid(){
   const acties = $('#whActies'); acties.innerHTML='';
   if (!mijnBeurt) return;
   const knop = (tekst, klas, zet) => { const b=document.createElement('button'); b.className=klas; b.textContent=tekst;
-    b.onclick=async()=>{ try{ await api('zet',{id:p.id, zet}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+    b.onclick=async()=>{ try{ await speelZet(zet); }catch(e){ meld(e.message); } };
     acties.appendChild(b); };
   if (!st.kaart){ knop('🎭 Doen','knop',{actie:'kies', wat:'doen'}); knop('💬 Waarheid','knop grijs',{actie:'kies', wat:'waarheid'}); }
   else { knop('✔ Gedaan (+1 punt)','knop',{actie:'af', gedaan:true}); knop('Toch maar niet','knop grijs',{actie:'af', gedaan:false}); }
@@ -938,7 +950,7 @@ function tekenProost(){
   const acties = $('#prActies'); acties.innerHTML='';
   if (mijnBeurt){
     const b=document.createElement('button'); b.className='knop'; b.textContent='🥂 Volgende kaart';
-    b.onclick=async()=>{ try{ await api('zet',{id:p.id, zet:{actie:'kaart'}}); const s=await api('staat',{id:p.id}); huidig=s.potje; tekenPotje(); }catch(e){ meld(e.message); } };
+    b.onclick=async()=>{ try{ await speelZet({actie:'kaart'}); }catch(e){ meld(e.message); } };
     acties.appendChild(b);
   } else if (p.status==='bezig'){
     acties.innerHTML = '<span class="leeg">'+esc(p.spelers[p.beurt])+' pakt de volgende kaart…</span>';
@@ -1003,14 +1015,7 @@ setInterval(()=>{
   const sec = Math.round((Date.now()-SU.start)/1000);
   $('#suInfo').textContent = '⏱ '+Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')+' · sneller is meer punten';
 }, 1000);
-async function laadSudokuBord(){
-  try{
-    const d = await api('arcade-bord',{spel:'sudoku'});
-    $('#suBordLijst').innerHTML = (d.bord||[]).length ? d.bord.map((r,i)=>
-      '<div class="rij"><div class="nm">'+(i+1)+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')+'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
-      : '<div class="leeg">Nog geen scores. Wees de eerste!</div>';
-  }catch(e){}
-}
+const laadSudokuBord = () => laadRanglijst('sudoku', '#suBordLijst');
 
 /* ---------- Vingerroulette: samen om een telefoon (geen server nodig) ---------- */
 const VZ = { blobs:new Map(), aftelTot:0, bezig:false, timer:null };

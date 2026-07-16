@@ -21,22 +21,34 @@ module.exports = (kern) => {
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
     random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld),
     mijn: (mij) => Object.assign({ status: 200 }, mijnSpellen(mij)),
-    staat: (mij, b) => spelStaat(mij, String(b.id || '')),
-    zet: (mij, b) => spelZet(mij, String(b.id || ''), b.zet),
+    staat: (mij, b) => spelStaat(mij, String(b.id || ''), b.velden === true),
+    zet: (mij, b) => {
+      // de nieuwe staat reist mee in het antwoord: scheelt de client een
+      // tweede round-trip na elke zet
+      const r = spelZet(mij, String(b.id || ''), b.zet);
+      if (!r.error) { const s = spelStaat(mij, String(b.id || '')); if (s.potje) r.potje = s.potje; }
+      return r;
+    },
     opgeven: (mij, b) => spelOpgeven(mij, String(b.id || '')),
     'sneek-score': (mij, b) => sneekScore(mij, b.punten),
     'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
     'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),
     'arcade-bord': (mij, b) => arcadeBord(mij, String(b.spel || ''), vriendenVan(mij))
   };
+  // vangnet: Express 4 vangt async-fouten niet zelf, dus zonder try/catch
+  // blijft een request eeuwig hangen als een actie onverwacht gooit
+  async function veilig(res, werk) {
+    try { stuur(res, await werk()); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  }
   for (const [naam, doe] of Object.entries(ACTIES)) {
-    app.post('/api/member/spel/' + naam, auth, async (req, res) => {
+    app.post('/api/member/spel/' + naam, auth, (req, res) => {
       if (geenGast(req, res)) return;
-      stuur(res, await doe(req.session.key, req.body || {}, 'rtg'));
+      veilig(res, () => doe(req.session.key, req.body || {}, 'rtg'));
     });
-    app.post('/api/rtf/spel/' + naam, async (req, res) => {
+    app.post('/api/rtf/spel/' + naam, (req, res) => {
       const mij = rtfSpeler(req, res); if (!mij) return;
-      stuur(res, await doe(mij, req.body || {}, 'rtf'));
+      veilig(res, () => doe(mij, req.body || {}, 'rtf'));
     });
   }
 };

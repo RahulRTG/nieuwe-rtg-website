@@ -289,21 +289,30 @@ test('rummi (RTF): veertien stenen, onzin-setjes geweigerd, pakken wisselt de be
   const fout = await rtfSpel('zet', { id: nieuw.id, zet: { tafel: [['r1', 'r5', 'r9']] } }, beurtS);
   assert.equal(fout.status, 400);
   assert.ok(/geldige rij of groep/.test((await json(fout)).error));
-  // niets kwijt kunnen: pak een steen en de ander is aan de beurt
+  // niets kwijt kunnen: pak een steen en de ander is ECHT aan de beurt
+  // (de beurt moet een geldige spelerindex zijn; NaN zou het potje muurvast zetten)
   const p1 = await json(await rtfSpel('zet', { id: nieuw.id, zet: { pak: true } }, beurtS));
   assert.ok(p1.gepakt, 'er komt een steen bij');
   st = await json(await rtfSpel('staat', { id: nieuw.id }, beurtS));
   assert.equal(st.potje.staat.rek.length, 15, 'het rek groeit naar vijftien');
+  assert.ok([0, 1].includes(st.potje.beurt), 'de beurt is een echte spelerindex');
   assert.notEqual(st.potje.beurt, st.potje.ik, 'de beurt is gewisseld');
+  // en de ander kan daarna ook echt zetten
+  const anderS = beurtS === A ? B : A;
+  const p2 = await json(await rtfSpel('zet', { id: nieuw.id, zet: { pak: true } }, anderS));
+  assert.ok(p2.gepakt, 'de tweede speler is aan de beurt en pakt');
 });
 
 test('magnaat: 1500 start, kopen op een vrij veld en bouwen vergt de hele kleurgroep', async () => {
   const { a, b } = await tweeVrienden();
   const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'magnaat', grootte: 2, vrienden: [b.key] }, a.tok));
   await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
-  let st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  // het statische bord reist alleen mee als de client erom vraagt (bij openen)
+  let st = await json(await raw('/member/spel/staat', { id: nieuw.id, velden: true }, a.tok));
   assert.deepEqual(st.potje.staat.geld, [1500, 1500], 'iedereen begint met 1500');
   assert.equal(st.potje.staat.velden.length, 40, 'veertig velden op het bord');
+  const licht = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(licht.potje.staat.velden, undefined, 'een gewone poll draagt het statische bord niet mee');
   // gooien buiten je beurt kan niet
   const anderTok = st.potje.beurt === st.potje.ik ? b.tok : a.tok;
   assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'gooi' } }, anderTok)).status, 409);
@@ -321,7 +330,7 @@ test('magnaat: 1500 start, kopen op een vrij veld en bouwen vergt de hele kleurg
     }
   }
   assert.ok(gekocht != null, 'binnen 120 beurten komt iemand op een vrij veld');
-  st = await json(await raw('/member/spel/staat', { id: nieuw.id }, koperTok));
+  st = await json(await raw('/member/spel/staat', { id: nieuw.id, velden: true }, koperTok));
   assert.equal(st.potje.staat.eigenaar[gekocht], st.potje.ik, 'het veld is nu van de koper');
   assert.ok(st.potje.staat.geld[st.potje.ik] < 1500, 'en de koop is betaald');
   // bouwen mag pas als de hele kleurgroep van jou is
@@ -371,6 +380,19 @@ test('doen of waarheid (RTF): kiezen, afronden en een punt verdienen', async () 
   const st = await json(await rtfSpel('staat', { id: nieuw.id }, A));
   assert.equal(st.potje.staat.punten[0], 1, 'gedaan is een punt');
   assert.equal(st.potje.beurt, 1, 'en de beurt schuift door');
+});
+
+test('30 seconden start nooit met minder dan vier: weigeren annuleert het potje', async () => {
+  const { a, b } = await tweeVrienden();
+  const t = Date.now() + '' + (teller++);
+  const c = await json(await raw('/auth/register', { name: 'Half C' + t, email: 'hc' + t + '@v.test', phone: '0699' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1994-04-04', tier: 'rtg' }));
+  await raw('/member/connections', {}, c.token);
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'seconden', vrienden: [b.key], codenamen: [c.state.user.codename] }, a.tok));
+  // een accepteert, een weigert: drie spelers is geen twee-tegen-twee
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  const laatste = await json(await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: false }, c.token));
+  assert.equal(laatste.gestart, false, 'het potje start niet half');
+  assert.equal((await raw('/member/spel/staat', { id: nieuw.id }, a.tok)).status, 404, 'het halve potje is opgeruimd');
 });
 
 test('elke app zijn eigen spelgroep: RTG start geen dammen, RTF start geen schaken', async () => {

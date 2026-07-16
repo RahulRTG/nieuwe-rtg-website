@@ -450,8 +450,10 @@
   // spelgroep); alleen een anonieme demo-gast zonder account speelt niet mee
   function renderSpelen(){
     const el = $('#homeSpelen'); if (!el) return;
-    if (!socialOK || !user || (user.tier === 'guest' && !user.account)){ el.style.display='none'; return; }
-    el.style.display='';
+    // de kaart begint verborgen (hidden in de HTML): zo staat er nooit een
+    // lege kaart op Home als de sociale laag (nog) niet geladen is
+    if (!socialOK || !user || (user.tier === 'guest' && !user.account)){ el.hidden = true; return; }
+    el.hidden = false;
     el.innerHTML = '<div class="label">'+T('spel.label','Spelen')+'</div>'+
       '<div class="big" style="font-size:1.02rem;">🎲 '+T('spel.kop','Een potje tussendoor?')+'</div>'+
       '<div class="meta" style="margin:.2rem 0 .7rem;">'+T('spel.uitleg','Schaken, Woordduel, Magnaat, 30 Seconden, Proost (18+) en Vingerroulette. Tegen vrienden of een random tegenstander; samen spelen maakt je niet automatisch vrienden.')+'</div>'+

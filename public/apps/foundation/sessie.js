@@ -4,6 +4,15 @@
    tools (leren, cv) je naam al kennen en de balk bovenin laat zien wie je bent. */
 (function (w) {
   var KEY = 'rtf_sessie';
+  // de gedeelde verbindingslaag (offline-banner + satellietmodus) laadt op
+  // elke RTF-pagina mee; sessie.js zit overal, dus dit is de ene plek
+  try {
+    if (!document.querySelector('script[src="/shared/verbinding.js"]')) {
+      var vscript = document.createElement('script');
+      vscript.src = '/shared/verbinding.js';
+      (document.head || document.documentElement).appendChild(vscript);
+    }
+  } catch (e) {}
   function lees() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
   function api(p, b) {
     return fetch('/api/foundation' + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b || {}) })

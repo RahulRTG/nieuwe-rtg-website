@@ -8,6 +8,7 @@
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/apps/foundation/stijl.css">
 <script src="/apps/foundation/palet.js"></script>
+<script src="/shared/verbinding.js"></script>
 <style>
   .wrap{max-width:34rem;margin:0 auto;padding:1rem 1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .8rem;}
@@ -382,7 +383,7 @@ async function openPotje(id){
   if (huidig.staat && huidig.staat.velden) mgVelden = huidig.staat.velden;
   toon('vSpel'); tekenPotje();
   clearInterval(pollT);
-  pollT = setInterval(()=>{ if (!document.hidden) ververs(); }, 8000);
+  pollT = setInterval(()=>{ if (document.hidden) return; if (window.Satelliet && !Satelliet.beurt('potje')) return; ververs(); }, 8000);
 }
 let stream = null;
 function verbindStream(){
@@ -1118,7 +1119,7 @@ document.querySelectorAll('.spelkaart').forEach(k => { if (!MIJN_SPELLEN.include
 laadLobby();
 verbindStream();
 // trage vangnet-poll voor de lobby: de stream doet het echte werk
-setInterval(()=>{ if (!$('#vLobby').hidden && !document.hidden) laadLobby(); }, 20000);
+setInterval(()=>{ if ($('#vLobby').hidden || document.hidden) return; if (window.Satelliet && !Satelliet.beurt('lobby')) return; laadLobby(); }, 20000);
 const qs = new URLSearchParams(location.search);
 if (qs.get('potje')) openPotje(qs.get('potje'));
 </script>

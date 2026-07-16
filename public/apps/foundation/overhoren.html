@@ -238,7 +238,11 @@ async function openDuel(id){
   toon('vDuel');
   await ververs();
   clearInterval(dPoll);
-  dPoll = setInterval(() => { if (!document.hidden && !$('#vDuel').hidden) ververs(); }, 3000);
+  dPoll = setInterval(() => {
+    if (document.hidden || $('#vDuel').hidden) return;
+    if (window.Satelliet && !Satelliet.beurt('duel')) return;
+    ververs();
+  }, 3000);
 }
 async function ververs(){
   let d; try { d = await api('sessie-staat', { id: D.id }); } catch (e) { return; }

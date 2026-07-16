@@ -68,5 +68,112 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', status);
   else status();
 
-  w.RTGNet = { toon: toonBanner, verberg: verbergBanner, fout: fout, haal: haal, status: status };
+  /* ---------- satellietmodus ----------
+     De hele app blijft bruikbaar op een satellietverbinding (of heel traag
+     mobiel): hoge vertraging, smalle band, af en toe een hapering. Drie dingen:
+     1) Elk /api/-verzoek krijgt een ruime timeout en meet stilletjes de
+        rondreistijd mee; mislukte GET's proberen het vanzelf nog eens.
+     2) Blijkt de mediaan traag (of zegt de browser 2g), dan gaat de zuinige
+        stand aan: pollers slaan beurten over (Satelliet.beurt) en een klein
+        balkje onderin vertelt het eerlijk. Wordt de lijn weer vlot, dan gaat
+        hij er vanzelf weer af.
+     3) De stand is te sturen (auto/aan/uit) via localStorage rtg_sat; welke
+        knoppen en opties daarbij komen is een aparte keuze. */
+  var SAT_KEY = 'rtg_sat'; // 'auto' | 'aan' | 'uit'
+  function satStand() { try { return localStorage.getItem(SAT_KEY) || 'auto'; } catch (e) { return 'auto'; } }
+  function satZet(v) { try { localStorage.setItem(SAT_KEY, v); } catch (e) {} satTeken(); }
+  var satTraag = false;
+  try {
+    var cn = navigator.connection;
+    if (cn && /(^|-)2g$/.test(String(cn.effectiveType || ''))) satTraag = true;
+  } catch (e) {}
+  function satActief() { var s = satStand(); return s === 'aan' || (s === 'auto' && satTraag); }
+
+  // meet mee met echte verzoeken: de mediaan beslist, zodat een losse hapering niet telt
+  var satMonsters = [];
+  function satMeet(ms, mislukt) {
+    satMonsters.push(mislukt ? 5000 : ms);
+    if (satMonsters.length > 8) satMonsters.shift();
+    if (satMonsters.length < 4) return;
+    var kopie = satMonsters.slice().sort(function (a, b) { return a - b; });
+    var mediaan = kopie[Math.floor(kopie.length / 2)];
+    var was = satTraag;
+    if (mediaan > 1200) satTraag = true;
+    else if (mediaan < 600) satTraag = false;
+    if (was !== satTraag) satTeken();
+  }
+
+  // fetch-wikkel voor /api/-paden: timeout, meting en een stille herkansing voor GET's
+  var echteFetch = w.fetch.bind(w);
+  w.fetch = function (invoer, opties) {
+    var url = typeof invoer === 'string' ? invoer : '';
+    if (url.split('?')[0].indexOf('/api/') !== 0) return echteFetch(invoer, opties);
+    var methode = String((opties && opties.method) || 'GET').toUpperCase();
+    var maxPogingen = methode === 'GET' ? 3 : 1; // schrijfacties nooit dubbel versturen
+    function poging(n) {
+      var start = Date.now();
+      var opts = opties || {};
+      var timer = null;
+      if (!opts.signal && w.AbortController) {
+        var ctl = new AbortController();
+        opts = Object.assign({}, opties, { signal: ctl.signal });
+        timer = setTimeout(function () { ctl.abort(); }, satActief() ? 60000 : 30000);
+      }
+      return echteFetch(invoer, opts).then(function (r) {
+        if (timer) clearTimeout(timer);
+        satMeet(Date.now() - start, false);
+        return r;
+      }, function (e) {
+        if (timer) clearTimeout(timer);
+        satMeet(Date.now() - start, true);
+        if (n >= maxPogingen || navigator.onLine === false) throw e;
+        return new Promise(function (klaar) { setTimeout(klaar, 1200 * n); }).then(function () { return poging(n + 1); });
+      });
+    }
+    return poging(1);
+  };
+
+  // pollers vragen per beurt of ze mogen: in de zuinige stand 1 op de 4
+  var satBeurten = {};
+  function satBeurt(naam) {
+    var m = satActief() ? 4 : 1;
+    satBeurten[naam] = (satBeurten[naam] || 0) + 1;
+    return satBeurten[naam] % m === 0;
+  }
+
+  // het balkje onderin: eerlijk zeggen dat de zuinige stand aanstaat
+  var satEl;
+  function satTeken() {
+    var aan = satActief();
+    if (!aan) { if (satEl) { satEl.remove(); satEl = null; } return; }
+    if (!document.body) { document.addEventListener('DOMContentLoaded', satTeken); return; }
+    if (!satEl) {
+      satEl = document.createElement('div');
+      satEl.id = 'rtg-sat-balkje';
+      satEl.setAttribute('role', 'status');
+      satEl.setAttribute('aria-live', 'polite');
+      satEl.style.cssText = 'position:fixed;left:50%;bottom:.7rem;transform:translateX(-50%);z-index:99999;' +
+        'display:flex;gap:.6rem;align-items:center;background:#14202b;color:#cfe0ee;border:1px solid #2c3f52;' +
+        'border-radius:999px;padding:.42rem .9rem;font:600 .78rem/1.2 system-ui,-apple-system,sans-serif;' +
+        'box-shadow:0 4px 16px rgba(0,0,0,.35);max-width:92vw;';
+      var tekst = document.createElement('span');
+      tekst.textContent = T('net.sat', '🛰 Trage verbinding: zuinige stand aan');
+      var uit = document.createElement('button');
+      uit.type = 'button';
+      uit.textContent = '✕';
+      uit.setAttribute('aria-label', T('net.satUit', 'Zuinige stand uitzetten'));
+      uit.style.cssText = 'background:none;border:0;color:#8fa6ba;cursor:pointer;font-size:.8rem;padding:0;';
+      uit.addEventListener('click', function () { satZet('uit'); });
+      satEl.appendChild(tekst); satEl.appendChild(uit);
+      document.body.appendChild(satEl);
+    }
+  }
+  if (satActief()) satTeken();
+
+  w.Satelliet = {
+    actief: satActief, stand: satStand, zetStand: satZet, beurt: satBeurt,
+    multiplier: function () { return satActief() ? 4 : 1; }
+  };
+
+  w.RTGNet = { toon: toonBanner, verberg: verbergBanner, fout: fout, haal: haal, status: status, satelliet: w.Satelliet };
 })(window);

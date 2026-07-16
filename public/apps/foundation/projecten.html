@@ -140,7 +140,11 @@ async function openProject(id){
   await ververs();
   laadVrienden();
   clearInterval(poll);
-  poll = setInterval(() => { if (!document.hidden && !$('#vProject').hidden) ververs(); }, 5000);
+  poll = setInterval(() => {
+    if (document.hidden || $('#vProject').hidden) return;
+    if (window.Satelliet && !Satelliet.beurt('project')) return;
+    ververs();
+  }, 5000);
 }
 async function ververs(){
   let d; try { d = await api('project-staat', { id: P.id }); } catch (e) { toon('vLijst'); laadOverzicht(); return; }

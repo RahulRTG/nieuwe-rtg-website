@@ -31,6 +31,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const zlib = require('zlib');
 const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek } = require('./db');
 const i18n = require('./translate');
@@ -373,6 +374,26 @@ app.use((req, res, next) => {
   next();
 });
 
+/* Satellietvriendelijk: ook alle API-antwoorden gaan gecomprimeerd over de
+   lijn (de statische laag deed dat al). Op een smalle, trage verbinding
+   (satelliet, buitengebied, traag mobiel) scheelt dat 70 tot 90 procent per
+   antwoord. Kleine antwoorden laten we met rust: daar kost gzip meer dan het
+   oplevert. Moet voor de routers staan, anders missen die de wikkel. */
+app.use((req, res, next) => {
+  if (!/\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) return next();
+  const gewoonJson = res.json.bind(res);
+  res.json = (data) => {
+    let s;
+    try { s = JSON.stringify(data); } catch (e) { return gewoonJson(data); }
+    if (typeof s !== 'string' || s.length < 1024 || res.headersSent) return gewoonJson(data);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Encoding', 'gzip');
+    res.setHeader('Vary', 'Accept-Encoding');
+    return res.send(zlib.gzipSync(Buffer.from(s), { level: 6 }));
+  };
+  next();
+});
+
 // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
 // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
 // draait mee op dezelfde database en failover.
@@ -404,7 +425,14 @@ app.use((req, res, next) => {
       "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline'; " +
       "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
       "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
-    res.type('html').send(html);
+    res.type('html');
+    // ook de pagina's zelf gecomprimeerd over de lijn (satelliet en traag mobiel)
+    if (html.length > 2048 && /\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) {
+      res.setHeader('Content-Encoding', 'gzip');
+      res.setHeader('Vary', 'Accept-Encoding');
+      return res.send(zlib.gzipSync(Buffer.from(html), { level: 6 }));
+    }
+    res.send(html);
   });
 });
 
@@ -413,7 +441,6 @@ app.use((req, res, next) => {
    regels, app-main.js ~4400) gaan zo ~75% kleiner over de lijn, zonder extra
    dependency (ingebouwde zlib) en zonder per-verzoek opnieuw te comprimeren.
    Valt netjes terug op express.static bij range-verzoeken of onbekende paden. */
-const zlib = require('zlib');
 const PUBLIC_DIR_STATIC = path.join(__dirname, '..', 'public');
 const GZIP_TYPE = { '.js': 'application/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json' };
 const MIN_DIR_STATIC = path.join(PUBLIC_DIR_STATIC, 'dist', 'min');
@@ -1468,6 +1495,10 @@ app.get('/api/health', (req, res) => res.json({
   domeinen: process.env.RTG_DOMAINS || 'alle',
   pid: process.pid, up: Math.round(process.uptime())
 }));
+
+// Het kleinst mogelijke antwoord (een paar tientallen bytes) waarmee de apps
+// de rondreistijd peilen voor de satellietmodus; zonder inloggen, zonder poespas.
+app.get('/api/sat/ping', (req, res) => res.json({ ok: 1, t: Date.now() }));
 
 /* Alleen in de testsuite: twee opzettelijke storingen om de foutisolatie te
    BEWIJZEN. /api/test/bug gooit een async fout (die ene aanvraag krijgt 500,
@@ -2606,6 +2637,12 @@ const server = app.listen(PORT, () => {
   }
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 });
+/* Satellietvriendelijk: op hoge-latency verbindingen (satelliet, traag mobiel)
+   duurt een nieuwe TLS-handshake al snel seconden. Houd bestaande verbindingen
+   daarom ruim open, dan wordt hij hergebruikt in plaats van opnieuw opgezet.
+   headersTimeout hoort boven keepAliveTimeout te blijven (Node-vereiste). */
+server.keepAliveTimeout = 75000;
+server.headersTimeout = 90000;
 
 // Netjes afsluiten: data wegschrijven, verbindingen sluiten, dan pas stoppen.
 for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {

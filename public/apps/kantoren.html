@@ -126,6 +126,19 @@
     </div>
   </section>
 
+  <!-- de paniekkamer -->
+  <section id="vPaniek" hidden>
+    <div class="kop">
+      <button class="terug" id="pTerug">← alle kamers</button>
+      <h1>🚨 De Paniekkamer</h1>
+    </div>
+    <p class="deck">Dezelfde knoppen als de boardroom, met het vier-ogen-principe: zet je hier een knop om, dan gaat er een voorstel naar de boardroom. Die accepteert, wijst af, of praat er eerst over. Zo kan niemand in paniek in zijn eentje het platform omgooien.</p>
+    <h3 class="sec">Jouw voorstellen</h3>
+    <div class="kaart lijst" id="pVoorstellen"><div class="leeg">Nog geen voorstellen.</div></div>
+    <h3 class="sec">Het schakelbord (elke omgezette knop wordt een voorstel)</h3>
+    <div class="schakels" id="pSchakels"></div>
+  </section>
+
   <!-- de boardroom -->
   <section id="vBoard" hidden>
     <div class="kop">
@@ -136,6 +149,9 @@
 
     <h3 class="sec">Alle kamers</h3>
     <div class="kpis" id="bKamers"></div>
+
+    <h3 class="sec">Uit de paniekkamer</h3>
+    <div class="kaart lijst" id="bPaniek"><div class="leeg">Geen open voorstellen.</div></div>
 
     <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.6rem;">Loop nu een ronde</button></h3>
     <div class="kaart lijst" id="bVoorstellen"></div>
@@ -156,7 +172,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vGate','vKamers','vKamer','vBoard'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vGate','vKamers','vKamer','vBoard','vPaniek'].forEach(x => $('#'+x).hidden = (x!==v)); }
 function uitgelogd(){ TOKEN = null; try { localStorage.removeItem('rtg_office_token'); } catch (e) {} toon('vGate'); }
 
 /* ---------- inloggen ---------- */
@@ -176,12 +192,13 @@ $('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#login')
 async function laadKamers(){
   const d = await api('kamers');
   toon('vKamers');
-  const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>';
+  const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
+    '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : openKamer(b.dataset.kamer)));
 }
 
 /* ---------- een kamer ---------- */
@@ -211,6 +228,50 @@ $('#kMaak').addEventListener('click', async () => {
 $('#kNieuw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#kMaak').click(); });
 $('#kTerug').addEventListener('click', laadKamers);
 $('#bTerug').addEventListener('click', laadKamers);
+$('#pTerug').addEventListener('click', laadKamers);
+
+/* ---------- de paniekkamer ---------- */
+function voorstelKaart(v, alsBoardroom){
+  const stand = v.status === 'open' ? 'wacht op de boardroom' : v.status;
+  return '<div class="voorstel" style="flex-direction:column;align-items:stretch;gap:.3rem;" data-vid="'+v.id+'">'+
+    '<div><b>'+esc(v.functieNaam)+'</b> '+(v.aan ? 'AAN' : 'UIT')+(v.doelgroep ? ' voor '+esc(v.doelgroep) : ' (globaal)')+
+    ' · <span style="color:var(--gold);">'+esc(stand)+'</span>'+(v.reden ? '<br><small style="color:var(--soft);">Reden: '+esc(v.reden)+'</small>' : '')+'</div>'+
+    (v.discussie.length ? '<div style="font-size:.8rem;color:var(--muted);">'+v.discussie.map(m => '<div>'+(m.wie==='boardroom'?'🏛️':'🚨')+' '+esc(m.tekst)+'</div>').join('')+'</div>' : '')+
+    (v.status === 'open' ? '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">'+
+      (alsBoardroom ? '<button class="knop stil" data-acc="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Accepteer en schakel</button>'+
+      '<button class="knop stil" data-afw="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Wijs af</button>' : '')+
+      '<input class="veld" data-msg="'+v.id+'" placeholder="Discussieer mee..." style="flex:1;min-width:10rem;padding:.35rem .7rem;font-size:.8rem;">'+
+      '<button class="knop stil" data-stuur="'+v.id+'" data-wie="'+(alsBoardroom?'boardroom':'paniekkamer')+'" style="padding:.3rem .9rem;font-size:.78rem;">Stuur</button></div>' : '')+
+    '</div>';
+}
+function koppelVoorstellen(el, herlaad){
+  el.querySelectorAll('[data-acc]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('paniek/besluit', { id: b.dataset.acc, besluit: 'accepteer' }); meld('Geaccepteerd en geschakeld.'); herlaad(); } catch (e) { meld(e.message); }
+  }));
+  el.querySelectorAll('[data-afw]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('paniek/besluit', { id: b.dataset.afw, besluit: 'wijs-af' }); meld('Afgewezen.'); herlaad(); } catch (e) { meld(e.message); }
+  }));
+  el.querySelectorAll('[data-stuur]').forEach(b => b.addEventListener('click', async () => {
+    const inp = el.querySelector('[data-msg="'+b.dataset.stuur+'"]');
+    try { await api('paniek/bericht', { id: b.dataset.stuur, wie: b.dataset.wie, tekst: inp.value }); inp.value = ''; herlaad(); } catch (e) { meld(e.message); }
+  }));
+}
+async function openPaniek(){
+  const [b, p] = await Promise.all([api('boardroom'), api('paniek')]);
+  toon('vPaniek');
+  $('#pVoorstellen').innerHTML = p.voorstellen.length ? p.voorstellen.map(v => voorstelKaart(v, false)).join('') : '<div class="leeg">Nog geen voorstellen.</div>';
+  koppelVoorstellen($('#pVoorstellen'), openPaniek);
+  $('#pSchakels').innerHTML = b.functies.map(g =>
+    '<div class="kaart cat"><h4>'+esc(g.categorie)+'</h4>'+g.functies.map(f =>
+      '<div class="fx"><div class="nm">'+esc(f.naam)+'<small>'+esc(f.uitleg || '')+'</small></div>'+
+      '<button type="button" class="wip" role="switch" aria-checked="'+(f.aan ? 'true' : 'false')+'" data-stel="'+f.id+'" aria-label="Voorstel: '+esc(f.naam)+' omzetten"></button></div>').join('')+'</div>').join('');
+  $('#pSchakels').querySelectorAll('[data-stel]').forEach(w => w.addEventListener('click', async () => {
+    const naarAan = w.getAttribute('aria-checked') !== 'true';
+    const reden = prompt('Waarom moet "'+w.dataset.stel+'" '+(naarAan?'AAN':'UIT')+'? De boardroom leest dit bij het voorstel.') || '';
+    try { await api('paniek/stel', { functie: w.dataset.stel, aan: naarAan, reden }); meld('Voorstel ligt bij de boardroom.'); openPaniek(); }
+    catch (e) { meld(e.message); }
+  }));
+}
 
 /* ---------- de boardroom ---------- */
 async function openBoard(){
@@ -220,6 +281,8 @@ async function openBoard(){
     '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+k.emoji+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');
   $('#bKamers').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => openKamer(b.dataset.kamer)));
   tekenVoorstellen(d.verbeterkamer);
+  $('#bPaniek').innerHTML = d.paniek.length ? d.paniek.map(v => voorstelKaart(v, true)).join('') : '<div class="leeg">Geen open voorstellen.</div>';
+  koppelVoorstellen($('#bPaniek'), openBoard);
   $('#bTelling').textContent = d.functiesUit ? '(' + d.functiesUit + ' uit)' : '(alles staat aan)';
   $('#bSchakels').innerHTML = d.functies.map(g =>
     '<div class="kaart cat"><h4>'+esc(g.categorie)+'</h4>'+g.functies.map(f =>

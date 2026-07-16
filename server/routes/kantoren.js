@@ -17,4 +17,18 @@ module.exports = (kern) => {
     return r;
   }));
   app.post('/api/office/boardroom/verbeter', officeAuth, (req, res) => veilig(res, () => ({ ok: true, verbeterkamer: afdelingen.voorstellen(true) })));
+
+  // de paniekkamer: knoppen worden voorstellen; de boardroom besluit
+  app.post('/api/office/paniek', officeAuth, (req, res) => veilig(res, () => afdelingen.paniekLijst()));
+  app.post('/api/office/paniek/stel', officeAuth, (req, res) => veilig(res, () => {
+    const r = afdelingen.paniekStel({ functie: String(req.body.functie || ''), aan: req.body.aan === true, doelgroep: req.body.doelgroep ? String(req.body.doelgroep) : null, reden: req.body.reden });
+    if (r.ok) sseToOffice('sync', { scope: 'paniek' });
+    return r;
+  }));
+  app.post('/api/office/paniek/besluit', officeAuth, (req, res) => veilig(res, () => {
+    const r = afdelingen.paniekBesluit(String(req.body.id || ''), String(req.body.besluit || ''));
+    if (r.ok) sseToOffice('sync', { scope: 'paniek' });
+    return r;
+  }));
+  app.post('/api/office/paniek/bericht', officeAuth, (req, res) => veilig(res, () => afdelingen.paniekBericht(String(req.body.id || ''), String(req.body.wie || ''), req.body.tekst)));
 };

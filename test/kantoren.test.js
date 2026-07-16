@@ -84,6 +84,34 @@ test('de boardroom ziet alles en schakelt echt: functie uit, pad dicht, weer aan
   assert.equal((await api('boardroom/schakel', { functie: 'bestaat-niet', aan: false })).status, 404);
 });
 
+test('de paniekkamer: een knop wordt een voorstel; de boardroom discussieert en besluit', async () => {
+  const alle = (await api('boardroom')).body.functies.flatMap(g => g.functies);
+  const fx = alle[1] || alle[0];
+  // het voorstel: uit, met reden; dubbel voorstellen wordt tegengehouden
+  const v = await api('paniek/stel', { functie: fx.id, aan: false, reden: 'Verdachte piek in het verkeer' });
+  assert.equal(v.status, 200);
+  assert.equal((await api('paniek/stel', { functie: fx.id, aan: false })).status, 409, 'geen dubbel voorstel voor dezelfde knop');
+  // cruciaal: de knop is NIET omgezet; het is een voorstel
+  let check = (await api('boardroom')).body;
+  assert.equal(check.functies.flatMap(g => g.functies).find(f => f.id === fx.id).aan, true, 'nog niets geschakeld');
+  assert.ok(check.paniek.some(p => p.id === v.body.voorstel.id), 'de boardroom ziet het voorstel');
+  // discussie over en weer
+  await api('paniek/bericht', { id: v.body.voorstel.id, wie: 'boardroom', tekst: 'Welke piek precies?' });
+  await api('paniek/bericht', { id: v.body.voorstel.id, wie: 'paniekkamer', tekst: 'Honderden mislukte inlogs per minuut.' });
+  const p = (await api('paniek')).body.voorstellen.find(x => x.id === v.body.voorstel.id);
+  assert.equal(p.discussie.length, 2);
+  // de boardroom accepteert: nu pas schakelt hij echt
+  assert.ok((await api('paniek/besluit', { id: v.body.voorstel.id, besluit: 'accepteer' })).body.ok);
+  check = (await api('boardroom')).body;
+  assert.equal(check.functies.flatMap(g => g.functies).find(f => f.id === fx.id).aan, false, 'na acceptatie staat de knop echt om');
+  assert.ok(!check.paniek.some(x => x.id === v.body.voorstel.id), 'het voorstel is afgehandeld');
+  // terug aan via een tweede voorstel dat wordt afgewezen: er verandert niets
+  const v2 = await api('paniek/stel', { functie: fx.id, aan: true });
+  assert.ok((await api('paniek/besluit', { id: v2.body.voorstel.id, besluit: 'wijs-af' })).body.ok);
+  assert.equal((await api('boardroom')).body.functies.flatMap(g => g.functies).find(f => f.id === fx.id).aan, false, 'afgewezen is niet geschakeld');
+  await api('boardroom/schakel', { functie: fx.id, aan: true }); // netjes terug
+});
+
 test('de verbeterkamer loopt op verzoek een verse ronde', async () => {
   const v = await api('boardroom/verbeter');
   assert.equal(v.status, 200);

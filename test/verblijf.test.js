@@ -151,11 +151,17 @@ test('housekeeping-prioriteit en de hotelcijfers in de shift-samenvatting', asyn
 
 test('het hoteldorp: negen afdelingen met dezelfde motor, elk een eigen keten', async () => {
   const dorp = (await api('supplier/dorp', {}, hotel)).body;
-  assert.equal(dorp.afdelingen.length, 11, 'front office tot en met IT, met amenities en de patissier');
+  assert.equal(dorp.afdelingen.length, 12, 'front office tot en met IT, met amenities, patissier en guest relations');
   const keys = dorp.afdelingen.map(a => a.key);
-  for (const k of ['frontoffice', 'guest', 'concierge', 'parking', 'security', 'gym', 'spa', 'amenities', 'patissier', 'klussen', 'it']) {
+  for (const k of ['frontoffice', 'guest', 'relations', 'concierge', 'parking', 'security', 'gym', 'spa', 'amenities', 'patissier', 'klussen', 'it']) {
     assert.ok(keys.includes(k), 'afdeling ' + k + ' bestaat');
   }
+  // guest relations volgt een signaal tot en met het nabellen
+  const klacht = await api('supplier/dorp/post', { afdeling: 'relations', waar: 'Garden kamer', tekst: 'Klacht over geluid van de poolbar' }, hotel);
+  assert.equal(klacht.body.post.status, 'gemeld');
+  assert.equal((await api('supplier/dorp/verder', { id: klacht.body.post.id }, hotel)).body.post.status, 'in gesprek');
+  assert.equal((await api('supplier/dorp/verder', { id: klacht.body.post.id }, hotel)).body.post.status, 'opgelost');
+  assert.equal((await api('supplier/dorp/verder', { id: klacht.body.post.id }, hotel)).body.post.status, 'nagebeld');
   // de patissier heeft de langste keten: besteld -> in de maak -> klaar -> geserveerd
   const taart = await api('supplier/dorp/post', { afdeling: 'patissier', waar: '19:00, Sea-view suite', tekst: 'Verjaardagstaart voor acht' }, hotel);
   assert.equal(taart.body.post.status, 'besteld');

@@ -850,6 +850,11 @@ function initRealtime() {
   // oudere databases: appartement-partner en doors-cap toevoegen
   if (db.data.supplierTypes.apartment && !db.data.supplierTypes.apartment.caps.includes('doors'))
     db.data.supplierTypes.apartment.caps.splice(1, 0, 'doors');
+  // oudere databases: horeca en nachtzaken verkopen nu ook tickets (pre-order via de app, deurverkoop via de PDA)
+  for (const t of ['restaurant', 'bar', 'club', 'beachclub']) {
+    const def = db.data.supplierTypes[t];
+    if (def && !def.caps.includes('tickets')) def.caps.push('tickets');
+  }
   if (!db.data.suppliers.find(s => s.code === 'SAKURA')) {
     db.data.suppliers.push({
       code: 'SAKURA', name: 'Villa Bahia Ibiza', type: 'apartment', city: 'Ibiza',
@@ -1238,7 +1243,7 @@ function initRealtime() {
      kassa, personeel, facturen, contracten, borden en AI overal meteen
      werken; per sector een demopartner om mee te spelen. ---- */
   const NIEUWE_TYPES = {
-    beachclub:   { label: 'Beachclub', icon: '\u{1F3D6}️', caps: ['menu', 'orders', 'reservations', 'location', 'pricing'] },
+    beachclub:   { label: 'Beachclub', icon: '\u{1F3D6}️', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
     koffie:      { label: 'Koffie & patisserie', icon: '☕', caps: ['menu', 'orders', 'location', 'pricing'] },
     chef:        { label: 'Privéchef & catering', icon: '\u{1F468}‍\u{1F373}', caps: ['services', 'location', 'pricing'] },
     villa:       { label: "Villa's & fincas", icon: '\u{1F334}', caps: ['bookings', 'doors', 'location', 'pricing'] },

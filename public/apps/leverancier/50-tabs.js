@@ -1121,8 +1121,8 @@
   let dorpKant = (() => { try { return localStorage.getItem('rtg_dorp_kant') || 'frontoffice'; } catch(e){ return 'frontoffice'; } })();
   async function renderDorp(){
     const el = $('#dorpWrap'); if (!el) return;
-    // kamers geven het hoteldorp, de nachtzaak (bar/club/beachclub) het clubdorp
-    if (!Array.isArray(state.rooms) && !['bar', 'club', 'beachclub'].includes(S && S.type)){ el.innerHTML = ''; return; }
+    // kamers geven het hoteldorp; nachtzaken, restaurants en beachclubs hun eigen dorp
+    if (!Array.isArray(state.rooms) && !['bar', 'club', 'beachclub', 'restaurant'].includes(S && S.type)){ el.innerHTML = ''; return; }
     let d; try { d = await API.call('/supplier/dorp', {}); } catch(e){ el.innerHTML = ''; return; }
     const afd = d.afdelingen.find(a => a.key === dorpKant) || d.afdelingen[0];
     dorpKant = afd.key;
@@ -1156,6 +1156,11 @@
       if (w.type === 'meter') return kop(esc(w.titel))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
         w.opties.map(o => '<span><button class="obtn'+(w.stand&&w.stand.stand===o?' primary':'')+'" data-meter="'+esc(o)+'" style="padding:0.15rem 0.55rem;">'+esc(o)+'</button></span>').join('')+'</div>'+
         (w.stand?'<div class="softline" style="margin-top:0.25rem;">'+T('gy.nu','Nu')+' '+esc(w.stand.stand)+' · '+esc(w.stand.door)+', '+timeAgo(w.stand.at)+'</div>':'');
+      // de leeftijdscheck aan de deur: ja/nee op codenaam, zonder gegevens
+      if (w.type === 'leeftijd') return kop(esc(w.titel))+
+        '<div class="tt-add" style="margin-top:0.35rem;flex-wrap:wrap;"><input id="dorpLftIn" placeholder="'+T('dorp.lft.ph','Codenaam van de gast')+'" style="flex:2;min-width:140px;">'+
+        '<button class="obtn js-dlft" data-min="18">18+?</button><button class="obtn js-dlft" data-min="21">21+?</button></div>'+
+        '<div id="dorpLftUit" class="softline" style="margin-top:0.3rem;">'+esc(w.hint||'')+'</div>';
       return '';
     }).join('');
     // de buurt op het conciergescherm: partners om de hoek, op afstand gesorteerd
@@ -1209,6 +1214,20 @@
     el.querySelectorAll('.js-dbuurt').forEach(b => b.addEventListener('click', () => {
       const inp = el.querySelector('#dorpTekst');
       if (inp){ inp.value = T('dorp.regelbij','Regel bij')+' '+b.dataset.naam+' ('+b.dataset.soort+', '+b.dataset.km+' km): '; inp.focus(); }
+    }));
+    // de leeftijdscheck: de paspoort-bevestiging geeft ja/nee, nooit gegevens
+    el.querySelectorAll('.js-dlft').forEach(b => b.addEventListener('click', async () => {
+      const inp = el.querySelector('#dorpLftIn'), uit = el.querySelector('#dorpLftUit');
+      const codenaam = (inp && inp.value || '').trim();
+      if (!codenaam){ toast(T('dorp.lft.leeg','Vul de codenaam van de gast in.')); return; }
+      const min = Number(b.dataset.min);
+      try {
+        const r = await API.call('/supplier/paspoort/vraag', { codenaam, niveau: 'bevestiging', minLeeftijd: min });
+        const ok = r.bevestiging && r.bevestiging.voldoetLeeftijd === true;
+        uit.innerHTML = ok
+          ? '<b style="color:var(--green,#7ecb8f);font-size:1rem;">✅ '+esc(codenaam)+' '+T('dorp.lft.ja','is')+' '+min+'+</b>'
+          : '<b style="color:var(--burgundy,#C23A5E);font-size:1rem;">⛔ '+esc(codenaam)+' '+T('dorp.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
+      } catch(e){ uit.innerHTML = '<b style="color:var(--burgundy,#C23A5E);">'+esc(e.message)+'</b>'; }
     }));
     // het logmoment: een tik en het staat geklokt als afgeronde post
     el.querySelectorAll('.js-dactie').forEach(b => b.addEventListener('click', async () => {

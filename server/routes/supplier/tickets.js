@@ -1,6 +1,6 @@
 /* Domein "supplier" (deelmodule): tickets. Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, crypto, db, logActivity, ticketsVoorSlot, managerOnly, save, schoon, sseToCustomer, sseToSupplier, supplierAuth } = kern;
+  const { app, crypto, db, logActivity, pay, ticketsVoorSlot, managerOnly, save, schoon, sseToCustomer, sseToSupplier, supplierAuth } = kern;
 
 /* ================== tickets: activiteiten, tours en musea ================== */
 function heeftTickets(s) {
@@ -55,7 +55,9 @@ app.post('/api/supplier/programma', supplierAuth, (req, res) => {
         activiteitId: a.id, naam: a.name, tijd, capaciteit: a.capaciteit,
         verkocht: kaartjes.reduce((n, t) => n + (t.personen || 1), 0),
         binnen: kaartjes.filter(t => t.checkin).reduce((n, t) => n + (t.personen || 1), 0),
-        gasten: kaartjes.map(t => ({ codename: t.customerCodename, personen: t.personen || 1, code: t.code, binnen: !!t.checkin }))
+        // VIP eerst: aan de deur wil je die namen bovenaan zien staan
+        gasten: kaartjes.map(t => ({ codename: t.customerCodename, personen: t.personen || 1, code: t.code, binnen: !!t.checkin, vip: !!t.vip }))
+          .sort((a, b) => (b.vip ? 1 : 0) - (a.vip ? 1 : 0))
       });
     }
   }
@@ -79,10 +81,61 @@ app.post('/api/supplier/ticket/checkin', supplierAuth, (req, res) => {
   t.checkin = { at: new Date().toISOString(), door: req.actor.name, staffId: req.actor.staffId || null };
   t.status = 'afgerond';
   save();
-  logActivity(s.code, req.actor, 'checkte ' + t.customerCodename + ' in (' + t.service.name + ', ' + (t.personen || 1) + 'p)');
-  sseToCustomer(t.customerKey || t.customerTier, 'sync', { scope: 'tickets' });
+  logActivity(s.code, req.actor, 'checkte ' + t.customerCodename + ' in (' + t.service.name + ', ' + (t.personen || 1) + 'p' + (t.vip ? ', VIP' : '') + ')');
+  if (t.customerKey || t.customerTier) sseToCustomer(t.customerKey || t.customerTier, 'sync', { scope: 'tickets' });
   sseToSupplier(s.code, 'sync', { scope: 'tickets' });
-  res.json({ ok: true, ticket: { naam: t.service.name, tijd: t.tijd, personen: t.personen || 1, codename: t.customerCodename } });
+  res.json({ ok: true, ticket: { naam: t.service.name, tijd: t.tijd, personen: t.personen || 1, codename: t.customerCodename, vip: !!t.vip } });
+});
+
+/* Deurverkoop en VIP-entree: de kassa aan de deur. Het personeelslid verkoopt
+   op de PDA (of het kassascherm) een kaartje voor een tijdslot van vandaag,
+   contant of met RTG Pay. Het ticket is meteen betaald, de code kan direct
+   naar binnen en de omzet telt gewoon mee op de kassa van de zaak. */
+app.post('/api/supplier/ticket/deurverkoop', supplierAuth, async (req, res) => {
+  const s = req.supplier;
+  if (!heeftTickets(s)) return res.status(409).json({ error: 'Deze sector verkoopt geen tickets.' });
+  const act = (s.activiteiten || []).find(a => a.id === String(req.body.activiteitId || ''));
+  if (!act) return res.status(404).json({ error: 'Kies een avond of activiteit.' });
+  const tijd = String(req.body.tijd || '');
+  if (!(act.tijden || []).includes(tijd)) return res.status(400).json({ error: 'Kies een tijdslot.' });
+  const personen = Math.min(20, Math.max(1, parseInt(req.body.personen, 10) || 1));
+  const vip = req.body.vip === true;
+  const datum = new Date().toISOString().slice(0, 10);
+  const al = ticketsVoorSlot(s.code, act.id, datum, tijd).reduce((n, t) => n + (t.personen || 1), 0);
+  if (al + personen > act.capaciteit) return res.status(409).json({ error: 'Vol: nog ' + Math.max(0, act.capaciteit - al) + ' plekken voor dit tijdslot.' });
+  const total = Math.round((act.prijs || 0) * personen * 100) / 100;
+  const method = req.body.method === 'rtgpay' ? 'rtgpay' : 'contant';
+  let betaler = null;
+  if (method === 'rtgpay' && total > 0) {
+    const p = await pay.kasInt({ supplierCode: s.code, code: req.body.payCode, centen: Math.round(total * 100), oms: s.name + ' - ' + act.name, idem: req.body.idem });
+    if (p.error) return res.status(p.status || 400).json({ error: p.error });
+    betaler = p.van;
+  }
+  const code = crypto.randomBytes(3).toString('hex').toUpperCase();
+  const ticket = {
+    ref: 'D' + crypto.randomBytes(4).toString('hex'),
+    kind: 'ticket', code,
+    supplierCode: s.code, supplierName: s.name,
+    customerTier: null, customerKey: null, customerCodename: betaler || 'Deurverkoop',
+    service: { id: act.id, name: act.name, soort: 'ticket' },
+    activiteitId: act.id, datum, tijd, personen, vip, deur: true,
+    price: total, wanneer: datum + ' ' + tijd,
+    betaalMoment: 'deur', status: 'bevestigd', paid: true, at: new Date().toISOString()
+  };
+  db.data.boekingen.unshift(ticket);
+  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  const bonnen = db.data.posSales[s.code] = (db.data.posSales[s.code] || []);
+  bonnen.unshift({
+    id: crypto.randomBytes(4).toString('hex'), bon: code, actor: req.actor.name,
+    desc: 'Deurverkoop ' + act.name + (vip ? ' (VIP)' : ''), room: null,
+    items: [{ name: act.name + (vip ? ' VIP' : ''), qty: personen, price: act.prijs || 0 }],
+    total, method, betaler, at: new Date().toISOString()
+  });
+  db.data.posSales[s.code] = bonnen.slice(0, 300);
+  save();
+  logActivity(s.code, req.actor, 'verkocht ' + personen + 'x ' + act.name + (vip ? ' (VIP)' : '') + ' aan de deur (' + method + ', € ' + total + ')');
+  sseToSupplier(s.code, 'sync', { scope: 'tickets' });
+  res.json({ ok: true, ticket: { code, naam: act.name, tijd, personen, vip, total, method } });
 });
 
 /* De eigen transferdienst van een activiteitenzaak: chauffeurs van de zaak

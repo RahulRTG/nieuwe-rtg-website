@@ -165,9 +165,9 @@ function maakVolledigeSeed() {
       apartment:  { label: 'Appartement',  icon: '🏡', caps: ['bookings', 'doors', 'location', 'pricing'] },
       taxi:       { label: 'Taxi',         icon: '🚘', caps: ['rides', 'location', 'pricing'] },
       jet:        { label: 'Privéjet',     icon: '✈️', caps: ['rides', 'location', 'pricing'] },
-      restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'location', 'pricing'] },
-      bar:        { label: 'Bar',          icon: '🍸', caps: ['menu', 'orders', 'location', 'pricing'] },
-      club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'location', 'pricing'] }
+      restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
+      bar:        { label: 'Bar',          icon: '🍸', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
+      club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] }
     },
 
     /* Voorbeeldleveranciers (demo-inlogcodes). rate = de dynamische prijs die

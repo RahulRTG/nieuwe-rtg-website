@@ -306,8 +306,8 @@
   const hkVan = r => (r.hk && r.hk.status) || (r.available ? 'schoon' : 'bezet');
   const heeftKamers = () => !!(state && (state.rooms || []).length);
   const heeftOpdrachten = () => !!(state && !(state.rooms || []).length && (state.boekingen || []).length);
-  // het clubdorp: bars, clubs en beachclubs krijgen het afdelingenbord op zak
-  const heeftClubdorp = () => !!(state && !(state.rooms || []).length && state.supplier && ['bar', 'club', 'beachclub'].includes(state.supplier.type));
+  // het eigen dorp op zak: bars, clubs, beachclubs en restaurants krijgen het afdelingenbord
+  const heeftClubdorp = () => !!(state && !(state.rooms || []).length && state.supplier && ['bar', 'club', 'beachclub', 'restaurant'].includes(state.supplier.type));
   let mbOpen = null;          // kamer waarvan de minibar-teller openstaat
   let mbTel = {};             // minibar-aantallen van die kamer
   // het receptiebord op zak: alleen de housekeeping-prioriteit is hier nodig
@@ -420,6 +420,11 @@
       if (w.type === 'knoppen') return kop(w.titel)+'<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+
         (w.knoppen||[]).map(k => '<button class="abtn ghost" data-pkdsnelknop="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div>';
       if (w.type === 'actie') return '<button class="abtn" data-pkdactie="'+esc(w.tekst)+'" style="width:100%;margin-top:0.45rem;">'+esc(w.knop)+'</button>';
+      // de leeftijdscheck aan de deur: ja/nee op codenaam, zonder gegevens
+      if (w.type === 'leeftijd') return kop(w.titel)+
+        '<div style="display:flex;gap:0.35rem;margin-top:0.35rem;"><input id="pkLftIn" placeholder="'+T('pd.lft.ph','Codenaam van de gast')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
+        '<button class="abtn" data-pklft="18">18+?</button><button class="abtn ghost" data-pklft="21">21+?</button></div>'+
+        '<div id="pkLftUit" style="margin-top:0.3rem;font-size:0.78rem;color:var(--soft);">'+esc(w.hint||'')+'</div>';
       if (w.type === 'meter') return kop(w.titel)+'<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+
         (w.opties||[]).map(o => '<button class="abtn'+(w.stand&&w.stand.stand===o?'':' ghost')+'" data-pkdmeter="'+esc(o)+'" style="flex:1;min-width:70px;">'+esc(o)+'</button>').join('')+'</div>';
       return '';
@@ -431,7 +436,8 @@
     const afd = pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0];
     pkDorpKant = afd.key;
     pkLaadTools();
-    return '<div class="card"><div class="k">🏘 '+T('pd.dorp','Afdelingen')+'</div>'+
+    return '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">🏘 '+T('pd.dorp','Afdelingen')+
+      '<button class="abtn ghost" id="pkDorpChat" style="font-size:0.66rem;">💬 '+T('pd.dorp.chat','Teamchat')+'</button></div>'+
       '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.4rem;">'+pkDorp.afdelingen.map(a =>
         '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+a.icon+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
       '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+afd.icon+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
@@ -499,6 +505,24 @@
     wrap.querySelectorAll('[data-pkdactie]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/dorp/post', { afdeling: pkDorpKant, waar: '', tekst: b.dataset.pkdactie, directKlaar: true }); toast(T('dorp.geklokt','Geklokt.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
       catch(e){ toast(e.message); }
+    }));
+    // elke afdeling in een tik bij de teamchat, de collegachat en de teamcall
+    const pdc = wrap.querySelector('#pkDorpChat');
+    if (pdc) pdc.addEventListener('click', () => openTab('team'));
+    // de leeftijdscheck: de paspoort-bevestiging geeft ja/nee, nooit gegevens
+    wrap.querySelectorAll('[data-pklft]').forEach(b => b.addEventListener('click', async () => {
+      const inp = wrap.querySelector('#pkLftIn'), uit = wrap.querySelector('#pkLftUit');
+      const codenaam = (inp && inp.value || '').trim();
+      if (!codenaam){ toast(T('pd.lft.leeg','Vul de codenaam van de gast in.')); return; }
+      const min = Number(b.dataset.pklft);
+      try {
+        const r = await API.call('/supplier/paspoort/vraag', { codenaam, niveau: 'bevestiging', minLeeftijd: min });
+        const ok = r.bevestiging && r.bevestiging.voldoetLeeftijd === true;
+        if (navigator.vibrate) navigator.vibrate(ok ? 80 : [200, 80, 200]);
+        uit.innerHTML = ok
+          ? '<b style="color:var(--green,#7ecb8f);font-size:1rem;">✅ '+esc(codenaam)+' '+T('pd.lft.ja','is')+' '+min+'+</b>'
+          : '<b style="color:#E36385;font-size:1rem;">⛔ '+esc(codenaam)+' '+T('pd.lft.nee','is NIET aantoonbaar')+' '+min+'+</b>';
+      } catch(e){ uit.innerHTML = '<b style="color:#E36385;">'+esc(e.message)+'</b>'; }
     }));
     wrap.querySelectorAll('[data-pkdmeter]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/dorp/drukte', { afdeling: pkDorpKant, stand: b.dataset.pkdmeter }); pkToolsKant = null; pkLaadTools(); } catch(e){ toast(e.message); }
@@ -1187,6 +1211,7 @@
 
   /* ---- entree: programma van vandaag + check-in op eigen naam ---- */
   let pdProgramma = null;
+  let pdVkLaatst = ''; // de laatste deurverkoop (de entreecode blijft leesbaar na verversen)
   // ---- winkelvloer (retail) ----
   let pdRetail = null;      // retail-toestand van het merk (voorraad, paskamer, apart)
   let winkelKlant = null;   // geopend klantdossier op de vloer
@@ -1383,6 +1408,17 @@
       '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
       '<button class="abtn" id="pdCheck">'+T('pd.e.binnen','Binnen')+'</button></div>'+
       '<div id="pdCheckUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);"></div></div>'+
+      // de kassa aan de deur: kaartje verkopen, contant of met RTG Pay, VIP kan
+      (slots.length ? '<div class="card"><div class="k">'+T('pd.e.verkoop','Deurverkoop')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
+      '<select id="pdVkSlot" style="flex:2;min-width:150px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;">'+
+        slots.map((x,i) => '<option value="'+i+'">'+x.tijd+' \u00B7 '+esc(x.naam)+' ('+(x.capaciteit-x.verkocht)+' '+T('pd.e.vrij','vrij')+')</option>').join('')+'</select>'+
+      '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
+      '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
+      '<button class="abtn" data-pdvk="contant" style="flex:1;">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
+      '<button class="abtn" data-pdvk="rtgpay" style="flex:1;">RTG Pay</button></div>'+
+      '<div id="pdVkUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);">'+(pdVkLaatst||'')+'</div></div>' : '')+
       '<div class="card"><div class="k">'+T('pd.e.prog','Programma vandaag')+' \u00B7 '+totBinnen+'/'+totVerkocht+' '+T('pd.e.binnen2','binnen')+'</div>'+
       (slots.length ? slots.map(x =>
         '<div class="task"><span class="ic">'+(x.binnen>=x.verkocht&&x.verkocht?'\u2705':'\uD83C\uDF9F\uFE0F')+'</span><div class="t"><b>'+x.tijd+' \u00B7 '+esc(x.naam)+'</b>'+
@@ -1393,11 +1429,48 @@
       const uit = document.getElementById('pdCheckUit');
       try {
         const r = await API.call('/supplier/ticket/checkin', { code: $('#pdCode').value });
-        uit.innerHTML = '<b style="color:var(--green);">\u2705 '+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>';
+        uit.innerHTML = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>';
         $('#pdCode').value = '';
         laadEntree();
       } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }
     });
+    // de deurverkoop: het kaartje is meteen betaald en de code kan naar binnen
+    wrap.querySelectorAll('[data-pdvk]').forEach(b => b.addEventListener('click', async () => {
+      const uit = document.getElementById('pdVkUit');
+      const slot = slots[parseInt(($('#pdVkSlot')||{}).value, 10) || 0];
+      if (!slot) return;
+      const body = {
+        activiteitId: slot.activiteitId, tijd: slot.tijd,
+        personen: parseInt(($('#pdVkPers')||{}).value, 10) || 1,
+        vip: ($('#pdVkSoort')||{}).value === 'vip',
+        method: b.dataset.pdvk
+      };
+      if (body.method === 'rtgpay'){
+        // tap to pay als het kan, met altijd de uitweg om de code te typen
+        let code = null;
+        if (window.TapPay && TapPay.kan() && window.confirm(T('pd.w.tapkeuze','Tap to pay: de klant tikt zijn toestel hiertegen. Liever de code typen (bijv. als NFC niet werkt)? Kies dan Annuleren.'))){
+          toast('\uD83D\uDCF3 '+T('pd.w.tap','Tap to pay: laat de klant het toestel hiertegen houden...'));
+          code = await TapPay.lees(12000);
+          if (!code) toast(T('pd.w.tapmis','Geen tik ontvangen; typ de code van de klant.'));
+        }
+        if (!code){
+          const c = window.prompt(T('pd.w.paycode','Betaalcode van de klant (uit de app):'));
+          if (!c) return;
+          code = c.trim().toUpperCase();
+        }
+        body.payCode = code;
+        body.idem = 'deur-' + Date.now();
+      }
+      try {
+        const r = await API.call('/supplier/ticket/deurverkoop', body);
+        // de code blijft staan als het programma zich ververst
+        pdVkLaatst = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+' \u00B7 \u20AC '+r.ticket.total+'</b>'+
+          '<div style="margin-top:0.35rem;font-size:1.3rem;letter-spacing:0.22em;font-weight:700;color:var(--gold);">'+esc(r.ticket.code)+'</div>'+
+          '<div style="font-size:0.72rem;color:var(--soft);">'+T('pd.e.geefcode','Geef deze entreecode aan de gast.')+'</div>';
+        uit.innerHTML = pdVkLaatst;
+        laadEntree();
+      } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }
+    }));
   }
 
   // ---- vaart (charter): de schipper handelt de charters van vandaag af ----

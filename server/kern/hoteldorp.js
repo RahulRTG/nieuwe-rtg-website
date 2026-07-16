@@ -39,20 +39,33 @@ const AFDELINGEN = {
   vloer: { label: 'Vloer & runners', icon: '🧹', waar: 'Plek', wat: 'Melding, bijv. glaswerk bij de dansvloer ophalen', keten: ['gemeld', 'bezig', 'klaar'] },
   promo: { label: 'Promo & marketing', icon: '📣', waar: 'Kanaal of avond', wat: 'Actie, bijv. story met de line-up van vrijdag', keten: ['idee', 'gepland', 'live', 'afgerond'] },
   inkoop: { label: 'Inkoop & voorraad', icon: '📦', waar: 'Leverancier of product', wat: 'Bestelling, bijv. tien kratten cava bijbestellen', keten: ['besteld', 'onderweg', 'binnen'] },
-  kantoor: { label: 'Kantoor & administratie', icon: '🗂️', waar: 'Map of onderwerp', wat: 'Taak, bijv. facturen van het weekend inboeken', keten: ['open', 'bezig', 'afgehandeld'] }
+  kantoor: { label: 'Kantoor & administratie', icon: '🗂️', waar: 'Map of onderwerp', wat: 'Taak, bijv. facturen van het weekend inboeken', keten: ['open', 'bezig', 'afgehandeld'] },
+  // het restaurantdorp: van het boek tot de pas
+  host: { label: 'Host & reserveringen', icon: '📖', waar: 'Tijd en gezelschap', wat: 'Reservering of ontvangst, bijv. 20:00, vier personen, raamtafel', keten: ['gereserveerd', 'ontvangen', 'aan tafel'] },
+  bediening: { label: 'Bediening', icon: '🤵', waar: 'Tafel', wat: 'Wens of signaal, bijv. tafel 4 vraagt de kaart nog een keer', keten: ['gevraagd', 'bezig', 'geserveerd'] },
+  keuken: { label: 'Keuken', icon: '🔪', waar: 'Sectie of gerecht', wat: 'Doorgifte, bijv. 86 op de zeebaars, mise en place bijna op', keten: ['gemeld', 'bezig', 'klaar'] },
+  // en het strand van de beachclub
+  ligbedden: { label: 'Ligbedden & strand', icon: '🏖️', waar: 'Rij en bed, bijv. eerste rij 4', wat: 'Reservering of wens, bijv. twee bedden, champagne-emmer om 15:00', keten: ['gereserveerd', 'bezet', 'vrijgegeven'] }
 };
 
 /* Welke afdelingen een zaak ziet: kamers geven het hoteldorp, een nachtzaak
-   het clubdorp. Security, klussen, IT, sales en events zitten in allebei:
-   dat werk is overal hetzelfde. */
+   het clubdorp, een restaurant het restaurantdorp en een beachclub het
+   restaurantdorp plus het strand. Security, klussen, IT, sales en events
+   zitten overal in: dat werk is overal hetzelfde. */
 const HOTEL_SET = ['frontoffice', 'guest', 'relations', 'concierge', 'parking', 'security', 'gym', 'spa', 'amenities', 'patissier', 'klussen', 'it', 'sales', 'events', 'florist', 'kidsclub', 'watersport'];
 const CLUB_SET = ['entree', 'garderobe', 'bar', 'vip', 'dj', 'techniek', 'vloer', 'promo', 'security', 'klussen', 'it', 'sales', 'events', 'inkoop', 'kantoor'];
-const CLUB_TYPES = ['bar', 'club', 'beachclub'];
+const RESTO_SET = ['host', 'bediening', 'keuken', 'bar', 'vloer', 'promo', 'inkoop', 'kantoor', 'security', 'klussen', 'it', 'sales', 'events'];
+const BEACH_SET = [...RESTO_SET, 'ligbedden', 'watersport'];
+const CLUB_TYPES = ['bar', 'club'];
 
 module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, haversine }) => {
   const nu = () => new Date().toISOString();
   const posten = s => (s.hotelPosten = Array.isArray(s.hotelPosten) ? s.hotelPosten : []);
-  const dorpSet = s => Array.isArray(s.rooms) ? HOTEL_SET : (CLUB_TYPES.includes(s.type) ? CLUB_SET : null);
+  const dorpSet = s => Array.isArray(s.rooms) ? HOTEL_SET
+    : CLUB_TYPES.includes(s.type) ? CLUB_SET
+    : s.type === 'restaurant' ? RESTO_SET
+    : s.type === 'beachclub' ? BEACH_SET
+    : null;
   const dorpKan = s => !!dorpSet(s);
 
   function dorpPost(s, afdelingIn, waar, tekst, wie, directKlaar) {
@@ -170,7 +183,11 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     vloer: ['Glaswerk ophalen', 'Dweilen bij de bar', 'Toiletten checken', 'Asbakken legen', 'Terras vegen'],
     promo: ['Story met de line-up', 'Post voor vanavond', 'Gastenlijst-actie', 'Flyer-team sturen', 'Fotograaf boeken'],
     inkoop: ['Drank bijbestellen', 'IJs bestellen', 'Rietjes en bekers', 'Schoonmaakmiddel', 'Leverancier bellen'],
-    kantoor: ['Facturen inboeken', 'Rooster rondsturen', 'Kas opmaken', 'Vergunning checken', 'Post verwerken']
+    kantoor: ['Facturen inboeken', 'Rooster rondsturen', 'Kas opmaken', 'Vergunning checken', 'Post verwerken'],
+    host: ['Tafel voor twee', 'Groep aangemeld', 'Op de wachtlijst', 'Kinderstoel klaarzetten', 'Taxi voor een gast'],
+    bediening: ['Extra couvert', 'Wijnadvies gevraagd', 'Allergie doorgeven', 'Kaarsje bij het dessert', 'Rekening gevraagd'],
+    keuken: ['86 doorgeven', 'Mise en place bijna op', 'Spoedbon', 'Speciale wens', 'Pas op: allergie'],
+    ligbedden: ['Bed reserveren', 'Handdoeken brengen', 'Parasol bijzetten', 'IJsemmer brengen', 'Bed ombouwen voor de avond']
   };
   const LOGACTIES = {
     frontoffice: 'Overdracht gedaan', guest: 'Voorkeuren bijgewerkt', relations: 'Belrondje gedaan',
@@ -182,7 +199,9 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     entree: 'Rij geteld', garderobe: 'Rekken geteld', bar: 'Bar gespoeld',
     vip: 'Tafels gecheckt', dj: 'Set gewisseld', techniek: 'Rondje techniek gelopen',
     vloer: 'Rondje vloer gelopen', promo: 'Bereik gecheckt', inkoop: 'Voorraad geteld',
-    kantoor: 'Administratie bijgewerkt'
+    kantoor: 'Administratie bijgewerkt',
+    host: 'Boek doorgenomen', bediening: 'Ronde langs de tafels', keuken: 'Doorgifte gecheckt',
+    ligbedden: 'Rijen geteld'
   };
   const METERS = {
     standaard: { titel: 'Drukte', opties: ['rustig', 'normaal', 'druk'] },
@@ -198,7 +217,10 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     dj: { titel: 'De vloer', opties: ['warmt op', 'goed vol', 'piek'] },
     techniek: { titel: 'Systemen', opties: ['alles draait', 'storing', 'onderhoud'] },
     inkoop: { titel: 'Voorraad', opties: ['gevuld', 'aanvullen', 'op'] },
-    promo: { titel: 'Campagne', opties: ['stil', 'loopt', 'piek'] }
+    promo: { titel: 'Campagne', opties: ['stil', 'loopt', 'piek'] },
+    host: { titel: 'Bezetting', opties: ['rustig', 'goed bezet', 'vol'] },
+    keuken: { titel: 'De pas', opties: ['rustig', 'loopt', 'vol'] },
+    ligbedden: { titel: 'Het strand', opties: ['rustig', 'goed bezet', 'vol'] }
   };
 
   function dorpTools(s, key) {
@@ -328,6 +350,11 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     if (key === 'vloer') {
       tools.push({ type: 'lijst', titel: 'Meldingen op de vloer', leeg: 'De vloer ligt er netjes bij.',
         rijen: open.map(p => ({ icoon: String.fromCodePoint(0x1F9F9), tekst: (p.waar ? p.waar + ' - ' : '') + p.tekst, rechts: minuten(p.at) + ' min', rood: minuten(p.at) > 20 })) });
+      // de bijvullijst van de runners: alles wat de bar open heeft staan
+      const barEind = AFDELINGEN.bar.keten[AFDELINGEN.bar.keten.length - 1];
+      const bijvul = posten(s).filter(p => p.afdeling === 'bar' && p.status !== barEind);
+      tools.push({ type: 'lijst', titel: 'Bijvullen voor de bar', leeg: 'De bar vraagt niets; loop je ronde.',
+        rijen: bijvul.map(p => ({ icoon: String.fromCodePoint(0x1F4E6), tekst: (p.waar ? p.waar + ' - ' : '') + p.tekst, rechts: minuten(p.at) + ' min', rood: minuten(p.at) > 30 })) });
     }
     if (key === 'promo') {
       tools.push({ type: 'cijfers', titel: 'Campagnebord', items: afd.keten.map(fase => ({ label: fase, waarde: alle.filter(p => p.status === fase).length })) });
@@ -339,6 +366,33 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     if (key === 'kantoor') {
       tools.push({ type: 'lijst', titel: 'Ligt op het bureau', leeg: 'Het bureau is leeg.',
         rijen: open.slice().sort((a, b) => a.at.localeCompare(b.at)).map(p => ({ icoon: String.fromCodePoint(0x1F5C2), tekst: (p.waar ? p.waar + ' - ' : '') + p.tekst, rechts: minuten(p.at) >= 1440 ? Math.round(minuten(p.at) / 1440) + ' dagen' : minuten(p.at) >= 60 ? Math.round(minuten(p.at) / 60) + ' uur' : minuten(p.at) + ' min', rood: minuten(p.at) >= 1440 })) });
+    }
+    // de borden van het restaurantdorp en het strand
+    if (key === 'host') {
+      tools.push({ type: 'lijst', titel: 'Het boek van vandaag', leeg: 'Nog geen reserveringen op het bord.',
+        rijen: open.slice().sort((a, b) => (a.waar || '').localeCompare(b.waar || '')).map(p => ({ icoon: String.fromCodePoint(0x1F4D6), tekst: (p.waar ? p.waar + ' - ' : '') + p.tekst, rechts: p.status })) });
+    }
+    if (key === 'bediening') {
+      tools.push({ type: 'lijst', titel: 'Tafels die iets vragen', leeg: 'Alle tafels zijn geholpen.',
+        rijen: open.map(p => ({ icoon: String.fromCodePoint(0x1F937), tekst: (p.waar ? p.waar + ' - ' : '') + p.tekst, rechts: minuten(p.at) + ' min', rood: minuten(p.at) > 10 })) });
+    }
+    if (key === 'keuken') {
+      tools.push({ type: 'lijst', titel: 'Doorgiftes en 86', leeg: 'De pas is stil.',
+        rijen: open.map(p => ({ icoon: String.fromCodePoint(0x1F52A), tekst: (p.waar ? p.waar + ' - ' : '') + p.tekst, rechts: minuten(p.at) + ' min', rood: /86|allergie/i.test(p.tekst) })) });
+    }
+    if (key === 'ligbedden') {
+      tools.push({ type: 'cijfers', titel: 'Strandstaat', items: [
+        { label: 'gereserveerd', waarde: alle.filter(p => p.status === 'gereserveerd').length },
+        { label: 'bezet', waarde: alle.filter(p => p.status === 'bezet').length },
+        { label: 'vrijgegeven vandaag', waarde: alle.filter(p => p.status === eind && opDag(p.updatedAt)).length }
+      ] });
+      tools.push({ type: 'lijst', titel: 'Nu op het strand', leeg: 'De bedden zijn vrij.',
+        rijen: alle.filter(p => p.status === 'bezet').slice(0, 12).map(p => ({ icoon: String.fromCodePoint(0x1F3D6), tekst: (p.waar ? p.waar + ' - ' : '') + p.tekst, rechts: minuten(p.updatedAt) >= 60 ? Math.round(minuten(p.updatedAt) / 60) + ' uur' : minuten(p.updatedAt) + ' min' })) });
+    }
+    // security checkt leeftijden aan de deur: ja/nee op codenaam, zonder
+    // gegevens (de paspoort-bevestiging doet het echte werk en logt alles)
+    if (key === 'security' || key === 'entree') {
+      tools.push({ type: 'leeftijd', titel: 'Leeftijdscheck', hint: 'Codenaam van de gast; het lid krijgt automatisch een melding van de check.' });
     }
 
     // 3. de bewaking: wat langer dan vier uur open staat, kleurt rood

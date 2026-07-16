@@ -161,7 +161,7 @@
     el.innerHTML =
       '<div class="live-start" style="margin-bottom:0.8rem;">' +
         '<div class="lh">🤵 ' + T('fl.h','Wat uw Butler weet en ziet') + '</div>' +
-        '<div class="ld">' + T('fl.d','Hij onthoudt wat u vertelt ("onthoud dat..."), leert van wat u gebruikt en regelt alles in de chat hieronder: zoeken, reserveren, uw 24 uur, een Tik of betaalverzoek. Alles is opvraagbaar en wisbaar; geld gaat nooit zonder uw "ja" de deur uit.') + '</div>' +
+        '<div class="ld">' + T('fl.d','Hij onthoudt wat u vertelt ("onthoud dat..."), leert van wat u gebruikt en regelt alles in de chat hieronder: zoeken, reserveren, bestellen en afrekenen, uw 24 uur, een Tik of betaalverzoek. Vraag "wat kun je" voor het hele overzicht; geld gaat nooit zonder uw "ja" de deur uit.') + '</div>' +
         ((prof.seintjes || []).length
           ? '<div style="margin-top:0.55rem;border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;">' +
               '<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">' + T('fl.sein','Uw Butler ziet') + '</div>' +

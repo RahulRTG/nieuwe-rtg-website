@@ -159,6 +159,32 @@ test('betaalverzoeken: de Butler maakt ze, toont ze en betaalt ze pas na "ja"', 
   assert.ok(/geen betaalverzoeken/i.test(leeg.body.antwoord));
 });
 
+test('de Butler bestelt en rekent af: voorstel, "ja", ophaalcode en een echte order', async () => {
+  const r = await api('fluister', { q: 'bestel 2 sangria en 1 bravas bij Sunset Ibiza' }, lid);
+  assert.equal(r.status, 200);
+  assert.ok(r.body.voorstel && !r.body.gedaan, 'bestellen is geld: eerst een voorstel');
+  assert.ok(/2x Sangria blanca/.test(r.body.antwoord) && /1x Patatas bravas/.test(r.body.antwoord));
+  assert.ok(/38,00/.test(r.body.antwoord), 'het totaal staat er eerlijk bij');
+  const ja = await api('fluister', { q: 'ja' }, lid);
+  assert.ok(ja.body.gedaan, 'besteld en betaald');
+  assert.ok(/ophaalcode/i.test(ja.body.antwoord));
+  const mijn = (await api('orders/mine', {}, lid)).body.orders || [];
+  const o = mijn.find(x => x.supplierCode === 'PONTO' && x.paid);
+  assert.ok(o, 'de bestelling staat echt in het systeem en is betaald');
+  assert.equal(o.items.reduce((a, i) => a + i.qty, 0), 3);
+  assert.equal(o.total, 38);
+  // en een onbekende zaak of lege kaartmatch blijft een nette vraag terug
+  const mis = await api('fluister', { q: 'bestel kaviaar bij Sunset Ibiza' }, lid);
+  assert.ok(!mis.body.voorstel && /op de kaart/i.test(mis.body.antwoord));
+});
+
+test('"wat kun je": de Butler somt eerlijk zijn hele kunnen op', async () => {
+  const r = await api('fluister', { q: 'wat kun je allemaal?' }, lid);
+  assert.ok(r.body.pakte);
+  for (const stuk of ['zoeken', 'reserveren', 'bestel', '24-uursblok', 'Tik', 'betaalverzoek'])
+    assert.ok(r.body.antwoord.includes(stuk), 'het overzicht noemt: ' + stuk);
+});
+
 test('de zaak-AI heeft hetzelfde geheugen gekregen: onthouden, opvragen, wissen', async () => {
   const r = await api('supplier/ai', { q: 'onthoud dat de fustwissel op dinsdag is' }, pda);
   assert.equal(r.status, 200);

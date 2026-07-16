@@ -34,7 +34,7 @@
    object (het 24-uursblok) wordt eerst een voorstel dat u bevestigt met
    "ja" (of afblaast met "nee"). Een tafelreservering blijft direct:
    gratis en altijd annuleerbaar. */
-module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGebruik, zorgVoor, pay }) => {
+module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGebruik, zorgVoor, pay, kernRef }) => {
   const nu = () => new Date().toISOString();
   // hetzelfde brein, een passend gezicht: De Butler voor leden, "uw
   // assistent" voor personeel en zaken
@@ -196,7 +196,16 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
 
   /* Een bevestigd voorstel echt uitvoeren; het antwoord zegt eerlijk wat er
      is gebeurd, ook als het alsnog misgaat. */
-  async function voerUit(key, codenaam, w) {
+  async function voerUit(key, codenaam, w, sess) {
+    // bestellen: plaatsen en direct afrekenen via exact dezelfde functies
+    // als de app-knoppen (ledenprijs, 86, leeftijd, zorgprofiel incluis)
+    if (w.soort === 'bestelling' && sess && kernRef && kernRef.plaatsOrderVoor) {
+      const r = kernRef.plaatsOrderVoor(sess, { supplierCode: w.supplierCode, items: w.items });
+      if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
+      const b = kernRef.betaalOrderVoor(sess, { ref: r.order.ref });
+      if (b.error) return { tekst: 'De bestelling staat klaar (' + r.order.ref + '), maar het afrekenen lukte niet: ' + b.error + ' Rond hem af in de Bestellen-tab.', gedaan: true };
+      return { tekst: 'Besteld en betaald bij ' + r.order.supplierName + ': ' + w.oms + ', samen ' + eur(b.order.total * 100) + '. Uw ophaalcode is ' + r.order.pickup + '; de zaak gaat er direct mee aan de slag.', gedaan: true };
+    }
     if (w.soort === 'blok' && assetGebruik) {
       const r = assetGebruik({ key }, w.assetId, w.datum);
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
@@ -257,6 +266,12 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
       regels.push('Wissen kan per weetje of in een keer ("vergeet alles").');
       return { ok: true, antwoord: regels.join(' '), pakte: true };
     }
+    // "wat kun je": een eerlijk overzicht van alles wat hij kan
+    if (/\bwat (kun|kan) (je|jij|u)\b/i.test(q) || /^help[!?.]?$/i.test(q)) {
+      const basis = 'Ik onthoud wat u vertelt ("onthoud dat..."), vertel precies wat ik weet ("wat weet je over mij"), wis alles op verzoek en geef seintjes bij alles wat nadert.';
+      if (!sess) return { ok: true, antwoord: basis + ' Vraag me gerust naar de actuele stand van uw dienst.', pakte: true };
+      return { ok: true, antwoord: basis + ' En ik regel het ook: zoeken door het hele aanbod ("zoek sushi"), een tafel reserveren, bestellen en afrekenen ("bestel 2 sangria bij Sunset Ibiza"), uw 24-uursblok plannen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw "ja".', pakte: true };
+    }
     /* ---- doen: Fluister voert het ook echt uit, alleen voor het lid zelf
        (sess reist alleen mee op de leden-route, nooit voor personeel).
        Boven de drempel (geld, of een claim op een gedeeld object) eerst
@@ -268,7 +283,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
         if (!wachtVers) return klaar('Er staat niets open om te bevestigen. Zeg gerust wat ik moet regelen.');
         const w = p.wacht;
         p.wacht = null;
-        const r = await voerUit(key, codenaam, w);
+        const r = await voerUit(key, codenaam, w, sess);
         return klaar(r.tekst, r.gedaan);
       }
       // "nee": het voorstel gaat van tafel
@@ -277,6 +292,31 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
         p.wacht = null;
         save();
         return klaar('Goed, het gaat niet door. Het voorstel is van tafel.');
+      }
+      // "bestel 2 sangria en 1 bravas bij Sunset Ibiza": eten en drinken
+      // wordt direct afgerekend via RTG Pay, dus boven de drempel
+      if (kernRef && kernRef.plaatsOrderVoor && /^bestel\b/i.test(q)) {
+        if (sess.tier === 'guest') return klaar('Bestellen via mij kan alleen met een lidmaatschap; als gast kan het via de Bestellen-tab.');
+        const naam = (q.match(/\bbij\s+(.+?)[.?!]?\s*$/i) || [])[1];
+        const s = naam && (db.data.suppliers || []).find(x => (x.name || '').toLowerCase().includes(naam.toLowerCase().trim()));
+        if (!s) return klaar('Bij welke zaak? Zeg bijvoorbeeld: "bestel 2 sangria bij Sunset Ibiza".');
+        // alleen het stuk voor "bij ..." telt als boodschappenlijst, anders
+        // matcht de zaaknaam zelf per ongeluk een gerecht (Hierbas Sunset)
+        const ql = q.toLowerCase().replace(/\bbij\s+.*$/, '');
+        const items = [];
+        for (const m of (s.menu || [])) {
+          if (m.uitverkocht) continue;
+          const w = (m.name || '').toLowerCase().split(/[^a-z0-9]+/).find(x => x.length > 3 && ql.includes(x));
+          if (!w) continue;
+          const qty = parseInt((ql.match(new RegExp('(\\d{1,2})\\s+(?:[a-z]+\\s+){0,2}?' + w)) || [])[1], 10) || 1;
+          items.push({ id: m.id, qty, naam: m.name, prijs: Number(m.price) || 0 });
+        }
+        if (!items.length) return klaar('Wat mag het zijn bij ' + s.name + '? Op de kaart staat onder meer: ' + (s.menu || []).slice(0, 5).map(m => m.name).join(', ') + '.');
+        const oms = items.map(i => i.qty + 'x ' + i.naam).join(', ');
+        const totaal = items.reduce((a, i) => a + i.prijs * i.qty, 0);
+        p.wacht = { soort: 'bestelling', supplierCode: s.code, items: items.map(i => ({ id: i.id, qty: i.qty })), oms, at: nu() };
+        save();
+        return klaar('Even checken: ' + oms + ' bij ' + s.name + ', samen ongeveer ' + eur(Math.round(totaal * 100)) + '. Ik plaats de bestelling en reken hem direct af via RTG Pay. Zeg "ja" en het staat in gang; "nee" en het gaat niet door.', false, true);
       }
       // "zet/plan/boek mijn 24 uur op 3 augustus (bij Villa ...)":
       // claimt een dag van het gedeelde object, dus eerst een voorstel

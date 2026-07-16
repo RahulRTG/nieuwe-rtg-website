@@ -27,10 +27,11 @@ module.exports = (kern) => {
      koopt, laat bezorgen of gaat de partner volgen) openen we automatisch een
      open chatlijn. Zo zijn ze nooit vreemden en kunnen ze vooraf elkaars Salon
      bekijken. Idempotent en stil voor gasten (die hebben geen ledenchat). */
-  const openLijn = (s, req) => {
-    if (!s || req.session.tier === 'guest') return;
-    try { zorgContact(s, req.session.key, liveCodename(req.session), req.session.tier); } catch (e) {}
+  const openLijnVoor = (s, session) => {
+    if (!s || session.tier === 'guest') return;
+    try { zorgContact(s, session.key, liveCodename(session), session.tier); } catch (e) {}
   };
+  const openLijn = (s, req) => openLijnVoor(s, req.session);
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
 
@@ -1009,32 +1010,35 @@ app.post('/api/suppliers', auth, (req, res) => {
   res.json({ suppliers: list, city: db.data.trip.dest });
 });
 
-app.post('/api/order', auth, (req, res) => {
+/* Bestellen en betalen als functies: dezelfde regels (ledenprijs, 86,
+   leeftijd/alcohol, zorgprofiel, betaalmoment) voor de app-knoppen en voor
+   De Butler ("bestel 2 sangria bij Sunset Ibiza"). */
+function plaatsOrderVoor(session, body) {
   // betalen bij partners mag ook zonder pas (gratis gebruiker)
-  const s = findSupplier(req.body.supplierCode);
-  if (!s) return res.status(404).json({ error: 'Leverancier niet gevonden.' });
-  if (s.settings && s.settings.ordersOpen === false) return res.status(409).json({ error: s.name + ' neemt op dit moment geen bestellingen aan.' });
-  const wanted = Array.isArray(req.body.items) ? req.body.items : [];
+  const s = findSupplier(body.supplierCode);
+  if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
+  if (s.settings && s.settings.ordersOpen === false) return { status: 409, error: s.name + ' neemt op dit moment geen bestellingen aan.' };
+  const wanted = Array.isArray(body.items) ? body.items : [];
   const items = [];
   let total = 0;
   for (const w of wanted) {
     const m = (s.menu || []).find(x => x.id === w.id);
     const qty = Math.min(20, Math.max(1, parseInt(w.qty, 10) || 1));
     // 86 van het keukenscherm: een uitverkocht gerecht is per direct niet te bestellen
-    if (m && m.uitverkocht) return res.status(409).json({ error: m.name + ' is helaas uitverkocht (86 gemeld door de keuken).' });
+    if (m && m.uitverkocht) return { status: 409, error: m.name + ' is helaas uitverkocht (86 gemeld door de keuken).' };
     // ledenprijsgarantie: reken nooit meer dan de publieke prijs, ook al zou
     // de menuprijs door een fout hoger staan (extra vangnet na het opslaan)
     if (m) { const unit = ledenPrijs(m.publiekePrijs, m.price); items.push({ id: m.id, name: m.name, qty, price: unit }); total += unit * qty; }
   }
-  if (!items.length) return res.status(400).json({ error: 'Geen geldige gerechten gekozen.' });
-  const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+  if (!items.length) return { status: 400, error: 'Geen geldige gerechten gekozen.' };
+  const codename = session.account ? session.account.codename : PERSONAS[session.tier].codename;
   // leeftijd uit het paspoort: alcohol (bar-items) alleen boven de grens van
   // het land van de zaak; de partner ziet enkel dat de leeftijd geverifieerd is
-  const lft = leeftijdVan(geborenVan(req.session));
+  const lft = leeftijdVan(geborenVan(session));
   const metAlcohol = items.some(it => { const m = (s.menu || []).find(x => x.id === it.id); return m && m.station === 'bar'; });
   if (metAlcohol && lft != null) {
     const a = alcoholGrensVan(s);
-    if (lft < a.grens) return res.status(403).json({ error: 'Alcohol is in ' + a.land + ' vanaf ' + a.grens + ' jaar; je leeftijd is via je paspoort geverifieerd. Kies iets zonder alcohol.' });
+    if (lft < a.grens) return { status: 403, error: 'Alcohol is in ' + a.land + ' vanaf ' + a.grens + ' jaar; je leeftijd is via je paspoort geverifieerd. Kies iets zonder alcohol.' };
   }
   // de zaak kiest het betaalmoment: vooraf (standaard, pas zichtbaar na
   // afrekenen) of achteraf (direct zichtbaar, betalen via de app volgt);
@@ -1044,43 +1048,43 @@ app.post('/api/order', auth, (req, res) => {
     ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     pickup: pickupCode(),
     supplierCode: s.code, supplierName: s.name, type: s.type,
-    customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
+    customerTier: session.tier, customerKey: session.key, customerCodename: codename,
     items, total,
-    table: schoon(req.body.table, 24),
-    allergyNote: schoon(req.body.allergyNote, 200),
+    table: schoon(body.table, 24),
+    allergyNote: schoon(body.allergyNote, 200),
     // het zorgprofiel reist automatisch mee naar de keuken (alleen met toestemming)
-    zorg: zorgVoor(req.session.key),
-    tagSalon: !!req.body.tagSalon,
+    zorg: zorgVoor(session.key),
+    tagSalon: !!body.tagSalon,
     betaalMoment: vooraf ? 'vooraf' : 'achteraf',
     leeftijdOk: metAlcohol && lft != null ? true : undefined,
     status: vooraf ? 'wacht-op-betaling' : 'nieuw', paid: false, at: new Date().toISOString()
   };
   db.data.orders.unshift(order);
-  openLijn(s, req);
+  openLijnVoor(s, session);
   save();
   if (!vooraf) {
     notifySupplier(s.code, { icon: '\u{1F6CE}️', title: 'Nieuwe bestelling (betaling achteraf)', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }
-  res.json({ ok: true, order });
-});
+  return { ok: true, order };
+}
 
-app.post('/api/order/pay', auth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && (x.customerKey || x.customerTier) === req.session.key);
-  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
-  if (o.paid) return res.status(409).json({ error: 'Al betaald.' });
+function betaalOrderVoor(session, body) {
+  const o = db.data.orders.find(x => x.ref === body.ref && (x.customerKey || x.customerTier) === session.key);
+  if (!o) return { status: 404, error: 'Bestelling niet gevonden.' };
+  if (o.paid) return { status: 409, error: 'Al betaald.' };
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
-  if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return res.status(410).json({ error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' });
+  if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return { status: 410, error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' };
   // fooi (gaat naar het team), punten-tegoed (RTG legt bij) en spaarpunten
-  const fooi = fooiUit(req.body, o.total);
+  const fooi = fooiUit(body, o.total);
   if (fooi) o.fooi = fooi;
-  const korting = pasTegoedToe(req.session.key, o.total);
+  const korting = pasTegoedToe(session.key, o.total);
   if (korting) o.puntenKorting = korting;
   o.paid = true;
   o.paidAt = new Date().toISOString();
   if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
-  verdienPunten(req.session.key, o.total - korting, o.supplierName);
+  verdienPunten(session.key, o.total - korting, o.supplierName);
   save();
   // betaald = definitief: het keukenbrein boekt de ingredienten af via de recepten
   try { kern.keuken.boekVerkoopAf(findSupplier(o.supplierCode), o.items || [], 'bestelling ' + o.ref); } catch (e) {}
@@ -1088,7 +1092,22 @@ app.post('/api/order/pay', auth, (req, res) => {
   notifySupplier(o.supplierCode, { icon: '\u{1F6CE}\uFE0F', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
   sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, order: o });
+  return { ok: true, order: o };
+}
+
+
+// De Butler bestelt via exact dezelfde functies als de app-knoppen
+Object.assign(kern, { plaatsOrderVoor, betaalOrderVoor });
+
+app.post('/api/order', auth, (req, res) => {
+  const r = plaatsOrderVoor(req.session, req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/order/pay', auth, (req, res) => {
+  const r = betaalOrderVoor(req.session, req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
 });
 
 app.post('/api/orders/mine', auth, (req, res) => {

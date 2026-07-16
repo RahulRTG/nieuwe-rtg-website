@@ -77,6 +77,18 @@
   .voorstel:last-child{border-bottom:0;}
   .voorstel .kamerlabel{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);white-space:nowrap;padding-top:.15rem;}
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;}
+  /* de wereld: bolletjes */
+  .wkaart{width:100%;border-radius:12px;background:#0a0f14;border:1px solid var(--line);display:block;}
+  .bol{display:inline-block;width:.72rem;height:.72rem;border-radius:50%;flex-shrink:0;}
+  .bol.groen{background:var(--green);box-shadow:0 0 7px var(--green);}
+  .bol.oranje{background:var(--amber);box-shadow:0 0 7px var(--amber);}
+  .bol.rood{background:var(--burgundy);box-shadow:0 0 7px var(--burgundy);}
+  .witem{display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.88rem;flex-wrap:wrap;}
+  .witem:last-child{border-bottom:0;}
+  .witem .wnm{min-width:11rem;font-weight:600;}
+  .witem .wdt{flex:1;color:var(--muted);font-size:.8rem;min-width:9rem;}
+  .wlegenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin:.5rem 0 .2rem;align-items:center;}
+  .wlegenda span{display:flex;gap:.35rem;align-items:center;}
 </style>
 </head>
 <body>
@@ -119,6 +131,7 @@
       <button class="knop stil" data-tab="stats" style="padding:.35rem 1rem;font-size:.8rem;">📊 Platform-statistieken</button>
       <button class="knop stil" data-tab="chat" style="padding:.35rem 1rem;font-size:.8rem;">💬 Chat & snap</button>
       <button class="knop stil" data-tab="onboarding" style="padding:.35rem 1rem;font-size:.8rem;">🤝 Onboarding</button>
+      <button class="knop stil" data-tab="wereld" id="kTabWereld" style="padding:.35rem 1rem;font-size:.8rem;" hidden>🌍 De wereld</button>
     </div>
     <div id="tabOverzicht">
     <div class="kpis" id="kKpis"></div>
@@ -135,6 +148,7 @@
     <div id="tabStats" hidden><div class="kpis" id="kStats"></div></div>
     <div id="tabChat" hidden></div>
     <div id="tabOnboarding" hidden></div>
+    <div id="tabWereld" hidden></div>
   </section>
 
   <!-- de paniekkamer -->
@@ -144,6 +158,8 @@
       <h1>🚨 De Paniekkamer</h1>
     </div>
     <p class="deck">Dezelfde knoppen als de boardroom, met het vier-ogen-principe: zet je hier een knop om, dan gaat er een voorstel naar de boardroom. Die accepteert, wijst af, of praat er eerst over. Zo kan niemand in paniek in zijn eentje het platform omgooien.</p>
+    <h3 class="sec">De wereld (groen = oke, oranje = uit, rood = storing)</h3>
+    <div id="pWereld"></div>
     <h3 class="sec">Paniekkamer-chat</h3>
     <div id="pChat"></div>
     <h3 class="sec">Jouw voorstellen</h3>
@@ -160,8 +176,13 @@
     </div>
     <p class="deck">Alles van elke afdeling in een oogopslag, het volledige schakelbord van het platform, en de verbeterkamer die elke dag de cijfers naloopt. Instellingen schakelt de boardroom zelf; codeverbeteringen gaan als voorstel naar de ontwikkelstraat.</p>
 
+    <h3 class="sec">De wereld (groen = oke, oranje = uit, rood = storing)</h3>
+    <div id="bWereld"></div>
+
     <h3 class="sec">Platform-statistieken (het hele huis)</h3>
     <div class="kpis" id="bStats"></div>
+    <h3 class="sec">Het logboek (wie deed wat)</h3>
+    <div class="kaart lijst" id="bAudit"><div class="leeg">Nog geen handelingen gelogd.</div></div>
     <h3 class="sec">Boardroom-chat</h3>
     <div id="bChat"></div>
 
@@ -227,6 +248,7 @@ async function openKamer(id){
   toon('vKamer');
   $('#kNaam').textContent = d.emoji + ' ' + d.naam;
   $('#kMissie').textContent = d.missie;
+  $('#kTabWereld').hidden = (id !== 'intern'); // de wereld hoort bij Intern & IT (en board- en paniekkamer)
   kamerTab('overzicht');
   $('#kKpis').innerHTML = d.kpis.map(k => '<div class="kaart kpi-tegel"><b>'+esc(String(k.waarde))+'</b><span>'+esc(k.label)+'</span></div>').join('');
   $('#kLijsten').innerHTML = d.lijsten.map(l =>
@@ -310,11 +332,89 @@ function onboardingHtml(o){
     blok('De knoppen die jij gaat gebruiken', o.knoppen)+
     blok('De vaste handelingen', o.handelingen);
 }
+/* ---------- de wereld: bolletjes op de kaart ----------
+   Groen = oke, oranje = uit, rood = storing. Bij een probleem staan er
+   knoppen: Reset (de doos haalt de opdracht op bij zijn volgende melding)
+   en Help (het ding stuurt direct een diagnoserapport). */
+const CONTINENTEN = [
+  [[-168,66],[-140,70],[-120,69],[-95,72],[-80,73],[-70,62],[-55,52],[-65,45],[-75,40],[-80,32],[-82,25],[-97,26],[-105,22],[-97,16],[-83,9],[-90,14],[-104,20],[-114,30],[-124,40],[-130,55],[-155,58]],
+  [[-45,60],[-20,70],[-30,83],[-60,82],[-55,70]],
+  [[-80,9],[-75,11],[-60,5],[-50,0],[-35,-8],[-40,-22],[-58,-35],[-65,-42],[-70,-54],[-72,-45],[-70,-18],[-77,-5]],
+  [[-10,36],[0,38],[10,38],[20,35],[28,36],[40,45],[50,50],[60,60],[40,70],[25,71],[10,60],[-5,48],[-10,43]],
+  [[-17,15],[-5,5],[8,4],[10,-5],[14,-20],[20,-35],[30,-30],[40,-15],[50,-10],[51,10],[43,12],[35,30],[20,32],[0,35],[-10,30],[-17,21]],
+  [[40,45],[50,40],[60,25],[70,20],[78,8],[80,15],[90,22],[100,10],[105,0],[110,5],[105,20],[110,25],[122,30],[122,40],[135,45],[142,55],[160,60],[170,66],[180,68],[180,72],[100,78],[70,73],[60,70],[60,60],[50,50]],
+  [[114,-22],[122,-18],[135,-12],[142,-11],[145,-15],[152,-25],[150,-35],[140,-38],[130,-32],[115,-34],[113,-26]]
+];
+function inLand(lon, lat){
+  for (const poly of CONTINENTEN){
+    let binnen = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++){
+      const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+      if (((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi)) binnen = !binnen;
+    }
+    if (binnen) return true;
+  }
+  return false;
+}
+function tekenWereldKaart(canvas, items){
+  const b = canvas.getBoundingClientRect();
+  const W = Math.max(320, Math.round(b.width)) , H = Math.round(W * 0.48);
+  canvas.width = W * 2; canvas.height = H * 2; canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+  const naarXY = (lon, lat) => [ (lon + 180) / 360 * W, (78 - lat) / 148 * H ];
+  ctx.fillStyle = 'rgba(244,241,236,0.13)';
+  const stap = Math.max(5, Math.round(W / 130));
+  for (let x = 0; x < W; x += stap) for (let y = 0; y < H; y += stap){
+    const lon = x / W * 360 - 180, lat = 78 - y / H * 148;
+    if (inLand(lon, lat)) { ctx.beginPath(); ctx.arc(x, y, stap * 0.22, 0, 7); ctx.fill(); }
+  }
+  const kleur = { groen: '#4C9A75', oranje: '#C99A2E', rood: '#C23A5E' };
+  for (const it of items){
+    if (!it.plek) continue;
+    const [x, y] = naarXY(it.plek.lon, it.plek.lat);
+    ctx.beginPath(); ctx.arc(x, y, 7, 0, 7); ctx.fillStyle = kleur[it.status] + '33'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, 3.4, 0, 7); ctx.fillStyle = kleur[it.status]; ctx.fill();
+  }
+}
+let wereldTimer = null;
+function wereldWidget(el){
+  if (!el.querySelector('canvas')) {
+    el.innerHTML = '<div class="kaart" style="padding:1rem 1.2rem;">'+
+      '<canvas class="wkaart" aria-label="Wereldkaart met de status van alles in het veld" role="img"></canvas>'+
+      '<div class="wlegenda"><span><span class="bol groen"></span> oke</span><span><span class="bol oranje"></span> uit</span><span><span class="bol rood"></span> storing</span><span data-wtelling style="margin-left:auto;color:var(--soft);"></span></div>'+
+      '<div data-wlijst></div></div>';
+  }
+  const laad = async () => {
+    try {
+      const d = await api('wereld');
+      tekenWereldKaart(el.querySelector('canvas'), d.items);
+      el.querySelector('[data-wtelling]').textContent = d.telling.groen + ' groen, ' + d.telling.oranje + ' oranje, ' + d.telling.rood + ' rood' + (d.opdrachtenOpen ? ' | ' + d.opdrachtenOpen + ' opdracht(en) onderweg' : '');
+      const soortIco = { doos: '📦', functie: '🧩', systeem: '🏛️' };
+      el.querySelector('[data-wlijst]').innerHTML = d.items.map(it =>
+        '<div class="witem"><span class="bol '+it.status+'"></span><span class="wnm">'+(soortIco[it.soort]||'')+' '+esc(it.naam)+'</span><span class="wdt">'+esc(it.detail)+'</span>'+
+        (it.acties || []).map(a => '<button class="knop stil" data-wact="'+a+'" data-wid="'+esc(it.id)+'" style="padding:.25rem .8rem;font-size:.75rem;">'+(a === 'reset' ? '↻ Reset' : '🆘 Help')+'</button>').join('')+
+        '</div>').join('') || '<div class="leeg">Nog niets in het veld; zet een doos aan het RTG-netwerk.</div>';
+      el.querySelectorAll('[data-wact]').forEach(b => b.addEventListener('click', async () => {
+        try {
+          const r = await api('wereld/actie', { id: b.dataset.wid, actie: b.dataset.wact, naam: mijnNaam || 'kantoor' });
+          meld(r.wacht || 'Gedaan.');
+          laad();
+        } catch (e) { meld(e.message); }
+      }));
+    } catch (e) {}
+  };
+  laad();
+  clearInterval(wereldTimer);
+  wereldTimer = setInterval(() => { if (!document.hidden && el.offsetParent !== null) laad(); }, 10000);
+}
+
 function kamerTab(naam){
-  ['Overzicht','Stats','Chat','Onboarding'].forEach(x => { const el = $('#tab'+x); if (el) el.hidden = (x.toLowerCase() !== naam); });
+  ['Overzicht','Stats','Chat','Onboarding','Wereld'].forEach(x => { const el = $('#tab'+x); if (el) el.hidden = (x.toLowerCase() !== naam); });
   if (naam === 'stats') api('stats').then(d => { $('#kStats').innerHTML = statsHtml(d); }).catch(() => {});
   if (naam === 'chat') chatWidget($('#tabChat'), KAMER);
   if (naam === 'onboarding') api('onboarding', { kamer: KAMER }).then(d => { $('#tabOnboarding').innerHTML = onboardingHtml(d.onboarding); }).catch(() => {});
+  if (naam === 'wereld') wereldWidget($('#tabWereld'));
 }
 $('#kTabs').querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => kamerTab(b.dataset.tab)));
 
@@ -347,6 +447,7 @@ function koppelVoorstellen(el, herlaad){
 async function openPaniek(){
   const [b, p] = await Promise.all([api('boardroom'), api('paniek')]);
   toon('vPaniek');
+  wereldWidget($('#pWereld'));
   chatWidget($('#pChat'), 'paniekkamer');
   $('#pVoorstellen').innerHTML = p.voorstellen.length ? p.voorstellen.map(v => voorstelKaart(v, false)).join('') : '<div class="leeg">Nog geen voorstellen.</div>';
   koppelVoorstellen($('#pVoorstellen'), openPaniek);
@@ -366,7 +467,12 @@ async function openPaniek(){
 async function openBoard(){
   const d = await api('boardroom');
   toon('vBoard');
+  wereldWidget($('#bWereld'));
   api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
+  $('#bAudit').innerHTML = (d.audit && d.audit.length) ? d.audit.map(a =>
+    '<div class="witem"><span class="wnm" style="color:var(--gold);">'+esc(a.wie)+'</span><span class="wdt">'+esc(a.wat)+'</span>'+
+    '<span style="color:var(--soft);font-size:.72rem;">'+new Date(a.at).toLocaleString('nl-NL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</span></div>').join('')
+    : '<div class="leeg">Nog geen handelingen gelogd.</div>';
   chatWidget($('#bChat'), 'boardroom');
   $('#bKamers').innerHTML = d.kamers.map(k =>
     '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+k.emoji+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');

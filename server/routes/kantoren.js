@@ -12,7 +12,7 @@ module.exports = (kern) => {
   app.post('/api/office/kamer/taak-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.taakZet(String(req.body.id || ''), String(req.body.taakId || ''), req.body.af)));
   app.post('/api/office/boardroom', officeAuth, (req, res) => veilig(res, () => afdelingen.boardroom()));
   app.post('/api/office/boardroom/schakel', officeAuth, (req, res) => veilig(res, () => {
-    const r = afdelingen.schakel(String(req.body.functie || ''), req.body.aan === true, req.body.doelgroep ? String(req.body.doelgroep) : null);
+    const r = afdelingen.schakel(String(req.body.functie || ''), req.body.aan === true, req.body.doelgroep ? String(req.body.doelgroep) : null, req.body.naam ? String(req.body.naam) : 'boardroom');
     if (r.ok) sseToOffice('sync', { scope: 'boardroom' });
     return r;
   }));
@@ -40,4 +40,12 @@ module.exports = (kern) => {
   app.post('/api/office/kachat/stuur', officeAuth, (req, res) => veilig(res, () => afdelingen.chatStuur(String(req.body.kamer || ''), req.body.naam, req.body.tekst, req.body.foto)));
   app.post('/api/office/onboarding', officeAuth, (req, res) => veilig(res, () => afdelingen.onboarding(String(req.body.kamer || ''))));
   app.post('/api/office/paniek/bericht', officeAuth, (req, res) => veilig(res, () => afdelingen.paniekBericht(String(req.body.id || ''), String(req.body.wie || ''), req.body.tekst)));
+  // de wereld: alles in het veld als bolletje (groen oke, oranje uit, rood
+  // storing), met reset- en hulpknoppen; elke knop komt in het auditlog
+  app.post('/api/office/wereld', officeAuth, (req, res) => veilig(res, () => afdelingen.wereld()));
+  app.post('/api/office/wereld/actie', officeAuth, (req, res) => veilig(res, () => {
+    const r = afdelingen.wereldActie(String(req.body.id || ''), String(req.body.actie || ''), req.body.naam);
+    if (r.ok) sseToOffice('sync', { scope: 'wereld' });
+    return r;
+  }));
 };

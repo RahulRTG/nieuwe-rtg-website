@@ -52,7 +52,8 @@ test.before(async () => {
     RTG_DATA_DIR: TMP_DOOS, SMTP_URL: '',
     RTG_DOOS_CLOUD: cloudBase(), RTG_DOOS_SLEUTEL: SLEUTEL,
     RTG_DOOS_USER: 'rahul', RTG_DOOS_WACHTWOORD: 'Imran',
-    RTG_DOOS_NETWERK: '1', RTG_DOOS_NAAM: 'testdoos'
+    RTG_DOOS_NETWERK: '1', RTG_DOOS_NAAM: 'testdoos',
+    RTG_DOOS_MELD_MS: '2000', RTG_DOOS_PLEK: '38.98,1.30'
   } });
 });
 test.after(() => {
@@ -121,6 +122,40 @@ test('de buurtfailover: een buurdoos zonder lijn meldt zich via deze doos', asyn
   }).then(x => x.json());
   const vloot = ((kamer.lijsten || []).find(l => /vloot/i.test(l.titel)) || {}).items || [];
   assert.ok(vloot.some(t => t.includes('strandtent-west') && t.includes('via testdoos')), 'de vlootkaart toont de buurmelding');
+});
+
+test('de wereldknop bereikt een echte doos: hulp-opdracht, diagnoserapport terug', async () => {
+  // het kantoor drukt op Help bij testdoos (die staat op de kaart via zijn meldingen)
+  const login = await fetch(cloudBase() + '/api/office/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'DOOS-KANTOOR-1' })
+  });
+  const token = (await login.json()).token;
+  const office = (pad, body) => fetch(cloudBase() + '/api/office/' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {})
+  }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  // wachten tot testdoos op de wereldkaart staat (zijn eerste melding)
+  let w;
+  for (let i = 0; i < 60; i++) {
+    w = await office('wereld');
+    if ((w.body.items || []).some(x => x.id === 'doos:testdoos')) break;
+    await new Promise(r => setTimeout(r, 500));
+  }
+  const bol = w.body.items.find(x => x.id === 'doos:testdoos');
+  assert.ok(bol, 'testdoos staat op de wereldkaart');
+  assert.equal(bol.status, 'groen');
+  assert.deepEqual(bol.plek, { lat: 38.98, lon: 1.3 }, 'met zijn plek erbij');
+  assert.equal((await office('wereld/actie', { id: 'doos:testdoos', actie: 'hulp', naam: 'Keurmeester' })).status, 200);
+  // de doos haalt de opdracht op bij zijn volgende melding en stuurt direct
+  // zijn diagnoserapport; dat verschijnt in het nachtwerk-overzicht
+  let gezien = false;
+  for (let i = 0; i < 60 && !gezien; i++) {
+    const kamer = (await office('kamer', { id: 'intern' })).body;
+    const nacht = ((kamer.lijsten || []).find(l => /nachtwerk/i.test(l.titel)) || {}).items || [];
+    gezien = nacht.some(t => t.includes('testdoos'));
+    if (!gezien) await new Promise(r => setTimeout(r, 500));
+  }
+  assert.ok(gezien, 'het diagnoserapport van testdoos is binnen');
 });
 
 let fotoNaam; // een Salon-foto op de cloud, voor de randcache

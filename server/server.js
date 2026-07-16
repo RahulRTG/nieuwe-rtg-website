@@ -253,7 +253,15 @@ app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
   res.set('X-Frame-Options', 'DENY');
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self)');
+  // 9+-hardening: eigen vensters delen geen proces met vreemden (COOP), onze
+  // bestanden zijn niet als bron voor andere sites bruikbaar (CORP), de
+  // browser lekt geen DNS-voorkennis, en gevoelige browser-API's staan
+  // expliciet dicht behalve wat de apps zelf nodig hebben.
+  res.set('Cross-Origin-Opener-Policy', 'same-origin');
+  res.set('Cross-Origin-Resource-Policy', 'same-origin');
+  res.set('X-DNS-Prefetch-Control', 'off');
+  res.set('X-Permitted-Cross-Domain-Policies', 'none');
+  res.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), serial=(), bluetooth=(), midi=()');
   res.set('Content-Security-Policy',
     "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
     "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
@@ -1538,15 +1546,43 @@ app.get('/api/health', (req, res) => res.json({
 // de rondreistijd peilen voor de satellietmodus; zonder inloggen, zonder poespas.
 app.get('/api/sat/ping', (req, res) => res.json({ ok: 1, t: Date.now() }));
 
-/* De Zaakdoos: een verse kloon van de data voor het kastje in de zaak.
-   Alleen met de gedeelde sleutel (RTG_DOOS_SLEUTEL), in constante tijd
-   vergeleken. De doos zelf meldt zijn status onbeschermd op het eigen net. */
-app.get('/api/doos/kloon', (req, res) => {
+/* ---------- de sleutelwacht van de doos-vloot ----------
+   Elke /api/doos/-route zit achter de gedeelde sleutel (RTG_DOOS_SLEUTEL),
+   in constante tijd vergeleken. Wie te vaak een verkeerde sleutel probeert
+   (brute force), wordt per IP een kwartier buitengesloten: ook een DAARNA
+   juiste sleutel krijgt dan 429. Elke afketser komt in het veiligheidslog
+   en telt mee op het Veiligheid-bord van de kantoren. */
+const doosAfketsers = new Map(); // ip -> [tijdstippen]
+const DOOS_AFKETS_MAX = 8, DOOS_AFKETS_VENSTER = 15 * 60 * 1000;
+function doosSleutelOk(req, res) {
+  const ip = req.ip || 'onbekend';
+  const rij = (doosAfketsers.get(ip) || []).filter(t => Date.now() - t < DOOS_AFKETS_VENSTER);
+  if (rij.length >= DOOS_AFKETS_MAX) {
+    doosAfketsers.set(ip, rij);
+    res.status(429).json({ error: 'Te veel mislukte pogingen; probeer het over een kwartier opnieuw.' });
+    return false;
+  }
   const s = process.env.RTG_DOOS_SLEUTEL || '';
   const g = String(req.get('x-doos-sleutel') || '');
   if (!s || g.length !== s.length || !crypto.timingSafeEqual(Buffer.from(g), Buffer.from(s))) {
-    return res.status(403).json({ error: 'Geen toegang.' });
+    rij.push(Date.now());
+    doosAfketsers.set(ip, rij);
+    if (!Array.isArray(db.data.doosAfketsers)) db.data.doosAfketsers = [];
+    db.data.doosAfketsers.unshift({ at: Date.now() });
+    db.data.doosAfketsers = db.data.doosAfketsers.slice(0, 500);
+    save();
+    try { if (beveilig && rij.length >= DOOS_AFKETS_MAX) beveilig.meld('doos-sleutel', 'hoog', 'IP na ' + rij.length + ' verkeerde doos-sleutels een kwartier buitengesloten.', { ip }); } catch (e) {}
+    res.status(403).json({ error: 'Geen toegang.' });
+    return false;
   }
+  doosAfketsers.delete(ip); // een goede sleutel wist de teller
+  return true;
+}
+
+/* De Zaakdoos: een verse kloon van de data voor het kastje in de zaak.
+   De doos zelf meldt zijn status onbeschermd op het eigen net. */
+app.get('/api/doos/kloon', (req, res) => {
+  if (!doosSleutelOk(req, res)) return;
   res.json({ data: db.data });
 });
 app.get('/api/doos/status', (req, res) => res.json(zaakdoos.status()));
@@ -1554,9 +1590,7 @@ app.get('/api/doos/status', (req, res) => res.json(zaakdoos.status()));
    meedoen (RTG_DOOS_NETWERK=1) melden hier hun lijnmeting. Compact en anoniem
    van aard: naam, rondreistijd, modus en journaalstand; geen zaakdata. */
 app.post('/api/doos/meting', (req, res) => {
-  const sl = process.env.RTG_DOOS_SLEUTEL || '';
-  const gg = String(req.get('x-doos-sleutel') || '');
-  if (!sl || gg.length !== sl.length || !crypto.timingSafeEqual(Buffer.from(gg), Buffer.from(sl))) return res.status(403).json({ error: 'Geen toegang.' });
+  if (!doosSleutelOk(req, res)) return;
   if (!Array.isArray(db.data.doosMetingen)) db.data.doosMetingen = [];
   const b = req.body || {};
   const meting = {
@@ -1567,18 +1601,22 @@ app.post('/api/doos/meting', (req, res) => {
   };
   // een buurdoos die de melding doorgaf, laat zijn via-stempel achter
   if (b.via) meting.via = String(b.via).replace(/[<>]/g, '').slice(0, 40);
+  // de plek van de doos (met instemming meegegeven) voor de wereldkaart
+  if (b.plek && Number.isFinite(Number(b.plek.lat)) && Number.isFinite(Number(b.plek.lon))) {
+    meting.plek = { lat: Math.max(-90, Math.min(90, Number(b.plek.lat))), lon: Math.max(-180, Math.min(180, Number(b.plek.lon))) };
+  }
   db.data.doosMetingen.unshift(meting);
   db.data.doosMetingen = db.data.doosMetingen.slice(0, 2000);
   save();
-  res.json({ ok: true });
+  // staat er vanaf het wereldbord een opdracht klaar (reset/hulp), geef hem mee
+  const opdracht = kern.afdelingen ? kern.afdelingen.opdrachtVoorDoos(meting.doos) : null;
+  res.json(opdracht ? { ok: true, opdracht } : { ok: true });
 });
 /* De buurtfailover: een buurdoos zonder eigen lijn geeft zijn melding hier
    (op een doos die de lijn nog wel heeft) af; deze doos stuurt hem door naar
    de cloud met een via-stempel. Alleen op een doos, alleen met de sleutel. */
 app.post('/api/doos/buurmelding', async (req, res) => {
-  const sl = process.env.RTG_DOOS_SLEUTEL || '';
-  const gg = String(req.get('x-doos-sleutel') || '');
-  if (!sl || gg.length !== sl.length || !crypto.timingSafeEqual(Buffer.from(gg), Buffer.from(sl))) return res.status(403).json({ error: 'Geen toegang.' });
+  if (!doosSleutelOk(req, res)) return;
   if (!zaakdoos.actief) return res.status(404).json({ error: 'Dit is geen doos.' });
   const doorgegeven = await zaakdoos.buurDoorgeven(req.body || {});
   res.json({ ok: true, doorgegeven });
@@ -1587,9 +1625,7 @@ app.post('/api/doos/buurmelding', async (req, res) => {
    in de nacht een dagrapport over de lijn: pings, gemiddelde rondreistijd,
    uitval en naspeelwerk. Compact en zonder zaakdata, achter de sleutel. */
 app.post('/api/doos/rapport', (req, res) => {
-  const sl = process.env.RTG_DOOS_SLEUTEL || '';
-  const gg = String(req.get('x-doos-sleutel') || '');
-  if (!sl || gg.length !== sl.length || !crypto.timingSafeEqual(Buffer.from(gg), Buffer.from(sl))) return res.status(403).json({ error: 'Geen toegang.' });
+  if (!doosSleutelOk(req, res)) return;
   if (!Array.isArray(db.data.doosRapporten)) db.data.doosRapporten = [];
   const b = req.body || {};
   db.data.doosRapporten.unshift({

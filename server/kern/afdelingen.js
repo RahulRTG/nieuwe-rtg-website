@@ -191,7 +191,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
 
   /* ---------- de boardroom ---------- */
   function functiesStand() { if (!d().techniek) d().techniek = {}; if (!d().techniek.functies) d().techniek.functies = {}; return d().techniek.functies; }
-  function schakel(id, aan, doelgroep) {
+  function schakel(id, aan, doelgroep, wie) {
     if (!functies.OP_ID[id]) return { status: 404, error: 'Onbekende functie.' };
     const st = functiesStand();
     if (!st[id]) st[id] = {};
@@ -203,6 +203,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
       st[id].aan = aan === true;
     }
     save();
+    audit(wie || 'boardroom', 'Functie ' + id + (doelgroep ? ' voor ' + doelgroep : '') + ' ' + (aan === true ? 'AAN' : 'UIT') + ' gezet');
     return { ok: true, functie: id, aan: aan === true, doelgroep: doelgroep || null };
   }
 
@@ -243,7 +244,8 @@ module.exports = ({ db, save, crypto, anthropic }) => {
       functies: cat, doelgroepen: functies.DOELGROEPEN,
       functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),
       verbeterkamer: voorstellen(false),
-      paniek: paniekRij().filter(v => v.status === 'open').slice(0, 20)
+      paniek: paniekRij().filter(v => v.status === 'open').slice(0, 20),
+      audit: auditRij().slice(0, 12)
     };
   }
 
@@ -274,6 +276,12 @@ module.exports = ({ db, save, crypto, anthropic }) => {
         ['Functies met storing', alleF.filter(f => f.storing).length],
         ['Uptime (uren)', Math.round(process.uptime() / 36) / 100],
         ['Geheugen (MB)', Math.round(process.memoryUsage().rss / 1048576)]
+      ] },
+      { groep: 'Veiligheid', items: [
+        ['Audit-regels (24u)', recent(d().kantoorAudit, 'at', 1)],
+        ['Sleutel-afketsers (24u)', recent(d().doosAfketsers, 'at', 1)],
+        ['Doos-opdrachten open', lijst(d().doosOpdrachten).filter(o => !o.klaar).length],
+        ['Bolletjes op rood', wereld().telling.rood]
       ] }
     ] };
   }
@@ -385,11 +393,12 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     if (!v) return { status: 404, error: 'Dit voorstel bestaat niet.' };
     if (v.status !== 'open') return { status: 409, error: 'Dit voorstel is al afgehandeld.' };
     if (besluit === 'accepteer') {
-      const r = schakel(v.functie, v.aan, v.doelgroep);
+      const r = schakel(v.functie, v.aan, v.doelgroep, 'boardroom (paniekvoorstel)');
       if (r.error) return r;
       v.status = 'geaccepteerd';
     } else if (besluit === 'wijs-af') {
       v.status = 'afgewezen';
+      audit('boardroom', 'Paniekvoorstel afgewezen: ' + v.functieNaam + ' ' + (v.aan ? 'AAN' : 'UIT'));
     } else return { status: 400, error: 'Kies accepteer of wijs-af.' };
     v.beslotenAt = nu();
     save();
@@ -407,5 +416,97 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   }
   function paniekLijst() { return { ok: true, voorstellen: paniekRij().slice(0, 50) }; }
 
-  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, schakel, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, KAMER_IDS } };
+  /* ---------- het logboek: wie deed wat (audittrail) ----------
+     Elke schakeling, elk paniekbesluit en elke wereldknop komt hier in, met
+     naam en tijd. Onmisbaar voor een 9+-beveiliging: achteraf is altijd te
+     herleiden wie welke knop heeft omgezet. */
+  function auditRij() {
+    if (!Array.isArray(d().kantoorAudit)) d().kantoorAudit = [];
+    return d().kantoorAudit;
+  }
+  function audit(wie, wat) {
+    const rij = auditRij();
+    rij.unshift({ wie: String(wie || 'kantoor').replace(/[<>]/g, '').slice(0, 30), wat: String(wat || '').replace(/[<>]/g, '').slice(0, 200), at: nu() });
+    if (rij.length > 2000) rij.pop();
+    save();
+  }
+
+  /* ---------- de wereld: alles in het veld als bolletje ----------
+     Groen = oke, oranje = uit (bewust uitgezet, of een doos die stilvalt),
+     rood = storing. Bij een probleem horen knoppen: reset (het ding krijgt
+     een reset-opdracht bij zijn volgende melding) of hulp (het ding stuurt
+     direct een diagnose-rapport). De doos haalt de opdracht zelf op via het
+     meetstation; de cloud hoeft het kastje dus nooit binnen te kunnen. */
+  const STIL_NA = 15 * 60 * 1000; // een doos die een kwartier niets meldt, staat op oranje
+  function laatstePerDoos() {
+    const per = {};
+    for (const m of lijst(d().doosMetingen)) if (!per[m.doos]) per[m.doos] = m;
+    return per;
+  }
+  function opdrachtRij() {
+    if (!Array.isArray(d().doosOpdrachten)) d().doosOpdrachten = [];
+    return d().doosOpdrachten;
+  }
+  function wereld() {
+    const items = [];
+    const per = laatstePerDoos();
+    for (const naam of Object.keys(per)) {
+      const m = per[naam];
+      const stil = nu() - m.at > STIL_NA;
+      const status = m.modus === 'lokaal' ? 'rood' : (stil ? 'oranje' : 'groen');
+      const detail = m.modus === 'lokaal'
+        ? 'lijn weg' + (m.journaal ? ', ' + m.journaal + ' in journaal' : '') + (m.via ? ', meldt zich via ' + m.via : '')
+        : (stil ? 'al ' + Math.round((nu() - m.at) / 60000) + ' min stil' : m.rtt + 'ms over de lijn');
+      items.push({ id: 'doos:' + naam, naam, soort: 'doos', plek: m.plek || null, status, detail,
+        acties: status === 'groen' ? ['hulp'] : ['reset', 'hulp'] });
+    }
+    for (const g of functies.catalogus(functiesStand())) for (const f of g.functies) {
+      if (f.storing) items.push({ id: 'functie:' + f.id, naam: f.naam, soort: 'functie', plek: null, status: 'rood', detail: 'storing gemeld: ' + String(f.storing).slice(0, 80), acties: ['reset'] });
+      else if (!f.aan) items.push({ id: 'functie:' + f.id, naam: f.naam, soort: 'functie', plek: null, status: 'oranje', detail: 'bewust uitgezet (schakelbord)', acties: [] });
+    }
+    items.push({ id: 'systeem:cloud', naam: 'RTG-cloud (dit huis)', soort: 'systeem', plek: { lat: 52.37, lon: 4.9 }, status: 'groen', detail: 'in de lucht, ' + Math.round(process.uptime() / 60) + ' min', acties: [] });
+    const telling = { groen: 0, oranje: 0, rood: 0 };
+    for (const i of items) telling[i.status]++;
+    return { ok: true, items, telling, opdrachtenOpen: opdrachtRij().filter(o => !o.klaar).length };
+  }
+  function wereldActie(id, actie, wie) {
+    if (actie !== 'reset' && actie !== 'hulp') return { status: 400, error: 'Kies reset of hulp.' };
+    const naam = String(wie || 'kantoor');
+    if (id.startsWith('doos:')) {
+      const doosNaam = id.slice(5);
+      if (!laatstePerDoos()[doosNaam]) return { status: 404, error: 'Deze doos staat niet op de kaart.' };
+      const rij = opdrachtRij();
+      if (rij.some(o => !o.klaar && o.doos === doosNaam && o.actie === actie))
+        return { status: 409, error: 'Deze opdracht staat al klaar voor de doos.' };
+      rij.unshift({ id: crypto.randomBytes(4).toString('hex'), doos: doosNaam, actie, door: naam.replace(/[<>]/g, '').slice(0, 30), klaar: false, at: nu() });
+      if (rij.length > 200) rij.pop();
+      save();
+      audit(naam, 'Wereldknop: ' + actie + ' voor doos ' + doosNaam);
+      return { ok: true, wacht: 'De doos haalt de opdracht op bij zijn volgende melding (binnen een minuut als de lijn er is).' };
+    }
+    if (id.startsWith('functie:')) {
+      const fid = id.slice(8);
+      if (!functies.OP_ID[fid]) return { status: 404, error: 'Onbekende functie.' };
+      if (actie !== 'reset') return { status: 400, error: 'Een functie kent alleen reset (storing wissen).' };
+      const st = functiesStand();
+      if (!st[fid] || !st[fid].storing) return { status: 409, error: 'Deze functie meldt geen storing.' };
+      st[fid].storing = null;
+      save();
+      audit(naam, 'Wereldknop: storing gewist op functie ' + fid);
+      return { ok: true };
+    }
+    return { status: 404, error: 'Onbekend bolletje.' };
+  }
+  // de doos meldt zich (meetstation): staat er een opdracht klaar, geef hem mee
+  function opdrachtVoorDoos(doosNaam) {
+    const o = opdrachtRij().find(x => !x.klaar && x.doos === doosNaam);
+    if (!o) return null;
+    o.klaar = true;
+    o.klaarAt = nu();
+    save();
+    audit('meetstation', 'Doos ' + doosNaam + ' heeft de ' + o.actie + '-opdracht opgehaald');
+    return o.actie;
+  }
+
+  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, schakel, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, wereld, wereldActie, opdrachtVoorDoos, audit, KAMER_IDS } };
 };

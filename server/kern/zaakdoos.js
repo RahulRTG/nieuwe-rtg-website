@@ -29,6 +29,10 @@ module.exports = ({ db, save, log, dataDir }) => {
   const GEBRUIKER = process.env.RTG_DOOS_USER || '';
   const WACHTWOORD = process.env.RTG_DOOS_WACHTWOORD || '';
   const actief = !!CLOUD;
+  // 9+-hardening: een korte gedeelde sleutel is te raden; waarschuw hard
+  if (SLEUTEL && SLEUTEL.length < 16) {
+    console.warn('[doos] RTG_DOOS_SLEUTEL is korter dan 16 tekens; kies een lange willekeurige sleutel (bijv. openssl rand -hex 24).');
+  }
 
   let modus = actief ? 'cloud' : 'uit'; // 'cloud' (doorgeefluik) | 'lokaal' | 'uit'
   let laatsteKloon = 0;
@@ -212,17 +216,46 @@ module.exports = ({ db, save, log, dataDir }) => {
      levende kaart van verbindingskwaliteit per zaak. */
   const NETWERK = process.env.RTG_DOOS_NETWERK === '1';
   const DOOS_NAAM = process.env.RTG_DOOS_NAAM || 'doos';
+  const MELD_MS = Math.max(1000, Number(process.env.RTG_DOOS_MELD_MS) || 60000);
+  // de plek van de doos op de wereldkaart (met instemming van de partner)
+  const PLEK = (() => {
+    const m = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/.exec(process.env.RTG_DOOS_PLEK || '');
+    return m ? { lat: Number(m[1]), lon: Number(m[2]) } : null;
+  })();
   let laatsteMelding = 0;
   async function meldMeting(rtt) {
-    if (!NETWERK || nu() - laatsteMelding < 60000) return;
+    if (!NETWERK || nu() - laatsteMelding < MELD_MS) return;
     laatsteMelding = nu();
     try {
-      await fetch(CLOUD + '/api/doos/meting', {
+      const r = await fetch(CLOUD + '/api/doos/meting', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
-        body: JSON.stringify({ doos: DOOS_NAAM, rtt, modus, journaal: journaal().length }),
+        body: JSON.stringify({ doos: DOOS_NAAM, rtt, modus, journaal: journaal().length, plek: PLEK || undefined }),
         signal: AbortSignal.timeout(10000)
       });
+      // het kantoor kan via het wereldbord een opdracht meegeven (reset/hulp)
+      const d = await r.json().catch(() => ({}));
+      if (d && d.opdracht) voerOpdrachtUit(d.opdracht);
     } catch (e) { /* geen lijn; de volgende tik probeert weer */ }
+  }
+  /* Een opdracht van het wereldbord, opgehaald bij de eigen melding (de cloud
+     hoeft het kastje dus nooit van buiten te bereiken):
+     - reset: gooi de kloon weg en haal hem vers op;
+     - hulp: stuur direct het dagrapport (diagnose) en meld meteen opnieuw. */
+  async function voerOpdrachtUit(actie) {
+    if (actie === 'reset') {
+      laatsteKloon = 0;
+      await haalKloon();
+      console.log('[doos] reset-opdracht van het kantoor uitgevoerd: verse kloon binnen');
+    } else if (actie === 'hulp') {
+      try {
+        await fetch(CLOUD + '/api/doos/rapport', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+          body: JSON.stringify(dagrapport()), signal: AbortSignal.timeout(10000)
+        });
+      } catch (e) {}
+      laatsteMelding = 0; // en de volgende tik meldt direct opnieuw
+      console.log('[doos] hulp-opdracht van het kantoor: diagnoserapport verstuurd');
+    }
   }
   /* De buurtfailover: valt bij deze doos de lijn weg, dan geeft hij zijn
      lijnmelding af bij een buurdoos (RTG_DOOS_BUREN), die hem met een

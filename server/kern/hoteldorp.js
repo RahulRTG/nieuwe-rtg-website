@@ -21,10 +21,15 @@ const AFDELINGEN = {
   amenities: { label: 'Amenities', icon: '🧴', waar: 'Kamer', wat: 'Aanvulling of attentie, bijv. badjassen maat L, kussenmenu', keten: ['gevraagd', 'onderweg', 'op de kamer'] },
   patissier: { label: 'Patissier', icon: '🍰', waar: 'Voor wanneer en waar, bijv. 19:00, Sea-view suite', wat: 'Bestelling, bijv. verjaardagstaart voor acht', keten: ['besteld', 'in de maak', 'klaar', 'geserveerd'] },
   klussen: { label: 'Klusjesman', icon: '🔧', waar: 'Plek', wat: 'Klus, bijv. lamp op het terras vervangen', keten: ['open', 'bezig', 'klaar'] },
-  it: { label: 'IT', icon: '🖥️', waar: 'Systeem of plek', wat: 'Storing, bijv. wifi in de lobby traag', keten: ['open', 'bezig', 'opgelost'] }
+  it: { label: 'IT', icon: '🖥️', waar: 'Systeem of plek', wat: 'Storing, bijv. wifi in de lobby traag', keten: ['open', 'bezig', 'opgelost'] },
+  sales: { label: 'Sales', icon: '📈', waar: 'Bedrijf of contact', wat: 'Lead, bijv. bedrijfsuitje twintig personen in september', keten: ['lead', 'offerte', 'gewonnen'] },
+  events: { label: 'Events', icon: '🎪', waar: 'Datum en zaal', wat: 'Aanvraag, bijv. bruiloft 12 september, tachtig gasten', keten: ['aanvraag', 'voorstel', 'bevestigd', 'gedraaid'] },
+  florist: { label: 'Florist', icon: '💐', waar: 'Waar het komt te staan', wat: 'Bestelling, bijv. boeket lobby en tafelstukken terras', keten: ['besteld', 'gemaakt', 'geplaatst'] },
+  kidsclub: { label: 'Kids club', icon: '🧸', waar: 'Kind en kamer', wat: 'Aanmelding, bijv. Mia (6), Garden kamer, tot 16:00', keten: ['aangemeld', 'binnen', 'opgehaald'] },
+  watersport: { label: 'Watersport', icon: '🏄', waar: 'Wie en wat', wat: 'Boeking, bijv. twee paddleboards, 14:00', keten: ['geboekt', 'op het water', 'terug'] }
 };
 
-module.exports = ({ save, crypto, schoon, sseToSupplier, notifySupplier }) => {
+module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, haversine }) => {
   const nu = () => new Date().toISOString();
   const posten = s => (s.hotelPosten = Array.isArray(s.hotelPosten) ? s.hotelPosten : []);
 
@@ -63,6 +68,50 @@ module.exports = ({ save, crypto, schoon, sseToSupplier, notifySupplier }) => {
     return { ok: true, post };
   }
 
+  /* Afdelingen praten met elkaar: een post reist door naar een andere
+     afdeling en begint daar vooraan in de keten, met het spoor erbij
+     ("via guest relations"). Zo wordt een klacht over een kapotte kraan
+     met een tik een klus, en een conciergewens een spa-afspraak. */
+  function dorpStuurDoor(s, id, naarIn, wie) {
+    const post = posten(s).find(p => p.id === id);
+    if (!post) return { status: 404, error: 'Post niet gevonden.' };
+    const naar = String(naarIn || '');
+    const afd = AFDELINGEN[naar];
+    if (!afd) return { status: 400, error: 'Onbekende afdeling.' };
+    if (naar === post.afdeling) return { status: 409, error: 'De post staat al bij ' + afd.label + '.' };
+    const vanLabel = (AFDELINGEN[post.afdeling] || { label: post.afdeling }).label;
+    post.via = Array.isArray(post.via) ? post.via : [];
+    post.via.push(vanLabel);
+    if (post.via.length > 6) post.via = post.via.slice(-6);
+    post.afdeling = naar;
+    post.status = afd.keten[0];
+    post.door = schoon(wie, 40) || post.door;
+    post.updatedAt = nu();
+    save();
+    sseToSupplier(s.code, 'sync', { scope: 'dorp' });
+    return { ok: true, post };
+  }
+
+  /* De buurt op het conciergescherm: alles wat om de hoek ligt (restaurants,
+     activiteiten, verhuur, watersport...) op afstand gesorteerd, zodat de
+     concierge met een tik een naam en een afstand bij de hand heeft. */
+  function dorpBuurt(s) {
+    if (!s.loc) return { ok: true, buurt: [] };
+    const types = db.data.supplierTypes || {};
+    const buurt = (db.data.suppliers || [])
+      .filter(x => x.code !== s.code && x.loc && x.loc.lat != null)
+      .map(x => ({
+        code: x.code, naam: x.name, stad: x.city,
+        soort: (types[x.type] || {}).label || x.type,
+        icon: (types[x.type] || {}).icon || '📍',
+        km: Math.round((haversine(s.loc, x.loc) || 0) / 100) / 10
+      }))
+      .filter(x => x.km > 0 && x.km <= 30)
+      .sort((a, b) => a.km - b.km)
+      .slice(0, 14);
+    return { ok: true, buurt };
+  }
+
   /* Het dorpsplein: per afdeling de open posten (en de laatste afgeronde),
      plus de telling waarmee de leiding het hele dorp overziet. */
   function dorpOverzicht(s) {
@@ -81,5 +130,5 @@ module.exports = ({ save, crypto, schoon, sseToSupplier, notifySupplier }) => {
     return { ok: true, afdelingen, totaalOpen: afdelingen.reduce((n, a) => n + a.openAantal, 0) };
   }
 
-  return { HOTEL_AFDELINGEN: AFDELINGEN, dorpPost, dorpVerder, dorpOverzicht };
+  return { HOTEL_AFDELINGEN: AFDELINGEN, dorpPost, dorpVerder, dorpStuurDoor, dorpBuurt, dorpOverzicht };
 };

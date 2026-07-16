@@ -401,10 +401,25 @@
       (afd.open.length ? afd.open.map(p => {
         const i = afd.keten.indexOf(p.status);
         const volgende = i >= 0 && i < afd.keten.length - 1 ? afd.keten[i + 1] : null;
-        return '<div class="task"><div class="t"><b>'+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</b><span>'+esc(p.status)+' · '+esc(p.door)+' · '+timeAgo(p.updatedAt||p.at)+'</span></div>'+
-          (volgende?'<button class="abtn" data-pkdverder="'+p.id+'">'+esc(volgende)+'</button>':'')+'</div>';
+        return '<div class="task"><div class="t"><b>'+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</b><span>'+esc(p.status)+' · '+esc(p.door)+' · '+timeAgo(p.updatedAt||p.at)+
+          ((p.via||[]).length?' · '+T('pd.dorp.via','via')+' '+p.via.map(esc).join(', '):'')+'</span></div>'+
+          '<div style="display:flex;gap:0.3rem;">'+(volgende?'<button class="abtn" data-pkdverder="'+p.id+'">'+esc(volgende)+'</button>':'')+
+          '<button class="abtn ghost" data-pkdstuur="'+p.id+'" aria-label="doorsturen">↪</button></div></div>';
       }).join('') : '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--soft);">'+T('pd.dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
+      (pkDorpKant === 'concierge' && pkBuurt && pkBuurt.length
+        ? '<div style="margin-top:0.5rem;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('pd.dorp.buurt','In de buurt')+'</div>'+
+          '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+pkBuurt.map(b =>
+            '<button class="abtn ghost" data-pkdbuurt="'+esc(b.naam)+'" data-soort="'+esc(b.soort)+'" data-km="'+b.km+'">'+b.icon+' '+esc(b.naam)+' · '+b.km+' km</button>').join('')+'</div>'
+        : '')+
       '<button class="abtn ghost" data-pkdnieuw style="width:100%;margin-top:0.5rem;">+ '+T('pd.dorp.nieuw','Zet iets op de lijst')+'</button></div>';
+  }
+  // de buurt voor de concierge-kant op zak
+  let pkBuurt = null, pkBuurtBezig = false;
+  function pkLaadBuurt(){
+    if (pkBuurt || pkBuurtBezig) return;
+    pkBuurtBezig = true;
+    API.call('/supplier/dorp/buurt').then(d => { pkBuurt = d.buurt || []; pkBuurtBezig = false; renderKamers(); })
+      .catch(() => { pkBuurt = []; pkBuurtBezig = false; });
   }
   /* opdrachten: de flow voor schoonmaakbedrijven en zzp'ers. Geen kamerbord
      maar de eigen boekingen: bevestigen, op locatie werken en afronden. */
@@ -444,6 +459,30 @@
     }));
     wrap.querySelectorAll('[data-pkdverder]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/dorp/verder', { id: b.dataset.pkdverder }); pkDorpAt = 0; pkLaadDorp(); } catch(e){ toast(e.message); }
+    }));
+    // doorsturen: de post reist naar een andere afdeling, met het spoor erbij
+    wrap.querySelectorAll('[data-pkdstuur]').forEach(b => b.addEventListener('click', async () => {
+      if (!pkDorp) return;
+      const naar = prompt(T('pd.dorp.stuurwaar','Naar welke afdeling?')+' ('+pkDorp.afdelingen.map(a=>a.key).join(', ')+')');
+      if (!naar) return;
+      try {
+        await API.call('/supplier/dorp/stuurdoor', { id: b.dataset.pkdstuur, naar: naar.trim().toLowerCase() });
+        toast('↪ '+T('pd.dorp.gestuurd','Doorgestuurd.'));
+        pkDorpAt = 0; pkLaadDorp();
+      } catch(e){ toast(e.message); }
+    }));
+    // de buurt: een tik zet de naam alvast in de wens
+    if (pkDorpKant === 'concierge') pkLaadBuurt();
+    wrap.querySelectorAll('[data-pkdbuurt]').forEach(b => b.addEventListener('click', async () => {
+      const afd = pkDorp && pkDorp.afdelingen.find(a => a.key === 'concierge');
+      const waar = prompt(afd ? afd.waarHint : 'Kamer') || '';
+      const tekst = prompt(T('pd.dorp.regelwat','Wat regelen we bij')+' '+b.dataset.pkdbuurt+' ('+b.dataset.soort+', '+b.dataset.km+' km)?');
+      if (!tekst) return;
+      try {
+        await API.call('/supplier/dorp/post', { afdeling: 'concierge', waar, tekst: b.dataset.pkdbuurt+': '+tekst });
+        toast('🎩 '+T('pd.dorp.gezet','Staat op de lijst.'));
+        pkDorpAt = 0; pkLaadDorp();
+      } catch(e){ toast(e.message); }
     }));
     const dn = wrap.querySelector('[data-pkdnieuw]'); if (dn) dn.addEventListener('click', async () => {
       const afd = pkDorp && (pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0]);

@@ -151,9 +151,9 @@ test('housekeeping-prioriteit en de hotelcijfers in de shift-samenvatting', asyn
 
 test('het hoteldorp: negen afdelingen met dezelfde motor, elk een eigen keten', async () => {
   const dorp = (await api('supplier/dorp', {}, hotel)).body;
-  assert.equal(dorp.afdelingen.length, 12, 'front office tot en met IT, met amenities, patissier en guest relations');
+  assert.equal(dorp.afdelingen.length, 17, 'het hele dorp: van front office tot watersport');
   const keys = dorp.afdelingen.map(a => a.key);
-  for (const k of ['frontoffice', 'guest', 'relations', 'concierge', 'parking', 'security', 'gym', 'spa', 'amenities', 'patissier', 'klussen', 'it']) {
+  for (const k of ['frontoffice', 'guest', 'relations', 'concierge', 'parking', 'security', 'gym', 'spa', 'amenities', 'patissier', 'klussen', 'it', 'sales', 'events', 'florist', 'kidsclub', 'watersport']) {
     assert.ok(keys.includes(k), 'afdeling ' + k + ' bestaat');
   }
   // guest relations volgt een signaal tot en met het nabellen
@@ -193,6 +193,33 @@ test('het hoteldorp: negen afdelingen met dezelfde motor, elk een eigen keten', 
   // een onbekende afdeling en een lege post ketsen af
   assert.equal((await api('supplier/dorp/post', { afdeling: 'casino', tekst: 'x' }, hotel)).status, 400);
   assert.equal((await api('supplier/dorp/post', { afdeling: 'spa', tekst: '' }, hotel)).status, 400);
+});
+
+test('afdelingen praten met elkaar: een post reist door met het spoor erbij', async () => {
+  // guest relations vangt een klacht over een kapotte kraan; die wordt een klus
+  const klacht = await api('supplier/dorp/post', { afdeling: 'relations', waar: 'Sea-view suite', tekst: 'Kraan badkamer lekt' }, hotel);
+  const r = await api('supplier/dorp/stuurdoor', { id: klacht.body.post.id, naar: 'klussen' }, hotel);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.post.afdeling, 'klussen', 'de post staat nu bij de klusjesman');
+  assert.equal(r.body.post.status, 'open', 'en begint daar vooraan in de keten');
+  assert.deepEqual(r.body.post.via, ['Guest relations'], 'het spoor reist mee');
+  // en door naar IT kan ook weer, het spoor groeit
+  const r2 = await api('supplier/dorp/stuurdoor', { id: klacht.body.post.id, naar: 'it' }, hotel);
+  assert.deepEqual(r2.body.post.via, ['Guest relations', 'Klusjesman']);
+  // naar dezelfde afdeling of naar onzin ketst af
+  assert.equal((await api('supplier/dorp/stuurdoor', { id: klacht.body.post.id, naar: 'it' }, hotel)).status, 409);
+  assert.equal((await api('supplier/dorp/stuurdoor', { id: klacht.body.post.id, naar: 'casino' }, hotel)).status, 400);
+});
+
+test('de buurt op het conciergescherm: partners om de hoek, op afstand gesorteerd', async () => {
+  const r = await api('supplier/dorp/buurt', {}, hotel);
+  assert.equal(r.status, 200);
+  assert.ok(r.body.buurt.length >= 3, 'er ligt genoeg om de hoek');
+  assert.ok(!r.body.buurt.some(b => b.code === 'HOSHI'), 'het hotel staat niet in zijn eigen buurt');
+  const salDeMar = r.body.buurt.find(b => b.naam === 'Sal de Mar');
+  assert.ok(salDeMar, 'het restaurant om de hoek staat erin');
+  assert.ok(salDeMar.km >= 0 && salDeMar.km <= 30, 'met een afstand in kilometers');
+  for (let i = 1; i < r.body.buurt.length; i++) assert.ok(r.body.buurt[i].km >= r.body.buurt[i-1].km, 'gesorteerd op afstand');
 });
 
 test('annuleren en no-show: het lid trekt terug, de receptie meldt wie niet kwam', async () => {

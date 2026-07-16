@@ -2,7 +2,7 @@
    Beslissen, inchecken en no-show zijn vloerhandelingen (iedereen achter de
    balie); het bord is leesbaar voor het hele team. */
 module.exports = (kern) => {
-  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity, dorpPost, dorpVerder, dorpOverzicht } = kern;
+  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity, dorpPost, dorpVerder, dorpStuurDoor, dorpBuurt, dorpOverzicht } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error, openLast: r.openLast }) : res.json(r);
 
   app.post('/api/supplier/receptie', supplierAuth, (req, res) => {
@@ -58,5 +58,17 @@ module.exports = (kern) => {
     const r = dorpVerder(req.supplier, String(req.body.id || ''), req.actor.name);
     if (r.ok) logActivity(req.supplier.code, req.actor, 'zette de post "' + r.post.tekst.slice(0, 40) + '" op ' + r.post.status);
     stuur(res, r);
+  });
+  // afdelingen praten met elkaar: een post reist door met het spoor erbij
+  app.post('/api/supplier/dorp/stuurdoor', supplierAuth, (req, res) => {
+    if (!eisDorp(req, res)) return;
+    const r = dorpStuurDoor(req.supplier, String(req.body.id || ''), req.body.naar, req.actor.name);
+    if (r.ok) logActivity(req.supplier.code, req.actor, 'stuurde de post "' + r.post.tekst.slice(0, 40) + '" door naar ' + r.post.afdeling);
+    stuur(res, r);
+  });
+  // de buurt op het conciergescherm: partners om de hoek, op afstand gesorteerd
+  app.post('/api/supplier/dorp/buurt', supplierAuth, (req, res) => {
+    if (!eisDorp(req, res)) return;
+    res.json(dorpBuurt(req.supplier));
   });
 };

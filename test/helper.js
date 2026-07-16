@@ -20,9 +20,28 @@ function vrijePoort() {
   });
 }
 
-// Start server/server.js (of een ander script) en wacht tot /api/health 200 geeft.
-// Geeft { child, base, port } terug. Gooit als de server niet gezond wordt.
+/* Start server/server.js (of een ander script) en wacht tot hij gezond is.
+   Geeft { child, base, port } terug. Gooit als de server niet gezond wordt.
+
+   Belangrijk: tussen het vrijgeven van de poort en het binden door de kindserver
+   zit een gaatje waarin een parallelle test dezelfde poort kan krijgen. Dan
+   antwoordt op onze poort de server van een ANDERE test (met andere env!) en
+   crasht ons eigen kind op EADDRINUSE. Daarom checken we via /api/health dat de
+   pid van de antwoordende server echt ons kind is, en proberen we bij een
+   verloren poort gewoon opnieuw op een verse poort. */
 async function startServer(opts = {}) {
+  let laatste;
+  for (let poging = 0; poging < 3; poging++) {
+    try { return await startEens(opts); }
+    catch (e) {
+      laatste = e;
+      if (!/stopte tijdens opstarten/.test(e.message)) throw e; // echte startfout: niet maskeren
+    }
+  }
+  throw laatste;
+}
+
+async function startEens(opts) {
   const script = opts.script || path.join(__dirname, '..', 'server', 'server.js');
   const wachtPad = opts.wachtPad || '/api/health';
   const pogingen = opts.pogingen || 150;
@@ -35,8 +54,23 @@ async function startServer(opts = {}) {
   for (let i = 0; i < pogingen; i++) {
     if (child.exitCode != null) throw new Error('server stopte tijdens opstarten (exit ' + child.exitCode + ')');
     try {
-      const r = await fetch(base + wachtPad, { headers: { 'X-Forwarded-Proto': 'https' } });
-      if (r.ok) return { child, base, port };
+      const r = await fetch(base + '/api/health', { headers: { 'X-Forwarded-Proto': 'https' } });
+      if (r.ok) {
+        const d = await r.json().catch(() => ({}));
+        if (d.pid === child.pid) {
+          // echt onze server; eventueel nog even wachten op het gevraagde pad
+          if (wachtPad !== '/api/health') {
+            for (let j = 0; j < 50; j++) {
+              const w = await fetch(base + wachtPad, { headers: { 'X-Forwarded-Proto': 'https' } }).catch(() => null);
+              if (w && w.ok) break;
+              await new Promise(r2 => setTimeout(r2, 100));
+            }
+          }
+          return { child, base, port };
+        }
+        // een vreemde server op onze poort: ons kind gaat zo op EADDRINUSE af,
+        // de exitCode-check hierboven vangt dat en we beginnen op een verse poort
+      }
     } catch (e) { /* nog niet op; opnieuw proberen */ }
     await new Promise(r => setTimeout(r, 100));
   }

@@ -214,6 +214,28 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     return { ok: true };
   }
 
+  /* ---------- de tik: vrienden betalen elkaar met een aanraking ----------
+     De ontvanger zet zijn toestel op ontvangen (tikcode); de betaler houdt
+     zijn telefoon ertegen en betaalt met een knop. De code wijst alleen de
+     ONTVANGER aan; er kan dus enkel geld naar de eigenaar toe, en daarom mag
+     hij binnen zijn vijf minuten door een hele tafel gebruikt worden. */
+  function tikcodes() { if (!Array.isArray(d().payTikCodes)) d().payTikCodes = []; return d().payTikCodes; }
+  function tikCode({ codenaam }) {
+    for (const k of tikcodes()) if (k.codenaam === codenaam) k.geldigTot = 0;
+    const code = crypto.randomBytes(3).toString('hex').toUpperCase();
+    tikcodes().unshift({ code, codenaam, geldigTot: nu() + KASCODE_MS, at: nu() });
+    if (tikcodes().length > 2000) tikcodes().length = 2000;
+    save();
+    return { ok: true, code, geldigTot: nu() + KASCODE_MS };
+  }
+  async function tikBetaal({ van, code, centen, oms, idem }) {
+    const k = tikcodes().find(x => x.code === String(code || '').toUpperCase().trim());
+    if (!k || k.geldigTot < nu()) return { status: 404, error: 'Deze tik is niet (meer) geldig; laat je vriend opnieuw op ontvangen zetten.' };
+    if (k.codenaam === van) return { status: 400, error: 'Dit is je eigen tik.' };
+    const r = await stuur({ van, aanCodenaam: k.codenaam, centen, oms: oms || 'Tik', idem: idem ? 'tik:' + idem : undefined });
+    return r.error ? r : Object.assign({ aan: k.codenaam }, r);
+  }
+
   /* ---------- de kassacode: contactloos bij de partner ---------- */
   function kasCode({ codenaam, maxCenten }) {
     const max = Math.min(KASCODE_MAX, Math.max(100, Math.round(Number(maxCenten) || 15000)));
@@ -284,6 +306,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   return { pay: {
     MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, stuur,
     verzoekMaak, verzoekenVoor, verzoekBetaal, verzoekIntrek,
+    tikCode, tikBetaal,
     kasCode, kasInt, partnerOverzicht, partnerUitbetaal, overzicht, saldoVan
   } };
 };

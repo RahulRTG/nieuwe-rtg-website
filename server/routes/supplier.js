@@ -554,6 +554,9 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const total = Number(req.body.total);
   if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
   const method = POS_METHODS.includes(req.body.method) ? req.body.method : 'contant';
+  // op de tafel zetten kan alleen op een echte tafel; afrekenen komt later
+  if (method === 'tafel' && !(req.supplier.tables || []).some(t => t.name === String(req.body.room || '')))
+    return res.status(400).json({ error: 'Kies een tafel om de bon op te zetten.' });
   const items = Array.isArray(req.body.items)
     ? req.body.items.slice(0, 40).map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
     : null;
@@ -638,8 +641,8 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   const room = String(req.body.room || '').slice(0, 60);
   const method = ['rtgpay', 'contant'].includes(req.body.method) ? req.body.method : 'contant';
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
-  const open = list.filter(s => s.method === 'kamer' && !s.settled && s.room === room);
-  if (!open.length) return res.status(404).json({ error: 'Geen open kamerlasten voor deze kamer.' });
+  const open = list.filter(s => (s.method === 'kamer' || s.method === 'tafel') && !s.settled && s.room === room);
+  if (!open.length) return res.status(404).json({ error: 'Geen open rekening voor deze kamer of tafel.' });
   let total = 0;
   for (const s of open) total += s.total;
   // eerst het geld (bij RTG Pay via de betaalcode), dan pas de lasten sluiten
@@ -658,7 +661,7 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
     id: crypto.randomBytes(4).toString('hex'),
     bon: pickupCode(),
     actor: req.actor.name,
-    desc: 'Check-out ' + room + ' (' + open.length + ' post(en))',
+    desc: (open[0].method === 'tafel' ? 'Rekening ' : 'Check-out ') + room + ' (' + open.length + ' post(en))',
     room, items: null, total, method, betaler,
     at: new Date().toISOString()
   };
@@ -667,6 +670,9 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   // na het uitchecken staat de kamer automatisch op "vuil" voor housekeeping
   const rm = (req.supplier.rooms || []).find(r => r.name === room);
   if (rm) rm.hk = { status: 'vuil', by: 'Systeem (check-out)', at: new Date().toISOString() };
+  // en een afgerekende tafel staat weer vrij voor de volgende gasten
+  const tf = (req.supplier.tables || []).find(t => t.name === room);
+  if (tf) tf.status = 'vrij';
   save();
   logActivity(req.supplier.code, req.actor, 'checkte ' + room + ' uit: € ' + total + ' (' + method + ')');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });

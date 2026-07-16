@@ -11,9 +11,10 @@
 
 const HK_STATUSES = ['schoon', 'vuil', 'bezig', 'bezet', 'defect'];
 /* Aan de kassa zijn er twee manieren van betalen: contant of RTG Pay (de
-   betaalcode uit de app, geind via het grootboek). 'kamer' is geen betaling
-   maar uitstel: de last komt bij de check-out alsnog langs deze twee. */
-const POS_METHODS = ['contant', 'rtgpay', 'kamer'];
+   betaalcode uit de app, geind via het grootboek). 'kamer' en 'tafel' zijn
+   geen betaling maar uitstel: de last komt bij de check-out of het afrekenen
+   van de tafel alsnog langs deze twee. */
+const POS_METHODS = ['contant', 'rtgpay', 'kamer', 'tafel'];
 const DOOR_RELOCK_MS = 10000;
 const TABLE_STATUSES = ['vrij', 'bezet', 'gereserveerd', 'dicht'];
 /* Elke zaak is baas over de eigen opties. Alles kan aan of uit, met een

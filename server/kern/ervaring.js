@@ -91,10 +91,16 @@ function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, 
       .filter(r => r.supplierCode === supplier.code && r.datum === datum && r.status !== 'geannuleerd' && r.status !== 'geweigerd')
       .sort((a, b) => (a.tijd || '').localeCompare(b.tijd || ''));
     const verwacht = dag.filter(r => ['bevestigd', 'aangekomen'].includes(r.status));
-    const tafels = (supplier.tables || []).map(t => ({
-      name: t.name, status: t.status,
-      reserveringen: dag.filter(r => r.tafel === t.name && ['bevestigd', 'aangekomen'].includes(r.status)).map(r => r.tijd)
-    }));
+    // de open rekening per tafel: alles wat de kassa "op de tafel" zette
+    const lasten = (db.data.posSales[supplier.code] || []).filter(s => s.method === 'tafel' && !s.settled && s.room);
+    const tafels = (supplier.tables || []).map(t => {
+      const rek = lasten.filter(s => s.room === t.name);
+      return {
+        name: t.name, status: t.status,
+        reserveringen: dag.filter(r => r.tafel === t.name && ['bevestigd', 'aangekomen'].includes(r.status)).map(r => r.tijd),
+        rekening: rek.length ? { totaal: Math.round(rek.reduce((n, s) => n + (s.total || 0), 0) * 100) / 100, posten: rek.length } : null
+      };
+    });
     return {
       ok: true, datum,
       reserveringen: dag,

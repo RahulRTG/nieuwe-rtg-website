@@ -235,3 +235,37 @@ test('de tafelplanning: reservering, tafel toewijzen, komst en de walk-in', asyn
   plan = (await api('supplier/tafelplan', {})).body;
   assert.equal(plan.tafels.find(t => t.name === vrije).status, 'vrij', 'na de no-show is de tafel weer vrij');
 });
+
+test('de rekening per tafel: bonnen op de tafel zetten, afrekenen, en de tafel is weer vrij', async () => {
+  // een walk-in aan een vrije tafel, en twee bonnen op die tafel
+  const plan0 = (await api('supplier/tafelplan', {})).body;
+  const tafel = plan0.tafels.find(t => t.status === 'vrij').name;
+  await api('supplier/walkin', { tafel, personen: 2 });
+  const b1 = await api('supplier/pos/sale', { total: menuItem.price, method: 'tafel', room: tafel, items: [{ name: menuItem.name, qty: 1, price: menuItem.price }] });
+  assert.equal(b1.status, 200);
+  await api('supplier/pos/sale', { total: 6, method: 'tafel', room: tafel, desc: 'Espresso en water' });
+  const plan = (await api('supplier/tafelplan', {})).body;
+  const t = plan.tafels.find(x => x.name === tafel);
+  assert.equal(t.rekening.posten, 2, 'de tafel draagt twee posten');
+  assert.equal(t.rekening.totaal, menuItem.price + 6);
+  // zonder echte tafel geen tafelbon
+  assert.equal((await api('supplier/pos/sale', { total: 5, method: 'tafel' })).status, 400);
+  // afrekenen: de rekening sluit en de tafel staat weer vrij
+  const uit = await api('supplier/pos/checkout', { room: tafel, method: 'contant' });
+  assert.equal(uit.status, 200);
+  assert.equal(uit.body.sale.total, menuItem.price + 6, 'een bedrag voor de hele tafel');
+  const na = (await api('supplier/tafelplan', {})).body.tafels.find(x => x.name === tafel);
+  assert.equal(na.rekening, null, 'de rekening is dicht');
+  assert.equal(na.status, 'vrij', 'en de tafel is weer vrij');
+});
+
+test('de shift-samenvatting: cijfers, gasten, toppers en derving in een kaart', async () => {
+  const r = await api('supplier/shift', {});
+  assert.equal(r.status, 200);
+  assert.ok(r.body.omzet > 0 && r.body.bonnen >= 3, 'de dagcijfers staan erin');
+  assert.ok(r.body.toppers.some(t => t.naam === menuItem.name), 'het gerecht staat bij de toppers');
+  assert.ok(r.body.gasten.noShows >= 1, 'de no-show uit de tafelplanning telt mee');
+  assert.ok(r.body.gasten.walkIns >= 2, 'de walk-ins ook');
+  assert.ok(r.body.derving >= 2 * 7.5, 'de gebroken kist wijn staat als derving in de briefing');
+  assert.ok(r.body.team.length >= 1, 'en wie er op de kassa stond');
+});

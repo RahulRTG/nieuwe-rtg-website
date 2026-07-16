@@ -40,6 +40,15 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, pay.verzoekIntrek({ codenaam: liveCodename(req.session), verzoekId: String(req.body.id || '') }));
   });
+  // de tik: ontvangen met een aanraking (tikcode), betalen met een knop
+  app.post('/api/pay/tikcode', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(pay.tikCode({ codenaam: liveCodename(req.session) }));
+  });
+  app.post('/api/pay/tik', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await pay.tikBetaal({ van: liveCodename(req.session), code: req.body.code, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem }));
+  });
   // de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
   app.post('/api/pay/kascode', auth, (req, res) => {
     if (geenGast(req, res)) return;

@@ -4034,19 +4034,44 @@
       ? '<div class="pos-chips" style="margin-top:0.5rem;">'+plan.tafels.map(t =>
           t.status==='vrij'
             ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
-            : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+'</span>'
+            : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>'
         ).join('')+'</div>'+
         '<div class="softline" style="margin-top:0.3rem;">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>'
+      : '';
+    // de open rekeningen: alles wat de kassa op de tafel zette, hier afrekenen
+    const rekeningen = plan.tafels.filter(t => t.rekening);
+    const rekBlok = rekeningen.length
+      ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'">'+
+          '<span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--gold);">'+eur(t.rekening.totaal)+'</b></span>'+
+          '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+
+            '<button class="obtn primary js-rekpay" data-method="rtgpay">RTG Pay</button>'+
+            '<button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span>'+
+        '</div>').join('')
       : '';
     wrap.innerHTML = '<div class="card"><div class="tt-h">🪑 '+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
       '<div class="pos-chips" style="margin-top:0.4rem;">'+
         '<span>👥 '+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
         (plan.openAanvragen?'<span>✋ '+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
         (plan.zonderTafel?'<span>🪑 '+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
-      '</div>'+chips+
+      '</div>'+chips+rekBlok+
       (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
       '</div>'+
       (later.length ? '<div class="card"><div class="tt-h">🗓 '+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
+    // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij
+    wrap.querySelectorAll('[data-tafelrek]').forEach(el => {
+      el.querySelectorAll('.js-rekpay').forEach(b => b.addEventListener('click', async () => {
+        try {
+          const body = { room: el.dataset.tafelrek, method: b.dataset.method };
+          if (body.method === 'rtgpay'){
+            body.payCode = await vraagPayCode(); if (!body.payCode) return;
+            body.idem = 'trek' + Date.now();
+          }
+          const d = await API.call('/supplier/pos/checkout', body);
+          toast(T('res.rekklaar','Rekening afgerekend:')+' '+el.dataset.tafelrek+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')');
+          await refresh(); renderReserveringen();
+        } catch(e){ toast(e.message); }
+      }));
+    });
     wrap.querySelectorAll('.js-walkin').forEach(b => b.addEventListener('click', async () => {
       const p = window.prompt(T('res.walkinp','Walk-in aan '+b.dataset.tafel+': met hoeveel personen?'), '2');
       if (!p) return;
@@ -4209,7 +4234,7 @@
   // ---- kassa, per sector ----
   let bon = {};        // horeca: menu-id -> aantal
   function bonTotal(){ return (state.menu||[]).reduce((s,m)=>s+m.price*(bon[m.id]||0),0); }
-  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='app'?T('pos.app','In de app'):m; }
+  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
   /* RTG Pay aan de kassa: eerst tap to pay (de gast houdt zijn toestel tegen
      de kassa, de code komt contactloos binnen), en anders de code intypen. */
   async function vraagPayCode(){
@@ -4230,10 +4255,31 @@
     else if (type==='hotel'||type==='apartment') html = kassaHotel();
     else html = kassaVervoer();
     html += kassaDay();
-    html += '<div id="zWrap"></div>';
+    html += '<div id="zWrap"></div><div id="shiftWrap"></div>';
     el.innerHTML = html;
     bindKassa(type);
     laadZ();
+    laadShift();
+  }
+
+  /* De shift-samenvatting: het avondbriefing-moment. Gasten, no-shows en
+     walk-ins, de toppers van de dag, de derving en wie er op de kassa stond. */
+  async function laadShift(){
+    const el = $('#shiftWrap'); if (!el) return;
+    let r; try { r = await API.call('/supplier/shift', {}); } catch(e){ return; }
+    const heeftGasten = r.gasten.reserveringen || r.gasten.walkIns || r.gasten.noShows;
+    if (!r.bonnen && !heeftGasten) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="card"><div class="tt-h">🌙 '+T('shift.h','Shift-samenvatting')+'</div>'+
+      (heeftGasten?'<div class="pos-chips" style="margin-top:0.4rem;">'+
+        '<span>👥 '+r.gasten.personen+' '+T('shift.gasten','gasten aan tafel')+'</span>'+
+        '<span>🪑 '+r.gasten.reserveringen+' '+T('shift.res','reservering(en)')+'</span>'+
+        (r.gasten.walkIns?'<span>🚶 '+r.gasten.walkIns+' walk-in(s)</span>':'')+
+        (r.gasten.noShows?'<span style="color:var(--burgundy);">✗ '+r.gasten.noShows+' no-show(s)</span>':'')+
+      '</div>':'')+
+      ((r.toppers||[]).length?'<div class="st-row" style="margin-top:0.4rem;"><span>'+T('shift.toppers','Toppers')+'</span><span class="sub">'+r.toppers.map(t=>t.aantal+'× '+esc(t.naam)).join(' · ')+'</span></div>':'')+
+      (r.derving?'<div class="st-row"><span>'+T('shift.derving','Derving (kostprijs)')+'</span><b style="color:var(--burgundy);">'+eur(r.derving)+'</b></div>':'')+
+      ((r.team||[]).length?'<div class="st-row"><span>'+T('shift.team','Op de kassa')+'</span><span class="sub">'+r.team.map(t=>esc(t.naam)+' '+eur(t.omzet)).join(' · ')+'</span></div>':'')+
+      '<div class="softline" style="margin-top:0.3rem;">'+T('shift.s','Samen met het Z-rapport hierboven is dit de briefing voor morgen.')+'</div></div>';
   }
 
   /* De dagafsluiting (Z-rapport): omzet, bonnen, fooien en de btw-splitsing
@@ -4266,7 +4312,14 @@
         '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
         '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
         '<button class="obtn js-pay" data-method="contant"'+(total?'':' disabled')+'>'+T('pos.cash','Contant')+'</button>'+
-      '</div></div>'+
+      '</div>'+
+      ((state.tables||[]).length ? '<div class="pos-pay" style="margin-top:0.4rem;">'+
+        '<select id="posTafel" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;">'+
+          '<option value="">'+T('pos.tafelkies','Tafel...')+'</option>'+
+          (state.tables||[]).map(t=>'<option value="'+t.name.replace(/"/g,'&quot;')+'">'+t.name+'</option>').join('')+'</select>'+
+        '<button class="obtn js-pay" data-method="tafel"'+(total?'':' disabled')+'>'+T('pos.optafel','Op de tafel')+'</button>'+
+      '</div>' : '')+
+      '</div>'+
       // gast toont het oplichtende scherm; sla de code aan om de bestelling uit te geven
       '<div class="card"><div class="tt-h">'+T('pos.redeemh','RTG-ophaalcode innen')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat het oplichtende scherm zien. Sla de code aan; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven.')+'</div>'+
@@ -4383,6 +4436,10 @@
       const items = (state.menu||[]).filter(m=>bon[m.id]).map(m=>({ name:m.name, qty:bon[m.id], price:m.price }));
       if (!items.length){ toast(T('pos.empty','Tik eerst gerechten aan.')); return; }
       body.items = items; body.total = bonTotal();
+      if (method === 'tafel'){
+        body.room = (($('#posTafel')||{}).value||'');
+        if (!body.room){ toast(T('pos.kiestafel','Kies eerst een tafel.')); return; }
+      }
     } else {
       body.total = Number(($('#posAmt')||{}).value);
       body.desc = (($('#posDesc')||{}).value||'').trim();

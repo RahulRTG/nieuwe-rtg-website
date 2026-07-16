@@ -94,10 +94,26 @@
       <button class="knop pay" id="pLaad">Opladen met Apple Pay</button>
     </div>
 
+    <h3 class="sec">Tikken</h3>
+    <div class="kaart" style="border-color:var(--gold);">
+      <div class="rij">
+        <input class="veld" id="xBedrag" inputmode="decimal" placeholder="Euro" style="max-width:7rem;">
+        <input class="veld" id="xOms" placeholder="Waarvoor? (mag leeg)" style="flex:1;min-width:8rem;" maxlength="80">
+      </div>
+      <div class="rij" style="margin-top:.6rem;">
+        <button class="knop merk" id="xBetaal">Tik en betaal</button>
+        <button class="knop stil" id="xOntvang">Zet op ontvangen</button>
+      </div>
+      <div id="xOntvangAan" hidden>
+        <div class="kascode" id="xCode" aria-live="polite"></div>
+        <p class="leeg" style="text-align:center;">Tik hier je telefoon tegenaan; geldig tot <span id="xTot"></span>.</p>
+      </div>
+    </div>
+
     <h3 class="sec">Voor jou</h3>
     <div class="kaart" id="pAanMij"><div class="leeg">Geen openstaande Klompjes.</div></div>
 
-    <h3 class="sec">Klompje vragen</h3>
+    <h3 class="sec">Klompje, voor wie er niet bij is</h3>
     <div class="kaart">
       <div class="rij">
         <input class="veld" id="tBedrag" inputmode="decimal" placeholder="Totaal in euro" style="max-width:9rem;">
@@ -256,6 +272,40 @@ $('#sStuur').addEventListener('click', async () => {
     const r = await api('pay/stuur', { aan: $('#sAan').value.trim(), centen, oms: 'Gestuurd via RTG Pay', idem: idem() });
     meld('Gestuurd.' + (r.bijgeladen ? ' Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : ''));
     $('#sAan').value = ''; $('#sBedrag').value = '';
+    ververs();
+  } catch (e) { meld(e.message); }
+});
+
+/* de tik: ontvangen met een aanraking, betalen met een knop */
+let tikTimer = null;
+$('#xOntvang').addEventListener('click', async () => {
+  try {
+    const r = await api('pay/tikcode', {});
+    $('#xOntvangAan').hidden = false;
+    $('#xCode').textContent = r.code;
+    $('#xTot').textContent = new Date(r.geldigTot).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    if (window.TapPay && TapPay.kan()) TapPay.schrijf(r.code, Math.max(1000, r.geldigTot - Date.now())).catch(() => {});
+    clearTimeout(tikTimer);
+    tikTimer = setTimeout(() => { $('#xOntvangAan').hidden = true; }, Math.max(1000, r.geldigTot - Date.now()));
+  } catch (e) { meld(e.message); }
+});
+$('#xBetaal').addEventListener('click', async () => {
+  const centen = Math.round(Number(String($('#xBedrag').value).replace(',', '.')) * 100);
+  if (!(centen > 0)) { meld('Vul een bedrag in.'); return; }
+  let code = null;
+  if (window.TapPay && TapPay.kan()) {
+    meld('Houd je telefoon tegen die van je vriend...');
+    code = await TapPay.lees(15000);
+  }
+  if (!code) {
+    const c = prompt('Tikcode van je vriend:');
+    if (!c) return;
+    code = c.trim().toUpperCase();
+  }
+  try {
+    const r = await api('pay/tik', { code, centen, oms: $('#xOms').value.trim(), idem: 'tik' + Date.now() });
+    meld(euro(centen) + ' eur getikt naar ' + r.aan + '.' + (r.bijgeladen ? ' Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : ''));
+    $('#xBedrag').value = ''; $('#xOms').value = '';
     ververs();
   } catch (e) { meld(e.message); }
 });

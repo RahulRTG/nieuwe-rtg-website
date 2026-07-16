@@ -3,7 +3,7 @@
    telling, verspilling en levering. Recepten en leveringen zijn management;
    tellen en derving melden mag iedereen (de vloer weet wat er staat). */
 module.exports = (kern) => {
-  const { app, supplierAuth, managerOnly, keuken, save, sseToSupplier, findSupplier, ghMarkt, ghPlaatsBestelling, sessionFor, dagrapport } = kern;
+  const { app, supplierAuth, managerOnly, keuken, save, sseToSupplier, findSupplier, ghMarkt, ghPlaatsBestelling, sessionFor, dagrapport, shiftSamenvatting } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const sein = code => sseToSupplier(code, 'sync', { scope: 'voorraad' });
 
@@ -74,6 +74,10 @@ module.exports = (kern) => {
   // de dagafsluiting (Z-rapport): omzet, bonnen, betaalwijzen en btw van een dag
   app.post('/api/supplier/dagrapport', supplierAuth, (req, res) => {
     res.json(dagrapport(req.supplier, req.body.datum));
+  });
+  // de shift-samenvatting: het avondbriefing-moment (cijfers, gasten, toppers, derving, team)
+  app.post('/api/supplier/shift', supplierAuth, (req, res) => {
+    res.json(shiftSamenvatting(req.supplier, req.body.datum));
   });
   // dezelfde cijfers als journaalregels voor de boekhouding (CSV-download)
   app.get('/api/supplier/dagrapport.csv', (req, res) => {

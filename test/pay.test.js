@@ -121,6 +121,23 @@ test('de kassabon op RTG Pay: code tonen, afrekenen, en de betaler staat op de b
   assert.ok(mis.body.error, 'de kassa legt uit waarom het niet lukte');
 });
 
+test('de tik: ontvangen met een aanraking, betalen met een knop', async () => {
+  // B zet zijn toestel op ontvangen; A tikt en betaalt
+  const t = await api('pay/tikcode', {}, lidB.token);
+  assert.equal(t.status, 200);
+  assert.match(t.body.code, /^[0-9A-F]{6}$/);
+  const voorB = (await api('pay/overzicht', {}, lidB.token)).body.saldo;
+  const r = await api('pay/tik', { code: t.body.code, centen: 750, oms: 'Koffie terug', idem: 'tik-1' }, lidA.token);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.aan, lidB.codenaam, 'de betaler ziet naar wie het ging');
+  assert.equal((await api('pay/overzicht', {}, lidB.token)).body.saldo, voorB + 750);
+  // dezelfde tik mag binnen zijn vijf minuten door een hele tafel gebruikt worden
+  assert.equal((await api('pay/tik', { code: t.body.code, centen: 250, idem: 'tik-2' }, lidA.token)).status, 200);
+  // naar jezelf tikken kan niet, en een onzincode ketst af
+  assert.equal((await api('pay/tik', { code: t.body.code, centen: 100, idem: 'tik-3' }, lidB.token)).status, 400);
+  assert.equal((await api('pay/tik', { code: '000000', centen: 100, idem: 'tik-4' }, lidA.token)).status, 404);
+});
+
 test('het grootboek sluit op de cent en gasten komen er niet in', async () => {
   const g = await fetch(base + '/api/pay/gezond');
   assert.equal(g.status, 200);

@@ -103,6 +103,24 @@ test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de 
   assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 0, 'uitbetaald naar de bank');
 });
 
+test('de kassabon op RTG Pay: code tonen, afrekenen, en de betaler staat op de bon', async () => {
+  // het lid maakt een verse betaalcode; de kassa rekent de bon ermee af
+  const k = await api('pay/kascode', { maxCenten: 5000 }, lidA.token);
+  assert.equal(k.status, 200);
+  const bon = await api('supplier/pos/sale', {
+    total: 21, method: 'rtgpay', payCode: k.body.code, idem: 'bon-rtgpay-1',
+    items: [{ name: 'Gazpacho de sandia', qty: 1, price: 21 }]
+  }, supToken);
+  assert.equal(bon.status, 200);
+  assert.equal(bon.body.sale.method, 'rtgpay');
+  assert.equal(bon.body.betaler, lidA.codenaam, 'de bon weet wie er betaalde');
+  assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 2100, 'de partnerpot ving 21 euro');
+  // een verkeerde of verlopen code betekent: geen betaling en geen bon
+  const mis = await api('supplier/pos/sale', { total: 10, method: 'rtgpay', payCode: 'FFFFFF', idem: 'bon-rtgpay-2' }, supToken);
+  assert.equal(mis.status, 404);
+  assert.ok(mis.body.error, 'de kassa legt uit waarom het niet lukte');
+});
+
 test('het grootboek sluit op de cent en gasten komen er niet in', async () => {
   const g = await fetch(base + '/api/pay/gezond');
   assert.equal(g.status, 200);

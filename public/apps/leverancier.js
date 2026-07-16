@@ -4000,27 +4000,75 @@
     Util.vervang(wrap, list.map(orderKaart));
   }
 
-  // tafelreserveringen: open aanvragen bevestigen of weigeren, komende tafels zien
-  function renderReserveringen(){
+  /* De tafelplanning: vandaag als gedekte avond (tafels, komst, walk-ins) en
+     de komende dagen als lijst. Elke rij draagt zijn eigen knoppen: bevestigen,
+     tafel toewijzen, gast is er, no-show, vertrokken. */
+  const RES_PILL = { aangevraagd:'nieuw', bevestigd:'bereiding', aangekomen:'klaar' };
+  function resStatusTekst(st){
+    return st==='aangevraagd'?T('res.st.nieuw','nieuw'):st==='bevestigd'?T('res.bevestigd','bevestigd'):st==='aangekomen'?T('res.st.er','aan tafel'):st==='no-show'?'no-show':st==='afgerond'?T('res.st.weg','vertrokken'):st;
+  }
+  function resRij(r, vandaag){
+    const knoppen = [];
+    if (r.status === 'aangevraagd') knoppen.push('<button class="obtn primary js-resok">'+T('res.ok','Bevestig')+'</button>','<button class="obtn warn js-resnee">'+T('sup.reject','Weiger')+'</button>');
+    if (r.status === 'bevestigd'){
+      knoppen.push('<button class="obtn js-restafel">🪑 '+(r.tafel?esc(r.tafel):T('res.tafel','Tafel'))+'</button>');
+      if (vandaag) knoppen.push('<button class="obtn primary js-reser">'+T('res.er','Gast is er')+'</button>','<button class="obtn warn js-resno">'+T('res.noshow','No-show')+'</button>');
+    }
+    if (r.status === 'aangekomen') knoppen.push('<button class="obtn js-resweg">'+T('res.weg','Vertrokken')+'</button>');
+    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-res="'+r.id+'">'+
+      '<span><b>'+r.tijd+'</b> · <b class="cn">'+esc(r.customerCodename)+'</b> · '+r.personen+'p'+
+        (r.tafel?' · 🪑 '+esc(r.tafel):'')+(r.notitie?' · 📝 '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+'</span>'+
+      (knoppen.length
+        ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
+        : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+
+    '</div>';
+  }
+  async function renderReserveringen(){
     const wrap = $('#resWrap');
     if (!wrap) return;
-    const list = state.reserveringen || [];
-    if (!list.length){ wrap.innerHTML = ''; return; }
-    wrap.innerHTML = '<div class="card"><div class="tt-h">🪑 ' + T('res.h','Reserveringen') + '</div>' +
-      list.map(r =>
-        '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;" data-res="' + r.id + '">' +
-          '<span><b class="cn">' + r.customerCodename + '</b> · ' + r.datum + ' ' + r.tijd + ' · ' + r.personen + 'p' + (r.notitie ? ' · 📝 ' + r.notitie : '') + '</span>' +
-          (r.status === 'aangevraagd'
-            ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="obtn primary js-resok">' + T('res.ok','Bevestig') + '</button><button class="obtn warn js-resnee">' + T('sup.reject','Weiger') + '</button></span>'
-            : '<span class="pill klaar" style="flex-shrink:0;">✓ ' + T('res.bevestigd','bevestigd') + '</span>') +
-        '</div>').join('') + '</div>';
+    const later = (state.reserveringen || []).filter(r => r.datum > new Date().toISOString().slice(0,10) && ['aangevraagd','bevestigd'].includes(r.status));
+    let plan = null;
+    try { plan = await API.call('/supplier/tafelplan', {}); } catch(e){ plan = { reserveringen: [], tafels: [], verwachtePersonen: 0, openAanvragen: 0, zonderTafel: 0 }; }
+    if (!plan.reserveringen.length && !later.length && !plan.tafels.length){ wrap.innerHTML = ''; return; }
+    const chips = plan.tafels.length
+      ? '<div class="pos-chips" style="margin-top:0.5rem;">'+plan.tafels.map(t =>
+          t.status==='vrij'
+            ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
+            : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+'</span>'
+        ).join('')+'</div>'+
+        '<div class="softline" style="margin-top:0.3rem;">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>'
+      : '';
+    wrap.innerHTML = '<div class="card"><div class="tt-h">🪑 '+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
+      '<div class="pos-chips" style="margin-top:0.4rem;">'+
+        '<span>👥 '+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
+        (plan.openAanvragen?'<span>✋ '+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
+        (plan.zonderTafel?'<span>🪑 '+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
+      '</div>'+chips+
+      (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
+      '</div>'+
+      (later.length ? '<div class="card"><div class="tt-h">🗓 '+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
+    wrap.querySelectorAll('.js-walkin').forEach(b => b.addEventListener('click', async () => {
+      const p = window.prompt(T('res.walkinp','Walk-in aan '+b.dataset.tafel+': met hoeveel personen?'), '2');
+      if (!p) return;
+      try { await API.call('/supplier/walkin', { tafel: b.dataset.tafel, personen: Number(p) }); toast('🪑 '+T('res.walkintoast','Walk-in geplaatst.')); renderReserveringen(); }
+      catch(e){ toast(e.message); }
+    }));
     wrap.querySelectorAll('[data-res]').forEach(el => {
-      const beslis = async action => {
-        try { await API.call('/supplier/reservering/beslis', { id: el.dataset.res, action }); toast(action === 'bevestig' ? '🪑 ' + T('res.oktoast','Reservering bevestigd; de gast hoort het meteen.') : T('res.neetoast','Reservering geweigerd.')); await refresh(); }
+      const doe = async (pad, body, boodschap) => {
+        try { await API.call(pad, body); if (boodschap) toast(boodschap); await refresh(); }
         catch(e){ toast(e.message); }
       };
-      const ok = el.querySelector('.js-resok'); if (ok) ok.addEventListener('click', () => beslis('bevestig'));
-      const nee = el.querySelector('.js-resnee'); if (nee) nee.addEventListener('click', () => beslis('weiger'));
+      const id = el.dataset.res;
+      const ok = el.querySelector('.js-resok'); if (ok) ok.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'bevestig' }, '🪑 '+T('res.oktoast','Reservering bevestigd; de gast hoort het meteen.')));
+      const nee = el.querySelector('.js-resnee'); if (nee) nee.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'weiger' }, T('res.neetoast','Reservering geweigerd.')));
+      const tf = el.querySelector('.js-restafel'); if (tf) tf.addEventListener('click', () => {
+        const namen = plan.tafels.map(t => t.name);
+        const keuze = window.prompt(T('res.tafelp','Welke tafel?')+' ('+namen.join(', ')+')');
+        if (keuze) doe('/supplier/reservering/tafel', { id, tafel: keuze.trim() }, '🪑 '+T('res.tafeltoast','Tafel toegewezen; de gast krijgt bericht.'));
+      });
+      const er = el.querySelector('.js-reser'); if (er) er.addEventListener('click', () => doe('/supplier/reservering/komst', { id, actie:'aangekomen' }, T('res.ertoast','Welkom; de tafel staat op bezet.')));
+      const no = el.querySelector('.js-resno'); if (no) no.addEventListener('click', () => doe('/supplier/reservering/komst', { id, actie:'no-show' }, T('res.noshowtoast','Gemeld als no-show; de tafel is weer vrij.')));
+      const weg = el.querySelector('.js-resweg'); if (weg) weg.addEventListener('click', () => doe('/supplier/reservering/komst', { id, actie:'vertrokken' }, T('res.wegtoast','Afgerond; de tafel is weer vrij.')));
     });
   }
   async function setStatus(ref, status){
@@ -4161,7 +4209,12 @@
   // ---- kassa, per sector ----
   let bon = {};        // horeca: menu-id -> aantal
   function bonTotal(){ return (state.menu||[]).reduce((s,m)=>s+m.price*(bon[m.id]||0),0); }
-  function methodLabel(m){ return m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):T('pos.room','Op de kamer'); }
+  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='app'?T('pos.app','In de app'):m; }
+  // RTG Pay aan de kassa: de gast toont de betaalcode uit de app, wij vragen die hier
+  function vraagPayCode(){
+    const c = window.prompt(T('pos.paycode','Betaalcode van de gast (uit de app):'));
+    return c ? c.trim().toUpperCase() : null;
+  }
 
   function renderKassa(){
     const el = $('#kassaWrap'); if (!el) return;
@@ -4187,7 +4240,7 @@
       '<div class="st-row"><span>'+T('pos.z.bonnen','Bonnen')+'</span><b>'+r.bonnen+'</b></div>'+
       (r.fooien?'<div class="st-row"><span>'+T('pos.fooien','Fooien')+'</span><b>'+eur(r.fooien)+'</b></div>':'')+
       (r.btw||[]).map(b => '<div class="st-row"><span>'+esc(b.label)+' · '+b.tarief+'% btw</span><b>'+eur(b.omzet)+' <span class="sub">'+T('pos.z.waarvanbtw','waarvan btw')+' '+eur(b.btw)+'</span></b></div>').join('')+
-      Object.entries(r.betaalwijzen||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.ontv','Ontvangsten')+' '+esc(w)+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
+      Object.entries(r.betaalwijzen||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.ontv','Ontvangsten')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
       '<button class="bigbtn" id="zCsv" style="margin-top:0.5rem;">⬇ '+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
       '<div class="softline" style="margin-top:0.3rem;">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
     const k = el.querySelector('#zCsv');
@@ -4205,7 +4258,7 @@
       (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+'</span></div></div>':'')+
       '<div class="pos-pay">'+
         '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
-        '<button class="obtn primary js-pay" data-method="pin"'+(total?'':' disabled')+'>'+T('pos.paypin','Afrekenen, PIN')+'</button>'+
+        '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
         '<button class="obtn js-pay" data-method="contant"'+(total?'':' disabled')+'>'+T('pos.cash','Contant')+'</button>'+
       '</div></div>'+
       // gast toont het oplichtende scherm; sla de code aan om de bestelling uit te geven
@@ -4226,7 +4279,7 @@
       '<div class="field"><label>'+T('pos.amount','Bedrag (€)')+'</label><input id="posAmt" type="number" inputmode="decimal" placeholder="45"></div>'+
       '<div class="pos-pay">'+
         '<button class="obtn primary js-pay" data-method="kamer">'+T('pos.toroom','Op de kamer')+'</button>'+
-        '<button class="obtn js-pay" data-method="pin">'+T('pos.pin','PIN')+'</button>'+
+        '<button class="obtn js-pay" data-method="rtgpay">RTG Pay</button>'+
         '<button class="obtn js-pay" data-method="contant">'+T('pos.cash','Contant')+'</button>'+
       '</div></div>' + kassaOpenRooms();
   }
@@ -4240,7 +4293,7 @@
       rooms.map(r =>
         '<div class="pos-sale"><div><b>'+r+'</b><span>'+open[r].count+' '+T('pos.posts','post(en)')+'</span></div>'+
         '<div class="row-mid-gap"><span class="amt" style="font-family:\'Bodoni Moda\',serif;">'+eur(open[r].total)+'</span>'+
-        '<button class="obtn primary js-checkout" data-room="'+r.replace(/"/g,'&quot;')+'" data-method="pin">'+T('pos.checkoutpin','Check-out, PIN')+'</button>'+
+        '<button class="obtn primary js-checkout" data-room="'+r.replace(/"/g,'&quot;')+'" data-method="rtgpay">'+T('pos.checkoutrtg','Check-out, RTG Pay')+'</button>'+
         '<button class="obtn js-checkout" data-room="'+r.replace(/"/g,'&quot;')+'" data-method="contant">'+T('pos.cash','Contant')+'</button></div></div>'
       ).join('')+'</div>';
   }
@@ -4251,7 +4304,7 @@
       '<div class="field"><label>'+T('pos.ride','Rit')+'</label><input id="posDesc" placeholder="'+T('pos.descride','Bijv. luchthaven naar Cala Jondal')+'"></div>'+
       '<div class="field"><label>'+T('pos.amount','Bedrag (€)')+'</label><input id="posAmt" type="number" inputmode="decimal" placeholder="28"></div>'+
       '<div class="pos-pay">'+
-        '<button class="obtn primary js-pay" data-method="pin">'+T('pos.paypin','Afrekenen, PIN')+'</button>'+
+        '<button class="obtn primary js-pay" data-method="rtgpay">'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
         '<button class="obtn js-pay" data-method="contant">'+T('pos.cash','Contant')+'</button>'+
       '</div></div>';
   }
@@ -4285,7 +4338,12 @@
     const codeInp = $('#posCode'); if (codeInp) codeInp.addEventListener('keydown', e => { if (e.key==='Enter') redeemCode(); });
     document.querySelectorAll('.js-checkout').forEach(b => b.addEventListener('click', async () => {
       try {
-        const d = await API.call('/supplier/pos/checkout', { room: b.dataset.room, method: b.dataset.method });
+        const body = { room: b.dataset.room, method: b.dataset.method };
+        if (body.method === 'rtgpay'){
+          body.payCode = vraagPayCode(); if (!body.payCode) return;
+          body.idem = 'co' + Date.now();
+        }
+        const d = await API.call('/supplier/pos/checkout', body);
         toast(T('pos.checkedout','Uitgecheckt:')+' '+b.dataset.room+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')');
         await refresh(); openTab('kassa');
       } catch(e){ toast(e.message); }
@@ -4325,6 +4383,10 @@
       const room = ($('#posRoom')||{}).value;
       if (room) body.room = room;
       if (!(body.total>0)){ toast(T('pos.fillamount','Vul een bedrag in.')); return; }
+    }
+    if (method === 'rtgpay'){
+      body.payCode = vraagPayCode(); if (!body.payCode) return;
+      body.idem = 'pos' + Date.now();
     }
     try {
       const d = await API.call('/supplier/pos/sale', body);
@@ -5583,7 +5645,8 @@
         ma.rijen.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
           '<div class="st-row"><span><b style="color:'+KLASSE[r.klasse][1]+';">'+KLASSE[r.klasse][0]+' '+esc(r.klasse)+'</b> '+esc(r.naam)+'</span>'+
           '<span class="sub">'+r.verkocht+'× · '+T('vr.marge','marge')+' '+geld(r.marge)+' · '+T('vr.winst','winst')+' '+geld(r.brutowinst)+'</span></div>'+
-          '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+'</div>';
+          '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+
+        (mgr?'<button class="bigbtn" id="vrPlan" style="margin-top:0.5rem;">🧠 '+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
     }
     // het logboek: elke beweging herleidbaar
     if ((d.logboek||[]).length) h += '<div class="card"><div class="tt-h">🧾 '+T('vr.log','Laatste bewegingen')+'</div>'+
@@ -5613,6 +5676,17 @@
         toast('🛒 '+T('vr.besteld','Bestelling ')+r.order.ref+' '+T('vr.besteld2','geplaatst.')+(r.nietGevonden.length?' '+T('vr.nietgev','Niet in het assortiment: ')+r.nietGevonden.join(', '):''));
         renderVoorraad();
       } catch(e){ toast(e.message); }
+    });
+    // het actieplan van de chef-adviseur: kwadranten plus derving, in euro's
+    const vp = el.querySelector('#vrPlan'); if (vp) vp.addEventListener('click', async () => {
+      const uit = el.querySelector('#vrPlanUit');
+      uit.innerHTML = '<div class="softline" style="margin-top:0.4rem;">'+T('vr.plan.laden','De adviseur rekent...')+'</div>';
+      try {
+        const p = await API.call('/supplier/keuken/menu-advies', {});
+        uit.innerHTML = '<div class="sub" style="margin-top:0.5rem;">'+esc(p.samenvatting)+'</div>'+
+          (p.acties||[]).map(x => '<div style="border-top:1px solid var(--line);padding:0.35rem 0;font-size:0.82rem;">'+
+            (x.impact?'<b style="color:var(--gold);">'+geld(x.impact)+'</b> · ':'')+esc(x.tekst)+'</div>').join('');
+      } catch(e){ uit.innerHTML = ''; toast(e.message); }
     });
     el.querySelectorAll('[data-vtel]').forEach(b => b.addEventListener('click', () => {
       const g = prompt(T('vr.telvraag','Wat is de getelde stand?')); if (g == null || g === '') return;

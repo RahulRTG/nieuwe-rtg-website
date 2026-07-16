@@ -65,6 +65,11 @@ module.exports = (kern) => {
   app.post('/api/supplier/keuken/menu-analyse', supplierAuth, (req, res) => {
     res.json(keuken.menuAnalyse(req.supplier, req.body.dagen));
   });
+  // het actieplan van de AI-chef-adviseur: kwadranten plus derving, in euro's
+  app.post('/api/supplier/keuken/menu-advies', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    res.json(keuken.menuAdvies(req.supplier, req.body.dagen));
+  });
 
   // de dagafsluiting (Z-rapport): omzet, bonnen, betaalwijzen en btw van een dag
   app.post('/api/supplier/dagrapport', supplierAuth, (req, res) => {
@@ -82,7 +87,8 @@ module.exports = (kern) => {
     res.setHeader('Content-Disposition', 'attachment; filename="dagrapport-' + s.code.toLowerCase() + '-' + r.datum + '.csv"');
     res.write('﻿' + ['datum', 'omschrijving', 'categorie', 'omzet incl btw', 'btw-tarief', 'btw-bedrag', 'omzet excl btw'].join(';') + '\n');
     for (const b of r.btw) res.write([r.datum, 'Omzet ' + b.label, b.cat, geld(b.omzet), b.tarief + '%', geld(b.btw), geld(b.grondslag)].join(';') + '\n');
-    for (const [wijze, bedrag] of Object.entries(r.betaalwijzen)) res.write([r.datum, 'Ontvangsten ' + wijze, 'betaalwijze', geld(bedrag), '', '', ''].join(';') + '\n');
+    const WIJZE = { app: 'in de app', contant: 'contant', rtgpay: 'RTG Pay', rtg: 'RTG-lidmaatschap', kamer: 'op de kamer', pin: 'PIN' };
+    for (const [wijze, bedrag] of Object.entries(r.betaalwijzen)) res.write([r.datum, 'Ontvangsten ' + (WIJZE[wijze] || wijze), 'betaalwijze', geld(bedrag), '', '', ''].join(';') + '\n');
     if (r.fooien) res.write([r.datum, 'Fooien (voor het team)', 'fooi', geld(r.fooien), '', '', ''].join(';') + '\n');
     res.end();
   });

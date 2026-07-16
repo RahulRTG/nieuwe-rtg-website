@@ -233,7 +233,7 @@ const stopServer = () => new Promise(r => {
         for (const st of ['in bereiding', 'klaar', 'geserveerd'])
           await api('keuken-status', '/api/supplier/order/status', { ref: klus.ref, status: st }, li.token);
       }
-      await api('kassa-verkoop', '/api/supplier/pos/sale', { total: 42, method: 'pin', desc: 'tafel 8', items: [{ name: 'Cava', qty: 2, price: 21 }] }, li.token);
+      await api('kassa-verkoop', '/api/supplier/pos/sale', { total: 42, method: 'contant', desc: 'tafel 8', items: [{ name: 'Cava', qty: 2, price: 21 }] }, li.token);
       await slaap(180);
     }
   })());

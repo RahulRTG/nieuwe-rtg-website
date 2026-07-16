@@ -2088,6 +2088,7 @@ const {
    ticketsVoorSlot, optieAan en zijnVrienden meeneemt. */
 const {
   reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
+  tafelplanning, reserveringTafel, reserveringKomst, walkIn,
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet,
   favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen,
   betaalSplits, zetOpWachtlijst, mijnWachtlijst, meldWachtlijst, rsvpAnnuleer,
@@ -2105,6 +2106,7 @@ const {
   isRetail: retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
   vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, verkoop: retailVerkoop,
+  verkoopTerug: retailVerkoopTerug,
   voorraadZoek, retailStats, retailState, catalogus: retailCatalogus
 } = maakRetail({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
@@ -2585,6 +2587,7 @@ const kern = {
   webpush, weekdagFactor, werkgeverSollicitatie,
   // de ervaring-laag (kern/ervaring.js)
   MELDING_SCOPES, reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
+  tafelplanning, reserveringTafel, reserveringKomst, walkIn,
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet, favorietenVan, isFavoriet,
   fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst,
   meldWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
@@ -2592,7 +2595,7 @@ const kern = {
   // de retail-/mode-laag (kern/retail.js)
   RETAIL_MATEN, RETAIL_SEIZOENEN, retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
-  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, voorraadZoek,
+  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, retailVerkoopTerug, voorraadZoek,
   retailStats, retailState, retailCatalogus,
   // de groothandel-/marktlaag (kern/groothandel.js)
   GROOTHANDEL_FUNCTIES, GROOTHANDEL_CATEGORIEEN, ghIsGroothandel, ghDefaults, ghFunctieAan,

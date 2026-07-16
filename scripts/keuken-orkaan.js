@@ -286,7 +286,7 @@ const stopServer = () => new Promise(r => {
       }
       // af en toe de AI-keukencoach raadplegen (allergenen/mise en place)
       if (Math.random() < 0.05) await api('keuken-coach', '/api/supplier/kitchen/coach', { vraag: 'Hoe verdeel ik de mise en place bij volle bak?' }, kok.token);
-      await api('kassa-verkoop', '/api/supplier/pos/sale', { total: 42, method: 'pin', desc: 'tafel 8', items: [{ name: 'Cava', qty: 2, price: 21 }] }, kok.token);
+      await api('kassa-verkoop', '/api/supplier/pos/sale', { total: 42, method: 'contant', desc: 'tafel 8', items: [{ name: 'Cava', qty: 2, price: 21 }] }, kok.token);
       await slaap(30);
     }
   })());

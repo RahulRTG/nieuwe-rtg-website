@@ -116,7 +116,7 @@ test('5. apart leggen + mobiele kassa: voorraad daalt, historie groeit, apart wo
   const mijn = await api(base, '/api/retail/mijn', {}, lid.token);
   assert.ok(mijn.body.apart.some(x => x.vsku === vM.vsku), 'het lid ziet zijn apart gelegde artikel');
   // mobiele kassa: verkoop het aan de klant
-  const verk = await api(base, '/api/supplier/retail/verkoop', { klantKey: klant.key, method: 'pin', regels: [{ vsku: vM.vsku, aantal: 1 }] }, brand.token);
+  const verk = await api(base, '/api/supplier/retail/verkoop', { klantKey: klant.key, method: 'contant', regels: [{ vsku: vM.vsku, aantal: 1 }] }, brand.token);
   assert.equal(verk.status, 200, JSON.stringify(verk.body));
   assert.equal(verk.body.sale.total, shirt.price, 'de bon staat op de ledenprijs');
   na = (await retail()).artikelen.find(a => a.naam === 'Linnen overhemd').varianten.find(v => v.maat === 'M').voorraad;

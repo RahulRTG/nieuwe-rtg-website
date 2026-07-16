@@ -29,7 +29,7 @@ test.before(async () => {
 test.after(() => stop(srv && srv.child));
 
 test('1. een kassaverkoop op codenaam factureert automatisch beide partijen', async () => {
-  const sale = await api(base, '/api/supplier/pos/sale', { total: 24.20, method: 'pin', codenaam, items: [{ name: 'Ramen', qty: 2, price: 12.10 }] }, sup);
+  const sale = await api(base, '/api/supplier/pos/sale', { total: 24.20, method: 'contant', codenaam, items: [{ name: 'Ramen', qty: 2, price: 12.10 }] }, sup);
   assert.equal(sale.status, 200);
   // verkoper ziet de factuur als "verkocht"
   const supF = (await api(base, '/api/supplier/facturen/mijn', {}, sup)).body;

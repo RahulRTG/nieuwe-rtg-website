@@ -7,7 +7,8 @@ module.exports = (kern) => {
     RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
     cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
-    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog } = kern;
+    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
+    tafelplanning, reserveringTafel, reserveringKomst, walkIn } = kern;
   // de dagcontext: tijd, seizoen en temperatuur, voor elke AI in dit domein
   const { dagContext } = require('../kern/context');
 
@@ -549,20 +550,32 @@ app.post('/api/supplier/salon/stats', supplierAuth, (req, res) => {
   });
 });
 
-app.post('/api/supplier/pos/sale', supplierAuth, (req, res) => {
+app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const total = Number(req.body.total);
   if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
-  const method = POS_METHODS.includes(req.body.method) ? req.body.method : 'pin';
+  const method = POS_METHODS.includes(req.body.method) ? req.body.method : 'contant';
   const items = Array.isArray(req.body.items)
     ? req.body.items.slice(0, 40).map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
     : null;
+  // RTG Pay: de gast toont de betaalcode uit de app; die wordt eerst geind
+  // in het grootboek. Lukt dat niet, dan is er ook geen bon.
+  let betaler = null;
+  if (method === 'rtgpay') {
+    const p = await pay.kasInt({
+      supplierCode: req.supplier.code, code: req.body.payCode,
+      centen: Math.round(total * 100), oms: req.supplier.name,
+      idem: req.body.idem
+    });
+    if (p.error) return res.status(p.status || 400).json({ error: p.error });
+    betaler = p.van;
+  }
   const sale = {
     id: crypto.randomBytes(4).toString('hex'),
     bon: pickupCode(),
     actor: req.actor.name,
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
-    items, total, method,
+    items, total, method, betaler,
     at: new Date().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
@@ -580,9 +593,9 @@ app.post('/api/supplier/pos/sale', supplierAuth, (req, res) => {
     : [{ omschrijving: sale.desc || 'Verkoop', aantal: 1, stuk: total }];
   facturatie.boekMetCodenaam({
     soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
-    koper: { naam: req.body.codenaam || sale.room || 'Kasklant' }, regels: factuurRegels, methode: method, ref: sale.id
-  }, req.body.codenaam).catch(() => {});
-  res.json({ ok: true, sale });
+    koper: { naam: req.body.codenaam || betaler || sale.room || 'Kasklant' }, regels: factuurRegels, methode: method, ref: sale.id
+  }, req.body.codenaam || betaler).catch(() => {});
+  res.json({ ok: true, sale, betaler });
 });
 
 app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
@@ -621,20 +634,32 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
   res.json({ ok: true, order: { ref: o.ref, codename: o.customerCodename, items: o.items, total: o.total, wasPaid }, sale });
 });
 
-app.post('/api/supplier/pos/checkout', supplierAuth, (req, res) => {
+app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   const room = String(req.body.room || '').slice(0, 60);
-  const method = ['pin', 'contant'].includes(req.body.method) ? req.body.method : 'pin';
+  const method = ['rtgpay', 'contant'].includes(req.body.method) ? req.body.method : 'contant';
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
   const open = list.filter(s => s.method === 'kamer' && !s.settled && s.room === room);
   if (!open.length) return res.status(404).json({ error: 'Geen open kamerlasten voor deze kamer.' });
   let total = 0;
-  for (const s of open) { s.settled = true; total += s.total; }
+  for (const s of open) total += s.total;
+  // eerst het geld (bij RTG Pay via de betaalcode), dan pas de lasten sluiten
+  let betaler = null;
+  if (method === 'rtgpay') {
+    const p = await pay.kasInt({
+      supplierCode: req.supplier.code, code: req.body.payCode,
+      centen: Math.round(total * 100), oms: 'Check-out ' + room + ', ' + req.supplier.name,
+      idem: req.body.idem
+    });
+    if (p.error) return res.status(p.status || 400).json({ error: p.error });
+    betaler = p.van;
+  }
+  for (const s of open) s.settled = true;
   const sale = {
     id: crypto.randomBytes(4).toString('hex'),
     bon: pickupCode(),
     actor: req.actor.name,
     desc: 'Check-out ' + room + ' (' + open.length + ' post(en))',
-    room, items: null, total, method,
+    room, items: null, total, method, betaler,
     at: new Date().toISOString()
   };
   list.unshift(sale);
@@ -2225,18 +2250,29 @@ app.post('/api/supplier/retail/styling', supplierAuth, (req, res) => {
   logActivity(req.supplier.code, req.actor, 'stuurde een stylingvoorstel'); res.json(r);
 });
 // mobiele kassa op de vloer: verkoop varianten (voorraad daalt, historie groeit)
-app.post('/api/supplier/retail/verkoop', supplierAuth, (req, res) => {
+app.post('/api/supplier/retail/verkoop', supplierAuth, async (req, res) => {
   if (!eisRetail(req, res)) return;
   const r = retailVerkoop(req.supplier, req.body, req.actor);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  // RTG Pay: het totaal staat pas na de verkoop vast (serverprijzen), dus
+  // eerst boeken, dan innen; ketst de code af, dan draait de verkoop terug.
+  if (r.sale.method === 'rtgpay') {
+    const p = await pay.kasInt({
+      supplierCode: req.supplier.code, code: req.body.payCode,
+      centen: Math.round(r.sale.total * 100), oms: req.supplier.name,
+      idem: r.sale.id
+    });
+    if (p.error) { retailVerkoopTerug(req.supplier, r.sale); return res.status(p.status || 400).json({ error: p.error }); }
+    r.sale.betaler = p.van;
+  }
   logActivity(req.supplier.code, req.actor, 'verkocht ' + r.sale.items.reduce((n, i) => n + i.qty, 0) + ' stuk(s) · € ' + r.sale.total);
   // automatische factuur voor beide partijen (koper gekoppeld via codenaam)
   facturatie.boekMetCodenaam({
     soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
-    koper: { naam: req.body.codenaam || 'Klant' },
+    koper: { naam: req.body.codenaam || r.sale.betaler || 'Klant' },
     regels: (r.sale.items || []).map(i => ({ omschrijving: i.naam || i.name || 'Artikel', aantal: i.qty, stuk: i.price || i.prijs })),
-    methode: r.sale.method || 'pin', ref: r.sale.id
-  }, req.body.codenaam || (r.sale.klant && r.sale.klant.codenaam)).catch(() => {});
+    methode: r.sale.method || 'contant', ref: r.sale.id
+  }, req.body.codenaam || r.sale.betaler || (r.sale.klant && r.sale.klant.codenaam)).catch(() => {});
   res.json(r);
 });
 
@@ -2287,6 +2323,31 @@ app.post('/api/supplier/reservering/beslis', supplierAuth, (req, res) => {
   const r = beslisReservering(req.supplier, String(req.body.id || ''), action);
   if (r.error) return res.status(r.status).json({ error: r.error });
   logActivity(req.supplier.code, req.actor, (action === 'bevestig' ? 'bevestigde' : 'weigerde') + ' de reservering van ' + r.reservering.customerCodename + ' (' + r.reservering.datum + ' ' + r.reservering.tijd + ')');
+  res.json(r);
+});
+
+/* De tafelplanning: de hele dag in een oogopslag (aanvragen, bevestigd,
+   toegewezen tafels, walk-ins), plus de vloerhandelingen: tafel toewijzen,
+   komst melden en een walk-in plaatsen. Voor iedereen die op de vloer staat. */
+app.post('/api/supplier/tafelplan', supplierAuth, (req, res) => {
+  res.json(tafelplanning(req.supplier, req.body.datum));
+});
+app.post('/api/supplier/reservering/tafel', supplierAuth, (req, res) => {
+  const r = reserveringTafel(req.supplier, String(req.body.id || ''), req.body.tafel);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  logActivity(req.supplier.code, req.actor, 'wees tafel ' + r.reservering.tafel + ' toe aan ' + r.reservering.customerCodename + ' (' + r.reservering.datum + ' ' + r.reservering.tijd + ')');
+  res.json(r);
+});
+app.post('/api/supplier/reservering/komst', supplierAuth, (req, res) => {
+  const r = reserveringKomst(req.supplier, String(req.body.id || ''), String(req.body.actie || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  logActivity(req.supplier.code, req.actor, 'meldde de reservering van ' + r.reservering.customerCodename + ' als ' + r.reservering.status);
+  res.json(r);
+});
+app.post('/api/supplier/walkin', supplierAuth, (req, res) => {
+  const r = walkIn(req.supplier, req.body.tafel, req.body.personen, req.actor.name);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  logActivity(req.supplier.code, req.actor, 'plaatste een walk-in (' + r.reservering.personen + 'p) aan tafel ' + r.reservering.tafel);
   res.json(r);
 });
 

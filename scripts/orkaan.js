@@ -519,7 +519,7 @@ const naam = i => 'Valk ' + i;
     ...lus('tweewielers', async () => { await api('tweewielers', '/api/verhuur/aanbod', {}, lid().token); }, 2, 1500),
     ...lus('wellness-spa', async () => { await api('wellness-spa', '/api/salon/profiel', { code: 'SERENA' }, lid().token); }, 1, 2000),
     ...lus('hq-audit', async () => { await api('hq-audit', '/api/office/securitylog', {}, offTok); }, 1, 3000),
-    ...lus('kassa', async () => { await api('kassa', '/api/supplier/pos/sale', { total: 10 + rnd(90), method: 'pin', desc: 'Orkaanbon' }, zaakToks.PONTO); }, 1, 2000),
+    ...lus('kassa', async () => { await api('kassa', '/api/supplier/pos/sale', { total: 10 + rnd(90), method: 'contant', desc: 'Orkaanbon' }, zaakToks.PONTO); }, 1, 2000),
     ...lus('modekoerier', async () => {
       const rt = await api('modekoerier', '/api/supplier/mode/bezorg/route', { lat: 38.907, lng: 1.435 }, maisonTok);
       const klus = modeQueue.shift();

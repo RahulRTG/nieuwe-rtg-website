@@ -60,7 +60,7 @@ test('een recept op het gerecht geeft kostprijs en marge', async () => {
 });
 
 test('de kassabon boekt de ingredienten automatisch af via het recept', async () => {
-  const bon = await api('supplier/pos/sale', { total: 2 * menuItem.price, method: 'pin', items: [{ name: menuItem.name, qty: 2, price: menuItem.price }] });
+  const bon = await api('supplier/pos/sale', { total: 2 * menuItem.price, method: 'contant', items: [{ name: menuItem.name, qty: 2, price: menuItem.price }] });
   assert.equal(bon.status, 200);
   const o = (await api('supplier/keuken')).body;
   const l = o.artikelen.find(a => a.id === lam.id);
@@ -164,7 +164,7 @@ test('de dagafsluiting: Z-rapport met btw-splitsing en de boekhoudexport als CSV
   assert.ok(r.body.bonnen >= 2, 'de kassabon en de gastbestelling tellen mee');
   assert.ok(r.body.omzet >= 3 * menuItem.price, 'de omzet telt beide verkopen');
   assert.ok(r.body.btw.length >= 1 && r.body.btw[0].btw > 0, 'de btw is gesplitst uit de omzet');
-  assert.ok(r.body.betaalwijzen.pin >= 2 * menuItem.price, 'de pinbon staat onder de betaalwijzen');
+  assert.ok(r.body.betaalwijzen.contant >= 2 * menuItem.price, 'de contante bon staat onder de betaalwijzen');
   assert.ok(r.body.betaalwijzen.app >= menuItem.price, 'de app-bestelling ook');
   const csv = await fetch(base + '/api/supplier/dagrapport.csv?token=' + token);
   assert.equal(csv.status, 200);
@@ -182,4 +182,56 @@ test('menu-engineering: volume maal marge, met een kwadrant en advies per gerech
   assert.ok(['ster', 'werkpaard', 'puzzel', 'hond'].includes(rij.klasse), 'het gerecht met recept krijgt een kwadrant');
   assert.ok(rij.advies.length > 10, 'met een advies erbij');
   assert.ok(r.body.rijen.some(x => x.klasse === 'onbekend'), 'zonder recept geen marge-oordeel');
+});
+
+test('het actieplan van de chef-adviseur: concrete acties met bedragen, plus de derving', async () => {
+  const r = await api('supplier/keuken/menu-advies', {});
+  assert.equal(r.status, 200);
+  assert.ok(/omzet/.test(r.body.samenvatting) && /brutowinst/.test(r.body.samenvatting), 'de samenvatting noemt omzet en brutowinst');
+  assert.ok(r.body.acties.length >= 1, 'er staan acties in het plan');
+  assert.ok(r.body.acties.every(a => a.tekst && a.tekst.length > 15), 'elke actie is uitgeschreven');
+  // de gebroken kist wijn (2 flessen) uit de eerdere test staat als derving in het plan
+  assert.ok(r.body.derving >= 2 * 7.5, 'de derving telt de kostprijs van de breuk');
+  assert.ok(r.body.acties.some(a => a.soort === 'derving'), 'en het plan benoemt de derving');
+});
+
+test('de tafelplanning: reservering, tafel toewijzen, komst en de walk-in', async () => {
+  // een lid vraagt een tafel voor vanavond aan
+  const lid = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) })).json();
+  const vandaag = new Date().toISOString().slice(0, 10);
+  const aanvraag = await api('reserveer', { supplierCode: supCode, datum: vandaag, tijd: '20:00', personen: 4, notitie: 'Bij het raam' }, lid.token);
+  assert.equal(aanvraag.status, 200);
+  const rid = aanvraag.body.reservering.id;
+  // de zaak ziet hem op de planning van vandaag als open aanvraag
+  let plan = (await api('supplier/tafelplan', {})).body;
+  assert.ok(plan.openAanvragen >= 1, 'de aanvraag staat open op de planning');
+  assert.ok(plan.tafels.length >= 4, 'de tafels staan op de kaart');
+  // bevestigen, tafel toewijzen: de tafel gaat op gereserveerd
+  assert.equal((await api('supplier/reservering/beslis', { id: rid, action: 'bevestig' })).status, 200);
+  const tafelNaam = plan.tafels[0].name;
+  assert.equal((await api('supplier/reservering/tafel', { id: rid, tafel: tafelNaam })).status, 200);
+  plan = (await api('supplier/tafelplan', {})).body;
+  assert.equal(plan.tafels.find(t => t.name === tafelNaam).status, 'gereserveerd');
+  assert.equal(plan.verwachtePersonen, 4, 'vier gasten verwacht vanavond');
+  // de gast komt binnen: de tafel staat op bezet; en na afloop weer vrij
+  assert.equal((await api('supplier/reservering/komst', { id: rid, actie: 'aangekomen' })).status, 200);
+  plan = (await api('supplier/tafelplan', {})).body;
+  assert.equal(plan.tafels.find(t => t.name === tafelNaam).status, 'bezet');
+  assert.equal((await api('supplier/reservering/komst', { id: rid, actie: 'vertrokken' })).status, 200);
+  plan = (await api('supplier/tafelplan', {})).body;
+  assert.equal(plan.tafels.find(t => t.name === tafelNaam).status, 'vrij');
+  // de walk-in: een tik op een vrije tafel; dezelfde tafel nog eens ketst af
+  const w = await api('supplier/walkin', { tafel: tafelNaam, personen: 2 });
+  assert.equal(w.status, 200);
+  assert.equal(w.body.reservering.status, 'aangekomen');
+  assert.equal((await api('supplier/walkin', { tafel: tafelNaam, personen: 2 })).status, 409, 'een bezette tafel neemt geen walk-in');
+  // en de no-show maakt de gereserveerde tafel weer vrij
+  const aan2 = await api('reserveer', { supplierCode: supCode, datum: vandaag, tijd: '21:30', personen: 2 }, lid.token);
+  const rid2 = aan2.body.reservering.id;
+  await api('supplier/reservering/beslis', { id: rid2, action: 'bevestig' });
+  const vrije = (await api('supplier/tafelplan', {})).body.tafels.find(t => t.status === 'vrij').name;
+  await api('supplier/reservering/tafel', { id: rid2, tafel: vrije });
+  assert.equal((await api('supplier/reservering/komst', { id: rid2, actie: 'no-show' })).status, 200);
+  plan = (await api('supplier/tafelplan', {})).body;
+  assert.equal(plan.tafels.find(t => t.name === vrije).status, 'vrij', 'na de no-show is de tafel weer vrij');
 });

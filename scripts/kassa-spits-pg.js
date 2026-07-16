@@ -204,7 +204,7 @@ const KEUKENS = ['KIKUNOI', 'PONTO'];
         await api('doorgeef', '/api/supplier/order/status', { ref, status: 'geserveerd' }, k.pda);
       }
     })());
-    taken.push((async () => { while (bezig()) { await api('kassa-verkoop', '/api/supplier/pos/sale', { total: 47, method: 'pin', desc: 'Terras', items: [{ name: 'Cava', qty: 2, price: 14 }] }, k.pda); await slaap(200); } })());
+    taken.push((async () => { while (bezig()) { await api('kassa-verkoop', '/api/supplier/pos/sale', { total: 47, method: 'contant', desc: 'Terras', items: [{ name: 'Cava', qty: 2, price: 14 }] }, k.pda); await slaap(200); } })());
     const vragen = ['hoeveel bestellingen staan er open?', 'wat is de omzet vandaag?', 'meld klus: vaatwasser lekt', 'welke tafels wachten nog?'];
     let vi = 0;
     taken.push((async () => { while (bezig()) { await api('ai-assistent', '/api/supplier/ai', { q: vragen[vi++ % vragen.length] }, k.pda); await slaap(500); } })());

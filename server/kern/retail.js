@@ -261,7 +261,7 @@ function maakRetail({ db, save, crypto, findSupplier, notify, notifySupplier, ss
     }
     if (!items.length) return { status: 400, error: 'Geen geldige artikelen.' };
     totaal = rond(totaal);
-    const method = ['pin', 'contant'].includes(body.method) ? body.method : 'pin';
+    const method = ['contant', 'rtgpay'].includes(body.method) ? body.method : 'contant';
     // als posSale, zodat het Z-rapport, de fooien en de boekhouding meelopen
     const sale = { id: id(), method, total: totaal, items, actor: (actor && actor.name) || 'Team', at: nu(), room: null, retail: true };
     (db.data.posSales[s.code] = db.data.posSales[s.code] || []).unshift(sale);
@@ -277,6 +277,18 @@ function maakRetail({ db, save, crypto, findSupplier, notify, notifySupplier, ss
     sseToSupplier(s.code, 'sync', { scope: 'retail' });
     sseToOffice('sync', { scope: 'orders' });
     return { ok: true, sale };
+  }
+
+  /* Ketst de RTG Pay-betaling na de verkoop alsnog af, dan draait de route de
+     verkoop hiermee terug: voorraad erbij, bon eruit. De klanthistorie laten
+     we staan; die is informatief en heeft geen geldwaarde. */
+  function verkoopTerug(s, sale) {
+    for (const it of sale.items || []) {
+      const hit = variantVan(s, it.vsku);
+      if (hit) hit.variant.voorraad += it.qty;
+    }
+    db.data.posSales[s.code] = (db.data.posSales[s.code] || []).filter(x => x.id !== sale.id);
+    save();
   }
 
   /* ---- voorraad opzoeken (winkelvloer): naam, sku, kleur of maat ---- */
@@ -384,7 +396,7 @@ function maakRetail({ db, save, crypto, findSupplier, notify, notifySupplier, ss
     isRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
     klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle,
     legApart, mijnApart, vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling,
-    verkoop, voorraadZoek, retailStats, retailState, catalogus
+    verkoop, verkoopTerug, voorraadZoek, retailStats, retailState, catalogus
   };
 }
 

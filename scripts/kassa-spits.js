@@ -235,7 +235,7 @@ const BASKET = [{ id: 'm1', qty: 1 }, { id: 'm2', qty: 1 }, { id: 'm3', qty: 1 }
     /* 2b) KASSA (POS): personeel slaat losse verkopen aan */
     taken.push((async () => {
       while (bezig()) {
-        await api('kassa-verkoop', '/api/supplier/pos/sale', { total: 47, method: 'pin', desc: 'Terras', items: [{ name: 'Cava', qty: 2, price: 14 }, { name: 'Tapas', qty: 1, price: 19 }] }, k.pda);
+        await api('kassa-verkoop', '/api/supplier/pos/sale', { total: 47, method: 'contant', desc: 'Terras', items: [{ name: 'Cava', qty: 2, price: 14 }, { name: 'Tapas', qty: 1, price: 19 }] }, k.pda);
         await slaap(200);
       }
     })());

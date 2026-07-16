@@ -333,7 +333,8 @@
         ma.rijen.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
           '<div class="st-row"><span><b style="color:'+KLASSE[r.klasse][1]+';">'+KLASSE[r.klasse][0]+' '+esc(r.klasse)+'</b> '+esc(r.naam)+'</span>'+
           '<span class="sub">'+r.verkocht+'× · '+T('vr.marge','marge')+' '+geld(r.marge)+' · '+T('vr.winst','winst')+' '+geld(r.brutowinst)+'</span></div>'+
-          '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+'</div>';
+          '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+
+        (mgr?'<button class="bigbtn" id="vrPlan" style="margin-top:0.5rem;">🧠 '+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
     }
     // het logboek: elke beweging herleidbaar
     if ((d.logboek||[]).length) h += '<div class="card"><div class="tt-h">🧾 '+T('vr.log','Laatste bewegingen')+'</div>'+
@@ -363,6 +364,17 @@
         toast('🛒 '+T('vr.besteld','Bestelling ')+r.order.ref+' '+T('vr.besteld2','geplaatst.')+(r.nietGevonden.length?' '+T('vr.nietgev','Niet in het assortiment: ')+r.nietGevonden.join(', '):''));
         renderVoorraad();
       } catch(e){ toast(e.message); }
+    });
+    // het actieplan van de chef-adviseur: kwadranten plus derving, in euro's
+    const vp = el.querySelector('#vrPlan'); if (vp) vp.addEventListener('click', async () => {
+      const uit = el.querySelector('#vrPlanUit');
+      uit.innerHTML = '<div class="softline" style="margin-top:0.4rem;">'+T('vr.plan.laden','De adviseur rekent...')+'</div>';
+      try {
+        const p = await API.call('/supplier/keuken/menu-advies', {});
+        uit.innerHTML = '<div class="sub" style="margin-top:0.5rem;">'+esc(p.samenvatting)+'</div>'+
+          (p.acties||[]).map(x => '<div style="border-top:1px solid var(--line);padding:0.35rem 0;font-size:0.82rem;">'+
+            (x.impact?'<b style="color:var(--gold);">'+geld(x.impact)+'</b> · ':'')+esc(x.tekst)+'</div>').join('');
+      } catch(e){ uit.innerHTML = ''; toast(e.message); }
     });
     el.querySelectorAll('[data-vtel]').forEach(b => b.addEventListener('click', () => {
       const g = prompt(T('vr.telvraag','Wat is de getelde stand?')); if (g == null || g === '') return;

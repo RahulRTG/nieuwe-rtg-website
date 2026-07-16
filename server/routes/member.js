@@ -741,8 +741,20 @@ app.post('/api/partner/apply', (req, res) => {
    prijs vastlegt die gold op het moment van bestellen; de verkooppagina
    toont ze ook in de munt van de kijker, maar gefactureerd wordt in euro. */
 const WINKEL = {
-  zaakdoos: { naam: 'RTG Zaakdoos', eenmalig: 100, perMaand: 150 }
+  zaakdoos:         { naam: 'RTG Zaakdoos',            eenmalig: 100, perMaand: 150, eenheid: 'per doos' },
+  'slimme-deur':    { naam: 'RTG Slimme Deur',         eenmalig: 120, perMaand: 10,  eenheid: 'per deur' },
+  'kamer-butler':   { naam: 'RTG Kamer-butler',        eenmalig: 180, perMaand: 15,  eenheid: 'per kamer' },
+  toegangspoort:    { naam: 'RTG Toegangspoort',       eenmalig: 450, perMaand: 50,  eenheid: 'per zuil' },
+  paniekknop:       { naam: 'RTG Paniekknop',          eenmalig: 60,  perMaand: 10,  eenheid: 'per knop' },
+  'gast-piepers':   { naam: 'RTG Gast-piepers',        eenmalig: 250, perMaand: 15,  eenheid: 'per set van 10' },
+  'rtg-pda':        { naam: 'RTG PDA',                 eenmalig: 220, perMaand: 20,  eenheid: 'per stuk' },
+  'rit-tracker':    { naam: 'RTG Rit-tracker',         eenmalig: 80,  perMaand: 12,  eenheid: 'per voertuig' },
+  veldsensor:       { naam: 'RTG Veldsensor-set',      eenmalig: 350, perMaand: 25,  eenheid: 'per set' },
+  schermen:         { naam: 'RTG Keuken- en kassascherm', eenmalig: 300, perMaand: 25, eenheid: 'per scherm' },
+  'satelliet-pakket': { naam: 'RTG Satelliet-startpakket', eenmalig: 900, perMaand: 75, eenheid: 'per locatie' }
 };
+// de prijstabel is de ene bron: de verkooppagina leest hem hiervandaan
+app.get('/api/winkel/producten', (req, res) => res.json({ producten: WINKEL }));
 app.post('/api/winkel/bestel', (req, res) => {
   const b = req.body || {};
   const product = WINKEL[String(b.product || '')];
@@ -752,7 +764,7 @@ app.post('/api/winkel/bestel', (req, res) => {
   const email = String(b.email || '').trim().toLowerCase().slice(0, 80);
   const phone = String(b.phone || '').trim().slice(0, 30);
   const note = schoon(b.note, 500);
-  const aantal = Math.min(10, Math.max(1, Math.round(Number(b.aantal) || 1)));
+  const aantal = Math.min(100, Math.max(1, Math.round(Number(b.aantal) || 1))); // een hotel bestelt zo 40 deuren
   if (!company || !contactName) return res.status(400).json({ error: 'Vul de bedrijfsnaam en contactpersoon in.' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
   if (b.akkoord !== true) return res.status(400).json({ error: 'Ga akkoord met de prijs en de voorwaarden om te bestellen.' });

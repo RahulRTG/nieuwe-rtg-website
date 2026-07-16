@@ -101,7 +101,7 @@
     <div class="kleinnoot" id="pNoot"></div>
   </div>
 
-  <h2 style="margin-top:3rem;">Bestellen</h2>
+  <h2 style="margin-top:3rem;" id="bestellen">Bestellen</h2>
   <form id="f">
     <div class="two">
       <div><label for="company">Bedrijfsnaam</label><input id="company" required maxlength="80"></div>
@@ -112,12 +112,12 @@
       <div><label for="phone">Telefoon</label><input id="phone" maxlength="30"></div>
     </div>
     <div class="two">
-      <div><label for="aantal">Aantal dozen</label><select id="aantal"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
-      <div></div>
+      <div><label for="product">Wat bestelt u?</label><select id="product"></select></div>
+      <div><label for="aantal">Aantal</label><input id="aantal" type="number" min="1" max="100" value="1" inputmode="numeric"></div>
     </div>
     <div><label for="note">Iets over uw locatie(s)? (mag leeg)</label><textarea id="note" maxlength="500" placeholder="Bijv. strandclub met satellietverbinding, twee kassa's en een keukenscherm."></textarea></div>
     <label class="akk"><input type="checkbox" id="akkoord"><span id="akkTekst"></span></label>
-    <button type="submit">Bestel de Zaakdoos</button>
+    <button type="submit" id="bestelKnop">Bestel</button>
     <div class="msg" id="msg" role="status"></div>
   </form>
 </section>
@@ -126,27 +126,73 @@
   <div class="kicker">Meer voor uw zaak</div>
   <h2 style="margin-top:1rem;">De winkelplanken</h2>
   <p class="deck" style="margin-top:.4rem;">Hier groeit het assortiment: hardware en uitbreidingen die uw zaak sterker maken, altijd met dezelfde belofte: aansluiten en klaar.</p>
-  <div class="plank">
-    <div class="product">
+  <div class="plank" id="plank">
+    <div class="product" data-product="zaakdoos">
       <span class="ic">📦</span>
       <h3>De Zaakdoos</h3>
       <p>Uw zaak werkt altijd door, ook zonder internet- of satellietlijn. Synchroniseert vanzelf.</p>
-      <span class="pp" data-plank-eenmalig="100" data-plank-maand="150"></span>
-      <a href="#zaakdoos">Bekijken en bestellen ↑</a>
+      <span class="pp"></span>
+      <a href="#zaakdoos">Alles over de Zaakdoos ↑</a>
     </div>
-    <div class="product binnenkort">
-      <span class="badge">Binnenkort</span>
+    <div class="product" data-product="slimme-deur">
+      <span class="ic">🚪</span>
+      <h3>De Slimme Deur</h3>
+      <p>Gasten openen hun kamer, appartement of bezichtiging met hun codenaam; het slot valt vanzelf weer dicht. Nooit meer een sleutelbalie.</p>
+      <span class="pp"></span>
+    </div>
+    <div class="product" data-product="kamer-butler">
+      <span class="ic">🛎️</span>
+      <h3>De Kamer-butler</h3>
+      <p>Een tablet naast het bed: roomservice, chat met de balie, housekeeping en de minibar in een glanzend geheel.</p>
+      <span class="pp"></span>
+    </div>
+    <div class="product" data-product="toegangspoort">
+      <span class="ic">🎟️</span>
+      <h3>De Toegangspoort</h3>
+      <p>Scanzuil bij de ingang voor tickets en tijdsloten: de oplichtende code uit de leden-app maakt van elke avond een VIP-entree.</p>
+      <span class="pp"></span>
+    </div>
+    <div class="product" data-product="paniekknop">
+      <span class="ic">🚨</span>
+      <h3>De Paniekknop</h3>
+      <p>Een vaste rode knop achter de bar of de nachtreceptie: een druk en het security-alarm met locatie staat op elk scherm van de zaak.</p>
+      <span class="pp"></span>
+    </div>
+    <div class="product" data-product="gast-piepers">
+      <span class="ic">📳</span>
+      <h3>De Gast-piepers</h3>
+      <p>Bon compleet op de pas? De pieper van de gast trilt. Set van tien, laadstation inbegrepen.</p>
+      <span class="pp"></span>
+    </div>
+    <div class="product" data-product="rtg-pda">
+      <span class="ic">📟</span>
+      <h3>De RTG PDA</h3>
+      <p>Robuuste handheld met de personeels-app voorgeinstalleerd: rooster, taken, walkie-talkie en de hele dienst batterij.</p>
+      <span class="pp"></span>
+    </div>
+    <div class="product" data-product="rit-tracker">
+      <span class="ic">🚗</span>
+      <h3>De Rit-tracker</h3>
+      <p>Voor verhuurauto's en de vloot: kilometers, tankstand, locatie en de SOS-knop vullen zichzelf in. De administratie klopt vanzelf.</p>
+      <span class="pp"></span>
+    </div>
+    <div class="product" data-product="veldsensor">
+      <span class="ic">🌾</span>
+      <h3>De Veldsensor-set</h3>
+      <p>Bodem- en weersensoren die de boerderij-AI voeden met echte metingen: zaaien en oogsten op het juiste moment.</p>
+      <span class="pp"></span>
+    </div>
+    <div class="product" data-product="schermen">
       <span class="ic">🖥️</span>
       <h3>Keuken- en kassaschermen</h3>
-      <p>Kant-en-klare schermen voor de keuken, de bar en de kassa: uitpakken, aan de doos hangen, werken.</p>
-      <span class="pp">Prijs volgt</span>
+      <p>Kant-en-klare schermen voor de keuken, de bar en de kassa: uitpakken, aan de Zaakdoos hangen, werken.</p>
+      <span class="pp"></span>
     </div>
-    <div class="product binnenkort">
-      <span class="badge">Binnenkort</span>
+    <div class="product" data-product="satelliet-pakket">
       <span class="ic">📡</span>
       <h3>Satelliet-startpakket</h3>
-      <p>Alles om een afgelegen locatie of boot online te krijgen, afgestemd op de Zaakdoos.</p>
-      <span class="pp">Prijs volgt</span>
+      <p>Alles om een afgelegen locatie of boot online te krijgen, afgestemd op de Zaakdoos. Aansluiten ter plekke inbegrepen.</p>
+      <span class="pp"></span>
     </div>
   </div>
 </section>
@@ -157,14 +203,16 @@
 </footer>
 
 <script>
-/* Prijzen in de munt van de kijker. De euro is de echte prijs (facturatie in
-   euro, ex btw); andere munten zijn een indicatie tegen een richtkoers, en dat
-   zeggen we er eerlijk bij. De munt wordt gegokt op de taal van de browser en
-   is altijd zelf te wisselen. */
+/* Een prijstabel op de server (/api/winkel/producten) is de bron; de pagina
+   toont alles in de munt van de kijker. De euro is de echte prijs (facturatie
+   in euro, ex btw); andere munten zijn een indicatie tegen een richtkoers, en
+   dat zeggen we er eerlijk bij. De munt wordt gegokt op de taal van de browser
+   en is altijd zelf te wisselen. */
 (function () {
-  const EENMALIG = 100, PER_MAAND = 150; // euro, ex btw
   const KOERS = { EUR: 1, USD: 1.10, GBP: 0.85, CHF: 0.94, AED: 4.05, SEK: 11.2, DKK: 7.46, NOK: 11.6, PLN: 4.30, JPY: 168 };
   const LAND_MUNT = { US: 'USD', GB: 'GBP', CH: 'CHF', AE: 'AED', SE: 'SEK', DK: 'DKK', NO: 'NOK', PL: 'PLN', JP: 'JPY' };
+  // vangnet als de prijstabel even niet laadt; de server blijft de bron
+  let PRODUCTEN = { zaakdoos: { naam: 'RTG Zaakdoos', eenmalig: 100, perMaand: 150, eenheid: 'per doos' } };
   const $ = s => document.querySelector(s);
 
   const kies = $('#valuta');
@@ -173,48 +221,82 @@
   kies.value = LAND_MUNT[land] || 'EUR';
 
   function bedrag(euro, munt) {
-    const v = euro * KOERS[munt];
-    try { return new Intl.NumberFormat(navigator.language || 'nl-NL', { style: 'currency', currency: munt, maximumFractionDigits: munt === 'JPY' ? 0 : 0 }).format(Math.round(v)); }
-    catch (e) { return munt + ' ' + Math.round(v); }
+    const v = Math.round(euro * KOERS[munt]);
+    try { return new Intl.NumberFormat(navigator.language || 'nl-NL', { style: 'currency', currency: munt, maximumFractionDigits: 0 }).format(v); }
+    catch (e) { return munt + ' ' + v; }
+  }
+  const gekozen = () => PRODUCTEN[$('#product').value] || PRODUCTEN.zaakdoos;
+  const aantalNu = () => Math.min(100, Math.max(1, Math.round(Number($('#aantal').value) || 1)));
+
+  function vulKeuze() {
+    const sel = $('#product'); const oud = sel.value;
+    sel.innerHTML = '';
+    Object.entries(PRODUCTEN).forEach(([id, p]) => {
+      const o = document.createElement('option'); o.value = id; o.textContent = p.naam + ' (' + p.eenheid + ')'; sel.appendChild(o);
+    });
+    if (PRODUCTEN[oud]) sel.value = oud;
   }
   function teken() {
     const m = kies.value;
-    $('#pEenmalig').textContent = bedrag(EENMALIG, m);
-    $('#pMaand').innerHTML = '';
-    $('#pMaand').appendChild(document.createTextNode(bedrag(PER_MAAND, m)));
+    const zd = PRODUCTEN.zaakdoos;
+    $('#pEenmalig').textContent = bedrag(zd.eenmalig, m);
+    $('#pMaand').textContent = '';
+    $('#pMaand').appendChild(document.createTextNode(bedrag(zd.perMaand, m)));
     const per = document.createElement('span'); per.className = 'per'; per.textContent = ' per maand';
     $('#pMaand').appendChild(per);
-    $('#pNoot').textContent = m === 'EUR'
-      ? 'Prijzen exclusief btw. Opzeggen kan maandelijks; de doos blijft van u.'
-      : 'Indicatie tegen een richtkoers; gefactureerd wordt in euro (EUR ' + EENMALIG + ' eenmalig, EUR ' + PER_MAAND + ' per maand), exclusief btw. Opzeggen kan maandelijks; de doos blijft van u.';
-    $('#akkTekst').textContent = 'Ik ga akkoord met de prijs (' + bedrag(EENMALIG, m) + ' eenmalig en daarna ' + bedrag(PER_MAAND, m) + ' per maand, exclusief btw, facturatie in euro) en de partnervoorwaarden.';
-    document.querySelectorAll('[data-plank-eenmalig]').forEach(el => {
-      el.textContent = bedrag(Number(el.dataset.plankEenmalig), m) + ' eenmalig · ' + bedrag(Number(el.dataset.plankMaand), m) + ' per maand';
+    $('#pNoot').textContent = (m === 'EUR' ? '' :
+      'Indicatie tegen een richtkoers; gefactureerd wordt in euro (EUR ' + zd.eenmalig + ' eenmalig, EUR ' + zd.perMaand + ' per maand). ') +
+      'Prijzen exclusief btw. Opzeggen kan maandelijks; de hardware blijft van u.';
+    // de plank: elke kaart zijn eigen prijs en een bestelknop
+    document.querySelectorAll('#plank .product').forEach(el => {
+      const p = PRODUCTEN[el.dataset.product];
+      const pp = el.querySelector('.pp');
+      if (!p || !pp) return;
+      pp.textContent = bedrag(p.eenmalig, m) + ' eenmalig · ' + bedrag(p.perMaand, m) + ' per maand · ' + p.eenheid;
+      if (!el.querySelector('[data-bestel]') && !el.querySelector('a[href="#zaakdoos"]')) {
+        const knop = document.createElement('a');
+        knop.href = '#bestellen'; knop.dataset.bestel = el.dataset.product;
+        knop.textContent = 'Bestellen →';
+        knop.addEventListener('click', () => { $('#product').value = el.dataset.product; akkoordTekst(); });
+        el.appendChild(knop);
+      }
     });
+    akkoordTekst();
+  }
+  function akkoordTekst() {
+    const m = kies.value, p = gekozen(), n = aantalNu();
+    $('#bestelKnop').textContent = 'Bestel: ' + n + 'x ' + p.naam;
+    $('#akkTekst').textContent = 'Ik ga akkoord met de prijs voor ' + n + 'x ' + p.naam + ' (' +
+      bedrag(p.eenmalig * n, m) + ' eenmalig en daarna ' + bedrag(p.perMaand * n, m) +
+      ' per maand, exclusief btw, facturatie in euro) en de partnervoorwaarden.';
   }
   kies.addEventListener('change', teken);
-  teken();
+
+  fetch('/api/winkel/producten').then(r => r.json()).then(d => {
+    if (d && d.producten && d.producten.zaakdoos) PRODUCTEN = d.producten;
+  }).catch(() => {}).finally(() => { vulKeuze(); teken(); $('#product').addEventListener('change', akkoordTekst); $('#aantal').addEventListener('input', akkoordTekst); });
 
   $('#f').addEventListener('submit', async (e) => {
     e.preventDefault();
     const msg = $('#msg');
     msg.className = 'msg';
+    const p = gekozen();
     try {
       const r = await fetch('/api/winkel/bestel', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          product: 'zaakdoos',
+          product: $('#product').value,
           company: $('#company').value, contactName: $('#contactName').value,
           email: $('#email').value, phone: $('#phone').value,
-          aantal: Number($('#aantal').value), note: $('#note').value,
+          aantal: aantalNu(), note: $('#note').value,
           akkoord: $('#akkoord').checked
         })
       });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || 'Er ging iets mis. Probeer het opnieuw.');
       msg.className = 'msg ok';
-      msg.textContent = 'Bedankt voor uw bestelling! U krijgt meteen een bevestiging per e-mail en we nemen binnen twee werkdagen contact op voor de levering en de aansluiting.';
-      e.target.reset();
+      msg.textContent = 'Bedankt voor uw bestelling van ' + p.naam + '! U krijgt meteen een bevestiging per e-mail en we nemen binnen twee werkdagen contact op voor de levering en de aansluiting.';
+      e.target.reset(); akkoordTekst();
     } catch (err) {
       msg.className = 'msg err';
       msg.textContent = err.message;

@@ -25,14 +25,22 @@ const bestel = body => fetch(base + '/api/winkel/bestel', {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-test('de verkooppagina staat online, met de prijzen en de winkelplanken erin', async () => {
+test('de verkooppagina staat online en de prijstabel op de server is de bron', async () => {
   const r = await fetch(base + '/site/winkel.html');
   assert.equal(r.status, 200);
   const html = await r.text();
   assert.match(html, /Zaakdoos/);
-  assert.match(html, /EENMALIG = 100, PER_MAAND = 150/, 'de europrijs staat vast in de pagina');
-  assert.match(html, /Binnenkort/, 'er is ruimte voor meer producten');
   assert.match(html, /facturatie in euro/i, 'eerlijk over de munt');
+  // de plank toont alle producten met een eigen kaart
+  for (const p of ['slimme-deur', 'kamer-butler', 'toegangspoort', 'paniekknop', 'gast-piepers', 'rtg-pda', 'rit-tracker', 'veldsensor', 'schermen', 'satelliet-pakket']) {
+    assert.match(html, new RegExp('data-product="' + p + '"'), p + ' staat op de plank');
+  }
+  // de ene prijsbron: het producten-endpoint
+  const d = await (await fetch(base + '/api/winkel/producten')).json();
+  assert.equal(Object.keys(d.producten).length, 11, 'elf producten in de tabel');
+  assert.equal(d.producten.zaakdoos.eenmalig, 100);
+  assert.equal(d.producten.zaakdoos.perMaand, 150);
+  assert.equal(d.producten['slimme-deur'].eenheid, 'per deur');
 });
 
 test('bestellen: validatie, vastgelegde prijs en een bevestiging', async () => {
@@ -69,7 +77,16 @@ test('bestellen: validatie, vastgelegde prijs en een bevestiging', async () => {
 test('het aantal wordt begrensd en de opmerking geschoond', async () => {
   const r = await bestel({
     product: 'zaakdoos', company: 'Marina Nord', contactName: 'Jens', email: 'jens@marina.test',
-    aantal: 99, note: '<script>alert(1)</script> twee steigers', akkoord: true
+    aantal: 999, note: '<script>alert(1)</script> twee steigers', akkoord: true
   });
   assert.equal(r.status, 200, 'een gek aantal wordt geklemd, niet geweigerd');
+});
+
+test('een hotel bestelt veertig slimme deuren in een keer', async () => {
+  const r = await bestel({
+    product: 'slimme-deur', company: 'Hotel Mirador', contactName: 'Ines', email: 'ines@mirador.test',
+    aantal: 40, note: 'Veertig kamers, twee verdiepingen', akkoord: true
+  });
+  assert.equal(r.status, 200);
+  assert.ok(r.body.ok, 'de deuren-bestelling staat erin');
 });

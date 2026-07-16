@@ -21,11 +21,16 @@
   const TOP_N = 3;          // met geschiedenis: zoveel kaarten standaard open
   const LEER_DREMPEL = 10;  // vanaf zoveel interacties gaat de geschiedenis sturen
 
-  let mem = { score: {}, open: {}, dicht: {} };
+  let mem = { score: {}, open: {}, dicht: {}, laatst: {}, gezien: {} };
   try { mem = Object.assign(mem, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+  if (!mem.laatst) mem.laatst = {};
+  if (!mem.gezien) mem.gezien = {};
   const bewaar = () => { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) {} };
   const totaal = () => Object.values(mem.score).reduce((a, b) => a + b, 0);
-  const top = () => Object.entries(mem.score).sort((a, b) => b[1] - a[1]).slice(0, TOP_N).map(x => x[0]);
+  // oude gewoontes vervagen: een score telt half per maand zonder gebruik,
+  // zodat de app meegroeit met wat je nu doet in plaats van wat je ooit deed
+  const gewicht = n => (mem.score[n] || 0) * Math.pow(0.5, (Date.now() - (mem.laatst[n] || Date.now())) / (30 * 86400000));
+  const top = () => Object.keys(mem.score).sort((a, b) => gewicht(b) - gewicht(a)).slice(0, TOP_N);
 
   function stijl() {
     if (document.getElementById('fxStijl')) return;
@@ -77,12 +82,17 @@
     }
     kop.setAttribute('role', 'button');
     kop.setAttribute('tabindex', '0');
-    // open of dicht: eigen keuze wint; daarna de geschiedenis; daarna de
-    // eerste twee kaarten van het scherm
+    // een kaart die pas verscheen nadat je de app al kende (een nieuwe
+    // functie) valt een dag lang op: hij staat open, ook als de
+    // geschiedenis hem anders zou verstoppen
+    if (!mem.gezien[n]) { mem.gezien[n] = totaal() >= LEER_DREMPEL ? Date.now() : 1; bewaar(); }
+    const nieuw = mem.gezien[n] > 1 && Date.now() - mem.gezien[n] < 86400000;
+    // open of dicht: eigen keuze wint; daarna de geschiedenis (plus de
+    // nieuwe kaarten); daarna de eerste twee kaarten van het scherm
     let open;
     if (mem.open[n]) open = true;
     else if (mem.dicht[n]) open = false;
-    else if (totaal() >= LEER_DREMPEL) open = top().includes(n);
+    else if (totaal() >= LEER_DREMPEL) open = nieuw || top().includes(n);
     else open = volgnr < 2;
     zet(kaart, open);
     kop.addEventListener('click', e => {
@@ -97,6 +107,7 @@
     kaart.addEventListener('click', e => {
       if (e.target.closest('.fx-kop') && !e.target.closest('button, a, input, select')) return;
       mem.score[n] = (mem.score[n] || 0) + 1;
+      mem.laatst[n] = Date.now();
       bewaar();
     }, true);
   }
@@ -127,6 +138,6 @@
   // voor Fluister: de tellers (en niets anders) zijn deelbaar
   window.FocusUI = {
     scores: () => Object.assign({}, mem.score),
-    reset: () => { mem = { score: {}, open: {}, dicht: {} }; bewaar(); }
+    reset: () => { mem = { score: {}, open: {}, dicht: {}, laatst: {}, gezien: {} }; bewaar(); }
   };
 })();

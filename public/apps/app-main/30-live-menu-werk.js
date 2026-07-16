@@ -161,6 +161,11 @@
       '<div class="live-start" style="margin-bottom:0.8rem;">' +
         '<div class="lh">✦ Fluister</div>' +
         '<div class="ld">' + T('fl.d','Uw persoonlijke assistent. Hij onthoudt wat u hem vertelt, leert van wat u gebruikt, en alles is opvraagbaar en wisbaar.') + '</div>' +
+        ((prof.seintjes || []).length
+          ? '<div style="margin-top:0.55rem;border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;">' +
+              '<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">' + T('fl.sein','Fluister fluistert') + '</div>' +
+              prof.seintjes.map(x => '<div style="margin-top:0.3rem;font-size:0.76rem;line-height:1.45;">' + esc(x.icoon) + ' ' + esc(x.tekst) + '</div>').join('') + '</div>'
+          : '') +
         (prof.weetjes.length
           ? '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem;">' + prof.weetjes.map((w, i) =>
               '<span style="display:inline-flex;align-items:center;gap:0.35rem;border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;font-size:0.68rem;color:var(--txt);">' + esc(w.tekst) +

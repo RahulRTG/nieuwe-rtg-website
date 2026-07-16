@@ -725,6 +725,7 @@
       // geheugen, nooit gedeeld met de werkgever)
       '<div class="card"><div class="k">✦ Fluister</div>'+
       '<div style="margin-top:0.35rem;font-size:0.74rem;color:var(--soft);">'+T('pd.fl.d','Uw eigen assistent. Hij onthoudt wat u hem vertelt ("onthoud dat...") en leert van wat u gebruikt; vraag "wat weet je over mij" en wis wanneer u wilt.')+'</div>'+
+      '<div id="pkFlSein"></div>'+
       '<div id="pkFlUit" style="margin-top:0.45rem;font-size:0.8rem;line-height:1.5;">'+(pkFlLaatst||'')+'</div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="pkFlIn" placeholder="'+T('pd.fl.ph','Vraag iets, of: onthoud dat...')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
       '<button class="abtn" id="pkFlStuur">'+T('pd.fl.stuur','Stuur')+'</button></div></div>'+
@@ -770,6 +771,15 @@
         }).join('')+'</div>' : '';
       })();
 
+    // Fluister fluistert ook zelf: seintjes uit je eigen weetjes (datums die
+    // naderen), zonder dat je iets hoeft te vragen
+    API.call('/staff/fluister/profiel').then(prof => {
+      const el = document.getElementById('pkFlSein');
+      if (!el || !(prof.seintjes || []).length) return;
+      el.innerHTML = '<div style="margin-top:0.45rem;border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.65rem;">'+
+        '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('pd.fl.sein','Fluister fluistert')+'</div>'+
+        prof.seintjes.map(x => '<div style="margin-top:0.28rem;font-size:0.76rem;line-height:1.45;">'+esc(x.icoon)+' '+esc(x.tekst)+'</div>').join('')+'</div>';
+    }).catch(() => {});
     // Fluister: vraag stellen; de gebruikstellers van de inklap-laag reizen mee
     const pkfs = document.getElementById('pkFlStuur');
     if (pkfs) pkfs.addEventListener('click', async () => {

@@ -55,6 +55,37 @@ test('onthouden, opvragen en wissen: het geheugen is van de gebruiker', async ()
   assert.equal((await api('fluister/profiel', {}, lid)).body.weetjes.length, 0);
 });
 
+test('Fluister fluistert zelf: seintjes uit datums in weetjes en uit de agenda', async () => {
+  // een verjaardag over vijf dagen, gewoon in het Nederlands verteld
+  const NL = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  const d = new Date(Date.now() + 5 * 86400000);
+  await api('fluister', { q: 'onthoud dat mijn verjaardag op ' + d.getUTCDate() + ' ' + NL[d.getUTCMonth()] + ' valt' }, lid);
+  const prof = (await api('fluister/profiel', {}, lid)).body;
+  const jarig = (prof.seintjes || []).find(s => s.icoon === '🎂');
+  assert.ok(jarig, 'de verjaardag uit het weetje wordt een seintje');
+  assert.ok(/over 5 dagen/.test(jarig.tekst));
+  // een reservering voor morgen fluistert vanzelf mee
+  const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const r = await api('reserveer', { supplierCode: 'KIKUNOI', datum: morgen, tijd: '20:00', personen: 2 }, lid);
+  assert.equal(r.status, 200);
+  const prof2 = (await api('fluister/profiel', {}, lid)).body;
+  assert.ok(prof2.seintjes.some(s => /morgen 20:00 gereserveerd/.test(s.tekst)));
+  // en de seintjes reizen mee in een gewoon antwoord
+  const antw = (await api('fluister', { q: 'goedemorgen, iets voor mij?' }, lid)).body;
+  assert.ok(/gereserveerd|seintje/i.test(antw.antwoord));
+  await api('reservering/annuleer', { id: r.body.reservering.id }, lid);
+  await api('fluister', { q: 'vergeet alles' }, lid);
+});
+
+test('hij onthoudt het gesprek (kort) en wist het net zo makkelijk', async () => {
+  assert.equal((await api('fluister/profiel', {}, lid)).body.gesprek, 0, 'na "vergeet alles" is ook het gesprek weg');
+  await api('fluister', { q: 'goedemorgen' }, lid);
+  await api('fluister', { q: 'en hoe laat is het ontbijt?' }, lid);
+  assert.equal((await api('fluister/profiel', {}, lid)).body.gesprek, 2, 'de laatste beurten blijven hangen');
+  await api('fluister', { q: 'vergeet alles' }, lid);
+  assert.equal((await api('fluister/profiel', {}, lid)).body.gesprek, 0);
+});
+
 test('hij leert van je schermgebruik: alleen tellers, en hij benoemt de top', async () => {
   assert.equal((await api('fluister/focus', { scores: { Tafelplanning: 14, Betalen: 3, Kamers: 8 } }, lid)).status, 200);
   const prof = (await api('fluister/profiel', {}, lid)).body;

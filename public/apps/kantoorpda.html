@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Kantoor PDA</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .wrap{max-width:30rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.5rem;margin:.4rem 0;}
+  h1 small{display:block;font-family:'Inter',sans-serif;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .veld{width:100%;border:1px solid var(--line);border-radius:10px;padding:.75rem .9rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
+  .veld:focus{border-color:var(--burgundy);}
+  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:999px;padding:.7rem 1.4rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;width:100%;}
+  .knop:hover{background:var(--burgundy);color:#fff;}
+  .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .fout{color:var(--burgundy);font-size:.85rem;min-height:1.1rem;margin-top:.4rem;}
+  .rij{display:flex;gap:.5rem;margin-top:.5rem;}
+  .wie{display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.88rem;}
+  .wie:last-child{border-bottom:0;}
+  .wie .thuis{font-size:.68rem;border:1px solid var(--line);border-radius:999px;padding:.1rem .5rem;color:var(--gold);}
+  .leeg{color:var(--soft);font-size:.85rem;}
+  label{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:600;display:block;margin-bottom:.3rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>RTG Kantoor PDA<small>Aanmelden en meewerken, ook vanuit huis</small></h1>
+
+  <div class="kaart" id="vGate">
+    <label for="code">Kantoorcode</label>
+    <input class="veld" id="code" type="password" autocomplete="current-password">
+    <button class="knop" id="login" style="margin-top:.6rem;">Binnen</button>
+    <div class="fout" id="gFout"></div>
+  </div>
+
+  <div id="vApp" hidden>
+    <div class="kaart" id="aanmeldBlok">
+      <label for="naam">Jouw naam</label>
+      <input class="veld" id="naam" maxlength="30" placeholder="Voor- en achternaam">
+      <div class="rij">
+        <select class="veld" id="kamer"></select>
+        <select class="veld" id="waar" style="max-width:9rem;"><option value="thuis">🏠 Thuis</option><option value="kantoor">🏢 Kantoor</option></select>
+      </div>
+      <button class="knop" id="meld" style="margin-top:.6rem;">Meld je aan voor je dienst</button>
+      <div class="fout" id="mFout"></div>
+    </div>
+    <div class="kaart" id="dienstBlok" hidden>
+      <div id="dienstTekst" style="font-size:.95rem;"></div>
+      <button class="knop stil" id="afmeld" style="margin-top:.6rem;">Meld je af</button>
+    </div>
+    <div class="kaart">
+      <label>Nu aan het werk</label>
+      <div id="wieLijst"><div class="leeg">Nog niemand aangemeld.</div></div>
+    </div>
+    <div class="kaart">
+      <label>De chat van jouw kamer</label>
+      <div id="chatBox" style="max-height:16rem;overflow-y:auto;font-size:.88rem;"></div>
+      <div class="rij">
+        <input class="veld" id="cTekst" placeholder="Bericht..." maxlength="500">
+        <button class="knop stil" id="cStuur" style="width:auto;">Stuur</button>
+      </div>
+    </div>
+    <div class="leeg">Het volledige kantoor (statistieken, taken, onboarding, boardroom) staat op kantoren.html; deze PDA is je zak-versie voor aanmelden en contact, waar je ook werkt.</div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+let DIENST = null; try { DIENST = JSON.parse(localStorage.getItem('rtg_kantoor_dienst') || 'null'); } catch (e) {}
+const api = (pad, body) => fetch('/api/office/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+$('#login').addEventListener('click', async () => {
+  $('#gFout').textContent = '';
+  try {
+    const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#code').value.trim() }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Die code klopt niet.');
+    TOKEN = d.token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch (e) {}
+    start();
+  } catch (e) { $('#gFout').textContent = e.message; }
+});
+
+async function start(){
+  $('#vGate').hidden = true; $('#vApp').hidden = false;
+  const k = await api('kamers');
+  $('#kamer').innerHTML = k.kamers.map(x => '<option value="'+x.id+'">'+x.emoji+' '+esc(x.naam)+'</option>').join('');
+  try { $('#naam').value = localStorage.getItem('rtg_kantoor_naam') || ''; } catch (e) {}
+  toonDienst(); laadWie(); laadChat();
+  setInterval(() => { if (!document.hidden) { laadWie(); laadChat(); } }, 8000);
+}
+function toonDienst(){
+  $('#aanmeldBlok').hidden = !!DIENST;
+  $('#dienstBlok').hidden = !DIENST;
+  if (DIENST) $('#dienstTekst').textContent = '✅ ' + DIENST.naam + ' is aangemeld (' + DIENST.waar + ', ' + DIENST.kamer + ') sinds ' + new Date(DIENST.in).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) + '.';
+}
+$('#meld').addEventListener('click', async () => {
+  $('#mFout').textContent = '';
+  try {
+    const d = await api('dienst/in', { naam: $('#naam').value, kamer: $('#kamer').value, waar: $('#waar').value });
+    DIENST = d.dienst;
+    try { localStorage.setItem('rtg_kantoor_dienst', JSON.stringify(DIENST)); localStorage.setItem('rtg_kantoor_naam', DIENST.naam); } catch (e) {}
+    toonDienst(); laadWie();
+  } catch (e) { $('#mFout').textContent = e.message; }
+});
+$('#afmeld').addEventListener('click', async () => {
+  try { await api('dienst/uit', { id: DIENST.id }); } catch (e) {}
+  DIENST = null; try { localStorage.removeItem('rtg_kantoor_dienst'); } catch (e) {}
+  toonDienst(); laadWie();
+});
+async function laadWie(){
+  try {
+    const d = await api('dienst');
+    $('#wieLijst').innerHTML = d.aangemeld.length ? d.aangemeld.map(x =>
+      '<div class="wie"><span>'+esc(x.naam)+'</span><span class="thuis">'+(x.waar==='thuis'?'🏠 thuis':'🏢 kantoor')+'</span><span style="color:var(--soft);font-size:.75rem;">'+esc(x.kamer)+'</span></div>').join('')
+      : '<div class="leeg">Nog niemand aangemeld.</div>';
+  } catch (e) {}
+}
+async function laadChat(){
+  try {
+    const kamer = DIENST ? DIENST.kamer : $('#kamer').value;
+    if (!kamer) return;
+    const d = await api('kachat', { kamer });
+    $('#chatBox').innerHTML = d.berichten.length ? d.berichten.slice(-25).map(m =>
+      '<div style="padding:.25rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' 📸':'')+'</div>').join('')
+      : '<div class="leeg">Nog stil hier.</div>';
+    $('#chatBox').scrollTop = $('#chatBox').scrollHeight;
+  } catch (e) {}
+}
+$('#cStuur').addEventListener('click', async () => {
+  const kamer = DIENST ? DIENST.kamer : $('#kamer').value;
+  try {
+    await api('kachat/stuur', { kamer, naam: (DIENST && DIENST.naam) || $('#naam').value || 'collega', tekst: $('#cTekst').value });
+    $('#cTekst').value = ''; laadChat();
+  } catch (e) {}
+});
+$('#cTekst').addEventListener('keydown', e => { if (e.key === 'Enter') $('#cStuur').click(); });
+
+if (TOKEN) start().catch(() => { $('#vGate').hidden = false; $('#vApp').hidden = true; });
+</script>
+</body>
+</html>

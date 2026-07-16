@@ -138,6 +138,18 @@ test('platform-statistieken, interne chat met snap en onboarding per kamer', asy
   assert.notDeepEqual(hr.body.onboarding.knoppen, o.body.onboarding.knoppen, 'elke afdeling zijn eigen knoppen');
 });
 
+test('aanmelden voor de dienst: kantoor of thuis, en iedereen ziet wie er werkt', async () => {
+  const d = await api('dienst/in', { naam: 'Stagiair Bo', kamer: 'sales', waar: 'thuis' });
+  assert.equal(d.status, 200);
+  assert.equal(d.body.dienst.waar, 'thuis');
+  assert.equal((await api('dienst/in', { naam: 'Stagiair Bo', kamer: 'sales' })).status, 409, 'niet dubbel aanmelden');
+  assert.equal((await api('dienst/in', { naam: 'X', kamer: 'kelder' })).status, 404);
+  const nu = await api('dienst');
+  assert.ok(nu.body.aangemeld.some(x => x.naam === 'Stagiair Bo' && x.waar === 'thuis'));
+  assert.ok((await api('dienst/uit', { id: d.body.dienst.id })).body.ok);
+  assert.ok(!(await api('dienst')).body.aangemeld.some(x => x.naam === 'Stagiair Bo'), 'afgemeld is weg uit de lijst');
+});
+
 test('de verbeterkamer loopt op verzoek een verse ronde', async () => {
   const v = await api('boardroom/verbeter');
   assert.equal(v.status, 200);

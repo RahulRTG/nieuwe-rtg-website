@@ -30,6 +30,10 @@ module.exports = (kern) => {
     if (r.ok) sseToOffice('sync', { scope: 'paniek' });
     return r;
   }));
+  // aanmelden: vanuit de kantoor-app of de RTG Kantoor PDA (ook thuis)
+  app.post('/api/office/dienst/in', officeAuth, (req, res) => veilig(res, () => afdelingen.dienstIn(req.body.naam, String(req.body.kamer || ''), String(req.body.waar || ''))));
+  app.post('/api/office/dienst/uit', officeAuth, (req, res) => veilig(res, () => afdelingen.dienstUit(String(req.body.id || ''))));
+  app.post('/api/office/dienst', officeAuth, (req, res) => veilig(res, () => afdelingen.dienstNu()));
   // platformbrede statistieken, interne chat met snaps, en onboarding per kamer
   app.post('/api/office/stats', officeAuth, (req, res) => veilig(res, () => afdelingen.platformStats()));
   app.post('/api/office/kachat', officeAuth, (req, res) => veilig(res, () => afdelingen.chatLijst(String(req.body.kamer || ''))));

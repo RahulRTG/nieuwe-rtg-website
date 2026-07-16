@@ -318,6 +318,32 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     } };
   }
 
+  /* ---------- aanmelden: wie werkt er nu, op kantoor of thuis ---------- */
+  function dienstRij() { if (!Array.isArray(d().kantoorDienst)) d().kantoorDienst = []; return d().kantoorDienst; }
+  function dienstIn(naam, kamerId, waar) {
+    const n = String(naam || '').replace(/[<>]/g, '').trim().slice(0, 30);
+    if (!n) return { status: 400, error: 'Wie meldt zich aan?' };
+    if (!AFDELINGEN[kamerId] && kamerId !== 'boardroom' && kamerId !== 'paniekkamer') return { status: 404, error: 'Deze kamer bestaat niet.' };
+    const rij = dienstRij();
+    const open = rij.find(x => !x.uit && x.naam.toLowerCase() === n.toLowerCase());
+    if (open) return { status: 409, error: n + ' is al aangemeld (' + open.waar + '). Eerst afmelden.' };
+    const e = { id: crypto.randomBytes(4).toString('hex'), naam: n, kamer: kamerId, waar: waar === 'thuis' ? 'thuis' : 'kantoor', in: nu(), uit: null };
+    rij.unshift(e);
+    if (rij.length > 500) rij.pop();
+    save();
+    return { ok: true, dienst: e };
+  }
+  function dienstUit(id) {
+    const e = dienstRij().find(x => x.id === id && !x.uit);
+    if (!e) return { status: 404, error: 'Deze aanmelding staat niet (meer) open.' };
+    e.uit = nu();
+    save();
+    return { ok: true, dienst: e };
+  }
+  function dienstNu() {
+    return { ok: true, aangemeld: dienstRij().filter(x => !x.uit).map(x => ({ id: x.id, naam: x.naam, kamer: x.kamer, waar: x.waar, sinds: x.in })) };
+  }
+
   /* ---------- de paniekkamer ----------
      Dezelfde knoppen als de boardroom, maar met het vier-ogen-principe: een
      omgezette knop wordt een voorstel. De boardroom accepteert (dan schakelt
@@ -371,5 +397,5 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   }
   function paniekLijst() { return { ok: true, voorstellen: paniekRij().slice(0, 50) }; }
 
-  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, schakel, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, KAMER_IDS } };
+  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, schakel, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, KAMER_IDS } };
 };

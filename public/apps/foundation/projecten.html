@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Samen aan een project</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .7rem;}
+  .blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;margin-bottom:.5rem;}
+  .rij .nm{flex:1;min-width:0;}
+  .rij small{display:block;color:var(--zacht);font-size:.78rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0 .8rem;}
+  .mini{background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem;}
+  .taak{display:flex;align-items:center;gap:.6rem;padding:.55rem .2rem;border-bottom:1px solid var(--lijn);}
+  .taak:last-child{border-bottom:0;}
+  .taak input[type=checkbox]{width:1.2rem;height:1.2rem;accent-color:var(--goud);}
+  .taak .tk{flex:1;min-width:0;line-height:1.35;}
+  .taak.af .tk{text-decoration:line-through;color:var(--zacht);}
+  .wiebadge{font-size:.72rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:999px;padding:.15rem .55rem;color:var(--goud2);white-space:nowrap;}
+  .noot{padding:.55rem .8rem;background:var(--paneel2);border-radius:12px;margin-bottom:.45rem;font-size:.92rem;line-height:1.4;}
+  .noot small{display:block;color:var(--zacht);font-size:.75rem;margin-bottom:.15rem;}
+  .keuzerij{display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0;}
+  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
+  .chip.aan{border-color:var(--goud);color:var(--goud2);}
+  .ledenregel{color:var(--zacht);font-size:.85rem;margin:.2rem 0 .8rem;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+
+  <!-- overzicht -->
+  <section id="vLijst">
+    <h1>🤝 Samen aan een project</h1>
+    <p class="intro">Een spreekbeurt, werkstuk of bouwplan: begin samen, verdeel de taken en houd bij wat af is. Nodig gezinsleden of vrienden uit; de buddy helpt met een plan.</p>
+    <div class="kaart blok">
+      <input class="veld" id="nTitel" placeholder="Waar gaan jullie aan werken? (bijv. Spreekbeurt over dolfijnen)" maxlength="80">
+      <input class="veld" id="nWat" style="margin-top:.4rem;" placeholder="Vertel er iets bij (mag leeg)" maxlength="300">
+      <button class="knop" id="nMaak" style="width:100%;margin-top:.4rem;">Start het project</button>
+      <div class="fout" id="nFout"></div>
+    </div>
+    <div id="uitnodigingen"></div>
+    <h2 class="sec">Jullie projecten</h2>
+    <div id="projecten"><div class="leeg">Nog geen projecten. Start er hierboven een.</div></div>
+  </section>
+
+  <!-- een project -->
+  <section id="vProject" hidden>
+    <h1 id="pTitel">Project</h1>
+    <div class="intro" id="pWat"></div>
+    <div class="ledenregel" id="pLeden"></div>
+
+    <h2 class="sec">Taken <small style="text-transform:none;letter-spacing:0;">(tik ✋ om een taak te pakken)</small></h2>
+    <div class="kaart blok">
+      <div id="pTaken"></div>
+      <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+        <input class="veld" id="tNieuw" style="flex:1;" placeholder="Nieuwe taak…" maxlength="140">
+        <button class="knop klein" id="tMaak">+</button>
+      </div>
+      <button class="knop grijs" id="pAi" style="width:100%;margin-top:.5rem;">✨ Laat de buddy een plan voorstellen</button>
+      <div class="fout" id="pFout"></div>
+    </div>
+
+    <h2 class="sec">Notities en vondsten</h2>
+    <div class="kaart blok">
+      <div id="pNotities"><div class="leeg">Nog niets genoteerd.</div></div>
+      <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+        <input class="veld" id="nNotitie" style="flex:1;" placeholder="Idee, bron of afspraak…" maxlength="500">
+        <button class="knop klein" id="nPlaats">+</button>
+      </div>
+    </div>
+
+    <h2 class="sec">Iemand erbij vragen</h2>
+    <div class="kaart blok">
+      <div class="keuzerij" id="uVrienden"><span class="leeg">Vrienden laden…</span></div>
+      <input class="veld" id="uCodenaam" placeholder="Of nodig uit op codenaam" style="margin-top:.3rem;">
+      <div class="leeg" style="padding:.3rem 0 0;">Samen werken maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
+      <button class="knop grijs" id="uStuur" style="width:100%;margin-top:.4rem;">Nodig uit</button>
+      <div class="fout" id="uFout"></div>
+    </div>
+
+    <div style="display:flex;gap:.5rem;">
+      <button class="knop grijs" id="pTerug" style="flex:1;">← terug</button>
+      <button class="knop rood" id="pWeg" style="flex:0 1 auto;" hidden>Project opruimen</button>
+    </div>
+  </section>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const groep = (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || 'kind';
+const api = (actie, body) => fetch('/api/rtf/leren/' + actie, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+function toon(v){ ['vLijst','vProject'].forEach(x => $('#'+x).hidden = (x!==v)); if (v!=='vProject') clearInterval(poll); }
+
+/* ---------- overzicht ---------- */
+async function laadOverzicht(){
+  const d = await api('projecten');
+  $('#uitnodigingen').innerHTML = d.uitnodigingen.length ? '<h2 class="sec">Uitnodigingen</h2>' + d.uitnodigingen.map(u =>
+    '<div class="kaart rij"><div class="nm">'+esc(u.titel)+'<small>van '+esc(u.van)+'</small></div>'+
+    '<button class="knop klein" data-ja="'+u.id+'">Doe mee</button><button class="mini" data-nee="'+u.id+'">✕</button></div>').join('') : '';
+  $('#uitnodigingen').querySelectorAll('[data-ja]').forEach(b => b.addEventListener('click', async () => { await api('project-antwoord',{id:b.dataset.ja, akkoord:true}); openProject(b.dataset.ja); }));
+  $('#uitnodigingen').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => { await api('project-antwoord',{id:b.dataset.nee, akkoord:false}); laadOverzicht(); }));
+  $('#projecten').innerHTML = d.projecten.length ? d.projecten.map(p =>
+    '<div class="kaart rij" style="cursor:pointer;" data-open="'+p.id+'"><div class="nm">'+esc(p.titel)+
+    '<small>'+p.leden.map(esc).join(', ')+' · '+p.af+' van '+p.taken+' taken af</small></div><span>→</span></div>').join('')
+    : '<div class="leeg">Nog geen projecten. Start er hierboven een.</div>';
+  $('#projecten').querySelectorAll('[data-open]').forEach(r => r.addEventListener('click', () => openProject(r.dataset.open)));
+}
+$('#nMaak').addEventListener('click', async () => {
+  $('#nFout').textContent = '';
+  try { const d = await api('project-maak', { titel: $('#nTitel').value, wat: $('#nWat').value }); $('#nTitel').value=''; $('#nWat').value=''; openProject(d.id); }
+  catch (e) { $('#nFout').textContent = e.message; }
+});
+
+/* ---------- een project ---------- */
+let P = null, poll = null, uGekozen = null;
+async function openProject(id){
+  P = { id };
+  toon('vProject');
+  await ververs();
+  laadVrienden();
+  clearInterval(poll);
+  poll = setInterval(() => { if (!document.hidden && !$('#vProject').hidden) ververs(); }, 5000);
+}
+async function ververs(){
+  let d; try { d = await api('project-staat', { id: P.id }); } catch (e) { toon('vLijst'); laadOverzicht(); return; }
+  const p = d.project; P.mijn = p.mijnCodenaam;
+  $('#pTitel').textContent = '🤝 ' + p.titel;
+  $('#pWat').textContent = p.wat || '';
+  $('#pLeden').textContent = 'Samen met: ' + p.leden.join(', ') + (p.wachtOp ? ' · wacht op ' + p.wachtOp + ' uitnodiging(en)' : '');
+  $('#pWeg').hidden = !p.ikMaakte;
+  $('#pTaken').innerHTML = p.taken.length ? p.taken.map(t =>
+    '<div class="taak'+(t.af?' af':'')+'"><input type="checkbox" data-af="'+t.id+'"'+(t.af?' checked':'')+'>'+
+    '<span class="tk">'+esc(t.tekst)+'</span>'+
+    (t.wie ? '<span class="wiebadge">'+esc(t.wie)+'</span>' : '')+
+    '<button class="mini" data-claim="'+t.id+'" title="Deze taak pakken of loslaten">'+(t.wie===P.mijn?'🤚':'✋')+'</button></div>').join('')
+    : '<div class="leeg">Nog geen taken. Voeg er een toe of vraag de buddy om een plan.</div>';
+  $('#pTaken').querySelectorAll('[data-af]').forEach(c => c.addEventListener('change', async () => { await api('taak-zet',{id:P.id, taakId:c.dataset.af, af:c.checked}); ververs(); }));
+  $('#pTaken').querySelectorAll('[data-claim]').forEach(b => b.addEventListener('click', async () => {
+    const nuVanMij = b.textContent === '🤚'; // claim wisselen: pakken of loslaten
+    await api('taak-zet', { id: P.id, taakId: b.dataset.claim, claim: !nuVanMij });
+    ververs();
+  }));
+  $('#pNotities').innerHTML = p.notities.length ? p.notities.map(n =>
+    '<div class="noot"><small>'+esc(n.van)+' · '+new Date(n.at).toLocaleString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'</small>'+esc(n.tekst)+'</div>').join('')
+    : '<div class="leeg">Nog niets genoteerd.</div>';
+}
+$('#tMaak').addEventListener('click', async () => {
+  $('#pFout').textContent = '';
+  try { await api('taak-maak', { id: P.id, tekst: $('#tNieuw').value }); $('#tNieuw').value=''; ververs(); }
+  catch (e) { $('#pFout').textContent = e.message; }
+});
+$('#tNieuw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#tMaak').click(); });
+$('#pAi').addEventListener('click', async () => {
+  $('#pFout').textContent = ''; $('#pAi').disabled = true;
+  try { const d = await api('project-ai', { id: P.id, groep }); $('#pFout').textContent = d.erbij ? 'De buddy zette ' + d.erbij + ' taken klaar' + (d.demo ? ' (demo)' : '') + '.' : 'Alles uit het plan staat er al.'; ververs(); }
+  catch (e) { $('#pFout').textContent = e.message; }
+  $('#pAi').disabled = false;
+});
+$('#nPlaats').addEventListener('click', async () => {
+  try { await api('notitie', { id: P.id, tekst: $('#nNotitie').value }); $('#nNotitie').value=''; ververs(); } catch (e) {}
+});
+$('#nNotitie').addEventListener('keydown', e => { if (e.key === 'Enter') $('#nPlaats').click(); });
+async function laadVrienden(){
+  uGekozen = null;
+  try {
+    const r = await fetch('/api/rtf/social/connections', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code:s.code, token:s.token }) });
+    const vr = ((await r.json()).connections) || [];
+    $('#uVrienden').innerHTML = vr.length ? vr.map(v => '<button type="button" class="chip" data-k="'+esc(v.key)+'">'+esc(v.codename)+'</button>').join('')
+      : '<span class="leeg">Nog geen vrienden; nodig uit op codenaam.</span>';
+    $('#uVrienden').querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => {
+      uGekozen = uGekozen === b.dataset.k ? null : b.dataset.k;
+      $('#uVrienden').querySelectorAll('.chip').forEach(c => c.classList.toggle('aan', c.dataset.k === uGekozen));
+    }));
+  } catch (e) {}
+}
+$('#uStuur').addEventListener('click', async () => {
+  $('#uFout').textContent = '';
+  const cn = $('#uCodenaam').value.trim();
+  try { await api('project-uitnodig', { id: P.id, vrienden: uGekozen ? [uGekozen] : [], codenamen: cn ? [cn] : [] }); $('#uCodenaam').value=''; $('#uFout').textContent = 'Uitnodiging verstuurd.'; ververs(); }
+  catch (e) { $('#uFout').textContent = e.message; }
+});
+$('#pTerug').addEventListener('click', () => { toon('vLijst'); laadOverzicht(); });
+$('#pWeg').addEventListener('click', async () => {
+  if (!confirm('Dit project opruimen? Dit kan niet terug.')) return;
+  await api('project-weg', { id: P.id });
+  toon('vLijst'); laadOverzicht();
+});
+
+laadOverzicht();
+const qs = new URLSearchParams(location.search);
+if (qs.get('project')) openProject(qs.get('project'));
+</script>
+</body>
+</html>

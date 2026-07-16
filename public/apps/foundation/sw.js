@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-hulp-f509a5c0';
+const CACHE = 'rtf-hulp-0023c32a';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html',
   '/apps/foundation/leren.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
@@ -11,6 +11,7 @@ const SHELL = [
   '/apps/foundation/opvoeden.html', '/apps/foundation/steun.html', '/apps/foundation/studie.html',
   '/apps/foundation/veilig.html', '/apps/foundation/pesten.html', '/apps/foundation/oppasinfo.html',
   '/apps/foundation/agenda.html', '/apps/foundation/klusjes.html',
+  '/apps/foundation/overhoren.html', '/apps/foundation/schrijven.html', '/apps/foundation/projecten.html',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html', '/apps/foundation/sessie.js',
   '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/foundation/palet.js', '/shared/seizoen.js', '/shared/dagkleur.css', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',

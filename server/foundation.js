@@ -1395,4 +1395,4 @@ router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F()
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
 require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto });
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, beheerdersVanHandle };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, beheerdersVanHandle, leeftijdInstr };

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Schrijven</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .7rem;}
+  .blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .opdracht{font-family:var(--serif);font-size:1.15rem;line-height:1.45;border-left:4px solid var(--goud);padding:.2rem 0 .2rem .8rem;margin:.2rem 0 .7rem;}
+  textarea.veld{width:100%;min-height:14rem;line-height:1.55;font-size:1rem;}
+  .teller{color:var(--zacht);font-size:.8rem;text-align:right;margin-top:.3rem;}
+  .fb{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.8rem 1rem;line-height:1.5;margin-top:.7rem;white-space:pre-wrap;}
+  .fb small{display:block;color:var(--goud2);font-size:.78rem;margin-bottom:.3rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0 .8rem;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;margin-bottom:.5rem;cursor:pointer;}
+  .rij .nm{flex:1;min-width:0;}
+  .rij small{display:block;color:var(--zacht);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .knoprij{display:flex;gap:.5rem;margin-top:.6rem;}
+  .knoprij .knop{flex:1;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>✍️ Schrijven</h1>
+  <p class="intro">Elke dag een nieuwe schrijfopdracht op jouw niveau. Schrijf je verhaal en laat je buddy meelezen: die geeft een compliment en tips, maar schrijft nooit voor je.</p>
+
+  <div class="kaart blok">
+    <div class="opdracht" id="opdracht">…</div>
+    <button class="knop grijs klein" id="anders">🎲 Andere opdracht</button>
+    <textarea class="veld" id="tekst" style="margin-top:.8rem;" placeholder="Begin maar; het hoeft niet in een keer goed."></textarea>
+    <div class="teller" id="teller">0 woorden</div>
+    <div class="knoprij">
+      <button class="knop" id="lees">💬 Buddy leest mee</button>
+      <button class="knop grijs" id="bewaar">Bewaar</button>
+    </div>
+    <div class="fb" id="fb" hidden></div>
+    <div class="fout" id="fout"></div>
+  </div>
+
+  <h2 class="sec">Jouw bewaarde stukken</h2>
+  <div id="schrijfsels"><div class="leeg">Nog niets bewaard.</div></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const groep = (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || 'kind';
+const buddy = (function(){ try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { return 'vrouw'; } })();
+const api = (actie, body) => fetch('/api/rtf/leren/' + actie, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+let laatsteFeedback = '';
+async function laadOpdracht(anders){
+  try { const d = await api('schrijf-opdracht', { groep, anders: !!anders }); $('#opdracht').textContent = d.opdracht; } catch (e) {}
+}
+$('#anders').addEventListener('click', () => laadOpdracht(true));
+$('#tekst').addEventListener('input', () => {
+  const n = $('#tekst').value.split(/\s+/).filter(Boolean).length;
+  $('#teller').textContent = n + (n === 1 ? ' woord' : ' woorden');
+});
+$('#lees').addEventListener('click', async () => {
+  $('#fout').textContent = ''; $('#lees').disabled = true; $('#lees').textContent = '💬 Even lezen…';
+  try {
+    const d = await api('schrijf-feedback', { tekst: $('#tekst').value, opdracht: $('#opdracht').textContent, groep, buddy });
+    laatsteFeedback = d.feedback;
+    $('#fb').hidden = false;
+    $('#fb').innerHTML = '<small>' + (d.demo ? 'je buddy (demo)' : 'je buddy') + ' las mee</small>' + esc(d.feedback);
+  } catch (e) { $('#fout').textContent = e.message; }
+  $('#lees').disabled = false; $('#lees').textContent = '💬 Buddy leest mee';
+});
+$('#bewaar').addEventListener('click', async () => {
+  $('#fout').textContent = '';
+  try { await api('schrijf-bewaar', { opdracht: $('#opdracht').textContent, tekst: $('#tekst').value, feedback: laatsteFeedback }); $('#fout').textContent = 'Bewaard!'; laadSchrijfsels(); }
+  catch (e) { $('#fout').textContent = e.message; }
+});
+async function laadSchrijfsels(){
+  try {
+    const d = await api('schrijfsels');
+    $('#schrijfsels').innerHTML = d.schrijfsels.length ? d.schrijfsels.map(x =>
+      '<div class="kaart rij" data-id="'+x.id+'"><div class="nm">'+esc(x.opdracht || 'Vrij geschreven')+
+      '<small>'+new Date(x.at).toLocaleDateString('nl-NL',{day:'numeric',month:'long'})+' · '+x.tekst.split(/\s+/).filter(Boolean).length+' woorden</small></div><span>→</span></div>').join('')
+      : '<div class="leeg">Nog niets bewaard.</div>';
+    $('#schrijfsels').querySelectorAll('[data-id]').forEach(r => r.addEventListener('click', () => {
+      const x = d.schrijfsels.find(y => y.id === r.dataset.id);
+      if (!x) return;
+      $('#opdracht').textContent = x.opdracht || $('#opdracht').textContent;
+      $('#tekst').value = x.tekst; $('#tekst').dispatchEvent(new Event('input'));
+      laatsteFeedback = x.feedback || '';
+      $('#fb').hidden = !x.feedback;
+      if (x.feedback) $('#fb').innerHTML = '<small>je buddy las mee</small>' + esc(x.feedback);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }));
+  } catch (e) {}
+}
+laadOpdracht();
+laadSchrijfsels();
+</script>
+</body>
+</html>

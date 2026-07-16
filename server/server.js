@@ -2465,6 +2465,12 @@ Object.assign(kern, require('./kern/spellen')({
     return lft != null && lft >= 18;
   }
 }));
+/* De leerlaag (kern/leren.js): overhoorlijsten, het overhoorduel, samen aan
+   projecten en schrijven met buddy-feedback; RTF- en RTG-leden doen samen mee. */
+Object.assign(kern, require('./kern/leren')({
+  db, save, crypto, codenaamVan: kern.codenaamVan, zijnVrienden: kern.zijnVrienden, socialZoek: kern.socialZoek,
+  isGeblokkeerd: kern.isGeblokkeerd, sociaalRate: kern.sociaalRate, sseToCustomer, anthropic, leeftijdInstr: rtf.leeftijdInstr
+}));
 /* Salon-ontmoetingen (kern/ontmoeting.js): wederzijdse connecties die vlakbij
    elkaar zijn kiezen samen een activiteit, tekenen een veiligheidscontract en
    RTG-kantoor kijkt live mee tot de afspraak klaar is. Draait op de sociale
@@ -2494,6 +2500,7 @@ require('./routes/facturatie')(kern);
 require('./routes/markt')(kern);
 require('./routes/borden')(kern);
 require('./routes/spellen')(kern);
+require('./routes/leren')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Overhoren</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .7rem;}
+  .blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;margin-bottom:.5rem;}
+  .rij .nm{flex:1;min-width:0;}
+  .rij small{display:block;color:var(--zacht);font-size:.78rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0 .8rem;}
+  .mini{background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem;}
+  .kaartgroot{padding:1.4rem;text-align:center;}
+  .vraag{font-family:var(--serif);font-size:1.5rem;line-height:1.35;margin:.6rem 0 1rem;min-height:2.4em;display:flex;align-items:center;justify-content:center;}
+  .uitslag{min-height:1.6rem;font-size:.95rem;margin-top:.6rem;}
+  .uitslag.goed{color:var(--groen);} .uitslag.fout{color:var(--rood);}
+  .balkjes{display:flex;flex-direction:column;gap:.4rem;margin:1rem 0;}
+  .balkje{display:flex;align-items:center;gap:.6rem;font-size:.85rem;}
+  .balkje .naam{width:9rem;text-align:right;color:var(--zacht);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .balkje .spoor{flex:1;height:.7rem;border-radius:999px;background:var(--paneel2);overflow:hidden;}
+  .balkje .vul{height:100%;background:var(--goud);border-radius:999px;transition:width .3s;}
+  .keuzerij{display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0;}
+  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
+  .chip.aan{border-color:var(--goud);color:var(--goud2);}
+  textarea.veld{width:100%;min-height:7rem;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+
+  <!-- overzicht -->
+  <section id="vLijsten">
+    <h1>📇 Overhoren</h1>
+    <p class="intro">Maak je eigen overhoorlijsten (woordjes, topografie, tafels), oefen ze zelf, of daag iemand uit voor een overhoorduel.</p>
+
+    <div class="kaart blok">
+      <input class="veld" id="mNaam" placeholder="Naam van je lijst (bijv. Frans hoofdstuk 3)" maxlength="60">
+      <textarea class="veld" id="mParen" style="margin-top:.4rem;" placeholder="Elke regel een paar, met = ertussen:&#10;de hond = le chien&#10;de kat = le chat"></textarea>
+      <button class="knop" id="mMaak" style="width:100%;margin-top:.4rem;">Lijst maken</button>
+      <div style="text-align:center;margin:.5rem 0 .1rem;color:var(--zacht);font-size:.8rem;">of laat je buddy er een maken</div>
+      <div style="display:flex;gap:.5rem;">
+        <input class="veld" id="mOnderwerp" style="flex:1;" placeholder="Waarover? (bijv. hoofdsteden van Europa)" maxlength="80">
+        <button class="knop grijs" id="mAi">✨ Maak</button>
+      </div>
+      <div class="fout" id="mFout"></div>
+    </div>
+
+    <div id="uitnodigingen"></div>
+    <h2 class="sec">Jouw lijsten</h2>
+    <div id="lijsten"><div class="leeg">Nog geen lijsten. Maak er hierboven een.</div></div>
+    <h2 class="sec">Jouw duels</h2>
+    <div id="sessies"><div class="leeg">Nog geen duels gespeeld.</div></div>
+  </section>
+
+  <!-- solo overhoren -->
+  <section id="vOverhoor" hidden>
+    <h1 id="oTitel">Overhoren</h1>
+    <div class="kaart kaartgroot">
+      <div style="color:var(--zacht);font-size:.82rem;" id="oTeller"></div>
+      <div class="vraag" id="oVraag"></div>
+      <input class="veld" id="oAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
+      <button class="knop" id="oCheck" style="width:100%;margin-top:.6rem;">Controleer</button>
+      <div class="uitslag" id="oUitslag"></div>
+    </div>
+    <div class="kaart kaartgroot" id="oKlaar" hidden>
+      <div class="vraag" id="oScore"></div>
+      <button class="knop" id="oFouten" style="width:100%;" hidden>De foutjes nog eens</button>
+      <button class="knop grijs" id="oTerug" style="width:100%;margin-top:.5rem;">Klaar</button>
+    </div>
+  </section>
+
+  <!-- samen leren: uitdagen -->
+  <section id="vSamen" hidden>
+    <h1>🤝 Overhoorduel</h1>
+    <p class="intro" id="sIntro"></p>
+    <div class="kaart blok">
+      <div class="keuzerij" id="sVrienden"><span class="leeg">Vrienden laden…</span></div>
+      <input class="veld" id="sCodenaam" placeholder="Of daag uit op codenaam" style="margin-top:.3rem;">
+      <div class="leeg" style="padding:.3rem 0 0;">Samen leren maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
+      <button class="knop" id="sStart" style="width:100%;margin-top:.4rem;">Daag uit</button>
+      <div class="fout" id="sFout"></div>
+    </div>
+    <button class="knop grijs" id="sTerug" style="width:100%;">← terug</button>
+  </section>
+
+  <!-- het duel zelf -->
+  <section id="vDuel" hidden>
+    <h1 id="dTitel">Duel</h1>
+    <div class="balkjes" id="dStanden"></div>
+    <div class="kaart kaartgroot" id="dSpeel">
+      <div style="color:var(--zacht);font-size:.82rem;" id="dTeller"></div>
+      <div class="vraag" id="dVraag"></div>
+      <input class="veld" id="dAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
+      <button class="knop" id="dCheck" style="width:100%;margin-top:.6rem;">Controleer</button>
+      <div class="uitslag" id="dUitslag"></div>
+    </div>
+    <div class="kaart kaartgroot" id="dKlaar" hidden>
+      <div class="vraag" id="dWin"></div>
+      <button class="knop grijs" id="dTerug" style="width:100%;">Terug naar je lijsten</button>
+    </div>
+  </section>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const groep = (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || 'kind';
+const api = (actie, body) => fetch('/api/rtf/leren/' + actie, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+function toon(v){ ['vLijsten','vOverhoor','vSamen','vDuel'].forEach(x => $('#'+x).hidden = (x!==v)); }
+
+/* ---------- overzicht ---------- */
+async function laadLijsten(){
+  const [dl, ds] = await Promise.all([api('lijsten'), api('sessies')]);
+  $('#lijsten').innerHTML = dl.lijsten.length ? dl.lijsten.map(l =>
+    '<div class="kaart rij"><div class="nm">'+esc(l.naam)+'<small>'+l.aantal+' vragen'+(l.beste ? ' · beste: '+l.beste.goed+' van '+l.beste.totaal : '')+'</small></div>'+
+    '<button class="knop klein" data-oefen="'+l.id+'">Overhoren</button>'+
+    '<button class="knop grijs klein" data-duel="'+l.id+'" data-naam="'+esc(l.naam)+'">Duel</button>'+
+    '<button class="mini" data-weg="'+l.id+'" title="Lijst weg">✕</button></div>').join('')
+    : '<div class="leeg">Nog geen lijsten. Maak er hierboven een.</div>';
+  $('#lijsten').querySelectorAll('[data-oefen]').forEach(b => b.addEventListener('click', () => beginOverhoor(b.dataset.oefen)));
+  $('#lijsten').querySelectorAll('[data-duel]').forEach(b => b.addEventListener('click', () => beginSamen(b.dataset.duel, b.dataset.naam)));
+  $('#lijsten').querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => { if (!confirm('Deze lijst weggooien?')) return; await api('lijst-weg',{id:b.dataset.weg}); laadLijsten(); }));
+  $('#uitnodigingen').innerHTML = ds.uitnodigingen.length ? '<h2 class="sec">Uitdagingen voor jou</h2>' + ds.uitnodigingen.map(u =>
+    '<div class="kaart rij"><div class="nm">'+esc(u.naam)+'<small>van '+esc(u.van)+' · '+u.aantal+' vragen</small></div>'+
+    '<button class="knop klein" data-ja="'+u.id+'">Doe mee</button><button class="mini" data-nee="'+u.id+'">✕</button></div>').join('') : '';
+  $('#uitnodigingen').querySelectorAll('[data-ja]').forEach(b => b.addEventListener('click', async () => { await api('sessie-antwoord',{id:b.dataset.ja, akkoord:true}); openDuel(b.dataset.ja); }));
+  $('#uitnodigingen').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => { await api('sessie-antwoord',{id:b.dataset.nee, akkoord:false}); laadLijsten(); }));
+  $('#sessies').innerHTML = ds.sessies.length ? ds.sessies.map(x =>
+    '<div class="kaart rij"><div class="nm">'+esc(x.naam)+'<small>'+x.spelers.map(esc).join(' tegen ')+' · '+(x.status==='klaar'?'afgerond':x.status==='wacht'?'wacht op de ander':'bezig')+'</small></div>'+
+    (x.status!=='wacht'?'<button class="knop grijs klein" data-open="'+x.id+'">Open</button>':'')+'</div>').join('')
+    : '<div class="leeg">Nog geen duels gespeeld.</div>';
+  $('#sessies').querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openDuel(b.dataset.open)));
+}
+$('#mMaak').addEventListener('click', async () => {
+  $('#mFout').textContent = '';
+  const paren = $('#mParen').value.split('\n').map(r => { const i = r.indexOf('='); return i > 0 ? { v: r.slice(0, i), a: r.slice(i+1) } : null; }).filter(Boolean);
+  try { await api('lijst-maak', { naam: $('#mNaam').value, paren }); $('#mNaam').value=''; $('#mParen').value=''; laadLijsten(); }
+  catch (e) { $('#mFout').textContent = e.message; }
+});
+$('#mAi').addEventListener('click', async () => {
+  $('#mFout').textContent = '';
+  $('#mAi').disabled = true; $('#mAi').textContent = '…';
+  try { const d = await api('lijst-ai', { onderwerp: $('#mOnderwerp').value, groep }); $('#mOnderwerp').value=''; if (d.demo) $('#mFout').textContent = 'De buddy koos een kant-en-klaar setje (demo).'; laadLijsten(); }
+  catch (e) { $('#mFout').textContent = e.message; }
+  $('#mAi').disabled = false; $('#mAi').textContent = '✨ Maak';
+});
+
+/* ---------- solo overhoren (op het scherm; de score gaat naar de server) ---------- */
+const norm = t => String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+let O = null;
+async function beginOverhoor(id){
+  const d = await api('lijst-haal', { id });
+  const volgorde = d.lijst.paren.map((_,i)=>i).sort(()=>Math.random()-0.5);
+  O = { id, naam: d.lijst.naam, paren: d.lijst.paren, rij: volgorde, i: 0, goed: 0, fouten: [], herkansing: false };
+  $('#oTitel').textContent = '📇 ' + d.lijst.naam;
+  $('#oKlaar').hidden = true; $('#oCheck').disabled = false;
+  toon('vOverhoor'); volgende();
+}
+function volgende(){
+  if (O.i >= O.rij.length) return oEinde();
+  $('#oTeller').textContent = (O.i+1) + ' van ' + O.rij.length + (O.herkansing ? ' (herkansing)' : '');
+  $('#oVraag').textContent = O.paren[O.rij[O.i]].v;
+  $('#oAntwoord').value = ''; $('#oUitslag').textContent = ''; $('#oUitslag').className = 'uitslag';
+  $('#oAntwoord').focus();
+}
+$('#oCheck').addEventListener('click', () => {
+  if (!O || O.i >= O.rij.length) return;
+  const p = O.paren[O.rij[O.i]];
+  const goed = norm($('#oAntwoord').value) === norm(p.a);
+  $('#oUitslag').textContent = goed ? '✓ Goed!' : '✗ Het was: ' + p.a;
+  $('#oUitslag').className = 'uitslag ' + (goed ? 'goed' : 'fout');
+  if (goed) O.goed++; else O.fouten.push(O.rij[O.i]);
+  O.i++;
+  setTimeout(volgende, goed ? 650 : 1600);
+});
+$('#oAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#oCheck').click(); });
+async function oEinde(){
+  $('#oScore').textContent = O.goed + ' van ' + O.rij.length + ' goed' + (O.goed === O.rij.length ? ' 🎉' : '');
+  $('#oFouten').hidden = !O.fouten.length;
+  $('#oKlaar').hidden = false;
+  if (!O.herkansing) try { await api('overhoor-klaar', { id: O.id, goed: O.goed, totaal: O.rij.length }); } catch (e) {}
+}
+$('#oFouten').addEventListener('click', () => { O = Object.assign(O, { rij: O.fouten.slice(), i: 0, goed: 0, fouten: [], herkansing: true }); $('#oKlaar').hidden = true; volgende(); });
+$('#oTerug').addEventListener('click', () => { toon('vLijsten'); laadLijsten(); });
+
+/* ---------- samen leren: uitdagen en het duel ---------- */
+let sLijst = null, sGekozen = null;
+async function beginSamen(lijstId, naam){
+  sLijst = lijstId; sGekozen = null;
+  $('#sIntro').textContent = 'Daag iemand uit over "' + naam + '": jullie krijgen allebei dezelfde vragen, wie kent ze het best?';
+  $('#sFout').textContent = ''; $('#sCodenaam').value = '';
+  toon('vSamen');
+  try {
+    const r = await fetch('/api/rtf/social/connections', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code:s.code, token:s.token }) });
+    const vr = ((await r.json()).connections) || [];
+    $('#sVrienden').innerHTML = vr.length ? vr.map(v => '<button type="button" class="chip" data-k="'+esc(v.key)+'">'+esc(v.codename)+'</button>').join('')
+      : '<span class="leeg">Nog geen vrienden; daag uit op codenaam.</span>';
+    $('#sVrienden').querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => {
+      sGekozen = sGekozen === b.dataset.k ? null : b.dataset.k;
+      $('#sVrienden').querySelectorAll('.chip').forEach(c => c.classList.toggle('aan', c.dataset.k === sGekozen));
+    }));
+  } catch (e) {}
+}
+$('#sStart').addEventListener('click', async () => {
+  $('#sFout').textContent = '';
+  const cn = $('#sCodenaam').value.trim();
+  try {
+    const d = await api('sessie-start', { lijstId: sLijst, vrienden: sGekozen ? [sGekozen] : [], codenamen: cn ? [cn] : [] });
+    openDuel(d.id);
+  } catch (e) { $('#sFout').textContent = e.message; }
+});
+$('#sTerug').addEventListener('click', () => { toon('vLijsten'); laadLijsten(); });
+
+let D = null, dPoll = null;
+async function openDuel(id){
+  D = { id };
+  toon('vDuel');
+  await ververs();
+  clearInterval(dPoll);
+  dPoll = setInterval(() => { if (!document.hidden && !$('#vDuel').hidden) ververs(); }, 3000);
+}
+async function ververs(){
+  let d; try { d = await api('sessie-staat', { id: D.id }); } catch (e) { return; }
+  const x = d.sessie;
+  $('#dTitel').textContent = '🤝 ' + x.naam;
+  const balk = (naam, wie) => '<div class="balkje"><span class="naam">'+esc(naam)+'</span><div class="spoor"><div class="vul" style="width:'+Math.round(100*wie.idx/x.aantal)+'%"></div></div><span>'+wie.goed+' goed</span></div>';
+  $('#dStanden').innerHTML = balk('jij', x.ik) + (x.ander ? balk(x.ander.codenaam, x.ander) : '<div class="leeg">Wacht tot de ander meedoet…</div>');
+  if (x.status === 'klaar'){
+    $('#dSpeel').hidden = true; $('#dKlaar').hidden = false;
+    $('#dWin').textContent = x.gelijk ? 'Gelijkspel! Sterk van allebei.' : '🏆 ' + x.winnaar + ' wint dit duel!';
+    clearInterval(dPoll);
+    return;
+  }
+  $('#dKlaar').hidden = true;
+  $('#dSpeel').hidden = x.status !== 'bezig';
+  if (x.status === 'bezig'){
+    if (x.ik.klaar){ $('#dVraag').textContent = 'Jij bent klaar; de ander is nog bezig…'; $('#dAntwoord').hidden = true; $('#dCheck').hidden = true; $('#dTeller').textContent=''; }
+    else {
+      $('#dAntwoord').hidden = false; $('#dCheck').hidden = false;
+      $('#dTeller').textContent = (x.ik.idx+1) + ' van ' + x.aantal;
+      if ($('#dVraag').textContent !== x.vraag){ $('#dVraag').textContent = x.vraag; $('#dAntwoord').value=''; $('#dUitslag').textContent=''; $('#dUitslag').className='uitslag'; }
+    }
+  }
+}
+$('#dCheck').addEventListener('click', async () => {
+  const antwoord = $('#dAntwoord').value;
+  try {
+    const d = await api('sessie-zet', { id: D.id, antwoord });
+    $('#dUitslag').textContent = d.goed ? '✓ Goed!' : '✗ Het was: ' + d.juist;
+    $('#dUitslag').className = 'uitslag ' + (d.goed ? 'goed' : 'fout');
+    setTimeout(ververs, d.goed ? 600 : 1500);
+  } catch (e) { $('#dUitslag').textContent = e.message; }
+});
+$('#dAntwoord').addEventListener('keydown', e => { if (e.key === 'Enter') $('#dCheck').click(); });
+$('#dTerug').addEventListener('click', () => { toon('vLijsten'); laadLijsten(); });
+
+laadLijsten();
+const qs = new URLSearchParams(location.search);
+if (qs.get('duel')) openDuel(qs.get('duel'));
+</script>
+</body>
+</html>

@@ -2037,13 +2037,14 @@
     }));
   }
 
-  /* ---------- Fluister: de persoonlijke assistent met geheugen ---------- */
-  let fluisterLog = [];
+  /* ---------- het brein van De Butler: geheugen en seintjes ----------
+     Het gesprek zelf loopt via de gewone Butler-chat op de AI-tab; deze
+     kaart toont rustig wat hij weet (wisbaar) en wat hij zelf ziet. */
   let fluisterSyncAt = 0;
   async function renderFluister(){
     const el = $('#fluisterWrap'); if (!el) return;
     if (!API.live){ el.innerHTML = ''; return; }
-    // de inklap-laag deelt (alleen) de gebruikstellers, zodat Fluister leert
+    // de inklap-laag deelt (alleen) de gebruikstellers, zodat de Butler leert
     if (window.FocusUI && Date.now() - fluisterSyncAt > 60000){
       fluisterSyncAt = Date.now();
       API.call('/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
@@ -2052,11 +2053,11 @@
     try { prof = await API.call('/fluister/profiel'); } catch(e){ el.innerHTML = ''; return; }
     el.innerHTML =
       '<div class="live-start" style="margin-bottom:0.8rem;">' +
-        '<div class="lh">✦ Fluister</div>' +
-        '<div class="ld">' + T('fl.d','Uw persoonlijke assistent. Hij onthoudt wat u hem vertelt, leert van wat u gebruikt, en regelt het ook: "reserveer bij Sal de Mar morgen om 20:00" of "zet mijn 24 uur op 3 augustus". Alles is opvraagbaar en wisbaar.') + '</div>' +
+        '<div class="lh">🤵 ' + T('fl.h','Wat uw Butler weet en ziet') + '</div>' +
+        '<div class="ld">' + T('fl.d','Hij onthoudt wat u vertelt ("onthoud dat..."), leert van wat u gebruikt en regelt alles in de chat hieronder: zoeken, reserveren, uw 24 uur, een Tik of betaalverzoek. Alles is opvraagbaar en wisbaar; geld gaat nooit zonder uw "ja" de deur uit.') + '</div>' +
         ((prof.seintjes || []).length
           ? '<div style="margin-top:0.55rem;border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;">' +
-              '<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">' + T('fl.sein','Fluister fluistert') + '</div>' +
+              '<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">' + T('fl.sein','Uw Butler ziet') + '</div>' +
               prof.seintjes.map(x => '<div style="margin-top:0.3rem;font-size:0.76rem;line-height:1.45;">' + esc(x.icoon) + ' ' + esc(x.tekst) + '</div>').join('') + '</div>'
           : '') +
         (prof.weetjes.length
@@ -2065,61 +2066,7 @@
               '<button class="js-flweg" data-i="' + i + '" aria-label="' + T('fl.weg','vergeet dit') + '" style="background:none;border:none;color:var(--soft);cursor:pointer;font-size:0.75rem;padding:0;">✕</button></span>').join('') + '</div>'
           : '<div style="margin-top:0.5rem;font-size:0.68rem;color:var(--soft);">' + T('fl.leeg','Nog geen weetjes. Zeg bijvoorbeeld: "onthoud dat ik cava drink, nooit rode wijn".') + '</div>') +
         (prof.top.length ? '<div style="margin-top:0.4rem;font-size:0.64rem;color:var(--soft);">' + T('fl.top','Ik zie dat u het meest werkt met') + ': ' + prof.top.map(esc).join(', ') + '.</div>' : '') +
-        '<div id="flThread" style="margin-top:0.55rem;font-size:0.78rem;line-height:1.55;">' + fluisterLog.map((m, i) =>
-          '<div style="margin-top:0.3rem;' + (m.van === 'ik' ? 'color:var(--soft);' : '') + '">' + (m.van === 'ik' ? '› ' : '✦ ') + esc(m.tekst) + '</div>' +
-          (m.voorstel && i === fluisterLog.length - 1
-            ? '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;"><button class="live-go js-flja" style="margin-top:0;width:auto;padding:0.45rem 1.1rem;">' + T('fl.ja','Ja, doe maar') + '</button>' +
-              '<button class="mo-code js-flnee">' + T('fl.nee','Nee, laat maar') + '</button></div>'
-            : '')).join('') + '</div>' +
-        '<div style="display:flex;gap:0.45rem;margin-top:0.55rem;">' +
-          '<input id="flIn" placeholder="' + T('fl.ph','Vraag iets, of: onthoud dat...') + '" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
-          (window.SpeechRecognition || window.webkitSpeechRecognition
-            ? '<button class="mo-code js-flmic" aria-label="' + T('fl.mic','Spreek uw vraag in') + '" style="flex:0 0 auto;">🎤</button>'
-            : '') +
-          '<button class="live-go js-flstuur" style="margin-top:0;flex:0 0 auto;width:auto;padding:0.6rem 1rem;">' + T('fl.stuur','Stuur') + '</button></div>' +
-        '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.45rem;">' +
-          '<button class="mo-code js-flchip">' + T('fl.chip1','Wat weet je over mij?') + '</button>' +
-          '<button class="mo-code js-flchip" data-q="Wat speelt er nu voor mij?">' + T('fl.chip2','Wat speelt er nu?') + '</button></div>' +
       '</div>';
-    const stuur = async (q) => {
-      if (!q) return;
-      fluisterLog.push({ van: 'ik', tekst: q });
-      try {
-        const r = await API.call('/fluister', { q });
-        fluisterLog.push({ van: 'fl', tekst: r.antwoord, voorstel: !!r.voorstel });
-        fluisterLog = fluisterLog.slice(-8);
-        if (r.gedaan) toast('✦ ' + T('fl.gedaan','Fluister heeft het geregeld.'));
-        renderFluister();
-      } catch(e){ toast(e.message); }
-    };
-    el.querySelector('.js-flstuur').addEventListener('click', () => { const i = el.querySelector('#flIn'); stuur((i.value || '').trim()); i.value = ''; });
-    el.querySelector('#flIn').addEventListener('keydown', e => { if (e.key === 'Enter'){ stuur((e.target.value || '').trim()); e.target.value = ''; } });
-    el.querySelectorAll('.js-flchip').forEach(b => b.addEventListener('click', () => stuur(b.dataset.q || b.textContent)));
-    // een voorstel bevestig of blaas je af met een tik (of gewoon met "ja"/"nee")
-    const ja = el.querySelector('.js-flja'), nee = el.querySelector('.js-flnee');
-    if (ja) ja.addEventListener('click', () => stuur('ja'));
-    if (nee) nee.addEventListener('click', () => stuur('nee'));
-    // spreek uw vraag in: de browser luistert, Fluister doet de rest
-    const mic = el.querySelector('.js-flmic');
-    if (mic) mic.addEventListener('click', () => {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      try {
-        const rec = new SR();
-        rec.lang = document.documentElement.lang === 'en' ? 'en-US' : 'nl-NL';
-        rec.interimResults = false;
-        rec.maxAlternatives = 1;
-        mic.textContent = '🔴';
-        rec.addEventListener('result', ev => {
-          const zin = ((ev.results[0] || [])[0] || {}).transcript || '';
-          const inp = el.querySelector('#flIn');
-          if (inp) inp.value = zin;
-          stuur(zin.trim());
-        });
-        rec.addEventListener('end', () => { mic.textContent = '🎤'; });
-        rec.addEventListener('error', () => { mic.textContent = '🎤'; toast(T('fl.michoor','Ik kon u niet verstaan; probeer het nog eens of typ het gewoon.')); });
-        rec.start();
-      } catch(e){ toast(T('fl.micniet','Spraak werkt niet in deze browser; typen kan altijd.')); }
-    });
     el.querySelectorAll('.js-flweg').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/fluister/vergeet', { wat: Number(b.dataset.i) }); renderFluister(); } catch(e){ toast(e.message); }
     }));
@@ -3869,8 +3816,45 @@
 
   const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
-  function ask(q){
-    if (!q.trim()) return;
+  // een voorstel van de Butler ("even checken...") krijgt echte knoppen
+  function voorstelChips(aan){
+    const box = $('#chips'); if (!box) return;
+    if (aan){
+      box.dataset.voorstel = '1';
+      box.innerHTML = '<button class="chip" id="flJa">✓ ' + T('fl.ja','Ja, doe maar') + '</button>' +
+        '<button class="chip" id="flNee">✕ ' + T('fl.nee','Nee, laat maar') + '</button>';
+      $('#flJa').addEventListener('click', () => ask('ja'));
+      $('#flNee').addEventListener('click', () => ask('nee'));
+      return;
+    }
+    if (!box.dataset.voorstel) return;
+    delete box.dataset.voorstel;
+    if (user.account && user.tier !== 'guest'){
+      box.innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
+      const bc = $('#aiBetaalChip'); if (bc) bc.addEventListener('click', () => kiesPartnerEnBetaal('ai'));
+    } else standaardChips();
+  }
+
+  async function ask(qIn){
+    const q = String(qIn || '').trim();
+    if (!q) return;
+    // eerst de Butler-motor: geheugen, seintjes, zoeken en echt regelen
+    // (reserveren, het 24-uursblok, een Tik, betaalverzoeken); pakt hij de
+    // vraag niet, dan neemt de gewone gesprekslaag het over
+    if (API.live){
+      let r = null;
+      try { r = await API.call('/fluister', { q }); } catch(e){}
+      if (r && r.pakte){
+        bubble(q, 'user');
+        bubble(r.antwoord, 'ai');
+        if (!user.account){ chatHistory.push({role:'user', content:q}); chatHistory.push({role:'assistant', content:r.antwoord}); }
+        if (r.gedaan) toast('🤵 ' + T('fl.gedaan','De Butler heeft het geregeld.'));
+        voorstelChips(!!r.voorstel);
+        if (typeof renderFluister === 'function') renderFluister();
+        $('#content').scrollTop = $('#content').scrollHeight;
+        return;
+      }
+    }
     if (user.account){ chatSend(q); return; }   // echte accounts: gekoppeld gesprek
     bubble(q, 'user');
     chatHistory.push({role:'user', content:q});
@@ -3947,6 +3931,13 @@
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
   }
 
+  function standaardChips(){
+    const chips = lang()==='en'
+      ? ['Yes, arrange it','What do you know about me?','What should I pack?','Plan my day','Arrange a restaurant']
+      : ['Ja, regel het','Wat weet je over mij?','Wat moet ik inpakken?','Plan mijn dag','Regel een restaurant'];
+    $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
+    document.querySelectorAll('#chips .chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
+  }
   function renderAI(){
     if (user.account){ renderChat(); return; }
     $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','Uw uitvoerende AI.');
@@ -3955,14 +3946,35 @@
     const opener = aiOpener();
     bubble(opener, 'ai');
     chatHistory.push({role:'assistant', content:opener});
-    const chips = lang()==='en'
-      ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
-      : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant'];
-    $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
-    document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
+    standaardChips();
   }
   $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
   $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
+  // spreek uw vraag in: de browser luistert, De Butler doet de rest
+  (function(){
+    const mic = $('#askMic');
+    if (!mic) return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR){ mic.hidden = true; return; }
+    mic.addEventListener('click', () => {
+      try {
+        const rec = new SR();
+        rec.lang = document.documentElement.lang === 'en' ? 'en-US' : 'nl-NL';
+        rec.interimResults = false;
+        rec.maxAlternatives = 1;
+        mic.textContent = '🔴';
+        rec.addEventListener('result', ev => {
+          const zin = (((ev.results[0] || [])[0] || {}).transcript || '').trim();
+          $('#askInput').value = zin;
+          ask(zin);
+          $('#askInput').value = '';
+        });
+        rec.addEventListener('end', () => { mic.textContent = '🎤'; });
+        rec.addEventListener('error', () => { mic.textContent = '🎤'; toast(T('fl.michoor','Ik kon u niet verstaan; probeer het nog eens of typ het gewoon.')); });
+        rec.start();
+      } catch(e){ toast(T('fl.micniet','Spraak werkt niet in deze browser; typen kan altijd.')); }
+    });
+  })();
 
   /* ---------- RTG Zakelijk: het professionele netwerk van de Business Pass ---------- */
   let zakView = 'feed';

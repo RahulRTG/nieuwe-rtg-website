@@ -50,8 +50,45 @@
 
   const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
-  function ask(q){
-    if (!q.trim()) return;
+  // een voorstel van de Butler ("even checken...") krijgt echte knoppen
+  function voorstelChips(aan){
+    const box = $('#chips'); if (!box) return;
+    if (aan){
+      box.dataset.voorstel = '1';
+      box.innerHTML = '<button class="chip" id="flJa">✓ ' + T('fl.ja','Ja, doe maar') + '</button>' +
+        '<button class="chip" id="flNee">✕ ' + T('fl.nee','Nee, laat maar') + '</button>';
+      $('#flJa').addEventListener('click', () => ask('ja'));
+      $('#flNee').addEventListener('click', () => ask('nee'));
+      return;
+    }
+    if (!box.dataset.voorstel) return;
+    delete box.dataset.voorstel;
+    if (user.account && user.tier !== 'guest'){
+      box.innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
+      const bc = $('#aiBetaalChip'); if (bc) bc.addEventListener('click', () => kiesPartnerEnBetaal('ai'));
+    } else standaardChips();
+  }
+
+  async function ask(qIn){
+    const q = String(qIn || '').trim();
+    if (!q) return;
+    // eerst de Butler-motor: geheugen, seintjes, zoeken en echt regelen
+    // (reserveren, het 24-uursblok, een Tik, betaalverzoeken); pakt hij de
+    // vraag niet, dan neemt de gewone gesprekslaag het over
+    if (API.live){
+      let r = null;
+      try { r = await API.call('/fluister', { q }); } catch(e){}
+      if (r && r.pakte){
+        bubble(q, 'user');
+        bubble(r.antwoord, 'ai');
+        if (!user.account){ chatHistory.push({role:'user', content:q}); chatHistory.push({role:'assistant', content:r.antwoord}); }
+        if (r.gedaan) toast('🤵 ' + T('fl.gedaan','De Butler heeft het geregeld.'));
+        voorstelChips(!!r.voorstel);
+        if (typeof renderFluister === 'function') renderFluister();
+        $('#content').scrollTop = $('#content').scrollHeight;
+        return;
+      }
+    }
     if (user.account){ chatSend(q); return; }   // echte accounts: gekoppeld gesprek
     bubble(q, 'user');
     chatHistory.push({role:'user', content:q});
@@ -128,6 +165,13 @@
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
   }
 
+  function standaardChips(){
+    const chips = lang()==='en'
+      ? ['Yes, arrange it','What do you know about me?','What should I pack?','Plan my day','Arrange a restaurant']
+      : ['Ja, regel het','Wat weet je over mij?','Wat moet ik inpakken?','Plan mijn dag','Regel een restaurant'];
+    $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
+    document.querySelectorAll('#chips .chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
+  }
   function renderAI(){
     if (user.account){ renderChat(); return; }
     $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','Uw uitvoerende AI.');
@@ -136,14 +180,35 @@
     const opener = aiOpener();
     bubble(opener, 'ai');
     chatHistory.push({role:'assistant', content:opener});
-    const chips = lang()==='en'
-      ? ['Yes, arrange it','What should I pack?','Do I need a visa?','Plan my day','Arrange a restaurant']
-      : ['Ja, regel het','Wat moet ik inpakken?','Heb ik een visum nodig?','Plan mijn dag','Regel een restaurant'];
-    $('#chips').innerHTML = chips.map(c => '<button class="chip">' + c + '</button>').join('');
-    document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => ask(c.textContent)));
+    standaardChips();
   }
   $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
   $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
+  // spreek uw vraag in: de browser luistert, De Butler doet de rest
+  (function(){
+    const mic = $('#askMic');
+    if (!mic) return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR){ mic.hidden = true; return; }
+    mic.addEventListener('click', () => {
+      try {
+        const rec = new SR();
+        rec.lang = document.documentElement.lang === 'en' ? 'en-US' : 'nl-NL';
+        rec.interimResults = false;
+        rec.maxAlternatives = 1;
+        mic.textContent = '🔴';
+        rec.addEventListener('result', ev => {
+          const zin = (((ev.results[0] || [])[0] || {}).transcript || '').trim();
+          $('#askInput').value = zin;
+          ask(zin);
+          $('#askInput').value = '';
+        });
+        rec.addEventListener('end', () => { mic.textContent = '🎤'; });
+        rec.addEventListener('error', () => { mic.textContent = '🎤'; toast(T('fl.michoor','Ik kon u niet verstaan; probeer het nog eens of typ het gewoon.')); });
+        rec.start();
+      } catch(e){ toast(T('fl.micniet','Spraak werkt niet in deze browser; typen kan altijd.')); }
+    });
+  })();
 
   /* ---------- RTG Zakelijk: het professionele netwerk van de Business Pass ---------- */
   let zakView = 'feed';

@@ -1,6 +1,9 @@
-/* Fluister: de persoonlijke assistent van het hele ecosysteem. Een soort
-   Siri, maar dan voor deze code: iedereen gebruikt hem voor zichzelf, en hij
-   leert de gebruiker kennen.
+/* De Butler-motor: de persoonlijke assistent van het hele ecosysteem.
+   Voor leden heet hij De Butler (een gezicht, geen tweede assistent naast
+   de bestaande AI: dit IS die AI); voor personeel en zaken is dezelfde
+   motor "uw assistent". Iedereen gebruikt hem voor zichzelf, en hij leert
+   de gebruiker kennen. De interne naam fluister blijft, zodat opslag en
+   routes stabiel zijn.
 
    Twee soorten geheugen, allebei van de gebruiker zelf:
    - weetjes: wat je hem expliciet vertelt ("onthoud dat ik cava drink,
@@ -33,6 +36,9 @@
    gratis en altijd annuleerbaar. */
 module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGebruik, zorgVoor, pay }) => {
   const nu = () => new Date().toISOString();
+  // hetzelfde brein, een passend gezicht: De Butler voor leden, "uw
+  // assistent" voor personeel en zaken
+  const wieBen = key => /^(staff|zaak):/.test(String(key)) ? 'uw assistent' : 'uw Butler';
   const lijsten = () => { if (!db.data.fluister) db.data.fluister = {}; };
   const van = key => {
     lijsten();
@@ -159,7 +165,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
     for (const s of fluisterSeintjes(key)) {
       if (p.geseind[s.tekst]) continue;
       p.geseind[s.tekst] = nu();
-      notify(key, { icon: s.icoon, title: 'Fluister fluistert', body: s.tekst, scope: 'fluister' });
+      notify(key, { icon: s.icoon, title: 'Uw Butler', body: s.tekst, scope: 'fluister' });
       n++;
     }
     // het piep-geheugen blijft klein: de oudste vermeldingen vallen eraf
@@ -197,9 +203,19 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
       return { tekst: 'Geregeld: uw 24 uur bij ' + r.gebruik.assetNaam + ' staat op ' + w.datum + ' (nog ' + r.dagenTegoed + ' dag(en) tegoed dit jaar). Het team neemt vooraf contact op.', gedaan: true };
     }
     if (w.soort === 'tik' && pay) {
-      const r = await pay.stuur({ van: codenaam, aanCodenaam: w.aan, centen: w.centen, oms: 'Via Fluister', soort: 'tik' });
+      const r = await pay.stuur({ van: codenaam, aanCodenaam: w.aan, centen: w.centen, oms: 'Via de Butler', soort: 'tik' });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       return { tekst: 'Gedaan: ' + eur(w.centen) + ' aan ' + w.aan + ' gestuurd via een Tik. Uw saldo: ' + eur(r.saldo) + '.', gedaan: true };
+    }
+    if (w.soort === 'klompjes' && pay) {
+      let betaald = 0, mis = null;
+      for (const id of w.ids || []) {
+        const r = await pay.verzoekBetaal({ codenaam, verzoekId: id });
+        if (r.error) { mis = r.error; continue; }
+        betaald++;
+      }
+      if (!betaald) return { tekst: 'Dat lukt niet: ' + (mis || 'de verzoeken zijn al weg.') };
+      return { tekst: 'Gedaan: ' + betaald + ' verzoek(en) betaald, samen ' + eur(w.totaal) + '.' + (mis ? ' Een verzoek lukte niet: ' + mis : ''), gedaan: true };
     }
     return { tekst: 'Dat voorstel ken ik niet meer; zeg het gerust opnieuw.' };
   }
@@ -216,12 +232,12 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
       p.gesprek.push({ u: q, a: String(antwoord).slice(0, 400), at: nu() });
       p.gesprek = p.gesprek.slice(-5);
       save();
-      return { ok: true, antwoord, gedaan: !!gedaan, voorstel: !!voorstel };
+      return { ok: true, antwoord, gedaan: !!gedaan, voorstel: !!voorstel, pakte: true };
     };
     if (/^onthoud\b/i.test(q)) {
       const r = fluisterOnthoud(key, q);
       if (r.error) return r;
-      return { ok: true, antwoord: 'Onthouden: "' + r.weetjes[r.weetjes.length - 1].tekst + '". U kunt dit altijd terugzien of wissen met "wat weet je over mij".', geleerd: true };
+      return { ok: true, antwoord: 'Onthouden: "' + r.weetjes[r.weetjes.length - 1].tekst + '". U kunt dit altijd terugzien of wissen met "wat weet je over mij".', geleerd: true, pakte: true };
     }
     if (/vergeet alles/i.test(q)) {
       fluisterVergeet(key, 'alles');
@@ -229,7 +245,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
       p.focus = {};
       p.wacht = null;
       save();
-      return { ok: true, antwoord: 'Alles gewist: uw weetjes, ons gesprek en de gebruikstellers. We beginnen met een schone lei.', geleerd: true };
+      return { ok: true, antwoord: 'Alles gewist: uw weetjes, ons gesprek en de gebruikstellers. We beginnen met een schone lei.', geleerd: true, pakte: true };
     }
     if (/wat (weet|onthoud) je (over|van) mij/i.test(q)) {
       const regels = [];
@@ -239,7 +255,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
       if (!regels.length) regels.push('Nog niets. Vertel me iets met "onthoud dat..." of gebruik de app; ik leer vanzelf wat u belangrijk vindt.');
       if (p.gesprek.length) regels.push('Verder onthoud ik alleen de laatste ' + p.gesprek.length + ' beurt(en) van ons gesprek.');
       regels.push('Wissen kan per weetje of in een keer ("vergeet alles").');
-      return { ok: true, antwoord: regels.join(' ') };
+      return { ok: true, antwoord: regels.join(' '), pakte: true };
     }
     /* ---- doen: Fluister voert het ook echt uit, alleen voor het lid zelf
        (sess reist alleen mee op de leden-route, nooit voor personeel).
@@ -310,6 +326,47 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
         if (z) { r.reservering.zorg = z; save(); }
         return klaar('Aangevraagd: ' + s.name + ', ' + datum + ' om ' + r.reservering.tijd + ' voor ' + personen + '. De zaak bevestigt zo; u ziet het in de bel.', true);
       }
+      // "zoek lamsrack" / "waar kan ik sushi eten": door het hele aanbod
+      // van alle partners (zaken, menukaarten, diensten en producten)
+      if (/^(zoek|vind)\b/i.test(q) || /\bwaar (kan|vind|koop|eet|drink|huur) ik\b/i.test(q)) {
+        const term = q.replace(/^(zoek|vind)\b(\s+(een|naar))?/i, '').replace(/\bwaar (kan|vind|koop|eet|drink|huur) ik\b/i, '').replace(/[?.!]/g, ' ').trim().toLowerCase();
+        if (term.length < 2) return klaar('Waar zal ik naar zoeken? Zeg bijvoorbeeld: "zoek lamsrack" of "waar kan ik sushi eten".');
+        const hits = [];
+        for (const s of (db.data.suppliers || [])) {
+          if (((s.name || '') + ' ' + (s.type || '') + ' ' + (s.city || '')).toLowerCase().includes(term))
+            hits.push((s.icon || '🏛') + ' ' + s.name + (s.type ? ' (' + s.type + ')' : '') + (s.city ? ' in ' + s.city : ''));
+          for (const it of [].concat(s.menu || [], s.services || [], s.products || [])) {
+            const naam = it.name || it.naam || '';
+            if (!naam.toLowerCase().includes(term)) continue;
+            const prijs = Number(it.price != null ? it.price : it.prijs);
+            hits.push('· ' + naam + (Number.isFinite(prijs) ? ' voor ' + eur(Math.round(prijs * 100)) : '') + ' bij ' + s.name);
+          }
+          if (hits.length >= 8) break;
+        }
+        if (!hits.length) return klaar('Ik vond niets over "' + term + '" in het aanbod. Probeer een ander woord, of vraag het de zaak via de gastchat.');
+        return klaar('Dit vond ik voor u: ' + hits.slice(0, 6).join(' | ') + '. Zal ik iets reserveren of regelen? Zeg het maar.');
+      }
+      // "vraag 20 euro aan Noordelijke Ster": een Klompje (betaalverzoek);
+      // er verlaat geen geld uw rekening, dus dit mag direct
+      if (pay && /\b(vraag|verzoek)\b/i.test(q)) {
+        const m = q.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:euro|eur|€)?\s+(?:aan|van)\s+(.+?)[.?!]?\s*$/i);
+        if (m) {
+          const centen = Math.round(parseFloat(m[1].replace(',', '.')) * 100);
+          const r = await pay.verzoekMaak({ van: codenaam, aan: [m[2].trim()], perCenten: centen, oms: 'Via de Butler' });
+          if (r.error) return klaar('Dat lukt niet: ' + r.error);
+          return klaar('Verzocht: ' + eur(centen) + ' aan ' + m[2].trim() + '. Het Klompje staat klaar; zodra er betaald is, ziet u het in de bel.', true);
+        }
+      }
+      // "wat moet ik nog betalen": openstaande betaalverzoeken aan mij,
+      // en met een "ja" betaal ik ze in een keer (geld, dus met drempel)
+      if (pay && /(wat (moet|heb) ik.*(betalen|open)|openstaande (verzoeken|betalingen)|staat er (nog )?(iets )?open)/i.test(q)) {
+        const aanMij = pay.verzoekenVoor(codenaam).aanMij;
+        if (!aanMij.length) return klaar('Er staan geen betaalverzoeken voor u open. Zo hoort het.');
+        const totaal = aanMij.reduce((a, v) => a + v.centen, 0);
+        p.wacht = { soort: 'klompjes', ids: aanMij.map(v => v.id), totaal, at: nu() };
+        save();
+        return klaar('Er staan ' + aanMij.length + ' verzoek(en) open, samen ' + eur(totaal) + ': ' + aanMij.map(v => eur(v.centen) + ' voor ' + v.van + (v.oms ? ' (' + v.oms + ')' : '')).join(', ') + '. Zeg "ja" en ik betaal ze alle ' + aanMij.length + '; "nee" en ze blijven staan.', false, true);
+      }
     }
 
     const stand = standVan(key);
@@ -323,7 +380,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
           (seintjes.length ? 'Actuele seintjes: ' + seintjes.map(x => x.tekst).join('; ') + '.' : '');
         const response = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 300,
-          system: 'Je bent Fluister, de persoonlijke assistent in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. Context: ' + ctx,
+          system: 'Je bent ' + (wieBen(key) === 'uw Butler' ? 'De Butler' : 'de persoonlijke assistent') + ' in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. Context: ' + ctx,
           messages: [...p.gesprek.flatMap(g => [{ role: 'user', content: g.u }, { role: 'assistant', content: g.a }]), { role: 'user', content: q }]
         });
         return klaar(response.content[0].text);
@@ -333,7 +390,11 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
     const groet = p.weetjes.length ? 'Ik denk aan uw ' + p.weetjes.length + ' weetje(s). ' : '';
     const fluistert = seintjes.length ? ' Mijn seintjes: ' + seintjes.map(x => x.icoon + ' ' + x.tekst).join(' | ') + '.' : '';
     if (stand.length || seintjes.length) return klaar(groet + (stand.length ? 'Dit speelt er nu voor u: ' + stand.join('; ') + '.' : 'Er staat niets open.') + fluistert + ' Vraag gerust door, of leer me iets met "onthoud dat...".');
-    return klaar(groet + 'Ik ben Fluister, uw persoonlijke assistent. Leer me kennen met "onthoud dat..." en vraag "wat weet je over mij" wanneer u wilt; wissen kan altijd.');
+    // niets persoonlijks te melden: pakte=false, zodat de app dit gesprek
+    // aan de gewone gesprekslaag kan geven (het brein deed hier niets mee)
+    const r = klaar(groet + 'Ik ben ' + wieBen(key) + '. Leer me kennen met "onthoud dat..." en vraag "wat weet je over mij" wanneer u wilt; wissen kan altijd. Ik kan ook zoeken en regelen: reserveren, uw 24 uur plannen, een Tik of een betaalverzoek.');
+    r.pakte = false;
+    return r;
   }
 
   return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush };

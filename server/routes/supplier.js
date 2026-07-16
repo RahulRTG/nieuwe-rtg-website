@@ -8,7 +8,8 @@ module.exports = (kern) => {
     cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
-    tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting } = kern;
+    tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
+    fluisterZeg } = kern;
   // de dagcontext: tijd, seizoen en temperatuur, voor elke AI in dit domein
   const { dagContext } = require('../kern/context');
 
@@ -1836,6 +1837,14 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   if (!q) return res.status(400).json({ error: 'Stel een vraag.' });
   const ql = q.toLowerCase();
   const A = (reply, did) => res.json({ reply, did: !!did });
+
+  // het persoonlijke geheugen (dezelfde motor als De Butler van de leden):
+  // onthouden, opvragen en wissen, per persoon binnen deze zaak
+  if (fluisterZeg && (/^onthoud\b/i.test(q) || /vergeet alles/i.test(q) || /wat (weet|onthoud) je (over|van) mij/i.test(q))) {
+    const fKey = 'zaak:' + s.code + ':' + (req.actor && req.actor.staffId != null ? req.actor.staffId : 'eigenaar');
+    const r = await fluisterZeg(fKey, (req.actor && req.actor.name) || s.name, q);
+    if (!r.error) return A(r.antwoord, !!r.geleerd);
+  }
 
   // ---- acties ----
   // kamerstatus: "zet <kamer> op schoon/vuil/bezig/bezet" of "meld <kamer> defect: reden"

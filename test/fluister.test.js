@@ -83,7 +83,7 @@ test('een nieuw seintje wordt een melding op het toestel, en piept precies een k
   await api('fluister', { q: 'onthoud dat ons jubileum op ' + d.getUTCDate() + ' ' + NL[d.getUTCMonth()] + ' valt' }, lid);
   await api('fluister/profiel', {}, lid); // het profiel ophalen zet de push in gang
   const tel = async () => ((await api('notifications', {}, lid)).body.notifications || [])
-    .filter(n => n.title === 'Fluister fluistert' && /jubileum/.test(n.body)).length;
+    .filter(n => n.title === 'Uw Butler' && /jubileum/.test(n.body)).length;
   assert.equal(await tel(), 1, 'het seintje hangt als melding in de bel');
   await api('fluister/profiel', {}, lid);
   assert.equal(await tel(), 1, 'dedupe: hetzelfde seintje piept nooit twee keer');
@@ -134,7 +134,54 @@ test('geld gaat nooit zonder bevestiging de deur uit, en "nee" blaast af', async
   await api('fluister', { q: 'vergeet alles' }, lid);
 });
 
+test('de Butler zoekt door het hele aanbod van alle partners', async () => {
+  const r = await api('fluister', { q: 'zoek lamsrack' }, lid);
+  assert.equal(r.status, 200);
+  assert.ok(r.body.pakte, 'zoeken is werk voor de Butler zelf');
+  assert.ok(/lamsrack/i.test(r.body.antwoord) && /Sal de Mar/.test(r.body.antwoord), 'hij vindt het gerecht en zegt bij welke zaak');
+  const niks = await api('fluister', { q: 'zoek iets-dat-niet-bestaat-xyz' }, lid);
+  assert.ok(/vond niets/i.test(niks.body.antwoord), 'geen hit blijft eerlijk geen hit');
+});
+
+test('betaalverzoeken: de Butler maakt ze, toont ze en betaalt ze pas na "ja"', async () => {
+  // het rtg-lid (Amberen Vos) vraagt 10 euro aan het business-lid
+  const r = await api('fluister', { q: 'vraag 10 euro aan Noordelijke Ster' }, lid);
+  assert.ok(r.body.gedaan, 'een verzoek maken mag direct: er verlaat geen geld de rekening');
+  assert.ok(/10,00/.test(r.body.antwoord) && /Klompje/i.test(r.body.antwoord));
+  // het business-lid vraagt wat er openstaat en betaalt met een "ja"
+  const lid2 = (await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'business' }) })).json()).token;
+  const open = await api('fluister', { q: 'wat moet ik nog betalen?' }, lid2);
+  assert.ok(open.body.voorstel, 'betalen is geld: eerst een voorstel');
+  assert.ok(/10,00/.test(open.body.antwoord) && /Amberen Vos/.test(open.body.antwoord));
+  const ja = await api('fluister', { q: 'ja' }, lid2);
+  assert.ok(ja.body.gedaan && /betaald/i.test(ja.body.antwoord));
+  const leeg = await api('fluister', { q: 'staat er nog iets open?' }, lid2);
+  assert.ok(/geen betaalverzoeken/i.test(leeg.body.antwoord));
+});
+
+test('de zaak-AI heeft hetzelfde geheugen gekregen: onthouden, opvragen, wissen', async () => {
+  const r = await api('supplier/ai', { q: 'onthoud dat de fustwissel op dinsdag is' }, pda);
+  assert.equal(r.status, 200);
+  assert.ok(/Onthouden/i.test(r.body.reply));
+  const wat = await api('supplier/ai', { q: 'wat weet je over mij?' }, pda);
+  assert.ok(/fustwissel/.test(wat.body.reply));
+  await api('supplier/ai', { q: 'vergeet alles' }, pda);
+  const naWis = await api('supplier/ai', { q: 'wat weet je over mij?' }, pda);
+  assert.ok(!/fustwissel/.test(naWis.body.reply), 'wissen is echt wissen');
+});
+
+test('pakt de Butler een gesprek niet, dan zegt hij dat eerlijk (pakte=false)', async () => {
+  // een vers lid zonder stand, weetjes of seintjes: een gewone vraag is
+  // dan voor de gesprekslaag van de app, niet voor de motor
+  const lid3 = (await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json()).token;
+  await api('fluister', { q: 'vergeet alles' }, lid3);
+  const r = await api('fluister', { q: 'hoe laat gaat de zon onder?' }, lid3);
+  assert.equal(r.body.pakte, false);
+  assert.ok(r.body.antwoord && r.body.antwoord.length > 10, 'maar hij laat u nooit met lege handen staan');
+});
+
 test('hij onthoudt het gesprek (kort) en wist het net zo makkelijk', async () => {
+  await api('fluister', { q: 'vergeet alles' }, lid);
   assert.equal((await api('fluister/profiel', {}, lid)).body.gesprek, 0, 'na "vergeet alles" is ook het gesprek weg');
   await api('fluister', { q: 'goedemorgen' }, lid);
   await api('fluister', { q: 'en hoe laat is het ontbijt?' }, lid);

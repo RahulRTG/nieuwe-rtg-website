@@ -723,7 +723,7 @@
     $('#hulpWrap').innerHTML =
       // Fluister: de persoonlijke assistent van dit personeelslid (eigen
       // geheugen, nooit gedeeld met de werkgever)
-      '<div class="card"><div class="k">✦ Fluister</div>'+
+      '<div class="card"><div class="k">✦ '+T('pd.fl.h','Mijn assistent')+'</div>'+
       '<div style="margin-top:0.35rem;font-size:0.74rem;color:var(--soft);">'+T('pd.fl.d','Uw eigen assistent. Hij onthoudt wat u hem vertelt ("onthoud dat...") en leert van wat u gebruikt; vraag "wat weet je over mij" en wis wanneer u wilt.')+'</div>'+
       '<div id="pkFlSein"></div>'+
       '<div id="pkFlUit" style="margin-top:0.45rem;font-size:0.8rem;line-height:1.5;">'+(pkFlLaatst||'')+'</div>'+
@@ -778,7 +778,7 @@
       const el = document.getElementById('pkFlSein');
       if (!el || !(prof.seintjes || []).length) return;
       el.innerHTML = '<div style="margin-top:0.45rem;border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.65rem;">'+
-        '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('pd.fl.sein','Fluister fluistert')+'</div>'+
+        '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('pd.fl.sein','Mijn assistent ziet')+'</div>'+
         prof.seintjes.map(x => '<div style="margin-top:0.28rem;font-size:0.76rem;line-height:1.45;">'+esc(x.icoon)+' '+esc(x.tekst)+'</div>').join('')+'</div>';
     }).catch(() => {});
     // Fluister: vraag stellen; de gebruikstellers van de inklap-laag reizen mee

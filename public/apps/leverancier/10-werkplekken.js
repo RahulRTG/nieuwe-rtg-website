@@ -439,6 +439,7 @@
         '<div class="tkc-top"><span class="tkc-code" style="font-size:1.2rem;">'+b.customerCodename+'</span><span class="tkc-age">'+(b.wanneer || timeAgo(b.at))+'</span></div>'+
         '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'📦 ':'🗓️ ')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--gold);">'+eur(b.price)+'</b></div>'+
         (b.note?'<div class="tkc-alg">📝 '+b.note+'</div>':'')+
+        (b.zorg?'<div class="tkc-alg" style="color:#E2B93B;">⚠ '+T('sup.zorgp','Zorgprofiel gast:')+' '+[((b.zorg.allergenen||[]).length?T('zorg.allergie','Allergie')+': '+b.zorg.allergenen.join(', '):''), b.zorg.dieet, b.zorg.medisch].filter(Boolean).join(' · ')+'</div>':'')+
         (acties?'<div class="tkc-act">'+acties+'</div>':'')+
       '</div>';
       html += '<div class="st-sec">'+T('ag.open','Nieuwe aanvragen')+' ('+openB.length+')</div>';

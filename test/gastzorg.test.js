@@ -63,6 +63,30 @@ test('het zorgprofiel reist alleen mee als de gast delen aanzet', async () => {
   assert.ok(aanvraag.zorg && aanvraag.zorg.dieet === 'vegetarisch', 'de receptie weet het meteen');
 });
 
+test('elke leverancier heeft de optie: het profiel reist ook mee met rit, reservering en ticket', async () => {
+  // de taxi: de chauffeur weet het voor hij voorrijdt (delen staat aan uit de vorige test)
+  const rit = await api('ride/request', { supplierCode: 'MKKX', from: 'Marina Botafoc', to: 'Sunset Ibiza', passengers: 2 }, lid);
+  assert.equal(rit.status, 200);
+  assert.deepEqual(rit.body.ride.zorg.allergenen, ['noten', 'schaaldieren']);
+  assert.equal(rit.body.ride.zorg.medisch, 'diabetes type 1');
+  // de tafelreservering: de zaak weet het al bij het dekken
+  const res1 = await api('reserveer', { supplierCode: 'KIKUNOI', datum: dagPlus(1), tijd: '20:00', personen: 4 }, lid);
+  assert.equal(res1.status, 200);
+  assert.equal(res1.body.reservering.zorg.dieet, 'vegetarisch');
+  // het ticket: de deur ziet het bij de check-in en op de gastenlijst
+  await api('supplier/activiteit', { name: 'Proeverij', prijs: 10, capaciteit: 20, tijden: '21:00' }, bar);
+  const actId = ((await api('supplier/programma', {}, bar)).body.slots.find(x => x.naam === 'Proeverij') || {}).activiteitId;
+  const tk = await api('ticket/koop', { supplierCode: 'PONTO', activiteitId: actId, datum: new Date().toISOString().slice(0, 10), tijd: '21:00', personen: 2 }, lid);
+  assert.equal(tk.status, 200);
+  assert.deepEqual(tk.body.ticket.zorg.allergenen, ['noten', 'schaaldieren']);
+  assert.equal((await api('booking/pay', { ref: tk.body.ticket.ref }, lid)).status, 200);
+  const slot = (await api('supplier/programma', {}, bar)).body.slots.find(x => x.activiteitId === actId);
+  assert.ok(slot.gasten.some(g => g.zorg && g.zorg.allergenen.includes('noten')), 'de deurlijst kent de allergenen');
+  const inche = await api('supplier/ticket/checkin', { code: tk.body.ticket.code }, bar);
+  assert.equal(inche.status, 200);
+  assert.ok(inche.body.ticket.zorg && inche.body.ticket.zorg.medisch, 'de check-in toont het zorgprofiel');
+});
+
 test('live meekijken: alleen met toestemming, en het stopt als de zaak het niet meer nodig heeft', async () => {
   // zonder toestemming ziet niemand iets, ook al is het lid live onderweg
   await api('live/start', { destCode: 'PONTO', mode: 'driving', lat: 38.99, lng: 1.30 }, lid);

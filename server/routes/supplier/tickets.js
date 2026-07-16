@@ -56,7 +56,7 @@ app.post('/api/supplier/programma', supplierAuth, (req, res) => {
         verkocht: kaartjes.reduce((n, t) => n + (t.personen || 1), 0),
         binnen: kaartjes.filter(t => t.checkin).reduce((n, t) => n + (t.personen || 1), 0),
         // VIP eerst: aan de deur wil je die namen bovenaan zien staan
-        gasten: kaartjes.map(t => ({ codename: t.customerCodename, personen: t.personen || 1, code: t.code, binnen: !!t.checkin, vip: !!t.vip }))
+        gasten: kaartjes.map(t => ({ codename: t.customerCodename, personen: t.personen || 1, code: t.code, binnen: !!t.checkin, vip: !!t.vip, zorg: t.zorg || null }))
           .sort((a, b) => (b.vip ? 1 : 0) - (a.vip ? 1 : 0))
       });
     }
@@ -84,7 +84,7 @@ app.post('/api/supplier/ticket/checkin', supplierAuth, (req, res) => {
   logActivity(s.code, req.actor, 'checkte ' + t.customerCodename + ' in (' + t.service.name + ', ' + (t.personen || 1) + 'p' + (t.vip ? ', VIP' : '') + ')');
   if (t.customerKey || t.customerTier) sseToCustomer(t.customerKey || t.customerTier, 'sync', { scope: 'tickets' });
   sseToSupplier(s.code, 'sync', { scope: 'tickets' });
-  res.json({ ok: true, ticket: { naam: t.service.name, tijd: t.tijd, personen: t.personen || 1, codename: t.customerCodename, vip: !!t.vip } });
+  res.json({ ok: true, ticket: { naam: t.service.name, tijd: t.tijd, personen: t.personen || 1, codename: t.customerCodename, vip: !!t.vip, zorg: t.zorg || null } });
 });
 
 /* Deurverkoop en VIP-entree: de kassa aan de deur. Het personeelslid verkoopt

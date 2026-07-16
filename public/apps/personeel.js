@@ -308,6 +308,8 @@
   const heeftOpdrachten = () => !!(state && !(state.rooms || []).length && (state.boekingen || []).length);
   // het eigen dorp op zak: bars, clubs, beachclubs en restaurants krijgen het afdelingenbord
   const heeftClubdorp = () => !!(state && !(state.rooms || []).length && state.supplier && ['bar', 'club', 'beachclub', 'restaurant'].includes(state.supplier.type));
+  // het zorgprofiel van de gast, kort op een regel (reist mee met toestemming)
+  const pkZorg = z => [((z.allergenen || []).length ? T('zorg.allergie', 'Allergie') + ': ' + z.allergenen.join(', ') : ''), z.dieet, z.medisch].filter(Boolean).join(' · ');
   let mbOpen = null;          // kamer waarvan de minibar-teller openstaat
   let mbTel = {};             // minibar-aantallen van die kamer
   // het receptiebord op zak: alleen de housekeeping-prioriteit is hier nodig
@@ -476,6 +478,7 @@
       '<span class="hkchip'+(b.status==='bevestigd'?' amber':' rood')+'">'+(b.status==='bevestigd'?T('hk.o.bevestigd','Ingepland'):T('hk.o.nieuw','Nieuw'))+'</span></div>'+
       '<div style="font-size:0.78rem;color:var(--soft);margin-top:0.25rem;">'+esc(b.customerCodename||'')+(b.wanneer?' · '+esc(b.wanneer):'')+(b.price?' · '+eur(b.price):'')+'</div>'+
       (b.note?'<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">📝 '+esc(b.note)+'</div>':'')+
+      (b.zorg?'<div style="font-size:0.76rem;color:#E2B93B;margin-top:0.3rem;">⚠ '+esc(pkZorg(b.zorg))+'</div>':'')+
       '<div class="row" style="flex-wrap:wrap;">'+acties+'</div></div>';
     let html = '<div class="card stat"><div><b style="color:#FF8589;">'+open.length+'</b><span>'+T('hk.o.nieuw','Nieuw')+'</span></div>'+
       '<div><b style="color:#E2B93B;">'+komend.length+'</b><span>'+T('hk.o.bevestigd','Ingepland')+'</span></div></div>';
@@ -838,7 +841,7 @@
       (mijn.length ? mijn.map(r => {
         const nxt = NEXT_RIDE[r.status];
         const st = RIT_ST[r.status];
-        return '<div class="task"><span class="ic">'+(jet?'✈️':'🚗')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' · 📝 '+esc(r.note):'')+'</span></div>'+
+        return '<div class="task"><span class="ic">'+(jet?'✈️':'🚗')+'</span><div class="t"><b>'+esc(r.customerCodename)+(st?' · '+T(st[0], st[1]):'')+'</b><span>'+esc(regel(r))+(r.note?' · 📝 '+esc(r.note):'')+(r.zorg?'<span style="display:block;color:#E2B93B;">⚠ '+esc(pkZorg(r.zorg))+'</span>':'')+'</span></div>'+
           (nxt ? '<button class="abtn" data-pdgo="'+r.ref+'" data-st="'+nxt+'">'+T(RIDE_LBL[nxt][0], RIDE_LBL[nxt][1])+'</button>' : '')+'</div>';
       }).join('') : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.r.geen','Geen actieve rit. Neem hieronder een open rit aan.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.r.openh','Open aanvragen')+' ('+open.length+')</div>'+
@@ -1142,7 +1145,7 @@
           '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
           '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'⚡ ':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
           (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">⚠ '+esc(o.allergyNote)+'</div>':'')+
-          (o.zorg?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">⚠ '+T('pd.zorgp','Zorgprofiel gast')+': '+esc([((o.zorg.allergenen||[]).length?'allergie: '+o.zorg.allergenen.join(', '):''), o.zorg.dieet, o.zorg.medisch].filter(Boolean).join(' · '))+'</div>':'')+
+          (o.zorg?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">⚠ '+T('pd.zorgp','Zorgprofiel gast')+': '+esc(pkZorg(o.zorg))+'</div>':'')+
           pkGast(o)+
           (adv?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+adv+'</div>':'')+
           '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost" data-pkgo="'+o.ref+'" data-phase="bezig" style="flex:1;">'+T('st.start','Start')+'</button>':'')+
@@ -1430,7 +1433,8 @@
       const uit = document.getElementById('pdCheckUit');
       try {
         const r = await API.call('/supplier/ticket/checkin', { code: $('#pdCode').value });
-        uit.innerHTML = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>';
+        uit.innerHTML = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>'+
+          (r.ticket.zorg?'<div style="margin-top:0.3rem;color:#E2B93B;">\u26A0 '+esc(pkZorg(r.ticket.zorg))+'</div>':'');
         $('#pdCode').value = '';
         laadEntree();
       } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }

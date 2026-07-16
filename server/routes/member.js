@@ -889,6 +889,7 @@ app.post('/api/booking/request', auth, (req, res) => {
     service: { id: dienst.id, name: dienst.name, soort: dienst.soort || 'dienst', duurMin: dienst.duurMin || null },
     price: dienst.price,
     wanneer, note: schoon(req.body.note, 140),
+    zorg: zorgVoor(req.session.key),
     betaalMoment: vooraf ? 'vooraf' : 'achteraf',
     status: vooraf ? 'wacht-op-betaling' : 'aangevraagd',
     paid: false, at: new Date().toISOString()
@@ -1219,6 +1220,8 @@ app.post('/api/ride/request', auth, (req, res) => {
       return isNaN(new Date(iso)) ? null : iso;
     })(),
     passengers: pax, luggage: koffers, note: schoon(req.body.note, 140),
+    // de chauffeur weet het (alleen met toestemming): bijv. rolstoel of medicatie
+    zorg: zorgVoor(req.session.key),
     km: Math.round(km * 10) / 10, quote,
     driver: null, vehicle: null,
     // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf;
@@ -1456,6 +1459,7 @@ app.post('/api/ticket/koop', auth, (req, res) => {
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     service: { id: act.id, name: act.name, soort: 'ticket' },
     activiteitId: act.id, datum, tijd, personen,
+    zorg: zorgVoor(req.session.key),
     price: (act.prijs || 0) * personen,
     wanneer: datum + ' ' + tijd,
     betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
@@ -1514,6 +1518,7 @@ app.post('/api/transfer/aanvraag', auth, (req, res) => {
     passengers: t.personen || 1, luggage: 0,
     note: schoon(req.body.note, 140),
     km: null, quote: prijs, ticketRef: t.ref,
+    zorg: zorgVoor(req.session.key),
     driver: null, vehicle: null,
     betaalMoment: 'vooraf',
     // prijs 0 = inclusief bij het ticket: meteen definitief, geen betaalstap
@@ -1581,6 +1586,7 @@ app.post('/api/huur/boek', auth, (req, res) => {
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     autoId: auto.id, autoNaam: auto.name, kenteken: auto.plate || null,
     van, tot, dagen,
+    zorg: zorgVoor(req.session.key),
     service: { id: auto.id, name: auto.name + ', ' + dagen + ' dag(en)', soort: 'huur' },
     price: (auto.dagprijs || 0) * dagen,
     wanneer: van,
@@ -1723,6 +1729,7 @@ app.post('/api/charter/boek', auth, (req, res) => {
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     bootId: boot.id, bootNaam: boot.naam, bootType: boot.type,
     van, tot, dagen, gasten, metSkipper, skipperNaam: null,
+    zorg: zorgVoor(req.session.key),
     service: { id: boot.id, name: boot.naam + ', ' + dagen + ' dag(en)' + (metSkipper ? ' met schipper' : ' bareboat'), soort: 'charter' },
     price: (boot.dagprijs || 0) * dagen + skipperKosten,
     wanneer: van,
@@ -2104,6 +2111,9 @@ app.post('/api/reserveer', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const r = reserveerTafel(req.session, liveCodename(req.session), req.body);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  // het zorgprofiel reist mee (alleen met toestemming): de zaak weet het al bij het dekken
+  const zorgR = zorgVoor(req.session.key);
+  if (zorgR) { r.reservering.zorg = zorgR; save(); }
   res.json(r);
 });
 app.post('/api/reserveringen/mijn', auth, (req, res) => res.json({ reserveringen: mijnReserveringen(req.session.key) }));

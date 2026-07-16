@@ -950,6 +950,7 @@
         '<div class="tkc-top"><span class="tkc-code" style="font-size:1.2rem;">'+b.customerCodename+'</span><span class="tkc-age">'+(b.wanneer || timeAgo(b.at))+'</span></div>'+
         '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'📦 ':'🗓️ ')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--gold);">'+eur(b.price)+'</b></div>'+
         (b.note?'<div class="tkc-alg">📝 '+b.note+'</div>':'')+
+        (b.zorg?'<div class="tkc-alg" style="color:#E2B93B;">⚠ '+T('sup.zorgp','Zorgprofiel gast:')+' '+[((b.zorg.allergenen||[]).length?T('zorg.allergie','Allergie')+': '+b.zorg.allergenen.join(', '):''), b.zorg.dieet, b.zorg.medisch].filter(Boolean).join(' · ')+'</div>':'')+
         (acties?'<div class="tkc-act">'+acties+'</div>':'')+
       '</div>';
       html += '<div class="st-sec">'+T('ag.open','Nieuwe aanvragen')+' ('+openB.length+')</div>';
@@ -4022,7 +4023,8 @@
     if (r.status === 'aangekomen') knoppen.push('<button class="obtn js-resweg">'+T('res.weg','Vertrokken')+'</button>');
     return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-res="'+r.id+'">'+
       '<span><b>'+r.tijd+'</b> · <b class="cn">'+esc(r.customerCodename)+'</b> · '+r.personen+'p'+
-        (r.tafel?' · 🪑 '+esc(r.tafel):'')+(r.notitie?' · 📝 '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+'</span>'+
+        (r.tafel?' · 🪑 '+esc(r.tafel):'')+(r.notitie?' · 📝 '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
+        (r.zorg?'<span style="display:block;color:#E2B93B;">⚠ '+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
       (knoppen.length
         ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
         : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+
@@ -4146,6 +4148,7 @@
         '<div class="ref" style="margin-top:0.25rem;">'+ritRegel(r)+
           (r.driver?' · 🚘 '+r.driver.name+(r.vehicle?' ('+r.vehicle.name+')':''):' · <span style="color:var(--amber,#B8860B);">'+T('sup.ride.nodriver','nog geen chauffeur')+'</span>')+'</div>'+
         (r.note?'<div class="ref">📝 '+r.note+'</div>':'')+
+        (r.zorg?'<div class="allergy">⚠ '+T('sup.zorgp','Zorgprofiel gast:')+' '+esc(zorgTekst(r.zorg))+'</div>':'')+
         eta +
         '<div class="acts">'+
           (nxt?'<button class="obtn primary js-rnext">'+T(RIDE_NEXT_LABEL[nxt], RIDE_NEXT_NL[nxt])+'</button>':'')+

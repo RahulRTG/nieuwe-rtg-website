@@ -108,7 +108,7 @@
     klussen:  { label:'Klussen',   svg:'<path d="M14.5 6.5a4 4 0 0 0-5.6 4.9L3 17.3V21h3.7l5.9-5.9a4 4 0 0 0 4.9-5.6l-2.6 2.6-2.4-2.4z"/>', cap:'bookings' },
     beheer:   { label:'Beheer',    svg:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/>' },
     doors:    { label:'Deuren',    svg:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><circle cx="15" cy="12" r="1.2"/><path d="M5 21h14"/>', cap:'doors' },
-    gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>', cap:'bookings' },
+    gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
     gchat:    { label:'Gastchat',  svg:'<path d="M21 12a8 8 0 0 1-8 8H4l2.5-3A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>' },
     ai:       { label:'AI',        svg:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>' },
@@ -3987,6 +3987,8 @@
       o.guestArrived ? E('div', { class: 'enroute here' }, '🎉 ' + T('sup.guesthere', 'Gast is gearriveerd. Serveer nu.'))
         : (o.guestEtaMin != null ? E('div', { class: 'enroute' }, '📍 ' + T('sup.guesteta', 'Gast onderweg, arriveert over ~') + o.guestEtaMin + ' ' + T('sup.min', 'min') + '. ' + T('sup.readyontime', 'Zet op tijd klaar.')) : null),
       o.allergyNote ? E('div', { class: 'allergy' }, '⚠ ' + T('sup.allergy', 'Allergie:') + ' ' + o.allergyNote) : null,
+      // het zorgprofiel van de gast reist automatisch mee (alleen met toestemming)
+      o.zorg ? E('div', { class: 'allergy' }, '⚠ ' + T('sup.zorgp', 'Zorgprofiel gast:') + ' ' + zorgTekst(o.zorg)) : null,
       o.tagSalon ? E('div', { class: 'salon' }, '✦ ' + T('sup.wantssalon', 'Gast wil dit taggen voor De Salon')) : null,
       E('div', { class: 'acts' },
         E('span', { class: 'pill ' + (o.paid ? 'betaald' : 'onbetaald') },
@@ -4903,7 +4905,8 @@
     const leeg = !r.aanvragen.length && !r.aankomsten.length && !r.inHuis.length && !r.komend.length;
     const rij = (v, knoppen, sub) => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-vb="'+v.id+'">'+
       '<span><b class="cn">'+esc(v.codenaam)+'</b> · '+esc(v.roomName)+' · '+(sub||v.aankomst+' tot '+v.vertrek+' · '+v.personen+'p · '+eur(v.totaal))+
-      (v.notitie?' · 📝 '+esc(v.notitie):'')+'</span>'+
+      (v.notitie?' · 📝 '+esc(v.notitie):'')+
+      (v.zorg?'<span style="display:block;color:#E2B93B;">⚠ '+esc(zorgTekst(v.zorg))+'</span>':'')+'</span>'+
       (knoppen?'<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+knoppen+'</span>':'')+
     '</div>';
     el.innerHTML = '<div class="card"><div class="tt-h">🛎️ '+T('rc.h','Receptie vandaag')+'</div>'+
@@ -5359,9 +5362,49 @@
   }
 
   // ---- gasten live volgen (hotel/appartement) ----
+  // het zorgprofiel van de gast, kort en leesbaar op een regel
+  function zorgTekst(z){
+    const parts = [];
+    if ((z.allergenen || []).length) parts.push(T('zorg.allergie', 'Allergie') + ': ' + z.allergenen.join(', '));
+    if (z.dieet) parts.push(z.dieet);
+    if (z.medisch) parts.push(z.medisch);
+    return parts.join(' · ');
+  }
+  // live meekijken met toestemming: de gast wijst de zaak aan, de zaak stopt het
+  let gastLoc = null, gastLocBezig = false, gastLocAt = 0;
+  function laadGastLoc(){
+    if (gastLocBezig || Date.now() - gastLocAt < 15000) return;
+    gastLocBezig = true;
+    API.call('/supplier/gastlocaties', {})
+      .then(d => { gastLoc = d.gasten || []; gastLocAt = Date.now(); gastLocBezig = false; renderGasten(); })
+      .catch(() => { gastLoc = gastLoc || []; gastLocAt = Date.now(); gastLocBezig = false; });
+  }
+  function gastLocBlok(){
+    const lijst = gastLoc || [];
+    return '<div class="card"><div class="tt-h">📍 '+T('gl.h','Live meekijken (met toestemming)')+'</div>'+
+      '<div style="font-size:0.75rem;color:var(--soft);margin-bottom:0.5rem;">'+T('gl.sub','De gast deelt zelf de live gps-locatie met uw zaak. Zet het uit zodra u het niet meer nodig heeft; de gast krijgt daar direct bericht van.')+'</div>'+
+      (lijst.length ? lijst.map(g =>
+        '<div class="guest-row" style="flex-wrap:wrap;gap:0.4rem;"><span class="cn">'+esc(g.codenaam)+'</span>'+
+        (g.wachtOpLocatie ? '<span class="ge">'+T('gl.wacht','toestemming, wacht op gps')+'</span>'
+          : '<span class="ge"><b>'+(g.km!=null?g.km+' km':'')+'</b>'+(g.etaMin!=null?' · ~'+g.etaMin+' min':'')+'</span>')+
+        '<button class="obtn" data-glstop="'+g.id+'" style="font-size:0.62rem;">'+T('gl.stop','Niet meer nodig')+'</button>'+
+        (g.zorg ? '<div style="flex-basis:100%;font-size:0.74rem;color:#E2B93B;">⚠ '+esc(zorgTekst(g.zorg))+'</div>' : '')+
+        '</div>').join('')
+      : '<div class="softline">'+T('gl.leeg','Nog geen gasten die hun locatie met u delen.')+'</div>')+'</div>';
+  }
+  function bindGastLoc(el){
+    el.querySelectorAll('[data-glstop]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const r = await API.call('/supplier/gastlocatie/stop', { id: b.dataset.glstop });
+        toast('📍 '+T('gl.gestopt','Meekijken gestopt;')+' '+r.deel.codenaam+' '+T('gl.gestopt2','heeft bericht gekregen.'));
+        gastLocAt = 0; laadGastLoc();
+      } catch(e){ toast(e.message); }
+    }));
+  }
   function renderGasten(){
     const el = $('#gastenWrap'); if (!el) return;
-    if (!has('bookings')){ el.innerHTML = ''; return; }
+    laadGastLoc();
+    if (!has('bookings')){ el.innerHTML = gastLocBlok(); bindGastLoc(el); return; }
     const guests = state.guests || [];
     const nearby = state.nearbyGuests || [];
 
@@ -5369,6 +5412,8 @@
     const pts = [];
     if (S.loc) pts.push({ lat:S.loc.lat, lng:S.loc.lng, me:true });
     guests.forEach(g => { if (g.loc) pts.push({ lat:g.loc.lat, lng:g.loc.lng, name:g.codename }); });
+    // gasten die met toestemming live meekijken laten, staan ook op de kaart
+    (gastLoc || []).forEach(g => { if (g.loc && !pts.some(p => p.name === g.codenaam)) pts.push({ lat:g.loc.lat, lng:g.loc.lng, name:g.codenaam }); });
     let map = '';
     if (pts.length > 1){
       const lats = pts.map(p=>p.lat), lngs = pts.map(p=>p.lng);
@@ -5384,7 +5429,8 @@
       }).join('')+'</div>';
     }
 
-    let html = '<div class="card"><div class="tt-h">'+T('gst.connected','Verbonden gasten')+'</div>'+map+
+    let html = gastLocBlok();
+    html += '<div class="card"><div class="tt-h">'+T('gst.connected','Verbonden gasten')+'</div>'+map+
       (guests.length ? guests.map(g =>
         '<div class="guest-row"><span class="cn">'+g.codename+'</span>'+
         (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>'
@@ -5401,6 +5447,7 @@
       '<div class="note-soft">'+T('gst.note','Verbinden meldt het bij de gast: u volgt de aankomst om alles klaar te zetten. U ziet daarna live de positie en aankomsttijd.')+'</div></div>';
 
     el.innerHTML = html;
+    bindGastLoc(el);
     el.querySelectorAll('[data-connect]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/guest/connect', { codename: b.dataset.connect }); toast(T('gst.done','Verbonden. De gast is op de hoogte.')); await refresh(); openTab('gasten'); }
       catch(e){ toast(e.message); }

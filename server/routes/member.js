@@ -16,6 +16,7 @@ module.exports = (kern) => {
     mbAanvraag, mbMijn,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
     zorgContact, fonds, munten, factuur, talen,
+    zorgVan, zorgZet, zorgVoor, locDeel, locStopKlant, locMijn,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -1044,6 +1045,8 @@ app.post('/api/order', auth, (req, res) => {
     items, total,
     table: schoon(req.body.table, 24),
     allergyNote: schoon(req.body.allergyNote, 200),
+    // het zorgprofiel reist automatisch mee naar de keuken (alleen met toestemming)
+    zorg: zorgVoor(req.session.key),
     tagSalon: !!req.body.tagSalon,
     betaalMoment: vooraf ? 'vooraf' : 'achteraf',
     leeftijdOk: metAlcohol && lft != null ? true : undefined,
@@ -1146,6 +1149,29 @@ app.post('/api/live/stop', auth, (req, res) => {
   if (L) { L.active = false; save(); pushLive(key); }
   res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
 });
+
+/* ---- de zorgvolle keten (kern/gastzorg.js) ----
+   Het zorgprofiel: allergenen, dieet en medische aandachtspunten. Reist
+   alleen mee met bestellingen en verblijven als het lid delen aanzet. */
+app.post('/api/zorgprofiel', auth, (req, res) => res.json({ ok: true, zorg: zorgVan(req.session.key) }));
+app.post('/api/zorgprofiel/zet', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  res.json(zorgZet(req.session.key, req.body));
+});
+/* Live meekijken met toestemming: het lid wijst een zaak aan; die ziet de
+   gps-positie tot de zaak (of het lid zelf) het delen stopzet. */
+app.post('/api/locatie/deel', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = locDeel(req.session.key, liveCodename(req.session), req.body.supplierCode);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/locatie/stop', auth, (req, res) => {
+  const r = locStopKlant(req.session.key, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/locatie/mijn', auth, (req, res) => res.json(locMijn(req.session.key)));
 
 app.post('/api/live/state', auth, (req, res) => {
   res.json({ live: liveStateFor(req.session.key, req.body.lang) });
@@ -1373,6 +1399,7 @@ app.post('/api/bezorg/bestel', auth, (req, res) => {
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     items, total, levering, adres, geo,
     allergyNote: schoon(req.body.note, 200),
+    zorg: zorgVoor(req.session.key),
     betaalMoment: 'vooraf',
     status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
   };
@@ -2050,6 +2077,9 @@ app.post('/api/verblijf', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   const r = verblijfBoek(req.session, liveCodename(req.session), req.body);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  // het zorgprofiel reist mee (alleen met toestemming): de receptie weet het meteen
+  const zorg = zorgVoor(req.session.key);
+  if (zorg) { r.verblijf.zorg = zorg; save(); }
   res.json(r);
 });
 app.post('/api/verblijf/mijn', auth, (req, res) => res.json({ verblijven: mijnVerblijven(req.session.key) }));

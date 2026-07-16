@@ -757,6 +757,7 @@
     } catch (e) { return; }
 
     renderLive();  // live "onderweg"-paneel bovenaan
+    renderZorg();  // zorgprofiel + wie er (met toestemming) live meekijkt
 
     // mijn lopende bestellingen bovenaan
     const active = myOrders.filter(o => o.status !== 'terugbetaald');

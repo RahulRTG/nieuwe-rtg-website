@@ -1697,6 +1697,7 @@
     } catch (e) { return; }
 
     renderLive();  // live "onderweg"-paneel bovenaan
+    renderZorg();  // zorgprofiel + wie er (met toestemming) live meekijkt
 
     // mijn lopende bestellingen bovenaan
     const active = myOrders.filter(o => o.status !== 'terugbetaald');
@@ -1915,12 +1916,57 @@
         '<div class="live-dest-row"><select id="liveDest">' + opts + '</select></div>' +
         '<div class="live-mode">' + modes.map(m => '<button data-mode="' + m[0] + '"' + (m[0]===liveMode?' class="on"':'') + '>' + T('live.mode.'+m[0], m[1]) + '</button>').join('') + '</div>' +
         '<button class="live-go" id="liveGo">' + T('live.go','Start onderweg') + '</button>' +
+        '<button class="live-go" id="liveDeel" style="margin-top:0.45rem;background:none;border:1px solid var(--line);color:var(--txt);">📍 ' + T('live.deel','Deel mijn live locatie met deze zaak') + '</button>' +
+        '<div style="margin-top:0.4rem;font-size:0.62rem;color:var(--soft);line-height:1.5;">' + T('live.deel.s','Alleen deze zaak ziet dan waar u bent, tot de zaak het niet meer nodig heeft of u het zelf stopt.') + '</div>' +
       '</div>';
     $('#livePanel').querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
       liveMode = b.dataset.mode;
       $('#livePanel').querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x.dataset.mode === liveMode));
     }));
     $('#liveGo').addEventListener('click', startLive);
+    const ld = $('#liveDeel');
+    if (ld) ld.addEventListener('click', async () => {
+      try {
+        const r = await API.call('/locatie/deel', { supplierCode: $('#liveDest').value });
+        toast('📍 ' + r.deel.supplierName + ' ' + T('live.deelok','kijkt nu met u mee, tot het niet meer nodig is.'));
+        renderZorg();
+      } catch(e){ toast(e.message); }
+    });
+  }
+
+  /* ---------- de zorgvolle keten: zorgprofiel + wie kijkt mee ---------- */
+  async function renderZorg(){
+    const el = $('#zorgPanel'); if (!el) return;
+    if (!API.live){ el.innerHTML = ''; return; }
+    let zorg, delen;
+    try {
+      zorg = (await API.call('/zorgprofiel')).zorg;
+      delen = await API.call('/locatie/mijn');
+    } catch(e){ el.innerHTML = ''; return; }
+    el.innerHTML =
+      '<div class="live-start" style="margin-top:0.8rem;">' +
+        '<div class="lh">🩺 ' + T('zorg.h','Mijn zorgprofiel') + '</div>' +
+        '<div class="ld">' + T('zorg.d','Allergenen en aandachtspunten reizen automatisch mee met uw bestellingen en verblijven, alleen als u delen aanzet. De keuken en de receptie weten het dan meteen.') + '</div>' +
+        '<input id="zAll" placeholder="' + T('zorg.all','Allergenen, gescheiden door komma (bijv. noten, schaaldieren)') + '" value="' + esc((zorg.allergenen || []).join(', ')) + '" style="width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
+        '<input id="zDieet" placeholder="' + T('zorg.dieet','Dieet (bijv. vegetarisch, halal)') + '" value="' + esc(zorg.dieet || '') + '" style="width:100%;margin-top:0.4rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
+        '<input id="zMed" placeholder="' + T('zorg.med','Medische aandachtspunten (bijv. diabetes, rolstoel)') + '" value="' + esc(zorg.medisch || '') + '" style="width:100%;margin-top:0.4rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
+        '<label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.55rem;font-size:0.74rem;color:var(--txt);"><input type="checkbox" id="zDelen"' + (zorg.delen ? ' checked' : '') + '> ' + T('zorg.delen','Deel dit automatisch met zaken waar ik bestel of verblijf') + '</label>' +
+        '<button class="live-go" id="zOpslaan" style="margin-top:0.55rem;">' + T('zorg.opslaan','Bewaar zorgprofiel') + '</button>' +
+        ((delen.actief || []).length
+          ? '<div style="margin-top:0.8rem;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">📍 ' + T('zorg.kijkt','Kijkt live met mij mee') + '</div>' +
+            delen.actief.map(d => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.4rem;font-size:0.78rem;"><span><b>' + esc(d.supplierName) + '</b> · ' + T('zorg.sinds','sinds') + ' ' + String(d.at).slice(11, 16) + '</span><button class="mo-code js-zstop" data-id="' + d.id + '">' + T('zorg.stop','Stop delen') + '</button></div>').join('')
+          : '<div style="margin-top:0.8rem;font-size:0.68rem;color:var(--soft);">📍 ' + T('zorg.niemand','Er kijkt nu niemand live met u mee.') + '</div>') +
+      '</div>';
+    $('#zOpslaan').addEventListener('click', async () => {
+      try {
+        await API.call('/zorgprofiel/zet', { allergenen: $('#zAll').value, dieet: $('#zDieet').value, medisch: $('#zMed').value, delen: $('#zDelen').checked });
+        toast('🩺 ' + T('zorg.bewaard','Zorgprofiel bewaard.'));
+      } catch(e){ toast(e.message); }
+    });
+    el.querySelectorAll('.js-zstop').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/locatie/stop', { id: b.dataset.id }); toast('📍 ' + T('zorg.gestopt','Delen gestopt.')); renderZorg(); }
+      catch(e){ toast(e.message); }
+    }));
   }
 
   async function startLive(){

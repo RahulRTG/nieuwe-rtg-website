@@ -2680,6 +2680,8 @@ Object.assign(kern, require('./kern/verblijf')({ db, save, crypto, schoon, findS
 /* Het hoteldorp (kern/hoteldorp.js): negen afdelingen met hetzelfde lichte
    gereedschap: postenlijsten met een eigen statusketen, en het dorpsplein. */
 Object.assign(kern, require('./kern/hoteldorp')({ db, save, crypto, schoon, sseToSupplier, notifySupplier, haversine }));
+// de zorgvolle keten: zorgprofiel van de gast + live meekijken met toestemming
+Object.assign(kern, require('./kern/gastzorg')({ db, save, crypto, schoon, notify, notifySupplier, sseToSupplier, sseToCustomer, findSupplier, haversine, etaMinutes }));
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

@@ -201,7 +201,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, notify, notifySuppli
       const open = kas.filter(s2 => s2.method === 'kamer' && !s2.settled && s2.room === naam);
       return open.length ? Math.round(open.reduce((n, s2) => n + (s2.total || 0), 0) * 100) / 100 : 0;
     };
-    const kaal = v => ({ id: v.id, ref: v.ref, codenaam: v.codenaam, roomName: v.roomName, aankomst: v.aankomst, vertrek: v.vertrek, nachten: v.nachten, personen: v.personen, totaal: v.totaal, notitie: v.notitie, status: v.status, openLast: openVan(v.roomName) });
+    const kaal = v => ({ id: v.id, ref: v.ref, codenaam: v.codenaam, roomName: v.roomName, aankomst: v.aankomst, vertrek: v.vertrek, nachten: v.nachten, personen: v.personen, totaal: v.totaal, notitie: v.notitie, status: v.status, openLast: openVan(v.roomName), zorg: v.zorg || null });
     const kamers = supplier.rooms || [];
     return {
       ok: true, datum,

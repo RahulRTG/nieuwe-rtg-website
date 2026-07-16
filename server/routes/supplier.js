@@ -8,7 +8,7 @@ module.exports = (kern) => {
     cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
-    tafelplanning, reserveringTafel, reserveringKomst, walkIn } = kern;
+    tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting } = kern;
   // de dagcontext: tijd, seizoen en temperatuur, voor elke AI in dit domein
   const { dagContext } = require('../kern/context');
 
@@ -676,7 +676,21 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   save();
   logActivity(req.supplier.code, req.actor, 'checkte ' + room + ' uit: € ' + total + ' (' + method + ')');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
-  res.json({ ok: true, sale });
+  /* Splitsen vanaf de rekening: de betaler rekent het geheel af met RTG Pay
+     en de tafelgenoten krijgen meteen een Klompje voor hun deel, uit naam
+     van de betaler. Ketst het splitsen af (onbekende codenaam), dan blijft
+     de betaling gewoon staan en komt de reden mee terug. */
+  let gesplitst = null, splitsFout = null;
+  const splitsMet = Array.isArray(req.body.splitsMet) ? req.body.splitsMet.filter(x => typeof x === 'string' && x.trim()).slice(0, 10) : [];
+  if (betaler && splitsMet.length) {
+    const v = await pay.verzoekMaak({
+      van: betaler, aan: splitsMet, totaalCenten: Math.round(total * 100),
+      oms: 'Rekening ' + room + ', ' + req.supplier.name, splitsMetMij: true
+    });
+    if (v.error) splitsFout = v.error;
+    else gesplitst = { vrienden: splitsMet.length, perPersoon: v.perPersoon };
+  }
+  res.json({ ok: true, sale, betaler, gesplitst, splitsFout });
 });
 
 app.post('/api/supplier/minibar/count', supplierAuth, (req, res) => {
@@ -1427,6 +1441,21 @@ app.post('/api/supplier/settings', supplierAuth, (req, res) => {
   if (changed.length) logActivity(req.supplier.code, req.actor, 'zette ' + changed.join(' en '));
   broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'settings' });
+  // gaat de zaak dicht, dan komt de shift-samenvatting vanzelf als bericht
+  // naar het team: het avondbriefing-moment zonder dat iemand erom vraagt
+  if (changed.includes('bestellingen dicht')) {
+    try {
+      const sh = shiftSamenvatting(req.supplier);
+      const delen = [
+        '€ ' + sh.omzet.toFixed(2) + ' omzet, ' + sh.bonnen + ' bon(nen)',
+        sh.gasten.personen ? sh.gasten.personen + ' gasten aan tafel' : null,
+        sh.gasten.noShows ? sh.gasten.noShows + ' no-show(s)' : null,
+        sh.toppers.length ? 'topper: ' + sh.toppers[0].aantal + 'x ' + sh.toppers[0].naam : null,
+        sh.derving ? '€ ' + sh.derving.toFixed(2) + ' derving' : null
+      ].filter(Boolean);
+      notifySupplier(req.supplier.code, { icon: '🌙', title: 'Shift-samenvatting ' + sh.datum, body: delen.join(' · ') });
+    } catch (e) {}
+  }
   res.json({ ok: true, settings: st });
 });
 

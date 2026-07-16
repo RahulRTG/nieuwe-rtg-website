@@ -138,6 +138,18 @@ test('de tik: ontvangen met een aanraking, betalen met een knop', async () => {
   assert.equal((await api('pay/tik', { code: '000000', centen: 100, idem: 'tik-4' }, lidA.token)).status, 404);
 });
 
+test('de tikgeschiedenis leest als een sociaal logboek: wie tikte wie', async () => {
+  const vanA = await api('pay/tiks', {}, lidA.token);
+  assert.equal(vanA.status, 200);
+  const uit = vanA.body.tiks.find(x => x.richting === 'uit' && x.met === lidB.codenaam && x.centen === 750);
+  assert.ok(uit, 'A ziet: jij tikte B');
+  assert.equal(uit.oms, 'Koffie terug', 'met het verhaaltje erbij');
+  const vanB = await api('pay/tiks', {}, lidB.token);
+  assert.ok(vanB.body.tiks.some(x => x.richting === 'in' && x.met === lidA.codenaam), 'B ziet: A tikte jou');
+  // gewone stortingen en kassabetalingen horen er niet in: alleen tikken
+  assert.ok(vanA.body.tiks.every(x => x.met !== 'opgeladen'), 'opladen staat niet in de tikgeschiedenis');
+});
+
 test('het grootboek sluit op de cent en gasten komen er niet in', async () => {
   const g = await fetch(base + '/api/pay/gezond');
   assert.equal(g.status, 200);

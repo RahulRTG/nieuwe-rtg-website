@@ -1097,11 +1097,12 @@
       if (!winkelCart.length) return;
       const body = { method: b.dataset.wbetaal, regels: winkelCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
       if (body.method === 'rtgpay'){
-        // eerst tap to pay (toestel van de klant tegen de PDA), anders typen
+        // tap to pay als het kan, met altijd de uitweg om de code te typen
         let code = null;
-        if (window.TapPay && TapPay.kan()){
+        if (window.TapPay && TapPay.kan() && window.confirm(T('pd.w.tapkeuze','Tap to pay: de klant tikt zijn toestel hiertegen. Liever de code typen (bijv. als NFC niet werkt)? Kies dan Annuleren.'))){
           toast('📳 '+T('pd.w.tap','Tap to pay: laat de klant het toestel hiertegen houden...'));
           code = await TapPay.lees(12000);
+          if (!code) toast(T('pd.w.tapmis','Geen tik ontvangen; typ de code van de klant.'));
         }
         if (!code){
           const c = window.prompt(T('pd.w.paycode','Betaalcode van de klant (uit de app):'));

@@ -109,6 +109,7 @@
         <p class="leeg" style="text-align:center;">Tik hier je telefoon tegenaan; geldig tot <span id="xTot"></span>.</p>
       </div>
     </div>
+    <div class="kaart" id="pTiks" hidden></div>
 
     <h3 class="sec">Voor jou</h3>
     <div class="kaart" id="pAanMij"><div class="leeg">Geen openstaande Klompjes.</div></div>
@@ -278,6 +279,24 @@ $('#sStuur').addEventListener('click', async () => {
 
 /* de tik: ontvangen met een aanraking, betalen met een knop */
 let tikTimer = null;
+// het kleine sociale logboek: wie tikte wie
+async function laadTiks(){
+  try {
+    const r = await api('pay/tiks', {});
+    const el = $('#pTiks');
+    if (!r.tiks.length){ el.hidden = true; return; }
+    el.hidden = false;
+    const wanneer = at => new Date(at).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    el.innerHTML = r.tiks.map(t =>
+      '<div style="display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.85rem;">'+
+        '<span>'+(t.richting === 'uit'
+          ? 'Jij tikte <b style="color:var(--gold);">'+esc(t.met)+'</b>'
+          : '<b style="color:var(--gold);">'+esc(t.met)+'</b> tikte jou')+
+          (t.oms && t.oms !== 'Tik' ? ' <span style="color:var(--muted);">· '+esc(t.oms)+'</span>' : '')+'</span>'+
+        '<span style="white-space:nowrap;color:var(--muted);">'+(t.richting==='uit'?'-':'+')+' '+euro(t.centen)+' · '+wanneer(t.at)+'</span>'+
+      '</div>').join('');
+  } catch (e) {}
+}
 $('#xOntvang').addEventListener('click', async () => {
   try {
     const r = await api('pay/tikcode', {});
@@ -307,6 +326,7 @@ $('#xBetaal').addEventListener('click', async () => {
     meld(euro(centen) + ' eur getikt naar ' + r.aan + '.' + (r.bijgeladen ? ' Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : ''));
     $('#xBedrag').value = ''; $('#xOms').value = '';
     ververs();
+    laadTiks();
   } catch (e) { meld(e.message); }
 });
 
@@ -333,9 +353,9 @@ $('#kMaak').addEventListener('click', async () => {
 });
 
 function start(){
-  ververs().then(laadVrienden).catch(() => toon('vGate'));
+  ververs().then(laadVrienden).then(laadTiks).catch(() => toon('vGate'));
 }
-setInterval(() => { if (!$('#vPay').hidden && !document.hidden) ververs().catch(() => {}); }, 8000);
+setInterval(() => { if (!$('#vPay').hidden && !document.hidden) { ververs().catch(() => {}); laadTiks(); } }, 8000);
 if (TOKEN) start(); else toon('vGate');
 </script>
 </body>

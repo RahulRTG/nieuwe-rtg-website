@@ -49,6 +49,10 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, await pay.tikBetaal({ van: liveCodename(req.session), code: req.body.code, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem }));
   });
+  app.post('/api/pay/tiks', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(pay.tikFeed(liveCodename(req.session)));
+  });
   // de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
   app.post('/api/pay/kascode', auth, (req, res) => {
     if (geenGast(req, res)) return;

@@ -4043,8 +4043,9 @@
     const rekBlok = rekeningen.length
       ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'">'+
           '<span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--gold);">'+eur(t.rekening.totaal)+'</b></span>'+
-          '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+
+          '<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+
             '<button class="obtn primary js-rekpay" data-method="rtgpay">RTG Pay</button>'+
+            '<button class="obtn js-reksplit">'+T('res.splits','Splits')+'</button>'+
             '<button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span>'+
         '</div>').join('')
       : '';
@@ -4059,18 +4060,29 @@
       (later.length ? '<div class="card"><div class="tt-h">🗓 '+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
     // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij
     wrap.querySelectorAll('[data-tafelrek]').forEach(el => {
-      el.querySelectorAll('.js-rekpay').forEach(b => b.addEventListener('click', async () => {
+      const rekenAf = async (extra) => {
         try {
-          const body = { room: el.dataset.tafelrek, method: b.dataset.method };
+          const body = Object.assign({ room: el.dataset.tafelrek }, extra);
           if (body.method === 'rtgpay'){
             body.payCode = await vraagPayCode(); if (!body.payCode) return;
             body.idem = 'trek' + Date.now();
           }
           const d = await API.call('/supplier/pos/checkout', body);
-          toast(T('res.rekklaar','Rekening afgerekend:')+' '+el.dataset.tafelrek+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')');
+          let boodschap = T('res.rekklaar','Rekening afgerekend:')+' '+el.dataset.tafelrek+', '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+')';
+          if (d.gesplitst) boodschap += ' · '+T('res.gesplitst','gesplitst met')+' '+d.gesplitst.vrienden+' ('+eur(d.gesplitst.perPersoon/100)+' p.p.)';
+          if (d.splitsFout) boodschap += ' · '+d.splitsFout;
+          toast(boodschap);
           await refresh(); renderReserveringen();
         } catch(e){ toast(e.message); }
-      }));
+      };
+      el.querySelectorAll('.js-rekpay').forEach(b => b.addEventListener('click', () => rekenAf({ method: b.dataset.method })));
+      // splitsen: een gast betaalt het geheel met RTG Pay, de tafelgenoten
+      // krijgen meteen een Klompje voor hun deel, uit naam van de betaler
+      const sp = el.querySelector('.js-reksplit'); if (sp) sp.addEventListener('click', () => {
+        const namen = window.prompt(T('res.splitswie','Codenamen van de tafelgenoten (met komma); de betaler tikt zo zijn code:'));
+        if (!namen) return;
+        rekenAf({ method: 'rtgpay', splitsMet: namen.split(',').map(x => x.trim()).filter(Boolean) });
+      });
     });
     wrap.querySelectorAll('.js-walkin').forEach(b => b.addEventListener('click', async () => {
       const p = window.prompt(T('res.walkinp','Walk-in aan '+b.dataset.tafel+': met hoeveel personen?'), '2');
@@ -4235,13 +4247,18 @@
   let bon = {};        // horeca: menu-id -> aantal
   function bonTotal(){ return (state.menu||[]).reduce((s,m)=>s+m.price*(bon[m.id]||0),0); }
   function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
-  /* RTG Pay aan de kassa: eerst tap to pay (de gast houdt zijn toestel tegen
-     de kassa, de code komt contactloos binnen), en anders de code intypen. */
+  /* RTG Pay aan de kassa: tap to pay als het kan (de gast houdt zijn toestel
+     hiertegen), met altijd de uitweg om de code te typen; werkt de NFC-chip
+     niet of tikt er niemand, dan komt het typvenster vanzelf. */
   async function vraagPayCode(){
     if (window.TapPay && TapPay.kan()){
-      toast('📳 '+T('pos.tap','Tap to pay: laat de gast het toestel hiertegen houden...'));
-      const code = await TapPay.lees(12000);
-      if (code){ toast('📳 '+T('pos.tapok','Code ontvangen via tap to pay.')); return code; }
+      const tap = window.confirm(T('pos.tapkeuze','Tap to pay: de gast tikt zijn toestel hiertegen. Liever de code typen (bijv. als NFC niet werkt)? Kies dan Annuleren.'));
+      if (tap){
+        toast('📳 '+T('pos.tap','Tap to pay: laat de gast het toestel hiertegen houden...'));
+        const code = await TapPay.lees(12000);
+        if (code){ toast('📳 '+T('pos.tapok','Code ontvangen via tap to pay.')); return code; }
+        toast(T('pos.tapmis','Geen tik ontvangen; typ de code van de gast.'));
+      }
     }
     const c = window.prompt(T('pos.paycode','Betaalcode van de gast (uit de app):'));
     return c ? c.trim().toUpperCase() : null;

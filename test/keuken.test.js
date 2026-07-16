@@ -259,6 +259,37 @@ test('de rekening per tafel: bonnen op de tafel zetten, afrekenen, en de tafel i
   assert.equal(na.status, 'vrij', 'en de tafel is weer vrij');
 });
 
+test('splitsen vanaf de rekening: een gast betaalt met RTG Pay, de tafelgenoten krijgen een Klompje', async () => {
+  // een nieuwe tafel met een bon erop; twee leden: de betaler en een tafelgenoot
+  const plan0 = (await api('supplier/tafelplan', {})).body;
+  const tafel = plan0.tafels.find(t => t.status === 'vrij').name;
+  await api('supplier/walkin', { tafel, personen: 2 });
+  await api('supplier/pos/sale', { total: 30, method: 'tafel', room: tafel, desc: 'Twee gangen' });
+  const betaler = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) })).json();
+  const genoot = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
+  const genootNaam = (await api('pay/overzicht', {}, genoot.token)).body.codenaam;
+  const kas = await api('pay/kascode', { maxCenten: 10000 }, betaler.token);
+  const uit = await api('supplier/pos/checkout', { room: tafel, method: 'rtgpay', payCode: kas.body.code, idem: 'splits-1', splitsMet: [genootNaam] });
+  assert.equal(uit.status, 200);
+  assert.equal(uit.body.gesplitst.vrienden, 1);
+  assert.equal(uit.body.gesplitst.perPersoon, 1500, 'dertig euro eerlijk door twee');
+  // de tafelgenoot ziet het Klompje van de betaler staan
+  const zicht = await api('pay/overzicht', {}, genoot.token);
+  const v = zicht.body.aanMij.find(x => x.van === uit.body.betaler);
+  assert.ok(v, 'het Klompje staat klaar');
+  assert.equal(v.centen, 1500);
+  assert.match(v.oms, /Rekening/);
+});
+
+test('gaat de zaak dicht, dan valt de shift-samenvatting als bericht bij het team', async () => {
+  assert.equal((await api('supplier/settings', { ordersOpen: false })).status, 200);
+  const st = (await api('supplier/state', {})).body.state;
+  const n = (st.notifications || []).find(x => /Shift-samenvatting/.test(x.title || ''));
+  assert.ok(n, 'het bericht staat in de meldingen van de zaak');
+  assert.match(n.body, /omzet/, 'met de cijfers van de dag erin');
+  await api('supplier/settings', { ordersOpen: true }); // netjes weer open
+});
+
 test('de shift-samenvatting: cijfers, gasten, toppers en derving in een kaart', async () => {
   const r = await api('supplier/shift', {});
   assert.equal(r.status, 200);

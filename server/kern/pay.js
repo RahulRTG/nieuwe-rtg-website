@@ -143,14 +143,14 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   async function bestaatLid(codenaam) {
     try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
   }
-  async function stuur({ van, aanCodenaam, centen, oms, idem }) {
+  async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
     const aan = schoon(aanCodenaam, 40);
     if (!aan || aan === van) return { status: 400, error: 'Kies aan wie je het stuurt.' };
     if (!(await bestaatLid(aan))) return { status: 404, error: 'Die codenaam kennen we niet.' };
     return metIdem(idem ? 'stuur:' + van + ':' + idem : null, async () => {
       const z = await zorgSaldo({ codenaam: van, centen, idem });
       if (z.error) return z;
-      const b = boek({ van: rekLid(van), naar: rekLid(aan), centen, soort: 'p2p', oms: oms || 'Zomaar' });
+      const b = boek({ van: rekLid(van), naar: rekLid(aan), centen, soort: soort || 'p2p', oms: oms || 'Zomaar' });
       if (b.error) return b;
       seintje(aan);
       return { ok: true, saldo: saldoVan(rekLid(van)), bijgeladen: z.bijgeladen, boeking: b.boeking.id };
@@ -232,8 +232,18 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     const k = tikcodes().find(x => x.code === String(code || '').toUpperCase().trim());
     if (!k || k.geldigTot < nu()) return { status: 404, error: 'Deze tik is niet (meer) geldig; laat je vriend opnieuw op ontvangen zetten.' };
     if (k.codenaam === van) return { status: 400, error: 'Dit is je eigen tik.' };
-    const r = await stuur({ van, aanCodenaam: k.codenaam, centen, oms: oms || 'Tik', idem: idem ? 'tik:' + idem : undefined });
+    const r = await stuur({ van, aanCodenaam: k.codenaam, centen, oms: oms || 'Tik', idem: idem ? 'tik:' + idem : undefined, soort: 'tik' });
     return r.error ? r : Object.assign({ aan: k.codenaam }, r);
+  }
+  // de tikgeschiedenis: wie tikte wie, als klein sociaal logboek in de app
+  function tikFeed(codenaam) {
+    const rek = rekLid(codenaam);
+    const rijen = grootboek().filter(r => r.soort === 'tik' && (r.van === rek || r.naar === rek)).slice(0, 20).map(r => ({
+      id: r.id, at: r.at, oms: r.oms, centen: r.centen,
+      richting: r.van === rek ? 'uit' : 'in',
+      met: (r.van === rek ? r.naar : r.van).replace(/^lid:/, '')
+    }));
+    return { ok: true, tiks: rijen };
   }
 
   /* ---------- de kassacode: contactloos bij de partner ---------- */
@@ -306,7 +316,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   return { pay: {
     MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, stuur,
     verzoekMaak, verzoekenVoor, verzoekBetaal, verzoekIntrek,
-    tikCode, tikBetaal,
+    tikCode, tikBetaal, tikFeed,
     kasCode, kasInt, partnerOverzicht, partnerUitbetaal, overzicht, saldoVan
   } };
 };

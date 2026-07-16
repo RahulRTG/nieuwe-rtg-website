@@ -38,6 +38,15 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   // hoeveel spelers mogen er maximaal in een potje? (de rest is 1 tegen 1)
   const MAXSP = { mejn: 4, pesten: 4, rummi: 4, magnaat: 6, seconden: 4, waarheid: 6, proost: 6 };
   const MEERSPELER = (soort) => (MAXSP[soort] || 2) > 2;
+  /* Elke app heeft zijn eigen spelgroep: de RTG-leden-app start schaken,
+     Woordduel, Magnaat, 30 Seconden en Proost; de RTFoundation-app start mens
+     erger je niet, pesten, dammen, Rummi en Doen of Waarheid. Meespelen op
+     uitnodiging kan altijd over en weer; alleen het STARTEN is per app. */
+  const WERELD = { rtg: ['schaak', 'woord', 'magnaat', 'seconden', 'proost'], rtf: ['mejn', 'pesten', 'dam', 'rummi', 'waarheid'] };
+  function wereldFout(wereld, soort) {
+    if (!WERELD[wereld] || WERELD[wereld].includes(soort)) return null;
+    return wereld === 'rtg' ? 'Dit spel vind je in de RTFoundation-app.' : 'Dit spel vind je in de RTG-leden-app.';
+  }
   // Proost is een drankspel: alleen voor leden van 18 of ouder, aangetoond met
   // de paspoort-geboortedatum van het account. RTF-profielen doen nooit mee.
   const PROOST_FOUT = 'Proost is 18+. Dit spel kan alleen met leden met een geverifieerde volwassen leeftijd.';
@@ -914,9 +923,11 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     if (soort === 'seconden') return 4;
     return Math.min(MAXSP[soort] || 2, Math.max(2, Number(grootte) || 2));
   }
-  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, taal }) {
+  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, taal, wereld }) {
     opschonen();
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekend spel.' };
+    const wf = wereldFout(wereld, soort);
+    if (wf) return { status: 400, error: wf };
     if (soort === 'proost' && !volwassen(mij)) return { status: 403, error: PROOST_FOUT };
     const max = spelGrootte(soort, grootte);
     const uitgenodigd = (Array.isArray(vrienden) ? vrienden : []).slice(0, max - 1).filter(v => zijnVrienden(mij, v));
@@ -955,9 +966,11 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     p.spelers.forEach(sp => nudge(sp, p));
     return { status: 200, ok: true, gestart: p.status === 'bezig' };
   }
-  function spelRandom(mij, soort, grootte, taal) {
+  function spelRandom(mij, soort, grootte, taal, wereld) {
     opschonen();
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekend spel.' };
+    const wf = wereldFout(wereld, soort);
+    if (wf) return { status: 400, error: wf };
     if (soort === 'proost' && !volwassen(mij)) return { status: 403, error: PROOST_FOUT };
     const max = spelGrootte(soort, grootte);
     const w_taal = taal === 'en' ? 'en' : 'nl';

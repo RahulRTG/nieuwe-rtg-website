@@ -14,11 +14,12 @@ module.exports = (kern) => {
   const vriendenVan = (mij) => (socialConnecties(mij).connections || []).map(c => c.key);
   const stuur = (res, r) => r.error ? res.status(r.status).json({ error: r.error }) : res.json(r);
 
-  // dezelfde acties voor beide werelden; alleen de identiteit verschilt
+  // dezelfde acties voor beide werelden; alleen de identiteit verschilt, en
+  // elke app start zijn eigen spelgroep (meespelen op uitnodiging kan altijd)
   const ACTIES = {
-    nieuw: (mij, b) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, taal: b.taal }),
+    nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, taal: b.taal, wereld }),
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    random: (mij, b) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal),
+    random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld),
     mijn: (mij) => Object.assign({ status: 200 }, mijnSpellen(mij)),
     staat: (mij, b) => spelStaat(mij, String(b.id || '')),
     zet: (mij, b) => spelZet(mij, String(b.id || ''), b.zet),
@@ -31,11 +32,11 @@ module.exports = (kern) => {
   for (const [naam, doe] of Object.entries(ACTIES)) {
     app.post('/api/member/spel/' + naam, auth, async (req, res) => {
       if (geenGast(req, res)) return;
-      stuur(res, await doe(req.session.key, req.body || {}));
+      stuur(res, await doe(req.session.key, req.body || {}, 'rtg'));
     });
     app.post('/api/rtf/spel/' + naam, async (req, res) => {
       const mij = rtfSpeler(req, res); if (!mij) return;
-      stuur(res, await doe(mij, req.body || {}));
+      stuur(res, await doe(mij, req.body || {}, 'rtf'));
     });
   }
 };

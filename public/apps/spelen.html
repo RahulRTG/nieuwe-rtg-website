@@ -279,7 +279,9 @@ async function vriendenLijst(){
   const r = await fetch('/api/rtf/social/connections', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code: rtfSess.code, token: rtfSess.token }) });
   return ((await r.json()).connections)||[];
 }
-$('#terugApp').href = memberTok ? '/apps/app.html?pas=rtg' : '/apps/foundation/index.html';
+// terug naar de eigen ingang: de pas reist mee (RTG, Lifestyle of Business)
+const pasParam = new URLSearchParams(location.search).get('pas');
+$('#terugApp').href = memberTok ? '/apps/app.html?pas=' + encodeURIComponent(pasParam || 'rtg') : '/apps/foundation/index.html';
 
 /* ---------- weergaven ---------- */
 function toon(v){ ['vLobby','vNieuw','vSpel','vSneek','vTetris','vSudoku','vVlek'].forEach(x => $('#'+x).hidden = (x!==v)); if(v!=='vSpel'){ clearInterval(pollT); huidig=null; } }
@@ -1074,7 +1076,15 @@ function vzTeken(){
 }
 
 /* ---------- start ---------- */
-if (!memberTok) $('#kProost').style.display = 'none'; // RTF-profielen hebben geen geverifieerde leeftijd
+/* Elke app zijn eigen spelgroep. RTG: schaken, Woordduel, Magnaat, 30 Seconden,
+   Proost (18+) en Vingerroulette. RTF: mens erger je niet, pesten, dammen,
+   Rummi, Doen of Waarheid en Sudoku. Sneek en Tetris zijn gedeelde arcade.
+   Meespelen op uitnodiging kan altijd over en weer; lopende potjes en
+   uitnodigingen van de andere kant blijven dus gewoon zichtbaar. */
+const MIJN_SPELLEN = memberTok
+  ? ['schaak', 'woord', 'magnaat', 'seconden', 'proost', 'vlek', 'sneek', 'tetris']
+  : ['mejn', 'pesten', 'dam', 'rummi', 'waarheid', 'sudoku', 'sneek', 'tetris'];
+document.querySelectorAll('.spelkaart').forEach(k => { if (!MIJN_SPELLEN.includes(k.dataset.spel)) k.style.display = 'none'; });
 laadLobby();
 setInterval(()=>{ if (!$('#vLobby').hidden) laadLobby(); }, 8000);
 const qs = new URLSearchParams(location.search);

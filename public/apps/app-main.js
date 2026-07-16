@@ -443,6 +443,20 @@
     } catch(e){ socialOK = false; }
     renderSocialBar();
     renderContacts();
+    renderSpelen();
+  }
+
+  // Spelen-kaart op Home: voor elke pas (RTG, Lifestyle en Business dezelfde
+  // spelgroep); alleen een anonieme demo-gast zonder account speelt niet mee
+  function renderSpelen(){
+    const el = $('#homeSpelen'); if (!el) return;
+    if (!socialOK || !user || (user.tier === 'guest' && !user.account)){ el.style.display='none'; return; }
+    el.style.display='';
+    el.innerHTML = '<div class="label">'+T('spel.label','Spelen')+'</div>'+
+      '<div class="big" style="font-size:1.02rem;">🎲 '+T('spel.kop','Een potje tussendoor?')+'</div>'+
+      '<div class="meta" style="margin:.2rem 0 .7rem;">'+T('spel.uitleg','Schaken, Woordduel, Magnaat, 30 Seconden, Proost (18+) en Vingerroulette. Tegen vrienden of een random tegenstander; samen spelen maakt je niet automatisch vrienden.')+'</div>'+
+      '<button class="go" id="gaSpelen">'+T('spel.ga','Naar de spellen')+' →</button>';
+    el.querySelector('#gaSpelen').addEventListener('click', () => { location.href = '/apps/spelen.html?pas=' + encodeURIComponent(vastePas || 'rtg'); });
   }
 
   // Contacten-kaart op Home: na het toevoegen bericht of (video)bel je elkaar met één tik

@@ -17,7 +17,7 @@ module.exports = (kern) => {
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
     zorgContact, fonds, munten, factuur, talen,
     zorgVan, zorgZet, zorgVoor, locDeel, locStopKlant, locMijn,
-    assetsOverzicht, assetKoop, assetMijn, assetGebruik, assetUitstap,
+    assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -1179,8 +1179,25 @@ app.post('/api/locatie/mijn', auth, (req, res) => res.json(locMijn(req.session.k
    Altijd 300 tickets per object; een ticket is 24 uur per jaar, tien jaar
    lang. Access loopt af, Asset heeft restwaarde en stapt uit via een Tik. */
 app.post('/api/assets', auth, (req, res) => res.json(assetsOverzicht(req.session.key)));
+// het essentiele-informatiedocument: lezen voordat er iets wordt afgerekend
+app.post('/api/asset/document', auth, (req, res) => {
+  const r = assetDocument(req.body.assetId);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
 app.post('/api/asset/koop', auth, (req, res) => {
-  const r = assetKoop(req.session, liveCodename(req.session), req.body.assetId, req.body.smaak, req.body.aantal);
+  const r = assetKoop(req.session, liveCodename(req.session), req.body.assetId, req.body.smaak, req.body.aantal, req.body.akkoord === true);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+// veertien dagen bedenktijd: volledige terugbetaling, voor beide smaken
+app.post('/api/asset/herroep', auth, async (req, res) => {
+  const r = await assetHerroep(req.session, liveCodename(req.session), req.body.ticketId);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/asset/wachtlijst', auth, (req, res) => {
+  const r = assetWachtlijstZet(req.session, liveCodename(req.session), req.body.assetId);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);
 });

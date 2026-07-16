@@ -29,6 +29,16 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
+  // het poolbestuur: verkoop, poolkas, wachtlijst, open terugkopen en restdagen
+  app.post('/api/office/asset/overzicht', officeAuth, (req, res) => res.json(kern.assetKantoor()));
+  // een terugkoop uitbetalen (uiterlijk binnen het venster van dertig dagen)
+  app.post('/api/office/asset/terugkoop', officeAuth, async (req, res) => {
+    const r = await kern.assetTerugkoopUit(req.body.verzoekId, 'RTG-kantoor');
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
+  // de jaarlijkse servicefee innen (per actief ticket een keer per jaar)
+  app.post('/api/office/asset/fees', officeAuth, async (req, res) => res.json(await kern.assetFeesInnen('RTG-kantoor')));
 
   // Naleving van de Salon-verplichting: welke partners zijn (niet) zichtbaar
   app.post('/api/office/salon-naleving', officeAuth, (req, res) => {

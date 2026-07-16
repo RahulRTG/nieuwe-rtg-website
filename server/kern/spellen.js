@@ -11,13 +11,21 @@
    - Woordduel (wordfeud-achtig): 15x15 met premievelden, de Nederlandse
      letterzak, kruiswoord-scoring en de 40-puntenbonus. Zonder woordenboek:
      het eer-systeem, zoals thuis aan tafel.
-   - Sneek: ieder speelt zelf; de beste scores vormen een ranglijst onder
-     vrienden.
+   - Dammen: 10x10 internationaal, slaan verplicht, meerslag met hetzelfde
+     stuk, een dam vliegt over de diagonaal.
+   - Rummi (rummikub-achtig): 106 stenen, eerste uitleg van 30 punten,
+     daarna vrij herschikken; de server keurt de hele tafel bij elke beurt.
+   - Magnaat (monopoly-achtig): 2 t/m 6 spelers, 40 velden in de RTG-wereld,
+     kopen, huur, bouwen, kanskaarten en de gevangenis; wie overblijft wint.
+   - Partyspellen: 30 Seconden (2 tegen 2, eer-systeem), Doen of Waarheid
+     (2 t/m 6) en Proost (2 t/m 6, alleen 18+ met paspoort-geboortedatum).
+   - Arcade (Sneek, Tetris, Sudoku): ieder speelt zelf; de beste scores
+     vormen een ranglijst onder vrienden.
 
-   Een potje start met uitgenodigde vrienden (die accepteren zelf) of via de
-   random wachtrij per spel en groepsgrootte. Beurten gaan via polling plus
-   een SSE-duwtje naar wie aan zet is. */
-module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate }) => {
+   Een potje start met uitgenodigde vrienden (die accepteren zelf), op
+   codenaam (maakt geen vriendschap) of via de random wachtrij per spel en
+   groepsgrootte. Beurten gaan via polling plus een SSE-duwtje. */
+module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
@@ -25,8 +33,14 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     if (!db.data.spellen) db.data.spellen = { potjes: {}, wachtrij: {}, sneek: {} };
     return db.data.spellen;
   }
-  const SOORTEN = { mejn: 'Mens erger je niet', schaak: 'Schaken', woord: 'Woordduel', pesten: 'Pesten' };
-  const MEERSPELER = (soort) => soort === 'mejn' || soort === 'pesten'; // 2 t/m 4 spelers
+  const SOORTEN = { mejn: 'Mens erger je niet', schaak: 'Schaken', woord: 'Woordduel', pesten: 'Pesten',
+    dam: 'Dammen', rummi: 'Rummi', magnaat: 'Magnaat', seconden: '30 Seconden', waarheid: 'Doen of Waarheid', proost: 'Proost' };
+  // hoeveel spelers mogen er maximaal in een potje? (de rest is 1 tegen 1)
+  const MAXSP = { mejn: 4, pesten: 4, rummi: 4, magnaat: 6, seconden: 4, waarheid: 6, proost: 6 };
+  const MEERSPELER = (soort) => (MAXSP[soort] || 2) > 2;
+  // Proost is een drankspel: alleen voor leden van 18 of ouder, aangetoond met
+  // de paspoort-geboortedatum van het account. RTF-profielen doen nooit mee.
+  const PROOST_FOUT = 'Proost is 18+. Dit spel kan alleen met leden met een geverifieerde volwassen leeftijd.';
   const nudge = (naar, potje) => { try { sseToCustomer(naar, 'social', { kind: 'spel', potje: potje.id, soort: potje.soort }); } catch (e) {} };
 
   /* ---------- opschonen: klare potjes na een dag weg, wachtenden na een uur ---------- */
@@ -455,18 +469,456 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     return { status: 200, ok: true };
   }
 
+  /* ================= Dammen =================
+     Internationaal op 10x10: schijven stappen schuin vooruit, slaan mag ook
+     achteruit en is verplicht, meerslag gaat door met hetzelfde stuk, en op
+     de laatste rij word je dam (die vliegt over de hele diagonaal). Als
+     huisregel hoeft de meerderheidsslag niet: elke slag telt. */
+  const D_RICH = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+  function damInit(potje) {
+    const b = Array(100).fill('.');
+    for (let i = 0; i < 100; i++) {
+      const r = Math.floor(i / 10);
+      if ((r + i % 10) % 2 !== 1) continue; // alleen de donkere velden
+      if (r <= 3) b[i] = 'z';
+      if (r >= 6) b[i] = 'w';
+    }
+    potje.staat = { bord: b, ketting: null };
+  }
+  const damKleur = (potje, h) => potje.spelers.indexOf(h) === 0 ? 'w' : 'z';
+  function damZettenVoor(st, k) {
+    const B = st.bord, slagen = [], stappen = [];
+    const ok = (r, c) => r >= 0 && r < 10 && c >= 0 && c < 10;
+    const vijand = (cel) => cel !== '.' && cel.toLowerCase() !== k;
+    for (let i = 0; i < 100; i++) {
+      const cel = B[i];
+      if (cel === '.' || cel.toLowerCase() !== k) continue;
+      const r = Math.floor(i / 10), c = i % 10, dame = cel === cel.toUpperCase();
+      for (const [dr, dc] of D_RICH) {
+        if (!dame) {
+          const r1 = r + dr, c1 = c + dc, r2 = r + 2 * dr, c2 = c + 2 * dc;
+          const vooruit = k === 'w' ? dr === -1 : dr === 1;
+          if (ok(r1, c1) && B[r1 * 10 + c1] === '.' && vooruit) stappen.push({ van: i, naar: r1 * 10 + c1 });
+          if (ok(r2, c2) && vijand(B[r1 * 10 + c1]) && B[r2 * 10 + c2] === '.') slagen.push({ van: i, naar: r2 * 10 + c2, slaat: r1 * 10 + c1 });
+        } else {
+          let rr = r + dr, cc = c + dc, gezien = null;
+          while (ok(rr, cc)) {
+            const doel = B[rr * 10 + cc];
+            if (doel === '.') { if (gezien === null) stappen.push({ van: i, naar: rr * 10 + cc }); else slagen.push({ van: i, naar: rr * 10 + cc, slaat: gezien }); }
+            else if (vijand(doel) && gezien === null) gezien = rr * 10 + cc;
+            else break; // eigen stuk, of een tweede stuk achter de eerste
+            rr += dr; cc += dc;
+          }
+        }
+      }
+    }
+    return { slagen, stappen };
+  }
+  function damZetten(potje, h) {
+    const st = potje.staat, k = damKleur(potje, h);
+    const { slagen, stappen } = damZettenVoor(st, k);
+    if (st.ketting != null) return slagen.filter(s => s.van === st.ketting);
+    return slagen.length ? slagen : stappen;
+  }
+  function damZet(potje, h, zet) {
+    const st = potje.staat, B = st.bord, k = damKleur(potje, h);
+    const mag = damZetten(potje, h);
+    const keuze = mag.find(z => z.van === Number(zet.van) && z.naar === Number(zet.naar));
+    if (!keuze) return { status: 400, error: mag.length && mag[0].slaat != null ? 'Slaan is verplicht.' : 'Die zet kan niet.' };
+    B[keuze.naar] = B[keuze.van]; B[keuze.van] = '.';
+    if (keuze.slaat != null) {
+      B[keuze.slaat] = '.';
+      // meerslag: hetzelfde stuk moet doorslaan zolang het kan
+      const verder = damZettenVoor(st, k).slagen.filter(s => s.van === keuze.naar);
+      if (verder.length) { st.ketting = keuze.naar; save(); return { status: 200, ok: true, verder: true }; }
+    }
+    st.ketting = null;
+    // dam worden kan pas als de (slag)beurt op de laatste rij eindigt
+    const rij = Math.floor(keuze.naar / 10);
+    if (B[keuze.naar] === 'w' && rij === 0) B[keuze.naar] = 'W';
+    if (B[keuze.naar] === 'z' && rij === 9) B[keuze.naar] = 'Z';
+    potje.beurt = 1 - potje.beurt;
+    const t = damZettenVoor(st, k === 'w' ? 'z' : 'w');
+    if (!t.slagen.length && !t.stappen.length) { potje.status = 'klaar'; potje.winnaar = codenaamVan(h); }
+    save(); nudge(potje.spelers[potje.beurt], potje);
+    return { status: 200, ok: true };
+  }
+
+  /* ================= Rummi (rummikub-achtig) =================
+     106 stenen: 1 t/m 13 in vier kleuren, alles dubbel, plus twee jokers (*).
+     Je eerste uitleg telt minstens 30 punten uit eigen rek; daarna mag je de
+     hele tafel herschikken. De client stuurt de complete nieuwe tafel op en
+     de server keurt: elke rij/groep geldig, alle oude stenen nog aanwezig,
+     de rest komt uit jouw rek. Kun je niets: pak een steen. */
+  const R_KLEUREN = ['r', 'b', 'g', 'z']; // rood, blauw, geel (goud), zwart
+  function rummiInit(potje) {
+    const zak = [];
+    for (const kl of R_KLEUREN) for (let n = 1; n <= 13; n++) { zak.push(kl + n, kl + n); }
+    zak.push('*', '*');
+    for (let i = zak.length - 1; i > 0; i--) { const j = crypto.randomInt(0, i + 1); [zak[i], zak[j]] = [zak[j], zak[i]]; }
+    const st = { zak, rekken: {}, tafel: [], eerste: {}, passes: 0 };
+    for (const h of potje.spelers) { st.rekken[h] = zak.splice(0, 14); st.eerste[h] = false; }
+    potje.staat = st;
+  }
+  // is dit setje een geldige groep of rij? levert de puntwaarde, anders null
+  function rummiSet(set) {
+    if (!Array.isArray(set) || set.length < 3) return null;
+    const echte = set.map((t, i) => [t, i]).filter(([t]) => t !== '*');
+    if (!echte.length) return null;
+    const nums = echte.map(([t]) => Number(t.slice(1))), kleuren = echte.map(([t]) => t[0]);
+    if (nums.some(n => !(n >= 1 && n <= 13)) || kleuren.some(kl => !R_KLEUREN.includes(kl))) return null;
+    // groep: zelfde nummer, allemaal een andere kleur, hooguit 4 stenen
+    if (set.length <= 4 && nums.every(n => n === nums[0]) && new Set(kleuren).size === echte.length) return nums[0] * set.length;
+    // rij: een kleur, opeenvolgende nummers; jokers vullen de gaten
+    if (new Set(kleuren).size === 1 && set.length <= 13) {
+      const start = nums[0] - echte[0][1];
+      if (start >= 1 && start + set.length - 1 <= 13 && echte.every(([t, i]) => Number(t.slice(1)) === start + i))
+        return set.reduce((som, _, i) => som + start + i, 0);
+    }
+    return null;
+  }
+  const rummiTel = (lijst) => { const m = {}; for (const t of lijst) m[t] = (m[t] || 0) + 1; return m; };
+  function rummiZet(potje, h, zet) {
+    const st = potje.staat, rek = st.rekken[h];
+    if (zet.pak === true) {
+      if (st.zak.length) { rek.push(st.zak.pop()); st.passes = 0; }
+      else st.passes++;
+      if (st.passes >= potje.spelers.length) return rummiEinde(potje); // zak leeg en niemand kan meer
+      pestenVolgende(potje, false); // zelfde beurtwissel: met de klok mee
+      save(); nudge(potje.spelers[potje.beurt], potje);
+      return { status: 200, ok: true, gepakt: true };
+    }
+    const tafel = Array.isArray(zet.tafel) ? zet.tafel.filter(s => Array.isArray(s) && s.length) : null;
+    if (!tafel) return { status: 400, error: 'Stuur de nieuwe tafel mee, of pak een steen.' };
+    const waardes = tafel.map(rummiSet);
+    const fout = waardes.findIndex(w => w == null);
+    if (fout >= 0) return { status: 400, error: 'Setje ' + (fout + 1) + ' is geen geldige rij of groep.' };
+    // welke stenen komen er nieuw bij? die moeten allemaal uit jouw rek komen
+    const oud = rummiTel(st.tafel.flat()), nieuw = rummiTel(tafel.flat()), mijn = rummiTel(rek);
+    const gebruikt = [];
+    for (const [t, n] of Object.entries(nieuw)) {
+      const extra = n - (oud[t] || 0);
+      if (extra < 0) return { status: 400, error: 'Er verdwijnen stenen van de tafel; dat mag niet.' };
+      if (extra > (mijn[t] || 0)) return { status: 400, error: 'Die stenen heb je niet op je rek.' };
+      for (let i = 0; i < extra; i++) gebruikt.push(t);
+    }
+    for (const [t, n] of Object.entries(oud)) if ((nieuw[t] || 0) < n) return { status: 400, error: 'Er verdwijnen stenen van de tafel; dat mag niet.' };
+    if (!gebruikt.length) return { status: 400, error: 'Leg minstens een steen uit je rek aan.' };
+    // eerste uitleg: minstens 30 punten, in eigen nieuwe setjes zonder de tafel te verbouwen
+    if (!st.eerste[h]) {
+      const oudeSets = new Set(st.tafel.map(s => s.slice().sort().join(',')));
+      let punten = 0;
+      for (let i = 0; i < tafel.length; i++) {
+        const sleutel = tafel[i].slice().sort().join(',');
+        if (oudeSets.has(sleutel)) { oudeSets.delete(sleutel); continue; }
+        const vanRek = tafel[i].every(t => (mijn[t] || 0) > 0);
+        if (!vanRek) return { status: 400, error: 'Je eerste uitleg komt helemaal uit je eigen rek (minstens 30 punten).' };
+        punten += waardes[i];
+      }
+      if (punten < 30) return { status: 400, error: 'Je eerste uitleg telt ' + punten + ' punten; er zijn er minstens 30 nodig.' };
+      st.eerste[h] = true;
+    }
+    st.tafel = tafel.map(s => s.slice());
+    for (const t of gebruikt) rek.splice(rek.indexOf(t), 1);
+    st.passes = 0;
+    if (!rek.length) { potje.status = 'klaar'; potje.winnaar = codenaamVan(h); }
+    else pestenVolgende(potje, false);
+    save(); nudge(potje.spelers[potje.beurt], potje);
+    return { status: 200, ok: true };
+  }
+  function rummiEinde(potje) {
+    // zak leeg en iedereen past: het laagste rek (joker telt 30) wint
+    const st = potje.staat;
+    const som = (h) => st.rekken[h].reduce((s, t) => s + (t === '*' ? 30 : Number(t.slice(1))), 0);
+    const beste = potje.spelers.slice().sort((a, b) => som(a) - som(b));
+    potje.status = 'klaar';
+    potje.winnaar = som(beste[0]) === som(beste[1]) ? null : codenaamVan(beste[0]);
+    potje.gelijk = !potje.winnaar;
+    save(); potje.spelers.forEach(sp => nudge(sp, potje));
+    return { status: 200, ok: true, einde: true };
+  }
+
+  /* ================= Magnaat (monopoly-achtig, 2 t/m 6) =================
+     Veertig velden door de RTG-wereld. Kopen, huur innen, bouwen op een
+     complete kleurgroep, kans- en kaskaarten, de cel en start-geld. Wie niet
+     kan betalen verkoopt automatisch terug aan de bank (halve prijs); is dat
+     niet genoeg, dan ben je failliet en spelen de anderen door. */
+  const M_GROEP_HUIZEN = [1, 5, 12, 35, 70, 120]; // huurfactor bij 0..5 huizen (5 = hotel)
+  const M_VELDEN = [
+    { t: 'start', n: 'Start' },
+    { t: 'straat', n: 'Strandtent Ibiza', p: 60, g: 0 }, { t: 'kas', n: 'Kas' }, { t: 'straat', n: 'Beachclub Blanca', p: 60, g: 0 },
+    { t: 'belasting', n: 'Toeristenbelasting', p: 200 }, { t: 'station', n: 'RTG Transfers', p: 200 },
+    { t: 'straat', n: 'Tapasbar Sol', p: 100, g: 1 }, { t: 'kans', n: 'Kans' }, { t: 'straat', n: 'Bodega Mar', p: 100, g: 1 }, { t: 'straat', n: 'Chiringuito Luz', p: 120, g: 1 },
+    { t: 'cel', n: 'Op bezoek / de cel' },
+    { t: 'straat', n: 'Salon Amsterdam', p: 140, g: 2 }, { t: 'nut', n: 'RTG Energie', p: 150 }, { t: 'straat', n: 'Grachtenatelier', p: 140, g: 2 }, { t: 'straat', n: 'Modehuis Noord', p: 160, g: 2 },
+    { t: 'station', n: 'RTG Jets', p: 200 },
+    { t: 'straat', n: 'Bistro Milaan', p: 180, g: 3 }, { t: 'kas', n: 'Kas' }, { t: 'straat', n: 'Galleria Moda', p: 180, g: 3 }, { t: 'straat', n: 'Teatro Aperto', p: 200, g: 3 },
+    { t: 'vrij', n: 'Vrij parkeren' },
+    { t: 'straat', n: 'Rooftop Barcelona', p: 220, g: 4 }, { t: 'kans', n: 'Kans' }, { t: 'straat', n: 'Casa del Arte', p: 220, g: 4 }, { t: 'straat', n: 'Mercado Central', p: 240, g: 4 },
+    { t: 'station', n: 'RTG Yachts', p: 200 },
+    { t: 'straat', n: 'Spa Kyoto', p: 260, g: 5 }, { t: 'straat', n: 'Theehuis Zen', p: 260, g: 5 }, { t: 'nut', n: 'RTG Water', p: 150 }, { t: 'straat', n: 'Ryokan Sakura', p: 280, g: 5 },
+    { t: 'naarcel', n: 'Ga naar de cel' },
+    { t: 'straat', n: 'Club Saint-Tropez', p: 300, g: 6 }, { t: 'straat', n: 'Vignoble Azur', p: 300, g: 6 }, { t: 'kas', n: 'Kas' }, { t: 'straat', n: 'Palais Riviera', p: 320, g: 6 },
+    { t: 'station', n: 'RTG Rail', p: 200 },
+    { t: 'kans', n: 'Kans' }, { t: 'straat', n: 'Penthouse Dubai', p: 350, g: 7 }, { t: 'belasting', n: 'Weeldebelasting', p: 100 }, { t: 'straat', n: 'Marina Skyline', p: 400, g: 7 }
+  ];
+  const M_KAARTEN = [
+    { tekst: 'De Salon deelt je post: ontvang 50.', geld: 50 },
+    { tekst: 'Dividend van RTG Jets: ontvang 100.', geld: 100 },
+    { tekst: 'Fooienpot van je beachclub: ontvang 25.', geld: 25 },
+    { tekst: 'Achterstallig onderhoud: betaal 75.', geld: -75 },
+    { tekst: 'Parkeerboete op de boulevard: betaal 40.', geld: -40 },
+    { tekst: 'Je wint de RTG-quiz: ontvang 150.', geld: 150 },
+    { tekst: 'Ga direct naar Start en ontvang 200.', naar: 0 },
+    { tekst: 'Storm op zee: je jacht moet de haven in. Betaal 60.', geld: -60 },
+    { tekst: 'Ga direct naar de cel, zonder langs Start te komen.', cel: true },
+    { tekst: 'Iedereen proost op jou: elke speler betaalt je 20.', vanIeder: 20 }
+  ];
+  function magnaatInit(potje) {
+    const st = { posities: {}, geld: {}, eigenaar: {}, huizen: {}, cel: {}, failliet: {}, dobbel: null, mag: 'gooi', koopVeld: null, kaart: null, dubbels: 0 };
+    for (const h of potje.spelers) { st.posities[h] = 0; st.geld[h] = 1500; st.cel[h] = 0; st.failliet[h] = false; }
+    potje.staat = st;
+  }
+  const magGroepCompleet = (st, g) => M_VELDEN.every((v, i) => v.g !== g || v.t !== 'straat' || st.eigenaar[i] != null) &&
+    new Set(M_VELDEN.map((v, i) => v.t === 'straat' && v.g === g ? st.eigenaar[i] : null).filter(x => x != null)).size === 1;
+  function magHuur(st, veld, worp) {
+    const v = M_VELDEN[veld], baas = st.eigenaar[veld];
+    if (v.t === 'station') { const n = M_VELDEN.filter((x, i) => x.t === 'station' && st.eigenaar[i] === baas).length; return 25 * Math.pow(2, n - 1); }
+    if (v.t === 'nut') { const n = M_VELDEN.filter((x, i) => x.t === 'nut' && st.eigenaar[i] === baas).length; return worp * (n === 2 ? 10 : 4); }
+    const basis = Math.round(v.p / 10);
+    const h = st.huizen[veld] || 0;
+    return basis * M_GROEP_HUIZEN[h] / (h === 0 && !magGroepCompleet(st, v.g) ? 2 : 1);
+  }
+  function magVolgende(potje) {
+    const st = potje.staat, n = potje.spelers.length;
+    st.dobbel = null; st.mag = 'gooi'; st.koopVeld = null; st.dubbels = 0;
+    for (let stap = 1; stap <= n; stap++) {
+      const kand = potje.spelers[(potje.beurt + stap) % n];
+      if (!st.failliet[kand]) { potje.beurt = potje.spelers.indexOf(kand); return; }
+    }
+  }
+  function magBetaal(potje, h, bedrag, aan) {
+    // automatisch afrekenen; komt de speler tekort, dan verkoopt de bank
+    // eerst huizen en dan straten terug (halve prijs); daarna failliet
+    const st = potje.staat;
+    while (st.geld[h] < bedrag) {
+      const metHuis = Object.keys(st.huizen).find(v => st.eigenaar[v] === h && st.huizen[v] > 0);
+      if (metHuis != null) { st.huizen[metHuis]--; st.geld[h] += Math.round(M_VELDEN[metHuis].p / 4); continue; }
+      const bezit = Object.keys(st.eigenaar).find(v => st.eigenaar[v] === h);
+      if (bezit != null) { delete st.eigenaar[bezit]; delete st.huizen[bezit]; st.geld[h] += Math.round(M_VELDEN[bezit].p / 2); continue; }
+      break;
+    }
+    const echt = Math.min(bedrag, st.geld[h]);
+    st.geld[h] -= echt;
+    if (aan) st.geld[aan] += echt;
+    if (echt < bedrag) {
+      st.failliet[h] = true;
+      // bezittingen terug naar de bank; de rest speelt door
+      for (const v of Object.keys(st.eigenaar)) if (st.eigenaar[v] === h) { delete st.eigenaar[v]; delete st.huizen[v]; }
+      const over = potje.spelers.filter(sp => !st.failliet[sp]);
+      if (over.length === 1) { potje.status = 'klaar'; potje.winnaar = codenaamVan(over[0]); }
+    }
+  }
+  function magnaatZet(potje, h, zet) {
+    const st = potje.staat;
+    if (st.failliet[h]) return { status: 409, error: 'Je bent failliet; dit potje kijk je uit.' };
+    const actie = String(zet.actie || '');
+    if (actie === 'bouw' || actie === 'verkoop') {
+      const veld = Number(zet.veld), v = M_VELDEN[veld];
+      if (!v || v.t !== 'straat' || st.eigenaar[veld] !== h) return { status: 400, error: 'Dat veld is niet van jou.' };
+      if (actie === 'bouw') {
+        if (!magGroepCompleet(st, v.g)) return { status: 400, error: 'Bouwen kan pas als de hele kleurgroep van jou is.' };
+        if ((st.huizen[veld] || 0) >= 5) return { status: 400, error: 'Hier staat al een hotel.' };
+        const prijs = Math.round(v.p / 2);
+        if (st.geld[h] < prijs) return { status: 400, error: 'Bouwen kost ' + prijs + '; dat heb je nu niet.' };
+        st.geld[h] -= prijs; st.huizen[veld] = (st.huizen[veld] || 0) + 1;
+      } else {
+        if ((st.huizen[veld] || 0) > 0) { st.huizen[veld]--; st.geld[h] += Math.round(v.p / 4); }
+        else { delete st.eigenaar[veld]; delete st.huizen[veld]; st.geld[h] += Math.round(v.p / 2); }
+      }
+      save(); return { status: 200, ok: true };
+    }
+    if (actie === 'koop' || actie === 'sla') {
+      if (st.mag !== 'koop' || st.koopVeld == null) return { status: 409, error: 'Er valt nu niets te kopen.' };
+      const veld = st.koopVeld, v = M_VELDEN[veld];
+      if (actie === 'koop') {
+        if (st.geld[h] < v.p) return { status: 400, error: 'Daar heb je niet genoeg geld voor.' };
+        st.geld[h] -= v.p; st.eigenaar[veld] = h;
+      }
+      if (st.dubbels > 0 && !st.failliet[h]) { st.mag = 'gooi'; st.koopVeld = null; } else magVolgende(potje);
+      save(); nudge(potje.spelers[potje.beurt], potje);
+      return { status: 200, ok: true };
+    }
+    if (actie !== 'gooi') return { status: 400, error: 'Onbekende actie.' };
+    if (st.mag !== 'gooi') return { status: 409, error: 'Rond eerst je kopen af.' };
+    st.kaart = null;
+    const d1 = crypto.randomInt(1, 7), d2 = crypto.randomInt(1, 7), worp = d1 + d2;
+    st.dobbel = [d1, d2];
+    // in de cel: alleen met dubbel kom je gratis vrij; na drie beurten betaal je 50
+    if (st.cel[h] > 0) {
+      if (d1 === d2) st.cel[h] = 0;
+      else if (--st.cel[h] === 0) magBetaal(potje, h, 50, null);
+      else { magVolgende(potje); save(); nudge(potje.spelers[potje.beurt], potje); return { status: 200, ok: true, dobbel: st.dobbel, cel: true }; }
+      if (st.failliet[h] || potje.status === 'klaar') { magVolgende(potje); save(); return { status: 200, ok: true, dobbel: st.dobbel }; }
+    }
+    st.dubbels = d1 === d2 ? st.dubbels + 1 : 0;
+    if (st.dubbels >= 3) { st.posities[h] = 10; st.cel[h] = 3; st.dubbels = 0; magVolgende(potje); save(); nudge(potje.spelers[potje.beurt], potje); return { status: 200, ok: true, dobbel: st.dobbel, naarCel: true }; }
+    const oud = st.posities[h];
+    let pos = (oud + worp) % 40;
+    if (pos < oud) st.geld[h] += 200; // langs Start
+    st.posities[h] = pos;
+    const v = M_VELDEN[pos];
+    if (v.t === 'naarcel') { st.posities[h] = 10; st.cel[h] = 3; st.dubbels = 0; }
+    else if (v.t === 'belasting') magBetaal(potje, h, v.p, null);
+    else if (v.t === 'kans' || v.t === 'kas') {
+      const kaart = M_KAARTEN[crypto.randomInt(0, M_KAARTEN.length)];
+      st.kaart = kaart.tekst;
+      if (kaart.geld > 0) st.geld[h] += kaart.geld;
+      else if (kaart.geld < 0) magBetaal(potje, h, -kaart.geld, null);
+      else if (kaart.naar != null) { st.posities[h] = kaart.naar; st.geld[h] += 200; }
+      else if (kaart.cel) { st.posities[h] = 10; st.cel[h] = 3; st.dubbels = 0; }
+      else if (kaart.vanIeder) for (const sp of potje.spelers) if (sp !== h && !st.failliet[sp]) magBetaal(potje, sp, kaart.vanIeder, h);
+    }
+    else if ((v.t === 'straat' || v.t === 'station' || v.t === 'nut')) {
+      const baas = st.eigenaar[pos];
+      if (baas == null) { st.mag = 'koop'; st.koopVeld = pos; save(); return { status: 200, ok: true, dobbel: st.dobbel, teKoop: pos }; }
+      if (baas !== h) magBetaal(potje, h, Math.round(magHuur(st, pos, worp)), baas);
+    }
+    if (potje.status === 'klaar') { save(); potje.spelers.forEach(sp => nudge(sp, potje)); return { status: 200, ok: true, dobbel: st.dobbel }; }
+    if (st.dubbels > 0 && !st.failliet[h] && st.cel[h] === 0) { st.mag = 'gooi'; save(); return { status: 200, ok: true, dobbel: st.dobbel, nogEens: true }; }
+    magVolgende(potje);
+    save(); nudge(potje.spelers[potje.beurt], potje);
+    return { status: 200, ok: true, dobbel: st.dobbel };
+  }
+
+  /* ================= partyspellen =================
+     30 Seconden: 2 tegen 2. De verteller pakt een kaart met vijf begrippen en
+     omschrijft ze (bel of aan tafel); de tegenpartij kijkt mee op het scherm,
+     de rader juist niet. Daarna vult de verteller eerlijk in hoeveel er goed
+     waren: het eer-systeem, zoals thuis. Eerste team op 30 wint. */
+  const S_BEGRIPPEN = ('zonnebril,strandstoel,vuurtoren,koffer,paspoort,cocktail,dj,zwembad,hangmat,surfplank,' +
+    'olifant,flamingo,dolfijn,papegaai,schildpad,kameleon,pinguin,zeehond,vlinder,eekhoorn,' +
+    'kapper,piloot,chirurg,scheidsrechter,tolk,imker,loodgieter,fotograaf,dirigent,advocaat,' +
+    'wereldbol,kompas,verrekijker,tandenborstel,paraplu,wasmachine,magnetron,stofzuiger,gieter,ladder,' +
+    'bruiloft,verjaardag,sinterklaas,koningsdag,carnaval,marathon,verhuizing,sollicitatie,examen,vakantie,' +
+    'pannenkoek,stroopwafel,bitterbal,erwtensoep,sushi,paella,tiramisu,croissant,smoothie,barbecue,' +
+    'schaatsen,zeilen,klimmen,boogschieten,jongleren,breakdance,karaoke,schaken,vissen,kamperen,' +
+    'piramide,iglo,molen,wolkenkrabber,aquaduct,vuurwerk,regenboog,lawine,woestijn,waterval,' +
+    'gitaar,dwarsfluit,trommel,accordeon,viool,saxofoon,harp,mondharmonica,triangel,doedelzak,' +
+    'raket,duikboot,heteluchtballon,bakfiets,steppen,tractor,kabelbaan,roltrap,zeppelin,hovercraft').split(',');
+  function secondenInit(potje) {
+    potje.staat = { scores: [0, 0], kaart: null, tot: null };
+  }
+  function secondenZet(potje, h, zet) {
+    const st = potje.staat, actie = String(zet.actie || '');
+    if (actie === 'kaart') {
+      if (st.kaart) return { status: 409, error: 'Er ligt al een kaart; vul eerst de score in.' };
+      const kies = new Set(); while (kies.size < 5) kies.add(S_BEGRIPPEN[crypto.randomInt(0, S_BEGRIPPEN.length)]);
+      st.kaart = [...kies]; st.tot = Date.now() + 33000; // 30 tellen plus even ademhalen
+      save(); potje.spelers.forEach(sp => nudge(sp, potje));
+      return { status: 200, ok: true, kaart: st.kaart, tot: st.tot };
+    }
+    if (actie !== 'score') return { status: 400, error: 'Onbekende actie.' };
+    if (!st.kaart) return { status: 409, error: 'Pak eerst een kaart.' };
+    const goed = Math.max(0, Math.min(5, Number(zet.goed) || 0));
+    const team = potje.teams[potje.beurt];
+    st.scores[team] += goed;
+    st.kaart = null; st.tot = null;
+    if (st.scores[team] >= 30) {
+      potje.status = 'klaar';
+      potje.winnaar = potje.spelers.filter((_, i) => potje.teams[i] === team).map(codenaamVan).join(' & ');
+    } else potje.beurt = (potje.beurt + 1) % potje.spelers.length;
+    save(); potje.spelers.forEach(sp => nudge(sp, potje));
+    return { status: 200, ok: true, goed };
+  }
+
+  /* Doen of Waarheid: 2 t/m 6 spelers, om de beurt kiezen, eerlijk afvinken
+     (eer-systeem). Wie het eerst acht kaarten afrondt wint. De kaarten zijn
+     voor iedereen leuk: niets gemeens, niets wat je niet durft te laten zien. */
+  const W_WAARHEID = ['Wat is het gekste dat je ooit gegeten hebt?', 'Waar lag je als kind wakker van?', 'Wat is je meest onhandige moment van dit jaar?',
+    'Welk compliment is je altijd bijgebleven?', 'Wat zou je doen met een dag onzichtbaarheid?', 'Welk liedje ken je stiekem helemaal uit je hoofd?',
+    'Wat is het beste cadeau dat je ooit gaf?', 'Waar kun je uren over praten?', 'Wat wilde je vroeger later worden?', 'Wat is je slechtste gewoonte?',
+    'Voor wie in dit potje heb je stiekem bewondering, en waarom?', 'Wat is het aardigste dat een vreemde ooit voor je deed?', 'Welke gewoonte van jezelf vind je zelf grappig?',
+    'Wat staat er bovenaan je bucketlist?', 'Welke film heb je vaker dan vijf keer gezien?', 'Wat is je guilty pleasure?'];
+  const W_DOEN = ['Doe je beste dierengeluid, tien tellen lang.', 'Zing het refrein van het laatste liedje dat je hoorde.', 'Vertel een mop; niemand hoeft te lachen.',
+    'Doe twintig seconden je beste robotdans.', 'Praat tot je volgende beurt met een accent.', 'Noem in tien tellen vijf dingen die geel zijn.',
+    'Geef iedereen in het potje een oprecht compliment.', 'Doe je beste slow-motion sprint.', 'Vertel het verhaal van je dag als sportcommentator.',
+    'Teken met je ogen dicht een huis en laat het zien.', 'Doe je beste imitatie van iemand in dit potje (lief houden).', 'Zeg het alfabet achterstevoren zo ver je komt.',
+    'Balanceer tien tellen op een been met je armen wijd.', 'Spreek drie zinnen zonder de letter e.', 'Doe alsof je een prijs wint en houd een dankwoord.'];
+  function waarheidInit(potje) {
+    const st = { punten: {}, kaart: null, wat: null };
+    for (const h of potje.spelers) st.punten[h] = 0;
+    potje.staat = st;
+  }
+  function waarheidZet(potje, h, zet) {
+    const st = potje.staat, actie = String(zet.actie || '');
+    if (actie === 'kies') {
+      if (st.kaart) return { status: 409, error: 'Er ligt al een kaart; rond die eerst af.' };
+      st.wat = zet.wat === 'doen' ? 'doen' : 'waarheid';
+      const lijst = st.wat === 'doen' ? W_DOEN : W_WAARHEID;
+      st.kaart = lijst[crypto.randomInt(0, lijst.length)];
+      save(); potje.spelers.forEach(sp => nudge(sp, potje));
+      return { status: 200, ok: true, kaart: st.kaart };
+    }
+    if (actie !== 'af') return { status: 400, error: 'Onbekende actie.' };
+    if (!st.kaart) return { status: 409, error: 'Kies eerst doen of waarheid.' };
+    if (zet.gedaan === true) st.punten[h]++;
+    st.kaart = null; st.wat = null;
+    if (st.punten[h] >= 8) { potje.status = 'klaar'; potje.winnaar = codenaamVan(h); }
+    else potje.beurt = (potje.beurt + 1) % potje.spelers.length;
+    save(); potje.spelers.forEach(sp => nudge(sp, potje));
+    return { status: 200, ok: true };
+  }
+
+  /* Proost: het drankspel, alleen voor 18+. Kaarten met opdrachten voor de
+     groep; wie niet wil of niet drinkt, drinkt water; dat staat er ook bij.
+     Na 25 kaarten is het potje klaar. Geen winnaar of verliezer. */
+  const P_PROOST = ['{A} proost met iedereen en neemt 1 slok.', 'Iedereen die vandaag heeft gewerkt: 1 slok.', '{A} kiest iemand die 2 slokken neemt.',
+    'Linkerbuur van {A}: 1 slok.', 'Waterronde: iedereen een glas water. Verplicht.', 'Iedereen die weleens te laat op een feest kwam: 1 slok.',
+    '{A} vertelt een geheimpje of neemt 3 slokken.', 'De jongste van het stel: 2 slokken.', 'Iedereen met een huisdier: 1 slok.',
+    '{A} en {B} klinken en nemen samen 1 slok.', 'Wie het laatst gelachen heeft om een eigen grap: 2 slokken.', 'Iedereen die vandaag sport heeft gedaan deelt 2 slokken uit.',
+    '{A} mag een regel instellen die tot het einde geldt.', 'Complimentenronde: wie een compliment krijgt, neemt 1 slok.', 'Iedereen die zijn telefoon vasthoudt: 2 slokken.',
+    '{A} doet een toost op de groep; iedereen 1 slok.', 'Duimen op tafel! De laatste: 2 slokken.', 'Wie ooit een verjaardag vergat: 1 slok.',
+    'Iedereen wijst de beste kok aan; die deelt 3 slokken uit.', '{B} kiest: zelf 2 slokken of iedereen 1.'];
+  function proostInit(potje) {
+    potje.staat = { kaart: 'Proost! Drink met mate, drink water tussendoor en zorg voor elkaar. Klaar? Pak de eerste kaart.', teller: 0, totaal: 25 };
+  }
+  function proostZet(potje, h, zet) {
+    const st = potje.staat;
+    if (String(zet.actie || '') !== 'kaart') return { status: 400, error: 'Onbekende actie.' };
+    st.teller++;
+    if (st.teller > st.totaal) {
+      potje.status = 'klaar'; potje.winnaar = null; potje.gelijk = true;
+      st.kaart = 'Dat was de laatste kaart. Proost, en kom veilig thuis.';
+    } else {
+      const spelers = potje.spelers.map(codenaamVan);
+      const A = spelers[crypto.randomInt(0, spelers.length)];
+      let B = spelers[crypto.randomInt(0, spelers.length)];
+      if (spelers.length > 1) while (B === A) B = spelers[crypto.randomInt(0, spelers.length)];
+      st.kaart = P_PROOST[crypto.randomInt(0, P_PROOST.length)].replace('{A}', A).replace('{B}', B);
+      potje.beurt = (potje.beurt + 1) % potje.spelers.length;
+    }
+    save(); potje.spelers.forEach(sp => nudge(sp, potje));
+    return { status: 200, ok: true, kaart: st.kaart };
+  }
+
   /* ================= lobby: uitnodigen, accepteren, random wachtrij ================= */
+  const INITS = { mejn: mejnInit, schaak: schaakInit, pesten: pestenInit, woord: woordInit,
+    dam: damInit, rummi: rummiInit, magnaat: magnaatInit, seconden: secondenInit, waarheid: waarheidInit, proost: proostInit };
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
-    if (potje.soort === 'mejn') mejnInit(potje);
-    else if (potje.soort === 'schaak') schaakInit(potje);
-    else if (potje.soort === 'pesten') pestenInit(potje);
-    else woordInit(potje);
+    INITS[potje.soort](potje);
+  }
+  // 30 Seconden speel je met twee teams van twee; Proost alleen met 18+
+  function spelGrootte(soort, grootte) {
+    if (soort === 'seconden') return 4;
+    return Math.min(MAXSP[soort] || 2, Math.max(2, Number(grootte) || 2));
   }
   async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, taal }) {
     opschonen();
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekend spel.' };
-    const max = MEERSPELER(soort) ? Math.min(4, Math.max(2, Number(grootte) || 2)) : 2;
+    if (soort === 'proost' && !volwassen(mij)) return { status: 403, error: PROOST_FOUT };
+    const max = spelGrootte(soort, grootte);
     const uitgenodigd = (Array.isArray(vrienden) ? vrienden : []).slice(0, max - 1).filter(v => zijnVrienden(mij, v));
     /* Uitnodigen op codenaam: samen spelen maakt je NIET automatisch vrienden.
        De ander accepteert de uitnodiging zelf, blokkades gelden gewoon en
@@ -481,9 +933,10 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     }
     if (!uitgenodigd.length) return { status: 400, error: 'Nodig minstens een speler uit (vriend of codenaam), of speel random.' };
     if (uitgenodigd.length > max - 1) return { status: 400, error: 'Te veel spelers voor dit spel.' };
-    const potje = { id: rid(5), soort, grootte: max, modus: soort === 'mejn' && modus === 'teams' && max === 4 ? 'teams' : 'vrij',
+    if (soort === 'proost' && uitgenodigd.some(v => !volwassen(v))) return { status: 403, error: PROOST_FOUT };
+    const potje = { id: rid(5), soort, grootte: max, modus: (soort === 'mejn' && modus === 'teams' && max === 4) || soort === 'seconden' ? 'teams' : 'vrij',
       taal: taal === 'en' ? 'en' : 'nl',
-      teams: [0, 1, 0, 1], spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) };
+      teams: [0, 1, 0, 1, 0, 1], spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) };
     S().potjes[potje.id] = potje;
     save();
     uitgenodigd.forEach(v => nudge(v, potje));
@@ -492,6 +945,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   function spelAntwoord(mij, id, akkoord) {
     const p = S().potjes[id];
     if (!p || p.status !== 'wacht' || !p.uitgenodigd.includes(mij)) return { status: 404, error: 'Deze uitnodiging is er niet meer.' };
+    if (akkoord === true && p.soort === 'proost' && !volwassen(mij)) return { status: 403, error: PROOST_FOUT };
     p.uitgenodigd = p.uitgenodigd.filter(x => x !== mij);
     if (akkoord === true) {
       p.spelers.push(mij);
@@ -504,7 +958,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   function spelRandom(mij, soort, grootte, taal) {
     opschonen();
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekend spel.' };
-    const max = MEERSPELER(soort) ? Math.min(4, Math.max(2, Number(grootte) || 2)) : 2;
+    if (soort === 'proost' && !volwassen(mij)) return { status: 403, error: PROOST_FOUT };
+    const max = spelGrootte(soort, grootte);
     const w_taal = taal === 'en' ? 'en' : 'nl';
     const sleutel = soort + ':' + max + (soort === 'woord' ? ':' + w_taal : '');
     const w = S().wachtrij;
@@ -512,7 +967,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     w[sleutel].push(mij);
     if (w[sleutel].length >= max) {
       const spelers = w[sleutel].splice(0, max);
-      const potje = { id: rid(5), soort, grootte: max, modus: 'vrij', taal: w_taal, teams: [0, 1, 0, 1], spelers, uitgenodigd: [],
+      const potje = { id: rid(5), soort, grootte: max, modus: soort === 'seconden' ? 'teams' : 'vrij', taal: w_taal, teams: [0, 1, 0, 1, 0, 1], spelers, uitgenodigd: [],
         status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'random' };
       S().potjes[potje.id] = potje;
       spelStart(potje);
@@ -547,6 +1002,17 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
       if (p.soort === 'mejn') uit.staat = { pionnen: p.spelers.map(sp => st.pionnen[sp].map(x => x.pos)), dobbel: st.dobbel, mag: st.mag, zetten: p.spelers[p.beurt] === mij && st.mag === 'zet' ? mejnZetten(p, mij) : [] };
       else if (p.soort === 'schaak') uit.staat = { bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null };
       else if (p.soort === 'pesten') uit.staat = { hand: st.handen[mij], aantallen: p.spelers.map(sp => st.handen[sp].length), open: st.open[st.open.length - 1], kleurKeuze: st.kleurKeuze, pak: st.pak, richting: st.richting, stapel: st.stapel.length };
+      else if (p.soort === 'dam') uit.staat = { bord: st.bord.join(''), ketting: st.ketting, zetten: p.status === 'bezig' && p.spelers[p.beurt] === mij ? damZetten(p, mij) : [] };
+      else if (p.soort === 'rummi') uit.staat = { rek: st.rekken[mij], tafel: st.tafel, aantallen: p.spelers.map(sp => st.rekken[sp].length), zak: st.zak.length, eerste: st.eerste[mij], passes: st.passes };
+      else if (p.soort === 'magnaat') uit.staat = { velden: M_VELDEN, posities: p.spelers.map(sp => st.posities[sp]), geld: p.spelers.map(sp => st.geld[sp]), failliet: p.spelers.map(sp => !!st.failliet[sp]), cel: p.spelers.map(sp => st.cel[sp] > 0),
+        eigenaar: Object.fromEntries(Object.entries(st.eigenaar).map(([v, h]) => [v, p.spelers.indexOf(h)])), // veld -> spelerindex
+        huizen: st.huizen, mag: st.mag, koopVeld: st.koopVeld, dobbel: st.dobbel, kaart: st.kaart };
+      else if (p.soort === 'seconden') {
+        const rader = (p.beurt + 2) % p.spelers.length; // de teamgenoot raadt en mag de kaart niet zien
+        uit.staat = { scores: st.scores, kaart: st.kaart && p.spelers.indexOf(mij) !== rader ? st.kaart : null, tot: st.tot, rader, bezig: !!st.kaart };
+      }
+      else if (p.soort === 'waarheid') uit.staat = { punten: p.spelers.map(sp => st.punten[sp]), kaart: st.kaart, wat: st.wat, doel: 8 };
+      else if (p.soort === 'proost') uit.staat = { kaart: st.kaart, teller: st.teller, totaal: st.totaal };
       else uit.staat = { bord: st.bord, scores: p.spelers.map(sp => st.scores[sp]), rek: st.rekken[mij], zak: st.zak.length, passes: st.passes };
     }
     return { status: 200, potje: uit };
@@ -555,10 +1021,18 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     const p = S().potjes[id];
     if (!p || !p.spelers.includes(mij)) return { status: 404, error: 'Dit potje bestaat niet (meer).' };
     if (p.status !== 'bezig') return { status: 409, error: 'Dit potje loopt niet (meer).' };
-    if (p.soort !== 'schaak' && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
+    // bouwen of terugverkopen aan de bank mag bij Magnaat ook buiten je beurt
+    const beheer = p.soort === 'magnaat' && zet && (zet.actie === 'bouw' || zet.actie === 'verkoop');
+    if (p.soort !== 'schaak' && !beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
     if (p.soort === 'mejn') return zet && zet.actie === 'gooi' ? mejnGooi(p, mij) : mejnZet(p, mij, zet || {});
     if (p.soort === 'schaak') return schaakZet(p, mij, zet || {});
     if (p.soort === 'pesten') return pestenZet(p, mij, zet || {});
+    if (p.soort === 'dam') return damZet(p, mij, zet || {});
+    if (p.soort === 'rummi') return rummiZet(p, mij, zet || {});
+    if (p.soort === 'magnaat') return magnaatZet(p, mij, zet || {});
+    if (p.soort === 'seconden') return secondenZet(p, mij, zet || {});
+    if (p.soort === 'waarheid') return waarheidZet(p, mij, zet || {});
+    if (p.soort === 'proost') return proostZet(p, mij, zet || {});
     return woordZet(p, mij, zet || {});
   }
   function spelOpgeven(mij, id) {
@@ -574,7 +1048,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   }
 
   /* ================= arcade (Sneek en Tetris): ranglijsten onder vrienden ================= */
-  const ARCADE = ['sneek', 'tetris'];
+  const ARCADE = ['sneek', 'tetris', 'sudoku'];
   function A(spel) {
     const s = S();
     if (!s.arcade) s.arcade = { sneek: s.sneek || {}, tetris: {} }; // neemt oude sneek-scores mee

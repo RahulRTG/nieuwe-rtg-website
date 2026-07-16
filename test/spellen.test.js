@@ -237,6 +237,153 @@ test('tetris: eigen arcadebord naast Sneek, beste score telt', async () => {
   assert.ok(!bord.bord.some(r => r.punten === 42), 'sneekscores lekken niet naar het tetrisbord');
 });
 
+test('dammen: wit begint, slaan is verplicht en een foute zet wordt geweigerd', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'dam', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  let st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(st.potje.staat.bord.length, 100, 'een bord van tien bij tien');
+  assert.equal((st.potje.staat.bord.match(/w/g) || []).length, 20, 'wit heeft twintig schijven');
+  assert.equal(st.potje.beurt, st.potje.ik, 'de maker (wit) begint');
+  assert.ok(st.potje.staat.zetten.length, 'wit heeft zetten');
+  // een zelfbedachte zet die niet in de lijst staat wordt geweigerd
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 0, naar: 55 } }, a.tok)).status, 400);
+  const zet = st.potje.staat.zetten[0];
+  const z = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { van: zet.van, naar: zet.naar } }, a.tok));
+  assert.ok(z.ok, 'een aangeboden zet telt');
+  st = await json(await raw('/member/spel/staat', { id: nieuw.id }, b.tok));
+  assert.equal(st.potje.beurt, st.potje.ik, 'daarna is zwart aan zet');
+  assert.ok(st.potje.staat.zetten.length, 'zwart krijgt zijn eigen zetten aangereikt');
+});
+
+test('rummi: veertien stenen, onzin-setjes geweigerd, pakken wisselt de beurt', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'rummi', grootte: 2, vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  let st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(st.potje.staat.rek.length, 14, 'je begint met veertien stenen');
+  assert.deepEqual(st.potje.staat.aantallen, [14, 14]);
+  assert.equal(st.potje.staat.eerste, false, 'de eerste uitleg moet nog komen');
+  const beurtTok = st.potje.beurt === st.potje.ik ? a.tok : b.tok;
+  // een setje dat geen rij en geen groep is, wordt met naam en toenaam geweigerd
+  const fout = await raw('/member/spel/zet', { id: nieuw.id, zet: { tafel: [['r1', 'r5', 'r9']] } }, beurtTok);
+  assert.equal(fout.status, 400);
+  assert.ok(/geldige rij of groep/.test((await json(fout)).error));
+  // niets kwijt kunnen: pak een steen en de ander is aan de beurt
+  const p1 = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { pak: true } }, beurtTok));
+  assert.ok(p1.gepakt, 'er komt een steen bij');
+  st = await json(await raw('/member/spel/staat', { id: nieuw.id }, beurtTok === a.tok ? a.tok : b.tok));
+  assert.equal(st.potje.staat.rek.length, 15, 'het rek groeit naar vijftien');
+  assert.notEqual(st.potje.beurt, st.potje.ik, 'de beurt is gewisseld');
+});
+
+test('magnaat: 1500 start, kopen op een vrij veld en bouwen vergt de hele kleurgroep', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'magnaat', grootte: 2, vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  let st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.deepEqual(st.potje.staat.geld, [1500, 1500], 'iedereen begint met 1500');
+  assert.equal(st.potje.staat.velden.length, 40, 'veertig velden op het bord');
+  // gooien buiten je beurt kan niet
+  const anderTok = st.potje.beurt === st.potje.ik ? b.tok : a.tok;
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'gooi' } }, anderTok)).status, 409);
+  // rondjes gooien tot iemand iets kan kopen; dan koopt hij het ook echt
+  let gekocht = null, koperTok = null;
+  for (let i = 0; i < 120 && !gekocht; i++) {
+    const s = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+    if (s.potje.status !== 'bezig') break;
+    const tok = s.potje.beurt === s.potje.ik ? a.tok : b.tok;
+    const g = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'gooi' } }, tok));
+    if (g.teKoop != null) {
+      const k = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'koop' } }, tok));
+      assert.ok(k.ok, 'kopen lukt');
+      gekocht = g.teKoop; koperTok = tok;
+    }
+  }
+  assert.ok(gekocht != null, 'binnen 120 beurten komt iemand op een vrij veld');
+  st = await json(await raw('/member/spel/staat', { id: nieuw.id }, koperTok));
+  assert.equal(st.potje.staat.eigenaar[gekocht], st.potje.ik, 'het veld is nu van de koper');
+  assert.ok(st.potje.staat.geld[st.potje.ik] < 1500, 'en de koop is betaald');
+  // bouwen mag pas als de hele kleurgroep van jou is
+  if (st.potje.staat.velden[gekocht].t === 'straat') {
+    const r = await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'bouw', veld: gekocht } }, koperTok);
+    assert.equal(r.status, 400);
+    assert.ok(/kleurgroep/.test((await json(r)).error));
+  }
+});
+
+test('30 seconden: twee teams, de rader ziet de kaart niet, eerlijk scoren telt op', async () => {
+  const { a, b } = await tweeVrienden();
+  // spelers drie en vier komen binnen op codenaam (en worden dus geen vrienden)
+  const t = Date.now() + '' + (teller++);
+  const c = await json(await raw('/auth/register', { name: 'Team C' + t, email: 'tc' + t + '@v.test', phone: '0655' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1993-05-05', tier: 'rtg' }));
+  const d = await json(await raw('/auth/register', { name: 'Team D' + t, email: 'td' + t + '@v.test', phone: '0666' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1995-06-06', tier: 'rtg' }));
+  await raw('/member/connections', {}, c.token); await raw('/member/connections', {}, d.token);
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'seconden', vrienden: [b.key], codenamen: [c.state.user.codename, d.state.user.codename] }, a.tok));
+  assert.ok(nieuw.ok, 'het potje staat klaar');
+  for (const tok of [b.tok, c.token, d.token]) await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, tok);
+  let st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(st.potje.status, 'bezig', 'met vier spelers start het');
+  assert.equal(st.potje.modus, 'teams', 'altijd twee tegen twee');
+  // de verteller pakt een kaart met vijf begrippen
+  const kaart = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'kaart' } }, a.tok));
+  assert.equal(kaart.kaart.length, 5, 'vijf begrippen op de kaart');
+  // de rader (teamgenoot, speler 3) ziet de kaart niet; de tegenpartij wel
+  const alsRader = await json(await raw('/member/spel/staat', { id: nieuw.id }, c.token));
+  assert.equal(alsRader.potje.staat.kaart, null, 'de rader ziet niets');
+  const alsTegen = await json(await raw('/member/spel/staat', { id: nieuw.id }, b.tok));
+  assert.equal((alsTegen.potje.staat.kaart || []).length, 5, 'de tegenpartij controleert mee');
+  // eerlijk invullen: 3 goed
+  await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'score', goed: 3 } }, a.tok);
+  st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.deepEqual(st.potje.staat.scores, [3, 0], 'team een staat op drie');
+  assert.equal(st.potje.beurt, 1, 'daarna vertelt de volgende');
+});
+
+test('doen of waarheid: kiezen, afronden en een punt verdienen', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'waarheid', grootte: 2, vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'af', gedaan: true } }, a.tok)).status, 409, 'eerst kiezen, dan afronden');
+  const k = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'kies', wat: 'doen' } }, a.tok));
+  assert.ok(k.kaart && k.kaart.length > 10, 'er komt een opdracht');
+  await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'af', gedaan: true } }, a.tok);
+  const st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(st.potje.staat.punten[0], 1, 'gedaan is een punt');
+  assert.equal(st.potje.beurt, 1, 'en de beurt schuift door');
+});
+
+test('proost is 18+: minderjarige leden komen er niet in, volwassen leden wel', async () => {
+  const t = Date.now() + '' + (teller++);
+  const jong = await json(await raw('/auth/register', { name: 'Jong ' + t, email: 'jg' + t + '@v.test', phone: '0677' + String(t).slice(-6), password: 'geheim123', geboortedatum: '2010-01-01', tier: 'rtg' }));
+  const { a, b } = await tweeVrienden();
+  await raw('/member/connections', {}, jong.token);
+  // een 16-jarige kan geen Proost-potje starten
+  const geweigerd = await raw('/member/spel/nieuw', { soort: 'proost', codenamen: [a.cn] }, jong.token);
+  assert.equal(geweigerd.status, 403);
+  assert.ok(/18\+/.test((await json(geweigerd)).error), 'de melding zegt waarom');
+  // en ook niet uitgenodigd worden
+  const metJong = await raw('/member/spel/nieuw', { soort: 'proost', codenamen: [jong.state.user.codename] }, a.tok);
+  assert.equal(metJong.status, 403, 'minderjarigen uitnodigen kan niet');
+  // twee volwassen leden spelen gewoon
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'proost', grootte: 2, vrienden: [b.key] }, a.tok));
+  assert.ok(nieuw.ok, 'volwassen leden mogen proosten');
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  const kaart = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'kaart' } }, a.tok));
+  assert.ok(kaart.kaart && kaart.kaart.length > 5, 'de eerste kaart ligt op tafel');
+  const st = await json(await raw('/member/spel/staat', { id: nieuw.id }, b.tok));
+  assert.equal(st.potje.staat.teller, 1, 'kaart een van vijfentwintig');
+});
+
+test('sudoku hoort bij de arcade: scores en ranglijst werken', async () => {
+  const { a, b } = await tweeVrienden();
+  await raw('/member/spel/arcade-score', { spel: 'sudoku', punten: 275 }, a.tok);
+  await raw('/member/spel/arcade-score', { spel: 'sudoku', punten: 410 }, b.tok);
+  const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'sudoku' }, a.tok));
+  assert.equal(bord.bord[0].punten, 410, 'de snelste oplosser staat bovenaan');
+  assert.equal(bord.bord.find(r => r.ik).punten, 275);
+});
+
 test('opgeven: de ander wint het potje', async () => {
   const { a, b } = await tweeVrienden();
   const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));

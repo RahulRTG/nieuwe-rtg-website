@@ -112,6 +112,32 @@ test('de paniekkamer: een knop wordt een voorstel; de boardroom discussieert en 
   await api('boardroom/schakel', { functie: fx.id, aan: true }); // netjes terug
 });
 
+test('platform-statistieken, interne chat met snap en onboarding per kamer', async () => {
+  // de statistieken beslaan het hele huis, van mensen tot de code zelf
+  const s = await api('stats');
+  assert.equal(s.status, 200);
+  const groepen = s.body.stats.map(g => g.groep);
+  for (const g of ['Mensen', 'Beweging', 'Geld', 'De code zelf']) assert.ok(groepen.includes(g), g);
+  // chat: bericht + snap in de sales-kamer; boardroom en paniekkamer hebben eigen kanalen
+  const SNAP = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  assert.equal((await api('kachat/stuur', { kamer: 'sales', naam: 'Stagiair Bo', tekst: 'Hallo team!', foto: SNAP })).status, 200);
+  assert.equal((await api('kachat/stuur', { kamer: 'boardroom', naam: 'Voorzitter', tekst: 'Welkom allemaal.' })).status, 200);
+  assert.equal((await api('kachat/stuur', { kamer: 'kelder', tekst: 'x' })).status, 404);
+  assert.equal((await api('kachat/stuur', { kamer: 'sales' })).status, 400, 'leeg bericht geweigerd');
+  const c = await api('kachat', { kamer: 'sales' });
+  const laatste = c.body.berichten[c.body.berichten.length - 1];
+  assert.equal(laatste.naam, 'Stagiair Bo');
+  assert.ok(laatste.foto && laatste.foto.startsWith('data:image/'), 'de snap kwam mee');
+  // onboarding: warm welkom, huisregels, knoppen en handelingen, per kamer
+  const o = await api('onboarding', { kamer: 'sales' });
+  assert.equal(o.status, 200);
+  assert.match(o.body.onboarding.welkom, /gehoord, gesteund/);
+  assert.ok(o.body.onboarding.regels.some(r => /vertrouwenspersoon/i.test(r)), 'de vertrouwenspersoon staat erin');
+  assert.ok(o.body.onboarding.knoppen.length >= 2 && o.body.onboarding.handelingen.length >= 1);
+  const hr = await api('onboarding', { kamer: 'hr' });
+  assert.notDeepEqual(hr.body.onboarding.knoppen, o.body.onboarding.knoppen, 'elke afdeling zijn eigen knoppen');
+});
+
 test('de verbeterkamer loopt op verzoek een verse ronde', async () => {
   const v = await api('boardroom/verbeter');
   assert.equal(v.status, 200);

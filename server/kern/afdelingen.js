@@ -237,6 +237,87 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     };
   }
 
+  /* ---------- platformbrede statistieken: dezelfde eerlijke cijfers in elke
+     kamer, over de hele code en het hele platform heen ---------- */
+  function platformStats() {
+    const cat = functies.catalogus(functiesStand());
+    const alleF = cat.flatMap(g => g.functies);
+    return { ok: true, stats: [
+      { groep: 'Mensen', items: [
+        ['Leden in de gids', Object.keys(d().memberDir || {}).length],
+        ['Gezinnen (RTF)', Object.keys((d().foundation || {}).gezinnen || {}).length],
+        ['Partners', tel(d().suppliers)],
+        ['Actieve sessies', Object.keys(d().sessions || {}).length]
+      ] },
+      { groep: 'Beweging', items: [
+        ['Orders totaal', tel(d().orders)], ['Orders deze week', recent(d().orders, 'at', 7)],
+        ['Boekingen', tel(d().boekingen)], ['Ritten', tel(d().rides)],
+        ['Salon-posts', tel(d().posts)], ['Kassa-verkopen', tel(d().posSales)]
+      ] },
+      { groep: 'Geld', items: [
+        ['Directe betalingen', tel(d().directBetalingen)], ['Munt-ontvangsten', tel(d().muntOntvangsten)],
+        ['Winkelbestellingen', tel(d().winkelBestellingen)], ['Cadeaukaarten', tel(d().giftcards)]
+      ] },
+      { groep: 'De code zelf', items: [
+        ['Functies in de catalogus', alleF.length],
+        ['Functies aan', alleF.filter(f => f.aan).length],
+        ['Functies met storing', alleF.filter(f => f.storing).length],
+        ['Uptime (uren)', Math.round(process.uptime() / 36) / 100],
+        ['Geheugen (MB)', Math.round(process.memoryUsage().rss / 1048576)]
+      ] }
+    ] };
+  }
+
+  /* ---------- interne chat met snaps, per kamer ---------- */
+  function chatRij(kamerId) {
+    if (!AFDELINGEN[kamerId] && kamerId !== 'boardroom' && kamerId !== 'paniekkamer') return null;
+    if (!d().kantoorChat) d().kantoorChat = {};
+    if (!Array.isArray(d().kantoorChat[kamerId])) d().kantoorChat[kamerId] = [];
+    return d().kantoorChat[kamerId];
+  }
+  function chatLijst(kamerId) {
+    const rij = chatRij(kamerId);
+    if (!rij) return { status: 404, error: 'Deze kamer bestaat niet.' };
+    return { ok: true, berichten: rij.slice(-60) };
+  }
+  function chatStuur(kamerId, naam, tekst, foto) {
+    const rij = chatRij(kamerId);
+    if (!rij) return { status: 404, error: 'Deze kamer bestaat niet.' };
+    const t = String(tekst || '').replace(/[<>]/g, '').trim().slice(0, 500);
+    const f = (typeof foto === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(foto) && foto.length < 300000) ? foto : null;
+    if (!t && !f) return { status: 400, error: 'Typ een bericht of stuur een snap.' };
+    rij.push({ id: crypto.randomBytes(4).toString('hex'), naam: String(naam || 'collega').replace(/[<>]/g, '').slice(0, 30), tekst: t, foto: f, at: nu() });
+    if (rij.length > 200) rij.shift();
+    save();
+    return { ok: true };
+  }
+
+  /* ---------- onboarding per afdeling: nieuwe mensen meteen thuis ---------- */
+  const HUISREGELS = [
+    'Vragen stellen is sterk, nooit dom; niemand hoeft hier iets te raden.',
+    'Fouten meld je meteen en zonder schaamte; we repareren samen, we wijzen niet.',
+    'Elke stagiair krijgt een buddy; je eerste week loop je overal gewoon mee.',
+    'Voel je je niet gehoord of niet veilig? De vertrouwenspersoon zit in de personeels-app, en HR heeft altijd een open deur.',
+    'Privacy is heilig: klantdata bekijk je alleen als je taak erom vraagt.'
+  ];
+  const ONBOARDING_EXTRA = {
+    sales: { knoppen: ['De winkel (/site/winkel.html): wat we verkopen en voor welke prijs', 'Deze kamer: open bestellingen en partner-aanvragen', 'De werklijst: pak een taak, vink hem af'], handelingen: ['Nieuwe bestelling? Binnen twee werkdagen bellen.', 'Partner-aanvraag? Eerst het Business Pass-bewijs controleren.'] },
+    hr: { knoppen: ['Sollicitaties en vacatures in deze kamer', 'Verlof en klok in de personeels-app'], handelingen: ['Elke sollicitant krijgt altijd antwoord, ook bij een nee.', 'Verlofaanvragen beslis je binnen een week.'] },
+    financien: { knoppen: ['Betalingen en munt-ontvangsten in deze kamer', 'Facturen lopen automatisch via de factuurmotor'], handelingen: ['Twijfel over een bedrag? Eerst vragen, nooit gokken.'] },
+    intern: { knoppen: ['Het schakelbord staat in de boardroom; de zekeringen op techniek.html', 'De Zaakdozen in het veld zie je in deze kamer'], handelingen: ['Bij een storing: eerst de verbeterkamer en het techniekbord lezen, dan pas schakelen (via de paniekkamer).'] }
+  };
+  function onboarding(kamerId) {
+    const a = AFDELINGEN[kamerId];
+    if (!a) return { status: 404, error: 'Deze kamer bestaat niet.' };
+    const extra = ONBOARDING_EXTRA[kamerId] || {};
+    return { ok: true, onboarding: {
+      welkom: 'Welkom bij ' + a.naam + '! ' + a.missie + ' Fijn dat je er bent; deze pagina is er zodat jij je vanaf dag een gehoord, gesteund en thuis voelt.',
+      regels: HUISREGELS,
+      knoppen: extra.knoppen || ['De cijfers van deze kamer staan bovenaan; de werklijst eronder.', 'De chat-tab is voor de kamer zelf: vraag alles.', 'De statistieken-tab toont het hele platform, zodat je snapt waar jouw werk landt.'],
+      handelingen: extra.handelingen || ['Begin elke dienst met de werklijst en de verbeterpunten uit de boardroom.', 'Sluit af met een korte notitie in de chat: wat is af, wat blijft liggen.']
+    } };
+  }
+
   /* ---------- de paniekkamer ----------
      Dezelfde knoppen als de boardroom, maar met het vier-ogen-principe: een
      omgezette knop wordt een voorstel. De boardroom accepteert (dan schakelt
@@ -290,5 +371,5 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   }
   function paniekLijst() { return { ok: true, voorstellen: paniekRij().slice(0, 50) }; }
 
-  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, schakel, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, KAMER_IDS } };
+  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, schakel, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, KAMER_IDS } };
 };

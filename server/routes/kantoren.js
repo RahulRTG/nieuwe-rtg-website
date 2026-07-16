@@ -30,5 +30,10 @@ module.exports = (kern) => {
     if (r.ok) sseToOffice('sync', { scope: 'paniek' });
     return r;
   }));
+  // platformbrede statistieken, interne chat met snaps, en onboarding per kamer
+  app.post('/api/office/stats', officeAuth, (req, res) => veilig(res, () => afdelingen.platformStats()));
+  app.post('/api/office/kachat', officeAuth, (req, res) => veilig(res, () => afdelingen.chatLijst(String(req.body.kamer || ''))));
+  app.post('/api/office/kachat/stuur', officeAuth, (req, res) => veilig(res, () => afdelingen.chatStuur(String(req.body.kamer || ''), req.body.naam, req.body.tekst, req.body.foto)));
+  app.post('/api/office/onboarding', officeAuth, (req, res) => veilig(res, () => afdelingen.onboarding(String(req.body.kamer || ''))));
   app.post('/api/office/paniek/bericht', officeAuth, (req, res) => veilig(res, () => afdelingen.paniekBericht(String(req.body.id || ''), String(req.body.wie || ''), req.body.tekst)));
 };

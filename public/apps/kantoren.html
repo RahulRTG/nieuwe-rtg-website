@@ -114,6 +114,13 @@
       <h1 id="kNaam"></h1>
       <span class="deck" id="kMissie" style="margin:0;"></span>
     </div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.8rem;" role="tablist" id="kTabs">
+      <button class="knop stil" data-tab="overzicht" style="padding:.35rem 1rem;font-size:.8rem;">Overzicht</button>
+      <button class="knop stil" data-tab="stats" style="padding:.35rem 1rem;font-size:.8rem;">📊 Platform-statistieken</button>
+      <button class="knop stil" data-tab="chat" style="padding:.35rem 1rem;font-size:.8rem;">💬 Chat & snap</button>
+      <button class="knop stil" data-tab="onboarding" style="padding:.35rem 1rem;font-size:.8rem;">🤝 Onboarding</button>
+    </div>
+    <div id="tabOverzicht">
     <div class="kpis" id="kKpis"></div>
     <div id="kLijsten"></div>
     <h3 class="sec">De werklijst van deze kamer</h3>
@@ -124,6 +131,10 @@
         <button class="knop stil" id="kMaak">+</button>
       </div>
     </div>
+    </div>
+    <div id="tabStats" hidden><div class="kpis" id="kStats"></div></div>
+    <div id="tabChat" hidden></div>
+    <div id="tabOnboarding" hidden></div>
   </section>
 
   <!-- de paniekkamer -->
@@ -133,6 +144,8 @@
       <h1>🚨 De Paniekkamer</h1>
     </div>
     <p class="deck">Dezelfde knoppen als de boardroom, met het vier-ogen-principe: zet je hier een knop om, dan gaat er een voorstel naar de boardroom. Die accepteert, wijst af, of praat er eerst over. Zo kan niemand in paniek in zijn eentje het platform omgooien.</p>
+    <h3 class="sec">Paniekkamer-chat</h3>
+    <div id="pChat"></div>
     <h3 class="sec">Jouw voorstellen</h3>
     <div class="kaart lijst" id="pVoorstellen"><div class="leeg">Nog geen voorstellen.</div></div>
     <h3 class="sec">Het schakelbord (elke omgezette knop wordt een voorstel)</h3>
@@ -146,6 +159,11 @@
       <h1>🏛️ De Boardroom</h1>
     </div>
     <p class="deck">Alles van elke afdeling in een oogopslag, het volledige schakelbord van het platform, en de verbeterkamer die elke dag de cijfers naloopt. Instellingen schakelt de boardroom zelf; codeverbeteringen gaan als voorstel naar de ontwikkelstraat.</p>
+
+    <h3 class="sec">Platform-statistieken (het hele huis)</h3>
+    <div class="kpis" id="bStats"></div>
+    <h3 class="sec">Boardroom-chat</h3>
+    <div id="bChat"></div>
 
     <h3 class="sec">Alle kamers</h3>
     <div class="kpis" id="bKamers"></div>
@@ -209,6 +227,7 @@ async function openKamer(id){
   toon('vKamer');
   $('#kNaam').textContent = d.emoji + ' ' + d.naam;
   $('#kMissie').textContent = d.missie;
+  kamerTab('overzicht');
   $('#kKpis').innerHTML = d.kpis.map(k => '<div class="kaart kpi-tegel"><b>'+esc(String(k.waarde))+'</b><span>'+esc(k.label)+'</span></div>').join('');
   $('#kLijsten').innerHTML = d.lijsten.map(l =>
     '<div class="kaart lijst"><h4>'+esc(l.titel)+'</h4>'+(l.items.length ? '<ul>'+l.items.map(i => '<li>'+esc(i)+'</li>').join('')+'</ul>' : '<div class="leeg">Niets openstaand.</div>')+'</div>').join('');
@@ -229,6 +248,75 @@ $('#kNieuw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#kMaak
 $('#kTerug').addEventListener('click', laadKamers);
 $('#bTerug').addEventListener('click', laadKamers);
 $('#pTerug').addEventListener('click', laadKamers);
+
+/* ---------- platform-statistieken, chat & snap, onboarding ---------- */
+function statsHtml(d){
+  return d.stats.map(g => '<div class="kaart lijst" style="grid-column:1/-1;"><h4>'+esc(g.groep)+'</h4><div class="kpis" style="margin:.5rem 0 0;">'+
+    g.items.map(i => '<div class="kaart kpi-tegel"><b>'+esc(String(i[1]))+'</b><span>'+esc(i[0])+'</span></div>').join('')+'</div></div>').join('');
+}
+let mijnNaam = '';
+try { mijnNaam = localStorage.getItem('rtg_kantoor_naam') || ''; } catch (e) {}
+let chatTimer = null;
+function chatWidget(el, kamerId){
+  el.innerHTML = '<div class="kaart lijst"><div id="cb_'+kamerId+'" style="max-height:20rem;overflow-y:auto;"></div>'+
+    '<div class="taakrij"><input class="veld" data-cnaam style="max-width:9rem;" placeholder="Jouw naam" maxlength="30" value="'+esc(mijnNaam)+'">'+
+    '<input class="veld" data-ctekst style="flex:1;" placeholder="Bericht aan de kamer..." maxlength="500">'+
+    '<label class="knop stil" style="padding:.5rem .8rem;">📸<input type="file" data-csnap accept="image/*" style="display:none;"></label>'+
+    '<button class="knop stil" data-cstuur>Stuur</button></div>'+
+    '<div class="leeg" style="margin-top:.3rem;">Snaps en berichten blijven binnen het kantoor; videobellen doe je via de personeels-app (walkie-talkie en teamcall).</div></div>';
+  const laad = async () => {
+    try {
+      const d = await api('kachat', { kamer: kamerId });
+      const box = el.querySelector('#cb_' + kamerId);
+      if (!box) return;
+      box.innerHTML = d.berichten.length ? d.berichten.map(m =>
+        '<div style="padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.88rem;"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+
+        '<span style="color:var(--soft);font-size:.7rem;">'+new Date(m.at).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span><br>'+
+        (m.foto ? '<img src="'+m.foto+'" alt="Snap van '+esc(m.naam)+'" style="max-width:12rem;border-radius:10px;margin:.2rem 0;">' : '')+esc(m.tekst||'')+'</div>').join('')
+        : '<div class="leeg">Nog stil hier; zeg eens hallo.</div>';
+      box.scrollTop = box.scrollHeight;
+    } catch (e) {}
+  };
+  let snapData = null;
+  el.querySelector('[data-csnap]').addEventListener('change', ev => {
+    const f = ev.target.files && ev.target.files[0]; if (!f) return;
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas'); const sc = Math.min(1, 640 / Math.max(img.width, img.height));
+      c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      snapData = c.toDataURL('image/jpeg', 0.75); meld('Snap staat klaar; druk op Stuur.');
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(f);
+  });
+  el.querySelector('[data-cstuur]').addEventListener('click', async () => {
+    mijnNaam = el.querySelector('[data-cnaam]').value.trim() || 'collega';
+    try { localStorage.setItem('rtg_kantoor_naam', mijnNaam); } catch (e) {}
+    try {
+      await api('kachat/stuur', { kamer: kamerId, naam: mijnNaam, tekst: el.querySelector('[data-ctekst]').value, foto: snapData });
+      el.querySelector('[data-ctekst]').value = ''; snapData = null; laad();
+    } catch (e) { meld(e.message); }
+  });
+  el.querySelector('[data-ctekst]').addEventListener('keydown', e => { if (e.key === 'Enter') el.querySelector('[data-cstuur]').click(); });
+  laad();
+  clearInterval(chatTimer);
+  chatTimer = setInterval(() => { if (!document.hidden && el.offsetParent !== null) laad(); }, 5000);
+}
+function onboardingHtml(o){
+  const blok = (titel, items) => '<div class="kaart lijst"><h4>'+titel+'</h4><ul>'+items.map(i => '<li>'+esc(i)+'</li>').join('')+'</ul></div>';
+  return '<div class="kaart lijst" style="border-color:var(--gold);"><p style="font-size:.95rem;line-height:1.6;">'+esc(o.welkom)+'</p></div>'+
+    blok('De huisregels (zo gaan we met elkaar om)', o.regels)+
+    blok('De knoppen die jij gaat gebruiken', o.knoppen)+
+    blok('De vaste handelingen', o.handelingen);
+}
+function kamerTab(naam){
+  ['Overzicht','Stats','Chat','Onboarding'].forEach(x => { const el = $('#tab'+x); if (el) el.hidden = (x.toLowerCase() !== naam); });
+  if (naam === 'stats') api('stats').then(d => { $('#kStats').innerHTML = statsHtml(d); }).catch(() => {});
+  if (naam === 'chat') chatWidget($('#tabChat'), KAMER);
+  if (naam === 'onboarding') api('onboarding', { kamer: KAMER }).then(d => { $('#tabOnboarding').innerHTML = onboardingHtml(d.onboarding); }).catch(() => {});
+}
+$('#kTabs').querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => kamerTab(b.dataset.tab)));
 
 /* ---------- de paniekkamer ---------- */
 function voorstelKaart(v, alsBoardroom){
@@ -259,6 +347,7 @@ function koppelVoorstellen(el, herlaad){
 async function openPaniek(){
   const [b, p] = await Promise.all([api('boardroom'), api('paniek')]);
   toon('vPaniek');
+  chatWidget($('#pChat'), 'paniekkamer');
   $('#pVoorstellen').innerHTML = p.voorstellen.length ? p.voorstellen.map(v => voorstelKaart(v, false)).join('') : '<div class="leeg">Nog geen voorstellen.</div>';
   koppelVoorstellen($('#pVoorstellen'), openPaniek);
   $('#pSchakels').innerHTML = b.functies.map(g =>
@@ -277,6 +366,8 @@ async function openPaniek(){
 async function openBoard(){
   const d = await api('boardroom');
   toon('vBoard');
+  api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
+  chatWidget($('#bChat'), 'boardroom');
   $('#bKamers').innerHTML = d.kamers.map(k =>
     '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+k.emoji+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');
   $('#bKamers').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => openKamer(b.dataset.kamer)));

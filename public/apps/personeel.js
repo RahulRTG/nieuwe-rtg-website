@@ -991,6 +991,8 @@
      De gespreks-UI en de verbindingen zitten in shared/teamcall.js; hier
      alleen de koppeling met de eigen login en het SSE-kanaal. */
   if (window.TeamCall) TeamCall.init({ API, mij: () => me, T, toast });
+  // en het directe chatbericht naar een collega (shared/collegachat.js)
+  if (window.CollegaChat) CollegaChat.init({ API, mij: () => me, T, toast });
   /* De voorraadbalk op zak: laag, op en 86-adviezen uit het keukenbrein,
      dezelfde informatie als op het grote keuken- en barscherm. */
   let pkWv = null, pkWvAt = 0, pkWvBezig = false;
@@ -1574,6 +1576,7 @@
           const in2 = !!(state.klok && (state.klok.binnen||[]).includes(m.name));
           return '<div class="task"><span class="ic">'+(m.role==='manager'?'⭐':'👤')+'</span><div class="t"><b>'+esc(m.name)+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+(in2?' · 🟢 '+T('pd.ingeklokt','ingeklokt'):'')+'</span></div>'+
             (in2?'<button class="abtn" data-belm="'+m.id+'" data-naam="'+esc(m.name)+'">📞</button>':'')+
+            '<button class="abtn ghost" data-dmm="'+m.id+'" data-naam="'+esc(m.name)+'" style="position:relative;">💬<i data-dmbadge="'+m.id+'" style="display:none;position:absolute;top:-6px;right:-6px;background:#C23A5E;color:#fff;border-radius:999px;font-style:normal;font-size:0.6rem;min-width:1.1rem;height:1.1rem;line-height:1.1rem;text-align:center;"></i></button>'+
             '<button class="abtn ghost" data-buzz="'+m.id+'">📳 '+T('pd.buzz','Tril')+'</button></div>';
         }).join('')+'</div>' : '')+
       '<div class="card"><div class="k">'+T('pd.chat','Teamchat')+'</div><div class="chat">'+
@@ -1605,6 +1608,8 @@
       catch(e){ toast(e.message); }
     });
     document.querySelectorAll('[data-belm]').forEach(b => b.addEventListener('click', () => window.TeamCall && TeamCall.bel(parseInt(b.dataset.belm, 10), b.dataset.naam)));
+    document.querySelectorAll('[data-dmm]').forEach(b => b.addEventListener('click', () => window.CollegaChat && CollegaChat.open(parseInt(b.dataset.dmm, 10), b.dataset.naam)));
+    if (window.CollegaChat) CollegaChat.badges();
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
         toast(d.reached ? '📳 '+d.name+' '+T('pd.buzzed','wordt opgeroepen.') : d.name+' '+T('pd.buzzoff','heeft de app nu niet open.')); }
@@ -1736,6 +1741,7 @@
       src.addEventListener('notify', () => refresh());
       // echt (video)bellen: alle WebRTC-signalen gaan naar de teamcall-module
       if (window.TeamCall) src.addEventListener('rtc', TeamCall.event);
+      if (window.CollegaChat) src.addEventListener('dm', CollegaChat.event);
     } catch(e){}
   }
 

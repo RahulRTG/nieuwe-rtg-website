@@ -50,13 +50,18 @@
     let html = '';
 
     // personeel
-    html += '<div class="card"><div class="tt-h" style="display:flex;justify-content:space-between;align-items:center;">'+T('team.roster','Personeel')+'<button class="obtn" id="buzzAll" style="font-size:0.66rem;">📢 '+T('team.buzzall','Iedereen')+'</button></div>';
+    html += '<div class="card"><div class="tt-h" style="display:flex;justify-content:space-between;align-items:center;">'+T('team.roster','Personeel')+'<span style="display:flex;gap:0.4rem;">'+
+      (a.staffId ? '<button class="obtn" id="teamCallSup" style="font-size:0.66rem;">📹 '+T('team.call','Teamcall')+'</button>' : '')+
+      '<button class="obtn" id="buzzAll" style="font-size:0.66rem;">📢 '+T('team.buzzall','Iedereen')+'</button></span></div>';
     html += staff.map(m => {
       const you = a.staffId && m.id === a.staffId;
+      // iedereen bereikt iedereen: een interne (video)call of een direct bericht
+      const bel = (you || !a.staffId) ? '' : '<button class="tt-buzz" data-belm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.belhint','Interne call (video)')+'">📞</button>';
+      const dm = (you || !a.staffId) ? '' : '<button class="tt-buzz" data-dmm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.dmhint','Direct bericht')+'" style="position:relative;">💬<i data-dmbadge="'+m.id+'" style="display:none;position:absolute;top:-5px;right:-5px;background:#C23A5E;color:#fff;border-radius:999px;font-style:normal;font-size:0.58rem;min-width:1rem;height:1rem;line-height:1rem;text-align:center;"></i></button>';
       const buzz = you ? '' : '<button class="tt-buzz" data-buzz="'+m.id+'" title="'+T('team.buzz','Oproepen (tril)')+'">📳</button>';
       const rm = (a.manager && !you) ? '<button class="tt-rm" data-rm="'+m.id+'">'+T('team.remove','Verwijder')+'</button>' : '';
       const tag = you ? '<span class="you">'+T('team.you','jij')+'</span>' : '';
-      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+(m.func? m.func+' · ':'')+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+buzz+rm+'</div>';
+      return '<div class="tt-person"><span class="av">'+initials(m.name)+'</span><span class="nm"><b>'+m.name+' '+tag+'</b><span>'+(m.func? m.func+' · ':'')+T('role.'+m.role, m.role==='manager'?'Manager':'Medewerker')+'</span></span>'+bel+dm+buzz+rm+'</div>';
     }).join('') || '<div class="softline">'+T('team.nostaff','Nog geen personeel toegevoegd.')+'</div>';
     if (a.manager){
       html += '<div class="tt-add" style="flex-wrap:wrap;"><input id="ttName" placeholder="'+T('team.name','Naam')+'" style="flex:2;min-width:110px;"><input id="ttFunc" placeholder="'+T('team.func','Functie')+'" style="flex:1;min-width:90px;"><select id="ttRole"><option value="staff">'+T('role.staff','Medewerker')+'</option><option value="manager">'+T('role.manager','Manager')+'</option></select><button id="ttAdd">'+T('team.invite','Nodig uit')+'</button></div>';
@@ -133,6 +138,11 @@
     $('#teamWrap').innerHTML = html;
 
     document.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', ()=>removeStaff(Number(b.dataset.rm))));
+    // de interne call en het directe bericht (shared/teamcall.js en collegachat.js)
+    document.querySelectorAll('[data-belm]').forEach(b => b.addEventListener('click', () => window.TeamCall && TeamCall.bel(parseInt(b.dataset.belm, 10), b.dataset.naam)));
+    document.querySelectorAll('[data-dmm]').forEach(b => b.addEventListener('click', () => window.CollegaChat && CollegaChat.open(parseInt(b.dataset.dmm, 10), b.dataset.naam)));
+    if (window.CollegaChat && a.staffId) CollegaChat.badges();
+    const tcs = $('#teamCallSup'); if (tcs) tcs.addEventListener('click', () => window.TeamCall && TeamCall.groep());
     const ba = $('#buzzAll'); if (ba) ba.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { all: true });
         toast('📢 '+T('team.allbuzzed','Hele team opgeroepen')+' ('+d.reached+' '+T('team.online','online')+').'); }
@@ -429,10 +439,15 @@
   // ---- live stream ----
   function startStream(){
     if (!window.EventSource) return;
+    // de interne call en het directe bericht draaien op dezelfde stroom
+    if (window.TeamCall) TeamCall.init({ API, mij: () => { const a = actor(); return a.staffId ? { staffId: a.staffId, name: a.name } : null; }, T, toast });
+    if (window.CollegaChat) CollegaChat.init({ API, mij: () => ({ staffId: actor().staffId, name: actor().name }), T, toast });
     try { source = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
     source.addEventListener('hello', e => { const d=JSON.parse(e.data); notifs = d.unread||[]; renderBell(); });
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
+    source.addEventListener('rtc', e => { if (window.TeamCall) TeamCall.event(e); });
+    source.addEventListener('dm', e => { if (window.CollegaChat) CollegaChat.event(e); });
     source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); if (fact) laadFacturen(); laadAgendaSup(); });
     // de keuken praat met de bediening: bon compleet op de pas -> belletje op
     // elk open scherm van de zaak (bedieningspost, kassa, kantoor)

@@ -819,6 +819,7 @@ function initRealtime() {
   if (!db.data.supplierNotifications) db.data.supplierNotifications = {};
   if (!db.data.supplierActivity) db.data.supplierActivity = {};   // wie deed wat, per bedrijf
   if (!db.data.supplierTeam) db.data.supplierTeam = {};           // interne teamchat, per bedrijf
+  if (!db.data.collegaChats) db.data.collegaChats = {};           // 1-op-1 berichten tussen collega's, per bedrijf
   if (!db.data.live) db.data.live = {};                           // live "onderweg"-toestand per lid (customerKey)
   if (!db.data.partnerApplications) db.data.partnerApplications = []; // bedrijven die partner willen worden
   // sector-features: elke partner een fotopagina, hotels/appartementen kamers

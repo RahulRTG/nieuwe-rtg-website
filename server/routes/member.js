@@ -18,6 +18,7 @@ module.exports = (kern) => {
     zorgContact, fonds, munten, factuur, talen,
     zorgVan, zorgZet, zorgVoor, locDeel, locStopKlant, locMijn,
     assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap,
+    fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -1174,6 +1175,27 @@ app.post('/api/locatie/stop', auth, (req, res) => {
   res.json(r);
 });
 app.post('/api/locatie/mijn', auth, (req, res) => res.json(locMijn(req.session.key)));
+
+/* ---- Fluister: de persoonlijke assistent met geheugen (kern/fluister.js).
+   Voor iedereen, over de eigen gegevens; alles is opvraagbaar en wisbaar. */
+app.post('/api/fluister', auth, async (req, res) => {
+  const r = await fluisterZeg(req.session.key, liveCodename(req.session), req.body.q);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/fluister/profiel', auth, (req, res) => res.json(fluisterProfiel(req.session.key)));
+app.post('/api/fluister/onthoud', auth, (req, res) => {
+  const r = fluisterOnthoud(req.session.key, req.body.tekst);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/fluister/vergeet', auth, (req, res) => {
+  const r = fluisterVergeet(req.session.key, req.body.wat);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+// de inklap-laag deelt (alleen) tellers van schermgebruik, zodat Fluister leert
+app.post('/api/fluister/focus', auth, (req, res) => res.json(fluisterFocus(req.session.key, req.body.scores)));
 
 /* ---- Toren 3: RTG Shared Assets (kern/assets.js) ----
    Altijd 300 tickets per object; een ticket is 24 uur per jaar, tien jaar

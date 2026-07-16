@@ -1,7 +1,8 @@
 /* Domein "staff" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan } = kern;
+  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
+    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = kern;
 
 /* Het urenoverzicht voor de zaak: wie is er nu binnen, wie werkte wanneer en
    hoelang (vandaag en deze week). Elke medewerker klokt via de PDA; het
@@ -115,6 +116,30 @@ app.post('/api/staff/dm/send', supplierAuth, (req, res) => {
     if (c.sup === req.supplier.code && c.staffId === st.id) { sseSend(c.res, 'dm', { vanId: req.actor.staffId, van: req.actor.name, text }); bezorgd++; }
   }
   res.json({ ok: true, bezorgd, messages: t.messages.slice(-100) });
+});
+
+/* Fluister voor de vloer: dezelfde persoonlijke assistent, met een eigen
+   geheugen per personeelslid (nooit gedeeld met de werkgever). */
+const staffKey = req => 'staff:' + req.supplier.code + ':' + req.actor.staffId;
+app.post('/api/staff/fluister', supplierAuth, async (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
+  const r = await fluisterZeg(staffKey(req), req.actor.name, req.body.q);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/staff/fluister/profiel', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
+  res.json(fluisterProfiel(staffKey(req)));
+});
+app.post('/api/staff/fluister/vergeet', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
+  const r = fluisterVergeet(staffKey(req), req.body.wat);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/staff/fluister/focus', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
+  res.json(fluisterFocus(staffKey(req), req.body.scores));
 });
 
 app.post('/api/staff/clock', supplierAuth, (req, res) => {

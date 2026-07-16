@@ -102,7 +102,7 @@
     const guest = user.tier === 'guest';
     ['reizen','betalen','ai','assets'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
     renderHome();
-    if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); }
+    if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); renderFluister(); }
     renderSalon();
     renderTerPlaatse();
     laadBestellen();

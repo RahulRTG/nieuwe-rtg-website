@@ -144,6 +144,56 @@
     }));
   }
 
+  /* ---------- Fluister: de persoonlijke assistent met geheugen ---------- */
+  let fluisterLog = [];
+  let fluisterSyncAt = 0;
+  async function renderFluister(){
+    const el = $('#fluisterWrap'); if (!el) return;
+    if (!API.live){ el.innerHTML = ''; return; }
+    // de inklap-laag deelt (alleen) de gebruikstellers, zodat Fluister leert
+    if (window.FocusUI && Date.now() - fluisterSyncAt > 60000){
+      fluisterSyncAt = Date.now();
+      API.call('/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
+    }
+    let prof;
+    try { prof = await API.call('/fluister/profiel'); } catch(e){ el.innerHTML = ''; return; }
+    el.innerHTML =
+      '<div class="live-start" style="margin-bottom:0.8rem;">' +
+        '<div class="lh">✦ Fluister</div>' +
+        '<div class="ld">' + T('fl.d','Uw persoonlijke assistent. Hij onthoudt wat u hem vertelt, leert van wat u gebruikt, en alles is opvraagbaar en wisbaar.') + '</div>' +
+        (prof.weetjes.length
+          ? '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem;">' + prof.weetjes.map((w, i) =>
+              '<span style="display:inline-flex;align-items:center;gap:0.35rem;border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;font-size:0.68rem;color:var(--txt);">' + esc(w.tekst) +
+              '<button class="js-flweg" data-i="' + i + '" aria-label="' + T('fl.weg','vergeet dit') + '" style="background:none;border:none;color:var(--soft);cursor:pointer;font-size:0.75rem;padding:0;">✕</button></span>').join('') + '</div>'
+          : '<div style="margin-top:0.5rem;font-size:0.68rem;color:var(--soft);">' + T('fl.leeg','Nog geen weetjes. Zeg bijvoorbeeld: "onthoud dat ik cava drink, nooit rode wijn".') + '</div>') +
+        (prof.top.length ? '<div style="margin-top:0.4rem;font-size:0.64rem;color:var(--soft);">' + T('fl.top','Ik zie dat u het meest werkt met') + ': ' + prof.top.map(esc).join(', ') + '.</div>' : '') +
+        '<div id="flThread" style="margin-top:0.55rem;font-size:0.78rem;line-height:1.55;">' + fluisterLog.map(m =>
+          '<div style="margin-top:0.3rem;' + (m.van === 'ik' ? 'color:var(--soft);' : '') + '">' + (m.van === 'ik' ? '› ' : '✦ ') + esc(m.tekst) + '</div>').join('') + '</div>' +
+        '<div style="display:flex;gap:0.45rem;margin-top:0.55rem;">' +
+          '<input id="flIn" placeholder="' + T('fl.ph','Vraag iets, of: onthoud dat...') + '" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.8rem;color:var(--txt);">' +
+          '<button class="live-go js-flstuur" style="margin-top:0;flex:0 0 auto;width:auto;padding:0.6rem 1rem;">' + T('fl.stuur','Stuur') + '</button></div>' +
+        '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.45rem;">' +
+          '<button class="mo-code js-flchip">' + T('fl.chip1','Wat weet je over mij?') + '</button>' +
+          '<button class="mo-code js-flchip" data-q="Wat speelt er nu voor mij?">' + T('fl.chip2','Wat speelt er nu?') + '</button></div>' +
+      '</div>';
+    const stuur = async (q) => {
+      if (!q) return;
+      fluisterLog.push({ van: 'ik', tekst: q });
+      try {
+        const r = await API.call('/fluister', { q });
+        fluisterLog.push({ van: 'fl', tekst: r.antwoord });
+        fluisterLog = fluisterLog.slice(-8);
+        renderFluister();
+      } catch(e){ toast(e.message); }
+    };
+    el.querySelector('.js-flstuur').addEventListener('click', () => { const i = el.querySelector('#flIn'); stuur((i.value || '').trim()); i.value = ''; });
+    el.querySelector('#flIn').addEventListener('keydown', e => { if (e.key === 'Enter'){ stuur((e.target.value || '').trim()); e.target.value = ''; } });
+    el.querySelectorAll('.js-flchip').forEach(b => b.addEventListener('click', () => stuur(b.dataset.q || b.textContent)));
+    el.querySelectorAll('.js-flweg').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/fluister/vergeet', { wat: Number(b.dataset.i) }); renderFluister(); } catch(e){ toast(e.message); }
+    }));
+  }
+
   /* ---------- de zorgvolle keten: zorgprofiel + wie kijkt mee ---------- */
   async function renderZorg(){
     const el = $('#zorgPanel'); if (!el) return;

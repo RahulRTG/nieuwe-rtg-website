@@ -709,6 +709,7 @@
       beheer
     );
   }
+  let pkFlLaatst = ''; // het laatste Fluister-antwoord blijft staan bij her-render
   function renderHulp(){
     const gids = EHBO_GIDS();
     const tr = (zaken && zaken.trust) || { anon: false, messages: [] };
@@ -720,6 +721,13 @@
       gemeld: [T('pd.vl.zm','gemeld'), 'var(--green)']
     };
     $('#hulpWrap').innerHTML =
+      // Fluister: de persoonlijke assistent van dit personeelslid (eigen
+      // geheugen, nooit gedeeld met de werkgever)
+      '<div class="card"><div class="k">✦ Fluister</div>'+
+      '<div style="margin-top:0.35rem;font-size:0.74rem;color:var(--soft);">'+T('pd.fl.d','Uw eigen assistent. Hij onthoudt wat u hem vertelt ("onthoud dat...") en leert van wat u gebruikt; vraag "wat weet je over mij" en wis wanneer u wilt.')+'</div>'+
+      '<div id="pkFlUit" style="margin-top:0.45rem;font-size:0.8rem;line-height:1.5;">'+(pkFlLaatst||'')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="pkFlIn" placeholder="'+T('pd.fl.ph','Vraag iets, of: onthoud dat...')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
+      '<button class="abtn" id="pkFlStuur">'+T('pd.fl.stuur','Stuur')+'</button></div></div>'+
       trainingKaart()+
       '<div class="card"><div class="k">🩹 '+T('pd.eh.h','EHBO, direct bij de hand')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">'+
@@ -762,6 +770,20 @@
         }).join('')+'</div>' : '';
       })();
 
+    // Fluister: vraag stellen; de gebruikstellers van de inklap-laag reizen mee
+    const pkfs = document.getElementById('pkFlStuur');
+    if (pkfs) pkfs.addEventListener('click', async () => {
+      const inp = document.getElementById('pkFlIn');
+      const q = (inp.value || '').trim();
+      if (!q) return;
+      inp.value = '';
+      if (window.FocusUI) API.call('/staff/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
+      try {
+        const r = await API.call('/staff/fluister', { q });
+        pkFlLaatst = '<span style="color:var(--soft);">› '+esc(q)+'</span><br>✦ '+esc(r.antwoord);
+        document.getElementById('pkFlUit').innerHTML = pkFlLaatst;
+      } catch(e){ toast(e.message); }
+    });
     document.querySelectorAll('[data-eh]').forEach(el => el.addEventListener('click', () => {
       const i = Number(el.dataset.eh);
       hulpOpen = hulpOpen === i ? null : i;

@@ -374,8 +374,37 @@
         (mbOpen === r.id ? minibarBlok(r) : '')+
       '</div>';
     }).join('');
+    html += pkDorpKaart();
     wrap.innerHTML = html;
     bindKamers(wrap);
+  }
+  /* Het hoteldorp op zak: dezelfde afdelingslijsten als in de zaak-app.
+     Kies je kant (concierge, parking, security, spa, klusjesman, IT...),
+     zet posten erbij en tik ze een stap verder. */
+  let pkDorp = null, pkDorpAt = 0, pkDorpBezig = false;
+  let pkDorpKant = (() => { try { return localStorage.getItem('rtg_pda_dorp') || 'klussen'; } catch(e){ return 'klussen'; } })();
+  function pkLaadDorp(){
+    if (pkDorpBezig || Date.now() - pkDorpAt < 20000) return;
+    pkDorpBezig = true;
+    API.call('/supplier/dorp').then(d => { pkDorp = d; pkDorpAt = Date.now(); pkDorpBezig = false; renderKamers(); })
+      .catch(() => { pkDorpBezig = false; pkDorpAt = Date.now(); });
+  }
+  function pkDorpKaart(){
+    pkLaadDorp();
+    if (!pkDorp) return '';
+    const afd = pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0];
+    pkDorpKant = afd.key;
+    return '<div class="card"><div class="k">🏘 '+T('pd.dorp','Afdelingen')+'</div>'+
+      '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.4rem;">'+pkDorp.afdelingen.map(a =>
+        '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+a.icon+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
+      '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+afd.icon+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
+      (afd.open.length ? afd.open.map(p => {
+        const i = afd.keten.indexOf(p.status);
+        const volgende = i >= 0 && i < afd.keten.length - 1 ? afd.keten[i + 1] : null;
+        return '<div class="task"><div class="t"><b>'+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</b><span>'+esc(p.status)+' · '+esc(p.door)+' · '+timeAgo(p.updatedAt||p.at)+'</span></div>'+
+          (volgende?'<button class="abtn" data-pkdverder="'+p.id+'">'+esc(volgende)+'</button>':'')+'</div>';
+      }).join('') : '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--soft);">'+T('pd.dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
+      '<button class="abtn ghost" data-pkdnieuw style="width:100%;margin-top:0.5rem;">+ '+T('pd.dorp.nieuw','Zet iets op de lijst')+'</button></div>';
   }
   /* opdrachten: de flow voor schoonmaakbedrijven en zzp'ers. Geen kamerbord
      maar de eigen boekingen: bevestigen, op locatie werken en afronden. */
@@ -407,6 +436,24 @@
       '<button class="abtn" data-mbboek="'+esc(r.name)+'" style="width:100%;margin-top:0.4rem;">'+T('hk.boek','Boek op de kamer')+'</button></div>';
   }
   function bindKamers(wrap){
+    // het hoteldorp: kant kiezen, posten doorzetten, en er iets bij zetten
+    wrap.querySelectorAll('[data-pkdkant]').forEach(b => b.addEventListener('click', () => {
+      pkDorpKant = b.dataset.pkdkant;
+      try { localStorage.setItem('rtg_pda_dorp', pkDorpKant); } catch(e){}
+      renderKamers();
+    }));
+    wrap.querySelectorAll('[data-pkdverder]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/dorp/verder', { id: b.dataset.pkdverder }); pkDorpAt = 0; pkLaadDorp(); } catch(e){ toast(e.message); }
+    }));
+    const dn = wrap.querySelector('[data-pkdnieuw]'); if (dn) dn.addEventListener('click', async () => {
+      const afd = pkDorp && (pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0]);
+      if (!afd) return;
+      const waar = prompt(afd.waarHint) || '';
+      const tekst = prompt(afd.watHint);
+      if (!tekst) return;
+      try { await API.call('/supplier/dorp/post', { afdeling: afd.key, waar, tekst }); toast(afd.icon+' '+T('pd.dorp.gezet','Staat op de lijst.')); pkDorpAt = 0; pkLaadDorp(); }
+      catch(e){ toast(e.message); }
+    });
     wrap.querySelectorAll('[data-khk]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/room/hk', { id: b.dataset.khk, status: b.dataset.st }); await refresh(); } catch(e){ toast(e.message); }
     }));

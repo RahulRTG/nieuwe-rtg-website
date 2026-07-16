@@ -1114,6 +1114,58 @@
       '<div class="softline" style="margin-top:0.45rem;">'+T('rc.plan.s','Goud is bevestigd, rood slaapt er nu; leeg is vrij om te verkopen.')+'</div></div>';
   }
 
+  /* ---- het hoteldorp: negen afdelingen, een motor ----
+     Elke afdeling (front office, guest manager, concierge, parking, security,
+     gym, spa, klusjesman, IT) heeft dezelfde lichte lijst: waar + wat + wie,
+     met een eigen statusketen. Een tik zet de post een stap verder. */
+  let dorpKant = (() => { try { return localStorage.getItem('rtg_dorp_kant') || 'frontoffice'; } catch(e){ return 'frontoffice'; } })();
+  async function renderDorp(){
+    const el = $('#dorpWrap'); if (!el) return;
+    if (!Array.isArray(state.rooms)){ el.innerHTML = ''; return; }
+    let d; try { d = await API.call('/supplier/dorp', {}); } catch(e){ el.innerHTML = ''; return; }
+    const afd = d.afdelingen.find(a => a.key === dorpKant) || d.afdelingen[0];
+    dorpKant = afd.key;
+    const rij = p => {
+      const i = afd.keten.indexOf(p.status);
+      const volgende = i >= 0 && i < afd.keten.length - 1 ? afd.keten[i + 1] : null;
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-dpost="'+p.id+'">'+
+        '<span>'+(p.waar?'<b>'+esc(p.waar)+'</b> · ':'')+esc(p.tekst)+' <span class="sub">'+esc(p.door)+' · '+timeAgo(p.updatedAt||p.at)+'</span></span>'+
+        (volgende
+          ? '<span style="display:flex;gap:0.4rem;align-items:center;flex-shrink:0;"><span class="pill bereiding">'+esc(p.status)+'</span><button class="obtn primary js-dverder">'+esc(volgende)+'</button></span>'
+          : '<span class="pill klaar" style="flex-shrink:0;">'+esc(p.status)+'</span>')+
+      '</div>';
+    };
+    el.innerHTML =
+      '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+d.afdelingen.map(a =>
+        '<button class="obtn'+(a.key===dorpKant?' primary':'')+'" data-dkant="'+a.key+'">'+a.icon+' '+esc(a.label)+(a.openAantal?' · '+a.openAantal:'')+'</button>').join('')+'</div>'+
+      '<div class="card"><div class="tt-h">'+afd.icon+' '+esc(afd.label)+' <span class="sub">('+afd.keten.join(' · ')+')</span></div>'+
+        (afd.open.length ? afd.open.map(rij).join('') : '<div class="softline" style="margin-top:0.5rem;">'+T('dorp.leeg','Niets open bij deze afdeling.')+'</div>')+
+        (afd.klaar.length ? '<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('dorp.klaar','Net afgerond')+'</div>'+afd.klaar.map(rij).join('') : '')+
+        '<div class="tt-add" style="flex-wrap:wrap;margin-top:0.7rem;">'+
+          '<input id="dorpWaar" placeholder="'+esc(afd.waarHint)+'" style="flex:1;min-width:110px;">'+
+          '<input id="dorpTekst" placeholder="'+esc(afd.watHint)+'" style="flex:2;min-width:160px;">'+
+          '<button id="dorpAdd">'+T('dorp.zet','Zet erbij')+'</button></div>'+
+      '</div>';
+    el.querySelectorAll('[data-dkant]').forEach(b => b.addEventListener('click', () => {
+      dorpKant = b.dataset.dkant;
+      try { localStorage.setItem('rtg_dorp_kant', dorpKant); } catch(e){}
+      renderDorp();
+    }));
+    el.querySelectorAll('[data-dpost]').forEach(elp => {
+      const knop = elp.querySelector('.js-dverder');
+      if (knop) knop.addEventListener('click', async () => {
+        try { await API.call('/supplier/dorp/verder', { id: elp.dataset.dpost }); renderDorp(); } catch(e){ toast(e.message); }
+      });
+    });
+    const add = el.querySelector('#dorpAdd'); if (add) add.addEventListener('click', async () => {
+      const waar = el.querySelector('#dorpWaar').value.trim();
+      const tekst = el.querySelector('#dorpTekst').value.trim();
+      if (!tekst){ toast(T('dorp.vul','Schrijf kort op wat er speelt.')); return; }
+      try { await API.call('/supplier/dorp/post', { afdeling: dorpKant, waar, tekst }); toast(afd.icon+' '+T('dorp.gezet','Staat op de lijst van')+' '+afd.label+'.'); renderDorp(); }
+      catch(e){ toast(e.message); }
+    });
+  }
+
   // ---- minibar-telling per kamer ----
   let mbRoom = null;       // gekozen kamer
   let mbQty = {};          // artikel-id -> gebruikt aantal

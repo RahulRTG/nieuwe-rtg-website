@@ -149,6 +149,35 @@ test('housekeeping-prioriteit en de hotelcijfers in de shift-samenvatting', asyn
   assert.equal(shift.verblijf.adr, Math.round(kamer.price * 100) / 100, 'ADR is de gemiddelde kamerprijs van wie er slaapt');
 });
 
+test('het hoteldorp: negen afdelingen met dezelfde motor, elk een eigen keten', async () => {
+  const dorp = (await api('supplier/dorp', {}, hotel)).body;
+  assert.equal(dorp.afdelingen.length, 9, 'front office tot en met IT');
+  const keys = dorp.afdelingen.map(a => a.key);
+  for (const k of ['frontoffice', 'guest', 'concierge', 'parking', 'security', 'gym', 'spa', 'klussen', 'it']) {
+    assert.ok(keys.includes(k), 'afdeling ' + k + ' bestaat');
+  }
+  // de klusjesman: post erbij, en de keten open -> bezig -> klaar
+  const klus = await api('supplier/dorp/post', { afdeling: 'klussen', waar: 'Terras', tekst: 'Lamp bij tafel 4 vervangen' }, hotel);
+  assert.equal(klus.status, 200);
+  assert.equal(klus.body.post.status, 'open');
+  assert.equal((await api('supplier/dorp/verder', { id: klus.body.post.id }, hotel)).body.post.status, 'bezig');
+  assert.equal((await api('supplier/dorp/verder', { id: klus.body.post.id }, hotel)).body.post.status, 'klaar');
+  assert.equal((await api('supplier/dorp/verder', { id: klus.body.post.id }, hotel)).status, 409, 'klaar is klaar');
+  // parking heeft zijn eigen keten: geparkeerd -> voorrijden -> staat voor
+  const auto = await api('supplier/dorp/post', { afdeling: 'parking', waar: 'P2-14', tekst: 'Blauwe Defender, Sea-view suite' }, hotel);
+  assert.equal(auto.body.post.status, 'geparkeerd');
+  assert.equal((await api('supplier/dorp/verder', { id: auto.body.post.id }, hotel)).body.post.status, 'voorrijden');
+  // het dorpsplein telt: parking heeft een open post, klussen is klaar
+  const na = (await api('supplier/dorp', {}, hotel)).body;
+  assert.equal(na.afdelingen.find(a => a.key === 'parking').openAantal, 1);
+  assert.equal(na.afdelingen.find(a => a.key === 'klussen').openAantal, 0);
+  assert.ok(na.afdelingen.find(a => a.key === 'klussen').klaar.length >= 1, 'de afgeronde klus blijft even zichtbaar');
+  assert.ok(na.totaalOpen >= 1);
+  // een onbekende afdeling en een lege post ketsen af
+  assert.equal((await api('supplier/dorp/post', { afdeling: 'casino', tekst: 'x' }, hotel)).status, 400);
+  assert.equal((await api('supplier/dorp/post', { afdeling: 'spa', tekst: '' }, hotel)).status, 400);
+});
+
 test('annuleren en no-show: het lid trekt terug, de receptie meldt wie niet kwam', async () => {
   // annuleren: een nieuwe aanvraag, meteen weer ingetrokken
   const a = await api('verblijf', { supplierCode: 'HOSHI', roomId: kamer.id, aankomst: dagPlus(10), vertrek: dagPlus(12) }, lid);

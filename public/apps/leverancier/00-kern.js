@@ -102,6 +102,7 @@
     beveiliging:{ label:'Commandocentrum', svg:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/>', cap:'beveiliging' },
     paspoort: { label:'Identiteit', svg:'<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="10" r="2.4"/><path d="M8 16c0.5-2 2.2-3 4-3s3.5 1 4 3"/>' },
     rooms:    { label:'Kamers',    svg:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/><path d="M3 18h18M3 21v-3M21 21v-3"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>', cap:'bookings' },
+    dorp:     { label:'Afdelingen', svg:'<path d="M3 21h18"/><path d="M5 21V8l4-3 4 3v13"/><path d="M13 21v-9h6v9"/><path d="M8 12h.01M8 15h.01M16 15h.01M16 18h.01"/>', cap:'bookings' },
     minibar:  { label:'Minibar',   svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 12h14"/><path d="M9 7.5v1.5M9 15.5v1.5"/>', cap:'bookings' },
     tafels:   { label:'Tafels',    svg:'<circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>', cap:'menu' },
     klussen:  { label:'Klussen',   svg:'<path d="M14.5 6.5a4 4 0 0 0-5.6 4.9L3 17.3V21h3.7l5.9-5.9a4 4 0 0 0 4.9-5.6l-2.6 2.6-2.4-2.4z"/>', cap:'bookings' },

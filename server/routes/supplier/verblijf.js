@@ -2,7 +2,7 @@
    Beslissen, inchecken en no-show zijn vloerhandelingen (iedereen achter de
    balie); het bord is leesbaar voor het hele team. */
 module.exports = (kern) => {
-  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity } = kern;
+  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity, dorpPost, dorpVerder, dorpOverzicht } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error, openLast: r.openLast }) : res.json(r);
 
   app.post('/api/supplier/receptie', supplierAuth, (req, res) => {
@@ -33,6 +33,30 @@ module.exports = (kern) => {
   app.post('/api/supplier/verblijf/noshow', supplierAuth, (req, res) => {
     const r = verblijfNoShow(req.supplier, String(req.body.id || ''));
     if (r.ok) logActivity(req.supplier.code, req.actor, 'meldde het verblijf van ' + r.verblijf.codenaam + ' als no-show');
+    stuur(res, r);
+  });
+
+  /* Het hoteldorp: negen afdelingen, een motor. Iedereen op de vloer kan
+     posten zetten en doorzetten; het dorpsplein is voor het hele team. */
+  const eisDorp = (req, res) => {
+    if (Array.isArray(req.supplier.rooms)) return true;
+    res.status(409).json({ error: 'Het hoteldorp is er voor bedrijven met kamers.' });
+    return false;
+  };
+  app.post('/api/supplier/dorp', supplierAuth, (req, res) => {
+    if (!eisDorp(req, res)) return;
+    res.json(dorpOverzicht(req.supplier));
+  });
+  app.post('/api/supplier/dorp/post', supplierAuth, (req, res) => {
+    if (!eisDorp(req, res)) return;
+    const r = dorpPost(req.supplier, req.body.afdeling, req.body.waar, req.body.tekst, req.actor.name);
+    if (r.ok) logActivity(req.supplier.code, req.actor, 'zette een post bij ' + r.post.afdeling + ': ' + r.post.tekst.slice(0, 60));
+    stuur(res, r);
+  });
+  app.post('/api/supplier/dorp/verder', supplierAuth, (req, res) => {
+    if (!eisDorp(req, res)) return;
+    const r = dorpVerder(req.supplier, String(req.body.id || ''), req.actor.name);
+    if (r.ok) logActivity(req.supplier.code, req.actor, 'zette de post "' + r.post.tekst.slice(0, 40) + '" op ' + r.post.status);
     stuur(res, r);
   });
 };

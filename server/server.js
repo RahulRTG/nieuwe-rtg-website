@@ -2671,6 +2671,9 @@ Object.assign(kern, require('./kern/keuken')({ db, save, crypto, schoon, notifyS
 /* De verblijf-laag (kern/verblijf.js): echte verblijven met datums, het
    receptiebord en de check-in/check-out-keten; logies als kamerlast. */
 Object.assign(kern, require('./kern/verblijf')({ db, save, crypto, schoon, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer }));
+/* Het hoteldorp (kern/hoteldorp.js): negen afdelingen met hetzelfde lichte
+   gereedschap: postenlijsten met een eigen statusketen, en het dorpsplein. */
+Object.assign(kern, require('./kern/hoteldorp')({ save, crypto, schoon, sseToSupplier, notifySupplier }));
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

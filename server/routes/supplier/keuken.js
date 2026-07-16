@@ -8,6 +8,8 @@ module.exports = (kern) => {
   const sein = code => sseToSupplier(code, 'sync', { scope: 'voorraad' });
 
   app.post('/api/supplier/keuken', supplierAuth, (req, res) => res.json(keuken.overzicht(req.supplier)));
+  // het uittreksel voor de werkvloer-schermen: laag, op en de 86-adviezen
+  app.post('/api/supplier/keuken/werkvloer', supplierAuth, (req, res) => res.json(keuken.werkvloer(req.supplier)));
 
   app.post('/api/supplier/keuken/recept', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;

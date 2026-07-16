@@ -98,6 +98,24 @@ test('onder het minimum verschijnt het inkoopadvies: aanvullen tot twee keer min
   assert.equal(adv.kosten, 9 * 7.5);
 });
 
+test('de werkvloer-balk: laag en op zichtbaar, en een 86-advies als een ingredient op is', async () => {
+  // de wijn staat op 3 (laag); zet het lam op nul: het gerecht verdient een 86
+  await api('supplier/keuken/telling', { artikelId: lam.id, geteld: 0 });
+  const w = (await api('supplier/keuken/werkvloer')).body;
+  assert.ok(w.laag.some(a => a.id === wijn.id), 'de wijn staat als laag op de balk');
+  assert.ok(w.op.some(a => a.id === lam.id), 'het lam staat als OP op de balk');
+  const adv = w.adviezen.find(a => a.menuItemId === menuItem.id);
+  assert.ok(adv, 'het gerecht krijgt een 86-advies');
+  assert.equal(adv.ingredient, 'Lamsrack');
+  // de knop op het scherm: 86 zetten laat het advies verdwijnen
+  assert.equal((await api('supplier/menu/86', { itemId: menuItem.id, op: true })).status, 200);
+  const na = (await api('supplier/keuken/werkvloer')).body;
+  assert.ok(!na.adviezen.some(a => a.menuItemId === menuItem.id), 'na de 86 is het advies weg');
+  // netjes terug voor de vervolgtest: weer beschikbaar en voorraad terug
+  await api('supplier/menu/86', { itemId: menuItem.id, op: false });
+  await api('supplier/keuken/telling', { artikelId: lam.id, geteld: 14.2 });
+});
+
 test('de betaalde gastbestelling boekt ook af (de tweede verkoopnaad)', async () => {
   // een lid bestelt het gerecht en betaalt; check de leden-bestelflow end-to-end
   const lid = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) })).json();

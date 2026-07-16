@@ -784,12 +784,31 @@
       ).join('')+'</div>';
   }
 
+  /* De voorraadbalk op de werkvloer: wat is laag, wat is op, en welke
+     gerechten verdienen een 86 omdat een ingredient uit het recept op is.
+     Gevoed door het keukenbrein (kern/keuken.js), zuinig ververst. */
+  let wvInfo = null, wvAt = 0, wvBezig = false;
+  function laadWerkvloer(){
+    if (wvBezig || Date.now() - wvAt < 15000) return;
+    wvBezig = true;
+    API.call('/supplier/keuken/werkvloer').then(d => { wvInfo = d; wvAt = Date.now(); wvBezig = false; renderStation(); }).catch(() => { wvBezig = false; wvAt = Date.now(); });
+  }
+  function werkvloerBalk(){
+    if (!wvInfo) return '';
+    const chips = [];
+    (wvInfo.adviezen||[]).forEach(a => chips.push('<button class="obtn warn" data-st86adv="'+a.menuItemId+'">\u26d4 86: '+esc(a.gerecht)+' ('+esc(a.ingredient)+' '+T('st.isop','is op')+')</button>'));
+    (wvInfo.op||[]).forEach(a => chips.push('<span class="ad" style="color:#FF8589;font-weight:600;">'+esc(a.naam)+' '+T('st.op','OP')+'</span>'));
+    (wvInfo.laag||[]).forEach(a => chips.push('<span class="ad">'+esc(a.naam)+' '+T('st.laag','laag')+' ('+a.aantal+' '+esc(a.eenheid)+')</span>'));
+    chips.push('<button class="obtn ghost" data-stderf>\u267b '+T('st.derf','Derving melden')+'</button>');
+    return '<div class="allday"><span class="ad-h">\ud83d\udce6 '+T('st.voorraad','Voorraad')+'</span>'+chips.join('')+'</div>';
+  }
   function renderStation(){
     const el = $('#stBody'); if (!el || !state) return;
     $('#stBiz').textContent = S ? S.name : '';
     $('#stLabel').textContent = stationLabel(stationMode) + (stationMode === 'keuken' ? ' \u00b7 ' + T('ks.'+keukenSectie, (KSECTIES[keukenSectie]||['',''])[1]) : '');
     const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
     let html = '';
+    if (stationMode === 'keuken' || stationMode === 'bar'){ laadWerkvloer(); html += werkvloerBalk(); }
     if (stationMode === 'bediening'){
       /* De bedieningspas: wat kan er NU gelopen worden en waarheen. Spoed en
          het langst wachtende eerst; de bestemming (tafel of ophaalcode) staat
@@ -1180,6 +1199,26 @@
 
   function bindStation(el){
     if (stationMode === 'keuken') loadCoach(el);
+    // de voorraadbalk: 86 zetten op advies en derving melden vanaf de vloer
+    el.querySelectorAll('[data-st86adv]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/menu/86', { itemId: b.dataset.st86adv, op: true });
+        toast('⛔ '+T('st.86gezet','86 gezet; leden kunnen het niet meer bestellen.'));
+        wvAt = 0; laadWerkvloer(); await refresh();
+      } catch(e){ toast(e.message); }
+    }));
+    const stDerf = el.querySelector('[data-stderf]'); if (stDerf) stDerf.addEventListener('click', async () => {
+      const naam = prompt(T('st.derfwat','Welk artikel is er weg (naam van de voorraadlijst)?')); if (!naam) return;
+      const art = ((wvInfo && wvInfo.artikelen) || []).find(a => a.naam.toLowerCase() === naam.trim().toLowerCase());
+      if (!art){ toast(T('st.derfgeen','Dat artikel staat niet op de voorraadlijst.')); return; }
+      const hv = prompt(T('vr.derfvraag','Hoeveel is er weg (breuk, derving)?')); if (!hv) return;
+      const reden = prompt(T('vr.derfreden','Reden?')) || '';
+      try {
+        await API.call('/supplier/keuken/verspilling', { artikelId: art.id, hoeveelheid: Number(String(hv).replace(',', '.')), reden });
+        toast('♻ '+T('st.derfok','Geboekt in het voorraadlogboek.'));
+        wvAt = 0; laadWerkvloer();
+      } catch(e){ toast(e.message); }
+    });
     el.querySelectorAll('.rcp-item').forEach(s2 => s2.addEventListener('click', () => dishSheet(s2.dataset.rcp)));
     el.querySelectorAll('[data-settbl]').forEach(b => b.addEventListener('click', async () => {
       const t = prompt(T('st.tblq','Welke tafel? (leeg = geen tafel)'), b.dataset.cur || '');

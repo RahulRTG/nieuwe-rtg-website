@@ -845,17 +845,36 @@
      De gespreks-UI en de verbindingen zitten in shared/teamcall.js; hier
      alleen de koppeling met de eigen login en het SSE-kanaal. */
   if (window.TeamCall) TeamCall.init({ API, mij: () => me, T, toast });
+  /* De voorraadbalk op zak: laag, op en 86-adviezen uit het keukenbrein,
+     dezelfde informatie als op het grote keuken- en barscherm. */
+  let pkWv = null, pkWvAt = 0, pkWvBezig = false;
+  function pkLaadWerkvloer(){
+    if (pkWvBezig || Date.now() - pkWvAt < 20000) return;
+    pkWvBezig = true;
+    API.call('/supplier/keuken/werkvloer').then(d => { pkWv = d; pkWvAt = Date.now(); pkWvBezig = false; renderKeuken(); }).catch(() => { pkWvBezig = false; pkWvAt = Date.now(); });
+  }
+  function pkVoorraadKaart(){
+    if (!pkWv || (!(pkWv.adviezen||[]).length && !(pkWv.op||[]).length && !(pkWv.laag||[]).length)) return '';
+    return '<div class="card" style="border-left:4px solid var(--gold,#A98F1C);"><div class="k">📦 '+T('st.voorraad','Voorraad')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.4rem;align-items:center;">'+
+      (pkWv.adviezen||[]).map(a => '<button class="abtn" data-pk86="'+a.menuItemId+'" style="border-color:#E5484D;color:#FF8589;">⛔ 86: '+esc(a.gerecht)+' ('+esc(a.ingredient)+' '+T('st.isop','is op')+')</button>').join('')+
+      (pkWv.op||[]).map(a => '<span style="font-size:0.78rem;color:#FF8589;font-weight:600;">'+esc(a.naam)+' '+T('st.op','OP')+'</span>').join('')+
+      (pkWv.laag||[]).map(a => '<span style="font-size:0.78rem;color:var(--soft);">'+esc(a.naam)+' '+T('st.laag','laag')+' ('+a.aantal+' '+esc(a.eenheid)+')</span>').join('')+
+      '<button class="abtn ghost" data-pkderf>♻ '+T('st.derf','Derving melden')+'</button></div></div>';
+  }
   function renderKeuken(){
     const tabBtn = document.getElementById('tabKeuken');
     if (tabBtn) tabBtn.style.display = heeftKeuken() ? '' : 'none';
     const wrap = $('#keukenWrap'); if (!wrap) return;
     if (!heeftKeuken()){ wrap.innerHTML = ''; return; }
+    pkLaadWerkvloer();
     const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status) && pkSecties(o).length);
     // kant kiezen = inloggen op dat station; de keuze blijft op dit toestel staan
     let html = '<div class="card" style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">'+Object.keys(PDA_KANTEN).map(k =>
       '<button class="abtn'+(pdaKant===k?'':' ghost')+'" data-pkkant="'+k+'">'+PDA_KANTEN[k][0]+' '+T('ks.'+k, PDA_KANTEN[k][1])+'</button>').join('')+
       '<button class="abtn'+(pdaPasBel?'':' ghost')+'" data-pkbel style="margin-left:auto;">'+(pdaPasBel?'🔔':'🔕')+' '+T('pd.k.pasbel','Pas-bel')+'</button>'+
       (ikBinnen()?'':'<span style="flex-basis:100%;font-size:0.68rem;color:var(--soft);">⏱ '+T('pd.k.nietin','Niet ingeklokt: pings staan uit tot je inklokt (tab Vandaag).')+'</span>')+'</div>';
+    html += pkVoorraadKaart();
     if (pdaKant === 'pas'){
       const opDePas = live.filter(o => (o.stations||{}).keuken === 'klaar').sort((a,b) => ((b.spoed?1:0)-(a.spoed?1:0)) || (new Date(a.pasAt||a.at)-new Date(b.pasAt||b.at)));
       const bezig = live.filter(o => (o.stations||{}).keuken !== 'klaar');
@@ -927,6 +946,26 @@
       try { localStorage.setItem('rtg_pda_kant', pdaKant); } catch(e){}
       renderKeuken();
     }));
+    // de voorraadbalk: 86 op advies en derving melden, recht vanaf de vloer
+    wrap.querySelectorAll('[data-pk86]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/menu/86', { itemId: b.dataset.pk86, op: true });
+        toast('⛔ '+T('st.86gezet','86 gezet; leden kunnen het niet meer bestellen.'));
+        pkWvAt = 0; pkLaadWerkvloer(); await refresh();
+      } catch(e){ toast(e.message); }
+    }));
+    const pkDerf = wrap.querySelector('[data-pkderf]'); if (pkDerf) pkDerf.addEventListener('click', async () => {
+      const naam = prompt(T('st.derfwat','Welk artikel is er weg (naam van de voorraadlijst)?')); if (!naam) return;
+      const art = ((pkWv && pkWv.artikelen) || []).find(a => a.naam.toLowerCase() === naam.trim().toLowerCase());
+      if (!art){ toast(T('st.derfgeen','Dat artikel staat niet op de voorraadlijst.')); return; }
+      const hv = prompt(T('vr.derfvraag','Hoeveel is er weg (breuk, derving)?')); if (!hv) return;
+      const reden = prompt(T('vr.derfreden','Reden?')) || '';
+      try {
+        await API.call('/supplier/keuken/verspilling', { artikelId: art.id, hoeveelheid: Number(String(hv).replace(',', '.')), reden });
+        toast('♻ '+T('st.derfok','Geboekt in het voorraadlogboek.'));
+        pkWvAt = 0; pkLaadWerkvloer();
+      } catch(e){ toast(e.message); }
+    });
     wrap.querySelectorAll('[data-pkover]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/overschot', { op: 'gebruikt', id: b.dataset.pkover }); await refresh(); openTab('keuken'); } catch(e){ toast(e.message); }
     }));

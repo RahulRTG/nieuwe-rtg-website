@@ -157,6 +157,28 @@ module.exports = ({ save, crypto, schoon, notifySupplier }) => {
         kosten: rond2(Math.max(1, Math.ceil(a.min * 2 - a.aantal)) * (Number(a.kostprijs) || 0))
       }));
   }
+  /* Het werkvloer-uittreksel voor het keukenscherm, het barscherm en de PDA:
+     wat is laag, wat is op, en welke gerechten verdienen een 86-advies omdat
+     een ingredient uit het recept op is. Compact, zodat de schermen het elke
+     verversing kunnen meevragen. */
+  function werkvloer(s) {
+    const inRecept = new Set();
+    for (const regels of Object.values(recepten(s))) for (const r of regels) inRecept.add(r.artikelId);
+    const alle = artikelen(s);
+    const op = alle.filter(a => a.aantal <= 0 && (a.min > 0 || inRecept.has(a.id)));
+    const laag = alle.filter(a => a.min > 0 && a.aantal > 0 && a.aantal <= a.min);
+    const adviezen = [];
+    for (const m of (Array.isArray(s.menu) ? s.menu : [])) {
+      if (m.uitverkocht) continue;
+      for (const r of (recepten(s)[m.id] || [])) {
+        const a = artikelVan(s, r.artikelId);
+        if (a && a.aantal <= 0) { adviezen.push({ menuItemId: m.id, gerecht: m.name, ingredient: a.naam }); break; }
+      }
+    }
+    const kaal = a => ({ id: a.id, naam: a.naam, aantal: a.aantal, eenheid: a.eenheid });
+    return { ok: true, op: op.map(kaal), laag: laag.map(kaal), adviezen, artikelen: alle.map(a => ({ id: a.id, naam: a.naam })) };
+  }
+
   function overzicht(s) {
     const lijst = artikelen(s).map(a => Object.assign({}, a, { waarde: rond2((Number(a.kostprijs) || 0) * Math.max(0, a.aantal)) }));
     return {
@@ -170,5 +192,5 @@ module.exports = ({ save, crypto, schoon, notifySupplier }) => {
     };
   }
 
-  return { keuken: { overzicht, receptZet, receptOverzicht, boekVerkoopAf, telling, verspilling, levering, inkoopadvies, kostprijsVan } };
+  return { keuken: { overzicht, werkvloer, receptZet, receptOverzicht, boekVerkoopAf, telling, verspilling, levering, inkoopadvies, kostprijsVan } };
 };

@@ -100,16 +100,37 @@ test('Fluister doet het ook echt: reserveren en het 24-uursblok plannen, in gewo
   const res = mijn.find(x => x.datum === morgen && x.tijd === '19:30' && x.supplierName === 'Sal de Mar');
   assert.ok(res, 'de reservering staat echt in het systeem');
   await api('reservering/annuleer', { id: res.id }, lid);
-  // en het 24-uursblok van een Shared Asset
+  // het 24-uursblok claimt een dag van het gedeelde object: eerst een voorstel
   const ov = (await api('assets', {}, lid)).body;
   await api('asset/koop', { assetId: ov.assets[0].id, smaak: 'access', aantal: 1 }, lid);
   const j = new Date().getUTCFullYear() + 1;
   const blok = await api('fluister', { q: 'zet mijn 24 uur op ' + j + '-01-20' }, lid);
-  assert.ok(blok.body.gedaan, 'het blok is geboekt');
-  assert.ok(blok.body.antwoord.includes(j + '-01-20'));
-  // een dag die al vergeven is, blijft eerlijk een nee
-  const dubbel = await api('fluister', { q: 'zet mijn 24 uur op ' + j + '-01-20' }, lid);
+  assert.ok(blok.body.voorstel && !blok.body.gedaan, 'boven de drempel: eerst een voorstel');
+  assert.ok(/even checken/i.test(blok.body.antwoord));
+  const ja = await api('fluister', { q: 'ja' }, lid);
+  assert.ok(ja.body.gedaan, 'na "ja" is het blok echt geboekt');
+  assert.ok(ja.body.antwoord.includes(j + '-01-20'));
+  // een dag die al vergeven is, blijft na bevestiging eerlijk een nee
+  await api('fluister', { q: 'zet mijn 24 uur op ' + j + '-01-20' }, lid);
+  const dubbel = await api('fluister', { q: 'ja' }, lid);
   assert.ok(!dubbel.body.gedaan && /lukt niet/i.test(dubbel.body.antwoord));
+  await api('fluister', { q: 'vergeet alles' }, lid);
+});
+
+test('geld gaat nooit zonder bevestiging de deur uit, en "nee" blaast af', async () => {
+  // "nee" haalt een voorstel van tafel; er gebeurt niets
+  await api('fluister', { q: 'stuur 12,50 euro naar Noordelijke Ster' }, lid);
+  const nee = await api('fluister', { q: 'nee' }, lid);
+  assert.ok(/niet door/i.test(nee.body.antwoord));
+  // en "ja" zonder openstaand voorstel voert nooit zomaar iets uit
+  const los = await api('fluister', { q: 'ja' }, lid);
+  assert.ok(!los.body.gedaan && /niets open/i.test(los.body.antwoord));
+  // met bevestiging gaat de Tik wel: voorstel, ja, geld onderweg
+  const tik = await api('fluister', { q: 'stuur 12,50 euro naar Noordelijke Ster' }, lid);
+  assert.ok(tik.body.voorstel && /12,50/.test(tik.body.antwoord));
+  const ja = await api('fluister', { q: 'ja' }, lid);
+  assert.ok(ja.body.gedaan, 'na "ja" is de Tik gestuurd');
+  assert.ok(/12,50/.test(ja.body.antwoord) && /Noordelijke Ster/.test(ja.body.antwoord));
   await api('fluister', { q: 'vergeet alles' }, lid);
 });
 

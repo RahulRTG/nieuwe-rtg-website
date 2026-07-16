@@ -728,6 +728,7 @@
       '<div id="pkFlSein"></div>'+
       '<div id="pkFlUit" style="margin-top:0.45rem;font-size:0.8rem;line-height:1.5;">'+(pkFlLaatst||'')+'</div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="pkFlIn" placeholder="'+T('pd.fl.ph','Vraag iets, of: onthoud dat...')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
+      ((window.SpeechRecognition || window.webkitSpeechRecognition) ? '<button class="abtn ghost" id="pkFlMic" aria-label="'+T('pd.fl.mic','Spreek uw vraag in')+'">🎤</button>' : '')+
       '<button class="abtn" id="pkFlStuur">'+T('pd.fl.stuur','Stuur')+'</button></div></div>'+
       trainingKaart()+
       '<div class="card"><div class="k">🩹 '+T('pd.eh.h','EHBO, direct bij de hand')+'</div>'+
@@ -781,18 +782,42 @@
         prof.seintjes.map(x => '<div style="margin-top:0.28rem;font-size:0.76rem;line-height:1.45;">'+esc(x.icoon)+' '+esc(x.tekst)+'</div>').join('')+'</div>';
     }).catch(() => {});
     // Fluister: vraag stellen; de gebruikstellers van de inklap-laag reizen mee
-    const pkfs = document.getElementById('pkFlStuur');
-    if (pkfs) pkfs.addEventListener('click', async () => {
-      const inp = document.getElementById('pkFlIn');
-      const q = (inp.value || '').trim();
+    const pkFlVraag = async q => {
       if (!q) return;
-      inp.value = '';
       if (window.FocusUI) API.call('/staff/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
       try {
         const r = await API.call('/staff/fluister', { q });
         pkFlLaatst = '<span style="color:var(--soft);">› '+esc(q)+'</span><br>✦ '+esc(r.antwoord);
-        document.getElementById('pkFlUit').innerHTML = pkFlLaatst;
+        const uit = document.getElementById('pkFlUit');
+        if (uit) uit.innerHTML = pkFlLaatst;
       } catch(e){ toast(e.message); }
+    };
+    const pkfs = document.getElementById('pkFlStuur');
+    if (pkfs) pkfs.addEventListener('click', () => {
+      const inp = document.getElementById('pkFlIn');
+      const q = (inp.value || '').trim();
+      inp.value = '';
+      pkFlVraag(q);
+    });
+    // spreek de vraag in: handig met een dienblad in de ene hand
+    const pkmic = document.getElementById('pkFlMic');
+    if (pkmic) pkmic.addEventListener('click', () => {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      try {
+        const rec = new SR();
+        rec.lang = document.documentElement.lang === 'en' ? 'en-US' : 'nl-NL';
+        rec.interimResults = false;
+        pkmic.textContent = '🔴';
+        rec.addEventListener('result', ev => {
+          const zin = (((ev.results[0] || [])[0] || {}).transcript || '').trim();
+          const inp = document.getElementById('pkFlIn');
+          if (inp) inp.value = zin;
+          pkFlVraag(zin);
+        });
+        rec.addEventListener('end', () => { pkmic.textContent = '🎤'; });
+        rec.addEventListener('error', () => { pkmic.textContent = '🎤'; });
+        rec.start();
+      } catch(e){ toast(T('pd.fl.micniet','Spraak werkt niet op dit toestel; typen kan altijd.')); }
     });
     document.querySelectorAll('[data-eh]').forEach(el => el.addEventListener('click', () => {
       const i = Number(el.dataset.eh);

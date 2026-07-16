@@ -23,9 +23,15 @@
    Nieuwe seintjes worden een echte melding op het toestel (fluisterPush,
    met dedupe zodat niets twee keer piept). En hij kan het ook dóén:
    "zet mijn 24 uur op 3 augustus" boekt het blok, "reserveer bij Sal de
-   Mar morgen om 20:00 met 2 personen" vraagt de tafel aan - alleen voor
-   het lid zelf, en het antwoord zegt eerlijk wat er is gebeurd. */
-module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGebruik, zorgVoor }) => {
+   Mar morgen om 20:00 met 2 personen" vraagt de tafel aan, "stuur 15
+   euro naar Noordelijke Ster" maakt een Tik - alleen voor het lid zelf,
+   en het antwoord zegt eerlijk wat er is gebeurd.
+
+   De drempel: alles met geld (een Tik) of een claim op een gedeeld
+   object (het 24-uursblok) wordt eerst een voorstel dat u bevestigt met
+   "ja" (of afblaast met "nee"). Een tafelreservering blijft direct:
+   gratis en altijd annuleerbaar. */
+module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGebruik, zorgVoor, pay }) => {
   const nu = () => new Date().toISOString();
   const lijsten = () => { if (!db.data.fluister) db.data.fluister = {}; };
   const van = key => {
@@ -89,6 +95,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
   const dagenTot = datum => Math.round((Date.parse(datum) - Date.parse(vandaag())) / 86400000);
   const plusDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
   const wanneer = d => d <= 0 ? 'vandaag' : d === 1 ? 'morgen' : 'over ' + d + ' dagen';
+  const eur = c => '€ ' + (c / 100).toFixed(2).replace('.', ',');
   // een dag uit een zin: 2026-08-03, "vandaag", "morgen" of "3 augustus"
   const datumInZin = txt => (String(txt).match(/\d{4}-\d{2}-\d{2}/) || [])[0] ||
     (/\bvandaag\b/i.test(txt) ? vandaag() : /\bovermorgen\b/i.test(txt) ? plusDagen(2) : /\bmorgen\b/i.test(txt) ? plusDagen(1) : datumUit(txt));
@@ -181,18 +188,35 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
     return delen;
   }
 
+  /* Een bevestigd voorstel echt uitvoeren; het antwoord zegt eerlijk wat er
+     is gebeurd, ook als het alsnog misgaat. */
+  async function voerUit(key, codenaam, w) {
+    if (w.soort === 'blok' && assetGebruik) {
+      const r = assetGebruik({ key }, w.assetId, w.datum);
+      if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
+      return { tekst: 'Geregeld: uw 24 uur bij ' + r.gebruik.assetNaam + ' staat op ' + w.datum + ' (nog ' + r.dagenTegoed + ' dag(en) tegoed dit jaar). Het team neemt vooraf contact op.', gedaan: true };
+    }
+    if (w.soort === 'tik' && pay) {
+      const r = await pay.stuur({ van: codenaam, aanCodenaam: w.aan, centen: w.centen, oms: 'Via Fluister', soort: 'tik' });
+      if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
+      return { tekst: 'Gedaan: ' + eur(w.centen) + ' aan ' + w.aan + ' gestuurd via een Tik. Uw saldo: ' + eur(r.saldo) + '.', gedaan: true };
+    }
+    return { tekst: 'Dat voorstel ken ik niet meer; zeg het gerust opnieuw.' };
+  }
+
   /* Het gesprek. Eerst de eigen commando's (onthouden, opvragen, vergeten);
      daarna Claude met het volledige persoonlijke beeld, of de eigen regels. */
   async function fluisterZeg(key, codenaam, qIn, sess) {
     const q = String(qIn || '').trim().slice(0, 600);
     if (!q) return { status: 400, error: 'Zeg iets.' };
     const p = van(key);
-    // het antwoord gaat ook het gespreksgeheugen in (laatste 5 beurten)
-    const klaar = (antwoord, gedaan) => {
+    // het antwoord gaat ook het gespreksgeheugen in (laatste 5 beurten);
+    // voorstel=true betekent: er staat iets klaar dat op "ja" wacht
+    const klaar = (antwoord, gedaan, voorstel) => {
       p.gesprek.push({ u: q, a: String(antwoord).slice(0, 400), at: nu() });
       p.gesprek = p.gesprek.slice(-5);
       save();
-      return { ok: true, antwoord, gedaan: !!gedaan };
+      return { ok: true, antwoord, gedaan: !!gedaan, voorstel: !!voorstel };
     };
     if (/^onthoud\b/i.test(q)) {
       const r = fluisterOnthoud(key, q);
@@ -203,6 +227,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
       fluisterVergeet(key, 'alles');
       p.gesprek = [];
       p.focus = {};
+      p.wacht = null;
       save();
       return { ok: true, antwoord: 'Alles gewist: uw weetjes, ons gesprek en de gebruikstellers. We beginnen met een schone lei.', geleerd: true };
     }
@@ -217,9 +242,28 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
       return { ok: true, antwoord: regels.join(' ') };
     }
     /* ---- doen: Fluister voert het ook echt uit, alleen voor het lid zelf
-       (sess reist alleen mee op de leden-route, nooit voor personeel) ---- */
+       (sess reist alleen mee op de leden-route, nooit voor personeel).
+       Boven de drempel (geld, of een claim op een gedeeld object) eerst
+       een voorstel; pas op "ja" gebeurt het echt. ---- */
     if (sess) {
-      // "zet/plan/boek mijn 24 uur op 3 augustus (bij Villa ...)"
+      const wachtVers = p.wacht && Date.now() - Date.parse(p.wacht.at) < 10 * 60000;
+      // "ja": het openstaande voorstel uitvoeren
+      if (/^(ja|yes|ok[eé]?|doe maar|graag|bevestig|akkoord|prima)[.!]?$/i.test(q)) {
+        if (!wachtVers) return klaar('Er staat niets open om te bevestigen. Zeg gerust wat ik moet regelen.');
+        const w = p.wacht;
+        p.wacht = null;
+        const r = await voerUit(key, codenaam, w);
+        return klaar(r.tekst, r.gedaan);
+      }
+      // "nee": het voorstel gaat van tafel
+      if (/^(nee|nope|laat maar|annuleer|stop|toch niet)[.!]?$/i.test(q)) {
+        if (!wachtVers) return klaar('Er stond niets open; alles blijft zoals het was.');
+        p.wacht = null;
+        save();
+        return klaar('Goed, het gaat niet door. Het voorstel is van tafel.');
+      }
+      // "zet/plan/boek mijn 24 uur op 3 augustus (bij Villa ...)":
+      // claimt een dag van het gedeelde object, dus eerst een voorstel
       if (assetGebruik && /\b24\s*-?\s*u/i.test(q) && /\b(zet|plan|boek|leg)\b/i.test(q)) {
         const datum = datumInZin(q);
         if (!datum) return klaar('Op welke dag? Zeg bijvoorbeeld: "zet mijn 24 uur op 3 augustus".');
@@ -231,11 +275,25 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGe
           return a && a.naam.toLowerCase().split(/\s+/).some(w => w.length > 3 && ql.includes(w));
         };
         const t = mijnTickets.find(past) || mijnTickets[0];
-        const r = assetGebruik({ key }, t.assetId, datum);
-        if (r.error) return klaar('Dat lukt niet: ' + r.error);
-        return klaar('Geregeld: uw 24 uur bij ' + r.gebruik.assetNaam + ' staat op ' + datum + ' (nog ' + r.dagenTegoed + ' dag(en) tegoed dit jaar). Het team neemt vooraf contact op.', true);
+        const naam = (((db.data.sharedAssets || []).find(x => x.id === t.assetId) || {}).naam) || 'uw object';
+        p.wacht = { soort: 'blok', assetId: t.assetId, datum, naam, at: nu() };
+        save();
+        return klaar('Even checken: uw 24 uur bij ' + naam + ' op ' + datum + ' vastleggen? Die dag is dan van u en gaat uit de pool. Zeg "ja" en ik regel het; "nee" en het gaat niet door.', false, true);
       }
-      // "reserveer bij Sal de Mar morgen om 20:00 met 2 personen"
+      // "stuur 15 euro naar Noordelijke Ster": geld gaat nooit zonder "ja"
+      if (pay && /\b(stuur|betaal|geef|tik)\b/i.test(q)) {
+        const m = q.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:euro|eur|€)?\s+(?:naar|aan)\s+(.+?)[.?!]?\s*$/i);
+        if (m) {
+          const centen = Math.round(parseFloat(m[1].replace(',', '.')) * 100);
+          if (!(centen > 0)) return klaar('Welk bedrag? Zeg bijvoorbeeld: "stuur 15 euro naar Noordelijke Ster".');
+          const aan = m[2].trim();
+          p.wacht = { soort: 'tik', centen, aan, at: nu() };
+          save();
+          return klaar('Even checken: ' + eur(centen) + ' aan ' + aan + ' sturen via een Tik? Zeg "ja" en ik maak het over; "nee" en het gaat niet door.', false, true);
+        }
+      }
+      // "reserveer bij Sal de Mar morgen om 20:00 met 2 personen":
+      // onder de drempel (gratis en altijd annuleerbaar), dus direct
       if (reserveerTafel && /\breserveer\b/i.test(q)) {
         if (sess.tier === 'guest') return klaar('Reserveren kan alleen met een lidmaatschap.');
         const naam = (q.match(/\bbij\s+(.+?)(?=\s+(?:op|om|voor|met|morgen|overmorgen|vandaag)\b|\s*[.?!]?\s*$)/i) || [])[1];

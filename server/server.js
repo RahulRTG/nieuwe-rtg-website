@@ -2687,7 +2687,7 @@ Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify,
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
 Object.assign(kern, require('./kern/fluister')({
   db, save, schoon, anthropic, notify,
-  reserveerTafel, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor
+  reserveerTafel, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay
 }));
 // nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
 // elk half uur en fluisterPush zelf zorgt dat niets twee keer piept

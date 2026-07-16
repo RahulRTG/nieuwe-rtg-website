@@ -121,7 +121,7 @@
   function injectCss() {
     if (cssGedaan) return; cssGedaan = true;
     var css = '.sb-balk{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-bottom:1px solid var(--lijn);position:relative;}' +
-      '.sb-brand{font-family:var(--serif);font-weight:500;}.sb-brand b{color:var(--goud);}' +
+      '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1734;color:#fff;padding:.18rem .6rem .22rem;border-radius:4px;}.sb-brand b{color:#F4E9C8;}' +
       '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
       '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;}' +
       '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:999px;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +

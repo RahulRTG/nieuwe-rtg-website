@@ -83,13 +83,14 @@
   .minipill .x{background:none;border:none;color:inherit;cursor:pointer;font-size:.9rem;line-height:1;padding:0 0 0 .1rem;}
   .minisel{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:.4rem .5rem;color:var(--txt);font-family:inherit;font-size:.8rem;}
   .toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
+.merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
 </head>
 <body>
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <main class="wrap" id="hoofd" tabindex="-1">
   <section id="vLogin" class="kaart login" hidden>
-    <h1>RTG Boardroom</h1>
+    <h1><span class="merkvlak">RTG Boardroom</span></h1>
     <p>Beveiligde schakelkast. Alleen de eigenaar en handmatig toegelaten personen kunnen inloggen.</p>
     <input class="veld" id="liLogin" placeholder="E-mail of gebruikersnaam" autocomplete="username">
     <input class="veld" id="liPass" type="password" placeholder="Wachtwoord" autocomplete="current-password">
@@ -100,7 +101,7 @@
   <div id="vBord" hidden>
     <header class="kop">
       <div>
-        <h1>RTG Boardroom</h1>
+        <h1><span class="merkvlak">RTG Boardroom</span></h1>
         <div class="sub">Alle functies van het platform, met status en schakelaar. <a href="/apps/techniek.html">Technische status ›</a></div>
       </div>
       <div style="display:flex;gap:.5rem;">

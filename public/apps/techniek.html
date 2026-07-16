@@ -88,13 +88,14 @@
   .voorstelrij{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-top:1px solid var(--line);font-size:.82rem;}
   .voorstelrij:first-child{border-top:none;}
   .voorstelrij .tag{font-size:.68rem;font-weight:700;padding:.12rem .45rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);}
+.merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
 </head>
 <body>
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <main class="wrap" id="hoofd" tabindex="-1">
   <section id="vLogin" class="kaart login" hidden>
-    <h1>Technische status</h1>
+    <h1><span class="merkvlak">RTG Techniek</span></h1>
     <p>Beveiligde pagina. Alleen de eigenaar en handmatig toegelaten personen kunnen inloggen.</p>
     <input class="veld" id="liLogin" placeholder="E-mail of gebruikersnaam" autocomplete="username">
     <input class="veld" id="liPass" type="password" placeholder="Wachtwoord" autocomplete="current-password">
@@ -105,7 +106,7 @@
   <div id="vBord" hidden>
     <header class="kop">
       <div>
-        <h1>Technische status</h1>
+        <h1><span class="merkvlak">RTG Techniek</span></h1>
         <div class="sub" id="wieSub"></div>
       </div>
       <div style="display:flex;gap:.5rem;">

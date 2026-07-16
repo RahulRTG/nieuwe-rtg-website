@@ -15,7 +15,7 @@
    - Betalen met te weinig saldo? De wallet laadt zelf bij (in stappen van
      tien euro) via de betaal-naad (Apple Pay/kaart) en betaalt door. Het lid
      tikt een keer, klaar.
-   - Een Goudje betalen is een knop: bedrag, autolaad, boeken, melding terug.
+   - Een Klompje betalen is een knop: bedrag, autolaad, boeken, melding terug.
    - De kassacode is vooraf-akkoord tot een maximum (zoals contactloos): het
      lid toont de code, de zaak int, niemand wacht.
 
@@ -40,7 +40,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
 
   function saldi() { if (!d().paySaldi || typeof d().paySaldi !== 'object') d().paySaldi = {}; return d().paySaldi; }
   function grootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
-  function goudjes() { if (!Array.isArray(d().payVerzoeken)) d().payVerzoeken = []; return d().payVerzoeken; }
+  function klompjes() { if (!Array.isArray(d().payVerzoeken)) d().payVerzoeken = []; return d().payVerzoeken; }
   function kascodes() { if (!Array.isArray(d().payCodes)) d().payCodes = []; return d().payCodes; }
 
   const rekLid = c => 'lid:' + c;
@@ -139,7 +139,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     return { ok: true, bijgeladen: stap };
   }
 
-  /* ---------- geld sturen en tikkies ---------- */
+  /* ---------- geld sturen en Klompjes ---------- */
   async function bestaatLid(codenaam) {
     try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
   }
@@ -156,7 +156,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
       return { ok: true, saldo: saldoVan(rekLid(van)), bijgeladen: z.bijgeladen, boeking: b.boeking.id };
     });
   }
-  /* Een Goudje (het RTG-eigen tikkie): vraag een bedrag aan een of meer vrienden. Met splitsMetMij
+  /* Een Klompje (goudklompje, het RTG-eigen betaalverzoek): vraag een bedrag aan een of meer vrienden. Met splitsMetMij
      deelt het totaal door de hele groep inclusief jezelf (jouw deel heb je
      immers al betaald aan de zaak); anders krijgt ieder het hele bedrag. */
   async function verzoekMaak({ van, aan, totaalCenten, perCenten, oms, splitsMetMij }) {
@@ -173,30 +173,30 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     const groep = id('TG');
     const uit = namen.map(n => ({
       id: id('TK'), groep, van, aan: n, centen: per,
-      oms: schoon(oms, 80) || 'Goudje', status: 'open', at: nu()
+      oms: schoon(oms, 80) || 'Klompje', status: 'open', at: nu()
     }));
-    goudjes().unshift(...uit);
-    if (goudjes().length > 5000) goudjes().length = 5000;
+    klompjes().unshift(...uit);
+    if (klompjes().length > 5000) klompjes().length = 5000;
     save();
     for (const n of namen) seintje(n);
     return { ok: true, verzoeken: uit, perPersoon: per };
   }
   function verzoekenVoor(codenaam) {
-    const alle = goudjes();
+    const alle = klompjes();
     return {
       aanMij: alle.filter(v => v.aan === codenaam && v.status === 'open').slice(0, 20),
       vanMij: alle.filter(v => v.van === codenaam).slice(0, 20)
     };
   }
-  // EEN knop: het Goudje betalen (met autolaad als het saldo tekortschiet)
+  // EEN knop: het Klompje betalen (met autolaad als het saldo tekortschiet)
   async function verzoekBetaal({ codenaam, verzoekId, idem }) {
-    const v = goudjes().find(x => x.id === verzoekId && x.aan === codenaam);
+    const v = klompjes().find(x => x.id === verzoekId && x.aan === codenaam);
     if (!v) return { status: 404, error: 'Dit verzoek staat niet voor jou open.' };
     if (v.status !== 'open') return { status: 409, error: 'Dit verzoek is al afgehandeld.' };
-    return metIdem(idem ? 'goudje:' + codenaam + ':' + idem : null, async () => {
+    return metIdem(idem ? 'klompje:' + codenaam + ':' + idem : null, async () => {
       const z = await zorgSaldo({ codenaam, centen: v.centen, idem });
       if (z.error) return z;
-      const b = boek({ van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'goudje', oms: v.oms, ref: v.id });
+      const b = boek({ van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'klompje', oms: v.oms, ref: v.id });
       if (b.error) return b;
       v.status = 'betaald';
       v.betaaldAt = nu();
@@ -206,7 +206,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     });
   }
   function verzoekIntrek({ codenaam, verzoekId }) {
-    const v = goudjes().find(x => x.id === verzoekId && x.van === codenaam);
+    const v = klompjes().find(x => x.id === verzoekId && x.van === codenaam);
     if (!v) return { status: 404, error: 'Dit verzoek is niet van jou.' };
     if (v.status !== 'open') return { status: 409, error: 'Dit verzoek is al afgehandeld.' };
     v.status = 'ingetrokken';

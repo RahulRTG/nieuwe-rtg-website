@@ -71,11 +71,10 @@
   <!-- poort: RTG Pay leunt op je gewone RTG-sessie -->
   <section id="vGate">
     <h1>Jouw geld, een knop</h1>
-    <p class="deck">RTG Pay gebruikt je gewone RTG-inlog. Open eerst je pas-app en kom terug, of stap in de demo direct in.</p>
     <div class="kaart">
       <div class="rij">
-        <button class="knop" id="gDemo">Stap in met de RTG Pass</button>
-        <a class="knop stil" href="/apps/app.html" style="text-decoration:none;">Eerst inloggen in de app</a>
+        <button class="knop" id="gDemo">Log in met mijn RTG-pas</button>
+        <a class="knop stil" href="/apps/app.html" style="text-decoration:none;">Naar de app</a>
       </div>
       <div class="fout" id="gFout"></div>
     </div>
@@ -93,27 +92,26 @@
         <input class="veld" id="pLaadVrij" inputmode="numeric" placeholder="anders..." style="max-width:7rem;flex:1;">
       </div>
       <button class="knop pay" id="pLaad">Opladen met Apple Pay</button>
-      <p class="leeg" style="margin-top:.5rem;">Te weinig saldo bij het betalen? De wallet laadt zelf bij in tientjes en betaalt door: jij tikt een keer.</p>
     </div>
 
-    <h3 class="sec">Voor jou (een tik en hij is betaald)</h3>
-    <div class="kaart" id="pAanMij"><div class="leeg">Geen openstaande Goudjes. Lekker.</div></div>
+    <h3 class="sec">Voor jou</h3>
+    <div class="kaart" id="pAanMij"><div class="leeg">Geen openstaande Klompjes.</div></div>
 
-    <h3 class="sec">Een Goudje vragen (het RTG-tikkie)</h3>
+    <h3 class="sec">Klompje vragen</h3>
     <div class="kaart">
       <div class="rij">
         <input class="veld" id="tBedrag" inputmode="decimal" placeholder="Totaal in euro" style="max-width:9rem;">
-        <input class="veld" id="tOms" placeholder="Waarvoor? (Strandbedjes...)" style="flex:1;min-width:10rem;" maxlength="80">
+        <input class="veld" id="tOms" placeholder="Waarvoor?" style="flex:1;min-width:10rem;" maxlength="80">
       </div>
       <div style="margin-top:.6rem;">
-        <input class="veld" id="tAan" placeholder="Codenamen, met komma (GoudenAdelaar, ...)">
+        <input class="veld" id="tAan" placeholder="Aan wie? Codenamen, met komma">
         <div class="chiprij" id="tVrienden" aria-label="Kies vrienden"></div>
       </div>
       <label class="schakel"><input type="checkbox" id="tSplits" checked> Splits het totaal, ik doe zelf mee</label>
-      <button class="knop merk" id="tStuur" style="margin-top:.7rem;">Vraag het Goudje</button>
+      <button class="knop merk" id="tStuur" style="margin-top:.7rem;">Vraag het Klompje</button>
     </div>
 
-    <h3 class="sec">Geld sturen (zomaar, of terugbetalen)</h3>
+    <h3 class="sec">Geld sturen</h3>
     <div class="kaart">
       <div class="rij">
         <input class="veld" id="sAan" placeholder="Codenaam" style="flex:1;min-width:8rem;">
@@ -125,7 +123,6 @@
     <h3 class="sec">Betalen aan de kassa</h3>
     <div class="kaart">
       <div id="kasUit">
-        <p class="deck" style="margin-bottom:.6rem;">Een code van vijf minuten, tot een maximum dat jij kiest. De zaak toetst hem in, jij bent al klaar.</p>
         <div class="rij">
           <input class="veld" id="kMax" inputmode="numeric" placeholder="Max (150)" style="max-width:8rem;">
           <button class="knop" id="kMaak">Maak mijn betaalcode</button>
@@ -138,7 +135,7 @@
     </div>
 
     <h3 class="sec">Uitstaand en geschiedenis</h3>
-    <div class="kaart" id="pVanMij"><div class="leeg">Geen uitstaande Goudjes.</div></div>
+    <div class="kaart" id="pVanMij"><div class="leeg">Geen uitstaande Klompjes.</div></div>
     <div class="kaart" id="pHist"><div class="leeg">Nog geen bewegingen.</div></div>
   </section>
 
@@ -181,7 +178,7 @@ async function ververs(){
   $('#pAanMij').innerHTML = d.aanMij.length ? d.aanMij.map(v =>
     '<div class="tikkie"><div class="wie"><b>'+esc(v.van)+'</b><small>'+esc(v.oms)+'</small></div>'+
     '<button class="knop merk" data-betaal="'+v.id+'" style="width:auto;flex:1;min-width:9rem;">Betaal '+esc(euro(v.centen))+' eur</button></div>').join('')
-    : '<div class="leeg">Geen openstaande Goudjes. Lekker.</div>';
+    : '<div class="leeg">Geen openstaande Klompjes.</div>';
   $('#pAanMij').querySelectorAll('[data-betaal]').forEach(b => b.addEventListener('click', async () => {
     b.disabled = true;
     try {
@@ -195,7 +192,7 @@ async function ververs(){
     '<div class="tikkie"><div class="wie"><b>'+esc(v.aan)+'</b><small>'+esc(v.oms)+' · '+esc(euro(v.centen))+' eur</small></div>'+
     '<span style="color:'+(v.status==='betaald'?'var(--green)':v.status==='open'?'var(--gold)':'var(--soft)')+';font-size:.82rem;">'+esc(v.status)+'</span>'+
     (v.status==='open' ? '<button class="knop stil" data-intrek="'+v.id+'" style="padding:.3rem .8rem;font-size:.75rem;">Trek in</button>' : '')+'</div>').join('')
-    : '<div class="leeg">Geen uitstaande Goudjes.</div>';
+    : '<div class="leeg">Geen uitstaande Klompjes.</div>';
   $('#pVanMij').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
     try { await api('pay/verzoek/intrek', { id: b.dataset.intrek }); ververs(); } catch (e) { meld(e.message); }
   }));
@@ -242,7 +239,7 @@ $('#tStuur').addEventListener('click', async () => {
   const aan = [...new Set([...gekozen, ...los])];
   try {
     const r = await api('pay/verzoek', { aan, totaalCenten: totaal, oms: $('#tOms').value, splitsMetMij: $('#tSplits').checked });
-    meld('Het Goudje staat uit: ' + euro(r.perPersoon) + ' eur per persoon, naar ' + r.verzoeken.length + ' vriend(en).');
+    meld('Klompje staat uit: ' + euro(r.perPersoon) + ' eur per persoon.');
     $('#tBedrag').value = ''; $('#tOms').value = ''; $('#tAan').value = '';
     gekozen.clear();
     $('#tVrienden').querySelectorAll('[data-vriend]').forEach(c => c.setAttribute('aria-pressed', 'false'));

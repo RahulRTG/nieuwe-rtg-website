@@ -3,7 +3,7 @@
    de RTG-leden-app (Bearer-token) en de RTFoundation (gezinscode + token),
    zodat alle leden tegen elkaar spelen. */
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, sneekScore, sneekBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -16,7 +16,7 @@ module.exports = (kern) => {
 
   // dezelfde acties voor beide werelden; alleen de identiteit verschilt
   const ACTIES = {
-    nieuw: (mij, b) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, taal: b.taal }),
+    nieuw: (mij, b) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, taal: b.taal }),
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
     random: (mij, b) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal),
     mijn: (mij) => Object.assign({ status: 200 }, mijnSpellen(mij)),
@@ -24,16 +24,18 @@ module.exports = (kern) => {
     zet: (mij, b) => spelZet(mij, String(b.id || ''), b.zet),
     opgeven: (mij, b) => spelOpgeven(mij, String(b.id || '')),
     'sneek-score': (mij, b) => sneekScore(mij, b.punten),
-    'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij)))
+    'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
+    'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),
+    'arcade-bord': (mij, b) => arcadeBord(mij, String(b.spel || ''), vriendenVan(mij))
   };
   for (const [naam, doe] of Object.entries(ACTIES)) {
-    app.post('/api/member/spel/' + naam, auth, (req, res) => {
+    app.post('/api/member/spel/' + naam, auth, async (req, res) => {
       if (geenGast(req, res)) return;
-      stuur(res, doe(req.session.key, req.body || {}));
+      stuur(res, await doe(req.session.key, req.body || {}));
     });
-    app.post('/api/rtf/spel/' + naam, (req, res) => {
+    app.post('/api/rtf/spel/' + naam, async (req, res) => {
       const mij = rtfSpeler(req, res); if (!mij) return;
-      stuur(res, doe(mij, req.body || {}));
+      stuur(res, await doe(mij, req.body || {}));
     });
   }
 };

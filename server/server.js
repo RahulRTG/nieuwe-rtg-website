@@ -2529,7 +2529,8 @@ Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Spellen (kern/spellen.js): mens-erger-je-niet, schaken, woordduel en het
    Sneek-scorebord op de vriendenlaag; RTF- en RTG-leden spelen tegen elkaar. */
 Object.assign(kern, require('./kern/spellen')({
-  db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer
+  db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
+  isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate
 }));
 /* Salon-ontmoetingen (kern/ontmoeting.js): wederzijdse connecties die vlakbij
    elkaar zijn kiezen samen een activiteit, tekenen een veiligheidscontract en

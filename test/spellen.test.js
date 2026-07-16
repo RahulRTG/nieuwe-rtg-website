@@ -162,6 +162,81 @@ test('sneek: alleen je beste score telt en vrienden zien elkaar op het bord', as
   assert.equal(ik.punten, 120, 'je beste score blijft staan');
 });
 
+test('uitnodigen op codenaam: samen spelen maakt je niet automatisch vrienden', async () => {
+  // twee leden die elkaar NIET kennen; geen connect, alleen een codenaam
+  const t = Date.now() + '' + (teller++);
+  const a = await json(await raw('/auth/register', { name: 'Los A' + t, email: 'la' + t + '@v.test', phone: '0633' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1988-03-03', tier: 'rtg' }));
+  const b = await json(await raw('/auth/register', { name: 'Los B' + t, email: 'lb' + t + '@v.test', phone: '0644' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1991-04-04', tier: 'rtg' }));
+  const bCn = b.state.user.codename;
+  // een eerste ingelogde aanraking zet beide leden in de codenaamgids
+  await raw('/member/connections', {}, a.token); await raw('/member/connections', {}, b.token);
+  // een onbekende codenaam wordt netjes geweigerd
+  assert.equal((await raw('/member/spel/nieuw', { soort: 'pesten', grootte: 2, codenamen: ['Bestaat Nietxyz'] }, a.token)).status, 404);
+  // uitnodigen op de echte codenaam: het potje start zodra de ander accepteert
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'pesten', grootte: 2, codenamen: [bCn] }, a.token));
+  assert.ok(nieuw.ok && nieuw.id, 'de uitnodiging op codenaam staat klaar');
+  const uitn = await json(await raw('/member/spel/mijn', {}, b.token));
+  assert.equal(uitn.uitnodigingen.length, 1, 'B ziet de uitnodiging van een niet-vriend');
+  const acc = await json(await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.token));
+  assert.ok(acc.gestart, 'het potje start');
+  // en dat is alles: geen vriendschap, geen verzoek, aan geen van beide kanten
+  for (const tok of [a.token, b.token]) {
+    const c = await json(await raw('/member/connections', {}, tok));
+    assert.equal((c.connections || []).length, 0, 'samen spelen levert geen vriendschap op');
+    assert.equal((c.requests || []).length, 0, 'en ook geen openstaand verzoek');
+  }
+});
+
+test('pesten: zeven kaarten, passend leggen of pakken, en de beurt schuift door', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'pesten', grootte: 2, vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  let st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(st.potje.staat.hand.length, 7, 'je begint met zeven kaarten');
+  assert.deepEqual(st.potje.staat.aantallen, [7, 7], 'iedereen begint met zeven kaarten');
+  assert.ok(st.potje.staat.open, 'er ligt een open kaart');
+  assert.equal(st.potje.staat.stapel, 52 - 14 - 1, 'de rest is trekstapel');
+  // een kaart die je niet hebt kun je niet leggen
+  const beurtTok = st.potje.beurt === st.potje.ik ? a.tok : b.tok;
+  const stB = await json(await raw('/member/spel/staat', { id: nieuw.id }, beurtTok));
+  const alle = []; for (const kl of ['H', 'R', 'K', 'S']) for (const rg of ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'B', 'V', 'K', 'A']) alle.push(kl + rg);
+  const nietVanMij = alle.find(k => !stB.potje.staat.hand.includes(k));
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { kaart: nietVanMij } }, beurtTok)).status, 400, 'een kaart die je niet hebt wordt geweigerd');
+  // spelen: leg wat past (bij een boer hoort een kleur), anders pakken
+  let gelegd = 0, gepakt = 0;
+  for (let i = 0; i < 60; i++) {
+    const s = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+    if (s.potje.status === 'klaar') break;
+    const tok = s.potje.beurt === s.potje.ik ? a.tok : b.tok;
+    const sm = await json(await raw('/member/spel/staat', { id: nieuw.id }, tok));
+    let ok = false;
+    for (const kaart of sm.potje.staat.hand) {
+      const r = await raw('/member/spel/zet', { id: nieuw.id, zet: { kaart, kleur: 'H' } }, tok);
+      if (r.status === 200) { ok = true; gelegd++; break; }
+    }
+    if (!ok) {
+      const p = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { pak: true } }, tok));
+      assert.ok(p.gepakt >= 1, 'wie niets kwijt kan pakt minstens een kaart');
+      gepakt++;
+    }
+    if (gelegd >= 3 && gepakt >= 1) break;
+  }
+  assert.ok(gelegd >= 1, 'passende kaarten worden gelegd');
+});
+
+test('tetris: eigen arcadebord naast Sneek, beste score telt', async () => {
+  const { a, b } = await tweeVrienden();
+  assert.equal((await raw('/member/spel/arcade-score', { spel: 'flipper', punten: 10 }, a.tok)).status, 400, 'onbekende arcadespellen bestaan niet');
+  await raw('/member/spel/arcade-score', { spel: 'tetris', punten: 500 }, a.tok);
+  await raw('/member/spel/arcade-score', { spel: 'tetris', punten: 300 }, a.tok); // lager: telt niet
+  await raw('/member/spel/arcade-score', { spel: 'tetris', punten: 900 }, b.tok);
+  await raw('/member/spel/sneek-score', { punten: 42 }, b.tok); // Sneek staat er los van
+  const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'tetris' }, a.tok));
+  assert.equal(bord.bord[0].punten, 900, 'de vriend staat bovenaan het tetrisbord');
+  assert.equal(bord.bord.find(r => r.ik).punten, 500, 'je beste tetrisscore blijft staan');
+  assert.ok(!bord.bord.some(r => r.punten === 42), 'sneekscores lekken niet naar het tetrisbord');
+});
+
 test('opgeven: de ander wint het potje', async () => {
   const { a, b } = await tweeVrienden();
   const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));

@@ -17,7 +17,7 @@
    Een potje start met uitgenodigde vrienden (die accepteren zelf) of via de
    random wachtrij per spel en groepsgrootte. Beurten gaan via polling plus
    een SSE-duwtje naar wie aan zet is. */
-module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }) => {
+module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
@@ -25,7 +25,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     if (!db.data.spellen) db.data.spellen = { potjes: {}, wachtrij: {}, sneek: {} };
     return db.data.spellen;
   }
-  const SOORTEN = { mejn: 'Mens erger je niet', schaak: 'Schaken', woord: 'Woordduel' };
+  const SOORTEN = { mejn: 'Mens erger je niet', schaak: 'Schaken', woord: 'Woordduel', pesten: 'Pesten' };
+  const MEERSPELER = (soort) => soort === 'mejn' || soort === 'pesten'; // 2 t/m 4 spelers
   const nudge = (naar, potje) => { try { sseToCustomer(naar, 'social', { kind: 'spel', potje: potje.id, soort: potje.soort }); } catch (e) {} };
 
   /* ---------- opschonen: klare potjes na een dag weg, wachtenden na een uur ---------- */
@@ -378,19 +379,107 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     potje.winnaar = potje.gelijk ? null : codenaamVan(beste[0]);
   }
 
+  /* ================= Pesten =================
+     Het klassieke Nederlandse kaartspel, 2 t/m 4 spelers. Pak je slag:
+     2 = de volgende pakt er twee (stapelt door), 8 = de volgende wacht een
+     beurt, boer = kies een kleur (altijd te leggen), aas = de richting
+     draait. Kun je niets: pak een kaart. Wie het eerst leeg is, wint. */
+  const P_KLEUREN = ['H', 'R', 'K', 'S'];
+  const P_RANGEN = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'B', 'V', 'K', 'A'];
+  function pestenInit(potje) {
+    const dek = [];
+    for (const kl of P_KLEUREN) for (const rg of P_RANGEN) dek.push(kl + rg);
+    for (let i = dek.length - 1; i > 0; i--) { const j = crypto.randomInt(0, i + 1); [dek[i], dek[j]] = [dek[j], dek[i]]; }
+    const st = { handen: {}, stapel: dek, open: [], kleurKeuze: null, pak: 0, richting: 1 };
+    for (const h of potje.spelers) st.handen[h] = st.stapel.splice(0, 7);
+    st.open.push(st.stapel.pop());
+    potje.staat = st;
+  }
+  const pKleur = (k) => k[0];
+  const pRang = (k) => k.slice(1);
+  function pestenMag(st, kaart) {
+    const top = st.open[st.open.length - 1];
+    if (st.pak > 0) return pRang(kaart) === '2'; // een pakstapel stapel je alleen door met een 2
+    if (pRang(kaart) === 'B') return true;       // de boer mag altijd
+    const kleur = st.kleurKeuze || pKleur(top);
+    return pKleur(kaart) === kleur || pRang(kaart) === pRang(top);
+  }
+  function pestenTrek(st, n) {
+    const uit = [];
+    for (let i = 0; i < n; i++) {
+      if (!st.stapel.length) {
+        // de aflegstapel (op de bovenste na) wordt de nieuwe trekstapel
+        const top = st.open.pop();
+        st.stapel = st.open; st.open = [top];
+        for (let x = st.stapel.length - 1; x > 0; x--) { const y = crypto.randomInt(0, x + 1); [st.stapel[x], st.stapel[y]] = [st.stapel[y], st.stapel[x]]; }
+      }
+      if (st.stapel.length) uit.push(st.stapel.pop());
+    }
+    return uit;
+  }
+  function pestenVolgende(potje, slaOver) {
+    const n = potje.spelers.length;
+    let stap = potje.staat.richting;
+    potje.beurt = ((potje.beurt + stap) % n + n) % n;
+    if (slaOver) potje.beurt = ((potje.beurt + stap) % n + n) % n;
+  }
+  function pestenZet(potje, h, zet) {
+    const st = potje.staat, hand = st.handen[h];
+    if (zet.pak === true) {
+      const n = st.pak > 0 ? st.pak : 1;
+      st.handen[h] = hand.concat(pestenTrek(st, n));
+      st.pak = 0;
+      pestenVolgende(potje, false);
+      save(); nudge(potje.spelers[potje.beurt], potje);
+      return { status: 200, ok: true, gepakt: n };
+    }
+    const kaart = String(zet.kaart || '');
+    if (!hand.includes(kaart)) return { status: 400, error: 'Die kaart heb je niet.' };
+    if (!pestenMag(st, kaart)) return { status: 400, error: st.pak > 0 ? 'Er ligt een pakstapel: leg een 2 of pak ' + st.pak + ' kaarten.' : 'Die kaart past niet op wat er ligt.' };
+    hand.splice(hand.indexOf(kaart), 1);
+    st.open.push(kaart);
+    st.kleurKeuze = null;
+    const rang = pRang(kaart);
+    let slaOver = false;
+    if (rang === '2') st.pak += 2;
+    else if (rang === '8') slaOver = true;
+    else if (rang === 'A') st.richting *= -1;
+    else if (rang === 'B') {
+      const kleur = String(zet.kleur || '').toUpperCase();
+      if (!P_KLEUREN.includes(kleur)) return (hand.push(kaart), st.open.pop(), { status: 400, error: 'Kies een kleur bij de boer (H, R, K of S).' });
+      st.kleurKeuze = kleur;
+    }
+    if (!hand.length) { potje.status = 'klaar'; potje.winnaar = codenaamVan(h); }
+    else pestenVolgende(potje, slaOver);
+    save(); nudge(potje.spelers[potje.beurt], potje);
+    return { status: 200, ok: true };
+  }
+
   /* ================= lobby: uitnodigen, accepteren, random wachtrij ================= */
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
     if (potje.soort === 'mejn') mejnInit(potje);
     else if (potje.soort === 'schaak') schaakInit(potje);
+    else if (potje.soort === 'pesten') pestenInit(potje);
     else woordInit(potje);
   }
-  function spelNieuw(mij, { soort, grootte, modus, vrienden, taal }) {
+  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, taal }) {
     opschonen();
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekend spel.' };
-    const max = soort === 'mejn' ? Math.min(4, Math.max(2, Number(grootte) || 2)) : 2;
+    const max = MEERSPELER(soort) ? Math.min(4, Math.max(2, Number(grootte) || 2)) : 2;
     const uitgenodigd = (Array.isArray(vrienden) ? vrienden : []).slice(0, max - 1).filter(v => zijnVrienden(mij, v));
-    if (!uitgenodigd.length) return { status: 400, error: 'Nodig minstens een vriend uit (of speel random).' };
+    /* Uitnodigen op codenaam: samen spelen maakt je NIET automatisch vrienden.
+       De ander accepteert de uitnodiging zelf, blokkades gelden gewoon en
+       beschermde kinderen zijn onvindbaar (die spelen alleen met vrienden). */
+    for (const cn of (Array.isArray(codenamen) ? codenamen : []).slice(0, max - 1)) {
+      if (!sociaalRate(mij, 'spel-uitnodiging', 20, 3600000)) return { status: 429, error: 'Rustig aan met uitnodigen.' };
+      const zoek = await socialZoek(mij, String(cn));
+      const hit = (zoek || []).find(r => String(r.codename).toLowerCase() === String(cn).trim().toLowerCase());
+      if (!hit) return { status: 404, error: 'De codenaam "' + String(cn).slice(0, 40) + '" is niet gevonden.' };
+      if (isGeblokkeerd(mij, hit.key)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
+      if (!uitgenodigd.includes(hit.key) && hit.key !== mij) uitgenodigd.push(hit.key);
+    }
+    if (!uitgenodigd.length) return { status: 400, error: 'Nodig minstens een speler uit (vriend of codenaam), of speel random.' };
     if (uitgenodigd.length > max - 1) return { status: 400, error: 'Te veel spelers voor dit spel.' };
     const potje = { id: rid(5), soort, grootte: max, modus: soort === 'mejn' && modus === 'teams' && max === 4 ? 'teams' : 'vrij',
       taal: taal === 'en' ? 'en' : 'nl',
@@ -415,7 +504,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
   function spelRandom(mij, soort, grootte, taal) {
     opschonen();
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekend spel.' };
-    const max = soort === 'mejn' ? Math.min(4, Math.max(2, Number(grootte) || 2)) : 2;
+    const max = MEERSPELER(soort) ? Math.min(4, Math.max(2, Number(grootte) || 2)) : 2;
     const w_taal = taal === 'en' ? 'en' : 'nl';
     const sleutel = soort + ':' + max + (soort === 'woord' ? ':' + w_taal : '');
     const w = S().wachtrij;
@@ -457,6 +546,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     if (p.status !== 'wacht' && st) {
       if (p.soort === 'mejn') uit.staat = { pionnen: p.spelers.map(sp => st.pionnen[sp].map(x => x.pos)), dobbel: st.dobbel, mag: st.mag, zetten: p.spelers[p.beurt] === mij && st.mag === 'zet' ? mejnZetten(p, mij) : [] };
       else if (p.soort === 'schaak') uit.staat = { bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null };
+      else if (p.soort === 'pesten') uit.staat = { hand: st.handen[mij], aantallen: p.spelers.map(sp => st.handen[sp].length), open: st.open[st.open.length - 1], kleurKeuze: st.kleurKeuze, pak: st.pak, richting: st.richting, stapel: st.stapel.length };
       else uit.staat = { bord: st.bord, scores: p.spelers.map(sp => st.scores[sp]), rek: st.rekken[mij], zak: st.zak.length, passes: st.passes };
     }
     return { status: 200, potje: uit };
@@ -468,6 +558,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     if (p.soort !== 'schaak' && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
     if (p.soort === 'mejn') return zet && zet.actie === 'gooi' ? mejnGooi(p, mij) : mejnZet(p, mij, zet || {});
     if (p.soort === 'schaak') return schaakZet(p, mij, zet || {});
+    if (p.soort === 'pesten') return pestenZet(p, mij, zet || {});
     return woordZet(p, mij, zet || {});
   }
   function spelOpgeven(mij, id) {
@@ -482,18 +573,29 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer }
     return { status: 200, ok: true };
   }
 
-  /* ================= Sneek: de ranglijst onder vrienden ================= */
-  function sneekScore(mij, punten) {
-    const n = Math.max(0, Math.min(99999, Math.floor(Number(punten) || 0)));
-    const s = S().sneek;
+  /* ================= arcade (Sneek en Tetris): ranglijsten onder vrienden ================= */
+  const ARCADE = ['sneek', 'tetris'];
+  function A(spel) {
+    const s = S();
+    if (!s.arcade) s.arcade = { sneek: s.sneek || {}, tetris: {} }; // neemt oude sneek-scores mee
+    if (!s.arcade[spel]) s.arcade[spel] = {};
+    return s.arcade[spel];
+  }
+  function arcadeScore(mij, spel, punten) {
+    if (!ARCADE.includes(spel)) return { status: 400, error: 'Onbekend arcadespel.' };
+    const n = Math.max(0, Math.min(999999, Math.floor(Number(punten) || 0)));
+    const s = A(spel);
     if (!s[mij] || n > s[mij].punten) { s[mij] = { punten: n, at: nu() }; save(); }
     return { status: 200, ok: true, beste: s[mij].punten };
   }
-  function sneekBord(mij, vrienden) {
-    const s = S().sneek;
+  function arcadeBord(mij, spel, vrienden) {
+    if (!ARCADE.includes(spel)) return { status: 400, error: 'Onbekend arcadespel.' };
+    const s = A(spel);
     const rij = [mij, ...vrienden].filter(h => s[h]).map(h => ({ codenaam: codenaamVan(h), ik: h === mij, punten: s[h].punten }));
     return { bord: rij.sort((a, b) => b.punten - a.punten).slice(0, 20) };
   }
+  const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
+  const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, sneekScore, sneekBord, SPEL_SOORTEN: SOORTEN };
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN };
 };

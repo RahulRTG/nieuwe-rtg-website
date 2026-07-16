@@ -59,7 +59,9 @@ async function tweeVrienden() {
   const a = await json(await raw('/auth/register', { name: 'Speler A' + t, email: 'a' + t + '@v.test', phone: '0611' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
   const b = await json(await raw('/auth/register', { name: 'Speler B' + t, email: 'b' + t + '@v.test', phone: '0622' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1992-02-02', tier: 'rtg' }));
   await raw('/member/connections', {}, a.token); await raw('/member/connections', {}, b.token);
-  const zoek = await json(await raw('/member/find', { q: b.state.user.codename.split(' ')[0] }, a.token));
+  // op de volledige codenaam zoeken: exact raak, ook als de gids vol zit met
+  // eerdere testspelers die hetzelfde eerste woord delen (CI-flake)
+  const zoek = await json(await raw('/member/find', { q: b.state.user.codename }, a.token));
   const bKey = (zoek.results.find(r => r.codename === b.state.user.codename) || {}).key;
   assert.ok(bKey, 'A vindt B op codenaam');
   await raw('/member/connect', { key: bKey }, a.token);

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Zakgeld</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .7rem;}
+  .blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0 .8rem;}
+  .mini{background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem;}
+  .saldo{text-align:center;padding:1.2rem 1rem;}
+  .saldo .b{font-family:var(--serif);font-size:2.3rem;color:var(--goud2);}
+  .saldo small{display:block;color:var(--zacht);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin-top:.2rem;}
+  .rij2{display:flex;gap:.5rem;margin-top:.5rem;}
+  .rij2 .veld{flex:1;min-width:0;}
+  .knoprij{display:flex;gap:.5rem;margin-top:.5rem;}
+  .knoprij .knop{flex:1;}
+  .tx{display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--lijn);font-size:.92rem;}
+  .tx:last-child{border-bottom:0;}
+  .tx .w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .tx small{color:var(--zacht);font-size:.75rem;}
+  .tx .b{font-variant-numeric:tabular-nums;}
+  .tx .b.plus{color:var(--groen,#5FA56A);}
+  .tx .b.min{color:var(--rood);}
+  .doel{padding:.9rem 1rem;margin-bottom:.6rem;}
+  .doel .kop{display:flex;align-items:baseline;gap:.5rem;}
+  .doel .nm{font-family:var(--serif);font-size:1.1rem;flex:1;}
+  .doel .st{font-size:.82rem;color:var(--zacht);font-variant-numeric:tabular-nums;}
+  .spoor{height:.55rem;border-radius:999px;background:var(--paneel2);overflow:hidden;margin:.5rem 0;}
+  .spoor div{height:100%;background:var(--goud);border-radius:999px;transition:width .3s;}
+  .doel.klaar .spoor div{background:var(--groen,#5FA56A);}
+  .doelrij{display:flex;gap:.4rem;align-items:center;}
+  .doelrij .veld{width:7rem;}
+  .tip{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;margin-top:.8rem;color:var(--zacht);}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>💶 Zakgeld</h1>
+  <p class="intro">Jouw eigen potje: houd bij wat erin komt en eruit gaat, en spaar voor wat jij wilt. Niemand kijkt mee; dit is van jou.</p>
+
+  <div class="kaart saldo">
+    <div class="b" id="saldo">€ 0,00</div>
+    <small>vrij in je potje</small>
+  </div>
+
+  <div class="kaart blok">
+    <div class="rij2">
+      <input class="veld" id="bBedrag" inputmode="decimal" placeholder="Bedrag (bijv. 5 of 2,50)">
+      <input class="veld" id="bWat" placeholder="Waarvoor? (mag leeg)" maxlength="60">
+    </div>
+    <div class="knoprij">
+      <button class="knop" id="bPlus">+ Erbij</button>
+      <button class="knop grijs" id="bMin">- Uitgegeven</button>
+    </div>
+    <div class="fout" id="bFout"></div>
+  </div>
+
+  <h2 class="sec">Spaardoelen</h2>
+  <div id="doelen"><div class="leeg">Nog geen spaardoel. Waar droom je van?</div></div>
+  <div class="kaart blok">
+    <div class="rij2">
+      <input class="veld" id="dNaam" placeholder="Waar spaar je voor? (bijv. koptelefoon)" maxlength="40">
+      <input class="veld" id="dBedrag" inputmode="decimal" placeholder="Hoeveel?" style="max-width:8rem;">
+    </div>
+    <button class="knop grijs" id="dDoe" style="width:100%;margin-top:.5rem;">Spaardoel maken</button>
+    <div class="fout" id="dFout"></div>
+  </div>
+  <div class="tip" id="tip"></div>
+
+  <h2 class="sec">Laatste bewegingen</h2>
+  <div class="kaart blok" id="txs"><div class="leeg">Nog niets geboekt.</div></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const api = (actie, body) => fetch('/api/rtf/tiener/' + actie, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const euro = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const centen = v => Math.round(parseFloat(String(v || '').replace(',', '.')) * 100);
+
+const TIPS = [
+  'Spaartruc: doe eerst een dag niks als je iets wilt kopen. Wil je het morgen nog steeds? Dan is het misschien echt wat.',
+  'Verdien-idee: vraag thuis of bij de buren om klusjes (auto wassen, gras maaien, oppassen op de hond).',
+  'Kleine bedragen tellen op: 1 euro per week is 52 euro per jaar. Gewoon door niks te doen.',
+  'Iets tweedehands kopen (of je oude spullen verkopen) is vaak de snelste weg naar je spaardoel.',
+  'Deel je potje in je hoofd in drie stukken: uitgeven, sparen, en een beetje voor onverwachte dingen.',
+  'Gratis is ook leuk: eerst kijken wat je al hebt of kunt lenen, voordat je koopt.'
+];
+$('#tip').textContent = '💡 ' + TIPS[Math.floor(Date.now() / 86400000) % TIPS.length];
+
+function toon(d){
+  $('#saldo').textContent = euro(d.saldoCenten);
+  $('#doelen').innerHTML = d.doelen.length ? d.doelen.map(x => {
+    const pct = Math.min(100, Math.round(100 * x.gespaard / x.doelCenten));
+    return '<div class="kaart doel' + (x.behaald ? ' klaar' : '') + '"><div class="kop"><span class="nm">' + (x.behaald ? '🎉 ' : '🎯 ') + esc(x.naam) + '</span>' +
+      '<span class="st">' + euro(x.gespaard) + ' van ' + euro(x.doelCenten) + '</span>' +
+      '<button class="mini" data-weg="' + x.id + '" title="Doel weghalen (het gespaarde valt terug in je potje)">✕</button></div>' +
+      '<div class="spoor"><div style="width:' + pct + '%"></div></div>' +
+      (x.behaald ? '<div style="font-size:.85rem;color:var(--groen,#5FA56A);">Gehaald! Tijd om hem waar te maken.</div>'
+        : '<div class="doelrij"><input class="veld" data-in="' + x.id + '" inputmode="decimal" placeholder="Bedrag"><button class="knop klein" data-leg="' + x.id + '">In dit doel</button></div>') +
+      '</div>';
+  }).join('') : '<div class="leeg">Nog geen spaardoel. Waar droom je van?</div>';
+  $('#doelen').querySelectorAll('[data-leg]').forEach(b => b.addEventListener('click', async () => {
+    const inp = $('#doelen').querySelector('[data-in="' + b.dataset.leg + '"]');
+    try { toon(await api('doel-inleg', { id: b.dataset.leg, centen: centen(inp.value) })); } catch (e) { alert(e.message); }
+  }));
+  $('#doelen').querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Dit doel weghalen? Het gespaarde valt terug in je potje.')) return;
+    try { toon(await api('doel-weg', { id: b.dataset.weg })); } catch (e) {}
+  }));
+  $('#txs').innerHTML = d.transacties.length ? d.transacties.map(t =>
+    '<div class="tx"><span class="w">' + esc(t.wat) + '<small> · ' + new Date(t.at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + '</small></span>' +
+    '<span class="b ' + (t.centen > 0 ? 'plus' : 'min') + '">' + (t.centen > 0 ? '+' : '') + euro(t.centen).replace('€ ', '€ ') + '</span></div>').join('')
+    : '<div class="leeg">Nog niets geboekt.</div>';
+}
+async function boek(teken){
+  $('#bFout').textContent = '';
+  const c = centen($('#bBedrag').value);
+  try {
+    await api('boek', { centen: teken * Math.abs(c), wat: $('#bWat').value });
+    $('#bBedrag').value = ''; $('#bWat').value = '';
+    toon(await api('potje'));
+  } catch (e) { $('#bFout').textContent = e.message; }
+}
+$('#bPlus').addEventListener('click', () => boek(1));
+$('#bMin').addEventListener('click', () => boek(-1));
+$('#dDoe').addEventListener('click', async () => {
+  $('#dFout').textContent = '';
+  try { toon(await api('doel-maak', { naam: $('#dNaam').value, doelCenten: centen($('#dBedrag').value) })); $('#dNaam').value=''; $('#dBedrag').value=''; }
+  catch (e) { $('#dFout').textContent = e.message; }
+});
+api('potje').then(toon).catch(() => {});
+</script>
+</body>
+</html>

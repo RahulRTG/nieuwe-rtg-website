@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Kompas</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .7rem;}
+  .blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .dagvraag{font-family:var(--serif);font-size:1.15rem;line-height:1.45;border-left:4px solid var(--goud);padding:.2rem 0 .2rem .8rem;}
+  .thema{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;}
+  .thema button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.4rem .85rem;font-size:.85rem;cursor:pointer;}
+  .thema button:hover{border-color:var(--goud);}
+  .weet{background:var(--paneel2);border-radius:12px;padding:.8rem 1rem;font-size:.9rem;line-height:1.55;margin-bottom:.5rem;}
+  .weet b{color:var(--goud2);font-weight:600;}
+  .noodkaart{background:#1a1512;border:1px solid var(--rood);border-radius:12px;padding:1rem 1.1rem;line-height:1.55;font-size:.92rem;}
+  .noodkaart b{color:#e9a;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🧭 Kompas</h1>
+  <p class="intro">Voor alles waar je mee rondloopt: school, vrienden, thuis, online, of gewoon jij. Praat met je buddy of pak een onderwerp; niks is te klein of te raar.</p>
+
+  <div class="kaart blok">
+    <div class="dagvraag" id="dagvraag"></div>
+  </div>
+
+  <div class="kaart blok">
+    <div class="thema" id="thema">
+      <button data-t="Iedereen in mijn klas doet iets en ik eigenlijk niet, maar ik wil er wel bij horen.">👥 Groepsdruk</button>
+      <button data-t="Ik zit best veel op mijn telefoon en vergelijk mezelf met anderen online.">📱 Online en schermtijd</button>
+      <button data-t="Ik heb stress om school en toetsen en weet niet waar ik moet beginnen.">📚 Schoolstress</button>
+      <button data-t="Thuis is er vaak ruzie of gedoe en daar baal ik van.">🏠 Thuis</button>
+      <button data-t="Ik voel me best onzeker over mezelf de laatste tijd.">🌪️ Onzeker</button>
+      <button data-t="Er is iemand die ik heel leuk vind en ik weet niet wat ik moet doen.">💘 Verliefd</button>
+    </div>
+    <div class="chat" id="chat"><div class="b ai">Hoi, goed dat je er bent. Vertel maar wat er speelt, of tik hierboven een onderwerp aan. Wat je typt wordt niet bewaard en niemand van je gezin leest mee.</div></div>
+    <div class="rijveld">
+      <textarea class="veld" id="vraag" rows="1" placeholder="Typ het gewoon zoals het is..." maxlength="1000"></textarea>
+      <button class="knop klein" id="stuur">Stuur</button>
+    </div>
+  </div>
+
+  <h2 class="sec">Goed om te weten</h2>
+  <div class="weet"><b>Online druk:</b> stuurt iemand rare verzoeken of vraagt iemand om foto's? Je hoeft nooit iets te sturen. Het is nooit jouw schuld, en vertellen aan een volwassene die je vertrouwt is het sterkste wat je kunt doen. Kijk ook op Helpwanted.nl.</div>
+  <div class="weet"><b>Erbij horen:</b> nee zeggen en toch aardig gevonden worden kan echt. Wie je alleen mag zijn met een kunstje, is geen echte vriend.</div>
+  <div class="weet"><b>Je hoofd:</b> slecht slapen, veel piekeren of nergens zin in hebben? Dat kan iedereen hebben, en erover praten helpt echt. Begin bij iemand thuis, je mentor, of je buddy hierboven.</div>
+
+  <div class="noodkaart" style="margin-top:1rem;">
+    <b>Even iemand nodig, nu?</b> De Kindertelefoon is er elke dag van 11:00 tot 21:00, gratis en anoniem: bel 0800-0432 of chat op kindertelefoon.nl. Denk je aan zelfmoord? Bel 113 (0800-0113), dag en nacht. Bij direct gevaar: 112.
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+/* een dagvraag om even bij jezelf te checken; wisselt elke dag */
+const VRAGEN = [
+  'Waar werd je vandaag heel even blij van, hoe klein ook?',
+  'Wat zou je vandaag doen als niemand er iets van vond?',
+  'Wie heeft je deze week geholpen zonder dat die het doorhad?',
+  'Wat kun jij beter dan een jaar geleden?',
+  'Als je een vriend was van jezelf: wat zou je tegen jezelf zeggen?',
+  'Wat wil je deze week een keer durven?',
+  'Van wie of wat krijg jij energie, en wanneer deed je dat voor het laatst?'
+];
+$('#dagvraag').textContent = '💭 ' + VRAGEN[Math.floor(Date.now() / 86400000) % VRAGEN.length];
+
+/* de thema-knoppen zetten een eerlijke openingszin klaar; versturen doe je zelf */
+document.querySelectorAll('#thema button').forEach(b => b.addEventListener('click', () => {
+  $('#vraag').value = b.dataset.t;
+  $('#vraag').focus();
+}));
+
+Sessie.coach({ kind: 'tiener', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
+</script>
+</body>
+</html>

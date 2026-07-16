@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Toetsplanner</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .7rem;}
+  .blok{padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0 .8rem;}
+  .mini{background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem;}
+  .toets{padding:.9rem 1rem;margin-bottom:.7rem;}
+  .toets .kop{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;}
+  .toets .vak{font-family:var(--serif);font-size:1.15rem;}
+  .toets .wanneer{font-size:.8rem;color:var(--goud2);}
+  .toets .wanneer.snel{color:var(--rood);}
+  .toets .wat{color:var(--zacht);font-size:.85rem;margin:.15rem 0 .5rem;}
+  .stap{display:flex;align-items:flex-start;gap:.55rem;padding:.4rem 0;border-bottom:1px solid var(--lijn);}
+  .stap:last-child{border-bottom:0;}
+  .stap input[type=checkbox]{width:1.15rem;height:1.15rem;accent-color:var(--goud);margin-top:.1rem;flex-shrink:0;}
+  .stap .d{width:5.2rem;flex-shrink:0;font-size:.78rem;color:var(--zacht);padding-top:.15rem;}
+  .stap .d.nu{color:var(--goud2);font-weight:700;}
+  .stap .t{flex:1;line-height:1.4;font-size:.92rem;}
+  .stap.af .t{text-decoration:line-through;color:var(--zacht);}
+  .voortgang{height:.45rem;border-radius:999px;background:var(--paneel2);overflow:hidden;margin-top:.6rem;}
+  .voortgang div{height:100%;background:var(--goud);border-radius:999px;transition:width .3s;}
+  .rij2{display:flex;gap:.5rem;}
+  .rij2 .veld{flex:1;min-width:0;}
+</style>
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🎯 Toetsplanner</h1>
+  <p class="intro">Zet je toets erin en de planner spreidt het leren over de dagen: elke dag een klein stukje in plaats van alles op de avond ervoor. Afvinken mag, dat lucht op.</p>
+
+  <div class="kaart blok">
+    <div class="rij2">
+      <input class="veld" id="nVak" placeholder="Vak (bijv. Frans)" maxlength="40">
+      <input class="veld" id="nDatum" type="date" aria-label="Datum van de toets">
+    </div>
+    <input class="veld" id="nWat" style="margin-top:.4rem;" placeholder="Wat moet je kennen? (bijv. hoofdstuk 3, woordjes)" maxlength="120">
+    <button class="knop" id="nDoe" style="width:100%;margin-top:.5rem;">Plan mijn toets</button>
+    <div class="fout" id="nFout"></div>
+  </div>
+
+  <h2 class="sec">Jouw toetsen</h2>
+  <div id="toetsen"><div class="leeg">Nog geen toetsen gepland. Lekker rustig, of tijd om er een in te zetten?</div></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisFamilie()) {}
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const api = (actie, body) => fetch('/api/rtf/tiener/' + actie, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+let VANDAAG = '';
+function dagLabel(d){
+  if (d === VANDAAG) return 'vandaag';
+  return new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+async function laad(){
+  const d = await api('toetsen');
+  VANDAAG = d.vandaag;
+  $('#toetsen').innerHTML = d.toetsen.length ? d.toetsen.map(t => {
+    const af = t.plan.filter(x => x.af).length;
+    const wanneer = t.dagenTot === 0 ? 'vandaag!' : t.dagenTot === 1 ? 'morgen' : t.dagenTot > 1 ? 'over ' + t.dagenTot + ' dagen' : 'geweest';
+    return '<div class="kaart toets"><div class="kop"><span class="vak">' + esc(t.vak) + '</span>' +
+      '<span class="wanneer' + (t.dagenTot <= 1 ? ' snel' : '') + '">' + wanneer + ' · ' + new Date(t.datum + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span>' +
+      '<button class="mini" data-weg="' + t.id + '" style="margin-left:auto;" title="Toets weghalen">✕</button></div>' +
+      (t.wat ? '<div class="wat">' + esc(t.wat) + '</div>' : '') +
+      t.plan.map(p => '<div class="stap' + (p.af ? ' af' : '') + '">' +
+        '<input type="checkbox" data-id="' + t.id + '" data-dag="' + p.dag + '"' + (p.af ? ' checked' : '') + ' aria-label="Leerstap af">' +
+        '<span class="d' + (p.dag === VANDAAG ? ' nu' : '') + '">' + dagLabel(p.dag) + '</span><span class="t">' + esc(p.taak) + '</span></div>').join('') +
+      '<div class="voortgang"><div style="width:' + Math.round(100 * af / t.plan.length) + '%"></div></div></div>';
+  }).join('') : '<div class="leeg">Nog geen toetsen gepland. Lekker rustig, of tijd om er een in te zetten?</div>';
+  $('#toetsen').querySelectorAll('input[type=checkbox]').forEach(c => c.addEventListener('change', async () => {
+    try { await api('toets-stap', { id: c.dataset.id, dag: c.dataset.dag, af: c.checked }); laad(); } catch (e) {}
+  }));
+  $('#toetsen').querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Deze toets uit je planner halen?')) return;
+    try { await api('toets-weg', { id: b.dataset.weg }); laad(); } catch (e) {}
+  }));
+}
+$('#nDoe').addEventListener('click', async () => {
+  $('#nFout').textContent = '';
+  try { await api('toets-maak', { vak: $('#nVak').value, wat: $('#nWat').value, datum: $('#nDatum').value }); $('#nVak').value=''; $('#nWat').value=''; $('#nDatum').value=''; laad(); }
+  catch (e) { $('#nFout').textContent = e.message; }
+});
+laad();
+</script>
+</body>
+</html>

@@ -2546,6 +2546,9 @@ Object.assign(kern, require('./kern/leren')({
 /* Het babyboekje (kern/baby.js): het dagboek van de allerkleinsten, met
    gezinsnamen en AI-gezinsmomenten; foto's gaan naar de mediastore. */
 Object.assign(kern, require('./kern/baby')({ save, crypto, media, anthropic }));
+/* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
+   boardroom die alles ziet en het functieschakelbord bedient. */
+Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic }));
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));
@@ -2581,6 +2584,7 @@ require('./routes/spellen')(kern);
 require('./routes/leren')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
+require('./routes/kantoren')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

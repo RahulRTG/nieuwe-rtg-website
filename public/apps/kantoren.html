@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RTG Kantoren</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  a{color:inherit;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 1.2rem;}
+  header{border-bottom:1px solid var(--line);padding:1.1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+  .brand{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  main{padding:1.6rem 0 4rem;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.7rem;margin:.3rem 0 .2rem;}
+  .deck{color:var(--muted);font-size:.95rem;max-width:46rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;}
+  .veld{width:100%;border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
+  .veld:focus{border-color:var(--burgundy);}
+  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:999px;padding:.7rem 1.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .knop:hover{background:var(--burgundy);color:#fff;}
+  .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
+  /* kamergrid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-top:1.4rem;}
+  .kamer{padding:1.1rem 1.2rem;cursor:pointer;transition:border-color .12s, transform .12s;display:flex;flex-direction:column;gap:.35rem;text-align:left;}
+  .kamer:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .kamer .ic{font-size:1.5rem;}
+  .kamer h2{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;}
+  .kamer p{font-size:.78rem;color:var(--soft);flex:1;}
+  .kamer .kpi{font-size:.78rem;color:var(--gold);font-weight:600;}
+  .kamer.board{border-color:var(--gold);background:linear-gradient(160deg, #1a1610, var(--card));}
+  /* kamer-detail */
+  .kop{display:flex;align-items:baseline;gap:.8rem;flex-wrap:wrap;margin-top:1rem;}
+  .kop .terug{font-size:.85rem;color:var(--muted);cursor:pointer;background:none;border:0;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.8rem;margin:1.1rem 0;}
+  .kpi-tegel{padding:.9rem 1rem;}
+  .kpi-tegel b{display:block;font-family:'Bodoni Moda',serif;font-size:1.6rem;font-weight:500;font-variant-numeric:tabular-nums;}
+  .kpi-tegel span{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);}
+  h3.sec{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.4rem 0 .6rem;}
+  .lijst{padding:1rem 1.2rem;margin-bottom:.8rem;}
+  .lijst h4{font-size:.9rem;margin-bottom:.4rem;}
+  .lijst ul{list-style:none;}
+  .lijst li{font-size:.85rem;color:var(--muted);padding:.3rem 0;border-bottom:1px solid var(--line);}
+  .lijst li:last-child{border-bottom:0;}
+  .leeg{color:var(--soft);font-size:.85rem;}
+  .taak{display:flex;gap:.6rem;align-items:center;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.9rem;}
+  .taak:last-child{border-bottom:0;}
+  .taak input{width:1.05rem;height:1.05rem;accent-color:var(--gold);}
+  .taak.af span{text-decoration:line-through;color:var(--soft);}
+  .taakrij{display:flex;gap:.5rem;margin-top:.6rem;}
+  /* boardroom: schakelbord */
+  .schakels{display:grid;gap:.8rem;margin-top:.6rem;}
+  .cat{padding:1rem 1.2rem;}
+  .cat h4{font-size:.85rem;color:var(--gold);margin-bottom:.5rem;}
+  .fx{display:flex;align-items:center;gap:.7rem;padding:.4rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .fx:last-child{border-bottom:0;}
+  .fx .nm{flex:1;min-width:12rem;font-size:.88rem;}
+  .fx .nm small{display:block;color:var(--soft);font-size:.72rem;}
+  .wip{position:relative;width:2.6rem;height:1.4rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);cursor:pointer;flex-shrink:0;transition:background .15s;}
+  .wip::after{content:'';position:absolute;top:2px;left:2px;width:1rem;height:1rem;border-radius:50%;background:var(--soft);transition:left .15s, background .15s;}
+  .wip[aria-checked="true"]{background:rgba(76,154,117,.35);border-color:var(--green);}
+  .wip[aria-checked="true"]::after{left:calc(100% - 1rem - 2px);background:var(--green);}
+  .dgchips{display:flex;gap:.35rem;flex-wrap:wrap;}
+  .dg{font-size:.68rem;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;background:var(--card2);color:var(--muted);cursor:pointer;}
+  .dg.uit{border-color:var(--burgundy);color:var(--burgundy);}
+  .voorstel{display:flex;gap:.7rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.88rem;}
+  .voorstel:last-child{border-bottom:0;}
+  .voorstel .kamerlabel{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);white-space:nowrap;padding-top:.15rem;}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;}
+</style>
+</head>
+<body>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<header><div class="wrap">
+  <div class="brand">RTG Kantoren<small>Elke afdeling een eigen kamer</small></div>
+  <nav aria-label="Kantoor"><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a></nav>
+</div></header>
+
+<main id="hoofd" tabindex="-1"><div class="wrap">
+
+  <!-- inlog -->
+  <section id="vGate">
+    <h1>Het kantoor in</h1>
+    <p class="deck">Log in met de kantoorcode; dezelfde als voor de backoffice.</p>
+    <div class="kaart" style="max-width:26rem;padding:1.3rem;margin-top:1rem;">
+      <label for="code" style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:600;display:block;margin-bottom:.4rem;">Kantoorcode</label>
+      <input class="veld" id="code" type="password" autocomplete="current-password">
+      <button class="knop" id="login" style="width:100%;margin-top:.7rem;">Binnen</button>
+      <div class="fout" id="gFout"></div>
+    </div>
+  </section>
+
+  <!-- kamergrid -->
+  <section id="vKamers" hidden>
+    <h1>De kantoren</h1>
+    <p class="deck">Twaalf kamers, elk met de cijfers en werklijsten van die afdeling. De boardroom ziet alles en kan alles schakelen.</p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- een kamer -->
+  <section id="vKamer" hidden>
+    <div class="kop">
+      <button class="terug" id="kTerug">← alle kamers</button>
+      <h1 id="kNaam"></h1>
+      <span class="deck" id="kMissie" style="margin:0;"></span>
+    </div>
+    <div class="kpis" id="kKpis"></div>
+    <div id="kLijsten"></div>
+    <h3 class="sec">De werklijst van deze kamer</h3>
+    <div class="kaart lijst">
+      <div id="kTaken"><div class="leeg">Nog geen taken.</div></div>
+      <div class="taakrij">
+        <input class="veld" id="kNieuw" style="flex:1;" placeholder="Nieuwe taak voor deze kamer" maxlength="200">
+        <button class="knop stil" id="kMaak">+</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- de boardroom -->
+  <section id="vBoard" hidden>
+    <div class="kop">
+      <button class="terug" id="bTerug">← alle kamers</button>
+      <h1>🏛️ De Boardroom</h1>
+    </div>
+    <p class="deck">Alles van elke afdeling in een oogopslag, het volledige schakelbord van het platform, en de verbeterkamer die elke dag de cijfers naloopt. Instellingen schakelt de boardroom zelf; codeverbeteringen gaan als voorstel naar de ontwikkelstraat.</p>
+
+    <h3 class="sec">Alle kamers</h3>
+    <div class="kpis" id="bKamers"></div>
+
+    <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.6rem;">Loop nu een ronde</button></h3>
+    <div class="kaart lijst" id="bVoorstellen"></div>
+
+    <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
+    <div class="schakels" id="bSchakels"></div>
+  </section>
+
+</div></main>
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+const api = (pad, body) => fetch('/api/office/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
+function toon(v){ ['vGate','vKamers','vKamer','vBoard'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function uitgelogd(){ TOKEN = null; try { localStorage.removeItem('rtg_office_token'); } catch (e) {} toon('vGate'); }
+
+/* ---------- inloggen ---------- */
+$('#login').addEventListener('click', async () => {
+  $('#gFout').textContent = '';
+  try {
+    const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#code').value.trim() }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Die code klopt niet.');
+    TOKEN = d.token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch (e) {}
+    laadKamers();
+  } catch (e) { $('#gFout').textContent = e.message; }
+});
+$('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#login').click(); });
+
+/* ---------- het kamergrid ---------- */
+async function laadKamers(){
+  const d = await api('kamers');
+  toon('vKamers');
+  const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>';
+  $('#grid').innerHTML = board + d.kamers.map(k =>
+    '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
+    '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
+  $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
+    b.dataset.kamer === 'boardroom' ? openBoard() : openKamer(b.dataset.kamer)));
+}
+
+/* ---------- een kamer ---------- */
+let KAMER = null;
+async function openKamer(id){
+  const d = await api('kamer', { id });
+  KAMER = id;
+  toon('vKamer');
+  $('#kNaam').textContent = d.emoji + ' ' + d.naam;
+  $('#kMissie').textContent = d.missie;
+  $('#kKpis').innerHTML = d.kpis.map(k => '<div class="kaart kpi-tegel"><b>'+esc(String(k.waarde))+'</b><span>'+esc(k.label)+'</span></div>').join('');
+  $('#kLijsten').innerHTML = d.lijsten.map(l =>
+    '<div class="kaart lijst"><h4>'+esc(l.titel)+'</h4>'+(l.items.length ? '<ul>'+l.items.map(i => '<li>'+esc(i)+'</li>').join('')+'</ul>' : '<div class="leeg">Niets openstaand.</div>')+'</div>').join('');
+  tekenTaken(d.taken);
+}
+function tekenTaken(taken){
+  $('#kTaken').innerHTML = taken.length ? taken.map(t =>
+    '<div class="taak'+(t.af?' af':'')+'"><input type="checkbox" data-taak="'+t.id+'"'+(t.af?' checked':'')+' aria-label="Taak af"><span>'+esc(t.tekst)+'</span></div>').join('')
+    : '<div class="leeg">Nog geen taken.</div>';
+  $('#kTaken').querySelectorAll('[data-taak]').forEach(c => c.addEventListener('change', async () => {
+    try { await api('kamer/taak-zet', { id: KAMER, taakId: c.dataset.taak, af: c.checked }); } catch (e) { meld(e.message); }
+  }));
+}
+$('#kMaak').addEventListener('click', async () => {
+  try { await api('kamer/taak', { id: KAMER, tekst: $('#kNieuw').value }); $('#kNieuw').value = ''; openKamer(KAMER); } catch (e) { meld(e.message); }
+});
+$('#kNieuw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#kMaak').click(); });
+$('#kTerug').addEventListener('click', laadKamers);
+$('#bTerug').addEventListener('click', laadKamers);
+
+/* ---------- de boardroom ---------- */
+async function openBoard(){
+  const d = await api('boardroom');
+  toon('vBoard');
+  $('#bKamers').innerHTML = d.kamers.map(k =>
+    '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+k.emoji+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');
+  $('#bKamers').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => openKamer(b.dataset.kamer)));
+  tekenVoorstellen(d.verbeterkamer);
+  $('#bTelling').textContent = d.functiesUit ? '(' + d.functiesUit + ' uit)' : '(alles staat aan)';
+  $('#bSchakels').innerHTML = d.functies.map(g =>
+    '<div class="kaart cat"><h4>'+esc(g.categorie)+'</h4>'+g.functies.map(f =>
+      '<div class="fx"><div class="nm">'+esc(f.naam)+(f.storing ? ' ⚠️' : '')+'<small>'+esc(f.uitleg || '')+'</small></div>'+
+      '<div class="dgchips">'+(f.doelgroepen || []).map(dg =>
+        '<button type="button" class="dg'+(dg.aan ? '' : ' uit')+'" data-fx="'+f.id+'" data-dg="'+dg.id+'" data-aan="'+dg.aan+'" title="'+esc(dg.naam)+' aan of uit">'+esc(dg.naam)+'</button>').join('')+'</div>'+
+      '<button type="button" class="wip" role="switch" aria-checked="'+(f.aan ? 'true' : 'false')+'" data-schakel="'+f.id+'" aria-label="'+esc(f.naam)+' aan of uit"></button></div>').join('')+'</div>').join('');
+  $('#bSchakels').querySelectorAll('[data-schakel]').forEach(w => w.addEventListener('click', async () => {
+    const naarAan = w.getAttribute('aria-checked') !== 'true';
+    try { await api('boardroom/schakel', { functie: w.dataset.schakel, aan: naarAan }); w.setAttribute('aria-checked', String(naarAan)); meld(naarAan ? 'Aan gezet.' : 'Uit gezet.'); }
+    catch (e) { meld(e.message); }
+  }));
+  $('#bSchakels').querySelectorAll('[data-fx][data-dg]').forEach(c => c.addEventListener('click', async () => {
+    const naarAan = c.dataset.aan !== 'true';
+    try { await api('boardroom/schakel', { functie: c.dataset.fx, doelgroep: c.dataset.dg, aan: naarAan }); c.dataset.aan = String(naarAan); c.classList.toggle('uit', !naarAan); meld('Voor deze doelgroep ' + (naarAan ? 'aan' : 'uit') + ' gezet.'); }
+    catch (e) { meld(e.message); }
+  }));
+}
+function tekenVoorstellen(v){
+  $('#bVoorstellen').innerHTML = (v.voorstellen || []).map(p =>
+    '<div class="voorstel"><span class="kamerlabel">'+esc(p.kamer)+'</span><span>'+esc(p.tekst)+'</span></div>').join('') || '<div class="leeg">Nog geen ronde gelopen.</div>';
+}
+$('#bVernieuw').addEventListener('click', async () => {
+  try { const d = await api('boardroom/verbeter'); tekenVoorstellen(d.verbeterkamer); meld('Verse ronde gelopen.'); } catch (e) { meld(e.message); }
+});
+
+/* de boardroom ververst zichzelf zolang hij openstaat */
+setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }, 30000);
+
+if (TOKEN) laadKamers().catch(() => toon('vGate'));
+else toon('vGate');
+</script>
+</body>
+</html>

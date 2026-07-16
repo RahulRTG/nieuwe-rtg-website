@@ -8,7 +8,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;}
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--merk:#7F1734;--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}
@@ -27,10 +27,12 @@
   .veld{width:100%;border:1px solid var(--line);border-radius:10px;padding:.75rem .9rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
   .veld:focus{border-color:var(--burgundy);}
   .knop{background:var(--txt);color:var(--bg);border:none;border-radius:999px;padding:.75rem 1.4rem;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;}
-  .knop:hover{background:var(--burgundy);color:#fff;}
+  .knop:hover{background:var(--merk);color:#fff;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600;}
   .knop.pay{background:#000;color:#fff;border:1px solid #333;width:100%;font-size:1rem;padding:.9rem;}
-  .knop.groen{background:var(--green);color:#08130d;width:100%;font-size:1.05rem;padding:.95rem;}
+  /* de grote actieknoppen dragen het merkrood van het logo */
+  .knop.merk{background:var(--merk);color:#fff;width:100%;font-size:1.05rem;padding:.95rem;box-shadow:0 4px 18px rgba(127,23,52,.45);}
+  .knop.merk:hover{background:#96203F;}
   .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
   h3.sec{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.5rem 0 .2rem;}
   /* saldo-held */
@@ -54,12 +56,13 @@
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
   .schakel{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--muted);cursor:pointer;}
   .schakel input{width:1.05rem;height:1.05rem;accent-color:var(--gold);}
+.merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
 </head>
 <body>
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
-  <div class="brand">RTG Pay<small>Een tik en het is geregeld</small></div>
+  <div class="brand"><span class="merkvlak">RTG Pay</span><small>Een tik en het is geregeld</small></div>
   <nav aria-label="Pay"><a href="/apps/app.html" style="font-size:.8rem;color:var(--muted);">Naar de app →</a></nav>
 </div></header>
 
@@ -94,9 +97,9 @@
     </div>
 
     <h3 class="sec">Voor jou (een tik en hij is betaald)</h3>
-    <div class="kaart" id="pAanMij"><div class="leeg">Geen openstaande verzoekjes. Lekker.</div></div>
+    <div class="kaart" id="pAanMij"><div class="leeg">Geen openstaande Goudjes. Lekker.</div></div>
 
-    <h3 class="sec">Tikkie sturen</h3>
+    <h3 class="sec">Een Goudje vragen (het RTG-tikkie)</h3>
     <div class="kaart">
       <div class="rij">
         <input class="veld" id="tBedrag" inputmode="decimal" placeholder="Totaal in euro" style="max-width:9rem;">
@@ -107,7 +110,7 @@
         <div class="chiprij" id="tVrienden" aria-label="Kies vrienden"></div>
       </div>
       <label class="schakel"><input type="checkbox" id="tSplits" checked> Splits het totaal, ik doe zelf mee</label>
-      <button class="knop groen" id="tStuur" style="margin-top:.7rem;">Stuur het tikkie</button>
+      <button class="knop merk" id="tStuur" style="margin-top:.7rem;">Vraag het Goudje</button>
     </div>
 
     <h3 class="sec">Geld sturen (zomaar, of terugbetalen)</h3>
@@ -135,7 +138,7 @@
     </div>
 
     <h3 class="sec">Uitstaand en geschiedenis</h3>
-    <div class="kaart" id="pVanMij"><div class="leeg">Geen uitstaande tikkies.</div></div>
+    <div class="kaart" id="pVanMij"><div class="leeg">Geen uitstaande Goudjes.</div></div>
     <div class="kaart" id="pHist"><div class="leeg">Nog geen bewegingen.</div></div>
   </section>
 
@@ -177,8 +180,8 @@ async function ververs(){
   // voor jou: elk verzoek is EEN knop
   $('#pAanMij').innerHTML = d.aanMij.length ? d.aanMij.map(v =>
     '<div class="tikkie"><div class="wie"><b>'+esc(v.van)+'</b><small>'+esc(v.oms)+'</small></div>'+
-    '<button class="knop groen" data-betaal="'+v.id+'" style="width:auto;flex:1;min-width:9rem;">Betaal '+esc(euro(v.centen))+' eur</button></div>').join('')
-    : '<div class="leeg">Geen openstaande verzoekjes. Lekker.</div>';
+    '<button class="knop merk" data-betaal="'+v.id+'" style="width:auto;flex:1;min-width:9rem;">Betaal '+esc(euro(v.centen))+' eur</button></div>').join('')
+    : '<div class="leeg">Geen openstaande Goudjes. Lekker.</div>';
   $('#pAanMij').querySelectorAll('[data-betaal]').forEach(b => b.addEventListener('click', async () => {
     b.disabled = true;
     try {
@@ -192,7 +195,7 @@ async function ververs(){
     '<div class="tikkie"><div class="wie"><b>'+esc(v.aan)+'</b><small>'+esc(v.oms)+' · '+esc(euro(v.centen))+' eur</small></div>'+
     '<span style="color:'+(v.status==='betaald'?'var(--green)':v.status==='open'?'var(--gold)':'var(--soft)')+';font-size:.82rem;">'+esc(v.status)+'</span>'+
     (v.status==='open' ? '<button class="knop stil" data-intrek="'+v.id+'" style="padding:.3rem .8rem;font-size:.75rem;">Trek in</button>' : '')+'</div>').join('')
-    : '<div class="leeg">Geen uitstaande tikkies.</div>';
+    : '<div class="leeg">Geen uitstaande Goudjes.</div>';
   $('#pVanMij').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
     try { await api('pay/verzoek/intrek', { id: b.dataset.intrek }); ververs(); } catch (e) { meld(e.message); }
   }));
@@ -239,7 +242,7 @@ $('#tStuur').addEventListener('click', async () => {
   const aan = [...new Set([...gekozen, ...los])];
   try {
     const r = await api('pay/verzoek', { aan, totaalCenten: totaal, oms: $('#tOms').value, splitsMetMij: $('#tSplits').checked });
-    meld('Tikkie staat uit: ' + euro(r.perPersoon) + ' eur per persoon, naar ' + r.verzoeken.length + ' vriend(en).');
+    meld('Het Goudje staat uit: ' + euro(r.perPersoon) + ' eur per persoon, naar ' + r.verzoeken.length + ' vriend(en).');
     $('#tBedrag').value = ''; $('#tOms').value = ''; $('#tAan').value = '';
     gekozen.clear();
     $('#tVrienden').querySelectorAll('[data-vriend]').forEach(c => c.setAttribute('aria-pressed', 'false'));

@@ -1,5 +1,5 @@
 /* RTG Pay: de interne betaallaag. Een wallet per lid op een dubbel grootboek,
-   alles EEN knop: opladen via de betaal-naad, tikkies (ook gesplitst) die je
+   alles EEN knop: opladen via de betaal-naad, Goudjes (de RTG-eigen tikkies, ook gesplitst) die je
    met een tik betaalt waarbij de wallet zelf bijlaadt, de kassacode bij de
    partner, en uitbetalen. De sluitcontrole bewaakt dat de som van alle saldi
    altijd exact nul is. Draai los:
@@ -59,7 +59,7 @@ test('opladen: een tik en het staat op de wallet; dubbel tikken laadt nooit dubb
   assert.equal((await api('pay/overzicht', {}, lidA.token)).body.saldo, 5000, 'en boekt niet dubbel');
 });
 
-test('het tikkie: gesplitst uitsturen, en de ander betaalt met EEN knop (autolaad doet de rest)', async () => {
+test('het Goudje: gesplitst uitsturen, en de ander betaalt met EEN knop (autolaad doet de rest)', async () => {
   // A schoot 30 euro voor en splitst met zichzelf mee: B moet 15 euro
   const t = await api('pay/verzoek', { aan: [lidB.codenaam], totaalCenten: 3000, oms: 'Strandbedjes', splitsMetMij: true }, lidA.token);
   assert.equal(t.status, 200);

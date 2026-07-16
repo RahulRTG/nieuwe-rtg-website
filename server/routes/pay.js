@@ -1,5 +1,5 @@
 /* Domein "pay": RTG Pay, de interne betaallaag. Ledenkant (wallet, opladen,
-   tikkies, kassacode) achter de gewone leden-inlog; partnerkant (innen,
+   Goudjes (betaalverzoeken), kassacode) achter de gewone leden-inlog; partnerkant (innen,
    saldo, uitbetalen) achter de leverancier-inlog. Alles idempotent: de
    client stuurt bij elke knop een idem-sleutel mee, dubbeltikken kan nooit
    dubbel boeken. */
@@ -26,12 +26,12 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, await pay.stuur({ van: liveCodename(req.session), aanCodenaam: req.body.aan, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem }));
   });
-  // een tikkie maken (een of meer vrienden, met of zonder splitsen)
+  // een Goudje vragen (een of meer vrienden, met of zonder splitsen)
   app.post('/api/pay/verzoek', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, await pay.verzoekMaak({ van: liveCodename(req.session), aan: req.body.aan, totaalCenten: req.body.totaalCenten, perCenten: req.body.perCenten, oms: req.body.oms, splitsMetMij: req.body.splitsMetMij === true }));
   });
-  // een tikkie betalen: EEN knop
+  // een Goudje betalen: EEN knop
   app.post('/api/pay/verzoek/betaal', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, await pay.verzoekBetaal({ codenaam: liveCodename(req.session), verzoekId: String(req.body.id || ''), idem: req.body.idem }));

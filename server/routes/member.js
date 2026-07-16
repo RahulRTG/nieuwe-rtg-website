@@ -3,6 +3,7 @@
 module.exports = (kern) => {
   const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessionFor, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept,
     reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview, reviewsVoor,
+    verblijfBoek, mijnVerblijven, verblijfAnnuleer,
     toggleFavoriet, favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits,
     zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
     voorkeurVan, zetVoorkeur,
@@ -2043,6 +2044,20 @@ app.post('/api/vastgoed/keyless', auth, (req, res) => {
 /* ================= DE ERVARING-LAAG (kern/ervaring.js) =================
    Tafelreserveringen, annuleren, reviews, favorieten, de reisagenda,
    rekening splitsen, wachtlijsten, RTG-punten en meldingsvoorkeuren. */
+
+// een kamer boeken: het lid kiest data, het hotel beslist (toren hotel)
+app.post('/api/verblijf', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = verblijfBoek(req.session, liveCodename(req.session), req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/verblijf/mijn', auth, (req, res) => res.json({ verblijven: mijnVerblijven(req.session.key) }));
+app.post('/api/verblijf/annuleer', auth, (req, res) => {
+  const r = verblijfAnnuleer(req.session.key, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
 
 // tafel reserveren: het lid vraagt aan, de zaak beslist
 app.post('/api/reserveer', auth, (req, res) => {

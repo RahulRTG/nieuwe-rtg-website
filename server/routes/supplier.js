@@ -2550,6 +2550,7 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
   require('./supplier/agent')(kern);
   require('./supplier/tools')(kern);
   require('./supplier/keuken')(kern);
+  require('./supplier/verblijf')(kern);
   require('./supplier/pda')(kern);
   require('./supplier/bezorg')(kern);
   require('./supplier/tickets')(kern);

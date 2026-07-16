@@ -2668,6 +2668,9 @@ Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCode
    voorraad-afboeking bij elke verkoop, telling/verspilling/levering met
    logboek, marges en het inkoopadvies. */
 Object.assign(kern, require('./kern/keuken')({ db, save, crypto, schoon, notifySupplier }));
+/* De verblijf-laag (kern/verblijf.js): echte verblijven met datums, het
+   receptiebord en de check-in/check-out-keten; logies als kamerlast. */
+Object.assign(kern, require('./kern/verblijf')({ db, save, crypto, schoon, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer }));
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

@@ -489,3 +489,22 @@
 
   function applyState(st){ state = st; S = st.supplier; }
 
+
+  /* De Zaakdoos: draait dit scherm op het kastje in de zaak, zeg dan eerlijk
+     wanneer de lijn weg is. Alles blijft gewoon werken; het journaal
+     synchroniseert vanzelf zodra de lijn terug is. */
+  (function () {
+    let doosTimer = null, doosBanner = false;
+    async function doosCheck() {
+      try {
+        const d = await (await fetch('/api/doos/status')).json();
+        if (!d.doos) return; // gewone cloudserver: niets te bewaken
+        if (!doosTimer) doosTimer = setInterval(doosCheck, 10000);
+        if (d.modus === 'lokaal' && window.RTGNet) {
+          doosBanner = true;
+          RTGNet.toon('📦 ' + T('doos.lokaal', 'Zaakdoos: de lijn is weg; de zaak draait lokaal door en synchroniseert vanzelf.') + (d.journaal ? ' (' + d.journaal + ' actie(s) in het journaal)' : ''));
+        } else if (doosBanner && window.RTGNet) { doosBanner = false; RTGNet.verberg(); }
+      } catch (e) {}
+    }
+    setTimeout(doosCheck, 2500);
+  })();

@@ -179,6 +179,21 @@ if (DEMO) {
 
 const app = express();
 
+/* ---------- De Zaakdoos (RTG_DOOS_CLOUD gezet) ----------
+   Dit proces draait dan op een kastje in de zaak. Online is het een
+   doorgeefluik naar de cloud; valt de lijn weg, dan draait alles hier lokaal
+   verder en wordt elke zaak-schrijfactie gejournald en later nagespeeld.
+   Deze middleware staat bewust voor de body-parsers: het doorgeefluik stuurt
+   de rauwe bytes een-op-een door. */
+const zaakdoos = require('./kern/zaakdoos')({ db, save, log }).doos;
+if (zaakdoos.actief) {
+  app.use((req, res, next) => {
+    if (zaakdoos.modusVan() !== 'cloud' || !zaakdoos.magProxy(req.path)) return next();
+    zaakdoos.proxy(req, res).then(gelukt => { if (!gelukt) next(); }).catch(() => next());
+  });
+  console.log('[doos] zaakdoos-modus: doorgeefluik naar', process.env.RTG_DOOS_CLOUD);
+}
+
 /* ---------- foutisolatie per verzoek ----------
    Een bug in EEN route mag nooit het proces (en dus alle andere apps) raken.
    Express 4 vangt een gegooide fout in een async handler niet zelf op: het
@@ -278,6 +293,19 @@ app.post('/api/munt/webhook', express.raw({ type: '*/*', limit: '1mb' }), async 
 });
 
 app.use(express.json({ limit: '8mb' }));
+
+/* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
+   journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.
+   Inloggen en de livestream horen bij de doos zelf en spelen we niet na. */
+if (zaakdoos.actief) {
+  app.use((req, res, next) => {
+    if (zaakdoos.modusVan() !== 'lokaal' || req.method !== 'POST') return next();
+    if (!req.path.startsWith('/api/supplier/') || req.path === '/api/supplier/login' || req.path.startsWith('/api/supplier/stream')) return next();
+    const echteJson = res.json.bind(res);
+    res.json = (d) => { if (res.statusCode < 300) zaakdoos.schrijfJournaal(req.path, req.body, d); return echteJson(d); };
+    next();
+  });
+}
 
 /* ---------- rem op de deur (rate-limiter) ----------
    In productie (of met RTG_RATELIMIT=1) mag een IP maximaal 300 API-verzoeken
@@ -1499,6 +1527,19 @@ app.get('/api/health', (req, res) => res.json({
 // Het kleinst mogelijke antwoord (een paar tientallen bytes) waarmee de apps
 // de rondreistijd peilen voor de satellietmodus; zonder inloggen, zonder poespas.
 app.get('/api/sat/ping', (req, res) => res.json({ ok: 1, t: Date.now() }));
+
+/* De Zaakdoos: een verse kloon van de data voor het kastje in de zaak.
+   Alleen met de gedeelde sleutel (RTG_DOOS_SLEUTEL), in constante tijd
+   vergeleken. De doos zelf meldt zijn status onbeschermd op het eigen net. */
+app.get('/api/doos/kloon', (req, res) => {
+  const s = process.env.RTG_DOOS_SLEUTEL || '';
+  const g = String(req.get('x-doos-sleutel') || '');
+  if (!s || g.length !== s.length || !crypto.timingSafeEqual(Buffer.from(g), Buffer.from(s))) {
+    return res.status(403).json({ error: 'Geen toegang.' });
+  }
+  res.json({ data: db.data });
+});
+app.get('/api/doos/status', (req, res) => res.json(zaakdoos.status()));
 
 /* Alleen in de testsuite: twee opzettelijke storingen om de foutisolatie te
    BEWIJZEN. /api/test/bug gooit een async fout (die ene aanvraag krijgt 500,

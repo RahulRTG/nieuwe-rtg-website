@@ -326,8 +326,23 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   /* Het woordenboek: echte NL- en EN-lijsten (server/woorden/*.txt.gz),
      lui geladen en daarna in het geheugen. Ontbreekt een lijst, dan valt
      dat potje terug op het eer-systeem in plaats van stuk te gaan. */
+  /* De woordenlijsten (NL + EN samen ruwweg 700.000 woorden) kosten tientallen
+     MB's aan geheugen. Ze laden lui bij het eerste woord-potje en worden weer
+     VRIJGEGEVEN als er een half uur geen woord gekeurd is: een server zonder
+     actieve Woordduel-potjes draagt ze dan niet mee. */
   const WOORDENBOEK = {};
+  let woordenboekGebruikt = 0, woordenboekOpruimer = null;
   function woordenboek(taal) {
+    woordenboekGebruikt = Date.now();
+    if (!woordenboekOpruimer) {
+      woordenboekOpruimer = setInterval(() => {
+        if (Date.now() - woordenboekGebruikt > 30 * 60000) {
+          for (const t of Object.keys(WOORDENBOEK)) delete WOORDENBOEK[t];
+          clearInterval(woordenboekOpruimer); woordenboekOpruimer = null;
+        }
+      }, 5 * 60000);
+      if (woordenboekOpruimer.unref) woordenboekOpruimer.unref();
+    }
     if (taal in WOORDENBOEK) return WOORDENBOEK[taal];
     try {
       const raw = zlib.gunzipSync(fs.readFileSync(path.join(__dirname, '..', 'woorden', taal + '.txt.gz')));
@@ -1127,5 +1142,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN };
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+    // alleen voor de drift-test: de client heeft een eigen kopie van deze
+    // regels (directe feedback); de test houdt beide kopieën tegen elkaar
+    _spelregels: { rummiSet, W_PREMIE } };
 };

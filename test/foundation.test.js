@@ -261,8 +261,14 @@ test('privacy: gevoelige data ligt versleuteld op schijf en het gezin kan alles 
   await api('/gezin/bericht', { code: g.code, token: kt, naar: 'allen', soort: 'hulp', tekst: 'GEHEIM-BERICHT-IK-WIL-PRATEN' });
   await new Promise(r => setTimeout(r, 200)); // even wachten tot alles is weggeschreven
 
-  // het ruwe databasebestand mag deze gegevens niet leesbaar bevatten
-  const ruw = fs.readFileSync(path.join(TMP, 'db.json'), 'utf8');
+  // het ruwe databasebestand mag deze gegevens niet leesbaar bevatten,
+  // welke opslagmotor er ook draait (db.json, of store.db met zijn WAL)
+  const ruw = ['db.json', 'store.db', 'store.db-wal']
+    .map(f => path.join(TMP, f))
+    .filter(f => fs.existsSync(f))
+    .map(f => fs.readFileSync(f, 'utf8'))
+    .join('\n');
+  assert.ok(ruw.length > 0, 'er ligt een databasebestand op schijf');
   assert.ok(ruw.includes('enc:'), 'er staat versleutelde data in de database');
   assert.ok(!ruw.includes('GEHEIM-ALLERGIE-PINDAKAAS'), 'de allergie-info staat niet leesbaar op schijf');
   assert.ok(!ruw.includes('GEHEIM-BERICHT-IK-WIL-PRATEN'), 'het bericht staat niet leesbaar op schijf');

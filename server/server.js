@@ -617,10 +617,14 @@ const etaMinutes = geo.etaMinutes;
    sseToSupplier, sseToOffice en findSupplier zijn hoisted functies. */
 const { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveStateFor, guestsFor } =
   maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n });
+/* De ledengids (sleutel -> codenaam + pas) staat in server/kern/gids.js:
+   dirTouch, ledental, opzoeken en zoeken op codenaam, met of zonder Postgres. */
+const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam } =
+  require('./kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsZoek, ledenGidsAantal });
 // Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
 // vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
 onExternalChange(() => {
-  _ledenAantalCache = null; // externe wijziging: ledental opnieuw bepalen
+  ledenAantalVerversen(); // externe wijziging: ledental opnieuw bepalen
   if (!db.data || !db.data.sessions) return;
   for (const [t, s] of Object.entries(db.data.sessions)) sessions.set(t, s);
 });
@@ -1409,88 +1413,9 @@ function auth(req, res, next) {
    weg, zodat door gebruikers ingevoerde namen en berichten nooit als
    opmaak in andermans scherm kunnen belanden. */
 
-/* Ledengids voor Salon-connecties: sleutel -> codenaam. Wordt bijgehouden
-   zodra een lid iets doet; zo kunnen leden elkaar op codenaam vinden
-   zonder dat er ooit een echte naam over de lijn gaat. */
-function dirTouch(sess) {
-  // echte accounts (ook de gratis laag) staan in de codenaam-gids en kunnen
-  // elkaar vinden; alleen een anonieme demo-gast zonder account niet
-  if (!sess) return;
-  if (sess.tier === 'guest' && !sess.account) return;
-  const cn = liveCodename(sess);
-  // Met Postgres gaat het lid naar de geindexeerde ledengids (member_dir) en
-  // NIET naar db.data.memberDir: zo groeit de gids buiten het geheugen en staan
-  // er bij miljoenen leden geen miljoenen rijen in het proces.
-  if (ledenGidsActief()) {
-    const cur = ledenGidsHaal(sess.key);
-    if (!cur || cur.codename !== cn || cur.tier !== sess.tier) ledenGidsZet(sess.key, cn, sess.tier).catch(() => {});
-    return;
-  }
-  if (!db.data.memberDir) return;
-  const cur = db.data.memberDir[sess.key];
-  if (!cur || cur.codename !== cn || cur.tier !== sess.tier) {
-    if (!cur && _ledenAantalCache != null) _ledenAantalCache++; // nieuw lid: teller ophogen
-    db.data.memberDir[sess.key] = { codename: cn, tier: sess.tier };
-    save();
-  }
-}
-
-// Goedkoop ledental voor de kantoor-totalen. Object.keys(memberDir).length is
-// O(N) en materialiseert een array van alle sleutels: bij miljoenen leden kost
-// dat seconden per kantoorverzoek. We cachen het aantal, hogen het op bij een
-// nieuw lid (zie dirTouch) en verversen alleen bij een externe datawijziging.
-// De demo-persona's die bij opstart in memberDir worden gezet (zie de init):
-// dit zijn geen echte leden en tellen dus niet mee in het ledental.
-const GIDS_SEED_TIERS = ['rtg', 'lifestyle', 'business'];
-let _ledenAantalCache = null;
-function ledenAantal() {
-  // Met Postgres komt het ledental uit de geindexeerde gids (O(1), telt ook de
-  // leden die niet in het geheugen staan). Zonder Postgres: de onderhouden
-  // lokale teller, met de seed-persona's eraf.
-  if (ledenGidsActief()) return ledenGidsAantal();
-  if (_ledenAantalCache == null) {
-    const dir = db.data.memberDir || {};
-    _ledenAantalCache = Object.keys(dir).length - GIDS_SEED_TIERS.filter(k => dir[k]).length;
-  }
-  return _ledenAantalCache;
-}
-
-// Eenpuntstoegang tot de ledengids. Met Postgres komt een lid uit de
-// geindexeerde tabel (cache + backfill), zonder Postgres uit db.data.memberDir.
-// Zo hoeft de gids bij miljoenen leden niet in het geheugen te staan, terwijl de
-// lezers hetzelfde blijven aanroepen.
-function gidsHaal(key) {
-  if (ledenGidsActief()) return ledenGidsHaal(key) || null;
-  return db.data.memberDir[key] || null;
-}
-// Zoeken op (deel van) een codenaam. Met Postgres geindexeerd; anders een scan
-// over het geheugen. exact=true eist een exacte codenaam.
-async function gidsZoekCodenaam(q, exact) {
-  const ql = String(q || '').trim().toLowerCase();
-  if (!ql) return [];
-  if (ledenGidsActief()) {
-    const rows = await ledenGidsZoek(ql, 50);
-    return exact ? rows.filter(r => String(r.codename || '').toLowerCase() === ql) : rows;
-  }
-  const out = [];
-  for (const [key, m] of Object.entries(db.data.memberDir || {})) {
-    const cl = String(m.codename || '').toLowerCase();
-    if (cl && (exact ? cl === ql : cl.includes(ql))) out.push({ key, codename: m.codename, tier: m.tier });
-  }
-  return out;
-}
-
-/* Een lid opzoeken op codenaam (voor contracten, uitnodigingen): de gids
-   koppelt de sleutel aan de codenaam, nooit aan een echte naam. Async: met
-   Postgres een geindexeerde opzoeking i.p.v. een scan door het geheugen. */
-async function keyVanCodenaam(codenaam) {
-  const c = String(codenaam || '').trim();
-  if (!c) return null;
-  // een exacte codenaam-treffer; met Postgres geindexeerd. We nemen codenaam en
-  // pas rechtstreeks uit de treffer (geen tweede opzoeking, dus geen cache-miss).
-  const treffers = await gidsZoekCodenaam(c, true);
-  return treffers.length ? { key: treffers[0].key, tier: treffers[0].tier, codename: treffers[0].codename } : null;
-}
+/* De ledengids (dirTouch, ledenAantal, gidsHaal, gidsZoekCodenaam,
+   keyVanCodenaam) staat in server/kern/gids.js en is hierboven, direct na de
+   live-laag, opgezet. */
 
 /* ---------- Salon-rechten (server-side afgedwongen) ----------
    gast: alleen liken; RTG: reageren/dm'en met RTG-leden;

@@ -40,7 +40,12 @@ function beslotenMap(d) { try { fs.mkdirSync(d, { recursive: true, mode: 0o700 }
    geef een collectie dus aan een domein.) De data in het geheugen (db.data)
    blijft precies gelijk, dus de rest van de app merkt er niets van. */
 const DATABASE_URL = process.env.DATABASE_URL || process.env.PG_URL || null;
-const STORE = process.env.RTG_STORE || (DATABASE_URL ? 'postgres' : 'json');
+/* De opslagkeuze: Postgres zodra er een DATABASE_URL is; anders houdt een
+   bestaande installatie zijn db.json (niets verandert onder je voeten), en
+   krijgt een VERSE installatie de SQLite-motor. Die schrijft per collectie
+   in plaats van telkens de hele kast te serialiseren: zuiniger en veel
+   beter schaalbaar. RTG_STORE blijft altijd de baas. */
+const STORE = process.env.RTG_STORE || (DATABASE_URL ? 'postgres' : (fs.existsSync(DB_FILE) ? 'json' : 'sqlite'));
 let kvdb = null;
 const toegepast = new Map();   // collectie -> versienummer dat dit proces al toegepast heeft
 const laatsteJson = new Map(); // collectie -> laatst weggeschreven JSON (om ongewijzigde over te slaan)
@@ -434,7 +439,14 @@ function load() {
     db.data = leesLokaleSnapshot() || seed();
   } else if (STORE === 'sqlite') {
     db.data = loadSqlite();
-    if (!db.data) { db.data = seed(); save(); }
+    if (!db.data) {
+      // migratiepad: wie met RTG_STORE=sqlite overstapt terwijl er nog een
+      // db.json ligt, neemt die data mee in plaats van leeg te beginnen
+      const oud = leesLokaleSnapshot();
+      if (oud) console.log('[db] bestaande db.json overgenomen in de SQLite-opslag.');
+      db.data = oud || seed();
+      save();
+    }
   } else if (fs.existsSync(DB_FILE)) {
     const ruw = fs.readFileSync(DB_FILE, 'utf8');
     let tekst;

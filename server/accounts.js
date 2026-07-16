@@ -57,6 +57,14 @@ function loadKey(file, envName) {
 function init() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   db = new DatabaseSync(DB_FILE);
+  /* WAL + busy_timeout: lezers en schrijvers blokkeren elkaar niet meer, en
+     als twee processen dezelfde accountsdatabase raken (failover-trio, een
+     herstart die de oude instance een tel overlapt, parallelle testservers)
+     wacht de tweede even in plaats van hard te crashen op "database is
+     locked". Dit was de bron van de sporadische testflake. */
+  db.exec('PRAGMA journal_mode=WAL');
+  db.exec('PRAGMA synchronous=NORMAL');
+  db.exec('PRAGMA busy_timeout=5000');
   db.exec(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email_hash TEXT UNIQUE,

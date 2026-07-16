@@ -28,7 +28,8 @@ const ORDER = (ref, at, status) => ({
 
 function boot() {
   child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', RTG_OWNER_EMAIL: '' },
+    // deze test seedt en leest het rauwe db.json en test dus bewust de JSON-opslag
+    env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, RTG_STORE: 'json', NODE_ENV: 'test', SMTP_URL: '', RTG_OWNER_EMAIL: '' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
   return (async () => {

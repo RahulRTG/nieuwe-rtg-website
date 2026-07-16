@@ -366,8 +366,15 @@ $('#nRandom').addEventListener('click', async ()=>{
   }catch(e){ $('#nFout').textContent = e.message; }
 });
 
-/* ---------- een potje spelen (polling houdt het bord vers) ---------- */
+/* ---------- een potje spelen: de server duwt, polling is het vangnet ----------
+   De SSE-stream seint zodra er in jouw potje gezet is; dan verversen we
+   meteen. De poll blijft als vangnet maar mag daardoor traag zijn, en hij
+   pauzeert als het scherm verborgen is (zuinig op data en batterij). */
 let huidig = null, pollT = null, mgVelden = null;
+async function ververs(){
+  if (!huidig) return;
+  try{ const d = await api('staat', { id: huidig.id }); huidig = d.potje; tekenPotje(); }catch(e){}
+}
 async function openPotje(id){
   // bij het openen reist het statische Magnaat-bord eenmalig mee; de polls
   // daarna dragen alleen de dynamische staat
@@ -375,11 +382,29 @@ async function openPotje(id){
   if (huidig.staat && huidig.staat.velden) mgVelden = huidig.staat.velden;
   toon('vSpel'); tekenPotje();
   clearInterval(pollT);
-  pollT = setInterval(async ()=>{
-    if (!huidig) return;
-    try{ const d = await api('staat', { id: huidig.id }); huidig = d.potje; tekenPotje(); }catch(e){}
-  }, 2500);
+  pollT = setInterval(()=>{ if (!document.hidden) ververs(); }, 8000);
 }
+let stream = null;
+function verbindStream(){
+  try{
+    const url = memberTok
+      ? '/api/stream?token=' + encodeURIComponent(memberTok)
+      : '/api/rtf/social/stream?code=' + encodeURIComponent(rtfSess.code) + '&token=' + encodeURIComponent(rtfSess.token);
+    stream = new EventSource(url); // herverbindt zelf na een dip
+    stream.addEventListener('social', (e)=>{
+      let d = {}; try{ d = JSON.parse(e.data); }catch(err){ return; }
+      if (d.kind !== 'spel') return;
+      if (huidig && d.potje === huidig.id && !$('#vSpel').hidden) ververs();
+      else if (!$('#vLobby').hidden) laadLobby();
+    });
+  }catch(e){}
+}
+// terug in beeld (tab-wissel, telefoon uit de zak): meteen even verversen
+document.addEventListener('visibilitychange', ()=>{
+  if (document.hidden) return;
+  if (huidig && !$('#vSpel').hidden) ververs();
+  else if (!$('#vLobby').hidden) laadLobby();
+});
 /* een zet spelen en meteen verversen: de server stuurt de nieuwe staat in
    het zet-antwoord mee, dus een tweede staat-verzoek is niet nodig */
 async function speelZet(zet){
@@ -1091,7 +1116,9 @@ const MIJN_SPELLEN = memberTok
   : ['mejn', 'pesten', 'dam', 'rummi', 'waarheid', 'sudoku', 'sneek', 'tetris'];
 document.querySelectorAll('.spelkaart').forEach(k => { if (!MIJN_SPELLEN.includes(k.dataset.spel)) k.style.display = 'none'; });
 laadLobby();
-setInterval(()=>{ if (!$('#vLobby').hidden) laadLobby(); }, 8000);
+verbindStream();
+// trage vangnet-poll voor de lobby: de stream doet het echte werk
+setInterval(()=>{ if (!$('#vLobby').hidden && !document.hidden) laadLobby(); }, 20000);
 const qs = new URLSearchParams(location.search);
 if (qs.get('potje')) openPotje(qs.get('potje'));
 </script>

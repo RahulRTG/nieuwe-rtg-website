@@ -14,7 +14,7 @@
       bijlegt, de zaak ontvangt altijd het volle bedrag)
   10. meldingsvoorkeuren (per scope aan of uit; afgedwongen in notify) */
 
-const MELDING_SCOPES = ['orders', 'events', 'salon', 'live', 'apply', 'wachtlijst'];
+const MELDING_SCOPES = ['orders', 'events', 'salon', 'live', 'apply', 'wachtlijst', 'assets', 'fluister'];
 
 function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan }) {
   const id = () => crypto.randomBytes(4).toString('hex');

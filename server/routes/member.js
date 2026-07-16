@@ -18,7 +18,7 @@ module.exports = (kern) => {
     zorgContact, fonds, munten, factuur, talen,
     zorgVan, zorgZet, zorgVoor, locDeel, locStopKlant, locMijn,
     assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap,
-    fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel,
+    fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterPush,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -1179,11 +1179,16 @@ app.post('/api/locatie/mijn', auth, (req, res) => res.json(locMijn(req.session.k
 /* ---- Fluister: de persoonlijke assistent met geheugen (kern/fluister.js).
    Voor iedereen, over de eigen gegevens; alles is opvraagbaar en wisbaar. */
 app.post('/api/fluister', auth, async (req, res) => {
-  const r = await fluisterZeg(req.session.key, liveCodename(req.session), req.body.q);
+  // de sessie reist mee zodat Fluister ook kan doen (reserveren, 24 uur plannen)
+  const r = await fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);
 });
-app.post('/api/fluister/profiel', auth, (req, res) => res.json(fluisterProfiel(req.session.key)));
+app.post('/api/fluister/profiel', auth, (req, res) => {
+  // nieuwe seintjes worden meteen ook een melding op het toestel (met dedupe)
+  fluisterPush(req.session.key);
+  res.json(fluisterProfiel(req.session.key));
+});
 app.post('/api/fluister/onthoud', auth, (req, res) => {
   const r = fluisterOnthoud(req.session.key, req.body.tekst);
   if (r.error) return res.status(r.status).json({ error: r.error });

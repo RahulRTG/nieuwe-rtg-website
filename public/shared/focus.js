@@ -7,6 +7,10 @@
    Activeren via de script-tag, per app:
    <script src="/shared/focus.js" data-app="pda" data-kaart=".card" data-kop=".k"></script>
 
+   Dichtgeklapt betekent niet doof: heeft een dichte kaart meldingen in zich
+   (badge-elementen zoals [data-dmbadge]), dan kleurt de balk en staat het
+   aantal erop. Extra badge-selectors per app via data-melding.
+
    Privacy: alleen tellers per kaartnaam, nooit inhoud. De leden-app deelt de
    tellers (met toestemming van de sessie) met Fluister, zodat de assistent
    leert waar je het meest mee werkt. */
@@ -17,6 +21,7 @@
   const APP = script.dataset.app || 'app';
   const KAART = script.dataset.kaart || '.card';
   const KOP = script.dataset.kop || '.k';
+  const MELDING = '[data-dmbadge], [data-fxtel]' + (script.dataset.melding ? ', ' + script.dataset.melding : '');
   const KEY = 'rtg_focus_' + APP;
   const TOP_N = 3;          // met geschiedenis: zoveel kaarten standaard open
   const LEER_DREMPEL = 10;  // vanaf zoveel interacties gaat de geschiedenis sturen
@@ -41,7 +46,11 @@
       '.fx-kop{cursor:pointer;user-select:none;}' +
       '.fx-kop:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px;}' +
       '.fx-pijl{float:right;margin-left:0.5rem;opacity:0.55;font-size:0.8em;transition:transform 0.15s;}' +
-      '.fx-dicht .fx-pijl{transform:rotate(-90deg);}';
+      '.fx-dicht .fx-pijl{transform:rotate(-90deg);}' +
+      // dicht maar niet doof: bij meldingen kleurt de balk en telt de badge
+      '.fx-badge{display:none;margin-left:0.5rem;background:#C23A5E;color:#fff;border-radius:999px;min-width:1.5em;height:1.5em;line-height:1.5em;text-align:center;font-size:0.68em;font-weight:700;padding:0 0.35em;vertical-align:middle;}' +
+      '.fx-kaart.fx-dicht.fx-melding > .fx-kop .fx-badge{display:inline-block;}' +
+      '.fx-kaart.fx-dicht.fx-melding{background-image:linear-gradient(rgba(194,58,94,0.16),rgba(194,58,94,0.16));border-color:rgba(194,58,94,0.55);}';
     document.head.appendChild(s);
   }
   // de naam van een kaart: de koptekst zonder tellers en tijden, zodat hij
@@ -74,6 +83,9 @@
     const kop = kaart.querySelector(KOP);
     kop.classList.add('fx-kop');
     if (!kop.querySelector('.fx-pijl')) {
+      const badge = document.createElement('span');
+      badge.className = 'fx-badge';
+      kop.appendChild(badge);
       const pijl = document.createElement('span');
       pijl.className = 'fx-pijl';
       pijl.textContent = '▾';
@@ -112,6 +124,32 @@
     }, true);
   }
 
+  // dicht maar niet doof: tel de meldingen in een kaart (badge-elementen);
+  // een getal telt als dat getal, elk ander gevuld badge-element als een
+  function telMeldingen(kaart) {
+    let n = 0;
+    kaart.querySelectorAll(MELDING).forEach(el => {
+      if (el.closest(KAART) !== kaart) return;
+      const t = (el.textContent || '').trim();
+      const v = parseInt(t, 10);
+      n += Number.isFinite(v) ? Math.max(0, v) : (t ? 1 : 0);
+    });
+    return n;
+  }
+  function badges() {
+    document.querySelectorAll('.fx-kaart').forEach(kaart => {
+      const b = kaart.querySelector('.fx-kop .fx-badge');
+      if (!b) return;
+      const n = telMeldingen(kaart);
+      const tekst = n ? String(n) : '';
+      if (b.textContent !== tekst) {
+        b.textContent = tekst;
+        b.setAttribute('aria-label', n ? n + ' meldingen' : '');
+      }
+      if (kaart.classList.contains('fx-melding') !== (n > 0)) kaart.classList.toggle('fx-melding', n > 0);
+    });
+  }
+
   let bezig = false;
   function loop() {
     if (bezig) return;
@@ -129,11 +167,13 @@
         perOuder.set(ouder, i + 1);
         pas(k, i);
       });
+      badges();
     });
   }
   const obs = new MutationObserver(loop);
-  if (document.body) { obs.observe(document.body, { childList: true, subtree: true }); loop(); }
-  else document.addEventListener('DOMContentLoaded', () => { obs.observe(document.body, { childList: true, subtree: true }); loop(); });
+  const kijk = () => { obs.observe(document.body, { childList: true, subtree: true, characterData: true }); loop(); };
+  if (document.body) kijk();
+  else document.addEventListener('DOMContentLoaded', kijk);
 
   // voor Fluister: de tellers (en niets anders) zijn deelbaar
   window.FocusUI = {

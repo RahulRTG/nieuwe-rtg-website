@@ -160,7 +160,7 @@
     el.innerHTML =
       '<div class="live-start" style="margin-bottom:0.8rem;">' +
         '<div class="lh">✦ Fluister</div>' +
-        '<div class="ld">' + T('fl.d','Uw persoonlijke assistent. Hij onthoudt wat u hem vertelt, leert van wat u gebruikt, en alles is opvraagbaar en wisbaar.') + '</div>' +
+        '<div class="ld">' + T('fl.d','Uw persoonlijke assistent. Hij onthoudt wat u hem vertelt, leert van wat u gebruikt, en regelt het ook: "reserveer bij Sal de Mar morgen om 20:00" of "zet mijn 24 uur op 3 augustus". Alles is opvraagbaar en wisbaar.') + '</div>' +
         ((prof.seintjes || []).length
           ? '<div style="margin-top:0.55rem;border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;">' +
               '<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">' + T('fl.sein','Fluister fluistert') + '</div>' +

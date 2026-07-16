@@ -2685,7 +2685,15 @@ Object.assign(kern, require('./kern/gastzorg')({ db, save, crypto, schoon, notif
 // Toren 3, RTG Shared Assets: 300 tickets per object, Access en Asset
 Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify, pay: kern.pay }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
-Object.assign(kern, require('./kern/fluister')({ db, save, schoon, anthropic }));
+Object.assign(kern, require('./kern/fluister')({
+  db, save, schoon, anthropic, notify,
+  reserveerTafel, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor
+}));
+// nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
+// elk half uur en fluisterPush zelf zorgt dat niets twee keer piept
+setInterval(() => {
+  try { for (const k of Object.keys(db.data.fluister || {})) kern.fluisterPush(k); } catch (e) {}
+}, 30 * 60 * 1000).unref();
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

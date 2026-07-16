@@ -77,6 +77,42 @@ test('Fluister fluistert zelf: seintjes uit datums in weetjes en uit de agenda',
   await api('fluister', { q: 'vergeet alles' }, lid);
 });
 
+test('een nieuw seintje wordt een melding op het toestel, en piept precies een keer', async () => {
+  const NL = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  const d = new Date(Date.now() + 3 * 86400000);
+  await api('fluister', { q: 'onthoud dat ons jubileum op ' + d.getUTCDate() + ' ' + NL[d.getUTCMonth()] + ' valt' }, lid);
+  await api('fluister/profiel', {}, lid); // het profiel ophalen zet de push in gang
+  const tel = async () => ((await api('notifications', {}, lid)).body.notifications || [])
+    .filter(n => n.title === 'Fluister fluistert' && /jubileum/.test(n.body)).length;
+  assert.equal(await tel(), 1, 'het seintje hangt als melding in de bel');
+  await api('fluister/profiel', {}, lid);
+  assert.equal(await tel(), 1, 'dedupe: hetzelfde seintje piept nooit twee keer');
+  await api('fluister', { q: 'vergeet alles' }, lid);
+});
+
+test('Fluister doet het ook echt: reserveren en het 24-uursblok plannen, in gewone taal', async () => {
+  // een tafel, gewoon gezegd zoals je het zou zeggen
+  const r = await api('fluister', { q: 'Reserveer bij Sal de Mar morgen om 19:30 met 4 personen' }, lid);
+  assert.equal(r.status, 200);
+  assert.ok(r.body.gedaan, 'hij heeft het uitgevoerd, niet alleen beantwoord');
+  const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const mijn = (await api('reserveringen/mijn', {}, lid)).body.reserveringen || [];
+  const res = mijn.find(x => x.datum === morgen && x.tijd === '19:30' && x.supplierName === 'Sal de Mar');
+  assert.ok(res, 'de reservering staat echt in het systeem');
+  await api('reservering/annuleer', { id: res.id }, lid);
+  // en het 24-uursblok van een Shared Asset
+  const ov = (await api('assets', {}, lid)).body;
+  await api('asset/koop', { assetId: ov.assets[0].id, smaak: 'access', aantal: 1 }, lid);
+  const j = new Date().getUTCFullYear() + 1;
+  const blok = await api('fluister', { q: 'zet mijn 24 uur op ' + j + '-01-20' }, lid);
+  assert.ok(blok.body.gedaan, 'het blok is geboekt');
+  assert.ok(blok.body.antwoord.includes(j + '-01-20'));
+  // een dag die al vergeven is, blijft eerlijk een nee
+  const dubbel = await api('fluister', { q: 'zet mijn 24 uur op ' + j + '-01-20' }, lid);
+  assert.ok(!dubbel.body.gedaan && /lukt niet/i.test(dubbel.body.antwoord));
+  await api('fluister', { q: 'vergeet alles' }, lid);
+});
+
 test('hij onthoudt het gesprek (kort) en wist het net zo makkelijk', async () => {
   assert.equal((await api('fluister/profiel', {}, lid)).body.gesprek, 0, 'na "vergeet alles" is ook het gesprek weg');
   await api('fluister', { q: 'goedemorgen' }, lid);

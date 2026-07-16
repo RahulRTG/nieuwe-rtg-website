@@ -18,8 +18,14 @@
    (een verjaardag), uit je agenda (reserveringen, check-in, je
    24-uursblokken) en uit lopende zaken (bedenktijd, terugkoop). Verder
    onthoudt hij de laatste beurten van het gesprek, zodat een vervolgvraag
-   gewoon begrepen wordt; ook dat gesprek wist "vergeet alles". */
-module.exports = ({ db, save, schoon, anthropic }) => {
+   gewoon begrepen wordt; ook dat gesprek wist "vergeet alles".
+
+   Nieuwe seintjes worden een echte melding op het toestel (fluisterPush,
+   met dedupe zodat niets twee keer piept). En hij kan het ook dóén:
+   "zet mijn 24 uur op 3 augustus" boekt het blok, "reserveer bij Sal de
+   Mar morgen om 20:00 met 2 personen" vraagt de tafel aan - alleen voor
+   het lid zelf, en het antwoord zegt eerlijk wat er is gebeurd. */
+module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, assetGebruik, zorgVoor }) => {
   const nu = () => new Date().toISOString();
   const lijsten = () => { if (!db.data.fluister) db.data.fluister = {}; };
   const van = key => {
@@ -81,7 +87,11 @@ module.exports = ({ db, save, schoon, anthropic }) => {
     return dd(jaar) >= vandaag() ? dd(jaar) : dd(jaar + 1);
   }
   const dagenTot = datum => Math.round((Date.parse(datum) - Date.parse(vandaag())) / 86400000);
+  const plusDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
   const wanneer = d => d <= 0 ? 'vandaag' : d === 1 ? 'morgen' : 'over ' + d + ' dagen';
+  // een dag uit een zin: 2026-08-03, "vandaag", "morgen" of "3 augustus"
+  const datumInZin = txt => (String(txt).match(/\d{4}-\d{2}-\d{2}/) || [])[0] ||
+    (/\bvandaag\b/i.test(txt) ? vandaag() : /\bovermorgen\b/i.test(txt) ? plusDagen(2) : /\bmorgen\b/i.test(txt) ? plusDagen(1) : datumUit(txt));
 
   /* ---- proactief: Fluister fluistert zelf, nog voordat je iets vraagt ---- */
   const BEDENKTIJD_DAGEN = 14; // gelijk aan kern/assets.js
@@ -127,9 +137,29 @@ module.exports = ({ db, save, schoon, anthropic }) => {
       const stil = (db.data.assetTickets || []).find(t => t.key === key && t.status === 'actief' &&
         Date.now() - Date.parse(t.at) >= BEDENKTIJD_DAGEN * 86400000 &&
         !(db.data.assetGebruik || []).some(g => g.key === key && g.assetId === t.assetId && g.datum.slice(0, 4) === jaar));
-      if (stil) s.push({ icoon: '💡', tekst: 'Uw 24 uur van dit jaar bij ' + ((db.data.assets || []).find(a => a.id === stil.assetId) || {}).naam + ' staat nog niet gepland' });
+      if (stil) s.push({ icoon: '💡', tekst: 'Uw 24 uur van dit jaar bij ' + (((db.data.sharedAssets || []).find(a => a.id === stil.assetId) || {}).naam || 'uw object') + ' staat nog niet gepland' });
     }
     return s.slice(0, 5);
+  }
+
+  /* Een nieuw seintje wordt vanzelf een melding op het toestel (de bel plus
+     web-push). Met geheugen: elk seintje piept precies een keer. */
+  function fluisterPush(key) {
+    if (String(key).startsWith('staff:') || !notify) return { ok: true, gepusht: 0 };
+    const p = van(key);
+    if (!p.geseind) p.geseind = {};
+    let n = 0;
+    for (const s of fluisterSeintjes(key)) {
+      if (p.geseind[s.tekst]) continue;
+      p.geseind[s.tekst] = nu();
+      notify(key, { icon: s.icoon, title: 'Fluister fluistert', body: s.tekst, scope: 'fluister' });
+      n++;
+    }
+    // het piep-geheugen blijft klein: de oudste vermeldingen vallen eraf
+    const ks = Object.keys(p.geseind);
+    if (ks.length > 60) for (const k of ks.sort((a, b) => p.geseind[a].localeCompare(p.geseind[b])).slice(0, ks.length - 60)) delete p.geseind[k];
+    if (n) save();
+    return { ok: true, gepusht: n };
   }
 
   function fluisterProfiel(key) {
@@ -153,10 +183,17 @@ module.exports = ({ db, save, schoon, anthropic }) => {
 
   /* Het gesprek. Eerst de eigen commando's (onthouden, opvragen, vergeten);
      daarna Claude met het volledige persoonlijke beeld, of de eigen regels. */
-  async function fluisterZeg(key, codenaam, qIn) {
+  async function fluisterZeg(key, codenaam, qIn, sess) {
     const q = String(qIn || '').trim().slice(0, 600);
     if (!q) return { status: 400, error: 'Zeg iets.' };
     const p = van(key);
+    // het antwoord gaat ook het gespreksgeheugen in (laatste 5 beurten)
+    const klaar = (antwoord, gedaan) => {
+      p.gesprek.push({ u: q, a: String(antwoord).slice(0, 400), at: nu() });
+      p.gesprek = p.gesprek.slice(-5);
+      save();
+      return { ok: true, antwoord, gedaan: !!gedaan };
+    };
     if (/^onthoud\b/i.test(q)) {
       const r = fluisterOnthoud(key, q);
       if (r.error) return r;
@@ -179,15 +216,46 @@ module.exports = ({ db, save, schoon, anthropic }) => {
       regels.push('Wissen kan per weetje of in een keer ("vergeet alles").');
       return { ok: true, antwoord: regels.join(' ') };
     }
+    /* ---- doen: Fluister voert het ook echt uit, alleen voor het lid zelf
+       (sess reist alleen mee op de leden-route, nooit voor personeel) ---- */
+    if (sess) {
+      // "zet/plan/boek mijn 24 uur op 3 augustus (bij Villa ...)"
+      if (assetGebruik && /\b24\s*-?\s*u/i.test(q) && /\b(zet|plan|boek|leg)\b/i.test(q)) {
+        const datum = datumInZin(q);
+        if (!datum) return klaar('Op welke dag? Zeg bijvoorbeeld: "zet mijn 24 uur op 3 augustus".');
+        const mijnTickets = (db.data.assetTickets || []).filter(t => t.key === key && t.status === 'actief');
+        if (!mijnTickets.length) return klaar('U heeft nog geen actief Shared Asset-ticket; kijk in de Assets-tab.');
+        const ql = q.toLowerCase();
+        const past = t => {
+          const a = (db.data.sharedAssets || []).find(x => x.id === t.assetId);
+          return a && a.naam.toLowerCase().split(/\s+/).some(w => w.length > 3 && ql.includes(w));
+        };
+        const t = mijnTickets.find(past) || mijnTickets[0];
+        const r = assetGebruik({ key }, t.assetId, datum);
+        if (r.error) return klaar('Dat lukt niet: ' + r.error);
+        return klaar('Geregeld: uw 24 uur bij ' + r.gebruik.assetNaam + ' staat op ' + datum + ' (nog ' + r.dagenTegoed + ' dag(en) tegoed dit jaar). Het team neemt vooraf contact op.', true);
+      }
+      // "reserveer bij Sal de Mar morgen om 20:00 met 2 personen"
+      if (reserveerTafel && /\breserveer\b/i.test(q)) {
+        if (sess.tier === 'guest') return klaar('Reserveren kan alleen met een lidmaatschap.');
+        const naam = (q.match(/\bbij\s+(.+?)(?=\s+(?:op|om|voor|met|morgen|overmorgen|vandaag)\b|\s*[.?!]?\s*$)/i) || [])[1];
+        const s = naam && (db.data.suppliers || []).find(x => (x.name || '').toLowerCase().includes(naam.toLowerCase().trim()));
+        if (!s) return klaar('Bij welke zaak? Zeg bijvoorbeeld: "reserveer bij Sal de Mar morgen om 20:00 met 2 personen".');
+        const tijd = q.match(/(\d{1,2})[:.](\d{2})/);
+        const datum = datumInZin(q);
+        if (!datum || !tijd) return klaar('Wanneer? Noem een dag en een tijd, bijvoorbeeld "morgen om 20:00".');
+        const personen = parseInt((q.match(/(\d{1,2})\s*(personen|gasten|man)\b/i) || [])[1], 10) || 2;
+        const r = reserveerTafel({ key, tier: sess.tier }, codenaam, { supplierCode: s.code, datum, tijd: tijd[1].padStart(2, '0') + ':' + tijd[2], personen });
+        if (r.error) return klaar('Dat lukt niet: ' + r.error);
+        // het zorgprofiel reist mee, precies zoals bij een gewone reservering
+        const z = zorgVoor && zorgVoor(key);
+        if (z) { r.reservering.zorg = z; save(); }
+        return klaar('Aangevraagd: ' + s.name + ', ' + datum + ' om ' + r.reservering.tijd + ' voor ' + personen + '. De zaak bevestigt zo; u ziet het in de bel.', true);
+      }
+    }
+
     const stand = standVan(key);
     const seintjes = fluisterSeintjes(key);
-    // het antwoord gaat straks ook het gespreksgeheugen in (laatste 5 beurten)
-    const klaar = antwoord => {
-      p.gesprek.push({ u: q, a: String(antwoord).slice(0, 400), at: nu() });
-      p.gesprek = p.gesprek.slice(-5);
-      save();
-      return { ok: true, antwoord };
-    };
     if (anthropic) {
       try {
         const ctx = 'Lid: ' + codenaam + '. ' +
@@ -210,5 +278,5 @@ module.exports = ({ db, save, schoon, anthropic }) => {
     return klaar(groet + 'Ik ben Fluister, uw persoonlijke assistent. Leer me kennen met "onthoud dat..." en vraag "wat weet je over mij" wanneer u wilt; wissen kan altijd.');
   }
 
-  return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes };
+  return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush };
 };

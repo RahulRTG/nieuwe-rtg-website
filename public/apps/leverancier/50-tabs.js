@@ -1121,7 +1121,8 @@
   let dorpKant = (() => { try { return localStorage.getItem('rtg_dorp_kant') || 'frontoffice'; } catch(e){ return 'frontoffice'; } })();
   async function renderDorp(){
     const el = $('#dorpWrap'); if (!el) return;
-    if (!Array.isArray(state.rooms)){ el.innerHTML = ''; return; }
+    // kamers geven het hoteldorp, de nachtzaak (bar/club/beachclub) het clubdorp
+    if (!Array.isArray(state.rooms) && !['bar', 'club', 'beachclub'].includes(S && S.type)){ el.innerHTML = ''; return; }
     let d; try { d = await API.call('/supplier/dorp', {}); } catch(e){ el.innerHTML = ''; return; }
     const afd = d.afdelingen.find(a => a.key === dorpKant) || d.afdelingen[0];
     dorpKant = afd.key;

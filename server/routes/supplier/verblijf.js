@@ -2,7 +2,7 @@
    Beslissen, inchecken en no-show zijn vloerhandelingen (iedereen achter de
    balie); het bord is leesbaar voor het hele team. */
 module.exports = (kern) => {
-  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity, dorpPost, dorpVerder, dorpStuurDoor, dorpBuurt, dorpOverzicht, dorpTools, dorpDrukte } = kern;
+  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity, dorpKan, dorpPost, dorpVerder, dorpStuurDoor, dorpBuurt, dorpOverzicht, dorpTools, dorpDrukte } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error, openLast: r.openLast }) : res.json(r);
 
   app.post('/api/supplier/receptie', supplierAuth, (req, res) => {
@@ -36,11 +36,12 @@ module.exports = (kern) => {
     stuur(res, r);
   });
 
-  /* Het hoteldorp: negen afdelingen, een motor. Iedereen op de vloer kan
-     posten zetten en doorzetten; het dorpsplein is voor het hele team. */
+  /* Het dorp achter de zaak: een motor voor alle afdelingen. Hotels krijgen
+     het hoteldorp, bars/clubs/beachclubs het clubdorp; iedereen op de vloer
+     kan posten zetten en doorzetten, het dorpsplein is voor het hele team. */
   const eisDorp = (req, res) => {
-    if (Array.isArray(req.supplier.rooms)) return true;
-    res.status(409).json({ error: 'Het hoteldorp is er voor bedrijven met kamers.' });
+    if (dorpKan(req.supplier)) return true;
+    res.status(409).json({ error: 'Deze zaak heeft geen afdelingenbord.' });
     return false;
   };
   app.post('/api/supplier/dorp', supplierAuth, (req, res) => {

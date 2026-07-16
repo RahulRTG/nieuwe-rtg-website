@@ -295,7 +295,9 @@
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
-    const keys = Object.keys(TABDEF).filter(k => !MAIN_TABS.includes(k) && (!TABDEF[k].cap || has(TABDEF[k].cap)) && (k !== 'bezorg' || !!(state && state.bezorg)));
+    // het afdelingenbord (dorp) is er voor kamers (hotel) en voor de nachtzaak
+    const dorpKan = has('bookings') || ['bar', 'club', 'beachclub'].includes(S && S.type);
+    const keys = Object.keys(TABDEF).filter(k => !MAIN_TABS.includes(k) && (!TABDEF[k].cap || has(TABDEF[k].cap)) && (k !== 'bezorg' || !!(state && state.bezorg)) && (k !== 'dorp' || dorpKan));
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
     ).join('') + '</div>';

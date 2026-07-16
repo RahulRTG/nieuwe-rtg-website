@@ -306,6 +306,8 @@
   const hkVan = r => (r.hk && r.hk.status) || (r.available ? 'schoon' : 'bezet');
   const heeftKamers = () => !!(state && (state.rooms || []).length);
   const heeftOpdrachten = () => !!(state && !(state.rooms || []).length && (state.boekingen || []).length);
+  // het clubdorp: bars, clubs en beachclubs krijgen het afdelingenbord op zak
+  const heeftClubdorp = () => !!(state && !(state.rooms || []).length && state.supplier && ['bar', 'club', 'beachclub'].includes(state.supplier.type));
   let mbOpen = null;          // kamer waarvan de minibar-teller openstaat
   let mbTel = {};             // minibar-aantallen van die kamer
   // het receptiebord op zak: alleen de housekeeping-prioriteit is hier nodig
@@ -319,16 +321,23 @@
 
   function renderKamers(){
     const tabBtn = $('#tabKamers');
-    const aan = heeftKamers() || heeftOpdrachten();
+    const aan = heeftKamers() || heeftOpdrachten() || heeftClubdorp();
+    const tabNaam = heeftKamers() ? T('pd.t.kamers','Kamers') : heeftClubdorp() ? T('pd.t.dorp','Afdelingen') : T('pd.t.opdr','Opdrachten');
     if (tabBtn){
       tabBtn.style.display = aan ? '' : 'none';
       const lbl = tabBtn.querySelector('span');
-      if (lbl) lbl.textContent = heeftKamers() ? T('pd.t.kamers','Kamers') : T('pd.t.opdr','Opdrachten');
+      if (lbl) lbl.textContent = tabNaam;
     }
     const kop = document.querySelector('.view[data-view="kamers"] h2');
-    if (kop) kop.textContent = heeftKamers() ? T('pd.v.kamers','Kamers') : T('pd.t.opdr','Opdrachten');
+    if (kop) kop.textContent = tabNaam;
     const wrap = $('#kamersWrap'); if (!wrap || !state) return;
     if (!aan){ wrap.innerHTML = ''; return; }
+    // de nachtzaak: het hele afdelingenbord (entree, garderobe, bar, vip...)
+    if (!heeftKamers() && heeftClubdorp()){
+      wrap.innerHTML = pkDorpKaart();
+      bindKamers(wrap);
+      return;
+    }
     // zonder kamers (schoonmaakbedrijf, zzp) werkt de tab op opdrachten
     if (!heeftKamers()) return renderOpdrachten(wrap);
     const rooms = (state.rooms || []).slice().sort((a,b) => (HK_ORDE[hkVan(a)] ?? 9) - (HK_ORDE[hkVan(b)] ?? 9));

@@ -262,7 +262,11 @@
         s.rooms.map(r => '<div class="ms-room"><div class="rt"><b>' + r.name + '</b>' + (r.desc ? '<span>' + r.desc + '</span>' : '') + '</div>' +
           '<div class="rp" style="display:flex;align-items:center;gap:0.5rem;">' + eur(r.price) + ' <span style="font-size:0.62rem;color:var(--soft);">' + T('app.ms.pernight','p.n.') + '</span>' +
           '<button class="vbtn" data-vbboek="' + r.id + '">' + T('vb.boek','Boek') + '</button></div></div>').join('') +
-        '<div style="margin:0.5rem 0 0.6rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote2','Tegen nettoprijs; het huis bevestigt uw verblijf en de rekening loopt op de kamer.') + '</div>';
+        '<div style="margin:0.5rem 0 0.6rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote2','Tegen nettoprijs; het huis bevestigt uw verblijf en de rekening loopt op de kamer.') + '</div>' +
+        // keyless: tijdens een ingecheckt verblijf is de telefoon de sleutel
+        '<div style="display:flex;gap:0.5rem;padding-bottom:0.8rem;">' +
+        '<button class="vbtn" id="vbDeurKamer" style="flex:1;">🗝️ ' + T('vb.deurkamer','Open mijn kamerdeur') + '</button>' +
+        '<button class="vbtn" id="vbDeurEntree" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);">' + T('vb.deurentree','Open de entree') + '</button></div>';
     }
     const funcs = APPLY_FUNCS[s.type] || [];
     const applyBlock = funcs.length
@@ -338,6 +342,15 @@
         toast('🪑 ' + T('erv.reserveerok','Reservering aangevraagd voor') + ' ' + d.reservering.datum + ' ' + d.reservering.tijd + '. ' + T('erv.zaakbevestigt','De zaak bevestigt hem zo.'));
       } catch(e){ toast(e.message); }
     });
+    // keyless: de deur van je kamer of de entree, met je telefoon als sleutel
+    const deur = async welke => {
+      try {
+        const d = await API.call('/verblijf/deur', { supplierCode: s.code, welke });
+        toast('🔓 ' + d.door.name + ' ' + T('vb.deuropen','is open; hij vergrendelt zelf weer na') + ' ' + d.door.relockSec + 's.');
+      } catch(e){ toast(e.message); }
+    };
+    const dk = $('#vbDeurKamer'); if (dk) dk.addEventListener('click', () => deur('kamer'));
+    const de = $('#vbDeurEntree'); if (de) de.addEventListener('click', () => deur('entree'));
     // een kamer boeken: datums kiezen, een knop, het huis bevestigt
     $('#msBody').querySelectorAll('[data-vbboek]').forEach(b => b.addEventListener('click', async () => {
       try {

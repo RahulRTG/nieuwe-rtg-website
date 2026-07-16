@@ -400,6 +400,13 @@
         (r.gasten.walkIns?'<span>🚶 '+r.gasten.walkIns+' walk-in(s)</span>':'')+
         (r.gasten.noShows?'<span style="color:var(--burgundy);">✗ '+r.gasten.noShows+' no-show(s)</span>':'')+
       '</div>':'')+
+      (r.verblijf?'<div class="pos-chips" style="margin-top:0.4rem;">'+
+        '<span>🛏 '+r.verblijf.bezet+' / '+r.verblijf.totaal+' '+T('rc.bezet','bezet')+'</span>'+
+        (r.verblijf.aankomsten?'<span>🗝️ '+r.verblijf.aankomsten+' '+T('shift.aank','check-in(s)')+'</span>':'')+
+        (r.verblijf.vertrekken?'<span>👋 '+r.verblijf.vertrekken+' '+T('shift.vertr','check-out(s)')+'</span>':'')+
+        (r.verblijf.noShows?'<span style="color:var(--burgundy);">✗ '+r.verblijf.noShows+' no-show(s)</span>':'')+
+        (r.verblijf.adr?'<span>ADR '+eur(r.verblijf.adr)+'</span>':'')+
+      '</div>':'')+
       ((r.toppers||[]).length?'<div class="st-row" style="margin-top:0.4rem;"><span>'+T('shift.toppers','Toppers')+'</span><span class="sub">'+r.toppers.map(t=>t.aantal+'× '+esc(t.naam)).join(' · ')+'</span></div>':'')+
       (r.derving?'<div class="st-row"><span>'+T('shift.derving','Derving (kostprijs)')+'</span><b style="color:var(--burgundy);">'+eur(r.derving)+'</b></div>':'')+
       ((r.team||[]).length?'<div class="st-row"><span>'+T('shift.team','Op de kassa')+'</span><span class="sub">'+r.team.map(t=>esc(t.naam)+' '+eur(t.omzet)).join(' · ')+'</span></div>':'')+
@@ -1009,6 +1016,7 @@
         (r.bezetting.vuil?'<span>🧹 '+r.bezetting.vuil+' '+T('rc.vuil','voor housekeeping')+'</span>':'')+
         (r.aanvragen.length?'<span>✋ '+r.aanvragen.length+' '+T('rc.aanvragen','aanvraag(en)')+'</span>':'')+
       '</div>'+
+      ((r.hkEerst||[]).length?'<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--burgundy);border:1px solid rgba(194,58,94,0.35);border-radius:10px;padding:0.45rem 0.6rem;">🧹 '+T('rc.hkeerst','Housekeeping eerst:')+' <b>'+r.hkEerst.map(esc).join(', ')+'</b> · '+T('rc.hkeerst2','daar komt vandaag alweer een gast aan.')+'</div>':'')+
       (r.aanvragen.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.nieuw','Aanvragen')+'</div>'+r.aanvragen.map(v => rij(v,
         '<button class="obtn primary js-vbok">'+T('res.ok','Bevestig')+'</button><button class="obtn warn js-vbnee">'+T('sup.reject','Weiger')+'</button>')).join(''):'')+
       (r.aankomsten.length?'<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+T('rc.aankomst','Aankomsten')+'</div>'+r.aankomsten.map(v => rij(v,
@@ -1037,7 +1045,7 @@
     const el = $('#roomsWrap'); if (!el) return;
     const rooms = state.rooms;
     if (!Array.isArray(rooms)){ el.innerHTML = ''; return; }
-    let html = '<div id="receptieWrap"></div><div class="card">';
+    let html = '<div id="receptieWrap"></div><div id="planWrap"></div><div class="card">';
     html += rooms.length ? rooms.map(r => {
       const hk = (r.hk && r.hk.status) || 'schoon';
       return '<div class="room-row'+(r.available?'':' off')+'" style="flex-wrap:wrap;">'+
@@ -1085,6 +1093,25 @@
       try { await API.call('/supplier/room/add', { name, price }); toast(T('sup.roomadded','Kamer toegevoegd en direct zichtbaar.')); await refresh(); openTab('rooms'); } catch(e){ toast(e.message); }
     });
     laadReceptie();
+    laadPlanning();
+  }
+
+  /* De kamerkalender: veertien dagen vooruit, per kamer een rij blokjes.
+     Goud = bevestigd, merkrood = ingecheckt; tik-tekst (title) toont wie. */
+  async function laadPlanning(){
+    const el = $('#planWrap'); if (!el) return;
+    let p; try { p = await API.call('/supplier/kamerplanning', {}); } catch(e){ el.innerHTML = ''; return; }
+    if (!p.kamers.length){ el.innerHTML = ''; return; }
+    const dagLabel = d => d.slice(8, 10);
+    el.innerHTML = '<div class="card"><div class="tt-h">🗓 '+T('rc.plan','Kamerkalender')+' <span class="sub">('+p.dagen.length+' '+T('vr.dagen','dagen')+')</span></div>'+
+      '<div style="display:flex;gap:2px;margin:0.5rem 0 0.15rem;padding-left:96px;overflow:hidden;">'+p.dagen.map(d => '<span style="width:16px;flex-shrink:0;font-size:0.55rem;color:var(--soft);text-align:center;">'+dagLabel(d)+'</span>').join('')+'</div>'+
+      p.kamers.map(k => '<div style="display:flex;align-items:center;gap:0;margin-top:3px;">'+
+        '<span style="width:96px;flex-shrink:0;font-size:0.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px;">'+esc(k.name)+'</span>'+
+        '<span style="display:flex;gap:2px;overflow:hidden;">'+k.dagen.map(d =>
+          '<span title="'+d.datum+(d.codenaam?', '+esc(d.codenaam):'')+'" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;border:1px solid var(--line);background:'+
+          (d.status==='ingecheckt'?'#7F1734':d.status==='bevestigd'?'#A98F1C':'transparent')+';"></span>').join('')+'</span>'+
+      '</div>').join('')+
+      '<div class="softline" style="margin-top:0.45rem;">'+T('rc.plan.s','Goud is bevestigd, rood slaapt er nu; leeg is vrij om te verkopen.')+'</div></div>';
   }
 
   // ---- minibar-telling per kamer ----

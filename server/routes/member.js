@@ -3,7 +3,7 @@
 module.exports = (kern) => {
   const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessionFor, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept,
     reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview, reviewsVoor,
-    verblijfBoek, mijnVerblijven, verblijfAnnuleer,
+    verblijfBoek, mijnVerblijven, verblijfAnnuleer, gastDeur,
     toggleFavoriet, favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits,
     zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
     voorkeurVan, zetVoorkeur,
@@ -2057,6 +2057,16 @@ app.post('/api/verblijf/annuleer', auth, (req, res) => {
   const r = verblijfAnnuleer(req.session.key, String(req.body.id || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);
+});
+/* Keyless: de ingecheckte gast opent met de app zijn kamerdeur of de entree.
+   De zaak-optie (digitale gastsleutel) blijft de baas; alles wordt gelogd. */
+app.post('/api/verblijf/deur', auth, (req, res) => {
+  const r = gastDeur(req.session.key, String(req.body.supplierCode || ''), req.body.welke === 'kamer' ? 'kamer' : 'entree');
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  if (!optieAan(r.supplier, 'deurenGast')) return res.status(409).json({ error: r.supplier.name + ' heeft de digitale gastsleutel op dit moment uitstaan. Meld u bij de receptie.' });
+  unlockDoor(r.supplier, r.door, r.verblijf.codenaam);
+  logActivity(r.supplier.code, { name: r.verblijf.codenaam }, 'opende "' + r.door.name + '" met de digitale sleutel');
+  res.json({ ok: true, door: { name: r.door.name, relockSec: DOOR_RELOCK_MS / 1000 } });
 });
 
 // tafel reserveren: het lid vraagt aan, de zaak beslist

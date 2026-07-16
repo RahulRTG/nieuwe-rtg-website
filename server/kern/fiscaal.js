@@ -250,10 +250,25 @@ function maakFiscaal({ db, centen, btwSplit }) {
     // wie stond er op de kassa
     const team = {};
     for (const v of db.data.posSales[s.code] || []) if (opDag(v.at) && v.actor) team[v.actor] = centen((team[v.actor] || 0) + (v.total || 0));
+    // de hotelkant: bezetting, aankomsten en vertrekken van vandaag, en de
+    // gemiddelde kamerprijs van wie er nu slaapt (ADR)
+    let verblijf = null;
+    if (Array.isArray(s.rooms) && s.rooms.length) {
+      const van = (db.data.verblijven || []).filter(v => v.supplierCode === s.code);
+      const inHuis = van.filter(v => v.status === 'ingecheckt');
+      verblijf = {
+        bezet: s.rooms.filter(r => r.hk && r.hk.status === 'bezet').length,
+        totaal: s.rooms.length,
+        aankomsten: van.filter(v => opDag(v.ingechecktAt)).length,
+        vertrekken: van.filter(v => opDag(v.uitgechecktAt)).length,
+        noShows: van.filter(v => v.status === 'no-show' && v.aankomst === z.datum).length,
+        adr: inHuis.length ? centen(inHuis.reduce((n, v) => n + (v.prijsPerNacht || 0), 0) / inHuis.length) : 0
+      };
+    }
     return {
       ok: true, datum: z.datum,
       omzet: z.omzet, bonnen: z.bonnen, fooien: z.fooien, betaalwijzen: z.betaalwijzen,
-      gasten, toppers, derving: centen(derving),
+      gasten, toppers, derving: centen(derving), verblijf,
       team: Object.entries(team).sort((a, b) => b[1] - a[1]).map(([naam, omzet]) => ({ naam, omzet }))
     };
   }

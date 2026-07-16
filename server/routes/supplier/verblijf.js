@@ -2,12 +2,17 @@
    Beslissen, inchecken en no-show zijn vloerhandelingen (iedereen achter de
    balie); het bord is leesbaar voor het hele team. */
 module.exports = (kern) => {
-  const { app, supplierAuth, receptie, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity } = kern;
+  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error, openLast: r.openLast }) : res.json(r);
 
   app.post('/api/supplier/receptie', supplierAuth, (req, res) => {
     if (!Array.isArray(req.supplier.rooms)) return res.status(409).json({ error: 'Dit bedrijf heeft geen kamers.' });
     res.json(receptie(req.supplier, req.body.datum));
+  });
+  // de kamerkalender: wie zit waar, welke nachten, ook vooruit
+  app.post('/api/supplier/kamerplanning', supplierAuth, (req, res) => {
+    if (!Array.isArray(req.supplier.rooms)) return res.status(409).json({ error: 'Dit bedrijf heeft geen kamers.' });
+    res.json(kamerplanning(req.supplier, req.body.dagen));
   });
   app.post('/api/supplier/verblijf/beslis', supplierAuth, (req, res) => {
     const actie = req.body.actie === 'bevestig' ? 'bevestig' : 'weiger';

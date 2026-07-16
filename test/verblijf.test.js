@@ -96,12 +96,67 @@ test('check-out kan pas als de rekening leeg is; de kassa int alles in een keer'
   assert.equal(mijn.find(v => v.id === vid).status, 'uitgecheckt');
 });
 
+test('de kamerkalender: geboekte nachten kleuren, de rest is vrij om te verkopen', async () => {
+  const login = await (await fetch(base + '/api/supplier/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'HOSHI', staffId: (await api('supplier/roster', { code: 'HOSHI' })).body.staff.find(x => x.role === 'manager').id, pin: '1234' }) })).json();
+  const kamer2 = (login.state.rooms || [])[1] || kamer;
+  const v = await api('verblijf', { supplierCode: 'HOSHI', roomId: kamer2.id, aankomst: dagPlus(1), vertrek: dagPlus(4) }, lid);
+  await api('supplier/verblijf/beslis', { id: v.body.verblijf.id, actie: 'bevestig' }, hotel);
+  const p = (await api('supplier/kamerplanning', {}, hotel)).body;
+  assert.equal(p.dagen.length, 14, 'veertien dagen vooruit');
+  const rij = p.kamers.find(k => k.id === kamer2.id);
+  assert.equal(rij.dagen[0].status, 'vrij', 'vandaag is de kamer nog vrij');
+  assert.equal(rij.dagen[1].status, 'bevestigd', 'de geboekte nachten kleuren');
+  assert.equal(rij.dagen[3].status, 'bevestigd');
+  assert.equal(rij.dagen[4].status, 'vrij', 'de vertrekdag is weer te verkopen');
+});
+
+test('keyless: de ingecheckte gast opent zijn kamerdeur met de app, daarna niet meer', async () => {
+  // SAKURA heeft slimme deuren; de kamer "Casa Mar, zeezijde" hoort bij deur "Casa Mar"
+  const roster = await api('supplier/roster', { code: 'SAKURA' });
+  const beheer = roster.body.staff.find(x => x.role === 'manager');
+  const villa = await (await fetch(base + '/api/supplier/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'SAKURA', staffId: beheer.id, pin: '1234' }) })).json();
+  const casa = villa.state.rooms.find(r => /casa mar/i.test(r.name));
+  const v = await api('verblijf', { supplierCode: 'SAKURA', roomId: casa.id, aankomst: dagPlus(0), vertrek: dagPlus(1) }, lid);
+  await api('supplier/verblijf/beslis', { id: v.body.verblijf.id, actie: 'bevestig' }, villa.token);
+  // voor de check-in doet de sleutel het nog niet
+  assert.equal((await api('verblijf/deur', { supplierCode: 'SAKURA', welke: 'kamer' }, lid)).status, 409);
+  const inn = await api('supplier/verblijf/checkin', { id: v.body.verblijf.id }, villa.token);
+  assert.equal(inn.body.verblijf.deurId, 'd2', 'de kamerdeur is aan het verblijf gekoppeld');
+  const deur = await api('verblijf/deur', { supplierCode: 'SAKURA', welke: 'kamer' }, lid);
+  assert.equal(deur.status, 200);
+  assert.equal(deur.body.door.name, 'Casa Mar', 'de eigen kamerdeur gaat open');
+  const entree = await api('verblijf/deur', { supplierCode: 'SAKURA', welke: 'entree' }, lid);
+  assert.match(entree.body.door.name, /Voordeur/, 'de entree kan ook');
+  // na de check-out is de digitale sleutel weg
+  await api('supplier/pos/checkout', { room: casa.name, method: 'contant' }, villa.token);
+  await api('supplier/verblijf/checkout', { id: v.body.verblijf.id }, villa.token);
+  assert.equal((await api('verblijf/deur', { supplierCode: 'SAKURA', welke: 'kamer' }, lid)).status, 409);
+});
+
+test('housekeeping-prioriteit en de hotelcijfers in de shift-samenvatting', async () => {
+  // de eerste kamer staat op vuil (check-out) en er komt vandaag alweer een gast
+  const v = await api('verblijf', { supplierCode: 'HOSHI', roomId: kamer.id, aankomst: dagPlus(0), vertrek: dagPlus(1) }, lid);
+  await api('supplier/verblijf/beslis', { id: v.body.verblijf.id, actie: 'bevestig' }, hotel);
+  const bord = (await api('supplier/receptie', {}, hotel)).body;
+  assert.ok(bord.hkEerst.includes(kamer.name), 'de vuile kamer met een aankomst vandaag staat bovenaan voor housekeeping');
+  // na de check-in tellen de hotelcijfers mee in de shift-samenvatting
+  await api('supplier/room/hk', { id: kamer.id, status: 'schoon' }, hotel);
+  await api('supplier/verblijf/checkin', { id: v.body.verblijf.id }, hotel);
+  const shift = (await api('supplier/shift', {}, hotel)).body;
+  assert.ok(shift.verblijf, 'het hotelblok staat in de shift');
+  assert.ok(shift.verblijf.bezet >= 1, 'de bezetting telt');
+  assert.ok(shift.verblijf.aankomsten >= 1, 'de check-in van vandaag telt');
+  assert.equal(shift.verblijf.adr, Math.round(kamer.price * 100) / 100, 'ADR is de gemiddelde kamerprijs van wie er slaapt');
+});
+
 test('annuleren en no-show: het lid trekt terug, de receptie meldt wie niet kwam', async () => {
   // annuleren: een nieuwe aanvraag, meteen weer ingetrokken
   const a = await api('verblijf', { supplierCode: 'HOSHI', roomId: kamer.id, aankomst: dagPlus(10), vertrek: dagPlus(12) }, lid);
   assert.equal((await api('verblijf/annuleer', { id: a.body.verblijf.id }, lid)).status, 200);
-  // no-show: bevestigd voor vandaag, maar de gast komt niet
-  const b = await api('verblijf', { supplierCode: 'HOSHI', roomId: kamer.id, aankomst: dagPlus(0), vertrek: dagPlus(1) }, lid);
+  // no-show: bevestigd voor vandaag, maar de gast komt niet (op een vrije kamer)
+  const st = (await api('supplier/state', {}, hotel)).body.state;
+  const vrijeKamer = st.rooms.find(r => r.available && r.id !== kamer.id);
+  const b = await api('verblijf', { supplierCode: 'HOSHI', roomId: vrijeKamer.id, aankomst: dagPlus(0), vertrek: dagPlus(1) }, lid);
   await api('supplier/verblijf/beslis', { id: b.body.verblijf.id, actie: 'bevestig' }, hotel);
   assert.equal((await api('supplier/verblijf/noshow', { id: b.body.verblijf.id }, hotel)).status, 200);
   const bord = (await api('supplier/receptie', {}, hotel)).body;

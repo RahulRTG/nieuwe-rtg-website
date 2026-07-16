@@ -308,6 +308,15 @@
   const heeftOpdrachten = () => !!(state && !(state.rooms || []).length && (state.boekingen || []).length);
   let mbOpen = null;          // kamer waarvan de minibar-teller openstaat
   let mbTel = {};             // minibar-aantallen van die kamer
+  // het receptiebord op zak: alleen de housekeeping-prioriteit is hier nodig
+  let pkReceptie = null, pkReceptieAt = 0, pkReceptieBezig = false;
+  function pkLaadReceptie(){
+    if (pkReceptieBezig || Date.now() - pkReceptieAt < 30000) return;
+    pkReceptieBezig = true;
+    API.call('/supplier/receptie').then(d => { pkReceptie = d; pkReceptieAt = Date.now(); pkReceptieBezig = false; renderKamers(); })
+      .catch(() => { pkReceptieBezig = false; pkReceptieAt = Date.now(); });
+  }
+
   function renderKamers(){
     const tabBtn = $('#tabKamers');
     const aan = heeftKamers() || heeftOpdrachten();
@@ -324,6 +333,11 @@
     if (!heeftKamers()) return renderOpdrachten(wrap);
     const rooms = (state.rooms || []).slice().sort((a,b) => (HK_ORDE[hkVan(a)] ?? 9) - (HK_ORDE[hkVan(b)] ?? 9));
     let html = '';
+    // de receptie kijkt mee: vuile kamers met een aankomst vandaag gaan voor
+    pkLaadReceptie();
+    if (pkReceptie && (pkReceptie.hkEerst || []).length)
+      html += '<div class="card" style="border-left:4px solid #E5484D;"><div class="k">🧹 '+T('hk.eerst','Eerst deze')+'</div>'+
+        '<div style="margin-top:0.35rem;font-size:0.85rem;"><b>'+pkReceptie.hkEerst.map(esc).join(', ')+'</b> · '+T('hk.eerst.s','daar komt vandaag alweer een gast aan.')+'</div></div>';
     // de AI kijkt vooruit: gasten onderweg (GPS) bepalen de prioriteit
     const onderweg = (state.guests || []).filter(g => g.heading && !g.arrived && Number.isFinite(g.etaMin));
     const vuil = rooms.filter(r => hkVan(r) === 'vuil').length;

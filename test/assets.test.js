@@ -44,6 +44,13 @@ test('de pool: drie objecten, altijd 300 tickets, alleen betalende leden kopen',
   assert.equal(d.regels.jaren, 10);
   villa = d.assets.find(a => a.soort === 'villa');
   assert.equal(villa.ticketWaarde, Math.round(villa.waarde / 300), 'ticketwaarde is waarde gedeeld door 300');
+  // de prijzen van de twee smaken zijn een formule op de ticketwaarde
+  const rond = n => Math.round(n / 100) * 100;
+  for (const a of d.assets) {
+    assert.equal(a.prijsAccess, rond(a.ticketWaarde * 0.25), a.naam + ': Access is 25% van de ticketwaarde');
+    assert.equal(a.prijsAsset, rond(a.ticketWaarde * 1.15), a.naam + ': Asset is ticketwaarde plus 15% pool-premie');
+    assert.ok(a.prijsAccess < a.ticketWaarde && a.ticketWaarde < a.prijsAsset, 'Access < ticketwaarde < Asset');
+  }
   // de gratis gebruiker mag kijken maar niet kopen
   assert.equal((await api('asset/koop', { assetId: villa.id, smaak: 'access', aantal: 1 }, gast)).status, 403);
 });
@@ -107,4 +114,26 @@ test('uitstappen: alleen Asset, tegen de actuele ticketwaarde, via een Tik', asy
   // Access heeft geen restwaarde en een vreemd ticket bestaat niet
   assert.equal((await api('asset/uitstap', { ticketId: accessTicketId }, lid)).status, 400);
   assert.equal((await api('asset/uitstap', { ticketId: 'bestaat-niet' }, lid)).status, 404);
+});
+
+test('hertaxatie: de waarde beweegt, en beide prijzen en de uitstapwaarde schuiven mee', async () => {
+  const kantoor = (await api('office/login', { code: 'RTG-OFFICE' })).body.token;
+  assert.ok(kantoor, 'het kantoor is binnen');
+  const rond = n => Math.round(n / 100) * 100;
+  // de villa wordt hoger getaxeerd: waarde keer anderhalf
+  const nieuw = Math.round(villa.waarde * 1.5);
+  const r = await api('office/asset/waarde', { assetId: villa.id, waarde: nieuw }, kantoor);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.asset.ticketWaarde, Math.round(nieuw / 300));
+  assert.equal(r.body.asset.prijsAccess, rond(r.body.asset.ticketWaarde * 0.25), 'Access schuift mee');
+  assert.equal(r.body.asset.prijsAsset, rond(r.body.asset.ticketWaarde * 1.15), 'Asset schuift mee');
+  // het lid ziet de nieuwe ticketwaarde meteen in het overzicht en de positie
+  const na = (await api('assets', {}, lid)).body.assets.find(a => a.id === villa.id);
+  assert.equal(na.ticketWaarde, Math.round(nieuw / 300));
+  assert.equal(na.prijsAccess, r.body.asset.prijsAccess);
+  const pos = (await api('asset/mijn', {}, lid)).body.posities.find(p => p.assetId === villa.id);
+  assert.equal(pos.ticketWaarde, Math.round(nieuw / 300), 'de uitstapwaarde beweegt automatisch mee');
+  // grenzen: een rare taxatie ketst af, en alleen het kantoor mag taxeren
+  assert.equal((await api('office/asset/waarde', { assetId: villa.id, waarde: 5 }, kantoor)).status, 400);
+  assert.equal((await api('office/asset/waarde', { assetId: villa.id, waarde: nieuw }, lid)).status, 401);
 });

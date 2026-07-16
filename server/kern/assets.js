@@ -15,6 +15,15 @@ const TICKETS_PER_OBJECT = 300;
 const UREN_PER_TICKET = 24;   // per jaar
 const JAREN_GELDIG = 10;
 const BETALENDE_PASSEN = ['rtg', 'lifestyle', 'business'];
+/* De prijzen van de twee smaken zijn een formule op de objectwaarde, zodat
+   ze automatisch meebewegen als RTG-kantoor het object hertaxeert:
+   - Access = 25% van de ticketwaarde: je koopt alleen het gebruik, geen
+     restwaarde, na tien jaar is het klaar.
+   - Asset = ticketwaarde + 15% pool-premie: je koopt het gebruik EN het
+     aandeel in het object; de premie dekt beheer en onderhoud van de pool. */
+const ACCESS_FACTOR = 0.25;
+const ASSET_FACTOR = 1.15;
+const netjes = n => Math.round(n / 100) * 100; // prijzen op honderden
 
 module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
   const nu = () => new Date().toISOString();
@@ -25,18 +34,20 @@ module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
       db.data.sharedAssets = [
         { id: 'sa-jet', naam: 'Aria One, Gulfstream G650', soort: 'privejet', icon: '✈️', waar: 'Thuisbasis Schiphol Oost',
           beschrijving: 'Volledig bemand, wereldwijd inzetbaar. Uw 24 uur is een retour binnen Europa of een enkele reis intercontinentaal.',
-          waarde: 42000000, prijsAccess: 30000, prijsAsset: 150000 },
+          waarde: 42000000 },
         { id: 'sa-jacht', naam: 'Azul Horizon, 34 meter', soort: 'jacht', icon: '🛥️', waar: 'Marina Botafoc, Ibiza',
           beschrijving: 'Met schipper en hostess. Uw 24 uur is een dag en een nacht op zee, Es Vedra bij zonsondergang inbegrepen.',
-          waarde: 9000000, prijsAccess: 9500, prijsAsset: 33000 },
+          waarde: 9000000 },
         { id: 'sa-villa', naam: 'Sunset Beach Villa', soort: 'villa', icon: '🏖️', waar: 'Cala Conta, Ibiza',
           beschrijving: 'Zes slaapkamers, eigen strandpad, dagelijkse housekeeping. Uw 24 uur is een volledige nacht met late check-out.',
-          waarde: 6000000, prijsAccess: 6500, prijsAsset: 22000 }
+          waarde: 6000000 }
       ];
     }
   };
   const objectVan = id => (db.data.sharedAssets || []).find(a => a.id === String(id || ''));
   const ticketWaarde = a => Math.round(a.waarde / TICKETS_PER_OBJECT);
+  const prijsAccessVan = a => netjes(ticketWaarde(a) * ACCESS_FACTOR);
+  const prijsAssetVan = a => netjes(ticketWaarde(a) * ASSET_FACTOR);
   const actieveVan = assetId => db.data.assetTickets.filter(t => t.assetId === assetId && t.status === 'actief');
   const magKopen = sess => BETALENDE_PASSEN.includes(sess.tier);
 
@@ -50,7 +61,7 @@ module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
         return {
           id: a.id, naam: a.naam, soort: a.soort, icon: a.icon, waar: a.waar, beschrijving: a.beschrijving,
           waarde: a.waarde, ticketWaarde: ticketWaarde(a),
-          prijsAccess: a.prijsAccess, prijsAsset: a.prijsAsset,
+          prijsAccess: prijsAccessVan(a), prijsAsset: prijsAssetVan(a),
           totaal: TICKETS_PER_OBJECT, beschikbaar: Math.max(0, TICKETS_PER_OBJECT - actief.length),
           mijnTickets: key ? actief.filter(t => t.key === key).length : 0
         };
@@ -67,7 +78,7 @@ module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
     const aantal = Math.max(1, Math.min(TICKETS_PER_OBJECT, parseInt(aantalIn, 10) || 1));
     const beschikbaar = TICKETS_PER_OBJECT - actieveVan(a.id).length;
     if (aantal > beschikbaar) return { status: 409, error: 'Uitverkocht: er zijn nog ' + beschikbaar + ' van de ' + TICKETS_PER_OBJECT + ' tickets beschikbaar.' };
-    const prijs = smaak === 'asset' ? a.prijsAsset : a.prijsAccess;
+    const prijs = smaak === 'asset' ? prijsAssetVan(a) : prijsAccessVan(a);
     const vervalt = new Date();
     vervalt.setFullYear(vervalt.getFullYear() + JAREN_GELDIG);
     const tickets = [];
@@ -162,5 +173,27 @@ module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
     return { ok: true, waarde, ticket: t };
   }
 
-  return { assetsOverzicht, assetKoop, assetMijn, assetGebruik, assetUitstap };
+  /* Hertaxatie door RTG-kantoor: de objectwaarde beweegt, en daarmee schuiven
+     de ticketwaarde, de uitstapwaarde en de prijzen van beide smaken
+     automatisch mee. De pool-leden krijgen er direct bericht van. */
+  function assetHertaxeer(assetIdIn, waardeIn, wie) {
+    lijsten();
+    const a = objectVan(assetIdIn);
+    if (!a) return { status: 404, error: 'Object niet gevonden.' };
+    const waarde = Math.round(Number(waardeIn));
+    if (!(waarde >= 300000) || waarde > 1000000000) return { status: 400, error: 'Geef een taxatiewaarde tussen € 300.000 en € 1 miljard.' };
+    const vorige = a.waarde;
+    a.waarde = waarde;
+    a.taxatie = { vorige, door: schoon(wie, 40) || 'RTG-kantoor', at: nu() };
+    save();
+    // iedereen in de pool hoort meteen wat het ticket nu waard is
+    const leden = [...new Set(actieveVan(a.id).map(t => t.key))];
+    const richting = waarde > vorige ? 'omhoog' : 'omlaag';
+    for (const key of leden) {
+      try { notify(key, { icon: a.icon, title: a.naam + ' is hertaxeerd', body: 'De ticketwaarde ging ' + richting + ' naar € ' + ticketWaarde(a) + '. Uw uitstapwaarde beweegt automatisch mee.', scope: 'assets' }); } catch (e) {}
+    }
+    return { ok: true, asset: { id: a.id, naam: a.naam, waarde: a.waarde, vorige, ticketWaarde: ticketWaarde(a), prijsAccess: prijsAccessVan(a), prijsAsset: prijsAssetVan(a) } };
+  }
+
+  return { assetsOverzicht, assetKoop, assetMijn, assetGebruik, assetUitstap, assetHertaxeer };
 };

@@ -1969,8 +1969,9 @@
             '</div></div>' : '') +
         (vol ? '' :
           '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);line-height:1.6;">' +
-            '<b style="color:var(--txt);">Access</b> · ' + eur(a.prijsAccess) + ' · ' + T('as.access.s','vaste prijs, teller reset elk jaar, na tien jaar is het klaar.') + '<br>' +
-            '<b style="color:var(--txt);">Asset</b> · ' + eur(a.prijsAsset) + ' · ' + T('as.asset.s','zelfde gebruik, plus uw aandeel in de restwaarde (waarde / 300). Uitstappen kan altijd via een Tik.') + '</div>' +
+            '<b style="color:var(--txt);">Access</b> · ' + eur(a.prijsAccess) + ' · ' + T('as.access.s','alleen het gebruik (25% van de ticketwaarde). Teller reset elk jaar, na tien jaar is het klaar.') + '<br>' +
+            '<b style="color:var(--txt);">Asset</b> · ' + eur(a.prijsAsset) + ' · ' + T('as.asset.s','ticketwaarde + 15% pool-premie. Zelfde gebruik, plus uw aandeel in de restwaarde. Uitstappen kan altijd via een Tik.') + '<br>' +
+            '<span style="font-size:0.66rem;">' + T('as.taxatie','Bij elke hertaxatie van het object bewegen beide prijzen en de uitstapwaarde automatisch mee.') + '</span></div>' +
           '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;">' +
             '<input type="number" min="1" max="10" value="1" data-asaantal="' + a.id + '" style="width:64px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.6rem;font-size:0.8rem;color:var(--txt);" aria-label="aantal">' +
             '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="access" style="flex:1;margin-top:0;">Access</button>' +

@@ -20,6 +20,16 @@ module.exports = (kern) => {
     res.json({ ok: true });
   });
 
+  /* Toren 3, RTG Shared Assets: het kantoor hertaxeert een object. De
+     ticketwaarde, de uitstapwaarde en de prijzen van beide smaken (Access
+     25% van de ticketwaarde, Asset ticketwaarde + 15%) schuiven automatisch
+     mee; de pool-leden krijgen direct bericht. */
+  app.post('/api/office/asset/waarde', officeAuth, (req, res) => {
+    const r = kern.assetHertaxeer(req.body.assetId, req.body.waarde, 'RTG-kantoor');
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
+
   // Naleving van de Salon-verplichting: welke partners zijn (niet) zichtbaar
   app.post('/api/office/salon-naleving', officeAuth, (req, res) => {
     const lijst = db.data.suppliers.map(s => {

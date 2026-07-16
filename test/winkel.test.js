@@ -41,6 +41,10 @@ test('de verkooppagina staat online en de prijstabel op de server is de bron', a
   assert.equal(d.producten.zaakdoos.eenmalig, 100);
   assert.equal(d.producten.zaakdoos.perMaand, 150);
   assert.equal(d.producten['slimme-deur'].eenheid, 'per deur');
+  // de afspraak: alles 5 euro per maand, behalve de doos en het satellietpakket (150)
+  for (const [id, p] of Object.entries(d.producten)) {
+    assert.equal(p.perMaand, (id === 'zaakdoos' || id === 'satelliet-pakket') ? 150 : 5, id + ' heeft de juiste maandprijs');
+  }
 });
 
 test('bestellen: validatie, vastgelegde prijs en een bevestiging', async () => {

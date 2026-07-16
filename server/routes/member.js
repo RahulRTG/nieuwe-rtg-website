@@ -742,16 +742,16 @@ app.post('/api/partner/apply', (req, res) => {
    toont ze ook in de munt van de kijker, maar gefactureerd wordt in euro. */
 const WINKEL = {
   zaakdoos:         { naam: 'RTG Zaakdoos',            eenmalig: 100, perMaand: 150, eenheid: 'per doos' },
-  'slimme-deur':    { naam: 'RTG Slimme Deur',         eenmalig: 120, perMaand: 10,  eenheid: 'per deur' },
-  'kamer-butler':   { naam: 'RTG Kamer-butler',        eenmalig: 180, perMaand: 15,  eenheid: 'per kamer' },
-  toegangspoort:    { naam: 'RTG Toegangspoort',       eenmalig: 450, perMaand: 50,  eenheid: 'per zuil' },
-  paniekknop:       { naam: 'RTG Paniekknop',          eenmalig: 60,  perMaand: 10,  eenheid: 'per knop' },
-  'gast-piepers':   { naam: 'RTG Gast-piepers',        eenmalig: 250, perMaand: 15,  eenheid: 'per set van 10' },
-  'rtg-pda':        { naam: 'RTG PDA',                 eenmalig: 220, perMaand: 20,  eenheid: 'per stuk' },
-  'rit-tracker':    { naam: 'RTG Rit-tracker',         eenmalig: 80,  perMaand: 12,  eenheid: 'per voertuig' },
-  veldsensor:       { naam: 'RTG Veldsensor-set',      eenmalig: 350, perMaand: 25,  eenheid: 'per set' },
-  schermen:         { naam: 'RTG Keuken- en kassascherm', eenmalig: 300, perMaand: 25, eenheid: 'per scherm' },
-  'satelliet-pakket': { naam: 'RTG Satelliet-startpakket', eenmalig: 900, perMaand: 75, eenheid: 'per locatie' }
+  'slimme-deur':    { naam: 'RTG Slimme Deur',         eenmalig: 120, perMaand: 5,   eenheid: 'per deur' },
+  'kamer-butler':   { naam: 'RTG Kamer-butler',        eenmalig: 180, perMaand: 5,   eenheid: 'per kamer' },
+  toegangspoort:    { naam: 'RTG Toegangspoort',       eenmalig: 450, perMaand: 5,   eenheid: 'per zuil' },
+  paniekknop:       { naam: 'RTG Paniekknop',          eenmalig: 60,  perMaand: 5,   eenheid: 'per knop' },
+  'gast-piepers':   { naam: 'RTG Gast-piepers',        eenmalig: 250, perMaand: 5,   eenheid: 'per set van 10' },
+  'rtg-pda':        { naam: 'RTG PDA',                 eenmalig: 220, perMaand: 5,   eenheid: 'per stuk' },
+  'rit-tracker':    { naam: 'RTG Rit-tracker',         eenmalig: 80,  perMaand: 5,   eenheid: 'per voertuig' },
+  veldsensor:       { naam: 'RTG Veldsensor-set',      eenmalig: 350, perMaand: 5,   eenheid: 'per set' },
+  schermen:         { naam: 'RTG Keuken- en kassascherm', eenmalig: 300, perMaand: 5, eenheid: 'per scherm' },
+  'satelliet-pakket': { naam: 'RTG Satelliet-startpakket', eenmalig: 900, perMaand: 150, eenheid: 'per locatie' }
 };
 // de prijstabel is de ene bron: de verkooppagina leest hem hiervandaan
 app.get('/api/winkel/producten', (req, res) => res.json({ producten: WINKEL }));

@@ -151,11 +151,22 @@ test('housekeeping-prioriteit en de hotelcijfers in de shift-samenvatting', asyn
 
 test('het hoteldorp: negen afdelingen met dezelfde motor, elk een eigen keten', async () => {
   const dorp = (await api('supplier/dorp', {}, hotel)).body;
-  assert.equal(dorp.afdelingen.length, 9, 'front office tot en met IT');
+  assert.equal(dorp.afdelingen.length, 11, 'front office tot en met IT, met amenities en de patissier');
   const keys = dorp.afdelingen.map(a => a.key);
-  for (const k of ['frontoffice', 'guest', 'concierge', 'parking', 'security', 'gym', 'spa', 'klussen', 'it']) {
+  for (const k of ['frontoffice', 'guest', 'concierge', 'parking', 'security', 'gym', 'spa', 'amenities', 'patissier', 'klussen', 'it']) {
     assert.ok(keys.includes(k), 'afdeling ' + k + ' bestaat');
   }
+  // de patissier heeft de langste keten: besteld -> in de maak -> klaar -> geserveerd
+  const taart = await api('supplier/dorp/post', { afdeling: 'patissier', waar: '19:00, Sea-view suite', tekst: 'Verjaardagstaart voor acht' }, hotel);
+  assert.equal(taart.body.post.status, 'besteld');
+  assert.equal((await api('supplier/dorp/verder', { id: taart.body.post.id }, hotel)).body.post.status, 'in de maak');
+  assert.equal((await api('supplier/dorp/verder', { id: taart.body.post.id }, hotel)).body.post.status, 'klaar');
+  assert.equal((await api('supplier/dorp/verder', { id: taart.body.post.id }, hotel)).body.post.status, 'geserveerd');
+  // amenities: gevraagd -> onderweg -> op de kamer
+  const badjas = await api('supplier/dorp/post', { afdeling: 'amenities', waar: 'Garden kamer', tekst: 'Badjassen maat L en kussenmenu' }, hotel);
+  assert.equal(badjas.body.post.status, 'gevraagd');
+  assert.equal((await api('supplier/dorp/verder', { id: badjas.body.post.id }, hotel)).body.post.status, 'onderweg');
+  assert.equal((await api('supplier/dorp/verder', { id: badjas.body.post.id }, hotel)).body.post.status, 'op de kamer');
   // de klusjesman: post erbij, en de keten open -> bezig -> klaar
   const klus = await api('supplier/dorp/post', { afdeling: 'klussen', waar: 'Terras', tekst: 'Lamp bij tafel 4 vervangen' }, hotel);
   assert.equal(klus.status, 200);

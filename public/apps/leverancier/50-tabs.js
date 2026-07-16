@@ -317,8 +317,14 @@
   let bon = {};        // horeca: menu-id -> aantal
   function bonTotal(){ return (state.menu||[]).reduce((s,m)=>s+m.price*(bon[m.id]||0),0); }
   function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='app'?T('pos.app','In de app'):m; }
-  // RTG Pay aan de kassa: de gast toont de betaalcode uit de app, wij vragen die hier
-  function vraagPayCode(){
+  /* RTG Pay aan de kassa: eerst tap to pay (de gast houdt zijn toestel tegen
+     de kassa, de code komt contactloos binnen), en anders de code intypen. */
+  async function vraagPayCode(){
+    if (window.TapPay && TapPay.kan()){
+      toast('📳 '+T('pos.tap','Tap to pay: laat de gast het toestel hiertegen houden...'));
+      const code = await TapPay.lees(12000);
+      if (code){ toast('📳 '+T('pos.tapok','Code ontvangen via tap to pay.')); return code; }
+    }
     const c = window.prompt(T('pos.paycode','Betaalcode van de gast (uit de app):'));
     return c ? c.trim().toUpperCase() : null;
   }
@@ -447,7 +453,7 @@
       try {
         const body = { room: b.dataset.room, method: b.dataset.method };
         if (body.method === 'rtgpay'){
-          body.payCode = vraagPayCode(); if (!body.payCode) return;
+          body.payCode = await vraagPayCode(); if (!body.payCode) return;
           body.idem = 'co' + Date.now();
         }
         const d = await API.call('/supplier/pos/checkout', body);
@@ -492,7 +498,7 @@
       if (!(body.total>0)){ toast(T('pos.fillamount','Vul een bedrag in.')); return; }
     }
     if (method === 'rtgpay'){
-      body.payCode = vraagPayCode(); if (!body.payCode) return;
+      body.payCode = await vraagPayCode(); if (!body.payCode) return;
       body.idem = 'pos' + Date.now();
     }
     try {

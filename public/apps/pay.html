@@ -131,6 +131,7 @@
       <div id="kasAan" hidden>
         <div class="kascode" id="kCode" aria-live="polite"></div>
         <p class="leeg" style="text-align:center;">geldig tot <span id="kTot"></span>, max <span id="kMaxToon"></span></p>
+        <p class="leeg" id="kTap" style="text-align:center;" hidden>📳 Tap to pay staat aan: houd uw telefoon tegen de kassa.</p>
       </div>
     </div>
 
@@ -142,6 +143,7 @@
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
+<script src="/shared/tappay.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -269,6 +271,12 @@ $('#kMaak').addEventListener('click', async () => {
     $('#kCode').textContent = r.code;
     $('#kMaxToon').textContent = euro(r.maxCenten) + ' eur';
     $('#kTot').textContent = new Date(r.geldigTot).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    // tap to pay: het toestel staat klaar om de code contactloos af te geven
+    // zolang hij geldig is; het scherm tonen blijft altijd werken
+    if (window.TapPay && TapPay.kan()){
+      $('#kTap').hidden = false;
+      TapPay.schrijf(r.code, Math.max(1000, r.geldigTot - Date.now())).catch(() => {});
+    }
     clearTimeout(kasTimer);
     kasTimer = setTimeout(() => { $('#kasUit').hidden = false; $('#kasAan').hidden = true; }, Math.max(1000, r.geldigTot - Date.now()));
   } catch (e) { meld(e.message); }

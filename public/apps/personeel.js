@@ -1097,10 +1097,18 @@
       if (!winkelCart.length) return;
       const body = { method: b.dataset.wbetaal, regels: winkelCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
       if (body.method === 'rtgpay'){
-        // de klant toont de betaalcode uit de app; zonder code geen verkoop
-        const c = window.prompt(T('pd.w.paycode','Betaalcode van de klant (uit de app):'));
-        if (!c) return;
-        body.payCode = c.trim().toUpperCase();
+        // eerst tap to pay (toestel van de klant tegen de PDA), anders typen
+        let code = null;
+        if (window.TapPay && TapPay.kan()){
+          toast('📳 '+T('pd.w.tap','Tap to pay: laat de klant het toestel hiertegen houden...'));
+          code = await TapPay.lees(12000);
+        }
+        if (!code){
+          const c = window.prompt(T('pd.w.paycode','Betaalcode van de klant (uit de app):'));
+          if (!c) return;
+          code = c.trim().toUpperCase();
+        }
+        body.payCode = code;
       }
       if (winkelKlant) body.klantKey = winkelKlant.key;
       try {

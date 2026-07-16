@@ -69,7 +69,7 @@ app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
     mail.send(a.email, 'Welkom als partner van Rahul Travel Group',
       'Beste ' + a.contactName + ',\n\n' + a.company + ' is goedgekeurd als RTG-partner.\n\n' +
       'Uw leverancierscode: ' + code + '\nUw manager-PIN: ' + pin + ' (op naam van ' + a.contactName + ')\n\n' +
-      'Open de partner-app op ' + url + '/apps/partners.html, kies uw bedrijf via de code, ' +
+      'Open de partner-app op ' + url + '/apps/leverancier.html, kies uw bedrijf via de code, ' +
       'log in als management met uw PIN en stel uw pagina, menukaart en team in.\n\n' +
       'Uw bedrijfsaccount op De Salon is direct aangemaakt; dit is een vast onderdeel van elk RTG-partnerschap. ' +
       'Via Kantoor, Marketing stelt u uw profiel in, plaatst u berichten, aanbiedingen en polls, en ziet u uw volgers en cijfers.\n\nRahul Travel Group');

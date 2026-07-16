@@ -400,44 +400,21 @@
   }
   function pkToolsHtml(){
     const t = pkTools;
-    if (!t || pkToolsKant !== pkDorpKant) return '';
-    const regel = (icoon, links, rechts, rood) => '<div style="display:flex;justify-content:space-between;gap:0.5rem;font-size:0.8rem;margin-top:0.3rem;"><span>'+icoon+' '+links+'</span>'+(rechts?'<b style="color:'+(rood?'#FF8589':'var(--gold)')+';">'+rechts+'</b>':'')+'</div>';
-    switch (t.soort) {
-      case 'dagstaat': { const g = t.dagstaat;
-        return regel('🗝️', g.aankomsten+' '+T('dt.aank','aankomst(en)')+' · 👋 '+g.vertrekken+' '+T('dt.vertr','vertrek(ken)'), g.bezet+'/'+g.totaal); }
-      case 'gastenkaart':
-        return t.gasten.slice(0, 6).map(g => regel('🛏', esc(g.codenaam)+' · '+esc(g.kamer), T('rc.tot','tot')+' '+g.tot.slice(5))).join('');
-      case 'herstel':
-        return t.verouderd.map(p => regel('⏰', esc(p.tekst), p.uren+' '+T('hs.uur','uur'), true)).join('')+
-          t.nabellen.map(p => regel('📞', T('hs.bel2','Nabellen:')+' '+esc(p.tekst), '')).join('');
-      case 'wachtrij':
-        return (t.voorrijden.length ? t.voorrijden.map(p => regel('🚗', esc(p.tekst), p.minuten+' min', p.minuten>=5)).join('') : regel('🚗', T('pk.leeg','Niemand wacht.'), ''))+
-          regel('🅿️', t.geparkeerd+' '+T('pk.gestald','auto(s) gestald.'), '');
-      case 'rondeklok':
-        return regel('🛡️', t.laatsteRonde ? T('sc.laatste','Laatste ronde')+' '+t.laatsteRonde.minuten+' min '+T('sc.geleden','geleden') : T('sc.geen','Nog geen ronde gelopen vandaag.'), t.vandaagMeldingen?t.vandaagMeldingen+' meldingen':'')+
-          '<button class="abtn" data-pkronde style="width:100%;margin-top:0.4rem;">🛡️ '+T('sc.knop','Ronde gelopen')+'</button>';
-      case 'drukte':
-        return '<div style="display:flex;gap:0.35rem;margin-top:0.35rem;">'+['rustig','normaal','druk'].map(st2 =>
-          '<button class="abtn'+(t.drukte&&t.drukte.stand===st2?'':' ghost')+'" data-pkdrukte="'+st2+'" style="flex:1;">'+st2+'</button>').join('')+'</div>';
-      case 'agenda':
-        return t.agenda.slice(0, 8).map(p => regel('💆', '<b>'+esc(p.waar||'?')+'</b> · '+esc(p.tekst), esc(p.status))).join('');
-      case 'snelknoppen':
-        return '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+t.knoppen.map(k =>
-          '<button class="abtn ghost" data-pkdsnelknop="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div>';
-      case 'defecten':
-        return t.defecten.length ? t.defecten.map(d2 => regel('⚠', '<b>'+esc(d2.kamer)+'</b>'+(d2.note?' · '+esc(d2.note):''), '', true)).join('') : regel('🔧', T('kl.leeg','Geen kamers defect gemeld.'), '');
-      case 'storingen':
-        return t.open.length ? t.open.map(p => regel('🖥️', esc(p.tekst), p.minuten+' min', p.minuten>=60)).join('') : regel('🖥️', T('it.leeg','Alles draait.'), '');
-      case 'funnel':
-        return regel('📊', t.funnel.map(f => esc(f.fase)+' '+f.aantal).join(' · '), '');
-      case 'ververs':
-        return t.teVerversen.map(p => regel('💐', esc(p.tekst), p.dagen+' '+T('fl.dagen','dagen'), true)).join('');
-      case 'presentie':
-        return t.binnen.length ? t.binnen.map(p => regel('🧸', esc(p.tekst), Math.round(p.minuten/60*10)/10+' '+T('hs.uur','uur'))).join('') : regel('🧸', T('kc.leeg','Geen kinderen binnen.'), '');
-      case 'buiten':
-        return t.buiten.length ? t.buiten.map(p => regel('🏄', esc(p.tekst), p.minuten+' min'+(p.teLang?' !':''), p.teLang)).join('') : regel('🏄', T('ws.leeg','Iedereen is binnen.'), '');
-    }
-    return '';
+    if (!t || pkToolsKant !== pkDorpKant || !Array.isArray(t.tools)) return '';
+    const kop = titel => '<div style="margin-top:0.5rem;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;">'+esc(titel)+'</div>';
+    const regel = (icoon, links, rechts, rood) => '<div style="display:flex;justify-content:space-between;gap:0.5rem;font-size:0.8rem;margin-top:0.3rem;"><span>'+(icoon?icoon+' ':'')+links+'</span>'+(rechts?'<b style="color:'+(rood?'#FF8589':'var(--gold)')+';white-space:nowrap;">'+rechts+'</b>':'')+'</div>';
+    return t.tools.map(w => {
+      if (w.type === 'cijfers') return kop(w.titel)+regel('', w.items.map(i => esc(i.label)+' <b>'+esc(String(i.waarde))+'</b>').join(' · '), '');
+      if (w.type === 'lijst') return kop(w.titel)+((w.rijen||[]).length
+        ? w.rijen.slice(0, 6).map(r => regel(r.icoon||'', esc(r.tekst)+(r.sub?'<span style="display:block;font-size:0.7rem;opacity:0.7;">'+esc(r.sub)+'</span>':''), r.rechts?esc(r.rechts):'', r.rood)).join('')
+        : '<div style="font-size:0.75rem;opacity:0.65;margin-top:0.25rem;">'+esc(w.leeg||'')+'</div>');
+      if (w.type === 'knoppen') return kop(w.titel)+'<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+
+        (w.knoppen||[]).map(k => '<button class="abtn ghost" data-pkdsnelknop="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div>';
+      if (w.type === 'actie') return '<button class="abtn" data-pkdactie="'+esc(w.tekst)+'" style="width:100%;margin-top:0.45rem;">'+esc(w.knop)+'</button>';
+      if (w.type === 'meter') return kop(w.titel)+'<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+
+        (w.opties||[]).map(o => '<button class="abtn'+(w.stand&&w.stand.stand===o?'':' ghost')+'" data-pkdmeter="'+esc(o)+'" style="flex:1;min-width:70px;">'+esc(o)+'</button>').join('')+'</div>';
+      return '';
+    }).join('');
   }
   function pkDorpKaart(){
     pkLaadDorp();
@@ -509,13 +486,13 @@
       try { localStorage.setItem('rtg_pda_dorp', pkDorpKant); } catch(e){}
       renderKamers();
     }));
-    // het specialistische gereedschap: rondeklok, druktemeter en snelposten
-    const rondeBtn = wrap.querySelector('[data-pkronde]'); if (rondeBtn) rondeBtn.addEventListener('click', async () => {
-      try { await API.call('/supplier/dorp/post', { afdeling: 'security', waar: '', tekst: 'Ronde gelopen', directKlaar: true }); toast('🛡️ '+T('sc.toast','Ronde geklokt.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
+    // het specialistische gereedschap: logmoment, meter en snelposten
+    wrap.querySelectorAll('[data-pkdactie]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/dorp/post', { afdeling: pkDorpKant, waar: '', tekst: b.dataset.pkdactie, directKlaar: true }); toast(T('dorp.geklokt','Geklokt.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
       catch(e){ toast(e.message); }
-    });
-    wrap.querySelectorAll('[data-pkdrukte]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/dorp/drukte', { stand: b.dataset.pkdrukte }); pkToolsKant = null; pkLaadTools(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-pkdmeter]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/dorp/drukte', { afdeling: pkDorpKant, stand: b.dataset.pkdmeter }); pkToolsKant = null; pkLaadTools(); } catch(e){ toast(e.message); }
     }));
     wrap.querySelectorAll('[data-pkdsnelknop]').forEach(b => b.addEventListener('click', async () => {
       const afd = pkDorp && (pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0]);

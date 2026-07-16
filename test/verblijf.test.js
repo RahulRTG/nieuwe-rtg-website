@@ -211,53 +211,61 @@ test('afdelingen praten met elkaar: een post reist door met het spoor erbij', as
   assert.equal((await api('supplier/dorp/stuurdoor', { id: klacht.body.post.id, naar: 'casino' }, hotel)).status, 400);
 });
 
-test('specialistische tools: elke afdeling het bord dat bij het vak past', async () => {
+test('specialistische tools: elke afdeling minstens vijf widgets', async () => {
+  const ALLE = ['frontoffice', 'guest', 'relations', 'concierge', 'parking', 'security', 'gym', 'spa', 'amenities', 'patissier', 'klussen', 'it', 'sales', 'events', 'florist', 'kidsclub', 'watersport'];
+  for (const key of ALLE) {
+    const r = await api('supplier/dorp/tools', { afdeling: key }, hotel);
+    assert.equal(r.status, 200, key + ' heeft gereedschap');
+    assert.ok(r.body.tools.length >= 5, key + ' heeft minstens vijf tools (' + r.body.tools.length + ')');
+    const types = r.body.tools.map(w => w.type);
+    for (const t of ['cijfers', 'lijst', 'knoppen', 'actie', 'meter']) assert.ok(types.includes(t), key + ' heeft een ' + t + '-widget');
+  }
+  assert.equal((await api('supplier/dorp/tools', { afdeling: 'casino' }, hotel)).status, 400);
+  const widget = async (key, titel) => ((await api('supplier/dorp/tools', { afdeling: key }, hotel)).body.tools.find(w => w.titel === titel));
   // front office: de dagstaat telt (er slaapt nog iemand uit de shift-test)
-  const dagstaat = (await api('supplier/dorp/tools', { afdeling: 'frontoffice' }, hotel)).body;
-  assert.equal(dagstaat.soort, 'dagstaat');
-  assert.ok(dagstaat.dagstaat.inHuis >= 1 && dagstaat.dagstaat.totaal >= 1);
+  const dagstaat = await widget('frontoffice', 'Dagstaat');
+  assert.ok(dagstaat.items.find(i => i.label === 'in huis').waarde >= 1);
   // parking: de voorrijd-wachtrij (de Defender staat sinds de dorptest op voorrijden)
-  const wachtrij = (await api('supplier/dorp/tools', { afdeling: 'parking' }, hotel)).body;
-  assert.equal(wachtrij.soort, 'wachtrij');
-  assert.ok(wachtrij.voorrijden.some(p => /Defender/.test(p.tekst)), 'de auto staat in de wachtrij');
-  // security: de rondeklok, met een direct afgeronde logpost
-  assert.equal((await api('supplier/dorp/post', { afdeling: 'security', tekst: 'Poolronde gelopen', directKlaar: true }, hotel)).body.post.status, 'afgehandeld');
-  const ronde = (await api('supplier/dorp/tools', { afdeling: 'security' }, hotel)).body;
-  assert.ok(ronde.laatsteRonde && ronde.laatsteRonde.minuten <= 1, 'de klok weet wanneer er gelopen is');
-  // gym: de druktemeter
-  assert.equal((await api('supplier/dorp/drukte', { stand: 'druk' }, hotel)).status, 200);
-  assert.equal((await api('supplier/dorp/tools', { afdeling: 'gym' }, hotel)).body.drukte.stand, 'druk');
-  assert.equal((await api('supplier/dorp/drukte', { stand: 'vol' }, hotel)).status, 400);
+  const wachtrij = await widget('parking', 'Voorrijd-wachtrij');
+  assert.ok(wachtrij.rijen.some(p => /Defender/.test(p.tekst)), 'de auto staat in de wachtrij');
+  // security: het logmoment vult de rondeklok
+  const actie = await widget('security', 'Logmoment');
+  assert.equal(actie.knop, 'Ronde gelopen');
+  assert.equal((await api('supplier/dorp/post', { afdeling: 'security', tekst: actie.tekst, directKlaar: true }, hotel)).body.post.status, 'afgehandeld');
+  const rondeklok = await widget('security', 'Rondeklok');
+  assert.ok(rondeklok.rijen.some(p => /Ronde gelopen/.test(p.tekst)), 'de klok weet wie er gelopen heeft');
+  // de meters: de gym-drukte en de eigen schaal van security
+  assert.equal((await api('supplier/dorp/drukte', { afdeling: 'gym', stand: 'druk' }, hotel)).status, 200);
+  assert.equal((await widget('gym', 'Drukte')).stand.stand, 'druk');
+  assert.equal((await api('supplier/dorp/drukte', { afdeling: 'gym', stand: 'vol' }, hotel)).status, 400);
+  assert.equal((await api('supplier/dorp/drukte', { afdeling: 'security', stand: 'verhoogd' }, hotel)).status, 200);
+  assert.equal((await widget('security', 'Status')).stand.stand, 'verhoogd');
+  assert.equal((await api('supplier/dorp/drukte', { afdeling: 'security', stand: 'druk' }, hotel)).status, 400, 'elke afdeling zijn eigen schaal');
   // kids club: de presentielijst weet wie er binnen is
   const kind = await api('supplier/dorp/post', { afdeling: 'kidsclub', waar: 'Garden kamer', tekst: 'Mia (6), tot 16:00' }, hotel);
   await api('supplier/dorp/verder', { id: kind.body.post.id }, hotel);
-  const presentie = (await api('supplier/dorp/tools', { afdeling: 'kidsclub' }, hotel)).body;
-  assert.ok(presentie.binnen.some(p => /Mia/.test(p.tekst)), 'Mia is binnen');
+  assert.ok((await widget('kidsclub', 'Presentielijst')).rijen.some(p => /Mia/.test(p.tekst)), 'Mia is binnen');
   // watersport: het op-het-water-bord met de tijd erbij
   const board = await api('supplier/dorp/post', { afdeling: 'watersport', waar: 'Sea-view suite', tekst: 'Twee paddleboards' }, hotel);
   await api('supplier/dorp/verder', { id: board.body.post.id }, hotel);
-  const buiten = (await api('supplier/dorp/tools', { afdeling: 'watersport' }, hotel)).body;
-  assert.ok(buiten.buiten.some(p => /paddleboards/.test(p.tekst) && p.minuten >= 0 && !p.teLang));
-  // sales: de funnel telt per fase
+  assert.ok((await widget('watersport', 'Op het water')).rijen.some(p => /paddleboards/.test(p.tekst) && !p.rood));
+  // sales: de pijplijn telt per fase
   await api('supplier/dorp/post', { afdeling: 'sales', waar: 'Bedrijf X', tekst: 'Uitje twintig personen' }, hotel);
-  const funnel = (await api('supplier/dorp/tools', { afdeling: 'sales' }, hotel)).body;
-  assert.equal(funnel.funnel.find(f => f.fase === 'lead').aantal, 1);
+  assert.equal((await widget('sales', 'Pijplijn')).items.find(f => f.label === 'lead').waarde, 1);
   // klussen: de brug naar housekeeping (defecte kamer = werkvoorraad)
   const st = (await api('supplier/state', {}, hotel)).body.state;
   const defectKamer = st.rooms.find(r => r.available);
   await api('supplier/room/hk', { id: defectKamer.id, status: 'defect', note: 'Airco tikt' }, hotel);
-  const defecten = (await api('supplier/dorp/tools', { afdeling: 'klussen' }, hotel)).body;
-  assert.ok(defecten.defecten.some(d => d.kamer === defectKamer.name && /Airco/.test(d.note)));
+  assert.ok((await widget('klussen', 'Defecten uit housekeeping')).rijen.some(d => d.tekst === defectKamer.name && /Airco/.test(d.sub)));
   await api('supplier/room/hk', { id: defectKamer.id, status: 'schoon' }, hotel); // netjes terug
   // guest relations: wie opgelost is, staat op de nabellijst
   const signaal = await api('supplier/dorp/post', { afdeling: 'relations', waar: 'Sea-view suite', tekst: 'Trage roomservice gisteravond' }, hotel);
   await api('supplier/dorp/verder', { id: signaal.body.post.id }, hotel);
   await api('supplier/dorp/verder', { id: signaal.body.post.id }, hotel);
-  const herstel = (await api('supplier/dorp/tools', { afdeling: 'relations' }, hotel)).body;
-  assert.ok(herstel.nabellen.some(p => /roomservice/.test(p.tekst)), 'nabellen staat klaar');
+  assert.ok((await widget('relations', 'Vandaag nabellen')).rijen.some(p => /roomservice/.test(p.tekst)), 'nabellen staat klaar');
   // amenities en patissier hebben snelknoppen
-  assert.ok((await api('supplier/dorp/tools', { afdeling: 'amenities' }, hotel)).body.knoppen.includes('Kussenmenu'));
-  assert.ok((await api('supplier/dorp/tools', { afdeling: 'patissier' }, hotel)).body.knoppen.includes('Verjaardagstaart'));
+  assert.ok((await widget('amenities', 'Veelgevraagd')).knoppen.includes('Kussenmenu'));
+  assert.ok((await widget('patissier', 'Veelgevraagd')).knoppen.includes('Verjaardagstaart'));
 });
 
 test('de buurt op het conciergescherm: partners om de hoek, op afstand gesorteerd', async () => {

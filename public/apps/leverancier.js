@@ -5034,67 +5034,23 @@
     let tools = null;
     try { tools = await API.call('/supplier/dorp/tools', { afdeling: dorpKant }); } catch(e){}
     const kop = t => '<div style="margin-top:0.6rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);">'+t+'</div>';
+    // de gereedschapskist: generieke widgets (cijfers, lijst, knoppen, actie, meter)
     let toolsBlok = '';
-    if (tools) switch (tools.soort) {
-      case 'dagstaat': { const g = tools.dagstaat;
-        toolsBlok = kop(T('dt.h','Dagstaat'))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
-          '<span>🗝️ '+g.aankomsten+' '+T('dt.aank','aankomst(en)')+'</span><span>👋 '+g.vertrekken+' '+T('dt.vertr','vertrek(ken)')+'</span>'+
-          '<span>🛏 '+g.inHuis+' '+T('dt.inhuis','in huis')+' ('+g.bezet+'/'+g.totaal+')</span>'+
-          (g.aanvragen?'<span>✋ '+g.aanvragen+' '+T('rc.aanvragen','aanvraag(en)')+'</span>':'')+'</div>'; break; }
-      case 'gastenkaart':
-        toolsBlok = kop(T('gk.h','Gastenkaart, wie slaapt er'))+(tools.gasten.length ? tools.gasten.map(g =>
-          '<div style="margin-top:0.45rem;font-size:0.82rem;"><b class="cn">'+esc(g.codenaam)+'</b> · '+esc(g.kamer)+' · '+T('rc.tot','tot')+' '+g.tot+
-          (g.posten.length?'<div class="sub" style="margin-top:0.15rem;">'+g.posten.map(p=>p.afdeling+' '+esc(p.tekst)+' ('+esc(p.status)+')').join(' · ')+'</div>':'')+'</div>').join('')
-          : '<div class="softline" style="margin-top:0.4rem;">'+T('gk.leeg','Niemand in huis.')+'</div>'); break;
-      case 'herstel':
-        toolsBlok = (tools.verouderd.length?kop(T('hs.oud','Staat te lang open'))+tools.verouderd.map(p=>'<div class="st-row"><span style="color:var(--burgundy);">'+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</span><b style="color:var(--burgundy);">'+p.uren+' '+T('hs.uur','uur')+'</b></div>').join(''):'')+
-          (tools.nabellen.length?kop(T('hs.bel','Vandaag nabellen'))+tools.nabellen.map(p=>'<div class="st-row"><span>📞 '+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</span></div>').join(''):''); break;
-      case 'wachtrij':
-        toolsBlok = kop(T('pk.h','Voorrijd-wachtrij'))+(tools.voorrijden.length ? tools.voorrijden.map(p =>
-          '<div class="st-row"><span>🚗 '+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</span><b style="color:'+(p.minuten>=5?'var(--burgundy)':'var(--gold)')+';">'+p.minuten+' min</b></div>').join('')
-          : '<div class="softline" style="margin-top:0.4rem;">'+T('pk.leeg','Niemand wacht.')+'</div>')+
-          '<div class="softline" style="margin-top:0.3rem;">'+tools.geparkeerd+' '+T('pk.gestald','auto(s) gestald.')+'</div>'; break;
-      case 'rondeklok':
-        toolsBlok = kop(T('sc.h','Rondeklok'))+
-          '<div class="st-row"><span>'+(tools.laatsteRonde?T('sc.laatste','Laatste ronde')+' '+tools.laatsteRonde.minuten+' min '+T('sc.geleden','geleden')+' ('+esc(tools.laatsteRonde.door)+')':T('sc.geen','Nog geen ronde gelopen vandaag.'))+'</span>'+
-          (tools.vandaagMeldingen?'<b>'+tools.vandaagMeldingen+' '+T('sc.meld','melding(en) vandaag')+'</b>':'')+'</div>'+
-          '<button class="obtn primary" id="dorpRonde" style="margin-top:0.4rem;">🛡️ '+T('sc.knop','Ronde gelopen')+'</button>'; break;
-      case 'drukte':
-        toolsBlok = kop(T('gy.h','Druktemeter'))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
-          ['rustig','normaal','druk'].map(st2=>'<span><button class="obtn'+(tools.drukte&&tools.drukte.stand===st2?' primary':'')+'" data-drukte="'+st2+'" style="padding:0.15rem 0.55rem;">'+st2+'</button></span>').join('')+'</div>'+
-          (tools.drukte?'<div class="softline" style="margin-top:0.3rem;">'+T('gy.nu','Nu')+' '+esc(tools.drukte.stand)+' · '+esc(tools.drukte.door)+', '+timeAgo(tools.drukte.at)+'</div>':''); break;
-      case 'agenda':
-        toolsBlok = kop(T('sp.h','Dagagenda'))+(tools.agenda.length ? tools.agenda.map(p =>
-          '<div class="st-row"><span><b>'+esc(p.waar||'?')+'</b> · '+esc(p.tekst)+'</span><span class="sub">'+esc(p.status)+'</span></div>').join('')
-          : '<div class="softline" style="margin-top:0.4rem;">'+T('sp.leeg','Geen afspraken.')+'</div>'); break;
-      case 'snelknoppen':
-        toolsBlok = kop(T('sn.h','Veelgevraagd'))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
-          tools.knoppen.map(k=>'<span><button class="obtn js-dsnel" data-snel="'+esc(k)+'" style="padding:0.15rem 0.55rem;">'+esc(k)+'</button></span>').join('')+'</div>'; break;
-      case 'defecten':
-        toolsBlok = kop(T('kl.h','Defecten uit housekeeping'))+(tools.defecten.length ? tools.defecten.map(d2 =>
-          '<div class="st-row"><span>⚠ <b>'+esc(d2.kamer)+'</b>'+(d2.note?' · '+esc(d2.note):'')+'</span></div>').join('')
-          : '<div class="softline" style="margin-top:0.4rem;">'+T('kl.leeg','Geen kamers defect gemeld.')+'</div>'); break;
-      case 'storingen':
-        toolsBlok = kop(T('it.h','Storingen'))+(tools.open.length ? tools.open.map(p =>
-          '<div class="st-row"><span>'+(p.waar?'<b>'+esc(p.waar)+'</b> · ':'')+esc(p.tekst)+'</span><b style="color:'+(p.minuten>=60?'var(--burgundy)':'var(--gold)')+';">'+(p.minuten>=60?Math.round(p.minuten/60)+' '+T('hs.uur','uur'):p.minuten+' min')+'</b></div>').join('')
-          : '<div class="softline" style="margin-top:0.4rem;">'+T('it.leeg','Alles draait.')+'</div>')+
-          (tools.vandaagOpgelost?'<div class="softline" style="margin-top:0.3rem;">'+tools.vandaagOpgelost+' '+T('it.opgelost','vandaag opgelost.')+'</div>':''); break;
-      case 'funnel':
-        toolsBlok = kop(T('fu.h','Pijplijn'))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
-          tools.funnel.map(f=>'<span>'+esc(f.fase)+' · <b>'+f.aantal+'</b></span>').join('')+'</div>'; break;
-      case 'ververs':
-        toolsBlok = kop(T('fl.h','Toe aan vers'))+(tools.teVerversen.length ? tools.teVerversen.map(p =>
-          '<div class="st-row"><span>💐 '+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</span><b>'+p.dagen+' '+T('fl.dagen','dagen')+'</b></div>').join('')
-          : '<div class="softline" style="margin-top:0.4rem;">'+T('fl.leeg','Alles staat er vers bij.')+'</div>'); break;
-      case 'presentie':
-        toolsBlok = kop(T('kc.h','Presentielijst'))+(tools.binnen.length ? tools.binnen.map(p =>
-          '<div class="st-row"><span>🧸 '+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</span><b>'+Math.round(p.minuten/60*10)/10+' '+T('hs.uur','uur')+'</b></div>').join('')
-          : '<div class="softline" style="margin-top:0.4rem;">'+T('kc.leeg','Geen kinderen binnen.')+'</div>'); break;
-      case 'buiten':
-        toolsBlok = kop(T('ws.h','Op het water'))+(tools.buiten.length ? tools.buiten.map(p =>
-          '<div class="st-row"><span>🏄 '+(p.waar?esc(p.waar)+' · ':'')+esc(p.tekst)+'</span><b style="color:'+(p.teLang?'var(--burgundy)':'var(--gold)')+';">'+p.minuten+' min'+(p.teLang?' · '+T('ws.telang','te lang')+'!':'')+'</b></div>').join('')
-          : '<div class="softline" style="margin-top:0.4rem;">'+T('ws.leeg','Iedereen is binnen.')+'</div>'); break;
-    }
+    if (tools && Array.isArray(tools.tools)) toolsBlok = tools.tools.map(w => {
+      if (w.type === 'cijfers') return kop(esc(w.titel))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
+        w.items.map(i => '<span>'+esc(i.label)+' · <b>'+esc(String(i.waarde))+'</b></span>').join('')+'</div>';
+      if (w.type === 'lijst') return kop(esc(w.titel))+((w.rijen||[]).length ? w.rijen.map(r =>
+        '<div class="st-row"><span>'+(r.icoon?r.icoon+' ':'')+esc(r.tekst)+(r.sub?'<span class="sub" style="display:block;">'+esc(r.sub)+'</span>':'')+'</span>'+
+        (r.rechts?'<b style="color:'+(r.rood?'var(--burgundy)':'var(--gold)')+';white-space:nowrap;">'+esc(r.rechts)+'</b>':'')+'</div>').join('')
+        : '<div class="softline" style="margin-top:0.35rem;">'+esc(w.leeg||'')+'</div>');
+      if (w.type === 'knoppen') return kop(esc(w.titel))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
+        w.knoppen.map(k => '<span><button class="obtn js-dsnel" data-snel="'+esc(k)+'" style="padding:0.15rem 0.55rem;">'+esc(k)+'</button></span>').join('')+'</div>';
+      if (w.type === 'actie') return kop(esc(w.titel))+'<button class="obtn primary js-dactie" data-tekst="'+esc(w.tekst)+'" style="margin-top:0.35rem;">'+esc(w.knop)+'</button>';
+      if (w.type === 'meter') return kop(esc(w.titel))+'<div class="pos-chips" style="margin-top:0.35rem;">'+
+        w.opties.map(o => '<span><button class="obtn'+(w.stand&&w.stand.stand===o?' primary':'')+'" data-meter="'+esc(o)+'" style="padding:0.15rem 0.55rem;">'+esc(o)+'</button></span>').join('')+'</div>'+
+        (w.stand?'<div class="softline" style="margin-top:0.25rem;">'+T('gy.nu','Nu')+' '+esc(w.stand.stand)+' · '+esc(w.stand.door)+', '+timeAgo(w.stand.at)+'</div>':'');
+      return '';
+    }).join('');
     // de buurt op het conciergescherm: partners om de hoek, op afstand gesorteerd
     let buurtBlok = '';
     if (dorpKant === 'concierge'){
@@ -5147,13 +5103,14 @@
       const inp = el.querySelector('#dorpTekst');
       if (inp){ inp.value = T('dorp.regelbij','Regel bij')+' '+b.dataset.naam+' ('+b.dataset.soort+', '+b.dataset.km+' km): '; inp.focus(); }
     }));
-    // de specialistische knoppen: rondeklok, druktemeter en snelposten
-    const ronde = el.querySelector('#dorpRonde'); if (ronde) ronde.addEventListener('click', async () => {
-      try { await API.call('/supplier/dorp/post', { afdeling: 'security', waar: '', tekst: 'Ronde gelopen', directKlaar: true }); toast('🛡️ '+T('sc.toast','Ronde geklokt.')); renderDorp(); }
+    // het logmoment: een tik en het staat geklokt als afgeronde post
+    el.querySelectorAll('.js-dactie').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/dorp/post', { afdeling: dorpKant, waar: '', tekst: b.dataset.tekst, directKlaar: true }); toast(afd.icon+' '+T('dorp.geklokt','Geklokt.')); renderDorp(); }
       catch(e){ toast(e.message); }
-    });
-    el.querySelectorAll('[data-drukte]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/dorp/drukte', { stand: b.dataset.drukte }); renderDorp(); } catch(e){ toast(e.message); }
+    }));
+    // de meter van de afdeling: drukte, voorraad, seizoen
+    el.querySelectorAll('[data-meter]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/dorp/drukte', { afdeling: dorpKant, stand: b.dataset.meter }); renderDorp(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-dsnel').forEach(b => b.addEventListener('click', () => {
       const inp = el.querySelector('#dorpTekst');

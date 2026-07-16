@@ -58,11 +58,11 @@ module.exports = (kern) => {
     if (!eisDorp(req, res)) return;
     stuur(res, dorpTools(req.supplier, String(req.body.afdeling || '')));
   });
-  // de druktemeter van de gym
+  // de standenmeter van een afdeling (drukte, voorraad, seizoen...)
   app.post('/api/supplier/dorp/drukte', supplierAuth, (req, res) => {
     if (!eisDorp(req, res)) return;
-    const r = dorpDrukte(req.supplier, String(req.body.stand || ''), req.actor.name);
-    if (r.ok) logActivity(req.supplier.code, req.actor, 'zette de gym-drukte op ' + r.drukte.stand);
+    const r = dorpDrukte(req.supplier, String(req.body.afdeling || ''), String(req.body.stand || ''), req.actor.name);
+    if (r.ok) logActivity(req.supplier.code, req.actor, 'zette de meter van ' + r.drukte.afdeling + ' op ' + r.drukte.stand);
     stuur(res, r);
   });
   app.post('/api/supplier/dorp/verder', supplierAuth, (req, res) => {

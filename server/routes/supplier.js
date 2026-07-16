@@ -569,6 +569,8 @@ app.post('/api/supplier/pos/sale', supplierAuth, (req, res) => {
   list.unshift(sale);
   db.data.posSales[req.supplier.code] = list.slice(0, 300);
   save();
+  // het keukenbrein boekt de ingredienten van de bon af via de recepten
+  try { kern.keuken.boekVerkoopAf(req.supplier, items || [], 'kassa (' + req.actor.name + ')'); } catch (e) {}
   logActivity(req.supplier.code, req.actor, 'rekende € ' + total + ' af (' + method + (sale.room ? ', ' + sale.room : '') + ')');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
   // automatische factuur voor beide partijen; de koper wordt gekoppeld als er een
@@ -2451,6 +2453,7 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
   // domein-deelmodules (aparte bestanden, zelfde gedeelde kern)
   require('./supplier/agent')(kern);
   require('./supplier/tools')(kern);
+  require('./supplier/keuken')(kern);
   require('./supplier/pda')(kern);
   require('./supplier/bezorg')(kern);
   require('./supplier/tickets')(kern);

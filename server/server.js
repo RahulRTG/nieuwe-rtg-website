@@ -2655,6 +2655,10 @@ Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic }
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));
+/* Het keukenbrein (kern/keuken.js): recepten per gerecht, automatische
+   voorraad-afboeking bij elke verkoop, telling/verspilling/levering met
+   logboek, marges en het inkoopadvies. */
+Object.assign(kern, require('./kern/keuken')({ save, crypto, schoon, notifySupplier }));
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

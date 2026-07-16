@@ -75,6 +75,8 @@ module.exports = (kern) => {
     if (req.body.delta != null) item.aantal = Math.max(0, Math.min(100000, item.aantal + Math.round(Number(req.body.delta) || 0)));
     if (req.body.min != null) item.min = Math.max(0, Math.min(100000, Math.round(Number(req.body.min) || 0)));
     if (req.body.eenheid != null && String(req.body.eenheid).trim()) item.eenheid = schoon(req.body.eenheid, 12);
+    // de kostprijs per eenheid (euro) draagt de voorraadwaarde en de marges
+    if (req.body.kostprijs != null) item.kostprijs = Math.max(0, Math.min(100000, Math.round((Number(req.body.kostprijs) || 0) * 100) / 100));
     // de drempelwachter: een melding per keer dat het item onder zijn minimum zakt
     if (item.min > 0 && item.aantal <= item.min && !item.laagGemeld) {
       item.laagGemeld = true;

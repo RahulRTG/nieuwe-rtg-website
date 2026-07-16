@@ -389,15 +389,67 @@
     API.call('/supplier/dorp').then(d => { pkDorp = d; pkDorpAt = Date.now(); pkDorpBezig = false; renderKamers(); })
       .catch(() => { pkDorpBezig = false; pkDorpAt = Date.now(); });
   }
+  // het specialistische gereedschap van de gekozen kant, compact op zak
+  let pkTools = null, pkToolsKant = null, pkToolsBezig = false;
+  function pkLaadTools(){
+    if (pkToolsBezig || pkToolsKant === pkDorpKant) return;
+    pkToolsBezig = true;
+    const kant = pkDorpKant;
+    API.call('/supplier/dorp/tools', { afdeling: kant }).then(d => { pkTools = d; pkToolsKant = kant; pkToolsBezig = false; renderKamers(); })
+      .catch(() => { pkTools = null; pkToolsKant = kant; pkToolsBezig = false; });
+  }
+  function pkToolsHtml(){
+    const t = pkTools;
+    if (!t || pkToolsKant !== pkDorpKant) return '';
+    const regel = (icoon, links, rechts, rood) => '<div style="display:flex;justify-content:space-between;gap:0.5rem;font-size:0.8rem;margin-top:0.3rem;"><span>'+icoon+' '+links+'</span>'+(rechts?'<b style="color:'+(rood?'#FF8589':'var(--gold)')+';">'+rechts+'</b>':'')+'</div>';
+    switch (t.soort) {
+      case 'dagstaat': { const g = t.dagstaat;
+        return regel('🗝️', g.aankomsten+' '+T('dt.aank','aankomst(en)')+' · 👋 '+g.vertrekken+' '+T('dt.vertr','vertrek(ken)'), g.bezet+'/'+g.totaal); }
+      case 'gastenkaart':
+        return t.gasten.slice(0, 6).map(g => regel('🛏', esc(g.codenaam)+' · '+esc(g.kamer), T('rc.tot','tot')+' '+g.tot.slice(5))).join('');
+      case 'herstel':
+        return t.verouderd.map(p => regel('⏰', esc(p.tekst), p.uren+' '+T('hs.uur','uur'), true)).join('')+
+          t.nabellen.map(p => regel('📞', T('hs.bel2','Nabellen:')+' '+esc(p.tekst), '')).join('');
+      case 'wachtrij':
+        return (t.voorrijden.length ? t.voorrijden.map(p => regel('🚗', esc(p.tekst), p.minuten+' min', p.minuten>=5)).join('') : regel('🚗', T('pk.leeg','Niemand wacht.'), ''))+
+          regel('🅿️', t.geparkeerd+' '+T('pk.gestald','auto(s) gestald.'), '');
+      case 'rondeklok':
+        return regel('🛡️', t.laatsteRonde ? T('sc.laatste','Laatste ronde')+' '+t.laatsteRonde.minuten+' min '+T('sc.geleden','geleden') : T('sc.geen','Nog geen ronde gelopen vandaag.'), t.vandaagMeldingen?t.vandaagMeldingen+' meldingen':'')+
+          '<button class="abtn" data-pkronde style="width:100%;margin-top:0.4rem;">🛡️ '+T('sc.knop','Ronde gelopen')+'</button>';
+      case 'drukte':
+        return '<div style="display:flex;gap:0.35rem;margin-top:0.35rem;">'+['rustig','normaal','druk'].map(st2 =>
+          '<button class="abtn'+(t.drukte&&t.drukte.stand===st2?'':' ghost')+'" data-pkdrukte="'+st2+'" style="flex:1;">'+st2+'</button>').join('')+'</div>';
+      case 'agenda':
+        return t.agenda.slice(0, 8).map(p => regel('💆', '<b>'+esc(p.waar||'?')+'</b> · '+esc(p.tekst), esc(p.status))).join('');
+      case 'snelknoppen':
+        return '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+t.knoppen.map(k =>
+          '<button class="abtn ghost" data-pkdsnelknop="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div>';
+      case 'defecten':
+        return t.defecten.length ? t.defecten.map(d2 => regel('⚠', '<b>'+esc(d2.kamer)+'</b>'+(d2.note?' · '+esc(d2.note):''), '', true)).join('') : regel('🔧', T('kl.leeg','Geen kamers defect gemeld.'), '');
+      case 'storingen':
+        return t.open.length ? t.open.map(p => regel('🖥️', esc(p.tekst), p.minuten+' min', p.minuten>=60)).join('') : regel('🖥️', T('it.leeg','Alles draait.'), '');
+      case 'funnel':
+        return regel('📊', t.funnel.map(f => esc(f.fase)+' '+f.aantal).join(' · '), '');
+      case 'ververs':
+        return t.teVerversen.map(p => regel('💐', esc(p.tekst), p.dagen+' '+T('fl.dagen','dagen'), true)).join('');
+      case 'presentie':
+        return t.binnen.length ? t.binnen.map(p => regel('🧸', esc(p.tekst), Math.round(p.minuten/60*10)/10+' '+T('hs.uur','uur'))).join('') : regel('🧸', T('kc.leeg','Geen kinderen binnen.'), '');
+      case 'buiten':
+        return t.buiten.length ? t.buiten.map(p => regel('🏄', esc(p.tekst), p.minuten+' min'+(p.teLang?' !':''), p.teLang)).join('') : regel('🏄', T('ws.leeg','Iedereen is binnen.'), '');
+    }
+    return '';
+  }
   function pkDorpKaart(){
     pkLaadDorp();
     if (!pkDorp) return '';
     const afd = pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0];
     pkDorpKant = afd.key;
+    pkLaadTools();
     return '<div class="card"><div class="k">🏘 '+T('pd.dorp','Afdelingen')+'</div>'+
       '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.4rem;">'+pkDorp.afdelingen.map(a =>
         '<button class="abtn'+(a.key===pkDorpKant?'':' ghost')+'" data-pkdkant="'+a.key+'">'+a.icon+(a.openAantal?' '+a.openAantal:'')+'</button>').join('')+'</div>'+
       '<div style="margin-top:0.45rem;font-size:0.72rem;color:var(--soft);">'+afd.icon+' '+esc(afd.label)+' · '+afd.keten.join(' · ')+'</div>'+
+      pkToolsHtml()+
       (afd.open.length ? afd.open.map(p => {
         const i = afd.keten.indexOf(p.status);
         const volgende = i >= 0 && i < afd.keten.length - 1 ? afd.keten[i + 1] : null;
@@ -457,8 +509,23 @@
       try { localStorage.setItem('rtg_pda_dorp', pkDorpKant); } catch(e){}
       renderKamers();
     }));
+    // het specialistische gereedschap: rondeklok, druktemeter en snelposten
+    const rondeBtn = wrap.querySelector('[data-pkronde]'); if (rondeBtn) rondeBtn.addEventListener('click', async () => {
+      try { await API.call('/supplier/dorp/post', { afdeling: 'security', waar: '', tekst: 'Ronde gelopen', directKlaar: true }); toast('🛡️ '+T('sc.toast','Ronde geklokt.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
+      catch(e){ toast(e.message); }
+    });
+    wrap.querySelectorAll('[data-pkdrukte]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/dorp/drukte', { stand: b.dataset.pkdrukte }); pkToolsKant = null; pkLaadTools(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-pkdsnelknop]').forEach(b => b.addEventListener('click', async () => {
+      const afd = pkDorp && (pkDorp.afdelingen.find(a => a.key === pkDorpKant) || pkDorp.afdelingen[0]);
+      if (!afd) return;
+      const waar = prompt(afd.waarHint) || '';
+      try { await API.call('/supplier/dorp/post', { afdeling: afd.key, waar, tekst: b.dataset.pkdsnelknop }); toast(afd.icon+' '+T('pd.dorp.gezet','Staat op de lijst.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
+      catch(e){ toast(e.message); }
+    }));
     wrap.querySelectorAll('[data-pkdverder]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/dorp/verder', { id: b.dataset.pkdverder }); pkDorpAt = 0; pkLaadDorp(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/dorp/verder', { id: b.dataset.pkdverder }); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); } catch(e){ toast(e.message); }
     }));
     // doorsturen: de post reist naar een andere afdeling, met het spoor erbij
     wrap.querySelectorAll('[data-pkdstuur]').forEach(b => b.addEventListener('click', async () => {
@@ -468,7 +535,7 @@
       try {
         await API.call('/supplier/dorp/stuurdoor', { id: b.dataset.pkdstuur, naar: naar.trim().toLowerCase() });
         toast('↪ '+T('pd.dorp.gestuurd','Doorgestuurd.'));
-        pkDorpAt = 0; pkLaadDorp();
+        pkDorpAt = 0; pkToolsKant = null; pkLaadDorp();
       } catch(e){ toast(e.message); }
     }));
     // de buurt: een tik zet de naam alvast in de wens
@@ -481,7 +548,7 @@
       try {
         await API.call('/supplier/dorp/post', { afdeling: 'concierge', waar, tekst: b.dataset.pkdbuurt+': '+tekst });
         toast('🎩 '+T('pd.dorp.gezet','Staat op de lijst.'));
-        pkDorpAt = 0; pkLaadDorp();
+        pkDorpAt = 0; pkToolsKant = null; pkLaadDorp();
       } catch(e){ toast(e.message); }
     }));
     const dn = wrap.querySelector('[data-pkdnieuw]'); if (dn) dn.addEventListener('click', async () => {
@@ -490,7 +557,7 @@
       const waar = prompt(afd.waarHint) || '';
       const tekst = prompt(afd.watHint);
       if (!tekst) return;
-      try { await API.call('/supplier/dorp/post', { afdeling: afd.key, waar, tekst }); toast(afd.icon+' '+T('pd.dorp.gezet','Staat op de lijst.')); pkDorpAt = 0; pkLaadDorp(); }
+      try { await API.call('/supplier/dorp/post', { afdeling: afd.key, waar, tekst }); toast(afd.icon+' '+T('pd.dorp.gezet','Staat op de lijst.')); pkDorpAt = 0; pkToolsKant = null; pkLaadDorp(); }
       catch(e){ toast(e.message); }
     });
     wrap.querySelectorAll('[data-khk]').forEach(b => b.addEventListener('click', async () => {

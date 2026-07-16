@@ -2,7 +2,7 @@
    Beslissen, inchecken en no-show zijn vloerhandelingen (iedereen achter de
    balie); het bord is leesbaar voor het hele team. */
 module.exports = (kern) => {
-  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity, dorpPost, dorpVerder, dorpStuurDoor, dorpBuurt, dorpOverzicht } = kern;
+  const { app, supplierAuth, receptie, kamerplanning, verblijfBeslis, verblijfCheckin, verblijfCheckout, verblijfNoShow, logActivity, dorpPost, dorpVerder, dorpStuurDoor, dorpBuurt, dorpOverzicht, dorpTools, dorpDrukte } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error, openLast: r.openLast }) : res.json(r);
 
   app.post('/api/supplier/receptie', supplierAuth, (req, res) => {
@@ -49,8 +49,20 @@ module.exports = (kern) => {
   });
   app.post('/api/supplier/dorp/post', supplierAuth, (req, res) => {
     if (!eisDorp(req, res)) return;
-    const r = dorpPost(req.supplier, req.body.afdeling, req.body.waar, req.body.tekst, req.actor.name);
+    const r = dorpPost(req.supplier, req.body.afdeling, req.body.waar, req.body.tekst, req.actor.name, req.body.directKlaar === true);
     if (r.ok) logActivity(req.supplier.code, req.actor, 'zette een post bij ' + r.post.afdeling + ': ' + r.post.tekst.slice(0, 60));
+    stuur(res, r);
+  });
+  // het specialistische gereedschap van een afdeling (dagstaat, wachtrij...)
+  app.post('/api/supplier/dorp/tools', supplierAuth, (req, res) => {
+    if (!eisDorp(req, res)) return;
+    stuur(res, dorpTools(req.supplier, String(req.body.afdeling || '')));
+  });
+  // de druktemeter van de gym
+  app.post('/api/supplier/dorp/drukte', supplierAuth, (req, res) => {
+    if (!eisDorp(req, res)) return;
+    const r = dorpDrukte(req.supplier, String(req.body.stand || ''), req.actor.name);
+    if (r.ok) logActivity(req.supplier.code, req.actor, 'zette de gym-drukte op ' + r.drukte.stand);
     stuur(res, r);
   });
   app.post('/api/supplier/dorp/verder', supplierAuth, (req, res) => {

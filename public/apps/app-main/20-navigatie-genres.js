@@ -100,9 +100,9 @@
     $('#codeChipTxt').textContent = user.codename;
     // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
     const guest = user.tier === 'guest';
-    ['reizen','betalen','ai'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    ['reizen','betalen','ai','assets'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
     renderHome();
-    if (!guest){ renderTrip(); renderPay(); renderAI(); }
+    if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); }
     renderSalon();
     renderTerPlaatse();
     laadBestellen();

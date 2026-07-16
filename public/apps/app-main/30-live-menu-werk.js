@@ -41,6 +41,71 @@
     });
   }
 
+  /* ---------- Toren 3: RTG Shared Assets ----------
+     Altijd 300 tickets per object; een ticket is 24 uur per jaar, tien jaar
+     lang. Access loopt af, Asset heeft restwaarde en stapt uit via een Tik. */
+  async function renderAssets(){
+    const el = $('#assetsWrap'); if (!el) return;
+    if (!API.live){ el.innerHTML = ''; return; }
+    let d, mijn;
+    try {
+      d = await API.call('/assets');
+      mijn = (await API.call('/asset/mijn')).posities || [];
+    } catch(e){ el.innerHTML = ''; return; }
+    const posVan = id => mijn.find(p => p.assetId === id);
+    el.innerHTML = d.assets.map(a => {
+      const p = posVan(a.id);
+      const vol = a.beschikbaar === 0;
+      return '<div class="live-start" style="margin-top:0.8rem;">' +
+        '<div class="lh">' + a.icon + ' ' + esc(a.naam) + '</div>' +
+        '<div class="ld">' + esc(a.beschrijving) + '<br>' + esc(a.waar) + ' · ' + T('as.waarde','objectwaarde') + ' ' + eur(a.waarde) + '</div>' +
+        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.55rem;font-size:0.72rem;color:var(--soft);">' +
+          '<span style="border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;">' + a.totaal + ' ' + T('as.tickets','tickets') + ' · ' + (vol ? T('as.vol','uitverkocht') : a.beschikbaar + ' ' + T('as.vrij','beschikbaar')) + '</span>' +
+          '<span style="border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;">1 ' + T('as.ticket','ticket') + ' = 24 ' + T('as.uur','uur per jaar') + ' · ' + d.regels.jaren + ' ' + T('as.jaar','jaar') + '</span>' +
+          '<span style="border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;">' + T('as.tw','ticketwaarde nu') + ' ' + eur(a.ticketWaarde) + '</span>' +
+        '</div>' +
+        (p ? '<div style="margin-top:0.7rem;border:1px solid var(--gold-soft,rgba(201,154,46,0.4));border-radius:12px;padding:0.6rem 0.75rem;font-size:0.78rem;">' +
+            '<b>' + T('as.mijn','Mijn positie') + ':</b> ' + p.tickets + ' ' + T('as.tickets','tickets') + ' (' + p.access + ' Access · ' + p.asset + ' Asset) · ' +
+            '<b style="color:var(--gold-bright,#C99A2E);">' + p.dagenTegoed + '</b> ' + T('as.dagen','x 24 uur over dit jaar') + ' · ' + T('as.geldig','geldig tot') + ' ' + p.vervaltOp +
+            (p.asset ? '<br>' + T('as.uitstapw','Uitstapwaarde vandaag') + ': <b>' + eur(p.uitstapWaarde) + '</b>' : '') +
+            (p.gepland.length ? '<br>📅 ' + T('as.gepland','Gepland') + ': ' + p.gepland.join(', ') : '') +
+            '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;">' +
+              '<input type="date" data-asdatum="' + a.id + '" min="' + new Date().toISOString().slice(0,10) + '" style="flex:1;min-width:130px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.6rem;font-size:0.78rem;color:var(--txt);" aria-label="' + T('as.dag','Kies uw dag') + '">' +
+              '<button class="mo-code js-asboek" data-id="' + a.id + '">' + T('as.boek','Boek mijn 24 uur') + '</button>' +
+              (p.asset ? '<button class="mo-code js-asuit" data-id="' + a.id + '" data-tid="' + p.assetTicketIds[0] + '" data-w="' + p.ticketWaarde + '">' + T('as.uitstap','Stap uit (1 ticket)') + '</button>' : '') +
+            '</div></div>' : '') +
+        (vol ? '' :
+          '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);line-height:1.6;">' +
+            '<b style="color:var(--txt);">Access</b> · ' + eur(a.prijsAccess) + ' · ' + T('as.access.s','vaste prijs, teller reset elk jaar, na tien jaar is het klaar.') + '<br>' +
+            '<b style="color:var(--txt);">Asset</b> · ' + eur(a.prijsAsset) + ' · ' + T('as.asset.s','zelfde gebruik, plus uw aandeel in de restwaarde (waarde / 300). Uitstappen kan altijd via een Tik.') + '</div>' +
+          '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;">' +
+            '<input type="number" min="1" max="10" value="1" data-asaantal="' + a.id + '" style="width:64px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.6rem;font-size:0.8rem;color:var(--txt);" aria-label="aantal">' +
+            '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="access" style="flex:1;margin-top:0;">Access</button>' +
+            '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="asset" style="flex:1;margin-top:0;background:var(--gold-bright,#C99A2E);">Asset</button>' +
+          '</div>')+
+      '</div>';
+    }).join('');
+    el.querySelectorAll('.js-askoop').forEach(b => b.addEventListener('click', async () => {
+      const aantal = parseInt((el.querySelector('[data-asaantal="' + b.dataset.id + '"]') || {}).value, 10) || 1;
+      try {
+        const r = await API.call('/asset/koop', { assetId: b.dataset.id, smaak: b.dataset.smaak, aantal });
+        toast('🎟️ ' + r.tickets.length + ' ticket(s) · ' + eur(r.totaalPrijs) + '. ' + T('as.welkom','Welkom in de pool.'));
+        renderAssets();
+      } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.js-asboek').forEach(b => b.addEventListener('click', async () => {
+      const datum = (el.querySelector('[data-asdatum="' + b.dataset.id + '"]') || {}).value;
+      if (!datum){ toast(T('as.kiesdag','Kies eerst een dag.')); return; }
+      try { const r = await API.call('/asset/gebruik', { assetId: b.dataset.id, datum }); toast('📅 ' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
+      catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.js-asuit').forEach(b => b.addEventListener('click', async () => {
+      if (!window.confirm(T('as.uitvraag','Uitstappen? RTG betaalt de actuele ticketwaarde') + ' (' + eur(Number(b.dataset.w)) + ') ' + T('as.uitvraag2','uit via een Tik en het ticket gaat terug in de pool.'))) return;
+      try { const r = await API.call('/asset/uitstap', { ticketId: b.dataset.tid }); toast('💰 ' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
+      catch(e){ toast(e.message); }
+    }));
+  }
+
   /* ---------- de zorgvolle keten: zorgprofiel + wie kijkt mee ---------- */
   async function renderZorg(){
     const el = $('#zorgPanel'); if (!el) return;

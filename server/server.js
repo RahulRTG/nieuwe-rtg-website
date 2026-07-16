@@ -2682,6 +2682,8 @@ Object.assign(kern, require('./kern/verblijf')({ db, save, crypto, schoon, findS
 Object.assign(kern, require('./kern/hoteldorp')({ db, save, crypto, schoon, sseToSupplier, notifySupplier, haversine }));
 // de zorgvolle keten: zorgprofiel van de gast + live meekijken met toestemming
 Object.assign(kern, require('./kern/gastzorg')({ db, save, crypto, schoon, notify, notifySupplier, sseToSupplier, sseToCustomer, findSupplier, haversine, etaMinutes }));
+// Toren 3, RTG Shared Assets: 300 tickets per object, Access en Asset
+Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify, pay: kern.pay }));
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

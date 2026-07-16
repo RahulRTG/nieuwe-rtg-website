@@ -17,6 +17,7 @@ module.exports = (kern) => {
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil, avTeken, avMijnDeals,
     zorgContact, fonds, munten, factuur, talen,
     zorgVan, zorgZet, zorgVoor, locDeel, locStopKlant, locMijn,
+    assetsOverzicht, assetKoop, assetMijn, assetGebruik, assetUitstap,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
@@ -1173,6 +1174,27 @@ app.post('/api/locatie/stop', auth, (req, res) => {
   res.json(r);
 });
 app.post('/api/locatie/mijn', auth, (req, res) => res.json(locMijn(req.session.key)));
+
+/* ---- Toren 3: RTG Shared Assets (kern/assets.js) ----
+   Altijd 300 tickets per object; een ticket is 24 uur per jaar, tien jaar
+   lang. Access loopt af, Asset heeft restwaarde en stapt uit via een Tik. */
+app.post('/api/assets', auth, (req, res) => res.json(assetsOverzicht(req.session.key)));
+app.post('/api/asset/koop', auth, (req, res) => {
+  const r = assetKoop(req.session, liveCodename(req.session), req.body.assetId, req.body.smaak, req.body.aantal);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/asset/mijn', auth, (req, res) => res.json(assetMijn(req.session.key)));
+app.post('/api/asset/gebruik', auth, (req, res) => {
+  const r = assetGebruik(req.session, req.body.assetId, req.body.datum);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/asset/uitstap', auth, async (req, res) => {
+  const r = await assetUitstap(req.session, liveCodename(req.session), req.body.ticketId);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
 
 app.post('/api/live/state', auth, (req, res) => {
   res.json({ live: liveStateFor(req.session.key, req.body.lang) });

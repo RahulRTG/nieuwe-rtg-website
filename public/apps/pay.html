@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RTG Pay</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  a{color:inherit;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .wrap{max-width:560px;margin:0 auto;padding:0 1.1rem;}
+  header{border-bottom:1px solid var(--line);padding:1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+  .brand{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  main{padding:1.4rem 0 4rem;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.6rem;margin:.3rem 0 .2rem;}
+  .deck{color:var(--muted);font-size:.92rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-top:1rem;}
+  .veld{width:100%;border:1px solid var(--line);border-radius:10px;padding:.75rem .9rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
+  .veld:focus{border-color:var(--burgundy);}
+  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:999px;padding:.75rem 1.4rem;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;}
+  .knop:hover{background:var(--burgundy);color:#fff;}
+  .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600;}
+  .knop.pay{background:#000;color:#fff;border:1px solid #333;width:100%;font-size:1rem;padding:.9rem;}
+  .knop.groen{background:var(--green);color:#08130d;width:100%;font-size:1.05rem;padding:.95rem;}
+  .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
+  h3.sec{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.5rem 0 .2rem;}
+  /* saldo-held */
+  .saldo{font-family:'Bodoni Moda',serif;font-size:3rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.1;}
+  .saldo small{font-size:1.2rem;color:var(--soft);}
+  .chiprij{display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0;}
+  .chip{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:.45rem 1rem;font-size:.9rem;cursor:pointer;font-family:inherit;font-weight:600;}
+  .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .rij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .tikkie{display:flex;align-items:center;gap:.7rem;padding:.6rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .tikkie:last-child{border-bottom:0;}
+  .tikkie .wie{flex:1;min-width:9rem;}
+  .tikkie .wie small{display:block;color:var(--soft);font-size:.75rem;}
+  .hist{display:flex;justify-content:space-between;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.88rem;}
+  .hist:last-child{border-bottom:0;}
+  .hist .plus{color:var(--green);font-variant-numeric:tabular-nums;font-weight:700;}
+  .hist .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;}
+  .hist span:first-child{color:var(--muted);}
+  .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--gold);text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
+  .leeg{color:var(--soft);font-size:.85rem;}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
+  .schakel{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--muted);cursor:pointer;}
+  .schakel input{width:1.05rem;height:1.05rem;accent-color:var(--gold);}
+</style>
+</head>
+<body>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<header><div class="wrap">
+  <div class="brand">RTG Pay<small>Een tik en het is geregeld</small></div>
+  <nav aria-label="Pay"><a href="/apps/app.html" style="font-size:.8rem;color:var(--muted);">Naar de app →</a></nav>
+</div></header>
+
+<main id="hoofd" tabindex="-1"><div class="wrap">
+
+  <!-- poort: RTG Pay leunt op je gewone RTG-sessie -->
+  <section id="vGate">
+    <h1>Jouw geld, een knop</h1>
+    <p class="deck">RTG Pay gebruikt je gewone RTG-inlog. Open eerst je pas-app en kom terug, of stap in de demo direct in.</p>
+    <div class="kaart">
+      <div class="rij">
+        <button class="knop" id="gDemo">Stap in met de RTG Pass</button>
+        <a class="knop stil" href="/apps/app.html" style="text-decoration:none;">Eerst inloggen in de app</a>
+      </div>
+      <div class="fout" id="gFout"></div>
+    </div>
+  </section>
+
+  <!-- de wallet -->
+  <section id="vPay" hidden>
+    <div class="kaart" style="border-color:var(--gold);">
+      <div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Saldo van <span id="pNaam" style="color:var(--gold);"></span></div>
+      <div class="saldo" id="pSaldo">0,00<small> eur</small></div>
+      <div class="chiprij" role="group" aria-label="Oplaadbedrag">
+        <button class="chip" data-laad="2500">+ 25</button>
+        <button class="chip" data-laad="5000">+ 50</button>
+        <button class="chip" data-laad="10000">+ 100</button>
+        <input class="veld" id="pLaadVrij" inputmode="numeric" placeholder="anders..." style="max-width:7rem;flex:1;">
+      </div>
+      <button class="knop pay" id="pLaad">Opladen met Apple Pay</button>
+      <p class="leeg" style="margin-top:.5rem;">Te weinig saldo bij het betalen? De wallet laadt zelf bij in tientjes en betaalt door: jij tikt een keer.</p>
+    </div>
+
+    <h3 class="sec">Voor jou (een tik en hij is betaald)</h3>
+    <div class="kaart" id="pAanMij"><div class="leeg">Geen openstaande verzoekjes. Lekker.</div></div>
+
+    <h3 class="sec">Tikkie sturen</h3>
+    <div class="kaart">
+      <div class="rij">
+        <input class="veld" id="tBedrag" inputmode="decimal" placeholder="Totaal in euro" style="max-width:9rem;">
+        <input class="veld" id="tOms" placeholder="Waarvoor? (Strandbedjes...)" style="flex:1;min-width:10rem;" maxlength="80">
+      </div>
+      <div style="margin-top:.6rem;">
+        <input class="veld" id="tAan" placeholder="Codenamen, met komma (GoudenAdelaar, ...)">
+        <div class="chiprij" id="tVrienden" aria-label="Kies vrienden"></div>
+      </div>
+      <label class="schakel"><input type="checkbox" id="tSplits" checked> Splits het totaal, ik doe zelf mee</label>
+      <button class="knop groen" id="tStuur" style="margin-top:.7rem;">Stuur het tikkie</button>
+    </div>
+
+    <h3 class="sec">Geld sturen (zomaar, of terugbetalen)</h3>
+    <div class="kaart">
+      <div class="rij">
+        <input class="veld" id="sAan" placeholder="Codenaam" style="flex:1;min-width:8rem;">
+        <input class="veld" id="sBedrag" inputmode="decimal" placeholder="Euro" style="max-width:7rem;">
+        <button class="knop" id="sStuur">Stuur</button>
+      </div>
+    </div>
+
+    <h3 class="sec">Betalen aan de kassa</h3>
+    <div class="kaart">
+      <div id="kasUit">
+        <p class="deck" style="margin-bottom:.6rem;">Een code van vijf minuten, tot een maximum dat jij kiest. De zaak toetst hem in, jij bent al klaar.</p>
+        <div class="rij">
+          <input class="veld" id="kMax" inputmode="numeric" placeholder="Max (150)" style="max-width:8rem;">
+          <button class="knop" id="kMaak">Maak mijn betaalcode</button>
+        </div>
+      </div>
+      <div id="kasAan" hidden>
+        <div class="kascode" id="kCode" aria-live="polite"></div>
+        <p class="leeg" style="text-align:center;">geldig tot <span id="kTot"></span>, max <span id="kMaxToon"></span></p>
+      </div>
+    </div>
+
+    <h3 class="sec">Uitstaand en geschiedenis</h3>
+    <div class="kaart" id="pVanMij"><div class="leeg">Geen uitstaande tikkies.</div></div>
+    <div class="kaart" id="pHist"><div class="leeg">Nog geen bewegingen.</div></div>
+  </section>
+
+</div></main>
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const euro = c => (c/100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const idem = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+const api = (pad, body) => fetch('/api/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) toon('vGate'); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3200); }
+function toon(v){ ['vGate','vPay'].forEach(x => $('#'+x).hidden = (x!==v)); }
+
+/* ---------- poort ---------- */
+$('#gDemo').addEventListener('click', async () => {
+  $('#gFout').textContent = '';
+  try {
+    const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Inloggen lukte niet.');
+    TOKEN = d.token; try { localStorage.setItem('rtg_member_token', TOKEN); } catch (e) {}
+    start();
+  } catch (e) { $('#gFout').textContent = e.message; }
+});
+
+/* ---------- de wallet ---------- */
+let LAADCENTEN = 2500;
+async function ververs(){
+  const d = await api('pay/overzicht');
+  toon('vPay');
+  $('#pNaam').textContent = d.codenaam;
+  $('#pSaldo').innerHTML = esc(euro(d.saldo)) + '<small> eur</small>';
+  // voor jou: elk verzoek is EEN knop
+  $('#pAanMij').innerHTML = d.aanMij.length ? d.aanMij.map(v =>
+    '<div class="tikkie"><div class="wie"><b>'+esc(v.van)+'</b><small>'+esc(v.oms)+'</small></div>'+
+    '<button class="knop groen" data-betaal="'+v.id+'" style="width:auto;flex:1;min-width:9rem;">Betaal '+esc(euro(v.centen))+' eur</button></div>').join('')
+    : '<div class="leeg">Geen openstaande verzoekjes. Lekker.</div>';
+  $('#pAanMij').querySelectorAll('[data-betaal]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true;
+    try {
+      const r = await api('pay/verzoek/betaal', { id: b.dataset.betaal, idem: idem() });
+      meld(r.bijgeladen ? 'Betaald. Er is ' + euro(r.bijgeladen) + ' eur bijgeladen via Apple Pay.' : 'Betaald.');
+      ververs();
+    } catch (e) { meld(e.message); b.disabled = false; }
+  }));
+  // uitstaand van mij
+  $('#pVanMij').innerHTML = d.vanMij.length ? d.vanMij.map(v =>
+    '<div class="tikkie"><div class="wie"><b>'+esc(v.aan)+'</b><small>'+esc(v.oms)+' · '+esc(euro(v.centen))+' eur</small></div>'+
+    '<span style="color:'+(v.status==='betaald'?'var(--green)':v.status==='open'?'var(--gold)':'var(--soft)')+';font-size:.82rem;">'+esc(v.status)+'</span>'+
+    (v.status==='open' ? '<button class="knop stil" data-intrek="'+v.id+'" style="padding:.3rem .8rem;font-size:.75rem;">Trek in</button>' : '')+'</div>').join('')
+    : '<div class="leeg">Geen uitstaande tikkies.</div>';
+  $('#pVanMij').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('pay/verzoek/intrek', { id: b.dataset.intrek }); ververs(); } catch (e) { meld(e.message); }
+  }));
+  // geschiedenis
+  $('#pHist').innerHTML = d.geschiedenis.length ? d.geschiedenis.map(h =>
+    '<div class="hist"><span>'+esc(h.oms)+' · '+esc(h.tegen)+'</span><span class="'+(h.centen>0?'plus':'min')+'">'+(h.centen>0?'+':'')+esc(euro(h.centen))+'</span></div>').join('')
+    : '<div class="leeg">Nog geen bewegingen.</div>';
+}
+
+/* opladen: chips kiezen het bedrag, de zwarte knop is de ene tik */
+document.querySelectorAll('[data-laad]').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('[data-laad]').forEach(x => x.setAttribute('aria-pressed', 'false'));
+  c.setAttribute('aria-pressed', 'true');
+  LAADCENTEN = Number(c.dataset.laad);
+  $('#pLaadVrij').value = '';
+}));
+$('#pLaad').addEventListener('click', async () => {
+  const vrij = Number(String($('#pLaadVrij').value).replace(',', '.'));
+  const centen = vrij > 0 ? Math.round(vrij * 100) : LAADCENTEN;
+  try {
+    const r = await api('pay/oplaad', { centen, idem: idem() });
+    meld(euro(r.geladen) + ' eur geladen. Nieuw saldo: ' + euro(r.saldo) + ' eur.');
+    ververs();
+  } catch (e) { meld(e.message); }
+});
+
+/* tikkie sturen: vrienden als chips, of los intypen */
+const gekozen = new Set();
+async function laadVrienden(){
+  try {
+    const d = await api('member/connections');
+    const namen = [...new Set((d.connections || []).map(c => c.codename || c.codenaam || c.naam).filter(Boolean))].slice(0, 12);
+    $('#tVrienden').innerHTML = namen.map(n => '<button class="chip" data-vriend="'+esc(n)+'" aria-pressed="false">'+esc(n)+'</button>').join('');
+    $('#tVrienden').querySelectorAll('[data-vriend]').forEach(c => c.addEventListener('click', () => {
+      const n = c.dataset.vriend;
+      if (gekozen.has(n)) gekozen.delete(n); else gekozen.add(n);
+      c.setAttribute('aria-pressed', String(gekozen.has(n)));
+    }));
+  } catch (e) { /* geen vrienden zichtbaar: het losse veld werkt altijd */ }
+}
+$('#tStuur').addEventListener('click', async () => {
+  const totaal = Math.round(Number(String($('#tBedrag').value).replace(',', '.')) * 100);
+  const los = $('#tAan').value.split(',').map(x => x.trim()).filter(Boolean);
+  const aan = [...new Set([...gekozen, ...los])];
+  try {
+    const r = await api('pay/verzoek', { aan, totaalCenten: totaal, oms: $('#tOms').value, splitsMetMij: $('#tSplits').checked });
+    meld('Tikkie staat uit: ' + euro(r.perPersoon) + ' eur per persoon, naar ' + r.verzoeken.length + ' vriend(en).');
+    $('#tBedrag').value = ''; $('#tOms').value = ''; $('#tAan').value = '';
+    gekozen.clear();
+    $('#tVrienden').querySelectorAll('[data-vriend]').forEach(c => c.setAttribute('aria-pressed', 'false'));
+    ververs();
+  } catch (e) { meld(e.message); }
+});
+
+/* geld sturen: een knop */
+$('#sStuur').addEventListener('click', async () => {
+  const centen = Math.round(Number(String($('#sBedrag').value).replace(',', '.')) * 100);
+  try {
+    const r = await api('pay/stuur', { aan: $('#sAan').value.trim(), centen, oms: 'Gestuurd via RTG Pay', idem: idem() });
+    meld('Gestuurd.' + (r.bijgeladen ? ' Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : ''));
+    $('#sAan').value = ''; $('#sBedrag').value = '';
+    ververs();
+  } catch (e) { meld(e.message); }
+});
+
+/* de kassacode */
+let kasTimer = null;
+$('#kMaak').addEventListener('click', async () => {
+  const max = Math.round(Number(String($('#kMax').value).replace(',', '.')) * 100);
+  try {
+    const r = await api('pay/kascode', { maxCenten: max > 0 ? max : undefined });
+    $('#kasUit').hidden = true;
+    $('#kasAan').hidden = false;
+    $('#kCode').textContent = r.code;
+    $('#kMaxToon').textContent = euro(r.maxCenten) + ' eur';
+    $('#kTot').textContent = new Date(r.geldigTot).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    clearTimeout(kasTimer);
+    kasTimer = setTimeout(() => { $('#kasUit').hidden = false; $('#kasAan').hidden = true; }, Math.max(1000, r.geldigTot - Date.now()));
+  } catch (e) { meld(e.message); }
+});
+
+function start(){
+  ververs().then(laadVrienden).catch(() => toon('vGate'));
+}
+setInterval(() => { if (!$('#vPay').hidden && !document.hidden) ververs().catch(() => {}); }, 8000);
+if (TOKEN) start(); else toon('vGate');
+</script>
+</body>
+</html>

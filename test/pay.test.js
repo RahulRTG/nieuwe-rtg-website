@@ -1,0 +1,118 @@
+/* RTG Pay: de interne betaallaag. Een wallet per lid op een dubbel grootboek,
+   alles EEN knop: opladen via de betaal-naad, tikkies (ook gesplitst) die je
+   met een tik betaalt waarbij de wallet zelf bijlaadt, de kassacode bij de
+   partner, en uitbetalen. De sluitcontrole bewaakt dat de som van alle saldi
+   altijd exact nul is. Draai los:
+   node --experimental-sqlite --test test/pay.test.js */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { startServer, stop } = require('./helper');
+
+let srv, base;
+let lidA, lidB;       // { token, codenaam }
+let supToken, supCode; // de partner voor de kassa
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pay-'));
+
+const api = (pad, body, token) => fetch(base + '/api/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+  body: JSON.stringify(body || {})
+}).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+
+async function lid(tier) {
+  const r = await fetch(base + '/api/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier })
+  });
+  const d = await r.json();
+  const o = await api('pay/overzicht', {}, d.token);
+  return { token: d.token, codenaam: o.body.codenaam };
+}
+
+test.before(async () => {
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  base = srv.base;
+  lidA = await lid('rtg');
+  lidB = await lid('lifestyle');
+  assert.ok(lidA.codenaam && lidB.codenaam && lidA.codenaam !== lidB.codenaam, 'twee leden met eigen codenaam');
+  const login = await fetch(base + '/api/supplier/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'rahul', password: 'Imran' })
+  });
+  const d = await login.json();
+  supToken = d.token;
+  supCode = d.state.supplier.code;
+  assert.ok(supToken && supCode, 'de partner logt in voor de kassa');
+});
+test.after(() => {
+  stop(srv && srv.child);
+  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+});
+
+test('opladen: een tik en het staat op de wallet; dubbel tikken laadt nooit dubbel', async () => {
+  const sleutel = 'oplaad-eenmalig-1';
+  const r1 = await api('pay/oplaad', { centen: 5000, idem: sleutel }, lidA.token);
+  assert.equal(r1.status, 200);
+  assert.equal(r1.body.saldo, 5000, 'vijftig euro geladen');
+  const r2 = await api('pay/oplaad', { centen: 5000, idem: sleutel }, lidA.token);
+  assert.equal(r2.body.herhaald, true, 'de dubbeltik is hetzelfde antwoord');
+  assert.equal((await api('pay/overzicht', {}, lidA.token)).body.saldo, 5000, 'en boekt niet dubbel');
+});
+
+test('het tikkie: gesplitst uitsturen, en de ander betaalt met EEN knop (autolaad doet de rest)', async () => {
+  // A schoot 30 euro voor en splitst met zichzelf mee: B moet 15 euro
+  const t = await api('pay/verzoek', { aan: [lidB.codenaam], totaalCenten: 3000, oms: 'Strandbedjes', splitsMetMij: true }, lidA.token);
+  assert.equal(t.status, 200);
+  assert.equal(t.body.perPersoon, 1500, 'het totaal is eerlijk gesplitst');
+  // B ziet hem staan en betaalt met een knop, ZONDER saldo: de wallet laadt zelf bij
+  const zicht = await api('pay/overzicht', {}, lidB.token);
+  const v = zicht.body.aanMij.find(x => x.van === lidA.codenaam);
+  assert.ok(v, 'B ziet het verzoek van A');
+  const betaal = await api('pay/verzoek/betaal', { id: v.id, idem: 'tikkie-1' }, lidB.token);
+  assert.equal(betaal.status, 200);
+  assert.equal(betaal.body.bijgeladen, 2000, 'de wallet laadde zelf 20 euro bij (tientjes)');
+  assert.equal(betaal.body.saldo, 500, 'en er blijft 5 euro saldo over');
+  assert.equal((await api('pay/overzicht', {}, lidA.token)).body.saldo, 6500, 'A heeft de 15 euro binnen');
+  // nog een keer dezelfde knop: geen dubbele boeking, verzoek is dicht
+  assert.equal((await api('pay/verzoek/betaal', { id: v.id, idem: 'tikkie-2' }, lidB.token)).status, 409);
+});
+
+test('geld sturen op codenaam werkt met een knop; onbekende namen ketsen af', async () => {
+  const r = await api('pay/stuur', { aan: lidB.codenaam, centen: 500, oms: 'Terug voor de taxi', idem: 'stuur-1' }, lidA.token);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.saldo, 6000);
+  assert.equal((await api('pay/overzicht', {}, lidB.token)).body.saldo, 1000, 'B ving de 5 euro');
+  assert.equal((await api('pay/stuur', { aan: 'BestaatNiet999', centen: 100 }, lidA.token)).status, 404);
+});
+
+test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de partnerpot', async () => {
+  const k = await api('pay/kascode', { maxCenten: 5000 }, lidA.token);
+  assert.equal(k.status, 200);
+  assert.match(k.body.code, /^[0-9A-F]{6}$/);
+  // boven het maximum weigert de kassa
+  assert.equal((await api('supplier/pay/in', { code: k.body.code, centen: 9000 }, supToken)).status, 402);
+  const inn = await api('supplier/pay/in', { code: k.body.code, centen: 2500, oms: 'Lunch aan zee', idem: 'kas-1' }, supToken);
+  assert.equal(inn.status, 200);
+  assert.equal(inn.body.centen, 2500);
+  // de code is eenmalig
+  assert.equal((await api('supplier/pay/in', { code: k.body.code, centen: 100 }, supToken)).status, 404);
+  const pot = await api('supplier/pay/overzicht', {}, supToken);
+  assert.equal(pot.body.saldo, 2500, 'de partnerpot telt de kassabetaling');
+  const uit = await api('supplier/pay/uitbetaal', { idem: 'uit-1' }, supToken);
+  assert.equal(uit.body.uitbetaald, 2500);
+  assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 0, 'uitbetaald naar de bank');
+});
+
+test('het grootboek sluit op de cent en gasten komen er niet in', async () => {
+  const g = await fetch(base + '/api/pay/gezond');
+  assert.equal(g.status, 200);
+  assert.equal((await g.json()).klopt, true, 'som van alle saldi is nul, niemand staat rood');
+  // een gast heeft geen wallet
+  const gast = await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'guest' }) });
+  const gastToken = (await gast.json()).token;
+  assert.equal((await api('pay/overzicht', {}, gastToken)).status, 403);
+  // en de geschiedenis leest als een bankafschrift
+  const o = await api('pay/overzicht', {}, lidA.token);
+  assert.ok(o.body.geschiedenis.some(h => h.centen === -2500 && /zaak /.test(h.tegen)), 'de kassabetaling staat erin');
+  assert.ok(o.body.geschiedenis.some(h => h.centen === 5000 && h.tegen === 'opgeladen'), 'het opladen staat erin');
+});

@@ -69,12 +69,15 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     financien: { naam: 'Financiën', emoji: '💶', missie: 'Elke euro kloppend, elke afdracht op tijd.',
       kpis: () => [
         ['Directe betalingen', tel(d().directBetalingen)],
+        ['RTG Pay boekingen (24u)', recent(d().payBoekingen, 'at', 1)],
         ['Munt-ontvangsten', tel(d().muntOntvangsten)],
         ['Kassa-verkopen', tel(d().posSales)],
         ['Boekingen totaal', tel(d().boekingen)]
       ],
       lijsten: () => [
-        { titel: 'Laatste directe betalingen', items: lijst(d().directBetalingen).slice(0, 8).map(b => '€ ' + (b.bedrag || b.amount || 0) + ' aan ' + (b.supplierCode || b.aan || '')) }
+        { titel: 'Laatste directe betalingen', items: lijst(d().directBetalingen).slice(0, 8).map(b => '€ ' + (b.bedrag || b.amount || 0) + ' aan ' + (b.supplierCode || b.aan || '')) },
+        // het grootboek van RTG Pay: de laatste bewegingen door het huis
+        { titel: 'RTG Pay (laatste grootboekregels)', items: lijst(d().payBoekingen).slice(0, 8).map(b => (b.centen / 100).toFixed(2) + ' euro, ' + b.soort + ': ' + b.van + ' naar ' + b.naar) }
       ] },
     inkoop: { naam: 'Inkoop', emoji: '📦', missie: 'De juiste spullen, op tijd, voor de beste prijs.',
       kpis: () => [

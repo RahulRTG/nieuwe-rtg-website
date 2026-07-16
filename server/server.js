@@ -2652,6 +2652,9 @@ Object.assign(kern, require('./kern/baby')({ save, crypto, media, anthropic }));
 /* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
    boardroom die alles ziet en het functieschakelbord bedient. */
 Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic }));
+/* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
+   tikkies, kassacode en automatisch bijladen via de betaal-naad. */
+Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));
@@ -2688,6 +2691,7 @@ require('./routes/leren')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
 require('./routes/kantoren')(kern);
+require('./routes/pay')(kern);
 console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
 /* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet

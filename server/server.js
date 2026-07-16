@@ -185,11 +185,21 @@ const app = express();
    verder en wordt elke zaak-schrijfactie gejournald en later nagespeeld.
    Deze middleware staat bewust voor de body-parsers: het doorgeefluik stuurt
    de rauwe bytes een-op-een door. */
-const zaakdoos = require('./kern/zaakdoos')({ db, save, log }).doos;
+const zaakdoos = require('./kern/zaakdoos')({ db, save, log, dataDir: DATA_DIR }).doos;
 if (zaakdoos.actief) {
   app.use((req, res, next) => {
     if (zaakdoos.modusVan() !== 'cloud' || !zaakdoos.magProxy(req.path)) return next();
     zaakdoos.proxy(req, res).then(gelukt => { if (!gelukt) next(); }).catch(() => next());
+  });
+  // de randcache: media die eerder over de lijn kwam, serveert de doos zelf
+  // zodra het doorgeefluik hem niet kan leveren (de lijn is weg)
+  app.use((req, res, next) => {
+    if (req.method !== 'GET' || !req.path.startsWith('/media/') || zaakdoos.modusVan() === 'cloud') return next();
+    const hit = zaakdoos.kasLees(req.originalUrl);
+    if (!hit) return next();
+    res.set('Content-Type', hit.type);
+    res.set('X-Content-Type-Options', 'nosniff');
+    res.end(hit.buf);
   });
   console.log('[doos] zaakdoos-modus: doorgeefluik naar', process.env.RTG_DOOS_CLOUD);
 }
@@ -1549,16 +1559,54 @@ app.post('/api/doos/meting', (req, res) => {
   if (!sl || gg.length !== sl.length || !crypto.timingSafeEqual(Buffer.from(gg), Buffer.from(sl))) return res.status(403).json({ error: 'Geen toegang.' });
   if (!Array.isArray(db.data.doosMetingen)) db.data.doosMetingen = [];
   const b = req.body || {};
-  db.data.doosMetingen.unshift({
+  const meting = {
     doos: String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40),
     rtt: Math.max(0, Math.min(60000, Math.round(Number(b.rtt) || 0))),
     modus: b.modus === 'lokaal' ? 'lokaal' : 'cloud',
     journaal: Math.max(0, Math.round(Number(b.journaal) || 0)), at: Date.now()
-  });
+  };
+  // een buurdoos die de melding doorgaf, laat zijn via-stempel achter
+  if (b.via) meting.via = String(b.via).replace(/[<>]/g, '').slice(0, 40);
+  db.data.doosMetingen.unshift(meting);
   db.data.doosMetingen = db.data.doosMetingen.slice(0, 2000);
   save();
   res.json({ ok: true });
 });
+/* De buurtfailover: een buurdoos zonder eigen lijn geeft zijn melding hier
+   (op een doos die de lijn nog wel heeft) af; deze doos stuurt hem door naar
+   de cloud met een via-stempel. Alleen op een doos, alleen met de sleutel. */
+app.post('/api/doos/buurmelding', async (req, res) => {
+  const sl = process.env.RTG_DOOS_SLEUTEL || '';
+  const gg = String(req.get('x-doos-sleutel') || '');
+  if (!sl || gg.length !== sl.length || !crypto.timingSafeEqual(Buffer.from(gg), Buffer.from(sl))) return res.status(403).json({ error: 'Geen toegang.' });
+  if (!zaakdoos.actief) return res.status(404).json({ error: 'Dit is geen doos.' });
+  const doorgegeven = await zaakdoos.buurDoorgeven(req.body || {});
+  res.json({ ok: true, doorgegeven });
+});
+/* Het nachtwerk van de doos-vloot: elke doos die meedoet, stuurt om vier uur
+   in de nacht een dagrapport over de lijn: pings, gemiddelde rondreistijd,
+   uitval en naspeelwerk. Compact en zonder zaakdata, achter de sleutel. */
+app.post('/api/doos/rapport', (req, res) => {
+  const sl = process.env.RTG_DOOS_SLEUTEL || '';
+  const gg = String(req.get('x-doos-sleutel') || '');
+  if (!sl || gg.length !== sl.length || !crypto.timingSafeEqual(Buffer.from(gg), Buffer.from(sl))) return res.status(403).json({ error: 'Geen toegang.' });
+  if (!Array.isArray(db.data.doosRapporten)) db.data.doosRapporten = [];
+  const b = req.body || {};
+  db.data.doosRapporten.unshift({
+    doos: String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40),
+    datum: /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum)) ? String(b.datum) : new Date().toISOString().slice(0, 10),
+    pings: Math.max(0, Math.round(Number(b.pings) || 0)),
+    rttGem: Math.max(0, Math.min(60000, Math.round(Number(b.rttGem) || 0))),
+    uitval: Math.max(0, Math.round(Number(b.uitval) || 0)),
+    lokaalMin: Math.max(0, Math.round(Number(b.lokaalMin) || 0)),
+    nagespeeld: Math.max(0, Math.round(Number(b.nagespeeld) || 0)), at: Date.now()
+  });
+  db.data.doosRapporten = db.data.doosRapporten.slice(0, 1000);
+  save();
+  res.json({ ok: true });
+});
+// het dagrapport van deze doos zelf (lokaal, voor het zaak-scherm en de tests)
+app.get('/api/doos/rapport', (req, res) => res.json(zaakdoos.dagrapport()));
 
 /* Alleen in de testsuite: twee opzettelijke storingen om de foutisolatie te
    BEWIJZEN. /api/test/bug gooit een async fout (die ene aanvraag krijgt 500,

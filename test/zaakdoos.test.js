@@ -23,7 +23,7 @@ const cloudBase = () => 'http://127.0.0.1:' + cloudPort;
 
 function startCloud() {
   cloudChild = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, NODE_ENV: 'test', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL },
+    env: { ...process.env, NODE_ENV: 'test', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-1' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
 }
@@ -90,6 +90,50 @@ test('het meetstation: de vloot meldt lijnmetingen, alleen met de sleutel', asyn
   });
   assert.equal(open.status, 200);
   assert.ok((await open.json()).ok, 'de meting is geland op de vlootkaart');
+  // het nachtrapport-endpoint van de cloud: hetzelfde sleutelregime
+  const rapDicht = await fetch(cloudBase() + '/api/doos/rapport', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(rapDicht.status, 403);
+  const rapOpen = await fetch(cloudBase() + '/api/doos/rapport', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+    body: JSON.stringify({ doos: 'beachclub-sol', datum: '2026-07-15', pings: 8640, rttGem: 420, uitval: 1, lokaalMin: 12, nagespeeld: 3 })
+  });
+  assert.equal(rapOpen.status, 200);
+});
+
+test('de buurtfailover: een buurdoos zonder lijn meldt zich via deze doos', async () => {
+  const dicht = await fetch(doos.base + '/api/doos/buurmelding', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ doos: 'x' }) });
+  assert.equal(dicht.status, 403);
+  const r = await fetch(doos.base + '/api/doos/buurmelding', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+    body: JSON.stringify({ doos: 'strandtent-west', rtt: 0, modus: 'lokaal', journaal: 3 })
+  });
+  assert.equal(r.status, 200);
+  const d = await r.json();
+  assert.ok(d.ok && d.doorgegeven, 'de melding is doorgegeven aan de cloud');
+  // en de vlootkaart in de Intern & IT-kamer toont hem, met via-stempel
+  const login = await fetch(cloudBase() + '/api/office/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'DOOS-KANTOOR-1' })
+  });
+  const token = (await login.json()).token;
+  const kamer = await fetch(cloudBase() + '/api/office/kamer', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ id: 'intern' })
+  }).then(x => x.json());
+  const vloot = ((kamer.lijsten || []).find(l => /vloot/i.test(l.titel)) || {}).items || [];
+  assert.ok(vloot.some(t => t.includes('strandtent-west') && t.includes('via testdoos')), 'de vlootkaart toont de buurmelding');
+});
+
+let fotoNaam; // een Salon-foto op de cloud, voor de randcache
+const FOTO = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+
+test('de randcache: een foto die over de lijn kwam, blijft op de doos', async () => {
+  // een foto rechtstreeks in de cloudmediastore leggen (zonder RTG_ENC_KEY onversleuteld)
+  fotoNaam = require('node:crypto').randomBytes(16).toString('hex') + '.png';
+  fs.mkdirSync(path.join(TMP_CLOUD, 'media'), { recursive: true });
+  fs.writeFileSync(path.join(TMP_CLOUD, 'media', fotoNaam), FOTO);
+  const r = await fetch(doos.base + '/media/' + fotoNaam);
+  assert.equal(r.status, 200, 'online komt de foto via het doorgeefluik');
+  assert.equal(Buffer.compare(Buffer.from(await r.arrayBuffer()), FOTO), 0, 'byte voor byte dezelfde foto');
 });
 
 test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', async () => {
@@ -114,6 +158,18 @@ test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', asy
   // en de zaakstaat op de doos toont hem meteen
   const state = (await api(doos.base, '/api/supplier/state', {}, login.body.token)).body.state;
   assert.ok((state.overschot || []).some(o => o.itemId === itemId), 'het overschot staat op het lokale scherm');
+});
+
+test('zonder lijn: de randcache serveert de foto en het dagrapport telt mee', async () => {
+  const r = await fetch(doos.base + '/media/' + fotoNaam);
+  assert.equal(r.status, 200, 'de foto komt uit de randcache van de doos zelf');
+  assert.equal(Buffer.compare(Buffer.from(await r.arrayBuffer()), FOTO), 0, 'dezelfde bytes, nu zonder cloud');
+  assert.ok((r.headers.get('content-type') || '').startsWith('image/'), 'met het juiste type');
+  // het nachtwerk-dagrapport van de doos zelf: pings en uitval zijn geteld
+  const rap = await (await fetch(doos.base + '/api/doos/rapport')).json();
+  assert.ok(rap.pings >= 1, 'de pings zijn geteld');
+  assert.ok(rap.uitval >= 1, 'de uitval staat in het dagrapport');
+  assert.equal(rap.doos, 'testdoos');
 });
 
 test('de lijn komt terug: het journaal wordt nagespeeld en de cloud kent de actie', async () => {

@@ -1540,6 +1540,25 @@ app.get('/api/doos/kloon', (req, res) => {
   res.json({ data: db.data });
 });
 app.get('/api/doos/status', (req, res) => res.json(zaakdoos.status()));
+/* Het meetstation van de doos-vloot: dozen die met instemming van de partner
+   meedoen (RTG_DOOS_NETWERK=1) melden hier hun lijnmeting. Compact en anoniem
+   van aard: naam, rondreistijd, modus en journaalstand; geen zaakdata. */
+app.post('/api/doos/meting', (req, res) => {
+  const sl = process.env.RTG_DOOS_SLEUTEL || '';
+  const gg = String(req.get('x-doos-sleutel') || '');
+  if (!sl || gg.length !== sl.length || !crypto.timingSafeEqual(Buffer.from(gg), Buffer.from(sl))) return res.status(403).json({ error: 'Geen toegang.' });
+  if (!Array.isArray(db.data.doosMetingen)) db.data.doosMetingen = [];
+  const b = req.body || {};
+  db.data.doosMetingen.unshift({
+    doos: String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40),
+    rtt: Math.max(0, Math.min(60000, Math.round(Number(b.rtt) || 0))),
+    modus: b.modus === 'lokaal' ? 'lokaal' : 'cloud',
+    journaal: Math.max(0, Math.round(Number(b.journaal) || 0)), at: Date.now()
+  });
+  db.data.doosMetingen = db.data.doosMetingen.slice(0, 2000);
+  save();
+  res.json({ ok: true });
+});
 
 /* Alleen in de testsuite: twee opzettelijke storingen om de foutisolatie te
    BEWIJZEN. /api/test/bug gooit een async fout (die ene aanvraag krijgt 500,

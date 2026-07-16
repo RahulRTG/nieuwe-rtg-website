@@ -149,12 +149,33 @@ module.exports = ({ db, save, log }) => {
   }
 
   /* ---------- de pinger: bewaakt de lijn en herstelt vanzelf ---------- */
+  /* Het meetstation: elke doos die mee mag doen aan het RTG-netwerk
+     (RTG_DOOS_NETWERK=1, met instemming van de partner) rapporteert compacte,
+     anonieme lijnmetingen: rondreistijd en modus. Zo krijgt de boardroom een
+     levende kaart van verbindingskwaliteit per zaak. */
+  const NETWERK = process.env.RTG_DOOS_NETWERK === '1';
+  const DOOS_NAAM = process.env.RTG_DOOS_NAAM || 'doos';
+  let laatsteMelding = 0;
+  async function meldMeting(rtt) {
+    if (!NETWERK || nu() - laatsteMelding < 60000) return;
+    laatsteMelding = nu();
+    try {
+      await fetch(CLOUD + '/api/doos/meting', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+        body: JSON.stringify({ doos: DOOS_NAAM, rtt, modus, journaal: journaal().length }),
+        signal: AbortSignal.timeout(10000)
+      });
+    } catch (e) { /* geen lijn; de volgende tik probeert weer */ }
+  }
+  const nu = () => Date.now();
   async function tik() {
     if (!actief || bezig) return;
     bezig = true;
     try {
+      const start = nu();
       const r = await fetch(CLOUD + '/api/sat/ping', { signal: AbortSignal.timeout(8000) });
       if (!r.ok) throw new Error('ping ' + r.status);
+      meldMeting(nu() - start);
       if (modus === 'lokaal') {
         // de lijn is terug: eerst het journaal netjes naspelen, dan verse kloon
         if (await speelNa()) {

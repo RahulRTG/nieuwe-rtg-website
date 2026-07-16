@@ -116,9 +116,16 @@ module.exports = ({ db, save, crypto, anthropic }) => {
         ['Ingeklokte diensten', tel(d().klok)],
         ['Actieve sessies', Object.keys(d().sessions || {}).length],
         ['Functies uit', functies.catalogus((d().techniek || {}).functies || {}).reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0)],
-        ['Zaakdozen in het veld', tel(lijst(d().winkelBestellingen).filter(o => o.product === 'zaakdoos'))]
+        ['Zaakdozen in het veld', tel(lijst(d().winkelBestellingen).filter(o => o.product === 'zaakdoos'))],
+        ['Doos-metingen (24u)', recent(d().doosMetingen, 'at', 1)]
       ],
       lijsten: () => [
+        // het meetstation van de doos-vloot: per doos de laatste lijnmeting
+        { titel: 'De doos-vloot (laatste meting per doos)', items: (() => {
+          const per = {};
+          for (const m of lijst(d().doosMetingen)) if (!per[m.doos]) per[m.doos] = m;
+          return Object.values(per).slice(0, 10).map(m => m.doos + ': ' + m.rtt + 'ms, ' + m.modus + (m.journaal ? ', ' + m.journaal + ' in journaal' : '') + ' (' + new Date(m.at).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) + ')');
+        })() },
         { titel: 'Verder kijken', items: ['Het volledige techniekbord staat op techniek.html (eigenaar-inlog).'] }
       ] },
     onderzoek: { naam: 'Onderzoek & data', emoji: '🔬', missie: 'Weten wat werkt: cijfers, trends en eerlijke conclusies.',

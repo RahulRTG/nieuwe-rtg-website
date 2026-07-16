@@ -51,7 +51,8 @@ test.before(async () => {
   doos = await startServer({ env: {
     RTG_DATA_DIR: TMP_DOOS, SMTP_URL: '',
     RTG_DOOS_CLOUD: cloudBase(), RTG_DOOS_SLEUTEL: SLEUTEL,
-    RTG_DOOS_USER: 'rahul', RTG_DOOS_WACHTWOORD: 'Imran'
+    RTG_DOOS_USER: 'rahul', RTG_DOOS_WACHTWOORD: 'Imran',
+    RTG_DOOS_NETWERK: '1', RTG_DOOS_NAAM: 'testdoos'
   } });
 });
 test.after(() => {
@@ -77,6 +78,18 @@ test('online: de doos is een doorgeefluik en haalt de datakloon binnen', async (
   // en de kloon-route zelf is dicht zonder sleutel
   const dicht = await fetch(cloudBase() + '/api/doos/kloon');
   assert.equal(dicht.status, 403);
+});
+
+test('het meetstation: de vloot meldt lijnmetingen, alleen met de sleutel', async () => {
+  // de doos meldt vanzelf (eerste tik); en het endpoint zelf is dicht zonder sleutel
+  const dicht = await fetch(cloudBase() + '/api/doos/meting', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ doos: 'x', rtt: 1 }) });
+  assert.equal(dicht.status, 403);
+  const open = await fetch(cloudBase() + '/api/doos/meting', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+    body: JSON.stringify({ doos: 'beachclub-sol', rtt: 340, modus: 'cloud', journaal: 0 })
+  });
+  assert.equal(open.status, 200);
+  assert.ok((await open.json()).ok, 'de meting is geland op de vlootkaart');
 });
 
 test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', async () => {

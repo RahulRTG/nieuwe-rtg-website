@@ -2685,11 +2685,22 @@ Object.assign(kern, require('./kern/gastzorg')({ db, save, crypto, schoon, notif
 // Toren 3, RTG Shared Assets: 300 tickets per object, Access en Asset
 Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify, pay: kern.pay }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
-/* De acties-registry van de Butler: routes/member.js registreert hier de
-   doe-functies (bestellen, tickets, ritten) die daar wonen; de motor roept
-   ze aan via dit expliciete contract in plaats van blind in de kern te
-   grijpen. Elke actie: (session, body) -> { ok, ... } | { status, error }. */
-kern.butlerActies = {};
+/* Lidacties (kern/lidacties.js): de transactiefuncties van het lid, als
+   kern-module met expliciete afhankelijkheden. Ze bedienen de app-routes
+   EN vullen de acties-registry van de Butler, volgens het contract
+   (session, body) -> { ok, ... } | { status, error }. */
+Object.assign(kern, require('./kern/lidacties')({
+  db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
+  leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
+  fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
+  notifySupplier, sseToSupplier, sseToOffice,
+  zorgVoor: kern.zorgVoor, zorgContact, keuken: kern.keuken
+}));
+kern.butlerActies = {
+  plaatsOrder: kern.plaatsOrderVoor, betaalOrder: kern.betaalOrderVoor,
+  koopTicket: kern.koopTicketVoor, betaalBoeking: kern.betaalBoekingVoor,
+  vraagRit: kern.vraagRitVoor, betaalRit: kern.betaalRitVoor
+};
 Object.assign(kern, require('./kern/fluister')({
   db, save, schoon, anthropic, notify,
   reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,

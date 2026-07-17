@@ -46,7 +46,10 @@
 
   /* login */
   #gate{flex:1;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 1.75rem 3rem;}
+  #gate .gate-top{display:flex;flex-direction:column;align-items:flex-start;gap:0.35rem;}
   #gate .badge{align-self:flex-start;background:#7F1734;border:1px solid #7F1734;border-radius:4px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#fff;}
+  .gate-klok{margin-top:1.1rem;font-size:3.9rem;font-weight:200;line-height:1;letter-spacing:0.01em;font-variant-numeric:tabular-nums;color:var(--txt);}
+  .gate-datum{font-size:0.82rem;color:var(--soft);text-transform:capitalize;}
   #gate h1{font-size:2rem;line-height:1.1;margin-top:1.5rem;}
   #gate h1 em{color:var(--burgundy);font-style:italic;}
   #gate .deck{margin-top:0.9rem;font-size:0.88rem;color:var(--muted);line-height:1.6;}
@@ -572,7 +575,13 @@
 <div id="shell">
 
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
-    <!-- kaal inlogscherm: alleen inloggen en aanmelden bij de werkgever -->
+    <!-- inlogscherm: de naam van de app, de klok en de datum; daaronder inloggen
+         en aanmelden bij de werkgever -->
+    <div class="gate-top">
+      <div class="badge">RTG Partner</div>
+      <div class="gate-klok" id="gateKlok">--:--</div>
+      <div class="gate-datum" id="gateDatum"></div>
+    </div>
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
       <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">

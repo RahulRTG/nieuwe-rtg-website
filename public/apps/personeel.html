@@ -35,7 +35,18 @@
 
   /* stappen-gate */
   #gate{flex:1;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 1.75rem 3rem;}
+  #gate .gate-top{display:flex;flex-direction:column;align-items:flex-start;gap:0.35rem;}
   #gate .badge{align-self:flex-start;background:#7F1734;border:1px solid #7F1734;border-radius:4px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#fff;}
+  .gate-klok{margin-top:1.1rem;font-size:3.9rem;font-weight:200;line-height:1;letter-spacing:0.01em;font-variant-numeric:tabular-nums;color:var(--txt);}
+  .gate-datum{font-size:0.82rem;color:var(--soft);text-transform:capitalize;}
+  .lform{margin-top:1.9rem;display:flex;flex-direction:column;gap:0.7rem;}
+  .lform input{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.9rem 1rem;color:var(--txt);font-size:0.95rem;outline:none;color-scheme:dark;}
+  .lform input:focus{border-color:var(--burgundy);}
+  .lform button.prim{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.95rem 1.2rem;font-size:0.9rem;font-weight:600;margin-top:0.2rem;}
+  .lform .err{font-size:0.76rem;color:#ff8a8a;min-height:1rem;}
+  .llinks{margin-top:1.3rem;display:flex;flex-direction:column;gap:0.7rem;}
+  .llink{background:none;border:none;color:var(--muted);font-size:0.8rem;text-align:left;padding:0;text-decoration:underline;text-underline-offset:3px;}
+  .lhint{margin-top:1rem;font-size:0.72rem;line-height:1.55;color:var(--soft);}
   #gate h1{font-size:1.9rem;line-height:1.12;margin-top:1.4rem;}
   #gate h1 em{color:var(--burgundy);font-style:italic;}
   #gate .deck{margin-top:0.8rem;font-size:0.86rem;color:var(--muted);line-height:1.6;}
@@ -167,8 +178,12 @@
 <div id="shell">
 
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
-    <!-- kaal inlogscherm: alleen inloggen (sector, bedrijf en pincode) -->
-    <div class="badge">RTG Personeel</div>
+    <!-- inlogscherm: de naam van de app, de klok en de datum; daaronder inloggen -->
+    <div class="gate-top">
+      <div class="badge">RTG Personeel</div>
+      <div class="gate-klok" id="gateKlok">--:--</div>
+      <div class="gate-datum" id="gateDatum"></div>
+    </div>
     <div id="gateStep"></div>
   </div>
 

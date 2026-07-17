@@ -488,6 +488,22 @@ function staffByMember(supplierCode, memberId) {
   return db.prepare('SELECT * FROM supplier_staff WHERE supplier_code = ? AND member_id = ? AND active = 1')
     .get(String(supplierCode || '').toUpperCase(), Number(memberId)) || null;
 }
+// Alle actieve personeelsplekken van één RTG-lid, over alle bedrijven heen.
+// Basis voor de "1x aanmelden"-inlog: log één keer in en land meteen op het
+// juiste bedrijf; wie bij meer bedrijven werkt, ziet die allemaal als opties.
+function staffPositions(memberId) {
+  if (memberId == null) return [];
+  return db.prepare('SELECT * FROM supplier_staff WHERE member_id = ? AND active = 1 ORDER BY supplier_code')
+    .all(Number(memberId));
+}
+// Koppel een bestaand personeelsaccount aan een RTG-lid (voor de demo-seed en
+// voor het achteraf verbinden van een naam-account met een echt RTG-account).
+function setStaffMember(id, memberId, memberTier) {
+  db.prepare('UPDATE supplier_staff SET member_id = ?, member_tier = ? WHERE id = ?')
+    .run(memberId != null ? Number(memberId) : null, memberTier ? String(memberTier).slice(0, 20) : null, id);
+  markStaff(id);
+  return getStaffById(id);
+}
 function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null, lid: s.member_id != null } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
@@ -505,7 +521,7 @@ function deleteUser(id) {
 module.exports = {
   init, startPostgres, onExternalChange, flushBijAfsluiten,
   createUser, createUserSync, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
-  createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin, setStaffPin, deactivateStaff, staffByMember, publicStaff, makePin, deleteUser,
+  createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin, setStaffPin, deactivateStaff, staffByMember, staffPositions, setStaffMember, publicStaff, makePin, deleteUser,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword

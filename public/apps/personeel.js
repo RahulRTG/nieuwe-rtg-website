@@ -60,17 +60,117 @@
     try { const c = localStorage.getItem('rtg_pda_bedrijf'); return (c && BEDRIJVEN[c]) ? c : null; } catch(e){ return null; }
   }
   function stepStart(){
-    // dezelfde een-ingang-gedachte als de pas-apps en de sector-apps: met
-    // ?bedrijf=CODE (bijv. vanuit de leverancier-app of een QR in de zaak)
-    // staat deze PDA meteen op dat bedrijf en opent het eigen team; daarna
-    // onthoudt het apparaat het bedrijf en slaat hij de keuze altijd over
+    // 1x aanmelden is de gewone ingang: log één keer in met uw eigen RTG-account
+    // en u landt meteen op de juiste bedrijfspagina. Een vast apparaat in de zaak
+    // (QR / ?bedrijf=CODE, of een onthouden bedrijf) houdt de naam-en-pincode-ingang.
     const qs = new URLSearchParams(location.search);
     if (qs.get('kantoor') != null){ stepKantoor(); return; }
     const qb = String(qs.get('bedrijf') || '').toUpperCase();
     if (qb && BEDRIJVEN[qb]){ stepWie(null, qb); return; }
     const vast = pdaBedrijf();
     if (vast) stepWie(null, vast);
-    else stepSector();
+    else stepLogin();
+  }
+  // de klok en de datum op het inlogscherm (de naam van de app staat in de badge)
+  function gateTik(){
+    const k = document.getElementById('gateKlok'), dt = document.getElementById('gateDatum');
+    if (!k && !dt) return;
+    const now = new Date(), loc = lang()==='en' ? 'en-GB' : 'nl-NL';
+    if (k) k.textContent = now.toLocaleTimeString(loc, { hour:'2-digit', minute:'2-digit' });
+    if (dt) dt.textContent = now.toLocaleDateString(loc, { weekday:'long', day:'numeric', month:'long' });
+  }
+  // De hoofd-ingang: inloggen met het eigen RTG-account (e-mail/gebruikersnaam +
+  // wachtwoord). Daaronder alleen aanmelden en wachtwoord vergeten; een vast
+  // apparaat kan nog op naam met pincode.
+  function stepLogin(){
+    kantoorStop();
+    $('#gateStep').innerHTML =
+      '<form class="lform" id="loginForm" autocomplete="on">'+
+        '<input id="liUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
+        '<input id="liPass" type="password" autocomplete="current-password" placeholder="'+T('pd.li.pass','Wachtwoord')+'" aria-label="'+T('pd.li.pass','Wachtwoord')+'">'+
+        '<div class="err" id="liErr" role="alert"></div>'+
+        '<button class="prim" type="submit">'+T('pd.login','Inloggen')+'</button>'+
+      '</form>'+
+      '<div class="llinks">'+
+        '<button class="llink" id="toJoin" type="button">'+T('pd.aanmelden','Aanmelden bij een bedrijf')+'</button>'+
+        '<button class="llink" id="toForgot" type="button">'+T('pd.forgot','Wachtwoord vergeten?')+'</button>'+
+        '<button class="llink" id="toDevice" type="button">'+T('pd.ondevice','Vast apparaat? Inloggen met naam en pincode')+'</button>'+
+      '</div>';
+    $('#loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('#liErr').textContent = '';
+      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      try { await mijnLogin($('#liUser').value.trim(), $('#liPass').value); }
+      catch(err){ $('#liErr').textContent = err.message || T('pd.badlogin','Onjuiste inloggegevens.'); btn.disabled = false; }
+    });
+    $('#toJoin').addEventListener('click', stepAanmelden);
+    $('#toForgot').addEventListener('click', stepForgot);
+    $('#toDevice').addEventListener('click', stepSector);
+    $('#liUser').focus();
+  }
+  // Aanmelden bij een bedrijf: bedrijfsnaam + kassacode (van de werkgever) +
+  // het eigen RTG-account + een zelfgekozen pincode. Daarna landt u meteen.
+  function stepAanmelden(){
+    $('#gateStep').innerHTML =
+      '<button class="gback" id="jaBack">← '+T('pd.back','Terug')+'</button>'+
+      '<form class="lform" id="joinForm" autocomplete="on">'+
+        '<input id="jaBedrijf" type="text" placeholder="'+T('pd.ja.bedrijf','Bedrijfsnaam')+'" aria-label="'+T('pd.ja.bedrijf','Bedrijfsnaam')+'">'+
+        '<input id="jaCode" type="text" autocapitalize="characters" placeholder="'+T('pd.ja.code','Kassacode van uw werkgever')+'" aria-label="'+T('pd.ja.code','Kassacode van uw werkgever')+'">'+
+        '<input id="jaUser" type="text" autocomplete="username" placeholder="'+T('pd.li.user','E-mail of gebruikersnaam')+'" aria-label="'+T('pd.li.user','E-mail of gebruikersnaam')+'">'+
+        '<input id="jaPass" type="password" autocomplete="current-password" placeholder="'+T('pd.ja.rtgpass','Wachtwoord van uw RTG-account')+'" aria-label="'+T('pd.ja.rtgpass','Wachtwoord van uw RTG-account')+'">'+
+        '<input id="jaPin" type="password" inputmode="numeric" maxlength="4" placeholder="'+T('pd.ja.pin','Kies een pincode (4 cijfers)')+'" aria-label="'+T('pd.ja.pin','Kies een pincode van 4 cijfers')+'">'+
+        '<div class="err" id="jaErr" role="alert"></div>'+
+        '<button class="prim" type="submit">'+T('pd.aanmelden.go','Aanmelden')+'</button>'+
+      '</form>'+
+      '<div class="lhint">'+T('pd.ja.hint','Nog geen RTG-account? Maak er gratis een aan in de leden-app; daarna meldt u zich hier aan met de kassacode van uw werkgever.')+'</div>';
+    $('#jaBack').addEventListener('click', stepLogin);
+    $('#joinForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('#jaErr').textContent = '';
+      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      try {
+        await API.call('/supplier/staff/join', { bedrijf: $('#jaBedrijf').value.trim(), kassacode: $('#jaCode').value.trim(),
+          login: $('#jaUser').value.trim(), password: $('#jaPass').value, pin: $('#jaPin').value.trim() });
+        // aangemeld: log meteen in met hetzelfde account en land op het bedrijf
+        await mijnLogin($('#jaUser').value.trim(), $('#jaPass').value);
+      } catch(err){ $('#jaErr').textContent = err.message || T('pd.mis','Er ging iets mis.'); btn.disabled = false; }
+    });
+    $('#jaBedrijf').focus();
+  }
+  // Wachtwoord vergeten: stuurt de herstelmail; verder gaat het via de leden-app.
+  function stepForgot(){
+    $('#gateStep').innerHTML =
+      '<button class="gback" id="fgBack">← '+T('pd.back','Terug')+'</button>'+
+      '<form class="lform" id="forgotForm" autocomplete="on">'+
+        '<input id="fgEmail" type="email" autocomplete="email" placeholder="'+T('pd.fg.email','Uw e-mailadres')+'" aria-label="'+T('pd.fg.email','Uw e-mailadres')+'">'+
+        '<div class="err" id="fgErr" role="alert"></div>'+
+        '<button class="prim" type="submit">'+T('pd.fg.go','Stuur herstel-link')+'</button>'+
+      '</form>'+
+      '<div class="lhint">'+T('pd.fg.hint','We sturen een link en een code om uw wachtwoord opnieuw in te stellen. Dat rondt u af in de leden-app.')+'</div>';
+    $('#fgBack').addEventListener('click', stepLogin);
+    $('#forgotForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button.prim'); btn.disabled = true;
+      try { await API.call('/auth/forgot', { email: $('#fgEmail').value.trim() });
+        toast(T('pd.fg.ok','Als dit adres bij ons bekend is, is de herstel-link onderweg.'));
+        stepLogin();
+      } catch(err){ $('#fgErr').textContent = err.message || T('pd.mis','Er ging iets mis.'); btn.disabled = false; }
+    });
+    $('#fgEmail').focus();
+  }
+  // Inloggen met het RTG-account en landen op de juiste bedrijfspagina.
+  async function mijnLogin(login, password, bedrijf){
+    const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
+    await landMijn(d);
+  }
+  // Land (of wissel) naar een van de eigen werkplekken: sessie zetten en de app openen.
+  async function landMijn(d){
+    API.token = d.token; state = d.state; code = d.supplier.code;
+    me = { name: d.actor.name, role: d.actor.role, staffId: d.actor.staffId };
+    mijnPosities = d.posities || [];
+    try { localStorage.setItem('rtg_pda_token', API.token); localStorage.setItem('rtg_pda_code', code); } catch(e){}
+    week = await API.call('/supplier/schedule', {}).catch(()=>null);
+    enter();
   }
   function stepSector(){
     kantoorStop();
@@ -254,7 +354,8 @@
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
     $('#meName').textContent = me.name;
-    $('#meSub').textContent = BEDRIJVEN[code].name + ' · ' + (me.role==='manager'?'Manager':T('pd.staff','Medewerker'));
+    const bedrijfNaam = (BEDRIJVEN[code] && BEDRIJVEN[code].name) || (state && state.supplier && state.supplier.name) || code;
+    $('#meSub').textContent = bedrijfNaam + ' · ' + (me.role==='manager'?'Manager':T('pd.staff','Medewerker'));
     renderAll();
     laadZaken().then(renderAll);
     laadZorgbalie();
@@ -289,9 +390,11 @@
   let coachRef = null;      // coaching voor een concrete tafel/bestelling
   let coachRefTafel = null; // leesbare naam van die tafel
   let wisselOpties = []; // verbonden zaken waar dit personeelslid ook op het rooster staat
+  let mijnPosities = []; // eigen werkplekken (RTG-account) om tussen te wisselen na 1x aanmelden
   async function laadZaken(){
     try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
     try { wisselOpties = (await API.call('/supplier/wissel/opties', {})).opties || []; } catch(e){ wisselOpties = []; }
+    try { mijnPosities = (await API.call('/supplier/mijn/opties', {})).posities || []; } catch(e){ mijnPosities = []; }
     try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }
     try { aandacht = await API.call('/supplier/aandacht', {}); } catch(e){ aandacht = null; }
     try { netwerk = (await API.call('/supplier/net/lijst', {})).verbindingen || []; } catch(e){ netwerk = []; }
@@ -401,6 +504,24 @@
           } catch(e){}
           toast('🔁 ' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
           setTimeout(() => location.reload(), 400);
+        } catch(e){ toast(e.message); b.disabled = false; }
+      }));
+    }
+    // 1x aanmelden: wie met het eigen RTG-account is ingelogd en bij meer bedrijven
+    // werkt, wisselt hier direct van werkplek. Inklokken doet u daar zelf, apart.
+    const andere = (mijnPosities || []).filter(p => p.code !== code);
+    if (andere.length){
+      $('#todayWrap').insertAdjacentHTML('beforeend',
+        '<div class="card"><div class="k">'+T('pd.mw.h','Mijn werkplekken')+'</div>'+
+        '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.mw.sub','U werkt bij meer bedrijven; wissel met één tik. U klokt daar zelf in.')+'</div>'+
+        andere.map(p => '<div class="task"><span class="ic">'+(BEDRIJVEN[p.code]?BEDRIJVEN[p.code].icon:'🏢')+'</span><div class="t"><b>'+esc(p.naam)+'</b><span>'+esc(p.func || (p.manager?'Manager':T('pd.staff','Medewerker')))+'</span></div>'+
+          '<button class="abtn" data-mijn="'+esc(p.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
+      document.querySelectorAll('[data-mijn]').forEach(b => b.addEventListener('click', async () => {
+        b.disabled = true;
+        try {
+          const d = await API.call('/supplier/mijn/wissel', { code: b.dataset.mijn });
+          toast('🔁 ' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
+          await landMijn(d); openTab('vandaag');
         } catch(e){ toast(e.message); b.disabled = false; }
       }));
     }
@@ -2086,8 +2207,9 @@
     } catch(e){}
   }
 
-  window.addEventListener('rtglang', () => { if (state) renderAll(); else stepStart(); });
+  window.addEventListener('rtglang', () => { if (state) renderAll(); else stepStart(); gateTik(); });
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  gateTik(); setInterval(gateTik, 15000);
   stepStart();
   // het Werk-OS: springboard, dock, klok en Cmd+K, precies als op een telefoon
   if (window.WerkOS) WerkOS.koppel({ thuisTab: 'vandaag', dock: ['rooster', 'taken', 'team', 'hulp'] });

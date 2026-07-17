@@ -190,6 +190,22 @@ if (DEMO) {
   if (!net.links.some(l => [String(l.a), String(l.b)].sort().join('|') === 'KIKUNOI|VORA')) {
     net.links.push({ a: 'KIKUNOI', b: 'VORA', status: 'akkoord', doorCode: 'KIKUNOI', at: new Date().toISOString(), beslistAt: new Date().toISOString() });
   }
+  // Demo van de "1x aanmelden"-inlog: een RTG-lid dat bij twee bedrijven op het
+  // rooster staat. Log in de personeels-app in met nora@rtg.example / werk en je
+  // landt meteen bij Sal de Mar, met Vora Beach Club als tweede werkplek om naar
+  // te wisselen. De personeelsrijen bestaan al (Nora Prins); we koppelen ze aan
+  // dit account via member_id, zodat de inlog ze allebei vindt.
+  try {
+    let nora = accounts.findByLogin('nora@rtg.example');
+    if (!nora) {
+      nora = accounts.createUserSync({ username: 'nora', email: 'nora@rtg.example', password: process.env.DEMO_STAFF_PASS || 'werk', tier: 'rtg', realName: 'Nora Prins', phone: '+31600000002' });
+      accounts.setVerification(nora.id, 'verified');
+    }
+    for (const c of ['KIKUNOI', 'VORA']) {
+      const rij = accounts.listStaff(c).find(m => m.name === 'Nora Prins');
+      if (rij && rij.member_id == null) accounts.setStaffMember(rij.id, nora.id, nora.tier);
+    }
+  } catch (e) { /* demo-koppeling is optioneel */ }
 }
 
 const app = express();
@@ -2006,7 +2022,7 @@ function supplierAuth(req, res, next) {
   req.supplier = findSupplier(sess.code);
   if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
   // Wie is er aan het werk (voor toeschrijving van activiteiten).
-  req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager };
+  req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, lid: sess.lid || null };
   next();
 }
 

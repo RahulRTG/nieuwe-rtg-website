@@ -1147,6 +1147,7 @@
       var(--bg);
   }
   .os-lock{text-align:center;padding-top:calc(env(safe-area-inset-top, 0px) + 1.6rem);margin-bottom:0.6rem;}
+  .os-lock-merk{margin-bottom:1.1rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;}
   .os-lock-klok{
     font-size:4.2rem;font-weight:200;letter-spacing:0.01em;line-height:1;
     font-variant-numeric:tabular-nums;color:var(--txt);
@@ -1209,8 +1210,14 @@
 
   <!-- login -->
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
-    <!-- kaal inlogscherm: alleen inloggen, aanmelden en wachtwoord vergeten.
-         Na het inloggen opent uw account vanzelf de juiste pas-app. -->
+    <!-- inlogscherm: de naam van de app, de klok en de datum; daaronder alleen
+         inloggen, aanmelden en wachtwoord vergeten. Na het inloggen opent uw
+         account vanzelf de juiste pas-app. -->
+    <div class="os-lock">
+      <div class="os-lock-merk"><span class="merkvlak">Rahul Travel Group</span></div>
+      <div class="os-lock-klok" id="gateKlok">--:--</div>
+      <div class="os-lock-datum" id="gateDatum"></div>
+    </div>
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
       <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">

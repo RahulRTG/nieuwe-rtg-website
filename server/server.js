@@ -312,6 +312,29 @@ app.post('/api/munt/webhook', express.raw({ type: '*/*', limit: '1mb' }), async 
 
 app.use(express.json({ limit: '8mb' }));
 
+/* Grenswacht tegen pathologisch diep geneste invoer. Een echte API-body is
+   een handvol niveaus diep; een 20.000-diep geneste array is geen gebruiker
+   maar een aanval: elke String()/Number()-coercie erop laat de stack
+   overlopen (Array.toString -> join -> recursie). We keuren de diepte hier
+   ITERATIEF (met een eigen stack, dus zelf niet te laten overlopen) en
+   weigeren te diep met een nette 400, voordat een route de body aanraakt. */
+const MAX_DIEPTE = 40;
+function teDiep(wortel) {
+  const stapel = [[wortel, 1]];
+  while (stapel.length) {
+    const [v, d] = stapel.pop();
+    if (!v || typeof v !== 'object') continue;
+    if (d > MAX_DIEPTE) return true;
+    for (const k in v) if (Object.prototype.hasOwnProperty.call(v, k)) stapel.push([v[k], d + 1]);
+  }
+  return false;
+}
+app.use((req, res, next) => {
+  if (req.body && typeof req.body === 'object' && teDiep(req.body))
+    return res.status(400).json({ error: 'Ongeldige invoer: te diep genest.' });
+  next();
+});
+
 /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
    journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.
    Inloggen en de livestream horen bij de doos zelf en spelen we niet na. */

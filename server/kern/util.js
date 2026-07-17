@@ -3,8 +3,15 @@
 const crypto = require('crypto');
 
 // Ontsmet vrije invoer: verwijder < en > (geen HTML), knip af en trim.
+// Alleen echte primitieven (string/getal/bool) worden tekst; een array of
+// object is nooit geldige invoer en wordt leeg. Dat is ook een schild: een
+// diep geneste array via String() coercen laat de stack overlopen (Array.
+// toString -> join -> recursie), en dat mag geen enkel veld kunnen.
 function schoon(v, n) {
-  return String(v == null ? '' : v).replace(/[<>]/g, '').slice(0, n || 120).trim();
+  if (v == null) return '';
+  const t = typeof v;
+  if (t !== 'string' && t !== 'number' && t !== 'boolean') return '';
+  return String(v).replace(/[<>]/g, '').slice(0, n || 120).trim();
 }
 
 // Ledenprijsgarantie: reken nooit meer dan de publieke prijs.

@@ -53,7 +53,10 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   };
 
   function fluisterOnthoud(key, tekstIn) {
-    const tekst = schoon(String(tekstIn || '').replace(/^onthoud\s+(dat\s+|alsjeblieft\s+)?/i, ''), 200);
+    // alleen een echte tekst kan een weetje worden; een array/object laat
+    // schoon() zelf vallen (dus geen "1,2,3" uit een gecoerced array)
+    const rauw = typeof tekstIn === 'string' ? tekstIn.replace(/^onthoud\s+(dat\s+|alsjeblieft\s+)?/i, '') : tekstIn;
+    const tekst = schoon(rauw, 200);
     if (!tekst) return { status: 400, error: 'Vertel me wat ik moet onthouden.' };
     const p = van(key);
     if (!p.weetjes.some(w => w.tekst.toLowerCase() === tekst.toLowerCase())) {
@@ -80,7 +83,10 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     const scores = scoresIn && typeof scoresIn === 'object' ? scoresIn : {};
     for (const [naam, n] of Object.entries(scores).slice(0, 40)) {
       const k = schoon(naam, 40);
-      if (k && Number.isFinite(Number(n))) p.focus[k] = Math.min(100000, Math.max(0, Math.round(Number(n))));
+      // alleen een echt getal telt; een array/object als waarde negeren we
+      // (Number() op een diep geneste array laat anders de stack overlopen)
+      if (k && (typeof n === 'number' || typeof n === 'string') && Number.isFinite(Number(n)))
+        p.focus[k] = Math.min(100000, Math.max(0, Math.round(Number(n))));
     }
     save();
     return { ok: true };

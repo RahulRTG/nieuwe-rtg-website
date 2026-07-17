@@ -20,6 +20,14 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
+// een rauwe JSON-string versturen: nodig voor input die JSON.stringify aan
+// de testkant zelf niet aankan (een 20.000 niveaus diep geneste array)
+const ruw = (pad, rawBody, t) => fetch(base + '/api/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
+  body: rawBody
+}).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+const diepeArray = n => { let s = '1'; for (let i = 0; i < n; i++) s = '[' + s + ']'; return s; };
+
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
@@ -128,6 +136,29 @@ test('99 sangria bestellen: het voorstel belooft precies wat de uitvoering waarm
   const t = await api('fluister', { q: 'boek 0 tickets voor de sunset cruise morgen' }, lid);
   assert.ok(/1 ticket/i.test(t.body.antwoord));
   await api('fluister', { q: 'nee' }, lid);
+});
+
+test('diep geneste rommel laat de stack niet overlopen (geen 500)', async () => {
+  // een 20.000 niveaus diep geneste array: vroeger liet Number()/String()
+  // hierop de stack overlopen (Array.toString -> join -> recursie) -> 500
+  const diep = diepeArray(20000);
+  const r = await ruw('fluister/focus', '{"scores":' + diep + '}', lid);
+  assert.notEqual(r.status, 500, 'geen serverfout op een diep geneste array als scores');
+  // en als tekstveld: schoon() coerceert een array niet blind naar tekst
+  const res = await ruw('reserveer', '{"supplierCode":"KIKUNOI","datum":"2099-01-01","tijd":"20:00","personen":2,"notitie":' + diep + '}', lid);
+  assert.notEqual(res.status, 500, 'geen serverfout op een diep geneste array als tekstveld');
+  if (res.status === 200) await api('reservering/annuleer', { id: res.body.reservering.id }, lid);
+});
+
+test('een array of object waar tekst hoort wordt genegeerd, niet gecoerced', async () => {
+  // schoon() geeft alleen echte primitieven terug; een weetje dat een array
+  // is, verdwijnt gewoon in plaats van "[object]" of een crash te worden
+  await api('fluister', { q: 'vergeet alles' }, lid);
+  const r = await ruw('fluister/onthoud', '{"tekst":[1,2,3]}', lid);
+  assert.notEqual(r.status, 500);
+  const prof = (await api('fluister/profiel', {}, lid)).body;
+  assert.ok(!prof.weetjes.some(w => /object|,/.test(w.tekst)), 'geen rare gecoerde array-tekst opgeslagen');
+  await api('fluister', { q: 'vergeet alles' }, lid);
 });
 
 test('een zaak van louter emoji en codenamen met sluiptekens: nette vragen terug', async () => {

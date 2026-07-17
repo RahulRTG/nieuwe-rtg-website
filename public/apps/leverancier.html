@@ -262,8 +262,12 @@
 
   /* kassa */
   .pos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;margin-top:0.7rem;}
-  .pos-key{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:0.8rem 0.9rem;text-align:left;color:var(--txt);}
-  .pos-key:active{border-color:var(--gold);}
+  .pos-key{background:linear-gradient(160deg, color-mix(in srgb, var(--card2) 88%, #fff), color-mix(in srgb, var(--card2) 93%, #000));
+    border:1px solid var(--line);border-radius:11px;padding:0.8rem 0.9rem;text-align:left;color:var(--txt);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), transform 0.13s cubic-bezier(0.22,0.7,0.3,1);}
+  @media (hover:hover){.pos-key:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));transform:translateY(-2px);}}
+  .pos-key:active{border-color:var(--gold);transform:scale(0.97);}
   .pos-key b{display:block;font-size:0.82rem;font-weight:600;}
   .pos-key span{font-size:0.72rem;color:var(--gold);}
   .pos-bon{margin-top:0.9rem;border-top:1px dashed var(--line);padding-top:0.5rem;}
@@ -389,7 +393,9 @@
   .tt-msg.sys .who{color:var(--soft);}
   .tt-msg time{display:block;margin-top:0.3rem;font-size:0.6rem;color:var(--soft);}
   .gc-salon-btn{margin-left:0.5rem;background:var(--card2);border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:0.2rem 0.7rem;font-size:0.68rem;font-weight:600;}
-  .ks-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.75rem;margin:0.6rem 0;}
+  .ks-card{background:linear-gradient(160deg, color-mix(in srgb, var(--card2) 90%, #fff), color-mix(in srgb, var(--card2) 94%, #000));
+    border:1px solid var(--line);border-radius:10px;padding:0.75rem;margin:0.6rem 0;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);}
   .ks-h{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;}
   .ks-h .av{width:32px;height:32px;flex-shrink:0;border-radius:50%;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--gold);}
   .ks-pas{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:0.1rem 0.5rem;}
@@ -401,17 +407,29 @@
   .tt-compose button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
 
   /* ---- werkplekken: keuken-, bar- en bedieningsscherm ---- */
-  #station{position:fixed;inset:0;z-index:60;background:#0A0A09;display:none;flex-direction:column;}
+  #station{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;
+    background:
+      radial-gradient(120% 45% at 50% -8%, rgba(169,143,28,0.08), transparent 60%),
+      radial-gradient(130% 55% at 50% 110%, rgba(127,23,52,0.07), transparent 62%),
+      #0A0A09;}
   #station.on{display:flex;}
+  /* een werkplek is schermvullend: het Werk-OS-dock wijkt zolang de post open is */
+  body:has(#station.on) .wos-dock{display:none !important;}
   .st-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.2rem 0.9rem;border-bottom:1px solid var(--line);}
   .st-head .t b{font-size:1.02rem;}
   .st-head .t span{display:block;font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-top:0.1rem;}
-  .st-clock{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
-  .st-exit{background:none;border:1px solid var(--line);border-radius:999px;padding:0.5rem 1rem;color:var(--muted);font-size:0.72rem;}
+  .st-clock{font-family:'Bodoni Moda',serif;font-size:1.5rem;font-variant-numeric:tabular-nums;}
+  .st-exit{background:none;border:1px solid var(--line);border-radius:999px;padding:0.5rem 1rem;color:var(--muted);
+    font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;
+    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), color 0.13s cubic-bezier(0.22,0.7,0.3,1);}
+  @media (hover:hover){.st-exit:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));color:var(--txt);}}
   .st-body{flex:1;overflow-y:auto;padding:1rem 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.2rem);display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:0.8rem;align-content:start;}
   .st-sec{grid-column:1/-1;font-size:0.64rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin-top:0.5rem;}
   .st-empty{grid-column:1/-1;padding:2.6rem 1rem;text-align:center;color:var(--soft);font-size:0.9rem;}
-  .tkc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem;display:flex;flex-direction:column;gap:0.5rem;}
+  .tkc{background:linear-gradient(160deg, color-mix(in srgb, var(--card) 90%, #fff), color-mix(in srgb, var(--card) 94%, #000));
+    border:1px solid var(--line);border-radius:12px;padding:0.9rem;display:flex;flex-direction:column;gap:0.5rem;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
+    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), box-shadow 0.13s cubic-bezier(0.22,0.7,0.3,1);}
   /* KDS-tijdbanden: groen (vers), amber (loopt op), rood (te laat); knippert door bij echt te laat */
   .tkc.ok{border-top:4px solid #2E7D5B;}
   .tkc.warn{border-top:4px solid #C99A2E;}
@@ -428,7 +446,9 @@
   .tkc.late .tkc-age{color:#FF8589;background:rgba(229,72,77,0.18);}
   /* de statusbalk van de lijn: open bonnen, te laat, oudste */
   .st-stats{grid-column:1/-1;display:flex;gap:0.5rem;flex-wrap:wrap;}
-  .st-stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.5rem 0.95rem;display:flex;flex-direction:column;min-width:86px;}
+  .st-stat{background:linear-gradient(160deg, color-mix(in srgb, var(--card) 90%, #fff), color-mix(in srgb, var(--card) 94%, #000));
+    border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.95rem;display:flex;flex-direction:column;min-width:86px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);}
   .st-stat b{font-family:'Bodoni Moda',serif;font-size:1.35rem;line-height:1.1;font-variant-numeric:tabular-nums;}
   .st-stat span{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
   .st-stat.rood b{color:#FF8589;}
@@ -440,7 +460,7 @@
   .allday .ad b{color:var(--gold);margin-right:0.3rem;font-variant-numeric:tabular-nums;}
   /* het gerechtenmenu: tik op een gerecht voor recept, bereiding, allergenen, drank en 86 */
   #dishSheet .ds-scrim{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,0.55);}
-  #dishSheet .ds-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:81;width:min(560px,92vw);max-height:82vh;overflow-y:auto;background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:1.1rem;display:flex;flex-direction:column;gap:0.8rem;}
+  #dishSheet .ds-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:81;width:min(560px,92vw);max-height:82vh;overflow-y:auto;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:1.1rem;display:flex;flex-direction:column;gap:0.8rem;}
   #dishSheet .ds-top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.8rem;}
   #dishSheet .ds-top b{font-size:1.05rem;}
   #dishSheet .ds-desc{display:block;font-size:0.78rem;color:var(--soft);margin-top:0.15rem;}
@@ -466,7 +486,10 @@
   .rcp-item:hover{color:var(--gold);}
   .tkc-alg{font-size:0.74rem;color:#E5484D;background:rgba(229,72,77,0.08);border:1px solid rgba(229,72,77,0.35);border-radius:8px;padding:0.4rem 0.6rem;}
   .tkc-act{display:flex;gap:0.5rem;margin-top:0.2rem;}
-  .tkc-act button{flex:1;border:none;border-radius:10px;padding:0.9rem;font-size:0.92rem;font-weight:600;font-family:inherit;}
+  .tkc-act button{flex:1;border:none;border-radius:9px;padding:0.9rem;font-size:0.92rem;font-weight:600;font-family:inherit;
+    transition:transform 0.13s cubic-bezier(0.22,0.7,0.3,1), filter 0.13s cubic-bezier(0.22,0.7,0.3,1);}
+  @media (hover:hover){.tkc-act button:hover{filter:brightness(1.08);}}
+  .tkc-act button:active{transform:scale(0.97);}
   .tkc-start{background:var(--card2);color:var(--txt);border:1px solid var(--line) !important;}
   .tkc-ready{background:#2E7D5B;color:#fff;}
   .tkc-serve{background:var(--gold);color:#0C0C0B;}
@@ -477,7 +500,9 @@
   .st-tblgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:0.5rem;}
   .mn-station{background:none;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.55rem;font-size:0.72rem;color:var(--muted);}
   .st-chips{grid-column:1/-1;display:flex;gap:0.45rem;flex-wrap:wrap;}
-  .st-chips button{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.78rem;color:var(--muted);}
+  .st-chips button{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.78rem;color:var(--muted);
+    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), color 0.13s cubic-bezier(0.22,0.7,0.3,1);}
+  @media (hover:hover){.st-chips button:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}}
   .st-chips button.on{border-color:var(--gold);color:var(--gold);}
   .st-row{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.86rem;}
   .st-row:last-child{border-bottom:none;}

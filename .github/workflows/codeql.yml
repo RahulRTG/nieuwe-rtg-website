@@ -1,0 +1,32 @@
+# CodeQL: GitHub's statische code-analyse (SAST). Zoekt bekende bug- en
+# kwetsbaarheidspatronen in de JavaScript-broncode (injecties, onveilige
+# regexes, path-traversal, enz.) en meldt ze in het Security-tabblad.
+# Werkt gratis op publieke repositories; op privé-repos vereist het GitHub
+# Advanced Security. Draait bij pushes/PR's naar de hoofdlijn en wekelijks.
+name: CodeQL
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '30 4 * * 1'
+
+jobs:
+  analyze:
+    name: CodeQL (JavaScript)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: CodeQL initialiseren
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+      - name: Analyse uitvoeren
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"

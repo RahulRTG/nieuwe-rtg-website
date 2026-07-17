@@ -1,0 +1,26 @@
+# Dependabot: houdt de dependencies en de CI-actions bij, en opent automatisch
+# een pull request bij een beveiligingsadvies (security update) of een nieuwe
+# versie. Zo blijft de audit-poort groen zonder dat iemand handmatig hoeft te
+# speuren. Security updates draaien sowieso, ook los van dit schema.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      # alle niet-security-updates gebundeld in één PR per week (minder ruis)
+      dependencies:
+        patterns: ["*"]
+    commit-message:
+      prefix: "deps"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"

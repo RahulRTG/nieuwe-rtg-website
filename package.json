@@ -18,6 +18,7 @@
     "test": "node --experimental-sqlite --test test/*.test.js",
     "test:coverage": "node --experimental-sqlite --experimental-test-coverage --test test/*.test.js",
     "audit": "npm audit --audit-level=high",
+    "secrets": "node scripts/geheimen.js",
     "e2e": "node --experimental-sqlite --test test/*.e2e.js",
     "chaos": "node --experimental-sqlite scripts/chaos-soak.js",
     "icons": "node scripts/icons.js"

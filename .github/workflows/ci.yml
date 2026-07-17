@@ -63,6 +63,8 @@ jobs:
         run: npm audit || true
       - name: Harde poort - faal op kwetsbare dependencies (high/critical)
         run: npm audit --audit-level=high
+      - name: Secret-scan - faal op gelekte sleutels/tokens in de broncode
+        run: npm run secrets
 
   a11y:
     name: Toegankelijkheid (axe)

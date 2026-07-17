@@ -88,24 +88,31 @@ app.post('/api/auth/register', async (req, res) => {
   } catch (e) {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
-  const mdNieuw = memberTemplate();
-  mdNieuw.geboren = geboren;
-  // geslacht zoals in het paspoort (v/m/x); pas betrouwbaar na RTG-verificatie.
-  // Gebruikt o.a. door Salon-ontmoetingen voor de "naar de vrouw"-regel.
-  const g = String(req.body.geslacht || '').toLowerCase();
-  if (g === 'v' || g === 'm' || g === 'x') mdNieuw.geslacht = g;
-  // land (2-letter code) van het lid: stuurt o.a. de Boardroom "per land"-regels
-  const ln = String(req.body.land || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
-  if (ln.length === 2) mdNieuw.land = ln;
-  accounts.saveMemberState(user.id, mdNieuw);
-  // bevestigingsmail met een echte, werkende link
-  const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
-  const verifyUrl = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(user.tier) + '&verify=' + vtok;
-  mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
-    'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl);
-  const token = accounts.issueToken(user.id);
-  const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
-  res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true, ...(DEV_VELDEN ? { devVerifyUrl: verifyUrl } : {}) });
+  // De vervolgstappen (profiel bewaren, tokens uitgeven, staat opbouwen) raken
+  // de opslag. Faalt daar iets (bijv. de database onder zware druk), dan geven
+  // we een nette 503 terug in plaats van een onafgevangen 500.
+  try {
+    const mdNieuw = memberTemplate();
+    mdNieuw.geboren = geboren;
+    // geslacht zoals in het paspoort (v/m/x); pas betrouwbaar na RTG-verificatie.
+    // Gebruikt o.a. door Salon-ontmoetingen voor de "naar de vrouw"-regel.
+    const g = String(req.body.geslacht || '').toLowerCase();
+    if (g === 'v' || g === 'm' || g === 'x') mdNieuw.geslacht = g;
+    // land (2-letter code) van het lid: stuurt o.a. de Boardroom "per land"-regels
+    const ln = String(req.body.land || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+    if (ln.length === 2) mdNieuw.land = ln;
+    accounts.saveMemberState(user.id, mdNieuw);
+    // bevestigingsmail met een echte, werkende link
+    const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
+    const verifyUrl = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(user.tier) + '&verify=' + vtok;
+    try { mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
+      'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl); } catch (e) {}
+    const token = accounts.issueToken(user.id);
+    const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+    res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true, ...(DEV_VELDEN ? { devVerifyUrl: verifyUrl } : {}) });
+  } catch (e) {
+    return res.status(503).json({ error: 'Registreren lukte even niet. Probeer het zo opnieuw.' });
+  }
 });
 
 app.post('/api/auth/verify-email', (req, res) => {

@@ -64,30 +64,48 @@ die ook de leden in Postgres meetelt (O(1)). Zo klopt het ledental in beide
 opslagmodi. `server/kern/paspoort.js` haalt de codenaam nu via `gidsHaal(key)`
 in plaats van rechtstreeks uit `memberDir`, om dezelfde reden.
 
-# De chaos-soak: 65M + activiteit + rommel op elke functie
+# De chaos-soak: een oordeel-harnas, geen groene tabellen
 
-`scripts/mega65-storm.js` gaat een stap verder dan de kale meting hierboven: het
-zet 65M in de ledengids (buiten het RAM) én een echte activiteitslaag in het
-werkgeheugen (een miljoen orders, plus boekingen, betalingen, verzoeken,
-reviews en meldingen), en bestookt daarna ~688 endpoints langdurig met onnozele
-invoer (emoji's, gigastrings, diep geneste JSON, verkeerde types, XSS/SQL-achtige
-strings), met rol-token-verwisseling. Het meet robuustheid (5xx), geheugen over
-de tijd en event-loop-haperingen (een health-sonde).
+`scripts/mega65-storm.js` is bewust een *oordeel*-harnas: het print geen mooie
+cijfers die altijd slagen, maar toetst harde drempels (SLO's) en **eindigt met
+exitcode 1** als er een zakt. Het is deterministisch (seeded PRNG, zelfde run =
+zelfde uitkomst), zet 65M in de ledengids (buiten het RAM) plus een activiteits-
+laag in het werkgeheugen, en bestookt daarna systematisch elk endpoint uit de
+bron met (a) het juiste rol-token, (b) elk verkeerde rol-token en (c) rommel-
+invoer (emoji's, gigastrings, diep geneste JSON, verkeerde types, XSS/SQL).
+
+De vijf oordelen: **ROBUUSTHEID** (nul onverwachte 5xx; een 503 voor een uitge-
+schakelde functie en een 429 rate-limit tellen expliciet niet mee), **ROL-
+SCHEIDING** (een verkeerd-rol token krijgt nooit 2xx), **DEKKING** (elk endpoint
+minstens N keer geraakt; ongeraakte endpoints worden benoemd), **GEHEUGEN** (de
+RAM-*vloer* na GC stijgt niet), **LATENTIE** (p99 onder de SLO). De uitvoer
+sluit af met een blok "wat deze test NIET bewijst".
 
 ```
 DATABASE_URL=postgres://... node --max-old-space-size=8192 scripts/mega65-storm.js
 ```
 
-## Wat de soak vond (en wat er gefixt is)
+## Wat de chaos vond -- en wat vals alarm was (eerlijk)
 
-1. **Een echte crash in de auth-laag.** Een leverancier- of kantoor-token dat op
-   een leden-endpoint belandt, gaf een 500: de leden-`auth` accepteerde die
-   sessie (die geen persona-`tier` heeft) en de ledengids crashte op een
-   ontbrekende codenaam. Nu weert de leden-`auth` niet-leden-sessies met 401 en
-   is `liveCodename` defensief. (`test/auth-rol.test.js`.)
-2. **`/api/auth/register` kon onder druk een onafgevangen 500 geven** doordat de
-   account-schrijfstappen na de validatie buiten een try/catch stonden. Nu een
-   nette 503. Het aantal register-5xx onder de storm daalde van 16 naar 1.
+1. **Een echte crash in de auth-laag (gefixt).** Een leverancier- of kantoor-
+   token dat op een leden-endpoint belandt, gaf een 500: de leden-`auth`
+   accepteerde die sessie (die geen persona-`tier` heeft) en de ledengids
+   crashte op een ontbrekende codenaam. Geverifieerd via de stacktrace,
+   gereproduceerd en gefixt: de leden-`auth` weert niet-leden-sessies nu met 401
+   en `liveCodename` is defensief. `test/auth-rol.test.js` toetst dit
+   **uitputtend**: het leest élke `auth`-route uit de bron (ruim 200) en eist dat
+   een leverancier- en kantoor-token daar 401 krijgen, nooit 2xx of 5xx.
+2. **Vals alarm door een tel-bug in de harnas zelf.** Eerdere runs "vonden" 5xx
+   op `/api/munt/*` en `/api/auth/register`. Dat waren geen serverfouten: het
+   waren nette **503**'s (munt-betalen staat standaard uit) en 429/503-
+   antwoorden. De harnas checkte `status >= 500` vóór `status === 503` en telde
+   503 (dat óók >= 500 is) daardoor als serverfout. Dat is precies zo oneerlijk
+   als een test die onterecht groen slaat: nu staat de volgorde goed (503 en 429
+   eerst), en de robuustheid slaat terecht PASS.
+3. **Een defensieve verbetering meegenomen.** `/api/auth/register` deed de
+   account-schrijfstappen na de validatie buiten een try/catch. Onder een
+   database-fout zou dat een onafgevangen 500 geven; dat is nu een nette 503.
+   Een echte latente kwetsbaarheid, los van de tel-bug hierboven.
 
 ## Wat de soak leerde over geheugen en de echte grens
 
@@ -103,9 +121,12 @@ DATABASE_URL=postgres://... node --max-old-space-size=8192 scripts/mega65-storm.
   collecties (orders enz.) die nog wél in het werkgeheugen (`db.data`) staan.
   Lees- en aggregatie-endpoints lopen daar O(N) overheen en serialiseren grote
   JSON; met een miljoen orders blokkeert één zo'n verzoek de (single-threaded)
-  event-loop seconden lang (health-sonde p95 ~5 s), waardoor de doorvoer onder
-  gelijktijdige last inzakt. Dit is precies de grens die de architectuur voor de
-  ledengids al oploste (naar Postgres), maar voor orders/boekingen nog niet.
+  event-loop seconden lang, waardoor de p99-latentie oploopt en de doorvoer onder
+  gelijktijdige last inzakt. De **LATENTIE**-drempel van de harnas is dáárom
+  bedoeld om te kunnen falen: bij een zware werkset zakt hij, en dat is de
+  eerlijke uitkomst -- geen groene tabel maar een rode drempel. Dit is precies de
+  grens die de architectuur voor de ledengids al oploste (naar Postgres), maar
+  voor orders/boekingen nog niet.
 
 ## Vervolg (bewust nog niet gedaan)
 

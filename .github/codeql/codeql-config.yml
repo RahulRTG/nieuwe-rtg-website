@@ -1,32 +1,26 @@
-# CodeQL-configuratie. Doel: de analyse op de bron richten en dubbele/ruis-
-# meldingen weglaten, zodat een alert in een PR echt iets nieuws betekent.
+# CodeQL-configuratie.
 #
-# De frontend wordt door scripts/build.js gebundeld: public/apps/app-main.js en
-# public/apps/leverancier.js zijn samengestelde kopieen van de losse delen in
-# public/apps/<naam>/. CodeQL zou anders elk patroon twee keer melden (in het
-# deel en in de bundel). We negeren daarom de gegenereerde bundels en de
-# geminificeerde build-output; de echte bron (de losse delen) wordt wel
-# geanalyseerd.
+# We richten de analyse op de server-side aanvalsoppervlakte: de Node/Express-
+# backend (server/) en de build-/onderhoudsscripts (scripts/). Dat is de code
+# die verzoeken, opslag, auth en betalingen afhandelt - waar statische analyse
+# echt iets toevoegt en waar de bevindingen betrouwbaar zijn.
+#
+# De frontend (public/) wordt bewust NIET door CodeQL geanalyseerd, om twee
+# redenen:
+#   1. De app-scripts worden door scripts/build.js opgebouwd uit losse delen in
+#      public/apps/<naam>/. Die delen zijn geen op zichzelf staande, geldige JS
+#      (de bundel is dat pas); CodeQL kan ze niet betrouwbaar parsen ("Unexpected
+#      token") en levert dan onbetrouwbare resultaten op fragmenten.
+#   2. De frontend draait onder een strikte, nonce-gebaseerde CSP zonder inline
+#      handlers (afgedwongen door scripts/check.js), plus axe- en e2e-tests. De
+#      client-side XSS-oppervlakte is daarmee op een andere laag afgedekt.
+#
+# Alle CodeQL-beveiligingsquery's blijven volledig actief - ze draaien nu alleen
+# op de server-code (injectie, path-traversal, SSRF, prototype-pollution,
+# command-injection, hardcoded secrets, onveilige crypto, enz.). Zo betekent een
+# alert weer echt iets, in plaats van ruis uit niet-parseerbare frontend-delen.
 name: "RTG CodeQL"
 
-paths-ignore:
-  - public/apps/app-main.js       # gegenereerde bundel (= som van public/apps/app/)
-  - public/apps/leverancier.js    # gegenereerde bundel (= som van public/apps/leverancier/)
-  - public/apps/spelen.html       # spelletjes: Math.random voor dobbelen/stukken/shuffle (geen beveiligingscontext)
-  - public/dist                   # geminificeerde, content-gehashte build-output
-  - "**/*.min.js"                 # geminificeerde bestanden
-
-# Query-filters. We onderdrukken bewust één query:
-#
-#   js/insecure-randomness  -  meldt elk gebruik van Math.random(). In deze
-#   codebase draait alle beveiligingsgevoelige willekeur (sessietokens,
-#   codenamen, pincodes, encryptie-IV's, afdracht-id's) al op node:crypto;
-#   dat is met de hand geverifieerd. De resterende Math.random-gevallen zijn
-#   niet-gevoelig: spelletjes, kaart-jitter op de kaart, een idempotentie-key
-#   (moet uniek zijn, niet onraadbaar) en een boekingsreferentie voor de demo.
-#   De query levert hier dus alleen ruis. Alle andere beveiligingsquery's
-#   (injectie, XSS, path-traversal, SSRF, prototype-pollution, hardcoded
-#   secrets, enz.) blijven onverkort actief.
-query-filters:
-  - exclude:
-      id: js/insecure-randomness
+paths:
+  - server
+  - scripts

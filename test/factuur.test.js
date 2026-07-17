@@ -33,6 +33,31 @@ test('factuur: overzichtPdf en csv', () => {
   assert.ok(c.includes('"b;c"') && c.includes('"d""e"'));
 });
 
+// Regressie-hek: CSV-/formule-injectie. Een cel die met = + - @ of een
+// besturingsteken begint mag in Excel/Sheets niet als formule uitgevoerd
+// kunnen worden. csvCel zet er een apostrof voor; gewone (ook negatieve)
+// bedragen blijven ongemoeid.
+test('csvCel: neutraliseert formule-injectie maar spaart getallen', () => {
+  // gevaarlijke leidende tekens krijgen een apostrof
+  assert.equal(factuur.csvCel('=1+1'), "'=1+1");
+  assert.equal(factuur.csvCel('+SUM(A1)'), "'+SUM(A1)");
+  assert.equal(factuur.csvCel('@foo'), "'@foo");
+  // de klassieke aanval, inclusief csv-escaping van de puntkomma
+  assert.equal(factuur.csvCel('=cmd|"/c calc"!A1'), '"\'=cmd|""/c calc""!A1"');
+  // een leidende tab wordt ook geneutraliseerd
+  assert.ok(factuur.csvCel('\t=1').startsWith("'"));
+  // gewone tekst blijft onaangeroerd
+  assert.equal(factuur.csvCel('AURELIA'), 'AURELIA');
+  // bedragen krijgen GEEN formule-apostrof (een leidende - blijft een getal).
+  // (een komma zorgt wel voor csv-quoting, dat is de bestaande escaping.)
+  assert.ok(!factuur.csvCel('12,50').startsWith("'"));
+  assert.ok(!factuur.csvCel('-12,50').startsWith("'") && !factuur.csvCel('-12,50').startsWith('"\''));
+  assert.equal(factuur.csvCel('-8%'), '-8%');   // geen komma: blijft kaal
+  // en het werkt door de hele csv() heen
+  const rij = factuur.csv([['gast', '=WEBSERVICE("http://x")']]);
+  assert.ok(rij.includes("'=WEBSERVICE"), 'formule in een rij wordt geneutraliseerd');
+});
+
 // ---- 2. de download-endpoints ----
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };

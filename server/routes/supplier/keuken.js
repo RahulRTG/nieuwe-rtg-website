@@ -87,13 +87,15 @@ module.exports = (kern) => {
     if (!s) return res.status(404).end();
     const r = dagrapport(s, req.query.datum);
     const geld = n => (Number(n) || 0).toFixed(2).replace('.', ',');
+    const cel = require('../../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
+    const rij = arr => arr.map(cel).join(';') + '\n';
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="dagrapport-' + s.code.toLowerCase() + '-' + r.datum + '.csv"');
-    res.write('﻿' + ['datum', 'omschrijving', 'categorie', 'omzet incl btw', 'btw-tarief', 'btw-bedrag', 'omzet excl btw'].join(';') + '\n');
-    for (const b of r.btw) res.write([r.datum, 'Omzet ' + b.label, b.cat, geld(b.omzet), b.tarief + '%', geld(b.btw), geld(b.grondslag)].join(';') + '\n');
+    res.write('﻿' + rij(['datum', 'omschrijving', 'categorie', 'omzet incl btw', 'btw-tarief', 'btw-bedrag', 'omzet excl btw']));
+    for (const b of r.btw) res.write(rij([r.datum, 'Omzet ' + b.label, b.cat, geld(b.omzet), b.tarief + '%', geld(b.btw), geld(b.grondslag)]));
     const WIJZE = { app: 'in de app', contant: 'contant', rtgpay: 'RTG Pay', rtg: 'RTG-lidmaatschap', kamer: 'op de kamer', pin: 'PIN' };
-    for (const [wijze, bedrag] of Object.entries(r.betaalwijzen)) res.write([r.datum, 'Ontvangsten ' + (WIJZE[wijze] || wijze), 'betaalwijze', geld(bedrag), '', '', ''].join(';') + '\n');
-    if (r.fooien) res.write([r.datum, 'Fooien (voor het team)', 'fooi', geld(r.fooien), '', '', ''].join(';') + '\n');
+    for (const [wijze, bedrag] of Object.entries(r.betaalwijzen)) res.write(rij([r.datum, 'Ontvangsten ' + (WIJZE[wijze] || wijze), 'betaalwijze', geld(bedrag), '', '', '']));
+    if (r.fooien) res.write(rij([r.datum, 'Fooien (voor het team)', 'fooi', geld(r.fooien), '', '', '']));
     res.end();
   });
 };

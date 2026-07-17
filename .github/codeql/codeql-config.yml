@@ -1,0 +1,16 @@
+# CodeQL-configuratie. Doel: de analyse op de bron richten en dubbele/ruis-
+# meldingen weglaten, zodat een alert in een PR echt iets nieuws betekent.
+#
+# De frontend wordt door scripts/build.js gebundeld: public/apps/app-main.js en
+# public/apps/leverancier.js zijn samengestelde kopieen van de losse delen in
+# public/apps/<naam>/. CodeQL zou anders elk patroon twee keer melden (in het
+# deel en in de bundel). We negeren daarom de gegenereerde bundels en de
+# geminificeerde build-output; de echte bron (de losse delen) wordt wel
+# geanalyseerd.
+name: "RTG CodeQL"
+
+paths-ignore:
+  - public/apps/app-main.js       # gegenereerde bundel (= som van public/apps/app/)
+  - public/apps/leverancier.js    # gegenereerde bundel (= som van public/apps/leverancier/)
+  - public/dist                   # geminificeerde, content-gehashte build-output
+  - "**/*.min.js"                 # geminificeerde bestanden

@@ -211,7 +211,7 @@ app.post('/api/office/timeline', officeAuth, (req, res) => {
 
 app.get('/api/office/export.csv', (req, res) => {
   if (!officeQueryMag(req.query.token)) return res.status(401).end();
-  const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const esc = require('../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');
   res.write('\uFEFF' + ['datum', 'soort', 'partner', 'gast', 'omschrijving', 'status', 'betaald', 'bedrag'].join(';') + '\n');

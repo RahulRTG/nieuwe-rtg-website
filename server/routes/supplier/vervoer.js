@@ -106,7 +106,7 @@ app.get('/api/supplier/rides.csv', (req, res) => {
   const alle = db.data.rides
     .filter(r => r.supplierCode === sess.code && (r.status === 'afgerond' || r.status === 'gearriveerd'))
     .sort((a, b) => String(b.finishedAt || b.at).localeCompare(String(a.finishedAt || a.at)));
-  const esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const esc = factuur.csvCel; // csv-veilig + bescherming tegen formule-injectie
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="ritten-' + sess.code.toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.csv"');
   res.write('\uFEFF' + ['datum', 'referentie', 'gast', 'van', 'naar', 'km', 'personen', 'prijs', 'chauffeur', 'voertuig'].join(';') + '\n');

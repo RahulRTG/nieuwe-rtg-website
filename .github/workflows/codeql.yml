@@ -26,6 +26,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
+          config-file: ./.github/codeql/codeql-config.yml
       - name: Analyse uitvoeren
         uses: github/codeql-action/analyze@v3
         with:

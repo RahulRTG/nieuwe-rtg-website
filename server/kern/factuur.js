@@ -179,12 +179,21 @@ function overzichtPdf(kop, rijen) {
 }
 
 // Kleine CSV-hulp: rijen (arrays) naar een veilige CSV-string (RFC 4180-achtig).
-function csv(rijen) {
-  const veld = v => {
-    const s = String(v == null ? '' : v);
-    return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  };
-  return rijen.map(r => r.map(veld).join(';')).join('\r\n') + '\r\n';
+// Eén cel csv-veilig maken. Twee lagen:
+//  1) formule-injectie: een cel die met = + - @ of een besturingsteken begint
+//     kan in Excel/Sheets als formule uitgevoerd worden (bv. =cmd|...). We
+//     zetten er een apostrof voor. Gewone (ook negatieve) bedragen laten we
+//     met rust, zodat -12,50 een getal blijft.
+//  2) csv-escaping: quotes verdubbelen en het veld tussen quotes zetten zodra
+//     er een scheidingsteken, quote of regeleinde in staat.
+function csvCel(v) {
+  let s = String(v == null ? '' : v);
+  if (/^[=+\-@\t\r]/.test(s) && !/^[-+]?[\d.,]+%?$/.test(s)) s = "'" + s;
+  return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
 
-module.exports = { pdf, ledenFactuur, transactieFactuur, overzichtPdf, csv, euroTekst, isContrib, RTG };
+function csv(rijen) {
+  return rijen.map(r => r.map(csvCel).join(';')).join('\r\n') + '\r\n';
+}
+
+module.exports = { pdf, ledenFactuur, transactieFactuur, overzichtPdf, csv, csvCel, euroTekst, isContrib, RTG };

@@ -14,6 +14,8 @@
    Alle 30%-rekenwerk staat hier, als enige bron van waarheid, zodat de leden-app,
    de backoffice en de website nooit uit elkaar lopen. */
 
+const crypto = require('crypto');
+
 const AANDEEL = 0.30;   // 30% van de abonnementsbijdrage
 const BTW = 1.21;       // afdracht rekent over het bedrag ex btw
 
@@ -65,7 +67,7 @@ function maakFonds(state) {
 
     const best = bestemming();
     const afdracht = {
-      id: 'RTF-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+      id: 'RTF-' + Date.now().toString(36) + '-' + crypto.randomBytes(4).toString('hex'),
       invoiceId: invoiceId || null,
       wie: wie || null,
       betaalId: betaalId || null,

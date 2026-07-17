@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Het RTG-bureaublad: alle apps en de hele website als tegels, met klok, datum en je accounts binnen handbereik.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>RTG OS, het bureaublad</title>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/seizoen.css" rel="stylesheet">
+<style>
+  :root{
+    --grond:#0C0C0B; --paneel:#151312; --paneel2:#1B1817;
+    --inkt:#F4F1EC; --lijn:rgba(255,255,255,0.09);
+    --grijs:rgba(244,241,236,0.72); --grijs-zacht:rgba(244,241,236,0.50);
+    --bordeaux:#C23A5E; --goud:#A98F1C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--grond); color:var(--inkt);
+    font-family:'Inter',sans-serif; line-height:1.5; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    /* een rustige, gedempte gloed, zoals een bureaublad-achtergrond */
+    background-image:
+      radial-gradient(1200px 700px at 78% -8%, rgba(194,58,94,0.10), transparent 60%),
+      radial-gradient(900px 600px at 8% 108%, rgba(169,143,28,0.08), transparent 60%);
+  }
+  .skip{
+    position:absolute; left:-999px; top:0; background:var(--paneel); color:var(--inkt);
+    padding:0.6rem 1rem; border:1px solid var(--lijn); z-index:50;
+  }
+  .skip:focus{left:0.6rem; top:0.6rem;}
+
+  /* bovenbalk: merk links, klok in het midden, accounts rechts */
+  .bar{
+    display:flex; align-items:center; gap:1rem;
+    padding:1rem clamp(1rem,4vw,2.6rem);
+    border-bottom:1px solid var(--lijn);
+    position:sticky; top:0; z-index:20;
+    background:rgba(12,12,11,0.72); backdrop-filter:blur(14px);
+  }
+  .merk{font-family:'Bodoni Moda',serif; font-size:1.15rem; letter-spacing:0.04em;}
+  .merk span{color:var(--goud); font-style:italic;}
+  .klok{margin-inline:auto; text-align:center; line-height:1.15;}
+  .klok time{
+    display:block; font-family:'Bodoni Moda',serif; font-size:1.5rem;
+    font-variant-numeric:tabular-nums; letter-spacing:0.02em;
+  }
+  .klok .datum{font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--grijs-zacht);}
+  .account{display:flex; flex-wrap:wrap; gap:0.4rem; justify-content:flex-end; max-width:46%;}
+  .chip{
+    display:inline-flex; align-items:center; gap:0.4rem;
+    border:1px solid var(--lijn); border-radius:999px;
+    padding:0.32rem 0.72rem; font-size:0.72rem; color:var(--grijs);
+    background:linear-gradient(155deg,#211E1B,#161311);
+  }
+  .chip.leeg{color:var(--grijs-zacht);}
+  .chip b{color:var(--inkt); font-weight:600;}
+  .chip .stip{width:0.5rem; height:0.5rem; border-radius:50%; background:var(--goud);}
+
+  main{padding:clamp(1.4rem,4vw,3rem) clamp(1rem,4vw,2.6rem) 4rem; max-width:1180px; margin:0 auto;}
+  .sectiekop{
+    font-size:0.72rem; letter-spacing:0.22em; text-transform:uppercase;
+    color:var(--grijs-zacht); margin:2.2rem 0 1rem;
+  }
+  .sectiekop:first-child{margin-top:0.4rem;}
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+    gap:1.4rem 0.6rem;
+  }
+  @media (min-width:700px){.grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:1.7rem 0.8rem;}}
+  .app{
+    display:flex; flex-direction:column; align-items:center; gap:0.55rem;
+    text-decoration:none; color:var(--inkt);
+    transition:transform 0.14s cubic-bezier(0.22,0.7,0.3,1);
+  }
+  .app:hover{transform:translateY(-3px);}
+  .app:focus-visible{outline:2px solid var(--goud); outline-offset:6px; border-radius:22px;}
+  .tegel{
+    width:78px; height:78px; border-radius:20px;
+    display:flex; align-items:center; justify-content:center; font-size:2rem;
+    background:linear-gradient(155deg,#23201C 0%,#171412 62%,#131110 100%);
+    border:1px solid var(--lijn);
+    box-shadow:0 10px 26px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+  @media (min-width:700px){.tegel{width:88px;height:88px;border-radius:22px;font-size:2.2rem;}}
+  .app:hover .tegel{border-color:color-mix(in srgb, var(--goud) 50%, transparent);}
+  .app.site .tegel{background:linear-gradient(155deg,#201A1C 0%,#161113 62%,#120F10 100%);}
+  .naam{font-size:0.78rem; text-align:center; color:var(--grijs); letter-spacing:0.01em;}
+  .toelichting{color:var(--grijs-zacht); font-size:0.82rem; max-width:60ch; margin:0.2rem 0 0.6rem;}
+</style>
+</head>
+<body>
+<a href="#hoofd" class="skip">Naar het bureaublad</a>
+
+<header class="bar">
+  <div class="merk">RTG <span>OS</span></div>
+  <div class="klok">
+    <time id="tijd" aria-label="Huidige tijd">--:--</time>
+    <span class="datum" id="datum"></span>
+  </div>
+  <div class="account" id="account" aria-live="polite" aria-label="Accounts op dit toestel">
+    <span class="chip leeg">Accounts laden…</span>
+  </div>
+</header>
+
+<main id="hoofd">
+  <h2 class="sectiekop" id="apps-kop">Apps</h2>
+  <p class="toelichting">Open een app. Ben je nog niet aangemeld, dan wijst de app je de weg; je hoeft maar één keer in te loggen.</p>
+  <nav class="grid" aria-labelledby="apps-kop">
+    <a class="app" href="/apps/app.html"><span class="tegel" aria-hidden="true">🎫</span><span class="naam">RTG-app</span></a>
+    <a class="app" href="/apps/leverancier.html"><span class="tegel" aria-hidden="true">🏛️</span><span class="naam">Leverancier</span></a>
+    <a class="app" href="/apps/personeel.html"><span class="tegel" aria-hidden="true">🧭</span><span class="naam">Personeel</span></a>
+    <a class="app" href="/apps/backoffice.html"><span class="tegel" aria-hidden="true">📊</span><span class="naam">Backoffice</span></a>
+    <a class="app" href="/apps/kantoren.html"><span class="tegel" aria-hidden="true">🗂️</span><span class="naam">Kantoren</span></a>
+    <a class="app" href="/apps/pay.html"><span class="tegel" aria-hidden="true">💳</span><span class="naam">RTG Pay</span></a>
+    <a class="app" href="/apps/spelen.html"><span class="tegel" aria-hidden="true">♟️</span><span class="naam">Spelen</span></a>
+    <a class="app" href="/apps/foundation/index.html"><span class="tegel" aria-hidden="true">🤝</span><span class="naam">RTFoundation</span></a>
+  </nav>
+
+  <h2 class="sectiekop" id="site-kop">De website</h2>
+  <p class="toelichting">De hele site als tegels: de passen, de foundation, boeken en partner worden.</p>
+  <nav class="grid" aria-labelledby="site-kop">
+    <a class="app site" href="/site/rtg-pass.html"><span class="tegel" aria-hidden="true">◆</span><span class="naam">RTG Pass</span></a>
+    <a class="app site" href="/site/lifestyle-pass.html"><span class="tegel" aria-hidden="true">❖</span><span class="naam">Lifestyle Pass</span></a>
+    <a class="app site" href="/site/business-pass.html"><span class="tegel" aria-hidden="true">◈</span><span class="naam">Business Pass</span></a>
+    <a class="app site" href="/site/rtfoundation.html"><span class="tegel" aria-hidden="true">✦</span><span class="naam">RTFoundation</span></a>
+    <a class="app site" href="/site/boeken.html"><span class="tegel" aria-hidden="true">🧭</span><span class="naam">Boeken</span></a>
+    <a class="app site" href="/site/systemen.html"><span class="tegel" aria-hidden="true">⛓️</span><span class="naam">Systemen</span></a>
+    <a class="app site" href="/site/partner-worden.html"><span class="tegel" aria-hidden="true">✚</span><span class="naam">Partner worden</span></a>
+    <a class="app site" href="/site/download.html"><span class="tegel" aria-hidden="true">⇩</span><span class="naam">Downloads</span></a>
+    <a class="app site" href="/"><span class="tegel" aria-hidden="true">⌂</span><span class="naam">Startpagina</span></a>
+  </nav>
+</main>
+
+<script src="/shared/accounts-os.js"></script>
+<script>
+(function () {
+  'use strict';
+  // ---- klok en datum ----
+  var DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+  var MND = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function tik() {
+    var d = new Date();
+    document.getElementById('tijd').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+    document.getElementById('datum').textContent = DAGEN[d.getDay()] + ' ' + d.getDate() + ' ' + MND[d.getMonth()];
+  }
+  tik();
+  setInterval(tik, 15000);
+
+  // ---- accounts op dit toestel ----
+  // De accountkluis onthoudt aangemelde accounts per wereld; daarnaast lezen we
+  // de kale app-tokens, zodat een bestaande inlog meteen zichtbaar is (ook al
+  // is de kluis nog niet gevuld). Puur tonen; wisselen komt in de volgende stap.
+  function lees(sleutel) { try { return localStorage.getItem(sleutel); } catch (e) { return null; } }
+  function toonAccounts() {
+    var vak = document.getElementById('account');
+    var kluis = window.RTGAccounts ? window.RTGAccounts.maak() : null;
+    var werelden = kluis ? kluis.WERELDEN : (window.RTGAccounts ? window.RTGAccounts.WERELDEN : {});
+    var chips = [];
+    Object.keys(werelden).forEach(function (w) {
+      var info = werelden[w];
+      var actief = kluis ? kluis.actief(w) : null;
+      var ingelogd = actief || lees(info.sleutel);
+      if (!ingelogd) return;
+      var label = actief && actief.label ? actief.label : info.naam;
+      var aantal = kluis ? kluis.lijst(w).length : 0;
+      chips.push('<span class="chip"><span class="stip"></span>' + info.naam +
+        (label !== info.naam ? ' &middot; <b>' + label + '</b>' : '') +
+        (aantal > 1 ? ' (' + aantal + ')' : '') + '</span>');
+    });
+    if (!chips.length) {
+      vak.innerHTML = '<span class="chip leeg">Nog niet aangemeld</span>';
+    } else {
+      vak.innerHTML = chips.join('');
+    }
+  }
+  toonAccounts();
+})();
+</script>
+</body>
+</html>

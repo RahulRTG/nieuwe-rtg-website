@@ -167,7 +167,8 @@ function maakVolledigeSeed() {
       jet:        { label: 'Privéjet',     icon: '✈️', caps: ['rides', 'location', 'pricing'] },
       restaurant: { label: 'Restaurant',   icon: '🍽️', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
       bar:        { label: 'Bar',          icon: '🍸', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
-      club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] }
+      club:       { label: 'Club',         icon: '🎧', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
+      zorg:       { label: 'Zorg & welzijn', icon: '🌿', caps: ['care', 'location', 'pricing'] }
     },
 
     /* Voorbeeldleveranciers (demo-inlogcodes). rate = de dynamische prijs die
@@ -241,6 +242,16 @@ function maakVolledigeSeed() {
       {
         code: 'JETAG', name: 'Aria Private Aviation', type: 'jet', city: 'Amsterdam', country: 'NL',
         loc: { lat: 52.308, lng: 4.764, label: 'Schiphol Business Aviation' }, rate: 0.10,
+        menu: []
+      },
+      {
+        code: 'ZENITH', name: 'Zenith Spa & Wellness', type: 'zorg', city: 'Ibiza',
+        loc: { lat: 38.916, lng: 1.448, label: 'Talamanca, Ibiza' }, rate: 0.15,
+        menu: []
+      },
+      {
+        code: 'CLARA', name: 'Kliniek Clara Ibiza', type: 'zorg', city: 'Ibiza',
+        loc: { lat: 38.907, lng: 1.432, label: 'Vila, Ibiza' }, rate: 0.12,
         menu: []
       }
     ],

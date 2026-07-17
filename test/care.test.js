@@ -19,7 +19,7 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'ZENITH' } });
   base = srv.base;
   const login = tier => fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier }) }).then(r => r.json()).then(d => d.token);
   lid = await login('rtg');
@@ -95,6 +95,57 @@ test('gasten mogen niet boeken; leden wel', async () => {
   const spa = ov.aanbieders.find(a => a.soort === 'spa');
   const r = await api('care/boek', { aanbiederId: spa.id, behandelingId: spa.behandelingen[0].id, datum: morgen(), tijd: spa.behandelingen[0].tijden[1] }, gast.token);
   assert.equal(r.status, 403);
+});
+
+test('de aanbieder-agenda: de behandelaar ziet de dag met zorgcontext en rondt af', async () => {
+  // een lid met zorgprofiel boekt en betaalt een aromamassage bij Zenith
+  await api('zorgprofiel/zet', { allergenen: 'pinda', dieet: '', medisch: '', delen: true }, lid);
+  const ov = (await api('care', {}, lid)).body;
+  const spa = ov.aanbieders.find(a => a.soort === 'spa');
+  const beh = spa.behandelingen.find(b => /aroma/i.test(b.naam));
+  const tijd = beh.tijden[beh.tijden.length - 1]; // laatste slot, zeker vrij
+  const boek = await api('care/boek', { aanbiederId: spa.id, behandelingId: beh.id, datum: morgen(), tijd }, lid);
+  assert.equal(boek.status, 200);
+  await api('care/betaal', { ref: boek.body.boeking.ref }, lid);
+  // de aanbieder (demo-eigenaar = ZENITH) logt in en ziet zijn dagagenda
+  const sup = (await api('supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+  assert.ok(sup, 'de zorgaanbieder kan inloggen');
+  const ag = await api('supplier/care/agenda', { datum: morgen() }, sup);
+  assert.equal(ag.status, 200);
+  const mijn = ag.body.afspraken.find(x => x.ref === boek.body.boeking.ref);
+  assert.ok(mijn, 'de betaalde afspraak staat in de agenda');
+  assert.ok(mijn.zorg && /pinda/.test(mijn.zorg.allergenen), 'de behandelaar ziet de allergie vooraf');
+  assert.ok(ag.body.behandelaars.length, 'de behandelaars staan erbij');
+  // afronden zet de afspraak op afgerond
+  const af = await api('supplier/care/afronden', { ref: boek.body.boeking.ref }, sup);
+  assert.equal(af.status, 200);
+  const ag2 = await api('supplier/care/agenda', { datum: morgen() }, sup);
+  assert.equal(ag2.body.afspraken.find(x => x.ref === boek.body.boeking.ref).status, 'afgerond');
+  // een gewoon restaurant is geen zorgaanbieder: 409
+  const geen = (await api('care', {}, lid)); // alleen om base te houden
+  assert.ok(geen.status === 200);
+});
+
+test('herstel- & verblijfpakket: overzicht met voordeel, boeken, betalen en mijn', async () => {
+  const pk = (await api('care/pakketten', {}, lid)).body.pakketten;
+  assert.ok(pk.length >= 1, 'er zijn pakketten geseed');
+  const p = pk.find(x => /Herstel/i.test(x.naam));
+  assert.ok(p.hotelNaam && p.behandelingNaam && p.nachten >= 1, 'het pakket koppelt hotel aan behandeling');
+  assert.ok(p.bespaar > 0, 'een pakket is voordeliger dan los');
+  const tijd = p.tijden[p.tijden.length - 1];
+  const boek = await api('care/pakket/boek', { pakketId: p.id, datum: morgen(), tijd }, lid);
+  assert.equal(boek.status, 200);
+  assert.equal(boek.body.pakket.status, 'wacht-op-betaling');
+  const bet = await api('care/pakket/betaal', { ref: boek.body.pakket.ref }, lid);
+  assert.ok(bet.body.pakket.paid && bet.body.pakket.status === 'geboekt');
+  const mijn = (await api('care/pakket/mijn', {}, lid)).body.pakketten;
+  assert.ok(mijn.some(x => x.ref === boek.body.pakket.ref && x.paid), 'het pakket staat betaald in mijn overzicht');
+  // de gekoppelde behandeling is meebevestigd in de gewone agenda
+  const care = (await api('care/mijn', {}, lid)).body.boekingen;
+  assert.ok(care.some(b => b.ref === boek.body.behandeling.ref && b.paid), 'de behandeling van het pakket staat betaald');
+  // gasten mogen geen pakket boeken
+  const gast = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'guest' }) })).json();
+  assert.equal((await api('care/pakket/boek', { pakketId: p.id, datum: morgen(), tijd: p.tijden[0] }, gast.token)).status, 403);
 });
 
 test('De Butler boekt een behandeling in gewone taal: voorstel, "ja", referentie', async () => {

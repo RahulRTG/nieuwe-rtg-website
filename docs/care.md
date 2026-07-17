@@ -32,6 +32,31 @@ het in gewone taal via de acties-registry.
    een "ja", en niet langer dan nodig. Een boeking draagt de intake alleen
    mee zolang de deling actief is.
 
+## De leden-tab
+
+Care heeft een eigen tab in de leden-app (`public/apps/app-main/20-navigatie-genres.js`,
+`laadCare`): mijn afspraken (met betalen/annuleren), mijn lopende
+intake-delingen (met stoppen), de herstel- & verblijfpakketten, en het aanbod
+van spa's, wellness en klinieken. Boeken kiest een dag en tijdslot en rekent
+in één keer af; bij een kliniek staat de aparte, uitdrukkelijke intake-deling
+in de kaart.
+
+## De aanbieder-kant (De Zorgbalie)
+
+Een zorgaanbieder is een echte leverancier: het `zorg`-sectortype in
+`seed.js`, met demo-accounts `ZENITH` en `CLARA`, gekoppeld aan de
+`careAanbieders` via `supplierCode`. `public/apps/zorgbalie.html` is de
+werkbalie van de behandelaar: de dagagenda per behandelaar, met de zorgcontext
+die met toestemming meereist — een notenallergie of bloedverdunner staat vóór
+de behandeling op het scherm — en een knop om een afspraak af te ronden.
+
+## Herstel- & verblijfpakketten
+
+Een behandeling gekoppeld aan een hotelverblijf, als één pakket met één prijs
+(voordeliger dan los; het voordeel wordt berekend tegen de echte nachtprijs van
+het hotel). Het pakket boekt de behandeling gewoon in de agenda — met dezelfde
+schaarste en zorgcontext — en legt het verblijf erbij vast. Betalen via RTG Pay.
+
 ## Routes
 
 | route | doet |
@@ -43,6 +68,12 @@ het in gewone taal via de acties-registry.
 | `POST /api/care/mijn` | mijn boekingen |
 | `POST /api/care/intake/deel` | een intake delen met een aanbieder |
 | `POST /api/care/intake/stop` | de deling intrekken |
+| `POST /api/care/pakketten` | de herstel- & verblijfpakketten |
+| `POST /api/care/pakket/boek` | een pakket boeken |
+| `POST /api/care/pakket/betaal` | een pakket afrekenen |
+| `POST /api/care/pakket/mijn` | mijn pakketten |
+| `POST /api/supplier/care/agenda` | (aanbieder) de dagagenda per behandelaar |
+| `POST /api/supplier/care/afronden` | (aanbieder) een afspraak afronden |
 
 ## De Butler
 

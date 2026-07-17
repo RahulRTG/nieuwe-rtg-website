@@ -7,7 +7,8 @@ module.exports = (kern) => {
     zorgVan, zorgZet, locDeel, locStopKlant, locMijn,
     fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus,
     assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap,
-    careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, careIntakeDeel, careIntakeStop } = kern;
+    careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, careIntakeDeel, careIntakeStop,
+    carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn } = kern;
 
 /* ---- de zorgvolle keten (kern/gastzorg.js) ----
    Het zorgprofiel: allergenen, dieet en medische aandachtspunten. Reist
@@ -130,4 +131,18 @@ app.post('/api/care/intake/stop', auth, (req, res) => {
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);
 });
+/* Herstel- & verblijfpakketten: een behandeling gekoppeld aan een hotelverblijf,
+   als een pakket met een prijs. De behandeling boekt gewoon in de agenda. */
+app.post('/api/care/pakketten', auth, (req, res) => res.json(carePakketOverzicht()));
+app.post('/api/care/pakket/boek', auth, (req, res) => {
+  const r = carePakketBoek(req.session, liveCodename(req.session), req.body);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/care/pakket/betaal', auth, (req, res) => {
+  const r = carePakketBetaal(req.session, req.body.ref, verdienPunten);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/care/pakket/mijn', auth, (req, res) => res.json(carePakketMijn(req.session.key)));
 };

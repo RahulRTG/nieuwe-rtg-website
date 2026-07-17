@@ -2575,4 +2575,5 @@ app.post('/api/supplier/menu/get', auth, (req, res) => {
   require('./supplier/modebezorg')(kern);
   require('./supplier/autoverkoop')(kern);
   require('./supplier/beveiliging')(kern);
+  require('./supplier/care')(kern);
 };

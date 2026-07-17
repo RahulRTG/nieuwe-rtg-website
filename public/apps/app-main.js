@@ -2105,7 +2105,9 @@
   if (!tabbar || !app || !grids[0] || !grids[1] || !dock || !pages) return;
 
   const pas = new URLSearchParams(location.search).get('pas') || 'rtg';
-  const DOCK = ['ai', 'betalen', 'bestellen', 'salon'];
+  // De Butler in het midden van het dock, als grotere gouden orb: hij is het
+  // hart van het OS en doet alles wat je hem vraagt.
+  const DOCK = ['betalen', 'bestellen', 'ai', 'salon', 'terplaatse'];
 
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
@@ -2238,6 +2240,16 @@
     });
     return uit;
   }
+  // De Butler vanuit het zoekscherm: open zijn app, vul de vraag in en verstuur
+  // via de bestaande chat-knoppen; de hele acties-registry van de Butler
+  // (bestellen, boeken, betalen, plannen, annuleren) doet dan gewoon zijn werk.
+  function vraagButler(q) {
+    sluitScrims();
+    const b = tabKnop('ai'); if (b) b.click();
+    const inp = $('#askInput'), knop = $('#askBtn');
+    if (inp && knop && q) { inp.value = q; setTimeout(() => knop.click(), 150); }
+    else if (inp) inp.focus();
+  }
   function zoek() {
     const q = (zoekInput.value || '').trim().toLowerCase();
     zoekLijst.textContent = '';
@@ -2251,6 +2263,12 @@
       b.addEventListener('click', () => { sluitScrims(); openItem(item); });
       zoekLijst.appendChild(b);
     }
+    // altijd onderaan: geef de vraag aan de Butler, wat het ook is
+    const bb = document.createElement('button');
+    const bi = document.createElement('span'); bi.className = 'zi'; bi.textContent = '✦'; bb.appendChild(bi);
+    bb.appendChild(document.createTextNode(q ? 'Vraag de Butler: "' + zoekInput.value.trim() + '"' : 'Vraag de Butler'));
+    bb.addEventListener('click', () => vraagButler(zoekInput.value.trim()));
+    zoekLijst.appendChild(bb);
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
   const zoekPil = $('#osZoekPil');
@@ -2346,6 +2364,8 @@
   function sync() {
     const tab = actieveTab(), open = tab !== 'home';
     app.classList.toggle('os-open', open);
+    // schermvast zodra de app zichtbaar is: dock en pill echt onderin beeld
+    document.body.classList.toggle('os-vast', getComputedStyle(app).display !== 'none');
     if (content) content.classList.toggle('os-thuis', !open);
     const terug = $('#osTerug'), brand = $('#osBrand'), titel = $('#osAppTitel');
     if (terug) terug.hidden = !open;
@@ -2358,23 +2378,219 @@
     if (gepland) return;
     gepland = requestAnimationFrame(() => { gepland = null; bouw(); });
   }).observe(tabbar, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style', 'class'] });
+  // de gate/app-wissel (inloggen, uitloggen) stuurt de schermvaste modus
+  new MutationObserver(sync).observe(app, { attributes: true, attributeFilter: ['style', 'class'] });
 
   const naarHome = () => { const b = tabKnop('home'); if (b) b.click(); };
   const terug = $('#osTerug'), pill = $('#osPill');
   if (terug) terug.addEventListener('click', naarHome);
-  if (pill) pill.addEventListener('click', naarHome);
+  // de pill: een tik gaat naar het beginscherm, vasthouden roept de Butler
+  // (het Siri-gebaar van dit OS)
+  let pillLang = false, pillTimer = null;
+  if (pill) {
+    pill.addEventListener('pointerdown', () => {
+      pillLang = false;
+      pillTimer = setTimeout(() => { pillLang = true; vraagButler(''); }, 550);
+    });
+    const pillLos = () => { if (pillTimer) { clearTimeout(pillTimer); pillTimer = null; } };
+    pill.addEventListener('pointerup', pillLos);
+    pill.addEventListener('pointercancel', pillLos);
+    pill.addEventListener('click', () => { if (!pillLang) naarHome(); pillLang = false; });
+  }
 
   const klok = $('#osKlok'), datum = $('#osDatum');
+  const gateKlok = $('#gateKlok'), gateDatum = $('#gateDatum');
   function tik() {
     const d = new Date();
-    if (klok) klok.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-    if (datum) {
-      const taal = (document.documentElement.lang || 'nl');
-      try { datum.textContent = d.toLocaleDateString(taal, { weekday: 'long', day: 'numeric', month: 'long' }); }
-      catch (e) { datum.textContent = d.toLocaleDateString(); }
-    }
+    const uur = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    if (klok) klok.textContent = uur;
+    if (gateKlok) gateKlok.textContent = uur;
+    const taal = (document.documentElement.lang || 'nl');
+    let lang;
+    try { lang = d.toLocaleDateString(taal, { weekday: 'long', day: 'numeric', month: 'long' }); }
+    catch (e) { lang = d.toLocaleDateString(); }
+    if (datum) datum.textContent = lang;
+    if (gateDatum) gateDatum.textContent = lang;
   }
   tik(); setInterval(tik, 15000);
+
+  /* ---------- notificatie-banner: glijdt bovenin binnen ---------- */
+  let bannerEl = null, bannerTimer = null;
+  function bannerToon(icoon, titel, tekst) {
+    if (!bannerEl) {
+      bannerEl = document.createElement('button');
+      bannerEl.className = 'os-banner';
+      bannerEl.setAttribute('aria-live', 'polite');
+      bannerEl.addEventListener('click', () => { bannerWeg(); const b = $('#bell'); if (b) b.click(); });
+      app.appendChild(bannerEl);
+    }
+    bannerEl.textContent = '';
+    const ic = document.createElement('span'); ic.className = 'ob-ic'; ic.textContent = icoon || '🔔';
+    const kol = document.createElement('span');
+    const t = document.createElement('div'); t.className = 'ob-titel'; t.textContent = titel || 'RTG';
+    kol.appendChild(t);
+    if (tekst) { const bd = document.createElement('div'); bd.className = 'ob-body'; bd.textContent = tekst; kol.appendChild(bd); }
+    bannerEl.appendChild(ic); bannerEl.appendChild(kol);
+    requestAnimationFrame(() => bannerEl.classList.add('open'));
+    if (bannerTimer) clearTimeout(bannerTimer);
+    bannerTimer = setTimeout(bannerWeg, 4500);
+  }
+  function bannerWeg() {
+    if (bannerEl) bannerEl.classList.remove('open');
+    if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
+  }
+  // live meldingen als banner: de kern geeft zijn onChange pas bij start() aan
+  // de realtime-bus, dus wikkelen we start() in en haken we daar op mee.
+  if (window.RTGRealtime && typeof RTGRealtime.start === 'function') {
+    const echteStart = RTGRealtime.start.bind(RTGRealtime);
+    RTGRealtime.start = (token, opts) => {
+      opts = opts || {};
+      const oud = opts.onChange;
+      opts.onChange = n => {
+        if (oud) oud(n);
+        if (n && n.title) bannerToon(n.icon || '🔔', n.title, n.body || '');
+      };
+      return echteStart(token, opts);
+    };
+  }
+
+  /* ---------- de Butler bestuurt het OS ----------
+     Zinnen die het OS zelf kan uitvoeren (open <app>, thema, licht/donker,
+     zoek, home) onderscheppen we in de capture-fase, vóór de chat-handlers;
+     al het andere gaat gewoon door naar de Butler-chat, die met zijn
+     acties-registry op de server bestelt, boekt, betaalt en annuleert. */
+  function alleDoelen() {
+    const uit = [];
+    for (const { item } of alleItems()) uit.push({ naam: itemNaam(item), doe: () => openItem(item) });
+    INDELING.flat().forEach(it => { if (typeof it !== 'string') uit.push({ naam: it.naam, doe: () => openMap(it) }); });
+    return uit;
+  }
+  function osCommando(ruw) {
+    const q = (ruw || '').trim().toLowerCase().replace(/[?.!]+$/, '');
+    if (!q) return false;
+    if (/^(home|thuis|beginscherm)$/.test(q)) { sluitScrims(); naarHome(); bannerToon('✦', 'Butler', 'Naar het beginscherm.'); return true; }
+    let m = q.match(/^zoek(?:en)?(?:\s+naar)?\s+(.+)$/);
+    if (m) { openZoek(); zoekInput.value = m[1]; zoek(); return true; }
+    m = q.match(/^thema\s+(bordeaux|parelmoer|standaard|klassiek)$/);
+    if (m && window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
+      RTGOSThema.zet(m[1] === 'klassiek' ? 'standaard' : m[1]);
+      bannerToon('✦', 'Butler', 'Het thema staat op ' + m[1] + '.');
+      return true;
+    }
+    if (/^(licht|donker|lichte modus|donkere modus)$/.test(q)) {
+      const b = $('#rtg-thema-knop');
+      if (b) { b.click(); bannerToon('✦', 'Butler', 'De weergave is omgezet.'); return true; }
+      return false;
+    }
+    m = q.match(/^(?:open|start|ga naar)\s+(.+)$/);
+    if (m) {
+      const naam = m[1].replace(/^(?:de|het|een)\s+/, '');
+      const doelen = alleDoelen();
+      const doel = doelen.find(d => d.naam.toLowerCase() === naam) || doelen.find(d => d.naam.toLowerCase().includes(naam));
+      if (doel) { sluitScrims(); doel.doe(); bannerToon('✦', 'Butler', doel.naam + ' staat voor u open.'); return true; }
+    }
+    return false;
+  }
+  document.addEventListener('click', e => {
+    if (!e.target || !e.target.closest || !e.target.closest('#askBtn')) return;
+    const inp = $('#askInput');
+    if (inp && osCommando(inp.value)) { inp.value = ''; e.stopImmediatePropagation(); e.preventDefault(); }
+  }, true);
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || !e.target || e.target.id !== 'askInput') return;
+    if (osCommando(e.target.value)) { e.target.value = ''; e.stopImmediatePropagation(); e.preventDefault(); }
+  }, true);
+
+  /* ---------- widgets op hoofdscherm 2: verbergen, terughalen, herschikken ----------
+     Zelfde gebaar als bij de iconen: lang drukken op een kaart zet de
+     wiebel-modus aan; de minus verbergt, de gestippelde chips halen terug,
+     slepen herschikt. Kaarten die de app zelf verbergt (hidden-attribuut)
+     blijven van de app; wij beheren alleen onze eigen klasse. */
+  const pagina2 = $('#osPagina2'), wChips = $('#osWChips');
+  const W_NAMEN = {
+    homeTrip: 'Reis', homePay: 'Betalen', homeSalon: 'De Salon', homeContacts: 'Contacten',
+    homeSpelen: 'Spelen', homeCv: 'CV', homeVacatures: 'Vacatures', homeFoundation: 'Foundation'
+  };
+  function wStand() { try { return JSON.parse(localStorage.getItem('rtg_os_widgets_' + pas) || 'null') || {}; } catch (e) { return {}; } }
+  function wBewaar(st) { try { localStorage.setItem('rtg_os_widgets_' + pas, JSON.stringify(st)); } catch (e) {} }
+  const wKaarten = () => pagina2 ? [...pagina2.querySelectorAll(':scope > .card')].filter(c => W_NAMEN[c.id]) : [];
+  function wToepas() {
+    if (!pagina2) return;
+    const st = wStand(), kaarten = wKaarten();
+    kaarten.forEach(c => c.classList.toggle('os-w-verborgen', (st.verborgen || []).includes(c.id)));
+    const perId = new Map(kaarten.map(c => [c.id, c]));
+    (st.volgorde || []).forEach(id => { const c = perId.get(id); if (c) pagina2.appendChild(c); });
+  }
+  let wiebelW = false, wSleep = null, wTimer = null;
+  function wChipsBouw() {
+    if (!wChips) return;
+    wChips.textContent = '';
+    for (const id of wStand().verborgen || []) {
+      if (!document.getElementById(id)) continue;
+      const b = document.createElement('button');
+      b.textContent = '+ ' + (W_NAMEN[id] || id);
+      b.addEventListener('click', () => {
+        const s = wStand(); s.verborgen = (s.verborgen || []).filter(x => x !== id); wBewaar(s);
+        wToepas(); zetWiebelW(true);
+      });
+      wChips.appendChild(b);
+    }
+  }
+  function zetWiebelW(aan) {
+    wiebelW = aan;
+    if (!pagina2) return;
+    pagina2.classList.toggle('os-wiebel-w', aan);
+    if (klaarKnop) klaarKnop.hidden = !(aan || wiebel);
+    pagina2.querySelectorAll('.os-w-min').forEach(b => b.remove());
+    if (aan) {
+      for (const c of wKaarten()) {
+        if (c.hidden || c.classList.contains('os-w-verborgen')) continue;
+        const min = document.createElement('button');
+        min.className = 'os-w-min'; min.textContent = '−';
+        min.setAttribute('aria-label', 'Verberg widget ' + (W_NAMEN[c.id] || c.id));
+        min.addEventListener('click', e => {
+          e.stopPropagation();
+          const s = wStand(); s.verborgen = [...new Set([...(s.verborgen || []), c.id])]; wBewaar(s);
+          wToepas(); zetWiebelW(true);
+        });
+        c.appendChild(min);
+      }
+      wChipsBouw();
+    } else {
+      const s = wStand(); s.volgorde = wKaarten().map(c => c.id); wBewaar(s); wSleep = null;
+    }
+  }
+  if (klaarKnop) klaarKnop.addEventListener('click', () => { if (wiebelW) zetWiebelW(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && wiebelW) zetWiebelW(false); });
+  if (pagina2) {
+    pagina2.addEventListener('pointerdown', e => {
+      const c = e.target.closest('.card');
+      if (!c || c.parentElement !== pagina2 || !W_NAMEN[c.id]) return;
+      if (e.target.closest('button, a, input') && !wiebelW) return; // knoppen in widgets gewoon laten werken
+      wTimer = setTimeout(() => zetWiebelW(true), 550);
+      if (wiebelW && !e.target.closest('.os-w-min')) { wSleep = c; c.classList.add('os-sleep'); }
+    });
+    pagina2.addEventListener('pointermove', e => {
+      if (wTimer && !wiebelW && (Math.abs(e.movementX) > 3 || Math.abs(e.movementY) > 3)) { clearTimeout(wTimer); wTimer = null; }
+      if (!wiebelW || !wSleep) return;
+      const onder = document.elementFromPoint(e.clientX, e.clientY);
+      const doel = onder && onder.closest && onder.closest('.card');
+      if (doel && doel !== wSleep && doel.parentElement === pagina2) {
+        const kinderen = [...pagina2.children];
+        pagina2.insertBefore(wSleep, kinderen.indexOf(doel) > kinderen.indexOf(wSleep) ? doel.nextSibling : doel);
+      }
+    });
+    const wLos = () => {
+      if (wTimer) { clearTimeout(wTimer); wTimer = null; }
+      if (wSleep) {
+        wSleep.classList.remove('os-sleep'); wSleep = null;
+        const s = wStand(); s.volgorde = wKaarten().map(c => c.id); wBewaar(s);
+      }
+    };
+    pagina2.addEventListener('pointerup', wLos);
+    pagina2.addEventListener('pointercancel', wLos);
+    wToepas();
+  }
 
   bouw(); bouwDots();
 })();

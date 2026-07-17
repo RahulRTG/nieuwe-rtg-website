@@ -907,6 +907,13 @@
   .os-app[data-tab="assets"] .os-tegel{background:linear-gradient(160deg,#4A4132,#2B2620);}
   .os-app[data-tab="gezin"] .os-tegel{background:linear-gradient(160deg,#A34D8C,#5E2B50);}
 
+  /* het OS is schermvast: zodra de app zichtbaar is (ingelogd) is de shell
+     exact de viewport en scrolt alles BINNEN de app, zoals op een echt
+     toestel; dock, zoekpil en stippen staan dan echt onderin beeld. De gate
+     blijft vrij scrollen (lange inlogformulieren op kleine schermen). */
+  body.os-vast{overflow:hidden;}
+  body.os-vast #shell{height:100dvh;min-height:0;}
+
   /* dock: zwevend glas met de vier kernapps */
   .os-dock{
     position:absolute;left:50%;transform:translateX(-50%);
@@ -1069,6 +1076,69 @@
   }
   .os-wiebel .os-app{cursor:grab;}
   .os-app.os-sleep{opacity:0.45;}
+
+  /* -------- vergrendelscherm-look voor het inlogscherm -------- */
+  #gate{
+    background:
+      radial-gradient(120% 60% at 50% -12%, rgba(169,143,28,0.16), transparent 60%),
+      radial-gradient(130% 70% at 50% 112%, rgba(194,58,94,0.14), transparent 62%),
+      var(--bg);
+  }
+  .os-lock{text-align:center;padding-top:calc(env(safe-area-inset-top, 0px) + 1.6rem);margin-bottom:0.6rem;}
+  .os-lock-klok{
+    font-size:4.2rem;font-weight:200;letter-spacing:0.01em;line-height:1;
+    font-variant-numeric:tabular-nums;color:var(--txt);
+  }
+  .os-lock-datum{margin-top:0.35rem;font-size:0.85rem;color:var(--muted);}
+
+  /* -------- De Butler: de gouden orb in het midden van het dock -------- */
+  .os-dock .os-app[data-tab="ai"]{margin-top:-14px;}
+  .os-dock .os-app[data-tab="ai"] .os-tegel{
+    width:64px;height:64px;border-radius:50%;
+    background:radial-gradient(circle at 30% 25%, #E8CB6F, var(--gold) 55%, #6B570F);
+    border:1px solid rgba(255,255,255,0.25);
+    box-shadow:0 10px 26px rgba(169,143,28,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .os-dock .os-app[data-tab="ai"] svg{width:30px;height:30px;stroke:#1C1608;}
+  .os-dock .os-app[data-tab="ai"].actief .os-tegel{outline-color:var(--txt);}
+
+  /* -------- notificatie-banner: glijdt bovenin binnen, zoals op een telefoon -------- */
+  .os-banner{
+    position:absolute;left:50%;transform:translate(-50%,-130%);
+    top:calc(env(safe-area-inset-top, 0px) + 0.55rem);
+    z-index:70;width:min(370px, 92%);
+    display:flex;align-items:flex-start;gap:0.7rem;
+    padding:0.75rem 0.9rem;border-radius:18px;
+    background:color-mix(in srgb, var(--card) 78%, transparent);
+    backdrop-filter:blur(24px) saturate(1.5);
+    -webkit-backdrop-filter:blur(24px) saturate(1.5);
+    border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,0.45);
+    color:var(--txt);text-align:left;cursor:pointer;
+    transition:transform 0.35s cubic-bezier(0.32,0.72,0.36,1);
+  }
+  .os-banner.open{transform:translate(-50%,0);}
+  .os-banner .ob-ic{font-size:1.25rem;flex-shrink:0;}
+  .os-banner .ob-titel{font-size:0.8rem;font-weight:650;}
+  .os-banner .ob-body{font-size:0.74rem;color:var(--muted);margin-top:0.1rem;line-height:1.35;}
+
+  /* -------- widgets kiezen en verplaatsen (wiebel-modus) -------- */
+  .card.os-w-verborgen{display:none !important;}
+  .os-wiebel-w .card{position:relative;}
+  .os-wiebel-w .card.os-sleep{opacity:0.45;}
+  @media (prefers-reduced-motion: no-preference){
+    .os-wiebel-w .card{animation:osWiebel 0.3s ease-in-out infinite alternate;}
+  }
+  .os-w-min{
+    position:absolute;top:-8px;left:-8px;z-index:5;
+    width:26px;height:26px;border-radius:50%;border:none;
+    background:var(--burgundy);color:#fff;font-size:1rem;line-height:1;
+  }
+  .os-w-chips{display:none;flex-wrap:wrap;gap:0.45rem;margin-top:1rem;}
+  .os-wiebel-w .os-w-chips{display:flex;}
+  .os-w-chips button{
+    border:1px dashed var(--line);border-radius:999px;background:none;
+    color:var(--muted);font-size:0.7rem;padding:0.35rem 0.8rem;
+  }
 </style>
 </head>
 <body>
@@ -1077,6 +1147,10 @@
 
   <!-- login -->
   <div id="gate" role="main" aria-label="Inloggen">
+    <div class="os-lock" aria-hidden="true">
+      <div class="os-lock-klok" id="gateKlok">--:--</div>
+      <div class="os-lock-datum" id="gateDatum"></div>
+    </div>
     <div class="logo"><span class="merkvlak">Rahul Travel Group</span></div>
     <div class="tagline">Experience the Elite Class</div>
     <h1 data-i18n-html="gate.title">Zo, daar ben je.<br>Je pas, <em>altijd</em> op zak.</h1>
@@ -1203,8 +1277,9 @@
             <div class="codecard" id="codecard"></div>
             <nav class="os-grid" id="osGrid" aria-label="Apps"></nav>
           </section>
-          <section class="os-pagina" aria-label="Hoofdscherm 2">
+          <section class="os-pagina" aria-label="Hoofdscherm 2" id="osPagina2">
             <nav class="os-grid" id="osGrid2" aria-label="Meer apps"></nav>
+            <div class="os-w-chips" id="osWChips"></div>
             <div class="card" id="homeTrip"></div>
             <div class="card" id="homePay"></div>
             <div class="card" id="homeSalon"></div>

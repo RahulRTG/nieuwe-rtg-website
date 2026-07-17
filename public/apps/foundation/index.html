@@ -18,16 +18,26 @@
   .logo b{color:var(--goud);font-weight:600;}
   .deck{color:var(--zacht);max-width:36rem;margin:.9rem auto 0;line-height:1.55;}
   .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--goud);border-radius:999px;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
-  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-  @media(max-width:560px){.tiles{grid-template-columns:1fr;}}
-  @media(min-width:900px){.tiles{grid-template-columns:repeat(3,1fr);}}
-  @media(min-width:1400px){.tiles{grid-template-columns:repeat(4,1fr);}}
-  .tile{display:flex;flex-direction:column;gap:.5rem;padding:1.5rem;text-decoration:none;color:var(--txt);transition:transform .12s,border-color .12s;position:relative;overflow:hidden;}
-  .tile:hover{transform:translateY(-3px);border-color:var(--goud);}
-  .tile .ic{font-size:2.4rem;}
-  .tile h2{font-family:var(--serif);font-weight:500;font-size:1.35rem;}
-  .tile p{color:var(--zacht);font-size:.9rem;line-height:1.45;}
-  .tile .cta{margin-top:auto;color:var(--goud);font-size:.85rem;font-weight:600;padding-top:.4rem;}
+  /* De hub in de RTG OS-look: de tegels zijn app-iconen op een hoofdscherm,
+     squircles met een klein label eronder; de teksten en pijlen zwijgen. */
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem .5rem;}
+  @media(min-width:560px){.tiles{grid-template-columns:repeat(5,1fr);}}
+  @media(min-width:900px){.tiles{grid-template-columns:repeat(6,1fr);}}
+  @media(min-width:1400px){.tiles{grid-template-columns:repeat(8,1fr);}}
+  .tile{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.4rem .1rem;text-decoration:none;color:var(--txt);transition:transform .12s;position:relative;overflow:visible;background:none;border:none;box-shadow:none;}
+  .tile:hover{transform:translateY(-3px);border-color:transparent;}
+  .tile:hover .ic{border-color:var(--goud);}
+  .tile .ic{
+    width:62px;height:62px;border-radius:27%;
+    display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+    background:linear-gradient(150deg,var(--paneel2),var(--paneel));
+    border:1px solid var(--lijn);
+    box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+    transition:border-color .12s;
+  }
+  .tile h2{font-family:var(--sans,inherit);font-weight:500;font-size:.72rem;text-align:center;line-height:1.2;color:var(--zacht);}
+  .tile p{display:none;}
+  .tile .cta{display:none;}
   .gratis{margin-top:1.6rem;text-align:center;font-size:.85rem;color:var(--zacht);line-height:1.55;border-top:1px solid var(--lijn);padding-top:1.2rem;}
   .gratis b{color:var(--goud);}
   /* AI-buddy-kiezer */

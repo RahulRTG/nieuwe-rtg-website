@@ -419,7 +419,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
         if (!datum) return klaar('Voor welke dag? Zeg bijvoorbeeld: "boek 2 tickets voor ' + act.name + ' morgen".');
         const tm = q.match(/(\d{1,2})[:.](\d{2})/);
         const tijd = (tm && (act.tijden || []).includes(tm[1].padStart(2, '0') + ':' + tm[2])) ? tm[1].padStart(2, '0') + ':' + tm[2] : (act.tijden || [])[0];
-        const personen = parseInt((q.match(/(\d{1,2})\s*(tickets?|kaartjes?|personen|man)\b/i) || [])[1], 10) || 1;
+        const personen = Math.min(10, Math.max(1, parseInt((q.match(/(\d{1,2})\s*(tickets?|kaartjes?|personen|man)\b/i) || [])[1], 10) || 1));
         const oms = personen + ' ticket(s) voor ' + act.name + ' bij ' + zaak.name;
         p.wacht = { soort: 'ticket', supplierCode: zaak.code, activiteitId: act.id, datum, tijd, personen, oms, at: nu() };
         save();
@@ -435,7 +435,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
         if (!rijder) return klaar('Ik zie nu geen vervoerspartner. Kijk anders even in Reizen.');
         const best = (q.match(/\bnaar\s+(.+?)(?=\s+(?:om|op|voor|met|morgen|overmorgen|vandaag)\b|[.?!]?\s*$)/i) || [])[1];
         const doel = best && (db.data.suppliers || []).find(x => (x.name || '').toLowerCase().includes(best.toLowerCase().trim()));
-        const personen = parseInt((q.match(/(\d{1,2})\s*(personen|man)\b/i) || [])[1], 10) || 1;
+        const personen = Math.min(9, Math.max(1, parseInt((q.match(/(\d{1,2})\s*(personen|man)\b/i) || [])[1], 10) || 1));
         const tm = q.match(/(\d{1,2})[:.](\d{2})/);
         const datum = datumInZin(q);
         p.wacht = { soort: 'rit', supplierCode: rijder.code, to: best ? best.trim() : '', toCode: doel ? doel.code : null, personen, datum: datum || null, tijd: tm ? tm[1].padStart(2, '0') + ':' + tm[2] : null, at: nu() };
@@ -457,7 +457,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
           if (m.uitverkocht) continue;
           const w = (m.name || '').toLowerCase().split(/[^a-z0-9]+/).find(x => x.length > 3 && ql.includes(x));
           if (!w) continue;
-          const qty = parseInt((ql.match(new RegExp('(\\d{1,2})\\s+(?:[a-z]+\\s+){0,2}?' + w)) || [])[1], 10) || 1;
+          const qty = Math.min(20, Math.max(1, parseInt((ql.match(new RegExp('(\\d{1,2})\\s+(?:[a-z]+\\s+){0,2}?' + w)) || [])[1], 10) || 1));
           items.push({ id: m.id, qty, naam: m.name, prijs: Number(m.price) || 0 });
         }
         if (!items.length) return klaar('Wat mag het zijn bij ' + s.name + '? Op de kaart staat onder meer: ' + (s.menu || []).slice(0, 5).map(m => m.name).join(', ') + '.');

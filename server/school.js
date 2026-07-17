@@ -39,7 +39,7 @@ module.exports = (ctx) => {
 
   // directie-authenticatie: schoolcode + beheer-token
   function schoolVan(req, res) {
-    const sch = S()[String(req.body.schoolCode || '').trim().toUpperCase()];
+    const sch = eigenVeld(S(), String(req.body.schoolCode || '').trim().toUpperCase());
     if (!sch || sch.token !== String(req.body.beheerToken || '')) {
       res.status(403).json({ error: 'Onbekende school of verkeerd beheer-token.' });
       return null;
@@ -48,7 +48,7 @@ module.exports = (ctx) => {
   }
   // personeels-authenticatie: schoolcode + personeel-token (status telt apart)
   function personeelVan(req, res) {
-    const sch = S()[String(req.body.schoolCode || '').trim().toUpperCase()];
+    const sch = eigenVeld(S(), String(req.body.schoolCode || '').trim().toUpperCase());
     const tok = String(req.body.personeelToken || '');
     const p = sch && tok ? Object.values(sch.personeel || {}).find(x => x.token === tok) : null;
     if (!p) { res.status(403).json({ error: 'Onbekende school of verkeerd personeel-token.' }); return null; }
@@ -113,7 +113,7 @@ module.exports = (ctx) => {
      Een leraar of ondersteuner meldt zich met de schoolcode en wacht daarna op
      goedkeuring van de directie. Pas na goedkeuring kan een leraar klassen maken. */
   router.post('/school/personeel/aanmeld', (req, res) => {
-    const sch = S()[String(req.body.schoolCode || '').trim().toUpperCase()];
+    const sch = eigenVeld(S(), String(req.body.schoolCode || '').trim().toUpperCase());
     if (!sch) return res.status(404).json({ error: 'Deze schoolcode kennen we niet. Vraag hem na bij de school.' });
     const naam = schoon(req.body.naam, 60);
     if (!naam) return res.status(400).json({ error: 'Vul je naam in.' });
@@ -234,7 +234,7 @@ module.exports = (ctx) => {
     const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
     if (!k) return res.status(404).json({ error: 'Deze klascode kennen we niet. Vraag hem na bij de leraar.' });
     const profielId = String(req.body.profielId || s.p.id);
-    const kind = s.g.profielen[profielId];
+    const kind = eigenVeld(s.g.profielen, profielId);
     if (!kind) return res.status(404).json({ error: 'Dat profiel bestaat niet in jouw gezin.' });
     const sleutel = leerlingSleutel(s.g.code, kind.id);
     if ((k.leerlingen || []).some(l => l.sleutel === sleutel)) return res.status(409).json({ error: 'Dit kind zit al in deze klas.' });

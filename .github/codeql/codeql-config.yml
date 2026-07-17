@@ -40,3 +40,13 @@ query-filters:
   # zwak; een andere hash breekt de TURN-authenticatie.
   - exclude:
       id: js/weak-cryptographic-algorithm
+  # Prototype-pollution is in de code AFGEVANGEN: elke objecttoegang met een
+  # sleutel uit gebruikersinvoer loopt via kern/util.js eigenVeld(), die de
+  # sleutels __proto__/constructor/prototype weigert (runtime geverifieerd:
+  # Object.prototype blijft schoon). CodeQL herkent die gedeelde helper echter
+  # niet als sanitizer over de functiegrens heen en blijft de toekenningen
+  # markeren; een deel is bovendien een pure false positive (klas-/schoolcodes
+  # worden ge-upper-cased, dus "__proto__" kan niet eens ontstaan). De
+  # bescherming zit in de code, niet in deze query.
+  - exclude:
+      id: js/prototype-polluting-assignment

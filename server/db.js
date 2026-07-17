@@ -273,6 +273,9 @@ async function flushNu() {
   pgVuil = false; pgFlushBezig = true;
   try {
     await pg.flush(db.data);
+    // grote collecties die door de flush-pacing zijn uitgesteld: vuil blijven,
+    // zodat de her-geplande flush ze na de pauze alsnog wegschrijft
+    if (pg.heeftUitgesteld && pg.heeftUitgesteld()) pgVuil = true;
     if (Date.now() - laatsteLokaleSnap >= PG_SNAP_MS) { schrijfLokaleSnapshotStil(); laatsteLokaleSnap = Date.now(); }
   }
   catch (e) { pgVuil = true; console.warn('[pg] flush mislukt:', e.message); }
@@ -642,7 +645,27 @@ async function startPostgres() {
     schrijfLokaleSnapshotStil();
     if (externCb) externCb();
   } else if (db.writable) {
-    await pg.flush(db.data); // lege database: onze seed/snapshot erin
+    await pg.flush(db.data, true); // lege database: onze seed/snapshot erin (alles, ook grote collecties)
+  }
+  // Venster-top-up uit het grootboek: de kv-blob mag voor grote collecties een
+  // paar seconden achterlopen (flush-pacing). Items die al wel als rij in het
+  // grootboek staan maar nog niet in de blob, komen hier terug in het venster,
+  // zodat er bij een herstart niets uit de actieve stroom verdwijnt.
+  if (txPool && db.data) {
+    for (const naam of ['orders', 'boekingen']) {
+      try {
+        const r = await txPool.query('SELECT data FROM tx_ledger WHERE soort=$1 ORDER BY at DESC LIMIT 500', [TX_SOORT[naam]]);
+        const arr = Array.isArray(db.data[naam]) ? db.data[naam] : (db.data[naam] = []);
+        const bekend = new Set(arr.map(t => t && t.ref).filter(x => x != null));
+        const missend = [];
+        for (const row of r.rows) { const t = JSON.parse(kluis.ontsleutel(row.data)); if (!bekend.has(t.ref)) missend.push(t); }
+        if (missend.length) {
+          missend.sort((a, b) => String(b.at || '').localeCompare(String(a.at || ''))); // nieuwste eerst, zoals unshift
+          db.data[naam] = missend.concat(arr);
+          console.log('[tx] ' + missend.length + ' ' + naam + ' uit het grootboek teruggezet in het venster (kv liep achter).');
+        }
+      } catch (e) { pgLog && pgLog.warn && pgLog.warn('[db] venster-top-up ' + naam + ' mislukt: ' + e.message); }
+    }
   }
   pgKlaar = true;
   await pg.luister(() => { pg.haalNieuwer(db.data, externCb).then(schrijfLokaleSnapshotStil).catch(() => {}); });
@@ -658,7 +681,7 @@ async function startPostgres() {
 async function flushBijAfsluiten() {
   if (db.writable && saveVuil) { try { schrijfSnapshotNu(); } catch (e) {} }
   if (STORE !== 'postgres' || !pg || !db.writable) return;
-  try { await pg.flush(db.data); } catch (e) {}
+  try { await pg.flush(db.data, true); } catch (e) {} // force: ook de door pacing uitgestelde grote collecties
 }
 
 // Ping de database voor de gezondheidscheck; geeft de antwoordtijd in ms.

@@ -23,7 +23,9 @@ const KANAAL = 'rtg_kv';
 
 function maakPg({ merge3, kluis, log, url }) {
   const { Pool } = require('pg');
-  const pool = new Pool({ connectionString: url, max: Number(process.env.PG_POOL_MAX || 10) });
+  // Pool-grootte: de kv-flush, het transactie-grootboek en de ledengids delen
+  // deze pool; onder gelijktijdige last is 10 te krap (wachtrij = latentie).
+  const pool = new Pool({ connectionString: url, max: Number(process.env.PG_POOL_MAX || 20) });
   let luisterClient = null;
   const toegepast = new Map();   // collectie -> versie die dit proces al toepaste
   const laatsteJson = new Map(); // collectie -> laatst gesynchroniseerde JSON
@@ -72,14 +74,27 @@ function maakPg({ merge3, kluis, log, url }) {
   // opgepikt; een wijziging-op-zijn-plaats (statuswissel) wordt bij de volgende
   // volledige check binnen GROOT_MS alsnog weggeschreven. In-memory blijft de
   // waarheid (write-behind), dus die kleine persist-vertraging is acceptabel.
+  // Grote collecties bovendien hooguit eens per GROOT_FLUSH_MS wegschrijven: de
+  // stringify van een venster van tienduizenden orders (~10 MB) bij elke
+  // flush-cyclus van 150 ms blokkeert de event-loop structureel. De kv-blob is
+  // voor die collecties enkel een grof snapshot -- elk nieuw item staat al
+  // DIRECT als eigen rij in het transactie-grootboek (tx_ledger), dus dit
+  // uitstel kost geen duurzaamheid. Wat uitgesteld is, meldt heeftUitgesteld()
+  // zodat de schrijver vuil blijft en het na de pauze alsnog weggaat; de
+  // afsluit-flush forceert alles.
   const GROOT_BYTES = 512 * 1024, GROOT_MS = 2000;
+  const GROOT_FLUSH_MS = Number(process.env.PG_GROOT_FLUSH_MS || 5000);
+  const laatsteSchrijf = new Map(); // collectie -> tijdstip van de laatste echte schrijf
+  let uitgesteld = false;
   const lengteVan = v => Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : 0);
-  async function flush(dataNu) {
+  async function flush(dataNu, force) {
     let geschreven = 0;
     const gewijzigd = [];
     const nu = Date.now();
+    uitgesteld = false;
     for (const k of Object.keys(dataNu)) {
       const groot = (laatsteGrootte.get(k) || 0) > GROOT_BYTES;
+      if (groot && !force && nu - (laatsteSchrijf.get(k) || 0) < GROOT_FLUSH_MS) { uitgesteld = true; continue; }
       if (groot && lengteVan(dataNu[k]) === laatsteLengte.get(k) && nu - (laatsteCheck.get(k) || 0) < GROOT_MS) continue;
       const j = JSON.stringify(dataNu[k]);
       laatsteCheck.set(k, nu); laatsteGrootte.set(k, j.length); laatsteLengte.set(k, lengteVan(dataNu[k]));
@@ -113,6 +128,7 @@ function maakPg({ merge3, kluis, log, url }) {
         await client.query(`SELECT pg_notify($1, $2)`, [KANAAL, k]);
         await client.query('COMMIT');
         laatsteJson.set(k, j);
+        laatsteSchrijf.set(k, Date.now());
         toegepast.set(k, ver);
         geschreven++;
       } catch (e) {
@@ -167,6 +183,7 @@ function maakPg({ merge3, kluis, log, url }) {
   }
 
   return { schema, laadAlles, flush, haalNieuwer, luister, sluit, pool,
+    heeftUitgesteld: () => uitgesteld,
     _staat: { toegepast, laatsteJson } };
 }
 

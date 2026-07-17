@@ -216,8 +216,30 @@ groen.
 
 De **LATENTIE**-drempel (p99 ≤ 2000 ms standaard) blijft op deze gedeelde
 testmachine eerlijk wisselvallig: 1600 ms op een rustige run (PASS), 2600 ms op
-een drukke (FAIL). De O(N)-vloer is weg; de resterende staart komt uit de
-bewust vijandige chaos-payloads (gigastrings parsen), GC en VM-ruis — dat staat
-hier zoals het is, geen opgerekte drempel om groen te kunnen tonen. De harnas
-zaait sinds deze stap in de echte vorm: het venster in kv, alles als rijen in
-`tx_ledger`.
+een drukke (FAIL). De O(N)-vloer is weg; wat overblijft is GC, wachtrijen naar
+Postgres en vooral VM-ruis — de doorvoer verschilt bij identieke code en config
+tot ~40% per run (69–116 calls/s), dus dit werkpunt zit op deze machine gewoon
+op de rand. (Een eerdere versie van dit stuk wees naar de chaos-"gigastrings";
+dat klopte niet: die zijn maar 20 KB en parsen in minder dan een milliseconde.)
+Geen opgerekte drempel om groen te kunnen tonen. De harnas zaait sinds deze
+stap in de echte vorm: het venster in kv, alles als rijen in `tx_ledger`.
+
+### Nazorg: flush-pacing en het venster-herstel bij een herstart
+
+Twee verfijningen op de opslaglaag, met een eerlijke meetuitkomst erbij:
+
+- **Flush-pacing voor grote collecties (`server/pg.js`).** De kv-blob van het
+  orders-venster (~10 MB) werd bij vrijwel elke flush-cyclus van 150 ms opnieuw
+  geserialiseerd zodra er orders bijkwamen. Grote collecties gaan nu hooguit
+  eens per `PG_GROOT_FLUSH_MS` (5 s) naar kv; wat uitgesteld is blijft vuil en
+  gaat na de pauze alsnog, en de afsluit-flush forceert alles. Dit kost geen
+  duurzaamheid: elk nieuw item staat bij aanmaak al als eigen rij in het
+  grootboek, en bij het opstarten haalt een **venster-top-up** items die wel in
+  het grootboek maar nog niet in de (hooguit 5 s oude) kv-blob staan terug in
+  het RAM — gedekt door de Postgres-integratietests. Ook is de gedeelde pool
+  verruimd (10 → 20 verbindingen; kv, grootboek en ledengids delen hem).
+- **De meting erbij, zonder mooipraterij:** een meetbare p99-winst leverde dit
+  op deze machine NIET op (2600 ms op beide na-runs, binnen de ruisband van
+  ervoor). De wijziging staat er omdat hij de event-loop aantoonbaar minder
+  vaak blokkeert en de herstart-semantiek verbetert, niet omdat de grafiek er
+  mooier van werd.

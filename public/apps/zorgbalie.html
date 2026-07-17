@@ -17,7 +17,11 @@
   html,body{margin:0;}
   body{
     font-family:'Inter',system-ui,-apple-system,sans-serif;
-    background:var(--bg); color:var(--txt);
+    background:
+      radial-gradient(120% 45% at 50% -8%, rgba(169,143,28,0.07), transparent 60%),
+      radial-gradient(130% 55% at 50% 110%, rgba(127,23,52,0.07), transparent 62%),
+      var(--bg);
+    color:var(--txt);
     min-height:100dvh; -webkit-font-smoothing:antialiased;
   }
   h1,h2,h3{font-family:'Bodoni Moda','Cormorant Garamond',Georgia,serif;font-weight:500;letter-spacing:-0.01em;margin:0;}
@@ -26,18 +30,29 @@
   .brand{width:40px;height:40px;border-radius:11px;background:var(--burgundy-deep);display:flex;align-items:center;justify-content:center;font-family:'Bodoni Moda',serif;font-size:0.7rem;letter-spacing:0.04em;color:#F4F1EC;flex:none;}
   .top h1{font-size:1.15rem;line-height:1.1;}
   .top .sub{font-size:0.72rem;color:var(--soft);letter-spacing:0.02em;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;margin-bottom:0.8rem;}
+  .card{background:linear-gradient(160deg, color-mix(in srgb, var(--card) 91%, #fff), color-mix(in srgb, var(--card) 95%, #000));
+    border:1px solid var(--line);border-radius:12px;padding:1rem;margin-bottom:0.8rem;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
   label{display:block;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--soft);margin-bottom:0.3rem;}
-  input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:0.65rem 0.8rem;font-size:0.95rem;color:var(--txt);outline:none;}
+  input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.65rem 0.8rem;font-size:0.95rem;color:var(--txt);outline:none;
+    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1);}
+  input:focus{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
   input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
-  .btn{background:var(--burgundy);border:none;border-radius:11px;padding:0.7rem 1rem;font-size:0.9rem;font-weight:600;color:#fff;cursor:pointer;}
+  .btn{background:var(--burgundy);border:none;border-radius:10px;padding:0.7rem 1rem;font-size:0.9rem;font-weight:600;color:#fff;cursor:pointer;
+    transition:transform 0.13s cubic-bezier(0.22,0.7,0.3,1), filter 0.13s cubic-bezier(0.22,0.7,0.3,1);}
+  @media (hover:hover){.btn:hover{filter:brightness(1.1);}}
+  .btn:active{transform:scale(0.97);}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:500;}
   .btn:disabled{opacity:0.5;cursor:default;}
   .row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
   .chip{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.8rem;font-size:0.8rem;color:var(--muted);cursor:pointer;}
   .chip.on{background:rgba(139,195,168,0.16);border-color:rgba(139,195,168,0.5);color:var(--txt);}
-  .appt{border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-top:0.7rem;background:var(--card2);}
-  .appt .t{font-family:'Bodoni Moda',serif;font-size:1.15rem;color:var(--gold);}
+  .appt{border:1px solid var(--line);border-radius:11px;padding:0.85rem;margin-top:0.7rem;
+    background:linear-gradient(160deg, color-mix(in srgb, var(--card2) 91%, #fff), color-mix(in srgb, var(--card2) 95%, #000));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);
+    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1);}
+  @media (hover:hover){.appt:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}}
+  .appt .t{font-family:'Bodoni Moda',serif;font-size:1.15rem;color:var(--gold);font-variant-numeric:tabular-nums;}
   .appt .beh{font-size:0.95rem;margin-top:0.1rem;}
   .appt .who{font-size:0.78rem;color:var(--soft);margin-top:0.15rem;}
   .flag{margin-top:0.55rem;border-radius:10px;padding:0.5rem 0.65rem;font-size:0.82rem;line-height:1.35;}

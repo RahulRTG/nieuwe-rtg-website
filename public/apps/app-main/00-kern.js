@@ -243,6 +243,9 @@
   }
   // meteen toepassen, ook op het beginscherm
   pasThemaToepassen();
+  // seam voor de OS-schil (bedieningspaneel): thema lezen/zetten zonder de
+  // logica hierboven te dupliceren
+  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => !!vastePas && vastePas !== 'business' };
 
   /* ---------- de stem van de pas (tone of voice) ----------
      Dezelfde vriend als op de website, maar in de taal van de pas:

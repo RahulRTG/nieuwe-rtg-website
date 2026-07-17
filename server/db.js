@@ -390,7 +390,18 @@ async function startPostgres() {
   ledenPool = pg.pool;
   try {
     await ledenPool.query('CREATE TABLE IF NOT EXISTS member_dir(key text PRIMARY KEY, codename text, tier text, codename_lower text)');
+    // btree: exact opzoeken (codenaam -> sleutel, de betaal/Tik-weg) is O(log n)
     await ledenPool.query('CREATE INDEX IF NOT EXISTS member_dir_codename_lower ON member_dir(codename_lower)');
+    // Deelzoeken ("vind een vriend", LIKE '%q%') kan een btree-index niet
+    // gebruiken door het wildcard-voorvoegsel: dan scant hij alle rijen (bij
+    // tientallen miljoenen leden seconden per zoekopdracht). De trigram-index
+    // (pg_trgm) maakt juist die LIKE '%q%' geindexeerd. Best-effort: mag de
+    // extensie niet (geen rechten) of ontbreekt pg_trgm, dan valt het zoeken
+    // terug op de scan en werkt de rest gewoon door.
+    try {
+      await ledenPool.query('CREATE EXTENSION IF NOT EXISTS pg_trgm');
+      await ledenPool.query('CREATE INDEX IF NOT EXISTS member_dir_codename_trgm ON member_dir USING gin(codename_lower gin_trgm_ops)');
+    } catch (e) { pgLog && pgLog.warn && pgLog.warn('[db] trigram-zoekindex niet beschikbaar (deelzoeken valt terug op scan): ' + e.message); }
     await ververLedenN();
   } catch (e) { ledenPool = null; pgLog && pgLog.warn && pgLog.warn('[db] ledengids init mislukt: ' + e.message); }
   const pgData = await pg.laadAlles();

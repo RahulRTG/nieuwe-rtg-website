@@ -11,7 +11,11 @@
 
 const functies = require('../functies');
 
-module.exports = ({ db, save, crypto, anthropic }) => {
+module.exports = ({ db, save, crypto, anthropic, ledenAantal }) => {
+  // Het ledental komt uit de onderhouden O(1)-teller (die met Postgres ook de
+  // leden buiten het geheugen meetelt); Object.keys(memberDir) zou daar 0 geven
+  // en is bovendien O(N) over de hele gids.
+  const ledenGeteld = () => (typeof ledenAantal === 'function' ? ledenAantal() : Object.keys(d().memberDir || {}).length);
 
   const nu = () => Date.now();
   const DAG = 86400000;
@@ -136,7 +140,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
       ] },
     onderzoek: { naam: 'Onderzoek & data', emoji: '🔬', missie: 'Weten wat werkt: cijfers, trends en eerlijke conclusies.',
       kpis: () => [
-        ['Leden in de gids', Object.keys(d().memberDir || {}).length],
+        ['Leden in de gids', ledenGeteld()],
         ['Connecties gelegd', tel(Object.keys(d().connections || {}))],
         ['Orders per week', recent(d().orders, 'at', 7)],
         ['Posts per week', recent(d().posts, 'at', 7)]
@@ -259,7 +263,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     const alleF = cat.flatMap(g => g.functies);
     return { ok: true, stats: [
       { groep: 'Mensen', items: [
-        ['Leden in de gids', Object.keys(d().memberDir || {}).length],
+        ['Leden in de gids', ledenGeteld()],
         ['Gezinnen (RTF)', Object.keys((d().foundation || {}).gezinnen || {}).length],
         ['Partners', tel(d().suppliers)],
         ['Actieve sessies', Object.keys(d().sessions || {}).length]

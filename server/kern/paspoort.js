@@ -32,7 +32,12 @@ const NIVEAUS = ['bevestiging', 'idkaart', 'paspoort'];
 const VIEW_TTL_MS = 10 * 60 * 1000;     // een goedgekeurde inzage is 10 minuten geldig
 const KIND_GRENS = 15;                   // bescherming minderjarigen: nooit delen t/m deze leeftijd
 
-function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, leesUploadDataUrl, leeftijdVan }) {
+function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, leesUploadDataUrl, leeftijdVan, gidsHaal }) {
+  // De codenaam uit de ledengids halen via gidsHaal: dat werkt in beide
+  // opslagmodi. db.data.memberDir is met Postgres leeg (de leden staan
+  // geindexeerd buiten het geheugen), dus een directe lezing zou de codenaam
+  // missen.
+  const codenaamUitGids = key => ((typeof gidsHaal === 'function' ? gidsHaal(key) : (db.data.memberDir || {})[key]) || {}).codename;
   const id = () => crypto.randomBytes(5).toString('hex');
   const nu = () => new Date().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).trim().slice(0, n || 200);
@@ -131,7 +136,7 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
     const u = accountVanKey(key);
     if (!u) return { status: 404, error: 'Dit lid heeft geen RTG-geverifieerd paspoort.' };
     const minLeeftijd = opts && opts.minLeeftijd != null ? Math.max(0, Math.min(99, parseInt(opts.minLeeftijd, 10) || 0)) : null;
-    const codenaam = ((db.data.memberDir || {})[key] || {}).codename || (typeof opts === 'object' && opts.codenaam) || null;
+    const codenaam = codenaamUitGids(key) || (typeof opts === 'object' && opts.codenaam) || null;
     // bescherming minderjarigen: identiteit van een kind (t/m 15) delen we nooit
     const lft = leeftijdVanAccount(u);
     if (nv !== 'bevestiging' && lft != null && lft <= KIND_GRENS) {
@@ -228,7 +233,7 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
     const r = schoon(reden, 500);
     if (r.length < 10) return { status: 400, error: 'Beschrijf het incident (minstens 10 tekens).' };
     const nv = ['idkaart', 'paspoort'].includes(niveau) ? niveau : 'idkaart';
-    const codenaam = ((db.data.memberDir || {})[key] || {}).codename || null;
+    const codenaam = codenaamUitGids(key) || null;
     const inc = {
       id: id(), supplierCode: supplier.code, supplierName: supplier.name,
       key, codenaam, reden: r, gevraagdNiveau: nv, status: 'ingediend',

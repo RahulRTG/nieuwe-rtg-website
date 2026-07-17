@@ -452,7 +452,7 @@
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
     source.addEventListener('rtc', e => { if (window.TeamCall) TeamCall.event(e); });
     source.addEventListener('dm', e => { if (window.CollegaChat) CollegaChat.event(e); });
-    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); if (fact) laadFacturen(); laadAgendaSup(); });
+    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('retail') && wvRetail) laadWinkelvloer(); if (has('care') && zbLev) laadZorgbalieLev(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); if (fact) laadFacturen(); laadAgendaSup(); });
     // de keuken praat met de bediening: bon compleet op de pas -> belletje op
     // elk open scherm van de zaak (bedieningspost, kassa, kantoor)
     source.addEventListener('pas', e => {

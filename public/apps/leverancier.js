@@ -38,6 +38,8 @@
     { code:'MOTOISLA', name:'Moto Isla', type:'Tweewielers', icon:'🛵', sub:'Scooters, motoren & quads · Ibiza' },
     { code:'FESTA',   name:'Festa Ibiza Events', type:'Events', icon:'🎪', sub:'Events & festivals · Cala Comte' },
     { code:'SERENA',  name:'Serena Spa', type:'Wellness', icon:'🧖', sub:'Wellness & spa · Santa Eularia' },
+    { code:'ZENITH',  name:'Zenith Spa & Wellness', type:'Zorg', icon:'🧖', sub:'Dagspa & behandelingen · Talamanca' },
+    { code:'CLARA',   name:'Kliniek Clara Ibiza', type:'Zorg', icon:'🩺', sub:'Privékliniek & herstel · Vila' },
     { code:'ORODOR',  name:'Casa d\'Oro', type:'Juwelier', icon:'💎', sub:'Juwelier & horloges · Dalt Vila' },
     { code:'LIENZO',  name:'Galeria Lienzo', type:'Galerie', icon:'🖼️', sub:'Kunst & galerie · Dalt Vila' }
   ];
@@ -68,6 +70,7 @@
     tweewielers: { label:'RTG Tweewielers & Quads', labelEn:'RTG Two-wheelers & Quads', codes:['MOTOISLA'], icon:'🛵' },
     events:      { label:'RTG Events & Festivals', labelEn:'RTG Events & Festivals', codes:['FESTA'], icon:'🎪' },
     wellness:    { label:'RTG Wellness & Spa', labelEn:'RTG Wellness & Spa', codes:['SERENA'], icon:'🧖' },
+    zorg:        { label:'RTG Zorg & Welzijn', labelEn:'RTG Care & Wellness', codes:['ZENITH','CLARA'], icon:'🌿' },
     juwelier:    { label:'RTG Juwelier', labelEn:'RTG Jeweller', codes:['ORODOR'], icon:'💎' },
     galerie:     { label:'RTG Kunst & Galerie', labelEn:'RTG Art & Gallery', codes:['LIENZO'], icon:'🖼️' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
@@ -116,6 +119,8 @@
     huur:     { label:'Verhuur',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M7 9.5h10"/>', cap:'huur' },
     verkoop:  { label:'Verkoop',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M9.5 9.2l1.6 1.6 3-3"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
+    winkelvloer:{ label:'Winkelvloer', svg:'<path d="M4 7h16l-1 4a3 3 0 0 1-3 2.4H8A3 3 0 0 1 5 11z"/><path d="M4 7 6 3h12l2 4"/><path d="M6 13v7h12v-7"/><path d="M10 20v-4h4v4"/>', cap:'retail' },
+    zorgbalie:{ label:'Zorgbalie', svg:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>', cap:'care' },
     charter:  { label:'Charter',   svg:'<path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/><path d="M3 20c1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0"/>', cap:'charter' },
     groothandel:{ label:'Groothandel', svg:'<rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M3 8l2-4h14l2 4"/><path d="M10 12h4"/>', cap:'groothandel' },
     inkoop:   { label:'Inkoop',    svg:'<circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M2 3h3l2.2 12.3a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>', cap:'menu' },
@@ -3903,7 +3908,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -5676,6 +5681,164 @@
     });
   }
 
+  /* ================= winkelvloer + zorgbalie in de zaak-app =================
+     Dezelfde vloerfuncties als op de personeels-PDA, maar dan in de eigen
+     app van de zaak: wie inlogt bij een modehuis krijgt de Winkelvloer als
+     app op het springboard, wie inlogt bij een spa of kliniek de Zorgbalie.
+     Zo landt elk account vanzelf in de juiste app met de juiste werkvloer. */
+
+  // ---- de winkelvloer: mobiele kassa, voorraad, paskamer, klant erbij ----
+  let wvRetail = null;   // vloer-toestand (voorraad, paskamer, apart)
+  let wvKlant = null;    // geopend klantdossier
+  let wvCart = [];       // bon: [{vsku, naam, kleur, maat, price, aantal}]
+  async function laadWinkelvloer(){
+    if (!has('retail') || !API.live) return;
+    try { wvRetail = (await API.call('/supplier/retail', {})).retail; }
+    catch(e){ wvRetail = { artikelen:[], paskamer:[], apart:[], klanten:[], stats:{} }; }
+    renderWinkelvloer();
+  }
+  function wvInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" style="flex:1;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:10px;padding:0.7rem 0.85rem;font-size:0.9rem;color:var(--txt);outline:none;font-family:inherit;">'; }
+  function wvKlantKaart(k){
+    const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
+    return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;margin-top:0.5rem;">'+
+      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
+      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('wv.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
+      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
+      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;margin-top:0.35rem;">💛 '+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
+      '</div>';
+  }
+  function renderWinkelvloer(){
+    const wrap = $('#wvWrap'); if (!wrap) return;
+    if (!has('retail')){ wrap.innerHTML = ''; return; }
+    if (!wvRetail){ wrap.innerHTML = '<div class="empty">…</div>'; laadWinkelvloer(); return; }
+    const cartTot = wvCart.reduce((n, r) => n + r.price * r.aantal, 0);
+    let html = '';
+    html += '<div class="card"><div class="tt-h" style="display:flex;justify-content:space-between;align-items:center;">'+T('wv.kassa','Mobiele kassa')+
+      (wvKlant?'<span style="color:var(--gold);font-size:0.7rem;">'+esc(wvKlant.codenaam||wvKlant.key)+'</span>':'')+'</div>'+
+      (wvCart.length ? '<div style="margin-top:0.5rem;">'+wvCart.map((r,i) =>
+        '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.naam)+' · '+esc(r.kleur)+' · '+esc(r.maat)+'</span><span class="pr">'+eur(r.price)+' × '+r.aantal+'</span></div>'+
+        '<button class="obtn" data-wvdel="'+i+'" style="margin-top:0.3rem;">✕ '+T('wv.weg','Weg')+'</button></div>').join('')+
+        '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.6rem;"><span>'+T('wv.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;"><button class="obtn primary" data-wvbetaal="rtgpay">RTG Pay</button>'+
+        '<button class="obtn" data-wvbetaal="contant">'+T('wv.contant','Contant')+'</button>'+
+        '<button class="obtn" id="wvLeeg">'+T('wv.leeg','Bon leegmaken')+'</button></div>'
+        : '<div class="empty">'+T('wv.leegbon','Zoek een artikel en tik + om het op de bon te zetten.')+'</div>')+'</div>';
+    html += '<div class="card"><div class="tt-h">'+T('wv.zoek','Voorraad opzoeken')+'</div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+wvInput('wvZoek', T('wv.zoekph','Naam, kleur of maat…'))+'<button class="obtn primary" id="wvZoekBtn">'+T('wv.zoekbtn','Zoek')+'</button></div>'+
+      '<div id="wvZoekUit" style="margin-top:0.5rem;"></div></div>';
+    const pk = wvRetail.paskamer || [];
+    html += '<div class="card"><div class="tt-h">'+T('wv.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
+      (pk.length ? pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">🚪 '+esc(v.artikelNaam)+' · '+esc(v.maat)+'</span></div>'+
+        '<div class="ds">'+esc(v.codenaam||'Gast')+' · '+esc(v.kleur)+(v.paskamer?' · '+esc(v.paskamer):'')+'</div>'+
+        '<button class="obtn primary" data-wvbreng="'+v.id+'" style="margin-top:0.35rem;">'+T('wv.breng','Gebracht')+'</button></div>').join('')
+        : '<div class="empty">'+T('wv.geenpk','Geen open verzoeken.')+'</div>')+'</div>';
+    const ap = wvRetail.apart || [];
+    if (ap.length) html += '<div class="card"><div class="tt-h">'+T('wv.apart','Apart gelegd')+' ('+ap.length+')</div>'+
+      ap.map(r => '<div class="mitem"><div class="r1"><span class="nm">🛍 '+esc(r.artikelNaam)+' · '+esc(r.maat)+'</span></div><div class="ds">'+esc(r.codenaam||r.key)+' · '+T('wv.tot','tot')+' '+esc(r.tot)+'</div></div>').join('')+'</div>';
+    html += '<div class="card"><div class="tt-h">'+T('wv.klant','Klant erbij pakken')+'</div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+wvInput('wvKlantKey', T('wv.klantph','Codenaam of sleutel van het lid'))+'<button class="obtn primary" id="wvKlantBtn">'+T('wv.open','Open')+'</button></div>'+
+      '<div id="wvKlantUit">'+(wvKlant?wvKlantKaart(wvKlant):'')+'</div></div>';
+    wrap.innerHTML = html;
+    wvBind(wrap);
+  }
+  function wvBind(wrap){
+    wrap.querySelectorAll('[data-wvdel]').forEach(b => b.addEventListener('click', () => { wvCart.splice(Number(b.dataset.wvdel), 1); renderWinkelvloer(); }));
+    const leeg = wrap.querySelector('#wvLeeg'); if (leeg) leeg.addEventListener('click', () => { wvCart = []; renderWinkelvloer(); });
+    wrap.querySelectorAll('[data-wvbetaal]').forEach(b => b.addEventListener('click', async () => {
+      if (!wvCart.length) return;
+      const body = { method: b.dataset.wvbetaal, regels: wvCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
+      if (body.method === 'rtgpay'){
+        const c = window.prompt(T('wv.paycode','Betaalcode van de klant (uit de app):'));
+        if (!c) return;
+        body.payCode = c.trim().toUpperCase();
+      }
+      if (wvKlant) body.klantKey = wvKlant.key;
+      try {
+        const r = await API.call('/supplier/retail/verkoop', body);
+        toast('✅ '+T('wv.verkocht','Verkocht')+' · '+eur(r.sale.total));
+        wvCart = [];
+        if (wvKlant){ try { wvKlant = (await API.call('/supplier/retail/klant', { key: wvKlant.key })).klant; } catch(e){} }
+        await laadWinkelvloer();
+      } catch(e){ toast(e.message); }
+    }));
+    const doeZoek = async () => {
+      const uit = wrap.querySelector('#wvZoekUit');
+      try {
+        const r = await API.call('/supplier/retail/zoek', { q: wrap.querySelector('#wvZoek').value });
+        uit.innerHTML = r.resultaten.length ? r.resultaten.map(v =>
+          '<div class="mitem"><div class="r1"><span class="nm">'+(v.voorraad>0?'👕':'🚫')+' '+esc(v.artikel)+'</span><span class="pr">'+eur(v.price)+'</span></div>'+
+          '<div class="ds">'+esc(v.kleur)+' · '+esc(v.maat)+' · '+T('wv.voorraad','voorraad')+' '+v.voorraad+'</div>'+
+          (v.voorraad>0?'<div style="display:flex;gap:0.35rem;margin-top:0.35rem;"><button class="obtn primary" data-wvadd="'+esc(v.vsku)+'" data-nm="'+esc(v.artikel)+'" data-kl="'+esc(v.kleur)+'" data-mt="'+esc(v.maat)+'" data-pr="'+v.price+'">+ '+T('wv.opbon','Op de bon')+'</button>'+
+          '<button class="obtn" data-wvapart="'+esc(v.vsku)+'">'+T('wv.legapart','Apart')+'</button></div>':'')+'</div>').join('')
+          : '<div class="empty">'+T('wv.niets','Niets gevonden.')+'</div>';
+        uit.querySelectorAll('[data-wvadd]').forEach(b => b.addEventListener('click', () => {
+          const bestaand = wvCart.find(r => r.vsku === b.dataset.wvadd);
+          if (bestaand) bestaand.aantal++;
+          else wvCart.push({ vsku: b.dataset.wvadd, naam: b.dataset.nm, kleur: b.dataset.kl, maat: b.dataset.mt, price: Number(b.dataset.pr), aantal: 1 });
+          renderWinkelvloer();
+        }));
+        uit.querySelectorAll('[data-wvapart]').forEach(b => b.addEventListener('click', async () => {
+          if (!wvKlant) return toast(T('wv.eerstklant','Pak eerst een klant erbij.'));
+          try { await API.call('/supplier/retail/apart', { key: wvKlant.key, vsku: b.dataset.wvapart }); toast(T('wv.apartok','Apart gelegd voor de klant.')); await laadWinkelvloer(); } catch(e){ toast(e.message); }
+        }));
+      } catch(e){ toast(e.message); }
+    };
+    const zb2 = wrap.querySelector('#wvZoekBtn'); if (zb2) zb2.addEventListener('click', doeZoek);
+    const zi = wrap.querySelector('#wvZoek'); if (zi) zi.addEventListener('keydown', e => { if (e.key === 'Enter') doeZoek(); });
+    wrap.querySelectorAll('[data-wvbreng]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/retail/paskamer/breng', { id: b.dataset.wvbreng }); toast(T('wv.gebracht','Gebracht.')); await laadWinkelvloer(); } catch(e){ toast(e.message); }
+    }));
+    const kb = wrap.querySelector('#wvKlantBtn');
+    const openKlant = async () => {
+      const key = wrap.querySelector('#wvKlantKey').value.trim(); if (!key) return;
+      try { wvKlant = (await API.call('/supplier/retail/klant', { key })).klant; renderWinkelvloer(); }
+      catch(e){ toast(e.message); }
+    };
+    if (kb) kb.addEventListener('click', openKlant);
+    const ki = wrap.querySelector('#wvKlantKey'); if (ki) ki.addEventListener('keydown', e => { if (e.key === 'Enter') openKlant(); });
+  }
+
+  // ---- de zorgbalie: de behandelaar-agenda van een spa of kliniek ----
+  let zbLev = null, zbLevDatum = null;
+  async function laadZorgbalieLev(){
+    if (!has('care') || !API.live) return;
+    try { zbLev = await API.call('/supplier/care/agenda', zbLevDatum ? { datum: zbLevDatum } : {}); }
+    catch(e){ zbLev = null; }
+    renderZorgbalieLev();
+  }
+  function renderZorgbalieLev(){
+    const wrap = $('#zbWrap'); if (!wrap) return;
+    if (!has('care')){ wrap.innerHTML = ''; return; }
+    if (!zbLev){ wrap.innerHTML = '<div class="empty">…</div>'; laadZorgbalieLev(); return; }
+    const dagen = [];
+    for (let i = 0; i < 7; i++){
+      const dt = new Date(Date.now() + i * 86400000).toISOString().slice(0, 10);
+      const aan = dt === zbLev.datum;
+      dagen.push('<button class="obtn'+(aan?' primary':'')+'" data-zblevdag="'+dt+'"'+(aan?' aria-current="date"':'')+'>'+
+        (i===0 ? T('zb.vandaag','vandaag') : dt.slice(8)+'/'+dt.slice(5,7))+'</button>');
+    }
+    const perBehandelaar = (zbLev.behandelaars || []).map(b => {
+      const eigen = (zbLev.afspraken || []).filter(a => a.behandelaarId === b.id);
+      return '<div class="card"><div class="tt-h">'+esc(b.naam)+' · '+esc(b.functie)+'</div>'+
+        (eigen.length ? eigen.map(a =>
+          '<div class="mitem"><div class="r1"><span class="nm" style="font-variant-numeric:tabular-nums;">'+(a.soort==='medisch'?'🩺':'🧖')+' '+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</span><span class="pr">'+eur(a.prijs)+'</span></div>'+
+          '<div class="ds">'+T('zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min</div>'+
+          (a.zorg ? '<div class="ds" style="color:#E2B93B;">⚠ '+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
+          (a.intake ? '<div class="ds" style="color:#E2B93B;">🩺 '+esc(a.intake)+'</div>' : '')+
+          (a.status === 'afgerond' ? '<div class="ds" style="color:var(--green,#4C9A75);">✅ '+T('zb.klaar','Afgerond')+'</div>'
+            : '<button class="obtn primary" data-zblevklaar="'+esc(a.ref)+'" style="margin-top:0.35rem;">'+T('zb.afronden','Afronden')+'</button>')+
+          '</div>').join('')
+        : '<div class="empty">'+T('zb.leeg','Geen afspraken op deze dag.')+'</div>')+
+      '</div>';
+    }).join('');
+    wrap.innerHTML = '<div class="card"><div class="tt-h">'+esc(zbLev.aanbieder || '')+'</div>'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.55rem;">'+dagen.join('')+'</div></div>' + perBehandelaar;
+    wrap.querySelectorAll('[data-zblevdag]').forEach(b => b.addEventListener('click', () => { zbLevDatum = b.dataset.zblevdag; laadZorgbalieLev(); }));
+    wrap.querySelectorAll('[data-zblevklaar]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/care/afronden', { ref: b.dataset.zblevklaar }); toast('✅ '+T('zb.klaar','Afgerond')); laadZorgbalieLev(); }
+      catch(e){ toast(e.message); }
+    }));
+  }
   // ---- AI-assistent ----
   let aiMsgs = [];
   function renderAIChips(){
@@ -6130,7 +6293,7 @@
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
     source.addEventListener('rtc', e => { if (window.TeamCall) TeamCall.event(e); });
     source.addEventListener('dm', e => { if (window.CollegaChat) CollegaChat.event(e); });
-    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); if (fact) laadFacturen(); laadAgendaSup(); });
+    source.addEventListener('sync', e => { refresh(); if (has('retail') && retailData) laadRetail(); if (has('retail') && wvRetail) laadWinkelvloer(); if (has('care') && zbLev) laadZorgbalieLev(); if (has('charter') && charters !== null) laadCharters(); if (paspoortData) laadPaspoort(); if (has('boerderij') && boer) laadBoerderij(); if (has('creator') && cr) laadCreator(); if (sw) laadSamenwerking(); if (fact) laadFacturen(); laadAgendaSup(); });
     // de keuken praat met de bediening: bon compleet op de pas -> belletje op
     // elk open scherm van de zaak (bedieningspost, kassa, kantoor)
     source.addEventListener('pas', e => {

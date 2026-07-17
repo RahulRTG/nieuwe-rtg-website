@@ -282,6 +282,13 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
       if (b.error) return { tekst: 'De tickets staan klaar (' + r.ticket.ref + '), maar het afrekenen lukte niet: ' + b.error, gedaan: true };
       return { tekst: 'Geboekt en betaald: ' + w.oms + ' op ' + w.datum + ' om ' + w.tijd + ', samen ' + eur((r.ticket.price || 0) * 100) + '. Uw entreecode is ' + r.ticket.code + '; laat hem bij de deur oplichten.', gedaan: true };
     }
+    // een behandeling: boeken en direct afrekenen (het zorgprofiel reist mee)
+    if (w.soort === 'behandeling' && sess && acties && acties.boekBehandeling) {
+      const r = acties.boekBehandeling(sess, { aanbiederId: w.aanbiederId, behandelingId: w.behandelingId, datum: w.datum, tijd: w.tijd, codenaam });
+      if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
+      return { tekst: 'Geboekt en betaald: ' + w.oms + ' op ' + w.datum + ' om ' + w.tijd + ' (referentie ' + r.boeking.ref + '). Uw zorgprofiel reisde mee.' +
+        (w.medisch ? ' Wilt u de behandelaar vooraf meer vertellen? Deel een intake in de Care-tab.' : ''), gedaan: true };
+    }
     // een rit: aanvragen en (bij vooraf betalen) de offerte direct voldoen
     if (w.soort === 'rit' && sess && acties && acties.vraagRit) {
       const r = acties.vraagRit(sess, { supplierCode: w.supplierCode, to: w.to, toCode: w.toCode, passengers: w.personen, date: w.datum, time: w.tijd });
@@ -349,7 +356,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     if (/\bwat (kun|kan) (je|jij|u)\b/i.test(q) || /^help[!?.]?$/i.test(q)) {
       const basis = 'Ik onthoud wat u vertelt ("onthoud dat..."), vertel precies wat ik weet ("wat weet je over mij"), wis alles op verzoek en geef seintjes bij alles wat nadert.';
       if (!sess) return { ok: true, antwoord: basis + ' Vraag me gerust naar de actuele stand van uw dienst.', pakte: true };
-      return { ok: true, antwoord: basis + ' En ik regel het ook: zoeken door het hele aanbod ("zoek sushi"), uw dag plannen ("plan mijn dag"), een tafel reserveren of annuleren, bestellen en afrekenen ("bestel 2 sangria bij Sunset Ibiza"), tickets boeken ("boek 2 tickets voor de sunset cruise morgen"), een taxi of transfer regelen, uw 24-uursblok plannen, uw saldo opvragen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw "ja".', pakte: true };
+      return { ok: true, antwoord: basis + ' En ik regel het ook: zoeken door het hele aanbod ("zoek sushi"), uw dag plannen ("plan mijn dag"), een tafel reserveren of annuleren, bestellen en afrekenen ("bestel 2 sangria bij Sunset Ibiza"), tickets boeken ("boek 2 tickets voor de sunset cruise morgen"), een behandeling in de spa of kliniek boeken ("boek een massage bij Zenith morgen om 15:00"), een taxi of transfer regelen, uw 24-uursblok plannen, uw saldo opvragen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw "ja".', pakte: true };
     }
     /* ---- doen: Fluister voert het ook echt uit, alleen voor het lid zelf
        (sess reist alleen mee op de leden-route, nooit voor personeel).
@@ -430,6 +437,37 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
         p.wacht = { soort: 'ticket', supplierCode: zaak.code, activiteitId: act.id, datum, tijd, personen, oms, at: nu() };
         save();
         return klaar('Even checken: ' + oms + ' op ' + datum + ' om ' + tijd + ', samen ' + eur(Math.round((act.prijs || 0) * personen * 100)) + '. Ik boek en reken direct af via RTG Pay. Zeg "ja" en de entreecode komt eraan; "nee" en het gaat niet door.', false, true);
+      }
+      // "boek een aromamassage bij Zenith morgen om 15:00": een behandeling
+      // in de zorg & welzijn-toren; geld, dus eerst een voorstel
+      if (acties && acties.careBoek && /\b(boek|regel|maak)\b/i.test(q) &&
+          /\b(massage|behandeling|afspraak|consult|fysio|spa|wellness|gezicht)\w*/i.test(q)) {
+        const ov = acties.careOverzicht(key);
+        const ql = q.toLowerCase();
+        let aanb = null, beh = null;
+        for (const a of ov.aanbieders) {
+          for (const b of a.behandelingen) {
+            if ((b.naam || '').toLowerCase().split(/[^a-z0-9]+/).some(w => w.length > 3 && ql.includes(w))) { aanb = a; beh = b; break; }
+          }
+          if (beh) break;
+        }
+        // ook op zaaknaam matchen als de behandeling niet letterlijk genoemd is
+        if (!beh) {
+          aanb = ov.aanbieders.find(a => (a.naam || '').toLowerCase().split(/\s+/).some(w => w.length > 3 && ql.includes(w)));
+          beh = aanb && aanb.behandelingen[0];
+        }
+        if (!beh) return klaar('Welke behandeling en waar? Bijvoorbeeld: ' + ov.aanbieders.flatMap(a => a.behandelingen.slice(0, 1).map(b => '"' + b.naam + '" bij ' + a.naam)).slice(0, 3).join(', ') + '.');
+        const datum = datumInZin(q);
+        if (!datum) return klaar('Voor welke dag? Zeg bijvoorbeeld: "boek een ' + beh.naam.toLowerCase() + ' bij ' + aanb.naam + ' morgen om ' + (beh.tijden[0] || '15:00') + '".');
+        const tm = q.match(/(\d{1,2})[:.](\d{2})/);
+        const tijd = (tm && beh.tijden.includes(tm[1].padStart(2, '0') + ':' + tm[2])) ? tm[1].padStart(2, '0') + ':' + tm[2] : beh.tijden[0];
+        if (!tijd) return klaar('Op welk tijdstip? ' + aanb.naam + ' heeft voor ' + beh.naam + ' geen vrije tijden meer die dag.');
+        const oms = beh.naam + ' bij ' + aanb.naam;
+        p.wacht = { soort: 'behandeling', aanbiederId: aanb.id, behandelingId: beh.id, datum, tijd, oms, medisch: beh.soort === 'medisch', at: nu() };
+        save();
+        return klaar('Even checken: ' + oms + ' op ' + datum + ' om ' + tijd + ' (' + beh.duurMin + ' min), ' + eur(Math.round((beh.prijs || 0) * 100)) + '. Ik boek en reken direct af via RTG Pay; uw zorgprofiel reist mee.' +
+          (beh.soort === 'medisch' ? ' Voor een medisch consult kunt u vooraf apart een intake delen in de Care-tab.' : '') +
+          ' Zeg "ja" en het staat vast; "nee" en het gaat niet door.', false, true);
       }
       // "regel een taxi naar Sal de Mar (om 23:00, met 4 personen)": de
       // offerte volgt het tarief van de vervoerder; betalen na uw "ja"

@@ -2707,6 +2707,9 @@ Object.assign(kern, require('./kern/hoteldorp')({ db, save, crypto, schoon, sseT
 Object.assign(kern, require('./kern/gastzorg')({ db, save, crypto, schoon, notify, notifySupplier, sseToSupplier, sseToCustomer, findSupplier, haversine, etaMinutes }));
 // Toren 3, RTG Shared Assets: 300 tickets per object, Access en Asset
 Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify, pay: kern.pay }));
+// Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
+// dat meereist en een aparte, veilige intake-deling per aanbieder.
+Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
 /* Lidacties (kern/lidacties.js): de transactiefuncties van het lid, als
    kern-module met expliciete afhankelijkheden. Ze bedienen de app-routes
@@ -2722,7 +2725,11 @@ Object.assign(kern, require('./kern/lidacties')({
 kern.butlerActies = {
   plaatsOrder: kern.plaatsOrderVoor, betaalOrder: kern.betaalOrderVoor,
   koopTicket: kern.koopTicketVoor, betaalBoeking: kern.betaalBoekingVoor,
-  vraagRit: kern.vraagRitVoor, betaalRit: kern.betaalRitVoor
+  vraagRit: kern.vraagRitVoor, betaalRit: kern.betaalRitVoor,
+  // Toren 4: een behandeling boeken en direct afrekenen, via exact dezelfde
+  // functies als de app-knoppen (het zorgprofiel reist mee)
+  careOverzicht: kern.careOverzicht, careBoek: kern.careBoek,
+  boekBehandeling: (session, body) => kern.boekBehandelingActie(session, body, verdienPunten)
 };
 Object.assign(kern, require('./kern/fluister')({
   db, save, schoon, anthropic, notify,

@@ -324,30 +324,39 @@ async function zaaiActiviteit(pool) {
   let totaal = 0;
   const rssReeks = [];
   let stormEind = Date.now() + SOAK_MS;   // wordt per ronde gezet (hoofd-soak + lek-rondes)
-  async function werker() {
-    while (Date.now() < stormEind) {
-      const r = routes[rint(routes.length)];
-      // 1 op 5: bewust een verkeerd-rol token (rol-scheiding toetsen); anders het juiste
-      const kruis = r.rol !== 'open' && rint(5) === 0;
-      const rol = kruis ? rkeuze(['member', 'supplier', 'office'].filter(x => x !== r.rol)) : r.rol;
-      const tk = rkeuze(tokVoor[rol].length ? tokVoor[rol] : tokVoor.member);
-      const st = await verzoek(r.method, r.pad, tk, r.method === 'GET' ? null : chaosBody(0));
-      totaal++; noteerLat(st.ms);
-      // per-endpoint latentie (om de echte trage paden te vinden, niet te gokken)
-      const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0 }; pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
-      if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
-      const s = st.status;
-      // Volgorde is cruciaal en eerlijk: 503 is de conventie voor "functie uit"
-      // (geen serverfout) en 429 is rate-limiting -- die MOETEN vóór de generieke
-      // >=500-check, anders telt een nette 503 ten onrechte als serverfout.
-      if (s === 0) buckets.stuk++;
-      else if (s === 503) buckets.r503++;
-      else if (s === 429) buckets.r429++;
-      else if (s >= 500) { buckets.s5xx++; vijfxx.set(r.pad, (vijfxx.get(r.pad) || 0) + 1); }
-      else if (s >= 400) buckets.herleid4xx++;
-      else { buckets.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.method + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
-      await new Promise(r => setTimeout(r, 1 + rint(4)));
-    }
+  async function raak(r, magKruisen) {
+    // 1 op 5: bewust een verkeerd-rol token (rol-scheiding toetsen); anders het juiste
+    const kruis = magKruisen && r.rol !== 'open' && rint(5) === 0;
+    const rol = kruis ? rkeuze(['member', 'supplier', 'office'].filter(x => x !== r.rol)) : r.rol;
+    const tk = rkeuze(tokVoor[rol].length ? tokVoor[rol] : tokVoor.member);
+    const st = await verzoek(r.method, r.pad, tk, r.method === 'GET' ? null : chaosBody(0));
+    totaal++; noteerLat(st.ms);
+    // per-endpoint latentie (om de echte trage paden te vinden, niet te gokken)
+    const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0 }; pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
+    if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
+    const s = st.status;
+    // Volgorde is cruciaal en eerlijk: 503 is de conventie voor "functie uit"
+    // (geen serverfout) en 429 is rate-limiting -- die MOETEN vóór de generieke
+    // >=500-check, anders telt een nette 503 ten onrechte als serverfout.
+    if (s === 0) buckets.stuk++;
+    else if (s === 503) buckets.r503++;
+    else if (s === 429) buckets.r429++;
+    else if (s >= 500) { buckets.s5xx++; vijfxx.set(r.pad, (vijfxx.get(r.pad) || 0) + 1); }
+    else if (s >= 400) buckets.herleid4xx++;
+    else { buckets.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.method + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
+    await new Promise(res => setTimeout(res, 1 + rint(4)));
+  }
+  // Dekking per CONSTRUCTIE, niet per kansspel: elke werker veegt eerst zijn
+  // deel van de endpoints SLO_DEKKING keer systematisch (juiste rol), daarna
+  // pas willekeurige chaos. Bij een lage doorvoer kon een enkel endpoint
+  // anders puur door toeval onder de drempel blijven; het DEKKING-oordeel
+  // toetst nu wat het moet toetsen: elk endpoint antwoordt N keer binnen de
+  // soak (en faalt dus alleen nog op echte onbereikbaarheid of timeouts).
+  async function werker(ix) {
+    const mijnDeel = routes.filter((_, j) => j % WERKERS === ix);
+    for (let ronde = 0; ronde < SLO_DEKKING; ronde++)
+      for (const r of mijnDeel) { if (Date.now() >= stormEind) break; await raak(r, false); }
+    while (Date.now() < stormEind) await raak(routes[rint(routes.length)], true);
   }
   // Vloer bij een verse, rustige server (geforceerde GC -> heapUsed).
   const vloerVers = await heapNaGc(child.pid);
@@ -358,7 +367,7 @@ async function zaaiActiviteit(pool) {
   const kanarie = spawn(process.execPath, [path.join(__dirname, 'ruis-canary.js'), KANARIE_UIT], { stdio: 'ignore' });
   const mon = setInterval(() => { const m = rssMB(child.pid); if (m) rssReeks.push(m); }, 3000);
   stormEind = Date.now() + SOAK_MS;
-  await Promise.all(Array.from({ length: WERKERS }, werker));
+  await Promise.all(Array.from({ length: WERKERS }, (_, ix) => werker(ix)));
   clearInterval(mon);
   try { kanarie.kill('SIGKILL'); } catch (e) {}
   let soakRuis = null; try { soakRuis = JSON.parse(fs.readFileSync(KANARIE_UIT, 'utf8')); } catch (e) {}

@@ -24,3 +24,19 @@ name: "RTG CodeQL"
 paths:
   - server
   - scripts
+
+# Twee query's leveren in deze codebase alleen bewezen false positives; ze zijn
+# met de hand geverifieerd en hier uitgesloten. Al het echte werk blijft
+# gedekt: alle andere beveiligingsquery's draaien onverkort.
+query-filters:
+  # veiligGelijk() in kern/util.js is een CONSTANTE-TIJD-vergelijking (double
+  # HMAC), geen wachtwoord-opslag. Echte wachtwoorden en pincodes gaan via
+  # scrypt + salt (accounts.js, foundation.js hashPin). De query ziet alleen
+  # "wachtwoord -> sha2" en kan opslag niet van een vergelijking onderscheiden.
+  - exclude:
+      id: js/insufficient-password-hash
+  # social.js gebruikt HMAC-SHA1 omdat dat het door coturn voorgeschreven
+  # REST-credentialformaat is (RFC 5766, "use-auth-secret"). HMAC-SHA1 is niet
+  # zwak; een andere hash breekt de TURN-authenticatie.
+  - exclude:
+      id: js/weak-cryptographic-algorithm

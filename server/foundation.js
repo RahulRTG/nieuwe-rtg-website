@@ -508,7 +508,7 @@ router.post('/gezin/inloggen', (req, res) => {
 
 router.post('/gezin/profiel/kies', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
-  const p = g.profielen[String(req.body.profielId || '')];
+  const p = eigenVeld(g.profielen, req.body.profielId);
   if (!p) return res.status(404).json({ error: 'Dit profiel bestaat niet meer.' });
   const bucket = 'pin:' + g.code + ':' + p.id;
   if (p.pin && p.pin.hash) {
@@ -1185,7 +1185,7 @@ router.get('/gezin/:code/kanaal', (req, res) => {
 
 router.post('/gezin/chat', (req, res) => {
   const s = sessieVan(req, res); if (!s) return;
-  const naarP = s.g.profielen[String(req.body.naar || '')];
+  const naarP = eigenVeld(s.g.profielen, req.body.naar);
   if (!naarP) return res.status(404).json({ error: 'Dit gezinslid bestaat niet.' });
   const tekst = schoon(req.body.tekst, 1000);
   if (!tekst) return res.status(400).json({ error: 'Schrijf een bericht.' });
@@ -1224,7 +1224,7 @@ router.get('/gezin/:code/chats', (req, res) => {
 // (beeld)bellen: WebRTC-signaal (ring/accept/offer/answer/ice/hangup) doorgeven
 router.post('/gezin/bel', (req, res) => {
   const s = sessieVan(req, res); if (!s) return;
-  const naarP = s.g.profielen[String(req.body.naar || '')];
+  const naarP = eigenVeld(s.g.profielen, req.body.naar);
   if (!naarP) return res.status(404).json({ error: 'Onbekend gezinslid.' });
   const kind = String(req.body.kind || '').slice(0, 12);
   gezinStuur(s.g.code, 'bel', { van: s.p.id, vanNaam: s.p.naam, vanAvatar: s.p.avatar, naar: naarP.id, kind, video: !!req.body.video, payload: req.body.payload || null }, c => c.profielId === naarP.id);

@@ -121,6 +121,10 @@
     }).join('');
     html += '</div>';
 
+    // de PDA van dit bedrijf: personeel opent met deze link (of QR) meteen
+    // het eigen team, zonder sector- en bedrijfskeuze
+    html += '<a class="obtn" style="text-decoration:none;display:inline-block;margin:0.2rem 0 0.8rem;" href="/apps/personeel.html?bedrijf='+encodeURIComponent(S.code)+'">👤 '+T('team.pdalink','Personeels-app van dit bedrijf')+'</a>';
+
     // activiteit
     html += '<div class="card"><div class="tt-h">'+T('team.activity','Wie deed wat')+'</div>';
     html += activity.length ? activity.map(e =>

@@ -58,6 +58,12 @@
     try { const c = localStorage.getItem('rtg_pda_bedrijf'); return (c && BEDRIJVEN[c]) ? c : null; } catch(e){ return null; }
   }
   function stepStart(){
+    // dezelfde een-ingang-gedachte als de pas-apps en de sector-apps: met
+    // ?bedrijf=CODE (bijv. vanuit de leverancier-app of een QR in de zaak)
+    // staat deze PDA meteen op dat bedrijf en opent het eigen team; daarna
+    // onthoudt het apparaat het bedrijf en slaat hij de keuze altijd over
+    const qb = String(new URLSearchParams(location.search).get('bedrijf') || '').toUpperCase();
+    if (qb && BEDRIJVEN[qb]){ stepWie(null, qb); return; }
     const vast = pdaBedrijf();
     if (vast) stepWie(null, vast);
     else stepSector();

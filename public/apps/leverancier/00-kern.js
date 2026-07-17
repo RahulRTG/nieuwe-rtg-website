@@ -77,6 +77,27 @@
   const SECTOR = (new URLSearchParams(location.search).get('sector') || '').toLowerCase();
   const SDEF = SECTOR_DEF[SECTOR] || null;
 
+  /* De zaak weet zelf bij welke sector-app hij hoort: na het inloggen (of met
+     een bewaarde sessie) opent meteen de juiste ingang, net zoals een
+     ledenaccount zijn eigen pas-app opent. Demo-partners herkennen we aan hun
+     code, alle andere zaken aan hun type. */
+  const TYPE2SECTOR = { apartment: 'appartement', jet: 'privejet', activiteit: 'activiteiten', verhuur: 'autoverhuur' };
+  function sectorVan(sup){
+    if (!sup) return null;
+    for (const k of Object.keys(SECTOR_DEF)){
+      if (!SECTOR_DEF[k].legacy && SECTOR_DEF[k].codes.includes(sup.code)) return k;
+    }
+    const t = String(sup.type || '').toLowerCase();
+    const k2 = TYPE2SECTOR[t] || t;
+    return (SECTOR_DEF[k2] && !SECTOR_DEF[k2].legacy) ? k2 : null;
+  }
+  function naarEigenSector(sup){
+    const doel = sectorVan(sup);
+    if (!doel || SECTOR === doel) return false;
+    location.replace(location.pathname + '?sector=' + doel);
+    return true;
+  }
+
   const TABDEF = {
     home:     { label:'Overzicht', svg:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>' },
     orders:   { label:'Orders',    svg:'<path d="M6 2h9l3 3v17H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>', cap:'orders' },
@@ -435,6 +456,8 @@
       return false;
     }
     try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
+    // de zaak opent zijn eigen sector-app (behalve midden in een kassa-station)
+    if (!pendingStation && naarEigenSector(S)) return true;
     if (pendingStation){
       try { localStorage.setItem('rtg_sup_station', pendingStation); } catch(e){}
       enterStation(pendingStation);
@@ -464,8 +487,10 @@
     API.token = t;
     try {
       const st = (await API.call('/supplier/state')).state;
-      // In een sector-app alleen herstellen als de sessie bij deze sector hoort;
-      // het token blijft bewaard voor de app waar het wel bij hoort.
+      // de bewaarde sessie weet bij welke sector hij hoort: verkeerde (of
+      // ontbrekende) ingang stuurt meteen door naar de eigen sector-app
+      if (st.supplier && naarEigenSector(st.supplier)) return;
+      // vangnet voor zaken zonder eigen sector-ingang
       if (SDEF && st.supplier && !SDEF.codes.includes(st.supplier.code)){ API.token = null; return; }
       applyState(st);
       let stn = null; try { stn = localStorage.getItem('rtg_sup_station'); } catch(e2){}

@@ -167,6 +167,9 @@ const STAFF_SEED = {
   MOTOISLA: [['Jordi Pons', 'manager', 'Verhuurmanager'], ['Mia Sastre', 'staff', 'Uitgifte & inname']],
   FESTA: [['Luz Romero', 'manager', 'Eventproducent'], ['Sam Ortega', 'staff', 'Crew & entree'], ['Vera Lind', 'staff', 'VIP-host']],
   SERENA: [['Anouk Visser', 'manager', 'Spa manager'], ['Carla Nunez', 'staff', 'Therapeut'], ['Iris Blom', 'staff', 'Therapeut']],
+  // zorg & welzijn: de zorgbalie draait op de PDA, dus ook hier demo-personeel
+  ZENITH: [['Nadia Sol', 'manager', 'Massagetherapeut'], ['Bram Veer', 'staff', 'Huidtherapeut']],
+  CLARA: [['Elena Ruiz', 'manager', 'Huisarts'], ['Tomas Blad', 'staff', 'Fysiotherapeut']],
   ORODOR: [['Esteban Oro', 'manager', 'Meester-juwelier'], ['Lia Costa', 'staff', 'Salon & taxatie']],
   LIENZO: [['Valeria Pinto', 'manager', 'Galeriehouder'], ['Hugo Ram', 'staff', 'Exposities & entree']]
 };

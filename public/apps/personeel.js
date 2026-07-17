@@ -9,6 +9,7 @@
     { id:'verblijf',icon:'🏨', nl:'Verblijf', en:'Stays', sub:'Hotels, appartementen, villa\'s', codes:['HOSHI','SAKURA','LUNARA'] },
     { id:'vervoer', icon:'🚘', nl:'Vervoer', en:'Transport', sub:'Taxi\'s, privéjets en helikopters', codes:['MKKX','JETAG','IBIZAIR'] },
     { id:'zzp', icon:'🧑‍🎨', nl:'Zelfstandig', en:'Independent', sub:'Mode, health, wellness en meer', codes:['AYAKA','KAITO','SERENA'] },
+    { id:'zorg', icon:'🧖', nl:'Zorg & welzijn', en:'Care & wellness', sub:'Spa\'s, klinieken, de zorgbalie', codes:['ZENITH','CLARA'] },
     { id:'activiteiten', icon:'🎟️', nl:'Activiteiten', en:'Experiences', sub:'Tours, musea, events, galeries', codes:['ESVEDRA','MACE','FESTA','LIENZO'] },
     { id:'verhuur', icon:'🚗', nl:'Verhuur', en:'Rentals', sub:'Auto\'s, scooters, motoren, quads', codes:['ISLAREN','MOTOISLA'] },
     { id:'vastgoed', icon:'🏡', nl:'Vastgoed', en:'Real estate', sub:'Makelaar, bezichtigingen', codes:['IBIZALIV'] },
@@ -36,6 +37,7 @@
     FUEGO:{ name:'Chef Fuego', icon:'👨‍🍳' }, LUNARA:{ name:'Casa Lunara', icon:'🌴' },
     MOTOISLA:{ name:'Moto Isla', icon:'🛵' }, FESTA:{ name:'Festa Ibiza Events', icon:'🎪' },
     SERENA:{ name:'Serena Spa', icon:'🧖' }, ORODOR:{ name:"Casa d'Oro", icon:'💎' },
+    ZENITH:{ name:'Zenith Spa & Wellness', icon:'🧖' }, CLARA:{ name:'Kliniek Clara Ibiza', icon:'🩺' },
     LIENZO:{ name:'Galeria Lienzo', icon:'🖼️' }
   };
 
@@ -62,17 +64,23 @@
     // ?bedrijf=CODE (bijv. vanuit de leverancier-app of een QR in de zaak)
     // staat deze PDA meteen op dat bedrijf en opent het eigen team; daarna
     // onthoudt het apparaat het bedrijf en slaat hij de keuze altijd over
-    const qb = String(new URLSearchParams(location.search).get('bedrijf') || '').toUpperCase();
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('kantoor') != null){ stepKantoor(); return; }
+    const qb = String(qs.get('bedrijf') || '').toUpperCase();
     if (qb && BEDRIJVEN[qb]){ stepWie(null, qb); return; }
     const vast = pdaBedrijf();
     if (vast) stepWie(null, vast);
     else stepSector();
   }
   function stepSector(){
+    kantoorStop();
     $('#gateStep').innerHTML = '<div class="glist">' + SECTORS.map(s =>
       '<button class="gbtn" data-sec="'+s.id+'"><span class="ic">'+s.icon+'</span><span><b>'+(lang()==='en'?s.en:s.nl)+'</b><span>'+s.sub+'</span></span></button>'
-    ).join('') + '</div>';
+    ).join('') +
+      '<button class="gbtn" id="gKantoor"><span class="ic">🏢</span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button>'
+    + '</div>';
     document.querySelectorAll('[data-sec]').forEach(b => b.addEventListener('click', () => stepBedrijf(b.dataset.sec)));
+    $('#gKantoor').addEventListener('click', stepKantoor);
   }
   function stepBedrijf(secId){
     const sec = SECTORS.find(s => s.id === secId);
@@ -123,6 +131,115 @@
     $('#pinInp').focus();
   }
 
+  /* ---------- de kantoor-modus: de oude kantoor-PDA, nu een ingang hier ----------
+     Kantoormensen zijn geen zaak-personeel: zij melden zich met de kantoorcode,
+     kiezen hun kamer en werkplek (thuis of kantoor) en houden de kamerchat bij.
+     Het volledige kantoor (taken, statistieken, boardroom) blijft kantoren.html. */
+  let kaToken = null, kaDienst = null, kaTimer = null;
+  try { kaToken = localStorage.getItem('rtg_office_token'); } catch(e){}
+  try { kaDienst = JSON.parse(localStorage.getItem('rtg_kantoor_dienst') || 'null'); } catch(e){}
+  const kaApi = (pad, body) => fetch('/api/office/' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kaToken },
+    body: JSON.stringify(body || {})
+  }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || T('pd.mis','Er ging iets mis.')); return d; });
+  function kantoorStop(){ if (kaTimer){ clearInterval(kaTimer); kaTimer = null; } }
+  function stepKantoor(){
+    kantoorStop();
+    if (kaToken){ enterKantoor().catch(() => toonKantoorLogin()); return; }
+    toonKantoorLogin();
+  }
+  function toonKantoorLogin(){
+    $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.back','Terug')+'</button>'+
+      '<div class="card"><div class="k">'+T('pd.ka.code','Kantoorcode')+'</div>'+
+      '<div class="pinrow" style="margin-top:0.6rem;"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
+      '<button id="kaGo">'+T('pd.ka.binnen','Binnen')+'</button></div>'+
+      '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
+    $('#kaTerug').addEventListener('click', stepSector);
+    const go = async () => {
+      $('#kaFout').textContent = '';
+      try {
+        const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#kaCode').value.trim() }) });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(d.error || T('pd.ka.fout','Die code klopt niet.'));
+        kaToken = d.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
+        enterKantoor();
+      } catch(e){ $('#kaFout').textContent = e.message; }
+    };
+    $('#kaGo').addEventListener('click', go);
+    $('#kaCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    $('#kaCode').focus();
+  }
+  async function enterKantoor(){
+    const k = await kaApi('kamers');
+    let naam = ''; try { naam = localStorage.getItem('rtg_kantoor_naam') || ''; } catch(e){}
+    $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.ka.staf','Personeel van een zaak')+'</button>'+
+      '<div class="card" id="kaMeld">'+
+        '<div class="k">'+T('pd.ka.naam','Jouw naam')+'</div>'+
+        '<input class="hin" id="kaNaam" maxlength="30" style="margin-top:0.4rem;" value="'+esc(naam)+'">'+
+        '<div class="row"><select class="hin" id="kaKamer">'+k.kamers.map(x => '<option value="'+x.id+'">'+x.emoji+' '+esc(x.naam)+'</option>').join('')+'</select>'+
+        '<select class="hin" id="kaWaar" style="max-width:9.5rem;"><option value="thuis">🏠 '+T('pd.ka.thuis','Thuis')+'</option><option value="kantoor">🏢 '+T('pd.ka.hier','Kantoor')+'</option></select></div>'+
+        '<button class="abtn" id="kaMeldGo" style="margin-top:0.7rem;width:100%;padding:0.8rem;">'+T('pd.ka.meld','Meld je aan voor je dienst')+'</button>'+
+        '<div id="kaMFout" style="margin-top:0.4rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>'+
+      '<div class="card" id="kaDienstBlok" hidden><div id="kaDienstTekst" style="font-size:0.9rem;"></div>'+
+        '<button class="abtn ghost" id="kaAfmeld" style="margin-top:0.6rem;">'+T('pd.ka.afmeld','Meld je af')+'</button></div>'+
+      '<div class="card"><div class="k">'+T('pd.ka.wie','Nu aan het werk')+'</div><div id="kaWie" style="margin-top:0.4rem;"></div></div>'+
+      '<div class="card"><div class="k">'+T('pd.ka.chat','De chat van jouw kamer')+'</div>'+
+        '<div id="kaChat" style="max-height:15rem;overflow-y:auto;font-size:0.85rem;margin-top:0.4rem;"></div>'+
+        '<div class="row"><input class="hin" id="kaTekst" maxlength="500" placeholder="'+T('pd.ka.bericht','Bericht...')+'">'+
+        '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
+      '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
+    $('#kaTerug').addEventListener('click', stepSector);
+    const toonDienst = () => {
+      $('#kaMeld').hidden = !!kaDienst;
+      $('#kaDienstBlok').hidden = !kaDienst;
+      if (kaDienst) $('#kaDienstTekst').textContent = '✅ ' + kaDienst.naam + ' ' + T('pd.ka.aangemeld','is aangemeld') + ' (' + kaDienst.waar + ', ' + kaDienst.kamer + ').';
+    };
+    const laadWie = async () => {
+      try {
+        const d = await kaApi('dienst');
+        $('#kaWie').innerHTML = d.aangemeld.length ? d.aangemeld.map(x =>
+          '<div class="task"><span class="ic">'+(x.waar==='thuis'?'🏠':'🏢')+'</span><div class="t"><b>'+esc(x.naam)+'</b><span>'+esc(x.kamer)+'</span></div></div>').join('')
+          : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.niemand','Nog niemand aangemeld.')+'</div>';
+      } catch(e){}
+    };
+    const laadChat = async () => {
+      try {
+        const kamer = kaDienst ? kaDienst.kamer : $('#kaKamer').value;
+        if (!kamer) return;
+        const d = await kaApi('kachat', { kamer });
+        $('#kaChat').innerHTML = d.berichten.length ? d.berichten.slice(-25).map(m =>
+          '<div style="padding:0.25rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' 📸':'')+'</div>').join('')
+          : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.stil','Nog stil hier.')+'</div>';
+        $('#kaChat').scrollTop = $('#kaChat').scrollHeight;
+      } catch(e){}
+    };
+    $('#kaMeldGo').addEventListener('click', async () => {
+      $('#kaMFout').textContent = '';
+      try {
+        const d = await kaApi('dienst/in', { naam: $('#kaNaam').value, kamer: $('#kaKamer').value, waar: $('#kaWaar').value });
+        kaDienst = d.dienst;
+        try { localStorage.setItem('rtg_kantoor_dienst', JSON.stringify(kaDienst)); localStorage.setItem('rtg_kantoor_naam', kaDienst.naam); } catch(e){}
+        toonDienst(); laadWie();
+      } catch(e){ $('#kaMFout').textContent = e.message; }
+    });
+    $('#kaAfmeld').addEventListener('click', async () => {
+      try { await kaApi('dienst/uit', { id: kaDienst.id }); } catch(e){}
+      kaDienst = null; try { localStorage.removeItem('rtg_kantoor_dienst'); } catch(e){}
+      toonDienst(); laadWie();
+    });
+    const stuur = async () => {
+      try {
+        await kaApi('kachat/stuur', { kamer: kaDienst ? kaDienst.kamer : $('#kaKamer').value, naam: (kaDienst && kaDienst.naam) || $('#kaNaam').value || T('pd.ka.collega','collega'), tekst: $('#kaTekst').value });
+        $('#kaTekst').value = ''; laadChat();
+      } catch(e){}
+    };
+    $('#kaStuur').addEventListener('click', stuur);
+    $('#kaTekst').addEventListener('keydown', e => { if (e.key === 'Enter') stuur(); });
+    toonDienst(); laadWie(); laadChat();
+    kantoorStop();
+    kaTimer = setInterval(() => { if (!document.hidden && document.getElementById('kaChat')) { laadWie(); laadChat(); } else kantoorStop(); }, 8000);
+  }
+
   function enter(){
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
@@ -130,9 +247,10 @@
     $('#meSub').textContent = BEDRIJVEN[code].name + ' · ' + (me.role==='manager'?'Manager':T('pd.staff','Medewerker'));
     renderAll();
     laadZaken().then(renderAll);
+    laadZorgbalie();
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderBorden(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderZorgbalie(); renderBorden(); renderTeam(); }
 
   /* ---- Borden: hetzelfde werkbord als in de leverancier-app (shared/borden.js) ---- */
   let pdBordenUI = null;
@@ -1839,6 +1957,55 @@
     } else fire(undefined, undefined);
   }
 
+  /* ---------- de zorgbalie: de behandelaar-agenda (spa of kliniek) ----------
+     Alleen zaken die als zorgaanbieder gekoppeld zijn (bijv. Zenith, Clara)
+     krijgen deze tab; de agenda toont per behandelaar wie er komt, met de
+     zorgcontext (allergenen, intake) die het lid met toestemming deelt. */
+  let zbData = null, zbDatum = null;
+  async function laadZorgbalie(){
+    if (!API.token) return;
+    try { zbData = await API.call('/supplier/care/agenda', zbDatum ? { datum: zbDatum } : {}); }
+    catch(e){ zbData = null; }
+    renderZorgbalie();
+  }
+  function renderZorgbalie(){
+    const tabBtn = document.getElementById('tabZorgbalie');
+    if (tabBtn) tabBtn.style.display = zbData ? '' : 'none';
+    const wrap = $('#zorgbalieWrap');
+    if (!wrap) return;
+    if (!zbData){ wrap.innerHTML = ''; return; }
+    const dagen = [];
+    for (let i = 0; i < 7; i++){
+      const dt = new Date(Date.now() + i * 86400000).toISOString().slice(0, 10);
+      const aan = dt === zbData.datum;
+      dagen.push('<button class="abtn ghost" data-zbdag="'+dt+'" style="padding:0.4rem 0.7rem;'+(aan?'border-color:var(--gold);color:var(--gold);':'')+'"'+(aan?' aria-current="date"':'')+'>'+
+        (i===0 ? T('pd.zb.vandaag','vandaag') : dt.slice(8)+'/'+dt.slice(5,7))+'</button>');
+    }
+    const perBehandelaar = (zbData.behandelaars || []).map(b => {
+      const eigen = (zbData.afspraken || []).filter(a => a.behandelaarId === b.id);
+      return '<div class="card"><div class="k">'+esc(b.naam)+' · '+esc(b.functie)+'</div>'+
+        (eigen.length ? eigen.map(a =>
+          '<div class="task"><span class="ic">'+(a.soort==='medisch'?'🩺':'🧖')+'</span><div class="t">'+
+            '<b style="font-variant-numeric:tabular-nums;">'+esc(a.tijd)+' · '+esc(a.behandelingNaam)+'</b>'+
+            '<span>'+T('pd.zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min · '+eur(a.prijs)+'</span>'+
+            (a.zorg ? '<span style="display:block;color:#E2B93B;">⚠ '+esc(pkZorg(a.zorg))+'</span>' : '')+
+            (a.intake ? '<span style="display:block;color:#E2B93B;">🩺 '+esc(a.intake)+'</span>' : '')+
+          '</div>'+
+          (a.status === 'afgerond' ? '<span class="pill g">'+T('pd.zb.klaar','Afgerond')+'</span>'
+            : '<button class="abtn" data-zbklaar="'+esc(a.ref)+'">'+T('pd.zb.afronden','Afronden')+'</button>')+
+          '</div>').join('')
+        : '<div style="margin-top:0.5rem;color:var(--soft);font-size:0.8rem;">'+T('pd.zb.leeg','Geen afspraken op deze dag.')+'</div>')+
+      '</div>';
+    }).join('');
+    wrap.innerHTML = '<div class="card"><div class="k">'+esc(zbData.aanbieder || '')+'</div>'+
+      '<div class="row" style="flex-wrap:wrap;margin-top:0.5rem;">'+dagen.join('')+'</div></div>' + perBehandelaar;
+    wrap.querySelectorAll('[data-zbdag]').forEach(b => b.addEventListener('click', () => { zbDatum = b.dataset.zbdag; laadZorgbalie(); }));
+    wrap.querySelectorAll('[data-zbklaar]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/care/afronden', { ref: b.dataset.zbklaar }); toast(T('pd.zb.klaar','Afgerond') + ' ✅'); laadZorgbalie(); }
+      catch(e){ toast(e.message); }
+    }));
+  }
+
   function openTab(tab, focusView){
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
     document.querySelectorAll('.tabbar button').forEach(b => {
@@ -1865,7 +2032,7 @@
     if (!window.EventSource) return;
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
-      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); });
+      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); if (zbData) laadZorgbalie(); });
       // de keuken praat met de bediening: bon compleet op de pas -> belletje op de PDA,
       // maar alleen op toestellen waar de pas-bel aanstaat (de gekozen personen)
       src.addEventListener('pas', e => {

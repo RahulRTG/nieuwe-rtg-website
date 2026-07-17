@@ -177,7 +177,7 @@ module.exports = ({ db, save, crypto, schoon, notifySupplier }) => {
         if (m) per[m.id] = (per[m.id] || 0) + Math.max(1, parseInt(it.qty, 10) || 1);
       }
     };
-    for (const o of db.data.orders) if (o.supplierCode === s.code && o.paid && new Date(o.paidAt || o.at) >= sinds) telItems(o.items);
+    for (const o of require('../db').ordersVanZaak(s.code)) if (o.paid && new Date(o.paidAt || o.at) >= sinds) telItems(o.items);
     for (const v of db.data.posSales[s.code] || []) if (new Date(v.at) >= sinds) telItems(v.items);
     const rijen = (Array.isArray(s.menu) ? s.menu : []).map(m => {
       const verkocht = per[m.id] || 0;

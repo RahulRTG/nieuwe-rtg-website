@@ -229,7 +229,7 @@ function maakFiscaal({ db, centen, btwSplit }) {
     // toppers: de meest verkochte items over kassa en app samen
     const per = {};
     const telItems = items => { for (const it of items || []) per[it.name] = (per[it.name] || 0) + (it.qty || 1); };
-    for (const o of db.data.orders) if (o.supplierCode === s.code && o.paid && opDag(o.paidAt || o.at)) telItems(o.items);
+    for (const o of require('../db').ordersVanZaak(s.code)) if (o.paid && opDag(o.paidAt || o.at)) telItems(o.items);
     for (const v of db.data.posSales[s.code] || []) if (opDag(v.at)) telItems(v.items);
     const toppers = Object.entries(per).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([naam, aantal]) => ({ naam, aantal }));
     // de gasten van vandaag

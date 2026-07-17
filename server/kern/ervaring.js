@@ -16,6 +16,8 @@
 
 const MELDING_SCOPES = ['orders', 'events', 'salon', 'live', 'apply', 'wachtlijst', 'assets', 'fluister'];
 
+const { orderMetRef, boekingMetRef, boekingenVanKlant } = require('../db'); // O(1)-index i.p.v. array-scans
+
 function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan }) {
   const id = () => crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
@@ -179,8 +181,8 @@ function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, 
   function annuleerItem(sess, soort, ref) {
     const key = sess.key;
     if (soort === 'order') {
-      const o = db.data.orders.find(x => x.ref === ref && (x.customerKey || x.customerTier) === key);
-      if (!o) return { status: 404, error: 'Bestelling niet gevonden.' };
+      const o = orderMetRef(ref);
+      if (!o || (o.customerKey || o.customerTier) !== key) return { status: 404, error: 'Bestelling niet gevonden.' };
       if (!['wacht-op-betaling', 'nieuw'].includes(o.status)) return { status: 409, error: 'Deze bestelling is al in behandeling (' + o.status + ') en kan niet meer geannuleerd worden.' };
       const wasBetaald = o.paid;
       if (o.paid) { o.paid = false; o.refunded = true; o.refundedAt = nu(); }
@@ -210,7 +212,7 @@ function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, 
       return { ok: true, terugbetaald: wasBetaald ? r.quote : 0 };
     }
     if (soort === 'boeking') {
-      const b = db.data.boekingen.find(x => x.ref === ref && (x.customerKey || x.customerTier) === key);
+      const b = (x => x && (x.customerKey || x.customerTier) === key ? x : undefined)(boekingMetRef(ref));
       if (!b) return { status: 404, error: 'Boeking niet gevonden.' };
       if (['afgerond', 'geweigerd'].includes(b.status)) return { status: 409, error: 'Deze boeking is al ' + b.status + '.' };
       if (b.kind === 'ticket') {
@@ -248,8 +250,10 @@ function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, 
     const score = parseInt(body.score, 10);
     if (!REVIEW_OK[soort]) return { status: 400, error: 'Onbekend soort.' };
     if (!(score >= 1 && score <= 5)) return { status: 400, error: 'Geef 1 tot 5 sterren.' };
-    const lijst = soort === 'order' ? db.data.orders : soort === 'ride' ? db.data.rides : db.data.boekingen;
-    const item = lijst.find(x => x.ref === ref && (x.customerKey || x.customerTier) === sess.key);
+    const item = (soort === 'order' ? orderMetRef(ref)
+      : soort === 'ride' ? db.data.rides.find(x => x.ref === ref)
+      : boekingMetRef(ref));
+    if (item && (item.customerKey || item.customerTier) !== sess.key) return { status: 404, error: 'Niet gevonden.' };
     if (!item) return { status: 404, error: 'Niet gevonden.' };
     if (!REVIEW_OK[soort].includes(item.status)) return { status: 409, error: 'Een review kan pas na afronding.' };
     if ((db.data.reviews || []).some(r => r.ref === ref && r.key === sess.key)) return { status: 409, error: 'U heeft deze dienst al beoordeeld.' };
@@ -325,8 +329,8 @@ function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, 
       if (r.customerKey !== key || !['aangevraagd', 'bevestigd'].includes(r.status) || r.datum < van) continue;
       items.push({ soort: 'reservering', datum: r.datum, tijd: r.tijd, titel: 'Tafel bij ' + r.supplierName + ' (' + r.personen + 'p)', status: r.status, ref: r.id });
     }
-    for (const b of db.data.boekingen || []) {
-      if ((b.customerKey || b.customerTier) !== key || ['geweigerd'].includes(b.status) || !b.datum || b.datum < van) continue;
+    for (const b of boekingenVanKlant(key)) {
+      if (['geweigerd'].includes(b.status) || !b.datum || b.datum < van) continue;
       items.push({ soort: b.kind === 'ticket' ? 'ticket' : 'boeking', datum: b.datum, tijd: b.tijd || '', titel: (b.kind === 'ticket' ? 'Ticket: ' : '') + (b.activiteitNaam || (b.service && b.service.name) || b.supplierName), status: b.status, ref: b.ref });
     }
     for (const r of db.data.rides || []) {
@@ -356,8 +360,8 @@ function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, 
      De betaler heeft al afgerekend (betalen-eerst) en stuurt betaalverzoeken
      naar verbonden vrienden voor een gelijk deel. Demo-geld, echte flow. */
   function maakSplits(key, codename, ref, metKeys) {
-    const o = db.data.orders.find(x => x.ref === ref && (x.customerKey || x.customerTier) === key);
-    if (!o) return { status: 404, error: 'Bestelling niet gevonden.' };
+    const o = orderMetRef(ref);
+    if (!o || (o.customerKey || o.customerTier) !== key) return { status: 404, error: 'Bestelling niet gevonden.' };
     if (!o.paid && o.status !== 'geserveerd') return { status: 409, error: 'Splitsen kan zodra de rekening betaald is.' };
     if ((db.data.splitsen || []).some(s => s.orderRef === ref)) return { status: 409, error: 'Deze rekening is al gesplitst.' };
     const keys = [...new Set((metKeys || []).map(String))].filter(k => k && k !== key).slice(0, 8);

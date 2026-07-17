@@ -261,10 +261,12 @@ function planFlush() {
 // De lokale snapshot is met Postgres alleen een warme-start-cache: Postgres is
 // de duurzame waarheid en wint bij het opstarten. Hem bij elke flush (elke
 // ~150 ms) volledig serialiseren (bij een grote kast honderden MB's) blokkeert
-// de event-loop seconden lang. Daarom ten hoogste eens per PG_SNAP_MS (30 s):
-// dat houdt de cache vers genoeg zonder het hete pad te raken.
+// de event-loop seconden lang. Daarom ten hoogste eens per PG_SNAP_MS (5 min):
+// een verse-genoeg cache, en de stringify-stall van het hele db.data raakt de
+// p99 dan hooguit een paar keer per uur in plaats van elke halve minuut.
+// (Bij het afsluiten schrijft flushBijAfsluiten sowieso nog een verse snapshot.)
 let laatsteLokaleSnap = 0;
-const PG_SNAP_MS = Number(process.env.PG_SNAP_MS || 30000);
+const PG_SNAP_MS = Number(process.env.PG_SNAP_MS || 300000);
 async function flushNu() {
   pgFlushTimer = null;
   if (!pg || !pgKlaar || pgFlushBezig || !db.writable || !pgVuil) return;
@@ -389,6 +391,205 @@ async function ledenGidsZoek(qLower, limit) {
   } catch (e) { return []; }
 }
 
+/* ---- Transactie-index (orders/boekingen) ----------------------------------
+   De hete leespaden zoeken een order/boeking op ref, klant of zaak. Als lineaire
+   scan over de array is dat O(N) per verzoek: met honderdduizenden levende
+   tickets blokkeert elke aanvraag de event-loop. Deze secundaire indexen maken
+   dat O(1), in ALLE opslagmodi (json/sqlite/postgres), zonder de arrays zelf te
+   veranderen: de waarheid blijft db.data.orders / db.data.boekingen.
+
+   Zelfherstellend: wordt de array vervangen (archief, venster-kap, een
+   Postgres-sync die de collectie overschrijft) of muteert iemand hem buiten de
+   helpers om (lengte klopt niet meer), dan bouwt de index zichzelf lui opnieuw
+   bij de eerstvolgende lezing. De indexsleutels (ref, klant, zaak) veranderen
+   nooit na aanmaak; statuswissels muteren het object in-place en zijn dus
+   automatisch zichtbaar via de index. */
+const txStaat = { orders: null, boekingen: null };
+const txKlantVan = t => t.customerKey || t.customerTier;
+function txBouw(naam) {
+  const arr = db.data[naam] || [];
+  const st = { arr, len: arr.length, byRef: new Map(), byKlant: new Map(), byZaak: new Map() };
+  for (const t of arr) {
+    if (!t) continue;
+    if (t.ref != null && !st.byRef.has(t.ref)) st.byRef.set(t.ref, t); // .find-semantiek: de eerste (nieuwste) wint
+    const k = txKlantVan(t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); l.push(t); }
+    const z = t.supplierCode; if (z != null) { let l = st.byZaak.get(z); if (!l) st.byZaak.set(z, l = []); l.push(t); }
+  }
+  txStaat[naam] = st;
+  return st;
+}
+function txZorg(naam) {
+  const st = txStaat[naam], arr = db.data[naam];
+  if (!st || st.arr !== arr || st.len !== (arr ? arr.length : 0)) return txBouw(naam);
+  return st;
+}
+// Nieuw ticket vooraan (nieuwste eerst), incrementeel in de index. Met
+// achteraan:true blijft de oude push-volgorde van die ene kassaroute intact.
+function txVoegToe(naam, t, opties) {
+  const st = txZorg(naam);
+  const achteraan = !!(opties && opties.achteraan);
+  if (achteraan) st.arr.push(t); else st.arr.unshift(t);
+  st.len++;
+  if (t.ref != null && (achteraan ? !st.byRef.has(t.ref) : true)) st.byRef.set(t.ref, t);
+  const k = txKlantVan(t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); if (achteraan) l.push(t); else l.unshift(t); }
+  const z = t.supplierCode; if (z != null) { let l = st.byZaak.get(z); if (!l) st.byZaak.set(z, l = []); if (achteraan) l.push(t); else l.unshift(t); }
+  // Nieuw item ook meteen (best-effort) naar het grootboek als dat actief is;
+  // de veegronde is het vangnet voor gemiste schrijfacties en statuswissels.
+  if (txPool) txLedgerZet(naam, t);
+  // Begrensde collecties (boekingen): pas kappen als de grens echt overschreden
+  // is, in plaats van bij elke toevoeging een kopie te slicen zoals voorheen.
+  // Met een actief grootboek kapt de veegronde (die de staart eerst veilig
+  // wegschrijft) -- dan verdwijnt er niets meer stilletjes.
+  const cap = opties && opties.cap;
+  if (cap && !txPool && st.arr.length > cap) { st.arr.length = cap; txBouw(naam); }
+}
+// De staart voorbij `max` (voor het RAM-venster van Fase B: eerst veilig naar
+// het grootboek, daarna pas verwijderen). Verwijderen gaat op identiteit, zodat
+// nieuwe toevoegingen tussendoor niets verschuiven.
+function txStaartNa(naam, max) { txZorg(naam); return (db.data[naam] || []).slice(max); }
+function txVerwijder(naam, items) {
+  if (!items || !items.length) return;
+  const weg = new Set(items);
+  db.data[naam] = (db.data[naam] || []).filter(t => !weg.has(t));
+  txBouw(naam);
+}
+const txMetRef = (naam, ref) => txZorg(naam).byRef.get(ref);
+const txVanKlant = (naam, key) => txZorg(naam).byKlant.get(key) || [];
+const txVanZaak = (naam, code) => txZorg(naam).byZaak.get(code) || [];
+// De gemaksnamen waar de routes en kern-modules mee lezen/schrijven.
+const orderMetRef = ref => txMetRef('orders', ref);
+const ordersVanKlant = key => txVanKlant('orders', key);
+const ordersVanZaak = code => txVanZaak('orders', code);
+const ordersVoegToe = (o, opties) => txVoegToe('orders', o, opties);
+const boekingMetRef = ref => txMetRef('boekingen', ref);
+const boekingenVanKlant = key => txVanKlant('boekingen', key);
+const boekingenVanZaak = code => txVanZaak('boekingen', code);
+const boekingenVoegToe = b => txVoegToe('boekingen', b, { cap: 50000 });
+
+/* ---- Transactie-grootboek (tx_ledger) -------------------------------------
+   Dezelfde stap als de ledengids, maar voor de transacties: orders en boekingen
+   als GEINDEXEERDE RIJEN in Postgres (soort+ref als sleutel, klant/zaak/at
+   geindexeerd), buiten het procesgeheugen. Het werkgeheugen houdt alleen een
+   VENSTER van de recentste items (TX_RAM_*); alles daarbuiten leeft in het
+   grootboek en is via de gepagineerde lezers bereikbaar. Zo blijft de kv-blob
+   klein (goedkope flush) en verdwijnt de laatste O(alles)-serialisatie.
+
+   Verlies-vrij per constructie: de veegronde schrijft de staart EERST (upsert,
+   idempotent) naar het grootboek en haalt hem pas daarna uit het RAM. Nieuwe
+   items gaan bij aanmaak direct (best-effort) mee; statuswissels van recente
+   items neemt de veegronde mee via de hete kop. Het grootboek is daarmee
+   hooguit een veegronde achter op in-place mutaties -- gedocumenteerd en
+   bewust: het RAM-venster blijft de waarheid voor het hete pad.
+   Zonder Postgres is dit alles inert en verandert er niets aan het gedrag,
+   op een verschil na dat alleen maar veiliger is: de boekingen-cap (50k) laat
+   met grootboek niets meer stilletjes verdwijnen. */
+let txPool = null;
+const TX_RAM_MAX = { orders: Number(process.env.TX_RAM_ORDERS || 30000), boekingen: Number(process.env.TX_RAM_BOEKINGEN || 50000) };
+const TX_SOORT = { orders: 'order', boekingen: 'boeking' };
+const TX_VEEG_MS = Number(process.env.TX_VEEG_MS || 30000);
+const TX_KAP = Number(process.env.TX_KAP || 20000);      // max staart-items per veegronde (tegen event-loop-stalls)
+const TX_KOP = Number(process.env.TX_KOP || 500);        // hete kop die elke ronde opnieuw meegaat (statuswissels)
+const txBekend = { orders: new Set(), boekingen: new Set() }; // refs waarvan we weten dat ze in het grootboek staan
+let txVeegTimer = null, txVeegBezig = false;
+function txLedgerActief() { return !!txPool; }
+const txDedup = items => { const gezien = new Set(); const uit = []; for (const t of items) { if (!t || t.ref == null || gezien.has(t.ref)) continue; gezien.add(t.ref); uit.push(t); } return uit; };
+async function txLedgerZet(naam, t) {
+  if (!txPool || !t || t.ref == null) return;
+  try {
+    await txPool.query(
+      `INSERT INTO tx_ledger(soort, ref, klant, zaak, paid, status, totaal, at, data) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       ON CONFLICT(soort, ref) DO UPDATE SET klant=$3, zaak=$4, paid=$5, status=$6, totaal=$7, at=$8, data=$9`,
+      [TX_SOORT[naam], String(t.ref), txKlantVan(t) || null, t.supplierCode || null, !!t.paid, t.status || null,
+        Number(t.total != null ? t.total : t.price) || 0, t.at || new Date().toISOString(), kluis.versleutel(JSON.stringify(t))]);
+    txBekend[naam].add(t.ref);
+  } catch (e) { /* eventueel-consistent: de veegronde (backfill/kop) probeert het opnieuw */ }
+}
+async function txLedgerBulk(naam, items) {
+  if (!txPool) return false;
+  const schoonItems = txDedup(items);
+  const soort = TX_SOORT[naam];
+  for (let i = 0; i < schoonItems.length; i += 1000) {
+    const brok = schoonItems.slice(i, i + 1000);
+    const vals = [], params = [];
+    brok.forEach((t, j) => {
+      const b = j * 9;
+      vals.push('($' + (b + 1) + ',$' + (b + 2) + ',$' + (b + 3) + ',$' + (b + 4) + ',$' + (b + 5) + ',$' + (b + 6) + ',$' + (b + 7) + ',$' + (b + 8) + ',$' + (b + 9) + ')');
+      params.push(soort, String(t.ref), txKlantVan(t) || null, t.supplierCode || null, !!t.paid, t.status || null,
+        Number(t.total != null ? t.total : t.price) || 0, t.at || new Date().toISOString(), kluis.versleutel(JSON.stringify(t)));
+    });
+    await txPool.query(
+      'INSERT INTO tx_ledger(soort,ref,klant,zaak,paid,status,totaal,at,data) VALUES ' + vals.join(',') +
+      ' ON CONFLICT(soort,ref) DO UPDATE SET klant=EXCLUDED.klant, zaak=EXCLUDED.zaak, paid=EXCLUDED.paid, status=EXCLUDED.status, totaal=EXCLUDED.totaal, at=EXCLUDED.at, data=EXCLUDED.data',
+      params);
+    for (const t of brok) txBekend[naam].add(t.ref);
+  }
+  return true;
+}
+// Gepagineerde lezers: geindexeerd op (soort, klant/zaak, at), nooit een scan.
+async function txLedgerVanKlant(naam, klant, limit, offset) {
+  if (!txPool) return [];
+  try {
+    const r = await txPool.query('SELECT data FROM tx_ledger WHERE soort=$1 AND klant=$2 ORDER BY at DESC LIMIT $3 OFFSET $4',
+      [TX_SOORT[naam], String(klant || ''), Math.min(200, limit || 25), Math.max(0, offset || 0)]);
+    return r.rows.map(x => JSON.parse(kluis.ontsleutel(x.data)));
+  } catch (e) { return []; }
+}
+async function txLedgerVanZaak(naam, zaak, limit, offset) {
+  if (!txPool) return [];
+  try {
+    const r = await txPool.query('SELECT data FROM tx_ledger WHERE soort=$1 AND zaak=$2 ORDER BY at DESC LIMIT $3 OFFSET $4',
+      [TX_SOORT[naam], String(zaak || ''), Math.min(200, limit || 25), Math.max(0, offset || 0)]);
+    return r.rows.map(x => JSON.parse(kluis.ontsleutel(x.data)));
+  } catch (e) { return []; }
+}
+async function txLedgerTel(naam, klant) {
+  if (!txPool) return 0;
+  try {
+    const r = klant != null
+      ? await txPool.query('SELECT count(*)::bigint AS c FROM tx_ledger WHERE soort=$1 AND klant=$2', [TX_SOORT[naam], String(klant)])
+      : await txPool.query('SELECT count(*)::bigint AS c FROM tx_ledger WHERE soort=$1', [TX_SOORT[naam]]);
+    return Number(r.rows[0].c);
+  } catch (e) { return 0; }
+}
+// Synchrone, gecachete totalen (zelfde patroon als ledenGidsAantal): de
+// KPI-lezers blijven synchroon en krijgen een teller die hooguit ~10 s achterloopt.
+const txN = { orders: 0, boekingen: 0 };
+let txNAt = 0;
+function txLedgerAantal(naam) {
+  if (txPool && Date.now() - txNAt > 10000) {
+    txNAt = Date.now();
+    (async () => { try { txN.orders = await txLedgerTel('orders'); txN.boekingen = await txLedgerTel('boekingen'); } catch (e) {} })();
+  }
+  return txN[naam] || 0;
+}
+/* De veegronde: (1) backfill wat het grootboek nog niet kent (na een boot met
+   een bestaande kv), (2) de hete kop opnieuw (statuswissels), (3) de staart
+   voorbij het venster veilig wegschrijven en dan pas uit het RAM halen.
+   Gepaced (TX_KAP per ronde) zodat een grote achterstand nooit de event-loop
+   blokkeert maar in rustige stappen wegloopt. */
+async function txVeegNu() {
+  if (!txPool || txVeegBezig || !db.writable) return;
+  txVeegBezig = true;
+  try {
+    for (const naam of ['orders', 'boekingen']) {
+      const arr = db.data[naam] || [];
+      const onbekend = arr.filter(t => t && t.ref != null && !txBekend[naam].has(t.ref)).slice(0, TX_KAP);
+      if (onbekend.length) await txLedgerBulk(naam, onbekend);
+      if (arr.length) await txLedgerBulk(naam, arr.slice(0, TX_KOP));
+      if (arr.length > TX_RAM_MAX[naam]) {
+        const staart = txStaartNa(naam, TX_RAM_MAX[naam]).slice(-TX_KAP).filter(t => t && t.ref != null);
+        if (staart.length) {
+          await txLedgerBulk(naam, staart);   // eerst duurzaam in het grootboek...
+          txVerwijder(naam, staart);          // ...dan pas uit het venster
+          save();
+          console.log('[tx] ' + staart.length + ' ' + naam + ' voorbij het venster naar het grootboek verhuisd; ' + (db.data[naam] || []).length + ' in het RAM.');
+        }
+      }
+    }
+  } catch (e) { console.warn('[tx] veegronde mislukt:', e.message); }
+  finally { txVeegBezig = false; }
+}
+
 async function startPostgres() {
   if (STORE !== 'postgres') return false;
   pg = require('./pg').maakPg({ merge3, kluis, log: pgLog, url: DATABASE_URL });
@@ -414,6 +615,20 @@ async function startPostgres() {
     } catch (e) { pgLog && pgLog.warn && pgLog.warn('[db] trigram-zoekindex niet beschikbaar (deelzoeken valt terug op scan): ' + e.message); }
     await ververLedenN();
   } catch (e) { ledenPool = null; pgLog && pgLog.warn && pgLog.warn('[db] ledengids init mislukt: ' + e.message); }
+  // het transactie-grootboek: orders/boekingen als geindexeerde rijen (zie boven)
+  try {
+    await pg.pool.query(`CREATE TABLE IF NOT EXISTS tx_ledger(
+      soort text NOT NULL, ref text NOT NULL, klant text, zaak text,
+      paid boolean, status text, totaal numeric, at timestamptz, data text NOT NULL,
+      PRIMARY KEY(soort, ref))`);
+    await pg.pool.query('CREATE INDEX IF NOT EXISTS tx_ledger_klant ON tx_ledger(soort, klant, at DESC)');
+    await pg.pool.query('CREATE INDEX IF NOT EXISTS tx_ledger_zaak ON tx_ledger(soort, zaak, at DESC)');
+    txPool = pg.pool;
+    txVeegTimer = setInterval(() => { txVeegNu().catch(() => {}); }, TX_VEEG_MS);
+    if (txVeegTimer.unref) txVeegTimer.unref();
+    const eersteVeeg = setTimeout(() => { txVeegNu().catch(() => {}); }, 3000);
+    if (eersteVeeg.unref) eersteVeeg.unref();
+  } catch (e) { txPool = null; pgLog && pgLog.warn && pgLog.warn('[db] tx-grootboek init mislukt: ' + e.message); }
   const pgData = await pg.laadAlles();
   if (pgData) {
     // Postgres is de gedeelde waarheid en wint voor elke collectie die hij heeft.
@@ -628,4 +843,8 @@ async function startGedeeld() {
 function onExternalChange(cb) { externCb = cb; }
 
 module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, pgPing, onExternalChange, merge3, schrijfDuurzaam, grootSupplierSync, grootAantal,
-  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek };
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek,
+  orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
+  boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  txStaartNa, txVerwijder,
+  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, txVeegNu };

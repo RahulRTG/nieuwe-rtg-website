@@ -6,6 +6,10 @@
    De regels reizen mee: ledenprijsgarantie, 86 van de keuken, de
    leeftijds/alcohol-grens per land, het zorgprofiel en het betaalmoment
    van de zaak. */
+// De transactie-index (O(1) opzoeken op ref/klant/zaak) komt rechtstreeks uit de
+// opslaglaag: db.js is een singleton en de index hoort bij de collecties zelf.
+const { orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe } = require('../db');
+
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
   leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
@@ -64,7 +68,7 @@ function plaatsOrderVoor(session, body) {
     leeftijdOk: metAlcohol && lft != null ? true : undefined,
     status: vooraf ? 'wacht-op-betaling' : 'nieuw', paid: false, at: new Date().toISOString()
   };
-  db.data.orders.unshift(order);
+  ordersVoegToe(order);
   openLijnVoor(s, session);
   save();
   if (!vooraf) {
@@ -76,8 +80,8 @@ function plaatsOrderVoor(session, body) {
 }
 
 function betaalOrderVoor(session, body) {
-  const o = db.data.orders.find(x => x.ref === body.ref && (x.customerKey || x.customerTier) === session.key);
-  if (!o) return { status: 404, error: 'Bestelling niet gevonden.' };
+  const o = orderMetRef(body.ref);
+  if (!o || (o.customerKey || o.customerTier) !== session.key) return { status: 404, error: 'Bestelling niet gevonden.' };
   if (o.paid) return { status: 409, error: 'Al betaald.' };
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
   if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return { status: 410, error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' };
@@ -128,15 +132,14 @@ function koopTicketVoor(session, body) {
     wanneer: datum + ' ' + tijd,
     betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
   };
-  db.data.boekingen.unshift(ticket);
-  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  boekingenVoegToe(ticket);
   save();
   return { ok: true, ticket }; // afrekenen via /api/booking/pay of de Butler
 }
 
 function betaalBoekingVoor(session, body) {
-  const b = db.data.boekingen.find(x => x.ref === body.ref && (x.customerKey || x.customerTier) === session.key);
-  if (!b) return { status: 404, error: 'Boeking niet gevonden.' };
+  const b = boekingMetRef(body.ref);
+  if (!b || (b.customerKey || b.customerTier) !== session.key) return { status: 404, error: 'Boeking niet gevonden.' };
   if (b.paid) return { status: 409, error: 'Al betaald.' };
   if (b.status === 'wacht-op-betaling' && Date.now() - new Date(b.at) > 30 * 60000)
     return { status: 410, error: 'Deze aanvraag is verlopen. Boek opnieuw.' };

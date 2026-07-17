@@ -8,6 +8,8 @@
    (O(orders + ritten)) i.p.v. per zaak over alles te filteren, en elke lijst
    in de uitkomst is begrensd; de echte totalen staan apart in totals. */
 
+const { txLedgerAantal } = require('../db'); // gecachete grootboek-teller (O(1), ~10 s vers)
+
 function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   function officeAuth(req, res, next) {
     const header = req.get('authorization') || '';
@@ -180,8 +182,12 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       // totalen over de volledige data, zodat de schermen eerlijk blijven
       // vertellen hoeveel er echt is, hoe groot de lijsten ook worden
       totals: {
-        // levend plus archief: het totaal blijft eerlijk, hoe oud tickets ook worden
-        orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').length + archief.stat().aantal,
+        // Levend plus archief: het totaal blijft eerlijk, hoe oud tickets ook
+        // worden. Met een actief transactie-grootboek (Postgres) kan het RAM
+        // een VENSTER zijn; dan is de grootboek-teller de ondergrens die ook
+        // de uit het venster gerolde tickets meetelt.
+        orders: Math.max(txLedgerAantal('orders'),
+          db.data.orders.filter(o => o.status !== 'wacht-op-betaling').length + archief.stat().aantal),
         rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').length,
         leden: ledenAantal(),
         // actieve zaken in het geheugen plus de bulk-zaken in het grootboek (Postgres)

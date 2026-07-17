@@ -14,7 +14,8 @@ module.exports = (kern) => {
     return true;
   }
   function charterVan(s, ref) {
-    return db.data.boekingen.find(b => b.kind === 'charter' && b.supplierCode === s.code && b.ref === String(ref || ''));
+    const b = kern.boekingMetRef(String(ref || ''));
+    return b && b.kind === 'charter' && b.supplierCode === s.code ? b : undefined;
   }
   function fotosVan(ref) { return db.data.charterFotos[ref] = db.data.charterFotos[ref] || { voor: [], na: [] }; }
   const getal = (v, min, max, standaard) => { const n = Number(v); return Number.isFinite(n) && n >= min && n <= max ? Math.round(n) : standaard; };

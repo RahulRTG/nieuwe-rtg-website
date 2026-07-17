@@ -9,7 +9,7 @@ module.exports = (kern) => {
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
-    fluisterZeg } = kern;
+    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
   // de dagcontext: tijd, seizoen en temperatuur, voor elke AI in dit domein
   const { dagContext } = require('../kern/context');
 
@@ -605,7 +605,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
 app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
   const code = String(req.body.code || '').trim().toUpperCase();
   if (!code) return res.status(400).json({ error: 'Voer een ophaalcode in.' });
-  const o = db.data.orders.find(x => x.supplierCode === req.supplier.code && x.pickup === code);
+  const o = ordersVanZaak(req.supplier.code).find(x => x.pickup === code);
   if (!o) return res.status(404).json({ error: 'Onbekende code voor dit bedrijf.' });
   if (o.refunded || o.status === 'geweigerd') return res.status(409).json({ error: 'Deze bestelling is geannuleerd.' });
   if (o.status === 'geserveerd') return res.status(409).json({ error: 'Code ' + code + ' is al uitgegeven.' });
@@ -1297,7 +1297,7 @@ app.post('/api/supplier/menu/86', supplierAuth, (req, res) => {
 app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
   const s = req.supplier;
   const lang = talen.taalVan(req.body.lang);
-  const open = db.data.orders.filter(o => o.supplierCode === s.code && ['nieuw', 'in bereiding'].includes(o.status) && sectiesForOrder(s, o).length);
+  const open = ordersVanZaak(s.code).filter(o => ['nieuw', 'in bereiding'].includes(o.status) && sectiesForOrder(s, o).length);
   if (!open.length) return res.json({ ok: true, lines: [], ai: !!anthropic });
   const hash = crypto.createHash('sha1').update(lang + JSON.stringify(open.map(o => [o.ref, o.status, o.table, o.secties, Math.floor((Date.now() - new Date(o.at)) / 300000)]))).digest('hex');
   const cached = coachCache.get(s.code);
@@ -1338,7 +1338,7 @@ app.post('/api/supplier/mep/daily', supplierAuth, async (req, res) => {
 
   // historie: bestellingen van de afgelopen 21 dagen
   const sinds = Date.now() - 21 * 86400000;
-  const hist = db.data.orders.filter(o => o.supplierCode === s.code && new Date(o.at).getTime() >= sinds && !['geweigerd', 'terugbetaald'].includes(o.status));
+  const hist = ordersVanZaak(s.code).filter(o => new Date(o.at).getTime() >= sinds && !['geweigerd', 'terugbetaald'].includes(o.status));
   const perGerecht = {}; let histQty = 0; const histDagen = new Set();
   for (const o of hist) {
     histDagen.add(String(o.at).slice(0, 10));
@@ -1560,9 +1560,9 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   const nu = Date.now();
   const dag = iso => String(iso || '').slice(0, 10);
   const vandaag = new Date().toISOString().slice(0, 10);
-  const orders = db.data.orders.filter(o => o.supplierCode === s.code && o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald');
+  const orders = ordersVanZaak(s.code).filter(o => o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald');
   const ritten = db.data.rides.filter(r => r.supplierCode === s.code && r.paid && r.status !== 'geweigerd');
-  const boekingen = db.data.boekingen.filter(b => b.supplierCode === s.code && b.paid && b.status !== 'geweigerd');
+  const boekingen = boekingenVanZaak(s.code).filter(b => b.paid && b.status !== 'geweigerd');
   // kassaverkopen zonder dubbeltellingen: RTG-codes zijn al app-omzet,
   // kamerlasten tellen pas bij het uitchecken
   const kassa = (db.data.posSales[s.code] || []).filter(v => v.method !== 'rtg' && v.method !== 'kamer');
@@ -1592,8 +1592,8 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   // actiecentrum van de zaak
   const alerts = [];
   const minGeleden = iso => Math.round((nu - new Date(iso)) / 60000);
-  for (const o of db.data.orders) {
-    if (o.supplierCode !== s.code || !o.paid || o.status !== 'nieuw') continue;
+  for (const o of ordersVanZaak(s.code)) {
+    if (!o.paid || o.status !== 'nieuw') continue;
     const m = minGeleden(o.paidAt || o.at);
     if (m >= 10) alerts.push({ level: 'rood', text: en
       ? 'Order ' + o.ref + ' has been untouched for ' + m + ' min (' + o.customerCodename + ').'
@@ -1659,7 +1659,7 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/booking/status', supplierAuth, (req, res) => {
-  const b = db.data.boekingen.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  const b = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(kern.boekingMetRef(req.body.ref));
   if (!b) return res.status(404).json({ error: 'Boeking niet gevonden.' });
   if (b.status === 'wacht-op-betaling') return res.status(409).json({ error: 'Deze boeking is nog niet betaald.' });
   const status = String(req.body.status || '');
@@ -1921,7 +1921,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
     return A(todo.length ? 'Nog te tellen: ' + todo.join(', ') + '.' : 'Alle minibars zijn vandaag geteld.');
   }
   if (/(bestelling|orders?|bon(nen)?\b)/.test(ql)) {
-    const open = db.data.orders.filter(o => o.supplierCode === s.code && !['geserveerd', 'geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status));
+    const open = ordersVanZaak(s.code).filter(o => !['geserveerd', 'geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status));
     return A(open.length
       ? open.length + ' open bestelling(en): ' + open.map(o => o.customerCodename + ' € ' + o.total + ' (' + o.status + ', code ' + o.pickup + ')').join('; ') + '.'
       : 'Er zijn geen open bestellingen.');
@@ -2036,7 +2036,7 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/order/table', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   o.table = String(req.body.table || '').slice(0, 24);
   save();
@@ -2052,7 +2052,7 @@ app.post('/api/supplier/order/table', supplierAuth, (req, res) => {
 app.post('/api/supplier/order/spoed', supplierAuth, (req, res) => {
   // intrekken: alleen eigen interne spoedbonnen
   if (req.body.op === false) {
-    const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code && x.intern);
+    const o = (x => x && x.supplierCode === req.supplier.code && x.intern ? x : undefined)(orderMetRef(req.body.ref));
     if (!o) return res.status(404).json({ error: 'Spoedbon niet gevonden.' });
     if (['klaar', 'geserveerd'].includes(o.status)) return res.status(409).json({ error: 'Deze spoedbon is al klaar.' });
     o.status = 'geweigerd';
@@ -2075,7 +2075,7 @@ app.post('/api/supplier/order/spoed', supplierAuth, (req, res) => {
     status: 'nieuw', at: new Date().toISOString(),
     spoed: { at: new Date().toISOString(), door: req.actor.name }, intern: true
   };
-  db.data.orders.push(o);
+  ordersVoegToe(o, { achteraan: true }); // dezelfde plek als de oude push: interne spoedbon achteraan
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
   logActivity(req.supplier.code, req.actor, 'zette een spoedbon op de lijn: ' + qty + 'x ' + m.name + (o.table ? ' (' + o.table + ')' : ''));
@@ -2141,7 +2141,7 @@ app.post('/api/supplier/lijn', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   const sectie = String(req.body.sectie || '');
   if (!['warm', 'koud', 'snack', 'dessert'].includes(sectie)) return res.status(400).json({ error: 'Onbekende sectie.' });
@@ -2174,7 +2174,7 @@ app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   const station = req.body.station === 'bar' ? 'bar' : 'keuken';
   const phase = req.body.phase === 'klaar' ? 'klaar' : 'bezig';
@@ -2200,7 +2200,7 @@ app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   const allowed = ['nieuw', 'in bereiding', 'klaar', 'geserveerd', 'geweigerd', 'onderweg', 'bezorgd', 'opgehaald'];
   const status = String(req.body.status || '');
@@ -2397,7 +2397,7 @@ app.post('/api/supplier/walkin', supplierAuth, (req, res) => {
 
 app.post('/api/supplier/refund', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return; // geld terugstorten is een management-handeling
-  const o = db.data.orders.find(x => x.ref === req.body.ref && x.supplierCode === req.supplier.code);
+  const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   if (!o.paid) return res.status(409).json({ error: 'Deze bestelling is niet betaald.' });
   o.paid = false;

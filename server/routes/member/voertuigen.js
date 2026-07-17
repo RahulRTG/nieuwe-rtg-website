@@ -8,7 +8,8 @@ module.exports = (kern) => {
     salonZichtbaar, ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken,
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
-    avTeken, avMijnDeals, zorgVoor, zorgContact, media } = kern;
+    avTeken, avMijnDeals, zorgVoor, zorgContact, media,
+    boekingMetRef, boekingenVanZaak, boekingenVoegToe } = kern;
 
   // koopt of huurt het lid echt? dan opent de chatlijn met de zaak: geen
   // vreemden meer (idempotent en stil voor gasten)
@@ -25,8 +26,8 @@ module.exports = (kern) => {
    live locatie delen. */
 const HUUR_KLAAR = { afgerond: 1, geweigerd: 1 };
 function mijnHuur(req, res) {
-  const h = db.data.boekingen.find(b => b.kind === 'huur' && b.ref === String(req.body.ref || '') &&
-    (b.customerKey || b.customerTier) === req.session.key);
+  const bh = boekingMetRef(String(req.body.ref || ''));
+  const h = bh && bh.kind === 'huur' && (bh.customerKey || bh.customerTier) === req.session.key ? bh : null;
   if (!h) { res.status(404).json({ error: 'Huur niet gevonden.' }); return null; }
   return h;
 }
@@ -57,7 +58,7 @@ app.post('/api/huur/boek', auth, (req, res) => {
     return res.status(403).json({ error: auto.name + ' verhuren we vanaf ' + auto.minLeeftijd + ' jaar; uw leeftijd is via uw paspoort geverifieerd.' });
   // dubbele boekingen: de auto is van een gast, niet van twee
   const nu = Date.now();
-  const bezet = db.data.boekingen.some(b => b.kind === 'huur' && b.supplierCode === s.code && b.autoId === auto.id &&
+  const bezet = boekingenVanZaak(s.code).some(b => b.kind === 'huur' && b.autoId === auto.id &&
     !HUUR_KLAAR[b.status] && (b.paid || (nu - new Date(b.at).getTime()) < 30 * 60000) &&
     b.van < tot && van < b.tot);
   if (bezet) return res.status(409).json({ error: auto.name + ' is in (een deel van) deze periode al verhuurd.' });
@@ -75,8 +76,7 @@ app.post('/api/huur/boek', auth, (req, res) => {
     betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false,
     sos: [], at: new Date().toISOString()
   };
-  db.data.boekingen.unshift(huur);
-  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  boekingenVoegToe(huur);
   openLijn(s, req);
   save();
   res.json({ ok: true, huur }); // afrekenen via /api/booking/pay: de prijs staat VAST
@@ -163,8 +163,8 @@ app.post('/api/huur/locatie', auth, (req, res) => {
    zaken: met of zonder schipper, en een vaarbewijs bij bareboat. */
 const CHARTER_KLAAR = { afgerond: 1, geweigerd: 1 };
 function mijnCharter(req, res) {
-  const c = db.data.boekingen.find(b => b.kind === 'charter' && b.ref === String(req.body.ref || '') &&
-    (b.customerKey || b.customerTier) === req.session.key);
+  const bc = boekingMetRef(String(req.body.ref || ''));
+  const c = bc && bc.kind === 'charter' && (bc.customerKey || bc.customerTier) === req.session.key ? bc : null;
   if (!c) { res.status(404).json({ error: 'Charter niet gevonden.' }); return null; }
   return c;
 }
@@ -199,7 +199,7 @@ app.post('/api/charter/boek', auth, (req, res) => {
     return res.status(403).json({ error: 'Zonder schipper vaart u bareboat: bevestig uw vaarbewijs, of boek met schipper.' });
   // dubbele boekingen: het vaartuig is van een gast, niet van twee
   const nu = Date.now();
-  const bezet = db.data.boekingen.some(b => b.kind === 'charter' && b.supplierCode === s.code && b.bootId === boot.id &&
+  const bezet = boekingenVanZaak(s.code).some(b => b.kind === 'charter' && b.bootId === boot.id &&
     !CHARTER_KLAAR[b.status] && (b.paid || (nu - new Date(b.at).getTime()) < 30 * 60000) &&
     b.van < tot && van < b.tot);
   if (bezet) return res.status(409).json({ error: boot.naam + ' is in (een deel van) deze periode al gecharterd.' });
@@ -218,8 +218,7 @@ app.post('/api/charter/boek', auth, (req, res) => {
     betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false,
     sos: [], at: new Date().toISOString()
   };
-  db.data.boekingen.unshift(charter);
-  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  boekingenVoegToe(charter);
   openLijn(s, req);
   save();
   res.json({ ok: true, charter }); // afrekenen via /api/booking/pay: de prijs staat VAST

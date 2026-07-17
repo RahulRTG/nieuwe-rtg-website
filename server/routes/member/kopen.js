@@ -7,7 +7,8 @@ module.exports = (kern) => {
     crypto, db, findPartner, findSupplier, magBezorgen,
     liveCodename, notifySupplier, pickupCode, publicPartner, save,
     schoon, sseToOffice, sseToSupplier, salonZichtbaar, zorgVoor,
-    koopTicketVoor, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek } = kern;
+    koopTicketVoor, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek,
+    orderMetRef, ordersVoegToe } = kern;
 
 /* ============ rechtstreeks betalen aan een leverancier (Face ID) ============
    Elk betalend lid rekent alles met Face ID af, via de AI en de Salon, en het
@@ -93,7 +94,7 @@ app.post('/api/bezorg/bestel', auth, (req, res) => {
     betaalMoment: 'vooraf',
     status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
   };
-  db.data.orders.unshift(order);
+  ordersVoegToe(order);
   save();
   res.json({ ok: true, order }); // afrekenen via /api/order/pay; dan pas hoort de zaak ervan
 });
@@ -101,8 +102,8 @@ app.post('/api/bezorg/bestel', auth, (req, res) => {
 /* De bestelling live volgen: status, bezorger op naam en (onderweg) de
    laatste GPS-positie met verwachte aankomsttijd. */
 app.post('/api/bezorg/volg', auth, (req, res) => {
-  const o = db.data.orders.find(x => x.ref === String(req.body.ref || '') && (x.customerKey || x.customerTier) === req.session.key);
-  if (!o || !o.levering) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  const o = orderMetRef(String(req.body.ref || ''));
+  if (!o || (o.customerKey || o.customerTier) !== req.session.key || !o.levering) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   const B = db.data.bezorgers || {};
   const pos = o.bezorger ? B[o.supplierCode + ':' + (o.bezorger.staffId || 'beheer')] : null;
   res.json({
@@ -153,8 +154,8 @@ app.post('/api/tickets/mijn', auth, (req, res) => {
    chauffeur van de zaak neemt hem op naam aan, de klant ziet wie er komt
    (en andersom), en de zaak ziet alles in de eigen app. */
 app.post('/api/transfer/aanvraag', auth, (req, res) => {
-  const t = db.data.boekingen.find(b => b.kind === 'ticket' && b.ref === String(req.body.ticketRef || '') &&
-    (b.customerKey || b.customerTier) === req.session.key);
+  const bt = kern.boekingMetRef(String(req.body.ticketRef || ''));
+  const t = bt && bt.kind === 'ticket' && (bt.customerKey || bt.customerTier) === req.session.key ? bt : null;
   if (!t) return res.status(404).json({ error: 'Ticket niet gevonden.' });
   if (!t.paid) return res.status(409).json({ error: 'Betaal eerst het ticket; dan regelen we de transfer.' });
   if (t.checkin) return res.status(409).json({ error: 'Dit ticket is al gebruikt.' });

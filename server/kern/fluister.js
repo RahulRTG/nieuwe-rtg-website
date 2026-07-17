@@ -241,7 +241,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   // de actuele stand van dit lid, kort: dat maakt de antwoorden persoonlijk
   function standVan(key) {
     const delen = [];
-    const orders = (db.data.orders || []).filter(o => (o.customerKey || o.customerTier) === key && !['geserveerd', 'geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status));
+    const orders = require('../db').ordersVanKlant(key).filter(o => !['geserveerd', 'geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status));
     if (orders.length) delen.push(orders.length + ' lopende bestelling(en)');
     const res = (db.data.reserveringen || []).filter(r => r.customerKey === key && ['aangevraagd', 'bevestigd'].includes(r.status));
     if (res.length) delen.push('eerstvolgende reservering ' + res[0].datum + ' ' + res[0].tijd + ' bij ' + res[0].supplierName);

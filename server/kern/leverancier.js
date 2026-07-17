@@ -28,6 +28,8 @@ const ZAAK_OPTIES = {
   events: 'event-aanmeldingen'
 };
 
+const { ordersVanZaak, boekingenVanZaak } = require('../db'); // O(1) per zaak i.p.v. een scan over alle orders/boekingen
+
 function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity, findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie }) {
   function publicTrip(t, staffRate, lang) {
     const out = {
@@ -138,7 +140,7 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
      dan 30 min) tellen niet mee voor de capaciteit. */
   function ticketsVoorSlot(code, activiteitId, datum, tijd) {
     const nu = Date.now();
-    return db.data.boekingen.filter(b => b.kind === 'ticket' && b.supplierCode === code &&
+    return boekingenVanZaak(code).filter(b => b.kind === 'ticket' &&
       b.activiteitId === activiteitId && b.datum === datum && b.tijd === tijd &&
       b.status !== 'geweigerd' &&
       (b.paid || (nu - new Date(b.at).getTime()) < 30 * 60000));
@@ -206,7 +208,7 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
     }
     // fooien van vandaag (uit app-betalingen: bestellingen en ritten): voor het team
     let fooien = 0;
-    for (const o of db.data.orders) if (o.supplierCode === code && o.fooi && String(o.paidAt || '').slice(0, 10) === today) fooien += o.fooi;
+    for (const o of ordersVanZaak(code)) if (o.fooi && String(o.paidAt || '').slice(0, 10) === today) fooien += o.fooi;
     for (const r of db.data.rides) if (r.supplierCode === code && r.fooi && String(r.paidAt || '').slice(0, 10) === today) fooien += r.fooi;
     return { total, count: sales.length, byMethod, byActor, openRooms, fooien: Math.round(fooien * 100) / 100, sales: sales.slice(0, 25) };
   }
@@ -261,14 +263,14 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
     const t = db.data.supplierTypes[s.type] || {};
     const vandaag = new Date().toISOString().slice(0, 10);
     const ORDER_KLAAR = { 'geserveerd': 1, 'geweigerd': 1, 'terugbetaald': 1, 'bezorgd': 1, 'opgehaald': 1 };
-    const alleOrders = db.data.orders.filter(o => o.supplierCode === s.code && o.status !== 'wacht-op-betaling');
+    const alleOrders = ordersVanZaak(s.code).filter(o => o.status !== 'wacht-op-betaling');
     const zichtOrders = alleOrders.filter(o => !ORDER_KLAAR[o.status] || String(o.at).slice(0, 10) === vandaag).slice(0, 80);
     const RIDE_KLAAR = { 'afgerond': 1, 'gearriveerd': 1, 'geweigerd': 1 };
     const alleRitten = db.data.rides.filter(r => r.supplierCode === s.code && r.status !== 'wacht-op-betaling');
     const klaarAll = alleRitten.filter(r => r.status === 'afgerond' || r.status === 'gearriveerd');
     const zichtRitten = alleRitten.filter(r => !RIDE_KLAAR[r.status] || String(r.finishedAt || r.at).slice(0, 10) === vandaag).slice(0, 80);
     const BOEK_KLAAR = { 'afgerond': 1, 'geweigerd': 1 };
-    const alleBoekingen = db.data.boekingen.filter(b => b.supplierCode === s.code && b.status !== 'wacht-op-betaling');
+    const alleBoekingen = boekingenVanZaak(s.code).filter(b => b.status !== 'wacht-op-betaling');
     const zichtBoekingen = alleBoekingen.filter(b => !BOEK_KLAAR[b.status] || String(b.finishedAt || b.at).slice(0, 10) === vandaag).slice(0, 80);
     return {
       supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city, caps: t.caps || [], loc: s.loc, rate: s.rate, vak: s.vak || null },

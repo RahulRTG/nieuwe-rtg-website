@@ -12,7 +12,8 @@ function isVerhuur(s, res) {
   return true;
 }
 function huurVan(s, ref) {
-  return db.data.boekingen.find(b => b.kind === 'huur' && b.supplierCode === s.code && b.ref === String(ref || ''));
+  const b = kern.boekingMetRef(String(ref || ''));
+  return b && b.kind === 'huur' && b.supplierCode === s.code ? b : undefined;
 }
 function fotosVan(ref) { return db.data.huurFotos[ref] = db.data.huurFotos[ref] || { voor: [], na: [] }; }
 

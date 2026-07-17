@@ -1,6 +1,6 @@
 /* Domein "supplier" (deelmodule): bezorg. Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, crypto, db, logActivity, magBezorgen, haversine, etaMinutes, managerOnly, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth } = kern;
+  const { app, crypto, db, logActivity, magBezorgen, haversine, etaMinutes, managerOnly, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, orderMetRef, ordersVanZaak } = kern;
 
 /* ================== de ophaal/bezorgdienst van de zaak ==================
    Beheer (assortiment + schakelaars) is voor managers; de bezorgersritten
@@ -62,10 +62,10 @@ app.post('/api/supplier/bezorg/product', supplierAuth, (req, res) => {
 /* Alles wat er nu loopt: voor de zaak-tab en de bezorger-PDA. */
 app.post('/api/supplier/bezorg/overzicht', supplierAuth, (req, res) => {
   const s = req.supplier;
-  const lopend = db.data.orders.filter(o => o.supplierCode === s.code && o.levering &&
+  const lopend = ordersVanZaak(s.code).filter(o => o.levering &&
     !['geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status) && o.status !== 'wacht-op-betaling').slice(0, 60);
   const vandaag = new Date().toISOString().slice(0, 10);
-  const klaarVandaag = db.data.orders.filter(o => o.supplierCode === s.code && o.levering &&
+  const klaarVandaag = ordersVanZaak(s.code).filter(o => o.levering &&
     ['bezorgd', 'opgehaald'].includes(o.status) && String(o.finishedAt || o.at).slice(0, 10) === vandaag);
   res.json({ bezorg: bezorgVan(s), lopend, vandaag: { aantal: klaarVandaag.length, omzet: klaarVandaag.reduce((x, o) => x + (o.total || 0), 0) } });
 });
@@ -76,7 +76,7 @@ app.post('/api/supplier/bezorg/neem', supplierAuth, (req, res) => {
   const refs = (Array.isArray(req.body.refs) ? req.body.refs : [req.body.ref]).filter(Boolean).slice(0, 8);
   const genomen = [];
   for (const ref of refs) {
-    const o = db.data.orders.find(x => x.ref === ref && x.supplierCode === s.code);
+    const o = (x => x && x.supplierCode === s.code ? x : undefined)(orderMetRef(ref));
     if (!o || o.levering !== 'bezorgen' || o.bezorger || !o.paid) continue;
     if (['geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status)) continue;
     o.bezorger = { staffId: req.actor.staffId || null, name: req.actor.name };
@@ -99,7 +99,7 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
   const refs = (Array.isArray(req.body.refs) ? req.body.refs : [req.body.ref]).filter(Boolean).slice(0, 8);
   const bijgewerkt = [];
   for (const ref of refs) {
-    const o = db.data.orders.find(x => x.ref === ref && x.supplierCode === s.code);
+    const o = (x => x && x.supplierCode === s.code ? x : undefined)(orderMetRef(ref));
     if (!o || !o.levering) continue;
     if (status === 'opgehaald' && o.levering !== 'ophalen') continue;
     if (status !== 'opgehaald' && o.levering !== 'bezorgen') continue;
@@ -127,7 +127,7 @@ app.post('/api/supplier/bezorg/gps', supplierAuth, (req, res) => {
   const s = req.supplier;
   const B = db.data.bezorgers = db.data.bezorgers || {};
   B[s.code + ':' + (req.actor.staffId || 'beheer')] = { lat, lng, at: new Date().toISOString(), staffId: req.actor.staffId || null, name: req.actor.name };
-  const mijnOnderweg = db.data.orders.filter(o => o.supplierCode === s.code && o.status === 'onderweg' &&
+  const mijnOnderweg = ordersVanZaak(s.code).filter(o => o.status === 'onderweg' &&
     o.bezorger && o.bezorger.staffId === (req.actor.staffId || null));
   const eta = [];
   for (const o of mijnOnderweg) {

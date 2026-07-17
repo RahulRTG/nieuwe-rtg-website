@@ -170,10 +170,54 @@ p99 zakte in deze run van ~6800 ms naar ~2000 ms):
 Wat daarna overblijft is de echte O(N)-lees-vloer: die vergt de architectuur-stap
 hieronder en is bewust niet met een lapmiddel weggepoetst.
 
-## Vervolg (bewust nog niet gedaan)
+## De architectuur-stap: transactie-index + grootboek (gedaan)
 
-De logische volgende stap is dezelfde behandeling voor de transactionele
-collecties als voor de ledengids: orders/boekingen als geïndexeerde rijen in
-Postgres met gepagineerde, geaggregeerde lezers, in plaats van als één grote
-array in `db.data`. Dan verdwijnt de laatste O(N)-serialisatie uit de hete paden
-en schaalt ook de activiteitslaag mee met de 65M.
+De hierboven aangekondigde stap is gezet, in twee lagen die elk op hun eigen
+manier getest zijn:
+
+**1. De transactie-index (alle opslagmodi).** De hete leespaden zochten een
+order/boeking met een lineaire scan (`.find`/`.filter` op ref, klant of zaak) —
+O(N) per verzoek. `server/db.js` onderhoudt nu secundaire indexen
+(ref → item, klant → items, zaak → items) met zelfherstel: wordt de array
+vervangen (archief, venster, pg-sync) of erbuiten om beschreven, dan bouwt de
+index zich lui opnieuw. Ruim veertig leessites gebruiken de O(1)-helpers; de
+schrijfsites gaan door `ordersVoegToe`/`boekingenVoegToe`. Dit werkt in
+json/sqlite/postgres en wordt dus door de VOLLEDIGE bestaande suite gedekt,
+plus een eigen equivalentietest (`test/txindex.test.js`) die bewijst dat de
+helpers exact hetzelfde antwoorden als de scans die ze vervangen.
+
+**2. Het transactie-grootboek (`tx_ledger`, Postgres).** Dezelfde behandeling
+als de ledengids: orders/boekingen als geïndexeerde rijen (soort+ref sleutel,
+klant/zaak/at geïndexeerd, data versleuteld at rest), buiten het
+procesgeheugen. Het RAM houdt een VENSTER van de recentste items
+(`TX_RAM_ORDERS`, standaard 30.000); de veegronde schrijft de staart eerst
+idempotent naar het grootboek en haalt hem daarna pas uit het RAM — verlies-vrij
+per constructie, en de boekingen-cap (50.000) laat daardoor niets meer stilletjes
+verdwijnen. Nieuwe items gaan bij aanmaak direct mee; statuswissels van recente
+items stromen via de hete kop van de veegronde na (grootboek is bewust hooguit
+één veegronde achter op in-place mutaties). De leden-historie
+(`/api/orders/mine`, `/api/bookings/mine`) leest de eerste pagina vers uit het
+venster en diepere pagina's plus het eerlijke totaal uit het grootboek; de
+kantoor-totalen tellen via de gecachete grootboek-teller ook wat uit het venster
+is gerold. Dit Postgres-pad kan de sqlite/json-suite per definitie niet dekken,
+dus het heeft een eigen integratietest (`test/txledger.pg.test.js`) die tegen
+een echte Postgres draait en zonder `DATABASE_URL` expliciet skipt — geen vals
+groen.
+
+### Gemeten effect (zelfde harnas-werkpunt: 1M orders, 200k leden, 2 min soak)
+
+| | Voor (arrays in RAM) | Na (index + venster + grootboek) |
+| --- | --- | --- |
+| Server-RAM na laden | 1011 MB | **~280-400 MB** |
+| RSS-piek onder last | 6,6-7,2 GB | **~1,05 GB** |
+| heapUsed-vloer (na GC) | ~2,5 GB | **~170-240 MB** |
+| p99-latentie | 6800 ms | **1600-2600 ms** |
+| doorvoer | ~84/s | **~116/s** |
+
+De **LATENTIE**-drempel (p99 ≤ 2000 ms standaard) blijft op deze gedeelde
+testmachine eerlijk wisselvallig: 1600 ms op een rustige run (PASS), 2600 ms op
+een drukke (FAIL). De O(N)-vloer is weg; de resterende staart komt uit de
+bewust vijandige chaos-payloads (gigastrings parsen), GC en VM-ruis — dat staat
+hier zoals het is, geen opgerekte drempel om groen te kunnen tonen. De harnas
+zaait sinds deze stap in de echte vorm: het venster in kv, alles als rijen in
+`tx_ledger`.

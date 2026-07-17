@@ -38,7 +38,7 @@ app.post('/api/supplier/contract/maak', supplierAuth, async (req, res) => {
   }
   let huurRef = null;
   if (soort === 'verhuur' && req.body.huurRef) {
-    const h = db.data.boekingen.find(b => b.kind === 'huur' && b.ref === String(req.body.huurRef) && b.supplierCode === s.code);
+    const h = (b => b && b.kind === 'huur' && b.supplierCode === s.code ? b : undefined)(kern.boekingMetRef(String(req.body.huurRef)));
     if (h) { huurRef = h.ref; if (partij.kind === 'lid' && !req.body.codenaam) partij = { kind: 'lid', key: h.customerKey, codename: h.customerCodename }; }
   }
   const c = {

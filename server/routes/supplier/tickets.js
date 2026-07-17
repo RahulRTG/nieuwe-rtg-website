@@ -72,7 +72,7 @@ app.post('/api/supplier/ticket/checkin', supplierAuth, (req, res) => {
   if (!heeftTickets(s)) return res.status(409).json({ error: 'Deze sector verkoopt geen tickets.' });
   const code = String(req.body.code || '').trim().toUpperCase();
   if (!code) return res.status(400).json({ error: 'Voer de entreecode in.' });
-  const t = db.data.boekingen.find(b => b.kind === 'ticket' && b.supplierCode === s.code && b.code === code);
+  const t = kern.boekingenVanZaak(s.code).find(b => b.kind === 'ticket' && b.code === code);
   if (!t) return res.status(404).json({ error: 'Deze code hoort niet bij een ticket van uw zaak.' });
   if (!t.paid) return res.status(409).json({ error: 'Dit ticket is nog niet betaald.' });
   if (t.checkin) return res.status(409).json({ error: 'Al binnen: om ' + String(t.checkin.at).slice(11, 16) + ' afgevinkt door ' + t.checkin.door + '.' });
@@ -122,8 +122,7 @@ app.post('/api/supplier/ticket/deurverkoop', supplierAuth, async (req, res) => {
     price: total, wanneer: datum + ' ' + tijd,
     betaalMoment: 'deur', status: 'bevestigd', paid: true, at: new Date().toISOString()
   };
-  db.data.boekingen.unshift(ticket);
-  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  kern.boekingenVoegToe(ticket);
   const bonnen = db.data.posSales[s.code] = (db.data.posSales[s.code] || []);
   bonnen.unshift({
     id: crypto.randomBytes(4).toString('hex'), bon: code, actor: req.actor.name,

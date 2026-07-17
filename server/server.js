@@ -33,7 +33,10 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
-  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek } = require('./db');
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek,
+  orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
+  boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal } = require('./db');
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
@@ -712,7 +715,7 @@ const etaMinutes = geo.etaMinutes;
    functies dragen db, de bus, de SSE-routers, geo-helpers en i18n;
    sseToSupplier, sseToOffice en findSupplier zijn hoisted functies. */
 const { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveStateFor, guestsFor } =
-  maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n });
+  maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n, ordersVanKlant });
 /* De ledengids (sleutel -> codenaam + pas) staat in server/kern/gids.js:
    dirTouch, ledental, opzoeken en zoeken op codenaam, met of zonder Postgres. */
 const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam } =
@@ -2596,6 +2599,9 @@ const { officeAuth, officeState, pendingVerifications } = maakKantoor({
    uitsluitend via deze kern met de gedeelde data en realtime praat. Zo kan een
    domein later als eigen proces draaien zonder de routecode te veranderen. */
 const kern = {
+  orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
+  boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal,
   AI_TONE, ALT_IDEE, AUTHOR_TIER, BOEK_KETEN, CLUSTER_KEY, CSP_NONCE, DATA_DIR, DEMO,
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,

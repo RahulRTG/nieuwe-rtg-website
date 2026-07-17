@@ -20,7 +20,9 @@ module.exports = (kern) => {
     assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap,
     fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterPush,
     plaatsOrderVoor, betaalOrderVoor, koopTicketVoor, betaalBoekingVoor, vraagRitVoor, betaalRitVoor,
-    dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media } = kern;
+    dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media,
+    ordersVanKlant, boekingenVanKlant, boekingenVoegToe,
+    txLedgerActief, txLedgerVanKlant, txLedgerTel } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -639,7 +641,7 @@ app.post('/api/privacy/export', auth, (req, res) => {
     invoices: state.invoices || [],
     trip: state.trip || null,
     live: db.data.live[key] || null,
-    orders: db.data.orders.filter(o => (o.customerKey || o.customerTier) === key),
+    orders: ordersVanKlant(key),
     guestChats: chats,
     likedPosts: likes,
     notifications: db.data.notifications[key] || []
@@ -898,8 +900,7 @@ app.post('/api/booking/request', auth, (req, res) => {
     status: vooraf ? 'wacht-op-betaling' : 'aangevraagd',
     paid: false, at: new Date().toISOString()
   };
-  db.data.boekingen.unshift(boeking);
-  db.data.boekingen = db.data.boekingen.slice(0, 50000);
+  boekingenVoegToe(boeking);
   save();
   if (!vooraf) {
     notifySupplier(s.code, { icon: '🗓️', title: 'Nieuwe boeking (betaling achteraf)', body: codename + ': ' + dienst.name + (wanneer ? ' · ' + wanneer : '') + ' · € ' + dienst.price });
@@ -915,9 +916,15 @@ app.post('/api/booking/pay', auth, (req, res) => {
   res.json(r);
 });
 
-app.post('/api/bookings/mine', auth, (req, res) => {
-  const mijn = db.data.boekingen.filter(b => (b.customerKey || b.customerTier) === req.session.key);
-  res.json({ boekingen: mijn.slice(0, 25), total: mijn.length });
+app.post('/api/bookings/mine', auth, async (req, res) => {
+  // zelfde vensterbeleid als /api/orders/mine: vers venster, grootboek-historie
+  const key = req.session.key;
+  const offset = Math.max(0, parseInt(req.body.offset, 10) || 0);
+  const mijn = boekingenVanKlant(key);
+  if (!txLedgerActief()) return res.json({ boekingen: mijn.slice(offset, offset + 25), total: mijn.length });
+  const total = Math.max(mijn.length, await txLedgerTel('boekingen', key));
+  const boekingen = offset < mijn.length ? mijn.slice(offset, offset + 25) : await txLedgerVanKlant('boekingen', key, 25, offset);
+  res.json({ boekingen, total });
 });
 
 app.post('/api/giftcard/buy', auth, (req, res) => {
@@ -957,7 +964,7 @@ app.post('/api/member/accountant', auth, async (req, res) => {
   const vraag = String(req.body.question || '').trim().slice(0, 400);
   if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
   const key = req.session.key;
-  const horeca = db.data.orders.filter(o => (o.customerKey || o.customerTier) === key && o.paid).reduce((x, o) => x + o.total, 0);
+  const horeca = ordersVanKlant(key).filter(o => o.paid).reduce((x, o) => x + o.total, 0);
   const vervoer = db.data.rides.filter(r => (r.customerKey || r.customerTier) === key && r.paid).reduce((x, r) => x + (r.quote || 0), 0);
   let answer = null;
   if (anthropic) {
@@ -1011,10 +1018,17 @@ app.post('/api/order/pay', auth, (req, res) => {
   res.json(r);
 });
 
-app.post('/api/orders/mine', auth, (req, res) => {
-  // schaalvast: de laatste 25 bestellingen plus het eerlijke totaal
-  const mijn = db.data.orders.filter(o => (o.customerKey || o.customerTier) === req.session.key);
-  res.json({ orders: mijn.slice(0, 25), total: mijn.length });
+app.post('/api/orders/mine', auth, async (req, res) => {
+  // Schaalvast: de eerste pagina komt vers uit het RAM-venster; is het
+  // grootboek actief, dan komen diepere pagina's (historie die uit het venster
+  // is gerold) en het eerlijke totaal uit de geindexeerde grootboek-rijen.
+  const key = req.session.key;
+  const offset = Math.max(0, parseInt(req.body.offset, 10) || 0);
+  const mijn = ordersVanKlant(key);
+  if (!txLedgerActief()) return res.json({ orders: mijn.slice(offset, offset + 25), total: mijn.length });
+  const total = Math.max(mijn.length, await txLedgerTel('orders', key));
+  const orders = offset < mijn.length ? mijn.slice(offset, offset + 25) : await txLedgerVanKlant('orders', key, 25, offset);
+  res.json({ orders, total });
 });
 
 app.post('/api/live/start', auth, (req, res) => {

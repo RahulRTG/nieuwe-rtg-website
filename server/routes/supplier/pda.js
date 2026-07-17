@@ -1,7 +1,7 @@
 /* Domein "supplier" (deelmodule): pda. Draait op de gedeelde kern. */
 const training = require('../../training');
 module.exports = (kern) => {
-  const { accounts, anthropic, app, db, findSupplier, logActivity, managerOnly, notifySupplier, save, schoon, sseToSupplier, supplierAuth } = kern;
+  const { accounts, anthropic, app, db, findSupplier, logActivity, managerOnly, notifySupplier, save, schoon, sseToSupplier, supplierAuth, orderMetRef, ordersVanZaak } = kern;
 
 /* ============================================================================
    Personeelsnetwerk: PDA's van VERSCHILLENDE bedrijven kunnen met elkaar praten,
@@ -96,7 +96,7 @@ app.post('/api/supplier/aandacht', supplierAuth, (req, res) => {
   const lijst = ((db.data.aandacht || {})[req.supplier.code] || []).filter(x => !x.klaar);
   const nu = Date.now();
   const grens = Math.max(1, Number(req.body.minuten) || 10) * 60000;
-  const traagTafels = (db.data.orders || []).filter(o => o.supplierCode === req.supplier.code && o.paid &&
+  const traagTafels = ordersVanZaak(req.supplier.code).filter(o => o.paid &&
       (o.status === 'nieuw' || o.status === 'in bereiding') && (nu - new Date(o.paidAt || o.at)) > grens)
     .map(o => ({ ref: o.ref, tafel: o.table || null, codename: o.customerCodename,
       minuten: Math.round((nu - new Date(o.paidAt || o.at)) / 60000) }))
@@ -191,7 +191,7 @@ app.post('/api/supplier/coach', supplierAuth, async (req, res) => {
   // Context van een concrete tafel/bestelling: allergie en wensen tellen mee.
   let orderCtx = '', tafel = null;
   if (req.body.ref) {
-    const o = (db.data.orders || []).find(x => x.ref === String(req.body.ref) && x.supplierCode === req.supplier.code);
+    const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(String(req.body.ref)));
     if (o) {
       tafel = o.table || null;
       const items = (o.items || []).map(i => (i.qty > 1 ? i.qty + 'x ' : '') + i.name).join(', ');

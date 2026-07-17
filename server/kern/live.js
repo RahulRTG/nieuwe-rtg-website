@@ -6,7 +6,11 @@
    SSE-routers, geo-helpers en i18n) en komen uit maakLive(state), zodat de
    logica los te testen is en server.js dun blijft. */
 
-function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n }) {
+function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n, ordersVanKlant }) {
+  // De transactie-index (O(1) per klant) komt via injectie mee, net als de rest
+  // van de afhankelijkheden; zonder (bijv. een unit-test met een eigen db-stub)
+  // valt dit terug op de equivalente scan over de meegegeven db.
+  const vanKlant = ordersVanKlant || (key => (db.data.orders || []).filter(o => (o.customerKey || o.customerTier) === key));
   function sseToCustomer(key, event, data) {
     bus.publish('sse', { doel: 'key', match: key, event, data, id: nextSseId() });
   }
@@ -28,8 +32,8 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
     const L = db.data.live[key];
     if (L && L.destCode) set.add(L.destCode);
     if (L) for (const c of (L.connected || [])) set.add(c);
-    for (const o of db.data.orders)
-      if ((o.customerKey || o.customerTier) === key && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status)) set.add(o.supplierCode);
+    for (const o of vanKlant(key))
+      if (!['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status)) set.add(o.supplierCode);
     for (const r of db.data.rides)
       if ((r.customerKey || r.customerTier) === key && !['gearriveerd', 'afgerond', 'geweigerd'].includes(r.status)) set.add(r.supplierCode);
     return [...set];
@@ -52,7 +56,7 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
       const s = findSupplier(code); if (!s) return null;
       const t = db.data.supplierTypes[s.type] || {};
       const dist = me && s.loc ? haversine(me, s.loc) : null;
-      const order = db.data.orders.find(o => (o.customerKey || o.customerTier) === key && o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status));
+      const order = vanKlant(key).find(o => o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status));
       const ride = db.data.rides.find(r => (r.customerKey || r.customerTier) === key && r.supplierCode === code && r.status !== 'gearriveerd' && r.status !== 'geweigerd');
       return {
         code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon,
@@ -85,7 +89,7 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
       if (!connectedSupplierCodes(key).includes(code)) continue;
       const me = Number.isFinite(L.lat) ? { lat: L.lat, lng: L.lng } : null;
       const dist = me && s && s.loc ? haversine(me, s.loc) : null;
-      const order = db.data.orders.find(o => (o.customerKey || o.customerTier) === key && o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status));
+      const order = vanKlant(key).find(o => o.supplierCode === code && !['terugbetaald', 'geserveerd', 'geweigerd', 'bezorgd', 'opgehaald'].includes(o.status));
       const ride = db.data.rides.find(r => (r.customerKey || r.customerTier) === key && r.supplierCode === code && r.status !== 'gearriveerd' && r.status !== 'geweigerd');
       out.push({
         codename: L.codename, distance: dist, etaMin: etaMinutes(dist, L.mode),

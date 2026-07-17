@@ -206,14 +206,43 @@ async function zaaiActiviteit(pool) {
   const NU = Date.now();
   const SUPS = ['KIKUNOI', 'PONTO', 'HOSHI', 'SAKURA', 'MKKX'];
   const naam = i => 'Valk ' + (i % LEDEN + 1), key = i => 'user-' + ((i % LEDEN) + 1);
+  // Sinds het transactie-grootboek is de echte architectuur: een RAM-VENSTER
+  // van de recentste orders/boekingen in kv, en ALLES als geindexeerde rijen in
+  // tx_ledger. We zaaien precies die vorm (venster in kv, alles in het
+  // grootboek), zodat de soak het echte werkpunt meet en de historie-lezers
+  // (diepere pagina's uit het grootboek) echt iets te lezen hebben.
+  const RAM_ORDERS = Number(process.env.TX_RAM_ORDERS || 30000);
+  const RAM_BOEK = Number(process.env.TX_RAM_BOEKINGEN || 50000);
+  const grootboek = async (soort, bouw, n, venster) => {
+    await pool.query('DELETE FROM tx_ledger WHERE soort=$1', [soort]);
+    const t0 = Date.now();
+    // max 65535 bind-parameters per query (16-bit limiet): 5000 rijen x 9 kolommen past
+    for (let s = 0; s < n; s += 5000) {
+      const e = Math.min(s + 5000, n);
+      const vals = [], params = []; let p = 0;
+      for (let i = s; i < e; i++) {
+        const t = bouw(i);
+        vals.push('($' + (++p) + ',$' + (++p) + ',$' + (++p) + ',$' + (++p) + ',$' + (++p) + ',$' + (++p) + ',$' + (++p) + ',$' + (++p) + ',$' + (++p) + ')');
+        params.push(soort, t.ref, t.customerKey || t.customerTier, t.supplierCode, !!t.paid, t.status, t.total != null ? t.total : t.price || 0, t.at, JSON.stringify(t));
+      }
+      await pool.query('INSERT INTO tx_ledger(soort,ref,klant,zaak,paid,status,totaal,at,data) VALUES ' + vals.join(',') + ' ON CONFLICT(soort,ref) DO NOTHING', params);
+    }
+    rij('tx_ledger ' + soort, nl(n) + ' rijen - ' + ((Date.now() - t0) / 1000).toFixed(0) + ' s');
+    return venster;
+  };
   const schrijf = async (nm, bouw, n) => {
     const st = ['[']; for (let i = 0; i < n; i++) { st.push(JSON.stringify(bouw(i))); if (i < n - 1) st.push(','); } st.push(']');
     const json = st.join('');
     await pool.query("INSERT INTO kv(key,val,ver) VALUES($1,$2,nextval('kv_ver_seq')) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=nextval('kv_ver_seq')", [nm, json]);
     rij('kv ' + nm, nl(n) + ' - ' + MB(Buffer.byteLength(json)) + ' MB');
   };
-  await schrijf('orders', i => ({ ref: 'RTG-O-S' + i.toString(36), pickup: 'T' + (i % 46656).toString(36), supplierCode: SUPS[i % 5], supplierName: SUPS[i % 5], type: 'restaurant', customerTier: 'rtg', customerKey: key(i * 7), customerCodename: naam(i * 7), items: [{ id: 1, name: 'Gazpacho', qty: 1, price: 16 }], total: 16, betaalMoment: 'vooraf', status: i % 9 ? 'geserveerd' : 'klaar', paid: true, at: new Date(NU - (i % 7776000) * 1000).toISOString() }), N_ORDERS);
-  await schrijf('boekingen', i => ({ ref: 'RTG-B-S' + i.toString(36), kind: i % 2 ? 'ticket' : 'verblijf', supplierCode: SUPS[i % 5], customerKey: key(i * 3), customerCodename: naam(i * 3), service: { name: 'Dienst', soort: 'ticket' }, datum: new Date(NU + (i % 30) * 86400000).toISOString().slice(0, 10), tijd: '10:00', personen: 1 + i % 4, code: (i % 46656).toString(36), price: 40, paid: true, status: 'bevestigd', at: new Date(NU - (i % 5e6) * 1000).toISOString() }), N_BOEK);
+  const bouwOrder = i => ({ ref: 'RTG-O-S' + i.toString(36), pickup: 'T' + (i % 46656).toString(36), supplierCode: SUPS[i % 5], supplierName: SUPS[i % 5], type: 'restaurant', customerTier: 'rtg', customerKey: key(i * 7), customerCodename: naam(i * 7), items: [{ id: 1, name: 'Gazpacho', qty: 1, price: 16 }], total: 16, betaalMoment: 'vooraf', status: i % 9 ? 'geserveerd' : 'klaar', paid: true, at: new Date(NU - (i % 7776000) * 1000).toISOString() });
+  const bouwBoeking = i => ({ ref: 'RTG-B-S' + i.toString(36), kind: i % 2 ? 'ticket' : 'verblijf', supplierCode: SUPS[i % 5], customerKey: key(i * 3), customerCodename: naam(i * 3), service: { name: 'Dienst', soort: 'ticket' }, datum: new Date(NU + (i % 30) * 86400000).toISOString().slice(0, 10), tijd: '10:00', personen: 1 + i % 4, code: (i % 46656).toString(36), price: 40, paid: true, status: 'bevestigd', at: new Date(NU - (i % 5e6) * 1000).toISOString() });
+  // alles in het grootboek (geindexeerde rijen), alleen het venster in kv/RAM
+  await grootboek('order', bouwOrder, N_ORDERS, RAM_ORDERS);
+  await grootboek('boeking', bouwBoeking, N_BOEK, RAM_BOEK);
+  await schrijf('orders', bouwOrder, Math.min(N_ORDERS, RAM_ORDERS));
+  await schrijf('boekingen', bouwBoeking, Math.min(N_BOEK, RAM_BOEK));
   await schrijf('directBetalingen', i => ({ id: 'db' + i.toString(36), bedrag: 10 + i % 500, amount: 10 + i % 500, van: key(i * 5), aan: SUPS[i % 5], supplierCode: SUPS[i % 5], at: new Date(NU - (i % 4e6) * 1000).toISOString() }), N_BETAAL);
   await schrijf('betaalVerzoeken', i => ({ id: 'v' + i.toString(36), van: key(i), naar: key(i * 2), centen: 100 + (i % 9000), oms: 'Etentje', status: i % 3 ? 'open' : 'betaald', at: new Date(NU - (i % 3e6) * 1000).toISOString() }), N_VERZ);
   await schrijf('reviews', i => ({ id: 'r' + i.toString(36), supplierCode: SUPS[i % 5], rating: 1 + i % 5, text: 'Prima', codename: naam(i), at: new Date(NU - (i % 6e6) * 1000).toISOString() }), N_REVIEW);

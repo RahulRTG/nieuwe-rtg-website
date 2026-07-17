@@ -26,7 +26,7 @@
     "web-push": "^3.6.7"
   },
   "optionalDependencies": {
-    "@sentry/node": "^8.0.0",
+    "@sentry/node": "^10.66.0",
     "pg": "^8.22.0",
     "redis": "^6.1.0",
     "stripe": "^17.0.0"

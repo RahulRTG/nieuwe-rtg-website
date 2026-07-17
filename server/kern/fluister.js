@@ -34,7 +34,12 @@
    object (het 24-uursblok) wordt eerst een voorstel dat u bevestigt met
    "ja" (of afblaast met "nee"). Een tafelreservering blijft direct:
    gratis en altijd annuleerbaar. */
-module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering, assetGebruik, zorgVoor, pay, kernRef }) => {
+module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering, assetGebruik, zorgVoor, pay, acties }) => {
+  /* De acties-registry: vermogens die pas na deze module op de kern komen
+     (bestellen, tickets, ritten worden in routes/member.js geregistreerd,
+     want daar wonen die regels). Het contract: elke actie is een functie
+     (session, body) die { ok, ... } of { status, error } teruggeeft -
+     exact dezelfde functie die de app-knoppen bedient, dus geen drift. */
   const nu = () => new Date().toISOString();
   // hetzelfde brein, een passend gezicht: De Butler voor leden, "uw
   // assistent" voor personeel en zaken
@@ -106,10 +111,49 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   const datumInZin = txt => (String(txt).match(/\d{4}-\d{2}-\d{2}/) || [])[0] ||
     (/\bvandaag\b/i.test(txt) ? vandaag() : /\bovermorgen\b/i.test(txt) ? plusDagen(2) : /\bmorgen\b/i.test(txt) ? plusDagen(1) : datumUit(txt));
 
+  /* ---- rem op de motor: hooguit 60 berichten per minuut per gebruiker.
+     Beschermt de AI-kosten en de doe-laag tegen scripts en vastlopende
+     spraak-loops; een mens merkt er niets van. ---- */
+  const rem = new Map();
+  function teSnel(key) {
+    const t = Date.now();
+    if (rem.size > 50000) rem.clear(); // nooit onbegrensd geheugen
+    const b = rem.get(key) || { vanaf: t, n: 0 };
+    if (t - b.vanaf > 60000) { b.vanaf = t; b.n = 0; }
+    b.n += 1;
+    rem.set(key, b);
+    return b.n > 60;
+  }
+
+  /* ---- de bronnen voor seintjes: per gebruiker los (de route), of uit
+     een vooraf gebouwde index (de halfuurlijkse sweep), zodat die ronde
+     over alle gebruikers maar een keer door de data hoeft ---- */
+  function maakSeintjesIndex() {
+    const idx = { res: new Map(), vb: new Map(), gebruik: new Map(), tickets: new Map(), terugkoop: new Map() };
+    const stop = (m, k, x) => { const l = m.get(k); if (l) l.push(x); else m.set(k, [x]); };
+    for (const r of db.data.reserveringen || []) stop(idx.res, r.customerKey, r);
+    for (const v of db.data.verblijven || []) stop(idx.vb, v.customerKey || v.key, v);
+    for (const g of db.data.assetGebruik || []) stop(idx.gebruik, g.key, g);
+    for (const t of db.data.assetTickets || []) stop(idx.tickets, t.key, t);
+    for (const v of db.data.assetTerugkoop || []) stop(idx.terugkoop, v.key, v);
+    return idx;
+  }
+  const bronnenVoor = (key, idx) => idx ? {
+    res: idx.res.get(key) || [], vb: idx.vb.get(key) || [], gebruik: idx.gebruik.get(key) || [],
+    tickets: idx.tickets.get(key) || [], terugkoop: idx.terugkoop.get(key) || []
+  } : {
+    res: (db.data.reserveringen || []).filter(r => r.customerKey === key),
+    vb: (db.data.verblijven || []).filter(v => (v.customerKey || v.key) === key),
+    gebruik: (db.data.assetGebruik || []).filter(g => g.key === key),
+    tickets: (db.data.assetTickets || []).filter(t => t.key === key),
+    terugkoop: (db.data.assetTerugkoop || []).filter(v => v.key === key)
+  };
+
   /* ---- proactief: Fluister fluistert zelf, nog voordat je iets vraagt ---- */
   const BEDENKTIJD_DAGEN = 14; // gelijk aan kern/assets.js
-  function fluisterSeintjes(key) {
+  function fluisterSeintjes(key, idx) {
     const p = van(key);
+    const bron = bronnenVoor(key, idx);
     const s = [];
     // 1. datums in je eigen weetjes: verjaardagen en afspraken die naderen
     for (const w of p.weetjes) {
@@ -120,36 +164,36 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
       s.push({ icoon: /verjaardag|jarig|birthday/i.test(w.tekst) ? '🎂' : '📅', tekst: w.tekst + ' · ' + wanneer(dgn) + ' (' + d + ')' });
     }
     // 2. de eerstvolgende reservering, zodra hij dichtbij komt
-    const res = (db.data.reserveringen || [])
-      .filter(r => r.customerKey === key && ['aangevraagd', 'bevestigd'].includes(r.status) && r.datum >= vandaag())
+    const res = bron.res
+      .filter(r => ['aangevraagd', 'bevestigd'].includes(r.status) && r.datum >= vandaag())
       .sort((a, b) => (a.datum + a.tijd).localeCompare(b.datum + b.tijd))[0];
     if (res && dagenTot(res.datum) <= 2)
       s.push({ icoon: '🪑', tekst: wanneer(dagenTot(res.datum)) + ' ' + res.tijd + ' gereserveerd bij ' + res.supplierName + (res.status === 'aangevraagd' ? ' (wacht nog op bevestiging)' : '') });
     // 3. verblijf: de check-in nadert, of het is tijd om uit te checken
-    for (const v of (db.data.verblijven || []).filter(v => (v.customerKey || v.key) === key)) {
+    for (const v of bron.vb) {
       if (v.status === 'bevestigd' && v.aankomst >= vandaag() && dagenTot(v.aankomst) <= 7)
         s.push({ icoon: '🏨', tekst: 'Check-in ' + v.roomName + ' bij ' + v.supplierName + ' · ' + wanneer(dagenTot(v.aankomst)) });
       if (v.status === 'ingecheckt' && v.vertrek && dagenTot(v.vertrek) <= 1)
         s.push({ icoon: '🧳', tekst: 'Uitchecken bij ' + v.supplierName + ' · ' + wanneer(dagenTot(v.vertrek)) });
     }
     // 4. een geboekt 24-uursblok van een Shared Asset dat eraan komt
-    for (const g of (db.data.assetGebruik || []).filter(g => g.key === key && g.datum >= vandaag() && dagenTot(g.datum) <= 7))
+    for (const g of bron.gebruik.filter(g => g.datum >= vandaag() && dagenTot(g.datum) <= 7))
       s.push({ icoon: '🔑', tekst: 'Uw 24 uur bij ' + g.assetNaam + ' · ' + wanneer(dagenTot(g.datum)) + ' (' + g.datum + ')' });
     // 5. lopende asset-zaken: bedenktijd die nog loopt, terugkoop onderweg
-    const bedenk = (db.data.assetTickets || []).filter(t => t.key === key && t.status === 'actief' &&
+    const bedenk = bron.tickets.filter(t => t.status === 'actief' &&
       Date.now() - Date.parse(t.at) < BEDENKTIJD_DAGEN * 86400000);
     if (bedenk.length) {
       const rest = Math.ceil(BEDENKTIJD_DAGEN - (Date.now() - Date.parse(bedenk[0].at)) / 86400000);
       s.push({ icoon: '↩️', tekst: 'Nog ' + rest + ' dag(en) bedenktijd op ' + bedenk.length + ' ticket(s); herroepen is kosteloos' });
     }
-    for (const v of (db.data.assetTerugkoop || []).filter(v => v.key === key && v.status === 'aangevraagd'))
+    for (const v of bron.terugkoop.filter(v => v.status === 'aangevraagd'))
       s.push({ icoon: '⏳', tekst: 'Terugkoop ' + v.assetNaam + ': uiterlijk ' + v.uiterlijk + ' staat het bedrag in uw tegoed' });
     // 6. een vriendelijke duw: het jaar loopt en uw 24 uur staat nog nergens
     if (vandaag().slice(5, 7) >= '07') {
       const jaar = vandaag().slice(0, 4);
-      const stil = (db.data.assetTickets || []).find(t => t.key === key && t.status === 'actief' &&
+      const stil = bron.tickets.find(t => t.status === 'actief' &&
         Date.now() - Date.parse(t.at) >= BEDENKTIJD_DAGEN * 86400000 &&
-        !(db.data.assetGebruik || []).some(g => g.key === key && g.assetId === t.assetId && g.datum.slice(0, 4) === jaar));
+        !bron.gebruik.some(g => g.assetId === t.assetId && g.datum.slice(0, 4) === jaar));
       if (stil) s.push({ icoon: '💡', tekst: 'Uw 24 uur van dit jaar bij ' + (((db.data.sharedAssets || []).find(a => a.id === stil.assetId) || {}).naam || 'uw object') + ' staat nog niet gepland' });
     }
     return s.slice(0, 5);
@@ -157,12 +201,12 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
 
   /* Een nieuw seintje wordt vanzelf een melding op het toestel (de bel plus
      web-push). Met geheugen: elk seintje piept precies een keer. */
-  function fluisterPush(key) {
+  function fluisterPush(key, idx) {
     if (String(key).startsWith('staff:') || !notify) return { ok: true, gepusht: 0 };
     const p = van(key);
     if (!p.geseind) p.geseind = {};
     let n = 0;
-    for (const s of fluisterSeintjes(key)) {
+    for (const s of fluisterSeintjes(key, idx)) {
       if (p.geseind[s.tekst]) continue;
       p.geseind[s.tekst] = nu();
       notify(key, { icon: s.icoon, title: 'Uw Butler', body: s.tekst, scope: 'fluister' });
@@ -172,6 +216,14 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     const ks = Object.keys(p.geseind);
     if (ks.length > 60) for (const k of ks.sort((a, b) => p.geseind[a].localeCompare(p.geseind[b])).slice(0, ks.length - 60)) delete p.geseind[k];
     if (n) save();
+    return { ok: true, gepusht: n };
+  }
+
+  // de halfuurlijkse ronde over alle gebruikers: een index, een datapass
+  function fluisterPushAlle() {
+    const idx = maakSeintjesIndex();
+    let n = 0;
+    for (const k of Object.keys(db.data.fluister || {})) n += fluisterPush(k, idx).gepusht;
     return { ok: true, gepusht: n };
   }
 
@@ -199,10 +251,10 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   async function voerUit(key, codenaam, w, sess) {
     // bestellen: plaatsen en direct afrekenen via exact dezelfde functies
     // als de app-knoppen (ledenprijs, 86, leeftijd, zorgprofiel incluis)
-    if (w.soort === 'bestelling' && sess && kernRef && kernRef.plaatsOrderVoor) {
-      const r = kernRef.plaatsOrderVoor(sess, { supplierCode: w.supplierCode, items: w.items });
+    if (w.soort === 'bestelling' && sess && acties && acties.plaatsOrder) {
+      const r = acties.plaatsOrder(sess, { supplierCode: w.supplierCode, items: w.items });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
-      const b = kernRef.betaalOrderVoor(sess, { ref: r.order.ref });
+      const b = acties.betaalOrder(sess, { ref: r.order.ref });
       if (b.error) return { tekst: 'De bestelling staat klaar (' + r.order.ref + '), maar het afrekenen lukte niet: ' + b.error + ' Rond hem af in de Bestellen-tab.', gedaan: true };
       return { tekst: 'Besteld en betaald bij ' + r.order.supplierName + ': ' + w.oms + ', samen ' + eur(b.order.total * 100) + '. Uw ophaalcode is ' + r.order.pickup + '; de zaak gaat er direct mee aan de slag.', gedaan: true };
     }
@@ -217,20 +269,20 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
       return { tekst: 'Gedaan: ' + eur(w.centen) + ' aan ' + w.aan + ' gestuurd via een Tik. Uw saldo: ' + eur(r.saldo) + '.', gedaan: true };
     }
     // tickets voor een activiteit: boeken en direct afrekenen, entreecode terug
-    if (w.soort === 'ticket' && sess && kernRef && kernRef.koopTicketVoor) {
-      const r = kernRef.koopTicketVoor(sess, { supplierCode: w.supplierCode, activiteitId: w.activiteitId, datum: w.datum, tijd: w.tijd, personen: w.personen });
+    if (w.soort === 'ticket' && sess && acties && acties.koopTicket) {
+      const r = acties.koopTicket(sess, { supplierCode: w.supplierCode, activiteitId: w.activiteitId, datum: w.datum, tijd: w.tijd, personen: w.personen });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
-      const b = kernRef.betaalBoekingVoor(sess, { ref: r.ticket.ref });
+      const b = acties.betaalBoeking(sess, { ref: r.ticket.ref });
       if (b.error) return { tekst: 'De tickets staan klaar (' + r.ticket.ref + '), maar het afrekenen lukte niet: ' + b.error, gedaan: true };
       return { tekst: 'Geboekt en betaald: ' + w.oms + ' op ' + w.datum + ' om ' + w.tijd + ', samen ' + eur((r.ticket.price || 0) * 100) + '. Uw entreecode is ' + r.ticket.code + '; laat hem bij de deur oplichten.', gedaan: true };
     }
     // een rit: aanvragen en (bij vooraf betalen) de offerte direct voldoen
-    if (w.soort === 'rit' && sess && kernRef && kernRef.vraagRitVoor) {
-      const r = kernRef.vraagRitVoor(sess, { supplierCode: w.supplierCode, to: w.to, toCode: w.toCode, passengers: w.personen, date: w.datum, time: w.tijd });
+    if (w.soort === 'rit' && sess && acties && acties.vraagRit) {
+      const r = acties.vraagRit(sess, { supplierCode: w.supplierCode, to: w.to, toCode: w.toCode, passengers: w.personen, date: w.datum, time: w.tijd });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       let slot = '';
       if (r.ride.status === 'wacht-op-betaling') {
-        const b = kernRef.betaalRitVoor(sess, { ref: r.ride.ref });
+        const b = acties.betaalRit(sess, { ref: r.ride.ref });
         if (b.error) return { tekst: 'De rit staat klaar (' + r.ride.ref + '), maar het afrekenen lukte niet: ' + b.error, gedaan: true };
         slot = ' De offerte van ' + eur(r.ride.quote * 100) + ' is betaald;';
       } else slot = ' Offerte: ' + eur(r.ride.quote * 100) + ' (' + r.ride.betaalMoment + ');';
@@ -254,6 +306,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   async function fluisterZeg(key, codenaam, qIn, sess) {
     const q = String(qIn || '').trim().slice(0, 600);
     if (!q) return { status: 400, error: 'Zeg iets.' };
+    if (teSnel(key)) return { status: 429, error: 'Even op adem komen: te veel berichten achter elkaar. Probeer het over een minuutje weer.' };
     const p = van(key);
     // het antwoord gaat ook het gespreksgeheugen in (laatste 5 beurten);
     // voorstel=true betekent: er staat iets klaar dat op "ja" wacht
@@ -352,7 +405,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
       }
       // "boek 2 tickets voor de sunset cruise morgen (om 19:00)": geld,
       // dus eerst een voorstel; de entreecode komt na uw "ja"
-      if (kernRef && kernRef.koopTicketVoor && /\b(boek|koop|regel)\b/i.test(q) && /\b(tickets?|kaartjes?)\b/i.test(q)) {
+      if (acties && acties.koopTicket && /\b(boek|koop|regel)\b/i.test(q) && /\b(tickets?|kaartjes?)\b/i.test(q)) {
         let zaak = null, act = null;
         const ql = q.toLowerCase();
         for (const x of (db.data.suppliers || [])) {
@@ -374,7 +427,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
       }
       // "regel een taxi naar Sal de Mar (om 23:00, met 4 personen)": de
       // offerte volgt het tarief van de vervoerder; betalen na uw "ja"
-      if (kernRef && kernRef.vraagRitVoor && /\b(regel|boek|bestel|vraag)\b/i.test(q) && /\b(taxi|auto|rit|chauffeur|wagen|transfer)\b/i.test(q)) {
+      if (acties && acties.vraagRit && /\b(regel|boek|bestel|vraag)\b/i.test(q) && /\b(taxi|auto|rit|chauffeur|wagen|transfer)\b/i.test(q)) {
         const ql = q.toLowerCase();
         const rijders = (db.data.suppliers || []).filter(x => ((db.data.supplierTypes[x.type] || {}).caps || []).includes('rides') && x.type !== 'activiteit');
         const rijder = rijders.find(x => (x.name || '').toLowerCase().split(/\s+/).some(wrd => wrd.length > 3 && ql.includes(wrd))) ||
@@ -391,7 +444,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
       }
       // "bestel 2 sangria en 1 bravas bij Sunset Ibiza": eten en drinken
       // wordt direct afgerekend via RTG Pay, dus boven de drempel
-      if (kernRef && kernRef.plaatsOrderVoor && /^bestel\b/i.test(q)) {
+      if (acties && acties.plaatsOrder && /^bestel\b/i.test(q)) {
         if (sess.tier === 'guest') return klaar('Bestellen via mij kan alleen met een lidmaatschap; als gast kan het via de Bestellen-tab.');
         const naam = (q.match(/\bbij\s+(.+?)[.?!]?\s*$/i) || [])[1];
         const s = naam && (db.data.suppliers || []).find(x => (x.name || '').toLowerCase().includes(naam.toLowerCase().trim()));
@@ -533,5 +586,5 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     return r;
   }
 
-  return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush };
+  return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle };
 };

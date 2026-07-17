@@ -1101,8 +1101,14 @@ function betaalOrderVoor(session, body) {
 }
 
 
-// De Butler bestelt via exact dezelfde functies als de app-knoppen
-Object.assign(kern, { plaatsOrderVoor, betaalOrderVoor, koopTicketVoor, betaalBoekingVoor, vraagRitVoor, betaalRitVoor });
+/* De Butler bestelt, boekt en rijdt via exact dezelfde functies als de
+   app-knoppen: registratie in de acties-registry (zie server.js), volgens
+   het contract (session, body) -> { ok, ... } | { status, error }. */
+Object.assign(kern.butlerActies, {
+  plaatsOrder: plaatsOrderVoor, betaalOrder: betaalOrderVoor,
+  koopTicket: koopTicketVoor, betaalBoeking: betaalBoekingVoor,
+  vraagRit: vraagRitVoor, betaalRit: betaalRitVoor
+});
 
 app.post('/api/order', auth, (req, res) => {
   const r = plaatsOrderVoor(req.session, req.body);

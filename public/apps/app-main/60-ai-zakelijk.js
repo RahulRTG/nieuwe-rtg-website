@@ -184,31 +184,12 @@
   }
   $('#askBtn').addEventListener('click', () => { ask($('#askInput').value); $('#askInput').value = ''; });
   $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ ask(e.target.value); e.target.value = ''; } });
-  // spreek uw vraag in: de browser luistert, De Butler doet de rest
-  (function(){
-    const mic = $('#askMic');
-    if (!mic) return;
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR){ mic.hidden = true; return; }
-    mic.addEventListener('click', () => {
-      try {
-        const rec = new SR();
-        rec.lang = document.documentElement.lang === 'en' ? 'en-US' : 'nl-NL';
-        rec.interimResults = false;
-        rec.maxAlternatives = 1;
-        mic.textContent = '🔴';
-        rec.addEventListener('result', ev => {
-          const zin = (((ev.results[0] || [])[0] || {}).transcript || '').trim();
-          $('#askInput').value = zin;
-          ask(zin);
-          $('#askInput').value = '';
-        });
-        rec.addEventListener('end', () => { mic.textContent = '🎤'; });
-        rec.addEventListener('error', () => { mic.textContent = '🎤'; toast(T('fl.michoor','Ik kon u niet verstaan; probeer het nog eens of typ het gewoon.')); });
-        rec.start();
-      } catch(e){ toast(T('fl.micniet','Spraak werkt niet in deze browser; typen kan altijd.')); }
-    });
-  })();
+  // spreek uw vraag in: de gedeelde spraakmotor luistert, De Butler doet de rest
+  if (window.Spraak) Spraak.koppel($('#askMic'), {
+    opTekst: zin => { $('#askInput').value = zin; ask(zin); $('#askInput').value = ''; },
+    nietVerstaan: () => toast(T('fl.michoor','Ik kon u niet verstaan; probeer het nog eens of typ het gewoon.')),
+    kanNiet: () => toast(T('fl.micniet','Spraak werkt niet in deze browser; typen kan altijd.'))
+  });
 
   /* ---------- RTG Zakelijk: het professionele netwerk van de Business Pass ---------- */
   let zakView = 'feed';

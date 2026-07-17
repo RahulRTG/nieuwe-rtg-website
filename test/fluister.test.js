@@ -263,6 +263,15 @@ test('hij leert van je schermgebruik: alleen tellers, en hij benoemt de top', as
   assert.ok(/Tafelplanning/.test(wat.antwoord), 'hij vertelt eerlijk waar hij dat van weet');
 });
 
+test('de rem: na 60 berichten in een minuut zegt de motor vriendelijk stop', async () => {
+  // een eigen gast-sessie, zodat de rem van dit geweld geen andere test raakt
+  const gast = (await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'guest' }) })).json()).token;
+  let laatste = null;
+  for (let i = 0; i < 61; i++) laatste = await api('fluister', { q: 'help' }, gast);
+  assert.equal(laatste.status, 429, 'de 61e binnen een minuut is er een te veel');
+  assert.ok(/rustig|adem/i.test(laatste.body.error));
+});
+
 test('het personeel heeft een eigen Fluister, gescheiden van het lid en de zaak', async () => {
   const r = await api('staff/fluister', { q: 'onthoud dat ik op dinsdag altijd de late dienst draai' }, pda);
   assert.equal(r.status, 200);

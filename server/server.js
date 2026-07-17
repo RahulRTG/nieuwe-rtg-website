@@ -2685,18 +2685,20 @@ Object.assign(kern, require('./kern/gastzorg')({ db, save, crypto, schoon, notif
 // Toren 3, RTG Shared Assets: 300 tickets per object, Access en Asset
 Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify, pay: kern.pay }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
+/* De acties-registry van de Butler: routes/member.js registreert hier de
+   doe-functies (bestellen, tickets, ritten) die daar wonen; de motor roept
+   ze aan via dit expliciete contract in plaats van blind in de kern te
+   grijpen. Elke actie: (session, body) -> { ok, ... } | { status, error }. */
+kern.butlerActies = {};
 Object.assign(kern, require('./kern/fluister')({
   db, save, schoon, anthropic, notify,
   reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,
-  // kernRef: voor vermogens die pas later op de kern komen (zoals bestellen,
-  // dat in routes/member.js op de kern wordt gehangen)
-  kernRef: kern
+  acties: kern.butlerActies
 }));
 // nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
-// elk half uur en fluisterPush zelf zorgt dat niets twee keer piept
-setInterval(() => {
-  try { for (const k of Object.keys(db.data.fluister || {})) kern.fluisterPush(k); } catch (e) {}
-}, 30 * 60 * 1000).unref();
+// elk half uur, bouwt een index (een datapass voor alle gebruikers) en
+// fluisterPush zelf zorgt dat niets twee keer piept
+setInterval(() => { try { kern.fluisterPushAlle(); } catch (e) {} }, 30 * 60 * 1000).unref();
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

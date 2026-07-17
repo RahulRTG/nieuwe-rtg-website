@@ -728,7 +728,7 @@
       '<div id="pkFlSein"></div>'+
       '<div id="pkFlUit" style="margin-top:0.45rem;font-size:0.8rem;line-height:1.5;">'+(pkFlLaatst||'')+'</div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="pkFlIn" placeholder="'+T('pd.fl.ph','Vraag iets, of: onthoud dat...')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
-      ((window.SpeechRecognition || window.webkitSpeechRecognition) ? '<button class="abtn ghost" id="pkFlMic" aria-label="'+T('pd.fl.mic','Spreek uw vraag in')+'">🎤</button>' : '')+
+      '<button class="abtn ghost" id="pkFlMic" aria-label="'+T('pd.fl.mic','Spreek uw vraag in')+'">🎤</button>'+
       '<button class="abtn" id="pkFlStuur">'+T('pd.fl.stuur','Stuur')+'</button></div></div>'+
       trainingKaart()+
       '<div class="card"><div class="k">🩹 '+T('pd.eh.h','EHBO, direct bij de hand')+'</div>'+
@@ -799,25 +799,15 @@
       inp.value = '';
       pkFlVraag(q);
     });
-    // spreek de vraag in: handig met een dienblad in de ene hand
-    const pkmic = document.getElementById('pkFlMic');
-    if (pkmic) pkmic.addEventListener('click', () => {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      try {
-        const rec = new SR();
-        rec.lang = document.documentElement.lang === 'en' ? 'en-US' : 'nl-NL';
-        rec.interimResults = false;
-        pkmic.textContent = '🔴';
-        rec.addEventListener('result', ev => {
-          const zin = (((ev.results[0] || [])[0] || {}).transcript || '').trim();
-          const inp = document.getElementById('pkFlIn');
-          if (inp) inp.value = zin;
-          pkFlVraag(zin);
-        });
-        rec.addEventListener('end', () => { pkmic.textContent = '🎤'; });
-        rec.addEventListener('error', () => { pkmic.textContent = '🎤'; });
-        rec.start();
-      } catch(e){ toast(T('pd.fl.micniet','Spraak werkt niet op dit toestel; typen kan altijd.')); }
+    // spreek de vraag in via de gedeelde spraakmotor: handig met een
+    // dienblad in de ene hand
+    if (window.Spraak) Spraak.koppel(document.getElementById('pkFlMic'), {
+      opTekst: zin => {
+        const inp = document.getElementById('pkFlIn');
+        if (inp) inp.value = zin;
+        pkFlVraag(zin);
+      },
+      kanNiet: () => toast(T('pd.fl.micniet','Spraak werkt niet op dit toestel; typen kan altijd.'))
     });
     document.querySelectorAll('[data-eh]').forEach(el => el.addEventListener('click', () => {
       const i = Number(el.dataset.eh);

@@ -206,15 +206,23 @@
     regTier = vastePas;
   } else {
 
-    // keuzescherm: alles van de poort dicht, alleen de drie pas-apps
-    document.title = 'RTG, kies uw pas-app';
+    // de ene poort: log in en uw account opent vanzelf de juiste pas-app
+    // (RTG, Lifestyle of Business); zelf kiezen kan daaronder nog steeds
+    document.title = 'RTG, log in of kies uw pas-app';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
-    ['#loginForm','#regForm','#forgotForm','#resetForm','#toReg','#toForgot','#toLogin']
+    ['#regForm','#forgotForm','#resetForm','#toReg','#toForgot','#toLogin']
       .forEach(sel => { const e = $(sel); if (e) e.style.display = 'none'; });
     document.querySelectorAll('#gate .gate-or, #gate .gate-list, #gate .note').forEach(e => { e.style.display = 'none'; });
     const kp = document.getElementById('kiesPas');
     if (kp){ kp.hidden = false; kp.style.display = 'flex'; }
+    const lf = document.getElementById('loginForm');
+    if (lf){
+      lf.style.display = 'flex';
+      if (kp && kp.parentElement) kp.parentElement.insertBefore(lf, kp); // inloggen boven de keuze
+    }
+    const kt = kp && kp.querySelector('.gate-or');
+    if (kt){ kt.style.display = ''; kt.textContent = 'Log in en u belandt vanzelf in uw eigen app. Of kies hem zelf:'; }
   }
 
   /* ---------- pas-thema (kleuren van de website) ----------
@@ -368,6 +376,16 @@
           API.token = data.token;
           applyState(data.state);           // user = het echte account
           tier = user.tier;
+          // uw account weet zelf bij welke pas hij hoort: zonder ?pas= (of in
+          // de verkeerde pas-app) opent meteen de juiste app, zoals de
+          // leeftijdskeuze dat bij de RTFoundation doet
+          const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
+          const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg', 'guest'] : [vastePas]) : [];
+          if (!magHier.includes(user.tier) && ['rtg', 'lifestyle', 'business'].includes(doelPas)){
+            try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
+            location.replace(location.pathname + '?pas=' + doelPas);
+            return;
+          }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
@@ -398,17 +416,21 @@
   }
 
   // Blijf ingelogd: met een bewaard token slaat de app het startscherm over.
-  // Alleen in een pas-app (het keuzescherm logt nooit in), en alleen als de
-  // bewaarde sessie ook echt bij deze pas hoort.
+  // De sessie weet zelf bij welke pas hij hoort: zonder ?pas= (of in de
+  // verkeerde pas-app) sturen we meteen door naar de juiste app.
   async function restoreSession(){
-    if (!API.enabled || !vastePas) return;
+    if (!API.enabled) return;
     let t = null; try { t = localStorage.getItem('rtg_member_token'); } catch(e){}
     if (!t) return;
     API.token = t;
     try {
       applyState((await API.call('/state')).state);
-      const magHier = vastePas === 'rtg' ? ['rtg','guest'] : [vastePas];
-      if (!magHier.includes(user.tier)) { API.token = null; return; } // andere pas: poort tonen
+      const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
+      const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg','guest'] : [vastePas]) : [];
+      if (!magHier.includes(user.tier)){
+        if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(location.pathname + '?pas=' + doelPas); return; }
+        API.token = null; return; // onbekende pas: poort tonen
+      }
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();

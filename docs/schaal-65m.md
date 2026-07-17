@@ -63,3 +63,54 @@ het geheugen) én O(N). Ze gebruiken nu `ledenAantal()` — de onderhouden telle
 die ook de leden in Postgres meetelt (O(1)). Zo klopt het ledental in beide
 opslagmodi. `server/kern/paspoort.js` haalt de codenaam nu via `gidsHaal(key)`
 in plaats van rechtstreeks uit `memberDir`, om dezelfde reden.
+
+# De chaos-soak: 65M + activiteit + rommel op elke functie
+
+`scripts/mega65-storm.js` gaat een stap verder dan de kale meting hierboven: het
+zet 65M in de ledengids (buiten het RAM) én een echte activiteitslaag in het
+werkgeheugen (een miljoen orders, plus boekingen, betalingen, verzoeken,
+reviews en meldingen), en bestookt daarna ~688 endpoints langdurig met onnozele
+invoer (emoji's, gigastrings, diep geneste JSON, verkeerde types, XSS/SQL-achtige
+strings), met rol-token-verwisseling. Het meet robuustheid (5xx), geheugen over
+de tijd en event-loop-haperingen (een health-sonde).
+
+```
+DATABASE_URL=postgres://... node --max-old-space-size=8192 scripts/mega65-storm.js
+```
+
+## Wat de soak vond (en wat er gefixt is)
+
+1. **Een echte crash in de auth-laag.** Een leverancier- of kantoor-token dat op
+   een leden-endpoint belandt, gaf een 500: de leden-`auth` accepteerde die
+   sessie (die geen persona-`tier` heeft) en de ledengids crashte op een
+   ontbrekende codenaam. Nu weert de leden-`auth` niet-leden-sessies met 401 en
+   is `liveCodename` defensief. (`test/auth-rol.test.js`.)
+2. **`/api/auth/register` kon onder druk een onafgevangen 500 geven** doordat de
+   account-schrijfstappen na de validatie buiten een try/catch stonden. Nu een
+   nette 503. Het aantal register-5xx onder de storm daalde van 16 naar 1.
+
+## Wat de soak leerde over geheugen en de echte grens
+
+- **Geen geheugenlek.** Het RAM slingert in een GC-zaagtand (bijv. ~2,5 GB dal,
+  ~8 GB piek) en zakt na elke GC weer terug; de *vloer* (het minimum na GC)
+  loopt niet op. Het harnas meet daarom expliciet de vloer-helling, niet de kale
+  begin-eind. De eerste meting die "stijgend, mogelijk lek" leek, was deels een
+  meet-artefact: de server logt elk verzoek, en dat door een trage pijplijn
+  persen gaf backpressure zodat Node in het geheugen bufferde. Sinds het
+  serverlog naar een bestand gaat, is dat weg.
+- **De echte grens zijn niet de 65M leden — die staan geïndexeerd in Postgres,
+  buiten het RAM, en blijven goedkoop.** De grens zijn de grote transactionele
+  collecties (orders enz.) die nog wél in het werkgeheugen (`db.data`) staan.
+  Lees- en aggregatie-endpoints lopen daar O(N) overheen en serialiseren grote
+  JSON; met een miljoen orders blokkeert één zo'n verzoek de (single-threaded)
+  event-loop seconden lang (health-sonde p95 ~5 s), waardoor de doorvoer onder
+  gelijktijdige last inzakt. Dit is precies de grens die de architectuur voor de
+  ledengids al oploste (naar Postgres), maar voor orders/boekingen nog niet.
+
+## Vervolg (bewust nog niet gedaan)
+
+De logische volgende stap is dezelfde behandeling voor de transactionele
+collecties als voor de ledengids: orders/boekingen als geïndexeerde rijen in
+Postgres met gepagineerde, geaggregeerde lezers, in plaats van als één grote
+array in `db.data`. Dan verdwijnt de laatste O(N)-serialisatie uit de hete paden
+en schaalt ook de activiteitslaag mee met de 65M.

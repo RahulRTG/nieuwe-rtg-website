@@ -27,6 +27,9 @@ function maakPg({ merge3, kluis, log, url }) {
   let luisterClient = null;
   const toegepast = new Map();   // collectie -> versie die dit proces al toepaste
   const laatsteJson = new Map(); // collectie -> laatst gesynchroniseerde JSON
+  const laatsteGrootte = new Map(); // collectie -> bytes van de laatste JSON (voor de grote-collectie-voorcheck)
+  const laatsteLengte = new Map();  // collectie -> aantal items bij de laatste volledige check
+  const laatsteCheck = new Map();    // collectie -> tijdstip van de laatste volledige check
   const uitStore = (v) => kluis.ontsleutel(v);
   const naarStore = (j) => kluis.versleutel(j);
 
@@ -60,11 +63,26 @@ function maakPg({ merge3, kluis, log, url }) {
      voegen we per item samen (merge3) in plaats van te overschrijven. Elke schrijf
      krijgt een nieuw, globaal oplopend versienummer en seint de andere instances
      via NOTIFY. Geeft terug hoeveel collecties echt zijn weggeschreven. */
+  // Verandering opsporen kost een JSON.stringify per collectie. Bij een grote
+  // collectie (bijv. een miljoen orders, honderden MB's) is dat elke flush een
+  // event-loop-stall van seconden, terwijl die collectie meestal niet wijzigt.
+  // Daarom een goedkope voorcheck voor GROTE collecties: is de lengte gelijk en
+  // hebben we hem recent volledig gecontroleerd, dan slaan we de dure stringify
+  // over. Een toevoeging (nieuwe order) verandert de lengte en wordt dus meteen
+  // opgepikt; een wijziging-op-zijn-plaats (statuswissel) wordt bij de volgende
+  // volledige check binnen GROOT_MS alsnog weggeschreven. In-memory blijft de
+  // waarheid (write-behind), dus die kleine persist-vertraging is acceptabel.
+  const GROOT_BYTES = 512 * 1024, GROOT_MS = 2000;
+  const lengteVan = v => Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : 0);
   async function flush(dataNu) {
     let geschreven = 0;
     const gewijzigd = [];
+    const nu = Date.now();
     for (const k of Object.keys(dataNu)) {
+      const groot = (laatsteGrootte.get(k) || 0) > GROOT_BYTES;
+      if (groot && lengteVan(dataNu[k]) === laatsteLengte.get(k) && nu - (laatsteCheck.get(k) || 0) < GROOT_MS) continue;
       const j = JSON.stringify(dataNu[k]);
+      laatsteCheck.set(k, nu); laatsteGrootte.set(k, j.length); laatsteLengte.set(k, lengteVan(dataNu[k]));
       if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
     }
     for (const [k, jOns] of gewijzigd) {

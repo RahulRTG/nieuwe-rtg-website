@@ -258,11 +258,21 @@ function planFlush() {
   pgFlushTimer = setTimeout(flushNu, Number(process.env.PG_FLUSH_MS || 150));
   if (pgFlushTimer.unref) pgFlushTimer.unref();
 }
+// De lokale snapshot is met Postgres alleen een warme-start-cache: Postgres is
+// de duurzame waarheid en wint bij het opstarten. Hem bij elke flush (elke
+// ~150 ms) volledig serialiseren (bij een grote kast honderden MB's) blokkeert
+// de event-loop seconden lang. Daarom ten hoogste eens per PG_SNAP_MS (30 s):
+// dat houdt de cache vers genoeg zonder het hete pad te raken.
+let laatsteLokaleSnap = 0;
+const PG_SNAP_MS = Number(process.env.PG_SNAP_MS || 30000);
 async function flushNu() {
   pgFlushTimer = null;
   if (!pg || !pgKlaar || pgFlushBezig || !db.writable || !pgVuil) return;
   pgVuil = false; pgFlushBezig = true;
-  try { await pg.flush(db.data); schrijfLokaleSnapshotStil(); }
+  try {
+    await pg.flush(db.data);
+    if (Date.now() - laatsteLokaleSnap >= PG_SNAP_MS) { schrijfLokaleSnapshotStil(); laatsteLokaleSnap = Date.now(); }
+  }
   catch (e) { pgVuil = true; console.warn('[pg] flush mislukt:', e.message); }
   finally { pgFlushBezig = false; if (pgVuil && pgKlaar) planFlush(); }
 }
@@ -560,9 +570,9 @@ function planSnapshot() {
 function save() {
   if (!db.writable) return;
   if (STORE === 'postgres') {
-    // Lokale snapshot (warme cache/fallback) gecoalesceerd + async flush naar
-    // Postgres plannen (write-behind). Postgres is de duurzame waarheid.
-    planSnapshot();
+    // Postgres is de duurzame waarheid (write-behind via planFlush). De lokale
+    // snapshot is enkel een warme cache en wordt binnen flushNu gethrotteld
+    // geschreven; hem hier óók plannen zou de event-loop dubbel belasten.
     planFlush();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).

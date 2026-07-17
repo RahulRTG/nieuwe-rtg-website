@@ -45,7 +45,9 @@ const WERKERS = Number(process.env.STORM_WERKERS || 24);
 // drempels (SLO's) waarop de test hard zakt
 const SLO_P99_MS = Number(process.env.SLO_P99_MS || 2000);
 const SLO_DEKKING = Number(process.env.SLO_DEKKING || 3);       // elk endpoint >= N keer
-const SLO_VLOER = Number(process.env.SLO_VLOER_MBMIN || 40);     // MB/min stijgende vloer = lek
+const SLO_VLOER = Number(process.env.SLO_VLOER_MBMIN || 40);     // MB/min stijgende vloer tussen rondes = lek
+const LEK_MS = Number(process.env.LEK_MS || 30000);             // duur van elke lek-controle-ronde
+const LEK_RONDES = Number(process.env.LEK_RONDES || 3);         // aantal herhaalde lek-rondes na de opwarming
 const DB = process.env.DATABASE_URL || process.env.PG_URL;
 if (!DB) { console.error('DATABASE_URL ontbreekt (een draaiende Postgres is nodig).'); process.exit(2); }
 function vindPsql() {
@@ -158,14 +160,37 @@ function chaosBody(d) {
 let child = null;
 const SRVLOG = path.join(TMP, 'server.log');
 function rssMB(pid) { try { const m = fs.readFileSync('/proc/' + pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/); return m ? Math.round(m[1] / 1024) : null; } catch (e) { return null; } }
+// Echte vloer meten: forceer een volledige GC in de server (SIGUSR2 ->
+// gc-hook.js) en lees het LEVENDE geheugen (heapUsed) dat het haakje wegschrijft.
+// Waarom niet de RSS: V8 geeft vrijgekomen pagina's niet terug aan de OS, ook
+// niet na een major GC -- de RSS blijft dan hoog terwijl de heap grotendeels
+// leeg is (gemeten: 200 MB vrijgemaakt gaf maar ~38 MB RSS-daling). heapUsed na
+// GC is de eerlijke lek-maat. We nemen meerdere metingen en houden de laagste.
+const GC_OUT = path.join(TMP, 'gc.json');
+async function heapNaGc(pid) {
+  let laagst = Infinity;
+  for (let i = 0; i < 4; i++) {
+    let voor = 0; try { voor = fs.statSync(GC_OUT).mtimeMs; } catch (e) {}
+    try { process.kill(pid, 'SIGUSR2'); } catch (e) {}
+    // wacht tot het haakje een verse meting schreef (event-loop kan even vastzitten)
+    for (let w = 0; w < 40; w++) {
+      await new Promise(r => setTimeout(r, 100));
+      try { const st = fs.statSync(GC_OUT); if (st.mtimeMs > voor) { const j = JSON.parse(fs.readFileSync(GC_OUT, 'utf8')); const mb = Math.round(j.heapUsed / 1048576); if (mb < laagst) laagst = mb; break; } } catch (e) {}
+    }
+  }
+  return laagst === Infinity ? null : laagst;
+}
 function boot() {
   return new Promise((resolve, reject) => {
     const logfd = fs.openSync(SRVLOG, 'a');
-    child = spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'], {
+    // --expose-gc + het gc-haakje: zo kan de harnas via SIGUSR2 een echte GC
+    // forceren en de vloer (levend geheugen na opruimen) eerlijk meten.
+    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), '--experimental-sqlite', 'server/server.js'], {
       cwd: ROOT,
       env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
         DATABASE_URL: DB, RTG_STORE: 'postgres', ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '',
-        NODE_OPTIONS: '--max-old-space-size=8192', DEMO_SUPPLIER: 'KIKUNOI', LOG_LEVEL: 'error' },
+        NODE_OPTIONS: '--max-old-space-size=8192', DEMO_SUPPLIER: 'KIKUNOI', LOG_LEVEL: 'error',
+        RTG_GC_OUT: GC_OUT },
       stdio: ['ignore', logfd, logfd]
     });
     child.on('exit', c => { if (c) reject(new Error('server stopte, code ' + c)); });
@@ -237,12 +262,13 @@ async function zaaiActiviteit(pool) {
   kop('FASE C: chaos-soak ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers');
   const buckets = { ok: 0, herleid4xx: 0, r429: 0, r503: 0, s5xx: 0, stuk: 0 };
   const vijfxx = new Map();
+  const perEnd = new Map();
   const rolLek = [];         // verkeerd-rol token dat 2xx kreeg op een beschermd endpoint
   let totaal = 0;
   const rssReeks = [];
-  const eind = Date.now() + SOAK_MS;
+  let stormEind = Date.now() + SOAK_MS;   // wordt per ronde gezet (hoofd-soak + lek-rondes)
   async function werker() {
-    while (Date.now() < eind) {
+    while (Date.now() < stormEind) {
       const r = routes[rint(routes.length)];
       // 1 op 5: bewust een verkeerd-rol token (rol-scheiding toetsen); anders het juiste
       const kruis = r.rol !== 'open' && rint(5) === 0;
@@ -250,6 +276,8 @@ async function zaaiActiviteit(pool) {
       const tk = rkeuze(tokVoor[rol].length ? tokVoor[rol] : tokVoor.member);
       const st = await verzoek(r.method, r.pad, tk, r.method === 'GET' ? null : chaosBody(0));
       totaal++; noteerLat(st.ms);
+      // per-endpoint latentie (om de echte trage paden te vinden, niet te gokken)
+      const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0 }; pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
       if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
       const s = st.status;
       // Volgorde is cruciaal en eerlijk: 503 is de conventie voor "functie uit"
@@ -264,9 +292,65 @@ async function zaaiActiviteit(pool) {
       await new Promise(r => setTimeout(r, 1 + rint(4)));
     }
   }
+  // Vloer bij een verse, rustige server (geforceerde GC -> heapUsed).
+  const vloerVers = await heapNaGc(child.pid);
   const mon = setInterval(() => { const m = rssMB(child.pid); if (m) rssReeks.push(m); }, 3000);
+  stormEind = Date.now() + SOAK_MS;
   await Promise.all(Array.from({ length: WERKERS }, werker));
   clearInterval(mon);
+
+  // ---------- lek-check: meerdere IDENTIEKE rondes, vloer na elke ronde ----------
+  // Eerlijk meten kan alleen als de last STOPT en de server uitademt: anders
+  // meet je in-flight O(N)-responses die nog bereikbaar zijn (geen lek). En de
+  // eenmalige opwarming (caches/afgeleide staat die bij eerste toegang vollopen)
+  // is GEEN lek. Daarom: neem de vloer NA een opwarm-ronde als basis en herhaal
+  // hetzelfde werk nog een paar rondes. Keert de vloer telkens terug naar
+  // hetzelfde niveau, dan is er geen lek; loopt hij ronde na ronde door, wel.
+  // We meten de helling met een kleinste-kwadraten-fit over alle rondes, zodat de
+  // ~enkele % ruis (de heap 'ademt') uitmiddelt in plaats van een korte ronde te
+  // laten exploderen. De vloer zelf is het MINIMUM over een venster (de diepste
+  // GC), niet een enkele meting.
+  async function rustVloer() {
+    await new Promise(r => setTimeout(r, 5000));   // last uitademen
+    let laagst = Infinity;
+    for (let i = 0; i < 3; i++) { const h = await heapNaGc(child.pid); if (h != null && h < laagst) laagst = h; await new Promise(r => setTimeout(r, 1500)); }
+    return laagst === Infinity ? null : laagst;
+  }
+  // De lek-rondes gebruiken bewust ALLEEN zware LEES-endpoints (de O(N)-paden waar
+  // een lek zich zou verstoppen). Cruciaal en eerlijk: lezen voegt GEEN data toe,
+  // dus een oplopende vloer kan dan niet "meer orders opgeslagen" zijn -- alleen
+  // een echt lek. (Bij de gemengde hoofd-soak groeit de werkset legitiem doordat
+  // chaos schrijft; dat is geen lek en zou de meting vertroebelen.)
+  const leesPaden = [
+    { m: 'POST', p: '/api/verkoop/mijn', rol: 'member' }, { m: 'POST', p: '/api/boekingen/mijn', rol: 'member' },
+    { m: 'GET', p: '/api/notifications', rol: 'member' }, { m: 'POST', p: '/api/state', rol: 'member' },
+    { m: 'POST', p: '/api/supplier/backoffice', rol: 'supplier' }, { m: 'POST', p: '/api/supplier/menu', rol: 'supplier' },
+    { m: 'POST', p: '/api/supplier/state', rol: 'supplier' }, { m: 'POST', p: '/api/office/state', rol: 'office' },
+    { m: 'POST', p: '/api/office/boardroom', rol: 'office' }, { m: 'POST', p: '/api/office/ontmoetingen', rol: 'office' }
+  ];
+  async function leesWerker() {
+    while (Date.now() < stormEind) {
+      const r = leesPaden[rint(leesPaden.length)];
+      const tk = rkeuze(tokVoor[r.rol].length ? tokVoor[r.rol] : tokVoor.member);
+      const st = await verzoek(r.m, r.p, tk, r.m === 'GET' ? null : {});
+      if (st.status >= 500) { buckets.s5xx++; vijfxx.set(r.p, (vijfxx.get(r.p) || 0) + 1); }
+      await new Promise(res => setTimeout(res, 1 + rint(4)));
+    }
+  }
+  async function lekRonde(ms) { stormEind = Date.now() + ms; await Promise.all(Array.from({ length: WERKERS }, leesWerker)); return rustVloer(); }
+  const lekMin = LEK_MS / 60000;
+  const vloers = [await rustVloer()];            // vloer na de hoofd-soak (opgewarmd)
+  for (let i = 0; i < LEK_RONDES; i++) vloers.push(await lekRonde(LEK_MS));
+  const vloer1 = vloers[0];
+  // kleinste-kwadraten-helling (MB per minuut) over ALLEEN de identieke lek-rondes.
+  // De eerste vloer (na de langere, zwaardere hoofd-soak) laten we buiten de fit:
+  // die draagt nog opwarming en is geen gelijke ronde. Zo meet de helling puur of
+  // hetzelfde werk telkens naar dezelfde vloer terugkeert (geen lek) of doorloopt.
+  const ys = vloers.slice(1);                       // de identieke rondes
+  const xs = ys.map((_, i) => i * lekMin);
+  const xm = xs.reduce((a, b) => a + b, 0) / xs.length, ym = ys.reduce((a, b) => a + b, 0) / ys.length;
+  let tel = 0, noem = 0; for (let i = 0; i < xs.length; i++) { tel += (xs[i] - xm) * (ys[i] - ym); noem += (xs[i] - xm) ** 2; }
+  const lekHelling = noem > 0 ? tel / noem : 0;
 
   // ---------- meting ----------
   kop('FASE D: meting');
@@ -277,13 +361,13 @@ async function zaaiActiviteit(pool) {
   rij('  5xx (SERVERFOUTEN)', buckets.s5xx === 0 ? '0' : '\x1b[31m' + buckets.s5xx + '\x1b[0m');
   if (vijfxx.size) for (const [p, n] of [...vijfxx.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20)) rij('    5xx bij', p + ' (' + n + 'x)');
   rij('latentie p50/p95/p99/p999/max', pct(0.5) + ' / ' + pct(0.95) + ' / ' + pct(0.99) + ' / ' + pct(0.999) + ' / ' + latMax + ' ms');
+  const traag = [...perEnd.entries()].filter(([, v]) => v.n >= 5).map(([p, v]) => ({ p, gem: v.som / v.n, max: v.max, n: v.n })).sort((a, b) => b.gem - a.gem).slice(0, 12);
+  console.log('  \x1b[2mtraagste endpoints (gem ms, max, n):\x1b[0m');
+  for (const t of traag) console.log('    ' + String(Math.round(t.gem)).padStart(5) + ' ms  (max ' + String(t.max).padStart(5) + ', n ' + t.n + ')  ' + t.p);
   const dal = Math.min(...rssReeks), piek = Math.max(...rssReeks), med = [...rssReeks].sort((a, b) => a - b)[rssReeks.length >> 1];
-  const derde = Math.max(1, Math.floor(rssReeks.length / 3));
-  const vloerB = Math.min(...rssReeks.slice(0, derde)), vloerE = Math.min(...rssReeks.slice(-derde));
-  const minuten = (SOAK_MS / 60000) * (2 / 3);
-  const vloerHelling = minuten > 0 ? (vloerE - vloerB) / minuten : 0;
-  rij('RAM dal/mediaan/piek', dal + ' / ' + med + ' / ' + piek + ' MB');
-  rij('RAM-vloer begin->eind (na GC)', vloerB + ' -> ' + vloerE + ' MB (' + vloerHelling.toFixed(1) + ' MB/min)');
+  rij('RAM (RSS) dal/mediaan/piek', dal + ' / ' + med + ' / ' + piek + ' MB');
+  rij('heapUsed vers / opgewarmd (na GC)', vloerVers + ' -> ' + vloer1 + ' MB (eenmalige opwarming ' + (vloer1 - vloerVers) + ' MB)');
+  rij('heapUsed lek-vloeren per ronde', vloers.join(' -> ') + ' MB (' + lekHelling.toFixed(1) + ' MB/min fit)');
   const onbereikt = [...dekking.entries()].filter(([, n]) => n < SLO_DEKKING);
   rij('endpoints < ' + SLO_DEKKING + 'x geraakt (juiste rol)', nl(onbereikt.length) + ' / ' + nl(routes.length));
 
@@ -294,7 +378,7 @@ async function zaaiActiviteit(pool) {
   v('ROBUUSTHEID (0 x 5xx)', buckets.s5xx === 0, buckets.s5xx + ' onverwachte serverfouten');
   v('ROL-SCHEIDING', rolLek.length === 0, rolLek.length ? rolLek.slice(0, 8).join(', ') : 'geen verkeerd-rol token kreeg 2xx');
   v('DEKKING (>= ' + SLO_DEKKING + 'x elk endpoint)', onbereikt.length === 0, onbereikt.length + ' endpoints te weinig geraakt' + (onbereikt.length ? ': ' + onbereikt.slice(0, 6).map(e => e[0]).join(', ') : ''));
-  v('GEHEUGEN (vloer stabiel)', vloerHelling <= SLO_VLOER, 'vloer-helling ' + vloerHelling.toFixed(1) + ' MB/min (drempel ' + SLO_VLOER + ')');
+  v('GEHEUGEN (geen lek)', lekHelling <= SLO_VLOER, 'vloer-helling over ' + LEK_RONDES + ' identieke rondes ' + lekHelling.toFixed(1) + ' MB/min (drempel ' + SLO_VLOER + '); eenmalige opwarming ' + (vloer1 - vloerVers) + ' MB telt niet mee');
   v('LATENTIE (p99 <= ' + SLO_P99_MS + 'ms)', pctMs(0.99) <= SLO_P99_MS, 'p99 = ' + pct(0.99) + ' ms');
 
   kop('WAT DEZE TEST NIET BEWIJST (eerlijk)');

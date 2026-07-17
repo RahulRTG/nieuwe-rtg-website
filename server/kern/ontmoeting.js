@@ -212,6 +212,7 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
     return d;
   }
   function dateVoor(key, dateId) {
+    lijsten();   // borgt db.data.ontmoetDates ook als die collectie nog nooit is opgeslagen (Postgres-boot)
     const d = db.data.ontmoetDates.find(x => x.id === dateId);
     if (!d || (d.a !== key && d.b !== key)) return null;
     return d;
@@ -306,8 +307,8 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
     return { status: 200, ok: true };
   }
   function signaalNaarLid(dateId, naarKey, payload) {
-    const d = db.data.ontmoetDates.find(x => x.id === dateId);
-    if (!d || (d.a !== naarKey && d.b !== naarKey)) return { status: 404, error: 'Afspraak niet gevonden.' };
+    const d = dateVoor(naarKey, dateId);   // zelfde controle, met de lijsten()-borging (geen crash op een lege collectie)
+    if (!d) return { status: 404, error: 'Afspraak niet gevonden.' };
     sseToCustomer(naarKey, 'ontmoeting-signaal', { dateId, vanKantoor: true, payload });
     return { status: 200, ok: true };
   }

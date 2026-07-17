@@ -77,9 +77,13 @@ invoer (emoji's, gigastrings, diep geneste JSON, verkeerde types, XSS/SQL).
 De vijf oordelen: **ROBUUSTHEID** (nul onverwachte 5xx; een 503 voor een uitge-
 schakelde functie en een 429 rate-limit tellen expliciet niet mee), **ROL-
 SCHEIDING** (een verkeerd-rol token krijgt nooit 2xx), **DEKKING** (elk endpoint
-minstens N keer geraakt; ongeraakte endpoints worden benoemd), **GEHEUGEN** (de
-RAM-*vloer* na GC stijgt niet), **LATENTIE** (p99 onder de SLO). De uitvoer
-sluit af met een blok "wat deze test NIET bewijst".
+minstens N keer geraakt; ongeraakte endpoints worden benoemd), **GEHEUGEN** (geen
+lek: zie hieronder de eerlijke meetmethode), **LATENTIE** (p99 onder de SLO). De
+uitvoer sluit af met een blok "wat deze test NIET bewijst".
+
+Dat de drempels écht kunnen zakken is geen theorie: in dezelfde ronde vond de
+harnas een echte 500 (zie hieronder), waardoor **ROBUUSTHEID** terecht rood sloeg
+tot de fix erin zat. Een test die alleen groen kan slaan bewijst niets.
 
 ```
 DATABASE_URL=postgres://... node --max-old-space-size=8192 scripts/mega65-storm.js
@@ -106,27 +110,65 @@ DATABASE_URL=postgres://... node --max-old-space-size=8192 scripts/mega65-storm.
    account-schrijfstappen na de validatie buiten een try/catch. Onder een
    database-fout zou dat een onafgevangen 500 geven; dat is nu een nette 503.
    Een echte latente kwetsbaarheid, los van de tel-bug hierboven.
+4. **Nog een echte crash (gefixt).** `/api/office/ontmoeting/signaal` gaf een 500
+   zodra het de allereerste aanraking met de Salon-ontmoetingen was. Oorzaak:
+   `db.data.ontmoetDates` wordt lui aangemaakt (`lijsten()`), en bij een
+   Postgres-boot waar die collectie nog nooit was weggeschreven is hij `undefined`;
+   `signaalNaarLid` deed er direct `.find` op. Gefixt door de gedeelde toegang
+   (`dateVoor`) de `lijsten()`-borging te geven en `signaalNaarLid` daar doorheen
+   te leiden. `test/ontmoeting-leeg.test.js` dekt precies dit: een verse server,
+   het signaal-endpoint als eerste call, eist een 404 in plaats van een 500.
 
-## Wat de soak leerde over geheugen en de echte grens
+## Geheugen eerlijk meten: heapUsed na GC, niet de RSS
 
-- **Geen geheugenlek.** Het RAM slingert in een GC-zaagtand (bijv. ~2,5 GB dal,
-  ~8 GB piek) en zakt na elke GC weer terug; de *vloer* (het minimum na GC)
-  loopt niet op. Het harnas meet daarom expliciet de vloer-helling, niet de kale
-  begin-eind. De eerste meting die "stijgend, mogelijk lek" leek, was deels een
-  meet-artefact: de server logt elk verzoek, en dat door een trage pijplijn
-  persen gaf backpressure zodat Node in het geheugen bufferde. Sinds het
-  serverlog naar een bestand gaat, is dat weg.
-- **De echte grens zijn niet de 65M leden — die staan geïndexeerd in Postgres,
-  buiten het RAM, en blijven goedkoop.** De grens zijn de grote transactionele
-  collecties (orders enz.) die nog wél in het werkgeheugen (`db.data`) staan.
-  Lees- en aggregatie-endpoints lopen daar O(N) overheen en serialiseren grote
-  JSON; met een miljoen orders blokkeert één zo'n verzoek de (single-threaded)
-  event-loop seconden lang, waardoor de p99-latentie oploopt en de doorvoer onder
-  gelijktijdige last inzakt. De **LATENTIE**-drempel van de harnas is dáárom
-  bedoeld om te kunnen falen: bij een zware werkset zakt hij, en dat is de
-  eerlijke uitkomst -- geen groene tabel maar een rode drempel. Dit is precies de
-  grens die de architectuur voor de ledengids al oploste (naar Postgres), maar
-  voor orders/boekingen nog niet.
+De eerste opzet mat de *RSS-vloer* (minimum uit `/proc`) en noemde dat "na GC".
+Dat is oneerlijk: V8 geeft vrijgekomen pagina's niet terug aan de OS, ook niet na
+een volledige GC. Gemeten gaf 200 MB vrijmaken maar ~38 MB RSS-daling. De RSS
+loopt dus met een ruime heap gewoon op zonder dat er iets lekt, en een RSS-drempel
+zou onterecht rood slaan. Twee dingen zetten dat recht:
+
+1. **Meet `heapUsed`, niet RSS, en forceer eerst een GC.** De harnas start de
+   server met `--expose-gc` en een test-preload (`scripts/gc-hook.js`); op SIGUSR2
+   draait de server een volledige GC en schrijft het levende `heapUsed` weg. Dat
+   is het bereikbare geheugen, niet de opgeblazen RSS. (De productieserver blijft
+   ongemoeid: de haak zit in de test-preload.)
+2. **Scheid eenmalige opwarming van een echt lek, met LEES-rondes.** Na de soak
+   meet de harnas de vloer, herhaalt dan een paar *identieke, puur lezende* rondes
+   (de zware O(N)-leespaden) en meet de vloer telkens opnieuw, na uitademen en GC.
+   Lezen voegt geen data toe, dus een oplopende vloer kan dan geen "meer orders
+   opgeslagen" zijn -- alleen een echt lek. De eenmalige opwarming (caches en
+   afgeleide staat die bij eerste toegang vollopen, hier ~1,6 GB) valt buiten de
+   fit. Uitkomst: de vloer keert elke ronde terug naar hetzelfde niveau (helling
+   rond 0, soms licht negatief). **Geen lek.**
+
+De eerdere "stijgend, mogelijk lek"-meting was dus deels een meet-artefact (RSS in
+plaats van heapUsed) en deels legitieme opwarming, niet een lek.
+
+## De echte grens: latentie, en wat eraan gefixt is
+
+De echte grens zijn niet de 65M leden -- die staan geïndexeerd in Postgres, buiten
+het RAM, en blijven goedkoop. De grens zijn de grote transactionele collecties
+(orders enz.) die nog wél in het werkgeheugen (`db.data`) staan. Lees- en
+aggregatie-endpoints lopen daar O(N) overheen; met een miljoen orders blokkeert
+zo'n verzoek de single-threaded event-loop, waardoor de p99 oploopt. De
+**LATENTIE**-drempel is dáárom bedoeld om te kunnen falen: bij een zware werkset
+zakt hij, en dat is de eerlijke uitkomst -- een rode drempel, geen groene tabel.
+
+Twee schrijf-pad-stalls die de latentie onnodig verergerden, zijn wél gefixt (de
+p99 zakte in deze run van ~6800 ms naar ~2000 ms):
+
+- **`server/pg.js` (flush).** Verandering opsporen deed per collectie een
+  `JSON.stringify`. Voor een grote, meestal-onveranderde collectie (honderden MB's)
+  was dat elke flush (~150 ms) een event-loop-stall. Nu een goedkope voorcheck
+  voor grote collecties: gelijke lengte en recent volledig gecontroleerd -> sla de
+  dure stringify over (een toevoeging verandert de lengte en wordt meteen opgepikt).
+- **`server/db.js` (lokale snapshot).** Bij Postgres is de lokale snapshot alleen
+  een warme-start-cache -- Postgres is de duurzame waarheid. Hem bij elke flush
+  volledig serialiseren (honderden MB's) belastte het hete pad dubbel. Nu ten
+  hoogste eens per 30 s, en niet meer óók vanuit `save()` ingepland.
+
+Wat daarna overblijft is de echte O(N)-lees-vloer: die vergt de architectuur-stap
+hieronder en is bewust niet met een lapmiddel weggepoetst.
 
 ## Vervolg (bewust nog niet gedaan)
 

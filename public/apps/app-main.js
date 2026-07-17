@@ -2129,14 +2129,14 @@
     privacy:     { naam: 'Privacy',      icoon: '🔒', url: '/site/privacy.html' },
     boeken:      { naam: 'Boeken',       icoon: '🧭', url: '/site/boeken.html' },
     download:    { naam: 'Apps',         icoon: '⬇️', url: '/site/download.html' },
-    // de RTFoundation-apps: eigen plek in het RTG OS, maar bij het openen
-    // krijgt u de eigen RTF-jas (de hub en de vijf leeftijd-ingangen)
+    // de RTFoundation-apps wonen in het RTG OS: dit is hun enige plek. Bij
+    // het openen krijgt u de eigen RTF-jas; ?groep= zet de leeftijd-bril op.
     rtf:         { naam: 'RTFoundation',  icoon: '🕊️', url: '/apps/foundation/index.html' },
-    rtfmini:     { naam: 'RTF Mini',      icoon: '🧸', url: '/apps/foundation/mini.html' },
-    rtfkids:     { naam: 'RTF Kids',      icoon: '🎒', url: '/apps/foundation/kind.html' },
-    rtftiener:   { naam: 'RTF Tiener',    icoon: '🛹', url: '/apps/foundation/tiener.html' },
-    rtfjong:     { naam: 'RTF Jong',      icoon: '🚀', url: '/apps/foundation/jong.html' },
-    rtfvolw:     { naam: 'RTF Volwassen', icoon: '🧑', url: '/apps/foundation/volw.html' }
+    rtfmini:     { naam: 'RTF Mini',      icoon: '🧸', url: '/apps/foundation/index.html?groep=mini' },
+    rtfkids:     { naam: 'RTF Kids',      icoon: '🎒', url: '/apps/foundation/index.html?groep=kind' },
+    rtftiener:   { naam: 'RTF Tiener',    icoon: '🛹', url: '/apps/foundation/index.html?groep=tiener' },
+    rtfjong:     { naam: 'RTF Jong',      icoon: '🚀', url: '/apps/foundation/index.html?groep=jong' },
+    rtfvolw:     { naam: 'RTF Volwassen', icoon: '🧑', url: '/apps/foundation/index.html?groep=volw' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de

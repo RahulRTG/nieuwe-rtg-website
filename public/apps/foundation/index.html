@@ -371,11 +371,11 @@ const AVATARS = ['🙂','😀','🦊','🐼','🐵','🦁','🐯','🐧','🦉',
 const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
 let mAv = '👑', mKl = KLEUREN[0], pinProfiel = null;
 
-/* Per leeftijdsgroep een eigen app: mini.html t/m volw.html zijn eigen
-   PWA-ingangen (eigen naam, icoon en manifest) die hier binnenkomen met de
-   groep onthouden. De hub zet dan de passende bril op: alleen de tegels van
-   die leeftijd, en de profielkiezer licht de passende profielen uit. Het
-   gezin en de inlog blijven een geheel. */
+/* Per leeftijdsgroep een eigen bril: de RTF-apps staan in het RTG OS (map
+   RTFoundation) en openen de hub met ?groep=mini t/m ?groep=volw. De hub
+   onthoudt de groep en zet de passende bril op: alleen de tegels van die
+   leeftijd, en de profielkiezer licht de passende profielen uit. Het gezin
+   en de inlog blijven een geheel. */
 const GROEP_APPS = {
   mini:   { naam: 'RTF Mini',      emoji: '🧸', sub: '0 t/m 4 jaar, samen met papa of mama' },
   kind:   { naam: 'RTF Kids',      emoji: '🎒', sub: '5 t/m 11 jaar' },
@@ -383,6 +383,11 @@ const GROEP_APPS = {
   jong:   { naam: 'RTF Jong',      emoji: '🚀', sub: '16 t/m 21+ jaar' },
   volw:   { naam: 'RTF Volwassen', emoji: '🧑', sub: 'voor ouders en verzorgers' }
 };
+// de groep uit de URL (de RTG OS-map) wint en wordt onthouden
+try {
+  const gq = new URLSearchParams(location.search).get('groep');
+  if (gq && GROEP_APPS[gq]) localStorage.setItem('rtf_app_groep', gq);
+} catch(e){}
 function appGroep(){ try { const g = localStorage.getItem('rtf_app_groep'); return GROEP_APPS[g] ? g : null; } catch(e){ return null; } }
 (function(){
   const ag = appGroep();

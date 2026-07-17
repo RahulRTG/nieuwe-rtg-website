@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" rx="112" fill="#0C0C0B"/>
-<rect x="14" y="14" width="484" height="484" rx="100" fill="none" stroke="#A98F1C" stroke-opacity="0.55" stroke-width="10"/>
-<text x="256" y="300" font-size="232" text-anchor="middle">🛹</text>
-<text x="256" y="448" font-size="42" text-anchor="middle" fill="#A98F1C" font-family="Georgia, serif" letter-spacing="4">RTF Tiener</text>
-</svg>

@@ -1,5 +1,6 @@
 /* Domein "member" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
+const { eigenVeld } = require('../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
   const { AUTHOR_TIER, DOOR_RELOCK_MS, FISCAAL_PEILJAAR, LANDEN, PERSONAS, UPLOAD_DIR, ZZP, accounts, aiSystemPrompt, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync, canEngage, cannedAnswer, centen, chatKeyOf, chatStuur, convOf, crypto, cvReady, db, eisAccount, engageError, findPartner, findStaffPartner, entreeCode, express, findSupplier, magBezorgen, ticketsVoorSlot, forgetSession, fs, gcCode, geborenVan, getChat, haversine, ledenPrijs, leeftijdVan, liveCodename, liveStateFor, logActivity, mail, meldWerkgever, memberSays, memberTemplate, myApplications, noteFailedTry, notify, notifySupplier, openVacatures, optieAan, path, pickupCode, publicPartner, publicSupplier, publicTrip, pushLive, registerContact, rtf, save, schoon, sessionFor, sessions, sseToCustomer, sseToOffice, sseToSupplier, stateFor, tooManyTries, trChat, unlockDoor, validDept,
     reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview, reviewsVoor,
@@ -522,13 +523,13 @@ app.post('/api/member/apply/chats', auth, (req, res) => {
 });
 
 app.post('/api/member/apply/chat', auth, (req, res) => {
-  const chat = db.data.applyChats[String(req.body.id || '')];
+  const chat = eigenVeld(db.data.applyChats, req.body.id);
   if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
   applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 
 app.post('/api/member/apply/chat/send', auth, (req, res) => {
-  const chat = db.data.applyChats[String(req.body.id || '')];
+  const chat = eigenVeld(db.data.applyChats, req.body.id);
   if (!chat || chat.applicant.kind !== 'rtg' || chat.applicant.key !== req.session.key) return res.status(404).json({ error: 'Chat niet gevonden.' });
   const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text, talen.taalVan(req.body.lang));
   if (!m) return res.status(400).json({ error: 'Typ een bericht.' });
@@ -539,7 +540,7 @@ app.post('/api/member/apply/chat/send', auth, (req, res) => {
 app.post('/api/rtf/apply/chat', (req, res) => {
   const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
   if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
-  const chat = db.data.applyChats[String(req.body.id || '')];
+  const chat = eigenVeld(db.data.applyChats, req.body.id);
   if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
     return res.status(404).json({ error: 'Chat niet gevonden.' });
   applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
@@ -548,7 +549,7 @@ app.post('/api/rtf/apply/chat', (req, res) => {
 app.post('/api/rtf/apply/chat/send', (req, res) => {
   const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
   if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
-  const chat = db.data.applyChats[String(req.body.id || '')];
+  const chat = eigenVeld(db.data.applyChats, req.body.id);
   if (!chat || chat.applicant.kind !== 'rtf' || chat.applicant.gezinCode !== String(req.body.code).toUpperCase() || chat.applicant.profielId !== sess.p.id)
     return res.status(404).json({ error: 'Chat niet gevonden.' });
   const m = chatStuur(chat, 'sollicitant', chat.applicant.naam, req.body.text, talen.taalVan(req.body.lang));

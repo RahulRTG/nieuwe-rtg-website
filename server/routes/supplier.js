@@ -1,5 +1,6 @@
 /* Domein "supplier" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
+const { eigenVeld } = require('../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
   const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
@@ -289,7 +290,7 @@ app.post('/api/supplier/door/toggle', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
-  const chat = db.data.guestChats[String(req.body.key || '')];
+  const chat = eigenVeld(db.data.guestChats, req.body.key);
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   const text = String(req.body.text || '').trim().slice(0, 500);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
@@ -306,7 +307,7 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
-  const chat = db.data.guestChats[String(req.body.key || '')];
+  const chat = eigenVeld(db.data.guestChats, req.body.key);
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   if (chat.unreadPartner) { chat.unreadPartner = 0; save(); }
   trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ messages, codename: chat.codename }));
@@ -317,7 +318,7 @@ app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
    Zo bent u geen vreemden van elkaar. Alleen op te vragen als er echt een open
    lijn met deze klant is (het gesprek moet bij deze zaak horen). */
 app.post('/api/supplier/klant/salon', supplierAuth, (req, res) => {
-  const chat = db.data.guestChats[String(req.body.key || '')];
+  const chat = eigenVeld(db.data.guestChats, req.body.key);
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   res.json(klantSalon(chat.customerKey));
 });

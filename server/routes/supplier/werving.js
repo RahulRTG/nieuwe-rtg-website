@@ -3,6 +3,7 @@
    sollicitatie -> beslissing -> uitnodiging). De invite-helpers zijn hier lokaal
    omdat zowel het uitnodigen als het accepteren van een sollicitatie ze gebruikt.
    Draait op de gedeelde kern. */
+const { eigenVeld } = require('../../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
   const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
     zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
@@ -223,14 +224,14 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
 });
 
 app.post('/api/supplier/apply/chat', supplierAuth, (req, res) => {
-  const chat = db.data.applyChats[String(req.body.id || '')];
+  const chat = eigenVeld(db.data.applyChats, req.body.id);
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
   applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));
 });
 
 app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
-  const chat = db.data.applyChats[String(req.body.id || '')];
+  const chat = eigenVeld(db.data.applyChats, req.body.id);
   if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
   const m = chatStuur(chat, 'werkgever', req.supplier.name, req.body.text, talen.taalVan(req.body.lang));
   if (!m) return res.status(400).json({ error: 'Typ een bericht.' });

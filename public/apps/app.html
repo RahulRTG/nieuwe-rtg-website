@@ -1209,22 +1209,8 @@
 
   <!-- login -->
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
-    <div class="os-lock" aria-hidden="true">
-      <div class="os-lock-klok" id="gateKlok">--:--</div>
-      <div class="os-lock-datum" id="gateDatum"></div>
-    </div>
-    <div class="logo"><span class="merkvlak">Rahul Travel Group</span></div>
-    <div class="tagline">Experience the Elite Class</div>
-    <h1 data-i18n-html="gate.title">Zo, daar ben je.<br>Je pas, <em>altijd</em> op zak.</h1>
-    <p class="deck" data-i18n="gate.deck">Boeken, betalen met één tik, je eigen AI en De Salon. Alles draait op je codenaam, niet op je echte naam. Zo hoort het.</p>
-    <!-- geen brede app meer: zonder ?pas= is dit alleen een keuzescherm dat
-         doorverwijst naar de app van uw eigen pas -->
-    <div id="kiesPas" class="gate-list" hidden>
-      <p class="gate-or" style="margin-top:0;" data-i18n="gate.kies">Elke pas heeft zijn eigen app. Kies de uwe:</p>
-      <a class="gate-btn t-rtg" href="?pas=rtg" style="text-decoration:none;"><span class="dot"></span><span><b>RTG Pass</b><span data-i18n="gate.kies.rtg">Het lidmaatschap, € 65 per maand; ook gratis te proberen</span></span></a>
-      <a class="gate-btn t-lifestyle" href="?pas=lifestyle" style="text-decoration:none;"><span class="dot"></span><span><b>Lifestyle Pass</b><span data-i18n="gate.kies.life">Uw eigen concierge, € 20.000 per maand ex btw</span></span></a>
-      <a class="gate-btn t-business" href="?pas=business" style="text-decoration:none;"><span class="dot"></span><span><b>Business Pass</b><span data-i18n="gate.kies.bus">Zakelijk reizen en de AI-boekhouder; prijs op maat</span></span></a>
-    </div>
+    <!-- kaal inlogscherm: alleen inloggen, aanmelden en wachtwoord vergeten.
+         Na het inloggen opent uw account vanzelf de juiste pas-app. -->
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
       <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
@@ -1249,17 +1235,9 @@
       <input id="rsPass" type="password" placeholder="Nieuw wachtwoord" data-i18n-ph="gate.newpass2" autocomplete="new-password">
       <button type="submit" data-i18n="gate.doreset">Stel nieuw wachtwoord in</button>
     </form>
-    <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Nog geen account? Registreer</button>
+    <button class="gate-switch" id="toReg" type="button" data-i18n="gate.toreg">Aanmelden</button>
     <button class="gate-switch" id="toForgot" type="button" data-i18n="gate.forgot">Wachtwoord vergeten?</button>
     <button class="gate-switch" id="toLogin" type="button" style="display:none;" data-i18n="gate.tologin">Al een account? Inloggen</button>
-    <p class="gate-or" data-i18n="gate.or">of kies een demoprofiel</p>
-    <div class="gate-list">
-      <button class="gate-btn t-rtg" data-login="rtg"><span class="dot"></span><span><b>K. Kiss</b><span>RTG Pass · codenaam Amberen Vos</span></span></button>
-      <button class="gate-btn t-lifestyle" data-login="lifestyle"><span class="dot"></span><span><b>F. Johanna</b><span>Lifestyle Pass · codenaam Gouden Ibis</span></span></button>
-      <button class="gate-btn t-business" data-login="business"><span class="dot"></span><span><b>R. Imran</b><span>Business Pass · codenaam Noordelijke Ster</span></span></button>
-      <button class="gate-btn t-guest" data-login="guest"><span class="dot" style="background:var(--soft);"></span><span><b data-i18n="gate.guest">Gratis, zonder pas</b><span data-i18n="gate.guest.s">Betaal bij partners, bekijk De Salon en solliciteer</span></span></button>
-    </div>
-    <p class="note" data-i18n-html="gate.note">Demo-account: gebruikersnaam <b>Rahul</b>, wachtwoord <b>Imran</b>. Of kies een profiel.<br><a href="/site/download.html" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:3px;">Zet de app op je beginscherm →</a></p>
   </div>
 
   <!-- verplichte onboarding + contract (blokkeert de app tot alles rond is) -->

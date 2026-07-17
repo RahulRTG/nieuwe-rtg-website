@@ -68,6 +68,9 @@
   .enroll-toggle{width:100%;background:var(--card);border:1px solid rgba(169,143,28,0.4);border-radius:13px;padding:0.9rem 1rem;color:var(--gold);font-size:0.82rem;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;}
   .enroll-toggle:hover{border-color:var(--gold);}
   .enroll-form{margin-top:0.9rem;}
+  /* het aanmeldformulier blijft dicht tot je op "Meld u aan" klikt; de klasse
+     .login-form zet display:flex, dus het hidden-attribuut moet dat overrulen */
+  .enroll-form[hidden]{display:none;}
   .enroll-hint{font-size:0.72rem;color:var(--soft);line-height:1.5;margin-bottom:0.2rem;}
   .enroll-msg{font-size:0.78rem;min-height:1rem;}
   .enroll-msg.err{color:#E8637A;}
@@ -569,17 +572,12 @@
 <div id="shell">
 
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
-    <div class="badge">RTG Partners</div>
-    <h1 data-i18n-html="gate.title">De leverancier-<em>app</em>.</h1>
-    <p class="deck" data-i18n="gate.deck">Uw zaak, live verbonden met uw gasten en de RTG-backoffice.</p>
+    <!-- kaal inlogscherm: alleen inloggen en aanmelden bij de werkgever -->
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
       <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
       <button type="submit" data-i18n="gate.signin">Inloggen</button>
     </form>
-    <p class="gate-or" data-i18n="gate.or">of kies een demo-partner</p>
-    <div class="gate-list" id="gateList"></div>
-    <p class="free" data-i18n-html="gate.free"><b>Demo:</b> Rahul / Imran. Gratis voor partners; u levert RTG uw beste dynamische prijs.</p>
 
     <div class="enroll-box">
       <button type="button" class="enroll-toggle" id="enrollToggle" aria-expanded="false" data-i18n="enr.toggle">🎟️ Uitgenodigd door uw werkgever? Meld u aan</button>

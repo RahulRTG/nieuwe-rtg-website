@@ -216,15 +216,11 @@
       const badge = document.querySelector('#gate .badge');
       if (badge) badge.textContent = (lang() === 'en' ? SDEF.labelEn : SDEF.label);
     }
-    $('#gateList').innerHTML = list.map(d =>
-      '<button class="gate-btn" data-code="'+d.code+'"><span class="ic">'+d.icon+'</span><span><b>'+d.name+'</b><span>'+d.sub+'</span></span></button>'
-    ).join('') + (SDEF ? '' :
-      '<div style="margin-top:0.9rem;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);">'+T('gate.sectorapps','Of open de app voor uw sector')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">'+
-        Object.keys(SECTOR_DEF).filter(k => !SECTOR_DEF[k].legacy).map(k => '<a class="obtn" style="text-decoration:none;" href="/apps/'+k+'.html">'+SECTOR_DEF[k].icon+' '+(lang()==='en'?SECTOR_DEF[k].labelEn:SECTOR_DEF[k].label)+'</a>').join('')+
-      '</div>'+
-      '<a class="obtn" style="text-decoration:none;display:inline-block;margin-top:0.8rem;border-color:rgba(169,143,28,0.4);color:var(--gold);" href="/apps/personeel.html">👤 '+T('gate.staffapp','Werkt u hier? Open de personeels-app')+'</a>'+
-      '<a class="obtn" style="text-decoration:none;display:inline-block;margin-top:0.8rem;margin-left:0.5rem;" href="/apps/">📱 '+T('gate.allapps','Alle RTG-apps')+'</a>');
+    // het inlogscherm blijft kaal: geen demo-partnerlijst; de demo logt in met
+    // de account-gegevens (of via ?sector=). De lijst blijft wel bestaan als
+    // element voor eventuele diepe koppelingen, maar wordt niet gevuld.
+    const gl = $('#gateList');
+    if (gl) gl.innerHTML = '';
     document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
     const lf = document.getElementById('loginForm');
     if (lf) lf.addEventListener('submit', e => {

@@ -206,23 +206,13 @@
     regTier = vastePas;
   } else {
 
-    // de ene poort: log in en uw account opent vanzelf de juiste pas-app
-    // (RTG, Lifestyle of Business); zelf kiezen kan daaronder nog steeds
-    document.title = 'RTG, log in of kies uw pas-app';
+    // de ene poort: het scherm blijft kaal (alleen inloggen, aanmelden en
+    // wachtwoord vergeten). Log in en uw account opent vanzelf de juiste
+    // pas-app (RTG, Lifestyle of Business); aanmelden maakt een RTG-account.
+    document.title = 'RTG, log in';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
-    ['#regForm','#forgotForm','#resetForm','#toReg','#toForgot','#toLogin']
-      .forEach(sel => { const e = $(sel); if (e) e.style.display = 'none'; });
-    document.querySelectorAll('#gate .gate-or, #gate .gate-list, #gate .note').forEach(e => { e.style.display = 'none'; });
-    const kp = document.getElementById('kiesPas');
-    if (kp){ kp.hidden = false; kp.style.display = 'flex'; }
-    const lf = document.getElementById('loginForm');
-    if (lf){
-      lf.style.display = 'flex';
-      if (kp && kp.parentElement) kp.parentElement.insertBefore(lf, kp); // inloggen boven de keuze
-    }
-    const kt = kp && kp.querySelector('.gate-or');
-    if (kt){ kt.style.display = ''; kt.textContent = 'Log in en u belandt vanzelf in uw eigen app. Of kies hem zelf:'; }
+    regTier = 'rtg';
   }
 
   /* ---------- pas-thema (kleuren van de website) ----------

@@ -20,17 +20,11 @@
   const call = (path, body) => API.call(path, body);
   function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const ago=T('t.ago',' geleden'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min')+ago; const h=Math.round(m/60); if(h<24)return h+T('t.h',' u')+ago; return Math.round(h/24)+T('t.d',' d')+ago; }
 
-  $('#loginBtn').addEventListener('click', login);
-  $('#code').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
-
-  async function login(){
-    if (!enabled){ alert('Start de RTG-server (npm start) om de backoffice te gebruiken.'); return; }
-    try {
-      const d = await call('/office/login', { code: $('#code').value.trim(), totp: ($('#totp') ? $('#totp').value.trim() : '') });
-      API.token = d.token; state = d.state;
-    } catch(e){ alert(e.message); return; }
-    try { localStorage.setItem('rtg_office_token', API.token); } catch(e){}
-    enterApp();
+  /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
+     is ingesteld); zonder geldige sessie sturen we daarheen, met een
+     terug-adres zodat u na het inloggen weer hier staat. */
+  function naarInlog(){
+    location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search));
   }
 
   // Werk-OS-bord: Cmd+K (of de Panelen-knop in de kop) opent een springboard
@@ -67,11 +61,12 @@
     stream();
   }
 
-  // Blijf ingelogd: met een bewaard token direct het overzicht in.
+  // Blijf ingelogd: met een bewaard token direct het overzicht in; zonder
+  // (of met een verlopen) token gaat het via de ene inlog in de personeels-app.
   (async function restoreSession(){
     if (!enabled) return;
     let t = null; try { t = localStorage.getItem('rtg_office_token'); } catch(e){}
-    if (!t) return;
+    if (!t){ naarInlog(); return; }
     API.token = t;
     try {
       state = (await call('/office/state')).state;
@@ -79,6 +74,7 @@
     } catch(e){
       API.token = null;
       try { localStorage.removeItem('rtg_office_token'); } catch(e2){}
+      naarInlog();
     }
   })();
 

@@ -199,11 +199,17 @@
         '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
       '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
     $('#kaTerug').addEventListener('click', stepSector);
-    // het volledige kantoor (kamers, boardroom) deelt deze inlog: een tik verder
-    const vol = document.createElement('a');
-    vol.className = 'gbtn'; vol.href = '/apps/kantoren.html'; vol.style.textDecoration = 'none'; vol.style.marginTop = '0.6rem';
-    vol.innerHTML = '<span class="ic">🏛</span><span><b>'+T('pd.ka.vol','Het volledige kantoor')+'</b><span>'+T('pd.ka.vol.sub','Alle twaalf kamers en de boardroom, met deze inlog')+'</span></span>';
-    $('#gateStep').insertBefore(vol, $('#kaMeld'));
+    // het volledige kantoor, de backoffice en de paniekkamer delen deze inlog
+    const sneltoetsen = [
+      ['/apps/kantoren.html', '🏛', T('pd.ka.vol','Het volledige kantoor'), T('pd.ka.vol.sub','Alle twaalf kamers en de boardroom, met deze inlog')],
+      ['/apps/backoffice.html', '🗂', T('pd.ka.bo','De backoffice'), T('pd.ka.bo.sub','Actiecentrum, verificaties en het live overzicht')],
+      ['/apps/kantoren.html?kamer=paniekkamer', '🚨', T('pd.ka.paniek','De paniekkamer'), T('pd.ka.paniek.sub','Incidenten en nood, direct de kamer in')]
+    ];
+    const snelDiv = document.createElement('div');
+    snelDiv.className = 'glist'; snelDiv.style.marginTop = '0.6rem'; snelDiv.style.marginBottom = '0.3rem';
+    snelDiv.innerHTML = sneltoetsen.map(s =>
+      '<a class="gbtn" href="'+s[0]+'" style="text-decoration:none;"><span class="ic">'+s[1]+'</span><span><b>'+s[2]+'</b><span>'+s[3]+'</span></span></a>').join('');
+    $('#gateStep').insertBefore(snelDiv, $('#kaMeld'));
     const toonDienst = () => {
       $('#kaMeld').hidden = !!kaDienst;
       $('#kaDienstBlok').hidden = !kaDienst;
@@ -293,8 +299,10 @@
   let tipsOpen = false;     // toon de volledige tip-lijst
   let coachRef = null;      // coaching voor een concrete tafel/bestelling
   let coachRefTafel = null; // leesbare naam van die tafel
+  let wisselOpties = []; // verbonden zaken waar dit personeelslid ook op het rooster staat
   async function laadZaken(){
     try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
+    try { wisselOpties = (await API.call('/supplier/wissel/opties', {})).opties || []; } catch(e){ wisselOpties = []; }
     try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }
     try { aandacht = await API.call('/supplier/aandacht', {}); } catch(e){ aandacht = null; }
     try { netwerk = (await API.call('/supplier/net/lijst', {})).verbindingen || []; } catch(e){ netwerk = []; }
@@ -385,6 +393,28 @@
         renderToday();
       } catch(e){ toast(e.message); kb.disabled = false; }
     });
+    // geaccrediteerd wisselen: wie ook bij een verbonden zaak op het rooster
+    // staat, stapt met een tik over, zonder opnieuw een PIN in te voeren
+    if (wisselOpties.length){
+      $('#todayWrap').insertAdjacentHTML('beforeend',
+        '<div class="card"><div class="k">'+T('pd.ws.h','Andere afdeling')+'</div>'+
+        '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.ws.sub','U bent hier ook geaccrediteerd; wisselen kan direct, uw inlog reist mee.')+'</div>'+
+        wisselOpties.map(o => '<div class="task"><span class="ic">'+(BEDRIJVEN[o.code]?BEDRIJVEN[o.code].icon:'🏢')+'</span><div class="t"><b>'+esc(o.naam)+'</b><span>'+T('pd.ws.acc','Geaccrediteerd via het personeelsnetwerk')+'</span></div>'+
+          '<button class="abtn" data-wissel="'+esc(o.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
+      document.querySelectorAll('[data-wissel]').forEach(b => b.addEventListener('click', async () => {
+        b.disabled = true;
+        try {
+          const d = await API.call('/supplier/wissel', { code: b.dataset.wissel });
+          try {
+            localStorage.setItem('rtg_pda_token', d.token);
+            localStorage.setItem('rtg_pda_code', d.supplier.code);
+            localStorage.setItem('rtg_pda_bedrijf', d.supplier.code);
+          } catch(e){}
+          toast('🔁 ' + T('pd.ws.ok','Gewisseld naar') + ' ' + d.supplier.name);
+          setTimeout(() => location.reload(), 400);
+        } catch(e){ toast(e.message); b.disabled = false; }
+      }));
+    }
   }
 
   function renderRooster(){

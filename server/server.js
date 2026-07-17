@@ -160,7 +160,9 @@ const STAFF_SEED = {
   AEGIS: [['Viktor Novak', 'manager', 'Operationeel leider'], ['Samir Haddad', 'staff', 'Beveiliger'],
     ['Elena Ruiz', 'staff', 'Beveiliger'], ['Marcus Kane', 'staff', 'Beveiliger'], ['Nadia Petrova', 'staff', 'Beveiliger']],
   // de negen nieuwe sectoren: elk een manager en vloerpersoneel voor de PDA
-  VORA: [['Ines Ferrer', 'manager', 'Club manager'], ['Diego Ramos', 'staff', 'Bediening strand'], ['Yara Klein', 'staff', 'Bar']],
+  // Nora Prins staat ook bij de beachclub op het rooster: samen met de
+  // netwerkverbinding hieronder is zij geaccrediteerd om van afdeling te wisselen
+  VORA: [['Ines Ferrer', 'manager', 'Club manager'], ['Diego Ramos', 'staff', 'Bediening strand'], ['Yara Klein', 'staff', 'Bar'], ['Nora Prins', 'staff', 'Bediening strand']],
   BRISA: [['Marta Colom', 'manager', 'Eigenaar'], ['Leo Duran', 'staff', 'Barista']],
   FUEGO: [['Alba Fuego', 'manager', 'Chef-eigenaar'], ['Nico Serra', 'staff', 'Sous-chef']],
   LUNARA: [['Claudia Mas', 'manager', 'Villamanager'], ['Pere Joan', 'staff', 'Huismeester'], ['Rosa Vives', 'staff', 'Housekeeping']],
@@ -180,6 +182,13 @@ if (DEMO) {
     if (accounts.countStaff(code) === 0) {
       people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }
+  }
+  // het restaurant en de beachclub zijn verbonden in het personeelsnetwerk,
+  // zodat het wisselen van afdeling (geaccrediteerd personeel) te proberen is
+  const net = db.data.supplierNet = db.data.supplierNet || { links: [], gesprek: {} };
+  if (!Array.isArray(net.links)) net.links = [];
+  if (!net.links.some(l => [String(l.a), String(l.b)].sort().join('|') === 'KIKUNOI|VORA')) {
+    net.links.push({ a: 'KIKUNOI', b: 'VORA', status: 'akkoord', doorCode: 'KIKUNOI', at: new Date().toISOString(), beslistAt: new Date().toISOString() });
   }
 }
 

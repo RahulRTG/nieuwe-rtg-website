@@ -1,7 +1,7 @@
 /* Domein "supplier" (deelmodule): pda. Draait op de gedeelde kern. */
 const training = require('../../training');
 module.exports = (kern) => {
-  const { accounts, anthropic, app, db, findSupplier, logActivity, managerOnly, notifySupplier, save, schoon, sseToSupplier, supplierAuth, orderMetRef, ordersVanZaak } = kern;
+  const { accounts, anthropic, app, crypto, db, findSupplier, logActivity, managerOnly, notifySupplier, rememberSession, save, schoon, sseToSupplier, supplierAuth, orderMetRef, ordersVanZaak } = kern;
 
 /* ============================================================================
    Personeelsnetwerk: PDA's van VERSCHILLENDE bedrijven kunnen met elkaar praten,
@@ -64,6 +64,42 @@ app.post('/api/supplier/net/lijst', supplierAuth, (req, res) => {
     return { code: ander, naam: s ? s.name : ander, status: l.status,
       inkomend: l.status === 'wacht' && l.doorCode !== me, uitgaand: l.status === 'wacht' && l.doorCode === me };
   }) });
+});
+
+/* Ingeklokt en geaccrediteerd: een personeelslid dat OOK op het rooster van een
+   verbonden zaak staat (zelfde naam), wisselt van afdeling zonder nieuwe PIN.
+   De PIN is bij het inloggen al bewezen; de accreditatie is dubbel: de zaken
+   zijn verbonden in het personeelsnetwerk EN de manager van de andere zaak
+   heeft de persoon zelf in het team gezet. */
+function wisselDoelen(code, staffId) {
+  const ik = accounts.listStaff(code).find(m => m.id === staffId);
+  if (!ik) return [];
+  return netState().links
+    .filter(l => l.status === 'akkoord' && (l.a === code || l.b === code))
+    .map(l => (l.a === code ? l.b : l.a))
+    .filter(ander => accounts.listStaff(ander).some(m => m.name === ik.name));
+}
+app.post('/api/supplier/wissel/opties', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.json({ opties: [] });
+  res.json({ opties: wisselDoelen(req.supplier.code, req.actor.staffId).map(code => {
+    const s = findSupplier(code);
+    return { code, naam: s ? s.name : code, type: s ? s.type : '' };
+  }) });
+});
+app.post('/api/supplier/wissel', supplierAuth, (req, res) => {
+  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen personeel wisselt van afdeling; log in op uw eigen naam.' });
+  const doel = findSupplier(req.body.code);
+  if (!doel) return res.status(404).json({ error: 'Dit bedrijf kennen we niet.' });
+  if (doel.code === req.supplier.code) return res.status(400).json({ error: 'U bent hier al.' });
+  if (!wisselDoelen(req.supplier.code, req.actor.staffId).includes(doel.code)) {
+    return res.status(403).json({ error: 'U bent daar niet geaccrediteerd: de zaken moeten verbonden zijn en de manager moet u in het team hebben gezet.' });
+  }
+  const ik = accounts.listStaff(req.supplier.code).find(m => m.id === req.actor.staffId);
+  const daar = accounts.listStaff(doel.code).find(m => m.name === ik.name);
+  const token = crypto.randomBytes(24).toString('hex');
+  rememberSession(token, { role: 'supplier', code: doel.code, actor: daar.name, staffId: daar.id, staffRole: daar.role, manager: daar.role === 'manager' });
+  logActivity(doel.code, { name: daar.name }, daar.name + ' wisselde van afdeling (vanuit ' + req.supplier.name + ')');
+  res.json({ token, supplier: { code: doel.code, name: doel.name } });
 });
 
 app.post('/api/supplier/net/gesprek', supplierAuth, (req, res) => {

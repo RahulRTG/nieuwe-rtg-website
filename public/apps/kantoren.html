@@ -30,15 +30,36 @@
   .knop:hover{background:var(--burgundy);color:#fff;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
   .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
-  /* kamergrid */
+  /* kamergrid in de Werk-OS-taal: scherpe tegels, haarlijnen, korte beweging */
+  body{background:
+    radial-gradient(85% 32% at 50% -4%, rgba(169,143,28,0.08), transparent 62%),
+    radial-gradient(110% 45% at 50% 108%, rgba(194,58,94,0.05), transparent 60%),
+    var(--bg);}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-top:1.4rem;}
-  .kamer{padding:1.1rem 1.2rem;cursor:pointer;transition:border-color .12s, transform .12s;display:flex;flex-direction:column;gap:.35rem;text-align:left;}
-  .kamer:hover{border-color:var(--gold);transform:translateY(-2px);}
-  .kamer .ic{font-size:1.5rem;}
+  .kamer{
+    padding:1.1rem 1.2rem;cursor:pointer;border-radius:14px;
+    background:linear-gradient(155deg,#1B1815 0%,var(--card) 60%);
+    box-shadow:0 10px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    transition:border-color .13s cubic-bezier(.22,.7,.3,1), transform .13s cubic-bezier(.22,.7,.3,1), box-shadow .13s;
+    display:flex;flex-direction:column;gap:.45rem;text-align:left;
+  }
+  .kamer:hover{
+    border-color:color-mix(in srgb, var(--gold) 60%, transparent);transform:translateY(-3px);
+    box-shadow:0 16px 34px rgba(0,0,0,0.45), 0 0 0 1px rgba(169,143,28,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .kamer:active{transform:scale(.985);}
+  .kamer .ic{
+    width:46px;height:46px;border-radius:12px;font-size:1.35rem;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(155deg,#23201C,#161311);
+    border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,0.07);
+  }
   .kamer h2{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;}
   .kamer p{font-size:.78rem;color:var(--soft);flex:1;}
-  .kamer .kpi{font-size:.78rem;color:var(--gold);font-weight:600;}
-  .kamer.board{border-color:var(--gold);background:linear-gradient(160deg, #1a1610, var(--card));}
+  .kamer .kpi{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:650;font-variant-numeric:tabular-nums;}
+  .kamer.board{border-color:color-mix(in srgb, var(--gold) 55%, transparent);background:linear-gradient(160deg, #1a1610, var(--card));}
+  /* klok rechtsboven, zoals in elk RTG OS */
+  .wos-klokchip{font-size:.86rem;font-weight:650;color:var(--txt);font-variant-numeric:tabular-nums;letter-spacing:.02em;margin-left:.9rem;}
   /* kamer-detail */
   .kop{display:flex;align-items:baseline;gap:.8rem;flex-wrap:wrap;margin-top:1rem;}
   .kop .terug{font-size:.85rem;color:var(--muted);cursor:pointer;background:none;border:0;}
@@ -96,7 +117,7 @@
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
-  <nav aria-label="Kantoor"><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a></nav>
+  <nav aria-label="Kantoor" style="display:flex;align-items:center;"><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
 </div></header>
 
 <main id="hoofd" tabindex="-1"><div class="wrap">
@@ -531,6 +552,13 @@ $('#bVernieuw').addEventListener('click', async () => {
 
 /* de boardroom ververst zichzelf zolang hij openstaat */
 setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }, 30000);
+
+/* de klok rechtsboven, zoals in elk RTG OS */
+(function () {
+  const k = $('#wosKlok');
+  const tik = () => { const d = new Date(); k.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  tik(); setInterval(tik, 15000);
+})();
 
 if (TOKEN) binnen().catch(() => toon('vGate'));
 else toon('vGate');

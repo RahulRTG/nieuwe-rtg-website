@@ -1888,5 +1888,7 @@
   window.addEventListener('rtglang', () => { if (state) renderAll(); else stepStart(); });
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
   stepStart();
+  // het Werk-OS: springboard, dock, klok en Cmd+K, precies als op een telefoon
+  if (window.WerkOS) WerkOS.koppel({ thuisTab: 'vandaag', dock: ['rooster', 'taken', 'team', 'hulp'] });
   restoreSession();
 })();

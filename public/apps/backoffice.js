@@ -33,10 +33,29 @@
     enterApp();
   }
 
+  // Werk-OS-bord: Cmd+K (of de Panelen-knop in de kop) opent een springboard
+  // over het bord; een tik scrolt naar het paneel en licht het even op.
+  let wosBord = null;
+  function startWerkOS(){
+    if (wosBord || !window.WerkOS) return;
+    const apps = [];
+    document.querySelectorAll('#app .panel h2, #app .panel2 h2, #app h2').forEach(h => {
+      const el = h.closest('.panel') || h.closest('.card') || h.parentElement;
+      if (!el || apps.some(a => a.el === el)) return;
+      const lab = h.querySelector('[data-i18n]');
+      const ruw = ((lab ? lab.textContent : h.textContent) || '').trim().replace(/\s+/g, ' ');
+      const emoji = ((h.textContent || '').match(/\p{Extended_Pictographic}/u) || [])[0] || '▦';
+      const naam = ruw.replace(/^[^\p{L}]+/u, '').replace(/[▾▸›\s]+$/g, '').split('·')[0].trim().slice(0, 26);
+      if (naam) apps.push({ naam, icoon: emoji, el });
+    });
+    wosBord = WerkOS.bord({ titel: 'RTG Backoffice, alle panelen', apps, knopIn: document.querySelector('header .wrap > span') });
+  }
+
   function enterApp(){
     $('#gate').style.display = 'none';
     $('#app').classList.add('on');
     $('#liveInd').style.display = 'inline-flex';
+    startWerkOS();
     render();
     laadTimeline();
     loadVerify();

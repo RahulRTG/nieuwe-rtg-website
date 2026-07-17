@@ -6159,6 +6159,12 @@
   renderAIThread();
   buildPad();
   renderGate();
+  // het Werk-OS: springboard, dock, klok en Cmd+K over het bestaande tabmodel
+  if (window.WerkOS) WerkOS.koppel({
+    thuisTab: 'home', dock: ['orders', 'kassa', 'menu', 'ai', 'team'],
+    // het Meer-grid waaiert uit over het springboard: alle functies als apps
+    verberg: ['meer'], extra: { houder: '#meerWrap', knop: '.meer-btn' }
+  });
   restoreSession();
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 })();

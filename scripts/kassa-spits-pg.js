@@ -75,8 +75,10 @@ async function bootServer() {
 }
 function rssMB() { try { const m = fs.readFileSync('/proc/' + child.pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/); return m ? Math.round(m[1] / 1024) : null; } catch (e) { return null; } }
 const stopServer = () => new Promise(r => { const dit = child; const t = setTimeout(() => { try { dit.kill('SIGKILL'); } catch (e) {} }, 12000); dit.once('exit', () => { clearTimeout(t); r(); }); dit.kill('SIGTERM'); });
-function psql(sql) { return execSync('psql "' + DATABASE_URL + '" -v ON_ERROR_STOP=1 -c "' + sql.replace(/"/g, '\\"') + '"', { stdio: ['ignore', 'pipe', 'pipe'] }).toString(); }
-function psqlVal(sql) { return execSync('psql "' + DATABASE_URL + '" -tA -c "' + sql.replace(/"/g, '\\"') + '"', { stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim(); }
+// Escape eerst de backslash, dan pas de quote (anders ontsnapt een \ de \"-escape).
+const shArg = sql => sql.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+function psql(sql) { return execSync('psql "' + DATABASE_URL + '" -v ON_ERROR_STOP=1 -c "' + shArg(sql) + '"', { stdio: ['ignore', 'pipe', 'pipe'] }).toString(); }
+function psqlVal(sql) { return execSync('psql "' + DATABASE_URL + '" -tA -c "' + shArg(sql) + '"', { stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim(); }
 
 const MENU = [
   { id: 'm1', name: 'Gazpacho de sandia', cat: 'Voor', publiekePrijs: 16, price: 16, station: 'keuken', sectie: 'koud' },

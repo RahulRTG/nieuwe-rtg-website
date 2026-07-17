@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { db, save, DATA_DIR } = require('./db');
+const { eigenVeld } = require('./kern/util'); // veilige objecttoegang (geen prototype-pollution)
 
 /* ---------- versleuteling van gevoelige gezinsdata ----------
    Locatie van kinderen, gezondheidsinfo (allergieen/medisch) en berichten liggen
@@ -441,7 +442,7 @@ function profielInfoVanHandle(handle) {
   const m = /^rtf:([A-Z0-9]+):(.+)$/.exec(String(handle || ''));
   if (!m) return null;
   const g = G()[m[1]]; if (!g) return null;
-  const p = g.profielen[m[2]]; if (!p || isGast(p)) return null;
+  const p = eigenVeld(g.profielen, m[2]); if (!p || isGast(p)) return null;
   return { handle, codenaam: ensureCodenaam(p), naam: p.naam, avatar: p.avatar, kleur: p.kleur, rol: p.rol, kind: p.rol === 'kind', beschermd: isBeschermd(p), gezinCode: g.code };
 }
 // beheerder(s) van het gezin waar dit kind-handle bij hoort
@@ -545,7 +546,7 @@ router.post('/gezin/profiel/maak', async (req, res) => {
 router.post('/gezin/profiel/wijzig', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
   if (!beheerderVan(g, req, res)) return;
-  const p = g.profielen[String(req.body.profielId || '')];
+  const p = eigenVeld(g.profielen, req.body.profielId);
   if (!p) return res.status(404).json({ error: 'Profiel niet gevonden.' });
   if (typeof req.body.naam === 'string' && schoon(req.body.naam, 40)) p.naam = schoon(req.body.naam, 40);
   if (req.body.avatar != null) p.avatar = schoonAvatar(req.body.avatar);
@@ -971,7 +972,7 @@ function gastProfielen(code) {
 function linkGast({ code, profielId, userId, tier, codenaam }) {
   const g = G()[String(code || '').toUpperCase()];
   if (!g) return { error: 'Dit gezin kennen we niet. Klopt de gezinscode?', status: 404 };
-  const p = g.profielen[String(profielId || '')];
+  const p = eigenVeld(g.profielen, profielId);
   if (!p) return { error: 'Dit profiel bestaat niet meer.', status: 404 };
   if (p.rol !== 'gast') return { error: 'Alleen een oppas- of familieprofiel kan aan een RTG-pas gekoppeld worden.', status: 403 };
   p.koppel = { userId, tier, tierNaam: TIERNAAM[tier] || 'RTG Pass', codenaam: codenaam || 'lid', at: nu() };

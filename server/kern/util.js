@@ -31,13 +31,29 @@ function entreeCode() { return codeUit(6); }
 function pickupCode() { return codeUit(4); }
 
 /* Tijd-veilige vergelijking van geheimen (codes, wachtwoorden): een gewone
-   !== lekt via de reactietijd hoeveel tekens al kloppen. We hashen beide
-   kanten naar vaste lengte en vergelijken in constante tijd, zoals banken
-   dat doen. */
+   !== lekt via de reactietijd hoeveel tekens al kloppen. We brengen beide
+   kanten met een HMAC onder een verse, willekeurige sleutel naar vaste lengte
+   en vergelijken in constante tijd (de bekende "double HMAC"-truc). De
+   willekeurige sleutel maakt de uitkomst onvoorspelbaar; dit is geen
+   wachtwoord-opslag (dat gebeurt met scrypt in accounts.js), alleen een
+   constante-tijd-vergelijking. */
 function veiligGelijk(a, b) {
-  const ha = crypto.createHash('sha256').update(String(a == null ? '' : a)).digest();
-  const hb = crypto.createHash('sha256').update(String(b == null ? '' : b)).digest();
+  const sleutel = crypto.randomBytes(32);
+  const ha = crypto.createHmac('sha256', sleutel).update(String(a == null ? '' : a)).digest();
+  const hb = crypto.createHmac('sha256', sleutel).update(String(b == null ? '' : b)).digest();
   return crypto.timingSafeEqual(ha, hb);
 }
 
-module.exports = { schoon, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk };
+/* Veilige objecttoegang met een sleutel uit gebruikersinvoer. Zonder deze
+   check zou een sleutel als "__proto__", "constructor" of "prototype" het
+   prototype teruggeven; muteer je dat object daarna, dan vervuil je
+   Object.prototype voor de hele server (prototype-pollution). We geven daarom
+   alleen echte eigen velden terug, en nooit die drie magische sleutels. */
+function eigenVeld(obj, sleutel) {
+  if (obj == null) return undefined;
+  const k = String(sleutel == null ? '' : sleutel);
+  if (k === '__proto__' || k === 'constructor' || k === 'prototype') return undefined;
+  return Object.prototype.hasOwnProperty.call(obj, k) ? obj[k] : undefined;
+}
+
+module.exports = { schoon, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };

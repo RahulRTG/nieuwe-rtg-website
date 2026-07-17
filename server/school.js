@@ -14,6 +14,8 @@
 
    Krijgt de gedeelde foundation-helpers mee (ctx) en registreert zijn routes op
    dezelfde router; alles onder /api/foundation/school/... */
+const { eigenVeld } = require('./kern/util'); // veilige objecttoegang (geen prototype-pollution)
+
 module.exports = (ctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto } = ctx;
 
@@ -58,7 +60,7 @@ module.exports = (ctx) => {
      - het personeel-token van de leraar die de klas geeft (mits actief);
      - het beheer-token van de school (de directie kan bij alle klassen). */
   function klasVan(req, res) {
-    const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
+    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
     const tok = String(req.body.leraarToken || req.body.personeelToken || req.body.beheerToken || '');
     let mag = false;
     if (k && tok) {
@@ -155,7 +157,7 @@ module.exports = (ctx) => {
   });
   router.post('/school/personeel/besluit', (req, res) => {
     const sch = schoolVan(req, res); if (!sch) return;
-    const p = (sch.personeel || {})[String(req.body.personeelId || '')];
+    const p = eigenVeld(sch.personeel || {}, req.body.personeelId);
     if (!p) return res.status(404).json({ error: 'Dit personeelslid is niet gevonden.' });
     // afwijzen mag altijd (spam opruimen), maar toelaten kan pas als RTG de school
     // zelf heeft goedgekeurd
@@ -229,7 +231,7 @@ module.exports = (ctx) => {
      en telt dus meteen. */
   router.post('/school/koppel', (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
-    const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
+    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
     if (!k) return res.status(404).json({ error: 'Deze klascode kennen we niet. Vraag hem na bij de leraar.' });
     const profielId = String(req.body.profielId || s.p.id);
     const kind = s.g.profielen[profielId];
@@ -255,7 +257,7 @@ module.exports = (ctx) => {
   // het kind beslist zelf over de uitnodiging van de ouder
   router.post('/school/uitnodiging/antwoord', (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
-    const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
+    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
     if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
     const sleutel = leerlingSleutel(s.g.code, s.p.id);
     const idx = (k.uitnodigingen || []).findIndex(u => u.sleutel === sleutel);
@@ -366,7 +368,7 @@ module.exports = (ctx) => {
   // huiswerk afvinken (kind of ouder), en weer terugzetten
   router.post('/school/huiswerk/af', (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
-    const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
+    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
     if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
     const profielId = s.beheerder && req.body.profielId ? String(req.body.profielId) : s.p.id;
     const l = leerlingVan(k, s.g, profielId);
@@ -385,7 +387,7 @@ module.exports = (ctx) => {
   router.post('/school/ziekmelden', (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
     if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder of verzorger meldt ziek.' });
-    const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
+    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
     if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
     const profielId = String(req.body.profielId || '');
     const l = leerlingVan(k, s.g, profielId);
@@ -414,7 +416,7 @@ module.exports = (ctx) => {
   const kanaalVan = (req) => (req.body.kanaal === 'ouders' ? 'ouders' : 'gezin');
   router.post('/school/bericht/gezin', (req, res) => {
     const s = gezinSessie(req, res); if (!s) return;
-    const k = K()[String(req.body.klasCode || '').trim().toUpperCase()];
+    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
     if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
     const kanaal = kanaalVan(req);
     // het privekanaal is alleen voor ouders/verzorgers; het kind komt er niet in

@@ -12,7 +12,13 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
   }
 
   function liveCodename(session) {
-    return session.account ? session.account.codename : PERSONAS[session.tier].codename;
+    if (!session) return null;
+    if (session.account) return session.account.codename;
+    // Defensief: een sessie zonder bekende persona-tier (bijv. een leverancier-
+    // of kantoor-token dat per ongeluk op een leden-route belandt) mag nooit een
+    // crash geven. De leden-auth weert die al, dit is de tweede lijn.
+    const p = PERSONAS[session.tier];
+    return p ? p.codename : null;
   }
 
   // Partners die op dit moment met dit reizende lid te maken hebben: de bestemming,

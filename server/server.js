@@ -1506,6 +1506,11 @@ function auth(req, res, next) {
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
   const sess = resolveSession(token);
   if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
+  // Alleen leden-sessies horen hier: een echt account, of een demo-pas met een
+  // bekende persona-tier. Leverancier- en kantoor-sessies (met een eigen auth
+  // en zonder tier) worden geweigerd i.p.v. verderop de ledengids te laten
+  // crashen op een ontbrekende codenaam.
+  if (!sess.account && !PERSONAS[sess.tier]) return res.status(401).json({ error: 'Niet ingelogd als lid.' });
   req.session = sess;
   dirTouch(sess);
   next();

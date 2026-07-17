@@ -32,7 +32,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
-const { db, load, save, DATA_DIR, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+const { db, load, save, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
@@ -1724,9 +1724,17 @@ if (process.env.NODE_ENV === 'test') {
 app.get('/api/ready', (req, res) => {
   let dataOk = false;
   try { dataOk = !!db.data && typeof db.data === 'object'; } catch (e) { dataOk = false; }
-  const klaar = dataOk;
+  // Echt klaar = de duurzame opslag is geladen. In Postgres-modus telt "geladen"
+  // pas als de gedeelde data binnen is en het RAM-venster uit het grootboek is
+  // bijgewerkt; zo krijgt een nog warmdraaiende instance nog geen verkeer van de
+  // load balancer (het boot-bottleneck-risico bij een herstart onder druk).
+  let klaar = dataOk;
+  try { klaar = opslagKlaar(); } catch (e) { klaar = false; }
+  let pool = null;
+  try { pool = pgPoolStatus(); } catch (e) { pool = null; }
   res.status(klaar ? 200 : 503).json({
-    ready: klaar, data: dataOk, writable: !!db.writable,
+    ready: klaar, data: dataOk, writable: !!db.writable, store: STORE,
+    ...(pool ? { pool } : {}),
     redis: process.env.REDIS_URL ? 'geconfigureerd' : 'uit', up: Math.round(process.uptime())
   });
 });

@@ -51,7 +51,11 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
     await new Promise(r => setTimeout(r, 100));
   }
   assert.ok(op, 'de server start met de veilige configuratie');
-  assert.equal((await haal("/api/ready")).status, 200, 'en meldt zich klaar voor verkeer');
+  const ready = await haal("/api/ready");
+  assert.equal(ready.status, 200, 'en meldt zich klaar voor verkeer');
+  const readyBody = await ready.json();
+  assert.equal(readyBody.ready, true, 'de readiness-check bevestigt dat de opslag geladen is');
+  assert.ok(typeof readyBody.store === 'string', 'de readiness-check meldt welke opslag actief is');
   assert.equal((await haal("/")).status, 200, "de website wordt geserveerd");
 
   // demo is ECHT dicht op ELK portaal: geen pas-login zonder wachtwoord, en het

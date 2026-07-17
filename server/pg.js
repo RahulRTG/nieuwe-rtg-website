@@ -25,7 +25,29 @@ function maakPg({ merge3, kluis, log, url }) {
   const { Pool } = require('pg');
   // Pool-grootte: de kv-flush, het transactie-grootboek en de ledengids delen
   // deze pool; onder gelijktijdige last is 10 te krap (wachtrij = latentie).
-  const pool = new Pool({ connectionString: url, max: Number(process.env.PG_POOL_MAX || 20) });
+  // Time-outs zijn er om te falen-en-herstellen in plaats van eeuwig te blokkeren:
+  //  - connectionTimeoutMillis: is de pool vol/de database traag, dan geeft
+  //    pool.connect() na deze tijd een fout (de flush blijft vuil en herprobeert)
+  //    in plaats van de event-loop-callback voor onbepaalde tijd te laten hangen;
+  //  - statement_timeout/query_timeout: een query (of het wachten op een advisory
+  //    lock) die vastloopt breekt af i.p.v. een verbinding voorgoed te bezetten en
+  //    zo de hele pool leeg te trekken -- precies het pad naar een p99-explosie;
+  //  - idleTimeoutMillis: inactieve verbindingen sluiten netjes af.
+  // Allemaal ruim gekozen en per env te tunen; de startup-load en de veegrondes
+  // zijn bewust begrensd (LIMIT), dus 30 s statement-time-out raakt niets normaals.
+  const pool = new Pool({
+    connectionString: url,
+    max: Number(process.env.PG_POOL_MAX || 20),
+    connectionTimeoutMillis: Number(process.env.PG_CONNECT_MS || 5000),
+    idleTimeoutMillis: Number(process.env.PG_IDLE_MS || 30000),
+    statement_timeout: Number(process.env.PG_STATEMENT_MS || 30000),
+    query_timeout: Number(process.env.PG_QUERY_MS || 30000)
+  });
+  // Zonder deze handler laat node-postgres een fout op een INACTIEVE client (bijv.
+  // de database sluit de verbinding, een netwerk-drop) opborrelen als een
+  // 'error'-event op de pool -- en een onafgehandeld 'error'-event laat het hele
+  // proces crashen. We loggen het; de pool vervangt de verbinding zelf.
+  pool.on('error', (e) => { if (log && log.warn) log.warn('pg-pool: fout op inactieve verbinding', { fout: e.message }); });
   let luisterClient = null;
   const toegepast = new Map();   // collectie -> versie die dit proces al toepaste
   const laatsteJson = new Map(); // collectie -> laatst gesynchroniseerde JSON
@@ -182,7 +204,13 @@ function maakPg({ merge3, kluis, log, url }) {
     try { await pool.end(); } catch (e) {}
   }
 
-  return { schema, laadAlles, flush, haalNieuwer, luister, sluit, pool,
+  // Pool-verzadiging in cijfers: waitingCount > 0 betekent dat verzoeken op een
+  // vrije verbinding staan te wachten -- de vroege waarschuwing voor het
+  // p99-blocking-scenario. Zichtbaar via /api/ready en de techniek-pagina.
+  function poolStatus() {
+    return { totaal: pool.totalCount, inactief: pool.idleCount, wachtend: pool.waitingCount, max: pool.options.max };
+  }
+  return { schema, laadAlles, flush, haalNieuwer, luister, sluit, pool, poolStatus,
     heeftUitgesteld: () => uitgesteld,
     _staat: { toegepast, laatsteJson } };
 }

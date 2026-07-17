@@ -865,7 +865,21 @@ async function startGedeeld() {
 // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.
 function onExternalChange(cb) { externCb = cb; }
 
-module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, pgPing, onExternalChange, merge3, schrijfDuurzaam, grootSupplierSync, grootAantal,
+// Is de duurzame opslag echt klaar om verkeer te dragen? json/sqlite laden
+// synchroon bij de start; Postgres is pas klaar als de gedeelde data geladen is
+// EN het RAM-venster (orders/boekingen) uit het grootboek is bijgewerkt (pgKlaar).
+// De load balancer gebruikt dit (via /api/ready) om een koud-opstartende of nog
+// warmdraaiende instance over te slaan i.p.v. er verkeer op te zetten -- precies
+// het "boot-bottleneck"-risico bij een herstart onder druk.
+function opslagKlaar() {
+  if (!db.data || typeof db.data !== 'object') return false;
+  if (STORE === 'postgres') return pgKlaar;
+  return true;
+}
+// Pool-verzadiging (alleen in Postgres-modus) voor de health/ready-checks.
+function pgPoolStatus() { return (pg && pg.poolStatus) ? pg.poolStatus() : null; }
+
+module.exports = { db, load, save, DATA_DIR, STORE, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, pgPing, opslagKlaar, pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,

@@ -9,12 +9,14 @@ const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const { _poort } = require('./helper');
 
-test('detectie: crashes tellen mee, client-fouten en ruis niet', () => {
+test('detectie: crashes en 5xx tellen mee, client-fouten en ruis niet', () => {
   assert.ok(_poort.isFataal('2026 ERROR uitzondering {"fout":"x","bron":"uncaughtException","fataal":true}'), 'uncaughtException telt mee');
   assert.ok(_poort.isFataal('ERROR uitzondering {"bron":"unhandledRejection"}'), 'unhandledRejection telt mee');
-  // een geworpen route-fout of client-fout via de express error-middleware (400/413)
-  // logt ook 'uitzondering', maar zonder bron -> mag de poort NIET laten afgaan
-  assert.equal(_poort.isFataal('ERROR uitzondering {"fout":"te groot","p":"/api/x"}'), false, 'client-fout telt niet mee');
+  // een geworpen route-fout -> 500: de server markeert die met serverfout:true
+  assert.ok(_poort.isFataal('ERROR uitzondering {"p":"/api/x","status":500,"serverfout":true}'), 'een onverwachte 5xx telt mee');
+  // een client-fout via de express error-middleware (400/413) krijgt GEEN serverfout-vlag
+  assert.equal(_poort.isFataal('ERROR uitzondering {"fout":"te groot","p":"/api/x","status":413}'), false, 'een 413 telt niet mee');
+  assert.equal(_poort.isFataal('ERROR uitzondering {"p":"/api/x","status":400}'), false, 'een 400 telt niet mee');
   assert.equal(_poort.isFataal('WARN [pg] flush mislukt: timeout'), false, 'een waarschuwing telt niet mee');
   assert.equal(_poort.isFataal('gewone logregel'), false, 'ruis telt niet mee');
 });

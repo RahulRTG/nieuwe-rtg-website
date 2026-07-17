@@ -41,15 +41,17 @@ async function startServer(opts = {}) {
   throw laatste;
 }
 
-/* Strenge poort: een geslaagde test mag de server nooit een uncaughtException of
-   unhandledRejection laten loggen -- dat zijn achtergrond-crashes en niet-opgevangen
-   beloftes die anders volledig stil doorglippen (de test checkt immers alleen zijn
-   eigen verzoeken). We lezen de stderr van elke kind-server mee, tonen hem gewoon,
-   en onthouden zulke regels. Aan het eind van de testrun faalt het proces (exit 1)
-   als er ook maar één is geweest. Client-fouten (400/413 via de express
-   error-middleware) tellen NIET mee: die horen bij normale negatieve tests. */
+/* Strenge poort: een geslaagde test mag de server nooit een echte fout laten
+   loggen -- een uncaughtException, een niet-opgevangen belofte (unhandledRejection),
+   of een onverwachte 5xx uit een route (een geworpen fout -> 500). Die glippen
+   anders stil door, want de test checkt alleen zijn eigen verzoeken. We lezen de
+   stderr van elke kind-server mee, tonen hem gewoon, en onthouden zulke regels.
+   Aan het eind van de testrun faalt het proces (exit 1) als er ook maar één is
+   geweest. Client-invoerfouten (400/413 via de express error-middleware) tellen
+   NIET mee -- die markeert de server niet als serverfout -- zodat normale negatieve
+   tests gewoon blijven werken. */
 const serverUitzonderingen = [];
-const FATAAL = /"bron":"(uncaughtException|unhandledRejection)"/;
+const FATAAL = /"bron":"(uncaughtException|unhandledRejection)"|"serverfout":true/;
 let poortGewapend = false;
 function wapenStrengePoort() {
   if (poortGewapend) return;

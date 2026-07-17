@@ -2844,10 +2844,14 @@ app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, '..', 'public', 'site', '404.html'));
 });
 app.use((err, req, res, next) => {
-  log.uitzondering(err instanceof Error ? err : new Error(String(err)), { id: req && req.id, p: req && req.path });
+  const status = err && err.type === 'entity.too.large' ? 413 : ((err && err.status) || 500);
+  // 5xx is een ECHTE serverfout (geen client-invoerfout zoals 400/413): apart
+  // gemarkeerd zodat de strenge testpoort er hard op faalt en de productie-logs
+  // de twee soorten uit elkaar houden.
+  log.uitzondering(err instanceof Error ? err : new Error(String(err)),
+    { id: req && req.id, p: req && req.path, status, ...(status >= 500 ? { serverfout: true } : {}) });
   if (res.headersSent) return next(err);
-  res.status(err && err.type === 'entity.too.large' ? 413 : (err.status || 500))
-     .json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
+  res.status(status).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
 });
 
 /* ---------- dagelijkse back-up van de data ---------- */

@@ -122,19 +122,8 @@
 
 <main id="hoofd" tabindex="-1"><div class="wrap">
 
-  <!-- inlog -->
-  <section id="vGate">
-    <h1>Het kantoor in</h1>
-    <p class="deck">Log in met de kantoorcode; dezelfde als voor de backoffice.</p>
-    <div class="kaart" style="max-width:26rem;padding:1.3rem;margin-top:1rem;">
-      <label for="code" style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:600;display:block;margin-bottom:.4rem;">Kantoorcode</label>
-      <input class="veld" id="code" type="password" autocomplete="current-password">
-      <label for="totp" style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:600;display:block;margin:.7rem 0 .4rem;">TOTP-code (alleen als die is ingesteld)</label>
-      <input class="veld" id="totp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456">
-      <button class="knop" id="login" style="width:100%;margin-top:.7rem;">Binnen</button>
-      <div class="fout" id="gFout"></div>
-    </div>
-  </section>
+  <!-- het inloggen is samengevoegd met de personeels-app (kantoor-ingang):
+       zonder geldige sessie stuurt dit scherm daarheen en komt u hier terug -->
 
   <!-- kamergrid -->
   <section id="vKamers" hidden>
@@ -235,20 +224,14 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vGate','vKamers','vKamer','vBoard','vPaniek'].forEach(x => $('#'+x).hidden = (x!==v)); }
-function uitgelogd(){ TOKEN = null; try { localStorage.removeItem('rtg_office_token'); } catch (e) {} toon('vGate'); }
-
-/* ---------- inloggen ---------- */
-$('#login').addEventListener('click', async () => {
-  $('#gFout').textContent = '';
-  try {
-    const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#code').value.trim(), totp: $('#totp').value.trim() }) });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(d.error || 'Die code klopt niet.');
-    TOKEN = d.token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch (e) {}
-    binnen();
-  } catch (e) { $('#gFout').textContent = e.message; }
-});
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek'].forEach(x => $('#'+x).hidden = (x!==v)); }
+/* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
+   is ingesteld); zonder geldige sessie sturen we daarheen, met een
+   terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
+function uitgelogd(){
+  TOKEN = null; try { localStorage.removeItem('rtg_office_token'); } catch (e) {}
+  location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search));
+}
 
 /* Dezelfde een-ingang-gedachte als de andere apps: een inlog (of bewaarde
    sessie) opent meteen de juiste kamer. ?kamer=hr (of boardroom of
@@ -265,7 +248,6 @@ async function binnen(){
     else await openKamer(start);
   } catch (e) { zetKamerUrl(''); }
 }
-$('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#login').click(); });
 
 /* ---------- het kamergrid ---------- */
 async function laadKamers(){
@@ -560,8 +542,8 @@ setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }
   tik(); setInterval(tik, 15000);
 })();
 
-if (TOKEN) binnen().catch(() => toon('vGate'));
-else toon('vGate');
+if (TOKEN) binnen().catch(uitgelogd);
+else uitgelogd();
 </script>
 </body>
 </html>

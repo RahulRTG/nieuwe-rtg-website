@@ -143,6 +143,11 @@
     body: JSON.stringify(body || {})
   }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || T('pd.mis','Er ging iets mis.')); return d; });
   function kantoorStop(){ if (kaTimer){ clearInterval(kaTimer); kaTimer = null; } }
+  // het terug-adres van een kantoren-deeplink (?kamer=...): alleen eigen paden
+  function kaTerugPad(){
+    const t = new URLSearchParams(location.search).get('terug') || '';
+    return (t.startsWith('/') && !t.startsWith('//')) ? t : null;
+  }
   function stepKantoor(){
     kantoorStop();
     if (kaToken){ enterKantoor().catch(() => toonKantoorLogin()); return; }
@@ -153,12 +158,14 @@
       '<div class="card"><div class="k">'+T('pd.ka.code','Kantoorcode')+'</div>'+
       '<div class="pinrow" style="margin-top:0.6rem;"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
       '<button id="kaGo">'+T('pd.ka.binnen','Binnen')+'</button></div>'+
+      '<div class="k" style="margin-top:0.7rem;">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
+      '<input class="hin" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" style="margin-top:0.4rem;">'+
       '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
     $('#kaTerug').addEventListener('click', stepSector);
     const go = async () => {
       $('#kaFout').textContent = '';
       try {
-        const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#kaCode').value.trim() }) });
+        const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#kaCode').value.trim(), totp: $('#kaTotp').value.trim() }) });
         const d = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(d.error || T('pd.ka.fout','Die code klopt niet.'));
         kaToken = d.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
@@ -171,6 +178,9 @@
   }
   async function enterKantoor(){
     const k = await kaApi('kamers');
+    // een kantoren-deeplink bracht ons hier alleen voor het inloggen: meteen door
+    const terug = kaTerugPad();
+    if (terug){ location.replace(terug); return; }
     let naam = ''; try { naam = localStorage.getItem('rtg_kantoor_naam') || ''; } catch(e){}
     $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.ka.staf','Personeel van een zaak')+'</button>'+
       '<div class="card" id="kaMeld">'+
@@ -189,6 +199,11 @@
         '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
       '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
     $('#kaTerug').addEventListener('click', stepSector);
+    // het volledige kantoor (kamers, boardroom) deelt deze inlog: een tik verder
+    const vol = document.createElement('a');
+    vol.className = 'gbtn'; vol.href = '/apps/kantoren.html'; vol.style.textDecoration = 'none'; vol.style.marginTop = '0.6rem';
+    vol.innerHTML = '<span class="ic">🏛</span><span><b>'+T('pd.ka.vol','Het volledige kantoor')+'</b><span>'+T('pd.ka.vol.sub','Alle twaalf kamers en de boardroom, met deze inlog')+'</span></span>';
+    $('#gateStep').insertBefore(vol, $('#kaMeld'));
     const toonDienst = () => {
       $('#kaMeld').hidden = !!kaDienst;
       $('#kaDienstBlok').hidden = !kaDienst;

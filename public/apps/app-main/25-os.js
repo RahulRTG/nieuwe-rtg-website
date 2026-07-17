@@ -27,10 +27,18 @@
     vrienden:    { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
     website:     { naam: 'Website',      icoon: '🌍', url: '/' },
     paspagina:   { naam: 'RTG Pass',     icoon: '🎫', url: '/site/rtg-pass.html' },
-    foundation:  { naam: 'RTFoundation', icoon: '🕊️', url: '/site/rtfoundation.html' },
+    foundation:  { naam: 'Over RTF',     icoon: '🕊️', url: '/site/rtfoundation.html' },
     privacy:     { naam: 'Privacy',      icoon: '🔒', url: '/site/privacy.html' },
     boeken:      { naam: 'Boeken',       icoon: '🧭', url: '/site/boeken.html' },
-    download:    { naam: 'Apps',         icoon: '⬇️', url: '/site/download.html' }
+    download:    { naam: 'Apps',         icoon: '⬇️', url: '/site/download.html' },
+    // de RTFoundation-apps: eigen plek in het RTG OS, maar bij het openen
+    // krijgt u de eigen RTF-jas (de hub en de vijf leeftijd-ingangen)
+    rtf:         { naam: 'RTFoundation',  icoon: '🕊️', url: '/apps/foundation/index.html' },
+    rtfmini:     { naam: 'RTF Mini',      icoon: '🧸', url: '/apps/foundation/mini.html' },
+    rtfkids:     { naam: 'RTF Kids',      icoon: '🎒', url: '/apps/foundation/kind.html' },
+    rtftiener:   { naam: 'RTF Tiener',    icoon: '🛹', url: '/apps/foundation/tiener.html' },
+    rtfjong:     { naam: 'RTF Jong',      icoon: '🚀', url: '/apps/foundation/jong.html' },
+    rtfvolw:     { naam: 'RTF Volwassen', icoon: '🧑', url: '/apps/foundation/volw.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -44,6 +52,7 @@
     ['tab:reizen', 'tab:betalen', 'tab:bestellen', 'tab:ai', 'tab:salon', 'tab:terplaatse',
       { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
     [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
+      { sleutel: 'map-rtf', naam: 'RTFoundation', items: ['link:rtf', 'link:rtfmini', 'link:rtfkids', 'link:rtftiener', 'link:rtfjong', 'link:rtfvolw'] },
       { sleutel: 'map-rtg', naam: 'RTG & info', items: ['link:website', 'link:paspagina', 'link:foundation', 'link:privacy'] },
       'link:boeken', 'link:download']
   ];

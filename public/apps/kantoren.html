@@ -108,6 +108,8 @@
     <div class="kaart" style="max-width:26rem;padding:1.3rem;margin-top:1rem;">
       <label for="code" style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:600;display:block;margin-bottom:.4rem;">Kantoorcode</label>
       <input class="veld" id="code" type="password" autocomplete="current-password">
+      <label for="totp" style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:600;display:block;margin:.7rem 0 .4rem;">TOTP-code (alleen als die is ingesteld)</label>
+      <input class="veld" id="totp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456">
       <button class="knop" id="login" style="width:100%;margin-top:.7rem;">Binnen</button>
       <div class="fout" id="gFout"></div>
     </div>
@@ -219,17 +221,34 @@ function uitgelogd(){ TOKEN = null; try { localStorage.removeItem('rtg_office_to
 $('#login').addEventListener('click', async () => {
   $('#gFout').textContent = '';
   try {
-    const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#code').value.trim() }) });
+    const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#code').value.trim(), totp: $('#totp').value.trim() }) });
     const d = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d.error || 'Die code klopt niet.');
     TOKEN = d.token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch (e) {}
-    laadKamers();
+    binnen();
   } catch (e) { $('#gFout').textContent = e.message; }
 });
+
+/* Dezelfde een-ingang-gedachte als de andere apps: een inlog (of bewaarde
+   sessie) opent meteen de juiste kamer. ?kamer=hr (of boardroom of
+   paniekkamer) is een directe, deelbare ingang; bij het openen van een kamer
+   loopt de URL mee, zodat verversen en bladwijzers dezelfde kamer geven. */
+function zetKamerUrl(id){ try { history.replaceState(null, '', location.pathname + (id ? '?kamer=' + encodeURIComponent(id) : '')); } catch (e) {} }
+async function binnen(){
+  const start = (new URLSearchParams(location.search).get('kamer') || '').toLowerCase();
+  await laadKamers();
+  if (!start) return;
+  try {
+    if (start === 'boardroom') await openBoard();
+    else if (start === 'paniekkamer') await openPaniek();
+    else await openKamer(start);
+  } catch (e) { zetKamerUrl(''); }
+}
 $('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#login').click(); });
 
 /* ---------- het kamergrid ---------- */
 async function laadKamers(){
+  zetKamerUrl('');
   const d = await api('kamers');
   toon('vKamers');
   const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
@@ -246,6 +265,7 @@ let KAMER = null;
 async function openKamer(id){
   const d = await api('kamer', { id });
   KAMER = id;
+  zetKamerUrl(id);
   toon('vKamer');
   $('#kNaam').textContent = d.emoji + ' ' + d.naam;
   $('#kMissie').textContent = d.missie;
@@ -446,6 +466,7 @@ function koppelVoorstellen(el, herlaad){
   }));
 }
 async function openPaniek(){
+  zetKamerUrl('paniekkamer');
   const [b, p] = await Promise.all([api('boardroom'), api('paniek')]);
   toon('vPaniek');
   wereldWidget($('#pWereld'));
@@ -466,6 +487,7 @@ async function openPaniek(){
 
 /* ---------- de boardroom ---------- */
 async function openBoard(){
+  zetKamerUrl('boardroom');
   const d = await api('boardroom');
   toon('vBoard');
   wereldWidget($('#bWereld'));
@@ -510,7 +532,7 @@ $('#bVernieuw').addEventListener('click', async () => {
 /* de boardroom ververst zichzelf zolang hij openstaat */
 setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }, 30000);
 
-if (TOKEN) laadKamers().catch(() => toon('vGate'));
+if (TOKEN) binnen().catch(() => toon('vGate'));
 else toon('vGate');
 </script>
 </body>

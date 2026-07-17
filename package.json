@@ -16,6 +16,7 @@
     "a11y": "node scripts/a11y.js",
     "build": "node scripts/build.js",
     "test": "node --experimental-sqlite --test test/*.test.js",
+    "test:coverage": "node --experimental-sqlite --experimental-test-coverage --test test/*.test.js",
     "e2e": "node --experimental-sqlite --test test/*.e2e.js",
     "chaos": "node --experimental-sqlite scripts/chaos-soak.js",
     "icons": "node scripts/icons.js"

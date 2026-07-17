@@ -41,16 +41,53 @@ async function startServer(opts = {}) {
   throw laatste;
 }
 
+/* Strenge poort: een geslaagde test mag de server nooit een uncaughtException of
+   unhandledRejection laten loggen -- dat zijn achtergrond-crashes en niet-opgevangen
+   beloftes die anders volledig stil doorglippen (de test checkt immers alleen zijn
+   eigen verzoeken). We lezen de stderr van elke kind-server mee, tonen hem gewoon,
+   en onthouden zulke regels. Aan het eind van de testrun faalt het proces (exit 1)
+   als er ook maar één is geweest. Client-fouten (400/413 via de express
+   error-middleware) tellen NIET mee: die horen bij normale negatieve tests. */
+const serverUitzonderingen = [];
+const FATAAL = /"bron":"(uncaughtException|unhandledRejection)"/;
+let poortGewapend = false;
+function wapenStrengePoort() {
+  if (poortGewapend) return;
+  poortGewapend = true;
+  process.on('exit', () => {
+    if (!serverUitzonderingen.length) return;
+    process.stderr.write('\n[31mSTRENGE POORT: ' + serverUitzonderingen.length +
+      ' server-uitzondering(en) tijdens de tests (uncaught/unhandled). De run faalt.[0m\n');
+    for (const r of serverUitzonderingen.slice(0, 10)) process.stderr.write('  - ' + r + '\n');
+    if (!process.exitCode) process.exitCode = 1;
+  });
+}
+function luisterOpFouten(child) {
+  wapenStrengePoort();
+  let rest = '';
+  child.stderr.on('data', (buf) => {
+    process.stderr.write(buf); // gewoon tonen, net als 'inherit'
+    rest += buf.toString();
+    const regels = rest.split('\n'); rest = regels.pop();
+    for (const regel of regels) if (FATAAL.test(regel)) serverUitzonderingen.push(regel.trim().slice(0, 300));
+  });
+}
+
 async function startEens(opts) {
   const script = opts.script || path.join(__dirname, '..', 'server', 'server.js');
   const wachtPad = opts.wachtPad || '/api/health';
   const pogingen = opts.pogingen || 150;
   const port = await vrijePoort();
   const base = 'http://127.0.0.1:' + port;
+  // Zonder eigen stderr-optie vangen we de stderr op (pipe) om de strenge poort te
+  // voeden; met een expliciete optie (een test die stderr zelf inspecteert) blijft
+  // het gedrag ongewijzigd.
+  const eigenStderr = opts.stderr && opts.stderr !== 'inherit';
   const child = spawn(process.execPath, ['--experimental-sqlite', script], {
     env: { ...process.env, NODE_ENV: 'test', ...(opts.env || {}), PORT: String(port) },
-    stdio: ['ignore', 'ignore', opts.stderr || 'inherit']
+    stdio: ['ignore', 'ignore', eigenStderr ? opts.stderr : 'pipe']
   });
+  if (!eigenStderr) luisterOpFouten(child);
   for (let i = 0; i < pogingen; i++) {
     if (child.exitCode != null) throw new Error('server stopte tijdens opstarten (exit ' + child.exitCode + ')');
     try {
@@ -80,4 +117,6 @@ async function startEens(opts) {
 
 function stop(child) { if (child) try { child.kill('SIGKILL'); } catch (e) {} }
 
-module.exports = { vrijePoort, startServer, stop };
+module.exports = { vrijePoort, startServer, stop,
+  // testhaken om de strenge poort zelf te kunnen verifiëren
+  _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

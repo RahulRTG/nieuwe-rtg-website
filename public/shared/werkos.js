@@ -304,7 +304,11 @@
       const tab = act ? act.dataset.tab : thuisTab;
       document.body.classList.toggle('wos-thuis', tab === thuisTab);
       document.body.classList.toggle('wos-aan', app.classList.contains('active'));
-      dock.querySelectorAll('button').forEach(b => b.classList.toggle('actief', !!b.dataset.tab && b.dataset.tab === tab));
+      dock.querySelectorAll('button').forEach(b => {
+        const actief = !!b.dataset.tab && b.dataset.tab === tab;
+        b.classList.toggle('actief', actief);
+        if (actief) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+      });
     }
 
     let gepland = null;

@@ -54,8 +54,9 @@ test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voort
     await page.goto(base + '/apps/personeel.html', { waitUntil: 'load' });
 
     // 3) naar de Hulp-tab; de trainingskaart moet verschijnen
-    await page.waitForSelector('[data-tab="hulp"]', { state: 'visible', timeout: 10000 });
-    await page.click('[data-tab="hulp"]');
+    // het Werk-OS verbergt de tabbar; de Hulp-app opent via het dock
+    await page.waitForSelector('.wos-dock button[data-tab="hulp"]', { state: 'visible', timeout: 10000 });
+    await page.click('.wos-dock button[data-tab="hulp"]');
     await page.waitForSelector('#trainKaart .card', { timeout: 10000 });
     const kop = await page.textContent('#trainKaart .k');
     assert.match(kop, /Training/i, 'de kaart toont de kop Training & tips');

@@ -155,10 +155,14 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     await page.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, login.token);
     await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
     await page.waitForSelector('#app.active', { timeout: 15000 });
-    await page.click('[data-tab="meer"]');
-    // a11y: de aangeklikte tab meldt zich als actief aan de schermlezer
-    assert.equal(await page.getAttribute('[data-tab="meer"]', 'aria-current'), 'page', 'de actieve tab heeft aria-current');
-    await page.click('[data-goto2="orders"]');
+    // het Werk-OS: alle functies staan als apps op het springboard; de zaak
+    // opent (na de sector-doorverwijzing) op het startscherm met dock
+    // a11y: de actieve app meldt zich als actief aan de schermlezer
+    await page.waitForSelector('.wos-dock button[data-tab="home"]', { state: 'visible', timeout: 10000 });
+    assert.equal(await page.getAttribute('.wos-dock button[data-tab="home"]', 'aria-current'), 'page', 'de actieve dock-app heeft aria-current');
+    // Orders opent als app vanaf het springboard
+    await page.waitForSelector('.wos-grid .wos-app[aria-label="Orders"]', { state: 'visible', timeout: 10000 });
+    await page.click('.wos-grid .wos-app[aria-label="Orders"]');
 
     // de betaalde bestelling staat op het scherm
     const kaart = page.locator('.order[data-ref="' + ref + '"]');

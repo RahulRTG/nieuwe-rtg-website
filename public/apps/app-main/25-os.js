@@ -30,29 +30,31 @@
     foundation:  { naam: 'Over RTF',     icoon: '🕊️', url: '/site/rtfoundation.html' },
     privacy:     { naam: 'Privacy',      icoon: '🔒', url: '/site/privacy.html' },
     boeken:      { naam: 'Boeken',       icoon: '🧭', url: '/site/boeken.html' },
-    download:    { naam: 'Apps',         icoon: '⬇️', url: '/site/download.html' },
-    // de RTFoundation-apps wonen in het RTG OS: dit is hun enige plek. Bij
-    // het openen krijgt u de eigen RTF-jas; ?groep= zet de leeftijd-bril op.
-    rtf:         { naam: 'RTFoundation',  icoon: '🕊️', url: '/apps/foundation/index.html' },
-    rtfmini:     { naam: 'RTF Mini',      icoon: '🧸', url: '/apps/foundation/index.html?groep=mini' },
-    rtfkids:     { naam: 'RTF Kids',      icoon: '🎒', url: '/apps/foundation/index.html?groep=kind' },
-    rtftiener:   { naam: 'RTF Tiener',    icoon: '🛹', url: '/apps/foundation/index.html?groep=tiener' },
-    rtfjong:     { naam: 'RTF Jong',      icoon: '🚀', url: '/apps/foundation/index.html?groep=jong' },
-    rtfvolw:     { naam: 'RTF Volwassen', icoon: '🧑', url: '/apps/foundation/index.html?groep=volw' }
+    download:    { naam: 'Apps',         icoon: '⬇️', url: '/site/download.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
-     sociale laag van de leden-app (WebRTC-bellen, snaps op codenaam). */
+     sociale laag van de leden-app (WebRTC-bellen, snaps op codenaam).
+     RTFoundation is EEN app: een tik toont de leeftijdskeuze en opent dan
+     de hub in de passende jas (?groep= zet de bril op). */
   const OSAPPS = {
-    bellen:      { naam: 'Bellen',      icoon: '📞' },
-    videobellen: { naam: 'Videobellen', icoon: '🎥' },
-    snaps:       { naam: 'Snaps',       icoon: '📷' }
+    bellen:      { naam: 'Bellen',       icoon: '📞' },
+    videobellen: { naam: 'Videobellen',  icoon: '🎥' },
+    snaps:       { naam: 'Snaps',        icoon: '📷' },
+    rtf:         { naam: 'RTFoundation', icoon: '🕊️' }
   };
+  const RTF_GROEPEN = [
+    { g: 'mini',   naam: 'RTF Mini',      icoon: '🧸', sub: '0 t/m 4 jaar' },
+    { g: 'kind',   naam: 'RTF Kids',      icoon: '🎒', sub: '5 t/m 11 jaar' },
+    { g: 'tiener', naam: 'RTF Tiener',    icoon: '🛹', sub: '12 t/m 15 jaar' },
+    { g: 'jong',   naam: 'RTF Jong',      icoon: '🚀', sub: '16 t/m 21+' },
+    { g: 'volw',   naam: 'RTF Volwassen', icoon: '🧑', sub: 'ouders en verzorgers' }
+  ];
   const INDELING = [
     ['tab:reizen', 'tab:betalen', 'tab:bestellen', 'tab:ai', 'tab:salon', 'tab:terplaatse',
       { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
     [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
-      { sleutel: 'map-rtf', naam: 'RTFoundation', items: ['link:rtf', 'link:rtfmini', 'link:rtfkids', 'link:rtftiener', 'link:rtfjong', 'link:rtfvolw'] },
+      'os:rtf',
       { sleutel: 'map-rtg', naam: 'RTG & info', items: ['link:website', 'link:paspagina', 'link:foundation', 'link:privacy'] },
       'link:boeken', 'link:download']
   ];
@@ -145,11 +147,29 @@
   const belScrim = $('#osBelScrim'), belTitel = $('#osBelTitel'), belLijst = $('#osBelLijst');
   function openOsApp(naam) {
     const app = OSAPPS[naam]; if (!app || !belScrim) return;
-    const S = window.RTGSocial;
-    const lijst = S && S.ok && S.ok() ? S.lijst() : [];
     sluitScrims();
     belTitel.textContent = app.icoon + ' ' + app.naam;
     belLijst.textContent = '';
+    // RTFoundation: een leeftijdskeuze, daarna opent de juiste app (RTF-jas)
+    if (naam === 'rtf') {
+      let onthouden = null;
+      try { onthouden = localStorage.getItem('rtf_app_groep'); } catch (e) {}
+      for (const gr of RTF_GROEPEN) {
+        const b = document.createElement('button');
+        const zi = document.createElement('span'); zi.className = 'zi'; zi.textContent = gr.icoon;
+        b.appendChild(zi);
+        b.appendChild(document.createTextNode(gr.naam));
+        const m = document.createElement('span'); m.className = 'zm';
+        m.textContent = gr.sub + (onthouden === gr.g ? ' · vorige keer' : '');
+        b.appendChild(m);
+        b.addEventListener('click', () => { location.href = '/apps/foundation/index.html?groep=' + gr.g; });
+        belLijst.appendChild(b);
+      }
+      belScrim.classList.add('open');
+      return;
+    }
+    const S = window.RTGSocial;
+    const lijst = S && S.ok && S.ok() ? S.lijst() : [];
     if (!lijst.length) {
       const d = document.createElement('div');
       d.className = 'os-bel-leeg';
@@ -565,6 +585,13 @@
     // elke functie een eigen app: bellen en videobellen direct via de Butler
     if (/^(bel|bellen|iemand bellen)$/.test(q)) { sluitScrims(); openItem('os:bellen'); return true; }
     if (/^(videobel|videobellen|video bellen)$/.test(q)) { sluitScrims(); openItem('os:videobellen'); return true; }
+    // RTF met leeftijd erbij slaat de keuze over: "open rtf kids"
+    let mr = q.match(/^(?:open\s+|start\s+|ga naar\s+)?rtf\s+(mini|kids|kind|tiener|jong|volw|volwassen)$/);
+    if (mr) {
+      const g = ({ kids: 'kind', volwassen: 'volw' })[mr[1]] || mr[1];
+      sluitScrims(); location.href = '/apps/foundation/index.html?groep=' + g;
+      return true;
+    }
     // mappen hernoemen: "hernoem sociaal naar vrienden" of "noem de map rtg & info om naar over rtg"
     const mh = schoon.match(/^(?:hernoem|noem)\s+(?:de\s+)?(?:map\s+)?(.+?)\s+(?:om\s+)?naar\s+(.+)$/i);
     if (mh) {

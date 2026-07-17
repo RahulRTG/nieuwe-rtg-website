@@ -1013,13 +1013,48 @@
     font-size:0.85rem;letter-spacing:0.08em;margin-bottom:0.9rem;color:var(--txt);
   }
   .os-map-grid{grid-template-columns:repeat(3,1fr);margin-top:0;}
-  /* de map-tegel op het springboard: 2x2 voorproefje van de inhoud */
+  /* de map-tegel op het springboard: 3x3 voorproefje van de inhoud */
   .os-app .os-tegel.os-map-tegel{
     background:color-mix(in srgb, var(--card2) 70%, transparent);
-    display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:7px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:6px;
   }
-  .os-map-mini{border-radius:30%;display:flex;align-items:center;justify-content:center;font-size:0.62rem;overflow:hidden;}
-  .os-map-mini svg{width:12px;height:12px;stroke:#fff;}
+  .os-map-mini{border-radius:30%;display:flex;align-items:center;justify-content:center;font-size:0.5rem;overflow:hidden;}
+  .os-map-mini svg{width:9px;height:9px;stroke:#fff;}
+
+  /* map hernoemen (wiebel-modus): klein paneel met een naamveld */
+  .os-hernoem{width:min(300px,86%);}
+  .os-hernoem input{
+    width:100%;padding:0.75rem 1rem;border-radius:14px;
+    border:1px solid var(--line);
+    background:color-mix(in srgb, var(--card2) 85%, transparent);
+    color:var(--txt);font-size:0.95rem;outline:none;text-align:center;
+  }
+  .os-hernoem-rij{display:flex;gap:0.5rem;margin-top:0.8rem;}
+  .os-hernoem-rij button{
+    flex:1;padding:0.6rem 0;border-radius:12px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);font-size:0.78rem;
+  }
+  .os-hernoem-rij button#osHernoemOk{background:var(--gold);border-color:var(--gold);color:#1C1608;font-weight:650;}
+
+  /* batterij in de statusbalk, zoals op een telefoon */
+  .os-bat{display:inline-flex;align-items:center;gap:5px;}
+  .os-bat i{
+    width:21px;height:11px;border:1px solid color-mix(in srgb, var(--txt) 55%, transparent);
+    border-radius:3.5px;padding:1.5px;display:block;position:relative;
+  }
+  .os-bat i::after{
+    content:"";position:absolute;right:-3.5px;top:3px;width:2px;height:4px;
+    border-radius:0 2px 2px 0;background:color-mix(in srgb, var(--txt) 55%, transparent);
+  }
+  .os-bat b{display:block;height:100%;border-radius:2px;background:var(--txt);min-width:2px;}
+  .os-bat.laag b{background:var(--burgundy);}
+  .os-bat em{font-style:normal;font-size:0.66rem;color:var(--soft);font-variant-numeric:tabular-nums;}
+
+  /* Spotlight: sectiekopjes (Voor u, Apps, Acties) */
+  .os-zoek-sectie{
+    font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--soft);margin:0.55rem 0.2rem 0.05rem;
+  }
 
   .os-zoek-paneel{margin-top:12vh;width:min(360px, 88%);}
   .os-zoek-paneel input{
@@ -1028,15 +1063,23 @@
     background:color-mix(in srgb, var(--card) 80%, transparent);
     color:var(--txt);font-size:0.95rem;outline:none;
   }
-  #osZoekLijst{margin-top:0.7rem;display:flex;flex-direction:column;gap:0.35rem;}
-  #osZoekLijst button{
+  #osZoekLijst,#osBelLijst{margin-top:0.7rem;display:flex;flex-direction:column;gap:0.35rem;}
+  #osZoekLijst button,#osBelLijst button{
     display:flex;align-items:center;gap:0.7rem;text-align:left;
     padding:0.6rem 0.8rem;border-radius:14px;border:1px solid var(--line);
     background:color-mix(in srgb, var(--card) 70%, transparent);color:var(--txt);font-size:0.85rem;
   }
-  #osZoekLijst .zi{width:30px;height:30px;border-radius:27%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--card2);}
-  #osZoekLijst .zi svg{width:16px;height:16px;stroke:#fff;}
-  #osZoekLijst .zm{color:var(--soft);font-size:0.68rem;margin-left:auto;}
+  #osZoekLijst .zi,#osBelLijst .zi{width:30px;height:30px;border-radius:27%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--card2);}
+  #osZoekLijst .zi svg,#osBelLijst .zi svg{width:16px;height:16px;stroke:#fff;}
+  #osZoekLijst .zm,#osBelLijst .zm{color:var(--soft);font-size:0.68rem;margin-left:auto;}
+  .os-bel-titel{
+    text-align:center;font-family:'Inter',sans-serif;font-weight:600;
+    font-size:0.85rem;letter-spacing:0.08em;color:var(--txt);
+  }
+  .os-bel-leeg{
+    padding:0.9rem;border:1px dashed var(--line);border-radius:14px;
+    color:var(--soft);font-size:0.8rem;text-align:center;line-height:1.5;
+  }
 
   .os-cc{
     margin-top:calc(env(safe-area-inset-top, 0px) + 3.6rem);
@@ -1229,6 +1272,7 @@
         <div class="brand" id="osBrand"><span class="merkvlak">RTG</span><small>OS</small></div>
       </div>
       <div style="display:flex;align-items:center;gap:0.6rem;">
+        <span class="os-bat" id="osBat" hidden aria-hidden="true"><i><b id="osBatVul"></b></i><em id="osBatPct"></em></span>
         <button class="os-klaar" id="osKlaar" hidden>Klaar</button>
         <button class="bell" id="osCcBtn" aria-label="Bedieningspaneel">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="var(--bg)"/><circle cx="15" cy="12" r="2" fill="var(--bg)"/><circle cx="7" cy="17" r="2" fill="var(--bg)"/></svg>
@@ -1412,8 +1456,28 @@
     <!-- RTG OS: zoeken (Spotlight) -->
     <div class="os-scrim" id="osZoekScrim">
       <div class="os-zoek-paneel" role="dialog" aria-modal="true" aria-label="Zoeken">
-        <input id="osZoekInput" placeholder="Zoek een app…" autocomplete="off">
+        <input id="osZoekInput" placeholder="Zoek apps en acties…" autocomplete="off">
         <div id="osZoekLijst"></div>
+      </div>
+    </div>
+
+    <!-- RTG OS: kiezer voor Bellen, Videobellen en Snaps (een tik = doen) -->
+    <div class="os-scrim" id="osBelScrim">
+      <div class="os-zoek-paneel" role="dialog" aria-modal="true" aria-labelledby="osBelTitel">
+        <h3 class="os-bel-titel" id="osBelTitel"></h3>
+        <div id="osBelLijst"></div>
+      </div>
+    </div>
+
+    <!-- RTG OS: map hernoemen (via de wiebel-modus) -->
+    <div class="os-scrim" id="osHernoemScrim">
+      <div class="os-map-paneel os-hernoem" role="dialog" aria-modal="true" aria-labelledby="osHernoemTitel">
+        <h3 id="osHernoemTitel">Map hernoemen</h3>
+        <input id="osHernoemIn" maxlength="18" autocomplete="off" aria-label="Naam van de map">
+        <div class="os-hernoem-rij">
+          <button id="osHernoemReset">Standaard</button>
+          <button id="osHernoemOk">Bewaar</button>
+        </div>
       </div>
     </div>
 

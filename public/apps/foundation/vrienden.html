@@ -214,6 +214,30 @@ function soc(pad, body){
 let mij = { beheerder:false, kind:false, codenaam:'' };
 let mijnHandle = null;
 
+/* In het RTG OS heeft elke functie een eigen app: Bellen, Videobellen en
+   Snaps openen deze pagina met een hash en zetten hem in die stand. Een tik
+   op een vriend doet dan meteen het juiste (bellen, videobellen of snappen). */
+const BEL_MODI = { '#bellen': 'bel', '#video': 'video', '#snap': 'snap' };
+const belModus = BEL_MODI[location.hash] || null;
+if (belModus){
+  document.title = belModus === 'bel' ? 'Bellen' : belModus === 'video' ? 'Videobellen' : 'Snaps';
+  const intro = document.querySelector('.intro');
+  if (intro){
+    const h = document.createElement('div');
+    h.className = 'kaart';
+    h.style.cssText = 'padding:.7rem .9rem;margin:.4rem 0 .8rem;border-color:var(--goud);font-size:.9rem;';
+    h.textContent = belModus === 'bel' ? '📞 Tik op een vriend om te bellen.'
+      : belModus === 'video' ? '🎥 Tik op een vriend om te videobellen.'
+      : '📷 Tik op een vriend om een snap te sturen.';
+    intro.after(h);
+  }
+}
+function belModusDoe(c){
+  if (belModus === 'bel') belStart(c.key, c.codename, false);
+  else if (belModus === 'video') belStart(c.key, c.codename, true);
+  else if (belModus === 'snap') kiesSnap(c.key, c.codename);
+}
+
 async function laad(){
   let d; try{ d = await soc('/connections'); }catch(e){ $('#vrienden').innerHTML='<div class="leeg">Kon contacten niet laden.</div>'; return; }
   mij = { beheerder:!!d.beheerder, kind:!!d.kind, beschermd:!!d.beschermd, codenaam:d.codename };
@@ -225,14 +249,17 @@ async function laad(){
     (mij.beschermd ? 'Je ouder kan deze codenaam aan een ander gezin geven.' : 'Geef deze aan iemand die jou wil toevoegen.')+'</span>';
   // vrienden (opgebouwd met de veilige component-bouwer i.p.v. HTML-strings)
   const cs = d.connections||[];
-  vervang($('#vrienden'), cs.length ? cs.map(c=> E('div',{class:'rij'},
+  vervang($('#vrienden'), cs.length ? cs.map(c=> E('div',
+    belModus ? {class:'rij', style:{cursor:'pointer'}, onclick:()=>belModusDoe(c)} : {class:'rij'},
     E('span',{class:'av'}, initcn(c.codename)),
     E('div',{class:'nm'}, c.codename, c.unread ? E('span',{class:'badge'}, c.unread) : null,
       c.vuurtje ? E('span',{class:'vuurchip', title:'Jullie vuurtje: '+c.vuurtje+' dagen op rij gesnapt'}, seizoenVuur()+' '+c.vuurtje) : null,
       E('small', null, (c.tier==='rtf'?'RTFoundation':'RTG') + (c.last?' · '+c.last:''))),
-    E('button',{class:'knop mini', onclick:()=>openChat(c.key,c.codename)}, 'Chat'),
-    E('button',{class:'knop grijs mini', onclick:()=>kiesSnap(c.key,c.codename)}, '📷'),
-    E('button',{class:'knop grijs mini', title:'Blokkeren of melden', onclick:()=>blokkeerMelden(c.key,c.codename)}, '🚫')
+    E('button',{class:'knop mini', onclick:ev=>{ ev.stopPropagation(); openChat(c.key,c.codename); }}, 'Chat'),
+    E('button',{class:'knop grijs mini', title:'Bellen', onclick:ev=>{ ev.stopPropagation(); belStart(c.key,c.codename,false); }}, '📞'),
+    E('button',{class:'knop grijs mini', title:'Videobellen', onclick:ev=>{ ev.stopPropagation(); belStart(c.key,c.codename,true); }}, '🎥'),
+    E('button',{class:'knop grijs mini', title:'Stuur een snap', onclick:ev=>{ ev.stopPropagation(); kiesSnap(c.key,c.codename); }}, '📷'),
+    E('button',{class:'knop grijs mini', title:'Blokkeren of melden', onclick:ev=>{ ev.stopPropagation(); blokkeerMelden(c.key,c.codename); }}, '🚫')
   )) : E('div',{class:'leeg'}, mij.beschermd ? 'Nog geen vrienden. Je ouder of verzorger kan ze toevoegen.' : 'Nog geen vrienden. Zoek hierboven op codenaam.'));
   // verzoeken (niet voor kinderen)
   const reqs = d.requests||[];

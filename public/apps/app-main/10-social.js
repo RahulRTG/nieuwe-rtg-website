@@ -512,3 +512,12 @@
     }
   }
 
+
+  /* seam voor de RTG OS-laag: de eigen Bellen-, Videobellen- en Snaps-apps
+     openen hiermee een kiezer en starten dan direct het gesprek of de snap */
+  window.RTGSocial = {
+    ok: () => socialOK,
+    lijst: () => (social.connections || []),
+    bel: (key, naam, video) => snelBel(key, naam, video),
+    snap: key => snapKies(key)
+  };

@@ -23,22 +23,69 @@
   /* ---------- de indeling: tab-apps, link-apps en mappen ----------
      Link-apps zijn losse leden-pagina's die als eigen app openen. */
   const LINKS = {
-    spelen:     { naam: 'Spelen',       icoon: '🎲', url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
-    vrienden:   { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
-    website:    { naam: 'Website',      icoon: '🌍', url: '/' },
-    paspagina:  { naam: 'RTG Pass',     icoon: '🎫', url: '/site/rtg-pass.html' },
-    foundation: { naam: 'RTFoundation', icoon: '🕊️', url: '/site/rtfoundation.html' },
-    privacy:    { naam: 'Privacy',      icoon: '🔒', url: '/site/privacy.html' },
-    boeken:     { naam: 'Boeken',       icoon: '🧭', url: '/site/boeken.html' },
-    download:   { naam: 'Apps',         icoon: '⬇️', url: '/site/download.html' }
+    spelen:      { naam: 'Spelen',       icoon: '🎲', url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
+    vrienden:    { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
+    website:     { naam: 'Website',      icoon: '🌍', url: '/' },
+    paspagina:   { naam: 'RTG Pass',     icoon: '🎫', url: '/site/rtg-pass.html' },
+    foundation:  { naam: 'RTFoundation', icoon: '🕊️', url: '/site/rtfoundation.html' },
+    privacy:     { naam: 'Privacy',      icoon: '🔒', url: '/site/privacy.html' },
+    boeken:      { naam: 'Boeken',       icoon: '🧭', url: '/site/boeken.html' },
+    download:    { naam: 'Apps',         icoon: '⬇️', url: '/site/download.html' }
+  };
+  /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
+     OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
+     sociale laag van de leden-app (WebRTC-bellen, snaps op codenaam). */
+  const OSAPPS = {
+    bellen:      { naam: 'Bellen',      icoon: '📞' },
+    videobellen: { naam: 'Videobellen', icoon: '🎥' },
+    snaps:       { naam: 'Snaps',       icoon: '📷' }
   };
   const INDELING = [
     ['tab:reizen', 'tab:betalen', 'tab:bestellen', 'tab:ai', 'tab:salon', 'tab:terplaatse',
       { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
-    [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:spelen', 'link:vrienden'] },
+    [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
       { sleutel: 'map-rtg', naam: 'RTG & info', items: ['link:website', 'link:paspagina', 'link:foundation', 'link:privacy'] },
       'link:boeken', 'link:download']
   ];
+
+  /* ---------- mappen: eigen namen ----------
+     De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus
+     (tik op de map) of via de Butler; de keuze staat per pas in localStorage. */
+  function mapNamen() { try { return JSON.parse(localStorage.getItem('rtg_os_mapnamen_' + pas) || '{}'); } catch (e) { return {}; } }
+  function mapNaam(map) { return (mapNamen()[map.sleutel] || '').trim() || map.naam; }
+  function zetMapNaam(map, naam) {
+    try {
+      const m = mapNamen();
+      const schoon = (naam || '').trim().slice(0, 18);
+      if (schoon && schoon !== map.naam) m[map.sleutel] = schoon; else delete m[map.sleutel];
+      localStorage.setItem('rtg_os_mapnamen_' + pas, JSON.stringify(m));
+    } catch (e) {}
+    bouw();
+  }
+
+  /* ---------- gebruik bijhouden: het OS leert wat u vaak opent ----------
+     Telt per app hoe vaak hij geopend wordt, met verval per dag; Spotlight
+     zet daar de rij "Voor u" van. Alles blijft lokaal op het toestel. */
+  function gebruik() { try { return JSON.parse(localStorage.getItem('rtg_os_gebruik_' + pas) || '{}'); } catch (e) { return {}; } }
+  function telGebruik(sleutel) {
+    try {
+      const g = gebruik(), nu = Date.now(), oud = g[sleutel] || { n: 0, t: nu };
+      const dagen = Math.max(0, (nu - (oud.t || nu)) / 86400000);
+      g[sleutel] = { n: (oud.n || 0) * Math.pow(0.85, dagen) + 1, t: nu };
+      localStorage.setItem('rtg_os_gebruik_' + pas, JSON.stringify(g));
+    } catch (e) {}
+  }
+  function topGebruik(k) {
+    const g = gebruik(), nu = Date.now();
+    return Object.entries(g)
+      .map(([s, v]) => [s, (v.n || 0) * Math.pow(0.85, Math.max(0, (nu - (v.t || nu)) / 86400000))])
+      .sort((a, b) => b[1] - a[1])
+      .map(([s]) => s)
+      .filter(s => s.startsWith('tab:') ? itemZichtbaar(s)
+        : s.startsWith('os:') ? !!OSAPPS[s.slice(3)]
+        : (s.startsWith('link:') && !!LINKS[s.slice(5)]))
+      .slice(0, k);
+  }
 
   const sleutelVan = it => typeof it === 'string' ? it : it.sleutel;
   function bewaardeVolgorde(p) { try { return JSON.parse(localStorage.getItem('rtg_os_indeling_' + pas + '_' + p) || 'null'); } catch (e) { return null; } }
@@ -58,24 +105,69 @@
   const tabZichtbaar = t => { const b = tabKnop(t); return !!b && b.style.display !== 'none'; };
   const tabNaam = t => { const s = tabKnop(t); const sp = s && s.querySelector('span'); return sp ? sp.textContent : t; };
 
-  function tegelInhoud(item) { // svg (tab) of emoji (link) in de tegel
+  function itemDef(item) { // os-app of link-app: de registry-invoer
+    return item.startsWith('os:') ? OSAPPS[item.slice(3)] : LINKS[item.slice(5)];
+  }
+  function tegelInhoud(item) { // svg (tab) of emoji (link/os-app) in de tegel
     if (item.startsWith('tab:')) {
       const svg = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('svg');
       return svg ? svg.cloneNode(true) : document.createTextNode('•');
     }
     const span = document.createElement('span');
     span.style.fontSize = '1.5rem';
-    span.textContent = (LINKS[item.slice(5)] || {}).icoon || '•';
+    span.textContent = (itemDef(item) || {}).icoon || '•';
     return span;
   }
   function itemNaam(item) {
-    return item.startsWith('tab:') ? tabNaam(item.slice(4)) : (LINKS[item.slice(5)] || {}).naam || item;
+    return item.startsWith('tab:') ? tabNaam(item.slice(4)) : (itemDef(item) || {}).naam || item;
   }
-  function itemZichtbaar(item) { return item.startsWith('tab:') ? tabZichtbaar(item.slice(4)) : true; }
+  function itemZichtbaar(item) { return item.startsWith('tab:') ? tabZichtbaar(item.slice(4)) : !!itemDef(item); }
   function openItem(item) {
     if (wiebel) return; // in wiebel-modus opent er niets, net als op een telefoon
+    telGebruik(item);
     if (item.startsWith('tab:')) { const b = tabKnop(item.slice(4)); if (b) b.click(); }
+    else if (item.startsWith('os:')) { openOsApp(item.slice(3)); }
     else { const l = LINKS[item.slice(5)]; if (l) location.href = l.url; }
+  }
+
+  /* ---------- de kiezer: Bellen, Videobellen en Snaps ----------
+     Een tik op de app opent uw contacten; een tik op een contact belt,
+     videobelt of stuurt de snap meteen (via de sociale laag, RTGSocial). */
+  const belScrim = $('#osBelScrim'), belTitel = $('#osBelTitel'), belLijst = $('#osBelLijst');
+  function openOsApp(naam) {
+    const app = OSAPPS[naam]; if (!app || !belScrim) return;
+    const S = window.RTGSocial;
+    const lijst = S && S.ok && S.ok() ? S.lijst() : [];
+    sluitScrims();
+    belTitel.textContent = app.icoon + ' ' + app.naam;
+    belLijst.textContent = '';
+    if (!lijst.length) {
+      const d = document.createElement('div');
+      d.className = 'os-bel-leeg';
+      d.textContent = 'Nog geen contacten. Voeg iemand toe in De Salon; daarna belt, videobelt en snapt u met een tik, zonder telefoonnummer.';
+      belLijst.appendChild(d);
+      const ga = document.createElement('button');
+      const gi = document.createElement('span'); gi.className = 'zi'; gi.textContent = '🫂';
+      ga.appendChild(gi); ga.appendChild(document.createTextNode('Naar De Salon'));
+      ga.addEventListener('click', () => { sluitScrims(); const b = tabKnop('salon'); if (b) b.click(); });
+      belLijst.appendChild(ga);
+    }
+    for (const c of lijst) {
+      const b = document.createElement('button');
+      const zi = document.createElement('span'); zi.className = 'zi';
+      zi.textContent = String(c.codename || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      b.appendChild(zi);
+      b.appendChild(document.createTextNode(c.codename || ''));
+      const m = document.createElement('span'); m.className = 'zm'; m.textContent = app.icoon; b.appendChild(m);
+      b.addEventListener('click', () => {
+        sluitScrims();
+        if (!window.RTGSocial) return;
+        if (naam === 'snaps') RTGSocial.snap(c.key);
+        else RTGSocial.bel(c.key, c.codename, naam === 'videobellen');
+      });
+      belLijst.appendChild(b);
+    }
+    belScrim.classList.add('open');
   }
 
   function maakAppIcoon(item, inDock) {
@@ -97,15 +189,19 @@
   function maakMapIcoon(map) {
     const el = document.createElement('button');
     el.className = 'os-app os-map'; el.dataset.sleutel = map.sleutel;
-    el.setAttribute('aria-label', 'Map ' + map.naam);
+    el.setAttribute('aria-label', 'Map ' + mapNaam(map));
     const tegel = document.createElement('span'); tegel.className = 'os-tegel os-map-tegel';
-    for (const item of map.items.filter(itemZichtbaar).slice(0, 4)) {
+    for (const item of map.items.filter(itemZichtbaar).slice(0, 9)) {
       const mini = document.createElement('span'); mini.className = 'os-map-mini';
       mini.appendChild(tegelInhoud(item)); tegel.appendChild(mini);
     }
     el.appendChild(tegel);
-    const n = document.createElement('span'); n.className = 'os-naam'; n.textContent = map.naam; el.appendChild(n);
-    el.addEventListener('click', () => { if (!wiebel) openMap(map); });
+    const n = document.createElement('span'); n.className = 'os-naam'; n.textContent = mapNaam(map); el.appendChild(n);
+    // gewoon tikken opent de map; in de wiebel-modus tik je om te hernoemen
+    el.addEventListener('click', () => {
+      if (!wiebel) { openMap(map); return; }
+      if (Date.now() - wiebelStart > 600) openHernoem(map);
+    });
     return el;
   }
 
@@ -125,18 +221,34 @@
   /* ---------- mappen openen ---------- */
   const mapScrim = $('#osMapScrim'), mapGrid = $('#osMapGrid'), mapTitel = $('#osMapTitel');
   function openMap(map) {
-    mapTitel.textContent = map.naam;
+    mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     for (const item of map.items.filter(itemZichtbaar)) {
       const el = maakAppIcoon(item, false);
-      el.addEventListener('click', () => sluitScrims());
+      // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
+      el.addEventListener('click', () => mapScrim.classList.remove('open'));
       mapGrid.appendChild(el);
     }
     mapScrim.classList.add('open');
   }
 
+  /* ---------- map hernoemen (wiebel-modus of Butler) ---------- */
+  const hernoemScrim = $('#osHernoemScrim'), hernoemIn = $('#osHernoemIn');
+  const hernoemOk = $('#osHernoemOk'), hernoemReset = $('#osHernoemReset');
+  let hernoemDoel = null;
+  function openHernoem(map) {
+    if (!hernoemScrim) return;
+    hernoemDoel = map;
+    hernoemIn.value = mapNaam(map);
+    hernoemScrim.classList.add('open');
+    setTimeout(() => { hernoemIn.focus(); hernoemIn.select(); }, 60);
+  }
+  if (hernoemOk) hernoemOk.addEventListener('click', () => { if (hernoemDoel) zetMapNaam(hernoemDoel, hernoemIn.value); sluitScrims(); });
+  if (hernoemReset) hernoemReset.addEventListener('click', () => { if (hernoemDoel) zetMapNaam(hernoemDoel, ''); sluitScrims(); });
+  if (hernoemIn) hernoemIn.addEventListener('keydown', e => { if (e.key === 'Enter' && hernoemOk) hernoemOk.click(); });
+
   /* ---------- overlays: gedeeld sluiten ---------- */
-  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim'].map(s => $(s)).filter(Boolean);
+  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim'].map(s => $(s)).filter(Boolean);
   function sluitScrims() { scrims.forEach(s => s.classList.remove('open')); }
   scrims.forEach(s => s.addEventListener('click', e => { if (e.target === s) sluitScrims(); }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { sluitScrims(); zetWiebel(false); } });
@@ -147,8 +259,25 @@
     const uit = [];
     INDELING.flat().forEach(it => {
       if (typeof it === 'string') { if (itemZichtbaar(it)) uit.push({ item: it, uit: null }); }
-      else it.items.forEach(sub => { if (itemZichtbaar(sub)) uit.push({ item: sub, uit: it.naam }); });
+      else it.items.forEach(sub => { if (itemZichtbaar(sub)) uit.push({ item: sub, uit: mapNaam(it) }); });
     });
+    return uit;
+  }
+  // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
+  function osActies() {
+    const uit = [
+      { naam: 'Licht of donker', icoon: '🌗', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
+      { naam: 'Meldingen', icoon: '🔔', doe: () => { const b = $('#bell'); if (b) b.click(); } },
+      { naam: 'Bedieningspaneel', icoon: '🎛️', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
+      { naam: 'Taal kiezen', icoon: '🌐', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
+      { naam: 'Push aanzetten', icoon: '📳', doe: () => { if (window.RTGRealtime) RTGRealtime.enablePush(); } },
+      { naam: 'Uitloggen', icoon: '⏻', doe: () => { const b = $('#logoutBtn'); if (b) b.click(); } }
+    ];
+    if (window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
+      for (const t of ['bordeaux', 'parelmoer', 'standaard']) {
+        uit.push({ naam: 'Thema ' + (t === 'standaard' ? 'klassiek' : t), icoon: '🎨', doe: () => RTGOSThema.zet(t) });
+      }
+    }
     return uit;
   }
   // De Butler vanuit het zoekscherm: open zijn app, vul de vraag in en verstuur
@@ -161,25 +290,50 @@
     if (inp && knop && q) { inp.value = q; setTimeout(() => knop.click(), 150); }
     else if (inp) inp.focus();
   }
+  function zoekSectie(tekst) {
+    const d = document.createElement('div'); d.className = 'os-zoek-sectie'; d.textContent = tekst;
+    zoekLijst.appendChild(d);
+  }
+  function zoekRij(icoonNode, label, meta, doe) {
+    const b = document.createElement('button');
+    const zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(icoonNode);
+    b.appendChild(zi);
+    b.appendChild(document.createTextNode(label));
+    if (meta) { const m = document.createElement('span'); m.className = 'zm'; m.textContent = meta; b.appendChild(m); }
+    b.addEventListener('click', doe);
+    zoekLijst.appendChild(b);
+  }
   function zoek() {
     const q = (zoekInput.value || '').trim().toLowerCase();
     zoekLijst.textContent = '';
+    // leeg veld: eerst "Voor u", de apps die u hier het vaakst opent
+    if (!q) {
+      const top = topGebruik(4);
+      if (top.length) {
+        zoekSectie('Voor u');
+        for (const s of top) zoekRij(tegelInhoud(s), itemNaam(s), null, () => { sluitScrims(); openItem(s); });
+        zoekSectie('Alle apps');
+      }
+    }
     for (const { item, uit } of alleItems()) {
       if (q && !itemNaam(item).toLowerCase().includes(q)) continue;
-      const b = document.createElement('button');
-      const zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(tegelInhoud(item));
-      b.appendChild(zi);
-      b.appendChild(document.createTextNode(itemNaam(item)));
-      if (uit) { const m = document.createElement('span'); m.className = 'zm'; m.textContent = uit; b.appendChild(m); }
-      b.addEventListener('click', () => { sluitScrims(); openItem(item); });
-      zoekLijst.appendChild(b);
+      zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); });
+    }
+    // acties (instellingen en schakelaars) doen mee zodra er getypt wordt
+    if (q) {
+      const acts = osActies().filter(a => a.naam.toLowerCase().includes(q));
+      if (acts.length) {
+        zoekSectie('Acties');
+        for (const a of acts) {
+          const ic = document.createElement('span'); ic.textContent = a.icoon;
+          zoekRij(ic, a.naam, null, () => { sluitScrims(); a.doe(); });
+        }
+      }
     }
     // altijd onderaan: geef de vraag aan de Butler, wat het ook is
-    const bb = document.createElement('button');
-    const bi = document.createElement('span'); bi.className = 'zi'; bi.textContent = '✦'; bb.appendChild(bi);
-    bb.appendChild(document.createTextNode(q ? 'Vraag de Butler: "' + zoekInput.value.trim() + '"' : 'Vraag de Butler'));
-    bb.addEventListener('click', () => vraagButler(zoekInput.value.trim()));
-    zoekLijst.appendChild(bb);
+    const bi = document.createElement('span'); bi.textContent = '✦';
+    zoekRij(bi, q ? 'Vraag de Butler: "' + zoekInput.value.trim() + '"' : 'Vraag de Butler', null,
+      () => vraagButler(zoekInput.value.trim()));
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
   const zoekPil = $('#osZoekPil');
@@ -222,10 +376,11 @@
   }
 
   /* ---------- wiebel-modus: herschikken met een lange druk ---------- */
-  let wiebel = false, drukTimer = null, sleepEl = null;
+  let wiebel = false, drukTimer = null, sleepEl = null, wiebelStart = 0;
   const klaarKnop = $('#osKlaar');
   function zetWiebel(aan) {
     wiebel = aan;
+    if (aan) wiebelStart = Date.now();
     grids.forEach(g => g.classList.toggle('os-wiebel', aan));
     if (klaarKnop) klaarKnop.hidden = !aan;
     if (!aan) { grids.forEach((g, p) => bewaarVolgorde(p, [...g.children].map(c => c.dataset.sleutel))); sleepEl = null; }
@@ -325,6 +480,23 @@
   }
   tik(); setInterval(tik, 15000);
 
+  /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
+  const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');
+  if (bat && navigator.getBattery) {
+    navigator.getBattery().then(b => {
+      const verf = () => {
+        bat.hidden = false;
+        const p = Math.round(b.level * 100);
+        batVul.style.width = Math.max(6, p) + '%';
+        batPct.textContent = p + '%';
+        bat.classList.toggle('laag', p <= 20 && !b.charging);
+      };
+      b.addEventListener('levelchange', verf);
+      b.addEventListener('chargingchange', verf);
+      verf();
+    }).catch(() => {});
+  }
+
   /* ---------- notificatie-banner: glijdt bovenin binnen ---------- */
   let bannerEl = null, bannerTimer = null;
   function bannerToon(icoon, titel, tekst) {
@@ -373,13 +545,30 @@
   function alleDoelen() {
     const uit = [];
     for (const { item } of alleItems()) uit.push({ naam: itemNaam(item), doe: () => openItem(item) });
-    INDELING.flat().forEach(it => { if (typeof it !== 'string') uit.push({ naam: it.naam, doe: () => openMap(it) }); });
+    INDELING.flat().forEach(it => { if (typeof it !== 'string') uit.push({ naam: mapNaam(it), doe: () => openMap(it) }); });
     return uit;
   }
   function osCommando(ruw) {
-    const q = (ruw || '').trim().toLowerCase().replace(/[?.!]+$/, '');
+    const schoon = (ruw || '').trim().replace(/[?.!]+$/, '');
+    const q = schoon.toLowerCase();
     if (!q) return false;
     if (/^(home|thuis|beginscherm)$/.test(q)) { sluitScrims(); naarHome(); bannerToon('✦', 'Butler', 'Naar het beginscherm.'); return true; }
+    // elke functie een eigen app: bellen en videobellen direct via de Butler
+    if (/^(bel|bellen|iemand bellen)$/.test(q)) { sluitScrims(); openItem('os:bellen'); return true; }
+    if (/^(videobel|videobellen|video bellen)$/.test(q)) { sluitScrims(); openItem('os:videobellen'); return true; }
+    // mappen hernoemen: "hernoem sociaal naar vrienden" of "noem de map rtg & info om naar over rtg"
+    const mh = schoon.match(/^(?:hernoem|noem)\s+(?:de\s+)?(?:map\s+)?(.+?)\s+(?:om\s+)?naar\s+(.+)$/i);
+    if (mh) {
+      // lidwoorden tellen niet mee: "de crew" en "crew" wijzen dezelfde map aan
+      const kaal = s => String(s || '').toLowerCase().replace(/^(?:de|het|een)\s+/, '');
+      const mappen = INDELING.flat().filter(it => typeof it !== 'string');
+      const doel = mappen.find(mp => kaal(mapNaam(mp)) === kaal(mh[1]) || kaal(mp.naam) === kaal(mh[1]));
+      if (doel) {
+        zetMapNaam(doel, mh[2]);
+        bannerToon('✦', 'Butler', 'De map heet nu "' + mapNaam(doel) + '".');
+        return true;
+      }
+    }
     let m = q.match(/^zoek(?:en)?(?:\s+naar)?\s+(.+)$/);
     if (m) { openZoek(); zoekInput.value = m[1]; zoek(); return true; }
     m = q.match(/^thema\s+(bordeaux|parelmoer|standaard|klassiek)$/);

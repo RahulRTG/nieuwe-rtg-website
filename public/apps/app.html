@@ -818,6 +818,131 @@
   #onbKlaar{width:100%;padding:.8rem;font-size:.9rem;}
   .onb-fout{color:#F4B8C6;font-size:.78rem;min-height:1rem;margin:.4rem 0;}
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+  /* ============================== RTG OS ==============================
+     De leden-app als telefoon-besturingssysteem: statusbalk met klok, het
+     home-scherm als springboard (paswidget + app-grid), een frosted dock
+     met de vier kernapps, en elke dienst opent fullscreen als eigen app
+     met een terugbalk en home-indicator. Apple-vormtaal (squircles, glas,
+     veerkrachtige overgangen), RTG-saus via de bestaande pas-thema's. */
+
+  /* de oude tabbar blijft in de DOM als model voor de OS-laag, maar is onzichtbaar */
+  .tabbar{display:none !important;}
+
+  /* wallpaper: subtiel goud boven, bordeaux onder, over het pasthema heen */
+  #app.active{
+    background:
+      radial-gradient(120% 60% at 50% -12%, rgba(169,143,28,0.14), transparent 60%),
+      radial-gradient(130% 70% at 50% 112%, rgba(194,58,94,0.12), transparent 62%),
+      var(--bg);
+  }
+
+  /* statusbalk: klok links, merk in het midden, bedieningen rechts */
+  .topbar{border-bottom:none;background:transparent;position:relative;z-index:31;}
+  #app.os-open .topbar{
+    background:color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter:blur(22px) saturate(1.4);
+    -webkit-backdrop-filter:blur(22px) saturate(1.4);
+    border-bottom:1px solid var(--line);
+  }
+  .os-links{display:flex;align-items:center;gap:0.9rem;min-width:0;}
+  .os-klok{
+    font-size:0.92rem;font-weight:650;letter-spacing:0.02em;
+    font-variant-numeric:tabular-nums;min-width:3.1em;
+  }
+  .os-terug{
+    display:flex;align-items:center;gap:0.15rem;max-width:46vw;
+    background:none;border:none;color:var(--txt);
+    font-size:0.9rem;font-weight:600;letter-spacing:0.01em;
+  }
+  .os-terug svg{width:20px;height:20px;stroke:var(--gold);flex-shrink:0;}
+  .os-terug span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .os-terug[hidden]{display:none;}
+
+  /* springboard: datumkop + widgets + app-grid */
+  .os-datum{
+    margin:0.2rem 0 0.1rem;
+    font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--gold);font-weight:600;
+  }
+  .os-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    gap:1.15rem 0.6rem;margin-top:1.3rem;
+  }
+  @media (min-width:700px){.os-grid{grid-template-columns:repeat(6,1fr);}}
+  .os-app{
+    background:none;border:none;color:var(--txt);
+    display:flex;flex-direction:column;align-items:center;gap:0.42rem;
+    min-width:0;position:relative;
+  }
+  .os-app .os-tegel{
+    width:58px;height:58px;border-radius:27%;
+    display:flex;align-items:center;justify-content:center;position:relative;
+    background:linear-gradient(160deg, var(--card2), var(--card));
+    border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.10), 0 6px 16px rgba(0,0,0,0.35);
+    transition:transform 0.16s ease;
+  }
+  .os-app:active .os-tegel{transform:scale(0.9);}
+  .os-app svg{width:26px;height:26px;stroke:#fff;fill:none;}
+  .os-app .os-naam{
+    font-size:0.6rem;letter-spacing:0.03em;color:var(--txt);
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  }
+  .os-badge{
+    position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;
+    background:var(--burgundy);border:2px solid var(--bg);
+  }
+  /* de RTG-saus per app: ingetogen kleurvlakken in de huisstijl */
+  .os-app[data-tab="reizen"] .os-tegel{background:linear-gradient(160deg,#2E5D48,#1C3A2D);}
+  .os-app[data-tab="betalen"] .os-tegel{background:linear-gradient(160deg,#8A6D14,#5C4A0E);}
+  .os-app[data-tab="bestellen"] .os-tegel{background:linear-gradient(160deg,#7F1634,#4E0D20);}
+  .os-app[data-tab="ai"] .os-tegel{background:linear-gradient(160deg,#3A3630,#211E1B);}
+  .os-app[data-tab="salon"] .os-tegel{background:linear-gradient(160deg,#C23A5E,#7F1634);}
+  .os-app[data-tab="terplaatse"] .os-tegel{background:linear-gradient(160deg,#33556B,#1E3441);}
+  .os-app[data-tab="zorg"] .os-tegel{background:linear-gradient(160deg,#4C9A75,#2E5D48);}
+  .os-app[data-tab="assets"] .os-tegel{background:linear-gradient(160deg,#4A4132,#2B2620);}
+  .os-app[data-tab="gezin"] .os-tegel{background:linear-gradient(160deg,#A34D8C,#5E2B50);}
+
+  /* dock: zwevend glas met de vier kernapps */
+  .os-dock{
+    position:absolute;left:50%;transform:translateX(-50%);
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 0.7rem);
+    z-index:30;display:flex;gap:1rem;padding:0.7rem 0.9rem;
+    border-radius:30px;
+    background:color-mix(in srgb, var(--card) 55%, transparent);
+    backdrop-filter:blur(26px) saturate(1.5);
+    -webkit-backdrop-filter:blur(26px) saturate(1.5);
+    border:1px solid var(--line);
+    box-shadow:0 12px 34px rgba(0,0,0,0.45);
+  }
+  .os-dock .os-app{gap:0;}
+  .os-dock .os-app .os-naam{display:none;}
+  .os-dock .os-app .os-tegel{width:54px;height:54px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);}
+  .os-dock .os-app.actief .os-tegel{outline:2px solid var(--gold);outline-offset:2px;}
+  #app.os-open .os-dock{display:none;}
+
+  /* app-modus: fullscreen met home-indicator */
+  .os-pill{
+    position:absolute;left:50%;transform:translateX(-50%);
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 0.35rem);
+    z-index:30;width:120px;height:18px;
+    background:none;border:none;display:none;align-items:center;justify-content:center;
+  }
+  .os-pill::after{
+    content:"";width:110px;height:5px;border-radius:3px;
+    background:color-mix(in srgb, var(--txt) 55%, transparent);
+  }
+  #app.os-open .os-pill{display:flex;}
+  #app.os-open .content{padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 3rem);}
+
+  /* app-opening: iOS-achtige zoom vanaf het grid */
+  @media (prefers-reduced-motion: no-preference){
+    #app.os-open .view.active{animation:osOpen 0.3s cubic-bezier(0.32,0.72,0.36,1);}
+    .view[data-view="home"].active{animation:osThuis 0.26s ease-out;}
+    @keyframes osOpen{from{transform:scale(0.88) translateY(26px);opacity:0.4;}to{transform:none;opacity:1;}}
+    @keyframes osThuis{from{transform:scale(1.05);opacity:0.5;}to{transform:none;opacity:1;}}
+  }
 </style>
 </head>
 <body>
@@ -895,7 +1020,14 @@
   <!-- app -->
   <div id="app">
     <div class="topbar" role="banner">
-      <div class="brand"><span class="merkvlak">RTG</span><small>de app</small></div>
+      <div class="os-links">
+        <span class="os-klok" id="osKlok">--:--</span>
+        <button class="os-terug" id="osTerug" hidden aria-label="Terug naar het beginscherm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          <span id="osAppTitel"></span>
+        </button>
+        <div class="brand" id="osBrand"><span class="merkvlak">RTG</span><small>OS</small></div>
+      </div>
       <div style="display:flex;align-items:center;gap:0.6rem;">
         <button class="bell" id="bell" aria-label="Meldingen">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
@@ -928,6 +1060,7 @@
     <div class="content" id="content" role="main">
 
       <div class="view" data-view="home">
+        <div class="os-datum" id="osDatum"></div>
         <h2 id="homeGreeting">Welkom.</h2>
         <p class="sub" id="homeSub"></p>
         <div id="verifyBanner"></div>
@@ -935,6 +1068,7 @@
         <input type="file" id="selfieFile" accept="image/*" capture="user" style="display:none;">
         <div id="paspoortInbox"></div>
         <div class="codecard" id="codecard"></div>
+        <nav class="os-grid" id="osGrid" aria-label="Apps"></nav>
         <div class="card" id="homeTrip"></div>
         <div class="card" id="homePay"></div>
         <div class="card" id="homeSalon"></div>
@@ -1047,6 +1181,10 @@
       <button data-tab="assets" id="tabAssets" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M9.5 20v-4.5h5V20"/><path d="M12 8.5v.01"/></svg><span data-i18n="app.tab.assets">Assets</span></button>
       <button data-tab="gezin" id="tabGezin" style="display:none;position:relative;"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-6-4.2-6-9a4 4 0 0 1 7.4-2A4 4 0 0 1 18 11c0 4.8-6 9-6 9z"/></svg><span>Gezin</span><span id="tabGezinDot" style="display:none;position:absolute;top:4px;right:18px;width:8px;height:8px;border-radius:50%;background:var(--burgundy,#C23A5E);"></span></button>
     </div>
+
+    <!-- RTG OS: het dock (vier kernapps) en de home-indicator in app-modus -->
+    <nav class="os-dock" id="osDock" aria-label="Dock"></nav>
+    <button class="os-pill" id="osPill" aria-label="Terug naar het beginscherm"></button>
   </div>
 
   <!-- betaaloverlay -->

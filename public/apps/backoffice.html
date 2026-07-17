@@ -136,7 +136,7 @@
 
 <!-- het inloggen is samengevoegd met de personeels-app (kantoor-ingang):
      zonder geldige sessie stuurt dit scherm daarheen en komt u hier terug -->
-<div id="gate" role="main" aria-label="Inloggen">
+<div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
   <div class="gate-card">
     <div class="k">Backoffice</div>
     <h1 data-i18n="gate.h">Even doorsturen…</h1>
@@ -257,6 +257,7 @@
 
 <script src="/shared/appshell.js"></script>
 <script src="/shared/werkos.js"></script>
+<script src="/shared/inlogkleur.js" defer></script>
 <script src="/apps/backoffice.js"></script>
 <script>
 window.I18N = { en: {

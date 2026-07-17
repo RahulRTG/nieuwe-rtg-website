@@ -199,17 +199,6 @@
         '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
       '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
     $('#kaTerug').addEventListener('click', stepSector);
-    // het volledige kantoor, de backoffice en de paniekkamer delen deze inlog
-    const sneltoetsen = [
-      ['/apps/kantoren.html', '🏛', T('pd.ka.vol','Het volledige kantoor'), T('pd.ka.vol.sub','Alle twaalf kamers en de boardroom, met deze inlog')],
-      ['/apps/backoffice.html', '🗂', T('pd.ka.bo','De backoffice'), T('pd.ka.bo.sub','Actiecentrum, verificaties en het live overzicht')],
-      ['/apps/kantoren.html?kamer=paniekkamer', '🚨', T('pd.ka.paniek','De paniekkamer'), T('pd.ka.paniek.sub','Incidenten en nood, direct de kamer in')]
-    ];
-    const snelDiv = document.createElement('div');
-    snelDiv.className = 'glist'; snelDiv.style.marginTop = '0.6rem'; snelDiv.style.marginBottom = '0.3rem';
-    snelDiv.innerHTML = sneltoetsen.map(s =>
-      '<a class="gbtn" href="'+s[0]+'" style="text-decoration:none;"><span class="ic">'+s[1]+'</span><span><b>'+s[2]+'</b><span>'+s[3]+'</span></span></a>').join('');
-    $('#gateStep').insertBefore(snelDiv, $('#kaMeld'));
     const toonDienst = () => {
       $('#kaMeld').hidden = !!kaDienst;
       $('#kaDienstBlok').hidden = !kaDienst;

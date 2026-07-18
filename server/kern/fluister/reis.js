@@ -165,6 +165,13 @@ module.exports = (ctx) => {
   /* ---- de haak in fluisterZeg: herkent de vragen en zet zelf het
      voorstel klaar; geeft null terug als de vraag niet van deze laag is. ---- */
   async function butlerExtra(q, p, sess, klaar, key) {
+    // fototips: Rahul als fotocoach voor iedereen (lezen, geen geld: direct)
+    if (/fototip|foto ?tip|mooiere foto('s)?|perfecte foto|hoe fotografeer/i.test(q)) {
+      const food = /food|eten|gerecht|bord/i.test(q);
+      return klaar(food
+        ? 'Voor het perfecte food-shot: recht van boven of juist op tafelhoogte, alles ertussenin maakt borden klein. Schuif het bord naar daglicht, zet uw rug naar de lamp en ruim de tafel rond het bord op. In de RTG Camera-app wordt de ring groen zodra u recht boven het bord hangt.'
+        : 'Voor de perfecte vakantiefoto: zet de horizon op een rasterlijn (niet in het midden), mensen op een derde van het beeld met kijkruimte, en fotografeer in het gouden uur, net na zonsopkomst of voor zonsondergang. De RTG Camera-app helpt met het raster en de waterpas.');
+    }
     if (!sess) {
       // de zaak- en personeelskant: het dagplan uit de echte dagstand
       if (/plan (mijn|onze|de) (service)?dag|dagplan|servicedag/i.test(q)) {

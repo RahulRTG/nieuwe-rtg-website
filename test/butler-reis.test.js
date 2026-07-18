@@ -92,6 +92,15 @@ test('een AI-hart: het personeel praat met Rahul en krijgt een echte servicedag'
   assert.ok(/servicedag bij/i.test(dag.body.antwoord), 'het dagplan komt uit de eigen zaakstand');
 });
 
+test('fotocoach: Rahul geeft gerichte tips voor vakantie- en food-fotografie', async () => {
+  const vak = await api('fluister', { q: 'geef me een fototip voor mijn vakantie' });
+  assert.equal(vak.status, 200);
+  assert.ok(/horizon|gouden uur/i.test(vak.body.antwoord), 'de vakantietip gaat over compositie en licht');
+  const food = await api('fluister', { q: 'fototip voor mijn eten?' });
+  assert.equal(food.status, 200);
+  assert.ok(/bord|boven/i.test(food.body.antwoord), 'de food-tip gaat over het bord en de hoek');
+});
+
 test('nee blijft nee: een afgewezen kledingvoorstel wordt niet uitgevoerd', async () => {
   const v = await api('fluister', { q: 'koop een zijden slipdress' });
   assert.equal(v.body.voorstel, true);

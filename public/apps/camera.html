@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Camera</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;overflow:hidden;}
+  .zoeker{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;}
+  .zoeker video{width:100%;height:100%;object-fit:cover;}
+  .zoeker.spiegel video{transform:scaleX(-1);}
+  /* zonder camera blijft de app netjes staan met een rustige uitleg */
+  .geen-cam{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+    gap:0.6rem;text-align:center;padding:2rem;background:radial-gradient(700px 500px at 50% 30%, #1B1817, #0C0C0B);}
+  .geen-cam.aan{display:flex;}
+  .geen-cam b{font-size:1.05rem;}
+  .geen-cam span{color:var(--soft);font-size:0.85rem;max-width:34ch;}
+
+  /* hulplagen: raster, waterpas en de food-cirkel */
+  .raster{position:absolute;inset:0;pointer-events:none;display:none;}
+  .raster.aan{display:block;}
+  .raster i{position:absolute;background:rgba(255,255,255,0.28);}
+  .raster .v1{left:33.33%;top:0;bottom:0;width:1px;} .raster .v2{left:66.66%;top:0;bottom:0;width:1px;}
+  .raster .h1{top:33.33%;left:0;right:0;height:1px;} .raster .h2{top:66.66%;left:0;right:0;height:1px;}
+  .waterpas{position:absolute;left:50%;top:50%;width:min(46vw,220px);height:2px;margin-left:calc(min(46vw,220px)/-2);
+    background:rgba(255,255,255,0.55);pointer-events:none;transition:background 0.2s;}
+  .waterpas.recht{background:var(--groen);}
+  .foodring{position:absolute;left:50%;top:50%;width:min(62vw,340px);height:min(62vw,340px);
+    transform:translate(-50%,-50%);border:1.5px dashed rgba(255,255,255,0.45);border-radius:50%;
+    pointer-events:none;display:none;transition:border-color 0.2s;}
+  .foodring.aan{display:block;} .foodring.recht{border-color:var(--groen);}
+
+  /* de balken: boven klein gereedschap, onder de sluiter */
+  .boven{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:0.5rem;
+    padding:calc(env(safe-area-inset-top,0px) + 0.6rem) 0.9rem 0.6rem;z-index:5;
+    background:linear-gradient(rgba(12,12,11,0.65),transparent);}
+  .boven .rek{flex:1;}
+  .knopje{background:rgba(21,19,18,0.72);border:1px solid var(--line);color:var(--txt);
+    min-width:42px;height:42px;border-radius:50%;font-size:1.05rem;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;}
+  .knopje[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .knopje:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .onder{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;flex-direction:column;gap:0.7rem;
+    padding:0.8rem 1rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);
+    background:linear-gradient(transparent,rgba(12,12,11,0.78));}
+  .standen{display:flex;justify-content:center;gap:0.4rem;}
+  .standen button{background:none;border:1px solid transparent;color:var(--soft);font:inherit;font-size:0.72rem;
+    letter-spacing:0.14em;text-transform:uppercase;padding:0.35rem 0.8rem;border-radius:999px;cursor:pointer;}
+  .standen button[aria-pressed="true"]{color:var(--gold);border-color:var(--gold);}
+  .rij{display:flex;align-items:center;justify-content:space-between;gap:0.8rem;}
+  .duimpje{width:52px;height:52px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+    overflow:hidden;padding:0;cursor:pointer;}
+  .duimpje img{width:100%;height:100%;object-fit:cover;display:block;}
+  .sluiter{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,0.15);
+    cursor:pointer;transition:transform 0.1s;}
+  .sluiter:active{transform:scale(0.9);}
+  .sluiter:focus-visible{outline:2px solid var(--gold);outline-offset:4px;}
+
+  /* Rahul kijkt mee: de tipstrook boven de sluiter */
+  .rahul{margin:0 0.2rem;background:rgba(21,19,18,0.82);border:1px solid var(--line);border-radius:12px;
+    padding:0.55rem 0.8rem;font-size:0.8rem;line-height:1.45;color:var(--txt);
+    display:flex;gap:0.55rem;align-items:flex-start;}
+  .rahul b{color:var(--gold);font-weight:600;}
+  .rahul .tekst{flex:1;min-width:0;}
+  .flits-anim{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9;}
+  .flits-anim.aan{animation:flits 0.28s ease-out;}
+  @keyframes flits{from{opacity:0.85;}to{opacity:0;}}
+  .vis-verborgen{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  @media (prefers-reduced-motion: reduce){.flits-anim.aan{animation:none;}}
+</style>
+</head>
+<body>
+<h1 class="vis-verborgen">RTG Camera</h1>
+
+<div class="zoeker" id="zoeker">
+  <video id="beeld" autoplay playsinline muted aria-label="Camerabeeld"></video>
+  <div class="raster aan" id="raster" aria-hidden="true"><i class="v1"></i><i class="v2"></i><i class="h1"></i><i class="h2"></i></div>
+  <div class="waterpas" id="waterpas" aria-hidden="true"></div>
+  <div class="foodring" id="foodring" aria-hidden="true"></div>
+  <div class="geen-cam" id="geenCam">
+    <b>De camera is hier niet beschikbaar</b>
+    <span>Geef de browser toegang tot de camera, of open de app op een telefoon. Rahul&#39;s fototips werken ondertussen gewoon.</span>
+  </div>
+</div>
+<div class="flits-anim" id="flitsAnim" aria-hidden="true"></div>
+
+<header class="boven">
+  <button class="knopje" id="terug" aria-label="Terug naar de app">←</button>
+  <span class="rek"></span>
+  <button class="knopje" id="rasterKnop" aria-label="Raster aan of uit" aria-pressed="true">▦</button>
+  <button class="knopje" id="flitsKnop" aria-label="Lamp aan of uit" aria-pressed="false" hidden>⚡</button>
+  <button class="knopje" id="wisselKnop" aria-label="Wissel tussen voor- en achtercamera">⟲</button>
+</header>
+
+<div class="onder">
+  <div class="rahul" id="rahulKaart"><span aria-hidden="true">✦</span>
+    <span class="tekst"><b>Rahul</b> · <span id="rahulTekst">Richt en tik op de sluiter; ik kijk mee en geef je per foto een tip.</span></span>
+  </div>
+  <div class="standen" role="group" aria-label="Fotostand">
+    <button data-stand="auto" aria-pressed="true">Auto</button>
+    <button data-stand="vakantie" aria-pressed="false">Vakantie</button>
+    <button data-stand="food" aria-pressed="false">Food</button>
+  </div>
+  <div class="rij">
+    <button class="duimpje" id="duimpje" aria-label="Laatste foto opslaan" hidden><img id="duimBeeld" alt="Laatste foto"></button>
+    <button class="sluiter" id="sluiter" aria-label="Maak een foto"></button>
+    <button class="knopje" id="micKnop" aria-label="Spraaksturing: zeg bijvoorbeeld foto, wissel of tip">🎤</button>
+  </div>
+</div>
+
+<script src="/shared/spraak.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const beeld = $('#beeld'), zoeker = $('#zoeker'), rahulTekst = $('#rahulTekst');
+
+  /* ---------- de standen en Rahul's vakkennis per stand ---------- */
+  const TIPS = {
+    auto: ['Houd de horizonlijn groen (recht) en zet je onderwerp op een rasterlijn: dat oogt meteen professioneel.',
+      'Tik niet te snel achter elkaar: adem uit, houd stil, en druk dan af.'],
+    vakantie: ['Zet de horizon op de onderste rasterlijn en laat de lucht ademen: zo voelt de vakantie groot.',
+      'Mensen op een derde van het beeld, nooit pal in het midden; laat ze de ruimte in kijken.',
+      'Het gouden uur (net na zonsopkomst, net voor zonsondergang) geeft het zachtste licht: plan je mooiste foto dan.'],
+    food: ['Recht van boven (de ring wordt groen) of juist op tafelhoogte: alles ertussenin maakt borden klein en scheef.',
+      'Schuif het bord naar daglicht bij het raam en zet je rug naar de lamp: kunstlicht maakt eten geel.',
+      'Ruim de tafel rond het bord op: een servet en een glas mogen meedoen, de rest leidt af.']
+  };
+  let stand = 'auto', tipTeller = 0;
+  const zegRahul = t => { rahulTekst.textContent = t; };
+  const volgendeTip = () => { const l = TIPS[stand]; zegRahul(l[tipTeller++ % l.length]); };
+
+  document.querySelectorAll('.standen button').forEach(b => b.addEventListener('click', () => {
+    stand = b.dataset.stand;
+    document.querySelectorAll('.standen button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    $('#foodring').classList.toggle('aan', stand === 'food');
+    tipTeller = 0; volgendeTip();
+  }));
+
+  /* ---------- de camera: hoogste kwaliteit die het toestel geeft ---------- */
+  let stroom = null, kant = 'environment', spoor = null;
+  async function start() {
+    if (stroom) stroom.getTracks().forEach(t => t.stop());
+    try {
+      stroom = await navigator.mediaDevices.getUserMedia({ audio: false, video: {
+        facingMode: kant, width: { ideal: 4096 }, height: { ideal: 2160 } } });
+      beeld.srcObject = stroom;
+      spoor = stroom.getVideoTracks()[0];
+      zoeker.classList.toggle('spiegel', kant === 'user');
+      $('#geenCam').classList.remove('aan');
+      // de lamp (torch) alleen tonen als dit toestel hem echt heeft
+      const kan = spoor.getCapabilities ? spoor.getCapabilities() : {};
+      $('#flitsKnop').hidden = !kan.torch;
+    } catch (e) { $('#geenCam').classList.add('aan'); }
+  }
+  $('#wisselKnop').addEventListener('click', () => { kant = kant === 'user' ? 'environment' : 'user'; start(); });
+  let lamp = false;
+  $('#flitsKnop').addEventListener('click', async () => {
+    lamp = !lamp;
+    try { await spoor.applyConstraints({ advanced: [{ torch: lamp }] }); } catch (e) { lamp = false; }
+    $('#flitsKnop').setAttribute('aria-pressed', String(lamp));
+  });
+  $('#rasterKnop').addEventListener('click', () => {
+    const r = $('#raster'); r.classList.toggle('aan');
+    $('#rasterKnop').setAttribute('aria-pressed', String(r.classList.contains('aan')));
+  });
+  $('#terug').addEventListener('click', () => { location.href = '/apps/app.html'; });
+
+  /* ---------- waterpas en food-ring uit de bewegingssensor ---------- */
+  let kantelG = 0, plat = false;
+  window.addEventListener('deviceorientation', ev => {
+    if (ev.gamma == null) return;
+    kantelG = ev.gamma;
+    plat = Math.abs(ev.beta || 0) < 14 && Math.abs(ev.gamma || 0) < 14;
+    const w = $('#waterpas');
+    w.style.transform = 'rotate(' + (-kantelG).toFixed(1) + 'deg)';
+    w.classList.toggle('recht', Math.abs(kantelG) < 2.5);
+    $('#foodring').classList.toggle('recht', plat);
+  });
+
+  /* ---------- de foto: op volle sensorresolutie, met Rahul's blik ---------- */
+  const strook = [];
+  function analyse(canvas) {
+    // een kleine meting is genoeg: gemiddelde helderheid en clipping
+    const k = document.createElement('canvas'); k.width = 64; k.height = 64;
+    k.getContext('2d').drawImage(canvas, 0, 0, 64, 64);
+    const d = k.getContext('2d').getImageData(0, 0, 64, 64).data;
+    let som = 0, donker = 0, licht = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      const y = 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+      som += y; if (y < 16) donker++; if (y > 240) licht++;
+    }
+    const n = d.length / 4, gem = som / n;
+    if (licht / n > 0.25) return 'Deze is flink overbelicht: zoek wat schaduw of richt iets van de lucht weg, dan houden de kleuren hun diepte.';
+    if (gem < 55) return 'Deze is aan de donkere kant: stap richting het licht of gebruik de lamp, dan wordt hij meteen rijker.';
+    if (Math.abs(kantelG) > 6 && stand !== 'food') return 'Mooi licht! Alleen de horizon hangt scheef: houd de waterpas groen en hij is perfect.';
+    if (stand === 'food' && !plat) return 'Goed belicht! Voor het perfecte food-shot: houd de telefoon recht boven het bord tot de ring groen wordt.';
+    return ['Prachtig: mooi licht en netjes recht. Deze mag de Salon in.',
+      'Sterke foto. Probeer er ook een van dichterbij: details vertellen het verhaal.',
+      'Mooi zo. Maak er direct nog een: de tweede is vaak nog net iets rustiger.'][Math.floor(Math.random() * 3)];
+  }
+  function maakFoto() {
+    if (!stroom) { volgendeTip(); return; }
+    const c = document.createElement('canvas');
+    c.width = beeld.videoWidth || 1280; c.height = beeld.videoHeight || 720;
+    const tx = c.getContext('2d');
+    if (kant === 'user') { tx.translate(c.width, 0); tx.scale(-1, 1); } // wat u ziet is wat u krijgt
+    tx.drawImage(beeld, 0, 0, c.width, c.height);
+    $('#flitsAnim').classList.remove('aan'); void $('#flitsAnim').offsetWidth; $('#flitsAnim').classList.add('aan');
+    zegRahul(analyse(c));
+    c.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      strook.unshift(url); if (strook.length > 6) URL.revokeObjectURL(strook.pop());
+      $('#duimpje').hidden = false; $('#duimBeeld').src = url;
+    }, 'image/jpeg', 0.95);
+  }
+  $('#sluiter').addEventListener('click', maakFoto);
+  $('#duimpje').addEventListener('click', () => {
+    if (!strook[0]) return;
+    const a = document.createElement('a');
+    a.href = strook[0]; a.download = 'rtg-foto-' + Date.now() + '.jpg';
+    document.body.appendChild(a); a.click(); a.remove();
+    zegRahul('Opgeslagen op uw toestel. Delen kan zo als snap of in De Salon.');
+  });
+
+  /* ---------- Rahul: tips uit het ene AI-hart, en spraaksturing ---------- */
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  async function vraagRahul(q) {
+    if (!token) { volgendeTip(); return; }
+    try {
+      const r = await fetch('/api/fluister', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ q }) });
+      const j = await r.json();
+      if (j && j.antwoord) zegRahul(j.antwoord); else volgendeTip();
+    } catch (e) { volgendeTip(); }
+  }
+  $('#rahulKaart').addEventListener('click', volgendeTip);
+  if (window.Spraak) Spraak.koppel($('#micKnop'), {
+    opTekst: zin => {
+      const z = zin.toLowerCase();
+      if (/\bfoto\b|cheese|klik/.test(z)) return maakFoto();
+      if (/wissel|draai om|selfie/.test(z)) return $('#wisselKnop').click();
+      if (/raster|lijnen/.test(z)) return $('#rasterKnop').click();
+      if (/\bfood\b|eten/.test(z)) { document.querySelector('[data-stand="food"]').click(); return; }
+      if (/vakantie/.test(z)) { document.querySelector('[data-stand="vakantie"]').click(); return; }
+      if (/\bauto\b|gewoon/.test(z)) { document.querySelector('[data-stand="auto"]').click(); return; }
+      if (/^tip\b|nog een tip|help/.test(z)) return volgendeTip();
+      vraagRahul(zin); // al het andere mag Rahul zelf beantwoorden
+    },
+    nietVerstaan: () => zegRahul('Dat verstond ik net niet. Zeg bijvoorbeeld "foto", "wissel", "food" of "tip".')
+  });
+
+  volgendeTip();
+  start();
+})();
+</script>
+</body>
+</html>

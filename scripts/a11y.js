@@ -27,6 +27,7 @@ const PAGINAS = [
   '/apps/leverancier.html',
   '/apps/backoffice.html',
   '/apps/personeel.html',
+  '/apps/camera.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

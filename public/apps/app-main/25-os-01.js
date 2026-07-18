@@ -25,7 +25,8 @@
   const LINKS = {
     spelen:      { naam: 'Spelen',       icoon: '🎲', url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
-    juridisch:   { naam: 'Juridisch',    icoon: '📜', url: '/apps/juridisch.html' }
+    juridisch:   { naam: 'Juridisch',    icoon: '📜', url: '/apps/juridisch.html' },
+    camera:      { naam: 'Camera',       icoon: '📸', url: '/apps/camera.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -50,6 +51,7 @@
       { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
     [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
       'os:rtf',
+      'link:camera',
       'link:juridisch']
   ];
 

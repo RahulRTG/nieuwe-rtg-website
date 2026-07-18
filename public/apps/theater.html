@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Theater</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--rood:#DE6E92;--groen:#69B891;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:820px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,.film:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
+  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  .rij input{flex:1;min-width:9rem;width:auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  /* de zaal: affiches, niets dat vanzelf beweegt of afspeelt */
+  .films{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.8rem;}
+  .film{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);
+    padding:0;text-align:left;color:var(--txt);font:inherit;cursor:pointer;}
+  .film .affiche{aspect-ratio:16/9;background:#000 center/cover no-repeat;display:flex;align-items:center;justify-content:center;
+    font-family:'Bodoni Moda',serif;font-size:2rem;color:var(--soft);}
+  .film .onder{padding:0.6rem 0.75rem 0.7rem;}
+  .film .titel{font-weight:600;font-size:0.88rem;line-height:1.3;}
+  .film .sub{font-size:0.7rem;color:var(--soft);margin-top:0.25rem;}
+  .film .mb{position:absolute;right:0.5rem;top:0.5rem;font-size:0.62rem;background:rgba(12,12,11,0.75);
+    border-radius:999px;padding:0.2rem 0.5rem;font-variant-numeric:tabular-nums;}
+  /* de bioscoop */
+  .doek{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .doek video{width:100%;display:block;max-height:70vh;}
+  .kijkTitel{font-family:'Bodoni Moda',serif;font-size:1.4rem;margin-top:0.8rem;}
+  .reacties{font-size:0.84rem;line-height:1.6;}
+  .reacties .r{border-top:1px solid var(--line);padding:0.4rem 0;overflow-wrap:anywhere;}
+  .reacties .r:first-child{border-top:none;}
+  .reacties .wie{color:var(--gold);font-weight:600;}
+  .voortgang{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin-top:0.6rem;display:none;}
+  .voortgang.zien{display:block;}
+  .voortgang i{display:block;height:100%;background:var(--gold);width:0;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>RTG Theater</h1>
+  <span class="rek"></span>
+  <span class="badge">Origineel beeld · geen hercompressie</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil" id="poortReden">Het Theater hoort bij uw lidmaatschap; log eerst in via de app.</p></div>
+  </section>
+
+  <!-- de zaal -->
+  <section id="vZaal" class="weg">
+    <p class="stil" id="kwaliteit"></p>
+    <div id="blokAbb" class="weg"><h2>Uw abonnementen</h2><div class="films" id="filmsAbb"></div></div>
+    <h2>Nieuw in de zaal</h2>
+    <div class="films" id="filmsNieuw"></div>
+    <p class="stil weg" id="leeg">Nog geen video's in de zaal. Start uw eigen kanaal hieronder.</p>
+    <h2>Mijn kanaal</h2>
+    <div id="mijnBlok"></div>
+  </section>
+
+  <!-- de bioscoop -->
+  <section id="vKijk" class="weg">
+    <button class="knop" id="terugZaal" type="button">← Terug naar de zaal</button>
+    <div class="doek" style="margin-top:0.7rem;">
+      <video id="doekVideo" controls playsinline preload="metadata"></video>
+    </div>
+    <div class="kijkTitel" id="kijkTitel"></div>
+    <p class="stil" id="kijkSub"></p>
+    <div class="rij">
+      <button class="knop" id="abbKnop" type="button">Abonneer op dit kanaal</button>
+      <button class="knop rood" id="meldKnop" type="button">Melden bij RTG-kantoor</button>
+    </div>
+    <h2>Reacties</h2>
+    <div class="kaart"><div class="reacties" id="reacties"><p class="stil">Nog geen reacties.</p></div>
+      <form class="rij" id="reactieForm">
+        <label for="reactieVeld" style="position:absolute;left:-999px;">Reactie</label>
+        <input id="reactieVeld" maxlength="300" placeholder="Reageer (op codenaam)" autocomplete="off">
+        <button class="knop vol" type="submit">Plaats</button>
+      </form>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/theater/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3400); };
+  const toon = naam => { for (const v of ['vPoort', 'vZaal', 'vKijk']) $('#' + v).classList.toggle('weg', v !== naam); };
+  const duur = s => s ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') : '';
+  let zaal = null, open = null;
+
+  /* ---------- de zaal ---------- */
+  function filmKnop(v) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'film';
+    b.innerHTML = '<span class="affiche"></span><span class="mb"></span><span class="onder">' +
+      '<span class="titel"></span><span class="sub"></span></span>';
+    const aff = b.querySelector('.affiche');
+    if (v.poster) aff.style.backgroundImage = 'url(' + v.poster + ')';
+    else aff.textContent = (v.titel || '?').slice(0, 1).toUpperCase();
+    b.querySelector('.mb').textContent = v.mb + ' MB';
+    b.querySelector('.titel').textContent = v.titel;
+    b.querySelector('.sub').textContent = v.kanaal + ' · ' + v.codenaam + (v.duurS ? ' · ' + duur(v.duurS) : '') +
+      (v.reacties ? ' · ' + v.reacties + ' reacties' : '');
+    b.addEventListener('click', () => kijk(v));
+    return b;
+  }
+  async function laadZaal() {
+    const r = await api('zaal');
+    if (r.status !== 200) { $('#poortReden').textContent = r.body.error || 'Log eerst in via de app.'; toon('vPoort'); return; }
+    zaal = r.body;
+    $('#kwaliteit').textContent = zaal.kwaliteit + ' Chronologisch en gecureerd: niets speelt vanzelf, niets wordt u opgedrongen.';
+    const abb = $('#filmsAbb'), nieuw = $('#filmsNieuw');
+    abb.innerHTML = ''; nieuw.innerHTML = '';
+    $('#blokAbb').classList.toggle('weg', !(zaal.abonnementen || []).length);
+    for (const v of zaal.abonnementen || []) abb.appendChild(filmKnop(v));
+    for (const v of zaal.nieuw || []) nieuw.appendChild(filmKnop(v));
+    $('#leeg').classList.toggle('weg', !!((zaal.nieuw || []).length + (zaal.abonnementen || []).length));
+    tekenMijn();
+    toon('vZaal');
+  }
+
+  /* ---------- mijn kanaal: aanmelden, opnemen in topkwaliteit, uploaden ---------- */
+  let stream = null, rec = null, brokken = [], opnameStart = 0;
+  function tekenMijn() {
+    const el = $('#mijnBlok'); el.innerHTML = '';
+    const m = zaal && zaal.mijn;
+    const kaart = document.createElement('div'); kaart.className = 'kaart';
+    el.appendChild(kaart);
+    if (!m) {
+      kaart.innerHTML = '<p class="stil">Start uw eigen kanaal. RTG-kantoor keurt elk kanaal eerst persoonlijk goed; daarna ' +
+        'publiceert u in originele kwaliteit, tot 4K: wij hercomprimeren niets.</p>' +
+        '<label for="kNaam">Naam van het kanaal</label><input id="kNaam" maxlength="40">' +
+        '<label for="kGenre">Genre</label><select id="kGenre"></select>' +
+        '<label for="kBio">Waar gaat het over?</label><input id="kBio" maxlength="300">' +
+        '<div class="rij"><button class="knop vol" id="kStart" type="button">Kanaal aanmelden</button></div>';
+      for (const g of (zaal.genres || [])) { const o = document.createElement('option'); o.value = g; o.textContent = g; kaart.querySelector('#kGenre').appendChild(o); }
+      kaart.querySelector('#kStart').addEventListener('click', async () => {
+        const r = await api('kanaal/aanmeld', { naam: $('#kNaam').value, genre: $('#kGenre').value, bio: $('#kBio').value });
+        if (r.body.error) return zeg(r.body.error);
+        zeg('Aangemeld. RTG-kantoor kijkt er persoonlijk naar.'); laadZaal();
+      });
+      return;
+    }
+    if (m.status === 'wacht') { kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> wacht op goedkeuring door RTG-kantoor. Een mens beslist; u krijgt een seintje.</p>'; return; }
+    if (m.status === 'geweigerd') { kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> is niet goedgekeurd door RTG-kantoor.</p>'; return; }
+    kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> · ' + m.volgers + ' abonnees · ' +
+      m.gebruiktMb + ' van ' + m.maxMb + ' MB gebruikt</p>' +
+      '<label for="vTitel">Titel van de nieuwe video</label><input id="vTitel" maxlength="80">' +
+      '<div class="rij">' +
+      '<button class="knop" id="vOpname" type="button">● Opnemen (hoogste kwaliteit)</button>' +
+      '<button class="knop" id="vKies" type="button">Bestand kiezen</button>' +
+      '<input type="file" id="vBestand" accept="video/webm,video/mp4" style="position:absolute;left:-999px;" tabindex="-1" aria-label="Videobestand kiezen"></div>' +
+      '<p class="stil" id="vStatus" style="margin-top:0.5rem;">De camera neemt op tot 4K met hoge bitrate; het bestand gaat exact zo naar de kijker.</p>' +
+      '<div class="voortgang" id="vVoortgang"><i></i></div>' +
+      '<video id="vVoorbeeld" style="width:100%;border-radius:10px;margin-top:0.6rem;display:none;" muted playsinline></video>';
+    kaart.querySelector('#vKies').addEventListener('click', () => kaart.querySelector('#vBestand').click());
+    kaart.querySelector('#vBestand').addEventListener('change', e => { const f = e.target.files[0]; if (f) stuurBlob(f, f.name); });
+    kaart.querySelector('#vOpname').addEventListener('click', opnameSchakel);
+  }
+  async function opnameSchakel() {
+    const knop = $('#vOpname'), status = $('#vStatus'), vb = $('#vVoorbeeld');
+    if (rec && rec.state === 'recording') { rec.stop(); return; }
+    try {
+      // bioscoopniveau: vraag het maximale dat de camera kan, met hoge bitrate
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 3840 }, height: { ideal: 2160 }, frameRate: { ideal: 30 } }, audio: true });
+    } catch (e) { return zeg('Camera en microfoon zijn nodig om op te nemen.'); }
+    vb.style.display = 'block'; vb.srcObject = stream; vb.play().catch(() => {});
+    const soort = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']
+      .find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+    rec = new MediaRecorder(stream, { mimeType: soort || undefined, videoBitsPerSecond: 16000000, audioBitsPerSecond: 192000 });
+    brokken = []; opnameStart = Date.now();
+    rec.ondataavailable = e => { if (e.data && e.data.size) brokken.push(e.data); };
+    rec.onstop = () => {
+      const s = stream; stream = null;
+      for (const t of s.getTracks()) t.stop();
+      vb.style.display = 'none'; vb.srcObject = null;
+      knop.textContent = '● Opnemen (hoogste kwaliteit)';
+      const blob = new Blob(brokken, { type: 'video/webm' });
+      stuurBlob(blob, null, Math.round((Date.now() - opnameStart) / 1000));
+    };
+    rec.start(500);
+    knop.textContent = '■ Stop en publiceer';
+    const trek = stream.getVideoTracks()[0].getSettings();
+    status.textContent = 'Opname loopt: ' + (trek.width || '?') + 'x' + (trek.height || '?') + ' · het origineel gaat exact zo de zaal in.';
+  }
+  async function stuurBlob(blob, naam, duurS) {
+    const titel = ($('#vTitel').value || naam || 'Zonder titel').trim();
+    if (blob.size < 100) return zeg('De opname is leeg.');
+    // de affiche: het eerste frame, klein en stil
+    const poster = await new Promise(res => {
+      const url = URL.createObjectURL(blob);
+      const v = document.createElement('video');
+      v.muted = true; v.playsInline = true; v.src = url; v.preload = 'auto';
+      const klaar = () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width = 640; c.height = Math.round(640 * (v.videoHeight || 9) / (v.videoWidth || 16));
+          c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+          res(c.toDataURL('image/jpeg', 0.72));
+        } catch (e) { res(null); }
+        URL.revokeObjectURL(url);
+      };
+      v.addEventListener('seeked', klaar, { once: true });
+      v.addEventListener('loadeddata', () => { try { v.currentTime = 0.1; } catch (e) { klaar(); } }, { once: true });
+      v.addEventListener('error', () => res(null), { once: true });
+    });
+    const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster });
+    if (kaart.body.error) return zeg(kaart.body.error);
+    // rauwe bytes met voortgang (XHR kan uploadvoortgang tonen, fetch niet)
+    const balk = $('#vVoortgang'); balk.classList.add('zien');
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/theater/upload/' + kaart.body.id);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+    xhr.setRequestHeader('Content-Type', blob.type || 'video/webm');
+    xhr.upload.onprogress = e => { if (e.lengthComputable) balk.firstElementChild.style.width = Math.round(e.loaded / e.total * 100) + '%'; };
+    xhr.onload = () => {
+      balk.classList.remove('zien'); balk.firstElementChild.style.width = '0';
+      let uit = {}; try { uit = JSON.parse(xhr.responseText); } catch (e) {}
+      if (xhr.status !== 200) return zeg(uit.error || 'Uploaden mislukte.');
+      zeg('"' + titel + '" staat in de zaal: ' + uit.mb + ' MB, byte voor byte uw origineel.');
+      $('#vTitel').value = '';
+      laadZaal();
+    };
+    xhr.onerror = () => { balk.classList.remove('zien'); zeg('Uploaden mislukte.'); };
+    xhr.send(blob);
+  }
+
+  /* ---------- de bioscoop ---------- */
+  async function kijk(v) {
+    open = v;
+    $('#doekVideo').src = '/api/theater/kijk/' + v.id + '?token=' + encodeURIComponent(token);
+    $('#kijkTitel').textContent = v.titel;
+    $('#kijkSub').textContent = v.kanaal + ' · ' + v.codenaam + ' · ' + v.mb + ' MB origineel' + (v.omschrijving ? ' · ' + v.omschrijving : '');
+    toonReacties();
+    toon('vKijk');
+  }
+  async function toonReacties() {
+    const r = await api('reacties', { id: open.id });
+    const el = $('#reacties');
+    const rijen = (r.body.reacties || []);
+    el.innerHTML = rijen.length ? '' : '<p class="stil">Nog geen reacties.</p>';
+    for (const x of rijen) {
+      const d = document.createElement('div'); d.className = 'r';
+      const wie = document.createElement('span'); wie.className = 'wie'; wie.textContent = x.codenaam;
+      d.appendChild(wie); d.appendChild(document.createTextNode(': ' + x.tekst));
+      el.appendChild(d);
+    }
+  }
+  $('#terugZaal').addEventListener('click', () => { $('#doekVideo').pause(); $('#doekVideo').removeAttribute('src'); laadZaal(); });
+  $('#reactieForm').addEventListener('submit', async e => { e.preventDefault();
+    const t = $('#reactieVeld').value.trim(); if (!t || !open) return;
+    const r = await api('reactie', { id: open.id, tekst: t });
+    if (r.body.error) zeg(r.body.error); else { $('#reactieVeld').value = ''; toonReacties(); }
+  });
+  $('#abbKnop').addEventListener('click', async () => { if (!open) return;
+    const r = await api('abonneer', { kanaalId: open.kanaalId });
+    zeg(r.body.error || 'Geabonneerd: nieuw werk van dit kanaal staat voortaan bovenaan.');
+  });
+  $('#meldKnop').addEventListener('click', async () => { if (!open) return;
+    const reden = prompt('Wat wilt u melden aan RTG-kantoor?');
+    if (reden == null) return;
+    const r = await api('meld', { id: open.id, reden });
+    zeg(r.body.error || 'Gemeld. Een mens van RTG-kantoor kijkt ernaar.');
+  });
+
+  /* ---------- start ---------- */
+  if (!token) toon('vPoort'); else laadZaal();
+})();
+</script>
+</body>
+</html>

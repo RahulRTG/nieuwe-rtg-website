@@ -33,6 +33,7 @@ const PAGINAS = [
   '/apps/oog.html',
   '/apps/ghost.html',
   '/apps/flits.html',
+  '/apps/theater.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

@@ -2139,7 +2139,8 @@
     camera:      { naam: 'Camera',       icoon: '📸', url: '/apps/camera.html' },
     muziek:      { naam: 'RTG Sound',    icoon: '🎧', url: '/apps/muziek.html' },
     podium:      { naam: 'Podium',       icoon: '🎬', url: '/apps/podium.html' },
-    flits:       { naam: 'Flits',        icoon: '🛣️', url: '/apps/flits.html' }
+    flits:       { naam: 'Flits',        icoon: '🛣️', url: '/apps/flits.html' },
+    theater:     { naam: 'Theater',      icoon: '🎞️', url: '/apps/theater.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -2168,6 +2169,7 @@
       'link:muziek',
       'link:podium',
       'link:flits',
+      'link:theater',
       'link:juridisch']
   ];
 

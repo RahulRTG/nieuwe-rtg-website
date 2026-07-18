@@ -2713,6 +2713,13 @@ Object.assign(kern, require('./kern/ghost').maakGhost({
 Object.assign(kern, require('./kern/flits').maakFlits({
   db, save, crypto, haversine, ghostSimuleer: kern.ghostSimuleer
 }));
+/* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
+   Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
+   hercompressie) en staan als bestanden in de datamap, nooit in git. */
+Object.assign(kern, require('./kern/theater').maakTheater({
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, notify, sseToOffice,
+  mediaDir: path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'theater')
+}));
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
    geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen
    die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar
@@ -2741,6 +2748,7 @@ require('./routes/pay')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);
 require('./routes/flits')(kern);
+require('./routes/theater')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

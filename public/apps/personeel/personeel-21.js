@@ -72,7 +72,18 @@
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
   gateTik(); setInterval(gateTik, 15000);
   stepStart();
-  // het Werk-OS: springboard, dock, klok en Cmd+K, precies als op een telefoon
-  if (window.WerkOS) WerkOS.koppel({ thuisTab: 'vandaag', dock: ['rooster', 'taken', 'team', 'hulp'] });
+  // het Werk-OS: springboard, dock, klok en Cmd+K, precies als op een telefoon.
+  // RTG Eye (de camerabril: voertuigschouw + werkvloerregister) staat als
+  // eigen app op het springboard; de knop leeft in een onzichtbare houder.
+  const extraHouder = document.createElement('div');
+  extraHouder.id = 'pdaExtra'; extraHouder.style.display = 'none';
+  const oogKnop = document.createElement('button');
+  oogKnop.type = 'button'; oogKnop.className = 'pda-app';
+  oogKnop.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></svg>RTG Eye';
+  oogKnop.addEventListener('click', () => { location.href = '/apps/oog.html'; });
+  extraHouder.appendChild(oogKnop);
+  document.body.appendChild(extraHouder);
+  if (window.WerkOS) WerkOS.koppel({ thuisTab: 'vandaag', dock: ['rooster', 'taken', 'team', 'hulp'],
+    extra: { houder: '#pdaExtra', knop: '.pda-app' } });
   restoreSession();
 })();

@@ -30,6 +30,7 @@ const PAGINAS = [
   '/apps/camera.html',
   '/apps/muziek.html',
   '/apps/podium.html',
+  '/apps/oog.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

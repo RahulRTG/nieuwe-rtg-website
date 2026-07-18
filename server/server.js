@@ -2694,6 +2694,11 @@ Object.assign(kern, require('./kern/podium').maakPodium({
   db, save, crypto, accounts, leeftijdVan, codenaamVan: kern.codenaamVan,
   sseToCustomer, sseToOffice, notify, pay: kern.pay, schoon
 }));
+/* RTG Eye (kern/oog.js): de camerabril van de werkvloer. Het kijken gebeurt
+   op het toestel; hier landen alleen compacte schouw-/uitgifteregels
+   (gecodeerd, geen beeld), die via een Zaakdoos-proxy vanzelf in het
+   doos-journaal terechtkomen. */
+Object.assign(kern, require('./kern/oog').maakOog({ db, save, crypto, schoon, sseToSupplier, logActivity }));
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
    geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen
    die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar

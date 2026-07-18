@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Eye</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:760px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .knop:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  .rij input,.rij select{flex:1;min-width:9rem;width:auto;}
+  .scherm{position:relative;background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:4/3;}
+  .scherm video{width:100%;height:100%;object-fit:cover;display:block;}
+  .scherm canvas.rooster{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  .scherm .status{position:absolute;left:0.7rem;top:0.7rem;font-size:0.72rem;background:rgba(12,12,11,0.72);
+    border-radius:999px;padding:0.3rem 0.7rem;max-width:80%;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .log{font-size:0.8rem;line-height:1.6;}
+  .log .r{display:flex;gap:0.6rem;border-top:1px solid var(--line);padding:0.35rem 0;}
+  .log .r:first-child{border-top:none;}
+  .log .tijd{color:var(--soft);white-space:nowrap;}
+  .ok{color:var(--groen);} .alarm{color:var(--rood);}
+  .weg{display:none !important;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/personeel.html" aria-label="Terug naar de personeels-app">←</a>
+  <h1>RTG Eye</h1>
+  <span class="rek"></span>
+  <span class="badge">Kijkt op het toestel · geen beeld naar buiten</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil" id="poortReden">Log eerst in op de personeels-app; RTG Eye werkt op uw PDA-inlog.</p></div>
+  </section>
+
+  <section id="vOog" class="weg">
+    <div class="rij" role="group" aria-label="Functie">
+      <button class="knop" id="modeSchouw" type="button" aria-pressed="true">Schouw</button>
+      <button class="knop" id="modeVloer" type="button" aria-pressed="false">Werkvloer</button>
+    </div>
+    <div class="scherm" style="margin-top:0.7rem;">
+      <video id="cam" autoplay playsinline muted></video>
+      <canvas id="rooster" class="rooster"></canvas>
+      <span class="status" id="oogStatus" role="status">Camera starten…</span>
+    </div>
+
+    <!-- de schouw: nulmeting per voertuig, daarna vergelijkt het oog live -->
+    <div id="paneelSchouw">
+      <h2>Voertuigschouw</h2>
+      <div class="rij">
+        <label for="voertuig" style="position:absolute;left:-999px;">Voertuig</label>
+        <select id="voertuig"></select>
+        <button class="knop" id="knopNulmeting" type="button">Nulmeting vastleggen</button>
+        <button class="knop vol" id="knopSchouw" type="button">Schouw en log</button>
+      </div>
+      <p class="stil" style="margin-top:0.5rem;">Richt de camera op het voertuig. De visielaag vergelijkt elke zone met de
+        nulmeting van dit voertuig en logt het oordeel als gecodeerde journaalregel: loopt de zaak via een Zaakdoos, dan
+        neemt het doos-journaal hem vanzelf op.</p>
+      <div class="kaart"><h2 style="margin-top:0;">Laatste schouwen</h2><div class="log" id="logSchouw"><p class="stil">Nog geen schouwen.</p></div></div>
+    </div>
+
+    <!-- de werkvloer: aanleren en knoploos loggen -->
+    <div id="paneelVloer" class="weg">
+      <h2>Werkvloer</h2>
+      <div class="rij">
+        <label for="leerNaam" style="position:absolute;left:-999px;">Naam van het item</label>
+        <input id="leerNaam" maxlength="40" placeholder="Naam (bijv. Kist gereedschap 2)">
+        <button class="knop" id="knopLeer" type="button">Toon het en leer aan</button>
+      </div>
+      <p class="stil" style="margin-top:0.5rem;">Houd een item even rustig in beeld. Herkent het oog een aangeleerd item,
+        dan logt het vanzelf wie het meeneemt of terugbrengt: zonder knop. U staat als drager op de regel via uw PDA-inlog.</p>
+      <div class="kaart"><h2 style="margin-top:0;">Uitgifteregister</h2><div class="log" id="logVloer"><p class="stil">Nog geen bewegingen.</p></div></div>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/staff/oog' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
+  const status = t => { $('#oogStatus').textContent = t; };
+
+  /* ================= de visielaag (RTG Eye zelf) =================
+     Eigen, volledig lokale beeldanalyse op een klein canvas: geen model van
+     buiten, geen beeld dat het toestel verlaat. Per frame:
+     - 3x3 zones met gemiddelde helderheid en randenergie (buurverschillen)
+       -> de schouw-handtekening (18 getallen), belichting-genormaliseerd;
+     - een kleur-handtekening van het centrum (12 tint-bakken + verzadiging)
+       -> de item-handtekening voor de werkvloer.
+     Interface bewust klein gehouden (window.RTGEye): een zwaarder neuraal
+     model kan hier later achter dezelfde functies inschuiven. */
+  const K = 48;
+  const kc = document.createElement('canvas'); kc.width = K; kc.height = K;
+  const kx = kc.getContext('2d', { willReadFrequently: true });
+  const ZONES = ['linksvoor', 'middenvoor', 'rechtsvoor', 'linksmidden', 'midden', 'rechtsmidden', 'linksachter', 'middenachter', 'rechtsachter'];
+  function grijp(video) {
+    if (!video.videoWidth) return null;
+    kx.drawImage(video, 0, 0, K, K);
+    return kx.getImageData(0, 0, K, K).data;
+  }
+  function schouwSig(d) {
+    // per 3x3-zone: [helderheid, randenergie], daarna genormaliseerd op de
+    // totale helderheid zodat ander licht geen valse kras wordt
+    const lum = new Float32Array(K * K);
+    for (let i = 0; i < K * K; i++) lum[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+    const zone = new Array(9).fill(0).map(() => ({ l: 0, e: 0, n: 0 }));
+    for (let y = 1; y < K - 1; y++) for (let x = 1; x < K - 1; x++) {
+      const i = y * K + x;
+      const z = zone[Math.min(2, Math.floor(y * 3 / K)) * 3 + Math.min(2, Math.floor(x * 3 / K))];
+      z.l += lum[i];
+      z.e += Math.abs(lum[i] - lum[i - 1]) + Math.abs(lum[i] - lum[i - K]);
+      z.n++;
+    }
+    const tot = zone.reduce((n, z) => n + z.l / z.n, 0) / 9 || 1;
+    const sig = [];
+    for (const z of zone) { sig.push(z.l / z.n / tot, z.e / z.n / tot); }
+    return sig;
+  }
+  function itemSig(d) {
+    // kleur-handtekening van het centrum (het item wordt centraal getoond)
+    const bak = new Array(16).fill(0);
+    let n = 0;
+    for (let y = 12; y < 36; y++) for (let x = 12; x < 36; x++) {
+      const i = (y * K + x) * 4, r = d[i] / 255, g = d[i + 1] / 255, b = d[i + 2] / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b), v = max, s = max ? (max - min) / max : 0;
+      let h = 0;
+      if (max !== min) {
+        if (max === r) h = ((g - b) / (max - min) + 6) % 6;
+        else if (max === g) h = (b - r) / (max - min) + 2;
+        else h = (r - g) / (max - min) + 4;
+      }
+      bak[Math.min(11, Math.floor(h * 2))] += s;         // 12 tint-bakken, gewogen op verzadiging
+      bak[12] += v; bak[13] += s; n++;
+    }
+    const som = bak.slice(0, 12).reduce((a, b2) => a + b2, 0) || 1;
+    const sig = bak.slice(0, 12).map(x => x / som);
+    sig.push(bak[12] / n, bak[13] / n);
+    return sig;
+  }
+  const gelijkenis = (a, b) => {
+    if (!a || !b || a.length !== b.length) return 0;
+    let ab = 0, aa = 0, bb = 0;
+    for (let i = 0; i < a.length; i++) { ab += a[i] * b[i]; aa += a[i] * a[i]; bb += b[i] * b[i]; }
+    return aa && bb ? ab / Math.sqrt(aa * bb) : 0;
+  };
+  function schouwVergelijk(nul, nuSig) {
+    // per zone: afwijking in helderheid en randenergie t.o.v. de nulmeting;
+    // extra randenergie op een gladde zone is het klassieke kras-signaal
+    const uit = [];
+    for (let z = 0; z < 9; z++) {
+      const dl = Math.abs(nuSig[z * 2] - nul[z * 2]);
+      const de = Math.abs(nuSig[z * 2 + 1] - nul[z * 2 + 1]);
+      const score = Math.min(100, Math.round(dl * 260 + de * 420));
+      uit.push({ zone: ZONES[z], score, oordeel: score >= 35 ? 'afwijking' : 'schoon' });
+    }
+    return uit;
+  }
+  window.RTGEye = { schouwSig, itemSig, gelijkenis, schouwVergelijk };
+
+  /* ================= de app er omheen ================= */
+  let modus = 'schouw', voertuigen = [], spullen = [], stabiel = null, stabielN = 0, koel = {};
+  const video = $('#cam');
+  function tekenRooster(zones) {
+    const c = $('#rooster'); const w = c.width = c.clientWidth; const h = c.height = c.clientHeight;
+    const g = c.getContext('2d'); g.clearRect(0, 0, w, h);
+    if (!zones) return;
+    zones.forEach((z, i) => {
+      const x = (i % 3) * w / 3, y = Math.floor(i / 3) * h / 3;
+      g.strokeStyle = z.oordeel === 'afwijking' ? 'rgba(222,110,146,0.9)' : 'rgba(105,184,145,0.45)';
+      g.lineWidth = z.oordeel === 'afwijking' ? 3 : 1;
+      g.strokeRect(x + 3, y + 3, w / 3 - 6, h / 3 - 6);
+    });
+  }
+  async function laadStand() {
+    const r = await api('', {});
+    if (r.status !== 200) { $('#poortReden').textContent = (r.body.error || 'Log eerst in op de personeels-app.'); $('#vPoort').classList.remove('weg'); return false; }
+    voertuigen = r.body.voertuigen || []; spullen = r.body.spullen || [];
+    const sel = $('#voertuig'); sel.innerHTML = '';
+    for (const v of voertuigen) { const o = document.createElement('option'); o.value = v.id; o.textContent = v.naam + (v.nulmeting ? '' : ' · nog geen nulmeting'); sel.appendChild(o); }
+    if (!voertuigen.length) { const o = document.createElement('option'); o.value = ''; o.textContent = 'Geen vloot bij deze zaak'; sel.appendChild(o); }
+    $('#vOog').classList.remove('weg');
+    return true;
+  }
+  async function toonSchouwen() {
+    const r = await api('/schouwen', {});
+    const el = $('#logSchouw');
+    const rijen = r.body.schouwen || [];
+    el.innerHTML = rijen.length ? '' : '<p class="stil">Nog geen schouwen.</p>';
+    for (const s of rijen.slice(0, 12)) {
+      const d = document.createElement('div'); d.className = 'r';
+      d.innerHTML = '<span class="tijd">' + String(s.at).slice(11, 16) + '</span><span></span>';
+      d.lastChild.innerHTML = s.voertuigNaam + ' · ' + s.door + ' · ' +
+        (s.oordeel === 'schoon' ? '<span class="ok">schoon</span>' : '<span class="alarm">' + s.afwijkingen + ' afwijking(en)</span>');
+      el.appendChild(d);
+    }
+  }
+  async function toonVloer() {
+    const r = await fetch('/api/supplier/oog/overzicht', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' }).then(x => x.json()).catch(() => ({}));
+    const el = $('#logVloer');
+    const rijen = r.uitgifte || [];
+    el.innerHTML = rijen.length ? '' : '<p class="stil">Nog geen bewegingen.</p>';
+    for (const u of rijen.slice(0, 12)) {
+      const d = document.createElement('div'); d.className = 'r';
+      d.innerHTML = '<span class="tijd">' + String(u.at).slice(11, 16) + '</span><span></span>';
+      d.lastChild.innerHTML = u.door + ' ' + (u.richting === 'mee' ? '<span class="alarm">neemt mee</span>' : '<span class="ok">brengt terug</span>') + ': ' + u.itemNaam;
+      el.appendChild(d);
+    }
+  }
+
+  async function nulmeting() {
+    const d = grijp(video); if (!d) return zeg('De camera is nog niet klaar.');
+    const vid = $('#voertuig').value; if (!vid) return zeg('Kies een voertuig uit de vloot.');
+    const r = await api('/nulmeting', { voertuigId: vid, sig: schouwSig(d) });
+    zeg(r.body.error || 'Nulmeting vastgelegd; hier kijkt het oog voortaan tegenaan.');
+    laadStand();
+  }
+  async function schouw() {
+    const d = grijp(video); if (!d) return zeg('De camera is nog niet klaar.');
+    const vid = $('#voertuig').value; if (!vid) return zeg('Kies een voertuig uit de vloot.');
+    const nul = (await api('/nulmeting/van', { voertuigId: vid })).body.nulmeting;
+    if (!nul) return zeg('Leg eerst de nulmeting van dit voertuig vast.');
+    const zones = schouwVergelijk(nul.sig, schouwSig(d));
+    tekenRooster(zones);
+    const naam = ($('#voertuig').selectedOptions[0] || {}).textContent || 'Voertuig';
+    const r = await api('/schouw', { voertuigId: vid, voertuigNaam: naam.replace(/ · nog geen nulmeting$/, ''), zones });
+    if (r.body.error) return zeg(r.body.error);
+    const afw = zones.filter(z => z.oordeel === 'afwijking');
+    status(afw.length ? afw.length + ' zone(s) wijken af van de nulmeting: gelogd.' : 'Schoon ten opzichte van de nulmeting: gelogd.');
+    toonSchouwen();
+  }
+  async function leerAan() {
+    const d = grijp(video); if (!d) return zeg('De camera is nog niet klaar.');
+    const naam = $('#leerNaam').value.trim(); if (!naam) return zeg('Geef het item eerst een naam.');
+    const r = await api('/leer', { naam, sig: itemSig(d) });
+    if (r.body.error) return zeg(r.body.error);
+    $('#leerNaam').value = '';
+    zeg('Aangeleerd: ' + naam + '. Toon het en het oog logt vanzelf.');
+    laadStand();
+  }
+  // de knoploze lus: zie ik een aangeleerd item stabiel in beeld, dan log ik
+  async function vloerTik() {
+    if (modus !== 'vloer') return;
+    const d = grijp(video); if (!d) return;
+    const sig = itemSig(d);
+    let beste = null, hoogste = 0;
+    for (const it of spullen) { const g = gelijkenis(sig, it.sig); if (g > hoogste) { hoogste = g; beste = it; } }
+    if (beste && hoogste > 0.93) {
+      stabielN = stabiel === beste.id ? stabielN + 1 : 1; stabiel = beste.id;
+      status('Ik zie: ' + beste.naam + ' (' + Math.round(hoogste * 100) + '%)');
+      if (stabielN === 3 && (!koel[beste.id] || Date.now() - koel[beste.id] > 25000)) {
+        koel[beste.id] = Date.now();
+        const r = await api('/uitgifte', { itemId: beste.id });
+        if (r.body.regel && !r.body.dubbel)
+          zeg((r.body.regel.richting === 'mee' ? 'Meegenomen: ' : 'Teruggebracht: ') + beste.naam + ': zonder knop gelogd.');
+        toonVloer();
+      }
+    } else { stabiel = null; stabielN = 0; status(spullen.length ? 'Toon een aangeleerd item; ik log vanzelf.' : 'Leer eerst een item aan.'); }
+  }
+
+  function zetModus(m) {
+    modus = m;
+    $('#modeSchouw').setAttribute('aria-pressed', String(m === 'schouw'));
+    $('#modeVloer').setAttribute('aria-pressed', String(m === 'vloer'));
+    $('#paneelSchouw').classList.toggle('weg', m !== 'schouw');
+    $('#paneelVloer').classList.toggle('weg', m !== 'vloer');
+    tekenRooster(null);
+    status(m === 'schouw' ? 'Richt op het voertuig en schouw.' : 'Toon een aangeleerd item; ik log vanzelf.');
+    if (m === 'vloer') toonVloer(); else toonSchouwen();
+  }
+  $('#modeSchouw').addEventListener('click', () => zetModus('schouw'));
+  $('#modeVloer').addEventListener('click', () => zetModus('vloer'));
+  $('#knopNulmeting').addEventListener('click', nulmeting);
+  $('#knopSchouw').addEventListener('click', schouw);
+  $('#knopLeer').addEventListener('click', leerAan);
+
+  (async () => {
+    if (!token) { $('#vPoort').classList.remove('weg'); return; }
+    if (!(await laadStand())) return;
+    try {
+      video.srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: 1280 }, audio: false });
+      status('Richt op het voertuig en schouw.');
+    } catch (e) { status('Camera niet beschikbaar; geef toestemming.'); }
+    toonSchouwen();
+    setInterval(vloerTik, 450);
+  })();
+})();
+</script>
+</body>
+</html>

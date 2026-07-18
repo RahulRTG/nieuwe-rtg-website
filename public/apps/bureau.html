@@ -58,6 +58,42 @@
   .chip.leeg{color:var(--grijs-zacht);}
   .chip b{color:var(--inkt); font-weight:600;}
   .chip .stip{width:0.5rem; height:0.5rem; border-radius:50%; background:var(--goud);}
+  button.chip{cursor:pointer; font-family:inherit;}
+  button.chip:hover{border-color:color-mix(in srgb, var(--goud) 50%, transparent);}
+  button.chip .pijl{color:var(--grijs-zacht); font-size:0.6rem;}
+
+  /* de accountwisselaar: een klein glazen paneel onder de balk */
+  .account{position:relative;}
+  .menu{
+    position:absolute; top:calc(100% + 0.6rem); right:0; z-index:30;
+    min-width:16rem; max-width:22rem; padding:0.5rem;
+    background:rgba(20,18,17,0.96); backdrop-filter:blur(16px);
+    border:1px solid var(--lijn); border-radius:14px;
+    box-shadow:0 18px 44px rgba(0,0,0,0.5);
+    display:none; text-align:left;
+  }
+  .menu.open{display:block;}
+  .menu h3{
+    font-size:0.64rem; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--grijs-zacht); margin:0.3rem 0.5rem 0.5rem; font-weight:600;
+  }
+  .rij{
+    display:flex; align-items:center; gap:0.5rem;
+    padding:0.5rem; border-radius:9px; text-decoration:none; color:var(--inkt);
+    width:100%; border:none; background:none; font:inherit; text-align:left; cursor:pointer;
+  }
+  .rij:hover{background:rgba(255,255,255,0.05);}
+  .rij .naam2{flex:1; font-size:0.84rem;}
+  .rij .rol{font-size:0.68rem; color:var(--grijs-zacht);}
+  .rij.actief .naam2::after{content:' \2713'; color:var(--goud);}
+  .rij .venster{
+    border:1px solid var(--lijn); border-radius:7px; background:none; color:var(--grijs);
+    padding:0.15rem 0.45rem; font-size:0.7rem; cursor:pointer;
+  }
+  .rij .venster:hover{border-color:color-mix(in srgb, var(--goud) 55%, transparent); color:var(--inkt);}
+  .menu .scheiding{height:1px; background:var(--lijn); margin:0.4rem 0;}
+  .menu .toevoeg{color:var(--grijs); font-size:0.8rem;}
+  .menu .toevoeg:hover{color:var(--inkt);}
 
   main{padding:clamp(1.4rem,4vw,3rem) clamp(1rem,4vw,2.6rem) 4rem; max-width:1180px; margin:0 auto;}
   .sectiekop{
@@ -150,31 +186,85 @@
   tik();
   setInterval(tik, 15000);
 
-  // ---- accounts op dit toestel ----
+  // ---- de accountwisselaar ----
   // De accountkluis onthoudt aangemelde accounts per wereld; daarnaast lezen we
-  // de kale app-tokens, zodat een bestaande inlog meteen zichtbaar is (ook al
-  // is de kluis nog niet gevuld). Puur tonen; wisselen komt in de volgende stap.
+  // de kale app-tokens, zodat een bestaande inlog meteen zichtbaar is. Per
+  // wereld een chip met een menu: wisselen (actief maken en de app openen),
+  // een account in een NIEUW venster openen (echt tegelijk), of er een
+  // toevoegen.
   function lees(sleutel) { try { return localStorage.getItem(sleutel); } catch (e) { return null; } }
+  function ontsnap(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var vak = document.getElementById('account');
+  var kluis = window.RTGAccounts ? window.RTGAccounts.maak() : null;
+  var werelden = kluis ? kluis.WERELDEN : {};
+  var openMenu = null;
+  function sluit() { if (openMenu) { openMenu.classList.remove('open'); openMenu = null; } }
+  document.addEventListener('click', function (e) { if (openMenu && !openMenu.parentNode.contains(e.target)) sluit(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
+  function ingang(w) { return '/' + werelden[w].ingang; }
+
+  function bouwChip(w) {
+    var info = werelden[w];
+    var actief = kluis ? kluis.actief(w) : null;
+    var label = actief && actief.label ? actief.label : info.naam;
+    var wrap = document.createElement('div'); wrap.className = 'chipwrap'; wrap.style.position = 'relative';
+    var knop = document.createElement('button');
+    knop.className = 'chip'; knop.type = 'button';
+    knop.setAttribute('aria-haspopup', 'true'); knop.setAttribute('aria-expanded', 'false');
+    knop.innerHTML = '<span class="stip"></span>' + ontsnap(info.naam) +
+      (label !== info.naam ? ' &middot; <b>' + ontsnap(label) + '</b>' : '') + ' <span class="pijl">▾</span>';
+    var menu = document.createElement('div'); menu.className = 'menu';
+    var h = document.createElement('h3'); h.textContent = info.naam; menu.appendChild(h);
+
+    var lijst = kluis ? kluis.lijst(w) : [];
+    lijst.forEach(function (a) {
+      var rij = document.createElement('button'); rij.type = 'button';
+      rij.className = 'rij' + (actief && a.id === actief.id ? ' actief' : '');
+      var nm = document.createElement('span'); nm.className = 'naam2'; nm.textContent = a.label; rij.appendChild(nm);
+      var venster = document.createElement('span'); venster.className = 'venster'; venster.textContent = '↗ venster';
+      venster.title = 'Open dit account in een nieuw venster, naast je huidige';
+      venster.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var u = kluis.vensterURL(w, a.id);
+        if (u) window.open('/' + u, '_blank', 'noopener');
+        sluit();
+      });
+      rij.appendChild(venster);
+      rij.addEventListener('click', function () { kluis.wissel(w, a.id); kluis.pasToe(w); location.href = ingang(w); });
+      menu.appendChild(rij);
+    });
+    if (!lijst.length) {
+      var leeg = document.createElement('div'); leeg.className = 'rol'; leeg.style.padding = '0.2rem 0.5rem 0.5rem';
+      leeg.textContent = 'Je bent aangemeld. Zodra je in de app (opnieuw) inlogt, verschijnen hier je accounts om tussen te wisselen.';
+      menu.appendChild(leeg);
+    }
+    var sep = document.createElement('div'); sep.className = 'scheiding'; menu.appendChild(sep);
+    var toevoeg = document.createElement('a'); toevoeg.className = 'rij toevoeg'; toevoeg.href = ingang(w);
+    toevoeg.textContent = '+  Nog een account toevoegen'; menu.appendChild(toevoeg);
+
+    knop.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var wasOpen = menu.classList.contains('open');
+      sluit();
+      if (!wasOpen) { menu.classList.add('open'); knop.setAttribute('aria-expanded', 'true'); openMenu = menu; }
+      else { knop.setAttribute('aria-expanded', 'false'); }
+    });
+    wrap.appendChild(knop); wrap.appendChild(menu);
+    return wrap;
+  }
+
   function toonAccounts() {
-    var vak = document.getElementById('account');
-    var kluis = window.RTGAccounts ? window.RTGAccounts.maak() : null;
-    var werelden = kluis ? kluis.WERELDEN : (window.RTGAccounts ? window.RTGAccounts.WERELDEN : {});
-    var chips = [];
+    vak.innerHTML = '';
+    var enige = false;
     Object.keys(werelden).forEach(function (w) {
       var info = werelden[w];
-      var actief = kluis ? kluis.actief(w) : null;
-      var ingelogd = actief || lees(info.sleutel);
-      if (!ingelogd) return;
-      var label = actief && actief.label ? actief.label : info.naam;
-      var aantal = kluis ? kluis.lijst(w).length : 0;
-      chips.push('<span class="chip"><span class="stip"></span>' + info.naam +
-        (label !== info.naam ? ' &middot; <b>' + label + '</b>' : '') +
-        (aantal > 1 ? ' (' + aantal + ')' : '') + '</span>');
+      if (!((kluis && kluis.actief(w)) || lees(info.sleutel))) return;
+      enige = true;
+      vak.appendChild(bouwChip(w));
     });
-    if (!chips.length) {
-      vak.innerHTML = '<span class="chip leeg">Nog niet aangemeld</span>';
-    } else {
-      vak.innerHTML = chips.join('');
+    if (!enige) {
+      var chip = document.createElement('span'); chip.className = 'chip leeg';
+      chip.textContent = 'Nog niet aangemeld'; vak.appendChild(chip);
     }
   }
   toonAccounts();

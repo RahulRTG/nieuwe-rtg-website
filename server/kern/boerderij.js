@@ -390,7 +390,8 @@ function maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon }) {
     if (actie) return actie;
     if (aiAan && anthropic) {
       try {
-        const sys = 'Je bent de ervaren, praktische bedrijfsadviseur van een boer op het RTG-platform. Antwoord kort, concreet en in het Nederlands. Hier is de huidige situatie: ' + samenvatting(s) + ' Geef bruikbaar advies over gewassen, dieren, planning en seizoen.';
+        const { RAHUL_LEAD } = require('./rahul');
+        const sys = RAHUL_LEAD + 'je bent de ervaren, praktische bedrijfsadviseur van een boer op het RTG-platform. Antwoord kort, concreet en in het Nederlands. Hier is de huidige situatie: ' + samenvatting(s) + ' Geef bruikbaar advies over gewassen, dieren, planning en seizoen.';
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 400, system: sys, messages: [{ role: 'user', content: vraag }] });
         const tekst = (r && r.content && r.content[0] && r.content[0].text || '').trim();
         if (tekst) return { antwoord: tekst };

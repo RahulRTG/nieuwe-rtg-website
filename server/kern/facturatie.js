@@ -179,7 +179,8 @@ function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify
         const kort = ctx.supplierCode
           ? 'Verkocht: ' + set.stats.verkocht + ' facturen, omzet EUR ' + set.stats.omzet + ', btw EUR ' + set.stats.btwAfdracht + '.'
           : 'Ontvangen: ' + set.telling + ' facturen, samen EUR ' + set.besteed + '.';
-        const sys = 'Je bent de facturen-assistent op RTG. Antwoord kort en concreet in het Nederlands. Situatie: ' + kort;
+        const { RAHUL_LEAD } = require('./rahul');
+        const sys = RAHUL_LEAD + 'je bent de facturen-assistent op RTG. Antwoord kort en concreet in het Nederlands. Situatie: ' + kort;
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 300, system: sys, messages: [{ role: 'user', content: opdracht }] });
         const t = (r && r.content && r.content[0] && r.content[0].text || '').trim();
         if (t) return { antwoord: t };

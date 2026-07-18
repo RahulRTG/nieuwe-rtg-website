@@ -765,7 +765,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
         'Open klussen: ' + (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length + '.';
       const response = await anthropic.messages.create({
         model: 'claude-sonnet-5', max_tokens: 300,
-        system: 'Je bent de AI-assistent van een RTG-partner. Antwoord kort en concreet in de taal van de vraag. Context: ' + ctx,
+        system: require('../kern/rahul').RAHUL_LEAD + 'je bent de AI-assistent van een RTG-partner. Antwoord kort en concreet in de taal van de vraag. Context: ' + ctx,
         messages: [{ role: 'user', content: q }]
       });
       return A(response.content[0].text);

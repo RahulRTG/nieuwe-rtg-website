@@ -307,7 +307,7 @@ app.post('/api/supplier/coach', supplierAuth, async (req, res) => {
       const context = eigen.concat(bib).slice(0, 20).map(t => '- ' + t.t + ': ' + t.s).join('\n');
       const msg = await anthropic.messages.create({
         model: 'claude-haiku-4-5-20251001', max_tokens: 300,
-        system: 'Je bent een vriendelijke, ervaren horeca- en service-coach voor het personeel van een topzaak (5-sterren-hotel, Michelin-niveau). '
+        system: require('../../kern/rahul').RAHUL_LEAD + 'je bent een vriendelijke, ervaren horeca- en service-coach voor het personeel van een topzaak (5-sterren-hotel, Michelin-niveau). '
           + 'Antwoord in het Nederlands, kort en praktisch (maximaal 4 zinnen), concreet en bemoedigend. '
           + 'Bij een allergie ben je stellig over veilige bereiding en dubbelcheck. '
           + 'De functie van het teamlid is: ' + (func || 'onbekend') + '. '

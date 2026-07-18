@@ -28,7 +28,12 @@ const bundels = {
   'apps/app-main.js': 'apps/app-main',
   'apps/personeel.js': 'apps/personeel',
   'apps/backoffice.js': 'apps/backoffice',
-  'apps/techniek.js': 'apps/techniek'
+  'apps/techniek.js': 'apps/techniek',
+  'apps/foundation/gezin-rt.js': 'apps/foundation/gezin-rt',
+  'shared/werkos.js': 'shared/werkos',
+  'shared/verbinding.js': 'shared/verbinding',
+  'shared/osmenu.js': 'shared/osmenu',
+  'shared/teamcall.js': 'shared/teamcall'
 };
 
 function deelBestanden(deelMap) {

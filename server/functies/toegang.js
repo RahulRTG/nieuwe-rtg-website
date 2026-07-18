@@ -60,16 +60,27 @@ function functieAanVoor(id, doelgroep, staat) {
 function blokkadeReden(id, staat, ctx) {
   if (!functieAan(id, staat)) return 'globaal';
   const s = staat && staat[id];
-  if (!s) return null;
   const c = ctx || {};
-  if (c.doelgroep && s.perDoelgroep && s.perDoelgroep[c.doelgroep] === false) return 'pas';
-  if (c.land && s.perLand && s.perLand[c.land] === false) return 'land';
-  if (c.persoon && s.perPersoon && s.perPersoon[c.persoon] === false) return 'persoon';
-  // de leveranciers-regie: een functie kan per GENRE zaken dicht (bijv. RTG
-  // Eye niet voor horeca); het genre komt uit de zaak achter het verzoek
-  if (c.genre && s.perGenre && s.perGenre[c.genre] === false) return 'genre';
+  if (s) {
+    if (c.doelgroep && s.perDoelgroep && s.perDoelgroep[c.doelgroep] === false) return 'pas';
+    if (c.land && s.perLand && s.perLand[c.land] === false) return 'land';
+    if (c.persoon && s.perPersoon && s.perPersoon[c.persoon] === false) return 'persoon';
+    // de leveranciers-regie: een functie kan per GENRE zaken dicht (bijv. RTG
+    // Eye niet voor horeca); het genre komt uit de zaak achter het verzoek
+    if (c.genre && s.perGenre && s.perGenre[c.genre] === false) return 'genre';
+  }
+  // de STANDAARD-matrix: een functie met alleenGenres is voor andere genres
+  // standaard dicht; een expliciete uitzondering (perGenre true) opent hem
+  if (c.genre) {
+    const f = OP_ID[id];
+    const uitzondering = s && s.perGenre && s.perGenre[c.genre] === true;
+    if (f && Array.isArray(f.alleenGenres) && !f.alleenGenres.includes(c.genre) && !uitzondering) return 'genre';
+  }
   return null;
 }
+// Staat er ergens een standaard-genre-matrix in de catalogus? Dan moet de
+// middleware het genre ook opzoeken als er (nog) geen bewaarde regels zijn.
+const HEEFT_GENRE_STANDAARD = FUNCTIES.some(f => Array.isArray(f.alleenGenres));
 // Staan er ergens land-regels? Zo niet, dan hoeft de middleware het land van het
 // lid niet op te zoeken (scheelt een opzoeking per verzoek).
 function heeftLandRegels(staat) {
@@ -119,4 +130,5 @@ function doelgroepVanVerzoek(pad, user) {
 // bord). Elke functie toont de globale stand plus haar doelgroepen met eigen stand.
 
 module.exports = { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
-  heeftLandRegels, heeftGenreRegels, blokkadeReden, padGeblokkeerd, doelgroepVanVerzoek, tierNaarDoelgroep };
+  heeftLandRegels, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd,
+  doelgroepVanVerzoek, tierNaarDoelgroep };

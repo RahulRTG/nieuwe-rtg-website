@@ -212,7 +212,16 @@ module.exports = (tctx) => {
         continue;
       }
       const cur = t.functies[w.id] = t.functies[w.id] || {};
-      if (w.genre) { cur.perGenre = cur.perGenre || {}; if (w.aan) delete cur.perGenre[w.genre]; else cur.perGenre[w.genre] = false; }
+      if (w.genre) {
+        cur.perGenre = cur.perGenre || {};
+        const f = functies.OP_ID[w.id];
+        // aan: terug naar de standaard, of een expliciete uitzondering als de
+        // standaard-matrix (alleenGenres) dit genre normaal niet kent
+        if (w.aan) {
+          if (f && Array.isArray(f.alleenGenres) && !f.alleenGenres.includes(w.genre)) cur.perGenre[w.genre] = true;
+          else delete cur.perGenre[w.genre];
+        } else cur.perGenre[w.genre] = false;
+      }
       else if (w.doelgroep) { cur.perDoelgroep = cur.perDoelgroep || {}; cur.perDoelgroep[w.doelgroep] = w.aan; }
       else cur.aan = w.aan;
       toegepast++;

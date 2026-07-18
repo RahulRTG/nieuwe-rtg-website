@@ -67,14 +67,21 @@ module.exports = (ctx) => {
   }
 
   /* De leveranciers-regie: een functie per GENRE zaken open of dicht (bijv.
-     RTG Eye niet voor horeca). aan=true haalt de regel weg (terug naar open). */
+     RTG Eye niet voor horeca). aan=true zet een expliciete uitzondering open;
+     dat werkt ook voor genres die volgens de standaard-matrix (alleenGenres in
+     de catalogus) normaal dicht staan. */
   function schakelGenre(id, genre, aan, wie) {
-    if (!functies.OP_ID[id]) return { status: 404, error: 'Onbekende functie.' };
+    const f = functies.OP_ID[id];
+    if (!f) return { status: 404, error: 'Onbekende functie.' };
     if (!d().supplierTypes || !d().supplierTypes[genre]) return { status: 404, error: 'Dit genre bestaat niet.' };
     const st = functiesStand();
     if (!st[id]) st[id] = {};
     st[id].perGenre = st[id].perGenre || {};
-    if (aan === true) delete st[id].perGenre[genre]; else st[id].perGenre[genre] = false;
+    if (aan === true) {
+      // terug naar de standaard als die dit genre al kent; anders een uitzondering
+      if (Array.isArray(f.alleenGenres) && !f.alleenGenres.includes(genre)) st[id].perGenre[genre] = true;
+      else delete st[id].perGenre[genre];
+    } else st[id].perGenre[genre] = false;
     save();
     audit(wie || 'boardroom', 'Functie ' + id + ' voor genre ' + genre + ' ' + (aan === true ? 'AAN' : 'UIT') + ' gezet');
     return { ok: true, functie: id, genre, aan: aan === true };
@@ -83,9 +90,16 @@ module.exports = (ctx) => {
     const st = functiesStand();
     const uit = [];
     for (const [id, s] of Object.entries(st))
-      for (const [genre, aan] of Object.entries(s.perGenre || {}))
-        if (aan === false) uit.push({ functie: id, naam: (functies.OP_ID[id] || {}).naam || id, genre });
+      for (const [genre, aan] of Object.entries(s.perGenre || {})) {
+        if (aan === false) uit.push({ functie: id, naam: (functies.OP_ID[id] || {}).naam || id, genre, soort: 'dicht' });
+        if (aan === true) uit.push({ functie: id, naam: (functies.OP_ID[id] || {}).naam || id, genre, soort: 'uitzondering' });
+      }
     return uit;
+  }
+  // de vaste PDA-matrix uit de catalogus: welke werk-app hoort bij welke genres
+  function genreStandaard() {
+    return functies.FUNCTIES.filter(f => Array.isArray(f.alleenGenres))
+      .map(f => ({ functie: f.id, naam: f.naam, alleen: f.alleenGenres }));
   }
 
   /* De grote hendel: ALLES in een keer beschikbaar zetten of sluiten, voor
@@ -142,6 +156,7 @@ module.exports = (ctx) => {
       kamers: kamers().kamers,
       functies: cat, doelgroepen: functies.DOELGROEPEN,
       genreRegels: genreRegels(),
+      genreStandaard: genreStandaard(),
       genres: Object.entries(d().supplierTypes || {}).map(([id, t]) => ({ id, label: t.label, icon: t.icon })),
       functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),
       verbeterkamer: voorstellen(false),

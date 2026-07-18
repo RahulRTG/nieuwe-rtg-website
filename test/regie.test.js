@@ -118,3 +118,29 @@ test('6. de leveranciers-regie: een functie per genre zaken dicht, andere genres
   await api('/api/office/boardroom/genre', { functie: 'ov', genre: 'ov', aan: true }, office);
   assert.equal((await api('/api/supplier/ov/overzicht', {}, ovZaak)).status, 200, 'weer open voor het genre');
 });
+
+test('7. de vaste PDA-matrix: werk-apps horen standaard bij passende genres, met uitzonderingen', async () => {
+  // een restaurant (Sal de Mar) heeft RTG Eye en Ghost Driver niet nodig: standaard dicht
+  const roster = await api('/api/supplier/roster', { code: 'KIKUNOI' });
+  const kok = roster.body.staff.find(x => x.role !== 'manager');
+  const restoPda = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: kok.id, pin: '5678' })).body.token;
+  const oogDicht = await api('/api/staff/oog', {}, restoPda);
+  assert.equal(oogDicht.status, 503, 'RTG Eye staat standaard niet op de horeca-PDA');
+  assert.equal(oogDicht.body.reden, 'genre');
+  const m = roster.body.staff.find(x => x.role === 'manager');
+  const restoZaak = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: m.id, pin: '1234' })).body.token;
+  assert.equal((await api('/api/supplier/ghost', {}, restoZaak)).status, 503, 'Ghost Driver ook niet');
+  // een vervoerder (taxi) heeft ze wel: de standaard-matrix laat hem door
+  const taxiRoster = await api('/api/supplier/roster', { code: 'MKKX' });
+  const chauffeur = taxiRoster.body.staff.find(x => x.role !== 'manager');
+  const taxiPda = (await api('/api/supplier/login', { code: 'MKKX', staffId: chauffeur.id, pin: '5678' })).body.token;
+  assert.equal((await api('/api/staff/oog', {}, taxiPda)).status, 200, 'de taxi-PDA heeft RTG Eye gewoon');
+  // de boardroom maakt een uitzondering: Eye toch open voor restaurants, en weer dicht
+  await api('/api/office/boardroom/genre', { functie: 'oog', genre: 'restaurant', aan: true }, office);
+  assert.equal((await api('/api/staff/oog', {}, restoPda)).status, 200, 'de uitzondering opent hem');
+  const bord = await api('/api/office/boardroom', {}, office);
+  assert.ok(bord.body.genreRegels.some(r => r.functie === 'oog' && r.soort === 'uitzondering'), 'de uitzondering staat op het bord');
+  assert.ok(bord.body.genreStandaard.some(s => s.functie === 'oog' && s.alleen.includes('taxi')), 'de vaste matrix staat op het bord');
+  await api('/api/office/boardroom/genre', { functie: 'oog', genre: 'restaurant', aan: false }, office);
+  assert.equal((await api('/api/staff/oog', {}, restoPda)).status, 503, 'en dicht is weer dicht');
+});

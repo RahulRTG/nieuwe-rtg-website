@@ -41,12 +41,13 @@
    gelijk, dus geen enkele aanroeper merkt er iets van. */
 const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID } = require('./functies/register');
 const { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
-  heeftLandRegels, heeftGenreRegels, blokkadeReden, padGeblokkeerd, doelgroepVanVerzoek, tierNaarDoelgroep } = require('./functies/toegang');
+  heeftLandRegels, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd,
+  doelgroepVanVerzoek, tierNaarDoelgroep } = require('./functies/toegang');
 const { catalogus, valideerVoorstel, duidVoorstel } = require('./functies/voorstel');
 
 module.exports = {
   FUNCTIES, CATEGORIEEN, OP_ID, DOELGROEPEN, DOELGROEP_IDS,
   functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
-  heeftLandRegels, heeftGenreRegels, blokkadeReden, padGeblokkeerd, catalogus,
+  heeftLandRegels, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd, catalogus,
   doelgroepVanVerzoek, tierNaarDoelgroep, valideerVoorstel, duidVoorstel
 };

@@ -575,9 +575,13 @@ async function openBoard(){
   $('#lrGenre').innerHTML = (d.genres || []).map(g => '<option value="'+esc(g.id)+'">'+esc((g.icon||'')+' '+(g.label||g.id))+'</option>').join('');
   if (lrF) $('#lrFunctie').value = lrF;
   if (lrG) $('#lrGenre').value = lrG;
-  $('#lrRegels').innerHTML = (d.genreRegels && d.genreRegels.length)
-    ? 'Gesloten: ' + d.genreRegels.map(r => esc(r.naam) + ' voor ' + esc(r.genre)).join(' · ')
-    : 'Geen genre-regels; elke werk-app staat open voor elk genre.';
+  const dichtRegels = (d.genreRegels || []).filter(r => r.soort !== 'uitzondering');
+  const uitzonderingen = (d.genreRegels || []).filter(r => r.soort === 'uitzondering');
+  $('#lrRegels').innerHTML =
+    (d.genreStandaard || []).map(s => 'Standaard: ' + esc(s.naam) + ' alleen voor ' + s.alleen.map(esc).join(', ')).join('<br>') +
+    (dichtRegels.length ? '<br>Gesloten door de boardroom: ' + dichtRegels.map(r => esc(r.naam) + ' voor ' + esc(r.genre)).join(' · ') : '') +
+    (uitzonderingen.length ? '<br>Uitzonderingen (open buiten de standaard): ' + uitzonderingen.map(r => esc(r.naam) + ' voor ' + esc(r.genre)).join(' · ') : '') +
+    (!dichtRegels.length && !uitzonderingen.length && !(d.genreStandaard || []).length ? 'Geen genre-regels; elke werk-app staat open voor elk genre.' : '');
   $('#bTelling').textContent = d.functiesUit ? '(' + d.functiesUit + ' uit)' : '(alles staat aan)';
   $('#bSchakels').innerHTML = d.functies.map(g =>
     '<div class="kaart cat"><h4>'+esc(g.categorie)+'</h4>'+g.functies.map(f =>

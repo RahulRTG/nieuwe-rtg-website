@@ -417,9 +417,11 @@ app.use((req, res, next) => {
   }
   const doelgroep = functies.doelgroepVanVerzoek(p, user) ||
     (sessieTier ? functies.tierNaarDoelgroep(sessieTier) : null);
-  // de leveranciers-regie: alleen als er genre-regels staan zoeken we de zaak
-  // achter een leveranciers-/personeelsverzoek op (scheelt werk per verzoek)
-  if ((p.startsWith('/api/supplier') || p.startsWith('/api/staff')) && functies.heeftGenreRegels(staat)) {
+  // de leveranciers-regie: alleen als er genre-regels staan (bewaard of als
+  // standaard-matrix in de catalogus) zoeken we de zaak achter een
+  // leveranciers-/personeelsverzoek op (scheelt werk per verzoek)
+  if ((p.startsWith('/api/supplier') || p.startsWith('/api/staff')) &&
+      (functies.HEEFT_GENRE_STANDAARD || functies.heeftGenreRegels(staat))) {
     try {
       const s = tok && sessionFor(tok);
       if (s && s.role === 'supplier') { const z = findSupplier(s.code); zaakGenre = z ? z.type : null; }

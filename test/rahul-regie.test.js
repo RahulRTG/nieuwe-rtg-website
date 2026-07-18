@@ -60,7 +60,7 @@ test('2. per genre in gewone taal: sluit RTG Eye voor een genre zaken', async ()
   assert.ok(bord.body.genreRegels.some(r => r.functie === 'oog' && r.genre === genre), 'de regel staat op het bord');
   await api('/api/boardroom/toepassen', { voorstel: [{ id: 'oog', genre, aan: true }] }, tech);
   const na = await api('/api/office/boardroom', {}, office);
-  assert.ok(!na.body.genreRegels.some(r => r.functie === 'oog'), 'en gaat er ook weer af');
+  assert.ok(!na.body.genreRegels.some(r => r.functie === 'oog' && r.soort === 'dicht'), 'de sluiting gaat er ook weer af');
 });
 
 test('3. de geld-regie in gewone taal: pasprijs en ledenvoordeel, met de vaste grenzen', async () => {

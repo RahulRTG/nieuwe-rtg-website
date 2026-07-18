@@ -89,9 +89,12 @@ test('prototype-pollution via de body omzeilt de auth niet en laat de server sta
 test('security-headers staan op elk antwoord', async () => {
   const r = await fetch(BASE + '/api/health');
   assert.equal(r.headers.get('x-content-type-options'), 'nosniff', 'geen MIME-sniffing');
-  assert.equal(r.headers.get('x-frame-options'), 'DENY', 'geen clickjacking (framing verboden)');
+  // SAMEORIGIN: het eigen bureaublad mag de apps insluiten, andere sites niet
+  // (clickjacking-bescherming tegen derden blijft; framing is niet vrij).
+  assert.equal(r.headers.get('x-frame-options'), 'SAMEORIGIN', 'framing alleen vanaf dezelfde origin');
   const csp = r.headers.get('content-security-policy') || '';
-  assert.match(csp, /frame-ancestors 'none'/, 'CSP verbiedt framing');
+  assert.match(csp, /frame-ancestors 'self'/, 'CSP staat framing alleen vanaf dezelfde origin toe');
+  assert.doesNotMatch(csp, /frame-ancestors[^;]*\*/, 'CSP staat geen framing door derden toe');
   assert.match(csp, /object-src 'none'/, 'CSP verbiedt plug-ins/objecten');
 });
 

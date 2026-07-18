@@ -125,6 +125,22 @@
   .app.site .tegel{background:linear-gradient(155deg,#201A1C 0%,#161113 62%,#120F10 100%);}
   .naam{font-size:0.78rem; text-align:center; color:var(--grijs); letter-spacing:0.01em;}
   .toelichting{color:var(--grijs-zacht); font-size:0.82rem; max-width:60ch; margin:0.2rem 0 0.6rem;}
+
+  /* een geopende app: schermvullend venster met de app in een iframe */
+  .appvenster{position:fixed; inset:0; z-index:2147482000; background:var(--grond); display:none;}
+  .appvenster.open{display:block;}
+  .appvenster iframe{position:absolute; inset:0; width:100%; height:100%; border:none; background:var(--grond);}
+  .appterug{
+    position:fixed; top:calc(env(safe-area-inset-top,0px) + 0.7rem); left:calc(env(safe-area-inset-left,0px) + 0.7rem);
+    z-index:2147482100; display:none; align-items:center; gap:0.4rem;
+    background:rgba(18,16,15,0.82); backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.14); border-radius:999px;
+    color:var(--inkt); padding:0.42rem 0.9rem 0.42rem 0.72rem; font-family:inherit; font-size:0.76rem; cursor:pointer;
+    box-shadow:0 8px 24px rgba(0,0,0,0.42);
+  }
+  .appterug.open{display:inline-flex;}
+  .appterug:hover{border-color:color-mix(in srgb, var(--goud) 55%, transparent);}
+  .appterug svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
 </style>
 </head>
 <body>
@@ -269,6 +285,67 @@
     }
   }
   toonAccounts();
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  // Een tegel opent de app SCHERMVULLEND: we laden hem in een iframe dat het
+  // hele scherm vult en vragen volledig scherm aan (mag, want het is een tik).
+  // De <a href> blijft als terugval werken zonder JavaScript.
+  var overlay = document.createElement('div');
+  overlay.className = 'appvenster';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-label', 'Geopende app');
+  var frame = document.createElement('iframe');
+  frame.setAttribute('allow', 'fullscreen; geolocation; camera; microphone; clipboard-write');
+  frame.title = 'RTG-app';
+  overlay.appendChild(frame);
+
+  var terug = document.createElement('button');
+  terug.type = 'button';
+  terug.className = 'appterug';
+  terug.setAttribute('aria-label', 'Terug naar het bureaublad');
+  terug.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Bureaublad</span>';
+
+  function volledig() {
+    var e = document.documentElement;
+    var f = e.requestFullscreen || e.webkitRequestFullscreen;
+    if (f && !(document.fullscreenElement || document.webkitFullscreenElement)) { try { f.call(e); } catch (x) {} }
+  }
+  function open(url, naam) {
+    frame.src = url;
+    frame.title = naam || 'RTG-app';
+    overlay.classList.add('open');
+    terug.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    volledig();
+  }
+  function sluit() {
+    overlay.classList.remove('open');
+    terug.classList.remove('open');
+    frame.src = 'about:blank';
+    document.body.style.overflow = '';
+    var d = document;
+    if (d.fullscreenElement || d.webkitFullscreenElement) { (d.exitFullscreen || d.webkitExitFullscreen || function () {}).call(d); }
+  }
+  terug.addEventListener('click', sluit);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay.classList.contains('open')) sluit(); });
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(terug);
+
+  Array.prototype.forEach.call(document.querySelectorAll('main .app'), function (a) {
+    a.addEventListener('click', function (e) {
+      // een bewuste nieuwe-tab-klik (cmd/ctrl/midden) met rust laten
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+      var href = a.getAttribute('href');
+      if (!href) return;
+      e.preventDefault();
+      var n = a.querySelector('.naam');
+      open(href, n ? n.textContent : '');
+    });
+  });
 })();
 </script>
 </body>

@@ -282,7 +282,10 @@ app.use(schild.middleware);
    verkeer dan de Google Fonts en blokkeert framing en MIME-sniffing. */
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
-  res.set('X-Frame-Options', 'DENY');
+  // SAMEORIGIN i.p.v. DENY: het RTG-bureaublad (zelfde origin) mag onze eigen
+  // apps schermvullend insluiten; andere sites kunnen ons nog steeds niet
+  // framen (clickjacking-bescherming blijft tegen derden overeind).
+  res.set('X-Frame-Options', 'SAMEORIGIN');
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   // 9+-hardening: eigen vensters delen geen proces met vreemden (COOP), onze
   // bestanden zijn niet als bron voor andere sites bruikbaar (CORP), de
@@ -296,7 +299,7 @@ app.use((req, res, next) => {
   res.set('Content-Security-Policy',
     "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
     "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
-    "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
+    "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
   next();
 });
 
@@ -524,7 +527,7 @@ app.use((req, res, next) => {
     res.set('Content-Security-Policy',
       "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline'; " +
       "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
-      "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
+      "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
     res.type('html');
     // ook de pagina's zelf gecomprimeerd over de lijn (satelliet en traag mobiel)
     if (html.length > 2048 && /\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) {

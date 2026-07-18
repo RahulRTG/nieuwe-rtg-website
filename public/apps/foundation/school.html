@@ -511,5 +511,6 @@ if (s && s.token) laadGezin();
 else { toon('leraar'); if (dirOpgeslagen) laadDirectie(dirOpgeslagen.code, dirOpgeslagen.token); else if (persOpgeslagen) laadPersoneel(persOpgeslagen.code, persOpgeslagen.token); }
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/schermbeeld.js" defer></script>
 </body>
 </html>

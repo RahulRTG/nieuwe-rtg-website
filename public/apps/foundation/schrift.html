@@ -212,5 +212,6 @@ $('#liveDot').classList.add('aan'); $('#liveTxt').textContent='live';
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 window.addEventListener('beforeunload', ()=>{ try{ vangHuidigeTekening(); navigator.sendBeacon && navigator.sendBeacon('/api/foundation/schrift/opslaan', new Blob([JSON.stringify({code:CODE,token:TOKEN,pages})],{type:'application/json'})); }catch(e){} });
 </script>
+<script src="/shared/schermbeeld.js" defer></script>
 </body>
 </html>

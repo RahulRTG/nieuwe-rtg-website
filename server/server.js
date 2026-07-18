@@ -2686,6 +2686,14 @@ Object.assign(kern, maakOntmoeting({
   connectieTussen: kern.connectieTussen, verbActief: kern.verbActief,
   zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, haversine
 }));
+/* RTG Podium (kern/podium.js): het eigen live-kanaal van De Salon. Strikt 18+
+   achter dezelfde paspoortpoort als de ontmoetingen; een kanaal gaat pas open
+   na menselijke goedkeuring door kantoor; cadeautjes en abonnementen lopen
+   via RTG Pay. Na pay en sociaal gemount (gebruikt beide). */
+Object.assign(kern, require('./kern/podium').maakPodium({
+  db, save, crypto, accounts, leeftijdVan, codenaamVan: kern.codenaamVan,
+  sseToCustomer, sseToOffice, notify, pay: kern.pay, schoon
+}));
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
    geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen
    die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar
@@ -2711,6 +2719,7 @@ require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
 require('./routes/kantoren')(kern);
 require('./routes/pay')(kern);
+require('./routes/podium')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

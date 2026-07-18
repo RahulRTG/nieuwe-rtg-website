@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Podium</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--rood:#DE6E92;--rood-diep:#C23A5E;--groen:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;letter-spacing:0.02em;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .badge.plus{color:var(--rood);border-color:rgba(194,58,94,0.5);}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:760px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.rood{border-color:rgba(194,58,94,0.55);color:var(--rood);}
+  .knop:focus-visible,.kan:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  /* de zaal */
+  .kan{display:flex;align-items:center;gap:0.8rem;width:100%;text-align:left;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;padding:0.85rem 1rem;margin:0.55rem 0;color:var(--txt);}
+  .kan .hoes{width:46px;height:46px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;
+    font-family:'Bodoni Moda',serif;font-size:1.25rem;background:linear-gradient(150deg,#241B2E,#7F1634 90%);}
+  .kan .wie{flex:1;min-width:0;}
+  .kan .naam{font-weight:600;font-size:0.92rem;}
+  .kan .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
+  .liveDot{display:inline-flex;align-items:center;gap:0.35rem;font-size:0.66rem;letter-spacing:0.1em;
+    text-transform:uppercase;color:var(--rood);font-weight:600;}
+  .liveDot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--rood-diep);}
+  /* de uitzending */
+  .scherm{position:relative;background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/10;}
+  .scherm video{width:100%;height:100%;object-fit:cover;display:block;}
+  .scherm .over{position:absolute;left:0.7rem;top:0.7rem;display:flex;gap:0.5rem;align-items:center;}
+  .scherm .tel{position:absolute;right:0.7rem;top:0.7rem;font-size:0.72rem;background:rgba(12,12,11,0.7);
+    border-radius:999px;padding:0.25rem 0.6rem;}
+  .chat{height:200px;overflow-y:auto;background:var(--card2);border:1px solid var(--line);border-radius:12px;
+    padding:0.7rem;margin-top:0.7rem;font-size:0.82rem;line-height:1.5;}
+  .chat .r{margin:0.2rem 0;overflow-wrap:anywhere;}
+  .chat .wie{color:var(--gold);font-weight:600;}
+  .chat .wie.abb::after{content:" ★";color:var(--rood);}
+  .chat .cad{color:var(--rood);}
+  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  .rij input{flex:1;min-width:9rem;width:auto;}
+  .cadeaus{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;}
+  .cadeaus .knop{display:flex;flex-direction:column;align-items:center;gap:0.15rem;min-width:4.6rem;}
+  .cadeaus .prijs{font-size:0.68rem;color:var(--soft);}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<a class="skip" href="#inhoud" style="position:absolute;left:-999px;">Naar inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>RTG Podium</h1>
+  <span class="badge plus">18+</span>
+  <span class="rek"></span>
+  <span class="badge">Op codenaam</span>
+</header>
+<main id="inhoud">
+
+  <!-- de poort: alleen 18+ met geverifieerd paspoort -->
+  <section id="vPoort" class="weg">
+    <div class="kaart">
+      <h2 style="margin-top:0;">De poort</h2>
+      <p class="stil" id="poortReden">Het Podium is de live-zaal van De Salon: leden zenden uit, u kijkt mee, praat mee
+        en stuurt cadeautjes via RTG Pay. Strikt vanaf 18 jaar, met een actief RTG-geverifieerd paspoort.</p>
+      <p class="stil" style="margin-top:0.6rem;">Verifieer uw paspoort in de app onder Profiel; daarna gaat deze deur vanzelf open.</p>
+    </div>
+  </section>
+
+  <!-- de zaal: kanalen, live eerst -->
+  <section id="vZaal" class="weg">
+    <h2>Nu live</h2>
+    <div id="lijstLive"><p class="stil">Er is nu niemand live. Kom straks terug, of start zelf een kanaal.</p></div>
+    <h2>Alle kanalen</h2>
+    <div id="lijstAlle"></div>
+    <h2>Mijn kanaal</h2>
+    <div id="mijnBlok"></div>
+  </section>
+
+  <!-- kijken -->
+  <section id="vKijk" class="weg">
+    <button class="knop" id="terugZaal" type="button">← Terug naar de zaal</button>
+    <div class="scherm" style="margin-top:0.7rem;">
+      <video id="kijkVideo" autoplay playsinline></video>
+      <div class="over"><span class="liveDot">Live</span><span class="badge" id="kijkTitel"></span></div>
+      <span class="tel" id="kijkTel"></span>
+    </div>
+    <p class="stil" style="margin-top:0.5rem;" id="kijkWie"></p>
+    <div id="chatKijk" class="chat" aria-live="polite" aria-label="Kanaalchat"></div>
+    <form class="rij" id="chatForm">
+      <label for="chatVeld" style="position:absolute;left:-999px;">Bericht in de kanaalchat</label>
+      <input id="chatVeld" maxlength="300" placeholder="Praat mee (op codenaam)" autocomplete="off">
+      <button class="knop vol" type="submit">Stuur</button>
+    </form>
+    <div class="cadeaus" id="cadeauRij" role="group" aria-label="Cadeautjes via RTG Pay"></div>
+    <div class="rij">
+      <button class="knop" id="abbKnop" type="button"></button>
+      <button class="knop rood" id="meldKnop" type="button">Melden bij RTG-kantoor</button>
+    </div>
+  </section>
+
+  <!-- de studio van de maker -->
+  <section id="vStudio" class="weg">
+    <button class="knop" id="terugZaal2" type="button">← Terug naar de zaal</button>
+    <div class="scherm" style="margin-top:0.7rem;">
+      <video id="studioVideo" autoplay playsinline muted></video>
+      <div class="over"><span class="liveDot" id="studioLiveDot" style="display:none;">Live</span></div>
+      <span class="tel" id="studioTel"></span>
+    </div>
+    <div class="rij">
+      <label for="studioTitel" style="position:absolute;left:-999px;">Titel van de uitzending</label>
+      <input id="studioTitel" maxlength="80" placeholder="Titel van de uitzending">
+      <button class="knop" id="studioAbb" type="button" aria-pressed="false">Alleen abonnees</button>
+      <button class="knop vol" id="studioKnop" type="button">Ga live</button>
+    </div>
+    <div id="chatStudio" class="chat" aria-live="polite" aria-label="Kanaalchat"></div>
+    <form class="rij" id="chatFormStudio">
+      <label for="chatVeldStudio" style="position:absolute;left:-999px;">Bericht in de kanaalchat</label>
+      <input id="chatVeldStudio" maxlength="300" placeholder="Praat met de zaal" autocomplete="off">
+      <button class="knop vol" type="submit">Stuur</button>
+    </form>
+    <h2>Kijkers</h2>
+    <div id="kijkerLijst"><p class="stil">Nog geen kijkers.</p></div>
+  </section>
+
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/podium/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const idem = () => Math.random().toString(36).slice(2, 10);
+  const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
+  const toon = naam => { for (const v of ['vPoort', 'vZaal', 'vKijk', 'vStudio']) $('#' + v).classList.toggle('weg', v !== naam); };
+
+  let zaal = null;        // laatste /kanalen-beeld
+  let open = null;        // het kanaal waar ik nu naar kijk
+  let cadeaus = [];
+  let hartslag = null;
+
+  /* ---------- de zaal ---------- */
+  function kanKnop(k, kijkbaar) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'kan';
+    const live = k.live ? '<span class="liveDot">Live</span> · ' + (k.kijkers || 0) + ' kijkers' :
+      (k.abbCenten ? 'Abonnement ' + eur(k.abbCenten) + ' p/m' : 'Niet live');
+    b.innerHTML = '<span class="hoes" aria-hidden="true">' + (k.naam || '?').slice(0, 1).toUpperCase() + '</span>' +
+      '<span class="wie"><span class="naam"></span><span class="sub">' + live + ' · ' + k.genre + '</span></span>';
+    b.querySelector('.naam').textContent = k.naam + ' · ' + k.codenaam;
+    if (kijkbaar) b.addEventListener('click', () => kijkStart(k));
+    else b.addEventListener('click', () => zeg(k.live ? 'Dit is uw eigen kanaal: open de studio.' : 'Dit kanaal is nu niet live.'));
+    return b;
+  }
+  async function laadZaal() {
+    const r = await api('kanalen');
+    if (r.status === 403) { $('#poortReden').textContent = r.body.error + ' Het Podium is de live-zaal van De Salon: strikt 18+, op codenaam, met melden en blokkeren ingebouwd.'; toon('vPoort'); return; }
+    zaal = r.body; cadeaus = zaal.cadeaus || [];
+    const liveEl = $('#lijstLive'), alleEl = $('#lijstAlle');
+    liveEl.innerHTML = ''; alleEl.innerHTML = '';
+    const rijen = zaal.kanalen || [];
+    const lives = rijen.filter(k => k.live);
+    if (!lives.length) liveEl.innerHTML = '<p class="stil">Er is nu niemand live. Kom straks terug, of start zelf een kanaal.</p>';
+    for (const k of lives) liveEl.appendChild(kanKnop(k, !(zaal.mijn && zaal.mijn.id === k.id)));
+    if (!rijen.length) alleEl.innerHTML = '<p class="stil">Nog geen kanalen in de zaal.</p>';
+    for (const k of rijen) alleEl.appendChild(kanKnop(k, !!k.live && !(zaal.mijn && zaal.mijn.id === k.id)));
+    tekenMijn();
+    toon('vZaal');
+  }
+  function tekenMijn() {
+    const el = $('#mijnBlok'); el.innerHTML = '';
+    const m = zaal && zaal.mijn;
+    const kaart = document.createElement('div'); kaart.className = 'kaart';
+    if (!m) {
+      kaart.innerHTML = '<p class="stil">Start uw eigen kanaal. RTG-kantoor keurt elk kanaal eerst persoonlijk goed; ' +
+        'daarna zendt u live uit, praat de zaal mee en verdient u via cadeautjes en abonnementen (RTG Pay).</p>' +
+        '<label for="mNaam">Naam van het kanaal</label><input id="mNaam" maxlength="40">' +
+        '<label for="mGenre">Genre</label><select id="mGenre"></select>' +
+        '<label for="mBio">Waar gaat het over?</label><input id="mBio" maxlength="300">' +
+        '<div class="rij"><button class="knop vol" id="mStart" type="button">Kanaal aanmelden</button></div>';
+      el.appendChild(kaart);
+      for (const g of (zaal.genres || [])) { const o = document.createElement('option'); o.value = g; o.textContent = g; kaart.querySelector('#mGenre').appendChild(o); }
+      kaart.querySelector('#mStart').addEventListener('click', async () => {
+        const r = await api('kanaal/aanmeld', { naam: $('#mNaam').value, genre: $('#mGenre').value, bio: $('#mBio').value });
+        if (r.body.error) return zeg(r.body.error);
+        zeg('Aangemeld. RTG-kantoor kijkt er persoonlijk naar.'); laadZaal();
+      });
+      return;
+    }
+    if (m.status === 'wacht') kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> wacht op goedkeuring door RTG-kantoor. Een mens beslist; u krijgt een seintje.</p>';
+    else if (m.status === 'geweigerd') kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> is niet goedgekeurd door RTG-kantoor.</p>';
+    else {
+      kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> · verdiend ' + eur(m.verdiend || 0) + ' · ' + (m.abonnees || 0) + ' abonnees</p>' +
+        '<label for="mAbb">Abonnementsprijs per maand (euro, 0 = geen abonnement)</label><input id="mAbb" inputmode="decimal" value="' + ((m.abbCenten || 0) / 100) + '">' +
+        '<div class="rij"><button class="knop" id="mZet" type="button">Bewaar</button>' +
+        '<button class="knop vol" id="mStudio" type="button">Open de studio</button></div>';
+      el.appendChild(kaart);
+      kaart.querySelector('#mZet').addEventListener('click', async () => {
+        const r = await api('kanaal/zet', { abbCenten: Math.round(parseFloat(String($('#mAbb').value).replace(',', '.')) * 100) || 0 });
+        zeg(r.body.error || 'Bewaard.'); laadZaal();
+      });
+      kaart.querySelector('#mStudio').addEventListener('click', studioStart);
+      return;
+    }
+    el.appendChild(kaart);
+  }
+
+  /* ---------- chat (gedeeld door kijker en studio) ---------- */
+  function chatRegel(regel) {
+    const r = document.createElement('div'); r.className = 'r';
+    const wie = document.createElement('span'); wie.className = 'wie' + (regel.abonnee ? ' abb' : '');
+    wie.textContent = (regel.maker ? '★ ' : '') + regel.codenaam;
+    r.appendChild(wie);
+    const rest = document.createElement('span');
+    if (regel.cadeau) { rest.className = 'cad'; rest.textContent = ' stuurt ' + regel.cadeau.icoon + ' ' + regel.cadeau.naam + ' (' + eur(regel.cadeau.centen) + ')'; }
+    else rest.textContent = ': ' + regel.tekst;
+    r.appendChild(rest);
+    return r;
+  }
+  function chatToon(el, regels) { el.innerHTML = ''; for (const x of regels || []) el.appendChild(chatRegel(x)); el.scrollTop = el.scrollHeight; }
+  function chatErbij(regel) {
+    for (const sel of ['#chatKijk', '#chatStudio']) { const el = $(sel); if (!el.closest('section').classList.contains('weg')) { el.appendChild(chatRegel(regel)); el.scrollTop = el.scrollHeight; } }
+  }
+
+  /* ---------- kijken (WebRTC-kijkerkant) ---------- */
+  let kijkPc = null;
+  async function kijkStart(k) {
+    const r = await api('kijk', { id: k.id });
+    if (r.body.error) return zeg(r.body.error);
+    open = r.body.kanaal;
+    $('#kijkTitel').textContent = open.live.titel;
+    $('#kijkTel').textContent = (open.kijkers || 1) + ' kijkers';
+    $('#kijkWie').textContent = open.codenaam + ' · ' + (open.bio || open.genre);
+    const abb = $('#abbKnop');
+    if (open.ikAbonnee) { abb.textContent = 'Abonnee ★'; abb.disabled = true; }
+    else if (open.abbCenten) { abb.textContent = 'Abonneer · ' + eur(open.abbCenten) + ' p/m'; abb.disabled = false; }
+    else abb.classList.add('weg');
+    const rij = $('#cadeauRij'); rij.innerHTML = '';
+    for (const c of cadeaus) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'knop';
+      b.innerHTML = '<span aria-hidden="true">' + c.icoon + '</span><span>' + c.naam + '</span><span class="prijs">' + eur(c.centen) + '</span>';
+      b.setAttribute('aria-label', c.naam + ' sturen, ' + eur(c.centen));
+      b.addEventListener('click', async () => {
+        const g = await api('cadeau', { id: open.id, cadeau: c.id, idem: idem() });
+        if (g.body.error) zeg(g.body.error); else zeg(c.icoon + ' ' + c.naam + ' gestuurd via RTG Pay.');
+      });
+      rij.appendChild(b);
+    }
+    chatToon($('#chatKijk'), r.body.chat);
+    toon('vKijk');
+    clearInterval(hartslag);
+    hartslag = setInterval(() => { if (open) api('kijk', { id: open.id }); }, 45000);
+  }
+  async function kijkStop() {
+    clearInterval(hartslag); hartslag = null;
+    if (kijkPc) { try { kijkPc.close(); } catch (e) {} kijkPc = null; }
+    if (open) { api('weg', { id: open.id }); open = null; }
+    $('#kijkVideo').srcObject = null;
+    laadZaal();
+  }
+  let iceConfig = null;
+  async function haalIce() { if (iceConfig) return iceConfig;
+    try { iceConfig = (await (await fetch('/api/ice')).json()).iceServers; } catch (e) {}
+    return iceConfig || (iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]); }
+  async function kijkOffer(d) {
+    if (!open || d.kanaalId !== open.id) return;
+    if (kijkPc) { try { kijkPc.close(); } catch (e) {} }
+    kijkPc = new RTCPeerConnection({ iceServers: await haalIce() });
+    kijkPc.ontrack = ev => { $('#kijkVideo').srcObject = ev.streams[0]; };
+    kijkPc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: open.id, kind: 'ice', payload: ev.candidate }); };
+    await kijkPc.setRemoteDescription(d.payload);
+    const antwoord = await kijkPc.createAnswer();
+    await kijkPc.setLocalDescription(antwoord);
+    api('signaal', { id: open.id, kind: 'answer', payload: antwoord });
+  }
+
+  /* ---------- de studio (WebRTC-makerkant: een verbinding per kijker) ---------- */
+  let stream = null, studioLive = false;
+  const pcs = new Map();  // kijkerKey -> RTCPeerConnection
+  async function studioStart() {
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: true }); }
+    catch (e) { return zeg('Camera en microfoon zijn nodig om uit te zenden.'); }
+    $('#studioVideo').srcObject = stream;
+    const m = zaal && zaal.mijn;
+    studioLive = !!(m && m.live);
+    $('#studioTitel').value = m && m.live ? m.live.titel : ($('#studioTitel').value || (m ? m.naam : ''));
+    tekenStudio();
+    const eigen = await api('mijn');
+    chatToon($('#chatStudio'), eigen.body.chat);
+    tekenKijkers((eigen.body.kanaal || {}).kijkerLijst || []);
+    toon('vStudio');
+  }
+  function tekenStudio() {
+    $('#studioKnop').textContent = studioLive ? 'Stop de uitzending' : 'Ga live';
+    $('#studioKnop').classList.toggle('vol', !studioLive);
+    $('#studioKnop').classList.toggle('rood', studioLive);
+    $('#studioLiveDot').style.display = studioLive ? '' : 'none';
+  }
+  async function studioSchakel() {
+    const abbAan = $('#studioAbb').getAttribute('aria-pressed') === 'true';
+    const r = await api('live', { aan: !studioLive, titel: $('#studioTitel').value, alleenAbonnees: abbAan });
+    if (r.body.error) return zeg(r.body.error);
+    studioLive = !studioLive; tekenStudio();
+    if (!studioLive) { for (const pc of pcs.values()) { try { pc.close(); } catch (e) {} } pcs.clear(); tekenKijkers([]); }
+    zeg(studioLive ? 'U bent live.' : 'Uitzending gestopt.');
+  }
+  async function makerKijker(d) {
+    // een nieuwe kijker: bouw een eigen verbinding en stuur de offer
+    if (!studioLive || !stream) return;
+    const pc = new RTCPeerConnection({ iceServers: await haalIce() });
+    pcs.set(d.van, pc);
+    for (const t of stream.getTracks()) pc.addTrack(t, stream);
+    pc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: d.kanaalId, doelKey: d.van, kind: 'ice', payload: ev.candidate }); };
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    api('signaal', { id: d.kanaalId, doelKey: d.van, kind: 'offer', payload: offer });
+    const eigen = await api('mijn');
+    tekenKijkers((eigen.body.kanaal || {}).kijkerLijst || []);
+  }
+  function tekenKijkers(lijst) {
+    $('#studioTel').textContent = lijst.length + ' kijkers';
+    const el = $('#kijkerLijst'); el.innerHTML = '';
+    if (!lijst.length) { el.innerHTML = '<p class="stil">Nog geen kijkers.</p>'; return; }
+    for (const x of lijst) {
+      const rij = document.createElement('div'); rij.className = 'rij';
+      const naam = document.createElement('span'); naam.className = 'stil'; naam.style.flex = '1'; naam.textContent = x.codenaam;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'knop rood'; b.textContent = 'Blokkeer';
+      b.addEventListener('click', async () => {
+        const r = await api('blokkeer', { id: zaal.mijn.id, key: x.key });
+        if (r.body.error) return zeg(r.body.error);
+        const pc = pcs.get(x.key); if (pc) { try { pc.close(); } catch (e) {} pcs.delete(x.key); }
+        zeg(x.codenaam + ' geblokkeerd.'); rij.remove();
+      });
+      rij.appendChild(naam); rij.appendChild(b); el.appendChild(rij);
+    }
+  }
+
+  /* ---------- de realtime lijn ---------- */
+  function startSse() {
+    if (!window.EventSource || !token) return;
+    const es = new EventSource('/api/stream?token=' + encodeURIComponent(token));
+    es.addEventListener('podium', async e => {
+      const d = JSON.parse(e.data);
+      if (d.kind === 'chat' || d.kind === 'cadeau') chatErbij(d.regel);
+      else if (d.kind === 'kijker') makerKijker(d);
+      else if (d.kind === 'weg') { const pc = pcs.get(d.van); if (pc) { try { pc.close(); } catch (e2) {} pcs.delete(d.van); } api('mijn').then(r => tekenKijkers((r.body.kanaal || {}).kijkerLijst || [])); }
+      else if (d.kind === 'offer') kijkOffer(d);
+      else if (d.kind === 'answer') { const pc = pcs.get(d.van); if (pc) try { await pc.setRemoteDescription(d.payload); } catch (e2) {} }
+      else if (d.kind === 'ice') { const pc = open ? kijkPc : pcs.get(d.van); if (pc) try { await pc.addIceCandidate(d.payload); } catch (e2) {} }
+      else if (d.kind === 'einde') { if (open && d.kanaalId === open.id) { zeg('De uitzending is afgelopen.'); kijkStop(); } }
+      else if (d.kind === 'abonnee') zeg(d.codenaam + ' is nu abonnee.');
+    });
+  }
+
+  /* ---------- knoppen ---------- */
+  $('#terugZaal').addEventListener('click', kijkStop);
+  $('#terugZaal2').addEventListener('click', () => { laadZaal(); });
+  $('#chatForm').addEventListener('submit', async ev => { ev.preventDefault();
+    const t = $('#chatVeld').value.trim(); if (!t || !open) return;
+    const r = await api('chat', { id: open.id, tekst: t });
+    if (r.body.error) zeg(r.body.error); else $('#chatVeld').value = '';
+  });
+  $('#chatFormStudio').addEventListener('submit', async ev => { ev.preventDefault();
+    const t = $('#chatVeldStudio').value.trim(); if (!t || !zaal || !zaal.mijn) return;
+    const r = await api('chat', { id: zaal.mijn.id, tekst: t });
+    if (r.body.error) zeg(r.body.error); else $('#chatVeldStudio').value = '';
+  });
+  $('#abbKnop').addEventListener('click', async () => {
+    if (!open) return;
+    const r = await api('abonneer', { id: open.id, idem: idem() });
+    if (r.body.error) return zeg(r.body.error);
+    zeg('U bent abonnee tot ' + new Date(r.body.tot).toLocaleDateString('nl-NL') + '.');
+    $('#abbKnop').textContent = 'Abonnee ★'; $('#abbKnop').disabled = true;
+  });
+  $('#meldKnop').addEventListener('click', async () => {
+    if (!open) return;
+    const reden = prompt('Wat wilt u melden aan RTG-kantoor?');
+    if (reden == null) return;
+    const r = await api('meld', { id: open.id, reden });
+    zeg(r.body.error || 'Gemeld. Een mens van RTG-kantoor kijkt ernaar.');
+  });
+  $('#studioKnop').addEventListener('click', studioSchakel);
+  $('#studioAbb').addEventListener('click', () => { const b = $('#studioAbb');
+    b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); });
+  // geen afmeld-beacon nodig: een kijker die stil valt, valt na 90s vanzelf
+  // uit de kijkerslijst (server-TTL), ook bij een dichtgeklapte telefoon
+
+  /* ---------- start ---------- */
+  if (!token) { $('#poortReden').textContent = 'Log eerst in via de RTG-app; het Podium hoort bij uw lidmaatschap.'; toon('vPoort'); }
+  else { laadZaal(); startSse(); }
+})();
+</script>
+</body>
+</html>

@@ -22,6 +22,7 @@
     ['🗂️', 'Kantoren', '/apps/kantoren.html'],
     ['💳', 'RTG Pay', '/apps/pay.html'],
     ['♟️', 'Spelen', '/apps/spelen.html'],
+    ['🎛️', 'Boardroom', '/apps/boardroom.html'],
     ['🤝', 'RTFoundation', '/apps/foundation/index.html']
   ];
   var SITE = [

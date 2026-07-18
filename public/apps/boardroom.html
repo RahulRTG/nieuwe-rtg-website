@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boardroom</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/shared/os.css">
+<link rel="stylesheet" href="/shared/osmenu.css">
+<script src="/apps/foundation/palet.js"></script>
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;
+    --muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.60);--acc:var(--dag-kleur,#C23A5E);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .wrap{max-width:840px;margin:0 auto;padding:1.4rem 1.1rem 4rem;}
+  .intro{margin:0 0 1.4rem;}
+  .intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
+  .intro p{color:var(--soft);font-size:.9rem;margin-top:.3rem;max-width:52ch;}
+  .groep{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.1rem 1.2rem;margin-bottom:1rem;}
+  .groep > h2{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin-bottom:.2rem;}
+  .groep > .gu{font-size:.8rem;color:var(--soft);margin-bottom:.8rem;}
+  .fn{display:flex;align-items:flex-start;gap:1rem;padding:.75rem 0;border-top:1px solid var(--line);}
+  .fn:first-of-type{border-top:none;}
+  .fn .tekst{flex:1;min-width:0;}
+  .fn .naam{font-weight:600;font-size:.95rem;}
+  .fn .uit{font-size:.8rem;color:var(--soft);margin-top:.1rem;}
+  /* schakelaar */
+  .sw{position:relative;flex:none;width:3.1rem;height:1.8rem;}
+  .sw input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;}
+  .sw .track{position:absolute;inset:0;background:var(--card2);border:1px solid var(--line);border-radius:999px;transition:background .15s,border-color .15s;}
+  .sw .dot{position:absolute;top:.22rem;left:.24rem;width:1.28rem;height:1.28rem;border-radius:50%;background:var(--soft);transition:transform .15s,background .15s;}
+  .sw input:checked + .track{background:color-mix(in srgb,var(--acc) 34%,transparent);border-color:var(--acc);}
+  .sw input:checked + .track + .dot{transform:translateX(1.28rem);background:var(--acc);}
+  .sw input:focus-visible + .track{outline:2px solid var(--acc);outline-offset:2px;}
+  .melding{color:var(--soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
+  .terug{display:inline-block;margin-bottom:1rem;color:var(--acc);text-decoration:none;font-size:.85rem;}
+</style>
+</head>
+<body data-osbar="Boardroom" data-oswereld="lid" data-osterug="apps/app.html">
+<main class="wrap" id="hoofd">
+  <a class="terug" href="/apps/app.html">← naar de app</a>
+  <div class="intro">
+    <h1>Jouw boardroom</h1>
+    <p>Zet zelf aan wat je gebruikt en uit wat je niet wilt. Gevoelige deel-functies staan bewust standaard uit. Je keuzes reizen mee naar al je toestellen.</p>
+  </div>
+  <div id="bord"><p class="melding" id="melding">Boardroom laden&hellip;</p></div>
+</main>
+<script src="/shared/osbar.js" defer></script>
+<script src="/shared/osmenu.js" defer></script>
+<script src="/apps/boardroom.js" defer></script>
+</body>
+</html>

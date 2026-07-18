@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Sound</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;letter-spacing:0.02em;}
+  .kop .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  .zoek{margin:0.4rem 1.1rem 0.8rem;}
+  .zoek input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  .zoek input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
+
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 11rem);}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:0.9rem 0 0.6rem;}
+  .stations{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.7rem;}
+  .station{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    aspect-ratio:1;cursor:pointer;background:var(--card);padding:0;text-align:left;color:var(--txt);font:inherit;}
+  .station .hoes{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.4rem;}
+  .station .naam{position:absolute;left:0;right:0;bottom:0;padding:0.55rem 0.7rem;
+    background:linear-gradient(transparent,rgba(12,12,11,0.85));font-size:0.82rem;font-weight:600;}
+  .station .sub{display:block;font-weight:400;font-size:0.68rem;color:var(--soft);}
+  .station[aria-pressed="true"]{border-color:var(--gold);}
+  .station:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .h-sunset{background:linear-gradient(150deg,#3A1E16,#7F1634 70%,#C9A24B 130%);}
+  .h-beach{background:linear-gradient(150deg,#12303A,#1E5A66 75%,#C9A24B 140%);}
+  .h-jazz{background:linear-gradient(150deg,#241B2E,#3A2440 80%,#7F1634 140%);}
+  .h-golden{background:linear-gradient(150deg,#33260F,#8A6A1C 90%,#C9A24B 140%);}
+  .h-focus{background:linear-gradient(150deg,#14201C,#24443A 85%,#4C9A75 150%);}
+  .h-nacht{background:linear-gradient(150deg,#0E1220,#1D2440 80%,#3A518A 150%);}
+  .wachtrij{list-style:none;display:flex;flex-direction:column;gap:0.35rem;}
+  .wachtrij li{display:flex;gap:0.6rem;align-items:baseline;font-size:0.8rem;color:var(--soft);}
+  .wachtrij li b{color:var(--txt);font-weight:500;}
+
+  .rahul{position:fixed;left:1.1rem;right:1.1rem;bottom:calc(env(safe-area-inset-bottom,0px) + 6.4rem);
+    background:rgba(21,19,18,0.9);border:1px solid var(--line);border-radius:12px;z-index:5;
+    padding:0.5rem 0.75rem;font-size:0.78rem;line-height:1.45;display:flex;gap:0.55rem;align-items:flex-start;}
+  .rahul b{color:var(--gold);font-weight:600;}
+  .rahul .tekst{flex:1;min-width:0;}
+  .rahul button{background:none;border:none;color:var(--txt);font-size:1rem;cursor:pointer;}
+
+  .speler{position:fixed;left:0;right:0;bottom:0;z-index:6;background:rgba(18,16,15,0.96);
+    border-top:1px solid var(--line);padding:0.55rem 1rem calc(env(safe-area-inset-bottom,0px) + 0.7rem);}
+  .speler .balk{height:3px;background:rgba(255,255,255,0.14);border-radius:2px;margin-bottom:0.55rem;overflow:hidden;}
+  .speler .balk i{display:block;height:100%;width:0;background:var(--gold);transition:width 0.5s linear;}
+  .speler .rij{display:flex;align-items:center;gap:0.7rem;}
+  .speler .info{flex:1;min-width:0;}
+  .speler .titel{font-size:0.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .speler .sub{font-size:0.7rem;color:var(--soft);}
+  .speler button{background:none;border:none;color:var(--txt);font-size:1.35rem;cursor:pointer;min-width:40px;height:40px;}
+  .speler button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px;}
+  .speler .afspeel{font-size:1.9rem;}
+  canvas.golf{position:fixed;left:0;right:0;width:100%;height:54px;z-index:4;pointer-events:none;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 4.6rem);opacity:0.5;}
+  .vis-verborgen{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>RTG Sound</h1>
+  <span class="badge">Ongecomprimeerd · eigen studio</span>
+  <span class="rek"></span>
+</header>
+<div class="zoek"><input id="zoek" type="search" placeholder="Zoek een station of sfeer…" aria-label="Zoeken"></div>
+
+<main>
+  <h2>Stations</h2>
+  <div class="stations" id="stations" role="group" aria-label="Stations"></div>
+  <h2>Straks in de wachtrij</h2>
+  <ul class="wachtrij" id="wachtrij"><li>Kies een station en de wachtrij vult zichzelf.</li></ul>
+</main>
+
+<div class="rahul"><span aria-hidden="true">✦</span>
+  <span class="tekst"><b>Rahul</b> · <span id="rahulTekst">Zeg wat u wilt horen ("iets voor bij het diner") en ik zet het juiste station op.</span></span>
+  <button id="micKnop" aria-label="Spraaksturing: zeg wat u wilt horen">🎤</button>
+</div>
+
+<canvas class="golf" id="golf" aria-hidden="true"></canvas>
+<footer class="speler" aria-label="Speler">
+  <div class="balk"><i id="voortgang"></i></div>
+  <div class="rij">
+    <div class="info">
+      <div class="titel" id="spTitel">Nog stil</div>
+      <div class="sub" id="spSub">Kies een station om te beginnen</div>
+    </div>
+    <button id="knopVorige" aria-label="Opnieuw beginnen">⏮</button>
+    <button id="knopSpeel" class="afspeel" aria-label="Afspelen of pauzeren">▶</button>
+    <button id="knopVolgende" aria-label="Volgende track">⏭</button>
+  </div>
+</footer>
+
+<script src="/shared/spraak.js" defer></script>
+<script>
+/* ============================== RTG Sound ==============================
+   Muziek uit eigen huis: elk station is een kleine studio die live
+   componeert op WebAudio (48 kHz, ongecomprimeerd, met echte galm via een
+   gegenereerde impulsrespons). Tracks zijn seeds: dezelfde track klinkt
+   altijd hetzelfde en de wachtrij is vooraf bekend. Geen externe streams,
+   geen rechtenmuziek: alles wordt hier ter plekke gemaakt. */
+(function () {
+  'use strict';
+  const $ = s => document.querySelector(s);
+
+  /* ---- de stations: elk een eigen studio-preset ---- */
+  const STATIONS = [
+    { id: 'sunset', naam: 'Sunset Lounge', sub: 'chill · 84 bpm', icoon: '🌅', hoes: 'h-sunset',
+      bpm: 84, toon: 57, akkoorden: [[0,3,7,10],[5,8,12,15],[3,7,10,14],[10,14,17,21]], perc: 'zacht', arp: true },
+    { id: 'beach', naam: 'Beach Club', sub: 'house · 118 bpm', icoon: '🏖️', hoes: 'h-beach',
+      bpm: 118, toon: 55, akkoorden: [[0,3,7,10],[8,12,15,19],[5,8,12,15],[7,10,14,17]], perc: 'club', arp: true },
+    { id: 'jazz', naam: 'Salon Jazz', sub: 'diner · 72 bpm', icoon: '🥂', hoes: 'h-jazz',
+      bpm: 72, toon: 58, akkoorden: [[0,4,7,11],[5,9,12,16],[7,11,14,17],[2,5,9,12]], perc: 'brush', arp: false },
+    { id: 'golden', naam: 'Golden Hour', sub: 'warm · 64 bpm', icoon: '🌇', hoes: 'h-golden',
+      bpm: 64, toon: 53, akkoorden: [[0,4,7,11],[9,12,16,19],[5,9,12,16],[7,10,14,19]], perc: 'geen', arp: false },
+    { id: 'focus', naam: 'Focus', sub: 'ambient · 60 bpm', icoon: '🌿', hoes: 'h-focus',
+      bpm: 60, toon: 50, akkoorden: [[0,7,12,16],[5,12,17,21],[3,10,15,19],[0,7,12,16]], perc: 'geen', arp: true },
+    { id: 'nacht', naam: 'Club Nacht', sub: 'deep · 122 bpm', icoon: '🌙', hoes: 'h-nacht',
+      bpm: 122, toon: 52, akkoorden: [[0,3,7,12],[10,14,17,22],[8,12,15,20],[5,8,12,17]], perc: 'club', arp: true }
+  ];
+  const W1 = ['Cala', 'Vora', 'Luna', 'Brisa', 'Sal', 'Isla', 'Alba', 'Mar', 'Ola', 'Sombra'];
+  const W2 = ['Dorada', 'Blanca', 'del Sur', 'de Medianoche', 'Serena', 'Secreta', 'Eterna', 'de Oro', 'Suave', 'Azul'];
+  const rngVan = seed => { let t = seed >>> 0; return () => { t += 0x6D2B79F5; let r = Math.imul(t ^ t >>> 15, 1 | t); r ^= r + Math.imul(r ^ r >>> 7, 61 | r); return ((r ^ r >>> 14) >>> 0) / 4294967296; }; };
+  const trackNaam = seed => { const r = rngVan(seed); return W1[Math.floor(r() * W1.length)] + ' ' + W2[Math.floor(r() * W2.length)]; };
+
+  /* ---- de motor ---- */
+  let ctx = null, master = null, analyser = null, galm = null;
+  let station = null, seed = 0, rng = null, speelt = false;
+  let startTijd = 0, duur = 180, tel = 0, klok = null, stemmen = [];
+  function zorgCtx() {
+    if (ctx) return;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = 0.7;
+    analyser = ctx.createAnalyser(); analyser.fftSize = 256;
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -18; comp.ratio.value = 3;
+    // echte galm: een gegenereerde impulsrespons (2s, exponentieel uitdovend)
+    galm = ctx.createConvolver();
+    const ir = ctx.createBuffer(2, ctx.sampleRate * 2, ctx.sampleRate);
+    for (let k = 0; k < 2; k++) { const d = ir.getChannelData(k); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2.6); }
+    galm.buffer = ir;
+    const galmMix = ctx.createGain(); galmMix.gain.value = 0.22;
+    master.connect(analyser); analyser.connect(comp); comp.connect(ctx.destination);
+    master.connect(galm); galm.connect(galmMix); galmMix.connect(comp);
+  }
+  const nootHz = n => 440 * Math.pow(2, (n - 69) / 12);
+  function toon(freq, t0, len, soort, vol, laag) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = soort; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(vol, t0 + Math.min(0.04, len / 4));
+    g.gain.exponentialRampToValueAtTime(0.0008, t0 + len);
+    let uit = g;
+    if (laag) { const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = laag; g.connect(f); uit = f; }
+    o.connect(g); uit.connect(master);
+    o.start(t0); o.stop(t0 + len + 0.05);
+    stemmen.push(o);
+  }
+  function ruis(t0, len, hz, vol, type) {
+    const b = ctx.createBuffer(1, ctx.sampleRate * len, ctx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    const s = ctx.createBufferSource(); s.buffer = b;
+    const f = ctx.createBiquadFilter(); f.type = type || 'highpass'; f.frequency.value = hz;
+    const g = ctx.createGain(); g.gain.value = vol;
+    s.connect(f); f.connect(g); g.connect(master);
+    s.start(t0); stemmen.push(s);
+  }
+  function kick(t0) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.setValueAtTime(150, t0); o.frequency.exponentialRampToValueAtTime(44, t0 + 0.12);
+    g.gain.setValueAtTime(0.85, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.22);
+    o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + 0.25);
+    stemmen.push(o);
+  }
+  // de partituur: per 16e noot beslist het station wat er klinkt
+  function plan(stap, t0) {
+    const s = station, tel16 = stap % 16, maat = Math.floor(stap / 16);
+    const akk = s.akkoorden[Math.floor(maat / 2) % s.akkoorden.length];
+    const beat = tel16 % 4 === 0;
+    if (tel16 === 0 && maat % 2 === 0) // het akkoord: twee maten warm tapijt
+      for (const iv of akk) toon(nootHz(s.toon + iv), t0, (16 * 2) * stapDuur() * 0.98, 'sawtooth', 0.05, 900);
+    if (beat) toon(nootHz(s.toon - 24 + akk[0]), t0, stapDuur() * (s.perc === 'club' ? 0.7 : 1.8), s.perc === 'club' ? 'triangle' : 'sine', 0.16, 500);
+    if (s.arp && tel16 % 2 === 1 && rng() < 0.75)
+      toon(nootHz(s.toon + 12 + akk[Math.floor(rng() * akk.length)]), t0, stapDuur() * 1.1, 'triangle', 0.06, 2400);
+    if (s.perc === 'club') { if (tel16 % 4 === 0) kick(t0); if (tel16 % 4 === 2) ruis(t0, 0.05, 7000, 0.12); if (rng() < 0.12) ruis(t0, 0.03, 9000, 0.06); }
+    if (s.perc === 'zacht' && tel16 % 8 === 4) ruis(t0, 0.09, 5000, 0.07);
+    if (s.perc === 'brush' && tel16 % 4 === 2) ruis(t0, 0.16, 2400, 0.05, 'bandpass');
+  }
+  const stapDuur = () => 60 / station.bpm / 4;
+  function tik() {
+    // een korte blik vooruit plannen, strak op de audioklok
+    while (speelt && startTijd + tel * stapDuur() < ctx.currentTime + 0.15) {
+      plan(tel, startTijd + tel * stapDuur()); tel++;
+      if ((startTijd + tel * stapDuur()) - startTijd > duur) { volgende(); return; }
+    }
+  }
+  function stopStemmen() { for (const v of stemmen) { try { v.stop(); } catch (e) {} } stemmen = []; }
+
+  /* ---- afspeellogica: tracks zijn seeds, de wachtrij is vooraf bekend ---- */
+  function speelTrack(st, zaad) {
+    zorgCtx(); if (ctx.state === 'suspended') ctx.resume();
+    stopStemmen(); if (klok) clearInterval(klok);
+    station = st; seed = zaad; rng = rngVan(zaad);
+    duur = 150 + Math.floor(rngVan(zaad + 1)() * 60);
+    startTijd = ctx.currentTime + 0.08; tel = 0; speelt = true;
+    klok = setInterval(tik, 40); tik();
+    $('#spTitel').textContent = trackNaam(zaad);
+    $('#spSub').textContent = st.naam + ' · eigen studio · ' + Math.round(ctx.sampleRate / 1000) + ' kHz';
+    $('#knopSpeel').textContent = '⏸';
+    document.querySelectorAll('.station').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === st.id)));
+    wachtrij();
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({ title: trackNaam(zaad), artist: 'RTG Sound', album: st.naam });
+      navigator.mediaSession.setActionHandler('play', hervat);
+      navigator.mediaSession.setActionHandler('pause', pauze);
+      navigator.mediaSession.setActionHandler('nexttrack', volgende);
+    }
+  }
+  function wachtrij() {
+    const ul = $('#wachtrij'); ul.textContent = '';
+    for (let i = 1; i <= 3; i++) {
+      const li = document.createElement('li');
+      const b = document.createElement('b'); b.textContent = trackNaam(seed + i);
+      li.appendChild(b); li.appendChild(document.createTextNode(' · ' + station.naam));
+      ul.appendChild(li);
+    }
+  }
+  function volgende() { if (station) speelTrack(station, seed + 1); }
+  function pauze() { speelt = false; if (ctx) ctx.suspend(); $('#knopSpeel').textContent = '▶'; }
+  function hervat() { if (!station) return; speelt = true; ctx.resume(); $('#knopSpeel').textContent = '⏸'; }
+  $('#knopSpeel').addEventListener('click', () => { if (!station) { zeg('Kies eerst een station, of zeg wat u wilt horen.'); return; } (speelt && ctx.state === 'running') ? pauze() : hervat(); });
+  $('#knopVolgende').addEventListener('click', volgende);
+  $('#knopVorige').addEventListener('click', () => { if (station) speelTrack(station, seed); });
+
+  /* ---- de stations op het scherm ---- */
+  const houder = $('#stations');
+  for (const st of STATIONS) {
+    const b = document.createElement('button');
+    b.className = 'station'; b.dataset.id = st.id; b.setAttribute('aria-pressed', 'false');
+    const h = document.createElement('span'); h.className = 'hoes ' + st.hoes; h.textContent = st.icoon; h.setAttribute('aria-hidden', 'true');
+    const n = document.createElement('span'); n.className = 'naam'; n.textContent = st.naam;
+    const su = document.createElement('span'); su.className = 'sub'; su.textContent = st.sub;
+    n.appendChild(su); b.appendChild(h); b.appendChild(n);
+    b.addEventListener('click', () => { speelTrack(st, (Date.now() / 60000 | 0) * 7 + STATIONS.indexOf(st)); zeg('Ik zet ' + st.naam + ' op; de wachtrij staat klaar.'); });
+    houder.appendChild(b);
+  }
+  $('#zoek').addEventListener('input', ev => {
+    const q = ev.target.value.toLowerCase();
+    document.querySelectorAll('.station').forEach(b => {
+      const st = STATIONS.find(x => x.id === b.dataset.id);
+      b.style.display = !q || (st.naam + ' ' + st.sub).toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+
+  /* ---- voortgang en de golf ---- */
+  const golf = $('#golf'); golf.width = innerWidth; golf.height = 54;
+  const gtx = golf.getContext('2d');
+  const data = new Uint8Array(128);
+  (function raam() {
+    requestAnimationFrame(raam);
+    if (analyser && speelt) {
+      analyser.getByteFrequencyData(data);
+      gtx.clearRect(0, 0, golf.width, 54);
+      const bw = golf.width / 48;
+      for (let i = 0; i < 48; i++) { const h = data[i + 4] / 255 * 50; gtx.fillStyle = 'rgba(201,162,75,0.8)'; gtx.fillRect(i * bw + 1, 54 - h, bw - 2, h); }
+      $('#voortgang').style.width = Math.min(100, ((ctx.currentTime - startTijd) / duur) * 100) + '%';
+    }
+  })();
+
+  /* ---- Rahul: de DJ die luistert ---- */
+  const zeg = t => { $('#rahulTekst').textContent = t; };
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  function kiesOpZin(zin) {
+    const z = zin.toLowerCase();
+    const kies = id => { const st = STATIONS.find(x => x.id === id); speelTrack(st, Date.now() % 100000); zeg('Ik zet ' + st.naam + ' op.'); return true; };
+    if (/diner|eten|restaurant|jazz|wijn/.test(z)) return kies('jazz');
+    if (/strand|beach|zwembad|pool/.test(z)) return kies('beach');
+    if (/zonsondergang|sunset|borrel|lounge|chill|rustig/.test(z)) return kies('sunset');
+    if (/goud|golden|romantisch|avondeten/.test(z)) return kies('golden');
+    if (/focus|werk|studeren|concentr/.test(z)) return kies('focus');
+    if (/club|feest|dans|nacht|party/.test(z)) return kies('nacht');
+    if (/pauze|stop/.test(z)) { pauze(); zeg('Gepauzeerd.'); return true; }
+    if (/volgende|skip/.test(z)) { volgende(); zeg('Volgende track.'); return true; }
+    if (/speel|muziek|zet.*op/.test(z)) return kies('sunset');
+    return false;
+  }
+  async function vraagRahul(zin) {
+    if (kiesOpZin(zin)) return;
+    if (!token) { zeg('Zeg bijvoorbeeld "iets voor bij het diner", "strand" of "focus" en ik kies het station.'); return; }
+    try {
+      const r = await fetch('/api/fluister', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ q: zin }) });
+      const j = await r.json();
+      zeg(j && j.antwoord ? j.antwoord : 'Zeg een sfeer en ik kies het station.');
+    } catch (e) { zeg('Zeg een sfeer ("diner", "strand", "focus") en ik kies het station.'); }
+  }
+  if (window.Spraak) Spraak.koppel($('#micKnop'), { opTekst: vraagRahul,
+    nietVerstaan: () => zeg('Dat verstond ik net niet. Zeg bijvoorbeeld "iets voor bij het diner".') });
+
+  // voor de tests: een kleine, alleen-lezen blik in de motor
+  window.RTGSound = { staat: () => ({ speelt, station: station && station.id, titel: $('#spTitel').textContent, ctx: ctx && ctx.state, sampleRate: ctx && ctx.sampleRate }), kiesOpZin };
+})();
+</script>
+</body>
+</html>

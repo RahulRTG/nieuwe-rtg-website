@@ -28,6 +28,7 @@ const PAGINAS = [
   '/apps/backoffice.html',
   '/apps/personeel.html',
   '/apps/camera.html',
+  '/apps/muziek.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

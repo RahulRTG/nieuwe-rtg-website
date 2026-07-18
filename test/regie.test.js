@@ -81,3 +81,40 @@ test('4. de grote hendel: alles bij iedereen uit, en de boardroom kan hem zelf t
   assert.equal((await api('/api/ov/kaart', { lat: 38.908, lng: 1.432 }, lid)).status, 200, 'alles staat weer open');
   assert.deepEqual((await api('/api/member/apps', {}, lid)).body.uit, [], 'en de leden-app verbergt weer niets');
 });
+
+test('5. de gratis app is een eigen doelgroep: de boardroom sluit gericht voor gasten', async () => {
+  const gast = (await api('/api/login', { tier: 'guest', pasApp: 'rtg' })).body.token;
+  assert.ok(gast, 'de gratis app logt in als gast');
+  assert.equal((await api('/api/member/apps', {}, gast)).status, 200, 'de gast kan de leden-laag bereiken');
+  const zet = await api('/api/office/boardroom/schakel', { functie: 'member', doelgroep: 'gast', aan: false }, office);
+  assert.equal(zet.status, 200);
+  const dicht = await api('/api/member/apps', {}, gast);
+  assert.equal(dicht.status, 503, 'de gratis app is nu gericht dicht');
+  assert.equal(dicht.body.reden, 'pas');
+  assert.equal((await api('/api/member/apps', {}, lid)).status, 200, 'leden met een pas merken er niets van');
+  await api('/api/office/boardroom/schakel', { functie: 'member', doelgroep: 'gast', aan: true }, office);
+  assert.equal((await api('/api/member/apps', {}, gast)).status, 200, 'weer open');
+});
+
+test('6. de leveranciers-regie: een functie per genre zaken dicht, andere genres blijven open', async () => {
+  const roster = await api('/api/supplier/roster', { code: 'TRANSIT' });
+  const m = roster.body.staff.find(x => x.role === 'manager');
+  const ovZaak = (await api('/api/supplier/login', { code: 'TRANSIT', staffId: m.id, pin: '1234' })).body.token;
+  assert.equal((await api('/api/supplier/ov/overzicht', {}, ovZaak)).status, 200, 'de OV-zaak kan erbij');
+  const zet = await api('/api/office/boardroom/genre', { functie: 'ov', genre: 'ov', aan: false }, office);
+  assert.equal(zet.status, 200);
+  const dicht = await api('/api/supplier/ov/overzicht', {}, ovZaak);
+  assert.equal(dicht.status, 503, 'de functie is voor dit genre gesloten');
+  assert.equal(dicht.body.reden, 'genre');
+  // een zaak van een ander genre merkt niets: de horeca-demo logt gewoon in en werkt
+  const horeca = (await api('/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+  assert.ok(horeca, 'de horeca-zaak logt in');
+  assert.equal((await api('/api/supplier/menu', { menu: [
+    { id: 'x1', name: 'Proefgerecht', price: 10, publiekePrijs: 10, cat: 'Warm', station: 'keuken', sectie: 'warm' }
+  ] }, horeca)).status, 200, 'en werkt gewoon door');
+  // de regel staat op het bord en gaat er ook weer af
+  const bord = await api('/api/office/boardroom', {}, office);
+  assert.ok(bord.body.genreRegels.some(r => r.functie === 'ov' && r.genre === 'ov'), 'de regel staat op het bord');
+  await api('/api/office/boardroom/genre', { functie: 'ov', genre: 'ov', aan: true }, office);
+  assert.equal((await api('/api/supplier/ov/overzicht', {}, ovZaak)).status, 200, 'weer open voor het genre');
+});

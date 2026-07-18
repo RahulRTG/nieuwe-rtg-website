@@ -18,6 +18,13 @@ module.exports = (kern) => {
     return r;
   }));
   app.post('/api/office/boardroom/verbeter', officeAuth, (req, res) => veilig(res, () => ({ ok: true, verbeterkamer: afdelingen.voorstellen(true) })));
+  // de leveranciers-regie: een functie per genre zaken open of dicht
+  app.post('/api/office/boardroom/genre', officeAuth, (req, res) => veilig(res, () => {
+    const r = afdelingen.schakelGenre(String(req.body.functie || ''), String(req.body.genre || ''),
+      req.body.aan === true, req.body.naam ? String(req.body.naam) : 'boardroom');
+    if (r.ok) sseToOffice('sync', { scope: 'boardroom' });
+    return r;
+  }));
   // de grote hendel: alles bij iedereen beschikbaar zetten of sluiten (intern blijft open)
   app.post('/api/office/boardroom/alles', officeAuth, (req, res) => veilig(res, () => {
     const r = afdelingen.schakelAlles(req.body.aan === true, req.body.naam ? String(req.body.naam) : 'boardroom');

@@ -245,6 +245,24 @@
       <div id="gStand" class="stil" style="margin-top:.8rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
     </div>
 
+    <h3 class="sec">De leveranciers-regie: welke werk-apps per genre zaken</h3>
+    <div class="kaart" id="bGenreRegie">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);">Standaard staat elke werk-app open voor elk genre; hier sluit u een functie gericht voor een genre (bijv. RTG Eye niet voor horeca). De vaste vak-poorten (OV-functies alleen voor OV-zaken) blijven altijd gelden.</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.6rem;">
+        <span style="flex:1;min-width:12rem;">
+          <label for="lrFunctie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Functie</label>
+          <select id="lrFunctie"></select>
+        </span>
+        <span style="flex:1;min-width:10rem;">
+          <label for="lrGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Genre</label>
+          <select id="lrGenre"></select>
+        </span>
+        <button class="knop stil" id="lrUit" type="button" style="border-color:var(--burgundy);">Sluit voor dit genre</button>
+        <button class="knop stil" id="lrAan" type="button">Open weer</button>
+      </div>
+      <div id="lrRegels" class="stil" style="margin-top:.7rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
+    </div>
+
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
     <div class="kaart" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
       <span style="font-size:.82rem;color:var(--soft);flex:1;min-width:14rem;">De grote hendel: alles bij iedereen beschikbaar zetten, of alles in een keer sluiten. De interne backoffice-functies blijven altijd open, zodat u de hendel kunt terugzetten.</span>
@@ -549,6 +567,17 @@ async function openBoard(){
   tekenVoorstellen(d.verbeterkamer);
   $('#bPaniek').innerHTML = d.paniek.length ? d.paniek.map(v => voorstelKaart(v, true)).join('') : '<div class="leeg">Geen open voorstellen.</div>';
   koppelVoorstellen($('#bPaniek'), openBoard);
+  // de leveranciers-regie: functies die zaken of personeel bedienen, per genre
+  const werkFuncties = d.functies.flatMap(g => g.functies)
+    .filter(f => (f.doelgroepen || []).some(dg => dg.id === 'leverancier' || dg.id === 'personeel'));
+  const lrF = $('#lrFunctie').value, lrG = $('#lrGenre').value; // keuze overleeft het hertekenen
+  $('#lrFunctie').innerHTML = werkFuncties.map(f => '<option value="'+esc(f.id)+'">'+esc(f.naam)+'</option>').join('');
+  $('#lrGenre').innerHTML = (d.genres || []).map(g => '<option value="'+esc(g.id)+'">'+esc((g.icon||'')+' '+(g.label||g.id))+'</option>').join('');
+  if (lrF) $('#lrFunctie').value = lrF;
+  if (lrG) $('#lrGenre').value = lrG;
+  $('#lrRegels').innerHTML = (d.genreRegels && d.genreRegels.length)
+    ? 'Gesloten: ' + d.genreRegels.map(r => esc(r.naam) + ' voor ' + esc(r.genre)).join(' · ')
+    : 'Geen genre-regels; elke werk-app staat open voor elk genre.';
   $('#bTelling').textContent = d.functiesUit ? '(' + d.functiesUit + ' uit)' : '(alles staat aan)';
   $('#bSchakels').innerHTML = d.functies.map(g =>
     '<div class="kaart cat"><h4>'+esc(g.categorie)+'</h4>'+g.functies.map(f =>
@@ -602,6 +631,15 @@ $('#gKorZet').addEventListener('click', async () => {
   try { await api('geld/korting', { genre: $('#gKorGenre').value, pct: Number($('#gKorPct').value) }); meld('Ledenvoordeel gezet; leden zien het bij het afrekenen.'); laadGeld(); }
   catch (e) { meld(e.message); }
 });
+
+/* de leveranciers-regie: een functie per genre zaken open of dicht */
+async function lrZet(aan){
+  try { await api('boardroom/genre', { functie: $('#lrFunctie').value, genre: $('#lrGenre').value, aan });
+    meld(aan ? 'Weer open voor dit genre.' : 'Gesloten voor dit genre.'); openBoard(); }
+  catch (e) { meld(e.message); }
+}
+$('#lrUit').addEventListener('click', () => lrZet(false));
+$('#lrAan').addEventListener('click', () => lrZet(true));
 
 /* de grote hendel: alles bij iedereen aan of uit (intern blijft altijd open) */
 $('#bAllesAan').addEventListener('click', async () => {

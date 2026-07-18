@@ -66,6 +66,28 @@ module.exports = (ctx) => {
     return { ok: true, functie: id, aan: aan === true, doelgroep: doelgroep || null };
   }
 
+  /* De leveranciers-regie: een functie per GENRE zaken open of dicht (bijv.
+     RTG Eye niet voor horeca). aan=true haalt de regel weg (terug naar open). */
+  function schakelGenre(id, genre, aan, wie) {
+    if (!functies.OP_ID[id]) return { status: 404, error: 'Onbekende functie.' };
+    if (!d().supplierTypes || !d().supplierTypes[genre]) return { status: 404, error: 'Dit genre bestaat niet.' };
+    const st = functiesStand();
+    if (!st[id]) st[id] = {};
+    st[id].perGenre = st[id].perGenre || {};
+    if (aan === true) delete st[id].perGenre[genre]; else st[id].perGenre[genre] = false;
+    save();
+    audit(wie || 'boardroom', 'Functie ' + id + ' voor genre ' + genre + ' ' + (aan === true ? 'AAN' : 'UIT') + ' gezet');
+    return { ok: true, functie: id, genre, aan: aan === true };
+  }
+  function genreRegels() {
+    const st = functiesStand();
+    const uit = [];
+    for (const [id, s] of Object.entries(st))
+      for (const [genre, aan] of Object.entries(s.perGenre || {}))
+        if (aan === false) uit.push({ functie: id, naam: (functies.OP_ID[id] || {}).naam || id, genre });
+    return uit;
+  }
+
   /* De grote hendel: ALLES in een keer beschikbaar zetten of sluiten, voor
      iedereen. De interne functies (doelgroep 'intern': de backoffice zelf)
      blijven buiten schot, anders sluit de boardroom zichzelf buiten en kan
@@ -119,6 +141,8 @@ module.exports = (ctx) => {
       ok: true,
       kamers: kamers().kamers,
       functies: cat, doelgroepen: functies.DOELGROEPEN,
+      genreRegels: genreRegels(),
+      genres: Object.entries(d().supplierTypes || {}).map(([id, t]) => ({ id, label: t.label, icon: t.icon })),
       functiesUit: cat.reduce((n, g) => n + g.functies.filter(f => !f.aan).length, 0),
       verbeterkamer: voorstellen(false),
       paniek: paniekRij().filter(v => v.status === 'open').slice(0, 20),
@@ -164,5 +188,5 @@ module.exports = (ctx) => {
   }
 
   /* ---------- interne chat met snaps, per kamer ---------- */
-  return { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, schakelAlles, bouwVoorstellen, voorstellen, boardroom, platformStats };
+  return { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, schakelAlles, schakelGenre, bouwVoorstellen, voorstellen, boardroom, platformStats };
 };

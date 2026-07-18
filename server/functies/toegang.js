@@ -55,8 +55,8 @@ function functieAanVoor(id, doelgroep, staat) {
 }
 
 // Is deze functie beschikbaar voor een concreet verzoek? ctx = { doelgroep,
-// land, persoon }. Elke expliciete false (op welke as dan ook) blokkeert.
-// Geeft de reden terug: 'globaal' | 'pas' | 'land' | 'persoon' | null (vrij).
+// land, persoon, genre }. Elke expliciete false (op welke as dan ook) blokkeert.
+// Geeft de reden terug: 'globaal' | 'pas' | 'land' | 'persoon' | 'genre' | null.
 function blokkadeReden(id, staat, ctx) {
   if (!functieAan(id, staat)) return 'globaal';
   const s = staat && staat[id];
@@ -65,6 +65,9 @@ function blokkadeReden(id, staat, ctx) {
   if (c.doelgroep && s.perDoelgroep && s.perDoelgroep[c.doelgroep] === false) return 'pas';
   if (c.land && s.perLand && s.perLand[c.land] === false) return 'land';
   if (c.persoon && s.perPersoon && s.perPersoon[c.persoon] === false) return 'persoon';
+  // de leveranciers-regie: een functie kan per GENRE zaken dicht (bijv. RTG
+  // Eye niet voor horeca); het genre komt uit de zaak achter het verzoek
+  if (c.genre && s.perGenre && s.perGenre[c.genre] === false) return 'genre';
   return null;
 }
 // Staan er ergens land-regels? Zo niet, dan hoeft de middleware het land van het
@@ -72,6 +75,13 @@ function blokkadeReden(id, staat, ctx) {
 function heeftLandRegels(staat) {
   if (!staat) return false;
   for (const id of Object.keys(staat)) { const pl = staat[id] && staat[id].perLand; if (pl && Object.keys(pl).length) return true; }
+  return false;
+}
+// Staan er ergens genre-regels? Zo niet, dan hoeft de middleware de zaak
+// achter een leveranciers-/personeelsverzoek niet op te zoeken.
+function heeftGenreRegels(staat) {
+  if (!staat) return false;
+  for (const id of Object.keys(staat)) { const pg = staat[id] && staat[id].perGenre; if (pg && Object.keys(pg).length) return true; }
   return false;
 }
 
@@ -94,7 +104,8 @@ function tierNaarDoelgroep(tier) {
   if (tier === 'lifestyle') return 'lifestyle';
   if (tier === 'business') return 'business';
   if (tier === 'rtg') return 'rtg';
-  return null; // guest/onbekend: alleen de globale schakelaar telt
+  if (tier === 'guest') return 'gast'; // de gratis app is een eigen doelgroep
+  return null; // onbekend: alleen de globale schakelaar telt
 }
 function doelgroepVanVerzoek(pad, user) {
   if (pad.startsWith('/api/supplier') || pad.startsWith('/api/partner')) return 'leverancier';
@@ -108,4 +119,4 @@ function doelgroepVanVerzoek(pad, user) {
 // bord). Elke functie toont de globale stand plus haar doelgroepen met eigen stand.
 
 module.exports = { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
-  heeftLandRegels, blokkadeReden, padGeblokkeerd, doelgroepVanVerzoek, tierNaarDoelgroep };
+  heeftLandRegels, heeftGenreRegels, blokkadeReden, padGeblokkeerd, doelgroepVanVerzoek, tierNaarDoelgroep };

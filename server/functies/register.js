@@ -19,6 +19,7 @@ const DOELGROEPEN = [
   { id: 'rtg',         naam: 'RTG-leden',    emoji: '🟢', kleur: '#3BA55D', uitleg: 'Leden met de RTG Pass.',                              synoniemen: ['rtg', 'rtg-leden', 'rtg leden', 'gewone leden'] },
   { id: 'lifestyle',   naam: 'Lifestyle',    emoji: '🟣', kleur: '#A46BD6', uitleg: 'Leden met de Lifestyle Pass.',                       synoniemen: ['lifestyle', 'lifestyle-leden', 'lifestyle mensen'] },
   { id: 'business',    naam: 'Business',     emoji: '🔵', kleur: '#4B8DC9', uitleg: 'Leden met de Business Pass (zakelijk).',             synoniemen: ['business', 'zakelijk', 'business pass'] },
+  { id: 'gast',        naam: 'Gratis app',   emoji: '⚪', kleur: '#8A8680', uitleg: 'De gratis RTG-app, zonder pas (rondkijken en bij partners bestellen).', synoniemen: ['gast', 'gasten', 'gratis', 'gratis app', 'zonder pas', 'free'] },
   { id: 'leverancier', naam: 'Leveranciers', emoji: '🟠', kleur: '#D6A32E', uitleg: 'Partners en hun personeel in de partner-app.',       synoniemen: ['leverancier', 'leveranciers', 'partner', 'partners', 'zaak', 'zaken'] },
   { id: 'personeel',   naam: 'Personeel',    emoji: '🟤', kleur: '#B07B4E', uitleg: 'Medewerkers in de personeels-app (PDA).',            synoniemen: ['personeel', 'medewerker', 'medewerkers', 'pda', 'staff'] },
   { id: 'foundation',  naam: 'Foundation',   emoji: '🎓', kleur: '#5AB4C9', uitleg: 'Gezinnen, leerlingen en scholen in de RTF-app.',     synoniemen: ['foundation', 'rtf', 'rtfoundation', 'school', 'scholen', 'onderwijs', 'gezin', 'gezinnen', 'leerling'] },
@@ -30,12 +31,14 @@ const DOELGROEP_OP_ID = Object.fromEntries(DOELGROEPEN.map(d => [d.id, d]));
 // Handige groepen doelgroepen om herhaling te vermijden.
 const LEDEN = ['rtg', 'lifestyle', 'business'];
 const LEDEN_RTF = ['rtg', 'lifestyle', 'business', 'foundation'];
+// mét de gratis app: de functies die ook zonder pas bereikbaar zijn
+const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
 
 // De catalogus. standaard: true = de functie staat normaal aan. doelgroepen:
 // welke doelgroepen deze functie bedient (en dus apart te schakelen zijn).
 const FUNCTIES = [
   // ---- Leden (RTG-app) ----
-  { id: 'member', categorie: 'Leden (RTG-app)', naam: 'Leden-app (algemeen)', standaard: true, doelgroepen: LEDEN,
+  { id: 'member', categorie: 'Leden (RTG-app)', naam: 'Leden-app (algemeen)', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).', paden: ['/api/member'] },
   { id: 'member-dm', categorie: 'Leden (RTG-app)', naam: 'Directe berichten (DM)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Privéberichten tussen leden onderling.', paden: ['/api/member/dm'] },
@@ -49,9 +52,9 @@ const FUNCTIES = [
     uitleg: 'De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.', paden: ['/api/zakelijk'] },
 
   // ---- Genres & diensten (leden boeken/kopen per sector) ----
-  { id: 'bestellen', categorie: 'Genres & diensten', naam: 'Bestellen & bezorgen', standaard: true, doelgroepen: LEDEN,
+  { id: 'bestellen', categorie: 'Genres & diensten', naam: 'Bestellen & bezorgen', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.', paden: ['/api/order', '/api/orders', '/api/bezorg'] },
-  { id: 'tickets', categorie: 'Genres & diensten', naam: 'Tickets & activiteiten', standaard: true, doelgroepen: LEDEN,
+  { id: 'tickets', categorie: 'Genres & diensten', naam: 'Tickets & activiteiten', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Tickets kopen met tijdslot en een oplichtende entreecode.', paden: ['/api/tickets'] },
   { id: 'verhuur', categorie: 'Genres & diensten', naam: 'Autoverhuur', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Auto huren met foto\'s voor/na, borg, SOS-knop en live locatie.', paden: ['/api/huur', '/api/verhuur'] },
@@ -69,7 +72,7 @@ const FUNCTIES = [
     uitleg: 'De brede B2B/B2C-marktplaats: horeca koopt in, leden bestellen boodschappen, met AI-bijbestellen. Elke groothandel zet zijn eigen functies aan/uit.', paden: ['/api/groothandel', '/api/supplier/groothandel', '/api/supplier/inkoop'] },
 
   // ---- Sociaal (De Salon) ----
-  { id: 'salon', categorie: 'Sociaal (De Salon)', naam: 'De Salon (feed, volgen, deals)', standaard: true, doelgroepen: LEDEN,
+  { id: 'salon', categorie: 'Sociaal (De Salon)', naam: 'De Salon (feed, volgen, deals)', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.', paden: ['/api/salon'] },
   { id: 'ontmoetingen', categorie: 'Sociaal (De Salon)', naam: 'Salon-ontmoetingen (in de buurt)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.', paden: ['/api/ontmoeten'] },
@@ -134,7 +137,7 @@ const FUNCTIES = [
     uitleg: 'De vacature- en sollicitatielaag binnen de RTFoundation-app.', paden: ['/api/rtf/apply', '/api/rtf/vacatures', '/api/rtf/solliciteer'] },
 
   // ---- Betalen & verificatie ----
-  { id: 'betalen', categorie: 'Betalen & verificatie', naam: 'Betaalverkeer', standaard: true, doelgroepen: LEDEN,
+  { id: 'betalen', categorie: 'Betalen & verificatie', naam: 'Betaalverkeer', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Betalingen (demo of Stripe) en de RTG Pay-wallet. Uit = er kan tijdelijk niet betaald worden.', paden: ['/api/betaal', '/api/pay'] },
   { id: 'webauthn', categorie: 'Betalen & verificatie', naam: 'Passkeys (WebAuthn)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Inloggen met vingerafdruk, gezicht of beveiligingssleutel. Wachtwoord-inloggen blijft altijd werken.', paden: ['/api/webauthn'] },

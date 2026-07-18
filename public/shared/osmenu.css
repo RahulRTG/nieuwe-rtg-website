@@ -119,6 +119,10 @@
 .osmenu-sw input:checked + .baan{background:color-mix(in srgb, var(--osm-accent) 55%, #1a1613);}
 .osmenu-sw input:checked + .baan + .knop{transform:translateX(18px); background:var(--osm-inkt);}
 .osmenu-sw input:focus-visible + .baan{outline:2px solid var(--osm-accent); outline-offset:2px;}
+/* een vaste (niet-schakelbare) schakelaar: het toestel bedient dit zelf */
+.osmenu-sw.uit{opacity:0.45;}
+.osmenu-sw.uit input{cursor:not-allowed;}
+.osmenu-toggle .tl b .uitleg-knop{margin-left:0.1rem;}
 
 /* 2-koloms app-raster */
 .osmenu-sectiekop{

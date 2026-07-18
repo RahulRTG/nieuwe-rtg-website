@@ -225,6 +225,51 @@
     uitleg.style.color = 'var(--osm-grijs-zacht)'; uitleg.style.fontSize = '0.78rem'; uitleg.style.margin = '0.2rem 0.2rem 0.6rem';
     lijf.appendChild(sectie('🎛️', 'Bedieningspaneel', [uitleg].concat(appToggles), false));
 
+    // ---- verbinding: GPS werkt echt; wifi/Bluetooth kan een website niet
+    //      schakelen (alleen het toestel zelf), dus die staan vast met uitleg ----
+    function gpsAan() { try { return localStorage.getItem('rtg_os_gps') === '1'; } catch (e) { return false; } }
+    var gpsRij = el('div', 'osmenu-toggle');
+    gpsRij.appendChild(el('span', 'ic', '📍'));
+    var gtl = el('div', 'tl'); gtl.appendChild(el('b', null, 'Locatie (GPS)'));
+    gtl.appendChild(el('small', null, 'Voor kaarten, ritten en veiligheid'));
+    gpsRij.appendChild(gtl);
+    var gLab = el('label', 'osmenu-sw');
+    var gInp = d.createElement('input'); gInp.type = 'checkbox'; gInp.checked = gpsAan();
+    gInp.addEventListener('change', function () {
+      if (gInp.checked) {
+        try { localStorage.setItem('rtg_os_gps', '1'); } catch (e) {}
+        if (w.navigator && w.navigator.geolocation) {
+          w.navigator.geolocation.getCurrentPosition(function () {}, function () {
+            try { localStorage.setItem('rtg_os_gps', '0'); } catch (e) {}
+            gInp.checked = false;   // toestemming geweigerd -> weer uit
+          });
+        }
+      } else { try { localStorage.setItem('rtg_os_gps', '0'); } catch (e) {} }
+    });
+    gLab.appendChild(gInp); gLab.appendChild(el('span', 'baan')); gLab.appendChild(el('span', 'knop'));
+    gpsRij.appendChild(gLab);
+
+    function vastRij(icoon, titel, uitlegTekst) {
+      var rij = el('div', 'osmenu-toggle');
+      rij.appendChild(el('span', 'ic', icoon));
+      var tl = el('div', 'tl');
+      var b = el('b'); b.appendChild(d.createTextNode(titel + ' '));
+      if (w.RTGUitleg && w.RTGUitleg.knop) b.appendChild(w.RTGUitleg.knop(uitlegTekst, 'Waarom kan dit niet?'));
+      tl.appendChild(b);
+      tl.appendChild(el('small', null, 'Je toestel schakelt dit zelf'));
+      rij.appendChild(tl);
+      var lab = el('label', 'osmenu-sw uit');
+      var inp = d.createElement('input'); inp.type = 'checkbox'; inp.disabled = true;
+      lab.appendChild(inp); lab.appendChild(el('span', 'baan')); lab.appendChild(el('span', 'knop'));
+      rij.appendChild(lab);
+      return rij;
+    }
+    var wifiRij = vastRij('📶', 'Wifi',
+      'Een website mag de wifi van je toestel niet aan- of uitzetten; dat kan alleen je telefoon zelf, via de instellingen. RTG-OS toont de schakelaar, maar bedient de radio niet.');
+    var btRij = vastRij('🔵', 'Bluetooth',
+      'Een website mag Bluetooth van je toestel niet aan- of uitzetten; dat kan alleen je telefoon zelf, via de instellingen. RTG-OS toont de schakelaar, maar bedient de radio niet.');
+    lijf.appendChild(sectie('📡', 'Verbinding', [gpsRij, wifiRij, btRij], false));
+
     // ---- instellingen (incl. afmelden) ----
     var instKinderen = [
       menurij(['🔒', 'Privacy', '/site/privacy.html']),

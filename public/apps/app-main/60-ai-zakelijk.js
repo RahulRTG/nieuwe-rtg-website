@@ -82,7 +82,7 @@
         bubble(q, 'user');
         bubble(r.antwoord, 'ai');
         if (!user.account){ chatHistory.push({role:'user', content:q}); chatHistory.push({role:'assistant', content:r.antwoord}); }
-        if (r.gedaan) toast('🤵 ' + T('fl.gedaan','De Butler heeft het geregeld.'));
+        if (r.gedaan) toast('🤵 ' + T('fl.gedaan','Rahul heeft het geregeld.'));
         voorstelChips(!!r.voorstel);
         if (typeof renderFluister === 'function') renderFluister();
         $('#content').scrollTop = $('#content').scrollHeight;
@@ -126,11 +126,11 @@
   }
   async function renderChat(){
     const concierge = user.tier !== 'rtg';
-    $('#aiTitle').textContent = concierge ? T('chat.concierge.title','Uw concierge.') : T('ai.title.rtg','De Butler.');
+    $('#aiTitle').textContent = concierge ? T('chat.concierge.title','Uw concierge.') : T('ai.title.rtg','Rahul.');
     const deck = document.querySelector('.view[data-view="ai"] .sub');
     if (deck) deck.textContent = concierge
       ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
-      : T('chat.butler.deck','De Butler, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
+      : T('chat.butler.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
     // Vaste snelactie: alles regelen én afrekenen kan hier. Face ID, direct naar de partner.
     if (user.tier !== 'guest'){
       $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
@@ -174,7 +174,7 @@
   }
   function renderAI(){
     if (user.account){ renderChat(); return; }
-    $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','De Butler.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','Uw uitvoerende AI.');
+    $('#aiTitle').textContent = user.tier === 'rtg' ? T('ai.title.rtg','Rahul.') : user.tier === 'lifestyle' ? T('ai.title.life','Uw AI.') : T('ai.title.biz','Uw uitvoerende AI.');
     $('#chat').innerHTML = '';
     chatHistory.length = 0;
     const opener = aiOpener();

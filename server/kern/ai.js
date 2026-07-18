@@ -1,15 +1,18 @@
-/* De persoonlijke AI-laag: de systeemprompt per pas ("de Butler" voor RTG),
-   demo-antwoorden zonder API-sleutel, het echte Claude-antwoord, en de
-   doorlopende conversatie in de app. RTG wordt door de AI beantwoord; Lifestyle
-   en Business gaan naar de menselijke concierge.
+/* De persoonlijke AI-laag: de systeemprompt per pas (de AI heet Rahul, de enige
+   AI-hulp in het hele systeem), demo-antwoorden zonder API-sleutel, het echte
+   Claude-antwoord, en de doorlopende conversatie in de app. RTG wordt door de AI
+   beantwoord; Lifestyle en Business gaan naar de menselijke concierge.
 
    AI_TONE is pure data; de rest draagt state (db, accounts, de Claude-client en
-   de realtime-helpers) en komt uit maakAi(state). */
+   de realtime-helpers) en komt uit maakAi(state). De interne kanaalsleutel van
+   Rahul's berichten blijft 'butler' (dataplumbing, niet zichtbaar voor het lid). */
 
+// Het register verschilt per pas; het karakter van Rahul (zie aiSystemPrompt)
+// blijft altijd hetzelfde.
 const AI_TONE = {
-  rtg: 'Je bent "de Butler": rustig, ingetogen, old money kalmte. Je tutoyeert niet, je vousvoyeert.',
-  lifestyle: 'Je werkt naast de persoonlijke concierge: warm, voorkomend en persoonlijk. U-vorm.',
-  business: 'Je bent een uitvoerende AI voor een zakelijk lid: kort, precies, to the point. U-vorm, geen overbodige woorden.'
+  rtg: 'Register: ingetogen "old money", rustig en zeker. Je tutoyeert het lid (je/jij-vorm).',
+  lifestyle: 'Register: warm, voorkomend en persoonlijk, naast de menselijke concierge. U-vorm.',
+  business: 'Register: kort, precies en uitvoerend. U-vorm, geen overbodige woorden.'
 };
 
 const { naamEn } = require('../talen');
@@ -20,16 +23,18 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     const persona = PERSONAS[tier];
     const trip = db.data.trip;
     const openInvoices = db.data.invoices.filter(i => i.status === 'open');
-    // De Butler spreekt de taal van het lid (wereldtalen via de Boardroom).
+    // Rahul spreekt de taal van het lid (wereldtalen via de Boardroom).
     const taalRegel = (!lang || lang === 'nl')
       ? 'Antwoord in het Nederlands, beknopt (maximaal ~120 woorden), zonder opsmuk.'
       : 'The member reads and writes in ' + naamEn(lang) + '. Answer ONLY in ' + naamEn(lang) + ', concise (max ~120 words), no frills. Keep the same courteous, formal register.';
     return [
-      'Je bent de exclusieve persoonlijke reis-AI van Rahul Travel Group (RTG), een membership-reisclub die tegen inkoopprijs boekt en 30% van elke ledenbijdrage aan de RTFoundation doneert.',
-      // de dagcontext: elke AI denkt aan tijd, seizoen en temperatuur
+      'Je bent Rahul (uitgesproken "Raoel"), de persoonlijke reis-AI van Rahul Travel Group (RTG) en de enige AI-hulp binnen het hele systeem. RTG is een membership-reisclub die tegen inkoopprijs boekt en 30% van elke ledenbijdrage aan de RTFoundation doneert.',
+      // Het karakter van Rahul, altijd gelijk (het register verschilt per pas).
+      'Je karakter: enorm empathisch, met een hoog EQ en IQ, en absurd eerlijk -- soms bijna te eerlijk. Je verzacht niets en verkoopt geen mooi weer: kan iets niet, of klopt iets niet, dan zeg je dat meteen, kalm en vriendelijk. Zakelijk ben je scherp en beslist, maar er is altijd ruimte voor mensen en familie. Tegen kinderen ben je juist zacht, warm en geduldig. Je kent luxe en gastvrijheid van de werkvloer tot de top en voelt haarfijn aan wat echt goede service is. Je ADHD heb je onder controle: gefocust, snel, to the point; je houdt antwoorden kort en concreet.',
+      // de dagcontext: Rahul denkt aan tijd, seizoen en temperatuur
       dagContext().zin + ' Weeg dat mee in adviezen (kleding, terras of binnen, dagplanning, seizoensgerechten).',
       AI_TONE[tier] || AI_TONE.rtg,
-      'Je bent de frictieloze vriend van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay), verwijs daarnaar, vraag nooit om betaalgegevens.',
+      'Je bent de frictieloze rechterhand van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay), verwijs daarnaar, vraag nooit om betaalgegevens.',
       'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig je kort dat het geregeld is en noem je wat je vervolgens in de gaten houdt.',
       'Je helpt het lid met reisvoorbereiding: paklijsten, documenten en visa, weer, dagplanning, restaurants en wijzigingen aan geboekte diensten. ' + taalRegel,
       `Het lid: ${persona.full} (${tier === 'rtg' ? 'RTG Pass' : tier === 'lifestyle' ? 'Lifestyle Pass' : 'Business Pass'}), lid sinds ${persona.since}.`,
@@ -59,7 +64,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     return 'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Ibiza kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.';
   }
 
-  /* Geeft { text, lang }: met AI antwoordt de Butler direct in de taal van het
+  /* Geeft { text, lang }: met AI antwoordt Rahul direct in de taal van het
      lid; zonder AI proberen we het demo-antwoord te vertalen en anders blijft
      het Nederlands, eerlijk gelabeld met de echte taal van de tekst. */
   async function generateAiReply(tier, convo, lang) {
@@ -94,7 +99,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     md.conversation = md.conversation || [];
     md.conversation.push({ from: 'member', text: String(text).slice(0, 1000), lang: lang || 'nl', at: new Date().toISOString(), channel });
     if (user.tier === 'rtg') {
-      // De Butler (AI) antwoordt meteen, in de taal van het lid.
+      // Rahul (AI) antwoordt meteen, in de taal van het lid.
       const reply = await generateAiReply(user.tier, md.conversation, lang);
       md.conversation.push({ from: 'butler', text: reply.text, lang: reply.lang, at: new Date().toISOString(), channel: 'butler' });
       md.needsConcierge = false;

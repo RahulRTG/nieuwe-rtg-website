@@ -361,7 +361,7 @@
     }
     // altijd onderaan: geef de vraag aan de Butler, wat het ook is
     const bi = document.createElement('span'); bi.textContent = '✦';
-    zoekRij(bi, q ? 'Vraag de Butler: "' + zoekInput.value.trim() + '"' : 'Vraag de Butler', null,
+    zoekRij(bi, q ? 'Vraag Rahul: "' + zoekInput.value.trim() + '"' : 'Vraag Rahul', null,
       () => vraagButler(zoekInput.value.trim()));
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
@@ -581,7 +581,7 @@
     const schoon = (ruw || '').trim().replace(/[?.!]+$/, '');
     const q = schoon.toLowerCase();
     if (!q) return false;
-    if (/^(home|thuis|beginscherm)$/.test(q)) { sluitScrims(); naarHome(); bannerToon('✦', 'Butler', 'Naar het beginscherm.'); return true; }
+    if (/^(home|thuis|beginscherm)$/.test(q)) { sluitScrims(); naarHome(); bannerToon('✦', 'Rahul', 'Naar het beginscherm.'); return true; }
     // elke functie een eigen app: bellen en videobellen direct via de Butler
     if (/^(bel|bellen|iemand bellen)$/.test(q)) { sluitScrims(); openItem('os:bellen'); return true; }
     if (/^(videobel|videobellen|video bellen)$/.test(q)) { sluitScrims(); openItem('os:videobellen'); return true; }
@@ -601,7 +601,7 @@
       const doel = mappen.find(mp => kaal(mapNaam(mp)) === kaal(mh[1]) || kaal(mp.naam) === kaal(mh[1]));
       if (doel) {
         zetMapNaam(doel, mh[2]);
-        bannerToon('✦', 'Butler', 'De map heet nu "' + mapNaam(doel) + '".');
+        bannerToon('✦', 'Rahul', 'De map heet nu "' + mapNaam(doel) + '".');
         return true;
       }
     }
@@ -610,12 +610,12 @@
     m = q.match(/^thema\s+(bordeaux|parelmoer|standaard|klassiek)$/);
     if (m && window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
       RTGOSThema.zet(m[1] === 'klassiek' ? 'standaard' : m[1]);
-      bannerToon('✦', 'Butler', 'Het thema staat op ' + m[1] + '.');
+      bannerToon('✦', 'Rahul', 'Het thema staat op ' + m[1] + '.');
       return true;
     }
     if (/^(licht|donker|lichte modus|donkere modus)$/.test(q)) {
       const b = $('#rtg-thema-knop');
-      if (b) { b.click(); bannerToon('✦', 'Butler', 'De weergave is omgezet.'); return true; }
+      if (b) { b.click(); bannerToon('✦', 'Rahul', 'De weergave is omgezet.'); return true; }
       return false;
     }
     m = q.match(/^(?:open|start|ga naar)\s+(.+)$/);
@@ -623,7 +623,7 @@
       const naam = m[1].replace(/^(?:de|het|een)\s+/, '');
       const doelen = alleDoelen();
       const doel = doelen.find(d => d.naam.toLowerCase() === naam) || doelen.find(d => d.naam.toLowerCase().includes(naam));
-      if (doel) { sluitScrims(); doel.doe(); bannerToon('✦', 'Butler', doel.naam + ' staat voor u open.'); return true; }
+      if (doel) { sluitScrims(); doel.doe(); bannerToon('✦', 'Rahul', doel.naam + ' staat voor u open.'); return true; }
     }
     return false;
   }

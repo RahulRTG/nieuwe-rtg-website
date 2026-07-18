@@ -41,6 +41,7 @@ const PAGINAS = [
   '/apps/ovroutes.html',
   '/apps/clips.html',
   '/apps/scherm.html',
+  '/apps/office.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

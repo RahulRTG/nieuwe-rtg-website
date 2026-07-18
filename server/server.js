@@ -2750,6 +2750,12 @@ Object.assign(kern, require('./kern/ov').maakOv({
 Object.assign(kern, require('./kern/clips').maakClips({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, sseToCustomer, sseToOffice
 }));
+/* RTG Office (kern/office.js): het eigen kantoorpakket. Documenten
+   (tekstdocument of rekenblad) op het account, alleen-lezen te delen op
+   codenaam. Na sociaal gemount (codenamen en de codenaam-opzoeker). */
+Object.assign(kern, require('./kern/office').maakOffice({
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, keyVanCodenaam, sseToCustomer
+}));
 /* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
    De cryptografie komt uit @simplewebauthn/server; wij bewaren alleen
    publieke sleutels per account, challenges leven kort en in RAM.
@@ -2801,6 +2807,7 @@ require('./routes/theater')(kern);
 require('./routes/wbw')(kern);
 require('./routes/ov')(kern);
 require('./routes/clips')(kern);
+require('./routes/kantoorpakket')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

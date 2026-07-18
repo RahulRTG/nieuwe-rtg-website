@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Office</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
+  button{font:inherit;cursor:pointer;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.8rem) 1.1rem 0.6rem;border-bottom:1px solid var(--line);}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+  .kop .rek{flex:1;}
+  .kop .staat{font-size:0.75rem;color:var(--soft);}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:0.82rem;padding:0.5rem 0.85rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,input:focus-visible,[contenteditable]:focus-visible,td:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
+  main{flex:1;min-height:0;overflow-y:auto;}
+  /* de mappenlijst */
+  #lijst{padding:1.1rem;max-width:820px;margin:0 auto;}
+  .rijk{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1rem 0 0.5rem;}
+  .doc{display:flex;align-items:center;gap:0.8rem;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;color:var(--txt);padding:0.85rem 1rem;margin-bottom:0.5rem;}
+  .doc .ic{font-size:1.4rem;}
+  .doc .rek{flex:1;min-width:0;}
+  .doc b{display:block;font-size:0.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .doc small{color:var(--soft);font-size:0.75rem;}
+  .doc .weg{background:none;border:1px solid var(--line);border-radius:8px;color:var(--rood);font-size:0.72rem;padding:0.3rem 0.6rem;}
+  .stil{color:var(--soft);font-size:0.85rem;}
+  /* de editor */
+  #editor{display:none;flex-direction:column;height:100%;}
+  #editor.aan{display:flex;}
+  .balk{display:flex;align-items:center;gap:0.4rem;padding:0.55rem 1rem;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--card2);}
+  .balk input.titel{flex:1;min-width:9rem;background:none;border:none;color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.1rem;outline:none;}
+  .balk .tb{background:var(--card);border:1px solid var(--line);border-radius:8px;color:var(--txt);width:2.1rem;height:2.1rem;font-weight:700;}
+  .balk .tb.ital{font-style:italic;} .balk .tb.und{text-decoration:underline;}
+  .vlak{flex:1;min-height:0;overflow:auto;padding:1.4rem;}
+  /* tekstdocument */
+  #tekst{max-width:820px;margin:0 auto;min-height:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:2.2rem 2.4rem;font-size:1rem;line-height:1.7;outline:none;}
+  #tekst:empty::before{content:attr(data-leeg);color:var(--soft);}
+  /* rekenblad */
+  #blad{border-collapse:collapse;font-variant-numeric:tabular-nums;}
+  #blad th,#blad td{border:1px solid var(--line);min-width:96px;height:32px;padding:0 0.5rem;font-size:0.88rem;}
+  #blad th{background:var(--card2);color:var(--soft);font-weight:600;text-align:center;position:sticky;top:0;}
+  #blad td[data-berekend]{color:var(--gold);}
+  #blad td:focus{background:rgba(201,162,75,0.12);}
+  #blad td.rijkop{background:var(--card2);color:var(--soft);text-align:center;font-weight:600;position:sticky;left:0;}
+  .deel-scrim{position:fixed;inset:0;z-index:20;background:rgba(12,12,11,0.85);display:none;align-items:center;justify-content:center;padding:1rem;}
+  .deel-scrim.open{display:flex;}
+  .deel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;width:min(440px,100%);}
+  .deel h3{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin-bottom:0.6rem;}
+  .deel input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:0.6rem 0.8rem;margin:0.5rem 0;}
+  .deel .lijst{font-size:0.85rem;color:var(--soft);margin:0.5rem 0;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:30;
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;opacity:0;transition:opacity .25s;}
+  .melding.zien{opacity:1;}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" id="terug" aria-label="Terug naar de leden-app">←</a>
+  <h1>RTG Office</h1>
+  <span class="rek"></span>
+  <span class="staat" id="staat"></span>
+</header>
+<main>
+  <!-- de mappenlijst -->
+  <section id="lijst">
+    <div class="rijk">
+      <button class="knop vol" id="nieuwTekst" type="button">📄 Nieuw document</button>
+      <button class="knop vol" id="nieuwBlad" type="button">📊 Nieuw rekenblad</button>
+    </div>
+    <h2>Mijn documenten</h2>
+    <div id="mijnDocs"></div>
+    <h2>Met mij gedeeld</h2>
+    <div id="gedeeldDocs"></div>
+  </section>
+
+  <!-- de editor -->
+  <section id="editor">
+    <div class="balk">
+      <button class="knop" id="editTerug" type="button">← Documenten</button>
+      <input class="titel" id="titel" maxlength="120" aria-label="Titel van het document">
+      <span id="tekstTools" style="display:flex;gap:0.4rem;">
+        <button class="tb" data-cmd="bold" title="Vet" type="button">B</button>
+        <button class="tb ital" data-cmd="italic" title="Cursief" type="button">I</button>
+        <button class="tb und" data-cmd="underline" title="Onderstreept" type="button">U</button>
+        <button class="tb" data-cmd="insertUnorderedList" title="Opsomming" type="button">•</button>
+      </span>
+      <span class="rek"></span>
+      <button class="knop" id="deelBtn" type="button">🔗 Delen</button>
+      <button class="knop" id="exportBtn" type="button">⬇ Export</button>
+    </div>
+    <div class="vlak">
+      <div id="tekst" contenteditable="true" data-leeg="Begin te typen…" role="textbox" aria-multiline="true" aria-label="Documenttekst"></div>
+      <div id="bladWrap" style="display:none;overflow:auto;"><table id="blad"></table></div>
+    </div>
+  </section>
+</main>
+
+<div class="deel-scrim" id="deelScrim" role="dialog" aria-label="Delen">
+  <div class="deel">
+    <h3>Delen (alleen lezen)</h3>
+    <p class="stil">Deel dit document alleen-lezen met een ander lid op codenaam. De ander ziet uw echte naam nooit.</p>
+    <form id="deelForm"><input id="deelCode" maxlength="60" placeholder="Codenaam van het lid" aria-label="Codenaam"><button class="knop vol" type="submit">Deel</button></form>
+    <div class="lijst" id="deelLijst"></div>
+    <button class="knop" id="deelDicht" type="button" style="margin-top:0.5rem;">Sluit</button>
+  </div>
+</div>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/kantoorpakket/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
+
+  let open = null, magBewerken = false, bewaarT = null, vuil = false;
+
+  /* ---------- de mappenlijst ---------- */
+  async function laadLijst(){
+    const r = await api('mijn');
+    if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
+    const teken = (rij, leegtekst) => rij.length ? rij.map(d =>
+      '<div class="doc"><span class="ic">'+(d.soort==='blad'?'📊':'📄')+'</span>'+
+      '<button class="rek" data-open="'+d.id+'" style="background:none;border:none;color:var(--txt);text-align:left;">'+
+        '<b>'+esc(d.titel)+'</b><small>'+esc(d.door)+' · '+new Date(d.gewijzigd).toLocaleDateString('nl-NL')+(d.gedeeld?' · gedeeld met '+d.gedeeld:'')+'</small></button>'+
+      (leegtekst==='eigen'?'<button class="weg" data-weg="'+d.id+'">weg</button>':'')+'</div>').join('') : '<p class="stil">Nog niets hier.</p>';
+    $('#mijnDocs').innerHTML = teken(r.body.docs, 'eigen');
+    $('#gedeeldDocs').innerHTML = teken(r.body.gedeeld, 'gedeeld');
+    document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openen(b.dataset.open)));
+    document.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Dit document verwijderen?')) return;
+      const w = await api('weg', { id: b.dataset.weg }); if (w.body.error) return zeg(w.body.error);
+      zeg('Verwijderd.'); laadLijst();
+    }));
+  }
+  async function nieuw(soort){
+    const r = await api('maak', { soort });
+    if (r.body.error) return zeg(r.body.error);
+    openen(r.body.id);
+  }
+  $('#nieuwTekst').addEventListener('click', () => nieuw('tekst'));
+  $('#nieuwBlad').addEventListener('click', () => nieuw('blad'));
+
+  /* ---------- een document openen ---------- */
+  async function openen(id){
+    const r = await api('open', { id });
+    if (r.status !== 200) return zeg(r.body.error || 'Kon niet openen.');
+    open = r.body; magBewerken = !!r.body.magBewerken; vuil = false;
+    $('#titel').value = r.body.titel; $('#titel').disabled = !magBewerken;
+    $('#staat').textContent = magBewerken ? '' : 'alleen lezen · van ' + r.body.door;
+    $('#deelBtn').style.display = magBewerken ? '' : 'none';
+    if (r.body.soort === 'blad') { toonBlad(r.body.inhoud); }
+    else { toonTekst(r.body.inhoud); }
+    $('#lijst').style.display = 'none'; $('#editor').classList.add('aan');
+  }
+  function sluitEditor(){ $('#editor').classList.remove('aan'); $('#lijst').style.display = ''; open = null; laadLijst(); }
+  $('#editTerug').addEventListener('click', () => { if (vuil) bewaarNu(); sluitEditor(); });
+
+  /* ---------- tekstdocument ---------- */
+  function toonTekst(inhoud){
+    $('#tekstTools').style.display = magBewerken ? 'flex' : 'none';
+    $('#tekst').style.display = ''; $('#bladWrap').style.display = 'none';
+    $('#tekst').innerHTML = inhoud && inhoud.tekst || '';
+    $('#tekst').contentEditable = magBewerken ? 'true' : 'false';
+  }
+  $('#tekst').addEventListener('input', () => markeer());
+  document.querySelectorAll('[data-cmd]').forEach(b => b.addEventListener('mousedown', e => {
+    e.preventDefault(); document.execCommand(b.dataset.cmd, false, null); $('#tekst').focus(); markeer();
+  }));
+
+  /* ---------- rekenblad met formules ---------- */
+  let bladData = null;
+  function kolLetter(i){ return String.fromCharCode(65 + i); }
+  function toonBlad(inhoud){
+    bladData = { cellen: Object.assign({}, (inhoud && inhoud.cellen) || {}),
+      rijen: (inhoud && inhoud.rijen) || 20, kolommen: (inhoud && inhoud.kolommen) || 8 };
+    $('#tekstTools').style.display = 'none';
+    $('#tekst').style.display = 'none'; $('#bladWrap').style.display = '';
+    tekenBlad();
+  }
+  function tekenBlad(){
+    const t = $('#blad'); let h = '<thead><tr><th></th>';
+    for (let c = 0; c < bladData.kolommen; c++) h += '<th>' + kolLetter(c) + '</th>';
+    h += '</tr></thead><tbody>';
+    for (let r = 1; r <= bladData.rijen; r++){
+      h += '<tr><td class="rijkop">' + r + '</td>';
+      for (let c = 0; c < bladData.kolommen; c++){
+        const ref = kolLetter(c) + r;
+        const rauw = bladData.cellen[ref] || '';
+        const isForm = String(rauw).startsWith('=');
+        const toon = isForm ? bereken(rauw) : rauw;
+        h += '<td tabindex="0" data-ref="'+ref+'"'+(isForm?' data-berekend="1"':'')+(magBewerken?' contenteditable="true"':'')+'>'+esc(toon)+'</td>';
+      }
+      h += '</tr>';
+    }
+    t.innerHTML = h + '</tbody>';
+    if (magBewerken) t.querySelectorAll('td[data-ref]').forEach(td => {
+      td.addEventListener('focus', () => { const ref = td.dataset.ref; td.textContent = bladData.cellen[ref] || ''; });
+      td.addEventListener('blur', () => {
+        const ref = td.dataset.ref, val = td.textContent.trim();
+        if (val) bladData.cellen[ref] = val; else delete bladData.cellen[ref];
+        markeer(); tekenBlad();
+      });
+      td.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); td.blur(); } });
+    });
+  }
+  function celGetal(ref, diepte){
+    const rauw = bladData.cellen[ref];
+    if (rauw == null || rauw === '') return 0;
+    if (String(rauw).startsWith('=')) { const v = bereken(rauw, diepte + 1); return parseFloat(v) || 0; }
+    return parseFloat(String(rauw).replace(',', '.')) || 0;
+  }
+  function reeks(a, b, diepte){
+    const m1 = /^([A-Z]+)([0-9]+)$/.exec(a), m2 = /^([A-Z]+)([0-9]+)$/.exec(b);
+    if (!m1 || !m2) return [];
+    const c1 = m1[1].charCodeAt(0), c2 = m2[1].charCodeAt(0), r1 = +m1[2], r2 = +m2[2];
+    const uit = [];
+    for (let c = Math.min(c1,c2); c <= Math.max(c1,c2); c++)
+      for (let r = Math.min(r1,r2); r <= Math.max(r1,r2); r++) uit.push(celGetal(String.fromCharCode(c) + r, diepte));
+    return uit;
+  }
+  function bereken(formule, diepte){
+    diepte = diepte || 0;
+    if (diepte > 30) return '#LUS';
+    try {
+      let f = String(formule).slice(1).toUpperCase().replace(/\s+/g, '');
+      // functies: SOM/SUM, GEM/AVERAGE, MIN, MAX, AANTAL/COUNT over een bereik
+      f = f.replace(/(SOM|SUM|GEM|AVERAGE|MIN|MAX|AANTAL|COUNT)\(([A-Z]+[0-9]+):([A-Z]+[0-9]+)\)/g, (_, fn, a, b) => {
+        const r = reeks(a, b, diepte);
+        if (fn === 'SOM' || fn === 'SUM') return r.reduce((n, x) => n + x, 0);
+        if (fn === 'GEM' || fn === 'AVERAGE') return r.length ? r.reduce((n, x) => n + x, 0) / r.length : 0;
+        if (fn === 'MIN') return r.length ? Math.min.apply(null, r) : 0;
+        if (fn === 'MAX') return r.length ? Math.max.apply(null, r) : 0;
+        return r.length; // AANTAL/COUNT
+      });
+      // losse celverwijzingen
+      f = f.replace(/[A-Z]+[0-9]+/g, ref => celGetal(ref, diepte));
+      if (!/^[-+*/().0-9,\s]*$/.test(f)) return '#FOUT';
+      const uit = Function('"use strict";return (' + f.replace(/,/g, '.') + ')')();
+      return (Math.round(uit * 10000) / 10000).toString();
+    } catch (e) { return '#FOUT'; }
+  }
+
+  /* ---------- autosave ---------- */
+  function markeer(){ vuil = true; $('#staat').textContent = 'Opslaan…'; clearTimeout(bewaarT); bewaarT = setTimeout(bewaarNu, 900); }
+  async function bewaarNu(){
+    if (!open || !magBewerken || !vuil) return;
+    const inhoud = open.soort === 'blad' ? { cellen: bladData.cellen, rijen: bladData.rijen, kolommen: bladData.kolommen }
+      : { tekst: $('#tekst').innerHTML.slice(0, 500000) };
+    const r = await api('bewaar', { id: open.id, titel: $('#titel').value, inhoud });
+    if (r.body.error) { $('#staat').textContent = ''; return zeg(r.body.error); }
+    vuil = false; $('#staat').textContent = 'Bewaard ' + new Date().toLocaleTimeString('nl-NL').slice(0,5);
+  }
+  $('#titel').addEventListener('input', markeer);
+  setInterval(() => { if (vuil) bewaarNu(); }, 8000);
+  window.addEventListener('beforeunload', () => { if (vuil) navigator.sendBeacon && bewaarNu(); });
+
+  /* ---------- delen ---------- */
+  $('#deelBtn').addEventListener('click', async () => { if (!open) return; await toonDeel(); $('#deelScrim').classList.add('open'); });
+  $('#deelDicht').addEventListener('click', () => $('#deelScrim').classList.remove('open'));
+  async function toonDeel(){
+    const r = await api('open', { id: open.id });
+    const met = (r.body && r.body.gedeeldMet) || [];
+    $('#deelLijst').innerHTML = met.length ? 'Gedeeld met: ' + met.map(esc).join(', ') : 'Nog met niemand gedeeld.';
+  }
+  $('#deelForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const r = await api('deel', { id: open.id, codenaam: $('#deelCode').value, aan: true });
+    if (r.body.error) return zeg(r.body.error);
+    $('#deelCode').value = ''; zeg('Gedeeld.'); toonDeel();
+  });
+
+  /* ---------- export ---------- */
+  $('#exportBtn').addEventListener('click', () => {
+    if (!open) return;
+    let data, naam, type;
+    if (open.soort === 'blad'){
+      const rijen = [];
+      for (let r = 1; r <= bladData.rijen; r++){
+        const cel = [];
+        for (let c = 0; c < bladData.kolommen; c++){ const ref = kolLetter(c) + r; const v = bladData.cellen[ref] || '';
+          cel.push('"' + String(String(v).startsWith('=') ? bereken(v) : v).replace(/"/g,'""') + '"'); }
+        rijen.push(cel.join(','));
+      }
+      data = rijen.join('\n'); naam = ($('#titel').value || 'rekenblad') + '.csv'; type = 'text/csv';
+    } else {
+      const div = document.createElement('div'); div.innerHTML = $('#tekst').innerHTML;
+      data = div.innerText; naam = ($('#titel').value || 'document') + '.txt'; type = 'text/plain';
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: type + ';charset=utf-8' }));
+    a.download = naam; a.click(); URL.revokeObjectURL(a.href);
+    zeg('Geëxporteerd: ' + naam);
+  });
+
+  if (!token) zeg('Log eerst in op de leden-app.'); else laadLijst();
+})();
+</script>
+</body>
+</html>

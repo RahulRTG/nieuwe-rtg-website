@@ -34,7 +34,8 @@
     wbw:         { naam: 'Wie betaalt wat', icoon: '💶', url: '/apps/wbw.html' },
     passkeys:    { naam: 'Passkeys',     icoon: '🔑', url: '/apps/passkeys.html' },
     ov:          { naam: 'OV',           icoon: '🚌', url: '/apps/ov.html' },
-    clips:       { naam: 'Clips',        icoon: '🎥', url: '/apps/clips.html' }
+    clips:       { naam: 'Clips',        icoon: '🎥', url: '/apps/clips.html' },
+    office:      { naam: 'RTG Office',   icoon: '📊', url: '/apps/office.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -67,6 +68,7 @@
       'link:flits',
       'link:theater',
       'link:wbw',
+      'link:office',
       'link:passkeys',
       'link:juridisch']
   ];

@@ -2772,6 +2772,14 @@ Object.assign(kern, require('./kern/wbw').maakWbw({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan,
   connectieTussen: kern.connectieTussen, verbActief: kern.verbActief, pay: kern.pay, notify
 }));
+/* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
+   (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een
+   match automatisch een tafel bij een partner rond het midden van de twee
+   woonplaatsen (EUR 10 p.p. vooraf: EUR 5 RTG, EUR 5 aanbetaling zaak). */
+Object.assign(kern, require('./kern/vonk').maakVonk({
+  db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
+  haversine, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
+}));
 /* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
    Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
    hercompressie) en staan als bestanden in de datamap, nooit in git. */
@@ -2813,6 +2821,7 @@ require('./routes/ov')(kern);
 require('./routes/clips')(kern);
 require('./routes/kantoorpakket')(kern);
 require('./routes/stuur')(kern);
+require('./routes/vonk')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

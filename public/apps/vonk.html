@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Vonk</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:720px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
+  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  .rij input{flex:1;min-width:6rem;width:auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .kaart .naam{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
+  .kaart .sub{font-size:0.75rem;color:var(--soft);margin:0.2rem 0 0.5rem;}
+  .chat{font-size:0.82rem;line-height:1.6;max-height:12rem;overflow:auto;border-top:1px solid var(--line);margin-top:0.6rem;padding-top:0.5rem;}
+  .chat .wie{color:var(--gold);font-weight:600;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+</style>
+</head>
+<body>
+<a class="skip" href="#inhoud" style="position:absolute;left:-999px;">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>💘 RTG Vonk</h1>
+  <div class="rek"></div>
+  <span class="stil">dating op codenaam</span>
+</header>
+<main id="inhoud">
+  <p class="stil">Een kleine selectie per dag, wederzijds passend bij uw wensen. Liken jullie elkaar, dan opent de chat en zet RTG automatisch een tafel klaar bij een partner rond het midden van jullie twee woonplaatsen. De date kost EUR 10 p.p. vooraf (EUR 5 RTG, EUR 5 aanbetaling bij de zaak). Veiligheid zoals in De Salon: 18+, geverifieerd paspoort, alleen uw stad zichtbaar, blokkeren en melden kan altijd.</p>
+
+  <section aria-label="Mijn profiel">
+    <h2>Mijn profiel en wensen</h2>
+    <div class="kaart">
+      <label for="pOver">Over mij (kort)</label><input id="pOver" maxlength="200">
+      <div class="rij">
+        <span><label for="pStad">Stad</label><input id="pStad" maxlength="40"></span>
+        <span><label for="pLat">Breedtegraad</label><input id="pLat" inputmode="decimal" placeholder="38.90"></span>
+        <span><label for="pLng">Lengtegraad</label><input id="pLng" inputmode="decimal" placeholder="1.42"></span>
+      </div>
+      <div class="rij">
+        <span><label for="pMin">Leeftijd van</label><input id="pMin" inputmode="numeric" value="18"></span>
+        <span><label for="pMax">tot</label><input id="pMax" inputmode="numeric" value="99"></span>
+        <span><label for="pKm">Max. km</label><input id="pKm" inputmode="numeric" value="100"></span>
+      </div>
+      <label for="pInt">Interesses (komma's)</label><input id="pInt" placeholder="zeilen, sushi, jazz">
+      <div class="rij"><button class="knop vol" id="pBewaar">Bewaar profiel</button><span class="stil" id="pStatus"></span></div>
+    </div>
+  </section>
+
+  <section aria-label="De dagselectie">
+    <h2>Vandaag voor u</h2>
+    <div id="selectie"><p class="stil">Nog geen selectie; bewaar eerst uw profiel.</p></div>
+  </section>
+
+  <section aria-label="Matches">
+    <h2>Matches</h2>
+    <div id="matches"><p class="stil">Nog geen matches.</p></div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
+  const api = (pad, body) => fetch('/api/vonk/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
+    body: JSON.stringify(body || {}) }).then(async r => { const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || 'Er ging iets mis.'); return j; });
+  let mt; const meld = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(mt); mt = setTimeout(() => m.classList.remove('zien'), 3200); };
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  async function laad() {
+    try {
+      const s = await api('selectie');
+      if (s.profiel) {
+        $('#pOver').value = s.profiel.over || ''; $('#pStad').value = s.profiel.stad || '';
+        $('#pMin').value = s.profiel.leeftijdMin; $('#pMax').value = s.profiel.leeftijdMax; $('#pKm').value = s.profiel.maxKm;
+        $('#pInt').value = (s.profiel.interesses || []).join(', ');
+      }
+      $('#selectie').innerHTML = (s.mensen || []).map(p =>
+        '<div class="kaart"><div class="naam">' + esc(p.codenaam) + ', ' + p.leeftijd + '</div>' +
+        '<div class="sub">' + esc(p.stad || 'stad onbekend') + (p.gemeen && p.gemeen.length ? ' · samen: ' + p.gemeen.map(esc).join(', ') : '') + '</div>' +
+        '<p class="stil">' + esc(p.over || '') + '</p>' +
+        '<div class="rij"><button class="knop vol" data-like="' + esc(p.codenaam) + '">Like</button>' +
+        '<button class="knop" data-nee="' + esc(p.codenaam) + '">Voorbij</button></div></div>').join('') ||
+        '<p class="stil">' + esc(s.uitleg || 'Vandaag niemand nieuw; morgen weer.') + '</p>';
+      koppel();
+      const m = await api('mijn');
+      $('#matches').innerHTML = (m.matches || []).map(x =>
+        '<div class="kaart"><div class="naam">' + esc(x.met) + '</div>' +
+        (x.tafel ? '<div class="sub">Tafel: ' + esc(x.tafel.supplierName) + ' (' + esc(x.tafel.plek) + '), ' + esc(x.tafel.datum) + ' ' + esc(x.tafel.tijd) +
+          ' · EUR ' + x.tafel.prijsPP + ' p.p. · status: ' + esc(x.status) + '</div>' : '<div class="sub">Spreek samen iets af in de chat.</div>') +
+        (x.tafel && !x.ikBetaalde ? '<div class="rij"><button class="knop vol" data-betaal="' + esc(x.id) + '">Bevestig met EUR ' + x.tafel.prijsPP + '</button></div>' : '') +
+        '<div class="chat">' + (x.berichten || []).map(b => '<div><span class="wie">' + esc(b.van) + '</span> ' + esc(b.tekst) + '</div>').join('') + '</div>' +
+        '<div class="rij"><input data-tekst="' + esc(x.id) + '" maxlength="300" placeholder="Bericht" aria-label="Bericht aan ' + esc(x.met) + '">' +
+        '<button class="knop" data-stuur="' + esc(x.id) + '">Stuur</button>' +
+        '<button class="knop" data-blok="' + esc(x.met) + '">Blokkeer en meld</button></div></div>').join('') ||
+        '<p class="stil">Nog geen matches.</p>';
+      koppel();
+    } catch (e) { meld(e.message); }
+  }
+  function koppel() {
+    document.querySelectorAll('[data-like]').forEach(b => b.onclick = async () => {
+      try { const r = await api('like', { codenaam: b.dataset.like }); meld(r.match ? 'Een vonk! De chat staat open.' : 'Genoteerd.'); laad(); } catch (e) { meld(e.message); } });
+    document.querySelectorAll('[data-nee]').forEach(b => b.onclick = async () => {
+      try { await api('like', { codenaam: b.dataset.nee, aan: false }); laad(); } catch (e) { meld(e.message); } });
+    document.querySelectorAll('[data-betaal]').forEach(b => b.onclick = async () => {
+      try { const r = await api('betaal', { id: b.dataset.betaal }); meld(r.status2 === 'bevestigd' ? 'De date staat!' : 'Betaald; zodra de ander ook bevestigt staat de tafel vast.'); laad(); } catch (e) { meld(e.message); } });
+    document.querySelectorAll('[data-stuur]').forEach(b => b.onclick = async () => {
+      const inp = document.querySelector('[data-tekst="' + b.dataset.stuur + '"]');
+      try { await api('bericht', { id: b.dataset.stuur, tekst: inp.value }); inp.value = ''; laad(); } catch (e) { meld(e.message); } });
+    document.querySelectorAll('[data-blok]').forEach(b => b.onclick = async () => {
+      const reden = prompt('Waarom meldt u ' + b.dataset.blok + '? (RTG kijkt mee)');
+      if (reden === null) return;
+      try { await api('blokkeer', { codenaam: b.dataset.blok, meld: reden || 'geblokkeerd' }); meld('Geblokkeerd en gemeld; RTG volgt dit op.'); laad(); } catch (e) { meld(e.message); } });
+  }
+  $('#pBewaar').addEventListener('click', async () => {
+    try {
+      await api('profiel', { over: $('#pOver').value, stad: $('#pStad').value,
+        lat: parseFloat($('#pLat').value), lng: parseFloat($('#pLng').value),
+        leeftijdMin: $('#pMin').value, leeftijdMax: $('#pMax').value, maxKm: $('#pKm').value,
+        interesses: $('#pInt').value.split(',').map(s => s.trim()).filter(Boolean) });
+      $('#pStatus').textContent = 'Bewaard.'; laad();
+    } catch (e) { meld(e.message); }
+  });
+  if (!tok) { meld('Log eerst in via de leden-app.'); return; }
+  laad();
+})();
+</script>
+</body>
+</html>

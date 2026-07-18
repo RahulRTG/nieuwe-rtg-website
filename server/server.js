@@ -2706,6 +2706,13 @@ Object.assign(kern, require('./kern/oog').maakOog({ db, save, crypto, schoon, ss
 Object.assign(kern, require('./kern/ghost').maakGhost({
   db, findSupplier, boekingenVanZaak: kern.boekingenVanZaak, haversine
 }));
+/* RTG Flits (kern/flits.js): de rijhulp van het netwerk: meldingen op
+   codenaam (flitser/file/ongeval/object/wegwerk) met houdbaarheid, dedupe
+   als bevestiging, klopt/weg-stemmen en landregels. Bewust zonder
+   spelmechaniek. Na ghost gemount (gebruikt de vooruitblik-motor). */
+Object.assign(kern, require('./kern/flits').maakFlits({
+  db, save, crypto, haversine, ghostSimuleer: kern.ghostSimuleer
+}));
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
    geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen
    die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar
@@ -2733,6 +2740,7 @@ require('./routes/kantoren')(kern);
 require('./routes/pay')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);
+require('./routes/flits')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Flits</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:760px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  /* het rijscherm: rust, grote cijfers, niets dat afleidt */
+  .rit{display:flex;flex-direction:column;align-items:center;padding:1.4rem 0 0.6rem;}
+  .snelheid{font-family:'Bodoni Moda',serif;font-size:6.5rem;line-height:1;font-variant-numeric:tabular-nums;}
+  .eenheid{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--soft);margin-top:0.3rem;}
+  .waarschuwing{width:100%;display:none;align-items:center;gap:0.8rem;background:var(--card);
+    border:1px solid var(--rood);border-radius:14px;padding:0.9rem 1rem;margin-top:1rem;}
+  .waarschuwing.zien{display:flex;}
+  .waarschuwing .wat{font-weight:600;white-space:nowrap;}
+  .waarschuwing .sub{display:block;font-size:0.76rem;color:var(--soft);margin-top:0.15rem;}
+  .waarschuwing .icoon{font-size:1.6rem;}
+  .stemmen{margin-left:auto;display:flex;gap:0.4rem;}
+  .stemmen button{background:var(--card2);border:1px solid var(--line);border-radius:999px;color:var(--txt);
+    font-size:0.76rem;padding:0.45rem 0.8rem;}
+  .stemmen button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  /* melden: een rustige rij, geen kleuren die schreeuwen */
+  .meldrij{display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;margin-top:1.1rem;}
+  .meldrij button{display:flex;flex-direction:column;align-items:center;gap:0.35rem;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;color:var(--txt);padding:0.85rem 0.3rem;font-size:0.72rem;}
+  .meldrij button .i{font-size:1.5rem;}
+  .meldrij button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .meldrij button:disabled{opacity:0.35;cursor:default;}
+  .lijst{font-size:0.82rem;line-height:1.6;}
+  .lijst .r{display:flex;gap:0.6rem;border-top:1px solid var(--line);padding:0.4rem 0;align-items:baseline;}
+  .lijst .r:first-child{border-top:none;}
+  .lijst .afstand{color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .lijst .wie{color:var(--soft);font-size:0.72rem;margin-left:auto;white-space:nowrap;}
+  .uren{display:flex;gap:0.35rem;align-items:flex-end;height:64px;margin-top:0.4rem;}
+  .uren .u{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.25rem;min-width:0;}
+  .uren .staaf{width:100%;max-width:22px;border-radius:3px 3px 0 0;background:var(--card2);border:1px solid var(--line);border-bottom:none;}
+  .uren .staaf.druk{background:var(--rood);border-color:var(--rood);}
+  .uren .staaf.middel{background:var(--gold);border-color:var(--gold);}
+  .uren .t{font-size:0.56rem;color:var(--soft);font-variant-numeric:tabular-nums;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>RTG Flits</h1>
+  <span class="rek"></span>
+  <span class="badge">Het netwerk meldt · geen spel</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil" id="poortReden">RTG Flits hoort bij uw lidmaatschap; log eerst in via de app.</p></div>
+  </section>
+
+  <section id="vRit" class="weg">
+    <div class="rit">
+      <span class="snelheid" id="snelheid" aria-live="off">0</span>
+      <span class="eenheid">km/u · gps</span>
+    </div>
+
+    <div class="waarschuwing" id="alarm" role="alert">
+      <span class="icoon" id="alarmIcoon" aria-hidden="true"></span>
+      <span><span class="wat" id="alarmWat"></span><span class="sub" id="alarmSub"></span></span>
+      <span class="stemmen">
+        <button type="button" id="stemKlopt">Klopt</button>
+        <button type="button" id="stemWeg">Weg</button>
+      </span>
+    </div>
+
+    <div class="meldrij" role="group" aria-label="Melden met een tik" id="meldrij"></div>
+    <p class="stil" id="landRegel" style="margin-top:0.5rem;"></p>
+
+    <h2>In de buurt</h2>
+    <div class="kaart"><div class="lijst" id="lijst"><p class="stil">Nog niets gemeld in de buurt.</p></div></div>
+
+    <h2>Vooruitblik</h2>
+    <div class="kaart">
+      <div class="uren" id="uren" role="img" aria-label="Drukteverwachting per uur"></div>
+      <p class="stil" id="urenSub" style="margin-top:0.5rem;"></p>
+    </div>
+    <p class="stil" id="bron" style="margin-top:0.4rem;"></p>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/flits/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
+  // rustige spraak, alleen als het ertoe doet (nadering); geen gebabbel
+  const spreek = t => { try { const u = new SpeechSynthesisUtterance(t); u.lang = 'nl-NL'; u.rate = 1.02; speechSynthesis.speak(u); } catch (e) {} };
+
+  const LAND = 'ES';                        // demo: Ibiza; in productie uit de live-locatie
+  let hier = { lat: 38.9089, lng: 1.4330 }; // demo-startpunt tot de gps spreekt
+  let rond = null, alarmMelding = null, gesproken = {};
+
+  /* ---- gps: snelheid en positie ---- */
+  if ('geolocation' in navigator) {
+    navigator.geolocation.watchPosition(p => {
+      hier = { lat: p.coords.latitude, lng: p.coords.longitude };
+      const kmu = p.coords.speed != null ? Math.max(0, Math.round(p.coords.speed * 3.6)) : null;
+      if (kmu != null) $('#snelheid').textContent = kmu;
+    }, () => {}, { enableHighAccuracy: true });
+  }
+
+  /* ---- het rondom-beeld en de naderingswaarschuwing ---- */
+  function toonAlarm(m) {
+    alarmMelding = m;
+    const el = $('#alarm');
+    if (!m) { el.classList.remove('zien'); return; }
+    $('#alarmIcoon').textContent = m.icoon;
+    $('#alarmWat').textContent = m.naam + ' over ' + (m.afstandKm < 1 ? Math.round(m.afstandKm * 1000) + ' m' : m.afstandKm + ' km');
+    $('#alarmSub').textContent = 'Gemeld door ' + m.door + (m.bevestigingen ? ' · ' + m.bevestigingen + 'x bevestigd' : '');
+    el.classList.add('zien');
+    if (!gesproken[m.id]) { gesproken[m.id] = true; spreek(m.naam + ' over ' + (m.afstandKm < 1 ? Math.round(m.afstandKm * 1000) + ' meter' : m.afstandKm + ' kilometer')); }
+  }
+  async function ververs() {
+    const r = await api('rond', { lat: hier.lat, lng: hier.lng, land: LAND });
+    if (r.status !== 200) return;
+    rond = r.body;
+    $('#bron').textContent = rond.bron + '.';
+    $('#landRegel').textContent = rond.flitsToegestaan ? '' :
+      'In dit land zijn flitsermeldingen wettelijk niet toegestaan; file- en gevaarmeldingen werken gewoon.';
+    // meldknoppen (flitser valt weg waar het niet mag)
+    const rij = $('#meldrij'); rij.innerHTML = '';
+    for (const s of rond.soorten) {
+      if (s.soort === 'wegwerk') continue;                // vier rustige knoppen is genoeg
+      if (s.soort === 'flitser' && !rond.flitsToegestaan) continue;
+      const b = document.createElement('button'); b.type = 'button';
+      b.innerHTML = '<span class="i" aria-hidden="true">' + s.icoon + '</span>' + s.naam;
+      b.addEventListener('click', async () => {
+        const m = await api('meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, land: LAND });
+        if (m.body.error) return zeg(m.body.error);
+        zeg(m.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : s.naam + ' gemeld voor het netwerk.');
+        ververs();
+      });
+      rij.appendChild(b);
+    }
+    // de lijst en het dichtstbijzijnde punt binnen 1,2 km als waarschuwing
+    const lijst = $('#lijst'); lijst.innerHTML = '';
+    if (!rond.meldingen.length) lijst.innerHTML = '<p class="stil">Nog niets gemeld binnen ' + rond.radiusKm + ' km. Zo hoort het.</p>';
+    for (const m of rond.meldingen.slice(0, 10)) {
+      const d = document.createElement('div'); d.className = 'r';
+      d.innerHTML = '<span aria-hidden="true">' + m.icoon + '</span><span>' + m.naam + '</span>' +
+        '<span class="afstand">' + m.afstandKm + ' km</span><span class="wie"></span>';
+      d.querySelector('.wie').textContent = m.door;
+      lijst.appendChild(d);
+    }
+    toonAlarm(rond.meldingen.find(m => m.afstandKm != null && m.afstandKm <= 1.2) || null);
+  }
+  $('#stemKlopt').addEventListener('click', async () => { if (!alarmMelding) return;
+    await api('stem', { id: alarmMelding.id, klopt: true }); zeg('Dank u.'); ververs(); });
+  $('#stemWeg').addEventListener('click', async () => { if (!alarmMelding) return;
+    const r = await api('stem', { id: alarmMelding.id, klopt: false });
+    zeg(r.body.weg ? 'De melding is weggehaald.' : 'Genoteerd.'); ververs(); });
+
+  /* ---- de vooruitblik (Ghost Driver-motor) ---- */
+  async function vooruit() {
+    const r = await api('vooruit', { stad: 'Ibiza' });
+    if (r.status !== 200) return;
+    const uren = $('#uren'); uren.innerHTML = '';
+    let drukste = null;
+    for (const u of (r.body.uurbeeld || [])) {
+      if (!drukste || u.kans > drukste.kans) drukste = u;
+      const el = document.createElement('span'); el.className = 'u';
+      const staaf = document.createElement('span');
+      staaf.className = 'staaf' + (u.kans >= 60 ? ' druk' : u.kans >= 30 ? ' middel' : '');
+      staaf.style.height = Math.max(5, Math.round(u.kans * 0.56)) + 'px';
+      const t = document.createElement('span'); t.className = 't'; t.textContent = u.tijd.slice(0, 2);
+      el.appendChild(staaf); el.appendChild(t); uren.appendChild(el);
+    }
+    const w = (r.body.waarschuwingen || [])[0];
+    $('#urenSub').textContent = w
+      ? 'Let op rond ' + w.tijd + ': ' + w.kans + '% kans op een opstopping bij ' + w.knooppunt + '.'
+      : (drukste ? 'Drukste uur: ' + drukste.tijd + ' (' + drukste.kans + '%).' : '');
+  }
+
+  /* ---- start ---- */
+  (async () => {
+    if (!token) { $('#vPoort').classList.remove('weg'); return; }
+    const eerste = await api('rond', { lat: hier.lat, lng: hier.lng, land: LAND });
+    if (eerste.status !== 200) { $('#poortReden').textContent = eerste.body.error || 'Log eerst in via de app.'; $('#vPoort').classList.remove('weg'); return; }
+    $('#vRit').classList.remove('weg');
+    rond = eerste.body;
+    await ververs(); vooruit();
+    setInterval(ververs, 20000);
+    setInterval(vooruit, 10 * 60 * 1000);
+  })();
+})();
+</script>
+</body>
+</html>

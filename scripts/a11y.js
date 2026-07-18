@@ -32,6 +32,7 @@ const PAGINAS = [
   '/apps/podium.html',
   '/apps/oog.html',
   '/apps/ghost.html',
+  '/apps/flits.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

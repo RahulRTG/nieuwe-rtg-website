@@ -2713,6 +2713,13 @@ Object.assign(kern, require('./kern/ghost').maakGhost({
 Object.assign(kern, require('./kern/flits').maakFlits({
   db, save, crypto, haversine, ghostSimuleer: kern.ghostSimuleer
 }));
+/* Wie betaalt wat (kern/wbw.js): het gedeelde uitgavenlijstje van een groep
+   Salon-vrienden, met sluitende centenverdeling en verrekenen via RTG Pay.
+   Na pay en sociaal gemount (gebruikt beide). */
+Object.assign(kern, require('./kern/wbw').maakWbw({
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan,
+  connectieTussen: kern.connectieTussen, verbActief: kern.verbActief, pay: kern.pay, notify
+}));
 /* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
    Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
    hercompressie) en staan als bestanden in de datamap, nooit in git. */
@@ -2749,6 +2756,7 @@ require('./routes/podium')(kern);
 require('./routes/ghost')(kern);
 require('./routes/flits')(kern);
 require('./routes/theater')(kern);
+require('./routes/wbw')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

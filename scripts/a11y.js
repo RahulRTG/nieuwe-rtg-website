@@ -34,6 +34,7 @@ const PAGINAS = [
   '/apps/ghost.html',
   '/apps/flits.html',
   '/apps/theater.html',
+  '/apps/wbw.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

@@ -18,15 +18,11 @@ module.exports = (kern) => {
   /* Altijd-aan rem op de twee routes die de schijf raken (los van de brede
      productie-IP-rem): kijken ruim (spoelen vuurt tientallen range-verzoeken
      per minuut, dat moet gewoon kunnen), uploaden strak. */
-  const remBakken = new Map();
-  setInterval(() => { const nu = Date.now(); for (const [k, b] of remBakken) if (nu - b.vanaf > 120000) remBakken.delete(k); }, 60000).unref();
-  const teVaak = (req, wat, max) => {
-    const sleutel = wat + ':' + req.ip, nu = Date.now();
-    const b = remBakken.get(sleutel) || { vanaf: nu, n: 0 };
-    if (nu - b.vanaf > 60000) { b.vanaf = nu; b.n = 0; }
-    b.n += 1; remBakken.set(sleutel, b);
-    return b.n > max;
-  };
+  const rateLimit = require('express-rate-limit');
+  const kijkRem = rateLimit({ windowMs: 60000, limit: 240, standardHeaders: false, legacyHeaders: false,
+    handler: (req, res) => res.status(429).end() });
+  const uploadRem = rateLimit({ windowMs: 60000, limit: 12, standardHeaders: false, legacyHeaders: false,
+    handler: (req, res) => res.status(429).json({ error: 'Even rustig aan met uploaden; probeer het over een minuut opnieuw.' }) });
 
   // de zaal: chronologisch, abonnementen eerst; geen algoritme, geen autoplay
   app.post('/api/theater/zaal', auth, (req, res) => {
@@ -42,9 +38,8 @@ module.exports = (kern) => {
     stuur(res, theaterVideoMaak(req.session.key, req.body || {}));
   });
   // de bytes: rauw binnen, exact zo bewaard (geen hercompressie, tot 4K)
-  app.post('/api/theater/upload/:id', auth, express.raw({ type: () => true, limit: '420mb' }), (req, res) => {
+  app.post('/api/theater/upload/:id', uploadRem, auth, express.raw({ type: () => true, limit: '420mb' }), (req, res) => {
     if (geenGast(req, res)) return;
-    if (teVaak(req, 'up', 12)) return res.status(429).json({ error: 'Even rustig aan met uploaden; probeer het over een minuut opnieuw.' });
     stuur(res, theaterVideoUpload(req.session.key, String(req.params.id || ''), req.body));
   });
   app.post('/api/theater/verwijder', auth, (req, res) => {
@@ -85,8 +80,7 @@ module.exports = (kern) => {
      sessie komt als ?token= mee (zelfde patroon als /api/stream). Met een
      Range-header komt precies het gevraagde stuk terug (206): soepel spoelen,
      byte voor byte het origineel. */
-  app.get('/api/theater/kijk/:id', (req, res) => {
-    if (teVaak(req, 'kijk', 240)) return res.status(429).end();
+  app.get('/api/theater/kijk/:id', kijkRem, (req, res) => {
     const sess = resolveSession(req.query.token);
     if (!sess || sess.tier === 'guest') return res.status(401).end();
     const v = theaterStreamVan(String(req.params.id || ''));

@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wie betaalt wat</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:720px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop:disabled{opacity:0.4;cursor:default;}
+  .knop:focus-visible,.lijstknop:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
+  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  .rij input{flex:1;min-width:8rem;width:auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .lijstknop{display:flex;align-items:baseline;gap:0.7rem;width:100%;text-align:left;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;padding:0.9rem 1rem;margin:0.55rem 0;color:var(--txt);font:inherit;}
+  .lijstknop .naam{font-weight:600;}
+  .lijstknop .sub{font-size:0.72rem;color:var(--soft);}
+  .lijstknop .rek{flex:1;}
+  .bedrag{font-variant-numeric:tabular-nums;font-weight:600;}
+  .plus{color:var(--groen);} .min{color:var(--rood);}
+  .vink{display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;padding:0.3rem 0;}
+  .vink input{width:auto;}
+  .balk{display:flex;align-items:center;gap:0.7rem;padding:0.35rem 0;font-size:0.85rem;}
+  .balk .staaf{flex:1;height:8px;border-radius:4px;background:var(--card2);position:relative;overflow:hidden;}
+  .balk .staaf i{position:absolute;top:0;bottom:0;left:50%;}
+  .balk .staaf i.plus{background:var(--groen);}
+  .balk .staaf i.min{background:var(--rood);right:auto;transform:translateX(-100%);left:50%;}
+  .log{font-size:0.82rem;line-height:1.6;}
+  .log .r{display:flex;gap:0.6rem;border-top:1px solid var(--line);padding:0.4rem 0;align-items:baseline;}
+  .log .r:first-child{border-top:none;}
+  .log .wie{color:var(--gold);font-weight:600;white-space:nowrap;}
+  .log .rek{flex:1;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>Wie betaalt wat</h1>
+  <span class="rek"></span>
+  <span class="badge">Verrekenen via RTG Pay</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil">Wie betaalt wat hoort bij uw lidmaatschap; log eerst in via de app.</p></div>
+  </section>
+
+  <!-- mijn lijstjes -->
+  <section id="vLijst" class="weg">
+    <h2>Mijn lijstjes</h2>
+    <div id="lijstjes"><p class="stil">Nog geen lijstjes. Begin er een met uw vrienden.</p></div>
+    <h2>Nieuw lijstje</h2>
+    <div class="kaart">
+      <label for="nNaam">Naam (bijv. Weekend Ibiza)</label><input id="nNaam" maxlength="40">
+      <label id="vriendenLabel">Wie doen er mee? (Salon-vrienden)</label>
+      <div id="vrienden" role="group" aria-labelledby="vriendenLabel"><p class="stil">Vrienden laden…</p></div>
+      <div class="rij"><button class="knop vol" id="nMaak" type="button">Maak het lijstje</button></div>
+    </div>
+  </section>
+
+  <!-- een lijstje -->
+  <section id="vGroep" class="weg">
+    <button class="knop" id="terug" type="button">← Mijn lijstjes</button>
+    <h2 id="gNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;text-transform:none;letter-spacing:0;color:var(--txt);"></h2>
+    <div class="kaart"><div id="balans"></div>
+      <div class="rij">
+        <button class="knop vol" id="knopVerreken" type="button">Verreken mijn deel</button>
+        <button class="knop" id="knopVerzoek" type="button">Stuur betaalverzoeken</button>
+      </div>
+      <p class="stil" style="margin-top:0.5rem;">Geld beweegt alleen door uw eigen tik: u betaalt uw eigen deel, of u
+        stuurt de anderen een net betaalverzoek. Niemand kan bij andermans wallet.</p>
+    </div>
+    <h2>Nieuwe uitgave</h2>
+    <div class="kaart">
+      <div class="rij">
+        <label for="uOms" style="position:absolute;left:-999px;">Omschrijving</label>
+        <input id="uOms" maxlength="80" placeholder="Wat was het? (bijv. Diner strandclub)">
+        <label for="uBedrag" style="position:absolute;left:-999px;">Bedrag in euro</label>
+        <input id="uBedrag" inputmode="decimal" placeholder="Bedrag" style="max-width:7rem;">
+      </div>
+      <div id="uVoor" role="group" aria-label="Voor wie was dit?"></div>
+      <div class="rij"><button class="knop vol" id="uVoeg" type="button">Ik heb dit betaald</button></div>
+    </div>
+    <h2>Het lijstje</h2>
+    <div class="kaart"><div class="log" id="log"><p class="stil">Nog geen uitgaven.</p></div></div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
+  const toon = naam => { for (const v of ['vPoort', 'vLijst', 'vGroep']) $('#' + v).classList.toggle('weg', v !== naam); };
+  const eur = c => (c < 0 ? '− ' : '') + '€ ' + (Math.abs(c) / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+  const idem = () => Math.random().toString(36).slice(2, 10);
+  let groep = null;
+
+  /* ---------- mijn lijstjes ---------- */
+  async function laadLijstjes() {
+    const r = await api('wbw/mijn');
+    if (r.status !== 200) { toon('vPoort'); return; }
+    const el = $('#lijstjes'); el.innerHTML = '';
+    if (!(r.body.groepen || []).length) el.innerHTML = '<p class="stil">Nog geen lijstjes. Begin er een met uw vrienden.</p>';
+    for (const g of r.body.groepen || []) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'lijstknop';
+      b.innerHTML = '<span class="naam"></span><span class="sub">' + g.leden + ' personen</span><span class="rek"></span>' +
+        '<span class="bedrag ' + (g.mijnSaldo > 0 ? 'plus' : g.mijnSaldo < 0 ? 'min' : '') + '">' + eur(g.mijnSaldo) + '</span>';
+      b.querySelector('.naam').textContent = g.naam;
+      b.addEventListener('click', () => openGroep(g.id));
+      el.appendChild(b);
+    }
+    laadVrienden();
+    toon('vLijst');
+  }
+  async function laadVrienden() {
+    const r = await api('member/connections');
+    const el = $('#vrienden'); el.innerHTML = '';
+    const rijen = (r.body.connections || []);
+    if (!rijen.length) { el.innerHTML = '<p class="stil">Maak eerst vrienden in De Salon; een lijstje deelt u met vrienden.</p>'; return; }
+    for (const v of rijen.slice(0, 20)) {
+      const l = document.createElement('label'); l.className = 'vink';
+      const c = document.createElement('input'); c.type = 'checkbox'; c.value = v.key;
+      l.appendChild(c); l.appendChild(document.createTextNode(v.codename || v.codenaam || v.key));
+      el.appendChild(l);
+    }
+  }
+  $('#nMaak').addEventListener('click', async () => {
+    const leden = [...document.querySelectorAll('#vrienden input:checked')].map(x => x.value);
+    const r = await api('wbw/maak', { naam: $('#nNaam').value, leden });
+    if (r.body.error) return zeg(r.body.error);
+    $('#nNaam').value = '';
+    zeg('Het lijstje staat klaar; iedereen kreeg een seintje.');
+    openGroep(r.body.groep.id);
+  });
+
+  /* ---------- een lijstje ---------- */
+  async function openGroep(id) {
+    const r = await api('wbw/groep', { id });
+    if (r.body.error) return zeg(r.body.error);
+    groep = r.body.groep;
+    teken();
+    toon('vGroep');
+  }
+  function teken() {
+    $('#gNaam').textContent = groep.naam;
+    const maxAbs = Math.max(1, ...groep.leden.map(l => Math.abs(l.saldo)));
+    const bal = $('#balans'); bal.innerHTML = '';
+    for (const l of groep.leden) {
+      const rij = document.createElement('div'); rij.className = 'balk';
+      const naam = document.createElement('span'); naam.style.minWidth = '9rem';
+      naam.textContent = l.codenaam + (l.ik ? ' (u)' : '');
+      const staaf = document.createElement('span'); staaf.className = 'staaf';
+      const vul = document.createElement('i'); vul.className = l.saldo >= 0 ? 'plus' : 'min';
+      vul.style.width = Math.round(Math.abs(l.saldo) / maxAbs * 50) + '%';
+      staaf.appendChild(vul);
+      const bedrag = document.createElement('span');
+      bedrag.className = 'bedrag ' + (l.saldo > 0 ? 'plus' : l.saldo < 0 ? 'min' : '');
+      bedrag.textContent = eur(l.saldo);
+      rij.appendChild(naam); rij.appendChild(staaf); rij.appendChild(bedrag);
+      bal.appendChild(rij);
+    }
+    $('#knopVerreken').disabled = groep.mijnSaldo >= 0;
+    $('#knopVerzoek').disabled = groep.mijnSaldo <= 0;
+    const voor = $('#uVoor'); voor.innerHTML = '';
+    for (const l of groep.leden) {
+      const lab = document.createElement('label'); lab.className = 'vink';
+      const c = document.createElement('input'); c.type = 'checkbox'; c.value = l.key; c.checked = true;
+      lab.appendChild(c); lab.appendChild(document.createTextNode(l.codenaam + (l.ik ? ' (u)' : '')));
+      voor.appendChild(lab);
+    }
+    const log = $('#log'); log.innerHTML = '';
+    if (!(groep.regels || []).length) log.innerHTML = '<p class="stil">Nog geen uitgaven.</p>';
+    for (const r of groep.regels || []) {
+      const d = document.createElement('div'); d.className = 'r';
+      const wie = document.createElement('span'); wie.className = 'wie'; wie.textContent = r.door;
+      const wat = document.createElement('span');
+      wat.textContent = r.soort === 'uitgave' ? (r.oms + ' · voor ' + r.voor) : ('verrekende met ' + r.aan);
+      const rek = document.createElement('span'); rek.className = 'rek';
+      const bedrag = document.createElement('span'); bedrag.className = 'bedrag'; bedrag.textContent = eur(r.centen);
+      d.appendChild(wie); d.appendChild(wat); d.appendChild(rek); d.appendChild(bedrag);
+      log.appendChild(d);
+    }
+  }
+  $('#terug').addEventListener('click', laadLijstjes);
+  $('#uVoeg').addEventListener('click', async () => {
+    const centen = Math.round(parseFloat(String($('#uBedrag').value).replace(',', '.')) * 100);
+    const voor = [...document.querySelectorAll('#uVoor input:checked')].map(x => x.value);
+    const r = await api('wbw/uitgave', { id: groep.id, oms: $('#uOms').value, centen, voor });
+    if (r.body.error) return zeg(r.body.error);
+    $('#uOms').value = ''; $('#uBedrag').value = '';
+    openGroep(groep.id);
+  });
+  $('#knopVerreken').addEventListener('click', async () => {
+    const r = await api('wbw/verreken', { id: groep.id, idem: idem() });
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Verrekend via RTG Pay: ' + r.body.betalingen.map(b => eur(b.centen) + ' naar ' + b.aan).join(', ') + '.');
+    openGroep(groep.id);
+  });
+  $('#knopVerzoek').addEventListener('click', async () => {
+    const r = await api('wbw/verzoek', { id: groep.id });
+    if (r.body.error) return zeg(r.body.error);
+    zeg(r.body.verzoeken + ' betaalverzoek(en) verstuurd; zij betalen met een tik.');
+  });
+
+  /* ---------- start ---------- */
+  if (!token) toon('vPoort'); else laadLijstjes();
+})();
+</script>
+</body>
+</html>

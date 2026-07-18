@@ -2140,7 +2140,8 @@
     muziek:      { naam: 'RTG Sound',    icoon: '🎧', url: '/apps/muziek.html' },
     podium:      { naam: 'Podium',       icoon: '🎬', url: '/apps/podium.html' },
     flits:       { naam: 'Flits',        icoon: '🛣️', url: '/apps/flits.html' },
-    theater:     { naam: 'Theater',      icoon: '🎞️', url: '/apps/theater.html' }
+    theater:     { naam: 'Theater',      icoon: '🎞️', url: '/apps/theater.html' },
+    wbw:         { naam: 'Wie betaalt wat', icoon: '💶', url: '/apps/wbw.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -2170,6 +2171,7 @@
       'link:podium',
       'link:flits',
       'link:theater',
+      'link:wbw',
       'link:juridisch']
   ];
 

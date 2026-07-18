@@ -11,7 +11,8 @@ const eigenaar = require('../eigenaar');
 const dbmod = require('../db');
 
 module.exports = (kern) => {
-  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal, talen, onboarding } = kern;
+  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal, talen, onboarding,
+    geldPasprijsZet, geldKortingZet, geldCommissieZet } = kern;
   const OWNER_EMAIL = eigenaar.OWNER_EMAIL;
 
   function staat() {
@@ -140,7 +141,8 @@ module.exports = (kern) => {
   /* De overige domeinen draaien als submodules op dezelfde gedeelde context
      (een keer bij het opstarten gemount, geen kosten per verzoek). */
   const tctx = { app, accounts, anthropic, archief, beveilig, crypto, db, mail, save, sendPushToUser,
-    LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx };
+    LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
+    geldPasprijsZet, geldKortingZet, geldCommissieZet };
   require('./techniek/functie')(tctx);
   require('./techniek/boardroom')(tctx);
   require('./techniek/beheer')(tctx);

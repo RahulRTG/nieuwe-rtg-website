@@ -3,7 +3,8 @@
    vanuit routes/techniek.js op de gedeelde context. */
 const functies = require('../../functies');
 module.exports = (tctx) => {
-  const { app, accounts, anthropic, archief, beveilig, crypto, db, mail, save, sendPushToUser, LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx } = tctx;
+  const { app, accounts, anthropic, archief, beveilig, crypto, db, mail, save, sendPushToUser, LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
+    geldPasprijsZet, geldKortingZet, geldCommissieZet } = tctx;
   /* ================== RTG Boardroom ==================
      Een complete stoplicht-schakelkast: elke functie van het platform met een
      status (groen = aan, rood = uit, oranje = storing), een directe schakelaar
@@ -16,20 +17,32 @@ module.exports = (tctx) => {
     }
     return { aan, uit, storing, totaal: aan + uit + storing };
   }
-  // gedeelde AI-hulp: begrijp een instructie en stel wijzigingen voor (Claude of ingebouwd)
+  // gedeelde AI-hulp (Rahul): begrijp een instructie en stel wijzigingen voor
+  // (Claude of ingebouwd). Rahul regelt de HELE regie: schakelen per pas of
+  // doelgroep, de leveranciers-regie per genre en de geld-regie; er verandert
+  // pas iets als de eigenaar het voorstel toepast (mens beslist).
+  const genresLijst = () => Object.entries(db.data.supplierTypes || {}).map(([id, tp]) => ({ id, label: tp.label }));
   async function boardroomAi(vraag, t) {
-    const lokaal = functies.duidVoorstel(vraag, t.functies);
+    const lokaal = functies.duidVoorstel(vraag, t.functies, { genres: genresLijst() });
     let antwoord = null, voorstel = lokaal.voorstel, bron = 'ingebouwd';
     if (anthropic) {
       try {
         const catTekst = functies.FUNCTIES.map(f => '- ' + f.id + ' ("' + f.naam + '", categorie ' + f.categorie +
           ', doelgroepen: ' + (f.doelgroepen || []).join('/') + ')').join('\n');
         const dgTekst = functies.DOELGROEPEN.map(d => d.id + ' = ' + d.naam).join(', ');
-        const prompt = 'Je bent de assistent van de RTG Boardroom (de schakelkast van het platform). De eigenaar kan functies ' +
-          'globaal of per doelgroep aan- of uitzetten.\nDoelgroepen: ' + dgTekst + '.\nBeschikbare functies:\n' + catTekst +
+        const genreTekst = genresLijst().map(g => g.id).join(', ');
+        const prompt = 'Je bent Rahul, de assistent van de RTG Boardroom (de schakelkast van het platform). De eigenaar kan functies ' +
+          'globaal, per doelgroep of per genre zaken aan- of uitzetten, en bepaalt de geldkant (pasprijzen, ledenvoordeel, partnervergoeding).\n' +
+          'Doelgroepen: ' + dgTekst + '.\nGenres zaken: ' + genreTekst + '.\nBeschikbare functies:\n' + catTekst +
           '\n\nVraag of instructie: "' + vraag + '"\n\nAntwoord kort in het Nederlands (max 4 zinnen). Vraagt de instructie om een ' +
-          'wijziging, geef daarna EEN codeblok:\n```json\n{"voorstel":[{"id":"<functie-id>","doelgroep":"<doelgroep-id of null>","aan":true}]}\n```\n' +
-          'Gebruik uitsluitend bestaande id\'s; laat doelgroep leeg (null) voor een globale wijziging. Geen codeblok als er niets te wijzigen valt.';
+          'wijziging, geef daarna EEN codeblok met een lijst wijzigingen in deze vormen:\n```json\n{"voorstel":[' +
+          '{"id":"<functie-id>","doelgroep":"<doelgroep-id of null>","aan":true},' +
+          '{"id":"<functie-id>","genre":"<genre-id>","aan":false},' +
+          '{"soort":"pasprijs","pas":"rtg|lifestyle","euro":65},' +
+          '{"soort":"korting","genre":"<genre-id>","pct":10},' +
+          '{"soort":"commissie","genre":"<genre-id>","pct":8}]}\n```\n' +
+          'Gebruik uitsluitend bestaande id\'s; laat doelgroep leeg (null) voor een globale wijziging. De gratis app blijft altijd ' +
+          'gratis en de Business Pass is prijs op maat: stel daar nooit een prijs voor voor. Geen codeblok als er niets te wijzigen valt.';
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 700, messages: [{ role: 'user', content: prompt }] });
         const tekst = (r.content && r.content[0] && r.content[0].text) || '';
         antwoord = tekst.replace(/```json[\s\S]*?```/g, '').trim();
@@ -182,16 +195,29 @@ module.exports = (tctx) => {
     res.json(await boardroomAi(vraag, t));
   });
 
-  // Een AI-voorstel toepassen (alleen de eigenaar, in een tik).
+  // Een AI-voorstel toepassen (alleen de eigenaar, in een tik). Naast het
+  // schakelen (globaal/pas/genre) voert dit ook de geld-regie uit via de
+  // geld-motor van de kern, die de grenzen nogmaals bewaakt.
   app.post('/api/boardroom/toepassen', techAuth, eigenaarAlleen, (req, res) => {
     const t = staat();
     const wijz = functies.valideerVoorstel(req.body.voorstel);
+    let toegepast = 0;
+    const fouten = [];
     for (const w of wijz) {
+      if (w.soort === 'pasprijs' || w.soort === 'korting' || w.soort === 'commissie') {
+        const doe = w.soort === 'pasprijs' ? geldPasprijsZet({ pas: w.pas, euro: w.euro })
+          : w.soort === 'korting' ? geldKortingZet({ genre: w.genre, pct: w.pct })
+          : geldCommissieZet(w.code ? { code: w.code, pct: w.pct } : { genre: w.genre, pct: w.pct });
+        if (doe && doe.ok) toegepast++; else fouten.push(w.naam + ': ' + ((doe && doe.error) || 'mislukt'));
+        continue;
+      }
       const cur = t.functies[w.id] = t.functies[w.id] || {};
-      if (w.doelgroep) { cur.perDoelgroep = cur.perDoelgroep || {}; cur.perDoelgroep[w.doelgroep] = w.aan; }
+      if (w.genre) { cur.perGenre = cur.perGenre || {}; if (w.aan) delete cur.perGenre[w.genre]; else cur.perGenre[w.genre] = false; }
+      else if (w.doelgroep) { cur.perDoelgroep = cur.perDoelgroep || {}; cur.perDoelgroep[w.doelgroep] = w.aan; }
       else cur.aan = w.aan;
+      toegepast++;
     }
     save();
-    res.json({ ok: true, toegepast: wijz.length, functies: functies.catalogus(t.functies) });
+    res.json({ ok: true, toegepast, fouten: fouten.length ? fouten : undefined, functies: functies.catalogus(t.functies) });
   });
 };

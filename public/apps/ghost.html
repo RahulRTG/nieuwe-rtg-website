@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ghost Driver</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:760px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .waarschuwing{border-left:3px solid var(--rood);}
+  .kans{font-family:'Bodoni Moda',serif;font-size:1.6rem;color:var(--rood);}
+  .rij{display:flex;gap:0.8rem;align-items:baseline;flex-wrap:wrap;}
+  .rij .rek{flex:1;}
+  ul{margin:0.4rem 0 0 1.1rem;font-size:0.82rem;color:var(--soft);line-height:1.6;}
+  .advies{margin-top:0.6rem;font-size:0.86rem;line-height:1.55;}
+  .advies b{color:var(--gold);}
+  .sim{display:flex;gap:1.2rem;margin-top:0.6rem;font-size:0.78rem;color:var(--soft);flex-wrap:wrap;}
+  .sim b{display:block;font-size:0.95rem;color:var(--txt);font-variant-numeric:tabular-nums;}
+  .sim .winst b{color:var(--groen);}
+  .uren{display:flex;gap:0.35rem;align-items:flex-end;height:90px;margin-top:0.4rem;}
+  .uren .u{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;min-width:0;}
+  .uren .staaf{width:100%;max-width:26px;border-radius:4px 4px 0 0;background:var(--card2);
+    border:1px solid var(--line);border-bottom:none;}
+  .uren .staaf.druk{background:var(--rood);border-color:var(--rood);}
+  .uren .staaf.middel{background:var(--gold);border-color:var(--gold);}
+  .uren .t{font-size:0.58rem;color:var(--soft);font-variant-numeric:tabular-nums;}
+  .weg{display:none !important;}
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/leverancier.html" aria-label="Terug naar de zaak-app">←</a>
+  <h1>Ghost Driver</h1>
+  <span class="rek"></span>
+  <span class="badge">Kijkt 12 uur vooruit</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil">Log eerst in op de zaak-app; de Ghost Driver rijdt op de inlog van uw zaak.</p></div>
+  </section>
+  <section id="vGhost" class="weg">
+    <p class="stil" id="uitleg"></p>
+    <h2>De komende 12 uur</h2>
+    <div class="kaart">
+      <div class="uren" id="uren" role="img" aria-label="Drukteverwachting per uur"></div>
+      <p class="stil" id="urenSub" style="margin-top:0.5rem;"></p>
+    </div>
+    <h2>Waarschuwingen</h2>
+    <div id="lijst"></div>
+    <h2>Waar de spookrit op let</h2>
+    <div class="kaart"><p class="stil" id="bouwstenen"></p></div>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_sup_token'); } catch (e) { return null; } })();
+  (async () => {
+    if (!token) { $('#vPoort').classList.remove('weg'); return; }
+    const r = await fetch('/api/supplier/ghost', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
+      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
+    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
+    const d = r.body;
+    $('#uitleg').textContent = 'De Ghost Driver rijdt de komende ' + d.horizonUren + ' uur alvast door ' + d.stad +
+      ' en meldt uren van tevoren waar het vast dreigt te lopen.';
+    const kn = d.knooppunten.slice(0, 8);
+    $('#bouwstenen').textContent = d.toelichting + ' Knooppunten (' + d.knooppunten.length + '): ' + kn.join(' · ') +
+      (d.knooppunten.length > kn.length ? ' en meer.' : '.');
+    const uren = $('#uren'); uren.innerHTML = '';
+    let drukste = null;
+    for (const u of (d.uurbeeld || [])) {
+      if (!drukste || u.kans > drukste.kans) drukste = u;
+      const el = document.createElement('span'); el.className = 'u';
+      const staaf = document.createElement('span');
+      staaf.className = 'staaf' + (u.kans >= d.drempel ? ' druk' : u.kans >= 30 ? ' middel' : '');
+      staaf.style.height = Math.max(6, Math.round(u.kans * 0.8)) + 'px';
+      const t = document.createElement('span'); t.className = 't'; t.textContent = u.tijd.slice(0, 2);
+      el.appendChild(staaf); el.appendChild(t); uren.appendChild(el);
+    }
+    $('#urenSub').textContent = drukste
+      ? 'Drukste uur: ' + drukste.tijd + ' (' + drukste.kans + '%' + (drukste.drukPunt ? ', rond ' + drukste.drukPunt : '') + ')' + (drukste.regen ? ' · regen in het weerbeeld (demo)' : '') + '.'
+      : '';
+    const lijst = $('#lijst'); lijst.innerHTML = '';
+    if (!d.waarschuwingen.length) {
+      lijst.innerHTML = '<div class="kaart"><p class="stil">De komende ' + d.horizonUren + ' uur ziet de spookrit nergens een opstopping aankomen. Rustig rijden.</p></div>';
+    }
+    for (const w of d.waarschuwingen) {
+      const k = document.createElement('div'); k.className = 'kaart waarschuwing';
+      const oorzaken = (w.oorzaken || []).map(o => { const li = document.createElement('li'); li.textContent = o; return li; });
+      k.innerHTML = '<div class="rij"><span class="kans"></span><strong></strong><span class="rek"></span><span class="badge"></span></div>' +
+        '<ul></ul><p class="advies"></p>' +
+        '<div class="sim"><span>Zonder ingrijpen<b class="z"></b></span><span>Met advies<b class="m"></b></span><span class="winst">Winst<b class="w"></b></span></div>';
+      k.querySelector('.kans').textContent = w.kans + '%';
+      k.querySelector('strong').textContent = 'kans op opstopping bij ' + w.knooppunt;
+      k.querySelector('.badge').textContent = 'rond ' + w.tijd;
+      for (const li of oorzaken) k.querySelector('ul').appendChild(li);
+      k.querySelector('.advies').innerHTML = '<b>Advies:</b> ';
+      k.querySelector('.advies').append(w.advies);
+      k.querySelector('.z').textContent = w.simulatie.zonderAdvies;
+      k.querySelector('.m').textContent = w.simulatie.metAdvies;
+      k.querySelector('.w').textContent = w.simulatie.winst;
+      lijst.appendChild(k);
+    }
+    $('#vGhost').classList.remove('weg');
+  })();
+})();
+</script>
+</body>
+</html>

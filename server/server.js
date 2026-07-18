@@ -2699,6 +2699,13 @@ Object.assign(kern, require('./kern/podium').maakPodium({
    (gecodeerd, geen beeld), die via een Zaakdoos-proxy vanzelf in het
    doos-journaal terechtkomen. */
 Object.assign(kern, require('./kern/oog').maakOog({ db, save, crypto, schoon, sseToSupplier, logActivity }));
+/* De Ghost Driver (kern/ghost.js): de vooruitkijkende verkeersleider. Rijdt
+   per knooppunt de komende twaalf uur alvast (dagritme, evenement-uitloop uit
+   verkochte tickets, eigen rittenhistorie, demo-weerbeeld) en adviseert de
+   vloot uren van tevoren. Na de boekingslaag gemount (leest tickets). */
+Object.assign(kern, require('./kern/ghost').maakGhost({
+  db, findSupplier, boekingenVanZaak: kern.boekingenVanZaak, haversine
+}));
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
    geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen
    die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar
@@ -2725,6 +2732,7 @@ require('./routes/tiener')(kern);
 require('./routes/kantoren')(kern);
 require('./routes/pay')(kern);
 require('./routes/podium')(kern);
+require('./routes/ghost')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

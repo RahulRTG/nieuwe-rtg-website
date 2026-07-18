@@ -44,10 +44,16 @@
     // het afdelingenbord (dorp) is er voor kamers (hotel), de nachtzaak, restaurants en beachclubs
     const dorpKan = has('bookings') || ['bar', 'club', 'beachclub', 'restaurant'].includes(S && S.type);
     const keys = Object.keys(TABDEF).filter(k => !MAIN_TABS.includes(k) && (!TABDEF[k].cap || has(TABDEF[k].cap)) && (k !== 'bezorg' || !!(state && state.bezorg)) && (k !== 'dorp' || dorpKan));
+    // vervoerszaken krijgen de Ghost Driver erbij: de vooruitkijkende
+    // verkeersleider (eigen app-pagina, zelfde zaak-inlog)
+    const ghost = has('rides')
+      ? '<button class="meer-btn" data-ghost="1"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 1 7 7v9l-2.3-2-2.4 2-2.3-2-2.3 2-2.4-2L5 19v-9a7 7 0 0 1 7-7z"/><circle cx="9.5" cy="11" r="1"/><circle cx="14.5" cy="11" r="1"/></svg><b>Ghost Driver</b></button>'
+      : '';
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
-    ).join('') + '</div>';
+    ).join('') + ghost + '</div>';
     el.querySelectorAll('[data-goto2]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto2)));
+    el.querySelectorAll('[data-ghost]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/ghost.html'; }));
   }
 
   function renderAll(){

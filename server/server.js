@@ -2717,7 +2717,7 @@ Object.assign(kern, require('./kern/flits').maakFlits({
    Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
    hercompressie) en staan als bestanden in de datamap, nooit in git. */
 Object.assign(kern, require('./kern/theater').maakTheater({
-  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, notify, sseToOffice,
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, notify, sseToOffice, sseToCustomer,
   mediaDir: path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'theater')
 }));
 /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld

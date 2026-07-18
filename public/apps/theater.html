@@ -133,9 +133,10 @@
     const aff = b.querySelector('.affiche');
     if (v.poster) aff.style.backgroundImage = 'url(' + v.poster + ')';
     else aff.textContent = (v.titel || '?').slice(0, 1).toUpperCase();
-    b.querySelector('.mb').textContent = v.mb + ' MB';
+    b.querySelector('.mb').textContent = (v.bewaring === 'thuis' ? '\u{1F3E0} ' : '') + v.mb + ' MB';
     b.querySelector('.titel').textContent = v.titel;
     b.querySelector('.sub').textContent = v.kanaal + ' · ' + v.codenaam + (v.duurS ? ' · ' + duur(v.duurS) : '') +
+      (v.bewaring === 'thuis' ? (v.online ? ' · Thuisarchief, nu te zien' : ' · Thuisarchief, maker offline') : '') +
       (v.reacties ? ' · ' + v.reacties + ' reacties' : '');
     b.addEventListener('click', () => kijk(v));
     return b;
@@ -182,6 +183,11 @@
     kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> · ' + m.volgers + ' abonnees · ' +
       m.gebruiktMb + ' van ' + m.maxMb + ' MB gebruikt</p>' +
       '<label for="vTitel">Titel van de nieuwe video</label><input id="vTitel" maxlength="80">' +
+      '<label for="vBewaring">Waar bewaren we het origineel?</label>' +
+      '<select id="vBewaring">' +
+      '<option value="rtg">In de RTG-zaal (altijd beschikbaar)</option>' +
+      '<option value="thuis">Op mijn eigen apparaat: Thuisarchief, niets bij RTG</option>' +
+      '</select>' +
       '<div class="rij">' +
       '<button class="knop" id="vOpname" type="button">● Opnemen (hoogste kwaliteit)</button>' +
       '<button class="knop" id="vKies" type="button">Bestand kiezen</button>' +
@@ -241,6 +247,24 @@
       v.addEventListener('loadeddata', () => { try { v.currentTime = 0.1; } catch (e) { klaar(); } }, { once: true });
       v.addEventListener('error', () => res(null), { once: true });
     });
+    const bewaring = ($('#vBewaring') || {}).value === 'thuis' ? 'thuis' : 'rtg';
+    if (bewaring === 'thuis') {
+      /* Het Thuisarchief: het origineel gaat naar het eigen bestandssysteem
+         van de browser (OPFS); bij RTG landen alleen titel en affiche. */
+      const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster, bewaring: 'thuis',
+        mbGeschat: Math.max(1, Math.round(blob.size / 1048576)) });
+      if (kaart.body.error) return zeg(kaart.body.error);
+      try {
+        const root = await navigator.storage.getDirectory();
+        const fh = await root.getFileHandle(kaart.body.id + '.webm', { create: true });
+        const w = await fh.createWritable(); await w.write(blob); await w.close();
+      } catch (e) { return zeg('Lokaal bewaren lukte niet: ' + e.message); }
+      thuisIds.push(kaart.body.id); thuisHartslag();
+      zeg('"' + titel + '" staat in uw Thuisarchief: het origineel blijft op dit apparaat; RTG bewaart alleen titel en affiche.');
+      $('#vTitel').value = '';
+      laadZaal();
+      return;
+    }
     const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster });
     if (kaart.body.error) return zeg(kaart.body.error);
     // rauwe bytes met voortgang (XHR kan uploadvoortgang tonen, fetch niet)
@@ -262,11 +286,108 @@
     xhr.send(blob);
   }
 
+  /* ---------- het Thuisarchief: aanbieden vanaf dit apparaat ---------- */
+  let thuisIds = [];
+  async function thuisHartslag() {
+    if (thuisIds.length) await api('thuis/aanwezig', { ids: thuisIds });
+  }
+  async function thuisLijstUitZaal() {
+    const m = zaal && zaal.mijn;
+    thuisIds = m ? (m.videos || []).filter(v => v.bewaring === 'thuis').map(v => v.id) : [];
+  }
+  const ijs = [{ urls: 'stun:stun.l.google.com:19302' }];
+  const dienPcs = new Map();   // kijkerKey -> RTCPeerConnection (makerkant)
+  async function dienUit(d) {
+    // een kijker klopt aan: lees het origineel uit het eigen archief en
+    // stuur het rechtstreeks (versleuteld datakanaal), buiten RTG om
+    let buf;
+    try {
+      const root = await navigator.storage.getDirectory();
+      const fh = await root.getFileHandle(d.videoId + '.webm');
+      buf = await (await fh.getFile()).arrayBuffer();
+    } catch (e) { return; }   // niet (meer) op dit apparaat
+    const pc = new RTCPeerConnection({ iceServers: ijs });
+    dienPcs.set(d.van, pc);
+    const kanaal = pc.createDataChannel('film');
+    kanaal.binaryType = 'arraybuffer';
+    kanaal.onopen = async () => {
+      kanaal.send(JSON.stringify({ soort: 'kop', bytes: buf.byteLength }));
+      const BROK = 64 * 1024;
+      for (let p = 0; p < buf.byteLength; p += BROK) {
+        while (kanaal.bufferedAmount > 4 * 1024 * 1024) await new Promise(r => setTimeout(r, 60));
+        kanaal.send(buf.slice(p, p + BROK));
+      }
+      kanaal.send(JSON.stringify({ soort: 'klaar' }));
+    };
+    pc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: d.videoId, kind: 'ice', doelKey: d.van, payload: ev.candidate }); };
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    api('signaal', { id: d.videoId, kind: 'offer', doelKey: d.van, payload: offer });
+  }
+
+  /* ---------- het Thuisarchief: rechtstreeks kijken ---------- */
+  let kijkPc = null, ontvangst = null;
+  async function kijkThuis(v) {
+    $('#kijkSub').textContent = 'Rechtstreeks van het apparaat van ' + v.codenaam + ' · ±' + v.mb + ' MB · de beelden passeren RTG nooit.';
+    ontvangst = { videoId: v.id, brokken: [], bytes: 0, totaal: 0 };
+    const r = await api('signaal', { id: v.id, kind: 'vraag' });
+    if (r.body.error) { zeg(r.body.error); ontvangst = null; }
+  }
+  async function kijkOntvang(d) {
+    if (!ontvangst || d.videoId !== ontvangst.videoId) return;
+    if (d.kind === 'offer') {
+      if (kijkPc) { try { kijkPc.close(); } catch (e) {} }
+      kijkPc = new RTCPeerConnection({ iceServers: ijs });
+      kijkPc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: d.videoId, kind: 'ice', payload: ev.candidate }); };
+      kijkPc.ondatachannel = ev => {
+        const kanaal = ev.channel; kanaal.binaryType = 'arraybuffer';
+        kanaal.onmessage = m => {
+          if (typeof m.data === 'string') {
+            const b = JSON.parse(m.data);
+            if (b.soort === 'kop') ontvangst.totaal = b.bytes;
+            if (b.soort === 'klaar') {
+              const blob = new Blob(ontvangst.brokken, { type: 'video/webm' });
+              $('#doekVideo').src = URL.createObjectURL(blob);
+              $('#kijkSub').textContent = 'Rechtstreeks ontvangen van ' + (open ? open.codenaam : 'de maker') + ': niets bij RTG bewaard.';
+            }
+            return;
+          }
+          ontvangst.brokken.push(m.data); ontvangst.bytes += m.data.byteLength;
+          if (ontvangst.totaal) $('#kijkSub').textContent = 'Rechtstreeks van de maker: ' + Math.round(ontvangst.bytes / ontvangst.totaal * 100) + '%';
+        };
+      };
+      await kijkPc.setRemoteDescription(d.payload);
+      const antwoord = await kijkPc.createAnswer();
+      await kijkPc.setLocalDescription(antwoord);
+      api('signaal', { id: d.videoId, kind: 'answer', payload: antwoord });
+    } else if (d.kind === 'ice' && kijkPc) { try { await kijkPc.addIceCandidate(d.payload); } catch (e) {} }
+  }
+
+  // de realtime lijn: als maker dienen, als kijker ontvangen
+  function startSse() {
+    if (!window.EventSource || !token) return;
+    const es = new EventSource('/api/stream?token=' + encodeURIComponent(token));
+    es.addEventListener('theater', async e => {
+      const d = JSON.parse(e.data);
+      if (d.kind === 'vraag') dienUit(d);
+      else if (d.kind === 'answer') { const pc = dienPcs.get(d.van); if (pc) try { await pc.setRemoteDescription(d.payload); } catch (e2) {} }
+      else if (d.kind === 'ice' && dienPcs.get(d.van)) { try { await dienPcs.get(d.van).addIceCandidate(d.payload); } catch (e2) {} }
+      else kijkOntvang(d);
+    });
+  }
+
   /* ---------- de bioscoop ---------- */
   async function kijk(v) {
     open = v;
-    $('#doekVideo').src = '/api/theater/kijk/' + v.id + '?token=' + encodeURIComponent(token);
+    $('#doekVideo').removeAttribute('src');
     $('#kijkTitel').textContent = v.titel;
+    if (v.bewaring === 'thuis') {
+      if (!v.online) { zeg('De maker is nu niet online; dit werk staat alleen op diens eigen apparaat.'); return; }
+      toonReacties(); toon('vKijk');
+      kijkThuis(v);
+      return;
+    }
+    $('#doekVideo').src = '/api/theater/kijk/' + v.id + '?token=' + encodeURIComponent(token);
     $('#kijkSub').textContent = v.kanaal + ' · ' + v.codenaam + ' · ' + v.mb + ' MB origineel' + (v.omschrijving ? ' · ' + v.omschrijving : '');
     toonReacties();
     toon('vKijk');
@@ -301,7 +422,13 @@
   });
 
   /* ---------- start ---------- */
-  if (!token) toon('vPoort'); else laadZaal();
+  if (!token) toon('vPoort');
+  else {
+    laadZaal().then(() => { thuisLijstUitZaal(); thuisHartslag(); });
+    startSse();
+    // zolang deze pagina open is, biedt dit apparaat het eigen Thuisarchief aan
+    setInterval(async () => { await thuisLijstUitZaal(); thuisHartslag(); }, 45000);
+  }
 })();
 </script>
 </body>

@@ -25,10 +25,17 @@ const MAX_KANAAL_MB = 1500;        // quotum per kanaal in de demo
 const REACTIES_MAX = 200;
 const GENRES = ['film', 'reizen', 'muziek', 'tafel', 'ambacht', 'salon'];
 
-function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffice, mediaDir }) {
+function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffice, sseToCustomer, mediaDir }) {
   const id = () => 'tv' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   try { fs.mkdirSync(mediaDir, { recursive: true }); } catch (e) {}
+  /* Het Thuisarchief: de maker bewaart de video op het EIGEN apparaat; wij
+     kennen alleen titel en affiche. Kijken loopt rechtstreeks (WebRTC-
+     datakanaal) van maker naar kijker; hier staat alleen wie er nu 'thuis
+     geeft' (aanwezigheid, kort houdbaar, alleen in RAM). */
+  const THUIS_TTL_MS = 90 * 1000;
+  const THUIS_SIGNALEN = ['vraag', 'offer', 'answer', 'ice', 'klaar', 'stop'];
+  const thuisAanwezigheid = new Map();   // videoId -> ts van de laatste hartslag van de maker
 
   function lijsten() {
     if (!Array.isArray(db.data.theaterKanalen)) db.data.theaterKanalen = [];
@@ -74,15 +81,21 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     const titel = schoon(data.titel, 80); if (!titel) return { status: 400, error: 'Geef de video een titel.' };
     let poster = null;
     if (typeof data.poster === 'string' && /^data:image\/(jpeg|webp);base64,/.test(data.poster) && data.poster.length < 120000) poster = data.poster;
+    const thuis = data.bewaring === 'thuis';
     const v = { id: id(), kanaalId: k.id, key, titel, omschrijving: schoon(data.omschrijving, 400),
       duurS: Math.min(Math.max(Math.round(Number(data.duurS) || 0), 0), 6 * 3600), poster,
-      klaar: false, bytes: 0, ext: null, at: nu() };
+      bewaring: thuis ? 'thuis' : 'rtg',
+      // een thuis-video is meteen 'klaar': de bytes blijven bij de maker,
+      // wij noteren alleen de (door de maker gemelde) omvang voor de kijker
+      klaar: thuis, mbGeschat: thuis ? Math.min(Math.max(Math.round(Number(data.mbGeschat) || 0), 0), 100000) : 0,
+      bytes: 0, ext: null, at: nu() };
     db.data.theaterVideos.push(v); save();
-    return { status: 200, ok: true, id: v.id, maxMb: MAX_VIDEO_MB };
+    return { status: 200, ok: true, id: v.id, maxMb: MAX_VIDEO_MB, bewaring: v.bewaring };
   }
   // de bytes zelf: exact bewaren wat binnenkomt; alleen echt beeldmateriaal
   function videoUpload(key, vid, buffer) {
     const v = videoMet(vid); if (!v || v.key !== key) return { status: 404, error: 'Video niet gevonden.' };
+    if (v.bewaring === 'thuis') return { status: 409, error: 'Deze video blijft bij u thuis; er wordt niets bij RTG bewaard.' };
     if (v.klaar) return { status: 409, error: 'Deze video is al geupload.' };
     if (!Buffer.isBuffer(buffer) || buffer.length < 100) return { status: 400, error: 'Geen videobestand ontvangen.' };
     if (buffer.length > MAX_VIDEO_MB * 1048576) return { status: 413, error: 'Tot ' + MAX_VIDEO_MB + ' MB per video in deze demo.' };
@@ -113,16 +126,40 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
   }
   // voor de kijk-route: waar de bytes staan (in productie: de CDN-verwijzing)
   function streamVan(vid) {
-    const v = videoMet(vid); if (!v || !v.klaar) return null;
+    const v = videoMet(vid); if (!v || !v.klaar || !v.ext) return null;   // thuis-video: wij hebben de bytes niet
     return { pad: path.join(mediaDir, v.id + '.' + v.ext), bytes: v.bytes,
       type: v.ext === 'webm' ? 'video/webm' : 'video/mp4', titel: v.titel };
+  }
+
+  /* ---- het Thuisarchief: aanwezigheid en het signaal-doorgeefluik ---- */
+  function thuisAanwezig(key, ids) {
+    lijsten();
+    const geaccepteerd = [];
+    for (const vid of (Array.isArray(ids) ? ids.slice(0, 100) : [])) {
+      const v = videoMet(String(vid));
+      if (v && v.key === key && v.bewaring === 'thuis') { thuisAanwezigheid.set(v.id, Date.now()); geaccepteerd.push(v.id); }
+    }
+    return { status: 200, ok: true, geaccepteerd, ttlS: THUIS_TTL_MS / 1000 };
+  }
+  const thuisOnline = v => v.bewaring === 'thuis' && Date.now() - (thuisAanwezigheid.get(v.id) || 0) < THUIS_TTL_MS;
+  function signaal(key, vid, kind, doelKey, payload) {
+    const v = videoMet(vid); if (!v || v.bewaring !== 'thuis') return { status: 404, error: 'Video niet gevonden.' };
+    if (!THUIS_SIGNALEN.includes(kind)) return { status: 400, error: 'Onbekend signaal.' };
+    const ikMaker = v.key === key;
+    if (ikMaker && !doelKey) return { status: 400, error: 'De maker antwoordt gericht aan een kijker.' };
+    if (!ikMaker && !thuisOnline(v)) return { status: 409, error: 'De maker is nu niet online; dit werk staat alleen op diens eigen apparaat.' };
+    const doel = ikMaker ? String(doelKey) : v.key;
+    sseToCustomer(doel, 'theater', { kind, videoId: v.id, van: key, payload: payload || null });
+    return { status: 200, ok: true };
   }
 
   /* ---- de zaal: chronologisch, abonnementen eerst, geen algoritme ---- */
   function videoBeeld(v) {
     const k = kanaalMet(v.kanaalId);
+    const thuis = v.bewaring === 'thuis';
     return { id: v.id, titel: v.titel, omschrijving: v.omschrijving, poster: v.poster,
-      duurS: v.duurS, mb: mbVan(v.bytes), kanaal: k ? k.naam : '?', kanaalId: v.kanaalId,
+      duurS: v.duurS, mb: thuis ? (v.mbGeschat || 0) : mbVan(v.bytes), kanaal: k ? k.naam : '?', kanaalId: v.kanaalId,
+      bewaring: v.bewaring || 'rtg', online: thuis ? thuisOnline(v) : true,
       codenaam: codenaamVan(v.key), reacties: (db.data.theaterReacties[v.id] || []).length, at: v.at };
   }
   function zaal(key) {
@@ -175,7 +212,8 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
   return { THEATER_GENRES: GENRES, theaterKanaalMaak: kanaalMaak, theaterOfficeLijst: officeLijst,
     theaterOfficeBeslis: officeBeslis, theaterVideoMaak: videoMaak, theaterVideoUpload: videoUpload,
     theaterVerwijder: verwijder, theaterStreamVan: streamVan, theaterZaal: zaal,
-    theaterAbonneer: abonneer, theaterReactie: reactie, theaterReacties: reacties, theaterMeld: meld };
+    theaterAbonneer: abonneer, theaterReactie: reactie, theaterReacties: reacties, theaterMeld: meld,
+    theaterThuisAanwezig: thuisAanwezig, theaterSignaal: signaal };
 }
 
 module.exports = { maakTheater };

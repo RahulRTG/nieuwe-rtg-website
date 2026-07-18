@@ -8,11 +8,24 @@ module.exports = (kern) => {
   const { app, express, auth, officeAuth, resolveSession,
     theaterKanaalMaak, theaterOfficeLijst, theaterOfficeBeslis, theaterVideoMaak,
     theaterVideoUpload, theaterVerwijder, theaterStreamVan, theaterZaal,
-    theaterAbonneer, theaterReactie, theaterReacties, theaterMeld } = kern;
+    theaterAbonneer, theaterReactie, theaterReacties, theaterMeld,
+    theaterThuisAanwezig, theaterSignaal } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Het Theater is voor leden.' }); return true; }
     return false;
+  };
+  /* Altijd-aan rem op de twee routes die de schijf raken (los van de brede
+     productie-IP-rem): kijken ruim (spoelen vuurt tientallen range-verzoeken
+     per minuut, dat moet gewoon kunnen), uploaden strak. */
+  const remBakken = new Map();
+  setInterval(() => { const nu = Date.now(); for (const [k, b] of remBakken) if (nu - b.vanaf > 120000) remBakken.delete(k); }, 60000).unref();
+  const teVaak = (req, wat, max) => {
+    const sleutel = wat + ':' + req.ip, nu = Date.now();
+    const b = remBakken.get(sleutel) || { vanaf: nu, n: 0 };
+    if (nu - b.vanaf > 60000) { b.vanaf = nu; b.n = 0; }
+    b.n += 1; remBakken.set(sleutel, b);
+    return b.n > max;
   };
 
   // de zaal: chronologisch, abonnementen eerst; geen algoritme, geen autoplay
@@ -31,6 +44,7 @@ module.exports = (kern) => {
   // de bytes: rauw binnen, exact zo bewaard (geen hercompressie, tot 4K)
   app.post('/api/theater/upload/:id', auth, express.raw({ type: () => true, limit: '420mb' }), (req, res) => {
     if (geenGast(req, res)) return;
+    if (teVaak(req, 'up', 12)) return res.status(429).json({ error: 'Even rustig aan met uploaden; probeer het over een minuut opnieuw.' });
     stuur(res, theaterVideoUpload(req.session.key, String(req.params.id || ''), req.body));
   });
   app.post('/api/theater/verwijder', auth, (req, res) => {
@@ -54,11 +68,25 @@ module.exports = (kern) => {
     stuur(res, theaterMeld(req.session.key, String(req.body.id || ''), req.body.reden));
   });
 
+  /* Het Thuisarchief: de maker meldt zich aanwezig voor zijn eigen werk
+     (kort houdbaar), en het kijken loopt via een puur signaal-doorgeefluik:
+     de videobytes reizen rechtstreeks van maker naar kijker (WebRTC) en
+     passeren deze server nooit. */
+  app.post('/api/theater/thuis/aanwezig', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterThuisAanwezig(req.session.key, req.body.ids));
+  });
+  app.post('/api/theater/signaal', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterSignaal(req.session.key, String(req.body.id || ''), String(req.body.kind || ''), req.body.doelKey, req.body.payload));
+  });
+
   /* Kijken: het video-element kan geen Authorization-header sturen, dus de
      sessie komt als ?token= mee (zelfde patroon als /api/stream). Met een
      Range-header komt precies het gevraagde stuk terug (206): soepel spoelen,
      byte voor byte het origineel. */
   app.get('/api/theater/kijk/:id', (req, res) => {
+    if (teVaak(req, 'kijk', 240)) return res.status(429).end();
     const sess = resolveSession(req.query.token);
     if (!sess || sess.tier === 'guest') return res.status(401).end();
     const v = theaterStreamVan(String(req.params.id || ''));

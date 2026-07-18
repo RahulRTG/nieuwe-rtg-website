@@ -1140,10 +1140,12 @@
   .os-app.os-sleep{opacity:0.45;}
 
   /* -------- vergrendelscherm-look voor het inlogscherm -------- */
+  /* ROS-laag: de wallpaper-glow ademt mee met de kleurmotor (--dag-kleur),
+     net als de os-balk op de apps. Valt terug op bordeaux als de motor uit is. */
   #gate{
     background:
-      radial-gradient(120% 60% at 50% -12%, rgba(169,143,28,0.16), transparent 60%),
-      radial-gradient(130% 70% at 50% 112%, rgba(194,58,94,0.14), transparent 62%),
+      radial-gradient(120% 60% at 50% -12%, color-mix(in srgb, var(--dag-kleur, #C23A5E) 20%, transparent), transparent 60%),
+      radial-gradient(130% 70% at 50% 112%, color-mix(in srgb, var(--dag-kleur, #C23A5E) 15%, transparent), transparent 62%),
       var(--bg);
   }
   .os-lock{text-align:center;padding-top:calc(env(safe-area-inset-top, 0px) + 1.6rem);margin-bottom:0.6rem;}

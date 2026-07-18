@@ -1,11 +1,16 @@
 /* Het RTG-OS uitschuifmenu. Zet een hamburger in de balk (.osbar op de apps,
-   .bar op het bureaublad) en bouwt een rustig navigatiepaneel: een profielkaart
-   met het actieve account, een 2-koloms app-raster met labels, "Meer weergeven"
-   voor de website-tegels, en inklapbare secties voor instellingen en hulp.
+   .bar op het bureaublad) en bouwt een rustig navigatiepaneel:
+     - een profielkaart die de ACCOUNTWISSELAAR openklapt (wisselen, in een
+       nieuw venster openen, nog een account toevoegen);
+     - een 2-koloms app-raster met labels (alleen de apps die AAN staan);
+     - "Meer weergeven" voor de website-tegels;
+     - een BEDIENINGSPANEEL waarin elke app aan/uit kan (uit = weg uit de
+       launcher), plus inklapbare secties voor instellingen (incl. afmelden)
+       en hulp.
 
-   De accountwereld komt uit body[data-oswereld] (standaard 'lid'); het account
-   zelf uit de accountkluis (shared/accounts-os.js). Geen inline handlers
-   (nonce-CSP). Insluiten met defer, NA shared/accounts-os.js. */
+   De accountwereld komt uit body[data-oswereld] (standaard 'lid'); accounts uit
+   de accountkluis (shared/accounts-os.js). Voorkeuren staan lokaal per toestel.
+   Geen inline handlers (nonce-CSP). Insluiten met defer, NA accounts-os.js. */
 (function (w, d) {
   'use strict';
 
@@ -30,15 +35,12 @@
     ['∩', 'Downloads', '/site/download.html'],
     ['⌂', 'Startpagina', '/']
   ];
-  var INSTELLINGEN = [
-    ['🔒', 'Privacy', '/site/privacy.html'],
-    ['📜', 'Voorwaarden', '/site/voorwaarden.html']
-  ];
   var HULP = [
     ['⚙️', 'Hoe alles werkt', '/site/systemen.html'],
     ['⌂', 'Naar de website', '/']
   ];
   var BUREAU = '/apps/bureau.html';
+  var UIT_SLEUTEL = 'rtg_os_apps_uit';   // localStorage: apps die AAN uit staan
 
   function el(tag, cls, txt) {
     var e = d.createElement(tag);
@@ -46,6 +48,22 @@
     if (txt != null) e.textContent = txt;
     return e;
   }
+  function leeg(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+  // ---- voorkeuren: welke apps staan uit ----
+  function leesUit() {
+    try { var a = JSON.parse(localStorage.getItem(UIT_SLEUTEL) || '[]'); return Array.isArray(a) ? a : []; }
+    catch (e) { return []; }
+  }
+  function schrijfUit(a) { try { localStorage.setItem(UIT_SLEUTEL, JSON.stringify(a)); } catch (e) {} }
+  function isUit(naam) { return leesUit().indexOf(naam) !== -1; }
+  function zetUit(naam, uit) {
+    var a = leesUit(); var i = a.indexOf(naam);
+    if (uit && i === -1) a.push(naam);
+    if (!uit && i !== -1) a.splice(i, 1);
+    schrijfUit(a);
+  }
+
   function tegel(rij) {
     var a = el('a', 'osmenu-tegel'); a.href = rij[2];
     a.appendChild(el('span', 'ic', rij[0]));
@@ -58,15 +76,39 @@
     a.appendChild(el('span', null, rij[1]));
     return a;
   }
-  function sectie(icoon, titel, rijen) {
-    var det = el('details', 'osmenu-sectie');
+  function knoprij(icoon, tekst, opKlik) {
+    var b = el('button', 'osmenu-rij', null); b.type = 'button';
+    b.style.width = '100%'; b.style.background = 'none'; b.style.border = '0'; b.style.cursor = 'pointer';
+    b.appendChild(el('span', 'ic', icoon));
+    b.appendChild(el('span', null, tekst));
+    b.addEventListener('click', opKlik);
+    return b;
+  }
+  function schakelaar(aan, opWissel) {
+    var lab = el('label', 'osmenu-sw');
+    var inp = d.createElement('input'); inp.type = 'checkbox'; inp.checked = !!aan;
+    inp.addEventListener('change', function () { opWissel(inp.checked); });
+    lab.appendChild(inp); lab.appendChild(el('span', 'baan')); lab.appendChild(el('span', 'knop'));
+    return lab;
+  }
+  function toggleRij(icoon, titel, sub, aan, opWissel) {
+    var rij = el('div', 'osmenu-toggle');
+    rij.appendChild(el('span', 'ic', icoon));
+    var tl = el('div', 'tl'); tl.appendChild(el('b', null, titel));
+    if (sub) tl.appendChild(el('small', null, sub));
+    rij.appendChild(tl);
+    rij.appendChild(schakelaar(aan, opWissel));
+    return rij;
+  }
+  function sectie(icoon, titel, kinderen, open) {
+    var det = el('details', 'osmenu-sectie'); if (open) det.open = true;
     var sum = el('summary');
     sum.appendChild(el('span', 'ic', icoon));
     sum.appendChild(el('span', null, titel));
     sum.appendChild(el('span', 'pijl', '▾'));
     det.appendChild(sum);
     var binnen = el('div', 'binnen');
-    rijen.forEach(function (r) { binnen.appendChild(menurij(r)); });
+    kinderen.forEach(function (k) { binnen.appendChild(k); });
     det.appendChild(binnen);
     return det;
   }
@@ -76,6 +118,12 @@
     var bar = d.querySelector('.osbar') || d.querySelector('.bar');
     if (!bar) return;
 
+    var wereld = (body.getAttribute('data-oswereld') || 'lid').trim() || 'lid';
+    var kluis = (w.RTGAccounts && w.RTGAccounts.maak) ? w.RTGAccounts.maak() : null;
+    var werelden = (w.RTGAccounts && w.RTGAccounts.WERELDEN) || {};
+    var winfo = werelden[wereld] || null;
+    function ingang() { return winfo ? '/' + winfo.ingang : BUREAU; }
+
     // hamburger in de balk
     var ham = el('button', 'os-ham');
     ham.type = 'button';
@@ -84,7 +132,6 @@
     ham.appendChild(el('span')); ham.appendChild(el('span')); ham.appendChild(el('span'));
     bar.insertBefore(ham, bar.firstChild);
 
-    // scrim + paneel
     var scrim = el('div', 'osmenu-scrim');
     var paneel = el('aside', 'osmenu');
     paneel.setAttribute('role', 'dialog');
@@ -100,31 +147,59 @@
 
     var lijf = el('div', 'osmenu-body');
 
-    // profielkaart
-    var wereld = (body.getAttribute('data-oswereld') || 'lid').trim() || 'lid';
+    // ---- profielkaart + accountwisselaar ----
     var acc = null, wnaam = '';
-    try {
-      if (w.RTGAccounts && w.RTGAccounts.maak) {
-        var kluis = w.RTGAccounts.maak();
-        acc = kluis.huidig(wereld);
-        var wdef = w.RTGAccounts.WERELDEN && w.RTGAccounts.WERELDEN[wereld];
-        wnaam = (wdef && wdef.naam) || '';
-      }
-    } catch (e) {}
+    try { if (kluis) { acc = kluis.huidig(wereld); wnaam = (winfo && winfo.naam) || ''; } } catch (e) {}
     var naam = (acc && acc.label) ? acc.label : 'Aanmelden';
-    var prof = el('a', 'osmenu-prof'); prof.href = BUREAU;
-    var ava = el('span', 'ava', naam.charAt(0).toUpperCase());
-    ava.setAttribute('aria-hidden', 'true');
+
+    var prof = el('button', 'osmenu-prof'); prof.type = 'button';
+    prof.setAttribute('aria-expanded', 'false');
+    var ava = el('span', 'ava', naam.charAt(0).toUpperCase()); ava.setAttribute('aria-hidden', 'true');
     var wie = el('span', 'wie');
     wie.appendChild(el('b', null, naam));
     wie.appendChild(el('small', null, acc ? (wnaam || 'Actief account') : 'Kies of voeg een account toe'));
     prof.appendChild(ava); prof.appendChild(wie); prof.appendChild(el('span', 'chev', '›'));
     lijf.appendChild(prof);
 
-    // app-raster
+    var accVak = el('div', 'osmenu-accounts'); accVak.hidden = true;
+    var lijst = kluis ? kluis.lijst(wereld) : [];
+    lijst.forEach(function (a) {
+      var rij = el('button', 'osmenu-acc' + (acc && a.id === acc.id ? ' actief' : '')); rij.type = 'button';
+      rij.appendChild(el('span', 'anaam', a.label));
+      var v = el('button', 'venster', '↗ venster'); v.type = 'button';
+      v.title = 'Open dit account in een nieuw venster, naast je huidige';
+      v.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var u = kluis.vensterURL(wereld, a.id); if (u) w.open('/' + u, '_blank', 'noopener');
+      });
+      rij.appendChild(v);
+      rij.addEventListener('click', function () { kluis.wissel(wereld, a.id); kluis.pasToe(wereld); w.location.href = ingang(); });
+      accVak.appendChild(rij);
+    });
+    var toevoeg = el('a', 'osmenu-acc toevoeg'); toevoeg.href = ingang();
+    toevoeg.appendChild(el('span', 'anaam', '+  Nog een account toevoegen'));
+    accVak.appendChild(toevoeg);
+    prof.addEventListener('click', function () {
+      var open = !accVak.hidden; accVak.hidden = open;
+      prof.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+    lijf.appendChild(accVak);
+
+    // ---- app-raster (respecteert aan/uit) ----
     lijf.appendChild(el('h3', 'osmenu-sectiekop', 'Apps'));
     var grid = el('div', 'osmenu-grid');
-    APPS.forEach(function (r) { grid.appendChild(tegel(r)); });
+    function vulGrid() {
+      leeg(grid);
+      var zichtbaar = APPS.filter(function (r) { return !isUit(r[1]); });
+      if (!zichtbaar.length) {
+        var p = el('p', null, 'Alle apps staan uit. Zet ze aan in het bedieningspaneel hieronder.');
+        p.style.color = 'var(--osm-grijs-zacht)'; p.style.fontSize = '0.85rem'; p.style.padding = '0.4rem 0.2rem';
+        grid.appendChild(p);
+      } else {
+        zichtbaar.forEach(function (r) { grid.appendChild(tegel(r)); });
+      }
+    }
+    vulGrid();
     lijf.appendChild(grid);
 
     // meer weergeven -> website-tegels
@@ -133,17 +208,39 @@
     var siteGrid = el('div', 'osmenu-grid'); siteGrid.hidden = true;
     SITE.forEach(function (r) { siteGrid.appendChild(tegel(r)); });
     meer.addEventListener('click', function () {
-      var open = !siteGrid.hidden;
-      siteGrid.hidden = open; siteKop.hidden = open;
+      var open = !siteGrid.hidden; siteGrid.hidden = open; siteKop.hidden = open;
       meer.textContent = open ? 'Meer weergeven' : 'Minder weergeven';
     });
     lijf.appendChild(meer);
     lijf.appendChild(siteKop);
     lijf.appendChild(siteGrid);
 
-    // inklapbare secties
-    lijf.appendChild(sectie('⚙️', 'Instellingen & privacy', INSTELLINGEN));
-    lijf.appendChild(sectie('❓', 'Hulp & ondersteuning', HULP));
+    // ---- bedieningspaneel: apps aan/uit ----
+    var appToggles = APPS.map(function (r) {
+      return toggleRij(r[0], r[1], null, !isUit(r[1]), function (aan) {
+        zetUit(r[1], !aan); vulGrid();
+      });
+    });
+    var uitleg = el('p', null, 'Zet uit wat je niet gebruikt; het verdwijnt dan uit je app-raster. Dit geldt alleen op dit toestel.');
+    uitleg.style.color = 'var(--osm-grijs-zacht)'; uitleg.style.fontSize = '0.78rem'; uitleg.style.margin = '0.2rem 0.2rem 0.6rem';
+    lijf.appendChild(sectie('🎛️', 'Bedieningspaneel', [uitleg].concat(appToggles), false));
+
+    // ---- instellingen (incl. afmelden) ----
+    var instKinderen = [
+      menurij(['🔒', 'Privacy', '/site/privacy.html']),
+      menurij(['📜', 'Voorwaarden', '/site/voorwaarden.html'])
+    ];
+    if (winfo && acc) {
+      instKinderen.push(knoprij('🚪', 'Afmelden', function () {
+        try { localStorage.removeItem(winfo.sleutel); } catch (e) {}
+        try { if (kluis) kluis.wisVensterAccount(); } catch (e) {}
+        w.location.reload();
+      }));
+    }
+    lijf.appendChild(sectie('⚙️', 'Instellingen & privacy', instKinderen, false));
+
+    // ---- hulp ----
+    lijf.appendChild(sectie('❓', 'Hulp & ondersteuning', HULP.map(menurij), false));
 
     paneel.appendChild(lijf);
     body.appendChild(scrim);
@@ -159,9 +256,7 @@
       scrim.classList.remove('open'); paneel.classList.remove('open');
       paneel.setAttribute('aria-hidden', 'true'); ham.setAttribute('aria-expanded', 'false');
     }
-    ham.addEventListener('click', function () {
-      if (paneel.classList.contains('open')) sluit(); else open();
-    });
+    ham.addEventListener('click', function () { if (paneel.classList.contains('open')) sluit(); else open(); });
     dicht.addEventListener('click', sluit);
     scrim.addEventListener('click', sluit);
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && paneel.classList.contains('open')) sluit(); });

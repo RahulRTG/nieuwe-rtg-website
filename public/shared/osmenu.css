@@ -76,6 +76,50 @@
 .osmenu-prof .wie small{color:var(--osm-grijs-zacht); font-size:0.76rem;}
 .osmenu-prof .chev{color:var(--osm-grijs-zacht); font-size:0.8rem; flex:0 0 auto;}
 
+/* accountwisselaar: klapt onder de profielkaart open */
+.osmenu-prof .chev{transition:transform 0.2s;}
+.osmenu-prof[aria-expanded="true"] .chev{transform:rotate(90deg);}
+.osmenu-accounts{margin:0.5rem 0 0.2rem; display:flex; flex-direction:column; gap:0.3rem;}
+.osmenu-acc{
+  display:flex; align-items:center; gap:0.6rem; width:100%;
+  padding:0.6rem 0.7rem; border-radius:12px; cursor:pointer; font:inherit; text-align:left;
+  background:var(--osm-paneel); border:1px solid var(--osm-lijn); color:var(--osm-inkt);
+}
+.osmenu-acc:hover{border-color:color-mix(in srgb, var(--osm-accent) 45%, transparent);}
+.osmenu-acc .anaam{flex:1; min-width:0; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.osmenu-acc.actief .anaam::after{content:' \2713'; color:var(--osm-accent);}
+.osmenu-acc .venster{
+  border:1px solid var(--osm-lijn); border-radius:8px; background:none; color:var(--osm-grijs);
+  padding:0.2rem 0.5rem; font-size:0.72rem; cursor:pointer; flex:0 0 auto;
+}
+.osmenu-acc .venster:hover{border-color:var(--osm-accent); color:var(--osm-inkt);}
+.osmenu-acc.toevoeg{color:var(--osm-grijs); justify-content:flex-start;}
+.osmenu-acc.toevoeg:hover{color:var(--osm-inkt);}
+
+/* schakelaar (iOS-stijl) voor het bedieningspaneel */
+.osmenu-toggle{
+  display:flex; align-items:center; gap:0.8rem; padding:0.6rem 0.4rem;
+  border-bottom:1px solid var(--osm-lijn);
+}
+.osmenu-toggle:last-child{border-bottom:0;}
+.osmenu-toggle .ic{font-size:1.05rem; width:1.6rem; text-align:center; flex:0 0 auto;}
+.osmenu-toggle .tl{flex:1; min-width:0;}
+.osmenu-toggle .tl b{display:block; font-size:0.9rem; font-weight:600;}
+.osmenu-toggle .tl small{color:var(--osm-grijs-zacht); font-size:0.74rem;}
+.osmenu-sw{position:relative; width:44px; height:26px; flex:0 0 auto; cursor:pointer;}
+.osmenu-sw input{position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer;}
+.osmenu-sw .baan{
+  position:absolute; inset:0; border-radius:999px; background:#2a2724; border:1px solid var(--osm-lijn);
+  transition:background 0.2s;
+}
+.osmenu-sw .knop{
+  position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%;
+  background:#8A8680; transition:transform 0.2s, background 0.2s;
+}
+.osmenu-sw input:checked + .baan{background:color-mix(in srgb, var(--osm-accent) 55%, #1a1613);}
+.osmenu-sw input:checked + .baan + .knop{transform:translateX(18px); background:var(--osm-inkt);}
+.osmenu-sw input:focus-visible + .baan{outline:2px solid var(--osm-accent); outline-offset:2px;}
+
 /* 2-koloms app-raster */
 .osmenu-sectiekop{
   font-size:0.64rem; letter-spacing:0.18em; text-transform:uppercase;

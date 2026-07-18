@@ -23,7 +23,7 @@ module.exports = (kern) => {
     plaatsOrderVoor, betaalOrderVoor, koopTicketVoor, betaalBoekingVoor, vraagRitVoor, betaalRitVoor,
     dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek, media,
     ordersVanKlant, boekingenVanKlant, boekingenVoegToe,
-    txLedgerActief, txLedgerVanKlant, txLedgerTel } = kern;
+    txLedgerActief, txLedgerVanKlant, txLedgerTel, geenGast, lidBoard, lidBoardZet } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -38,6 +38,20 @@ module.exports = (kern) => {
   const openLijn = (s, req) => openLijnVoor(s, req.session);
 
 app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
+
+/* De eigen boardroom van het lid: het schakelbord met alle functies (app-
+   onderdelen, privacy & sociaal, AI & meldingen, verbindingen). Alleen voor een
+   echt account (geen gast). De stand staat server-side op de sessiesleutel, dus
+   hij reist mee naar elk toestel van het lid. */
+app.post('/api/member/boardroom', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  res.json({ bord: lidBoard(req.session.key) });
+});
+app.post('/api/member/boardroom/zet', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const r = lidBoardZet(req.session.key, String(req.body.id || ''), req.body.aan !== false);
+  res.status(r.status).json(r);
+});
 
 app.post('/api/rtf/profielen', auth, (req, res) => {
   if (!eisAccount(req, res)) return;

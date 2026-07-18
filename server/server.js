@@ -62,6 +62,7 @@ const { RETAIL_MATEN, RETAIL_SEIZOENEN, maakRetail } = require('./kern/retail');
 const { maakGroothandel } = require('./kern/groothandel');
 const { maakModebezorg } = require('./kern/modebezorg');
 const { maakZaak } = require('./kern/zaak');
+const { maakLidboard } = require('./kern/lidboard');
 const { maakAutoverkoop } = require('./kern/autoverkoop');
 const { maakBeveiliging } = require('./kern/beveiliging');
 const { maakDirectpay } = require('./kern/directpay');
@@ -2236,6 +2237,11 @@ const {
 const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard } =
   maakZaak({ db, save, accounts });
 
+/* De eigen boardroom per lid (kern/lidboard.js): elk lid zet zijn eigen
+   functies aan/uit; een ouder/beheerder stuurt via dezelfde motor de boardroom
+   van zijn beschermde kind bij (de route bewaakt het gezinsverband). */
+const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardAan } = maakLidboard({ db, save });
+
 /* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
    autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,
    inruil en concierge-aflevering, en een digitaal koopcontract. */
@@ -2688,6 +2694,7 @@ const kern = {
   mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
+  LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardAan,
   // de autoverkoop-laag (kern/autoverkoop.js)
   AUTOVERKOOP_BRANDSTOF, avMagVerkopen, avZetAan, avZetAuto, avVerwijderAuto, avShowroom,
   avAanbevolen, avProefrit, avKoop, avInruil, avBeslis, avTeken, avMijnDeals, avDealerInbox,

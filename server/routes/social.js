@@ -3,7 +3,11 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding } = kern;
+  const { app, express, auth, geenGast, db, save, rtf, webpush, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan, sseToCustomer, sseClients, sseSend, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder, onboarding, lidBoard, lidBoardZet } = kern;
+
+  // Hoort dit kind-handle echt bij het gezin van deze beheerder? (voogd-check)
+  const isKindVanGezin = (gezinCode, kindHandle) =>
+    rtf.socialProfielen().some(sp => sp.handle === kindHandle && sp.gezinCode === gezinCode && sp.beschermd);
   // Een RTF-profiel als onboarding-sessie: de handle is de sleutel, tier 'rtf'.
   const rtfOnbSess = (s) => ({ key: s.handle, tier: 'rtf', account: null });
 
@@ -283,6 +287,26 @@ app.post('/api/rtf/social/kind/verwijder', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan dit.' });
   const r = kindVerwijder(s.g.code, String(req.body.kindHandle || ''), String(req.body.anderKey || ''));
+  res.status(r.status).json(r);
+});
+
+/* Ouderlijk beheer: de beheerder bekijkt en stuurt de boardroom van zijn
+   beschermde kind bij. Dezelfde functie-motor als het lid zelf gebruikt, met de
+   RTF-handle van het kind als sleutel. De voogd-check bewaakt dat het echt zijn
+   kind is; kind:true laat de functies weg die niet bij een kind horen. */
+app.post('/api/rtf/social/kind/boardroom', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan de boardroom van een kind beheren.' });
+  const kindHandle = String(req.body.kindHandle || '');
+  if (!isKindVanGezin(s.g.code, kindHandle)) return res.status(403).json({ error: 'Dit is geen kind van jouw gezin.' });
+  res.json({ bord: lidBoard(kindHandle, { kind: true }) });
+});
+app.post('/api/rtf/social/kind/boardroom/zet', (req, res) => {
+  const s = rtfSociaal(req, res); if (!s) return;
+  if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder kan dit.' });
+  const kindHandle = String(req.body.kindHandle || '');
+  if (!isKindVanGezin(s.g.code, kindHandle)) return res.status(403).json({ error: 'Dit is geen kind van jouw gezin.' });
+  const r = lidBoardZet(kindHandle, String(req.body.id || ''), req.body.aan !== false, { kind: true });
   res.status(r.status).json(r);
 });
 

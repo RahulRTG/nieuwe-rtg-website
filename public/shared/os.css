@@ -1,0 +1,88 @@
+/* RTG-OS chrome, gedeeld door alle apps. Geeft elke app dezelfde bovenbalk
+   (woordmerk + live klok/datum + actieve account) en dezelfde rustige
+   bureaublad-gloed als het bureaublad (apps/bureau.html).
+
+   De KLEUR komt uit de machines die we al hebben: shared/seizoen.js zet
+   data-seizoen en data-dagdeel op <html>, shared/dagkleur.css vertaalt dat
+   naar de levende --dag-kleur (zestien tinten, seizoen x zonstand). De OS
+   rendert die kleur in zijn eigen materiaal: als accent op het woordmerk,
+   de klok-onderstreping, de accountchip en de gloed. De GROND blijft altijd
+   diep zwart (de motorkap) en het wijnrood-anker (#7F1634) draait nooit mee
+   -- precies zoals de merkregels voorschrijven. Zonder JavaScript blijft de
+   vaste donkere huisstijl met bordeaux-terugval staan.
+
+   Insluiten NA shared/dagkleur.css, en shared/osbar.js bouwt de balk. */
+:root{
+  --os-grond:#0C0C0B; --os-paneel:#151312; --os-paneel2:#1B1817;
+  --os-inkt:#F4F1EC; --os-lijn:rgba(255,255,255,0.09);
+  --os-grijs:rgba(244,241,236,0.72); --os-grijs-zacht:rgba(244,241,236,0.50);
+  --os-anker:#7F1634;                     /* vaste wijn, het merkanker */
+  --os-metaal:#A98F1C;                    /* rustig vast metaal */
+  /* de levende dagkleur, met bordeaux-terugval als de machines uit staan */
+  --os-accent:var(--dag-kleur,#C23A5E);
+}
+
+/* de bureaublad-gloed: alleen op pagina's die de balk aanzetten */
+body[data-osbar]{
+  background-image:
+    radial-gradient(1200px 700px at 78% -8%, color-mix(in srgb, var(--os-accent) 12%, transparent), transparent 60%),
+    radial-gradient(900px 600px at 8% 108%, color-mix(in srgb, var(--os-metaal) 9%, transparent), transparent 60%);
+  background-attachment:fixed;
+  /* het licht wisselt zacht mee met de zon, net als bij de passen */
+  transition:background-color 0.8s ease;
+}
+
+/* ---- de bovenbalk ---- */
+.osbar{
+  display:flex; align-items:center; gap:1rem;
+  padding:0.75rem clamp(1rem,4vw,2.4rem);
+  border-bottom:1px solid var(--os-lijn);
+  position:sticky; top:0; z-index:40;
+  background:rgba(12,12,11,0.72); backdrop-filter:blur(14px);
+}
+.osbar .os-merk{
+  display:inline-flex; flex-direction:column; gap:0.1rem;
+  text-decoration:none; color:var(--os-inkt); line-height:1.05;
+}
+.osbar .os-kick{
+  font-size:0.56rem; letter-spacing:0.24em; text-transform:uppercase;
+  color:var(--os-grijs-zacht);
+}
+.osbar .os-kick b{ color:var(--os-accent); font-weight:700; transition:color 0.8s ease; }
+.osbar .os-app{ font-family:'Bodoni Moda',serif; font-size:1.12rem; letter-spacing:0.02em; }
+.osbar .os-merk:hover .os-app{ color:var(--os-accent); transition:color 0.2s ease; }
+
+.osbar .os-klok{ margin-inline:auto; text-align:center; line-height:1.12; }
+.osbar .os-klok time{
+  display:block; font-family:'Bodoni Moda',serif; font-size:1.32rem;
+  font-variant-numeric:tabular-nums; letter-spacing:0.02em;
+  border-bottom:2px solid color-mix(in srgb, var(--os-accent) 60%, transparent);
+  padding-bottom:0.08rem; transition:border-color 0.8s ease;
+}
+.osbar .os-datum{
+  font-size:0.62rem; letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--os-grijs-zacht);
+}
+
+.osbar .os-account{ display:flex; justify-content:flex-end; }
+.osbar .os-chip{
+  display:inline-flex; align-items:center; gap:0.45rem;
+  border:1px solid var(--os-lijn); border-radius:999px;
+  padding:0.34rem 0.8rem; font-size:0.74rem; color:var(--os-grijs);
+  background:linear-gradient(155deg,#211E1B,#161311);
+  text-decoration:none; font-family:'Inter',sans-serif;
+}
+.osbar .os-chip:hover{ border-color:color-mix(in srgb, var(--os-accent) 55%, transparent); color:var(--os-inkt); }
+.osbar .os-chip b{ color:var(--os-inkt); font-weight:600; }
+.osbar .os-chip .os-stip{
+  width:0.5rem; height:0.5rem; border-radius:50%;
+  background:var(--os-accent); transition:background-color 0.8s ease;
+}
+.osbar .os-chip.leeg .os-stip{ background:var(--os-grijs-zacht); }
+
+/* wat smaller op een telefoon: de app-naam en datum mogen inklappen */
+@media (max-width:520px){
+  .osbar .os-app{ font-size:1rem; }
+  .osbar .os-klok time{ font-size:1.12rem; }
+  .osbar .os-chip .os-rol{ display:none; }
+}

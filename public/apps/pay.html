@@ -7,8 +7,13 @@
 <meta name="theme-color" content="#0C0C0B">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/os.css" rel="stylesheet">
 <style>
-  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--merk:#7F1734;--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;}
+  /* --burgundy volgt nu de levende dagkleur uit de machines (dagkleur.css),
+     met de bordeaux-op-zwart als vaste terugval; --merk (wijn) en --gold
+     blijven vast, precies zoals de merkregels voorschrijven. */
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.09);--txt:#F4F1EC;--muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--merk:#7F1734;--burgundy:var(--dag-kleur,#C23A5E);--gold:#A98F1C;--green:#4C9A75;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}
@@ -59,12 +64,10 @@
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
 </head>
-<body>
+<body data-osbar="RTG Pay" data-oswereld="lid">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
-<header><div class="wrap">
-  <div class="brand"><span class="merkvlak">RTG Pay</span><small>Een tik en het is geregeld</small></div>
-  <nav aria-label="Pay"><a href="/apps/app.html" style="font-size:.8rem;color:var(--muted);">Naar de app →</a></nav>
-</div></header>
+<!-- de RTG-OS bovenbalk (woordmerk + klok + account) wordt door
+     shared/osbar.js hierboven ingevoegd; de app-eigen header is vervallen -->
 
 <main id="hoofd" tabindex="-1"><div class="wrap">
 
@@ -358,6 +361,9 @@ function start(){
 setInterval(() => { if (!$('#vPay').hidden && !document.hidden) { ververs().catch(() => {}); laadTiks(); } }, 8000);
 if (TOKEN) start(); else toon('vGate');
 </script>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/accounts-os.js" defer></script>
+<script src="/shared/osbar.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 </body>
 </html>

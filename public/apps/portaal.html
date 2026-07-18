@@ -11,25 +11,30 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/os.css" rel="stylesheet">
 <style>
+  /* Standaard nu de donkere RTG-OS look (de motorkap), zodat het portaal als
+     losse app aanvoelt en bij Spelen/Vrienden past. --paper is de grond,
+     --white de panelen, --black de inkt. Het accent (--burgundy) volgt de
+     levende dagkleur uit de machines (dagkleur.css) met de bordeaux-op-zwart
+     als terugval; het wijn-anker en goud blijven vaste merkkleuren. */
   :root{
-    --white:#FFFFFF;
-    --black:#0C0C0B;
-    --burgundy:#7F1634;
-    --burgundy-bright:#9E1C40;
+    --white:#151312;
+    --black:#F4F1EC;
+    --burgundy:var(--dag-kleur,#C23A5E);
+    --burgundy-bright:#E0637F;
     --burgundy-on-dark:#C23A5E;
-    --gold:#857007;
-    --gold-bright:#A98F1C;
-    --line:#DEDBD5;
-    --grey:#4D4A45;
-    --grey-soft:#8A8680;
-    --paper:#F7F5F1;
-    --green:#2E6B4F;
+    --gold:#A98F1C;
+    --gold-bright:#C9A82E;
+    --line:rgba(255,255,255,0.09);
+    --grey:rgba(244,241,236,0.72);
+    --grey-soft:rgba(244,241,236,0.50);
+    --paper:#0C0C0B;
+    --green:#4C9A75;
   }
 
-  /* Pas-thema's: RTG Pass bordeaux met wit en goud, Lifestyle Pass parelmoer
-     met goud en bordeaux, Business Pass het zwart/wit-standaard. De semantische
-     variabelen kantelen mee: --paper is de pagina, --white de kaarten,
-     --black de tekst en knoppen. */
+  /* Pas-thema's: RTG Pass bordeaux, Lifestyle Pass parelmoer (bewust licht,
+     de handtekening van die pas), Business Pass volgt de donkere standaard.
+     De semantische variabelen kantelen mee: --paper is de pagina, --white de
+     kaarten, --black de tekst en knoppen. */
   body.theme-rtg{
     --white:#2E0A15;
     --black:#FBF6F1;
@@ -43,9 +48,20 @@
     --paper:#22060E;
     --green:#4C9A75;
   }
+  /* Lifestyle Pass blijft parelmoer-licht: een volledige lichte set, zodat de
+     pas zijn eigen handtekening houdt en niet de donkere standaard erft. */
   body.theme-life{
-    --paper:#FAF8F3;
+    --white:#FFFFFF;
+    --black:#0C0C0B;
+    --burgundy:#7F1634;
+    --burgundy-bright:#9E1C40;
+    --gold:#857007;
+    --gold-bright:#A98F1C;
     --line:#E3DFD6;
+    --grey:#4D4A45;
+    --grey-soft:#8A8680;
+    --paper:#FAF8F3;
+    --green:#2E6B4F;
   }
   /* Blokken die vaste lichte tekst dragen, blijven in het RTG-thema donker. */
   body.theme-rtg header{background:rgba(34,6,14,0.92);}
@@ -335,8 +351,11 @@
   #portal.active{display:block;}
   #gate.hidden{display:none;}
 
+  /* de tabbalk is een vaste donkere contrastbalk (met witte tekst) in elk
+     thema: donker op de donkere standaard, en een contrastblok op het lichte
+     Lifestyle-thema. Vroeger via var(--black), maar dat kantelt nu mee. */
   .portal-nav{
-    background:var(--black);
+    background:#151312;
     position:sticky;
     top:63px;
     z-index:90;
@@ -362,7 +381,7 @@
   }
   .portal-nav button:hover{color:var(--white);}
   .portal-nav button.active{
-    color:var(--white);
+    color:#F4F1EC;
     border-bottom-color:var(--burgundy-on-dark);
   }
   .portal-nav button .lock{font-size:0.7rem;opacity:0.7;margin-left:0.3rem;}
@@ -875,6 +894,7 @@
     font-size:0.95rem;
     flex-shrink:0;
   }
+  .avatar{color:var(--paper);}
   .avatar.a-rtg{background:var(--burgundy);}
   .avatar.a-lifestyle{background:var(--gold);}
   .avatar.a-business{background:var(--black);}

@@ -6,24 +6,23 @@ Conceptwebsite van Rahul Travel Group: homepage, drie passen (RTG / Lifestyle / 
 
 ```
 public/            alles wat de browser laadt (de webroot die de server serveert)
-├── index.html     homepage (bereikbaar op /)
 ├── sw.js          service worker (staat bewust in de root: scope /)
 ├── manifest.webmanifest
 ├── icon.svg
-├── shared/        gedeelde client-scripts (i18n.js, realtime.js)
-├── site/          marketingpagina's (passen, foundation, boeken, toegang, download, partner-worden)
+├── shared/        gedeelde client-scripts (i18n.js, realtime.js, osmenu, os.css)
+├── site/          winkel.html (hardware-shop voor partners) + 404.html
 └── apps/          alle web-apps, per doelgroep en genre:
+    ├── app.html           leden-app (RTG-OS, tevens het inlogscherm op /)
     ├── index.html         app-overzicht (hub)
-    ├── leden.html         leden-app (de passen; alias van app.html)
+    ├── juridisch.html     juridische ROS-app (voorwaarden, privacy, partnervoorwaarden)
     ├── personeel.html     personeels-app (rooster, taken, walkie-talkie, SOS)
-    ├── partners.html      werkgevers-app (alias van leverancier.html, alle genres)
-    ├── restaurant/bar/hotel/appartement/taxi/privejet.html  eigen app per genre
-    ├── portaal.html       ledenportaal (web)
+    ├── leverancier.html   werkgevers-app (alle genres)
+    ├── boardroom.html     persoonlijke boardroom (functies aan/uit, ouderbeheer)
     └── backoffice.html    RTG-backoffice
 server/            Node.js/Express-backend + data (db.json, rtg.db, sleutels, uploads)
 ```
 
-Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
+Er is geen losse marketingsite meer: `/` stuurt meteen door naar het RTG-OS-inlogscherm (`/apps/app.html`). Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
 
 ## Starten (met backend)
 
@@ -34,7 +33,7 @@ npm install
 npm start
 ```
 
-Open daarna **http://localhost:3000/apps/portaal.html** (de rest van de site staat op http://localhost:3000).
+Open daarna **http://localhost:3000** — dat brengt je meteen op het RTG-OS-inlogscherm van de leden-app.
 
 Met de backend actief lopen inloggen, betalingen, likes, reacties, DM's en de AI via de echte API:
 
@@ -135,11 +134,11 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 - **Security-headers:** Content-Security-Policy (geen extern verkeer behalve Google Fonts), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy` (camera, microfoon en locatie alleen voor de eigen apps).
 - **AVG-rechten in de app:** elk lid kan onderin het meldingenpaneel zijn volledige dossier downloaden (inzagerecht, JSON) en zijn gegevens definitief laten wissen (vergetelheid): cv, chats, likes, live-locatie en account inclusief geupload document; sollicitaties bij bedrijven worden geanonimiseerd en alle sessies uitgelogd.
 - **Wachtwoorden en PIN's** worden gehasht met scrypt; identiteitsdocumenten staan buiten de webroot en zijn alleen voor de backoffice toegankelijk.
-- **Juridisch:** [privacybeleid](public/site/privacy.html) en [algemene voorwaarden](public/site/voorwaarden.html) staan op de site en kloppen met wat de techniek doet.
+- **Juridisch:** [privacybeleid](public/apps/juridisch/privacy.html), [algemene voorwaarden](public/apps/juridisch/voorwaarden.html) en [partnervoorwaarden](public/apps/juridisch/partnervoorwaarden.html) staan gebundeld in de juridische ROS-app (`/apps/juridisch.html`) en kloppen met wat de techniek doet.
 
 ## Partner worden & e-mail
 
-Bedrijven melden zich aan via **/site/partner-worden.html**; de backoffice keurt goed of wijst af. Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.
+Bedrijven worden aangemaakt vanuit de backoffice (de losse publieke wervingspagina is met de marketingsite verwijderd; het aanvraag-endpoint blijft bestaan). Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.
 
 E-mail (verificatie, wachtwoord-herstel, sollicitatie- en partner-besluiten) is af: met `SMTP_URL` (+ optioneel `MAIL_FROM`) in de omgeving verstuurt nodemailer echte mail; zonder gaan berichten naar `server/data/outbox/` en werken alle links gewoon.
 
@@ -159,7 +158,7 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 
 ## Partnerkanaal
 
-Niet-leden boeken via **site/boeken.html**, bereikbaar via een partnerlink zoals `/site/boeken.html?via=NOVA`. De klant ziet uitsluitend één totaalprijs; nettoprijs en service zijn interne administratie en worden per boeking opgeslagen in `server/data/db.json` onder `bookings`. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen.
+Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)
 
 ## Documentatie
 

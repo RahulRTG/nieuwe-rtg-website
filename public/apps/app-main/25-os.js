@@ -25,12 +25,7 @@
   const LINKS = {
     spelen:      { naam: 'Spelen',       icoon: '🎲', url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     icoon: '💬', url: '/apps/foundation/vrienden.html' },
-    website:     { naam: 'Website',      icoon: '🌍', url: '/' },
-    paspagina:   { naam: 'RTG Pass',     icoon: '🎫', url: '/site/rtg-pass.html' },
-    foundation:  { naam: 'Over RTF',     icoon: '🕊️', url: '/site/rtfoundation.html' },
-    privacy:     { naam: 'Privacy',      icoon: '🔒', url: '/site/privacy.html' },
-    boeken:      { naam: 'Boeken',       icoon: '🧭', url: '/site/boeken.html' },
-    download:    { naam: 'Apps',         icoon: '⬇️', url: '/site/download.html' }
+    juridisch:   { naam: 'Juridisch',    icoon: '📜', url: '/apps/juridisch.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -55,8 +50,7 @@
       { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
     [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
       'os:rtf',
-      { sleutel: 'map-rtg', naam: 'RTG & info', items: ['link:website', 'link:paspagina', 'link:foundation', 'link:privacy'] },
-      'link:boeken', 'link:download']
+      'link:juridisch']
   ];
 
   /* ---------- mappen: eigen namen ----------

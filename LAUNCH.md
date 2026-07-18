@@ -18,7 +18,7 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
 - [x] AVG: gegevens downloaden en definitief verwijderen, rechtstreeks in de leden-app
 - [x] E-maillaag af: verificatie, wachtwoord-herstel, sollicitatie-besluit,
       verificatie-besluit, partner-onboarding. Zonder SMTP gaan mails naar `server/data/outbox`
-- [x] Partner-onboarding: aanmelden via `/site/partner-worden.html`, goedkeuren in de backoffice,
+- [x] Partner-onboarding: aanmelden via het aanvraag-endpoint, goedkeuren in de backoffice,
       code + manager-PIN automatisch, welkomstmail
 - [x] Privacybeleid en algemene voorwaarden (kloppen met de techniek), 404-pagina,
       robots.txt, security.txt
@@ -69,7 +69,8 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
    Back-ups extern opslaan (nu lokaal, 14 dagen).
 7. **Juridisch nalopen (voor livegang door een advocaat laten toetsen):**
    - De drie documenten: privacybeleid, algemene voorwaarden en partnervoorwaarden
-     (`/site/privacy.html`, `/site/voorwaarden.html`, `/site/partnervoorwaarden.html`).
+     (gebundeld in de juridische ROS-app: `/apps/juridisch/privacy.html`,
+     `/apps/juridisch/voorwaarden.html`, `/apps/juridisch/partnervoorwaarden.html`).
      Het partner-akkoord wordt al technisch afgedwongen en vastgelegd bij de aanvraag.
    - E-mailadressen (privacy@/legal@/partners@/security@) echt aanmaken.
    - Verwerkersovereenkomsten met partners formeel ondertekenen (de afspraken staan
@@ -84,7 +85,7 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
      in een boeking of betaling ("boek je hele reis in een tik" zou RTG alsnog
      organisator maken en SGR/insolventiedekking vereisen).
    - **Founding-actie:** bepaal en publiceer de sluitingsdatum (staat nu als "wordt
-     nog aangekondigd" op partner-worden en in de partnervoorwaarden) en leg per
+     nog aangekondigd" in de partnervoorwaarden) en leg per
      partner vast wanneer de uitnodiging is verstuurd en wat het antwoord was; dat
      bewijs bepaalt later wie founding is. Laat de doorbelasting van
      onderhoudskosten "zonder maximum" toetsen: een open kostenclausule is b2b

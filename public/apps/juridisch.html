@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Juridisch</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/shared/os.css">
+<link rel="stylesheet" href="/shared/osmenu.css">
+<script src="/apps/foundation/palet.js"></script>
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.60);--acc:var(--dag-kleur,#C23A5E);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .wrap{max-width:720px;margin:0 auto;padding:1.4rem 1.1rem 4rem;}
+  .terug{display:inline-block;margin-bottom:1rem;color:var(--acc);text-decoration:none;font-size:.85rem;}
+  .intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
+  .intro p{color:var(--soft);font-size:.9rem;margin:.3rem 0 1.4rem;max-width:54ch;}
+  .docs{display:flex;flex-direction:column;gap:.8rem;}
+  .doc{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;text-decoration:none;color:inherit;transition:border-color .15s;}
+  .doc:hover,.doc:focus-visible{border-color:var(--acc);outline:none;}
+  .doc .ic{font-size:1.5rem;flex:none;}
+  .doc .t{flex:1;min-width:0;}
+  .doc .t b{font-weight:600;font-size:1rem;}
+  .doc .t small{display:block;color:var(--soft);font-size:.82rem;margin-top:.1rem;}
+  .doc .pijl{color:var(--soft);flex:none;}
+  .vt{margin-top:2rem;font-size:.78rem;color:var(--soft);line-height:1.6;}
+</style>
+</head>
+<body data-osbar="Juridisch" data-oswereld="lid" data-osterug="apps/app.html">
+<main class="wrap" id="hoofd">
+  <a class="terug" href="/apps/app.html">← naar de app</a>
+  <div class="intro">
+    <h1>Juridisch</h1>
+    <p>Alle voorwaarden en het privacybeleid van Rahul Travel Group op één plek. Helder, kort en zonder kleine lettertjes-trucs.</p>
+  </div>
+  <nav class="docs" aria-label="Juridische documenten">
+    <a class="doc" href="/apps/juridisch/voorwaarden.html">
+      <span class="ic" aria-hidden="true">📜</span>
+      <span class="t"><b>Algemene voorwaarden</b><small>De afspraken voor het gebruik van RTG en de passen.</small></span>
+      <span class="pijl" aria-hidden="true">→</span>
+    </a>
+    <a class="doc" href="/apps/juridisch/privacy.html">
+      <span class="ic" aria-hidden="true">🔒</span>
+      <span class="t"><b>Privacybeleid</b><small>Wat we bewaren, waarom, en jouw rechten (inzage, download, verwijderen).</small></span>
+      <span class="pijl" aria-hidden="true">→</span>
+    </a>
+    <a class="doc" href="/apps/juridisch/partnervoorwaarden.html">
+      <span class="ic" aria-hidden="true">🤝</span>
+      <span class="t"><b>Partnervoorwaarden</b><small>De afspraken voor partnerbedrijven, met 0% commissie en verwerkersafspraken.</small></span>
+      <span class="pijl" aria-hidden="true">→</span>
+    </a>
+  </nav>
+  <p class="vt">© Rahul Travel Group · KvK 82273510 · btw NL002291440B89</p>
+</main>
+<script src="/shared/osbar.js" defer></script>
+<script src="/shared/osmenu.js" defer></script>
+</body>
+</html>

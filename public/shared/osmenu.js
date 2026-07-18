@@ -25,20 +25,8 @@
     ['🎛️', 'Boardroom', '/apps/boardroom.html'],
     ['🤝', 'RTFoundation', '/apps/foundation/index.html']
   ];
-  var SITE = [
-    ['◆', 'RTG Pass', '/site/rtg-pass.html'],
-    ['❖', 'Lifestyle Pass', '/site/lifestyle-pass.html'],
-    ['◈', 'Business Pass', '/site/business-pass.html'],
-    ['✦', 'RTFoundation', '/site/rtfoundation.html'],
-    ['🧭', 'Boeken', '/site/boeken.html'],
-    ['⛓️', 'Systemen', '/site/systemen.html'],
-    ['➕', 'Partner worden', '/site/partner-worden.html'],
-    ['∩', 'Downloads', '/site/download.html'],
-    ['⌂', 'Startpagina', '/']
-  ];
   var HULP = [
-    ['⚙️', 'Hoe alles werkt', '/site/systemen.html'],
-    ['⌂', 'Naar de website', '/']
+    ['📜', 'Juridisch', '/apps/juridisch.html']
   ];
   var BUREAU = '/apps/bureau.html';
   var UIT_SLEUTEL = 'rtg_os_apps_uit';   // localStorage: apps die AAN uit staan
@@ -203,19 +191,6 @@
     vulGrid();
     lijf.appendChild(grid);
 
-    // meer weergeven -> website-tegels
-    var meer = el('button', 'osmenu-meer', 'Meer weergeven'); meer.type = 'button';
-    var siteKop = el('h3', 'osmenu-sectiekop', 'De website'); siteKop.hidden = true;
-    var siteGrid = el('div', 'osmenu-grid'); siteGrid.hidden = true;
-    SITE.forEach(function (r) { siteGrid.appendChild(tegel(r)); });
-    meer.addEventListener('click', function () {
-      var open = !siteGrid.hidden; siteGrid.hidden = open; siteKop.hidden = open;
-      meer.textContent = open ? 'Meer weergeven' : 'Minder weergeven';
-    });
-    lijf.appendChild(meer);
-    lijf.appendChild(siteKop);
-    lijf.appendChild(siteGrid);
-
     // ---- bedieningspaneel: apps aan/uit ----
     var appToggles = APPS.map(function (r) {
       return toggleRij(r[0], r[1], null, !isUit(r[1]), function (aan) {
@@ -295,8 +270,8 @@
 
     // ---- instellingen (incl. afmelden) ----
     var instKinderen = [
-      menurij(['🔒', 'Privacy', '/site/privacy.html']),
-      menurij(['📜', 'Voorwaarden', '/site/voorwaarden.html'])
+      menurij(['🔒', 'Privacy', '/apps/juridisch/privacy.html']),
+      menurij(['📜', 'Voorwaarden', '/apps/juridisch/voorwaarden.html'])
     ];
     if (winfo && acc) {
       instKinderen.push(knoprij('🚪', 'Afmelden', function () {

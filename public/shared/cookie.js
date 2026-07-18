@@ -35,7 +35,7 @@
   var rij = document.createElement('div');
   rij.className = 'rij';
   var a = document.createElement('a');
-  a.href = '/site/privacy.html';
+  a.href = '/apps/juridisch/privacy.html';
   a.textContent = T.privacy;
   var knop = document.createElement('button');
   knop.type = 'button';

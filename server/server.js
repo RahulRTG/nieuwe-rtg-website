@@ -506,11 +506,11 @@ app.use('/api/foundation', rtf.router);
 // een gezinsmelding voor een gekoppelde oppas/familie ook als telefoonmelding (web-push)
 rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch (e) {} });
 
-/* De voordeur is het RTG-OS-inlogscherm van de app, niet de marketingpagina:
-   wie naar / gaat, komt meteen op het inlogscherm (app.html toont het gate-
-   scherm als je niet ingelogd bent, en de app zelf als je dat wel bent). De
-   marketingpagina blijft gewoon bereikbaar op /index.html. 302 zodat dit
-   makkelijk terug te draaien is en niet hard gecachet wordt. */
+/* De voordeur is het RTG-OS-inlogscherm van de app. Er is geen losse
+   marketingsite meer: wie naar / gaat, komt meteen op het inlogscherm
+   (app.html toont het gate-scherm als je niet ingelogd bent, en de app zelf
+   als je dat wel bent). 302 zodat dit makkelijk terug te draaien is en niet
+   hard gecachet wordt. */
 app.get('/', (req, res) => res.redirect(302, '/apps/app.html'));
 
 /* Strengere CSP voor de app-pagina's: geen 'unsafe-inline' voor scripts, maar

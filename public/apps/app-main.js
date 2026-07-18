@@ -2584,17 +2584,48 @@
   const terug = $('#osTerug'), pill = $('#osPill');
   if (terug) terug.addEventListener('click', naarHome);
   // de pill: een tik gaat naar het beginscherm, vasthouden roept de Butler
-  // (het Siri-gebaar van dit OS)
-  let pillLang = false, pillTimer = null;
+  // (het Siri-gebaar van dit OS), en omhoog vegen sluit de open app: de app
+  // krimpt onder de vinger weg (of veert terug als de veeg te kort was)
+  let pillLang = false, pillTimer = null, pillY = null, pillDy = 0, pillVeeg = false;
+  const rustigOS = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (pill) {
-    pill.addEventListener('pointerdown', () => {
-      pillLang = false;
+    pill.addEventListener('pointerdown', e => {
+      pillLang = false; pillY = e.clientY; pillDy = 0; pillVeeg = false;
+      try { pill.setPointerCapture(e.pointerId); } catch (x) {}
       pillTimer = setTimeout(() => { pillLang = true; vraagButler(''); }, 550);
     });
-    const pillLos = () => { if (pillTimer) { clearTimeout(pillTimer); pillTimer = null; } };
+    pill.addEventListener('pointermove', e => {
+      if (pillY == null || pillLang) return;
+      pillDy = Math.max(0, pillY - e.clientY);
+      if (pillDy > 8 && !pillVeeg) {
+        pillVeeg = true;
+        if (pillTimer) { clearTimeout(pillTimer); pillTimer = null; } // vegen is geen vasthouden
+      }
+      if (!pillVeeg || rustigOS || !content) return;
+      const p = Math.min(pillDy / 240, 1);
+      content.style.transformOrigin = '50% 90%';
+      content.style.transform = 'scale(' + (1 - p * 0.15).toFixed(4) + ') translateY(' + Math.round(-pillDy * 0.35) + 'px)';
+      content.style.opacity = String(1 - p * 0.3);
+    });
+    const pillLos = () => {
+      if (pillTimer) { clearTimeout(pillTimer); pillTimer = null; }
+      if (pillY == null) return;
+      const d = pillDy; pillY = null;
+      if (!pillVeeg || !content) return;
+      if (d > 70) {
+        content.style.transform = ''; content.style.opacity = '';
+        if (rustigOS) { naarHome(); return; }
+        content.classList.add('os-veeg-weg');
+        setTimeout(() => { naarHome(); content.classList.remove('os-veeg-weg'); }, 170);
+      } else {
+        content.classList.add('os-veeg-terug');
+        content.style.transform = ''; content.style.opacity = '';
+        setTimeout(() => content.classList.remove('os-veeg-terug'), 240);
+      }
+    };
     pill.addEventListener('pointerup', pillLos);
     pill.addEventListener('pointercancel', pillLos);
-    pill.addEventListener('click', () => { if (!pillLang) naarHome(); pillLang = false; });
+    pill.addEventListener('click', () => { if (!pillLang && !pillVeeg) naarHome(); pillLang = false; pillVeeg = false; });
   }
 
   const klok = $('#osKlok'), datum = $('#osDatum');

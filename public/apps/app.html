@@ -950,6 +950,7 @@
     bottom:calc(env(safe-area-inset-bottom, 0px) + 0.35rem);
     z-index:30;width:120px;height:18px;
     background:none;border:none;display:none;align-items:center;justify-content:center;
+    touch-action:none; /* de veeg omhoog blijft bij de pill, niet bij het scrollen */
   }
   .os-pill::after{
     content:"";width:110px;height:5px;border-radius:3px;
@@ -964,6 +965,9 @@
     .view[data-view="home"].active{animation:osThuis 0.26s ease-out;}
     @keyframes osOpen{from{transform:scale(0.88) translateY(26px);opacity:0.4;}to{transform:none;opacity:1;}}
     @keyframes osThuis{from{transform:scale(1.05);opacity:0.5;}to{transform:none;opacity:1;}}
+    /* omhoog vegen op de pill: de app krimpt onder de vinger weg of veert terug */
+    #content.os-veeg-terug{transition:transform 0.22s cubic-bezier(0.32,0.72,0.36,1),opacity 0.22s ease;}
+    #content.os-veeg-weg{transition:transform 0.18s ease-in,opacity 0.18s ease-in;transform:scale(0.85) translateY(-10vh);opacity:0;}
   }
 
   /* -------- meerdere hoofdschermen: horizontale scroll-snap + stippen -------- */

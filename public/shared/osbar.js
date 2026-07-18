@@ -113,5 +113,59 @@
     }
   } catch (e) { /* de balk blijft gewoon staan met "Aanmelden" */ }
 
+  // ---- telefoongevoel: de home-indicator onderin ----
+  // Een tik gaat naar het bureaublad; omhoog vegen laat de app onder de
+  // vinger wegkrimpen en sluit hem dan (net als op een telefoon). Op het
+  // bureaublad zelf is er niets te sluiten, dus daar geen indicator.
+  var opBureau = location.pathname.replace(/\/+$/, '') === BUREAU.replace(/\.html$/, '') || location.pathname === BUREAU;
+  if (!opBureau) {
+    var pil = el('button', 'os-thuis-pill');
+    pil.type = 'button';
+    pil.setAttribute('aria-label', 'Naar het bureaublad; omhoog vegen sluit de app');
+    body.appendChild(pil);
+
+    var rustig = false;
+    try { rustig = w.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    function naarBureau() {
+      if (rustig) { location.href = BUREAU; return; }
+      body.style.transform = ''; body.style.opacity = '';
+      body.classList.add('os-weg');
+      setTimeout(function () { location.href = BUREAU; }, 190);
+    }
+
+    var startY = null, dy = 0, veegde = false;
+    pil.addEventListener('pointerdown', function (e) {
+      startY = e.clientY; dy = 0; veegde = false;
+      try { pil.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    pil.addEventListener('pointermove', function (e) {
+      if (startY == null) return;
+      dy = Math.max(0, startY - e.clientY);
+      if (dy > 8) veegde = true;
+      if (rustig || !veegde) return;
+      // de app volgt de vinger: krimpen richting het bureaublad
+      var p = Math.min(dy / 260, 1);
+      body.style.transformOrigin = '50% 85%';
+      body.style.transform = 'scale(' + (1 - p * 0.16).toFixed(4) + ') translateY(' + Math.round(-dy * 0.35) + 'px)';
+      body.style.opacity = String(1 - p * 0.25);
+    });
+    function los() {
+      if (startY == null) return;
+      var d = dy; startY = null;
+      if (!veegde) return;
+      if (d > 70) { naarBureau(); return; }
+      // niet ver genoeg: rustig terugveren
+      body.classList.add('os-terugvering');
+      body.style.transform = ''; body.style.opacity = '';
+      setTimeout(function () { body.classList.remove('os-terugvering'); }, 240);
+    }
+    pil.addEventListener('pointerup', los);
+    pil.addEventListener('pointercancel', los);
+    pil.addEventListener('click', function () {
+      if (veegde) { veegde = false; return; } // de veeg is al afgehandeld
+      naarBureau();
+    });
+  }
+
   w.RTGosbar = { tik: tik };
 })(window, document);

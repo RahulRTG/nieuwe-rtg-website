@@ -488,4 +488,4 @@ function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier
   };
 }
 
-module.exports = { maakMarkt, MARKT_CATEGORIEEN: CATEGORIEEN, MARKT_STATEN: STATEN };
+module.exports = { maakMarkt };

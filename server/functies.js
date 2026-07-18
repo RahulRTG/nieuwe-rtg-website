@@ -226,7 +226,6 @@ function blokkadeReden(id, staat, ctx) {
   if (c.persoon && s.perPersoon && s.perPersoon[c.persoon] === false) return 'persoon';
   return null;
 }
-function functieBeschikbaar(id, staat, ctx) { return blokkadeReden(id, staat, ctx) === null; }
 // Staan er ergens land-regels? Zo niet, dan hoeft de middleware het land van het
 // lid niet op te zoeken (scheelt een opzoeking per verzoek).
 function heeftLandRegels(staat) {
@@ -359,7 +358,7 @@ function duidVoorstel(vraag, staat) {
 
 module.exports = {
   FUNCTIES, CATEGORIEEN, OP_ID, DOELGROEPEN, DOELGROEP_IDS,
-  functieVoorPad, functieAan, functieAanVoor, functieBeschikbaar, functieStoring, functieStatus,
+  functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
   heeftLandRegels, blokkadeReden, padGeblokkeerd, catalogus,
   doelgroepVanVerzoek, tierNaarDoelgroep, valideerVoorstel, duidVoorstel
 };

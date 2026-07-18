@@ -336,4 +336,4 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
   };
 }
 
-module.exports = { PASPOORT_NIVEAUS: NIVEAUS, PASPOORT_VIEW_TTL_MS: VIEW_TTL_MS, maakPaspoort };
+module.exports = { PASPOORT_NIVEAUS: NIVEAUS, maakPaspoort };

@@ -193,4 +193,4 @@ function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify
   return { SOORTEN, boek, boekMetCodenaam, voorSupplier, voorLid, vind, mag, pdf, publiek, standaardBtw, ai };
 }
 
-module.exports = { maakFacturatie, FACTUUR_SOORTEN: SOORTEN };
+module.exports = { maakFacturatie };

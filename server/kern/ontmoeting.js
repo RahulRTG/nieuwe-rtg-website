@@ -366,4 +366,4 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
   };
 }
 
-module.exports = { ONTMOET_RADIUS_M: RADIUS_M, ONTMOET_MIN_LEEFTIJD: MIN_LEEFTIJD, maakOntmoeting };
+module.exports = { maakOntmoeting };

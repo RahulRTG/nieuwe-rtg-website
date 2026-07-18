@@ -445,14 +445,6 @@ function profielInfoVanHandle(handle) {
   const p = eigenVeld(g.profielen, m[2]); if (!p || isGast(p)) return null;
   return { handle, codenaam: ensureCodenaam(p), naam: p.naam, avatar: p.avatar, kleur: p.kleur, rol: p.rol, kind: p.rol === 'kind', beschermd: isBeschermd(p), gezinCode: g.code };
 }
-// beheerder(s) van het gezin waar dit kind-handle bij hoort
-function beheerdersVanHandle(handle) {
-  const m = /^rtf:([A-Z0-9]+):(.+)$/.exec(String(handle || ''));
-  if (!m) return [];
-  const g = G()[m[1]]; if (!g) return [];
-  return Object.values(g.profielen).filter(x => x.rol === 'beheerder').map(x => rtfHandle(g.code, x.id));
-}
-
 function pubProfiel(p) {
   const groep = p.groep && GROEP_INFO[p.groep] ? p.groep : null;
   if (!isGast(p)) ensureCodenaam(p);
@@ -1410,4 +1402,4 @@ router.get('/health', (req, res) => res.json({ ok: true, lessen: Object.keys(F()
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
 require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto });
 
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, beheerdersVanHandle, leeftijdInstr };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr };

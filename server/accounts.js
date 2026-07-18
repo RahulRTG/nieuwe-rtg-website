@@ -322,11 +322,6 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
   markUser(newId);
   return getUserById(newId);
 }
-function findByPhone(phone) {
-  const h = phoneHash(phone);
-  if (!h) return null;
-  return db.prepare('SELECT * FROM users WHERE phone_hash = ?').get(h) || null;
-}
 function getUserById(id) { return db.prepare('SELECT * FROM users WHERE id = ?').get(id) || null; }
 function findByLogin(login) {
   const v = String(login || '').trim();
@@ -520,7 +515,7 @@ function deleteUser(id) {
 
 module.exports = {
   init, startPostgres, onExternalChange, flushBijAfsluiten,
-  createUser, createUserSync, getUserById, findByLogin, findByPhone, verifyPassword, issueToken, verifyToken, count, publicUser,
+  createUser, createUserSync, getUserById, findByLogin, verifyPassword, issueToken, verifyToken, count, publicUser,
   createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin, setStaffPin, deactivateStaff, staffByMember, staffPositions, setStaffMember, publicStaff, makePin, deleteUser,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations,
   realNameOf, emailOf, phoneOf, issueActionToken, verifyActionToken,

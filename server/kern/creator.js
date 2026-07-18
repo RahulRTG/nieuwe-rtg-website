@@ -165,4 +165,4 @@ function maakCreator({ db, save, crypto, anthropic, schoon }) {
   };
 }
 
-module.exports = { maakCreator, CREATOR_PLATFORMS: PLATFORMS, CREATOR_SOORTEN: SOORTEN };
+module.exports = { maakCreator };

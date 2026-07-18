@@ -183,4 +183,4 @@ function maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseT
   };
 }
 
-module.exports = { maakSamenwerking, SAMENWERKING_SOORTEN: CONTENT_SOORTEN };
+module.exports = { maakSamenwerking };

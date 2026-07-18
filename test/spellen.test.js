@@ -319,13 +319,17 @@ test('magnaat: 1500 start, kopen op een vrij veld en bouwen vergt de hele kleurg
   const anderTok = st.potje.beurt === st.potje.ik ? b.tok : a.tok;
   assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'gooi' } }, anderTok)).status, 409);
   // rondjes gooien tot iemand iets kan kopen; dan koopt hij het ook echt
-  let gekocht = null, koperTok = null;
+  let gekocht = null, koperTok = null, geldVoorKoop = null;
   for (let i = 0; i < 120 && !gekocht; i++) {
     const s = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
     if (s.potje.status !== 'bezig') break;
     const tok = s.potje.beurt === s.potje.ik ? a.tok : b.tok;
     const g = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'gooi' } }, tok));
     if (g.teKoop != null) {
+      // de stand VLAK voor de koop: langs Start komen kan het saldo al boven
+      // de 1500 hebben getild, dus de betaal-check moet relatief zijn
+      const voor = await json(await raw('/member/spel/staat', { id: nieuw.id }, tok));
+      geldVoorKoop = voor.potje.staat.geld[voor.potje.ik];
       const k = await json(await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'koop' } }, tok));
       assert.ok(k.ok, 'kopen lukt');
       gekocht = g.teKoop; koperTok = tok;
@@ -334,7 +338,7 @@ test('magnaat: 1500 start, kopen op een vrij veld en bouwen vergt de hele kleurg
   assert.ok(gekocht != null, 'binnen 120 beurten komt iemand op een vrij veld');
   st = await json(await raw('/member/spel/staat', { id: nieuw.id, velden: true }, koperTok));
   assert.equal(st.potje.staat.eigenaar[gekocht], st.potje.ik, 'het veld is nu van de koper');
-  assert.ok(st.potje.staat.geld[st.potje.ik] < 1500, 'en de koop is betaald');
+  assert.ok(st.potje.staat.geld[st.potje.ik] < geldVoorKoop, 'en de koop is betaald');
   // bouwen mag pas als de hele kleurgroep van jou is
   if (st.potje.staat.velden[gekocht].t === 'straat') {
     const r = await raw('/member/spel/zet', { id: nieuw.id, zet: { actie: 'bouw', veld: gekocht } }, koperTok);

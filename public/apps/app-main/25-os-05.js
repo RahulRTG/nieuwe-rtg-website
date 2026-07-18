@@ -29,7 +29,7 @@
      dit houdt het scherm eerlijk). De sleutel hier is de functie-id op het
      schakelbord; alles wat niet genoemd wordt, blijft gewoon staan. */
   const REGIE = { spelen: 'spellen', podium: 'podium', flits: 'flits', theater: 'theater',
-    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov' };
+    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov', clips: 'clips' };
   (function () {
     let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
     if (!tok) return;

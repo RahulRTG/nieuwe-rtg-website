@@ -2144,7 +2144,8 @@
     theater:     { naam: 'Theater',      icoon: '🎞️', url: '/apps/theater.html' },
     wbw:         { naam: 'Wie betaalt wat', icoon: '💶', url: '/apps/wbw.html' },
     passkeys:    { naam: 'Passkeys',     icoon: '🔑', url: '/apps/passkeys.html' },
-    ov:          { naam: 'OV',           icoon: '🚌', url: '/apps/ov.html' }
+    ov:          { naam: 'OV',           icoon: '🚌', url: '/apps/ov.html' },
+    clips:       { naam: 'Clips',        icoon: '🎥', url: '/apps/clips.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -2173,6 +2174,7 @@
       'link:camera',
       'link:muziek',
       'link:podium',
+      'link:clips',
       'link:flits',
       'link:theater',
       'link:wbw',
@@ -2887,7 +2889,7 @@
      dit houdt het scherm eerlijk). De sleutel hier is de functie-id op het
      schakelbord; alles wat niet genoemd wordt, blijft gewoon staan. */
   const REGIE = { spelen: 'spellen', podium: 'podium', flits: 'flits', theater: 'theater',
-    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov' };
+    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov', clips: 'clips' };
   (function () {
     let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
     if (!tok) return;

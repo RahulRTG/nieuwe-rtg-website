@@ -2726,6 +2726,13 @@ Object.assign(kern, require('./kern/flits').maakFlits({
 Object.assign(kern, require('./kern/ov').maakOv({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify
 }));
+/* RTG Clips (kern/clips.js): korte verticale video's die alleen op het
+   toestel van de maker staan (OPFS); RTG bewaart enkel titel, affiche en
+   het signaal-doorgeefluik. De feed is een eindige dagselectie, bewust
+   zonder oneindige scroll. Na sociaal gemount (codenamen). */
+Object.assign(kern, require('./kern/clips').maakClips({
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, sseToCustomer, sseToOffice
+}));
 /* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
    De cryptografie komt uit @simplewebauthn/server; wij bewaren alleen
    publieke sleutels per account, challenges leven kort en in RAM.
@@ -2776,6 +2783,7 @@ require('./routes/flits')(kern);
 require('./routes/theater')(kern);
 require('./routes/wbw')(kern);
 require('./routes/ov')(kern);
+require('./routes/clips')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

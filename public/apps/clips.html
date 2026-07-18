@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Clips</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;height:100dvh;overflow:hidden;}
+  .kop{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;gap:0.7rem;
+    padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;
+    background:linear-gradient(rgba(12,12,11,0.85),rgba(12,12,11,0));}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.55rem 0.9rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  /* de feed: verticale snap, EINDIG (bewust geen oneindige scroll) */
+  #feed{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory;}
+  .clip{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;position:relative;
+    display:flex;align-items:center;justify-content:center;background:#000;}
+  .clip video,.clip img.poster{max-width:100%;max-height:100%;width:auto;height:auto;}
+  .clip img.poster{position:absolute;inset:0;margin:auto;object-fit:contain;}
+  .laag{position:absolute;left:0;right:0;bottom:0;padding:1rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.2rem);
+    background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.72));}
+  .laag .t{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
+  .laag .m{font-size:0.78rem;color:var(--soft);margin-top:0.2rem;}
+  .laag .rij{display:flex;gap:0.5rem;margin-top:0.7rem;flex-wrap:wrap;}
+  .status{position:absolute;top:calc(env(safe-area-inset-top,0px) + 4rem);left:50%;transform:translateX(-50%);
+    background:rgba(12,12,11,0.72);border:1px solid var(--line);border-radius:999px;
+    padding:0.35rem 0.85rem;font-size:0.75rem;color:var(--soft);}
+  .einde{height:100dvh;scroll-snap-align:start;display:flex;flex-direction:column;gap:0.8rem;
+    align-items:center;justify-content:center;text-align:center;padding:2rem;}
+  .einde h2{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
+  /* de studio en de reacties: eenvoudige sheets */
+  .sheet{position:fixed;inset:0;z-index:10;background:rgba(12,12,11,0.92);display:none;
+    align-items:flex-end;justify-content:center;}
+  .sheet.open{display:flex;}
+  .sheet .vlak{background:var(--card);border:1px solid var(--line);border-radius:16px 16px 0 0;
+    width:min(560px,100vw);max-height:88dvh;overflow-y:auto;padding:1.1rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.1rem);}
+  .vlak h2{font-family:'Bodoni Moda',serif;font-size:1.2rem;margin-bottom:0.6rem;}
+  .vlak label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
+  #studioDoek{width:100%;max-height:46dvh;background:#000;border-radius:12px;}
+  .reactieRij{border-top:1px solid var(--line);padding:0.55rem 0;font-size:0.82rem;}
+  .reactieRij b{color:var(--gold);font-weight:600;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    z-index:20;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;
+    font-size:0.8rem;max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} #feed{scroll-behavior:auto;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de leden-app">←</a>
+  <h1>Clips</h1>
+  <span class="rek"></span>
+  <button class="knop" id="studioOpen" type="button">✚ Maak een clip</button>
+</header>
+
+<main id="feed" aria-label="De dagselectie van vandaag"></main>
+
+<!-- de studio: opnemen (max 60s), lokaal bewaren (OPFS), alleen de kaart naar RTG -->
+<div class="sheet" id="studio" role="dialog" aria-label="Clip maken">
+  <div class="vlak">
+    <h2>Een clip maken</h2>
+    <p class="stil">Maximaal 60 seconden. Het origineel blijft in het eigen bestandssysteem van deze
+      browser (OPFS); RTG bewaart alleen de titel en een kleine affiche. Kijkers halen de clip
+      rechtstreeks bij u op zolang u online bent.</p>
+    <video id="studioDoek" autoplay muted playsinline></video>
+    <label for="clipTitel">Titel</label>
+    <input id="clipTitel" maxlength="80" placeholder="Bijv. Zonsondergang bij de haven">
+    <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="knop vol" id="opneem" type="button">● Opnemen</button>
+      <button class="knop" id="stopOpname" type="button" disabled>◼ Stop</button>
+      <button class="knop" id="deelClip" type="button" disabled>Deel de clip</button>
+      <button class="knop" id="studioDicht" type="button">Sluit</button>
+    </div>
+    <p class="stil" id="studioStatus" style="margin-top:0.6rem;"></p>
+  </div>
+</div>
+
+<!-- reacties -->
+<div class="sheet" id="reactieSheet" role="dialog" aria-label="Reacties">
+  <div class="vlak">
+    <h2>Reacties</h2>
+    <div id="reactieLijst"></div>
+    <form id="reactieForm" style="display:flex;gap:0.5rem;margin-top:0.8rem;">
+      <label for="reactieVeld" style="position:absolute;left:-999px;">Uw reactie</label>
+      <input id="reactieVeld" maxlength="300" placeholder="Schrijf een reactie…">
+      <button class="knop vol" type="submit">Plaats</button>
+    </form>
+    <div style="margin-top:0.6rem;"><button class="knop" id="reactieDicht" type="button">Sluit</button></div>
+  </div>
+</div>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/clips/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3400); };
+
+  /* ---------- OPFS: het eigen archief van maker en kijker ---------- */
+  const opfs = () => navigator.storage.getDirectory();
+  async function schrijf(naam, blob) {
+    const fh = await (await opfs()).getFileHandle(naam, { create: true });
+    const w = await fh.createWritable(); await w.write(blob); await w.close();
+  }
+  async function lees(naam) {
+    try { return await (await (await opfs()).getFileHandle(naam)).getFile(); }
+    catch (e) { return null; }
+  }
+
+  /* ---------- de feed: eindige dagselectie, geen oneindige scroll ---------- */
+  let feedData = null, mijnIds = [];
+  async function laadFeed() {
+    const r = await api('feed');
+    if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
+    feedData = r.body;
+    mijnIds = (feedData.mijn || []).map(c => c.id);
+    const alles = [...(feedData.mijn || []).slice(0, 3), ...feedData.clips];
+    const feed = $('#feed'); feed.textContent = '';
+    for (const c of alles) {
+      const sec = document.createElement('section');
+      sec.className = 'clip'; sec.dataset.id = c.id; sec.dataset.mijn = c.mijn ? '1' : '';
+      sec.setAttribute('aria-label', c.titel + ' van ' + c.codenaam);
+      if (c.poster) { const img = document.createElement('img'); img.className = 'poster';
+        img.alt = 'Affiche van ' + c.titel; img.src = c.poster; sec.appendChild(img); }
+      const vid = document.createElement('video');
+      vid.playsInline = true; vid.muted = true; vid.loop = false; vid.controls = false;
+      sec.appendChild(vid);
+      const status = document.createElement('div'); status.className = 'status';
+      status.textContent = c.mijn ? 'Uit uw eigen archief' : (c.online ? 'Rechtstreeks van ' + c.codenaam : 'Maker offline: de clip staat alleen op diens toestel');
+      sec.appendChild(status);
+      const laag = document.createElement('div'); laag.className = 'laag';
+      laag.innerHTML = '<div class="t">' + esc(c.titel) + '</div>' +
+        '<div class="m">' + esc(c.codenaam) + ' · ' + c.duurS + 's · ±' + c.mb + ' MB · het beeld passeert RTG nooit</div>';
+      const rij = document.createElement('div'); rij.className = 'rij';
+      const maakKnop = (tekst, cls, doe) => { const b = document.createElement('button');
+        b.className = 'knop ' + (cls || ''); b.type = 'button'; b.textContent = tekst;
+        b.addEventListener('click', doe); rij.appendChild(b); return b; };
+      maakKnop('▶ Speel', 'vol', () => speel(sec, c));
+      if (!c.mijn) {
+        const vb = maakKnop(c.volgIk ? '✓ Volgend' : '+ Volg', '', async () => {
+          const r2 = await api('volg', { id: c.id, aan: !c.volgIk });
+          if (r2.body.error) return zeg(r2.body.error);
+          c.volgIk = !c.volgIk; vb.textContent = c.volgIk ? '✓ Volgend' : '+ Volg';
+        });
+      }
+      maakKnop('💬 ' + c.reacties, '', () => openReacties(c));
+      if (c.mijn) maakKnop('Weg', 'rood', async () => {
+        const r2 = await api('weg', { id: c.id });
+        if (r2.body.error) return zeg(r2.body.error);
+        zeg('Clip weggehaald.'); laadFeed();
+      });
+      else maakKnop('Meld', '', async () => {
+        const r2 = await api('meld', { id: c.id, reden: 'Gemeld vanuit de feed' });
+        zeg(r2.body.error || 'Gemeld bij RTG; het kantoor kijkt ernaar.');
+      });
+      laag.appendChild(rij); sec.appendChild(laag);
+      feed.appendChild(sec);
+    }
+    // het bewuste einde: geen oneindige scroll, geen lokkertjes
+    const einde = document.createElement('section'); einde.className = 'einde';
+    einde.innerHTML = '<h2>' + esc(feedData.einde) + '</h2>' +
+      '<p class="stil">De dagselectie is eindig; zo hoort het. Kom morgen terug voor nieuwe clips,<br>of maak er zelf een.</p>';
+    const nogEen = document.createElement('button'); nogEen.className = 'knop'; nogEen.type = 'button';
+    nogEen.textContent = '↑ Terug naar boven';
+    nogEen.addEventListener('click', () => $('#feed').scrollTo({ top: 0, behavior: 'smooth' }));
+    einde.appendChild(nogEen);
+    feed.appendChild(einde);
+    hartslag();
+  }
+
+  /* ---------- afspelen: eigen archief, cache, of rechtstreeks P2P ---------- */
+  const ijs = [{ urls: 'stun:stun.l.google.com:19302' }];
+  let ontvangst = null, kijkPc = null;
+  async function speel(sec, c) {
+    const vid = sec.querySelector('video');
+    if (vid.src) { vid.muted = false; vid.play().catch(() => {}); return; }
+    const eigen = await lees((c.mijn ? 'clip-' : 'clipcache-') + c.id + '.webm');
+    if (eigen) { toonVideo(sec, eigen); return; }
+    if (c.mijn) { zeg('Deze clip staat niet (meer) op dit toestel.'); return; }
+    if (!c.online) { zeg('De maker is nu niet online; deze clip staat alleen op diens eigen toestel.'); return; }
+    sec.querySelector('.status').textContent = 'Rechtstreeks ophalen bij ' + c.codenaam + '…';
+    ontvangst = { clipId: c.id, sec, brokken: [], bytes: 0, totaal: 0 };
+    const r = await api('signaal', { id: c.id, kind: 'vraag' });
+    if (r.body.error) { zeg(r.body.error); ontvangst = null; }
+  }
+  function toonVideo(sec, blob) {
+    const vid = sec.querySelector('video');
+    vid.src = URL.createObjectURL(blob);
+    vid.muted = false;
+    vid.play().catch(() => { vid.muted = true; vid.play().catch(() => {}); });
+    const p = sec.querySelector('img.poster'); if (p) p.remove();
+    sec.querySelector('.status').textContent = 'Speelt: rechtstreeks ontvangen, niets bij RTG bewaard';
+  }
+  async function kijkOntvang(d) {
+    if (!ontvangst || d.clipId !== ontvangst.clipId) return;
+    if (d.kind === 'offer') {
+      if (kijkPc) { try { kijkPc.close(); } catch (e) {} }
+      kijkPc = new RTCPeerConnection({ iceServers: ijs });
+      kijkPc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: d.clipId, kind: 'ice', payload: ev.candidate }); };
+      kijkPc.ondatachannel = ev => {
+        const kanaal = ev.channel; kanaal.binaryType = 'arraybuffer';
+        kanaal.onmessage = async m => {
+          if (typeof m.data === 'string') {
+            const b = JSON.parse(m.data);
+            if (b.soort === 'kop') ontvangst.totaal = b.bytes;
+            if (b.soort === 'klaar') {
+              const blob = new Blob(ontvangst.brokken, { type: 'video/webm' });
+              try { await schrijf('clipcache-' + ontvangst.clipId + '.webm', blob); } catch (e) {}
+              toonVideo(ontvangst.sec, blob);
+            }
+            return;
+          }
+          ontvangst.brokken.push(m.data); ontvangst.bytes += m.data.byteLength;
+          if (ontvangst.totaal) ontvangst.sec.querySelector('.status').textContent =
+            'Ophalen: ' + Math.round(ontvangst.bytes / ontvangst.totaal * 100) + '%';
+        };
+      };
+      await kijkPc.setRemoteDescription(d.payload);
+      const antwoord = await kijkPc.createAnswer();
+      await kijkPc.setLocalDescription(antwoord);
+      api('signaal', { id: d.clipId, kind: 'answer', payload: antwoord });
+    } else if (d.kind === 'ice' && kijkPc) { try { await kijkPc.addIceCandidate(d.payload); } catch (e) {} }
+  }
+
+  /* ---------- als maker dienen: het origineel uit het eigen archief ---------- */
+  const dienPcs = new Map();
+  async function dienUit(d) {
+    const f = await lees('clip-' + d.clipId + '.webm'); if (!f) return;
+    const buf = await f.arrayBuffer();
+    const pc = new RTCPeerConnection({ iceServers: ijs });
+    dienPcs.set(d.van, pc);
+    const kanaal = pc.createDataChannel('clip');
+    kanaal.binaryType = 'arraybuffer';
+    kanaal.onopen = async () => {
+      kanaal.send(JSON.stringify({ soort: 'kop', bytes: buf.byteLength }));
+      const BROK = 64 * 1024;
+      for (let p = 0; p < buf.byteLength; p += BROK) {
+        while (kanaal.bufferedAmount > 4 * 1024 * 1024) await new Promise(r => setTimeout(r, 60));
+        kanaal.send(buf.slice(p, p + BROK));
+      }
+      kanaal.send(JSON.stringify({ soort: 'klaar' }));
+    };
+    pc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: d.clipId, kind: 'ice', doelKey: d.van, payload: ev.candidate }); };
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    api('signaal', { id: d.clipId, kind: 'offer', doelKey: d.van, payload: offer });
+  }
+  async function hartslag() { if (mijnIds.length) await api('aanwezig', { ids: mijnIds }); }
+  setInterval(hartslag, 45000);
+
+  function startSse() {
+    if (!window.EventSource || !token) return;
+    const es = new EventSource('/api/stream?token=' + encodeURIComponent(token));
+    es.addEventListener('clips', async e => {
+      const d = JSON.parse(e.data);
+      if (d.kind === 'vraag') dienUit(d);
+      else if (d.kind === 'answer') { const pc = dienPcs.get(d.van); if (pc) try { await pc.setRemoteDescription(d.payload); } catch (e2) {} }
+      else if (d.kind === 'ice' && dienPcs.get(d.van)) { try { await dienPcs.get(d.van).addIceCandidate(d.payload); } catch (e2) {} }
+      else kijkOntvang(d);
+    });
+  }
+
+  /* ---------- de studio: opnemen, lokaal bewaren, kaart delen ---------- */
+  let stroom = null, recorder = null, brokken = [], opnameBlob = null, opnameT = null, opnameStart = 0;
+  $('#studioOpen').addEventListener('click', async () => {
+    $('#studio').classList.add('open');
+    try {
+      stroom = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
+      $('#studioDoek').srcObject = stroom;
+      $('#studioStatus').textContent = 'Klaar om op te nemen (max 60 seconden).';
+    } catch (e) { $('#studioStatus').textContent = 'Geen camera beschikbaar: ' + e.message; }
+  });
+  $('#studioDicht').addEventListener('click', () => {
+    $('#studio').classList.remove('open');
+    if (stroom) { stroom.getTracks().forEach(t => t.stop()); stroom = null; }
+    if (recorder && recorder.state !== 'inactive') recorder.stop();
+  });
+  $('#opneem').addEventListener('click', () => {
+    if (!stroom) return;
+    brokken = []; opnameBlob = null;
+    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+    recorder = new MediaRecorder(stroom, { mimeType: mime });
+    recorder.ondataavailable = e => { if (e.data.size) brokken.push(e.data); };
+    recorder.onstop = () => {
+      opnameBlob = new Blob(brokken, { type: 'video/webm' });
+      $('#deelClip').disabled = false;
+      $('#studioStatus').textContent = 'Opname klaar: ' + Math.round(opnameBlob.size / 1024) + ' kB. Geef een titel en deel.';
+    };
+    recorder.start();
+    opnameStart = Date.now();
+    $('#opneem').disabled = true; $('#stopOpname').disabled = false;
+    $('#studioStatus').textContent = 'Opnemen…';
+    opnameT = setTimeout(() => { if (recorder.state !== 'inactive') recorder.stop(); }, 60000);
+  });
+  $('#stopOpname').addEventListener('click', () => {
+    clearTimeout(opnameT);
+    if (recorder && recorder.state !== 'inactive') recorder.stop();
+    $('#opneem').disabled = false; $('#stopOpname').disabled = true;
+  });
+  $('#deelClip').addEventListener('click', async () => {
+    if (!opnameBlob) return;
+    const titel = $('#clipTitel').value.trim();
+    if (!titel) return zeg('Geef de clip eerst een titel.');
+    const duurS = Math.max(1, Math.min(60, Math.round((Date.now() - opnameStart) / 1000)));
+    const poster = await posterVan(opnameBlob);
+    const r = await api('maak', { titel, duurS, poster, mbGeschat: Math.max(1, Math.round(opnameBlob.size / 1048576)) });
+    if (r.body.error) return zeg(r.body.error);
+    try { await schrijf('clip-' + r.body.id + '.webm', opnameBlob); }
+    catch (e) { await api('weg', { id: r.body.id }); return zeg('Lokaal bewaren lukte niet: ' + e.message); }
+    zeg('"' + titel + '" staat in uw archief; kijkers halen hem rechtstreeks bij u op.');
+    $('#clipTitel').value = ''; $('#deelClip').disabled = true;
+    $('#studioDicht').click();
+    laadFeed();
+  });
+  function posterVan(blob) {
+    return new Promise(res => {
+      const url = URL.createObjectURL(blob);
+      const v = document.createElement('video');
+      v.muted = true; v.src = url;
+      const klaar = () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width = 360; c.height = Math.round(360 * (v.videoHeight || 16) / (v.videoWidth || 9));
+          c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+          res(c.toDataURL('image/jpeg', 0.7));
+        } catch (e) { res(null); }
+        URL.revokeObjectURL(url);
+      };
+      v.addEventListener('seeked', klaar, { once: true });
+      v.addEventListener('loadeddata', () => { try { v.currentTime = 0.1; } catch (e) { klaar(); } }, { once: true });
+      v.addEventListener('error', () => res(null), { once: true });
+    });
+  }
+
+  /* ---------- reacties ---------- */
+  let reactieClip = null;
+  async function openReacties(c) {
+    reactieClip = c;
+    const r = await api('reacties', { id: c.id });
+    $('#reactieLijst').innerHTML = (r.body.reacties || []).map(x =>
+      '<div class="reactieRij"><b>' + esc(x.codenaam) + '</b> ' + esc(x.tekst) + '</div>').join('') ||
+      '<p class="stil">Nog geen reacties.</p>';
+    $('#reactieSheet').classList.add('open');
+  }
+  $('#reactieForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const r = await api('reactie', { id: reactieClip.id, tekst: $('#reactieVeld').value });
+    if (r.body.error) return zeg(r.body.error);
+    $('#reactieVeld').value = '';
+    openReacties(reactieClip);
+  });
+  $('#reactieDicht').addEventListener('click', () => $('#reactieSheet').classList.remove('open'));
+
+  if (!token) { zeg('Log eerst in op de leden-app.'); }
+  else { laadFeed(); startSse(); }
+})();
+</script>
+</body>
+</html>

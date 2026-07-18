@@ -102,7 +102,8 @@ const FUNCTIES = [
     alleenGenres: ['ov'] },
   { id: 'wbw', categorie: 'Eigen apps', naam: 'Wie betaalt wat', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Groepsuitgaven met een live balans en verrekenen via RTG Pay.', paden: ['/api/wbw'] },
-  { id: 'office', categorie: 'Eigen apps', naam: 'RTG Office (kantoorpakket)', standaard: true, doelgroepen: LEDEN,
+  // Let op: NIET 'office' als id; die naam is al van de RTG-Backoffice hieronder.
+  { id: 'kantoorpakket', categorie: 'Eigen apps', naam: 'RTG Office (kantoorpakket)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het eigen kantoorpakket: tekstdocumenten en rekenbladen op uw account, alleen-lezen te delen op codenaam.', paden: ['/api/kantoorpakket'] },
   { id: 'clips', categorie: 'Eigen apps', naam: 'RTG Clips (korte video’s)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Korte verticale video’s die alleen op het toestel van de maker staan (OPFS); kijken is rechtstreeks P2P. De feed is een eindige dagselectie, bewust zonder oneindige scroll.', paden: ['/api/clips'] },
@@ -163,5 +164,12 @@ const FUNCTIES = [
 ];
 
 const OP_ID = Object.fromEntries(FUNCTIES.map(f => [f.id, f]));
+// fail-fast: een dubbele id zou stil de laatste laten winnen in OP_ID en de
+// schakelkast op de verkeerde functie laten werken; dat is eerder misgegaan
+if (Object.keys(OP_ID).length !== FUNCTIES.length) {
+  const gezien = new Set();
+  const dubbel = FUNCTIES.map(f => f.id).filter(id => gezien.has(id) || !gezien.add(id));
+  throw new Error('functie-catalogus: dubbele id(s): ' + dubbel.join(', '));
+}
 
 module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID };

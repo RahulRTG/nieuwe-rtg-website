@@ -26,7 +26,7 @@ module.exports = (ctx) => {
       return { tekst: 'Geregeld: uw 24 uur bij ' + r.gebruik.assetNaam + ' staat op ' + w.datum + ' (nog ' + r.dagenTegoed + ' dag(en) tegoed dit jaar). Het team neemt vooraf contact op.', gedaan: true };
     }
     if (w.soort === 'tik' && pay) {
-      const r = await pay.stuur({ van: codenaam, aanCodenaam: w.aan, centen: w.centen, oms: 'Via de Butler', soort: 'tik' });
+      const r = await pay.stuur({ van: codenaam, aanCodenaam: w.aan, centen: w.centen, oms: 'Via Rahul', soort: 'tik' });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       return { tekst: 'Gedaan: ' + eur(w.centen) + ' aan ' + w.aan + ' gestuurd via een Tik. Uw saldo: ' + eur(r.saldo) + '.', gedaan: true };
     }
@@ -117,6 +117,14 @@ module.exports = (ctx) => {
       if (!sess) return { ok: true, antwoord: basis + ' Vraag me gerust naar de actuele stand van uw dienst.', pakte: true };
       return { ok: true, antwoord: basis + ' En ik regel het ook: zoeken door het hele aanbod ("zoek sushi"), uw dag plannen ("plan mijn dag"), een tafel reserveren of annuleren, bestellen en afrekenen ("bestel 2 sangria bij Sunset Ibiza"), tickets boeken ("boek 2 tickets voor de sunset cruise morgen"), een behandeling in de spa of kliniek boeken ("boek een massage bij Zenith morgen om 15:00"), een taxi of transfer regelen, uw 24-uursblok plannen, uw saldo opvragen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw "ja".', pakte: true };
     }
+    /* De reislaag (kern/fluister/reis.js): een hele reis op een vraag,
+       kleding en voorspellen voor leden, en de servicedag voor zaak en
+       personeel (zonder sessie). "ja"/"nee" matcht hier bewust niet, dus
+       de bevestigingsdrempel hieronder blijft de baas. */
+    if (butlerExtra) {
+      const extra = await butlerExtra(q, p, sess, klaar, key);
+      if (extra) return extra;
+    }
     /* ---- doen: Fluister voert het ook echt uit, alleen voor het lid zelf
        (sess reist alleen mee op de leden-route, nooit voor personeel).
        Boven de drempel (geld, of een claim op een gedeeld object) eerst
@@ -137,12 +145,6 @@ module.exports = (ctx) => {
         p.wacht = null;
         save();
         return klaar('Goed, het gaat niet door. Het voorstel is van tafel.');
-      }
-      // de reislaag: een hele reis op een vraag, kleding kopen en voorspellen
-      // wat er nodig is (kern/fluister/reis.js); null = niet van deze laag
-      if (butlerExtra) {
-        const extra = await butlerExtra(q, p, sess, klaar);
-        if (extra) return extra;
       }
       // "plan mijn dag": een echt dagprogramma uit het echte aanbod, met
       // voor elk onderdeel de zin waarmee ik het meteen regel
@@ -350,7 +352,7 @@ module.exports = (ctx) => {
         const m = q.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:euro|eur|€)?\s+(?:aan|van)\s+(.+?)[.?!]?\s*$/i);
         if (m) {
           const centen = Math.round(parseFloat(m[1].replace(',', '.')) * 100);
-          const r = await pay.verzoekMaak({ van: codenaam, aan: [m[2].trim()], perCenten: centen, oms: 'Via de Butler' });
+          const r = await pay.verzoekMaak({ van: codenaam, aan: [m[2].trim()], perCenten: centen, oms: 'Via Rahul' });
           if (r.error) return klaar('Dat lukt niet: ' + r.error);
           return klaar('Verzocht: ' + eur(centen) + ' aan ' + m[2].trim() + '. Het Klompje staat klaar; zodra er betaald is, ziet u het in de bel.', true);
         }

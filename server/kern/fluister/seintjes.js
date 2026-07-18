@@ -103,7 +103,7 @@ module.exports = (ctx) => {
     for (const s of fluisterSeintjes(key, idx)) {
       if (p.geseind[s.tekst]) continue;
       p.geseind[s.tekst] = nu();
-      notify(key, { icon: s.icoon, title: 'Uw Butler', body: s.tekst, scope: 'fluister' });
+      notify(key, { icon: s.icoon, title: 'Rahul', body: s.tekst, scope: 'fluister' });
       n++;
     }
     // het piep-geheugen blijft klein: de oudste vermeldingen vallen eraf

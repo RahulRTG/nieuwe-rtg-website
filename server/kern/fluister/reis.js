@@ -137,10 +137,42 @@ module.exports = (ctx) => {
       ' Zeg een van de zinnen en ik regel het, met een voorstel vooraf zodra er geld mee gemoeid is.';
   }
 
-  /* ---- de haak in fluisterZeg: herkent de drie vragen en zet zelf het
+  /* ---- de servicedag: voor een zaak of een personeelslid bouwt Rahul uit
+     de echte dagstand (reserveringen, lopende orders, activiteiten) een
+     werkplan met per regel de vervolgstap. Lezen, geen geld: direct. ---- */
+  function servicedag(key) {
+    const code = (String(key).match(/^(?:staff|zaak):([^:]+)/) || [])[1];
+    const s = code && zaken().find(x => x.code === code);
+    if (!s) return null;
+    const vandaag = new Date().toISOString().slice(0, 10);
+    const regels = [];
+    const res = (db.data.reserveringen || []).filter(r => r.supplierCode === s.code && r.datum === vandaag && ['aangevraagd', 'bevestigd'].includes(r.status));
+    if (res.length) {
+      const open = res.filter(r => r.status === 'aangevraagd').length;
+      regels.push(res.length + ' reservering(en) vandaag, de eerste om ' + res.map(r => r.tijd).sort()[0] +
+        (open ? ' (' + open + ' nog te bevestigen: doe dat eerst, gasten wachten op zekerheid)' : ''));
+    }
+    let orders = [];
+    try { orders = require('../../db').ordersVanZaak(s.code).filter(o => !['geserveerd', 'geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status)); } catch (e) {}
+    if (orders.length) regels.push(orders.length + ' lopende bestelling(en) op de lijn: houd de wachttijden kort');
+    for (const a of (s.activiteiten || []).slice(0, 2))
+      regels.push(a.name + ' vandaag om ' + ((a.tijden || [])[0] || '?') + ': zet de entree en het team klaar');
+    if (s.settings && s.settings.ordersOpen === false) regels.push('de zaak staat DICHT voor bestellingen: vergeet niet open te zetten als de dienst begint');
+    if (!regels.length) regels.push('een rustige start: geen reserveringen of lopende orders op dit moment. Goed moment voor de voorraad, het bord en de briefing');
+    return 'Uw servicedag bij ' + s.name + ': ' + regels.join(' | ') + '. Vraag me gerust door per onderdeel; ik geef ook seintjes zodra er iets bijkomt.';
+  }
+
+  /* ---- de haak in fluisterZeg: herkent de vragen en zet zelf het
      voorstel klaar; geeft null terug als de vraag niet van deze laag is. ---- */
-  async function butlerExtra(q, p, sess, klaar) {
-    if (!sess) return null;
+  async function butlerExtra(q, p, sess, klaar, key) {
+    if (!sess) {
+      // de zaak- en personeelskant: het dagplan uit de echte dagstand
+      if (/plan (mijn|onze|de) (service)?dag|dagplan|servicedag/i.test(q)) {
+        const plan = servicedag(key);
+        if (plan) return klaar(plan);
+      }
+      return null;
+    }
     if (/\b(plan|regel|boek)\b/i.test(q) && /\b(reis|trip|weekend|tripje|city ?trip)\b/i.test(q)) {
       const plan = bouwReisplan(q);
       if (!plan.delen.length) return klaar('Ik zie nu geen aanbod om een reis van te bouwen; kijk anders even in Reizen.');

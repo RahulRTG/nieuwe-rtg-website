@@ -43,7 +43,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   const nu = () => new Date().toISOString();
   // hetzelfde brein, een passend gezicht: De Butler voor leden, "uw
   // assistent" voor personeel en zaken
-  const wieBen = key => /^(staff|zaak):/.test(String(key)) ? 'uw assistent' : 'uw Butler';
+  const wieBen = () => 'Rahul'; // het ene AI-hart: iedereen praat met Rahul
   const lijsten = () => { if (!db.data.fluister) db.data.fluister = {}; };
   const van = key => {
     lijsten();

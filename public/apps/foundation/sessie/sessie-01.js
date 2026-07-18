@@ -44,7 +44,7 @@
     coach: function (opts) {
       var s = lees(); if (!s) return;
       var gesprek = [];
-      var NM = { vrouw: 'Amber', man: 'Fayaz', nonbinair: 'Robin' };
+      var NM = { vrouw: 'Rahul', man: 'Rahul', nonbinair: 'Rahul' };
       function buddyKeuze() { try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { return 'vrouw'; } }
       // de leeftijdsgroep stuurt taal en niveau van de AI; van het profiel, anders de app-ingang
       function groepVan() { try { return (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || ''; } catch (e) { return ''; } }
@@ -54,7 +54,7 @@
         opts.input.value = '';
         opts.chat.insertAdjacentHTML('beforeend', '<div class="b ik">' + esc2(t) + '</div>');
         gesprek.push({ role: 'user', content: t });
-        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = (NM[buddyKeuze()] || 'Je buddy') + ' denkt mee...';
+        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = (NM[buddyKeuze()] || 'Rahul') + ' denkt mee...';
         opts.chat.appendChild(w); opts.chat.scrollTop = opts.chat.scrollHeight;
         api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek, buddy: buddyKeuze(), groep: groepVan() })
           .then(function (d) { w.textContent = d.text; gesprek.push({ role: 'assistant', content: d.text }); opts.chat.scrollTop = opts.chat.scrollHeight; })

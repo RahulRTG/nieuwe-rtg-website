@@ -24,7 +24,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
 
   // het persoonlijke geheugen (dezelfde motor als De Butler van de leden):
   // onthouden, opvragen en wissen, per persoon binnen deze zaak
-  if (fluisterZeg && (/^onthoud\b/i.test(q) || /vergeet alles/i.test(q) || /wat (weet|onthoud) je (over|van) mij/i.test(q))) {
+  if (fluisterZeg && (/^onthoud\b/i.test(q) || /vergeet alles/i.test(q) || /wat (weet|onthoud) je (over|van) mij/i.test(q) || /plan (mijn|onze|de) (service)?dag|dagplan|servicedag/i.test(q))) {
     const fKey = 'zaak:' + s.code + ':' + (req.actor && req.actor.staffId != null ? req.actor.staffId : 'eigenaar');
     const r = await fluisterZeg(fKey, (req.actor && req.actor.name) || s.name, q);
     if (!r.error) return A(r.antwoord, !!r.geleerd);

@@ -53,11 +53,11 @@ const AI_KINDS = Object.keys(HULP_SYS);
 /* De AI-buddy: iedereen kiest zelf hoe die klinkt (vrouw, man of non-binair)
    met een eigen naam. De buddy blijft dezelfde persoon door alle coaches heen;
    we vervangen alleen de vaste naam in de systeemprompt door de gekozen buddy. */
-const BUDDY = {
-  vrouw:     { naam: 'Amber', wie: 'een vrouw' },
-  man:       { naam: 'Fayaz', wie: 'een man' },
-  nonbinair: { naam: 'Robin', wie: 'non-binair' }
-};
+/* Een AI-buddy voor het hele huis: Rahul. De oude keuzesleutels blijven
+   bestaan zodat opgeslagen voorkeuren gewoon blijven werken, maar elk pad
+   leidt naar dezelfde vaste buddy. */
+const RAHUL = { naam: 'Rahul', wie: 'Rahul, de vaste AI-buddy van RTG voor het hele gezin' };
+const BUDDY = { vrouw: RAHUL, man: RAHUL, nonbinair: RAHUL };
 
 /* De leeftijdslaag: dezelfde tool voelt anders per leeftijdsgroep. Elke AI
    krijgt te horen met wie die praat, zodat taal, voorbeelden en niveau

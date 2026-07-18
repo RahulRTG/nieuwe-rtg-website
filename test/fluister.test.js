@@ -83,7 +83,7 @@ test('een nieuw seintje wordt een melding op het toestel, en piept precies een k
   await api('fluister', { q: 'onthoud dat ons jubileum op ' + d.getUTCDate() + ' ' + NL[d.getUTCMonth()] + ' valt' }, lid);
   await api('fluister/profiel', {}, lid); // het profiel ophalen zet de push in gang
   const tel = async () => ((await api('notifications', {}, lid)).body.notifications || [])
-    .filter(n => n.title === 'Uw Butler' && /jubileum/.test(n.body)).length;
+    .filter(n => n.title === 'Rahul' && /jubileum/.test(n.body)).length;
   assert.equal(await tel(), 1, 'het seintje hangt als melding in de bel');
   await api('fluister/profiel', {}, lid);
   assert.equal(await tel(), 1, 'dedupe: hetzelfde seintje piept nooit twee keer');

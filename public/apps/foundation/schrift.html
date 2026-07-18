@@ -100,7 +100,7 @@
   <button data-tab="schrift"><span class="ic">📓</span>Schrift</button>
   <button data-tab="opgaven"><span class="ic">📝</span>Opgaven</button>
   <button data-tab="agenda"><span class="ic">📅</span>Agenda</button>
-  <button data-tab="bram"><span class="ic">🤖</span><span id="tabBuddyNaam">Buddy</span></button>
+  <button data-tab="bram"><span class="ic">🤖</span><span id="tabBuddyNaam">Rahul</span></button>
 </div>
 
 <script src="tekenen.js"></script>
@@ -178,12 +178,12 @@ function toonOpgaven(){
 
 function toonAgenda(list){ $('#agLijst').innerHTML = (list&&list.length) ? list.map(a=> '<div class="kaart item">'+(a.datum?'<div class="mini" style="color:var(--goud)">'+esc(a.datum)+'</div>':'')+'<div>'+esc(a.tekst)+'</div></div>').join('') : '<div class="mini">Nog niets in de agenda.</div>'; }
 
-const BUDDYNM={vrouw:'Amber',man:'Fayaz',nonbinair:'Robin'};
+const BUDDYNM={vrouw:'Rahul',man:'Rahul',nonbinair:'Rahul'};
 function buddyKeuze(){ try{ return localStorage.getItem('rtf_buddy')||'vrouw'; }catch(e){ return 'vrouw'; } }
 function groepVan(){ return document.documentElement.getAttribute('data-rtf-groep')||''; }
 // de tab en het vraagveld dragen de naam van de gekozen buddy
-(function(){ const n=BUDDYNM[buddyKeuze()]||'Amber'; const t=$('#tabBuddyNaam'); if(t) t.textContent=n; const v=$('#vraag'); if(v) v.placeholder='Vraag '+n+' om hulp met leren…'; })();
-let gesprek=[{role:'assistant',content:'Hoi! Ik ben '+(BUDDYNM[buddyKeuze()]||'Amber')+', je bijleshulp. Waar ben je mee bezig? Ik help je graag op weg, zonder het antwoord zomaar te geven. 😊'}];
+(function(){ const n=BUDDYNM[buddyKeuze()]||'Rahul'; const t=$('#tabBuddyNaam'); if(t) t.textContent=n; const v=$('#vraag'); if(v) v.placeholder='Vraag '+n+' om hulp met leren…'; })();
+let gesprek=[{role:'assistant',content:'Hoi! Ik ben '+(BUDDYNM[buddyKeuze()]||'Rahul')+', je bijleshulp. Waar ben je mee bezig? Ik help je graag op weg, zonder het antwoord zomaar te geven. 😊'}];
 function toonChat(){ $('#chat').innerHTML = gesprek.map(m=> '<div class="bubbel '+(m.role==='user'?'ik':'bram')+'">'+esc(m.content)+'</div>').join(''); $('#chat').scrollTop=1e9; }
 async function vraagBram(){
   const t=$('#vraag').value.trim(); if(!t) return;

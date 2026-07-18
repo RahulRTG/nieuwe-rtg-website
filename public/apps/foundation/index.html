@@ -153,9 +153,7 @@
   <div class="buddy kaart" id="buddyKaart">
     <div class="buddy-t">Jouw AI-buddy<span class="buddy-nm" id="buddyNm"></span></div>
     <div class="buddy-keuze">
-      <button type="button" class="buddy-b" data-buddy="vrouw"><span>👩</span>Amber</button>
-      <button type="button" class="buddy-b" data-buddy="man"><span>👨</span>Fayaz</button>
-      <button type="button" class="buddy-b" data-buddy="nonbinair"><span>🧑</span>Robin</button>
+      <span class="buddy-b aan"><span>✦</span>Rahul</span>
     </div>
   </div>
 
@@ -614,15 +612,15 @@ $('#rtfOnbDoe').addEventListener('click', async () => {
 });
 
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
-/* De AI-buddy: iedereen kiest zelf hoe die klinkt (vrouw, man of non-binair).
-   De keuze staat op dit toestel en reist mee naar elke coach. */
+/* De AI-buddy: een vast gezicht voor het hele huis, Rahul. Oude
+   toestel-voorkeuren blijven werken maar leiden allemaal naar hem. */
 (function(){
-  const NM = { vrouw:'Amber', man:'Fayaz', nonbinair:'Robin' };
+  const NM = { vrouw:'Rahul', man:'Rahul', nonbinair:'Rahul' };
   function huidig(){ try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch(e){ return 'vrouw'; } }
   function verf(){
     const c = huidig();
     document.querySelectorAll('.buddy-b').forEach(b => b.classList.toggle('aan', b.dataset.buddy === c));
-    const nm = $('#buddyNm'); if (nm) nm.textContent = ' · ' + (NM[c] || 'Amber');
+    const nm = $('#buddyNm'); if (nm) nm.textContent = ' · Rahul';
   }
   document.querySelectorAll('.buddy-b').forEach(b => b.addEventListener('click', () => {
     try { localStorage.setItem('rtf_buddy', b.dataset.buddy); } catch(e){}

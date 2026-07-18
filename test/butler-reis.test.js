@@ -70,6 +70,28 @@ test('kleding kopen: gevonden in de collectie, en na "ja" hangt het apart in de 
   assert.ok((mijn.body.apart || []).some(a => /Linnen overhemd/i.test(a.artikelNaam || '')), 'het apart gelegde stuk staat in de app');
 });
 
+test('een AI-hart: het personeel praat met Rahul en krijgt een echte servicedag', async () => {
+  const roster = await api('supplier/roster', { code: 'HOSHI' });
+  const m = (roster.body.staff || []).find(x => x.role === 'manager');
+  const pda = (await (await fetch(base + '/api/supplier/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'HOSHI', staffId: m.id, pin: '1234' })
+  })).json()).token;
+  assert.ok(pda);
+  const vraag = q => fetch(base + '/api/staff/fluister', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + pda },
+    body: JSON.stringify({ q })
+  }).then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
+  // het ene hart: ook hier heet de assistent Rahul
+  const wie = await vraag('wie ben je?');
+  assert.equal(wie.status, 200);
+  assert.ok(/Rahul/.test(wie.body.antwoord), 'de assistent heet Rahul, ook voor personeel');
+  // en hij bouwt de servicedag uit de echte dagstand van de eigen zaak
+  const dag = await vraag('plan mijn servicedag');
+  assert.equal(dag.status, 200);
+  assert.ok(/servicedag bij/i.test(dag.body.antwoord), 'het dagplan komt uit de eigen zaakstand');
+});
+
 test('nee blijft nee: een afgewezen kledingvoorstel wordt niet uitgevoerd', async () => {
   const v = await api('fluister', { q: 'koop een zijden slipdress' });
   assert.equal(v.body.voorstel, true);

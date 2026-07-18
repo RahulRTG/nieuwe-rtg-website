@@ -210,6 +210,53 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
     return { status: 200, rit: actieveRit(key) ? ritBeeld(actieveRit(key)) : null, ritten: rijen.map(ritBeeld) };
   }
 
+  /* ---- de routetekenaar: de zaak zet zelf lijnen en haltes op de kaart ----
+     De kaart in de app is een eigen SVG die zich ijkt op de echte plekken van
+     de stad (partnerlocaties als herkenningspunten); hier landen alleen de
+     lijnen zelf: naam, soort, frequentie, tarief en de haltes in volgorde. */
+  function ijkpunten(s) {
+    return db.data.suppliers
+      .filter(x => x.city === s.city && x.loc && Number.isFinite(x.loc.lat))
+      .map(x => ({ naam: x.name, lat: x.loc.lat, lng: x.loc.lng }))
+      .slice(0, 40);
+  }
+  function lijnenBeheer(s) {
+    ensureOv();
+    return { status: 200, soorten: Object.keys(SOORTEN),
+      lijnen: (s.lijnen || []).map(l => ({ id: l.id, naam: l.naam, soort: l.soort, icoon: SOORTEN[l.soort],
+        frequentieMin: l.frequentieMin, tarief: l.tarief, haltes: l.haltes })),
+      ijkpunten: ijkpunten(s) };
+  }
+  function lijnZet(s, data) {
+    ensureOv();
+    s.lijnen = s.lijnen || [];
+    if (data.weg) {
+      const l = lijnVan(s, String(data.id || ''));
+      if (!l) return { status: 404, error: 'Lijn niet gevonden.' };
+      s.lijnen = s.lijnen.filter(x => x.id !== l.id);
+      db.data.ovVoertuigen = db.data.ovVoertuigen.filter(v => !(v.code === s.code && v.lijnId === l.id));
+      save();
+      return { status: 200, ok: true };
+    }
+    const naam = schoon(data.naam, 40); if (!naam) return { status: 400, error: 'Geef de lijn een naam.' };
+    const soort = SOORTEN[data.soort] ? data.soort : null;
+    if (!soort) return { status: 400, error: 'Kies bus, trein, metro, veerboot of tram.' };
+    const haltes = (Array.isArray(data.haltes) ? data.haltes : []).slice(0, 20).map((h, i) => ({
+      id: 'h' + (i + 1), naam: schoon(h.naam, 40) || ('Halte ' + (i + 1)),
+      lat: Number(h.lat), lng: Number(h.lng) }));
+    if (haltes.length < 2) return { status: 400, error: 'Een lijn heeft minstens twee haltes.' };
+    if (haltes.some(h => !Number.isFinite(h.lat) || !Number.isFinite(h.lng) || Math.abs(h.lat) > 90 || Math.abs(h.lng) > 180))
+      return { status: 400, error: 'Een halte staat buiten de kaart.' };
+    const frequentieMin = Math.min(Math.max(Math.round(Number(data.frequentieMin) || 15), 1), 240);
+    const basis = Math.min(Math.max(Math.round(Number(data.tarief && data.tarief.basis) || 180), 0), 10000);
+    const perKm = Math.min(Math.max(Math.round(Number(data.tarief && data.tarief.perKm) || 20), 0), 2000);
+    let l = data.id ? lijnVan(s, String(data.id)) : null;
+    if (!l) { l = { id: id('L') }; s.lijnen.push(l); }
+    Object.assign(l, { naam, soort, frequentieMin, tarief: { basis, perKm }, haltes });
+    save();
+    return { status: 200, ok: true, lijn: { id: l.id, naam: l.naam, soort: l.soort, haltes: l.haltes } };
+  }
+
   /* ---- het zaakoverzicht: live vloot, reizigers en omzet vandaag ---- */
   function overzicht(s) {
     ensureOv();
@@ -226,7 +273,8 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
 
   ensureOv();
   return { ovKaart: kaart, ovCodeMaak: codeMaak, ovHierIn: hierIn, ovCheckUit: checkUit, ovMijn: mijn,
-    ovDienst: dienst, ovPos: pos, ovCodeIn: codeIn, ovStand: stand, ovOverzicht: overzicht };
+    ovDienst: dienst, ovPos: pos, ovCodeIn: codeIn, ovStand: stand, ovOverzicht: overzicht,
+    ovLijnenBeheer: lijnenBeheer, ovLijnZet: lijnZet };
 }
 
 module.exports = { maakOv };

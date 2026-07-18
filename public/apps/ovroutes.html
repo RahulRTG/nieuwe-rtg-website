@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OV-routes</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:560px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
+  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  .rij input,.rij select{flex:1;min-width:7rem;width:auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .lijnknop{display:flex;align-items:center;gap:0.6rem;width:100%;text-align:left;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:0.7rem 0.9rem;margin:0.45rem 0;font-size:0.88rem;}
+  .lijnknop small{color:var(--soft);display:block;font-size:0.72rem;margin-top:0.15rem;}
+  .lijnknop .rek{flex:1;}
+  /* de tekentafel: een eigen SVG-kaart, geijkt op de plekken van de stad */
+  .tafel{background:var(--card2);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .tafel svg{display:block;width:100%;height:auto;touch-action:manipulation;}
+  .halteRij{display:flex;align-items:center;gap:0.5rem;margin:0.4rem 0;}
+  .halteRij .nr{font-variant-numeric:tabular-nums;color:var(--gold);font-size:0.8rem;min-width:1.4rem;}
+  .halteRij input{flex:1;}
+  .halteRij .weghalte{background:none;border:1px solid var(--line);border-radius:8px;color:var(--rood);
+    font-size:0.75rem;padding:0.35rem 0.6rem;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/ovdienst.html" aria-label="Terug naar de OV-dienst">←</a>
+  <h1>OV-routes</h1>
+  <span class="rek"></span>
+  <span class="badge" id="kopBadge">Routetekenaar</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil" id="poortReden">Log eerst in op de personeels-app van uw OV-zaak.</p></div>
+  </section>
+
+  <section id="vBeheer" class="weg">
+    <h2>Uw lijnen</h2>
+    <p class="stil">Tik op de kaart en de haltes komen op volgorde te staan; de grijze stippen zijn bekende
+      plekken in uw stad, zodat u zich makkelijk oriënteert. Leden zien de lijn meteen in de OV-app.</p>
+    <div id="lijnLijst"></div>
+    <div class="rij"><button class="knop" id="nieuwBtn" type="button">+ Nieuwe lijn</button></div>
+
+    <div id="editor" class="weg">
+      <h2 id="editorKop">Nieuwe lijn</h2>
+      <div class="kaart">
+        <div class="tafel">
+          <svg id="tekenvlak" viewBox="0 0 480 340" role="img" aria-label="Tekenkaart van de stad; elke tik plaatst de volgende halte"></svg>
+        </div>
+        <p class="stil" style="margin-top:0.5rem;">Elke tik op de kaart plaatst de volgende halte.
+          Zonder aanraakscherm: <button class="knop" id="midBtn" type="button" style="padding:0.3rem 0.6rem;font-size:0.75rem;">halte in het midden</button></p>
+        <div id="halteLijst"></div>
+        <label for="fNaam">Naam van de lijn</label>
+        <input id="fNaam" maxlength="40" placeholder="Bijv. Lijn 2 Haven">
+        <div class="rij">
+          <span style="flex:1;min-width:7rem;"><label for="fSoort">Soort</label><select id="fSoort"></select></span>
+          <span style="flex:1;min-width:7rem;"><label for="fFreq">Om de … minuten</label><input id="fFreq" type="number" min="1" max="240" value="15"></span>
+        </div>
+        <div class="rij">
+          <span style="flex:1;min-width:7rem;"><label for="fBasis">Basistarief (€)</label><input id="fBasis" type="number" min="0" max="100" step="0.05" value="1.80"></span>
+          <span style="flex:1;min-width:7rem;"><label for="fKm">Per km (€)</label><input id="fKm" type="number" min="0" max="20" step="0.05" value="0.20"></span>
+        </div>
+        <div class="rij">
+          <button class="knop vol" id="bewaarBtn" type="button">Bewaar de lijn</button>
+          <button class="knop" id="leegBtn" type="button">Haltes wissen</button>
+          <button class="knop rood weg" id="wegBtn" type="button">Lijn verwijderen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/staff/ov/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ICOON = { bus: '🚌', trein: '🚆', metro: '🚇', veerboot: '⛴️', tram: '🚊' };
+
+  let beheer = null;       // {soorten, lijnen, ijkpunten}
+  let huidig = null;       // de lijn in de editor: {id?, haltes:[{naam,lat,lng}]}
+
+  /* ---- de projectie: alle bekende punten in beeld, met wat lucht ---- */
+  const B = { w: 480, h: 340, r: 26 };
+  function grenzen() {
+    const pts = [];
+    for (const p of beheer.ijkpunten) pts.push(p);
+    for (const l of beheer.lijnen) for (const h of l.haltes) pts.push(h);
+    if (huidig) for (const h of huidig.haltes) pts.push(h);
+    if (!pts.length) pts.push({ lat: 38.908, lng: 1.432 });
+    let laMin = Infinity, laMax = -Infinity, loMin = Infinity, loMax = -Infinity;
+    for (const p of pts) { laMin = Math.min(laMin, p.lat); laMax = Math.max(laMax, p.lat);
+      loMin = Math.min(loMin, p.lng); loMax = Math.max(loMax, p.lng); }
+    const laPad = Math.max((laMax - laMin) * 0.18, 0.004), loPad = Math.max((loMax - loMin) * 0.18, 0.006);
+    return { laMin: laMin - laPad, laMax: laMax + laPad, loMin: loMin - loPad, loMax: loMax + loPad };
+  }
+  function naarXY(g, p) {
+    return { x: B.r + (p.lng - g.loMin) / (g.loMax - g.loMin) * (B.w - 2 * B.r),
+      y: B.h - B.r - (p.lat - g.laMin) / (g.laMax - g.laMin) * (B.h - 2 * B.r) };
+  }
+  function naarLatLng(g, x, y) {
+    return { lng: g.loMin + (x - B.r) / (B.w - 2 * B.r) * (g.loMax - g.loMin),
+      lat: g.laMin + (B.h - B.r - y) / (B.h - 2 * B.r) * (g.laMax - g.laMin) };
+  }
+
+  /* ---- tekenen: ijkpunten zacht, andere lijnen gedempt, deze lijn goud ---- */
+  function teken() {
+    const svg = $('#tekenvlak'); const g = grenzen(); let d = '';
+    d += '<rect width="' + B.w + '" height="' + B.h + '" fill="#131110"/>';
+    for (const p of beheer.ijkpunten) {
+      const { x, y } = naarXY(g, p);
+      d += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3" fill="rgba(244,241,236,0.22)"/>';
+      d += '<text x="' + (x + 6).toFixed(1) + '" y="' + (y + 3).toFixed(1) + '" font-size="8" fill="rgba(244,241,236,0.34)" font-family="Inter,sans-serif">' + esc(p.naam) + '</text>';
+    }
+    for (const l of beheer.lijnen) {
+      if (huidig && huidig.id === l.id) continue;
+      const pt = l.haltes.map(h => { const c = naarXY(g, h); return c.x.toFixed(1) + ',' + c.y.toFixed(1); }).join(' ');
+      d += '<polyline points="' + pt + '" fill="none" stroke="rgba(244,241,236,0.16)" stroke-width="2"/>';
+    }
+    if (huidig && huidig.haltes.length) {
+      const pt = huidig.haltes.map(h => { const c = naarXY(g, h); return c.x.toFixed(1) + ',' + c.y.toFixed(1); }).join(' ');
+      if (huidig.haltes.length > 1)
+        d += '<polyline points="' + pt + '" fill="none" stroke="#C9A24B" stroke-width="2.5"/>';
+      huidig.haltes.forEach((h, i) => {
+        const { x, y } = naarXY(g, h);
+        d += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="7" fill="#C9A24B"/>';
+        d += '<text x="' + x.toFixed(1) + '" y="' + (y + 3).toFixed(1) + '" font-size="8" font-weight="700" text-anchor="middle" fill="#0C0C0B" font-family="Inter,sans-serif">' + (i + 1) + '</text>';
+      });
+    }
+    svg.innerHTML = d;
+  }
+  function halteLijst() {
+    const wrap = $('#halteLijst'); wrap.textContent = '';
+    huidig.haltes.forEach((h, i) => {
+      const rij = document.createElement('div'); rij.className = 'halteRij';
+      const nr = document.createElement('span'); nr.className = 'nr'; nr.textContent = (i + 1) + '.'; rij.appendChild(nr);
+      const inp = document.createElement('input'); inp.value = h.naam || ''; inp.maxLength = 40;
+      inp.placeholder = 'Halte ' + (i + 1); inp.setAttribute('aria-label', 'Naam van halte ' + (i + 1));
+      inp.addEventListener('input', () => { h.naam = inp.value; });
+      rij.appendChild(inp);
+      const wegB = document.createElement('button'); wegB.type = 'button'; wegB.className = 'weghalte';
+      wegB.textContent = 'weg'; wegB.setAttribute('aria-label', 'Verwijder halte ' + (i + 1));
+      wegB.addEventListener('click', () => { huidig.haltes.splice(i, 1); teken(); halteLijst(); });
+      rij.appendChild(wegB);
+      wrap.appendChild(rij);
+    });
+  }
+
+  /* ---- de editor openen, bewaren, verwijderen ---- */
+  function openEditor(l) {
+    huidig = l ? { id: l.id, haltes: l.haltes.map(h => ({ naam: h.naam, lat: h.lat, lng: h.lng })) } : { haltes: [] };
+    $('#editorKop').textContent = l ? l.naam + ' bewerken' : 'Nieuwe lijn';
+    $('#fNaam').value = l ? l.naam : '';
+    $('#fSoort').value = l ? l.soort : 'bus';
+    $('#fFreq').value = l ? l.frequentieMin : 15;
+    $('#fBasis').value = l ? (l.tarief.basis / 100).toFixed(2) : '1.80';
+    $('#fKm').value = l ? (l.tarief.perKm / 100).toFixed(2) : '0.20';
+    $('#wegBtn').classList.toggle('weg', !l);
+    $('#editor').classList.remove('weg');
+    teken(); halteLijst();
+    $('#editor').scrollIntoView({ block: 'start' });
+  }
+  function toonLijnen() {
+    const wrap = $('#lijnLijst'); wrap.textContent = '';
+    for (const l of beheer.lijnen) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'lijnknop';
+      const info = document.createElement('span'); info.className = 'rek';
+      info.textContent = (ICOON[l.soort] || '🚌') + ' ' + l.naam;
+      const sub = document.createElement('small');
+      sub.textContent = l.haltes.length + ' haltes · om de ' + l.frequentieMin + ' min · € ' + (l.tarief.basis / 100).toFixed(2) + ' + € ' + (l.tarief.perKm / 100).toFixed(2) + '/km';
+      info.appendChild(sub); b.appendChild(info);
+      b.addEventListener('click', () => openEditor(l));
+      wrap.appendChild(b);
+    }
+    if (!beheer.lijnen.length) {
+      const p = document.createElement('p'); p.className = 'stil';
+      p.textContent = 'Nog geen lijnen; begin met een nieuwe lijn.'; wrap.appendChild(p);
+    }
+    $('#kopBadge').textContent = beheer.lijnen.length + (beheer.lijnen.length === 1 ? ' lijn' : ' lijnen');
+  }
+
+  $('#tekenvlak').addEventListener('click', e => {
+    if (!huidig || huidig.haltes.length >= 20) return;
+    const r = $('#tekenvlak').getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width * B.w, y = (e.clientY - r.top) / r.height * B.h;
+    huidig.haltes.push({ naam: '', ...naarLatLng(grenzen(), x, y) });
+    teken(); halteLijst();
+  });
+  $('#midBtn').addEventListener('click', () => {
+    if (!huidig || huidig.haltes.length >= 20) return;
+    huidig.haltes.push({ naam: '', ...naarLatLng(grenzen(), B.w / 2, B.h / 2) });
+    teken(); halteLijst();
+  });
+  $('#leegBtn').addEventListener('click', () => { if (huidig) { huidig.haltes = []; teken(); halteLijst(); } });
+  $('#nieuwBtn').addEventListener('click', () => openEditor(null));
+  $('#bewaarBtn').addEventListener('click', async () => {
+    if (!huidig) return;
+    const r = await api('lijn/zet', { id: huidig.id, naam: $('#fNaam').value, soort: $('#fSoort').value,
+      frequentieMin: Number($('#fFreq').value),
+      tarief: { basis: Math.round(Number($('#fBasis').value) * 100), perKm: Math.round(Number($('#fKm').value) * 100) },
+      haltes: huidig.haltes });
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Lijn bewaard; leden zien hem meteen in de OV-app.');
+    $('#editor').classList.add('weg'); huidig = null;
+    laad();
+  });
+  $('#wegBtn').addEventListener('click', async () => {
+    if (!huidig || !huidig.id) return;
+    const r = await api('lijn/zet', { id: huidig.id, weg: true });
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Lijn verwijderd.');
+    $('#editor').classList.add('weg'); huidig = null;
+    laad();
+  });
+
+  async function laad() {
+    if (!token) { $('#vPoort').classList.remove('weg'); return; }
+    const r = await api('lijnen');
+    if (r.status !== 200) {
+      $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.';
+      $('#vPoort').classList.remove('weg'); $('#vBeheer').classList.add('weg'); return;
+    }
+    beheer = r.body;
+    const sel = $('#fSoort');
+    if (!sel.options.length)
+      for (const s of beheer.soorten) { const o = document.createElement('option'); o.value = s;
+        o.textContent = (ICOON[s] || '') + ' ' + s; sel.appendChild(o); }
+    $('#vPoort').classList.add('weg'); $('#vBeheer').classList.remove('weg');
+    toonLijnen();
+    if (huidig) teken();
+  }
+  laad();
+})();
+</script>
+</body>
+</html>

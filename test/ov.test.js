@@ -116,3 +116,48 @@ test('6. het zaakoverzicht: live vloot, reizigers en omzet vandaag', async () =>
   const dicht = await api('/api/supplier/ov/overzicht', {}, taxiTok);
   assert.equal(dicht.status, 409, 'OV-functies horen alleen bij een OV-zaak');
 });
+
+test('7. de routetekenaar: de manager zet zelf een lijn op de kaart en leden zien hem meteen', async () => {
+  // de chauffeur mag niet aan de lijnen komen; alleen de manager
+  const geenM = await api('/api/staff/ov/lijnen', {}, pda);
+  assert.equal(geenM.status, 403, 'de routetekenaar is alleen voor de manager');
+  const roster = await api('/api/supplier/roster', { code: 'TRANSIT' });
+  const m = roster.body.staff.find(x => x.role === 'manager');
+  const baas = (await api('/api/supplier/login', { code: 'TRANSIT', staffId: m.id, pin: '1234' })).body.token;
+  const beheer = await api('/api/staff/ov/lijnen', {}, baas);
+  assert.equal(beheer.status, 200);
+  assert.ok(beheer.body.soorten.includes('bus'), 'de soorten staan klaar');
+  assert.ok(beheer.body.ijkpunten.length > 0, 'de eigen kaart ijkt op bekende plekken in de stad');
+  // een lijn met minder dan twee haltes is geen lijn
+  const teKort = await api('/api/staff/ov/lijn/zet', { naam: 'Stompje', soort: 'bus',
+    haltes: [{ naam: 'Ergens', lat: 38.9, lng: 1.43 }] }, baas);
+  assert.equal(teKort.status, 400);
+  // drie tikken op de kaart en de lijn staat er
+  const nieuw = await api('/api/staff/ov/lijn/zet', { naam: 'Lijn 9 Haven', soort: 'bus', frequentieMin: 10,
+    tarief: { basis: 200, perKm: 25 },
+    haltes: [{ naam: 'Haven', lat: 38.912, lng: 1.436 }, { lat: 38.916, lng: 1.446 },
+      { naam: 'Talamanca', lat: 38.917, lng: 1.455 }] }, baas);
+  assert.equal(nieuw.status, 200);
+  assert.equal(nieuw.body.lijn.haltes.length, 3);
+  assert.equal(nieuw.body.lijn.haltes[1].naam, 'Halte 2', 'een naamloze tik krijgt een nette naam');
+  const kaart = await api('/api/ov/kaart', STAD, lidB);
+  const zichtbaar = kaart.body.lijnen.find(l => l.naam === 'Lijn 9 Haven');
+  assert.ok(zichtbaar, 'leden zien de nieuwe lijn meteen in de OV-app');
+  // bewerken: dezelfde lijn een andere naam geven, geen tweede lijn erbij
+  const voor = (await api('/api/staff/ov/lijnen', {}, baas)).body.lijnen.length;
+  const anders = await api('/api/staff/ov/lijn/zet', { id: nieuw.body.lijn.id, naam: 'Lijn 9 Marina',
+    soort: 'bus', haltes: nieuw.body.lijn.haltes }, baas);
+  assert.equal(anders.status, 200);
+  const na = (await api('/api/staff/ov/lijnen', {}, baas)).body.lijnen;
+  assert.equal(na.length, voor, 'bewerken maakt geen extra lijn');
+  assert.ok(na.some(l => l.naam === 'Lijn 9 Marina'));
+  // weghalen ruimt ook de voertuigen van die lijn op
+  await api('/api/staff/ov/dienst', { lijnId: nieuw.body.lijn.id, voertuigNaam: 'Bus 9' }, pda);
+  await api('/api/staff/ov/pos', { lat: 38.912, lng: 1.436 }, pda);
+  const weg = await api('/api/staff/ov/lijn/zet', { id: nieuw.body.lijn.id, weg: true }, baas);
+  assert.equal(weg.status, 200);
+  const over = await api('/api/supplier/ov/overzicht', {}, baas);
+  assert.ok(!over.body.voertuigen.some(v => /Bus 9/.test(v.naam)), 'het voertuig van de lijn is mee opgeruimd');
+  const kaart2 = await api('/api/ov/kaart', STAD, lidB);
+  assert.ok(!kaart2.body.lijnen.some(l => /Lijn 9/.test(l.naam)), 'de lijn is uit de leden-app');
+});

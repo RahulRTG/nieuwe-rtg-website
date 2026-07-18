@@ -3,8 +3,8 @@
    de dienstkant (dienst starten, live GPS, code-check-in) achter de
    PDA-inlog; het zaakoverzicht voor de vervoerder zelf. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, ovKaart, ovCodeMaak, ovHierIn, ovCheckUit, ovMijn,
-    ovDienst, ovPos, ovCodeIn, ovStand, ovOverzicht } = kern;
+  const { app, auth, supplierAuth, managerOnly, ovKaart, ovCodeMaak, ovHierIn, ovCheckUit, ovMijn,
+    ovDienst, ovPos, ovCodeIn, ovStand, ovOverzicht, ovLijnenBeheer, ovLijnZet } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG OV is voor leden.' }); return true; }
@@ -55,6 +55,18 @@ module.exports = (kern) => {
   app.post('/api/staff/ov/stand', supplierAuth, (req, res) => {
     if (ovZaakOnly(req, res)) return;
     stuur(res, ovStand(req.supplier, req.actor));
+  });
+
+  // de routetekenaar (PDA, alleen de manager): lijnen en haltes op de eigen kaart
+  app.post('/api/staff/ov/lijnen', supplierAuth, (req, res) => {
+    if (ovZaakOnly(req, res)) return;
+    if (!managerOnly(req, res)) return;
+    stuur(res, ovLijnenBeheer(req.supplier));
+  });
+  app.post('/api/staff/ov/lijn/zet', supplierAuth, (req, res) => {
+    if (ovZaakOnly(req, res)) return;
+    if (!managerOnly(req, res)) return;
+    stuur(res, ovLijnZet(req.supplier, req.body || {}));
   });
 
   // het zaakoverzicht

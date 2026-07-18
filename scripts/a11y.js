@@ -38,6 +38,7 @@ const PAGINAS = [
   '/apps/passkeys.html',
   '/apps/ov.html',
   '/apps/ovdienst.html',
+  '/apps/ovroutes.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

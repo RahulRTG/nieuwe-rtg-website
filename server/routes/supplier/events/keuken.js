@@ -1,0 +1,161 @@
+/* Supplier-events (deelmodule): receptkaarten, keukenkennis, 86-lijst en de keukencoach.
+   Draait op de gedeelde kern; gemount vanuit routes/supplier/events.js. */
+module.exports = (kern) => {
+  const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
+    zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
+    legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
+    RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
+    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, pinFails, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
+    zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
+    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
+    tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
+    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
+  const { dagContext } = require('../../../kern/context');
+
+app.post('/api/supplier/menu/recipe', supplierAuth, async (req, res) => {
+  const m = (req.supplier.menu || []).find(x => x.id === req.body.itemId);
+  if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
+  let recept = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 700,
+        system: 'Je bent een chef-kok die werkinstructies schrijft voor nieuwe keukenkrachten. Antwoord in het Nederlands, platte tekst, maximaal 10 korte genummerde stappen: mise en place, bereiding, afwerking en bord. Concreet, geen inleiding.',
+        messages: [{ role: 'user', content: 'Gerecht: ' + m.name + (m.desc ? ' (' + m.desc + ')' : '') + '. Keuken: ' + req.supplier.name + '. Allergenen: ' + ((m.allergens || []).join(', ') || 'geen') + '.' }]
+      });
+      recept = String(msg.content[0].text || '').trim().slice(0, 1500);
+    } catch (err) { recept = null; }
+  }
+  if (!recept) {
+    recept = '1. Mise en place: alle ingredienten voor ' + m.name + ' afwegen en klaarzetten.\n' +
+      (m.desc ? '2. Basis: ' + m.desc + '\n' : '2. Basis volgens de huisreceptuur van ' + req.supplier.name + '.\n') +
+      '3. Bereiden op de eigen sectie (' + (m.sectie || 'warm') + '); tussentijds proeven.\n' +
+      ((m.allergens || []).length ? '4. LET OP allergenen: ' + m.allergens.join(', ') + '. Bij een allergie-bon strikt gescheiden werken.\n' : '') +
+      '5. Afwerking en garnituur; bord vegen.\n' +
+      '6. Doorgeven aan de pas; chef proeft steekproefsgewijs.\n' +
+      '(Laat de manager dit recept aanscherpen in het Kantoor, of zet een ANTHROPIC_API_KEY voor een uitgewerkt recept.)';
+  }
+  m.recept = recept;
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette het recept van ' + m.name + ' op de bon');
+  // bewust geen sync-broadcast: het scherm dat het recept opvroeg werkt zijn
+  // eigen menukopie bij, andere schermen zien het bij hun eerstvolgende refresh
+  res.json({ ok: true, recept, ai: !!anthropic });
+});
+
+/* De gerechtenkennis op het keukenscherm: tik op een gerecht en vraag het
+   recept, de bereidingswijze, de allergenen met vervangers of een drank-
+   suggestie op. Elke soort wordt een keer gemaakt (Claude waar mogelijk,
+   anders een vakkundige fallback) en daarna op het gerecht bewaard. */
+const KENNIS_SOORTEN = {
+  recept: {
+    sys: 'Je bent een chef-kok die werkinstructies schrijft voor nieuwe keukenkrachten. Antwoord in het Nederlands, platte tekst, maximaal 10 korte genummerde stappen: mise en place, bereiding, afwerking en bord. Concreet, geen inleiding.',
+    val: (s, m) => '1. Mise en place: alle ingredienten voor ' + m.name + ' afwegen en klaarzetten.\n' +
+      (m.desc ? '2. Basis: ' + m.desc + '\n' : '2. Basis volgens de huisreceptuur van ' + s.name + '.\n') +
+      '3. Bereiden op de eigen sectie (' + (m.sectie || 'warm') + '); tussentijds proeven.\n' +
+      ((m.allergens || []).length ? '4. LET OP allergenen: ' + m.allergens.join(', ') + '. Bij een allergie-bon strikt gescheiden werken.\n' : '') +
+      '5. Afwerking en garnituur; bord vegen.\n6. Doorgeven aan de pas; chef proeft steekproefsgewijs.'
+  },
+  bereiding: {
+    sys: 'Je bent een sous-chef die de bereidingswijze uitlegt aan de kok op de sectie. Antwoord in het Nederlands, platte tekst, maximaal 8 genummerde stappen met concrete temperaturen, tijden en garingspunten (pan, oven, kerntemperatuur). Sluit af met een regel over de valkuil van dit gerecht. Geen inleiding.',
+    val: (s, m) => {
+      const tijd = { warm: 12, snack: 8, koud: 6, dessert: 5 }[m.sectie || 'warm'] || 8;
+      return '1. Sectie ' + (m.sectie || 'warm') + ', richttijd ~' + tijd + ' min per uitgifte.\n' +
+        '2. Werkplek en pannen voorverwarmen; gereedschap klaar.\n' +
+        (m.desc ? '3. Kern: ' + m.desc + '\n' : '3. Volg de huisbereiding van ' + s.name + '.\n') +
+        '4. Garing checken (kleur, kern, textuur) voor het doorgeven.\n' +
+        '5. Warm doorgeven aan de pas; niet laten staan.\n' +
+        'Valkuil: te vroeg starten; kijk naar het vuurplan op de bon zodat de tafel samen uitgaat.';
+    }
+  },
+  allergenen: {
+    sys: 'Je bent een chef-kok en allergenenexpert. Antwoord in het Nederlands, platte tekst, maximaal 8 regels: welke allergenen dit gerecht bevat, hoe kruisbesmetting op de lijn voorkomen wordt, en per allergeen een volwaardig vervangend ingredient of variant. Geen inleiding.',
+    val: (s, m) => {
+      const al = m.allergens || [];
+      if (!al.length) return 'Geen geregistreerde allergenen voor ' + m.name + '.\nBij een allergie-bon toch altijd doorvragen en strikt gescheiden werken: schone snijplank, schoon gereedschap, aparte pan.';
+      return al.map(a => {
+        const idee = ALT_IDEE[a];
+        return '⚠ ' + a + (idee ? ': vervang met ' + idee[0] + ' (' + idee[1] + ').' : ': overleg met de chef over een vervanger.');
+      }).join('\n') + '\nAltijd: schone snijplank, schoon gereedschap, aparte pan; de allergie-bon gaat als laatste check langs de pas.';
+    }
+  },
+  pairing: {
+    sys: 'Je bent een sommelier. Antwoord in het Nederlands, platte tekst, maximaal 6 regels: twee wijnsuggesties (per glas), een cocktail of mocktail en een alcoholvrij alternatief bij dit gerecht, elk met een korte reden. Geen inleiding.',
+    val: (s, m) => {
+      const bar = (s.menu || []).filter(x => x.station === 'bar').slice(0, 3);
+      return (bar.length ? 'Van de eigen kaart: ' + bar.map(b => b.name).join(', ') + '.\n' : '') +
+        'Wit en fris bij lichte en koude gerechten; rond en rood bij ' + ((m.sectie || 'warm') === 'warm' ? 'dit warme gerecht' : 'de warme kant') + '.\n' +
+        'Alcoholvrij: huisgemaakte citrus-tonic of verse munt-gember.';
+    }
+  }
+};
+app.post('/api/supplier/menu/kennis', supplierAuth, async (req, res) => {
+  const m = (req.supplier.menu || []).find(x => x.id === req.body.itemId);
+  if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
+  const soort = String(req.body.soort || '');
+  const def = KENNIS_SOORTEN[soort];
+  if (!def) return res.status(400).json({ error: 'Onbekende kennissoort.' });
+  m.kennis = m.kennis || {};
+  const bestaand = soort === 'recept' ? (m.recept || m.kennis.recept) : m.kennis[soort];
+  if (bestaand && !req.body.opnieuw) return res.json({ ok: true, tekst: bestaand, cached: true, ai: !!anthropic });
+  let tekst = null;
+  if (anthropic) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 700, system: def.sys,
+        messages: [{ role: 'user', content: 'Gerecht: ' + m.name + (m.desc ? ' (' + m.desc + ')' : '') + '. Keuken: ' + req.supplier.name + '. Sectie: ' + (m.sectie || 'warm') + '. Allergenen: ' + ((m.allergens || []).join(', ') || 'geen') + '. ' + dagContext().zin }]
+      });
+      tekst = String(msg.content[0].text || '').trim().slice(0, 1500);
+    } catch (err) { tekst = null; }
+  }
+  if (!tekst) tekst = def.val(req.supplier, m);
+  m.kennis[soort] = tekst;
+  if (soort === 'recept') m.recept = tekst;
+  save();
+  logActivity(req.supplier.code, req.actor, 'vroeg ' + soort + ' van ' + m.name + ' op');
+  res.json({ ok: true, tekst, ai: !!anthropic });
+});
+
+/* 86: een gerecht is op. Elke keukenkracht mag het melden; het bestellen
+   wordt per direct geblokkeerd en alle schermen zien het. Weer beschikbaar
+   melden kan net zo snel. */
+app.post('/api/supplier/menu/86', supplierAuth, (req, res) => {
+  const m = (req.supplier.menu || []).find(x => x.id === req.body.itemId);
+  if (!m) return res.status(404).json({ error: 'Gerecht niet gevonden.' });
+  m.uitverkocht = !!req.body.op;
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  broadcastSync(['rtg', 'lifestyle', 'business'], 'orders');
+  logActivity(req.supplier.code, req.actor, (m.uitverkocht ? 'meldde 86 (uitverkocht): ' : 'meldde weer beschikbaar: ') + m.name);
+  res.json({ ok: true, uitverkocht: m.uitverkocht });
+});
+
+app.post('/api/supplier/kitchen/coach', supplierAuth, async (req, res) => {
+  const s = req.supplier;
+  const lang = talen.taalVan(req.body.lang);
+  const open = ordersVanZaak(s.code).filter(o => ['nieuw', 'in bereiding'].includes(o.status) && sectiesForOrder(s, o).length);
+  if (!open.length) return res.json({ ok: true, lines: [], ai: !!anthropic });
+  const hash = crypto.createHash('sha1').update(lang + JSON.stringify(open.map(o => [o.ref, o.status, o.table, o.secties, Math.floor((Date.now() - new Date(o.at)) / 300000)]))).digest('hex');
+  const cached = coachCache.get(s.code);
+  if (cached && cached.hash === hash) return res.json({ ok: true, lines: cached.lines, ai: !!anthropic, cached: true });
+  let lines = null;
+  if (anthropic) {
+    try {
+      const beeld = open.map(o => ({ bon: o.pickup, tafel: o.table || null, min: Math.round((Date.now() - new Date(o.at)) / 60000), items: o.items.map(i => i.qty + 'x ' + i.name), kanten: o.secties || {} }));
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-5', max_tokens: 600,
+        system: (lang === 'en'
+          ? 'You are a sous-chef running the line. Mission: every table leaves in ONE go with HOT food; no plate waits under the pass. Cook times: warm ~12 min, snack ~8, koud ~6, dessert ~5, bar ~4 (a station marked "bezig" is roughly halfway). Reply ONLY with a JSON array of at most 6 short English instructions (strings): what to fire now, what to hold and for how many minutes, what to batch, which table leaves together, who gets priority. ' + dagContext().zinEn + ' Weigh that in (terrace weather, hot versus cold dishes, quiet or busy hours).'
+          : 'Je bent een sous-chef die de lijn aanstuurt. Missie: elke tafel gaat in EEN keer met WARM eten uit; geen bord staat te wachten onder de pas. Bereidingstijden: warm ~12 min, snack ~8, koud ~6, dessert ~5, bar ~4 (een kant op "bezig" is ongeveer halverwege). Antwoord UITSLUITEND met een JSON-array van maximaal 6 korte Nederlandse aanwijzingen (strings): wat nu afvuren, wat vasthouden en hoeveel minuten, wat batchen, welke tafel samen uitgaat, wie voorrang krijgt. ' + dagContext().zin + ' Weeg dat mee (terrasweer, warme versus koude kaart, rustige of drukke uren).'),
+        messages: [{ role: 'user', content: JSON.stringify(beeld) }]
+      });
+      const arr = JSON.parse((msg.content[0].text.match(/\[[\s\S]*\]/) || ['[]'])[0]);
+      if (Array.isArray(arr) && arr.length) lines = arr.slice(0, 6).map(x => String(x).slice(0, 160));
+    } catch (err) { lines = null; }
+  }
+  if (!lines) lines = coachRules(s, open, lang);
+  coachCache.set(s.code, { hash, lines, at: Date.now() });
+  res.json({ ok: true, lines, ai: !!anthropic });
+});
+
+};

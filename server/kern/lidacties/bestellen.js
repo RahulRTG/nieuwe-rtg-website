@@ -8,7 +8,7 @@ module.exports = (ctx) => {
     leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
-    orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor } = ctx;
+    orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor } = ctx;
 function plaatsOrderVoor(session, body) {
   // betalen bij partners mag ook zonder pas (gratis gebruiker)
   const s = findSupplier(body.supplierCode);
@@ -77,10 +77,14 @@ function betaalOrderVoor(session, body) {
   if (fooi) o.fooi = fooi;
   const korting = pasTegoedToe(session.key, o.total);
   if (korting) o.puntenKorting = korting;
+  // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij,
+  // dus de zaak houdt het volle bedrag en de nettoprijzen-belofte blijft staan)
+  const voordeel = ledenvoordeelVoor(findSupplier(o.supplierCode), o.total - korting);
+  if (voordeel) o.regieKorting = voordeel;
   o.paid = true;
   o.paidAt = new Date().toISOString();
   if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
-  verdienPunten(session.key, o.total - korting, o.supplierName);
+  verdienPunten(session.key, o.total - korting - voordeel, o.supplierName);
   save();
   // betaald = definitief: het keukenbrein boekt de ingredienten af via de recepten
   try { keuken.boekVerkoopAf(findSupplier(o.supplierCode), o.items || [], 'bestelling ' + o.ref); } catch (e) {}

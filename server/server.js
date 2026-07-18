@@ -2641,6 +2641,12 @@ Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify,
 // dat meereist en een aparte, veilige intake-deling per aanbieder.
 Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
+/* Geldregie (kern/geldregie.js): RTG bepaalt de geldkant vanuit de boardroom:
+   pasprijzen (publiek zichtbaar), de interne partnervergoeding per genre of
+   zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de nettoprijzen-
+   belofte uit de voorwaarden blijft intact). Voor lidacties gemount, want
+   de betaal-seams rekenen het voordeel mee. */
+Object.assign(kern, require('./kern/geldregie').maakGeldregie({ db, save }));
 /* Lidacties (kern/lidacties.js): de transactiefuncties van het lid, als
    kern-module met expliciete afhankelijkheden. Ze bedienen de app-routes
    EN vullen de acties-registry van de Butler, volgens het contract
@@ -2650,7 +2656,8 @@ Object.assign(kern, require('./kern/lidacties')({
   leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
   notifySupplier, sseToSupplier, sseToOffice,
-  zorgVoor: kern.zorgVoor, zorgContact, keuken: kern.keuken
+  zorgVoor: kern.zorgVoor, zorgContact, keuken: kern.keuken,
+  ledenvoordeelVoor: kern.ledenvoordeelVoor
 }));
 kern.butlerActies = {
   plaatsOrder: kern.plaatsOrderVoor, betaalOrder: kern.betaalOrderVoor,

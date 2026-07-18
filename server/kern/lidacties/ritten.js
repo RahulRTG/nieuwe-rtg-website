@@ -7,7 +7,7 @@ module.exports = (ctx) => {
     leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
-    orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor } = ctx;
+    orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor } = ctx;
 function vraagRitVoor(session, body) {
   if (session.tier === 'guest') return { status: 403, error: 'Alleen voor leden.' };
   const s = findSupplier(body.supplierCode);
@@ -83,10 +83,13 @@ function betaalRitVoor(session, body) {
   if (fooiR) r.fooi = fooiR;
   const kortingR = pasTegoedToe(session.key, r.quote);
   if (kortingR) r.puntenKorting = kortingR;
+  // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij)
+  const voordeelR = ledenvoordeelVoor(findSupplier(r.supplierCode), r.quote - kortingR);
+  if (voordeelR) r.regieKorting = voordeelR;
   r.paid = true;
   r.paidAt = new Date().toISOString();
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
-  verdienPunten(session.key, r.quote - kortingR, r.supplierName);
+  verdienPunten(session.key, r.quote - kortingR - voordeelR, r.supplierName);
   save();
   notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? '\u2708\uFE0F' : '\u{1F697}', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
   sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });

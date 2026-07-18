@@ -50,9 +50,9 @@
     <h2>1. Het lidmaatschap</h2>
     <ul>
       <li>RTG kent drie passen: <b>RTG Pass</b>, <b>Lifestyle Pass</b> en <b>Business Pass</b>, elk met eigen rechten in de app en De Salon.</li>
-      <li>De maandbijdrage bedraagt <b>&euro; 65</b> (RTG Pass) of <b>&euro; 20.000</b> (Lifestyle Pass), telkens exclusief 21% btw. De Business Pass kent een <b>prijs op maat</b>, onder dezelfde condities.</li>
+      <li>De <b>gratis app</b> is en blijft kosteloos. De maandbijdrage bedraagt <b><span data-pasprijs="rtg">&euro; 65</span></b> (RTG Pass) of <b><span data-pasprijs="lifestyle">&euro; 20.000</span></b> (Lifestyle Pass), telkens exclusief 21% btw. De Business Pass kent een <b>prijs op maat</b>, onder dezelfde condities.</li>
       <li>Het lidmaatschap wordt aangegaan voor <b>minimaal 12 maanden</b> (jaarcontract).</li>
-      <li>Leden reizen op <b>nettoprijzen</b> (inkoopprijs); RTG rekent daar niets over. RTG's enige inkomsten zijn de maandbijdragen, en daarvan <b>gaat 30% (ex btw) naar de RTFoundation</b>: € 19,50 per maand van de RTG Pass, € 6.000 van de Lifestyle Pass en 30% van elke Business Pass-bijdrage.</li>
+      <li>Leden reizen op <b>nettoprijzen</b> (inkoopprijs); RTG rekent daar niets over. RTG's enige inkomsten zijn de maandbijdragen, en daarvan <b>gaat 30% (ex btw) naar de RTFoundation</b>: <span data-pasrtf="rtg">€ 19,50</span> per maand van de RTG Pass, <span data-pasrtf="lifestyle">€ 6.000</span> van de Lifestyle Pass en 30% van elke Business Pass-bijdrage.</li>
       <li><b>Ledenprijsgarantie:</b> bij partners betaalt u via de app nooit meer dan de eigen publieke prijs van de zaak voor dezelfde dienst op hetzelfde moment. Ziet u het bij de zaak zelf toch goedkoper, meld het via de app: de partner past de prijs aan en het verschil wordt voor u rechtgezet.</li>
       <li>Diensten die het lid afneemt (reizen, verblijf, vervoer, horeca) betaalt het lid per afname tegen nettoprijs, rechtstreeks aan de partner; RTG verdient daar niets aan.</li>
       <li>Het lidmaatschap is persoonlijk en niet overdraagbaar. De digitale pas en codenaam zijn gekoppeld aan uw account.</li>
@@ -165,5 +165,22 @@
 </footer>
 <script src="/shared/cookie.js"></script>
 <script src="/shared/seizoen.js" defer></script>
+<script>
+/* De actuele maandbijdragen komen live uit de geld-regie van de boardroom;
+   wat daar staat is het geldende bedrag. Zonder verbinding blijven de
+   gedrukte bedragen staan. */
+fetch('/api/pasprijzen').then(r => (r.ok ? r.json() : null)).then(d => {
+  if (!d || !d.passen) return;
+  const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 });
+  for (const el of document.querySelectorAll('[data-pasprijs]')) {
+    const p = d.passen[el.dataset.pasprijs];
+    if (p && Number.isFinite(p.maandCenten)) el.textContent = eur(p.maandCenten);
+  }
+  for (const el of document.querySelectorAll('[data-pasrtf]')) {
+    const p = d.passen[el.dataset.pasrtf];
+    if (p && Number.isFinite(p.rtfCenten)) el.textContent = eur(p.rtfCenten);
+  }
+}).catch(() => {});
+</script>
 </body>
 </html>

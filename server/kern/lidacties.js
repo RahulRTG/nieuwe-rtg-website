@@ -13,7 +13,8 @@ const { orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe } = require(
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
   leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
-  notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken }) => {
+  notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
+  ledenvoordeelVoor }) => {
 
   /* Zodra het lid echt bij een partner koopt, opent de chatlijn: ze zijn
      dan geen vreemden meer. Idempotent en stil voor gasten. */
@@ -64,10 +65,13 @@ function betaalBoekingVoor(session, body) {
   // punten-tegoed (RTG legt bij) en spaarpunten
   const kortingB = pasTegoedToe(session.key, b.price || 0);
   if (kortingB) b.puntenKorting = kortingB;
+  // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij)
+  const voordeelB = ledenvoordeelVoor(findSupplier(b.supplierCode), (b.price || 0) - kortingB);
+  if (voordeelB) b.regieKorting = voordeelB;
   b.paid = true;
   b.paidAt = new Date().toISOString();
   if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
-  verdienPunten(session.key, (b.price || 0) - kortingB, b.supplierName);
+  verdienPunten(session.key, (b.price || 0) - kortingB - voordeelB, b.supplierName);
   openLijnVoor(findSupplier(b.supplierCode), session);
   save();
   notifySupplier(b.supplierCode, { icon: '🗓️', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
@@ -82,7 +86,7 @@ function betaalBoekingVoor(session, body) {
     leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
-    orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor };
+    orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor };
   const { plaatsOrderVoor, betaalOrderVoor } = require('./lidacties/bestellen')(ctx);
   const { vraagRitVoor, betaalRitVoor } = require('./lidacties/ritten')(ctx);
 

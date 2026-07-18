@@ -2,7 +2,8 @@
    Alles achter de office-inlog (dezelfde als de backoffice); het schakelen
    van functies raakt het hele platform en hoort dus bij het kantoor. */
 module.exports = (kern) => {
-  const { app, officeAuth, afdelingen, sseToOffice } = kern;
+  const { app, officeAuth, afdelingen, sseToOffice,
+    geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status).json({ error: r.error }) : res.json(r);
   const veilig = (res, werk) => { try { stuur(res, werk()); } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
 
@@ -21,6 +22,28 @@ module.exports = (kern) => {
   app.post('/api/office/boardroom/alles', officeAuth, (req, res) => veilig(res, () => {
     const r = afdelingen.schakelAlles(req.body.aan === true, req.body.naam ? String(req.body.naam) : 'boardroom');
     if (r.ok) sseToOffice('sync', { scope: 'boardroom' });
+    return r;
+  }));
+
+  /* De geld-regie: RTG bepaalt de pasprijzen, de partnervergoeding (per genre
+     of per zaak) en het ledenvoordeel per genre. De pasprijzen zijn publiek:
+     wat hier gezet wordt is meteen overal het geldende bedrag. */
+  app.post('/api/pasprijzen', (req, res) => stuur(res, geldPasprijzen()));
+  app.get('/api/pasprijzen', (req, res) => stuur(res, geldPasprijzen()));
+  app.post('/api/office/geld', officeAuth, (req, res) => veilig(res, () => geldOverzicht()));
+  app.post('/api/office/geld/pasprijs', officeAuth, (req, res) => veilig(res, () => {
+    const r = geldPasprijsZet(req.body || {});
+    if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Pasprijs ' + r.pas + ' gezet op € ' + (r.maandCenten / 100).toFixed(2) + ' per maand (ex btw)');
+    return r;
+  }));
+  app.post('/api/office/geld/commissie', officeAuth, (req, res) => veilig(res, () => {
+    const r = geldCommissieZet(req.body || {});
+    if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Partnervergoeding ' + (r.code || r.genre) + ' gezet op ' + (r.rate * 100).toFixed(1) + '%');
+    return r;
+  }));
+  app.post('/api/office/geld/korting', officeAuth, (req, res) => veilig(res, () => {
+    const r = geldKortingZet(req.body || {});
+    if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Ledenvoordeel ' + r.genre + ' gezet op ' + r.pct + '%');
     return r;
   }));
 

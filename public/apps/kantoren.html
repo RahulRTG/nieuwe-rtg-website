@@ -210,6 +210,41 @@
     <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.6rem;">Loop nu een ronde</button></h3>
     <div class="kaart lijst" id="bVoorstellen"></div>
 
+    <h3 class="sec">De geld-regie: pasprijzen, partnervergoeding en ledenvoordeel</h3>
+    <div class="kaart" id="bGeld">
+      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">
+        <span style="flex:1;min-width:11rem;">
+          <label for="gPasKeuze" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Pasprijs per maand (ex btw); de gratis app blijft gratis, Business is op maat</label>
+          <select id="gPasKeuze"><option value="rtg">RTG Pass</option><option value="lifestyle">Lifestyle Pass</option></select>
+        </span>
+        <span><label for="gPasEuro" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Bedrag (€)</label>
+          <input id="gPasEuro" type="number" min="0" step="0.01" style="width:8rem;"></span>
+        <button class="knop stil" id="gPasZet" type="button">Zet de pasprijs</button>
+        <span class="stil" id="gPasNu" style="font-size:.78rem;color:var(--soft);"></span>
+      </div>
+      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem;">
+        <span style="flex:1;min-width:11rem;">
+          <label for="gComGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Partnervergoeding (interne afspraak RTG en zaak; raakt het lid nooit)</label>
+          <select id="gComGenre"></select>
+        </span>
+        <span><label for="gComZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Of een zaak (code)</label>
+          <input id="gComZaak" maxlength="12" placeholder="bijv. TRANSIT" style="width:8rem;text-transform:uppercase;"></span>
+        <span><label for="gComPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">%</label>
+          <input id="gComPct" type="number" min="0" max="30" step="0.1" style="width:5.5rem;"></span>
+        <button class="knop stil" id="gComZet" type="button">Zet de vergoeding</button>
+      </div>
+      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem;">
+        <span style="flex:1;min-width:11rem;">
+          <label for="gKorGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Ledenvoordeel per genre (RTG legt bij; de zaak houdt het volle bedrag)</label>
+          <select id="gKorGenre"></select>
+        </span>
+        <span><label for="gKorPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">%</label>
+          <input id="gKorPct" type="number" min="0" max="50" step="0.5" style="width:5.5rem;"></span>
+        <button class="knop stil" id="gKorZet" type="button">Zet het voordeel</button>
+      </div>
+      <div id="gStand" class="stil" style="margin-top:.8rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
+    </div>
+
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
     <div class="kaart" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
       <span style="font-size:.82rem;color:var(--soft);flex:1;min-width:14rem;">De grote hendel: alles bij iedereen beschikbaar zetten, of alles in een keer sluiten. De interne backoffice-functies blijven altijd open, zodat u de hendel kunt terugzetten.</span>
@@ -500,6 +535,7 @@ async function openBoard(){
   zetKamerUrl('boardroom');
   const d = await api('boardroom');
   toon('vBoard');
+  laadGeld();
   wereldWidget($('#bWereld'));
   api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
   $('#bAudit').innerHTML = (d.audit && d.audit.length) ? d.audit.map(a =>
@@ -538,6 +574,35 @@ function tekenVoorstellen(v){
 $('#bVernieuw').addEventListener('click', async () => {
   try { const d = await api('boardroom/verbeter'); tekenVoorstellen(d.verbeterkamer); meld('Verse ronde gelopen.'); } catch (e) { meld(e.message); }
 });
+/* de geld-regie: pasprijzen, partnervergoeding en ledenvoordeel */
+const eurC = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 });
+async function laadGeld(){
+  try {
+    const d = await api('geld');
+    const genres = d.genres.map(g => '<option value="'+esc(g.id)+'">'+esc((g.icon||'')+' '+(g.label||g.id))+'</option>').join('');
+    if (!$('#gComGenre').options.length) { $('#gComGenre').innerHTML = genres; $('#gKorGenre').innerHTML = genres; }
+    const p = d.pasprijzen;
+    $('#gPasNu').textContent = 'Nu: RTG ' + eurC(p.rtg.maandCenten) + ' · Lifestyle ' + eurC(p.lifestyle.maandCenten) + ' · gratis app € 0 · Business op maat · 30% naar RTFoundation';
+    const kort = Object.entries(d.kortingen).map(([g, pct]) => esc(g) + ' ' + pct + '%').join(', ');
+    const com = Object.entries(d.commissies.standaard).map(([g, r]) => esc(g) + ' ' + (r*100).toFixed(1) + '%').join(', ');
+    const per = Object.entries(d.commissies.perZaak).map(([c, r]) => esc(c) + ' ' + (r*100).toFixed(1) + '%').join(', ');
+    $('#gStand').innerHTML = 'Ledenvoordeel: ' + (kort || 'geen') + '<br>Vergoeding per genre: ' + (com || 'standaard van de zaak') + (per ? '<br>Eigen afspraken: ' + per : '');
+  } catch (e) { $('#gStand').textContent = e.message; }
+}
+$('#gPasZet').addEventListener('click', async () => {
+  try { await api('geld/pasprijs', { pas: $('#gPasKeuze').value, euro: Number($('#gPasEuro').value) }); meld('Pasprijs gezet; de voorwaarden tonen meteen het nieuwe bedrag.'); laadGeld(); }
+  catch (e) { meld(e.message); }
+});
+$('#gComZet').addEventListener('click', async () => {
+  const zaak = $('#gComZaak').value.trim().toUpperCase();
+  try { await api('geld/commissie', zaak ? { code: zaak, pct: Number($('#gComPct').value) } : { genre: $('#gComGenre').value, pct: Number($('#gComPct').value) }); meld('Vergoeding gezet.'); laadGeld(); }
+  catch (e) { meld(e.message); }
+});
+$('#gKorZet').addEventListener('click', async () => {
+  try { await api('geld/korting', { genre: $('#gKorGenre').value, pct: Number($('#gKorPct').value) }); meld('Ledenvoordeel gezet; leden zien het bij het afrekenen.'); laadGeld(); }
+  catch (e) { meld(e.message); }
+});
+
 /* de grote hendel: alles bij iedereen aan of uit (intern blijft altijd open) */
 $('#bAllesAan').addEventListener('click', async () => {
   try { const r = await api('boardroom/alles', { aan: true }); meld(r.aantal + ' functies aan gezet.'); openBoard(); } catch (e) { meld(e.message); }

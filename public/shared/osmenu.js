@@ -269,7 +269,29 @@
       'Een website mag de wifi van je toestel niet aan- of uitzetten; dat kan alleen je telefoon zelf, via de instellingen. RTG-OS toont de schakelaar, maar bedient de radio niet.');
     var btRij = vastRij('🔵', 'Bluetooth',
       'Een website mag Bluetooth van je toestel niet aan- of uitzetten; dat kan alleen je telefoon zelf, via de instellingen. RTG-OS toont de schakelaar, maar bedient de radio niet.');
-    lijf.appendChild(sectie('📡', 'Verbinding', [gpsRij, wifiRij, btRij], false));
+    // Zaakdoos: het lokale kastje van de zaak. Staat er een adres, dan probeert
+    // elke app dat eerst en valt terug op de cloud als de doos niet reageert.
+    function doosRij() {
+      var rij = el('div', 'osmenu-conn');
+      rij.appendChild(el('span', 'ic', '🖧'));
+      var tl = el('div', 'tl');
+      tl.appendChild(el('b', null, 'Zaakdoos'));
+      var opdoos = w.RTGdoos && w.RTGdoos.opDeDoos && w.RTGdoos.opDeDoos();
+      tl.appendChild(el('small', null, opdoos ? 'Nu verbonden met de Zaakdoos' : 'Adres van het kastje in de zaak'));
+      rij.appendChild(tl);
+      var inp = d.createElement('input');
+      inp.type = 'url'; inp.placeholder = 'http://…'; inp.setAttribute('aria-label', 'Zaakdoos-adres');
+      inp.value = (w.RTGdoos && w.RTGdoos.adres && w.RTGdoos.adres()) || '';
+      inp.style.cssText = 'flex:none;width:9rem;max-width:42vw;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:inherit;font:inherit;font-size:.8rem;padding:.35rem .5rem;';
+      var bwr = el('button', 'osmenu-mini'); bwr.type = 'button'; bwr.textContent = 'Bewaar';
+      bwr.addEventListener('click', function () {
+        if (w.RTGdoos) { w.RTGdoos.instellen(inp.value); w.RTGdoos.uit(false); }
+        if (inp.value.trim() && w.RTGdoos && w.RTGdoos.naarDoos) w.RTGdoos.naarDoos();
+      });
+      rij.appendChild(inp); rij.appendChild(bwr);
+      return rij;
+    }
+    lijf.appendChild(sectie('📡', 'Verbinding', [gpsRij, wifiRij, btRij, doosRij()], false));
 
     // ---- instellingen (incl. afmelden) ----
     var instKinderen = [

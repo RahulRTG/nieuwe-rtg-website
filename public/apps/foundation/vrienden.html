@@ -312,10 +312,43 @@ function renderMeekijk(kinderen){
   $('#meekijk').innerHTML = kinderen.map(k=>
     '<div class="rij"><span class="av">'+initcn(k.codenaam)+'</span><div class="nm">'+esc(k.codenaam)+'<small>jij voegt vrienden toe en kijkt mee</small></div>'+
     '<button class="knop mini" data-voeg="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">➕ Vriend</button>'+
-    '<button class="knop grijs mini" data-kijk="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Bekijk</button></div>'
+    '<button class="knop grijs mini" data-kijk="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Bekijk</button>'+
+    '<button class="knop grijs mini" data-board="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">🎛️ Boardroom</button></div>'
   ).join('');
   $('#meekijk').querySelectorAll('[data-kijk]').forEach(b=> b.addEventListener('click', ()=> kindContacten(b.dataset.kijk, b.dataset.cn)));
   $('#meekijk').querySelectorAll('[data-voeg]').forEach(b=> b.addEventListener('click', ()=> ouderVoegt(b.dataset.voeg, b.dataset.cn)));
+  $('#meekijk').querySelectorAll('[data-board]').forEach(b=> b.addEventListener('click', ()=> kindBoard(b.dataset.board, b.dataset.cn)));
+}
+
+/* De boardroom van een beschermd kind: de ouder/beheerder zet functies aan/uit.
+   Server bewaakt het gezinsverband; kind-functies (paspoort, Pay, Care) staan
+   er niet op. Een lichte overlay met schakelaars per groep. */
+async function kindBoard(kindHandle, cn){
+  let d; try{ d = await soc('/kind/boardroom', { kindHandle }); }catch(e){ alert(e.message); return; }
+  const oud = $('#kindBoardOverlay'); if (oud) oud.remove();
+  const groepen = (d.bord && d.bord.categorieen) || [];
+  const paneel = E('div',{class:'kaart', style:'max-width:26rem;width:92vw;max-height:80vh;overflow:auto;'},
+    E('div',{class:'sec', style:'margin-top:0'}, 'Boardroom van '+cn),
+    ...groepen.map(cat => E('div',{style:'margin:.6rem 0'},
+      E('div',{class:'sec', style:'margin:.4rem 0 .2rem'}, cat.naam),
+      ...cat.functies.map(fn => {
+        const inp = E('input',{type:'checkbox'});
+        inp.checked = !!fn.aan;
+        inp.addEventListener('change', async ()=>{
+          inp.disabled = true;
+          try{ await soc('/kind/boardroom/zet', { kindHandle, id:fn.id, aan:inp.checked }); }
+          catch(e){ inp.checked = !inp.checked; alert(e.message); }
+          inp.disabled = false;
+        });
+        return E('label',{class:'rij', style:'gap:.7rem;align-items:center;cursor:pointer'},
+          inp, E('div',{class:'nm'}, fn.naam, E('small',{}, fn.uitleg||'')));
+      })
+    )),
+    E('button',{class:'knop grijs mini', style:'margin-top:.6rem', onclick:()=> $('#kindBoardOverlay').remove()}, 'Sluiten')
+  );
+  const overlay = E('div',{id:'kindBoardOverlay', style:'position:fixed;inset:0;z-index:100002;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:1rem'}, paneel);
+  overlay.addEventListener('click', e=>{ if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
 }
 // Een ouder voegt een vriend toe voor zijn kind: op exacte codenaam. De andere
 // kant moet daarna nog zelf accepteren (of diens ouder, als die ook een kind is).

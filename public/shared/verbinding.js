@@ -256,5 +256,89 @@
     noodtekst: noodtekst
   };
 
-  w.RTGNet = { toon: toonBanner, verberg: verbergBanner, fout: fout, haal: haal, status: status, satelliet: w.Satelliet };
+  /* ---------- Zaakdoos-voorkeur ----------
+     Elke app probeert standaard eerst een Zaakdoos (het kastje in de zaak) en
+     valt pas terug op de cloud als er geen doos is. Een browser mag het lokale
+     net niet zelf afscannen, dus dit werkt in drie trappen:
+     1) De app is al vanaf een Zaakdoos geopend (zelfde origin serveert de doos)
+        -> alles loopt al via de doos, die zelf terugvalt op de cloud. Een groen
+        lampje laat dat zien.
+     2) Er is een Zaakdoos-adres ingesteld (localStorage rtg_doos_url): de app
+        probeert dat eerst en stapt erheen (met de sessie mee via de hash), of
+        valt terug op de cloud als de doos niet reageert.
+     3) Niets ingesteld en niet op een doos -> gewoon de cloud. */
+  (function doosLaag() {
+    var DOOS_KEY = 'rtg_doos_url', DOOS_UIT = 'rtg_doos_uit', SESSIE = 'rtg_doos_geprobeerd';
+    function lees(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+    function schrijf(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+    function doosURL() { return lees(DOOS_KEY).trim().replace(/\/$/, ''); }
+    var opDeDoos = false;
+
+    // token-overdracht: kwamen we van de cloud naar de doos met de sessie in de hash?
+    try {
+      var m = /[#&]doos-token=([^&]+)/.exec(location.hash || '');
+      if (m) {
+        try { localStorage.setItem('rtg_member_token', decodeURIComponent(m[1])); } catch (e) {}
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+    } catch (e) {}
+
+    function probe(base, ms) {
+      return new Promise(function (res) {
+        var ctl = w.AbortController ? new AbortController() : null;
+        var t = setTimeout(function () { if (ctl) ctl.abort(); res(false); }, ms || 2500);
+        echteFetch((base || '') + '/api/doos/status', ctl ? { signal: ctl.signal } : {})
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) { clearTimeout(t); res(!!(d && d.doos)); })
+          .catch(function () { clearTimeout(t); res(false); });
+      });
+    }
+    function naarDoos() {
+      var u = doosURL(); if (!u) return;
+      var tok = ''; try { tok = localStorage.getItem('rtg_member_token') || ''; } catch (e) {}
+      location.href = u + location.pathname + location.search + (tok ? '#doos-token=' + encodeURIComponent(tok) : '');
+    }
+    function lampje(soort) {
+      var el = document.getElementById('rtg-doos-pill');
+      if (!soort) { if (el) el.remove(); return; }
+      if (!document.body) { document.addEventListener('DOMContentLoaded', function () { lampje(soort); }); return; }
+      if (!el) {
+        el = document.createElement(soort === 'beschikbaar' ? 'button' : 'div');
+        el.id = 'rtg-doos-pill';
+        el.style.cssText = 'position:fixed;left:.7rem;bottom:.7rem;z-index:99998;display:flex;gap:.4rem;align-items:center;' +
+          'border-radius:999px;padding:.4rem .8rem;font:600 .76rem/1.2 system-ui,-apple-system,sans-serif;border:1px solid;' +
+          'box-shadow:0 4px 16px rgba(0,0,0,.35);' + (soort === 'beschikbaar' ? 'cursor:pointer;' : '');
+        if (soort === 'beschikbaar') { el.type = 'button'; el.addEventListener('click', naarDoos); }
+        document.body.appendChild(el);
+      }
+      if (soort === 'doos') { el.style.background = '#10231a'; el.style.color = '#8fe0b0'; el.style.borderColor = '#2f7d54'; el.textContent = '● Zaakdoos'; el.title = 'Deze app draait via de Zaakdoos in de zaak (valt zelf terug op de cloud).'; }
+      else { el.style.background = '#14202b'; el.style.color = '#cfe0ee'; el.style.borderColor = '#2c3f52'; el.textContent = '◐ Open op de Zaakdoos'; }
+    }
+    function init() {
+      probe('', 2500).then(function (hier) {
+        if (hier) { opDeDoos = true; lampje('doos'); return; }
+        var u = doosURL();
+        if (!u || lees(DOOS_UIT) === '1') return; // geen doos ingesteld of bewust uit: cloud
+        probe(u, 3000).then(function (bereikbaar) {
+          if (!bereikbaar) return; // geen doos gevonden: terugval op de cloud
+          var alGeprobeerd = false;
+          try { alGeprobeerd = sessionStorage.getItem(SESSIE) === '1'; } catch (e) {}
+          if (alGeprobeerd) { lampje('beschikbaar'); return; } // niet in een lus belanden
+          try { sessionStorage.setItem(SESSIE, '1'); } catch (e) {}
+          naarDoos(); // standaard eerst naar de doos
+        });
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+    w.RTGdoos = {
+      opDeDoos: function () { return opDeDoos; },
+      adres: doosURL,
+      instellen: function (url) { schrijf(DOOS_KEY, (String(url || '').trim().replace(/\/$/, '')) || null); },
+      uit: function (v) { schrijf(DOOS_UIT, v ? '1' : null); },
+      naarDoos: naarDoos
+    };
+  })();
+
+  w.RTGNet = { toon: toonBanner, verberg: verbergBanner, fout: fout, haal: haal, status: status, satelliet: w.Satelliet, doos: w.RTGdoos };
 })(window);

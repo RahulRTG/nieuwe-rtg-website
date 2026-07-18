@@ -30,7 +30,7 @@ const VERBODEN = [
 // paden die over geld gaan: eerst een voorstel, dan pas doen (na bevestiging)
 const GELD = /(betaal|\/pay(\/|$)|\/tik|giftcard|verreken|refund|terugbetaal)/i;
 
-function maakStuur({ log }) {
+function maakStuur({ log, anthropic, app }) {
 
   /* ---- de poortwachter: mag dit pad überhaupt via het stuur? ---- */
   function stuurToets(pad, body, bevestigd) {
@@ -89,7 +89,66 @@ function maakStuur({ log }) {
     return [...new Set(uit)].sort();
   }
 
-  return { stuurToets, stuurRoep, stuurPaden };
+  /* ---- de tool-lus: Rahul aan het stuur ----
+     Met een AI-sleutel verstaat Rahul een vrije vraag en voert hij hem ook
+     uit, met twee gereedschappen: 'kaart' (welke paden kan ik) en 'doe'
+     (voer uit via het stuur, dus met de inlog en de remmen van hierboven).
+     Zonder sleutel geeft dit null terug en blijven de vaste antwoorden
+     van de assistenten gewoon staan. */
+  const LUS_REGELS = 'Je hebt het stuur van RTG: met de tool "doe" voer je acties uit op de API, ' +
+    'altijd met de inlog van de gebruiker zelf (je kunt dus nooit meer dan zij). Gebruik "kaart" om te zien welke paden er zijn. ' +
+    'Vaste regels: een geld-actie geeft eerst bevestigNodig terug; leg dan in je antwoord voor WAT je gaat doen en voer hem pas uit ' +
+    'met bevestigd=true als het huidige bericht van de gebruiker die actie al expliciet bevestigt. ' +
+    'Beloof nooit toegang tot de Lifestyle of Business Pass (dat beslist een mens), voer geen echte hotel- of luchtvaartmerken op als partner, ' +
+    'en zeg eerlijk wat er wel en niet gelukt is. Antwoord kort, in de taal van de vraag.';
+
+  async function stuurLus(req, opties) {
+    if (!anthropic) return null;
+    const vraag = String((opties && opties.vraag) || '').trim().slice(0, 600);
+    if (!vraag) return null;
+    const paden = () => stuurPaden(app, null).filter(opties.filter || (() => true));
+    const tools = [
+      { name: 'kaart', description: 'De lijst API-paden (POST) die je met "doe" kunt aanroepen.',
+        input_schema: { type: 'object', properties: {} } },
+      { name: 'doe', description: 'Voer een actie uit op een RTG API-pad (POST), met de inlog van de gebruiker.',
+        input_schema: { type: 'object', properties: {
+          pad: { type: 'string' }, body: { type: 'object' }, bevestigd: { type: 'boolean' } }, required: ['pad'] } }
+    ];
+    const messages = [{ role: 'user', content: vraag }];
+    const acties = [];
+    try {
+      for (let stap = 0; stap < 6; stap++) {
+        const resp = await anthropic.messages.create({
+          model: 'claude-sonnet-5', max_tokens: 700,
+          system: (opties.systeem || '') + '\n' + LUS_REGELS, tools, messages
+        });
+        const wilTools = resp.content.filter(c => c.type === 'tool_use');
+        if (!wilTools.length || resp.stop_reason !== 'tool_use') {
+          const tekst = resp.content.filter(c => c.type === 'text').map(c => c.text).join('').trim();
+          return { tekst: tekst || 'Gedaan.', acties };
+        }
+        messages.push({ role: 'assistant', content: resp.content });
+        const uitkomsten = [];
+        for (const t of wilTools) {
+          let uit;
+          if (t.name === 'kaart') uit = { paden: paden() };
+          else {
+            uit = await stuurRoep(req, String((t.input || {}).pad || ''), (t.input || {}).body,
+              { bevestigd: (t.input || {}).bevestigd === true });
+            acties.push({ pad: (t.input || {}).pad, status: uit.status });
+          }
+          uitkomsten.push({ type: 'tool_result', tool_use_id: t.id, content: JSON.stringify(uit).slice(0, 6000) });
+        }
+        messages.push({ role: 'user', content: uitkomsten });
+      }
+    } catch (e) {
+      try { log && log.warn && log.warn('stuurlus', { fout: (e && e.message || '').slice(0, 120) }); } catch (e2) {}
+      return null; // de vaste antwoorden vangen het op
+    }
+    return { tekst: 'Daar kwam ik binnen de tijd niet helemaal uit; zeg het iets specifieker en ik doe het alsnog.', acties };
+  }
+
+  return { stuurToets, stuurRoep, stuurPaden, stuurLus };
 }
 
 module.exports = { maakStuur };

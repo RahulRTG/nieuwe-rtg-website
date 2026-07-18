@@ -2,13 +2,13 @@
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
   const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
-    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel,
+    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
     oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht } = kern;
 
   /* De collega-, dienst- en ooglaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const actx = { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
-    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel,
+    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
     oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht };
   require('./staff/collega')(actx);
   require('./staff/dienst')(actx);

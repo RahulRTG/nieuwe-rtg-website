@@ -5,7 +5,7 @@
 module.exports = (kern) => {
   const { app, auth, liveCodename, verdienPunten,
     zorgVan, zorgZet, locDeel, locStopKlant, locMijn,
-    fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus,
+    fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, stuurLus,
     assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap,
     careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, careIntakeDeel, careIntakeStop,
     carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn } = kern;
@@ -39,6 +39,19 @@ app.post('/api/fluister', auth, async (req, res) => {
   // de sessie reist mee zodat Fluister ook kan doen (reserveren, 24 uur plannen)
   const r = await fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  /* Rahul aan het stuur: pakten de eigen regels het gesprek NIET op
+     (pakte=false), dan mag hij het met het AI-stuur alsnog echt DOEN;
+     alles wat het lid zelf kan, met de eigen inlog en de geld-drempel.
+     Zonder AI-sleutel bestaat stuurLus niet en blijft alles zoals het was. */
+  if (stuurLus && !r.pakte) {
+    const lus = await stuurLus(req, {
+      vraag: req.body.q,
+      filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/foundation', '/api/partner'].some(w => p.startsWith(w)),
+      systeem: require('../../kern/rahul').RAHUL_LEAD +
+        'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app.'
+    });
+    if (lus && lus.tekst) return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
+  }
   res.json(r);
 });
 app.post('/api/fluister/profiel', auth, (req, res) => {

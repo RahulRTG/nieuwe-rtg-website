@@ -2759,7 +2759,7 @@ Object.assign(kern, require('./kern/office').maakOffice({
 /* Het AI-stuur (kern/stuur.js): Rahul voert acties uit op elk toegestaan
    API-pad, als interne aanroep met de eigen inlog van de gebruiker. Een
    codepad, dezelfde rechten en dezelfde schakelkast als de app-knoppen. */
-Object.assign(kern, require('./kern/stuur').maakStuur({ log }));
+Object.assign(kern, require('./kern/stuur').maakStuur({ log, anthropic, app }));
 /* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
    De cryptografie komt uit @simplewebauthn/server; wij bewaren alleen
    publieke sleutels per account, challenges leven kort en in RAM.

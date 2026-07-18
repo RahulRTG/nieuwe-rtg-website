@@ -116,20 +116,20 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
     return A('Vandaag: ' + today.staff.map(x => x.name + ' ' + x.shift).join('; ') + '. Het volledige rooster staat in de personeels-app.');
   }
 
-  // vrije vraag: Claude met bedrijfscontext, anders hulptekst
-  if (anthropic) {
-    try {
-      const p = posDay(s.code);
-      const ctx = 'Bedrijf: ' + s.name + ' (' + s.type + ', ' + s.city + '). Vandaag ontvangen: € ' + p.total + '. ' +
-        'Kamers: ' + (s.rooms || []).map(r => r.name + '=' + ((r.hk && r.hk.status) || 'schoon')).join(', ') + '. ' +
-        'Open klussen: ' + (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length + '.';
-      const response = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 300,
-        system: require('../../kern/rahul').RAHUL_LEAD + 'je bent de AI-assistent van een RTG-partner. Antwoord kort en concreet in de taal van de vraag. Context: ' + ctx,
-        messages: [{ role: 'user', content: q }]
-      });
-      return A(response.content[0].text);
-    } catch (e) { /* val terug op hulptekst */ }
+  // vrije vraag: Rahul aan het stuur; hij beantwoordt niet alleen, hij DOET
+  // (alles wat de zaak zelf kan, met de eigen inlog en de geld-drempel)
+  if (kern.stuurLus) {
+    const p = posDay(s.code);
+    const ctx = 'Bedrijf: ' + s.name + ' (' + s.type + ', ' + s.city + '). Vandaag ontvangen: € ' + p.total + '. ' +
+      'Kamers: ' + (s.rooms || []).map(r => r.name + '=' + ((r.hk && r.hk.status) || 'schoon')).join(', ') + '. ' +
+      'Open klussen: ' + (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length + '.';
+    const lus = await kern.stuurLus(req, {
+      vraag: q,
+      filter: pd => pd.startsWith('/api/supplier') || pd.startsWith('/api/staff'),
+      systeem: require('../../kern/rahul').RAHUL_LEAD +
+        'Je bent de AI-assistent van een RTG-partner (ingelogd: ' + ((req.actor && req.actor.name) || 'Beheer') + '). Context: ' + ctx
+    });
+    if (lus && lus.tekst) return A(lus.tekst, lus.acties.some(a => a.status < 400));
   }
   return A('Dat begrijp ik nog niet helemaal. U kunt mij bijvoorbeeld vragen: "dagomzet", "welke kamers zijn vuil", "zet Riverside suite op schoon", "meld Garden kamer defect: douche lekt", "open de voordeur", "meld klus: lamp vervangen", "wie is er onderweg", "onbeantwoorde berichten", "welke minibars nog tellen" of "open bestellingen".');
 });

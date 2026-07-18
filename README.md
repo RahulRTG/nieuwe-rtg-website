@@ -60,6 +60,16 @@ ANTHROPIC_API_KEY=sk-ant-... npm start
 
 Zonder key geeft de AI vaste demo-antwoorden.
 
+Met key krijgt Rahul bovendien **het AI-stuur** (`server/kern/stuur.js`): in de
+drie assistenten (leden-app, partner-app, personeels-PDA) voert hij vrije
+opdrachten echt uit, via interne aanroepen op de gewone API met de inlog van
+de gebruiker zelf. Hij kan dus alles wat de gebruiker via de knoppen kan en
+nooit meer: dezelfde auth, dezelfde functie-schakelkast, dezelfde limieten.
+Accounts, het techniekbord en de zaakdoos zijn verboden terrein, en elke
+geld-actie vraagt eerst een expliciete bevestiging. De losse endpoints
+(`/api/member/doe`, `/api/supplier/doe`, `/api/staff/doe` + `/kaart`) werken
+ook zonder key en de boardroom kan de functie `stuur` per doelgroep sluiten.
+
 ## Tests
 
 ```bash

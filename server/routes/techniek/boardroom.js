@@ -162,8 +162,11 @@ module.exports = (tctx) => {
     } else {
       cur.aan = aan;
     }
+    // de tegenhanger volgt automatisch (dezelfde regel als in de kantoren-boardroom)
+    const ookGeschakeld = functies.volgKoppels(f.id, t.functies);
     save();
-    res.json({ ok: true, id: f.id, status: functies.functieStatus(f.id, t.functies) });
+    res.json({ ok: true, id: f.id, status: functies.functieStatus(f.id, t.functies),
+      ookGeschakeld: ookGeschakeld.length ? ookGeschakeld : undefined });
   });
 
   // Storing melden of herstellen (oranje aan/uit): { id, storing:bool, reden }.
@@ -225,6 +228,8 @@ module.exports = (tctx) => {
       else if (w.doelgroep) { cur.perDoelgroep = cur.perDoelgroep || {}; cur.perDoelgroep[w.doelgroep] = w.aan; }
       else cur.aan = w.aan;
       toegepast++;
+      // de tegenhanger volgt automatisch mee (dezelfde regel als bij direct schakelen)
+      functies.volgKoppels(w.id, t.functies);
     }
     save();
     res.json({ ok: true, toegepast, fouten: fouten.length ? fouten : undefined, functies: functies.catalogus(t.functies) });

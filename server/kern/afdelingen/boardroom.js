@@ -50,6 +50,19 @@ module.exports = (ctx) => {
 
   /* ---------- de boardroom ---------- */
   function functiesStand() { if (!d().techniek) d().techniek = {}; if (!d().techniek.functies) d().techniek.functies = {}; return d().techniek.functies; }
+
+  /* De tegenhangers (KOPPELS in de catalogus): na een schakeling volgt de
+     andere kant van dezelfde dienst automatisch. De regel zelf woont in de
+     functies-motor (volgKoppels), zodat elke boardroom dezelfde koppeling
+     toepast; hier komen alleen de audit en het bewaren bij. */
+  function volgKoppels(id, wie) {
+    const gevolgd = functies.volgKoppels(id, functiesStand());
+    for (const g of gevolgd)
+      audit(wie || 'boardroom', 'Tegenhanger ' + g.functie + ' automatisch ' + (g.aan ? 'AAN' : 'UIT') + ' (gekoppeld aan ' + id + ')');
+    if (gevolgd.length) save();
+    return gevolgd;
+  }
+
   function schakel(id, aan, doelgroep, wie) {
     if (!functies.OP_ID[id]) return { status: 404, error: 'Onbekende functie.' };
     const st = functiesStand();
@@ -63,7 +76,8 @@ module.exports = (ctx) => {
     }
     save();
     audit(wie || 'boardroom', 'Functie ' + id + (doelgroep ? ' voor ' + doelgroep : '') + ' ' + (aan === true ? 'AAN' : 'UIT') + ' gezet');
-    return { ok: true, functie: id, aan: aan === true, doelgroep: doelgroep || null };
+    const ookGeschakeld = volgKoppels(id, wie);
+    return { ok: true, functie: id, aan: aan === true, doelgroep: doelgroep || null, ookGeschakeld };
   }
 
   /* De leveranciers-regie: een functie per GENRE zaken open of dicht (bijv.
@@ -155,6 +169,8 @@ module.exports = (ctx) => {
       ok: true,
       kamers: kamers().kamers,
       functies: cat, doelgroepen: functies.DOELGROEPEN,
+      koppels: (functies.KOPPELS || []).map(k => ({ a: k.a, b: k.b,
+        aNaam: (functies.OP_ID[k.a] || {}).naam, bNaam: (functies.OP_ID[k.b] || {}).naam, uitleg: k.uitleg })),
       genreRegels: genreRegels(),
       genreStandaard: genreStandaard(),
       genres: Object.entries(d().supplierTypes || {}).map(([id, t]) => ({ id, label: t.label, icon: t.icon })),

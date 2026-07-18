@@ -1,7 +1,7 @@
 /* Functieschakelaars (deelmodule): de toegangsmotor: pad-matching (langste
    prefix wint), de aan/uit-assen (globaal, doelgroep, land, persoon) en de
    nette blokkadereden voor de gebruiker. */
-const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID } = require('./register');
+const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS } = require('./register');
 function prefixLengte(pad, prefix) {
   if (!pad.startsWith(prefix)) return 0;
   const rest = pad.slice(prefix.length);
@@ -96,6 +96,31 @@ function heeftGenreRegels(staat) {
   return false;
 }
 
+/* Tegenhangers volgen. Na een schakeling van functie `id` krijgen de
+   gekoppelde functies (KOPPELS in de catalogus) dezelfde effectieve stand,
+   zodat er nooit een halve dienst overblijft. "Effectief aan" is de "nog
+   publiek?"-vraag: globaal aan EN minstens een doelgroep open. Muteert de
+   staat (de aanroeper bewaart) en geeft terug wat er meeging; alleen directe
+   partners, geen kettingreacties. Per-doelgroep fijnregeling op de
+   tegenhanger zelf blijft staan en kan hem alsnog dicht houden. */
+function volgKoppels(id, staat) {
+  const gevolgd = [];
+  const bron = OP_ID[id];
+  if (!bron || !staat) return gevolgd;
+  const effectief = f => functieAan(f.id, staat) && (f.doelgroepen || []).some(dg => functieAanVoor(f.id, dg, staat));
+  for (const k of KOPPELS) {
+    const anderId = k.a === id ? k.b : (k.b === id ? k.a : null);
+    if (!anderId) continue;
+    const ander = OP_ID[anderId];
+    const stand = effectief(bron);
+    if (effectief(ander) === stand) continue; // al gelijk: niets te doen
+    if (!staat[anderId]) staat[anderId] = {};
+    staat[anderId].aan = stand;
+    gevolgd.push({ functie: anderId, naam: ander.naam, aan: stand, want: k.uitleg });
+  }
+  return gevolgd;
+}
+
 /* Kernvraag voor de middleware: is dit pad geblokkeerd (voor dit verzoek)?
    ctx = { doelgroep, land, persoon }. Geeft { functie, reden } terug of null.
    Een simpele string als ctx wordt als doelgroep gelezen (achterwaarts compat). */
@@ -131,4 +156,4 @@ function doelgroepVanVerzoek(pad, user) {
 
 module.exports = { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
   heeftLandRegels, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd,
-  doelgroepVanVerzoek, tierNaarDoelgroep };
+  doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels };

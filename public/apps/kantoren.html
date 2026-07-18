@@ -583,20 +583,36 @@ async function openBoard(){
     (uitzonderingen.length ? '<br>Uitzonderingen (open buiten de standaard): ' + uitzonderingen.map(r => esc(r.naam) + ' voor ' + esc(r.genre)).join(' · ') : '') +
     (!dichtRegels.length && !uitzonderingen.length && !(d.genreStandaard || []).length ? 'Geen genre-regels; elke werk-app staat open voor elk genre.' : '');
   $('#bTelling').textContent = d.functiesUit ? '(' + d.functiesUit + ' uit)' : '(alles staat aan)';
-  $('#bSchakels').innerHTML = d.functies.map(g =>
+  const koppelKaart = (d.koppels && d.koppels.length)
+    ? '<div class="kaart cat"><h4>Gekoppelde schakelaars (de tegenhanger volgt automatisch)</h4>' +
+      d.koppels.map(k => '<div class="fx"><div class="nm">' + esc(k.aNaam) + ' ⇄ ' + esc(k.bNaam) +
+        '<small>' + esc(k.uitleg) + '</small></div></div>').join('') + '</div>'
+    : '';
+  $('#bSchakels').innerHTML = koppelKaart + d.functies.map(g =>
     '<div class="kaart cat"><h4>'+esc(g.categorie)+'</h4>'+g.functies.map(f =>
       '<div class="fx"><div class="nm">'+esc(f.naam)+(f.storing ? ' ⚠️' : '')+'<small>'+esc(f.uitleg || '')+'</small></div>'+
       '<div class="dgchips">'+(f.doelgroepen || []).map(dg =>
         '<button type="button" class="dg'+(dg.aan ? '' : ' uit')+'" data-fx="'+f.id+'" data-dg="'+dg.id+'" data-aan="'+dg.aan+'" title="'+esc(dg.naam)+' aan of uit">'+esc(dg.naam)+'</button>').join('')+'</div>'+
       '<button type="button" class="wip" role="switch" aria-checked="'+(f.aan ? 'true' : 'false')+'" data-schakel="'+f.id+'" aria-label="'+esc(f.naam)+' aan of uit"></button></div>').join('')+'</div>').join('');
+  // de tegenhanger-melding: als de server een gekoppelde functie meeschakelde
+  // (Salon en partner-Salon, solliciteren en vacatures) zeggen we dat erbij en
+  // spiegelt de betreffende schakelaar meteen mee op het bord
+  const meldMetKoppels = (r, basis) => {
+    const ook = (r && r.ookGeschakeld) || [];
+    for (const g of ook) {
+      const w2 = $('#bSchakels').querySelector('[data-schakel="' + g.functie + '"]');
+      if (w2) w2.setAttribute('aria-checked', String(!!g.aan));
+    }
+    meld(basis + (ook.length ? ' Tegenhanger volgde mee: ' + ook.map(g => g.naam + ' ' + (g.aan ? 'aan' : 'uit')).join(', ') + '.' : ''));
+  };
   $('#bSchakels').querySelectorAll('[data-schakel]').forEach(w => w.addEventListener('click', async () => {
     const naarAan = w.getAttribute('aria-checked') !== 'true';
-    try { await api('boardroom/schakel', { functie: w.dataset.schakel, aan: naarAan }); w.setAttribute('aria-checked', String(naarAan)); meld(naarAan ? 'Aan gezet.' : 'Uit gezet.'); }
+    try { const r = await api('boardroom/schakel', { functie: w.dataset.schakel, aan: naarAan }); w.setAttribute('aria-checked', String(naarAan)); meldMetKoppels(r, naarAan ? 'Aan gezet.' : 'Uit gezet.'); }
     catch (e) { meld(e.message); }
   }));
   $('#bSchakels').querySelectorAll('[data-fx][data-dg]').forEach(c => c.addEventListener('click', async () => {
     const naarAan = c.dataset.aan !== 'true';
-    try { await api('boardroom/schakel', { functie: c.dataset.fx, doelgroep: c.dataset.dg, aan: naarAan }); c.dataset.aan = String(naarAan); c.classList.toggle('uit', !naarAan); meld('Voor deze doelgroep ' + (naarAan ? 'aan' : 'uit') + ' gezet.'); }
+    try { const r = await api('boardroom/schakel', { functie: c.dataset.fx, doelgroep: c.dataset.dg, aan: naarAan }); c.dataset.aan = String(naarAan); c.classList.toggle('uit', !naarAan); meldMetKoppels(r, 'Voor deze doelgroep ' + (naarAan ? 'aan' : 'uit') + ' gezet.'); }
     catch (e) { meld(e.message); }
   }));
 }

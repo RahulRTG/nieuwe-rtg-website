@@ -172,4 +172,28 @@ if (Object.keys(OP_ID).length !== FUNCTIES.length) {
   throw new Error('functie-catalogus: dubbele id(s): ' + dubbel.join(', '));
 }
 
-module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID };
+/* Tegenhangers: twee functies die samen EEN dienst vormen (de leden-kant en de
+   werk-kant). Zet de boardroom de ene kant om, dan volgt de andere kant
+   automatisch, zodat er nooit een halve dienst overblijft (vacatures zonder
+   sollicitanten, een Salon-feed zonder partner-marketing). De regel is de
+   "nog publiek?"-vraag: de tegenhanger volgt of de bron nog ergens aan staat.
+   Alleen directe partners volgen (geen kettingreacties), en per-doelgroep
+   fijnregeling op de tegenhanger zelf blijft gerespecteerd. */
+const KOPPELS = [
+  { a: 'salon', b: 'supplier-salon',
+    uitleg: 'De ledenfeed en de partner-marketing zijn twee kanten van dezelfde Salon.' },
+  { a: 'member-werk', b: 'supplier-apply',
+    uitleg: 'Solliciteren zonder vacatures werkt niet, en andersom.' },
+  { a: 'werk-rtf', b: 'supplier-apply',
+    uitleg: 'RTF-sollicitaties lopen op dezelfde partner-vacatures.' },
+  { a: 'foundation-school', b: 'office-school',
+    uitleg: 'Het schoolkanaal en de schoolgoedkeuring horen bij elkaar.' },
+  { a: 'verificatie', b: 'paspoort',
+    uitleg: 'Paspoort delen leunt op de identiteitsverificatie.' },
+  { a: 'social', b: 'rtf-contacten',
+    uitleg: 'De familiekoppeling draait op de sociale laag.' }
+];
+for (const k of KOPPELS) if (!OP_ID[k.a] || !OP_ID[k.b])
+  throw new Error('functie-catalogus: koppel verwijst naar onbekende functie: ' + k.a + ' <-> ' + k.b);
+
+module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS };

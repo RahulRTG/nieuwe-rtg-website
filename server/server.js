@@ -2664,7 +2664,11 @@ kern.butlerActies = {
 Object.assign(kern, require('./kern/fluister')({
   db, save, schoon, anthropic, notify,
   reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,
-  acties: kern.butlerActies
+  acties: kern.butlerActies,
+  // de reislaag van De Butler: een hele reis op een vraag, kleding apart
+  // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen
+  verblijfBoek: (session, body) => kern.verblijfBoek(session, liveCodename(session), body),
+  retailLegApart: legApart, retailKlantProfiel: klantProfiel
 }));
 // nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
 // elk half uur, bouwt een index (een datapass voor alle gebruikers) en

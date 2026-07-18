@@ -34,7 +34,7 @@
    object (het 24-uursblok) wordt eerst een voorstel dat u bevestigt met
    "ja" (of afblaast met "nee"). Een tafelreservering blijft direct:
    gratis en altijd annuleerbaar. */
-module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering, assetGebruik, zorgVoor, pay, acties }) => {
+module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering, assetGebruik, zorgVoor, pay, acties, verblijfBoek, retailLegApart, retailKlantProfiel }) => {
   /* De acties-registry: vermogens die pas na deze module op de kern komen
      (bestellen, tickets, ritten worden in routes/member.js geregistreerd,
      want daar wonen die regels). Het contract: elke actie is een functie
@@ -129,10 +129,17 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   /* ---- het doe-deel: voerUit + fluisterZeg wonen in fluister/acties.js ----
      Het geheugen, de seintjes en de stand blijven hier; de acties krijgen ze
      via de context mee. */
+  /* De reislaag (hele reis op een vraag, kleding, voorspellen) draait als
+     eigen submodule en haakt via de context in fluisterZeg en voerUit. */
+  const { butlerExtra, voerReisUit, voerKledingUit } = require('./fluister/reis')({
+    db, save, acties, reserveerTafel, zorgVoor, eur, datumInZin, plusDagen, nu,
+    verblijfBoek, retailLegApart, retailKlantProfiel });
+
   const { voerUit, fluisterZeg } = require('./fluister/acties')({
     db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
-    fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin });
+    fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
+    butlerExtra, voerReisUit, voerKledingUit });
 
   return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle };
 };

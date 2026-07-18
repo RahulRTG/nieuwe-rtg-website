@@ -7,7 +7,8 @@
 module.exports = (ctx) => {
   const { db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
-    fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin } = ctx;
+    fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
+    butlerExtra, voerReisUit, voerKledingUit } = ctx;
 
   async function voerUit(key, codenaam, w, sess) {
     // bestellen: plaatsen en direct afrekenen via exact dezelfde functies
@@ -66,6 +67,9 @@ module.exports = (ctx) => {
       if (!betaald) return { tekst: 'Dat lukt niet: ' + (mis || 'de verzoeken zijn al weg.') };
       return { tekst: 'Gedaan: ' + betaald + ' verzoek(en) betaald, samen ' + eur(w.totaal) + '.' + (mis ? ' Een verzoek lukte niet: ' + mis : ''), gedaan: true };
     }
+    // de reislaag: een hele reis in een keer, of kleding apart leggen
+    if (w.soort === 'reisplan' && voerReisUit) return voerReisUit(key, codenaam, w, sess);
+    if (w.soort === 'kleding' && voerKledingUit) return voerKledingUit(key, codenaam, w);
     return { tekst: 'Dat voorstel ken ik niet meer; zeg het gerust opnieuw.' };
   }
 
@@ -133,6 +137,12 @@ module.exports = (ctx) => {
         p.wacht = null;
         save();
         return klaar('Goed, het gaat niet door. Het voorstel is van tafel.');
+      }
+      // de reislaag: een hele reis op een vraag, kleding kopen en voorspellen
+      // wat er nodig is (kern/fluister/reis.js); null = niet van deze laag
+      if (butlerExtra) {
+        const extra = await butlerExtra(q, p, sess, klaar);
+        if (extra) return extra;
       }
       // "plan mijn dag": een echt dagprogramma uit het echte aanbod, met
       // voor elk onderdeel de zin waarmee ik het meteen regel

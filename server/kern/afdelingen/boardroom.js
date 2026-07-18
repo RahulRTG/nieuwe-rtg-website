@@ -66,6 +66,24 @@ module.exports = (ctx) => {
     return { ok: true, functie: id, aan: aan === true, doelgroep: doelgroep || null };
   }
 
+  /* De grote hendel: ALLES in een keer beschikbaar zetten of sluiten, voor
+     iedereen. De interne functies (doelgroep 'intern': de backoffice zelf)
+     blijven buiten schot, anders sluit de boardroom zichzelf buiten en kan
+     niemand de hendel nog terugzetten. */
+  function schakelAlles(aan, wie) {
+    const st = functiesStand();
+    let n = 0;
+    for (const f of Object.values(functies.OP_ID)) {
+      if ((f.doelgroepen || []).includes('intern')) continue;
+      if (!st[f.id]) st[f.id] = {};
+      st[f.id].aan = aan === true;
+      n++;
+    }
+    save();
+    audit(wie || 'boardroom', 'ALLES ' + (aan === true ? 'AAN' : 'UIT') + ': ' + n + ' functies in een keer geschakeld (interne functies uitgezonderd)');
+    return { ok: true, aan: aan === true, aantal: n };
+  }
+
   /* De verbeterkamer: elke dag verse voorstellen uit de echte cijfers.
      Type 'schakel' heeft een knop die het direct uitvoert; type 'aandacht'
      is een werkpunt voor een kamer; type 'code' gaat naar de ontwikkelstraat. */
@@ -146,5 +164,5 @@ module.exports = (ctx) => {
   }
 
   /* ---------- interne chat met snaps, per kamer ---------- */
-  return { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, bouwVoorstellen, voorstellen, boardroom, platformStats };
+  return { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, schakelAlles, bouwVoorstellen, voorstellen, boardroom, platformStats };
 };

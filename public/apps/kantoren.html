@@ -211,6 +211,11 @@
     <div class="kaart lijst" id="bVoorstellen"></div>
 
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
+    <div class="kaart" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+      <span style="font-size:.82rem;color:var(--soft);flex:1;min-width:14rem;">De grote hendel: alles bij iedereen beschikbaar zetten, of alles in een keer sluiten. De interne backoffice-functies blijven altijd open, zodat u de hendel kunt terugzetten.</span>
+      <button class="knop stil" id="bAllesAan" type="button">Alles aan</button>
+      <button class="knop stil" id="bAllesUit" type="button" style="border-color:var(--burgundy);">Alles uit</button>
+    </div>
     <div class="schakels" id="bSchakels"></div>
   </section>
 
@@ -532,6 +537,14 @@ function tekenVoorstellen(v){
 }
 $('#bVernieuw').addEventListener('click', async () => {
   try { const d = await api('boardroom/verbeter'); tekenVoorstellen(d.verbeterkamer); meld('Verse ronde gelopen.'); } catch (e) { meld(e.message); }
+});
+/* de grote hendel: alles bij iedereen aan of uit (intern blijft altijd open) */
+$('#bAllesAan').addEventListener('click', async () => {
+  try { const r = await api('boardroom/alles', { aan: true }); meld(r.aantal + ' functies aan gezet.'); openBoard(); } catch (e) { meld(e.message); }
+});
+$('#bAllesUit').addEventListener('click', async () => {
+  if (!confirm('Weet u het zeker? Dit sluit ALLE functies voor iedereen (leden, partners en personeel). Alleen de interne backoffice blijft open.')) return;
+  try { const r = await api('boardroom/alles', { aan: false }); meld(r.aantal + ' functies uit gezet.'); openBoard(); } catch (e) { meld(e.message); }
 });
 
 /* de boardroom ververst zichzelf zolang hij openstaat */

@@ -23,4 +23,26 @@
   }
 
   bouw(); bouwDots();
+
+  /* De app-regie van de RTG-boardroom: apps die voor deze pas zijn uitgezet
+     verdwijnen van het springboard (de server weigert hun API's sowieso al;
+     dit houdt het scherm eerlijk). De sleutel hier is de functie-id op het
+     schakelbord; alles wat niet genoemd wordt, blijft gewoon staan. */
+  const REGIE = { spelen: 'spellen', podium: 'podium', flits: 'flits', theater: 'theater',
+    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov' };
+  (function () {
+    let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
+    if (!tok) return;
+    fetch('/api/member/apps', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (!d || !Array.isArray(d.uit) || !d.uit.length) return;
+        const uit = new Set(d.uit);
+        let anders = false;
+        for (const sleutel of Object.keys(REGIE))
+          if (uit.has(REGIE[sleutel]) && LINKS[sleutel]) { delete LINKS[sleutel]; anders = true; }
+        if (anders) bouw();
+      }).catch(() => {});
+  })();
 })();

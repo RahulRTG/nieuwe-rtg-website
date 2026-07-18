@@ -3,9 +3,22 @@
    overige leden-routes wonen in behapbare submodules onder routes/member/.
    De helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { app, auth, stateFor, geenGast, lidBoard, lidBoardZet } = kern;
+  const { app, auth, db, stateFor, geenGast, lidBoard, lidBoardZet } = kern;
+  const functies = require('../functies');
 
   app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));
+
+  /* De app-regie van de RTG-boardroom, gezien vanaf deze pas: welke functies
+     staan voor dit lid uit? Het OS-springboard verbergt die apps; de API
+     weigert ze sowieso al (de toegangsmotor bewaakt elke route). */
+  app.post('/api/member/apps', auth, (req, res) => {
+    const staat = db.data && db.data.techniek && db.data.techniek.functies;
+    const dg = functies.tierNaarDoelgroep(req.session.tier);
+    const uit = !staat ? [] : functies.FUNCTIES
+      .filter(f => functies.blokkadeReden(f.id, staat, { doelgroep: dg, persoon: req.session.key }))
+      .map(f => f.id);
+    res.json({ uit });
+  });
 
   /* De eigen boardroom van het lid: het schakelbord met alle functies (app-
      onderdelen, privacy & sociaal, AI & meldingen, verbindingen). Alleen voor een

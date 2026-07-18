@@ -41,9 +41,9 @@ module.exports = ({ db, save, crypto, anthropic, ledenAantal }) => {
   Object.assign(ctx, deelKantoor);
   const deelBewaking = require('./afdelingen/bewaking')(ctx);
   Object.assign(ctx, deelBewaking);
-  const { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, bouwVoorstellen, voorstellen, boardroom, platformStats } = deelBoardroom;
+  const { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, schakelAlles, bouwVoorstellen, voorstellen, boardroom, platformStats } = deelBoardroom;
   const { chatRij, chatLijst, chatStuur, HUISREGELS, ONBOARDING_EXTRA, onboarding, dienstRij, dienstIn, dienstUit, dienstNu } = deelKantoor;
   const { paniekRij, paniekStel, paniekBesluit, paniekBericht, paniekLijst, auditRij, audit, laatstePerDoos, opdrachtRij, wereld, wereldActie, opdrachtVoorDoos } = deelBewaking;
 
-  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, schakel, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, wereld, wereldActie, opdrachtVoorDoos, audit, KAMER_IDS } };
+  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, schakel, schakelAlles, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, wereld, wereldActie, opdrachtVoorDoos, audit, KAMER_IDS } };
 };

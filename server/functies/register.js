@@ -5,6 +5,7 @@ const CATEGORIEEN = [
   'Leden (RTG-app)',
   'Genres & diensten',
   'Sociaal (De Salon)',
+  'Eigen apps',
   'Partners (leveranciers)',
   'RTG-Backoffice',
   'RTFoundation',
@@ -77,6 +78,27 @@ const FUNCTIES = [
   { id: 'rtf-contacten', categorie: 'Sociaal (De Salon)', naam: 'RTF contacten & familiekoppeling', standaard: true, doelgroepen: LEDEN_RTF,
     uitleg: 'De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.', paden: ['/api/rtf'] },
 
+  // ---- Eigen apps: elke RTG-app als eigen schakelaar. De standaardindeling
+  // is bewust ALLES AAN voor IEDEREEN (premium, ook aan de onderkant); de
+  // boardroom stuurt per pas of doelgroep bij. Vaste veiligheidsregels (18+,
+  // verificatie, kinderbescherming) blijven altijd gelden, ook als een app aan staat.
+  { id: 'spellen', categorie: 'Eigen apps', naam: 'Spelen (spellen met vrienden)', standaard: true, doelgroepen: LEDEN_RTF,
+    uitleg: 'Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.', paden: ['/api/member/spel', '/api/rtf/spel'] },
+  { id: 'podium', categorie: 'Eigen apps', naam: 'RTG Podium (livestreams, 18+)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Het eigen livekanaal met chat, RTG Pay-cadeaus en abonnementen. De 18+/verificatie-eis blijft altijd gelden.', paden: ['/api/podium'] },
+  { id: 'theater', categorie: 'Eigen apps', naam: 'RTG Theater (video)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De videobibliotheek op bioscoopniveau, inclusief het Thuisarchief (P2P).', paden: ['/api/theater'] },
+  { id: 'flits', categorie: 'Eigen apps', naam: 'RTG Flits (rijscherm)', standaard: true, doelgroepen: ['rtg', 'lifestyle', 'business', 'personeel'],
+    uitleg: 'Het rijscherm met meldingen uit het eigen netwerk (flitser, file, ongeval) en de vooruitblik.', paden: ['/api/flits', '/api/staff/flits'] },
+  { id: 'ov', categorie: 'Eigen apps', naam: 'RTG OV (reizen)', standaard: true, doelgroepen: ['rtg', 'lifestyle', 'business', 'leverancier', 'personeel'],
+    uitleg: 'Alle vervoer in een app: de kaart, twee snelle check-ins, de dienst-PDA en de routetekenaar.', paden: ['/api/ov', '/api/staff/ov', '/api/supplier/ov'] },
+  { id: 'wbw', categorie: 'Eigen apps', naam: 'Wie betaalt wat', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Groepsuitgaven met een live balans en verrekenen via RTG Pay.', paden: ['/api/wbw'] },
+  { id: 'oog', categorie: 'Eigen apps', naam: 'RTG Eye (werkvloer-camera)', standaard: true, doelgroepen: ['leverancier', 'personeel'],
+    uitleg: 'De camerablik van de werkvloer: voertuigschouw en het handsfree uitgifteregister.', paden: ['/api/staff/oog', '/api/supplier/oog'] },
+  { id: 'ghost', categorie: 'Eigen apps', naam: 'Ghost Driver (simulatie)', standaard: true, doelgroepen: ['leverancier', 'intern'],
+    uitleg: 'De voorspellende verkeers- en logistieksimulatie voor vervoerders en de verkeersleiding.', paden: ['/api/supplier/ghost', '/api/office/ghost'] },
+
   // ---- Partners (leveranciers) ----
   { id: 'supplier', categorie: 'Partners (leveranciers)', naam: 'Partner-app (algemeen)', standaard: true, doelgroepen: ['leverancier'],
     uitleg: 'Alle leveranciersfuncties. Uit = partners kunnen niets meer doen (behalve wat hieronder apart aan staat).', paden: ['/api/supplier', '/api/partner'] },
@@ -111,7 +133,9 @@ const FUNCTIES = [
 
   // ---- Betalen & verificatie ----
   { id: 'betalen', categorie: 'Betalen & verificatie', naam: 'Betaalverkeer', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Betalingen (demo of Stripe). Uit = er kan tijdelijk niet betaald worden.', paden: ['/api/betaal'] },
+    uitleg: 'Betalingen (demo of Stripe) en de RTG Pay-wallet. Uit = er kan tijdelijk niet betaald worden.', paden: ['/api/betaal', '/api/pay'] },
+  { id: 'webauthn', categorie: 'Betalen & verificatie', naam: 'Passkeys (WebAuthn)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Inloggen met vingerafdruk, gezicht of beveiligingssleutel. Wachtwoord-inloggen blijft altijd werken.', paden: ['/api/webauthn'] },
   { id: 'verificatie', categorie: 'Betalen & verificatie', naam: 'Identiteitsverificatie (KYC)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.', paden: ['/api/verify'] },
   { id: 'paspoort', categorie: 'Betalen & verificatie', naam: 'Paspoort delen (gecontroleerd)', standaard: true, doelgroepen: ['rtg', 'lifestyle', 'business', 'leverancier'],

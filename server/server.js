@@ -1703,7 +1703,10 @@ app.post('/api/doos/rapport', (req, res) => {
     rttGem: Math.max(0, Math.min(60000, Math.round(Number(b.rttGem) || 0))),
     uitval: Math.max(0, Math.round(Number(b.uitval) || 0)),
     lokaalMin: Math.max(0, Math.round(Number(b.lokaalMin) || 0)),
-    nagespeeld: Math.max(0, Math.round(Number(b.nagespeeld) || 0)), at: Date.now()
+    nagespeeld: Math.max(0, Math.round(Number(b.nagespeeld) || 0)),
+    kloonLeeftijdMin: b.kloonLeeftijdMin == null ? null : Math.max(0, Math.round(Number(b.kloonLeeftijdMin) || 0)),
+    kasStuks: Math.max(0, Math.round(Number(b.kasStuks) || 0)),
+    journaalNu: Math.max(0, Math.round(Number(b.journaalNu) || 0)), at: Date.now()
   });
   db.data.doosRapporten = db.data.doosRapporten.slice(0, 1000);
   save();

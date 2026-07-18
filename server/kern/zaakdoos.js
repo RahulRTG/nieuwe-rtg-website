@@ -24,11 +24,17 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = ({ db, save, log, dataDir }) => {
-  const CLOUD = String(process.env.RTG_DOOS_CLOUD || '').replace(/\/$/, '');
+  // De doos praat met een of meer cloud-adressen (komma-lijst). Zijn het er
+  // meer, dan zijn het replica's (trio/nood): valt de eerste weg, dan pakt de
+  // doos de volgende voordat hij naar lokaal schakelt, en bij herstel keert hij
+  // vanzelf terug naar de primaire (hij kiest elke tik van boven af).
+  const CLOUDS = String(process.env.RTG_DOOS_CLOUD || '').split(',').map(s => s.trim().replace(/\/$/, '')).filter(Boolean);
+  let cloudIdx = 0;
+  const CLOUD = () => CLOUDS[cloudIdx] || '';
   const SLEUTEL = process.env.RTG_DOOS_SLEUTEL || '';
   const GEBRUIKER = process.env.RTG_DOOS_USER || '';
   const WACHTWOORD = process.env.RTG_DOOS_WACHTWOORD || '';
-  const actief = !!CLOUD;
+  const actief = CLOUDS.length > 0;
   // 9+-hardening: een korte gedeelde sleutel is te raden; waarschuw hard
   if (SLEUTEL && SLEUTEL.length < 16) {
     console.warn('[doos] RTG_DOOS_SLEUTEL is korter dan 16 tekens; kies een lange willekeurige sleutel (bijv. openssl rand -hex 24).');
@@ -51,7 +57,13 @@ module.exports = ({ db, save, log, dataDir }) => {
     return db.data.doosJournaal;
   }
   function status() {
-    return { doos: actief, modus, journaal: actief ? journaal().length : 0, laatsteKloon };
+    const kas = kasStats();
+    return {
+      doos: actief, modus, journaal: actief ? journaal().length : 0, laatsteKloon,
+      kloonLeeftijdMin: laatsteKloon ? Math.round((nu() - laatsteKloon) / 60000) : null,
+      kasStuks: kas.stuks, kasBytes: kas.bytes,
+      clouds: CLOUDS.length, actieveCloud: cloudIdx
+    };
   }
   function naarLokaal(reden) {
     if (modus !== 'lokaal') {
@@ -74,7 +86,7 @@ module.exports = ({ db, save, log, dataDir }) => {
     for (const [k, v] of Object.entries(req.headers)) { if (!HOP.includes(k.toLowerCase())) headers[k] = v; }
     let r;
     try {
-      r = await fetch(CLOUD + req.originalUrl, {
+      r = await fetch(CLOUD() + req.originalUrl, {
         method: req.method, headers,
         body: (req.method === 'GET' || req.method === 'HEAD') ? undefined : req,
         duplex: 'half', signal: AbortSignal.timeout(45000)
@@ -135,12 +147,22 @@ module.exports = ({ db, save, log, dataDir }) => {
       return { buf, type };
     } catch (e) { return null; }
   }
+  // hoeveel foto's staan er in de randcache en hoe groot is die (voor het
+  // statuspaneel en het dagrapport)
+  function kasStats() {
+    try {
+      const bins = fs.readdirSync(KAS_DIR).filter(n => n.endsWith('.bin'));
+      let bytes = 0;
+      for (const n of bins) { try { bytes += fs.statSync(path.join(KAS_DIR, n)).size; } catch (e) {} }
+      return { stuks: bins.length, bytes };
+    } catch (e) { return { stuks: 0, bytes: 0 }; }
+  }
 
   /* ---------- de kloon: een verse kopie van de clouddata ---------- */
   async function haalKloon() {
     if (!actief || modus !== 'cloud' || journaal().length) return;
     try {
-      const r = await fetch(CLOUD + '/api/doos/kloon', { headers: { 'x-doos-sleutel': SLEUTEL }, signal: AbortSignal.timeout(60000) });
+      const r = await fetch(CLOUD() + '/api/doos/kloon', { headers: { 'x-doos-sleutel': SLEUTEL }, signal: AbortSignal.timeout(60000) });
       if (!r.ok) return;
       const d = await r.json();
       if (!d || typeof d.data !== 'object' || !d.data) return;
@@ -157,7 +179,7 @@ module.exports = ({ db, save, log, dataDir }) => {
   /* ---------- naspelen na herstel ---------- */
   async function cloudToken() {
     if (cloudTokenCache) return cloudTokenCache;
-    const r = await fetch(CLOUD + '/api/supplier/login', {
+    const r = await fetch(CLOUD() + '/api/supplier/login', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: GEBRUIKER, password: WACHTWOORD }), signal: AbortSignal.timeout(20000)
     });
@@ -192,7 +214,7 @@ module.exports = ({ db, save, log, dataDir }) => {
       const e = rij[0];
       let r;
       try {
-        r = await fetch(CLOUD + e.pad, {
+        r = await fetch(CLOUD() + e.pad, {
           method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
           body: JSON.stringify(herschrijf(e.body, kaart)), signal: AbortSignal.timeout(30000)
         });
@@ -227,7 +249,7 @@ module.exports = ({ db, save, log, dataDir }) => {
     if (!NETWERK || nu() - laatsteMelding < MELD_MS) return;
     laatsteMelding = nu();
     try {
-      const r = await fetch(CLOUD + '/api/doos/meting', {
+      const r = await fetch(CLOUD() + '/api/doos/meting', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
         body: JSON.stringify({ doos: DOOS_NAAM, rtt, modus, journaal: journaal().length, plek: PLEK || undefined }),
         signal: AbortSignal.timeout(10000)
@@ -248,7 +270,7 @@ module.exports = ({ db, save, log, dataDir }) => {
       console.log('[doos] reset-opdracht van het kantoor uitgevoerd: verse kloon binnen');
     } else if (actie === 'hulp') {
       try {
-        await fetch(CLOUD + '/api/doos/rapport', {
+        await fetch(CLOUD() + '/api/doos/rapport', {
           method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
           body: JSON.stringify(dagrapport()), signal: AbortSignal.timeout(10000)
         });
@@ -283,7 +305,7 @@ module.exports = ({ db, save, log, dataDir }) => {
     if (modus !== 'cloud') return false; // onze eigen lijn ligt er ook uit
     b = b || {};
     try {
-      const r = await fetch(CLOUD + '/api/doos/meting', {
+      const r = await fetch(CLOUD() + '/api/doos/meting', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
         body: JSON.stringify({ doos: b.doos, rtt: b.rtt, modus: b.modus, journaal: b.journaal, via: DOOS_NAAM }),
         signal: AbortSignal.timeout(10000)
@@ -300,7 +322,9 @@ module.exports = ({ db, save, log, dataDir }) => {
       doos: DOOS_NAAM, datum: new Date(teller.sinds).toISOString().slice(0, 10),
       pings: teller.pings, rttGem: teller.pings ? Math.round(teller.rttSom / teller.pings) : 0,
       uitval: teller.uitval, lokaalMin: Math.round((teller.lokaalMs + inLokaal) / 60000),
-      nagespeeld: teller.nagespeeld
+      nagespeeld: teller.nagespeeld,
+      kloonLeeftijdMin: laatsteKloon ? Math.round((nu() - laatsteKloon) / 60000) : null,
+      kasStuks: kasStats().stuks, journaalNu: journaal().length
     };
   }
   async function nachtwerk() {
@@ -308,7 +332,7 @@ module.exports = ({ db, save, log, dataDir }) => {
     if (!journaal().length && Object.keys(db.data.doosRefKaart || {}).length > 500) { db.data.doosRefKaart = {}; save(); }
     if (!NETWERK) return;
     try {
-      const r = await fetch(CLOUD + '/api/doos/rapport', {
+      const r = await fetch(CLOUD() + '/api/doos/rapport', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
         body: JSON.stringify(dagrapport()), signal: AbortSignal.timeout(10000)
       });
@@ -319,17 +343,29 @@ module.exports = ({ db, save, log, dataDir }) => {
     } catch (e) { /* geen lijn; de volgende nacht opnieuw */ }
   }
 
+  // Kies de eerste bereikbare cloud, van de primaire af. Zo springt de doos naar
+  // een replica als de primaire wegvalt (zonder onnodig naar lokaal te gaan) en
+  // keert hij vanzelf terug naar de primaire zodra die er weer is.
+  async function kiesCloud() {
+    for (let i = 0; i < CLOUDS.length; i++) {
+      const start = nu();
+      try {
+        const r = await fetch(CLOUDS[i] + '/api/sat/ping', { signal: AbortSignal.timeout(8000) });
+        if (r.ok) return { idx: i, rtt: nu() - start };
+      } catch (e) { /* deze cloud niet bereikbaar; de volgende proberen */ }
+    }
+    return null;
+  }
   async function tik() {
     if (!actief || bezig) return;
     bezig = true;
     try {
-      const start = nu();
-      const r = await fetch(CLOUD + '/api/sat/ping', { signal: AbortSignal.timeout(8000) });
-      if (!r.ok) throw new Error('ping ' + r.status);
-      const rtt = nu() - start;
+      const keus = await kiesCloud();
+      if (!keus) throw new Error('geen enkele cloud bereikbaar');
+      cloudIdx = keus.idx;
       teller.pings++;
-      teller.rttSom += rtt;
-      meldMeting(rtt);
+      teller.rttSom += keus.rtt;
+      meldMeting(keus.rtt);
       if (modus === 'lokaal') {
         // de lijn is terug: eerst het journaal netjes naspelen, dan verse kloon
         if (await speelNa()) {

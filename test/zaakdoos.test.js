@@ -222,3 +222,53 @@ test('de lijn komt terug: het journaal wordt nagespeeld en de cloud kent de acti
   const state = (await api(cloudBase(), '/api/supplier/state', {}, login.body.token)).body.state;
   assert.ok((state.overschot || []).some(o => o.itemId === itemId && o.qty === 2), 'de overschot-melding staat in de cloud');
 });
+
+test('de doos-status toont kloon-leeftijd, randcache en cloud-info', async () => {
+  const st = await (await fetch(doos.base + '/api/doos/status')).json();
+  assert.equal(st.clouds, 1, 'een enkele cloud geconfigureerd');
+  assert.equal(st.actieveCloud, 0, 'op de primaire cloud');
+  assert.equal(typeof st.kasStuks, 'number', 'de randcache-telling staat in de status');
+  assert.ok(st.kasStuks >= 1, 'de eerder gecachete foto telt mee in de randcache');
+  assert.ok(st.kloonLeeftijdMin === null || typeof st.kloonLeeftijdMin === 'number', 'kloon-leeftijd is een getal of null');
+  // het dagrapport draagt de nieuwe velden ook
+  const rap = await (await fetch(doos.base + '/api/doos/rapport')).json();
+  assert.ok('kasStuks' in rap && 'journaalNu' in rap && 'kloonLeeftijdMin' in rap, 'het dagrapport is verrijkt');
+});
+
+test('cloud-failover: valt de primaire cloud weg, dan pakt de doos de replica', async () => {
+  const dirA = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-doos-a-'));
+  const dirB = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-doos-b-'));
+  const dirBox = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-doos-fo-'));
+  const portA = await vrijePoort();
+  const portB = await vrijePoort();
+  const spawnCloud = (port, dir) => spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
+    env: { ...process.env, NODE_ENV: 'test', PORT: String(port), RTG_DATA_DIR: dir, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-2' },
+    stdio: ['ignore', 'ignore', 'inherit']
+  });
+  let cloudA = spawnCloud(portA, dirA);
+  let cloudB = spawnCloud(portB, dirB);
+  let box;
+  try {
+    await wachtOp('/api/health', 'http://127.0.0.1:' + portA);
+    await wachtOp('/api/health', 'http://127.0.0.1:' + portB);
+    box = await startServer({ env: {
+      RTG_DATA_DIR: dirBox, SMTP_URL: '',
+      RTG_DOOS_CLOUD: 'http://127.0.0.1:' + portA + ',http://127.0.0.1:' + portB,
+      RTG_DOOS_SLEUTEL: SLEUTEL, RTG_DOOS_USER: 'rahul', RTG_DOOS_WACHTWOORD: 'Imran',
+      RTG_DOOS_NAAM: 'failoverdoos'
+    } });
+    // online op de primaire (cloud A)
+    const st0 = await wachtOp('/api/doos/status', box.base, d => d.modus === 'cloud' && d.actieveCloud === 0);
+    assert.equal(st0.clouds, 2, 'twee clouds geconfigureerd');
+    // de primaire cloud valt weg
+    cloudA.kill('SIGKILL');
+    // de doos springt naar de replica (cloud B) en blijft doorgeefluik (niet lokaal)
+    const st1 = await wachtOp('/api/doos/status', box.base, d => d.actieveCloud === 1, 120);
+    assert.equal(st1.actieveCloud, 1, 'overgeschakeld naar de replica');
+    assert.equal(st1.modus, 'cloud', 'gebleven als doorgeefluik, niet naar lokaal geschakeld');
+  } finally {
+    if (box) stop(box.child);
+    for (const c of [cloudA, cloudB]) if (c) try { c.kill('SIGKILL'); } catch (e) {}
+    for (const d of [dirA, dirB, dirBox]) try { fs.rmSync(d, { recursive: true, force: true }); } catch (e) {}
+  }
+});

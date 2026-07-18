@@ -67,6 +67,24 @@ test('de boardroom is niet voor gasten (geen account, geen toegang)', async () =
   assert.notEqual(r.status, 200, 'zonder geldig lid-account geen boardroom');
 });
 
+test('handhaving: een uitgezette functie zet ook de API dicht', async () => {
+  const l = await lid('Handhaaf Lid');
+  // standaard aan: de handhaving grijpt niet in (geen functieUit-markering)
+  const voor = await (await l.call('/pay', {})).json().catch(() => ({}));
+  assert.notEqual(voor.functieUit, 'pay', 'pay is standaard toegestaan');
+  // uitzetten in de eigen boardroom
+  await l.call('/member/boardroom/zet', { id: 'pay', aan: false });
+  const dicht = await l.call('/pay', {});
+  assert.equal(dicht.status, 403, 'pay is nu dicht');
+  assert.equal((await dicht.json().catch(() => ({}))).functieUit, 'pay', 'met de juiste reden');
+  // de boardroom zelf blijft altijd bereikbaar (niet gemapt)
+  assert.equal((await l.call('/member/boardroom', {})).status, 200, 'je bord blijft bereikbaar');
+  // weer aanzetten: weer toegankelijk
+  await l.call('/member/boardroom/zet', { id: 'pay', aan: true });
+  const weer = await (await l.call('/pay', {})).json().catch(() => ({}));
+  assert.notEqual(weer.functieUit, 'pay', 'pay is weer toegestaan');
+});
+
 test('een ouder stuurt de boardroom van zijn beschermde kind bij', async () => {
   const fam = await gezinMetKind('Schild');
   const bord = await json(await soc('/kind/boardroom', { code: fam.g.code, token: fam.g.token, kindHandle: fam.kidHandle }));

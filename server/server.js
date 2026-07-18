@@ -1547,6 +1547,13 @@ function auth(req, res, next) {
   // crashen op een ontbrekende codenaam.
   if (!sess.account && !PERSONAS[sess.tier]) return res.status(401).json({ error: 'Niet ingelogd als lid.' });
   req.session = sess;
+  // Handhaving van de eigen boardroom: heeft het lid (of, via de kind-sleutel,
+  // de ouder) deze functie uitgezet, dan gaat de API ook echt dicht. Alles staat
+  // standaard aan, dus dit raakt pas iets zodra iemand bewust iets omzet.
+  const _fid = lidPadFunctie(req.path);
+  if (_fid && sess.key && lidBoardUit(sess.key, _fid)) {
+    return res.status(403).json({ error: 'Deze functie staat uit in je boardroom.', functieUit: _fid });
+  }
   dirTouch(sess);
   next();
 }
@@ -2240,7 +2247,7 @@ const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarket
 /* De eigen boardroom per lid (kern/lidboard.js): elk lid zet zijn eigen
    functies aan/uit; een ouder/beheerder stuurt via dezelfde motor de boardroom
    van zijn beschermde kind bij (de route bewaakt het gezinsverband). */
-const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardAan } = maakLidboard({ db, save });
+const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardAan, lidPadFunctie, lidBoardUit } = maakLidboard({ db, save });
 
 /* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
    autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,

@@ -93,7 +93,46 @@ function maakLidboard({ db, save }) {
     return { status: 200, ok: true, bord: bord(sleutel, opts) };
   }
 
-  return { LIDBOARD_CAPS: CAPS, lidBoard: bord, lidBoardZet: zet, lidBoardAan: aan };
+  /* Handhaving: welke API-pad-prefix hoort bij welke functie. Alleen
+     ondubbelzinnige prefixen die precies bij een boardroom-functie horen, zodat
+     het uitzetten van een functie die API ook echt dichtzet (voor het lid en,
+     via de kind-sleutel, voor een beschermd kind) zonder gedeelde routes te
+     raken. Langste prefix wint. Wat hier niet staat, wordt niet server-side
+     geblokkeerd (device-functies en zuiver visuele onderdelen regelt de app). */
+  const PAD_FUNCTIE = [
+    ['/api/member/spel', 'spelen'],
+    ['/api/ai', 'rahul'],
+    ['/api/fluister', 'rahul'],
+    ['/api/pay', 'pay'],
+    ['/api/care', 'care'],
+    ['/api/paspoort', 'paspoort'],
+    ['/api/locatie', 'locatie'],
+    ['/api/dm', 'dm'],
+    ['/api/salon', 'salon'],
+    ['/api/ticket', 'tickets'],
+    ['/api/order', 'bestellen'],
+    ['/api/bezorg', 'bestellen'],
+    ['/api/charter', 'vervoer'],
+    ['/api/book', 'reizen'],
+    ['/api/reserveer', 'reizen'],
+    ['/api/reservering', 'reizen']
+  ].sort((a, b) => b[0].length - a[0].length);
+  function padFunctie(pad) {
+    const p = String(pad || '').split('?')[0];
+    for (const [pre, fid] of PAD_FUNCTIE) {
+      if (p === pre || p.indexOf(pre + '/') === 0) return fid;
+    }
+    return null;
+  }
+  // Alleen een BEWUST uitgezette functie (opgeslagen false) blokkeert de API. Een
+  // functie die enkel op zijn standaard-uit staat (bv. paspoort/locatie, met een
+  // eigen toestemmingsflow) blokkeren we hier niet.
+  function bewustUit(sleutel, id) {
+    const eig = eigen(sleutel);
+    return Object.prototype.hasOwnProperty.call(eig, id) && eig[id] === false;
+  }
+
+  return { LIDBOARD_CAPS: CAPS, lidBoard: bord, lidBoardZet: zet, lidBoardAan: aan, lidPadFunctie: padFunctie, lidBoardUit: bewustUit };
 }
 
 module.exports = { maakLidboard };

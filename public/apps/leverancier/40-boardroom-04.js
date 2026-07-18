@@ -49,11 +49,19 @@
     const ghost = has('rides')
       ? '<button class="meer-btn" data-ghost="1"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 1 7 7v9l-2.3-2-2.4 2-2.3-2-2.3 2-2.4-2L5 19v-9a7 7 0 0 1 7-7z"/><circle cx="9.5" cy="11" r="1"/><circle cx="14.5" cy="11" r="1"/></svg><b>Ghost Driver</b></button>'
       : '';
+    // een tweede scherm aansluiten: een extra beeldscherm dat schermvullend een
+    // werkplek toont (keuken, bar, uit te serveren, kassa, gasten) of het
+    // hoofdscherm spiegelt. Werkt op elke zaak; opent een eigen venster.
+    const scherm = '<button class="meer-btn" data-scherm="1"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 20h8M12 17v3"/></svg><b>'+T('tab.scherm','Tweede scherm')+'</b></button>';
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
-    ).join('') + ghost + '</div>';
+    ).join('') + ghost + scherm + '</div>';
     el.querySelectorAll('[data-goto2]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto2)));
     el.querySelectorAll('[data-ghost]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/ghost.html'; }));
+    el.querySelectorAll('[data-scherm]').forEach(b => b.addEventListener('click', () => {
+      window.open('/apps/scherm.html', 'rtg-scherm', 'width=1280,height=800');
+      toast(T('scherm.geopend','Tweede scherm geopend. Sleep het venster naar uw extra beeldscherm en kies daar een werkplek of "Spiegel".'));
+    }));
   }
 
   function renderAll(){

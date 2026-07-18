@@ -2403,6 +2403,15 @@
 
   // ---- navigatie: vijf vaste knoppen, de rest overzichtelijk onder "Meer" ----
   const MAIN_TABS = ['home', 'kassa', 'ai', 'gchat', 'meer'];
+  // de spiegel-koppeling met het tweede scherm: welke werkplek hoort bij welke tab
+  const SPIEGEL_WERK = { keuken: 'keuken', bar: 'bar', bediening: 'serveren', kassa: 'kassa',
+    tafels: 'gasten', gasten: 'gasten', rooms: 'kamers', dorp: 'serveren' };
+  let spiegelKanaal = null;
+  try { spiegelKanaal = new BroadcastChannel('rtg-scherm'); } catch (e) {}
+  function zendSpiegel(tab){
+    const werk = SPIEGEL_WERK[tab]; if (!werk || !spiegelKanaal) return;
+    try { spiegelKanaal.postMessage({ type: 'werkplek', werk }); } catch (e) {}
+  }
   function buildTabs(){
     $('#tabbar').innerHTML = MAIN_TABS.map((k,i) =>
       '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+T('tab.'+k, TABDEF[k].label)+'</button>'
@@ -2418,6 +2427,9 @@
       if (on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); // schermlezer meldt de actieve tab
     });
     $('#content').scrollTop = 0;
+    // het tweede scherm (spiegel-modus) volgt de werkplek van dit hoofdscherm:
+    // we zenden de best passende werkplek uit over een BroadcastChannel.
+    zendSpiegel(tab);
     // Alleen bij een echte klik de focus naar de nieuwe weergave verplaatsen, zodat
     // toetsenbord- en schermlezergebruikers meelopen (niet bij programmatische wissels).
     if (focusView){
@@ -3907,11 +3919,19 @@
     const ghost = has('rides')
       ? '<button class="meer-btn" data-ghost="1"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 1 7 7v9l-2.3-2-2.4 2-2.3-2-2.3 2-2.4-2L5 19v-9a7 7 0 0 1 7-7z"/><circle cx="9.5" cy="11" r="1"/><circle cx="14.5" cy="11" r="1"/></svg><b>Ghost Driver</b></button>'
       : '';
+    // een tweede scherm aansluiten: een extra beeldscherm dat schermvullend een
+    // werkplek toont (keuken, bar, uit te serveren, kassa, gasten) of het
+    // hoofdscherm spiegelt. Werkt op elke zaak; opent een eigen venster.
+    const scherm = '<button class="meer-btn" data-scherm="1"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 20h8M12 17v3"/></svg><b>'+T('tab.scherm','Tweede scherm')+'</b></button>';
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
-    ).join('') + ghost + '</div>';
+    ).join('') + ghost + scherm + '</div>';
     el.querySelectorAll('[data-goto2]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto2)));
     el.querySelectorAll('[data-ghost]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/ghost.html'; }));
+    el.querySelectorAll('[data-scherm]').forEach(b => b.addEventListener('click', () => {
+      window.open('/apps/scherm.html', 'rtg-scherm', 'width=1280,height=800');
+      toast(T('scherm.geopend','Tweede scherm geopend. Sleep het venster naar uw extra beeldscherm en kies daar een werkplek of "Spiegel".'));
+    }));
   }
 
   function renderAll(){

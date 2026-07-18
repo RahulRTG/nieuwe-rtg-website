@@ -1,5 +1,14 @@
   // ---- navigatie: vijf vaste knoppen, de rest overzichtelijk onder "Meer" ----
   const MAIN_TABS = ['home', 'kassa', 'ai', 'gchat', 'meer'];
+  // de spiegel-koppeling met het tweede scherm: welke werkplek hoort bij welke tab
+  const SPIEGEL_WERK = { keuken: 'keuken', bar: 'bar', bediening: 'serveren', kassa: 'kassa',
+    tafels: 'gasten', gasten: 'gasten', rooms: 'kamers', dorp: 'serveren' };
+  let spiegelKanaal = null;
+  try { spiegelKanaal = new BroadcastChannel('rtg-scherm'); } catch (e) {}
+  function zendSpiegel(tab){
+    const werk = SPIEGEL_WERK[tab]; if (!werk || !spiegelKanaal) return;
+    try { spiegelKanaal.postMessage({ type: 'werkplek', werk }); } catch (e) {}
+  }
   function buildTabs(){
     $('#tabbar').innerHTML = MAIN_TABS.map((k,i) =>
       '<button data-tab="'+k+'"'+(i===0?' class="active"':'')+'><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg>'+T('tab.'+k, TABDEF[k].label)+'</button>'
@@ -15,6 +24,9 @@
       if (on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); // schermlezer meldt de actieve tab
     });
     $('#content').scrollTop = 0;
+    // het tweede scherm (spiegel-modus) volgt de werkplek van dit hoofdscherm:
+    // we zenden de best passende werkplek uit over een BroadcastChannel.
+    zendSpiegel(tab);
     // Alleen bij een echte klik de focus naar de nieuwe weergave verplaatsen, zodat
     // toetsenbord- en schermlezergebruikers meelopen (niet bij programmatische wissels).
     if (focusView){

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG · Tweede scherm</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;--oranje:#E2B93B;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;height:100dvh;overflow:hidden;
+    display:flex;flex-direction:column;}
+  button{font:inherit;cursor:pointer;}
+  .kop{display:flex;align-items:center;gap:1rem;padding:1rem 1.6rem;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.5rem;}
+  .kop .zaak{color:var(--gold);font-size:0.95rem;}
+  .kop .rek{flex:1;}
+  .kop .klok{font-variant-numeric:tabular-nums;font-size:1.4rem;font-weight:600;letter-spacing:0.04em;}
+  .kies{display:flex;gap:0.5rem;flex-wrap:wrap;}
+  .kies button{background:var(--card);border:1px solid var(--line);border-radius:999px;color:var(--soft);
+    font-size:0.85rem;padding:0.45rem 1rem;}
+  .kies button.aan{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .kies button.spiegel.aan{background:var(--groen);border-color:var(--groen);}
+  main{flex:1;min-height:0;overflow-y:auto;padding:1.4rem 1.6rem 2rem;}
+  .vol{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.2rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.15rem 1.25rem;}
+  .kaart.laat{border-color:rgba(226,185,59,0.6);}
+  .kaart.langlaat{border-color:rgba(222,110,146,0.7);}
+  .kaart .bon{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.6rem;}
+  .kaart .bon b{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
+  .kaart .tijd{font-size:1.5rem;font-variant-numeric:tabular-nums;font-weight:600;color:var(--gold);}
+  .kaart.laat .tijd{color:var(--oranje);} .kaart.langlaat .tijd{color:var(--rood);}
+  .kaart ul{list-style:none;} .kaart li{font-size:1.15rem;padding:0.22rem 0;display:flex;gap:0.6rem;}
+  .kaart li .q{color:var(--gold);font-weight:700;min-width:1.6rem;}
+  .kaart .meta{margin-top:0.5rem;font-size:0.85rem;color:var(--soft);}
+  .groot{font-family:'Bodoni Moda',serif;font-size:3.2rem;line-height:1.1;}
+  .cijfers{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem;}
+  .cijfer{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.5rem;}
+  .cijfer span{font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
+  .rij{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.1rem;margin-bottom:0.7rem;
+    display:flex;align-items:center;gap:1rem;font-size:1.1rem;}
+  .rij .pill{font-size:0.8rem;padding:0.25rem 0.7rem;border-radius:999px;border:1px solid var(--line);color:var(--soft);}
+  .rij .pill.g{color:var(--groen);border-color:rgba(105,184,145,0.5);}
+  .rij .rek{flex:1;}
+  .leeg{color:var(--soft);font-size:1.3rem;text-align:center;padding:4rem 1rem;}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:var(--card2);
+    border:1px solid var(--line);border-radius:999px;padding:0.6rem 1.1rem;font-size:0.9rem;opacity:0;transition:opacity .25s;}
+  .melding.zien{opacity:1;}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<header class="kop">
+  <h1>Tweede scherm</h1>
+  <span class="zaak" id="zaakNaam"></span>
+  <span class="rek"></span>
+  <div class="kies" id="kies"></div>
+  <span class="klok" id="klok">--:--</span>
+</header>
+<main id="doek"><div class="leeg" id="poort">Log eerst in op de leverancier-app op dit toestel; open dit tweede scherm daarna vanuit "Meer → Tweede scherm".</div></main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const token = (() => { try { return localStorage.getItem('rtg_sup_token'); } catch (e) { return null; } })();
+  let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
+
+  // de werkplekken die schermvullend te tonen zijn; welke passen hangt van de zaak af
+  const WERK = {
+    keuken:    { naam: 'Keuken', caps: ['orders'], teken: kdsKeuken },
+    bar:       { naam: 'Bar', caps: ['orders'], teken: kdsBar },
+    serveren:  { naam: 'Uit te serveren', caps: ['orders'], teken: serveren },
+    kassa:     { naam: 'Kassa vandaag', caps: [], teken: kassa },
+    gasten:    { naam: 'Reserveringen', caps: [], teken: gasten },
+    kamers:    { naam: 'Kamers', caps: ['rooms'], teken: kamers }
+  };
+  let modus = 'keuken', spiegel = false, state = null, kanaal = null;
+
+  function klok(){ const d = new Date(); $('#klok').textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+  klok(); setInterval(klok, 15000);
+
+  async function haal(){
+    if (!token) return;
+    try {
+      const r = await fetch('/api/supplier/state', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' });
+      if (r.status !== 200) { $('#doek').innerHTML = '<div class="leeg">De inlog is verlopen. Log opnieuw in op de leverancier-app.</div>'; return; }
+      const d = await r.json(); state = d.state || d;
+      $('#zaakNaam').textContent = (state.supplier && (state.supplier.icon + ' ' + state.supplier.name)) || '';
+      bouwKies();
+      teken();
+    } catch (e) {}
+  }
+  function passendWerk(){
+    const caps = (state && state.supplier && state.supplier.caps) || [];
+    return Object.entries(WERK).filter(([k, w]) => !w.caps.length || w.caps.some(c => caps.includes(c)));
+  }
+  function bouwKies(){
+    const kies = $('#kies');
+    const werk = passendWerk();
+    if (modus !== 'spiegel' && !werk.some(([k]) => k === modus)) modus = werk[0] ? werk[0][0] : 'kassa';
+    kies.innerHTML = werk.map(([k, w]) => '<button data-werk="'+k+'"'+(modus===k&&!spiegel?' class="aan"':'')+'>'+esc(w.naam)+'</button>').join('') +
+      '<button data-spiegel="1" class="spiegel'+(spiegel?' aan':'')+'">🔗 Spiegel hoofdscherm</button>';
+    kies.querySelectorAll('[data-werk]').forEach(b => b.addEventListener('click', () => { spiegel = false; modus = b.dataset.werk; bouwKies(); teken(); }));
+    kies.querySelector('[data-spiegel]').addEventListener('click', () => { spiegel = !spiegel; if (spiegel) zeg('Spiegel aan: dit scherm volgt de werkplek van de hoofd-app.'); bouwKies(); teken(); });
+  }
+
+  /* ---- de werkplek-tekeningen (schermvullend, groot leesbaar) ---- */
+  const nu = () => Date.now();
+  const minSinds = at => Math.max(0, Math.round((nu() - new Date(at).getTime()) / 60000));
+  function orderKaart(o, items){
+    const m = minSinds(o.at);
+    const kl = m >= 20 ? 'langlaat' : m >= 12 ? 'laat' : '';
+    return '<div class="kaart '+kl+'"><div class="bon"><b>'+esc(o.pickup || o.ref || '')+'</b><span class="tijd">'+m+"'</span></div>"+
+      '<ul>'+items.map(it => '<li><span class="q">'+it.qty+'×</span><span>'+esc(it.name)+'</span></li>').join('')+'</ul>'+
+      (o.table ? '<div class="meta">Tafel '+esc(o.table)+'</div>' : '')+
+      (o.allergyNote ? '<div class="meta" style="color:var(--oranje);">⚠ '+esc(o.allergyNote)+'</div>' : '')+'</div>';
+  }
+  function menuStation(id){ const m = (state.menu||[]).find(x => x.id === id); return m && m.station === 'bar' ? 'bar' : 'keuken'; }
+  function lopende(){ return (state.orders||[]).filter(o => o.paid && !['klaar','geserveerd','geweigerd','terugbetaald','bezorgd','opgehaald'].includes(o.status)); }
+  function kdsFilter(station){
+    return lopende().map(o => {
+      const items = (o.items||[]).filter(it => menuStation(it.id) === station);
+      return items.length ? orderKaart(o, items) : '';
+    }).filter(Boolean).join('');
+  }
+  function kdsKeuken(){ const h = kdsFilter('keuken'); return h ? '<div class="vol">'+h+'</div>' : leeg('Geen openstaande keukenbonnen.'); }
+  function kdsBar(){ const h = kdsFilter('bar'); return h ? '<div class="vol">'+h+'</div>' : leeg('Geen openstaande barbonnen.'); }
+  function serveren(){
+    const rij = (state.orders||[]).filter(o => o.status === 'klaar');
+    if (!rij.length) return leeg('Niets staat klaar om uit te serveren.');
+    return '<div class="vol">'+rij.map(o => orderKaart(o, o.items||[])).join('')+'</div>';
+  }
+  function kassa(){
+    const p = state.pos || {};
+    const eur = n => '€ ' + Number(n||0).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '<div class="cijfers">'+
+      '<div class="cijfer"><span>Omzet vandaag</span><div class="groot">'+eur(p.omzet || p.total || 0)+'</div></div>'+
+      '<div class="cijfer"><span>Verkopen</span><div class="groot">'+(p.aantal || p.count || (p.sales && p.sales.length) || 0)+'</div></div>'+
+      '<div class="cijfer"><span>Open bestellingen</span><div class="groot">'+lopende().length+'</div></div>'+'</div>';
+  }
+  function gasten(){
+    const rij = state.reserveringen || [];
+    if (!rij.length) return leeg('Geen komende reserveringen.');
+    return rij.map(r => '<div class="rij"><span class="tijd" style="font-size:1.3rem;color:var(--gold);">'+esc(r.tijd)+'</span>'+
+      '<span class="rek">'+esc(r.codenaam || r.codename || 'Gast')+' · '+ (r.personen||r.people||2) +' pers.'+(r.notitie?' · '+esc(r.notitie):'')+'</span>'+
+      '<span class="pill'+(r.status==='bevestigd'?' g':'')+'">'+esc(r.status)+'</span></div>').join('');
+  }
+  function kamers(){
+    const rij = state.rooms || [];
+    if (!rij.length) return leeg('Geen kamers.');
+    return '<div class="vol">'+rij.map(k => '<div class="kaart"><div class="bon"><b>'+esc(k.naam||k.name||k.nr||'')+'</b>'+
+      '<span class="pill'+(k.status==='schoon'||k.status==='vrij'?' g':'')+'">'+esc(k.status||'')+'</span></div>'+
+      (k.gast||k.guest?'<div class="meta">'+esc(k.gast||k.guest)+'</div>':'')+'</div>').join('')+'</div>';
+  }
+  function leeg(t){ return '<div class="leeg">'+esc(t)+'</div>'; }
+
+  function teken(){
+    if (!state){ return; }
+    const w = WERK[modus] || WERK.kassa;
+    $('#doek').innerHTML = (w.teken ? w.teken() : leeg('...'));
+  }
+
+  /* ---- de spiegel: volg de werkplek die de hoofd-app uitzendt ---- */
+  try {
+    kanaal = new BroadcastChannel('rtg-scherm');
+    kanaal.onmessage = e => {
+      const d = e.data || {};
+      if (spiegel && d.type === 'werkplek' && d.werk && WERK[d.werk]) { modus = d.werk; teken(); bouwKies(); }
+    };
+  } catch (e) {}
+
+  if (token) { haal(); setInterval(haal, 5000); }
+})();
+</script>
+</body>
+</html>

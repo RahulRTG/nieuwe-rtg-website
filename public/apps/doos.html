@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/os.css" rel="stylesheet">
 <style>
   :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;
     --muted:rgba(244,241,236,0.70);--soft:rgba(244,241,236,0.62);--gold:#C9A24B;
@@ -39,7 +41,7 @@
   .leeg{color:var(--soft);font-size:.9rem;padding:2rem 0;text-align:center;}
 </style>
 </head>
-<body>
+<body data-osbar="Zaakdoos" data-oswereld="leverancier">
 <a href="#hoofd" class="skip">Naar de inhoud</a>
 <main class="wrap" id="hoofd" tabindex="-1">
   <header class="kop">
@@ -60,5 +62,8 @@
   <p class="leeg" id="leeg" hidden>Dit apparaat is geen Zaakdoos (geen doosmodus actief).</p>
 </main>
 <script src="/apps/doos.js"></script>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/accounts-os.js" defer></script>
+<script src="/shared/osbar.js" defer></script>
 </body>
 </html>

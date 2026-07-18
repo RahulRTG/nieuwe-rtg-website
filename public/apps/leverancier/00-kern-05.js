@@ -1,0 +1,126 @@
+  function bindBack(fn){ const b = $('#spBack2'); if (b) b.addEventListener('click', fn); }
+
+  $('#spBack').addEventListener('click', () => $('#staffPick').classList.remove('open'));
+
+  // Stap 2: persoon gekozen → pincode invoeren.
+  let pinFor = null, pinBuf = '';
+  function renderDots(){
+    document.querySelectorAll('#spDots i').forEach((el,i)=> el.classList.toggle('on', i < pinBuf.length));
+  }
+  function openPin(sid, name, role){
+    pinFor = Number(sid); pinBuf = '';
+    $('#spPinName').textContent = name;
+    $('#spPinRole').textContent = T('role.'+role, role==='manager'?'Manager':'Medewerker');
+    $('#spDots').classList.remove('bad'); renderDots();
+    $('#spPin').classList.add('open');
+  }
+  function buildPad(){
+    const keys = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
+    $('#spPad').innerHTML = keys.map(k => k==='' ? '<span></span>' :
+      '<button class="sp-key'+(k==='⌫'?' wide':'')+'" data-k="'+k+'">'+k+'</button>').join('');
+    document.querySelectorAll('#spPad [data-k]').forEach(b => b.addEventListener('click', () => pinKey(b.dataset.k)));
+  }
+  async function pinKey(k){
+    $('#spDots').classList.remove('bad');
+    if (k==='⌫'){ pinBuf = pinBuf.slice(0,-1); renderDots(); return; }
+    if (pinBuf.length >= 4) return;
+    pinBuf += k; renderDots();
+    if (pinBuf.length === 4){
+      const pin = pinBuf;
+      const ok = await login({ code: pickCode, staffId: pinFor, pin }, false, true);
+      if (!ok){ $('#spDots').classList.add('bad'); pinBuf=''; setTimeout(renderDots, 400); }
+    }
+  }
+  $('#spPinCancel').addEventListener('click', () => { $('#spPin').classList.remove('open'); pinBuf=''; });
+
+  // Gemeenschappelijke login. Geeft true/false terug bij PIN, zodat de pad kan reageren.
+  async function login(body, isCred, silent){
+    if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return false; }
+    try {
+      const d = await API.call('/supplier/login', body);
+      API.token = d.token;
+      applyState(d.state);
+    } catch(e){
+      if (silent) return false;
+      toast(isCred ? T('login.bad','Onjuiste gebruikersnaam of wachtwoord.') : (e.message||T('login.failed','Inloggen mislukt.')));
+      return false;
+    }
+    try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
+    // de zaak opent zijn eigen sector-app (behalve midden in een kassa-station)
+    if (!pendingStation && naarEigenSector(S)) return true;
+    if (pendingStation){
+      try { localStorage.setItem('rtg_sup_station', pendingStation); } catch(e){}
+      enterStation(pendingStation);
+    } else {
+      try { localStorage.removeItem('rtg_sup_station'); } catch(e){}
+      enterApp();
+    }
+    return true;
+  }
+
+  function enterApp(){
+    $('#staffPick').classList.remove('open');
+    $('#spPin').classList.remove('open');
+    $('#gate').style.display = 'none';
+    $('#app').classList.add('active');
+    buildTabs();
+    renderAll();
+    startStream();
+    loadNotifs();
+  }
+
+  // Blijf ingelogd: met een bewaard token direct de app in, zonder PIN.
+  async function restoreSession(){
+    if (!API.enabled) return;
+    let t = null; try { t = localStorage.getItem('rtg_sup_token'); } catch(e){}
+    if (!t) return;
+    API.token = t;
+    try {
+      const st = (await API.call('/supplier/state')).state;
+      // de bewaarde sessie weet bij welke sector hij hoort: verkeerde (of
+      // ontbrekende) ingang stuurt meteen door naar de eigen sector-app
+      if (st.supplier && naarEigenSector(st.supplier)) return;
+      // vangnet voor zaken zonder eigen sector-ingang
+      if (SDEF && st.supplier && !SDEF.codes.includes(st.supplier.code)){ API.token = null; return; }
+      applyState(st);
+      let stn = null; try { stn = localStorage.getItem('rtg_sup_station'); } catch(e2){}
+      if (stn) enterStation(stn); else enterApp();
+    } catch(e){
+      API.token = null;
+      try { localStorage.removeItem('rtg_sup_token'); } catch(e2){}
+    }
+  }
+
+  // Wissel van gebruiker: sessie loslaten, terug naar het inlogscherm.
+  function switchUser(){
+    if (source){ try{ source.close(); }catch(_){} source = null; }
+    stationMode = null; pendingStation = null;
+    $('#station').classList.remove('on');
+    API.token = null; state = null; S = null; notifs = [];
+    try { localStorage.removeItem('rtg_sup_token'); localStorage.removeItem('rtg_sup_station'); } catch(e){}
+    $('#app').classList.remove('active');
+    $('#gate').style.display = '';
+    if (pickCode) pickPartner(pickCode); else $('#staffPick').classList.remove('open');
+  }
+
+  function applyState(st){ state = st; S = st.supplier; }
+
+
+  /* De Zaakdoos: draait dit scherm op het kastje in de zaak, zeg dan eerlijk
+     wanneer de lijn weg is. Alles blijft gewoon werken; het journaal
+     synchroniseert vanzelf zodra de lijn terug is. */
+  (function () {
+    let doosTimer = null, doosBanner = false;
+    async function doosCheck() {
+      try {
+        const d = await (await fetch('/api/doos/status')).json();
+        if (!d.doos) return; // gewone cloudserver: niets te bewaken
+        if (!doosTimer) doosTimer = setInterval(doosCheck, 10000);
+        if (d.modus === 'lokaal' && window.RTGNet) {
+          doosBanner = true;
+          RTGNet.toon('📦 ' + T('doos.lokaal', 'Zaakdoos: de lijn is weg; de zaak draait lokaal door en synchroniseert vanzelf.') + (d.journaal ? ' (' + d.journaal + ' actie(s) in het journaal)' : ''));
+        } else if (doosBanner && window.RTGNet) { doosBanner = false; RTGNet.verberg(); }
+      } catch (e) {}
+    }
+    setTimeout(doosCheck, 2500);
+  })();

@@ -160,7 +160,11 @@ const FUNCTIES = [
 
   // ---- Personeel & integraties ----
   { id: 'staff', categorie: 'Personeel & integraties', naam: 'Personeels-app (PDA)', standaard: true, doelgroepen: ['personeel'],
-    uitleg: 'De personeels-app: rooster, klokken, verlof/ziek, taken, team en de vertrouwenspersoon.', paden: ['/api/staff'] }
+    uitleg: 'De personeels-app: rooster, klokken, verlof/ziek, taken, team en de vertrouwenspersoon.', paden: ['/api/staff'] },
+  { id: 'stuur', categorie: 'Personeel & integraties', naam: 'Rahul doet het (AI-stuur)', standaard: true,
+    doelgroepen: ['rtg', 'lifestyle', 'business', 'gast', 'leverancier', 'personeel'],
+    uitleg: 'De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf). Geld-acties vragen altijd eerst een bevestiging.',
+    paden: ['/api/member/doe', '/api/supplier/doe', '/api/staff/doe'] }
 ];
 
 const OP_ID = Object.fromEntries(FUNCTIES.map(f => [f.id, f]));

@@ -2756,6 +2756,10 @@ Object.assign(kern, require('./kern/clips').maakClips({
 Object.assign(kern, require('./kern/office').maakOffice({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, keyVanCodenaam, sseToCustomer
 }));
+/* Het AI-stuur (kern/stuur.js): Rahul voert acties uit op elk toegestaan
+   API-pad, als interne aanroep met de eigen inlog van de gebruiker. Een
+   codepad, dezelfde rechten en dezelfde schakelkast als de app-knoppen. */
+Object.assign(kern, require('./kern/stuur').maakStuur({ log }));
 /* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
    De cryptografie komt uit @simplewebauthn/server; wij bewaren alleen
    publieke sleutels per account, challenges leven kort en in RAM.
@@ -2808,6 +2812,7 @@ require('./routes/wbw')(kern);
 require('./routes/ov')(kern);
 require('./routes/clips')(kern);
 require('./routes/kantoorpakket')(kern);
+require('./routes/stuur')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

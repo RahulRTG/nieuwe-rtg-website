@@ -1,7 +1,8 @@
 /* Bundelt de opgeknipte app-scripts weer samen.
 
-   De twee grote app-scripts (leverancier.js, app-main.js) zijn te groot om
-   prettig in een bestand te bewerken, maar delen intern een gesloten scope:
+   De grote app-scripts (leverancier.js, app-main.js, personeel.js,
+   backoffice.js, techniek.js) zijn te groot om prettig in een bestand te
+   bewerken, maar delen intern een gesloten scope:
    je kunt ze niet zomaar in losse modules hakken zonder alles te herschrijven.
    Daarom bewaren we de bron opgeknipt per onderdeel in public/apps/<naam>/,
    en plakken die delen bij de build weer aaneen tot exact hetzelfde bestand.
@@ -24,7 +25,10 @@ const PUB = path.join(__dirname, '..', 'public');
 // het resultaat exact de oorspronkelijke bron is.
 const bundels = {
   'apps/leverancier.js': 'apps/leverancier',
-  'apps/app-main.js': 'apps/app-main'
+  'apps/app-main.js': 'apps/app-main',
+  'apps/personeel.js': 'apps/personeel',
+  'apps/backoffice.js': 'apps/backoffice',
+  'apps/techniek.js': 'apps/techniek'
 };
 
 function deelBestanden(deelMap) {

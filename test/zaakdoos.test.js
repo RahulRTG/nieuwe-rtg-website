@@ -172,6 +172,10 @@ test('de randcache: een foto die over de lijn kwam, blijft op de doos', async ()
 });
 
 test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', async () => {
+  // Borg dat er minstens een gezonde ping geteld is voordat de lijn wegvalt: de
+  // pinger tikt elke 10s, dus op een snelle runner kan het dagrapport (verderop)
+  // anders pings=0 zien omdat de eerste tik nog niet gelopen had.
+  await wachtOp('/api/doos/rapport', doos.base, d => d.pings >= 1);
   cloudChild.kill('SIGKILL');
   await new Promise(r => setTimeout(r, 300));
   // het eerstvolgende verzoek merkt het en valt door naar lokaal: inloggen

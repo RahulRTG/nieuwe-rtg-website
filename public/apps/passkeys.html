@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Passkeys</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:640px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
+  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  .rij input{flex:1;min-width:9rem;width:auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .sleutel{display:flex;align-items:baseline;gap:0.7rem;border-top:1px solid var(--line);padding:0.55rem 0;font-size:0.85rem;}
+  .sleutel:first-child{border-top:none;}
+  .sleutel .sub{font-size:0.7rem;color:var(--soft);}
+  .sleutel .rek{flex:1;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>Passkeys</h1>
+  <span class="rek"></span>
+  <span class="badge">Phishingbestendig · geen wachtwoord</span>
+</header>
+<main>
+  <p class="stil">Een passkey is uw vingerafdruk, gezicht of hardwaresleutel als inlog. Er valt bij ons niets te
+    stelen: RTG bewaart alleen de publieke helft van de sleutel; de geheime helft verlaat uw apparaat nooit.</p>
+
+  <!-- inloggen met een passkey (zonder wachtwoord) -->
+  <section id="vLogin">
+    <h2>Inloggen met een passkey</h2>
+    <div class="kaart">
+      <label for="lLogin">E-mailadres van uw account</label>
+      <div class="rij">
+        <input id="lLogin" type="email" autocomplete="username webauthn" placeholder="u@voorbeeld.nl">
+        <button class="knop vol" id="lKnop" type="button">Log in met passkey</button>
+      </div>
+      <p class="stil" id="lStatus" style="margin-top:0.5rem;"></p>
+    </div>
+  </section>
+
+  <!-- beheren (ingelogd) -->
+  <section id="vBeheer" class="weg">
+    <h2>Mijn passkeys</h2>
+    <div class="kaart">
+      <div id="sleutels"><p class="stil">Nog geen passkeys.</p></div>
+      <div class="rij">
+        <label for="bNaam" style="position:absolute;left:-999px;">Naam voor de nieuwe passkey</label>
+        <input id="bNaam" maxlength="40" placeholder="Naam (bijv. Telefoon)">
+        <button class="knop vol" id="bMaak" type="button">Passkey toevoegen</button>
+      </div>
+      <p class="stil" style="margin-top:0.5rem;">Uw apparaat vraagt zo om uw vingerafdruk, gezicht of pincode: dat
+        gebeurt op het toestel zelf; RTG ziet er niets van.</p>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  let token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/webauthn/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3400); };
+
+  /* ---- base64url <-> bytes: WebAuthn praat binair, de server in tekst ---- */
+  const naarBuf = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+  const naarB64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  /* ---- registreren: het antwoord van de browser klaarmaken voor de server ---- */
+  async function maakPasskey() {
+    if (!('credentials' in navigator)) return zeg('Deze browser kent geen passkeys.');
+    const o = await api('registreer/opties');
+    if (o.body.error) return zeg(o.body.error);
+    const pub = o.body.opties;
+    pub.challenge = naarBuf(pub.challenge);
+    pub.user.id = naarBuf(pub.user.id);
+    pub.excludeCredentials = (pub.excludeCredentials || []).map(c => ({ ...c, id: naarBuf(c.id) }));
+    let cred;
+    try { cred = await navigator.credentials.create({ publicKey: pub }); }
+    catch (e) { return zeg('Afgebroken: ' + e.message); }
+    const antwoord = {
+      id: cred.id, rawId: naarB64(cred.rawId), type: cred.type,
+      clientExtensionResults: cred.getClientExtensionResults(),
+      response: {
+        attestationObject: naarB64(cred.response.attestationObject),
+        clientDataJSON: naarB64(cred.response.clientDataJSON),
+        transports: cred.response.getTransports ? cred.response.getTransports() : []
+      }
+    };
+    const r = await api('registreer', { antwoord, naam: $('#bNaam').value });
+    if (r.body.error) return zeg(r.body.error);
+    $('#bNaam').value = '';
+    zeg('Passkey toegevoegd: voortaan logt u in zonder wachtwoord.');
+    toonSleutels(r.body.sleutels);
+  }
+
+  /* ---- inloggen: zelfde dans, andere kant op ---- */
+  async function logIn() {
+    const login = $('#lLogin').value.trim();
+    if (!login) return zeg('Vul het e-mailadres van uw account in.');
+    $('#lStatus').textContent = 'Uw apparaat vraagt nu om uw passkey…';
+    const o = await api('opties', { login });
+    if (o.body.error) { $('#lStatus').textContent = ''; return zeg(o.body.error); }
+    const pub = o.body.opties;
+    pub.challenge = naarBuf(pub.challenge);
+    pub.allowCredentials = (pub.allowCredentials || []).map(c => ({ ...c, id: naarBuf(c.id) }));
+    let cred;
+    try { cred = await navigator.credentials.get({ publicKey: pub }); }
+    catch (e) { $('#lStatus').textContent = ''; return zeg('Afgebroken: ' + e.message); }
+    const antwoord = {
+      id: cred.id, rawId: naarB64(cred.rawId), type: cred.type,
+      clientExtensionResults: cred.getClientExtensionResults(),
+      response: {
+        authenticatorData: naarB64(cred.response.authenticatorData),
+        clientDataJSON: naarB64(cred.response.clientDataJSON),
+        signature: naarB64(cred.response.signature),
+        userHandle: cred.response.userHandle ? naarB64(cred.response.userHandle) : null
+      }
+    };
+    const r = await api('login', { login, antwoord });
+    if (r.body.error) { $('#lStatus').textContent = ''; return zeg(r.body.error); }
+    token = r.body.token;
+    try { localStorage.setItem('rtg_member_token', token); } catch (e) {}
+    $('#lStatus').textContent = 'Ingelogd zonder wachtwoord. Welkom terug.';
+    zeg('Ingelogd met uw passkey.');
+    start();
+  }
+
+  /* ---- beheer ---- */
+  function toonSleutels(rijen) {
+    const el = $('#sleutels'); el.innerHTML = '';
+    if (!(rijen || []).length) { el.innerHTML = '<p class="stil">Nog geen passkeys.</p>'; return; }
+    for (const s of rijen) {
+      const d = document.createElement('div'); d.className = 'sleutel';
+      const naam = document.createElement('span'); naam.textContent = '\u{1F511} ' + s.naam;
+      const sub = document.createElement('span'); sub.className = 'sub';
+      sub.textContent = 'sinds ' + String(s.at).slice(0, 10) + (s.laatstGebruikt ? ' · laatst ' + String(s.laatstGebruikt).slice(0, 10) : '');
+      const rek = document.createElement('span'); rek.className = 'rek';
+      const weg = document.createElement('button'); weg.type = 'button'; weg.className = 'knop rood'; weg.textContent = 'Verwijder';
+      weg.addEventListener('click', async () => {
+        const r = await api('weg', { id: s.id });
+        if (r.body.error) return zeg(r.body.error);
+        toonSleutels(r.body.sleutels);
+      });
+      d.appendChild(naam); d.appendChild(sub); d.appendChild(rek); d.appendChild(weg);
+      el.appendChild(d);
+    }
+  }
+  async function start() {
+    if (!token) { $('#vBeheer').classList.add('weg'); return; }
+    const r = await api('lijst');
+    if (r.status !== 200) { $('#vBeheer').classList.add('weg'); return; }
+    $('#vBeheer').classList.remove('weg');
+    toonSleutels(r.body.sleutels);
+  }
+  $('#bMaak').addEventListener('click', maakPasskey);
+  $('#lKnop').addEventListener('click', logIn);
+  start();
+})();
+</script>
+</body>
+</html>

@@ -2713,6 +2713,11 @@ Object.assign(kern, require('./kern/ghost').maakGhost({
 Object.assign(kern, require('./kern/flits').maakFlits({
   db, save, crypto, haversine, ghostSimuleer: kern.ghostSimuleer
 }));
+/* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
+   De cryptografie komt uit @simplewebauthn/server; wij bewaren alleen
+   publieke sleutels per account, challenges leven kort en in RAM.
+   Voor de auth-routes gemount (die geven de passkey-login een sessie). */
+Object.assign(kern, require('./kern/webauthn').maakWebauthn({ db, save, accounts, schoon }));
 /* Wie betaalt wat (kern/wbw.js): het gedeelde uitgavenlijstje van een groep
    Salon-vrienden, met sluitende centenverdeling en verrekenen via RTG Pay.
    Na pay en sociaal gemount (gebruikt beide). */

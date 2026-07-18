@@ -35,6 +35,7 @@ const PAGINAS = [
   '/apps/flits.html',
   '/apps/theater.html',
   '/apps/wbw.html',
+  '/apps/passkeys.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

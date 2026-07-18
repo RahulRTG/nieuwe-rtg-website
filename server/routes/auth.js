@@ -81,8 +81,12 @@ app.post('/api/auth/me', auth, (req, res) => {
   /* De registratie-, herstel- en verificatieroutes draaien als submodules
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
   const actx = { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN };
+    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN,
+    webauthnRegOpties: kern.webauthnRegOpties, webauthnRegMaak: kern.webauthnRegMaak,
+    webauthnLoginOpties: kern.webauthnLoginOpties, webauthnLoginMaak: kern.webauthnLoginMaak,
+    webauthnLijst: kern.webauthnLijst, webauthnWeg: kern.webauthnWeg };
   require('./auth/account')(actx);
   require('./auth/herstel')(actx);
   require('./auth/verificatie')(actx);
+  require('./auth/webauthn')(actx);
 };

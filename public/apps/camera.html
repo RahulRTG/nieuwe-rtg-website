@@ -75,6 +75,36 @@
   @keyframes flits{from{opacity:0.85;}to{opacity:0;}}
   .vis-verborgen{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
   @media (prefers-reduced-motion: reduce){.flits-anim.aan{animation:none;}}
+
+  /* ---- de Studio: professionele nabewerking over het volle scherm ---- */
+  .studio{position:fixed;inset:0;z-index:20;background:var(--bg);display:none;flex-direction:column;}
+  .studio.aan{display:flex;}
+  .studio-kop{display:flex;align-items:center;gap:0.5rem;
+    padding:calc(env(safe-area-inset-top,0px) + 0.6rem) 0.9rem 0.6rem;}
+  .studio-kop b{font-size:0.8rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);}
+  .studio-doek{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 0.6rem;}
+  .studio-doek canvas{max-width:100%;max-height:100%;border:1px solid var(--line);}
+  .studio-voet{padding:0.55rem 0.9rem calc(env(safe-area-inset-bottom,0px) + 0.8rem);
+    display:flex;flex-direction:column;gap:0.55rem;background:linear-gradient(transparent,rgba(12,12,11,0.85));}
+  .studio .rahul{margin:0;}
+  .chips{display:flex;gap:0.4rem;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chips button{flex-shrink:0;background:var(--card);border:1px solid var(--line);color:var(--txt);
+    font:inherit;font-size:0.72rem;padding:0.4rem 0.75rem;border-radius:999px;cursor:pointer;}
+  .chips button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .chips button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .regelaars{display:none;flex-direction:column;gap:0.3rem;max-height:31vh;overflow-y:auto;}
+  .regelaars.aan{display:flex;}
+  .regel{display:grid;grid-template-columns:6.4rem 1fr 2.6rem;align-items:center;gap:0.6rem;font-size:0.72rem;}
+  .regel label{color:var(--soft);}
+  .regel output{text-align:right;color:var(--soft);font-variant-numeric:tabular-nums;}
+  .regel input[type=range]{width:100%;accent-color:var(--gold);height:22px;}
+  .studio-acties{display:flex;gap:0.5rem;align-items:center;}
+  .studio-acties .rek{flex:1;}
+  .aknop{background:var(--card);border:1px solid var(--line);color:var(--txt);font:inherit;
+    font-size:0.78rem;padding:0.55rem 0.9rem;border-radius:10px;cursor:pointer;}
+  .aknop.goud{border-color:var(--gold);color:var(--gold);}
+  .aknop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 </style>
 </head>
 <body>
@@ -95,6 +125,8 @@
 <header class="boven">
   <button class="knopje" id="terug" aria-label="Terug naar de app">←</button>
   <span class="rek"></span>
+  <button class="knopje" id="openKnop" aria-label="Open een bestaande foto in de Studio">🖼️</button>
+  <input type="file" id="openBestand" accept="image/*" class="vis-verborgen">
   <button class="knopje" id="rasterKnop" aria-label="Raster aan of uit" aria-pressed="true">▦</button>
   <button class="knopje" id="flitsKnop" aria-label="Lamp aan of uit" aria-pressed="false" hidden>⚡</button>
   <button class="knopje" id="wisselKnop" aria-label="Wissel tussen voor- en achtercamera">⟲</button>
@@ -110,13 +142,282 @@
     <button data-stand="food" aria-pressed="false">Food</button>
   </div>
   <div class="rij">
-    <button class="duimpje" id="duimpje" aria-label="Laatste foto opslaan" hidden><img id="duimBeeld" alt="Laatste foto"></button>
+    <button class="duimpje" id="duimpje" aria-label="Laatste foto openen in de Studio" hidden><img id="duimBeeld" alt="Laatste foto"></button>
     <button class="sluiter" id="sluiter" aria-label="Maak een foto"></button>
     <button class="knopje" id="micKnop" aria-label="Spraaksturing: zeg bijvoorbeeld foto, wissel of tip">🎤</button>
   </div>
 </div>
 
+<!-- de Studio: professionele nabewerking, met Rahul als retoucheur -->
+<section class="studio" id="studio" role="dialog" aria-modal="true" aria-label="Studio: foto nabewerken">
+  <header class="studio-kop">
+    <button class="knopje" id="stTerug" aria-label="Studio sluiten zonder opslaan">←</button>
+    <b>Studio</b>
+    <span class="rek"></span>
+    <button class="knopje" id="stVergelijk" aria-label="Houd ingedrukt om het origineel te zien">◐</button>
+    <button class="knopje" id="stMic" aria-label="Spraaksturing in de Studio">🎤</button>
+  </header>
+  <div class="studio-doek"><canvas id="stDoek" aria-label="Voorbeeld van de bewerkte foto"></canvas></div>
+  <div class="studio-voet">
+    <div class="rahul"><span aria-hidden="true">✦</span>
+      <span class="tekst"><b>Rahul</b> · <span id="stRahul">Tik op ✨ en ik werk hem voor u af; daarna kunt u alles zelf verfijnen.</span></span>
+    </div>
+    <div class="chips" role="group" aria-label="Looks">
+      <button id="stAuto" class="goud" aria-pressed="false">✨ Rahul: werk af</button>
+      <button data-look="origineel" aria-pressed="true">Origineel</button>
+      <button data-look="quiet" aria-pressed="false">Quiet Luxury</button>
+      <button data-look="ibiza" aria-pressed="false">Ibiza Zon</button>
+      <button data-look="food" aria-pressed="false">Food Fresh</button>
+      <button data-look="golden" aria-pressed="false">Golden Hour</button>
+      <button data-look="zw" aria-pressed="false">Editorial Z/W</button>
+    </div>
+    <div class="chips" role="group" aria-label="Uitsnede">
+      <button data-ar="0" aria-pressed="true">Vrij</button>
+      <button data-ar="1" aria-pressed="false">1:1</button>
+      <button data-ar="0.8" aria-pressed="false">4:5</button>
+      <button data-ar="1.7778" aria-pressed="false">16:9</button>
+      <button id="stSpiegel" aria-pressed="false">Spiegel</button>
+      <button id="stRegelKnop" aria-pressed="false">Fijnregelaars</button>
+    </div>
+    <div class="regelaars" id="stRegelaars" aria-label="Fijnregelaars">
+      <div class="regel"><label for="rBel">Belichting</label><input type="range" id="rBel" min="-100" max="100" value="0"><output for="rBel">0</output></div>
+      <div class="regel"><label for="rCon">Contrast</label><input type="range" id="rCon" min="-100" max="100" value="0"><output for="rCon">0</output></div>
+      <div class="regel"><label for="rHoog">Hooglichten</label><input type="range" id="rHoog" min="-100" max="100" value="0"><output for="rHoog">0</output></div>
+      <div class="regel"><label for="rScha">Schaduwen</label><input type="range" id="rScha" min="-100" max="100" value="0"><output for="rScha">0</output></div>
+      <div class="regel"><label for="rWarm">Warmte</label><input type="range" id="rWarm" min="-100" max="100" value="0"><output for="rWarm">0</output></div>
+      <div class="regel"><label for="rVerz">Verzadiging</label><input type="range" id="rVerz" min="-100" max="100" value="0"><output for="rVerz">0</output></div>
+      <div class="regel"><label for="rScherp">Scherpte</label><input type="range" id="rScherp" min="0" max="100" value="0"><output for="rScherp">0</output></div>
+      <div class="regel"><label for="rVig">Vignet</label><input type="range" id="rVig" min="0" max="100" value="0"><output for="rVig">0</output></div>
+      <div class="regel"><label for="rRecht">Rechttrekken</label><input type="range" id="rRecht" min="-10" max="10" value="0" step="0.2"><output for="rRecht">0</output></div>
+    </div>
+    <div class="studio-acties">
+      <button class="aknop" id="stReset">Herstel</button>
+      <span class="rek"></span>
+      <button class="aknop goud" id="stBewaar">Opslaan (volle resolutie)</button>
+    </div>
+  </div>
+</section>
+
 <script src="/shared/spraak.js" defer></script>
+<script>
+/* ============================ de Studio-motor ============================
+   Professionele nabewerking, volledig op het toestel (de foto verlaat de
+   telefoon niet): geometrie (rechttrekken, uitsnede, spiegelen), een echte
+   pixel-pijplijn (belichting, contrast, hooglichten/schaduwen, warmte,
+   verzadiging), vignet en scherpte (bij het opslaan, op volle resolutie).
+   Rahul werkt de foto op verzoek zelf af: hij meet het histogram en de
+   kleurbalans en zet de regelaars, met uitleg erbij. */
+window.Studio = (function () {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const doek = $('#stDoek'), sect = $('#studio'), rahul = $('#stRahul');
+  let bron = null;            // ImageBitmap op volle resolutie
+  let ar = 0, spiegel = false, toonOrigineel = false;
+  const R = { bel: 0, con: 0, hoog: 0, scha: 0, warm: 0, verz: 0, scherp: 0, vig: 0, recht: 0 };
+  const LOOKS = {
+    origineel: {},
+    quiet:  { con: 12, hoog: -22, scha: 10, warm: 8,  verz: -18, vig: 22 },
+    ibiza:  { bel: 8,  con: 14,  hoog: -12, warm: 22, verz: 16,  vig: 10 },
+    food:   { bel: 10, con: 10,  scha: 14,  warm: 6,  verz: 20,  scherp: 25 },
+    golden: { bel: 4,  con: 8,   hoog: -18, warm: 34, verz: 8,   vig: 26 },
+    zw:     { con: 22, hoog: -10, scha: 8,  verz: -100, vig: 18, scherp: 20 }
+  };
+
+  /* ---- de pijplijn: geometrie -> pixels -> vignet ---- */
+  function geometrie(maxKant) {
+    const a = R.recht * Math.PI / 180, abs = Math.abs(a);
+    let w = bron.width, h = bron.height;
+    const schaalNaar = maxKant ? Math.min(1, maxKant / Math.max(w, h)) : 1;
+    w = Math.round(w * schaalNaar); h = Math.round(h * schaalNaar);
+    // uitsnede naar de gekozen verhouding, uit het midden
+    let uw = w, uh = h;
+    if (ar > 0) { if (uw / uh > ar) uw = Math.round(uh * ar); else uh = Math.round(uw / ar); }
+    const c = document.createElement('canvas'); c.width = uw; c.height = uh;
+    const tx = c.getContext('2d');
+    // rechttrekken: roteren en net genoeg inzoomen zodat er geen randen komen
+    const dek = Math.cos(abs) + Math.sin(abs) * (Math.max(uw, uh) / Math.min(uw, uh));
+    tx.translate(uw / 2, uh / 2);
+    if (spiegel) tx.scale(-1, 1);
+    tx.rotate(a); tx.scale(dek, dek);
+    tx.drawImage(bron, -w / 2, -h / 2, w, h);
+    return c;
+  }
+  function pixels(c) {
+    const tx = c.getContext('2d');
+    const beeld = tx.getImageData(0, 0, c.width, c.height), d = beeld.data;
+    const mult = Math.pow(2, R.bel / 100);
+    const con = 1 + R.con / 100 * 0.8;
+    const warm = R.warm / 100 * 22;
+    const sat = 1 + R.verz / 100;
+    const hoog = R.hoog / 100 * 46, scha = R.scha / 100 * 46;
+    for (let i = 0; i < d.length; i += 4) {
+      let r = d[i] * mult, g = d[i + 1] * mult, b = d[i + 2] * mult;
+      const y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      const yn = Math.min(1, Math.max(0, y / 255));
+      const toon = hoog * yn * yn + scha * (1 - yn) * (1 - yn); // zachte tooncurve
+      r += toon; g += toon; b += toon;
+      r = (r - 128) * con + 128; g = (g - 128) * con + 128; b = (b - 128) * con + 128;
+      r += warm; b -= warm;
+      const y2 = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      d[i] = y2 + (r - y2) * sat; d[i + 1] = y2 + (g - y2) * sat; d[i + 2] = y2 + (b - y2) * sat;
+    }
+    tx.putImageData(beeld, 0, 0);
+    if (R.vig > 0) {
+      const gr = tx.createRadialGradient(c.width / 2, c.height / 2, Math.min(c.width, c.height) * 0.42,
+        c.width / 2, c.height / 2, Math.max(c.width, c.height) * 0.72);
+      gr.addColorStop(0, 'rgba(0,0,0,0)');
+      gr.addColorStop(1, 'rgba(0,0,0,' + (R.vig / 100 * 0.5).toFixed(3) + ')');
+      tx.fillStyle = gr; tx.fillRect(0, 0, c.width, c.height);
+    }
+    return c;
+  }
+  function scherpte(c) {
+    if (R.scherp <= 0) return c;
+    // een lichte unsharp-kernel, alleen bij het opslaan (volle resolutie)
+    const tx = c.getContext('2d');
+    const bIn = tx.getImageData(0, 0, c.width, c.height);
+    const uit = tx.createImageData(c.width, c.height);
+    const a = R.scherp / 100, w = c.width, h = c.height, d = bIn.data, o = uit.data;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (x === 0 || y === 0 || x === w - 1 || y === h - 1) { o[i] = d[i]; o[i + 1] = d[i + 1]; o[i + 2] = d[i + 2]; o[i + 3] = 255; continue; }
+      for (let k = 0; k < 3; k++) {
+        const v = d[i + k] * (1 + 4 * a) - a * (d[i - 4 + k] + d[i + 4 + k] + d[i - w * 4 + k] + d[i + w * 4 + k]);
+        o[i + k] = v;
+      }
+      o[i + 3] = 255;
+    }
+    tx.putImageData(uit, 0, 0);
+    return c;
+  }
+
+  let gepland = null;
+  function teken() {
+    if (!bron) return;
+    if (gepland) return;
+    gepland = requestAnimationFrame(() => {
+      gepland = null;
+      const c = toonOrigineel ? geometrie(1100) : pixels(geometrie(1100));
+      doek.width = c.width; doek.height = c.height;
+      doek.getContext('2d').drawImage(c, 0, 0);
+    });
+  }
+
+  /* ---- Rahul werkt af: meten en zetten, met uitleg ---- */
+  function werkAf() {
+    const c = geometrie(320), tx = c.getContext('2d');
+    const d = tx.getImageData(0, 0, c.width, c.height).data;
+    const hist = new Array(256).fill(0);
+    let sr = 0, sb = 0;
+    const n = d.length / 4;
+    for (let i = 0; i < d.length; i += 4) {
+      hist[Math.round(0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2])]++;
+      sr += d[i]; sb += d[i + 2];
+    }
+    const perc = p => { let t = 0; for (let v = 0; v < 256; v++) { t += hist[v]; if (t >= n * p) return v; } return 255; };
+    const p5 = perc(0.05), p50 = perc(0.5), p95 = perc(0.95);
+    const klem = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+    const deed = [];
+    R.bel = klem(Math.log2(118 / Math.max(30, p50)) * 100, -60, 60);
+    if (Math.abs(R.bel) > 6) deed.push(R.bel > 0 ? 'belichting omhoog' : 'belichting getemperd');
+    R.con = klem((215 / Math.max(60, p95 - p5) - 1) * 70, 0, 45);
+    if (R.con > 6) deed.push('contrast aangezet');
+    R.scha = p5 < 12 ? 18 : 8; R.hoog = p95 > 248 ? -24 : -10;
+    const balans = (sr - sb) / n;
+    R.warm = klem(-balans * 1.1 + 8, -25, 30);
+    if (R.warm > 10) deed.push('warmer gemaakt');
+    if (R.warm < -6) deed.push('koeler gemaakt');
+    R.verz = 12; R.scherp = Math.max(R.scherp, 20); R.vig = Math.max(R.vig, 12);
+    deed.push('kleur en scherpte verfijnd');
+    zetSchuiven(); teken();
+    rahul.textContent = 'Afgewerkt: ' + deed.join(', ') + '. Schuif gerust bij, of zeg bijvoorbeeld "warmer" of "meer contrast".';
+  }
+
+  /* ---- bediening ---- */
+  const VELDEN = { rBel: 'bel', rCon: 'con', rHoog: 'hoog', rScha: 'scha', rWarm: 'warm', rVerz: 'verz', rScherp: 'scherp', rVig: 'vig', rRecht: 'recht' };
+  function zetSchuiven() {
+    for (const [id, k] of Object.entries(VELDEN)) {
+      const el = $('#' + id); el.value = R[k];
+      el.nextElementSibling.textContent = String(Math.round(R[k]));
+    }
+  }
+  for (const [id, k] of Object.entries(VELDEN)) $('#' + id).addEventListener('input', ev => {
+    R[k] = Number(ev.target.value);
+    ev.target.nextElementSibling.textContent = String(Math.round(R[k]));
+    teken();
+  });
+  function look(naam) {
+    const l = LOOKS[naam] || {};
+    for (const k of Object.keys(R)) if (k !== 'recht') R[k] = l[k] || 0;
+    document.querySelectorAll('[data-look]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.look === naam)));
+    zetSchuiven(); teken();
+  }
+  document.querySelectorAll('[data-look]').forEach(b => b.addEventListener('click', () => {
+    look(b.dataset.look);
+    rahul.textContent = b.dataset.look === 'origineel' ? 'Terug naar het origineel.' : 'De look "' + b.textContent + '" staat erop; schuif gerust bij.';
+  }));
+  document.querySelectorAll('[data-ar]').forEach(b => b.addEventListener('click', () => {
+    ar = Number(b.dataset.ar);
+    document.querySelectorAll('[data-ar]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    teken();
+  }));
+  $('#stSpiegel').addEventListener('click', () => { spiegel = !spiegel; $('#stSpiegel').setAttribute('aria-pressed', String(spiegel)); teken(); });
+  $('#stRegelKnop').addEventListener('click', () => {
+    const r = $('#stRegelaars'); r.classList.toggle('aan');
+    $('#stRegelKnop').setAttribute('aria-pressed', String(r.classList.contains('aan')));
+  });
+  $('#stAuto').addEventListener('click', werkAf);
+  $('#stReset').addEventListener('click', () => { look('origineel'); R.recht = 0; ar = 0; spiegel = false; zetSchuiven(); teken(); rahul.textContent = 'Alles hersteld naar het origineel.'; });
+  const houdOrigineel = aan => { toonOrigineel = aan; teken(); };
+  $('#stVergelijk').addEventListener('pointerdown', () => houdOrigineel(true));
+  $('#stVergelijk').addEventListener('pointerup', () => houdOrigineel(false));
+  $('#stVergelijk').addEventListener('pointercancel', () => houdOrigineel(false));
+  $('#stTerug').addEventListener('click', sluit);
+  $('#stBewaar').addEventListener('click', () => {
+    rahul.textContent = 'Momentje: ik werk hem op volle resolutie af…';
+    setTimeout(() => {
+      const c = scherpte(pixels(geometrie(0)));
+      c.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'rtg-studio-' + Date.now() + '.jpg';
+        document.body.appendChild(a); a.click(); a.remove();
+        rahul.textContent = 'Opgeslagen op volle resolutie (' + c.width + '×' + c.height + '). Deze mag de Salon in.';
+      }, 'image/jpeg', 0.95);
+    }, 30);
+  });
+
+  /* ---- spraak in de Studio: kleine, duidelijke bijstellingen ---- */
+  const stap = (k, n, lo, hi) => { R[k] = Math.max(lo == null ? -100 : lo, Math.min(hi == null ? 100 : hi, R[k] + n)); zetSchuiven(); teken(); };
+  function spraak(zin) {
+    const z = zin.toLowerCase();
+    if (/warmer/.test(z)) { stap('warm', 15); rahul.textContent = 'Warmer.'; return true; }
+    if (/koeler|kouder/.test(z)) { stap('warm', -15); rahul.textContent = 'Koeler.'; return true; }
+    if (/lichter|helderder/.test(z)) { stap('bel', 15); rahul.textContent = 'Lichter.'; return true; }
+    if (/donkerder/.test(z)) { stap('bel', -15); rahul.textContent = 'Donkerder.'; return true; }
+    if (/meer contrast/.test(z)) { stap('con', 15); rahul.textContent = 'Meer contrast.'; return true; }
+    if (/minder contrast/.test(z)) { stap('con', -15); rahul.textContent = 'Minder contrast.'; return true; }
+    if (/scherper/.test(z)) { stap('scherp', 15, 0); rahul.textContent = 'Scherper bij het opslaan.'; return true; }
+    if (/zwart.?wit/.test(z)) { look('zw'); rahul.textContent = 'Editorial zwart-wit.'; return true; }
+    if (/\bfood\b|eten/.test(z)) { look('food'); rahul.textContent = 'Food Fresh staat erop.'; return true; }
+    if (/vignet/.test(z)) { stap('vig', 15, 0); rahul.textContent = 'Iets meer vignet.'; return true; }
+    if (/werk.*af|maak.*af|automatisch|\bauto\b/.test(z)) { werkAf(); return true; }
+    if (/origineel|herstel/.test(z)) { $('#stReset').click(); return true; }
+    if (/opslaan|bewaar/.test(z)) { $('#stBewaar').click(); return true; }
+    if (/vergelijk/.test(z)) { houdOrigineel(true); setTimeout(() => houdOrigineel(false), 1200); return true; }
+    if (/terug|sluit/.test(z)) { sluit(); return true; }
+    return false;
+  }
+
+  async function open(blob) {
+    bron = await createImageBitmap(blob);
+    look('origineel'); R.recht = 0; ar = 0; spiegel = false; zetSchuiven();
+    sect.classList.add('aan'); teken();
+    rahul.textContent = 'Tik op ✨ en ik werk hem voor u af; of kies een look en schuif zelf.';
+  }
+  function sluit() { sect.classList.remove('aan'); if (bron) { bron.close(); bron = null; } }
+  return { open, sluit, spraak, isOpen: () => sect.classList.contains('aan'), micKnop: () => $('#stMic') };
+})();
+</script>
 <script>
 (function () {
   'use strict';
@@ -218,17 +519,18 @@
     zegRahul(analyse(c));
     c.toBlob(blob => {
       const url = URL.createObjectURL(blob);
-      strook.unshift(url); if (strook.length > 6) URL.revokeObjectURL(strook.pop());
+      strook.unshift({ url, blob }); if (strook.length > 6) URL.revokeObjectURL(strook.pop().url);
       $('#duimpje').hidden = false; $('#duimBeeld').src = url;
     }, 'image/jpeg', 0.95);
   }
   $('#sluiter').addEventListener('click', maakFoto);
-  $('#duimpje').addEventListener('click', () => {
-    if (!strook[0]) return;
-    const a = document.createElement('a');
-    a.href = strook[0]; a.download = 'rtg-foto-' + Date.now() + '.jpg';
-    document.body.appendChild(a); a.click(); a.remove();
-    zegRahul('Opgeslagen op uw toestel. Delen kan zo als snap of in De Salon.');
+  // het duimpje opent de Studio: daar werkt Rahul de foto af en slaat u op
+  $('#duimpje').addEventListener('click', () => { if (strook[0] && window.Studio) Studio.open(strook[0].blob); });
+  $('#openKnop').addEventListener('click', () => $('#openBestand').click());
+  $('#openBestand').addEventListener('change', ev => {
+    const f = ev.target.files && ev.target.files[0];
+    if (f && window.Studio) Studio.open(f);
+    ev.target.value = '';
   });
 
   /* ---------- Rahul: tips uit het ene AI-hart, en spraaksturing ---------- */
@@ -246,6 +548,7 @@
   $('#rahulKaart').addEventListener('click', volgendeTip);
   if (window.Spraak) Spraak.koppel($('#micKnop'), {
     opTekst: zin => {
+      if (window.Studio && Studio.isOpen() && Studio.spraak(zin)) return;
       const z = zin.toLowerCase();
       if (/\bfoto\b|cheese|klik/.test(z)) return maakFoto();
       if (/wissel|draai om|selfie/.test(z)) return $('#wisselKnop').click();
@@ -257,6 +560,10 @@
       vraagRahul(zin); // al het andere mag Rahul zelf beantwoorden
     },
     nietVerstaan: () => zegRahul('Dat verstond ik net niet. Zeg bijvoorbeeld "foto", "wissel", "food" of "tip".')
+  });
+  if (window.Spraak && window.Studio) Spraak.koppel(Studio.micKnop(), {
+    opTekst: zin => { if (!Studio.spraak(zin)) vraagRahul(zin); },
+    nietVerstaan: () => {}
   });
 
   volgendeTip();

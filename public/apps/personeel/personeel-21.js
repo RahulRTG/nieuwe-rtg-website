@@ -82,6 +82,12 @@
   oogKnop.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></svg>RTG Eye';
   oogKnop.addEventListener('click', () => { location.href = '/apps/oog.html'; });
   extraHouder.appendChild(oogKnop);
+  // de OV-dienst (chauffeur/machinist/schipper): dienst starten en GPS delen
+  const ovKnop = document.createElement('button');
+  ovKnop.type = 'button'; ovKnop.className = 'pda-app';
+  ovKnop.innerHTML = '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M4 10h16"/><circle cx="8" cy="19" r="1.6"/><circle cx="16" cy="19" r="1.6"/></svg>OV-dienst';
+  ovKnop.addEventListener('click', () => { location.href = '/apps/ovdienst.html'; });
+  extraHouder.appendChild(ovKnop);
   document.body.appendChild(extraHouder);
   if (window.WerkOS) WerkOS.koppel({ thuisTab: 'vandaag', dock: ['rooster', 'taken', 'team', 'hulp'],
     extra: { houder: '#pdaExtra', knop: '.pda-app' } });

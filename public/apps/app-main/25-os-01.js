@@ -32,7 +32,8 @@
     flits:       { naam: 'Flits',        icoon: '🛣️', url: '/apps/flits.html' },
     theater:     { naam: 'Theater',      icoon: '🎞️', url: '/apps/theater.html' },
     wbw:         { naam: 'Wie betaalt wat', icoon: '💶', url: '/apps/wbw.html' },
-    passkeys:    { naam: 'Passkeys',     icoon: '🔑', url: '/apps/passkeys.html' }
+    passkeys:    { naam: 'Passkeys',     icoon: '🔑', url: '/apps/passkeys.html' },
+    ov:          { naam: 'OV',           icoon: '🚌', url: '/apps/ov.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -56,6 +57,7 @@
     ['tab:reizen', 'tab:betalen', 'tab:bestellen', 'tab:ai', 'tab:salon', 'tab:terplaatse',
       { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
     [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
+      'link:ov',
       'os:rtf',
       'link:camera',
       'link:muziek',

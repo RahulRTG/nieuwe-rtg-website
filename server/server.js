@@ -2713,6 +2713,12 @@ Object.assign(kern, require('./kern/ghost').maakGhost({
 Object.assign(kern, require('./kern/flits').maakFlits({
   db, save, crypto, haversine, ghostSimuleer: kern.ghostSimuleer
 }));
+/* RTG OV (kern/ov.js): al het vervoer in een app. Lijnen met haltes, live
+   voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS) en
+   uitchecken met eerlijke km-prijs via RTG Pay. Na pay en sociaal gemount. */
+Object.assign(kern, require('./kern/ov').maakOv({
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify
+}));
 /* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
    De cryptografie komt uit @simplewebauthn/server; wij bewaren alleen
    publieke sleutels per account, challenges leven kort en in RAM.
@@ -2762,6 +2768,7 @@ require('./routes/ghost')(kern);
 require('./routes/flits')(kern);
 require('./routes/theater')(kern);
 require('./routes/wbw')(kern);
+require('./routes/ov')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

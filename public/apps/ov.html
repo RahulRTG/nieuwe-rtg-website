@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG OV</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:640px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  /* de twee snelle check-ins: twee grote rustige vlakken */
+  .snel{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-top:0.8rem;}
+  .snel button{display:flex;flex-direction:column;align-items:center;gap:0.4rem;background:var(--card);
+    border:1px solid var(--line);border-radius:16px;color:var(--txt);padding:1.2rem 0.6rem;font-size:0.85rem;}
+  .snel button .i{font-size:1.9rem;}
+  .snel button .sub{font-size:0.68rem;color:var(--soft);}
+  .snel button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  /* lijnen dichtbij */
+  .lijn{display:flex;align-items:baseline;gap:0.7rem;border-top:1px solid var(--line);padding:0.6rem 0;font-size:0.88rem;}
+  .lijn:first-child{border-top:none;}
+  .lijn .icoon{font-size:1.2rem;}
+  .lijn .sub{display:block;font-size:0.7rem;color:var(--soft);margin-top:0.15rem;}
+  .lijn .rek{flex:1;}
+  .lijn .over{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;}
+  .lijn .over .puls{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--groen);
+    margin-right:0.35rem;animation:puls 1.6s ease-in-out infinite;}
+  @keyframes puls{0%,100%{opacity:0.35;}50%{opacity:1;}}
+  /* de actieve rit en de oplichtende code */
+  .rit{border-left:3px solid var(--groen);}
+  .codeScherm{position:fixed;inset:0;background:#0C0C0B;display:none;flex-direction:column;align-items:center;
+    justify-content:center;gap:1.2rem;z-index:50;}
+  .codeScherm.zien{display:flex;}
+  .codeScherm .code{font-family:'Bodoni Moda',serif;font-size:3.4rem;letter-spacing:0.35em;padding-left:0.35em;
+    color:#0C0C0B;background:var(--gold);border-radius:16px;padding:1rem 1.4rem;
+    box-shadow:0 0 60px rgba(201,162,75,0.65), 0 0 140px rgba(201,162,75,0.35);}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:60;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>RTG OV</h1>
+  <span class="rek"></span>
+  <span class="badge">Alles in één · live gps</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil">RTG OV hoort bij uw lidmaatschap; log eerst in via de app.</p></div>
+  </section>
+
+  <section id="vOv" class="weg">
+    <!-- de actieve rit -->
+    <div class="kaart rit weg" id="ritKaart">
+      <p style="font-size:0.95rem;"><span id="ritIcoon"></span> <strong>U bent ingecheckt</strong></p>
+      <p class="stil" id="ritSub"></p>
+      <div style="margin-top:0.7rem;"><button class="knop vol" id="uitKnop" type="button">Check uit</button></div>
+    </div>
+
+    <!-- twee snelle opties -->
+    <div id="inBlok">
+      <h2>Inchecken, twee snelle opties</h2>
+      <div class="snel">
+        <button id="knopCode" type="button">
+          <span class="i" aria-hidden="true">✨</span>Oplichtende code
+          <span class="sub">Tonen; het personeel tikt hem in</span>
+        </button>
+        <button id="knopGps" type="button">
+          <span class="i" aria-hidden="true">📍</span>Eén tik
+          <span class="sub">U staat bij het voertuig, klaar</span>
+        </button>
+      </div>
+    </div>
+
+    <h2>In de buurt</h2>
+    <div class="kaart"><div id="lijnen"><p class="stil">Even kijken wat er rijdt…</p></div></div>
+
+    <h2>Privéchauffeur</h2>
+    <div class="kaart">
+      <p class="stil">Liever een eigen wagen met chauffeur? Dezelfde app, dezelfde wallet.</p>
+      <div style="margin-top:0.6rem;"><a class="knop" href="/apps/app.html" style="text-decoration:none;display:inline-block;">Boek een privéchauffeur</a></div>
+    </div>
+    <p class="stil" id="uitleg">Uitchecken rekent eerlijk af: basistarief plus de gereden kilometers, direct uit uw
+      RTG Pay-wallet (die zichzelf bijlaadt als dat nodig is).</p>
+  </section>
+</main>
+
+<div class="codeScherm" id="codeScherm" role="dialog" aria-label="Uw incheckcode">
+  <p class="stil">Toon dit scherm; het personeel tikt de code in.</p>
+  <div class="code" id="codeTekst" aria-live="polite"></div>
+  <p class="stil" id="codeTijd"></p>
+  <button class="knop" id="codeDicht" type="button">Sluiten</button>
+</div>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/ov/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3600); };
+  const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+
+  let hier = { lat: 38.908, lng: 1.432 };   // demo-startpunt tot de gps spreekt
+  if ('geolocation' in navigator)
+    navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
+
+  async function ververs() {
+    const r = await api('kaart', hier);
+    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); $('#vOv').classList.add('weg'); return; }
+    $('#vOv').classList.remove('weg');
+    // de actieve rit
+    const rit = r.body.rit;
+    $('#ritKaart').classList.toggle('weg', !rit);
+    $('#inBlok').classList.toggle('weg', !!rit);
+    if (rit) {
+      $('#ritIcoon').textContent = rit.icoon;
+      $('#ritSub').textContent = 'Sinds ' + String(rit.inAt).slice(11, 16) + ' · uitchecken rekent eerlijk af per kilometer.';
+    }
+    // de lijnen dichtbij
+    const el = $('#lijnen'); el.innerHTML = '';
+    if (!(r.body.lijnen || []).length) el.innerHTML = '<p class="stil">Geen lijnen in de buurt.</p>';
+    for (const l of (r.body.lijnen || []).slice(0, 8)) {
+      const d = document.createElement('div'); d.className = 'lijn';
+      const afst = l.halte && l.halte.afstandM != null
+        ? (l.halte.afstandM < 1000 ? Math.round(l.halte.afstandM) + ' m' : (Math.round(l.halte.afstandM / 100) / 10) + ' km') : '';
+      d.innerHTML = '<span class="icoon" aria-hidden="true">' + l.icoon + '</span>' +
+        '<span><strong></strong><span class="sub"></span></span><span class="rek"></span>' +
+        '<span class="over">' + (l.live ? '<span class="puls" aria-hidden="true"></span>' : '') + 'over ~' + l.overMin + ' min</span>';
+      d.querySelector('strong').textContent = l.naam;
+      d.querySelector('.sub').textContent = (l.halte ? l.halte.naam + ' · ' + afst : '') +
+        (l.live ? ' · live' : ' · elke ' + l.frequentieMin + ' min');
+      el.appendChild(d);
+    }
+  }
+
+  /* ---- snelle optie 1: de oplichtende code ---- */
+  let codeTimer;
+  $('#knopCode').addEventListener('click', async () => {
+    const r = await api('code');
+    if (r.body.error) return zeg(r.body.error);
+    $('#codeTekst').textContent = r.body.code;
+    $('#codeScherm').classList.add('zien');
+    let over = r.body.geldigS;
+    clearInterval(codeTimer);
+    codeTimer = setInterval(() => {
+      over -= 1;
+      $('#codeTijd').textContent = 'Nog ' + Math.floor(over / 60) + ':' + String(over % 60).padStart(2, '0') + ' geldig';
+      if (over <= 0) { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); }
+      // ingecheckt door het personeel? Dan sluit het scherm vanzelf
+      if (over % 3 === 0) api('mijn').then(m => { if (m.body.rit) { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); zeg('Ingecheckt. Goede reis.'); ververs(); } });
+    }, 1000);
+  });
+  $('#codeDicht').addEventListener('click', () => { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); });
+
+  /* ---- snelle optie 2: een tik op GPS ---- */
+  $('#knopGps').addEventListener('click', async () => {
+    const r = await api('hier', hier);
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Ingecheckt met één tik. Goede reis.');
+    ververs();
+  });
+
+  /* ---- uitchecken ---- */
+  $('#uitKnop').addEventListener('click', async () => {
+    const r = await api('uit', { ...hier, idem: Math.random().toString(36).slice(2, 10) });
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Uitgecheckt: ' + r.body.km + ' km · ' + eur(r.body.prijs) + ' · saldo ' + eur(r.body.saldo) + '.');
+    ververs();
+  });
+
+  /* ---- start ---- */
+  if (!token) { $('#vPoort').classList.remove('weg'); return; }
+  ververs();
+  setInterval(ververs, 15000);
+})();
+</script>
+</body>
+</html>

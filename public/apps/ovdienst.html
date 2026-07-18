@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OV-dienst</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:560px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
+  label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
+  .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
+  .rij input,.rij select{flex:1;min-width:8rem;width:auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .tellers{display:flex;gap:1.4rem;}
+  .tellers b{display:block;font-family:'Bodoni Moda',serif;font-size:2rem;font-variant-numeric:tabular-nums;}
+  .tellers span{font-size:0.7rem;color:var(--soft);letter-spacing:0.1em;text-transform:uppercase;}
+  .codeIn input{font-size:1.4rem;letter-spacing:0.3em;text-transform:uppercase;text-align:center;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/personeel.html" aria-label="Terug naar de personeels-app">←</a>
+  <h1>OV-dienst</h1>
+  <span class="rek"></span>
+  <span class="badge" id="dienstBadge">Geen dienst</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil" id="poortReden">Log eerst in op de personeels-app van uw OV-zaak.</p></div>
+  </section>
+
+  <section id="vDienst" class="weg">
+    <!-- dienst kiezen -->
+    <div id="kies">
+      <h2>Dienst starten</h2>
+      <div class="kaart">
+        <label for="dLijn">Lijn</label><select id="dLijn"></select>
+        <label for="dNaam">Voertuig</label><input id="dNaam" maxlength="40" placeholder="Bijv. Bus 4">
+        <div class="rij"><button class="knop vol" id="dStart" type="button">Start de dienst</button></div>
+        <p class="stil" style="margin-top:0.5rem;">Zodra de dienst loopt deelt deze PDA de positie; leden zien uw
+          voertuig live aankomen bij hun halte.</p>
+      </div>
+    </div>
+
+    <!-- de lopende dienst -->
+    <div id="loopt" class="weg">
+      <div class="kaart">
+        <div class="tellers">
+          <span><b id="tAanBoord">0</b><span>aan boord</span></span>
+          <span><b id="tVandaag">0</b><span>vandaag</span></span>
+        </div>
+        <p class="stil" id="gpsStatus" style="margin-top:0.6rem;">GPS delen…</p>
+        <div class="rij"><button class="knop rood" id="dStop" type="button">Stop de dienst</button></div>
+      </div>
+      <h2>Check-in met code</h2>
+      <div class="kaart codeIn">
+        <p class="stil">Het lid toont een oplichtende code; tik hem in en de reiziger is binnen.</p>
+        <form class="rij" id="codeForm">
+          <label for="codeVeld" style="position:absolute;left:-999px;">Incheckcode</label>
+          <input id="codeVeld" maxlength="6" autocomplete="off" placeholder="XXXXXX">
+          <button class="knop vol" type="submit">Check in</button>
+        </form>
+        <p class="stil" style="margin-top:0.5rem;">Reizigers met de GPS-tik checken zichzelf in; die ziet u vanzelf in
+          de teller verschijnen.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/staff/ov/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3200); };
+
+  let hier = { lat: 38.908, lng: 1.432 };
+  if ('geolocation' in navigator)
+    navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
+
+  let posTimer = null, standTimer = null;
+  async function start() {
+    if (!token) { $('#vPoort').classList.remove('weg'); return; }
+    // de lijnen komen uit het zaakoverzicht (zelfde inlog)
+    const r = await fetch('/api/supplier/ov/overzicht', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
+      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
+    if (r.status !== 200) { $('#poortReden').textContent = r.body.error || 'Log eerst in op de personeels-app van uw OV-zaak.'; $('#vPoort').classList.remove('weg'); return; }
+    const sel = $('#dLijn'); sel.innerHTML = '';
+    for (const l of r.body.lijnen || []) { const o = document.createElement('option'); o.value = l.id; o.textContent = l.icoon + ' ' + l.naam; sel.appendChild(o); }
+    $('#vDienst').classList.remove('weg');
+  }
+
+  $('#dStart').addEventListener('click', async () => {
+    const r = await api('dienst', { lijnId: $('#dLijn').value, voertuigNaam: $('#dNaam').value });
+    if (r.body.error) return zeg(r.body.error);
+    $('#kies').classList.add('weg'); $('#loopt').classList.remove('weg');
+    $('#dienstBadge').textContent = r.body.lijn.naam + ' · live';
+    const deel = async () => {
+      const p = await api('pos', hier);
+      $('#gpsStatus').textContent = p.body.error ? p.body.error : 'GPS gedeeld om ' + new Date().toLocaleTimeString('nl-NL').slice(0, 5) + '; leden zien u live.';
+    };
+    deel(); posTimer = setInterval(deel, 7000);
+    const stand = async () => {
+      const s = await api('stand');
+      if (s.status === 200) { $('#tAanBoord').textContent = s.body.aanBoord; $('#tVandaag').textContent = s.body.vandaag; }
+    };
+    stand(); standTimer = setInterval(stand, 8000);
+  });
+  $('#dStop').addEventListener('click', async () => {
+    await api('dienst', { aan: false });
+    clearInterval(posTimer); clearInterval(standTimer);
+    $('#kies').classList.remove('weg'); $('#loopt').classList.add('weg');
+    $('#dienstBadge').textContent = 'Geen dienst';
+    zeg('Dienst gestopt.');
+  });
+  $('#codeForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const r = await api('checkin', { code: $('#codeVeld').value });
+    if (r.body.error) return zeg(r.body.error);
+    $('#codeVeld').value = '';
+    zeg('Reiziger ingecheckt.');
+    const s = await api('stand');
+    if (s.status === 200) { $('#tAanBoord').textContent = s.body.aanBoord; $('#tVandaag').textContent = s.body.vandaag; }
+  });
+
+  start();
+})();
+</script>
+</body>
+</html>

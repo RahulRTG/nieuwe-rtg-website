@@ -8,6 +8,7 @@ const STAFF_SEED = {
   PONTO: [['Diego Serra', 'manager', 'Bar'], ['Lisa Groen', 'staff', 'Bediening']],
   HOSHI: [['Carla Vidal', 'manager', 'Receptie'], ['Ibrahim Yildiz', 'staff', 'Housekeeping']],
   MKKX: [['Paolo Mendez', 'manager', 'Taxi centrale'], ['Yara El Idrissi', 'staff', 'Chauffeur']],
+  TRANSIT: [['Marisol Vega', 'manager', 'Verkeersleiding'], ['Diego Ferrer', 'staff', 'Buschauffeur'], ['Nuria Camps', 'staff', 'Schipper']],
   JETAG: [['Sophie Bakker', 'manager', 'Operations'], ['Lucas de Jong', 'staff', 'Crew']],
   // zelfstandigen: eenmanszaken, dus alleen een eigenaar met beheer-rechten
   AYAKA: [['Livia Bergkamp', 'manager', 'Goudsmid']],

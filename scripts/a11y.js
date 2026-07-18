@@ -36,6 +36,8 @@ const PAGINAS = [
   '/apps/theater.html',
   '/apps/wbw.html',
   '/apps/passkeys.html',
+  '/apps/ov.html',
+  '/apps/ovdienst.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

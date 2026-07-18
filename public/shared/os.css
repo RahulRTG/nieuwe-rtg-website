@@ -64,7 +64,11 @@ body[data-osbar]{
   color:var(--os-grijs-zacht);
 }
 
-.osbar .os-account{ display:flex; justify-content:flex-end; }
+.osbar .os-account{ display:flex; align-items:center; gap:0.6rem; justify-content:flex-end; }
+.osbar .os-terug{
+  font-size:0.72rem; color:var(--os-grijs-zacht); text-decoration:none; white-space:nowrap;
+}
+.osbar .os-terug:hover{ color:var(--os-inkt); }
 .osbar .os-chip{
   display:inline-flex; align-items:center; gap:0.45rem;
   border:1px solid var(--os-lijn); border-radius:999px;

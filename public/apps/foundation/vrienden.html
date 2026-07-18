@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
+<link rel="stylesheet" href="/shared/os.css">
 <script src="palet.js"></script>
 <style>
   .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
@@ -81,7 +82,7 @@
   :focus-visible{outline:2px solid var(--goud,#C9A24B);outline-offset:2px;}
 </style>
 </head>
-<body>
+<body data-osbar="Vrienden" data-oswereld="foundation">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header id="balk"></header>
 <main class="wrap" id="hoofd" tabindex="-1">
@@ -606,6 +607,8 @@ startStream();
 setInterval(()=>{ if(!document.querySelector('.ov.open')) laad(); }, 12000);
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<script src="/shared/accounts-os.js" defer></script>
+<script src="/shared/osbar.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 </body>
 </html>

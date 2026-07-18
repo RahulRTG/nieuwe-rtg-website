@@ -55,6 +55,16 @@
 
   var accountWrap = el('div', 'os-account');
   accountWrap.setAttribute('aria-live', 'polite');
+
+  // optioneel: een "terug"-link in de balk (data-osterug="/pad",
+  // data-osterug-label="Naar de site"). Voor apps die naast het bureaublad
+  // ook een eigen uitgang willen tonen (zoals het ledenportaal -> de site).
+  var terugPad = body.getAttribute('data-osterug');
+  if (terugPad) {
+    var terug = el('a', 'os-terug', '← ' + (body.getAttribute('data-osterug-label') || 'Terug'));
+    terug.href = terugPad;
+    accountWrap.appendChild(terug);
+  }
   var chip = el('a', 'os-chip leeg');
   chip.href = BUREAU;
   var stip = el('span', 'os-stip');

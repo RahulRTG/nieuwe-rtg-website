@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#0C0C0B">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/apps/foundation/stijl.css">
+<link rel="stylesheet" href="/shared/os.css">
 <script src="/apps/foundation/palet.js"></script>
 <script src="/shared/verbinding.js"></script>
 <style>
@@ -84,7 +85,7 @@
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
 </head>
-<body>
+<body data-osbar="Spelen" data-oswereld="lid">
 <main class="wrap" id="hoofd">
   <!-- lobby -->
   <section id="vLobby">
@@ -1124,6 +1125,8 @@ setInterval(()=>{ if ($('#vLobby').hidden || document.hidden) return; if (window
 const qs = new URLSearchParams(location.search);
 if (qs.get('potje')) openPotje(qs.get('potje'));
 </script>
+<script src="/shared/accounts-os.js" defer></script>
+<script src="/shared/osbar.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 </body>
 </html>

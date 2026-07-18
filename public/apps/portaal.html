@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/os.css" rel="stylesheet">
 <style>
   :root{
     --white:#FFFFFF;
@@ -130,6 +132,18 @@
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
+  /* de slanke actiebalk onder de OS-balk: niet sticky, geen achtergrond of
+     rand, rechts uitgelijnd; leeg (uitgelogd) neemt hij nauwelijks ruimte. */
+  header.acties{
+    position:static;
+    z-index:auto;
+    padding:0.4rem 0 0;
+    background:none;
+    backdrop-filter:none;
+    border-bottom:0;
+  }
+  header.acties .wrap{justify-content:flex-end;}
+  header.acties:empty, header.acties .header-user:empty{padding:0;}
   header .wrap{
     display:flex;
     align-items:center;
@@ -1015,17 +1029,14 @@
   .modal .actions{display:flex;gap:0.75rem;margin-top:1.25rem;justify-content:flex-end;}
 </style>
 </head>
-<body>
+<body data-osbar="Ledenportaal" data-oswereld="lid" data-osterug="/index.html" data-osterug-label="Naar de site">
 
-<header>
+<!-- de RTG-OS balk (shared/osbar.js) is nu de kop; deze slanke, niet-sticky
+     actiebalk houdt alleen de bel + het account (ingelogd) vast. '← Naar de
+     site' staat via data-osterug in de OS-balk. -->
+<header class="acties">
   <div class="wrap">
-    <a href="/index.html" class="brandmark">
-      <span class="bm-block">Rahul Travel Group</span>
-      <span class="bm-tagline">Ledenportaal</span>
-    </a>
-    <div class="header-user" id="headerUser">
-      <a href="/index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>
-    </div>
+    <div class="header-user" id="headerUser"></div>
   </div>
 </header>
 
@@ -1532,7 +1543,7 @@
     document.body.classList.remove('theme-rtg', 'theme-life');
     $('#portal').classList.remove('active');
     $('#gate').classList.remove('hidden');
-    $('#headerUser').innerHTML = '<a href="/index.html" style="font-size:0.78rem;color:var(--grey-soft);">← Terug naar de site</a>';
+    $('#headerUser').innerHTML = '';  // '← Naar de site' staat nu in de OS-balk
     window.scrollTo({top:0});
   }
 
@@ -2285,6 +2296,9 @@ window.I18N = { en: {
 </script>
 <script src="/shared/i18n.js"></script>
 
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/accounts-os.js" defer></script>
+<script src="/shared/osbar.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 </body>
 </html>

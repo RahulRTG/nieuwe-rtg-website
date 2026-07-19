@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>De Overheid</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  section.paneel{display:none;}
+  section.paneel.aan{display:block;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:.8rem;}
+  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;}
+  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  textarea.veld{resize:vertical;min-height:3rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.3rem 0;}
+  .chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
+  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card2);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+  .item .meta{font-size:.76rem;color:var(--soft);margin-top:.15rem;}
+  .item.onge{border-color:var(--gold);}
+  .status{display:inline-block;font-size:.72rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);margin-top:.3rem;text-transform:capitalize;}
+  .status.op{border-color:var(--green);color:var(--green);}
+  .status.af{border-color:var(--burgundy);color:var(--burgundy);}
+  .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .rij .veld{flex:1;min-width:8rem;}
+  .bedrag{font-family:'Bodoni Moda',serif;font-size:1.5rem;font-variant-numeric:tabular-nums;}
+  .bedrag.terug{color:var(--green);} .bedrag.bij{color:var(--burgundy);}
+  .stemopt{display:flex;justify-content:space-between;align-items:center;gap:.6rem;border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;margin-bottom:.5rem;background:var(--card2);}
+  .balk{height:6px;border-radius:3px;background:var(--gold);margin-top:.35rem;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
+  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  .bad{display:inline-block;min-width:1.1rem;text-align:center;background:var(--burgundy);color:#fff;border-radius:999px;font-size:.68rem;padding:.02rem .35rem;margin-left:.3rem;}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/app.html">← App</a>
+  <div><div class="ey">MijnOverheid · het rijk</div><h1>De Overheid</h1></div>
+</header>
+<main id="main">
+  <div class="tabs" id="tabs"></div>
+
+  <section class="paneel" id="p-box">
+    <div class="kaart">
+      <h3>Berichtenbox</h3>
+      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:.3rem;">Je officiële post van het rijk · Belastingdienst, Toeslagen, RDW, UWV/SVB. Tik een bericht aan om het te lezen.</p>
+    </div>
+    <div id="boxLijst"><div class="leeg">Laden…</div></div>
+  </section>
+
+  <section class="paneel" id="p-belasting">
+    <div class="kaart">
+      <h3>Aangifte inkomstenbelasting</h3>
+      <div class="rij">
+        <div style="flex:1;"><div class="lbl">Bruto jaarinkomen (€)</div><input class="veld" id="ibInkomen" inputmode="numeric" placeholder="Bijv. 48000"></div>
+        <div style="flex:1;"><div class="lbl">Aftrekposten (€)</div><input class="veld" id="ibAftrek" inputmode="numeric" placeholder="0"></div>
+      </div>
+      <div class="lbl">Al ingehouden loonheffing (€, optioneel)</div>
+      <input class="veld" id="ibIngehouden" inputmode="numeric" placeholder="Leeg = schatting">
+      <div id="ibUit" style="margin-top:.8rem;"></div>
+      <div class="rij" style="margin-top:.8rem;">
+        <button class="knop stil" id="ibBereken" style="width:auto;">Bereken</button>
+        <button class="knop" id="ibGo" style="width:auto;">Aangifte indienen</button>
+      </div>
+    </div>
+    <h3 style="margin:1.1rem 0 .5rem;">Mijn aanslagen</h3>
+    <div id="ibMijn"><div class="leeg">Nog geen aanslagen.</div></div>
+    <div class="kaart" style="margin-top:1rem;">
+      <h3>Toeslag aanvragen</h3>
+      <div class="lbl">Welke toeslag?</div>
+      <div class="chips" id="tsSoorten"></div>
+      <div class="lbl">Jaarinkomen (€)</div>
+      <input class="veld" id="tsInkomen" inputmode="numeric" placeholder="Bijv. 22000">
+      <button class="knop" id="tsGo" style="margin-top:.8rem;">Toeslag aanvragen</button>
+    </div>
+    <div id="tsMijn"></div>
+  </section>
+
+  <section class="paneel" id="p-rdw">
+    <div class="kaart">
+      <h3>Rijbewijs</h3>
+      <div id="rbInfo" class="meta" style="margin-top:.3rem;">Laden…</div>
+      <button class="knop stil" id="rbVerleng" style="margin-top:.7rem;width:auto;">Rijbewijs verlengen</button>
+    </div>
+    <div class="kaart">
+      <h3>Voertuig registreren (RDW)</h3>
+      <div class="rij">
+        <div style="flex:1;"><div class="lbl">Kenteken</div><input class="veld" id="vtKenteken" maxlength="12" placeholder="Bijv. 12-ABC-3"></div>
+        <div style="flex:1;"><div class="lbl">Merk</div><input class="veld" id="vtMerk" maxlength="40" placeholder="Bijv. Land Rover"></div>
+      </div>
+      <button class="knop" id="vtGo" style="margin-top:.8rem;">Op mijn naam zetten</button>
+    </div>
+    <h3 style="margin:1.1rem 0 .5rem;">Mijn voertuigen</h3>
+    <div id="vtMijn"><div class="leeg">Nog geen voertuigen.</div></div>
+  </section>
+
+  <section class="paneel" id="p-kvk">
+    <div class="kaart">
+      <h3>Handelsregister (KVK)</h3>
+      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:.3rem;">Start je eigen zaak: schrijf je in en krijg een KVK-nummer en uittreksel.</p>
+      <div class="lbl">Bedrijfsnaam</div>
+      <input class="veld" id="kvNaam" maxlength="120" placeholder="Bijv. Casa del Sol">
+      <div class="lbl">Rechtsvorm</div>
+      <div class="chips" id="kvVormen"></div>
+      <div class="lbl">SBI-code (optioneel)</div>
+      <input class="veld" id="kvSbi" maxlength="8" placeholder="Bijv. 5610">
+      <button class="knop" id="kvGo" style="margin-top:.8rem;">Inschrijven</button>
+    </div>
+    <h3 style="margin:1.1rem 0 .5rem;">Mijn inschrijvingen</h3>
+    <div id="kvMijn"><div class="leeg">Nog geen inschrijving.</div></div>
+  </section>
+
+  <section class="paneel" id="p-sociaal">
+    <div class="kaart">
+      <h3>Sociale zekerheid (UWV/SVB)</h3>
+      <div class="lbl">Regeling</div>
+      <div class="chips" id="szSoorten"></div>
+      <div class="lbl">Toelichting (optioneel)</div>
+      <textarea class="veld" id="szToe" maxlength="400" placeholder="Vertel kort je situatie"></textarea>
+      <button class="knop" id="szGo" style="margin-top:.8rem;">Aanvraag indienen</button>
+    </div>
+    <div id="szMijn"></div>
+    <div class="kaart">
+      <h3>Bezwaar maken</h3>
+      <div class="lbl">Waartegen?</div>
+      <input class="veld" id="bzTegen" maxlength="120" placeholder="Bijv. Aanslag IB 2026">
+      <div class="lbl">Reden</div>
+      <textarea class="veld" id="bzReden" maxlength="800" placeholder="Waarom ben je het er niet mee eens?"></textarea>
+      <button class="knop stil" id="bzGo" style="margin-top:.8rem;width:auto;">Bezwaar indienen</button>
+    </div>
+    <div id="bzMijn"></div>
+  </section>
+
+  <section class="paneel" id="p-stem">
+    <div class="kaart" id="stemKaart"><div class="leeg">Laden…</div></div>
+    <h3 style="margin:1.1rem 0 .5rem;">Bekendmakingen</h3>
+    <div id="bekLijst"><div class="leeg">Laden…</div></div>
+  </section>
+</main>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3000); }
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+if (!TOKEN) {
+  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
+    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">MijnOverheid werkt met je RTG-account. Open de app en log in.</p>'+
+    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+} else { start(); }
+
+const TABS = [['box','Berichtenbox'],['belasting','Belasting'],['rdw','RDW'],['kvk','Onderneming'],['sociaal','Sociaal'],['stem','Stemmen']];
+const TOESLAGEN = { zorgtoeslag:'Zorgtoeslag', huurtoeslag:'Huurtoeslag', kindgebonden:'Kindgebonden budget' };
+const VORMEN = { eenmanszaak:'Eenmanszaak', vof:'V.O.F.', bv:'Besloten vennootschap', stichting:'Stichting' };
+const UITK = { ww:'WW-uitkering', bijstand:'Bijstand', aow:'AOW', kinderbijslag:'Kinderbijslag' };
+let tsSoort = 'zorgtoeslag', kvVorm = 'eenmanszaak', szSoort = 'ww';
+
+function chips(host, map, huidig, set){
+  $(host).innerHTML = Object.entries(map).map(([k,l]) => '<button class="chip'+(k===huidig()?' aan':'')+'" data-k="'+k+'">'+esc(l)+'</button>').join('');
+  $(host).querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { set(b.dataset.k); $(host).querySelectorAll('.chip').forEach(x => x.classList.toggle('aan', x===b)); }));
+}
+function toon(t){
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
+  TABS.forEach(([x]) => $('#p-'+x).classList.toggle('aan', x === t));
+  if (t === 'box') laadBox();
+  if (t === 'belasting') { laadAanslagen(); laadToeslagen(); }
+  if (t === 'rdw') { laadRijbewijs(); laadVoertuigen(); }
+  if (t === 'kvk') laadKvk();
+  if (t === 'sociaal') { laadUitkeringen(); laadBezwaren(); }
+  if (t === 'stem') { laadStem(); laadBekend(); }
+}
+function start(){
+  $('#tabs').innerHTML = TABS.map(([t,l]) => '<button class="tab" data-t="'+t+'">'+esc(l)+'</button>').join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => toon(b.dataset.t)));
+  chips('#tsSoorten', TOESLAGEN, () => tsSoort, k => tsSoort = k);
+  chips('#kvVormen', VORMEN, () => kvVorm, k => kvVorm = k);
+  chips('#szSoorten', UITK, () => szSoort, k => szSoort = k);
+  toon('box'); vernieuwBadge();
+}
+async function vernieuwBadge(){
+  try { const d = await api('/api/overheid/berichten'); const t = $('#tabs').querySelector('[data-t="box"]');
+    if (t && d.ongelezen) t.innerHTML = 'Berichtenbox<span class="bad">'+d.ongelezen+'</span>'; } catch(e){}
+}
+
+// Berichtenbox
+async function laadBox(){
+  let d; try { d = await api('/api/overheid/berichten'); } catch(e){ return; }
+  const l = d.berichten || [];
+  $('#boxLijst').innerHTML = l.length ? l.map(b =>
+    '<div class="item'+(b.gelezen?'':' onge')+'" data-id="'+esc(b.id)+'"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.van)+'</div>'+
+    '<div style="font-size:.86rem;color:var(--muted);margin-top:.3rem;line-height:1.5;">'+esc(b.tekst)+'</div></div>').join('') : '<div class="leeg">Nog geen berichten.</div>';
+  $('#boxLijst').querySelectorAll('.item.onge').forEach(el => el.addEventListener('click', async () => {
+    try { await api('/api/overheid/bericht/gelezen', { id: el.dataset.id }); el.classList.remove('onge'); vernieuwBadge(); } catch(e){}
+  }));
+}
+
+// Belasting
+function toonUit(u, host){
+  const t = u.saldo < 0;
+  $(host).innerHTML = '<div class="lbl">'+(t?'Je krijgt terug':(u.saldo>0?'Je moet bijbetalen':'Saldo'))+'</div>'+
+    '<div class="bedrag '+(t?'terug':(u.saldo>0?'bij':''))+'">€ '+Math.abs(u.saldo)+'</div>'+
+    '<div class="meta">Belastbaar € '+u.belastbaar+' · belasting € '+u.belasting+' · heffingskorting € '+u.heffingskorting+' · ingehouden € '+u.ingehouden+'</div>';
+}
+$('#ibBereken').addEventListener('click', async () => {
+  try { const d = await api('/api/overheid/belasting/bereken', { inkomen: $('#ibInkomen').value, aftrek: $('#ibAftrek').value, ingehouden: $('#ibIngehouden').value }); toonUit(d.uitkomst, '#ibUit'); }
+  catch(e){ meld(e.message); }
+});
+$('#ibGo').addEventListener('click', async () => {
+  if (!(parseInt($('#ibInkomen').value,10) > 0)){ meld('Vul je bruto jaarinkomen in.'); return; }
+  try { const d = await api('/api/overheid/aangifte', { inkomen: $('#ibInkomen').value, aftrek: $('#ibAftrek').value, ingehouden: $('#ibIngehouden').value });
+    toonUit(d.aanslag, '#ibUit'); meld('Aangifte ingediend. Zie je Berichtenbox.'); laadAanslagen(); vernieuwBadge();
+  } catch(e){ meld(e.message); }
+});
+async function laadAanslagen(){
+  let d; try { d = await api('/api/overheid/aanslagen/mijn'); } catch(e){ return; }
+  const l = d.aanslagen || [];
+  $('#ibMijn').innerHTML = l.length ? l.map(a => '<div class="item"><h4>Aanslag IB '+esc(a.jaar)+'</h4>'+
+    '<div class="meta">'+(a.saldo<0?'Teruggaaf € '+Math.abs(a.saldo):a.saldo>0?'Te betalen € '+a.saldo:'Nul')+' · inkomen € '+esc(a.inkomen)+'</div>'+
+    '<span class="status '+(a.betaald?'op':'')+'">'+(a.saldo>0?(a.betaald?'betaald':'openstaand'):'niets te betalen')+'</span>'+
+    ((a.saldo>0 && !a.betaald)?' <button class="knop stil" data-bet="'+esc(a.ref)+'" style="padding:.2rem .6rem;font-size:.76rem;">Betalen</button>':'')+'</div>').join('') : '<div class="leeg">Nog geen aanslagen.</div>';
+  $('#ibMijn').querySelectorAll('button[data-bet]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Deze aanslag nu betalen?')) return;
+    try { await api('/api/overheid/aanslag/betaal', { ref: b.dataset.bet }); meld('Betaald. Bedankt.'); laadAanslagen(); vernieuwBadge(); } catch(e){ meld(e.message); }
+  }));
+}
+$('#tsGo').addEventListener('click', async () => {
+  try { const d = await api('/api/overheid/toeslag', { soort: tsSoort, inkomen: $('#tsInkomen').value });
+    meld(d.toeslag.maandbedrag>0 ? 'Aangevraagd: € '+d.toeslag.maandbedrag+' per maand (voorlopig).' : 'Op dit inkomen is er geen recht.'); laadToeslagen(); vernieuwBadge();
+  } catch(e){ meld(e.message); }
+});
+async function laadToeslagen(){
+  let d; try { d = await api('/api/overheid/toeslagen/mijn'); } catch(e){ return; }
+  const l = d.toeslagen || [];
+  $('#tsMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn toeslagen</h3>'+l.map(t =>
+    '<div class="item"><h4>'+esc(t.soortLabel)+'</h4><div class="meta">€ '+esc(t.maandbedrag)+' per maand</div>'+
+    '<span class="status '+(t.status==='toegekend'?'op':t.status==='afgewezen'?'af':'')+'">'+esc(t.status)+'</span></div>').join('') : '';
+}
+
+// RDW
+async function laadRijbewijs(){
+  let d; try { d = await api('/api/overheid/rijbewijs'); } catch(e){ return; }
+  const r = d.rijbewijs || {};
+  $('#rbInfo').textContent = 'Categorieën: ' + (r.categorieen||[]).join(', ') + ' · geldig tot ' + (r.geldigTot||'·');
+}
+$('#rbVerleng').addEventListener('click', async () => {
+  try { const d = await api('/api/overheid/rijbewijs/verleng'); meld('Verlengd tot ' + d.rijbewijs.geldigTot + '.'); laadRijbewijs(); vernieuwBadge(); } catch(e){ meld(e.message); }
+});
+$('#vtGo').addEventListener('click', async () => {
+  if ($('#vtKenteken').value.trim().length < 4){ meld('Vul een geldig kenteken in.'); return; }
+  try { await api('/api/overheid/voertuig/meld', { kenteken: $('#vtKenteken').value, merk: $('#vtMerk').value });
+    $('#vtKenteken').value=''; $('#vtMerk').value=''; meld('Voertuig op je naam gezet.'); laadVoertuigen();
+  } catch(e){ meld(e.message); }
+});
+async function laadVoertuigen(){
+  let d; try { d = await api('/api/overheid/voertuigen'); } catch(e){ return; }
+  const l = d.voertuigen || [];
+  $('#vtMijn').innerHTML = l.length ? l.map(v => '<div class="item"><h4>'+esc(v.kenteken)+'</h4><div class="meta">'+esc(v.merk)+' · bouwjaar '+esc(v.bouwjaar)+' · APK tot '+esc(v.apkTot)+'</div>'+
+    '<span class="status'+(v.geschorst?' af':'')+'">'+(v.geschorst?'geschorst':'actief')+'</span> <button class="knop stil" data-sch="'+esc(v.id)+'" data-nu="'+(v.geschorst?'0':'1')+'" style="padding:.2rem .6rem;font-size:.76rem;">'+(v.geschorst?'Schorsing opheffen':'Schorsen')+'</button></div>').join('') : '<div class="leeg">Nog geen voertuigen.</div>';
+  $('#vtMijn').querySelectorAll('button[data-sch]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/overheid/voertuig/schors', { id: b.dataset.sch, schors: b.dataset.nu === '1' }); laadVoertuigen(); } catch(e){ meld(e.message); }
+  }));
+}
+
+// KVK
+$('#kvGo').addEventListener('click', async () => {
+  if ($('#kvNaam').value.trim().length < 2){ meld('Vul een bedrijfsnaam in.'); return; }
+  try { const d = await api('/api/overheid/kvk/inschrijven', { naam: $('#kvNaam').value, rechtsvorm: kvVorm, sbi: $('#kvSbi').value });
+    $('#kvNaam').value=''; meld('Ingeschreven onder KVK ' + d.inschrijving.kvkNummer + '.'); laadKvk(); vernieuwBadge();
+  } catch(e){ meld(e.message); }
+});
+async function laadKvk(){
+  let d; try { d = await api('/api/overheid/kvk/mijn'); } catch(e){ return; }
+  const l = d.inschrijvingen || [];
+  $('#kvMijn').innerHTML = l.length ? l.map(k => '<div class="item"><h4>'+esc(k.naam)+'</h4><div class="meta">KVK '+esc(k.kvkNummer)+' · '+esc(k.rechtsvormLabel)+' · SBI '+esc(k.sbi)+' · '+esc(k.vestiging)+'</div></div>').join('') : '<div class="leeg">Nog geen inschrijving.</div>';
+}
+
+// Sociaal
+$('#szGo').addEventListener('click', async () => {
+  try { await api('/api/overheid/uitkering', { soort: szSoort, toelichting: $('#szToe').value });
+    $('#szToe').value=''; meld('Aanvraag ingediend.'); laadUitkeringen(); vernieuwBadge();
+  } catch(e){ meld(e.message); }
+});
+async function laadUitkeringen(){
+  let d; try { d = await api('/api/overheid/uitkeringen/mijn'); } catch(e){ return; }
+  const l = d.uitkeringen || [];
+  $('#szMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn aanvragen</h3>'+l.map(u =>
+    '<div class="item"><h4>'+esc(u.soortLabel)+'</h4><span class="status '+(u.status==='toegekend'?'op':u.status==='afgewezen'?'af':'')+'">'+esc(u.status)+'</span></div>').join('') : '';
+}
+$('#bzGo').addEventListener('click', async () => {
+  if ($('#bzTegen').value.trim().length < 3 || $('#bzReden').value.trim().length < 6){ meld('Vul in waartegen en waarom.'); return; }
+  try { await api('/api/overheid/bezwaar', { tegen: $('#bzTegen').value, reden: $('#bzReden').value });
+    $('#bzTegen').value=''; $('#bzReden').value=''; meld('Bezwaar ingediend.'); laadBezwaren(); vernieuwBadge();
+  } catch(e){ meld(e.message); }
+});
+async function laadBezwaren(){
+  let d; try { d = await api('/api/overheid/bezwaren/mijn'); } catch(e){ return; }
+  const l = d.bezwaren || [];
+  $('#bzMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn bezwaren</h3>'+l.map(b =>
+    '<div class="item"><h4>'+esc(b.tegen)+'</h4><span class="status '+(b.status==='gegrond'?'op':b.status==='ongegrond'?'af':'')+'">'+esc(b.status)+'</span></div>').join('') : '';
+}
+
+// Stemmen + bekendmakingen
+async function laadStem(){
+  let d; try { d = await api('/api/overheid/verkiezing'); } catch(e){ return; }
+  const v = d.verkiezing;
+  if (!v){ $('#stemKaart').innerHTML = '<div class="leeg">Er loopt op dit moment geen stemming.</div>'; return; }
+  $('#stemKaart').innerHTML = '<h3>'+esc(v.titel)+'</h3><p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin:.3rem 0 .7rem;">'+esc(v.toelichting||'')+'</p>'+
+    v.opties.map(o => '<div class="stemopt"><div style="flex:1;"><b>'+esc(o.label)+'</b><div class="balk" style="width:'+o.pct+'%;"></div></div>'+
+      '<div style="text-align:right;min-width:3rem;"><div style="font-variant-numeric:tabular-nums;">'+o.pct+'%</div>'+
+      ((v.open && !v.alGestemd)?'<button class="knop" data-stem="'+esc(o.id)+'" style="padding:.25rem .7rem;font-size:.78rem;margin-top:.2rem;">Stem</button>':'')+'</div></div>').join('')+
+    '<div class="meta">'+(v.open ? (v.alGestemd?'Je hebt gestemd. ':'') : 'Stemming gesloten. ')+v.totaal+' stem(men)</div>';
+  $('#stemKaart').querySelectorAll('button[data-stem]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/overheid/stem', { keuze: b.dataset.stem }); meld('Je stem is geteld.'); laadStem(); } catch(e){ meld(e.message); }
+  }));
+}
+async function laadBekend(){
+  let d; try { d = await api('/api/overheid/bekendmakingen'); } catch(e){ return; }
+  const l = d.bekendmakingen || [];
+  $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Geen bekendmakingen.</div>';
+}
+</script>
+<button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
+<section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
+  <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
+  <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
+  <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Bijv. doe mijn aangifte met inkomen 48000" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
+</section>
+<style>
+.rahulfab{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--gold);color:#000;border:none;border-radius:999px;padding:.7rem 1.1rem;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+.rahulsheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:var(--card,#151312);border:1px solid var(--gold);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.rahulsheet[hidden]{display:none;}
+.rahulkop{display:flex;align-items:center;justify-content:space-between;}
+.rahulkop b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+.rahulkop .terug{padding:.2rem .55rem;}
+.rahuluit{font-size:.86rem;color:var(--muted,#bbb);line-height:1.55;max-height:40vh;overflow-y:auto;white-space:pre-wrap;}
+.rahulrij{display:flex;gap:.4rem;}
+.rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:10px;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
+.rahulgo{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
+</style>
+<script>(function(){
+  var tok=null; try{tok=localStorage.getItem('rtg_member_token');}catch(e){}
+  var fab=document.getElementById('rahulFab'), sheet=document.getElementById('rahulSheet');
+  var uit=document.getElementById('rahulUit'), form=document.getElementById('rahulForm'), inp=document.getElementById('rahulIn');
+  if(!tok){ if(fab) fab.style.display='none'; return; }
+  fab.addEventListener('click',function(){ sheet.hidden=false; fab.style.display='none'; inp.focus(); if(!uit.textContent) uit.textContent='Zeg wat je wilt. Ik doe je aangifte, vraag een toeslag aan, schrijf je in bij de KVK of laat je stemmen, met jouw eigen inlog.'; });
+  document.getElementById('rahulSluit').addEventListener('click',function(){ sheet.hidden=true; fab.style.display=''; });
+  form.addEventListener('submit',function(ev){ ev.preventDefault(); var q=inp.value.trim(); if(!q) return; inp.value=''; uit.textContent='Rahul denkt na…';
+    fetch('/api/fluister',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({q:q})})
+      .then(function(r){return r.json();}).then(function(d){ uit.textContent=(d&&(d.antwoord||d.error))||'Ik kwam er niet uit.'; })
+      .catch(function(){ uit.textContent='Er ging iets mis. Probeer het opnieuw.'; });
+  });
+})();</script>
+</body>
+</html>

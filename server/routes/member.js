@@ -65,6 +65,8 @@ module.exports = (kern) => {
   require('./member/winkel')(kern);
   // Het inwoner-loket van RTG Gemeente (meldingen, burgerzaken, vergunningen, afval).
   require('./member/gemeente')(kern);
+  // Het MijnOverheid-loket van De Overheid (Berichtenbox, belasting, RDW, KVK, sociale zekerheid, stemmen).
+  require('./member/overheid')(kern);
   // De Salon: post-interactie en de partner-etalage.
   require('./member/salon')(kern);
   // Werk & sollicitaties: cv, vacatures, solliciteren en de sollicitatie-chat.

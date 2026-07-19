@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rijks-loket (ambtenaar)</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;margin-top:.05rem;}
+  main{padding:1.1rem;max-width:820px;margin:0 auto;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.6rem;margin-bottom:1rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;}
+  .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.5rem;display:block;}
+  .kpi span{font-size:.72rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  section.paneel{display:none;} section.paneel.aan{display:block;}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+  .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.42rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
+  .status{display:inline-block;font-size:.72rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);text-transform:capitalize;}
+  .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.5rem 0 .25rem;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
+  .login .veld{width:100%;margin-bottom:.6rem;}
+</style>
+</head>
+<body>
+<header>
+  <div class="ey">Rijksambtenaar</div><h1>RTG Rijks-loket</h1>
+</header>
+<main id="main">
+  <div class="login" id="login">
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1rem;">Log in als medewerker van het rijk met je persoonlijke pincode.</p>
+    <select class="veld" id="wie"><option value="">Laden…</option></select>
+    <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
+    <button class="knop" id="loginGo" style="width:100%;">Inloggen</button>
+  </div>
+
+  <div id="app" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="tabs" id="tabs"></div>
+    <section class="paneel" id="p-tos"></section>
+    <section class="paneel" id="p-uit"></section>
+    <section class="paneel" id="p-bez"></section>
+    <section class="paneel" id="p-stem"></section>
+    <section class="paneel" id="p-bek">
+      <div class="item">
+        <h3>Nieuwe rijksbekendmaking</h3>
+        <div class="lbl">Titel</div><input class="veld" id="bekTitel" maxlength="120" style="width:100%;">
+        <div class="lbl">Tekst</div><textarea class="veld" id="bekTekst" maxlength="800" style="width:100%;min-height:3rem;resize:vertical;"></textarea>
+        <div class="lbl">Soort</div>
+        <select class="veld" id="bekSoort"><option value="algemeen">Algemeen</option><option value="belasting">Belasting</option><option value="rdw">RDW</option><option value="sociaal">Sociaal</option><option value="wet">Wet & regeling</option></select>
+        <div class="rij"><button class="knop" id="bekGo">Plaatsen</button></div>
+      </div>
+      <div id="bekLijst"></div>
+    </section>
+  </div>
+</main>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
+let TOKEN = null;
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const CODE = 'RIJK';
+async function vulWie(){
+  try { const r = await api('/api/supplier/roster', { code: CODE });
+    $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
+  } catch(e){ $('#wie').innerHTML = '<option value="">Loket niet bereikbaar</option>'; }
+}
+vulWie();
+$('#loginGo').addEventListener('click', async () => {
+  const staffId = $('#wie').value, pin = $('#pin').value.trim();
+  if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
+  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token;
+    $('#login').hidden = true; $('#app').hidden = false; start();
+  } catch(e){ meld(e.message); }
+});
+
+const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['stem','Stemming'],['bek','Bekendmakingen']];
+function toon(t){
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
+  ['tos','uit','bez','stem','bek'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  if (t === 'tos') laadToeslagen();
+  if (t === 'uit') laadUitkeringen();
+  if (t === 'bez') laadBezwaren();
+  if (t === 'stem') laadStem();
+  if (t === 'bek') laadBekend();
+}
+function start(){
+  $('#tabs').innerHTML = TABS.map(([t,l]) => '<button class="tab" data-t="'+t+'">'+esc(l)+'</button>').join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => toon(b.dataset.t)));
+  laadRegie(); toon('tos');
+}
+async function laadRegie(){
+  let d; try { d = await api('/api/overheid/regie'); } catch(e){ return; }
+  $('#kpis').innerHTML =
+    '<div class="kpi"><b>'+d.toeslagenOpen+'</b><span>Toeslagen open</span></div>'+
+    '<div class="kpi"><b>'+d.uitkeringenOpen+'</b><span>Uitkeringen open</span></div>'+
+    '<div class="kpi"><b>'+d.bezwarenOpen+'</b><span>Bezwaren open</span></div>'+
+    '<div class="kpi"><b>'+d.aangiftenJaar+'</b><span>Aangiften</span></div>'+
+    '<div class="kpi"><b>'+d.inschrijvingen+'</b><span>KVK-inschr.</span></div>'+
+    '<div class="kpi"><b>'+d.stemmen+'</b><span>Stemmen</span></div>';
+}
+async function laadToeslagen(){
+  let d; try { d = await api('/api/overheid/toeslagen'); } catch(e){ return; }
+  const l = d.toeslagen || [];
+  $('#p-tos').innerHTML = l.length ? l.map(t =>
+    '<div class="item" data-ref="'+esc(t.ref)+'"><h4>'+esc(t.soortLabel)+' · € '+esc(t.maandbedrag)+'/mnd</h4>'+
+    '<div class="meta">inkomen € '+esc(t.inkomen)+' · aanvrager '+esc(t.aanvrager||'')+'</div>'+
+    '<div class="rij"><button class="knop bes" data-b="toegekend">Toekennen</button>'+
+    '<button class="knop rood bes" data-b="afgewezen">Afwijzen</button></div></div>').join('') : '<div class="leeg">Geen openstaande aanvragen.</div>';
+  $('#p-tos').querySelectorAll('.item').forEach(it => it.querySelectorAll('.bes').forEach(btn => btn.addEventListener('click', async () => {
+    try { await api('/api/overheid/toeslag/beslis', { ref: it.dataset.ref, besluit: btn.dataset.b }); meld('Bijgewerkt.'); laadToeslagen(); laadRegie(); } catch(e){ meld(e.message); }
+  })));
+}
+async function laadUitkeringen(){
+  let d; try { d = await api('/api/overheid/uitkeringen'); } catch(e){ return; }
+  const l = d.uitkeringen || [];
+  $('#p-uit').innerHTML = l.length ? l.map(u =>
+    '<div class="item" data-ref="'+esc(u.ref)+'"><h4>'+esc(u.soortLabel)+'</h4>'+
+    '<div class="meta">'+esc(u.aanvrager||'')+(u.toelichting?' · '+esc(u.toelichting):'')+'</div><span class="status">'+esc(u.status)+'</span>'+
+    '<div class="rij"><button class="knop bes" data-b="toegekend">Toekennen</button>'+
+    '<button class="knop stil bes" data-b="in behandeling">In behandeling</button>'+
+    '<button class="knop rood bes" data-b="afgewezen">Afwijzen</button></div></div>').join('') : '<div class="leeg">Geen openstaande aanvragen.</div>';
+  $('#p-uit').querySelectorAll('.item').forEach(it => it.querySelectorAll('.bes').forEach(btn => btn.addEventListener('click', async () => {
+    try { await api('/api/overheid/uitkering/beslis', { ref: it.dataset.ref, besluit: btn.dataset.b }); meld('Bijgewerkt.'); laadUitkeringen(); laadRegie(); } catch(e){ meld(e.message); }
+  })));
+}
+async function laadBezwaren(){
+  let d; try { d = await api('/api/overheid/bezwaren'); } catch(e){ return; }
+  const l = d.bezwaren || [];
+  $('#p-bez').innerHTML = l.length ? l.map(b =>
+    '<div class="item" data-ref="'+esc(b.ref)+'"><h4>'+esc(b.tegen)+'</h4><div class="meta">'+esc(b.reden)+' · '+esc(b.aanvrager||'')+'</div><span class="status">'+esc(b.status)+'</span>'+
+    '<div class="rij"><button class="knop bes" data-b="gegrond">Gegrond</button>'+
+    '<button class="knop rood bes" data-b="ongegrond">Ongegrond</button></div></div>').join('') : '<div class="leeg">Geen openstaande bezwaren.</div>';
+  $('#p-bez').querySelectorAll('.item').forEach(it => it.querySelectorAll('.bes').forEach(btn => btn.addEventListener('click', async () => {
+    try { await api('/api/overheid/bezwaar/beslis', { ref: it.dataset.ref, besluit: btn.dataset.b }); meld('Bijgewerkt.'); laadBezwaren(); laadRegie(); } catch(e){ meld(e.message); }
+  })));
+}
+async function laadStem(){
+  let d; try { d = await api('/api/overheid/verkiezing'); } catch(e){ return; }
+  const v = d.verkiezing;
+  if (!v){ $('#p-stem').innerHTML = '<div class="leeg">Er is geen stemming.</div>'; return; }
+  $('#p-stem').innerHTML = '<div class="item"><h4>'+esc(v.titel)+'</h4>'+
+    v.opties.map(o => '<div class="meta">'+esc(o.label)+': '+o.stemmen+' ('+o.pct+'%)</div>').join('')+
+    '<div class="meta" style="margin-top:.3rem;">Totaal '+v.totaal+' · status: '+(v.open?'open':'gesloten')+'</div>'+
+    '<div class="rij"><button class="knop'+(v.open?' rood':'')+'" id="stemToggle">'+(v.open?'Stemming sluiten':'Stemming heropenen')+'</button></div></div>';
+  $('#stemToggle').addEventListener('click', async () => {
+    try { await api('/api/overheid/verkiezing/sluit', { open: !v.open }); meld('Bijgewerkt.'); laadStem(); laadRegie(); } catch(e){ meld(e.message); }
+  });
+}
+$('#bekGo').addEventListener('click', async () => {
+  const titel = $('#bekTitel').value.trim(), tekst = $('#bekTekst').value.trim();
+  if (titel.length < 3 || tekst.length < 3){ meld('Vul een titel en tekst in.'); return; }
+  try { await api('/api/overheid/bekendmaking', { titel, tekst, soort: $('#bekSoort').value });
+    $('#bekTitel').value = ''; $('#bekTekst').value = ''; meld('Geplaatst.'); laadBekend();
+  } catch(e){ meld(e.message); }
+});
+async function laadBekend(){
+  let d; try { d = await api('/api/supplier/overheid/bekendmakingen'); } catch(e){ return; }
+  const l = d.bekendmakingen || [];
+  $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Nog geen bekendmakingen.</div>';
+}
+</script>
+</body>
+</html>

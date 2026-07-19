@@ -60,7 +60,9 @@ const STAFF_SEED = {
   ORODOR: [['Esteban Oro', 'manager', 'Meester-juwelier'], ['Lia Costa', 'staff', 'Salon & taxatie']],
   LIENZO: [['Valeria Pinto', 'manager', 'Galeriehouder'], ['Hugo Ram', 'staff', 'Exposities & entree']],
   // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
-  GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']]
+  GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']],
+  // het rijk: een behandelaar (beoordeelt toeslagen/uitkeringen/bezwaren) en een baliemedewerker
+  RIJK: [['Sander de Vries', 'manager', 'Behandeling & beleid'], ['Fatima El Amrani', 'staff', 'Rijksbalie']]
 };
 
 module.exports = { STAFF_SEED };

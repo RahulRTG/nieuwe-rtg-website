@@ -1,9 +1,9 @@
-/* Het afdelingsregister, deel 2 (kern/afdelingen): de vijf jongere kamers
-   van het RTG-kantoor: Support team, Ingenieurs, Consumenten-abonnementen,
-   Partner-abonnementen en de Kantine. Zelfde vorm als register.js: per
-   kamer de naam, KPI's en lijsten, alles defensief lezend. Kamers met
-   naamInzage: true mogen via de identiteitskluis de echte naam bij een
-   codenaam opvragen (elke opvraging komt in het auditlog). */
+/* Afdelingsregister deel 2, kamergroep "kantoorkamers" (kern/afdelingen): de
+   vijf jongere bedrijfskamers - Support team, Ingenieurs, Consumenten-
+   abonnementen, Partner-abonnementen en de Kantine. Zelfde vorm als register.js:
+   per kamer de naam, KPI's en lijsten, alles defensief lezend. Kamers met
+   naamInzage: true mogen via de identiteitskluis de echte naam bij een codenaam
+   opvragen (elke opvraging komt in het auditlog). Verbatim uit register2.js. */
 module.exports = (ctx) => {
   const { d, lijst, tel, recent, ledenGeteld, functies, accounts } = ctx;
   const functiesStand = () => ((d().techniek || {}).functies || {});
@@ -81,66 +81,6 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'De kaart van vandaag' + ((d().kantineMenu || {}).datum ? ' (' + d().kantineMenu.datum + ')' : ''), items: ((d().kantineMenu || {}).items || []).slice(0, 12) },
         { titel: 'Huisregel', items: ['In de kantine praten we niet over cijfers; werkvragen mogen mee terug naar de kamer.'] }
-      ] },
-    /* RTG Atelier: het besloten ontwerpbureau van het kantoor. De cijfers
-       staan hier; de eigenlijke ontwerpvloer (concepten, tech packs, de
-       creatief directeur) opent als een eigen cockpit op deze kamer. */
-    atelier: { naam: 'RTG Atelier', emoji: '✂️', missie: 'Het ontwerpbureau van het kantoor voor mode en alles wat je aan het lijf draagt; het huis waar de grote maisons hun atelier zouden willen hebben.', eigenApp: true,
-      kpis: () => [
-        ['Ontwerpen', tel((d().atelier || {}).ontwerpen)],
-        ['In productie', tel(lijst((d().atelier || {}).ontwerpen).filter(o => o.status === 'productie'))],
-        ['Categorieen', 8],
-        ['Collecties', tel((d().atelier || {}).collecties)],
-        ['Bijgewerkt (7d)', recent((d().atelier || {}).ontwerpen, 'updatedAt', 7)]
-      ],
-      lijsten: () => [
-        { titel: 'Laatste ontwerpen', items: lijst((d().atelier || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.categorie) + ', ' + String(o.status) + ')') },
-        { titel: 'Verder werken', items: ['Klik op deze kamer om het atelier te openen: brief een stuk, laat de AI het concept uittekenen, en vraag het tech pack en de creatief directeur.'] }
-      ] },
-    /* RTG Ontwerpstudio: het voertuig- en vaartuig-ontwerpbureau van het
-       kantoor (automotive, jachten, luchtvaart, helikopters). Cijfers hier;
-       de ontwerpvloer opent als eigen cockpit op deze kamer. */
-    studio: { naam: 'RTG Ontwerpstudio', emoji: '🏎️', missie: 'Het ontwerpbureau van het kantoor voor alles wat je beweegt: hypercars, jachten, business jets en helikopters, op het niveau waar de grote namen om zouden vragen.', eigenApp: true,
-      kpis: () => [
-        ['Concepten', tel((d().studio || {}).ontwerpen)],
-        ['In productie', tel(lijst((d().studio || {}).ontwerpen).filter(o => o.status === 'productie'))],
-        ['Disciplines', 4],
-        ['Programma’s', tel((d().studio || {}).collecties)],
-        ['Bijgewerkt (7d)', recent((d().studio || {}).ontwerpen, 'updatedAt', 7)]
-      ],
-      lijsten: () => [
-        { titel: 'Laatste concepten', items: lijst((d().studio || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.discipline) + ', ' + String(o.status) + ')') },
-        { titel: 'Verder werken', items: ['Klik op deze kamer om de studio te openen: brief een concept, laat de AI het uittekenen, en vraag de specsheet en de chef-ontwerper. Onderweg werkt de RTG Studio PDA.'] }
-      ] },
-    /* RTG Hardwarelab: het eigen hardware-ontwerpbureau van het kantoor
-       (apparaten, schermen, sensoren, edge & servers, accessoires). Cijfers
-       hier; de ontwerpvloer opent als eigen cockpit op deze kamer. */
-    hardware: { naam: 'RTG Hardwarelab', emoji: '🔧', missie: 'Het ontwerpbureau van het kantoor voor de eigen apparaten: PDA\'s en tablets, schermen, sensoren, de zaakdoos-familie en accessoires, van eerste schets tot vrijgave.', eigenApp: true,
-      kpis: () => [
-        ['Concepten', tel((d().hardware || {}).ontwerpen)],
-        ['In de winkel', tel(lijst((d().hardware || {}).ontwerpen).filter(o => o.winkel))],
-        ['Disciplines', 6],
-        ['Series', tel((d().hardware || {}).collecties)],
-        ['Bijgewerkt (7d)', recent((d().hardware || {}).ontwerpen, 'updatedAt', 7)]
-      ],
-      lijsten: () => [
-        { titel: 'Laatste concepten', items: lijst((d().hardware || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.discipline) + ', ' + String(o.status) + ')') },
-        { titel: 'Verder werken', items: ['Klik op deze kamer om het Hardwarelab te openen: brief een apparaat, laat de AI het concept uittekenen, en vraag de stuklijst en de chef-engineer. Onderweg werkt de RTG Hardware PDA.'] }
-      ] },
-    /* RTG Architectenbureau: het huizen-ontwerpbureau van het kantoor (villa's,
-       penthouses, landgoederen, chalets, paviljoens). Cijfers hier; de
-       ontwerpvloer opent als eigen cockpit op deze kamer. */
-    architect: { naam: 'RTG Architectenbureau', emoji: '🏛️', missie: 'Het ontwerpbureau van het kantoor voor het gebouwde: villa\'s, penthouses, landgoederen, chalets en paviljoens, van eerste schets tot oplevering.', eigenApp: true,
-      kpis: () => [
-        ['Concepten', tel((d().architect || {}).ontwerpen)],
-        ['In realisatie', tel(lijst((d().architect || {}).ontwerpen).filter(o => o.status === 'realisatie'))],
-        ['Disciplines', 5],
-        ['Projecten', tel((d().architect || {}).collecties)],
-        ['Bijgewerkt (7d)', recent((d().architect || {}).ontwerpen, 'updatedAt', 7)]
-      ],
-      lijsten: () => [
-        { titel: 'Laatste concepten', items: lijst((d().architect || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.discipline) + ', ' + String(o.status) + ')') },
-        { titel: 'Verder werken', items: ['Klik op deze kamer om het Architectenbureau te openen: brief een huis, laat de AI het concept uittekenen, en vraag de bouwstaat en de chef-architect. Onderweg werkt de RTG Architect PDA.'] }
       ] }
   };
 };

@@ -107,9 +107,19 @@
   async function laadZorg(hulpBord) {
     let z = null;
     try { z = await api('zorg/overzicht'); } catch (e) { z = null; }
-    ['#kSeh', '#kRecepten', '#kVoorschrijf', '#kVerwijs', '#kInbox', '#kAfspraken'].forEach(s => { $(s).hidden = true; });
+    ['#kReceptie', '#kSeh', '#kRecepten', '#kVoorschrijf', '#kVerwijs', '#kInbox', '#kAfspraken'].forEach(s => { $(s).hidden = true; });
     if (!z) return;
     if (!hulpBord) { $('#titel').textContent = '🩺 ' + z.zaak.naam; $('#wie').textContent = z.zaak.label; }
+    if (z.receptie) {
+      $('#kReceptie').hidden = false;
+      $('#wachtkamer').innerHTML = z.receptie.length ? z.receptie.map(p =>
+        '<div class="melding"><b>' + esc(p.aanduiding) + '</b>' + (p.reden ? ' · ' + esc(p.reden) : '') + ' · ' + esc(p.status) + (p.kamer ? ' (' + esc(p.kamer) + ')' : '') +
+        '<div class="rij">' +
+        (p.status === 'wacht' ? '<input class="veld" data-pkamer="' + p.id + '" placeholder="Kamer" maxlength="30" style="max-width:8rem;">' +
+          '<button class="knop klein" data-proep="' + p.id + '" type="button">Roep op</button>' : '') +
+        '<button class="knop klein" data-pklaar="' + p.id + '" type="button">Klaar</button></div></div>').join('')
+        : '<p class="stil">De wachtkamer is leeg.</p>';
+    }
     if (z.seh) {
       $('#kSeh').hidden = false;
       $('#sehRij').innerHTML = z.seh.length ? z.seh.map(p =>
@@ -155,6 +165,9 @@
           '<button class="knop klein" data-az="geannuleerd" data-a="' + a.id + '" type="button">Annuleer</button></div>' : '') +
         '</div>').join('') : '<p class="stil">De agenda is leeg.</p>';
     }
+    document.querySelectorAll('[data-proep]').forEach(b => b.addEventListener('click', () =>
+      doe('zorg/receptie/roep', { id: b.dataset.proep, kamer: (document.querySelector('[data-pkamer="' + b.dataset.proep + '"]') || {}).value })));
+    document.querySelectorAll('[data-pklaar]').forEach(b => b.addEventListener('click', () => doe('zorg/receptie/klaar', { id: b.dataset.pklaar })));
     document.querySelectorAll('[data-seh]').forEach(b => b.addEventListener('click', () => doe('zorg/seh/zet', { id: b.dataset.p, status: b.dataset.seh })));
     document.querySelectorAll('[data-rz]').forEach(b => b.addEventListener('click', () => doe('zorg/recept/zet', { id: b.dataset.r, status: b.dataset.rz })));
     document.querySelectorAll('[data-vz]').forEach(b => b.addEventListener('click', () => doe('zorg/verwijs/zet', { id: b.dataset.v, status: b.dataset.vz })));
@@ -203,6 +216,12 @@
     if (!klacht) return;
     doe('hulp/consult/maak', { klacht, urgentie: $('#cUrgentie').value, wanneer: $('#cWanneer').value });
     $('#cKlacht').value = '';
+  });
+  $('#pAan').addEventListener('click', () => {
+    const aanduiding = $('#pAanduiding').value.trim();
+    if (!aanduiding) return;
+    doe('zorg/receptie/aan', { aanduiding, reden: $('#pReden').value });
+    $('#pAanduiding').value = ''; $('#pReden').value = '';
   });
   $('#sBinnen').addEventListener('click', () => {
     const klacht = $('#sKlacht').value.trim();

@@ -94,7 +94,24 @@ test('4. de agenda: de specialist plant vrij, beauty medical nooit zonder intake
   assert.equal((await api('/api/supplier/zorg/afspraak/maak', { wat: 'x' }, tokens.FARMACIA)).status, 403);
 });
 
-test('5. het zorg-overzicht past zich aan de soort zaak aan', async () => {
+test('5. de medische receptie: aanmelden, oproepen naar een kamer, klaar; nooit een volledige naam nodig', async () => {
+  const aan = await api('/api/supplier/zorg/receptie/aan', { aanduiding: 'dhr. V., 10:15', reden: 'controle' }, tokens.CONSULTA);
+  assert.equal(aan.status, 200);
+  assert.equal(aan.body.bezoek.status, 'wacht');
+  const roep = await api('/api/supplier/zorg/receptie/roep', { id: aan.body.bezoek.id, kamer: 'kamer 2' }, tokens.CONSULTA);
+  assert.equal(roep.body.bezoek.status, 'opgeroepen');
+  assert.equal(roep.body.bezoek.kamer, 'kamer 2');
+  const rij = await api('/api/supplier/zorg/overzicht', {}, tokens.CONSULTA);
+  assert.ok(rij.body.receptie.some(p => p.id === aan.body.bezoek.id), 'het bezoek staat op het wachtkamerbord');
+  await api('/api/supplier/zorg/receptie/klaar', { id: aan.body.bezoek.id }, tokens.CONSULTA);
+  const na = await api('/api/supplier/zorg/overzicht', {}, tokens.CONSULTA);
+  assert.ok(!na.body.receptie.some(p => p.id === aan.body.bezoek.id), 'klaar is van het bord');
+  // ook de specialist en beauty medical hebben de receptie; de apotheek niet
+  assert.equal((await api('/api/supplier/zorg/receptie/aan', { aanduiding: 'mevr. K.' }, tokens.ESTETICA)).status, 200);
+  assert.equal((await api('/api/supplier/zorg/receptie/aan', { aanduiding: 'x' }, tokens.FARMACIA)).status, 403);
+});
+
+test('6. het zorg-overzicht past zich aan de soort zaak aan', async () => {
   const apo = await api('/api/supplier/zorg/overzicht', {}, tokens.FARMACIA);
   assert.ok(Array.isArray(apo.body.recepten) && !apo.body.seh, 'de apotheek ziet recepten, geen SEH');
   const ha = await api('/api/supplier/zorg/overzicht', {}, tokens.CONSULTA);

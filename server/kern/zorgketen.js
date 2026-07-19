@@ -141,6 +141,38 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
     return { ok: true, afspraak: a };
   }
 
+  /* ---------- de medische receptie: de wachtkamer van de spreekkamers ----------
+     Aanmelden bij de balie, oproepen naar een kamer, klaar. Op de borden
+     staat een vrije aanduiding (bijv. "dhr. V., 10:15"), nooit kluisdata:
+     de echte naam blijft in de identiteitskluis. */
+  function receptieRij(code) { const h = bak(); if (!h.receptie) h.receptie = {}; if (!Array.isArray(h.receptie[code])) h.receptie[code] = []; return h.receptie[code]; }
+  const SPREEKKAMERS = ['ziekenhuis', 'huisarts', 'specialist', 'beautymedical'];
+  function receptieAan(code, b) {
+    if (!SPREEKKAMERS.includes(soortVan(code))) return { status: 403, error: 'Alleen een spreekkamer-zaak heeft een medische receptie.' };
+    const wie = schoon(b.aanduiding, 60);
+    if (!wie) return { status: 400, error: 'Wie meldt zich (een korte aanduiding, geen volledige naam nodig)?' };
+    const r = { id: crypto.randomBytes(4).toString('hex'), aanduiding: wie, reden: schoon(b.reden, 120), status: 'wacht', kamer: null, at: nu() };
+    receptieRij(code).push(r);
+    if (receptieRij(code).length > 200) receptieRij(code).shift();
+    save();
+    return { ok: true, bezoek: r };
+  }
+  function receptieRoep(code, id, kamer) {
+    const r = receptieRij(code).find(x => x.id === id);
+    if (!r) return { status: 404, error: 'Dit bezoek staat niet in de wachtkamer.' };
+    r.status = 'opgeroepen';
+    r.kamer = schoon(kamer, 30) || 'spreekkamer';
+    save();
+    return { ok: true, bezoek: r };
+  }
+  function receptieKlaar(code, id) {
+    const r = receptieRij(code).find(x => x.id === id);
+    if (!r) return { status: 404, error: 'Dit bezoek staat niet in de wachtkamer.' };
+    r.status = 'klaar';
+    save();
+    return { ok: true, bezoek: r };
+  }
+
   /* ---------- het zorg-overzicht per soort zaak ---------- */
   function zorgOverzicht(s) {
     const soort = s && s.type;
@@ -154,6 +186,7 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
       uit.apotheken = (db.data.suppliers || []).filter(x => x.type === 'apotheek').map(x => ({ code: x.code, naam: x.name }));
     }
     if (soort === 'ziekenhuis') uit.seh = sehGesorteerd(s.code);
+    if (SPREEKKAMERS.includes(soort)) uit.receptie = receptieRij(s.code).filter(r => r.status !== 'klaar').slice(0, 40);
     if (VERWIJZERS.includes(soort))
       uit.verwijsDoelen = (db.data.suppliers || []).filter(x => AGENDAS.includes(x.type)).map(x => ({ code: x.code, naam: x.name, soort: x.type }));
     if (AGENDAS.includes(soort)) {
@@ -163,6 +196,6 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
     return uit;
   }
 
-  return { zorgketen: { ZORG_TYPES, TRIAGE, zorgOverzicht, receptMaak, receptZet, sehBinnen, sehZet, verwijsMaak, verwijsZet, afspraakMaak, afspraakZet } };
+  return { zorgketen: { ZORG_TYPES, TRIAGE, zorgOverzicht, receptMaak, receptZet, sehBinnen, sehZet, verwijsMaak, verwijsZet, afspraakMaak, afspraakZet, receptieAan, receptieRoep, receptieKlaar } };
 };
 module.exports.ZORG_TYPES = ZORG_TYPES;

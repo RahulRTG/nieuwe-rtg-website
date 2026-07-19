@@ -151,9 +151,10 @@
     renderAll();
     laadZaken().then(renderAll);
     laadZorgbalie();
+    laadMeldkamerPda();
     startStream();
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderZorgbalie(); renderBorden(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
 
   /* ---- Borden: hetzelfde werkbord als in de leverancier-app (shared/borden.js) ---- */
   let pdBordenUI = null;

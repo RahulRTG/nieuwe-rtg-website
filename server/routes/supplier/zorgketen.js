@@ -41,6 +41,22 @@ module.exports = (kern) => {
     if (!r.error) sync(req.supplier.code);
     stuur(res, r);
   });
+  // de medische receptie: aanmelden, oproepen naar een kamer, klaar
+  app.post('/api/supplier/zorg/receptie/aan', supplierAuth, (req, res) => {
+    const r = zorgketen.receptieAan(req.supplier.code, req.body || {});
+    if (!r.error) { logActivity(req.supplier.code, req.actor, 'meldde een bezoek aan bij de receptie'); sync(req.supplier.code); }
+    stuur(res, r);
+  });
+  app.post('/api/supplier/zorg/receptie/roep', supplierAuth, (req, res) => {
+    const r = zorgketen.receptieRoep(req.supplier.code, String(req.body.id || ''), req.body.kamer);
+    if (!r.error) sync(req.supplier.code);
+    stuur(res, r);
+  });
+  app.post('/api/supplier/zorg/receptie/klaar', supplierAuth, (req, res) => {
+    const r = zorgketen.receptieKlaar(req.supplier.code, String(req.body.id || ''));
+    if (!r.error) sync(req.supplier.code);
+    stuur(res, r);
+  });
   // afspraken: specialist en beauty medical
   app.post('/api/supplier/zorg/afspraak/maak', supplierAuth, (req, res) => {
     const r = zorgketen.afspraakMaak(req.supplier.code, req.body || {});

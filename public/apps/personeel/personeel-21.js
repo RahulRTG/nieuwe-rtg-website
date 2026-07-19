@@ -22,6 +22,61 @@
     }));
   }
 
+  /* ---------- de meldkamer op de PDA: het korps in de binnenzak ----------
+     Voor de hulpdiensten (politie, brandweer, ambulance, special forces) de
+     open meldingen met de veld-knoppen (ter plaatse, afronden); voor de
+     zorg-zaken de medische receptie en de eerste hulp. De tab verschijnt
+     alleen als de zaak een korps of zorg-zaak is. */
+  let mkHulp = null, mkZorg = null;
+  async function laadMeldkamerPda(){
+    if (!API.token) return;
+    try { mkHulp = await API.call('/supplier/hulp/overzicht'); } catch(e){ mkHulp = null; }
+    try { mkZorg = await API.call('/supplier/zorg/overzicht'); } catch(e){ mkZorg = null; }
+    renderMeldkamerPda();
+  }
+  function renderMeldkamerPda(){
+    const tabBtn = document.getElementById('tabMeldkamer');
+    if (tabBtn) tabBtn.style.display = (mkHulp || mkZorg) ? '' : 'none';
+    const wrap = $('#meldkamerWrap');
+    if (!wrap) return;
+    if (!mkHulp && !mkZorg){ wrap.innerHTML = ''; return; }
+    let html = '';
+    if (mkHulp){
+      const open = [...(mkHulp.bijstand || []), ...(mkHulp.meldingen || []).filter(m => m.status !== 'afgerond')];
+      html += '<div class="card"><div class="k">'+esc(mkHulp.korps.naam)+' · '+(mkHulp.open || 0)+' '+T('pd.mk.open','open')+'</div>'+
+        (open.length ? open.map(m =>
+          '<div class="task"><span class="ic">'+(m.prio === 1 ? '🔴' : m.prio === 2 ? '🟠' : '🟢')+'</span><div class="t"><b>'+esc(m.tekst)+'</b>'+
+          '<span>'+(m.plek ? esc(m.plek)+' · ' : '')+esc(m.status)+'</span></div>'+
+          '<button class="abtn ghost" data-mkst="ter-plaatse" data-mkm="'+m.id+'">'+T('pd.mk.tp','Ter plaatse')+'</button>'+
+          '<button class="abtn" data-mkst="afgerond" data-mkm="'+m.id+'">'+T('pd.mk.af','Rond af')+'</button></div>').join('')
+        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.mk.rustig','Geen open meldingen; rustig op het bord.')+'</div>')+
+        '<div style="margin-top:0.5rem;font-size:0.75rem;color:var(--soft);">'+(mkHulp.eenheden || []).map(e => e.naam+' ('+e.status+')').join(' · ')+'</div></div>';
+    }
+    if (mkZorg && mkZorg.receptie){
+      html += '<div class="card"><div class="k">'+T('pd.mk.receptie','Medische receptie')+'</div>'+
+        (mkZorg.receptie.length ? mkZorg.receptie.map(p =>
+          '<div class="task"><span class="ic">🪪</span><div class="t"><b>'+esc(p.aanduiding)+'</b><span>'+esc(p.status)+(p.kamer ? ' ('+esc(p.kamer)+')' : '')+'</span></div>'+
+          (p.status === 'wacht' ? '<button class="abtn" data-mkroep="'+p.id+'">'+T('pd.mk.roep','Roep op')+'</button>' : '')+
+          '<button class="abtn ghost" data-mkpk="'+p.id+'">'+T('pd.mk.klaar','Klaar')+'</button></div>').join('')
+        : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.mk.wkleeg','De wachtkamer is leeg.')+'</div>')+'</div>';
+    }
+    if (mkZorg && mkZorg.seh){
+      html += '<div class="card"><div class="k">'+T('pd.mk.seh','Eerste hulp')+' · '+mkZorg.seh.length+' '+T('pd.mk.inrij','in de rij')+'</div>'+
+        mkZorg.seh.slice(0, 6).map(p => '<div class="task"><span class="ic">'+({rood:'🔴',oranje:'🟠',geel:'🟡',groen:'🟢',blauw:'🔵'}[p.triage]||'🟡')+'</span><div class="t"><b>'+esc(p.klacht)+'</b><span>'+esc(p.status)+' · via '+esc(p.via)+'</span></div></div>').join('')+'</div>';
+    }
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-mkm]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/hulp/melding/status', { melding: b.dataset.mkm, status: b.dataset.mkst }); toast('✅'); laadMeldkamerPda(); }
+      catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-mkroep]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/zorg/receptie/roep', { id: b.dataset.mkroep }); laadMeldkamerPda(); } catch(e){ toast(e.message); }
+    }));
+    wrap.querySelectorAll('[data-mkpk]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/zorg/receptie/klaar', { id: b.dataset.mkpk }); laadMeldkamerPda(); } catch(e){ toast(e.message); }
+    }));
+  }
+
   function openTab(tab, focusView){
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
     document.querySelectorAll('.tabbar button').forEach(b => {
@@ -48,7 +103,7 @@
     if (!window.EventSource) return;
     try {
       const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
-      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); if (zbData) laadZorgbalie(); });
+      src.addEventListener('sync', () => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); if (zbData) laadZorgbalie(); if (mkHulp || mkZorg) laadMeldkamerPda(); });
       // de keuken praat met de bediening: bon compleet op de pas -> belletje op de PDA,
       // maar alleen op toestellen waar de pas-bel aanstaat (de gekozen personen)
       src.addEventListener('pas', e => {

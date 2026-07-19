@@ -125,7 +125,7 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
       waarschuwingen: r.waarschuwingen.slice(0, 3).map(w => ({ tijd: w.tijd, knooppunt: w.knooppunt, kans: w.kans })) };
   }
 
-  return { FLITS_SOORTEN: SOORTEN, flitsMeld: meld, flitsStem: stem, flitsRond: rond, flitsVooruit: vooruit, flitsVerbodenIn };
+  return { flitsMeld: meld, flitsStem: stem, flitsRond: rond, flitsVooruit: vooruit, flitsVerbodenIn };
 }
 
 module.exports = { maakFlits };

@@ -256,8 +256,7 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
   }
 
   return {
-    PODIUM_CADEAUS: CADEAUS, PODIUM_GENRES: GENRES,
-    podiumMag: mag, podiumKanaalMaak: kanaalMaak, podiumKanaalZet: kanaalZet,
+    podiumKanaalMaak: kanaalMaak, podiumKanaalZet: kanaalZet,
     podiumKanalen: kanalen, podiumMijn: mijnPodium, podiumLiveZet: liveZet,
     podiumKijk: kijk, podiumWeg: weg, podiumSignaal: signaal, podiumChatStuur: chat,
     podiumCadeau: cadeau, podiumAbonneer: abonneer, podiumBlokkeer: blokkeer,

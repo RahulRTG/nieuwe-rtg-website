@@ -150,5 +150,5 @@ module.exports = ({ db, save, crypto, schoon, sseToSupplier, notifySupplier, hav
     return { ok: true, afdelingen, totaalOpen: afdelingen.reduce((n, a) => n + a.openAantal, 0) };
   }
 
-  return { HOTEL_AFDELINGEN: AFDELINGEN, dorpKan, dorpPost, dorpVerder, dorpStuurDoor, dorpBuurt, dorpOverzicht, dorpTools, dorpDrukte };
+  return { dorpKan, dorpPost, dorpVerder, dorpStuurDoor, dorpBuurt, dorpOverzicht, dorpTools, dorpDrukte };
 };

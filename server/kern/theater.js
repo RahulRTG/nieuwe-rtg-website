@@ -209,7 +209,7 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     return { status: 200, ok: true };
   }
 
-  return { THEATER_GENRES: GENRES, theaterKanaalMaak: kanaalMaak, theaterOfficeLijst: officeLijst,
+  return { theaterKanaalMaak: kanaalMaak, theaterOfficeLijst: officeLijst,
     theaterOfficeBeslis: officeBeslis, theaterVideoMaak: videoMaak, theaterVideoUpload: videoUpload,
     theaterVerwijder: verwijder, theaterStreamVan: streamVan, theaterZaal: zaal,
     theaterAbonneer: abonneer, theaterReactie: reactie, theaterReacties: reacties, theaterMeld: meld,

@@ -144,7 +144,7 @@ function maakGhost({ db, findSupplier, boekingenVanZaak, haversine }) {
     return { zaken: uit };
   }
 
-  return { ghostSimuleer: simuleer, ghostKantoor: kantoorBeeld, ghostWeer: weerVoor };
+  return { ghostSimuleer: simuleer, ghostKantoor: kantoorBeeld };
 }
 
 module.exports = { maakGhost };

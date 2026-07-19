@@ -119,12 +119,10 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
   const { maakDate, dateVoor, teken, dateHier, stop, sos, sosAf, signaalNaarKantoor, signaalNaarLid, opschonen, publiekVoorstel, publiekeDate, mijnState, kantoorState } = deelDate;
 
   return {
-    ONTMOET_ACTIVITEITEN: ACTIVITEITEN,
-    ontmoetMag: mag, ontmoetZet: zet, ontmoetStaatAan: staatAan, ontmoetPos: pos,
+    ontmoetZet: zet, ontmoetPos: pos,
     ontmoetKies: kies, ontmoetTeken: teken, ontmoetHier: dateHier, ontmoetStop: stop,
     ontmoetSos: sos, ontmoetSosAf: sosAf, ontmoetSignaalKantoor: signaalNaarKantoor,
-    ontmoetSignaalLid: signaalNaarLid, ontmoetMijnState: mijnState, ontmoetKantoorState: kantoorState,
-    ontmoetBeslisActiviteit: beslisActiviteit
+    ontmoetSignaalLid: signaalNaarLid, ontmoetMijnState: mijnState, ontmoetKantoorState: kantoorState
   };
 }
 

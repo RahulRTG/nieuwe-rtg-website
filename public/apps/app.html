@@ -973,10 +973,18 @@
   /* -------- meerdere hoofdschermen: horizontale scroll-snap + stippen -------- */
   #content.os-thuis{padding:0;overflow:hidden;display:flex;flex-direction:column;}
   .view[data-view="home"].active{display:flex;flex-direction:column;flex:1;min-height:0;}
+  /* Eén RTG-beweging: dezelfde rustige easing voor het hele OS, zachte
+     scroll, en geen browser-tikflitsen; dat maakt het geheel high-end. */
+  :root{--rtg-ease:cubic-bezier(0.22, 0.61, 0.21, 1);}
+  #app, .os-home{-webkit-tap-highlight-color:transparent;}
+  .os-app .os-tegel, .os-dock, .tabbar button, .card{transition-timing-function:var(--rtg-ease);}
+  .os-app:active .os-tegel{transform:scale(0.92);transition:transform 0.16s var(--rtg-ease);}
+  @media (prefers-reduced-motion: reduce){ .os-app:active .os-tegel{transform:none;} }
   .os-pages{
     flex:1;min-height:0;display:flex;
     overflow-x:auto;overflow-y:hidden;
     scroll-snap-type:x mandatory;scrollbar-width:none;
+    scroll-behavior:smooth;
   }
   .os-pages::-webkit-scrollbar{display:none;}
   .os-pagina{
@@ -1153,12 +1161,14 @@
       var(--bg);
   }
   .os-lock{text-align:center;padding-top:calc(env(safe-area-inset-top, 0px) + 1.6rem);margin-bottom:0.6rem;}
-  .os-lock-merk{margin-bottom:1.1rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;}
+  .os-lock-merk{margin-bottom:1.1rem;}
+  .os-lock-logo{width:72px;height:72px;border-radius:17px;box-shadow:0 12px 34px rgba(0,0,0,0.45);}
   .os-lock-klok{
     font-size:4.2rem;font-weight:200;letter-spacing:0.01em;line-height:1;
-    font-variant-numeric:tabular-nums;color:var(--txt);
+    font-variant-numeric:tabular-nums;color:var(--txt);justify-content:center;
   }
   .os-lock-datum{margin-top:0.35rem;font-size:0.85rem;color:var(--muted);}
+  .os-merk-logo{width:18px;height:18px;border-radius:4px;vertical-align:middle;}
 
   /* -------- De Butler: de gouden orb in het midden van het dock -------- */
   .os-dock .os-app[data-tab="ai"]{margin-top:-14px;}
@@ -1255,9 +1265,9 @@
          inloggen, aanmelden en wachtwoord vergeten. Na het inloggen opent uw
          account vanzelf de juiste pas-app. -->
     <div class="os-lock">
-      <div class="os-lock-merk"><span class="merkvlak">Rahul Travel Group</span></div>
-      <div class="os-lock-klok" id="gateKlok">--:--</div>
-      <div class="os-lock-datum" id="gateDatum"></div>
+      <div class="os-lock-merk"><img class="os-lock-logo" src="/icon.svg" alt="Rahul Travel Group" width="72" height="72"></div>
+      <div class="os-lock-klok" id="gateKlok" data-rtg-klok>--:--</div>
+      <div class="os-lock-datum" id="gateDatum" data-rtg-datum></div>
     </div>
     <form class="login-form" id="loginForm">
       <input id="liUser" name="username" placeholder="E-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
@@ -1309,12 +1319,12 @@
   <div id="app">
     <div class="topbar" role="banner">
       <div class="os-links">
-        <span class="os-klok" id="osKlok">--:--</span>
+        <span class="os-klok" id="osKlok" data-rtg-klok>--:--</span>
         <button class="os-terug" id="osTerug" hidden aria-label="Terug naar het beginscherm">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
           <span id="osAppTitel"></span>
         </button>
-        <div class="brand" id="osBrand"><span class="merkvlak">RTG</span><small>OS</small></div>
+        <div class="brand" id="osBrand"><img class="os-merk-logo" src="/icon.svg" alt="RTG" width="18" height="18"><small>OS</small></div>
       </div>
       <div style="display:flex;align-items:center;gap:0.6rem;">
         <span class="os-bat" id="osBat" hidden aria-hidden="true"><i><b id="osBatVul"></b></i><em id="osBatPct"></em></span>
@@ -1356,7 +1366,7 @@
         <!-- RTG OS: twee veegbare hoofdschermen (scroll-snap) met pagina-stippen -->
         <div class="os-pages" id="osPages">
           <section class="os-pagina" aria-label="Hoofdscherm 1">
-            <div class="os-datum" id="osDatum"></div>
+            <div class="os-datum" id="osDatum" data-rtg-datum></div>
             <h2 id="homeGreeting">Welkom.</h2>
             <p class="sub" id="homeSub"></p>
             <div id="verifyBanner"></div>
@@ -1749,6 +1759,7 @@
 <script src="/apps/translate.js"></script>
 <script src="/apps/foundation/gezin-rt.js"></script>
 <script src="/shared/thema.js"></script>
+<script src="/shared/klok.js" defer></script>
 <script src="/shared/inlogkleur.js" defer></script>
 <script src="/shared/focus.js" data-app="leden" data-kaart=".live-start" data-kop=".lh"></script>
 <script src="/shared/spraak.js"></script>

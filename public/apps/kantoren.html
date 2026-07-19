@@ -691,12 +691,8 @@ $('#bAllesUit').addEventListener('click', async () => {
 /* de boardroom ververst zichzelf zolang hij openstaat */
 setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }, 30000);
 
-/* de klok rechtsboven, zoals in elk RTG OS */
-(function () {
-  const k = $('#wosKlok');
-  const tik = () => { const d = new Date(); k.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
-  tik(); setInterval(tik, 15000);
-})();
+/* de klok rechtsboven komt van de ene RTG-klok (/shared/klok.js) */
+(function () { const k = $('#wosKlok'); if (k) { k.setAttribute('data-rtg-klok', ''); if (window.RTGKlok) RTGKlok.alles(); } })();
 
 if (TOKEN) binnen().catch(uitgelogd);
 else uitgelogd();

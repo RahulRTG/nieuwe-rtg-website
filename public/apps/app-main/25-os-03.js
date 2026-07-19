@@ -162,21 +162,10 @@
     pill.addEventListener('click', () => { if (!pillLang && !pillVeeg) naarHome(); pillLang = false; pillVeeg = false; });
   }
 
-  const klok = $('#osKlok'), datum = $('#osDatum');
-  const gateKlok = $('#gateKlok'), gateDatum = $('#gateDatum');
-  function tik() {
-    const d = new Date();
-    const uur = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-    if (klok) klok.textContent = uur;
-    if (gateKlok) gateKlok.textContent = uur;
-    const taal = (document.documentElement.lang || 'nl');
-    let lang;
-    try { lang = d.toLocaleDateString(taal, { weekday: 'long', day: 'numeric', month: 'long' }); }
-    catch (e) { lang = d.toLocaleDateString(); }
-    if (datum) datum.textContent = lang;
-    if (gateDatum) gateDatum.textContent = lang;
-  }
-  tik(); setInterval(tik, 15000);
+  /* De klok en de datum komen van de ene RTG-klok (/shared/klok.js), zodat
+     elke app exact dezelfde tijd toont: Bodoni-cijfers met seconden en
+     milliseconden. De elementen dragen data-rtg-klok / data-rtg-datum. */
+  if (window.RTGKlok) RTGKlok.alles();
 
   /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
   const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');

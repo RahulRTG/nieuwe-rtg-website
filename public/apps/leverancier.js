@@ -236,15 +236,9 @@
     if (ef) ef.addEventListener('submit', enroll);
     gateTik();
   }
-  // De klok en de datum op het inlogscherm (de naam van de app staat in de badge).
-  function gateTik(){
-    const k = document.getElementById('gateKlok'), dt = document.getElementById('gateDatum');
-    if (!k && !dt) return;
-    const now = new Date(), loc = lang() === 'en' ? 'en-GB' : 'nl-NL';
-    if (k) k.textContent = now.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' });
-    if (dt) dt.textContent = now.toLocaleDateString(loc, { weekday: 'long', day: 'numeric', month: 'long' });
-  }
-  setInterval(gateTik, 15000);
+  // De klok en de datum op het inlogscherm komen van de ene RTG-klok
+  // (/shared/klok.js): overal dezelfde cijfers, met seconden en milliseconden.
+  function gateTik(){ if (window.RTGKlok) RTGKlok.alles(); }
 
   // Uitgenodigd door de werkgever: aanmelden met bedrijfsnaam + kassacode + eigen
   // RTG-inlog. Alleen echte RTG/Lifestyle/Business-leden komen erin.

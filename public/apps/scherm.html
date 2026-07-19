@@ -59,7 +59,7 @@
   <span class="zaak" id="zaakNaam"></span>
   <span class="rek"></span>
   <div class="kies" id="kies"></div>
-  <span class="klok" id="klok">--:--</span>
+  <span class="klok" id="klok" data-rtg-klok>--:--</span>
 </header>
 <main id="doek"><div class="leeg" id="poort">Log eerst in op de leverancier-app op dit toestel; open dit tweede scherm daarna vanuit "Meer → Tweede scherm".</div></main>
 <div class="melding" id="melding" role="status"></div>
@@ -81,7 +81,7 @@
   };
   let modus = 'keuken', spiegel = false, state = null, kanaal = null;
 
-  function klok(){ const d = new Date(); $('#klok').textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+  function klok(){ /* de klok komt van de ene RTG-klok (/shared/klok.js) */ }
   klok(); setInterval(klok, 15000);
 
   async function haal(){

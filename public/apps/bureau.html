@@ -144,6 +144,7 @@
   .appterug:hover{border-color:color-mix(in srgb, var(--goud) 55%, transparent);}
   .appterug svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
 </style>
+<script src="/shared/klok.js" defer></script>
 </head>
 <body>
 <a href="#hoofd" class="skip">Naar het bureaublad</a>
@@ -151,7 +152,7 @@
 <header class="bar">
   <div class="merk">RTG <span>OS</span></div>
   <div class="klok">
-    <time id="tijd" aria-label="Huidige tijd">--:--</time>
+    <time id="tijd" aria-label="Huidige tijd" data-rtg-klok>--:--</time>
     <span class="datum" id="datum"></span>
   </div>
   <div class="account" id="account" aria-live="polite" aria-label="Accounts op dit toestel">
@@ -194,7 +195,6 @@
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function tik() {
     var d = new Date();
-    document.getElementById('tijd').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
     document.getElementById('datum').textContent = DAGEN[d.getDay()] + ' ' + d.getDate() + ' ' + MND[d.getMonth()];
   }
   tik();

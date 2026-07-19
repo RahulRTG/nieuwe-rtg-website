@@ -72,13 +72,7 @@
     else stepLogin();
   }
   // de klok en de datum op het inlogscherm (de naam van de app staat in de badge)
-  function gateTik(){
-    const k = document.getElementById('gateKlok'), dt = document.getElementById('gateDatum');
-    if (!k && !dt) return;
-    const now = new Date(), loc = lang()==='en' ? 'en-GB' : 'nl-NL';
-    if (k) k.textContent = now.toLocaleTimeString(loc, { hour:'2-digit', minute:'2-digit' });
-    if (dt) dt.textContent = now.toLocaleDateString(loc, { weekday:'long', day:'numeric', month:'long' });
-  }
+  function gateTik(){ if (window.RTGKlok) RTGKlok.alles(); }
   // De hoofd-ingang: inloggen met het eigen RTG-account (e-mail/gebruikersnaam +
   // wachtwoord). Daaronder alleen aanmelden en wachtwoord vergeten; een vast
   // apparaat kan nog op naam met pincode.

@@ -25,10 +25,19 @@ module.exports = (kern) => {
   app.post('/api/overheid/bezwaar/beslis', supplierAuth, rijk, (req, res) => stuur(res, overheid.bezwaarBeslis(wie(req), String(req.body.ref || ''), req.body || {})));
   app.post('/api/overheid/bekendmaking', supplierAuth, rijk, (req, res) => stuur(res, overheid.bekendmakingMaak(wie(req), req.body || {})));
   app.post('/api/overheid/verkiezing/sluit', supplierAuth, rijk, (req, res) => stuur(res, overheid.verkiezingSluit(req.body.open === true)));
+  // provincie (subsidies) & waterschap (meldingen)
+  app.post('/api/overheid/subsidies/lijst', supplierAuth, rijk, (req, res) => res.json(overheid.subsidiesLijst(req.body || {})));
+  app.post('/api/overheid/subsidie/beslis', supplierAuth, rijk, (req, res) => stuur(res, overheid.subsidieBeslis(wie(req), String(req.body.ref || ''), req.body || {})));
+  app.post('/api/overheid/water/meldingen', supplierAuth, rijk, (req, res) => res.json(overheid.waterMeldingenLijst(req.body || {})));
+  app.post('/api/overheid/water/melding/zet', supplierAuth, rijk, (req, res) => stuur(res, overheid.waterMeldingZet(wie(req), String(req.body.ref || ''), req.body || {})));
 
   /* ---- ondernemers: inschrijven in het handelsregister als onderneming ---- */
   app.post('/api/supplier/overheid/kvk/inschrijven', supplierAuth, (req, res) =>
     stuur(res, overheid.kvkInschrijven({ supplierCode: req.supplier.code, bedrijf: req.supplier.name }, req.body || {})));
   app.post('/api/supplier/overheid/kvk/mijn', supplierAuth, (req, res) => res.json(overheid.kvkMijn({ supplierCode: req.supplier.code })));
   app.post('/api/supplier/overheid/bekendmakingen', supplierAuth, (req, res) => res.json(overheid.bekendmakingen()));
+  // een onderneming vraagt zelf een provinciale subsidie aan en volgt hem
+  app.post('/api/supplier/overheid/subsidie', supplierAuth, (req, res) =>
+    stuur(res, overheid.subsidieAanvraag({ supplierCode: req.supplier.code, bedrijf: req.supplier.name }, req.body || {})));
+  app.post('/api/supplier/overheid/subsidies', supplierAuth, (req, res) => res.json(overheid.mijnSubsidies({ supplierCode: req.supplier.code })));
 };

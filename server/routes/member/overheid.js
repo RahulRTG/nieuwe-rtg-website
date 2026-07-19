@@ -50,4 +50,16 @@ module.exports = (kern) => {
   app.post('/api/overheid/bekendmakingen', auth, (req, res) => res.json(overheid.bekendmakingen()));
   app.post('/api/overheid/bezwaar', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.bezwaarIndienen(req.session, liveCodename(req.session), req.body || {})); });
   app.post('/api/overheid/bezwaren/mijn', auth, (req, res) => res.json(overheid.mijnBezwaren(req.session.key)));
+
+  // pijler 7: provincie (subsidies)
+  app.post('/api/overheid/subsidies', auth, (req, res) => res.json(overheid.provincieSubsidies()));
+  app.post('/api/overheid/subsidie', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.subsidieAanvraag({ key: req.session.key, codenaam: liveCodename(req.session) }, req.body || {})); });
+  app.post('/api/overheid/subsidies/mijn', auth, (req, res) => res.json(overheid.mijnSubsidies({ key: req.session.key })));
+
+  // pijler 8: waterschap (belasting + meldingen)
+  app.post('/api/overheid/waterschap/mijn', auth, (req, res) => res.json(overheid.waterschapMijn(req.session.key)));
+  // een waterschapsaanslag betalen loopt via de geld-drempel van de AI (pad bevat "betaal")
+  app.post('/api/overheid/waterschap/betaal', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.waterschapBetaal(req.session.key, String(req.body.ref || ''))); });
+  app.post('/api/overheid/water/meld', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.waterMeld(req.session, liveCodename(req.session), req.body || {})); });
+  app.post('/api/overheid/water/meldingen/mijn', auth, (req, res) => res.json(overheid.mijnWaterMeldingen(req.session.key)));
 };

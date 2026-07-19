@@ -154,6 +154,39 @@
     <div id="bzMijn"></div>
   </section>
 
+  <section class="paneel" id="p-prov">
+    <div class="kaart">
+      <h3>Provinciale subsidie</h3>
+      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:.3rem;">De provincie draagt bij aan verduurzaming, natuur, cultuur en innovatie. Vraag een bijdrage aan.</p>
+      <div class="lbl">Regeling</div>
+      <div class="chips" id="sbRegelingen"></div>
+      <div class="lbl">Project</div>
+      <textarea class="veld" id="sbProject" maxlength="300" placeholder="Wat wil je doen?"></textarea>
+      <div class="lbl">Gevraagd bedrag (€)</div>
+      <input class="veld" id="sbBedrag" inputmode="numeric" placeholder="Bijv. 3000">
+      <button class="knop" id="sbGo" style="margin-top:.8rem;">Subsidie aanvragen</button>
+    </div>
+    <div id="sbMijn"></div>
+  </section>
+
+  <section class="paneel" id="p-water">
+    <div class="kaart">
+      <h3>Waterschapsbelasting</h3>
+      <div id="wbMijn"><div class="leeg">Laden…</div></div>
+    </div>
+    <div class="kaart">
+      <h3>Melding aan het waterschap</h3>
+      <div class="lbl">Soort</div>
+      <div class="chips" id="wmSoorten"></div>
+      <div class="lbl">Wat is er aan de hand?</div>
+      <textarea class="veld" id="wmTekst" maxlength="500" placeholder="Bijv. ondergelopen tunnel na de bui"></textarea>
+      <div class="lbl">Locatie (optioneel)</div>
+      <input class="veld" id="wmLoc" maxlength="120" placeholder="Straat of plek">
+      <button class="knop" id="wmGo" style="margin-top:.8rem;">Melding versturen</button>
+    </div>
+    <div id="wmMijn"></div>
+  </section>
+
   <section class="paneel" id="p-stem">
     <div class="kaart" id="stemKaart"><div class="leeg">Laden…</div></div>
     <h3 style="margin:1.1rem 0 .5rem;">Bekendmakingen</h3>
@@ -178,11 +211,13 @@ if (!TOKEN) {
     '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { start(); }
 
-const TABS = [['box','Berichtenbox'],['belasting','Belasting'],['rdw','RDW'],['kvk','Onderneming'],['sociaal','Sociaal'],['stem','Stemmen']];
+const TABS = [['box','Berichtenbox'],['belasting','Belasting'],['rdw','RDW'],['kvk','Onderneming'],['sociaal','Sociaal'],['prov','Provincie'],['water','Waterschap'],['stem','Stemmen']];
 const TOESLAGEN = { zorgtoeslag:'Zorgtoeslag', huurtoeslag:'Huurtoeslag', kindgebonden:'Kindgebonden budget' };
 const VORMEN = { eenmanszaak:'Eenmanszaak', vof:'V.O.F.', bv:'Besloten vennootschap', stichting:'Stichting' };
 const UITK = { ww:'WW-uitkering', bijstand:'Bijstand', aow:'AOW', kinderbijslag:'Kinderbijslag' };
-let tsSoort = 'zorgtoeslag', kvVorm = 'eenmanszaak', szSoort = 'ww';
+const SUBS = { verduurzaming:'Verduurzaming', natuur:'Natuur & landschap', cultuur:'Cultuur & erfgoed', innovatie:'MKB-innovatie' };
+const WMELD = { verontreiniging:'Verontreiniging', wateroverlast:'Wateroverlast', kade:'Kade/oever', beschoeiing:'Beschoeiing' };
+let tsSoort = 'zorgtoeslag', kvVorm = 'eenmanszaak', szSoort = 'ww', sbReg = 'verduurzaming', wmSoort = 'wateroverlast';
 
 function chips(host, map, huidig, set){
   $(host).innerHTML = Object.entries(map).map(([k,l]) => '<button class="chip'+(k===huidig()?' aan':'')+'" data-k="'+k+'">'+esc(l)+'</button>').join('');
@@ -196,6 +231,8 @@ function toon(t){
   if (t === 'rdw') { laadRijbewijs(); laadVoertuigen(); }
   if (t === 'kvk') laadKvk();
   if (t === 'sociaal') { laadUitkeringen(); laadBezwaren(); }
+  if (t === 'prov') laadSubsidies();
+  if (t === 'water') { laadWaterbelasting(); laadWaterMeldingen(); }
   if (t === 'stem') { laadStem(); laadBekend(); }
 }
 function start(){
@@ -204,6 +241,8 @@ function start(){
   chips('#tsSoorten', TOESLAGEN, () => tsSoort, k => tsSoort = k);
   chips('#kvVormen', VORMEN, () => kvVorm, k => kvVorm = k);
   chips('#szSoorten', UITK, () => szSoort, k => szSoort = k);
+  chips('#sbRegelingen', SUBS, () => sbReg, k => sbReg = k);
+  chips('#wmSoorten', WMELD, () => wmSoort, k => wmSoort = k);
   toon('box'); vernieuwBadge();
 }
 async function vernieuwBadge(){
@@ -326,6 +365,48 @@ async function laadBezwaren(){
   const l = d.bezwaren || [];
   $('#bzMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn bezwaren</h3>'+l.map(b =>
     '<div class="item"><h4>'+esc(b.tegen)+'</h4><span class="status '+(b.status==='gegrond'?'op':b.status==='ongegrond'?'af':'')+'">'+esc(b.status)+'</span></div>').join('') : '';
+}
+
+// Provincie (subsidies)
+$('#sbGo').addEventListener('click', async () => {
+  if ($('#sbProject').value.trim().length < 6){ meld('Omschrijf je project.'); return; }
+  try { const d = await api('/api/overheid/subsidie', { regeling: sbReg, project: $('#sbProject').value, bedrag: $('#sbBedrag').value });
+    $('#sbProject').value=''; $('#sbBedrag').value=''; meld('Aangevraagd: € '+d.subsidie.gevraagd+'.'); laadSubsidies(); vernieuwBadge();
+  } catch(e){ meld(e.message); }
+});
+async function laadSubsidies(){
+  let d; try { d = await api('/api/overheid/subsidies/mijn'); } catch(e){ return; }
+  const l = d.subsidies || [];
+  $('#sbMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn aanvragen</h3>'+l.map(s =>
+    '<div class="item"><h4>'+esc(s.regelingLabel)+'</h4><div class="meta">'+esc(s.project)+' · gevraagd € '+esc(s.gevraagd)+(s.toegekend?' · toegekend € '+esc(s.toegekend):'')+'</div>'+
+    '<span class="status '+(s.status==='toegekend'?'op':s.status==='afgewezen'?'af':'')+'">'+esc(s.status)+'</span></div>').join('') : '';
+}
+
+// Waterschap
+async function laadWaterbelasting(){
+  let d; try { d = await api('/api/overheid/waterschap/mijn'); } catch(e){ return; }
+  const l = d.aanslagen || [];
+  $('#wbMijn').innerHTML = l.length ? l.map(a => '<div class="item"><h4>'+esc(a.soort)+' '+esc(a.jaar)+'</h4><div class="meta">€ '+esc(a.bedrag)+'</div>'+
+    '<span class="status '+(a.betaald?'op':'')+'">'+(a.betaald?'betaald':'openstaand')+'</span>'+
+    (a.betaald?'':' <button class="knop stil" data-bet="'+esc(a.ref)+'" style="padding:.2rem .6rem;font-size:.76rem;">Betalen</button>')+'</div>').join('') : '<div class="leeg">Geen aanslagen.</div>';
+  $('#wbMijn').querySelectorAll('button[data-bet]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Deze aanslag nu betalen?')) return;
+    try { await api('/api/overheid/waterschap/betaal', { ref: b.dataset.bet }); meld('Betaald. Bedankt.'); laadWaterbelasting(); vernieuwBadge(); } catch(e){ meld(e.message); }
+  }));
+}
+$('#wmGo').addEventListener('click', async () => {
+  if ($('#wmTekst').value.trim().length < 4){ meld('Omschrijf kort wat er is.'); return; }
+  try { await api('/api/overheid/water/meld', { soort: wmSoort, tekst: $('#wmTekst').value, locatie: $('#wmLoc').value });
+    $('#wmTekst').value=''; $('#wmLoc').value=''; meld('Melding verstuurd.'); laadWaterMeldingen();
+  } catch(e){ meld(e.message); }
+});
+async function laadWaterMeldingen(){
+  let d; try { d = await api('/api/overheid/water/meldingen/mijn'); } catch(e){ return; }
+  const l = d.meldingen || [];
+  $('#wmMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn meldingen</h3>'+l.map(m =>
+    '<div class="item"><h4>'+esc(m.soortLabel)+'</h4><div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+'</div>'+
+    '<span class="status '+(m.status==='opgelost'?'op':m.status==='afgewezen'?'af':'')+'">'+esc(m.status)+'</span>'+
+    ((m.updates&&m.updates.length)?'<div class="meta" style="margin-top:.3rem;">Laatste: '+esc(m.updates[0].tekst)+'</div>':'')+'</div>').join('') : '';
 }
 
 // Stemmen + bekendmakingen

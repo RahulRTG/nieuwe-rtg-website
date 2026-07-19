@@ -145,3 +145,43 @@ test('8. Belasting-rekenhulp geeft dezelfde uitkomst zonder in te dienen', async
   assert.equal(r.body.uitkomst.belastbaar, 60000);
   assert.ok(r.body.uitkomst.saldo > 0, '15000 ingehouden op 60000 -> nog bijbetalen');
 });
+
+test('9. Provincie: subsidie aanvragen (gecapt op het maximum) en de ambtenaar kent een bedrag toe', async () => {
+  const reg = await api(base, '/api/overheid/subsidies', {}, lid);
+  assert.ok(reg.body.regelingen.some(r => r.id === 'verduurzaming'));
+  // meer vragen dan het maximum wordt gecapt
+  const s = await api(base, '/api/overheid/subsidie', { regeling: 'verduurzaming', project: 'Zonnepanelen op het dak', bedrag: 99999 }, lid);
+  assert.equal(s.status, 200);
+  assert.equal(s.body.subsidie.gevraagd, 4000, 'gecapt op het maximum van de regeling');
+  const lijst = await api(base, '/api/overheid/subsidies/lijst', {}, rijk);
+  assert.ok(lijst.body.subsidies.some(x => x.ref === s.body.subsidie.ref));
+  const bes = await api(base, '/api/overheid/subsidie/beslis', { ref: s.body.subsidie.ref, besluit: 'toegekend', bedrag: 3000 }, rijk);
+  assert.equal(bes.status, 200);
+  assert.equal(bes.body.subsidie.toegekend, 3000);
+  // een gewone partner mag niet behandelen
+  assert.equal((await api(base, '/api/overheid/subsidies/lijst', {}, partner)).status, 403);
+});
+
+test('10. Waterschap: aanslagen verschijnen en zijn te betalen; een watermelding wordt door de ambtenaar afgehandeld', async () => {
+  assert.equal((await api(base, '/api/overheid/waterschap/betaal', { ref: 'x' }, null)).status, 401);
+  const mijn = await api(base, '/api/overheid/waterschap/mijn', {}, lid);
+  assert.equal(mijn.status, 200);
+  assert.ok(mijn.body.aanslagen.length >= 2, 'watersysteem- en zuiveringsheffing staan klaar');
+  const open = mijn.body.aanslagen.find(a => !a.betaald);
+  const bet = await api(base, '/api/overheid/waterschap/betaal', { ref: open.ref }, lid);
+  assert.equal(bet.status, 200);
+  assert.equal(bet.body.aanslag.betaald, true);
+  assert.equal((await api(base, '/api/overheid/waterschap/betaal', { ref: open.ref }, lid)).status, 409);
+  // een melding aan het waterschap
+  const m = await api(base, '/api/overheid/water/meld', { soort: 'wateroverlast', tekst: 'Ondergelopen fietstunnel na de bui', locatie: 'Tunnel Vara de Rey' }, lid);
+  assert.equal(m.status, 200);
+  const lijst = await api(base, '/api/overheid/water/meldingen', {}, rijk);
+  assert.ok(lijst.body.meldingen.some(x => x.ref === m.body.melding.ref));
+  const zet = await api(base, '/api/overheid/water/melding/zet', { ref: m.body.melding.ref, status: 'in behandeling', update: 'Gemaal opgeschaald' }, rijk);
+  assert.equal(zet.status, 200);
+  assert.equal(zet.body.melding.status, 'in behandeling');
+  const na = await api(base, '/api/overheid/water/meldingen/mijn', {}, lid);
+  const mine = na.body.meldingen.find(x => x.ref === m.body.melding.ref);
+  assert.equal(mine.status, 'in behandeling');
+  assert.ok(mine.updates.some(u => /opgeschaald/.test(u.tekst)), 'de update reist mee naar de melder');
+});

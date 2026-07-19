@@ -31,6 +31,20 @@ const UITKERINGEN = {
 };
 const RECHTSVORMEN = { eenmanszaak: 'Eenmanszaak', vof: 'Vennootschap onder firma', bv: 'Besloten vennootschap (bv)', stichting: 'Stichting' };
 const RIJBEWIJS_CATS = ['AM', 'A', 'B', 'BE', 'C', 'D'];
+// provincie: subsidieregelingen (regionaal), met een maximumbijdrage
+const SUBSIDIES = {
+  verduurzaming: { label: 'Verduurzaming woning', max: 4000 },
+  natuur: { label: 'Natuur & landschap', max: 15000 },
+  cultuur: { label: 'Cultuur & erfgoed', max: 8000 },
+  innovatie: { label: 'MKB-innovatie', max: 25000 }
+};
+// waterschap: de jaarlijkse waterschapsbelasting en de meldingen aan het waterschap
+const WATERHEFFINGEN = [
+  { soort: 'Watersysteemheffing', basis: 120, spreiding: 180 },
+  { soort: 'Zuiveringsheffing', basis: 160, spreiding: 90 }
+];
+const WATERMELD = { verontreiniging: 'Verontreiniging/lozing', wateroverlast: 'Wateroverlast', kade: 'Kade/oever', beschoeiing: 'Beschoeiing/duiker' };
+const WATER_STATUS = ['nieuw', 'in behandeling', 'opgelost', 'afgewezen'];
 
 function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier }) {
   const nu = () => new Date().toISOString();
@@ -47,7 +61,8 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
     if (!db.data.supplierTypes.rijk)
       db.data.supplierTypes.rijk = { label: 'Rijksoverheid', icon: '\u{1F3E2}', caps: ['rijk'] };
     for (const k of ['rijkBerichten', 'rijkAanslagen', 'rijkToeslagen', 'rijkVoertuigen', 'rijkRijbewijzen',
-      'rijkKvk', 'rijkUitkeringen', 'rijkBezwaren', 'rijkStemmen', 'rijkBekend'])
+      'rijkKvk', 'rijkUitkeringen', 'rijkBezwaren', 'rijkStemmen', 'rijkBekend',
+      'rijkSubsidies', 'waterAanslagen', 'waterMeldingen'])
       if (!Array.isArray(db.data[k])) db.data[k] = [];
     if (db.data._overheidSeed) return;
     db.data._overheidSeed = true;
@@ -313,6 +328,83 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
   }
   function mijnBezwaren(key) { seed(); return { ok: true, bezwaren: (db.data.rijkBezwaren || []).filter(b => b.key === key).slice(0, 30).map(b => ({ ref: b.ref, tegen: b.tegen, status: b.status, besluit: b.besluit || null, at: b.at })) }; }
 
+  /* ---------- pijler 7: provincie (subsidies) ---------- */
+  function provincieSubsidies() {
+    seed();
+    return { ok: true, regelingen: Object.entries(SUBSIDIES).map(([k, v]) => ({ id: k, label: v.label, max: v.max })) };
+  }
+  function subsidieAanvraag(houder, data) {
+    seed();
+    data = data || {};
+    const regeling = SUBSIDIES[data.regeling] ? data.regeling : null;
+    if (!regeling) return { status: 400, error: 'Kies een geldige subsidieregeling.' };
+    const project = schoon(data.project, 300);
+    if (project.length < 6) return { status: 400, error: 'Omschrijf je project.' };
+    const gevraagd = Math.min(SUBSIDIES[regeling].max, Math.max(0, eur(data.bedrag)));
+    const s = { id: id(), ref: ref('SB'), key: houder.key || null, supplierCode: houder.supplierCode || null,
+      aanvrager: houder.codenaam || houder.bedrijf || null, regeling, regelingLabel: SUBSIDIES[regeling].label,
+      project, gevraagd, status: 'aangevraagd', at: nu() };
+    db.data.rijkSubsidies.unshift(s);
+    db.data.rijkSubsidies = db.data.rijkSubsidies.slice(0, 40000);
+    if (houder.key) bericht(houder.key, 'Provincie', 'Subsidieaanvraag ' + s.regelingLabel, 'Je aanvraag (€ ' + gevraagd + ') is ontvangen en wordt beoordeeld.', 'subsidie');
+    save();
+    return { ok: true, subsidie: publiekeSubsidie(s) };
+  }
+  function publiekeSubsidie(s) { return { ref: s.ref, regeling: s.regeling, regelingLabel: s.regelingLabel, project: s.project, gevraagd: s.gevraagd, toegekend: s.toegekend || 0, status: s.status, at: s.at }; }
+  function mijnSubsidies(houder) {
+    seed();
+    const list = (db.data.rijkSubsidies || []).filter(s => (houder.key && s.key === houder.key) || (houder.supplierCode && s.supplierCode === houder.supplierCode));
+    return { ok: true, subsidies: list.slice(0, 30).map(publiekeSubsidie) };
+  }
+
+  /* ---------- pijler 8: waterschap ---------- */
+  function ensureWaterAanslagen(key) {
+    if (!key) return;
+    const j = jaar();
+    if ((db.data.waterAanslagen || []).some(a => a.key === key && a.jaar === j)) return;
+    const h = hash('water' + String(key) + j);
+    WATERHEFFINGEN.forEach((w, i) => {
+      const bedrag = w.basis + ((h >>> (i * 5)) % (w.spreiding + 1));
+      db.data.waterAanslagen.unshift({ id: id(), ref: ref('WB'), key, soort: w.soort, jaar: j, bedrag, betaald: false, at: nu() });
+    });
+    db.data.waterAanslagen = db.data.waterAanslagen.slice(0, 40000);
+    save();
+  }
+  function waterschapMijn(key) {
+    seed(); ensureWaterAanslagen(key);
+    return { ok: true, aanslagen: (db.data.waterAanslagen || []).filter(a => a.key === key)
+      .map(a => ({ ref: a.ref, soort: a.soort, jaar: a.jaar, bedrag: a.bedrag, betaald: !!a.betaald })) };
+  }
+  function waterschapBetaal(key, r) {
+    const a = (db.data.waterAanslagen || []).find(x => x.ref === String(r || '') && x.key === key);
+    if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
+    if (a.betaald) return { status: 409, error: 'Deze aanslag is al betaald.' };
+    a.betaald = true; a.betaaldAt = nu();
+    bericht(key, 'Waterschap', 'Betaling ontvangen', 'Je betaling van € ' + a.bedrag + ' (' + a.soort + ') is ontvangen.', 'water');
+    save();
+    return { ok: true, aanslag: { ref: a.ref, soort: a.soort, jaar: a.jaar, bedrag: a.bedrag, betaald: true } };
+  }
+  function waterMeld(sess, codenaam, data) {
+    seed();
+    data = data || {};
+    const soort = WATERMELD[data.soort] ? data.soort : 'wateroverlast';
+    const tekst = schoon(data.tekst, 500);
+    if (tekst.length < 4) return { status: 400, error: 'Omschrijf kort wat er aan de hand is.' };
+    const m = { id: id(), ref: ref('WM'), soort, soortLabel: WATERMELD[soort], tekst, locatie: schoon(data.locatie, 120) || null,
+      melderKey: sess.key, melder: codenaam, status: 'nieuw', updates: [], at: nu() };
+    db.data.waterMeldingen.unshift(m);
+    db.data.waterMeldingen = db.data.waterMeldingen.slice(0, 40000);
+    save();
+    return { ok: true, melding: publiekeWaterMelding(m) };
+  }
+  function publiekeWaterMelding(m) {
+    return { ref: m.ref, soort: m.soort, soortLabel: m.soortLabel, tekst: m.tekst, locatie: m.locatie, status: m.status,
+      updates: (m.updates || []).map(u => ({ tekst: u.tekst, at: u.at })), at: m.at };
+  }
+  function mijnWaterMeldingen(key) {
+    return { ok: true, meldingen: (db.data.waterMeldingen || []).filter(m => m.melderKey === key).slice(0, 40).map(publiekeWaterMelding) };
+  }
+
   /* ---------- rijksambtenaren (partner-app) ---------- */
   function regie() {
     seed();
@@ -320,9 +412,48 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
       toeslagenOpen: (db.data.rijkToeslagen || []).filter(t => t.status === 'aangevraagd').length,
       uitkeringenOpen: (db.data.rijkUitkeringen || []).filter(u => ['aangevraagd', 'in behandeling'].includes(u.status)).length,
       bezwarenOpen: (db.data.rijkBezwaren || []).filter(b => ['ingediend', 'in behandeling'].includes(b.status)).length,
+      subsidiesOpen: (db.data.rijkSubsidies || []).filter(s => s.status === 'aangevraagd').length,
+      waterMeldingenOpen: (db.data.waterMeldingen || []).filter(m => !['opgelost', 'afgewezen'].includes(m.status)).length,
       aangiftenJaar: (db.data.rijkAanslagen || []).filter(a => a.jaar === jaar()).length,
       inschrijvingen: (db.data.rijkKvk || []).length,
       stemmen: db.data.rijkVerkiezing ? (db.data.rijkStemmen || []).filter(s => s.verkiezingId === db.data.rijkVerkiezing.id).length : 0 };
+  }
+  function subsidiesLijst(filter) {
+    seed(); filter = filter || {};
+    let list = (db.data.rijkSubsidies || []);
+    list = filter.status ? list.filter(s => s.status === filter.status) : list.filter(s => s.status === 'aangevraagd');
+    return { ok: true, subsidies: list.slice(0, 200).map(s => ({ ...publiekeSubsidie(s), aanvrager: s.aanvrager })) };
+  }
+  function subsidieBeslis(actor, r, data) {
+    data = data || {};
+    const s = (db.data.rijkSubsidies || []).find(x => x.ref === String(r || ''));
+    if (!s) return { status: 404, error: 'Aanvraag niet gevonden.' };
+    const besluit = ['toegekend', 'afgewezen', 'in behandeling'].includes(data.besluit) ? data.besluit : null;
+    if (!besluit) return { status: 400, error: 'Kies een geldig besluit.' };
+    s.status = besluit;
+    if (besluit === 'toegekend') s.toegekend = Math.min(s.gevraagd, data.bedrag == null ? s.gevraagd : Math.max(0, eur(data.bedrag)));
+    s.besluit = { door: actor || 'rijk', at: nu() };
+    if (s.key) bericht(s.key, 'Provincie', 'Besluit ' + s.regelingLabel,
+      besluit === 'toegekend' ? 'Je subsidie van € ' + s.toegekend + ' is toegekend.' : besluit === 'afgewezen' ? 'Je aanvraag is afgewezen.' : 'Je aanvraag is in behandeling.', 'subsidie');
+    save();
+    return { ok: true, subsidie: publiekeSubsidie(s) };
+  }
+  function waterMeldingenLijst(filter) {
+    seed(); filter = filter || {};
+    let list = (db.data.waterMeldingen || []);
+    list = filter.status ? list.filter(m => m.status === filter.status) : list.filter(m => !['opgelost', 'afgewezen'].includes(m.status));
+    return { ok: true, meldingen: list.slice(0, 200).map(m => ({ ...publiekeWaterMelding(m), melder: m.melder })) };
+  }
+  function waterMeldingZet(actor, r, data) {
+    data = data || {};
+    const m = (db.data.waterMeldingen || []).find(x => x.ref === String(r || ''));
+    if (!m) return { status: 404, error: 'Melding niet gevonden.' };
+    if (typeof data.status === 'string' && WATER_STATUS.includes(data.status)) m.status = data.status;
+    const note = schoon(data.update, 300);
+    if (note) m.updates.unshift({ tekst: note, at: nu(), door: actor || 'waterschap' });
+    m.updates = (m.updates || []).slice(0, 40);
+    save();
+    return { ok: true, melding: publiekeWaterMelding(m) };
   }
   function toeslagenLijst(filter) {
     seed(); filter = filter || {};
@@ -431,9 +562,13 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
       toeslagAanvraag, mijnToeslagen, voertuigen, voertuigMeld, voertuigSchors, rijbewijs, rijbewijsVerleng,
       kvkInschrijven, kvkMijn, uitkeringAanvraag, mijnUitkeringen,
       verkiezing, stem, bekendmakingen, bezwaarIndienen, mijnBezwaren, aangifteAdvies,
+      // provincie & waterschap (regionaal)
+      provincieSubsidies, subsidieAanvraag, mijnSubsidies,
+      waterschapMijn, waterschapBetaal, waterMeld, mijnWaterMeldingen,
       // ambtenaren
       regie, toeslagenLijst, toeslagBeslis, uitkeringenLijst, uitkeringBeslis,
-      bezwarenLijst, bezwaarBeslis, bekendmakingMaak, verkiezingSluit
+      bezwarenLijst, bezwaarBeslis, bekendmakingMaak, verkiezingSluit,
+      subsidiesLijst, subsidieBeslis, waterMeldingenLijst, waterMeldingZet
     }
   };
 }

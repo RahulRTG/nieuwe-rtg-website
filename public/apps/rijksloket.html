@@ -61,6 +61,8 @@
     <section class="paneel" id="p-tos"></section>
     <section class="paneel" id="p-uit"></section>
     <section class="paneel" id="p-bez"></section>
+    <section class="paneel" id="p-sub"></section>
+    <section class="paneel" id="p-wm"></section>
     <section class="paneel" id="p-stem"></section>
     <section class="paneel" id="p-bek">
       <div class="item">
@@ -102,13 +104,15 @@ $('#loginGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
 });
 
-const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['stem','Stemming'],['bek','Bekendmakingen']];
+const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['sub','Subsidies'],['wm','Watermeldingen'],['stem','Stemming'],['bek','Bekendmakingen']];
 function toon(t){
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
-  ['tos','uit','bez','stem','bek'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  ['tos','uit','bez','sub','wm','stem','bek'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'tos') laadToeslagen();
   if (t === 'uit') laadUitkeringen();
   if (t === 'bez') laadBezwaren();
+  if (t === 'sub') laadSubsidies();
+  if (t === 'wm') laadWaterMeldingen();
   if (t === 'stem') laadStem();
   if (t === 'bek') laadBekend();
 }
@@ -123,6 +127,8 @@ async function laadRegie(){
     '<div class="kpi"><b>'+d.toeslagenOpen+'</b><span>Toeslagen open</span></div>'+
     '<div class="kpi"><b>'+d.uitkeringenOpen+'</b><span>Uitkeringen open</span></div>'+
     '<div class="kpi"><b>'+d.bezwarenOpen+'</b><span>Bezwaren open</span></div>'+
+    '<div class="kpi"><b>'+d.subsidiesOpen+'</b><span>Subsidies open</span></div>'+
+    '<div class="kpi"><b>'+d.waterMeldingenOpen+'</b><span>Watermeldingen</span></div>'+
     '<div class="kpi"><b>'+d.aangiftenJaar+'</b><span>Aangiften</span></div>'+
     '<div class="kpi"><b>'+d.inschrijvingen+'</b><span>KVK-inschr.</span></div>'+
     '<div class="kpi"><b>'+d.stemmen+'</b><span>Stemmen</span></div>';
@@ -162,6 +168,38 @@ async function laadBezwaren(){
   $('#p-bez').querySelectorAll('.item').forEach(it => it.querySelectorAll('.bes').forEach(btn => btn.addEventListener('click', async () => {
     try { await api('/api/overheid/bezwaar/beslis', { ref: it.dataset.ref, besluit: btn.dataset.b }); meld('Bijgewerkt.'); laadBezwaren(); laadRegie(); } catch(e){ meld(e.message); }
   })));
+}
+async function laadSubsidies(){
+  let d; try { d = await api('/api/overheid/subsidies/lijst'); } catch(e){ return; }
+  const l = d.subsidies || [];
+  $('#p-sub').innerHTML = l.length ? l.map(s =>
+    '<div class="item" data-ref="'+esc(s.ref)+'"><h4>'+esc(s.regelingLabel)+' · gevraagd € '+esc(s.gevraagd)+'</h4>'+
+    '<div class="meta">'+esc(s.project)+' · aanvrager '+esc(s.aanvrager||'')+'</div>'+
+    '<div class="rij"><input class="veld bd" inputmode="numeric" placeholder="Bedrag (leeg = gevraagd)" style="width:11rem;">'+
+    '<button class="knop bes" data-b="toegekend">Toekennen</button>'+
+    '<button class="knop rood bes" data-b="afgewezen">Afwijzen</button></div></div>').join('') : '<div class="leeg">Geen openstaande aanvragen.</div>';
+  $('#p-sub').querySelectorAll('.item').forEach(it => it.querySelectorAll('.bes').forEach(btn => btn.addEventListener('click', async () => {
+    const bd = it.querySelector('.bd').value.trim();
+    const body = { ref: it.dataset.ref, besluit: btn.dataset.b };
+    if (btn.dataset.b === 'toegekend' && bd) body.bedrag = Number(bd);
+    try { await api('/api/overheid/subsidie/beslis', body); meld('Bijgewerkt.'); laadSubsidies(); laadRegie(); } catch(e){ meld(e.message); }
+  })));
+}
+const WM_ST = ['nieuw','in behandeling','opgelost','afgewezen'];
+async function laadWaterMeldingen(){
+  let d; try { d = await api('/api/overheid/water/meldingen'); } catch(e){ return; }
+  const l = d.meldingen || [];
+  $('#p-wm').innerHTML = l.length ? l.map(m =>
+    '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.soortLabel)+'</h4>'+
+    '<div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+' · melder '+esc(m.melder||'')+'</div>'+
+    '<div class="rij"><select class="veld st">'+WM_ST.map(s => '<option'+(s===m.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+    '<input class="veld upd" placeholder="Update voor de melder" style="flex:1;min-width:8rem;">'+
+    '<button class="knop zet">Opslaan</button></div></div>').join('') : '<div class="leeg">Geen open meldingen.</div>';
+  $('#p-wm').querySelectorAll('.item').forEach(it => it.querySelector('.zet').addEventListener('click', async () => {
+    try { await api('/api/overheid/water/melding/zet', { ref: it.dataset.ref, status: it.querySelector('.st').value, update: it.querySelector('.upd').value.trim() });
+      meld('Bijgewerkt.'); laadWaterMeldingen(); laadRegie();
+    } catch(e){ meld(e.message); }
+  }));
 }
 async function laadStem(){
   let d; try { d = await api('/api/overheid/verkiezing'); } catch(e){ return; }

@@ -102,8 +102,9 @@
       });
     }
     // de signatuur: alleen de naam, in het goud van het huis, op vaste
-    // breedte (textLength) zodat hij exact gecentreerd en rustig gespreid is
-    const naam = maak('text', { x: 100, y: 45, class: 'rr-naam', 'text-anchor': 'middle',
+    // breedte (textLength) exact gecentreerd, en verticaal precies in het
+    // midden tussen de binnenrand van de plaat en de bovenkant van de cijfers
+    const naam = maak('text', { x: 100, y: 55.4, class: 'rr-naam', 'text-anchor': 'middle',
       textLength: 86, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
     // het datumvenster op zes uur

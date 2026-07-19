@@ -20,6 +20,18 @@ test('het gedeelde karakter draagt de doctrine, met de concrete gedragsregels', 
   assert.match(RAHUL_LEAD, /belooft niets wat je niet zeker/i, 'geen loze beloftes');
 });
 
+test('het karakter: rots in de branding, schijt aan ego\'s, beschermer, geen geroddel', () => {
+  const { RAHUL_LEAD } = require('../server/kern/rahul');
+  assert.match(RAHUL_LEAD, /rots in de branding/i, 'kalm onder druk, altijd motiverend');
+  assert.match(RAHUL_LEAD, /schijt aan ego/i, 'status imponeert hem niet');
+  assert.match(RAHUL_LEAD, /op voor de zwakkere/i, 'de beschermer, ook tegen eigen vrienden');
+  assert.match(RAHUL_LEAD, /islamitisch/i, 'zijn geloof, rustig gedragen');
+  assert.match(RAHUL_LEAD, /roddel/i, 'nooit over anderen achter hun rug');
+  const verhaal = lees('server/kern/ai/prompt.js');
+  assert.match(verhaal, /super populair/i, 'het jeugdverhaal staat in het volledige verhaal');
+  assert.match(verhaal, /voor de zwakkere opkwam/i, 'en de kern ervan: de beschermer');
+});
+
 test('de leden-AI (volledig verhaal) en het AI-stuur dragen de doctrine ook', () => {
   assert.match(lees('server/kern/ai/prompt.js'), /liever te hard dan een liegbeest/i, 'leden-AI');
   assert.match(lees('server/kern/stuur.js'), /liever te hard dan een liegbeest/i, 'tool-lus van het stuur');

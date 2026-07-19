@@ -8,7 +8,7 @@
   if (reduce || !('IntersectionObserver' in window) || !('MutationObserver' in window)) return;
 
   // de tegels/kaarten die meedoen (de bouwstenen van de nieuwe pagina's)
-  var SEL = '.kaart, .item, .reis, .resto, .boutiek, .genre, .fr, .kpi, .ev';
+  var SEL = '.kaart, .item, .reis, .resto, .boutiek, .genre, .fr, .kpi, .ev, .app';
   var stagger = 0;
   var io = new IntersectionObserver(function (ents) {
     for (var i = 0; i < ents.length; i++) {

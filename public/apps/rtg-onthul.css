@@ -1,0 +1,12 @@
+/* RTG Onthul: het signatuur-onthuleffect. Kaarten en tegels stijgen zacht en
+   ingehouden op wanneer ze in beeld komen, gestaffeld. Eén premium beweging,
+   geen stapeling van trucjes; wie liever geen beweging ziet krijgt niets te
+   zien bewegen (de hele laag zit in een no-preference-mediaquery, en het
+   script zet zichzelf dan uit). FOUC-veilig: zonder script blijft alles staan. */
+@media (prefers-reduced-motion: no-preference) {
+  .onthul { opacity: 0; transform: translateY(10px); will-change: opacity, transform; }
+  .onthul.in {
+    opacity: 1; transform: none;
+    transition: opacity .45s ease var(--od, 0ms), transform .5s cubic-bezier(.2, .7, .2, 1) var(--od, 0ms);
+  }
+}

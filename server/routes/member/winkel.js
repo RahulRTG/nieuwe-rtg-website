@@ -5,7 +5,18 @@ module.exports = (kern) => {
   const { accounts, app, auth, findSupplier, liveCodename,
     notify, voorkeurVan, zetVoorkeur, retailCatalogus, wishlistToggle,
     mijnApart, mijnStyling, vraagPaskamer, retailIsRetail, PASPOORT_NIVEAUS,
-    paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn, mall } = kern;
+    paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn, mall, foodcourt } = kern;
+
+/* ---- de RTG Food Court: alle restaurants op een rij, reserveren met tijdsloten ---- */
+// het overzicht van de restaurants (keuken, prijs, ledenvoordeel)
+app.post('/api/foodcourt', auth, (req, res) => res.json(foodcourt.overzicht()));
+// de vrije tijdsloten voor een restaurant op een datum en gezelschap; reserveren
+// gaat via het bestaande /api/reserveer (de zaak beslist)
+app.post('/api/foodcourt/tijden', auth, (req, res) => {
+  const r = foodcourt.tijden(String(req.body.code || ''), req.body.datum, req.body.personen);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
 
 /* ---- de RTG Mall: de enige plek waar je bij RTG koopt ---- */
 // het overzicht van de mall: etages met boutieks; een mode-boutique opent haar

@@ -2725,6 +2725,10 @@ Object.assign(kern, require('./kern/architect').maakArchitect({ db, save, crypto
 /* De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app; een
    gecureerde etagelijst van de retail-partners, elk met een eigen catalogus. */
 Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail }));
+/* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
+   stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
+   tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */
+Object.assign(kern, require('./kern/foodcourt').maakFoodcourt({ db, save, crypto }));
 /* De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier
    ontwerpbureaus; een idee kan als concept naar elk bureau (spin-off), dus de
    bureaus gaan als referenties mee. */

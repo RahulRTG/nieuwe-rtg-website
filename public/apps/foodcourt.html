@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Food Court</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:900px;margin:0 auto;}
+  .chips{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .6rem;}
+  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
+  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  .lijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.9rem;margin-top:.6rem;}
+  .resto{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.3rem;text-align:left;}
+  .resto:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .resto h3{font-size:1.08rem;}
+  .resto .meta{font-size:.74rem;color:var(--soft);letter-spacing:.04em;text-transform:uppercase;}
+  .resto .tag{font-size:.84rem;color:var(--muted);line-height:1.5;}
+  .deal{display:inline-block;margin-top:.2rem;font-size:.72rem;color:#000;background:var(--gold);border-radius:6px;padding:.15rem .5rem;width:max-content;}
+  .dicht{font-size:.72rem;color:var(--burgundy);}
+  .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
+  .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
+  .blad.open{display:block;}
+  .blad-kop{position:sticky;top:0;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  .paneel{max-width:560px;margin:0 auto;padding:1.1rem;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;}
+  .step{display:flex;align-items:center;gap:.5rem;}
+  .step button{width:2.2rem;height:2.2rem;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:1.1rem;cursor:pointer;}
+  .sec{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 .5rem;}
+  .dienst{font-size:.7rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin:.6rem 0 .3rem;}
+  .slots{display:flex;gap:.45rem;flex-wrap:wrap;}
+  .slot{border:1px solid var(--line);background:var(--card);color:var(--txt);border-radius:10px;padding:.5rem .7rem;font:inherit;font-size:.86rem;cursor:pointer;font-variant-numeric:tabular-nums;}
+  .slot:hover:not(:disabled){border-color:var(--gold);}
+  .slot:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
+  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/app.html">← App</a>
+  <div><div class="ey">Reserveer een tafel</div><h1>RTG Food Court</h1></div>
+</header>
+<main id="main">
+  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Alle restaurants op een rij. Kies een keuken, een datum en je gezelschap, en zie meteen de vrije tijden. Je reservering gaat naar het restaurant, dat hem bevestigt.</p>
+  <div class="chips" id="keukens"></div>
+  <div class="lijst" id="lijst"></div>
+</main>
+
+<section class="blad" id="blad" aria-label="Reserveren">
+  <div class="blad-kop">
+    <button class="terug" id="bladTerug">← Food Court</button>
+    <div><div class="ey" id="bladMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+  </div>
+  <div class="paneel">
+    <div id="bladDeal"></div>
+    <div class="rij" style="margin-top:.8rem;gap:1rem;align-items:flex-end;">
+      <div><div class="lbl">Datum</div><input class="veld" id="rDatum" type="date"></div>
+      <div><div class="lbl">Gezelschap</div><div class="step"><button type="button" id="rMin">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus">+</button></div></div>
+    </div>
+    <div class="sec">Vrije tijden</div>
+    <div id="rSlots"><div class="leeg">Kies een datum.</div></div>
+  </div>
+</section>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+if (!TOKEN) {
+  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
+    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Food Court is er voor leden. Open de app en log in met je RTG-account.</p>'+
+    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+} else { laad(); }
+
+let ALLE = [], keuken = '';
+async function laad(){
+  let d;
+  try { d = await api('/api/foodcourt'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  ALLE = d.restaurants || [];
+  $('#keukens').innerHTML = '<button class="chip'+(keuken===''?' aan':'')+'" data-k="">Alle keukens</button>' +
+    (d.keukens||[]).map(k => '<button class="chip'+(keuken===k?' aan':'')+'" data-k="'+esc(k)+'">'+esc(k)+'</button>').join('');
+  $('#keukens').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { keuken = b.dataset.k; laad(); }));
+  const lijst = ALLE.filter(r => !keuken || r.keuken === keuken);
+  $('#lijst').innerHTML = lijst.length ? lijst.map(r =>
+    '<button class="resto" data-code="'+esc(r.code)+'" data-naam="'+esc(r.naam)+'" data-keuken="'+esc(r.keuken)+'" data-deal="'+esc(r.deal||'')+'">'+
+      '<span class="meta">'+esc(r.keuken)+' · '+esc(r.prijs)+(r.stad?' · '+esc(r.stad):'')+'</span>'+
+      '<h3>'+esc(r.naam)+'</h3>'+
+      '<span class="tag">'+esc(r.tagline)+'</span>'+
+      (r.deal?'<span class="deal">'+esc(r.deal)+'</span>':'')+
+      (r.open?'':'<span class="dicht">Nu gesloten voor reserveringen</span>')+
+    '</button>').join('') : '<div class="leeg">Geen restaurants in deze keuken.</div>';
+  $('#lijst').querySelectorAll('.resto').forEach(b => b.addEventListener('click', () => openResto(b.dataset)));
+}
+
+let HUIDIG = null, AANTAL = 2;
+function openResto(ds){
+  HUIDIG = ds.code; AANTAL = 2;
+  $('#bladNaam').textContent = ds.naam;
+  $('#bladMeta').textContent = ds.keuken;
+  $('#bladDeal').innerHTML = ds.deal ? '<span class="deal">'+esc(ds.deal)+'</span>' : '';
+  $('#rAantal').textContent = AANTAL;
+  const t = new Date(); const iso = t.toISOString().slice(0,10);
+  $('#rDatum').min = iso; $('#rDatum').value = iso;
+  $('#blad').classList.add('open');
+  laadTijden();
+}
+async function laadTijden(){
+  $('#rSlots').innerHTML = '<div class="leeg">Laden...</div>';
+  let d;
+  try { d = await api('/api/foodcourt/tijden', { code: HUIDIG, datum: $('#rDatum').value, personen: AANTAL }); }
+  catch(e){ $('#rSlots').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  if (!d.open){ $('#rSlots').innerHTML = '<div class="leeg">Dit restaurant neemt nu geen reserveringen aan.</div>'; return; }
+  const diensten = [['lunch','Lunch'],['diner','Diner']];
+  let html = '';
+  for (const [id,label] of diensten){
+    const sl = d.slots.filter(s => s.dienst === id);
+    if (!sl.length) continue;
+    html += '<div class="dienst">'+label+'</div><div class="slots">'+
+      sl.map(s => '<button class="slot" data-tijd="'+s.tijd+'"'+(s.vol?' disabled':'')+'>'+s.tijd+'</button>').join('')+'</div>';
+  }
+  $('#rSlots').innerHTML = html || '<div class="leeg">Geen vrije tijden meer op deze dag. Kies een andere datum.</div>';
+  $('#rSlots').querySelectorAll('.slot:not([disabled])').forEach(b => b.addEventListener('click', () => reserveer(b.dataset.tijd)));
+}
+async function reserveer(tijd){
+  try {
+    await api('/api/reserveer', { supplierCode: HUIDIG, datum: $('#rDatum').value, tijd, personen: AANTAL });
+    $('#blad').classList.remove('open');
+    meld('Reservering aangevraagd voor ' + tijd + '. Het restaurant bevestigt hem.');
+  } catch(e){ meld(e.message); }
+}
+$('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
+$('#rDatum').addEventListener('change', laadTijden);
+$('#rMin').addEventListener('click', () => { AANTAL = Math.max(1, AANTAL-1); $('#rAantal').textContent = AANTAL; laadTijden(); });
+$('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $('#rAantal').textContent = AANTAL; laadTijden(); });
+</script>
+</body>
+</html>

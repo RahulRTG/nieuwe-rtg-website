@@ -2740,6 +2740,14 @@ Object.assign(kern, require('./kern/logies').maakLogies({ db }));
 /* De losse uitgaan-pagina (kern/uitgaan.js): bars, clubs en beachclubs met hun
    avonden; aanmelden loopt via /api/event/rsvp. */
 Object.assign(kern, require('./kern/uitgaan').maakUitgaan({ db, save, crypto }));
+/* RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre.
+   Vier pijlers (meldingen openbare ruimte, burgerzaken/afspraken, vergunningen,
+   afval/belasting/bestuur) voor inwoners, gemeente-medewerkers en partners. */
+Object.assign(kern, require('./kern/gemeente').maakGemeente({ db, save, crypto, anthropic,
+  findSupplier, notify, notifySupplier, sseToSupplier }));
+// de gemeente-partner en zijn config bestaan meteen bij het opstarten, zodat een
+// medewerker kan inloggen ook zonder dat er eerst een inwoner iets deed
+kern.gemeente.seed();
 /* De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier
    ontwerpbureaus; een idee kan als concept naar elk bureau (spin-off), dus de
    bureaus gaan als referenties mee. */
@@ -2977,6 +2985,7 @@ require('./routes/leren')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
 require('./routes/kantoren')(kern);
+require('./routes/gemeente')(kern);
 require('./routes/pay')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);

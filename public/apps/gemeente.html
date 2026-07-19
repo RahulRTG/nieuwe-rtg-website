@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Gemeente</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  section.paneel{display:none;}
+  section.paneel.aan{display:block;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:.8rem;}
+  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;}
+  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  textarea.veld{resize:vertical;min-height:3rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.3rem 0;}
+  .chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
+  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  .slots{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.4rem;}
+  .slot{border:1px solid var(--line);background:var(--bg);color:var(--txt);border-radius:9px;padding:.45rem .7rem;font:inherit;font-size:.85rem;cursor:pointer;font-variant-numeric:tabular-nums;}
+  .slot:hover:not(:disabled){border-color:var(--gold);}
+  .slot:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through;}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card2);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+  .item .meta{font-size:.76rem;color:var(--soft);margin-top:.15rem;}
+  .status{display:inline-block;font-size:.72rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);margin-top:.3rem;text-transform:capitalize;}
+  .status.op{border-color:var(--green);color:var(--green);}
+  .status.af{border-color:var(--burgundy);color:var(--burgundy);}
+  .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  .kal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.6rem;}
+  .kal .fr{border:1px solid var(--line);border-radius:12px;padding:.7rem;background:var(--card2);}
+  .kal .fr b{font-family:'Bodoni Moda',serif;font-weight:500;}
+  .kal .fr div{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
+  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/app.html">← App</a>
+  <div><div class="ey">Het loket voor inwoners</div><h1>RTG Gemeente</h1></div>
+</header>
+<main id="main">
+  <div class="tabs" id="tabs"></div>
+
+  <section class="paneel" id="p-melden">
+    <div class="kaart">
+      <h3>Melding openbare ruimte</h3>
+      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:.3rem;">Iets kapot of vies in de buurt? Meld het; de gemeente wijst het toe aan de juiste ploeg en je volgt de status.</p>
+      <div class="lbl">Categorie</div>
+      <div class="chips" id="meldCats"></div>
+      <div class="lbl">Wat is er aan de hand?</div>
+      <textarea class="veld" id="meldTekst" maxlength="500" placeholder="Bijv. de lantaarn bij de haven doet het niet"></textarea>
+      <div class="lbl">Locatie (optioneel)</div>
+      <input class="veld" id="meldLoc" maxlength="120" placeholder="Straat of plek">
+      <button class="knop" id="meldGo" style="margin-top:.8rem;">Melding versturen</button>
+    </div>
+    <h3 style="margin:1.2rem 0 .6rem;">Mijn meldingen</h3>
+    <div id="meldMijn"><div class="leeg">Nog geen meldingen.</div></div>
+  </section>
+
+  <section class="paneel" id="p-burger">
+    <div class="kaart">
+      <h3>Afspraak burgerzaken</h3>
+      <div class="lbl">Waarvoor?</div>
+      <div class="chips" id="bzSoorten"></div>
+      <div class="lbl">Datum</div>
+      <input class="veld" id="bzDatum" type="date">
+      <div class="lbl">Vrije tijden</div>
+      <div class="slots" id="bzSlots"><div class="leeg">Kies eerst waarvoor en een datum.</div></div>
+    </div>
+    <div class="kaart">
+      <h3>Verhuizing doorgeven</h3>
+      <div class="lbl">Nieuw adres</div>
+      <input class="veld" id="vhNieuw" maxlength="160" placeholder="Straat, nummer, plaats">
+      <div class="lbl">Ingangsdatum (optioneel)</div>
+      <input class="veld" id="vhDatum" type="date">
+      <button class="knop" id="vhGo" style="margin-top:.8rem;">Verhuizing doorgeven</button>
+    </div>
+    <h3 style="margin:1.2rem 0 .6rem;">Mijn afspraken</h3>
+    <div id="bzMijn"><div class="leeg">Nog geen afspraken.</div></div>
+  </section>
+
+  <section class="paneel" id="p-verg">
+    <div class="kaart">
+      <h3>Vergunning aanvragen</h3>
+      <div class="lbl">Soort</div>
+      <div class="chips" id="vgSoorten"></div>
+      <div class="lbl">Omschrijving</div>
+      <textarea class="veld" id="vgOms" maxlength="800" placeholder="Wat wil je doen, waar en wanneer?"></textarea>
+      <div class="lbl">Locatie (optioneel)</div>
+      <input class="veld" id="vgLoc" maxlength="160" placeholder="Adres of plek">
+      <button class="knop" id="vgGo" style="margin-top:.8rem;">Aanvraag indienen</button>
+    </div>
+    <h3 style="margin:1.2rem 0 .6rem;">Mijn aanvragen</h3>
+    <div id="vgMijn"><div class="leeg">Nog geen aanvragen.</div></div>
+  </section>
+
+  <section class="paneel" id="p-info">
+    <div class="kaart">
+      <h3>Afvalkalender</h3>
+      <div class="lbl">Postcode</div>
+      <div style="display:flex;gap:.5rem;"><input class="veld" id="afPost" maxlength="8" placeholder="Bijv. 07800" style="flex:1;"><button class="knop stil" id="afGo" style="width:auto;">Toon</button></div>
+      <div class="kal" id="afKal" style="margin-top:.8rem;"></div>
+      <div class="lbl">Grofvuil op afspraak</div>
+      <input class="veld" id="gvWat" maxlength="300" placeholder="Wat moet opgehaald worden?">
+      <button class="knop stil" id="gvGo" style="margin-top:.6rem;width:auto;">Grofvuil aanvragen</button>
+    </div>
+    <div class="kaart">
+      <h3>Mijn aanslagen</h3>
+      <div id="belMijn"><div class="leeg">Geen openstaande aanslagen.</div></div>
+    </div>
+    <div class="kaart">
+      <h3>Bekendmakingen</h3>
+      <div id="bekLijst"><div class="leeg">Laden...</div></div>
+    </div>
+  </section>
+</main>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3000); }
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+if (!TOKEN) {
+  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
+    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het gemeenteloket is er voor inwoners met een RTG-account. Open de app en log in.</p>'+
+    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+} else { start(); }
+
+const TABS = [['melden','Melden'],['burger','Burgerzaken'],['verg','Vergunningen'],['info','Afval & meer']];
+function toon(t){
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
+  ['melden','burger','verg','info'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  if (t === 'info') { laadAfval(); laadBelasting(); laadBekend(); }
+  if (t === 'melden') laadMijnMeldingen();
+  if (t === 'burger') laadMijnAfspraken();
+  if (t === 'verg') laadMijnVerg();
+}
+const CATS = { verlichting:'Straatverlichting', afval:'Afval & vuil', wegdek:'Wegdek & stoep', groen:'Groen & bomen', riool:'Riool & water', overlast:'Overlast', speeltuin:'Speeltuin', overig:'Overig' };
+let meldCat = 'verlichting';
+const VERG = { bouw:'Bouw/omgeving', evenement:'Evenement', terras:'Terras', horeca:'Horeca', kap:'Kap', standplaats:'Standplaats' };
+let vgSoort = 'evenement';
+let bzSoort = null;
+
+function start(){
+  $('#tabs').innerHTML = TABS.map(([t,l]) => '<button class="tab" data-t="'+t+'">'+esc(l)+'</button>').join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => toon(b.dataset.t)));
+  $('#meldCats').innerHTML = Object.entries(CATS).map(([k,l]) => '<button class="chip'+(k===meldCat?' aan':'')+'" data-k="'+k+'">'+esc(l)+'</button>').join('');
+  $('#meldCats').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { meldCat = b.dataset.k; $('#meldCats').querySelectorAll('.chip').forEach(x => x.classList.toggle('aan', x===b)); }));
+  $('#vgSoorten').innerHTML = Object.entries(VERG).map(([k,l]) => '<button class="chip'+(k===vgSoort?' aan':'')+'" data-k="'+k+'">'+esc(l)+'</button>').join('');
+  $('#vgSoorten').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { vgSoort = b.dataset.k; $('#vgSoorten').querySelectorAll('.chip').forEach(x => x.classList.toggle('aan', x===b)); }));
+  const iso = new Date().toISOString().slice(0,10);
+  $('#bzDatum').min = iso; $('#vhDatum').min = iso;
+  laadBurgerzaken();
+  toon('melden');
+}
+
+// meldingen
+$('#meldGo').addEventListener('click', async () => {
+  const tekst = $('#meldTekst').value.trim();
+  if (tekst.length < 4){ meld('Omschrijf kort wat er is.'); return; }
+  try { await api('/api/gemeente/meld', { categorie: meldCat, tekst, locatie: $('#meldLoc').value.trim() });
+    $('#meldTekst').value = ''; $('#meldLoc').value = ''; meld('Melding verstuurd. Je volgt de status hier.'); laadMijnMeldingen();
+  } catch(e){ meld(e.message); }
+});
+async function laadMijnMeldingen(){
+  let d; try { d = await api('/api/gemeente/meldingen/mijn'); } catch(e){ return; }
+  const l = d.meldingen || [];
+  $('#meldMijn').innerHTML = l.length ? l.map(m =>
+    '<div class="item"><h4>'+esc(m.categorieLabel)+'</h4><div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+'</div>'+
+    '<span class="status '+(m.status==='opgelost'?'op':m.status==='afgewezen'?'af':'')+'">'+esc(m.status)+' · '+esc(m.ploeg)+'</span>'+
+    ((m.updates&&m.updates.length)?'<div class="meta" style="margin-top:.3rem;">Laatste: '+esc(m.updates[0].tekst)+'</div>':'')+
+    '</div>').join('') : '<div class="leeg">Nog geen meldingen.</div>';
+}
+
+// burgerzaken
+async function laadBurgerzaken(){
+  let d; try { d = await api('/api/gemeente/burgerzaken'); } catch(e){ return; }
+  const balie = (d.soorten||[]).filter(s => s.opAfspraak);
+  bzSoort = bzSoort || (balie[0] && balie[0].id);
+  $('#bzSoorten').innerHTML = balie.map(s => '<button class="chip'+(s.id===bzSoort?' aan':'')+'" data-k="'+s.id+'">'+esc(s.label)+'</button>').join('');
+  $('#bzSoorten').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { bzSoort = b.dataset.k; $('#bzSoorten').querySelectorAll('.chip').forEach(x => x.classList.toggle('aan', x===b)); laadSlots(); }));
+}
+$('#bzDatum').addEventListener('change', laadSlots);
+async function laadSlots(){
+  if (!bzSoort || !$('#bzDatum').value){ return; }
+  $('#bzSlots').innerHTML = '<div class="leeg">Laden...</div>';
+  let d; try { d = await api('/api/gemeente/burgerzaken/slots', { soort: bzSoort, datum: $('#bzDatum').value }); }
+  catch(e){ $('#bzSlots').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  $('#bzSlots').innerHTML = (d.slots||[]).length ? d.slots.map(s => '<button class="slot" data-t="'+s.tijd+'"'+(s.vol?' disabled':'')+'>'+s.tijd+'</button>').join('') : '<div class="leeg">Geen vrije tijden. Kies een andere datum.</div>';
+  $('#bzSlots').querySelectorAll('.slot:not([disabled])').forEach(b => b.addEventListener('click', () => afspraakMaak(b.dataset.t)));
+}
+async function afspraakMaak(tijd){
+  try { await api('/api/gemeente/afspraak', { soort: bzSoort, datum: $('#bzDatum').value, tijd });
+    meld('Afspraak gepland op ' + $('#bzDatum').value + ' om ' + tijd + '.'); laadSlots(); laadMijnAfspraken();
+  } catch(e){ meld(e.message); }
+}
+$('#vhGo').addEventListener('click', async () => {
+  const nieuwAdres = $('#vhNieuw').value.trim();
+  if (nieuwAdres.length < 4){ meld('Vul je nieuwe adres in.'); return; }
+  try { await api('/api/gemeente/verhuizing', { nieuwAdres, datum: $('#vhDatum').value });
+    $('#vhNieuw').value = ''; meld('Verhuizing doorgegeven. De gemeente verwerkt hem.'); laadMijnAfspraken();
+  } catch(e){ meld(e.message); }
+});
+async function laadMijnAfspraken(){
+  let d; try { d = await api('/api/gemeente/afspraken/mijn'); } catch(e){ return; }
+  const l = (d.afspraken||[]).filter(a => a.status !== 'geannuleerd');
+  $('#bzMijn').innerHTML = l.length ? l.map(a =>
+    '<div class="item"><h4>'+esc(a.soortLabel)+'</h4><div class="meta">'+(a.datum?esc(a.datum)+(a.tijd?' om '+esc(a.tijd):''):esc(a.nieuwAdres||''))+'</div>'+
+    '<span class="status">'+esc(a.status)+'</span> <button class="knop stil" data-ref="'+esc(a.ref)+'" style="padding:.2rem .6rem;font-size:.76rem;">Annuleer</button></div>').join('') : '<div class="leeg">Nog geen afspraken.</div>';
+  $('#bzMijn').querySelectorAll('button[data-ref]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/gemeente/afspraak/annuleer', { ref: b.dataset.ref }); meld('Geannuleerd.'); laadMijnAfspraken(); } catch(e){ meld(e.message); }
+  }));
+}
+
+// vergunningen
+$('#vgGo').addEventListener('click', async () => {
+  const omschrijving = $('#vgOms').value.trim();
+  if (omschrijving.length < 6){ meld('Omschrijf je aanvraag.'); return; }
+  try { await api('/api/gemeente/vergunning', { soort: vgSoort, omschrijving, locatie: $('#vgLoc').value.trim() });
+    $('#vgOms').value = ''; $('#vgLoc').value = ''; meld('Aanvraag ingediend. De gemeente beoordeelt hem.'); laadMijnVerg();
+  } catch(e){ meld(e.message); }
+});
+async function laadMijnVerg(){
+  let d; try { d = await api('/api/gemeente/vergunningen/mijn'); } catch(e){ return; }
+  const l = d.vergunningen || [];
+  $('#vgMijn').innerHTML = l.length ? l.map(v =>
+    '<div class="item"><h4>'+esc(v.soortLabel)+'</h4><div class="meta">'+esc(v.omschrijving)+(v.locatie?' · '+esc(v.locatie):'')+'</div>'+
+    '<span class="status '+(v.status==='verleend'?'op':v.status==='geweigerd'?'af':'')+'">'+esc(v.status)+'</span>'+
+    ((v.voorwaarden&&v.voorwaarden.length)?'<div class="meta" style="margin-top:.3rem;">Voorwaarden: '+v.voorwaarden.map(esc).join('; ')+'</div>':'')+
+    '</div>').join('') : '<div class="leeg">Nog geen aanvragen.</div>';
+}
+
+// afval, belasting, bekendmakingen
+$('#afGo').addEventListener('click', laadAfval);
+async function laadAfval(){
+  const pc = $('#afPost').value.trim();
+  if (!pc){ $('#afKal').innerHTML = '<div class="leeg">Vul je postcode in voor de ophaaldagen.</div>'; return; }
+  let d; try { d = await api('/api/gemeente/afval', { postcode: pc }); } catch(e){ return; }
+  const fr = d.fracties || {};
+  $('#afKal').innerHTML = Object.keys(fr).map(k => '<div class="fr"><b>'+esc(fr[k].label)+'</b>'+(fr[k].data||[]).map(x => '<div>'+esc(x)+'</div>').join('')+'</div>').join('');
+}
+$('#gvGo').addEventListener('click', async () => {
+  const wat = $('#gvWat').value.trim();
+  if (wat.length < 3){ meld('Omschrijf wat er opgehaald moet worden.'); return; }
+  try { await api('/api/gemeente/grofvuil', { wat, adres: $('#afPost').value.trim() });
+    $('#gvWat').value = ''; meld('Grofvuil aangevraagd. De reiniging plant een moment in.');
+  } catch(e){ meld(e.message); }
+});
+async function laadBelasting(){
+  let d; try { d = await api('/api/gemeente/belasting/mijn'); } catch(e){ return; }
+  const l = d.aanslagen || [];
+  $('#belMijn').innerHTML = l.length ? l.map(a => '<div class="item"><h4>'+esc(a.soort)+' '+esc(a.jaar)+'</h4><div class="meta">€ '+esc(a.bedrag)+'</div><span class="status '+(a.betaald?'op':'')+'">'+(a.betaald?'betaald':'openstaand')+'</span></div>').join('') : '<div class="leeg">Geen openstaande aanslagen.</div>';
+}
+async function laadBekend(){
+  let d; try { d = await api('/api/gemeente/bekendmakingen'); } catch(e){ return; }
+  const l = d.bekendmakingen || [];
+  $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Geen bekendmakingen.</div>';
+}
+</script>
+<button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
+<section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
+  <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
+  <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
+  <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Bijv. meld een kapotte lantaarn bij de haven" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
+</section>
+<style>
+.rahulfab{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--gold);color:#000;border:none;border-radius:999px;padding:.7rem 1.1rem;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+.rahulsheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:var(--card,#151312);border:1px solid var(--gold);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.rahulsheet[hidden]{display:none;}
+.rahulkop{display:flex;align-items:center;justify-content:space-between;}
+.rahulkop b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+.rahulkop .terug{padding:.2rem .55rem;}
+.rahuluit{font-size:.86rem;color:var(--muted,#bbb);line-height:1.55;max-height:40vh;overflow-y:auto;white-space:pre-wrap;}
+.rahulrij{display:flex;gap:.4rem;}
+.rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:10px;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
+.rahulgo{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
+</style>
+<script>(function(){
+  var tok=null; try{tok=localStorage.getItem('rtg_member_token');}catch(e){}
+  var fab=document.getElementById('rahulFab'), sheet=document.getElementById('rahulSheet');
+  var uit=document.getElementById('rahulUit'), form=document.getElementById('rahulForm'), inp=document.getElementById('rahulIn');
+  if(!tok){ if(fab) fab.style.display='none'; return; }
+  fab.addEventListener('click',function(){ sheet.hidden=false; fab.style.display='none'; inp.focus(); if(!uit.textContent) uit.textContent='Zeg wat je wilt. Ik meld, plan een afspraak of vraag een vergunning aan, met jouw eigen inlog.'; });
+  document.getElementById('rahulSluit').addEventListener('click',function(){ sheet.hidden=true; fab.style.display=''; });
+  form.addEventListener('submit',function(ev){ ev.preventDefault(); var q=inp.value.trim(); if(!q) return; inp.value=''; uit.textContent='Rahul denkt na...';
+    fetch('/api/fluister',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({q:q})})
+      .then(function(r){return r.json();}).then(function(d){ uit.textContent=(d&&(d.antwoord||d.error))||'Ik kwam er niet uit.'; })
+      .catch(function(){ uit.textContent='Er ging iets mis. Probeer het opnieuw.'; });
+  });
+})();</script>
+</body>
+</html>

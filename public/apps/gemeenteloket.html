@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gemeente-loket (medewerker)</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;margin-top:.05rem;}
+  main{padding:1.1rem;max-width:820px;margin:0 auto;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.6rem;margin-bottom:1rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;}
+  .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.5rem;display:block;}
+  .kpi span{font-size:.72rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  section.paneel{display:none;} section.paneel.aan{display:block;}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+  .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.42rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
+  .status{display:inline-block;font-size:.72rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);text-transform:capitalize;}
+  .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.5rem 0 .25rem;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
+  .login .veld{width:100%;margin-bottom:.6rem;}
+</style>
+</head>
+<body>
+<header>
+  <div class="ey">Gemeente-medewerker</div><h1 id="titel">RTG Gemeente-loket</h1>
+</header>
+<main id="main">
+  <div class="login" id="login">
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1rem;">Log in als medewerker van de gemeente met je persoonlijke pincode.</p>
+    <select class="veld" id="wie"><option value="">Laden...</option></select>
+    <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
+    <button class="knop" id="loginGo" style="width:100%;">Inloggen</button>
+  </div>
+
+  <div id="app" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="tabs" id="tabs"></div>
+    <section class="paneel" id="p-meld"></section>
+    <section class="paneel" id="p-afs"></section>
+    <section class="paneel" id="p-verg"></section>
+    <section class="paneel" id="p-bek">
+      <div class="item">
+        <h3>Nieuwe bekendmaking</h3>
+        <div class="lbl">Titel</div><input class="veld" id="bekTitel" maxlength="120" style="width:100%;">
+        <div class="lbl">Tekst</div><textarea class="veld" id="bekTekst" maxlength="800" style="width:100%;min-height:3rem;resize:vertical;"></textarea>
+        <div class="lbl">Soort</div>
+        <select class="veld" id="bekSoort"><option value="algemeen">Algemeen</option><option value="raad">Raad</option><option value="verkeer">Verkeer</option><option value="vergunning">Vergunning</option></select>
+        <div class="rij"><button class="knop" id="bekGo">Plaatsen</button></div>
+      </div>
+      <div id="bekLijst"></div>
+    </section>
+  </div>
+</main>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
+let TOKEN = null;
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const CODE = 'GEMEENTE';
+async function vulWie(){
+  try { const r = await api('/api/supplier/roster', { code: CODE });
+    $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
+  } catch(e){ $('#wie').innerHTML = '<option value="">Balie niet bereikbaar</option>'; }
+}
+vulWie();
+$('#loginGo').addEventListener('click', async () => {
+  const staffId = $('#wie').value, pin = $('#pin').value.trim();
+  if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
+  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token;
+    $('#login').hidden = true; $('#app').hidden = false; start();
+  } catch(e){ meld(e.message); }
+});
+
+const TABS = [['meld','Meldingen'],['afs','Afspraken'],['verg','Vergunningen'],['bek','Bekendmakingen']];
+function toon(t){
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
+  ['meld','afs','verg','bek'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  if (t === 'meld') laadMeldingen();
+  if (t === 'afs') laadAfspraken();
+  if (t === 'verg') laadVergunningen();
+  if (t === 'bek') laadBekend();
+}
+function start(){
+  $('#tabs').innerHTML = TABS.map(([t,l]) => '<button class="tab" data-t="'+t+'">'+esc(l)+'</button>').join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => toon(b.dataset.t)));
+  laadRegie(); toon('meld');
+}
+async function laadRegie(){
+  let d; try { d = await api('/api/gemeente/regie'); } catch(e){ return; }
+  $('#kpis').innerHTML =
+    '<div class="kpi"><b>'+d.meldingenOpen+'</b><span>Meldingen open</span></div>'+
+    '<div class="kpi"><b>'+d.afsprakenVandaag+'</b><span>Afspraken vandaag</span></div>'+
+    '<div class="kpi"><b>'+d.vergunningenOpen+'</b><span>Vergunningen open</span></div>'+
+    '<div class="kpi"><b>'+d.bekendmakingen+'</b><span>Bekendmakingen</span></div>';
+}
+const MELD_ST = ['nieuw','in behandeling','gepland','opgelost','afgewezen'];
+async function laadMeldingen(){
+  let d; try { d = await api('/api/gemeente/meldingen'); } catch(e){ return; }
+  const l = d.meldingen || [];
+  $('#p-meld').innerHTML = l.length ? l.map(m =>
+    '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.categorieLabel)+' · '+esc(m.ploeg)+'</h4>'+
+    '<div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+' · melder '+esc(m.melder)+'</div>'+
+    '<div class="rij"><select class="veld st">'+MELD_ST.map(s => '<option'+(s===m.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+    '<input class="veld upd" placeholder="Update voor de melder" style="flex:1;min-width:8rem;">'+
+    '<button class="knop zet">Opslaan</button></div></div>').join('') : '<div class="leeg">Geen open meldingen.</div>';
+  $('#p-meld').querySelectorAll('.item').forEach(it => it.querySelector('.zet').addEventListener('click', async () => {
+    try { await api('/api/gemeente/melding/zet', { ref: it.dataset.ref, patch: { status: it.querySelector('.st').value, update: it.querySelector('.upd').value.trim() } });
+      meld('Bijgewerkt.'); laadMeldingen(); laadRegie();
+    } catch(e){ meld(e.message); }
+  }));
+}
+async function laadAfspraken(){
+  let d; try { d = await api('/api/gemeente/afspraken', {}); } catch(e){ return; }
+  const l = d.afspraken || [];
+  $('#p-afs').innerHTML = '<div class="lbl">Afspraken op '+esc(d.datum)+' (en openstaande verhuizingen)</div>' + (l.length ? l.map(a =>
+    '<div class="item"><h4>'+esc(a.soortLabel)+(a.tijd?' · '+esc(a.tijd):'')+'</h4><div class="meta">'+esc(a.codenaam)+(a.nieuwAdres?' · nieuw adres: '+esc(a.nieuwAdres):'')+'</div><span class="status">'+esc(a.status)+'</span></div>').join('') : '<div class="leeg">Geen afspraken vandaag.</div>');
+}
+const VG_ST = { verleend:'Verlenen', geweigerd:'Weigeren', 'in behandeling':'In behandeling nemen' };
+async function laadVergunningen(){
+  let d; try { d = await api('/api/gemeente/vergunningen'); } catch(e){ return; }
+  const l = d.vergunningen || [];
+  $('#p-verg').innerHTML = l.length ? l.map(v =>
+    '<div class="item" data-ref="'+esc(v.ref)+'"><h4>'+esc(v.soortLabel)+'</h4><div class="meta">'+esc(v.omschrijving)+(v.locatie?' · '+esc(v.locatie):'')+' · '+esc(v.aanvrager||'')+'</div>'+
+    '<span class="status">'+esc(v.status)+'</span>'+
+    '<div class="rij"><input class="veld vw" placeholder="Voorwaarde (optioneel)" style="flex:1;min-width:8rem;">'+
+    '<button class="knop bes" data-b="verleend">Verlenen</button>'+
+    '<button class="knop rood bes" data-b="geweigerd">Weigeren</button></div></div>').join('') : '<div class="leeg">Geen openstaande aanvragen.</div>';
+  $('#p-verg').querySelectorAll('.item').forEach(it => it.querySelectorAll('.bes').forEach(btn => btn.addEventListener('click', async () => {
+    const vw = it.querySelector('.vw').value.trim();
+    try { await api('/api/gemeente/vergunning/beslis', { ref: it.dataset.ref, besluit: btn.dataset.b, voorwaarden: vw ? [vw] : [] });
+      meld(btn.dataset.b === 'verleend' ? 'Verleend.' : 'Geweigerd.'); laadVergunningen(); laadRegie();
+    } catch(e){ meld(e.message); }
+  })));
+}
+$('#bekGo').addEventListener('click', async () => {
+  const titel = $('#bekTitel').value.trim(), tekst = $('#bekTekst').value.trim();
+  if (titel.length < 3 || tekst.length < 3){ meld('Vul een titel en tekst in.'); return; }
+  try { await api('/api/gemeente/bekendmaking', { titel, tekst, soort: $('#bekSoort').value });
+    $('#bekTitel').value = ''; $('#bekTekst').value = ''; meld('Geplaatst.'); laadBekend(); laadRegie();
+  } catch(e){ meld(e.message); }
+});
+async function laadBekend(){
+  let d; try { d = await api('/api/supplier/gemeente/bekendmakingen'); } catch(e){ return; }
+  const l = d.bekendmakingen || [];
+  $('#bekLijst').innerHTML = l.length ? l.map(b => '<div class="item"><h4>'+esc(b.titel)+'</h4><div class="meta">'+esc(b.tekst)+'</div><span class="status">'+esc(b.soort)+'</span></div>').join('') : '<div class="leeg">Nog geen bekendmakingen.</div>';
+}
+</script>
+</body>
+</html>

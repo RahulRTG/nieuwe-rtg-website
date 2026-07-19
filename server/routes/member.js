@@ -63,6 +63,8 @@ module.exports = (kern) => {
   require('./member/handel')(kern);
   // De winkel-laag (retail/mode-catalogus) en de paspoort/identiteits-routes.
   require('./member/winkel')(kern);
+  // Het inwoner-loket van RTG Gemeente (meldingen, burgerzaken, vergunningen, afval).
+  require('./member/gemeente')(kern);
   // De Salon: post-interactie en de partner-etalage.
   require('./member/salon')(kern);
   // Werk & sollicitaties: cv, vacatures, solliciteren en de sollicitatie-chat.

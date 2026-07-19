@@ -58,7 +58,9 @@ const STAFF_SEED = {
   ZENITH: [['Nadia Sol', 'manager', 'Massagetherapeut'], ['Bram Veer', 'staff', 'Huidtherapeut']],
   CLARA: [['Elena Ruiz', 'manager', 'Huisarts'], ['Tomas Blad', 'staff', 'Fysiotherapeut']],
   ORODOR: [['Esteban Oro', 'manager', 'Meester-juwelier'], ['Lia Costa', 'staff', 'Salon & taxatie']],
-  LIENZO: [['Valeria Pinto', 'manager', 'Galeriehouder'], ['Hugo Ram', 'staff', 'Exposities & entree']]
+  LIENZO: [['Valeria Pinto', 'manager', 'Galeriehouder'], ['Hugo Ram', 'staff', 'Exposities & entree']],
+  // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
+  GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']]
 };
 
 module.exports = { STAFF_SEED };

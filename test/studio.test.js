@@ -84,3 +84,22 @@ test('5. status doorschakelen, programma aanmaken en de studio is een kantoorafd
   const kamers = await api('/api/office/kamers', {}, office);
   assert.ok(kamers.body.kamers.some(k => k.id === 'studio'), 'de studio is een kantoorafdeling');
 });
+
+test('6. lookbook per programma: toegewezen concepten komen samen in een boek', async () => {
+  await api('/api/office/studio/collectie', { naam: 'Meridiaan', seizoen: '2028' }, office);
+  const mk = await api('/api/office/studio/maak', { discipline: 'automotive', naam: 'Meridiaan Coupe' }, office);
+  const oid = mk.body.ontwerp.id;
+  await api('/api/office/studio/concept', { id: oid }, office);
+  // concept toewijzen aan het programma via de zet-route (zelfde weg als de UI)
+  const zet = await api('/api/office/studio/zet', { id: oid, collectie: 'Meridiaan' }, office);
+  assert.equal(zet.body.ontwerp.collectie, 'Meridiaan');
+  const lb = await api('/api/office/studio/lookbook', { naam: 'Meridiaan' }, office);
+  assert.equal(lb.status, 200);
+  assert.equal(lb.body.programma.naam, 'Meridiaan');
+  assert.ok(lb.body.ontwerpen.some(o => o.id === oid), 'het toegewezen concept staat in de lookbook');
+  assert.ok(lb.body.ontwerpen.every(o => o.collectie === 'Meridiaan'), 'de lookbook bevat alleen concepten van dit programma');
+  assert.ok(lb.body.disciplines.length >= 1, 'de betrokken disciplines staan erbij');
+  // een onbekend programma levert geen boek
+  assert.equal((await api('/api/office/studio/lookbook', { naam: 'Bestaat Niet' }, office)).status, 404);
+  assert.equal((await api('/api/office/studio/lookbook', { naam: 'Meridiaan' }, null)).status, 401);
+});

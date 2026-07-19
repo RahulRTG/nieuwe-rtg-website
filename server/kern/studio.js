@@ -182,6 +182,27 @@ function maakStudio({ db, save, crypto, anthropic, schoon }) {
     return { ok: true, collectie: c };
   }
 
+  /* Het lookbook per programma: alle concepten die aan dit programma zijn
+     toegewezen (op naam), met hun uitgewerkte concept, klaar om als
+     presentatie te tonen, te printen of als PDF te bewaren. */
+  function lookbook(naam) {
+    const sleutel = scho(naam, 80);
+    if (!sleutel) return { status: 400, error: 'Kies een programma.' };
+    const col = store().collecties.find(c => c.naam === sleutel) || null;
+    const items = alle().filter(o => o.collectie === sleutel);
+    if (!col && !items.length) return { status: 404, error: 'Geen programma met concepten gevonden.' };
+    const disciplines = [...new Set(items.map(o => o.discipline))]
+      .map(k => (DISCIPLINES[k] || {}).label || k);
+    return {
+      ok: true,
+      programma: col || { naam: sleutel, seizoen: null, huis: null },
+      disciplines,
+      aantal: items.length,
+      ontwerpen: items.map(publiek),
+      gemaaktOp: nu()
+    };
+  }
+
   async function aiConcept(oid) {
     const o = vind(oid); if (!o) return { status: 404, error: 'Concept niet gevonden.' };
     let concept = null;
@@ -254,7 +275,7 @@ function maakStudio({ db, save, crypto, anthropic, schoon }) {
     return { ok: true, kritiek: o.kritiek, punten: regels, ontwerp: publiek(o) };
   }
 
-  return { studio: { DISCIPLINES, STATUS, PALET, overzicht, ontwerpMaak, ontwerpZet, ontwerpVerwijder, collectieMaak, aiConcept, aiSpecsheet, aiKritiek } };
+  return { studio: { DISCIPLINES, STATUS, PALET, overzicht, ontwerpMaak, ontwerpZet, ontwerpVerwijder, collectieMaak, lookbook, aiConcept, aiSpecsheet, aiKritiek } };
 }
 
 module.exports = { maakStudio, DISCIPLINES, STATUS };

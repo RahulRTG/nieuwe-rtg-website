@@ -91,6 +91,7 @@ module.exports = (kern) => {
   app.post('/api/office/studio/zet', officeAuth, (req, res) => veilig(res, () => kern.studio.ontwerpZet(String(req.body.id || ''), req.body || {})));
   app.post('/api/office/studio/verwijder', officeAuth, (req, res) => veilig(res, () => kern.studio.ontwerpVerwijder(String(req.body.id || ''))));
   app.post('/api/office/studio/collectie', officeAuth, (req, res) => veilig(res, () => kern.studio.collectieMaak(req.body || {})));
+  app.post('/api/office/studio/lookbook', officeAuth, (req, res) => veilig(res, () => kern.studio.lookbook(req.body.naam)));
   app.post('/api/office/studio/specsheet', officeAuth, (req, res) => veilig(res, () => kern.studio.aiSpecsheet(String(req.body.id || ''))));
   app.post('/api/office/studio/concept', officeAuth, async (req, res) => {
     try { const r = await kern.studio.aiConcept(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }

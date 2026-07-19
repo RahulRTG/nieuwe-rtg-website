@@ -1,40 +1,12 @@
-/* Spelmotor "magnaat" (kern/spellen): Magnaat (monopoly-achtig): 40 velden in de RTG-wereld, kopen, huur, bouwen, kanskaarten en de cel.
-   Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
-   beurten en views en roept deze motor via de gedeelde context aan. */
+/* Spelmotor "magnaat" (kern/spellen): Magnaat (monopoly-achtig): 40 velden in de
+   RTG-wereld, kopen, huur, bouwen, kanskaarten en de cel. Verbatim afgesplitst
+   uit kern/spellen.js; de lobby (aldaar) doet matchmaking, beurten en views en
+   roept deze motor via de gedeelde context aan. Het bord zelf (de velden, de
+   kaarten en de huurfactor) is pure data en woont in ./bord. */
+const { M_GROEP_HUIZEN, M_VELDEN, M_KAARTEN } = require('./bord');
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, codenaamVan, nudge } = ctx;
 
-  const M_GROEP_HUIZEN = [1, 5, 12, 35, 70, 120]; // huurfactor bij 0..5 huizen (5 = hotel)
-  const M_VELDEN = [
-    { t: 'start', n: 'Start' },
-    { t: 'straat', n: 'Strandtent Ibiza', p: 60, g: 0 }, { t: 'kas', n: 'Kas' }, { t: 'straat', n: 'Beachclub Blanca', p: 60, g: 0 },
-    { t: 'belasting', n: 'Toeristenbelasting', p: 200 }, { t: 'station', n: 'RTG Transfers', p: 200 },
-    { t: 'straat', n: 'Tapasbar Sol', p: 100, g: 1 }, { t: 'kans', n: 'Kans' }, { t: 'straat', n: 'Bodega Mar', p: 100, g: 1 }, { t: 'straat', n: 'Chiringuito Luz', p: 120, g: 1 },
-    { t: 'cel', n: 'Op bezoek / de cel' },
-    { t: 'straat', n: 'Salon Amsterdam', p: 140, g: 2 }, { t: 'nut', n: 'RTG Energie', p: 150 }, { t: 'straat', n: 'Grachtenatelier', p: 140, g: 2 }, { t: 'straat', n: 'Modehuis Noord', p: 160, g: 2 },
-    { t: 'station', n: 'RTG Jets', p: 200 },
-    { t: 'straat', n: 'Bistro Milaan', p: 180, g: 3 }, { t: 'kas', n: 'Kas' }, { t: 'straat', n: 'Galleria Moda', p: 180, g: 3 }, { t: 'straat', n: 'Teatro Aperto', p: 200, g: 3 },
-    { t: 'vrij', n: 'Vrij parkeren' },
-    { t: 'straat', n: 'Rooftop Barcelona', p: 220, g: 4 }, { t: 'kans', n: 'Kans' }, { t: 'straat', n: 'Casa del Arte', p: 220, g: 4 }, { t: 'straat', n: 'Mercado Central', p: 240, g: 4 },
-    { t: 'station', n: 'RTG Yachts', p: 200 },
-    { t: 'straat', n: 'Spa Kyoto', p: 260, g: 5 }, { t: 'straat', n: 'Theehuis Zen', p: 260, g: 5 }, { t: 'nut', n: 'RTG Water', p: 150 }, { t: 'straat', n: 'Ryokan Sakura', p: 280, g: 5 },
-    { t: 'naarcel', n: 'Ga naar de cel' },
-    { t: 'straat', n: 'Club Saint-Tropez', p: 300, g: 6 }, { t: 'straat', n: 'Vignoble Azur', p: 300, g: 6 }, { t: 'kas', n: 'Kas' }, { t: 'straat', n: 'Palais Riviera', p: 320, g: 6 },
-    { t: 'station', n: 'RTG Rail', p: 200 },
-    { t: 'kans', n: 'Kans' }, { t: 'straat', n: 'Penthouse Dubai', p: 350, g: 7 }, { t: 'belasting', n: 'Weeldebelasting', p: 100 }, { t: 'straat', n: 'Marina Skyline', p: 400, g: 7 }
-  ];
-  const M_KAARTEN = [
-    { tekst: 'De Salon deelt je post: ontvang 50.', geld: 50 },
-    { tekst: 'Dividend van RTG Jets: ontvang 100.', geld: 100 },
-    { tekst: 'Fooienpot van je beachclub: ontvang 25.', geld: 25 },
-    { tekst: 'Achterstallig onderhoud: betaal 75.', geld: -75 },
-    { tekst: 'Parkeerboete op de boulevard: betaal 40.', geld: -40 },
-    { tekst: 'Je wint de RTG-quiz: ontvang 150.', geld: 150 },
-    { tekst: 'Ga direct naar Start en ontvang 200.', naar: 0 },
-    { tekst: 'Storm op zee: je jacht moet de haven in. Betaal 60.', geld: -60 },
-    { tekst: 'Ga direct naar de cel, zonder langs Start te komen.', cel: true },
-    { tekst: 'Iedereen proost op jou: elke speler betaalt je 20.', vanIeder: 20 }
-  ];
   function magnaatInit(potje) {
     const st = { posities: {}, geld: {}, eigenaar: {}, huizen: {}, cel: {}, failliet: {}, dobbel: null, mag: 'gooi', koopVeld: null, kaart: null, dubbels: 0 };
     for (const h of potje.spelers) { st.posities[h] = 0; st.geld[h] = 1500; st.cel[h] = 0; st.failliet[h] = false; }
@@ -154,12 +126,6 @@ module.exports = (ctx) => {
     save(); nudge(potje.spelers[potje.beurt], potje);
     return { status: 200, ok: true, dobbel: st.dobbel };
   }
-
-  /* ================= partyspellen =================
-     30 Seconden: 2 tegen 2. De verteller pakt een kaart met vijf begrippen en
-     omschrijft ze (bel of aan tafel); de tegenpartij kijkt mee op het scherm,
-     de rader juist niet. Daarna vult de verteller eerlijk in hoeveel er goed
-     waren: het eer-systeem, zoals thuis. Eerste team op 30 wint. */
 
   return { magnaatInit, magnaatZet, M_VELDEN };
 };

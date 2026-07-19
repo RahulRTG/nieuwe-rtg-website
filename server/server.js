@@ -2718,6 +2718,10 @@ Object.assign(kern, require('./kern/ketenchat')({ db, save, crypto, findSupplier
    bevoorrading en oefeningen. Logistiek en organisatie, uitdrukkelijk GEEN
    wapensysteem, vuurleiding of doelselectie. */
 Object.assign(kern, require('./kern/defensie')({ db, save, crypto, anthropic, findSupplier }));
+/* Het gezamenlijke rampbeeld (kern/rampbeeld.js): korpsen, zorg en defensie
+   delen tijdens een calamiteit hun paraatheid, vrije bedden en eenheden in
+   een overzicht, met een coordinatieniveau. */
+Object.assign(kern, require('./kern/rampbeeld')({ db, save, findSupplier }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));

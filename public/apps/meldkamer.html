@@ -42,6 +42,11 @@
   .chat{max-height:16rem;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.6rem;}
   .chat .b{border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;font-size:0.83rem;line-height:1.5;max-width:85%;}
   .chat .ik{align-self:flex-end;border-color:var(--gold);}
+  .rkpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.6rem;text-align:center;}
+  .rkpi b{display:block;font-size:1.3rem;font-family:'Bodoni Moda',serif;}
+  .rkpi span{font-size:0.64rem;color:var(--soft);}
+  .nvl{border-radius:8px;padding:0.3rem 0.7rem;font-size:0.75rem;border:1px solid var(--line);cursor:pointer;background:var(--card);color:var(--txt);}
+  .nvl.on{border-color:var(--rood);color:var(--rood);}
 </style>
 </head>
 <body>
@@ -176,6 +181,13 @@
       </div>
       <p class="stil" id="aUit" aria-live="polite"></p>
       <div id="afspraken"></div>
+    </div>
+    <div class="kaart" id="kRamp" hidden>
+      <h2 style="margin-top:0;">Het gezamenlijke rampbeeld</h2>
+      <p class="stil" style="margin-bottom:0.5rem;">De paraatheid van uw keten-partners in een overzicht. Schaal op of af zodat iedereen op hetzelfde niveau werkt.</p>
+      <div class="rij" id="rampNiveau"></div>
+      <div class="kpis" id="rampKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(6.5rem,1fr));gap:0.5rem;margin:0.6rem 0;"></div>
+      <div id="rampDetail"></div>
     </div>
     <div class="kaart" id="kKeten">
       <h2 style="margin-top:0;">De ketenchat</h2>

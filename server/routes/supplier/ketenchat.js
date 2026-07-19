@@ -3,7 +3,7 @@
    deelgroepen (meldkamer kijkt mee) en de interne noodknop draait op de
    bestaande /api/supplier/security. Logica in kern/ketenchat.js. */
 module.exports = (kern) => {
-  const { app, ketenchat, logActivity, sseToSupplier, supplierAuth } = kern;
+  const { app, ketenchat, rampbeeld, logActivity, sseToSupplier, supplierAuth } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
   app.post('/api/supplier/keten/status', supplierAuth, (req, res) => stuur(res, ketenchat.status(req.supplier, req.actor)));
@@ -22,6 +22,18 @@ module.exports = (kern) => {
     if (!r.error) {
       logActivity(req.supplier.code, req.actor, 'maakte ketengroep "' + r.groep.naam + '"');
       for (const k of r.groep.korpsen) sseToSupplier(k, 'sync', { scope: 'keten' });
+    }
+    stuur(res, r);
+  });
+  // het gezamenlijke rampbeeld: de eigen keten-partners in een overzicht
+  app.post('/api/supplier/keten/rampbeeld', supplierAuth, (req, res) => stuur(res, rampbeeld.beeld(req.supplier.code)));
+  app.post('/api/supplier/keten/rampbeeld/schaal', supplierAuth, (req, res) => {
+    const r = rampbeeld.schaal(String(req.body.niveau || ''), req.actor && req.actor.name);
+    if (!r.error) {
+      logActivity(req.supplier.code, req.actor, 'zette het coordinatieniveau op ' + r.ramp.niveau);
+      // elk verbonden korps krijgt het nieuwe niveau te zien
+      const st = ketenchat.status(req.supplier, req.actor);
+      for (const d of new Set([...(st.partners || []), req.supplier.code])) sseToSupplier(d, 'sync', { scope: 'keten' });
     }
     stuur(res, r);
   });

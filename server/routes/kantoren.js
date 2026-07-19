@@ -59,6 +59,9 @@ module.exports = (kern) => {
   /* De doos-regie: beheer op afstand van de Zaakdoos-vloot. Het kantoor zet
      de doelversie en per doos een netwerkrol; de doos haalt beide zelf op
      bij zijn eigen melding (de cloud duwt nooit iets naar binnen). */
+  // het gezamenlijke rampbeeld: de boardroom ziet alle korpsen, zorg en defensie
+  app.post('/api/office/rampbeeld', officeAuth, (req, res) => veilig(res, () => kern.rampbeeld.beeld(null)));
+  app.post('/api/office/rampbeeld/schaal', officeAuth, (req, res) => veilig(res, () => kern.rampbeeld.schaal(String(req.body.niveau || ''), req.body.naam || 'boardroom')));
   app.post('/api/office/doos/regie', officeAuth, (req, res) => veilig(res, () => afdelingen.doosRegie()));
   app.post('/api/office/doos/update-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosUpdateZet(req.body.versie, req.body.notities, req.body.naam)));
   app.post('/api/office/doos/netwerk-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosNetwerkZet(String(req.body.doos || ''), req.body.instellingen || {}, req.body.naam)));

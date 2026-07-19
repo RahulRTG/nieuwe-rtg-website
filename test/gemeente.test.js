@@ -122,3 +122,33 @@ test('7. AI-triage kiest een categorie en ploeg (regel-fallback zonder sleutel)'
   // zonder gemeente-inlog kan het niet
   assert.equal((await api(base, '/api/gemeente/triage', { tekst: 'x' }, lid)).status, 401);
 });
+
+test('8. aanslagen verschijnen vanzelf voor de inwoner en zijn te betalen; dubbel en onbekend worden geweigerd', async () => {
+  // een gast (geen lid) mag de belastingroute niet gebruiken
+  assert.equal((await api(base, '/api/gemeente/belasting/betaal', { id: 'x' }, null)).status, 401);
+  const mijn = await api(base, '/api/gemeente/belasting/mijn', {}, lid);
+  assert.equal(mijn.status, 200);
+  assert.ok(mijn.body.aanslagen.length >= 3, 'er staan automatisch aanslagen klaar (OZB, afval, riool)');
+  assert.ok(mijn.body.aanslagen.some(a => a.soort === 'OZB'), 'OZB hoort erbij');
+  const open = mijn.body.aanslagen.find(a => !a.betaald);
+  assert.ok(open, 'er is een openstaande aanslag');
+  // betalen markeert hem als betaald
+  const bet = await api(base, '/api/gemeente/belasting/betaal', { id: open.id }, lid);
+  assert.equal(bet.status, 200);
+  assert.equal(bet.body.aanslag.betaald, true);
+  // een tweede betaling van dezelfde aanslag botst
+  assert.equal((await api(base, '/api/gemeente/belasting/betaal', { id: open.id }, lid)).status, 409);
+  // een onbekende aanslag bestaat niet
+  assert.equal((await api(base, '/api/gemeente/belasting/betaal', { id: 'bestaat-niet' }, lid)).status, 404);
+  // de betaalde status reist mee naar het overzicht
+  const na = await api(base, '/api/gemeente/belasting/mijn', {}, lid);
+  assert.equal(na.body.aanslagen.find(a => a.id === open.id).betaald, true);
+});
+
+test('9. een melding met GPS-coördinaten bewaart de locatie', async () => {
+  const m = await api(base, '/api/gemeente/meld', { categorie: 'wegdek', tekst: 'Gat in het wegdek bij de rotonde', lat: 38.909, lng: 1.432 }, lid);
+  assert.equal(m.status, 200);
+  const mijn = await api(base, '/api/gemeente/meldingen/mijn', {}, lid);
+  const mine = mijn.body.meldingen.find(x => x.ref === m.body.melding.ref);
+  assert.ok(mine, 'de melding staat in mijn overzicht');
+});

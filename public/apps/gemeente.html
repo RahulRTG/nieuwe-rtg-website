@@ -73,6 +73,10 @@
       <textarea class="veld" id="meldTekst" maxlength="500" placeholder="Bijv. de lantaarn bij de haven doet het niet"></textarea>
       <div class="lbl">Locatie (optioneel)</div>
       <input class="veld" id="meldLoc" maxlength="120" placeholder="Straat of plek">
+      <div style="margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+        <button class="knop stil" id="meldGps" type="button" style="width:auto;">📍 Gebruik mijn locatie</button>
+        <span id="meldGpsUit" style="font-size:.78rem;color:var(--soft);"></span>
+      </div>
       <button class="knop" id="meldGo" style="margin-top:.8rem;">Melding versturen</button>
     </div>
     <h3 style="margin:1.2rem 0 .6rem;">Mijn meldingen</h3>
@@ -183,11 +187,21 @@ function start(){
 }
 
 // meldingen
+let meldPos = null;
+$('#meldGps').addEventListener('click', () => {
+  if (!navigator.geolocation){ meld('Locatie wordt niet ondersteund op dit toestel.'); return; }
+  $('#meldGpsUit').textContent = 'Locatie zoeken…';
+  navigator.geolocation.getCurrentPosition(
+    p => { meldPos = { lat: p.coords.latitude, lng: p.coords.longitude }; $('#meldGpsUit').textContent = '📍 Locatie vastgelegd (' + meldPos.lat.toFixed(4) + ', ' + meldPos.lng.toFixed(4) + ')'; },
+    () => { meldPos = null; $('#meldGpsUit').textContent = 'Kon locatie niet bepalen · vul hierboven een plek in.'; },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  );
+});
 $('#meldGo').addEventListener('click', async () => {
   const tekst = $('#meldTekst').value.trim();
   if (tekst.length < 4){ meld('Omschrijf kort wat er is.'); return; }
-  try { await api('/api/gemeente/meld', { categorie: meldCat, tekst, locatie: $('#meldLoc').value.trim() });
-    $('#meldTekst').value = ''; $('#meldLoc').value = ''; meld('Melding verstuurd. Je volgt de status hier.'); laadMijnMeldingen();
+  try { await api('/api/gemeente/meld', { categorie: meldCat, tekst, locatie: $('#meldLoc').value.trim(), lat: meldPos && meldPos.lat, lng: meldPos && meldPos.lng });
+    $('#meldTekst').value = ''; $('#meldLoc').value = ''; meldPos = null; $('#meldGpsUit').textContent = ''; meld('Melding verstuurd. Je volgt de status hier.'); laadMijnMeldingen();
   } catch(e){ meld(e.message); }
 });
 async function laadMijnMeldingen(){
@@ -277,7 +291,12 @@ $('#gvGo').addEventListener('click', async () => {
 async function laadBelasting(){
   let d; try { d = await api('/api/gemeente/belasting/mijn'); } catch(e){ return; }
   const l = d.aanslagen || [];
-  $('#belMijn').innerHTML = l.length ? l.map(a => '<div class="item"><h4>'+esc(a.soort)+' '+esc(a.jaar)+'</h4><div class="meta">€ '+esc(a.bedrag)+'</div><span class="status '+(a.betaald?'op':'')+'">'+(a.betaald?'betaald':'openstaand')+'</span></div>').join('') : '<div class="leeg">Geen openstaande aanslagen.</div>';
+  $('#belMijn').innerHTML = l.length ? l.map(a => '<div class="item"><h4>'+esc(a.soort)+' '+esc(a.jaar)+'</h4><div class="meta">€ '+esc(a.bedrag)+'</div><span class="status '+(a.betaald?'op':'')+'">'+(a.betaald?'betaald':'openstaand')+'</span>'+
+    (a.betaald?'':' <button class="knop stil" data-bet="'+esc(a.id)+'" style="padding:.2rem .6rem;font-size:.76rem;">Betalen</button>')+'</div>').join('') : '<div class="leeg">Geen openstaande aanslagen.</div>';
+  $('#belMijn').querySelectorAll('button[data-bet]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Deze aanslag nu betalen?')) return;
+    try { await api('/api/gemeente/belasting/betaal', { id: b.dataset.bet }); meld('Aanslag betaald. Bedankt.'); laadBelasting(); } catch(e){ meld(e.message); }
+  }));
 }
 async function laadBekend(){
   let d; try { d = await api('/api/gemeente/bekendmakingen'); } catch(e){ return; }

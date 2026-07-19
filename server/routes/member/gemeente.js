@@ -30,5 +30,7 @@ module.exports = (kern) => {
   app.post('/api/gemeente/afval', auth, (req, res) => res.json(gemeente.afvalVoor(String(req.body.postcode || ''))));
   app.post('/api/gemeente/grofvuil', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, gemeente.grofvuilAanvraag(req.session, liveCodename(req.session), req.body || {})); });
   app.post('/api/gemeente/belasting/mijn', auth, (req, res) => res.json({ aanslagen: gemeente.belastingMijn(req.session.key) }));
+  // een aanslag betalen (loopt via de geld-drempel van de AI: eerst bevestigen)
+  app.post('/api/gemeente/belasting/betaal', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, gemeente.belastingBetaal(req.session.key, String(req.body.id || ''))); });
   app.post('/api/gemeente/bekendmakingen', auth, (req, res) => res.json(gemeente.bekendmakingen()));
 };

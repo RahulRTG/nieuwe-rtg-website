@@ -262,9 +262,41 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
     if (g && sseToSupplier) sseToSupplier(g.code, 'sync', { scope: 'gemeente' });
     return { ok: true, aanvraag: publiekeMelding(m) };
   }
+  /* De gemeentelijke aanslagen. In de demo staan er voorbeeldaanslagen klaar per
+     inwoner (OZB, afvalstoffenheffing, rioolheffing), deterministisch afgeleid
+     van de sleutel zodat de bedragen stabiel blijven. Betalen loopt via de
+     geld-drempel (de AI vraagt eerst bevestiging); nooit de belofte dat een
+     betaling al bij de belastingdienst verwerkt is voordat een mens dat ziet. */
+  const BELASTINGEN = [
+    { soort: 'OZB', basis: 180, spreiding: 520 },
+    { soort: 'Afvalstoffenheffing', basis: 240, spreiding: 120 },
+    { soort: 'Rioolheffing', basis: 150, spreiding: 90 }
+  ];
+  function hash(s) { let h = 0x811c9dc5 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h >>> 0; }
+  function ensureAanslagen(key) {
+    if (!key) return;
+    const jaar = new Date().getFullYear();
+    if ((db.data.gemeenteAanslagen || []).some(a => a.key === key && a.jaar === jaar)) return;
+    const h = hash(String(key) + jaar);
+    BELASTINGEN.forEach((b, i) => {
+      const bedrag = b.basis + ((h >>> (i * 5)) % (b.spreiding + 1));
+      db.data.gemeenteAanslagen.unshift({ id: id(), key, soort: b.soort, jaar, bedrag, betaald: false, at: nu() });
+    });
+    db.data.gemeenteAanslagen = db.data.gemeenteAanslagen.slice(0, 20000);
+    save();
+  }
   function belastingMijn(key) {
+    seed(); ensureAanslagen(key);
     return (db.data.gemeenteAanslagen || []).filter(a => a.key === key)
       .map(a => ({ id: a.id, soort: a.soort, jaar: a.jaar, bedrag: a.bedrag, betaald: !!a.betaald }));
+  }
+  function belastingBetaal(key, aid) {
+    const a = (db.data.gemeenteAanslagen || []).find(x => x.id === String(aid || '') && x.key === key);
+    if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
+    if (a.betaald) return { status: 409, error: 'Deze aanslag is al betaald.' };
+    a.betaald = true; a.betaaldAt = nu();
+    save();
+    return { ok: true, aanslag: { id: a.id, soort: a.soort, jaar: a.jaar, bedrag: a.bedrag, betaald: true } };
   }
   function bekendmakingen() {
     seed();
@@ -396,7 +428,7 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
       // inwoners
       meld, mijnMeldingen, burgerzakenOverzicht, burgerzakenSlots, afspraakMaak, verhuizingDoorgeven,
       mijnAfspraken, afspraakAnnuleer, vergunningAanvraag, mijnVergunningen, vergunningenVanPartner,
-      afvalVoor, grofvuilAanvraag, belastingMijn, bekendmakingen,
+      afvalVoor, grofvuilAanvraag, belastingMijn, belastingBetaal, bekendmakingen,
       // medewerkers
       regie, meldingenLijst, meldingZet, afsprakenLijst, vergunningenLijst, vergunningBeslis, bekendmakingMaak, triage
     }

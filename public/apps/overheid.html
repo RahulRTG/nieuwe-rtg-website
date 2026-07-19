@@ -115,6 +115,12 @@
     </div>
     <h3 style="margin:1.1rem 0 .5rem;">Mijn voertuigen</h3>
     <div id="vtMijn"><div class="leeg">Nog geen voertuigen.</div></div>
+    <div class="kaart" style="margin-top:1rem;">
+      <h3>Kenteken controleren</h3>
+      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:.3rem;">Check bij de RDW of een kenteken bekend is en of de APK geldig is · handig vóór je een auto huurt of instapt.</p>
+      <div class="rij" style="margin-top:.5rem;"><input class="veld" id="chkKenteken" maxlength="12" placeholder="Kenteken" style="flex:1;min-width:8rem;"><button class="knop stil" id="chkGo" style="width:auto;">Controleer</button></div>
+      <div id="chkUit" style="margin-top:.6rem;"></div>
+    </div>
   </section>
 
   <section class="paneel" id="p-kvk">
@@ -328,6 +334,15 @@ async function laadVoertuigen(){
     try { await api('/api/overheid/voertuig/schors', { id: b.dataset.sch, schors: b.dataset.nu === '1' }); laadVoertuigen(); } catch(e){ meld(e.message); }
   }));
 }
+
+$('#chkGo').addEventListener('click', async () => {
+  if ($('#chkKenteken').value.trim().length < 4){ meld('Vul een kenteken in.'); return; }
+  try { const d = await api('/api/overheid/rdw/check', { kenteken: $('#chkKenteken').value });
+    $('#chkUit').innerHTML = d.bekend
+      ? '<div class="item"><h4>'+esc(d.kenteken)+' · '+esc(d.merk)+'</h4><div class="meta">Bouwjaar '+esc(d.bouwjaar)+' · APK tot '+esc(d.apkTot)+'</div><span class="status '+(d.apkGeldig?'op':'af')+'">'+(d.geschorst?'geschorst':d.apkGeldig?'APK geldig':'APK verlopen')+'</span></div>'
+      : '<div class="item"><h4>'+esc(d.kenteken)+'</h4><div class="meta">Niet bekend in het RDW-register.</div></div>';
+  } catch(e){ meld(e.message); }
+});
 
 // KVK
 $('#kvGo').addEventListener('click', async () => {

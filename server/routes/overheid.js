@@ -30,11 +30,15 @@ module.exports = (kern) => {
   app.post('/api/overheid/subsidie/beslis', supplierAuth, rijk, (req, res) => stuur(res, overheid.subsidieBeslis(wie(req), String(req.body.ref || ''), req.body || {})));
   app.post('/api/overheid/water/meldingen', supplierAuth, rijk, (req, res) => res.json(overheid.waterMeldingenLijst(req.body || {})));
   app.post('/api/overheid/water/melding/zet', supplierAuth, rijk, (req, res) => stuur(res, overheid.waterMeldingZet(wie(req), String(req.body.ref || ''), req.body || {})));
+  // het handelsregister-overzicht voor de ambtenaar
+  app.post('/api/overheid/kvk/lijst', supplierAuth, rijk, (req, res) => res.json(overheid.kvkLijst()));
 
   /* ---- ondernemers: inschrijven in het handelsregister als onderneming ---- */
   app.post('/api/supplier/overheid/kvk/inschrijven', supplierAuth, (req, res) =>
     stuur(res, overheid.kvkInschrijven({ supplierCode: req.supplier.code, bedrijf: req.supplier.name }, req.body || {})));
   app.post('/api/supplier/overheid/kvk/mijn', supplierAuth, (req, res) => res.json(overheid.kvkMijn({ supplierCode: req.supplier.code })));
+  // in één tik inschrijven in het handelsregister (idempotent) · de onboarding-koppeling
+  app.post('/api/supplier/overheid/kvk/zorg', supplierAuth, (req, res) => stuur(res, overheid.kvkZorg(req.supplier)));
   app.post('/api/supplier/overheid/bekendmakingen', supplierAuth, (req, res) => res.json(overheid.bekendmakingen()));
   // een onderneming vraagt zelf een provinciale subsidie aan en volgt hem
   app.post('/api/supplier/overheid/subsidie', supplierAuth, (req, res) =>

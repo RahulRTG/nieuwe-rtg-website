@@ -35,6 +35,8 @@ module.exports = (kern) => {
   app.post('/api/overheid/voertuig/schors', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.voertuigSchors(req.session.key, String(req.body.id || ''), req.body.schors !== false)); });
   app.post('/api/overheid/rijbewijs', auth, (req, res) => res.json(overheid.rijbewijs(req.session.key)));
   app.post('/api/overheid/rijbewijs/verleng', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.rijbewijsVerleng(req.session.key)); });
+  // RDW-kentekencheck (dezelfde seam die autoverhuur en RTG OV kunnen aanroepen)
+  app.post('/api/overheid/rdw/check', auth, (req, res) => stuur(res, overheid.rdwCheck(String(req.body.kenteken || ''))));
 
   // pijler 4: KVK ondernemersloket (een lid kan een eenmanszaak inschrijven)
   app.post('/api/overheid/kvk/inschrijven', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.kvkInschrijven({ key: req.session.key, codenaam: liveCodename(req.session) }, req.body || {})); });

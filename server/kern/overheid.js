@@ -328,6 +328,34 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
   }
   function mijnBezwaren(key) { seed(); return { ok: true, bezwaren: (db.data.rijkBezwaren || []).filter(b => b.key === key).slice(0, 30).map(b => ({ ref: b.ref, tegen: b.tegen, status: b.status, besluit: b.besluit || null, at: b.at })) }; }
 
+  /* ---------- koppelingen met de rest van het ecosysteem ----------
+     De overheid staat niet los: een onderneming schrijft zich met één tik in
+     bij de KVK (idempotent), en elk voertuig is bij de RDW te controleren
+     (dezelfde check die autoverhuur en RTG OV kunnen aanroepen). */
+  function kvkVoorSupplier(code) { return (db.data.rijkKvk || []).find(k => k.supplierCode === code) || null; }
+  function kvkZorg(supplier) {
+    seed();
+    if (!supplier || !supplier.code) return { status: 400, error: 'Onbekende onderneming.' };
+    const bestaand = kvkVoorSupplier(supplier.code);
+    if (bestaand) return { ok: true, inschrijving: publiekeKvk(bestaand), nieuw: false };
+    const r = kvkInschrijven({ supplierCode: supplier.code, bedrijf: supplier.name }, { naam: supplier.name, rechtsvorm: 'bv' });
+    return r.error ? r : { ok: true, inschrijving: r.inschrijving, nieuw: true };
+  }
+  function kvkLijst() {
+    seed();
+    return { ok: true, inschrijvingen: (db.data.rijkKvk || []).slice(0, 300).map(k => ({ ...publiekeKvk(k), houder: k.houder, viaOnderneming: !!k.supplierCode })) };
+  }
+  // RDW-controle op een kenteken; door autoverhuur/OV te hergebruiken vóór verhuur/inzet
+  function rdwCheck(kenteken) {
+    seed();
+    const kt = String(kenteken || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (kt.length < 4) return { status: 400, error: 'Vul een geldig kenteken in.' };
+    const v = (db.data.rijkVoertuigen || []).find(x => x.kenteken === kt);
+    if (!v) return { ok: true, kenteken: kt, bekend: false };
+    const apkGeldig = !v.geschorst && v.apkTot >= new Date().toISOString().slice(0, 10);
+    return { ok: true, kenteken: kt, bekend: true, merk: v.merk, bouwjaar: v.bouwjaar, apkTot: v.apkTot, geschorst: !!v.geschorst, apkGeldig };
+  }
+
   /* ---------- pijler 7: provincie (subsidies) ---------- */
   function provincieSubsidies() {
     seed();
@@ -565,6 +593,8 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
       // provincie & waterschap (regionaal)
       provincieSubsidies, subsidieAanvraag, mijnSubsidies,
       waterschapMijn, waterschapBetaal, waterMeld, mijnWaterMeldingen,
+      // koppelingen met de rest van het ecosysteem
+      kvkVoorSupplier, kvkZorg, kvkLijst, rdwCheck,
       // ambtenaren
       regie, toeslagenLijst, toeslagBeslis, uitkeringenLijst, uitkeringBeslis,
       bezwarenLijst, bezwaarBeslis, bekendmakingMaak, verkiezingSluit,

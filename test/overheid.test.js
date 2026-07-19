@@ -185,3 +185,32 @@ test('10. Waterschap: aanslagen verschijnen en zijn te betalen; een watermelding
   assert.equal(mine.status, 'in behandeling');
   assert.ok(mine.updates.some(u => /opgeschaald/.test(u.tekst)), 'de update reist mee naar de melder');
 });
+
+test('11. Koppeling KVK: een onderneming schrijft zich in één tik in (idempotent) en de ambtenaar ziet het handelsregister', async () => {
+  const z1 = await api(base, '/api/supplier/overheid/kvk/zorg', {}, partner);
+  assert.equal(z1.status, 200);
+  assert.ok(z1.body.inschrijving.kvkNummer, 'er is een KVK-nummer');
+  // nog een keer levert dezelfde inschrijving, geen dubbele
+  const z2 = await api(base, '/api/supplier/overheid/kvk/zorg', {}, partner);
+  assert.equal(z2.status, 200);
+  assert.equal(z2.body.nieuw, false);
+  assert.equal(z2.body.inschrijving.kvkNummer, z1.body.inschrijving.kvkNummer);
+  // de ambtenaar ziet het in het handelsregister
+  const lijst = await api(base, '/api/overheid/kvk/lijst', {}, rijk);
+  assert.ok(lijst.body.inschrijvingen.some(k => k.kvkNummer === z1.body.inschrijving.kvkNummer));
+  // een gewoon lid mag het register niet inzien
+  assert.equal((await api(base, '/api/overheid/kvk/lijst', {}, lid)).status, 401);
+});
+
+test('12. Koppeling RDW: een geregistreerd kenteken is bekend met APK-status, een onbekend kenteken niet', async () => {
+  // in test 3 registreerde het lid RTG01A
+  const ok = await api(base, '/api/overheid/rdw/check', { kenteken: 'rtg-01-a' }, lid);
+  assert.equal(ok.status, 200);
+  assert.equal(ok.body.bekend, true);
+  assert.equal(ok.body.kenteken, 'RTG01A');
+  assert.equal(typeof ok.body.apkGeldig, 'boolean');
+  const onbekend = await api(base, '/api/overheid/rdw/check', { kenteken: 'ZZ-999-Z' }, lid);
+  assert.equal(onbekend.body.bekend, false);
+  // te kort kenteken wordt geweigerd
+  assert.equal((await api(base, '/api/overheid/rdw/check', { kenteken: 'AB' }, lid)).status, 400);
+});

@@ -63,6 +63,7 @@
     <section class="paneel" id="p-bez"></section>
     <section class="paneel" id="p-sub"></section>
     <section class="paneel" id="p-wm"></section>
+    <section class="paneel" id="p-kvk"></section>
     <section class="paneel" id="p-stem"></section>
     <section class="paneel" id="p-bek">
       <div class="item">
@@ -104,15 +105,16 @@ $('#loginGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
 });
 
-const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['sub','Subsidies'],['wm','Watermeldingen'],['stem','Stemming'],['bek','Bekendmakingen']];
+const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['sub','Subsidies'],['wm','Watermeldingen'],['kvk','Handelsregister'],['stem','Stemming'],['bek','Bekendmakingen']];
 function toon(t){
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
-  ['tos','uit','bez','sub','wm','stem','bek'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  ['tos','uit','bez','sub','wm','kvk','stem','bek'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'tos') laadToeslagen();
   if (t === 'uit') laadUitkeringen();
   if (t === 'bez') laadBezwaren();
   if (t === 'sub') laadSubsidies();
   if (t === 'wm') laadWaterMeldingen();
+  if (t === 'kvk') laadKvk();
   if (t === 'stem') laadStem();
   if (t === 'bek') laadBekend();
 }
@@ -200,6 +202,14 @@ async function laadWaterMeldingen(){
       meld('Bijgewerkt.'); laadWaterMeldingen(); laadRegie();
     } catch(e){ meld(e.message); }
   }));
+}
+async function laadKvk(){
+  let d; try { d = await api('/api/overheid/kvk/lijst'); } catch(e){ return; }
+  const l = d.inschrijvingen || [];
+  $('#p-kvk').innerHTML = l.length ? l.map(k =>
+    '<div class="item"><h4>'+esc(k.naam)+' · KVK '+esc(k.kvkNummer)+'</h4>'+
+    '<div class="meta">'+esc(k.rechtsvormLabel)+' · SBI '+esc(k.sbi)+' · '+esc(k.vestiging)+(k.houder?' · '+esc(k.houder):'')+'</div>'+
+    '<span class="status">'+(k.viaOnderneming?'onderneming':'inwoner')+'</span></div>').join('') : '<div class="leeg">Nog geen inschrijvingen.</div>';
 }
 async function laadStem(){
   let d; try { d = await api('/api/overheid/verkiezing'); } catch(e){ return; }

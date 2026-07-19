@@ -379,13 +379,33 @@
       '<div class="melding" style="padding:0.4rem 0;">' + esc(d.naam) + ' · ' + d.gevechtsgereed + ' gevechtsgereed, ' + d.beperkt + ' beperkt · ' + d.gewonden + ' gewonden</div>').join('') + '</div>';
     $('#rampDetail').innerHTML = h;
     document.querySelectorAll('[data-nvl]').forEach(x => x.addEventListener('click', async () => {
-      try { await api('keten/rampbeeld/schaal', { niveau: x.dataset.nvl }); laadRamp(); } catch (e) { alert(e.message); }
+      try {
+        const r = await api('keten/rampbeeld/schaal', { niveau: x.dataset.nvl });
+        // bij afschalen naar normaal komt het naoefening-rapport meteen mee
+        if (r.evaluatie) toonRapport(r.evaluatie);
+        laadRamp();
+      } catch (e) { alert(e.message); }
     }));
   }
   $('#coordKnop').addEventListener('click', async () => {
     $('#coordUit').textContent = 'De coordinator denkt mee…';
     try { const r = await api('keten/rampbeeld/ai', {}); $('#coordUit').textContent = r.antwoord; }
     catch (e) { $('#coordUit').textContent = e.message; }
+  });
+  function toonRapport(ev) {
+    const m = ev.meldingen, e = ev.evacuaties;
+    $('#rapportUit').innerHTML =
+      '<div class="melding" style="padding:0.5rem 0;"><b>Meldingen</b>: ' + m.totaal + ' (prio 1: ' + m.perPrio[1] + ', 2: ' + m.perPrio[2] + ', 3: ' + m.perPrio[3] + '), ' + m.bemand + ' bemand.' +
+      (m.gemAanrijMin != null ? ' Gem. aanrijtijd ' + m.gemAanrijMin + ' min.' : '') +
+      (m.gemAfhandelMin != null ? ' Gem. afhandeltijd ' + m.gemAfhandelMin + ' min' + (m.langsteAfhandelMin != null ? ' (langste ' + m.langsteAfhandelMin + ' min)' : '') + '.' : '') + '</div>' +
+      '<div class="melding" style="padding:0.5rem 0;"><b>Evacuaties</b>: ' + e.totaal +
+      (e.totaal ? ' (' + Object.entries(e.perTriage).map(function(t){return t[1]+' '+t[0];}).join(', ') + ')' : '') + '.</div>' +
+      '<div class="melding" style="padding:0.5rem 0;"><b>Knelpunten</b><ul style="margin:0.3rem 0 0 1rem;">' + ev.knelpunten.map(function(k){return '<li>'+esc(k)+'</li>';}).join('') + '</ul></div>';
+  }
+  $('#rapportKnop').addEventListener('click', async () => {
+    $('#rapportUit').textContent = 'Rapport opstellen…';
+    try { toonRapport(await api('keten/rampbeeld/evaluatie', {})); }
+    catch (e) { $('#rapportUit').textContent = e.message; }
   });
 
   function start() {

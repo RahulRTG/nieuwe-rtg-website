@@ -104,7 +104,33 @@ test('5. de AI-coordinator doet concrete voorstellen, maar voert niets uit', asy
   assert.equal((await api('/api/office/rampbeeld/ai', {}, office)).status, 200);
 });
 
-test('6. de grens: zonder keten geen rampbeeld, en geen andere zaak dan hulp/zorg/defensie', async () => {
+test('6. het naoefening-rapport: inzettijden, evacuaties en knelpunten, en het komt mee bij afschalen', async () => {
+  // opschalen en een melding volledig afhandelen zodat er tijden te meten zijn
+  await api('/api/supplier/keten/rampbeeld/schaal', { niveau: 'ramp' }, tok.URGENCIA);
+  const m = await api('/api/supplier/hulp/melding/maak', { tekst: 'Ongeval met letsel', prio: 2 }, tok.GUARDIA);
+  const bord = await api('/api/supplier/hulp/overzicht', {}, tok.GUARDIA);
+  const e = bord.body.eenheden.find(x => x.status === 'vrij');
+  await api('/api/supplier/hulp/melding/wijs', { melding: m.body.melding.id, eenheid: e.id }, tok.GUARDIA);
+  await api('/api/supplier/hulp/melding/status', { melding: m.body.melding.id, status: 'ter-plaatse' }, tok.GUARDIA);
+  await api('/api/supplier/hulp/melding/status', { melding: m.body.melding.id, status: 'afgerond' }, tok.GUARDIA);
+  // een gewonde evacueren, zodat het rapport dat telt
+  const g = await api('/api/supplier/def/gewonde/maak', { klacht: 'Snijwond', triage: 'oranje' }, tok.GARNIZOEN);
+  await api('/api/supplier/def/gewonde/evacueer', { id: g.body.gewonde.id, ziekenhuis: 'CANMISSES' }, tok.GARNIZOEN);
+  // het rapport los opvragen
+  const ev = await api('/api/supplier/keten/rampbeeld/evaluatie', {}, tok.URGENCIA);
+  assert.equal(ev.status, 200);
+  assert.ok(ev.body.meldingen.totaal >= 1, 'de meldingen zijn geteld');
+  assert.ok(ev.body.meldingen.gemAfhandelMin != null, 'er is een afhandeltijd berekend');
+  assert.ok(ev.body.evacuaties.totaal >= 1, 'de evacuatie staat in het rapport');
+  assert.ok(Array.isArray(ev.body.knelpunten), 'met een knelpunten-lijst');
+  // afschalen naar normaal levert het rapport meteen mee
+  const af = await api('/api/supplier/keten/rampbeeld/schaal', { niveau: 'normaal' }, tok.URGENCIA);
+  assert.ok(af.body.evaluatie && af.body.evaluatie.meldingen, 'het naoefening-rapport komt mee bij het afschalen');
+  // en de boardroom kan het ook opvragen
+  assert.equal((await api('/api/office/rampbeeld/evaluatie', {}, office)).status, 200);
+});
+
+test('7. de grens: zonder keten geen rampbeeld, en geen andere zaak dan hulp/zorg/defensie', async () => {
   // een vers korps zonder verbindingen krijgt 409
   const bombers = await login('BOMBERS', '1234');
   assert.equal((await api('/api/supplier/keten/rampbeeld', {}, bombers)).status, 409);

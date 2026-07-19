@@ -62,6 +62,7 @@ module.exports = (kern) => {
   // het gezamenlijke rampbeeld: de boardroom ziet alle korpsen, zorg en defensie
   app.post('/api/office/rampbeeld', officeAuth, (req, res) => veilig(res, () => kern.rampbeeld.beeld(null)));
   app.post('/api/office/rampbeeld/schaal', officeAuth, (req, res) => veilig(res, () => kern.rampbeeld.schaal(String(req.body.niveau || ''), req.body.naam || 'boardroom')));
+  app.post('/api/office/rampbeeld/evaluatie', officeAuth, (req, res) => veilig(res, () => kern.rampbeeld.evaluatie(null)));
   app.post('/api/office/rampbeeld/ai', officeAuth, async (req, res) => {
     try { const r = await kern.rampbeeld.coordinatorAi(null, req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
     catch (e) { console.error('[rampbeeld]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }

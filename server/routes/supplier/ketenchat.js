@@ -42,6 +42,8 @@ module.exports = (kern) => {
     try { stuur(res, await rampbeeld.coordinatorAi(req.supplier.code, req.body.q)); }
     catch (e) { console.error('[rampbeeld]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+  // het naoefening-rapport: inzettijden, evacuaties en knelpunten om van te leren
+  app.post('/api/supplier/keten/rampbeeld/evaluatie', supplierAuth, (req, res) => stuur(res, rampbeeld.evaluatie(req.supplier.code)));
   app.post('/api/supplier/keten/gesprek', supplierAuth, (req, res) => stuur(res, ketenchat.gesprek(req.supplier, req.actor, req.body.kanaal)));
   app.post('/api/supplier/keten/bericht', supplierAuth, (req, res) => {
     const r = ketenchat.bericht(req.supplier, req.actor, req.body.kanaal, req.body.tekst);

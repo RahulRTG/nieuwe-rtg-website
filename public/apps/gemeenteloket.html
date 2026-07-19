@@ -76,6 +76,26 @@
 </main>
 
 <div class="melding" id="melding" role="status"></div>
+<button class="rahulfab" id="rahulFab" type="button" style="display:none;">✨ Vraag Rahul</button>
+<section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
+  <div class="rahulkop"><b>Rahul · gemeentebalie</b><button class="knop stil" id="rahulSluit" type="button" aria-label="Sluiten" style="padding:.2rem .55rem;">✕</button></div>
+  <div class="rahulsug" id="rahulSug"></div>
+  <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
+  <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Vraag om een briefing of een actie" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
+</section>
+<style>
+.rahulfab{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--gold);color:#000;border:none;border-radius:999px;padding:.7rem 1.1rem;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+.rahulsheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.rahulsheet[hidden]{display:none;}
+.rahulkop{display:flex;align-items:center;justify-content:space-between;}
+.rahulkop b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+.rahuluit{font-size:.86rem;color:var(--muted);line-height:1.55;max-height:40vh;overflow-y:auto;white-space:pre-wrap;}
+.rahulrij{display:flex;gap:.4rem;}
+.rahulrij input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
+.rahulgo{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
+.rahulsug{display:flex;gap:.35rem;flex-wrap:wrap;}
+.rahulsug button{background:var(--bg);border:1px solid var(--gold);color:var(--txt);border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
+</style>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -102,7 +122,9 @@ $('#loginGo').addEventListener('click', async () => {
 });
 
 const TABS = [['meld','Meldingen'],['afs','Afspraken'],['verg','Vergunningen'],['bek','Bekendmakingen']];
+let HUIDIG = 'meld';
 function toon(t){
+  HUIDIG = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
   ['meld','afs','verg','bek'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'meld') laadMeldingen();
@@ -114,7 +136,27 @@ function start(){
   $('#tabs').innerHTML = TABS.map(([t,l]) => '<button class="tab" data-t="'+t+'">'+esc(l)+'</button>').join('');
   $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => toon(b.dataset.t)));
   laadRegie(); toon('meld');
+  $('#rahulFab').style.display = '';
 }
+// Rahul, de AI-assistent van de gemeentebalie (vraagt en doet met jouw medewerker-inlog)
+const RSUG = {
+  meld: ['Welke meldingen zijn urgent?', 'Vat de open meldingen samen'],
+  afs: ['Wie komt er vandaag langs?', 'Zijn er verhuizingen te verwerken?'],
+  verg: ['Welke vergunningen wachten op een besluit?', 'Geef me een korte briefing'],
+  bek: ['Stel een bekendmaking voor over wegwerkzaamheden']
+};
+function rahulVul(){
+  var lijst = RSUG[HUIDIG] || RSUG.meld, sug = $('#rahulSug'); sug.innerHTML = '';
+  lijst.forEach(function(s){ var b=document.createElement('button'); b.type='button'; b.textContent=s; b.addEventListener('click',function(){ rahulVraag(s); }); sug.appendChild(b); });
+}
+async function rahulVraag(q){
+  $('#rahulIn').value=''; $('#rahulUit').textContent='Rahul denkt na…';
+  try { const d = await api('/api/supplier/ai', { q }); $('#rahulUit').textContent = (d && (d.reply || d.error)) || 'Ik kwam er niet uit.'; if (d && d.did){ laadRegie(); toon(HUIDIG); } }
+  catch(e){ $('#rahulUit').textContent = e.message; }
+}
+document.getElementById('rahulFab').addEventListener('click',function(){ $('#rahulSheet').hidden=false; this.style.display='none'; rahulVul(); $('#rahulIn').focus(); if(!$('#rahulUit').textContent) $('#rahulUit').textContent='Vraag me om een briefing, of tik een suggestie. Ik lees mee met de openstaande zaken.'; });
+document.getElementById('rahulSluit').addEventListener('click',function(){ $('#rahulSheet').hidden=true; $('#rahulFab').style.display=''; });
+document.getElementById('rahulForm').addEventListener('submit',function(ev){ ev.preventDefault(); var q=$('#rahulIn').value.trim(); if(q) rahulVraag(q); });
 async function laadRegie(){
   let d; try { d = await api('/api/gemeente/regie'); } catch(e){ return; }
   $('#kpis').innerHTML =

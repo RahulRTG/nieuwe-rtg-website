@@ -234,3 +234,9 @@ test('14. Rahul-aangiftehulp: uit een omschrijving haalt de AI inkomen en aftrek
   assert.equal(d.body.inkomen, 48000);
   assert.equal(d.body.aftrek, 3200);
 });
+
+test('15. De AI-assistent van de rijksbalie antwoordt (backoffice-Rahul)', async () => {
+  const d = await api(base, '/api/supplier/ai', { q: 'Geef me een korte briefing van vandaag' }, rijk);
+  assert.equal(d.status, 200);
+  assert.ok(typeof d.body.reply === 'string' && d.body.reply.length, 'er komt een antwoord terug');
+});

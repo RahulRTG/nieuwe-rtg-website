@@ -31,7 +31,7 @@ module.exports = (tctx) => {
           ', doelgroepen: ' + (f.doelgroepen || []).join('/') + ')').join('\n');
         const dgTekst = functies.DOELGROEPEN.map(d => d.id + ' = ' + d.naam).join(', ');
         const genreTekst = genresLijst().map(g => g.id).join(', ');
-        const prompt = 'Je bent Rahul, de assistent van de RTG Boardroom (de schakelkast van het platform). De eigenaar kan functies ' +
+        const prompt = require('../../kern/rahul').RAHUL_LEAD + 'de assistent van de RTG Boardroom (de schakelkast van het platform). De eigenaar kan functies ' +
           'globaal, per doelgroep of per genre zaken aan- of uitzetten, en bepaalt de geldkant (pasprijzen, ledenvoordeel, partnervergoeding).\n' +
           'Doelgroepen: ' + dgTekst + '.\nGenres zaken: ' + genreTekst + '.\nBeschikbare functies:\n' + catTekst +
           '\n\nVraag of instructie: "' + vraag + '"\n\nAntwoord kort in het Nederlands (max 4 zinnen). Vraagt de instructie om een ' +

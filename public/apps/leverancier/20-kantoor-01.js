@@ -21,7 +21,7 @@
     renderStation();
   }
   // eigen backoffice van de zaak: dagcijfers, weektrend, toppers en actiecentrum
-  let boData = null, boBusy = false, vwData = null;
+  let boData = null, boBusy = false, vwData = null, synData = null;
   async function laadBackoffice(){
     if (boBusy) return;
     boBusy = true;
@@ -29,6 +29,8 @@
     catch(e){ boData = { error: e.message }; }
     // de voorspeller kijkt mee: wat komt er morgen waarschijnlijk?
     try { vwData = await API.call('/supplier/voorspel', {}); } catch(e){ vwData = null; }
+    // synergie: deals en pakketten samen met andere zaken
+    try { synData = await API.call('/supplier/synergie', {}); } catch(e){ synData = null; }
     boBusy = false;
     renderStation();
   }

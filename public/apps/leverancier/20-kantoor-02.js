@@ -39,6 +39,28 @@
                   (m.bevoorrading ? '<br>📦 '+m.bevoorrading : '')+'</div>'
               : '<div class="tkc-who">'+(vwData.uitleg||'')+'</div>')+'</div>';
         }
+        // synergie: samen met andere zaken deals en hele pakketten maken
+        const mijnCode = (S && S.code) || '';
+        const synDeals = (synData && synData.deals) || [];
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤝 '+T('sy.h','Synergie: samen deals maken')+'</h3>'+
+          '<div class="tkc-who">'+T('sy.d','Stel met een andere RTG-zaak een pakket samen met een prijs; elke deelnemer tekent voor zijn aandeel en pas dan staat het live voor leden. RTG Pay splitst elke aankoop exact volgens de afspraak.')+'</div>'+
+          synDeals.slice(0,6).map(d => {
+            const mij = d.aandelen.find(a => a.code === mijnCode) || {};
+            return '<div class="st-row"><span><b>'+esc(d.naam)+'</b> · '+eur(d.prijsCenten)+
+              '<span class="sub">'+d.aandelen.map(a => esc(a.naam)+' '+eur(a.centen)+(a.akkoord?' ✓':' …')).join(' + ')+
+              ' · status: '+esc(d.status)+'</span></span>'+
+              (d.status === 'voorstel' && !mij.akkoord
+                ? '<span><button class="obtn" data-synja="'+d.id+'">✓ '+T('sy.teken','Teken')+'</button> '+
+                  '<button class="obtn ghost" data-synnee="'+d.id+'">✕</button></span>'
+                : (d.status !== 'gestopt' ? '<button class="obtn ghost" data-synstop="'+d.id+'">'+T('sy.stop','Stop')+'</button>' : ''))+
+              '</div>';
+          }).join('')+
+          '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.6rem;align-items:center;">'+
+            '<input id="synNaam" placeholder="'+T('sy.naam','Naam van de deal')+'" style="flex:2;min-width:9rem;">'+
+            '<input id="synPartner" placeholder="'+T('sy.partner','Partnercode (bijv. SAKURA)')+'" style="flex:1;min-width:7rem;">'+
+            '<input id="synPrijs" inputmode="decimal" placeholder="'+T('sy.prijs','Totaal EUR')+'" style="width:6.5rem;">'+
+            '<input id="synMijn" inputmode="decimal" placeholder="'+T('sy.mijn','Mijn deel EUR')+'" style="width:6.5rem;">'+
+            '<button class="obtn" id="synMaak">🤝 '+T('sy.maak','Stel voor')+'</button></div></div>';
         // baas over uw zaak: elke functie aan of uit; alleen app-betalen heeft
         // bewust geen knop, wel kiest u het moment (vooraf of achteraf)
         const caps2 = (S && S.caps) || [];

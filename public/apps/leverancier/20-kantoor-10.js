@@ -59,6 +59,32 @@
       t2.textContent = (boData && boData.briefing) || '';
       t2.style.display = t2.style.display === 'none' ? 'block' : 'none';
     });
+    // synergie: tekenen, stoppen en een nieuwe deal voorstellen
+    const synVer = async () => { boData = null; synData = null; await refresh(); };
+    el.querySelectorAll('[data-synja]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synja, akkoord: true }); toast('🤝 '+T('sy.ok','Getekend.')); await synVer(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-synnee]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synnee, akkoord: false }); await synVer(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-synstop]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/synergie/stop', { id: b.dataset.synstop }); await synVer(); } catch(e){ toast(e.message); }
+    }));
+    const sm = el.querySelector('#synMaak'); if (sm) sm.addEventListener('click', async () => {
+      const w = id => (el.querySelector(id) || {}).value || '';
+      const totaal = Math.round(parseFloat(String(w('#synPrijs')).replace(',', '.')) * 100);
+      const mijn = Math.round(parseFloat(String(w('#synMijn')).replace(',', '.')) * 100);
+      if (!(totaal > 0) || !(mijn >= 0) || mijn > totaal) { toast(T('sy.bedrag','Controleer de bedragen.')); return; }
+      try {
+        await API.call('/supplier/synergie/maak', { naam: w('#synNaam'),
+          prijsCenten: totaal, aandelen: [
+            { code: (S && S.code) || '', centen: mijn },
+            { code: String(w('#synPartner')).toUpperCase().trim(), centen: totaal - mijn }
+          ] });
+        toast('🤝 '+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
+        await synVer();
+      } catch(e){ toast(e.message); }
+    });
     el.querySelectorAll('[data-khire]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/apply/decide', { id: b.dataset.khire, action: 'aannemen' });
         kantoorMsg = '\u2705 '+T('kt.hired','Aangenomen.')+' <b>'+escT(d.invite.naam)+'</b> '+T('kt.hired.geef','meldt zich zelf aan met bedrijfsnaam')+' <b>'+escT(d.bedrijf)+'</b> + '+T('kt.invite.code','Kassacode')+' <b style="color:var(--gold);font-family:monospace;letter-spacing:0.14em;">'+escT(d.invite.kassacode)+'</b>';

@@ -1409,7 +1409,7 @@
     renderStation();
   }
   // eigen backoffice van de zaak: dagcijfers, weektrend, toppers en actiecentrum
-  let boData = null, boBusy = false, vwData = null;
+  let boData = null, boBusy = false, vwData = null, synData = null;
   async function laadBackoffice(){
     if (boBusy) return;
     boBusy = true;
@@ -1417,6 +1417,8 @@
     catch(e){ boData = { error: e.message }; }
     // de voorspeller kijkt mee: wat komt er morgen waarschijnlijk?
     try { vwData = await API.call('/supplier/voorspel', {}); } catch(e){ vwData = null; }
+    // synergie: deals en pakketten samen met andere zaken
+    try { synData = await API.call('/supplier/synergie', {}); } catch(e){ synData = null; }
     boBusy = false;
     renderStation();
   }
@@ -1551,6 +1553,28 @@
                   (m.bevoorrading ? '<br>📦 '+m.bevoorrading : '')+'</div>'
               : '<div class="tkc-who">'+(vwData.uitleg||'')+'</div>')+'</div>';
         }
+        // synergie: samen met andere zaken deals en hele pakketten maken
+        const mijnCode = (S && S.code) || '';
+        const synDeals = (synData && synData.deals) || [];
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤝 '+T('sy.h','Synergie: samen deals maken')+'</h3>'+
+          '<div class="tkc-who">'+T('sy.d','Stel met een andere RTG-zaak een pakket samen met een prijs; elke deelnemer tekent voor zijn aandeel en pas dan staat het live voor leden. RTG Pay splitst elke aankoop exact volgens de afspraak.')+'</div>'+
+          synDeals.slice(0,6).map(d => {
+            const mij = d.aandelen.find(a => a.code === mijnCode) || {};
+            return '<div class="st-row"><span><b>'+esc(d.naam)+'</b> · '+eur(d.prijsCenten)+
+              '<span class="sub">'+d.aandelen.map(a => esc(a.naam)+' '+eur(a.centen)+(a.akkoord?' ✓':' …')).join(' + ')+
+              ' · status: '+esc(d.status)+'</span></span>'+
+              (d.status === 'voorstel' && !mij.akkoord
+                ? '<span><button class="obtn" data-synja="'+d.id+'">✓ '+T('sy.teken','Teken')+'</button> '+
+                  '<button class="obtn ghost" data-synnee="'+d.id+'">✕</button></span>'
+                : (d.status !== 'gestopt' ? '<button class="obtn ghost" data-synstop="'+d.id+'">'+T('sy.stop','Stop')+'</button>' : ''))+
+              '</div>';
+          }).join('')+
+          '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.6rem;align-items:center;">'+
+            '<input id="synNaam" placeholder="'+T('sy.naam','Naam van de deal')+'" style="flex:2;min-width:9rem;">'+
+            '<input id="synPartner" placeholder="'+T('sy.partner','Partnercode (bijv. SAKURA)')+'" style="flex:1;min-width:7rem;">'+
+            '<input id="synPrijs" inputmode="decimal" placeholder="'+T('sy.prijs','Totaal EUR')+'" style="width:6.5rem;">'+
+            '<input id="synMijn" inputmode="decimal" placeholder="'+T('sy.mijn','Mijn deel EUR')+'" style="width:6.5rem;">'+
+            '<button class="obtn" id="synMaak">🤝 '+T('sy.maak','Stel voor')+'</button></div></div>';
         // baas over uw zaak: elke functie aan of uit; alleen app-betalen heeft
         // bewust geen knop, wel kiest u het moment (vooraf of achteraf)
         const caps2 = (S && S.caps) || [];
@@ -2131,6 +2155,32 @@
       if (!t2) return;
       t2.textContent = (boData && boData.briefing) || '';
       t2.style.display = t2.style.display === 'none' ? 'block' : 'none';
+    });
+    // synergie: tekenen, stoppen en een nieuwe deal voorstellen
+    const synVer = async () => { boData = null; synData = null; await refresh(); };
+    el.querySelectorAll('[data-synja]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synja, akkoord: true }); toast('🤝 '+T('sy.ok','Getekend.')); await synVer(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-synnee]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synnee, akkoord: false }); await synVer(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-synstop]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/synergie/stop', { id: b.dataset.synstop }); await synVer(); } catch(e){ toast(e.message); }
+    }));
+    const sm = el.querySelector('#synMaak'); if (sm) sm.addEventListener('click', async () => {
+      const w = id => (el.querySelector(id) || {}).value || '';
+      const totaal = Math.round(parseFloat(String(w('#synPrijs')).replace(',', '.')) * 100);
+      const mijn = Math.round(parseFloat(String(w('#synMijn')).replace(',', '.')) * 100);
+      if (!(totaal > 0) || !(mijn >= 0) || mijn > totaal) { toast(T('sy.bedrag','Controleer de bedragen.')); return; }
+      try {
+        await API.call('/supplier/synergie/maak', { naam: w('#synNaam'),
+          prijsCenten: totaal, aandelen: [
+            { code: (S && S.code) || '', centen: mijn },
+            { code: String(w('#synPartner')).toUpperCase().trim(), centen: totaal - mijn }
+          ] });
+        toast('🤝 '+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
+        await synVer();
+      } catch(e){ toast(e.message); }
     });
     el.querySelectorAll('[data-khire]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/apply/decide', { id: b.dataset.khire, action: 'aannemen' });

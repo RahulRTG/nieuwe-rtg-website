@@ -46,7 +46,9 @@ test('een onveilige productiestart wordt geweigerd (fail-fast, echt proces)', as
 test('de veilige productiestart komt op en gedraagt zich als productie', async () => {
   child = spawn(process.execPath, ['--experimental-sqlite', SERVER], { env: PROD_ENV, stdio: ['ignore', 'ignore', 'inherit'] });
   let op = false;
-  for (let i = 0; i < 120; i++) {
+  // ruime marge: op een zwaar belaste CI-runner (Postgres-container + veel
+   // parallelle server-starts) mag een koude productiestart wat langer duren
+  for (let i = 0; i < 400; i++) {
     try { const r = await haal("/api/health"); if (r.ok) { op = true; break; } } catch (e) {}
     await new Promise(r => setTimeout(r, 100));
   }

@@ -2748,6 +2748,9 @@ Object.assign(kern, require('./kern/gemeente').maakGemeente({ db, save, crypto, 
 // de gemeente-partner en zijn config bestaan meteen bij het opstarten, zodat een
 // medewerker kan inloggen ook zonder dat er eerst een inwoner iets deed
 kern.gemeente.seed();
+/* RTG contentbescherming (kern/drm.js): de DRM-route (Encrypted Media
+   Extensions, Clear Key door RTG zelf bediend) voor de beschermde media. */
+Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));
 /* De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier
    ontwerpbureaus; een idee kan als concept naar elk bureau (spin-off), dus de
    bureaus gaan als referenties mee. */
@@ -2986,6 +2989,7 @@ require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
 require('./routes/kantoren')(kern);
 require('./routes/gemeente')(kern);
+require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);

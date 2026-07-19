@@ -8,6 +8,8 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/apps/rtg-protect.css" rel="stylesheet">
+<script src="/apps/rtg-protect.js" defer></script>
 <script src="/shared/schermrust.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
@@ -106,7 +108,7 @@
   <section id="vKijk" class="weg">
     <button class="knop" id="terugZaal" type="button">← Terug naar de zaal</button>
     <div class="scherm" style="margin-top:0.7rem;">
-      <video id="kijkVideo" autoplay playsinline></video>
+      <video id="kijkVideo" autoplay playsinline data-rtg-protect data-watermark="RTG Podium"></video>
       <div class="over"><span class="liveDot">Live</span><span class="badge" id="kijkTitel"></span></div>
       <span class="tel" id="kijkTel"></span>
     </div>

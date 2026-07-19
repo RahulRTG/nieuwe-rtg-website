@@ -1,0 +1,135 @@
+/* RTG contentbescherming: de CSS-basis van de DRM-route.
+   Twee lagen die overal (Theater, Clips, Podium, Salon, camerabeeld) hetzelfde
+   gedragen:
+   1) de BLUR: beschermd beeld vervaagt zodra het toestel/venster de aandacht
+      verliest (tabwissel, minimaliseren, schermopname-achtige focusverlies) en
+      wanneer het lid geen recht heeft of de speler op slot staat.
+   2) de OVERLAY: een dunne, niet-klikbare laag met een schuin herhaald
+      watermerk (de codenaam + moment), zodat een schermafbeelding altijd te
+      herleiden is. Werkt samen met rtg-protect.js.
+
+   Alleen huisstijlkleuren; geen externe assets. */
+
+.rtgp {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* de beschermde media zelf: niet te selecteren, niet te slepen, met een zachte
+   overgang zodat de blur nooit hard inklapt */
+.rtgp-media,
+.rtgp > video,
+.rtgp > img,
+.rtgp > canvas {
+  display: block;
+  max-width: 100%;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  transition: filter .28s ease, opacity .28s ease;
+}
+
+/* ---- laag 1: de blur ---- */
+/* het venster verloor de aandacht: vervaag beschermd beeld als afschrikking
+   tegen meekijken en opnemen. rtg-protect.js zet .rtgp--wazig op de container. */
+.rtgp--wazig .rtgp-media,
+.rtgp--wazig > video,
+.rtgp--wazig > img,
+.rtgp--wazig > canvas {
+  filter: blur(26px) brightness(.42) saturate(.7);
+}
+
+/* op slot: geen recht, of de speler kon (nog) niet beveiligd starten. Sterkere
+   blur plus de slot-kaart in het midden. */
+.rtgp--slot .rtgp-media,
+.rtgp--slot > video,
+.rtgp--slot > img,
+.rtgp--slot > canvas {
+  filter: blur(34px) brightness(.34) saturate(.6);
+  pointer-events: none;
+}
+
+/* ---- laag 2: de overlay met watermerk ---- */
+.rtgp-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+  /* een heel dunne vignet zodat de overlay leeft zonder het beeld te storen */
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(0,0,0,0) 60%, rgba(0,0,0,.16) 100%);
+}
+
+/* het schuine, herhaalde watermerk. De tekst zelf komt uit rtg-protect.js
+   (codenaam + moment) en wordt hier vele malen getegeld. */
+.rtgp-mark {
+  position: absolute;
+  inset: -40%;
+  transform: rotate(-24deg);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 3.2rem 2.4rem;
+  align-content: center;
+  justify-items: center;
+  opacity: .11;
+  color: #FFFFFF;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: .78rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+/* de slot-kaart: verschijnt alleen bij .rtgp--slot */
+.rtgp-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: .5rem;
+  text-align: center;
+  padding: 1.2rem;
+  color: #F4F1EC;
+  background: rgba(12, 12, 11, .42);
+  backdrop-filter: blur(2px);
+}
+.rtgp--slot .rtgp-lock { display: flex; }
+.rtgp-lock .ic { font-size: 1.6rem; }
+.rtgp-lock b { font-family: 'Bodoni Moda', serif; font-weight: 500; font-size: 1.05rem; }
+.rtgp-lock span { font-size: .82rem; color: rgba(244, 241, 236, .7); max-width: 30ch; line-height: 1.5; }
+
+/* een klein, onopvallend schildje rechtsonder: dit beeld is beschermd */
+.rtgp-badge {
+  position: absolute;
+  right: .55rem;
+  bottom: .55rem;
+  z-index: 4;
+  pointer-events: none;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 236, .72);
+  background: rgba(12, 12, 11, .5);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 6px;
+  padding: .15rem .45rem;
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+.rtgp-badge.eme::before { content: '🔒'; }
+.rtgp-badge.zicht::before { content: '👁'; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rtgp-media, .rtgp > video, .rtgp > img, .rtgp > canvas { transition: none; }
+}

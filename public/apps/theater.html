@@ -8,7 +8,9 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/apps/rtg-protect.css" rel="stylesheet">
 <script src="/shared/schermrust.js" defer></script>
+<script src="/apps/rtg-protect.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <style>
   :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
@@ -390,6 +392,8 @@
       return;
     }
     $('#doekVideo').src = '/api/theater/kijk/' + v.id + '?token=' + encodeURIComponent(token);
+    // contentbescherming: de DRM-route (EME) plus de zichtbare laag (blur, overlay, watermerk)
+    try { if (window.RTGProtect) RTGProtect.guardVideo($('#doekVideo'), { contentId: 'theater:' + v.id, watermark: 'RTG Theater · ' + (v.codenaam || 'lid') }); } catch (e) {}
     $('#kijkSub').textContent = v.kanaal + ' · ' + v.codenaam + ' · ' + v.mb + ' MB origineel' + (v.omschrijving ? ' · ' + v.omschrijving : '');
     toonReacties();
     toon('vKijk');

@@ -269,6 +269,9 @@
       <button class="knop stil" id="bAllesAan" type="button">Alles aan</button>
       <button class="knop stil" id="bAllesUit" type="button" style="border-color:var(--burgundy);">Alles uit</button>
     </div>
+    <div class="kaart" id="bFases" style="display:flex;gap:.6rem;align-items:flex-start;flex-wrap:wrap;">
+      <span style="font-size:.82rem;color:var(--soft);flex:1 1 100%;">De uitrolfases: alles is gebouwd en staat klaar; lanceren is een fase kiezen. Eén klik zet de hele kast in die stand (per-pas-fijnregeling blijft staan; intern blijft altijd open).</span>
+    </div>
     <div class="schakels" id="bSchakels"></div>
   </section>
 
@@ -583,6 +586,21 @@ async function openBoard(){
     (uitzonderingen.length ? '<br>Uitzonderingen (open buiten de standaard): ' + uitzonderingen.map(r => esc(r.naam) + ' voor ' + esc(r.genre)).join(' · ') : '') +
     (!dichtRegels.length && !uitzonderingen.length && !(d.genreStandaard || []).length ? 'Geen genre-regels; elke werk-app staat open voor elk genre.' : '');
   $('#bTelling').textContent = d.functiesUit ? '(' + d.functiesUit + ' uit)' : '(alles staat aan)';
+  // de fase-knoppen: een klik zet de hele kast in de stand van die fase
+  const faseDoos = $('#bFases');
+  faseDoos.querySelectorAll('button').forEach(b => b.remove());
+  for (const f of d.fases || []) {
+    const b = document.createElement('button');
+    b.className = 'knop stil'; b.type = 'button';
+    b.textContent = f.naam + ' (' + f.aantalAan + ' aan)';
+    b.title = f.uitleg;
+    b.addEventListener('click', async () => {
+      if (!confirm(f.naam + '\n\n' + f.uitleg + '\n\nDe hele schakelkast gaat in deze stand. Doorgaan?')) return;
+      try { const r = await api('boardroom/fase', { fase: f.id }); meld(r.naam + ': ' + r.aan + ' functies aan, ' + r.uit + ' dicht.'); openBoard(); }
+      catch (e) { meld(e.message); }
+    });
+    faseDoos.appendChild(b);
+  }
   const koppelKaart = (d.koppels && d.koppels.length)
     ? '<div class="kaart cat"><h4>Gekoppelde schakelaars (de tegenhanger volgt automatisch)</h4>' +
       d.koppels.map(k => '<div class="fx"><div class="nm">' + esc(k.aNaam) + ' ⇄ ' + esc(k.bNaam) +

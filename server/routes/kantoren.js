@@ -31,6 +31,12 @@ module.exports = (kern) => {
     if (r.ok) sseToOffice('sync', { scope: 'boardroom' });
     return r;
   }));
+  // de uitrolfases: in EEN klik de hele kast in de stand van een fase
+  app.post('/api/office/boardroom/fase', officeAuth, (req, res) => veilig(res, () => {
+    const r = afdelingen.schakelFase(String(req.body.fase || ''), req.body.naam ? String(req.body.naam) : 'boardroom');
+    if (r.ok) sseToOffice('sync', { scope: 'boardroom' });
+    return r;
+  }));
 
   /* De geld-regie: RTG bepaalt de pasprijzen, de partnervergoeding (per genre
      of per zaak) en het ledenvoordeel per genre. De pasprijzen zijn publiek:

@@ -39,14 +39,14 @@
    functies/register.js (de catalogus), functies/toegang.js (de motor) en
    functies/voorstel.js (bord + AI-voorstellen). De exports blijven exact
    gelijk, dus geen enkele aanroeper merkt er iets van. */
-const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS } = require('./functies/register');
+const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS, FASES } = require('./functies/register');
 const { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
   heeftLandRegels, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd,
   doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels } = require('./functies/toegang');
 const { catalogus, valideerVoorstel, duidVoorstel } = require('./functies/voorstel');
 
 module.exports = {
-  FUNCTIES, CATEGORIEEN, OP_ID, DOELGROEPEN, DOELGROEP_IDS, KOPPELS,
+  FUNCTIES, CATEGORIEEN, OP_ID, DOELGROEPEN, DOELGROEP_IDS, KOPPELS, FASES,
   functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
   heeftLandRegels, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd, catalogus,
   doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels, valideerVoorstel, duidVoorstel

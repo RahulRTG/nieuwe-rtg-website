@@ -202,4 +202,37 @@ const KOPPELS = [
 for (const k of KOPPELS) if (!OP_ID[k.a] || !OP_ID[k.b])
   throw new Error('functie-catalogus: koppel verwijst naar onbekende functie: ' + k.a + ' <-> ' + k.b);
 
-module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS };
+/* Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd en
+   staat klaar; lanceren is daardoor letterlijk een fase kiezen in plaats van
+   tientallen losse schakelaars omzetten. Elke fase somt op wat er AAN staat;
+   al het andere gaat dicht (interne functies blijven altijd open, anders
+   sluit de boardroom zichzelf buiten). De fases stapelen: stad = fundament
+   plus de stadslaag; alles = de volledige catalogus. */
+const FASE_FUNDAMENT = [
+  // de wig: een stad, een sector diep - leden bestellen en betalen bij
+  // partners, de zaak draait op kassa en personeel, identiteit is op orde
+  'member', 'bestellen', 'betalen', 'verificatie', 'webauthn', 'paspoort',
+  'salon', 'member-dm', 'member-connect', 'member-werk',
+  'supplier', 'supplier-pos', 'supplier-salon', 'supplier-apply', 'supplier-finance',
+  'staff', 'stuur'
+];
+const FASE_STAD = [...FASE_FUNDAMENT,
+  // de stad wordt levend: tickets, vervoer, kamers, events, de sociale laag,
+  // de eerste eigen apps en de RTFoundation (het goede doel hoort erbij)
+  'tickets', 'ov', 'onderweg', 'supplier-ride', 'supplier-rooms', 'supplier-events',
+  'ontmoetingen', 'social', 'member-snaps', 'spellen', 'wbw', 'kantoorpakket',
+  'flits', 'oog', 'contracten', 'verhuur',
+  'foundation', 'foundation-school', 'werk-rtf', 'rtf-contacten'
+];
+const FASES = [
+  { id: 'fundament', naam: 'Fase 1 · Het fundament (de wig)', aan: FASE_FUNDAMENT,
+    uitleg: 'Eén stad, één sector diep: leden bestellen en betalen bij partners, de zaak draait op kassa, Salon en personeel, en de identiteitslaag staat. Al het andere blijft dicht tot u verder draait.' },
+  { id: 'stad', naam: 'Fase 2 · De stad', aan: FASE_STAD,
+    uitleg: 'Het fundament plus alles wat een stad levend maakt: tickets, vervoer, kamers, events, de sociale laag, de eerste eigen apps en de RTFoundation.' },
+  { id: 'alles', naam: 'Fase 3 · Alles open', aan: null,
+    uitleg: 'De volledige catalogus open, zoals de standaard: elk genre, elke eigen app, elke dienst.' }
+];
+for (const f of FASES) for (const id of f.aan || [])
+  if (!OP_ID[id]) throw new Error('functie-catalogus: fase "' + f.id + '" noemt onbekende functie: ' + id);
+
+module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS, FASES };

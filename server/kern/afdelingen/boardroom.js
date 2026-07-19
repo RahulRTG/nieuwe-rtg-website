@@ -116,6 +116,27 @@ module.exports = (ctx) => {
       .map(f => ({ functie: f.id, naam: f.naam, alleen: f.alleenGenres }));
   }
 
+  /* De uitrolfases: de gefaseerde uitrol als voorinstelling. Eén klik zet de
+     hele kast in de stand van die fase (aan wat de fase noemt, dicht wat er
+     niet in staat); de interne functies blijven altijd open, net als bij de
+     grote hendel. Per-doelgroep fijnregeling blijft staan. */
+  function schakelFase(id, wie) {
+    const fase = (functies.FASES || []).find(f => f.id === id);
+    if (!fase) return { status: 404, error: 'Onbekende fase.' };
+    const st = functiesStand();
+    let aanN = 0, uitN = 0;
+    for (const f of Object.values(functies.OP_ID)) {
+      if ((f.doelgroepen || []).includes('intern')) continue;
+      if (!st[f.id]) st[f.id] = {};
+      const aan = fase.aan === null ? true : fase.aan.includes(f.id);
+      st[f.id].aan = aan;
+      if (aan) aanN++; else uitN++;
+    }
+    save();
+    audit(wie || 'boardroom', 'Uitrolfase "' + fase.naam + '" gezet: ' + aanN + ' functies aan, ' + uitN + ' dicht');
+    return { ok: true, fase: fase.id, naam: fase.naam, aan: aanN, uit: uitN };
+  }
+
   /* De grote hendel: ALLES in een keer beschikbaar zetten of sluiten, voor
      iedereen. De interne functies (doelgroep 'intern': de backoffice zelf)
      blijven buiten schot, anders sluit de boardroom zichzelf buiten en kan
@@ -171,6 +192,8 @@ module.exports = (ctx) => {
       functies: cat, doelgroepen: functies.DOELGROEPEN,
       koppels: (functies.KOPPELS || []).map(k => ({ a: k.a, b: k.b,
         aNaam: (functies.OP_ID[k.a] || {}).naam, bNaam: (functies.OP_ID[k.b] || {}).naam, uitleg: k.uitleg })),
+      fases: (functies.FASES || []).map(f => ({ id: f.id, naam: f.naam, uitleg: f.uitleg,
+        aantalAan: f.aan === null ? Object.values(functies.OP_ID).filter(x => !(x.doelgroepen || []).includes('intern')).length : f.aan.length })),
       genreRegels: genreRegels(),
       genreStandaard: genreStandaard(),
       genres: Object.entries(d().supplierTypes || {}).map(([id, t]) => ({ id, label: t.label, icon: t.icon })),
@@ -219,5 +242,5 @@ module.exports = (ctx) => {
   }
 
   /* ---------- interne chat met snaps, per kamer ---------- */
-  return { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, schakelAlles, schakelGenre, bouwVoorstellen, voorstellen, boardroom, platformStats };
+  return { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, schakelAlles, schakelGenre, schakelFase, bouwVoorstellen, voorstellen, boardroom, platformStats };
 };

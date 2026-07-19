@@ -1,0 +1,27 @@
+/* De RTG-verfijningslaag: kleine, overal veilige details die samen het
+   high-end gevoel maken, in EEN stijl over de hele familie. Puur additief
+   (geen layout), dus elke pagina kan hem dragen:
+   - focus in het goud van het huis (toetsenbord-navigatie voelt bedoeld),
+   - tekstselectie in bordeaux (zelfs selecteren is merk),
+   - dunne, donkere schuifbalken in plaats van systeemgrijs,
+   - geen browser-tikflitsen, nette font-rendering,
+   - de ene RTG-beweging (--rtg-ease) voor wie hem gebruikt,
+   - en rust voor wie minder beweging wil. */
+:root{ --rtg-ease:cubic-bezier(0.22, 0.61, 0.21, 1); }
+
+html{ -webkit-tap-highlight-color:transparent; }
+body{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+
+:focus-visible{ outline:2px solid var(--gold, #C9A24B); outline-offset:2px; }
+
+::selection{ background:#7F1634; color:#FFFFFF; }
+
+* { scrollbar-width:thin; scrollbar-color:rgba(244,241,236,0.22) transparent; }
+::-webkit-scrollbar{ width:8px; height:8px; }
+::-webkit-scrollbar-thumb{ background:rgba(244,241,236,0.18); border-radius:4px; }
+::-webkit-scrollbar-thumb:hover{ background:rgba(244,241,236,0.3); }
+::-webkit-scrollbar-track{ background:transparent; }
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+}

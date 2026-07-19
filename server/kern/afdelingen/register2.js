@@ -96,6 +96,21 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Laatste ontwerpen', items: lijst((d().atelier || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.categorie) + ', ' + String(o.status) + ')') },
         { titel: 'Verder werken', items: ['Klik op deze kamer om het atelier te openen: brief een stuk, laat de AI het concept uittekenen, en vraag het tech pack en de creatief directeur.'] }
+      ] },
+    /* RTG Ontwerpstudio: het voertuig- en vaartuig-ontwerpbureau van het
+       kantoor (automotive, jachten, luchtvaart, helikopters). Cijfers hier;
+       de ontwerpvloer opent als eigen cockpit op deze kamer. */
+    studio: { naam: 'RTG Ontwerpstudio', emoji: '🏎️', missie: 'Het ontwerpbureau van het kantoor voor alles wat je beweegt: hypercars, jachten, business jets en helikopters, op het niveau waar de grote namen om zouden vragen.', eigenApp: true,
+      kpis: () => [
+        ['Concepten', tel((d().studio || {}).ontwerpen)],
+        ['In productie', tel(lijst((d().studio || {}).ontwerpen).filter(o => o.status === 'productie'))],
+        ['Disciplines', 4],
+        ['Programma’s', tel((d().studio || {}).collecties)],
+        ['Bijgewerkt (7d)', recent((d().studio || {}).ontwerpen, 'updatedAt', 7)]
+      ],
+      lijsten: () => [
+        { titel: 'Laatste concepten', items: lijst((d().studio || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.discipline) + ', ' + String(o.status) + ')') },
+        { titel: 'Verder werken', items: ['Klik op deze kamer om de studio te openen: brief een concept, laat de AI het uittekenen, en vraag de specsheet en de chef-ontwerper. Onderweg werkt de RTG Studio PDA.'] }
       ] }
   };
 };

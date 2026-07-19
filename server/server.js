@@ -2708,6 +2708,11 @@ Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic, 
    levert tech packs en de blik van de creatief directeur; het palet komt als
    naam + hex mee zodat het scherm een moodboard toont. */
 Object.assign(kern, require('./kern/atelier').maakAtelier({ db, save, crypto, anthropic, schoon }));
+/* RTG Ontwerpstudio (kern/studio.js): de tegenhanger van het Atelier voor
+   alles wat je beweegt: automotive, jachten & boten, luchtvaart en
+   helikopters. AI tekent het concept uit, levert een specsheet en de blik
+   van de chef-ontwerper. */
+Object.assign(kern, require('./kern/studio').maakStudio({ db, save, crypto, anthropic, schoon }));
 /* De hulpdiensten (kern/hulpdienst.js): zes korpsen met een meldkamer,
    eenheden over land, water en door de lucht, bijstand tussen korpsen en
    de zorgketen ambulance -> ziekenhuis -> huisarts. */

@@ -83,6 +83,23 @@ module.exports = (kern) => {
     try { const r = await kern.atelier.aiKritiek(String(req.body.id || ''), req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
     catch (e) { console.error('[atelier]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+
+  /* RTG Ontwerpstudio: het voertuig- en vaartuig-ontwerpbureau. Zelfde vorm
+     als het atelier: concepten met AI, specsheet en de chef-ontwerper. */
+  app.post('/api/office/studio', officeAuth, (req, res) => veilig(res, () => kern.studio.overzicht()));
+  app.post('/api/office/studio/maak', officeAuth, (req, res) => veilig(res, () => kern.studio.ontwerpMaak(req.body || {})));
+  app.post('/api/office/studio/zet', officeAuth, (req, res) => veilig(res, () => kern.studio.ontwerpZet(String(req.body.id || ''), req.body || {})));
+  app.post('/api/office/studio/verwijder', officeAuth, (req, res) => veilig(res, () => kern.studio.ontwerpVerwijder(String(req.body.id || ''))));
+  app.post('/api/office/studio/collectie', officeAuth, (req, res) => veilig(res, () => kern.studio.collectieMaak(req.body || {})));
+  app.post('/api/office/studio/specsheet', officeAuth, (req, res) => veilig(res, () => kern.studio.aiSpecsheet(String(req.body.id || ''))));
+  app.post('/api/office/studio/concept', officeAuth, async (req, res) => {
+    try { const r = await kern.studio.aiConcept(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[studio]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  app.post('/api/office/studio/kritiek', officeAuth, async (req, res) => {
+    try { const r = await kern.studio.aiKritiek(String(req.body.id || ''), req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[studio]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
   app.post('/api/office/doos/regie', officeAuth, (req, res) => veilig(res, () => afdelingen.doosRegie()));
   app.post('/api/office/doos/update-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosUpdateZet(req.body.versie, req.body.notities, req.body.naam)));
   app.post('/api/office/doos/netwerk-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosNetwerkZet(String(req.body.doos || ''), req.body.instellingen || {}, req.body.naam)));

@@ -21,6 +21,7 @@ const TIMEOUT_MS = 15000; // een interne aanroep die langer duurt is stuk
 const VERBODEN = [
   /^\/api\/auth\//,        // accounts en wachtwoorden: geen AI-terrein
   /^\/api\/login$/,        // (gast)sessies aanmaken evenmin
+  /^\/api\/account\//,     // de sleutelbos (rollen koppelen/starten): mensenwerk
   /^\/api\/techniek\//,    // het beveiligde techniekbord is van de eigenaar
   /^\/api\/boardroom\//,   // idem: de eigenaarskast
   /^\/api\/doos\//,        // de zaakdoos (lokale sleutels)

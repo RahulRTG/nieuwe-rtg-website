@@ -32,12 +32,41 @@
         const d = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(d.error || T('pd.ka.fout','Die code klopt niet.'));
         kaToken = d.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
+        // een account voor alles: net bewezen code stil aan het RTG-account koppelen
+        try {
+          const lt = localStorage.getItem('rtg_member_token');
+          if (lt) fetch('/api/account/koppel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
+            body: JSON.stringify({ soort: 'kantoor', code: $('#kaCode').value.trim(), totp: $('#kaTotp').value.trim() }) });
+        } catch(e){}
         enterKantoor();
       } catch(e){ $('#kaFout').textContent = e.message; }
     };
     $('#kaGo').addEventListener('click', go);
     $('#kaCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
     $('#kaCode').focus();
+    // is de kantoor-rol al aan het RTG-account op dit toestel gekoppeld,
+    // dan is een tik genoeg (het ene account start dezelfde kantoor-sessie)
+    (async () => {
+      let lt = null; try { lt = localStorage.getItem('rtg_member_token'); } catch(e){}
+      if (!lt) return;
+      try {
+        const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok || !(d.rollen || []).some(x => x.rol === 'kantoor')) return;
+        const b = document.createElement('button');
+        b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
+        b.textContent = '👤 ' + T('pd.ka.een', 'Verder met uw RTG-account');
+        b.addEventListener('click', async () => {
+          const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: JSON.stringify({ rol: 'kantoor' }) });
+          const sd = await s.json().catch(() => ({}));
+          if (!s.ok) { $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.'); return; }
+          kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
+          enterKantoor();
+        });
+        const kaart = $('#gateStep').querySelector('.card');
+        if (kaart) kaart.appendChild(b);
+      } catch(e){}
+    })();
   }
   async function enterKantoor(){
     const k = await kaApi('kamers');

@@ -143,6 +143,18 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 
 **Blijf ingelogd:** sessies worden bewaard (server-side in `db.json`, client-side in de browser). Wie inlogt blijft ingelogd, ook na een herstart van de server of het sluiten van de app. Uitloggen kan in elke app (leden-app: onderin het meldingenpaneel; partner-app: de gebruikerschip rechtsboven; personeels-app: Wissel). Personeels-PIN's zijn beschermd tegen raden: na vijf foute pogingen volgt een minuut wachttijd.
 
+## Eén account voor alles
+
+Mensen registreren zich één keer (het leden-account met codenaam in de kluis).
+Elke andere rol is daarna een **koppeling** aan dat ene account, nooit een
+nieuw account: personeel koppelt door één keer zaak-code + eigen PIN te
+bewijzen, de zaak met de bedrijfsinlog, het kantoor met de backoffice-code
+(en TOTP als die aanstaat). Daarna toont elk inlogscherm "verder met uw
+RTG-account" en munt `/api/account/start` exact dezelfde sessie als de losse
+inlog (zelfde `rememberSession`, zelfde logs). Endpoints:
+`/api/account/{rollen,koppel,start,ontkoppel}` (kern/eenaccount.js); het
+AI-stuur blijft bewust van deze sleutelbos af.
+
 ## Privacy & security
 
 - **Pseudonimisering by design:** klanten staan in alle operationele systemen op hun codenaam; echte namen liggen in een gescheiden kluis en worden pas bij ticketing/check-in gekoppeld.

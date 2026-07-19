@@ -2772,6 +2772,16 @@ Object.assign(kern, require('./kern/wbw').maakWbw({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan,
   connectieTussen: kern.connectieTussen, verbActief: kern.verbActief, pay: kern.pay, notify
 }));
+/* Een account voor alles (kern/eenaccount.js): mensen registreren zich een
+   keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene
+   account (na bewijs van de werk-inlog), en accStart munt exact dezelfde
+   sessies als de losse logins. */
+Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
+  db, save, crypto, accounts, findSupplier, checkCred: kern.checkCred, hasCred: kern.hasCred,
+  DEMO: kern.DEMO, DEMO_SUPPLIER: kern.DEMO_SUPPLIER, OFFICE_CODE: kern.OFFICE_CODE,
+  veiligGelijk: kern.veiligGelijk, totpOk: kern.totpOk, rememberSession, logInlog: kern.logInlog,
+  logActivity, supplierState, officeState: kern.officeState
+}));
 /* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
    (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een
    match automatisch een tafel bij een partner rond het midden van de twee
@@ -2822,6 +2832,7 @@ require('./routes/clips')(kern);
 require('./routes/kantoorpakket')(kern);
 require('./routes/stuur')(kern);
 require('./routes/vonk')(kern);
+require('./routes/account')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

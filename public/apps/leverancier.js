@@ -461,6 +461,7 @@
       const d = await API.call('/supplier/login', body);
       API.token = d.token;
       applyState(d.state);
+      koppelAanRtgAccount(body, isCred); // een account voor alles: stil koppelen
     } catch(e){
       if (silent) return false;
       toast(isCred ? T('login.bad','Onjuiste gebruikersnaam of wachtwoord.') : (e.message||T('login.failed','Inloggen mislukt.')));
@@ -525,6 +526,54 @@
   }
 
   function applyState(st){ state = st; S = st.supplier; }
+
+  /* ---- Een account voor alles ----
+     Wie hier net zijn werk-inlog bewees EN een RTG-leden-account op dit
+     toestel heeft, wordt stil gekoppeld: voortaan is dat ene account genoeg.
+     En op het inlogscherm: staat er al een koppeling, dan verschijnt een
+     "verder met uw RTG-account"-keuze die de werk-sessie direct start. */
+  function lidToken(){ try { return localStorage.getItem('rtg_member_token'); } catch(e){ return null; } }
+  const accApi = (pad, body) => fetch('/api/account/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lidToken() },
+    body: JSON.stringify(body || {}) }).then(r => r.json().then(j => ({ ok: r.ok, j })));
+  async function koppelAanRtgAccount(body, isCred){
+    if (!lidToken()) return;
+    try {
+      const soort = body.staffId != null ? 'personeel' : (isCred ? 'zaak' : null);
+      if (!soort) return;
+      const r = await accApi('koppel', soort === 'personeel'
+        ? { soort, code: body.code, staffId: body.staffId, pin: body.pin }
+        : { soort, username: body.username, password: body.password });
+      if (r.ok) toast(T('acc.gekoppeld', 'Gekoppeld aan uw RTG-account: voortaan is een inlog genoeg.'));
+    } catch(e){}
+  }
+  async function rtgAccountKeuze(){
+    const gate = $('#gate');
+    if (!gate || !API.enabled || !lidToken()) return;
+    try {
+      const r = await accApi('rollen');
+      const rollen = (r.ok && r.j.rollen || []).filter(x => x.rol === 'zaak' || x.rol === 'personeel');
+      if (!rollen.length) return;
+      const doos = document.createElement('div');
+      doos.className = 'login-form';
+      doos.setAttribute('aria-label', 'Verder met uw RTG-account');
+      doos.innerHTML = rollen.map((x, i) =>
+        '<button type="button" data-acc-start="' + i + '">👤 ' + (x.naam || 'Beheer') + ' · ' + (x.zaakNaam || x.code) +
+        ' <small>' + T('acc.een', 'met uw RTG-account') + '</small></button>').join('');
+      gate.querySelector('.login-form').after(doos);
+      doos.querySelectorAll('[data-acc-start]').forEach(b => b.addEventListener('click', async () => {
+        const x = rollen[Number(b.dataset.accStart)];
+        const s = await accApi('start', { rol: x.rol, code: x.code, staffId: x.staffId });
+        if (!s.ok) return toast(s.j.error || T('login.failed', 'Inloggen mislukt.'));
+        API.token = s.j.token;
+        try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
+        applyState(s.j.state);
+        if (naarEigenSector(S)) return;
+        enterApp();
+      }));
+    } catch(e){}
+  }
+  setTimeout(rtgAccountKeuze, 800);
 
 
   /* De Zaakdoos: draait dit scherm op het kastje in de zaak, zeg dan eerlijk

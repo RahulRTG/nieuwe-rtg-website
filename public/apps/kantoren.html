@@ -425,6 +425,37 @@
     <div id="hLijst"><div class="leeg">Nog geen concepten.</div></div>
   </section>
 
+  <!-- RTG Architectenbureau: huizen -->
+  <section id="vArchitect" hidden>
+    <div class="kop">
+      <button class="terug" id="gTerug">← alle kamers</button>
+      <h1>🏛️ RTG Architectenbureau</h1>
+    </div>
+    <p class="deck">Het ontwerpbureau van de kantoren voor het gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. Geef een brief, de AI tekent het concept uit met typologie, constructie, materialen, een gedempt palet, voorzieningen en een verhaal, levert een bouwstaat en de blik van de chef-architect. <a href="/apps/architect-pda.html" style="color:var(--gold);">🏛️ Onderweg? Open de RTG Architect PDA →</a></p>
+    <div class="kpis" id="gKpi"></div>
+    <h3 class="sec">Nieuw concept briefen</h3>
+    <div class="kaart">
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+        <select class="veld" id="gCat" style="max-width:13rem;" aria-label="Discipline"></select>
+        <input class="veld" id="gNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Villa Meridiaan" maxlength="100">
+        <input class="veld" id="gHuis" style="max-width:11rem;" placeholder="Huis / project (optioneel)" maxlength="80">
+      </div>
+      <textarea id="gBrief" rows="2" maxlength="600" placeholder="De brief: ligging, sfeer, gebruik of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <button class="knop" id="gMaak" style="margin-top:.5rem;">Concept aanmaken</button>
+    </div>
+    <h3 class="sec">Projecten <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een portfolio</span></h3>
+    <div class="kaart">
+      <div class="rij" style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+        <input class="veld" id="gProjNaam" style="flex:1;min-width:9rem;" placeholder="Projectnaam, bijv. Kustlijn" maxlength="80">
+        <input class="veld" id="gProjSeizoen" style="max-width:8rem;" placeholder="Fase / jaar" maxlength="40">
+        <button class="knop stil" id="gProjMaak">Project aanmaken</button>
+      </div>
+      <div id="gProj" style="margin-top:.6rem;"></div>
+    </div>
+    <h3 class="sec">Het bureau <span id="gFilters" style="margin-left:.4rem;"></span></h3>
+    <div id="gLijst"><div class="leeg">Nog geen concepten.</div></div>
+  </section>
+
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -437,7 +468,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vAtelier','vStudio','vHardware'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vAtelier','vStudio','vHardware','vArchitect'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -461,6 +492,7 @@ async function binnen(){
     else if (start === 'atelier') await openAtelier();
     else if (start === 'studio') await openStudio();
     else if (start === 'hardware') await openHardware();
+    else if (start === 'architect') await openArchitect();
     else await openKamer(start);
   } catch (e) { zetKamerUrl(''); }
 }
@@ -476,7 +508,7 @@ async function laadKamers(){
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
 }
 
 /* ---------- een kamer ---------- */
@@ -854,6 +886,16 @@ function renderHardware(){
         '<button class="knop stil hKritiek" data-o="'+o.id+'">Kritiek</button>'+
         '<select class="veld hSerieSel" data-o="'+o.id+'" title="Toewijzen aan serie" style="max-width:11rem;font-size:.75rem;padding:.25rem .4rem;">'+(o.collectie?serieOpts.replace('value="'+esc(o.collectie)+'"','value="'+esc(o.collectie)+'" selected'):serieOpts)+'</select>'+
         '<button class="knop stil hDel" data-o="'+o.id+'" style="margin-left:auto;color:var(--burgundy);">Verwijder</button>'+
+      '</div>'+
+      '<div style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;">'+(o.winkel ?
+        '<div class="rij" style="gap:.5rem;align-items:center;font-size:.8rem;"><span style="color:var(--gold);">🛒 In de winkel · EUR '+o.winkel.eenmalig+' eenmalig'+(o.winkel.perMaand?' · EUR '+o.winkel.perMaand+' p/m':'')+' · '+esc(o.winkel.eenheid)+'</span>'+
+          '<button class="knop stil hWinkelUit" data-o="'+o.id+'" style="margin-left:auto;font-size:.75rem;padding:.25rem .5rem;">Terughalen</button></div>'
+        :
+        '<div class="rij" style="gap:.4rem;align-items:center;font-size:.8rem;"><span style="color:var(--muted);">Naar de winkel:</span>'+
+          '<input class="veld hwEen" data-o="'+o.id+'" type="number" min="0" placeholder="eenmalig EUR" style="max-width:7.5rem;font-size:.78rem;padding:.25rem .4rem;">'+
+          '<input class="veld hwMaand" data-o="'+o.id+'" type="number" min="0" placeholder="p/m EUR" style="max-width:6rem;font-size:.78rem;padding:.25rem .4rem;">'+
+          '<input class="veld hwEenheid" data-o="'+o.id+'" placeholder="per stuk" maxlength="40" style="max-width:8rem;font-size:.78rem;padding:.25rem .4rem;">'+
+          '<button class="knop stil hWinkelIn" data-o="'+o.id+'" style="font-size:.75rem;padding:.25rem .5rem;">🛒 Publiceren</button></div>')+
       '</div></div>';
   }).join('') : '<div class="leeg">Nog geen concepten in deze discipline.</div>';
   bindHardware();
@@ -883,6 +925,15 @@ function bindHardware(){
   }));
   el.querySelectorAll('.hSerieSel').forEach(s => s.addEventListener('change', async () => {
     try { const r = await api('hardware/zet', { id: s.dataset.o, collectie: s.value }); vervangHw(r.ontwerp); meld(s.value?'Toegewezen aan '+s.value:'Uit serie gehaald'); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.hWinkelIn').forEach(b => b.addEventListener('click', async () => {
+    const rij = b.closest('.rij');
+    const eenmalig = rij.querySelector('.hwEen').value, perMaand = rij.querySelector('.hwMaand').value, eenheid = rij.querySelector('.hwEenheid').value.trim();
+    if (!(Number(eenmalig) > 0)){ meld('Geef een eenmalige prijs in euro.'); return; }
+    try { const r = await api('hardware/winkel', { id: b.dataset.o, prijs: { eenmalig, perMaand, eenheid } }); vervangHw(r.ontwerp); meld('In de winkel gezet.'); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.hWinkelUit').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('hardware/winkel-uit', { id: b.dataset.o }); vervangHw(r.ontwerp); meld('Uit de winkel gehaald.'); } catch(e){ meld(e.message); }
   }));
   el.querySelectorAll('.hDel').forEach(b => b.addEventListener('click', async () => {
     try { await api('hardware/verwijder', { id: b.dataset.o }); HARDWARE.ontwerpen = HARDWARE.ontwerpen.filter(o => o.id !== b.dataset.o); renderHardware(); } catch(e){ meld(e.message); }
@@ -972,6 +1023,179 @@ async function exportProductblad(naam){
   window.open(url, '_blank');
   setTimeout(() => URL.revokeObjectURL(url), 60000);
   meld('Productblad geopend in een nieuw tabblad.');
+}
+
+/* ---------- RTG Architectenbureau: huizen ---------- */
+let ARCHITECT = null, gFilter = '';
+async function openArchitect(){
+  const d = await api('architect');
+  ARCHITECT = d;
+  zetKamerUrl('architect');
+  toon('vArchitect');
+  const sel = $('#gCat');
+  if (!sel.options.length) sel.innerHTML = d.disciplines.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  renderArchitect();
+}
+function renderArchitect(){
+  const d = ARCHITECT; if (!d) return;
+  $('#gKpi').innerHTML = [
+    ['Concepten', d.kpi.totaal], ['In realisatie', d.kpi.inRealisatie],
+    ['Huizen', d.kpi.huizen], ['Projecten', d.collecties.length]
+  ].map(x => '<div class="kaart kpi-tegel"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
+  const perProj = {}; d.ontwerpen.forEach(o => { if (o.collectie) perProj[o.collectie] = (perProj[o.collectie]||0)+1; });
+  $('#gProj').innerHTML = d.collecties.length ? d.collecties.map(c =>
+    '<div class="rij" style="justify-content:space-between;border-top:1px solid var(--line);padding:.45rem 0;">'+
+      '<span><b>'+esc(c.naam)+'</b>'+(c.seizoen?' <span style="color:var(--muted);">'+esc(c.seizoen)+'</span>':'')+
+      ' <span style="color:var(--soft);font-size:.78rem;">· '+(perProj[c.naam]||0)+' concept(en)</span></span>'+
+      '<button class="knop stil gPort" data-naam="'+esc(c.naam)+'">📐 Portfolio</button></div>'
+  ).join('') : '<div class="leeg" style="color:var(--muted);font-size:.82rem;">Nog geen project. Maak er een aan en wijs concepten toe.</div>';
+  $('#gProj').querySelectorAll('.gPort').forEach(b => b.addEventListener('click', () => exportPortfolio(b.dataset.naam)));
+  $('#gFilters').innerHTML = '<button class="knop stil gFilterKnop'+(gFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
+    d.disciplines.filter(c => c.aantal).map(c => '<button class="knop stil gFilterKnop'+(gFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
+  $('#gFilters').querySelectorAll('.gFilterKnop').forEach(b => b.addEventListener('click', () => { gFilter = b.dataset.f; renderArchitect(); }));
+  const lijst = d.ontwerpen.filter(o => !gFilter || o.discipline === gFilter);
+  const opts = d.statussen.map(s => '<option value="'+s+'">'+s+'</option>').join('');
+  const projOpts = '<option value="">Geen project</option>' + d.collecties.map(c => '<option value="'+esc(c.naam)+'">'+esc(c.naam)+'</option>').join('');
+  $('#gLijst').innerHTML = lijst.length ? lijst.map(o => {
+    const c = o.concept;
+    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
+        '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
+        '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
+        '<select class="veld gStatus" data-o="'+o.id+'" style="max-width:9rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
+      '</div>'+
+      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:.4rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
+      (c ? '<div style="margin-top:.5rem;">'+swatches(c.kleuren)+
+        '<div style="font-size:.82rem;line-height:1.6;"><b>'+esc(c.typologie)+'</b> · '+esc(c.constructie)+'<br>'+esc((c.materialen||[]).join(', '))+' <span style="color:var(--muted);">'+esc((c.voorzieningen||[]).join(' · '))+'</span></div>'+
+        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
+        : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
+      (o.bouwstaat ? bouwstaatHtml(o.bouwstaat) : '')+
+      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-architect:</b> '+esc(o.kritiek)+'</div>' : '')+
+      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
+        '<button class="knop gConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✨ AI tekent concept')+'</button>'+
+        '<button class="knop stil gBouw" data-o="'+o.id+'">Bouwstaat</button>'+
+        '<button class="knop stil gKritiek" data-o="'+o.id+'">Kritiek</button>'+
+        '<select class="veld gProjSel" data-o="'+o.id+'" title="Toewijzen aan project" style="max-width:11rem;font-size:.75rem;padding:.25rem .4rem;">'+(o.collectie?projOpts.replace('value="'+esc(o.collectie)+'"','value="'+esc(o.collectie)+'" selected'):projOpts)+'</select>'+
+        '<button class="knop stil gDel" data-o="'+o.id+'" style="margin-left:auto;color:var(--burgundy);">Verwijder</button>'+
+      '</div></div>';
+  }).join('') : '<div class="leeg">Nog geen concepten in deze discipline.</div>';
+  bindArchitect();
+}
+function bouwstaatHtml(p){
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Bouwstaat</div>'+
+    (p.delen||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
+    '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.oppervlak)+' · '+esc(p.kavel)+'</div>'+
+    '<div style="font-size:.72rem;color:var(--muted);">Controle: '+esc((p.controle||[]).join(', '))+'</div></div>';
+}
+function bindArchitect(){
+  const el = $('#gLijst');
+  el.querySelectorAll('.gConcept').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = 'De chef-architect tekent...';
+    try { const r = await api('architect/concept', { id: b.dataset.o }); vervangArc(r.ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  el.querySelectorAll('.gBouw').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('architect/bouwstaat', { id: b.dataset.o }); vervangArc(r.ontwerp); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.gKritiek').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = 'Denkt na...';
+    try { const r = await api('architect/kritiek', { id: b.dataset.o }); vervangArc(r.ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  el.querySelectorAll('.gStatus').forEach(s => s.addEventListener('change', async () => {
+    try { const r = await api('architect/zet', { id: s.dataset.o, status: s.value }); vervangArc(r.ontwerp); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.gProjSel').forEach(s => s.addEventListener('change', async () => {
+    try { const r = await api('architect/zet', { id: s.dataset.o, collectie: s.value }); vervangArc(r.ontwerp); meld(s.value?'Toegewezen aan '+s.value:'Uit project gehaald'); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.gDel').forEach(b => b.addEventListener('click', async () => {
+    try { await api('architect/verwijder', { id: b.dataset.o }); ARCHITECT.ontwerpen = ARCHITECT.ontwerpen.filter(o => o.id !== b.dataset.o); renderArchitect(); } catch(e){ meld(e.message); }
+  }));
+}
+function vervangArc(o){ if (!o || !ARCHITECT) return; const i = ARCHITECT.ontwerpen.findIndex(x => x.id === o.id); if (i >= 0) ARCHITECT.ontwerpen[i] = o; renderArchitect(); }
+$('#gTerug').addEventListener('click', laadKamers);
+$('#gMaak').addEventListener('click', async () => {
+  const naam = $('#gNaam').value.trim(); if (!naam){ meld('Geef het concept een naam.'); return; }
+  try {
+    const r = await api('architect/maak', { discipline: $('#gCat').value, naam, huis: $('#gHuis').value.trim(), brief: $('#gBrief').value.trim() });
+    $('#gNaam').value = ''; $('#gBrief').value = '';
+    ARCHITECT.ontwerpen.unshift(r.ontwerp); ARCHITECT.kpi.totaal++;
+    try { const c = await api('architect/concept', { id: r.ontwerp.id }); vervangArc(c.ontwerp); } catch(e){ renderArchitect(); }
+    meld('Concept aangemaakt; de chef-architect tekent het uit.');
+  } catch(e){ meld(e.message); }
+});
+$('#gProjMaak').addEventListener('click', async () => {
+  const naam = $('#gProjNaam').value.trim(); if (!naam){ meld('Geef het project een naam.'); return; }
+  try {
+    const r = await api('architect/project', { naam, seizoen: $('#gProjSeizoen').value.trim() });
+    $('#gProjNaam').value = ''; $('#gProjSeizoen').value = '';
+    ARCHITECT.collecties.unshift(r.collectie); renderArchitect();
+    meld('Project "'+naam+'" aangemaakt.');
+  } catch(e){ meld(e.message); }
+});
+async function exportPortfolio(naam){
+  let d;
+  try { d = await api('architect/portfolio', { naam }); } catch(e){ meld(e.message); return; }
+  if (!d.ontwerpen || !d.ontwerpen.length){ meld('Nog geen concepten in dit project.'); return; }
+  const p = d.project || { naam: naam, seizoen: null };
+  const swatchStrook = k => (k||[]).map(s => '<div class="sw"><span style="background:'+esc(s.hex)+'"></span><em>'+esc(s.naam)+'</em><b>'+esc(s.hex)+'</b></div>').join('');
+  const secties = d.ontwerpen.map((o, i) => {
+    const c = o.concept, sp = o.bouwstaat;
+    return '<article>'+
+      '<header><span class="nr">'+String(i+1).padStart(2,'0')+'</span>'+
+        '<div><h2>'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div class="meta">'+esc(o.disciplineLabel)+(o.huis?' &middot; '+esc(o.huis):'')+' &middot; '+esc(o.status)+'</div></div></header>'+
+      (c ? '<div class="swrij">'+swatchStrook(c.kleuren)+'</div>'+
+        '<p class="lead"><b>'+esc(c.typologie)+'</b> &middot; '+esc(c.constructie)+'</p>'+
+        '<p class="mat">'+esc((c.materialen||[]).join(', '))+'<span class="uit"> &middot; '+esc((c.voorzieningen||[]).join(' &middot; '))+'</span></p>'+
+        (c.verhaal?'<p class="verhaal">'+esc(c.verhaal)+'</p>':'') : '<p class="mat">Nog geen concept uitgetekend.</p>')+
+      (sp ? '<div class="spec"><div class="spectitel">Bouwstaat</div>'+
+        (sp.delen||[]).map(m => '<div class="specrij"><b>'+esc(m.naam)+'</b><span>'+esc(m.spec)+'</span></div>').join('')+
+        '<div class="specfoot">'+esc(sp.oppervlak)+' &middot; '+esc(sp.kavel)+'</div></div>' : '')+
+    '</article>';
+  }).join('');
+  const titel = 'RTG Architectenbureau &middot; '+esc(p.naam)+(p.seizoen?' &middot; '+esc(p.seizoen):'');
+  const html = '<!doctype html><html lang="nl"><head><meta charset="utf-8">'+
+    '<meta name="viewport" content="width=device-width, initial-scale=1">'+
+    '<title>Portfolio '+esc(p.naam)+'</title><style>'+
+    ':root{--bg:#0C0C0B;--ink:#F4F1EC;--muted:rgba(244,241,236,.62);--soft:rgba(244,241,236,.4);--gold:#A98F1C;--line:rgba(244,241,236,.14);}'+
+    '*{box-sizing:border-box;margin:0;}body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.6;padding:3rem 1.4rem 5rem;}'+
+    'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}'+
+    '.wrap{max-width:820px;margin:0 auto;}'+
+    '.cover{border-bottom:1px solid var(--line);padding-bottom:1.6rem;margin-bottom:2.4rem;}'+
+    '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}'+
+    '.cover h1{font-size:2.4rem;margin:.5rem 0 .3rem;}'+
+    '.cover .sub{color:var(--muted);font-size:.9rem;}'+
+    'article{border-top:1px solid var(--line);padding:2rem 0;page-break-inside:avoid;}'+
+    'article:first-of-type{border-top:none;}'+
+    'article header{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem;}'+
+    '.nr{font-family:"Bodoni Moda",serif;font-size:1.6rem;color:var(--soft);min-width:2.4rem;}'+
+    'article h2{font-size:1.4rem;}.meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}'+
+    '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}'+
+    '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}'+
+    '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}'+
+    '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}'+
+    '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}.uit{color:var(--soft);}'+
+    '.verhaal{font-style:italic;color:var(--ink);margin-top:.8rem;font-size:.96rem;}'+
+    '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}'+
+    '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}'+
+    '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}'+
+    '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}'+
+    '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}'+
+    '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
+    '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.sw em{color:#555;}.sw b,.uit,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}article,.cover{border-color:#ddd;}}'+
+    '</style></head><body>'+
+    '<div class="balk"><span>Portfolio &middot; '+esc(p.naam)+'</span><button id="pbtn" type="button">Print / PDF</button></div>'+
+    '<div class="wrap"><div class="cover"><div class="ey">Portfolio</div><h1>'+titel+'</h1>'+
+    '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
+    secties+'</div>'+
+    '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
+    '</body></html>';
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  meld('Portfolio geopend in een nieuw tabblad.');
 }
 
 /* ---------- platform-statistieken, chat & snap, onboarding ---------- */

@@ -116,11 +116,17 @@ module.exports = (kern) => {
     schermen:         { naam: 'RTG Keuken- en kassascherm', eenmalig: 300, perMaand: 5, eenheid: 'per scherm' },
     'satelliet-pakket': { naam: 'RTG Satelliet-startpakket', eenmalig: 900, perMaand: 150, eenheid: 'per locatie' }
   };
+  /* De vaste catalogus hierboven plus de producten die RTG Hardwarelab naar de
+     winkel heeft gezet (db.data.winkelProducten). Zo verschijnen eigen
+     ontwerpen die in productie gaan naast de standaardhardware, met dezelfde
+     prijslogica (euro, ex btw). */
+  const alleProducten = () => Object.assign({}, WINKEL,
+    (db.data.winkelProducten && typeof db.data.winkelProducten === 'object') ? db.data.winkelProducten : {});
   // de prijstabel is de ene bron: de verkooppagina leest hem hiervandaan
-  app.get('/api/winkel/producten', (req, res) => res.json({ producten: WINKEL }));
+  app.get('/api/winkel/producten', (req, res) => res.json({ producten: alleProducten() }));
   app.post('/api/winkel/bestel', (req, res) => {
     const b = req.body || {};
-    const product = WINKEL[String(b.product || '')];
+    const product = alleProducten()[String(b.product || '')];
     if (!product) return res.status(400).json({ error: 'Kies een geldig product.' });
     const company = schoon(b.company, 80);
     const contactName = schoon(b.contactName, 60);

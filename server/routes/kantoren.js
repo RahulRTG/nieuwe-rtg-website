@@ -111,6 +111,8 @@ module.exports = (kern) => {
   app.post('/api/office/hardware/verwijder', officeAuth, (req, res) => veilig(res, () => kern.hardware.ontwerpVerwijder(String(req.body.id || ''))));
   app.post('/api/office/hardware/serie', officeAuth, (req, res) => veilig(res, () => kern.hardware.collectieMaak(req.body || {})));
   app.post('/api/office/hardware/productblad', officeAuth, (req, res) => veilig(res, () => kern.hardware.productblad(req.body.naam)));
+  app.post('/api/office/hardware/winkel', officeAuth, (req, res) => veilig(res, () => kern.hardware.naarWinkel(String(req.body.id || ''), req.body.prijs || req.body || {})));
+  app.post('/api/office/hardware/winkel-uit', officeAuth, (req, res) => veilig(res, () => kern.hardware.uitWinkel(String(req.body.id || ''))));
   app.post('/api/office/hardware/stuklijst', officeAuth, (req, res) => veilig(res, () => kern.hardware.aiStuklijst(String(req.body.id || ''))));
   app.post('/api/office/hardware/concept', officeAuth, async (req, res) => {
     try { const r = await kern.hardware.aiConcept(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
@@ -119,6 +121,25 @@ module.exports = (kern) => {
   app.post('/api/office/hardware/kritiek', officeAuth, async (req, res) => {
     try { const r = await kern.hardware.aiKritiek(String(req.body.id || ''), req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
     catch (e) { console.error('[hardware]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
+  /* RTG Architectenbureau: het huizen-ontwerpbureau. Zelfde vorm als de studio:
+     concepten met AI, een bouwstaat en de chef-architect, plus een portfolio
+     per project. */
+  app.post('/api/office/architect', officeAuth, (req, res) => veilig(res, () => kern.architect.overzicht()));
+  app.post('/api/office/architect/maak', officeAuth, (req, res) => veilig(res, () => kern.architect.ontwerpMaak(req.body || {})));
+  app.post('/api/office/architect/zet', officeAuth, (req, res) => veilig(res, () => kern.architect.ontwerpZet(String(req.body.id || ''), req.body || {})));
+  app.post('/api/office/architect/verwijder', officeAuth, (req, res) => veilig(res, () => kern.architect.ontwerpVerwijder(String(req.body.id || ''))));
+  app.post('/api/office/architect/project', officeAuth, (req, res) => veilig(res, () => kern.architect.collectieMaak(req.body || {})));
+  app.post('/api/office/architect/portfolio', officeAuth, (req, res) => veilig(res, () => kern.architect.portfolio(req.body.naam)));
+  app.post('/api/office/architect/bouwstaat', officeAuth, (req, res) => veilig(res, () => kern.architect.aiBouwstaat(String(req.body.id || ''))));
+  app.post('/api/office/architect/concept', officeAuth, async (req, res) => {
+    try { const r = await kern.architect.aiConcept(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[architect]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  app.post('/api/office/architect/kritiek', officeAuth, async (req, res) => {
+    try { const r = await kern.architect.aiKritiek(String(req.body.id || ''), req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[architect]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
   app.post('/api/office/doos/regie', officeAuth, (req, res) => veilig(res, () => afdelingen.doosRegie()));
   app.post('/api/office/doos/update-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosUpdateZet(req.body.versie, req.body.notities, req.body.naam)));

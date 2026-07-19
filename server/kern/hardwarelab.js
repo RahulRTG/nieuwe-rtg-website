@@ -12,6 +12,7 @@
 
 const DISCIPLINES = {
   apparaat:   { label: 'Apparaten', icon: '📱' },
+  wearable:   { label: 'Wearables', icon: '⌚' },
   scherm:     { label: 'Schermen & panelen', icon: '🖥️' },
   sensor:     { label: 'Sensoren & IoT', icon: '📡' },
   edge:       { label: 'Edge & servers', icon: '🗄️' },
@@ -37,6 +38,15 @@ const BANK = {
     onderdelen: ['Processor', 'Scherm', 'Batterij', 'Camera', 'Behuizing'],
     verbruik: 'batterij ~4.500 mAh, standby ~3 dagen, snelladen 0-50% in ~20 min',
     afmetingen: '~160 x 74 x 7,8 mm, ~185 g'
+  },
+  wearable: {
+    behuizing: ['titanium horlogekast', 'keramische smartring', 'lichtgewicht band van aluminium', 'in-ear behuizing van hars', 'monturen met titanium scharnieren'],
+    chip: ['RTG W1 wearable-SoC (5 nm)', 'zuinige RTG A0 met sensor-hub', 'RTG BioCore met hartslag-DSP', 'ultralage-energie coprocessor'],
+    materiaal: ['gerecycled titanium', 'saffierglas', 'medisch siliconen', 'keramiek', 'gerecycled aluminium'],
+    poorten: ['Bluetooth LE 5.4', 'NFC / RTG-pas', 'draadloos laden', 'huidsensoren (hartslag/SpO2)', 'ECG-elektroden', 'bewegingssensor (9-assig)'],
+    onderdelen: ['Sensorpakket', 'Rekenkern', 'Batterij', 'Radio', 'Behuizing'],
+    verbruik: 'batterij ~2-7 dagen afhankelijk van de sensoren, draadloos laden in ~50 min',
+    afmetingen: 'afhankelijk van de uitvoering; ~20-45 mm, ~8-50 g'
   },
   scherm: {
     behuizing: ['naadloos glazen paneel', 'ultradun aluminium frame', 'randloos OLED-vlak', 'gebogen ambient-display', 'e-ink hybride paneel'],
@@ -132,8 +142,49 @@ function maakHardwarelab({ db, save, crypto, anthropic, schoon }) {
       icon: (DISCIPLINES[o.discipline] || {}).icon || '🔧',
       naam: o.naam, brief: o.brief, huis: o.huis || null, collectie: o.collectie || null,
       status: o.status, concept: o.concept || null, stuklijst: o.stuklijst || null,
-      kritiek: o.kritiek || null, at: o.at, updatedAt: o.updatedAt || o.at, door: o.door || null
+      kritiek: o.kritiek || null, winkel: o.winkel || null,
+      at: o.at, updatedAt: o.updatedAt || o.at, door: o.door || null
     };
+  }
+
+  const DIAKRIET = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g');
+  function slug(s) {
+    return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(DIAKRIET, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'rtg-product';
+  }
+  function winkelStore() {
+    if (!d().winkelProducten || typeof d().winkelProducten !== 'object') d().winkelProducten = {};
+    return d().winkelProducten;
+  }
+  /* Een afgerond concept als echt product in de RTG-winkel zetten: het komt in
+     db.data.winkelProducten en verschijnt zo op de verkooppagina en in het
+     bestel-endpoint, naast de vaste catalogus. De prijs is euro, ex btw. */
+  function naarWinkel(oid, prijs) {
+    const o = vind(oid); if (!o) return { status: 404, error: 'Concept niet gevonden.' };
+    const eenmalig = Math.max(0, Math.round(Number(prijs && prijs.eenmalig) || 0));
+    const perMaand = Math.max(0, Math.round(Number(prijs && prijs.perMaand) || 0));
+    if (!eenmalig) return { status: 400, error: 'Geef een geldige eenmalige prijs (euro, ex btw).' };
+    const eenheid = scho(prijs && prijs.eenheid, 40) || 'per stuk';
+    const con = o.concept || _concept(o.discipline, o.brief, o.naam);
+    const store = winkelStore();
+    let sl = (o.winkel && o.winkel.slug) ? o.winkel.slug : slug(o.naam);
+    if (store[sl] && store[sl].concept && store[sl].concept !== o.id) sl = sl + '-' + o.id.slice(-4);
+    store[sl] = {
+      naam: o.naam, eenmalig, perMaand, eenheid,
+      bron: 'hardwarelab', concept: o.id, discipline: o.discipline,
+      disciplineLabel: (DISCIPLINES[o.discipline] || {}).label || o.discipline,
+      beschrijving: con.behuizing + ' met ' + con.chip + '.',
+      kleuren: (con.kleuren || []).slice(0, 3), at: nu()
+    };
+    o.winkel = { slug: sl, eenmalig, perMaand, eenheid, at: nu() };
+    o.updatedAt = nu(); save();
+    return { ok: true, ontwerp: publiek(o), product: store[sl], slug: sl };
+  }
+  function uitWinkel(oid) {
+    const o = vind(oid); if (!o) return { status: 404, error: 'Concept niet gevonden.' };
+    if (o.winkel && o.winkel.slug) { const store = winkelStore(); delete store[o.winkel.slug]; }
+    o.winkel = null; o.updatedAt = nu(); save();
+    return { ok: true, ontwerp: publiek(o) };
   }
 
   function _maak(data) {
@@ -285,7 +336,7 @@ function maakHardwarelab({ db, save, crypto, anthropic, schoon }) {
     return { ok: true, kritiek: o.kritiek, punten: regels, ontwerp: publiek(o) };
   }
 
-  return { hardware: { DISCIPLINES, STATUS, PALET, overzicht, ontwerpMaak, ontwerpZet, ontwerpVerwijder, collectieMaak, productblad, aiConcept, aiStuklijst, aiKritiek } };
+  return { hardware: { DISCIPLINES, STATUS, PALET, overzicht, ontwerpMaak, ontwerpZet, ontwerpVerwijder, collectieMaak, productblad, naarWinkel, uitWinkel, aiConcept, aiStuklijst, aiKritiek } };
 }
 
 module.exports = { maakHardwarelab, DISCIPLINES, STATUS };

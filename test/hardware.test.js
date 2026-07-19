@@ -31,7 +31,7 @@ test.after(() => {
 test('1. het lab staat klaar met vijf disciplines en gezaaide concepten', async () => {
   const r = await api('/api/office/hardware', {}, office);
   assert.equal(r.status, 200);
-  for (const id of ['apparaat', 'scherm', 'sensor', 'edge', 'accessoire']) {
+  for (const id of ['apparaat', 'wearable', 'scherm', 'sensor', 'edge', 'accessoire']) {
     assert.ok(r.body.disciplines.some(x => x.id === id), id + ' is een discipline');
   }
   assert.ok(r.body.ontwerpen.length >= 2, 'er staan al concepten in het lab');
@@ -100,4 +100,40 @@ test('6. productblad per serie: toegewezen concepten komen samen in een blad', a
   assert.ok(pb.body.disciplines.length >= 1, 'de betrokken disciplines staan erbij');
   assert.equal((await api('/api/office/hardware/productblad', { naam: 'Bestaat Niet' }, office)).status, 404);
   assert.equal((await api('/api/office/hardware/productblad', { naam: 'RTG Edge' }, null)).status, 401);
+});
+
+test('7. een wearable-concept met echte elektronica', async () => {
+  const mk = await api('/api/office/hardware/maak', { discipline: 'wearable', naam: 'RTG Band', brief: 'Slanke gezondheidsband, hartslag en SpO2, dagen batterij' }, office);
+  assert.equal(mk.body.ontwerp.discipline, 'wearable');
+  const con = await api('/api/office/hardware/concept', { id: mk.body.ontwerp.id }, office);
+  const c = con.body.ontwerp.concept;
+  assert.ok(c.behuizing && c.chip, 'behuizing en chip');
+  assert.ok((c.poorten || []).length >= 2, 'sensoren/aansluitingen komen mee');
+});
+
+test('8. een concept naar de winkel zetten en weer terughalen', async () => {
+  const mk = await api('/api/office/hardware/maak', { discipline: 'apparaat', naam: 'RTG Tab' }, office);
+  const oid = mk.body.ontwerp.id;
+  await api('/api/office/hardware/concept', { id: oid }, office);
+  // zonder prijs mag het niet
+  assert.equal((await api('/api/office/hardware/winkel', { id: oid, prijs: {} }, office)).status, 400);
+  const inWinkel = await api('/api/office/hardware/winkel', { id: oid, prijs: { eenmalig: 320, perMaand: 5, eenheid: 'per stuk' } }, office);
+  assert.equal(inWinkel.status, 200);
+  assert.ok(inWinkel.body.ontwerp.winkel, 'het concept is als product gemarkeerd');
+  const slug = inWinkel.body.slug;
+  // de publieke winkel-catalogus bevat het nu, naast de vaste producten
+  const cat = await (await fetch(base + '/api/winkel/producten')).json();
+  assert.ok(cat.producten[slug], 'het RTG-ontwerp staat in de winkel');
+  assert.ok(cat.producten.zaakdoos, 'de vaste catalogus staat er nog');
+  assert.equal(cat.producten[slug].bron, 'hardwarelab');
+  // en het is echt te bestellen via het bestaande bestel-endpoint
+  const best = await (await fetch(base + '/api/winkel/bestel', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ product: slug, company: 'Hotel Sol', contactName: 'Mar', email: 'mar@sol.example', aantal: 3, akkoord: true })
+  })).json();
+  assert.ok(best.ok, 'de bestelling gaat door');
+  // terughalen verwijdert het weer uit de catalogus
+  await api('/api/office/hardware/winkel-uit', { id: oid }, office);
+  const cat2 = await (await fetch(base + '/api/winkel/producten')).json();
+  assert.ok(!cat2.producten[slug], 'na terughalen is het weg uit de winkel');
 });

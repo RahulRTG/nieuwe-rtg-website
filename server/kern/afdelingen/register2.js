@@ -118,14 +118,29 @@ module.exports = (ctx) => {
     hardware: { naam: 'RTG Hardwarelab', emoji: '🔧', missie: 'Het ontwerpbureau van het kantoor voor de eigen apparaten: PDA\'s en tablets, schermen, sensoren, de zaakdoos-familie en accessoires, van eerste schets tot vrijgave.', eigenApp: true,
       kpis: () => [
         ['Concepten', tel((d().hardware || {}).ontwerpen)],
-        ['In productie', tel(lijst((d().hardware || {}).ontwerpen).filter(o => o.status === 'productie'))],
-        ['Disciplines', 5],
+        ['In de winkel', tel(lijst((d().hardware || {}).ontwerpen).filter(o => o.winkel))],
+        ['Disciplines', 6],
         ['Series', tel((d().hardware || {}).collecties)],
         ['Bijgewerkt (7d)', recent((d().hardware || {}).ontwerpen, 'updatedAt', 7)]
       ],
       lijsten: () => [
         { titel: 'Laatste concepten', items: lijst((d().hardware || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.discipline) + ', ' + String(o.status) + ')') },
         { titel: 'Verder werken', items: ['Klik op deze kamer om het Hardwarelab te openen: brief een apparaat, laat de AI het concept uittekenen, en vraag de stuklijst en de chef-engineer. Onderweg werkt de RTG Hardware PDA.'] }
+      ] },
+    /* RTG Architectenbureau: het huizen-ontwerpbureau van het kantoor (villa's,
+       penthouses, landgoederen, chalets, paviljoens). Cijfers hier; de
+       ontwerpvloer opent als eigen cockpit op deze kamer. */
+    architect: { naam: 'RTG Architectenbureau', emoji: '🏛️', missie: 'Het ontwerpbureau van het kantoor voor het gebouwde: villa\'s, penthouses, landgoederen, chalets en paviljoens, van eerste schets tot oplevering.', eigenApp: true,
+      kpis: () => [
+        ['Concepten', tel((d().architect || {}).ontwerpen)],
+        ['In realisatie', tel(lijst((d().architect || {}).ontwerpen).filter(o => o.status === 'realisatie'))],
+        ['Disciplines', 5],
+        ['Projecten', tel((d().architect || {}).collecties)],
+        ['Bijgewerkt (7d)', recent((d().architect || {}).ontwerpen, 'updatedAt', 7)]
+      ],
+      lijsten: () => [
+        { titel: 'Laatste concepten', items: lijst((d().architect || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.discipline) + ', ' + String(o.status) + ')') },
+        { titel: 'Verder werken', items: ['Klik op deze kamer om het Architectenbureau te openen: brief een huis, laat de AI het concept uittekenen, en vraag de bouwstaat en de chef-architect. Onderweg werkt de RTG Architect PDA.'] }
       ] }
   };
 };

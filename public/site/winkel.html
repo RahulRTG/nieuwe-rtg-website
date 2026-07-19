@@ -196,6 +196,11 @@
       <span class="pp"></span>
     </div>
   </div>
+  <div id="ontwerpVak" hidden>
+    <h2 style="margin-top:2.4rem;">Uit het RTG Hardwarelab</h2>
+    <p class="deck">Eigen ontwerpen die in productie zijn gegaan. Zelfde partnervoorwaarden en prijslogica (euro, ex btw).</p>
+    <div class="plank" id="ontwerpPlank"></div>
+  </div>
 </section>
 </main>
 
@@ -249,7 +254,7 @@
       'Indicatie tegen een richtkoers; gefactureerd wordt in euro (EUR ' + zd.eenmalig + ' eenmalig, EUR ' + zd.perMaand + ' per maand). ') +
       'Prijzen exclusief btw. Opzeggen kan maandelijks; de hardware blijft van u.';
     // de plank: elke kaart zijn eigen prijs en een bestelknop
-    document.querySelectorAll('#plank .product').forEach(el => {
+    document.querySelectorAll('.product[data-product]').forEach(el => {
       const p = PRODUCTEN[el.dataset.product];
       const pp = el.querySelector('.pp');
       if (!p || !pp) return;
@@ -273,9 +278,25 @@
   }
   kies.addEventListener('change', teken);
 
+  // de eigen ontwerpen (bron 'hardwarelab') krijgen hun eigen plank
+  function bouwOntwerp() {
+    const eigen = Object.entries(PRODUCTEN).filter(([, p]) => p && p.bron === 'hardwarelab');
+    const vak = $('#ontwerpVak'), plank = $('#ontwerpPlank');
+    if (!eigen.length) { vak.hidden = true; return; }
+    vak.hidden = false; plank.innerHTML = '';
+    eigen.forEach(([id, p]) => {
+      const kaart = document.createElement('div'); kaart.className = 'product'; kaart.dataset.product = id;
+      const ic = document.createElement('span'); ic.className = 'ic'; ic.textContent = '🔧'; kaart.appendChild(ic);
+      const h = document.createElement('h3'); h.textContent = p.naam; kaart.appendChild(h);
+      const beschr = document.createElement('p'); beschr.textContent = (p.disciplineLabel ? p.disciplineLabel + '. ' : '') + (p.beschrijving || 'Een eigen RTG-ontwerp.'); kaart.appendChild(beschr);
+      const pp = document.createElement('span'); pp.className = 'pp'; kaart.appendChild(pp);
+      plank.appendChild(kaart);
+    });
+  }
+
   fetch('/api/winkel/producten').then(r => r.json()).then(d => {
     if (d && d.producten && d.producten.zaakdoos) PRODUCTEN = d.producten;
-  }).catch(() => {}).finally(() => { vulKeuze(); teken(); $('#product').addEventListener('change', akkoordTekst); $('#aantal').addEventListener('input', akkoordTekst); });
+  }).catch(() => {}).finally(() => { bouwOntwerp(); vulKeuze(); teken(); $('#product').addEventListener('change', akkoordTekst); $('#aantal').addEventListener('input', akkoordTekst); });
 
   $('#f').addEventListener('submit', async (e) => {
     e.preventDefault();

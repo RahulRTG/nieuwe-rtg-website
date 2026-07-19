@@ -2718,6 +2718,10 @@ Object.assign(kern, require('./kern/studio').maakStudio({ db, save, crypto, anth
    accessoires. AI tekent het concept uit, levert een stuklijst en de blik
    van de chef-engineer. */
 Object.assign(kern, require('./kern/hardwarelab').maakHardwarelab({ db, save, crypto, anthropic, schoon }));
+/* RTG Architectenbureau (kern/architect.js): de vierde ontwerptak, voor het
+   gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. AI tekent
+   het concept uit, levert een bouwstaat en de blik van de chef-architect. */
+Object.assign(kern, require('./kern/architect').maakArchitect({ db, save, crypto, anthropic, schoon }));
 /* De hulpdiensten (kern/hulpdienst.js): zes korpsen met een meldkamer,
    eenheden over land, water en door de lucht, bijstand tussen korpsen en
    de zorgketen ambulance -> ziekenhuis -> huisarts. */

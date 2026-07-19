@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Architect PDA</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.55);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:2rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
+  select.veld{color-scheme:dark;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .chips{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem;}
+  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
+  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .swatch{width:1.6rem;height:1.6rem;border-radius:7px;border:1px solid var(--line);}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
+  .leeg{color:var(--muted);font-size:.85rem;padding:.6rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
+</style>
+</head>
+<body>
+<header>
+  <div class="ey">RTG Architectenbureau</div>
+  <h1>🏛️ Architect PDA</h1>
+</header>
+<main id="main">
+  <div class="kaart" id="briefKaart">
+    <div class="sec">Snel briefen</div>
+    <div class="rij" style="margin-bottom:.5rem;">
+      <select class="veld" id="pCat" style="flex:1;min-width:9rem;" aria-label="Discipline"></select>
+    </div>
+    <input class="veld" id="pNaam" placeholder="Naam van het concept" maxlength="100" style="margin-bottom:.5rem;">
+    <input class="veld" id="pBrief" placeholder="Brief: ligging, sfeer, gebruik" maxlength="600" style="margin-bottom:.5rem;">
+    <button class="knop" id="pMaak" style="width:100%;">✨ Concept + AI</button>
+  </div>
+  <div class="chips" id="pFilters"></div>
+  <div id="pLijst"><div class="leeg">Laden...</div></div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+if (!TOKEN) uitgelogd();
+const api = (pad, body) => fetch('/api/office/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2400); }
+
+let DATA = null, filter = '';
+async function laad(){
+  try { DATA = await api('architect'); } catch(e){ $('#pLijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const sel = $('#pCat');
+  if (!sel.options.length) sel.innerHTML = DATA.disciplines.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  render();
+}
+function statusPil(s){ const g = s==='realisatie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span class="pil" style="color:'+g+';">'+esc(s)+'</span>'; }
+function volgende(s){ const i = DATA.statussen.indexOf(s); return (i>=0 && i < DATA.statussen.length-1) ? DATA.statussen[i+1] : null; }
+function render(){
+  $('#pFilters').innerHTML = '<button class="chip'+(filter===''?' aan':'')+'" data-f="">Alle</button>' +
+    DATA.disciplines.map(c => '<button class="chip'+(filter===c.id?' aan':'')+'" data-f="'+c.id+'">'+c.icon+' '+esc(c.label)+(c.aantal?' ('+c.aantal+')':'')+'</button>').join('');
+  $('#pFilters').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; render(); }));
+  const lijst = DATA.ontwerpen.filter(o => !filter || o.discipline === filter);
+  $('#pLijst').innerHTML = lijst.length ? lijst.map(o => {
+    const c = o.concept; const nx = volgende(o.status);
+    return '<div class="kaart" style="margin-bottom:.7rem;">'+
+      '<div class="rij" style="justify-content:space-between;">'+
+        '<h2 style="font-size:1.02rem;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+statusPil(o.status)+'</div>'+
+      '<div style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem;">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+'</div>'+
+      (c ? '<div class="rij" style="margin-bottom:.4rem;">'+(c.kleuren||[]).map(k => '<span class="swatch" title="'+esc(k.naam)+'" style="background:'+esc(k.hex)+';"></span>').join('')+'</div>'+
+        '<div style="font-size:.82rem;line-height:1.55;"><b>'+esc(c.typologie)+'</b> · '+esc(c.constructie)+'</div>'
+        : '<div class="leeg">Nog geen concept.</div>')+
+      (o.kritiek ? '<div style="margin-top:.45rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.8rem;line-height:1.5;">'+esc(o.kritiek)+'</div>' : '')+
+      '<div class="rij" style="margin-top:.6rem;">'+
+        '<button class="knop stil" data-concept="'+o.id+'">'+(c?'Herteken':'✨ Teken')+'</button>'+
+        '<button class="knop stil" data-kritiek="'+o.id+'">Kritiek</button>'+
+        (nx?'<button class="knop" data-next="'+o.id+'" data-s="'+nx+'" style="margin-left:auto;">→ '+nx+'</button>':'')+
+      '</div></div>';
+  }).join('') : '<div class="leeg">Geen concepten in deze discipline.</div>';
+  bind();
+}
+function vervang(o){ const i = DATA.ontwerpen.findIndex(x => x.id === o.id); if (i>=0) DATA.ontwerpen[i] = o; render(); }
+function bind(){
+  document.querySelectorAll('[data-concept]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = 'Tekent...';
+    try { vervang((await api('architect/concept', { id: b.dataset.concept })).ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  document.querySelectorAll('[data-kritiek]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = '...';
+    try { vervang((await api('architect/kritiek', { id: b.dataset.kritiek })).ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', async () => {
+    try { vervang((await api('architect/zet', { id: b.dataset.next, status: b.dataset.s })).ontwerp); meld('Naar '+b.dataset.s); } catch(e){ meld(e.message); }
+  }));
+}
+$('#pMaak').addEventListener('click', async () => {
+  const naam = $('#pNaam').value.trim(); if (!naam){ meld('Geef het concept een naam.'); return; }
+  try {
+    const r = await api('architect/maak', { discipline: $('#pCat').value, naam, brief: $('#pBrief').value.trim() });
+    $('#pNaam').value = ''; $('#pBrief').value = '';
+    DATA.ontwerpen.unshift(r.ontwerp);
+    try { vervang((await api('architect/concept', { id: r.ontwerp.id })).ontwerp); } catch(e){ render(); }
+    meld('Concept aangemaakt; de chef-architect tekent het uit.');
+  } catch(e){ meld(e.message); }
+});
+laad();
+</script>
+</body>
+</html>

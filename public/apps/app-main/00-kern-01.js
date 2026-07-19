@@ -120,7 +120,11 @@
     try {
       const res = await fetch('/api' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API.token }, body: JSON.stringify(body || {}) });
       if (!res.ok) throw new Error('fout');
-      const url = URL.createObjectURL(await res.blob());
+      const blob = await res.blob();
+      // het eigen toestel als opslag: elke download krijgt stil een kopie in
+      // de Toestelkluis (OPFS), zodat het exemplaar van het lid lokaal blijft
+      if (window.Toestelkluis) Toestelkluis.bewaar(filename, blob).catch(() => {});
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     } catch(e){ toast(T('fin.dlfout','Downloaden lukte niet.')); }

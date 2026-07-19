@@ -2802,6 +2802,13 @@ Object.assign(kern, require('./kern/synergie').maakSynergie({
   db, save, crypto, schoon, findSupplier, notifySupplier, pay: kern.pay
 }));
 
+/* RTG Balans (kern/balans.js): Rahul kijkt naar agenda, rooster en
+   eetpatroon en adviseert ook eens niks: rust, hobby's, ontprikkelen;
+   zonder dwang en zonder iets nieuws over het lid vast te leggen. */
+Object.assign(kern, require('./kern/balans').maakBalans({
+  db, zorgVan: kern.zorgVan, klokVan
+}));
+
 /* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
    Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
    hercompressie) en staan als bestanden in de datamap, nooit in git. */
@@ -2846,6 +2853,7 @@ require('./routes/stuur')(kern);
 require('./routes/vonk')(kern);
 require('./routes/voorspel')(kern);
 require('./routes/synergie')(kern);
+require('./routes/balans')(kern);
 require('./routes/account')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.

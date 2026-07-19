@@ -2151,7 +2151,8 @@
     ov:          { naam: 'OV',           icoon: '🚌', url: '/apps/ov.html' },
     clips:       { naam: 'Clips',        icoon: '🎥', url: '/apps/clips.html' },
     office:      { naam: 'RTG Office',   icoon: '📊', url: '/apps/office.html' },
-    vonk:        { naam: 'Vonk',         icoon: '💘', url: '/apps/vonk.html' }
+    vonk:        { naam: 'Vonk',         icoon: '💘', url: '/apps/vonk.html' },
+    balans:      { naam: 'Balans',       icoon: '🌿', url: '/apps/balans.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -2182,6 +2183,7 @@
       'link:podium',
       'link:clips',
       'link:vonk',
+      'link:balans',
       'link:flits',
       'link:theater',
       'link:wbw',
@@ -2659,6 +2661,13 @@
      elke app exact dezelfde tijd toont: Bodoni-cijfers met seconden en
      milliseconden. De elementen dragen data-rtg-klok / data-rtg-datum. */
   if (window.RTGKlok) RTGKlok.alles();
+
+  /* Een app (zoals Balans) kan met #ai terugverwijzen naar de Rahul-chat:
+     na het opstarten openen we dan meteen de AI-tab. */
+  if (location.hash === '#ai') setTimeout(() => {
+    const t = document.querySelector('.os-app[data-tab="ai"]');
+    if (t) t.click();
+  }, 600);
 
   /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
   const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');

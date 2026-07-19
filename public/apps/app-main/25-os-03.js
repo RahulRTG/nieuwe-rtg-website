@@ -167,6 +167,13 @@
      milliseconden. De elementen dragen data-rtg-klok / data-rtg-datum. */
   if (window.RTGKlok) RTGKlok.alles();
 
+  /* Een app (zoals Balans) kan met #ai terugverwijzen naar de Rahul-chat:
+     na het opstarten openen we dan meteen de AI-tab. */
+  if (location.hash === '#ai') setTimeout(() => {
+    const t = document.querySelector('.os-app[data-tab="ai"]');
+    if (t) t.click();
+  }, 600);
+
   /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
   const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');
   if (bat && navigator.getBattery) {

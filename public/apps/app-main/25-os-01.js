@@ -36,7 +36,8 @@
     ov:          { naam: 'OV',           icoon: '🚌', url: '/apps/ov.html' },
     clips:       { naam: 'Clips',        icoon: '🎥', url: '/apps/clips.html' },
     office:      { naam: 'RTG Office',   icoon: '📊', url: '/apps/office.html' },
-    vonk:        { naam: 'Vonk',         icoon: '💘', url: '/apps/vonk.html' }
+    vonk:        { naam: 'Vonk',         icoon: '💘', url: '/apps/vonk.html' },
+    balans:      { naam: 'Balans',       icoon: '🌿', url: '/apps/balans.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -67,6 +68,7 @@
       'link:podium',
       'link:clips',
       'link:vonk',
+      'link:balans',
       'link:flits',
       'link:theater',
       'link:wbw',

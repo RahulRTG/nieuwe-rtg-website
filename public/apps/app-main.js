@@ -3059,7 +3059,19 @@
     }
     let prof;
     try { prof = await API.call('/fluister/profiel'); } catch(e){ el.innerHTML = ''; return; }
+    // de voorspeller: RTG leert uw ritme en zet de beste verwachting klaar
+    let vw = null;
+    try { vw = await API.call('/voorspel'); } catch(e){}
+    const v = vw && (vw.verwachtingen || [])[0];
     el.innerHTML =
+      (v
+        ? '<div class="live-start" style="margin-bottom:0.8rem;">' +
+            '<div class="lh">🔮 ' + T('vs.h','Rahul verwacht') + '</div>' +
+            '<div class="ld">' + esc(v.wat) + ' · ' + esc(v.waarom) + '. ' +
+              T('vs.d','Klopt het niet, dan negeert u dit gewoon; Rahul leert vanzelf bij.') + '</div>' +
+            '<button class="chip js-vsdoe" style="margin-top:0.5rem;">🤵 ' + T('vs.doe','Laat Rahul het klaarzetten') + '</button>' +
+          '</div>'
+        : '') +
       '<div class="live-start" style="margin-bottom:0.8rem;">' +
         '<div class="lh">🤵 ' + T('fl.h','Wat Rahul weet en ziet') + '</div>' +
         '<div class="ld">' + T('fl.d','Hij onthoudt wat u vertelt ("onthoud dat..."), leert van wat u gebruikt en regelt alles in de chat hieronder: zoeken, reserveren, bestellen en afrekenen, uw 24 uur, een Tik of betaalverzoek. Vraag "wat kun je" voor het hele overzicht; geld gaat nooit zonder uw "ja" de deur uit.') + '</div>' +
@@ -3077,6 +3089,10 @@
       '</div>';
     el.querySelectorAll('.js-flweg').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/fluister/vergeet', { wat: Number(b.dataset.i) }); renderFluister(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.js-vsdoe').forEach(b => b.addEventListener('click', () => {
+      const tegel = document.querySelector('.os-app[data-tab="ai"]'); if (tegel) tegel.click();
+      if (typeof ask === 'function') ask(v.vraag);
     }));
   }
 

@@ -2790,6 +2790,11 @@ Object.assign(kern, require('./kern/vonk').maakVonk({
   db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
   haversine, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
 }));
+/* De voorspeller (kern/voorspel.js): leert het ritme van elk lid en elke
+   zaak uit het RTG Pay-grootboek (de ene bron waar elke app in boekt) en
+   zet verwachtingen klaar voor de apps en voor Rahul. */
+Object.assign(kern, require('./kern/voorspel').maakVoorspel({ db, findSupplier }));
+
 /* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
    Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
    hercompressie) en staan als bestanden in de datamap, nooit in git. */
@@ -2832,6 +2837,7 @@ require('./routes/clips')(kern);
 require('./routes/kantoorpakket')(kern);
 require('./routes/stuur')(kern);
 require('./routes/vonk')(kern);
+require('./routes/voorspel')(kern);
 require('./routes/account')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.

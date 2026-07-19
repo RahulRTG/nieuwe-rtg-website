@@ -26,6 +26,17 @@
           (b.alerts.length ? b.alerts.map(a =>
             '<div class="st-row"><span>'+(a.level==='rood'?'🔴':a.level==='amber'?'🟠':'🟢')+' '+a.text+'</span></div>').join('')
             : '<div class="tkc-who">✓ '+T('bz.niks','Alles loopt. Vastgelopen bestellingen, wachtende gasten en open personeelszaken verschijnen hier vanzelf.')+'</div>')+'</div>';
+        // de voorspeller: eerlijk vooruitkijken op basis van het eigen ritme
+        if (vwData && vwData.ok){
+          const m = vwData.morgen;
+          html += '<div class="tkc" style="grid-column:1/-1;"><h3>🔮 '+T('vw.h','Verwachting voor morgen')+'</h3>'+
+            (m
+              ? '<div class="tkc-who">'+T('vw.d','Op basis van uw eigen ritme van de afgelopen weken')+' ('+vwData.weken+' '+T('vw.weken','weken geschiedenis')+'): '+
+                  '<b>'+m.verwachtTransacties+'</b> '+T('vw.trans','transacties')+' · <b>'+eur(m.verwachtCenten)+'</b> '+T('vw.omzet','omzet')+' ('+m.dagNaam+').'+
+                  (m.drukUren.length ? ' '+T('vw.druk','Drukste uren')+': '+m.drukUren.map(u => u.uur+':00').join(', ')+'.' : '')+
+                  ((vwData.vasteGasten||[]).length ? ' '+T('vw.gast','Vaste gasten')+': '+vwData.vasteGasten.map(g => g.codenaam).join(', ')+'.' : '')+'</div>'
+              : '<div class="tkc-who">'+(vwData.uitleg||'')+'</div>')+'</div>';
+        }
         // baas over uw zaak: elke functie aan of uit; alleen app-betalen heeft
         // bewust geen knop, wel kiest u het moment (vooraf of achteraf)
         const caps2 = (S && S.caps) || [];

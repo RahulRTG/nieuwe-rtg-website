@@ -12,6 +12,15 @@
    stuur, en de apps tonen de beste verwachting als stille kaart. */
 const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
+/* puur: het stille seintje. Alleen als de beste gewoonte echt rijp is
+   (het gebruikelijke ritme is bijna of helemaal verstreken) fluistert de
+   voorspeller een keer mee in "Rahul ziet"; nooit een schreeuwende melding. */
+function seintjeVoor(voorLidResultaat) {
+  const v = voorLidResultaat && (voorLidResultaat.verwachtingen || [])[0];
+  if (!v || v.rijp < 0.6 || v.zekerheid < 0.2) return null;
+  return { icoon: '\u{1F52E}', tekst: 'Rond deze tijd, als u wilt: ' + v.wat + ' (' + v.waarom + ')' };
+}
+
 function modus(arr) {
   const tel = {}; let beste = arr[0], n = 0;
   for (const x of arr) { tel[x] = (tel[x] || 0) + 1; if (tel[x] > n) { n = tel[x]; beste = x; } }
@@ -44,7 +53,7 @@ function gewoontenUit(rijen, rek, nu = new Date()) {
       code, n: rs.length, uur: uur.waarde, dag: dag.waarde, dagNaam: DAGEN[dag.waarde],
       tussenDagen: +tussenDagen.toFixed(2), sindsDagen: +sindsDagen.toFixed(2),
       gemCenten: Math.round(rs.reduce((s, r) => s + r.centen, 0) / rs.length),
-      zekerheid: +zekerheid.toFixed(2)
+      rijp: +rijp.toFixed(2), zekerheid: +zekerheid.toFixed(2)
     });
   }
   return lijst.sort((a, b) => b.zekerheid - a.zekerheid);
@@ -59,7 +68,7 @@ function maakVoorspel({ db, findSupplier }) {
     const rijen = boek().filter(r => r.van === rek).slice(0, 400);
     const gewoonten = gewoontenUit(rijen, rek, nu);
     const verwachtingen = gewoonten.slice(0, 3).map(g => ({
-      zaak: naamVan(g.code), code: g.code, zekerheid: g.zekerheid,
+      zaak: naamVan(g.code), code: g.code, zekerheid: g.zekerheid, rijp: g.rijp,
       wat: naamVan(g.code) + ' rond ' + g.uur + ':00' +
         (g.tussenDagen >= 4 ? ', meestal op ' + g.dagNaam : ''),
       waarom: g.n + ' eerdere bezoeken, gemiddeld elke ' +
@@ -93,19 +102,23 @@ function maakVoorspel({ db, findSupplier }) {
     for (const r of rijen) { const c = r.van.slice(4); perGast[c] = (perGast[c] || 0) + 1; }
     const vasteGasten = Object.entries(perGast).filter(([, n]) => n >= 2)
       .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([c, n]) => ({ codenaam: c, n }));
+    const advies = drukUren.length
+      ? 'Plan de bezetting rond ' + drukUren.map(u => u.uur + ':00').join(' en ') +
+        ' en zet de voorbereiding ruim daarvoor klaar.'
+      : 'Nog geen duidelijke piek op deze weekdag; het beeld groeit met elke transactie.';
     return {
       ok: true, geleerdUit: rijen.length, weken: +weken.toFixed(1),
       morgen: {
         dagNaam: DAGEN[morgenDag],
         verwachtTransacties: Math.round(opDag.length / weken),
         verwachtCenten: Math.round(opDag.reduce((s, r) => s + r.centen, 0) / weken),
-        drukUren
+        drukUren, advies
       },
       vasteGasten
     };
   }
 
-  return { voorspel: { voorLid, voorZaak, gewoontenUit } };
+  return { voorspel: { voorLid, voorZaak, gewoontenUit, seintjeVoor } };
 }
 
-module.exports = { maakVoorspel, gewoontenUit, DAGEN };
+module.exports = { maakVoorspel, gewoontenUit, seintjeVoor, DAGEN };

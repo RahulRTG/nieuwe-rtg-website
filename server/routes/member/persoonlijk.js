@@ -57,7 +57,12 @@ app.post('/api/fluister', auth, async (req, res) => {
 app.post('/api/fluister/profiel', auth, (req, res) => {
   // nieuwe seintjes worden meteen ook een melding op het toestel (met dedupe)
   fluisterPush(req.session.key);
-  res.json(fluisterProfiel(req.session.key));
+  const p = fluisterProfiel(req.session.key);
+  // de voorspeller fluistert stil mee: alleen een rijpe gewoonte wordt een
+  // seintje in "Rahul ziet", nooit een melding op het toestel
+  const vs = kern.voorspel && kern.voorspel.seintjeVoor(kern.voorspel.voorLid(liveCodename(req.session)));
+  if (vs) p.seintjes = [vs].concat(p.seintjes || []).slice(0, 5);
+  res.json(p);
 });
 app.post('/api/fluister/onthoud', auth, (req, res) => {
   const r = fluisterOnthoud(req.session.key, req.body.tekst);

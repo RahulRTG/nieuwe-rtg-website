@@ -8,7 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
-const { gewoontenUit } = require('../server/kern/voorspel.js');
+const { gewoontenUit, seintjeVoor } = require('../server/kern/voorspel.js');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-voorspel-'));
 let srv, base, lid, zaak;
@@ -57,6 +57,23 @@ test('het pure leren: minder dan drie bezoeken is geen gewoonte', () => {
   assert.equal(gewoontenUit(rijen, rek).length, 0);
 });
 
+test('het stille seintje: alleen een rijpe gewoonte fluistert mee', () => {
+  const basis = { wat: 'Sal de Mar rond 20:00', waarom: '6 eerdere bezoeken', zekerheid: 0.5 };
+  const rijp = seintjeVoor({ verwachtingen: [{ ...basis, rijp: 0.9 }] });
+  assert.ok(rijp && rijp.tekst.includes('Sal de Mar'), 'rijp wordt een seintje');
+  assert.equal(seintjeVoor({ verwachtingen: [{ ...basis, rijp: 0.1 }] }), null, 'vers bezoek blijft stil');
+  assert.equal(seintjeVoor({ verwachtingen: [] }), null, 'geen gewoonte, geen seintje');
+});
+
+test('het pure leren: een rijpe weekgewoonte krijgt een hoge rijpheid', () => {
+  const rek = 'lid:X';
+  const rijen = ['2026-06-26', '2026-07-03', '2026-07-10'].map((d, i) => ({
+    at: d + 'T20:0' + i + ':00.000Z', van: rek, naar: 'partner:KIKUNOI', centen: 8000
+  }));
+  const g = gewoontenUit(rijen, rek, new Date('2026-07-17T12:00:00.000Z'));
+  assert.ok(g[0].rijp >= 0.9, 'bijna een week later is de gewoonte rijp (rijp=' + g[0].rijp + ')');
+});
+
 test('lid zonder geschiedenis krijgt een eerlijk "nog te weinig"', async () => {
   const r = await api('/api/voorspel', {}, lid);
   assert.equal(r.status, 200);
@@ -90,10 +107,18 @@ test('de zaak ziet een eerlijke morgen-verwachting met vaste gasten', async () =
   if (r.body.morgen) {
     assert.ok(typeof r.body.morgen.verwachtTransacties === 'number');
     assert.ok(Array.isArray(r.body.morgen.drukUren));
+    assert.ok(typeof r.body.morgen.advies === 'string' && r.body.morgen.advies.length > 0, 'werkvloer-advies aanwezig');
     assert.ok(Array.isArray(r.body.vasteGasten));
   } else {
     assert.match(r.body.uitleg, /te weinig/i);
   }
+});
+
+test('het profiel-endpoint blijft gezond met de voorspeller erbij', async () => {
+  const r = await api('/api/fluister/profiel', {}, lid);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.ok, true);
+  assert.ok(Array.isArray(r.body.seintjes), 'seintjes is een lijst');
 });
 
 test('beide paden zijn dicht zonder inlog', async () => {

@@ -160,6 +160,7 @@ if (!TOKEN) {
 
 const TABS = [['melden','Melden'],['burger','Burgerzaken'],['verg','Vergunningen'],['info','Afval & meer']];
 function toon(t){
+  document.body.dataset.tab = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
   ['melden','burger','verg','info'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'info') { laadAfval(); laadBelasting(); laadBekend(); }
@@ -307,6 +308,7 @@ async function laadBekend(){
 <button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
+  <div class="rahulsug" id="rahulSug"></div>
   <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
   <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Bijv. meld een kapotte lantaarn bij de haven" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
 </section>
@@ -321,19 +323,34 @@ async function laadBekend(){
 .rahulrij{display:flex;gap:.4rem;}
 .rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:10px;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
 .rahulgo{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
+.rahulsug{display:flex;gap:.35rem;flex-wrap:wrap;}
+.rahulsug button{background:var(--bg,#0C0C0B);border:1px solid var(--gold);color:var(--txt,#eee);border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
 </style>
 <script>(function(){
   var tok=null; try{tok=localStorage.getItem('rtg_member_token');}catch(e){}
   var fab=document.getElementById('rahulFab'), sheet=document.getElementById('rahulSheet');
-  var uit=document.getElementById('rahulUit'), form=document.getElementById('rahulForm'), inp=document.getElementById('rahulIn');
+  var uit=document.getElementById('rahulUit'), form=document.getElementById('rahulForm'), inp=document.getElementById('rahulIn'), sug=document.getElementById('rahulSug');
   if(!tok){ if(fab) fab.style.display='none'; return; }
-  fab.addEventListener('click',function(){ sheet.hidden=false; fab.style.display='none'; inp.focus(); if(!uit.textContent) uit.textContent='Zeg wat je wilt. Ik meld, plan een afspraak of vraag een vergunning aan, met jouw eigen inlog.'; });
-  document.getElementById('rahulSluit').addEventListener('click',function(){ sheet.hidden=true; fab.style.display=''; });
-  form.addEventListener('submit',function(ev){ ev.preventDefault(); var q=inp.value.trim(); if(!q) return; inp.value=''; uit.textContent='Rahul denkt na...';
+  var SUG = {
+    melden: ['Meld een kapotte lantaarn bij de haven', 'Meld zwerfafval in mijn straat', 'Wat is de status van mijn meldingen?'],
+    burger: ['Plan een afspraak voor mijn paspoort', 'Geef mijn verhuizing door', 'Welke afspraken heb ik openstaan?'],
+    verg: ['Vraag een evenementenvergunning aan', 'Vraag een terrasvergunning aan', 'Hoe staat mijn aanvraag ervoor?'],
+    info: ['Wanneer wordt mijn afval opgehaald?', 'Betaal mijn gemeenteaanslag', 'Vraag grofvuil op']
+  };
+  function stuur(q){ inp.value=''; uit.textContent='Rahul denkt na...';
     fetch('/api/fluister',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({q:q})})
       .then(function(r){return r.json();}).then(function(d){ uit.textContent=(d&&(d.antwoord||d.error))||'Ik kwam er niet uit.'; })
       .catch(function(){ uit.textContent='Er ging iets mis. Probeer het opnieuw.'; });
-  });
+  }
+  function vulSug(){
+    var lijst = SUG[document.body.dataset.tab] || SUG.melden;
+    sug.innerHTML = '';
+    lijst.forEach(function(s){ var b=document.createElement('button'); b.type='button'; b.textContent=s;
+      b.addEventListener('click',function(){ stuur(s); }); sug.appendChild(b); });
+  }
+  fab.addEventListener('click',function(){ sheet.hidden=false; fab.style.display='none'; vulSug(); inp.focus(); if(!uit.textContent) uit.textContent='Zeg wat je wilt, of tik een suggestie. Ik meld, plan een afspraak of vraag een vergunning aan, met jouw eigen inlog.'; });
+  document.getElementById('rahulSluit').addEventListener('click',function(){ sheet.hidden=true; fab.style.display=''; });
+  form.addEventListener('submit',function(ev){ ev.preventDefault(); var q=inp.value.trim(); if(!q) return; stuur(q); });
 })();</script>
 </body>
 </html>

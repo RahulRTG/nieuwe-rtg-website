@@ -214,3 +214,23 @@ test('12. Koppeling RDW: een geregistreerd kenteken is bekend met APK-status, ee
   // te kort kenteken wordt geweigerd
   assert.equal((await api(base, '/api/overheid/rdw/check', { kenteken: 'AB' }, lid)).status, 400);
 });
+
+test('13. RDW-vloot: een huurauto uit het aanbod is bij de RDW bekend met APK-status', async () => {
+  const aanbod = await api(base, '/api/verhuur/aanbod', {}, lid);
+  assert.equal(aanbod.status, 200);
+  const autos = (aanbod.body.partners || []).flatMap(p => p.autos || []);
+  assert.ok(autos.length, 'er is verhuuraanbod');
+  const metApk = autos.find(a => a.apk && a.apk.bekend);
+  assert.ok(metApk, 'minstens één huurauto is in het RDW-register gezet (registreerVloot)');
+  assert.ok('geldig' in metApk.apk && metApk.apk.apkTot, 'de APK-status komt mee');
+  // en de losse RDW-check op datzelfde kenteken bevestigt het
+  const chk = await api(base, '/api/overheid/rdw/check', { kenteken: metApk.plate }, lid);
+  assert.equal(chk.body.bekend, true);
+});
+
+test('14. Rahul-aangiftehulp: uit een omschrijving haalt de AI inkomen en aftrek', async () => {
+  const d = await api(base, '/api/overheid/aangifte/advies', { tekst: 'Ik verdien 48000 bruto en had 3200 aftrek' }, lid);
+  assert.equal(d.status, 200);
+  assert.equal(d.body.inkomen, 48000);
+  assert.equal(d.body.aftrek, 3200);
+});

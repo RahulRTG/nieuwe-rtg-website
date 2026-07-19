@@ -2,7 +2,7 @@
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    routes/member/voertuigen.js. */
 module.exports = (vctx) => {
-  const { app, auth, crypto, db, eisAccount,
+  const { app, auth, crypto, db, eisAccount, overheid,
     express, findSupplier, geborenVan, leeftijdVan, liveCodename,
     notifySupplier, save, schoon, sseToOffice, sseToSupplier,
     salonZichtbaar, ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken,
@@ -25,11 +25,20 @@ function mijnHuur(req, res) {
 }
 function huurFotos(ref) { return db.data.huurFotos[ref] = db.data.huurFotos[ref] || { voor: [], na: [] }; }
 
+// APK-status uit het RDW-register (gevuld door kern/overheid.registreerVloot)
+function apkVan(plate) {
+  const kt = String(plate || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (kt.length < 4) return null;
+  const v = (db.data.rijkVoertuigen || []).find(x => x.kenteken === kt);
+  if (!v) return null;
+  return { bekend: true, apkTot: v.apkTot, geldig: !v.geschorst && v.apkTot >= new Date().toISOString().slice(0, 10) };
+}
 app.post('/api/verhuur/aanbod', auth, (req, res) => {
+  if (overheid && overheid.registreerVloot) overheid.registreerVloot(); // idempotent: vloot in het RDW-register
   const partners = db.data.suppliers
     .filter(s => (s.type === 'verhuur' || s.type === 'tweewielers') && (s.autos || []).some(a => a.actief !== false) && salonZichtbaar(s))
     .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null,
-      autos: (s.autos || []).filter(a => a.actief !== false).slice(0, 40) }));
+      autos: (s.autos || []).filter(a => a.actief !== false).slice(0, 40).map(a => ({ ...a, apk: apkVan(a.plate) })) }));
   res.json({ partners });
 });
 

@@ -26,7 +26,7 @@ module.exports = (kern) => {
     salonZichtbaar, ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken,
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
-    avTeken, avMijnDeals, zorgVoor, zorgContact, media,
+    avTeken, avMijnDeals, zorgVoor, zorgContact, media, overheid: kern.overheid,
     boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn };
   require('./voertuigen/huur')(vctx);
   require('./voertuigen/charter')(vctx);

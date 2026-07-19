@@ -2755,6 +2755,9 @@ kern.gemeente.seed();
 Object.assign(kern, require('./kern/overheid').maakOverheid({ db, save, crypto, anthropic,
   findSupplier, notify, notifySupplier, sseToSupplier }));
 kern.overheid.seed();
+// de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
+// kenteken-check op een huurauto de APK-status teruggeeft
+kern.overheid.registreerVloot();
 /* RTG contentbescherming (kern/drm.js): de DRM-route (Encrypted Media
    Extensions, Clear Key door RTG zelf bediend) voor de beschermde media. */
 Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));

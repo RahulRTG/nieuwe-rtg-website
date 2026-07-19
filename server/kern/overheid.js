@@ -345,6 +345,27 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
     seed();
     return { ok: true, inschrijvingen: (db.data.rijkKvk || []).slice(0, 300).map(k => ({ ...publiekeKvk(k), houder: k.houder, viaOnderneming: !!k.supplierCode })) };
   }
+  // de vloot van RTG (autoverhuur, tweewielers) in het RDW-register zetten, zodat
+  // een kenteken-check op een huurauto "bekend" met een APK-datum teruggeeft
+  function registreerVloot() {
+    seed();
+    let n = 0;
+    const bestaat = new Set((db.data.rijkVoertuigen || []).map(v => v.kenteken));
+    for (const s of (db.data.suppliers || [])) {
+      if (s.type !== 'verhuur' && s.type !== 'tweewielers') continue;
+      for (const a of (s.autos || [])) {
+        const kt = String(a.plate || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (kt.length < 4 || bestaat.has(kt)) continue;
+        const h = hash(kt);
+        const apk = new Date(); apk.setMonth(apk.getMonth() + 7 + (h % 11));
+        db.data.rijkVoertuigen.unshift({ id: id(), key: null, vloot: s.code, kenteken: kt,
+          merk: a.name || s.name, bouwjaar: 2018 + (h % 7), apkTot: apk.toISOString().slice(0, 10), geschorst: false, at: nu() });
+        bestaat.add(kt); n++;
+      }
+    }
+    if (n) { db.data.rijkVoertuigen = db.data.rijkVoertuigen.slice(0, 60000); save(); }
+    return n;
+  }
   // RDW-controle op een kenteken; door autoverhuur/OV te hergebruiken vóór verhuur/inzet
   function rdwCheck(kenteken) {
     seed();
@@ -563,8 +584,13 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
   function regelAangifte(tekst) {
     const t = String(tekst || '');
     const num = re => { const m = t.match(re); return m ? eur(m[1].replace(/[.\s]/g, '')) : 0; };
-    const inkomen = num(/(?:verdien|inkomen|salaris|bruto)[^\d]{0,12}(\d[\d.\s]{2,})/i) || num(/(\d[\d.\s]{3,})/);
-    const aftrek = num(/(?:aftrek|hypotheek|zorgkosten|gift)[^\d]{0,12}(\d[\d.\s]{2,})/i);
+    const alle = (t.match(/\d[\d.\s]{2,}/g) || []).map(x => eur(x.replace(/[.\s]/g, '')));
+    let inkomen = num(/(?:verdien|inkomen|salaris|bruto)[^\d]{0,12}(\d[\d.\s]{2,})/i);
+    // aftrek staat vaak vóór of ná het trefwoord ("3200 aftrek" of "aftrek 3200")
+    let aftrek = num(/(\d[\d.\s]{2,})[^\d]{0,14}(?:aftrek|hypotheek|zorgkost|gift)/i)
+      || num(/(?:aftrek|hypotheek|zorgkosten|gift)[^\d]{0,14}(\d[\d.\s]{2,})/i);
+    if (!inkomen && alle.length) inkomen = Math.max.apply(null, alle);
+    if (!aftrek && alle.length > 1) aftrek = [...alle].sort((a, b) => b - a)[1];
     return { inkomen, aftrek };
   }
   async function aangifteAdvies(tekst) {
@@ -594,7 +620,7 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
       provincieSubsidies, subsidieAanvraag, mijnSubsidies,
       waterschapMijn, waterschapBetaal, waterMeld, mijnWaterMeldingen,
       // koppelingen met de rest van het ecosysteem
-      kvkVoorSupplier, kvkZorg, kvkLijst, rdwCheck,
+      kvkVoorSupplier, kvkZorg, kvkLijst, rdwCheck, registreerVloot,
       // ambtenaren
       regie, toeslagenLijst, toeslagBeslis, uitkeringenLijst, uitkeringBeslis,
       bezwarenLijst, bezwaarBeslis, bekendmakingMaak, verkiezingSluit,

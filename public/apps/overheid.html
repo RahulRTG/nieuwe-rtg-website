@@ -80,6 +80,11 @@
       </div>
       <div class="lbl">Al ingehouden loonheffing (€, optioneel)</div>
       <input class="veld" id="ibIngehouden" inputmode="numeric" placeholder="Leeg = schatting">
+      <div style="margin-top:.7rem;border-top:1px solid var(--line);padding-top:.6rem;">
+        <div class="lbl" style="color:var(--gold);">✨ Laat Rahul het invullen</div>
+        <textarea class="veld" id="ibAi" maxlength="300" placeholder="Bijv. ik verdien 48.000 bruto en had 3.200 aan hypotheekrente"></textarea>
+        <button class="knop stil" id="ibAiGo" style="margin-top:.5rem;width:auto;">Rahul vult de velden in</button>
+      </div>
       <div id="ibUit" style="margin-top:.8rem;"></div>
       <div class="rij" style="margin-top:.8rem;">
         <button class="knop stil" id="ibBereken" style="width:auto;">Bereken</button>
@@ -230,6 +235,7 @@ function chips(host, map, huidig, set){
   $(host).querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { set(b.dataset.k); $(host).querySelectorAll('.chip').forEach(x => x.classList.toggle('aan', x===b)); }));
 }
 function toon(t){
+  document.body.dataset.tab = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
   TABS.forEach(([x]) => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'box') laadBox();
@@ -275,6 +281,18 @@ function toonUit(u, host){
     '<div class="bedrag '+(t?'terug':(u.saldo>0?'bij':''))+'">€ '+Math.abs(u.saldo)+'</div>'+
     '<div class="meta">Belastbaar € '+u.belastbaar+' · belasting € '+u.belasting+' · heffingskorting € '+u.heffingskorting+' · ingehouden € '+u.ingehouden+'</div>';
 }
+$('#ibAiGo').addEventListener('click', async () => {
+  const tekst = $('#ibAi').value.trim();
+  if (tekst.length < 6){ meld('Vertel Rahul kort over je inkomen.'); return; }
+  const btn = $('#ibAiGo'); btn.disabled = true; btn.textContent = 'Rahul leest mee…';
+  try { const d = await api('/api/overheid/aangifte/advies', { tekst });
+    if (d.inkomen) $('#ibInkomen').value = d.inkomen;
+    if (d.aftrek) $('#ibAftrek').value = d.aftrek;
+    const r = await api('/api/overheid/belasting/bereken', { inkomen: $('#ibInkomen').value, aftrek: $('#ibAftrek').value, ingehouden: $('#ibIngehouden').value });
+    toonUit(r.uitkomst, '#ibUit'); meld('Rahul heeft de velden ingevuld. Controleer en dien in.');
+  } catch(e){ meld(e.message); }
+  btn.disabled = false; btn.textContent = 'Rahul vult de velden in';
+});
 $('#ibBereken').addEventListener('click', async () => {
   try { const d = await api('/api/overheid/belasting/bereken', { inkomen: $('#ibInkomen').value, aftrek: $('#ibAftrek').value, ingehouden: $('#ibIngehouden').value }); toonUit(d.uitkomst, '#ibUit'); }
   catch(e){ meld(e.message); }
@@ -447,6 +465,7 @@ async function laadBekend(){
 <button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
+  <div class="rahulsug" id="rahulSug"></div>
   <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
   <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Bijv. doe mijn aangifte met inkomen 48000" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
 </section>
@@ -461,19 +480,39 @@ async function laadBekend(){
 .rahulrij{display:flex;gap:.4rem;}
 .rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:10px;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
 .rahulgo{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
+.rahulsug{display:flex;gap:.35rem;flex-wrap:wrap;}
+.rahulsug button{background:var(--bg,#0C0C0B);border:1px solid var(--gold);color:var(--txt,#eee);border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
 </style>
 <script>(function(){
   var tok=null; try{tok=localStorage.getItem('rtg_member_token');}catch(e){}
   var fab=document.getElementById('rahulFab'), sheet=document.getElementById('rahulSheet');
-  var uit=document.getElementById('rahulUit'), form=document.getElementById('rahulForm'), inp=document.getElementById('rahulIn');
+  var uit=document.getElementById('rahulUit'), form=document.getElementById('rahulForm'), inp=document.getElementById('rahulIn'), sug=document.getElementById('rahulSug');
   if(!tok){ if(fab) fab.style.display='none'; return; }
-  fab.addEventListener('click',function(){ sheet.hidden=false; fab.style.display='none'; inp.focus(); if(!uit.textContent) uit.textContent='Zeg wat je wilt. Ik doe je aangifte, vraag een toeslag aan, schrijf je in bij de KVK of laat je stemmen, met jouw eigen inlog.'; });
-  document.getElementById('rahulSluit').addEventListener('click',function(){ sheet.hidden=true; fab.style.display=''; });
-  form.addEventListener('submit',function(ev){ ev.preventDefault(); var q=inp.value.trim(); if(!q) return; inp.value=''; uit.textContent='Rahul denkt na…';
+  // contextuele suggesties: passen zich aan aan de tab waar je op staat
+  var SUG = {
+    box: ['Zijn er nieuwe berichten voor mij?', 'Wat moet ik nog doen bij de overheid?'],
+    belasting: ['Doe mijn aangifte, ik verdien 48000 bruto', 'Vraag zorgtoeslag aan', 'Hoeveel krijg ik terug?'],
+    rdw: ['Verleng mijn rijbewijs', 'Controleer kenteken 12-ABC-3', 'Zet een auto op mijn naam'],
+    kvk: ['Schrijf mijn eenmanszaak in bij de KVK', 'Toon mijn KVK-inschrijving'],
+    sociaal: ['Vraag WW aan', 'Maak bezwaar tegen mijn aanslag'],
+    prov: ['Vraag verduurzamingssubsidie aan', 'Welke subsidies zijn er?'],
+    water: ['Betaal mijn waterschapsbelasting', 'Meld wateroverlast bij de haven'],
+    stem: ['Stem voor het referendum', 'Wat zijn de laatste bekendmakingen?']
+  };
+  function stuur(q){ inp.value=''; uit.textContent='Rahul denkt na…';
     fetch('/api/fluister',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({q:q})})
       .then(function(r){return r.json();}).then(function(d){ uit.textContent=(d&&(d.antwoord||d.error))||'Ik kwam er niet uit.'; })
       .catch(function(){ uit.textContent='Er ging iets mis. Probeer het opnieuw.'; });
-  });
+  }
+  function vulSug(){
+    var lijst = SUG[document.body.dataset.tab] || SUG.box;
+    sug.innerHTML = '';
+    lijst.forEach(function(s){ var b=document.createElement('button'); b.type='button'; b.textContent=s;
+      b.addEventListener('click',function(){ stuur(s); }); sug.appendChild(b); });
+  }
+  fab.addEventListener('click',function(){ sheet.hidden=false; fab.style.display='none'; vulSug(); inp.focus(); if(!uit.textContent) uit.textContent='Zeg wat je wilt, of tik een suggestie. Ik doe je aangifte, vraag een toeslag aan, schrijf je in bij de KVK of laat je stemmen · met jouw eigen inlog.'; });
+  document.getElementById('rahulSluit').addEventListener('click',function(){ sheet.hidden=true; fab.style.display=''; });
+  form.addEventListener('submit',function(ev){ ev.preventDefault(); var q=inp.value.trim(); if(!q) return; stuur(q); });
 })();</script>
 </body>
 </html>

@@ -394,6 +394,37 @@
     <div id="sLijst"><div class="leeg">Nog geen concepten.</div></div>
   </section>
 
+  <!-- RTG Hardwarelab: de eigen apparaten -->
+  <section id="vHardware" hidden>
+    <div class="kop">
+      <button class="terug" id="hTerug">← alle kamers</button>
+      <h1>🔧 RTG Hardwarelab</h1>
+    </div>
+    <p class="deck">Het ontwerpbureau van de kantoren voor de eigen apparaten: PDA's en tablets, schermen en panelen, sensoren en IoT, de zaakdoos-familie (edge & servers) en accessoires. Geef een brief, de AI tekent het concept uit met behuizing, chip, materialen, een gedempt palet, poorten en een verhaal, levert een stuklijst en de blik van de chef-engineer. <a href="/apps/hardware-pda.html" style="color:var(--gold);">🔧 Onderweg? Open de RTG Hardware PDA →</a></p>
+    <div class="kpis" id="hKpi"></div>
+    <h3 class="sec">Nieuw concept briefen</h3>
+    <div class="kaart">
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+        <select class="veld" id="hCat" style="max-width:13rem;" aria-label="Discipline"></select>
+        <input class="veld" id="hNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. RTG PDA One" maxlength="100">
+        <input class="veld" id="hHuis" style="max-width:11rem;" placeholder="Huis / serie (optioneel)" maxlength="80">
+      </div>
+      <textarea id="hBrief" rows="2" maxlength="600" placeholder="De brief: gebruik, formaat, aansluitingen of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <button class="knop" id="hMaak" style="margin-top:.5rem;">Concept aanmaken</button>
+    </div>
+    <h3 class="sec">Series <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een productblad</span></h3>
+    <div class="kaart">
+      <div class="rij" style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+        <input class="veld" id="hSerieNaam" style="flex:1;min-width:9rem;" placeholder="Serienaam, bijv. RTG One" maxlength="80">
+        <input class="veld" id="hSerieSeizoen" style="max-width:8rem;" placeholder="Generatie" maxlength="40">
+        <button class="knop stil" id="hSerieMaak">Serie aanmaken</button>
+      </div>
+      <div id="hSerie" style="margin-top:.6rem;"></div>
+    </div>
+    <h3 class="sec">Het lab <span id="hFilters" style="margin-left:.4rem;"></span></h3>
+    <div id="hLijst"><div class="leeg">Nog geen concepten.</div></div>
+  </section>
+
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -406,7 +437,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vAtelier','vStudio'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vAtelier','vStudio','vHardware'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -429,6 +460,7 @@ async function binnen(){
     else if (start === 'paniekkamer') await openPaniek();
     else if (start === 'atelier') await openAtelier();
     else if (start === 'studio') await openStudio();
+    else if (start === 'hardware') await openHardware();
     else await openKamer(start);
   } catch (e) { zetKamerUrl(''); }
 }
@@ -444,7 +476,7 @@ async function laadKamers(){
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : openKamer(b.dataset.kamer)));
 }
 
 /* ---------- een kamer ---------- */
@@ -767,6 +799,179 @@ async function exportLookbook(naam){
   window.open(url, '_blank');
   setTimeout(() => URL.revokeObjectURL(url), 60000);
   meld('Lookbook geopend in een nieuw tabblad.');
+}
+
+/* ---------- RTG Hardwarelab: de eigen apparaten ---------- */
+let HARDWARE = null, hFilter = '';
+async function openHardware(){
+  const d = await api('hardware');
+  HARDWARE = d;
+  zetKamerUrl('hardware');
+  toon('vHardware');
+  const sel = $('#hCat');
+  if (!sel.options.length) sel.innerHTML = d.disciplines.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  renderHardware();
+}
+function renderHardware(){
+  const d = HARDWARE; if (!d) return;
+  $('#hKpi').innerHTML = [
+    ['Concepten', d.kpi.totaal], ['In productie', d.kpi.inProductie],
+    ['Huizen', d.kpi.huizen], ['Series', d.collecties.length]
+  ].map(x => '<div class="kaart kpi-tegel"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
+  const perSerie = {}; d.ontwerpen.forEach(o => { if (o.collectie) perSerie[o.collectie] = (perSerie[o.collectie]||0)+1; });
+  $('#hSerie').innerHTML = d.collecties.length ? d.collecties.map(c =>
+    '<div class="rij" style="justify-content:space-between;border-top:1px solid var(--line);padding:.45rem 0;">'+
+      '<span><b>'+esc(c.naam)+'</b>'+(c.seizoen?' <span style="color:var(--muted);">'+esc(c.seizoen)+'</span>':'')+
+      ' <span style="color:var(--soft);font-size:.78rem;">· '+(perSerie[c.naam]||0)+' concept(en)</span></span>'+
+      '<button class="knop stil hProd" data-naam="'+esc(c.naam)+'">📄 Productblad</button></div>'
+  ).join('') : '<div class="leeg" style="color:var(--muted);font-size:.82rem;">Nog geen serie. Maak er een aan en wijs concepten toe.</div>';
+  $('#hSerie').querySelectorAll('.hProd').forEach(b => b.addEventListener('click', () => exportProductblad(b.dataset.naam)));
+  $('#hFilters').innerHTML = '<button class="knop stil hFilterKnop'+(hFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
+    d.disciplines.filter(c => c.aantal).map(c => '<button class="knop stil hFilterKnop'+(hFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
+  $('#hFilters').querySelectorAll('.hFilterKnop').forEach(b => b.addEventListener('click', () => { hFilter = b.dataset.f; renderHardware(); }));
+  const lijst = d.ontwerpen.filter(o => !hFilter || o.discipline === hFilter);
+  const opts = d.statussen.map(s => '<option value="'+s+'">'+s+'</option>').join('');
+  const serieOpts = '<option value="">Geen serie</option>' + d.collecties.map(c => '<option value="'+esc(c.naam)+'">'+esc(c.naam)+'</option>').join('');
+  $('#hLijst').innerHTML = lijst.length ? lijst.map(o => {
+    const c = o.concept;
+    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
+        '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
+        '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
+        '<select class="veld hStatus" data-o="'+o.id+'" style="max-width:8.5rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
+      '</div>'+
+      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:.4rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
+      (c ? '<div style="margin-top:.5rem;">'+swatches(c.kleuren)+
+        '<div style="font-size:.82rem;line-height:1.6;"><b>'+esc(c.behuizing)+'</b> · '+esc(c.chip)+'<br>'+esc((c.materialen||[]).join(', '))+' <span style="color:var(--muted);">'+esc((c.poorten||[]).join(' · '))+'</span></div>'+
+        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
+        : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
+      (o.stuklijst ? stuklijstHtml(o.stuklijst) : '')+
+      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-engineer:</b> '+esc(o.kritiek)+'</div>' : '')+
+      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
+        '<button class="knop hConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✨ AI tekent concept')+'</button>'+
+        '<button class="knop stil hStuk" data-o="'+o.id+'">Stuklijst</button>'+
+        '<button class="knop stil hKritiek" data-o="'+o.id+'">Kritiek</button>'+
+        '<select class="veld hSerieSel" data-o="'+o.id+'" title="Toewijzen aan serie" style="max-width:11rem;font-size:.75rem;padding:.25rem .4rem;">'+(o.collectie?serieOpts.replace('value="'+esc(o.collectie)+'"','value="'+esc(o.collectie)+'" selected'):serieOpts)+'</select>'+
+        '<button class="knop stil hDel" data-o="'+o.id+'" style="margin-left:auto;color:var(--burgundy);">Verwijder</button>'+
+      '</div></div>';
+  }).join('') : '<div class="leeg">Nog geen concepten in deze discipline.</div>';
+  bindHardware();
+}
+function stuklijstHtml(p){
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Stuklijst</div>'+
+    (p.onderdelen||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
+    '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.verbruik)+' · '+esc(p.afmetingen)+'</div>'+
+    '<div style="font-size:.72rem;color:var(--muted);">Controle: '+esc((p.controle||[]).join(', '))+'</div></div>';
+}
+function bindHardware(){
+  const el = $('#hLijst');
+  el.querySelectorAll('.hConcept').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = 'De chef-engineer tekent...';
+    try { const r = await api('hardware/concept', { id: b.dataset.o }); vervangHw(r.ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  el.querySelectorAll('.hStuk').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('hardware/stuklijst', { id: b.dataset.o }); vervangHw(r.ontwerp); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.hKritiek').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = 'Denkt na...';
+    try { const r = await api('hardware/kritiek', { id: b.dataset.o }); vervangHw(r.ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  el.querySelectorAll('.hStatus').forEach(s => s.addEventListener('change', async () => {
+    try { const r = await api('hardware/zet', { id: s.dataset.o, status: s.value }); vervangHw(r.ontwerp); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.hSerieSel').forEach(s => s.addEventListener('change', async () => {
+    try { const r = await api('hardware/zet', { id: s.dataset.o, collectie: s.value }); vervangHw(r.ontwerp); meld(s.value?'Toegewezen aan '+s.value:'Uit serie gehaald'); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.hDel').forEach(b => b.addEventListener('click', async () => {
+    try { await api('hardware/verwijder', { id: b.dataset.o }); HARDWARE.ontwerpen = HARDWARE.ontwerpen.filter(o => o.id !== b.dataset.o); renderHardware(); } catch(e){ meld(e.message); }
+  }));
+}
+function vervangHw(o){ if (!o || !HARDWARE) return; const i = HARDWARE.ontwerpen.findIndex(x => x.id === o.id); if (i >= 0) HARDWARE.ontwerpen[i] = o; renderHardware(); }
+$('#hTerug').addEventListener('click', laadKamers);
+$('#hMaak').addEventListener('click', async () => {
+  const naam = $('#hNaam').value.trim(); if (!naam){ meld('Geef het concept een naam.'); return; }
+  try {
+    const r = await api('hardware/maak', { discipline: $('#hCat').value, naam, huis: $('#hHuis').value.trim(), brief: $('#hBrief').value.trim() });
+    $('#hNaam').value = ''; $('#hBrief').value = '';
+    HARDWARE.ontwerpen.unshift(r.ontwerp); HARDWARE.kpi.totaal++;
+    try { const c = await api('hardware/concept', { id: r.ontwerp.id }); vervangHw(c.ontwerp); } catch(e){ renderHardware(); }
+    meld('Concept aangemaakt; de chef-engineer tekent het uit.');
+  } catch(e){ meld(e.message); }
+});
+$('#hSerieMaak').addEventListener('click', async () => {
+  const naam = $('#hSerieNaam').value.trim(); if (!naam){ meld('Geef de serie een naam.'); return; }
+  try {
+    const r = await api('hardware/serie', { naam, seizoen: $('#hSerieSeizoen').value.trim() });
+    $('#hSerieNaam').value = ''; $('#hSerieSeizoen').value = '';
+    HARDWARE.collecties.unshift(r.collectie); renderHardware();
+    meld('Serie "'+naam+'" aangemaakt.');
+  } catch(e){ meld(e.message); }
+});
+async function exportProductblad(naam){
+  let d;
+  try { d = await api('hardware/productblad', { naam }); } catch(e){ meld(e.message); return; }
+  if (!d.ontwerpen || !d.ontwerpen.length){ meld('Nog geen concepten in deze serie.'); return; }
+  const p = d.serie || { naam: naam, seizoen: null };
+  const swatchStrook = k => (k||[]).map(s => '<div class="sw"><span style="background:'+esc(s.hex)+'"></span><em>'+esc(s.naam)+'</em><b>'+esc(s.hex)+'</b></div>').join('');
+  const secties = d.ontwerpen.map((o, i) => {
+    const c = o.concept, sp = o.stuklijst;
+    return '<article>'+
+      '<header><span class="nr">'+String(i+1).padStart(2,'0')+'</span>'+
+        '<div><h2>'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<div class="meta">'+esc(o.disciplineLabel)+(o.huis?' &middot; '+esc(o.huis):'')+' &middot; '+esc(o.status)+'</div></div></header>'+
+      (c ? '<div class="swrij">'+swatchStrook(c.kleuren)+'</div>'+
+        '<p class="lead"><b>'+esc(c.behuizing)+'</b> &middot; '+esc(c.chip)+'</p>'+
+        '<p class="mat">'+esc((c.materialen||[]).join(', '))+'<span class="uit"> &middot; '+esc((c.poorten||[]).join(' &middot; '))+'</span></p>'+
+        (c.verhaal?'<p class="verhaal">'+esc(c.verhaal)+'</p>':'') : '<p class="mat">Nog geen concept uitgetekend.</p>')+
+      (sp ? '<div class="spec"><div class="spectitel">Stuklijst</div>'+
+        (sp.onderdelen||[]).map(m => '<div class="specrij"><b>'+esc(m.naam)+'</b><span>'+esc(m.spec)+'</span></div>').join('')+
+        '<div class="specfoot">'+esc(sp.verbruik)+' &middot; '+esc(sp.afmetingen)+'</div></div>' : '')+
+    '</article>';
+  }).join('');
+  const titel = 'RTG Hardwarelab &middot; '+esc(p.naam)+(p.seizoen?' &middot; '+esc(p.seizoen):'');
+  const html = '<!doctype html><html lang="nl"><head><meta charset="utf-8">'+
+    '<meta name="viewport" content="width=device-width, initial-scale=1">'+
+    '<title>Productblad '+esc(p.naam)+'</title><style>'+
+    ':root{--bg:#0C0C0B;--ink:#F4F1EC;--muted:rgba(244,241,236,.62);--soft:rgba(244,241,236,.4);--gold:#A98F1C;--line:rgba(244,241,236,.14);}'+
+    '*{box-sizing:border-box;margin:0;}body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.6;padding:3rem 1.4rem 5rem;}'+
+    'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}'+
+    '.wrap{max-width:820px;margin:0 auto;}'+
+    '.cover{border-bottom:1px solid var(--line);padding-bottom:1.6rem;margin-bottom:2.4rem;}'+
+    '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}'+
+    '.cover h1{font-size:2.4rem;margin:.5rem 0 .3rem;}'+
+    '.cover .sub{color:var(--muted);font-size:.9rem;}'+
+    'article{border-top:1px solid var(--line);padding:2rem 0;page-break-inside:avoid;}'+
+    'article:first-of-type{border-top:none;}'+
+    'article header{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem;}'+
+    '.nr{font-family:"Bodoni Moda",serif;font-size:1.6rem;color:var(--soft);min-width:2.4rem;}'+
+    'article h2{font-size:1.4rem;}.meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}'+
+    '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}'+
+    '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}'+
+    '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}'+
+    '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}'+
+    '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}.uit{color:var(--soft);}'+
+    '.verhaal{font-style:italic;color:var(--ink);margin-top:.8rem;font-size:.96rem;}'+
+    '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}'+
+    '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}'+
+    '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}'+
+    '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}'+
+    '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}'+
+    '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
+    '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.sw em{color:#555;}.sw b,.uit,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}article,.cover{border-color:#ddd;}}'+
+    '</style></head><body>'+
+    '<div class="balk"><span>Productblad &middot; '+esc(p.naam)+'</span><button id="pbtn" type="button">Print / PDF</button></div>'+
+    '<div class="wrap"><div class="cover"><div class="ey">Productblad</div><h1>'+titel+'</h1>'+
+    '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
+    secties+'</div>'+
+    '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
+    '</body></html>';
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  meld('Productblad geopend in een nieuw tabblad.');
 }
 
 /* ---------- platform-statistieken, chat & snap, onboarding ---------- */

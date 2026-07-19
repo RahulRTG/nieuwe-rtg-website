@@ -111,6 +111,21 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Laatste concepten', items: lijst((d().studio || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.discipline) + ', ' + String(o.status) + ')') },
         { titel: 'Verder werken', items: ['Klik op deze kamer om de studio te openen: brief een concept, laat de AI het uittekenen, en vraag de specsheet en de chef-ontwerper. Onderweg werkt de RTG Studio PDA.'] }
+      ] },
+    /* RTG Hardwarelab: het eigen hardware-ontwerpbureau van het kantoor
+       (apparaten, schermen, sensoren, edge & servers, accessoires). Cijfers
+       hier; de ontwerpvloer opent als eigen cockpit op deze kamer. */
+    hardware: { naam: 'RTG Hardwarelab', emoji: '🔧', missie: 'Het ontwerpbureau van het kantoor voor de eigen apparaten: PDA\'s en tablets, schermen, sensoren, de zaakdoos-familie en accessoires, van eerste schets tot vrijgave.', eigenApp: true,
+      kpis: () => [
+        ['Concepten', tel((d().hardware || {}).ontwerpen)],
+        ['In productie', tel(lijst((d().hardware || {}).ontwerpen).filter(o => o.status === 'productie'))],
+        ['Disciplines', 5],
+        ['Series', tel((d().hardware || {}).collecties)],
+        ['Bijgewerkt (7d)', recent((d().hardware || {}).ontwerpen, 'updatedAt', 7)]
+      ],
+      lijsten: () => [
+        { titel: 'Laatste concepten', items: lijst((d().hardware || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.discipline) + ', ' + String(o.status) + ')') },
+        { titel: 'Verder werken', items: ['Klik op deze kamer om het Hardwarelab te openen: brief een apparaat, laat de AI het concept uittekenen, en vraag de stuklijst en de chef-engineer. Onderweg werkt de RTG Hardware PDA.'] }
       ] }
   };
 };

@@ -2713,6 +2713,11 @@ Object.assign(kern, require('./kern/atelier').maakAtelier({ db, save, crypto, an
    helikopters. AI tekent het concept uit, levert een specsheet en de blik
    van de chef-ontwerper. */
 Object.assign(kern, require('./kern/studio').maakStudio({ db, save, crypto, anthropic, schoon }));
+/* RTG Hardwarelab (kern/hardwarelab.js): de derde ontwerptak, voor de eigen
+   apparaten: PDA's en tablets, schermen, sensoren, de zaakdoos-familie en
+   accessoires. AI tekent het concept uit, levert een stuklijst en de blik
+   van de chef-engineer. */
+Object.assign(kern, require('./kern/hardwarelab').maakHardwarelab({ db, save, crypto, anthropic, schoon }));
 /* De hulpdiensten (kern/hulpdienst.js): zes korpsen met een meldkamer,
    eenheden over land, water en door de lucht, bijstand tussen korpsen en
    de zorgketen ambulance -> ziekenhuis -> huisarts. */

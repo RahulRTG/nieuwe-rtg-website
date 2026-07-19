@@ -101,6 +101,25 @@ module.exports = (kern) => {
     try { const r = await kern.studio.aiKritiek(String(req.body.id || ''), req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
     catch (e) { console.error('[studio]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+
+  /* RTG Hardwarelab: het eigen hardware-ontwerpbureau. Zelfde vorm als de
+     studio: concepten met AI, een stuklijst en de chef-engineer, plus een
+     productblad per serie. */
+  app.post('/api/office/hardware', officeAuth, (req, res) => veilig(res, () => kern.hardware.overzicht()));
+  app.post('/api/office/hardware/maak', officeAuth, (req, res) => veilig(res, () => kern.hardware.ontwerpMaak(req.body || {})));
+  app.post('/api/office/hardware/zet', officeAuth, (req, res) => veilig(res, () => kern.hardware.ontwerpZet(String(req.body.id || ''), req.body || {})));
+  app.post('/api/office/hardware/verwijder', officeAuth, (req, res) => veilig(res, () => kern.hardware.ontwerpVerwijder(String(req.body.id || ''))));
+  app.post('/api/office/hardware/serie', officeAuth, (req, res) => veilig(res, () => kern.hardware.collectieMaak(req.body || {})));
+  app.post('/api/office/hardware/productblad', officeAuth, (req, res) => veilig(res, () => kern.hardware.productblad(req.body.naam)));
+  app.post('/api/office/hardware/stuklijst', officeAuth, (req, res) => veilig(res, () => kern.hardware.aiStuklijst(String(req.body.id || ''))));
+  app.post('/api/office/hardware/concept', officeAuth, async (req, res) => {
+    try { const r = await kern.hardware.aiConcept(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[hardware]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  app.post('/api/office/hardware/kritiek', officeAuth, async (req, res) => {
+    try { const r = await kern.hardware.aiKritiek(String(req.body.id || ''), req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
+    catch (e) { console.error('[hardware]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
   app.post('/api/office/doos/regie', officeAuth, (req, res) => veilig(res, () => afdelingen.doosRegie()));
   app.post('/api/office/doos/update-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosUpdateZet(req.body.versie, req.body.notities, req.body.naam)));
   app.post('/api/office/doos/netwerk-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosNetwerkZet(String(req.body.doos || ''), req.body.instellingen || {}, req.body.naam)));

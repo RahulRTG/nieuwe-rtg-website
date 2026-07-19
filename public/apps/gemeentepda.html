@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gemeente-PDA (buitendienst)</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:2rem;max-width:520px;margin:0 auto;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:.6rem;}
+  header .ey{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.2rem;}
+  main{padding:.9rem 1rem;}
+  .chips{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .7rem;}
+  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .85rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  .item{border:1px solid var(--line);border-radius:14px;padding:.85rem;margin-bottom:.7rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.02rem;}
+  .item .meta{font-size:.8rem;color:var(--muted);margin-top:.25rem;line-height:1.5;}
+  .item .loc{display:inline-block;margin-top:.4rem;font-size:.8rem;color:var(--gold);border-bottom:1px solid var(--gold);}
+  .status{display:inline-block;font-size:.72rem;padding:.14rem .55rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);margin-top:.35rem;text-transform:capitalize;}
+  .acts{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;}
+  .knop{background:transparent;color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:.42rem .75rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .knop.aan{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;}
+  .knop.klaar{border-color:var(--green);color:var(--green);}
+  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.5rem .6rem;margin-top:.5rem;}
+  .verstuur{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;margin-top:.5rem;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:1.4rem 0;text-align:center;}
+  .login{padding:2.4rem 1.2rem;text-align:center;}
+  .login .veld{margin-top:.6rem;}
+  .ververser{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:.35rem .6rem;font:inherit;font-size:.78rem;cursor:pointer;}
+  .melding{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:92%;z-index:30;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="ey">Gemeente buitendienst</div><h1 id="titel">Gemeente-PDA</h1></div>
+  <button class="ververser" id="ververs" hidden>Ververs</button>
+</header>
+<main id="main">
+  <div class="login" id="login">
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;">Meld je aan voor je dienst met je persoonlijke pincode.</p>
+    <select class="veld" id="wie"><option value="">Laden...</option></select>
+    <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
+    <button class="verstuur" id="loginGo" style="width:100%;margin-top:.7rem;">Aanmelden</button>
+  </div>
+  <div id="app" hidden>
+    <div class="chips" id="ploegen"></div>
+    <div id="lijst"><div class="leeg">Laden...</div></div>
+  </div>
+</main>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
+let TOKEN = null;
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const CODE = 'GEMEENTE';
+(async function vulWie(){
+  try { const r = await api('/api/supplier/roster', { code: CODE });
+    $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
+  } catch(e){ $('#wie').innerHTML = '<option value="">Niet bereikbaar</option>'; }
+})();
+$('#loginGo').addEventListener('click', async () => {
+  const staffId = $('#wie').value, pin = $('#pin').value.trim();
+  if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
+  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token;
+    $('#login').hidden = true; $('#app').hidden = false; $('#ververs').hidden = false; start();
+  } catch(e){ meld(e.message); }
+});
+
+const PLOEGEN = ['openbare werken', 'reiniging', 'groenbeheer', 'handhaving'];
+const MELD_ST = ['in behandeling', 'gepland', 'opgelost', 'afgewezen'];
+let ploeg = 'openbare werken';
+function start(){
+  $('#ploegen').innerHTML = PLOEGEN.map(p => '<button class="chip'+(p===ploeg?' aan':'')+'" data-p="'+esc(p)+'">'+esc(p)+'</button>').join('');
+  $('#ploegen').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { ploeg = b.dataset.p; $('#ploegen').querySelectorAll('.chip').forEach(x => x.classList.toggle('aan', x===b)); laad(); }));
+  laad();
+}
+$('#ververs').addEventListener('click', laad);
+async function laad(){
+  $('#lijst').innerHTML = '<div class="leeg">Laden...</div>';
+  let d; try { d = await api('/api/gemeente/meldingen', { ploeg }); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const l = d.meldingen || [];
+  $('#lijst').innerHTML = l.length ? l.map(m => {
+    const maps = (m.lat && m.lng) ? '<a class="loc" href="https://www.openstreetmap.org/?mlat='+m.lat+'&mlon='+m.lng+'#map=18/'+m.lat+'/'+m.lng+'" target="_blank" rel="noopener">Kaart openen</a>' : (m.locatie ? '<span class="loc" style="border:none;color:var(--soft);">'+esc(m.locatie)+'</span>' : '');
+    return '<div class="item" data-ref="'+esc(m.ref)+'"><h4>'+esc(m.categorieLabel)+'</h4>'+
+      '<div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+' · melder '+esc(m.melder||'')+'</div>'+
+      maps + '<div><span class="status">'+esc(m.status)+'</span></div>'+
+      '<div class="acts">'+MELD_ST.map(s => '<button class="knop st'+(s==='opgelost'?' klaar':'')+'" data-st="'+s+'">'+s+'</button>').join('')+'</div>'+
+      '<input class="veld upd" placeholder="Notitie voor de melder (optioneel)">'+
+    '</div>'; }).join('') : '<div class="leeg">Geen open meldingen voor deze ploeg.</div>';
+  $('#lijst').querySelectorAll('.item').forEach(it => it.querySelectorAll('.st').forEach(btn => btn.addEventListener('click', async () => {
+    try { await api('/api/gemeente/melding/zet', { ref: it.dataset.ref, patch: { status: btn.dataset.st, update: it.querySelector('.upd').value.trim() } });
+      meld('Bijgewerkt: ' + btn.dataset.st + '.'); laad();
+    } catch(e){ meld(e.message); }
+  })));
+}
+</script>
+</body>
+</html>

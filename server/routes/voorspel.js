@@ -13,4 +13,10 @@ module.exports = (kern) => {
   app.post('/api/supplier/voorspel', supplierAuth, (req, res) => {
     res.json(voorspel.voorZaak(req.supplier.code));
   });
+
+  // de werkvloer kijkt mee: dezelfde morgen-verwachting op de PDA, zodat
+  // het team de piek ziet aankomen in plaats van erdoor overvallen te worden
+  app.post('/api/staff/voorspel', supplierAuth, (req, res) => {
+    res.json(voorspel.voorZaak(req.supplier.code));
+  });
 };

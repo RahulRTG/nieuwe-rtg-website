@@ -147,7 +147,14 @@ test('het profiel-endpoint blijft gezond met de voorspeller erbij', async () => 
   assert.ok(Array.isArray(r.body.seintjes), 'seintjes is een lijst');
 });
 
-test('beide paden zijn dicht zonder inlog', async () => {
+test('de werkvloer kijkt mee: dezelfde verwachting op de PDA', async () => {
+  const r = await api('/api/staff/voorspel', {}, zaak);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.ok, true);
+});
+
+test('alle paden zijn dicht zonder inlog', async () => {
   assert.equal((await api('/api/voorspel', {})).status, 401);
   assert.equal((await api('/api/supplier/voorspel', {})).status, 401);
+  assert.equal((await api('/api/staff/voorspel', {})).status, 401);
 });

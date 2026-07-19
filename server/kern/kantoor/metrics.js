@@ -1,50 +1,14 @@
-/* De backoffice-laag (RTG-kantoor): toegang (officeAuth), het complete
-   live-overzicht met dagcijfers, weektrend, partnerprestaties en het
-   actiecentrum (officeState), en de wachtrij van identiteitsverificaties
-   (pendingVerifications). Alle functies dragen state en komen uit
-   maakKantoor(state), zodat server.js dun blijft.
+/* De backoffice-laag, deelbestand "metrics": de zware berekeningen achter het
+   live-overzicht. De weektrend en dagcijfers (omzet, foundation-afdracht, munt-
+   ontvangsten), de partnerprestaties (schaalvast: EEN keer optellen per code) en het
+   actiecentrum (alle alerts die nu een oog van RTG nodig hebben, belangrijkste eerst).
+   Krijgt de gedeelde ctx van kern/kantoor/index.js. */
+module.exports = (ctx) => {
+  const { db, accounts, conciergeInbox, beveilig } = ctx;
+  const dagVan = iso => String(iso || '').slice(0, 10);
 
-   Schaalvast: partnerprestaties tellen orders/ritten EEN keer op per code
-   (O(orders + ritten)) i.p.v. per zaak over alles te filteren, en elke lijst
-   in de uitkomst is begrensd; de echte totalen staan apart in totals. */
-
-const { txLedgerAantal } = require('../db'); // gecachete grootboek-teller (O(1), ~10 s vers)
-
-function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
-  function officeAuth(req, res, next) {
-    const header = req.get('authorization') || '';
-    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-    const sess = token && sessionFor(token);
-    if (sess && sess.role === 'office') return next();
-    // de eigenaar komt ook met zijn eigen accountlogin binnen (geen aparte code nodig)
-    try { if (token && eigenaar.isEigenaar(accounts, accounts.verifyToken(token))) { req.eigenaar = true; return next(); } } catch (e) {}
-    return res.status(401).json({ error: 'Geen backoffice-sessie.' });
-  }
-
-  function officeState() {
-    // live overzicht: welke leden zijn nu onderweg, waarheen en met welke partners
-    const live = Object.keys(db.data.live || {}).map(key => {
-      const L = db.data.live[key];
-      if (!L || !L.active) return null;
-      const dest = L.destCode ? findSupplier(L.destCode) : null;
-      return {
-        codename: L.codename, tier: L.tier, mode: L.mode, arrived: !!L.arrived,
-        dest: dest ? { code: dest.code, name: dest.name } : null,
-        partners: connectedSupplierCodes(key).map(c => { const s = findSupplier(c); return s ? s.name : c; }),
-        updatedAt: L.updatedAt
-      };
-    }).filter(Boolean);
-    const applications = [];
-    for (const [code, list] of Object.entries(db.data.applications || {})) {
-      const sup = findSupplier(code);
-      for (const a of list) applications.push({ company: sup ? sup.name : code, name: a.name, func: a.func, status: a.status, viaRTG: !!a.viaRTG, at: a.at });
-    }
-    applications.sort((x, y) => (y.at || '').localeCompare(x.at || ''));
-    // slimme laag: dagcijfers, weektrend, partnerprestaties en een actiecentrum
-    const nu = Date.now();
-    const dagVan = iso => String(iso || '').slice(0, 10);
-    const betaaldeOrders = db.data.orders.filter(o => o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald');
-    const betaaldeRitten = db.data.rides.filter(r => r.paid && r.status !== 'geweigerd');
+  // de weektrend en de dagcijfers, plus foundation-afdracht en munt-ontvangsten
+  function weekEnStats(betaaldeOrders, betaaldeRitten, live, nu) {
     const week = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(nu - i * 86400000).toISOString().slice(0, 10);
@@ -62,9 +26,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     const fonds = db.data.invoices
       .filter(i => (i.status === 'paid' || i.status === 'betaald') && /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(i.desc || ''))
       .reduce((s2, i) => s2 + Math.round((i.bijdrage || 0) / 1.21 * 0.3), 0);
-    // Het echte afdracht-grootboek (kern/fonds.js boekt hier per betaling): wat is
-    // al gereserveerd, en staat het klaar om uit te betalen of wacht het nog op
-    // het IBAN? Bedragen in centen -> euro's.
+    // Het echte afdracht-grootboek (kern/fonds.js boekt hier per betaling).
     const afdrachten = Array.isArray(db.data.fondsAfdrachten) ? db.data.fondsAfdrachten : [];
     let afTotaal = 0, afTeStorten = 0, afIngepland = 0, afGestort = 0;
     for (const a of afdrachten) {
@@ -83,8 +45,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       iban: (process.env.RTF_IBAN || '').trim(),
       begunstigde: (process.env.RTF_BEGUNSTIGDE || 'Stichting RTFoundation').trim()
     };
-    // Munt-ontvangsten (crypto meteen omgezet naar euro): hoeveel is er in euro
-    // binnengekomen en staat er nog open? Alleen relevant als acceptatie aanstaat.
+    // Munt-ontvangsten (crypto meteen omgezet naar euro).
     const muntRijen = Array.isArray(db.data.muntOntvangsten) ? db.data.muntOntvangsten : [];
     let muntEuroCenten = 0, muntWacht = 0;
     for (const r of muntRijen) {
@@ -101,23 +62,25 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       omzetWeek: week.reduce((s2, d) => s2 + d.omzet, 0),
       foundation: fonds, fondsAfdracht, muntOntvangst, liveNu: live.length
     };
-    /* Partnerprestaties: NIET per zaak over alle orders filteren (dat is
-       O(zaken x orders) en loopt met miljoenen restaurants volledig vast).
-       In plaats daarvan tellen we de orders/ritten EEN keer op per code, en
-       bouwen we alleen prestaties voor zaken die vandaag/deze week echt iets
-       deden. O(orders + ritten + actieve zaken). */
+    return { week, stats };
+  }
+
+  /* Partnerprestaties: NIET per zaak over alle orders filteren (dat is
+     O(zaken x orders) en loopt met miljoenen restaurants volledig vast).
+     In plaats daarvan tellen we de orders/ritten EEN keer op per code. */
+  function prestaties(betaaldeOrders, betaaldeRitten) {
     const perCode = new Map();
-    // naam/type uit het order/rit-record zelf halen (die staan erop), zodat we
-    // NIET per code findSupplier hoeven te doen: bij miljoenen bulk-zaken zou dat
-    // het grootboek overspoelen met losse queries.
     const aggCode = (code, naam, type) => { let a = perCode.get(code); if (!a) { a = { naam: naam || code, type: type || '', omzet: 0, aantal: 0, openNu: 0, dur: 0, durN: 0 }; perCode.set(code, a); } return a; };
     for (const o of betaaldeOrders) { const a = aggCode(o.supplierCode, o.supplierName, o.type); a.omzet += (o.total || 0); a.aantal += 1; }
     for (const r of betaaldeRitten) { const a = aggCode(r.supplierCode, r.supplierName, r.type); a.omzet += (r.quote || 0); a.aantal += 1; if (r.finishedAt) { a.dur += (new Date(r.finishedAt) - new Date(r.at)) / 60000; a.durN += 1; } }
     for (const o of db.data.orders) if (o.paid && (o.status === 'nieuw' || o.status === 'in bereiding')) aggCode(o.supplierCode, o.supplierName, o.type).openNu += 1;
     for (const r of db.data.rides) if (r.paid && !['afgerond', 'gearriveerd', 'geweigerd', 'wacht-op-betaling'].includes(r.status)) aggCode(r.supplierCode, r.supplierName, r.type).openNu += 1;
-    const performance = [...perCode.entries()].map(([code, a]) => ({ code, name: a.naam, type: a.type, omzet: a.omzet, aantal: a.aantal, openNu: a.openNu,
+    return [...perCode.entries()].map(([code, a]) => ({ code, name: a.naam, type: a.type, omzet: a.omzet, aantal: a.aantal, openNu: a.openNu,
       gemMin: a.durN ? Math.round(a.dur / a.durN) : null })).sort((a, b) => b.omzet - a.omzet);
-    // actiecentrum: alles wat nu een oog van RTG nodig heeft, belangrijkste eerst
+  }
+
+  // actiecentrum: alles wat nu een oog van RTG nodig heeft, belangrijkste eerst
+  function actiecentrum(applications, nu) {
     const alerts = [];
     // open SOS van huurders: altijd rood en bovenaan, tot de zaak hem afhandelt
     for (const h of db.data.boekingen) {
@@ -166,47 +129,8 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     if (nieuweSollicitaties) alerts.push({ level: 'info', kind: 'apps', text: nieuweSollicitaties + ' open sollicitatie(s) bij partners.' });
     const volgorde = { rood: 0, amber: 1, info: 2 };
     alerts.sort((a, b) => volgorde[a.level] - volgorde[b.level]);
-    return {
-      prices: db.data.supplierPrices.slice(0, 60),
-      orders: db.data.orders.filter(o => o.status !== 'wacht-op-betaling').slice(0, 60),
-      rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').slice(0, 60),
-      live: live.slice(0, 40),
-      applications: applications.slice(0, 40),
-      // de zaken-lijst is begrensd (het echte aantal staat in totals.partners);
-      // een rauwe dump van miljoenen zaken zou het antwoord onbruikbaar maken
-      suppliers: db.data.suppliers.slice(0, 1000).map(publicSupplier),
-      partnerApplications: (db.data.partnerApplications || []).slice(0, 40),
-      pendingSchools: wachtScholen.map(s => ({ code: s.code, naam: s.naam, plaats: s.plaats, at: s.at,
-        personeel: Object.keys(s.personeel || {}).length })).slice(0, 40),
-      stats, week, performance: performance.slice(0, 12), alerts: alerts.slice(0, 20),
-      // totalen over de volledige data, zodat de schermen eerlijk blijven
-      // vertellen hoeveel er echt is, hoe groot de lijsten ook worden
-      totals: {
-        // Levend plus archief: het totaal blijft eerlijk, hoe oud tickets ook
-        // worden. Met een actief transactie-grootboek (Postgres) kan het RAM
-        // een VENSTER zijn; dan is de grootboek-teller de ondergrens die ook
-        // de uit het venster gerolde tickets meetelt.
-        orders: Math.max(txLedgerAantal('orders'),
-          db.data.orders.filter(o => o.status !== 'wacht-op-betaling').length + archief.stat().aantal),
-        rides: db.data.rides.filter(r => r.status !== 'wacht-op-betaling').length,
-        leden: ledenAantal(),
-        // actieve zaken in het geheugen plus de bulk-zaken in het grootboek (Postgres)
-        partners: db.data.suppliers.length + (grootAantal ? grootAantal() : 0),
-        live: live.length
-      }
-    };
+    return { alerts, wachtScholen };
   }
 
-  /* Backoffice: identiteitsverificaties beoordelen. */
-  function pendingVerifications() {
-    // De backoffice mag voor de KYC-controle de echte naam/e-mail uit de kluis zien.
-    return accounts.listByVerification('pending').map(u => ({
-      id: u.id, name: accounts.realNameOf(u), email: accounts.emailOf(u), codename: u.codename,
-      tier: u.tier, doc: u.id_doc, at: u.created_at
-    }));
-  }
-
-  return { officeAuth, officeState, pendingVerifications };
-}
-
-module.exports = { maakKantoor };
+  return { weekEnStats, prestaties, actiecentrum };
+};

@@ -2703,6 +2703,11 @@ Object.assign(kern, require('./kern/baby')({ save, crypto, media, anthropic }));
 /* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
    boardroom die alles ziet en het functieschakelbord bedient. */
 Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCodenaam }));
+/* RTG Atelier (kern/atelier.js): het besloten ontwerpbureau van de kantoren
+   voor mode en alles wat je aan het lijf draagt. AI tekent concepten uit,
+   levert tech packs en de blik van de creatief directeur; het palet komt als
+   naam + hex mee zodat het scherm een moodboard toont. */
+Object.assign(kern, require('./kern/atelier').maakAtelier({ db, save, crypto, anthropic, schoon }));
 /* De hulpdiensten (kern/hulpdienst.js): zes korpsen met een meldkamer,
    eenheden over land, water en door de lucht, bijstand tussen korpsen en
    de zorgketen ambulance -> ziekenhuis -> huisarts. */

@@ -341,6 +341,28 @@
     <div class="schakels" id="bSchakels"></div>
   </section>
 
+  <!-- RTG Atelier: het ontwerpbureau -->
+  <section id="vAtelier" hidden>
+    <div class="kop">
+      <button class="terug" id="aTerug">← alle kamers</button>
+      <h1>✂️ RTG Atelier</h1>
+    </div>
+    <p class="deck">Het besloten ontwerpbureau van de kantoren voor mode en alles wat je aan het lijf draagt: couture, tassen, horloges, schoenen, hoeden, haute joaillerie, eyewear en kleinlederwaren. Geef een brief, de AI tekent het concept uit met silhouet, materialen, een gedempt palet en een verhaal, levert een tech pack en de blik van de creatief directeur.</p>
+    <div class="kpis" id="aKpi"></div>
+    <h3 class="sec">Nieuw ontwerp briefen</h3>
+    <div class="kaart">
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+        <select class="veld" id="aCat" style="max-width:13rem;" aria-label="Categorie"></select>
+        <input class="veld" id="aNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Bordeaux Top-Handle No.2" maxlength="100">
+        <input class="veld" id="aHuis" style="max-width:11rem;" placeholder="Huis / maison (optioneel)" maxlength="80">
+      </div>
+      <textarea id="aBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gelegenheid, materiaal of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <button class="knop" id="aMaak" style="margin-top:.5rem;">Ontwerp aanmaken</button>
+    </div>
+    <h3 class="sec">Het atelier <span id="aFilters" style="margin-left:.4rem;"></span></h3>
+    <div id="aLijst"><div class="leeg">Nog geen ontwerpen.</div></div>
+  </section>
+
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -353,7 +375,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vAtelier'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -374,6 +396,7 @@ async function binnen(){
   try {
     if (start === 'boardroom') await openBoard();
     else if (start === 'paniekkamer') await openPaniek();
+    else if (start === 'atelier') await openAtelier();
     else await openKamer(start);
   } catch (e) { zetKamerUrl(''); }
 }
@@ -384,12 +407,13 @@ async function laadKamers(){
   const d = await api('kamers');
   toon('vKamers');
   const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
-    '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
+    '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>' +
+    '<button class="kaart kamer" data-kamer="atelier" style="border-color:var(--gold);"><span class="ic">✂️</span><h2>RTG Atelier</h2><p>Het ontwerpbureau voor mode en alles wat je aan het lijf draagt. Vol met AI.</p><span class="kpi" style="color:var(--gold);">Ontwerpen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : openKamer(b.dataset.kamer)));
 }
 
 /* ---------- een kamer ---------- */
@@ -446,6 +470,99 @@ $('#kNieuw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#kMaak
 $('#kTerug').addEventListener('click', laadKamers);
 $('#bTerug').addEventListener('click', laadKamers);
 $('#pTerug').addEventListener('click', laadKamers);
+
+/* ---------- RTG Atelier: het ontwerpbureau ---------- */
+let ATELIER = null, aFilter = '';
+async function openAtelier(){
+  const d = await api('atelier');
+  ATELIER = d;
+  zetKamerUrl('atelier');
+  toon('vAtelier');
+  const sel = $('#aCat');
+  if (!sel.options.length) sel.innerHTML = d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  renderAtelier();
+}
+function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+g+';border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;">'+esc(s)+'</span>'; }
+function swatches(kleuren){ return '<div style="display:flex;gap:.3rem;margin:.4rem 0;">'+(kleuren||[]).map(k =>
+  '<span title="'+esc(k.naam)+'" style="width:1.5rem;height:1.5rem;border-radius:6px;border:1px solid var(--line);background:'+esc(k.hex)+';"></span>').join('')+
+  '<span style="align-self:center;font-size:.7rem;color:var(--muted);margin-left:.3rem;">'+(kleuren||[]).map(k => esc(k.naam)).join(' · ')+'</span></div>'; }
+function renderAtelier(){
+  const d = ATELIER; if (!d) return;
+  $('#aKpi').innerHTML = [
+    ['Ontwerpen', d.kpi.totaal], ['In productie', d.kpi.inProductie],
+    ['Maisons', d.kpi.huizen], ['Collecties', d.collecties.length]
+  ].map(x => '<div class="kaart kpi-tegel"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
+  $('#aFilters').innerHTML = '<button class="knop stil aFilterKnop'+(aFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
+    d.categorieen.filter(c => c.aantal).map(c => '<button class="knop stil aFilterKnop'+(aFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+c.icon+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ');
+  $('#aFilters').querySelectorAll('.aFilterKnop').forEach(b => b.addEventListener('click', () => { aFilter = b.dataset.f; renderAtelier(); }));
+  const lijst = d.ontwerpen.filter(o => !aFilter || o.categorie === aFilter);
+  const opts = d.statussen.map(s => '<option value="'+s+'">'+s+'</option>').join('');
+  $('#aLijst').innerHTML = lijst.length ? lijst.map(o => {
+    const c = o.concept;
+    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
+        '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.icon)+' '+esc(o.naam)+'</h2>'+
+        '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.categorieLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
+        '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
+        '<select class="veld aStatus" data-o="'+o.id+'" style="max-width:8.5rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
+      '</div>'+
+      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:.4rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
+      (c ? '<div style="margin-top:.5rem;">'+swatches(c.kleuren)+
+        '<div style="font-size:.82rem;line-height:1.6;"><b>'+esc(c.silhouet)+'</b> in '+esc((c.materialen||[]).join(', '))+'. '+
+        '<span style="color:var(--muted);">'+esc((c.details||[]).join(' · '))+(c.afwerking?' · '+esc(c.afwerking):'')+'</span></div>'+
+        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
+        : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
+      (o.techpack ? techpackHtml(o.techpack) : '')+
+      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Creatief directeur:</b> '+esc(o.kritiek)+'</div>' : '')+
+      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
+        '<button class="knop aConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✨ AI tekent concept')+'</button>'+
+        '<button class="knop stil aTech" data-o="'+o.id+'">Tech pack</button>'+
+        '<button class="knop stil aKritiek" data-o="'+o.id+'">Kritiek</button>'+
+        '<button class="knop stil aDel" data-o="'+o.id+'" style="margin-left:auto;color:var(--burgundy);">Verwijder</button>'+
+      '</div></div>';
+  }).join('') : '<div class="leeg">Nog geen ontwerpen in deze categorie.</div>';
+  bindAtelier();
+}
+function techpackHtml(p){
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Tech pack</div>'+
+    (p.onderdelen||[]).map(o => '<div style="font-size:.8rem;"><b>'+esc(o.naam)+'</b> · '+esc(o.materiaal)+' <span style="color:var(--muted);">('+esc(o.spec)+')</span></div>').join('')+
+    '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.constructie)+' · '+esc(p.maten)+'</div>'+
+    '<div style="font-size:.72rem;color:var(--muted);">Controle: '+esc((p.controle||[]).join(', '))+'</div></div>';
+}
+function bindAtelier(){
+  const el = $('#aLijst');
+  el.querySelectorAll('.aConcept').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = 'De creatief directeur tekent...';
+    try { const r = await api('atelier/concept', { id: b.dataset.o }); vervangOntwerp(r.ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  el.querySelectorAll('.aTech').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('atelier/techpack', { id: b.dataset.o }); vervangOntwerp(r.ontwerp); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.aKritiek').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = 'Denkt na...';
+    try { const r = await api('atelier/kritiek', { id: b.dataset.o }); vervangOntwerp(r.ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  el.querySelectorAll('.aStatus').forEach(s => s.addEventListener('change', async () => {
+    try { const r = await api('atelier/zet', { id: s.dataset.o, status: s.value }); vervangOntwerp(r.ontwerp); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.aDel').forEach(b => b.addEventListener('click', async () => {
+    try { await api('atelier/verwijder', { id: b.dataset.o }); ATELIER.ontwerpen = ATELIER.ontwerpen.filter(o => o.id !== b.dataset.o); renderAtelier(); } catch(e){ meld(e.message); }
+  }));
+}
+function vervangOntwerp(o){ if (!o || !ATELIER) return; const i = ATELIER.ontwerpen.findIndex(x => x.id === o.id); if (i >= 0) ATELIER.ontwerpen[i] = o; renderAtelier(); }
+$('#aTerug').addEventListener('click', laadKamers);
+$('#aMaak').addEventListener('click', async () => {
+  const naam = $('#aNaam').value.trim(); if (!naam){ meld('Geef het ontwerp een naam.'); return; }
+  try {
+    const r = await api('atelier/maak', { categorie: $('#aCat').value, naam, huis: $('#aHuis').value.trim(), brief: $('#aBrief').value.trim() });
+    $('#aNaam').value = ''; $('#aBrief').value = '';
+    ATELIER.ontwerpen.unshift(r.ontwerp); ATELIER.kpi.totaal++;
+    // meteen de AI het concept laten tekenen
+    try { const c = await api('atelier/concept', { id: r.ontwerp.id }); vervangOntwerp(c.ontwerp); } catch(e){ renderAtelier(); }
+    meld('Ontwerp aangemaakt; de creatief directeur tekent het concept.');
+  } catch(e){ meld(e.message); }
+});
 
 /* ---------- platform-statistieken, chat & snap, onboarding ---------- */
 function statsHtml(d){

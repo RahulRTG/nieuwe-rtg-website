@@ -131,7 +131,7 @@
   <!-- kamergrid -->
   <section id="vKamers" hidden>
     <h1>De kantoren</h1>
-    <p class="deck">Twaalf kamers, elk met de cijfers en werklijsten van die afdeling. De boardroom ziet alles en kan alles schakelen. <a href="/apps/personeel.html?kantoor=1" style="color:var(--gold);">📟 Aanmelden voor je dienst (ook thuiswerken) via de personeels-app →</a></p>
+    <p class="deck">Elke afdeling een eigen kamer met de cijfers en werklijsten die er toe doen, plus het RTG Atelier: het ontwerpbureau van het kantoor. De boardroom ziet alles en kan alles schakelen. <a href="/apps/personeel.html?kantoor=1" style="color:var(--gold);">📟 Aanmelden voor je dienst (ook thuiswerken) via de personeels-app →</a></p>
     <div class="grid" id="grid"></div>
   </section>
 
@@ -407,8 +407,7 @@ async function laadKamers(){
   const d = await api('kamers');
   toon('vKamers');
   const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
-    '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>' +
-    '<button class="kaart kamer" data-kamer="atelier" style="border-color:var(--gold);"><span class="ic">✂️</span><h2>RTG Atelier</h2><p>Het ontwerpbureau voor mode en alles wat je aan het lijf draagt. Vol met AI.</p><span class="kpi" style="color:var(--gold);">Ontwerpen →</span></button>';
+    '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');

@@ -81,6 +81,21 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'De kaart van vandaag' + ((d().kantineMenu || {}).datum ? ' (' + d().kantineMenu.datum + ')' : ''), items: ((d().kantineMenu || {}).items || []).slice(0, 12) },
         { titel: 'Huisregel', items: ['In de kantine praten we niet over cijfers; werkvragen mogen mee terug naar de kamer.'] }
+      ] },
+    /* RTG Atelier: het besloten ontwerpbureau van het kantoor. De cijfers
+       staan hier; de eigenlijke ontwerpvloer (concepten, tech packs, de
+       creatief directeur) opent als een eigen cockpit op deze kamer. */
+    atelier: { naam: 'RTG Atelier', emoji: '✂️', missie: 'Het ontwerpbureau van het kantoor voor mode en alles wat je aan het lijf draagt; het huis waar de grote maisons hun atelier zouden willen hebben.', eigenApp: true,
+      kpis: () => [
+        ['Ontwerpen', tel((d().atelier || {}).ontwerpen)],
+        ['In productie', tel(lijst((d().atelier || {}).ontwerpen).filter(o => o.status === 'productie'))],
+        ['Categorieen', 8],
+        ['Collecties', tel((d().atelier || {}).collecties)],
+        ['Bijgewerkt (7d)', recent((d().atelier || {}).ontwerpen, 'updatedAt', 7)]
+      ],
+      lijsten: () => [
+        { titel: 'Laatste ontwerpen', items: lijst((d().atelier || {}).ontwerpen).slice(0, 8).map(o => String(o.naam) + ' (' + String(o.categorie) + ', ' + String(o.status) + ')') },
+        { titel: 'Verder werken', items: ['Klik op deze kamer om het atelier te openen: brief een stuk, laat de AI het concept uittekenen, en vraag het tech pack en de creatief directeur.'] }
       ] }
   };
 };

@@ -382,6 +382,11 @@
       try { await api('keten/rampbeeld/schaal', { niveau: x.dataset.nvl }); laadRamp(); } catch (e) { alert(e.message); }
     }));
   }
+  $('#coordKnop').addEventListener('click', async () => {
+    $('#coordUit').textContent = 'De coordinator denkt mee…';
+    try { const r = await api('keten/rampbeeld/ai', {}); $('#coordUit').textContent = r.antwoord; }
+    catch (e) { $('#coordUit').textContent = e.message; }
+  });
 
   function start() {
     $('#vLogin').hidden = true;

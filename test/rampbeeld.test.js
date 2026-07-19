@@ -88,7 +88,23 @@ test('4. de boardroom ziet het volledige rampbeeld over alle korpsen heen', asyn
   await api('/api/office/rampbeeld/schaal', { niveau: 'normaal', naam: 'boardroom' }, office);
 });
 
-test('5. de grens: zonder keten geen rampbeeld, en geen andere zaak dan hulp/zorg/defensie', async () => {
+test('5. de AI-coordinator doet concrete voorstellen, maar voert niets uit', async () => {
+  // een open melding zonder eenheid moet in de voorstellen komen
+  await api('/api/supplier/hulp/melding/maak', { tekst: 'Instorting, meerdere gewonden', plek: 'Dalt Vila', prio: 1 }, tok.URGENCIA);
+  const r = await api('/api/supplier/keten/rampbeeld/ai', {}, tok.URGENCIA);
+  assert.equal(r.status, 200);
+  assert.ok(Array.isArray(r.body.voorstellen) && r.body.voorstellen.length, 'er zijn concrete voorstellen');
+  assert.ok(r.body.antwoord.length > 15, 'en een leesbaar advies');
+  assert.match(JSON.stringify(r.body.voorstellen), /Instorting|ziekenhuis|eenheid|bijstand/i, 'het voorstel gaat over de open melding of de inzet');
+  // de coordinator wijst NIETS toe: de melding blijft onbemand tot een mens hem toewijst
+  const bord = await api('/api/supplier/hulp/overzicht', {}, tok.URGENCIA);
+  const nog = bord.body.meldingen.find(m => /Instorting/.test(m.tekst));
+  assert.equal(nog.eenheidId, null, 'de coordinator heeft niets zelf toegewezen');
+  // de boardroom kan de coordinator ook raadplegen
+  assert.equal((await api('/api/office/rampbeeld/ai', {}, office)).status, 200);
+});
+
+test('6. de grens: zonder keten geen rampbeeld, en geen andere zaak dan hulp/zorg/defensie', async () => {
   // een vers korps zonder verbindingen krijgt 409
   const bombers = await login('BOMBERS', '1234');
   assert.equal((await api('/api/supplier/keten/rampbeeld', {}, bombers)).status, 409);

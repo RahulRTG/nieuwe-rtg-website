@@ -37,6 +37,11 @@ module.exports = (kern) => {
     }
     stuur(res, r);
   });
+  // de AI-coordinator: adviserende inzetvoorstellen op het gedeelde beeld
+  app.post('/api/supplier/keten/rampbeeld/ai', supplierAuth, async (req, res) => {
+    try { stuur(res, await rampbeeld.coordinatorAi(req.supplier.code, req.body.q)); }
+    catch (e) { console.error('[rampbeeld]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
   app.post('/api/supplier/keten/gesprek', supplierAuth, (req, res) => stuur(res, ketenchat.gesprek(req.supplier, req.actor, req.body.kanaal)));
   app.post('/api/supplier/keten/bericht', supplierAuth, (req, res) => {
     const r = ketenchat.bericht(req.supplier, req.actor, req.body.kanaal, req.body.tekst);

@@ -10,6 +10,9 @@ const fs = require('fs');
 const path = require('path');
 
 const lees = p => fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
+// het volledige verhaal van de leden-AI staat in de ai-promptlaag: de assemblage
+// in prompt.js plus het vaste karakterportret in het sibling-bestand karakter.js
+const aiVerhaal = () => lees('server/kern/ai/prompt.js') + '\n' + lees('server/kern/ai/karakter.js');
 
 test('het gedeelde karakter draagt de doctrine, met de concrete gedragsregels', () => {
   const { RAHUL_LEAD } = require('../server/kern/rahul');
@@ -27,7 +30,7 @@ test('het karakter: rots in de branding, schijt aan ego\'s, beschermer, geen ger
   assert.match(RAHUL_LEAD, /op voor de zwakkere/i, 'de beschermer, ook tegen eigen vrienden');
   assert.match(RAHUL_LEAD, /islamitisch/i, 'zijn geloof, rustig gedragen');
   assert.match(RAHUL_LEAD, /roddel/i, 'nooit over anderen achter hun rug');
-  const verhaal = lees('server/kern/ai/prompt.js');
+  const verhaal = aiVerhaal();
   assert.match(verhaal, /super populair/i, 'het jeugdverhaal staat in het volledige verhaal');
   assert.match(verhaal, /voor de zwakkere opkwam/i, 'en de kern ervan: de beschermer');
   assert.match(verhaal, /familie Zuidam/i, 'de boerderij waar hij als peuter woonde');
@@ -41,7 +44,7 @@ test('de geschiedenis: van huis weg, de verliezen van 2024 en 2025, en de discre
   assert.match(RAHUL_LEAD, /vijftiende.*van huis weg/i, 'de weggelopen jaren staan in de lead');
   assert.match(RAHUL_LEAD, /2024 en 2025/i, 'de verliesjaren staan in de lead');
   assert.match(RAHUL_LEAD, /NOOIT uit jezelf/i, 'de discretieregel: nooit ongevraagd');
-  const verhaal = lees('server/kern/ai/prompt.js');
+  const verhaal = aiVerhaal();
   assert.match(verhaal, /voetbalkleedkamers/i, 'overal en nergens gewoond, tot in de details');
   assert.match(verhaal, /zonder dat iemand daar iets doorhad/i, 'en op school had niemand iets door');
   assert.match(verhaal, /2024.*alles tegelijk/i, 'het verlies van 2024');
@@ -62,7 +65,7 @@ test('de werkvloer-regel: in een werkomgeving nooit persoonlijke zaken, behalve 
 });
 
 test('de leden-AI (volledig verhaal) en het AI-stuur dragen de doctrine ook', () => {
-  assert.match(lees('server/kern/ai/prompt.js'), /liever te hard dan een liegbeest/i, 'leden-AI');
+  assert.match(aiVerhaal(), /liever te hard dan een liegbeest/i, 'leden-AI');
   assert.match(lees('server/kern/stuur.js'), /liever te hard dan een liegbeest/i, 'tool-lus van het stuur');
 });
 

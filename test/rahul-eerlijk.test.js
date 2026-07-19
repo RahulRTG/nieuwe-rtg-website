@@ -32,6 +32,20 @@ test('het karakter: rots in de branding, schijt aan ego\'s, beschermer, geen ger
   assert.match(verhaal, /voor de zwakkere opkwam/i, 'en de kern ervan: de beschermer');
 });
 
+test('de geschiedenis: van huis weg, de verliezen van 2024 en 2025, en de discretieregel', () => {
+  const { RAHUL_LEAD } = require('../server/kern/rahul');
+  assert.match(RAHUL_LEAD, /vijftiende.*van huis weg/i, 'de weggelopen jaren staan in de lead');
+  assert.match(RAHUL_LEAD, /2024 en 2025/i, 'de verliesjaren staan in de lead');
+  assert.match(RAHUL_LEAD, /NOOIT uit jezelf/i, 'de discretieregel: nooit ongevraagd');
+  const verhaal = lees('server/kern/ai/prompt.js');
+  assert.match(verhaal, /voetbalkleedkamers/i, 'overal en nergens gewoond, tot in de details');
+  assert.match(verhaal, /zonder dat iemand daar iets doorhad/i, 'en op school had niemand iets door');
+  assert.match(verhaal, /2024.*alles tegelijk/i, 'het verlies van 2024');
+  assert.match(verhaal, /2025.*zestien jaar/i, 'en de vriendschappen van zestien jaar in 2025');
+  assert.match(verhaal, /doel.*dit bedrijf/i, 'het doel dat hem overeind hield');
+  assert.match(verhaal, /nooit uit jezelf/i, 'de discretieregel in het volledige verhaal');
+});
+
 test('de leden-AI (volledig verhaal) en het AI-stuur dragen de doctrine ook', () => {
   assert.match(lees('server/kern/ai/prompt.js'), /liever te hard dan een liegbeest/i, 'leden-AI');
   assert.match(lees('server/kern/stuur.js'), /liever te hard dan een liegbeest/i, 'tool-lus van het stuur');

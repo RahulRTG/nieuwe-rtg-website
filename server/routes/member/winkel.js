@@ -7,10 +7,18 @@ module.exports = (kern) => {
     mijnApart, mijnStyling, vraagPaskamer, retailIsRetail, PASPOORT_NIVEAUS,
     paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn, mall } = kern;
 
-/* ---- de RTG Mall: de luxe shoppingmall, een etagelijst van de boutieks ---- */
-// het overzicht van de mall: etages met boutieks; elke boutique opent haar
-// eigen catalogus via /api/retail/catalogus
+/* ---- de RTG Mall: de enige plek waar je bij RTG koopt ---- */
+// het overzicht van de mall: etages met boutieks; een mode-boutique opent haar
+// catalogus via /api/retail/catalogus, het eigen-merk via /api/mall/eigen
 app.post('/api/mall', auth, (req, res) => res.json(mall.overzicht()));
+// de catalogus van het RTG eigen-merk (hardware + de Hardwarelab-ontwerpen)
+app.post('/api/mall/eigen', auth, (req, res) => res.json(mall.eigenCatalogus()));
+// een lid bestelt een eigen-merk-product direct in de app
+app.post('/api/mall/bestel', auth, (req, res) => {
+  const r = mall.memberBestel(req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
 
 /* ---- retail/mode: de catalogus van een modehuis, verlanglijst, apart en styling ---- */
 // de catalogus van een merk (collecties + artikelen met ledenprijs, drops, wishlist)

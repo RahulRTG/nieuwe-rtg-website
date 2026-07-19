@@ -60,7 +60,7 @@
   <div><div class="ey">Alleen voor leden</div><h1>De RTG Mall</h1></div>
 </header>
 <main id="main">
-  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">De boutieks van RTG, per etage. Ledenprijzen gelden binnen elke boutique; je legt een stuk apart of laat een maat naar de paskamer brengen. Prijzen in euro.</p>
+  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Alles wat je bij RTG koopt, op één plek. Het eigen-merk bestel je direct; bij de mode-boutieks gelden ledenprijzen en leg je een stuk apart of laat je een maat naar de paskamer brengen. Prijzen in euro.</p>
   <div id="etages"></div>
 </main>
 
@@ -97,27 +97,63 @@ async function laad(){
   $('#etages').innerHTML = d.etages.map(e =>
     '<div class="etage"><div class="etage-kop"><h2>'+e.icon+' '+esc(e.label)+'</h2><span class="n">'+e.boutieks.length+' '+(e.boutieks.length===1?'boutique':'boutieks')+'</span></div>'+
     '<div class="boutieks">'+e.boutieks.map(b =>
-      '<button class="boutiek" data-code="'+esc(b.code)+'" data-naam="'+esc(b.naam)+'" data-stad="'+esc(b.stad||'')+'">'+
+      '<button class="boutiek" data-code="'+esc(b.code)+'" data-kind="'+esc(b.kind||'retail')+'" data-naam="'+esc(b.naam)+'" data-stad="'+esc(b.stad||'')+'">'+
         '<span class="stad">'+esc(b.stad||'RTG')+'</span>'+
         '<h3>'+esc(b.naam)+'</h3>'+
         '<span class="tag">'+esc(b.tagline)+'</span>'+
         '<span class="meta">'+b.aantal+' stuk(s)'+(b.vanaf!=null?' · vanaf '+euro(b.vanaf):'')+(b.categorieen.length?' · '+b.categorieen.map(esc).join(', '):'')+'</span>'+
       '</button>').join('')+'</div></div>'
   ).join('');
-  $('#etages').querySelectorAll('.boutiek').forEach(b => b.addEventListener('click', () => openBoutiek(b.dataset.code, b.dataset.naam, b.dataset.stad)));
+  $('#etages').querySelectorAll('.boutiek').forEach(b => b.addEventListener('click', () => openBoutiek(b.dataset.code, b.dataset.naam, b.dataset.stad, b.dataset.kind)));
 }
 
 let HUIDIG = null;
-async function openBoutiek(code, naam, stad){
+async function openBoutiek(code, naam, stad, kind){
   HUIDIG = code;
   $('#bladNaam').textContent = naam;
   $('#bladStad').textContent = stad || 'RTG';
   $('#bladArt').innerHTML = '<div class="leeg">Laden...</div>';
   $('#blad').classList.add('open');
   try {
-    const d = await api('/api/retail/catalogus', { supplierCode: code });
-    tekenArt(d.artikelen || []);
+    if (kind === 'eigen') { const d = await api('/api/mall/eigen'); tekenEigen(d.producten || []); }
+    else { const d = await api('/api/retail/catalogus', { supplierCode: code }); tekenArt(d.artikelen || []); }
   } catch(e){ $('#bladArt').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+function tekenEigen(prod){
+  $('#bladArt').innerHTML = prod.length ? prod.map(p =>
+    '<div class="kaart">'+
+      (p.discipline?'<span class="cat">'+esc(p.discipline)+'</span>':(p.eigen?'<span class="cat">RTG Hardwarelab</span>':''))+
+      '<h3>'+esc(p.naam)+'</h3>'+
+      (p.beschrijving?'<span class="oms">'+esc(p.beschrijving)+'</span>':'')+
+      '<span class="prijs">'+euro(p.eenmalig)+(p.perMaand?' <span style="color:var(--soft);font-size:.8rem;">+ '+euro(p.perMaand)+'/mnd</span>':'')+'</span>'+
+      '<span class="opties">'+esc(p.eenheid)+' · euro, ex btw</span>'+
+      '<div class="rij"><button class="knop koop" data-slug="'+esc(p.slug)+'" data-naam="'+esc(p.naam)+'">Bestellen</button></div>'+
+    '</div>').join('') : '<div class="leeg">Het eigen-merk vult zich nog.</div>';
+  $('#bladArt').querySelectorAll('.koop').forEach(b => b.addEventListener('click', () => koopEigen(b.dataset.slug, b.dataset.naam)));
+}
+function koopEigen(slug, naam){
+  const wrap = document.createElement('div');
+  wrap.className = 'blad open'; wrap.style.zIndex = '40';
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="koopTerug">← Terug</button>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">Bestellen</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
+    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+      '<label class="opties">Naam voor de levering</label><input class="veld" id="koopNaam" maxlength="60" style="margin-bottom:.5rem;">'+
+      '<label class="opties">E-mail</label><input class="veld" id="koopMail" type="email" maxlength="80" style="margin-bottom:.5rem;">'+
+      '<label class="opties">Aantal</label><input class="veld" id="koopAantal" type="number" min="1" max="50" value="1" style="margin-bottom:.5rem;">'+
+      '<textarea class="veld" id="koopNote" rows="2" maxlength="500" placeholder="Opmerking (optioneel)" style="margin-bottom:.6rem;resize:vertical;"></textarea>'+
+      '<button class="knop" id="koopBevestig" style="width:100%;">Bestelling plaatsen</button>'+
+      '<p class="opties" style="margin-top:.5rem;">We nemen contact op voor de levering. Facturatie in euro, ex btw.</p>'+
+    '</div></div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('#koopTerug').addEventListener('click', () => wrap.remove());
+  wrap.querySelector('#koopBevestig').addEventListener('click', async () => {
+    const naamV = wrap.querySelector('#koopNaam').value.trim(), mail = wrap.querySelector('#koopMail').value.trim();
+    const aantal = wrap.querySelector('#koopAantal').value, note = wrap.querySelector('#koopNote').value.trim();
+    if (!naamV){ meld('Vul je naam in.'); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){ meld('Vul een geldig e-mailadres in.'); return; }
+    try { await api('/api/mall/bestel', { slug, naam: naamV, email: mail, aantal, note }); wrap.remove(); meld('Bestelling geplaatst. We nemen contact op.'); }
+    catch(e){ meld(e.message); }
+  });
 }
 function tekenArt(arts){
   $('#bladArt').innerHTML = arts.length ? arts.map(a => {

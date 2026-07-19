@@ -32,12 +32,28 @@ test('1. de mall toont etages met boutieks; alleen na inlog', async () => {
   assert.equal((await api(base, '/api/mall', {}, null)).status, 401);
   const r = await api(base, '/api/mall', {}, lid.token);
   assert.equal(r.status, 200);
-  assert.ok(Array.isArray(r.body.etages) && r.body.etages.length >= 2, 'er zijn meerdere etages');
+  assert.ok(Array.isArray(r.body.etages) && r.body.etages.length >= 3, 'er zijn meerdere etages');
   const ids = r.body.etages.map(e => e.id);
-  for (const id of ['mode', 'sieraden', 'leer']) assert.ok(ids.includes(id), 'etage ' + id + ' is gevuld');
+  for (const id of ['eigen', 'mode', 'sieraden', 'leer']) assert.ok(ids.includes(id), 'etage ' + id + ' is gevuld');
+  assert.equal(ids[0], 'eigen', 'het RTG eigen-merk staat vooraan');
   const boutieks = r.body.etages.flatMap(e => e.boutieks);
   assert.ok(boutieks.every(b => b.code && b.naam && b.tagline), 'elke boutique heeft naam en tagline');
   assert.ok(boutieks.some(b => b.vanaf > 0), 'ten minste een boutique toont een vanaf-prijs');
+});
+
+test('1b. het RTG eigen-merk heeft een catalogus en is direct te bestellen', async () => {
+  const cat = await api(base, '/api/mall/eigen', {}, lid.token);
+  assert.equal(cat.status, 200);
+  assert.ok(cat.body.producten.length >= 5, 'de vaste hardware staat erin');
+  assert.ok(cat.body.producten.some(p => p.slug === 'zaakdoos'), 'de Zaakdoos hoort erbij');
+  const best = await api(base, '/api/mall/bestel', { slug: 'rtg-pda', naam: 'Sam', email: 'sam@x.nl', aantal: 2 }, lid.token);
+  assert.equal(best.status, 200);
+  assert.equal(best.body.bestelling.aantal, 2);
+  assert.equal(best.body.bestelling.prijs.valuta, 'EUR');
+  // zonder e-mail mag het niet, en een dubbele open bestelling wordt geweigerd
+  assert.equal((await api(base, '/api/mall/bestel', { slug: 'rtg-pda', naam: 'Sam' }, lid.token)).status, 400);
+  assert.equal((await api(base, '/api/mall/bestel', { slug: 'rtg-pda', naam: 'Sam', email: 'sam@x.nl' }, lid.token)).status, 409);
+  assert.equal((await api(base, '/api/mall/bestel', { slug: 'bestaat-niet', naam: 'Sam', email: 'sam@x.nl' }, lid.token)).status, 400);
 });
 
 test('2. een boutique uit de mall opent haar catalogus met ledenprijzen', async () => {

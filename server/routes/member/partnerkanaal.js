@@ -99,29 +99,13 @@ module.exports = (kern) => {
     res.json({ ok: true });
   });
 
-  /* De RTG-winkel: hardware en uitbreidingen voor partners, zoals de Zaakdoos.
-     De prijzen staan hier vast (euro, ex btw) zodat een bestelling altijd de
-     prijs vastlegt die gold op het moment van bestellen; de verkooppagina
-     toont ze ook in de munt van de kijker, maar gefactureerd wordt in euro. */
-  const WINKEL = {
-    zaakdoos:         { naam: 'RTG Zaakdoos',            eenmalig: 100, perMaand: 150, eenheid: 'per doos' },
-    'slimme-deur':    { naam: 'RTG Slimme Deur',         eenmalig: 120, perMaand: 5,   eenheid: 'per deur' },
-    'kamer-butler':   { naam: 'RTG Kamer-butler',        eenmalig: 180, perMaand: 5,   eenheid: 'per kamer' },
-    toegangspoort:    { naam: 'RTG Toegangspoort',       eenmalig: 450, perMaand: 5,   eenheid: 'per zuil' },
-    paniekknop:       { naam: 'RTG Paniekknop',          eenmalig: 60,  perMaand: 5,   eenheid: 'per knop' },
-    'gast-piepers':   { naam: 'RTG Gast-piepers',        eenmalig: 250, perMaand: 5,   eenheid: 'per set van 10' },
-    'rtg-pda':        { naam: 'RTG PDA',                 eenmalig: 220, perMaand: 5,   eenheid: 'per stuk' },
-    'rit-tracker':    { naam: 'RTG Rit-tracker',         eenmalig: 80,  perMaand: 5,   eenheid: 'per voertuig' },
-    veldsensor:       { naam: 'RTG Veldsensor-set',      eenmalig: 350, perMaand: 5,   eenheid: 'per set' },
-    schermen:         { naam: 'RTG Keuken- en kassascherm', eenmalig: 300, perMaand: 5, eenheid: 'per scherm' },
-    'satelliet-pakket': { naam: 'RTG Satelliet-startpakket', eenmalig: 900, perMaand: 150, eenheid: 'per locatie' }
-  };
-  /* De vaste catalogus hierboven plus de producten die RTG Hardwarelab naar de
-     winkel heeft gezet (db.data.winkelProducten). Zo verschijnen eigen
-     ontwerpen die in productie gaan naast de standaardhardware, met dezelfde
-     prijslogica (euro, ex btw). */
-  const alleProducten = () => Object.assign({}, WINKEL,
-    (db.data.winkelProducten && typeof db.data.winkelProducten === 'object') ? db.data.winkelProducten : {});
+  /* De RTG-winkel: hardware en uitbreidingen, zoals de Zaakdoos. De vaste
+     catalogus staat in kern/winkelcatalogus.js (een gedeelde bron met de RTG
+     Mall); daarbovenop komen de door RTG Hardwarelab gepubliceerde ontwerpen uit
+     db.data.winkelProducten. Prijzen in euro, ex btw; een bestelling legt de
+     prijs vast die op dat moment gold. */
+  const { alleProducten: catalogusVan } = require('../../kern/winkelcatalogus');
+  const alleProducten = () => catalogusVan(db);
   // de prijstabel is de ene bron: de verkooppagina leest hem hiervandaan
   app.get('/api/winkel/producten', (req, res) => res.json({ producten: alleProducten() }));
   app.post('/api/winkel/bestel', (req, res) => {

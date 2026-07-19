@@ -9,6 +9,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<script src="/shared/toestelkluis.js" defer></script>
 <style>
   :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
     --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;}
@@ -58,6 +59,19 @@
     <h2>Eten, koken en bewegen</h2>
     <div class="kaart" id="kookKaart"><p class="stil">Laden…</p></div>
   </section>
+
+  <section aria-label="Mijn recepten">
+    <h2>Mijn recepten, op dit toestel</h2>
+    <div class="kaart" id="receptKaart">
+      <p class="stil">Bewaar de recepten van Rahul (of uw eigen) in de beveiligde opslag van dit toestel. Alleen u kunt erbij; er gaat niets over de lijn.</p>
+      <label class="stil" for="receptNaam" style="display:block;margin-top:0.6rem;">Naam</label>
+      <input id="receptNaam" maxlength="60" placeholder="Bijv. pasta van Rahul" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.55rem 0.8rem;margin-top:0.25rem;">
+      <label class="stil" for="receptTekst" style="display:block;margin-top:0.6rem;">Recept</label>
+      <textarea id="receptTekst" rows="4" maxlength="4000" placeholder="Plak hier het recept uit de Rahul-chat" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.55rem 0.8rem;margin-top:0.25rem;resize:vertical;"></textarea>
+      <button class="knop" id="receptBewaar">📱 Bewaar op dit toestel</button>
+      <div id="receptLijst" style="margin-top:0.6rem;"></div>
+    </div>
+  </section>
 </main>
 <script>
 (() => {
@@ -86,15 +100,47 @@
     $('#kookKaart').innerHTML =
       '<p class="stil">Uit eten: ongeveer ' + b.uitPerWeek + ' keer per week' + (b.laat ? ' · ' + b.laat + ' late nachten in twee weken' : '') + '.</p>' +
       '<p class="stil" style="margin-top:0.5rem;">' + esc(d.koken) + '</p>' +
-      '<button class="knop" id="kookKnop">🍳 Vraag Rahul een recept voor vanavond</button>';
+      '<button class="knop" id="kookKnop">🍳 Vraag Rahul een recept voor vanavond</button> ' +
+      '<button class="knop" id="beweegKnop">💆 Vraag Rahul naar sport en wellness</button>';
     const vraag = async (tekst) => {
       try { await navigator.clipboard.writeText(tekst); } catch (e) {}
       location.href = '/apps/app.html#ai';
     };
     $('#rustKnop').addEventListener('click', () => vraag(d.vraagRust));
     $('#kookKnop').addEventListener('click', () => vraag(d.vraagKoken));
+    $('#beweegKnop').addEventListener('click', () => vraag(d.vraagBewegen));
   }
+
+  /* Mijn recepten: eigen kopieen in de Toestelkluis (OPFS) van dit toestel */
+  async function recepten() {
+    const host = $('#receptLijst');
+    if (!window.Toestelkluis || !Toestelkluis.kan()) { host.innerHTML = ''; return; }
+    const items = (await Toestelkluis.lijst()).filter(x => x.naam.startsWith('recept_'));
+    host.innerHTML = items.map(x =>
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.4rem;">' +
+        '<span>🍳 ' + esc(x.naam.slice(7).replace(/_/g, ' ').replace(/\.txt$/, '')) + '</span>' +
+        '<span style="white-space:nowrap;">' +
+        '<button class="knop" style="margin-top:0;padding:0.25rem 0.6rem;font-size:0.72rem;" data-ropen="' + esc(x.naam) + '">Lees</button> ' +
+        '<button class="knop" style="margin-top:0;padding:0.25rem 0.6rem;font-size:0.72rem;color:var(--soft);border-color:var(--line);" data-rwis="' + esc(x.naam) + '" aria-label="wis recept">✕</button></span></div>').join('') ||
+      '<p class="stil" style="margin-top:0.4rem;">Nog geen recepten bewaard.</p>';
+    host.querySelectorAll('[data-ropen]').forEach(b => b.addEventListener('click', async () => {
+      const f = await Toestelkluis.haal(b.dataset.ropen);
+      if (f) window.alert(await f.text());
+    }));
+    host.querySelectorAll('[data-rwis]').forEach(b => b.addEventListener('click', async () => {
+      await Toestelkluis.wis(b.dataset.rwis); recepten();
+    }));
+  }
+  $('#receptBewaar').addEventListener('click', async () => {
+    const naam = $('#receptNaam').value.trim(), tekst = $('#receptTekst').value.trim();
+    if (!naam || !tekst || !window.Toestelkluis || !Toestelkluis.kan()) return;
+    await Toestelkluis.bewaar('recept_' + naam + '.txt', new Blob([tekst], { type: 'text/plain' }));
+    $('#receptNaam').value = ''; $('#receptTekst').value = '';
+    recepten();
+  });
   laad();
+  if (document.readyState === 'complete') recepten();
+  else window.addEventListener('load', recepten);
 })();
 </script>
 </body>

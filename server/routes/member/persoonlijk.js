@@ -58,10 +58,12 @@ app.post('/api/fluister/profiel', auth, (req, res) => {
   // nieuwe seintjes worden meteen ook een melding op het toestel (met dedupe)
   fluisterPush(req.session.key);
   const p = fluisterProfiel(req.session.key);
-  // de voorspeller fluistert stil mee: alleen een rijpe gewoonte wordt een
-  // seintje in "Rahul ziet", nooit een melding op het toestel
+  // de voorspeller en Balans fluisteren stil mee: alleen een rijpe gewoonte
+  // of een echt volle week wordt een seintje in "Rahul ziet", nooit een
+  // melding op het toestel
   const vs = kern.voorspel && kern.voorspel.seintjeVoor(kern.voorspel.voorLid(liveCodename(req.session), req.session.key));
-  if (vs) p.seintjes = [vs].concat(p.seintjes || []).slice(0, 5);
+  const bs = kern.balans && kern.balans.seintjeVoorBalans(kern.balans.balansVoorLid(liveCodename(req.session), req.session.key));
+  p.seintjes = [vs, bs].filter(Boolean).concat(p.seintjes || []).slice(0, 5);
   res.json(p);
 });
 app.post('/api/fluister/onthoud', auth, (req, res) => {

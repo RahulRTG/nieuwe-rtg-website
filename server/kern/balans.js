@@ -38,6 +38,15 @@ function adviezenUit(b) {
   return a.slice(0, 4);
 }
 
+/* puur: het stille balans-seintje. Alleen als de komende week echt vol zit
+   (nul lege dagen) fluistert Balans een keer mee in "Rahul ziet"; nooit
+   een melding op het toestel, en een week met lucht blijft stil. */
+function seintjeVoorBalans(balansResultaat) {
+  const b = balansResultaat && balansResultaat.beeld;
+  if (!b || b.vrijeDagen > 0) return null;
+  return { icoon: '🌿', tekst: 'Uw komende week zit vol; niks doen is ook een afspraak. Vraag me gerust een rustmoment te plannen.' };
+}
+
 function maakBalans({ db, zorgVan, klokVan }) {
   const boek = () => Array.isArray(db.data.payBoekingen) ? db.data.payBoekingen : [];
 
@@ -52,7 +61,8 @@ function maakBalans({ db, zorgVan, klokVan }) {
         ? 'Rahul kookt met u mee en houdt rekening met: ' + zorg.allergenen.join(', ') + '.'
         : 'Rahul kookt met u mee; zet allergenen of een dieet in uw zorgprofiel en hij houdt er rekening mee.',
       vraagRust: 'Kijk naar mijn agenda en plan een rustmoment deze week; ik wil een dag niks.',
-      vraagKoken: 'Geef me een simpel recept voor vanavond dat bij mijn zorgprofiel past.'
+      vraagKoken: 'Geef me een simpel recept voor vanavond dat bij mijn zorgprofiel past.',
+      vraagBewegen: 'Welke spa-, wellness- of sportmogelijkheden zijn er bij onze huizen? Plan er een op een lege dag deze week.'
     };
   }
 
@@ -68,7 +78,7 @@ function maakBalans({ db, zorgVan, klokVan }) {
     return { ok: true, klok, adviezen: a };
   }
 
-  return { balans: { balansVoorLid, balansVoorStaf, weekBeeld, adviezenUit } };
+  return { balans: { balansVoorLid, balansVoorStaf, seintjeVoorBalans, weekBeeld, adviezenUit } };
 }
 
-module.exports = { maakBalans, weekBeeld, adviezenUit };
+module.exports = { maakBalans, weekBeeld, adviezenUit, seintjeVoorBalans };

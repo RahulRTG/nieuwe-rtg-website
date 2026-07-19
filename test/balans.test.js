@@ -7,7 +7,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
-const { weekBeeld, adviezenUit } = require('../server/kern/balans.js');
+const { weekBeeld, adviezenUit, seintjeVoorBalans } = require('../server/kern/balans.js');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-balans-'));
 let srv, base, lid, zaak, staf;
@@ -38,6 +38,13 @@ test('het pure weekbeeld: volle en lege dagen, avonden en late nachten', () => {
   assert.ok(adviezenUit(laat).some(x => /slaap/i.test(x.tekst)));
 });
 
+test('het stille balans-seintje: alleen een echt volle week fluistert', () => {
+  const vol = seintjeVoorBalans({ beeld: { vrijeDagen: 0 } });
+  assert.ok(vol && /rustmoment/i.test(vol.tekst));
+  assert.equal(seintjeVoorBalans({ beeld: { vrijeDagen: 1 } }), null, 'een dag lucht: stil');
+  assert.equal(seintjeVoorBalans(null), null);
+});
+
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_ENC_KEY: 'test-encryptiesleutel-1234567890' } });
   base = srv.base;
@@ -62,7 +69,8 @@ test('het lid krijgt een weekbeeld met adviezen en kookhulp', async () => {
   assert.equal(r.body.beeld.perDag.length, 7);
   assert.ok(r.body.adviezen.length >= 1 && r.body.adviezen.length <= 4);
   assert.match(r.body.koken, /zorgprofiel/i);
-  assert.ok(r.body.vraagRust && r.body.vraagKoken, 'kant-en-klare vragen voor Rahul');
+  assert.ok(r.body.vraagRust && r.body.vraagKoken && r.body.vraagBewegen, 'kant-en-klare vragen voor Rahul');
+  assert.match(r.body.vraagBewegen, /wellness|sport/i);
 });
 
 test('personeel: eigen klokbalans op naam, eerlijk zonder staffId', async () => {

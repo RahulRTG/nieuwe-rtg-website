@@ -8,6 +8,52 @@
         '<label class="soft-xs">'+T('kt.min','Minimumprijs (€)')+'</label><input class="st-in" id="ktTc" type="number" step="1" value="'+(t2.minimum||0)+'">'+
         '<button class="bigbtn" id="ktTSave" style="margin-top:0.2rem;">'+T('kt.tsave','Tarief opslaan')+'</button></div></div>';
     }
+    if (kantoorSec === 'vandaag'){
+      // het slimme vandaag-bord van de dienstverlener (zzp, chef, wellness)
+      if (!vakData){
+        laadVakwerk();
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+      } else if (vakData.error){
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+vakData.error+'</div></div>';
+      } else {
+        const v = vakData, k = v.kpi;
+        const rij = (b, knop) => '<div class="st-row"><span>'+(b.soort==='product'?'📦':'🗓️')+' '+b.dienst+
+          '<span class="sub">'+b.klant+(b.tijd?' · '+b.tijd:(b.datum?' · '+b.datum:' · '+T('kt.geendatum','nog geen datum')))+(b.duurMin?' · '+b.duurMin+' min':'')+'</span></span>'+
+          '<span class="acts"><b style="color:var(--gold);margin-right:0.4rem;">'+eur(b.prijs)+'</b>'+(knop||'')+'</span></div>';
+        // KPI-strip
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+' · '+v.label+'</h3>'+
+          '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:0.55rem;">'+
+          [[T('vk.omzetvd','Omzet vandaag'), eur(k.omzetVandaag)],
+           [T('vk.omzetwk','Deze week'), eur(k.omzetWeek)],
+           [T('vk.omzetmnd','Deze maand'), eur(k.omzetMaand)],
+           [T('vk.gembon','Gem. bon'), eur(k.gemBon)],
+           [T('vk.open','Open aanvragen'), k.openAanvragen],
+           [T('vk.bezet','Bezet vandaag'), k.bezetUurVandaag+' u']]
+          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;">'+
+            '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
+            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--gold);margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
+          '<div class="tkc-who" style="margin-top:0.5rem;">'+T('vk.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div></div>';
+        // aanvragen die op bevestiging wachten
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📥 '+T('vk.tebev','Wacht op bevestiging')+' ('+v.teBevestigen.length+')</h3>'+
+          (v.teBevestigen.length ? v.teBevestigen.map(b => rij(b, '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>')).join('')
+            : '<div class="tkc-who">'+T('vk.geentebev','Geen openstaande aanvragen.')+'</div>')+'</div>';
+        // het vandaag-bord
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗓️ '+T('vk.vandaaglijst','Vandaag')+' ('+v.vandaag.length+')</h3>'+
+          (v.vandaag.length ? v.vandaag.map(b => rij(b, b.status==='bevestigd' ? '<button class="obtn" data-vakaf="'+b.ref+'">'+T('vk.afronden','Afronden')+'</button>' : '')).join('')
+            : '<div class="tkc-who">'+T('vk.geenvandaag','Vandaag staat er niets in de agenda.')+'</div>')+'</div>';
+        // de eerstvolgende afspraken
+        if (v.binnenkort.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>🔜 '+T('vk.binnenkort','Binnenkort')+' ('+v.binnenkort.length+')</h3>'+
+          v.binnenkort.slice(0,12).map(b => rij(b, '')).join('')+'</div>';
+        // boekingen zonder datum die nog gepland moeten worden
+        if (v.zonderDatum.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>📌 '+T('vk.zonderdatum','Nog te plannen')+' ('+v.zonderDatum.length+')</h3>'+
+          v.zonderDatum.map(b => rij(b, b.status==='aangevraagd' ? '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>' : '')).join('')+'</div>';
+        // de genre-bewuste AI-assistent
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤖 '+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
+          '<div class="st-form"><input class="st-in" id="vakQ" placeholder="'+T('vk.aiplace','Bijv. waar moet ik me vandaag op richten?')+'">'+
+          '<button class="bigbtn" id="vakAi"'+(vakAiBusy?' disabled':'')+'>'+(vakAiBusy?T('vk.aidenkt','De assistent denkt na...'):T('vk.aivraag','Vraag advies'))+'</button></div>'+
+          (vakAiMsg ? '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;">'+vakAiMsg+'</div>' : '')+'</div>';
+      }
+    }
     if (kantoorSec === 'diensten'){
       // het aanbod van de zelfstandige: diensten en producten, eigen beheer
       const sv = state.services || [];

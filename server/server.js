@@ -2722,6 +2722,11 @@ Object.assign(kern, require('./kern/defensie')({ db, save, crypto, anthropic, fi
    delen tijdens een calamiteit hun paraatheid, vrije bedden en eenheden in
    een overzicht, met een coordinatieniveau. */
 Object.assign(kern, require('./kern/rampbeeld')({ db, save, findSupplier, anthropic }));
+/* Vakwerk (kern/vakwerk.js): het slimme dashboard voor de dienstverlenende
+   genres (zzp, chef, wellness). Zelfde aanbod-/boekingsmodel als voorheen,
+   maar met een vandaag-bord, KPI's en een genre-bewuste AI-assistent, zodat
+   deze apps op het niveau van de horeca- en hoteltorens komen. */
+Object.assign(kern, require('./kern/vakwerk').maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));

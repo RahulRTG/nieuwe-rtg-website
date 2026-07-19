@@ -62,4 +62,21 @@ app.post('/api/supplier/service', supplierAuth, (req, res) => {
   res.json({ ok: true, services: s.services });
 });
 
+/* Het vakwerk-dashboard: het vandaag-bord, de aanvragen die op bevestiging
+   wachten, het aanbod met boek-cijfers en de KPI's van de dienstverlener
+   (zzp, chef, wellness), plus de genre-bewuste AI-assistent. */
+app.post('/api/supplier/vak/bord', supplierAuth, (req, res) => {
+  const r = kern.vakwerk.bord(req.supplier.code);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/supplier/vak/ai', supplierAuth, async (req, res) => {
+  try {
+    const r = await kern.vakwerk.adviseur(req.supplier.code, req.body.q);
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    logActivity(req.supplier.code, req.actor, 'vroeg de vakwerk-assistent om advies');
+    res.json(r);
+  } catch (e) { console.error('[vakwerk]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+});
+
 };

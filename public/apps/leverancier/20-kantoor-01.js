@@ -75,6 +75,16 @@
     finBusy = false;
     renderStation();
   }
+  // het vakwerk-dashboard (zzp, chef, wellness): vandaag-bord, aanvragen, KPI's en AI
+  let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false;
+  async function laadVakwerk(){
+    if (vakBusy) return;
+    vakBusy = true;
+    try { vakData = await API.call('/supplier/vak/bord', {}); }
+    catch(e){ vakData = { error: e.message }; }
+    vakBusy = false;
+    renderStation();
+  }
   // ritgeschiedenis komt gepagineerd van de server (schaalvast bij miljoenen ritten)
   let histData = null, histPage = 1, histQ = '', histBusy = false;
   async function laadHistorie(){
@@ -117,7 +127,12 @@
       ['tarief','\uD83E\uDDEE',T('kt.tarief','Tarief')],
       ['prijzen','\uD83D\uDCB6',T('kt.prijzen','Prijzen')]
     );
-    if (type === 'zzp') secs.push(['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]);
+    // de dienstverlenende genres (zelfstandige, privechef, wellness) krijgen
+    // hun eigen vandaag-bord en aanbodbeheer
+    if (['zzp','chef','wellness'].includes(type)) secs.push(
+      ['vandaag','\u2600\uFE0F',T('kt.vandaag','Vandaag')],
+      ['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]
+    );
     secs.push(['marketing','\uD83D\uDCE3','Marketing']);
     if (!secs.some(s2 => s2[0] === kantoorSec)) kantoorSec = 'bo';
     let html = '<div class="st-chips">'+secs.map(s2 =>

@@ -1463,6 +1463,16 @@
     finBusy = false;
     renderStation();
   }
+  // het vakwerk-dashboard (zzp, chef, wellness): vandaag-bord, aanvragen, KPI's en AI
+  let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false;
+  async function laadVakwerk(){
+    if (vakBusy) return;
+    vakBusy = true;
+    try { vakData = await API.call('/supplier/vak/bord', {}); }
+    catch(e){ vakData = { error: e.message }; }
+    vakBusy = false;
+    renderStation();
+  }
   // ritgeschiedenis komt gepagineerd van de server (schaalvast bij miljoenen ritten)
   let histData = null, histPage = 1, histQ = '', histBusy = false;
   async function laadHistorie(){
@@ -1505,7 +1515,12 @@
       ['tarief','\uD83E\uDDEE',T('kt.tarief','Tarief')],
       ['prijzen','\uD83D\uDCB6',T('kt.prijzen','Prijzen')]
     );
-    if (type === 'zzp') secs.push(['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]);
+    // de dienstverlenende genres (zelfstandige, privechef, wellness) krijgen
+    // hun eigen vandaag-bord en aanbodbeheer
+    if (['zzp','chef','wellness'].includes(type)) secs.push(
+      ['vandaag','\u2600\uFE0F',T('kt.vandaag','Vandaag')],
+      ['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]
+    );
     secs.push(['marketing','\uD83D\uDCE3','Marketing']);
     if (!secs.some(s2 => s2[0] === kantoorSec)) kantoorSec = 'bo';
     let html = '<div class="st-chips">'+secs.map(s2 =>
@@ -1980,6 +1995,52 @@
         '<label class="soft-xs">'+T('kt.min','Minimumprijs (€)')+'</label><input class="st-in" id="ktTc" type="number" step="1" value="'+(t2.minimum||0)+'">'+
         '<button class="bigbtn" id="ktTSave" style="margin-top:0.2rem;">'+T('kt.tsave','Tarief opslaan')+'</button></div></div>';
     }
+    if (kantoorSec === 'vandaag'){
+      // het slimme vandaag-bord van de dienstverlener (zzp, chef, wellness)
+      if (!vakData){
+        laadVakwerk();
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+      } else if (vakData.error){
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+'</h3><div class="tkc-who">'+vakData.error+'</div></div>';
+      } else {
+        const v = vakData, k = v.kpi;
+        const rij = (b, knop) => '<div class="st-row"><span>'+(b.soort==='product'?'📦':'🗓️')+' '+b.dienst+
+          '<span class="sub">'+b.klant+(b.tijd?' · '+b.tijd:(b.datum?' · '+b.datum:' · '+T('kt.geendatum','nog geen datum')))+(b.duurMin?' · '+b.duurMin+' min':'')+'</span></span>'+
+          '<span class="acts"><b style="color:var(--gold);margin-right:0.4rem;">'+eur(b.prijs)+'</b>'+(knop||'')+'</span></div>';
+        // KPI-strip
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>☀️ '+T('kt.vandaag','Vandaag')+' · '+v.label+'</h3>'+
+          '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:0.55rem;">'+
+          [[T('vk.omzetvd','Omzet vandaag'), eur(k.omzetVandaag)],
+           [T('vk.omzetwk','Deze week'), eur(k.omzetWeek)],
+           [T('vk.omzetmnd','Deze maand'), eur(k.omzetMaand)],
+           [T('vk.gembon','Gem. bon'), eur(k.gemBon)],
+           [T('vk.open','Open aanvragen'), k.openAanvragen],
+           [T('vk.bezet','Bezet vandaag'), k.bezetUurVandaag+' u']]
+          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;">'+
+            '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
+            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--gold);margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
+          '<div class="tkc-who" style="margin-top:0.5rem;">'+T('vk.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div></div>';
+        // aanvragen die op bevestiging wachten
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>📥 '+T('vk.tebev','Wacht op bevestiging')+' ('+v.teBevestigen.length+')</h3>'+
+          (v.teBevestigen.length ? v.teBevestigen.map(b => rij(b, '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>')).join('')
+            : '<div class="tkc-who">'+T('vk.geentebev','Geen openstaande aanvragen.')+'</div>')+'</div>';
+        // het vandaag-bord
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗓️ '+T('vk.vandaaglijst','Vandaag')+' ('+v.vandaag.length+')</h3>'+
+          (v.vandaag.length ? v.vandaag.map(b => rij(b, b.status==='bevestigd' ? '<button class="obtn" data-vakaf="'+b.ref+'">'+T('vk.afronden','Afronden')+'</button>' : '')).join('')
+            : '<div class="tkc-who">'+T('vk.geenvandaag','Vandaag staat er niets in de agenda.')+'</div>')+'</div>';
+        // de eerstvolgende afspraken
+        if (v.binnenkort.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>🔜 '+T('vk.binnenkort','Binnenkort')+' ('+v.binnenkort.length+')</h3>'+
+          v.binnenkort.slice(0,12).map(b => rij(b, '')).join('')+'</div>';
+        // boekingen zonder datum die nog gepland moeten worden
+        if (v.zonderDatum.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>📌 '+T('vk.zonderdatum','Nog te plannen')+' ('+v.zonderDatum.length+')</h3>'+
+          v.zonderDatum.map(b => rij(b, b.status==='aangevraagd' ? '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>' : '')).join('')+'</div>';
+        // de genre-bewuste AI-assistent
+        html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤖 '+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
+          '<div class="st-form"><input class="st-in" id="vakQ" placeholder="'+T('vk.aiplace','Bijv. waar moet ik me vandaag op richten?')+'">'+
+          '<button class="bigbtn" id="vakAi"'+(vakAiBusy?' disabled':'')+'>'+(vakAiBusy?T('vk.aidenkt','De assistent denkt na...'):T('vk.aivraag','Vraag advies'))+'</button></div>'+
+          (vakAiMsg ? '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;">'+vakAiMsg+'</div>' : '')+'</div>';
+      }
+    }
     if (kantoorSec === 'diensten'){
       // het aanbod van de zelfstandige: diensten en producten, eigen beheer
       const sv = state.services || [];
@@ -2061,7 +2122,7 @@
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
       try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = '✅ '+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }
@@ -2429,6 +2490,21 @@
     el.querySelectorAll('[data-svdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/service', { action: 'remove', id: b.dataset.svdel }); await refresh(); } catch(e){ toast(e.message); }
     }));
+    // vakwerk: een aanvraag bevestigen of een afspraak afronden
+    el.querySelectorAll('[data-vakbev]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakbev, status: 'bevestigd' }); vakData = null; kantoorMsg = '✅ '+T('vk.bevok','Bevestigd; het lid krijgt bericht.'); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-vakaf]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = '✅ '+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // vakwerk: de genre-bewuste assistent om advies vragen
+    const vakAiBtn = el.querySelector('#vakAi'); if (vakAiBtn) vakAiBtn.addEventListener('click', async () => {
+      vakAiBusy = true; renderStation();
+      try { const d = await API.call('/supplier/vak/ai', { q: (el.querySelector('#vakQ') ? el.querySelector('#vakQ').value : '') });
+        vakAiMsg = d.antwoord + (d.voorstellen && d.voorstellen.length ? '\n\n• '+d.voorstellen.join('\n• ') : '');
+      } catch(e){ vakAiMsg = e.message; }
+      vakAiBusy = false; renderStation();
+    });
     // verlofaanvragen beslissen
     el.querySelectorAll('[data-kvja]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/leave/decide', { id: b.dataset.kvja, action: 'goedkeuren' }); kantoorMsg = '✅ '+T('kt.vgedaan','Verlof goedgekeurd; het staflid ziet dit direct op de PDA.'); await refresh(); } catch(e){ toast(e.message); }

@@ -99,6 +99,21 @@
     el.querySelectorAll('[data-svdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/service', { action: 'remove', id: b.dataset.svdel }); await refresh(); } catch(e){ toast(e.message); }
     }));
+    // vakwerk: een aanvraag bevestigen of een afspraak afronden
+    el.querySelectorAll('[data-vakbev]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakbev, status: 'bevestigd' }); vakData = null; kantoorMsg = '✅ '+T('vk.bevok','Bevestigd; het lid krijgt bericht.'); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-vakaf]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = '✅ '+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
+    }));
+    // vakwerk: de genre-bewuste assistent om advies vragen
+    const vakAiBtn = el.querySelector('#vakAi'); if (vakAiBtn) vakAiBtn.addEventListener('click', async () => {
+      vakAiBusy = true; renderStation();
+      try { const d = await API.call('/supplier/vak/ai', { q: (el.querySelector('#vakQ') ? el.querySelector('#vakQ').value : '') });
+        vakAiMsg = d.antwoord + (d.voorstellen && d.voorstellen.length ? '\n\n• '+d.voorstellen.join('\n• ') : '');
+      } catch(e){ vakAiMsg = e.message; }
+      vakAiBusy = false; renderStation();
+    });
     // verlofaanvragen beslissen
     el.querySelectorAll('[data-kvja]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/leave/decide', { id: b.dataset.kvja, action: 'goedkeuren' }); kantoorMsg = '✅ '+T('kt.vgedaan','Verlof goedgekeurd; het staflid ziet dit direct op de PDA.'); await refresh(); } catch(e){ toast(e.message); }

@@ -114,6 +114,28 @@
       </div>
     </div>
     <div class="kaart">
+      <h2 style="margin-top:0;">Veldhospitaal (gewondenopvang met triage)</h2>
+      <div id="gewonden"></div>
+      <div class="rij">
+        <input class="veld" id="gAand" placeholder="Aanduiding (geen naam nodig)" maxlength="40" style="max-width:12rem;">
+        <input class="veld" id="gKlacht" placeholder="Letsel of klacht" maxlength="200">
+        <select id="gTriage" aria-label="Triagekleur"><option value="rood">Rood</option><option value="oranje">Oranje</option><option value="geel" selected>Geel</option><option value="groen">Groen</option><option value="blauw">Blauw</option></select>
+        <button class="knop klein" id="gMaak" type="button">Opnemen</button>
+      </div>
+    </div>
+    <div class="kaart">
+      <h2 style="margin-top:0;">Verplaatsingen (transport over land, water en lucht)</h2>
+      <div id="verplaatsingen"></div>
+      <div class="rij">
+        <input class="veld" id="vpVan" placeholder="Van" maxlength="60" style="max-width:8rem;">
+        <input class="veld" id="vpNaar" placeholder="Naar" maxlength="60" style="max-width:8rem;">
+        <select id="vpSoort" aria-label="Wijze"><option value="land">Land</option><option value="water">Water</option><option value="lucht">Lucht</option></select>
+        <select id="vpLading" aria-label="Lading"><option value="troepen">Troepen</option><option value="materieel">Materieel</option><option value="gewonden">Gewonden</option><option value="voorraad">Voorraad</option></select>
+        <input class="veld" id="vpWanneer" placeholder="Wanneer" maxlength="40" style="max-width:8rem;">
+        <button class="knop klein" id="vpMaak" type="button">Plan</button>
+      </div>
+    </div>
+    <div class="kaart">
       <h2 style="margin-top:0;">De staf-AI (logistiek en planning)</h2>
       <p class="stil" style="margin-bottom:0.5rem;">Vraag over paraatheid, materieel, onderhoud, bevoorrading en oefeningen. De AI is geen wapensysteem en weigert vragen over wapeninzet of doelbestrijding.</p>
       <div class="chat" id="aiChat"></div>

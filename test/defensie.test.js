@@ -80,7 +80,38 @@ test('4. oefeningen plannen en afronden', async () => {
   assert.equal((await api('/api/supplier/def/oefening/zet', { id: o.body.oefening.id, status: 'afgerond' }, cmd)).status, 200);
 });
 
-test('5. de staf-AI helpt met logistiek maar weigert wapeninzet', async () => {
+test('5. het veldhospitaal: triage sorteert de gewonden en evacuatie meldt zich bij het ziekenhuis', async () => {
+  await api('/api/supplier/def/gewonde/maak', { aanduiding: 'G1', klacht: 'Enkelletsel', triage: 'groen' }, log);
+  const rood = await api('/api/supplier/def/gewonde/maak', { aanduiding: 'G2', klacht: 'Bloeding', triage: 'rood' }, log);
+  const o = await api('/api/supplier/def/overzicht', {}, cmd);
+  assert.equal(o.body.gewonden[0].triage, 'rood', 'rood staat vooraan');
+  assert.equal((await api('/api/supplier/def/gewonde/maak', { klacht: 'x', triage: 'paars' }, log)).status, 400);
+  // evacueren naar een bestaand ziekenhuis; de gewonde komt daar op de SEH binnen
+  const ev = await api('/api/supplier/def/gewonde/evacueer', { id: rood.body.gewonde.id, ziekenhuis: 'CANMISSES' }, log);
+  assert.equal(ev.status, 200);
+  assert.equal(ev.body.gewonde.status, 'geevacueerd');
+  assert.equal((await api('/api/supplier/def/gewonde/evacueer', { id: rood.body.gewonde.id, ziekenhuis: 'BESTAATNIET' }, log)).status, 404);
+  // het ziekenhuis ziet de veldevacuatie op zijn eerste hulp
+  const zkRoster = await api('/api/supplier/roster', { code: 'CANMISSES' });
+  const zkChef = zkRoster.body.staff.find(m => m.role === 'manager');
+  const zkTok = (await api('/api/supplier/login', { code: 'CANMISSES', staffId: zkChef.id, pin: '1234' })).body.token;
+  const seh = await api('/api/supplier/zorg/overzicht', {}, zkTok);
+  assert.ok(seh.body.seh.some(p => /veldevacuatie/.test(p.klacht) && p.triage === 'rood'), 'de veldevacuatie staat op de SEH');
+});
+
+test('6. verplaatsingen: transport over land, water of lucht plannen en door de keten zetten', async () => {
+  const v = await api('/api/supplier/def/verplaatsing/maak', { van: 'Kazerne', naar: 'Haven', soort: 'water', lading: 'voorraad', wanneer: 'do 06:00' }, cmd);
+  assert.equal(v.status, 200);
+  // een gewone rol plant geen verplaatsing (manager-actie)
+  assert.equal((await api('/api/supplier/def/verplaatsing/maak', { van: 'a', naar: 'b', soort: 'land', lading: 'troepen' }, log)).status, 403);
+  assert.equal((await api('/api/supplier/def/verplaatsing/maak', { van: 'a', naar: 'b', soort: 'ruimte', lading: 'troepen' }, cmd)).status, 400);
+  const aan = await api('/api/supplier/def/verplaatsing/zet', { id: v.body.verplaatsing.id, status: 'aangekomen' }, cmd);
+  assert.equal(aan.body.verplaatsing.status, 'aangekomen');
+  const na = await api('/api/supplier/def/overzicht', {}, cmd);
+  assert.ok(!na.body.verplaatsingen.some(x => x.id === v.body.verplaatsing.id), 'aangekomen verdwijnt van het open bord');
+});
+
+test('7. de staf-AI helpt met logistiek maar weigert wapeninzet', async () => {
   const ok = await api('/api/supplier/def/ai', { q: 'Hoe plan ik het onderhoud met minimale uitval?' }, cmd);
   assert.equal(ok.status, 200);
   assert.ok(ok.body.antwoord.length > 15, 'een echt logistiek antwoord');

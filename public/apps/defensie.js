@@ -70,6 +70,21 @@
       (v.aantal ? ' · ' + esc(v.aantal) : '') + ' · ' + esc(v.soort) + ' · ' + esc(v.status) +
       '<div class="rij">' + BEV_OPTS.map(o => '<button class="knop klein" data-bevzet="' + v.id + '" data-bevst="' + o + '" type="button">' + o + '</button>').join('') + '</div></div>').join('')
       : '<p class="stil">Geen open bevoorradingsverzoeken.</p>';
+    const TRIAGE_KLEUR = { rood: 'var(--rood)', oranje: '#E08A3C', geel: 'var(--gold)', groen: 'var(--groen)', blauw: '#6FA8DC' };
+    const zkOpts = (d.ziekenhuizen || []).map(z => '<option value="' + z.code + '">' + esc(z.naam) + '</option>').join('');
+    $('#gewonden').innerHTML = d.gewonden.length ? d.gewonden.map(g =>
+      '<div class="item"><span class="pill" style="color:' + TRIAGE_KLEUR[g.triage] + ';border-color:' + TRIAGE_KLEUR[g.triage] + ';">' + esc(g.triage) + '</span> <b>' + esc(g.aanduiding) + '</b> · ' + esc(g.klacht) + ' · ' + esc(g.status) +
+      '<div class="rij"><button class="knop klein" data-gz="in-behandeling" data-g="' + g.id + '" type="button">Behandel</button>' +
+      '<button class="knop klein" data-gz="stabiel" data-g="' + g.id + '" type="button">Stabiel</button>' +
+      (zkOpts ? '<select data-gevzk="' + g.id + '">' + zkOpts + '</select><button class="knop klein" data-gev="' + g.id + '" type="button">Evacueer</button>' : '') +
+      '<button class="knop klein" data-gz="ontslagen" data-g="' + g.id + '" type="button">Ontsla</button></div></div>').join('')
+      : '<p class="stil">Geen gewonden op het bord.</p>';
+    $('#verplaatsingen').innerHTML = d.verplaatsingen.length ? d.verplaatsingen.map(v =>
+      '<div class="item"><b>' + esc(v.van) + ' → ' + esc(v.naar) + '</b> · ' + ({ land: '🚚', water: '🚢', lucht: '✈️' }[v.soort] || '') + ' ' + esc(v.soort) + ' · ' + esc(v.lading) + (v.wanneer ? ' · ' + esc(v.wanneer) : '') + ' · ' + esc(v.status) +
+      '<div class="rij"><button class="knop klein" data-vpz="onderweg" data-vp="' + v.id + '" type="button">Onderweg</button>' +
+      '<button class="knop klein" data-vpz="aangekomen" data-vp="' + v.id + '" type="button">Aangekomen</button>' +
+      '<button class="knop klein" data-vpz="afgelast" data-vp="' + v.id + '" type="button">Afgelast</button></div></div>').join('')
+      : '<p class="stil">Geen verplaatsingen gepland.</p>';
     $('#oefeningen').innerHTML = d.oefeningen.length ? d.oefeningen.map(o =>
       '<div class="item"><b>' + esc(o.naam) + '</b>' + (o.wanneer ? ' · ' + esc(o.wanneer) : '') + (o.locatie ? ' · ' + esc(o.locatie) : '') + ' · ' + esc(o.status) +
       '<div class="rij"><button class="knop klein" data-oefzet="' + o.id + '" data-oefst="bezig" type="button">Bezig</button>' +
@@ -85,6 +100,10 @@
       { id: b.dataset.matzet, staat: (document.querySelector('[data-mat="' + b.dataset.matzet + '"]') || {}).value, notitie: (document.querySelector('[data-matn="' + b.dataset.matzet + '"]') || {}).value })));
     document.querySelectorAll('[data-bevzet]').forEach(b => b.addEventListener('click', () => doe('def/bevoorrading/zet', { id: b.dataset.bevzet, status: b.dataset.bevst })));
     document.querySelectorAll('[data-oefzet]').forEach(b => b.addEventListener('click', () => doe('def/oefening/zet', { id: b.dataset.oefzet, status: b.dataset.oefst })));
+    document.querySelectorAll('[data-gz]').forEach(b => b.addEventListener('click', () => doe('def/gewonde/zet', { id: b.dataset.g, status: b.dataset.gz })));
+    document.querySelectorAll('[data-gev]').forEach(b => b.addEventListener('click', () => doe('def/gewonde/evacueer',
+      { id: b.dataset.gev, ziekenhuis: (document.querySelector('[data-gevzk="' + b.dataset.gev + '"]') || {}).value })));
+    document.querySelectorAll('[data-vpz]').forEach(b => b.addEventListener('click', () => doe('def/verplaatsing/zet', { id: b.dataset.vp, status: b.dataset.vpz })));
   }
   async function doe(pad, body) { try { await api(pad, body); laad(); } catch (e) { alert(e.message); } }
 
@@ -107,6 +126,16 @@
     if (!$('#oNaam').value.trim()) return;
     doe('def/oefening/maak', { naam: $('#oNaam').value, wanneer: $('#oWanneer').value, locatie: $('#oLocatie').value });
     $('#oNaam').value = ''; $('#oWanneer').value = ''; $('#oLocatie').value = '';
+  });
+  $('#gMaak').addEventListener('click', () => {
+    if (!$('#gKlacht').value.trim()) return;
+    doe('def/gewonde/maak', { aanduiding: $('#gAand').value, klacht: $('#gKlacht').value, triage: $('#gTriage').value });
+    $('#gAand').value = ''; $('#gKlacht').value = '';
+  });
+  $('#vpMaak').addEventListener('click', () => {
+    if (!$('#vpVan').value.trim() || !$('#vpNaar').value.trim()) return;
+    doe('def/verplaatsing/maak', { van: $('#vpVan').value, naar: $('#vpNaar').value, soort: $('#vpSoort').value, lading: $('#vpLading').value, wanneer: $('#vpWanneer').value });
+    $('#vpVan').value = ''; $('#vpNaar').value = ''; $('#vpWanneer').value = '';
   });
   $('#aiStuur').addEventListener('click', async () => {
     const q = $('#aiVraag').value.trim();

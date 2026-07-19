@@ -61,6 +61,17 @@
     });
     // synergie: tekenen, stoppen en een nieuwe deal voorstellen
     const synVer = async () => { boData = null; synData = null; await refresh(); };
+    el.querySelectorAll('[data-synkans]').forEach(b => b.addEventListener('click', async () => {
+      const k = ((vwData && vwData.dealkansen) || [])[Number(b.dataset.synkans)];
+      if (!k) return;
+      try {
+        await API.call('/supplier/synergie/maak', { naam: k.voorstel.naam,
+          omschrijving: T('sy.kansoms','Voorgesteld door de dealvinder op basis van combinatiegedrag van gasten.'),
+          prijsCenten: k.voorstel.prijsCenten, aandelen: k.voorstel.aandelen });
+        toast('🤝 '+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
+        await synVer();
+      } catch(e){ toast(e.message); }
+    }));
     el.querySelectorAll('[data-synja]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synja, akkoord: true }); toast('🤝 '+T('sy.ok','Getekend.')); await synVer(); } catch(e){ toast(e.message); }
     }));

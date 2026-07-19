@@ -88,6 +88,36 @@ function gewoontenUit(rijen, rek, nu = new Date()) {
   return lijst.sort((a, b) => b.zekerheid - a.zekerheid);
 }
 
+/* puur: combinatiegedrag. Twee zaken die door dezelfde leden binnen een
+   dagdeel (6 uur) na elkaar worden bezocht, horen blijkbaar bij elkaar;
+   dat is de grondstof voor een Synergie-deal. Telt per paar hoe vaak en
+   wat er gemiddeld per zaak wordt besteed. */
+function combinatiesUit(rijen) {
+  const perLid = new Map();
+  for (const r of rijen) {
+    if (!/^lid:/.test(r.van) || !/^partner:/.test(r.naar)) continue;
+    if (!perLid.has(r.van)) perLid.set(r.van, []);
+    perLid.get(r.van).push({ t: Date.parse(r.at), code: r.naar.slice(8), centen: r.centen });
+  }
+  const paren = new Map();
+  for (const lijst of perLid.values()) {
+    lijst.sort((a, b) => a.t - b.t);
+    for (let i = 0; i < lijst.length; i++) {
+      for (let j = i + 1; j < lijst.length; j++) {
+        if (lijst[j].t - lijst[i].t > 6 * 3600000) break;
+        if (lijst[i].code === lijst[j].code) continue;
+        const [x, y] = lijst[i].code < lijst[j].code ? [lijst[i], lijst[j]] : [lijst[j], lijst[i]];
+        const k = x.code + '|' + y.code;
+        const p = paren.get(k) || { a: x.code, b: y.code, n: 0, somA: 0, somB: 0 };
+        p.n += 1; p.somA += x.centen; p.somB += y.centen;
+        paren.set(k, p);
+      }
+    }
+  }
+  return [...paren.values()].map(p => ({ a: p.a, b: p.b, n: p.n,
+    gemA: Math.round(p.somA / p.n), gemB: Math.round(p.somB / p.n) })).sort((x, y) => y.n - x.n);
+}
+
 function maakVoorspel({ db, findSupplier }) {
   const boek = () => Array.isArray(db.data.payBoekingen) ? db.data.payBoekingen : [];
   const naamVan = (code) => { const z = findSupplier(code); return z ? z.name : code; };
@@ -117,11 +147,45 @@ function maakVoorspel({ db, findSupplier }) {
     };
   }
 
+  /* de dealvinder: van combinatiegedrag naar een kant-en-klaar
+     Synergie-voorstel. De pakketprijs is de som van de gemiddelde
+     bestedingen met tien procent pakketvoordeel; de aandelen zijn naar
+     rato en tellen exact op tot de prijs (de rest valt bij de eigen
+     zaak). Voorstellen doen blijft een menselijke keuze: een knop, geen
+     automatische deal. */
+  function dealkansenVoor(code, nu = new Date()) {
+    const rijen = boek().slice(0, 2000);
+    if (!rijen.length) return [];
+    const oudste = Math.min(...rijen.map(r => Date.parse(r.at)));
+    const weken = Math.max(1, (nu.getTime() - oudste) / (7 * 86400000));
+    return combinatiesUit(rijen)
+      .filter(p => (p.a === code || p.b === code) && p.n >= 3)
+      .slice(0, 3).map(p => {
+        const partner = p.a === code ? p.b : p.a;
+        const gemMijn = p.a === code ? p.gemA : p.gemB;
+        const gemPartner = p.a === code ? p.gemB : p.gemA;
+        const prijs = Math.round((gemMijn + gemPartner) * 0.9);
+        const partnerDeel = Math.round(prijs * gemPartner / (gemMijn + gemPartner));
+        return {
+          partner: naamVan(partner), partnerCode: partner, n: p.n,
+          perWeek: +(p.n / weken).toFixed(1),
+          tekst: 'Gasten combineerden u ' + p.n + ' keer met ' + naamVan(partner) +
+            ' binnen een dagdeel (~' + +(p.n / weken).toFixed(1) + ' keer per week).',
+          voorstel: {
+            naam: naamVan(code) + ' × ' + naamVan(partner),
+            prijsCenten: prijs,
+            aandelen: [{ code, centen: prijs - partnerDeel }, { code: partner, centen: partnerDeel }]
+          }
+        };
+      });
+  }
+
   function voorZaak(code, nu = new Date()) {
     const rek = 'partner:' + code;
     const rijen = boek().filter(r => r.naar === rek && /^lid:/.test(r.van)).slice(0, 2000);
     if (rijen.length < 5) {
-      return { ok: true, morgen: null, vasteGasten: [], geleerdUit: rijen.length,
+      return { ok: true, morgen: null, vasteGasten: [], dealkansen: dealkansenVoor(code, nu),
+        geleerdUit: rijen.length,
         uitleg: 'Nog te weinig geschiedenis om eerlijk te voorspellen; het beeld groeit met elke transactie.' };
     }
     const oudste = Math.min(...rijen.map(r => new Date(r.at).getTime()));
@@ -156,11 +220,12 @@ function maakVoorspel({ db, findSupplier }) {
         verwachtCenten: Math.round(opDag.reduce((s, r) => s + r.centen, 0) / weken),
         drukUren, advies, bevoorrading
       },
-      vasteGasten
+      vasteGasten,
+      dealkansen: dealkansenVoor(code, nu)
     };
   }
 
-  return { voorspel: { voorLid, voorZaak, gewoontenUit, seintjeVoor, ketenUit } };
+  return { voorspel: { voorLid, voorZaak, dealkansenVoor, gewoontenUit, seintjeVoor, ketenUit } };
 }
 
-module.exports = { maakVoorspel, gewoontenUit, seintjeVoor, ketenUit, DAGEN };
+module.exports = { maakVoorspel, gewoontenUit, seintjeVoor, ketenUit, combinatiesUit, DAGEN };

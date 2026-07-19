@@ -1556,8 +1556,14 @@
         // synergie: samen met andere zaken deals en hele pakketten maken
         const mijnCode = (S && S.code) || '';
         const synDeals = (synData && synData.deals) || [];
+        const kansen = (vwData && vwData.dealkansen) || [];
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤝 '+T('sy.h','Synergie: samen deals maken')+'</h3>'+
           '<div class="tkc-who">'+T('sy.d','Stel met een andere RTG-zaak een pakket samen met een prijs; elke deelnemer tekent voor zijn aandeel en pas dan staat het live voor leden. RTG Pay splitst elke aankoop exact volgens de afspraak.')+'</div>'+
+          kansen.map((k,i) =>
+            '<div class="st-row"><span>🔮 '+esc(k.tekst)+
+              '<span class="sub">'+T('sy.kans','Voorstel van de dealvinder')+': <b>'+esc(k.voorstel.naam)+'</b> · '+eur(k.voorstel.prijsCenten)+
+              ' ('+k.voorstel.aandelen.map(a => eur(a.centen)).join(' / ')+', 10% '+T('sy.voordeel','pakketvoordeel')+')</span></span>'+
+            '<button class="obtn" data-synkans="'+i+'">🤝 '+T('sy.stel','Stel voor')+'</button></div>').join('')+
           synDeals.slice(0,6).map(d => {
             const mij = d.aandelen.find(a => a.code === mijnCode) || {};
             return '<div class="st-row"><span><b>'+esc(d.naam)+'</b> · '+eur(d.prijsCenten)+
@@ -2158,6 +2164,17 @@
     });
     // synergie: tekenen, stoppen en een nieuwe deal voorstellen
     const synVer = async () => { boData = null; synData = null; await refresh(); };
+    el.querySelectorAll('[data-synkans]').forEach(b => b.addEventListener('click', async () => {
+      const k = ((vwData && vwData.dealkansen) || [])[Number(b.dataset.synkans)];
+      if (!k) return;
+      try {
+        await API.call('/supplier/synergie/maak', { naam: k.voorstel.naam,
+          omschrijving: T('sy.kansoms','Voorgesteld door de dealvinder op basis van combinatiegedrag van gasten.'),
+          prijsCenten: k.voorstel.prijsCenten, aandelen: k.voorstel.aandelen });
+        toast('🤝 '+T('sy.voorgesteld','Voorgesteld; de partner tekent in het eigen kantoor.'));
+        await synVer();
+      } catch(e){ toast(e.message); }
+    }));
     el.querySelectorAll('[data-synja]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/synergie/reageer', { id: b.dataset.synja, akkoord: true }); toast('🤝 '+T('sy.ok','Getekend.')); await synVer(); } catch(e){ toast(e.message); }
     }));

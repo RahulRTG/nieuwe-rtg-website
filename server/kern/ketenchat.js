@@ -13,7 +13,7 @@
      schrijven), zodat een besloten lijn nooit een blinde vlek wordt. */
 
 module.exports = ({ db, save, crypto, findSupplier }) => {
-  const HULP_ZORG = ['politie', 'brandweer', 'ambulance', 'ziekenhuis', 'huisarts', 'specials', 'apotheek', 'specialist', 'beautymedical'];
+  const HULP_ZORG = ['politie', 'brandweer', 'ambulance', 'ziekenhuis', 'huisarts', 'specials', 'apotheek', 'specialist', 'beautymedical', 'defensie'];
   const nu = () => Date.now();
   const schoon = (v, max) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max || 200);
   const magKeten = s => !!s && HULP_ZORG.includes(s.type);

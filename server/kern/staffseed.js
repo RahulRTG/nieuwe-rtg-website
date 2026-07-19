@@ -14,6 +14,8 @@ const STAFF_SEED = {
   FARMACIA: [['Clara Bonet', 'manager', 'Apotheker'], ['Omar Haddad', 'staff', 'Assistent']],
   CARDIO: [['Dr. Sofia Marti', 'manager', 'Cardioloog'], ['Rosa Tur', 'staff', 'Poli-assistente']],
   ESTETICA: [['Dr. Lena Vos', 'manager', 'Cosmetisch arts'], ['Mireia Camps', 'staff', 'Intake & nazorg']],
+  // defensie: een commandant/staf (beheer) en een logistiek onderofficier
+  GARNIZOEN: [['Kap. Reinier Vos', 'manager', 'Commando & staf'], ['Sgt. Ilias Ben Ali', 'staff', 'Logistiek']],
   KIKUNOI: [['Mateo Ferrer', 'manager', 'Keuken'], ['Nora Prins', 'staff', 'Bediening']],
   PONTO: [['Diego Serra', 'manager', 'Bar'], ['Lisa Groen', 'staff', 'Bediening']],
   HOSHI: [['Carla Vidal', 'manager', 'Receptie'], ['Ibrahim Yildiz', 'staff', 'Housekeeping']],

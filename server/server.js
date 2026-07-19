@@ -1379,6 +1379,8 @@ function initRealtime() {
   for (const [t, def] of Object.entries(HULP_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const ZORG_TYPES = require('./kern/zorgketen').ZORG_TYPES;
   for (const [t, def] of Object.entries(ZORG_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
+  const DEF_TYPES = require('./kern/defensie').DEF_TYPES;
+  for (const [t, def] of Object.entries(DEF_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const HULP_KORPSEN = [
     { code: 'GUARDIA', name: 'Politie Ibiza', type: 'politie', city: 'Ibiza', loc: { lat: 38.912, lng: 1.438, label: 'Ibiza-stad' }, rate: 0, menu: [],
       hulpEenheden: [['Noodhulp 11', 'land'], ['Noodhulp 12', 'land'], ['Politieheli PH-1', 'heli'], ['Vliegdienst PV-2', 'lucht'], ['Patrouillevaartuig P-9', 'water']] },
@@ -1392,16 +1394,30 @@ function initRealtime() {
       hulpEenheden: [['Team Alfa', 'land'], ['Team Bravo', 'land'], ['Heli Falco-1', 'heli'], ['Interventievaartuig F-3', 'water']] },
     { code: 'FARMACIA', name: 'Farmacia del Port', type: 'apotheek', city: 'Ibiza', loc: { lat: 38.91, lng: 1.433, label: 'de haven, Ibiza-stad' }, rate: 0, menu: [] },
     { code: 'CARDIO', name: 'Specialisten Ibiza', type: 'specialist', city: 'Ibiza', loc: { lat: 38.915, lng: 1.427, label: 'bij Can Misses' }, rate: 0, menu: [] },
-    { code: 'ESTETICA', name: 'Clinica Estetica', type: 'beautymedical', city: 'Ibiza', loc: { lat: 38.909, lng: 1.44, label: 'Marina Botafoch' }, rate: 0, menu: [] }
+    { code: 'ESTETICA', name: 'Clinica Estetica', type: 'beautymedical', city: 'Ibiza', loc: { lat: 38.909, lng: 1.44, label: 'Marina Botafoch' }, rate: 0, menu: [] },
+    { code: 'GARNIZOEN', name: 'Garnizoen Baleares (demo)', type: 'defensie', city: 'Ibiza', loc: { lat: 38.87, lng: 1.32, label: 'kazerne (besloten)' }, rate: 0, menu: [],
+      defEenheden: [['1e Genie-compagnie', 'genie', 'gevechtsgereed', 120], ['Logistiek peloton', 'logistiek', 'beperkt', 40], ['Geneeskundig detachement', 'geneeskundig', 'gevechtsgereed', 25]],
+      defMaterieel: [['Bergingsvoertuig', 'voertuig', 'inzetbaar'], ['Transportvaartuig', 'vaartuig', 'in-onderhoud'], ['Veldhospitaal-set', 'medisch', 'inzetbaar'], ['Verbindingswagen', 'verbinding', 'inzetbaar']] }
   ];
   for (const p of HULP_KORPSEN) {
-    const { hulpEenheden, ...zaak } = p;
+    const { hulpEenheden, defEenheden, defMaterieel, ...zaak } = p;
     if (!db.data.suppliers.find(s => s.code === zaak.code)) { db.data.suppliers.push(zaak); ensureSupplierDefaults(zaak); }
     if (hulpEenheden) {
       if (!db.data.hulp) db.data.hulp = {};
       if (!db.data.hulp.eenheden) db.data.hulp.eenheden = {};
       if (!Array.isArray(db.data.hulp.eenheden[zaak.code]) || !db.data.hulp.eenheden[zaak.code].length) {
         db.data.hulp.eenheden[zaak.code] = hulpEenheden.map(([naam, soort], i) => ({ id: 'he' + i + zaak.code.toLowerCase(), naam, soort, status: 'vrij' }));
+      }
+    }
+    // de defensie-demozaak krijgt eenheden en materieel om mee te oefenen
+    if (defEenheden || defMaterieel) {
+      if (!db.data.defensie) db.data.defensie = {};
+      if (!db.data.defensie[zaak.code]) {
+        db.data.defensie[zaak.code] = {
+          eenheden: (defEenheden || []).map(([naam, soort, paraat, sterkte], i) => ({ id: 'de' + i + zaak.code.toLowerCase(), naam, soort, paraat, reden: '', sterkte, at: Date.now() })),
+          materieel: (defMaterieel || []).map(([naam, soort, staat], i) => ({ id: 'dm' + i + zaak.code.toLowerCase(), naam, soort, kenmerk: '', staat, notitie: '', at: Date.now() })),
+          bevoorrading: [], oefeningen: []
+        };
       }
     }
   }
@@ -1445,7 +1461,8 @@ function initRealtime() {
     specials: 'Besloten eenheid; uitsluitend inzet via een bijstandsverzoek van de politie.',
     apotheek: 'Zorgpartner op het RTG-net: recepten klaarzetten en uitreiken.',
     specialist: 'Zorgpartner op het RTG-net: verwijzingen en specialistische consulten.',
-    beautymedical: 'Beauty medical op afspraak; behandelen doen we nooit zonder intake.'
+    beautymedical: 'Beauty medical op afspraak; behandelen doen we nooit zonder intake.',
+    defensie: 'Defensie-organisatie op het RTG-net: logistiek, paraatheid en onderhoud. Geen wapensysteem.'
   };
   const salonFotoVoor = (s) => {
     const t = db.data.supplierTypes[s.type] || {};
@@ -1472,7 +1489,7 @@ function initRealtime() {
       'AZUL', 'AEGIS', 'CANFERRER', 'LUMINA',
       'VORA', 'BRISA', 'FUEGO', 'LUNARA', 'MOTOISLA', 'FESTA', 'SERENA', 'ORODOR', 'LIENZO',
       'GUARDIA', 'BOMBERS', 'URGENCIA', 'CANMISSES', 'CONSULTA', 'FALCO',
-      'FARMACIA', 'CARDIO', 'ESTETICA'];
+      'FARMACIA', 'CARDIO', 'ESTETICA', 'GARNIZOEN'];
     const voor = db.data.suppliers.length;
     db.data.suppliers = db.data.suppliers.filter(s => !DEMO_ZAKEN.includes(s.code));
     // en de bijbehorende voorbeeldposts uit De Salon (de zes geseede verhalen)
@@ -2697,6 +2714,10 @@ Object.assign(kern, require('./kern/zorgketen')({ db, save, crypto, findSupplier
 /* De ketenchat (kern/ketenchat.js): korpsen verbinden eenmalig, delen een
    ketenkanaal en maken besloten deelgroepen waar de meldkamer meekijkt. */
 Object.assign(kern, require('./kern/ketenchat')({ db, save, crypto, findSupplier }));
+/* De defensie-toren (kern/defensie.js): paraatheid, materieel en onderhoud,
+   bevoorrading en oefeningen. Logistiek en organisatie, uitdrukkelijk GEEN
+   wapensysteem, vuurleiding of doelselectie. */
+Object.assign(kern, require('./kern/defensie')({ db, save, crypto, anthropic, findSupplier }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));

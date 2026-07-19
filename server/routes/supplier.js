@@ -83,6 +83,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/hulpdienst')(kern);
   require('./supplier/zorgketen')(kern);
   require('./supplier/ketenchat')(kern);
+  require('./supplier/defensie')(kern);
   require('./supplier/retail')(kern);
   require('./supplier/paspoort')(kern);
   require('./supplier/salon')(kern);

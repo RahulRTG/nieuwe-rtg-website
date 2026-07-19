@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Defensie</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#C23A5E;--olijf:#7d8154;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.25rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:860px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .veld,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.55rem 0.7rem;}
+  .knop{background:var(--card);border:1px solid var(--gold);border-radius:10px;color:var(--gold);font:inherit;font-size:0.85rem;padding:0.55rem 0.95rem;cursor:pointer;}
+  .knop.klein{font-size:0.72rem;padding:0.3rem 0.6rem;}
+  .knop:focus-visible,.veld:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .rij{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.5rem;}
+  .rij .veld{flex:1;min-width:8rem;}
+  .item{border-top:1px solid var(--line);padding:0.6rem 0;font-size:0.85rem;line-height:1.5;}
+  .item:first-child{border-top:none;}
+  .pill{display:inline-block;border-radius:6px;padding:0.05rem 0.5rem;font-size:0.68rem;border:1px solid var(--line);}
+  .pill.g{color:var(--groen);border-color:var(--groen);}
+  .pill.b{color:var(--gold);border-color:var(--gold);}
+  .pill.r{color:var(--rood);border-color:var(--rood);}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(7rem,1fr));gap:0.6rem;margin-top:0.5rem;}
+  .kpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.7rem;text-align:center;}
+  .kpi b{display:block;font-size:1.4rem;font-family:'Bodoni Moda',serif;}
+  .kpi span{font-size:0.68rem;color:var(--soft);}
+  .chat{max-height:16rem;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.6rem;}
+  .chat .bb{border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;font-size:0.83rem;line-height:1.5;max-width:85%;}
+  .chat .ik{align-self:flex-end;border-color:var(--gold);}
+</style>
+</head>
+<body>
+<a class="skip" href="#inhoud" style="position:absolute;left:-999px;">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/index.html" aria-label="Terug naar de hub">←</a>
+  <h1 id="titel">🎖️ RTG Defensie</h1>
+  <div class="rek"></div>
+  <span class="stil" id="wie"></span>
+</header>
+<main id="inhoud">
+  <section id="vLogin">
+    <p class="stil">De administratieve, logistieke en zorg-ruggengraat van een defensie-organisatie: paraatheid, materieel en onderhoud, bevoorrading en oefeningen, met een staf-AI die meedenkt over de logistiek. Dit is nadrukkelijk een organisatie- en oefensysteem; het is geen wapen- of vuurleidingssysteem, en de AI weigert alles wat richting wapeninzet of doelbestrijding gaat.</p>
+    <div class="kaart">
+      <div class="rij">
+        <input class="veld" id="lCode" placeholder="Code (demo: GARNIZOEN)" maxlength="20" style="text-transform:uppercase;">
+        <button class="knop" id="lZoek" type="button">Verder</button>
+      </div>
+      <div class="rij" id="lWieRij" hidden>
+        <select id="lWie" aria-label="Wie bent u"></select>
+        <input class="veld" id="lPin" type="password" inputmode="numeric" placeholder="PIN" maxlength="8" style="max-width:6rem;">
+        <button class="knop" id="lIn" type="button">Meld aan</button>
+      </div>
+      <p class="stil" id="lFout" aria-live="polite" style="margin-top:0.5rem;"></p>
+      <p class="stil" style="margin-top:0.6rem;">Demo: GARNIZOEN, commando-PIN 1234, logistiek-PIN 5678.</p>
+    </div>
+  </section>
+
+  <section id="vBord" hidden>
+    <div class="kaart">
+      <h2 style="margin-top:0;">Paraatheid</h2>
+      <div class="kpis" id="paraatheid"></div>
+    </div>
+    <div class="kaart">
+      <h2 style="margin-top:0;">Eenheden</h2>
+      <div id="eenheden"></div>
+      <div class="rij" id="rEenheid">
+        <input class="veld" id="eNaam" placeholder="Naam eenheid" maxlength="60">
+        <input class="veld" id="eSoort" placeholder="Soort" maxlength="30" style="max-width:8rem;">
+        <input class="veld" id="eSterkte" type="number" min="0" placeholder="Sterkte" style="max-width:6rem;">
+        <button class="knop klein" id="eMaak" type="button">Voeg toe</button>
+      </div>
+    </div>
+    <div class="kaart">
+      <h2 style="margin-top:0;">Materieel & onderhoud</h2>
+      <div id="materieel"></div>
+      <div class="rij" id="rMat">
+        <input class="veld" id="mNaam" placeholder="Materieel" maxlength="60">
+        <select id="mSoort" aria-label="Soort"><option value="voertuig">Voertuig</option><option value="vaartuig">Vaartuig</option><option value="luchtvaartuig">Luchtvaartuig</option><option value="uitrusting">Uitrusting</option><option value="medisch">Medisch</option><option value="verbinding">Verbinding</option></select>
+        <button class="knop klein" id="mMaak" type="button">Voeg toe</button>
+      </div>
+    </div>
+    <div class="kaart">
+      <h2 style="margin-top:0;">Bevoorrading</h2>
+      <div id="bevoorrading"></div>
+      <div class="rij">
+        <select id="bSoort" aria-label="Soort"><option value="brandstof">Brandstof</option><option value="rantsoenen">Rantsoenen</option><option value="onderdelen">Onderdelen</option><option value="medisch">Medisch</option><option value="verbinding">Verbinding</option><option value="overig">Overig</option></select>
+        <input class="veld" id="bWat" placeholder="Wat is er nodig?" maxlength="120">
+        <input class="veld" id="bAantal" placeholder="Aantal" maxlength="40" style="max-width:6rem;">
+        <select id="bPrio" aria-label="Prioriteit"><option value="hoog">Hoog</option><option value="normaal" selected>Normaal</option><option value="laag">Laag</option></select>
+        <button class="knop klein" id="bMaak" type="button">Vraag aan</button>
+      </div>
+    </div>
+    <div class="kaart">
+      <h2 style="margin-top:0;">Oefeningen</h2>
+      <div id="oefeningen"></div>
+      <div class="rij" id="rOef">
+        <input class="veld" id="oNaam" placeholder="Naam oefening" maxlength="80">
+        <input class="veld" id="oWanneer" placeholder="Wanneer" maxlength="40" style="max-width:9rem;">
+        <input class="veld" id="oLocatie" placeholder="Locatie" maxlength="60" style="max-width:9rem;">
+        <button class="knop klein" id="oMaak" type="button">Plan</button>
+      </div>
+    </div>
+    <div class="kaart">
+      <h2 style="margin-top:0;">De staf-AI (logistiek en planning)</h2>
+      <p class="stil" style="margin-bottom:0.5rem;">Vraag over paraatheid, materieel, onderhoud, bevoorrading en oefeningen. De AI is geen wapensysteem en weigert vragen over wapeninzet of doelbestrijding.</p>
+      <div class="chat" id="aiChat"></div>
+      <div class="rij">
+        <input class="veld" id="aiVraag" placeholder="Bijv.: hoe plan ik het onderhoud met minimale uitval?" maxlength="400">
+        <button class="knop" id="aiStuur" type="button">Vraag</button>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="/apps/defensie.js" defer></script>
+</body>
+</html>

@@ -27,11 +27,16 @@
      open meldingen met de veld-knoppen (ter plaatse, afronden); voor de
      zorg-zaken de medische receptie en de eerste hulp. De tab verschijnt
      alleen als de zaak een korps of zorg-zaak is. */
-  let mkHulp = null, mkZorg = null;
+  let mkHulp = null, mkZorg = null, mkKeten = null, mkKanaal = 'keten', mkGesprek = null;
   async function laadMeldkamerPda(){
     if (!API.token) return;
     try { mkHulp = await API.call('/supplier/hulp/overzicht'); } catch(e){ mkHulp = null; }
     try { mkZorg = await API.call('/supplier/zorg/overzicht'); } catch(e){ mkZorg = null; }
+    try { mkKeten = await API.call('/supplier/keten/status'); } catch(e){ mkKeten = null; }
+    if (mkKeten && (mkKeten.kanalen || []).length){
+      if (!mkKeten.kanalen.some(k => k.id === mkKanaal)) mkKanaal = mkKeten.kanalen[0].id;
+      try { mkGesprek = await API.call('/supplier/keten/gesprek', { kanaal: mkKanaal }); } catch(e){ mkGesprek = null; }
+    } else mkGesprek = null;
     renderMeldkamerPda();
   }
   function renderMeldkamerPda(){
@@ -64,7 +69,25 @@
       html += '<div class="card"><div class="k">'+T('pd.mk.seh','Eerste hulp')+' · '+mkZorg.seh.length+' '+T('pd.mk.inrij','in de rij')+'</div>'+
         mkZorg.seh.slice(0, 6).map(p => '<div class="task"><span class="ic">'+({rood:'🔴',oranje:'🟠',geel:'🟡',groen:'🟢',blauw:'🔵'}[p.triage]||'🟡')+'</span><div class="t"><b>'+esc(p.klacht)+'</b><span>'+esc(p.status)+' · via '+esc(p.via)+'</span></div></div>').join('')+'</div>';
     }
+    // de ketenchat: het gedeelde kanaal en de eigen besloten groepen
+    if (mkKeten && (mkKeten.kanalen || []).length){
+      html += '<div class="card"><div class="k">'+T('pd.mk.keten','Ketenchat')+'</div>'+
+        '<div class="row" style="flex-wrap:wrap;margin-top:0.4rem;">'+mkKeten.kanalen.map(k =>
+          '<button class="abtn '+(k.id===mkKanaal?'':'ghost')+'" data-mkkan="'+k.id+'"'+(k.id===mkKanaal?' aria-current="true"':'')+'>'+esc(k.naam)+'</button>').join('')+'</div>'+
+        '<div class="chat" style="margin-top:0.4rem;">'+((mkGesprek && mkGesprek.berichten) || []).slice(-15).map(m =>
+          '<div class="msg other"><span class="who">'+esc(m.van)+' · '+esc(m.korpsNaam || m.korps)+'</span>'+esc(m.tekst)+'</div>').join('')+'</div>'+
+        (mkGesprek && mkGesprek.magSchrijven === false
+          ? '<div style="font-size:0.75rem;color:var(--soft);margin-top:0.3rem;">'+T('pd.mk.meekijk','U kijkt mee als meldkamer; alleen de leden schrijven.')+'</div>'
+          : '<div class="compose" style="margin-top:0.4rem;"><input id="mkMsg" placeholder="'+T('pd.mk.msg','Bericht aan de keten')+'" maxlength="500"><button id="mkSend">'+T('pd.send','Stuur')+'</button></div>')+
+        '</div>';
+    }
     wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-mkkan]').forEach(b => b.addEventListener('click', () => { mkKanaal = b.dataset.mkkan; laadMeldkamerPda(); }));
+    const mkSend = wrap.querySelector('#mkSend');
+    if (mkSend) mkSend.addEventListener('click', async () => {
+      const i = wrap.querySelector('#mkMsg'); const t = (i.value || '').trim(); if (!t) return; i.value = '';
+      try { await API.call('/supplier/keten/bericht', { kanaal: mkKanaal, tekst: t }); laadMeldkamerPda(); } catch(e){ toast(e.message); }
+    });
     wrap.querySelectorAll('[data-mkm]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/hulp/melding/status', { melding: b.dataset.mkm, status: b.dataset.mkst }); toast('✅'); laadMeldkamerPda(); }
       catch(e){ toast(e.message); }

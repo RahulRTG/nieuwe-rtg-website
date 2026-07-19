@@ -2694,6 +2694,9 @@ Object.assign(kern, require('./kern/hulpdienst')({ db, save, crypto, anthropic, 
    hulp met triagekleuren, verwijzingen en de agenda's van de specialist en
    beauty medical. */
 Object.assign(kern, require('./kern/zorgketen')({ db, save, crypto, findSupplier }));
+/* De ketenchat (kern/ketenchat.js): korpsen verbinden eenmalig, delen een
+   ketenkanaal en maken besloten deelgroepen waar de meldkamer meekijkt. */
+Object.assign(kern, require('./kern/ketenchat')({ db, save, crypto, findSupplier }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));

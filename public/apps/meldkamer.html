@@ -50,6 +50,7 @@
   <a href="/apps/index.html" aria-label="Terug naar de hub">←</a>
   <h1 id="titel">🚨 RTG Meldkamer</h1>
   <div class="rek"></div>
+  <button class="knop" id="noodKnop" type="button" hidden style="border-color:var(--rood);color:var(--rood);">🚨 Nood</button>
   <span class="stil" id="wie"></span>
 </header>
 <main id="inhoud">
@@ -175,6 +176,35 @@
       </div>
       <p class="stil" id="aUit" aria-live="polite"></p>
       <div id="afspraken"></div>
+    </div>
+    <div class="kaart" id="kKeten">
+      <h2 style="margin-top:0;">De ketenchat</h2>
+      <p class="stil" style="margin-bottom:0.5rem;">Nodig een korps of zorg-zaak eenmalig uit; daarna deelt u het ketenkanaal. Besloten deelgroepen zijn alleen voor de leden; de meldkamer-chefs van de betrokken korpsen kijken mee.</p>
+      <div class="rij">
+        <select id="ktKandidaat" aria-label="Korps om uit te nodigen"></select>
+        <button class="knop klein" id="ktNodig" type="button">Nodig uit</button>
+        <span class="stil" id="ktLinks" style="font-size:0.75rem;"></span>
+      </div>
+      <div id="ktInkomend" class="rij"></div>
+      <div class="rij" style="margin-top:0.6rem;">
+        <select id="ktKanaal" aria-label="Kanaal"></select>
+        <button class="knop klein" id="ktGroepToon" type="button">+ Nieuwe deelgroep</button>
+      </div>
+      <div id="ktGroepMaak" hidden style="border:1px solid var(--line);border-radius:10px;padding:0.6rem;margin-top:0.5rem;">
+        <div class="rij">
+          <input class="veld" id="ktGroepNaam" placeholder="Naam van de groep" maxlength="60">
+          <select id="ktGroepKorps" aria-label="Korps voor leden"></select>
+          <button class="knop klein" id="ktGroepRoster" type="button">Haal mensen op</button>
+        </div>
+        <div id="ktGroepLeden" class="rij"></div>
+        <button class="knop klein" id="ktGroepMaakKnop" type="button" style="margin-top:0.4rem;">Maak de groep</button>
+      </div>
+      <div class="chat" id="ktChat" style="margin-top:0.6rem;"></div>
+      <div class="rij">
+        <input class="veld" id="ktTekst" placeholder="Bericht aan de keten of de groep" maxlength="500">
+        <button class="knop klein" id="ktStuur" type="button">Stuur</button>
+      </div>
+      <p class="stil" id="ktUit" aria-live="polite"></p>
     </div>
     <div class="kaart" id="kAi">
       <h2 style="margin-top:0;">De meldkamer-AI</h2>

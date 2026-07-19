@@ -8,7 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
-const { combinatiesUit } = require('../server/kern/voorspel.js');
+const { combinatiesUit } = require('../server/kern/voorspel');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dealkans-'));
 let srv, base, kikunoi, sakura, lid;

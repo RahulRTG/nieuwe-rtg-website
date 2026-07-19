@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Meldkamer</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#C23A5E;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.25rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:860px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .veld,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font:inherit;font-size:0.85rem;padding:0.55rem 0.7rem;}
+  .knop{background:var(--card);border:1px solid var(--gold);border-radius:10px;color:var(--gold);
+    font:inherit;font-size:0.85rem;padding:0.55rem 0.95rem;cursor:pointer;}
+  .knop.klein{font-size:0.72rem;padding:0.3rem 0.6rem;}
+  .knop:focus-visible,.veld:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .rij{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.5rem;}
+  .rij .veld{flex:1;min-width:8rem;}
+  .melding{border-top:1px solid var(--line);padding:0.6rem 0;font-size:0.85rem;line-height:1.5;}
+  .melding:first-child{border-top:none;}
+  .prio{display:inline-block;border-radius:6px;padding:0.05rem 0.45rem;font-size:0.68rem;margin-right:0.4rem;border:1px solid var(--line);}
+  .prio.p1{color:var(--rood);border-color:var(--rood);}
+  .prio.p2{color:var(--gold);border-color:var(--gold);}
+  .prio.p3{color:var(--groen);border-color:var(--groen);}
+  .eenheid{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:0.25rem 0.55rem;margin:0.2rem 0.3rem 0 0;font-size:0.75rem;}
+  .eenheid.vrij{border-color:var(--groen);color:var(--groen);}
+  .eenheid.onderweg,.eenheid.ter-plaatse{border-color:var(--gold);color:var(--gold);}
+  .log{font-size:0.72rem;color:var(--soft);margin-top:0.3rem;line-height:1.5;}
+  .chat{max-height:16rem;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.6rem;}
+  .chat .b{border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;font-size:0.83rem;line-height:1.5;max-width:85%;}
+  .chat .ik{align-self:flex-end;border-color:var(--gold);}
+</style>
+</head>
+<body>
+<a class="skip" href="#inhoud" style="position:absolute;left:-999px;">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/index.html" aria-label="Terug naar de hub">←</a>
+  <h1 id="titel">🚨 RTG Meldkamer</h1>
+  <div class="rek"></div>
+  <span class="stil" id="wie"></span>
+</header>
+<main id="inhoud">
+  <section id="vLogin">
+    <p class="stil">De meldkamer van uw korps: meldingen, eenheden over land, water en door de lucht, bijstand tussen korpsen en de AI die meedenkt. Dit is het RTG-demosysteem voor besturing en oefening; het vervangt geen 112 en geen enkel officieel protocol.</p>
+    <div class="kaart">
+      <div class="rij">
+        <input class="veld" id="lCode" placeholder="Korps-code (bijv. GUARDIA)" maxlength="20" style="text-transform:uppercase;">
+        <button class="knop" id="lZoek" type="button">Verder</button>
+      </div>
+      <div class="rij" id="lWieRij" hidden>
+        <select id="lWie" aria-label="Wie bent u"></select>
+        <input class="veld" id="lPin" type="password" inputmode="numeric" placeholder="PIN" maxlength="8" style="max-width:6rem;">
+        <button class="knop" id="lIn" type="button">Meld aan</button>
+      </div>
+      <p class="stil" id="lFout" aria-live="polite" style="margin-top:0.5rem;"></p>
+      <p class="stil" style="margin-top:0.6rem;">Demokorpsen: GUARDIA (politie), BOMBERS (brandweer), URGENCIA (ambulance), CANMISSES (ziekenhuis), CONSULTA (huisarts), FALCO (special forces, besloten). Manager-PIN 1234.</p>
+    </div>
+  </section>
+
+  <section id="vBord" hidden>
+    <div class="kaart" id="kMeldkamer">
+      <h2 style="margin-top:0;">De meldkamer</h2>
+      <div class="rij" id="rNieuw">
+        <input class="veld" id="mTekst" placeholder="Wat is er gemeld?" maxlength="300">
+        <input class="veld" id="mPlek" placeholder="Waar?" maxlength="80" style="max-width:10rem;">
+        <select id="mPrio" aria-label="Prioriteit"><option value="1">Prio 1</option><option value="2" selected>Prio 2</option><option value="3">Prio 3</option></select>
+        <button class="knop" id="mMaak" type="button">Neem aan</button>
+      </div>
+      <div id="meldingen"><p class="stil">Laden…</p></div>
+    </div>
+    <div class="kaart">
+      <h2 style="margin-top:0;">De eenheden</h2>
+      <div id="eenheden" class="stil">Laden…</div>
+      <div class="rij">
+        <input class="veld" id="eNaam" placeholder="Nieuwe eenheid (naam)" maxlength="40">
+        <select id="eSoort" aria-label="Soort"><option value="land">Land</option><option value="water">Water</option><option value="lucht">Lucht</option><option value="heli">Heli</option></select>
+        <button class="knop" id="eMaak" type="button">Zet op het bord</button>
+      </div>
+    </div>
+    <div class="kaart" id="kZiekenhuis" hidden>
+      <h2 style="margin-top:0;">Bedden en opnames</h2>
+      <div id="bedden" class="stil"></div>
+      <div class="rij">
+        <input class="veld" id="bTotaal" type="number" min="0" max="2000" placeholder="Totaal bedden" style="max-width:9rem;">
+        <button class="knop" id="bZet" type="button">Zet het beddenbord</button>
+      </div>
+      <div id="opnames"></div>
+    </div>
+    <div class="kaart" id="kOverdracht" hidden>
+      <h2 style="margin-top:0;">Overdracht aan het ziekenhuis</h2>
+      <div class="rij">
+        <select id="oZiekenhuis" aria-label="Ziekenhuis"></select>
+        <input class="veld" id="oTriage" placeholder="Triage / reden van overdracht" maxlength="200">
+        <button class="knop" id="oMaak" type="button">Kondig aan</button>
+      </div>
+      <p class="stil" id="oUit" aria-live="polite"></p>
+    </div>
+    <div class="kaart" id="kConsulten" hidden>
+      <h2 style="margin-top:0;">Consulten</h2>
+      <div class="rij">
+        <input class="veld" id="cKlacht" placeholder="Klacht" maxlength="200">
+        <select id="cUrgentie" aria-label="Urgentie"><option value="hoog">Hoog</option><option value="normaal" selected>Normaal</option><option value="laag">Laag</option></select>
+        <input class="veld" id="cWanneer" placeholder="Wanneer (bijv. ma 10:15)" maxlength="40" style="max-width:11rem;">
+        <button class="knop" id="cMaak" type="button">Plan in</button>
+      </div>
+      <div id="consulten"></div>
+    </div>
+    <div class="kaart">
+      <h2 style="margin-top:0;">De meldkamer-AI</h2>
+      <div class="chat" id="aiChat"></div>
+      <div class="rij">
+        <input class="veld" id="aiVraag" placeholder="Bijv.: welke eenheid stuur ik naar een vaartuig in nood?" maxlength="400">
+        <button class="knop" id="aiStuur" type="button">Vraag</button>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="/apps/meldkamer.js" defer></script>
+</body>
+</html>

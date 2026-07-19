@@ -4,6 +4,13 @@
 // Demo-personeel per leverancier: een manager (PIN 1234) en een medewerker (PIN 5678).
 const STAFF_SEED = {
   SAKURA: [['Marc Bosch', 'manager', 'Beheer'], ['Rosa Torres', 'staff', 'Onderhoud']],
+  // de hulpdiensten: per korps een meldkamer-chef (PIN 1234) en een collega
+  GUARDIA: [['Marta Colom', 'manager', 'Meldkamer'], ['Jordi Ripoll', 'staff', 'Noodhulp']],
+  BOMBERS: [['Pere Marti', 'manager', 'Meldkamer'], ['Aina Bonet', 'staff', 'Bevelvoerder']],
+  URGENCIA: [['Laura Cardona', 'manager', 'Meldkamer'], ['Toni Serra', 'staff', 'Verpleegkundige']],
+  CANMISSES: [['Dr. Elena Roig', 'manager', 'Spoedeisende hulp'], ['Marc Tur', 'staff', 'Opnamecoordinator']],
+  CONSULTA: [['Dr. Pau Ferrer', 'manager', 'Huisarts'], ['Ines Planells', 'staff', 'Assistente']],
+  FALCO: [['Cdt. Vidal', 'manager', 'Operatieleider'], ['Sgt. Mari', 'staff', 'Teamleider']],
   KIKUNOI: [['Mateo Ferrer', 'manager', 'Keuken'], ['Nora Prins', 'staff', 'Bediening']],
   PONTO: [['Diego Serra', 'manager', 'Bar'], ['Lisa Groen', 'staff', 'Bediening']],
   HOSHI: [['Carla Vidal', 'manager', 'Receptie'], ['Ibrahim Yildiz', 'staff', 'Housekeeping']],

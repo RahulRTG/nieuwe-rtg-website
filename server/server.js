@@ -1371,6 +1371,39 @@ function initRealtime() {
   ];
   for (const p of NIEUWE_PARTNERS) if (!db.data.suppliers.find(s => s.code === p.code)) { db.data.suppliers.push(p); ensureSupplierDefaults(p); }
 
+  /* ---- de hulpdiensten: zes korpsen op dezelfde motor (kern/hulpdienst.js),
+     met de meldkamer als klantenservice-room. Special forces zijn besloten:
+     alleen de politie kan ze om bijstand vragen. Per korps een demokorps met
+     eenheden over land, water en door de lucht. ---- */
+  const HULP_TYPES = require('./kern/hulpdienst').HULP_TYPES;
+  for (const [t, def] of Object.entries(HULP_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
+  const HULP_KORPSEN = [
+    { code: 'GUARDIA', name: 'Politie Ibiza', type: 'politie', city: 'Ibiza', loc: { lat: 38.912, lng: 1.438, label: 'Ibiza-stad' }, rate: 0, menu: [],
+      hulpEenheden: [['Noodhulp 11', 'land'], ['Noodhulp 12', 'land'], ['Politieheli PH-1', 'heli'], ['Vliegdienst PV-2', 'lucht'], ['Patrouillevaartuig P-9', 'water']] },
+    { code: 'BOMBERS', name: 'Brandweer Ibiza', type: 'brandweer', city: 'Ibiza', loc: { lat: 38.906, lng: 1.42, label: 'Kazerne Eivissa' }, rate: 0, menu: [],
+      hulpEenheden: [['Autospuit TS-1', 'land'], ['Ladderwagen AL-2', 'land'], ['Blusboot B-1', 'water'], ['Blusvliegtuig BV-1', 'lucht']] },
+    { code: 'URGENCIA', name: 'Ambulance Ibiza', type: 'ambulance', city: 'Ibiza', loc: { lat: 38.917, lng: 1.443, label: 'Post Can Misses' }, rate: 0, menu: [],
+      hulpEenheden: [['Ambulance A-1', 'land'], ['Ambulance A-2', 'land'], ['Traumaheli LF-1', 'heli']] },
+    { code: 'CANMISSES', name: 'Ziekenhuis Can Misses', type: 'ziekenhuis', city: 'Ibiza', loc: { lat: 38.916, lng: 1.425, label: 'Can Misses' }, rate: 0, menu: [] },
+    { code: 'CONSULTA', name: 'Huisartsen Es Vive', type: 'huisarts', city: 'Ibiza', loc: { lat: 38.9, lng: 1.44, label: 'Es Vive' }, rate: 0, menu: [] },
+    { code: 'FALCO', name: 'Eenheid Falco', type: 'specials', city: 'Ibiza', loc: { lat: 38.88, lng: 1.4, label: 'besloten locatie' }, rate: 0, menu: [],
+      hulpEenheden: [['Team Alfa', 'land'], ['Team Bravo', 'land'], ['Heli Falco-1', 'heli'], ['Interventievaartuig F-3', 'water']] }
+  ];
+  for (const p of HULP_KORPSEN) {
+    const { hulpEenheden, ...zaak } = p;
+    if (!db.data.suppliers.find(s => s.code === zaak.code)) { db.data.suppliers.push(zaak); ensureSupplierDefaults(zaak); }
+    if (hulpEenheden) {
+      if (!db.data.hulp) db.data.hulp = {};
+      if (!db.data.hulp.eenheden) db.data.hulp.eenheden = {};
+      if (!Array.isArray(db.data.hulp.eenheden[zaak.code]) || !db.data.hulp.eenheden[zaak.code].length) {
+        db.data.hulp.eenheden[zaak.code] = hulpEenheden.map(([naam, soort], i) => ({ id: 'he' + i + zaak.code.toLowerCase(), naam, soort, status: 'vrij' }));
+      }
+    }
+  }
+  if (!db.data.hulp) db.data.hulp = {};
+  if (!db.data.hulp.bedden) db.data.hulp.bedden = {};
+  if (!db.data.hulp.bedden.CANMISSES) db.data.hulp.bedden.CANMISSES = { totaal: 24, bezet: 0 };
+
   // De Salon is verplicht: geef elke geseede partner een compleet profiel (bio +
   // foto), zodat ze aan leden worden getoond. Dit draait NA alle genre-seeds,
   // zodat ook vastgoed, retail en charter meelopen. Een echte partner vult dit
@@ -1398,7 +1431,13 @@ function initRealtime() {
     events: 'Events en festivals: tickets, VIP-decks en de crew die alles regelt.',
     wellness: 'Wellness en spa: behandelingen op afspraak, in de cabine of op uw suite.',
     juwelier: 'Juwelen en horloges, privé-afspraken en ontwerp op maat.',
-    galerie: 'Hedendaagse kunst: exposities, vernissages en stille verkoop.'
+    galerie: 'Hedendaagse kunst: exposities, vernissages en stille verkoop.',
+    politie: 'Hulpdienst op het RTG-net: meldkamer en eenheden. Geen 112-vervanging.',
+    brandweer: 'Hulpdienst op het RTG-net: meldkamer en bluseenheden. Geen 112-vervanging.',
+    ambulance: 'Hulpdienst op het RTG-net: meldkamer en overdracht. Geen 112-vervanging.',
+    ziekenhuis: 'Zorgpartner op het RTG-net: beddenbord en opnames.',
+    huisarts: 'Zorgpartner op het RTG-net: consulten en verwijzingen.',
+    specials: 'Besloten eenheid; uitsluitend inzet via een bijstandsverzoek van de politie.'
   };
   const salonFotoVoor = (s) => {
     const t = db.data.supplierTypes[s.type] || {};
@@ -1423,7 +1462,8 @@ function initRealtime() {
     const DEMO_ZAKEN = ['KIKUNOI', 'PONTO', 'HOSHI', 'SAKURA', 'MKKX', 'JETAG', 'IBIZAIR',
       'AYAKA', 'KAITO', 'ESVEDRA', 'MACE', 'ISLAREN', 'IBIZALIV', 'MAISON', 'MERCABIZA',
       'AZUL', 'AEGIS', 'CANFERRER', 'LUMINA',
-      'VORA', 'BRISA', 'FUEGO', 'LUNARA', 'MOTOISLA', 'FESTA', 'SERENA', 'ORODOR', 'LIENZO'];
+      'VORA', 'BRISA', 'FUEGO', 'LUNARA', 'MOTOISLA', 'FESTA', 'SERENA', 'ORODOR', 'LIENZO',
+      'GUARDIA', 'BOMBERS', 'URGENCIA', 'CANMISSES', 'CONSULTA', 'FALCO'];
     const voor = db.data.suppliers.length;
     db.data.suppliers = db.data.suppliers.filter(s => !DEMO_ZAKEN.includes(s.code));
     // en de bijbehorende voorbeeldposts uit De Salon (de zes geseede verhalen)
@@ -2637,6 +2677,10 @@ Object.assign(kern, require('./kern/baby')({ save, crypto, media, anthropic }));
 /* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
    boardroom die alles ziet en het functieschakelbord bedient. */
 Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCodenaam }));
+/* De hulpdiensten (kern/hulpdienst.js): zes korpsen met een meldkamer,
+   eenheden over land, water en door de lucht, bijstand tussen korpsen en
+   de zorgketen ambulance -> ziekenhuis -> huisarts. */
+Object.assign(kern, require('./kern/hulpdienst')({ db, save, crypto, anthropic, findSupplier }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));

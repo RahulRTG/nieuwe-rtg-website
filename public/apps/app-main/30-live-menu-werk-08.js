@@ -18,6 +18,7 @@
     club:       ['Bediening','Bar','Security'],
     hotel:      ['Receptie','Housekeeping','Roomservice','Onderhoud','Security'],
     apartment:  ['Beheer','Housekeeping','Onderhoud'],
+    villa:      ['Beheer','Housekeeping','Onderhoud'],
     taxi:       ['Taxi centrale','Chauffeur'],
     jet:        ['Operations','Crew','Piloot']
   };

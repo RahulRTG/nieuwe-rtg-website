@@ -27,7 +27,7 @@ function maakZaak({ db, save, accounts }) {
     { id: 'modebezorg', naam: 'Veilige mode-bezorging', types: ['retail'], echt: true,
       get: s => !!(s.modebezorg && s.modebezorg.aan), set: (s, v) => { s.modebezorg = s.modebezorg || {}; s.modebezorg.aan = v; } },
     { id: 'salon', naam: 'Salon-marketing (posten)', types: '*', echt: false, get: s => zf(s, 'salon'), set: (s, v) => sf(s, 'salon', v) },
-    { id: 'gastchat', naam: 'Gastchat', types: ['hotel', 'apartment', 'restaurant', 'bar', 'club'], echt: false, get: s => zf(s, 'gastchat'), set: (s, v) => sf(s, 'gastchat', v) }
+    { id: 'gastchat', naam: 'Gastchat', types: ['hotel', 'apartment', 'villa', 'restaurant', 'bar', 'club'], echt: false, get: s => zf(s, 'gastchat'), set: (s, v) => sf(s, 'gastchat', v) }
   ];
   const OP_ID = Object.fromEntries(CAPS.map(c => [c.id, c]));
   function voorType(s) { return CAPS.filter(c => c.types === '*' || c.types.includes(s.type)); }

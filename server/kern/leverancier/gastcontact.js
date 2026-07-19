@@ -8,7 +8,7 @@ module.exports = (ctx) => {
     ordersVanZaak, boekingenVanZaak, publicTrip } = ctx;
   function deptsFor(s) {
     if (s.type === 'hotel') return ['Receptie', 'Roomservice', 'Housekeeping', 'Onderhoud', 'Security'];
-    if (s.type === 'apartment') return ['Beheer', 'Onderhoud', 'Security'];
+    if (s.type === 'apartment' || s.type === 'villa') return ['Beheer', 'Onderhoud', 'Security'];
     return ['Team'];
   }
   function chatKeyOf(supplierCode, customerKey, dept) { return supplierCode + '|' + customerKey + '|' + dept; }

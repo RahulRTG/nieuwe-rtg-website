@@ -266,13 +266,14 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
     club:       ['Bediening','Bar','Security'],
     hotel:      ['Receptie','Housekeeping','Roomservice','Onderhoud','Security'],
     apartment:  ['Beheer','Housekeeping','Onderhoud'],
+    villa:      ['Beheer','Housekeeping','Onderhoud'],
     taxi:       ['Taxi centrale','Chauffeur'],
     jet:        ['Operations','Crew','Piloot'],
     helikopter: ['Operations','Piloot','Crew','Grondpersoneel'],
@@ -1504,7 +1505,7 @@
       ['kamers','\uD83D\uDECF',T('kt.kamers','Kamers')],
       ['minibar','\uD83E\uDDCA','Minibar']
     );
-    if (type === 'apartment') secs.push(
+    if (type === 'apartment' || type === 'villa') secs.push(
       ['kamers','\uD83C\uDFE1',T('kt.units','Verblijven')],
       ['deuren','\uD83D\uDEAA',T('kt.deuren','Deuren')]
     );
@@ -1883,8 +1884,9 @@
     }
     if (kantoorSec === 'kamers'){
       const rooms = state.rooms || [];
-      const unit = type === 'apartment' ? T('kt.unit','verblijf') : T('kt.kamer','kamer');
-      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(type==='apartment'?'🏡 '+T('kt.units','Verblijven'):'🛏 '+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
+      const verblijfGenre = type === 'apartment' || type === 'villa';
+      const unit = verblijfGenre ? T('kt.unit','verblijf') : T('kt.kamer','kamer');
+      html += '<div class="tkc" style="grid-column:1/-1;"><h3>'+(verblijfGenre?'🏡 '+T('kt.units','Verblijven'):'🛏 '+T('kt.kamers','Kamers'))+' ('+rooms.length+')</h3>'+
         (rooms.length ? rooms.map(r => {
           const hk = (r.hk && r.hk.status) || 'schoon';
           return '<div class="st-row"><span>'+r.name+(r.available?'':' · '+T('kt.offline','offline'))+
@@ -1894,7 +1896,7 @@
             '<button class="obtn warn" data-kmrd="'+r.id+'">✕</button></span></div>';
         }).join('') : '<div class="tkc-who">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>')+
         '<div class="st-form"><div class="row-gap"><input class="st-in" id="kRmN" placeholder="'+T('sup.roomname','Kamernaam')+'" style="flex:2;"><input class="st-in" id="kRmP" type="number" inputmode="decimal" placeholder="€" style="flex:1;"></div>'+
-        '<button class="bigbtn" id="kRmAdd" style="margin-top:0.2rem;">'+(type==='apartment'?T('kt.unitadd','Verblijf toevoegen'):T('kt.kameradd','Kamer toevoegen'))+'</button></div>'+
+        '<button class="bigbtn" id="kRmAdd" style="margin-top:0.2rem;">'+(verblijfGenre?T('kt.unitadd','Verblijf toevoegen'):T('kt.kameradd','Kamer toevoegen'))+'</button></div>'+
         '<div class="tkc-who">'+T('kt.hknote','Tik op de bezem om de housekeeping-status door te schakelen; Dicht = direct onzichtbaar voor gasten.')+'</div></div>';
     }
     if (kantoorSec === 'minibar'){
@@ -4540,7 +4542,7 @@
     const type = S.type;
     let html = '';
     if (type==='restaurant'||type==='bar'||type==='club') html = kassaHoreca();
-    else if (type==='hotel'||type==='apartment') html = kassaHotel();
+    else if (type==='hotel'||type==='apartment'||type==='villa') html = kassaHotel();
     else html = kassaVervoer();
     html += kassaDay();
     html += '<div id="zWrap"></div><div id="shiftWrap"></div>';

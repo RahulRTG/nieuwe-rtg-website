@@ -59,7 +59,7 @@
     const type = S.type;
     let html = '';
     if (type==='restaurant'||type==='bar'||type==='club') html = kassaHoreca();
-    else if (type==='hotel'||type==='apartment') html = kassaHotel();
+    else if (type==='hotel'||type==='apartment'||type==='villa') html = kassaHotel();
     else html = kassaVervoer();
     html += kassaDay();
     html += '<div id="zWrap"></div><div id="shiftWrap"></div>';

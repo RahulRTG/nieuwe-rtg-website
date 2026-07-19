@@ -116,7 +116,7 @@
       ['kamers','\uD83D\uDECF',T('kt.kamers','Kamers')],
       ['minibar','\uD83E\uDDCA','Minibar']
     );
-    if (type === 'apartment') secs.push(
+    if (type === 'apartment' || type === 'villa') secs.push(
       ['kamers','\uD83C\uDFE1',T('kt.units','Verblijven')],
       ['deuren','\uD83D\uDEAA',T('kt.deuren','Deuren')]
     );

@@ -36,7 +36,7 @@ module.exports = (ctx) => {
     'Privacy is heilig: klantdata bekijk je alleen als je taak erom vraagt.'
   ];
   const ONBOARDING_EXTRA = {
-    sales: { knoppen: ['De winkel (/site/winkel.html): wat we verkopen en voor welke prijs', 'Deze kamer: open bestellingen en partner-aanvragen', 'De werklijst: pak een taak, vink hem af'], handelingen: ['Nieuwe bestelling? Binnen twee werkdagen bellen.', 'Partner-aanvraag? Eerst het Business Pass-bewijs controleren.'] },
+    sales: { knoppen: ['De RTG Mall (/apps/mall.html): wat we verkopen en voor welke prijs', 'Deze kamer: open bestellingen en partner-aanvragen', 'De werklijst: pak een taak, vink hem af'], handelingen: ['Nieuwe bestelling? Binnen twee werkdagen bellen.', 'Partner-aanvraag? Eerst het Business Pass-bewijs controleren.'] },
     hr: { knoppen: ['Sollicitaties en vacatures in deze kamer', 'Verlof en klok in de personeels-app'], handelingen: ['Elke sollicitant krijgt altijd antwoord, ook bij een nee.', 'Verlofaanvragen beslis je binnen een week.'] },
     financien: { knoppen: ['Betalingen en munt-ontvangsten in deze kamer', 'Facturen lopen automatisch via de factuurmotor'], handelingen: ['Twijfel over een bedrag? Eerst vragen, nooit gokken.'] },
     intern: { knoppen: ['Het schakelbord staat in de boardroom; de zekeringen op techniek.html', 'De Zaakdozen in het veld zie je in deze kamer'], handelingen: ['Bij een storing: eerst de verbeterkamer en het techniekbord lezen, dan pas schakelen (via de paniekkamer).'] }

@@ -17,9 +17,11 @@ const ETAGES = [
   { id: 'sieraden', label: 'Sieraden & horloges',  icon: '💎' },
   { id: 'leer',     label: 'Leer & accessoires',   icon: '👜' },
   { id: 'wonen',    label: 'Wonen & interieur',    icon: '🛋️' },
-  { id: 'beauty',   label: 'Parfum & beauty',      icon: '🧴' }
+  { id: 'beauty',   label: 'Parfum & beauty',      icon: '🧴' },
+  { id: 'land',     label: 'Van het land',         icon: '🌾' }
 ];
-const ETAGE_IDS = ETAGES.map(e => e.id).filter(id => id !== 'eigen');
+// de etages waar retail-boutieks op landen (eigen-merk en boerderij vullen we apart)
+const ETAGE_IDS = ETAGES.map(e => e.id).filter(id => id !== 'eigen' && id !== 'land');
 
 function maakMall({ db, save, crypto, isRetail }) {
   const nu = () => new Date().toISOString();
@@ -72,8 +74,30 @@ function maakMall({ db, save, crypto, isRetail }) {
       }
     ];
     for (const b of boutieks) if (!db.data.suppliers.find(s => s.code === b.code)) db.data.suppliers.push(b);
+    // een demo-boerderij voor de etage "Van het land"
+    if (!db.data.supplierTypes.boerderij)
+      db.data.supplierTypes.boerderij = { label: 'Boerderij & tuinderij', icon: '🌾', caps: ['boerderij', 'location', 'pricing'] };
+    if (!db.data.suppliers.find(s => s.code === 'HOEVE')) {
+      db.data.suppliers.push({
+        code: 'HOEVE', name: 'Hoeve del Sol', type: 'boerderij', city: 'Ibiza',
+        loc: { lat: 38.98, lng: 1.43, label: 'Santa Gertrudis, Ibiza' }, rate: 0.10, menu: [], photos: [],
+        mall: { etage: 'land', tagline: 'Vers van het eiland: groente, olijfolie en honing van eigen erf.' },
+        boerderij: {
+          type: 'gemengd', opgezet: true, percelen: [], dieren: [], taken: [], instel: {},
+          producten: [
+            { id: crypto.randomBytes(4).toString('hex'), naam: 'Olijfolie extra vergine', eenheid: 'fles 500 ml', prijs: 18, voorraad: 120, bron: 'oogst' },
+            { id: crypto.randomBytes(4).toString('hex'), naam: 'Bloesemhoning', eenheid: 'pot 350 g', prijs: 9, voorraad: 80, bron: 'oogst' },
+            { id: crypto.randomBytes(4).toString('hex'), naam: 'Groentepakket van het seizoen', eenheid: 'per pakket', prijs: 22, voorraad: 40, bron: 'oogst' }
+          ]
+        },
+        klanten: {}
+      });
+    }
     save();
   }
+
+  function isBoer(s) { return !!s && ((db.data.supplierTypes[s.type] || {}).caps || []).includes('boerderij'); }
+  const farmTeKoop = s => ((s.boerderij && s.boerderij.producten) || []).filter(p => (p.prijs || 0) > 0 && (p.voorraad || 0) > 0);
 
   function vanafPrijs(s) {
     const prijzen = (s.artikelen || []).map(a => Math.max(0, Number(a.publiekePrijs || a.price) || 0)).filter(Boolean);
@@ -123,20 +147,74 @@ function maakMall({ db, save, crypto, isRetail }) {
     };
   }
 
+  /* Van het land: de boerderijen en tuinderijen met producten die te koop staan
+     (prijs en voorraad). Elke boerderij is een boutique; leden bestellen een
+     product direct en de voorraad daalt. */
+  function farmBoutiek(s) {
+    const p = farmTeKoop(s);
+    if (!p.length) return null;
+    const prijzen = p.map(x => x.prijs).filter(Boolean);
+    return {
+      code: s.code, kind: 'farm', naam: s.name, stad: s.city || null, etage: 'land',
+      tagline: (s.mall && s.mall.tagline) || 'Vers van het erf.',
+      categorieen: [], aantal: p.length, vanaf: prijzen.length ? Math.min(...prijzen) : null
+    };
+  }
+  function farmBoutieks() {
+    return (db.data.suppliers || []).filter(s => isBoer(s)).map(farmBoutiek).filter(Boolean);
+  }
+  function farmCatalogus(code) {
+    const s = (db.data.suppliers || []).find(x => x.code === String(code || '') && isBoer(x));
+    if (!s) return { status: 404, error: 'Boerderij niet gevonden.' };
+    return {
+      ok: true, naam: s.name, stad: s.city || null,
+      producten: farmTeKoop(s).map(p => ({ id: p.id, naam: p.naam, eenheid: p.eenheid, prijs: Math.max(0, Number(p.prijs) || 0), voorraad: p.voorraad })),
+      valuta: 'EUR'
+    };
+  }
+  function memberBestelFarm(data) {
+    data = data || {};
+    const s = (db.data.suppliers || []).find(x => x.code === String(data.code || '') && isBoer(x));
+    if (!s) return { status: 404, error: 'Boerderij niet gevonden.' };
+    const p = (s.boerderij.producten || []).find(x => x.id === String(data.productId || ''));
+    if (!p || !((p.prijs || 0) > 0)) return { status: 400, error: 'Kies een geldig product.' };
+    const naam = String(data.naam || '').replace(/[<>]/g, '').trim().slice(0, 60);
+    const email = String(data.email || '').trim().toLowerCase().slice(0, 80);
+    const aantal = Math.min(100, Math.max(1, Math.round(Number(data.aantal) || 1)));
+    if (!naam) return { status: 400, error: 'Vul je naam in voor de levering.' };
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { status: 400, error: 'Vul een geldig e-mailadres in.' };
+    if ((p.voorraad || 0) < aantal) return { status: 409, error: 'Niet genoeg voorraad. Nog ' + (p.voorraad || 0) + ' beschikbaar.' };
+    p.voorraad -= aantal;
+    if (!Array.isArray(db.data.winkelBestellingen)) db.data.winkelBestellingen = [];
+    const entry = {
+      id: crypto.randomBytes(4).toString('hex'),
+      product: p.id, productNaam: p.naam, aantal,
+      prijs: { stuk: Math.max(0, Number(p.prijs) || 0), totaal: Math.round((p.prijs || 0) * aantal * 100) / 100, valuta: 'EUR' },
+      leverancier: s.code, leverancierNaam: s.name,
+      contactName: naam, email, kanaal: 'lid', status: 'nieuw', at: nu()
+    };
+    db.data.winkelBestellingen.unshift(entry);
+    db.data.winkelBestellingen = db.data.winkelBestellingen.slice(0, 500);
+    save();
+    return { ok: true, bestelling: { id: entry.id, product: entry.productNaam, aantal, prijs: entry.prijs, restVoorraad: p.voorraad } };
+  }
+
   function overzicht() {
     seed();
     const winkels = (db.data.suppliers || []).filter(s => isRetail(s)).map(boutiek);
+    const farms = farmBoutieks();
     const etages = ETAGES.map(e => {
       let boutieks = winkels.filter(b => b.etage === e.id);
       if (e.id === 'eigen') { const eb = eigenBoutiek(); boutieks = eb ? [eb] : []; }
+      if (e.id === 'land') boutieks = farms;
       return { ...e, boutieks };
     }).filter(e => e.boutieks.length);
     return {
       ok: true,
       etages,
-      totaalBoutieks: winkels.length + (eigenBoutiek() ? 1 : 0),
+      totaalBoutieks: winkels.length + farms.length + (eigenBoutiek() ? 1 : 0),
       valuta: 'EUR',
-      opmerking: 'De enige plek waar je bij RTG koopt. Ledenprijzen in de boutique; het eigen-merk bestel je direct. Prijzen in euro, exclusief eventuele lokale btw.'
+      opmerking: 'De enige plek waar je bij RTG koopt. Ledenprijzen in de boutique; het eigen-merk en de boerderij bestel je direct. Prijzen in euro, exclusief eventuele lokale btw.'
     };
   }
 
@@ -170,7 +248,7 @@ function maakMall({ db, save, crypto, isRetail }) {
     return { ok: true, bestelling: { id: entry.id, product: entry.productNaam, aantal, prijs: entry.prijs } };
   }
 
-  return { mall: { ETAGES, overzicht, seed, eigenCatalogus, memberBestel } };
+  return { mall: { ETAGES, overzicht, seed, eigenCatalogus, memberBestel, farmCatalogus, memberBestelFarm } };
 }
 
 module.exports = { maakMall, MALL_ETAGES: ETAGES };

@@ -99,48 +99,7 @@ module.exports = (kern) => {
     res.json({ ok: true });
   });
 
-  /* De RTG-winkel: hardware en uitbreidingen, zoals de Zaakdoos. De vaste
-     catalogus staat in kern/winkelcatalogus.js (een gedeelde bron met de RTG
-     Mall); daarbovenop komen de door RTG Hardwarelab gepubliceerde ontwerpen uit
-     db.data.winkelProducten. Prijzen in euro, ex btw; een bestelling legt de
-     prijs vast die op dat moment gold. */
-  const { alleProducten: catalogusVan } = require('../../kern/winkelcatalogus');
-  const alleProducten = () => catalogusVan(db);
-  // de prijstabel is de ene bron: de verkooppagina leest hem hiervandaan
-  app.get('/api/winkel/producten', (req, res) => res.json({ producten: alleProducten() }));
-  app.post('/api/winkel/bestel', (req, res) => {
-    const b = req.body || {};
-    const product = alleProducten()[String(b.product || '')];
-    if (!product) return res.status(400).json({ error: 'Kies een geldig product.' });
-    const company = schoon(b.company, 80);
-    const contactName = schoon(b.contactName, 60);
-    const email = String(b.email || '').trim().toLowerCase().slice(0, 80);
-    const phone = String(b.phone || '').trim().slice(0, 30);
-    const note = schoon(b.note, 500);
-    const aantal = Math.min(100, Math.max(1, Math.round(Number(b.aantal) || 1))); // een hotel bestelt zo 40 deuren
-    if (!company || !contactName) return res.status(400).json({ error: 'Vul de bedrijfsnaam en contactpersoon in.' });
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Vul een geldig e-mailadres in.' });
-    if (b.akkoord !== true) return res.status(400).json({ error: 'Ga akkoord met de prijs en de voorwaarden om te bestellen.' });
-    if (!Array.isArray(db.data.winkelBestellingen)) db.data.winkelBestellingen = [];
-    if (db.data.winkelBestellingen.some(o => o.status === 'nieuw' && o.email === email && o.product === String(b.product)))
-      return res.status(409).json({ error: 'Deze bestelling staat al open. We nemen contact met u op.' });
-    const entry = {
-      id: crypto.randomBytes(4).toString('hex'),
-      product: String(b.product), productNaam: product.naam, aantal,
-      // de prijs zoals die gold bij het bestellen: eenmalig + per maand, euro ex btw
-      prijs: { eenmalig: product.eenmalig, perMaand: product.perMaand, valuta: 'EUR', exBtw: true },
-      company, contactName, email, phone, note,
-      akkoord: { prijs: true, at: new Date().toISOString() },
-      status: 'nieuw', at: new Date().toISOString()
-    };
-    db.data.winkelBestellingen.unshift(entry);
-    db.data.winkelBestellingen = db.data.winkelBestellingen.slice(0, 500);
-    save();
-    mail.send(email, 'Uw bestelling bij Rahul Travel Group: ' + product.naam,
-      'Beste ' + contactName + ',\n\nBedankt voor uw bestelling: ' + aantal + 'x ' + product.naam + ' voor ' + company + '.\n' +
-      'Prijs: EUR ' + (product.eenmalig * aantal) + ' eenmalig en daarna EUR ' + (product.perMaand * aantal) + ' per maand, exclusief btw; facturatie in euro.\n' +
-      'We nemen binnen twee werkdagen contact op voor de levering en de aansluiting.\n\nRahul Travel Group');
-    sseToOffice('sync', { scope: 'team' });
-    res.json({ ok: true });
-  });
+  // De losse partner-winkel is opgeheven: kopen gaat voortaan uitsluitend via de
+  // RTG Mall (kern/mall.js + /api/mall). De catalogus woont in
+  // kern/winkelcatalogus.js; de Mall leest hem daar.
 };

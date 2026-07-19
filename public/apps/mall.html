@@ -116,8 +116,42 @@ async function openBoutiek(code, naam, stad, kind){
   $('#blad').classList.add('open');
   try {
     if (kind === 'eigen') { const d = await api('/api/mall/eigen'); tekenEigen(d.producten || []); }
+    else if (kind === 'farm') { const d = await api('/api/mall/land', { code }); tekenFarm(d.producten || []); }
     else { const d = await api('/api/retail/catalogus', { supplierCode: code }); tekenArt(d.artikelen || []); }
   } catch(e){ $('#bladArt').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+function tekenFarm(prod){
+  $('#bladArt').innerHTML = prod.length ? prod.map(p =>
+    '<div class="kaart">'+
+      '<h3>'+esc(p.naam)+'</h3>'+
+      '<span class="prijs">'+euro(p.prijs)+' <span style="color:var(--soft);font-size:.8rem;">'+esc(p.eenheid)+'</span></span>'+
+      '<span class="opties">'+(p.voorraad>0?('nog '+p.voorraad+' beschikbaar'):'uitverkocht')+'</span>'+
+      '<div class="rij"><button class="knop koopf" data-id="'+esc(p.id)+'" data-naam="'+esc(p.naam)+'" data-eenheid="'+esc(p.eenheid)+'">Bestellen</button></div>'+
+    '</div>').join('') : '<div class="leeg">Deze boerderij heeft nu niets te koop.</div>';
+  $('#bladArt').querySelectorAll('.koopf').forEach(b => b.addEventListener('click', () => koopFarm(HUIDIG, b.dataset.id, b.dataset.naam)));
+}
+function koopFarm(code, productId, naam){
+  const wrap = document.createElement('div');
+  wrap.className = 'blad open'; wrap.style.zIndex = '40';
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="kfTerug">← Terug</button>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">Van het land</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
+    '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
+      '<label class="opties">Naam voor de levering</label><input class="veld" id="kfNaam" maxlength="60" style="margin-bottom:.5rem;">'+
+      '<label class="opties">E-mail</label><input class="veld" id="kfMail" type="email" maxlength="80" style="margin-bottom:.5rem;">'+
+      '<label class="opties">Aantal</label><input class="veld" id="kfAantal" type="number" min="1" max="100" value="1" style="margin-bottom:.6rem;">'+
+      '<button class="knop" id="kfBevestig" style="width:100%;">Bestelling plaatsen</button>'+
+      '<p class="opties" style="margin-top:.5rem;">Vers van het erf; we nemen contact op voor de levering. Prijs in euro.</p>'+
+    '</div></div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('#kfTerug').addEventListener('click', () => wrap.remove());
+  wrap.querySelector('#kfBevestig').addEventListener('click', async () => {
+    const naamV = wrap.querySelector('#kfNaam').value.trim(), mail = wrap.querySelector('#kfMail').value.trim();
+    const aantal = wrap.querySelector('#kfAantal').value;
+    if (!naamV){ meld('Vul je naam in.'); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){ meld('Vul een geldig e-mailadres in.'); return; }
+    try { await api('/api/mall/land-bestel', { code, productId, naam: naamV, email: mail, aantal }); wrap.remove(); meld('Bestelling geplaatst. We nemen contact op.'); openBoutiek(code, naam, '', 'farm'); }
+    catch(e){ meld(e.message); }
+  });
 }
 function tekenEigen(prod){
   $('#bladArt').innerHTML = prod.length ? prod.map(p =>

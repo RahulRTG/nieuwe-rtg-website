@@ -121,19 +121,19 @@ test('8. een concept naar de winkel zetten en weer terughalen', async () => {
   assert.equal(inWinkel.status, 200);
   assert.ok(inWinkel.body.ontwerp.winkel, 'het concept is als product gemarkeerd');
   const slug = inWinkel.body.slug;
-  // de publieke winkel-catalogus bevat het nu, naast de vaste producten
-  const cat = await (await fetch(base + '/api/winkel/producten')).json();
-  assert.ok(cat.producten[slug], 'het RTG-ontwerp staat in de winkel');
-  assert.ok(cat.producten.zaakdoos, 'de vaste catalogus staat er nog');
-  assert.equal(cat.producten[slug].bron, 'hardwarelab');
-  // en het is echt te bestellen via het bestaande bestel-endpoint
-  const best = await (await fetch(base + '/api/winkel/bestel', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ product: slug, company: 'Hotel Sol', contactName: 'Mar', email: 'mar@sol.example', aantal: 3, akkoord: true })
-  })).json();
-  assert.ok(best.ok, 'de bestelling gaat door');
+  // de RTG Mall (het eigen-merk) bevat het nu, naast de vaste producten
+  const u = Date.now().toString().slice(-8);
+  const reg = await api('/api/auth/register', { name: 'Koper', email: 'k' + u + '@x.nl', phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+  const lid = reg.body.token;
+  const cat = await api('/api/mall/eigen', {}, lid);
+  assert.ok(cat.body.producten.some(p => p.slug === slug && p.eigen), 'het RTG-ontwerp staat in de Mall');
+  assert.ok(cat.body.producten.some(p => p.slug === 'zaakdoos'), 'de vaste catalogus staat er nog');
+  // en het is echt te bestellen via de Mall
+  const best = await api('/api/mall/bestel', { slug, naam: 'Mar', email: 'mar@sol.example', aantal: 3 }, lid);
+  assert.equal(best.status, 200);
+  assert.equal(best.body.bestelling.aantal, 3);
   // terughalen verwijdert het weer uit de catalogus
   await api('/api/office/hardware/winkel-uit', { id: oid }, office);
-  const cat2 = await (await fetch(base + '/api/winkel/producten')).json();
-  assert.ok(!cat2.producten[slug], 'na terughalen is het weg uit de winkel');
+  const cat2 = await api('/api/mall/eigen', {}, lid);
+  assert.ok(!cat2.body.producten.some(p => p.slug === slug), 'na terughalen is het weg uit de Mall');
 });

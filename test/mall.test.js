@@ -67,6 +67,25 @@ test('2. een boutique uit de mall opent haar catalogus met ledenprijzen', async 
   assert.ok(cat.body.artikelen.every(a => a.publiekePrijs > 0), 'met een prijs');
 });
 
+test('1c. de etage Van het land: een boerderij met producten, direct te bestellen', async () => {
+  const r = await api(base, '/api/mall', {}, lid.token);
+  const land = r.body.etages.find(e => e.id === 'land');
+  assert.ok(land, 'de etage Van het land is gevuld');
+  const hoeve = land.boutieks.find(b => b.code === 'HOEVE' && b.kind === 'farm');
+  assert.ok(hoeve, 'de demo-boerderij staat erop');
+  const cat = await api(base, '/api/mall/land', { code: 'HOEVE' }, lid.token);
+  assert.equal(cat.status, 200);
+  assert.ok(cat.body.producten.length >= 2, 'de boerderij heeft producten te koop');
+  const olie = cat.body.producten.find(p => /Olijfolie/.test(p.naam));
+  const voor = olie.voorraad;
+  const best = await api(base, '/api/mall/land-bestel', { code: 'HOEVE', productId: olie.id, naam: 'Sam', email: 'sam@x.nl', aantal: 2 }, lid.token);
+  assert.equal(best.status, 200);
+  assert.equal(best.body.bestelling.restVoorraad, voor - 2, 'de voorraad daalt');
+  // meer bestellen dan er is, kan niet (het groentepakket heeft weinig voorraad)
+  const pakket = cat.body.producten.find(p => /Groentepakket/.test(p.naam));
+  assert.equal((await api(base, '/api/mall/land-bestel', { code: 'HOEVE', productId: pakket.id, naam: 'Sam', email: 'sam@x.nl', aantal: pakket.voorraad + 5 }, lid.token)).status, 409);
+});
+
 test('3. verlanglijst werkt vanuit de mall-boutique', async () => {
   const cat = await api(base, '/api/retail/catalogus', { supplierCode: 'CUIRHUIS' }, lid.token);
   const tas = cat.body.artikelen.find(a => a.naam === 'Weekendtas');

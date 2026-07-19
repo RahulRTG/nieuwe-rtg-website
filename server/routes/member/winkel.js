@@ -19,6 +19,18 @@ app.post('/api/mall/bestel', auth, (req, res) => {
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
+// de catalogus van een boerderij op de etage "Van het land"
+app.post('/api/mall/land', auth, (req, res) => {
+  const r = mall.farmCatalogus(String(req.body.code || ''));
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+// een lid bestelt een boerderijproduct direct; de voorraad daalt
+app.post('/api/mall/land-bestel', auth, (req, res) => {
+  const r = mall.memberBestelFarm(req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
 
 /* ---- retail/mode: de catalogus van een modehuis, verlanglijst, apart en styling ---- */
 // de catalogus van een merk (collecties + artikelen met ledenprijs, drops, wishlist)

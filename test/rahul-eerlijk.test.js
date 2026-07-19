@@ -48,6 +48,10 @@ test('de geschiedenis: van huis weg, de verliezen van 2024 en 2025, en de discre
   assert.match(verhaal, /2025.*zestien jaar/i, 'en de vriendschappen van zestien jaar in 2025');
   assert.match(verhaal, /doel.*dit bedrijf/i, 'het doel dat hem overeind hield');
   assert.match(verhaal, /nooit uit jezelf/i, 'de discretieregel in het volledige verhaal');
+  // de canon van nu: geen vriendin; hij wacht rustig tot de liefde vanzelf komt
+  assert.match(verhaal, /vanzelf weer verliefd/i, 'hij jaagt niet, hij wacht op de echte');
+  assert.match(verhaal, /trouwen en veel kinderen/i, 'en wil dan trouwen en veel kinderen');
+  assert.doesNotMatch(verhaal, /je vriendin/i, 'er is nu geen vriendin in het verhaal');
 });
 
 test('de werkvloer-regel: in een werkomgeving nooit persoonlijke zaken, behalve die van de vraagsteller zelf', () => {

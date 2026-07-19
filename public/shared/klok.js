@@ -23,21 +23,22 @@
     '.rtg-klok .km{font-family:Inter,system-ui,sans-serif;font-weight:500;font-size:0.26em;letter-spacing:0.08em;' +
       'color:var(--gold,#C9A24B);margin-left:0.22em;min-width:3.6ch;text-align:left;align-self:center;}' +
     '@media (prefers-reduced-motion: reduce){.rtg-klok .km{display:none;}}' +
-    // het ring-gezicht: bordeaux haarlijn, gouden veger, monogram op twaalf
-    '.rtg-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;width:15.5rem;height:15.5rem;max-width:72vw;max-height:72vw;}' +
+    // het ring-gezicht: de rode signatuur, de dubbele haarlijn-rand en goud
+    '.rtg-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16rem;height:16rem;max-width:74vw;max-height:74vw;}' +
     '.rtg-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}' +
-    '.rtg-ring .rr-ring{fill:none;stroke:var(--burgundy,#7F1634);stroke-opacity:0.85;stroke-width:1.4;}' +
-    '.rtg-ring .rr-bezel{fill:none;stroke:currentColor;stroke-opacity:0.16;stroke-width:1;}' +
-    '.rtg-ring .rr-schroef{fill:currentColor;fill-opacity:0.28;}' +
-    '.rtg-ring .rr-tapblok{fill:currentColor;fill-opacity:0.012;}' +
-    '.rtg-ring .rr-min{stroke:currentColor;stroke-opacity:0.18;stroke-width:0.8;}' +
-    '.rtg-ring .rr-vijf{stroke:var(--gold,#C9A24B);stroke-opacity:0.55;stroke-width:1.2;}' +
-    '.rtg-ring .rr-venster{fill:rgba(0,0,0,0.35);stroke:var(--gold,#C9A24B);stroke-opacity:0.4;stroke-width:0.8;}' +
+    '.rtg-ring .rr-rand{fill:none;stroke:currentColor;stroke-opacity:0.22;stroke-width:0.7;}' +
+    '.rtg-ring .rr-rehaut{fill:none;stroke:currentColor;stroke-opacity:0.1;stroke-width:0.7;}' +
+    '.rtg-ring .rr-min{stroke:currentColor;stroke-opacity:0.16;stroke-width:0.7;}' +
+    '.rtg-ring .rr-vijf{stroke:var(--gold,#C9A24B);stroke-opacity:0.7;stroke-width:1.1;}' +
+    ".rtg-ring .rr-monogram{fill:var(--burgundy,#C23A5E);font-family:'Bodoni Moda',serif;font-size:21px;font-weight:600;}" +
+    '.rtg-ring .rr-lijn{stroke:var(--burgundy,#C23A5E);stroke-opacity:0.85;stroke-width:0.6;}' +
+    '.rtg-ring .rr-naam{fill:var(--burgundy,#C23A5E);font-family:Inter,system-ui,sans-serif;font-size:5px;font-weight:600;}' +
+    '.rtg-ring .rr-venster{fill:rgba(0,0,0,0.4);stroke:currentColor;stroke-opacity:0.25;stroke-width:0.7;}' +
     ".rtg-ring .rr-datum{fill:var(--gold,#C9A24B);font-family:'Bodoni Moda',serif;font-size:10.5px;font-variant-numeric:tabular-nums;}" +
-    ".rtg-ring .rr-monogram{fill:var(--gold,#C9A24B);font-family:'Bodoni Moda',serif;font-size:13px;letter-spacing:3.5px;}" +
-    '.rtg-ring .rr-wijzer{fill:var(--gold,#C9A24B);filter:drop-shadow(0 0 6px color-mix(in srgb, var(--gold,#C9A24B) 65%, transparent));}' +
-    '.rtg-ring .rr-kern{text-align:center;}' +
-    '.rtg-ring .rr-kern.rtg-klok{font-size:2.05rem;}';
+    '.rtg-ring .rr-wijzer{fill:var(--gold,#C9A24B);filter:drop-shadow(0 0 5px color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent));}' +
+    '.rtg-ring .rr-kern{position:relative;text-align:center;margin-top:0.9rem;}' +
+    '.rtg-ring .rr-kern.rtg-klok{font-size:2.05rem;}' +
+    '.rtg-ring .rr-kern .km{align-self:baseline;}';
   document.head.appendChild(stijl);
 
   const twee = n => String(n).padStart(2, '0');
@@ -62,88 +63,63 @@
   }
 
   /* ---- de RTG-ring: het signatuurgezicht van de klok ----
-     Een subtiele mix van de grote horlogetaal, maar echt RTG-eigen:
-     - een achthoekige haarlijn-bezel om de ronde wijzerplaat, met acht
-       fijne schroefjes op de hoeken (de taal van de Royal Oak, in fluister),
-     - een minuutbaan van zestig fijne streepjes met gouden accenten op de
-       vijf minuten, en een datumvenster op drie uur (de taal van Rolex),
-     - een heel zachte tapisserie-structuur in het hart,
-     - en het RTG-anker dat alles draagt: de bordeaux ring, de GOUDEN
-       secondewijzer die er mechanisch omheen zweeft (op de milliseconden),
-       de Bodoni-cijfers in het midden en het monogram op twaalf uur.
-     Wie minder beweging wil, krijgt een wijzer die per seconde verspringt. */
+     Helemaal opnieuw getekend als een echte wijzerplaat, met de signatuur
+     voorop: RTG in het rood van het huis, met daaronder een dunne rode
+     kaderlijn en daarin RAHUL TRAVEL GROUP. De plaat zelf is diep en stil:
+     een dubbele haarlijn-rand (rehaut) met daartussen de minuutbaan van
+     zestig fijne streepjes en gouden accenten op de vijf minuten, een
+     wijzerplaat met zachte diepte, de Bodoni-cijfers in het midden, een
+     datumvenster op zes uur, en de GOUDEN secondewijzer die als een klein
+     juweel over de rand zweeft (op de milliseconden; wie minder beweging
+     wil krijgt een wijzer die per seconde verspringt). Op zwart draagt het
+     rood de on-dark-tint, precies volgens de merkregels. */
   function maakRing(el) {
     el.classList.add('rtg-ring');
     const NS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', '0 0 200 200');
     svg.setAttribute('aria-hidden', 'true');
-    // de achthoekige bezel met schroefjes op de hoeken
-    const acht = [];
-    for (let i = 0; i < 8; i++) {
-      const rad = (i * 45 + 22.5) * Math.PI / 180;
-      acht.push([100 + Math.sin(rad) * 99, 100 - Math.cos(rad) * 99]);
-    }
-    const bezel = document.createElementNS(NS, 'polygon');
-    bezel.setAttribute('points', acht.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '));
-    bezel.setAttribute('class', 'rr-bezel');
-    svg.appendChild(bezel);
-    for (const [x, y] of acht) {
-      const schroef = document.createElementNS(NS, 'circle');
-      schroef.setAttribute('cx', x.toFixed(1)); schroef.setAttribute('cy', y.toFixed(1)); schroef.setAttribute('r', '1.5');
-      schroef.setAttribute('class', 'rr-schroef');
-      svg.appendChild(schroef);
-    }
-    // de zachte tapisserie in het hart (een fijn ruitraster, nauwelijks daar)
-    const patroon = document.createElementNS(NS, 'pattern');
-    patroon.setAttribute('id', 'rr-tap'); patroon.setAttribute('width', '7'); patroon.setAttribute('height', '7');
-    patroon.setAttribute('patternUnits', 'userSpaceOnUse'); patroon.setAttribute('patternTransform', 'rotate(45)');
-    const blokje = document.createElementNS(NS, 'rect');
-    blokje.setAttribute('width', '5.4'); blokje.setAttribute('height', '5.4');
-    blokje.setAttribute('class', 'rr-tapblok');
-    patroon.appendChild(blokje);
-    svg.appendChild(patroon);
-    const hart = document.createElementNS(NS, 'circle');
-    hart.setAttribute('cx', '100'); hart.setAttribute('cy', '100'); hart.setAttribute('r', '88');
-    hart.setAttribute('fill', 'url(#rr-tap)');
-    svg.appendChild(hart);
-    // de bordeaux ring, het anker
-    const cirkel = document.createElementNS(NS, 'circle');
-    cirkel.setAttribute('cx', '100'); cirkel.setAttribute('cy', '100'); cirkel.setAttribute('r', '96');
-    cirkel.setAttribute('class', 'rr-ring');
-    svg.appendChild(cirkel);
-    // de minuutbaan: zestig fijne streepjes, goud op de vijf minuten
+    const maak = (naam, at) => {
+      const n = document.createElementNS(NS, naam);
+      for (const [k, v] of Object.entries(at)) n.setAttribute(k, v);
+      svg.appendChild(n);
+      return n;
+    };
+    // de wijzerplaat: zachte diepte van binnen naar buiten
+    const defs = document.createElementNS(NS, 'defs');
+    defs.innerHTML = '<radialGradient id="rr-plaat" cx="50%" cy="42%" r="65%">' +
+      '<stop offset="0%" stop-color="#1B1817"/><stop offset="72%" stop-color="#141211"/>' +
+      '<stop offset="100%" stop-color="#0C0C0B"/></radialGradient>';
+    svg.appendChild(defs);
+    maak('circle', { cx: 100, cy: 100, r: 97, fill: 'url(#rr-plaat)' });
+    // de dubbele haarlijn-rand (rehaut) met de minuutbaan ertussen
+    maak('circle', { cx: 100, cy: 100, r: 97, class: 'rr-rand' });
+    maak('circle', { cx: 100, cy: 100, r: 88.5, class: 'rr-rehaut' });
     for (let m = 0; m < 60; m++) {
-      if (m === 0) continue; // twaalf uur draagt het monogram
-      const rad = m * 6 * Math.PI / 180;
-      const vijf = m % 5 === 0;
-      const lijn = document.createElementNS(NS, 'line');
-      const r1 = vijf ? 89.5 : 92.5;
-      lijn.setAttribute('x1', (100 + Math.sin(rad) * r1).toFixed(2)); lijn.setAttribute('y1', (100 - Math.cos(rad) * r1).toFixed(2));
-      lijn.setAttribute('x2', (100 + Math.sin(rad) * 96).toFixed(2)); lijn.setAttribute('y2', (100 - Math.cos(rad) * 96).toFixed(2));
-      lijn.setAttribute('class', vijf ? 'rr-vijf' : 'rr-min');
-      svg.appendChild(lijn);
+      const rad = m * 6 * Math.PI / 180, vijf = m % 5 === 0;
+      const r1 = vijf ? 90.5 : 92.8, r2 = 95.4;
+      maak('line', {
+        x1: (100 + Math.sin(rad) * r1).toFixed(2), y1: (100 - Math.cos(rad) * r1).toFixed(2),
+        x2: (100 + Math.sin(rad) * r2).toFixed(2), y2: (100 - Math.cos(rad) * r2).toFixed(2),
+        class: vijf ? 'rr-vijf' : 'rr-min'
+      });
     }
-    // het datumvenster op drie uur
-    const venster = document.createElementNS(NS, 'rect');
-    venster.setAttribute('x', '91.5'); venster.setAttribute('y', '150'); venster.setAttribute('width', '17'); venster.setAttribute('height', '15');
-    venster.setAttribute('rx', '2'); venster.setAttribute('class', 'rr-venster');
-    svg.appendChild(venster);
-    const datumTekst = document.createElementNS(NS, 'text');
-    datumTekst.setAttribute('x', '100'); datumTekst.setAttribute('y', '161.2');
-    datumTekst.setAttribute('class', 'rr-datum'); datumTekst.setAttribute('text-anchor', 'middle');
-    svg.appendChild(datumTekst);
-    // het monogram op twaalf uur
-    const monogram = document.createElementNS(NS, 'text');
-    monogram.setAttribute('x', '100'); monogram.setAttribute('y', '22');
-    monogram.setAttribute('class', 'rr-monogram'); monogram.setAttribute('text-anchor', 'middle');
+    // de signatuur, EEN geheel: RTG in het rood, met daaronder de dunne rode
+    // haarlijn die zich opent voor de naam en weer sluit; alles op vaste
+    // breedtes (textLength), zodat het exact gecentreerd en in verhouding is
+    const monogram = maak('text', { x: 100, y: 35, class: 'rr-monogram', 'text-anchor': 'middle',
+      textLength: 52, lengthAdjust: 'spacing' });
     monogram.textContent = 'RTG';
-    svg.appendChild(monogram);
-    // de gouden veger
-    const wijzer = document.createElementNS(NS, 'circle');
-    wijzer.setAttribute('cx', '100'); wijzer.setAttribute('cy', '4'); wijzer.setAttribute('r', '3.4');
-    wijzer.setAttribute('class', 'rr-wijzer');
-    svg.appendChild(wijzer);
+    maak('line', { x1: 40, y1: 45, x2: 57, y2: 45, class: 'rr-lijn' });
+    maak('line', { x1: 143, y1: 45, x2: 160, y2: 45, class: 'rr-lijn' });
+    const naam = maak('text', { x: 100, y: 46.8, class: 'rr-naam', 'text-anchor': 'middle',
+      textLength: 80, lengthAdjust: 'spacing' });
+    naam.textContent = 'RAHUL TRAVEL GROUP';
+    // het datumvenster op zes uur
+    maak('rect', { x: 91, y: 148, width: 18, height: 15, rx: 2, class: 'rr-venster' });
+    const datumTekst = maak('text', { x: 100, y: 159.2, class: 'rr-datum', 'text-anchor': 'middle' });
+    // de gouden veger: een klein juweel op de rand
+    const wijzer = maak('circle', { cx: 100, cy: 7, r: 2.6, class: 'rr-wijzer' });
     const kern = document.createElement('div');
     kern.className = 'rr-kern';
     el.textContent = '';

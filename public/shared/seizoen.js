@@ -46,4 +46,39 @@
   var timer = setInterval(zet, 5 * 60000);
   if (timer && timer.unref) timer.unref();
   w.Seizoen = { zet: zet };
+
+  /* De ademende dagkleur: op elke getekende milliseconde is de kleur een
+     fractie anders. Toon en lichtheid golven heel langzaam (tientallen
+     seconden per ademtocht, hooguit een paar graden en anderhalf procent)
+     rond de dagkleur uit het blad, zodat elke levende achtergrond
+     onmerkbaar van kleur naar kleur glijdt. Wie minder beweging wil
+     (prefers-reduced-motion) houdt de stilstaande kleur. */
+  var RUSTIG = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!RUSTIG && w.requestAnimationFrame) {
+    var wortel = d.documentElement, basis = null, sleutel = '';
+    var naarHsl = function (hex) {
+      var n = parseInt(hex.slice(1), 16);
+      var r = (n >> 16 & 255) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255;
+      var ma = Math.max(r, g, b), mi = Math.min(r, g, b), t = ma - mi, l = (ma + mi) / 2;
+      var s = t === 0 ? 0 : t / (1 - Math.abs(2 * l - 1));
+      var h = t === 0 ? 0 : ma === r ? ((g - b) / t + 6) % 6 : ma === g ? (b - r) / t + 2 : (r - g) / t + 4;
+      return { h: h * 60, s: s * 100, l: l * 100 };
+    };
+    var lees = function () {
+      wortel.style.removeProperty('--dag-kleur');
+      var v = getComputedStyle(wortel).getPropertyValue('--dag-kleur').trim();
+      basis = /^#[0-9A-Fa-f]{6}$/.test(v) ? naarHsl(v) : null;
+    };
+    var adem = function (t) {
+      var nu = wortel.getAttribute('data-seizoen') + '/' + wortel.getAttribute('data-dagdeel');
+      if (nu !== sleutel) { sleutel = nu; lees(); }
+      if (basis) {
+        var h = basis.h + 4 * Math.sin(t / 21000) + 2 * Math.sin(t / 8700);
+        var l = basis.l + 1.5 * Math.sin(t / 13000);
+        wortel.style.setProperty('--dag-kleur', 'hsl(' + h.toFixed(3) + ' ' + basis.s.toFixed(2) + '% ' + l.toFixed(3) + '%)');
+      }
+      w.requestAnimationFrame(adem);
+    };
+    w.requestAnimationFrame(adem);
+  }
 })(window, document);

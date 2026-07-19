@@ -2809,6 +2809,11 @@ Object.assign(kern, require('./kern/balans').maakBalans({
   db, zorgVan: kern.zorgVan, klokVan
 }));
 
+/* De AI-regie: de boardroom kan Rahuls karakter en verhaal aanvullen
+   (kern/rahul.js leest het profiel live uit de database; de vaste kern
+   blijft in de code en wordt door de drift-tests bewaakt). */
+require('./kern/rahul').zetRahulBron(() => db.data.rahulProfiel || null);
+
 /* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
    Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
    hercompressie) en staan als bestanden in de datamap, nooit in git. */

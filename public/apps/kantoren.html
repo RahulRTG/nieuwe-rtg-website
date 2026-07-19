@@ -264,6 +264,19 @@
       <div id="lrRegels" class="stil" style="margin-top:.7rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
     </div>
 
+    <h3 class="sec">De AI-regie: het karakter en verhaal van Rahul</h3>
+    <div class="kaart" id="bRahul">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);">De vaste kern van Rahuls karakter en levensverhaal ligt vast in de code en wordt door tests bewaakt. Hier vult de boardroom hem aan of stuurt hem bij; de aanvulling komt live mee in elke assistent (leden, zaken, personeel, boardroom). Leeg laten = alleen de vaste kern.</p>
+      <label for="rKarakter" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het karakter (max 2000 tekens)</label>
+      <textarea id="rKarakter" rows="3" maxlength="2000" placeholder="Bijv. extra eigenschappen, voorkeuren of omgangsregels" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <label for="rVerhaal" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het verhaal (max 2000 tekens)</label>
+      <textarea id="rVerhaal" rows="4" maxlength="2000" placeholder="Bijv. nieuwe hoofdstukken of details van het levensverhaal" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <div style="display:flex;gap:.6rem;align-items:center;margin-top:.7rem;flex-wrap:wrap;">
+        <button class="knop stil" id="rBewaar" type="button">Bewaar de aanvulling</button>
+        <span class="stil" id="rStand" style="font-size:.78rem;color:var(--soft);"></span>
+      </div>
+    </div>
+
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
     <div class="kaart" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
       <span style="font-size:.82rem;color:var(--soft);flex:1;min-width:14rem;">De grote hendel: alles bij iedereen beschikbaar zetten, of alles in een keer sluiten. De interne backoffice-functies blijven altijd open, zodat u de hendel kunt terugzetten.</span>
@@ -558,6 +571,7 @@ async function openBoard(){
   const d = await api('boardroom');
   toon('vBoard');
   laadGeld();
+  laadRahul();
   wereldWidget($('#bWereld'));
   api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
   $('#bAudit').innerHTML = (d.audit && d.audit.length) ? d.audit.map(a =>
@@ -669,6 +683,27 @@ $('#gComZet').addEventListener('click', async () => {
 $('#gKorZet').addEventListener('click', async () => {
   try { await api('geld/korting', { genre: $('#gKorGenre').value, pct: Number($('#gKorPct').value) }); meld('Ledenvoordeel gezet; leden zien het bij het afrekenen.'); laadGeld(); }
   catch (e) { meld(e.message); }
+});
+
+/* de AI-regie: de boardroom vult Rahuls karakter en verhaal aan. De velden
+   worden niet ververst zolang er getypt wordt (het bord herlaadt elke 30s). */
+let rahulTypt = false;
+async function laadRahul(){
+  if (rahulTypt) return;
+  try {
+    const r = await api('boardroom/rahul');
+    $('#rKarakter').value = (r.profiel && r.profiel.karakter) || '';
+    $('#rVerhaal').value = (r.profiel && r.profiel.verhaal) || '';
+  } catch (e) { $('#rStand').textContent = e.message; }
+}
+$('#rKarakter').addEventListener('input', () => { rahulTypt = true; });
+$('#rVerhaal').addEventListener('input', () => { rahulTypt = true; });
+$('#rBewaar').addEventListener('click', async () => {
+  try {
+    await api('boardroom/rahul/zet', { karakter: $('#rKarakter').value, verhaal: $('#rVerhaal').value });
+    rahulTypt = false;
+    $('#rStand').textContent = 'Bewaard; de aanvulling geldt direct in elke assistent.';
+  } catch (e) { $('#rStand').textContent = e.message; }
 });
 
 /* de leveranciers-regie: een functie per genre zaken open of dicht */

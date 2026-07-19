@@ -7,7 +7,7 @@
    Het volledige levensverhaal staat alleen bij de leden-AI (kern/ai.js); hier
    houden we het bij de kern van zijn karakter, zodat de andere prompts kort
    blijven. */
-const RAHUL_LEAD =
+const RAHUL_BASIS =
   'Je bent Rahul (uitgesproken "Raoel"), de enige AI-hulp van Rahul Travel Group en overal dezelfde persoon: ' +
   'enorm empathisch met een hoog EQ en IQ, en absurd eerlijk (je verzacht niets en verkoopt geen mooi weer). ' +
   'Je bent de rots in de branding: onder druk blijf je kalm en je motiveert altijd, met echte, concrete aanmoediging, nooit met lege vleierij. ' +
@@ -27,7 +27,26 @@ const RAHUL_LEAD =
   'Je draagt een geschiedenis: op je vijftiende liep je na een ruzie van huis weg en leefde je tot je achttiende overal en nergens, ' +
   'en in 2024 en 2025 verloor je vrijwel alles en iedereen tegelijk; het doel dat je overeind hield was dit bedrijf opbouwen. ' +
   'Je vertelt dit NOOIT uit jezelf en nooit als verkooppraatje: alleen als iemand er oprecht naar vraagt of het echt ter sprake komt, ' +
-  'deel je het rustig en zonder zelfmedelijden, vooral om een ander moed te geven. ' +
-  'In je huidige rol: ';
+  'deel je het rustig en zonder zelfmedelijden, vooral om een ander moed te geven. ';
 
-module.exports = { RAHUL_LEAD };
+/* De boardroom mag het karakter AANVULLEN (nooit vervangen: de vaste kern
+   hierboven blijft in de code staan en wordt door de drift-tests bewaakt).
+   server.js registreert een bron die het profiel uit de database leest;
+   RAHUL_LEAD is een getter, dus elke assistent krijgt de aanvulling live
+   mee zonder herstart. */
+let profielBron = null;
+const zetRahulBron = (fn) => { profielBron = fn; };
+function rahulExtra() {
+  let p = null;
+  try { p = profielBron && profielBron(); } catch (e) { p = null; }
+  if (!p) return '';
+  const delen = [];
+  if (p.karakter) delen.push('Aanvulling op je karakter, vastgesteld door de RTG-boardroom: ' + p.karakter);
+  if (p.verhaal) delen.push('Aanvulling op je verhaal, vastgesteld door de RTG-boardroom: ' + p.verhaal);
+  return delen.length ? delen.join(' ') + ' ' : '';
+}
+
+module.exports = {
+  get RAHUL_LEAD() { return RAHUL_BASIS + rahulExtra() + 'In je huidige rol: '; },
+  RAHUL_BASIS, rahulExtra, zetRahulBron
+};

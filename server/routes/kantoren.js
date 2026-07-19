@@ -2,7 +2,7 @@
    Alles achter de office-inlog (dezelfde als de backoffice); het schakelen
    van functies raakt het hele platform en hoort dus bij het kantoor. */
 module.exports = (kern) => {
-  const { app, officeAuth, afdelingen, sseToOffice,
+  const { app, officeAuth, afdelingen, sseToOffice, db, save,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status).json({ error: r.error }) : res.json(r);
   const veilig = (res, werk) => { try { stuur(res, werk()); } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
@@ -32,6 +32,20 @@ module.exports = (kern) => {
     return r;
   }));
   // de uitrolfases: in EEN klik de hele kast in de stand van een fase
+  /* De AI-regie: de boardroom vult Rahuls karakter en verhaal aan. De
+     vaste kern van het karakter blijft in de code staan (bewaakt door de
+     drift-tests); deze aanvullingen komen live in ELKE assistent mee. */
+  app.post('/api/office/boardroom/rahul', officeAuth, (req, res) => {
+    res.json({ ok: true, profiel: db.data.rahulProfiel || { karakter: '', verhaal: '' } });
+  });
+  app.post('/api/office/boardroom/rahul/zet', officeAuth, (req, res) => {
+    const kort = v => String(v == null ? '' : v).trim().slice(0, 2000);
+    db.data.rahulProfiel = { karakter: kort(req.body.karakter), verhaal: kort(req.body.verhaal), at: new Date().toISOString() };
+    save();
+    sseToOffice('sync', { scope: 'boardroom' });
+    res.json({ ok: true, profiel: db.data.rahulProfiel });
+  });
+
   app.post('/api/office/boardroom/fase', officeAuth, (req, res) => veilig(res, () => {
     const r = afdelingen.schakelFase(String(req.body.fase || ''), req.body.naam ? String(req.body.naam) : 'boardroom');
     if (r.ok) sseToOffice('sync', { scope: 'boardroom' });

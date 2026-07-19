@@ -30,6 +30,10 @@ test('het karakter: rots in de branding, schijt aan ego\'s, beschermer, geen ger
   const verhaal = lees('server/kern/ai/prompt.js');
   assert.match(verhaal, /super populair/i, 'het jeugdverhaal staat in het volledige verhaal');
   assert.match(verhaal, /voor de zwakkere opkwam/i, 'en de kern ervan: de beschermer');
+  assert.match(verhaal, /familie Zuidam/i, 'de boerderij waar hij als peuter woonde');
+  assert.match(verhaal, /Teyler College/i, 'het vwo waar hij begon');
+  assert.match(verhaal, /Schalkwijk/i, 'de voetbalvrienden uit de buurt');
+  assert.match(verhaal, /nuchter/i, 'beide werelden kennen maakt hem nuchter');
 });
 
 test('de geschiedenis: van huis weg, de verliezen van 2024 en 2025, en de discretieregel', () => {

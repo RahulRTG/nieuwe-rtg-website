@@ -79,4 +79,34 @@ test('4. RTG Uitgaan toont nachtadressen met avonden en meldt aan via /api/event
   const rsvp = await api(base, '/api/event/rsvp', { supplierCode: zaak.code, eventId: ev.id, qty: 2 }, lid.token);
   assert.equal(rsvp.status, 200);
   assert.equal(rsvp.body.ok, true);
+  // mijn avonden toont de aanmelding; afmelden haalt hem weg
+  const mijn = await api(base, '/api/uitgaan/mijn', {}, lid.token);
+  assert.ok(mijn.body.avonden.some(a => a.eventId === ev.id && a.supplierCode === zaak.code), 'de avond staat bij mij');
+  const af = await api(base, '/api/event/rsvp/annuleer', { supplierCode: zaak.code, eventId: ev.id }, lid.token);
+  assert.equal(af.status, 200);
+  const mijn2 = await api(base, '/api/uitgaan/mijn', {}, lid.token);
+  assert.ok(!mijn2.body.avonden.some(a => a.eventId === ev.id), 'na afmelden staat de avond niet meer bij mij');
+});
+
+test('5. een reisaanvraag intrekken; daarna kan dezelfde reis weer', async () => {
+  const mijn = await api(base, '/api/reisbureau/mijn', {}, lid.token);
+  const open = mijn.body.aanvragen.find(a => a.status === 'aangevraagd');
+  assert.ok(open, 'er staat een open aanvraag (uit test 2)');
+  const ann = await api(base, '/api/reisbureau/annuleer', { ref: open.ref }, lid.token);
+  assert.equal(ann.status, 200);
+  assert.equal(ann.body.aanvraag.status, 'geannuleerd');
+  // onbekende ref
+  assert.equal((await api(base, '/api/reisbureau/annuleer', { ref: 'RTG-R-XXXXXX' }, lid.token)).status, 404);
+  // dezelfde reis mag nu weer aangevraagd worden
+  const opnieuw = await api(base, '/api/reisbureau/boek', { tripId: open.tripId, personen: 2 }, lid.token);
+  assert.equal(opnieuw.status, 200);
+});
+
+test('6. AI-reisadvies wijst een reis uit de catalogus aan (regel-fallback zonder sleutel)', async () => {
+  const r = await api(base, '/api/reisbureau/advies', { wens: 'zon, zee en strand op een eiland' }, lid.token);
+  assert.equal(r.status, 200);
+  assert.ok(r.body.reis && r.body.reis.id, 'er komt een concrete reis terug');
+  assert.ok(typeof r.body.reden === 'string' && r.body.reden.length, 'met een korte reden');
+  const cat = await api(base, '/api/reisbureau', {}, lid.token);
+  assert.ok(cat.body.reizen.some(x => x.id === r.body.reis.id), 'de aangeraden reis komt uit de catalogus');
 });

@@ -63,6 +63,7 @@
   <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Hotels, appartementen en villa's van RTG-partners. Kies een adres, een kamer en je data. Je vraagt het verblijf aan; het huis bevestigt.</p>
   <div class="chips" id="soorten"></div>
   <div class="lijst" id="lijst"></div>
+  <div id="mijnWrap"></div>
 </main>
 
 <section class="blad" id="blad" aria-label="Verblijf boeken">
@@ -109,6 +110,20 @@ async function laad(){
   $('#soorten').innerHTML = SOORTEN.map(([k,l]) => '<button class="chip'+(soort===k?' aan':'')+'" data-k="'+esc(k)+'">'+esc(l)+'</button>').join('');
   $('#soorten').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { soort = b.dataset.k; teken(); }));
   teken();
+  laadMijn();
+}
+async function laadMijn(){
+  let d; try { d = await api('/api/verblijf/mijn'); } catch(e){ return; }
+  const open = (d.verblijven||[]).filter(v => ['aangevraagd','bevestigd'].includes(v.status));
+  if (!open.length){ $('#mijnWrap').innerHTML = ''; return; }
+  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn verblijven</h2>'+
+    open.map(v => '<div class="resto" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;">'+
+      '<div><h3 style="font-size:1rem;">'+esc(v.supplierName)+'</h3><span class="meta">'+esc(v.roomName)+' · '+esc(v.aankomst)+' tot '+esc(v.vertrek)+' · '+esc(v.status)+'</span></div>'+
+      '<button class="knop" data-id="'+esc(v.id)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);">Annuleer</button>'+
+    '</div>').join('');
+  $('#mijnWrap').querySelectorAll('button[data-id]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/verblijf/annuleer', { id: b.dataset.id }); meld('Verblijf geannuleerd.'); laadMijn(); } catch(e){ meld(e.message); }
+  }));
 }
 function teken(){
   const lijst = ALLE.filter(h => !soort || h.soort === soort);
@@ -169,5 +184,37 @@ $('#rMin').addEventListener('click', () => { AANTAL = Math.max(1, AANTAL-1); $('
 $('#rPlus').addEventListener('click', () => { AANTAL = Math.min(10, AANTAL+1); $('#rAantal').textContent = AANTAL; });
 $('#rBoek').addEventListener('click', boek);
 </script>
+<button class="rahulfab" id="rahulFab" type="button">✨ Vraag Rahul</button>
+<section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
+  <div class="rahulkop"><b>Vraag het Rahul</b><button class="terug" id="rahulSluit" type="button" aria-label="Sluiten">✕</button></div>
+  <div class="rahuluit" id="rahulUit" aria-live="polite"></div>
+  <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Bijv. boek Ibiza voor 2 personen" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
+</section>
+<style>
+.rahulfab{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--gold);color:#000;border:none;border-radius:999px;padding:.7rem 1.1rem;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+.rahulsheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:var(--card,#151312);border:1px solid var(--gold);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.rahulsheet[hidden]{display:none;}
+.rahulkop{display:flex;align-items:center;justify-content:space-between;}
+.rahulkop b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+.rahulkop .terug{padding:.2rem .55rem;}
+.rahuluit{font-size:.86rem;color:var(--muted,#bbb);line-height:1.55;max-height:40vh;overflow-y:auto;white-space:pre-wrap;}
+.rahulrij{display:flex;gap:.4rem;}
+.rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:10px;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
+.rahulgo{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
+</style>
+<script>(function(){
+  var tok=null; try{tok=localStorage.getItem('rtg_member_token');}catch(e){}
+  var fab=document.getElementById('rahulFab'), sheet=document.getElementById('rahulSheet');
+  var uit=document.getElementById('rahulUit'), form=document.getElementById('rahulForm'), inp=document.getElementById('rahulIn');
+  if(!tok){ if(fab) fab.style.display='none'; return; }
+  fab.addEventListener('click',function(){ sheet.hidden=false; fab.style.display='none'; inp.focus(); if(!uit.textContent) uit.textContent='Zeg wat je wilt. Ik reserveer, boek, meld je aan en bestel, alles met jouw eigen inlog.'; });
+  document.getElementById('rahulSluit').addEventListener('click',function(){ sheet.hidden=true; fab.style.display=''; });
+  form.addEventListener('submit',function(ev){ ev.preventDefault(); var q=inp.value.trim(); if(!q) return; inp.value=''; uit.textContent='Rahul denkt na...';
+    fetch('/api/fluister',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({q:q})})
+      .then(function(r){return r.json();}).then(function(d){ uit.textContent=(d&&(d.antwoord||d.error))||'Ik kwam er niet uit.'; })
+      .catch(function(){ uit.textContent='Er ging iets mis. Probeer het opnieuw.'; });
+  });
+})();</script>
+
 </body>
 </html>

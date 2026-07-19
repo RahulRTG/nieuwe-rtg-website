@@ -53,7 +53,26 @@ function maakUitgaan({ db, save, crypto }) {
     };
   }
 
-  return { uitgaan: { overzicht, seed } };
+  // mijn avonden: de events waar dit lid op de gastenlijst staat (aankomend eerst)
+  function mijnAvonden(key) {
+    const uit = [];
+    for (const s of (db.data.suppliers || [])) {
+      if (!TYPES[s.type]) continue;
+      for (const e of (s.events || [])) {
+        const g = (e.guests || []).find(x => x.key === key);
+        if (!g) continue;
+        uit.push({
+          supplierCode: s.code, zaak: s.name, soortLabel: TYPES[s.type],
+          eventId: e.id, naam: e.name, datum: e.date || null, tijd: e.time || null,
+          qty: g.qty || 1, ingecheckt: !!g.checkedIn
+        });
+      }
+    }
+    uit.sort((a, b) => String(a.datum || '').localeCompare(String(b.datum || '')));
+    return uit.slice(0, 50);
+  }
+
+  return { uitgaan: { overzicht, seed, mijnAvonden } };
 }
 
 module.exports = { maakUitgaan };

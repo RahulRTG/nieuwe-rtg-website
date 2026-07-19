@@ -2733,7 +2733,7 @@ Object.assign(kern, require('./kern/foodcourt').maakFoodcourt({ db, save, crypto
    leden bladeren door de samengestelde reizen en vragen er een aan tegen de
    nettoprijs. De aanvraag landt bij een RTG-reisadviseur (aangevraagd, mens
    bevestigt). */
-Object.assign(kern, require('./kern/reisbureau').maakReisbureau({ db, save, crypto }));
+Object.assign(kern, require('./kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic }));
 /* De losse verblijf-pagina (kern/logies.js): hotels, appartementen en villa's
    op een rij met hun vrije kamers; boeken loopt via /api/verblijf. */
 Object.assign(kern, require('./kern/logies').maakLogies({ db }));

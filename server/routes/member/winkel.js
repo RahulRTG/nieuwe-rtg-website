@@ -51,6 +51,8 @@ app.post('/api/hotels', auth, (req, res) => res.json(logies.overzicht()));
 /* ---- de losse uitgaan-pagina: bars, clubs en beachclubs met hun avonden ---- */
 // het overzicht van de nachtadressen met hun gepubliceerde events; aanmelden gaat via /api/event/rsvp
 app.post('/api/uitgaan', auth, (req, res) => res.json(uitgaan.overzicht()));
+// de avonden waar ik op de gastenlijst sta (annuleren gaat via /api/event/rsvp/annuleer)
+app.post('/api/uitgaan/mijn', auth, (req, res) => res.json({ avonden: uitgaan.mijnAvonden(req.session.key) }));
 
 /* ---- het RTG-reisbureau: samengestelde reizen, tegen de nettoprijs ---- */
 // het overzicht van de reizen
@@ -64,6 +66,18 @@ app.post('/api/reisbureau/boek', auth, (req, res) => {
 });
 // mijn reisaanvragen
 app.post('/api/reisbureau/mijn', auth, (req, res) => res.json({ aanvragen: reisbureau.mijn(req.session.key) }));
+// een eigen reisaanvraag intrekken zolang die openstaat
+app.post('/api/reisbureau/annuleer', auth, (req, res) => {
+  const r = reisbureau.annuleer(req.session.key, String(req.body.ref || ''));
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+// AI-reisadvies: vertel je wens, de reisadviseur wijst de best passende reis aan
+app.post('/api/reisbureau/advies', auth, async (req, res) => {
+  const r = await reisbureau.advies(String(req.body.wens || ''));
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
 
 /* ---- retail/mode: de catalogus van een modehuis, verlanglijst, apart en styling ---- */
 // de catalogus van een merk (collecties + artikelen met ledenprijs, drops, wishlist)

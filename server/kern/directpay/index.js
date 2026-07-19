@@ -11,15 +11,11 @@
      Stripe het bedrag direct naar de leverancier routeert. De naad (server/
      betaal.js) blijft gelijk; alleen de bestemming komt erbij.
 
-   Twee kanten:
-   1. Het lid betaalt zelf een leverancier (bedrag dat het lid kiest, bijv. iets
-      dat via de chat of de Salon is afgesproken): betaalDirect().
-   2. De leverancier stuurt een betaalverzoek op codenaam; het lid ziet het en
-      rekent met Face ID af: verzoekMaak() + betaalVerzoek().
-
    Veilig: bedrag begrensd, leverancier moet echt bestaan, idempotent (twee keer
    tikken of een herhaald verzoek schrijft nooit dubbel af), en de betaalstatus
-   komt uit de betaal-naad, niet van de client. */
+   komt uit de betaal-naad, niet van de client. Dit is de orkestrator: het
+   grootboek, de idempotentie, de tempolimiet en het rechtstreeks betalen wonen
+   hier; de betaalverzoeken en de ontvangsten-teller in ./verzoek. */
 
 const MIN_CENTEN = 50;          // € 0,50 ondergrens
 const MAX_CENTEN = 5000000;     // € 50.000 bovengrens per transactie
@@ -82,6 +78,11 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     ensure();
     if (!db.data.directOntvangsten[code]) db.data.directOntvangsten[code] = { som: 0, aantal: 0, uitbetaald: 0 };
     return db.data.directOntvangsten[code];
+  }
+
+  function publiek(b) {
+    return { ref: b.ref, supplierCode: b.supplierCode, supplierName: b.supplierName, bedrag: b.bedrag,
+      omschrijving: b.omschrijving, bron: b.bron, codename: b.codename, betaalwijze: b.betaalwijze || 'kaart', at: b.at };
   }
 
   /* Het lid betaalt een leverancier rechtstreeks. `idem` is een client-token dat
@@ -159,95 +160,21 @@ function maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifyS
     return { status: 200, ok: true, betaling: publiek(b) };
   }
 
-  function publiek(b) {
-    return { ref: b.ref, supplierCode: b.supplierCode, supplierName: b.supplierName, bedrag: b.bedrag,
-      omschrijving: b.omschrijving, bron: b.bron, codename: b.codename, betaalwijze: b.betaalwijze || 'kaart', at: b.at };
-  }
   function mijnBetalingen(key) {
     ensure();
     // nieuwste-eerst met early exit: nooit verder scannen dan de 100 die we tonen
     return verzamel(db.data.directBetalingen, b => b.key === key, 100, publiek);
   }
 
-  /* De leverancier stuurt een betaalverzoek op codenaam (of open aan wie het
-     bekijkt). Het lid rekent het met Face ID af. */
-  function verzoekMaak({ supplierCode, actorName, naarCodename, bedragCenten, omschrijving }) {
-    ensure();
-    const s = findSupplier(supplierCode);
-    if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
-    const cent = centenVan(bedragCenten);
-    if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
-    if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog.' };
-    const v = {
-      ref: id('BV'), supplierCode: s.code, supplierName: s.name,
-      naarCodename: naarCodename ? schoon(naarCodename, 40) : null,
-      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Betaalverzoek',
-      status: 'open', door: schoon(actorName, 60) || 'Beheer', betaaldDoor: null, betaaldRef: null, at: nu()
-    };
-    db.data.betaalVerzoeken.unshift(v);
-    db.data.betaalVerzoeken = db.data.betaalVerzoeken.slice(0, 100000);
-    save();
-    try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
-    return { status: 200, ok: true, verzoek: verzoekPubliek(v) };
-  }
-  function verzoekPubliek(v) {
-    return { ref: v.ref, supplierCode: v.supplierCode, supplierName: v.supplierName, naarCodename: v.naarCodename,
-      bedrag: v.bedrag, omschrijving: v.omschrijving, status: v.status, betaaldDoor: v.betaaldDoor, at: v.at };
-  }
-  // open verzoeken die aan dit lid gericht zijn (op codenaam), nieuwste eerst
-  function verzoekenVoor(codename) {
-    ensure();
-    if (!codename) return [];
-    const wie = String(codename).toLowerCase();
-    return verzamel(db.data.betaalVerzoeken,
-      v => v.status === 'open' && v.naarCodename && v.naarCodename.toLowerCase() === wie,
-      40, verzoekPubliek);
-  }
-  async function betaalVerzoek({ key, codename, ref, idem }) {
-    ensure();
-    const v = db.data.betaalVerzoeken.find(x => x.ref === ref);
-    if (!v) return { status: 404, error: 'Betaalverzoek niet gevonden.' };
-    if (v.status === 'betaald') { const b = db.data.directBetalingen.find(x => x.ref === v.betaaldRef); return { status: 200, ok: true, betaling: b ? publiek(b) : null, herhaald: true }; }
-    if (v.status !== 'open') return { status: 409, error: 'Dit betaalverzoek is niet meer open.' };
-    if (v.naarCodename && codename && v.naarCodename.toLowerCase() !== String(codename).toLowerCase())
-      return { status: 403, error: 'Dit betaalverzoek staat op naam van iemand anders.' };
-    const r = await betaalDirect({ key, codename, supplierCode: v.supplierCode, bedragCenten: v.bedrag,
-      omschrijving: v.omschrijving, bron: 'verzoek', idem: idem || ('bv:' + v.ref) });
-    if (!r.ok) return r;
-    v.status = 'betaald'; v.betaaldDoor = codename || key; v.betaaldRef = r.betaling.ref;
-    save();
-    try { sseToSupplier(v.supplierCode, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
-    return { status: 200, ok: true, betaling: r.betaling };
-  }
-  function verzoekIntrek(supplierCode, ref) {
-    ensure();
-    const v = db.data.betaalVerzoeken.find(x => x.ref === ref && x.supplierCode === supplierCode);
-    if (!v) return { status: 404, error: 'Betaalverzoek niet gevonden.' };
-    if (v.status !== 'open') return { status: 409, error: 'Alleen een open verzoek kan ingetrokken worden.' };
-    v.status = 'ingetrokken';
-    save();
-    return { status: 200, ok: true };
-  }
-
-  // de leverancierskant: wat kwam er rechtstreeks binnen + openstaande verzoeken
-  function ontvangsten(supplierCode) {
-    ensure();
-    const L = ledger(supplierCode);
-    const betalingen = verzamel(db.data.directBetalingen, b => b.supplierCode === supplierCode, 60, publiek);
-    const verzoeken = verzamel(db.data.betaalVerzoeken, v => v.supplierCode === supplierCode, 40, verzoekPubliek);
-    return {
-      som: L.som, aantal: L.aantal, uitbetaald: L.uitbetaald, saldo: L.som - L.uitbetaald,
-      betalingen, openVerzoeken: verzoeken.filter(v => v.status === 'open'), verzoeken
-    };
-  }
-
-  return {
+  // de gedeelde ctx voor de deelbestanden
+  const ctx = { db, save, ensure, centenVan, id, schoon, nu, verzamel, ledger, publiek, betaalDirect,
+    findSupplier, sseToSupplier, MIN_CENTEN, MAX_CENTEN };
+  const api = {
     DP_MIN_CENTEN: MIN_CENTEN, DP_MAX_CENTEN: MAX_CENTEN,
-    dpBetaalDirect: betaalDirect, dpMijnBetalingen: mijnBetalingen,
-    dpVerzoekMaak: verzoekMaak, dpVerzoekenVoor: verzoekenVoor, dpBetaalVerzoek: betaalVerzoek,
-    dpVerzoekIntrek: verzoekIntrek, dpOntvangsten: ontvangsten,
-    dpRegistreerMunt: registreerMuntBetaling
+    dpBetaalDirect: betaalDirect, dpMijnBetalingen: mijnBetalingen, dpRegistreerMunt: registreerMuntBetaling
   };
+  Object.assign(api, require('./verzoek')(ctx));
+  return api;
 }
 
 module.exports = { maakDirectpay };

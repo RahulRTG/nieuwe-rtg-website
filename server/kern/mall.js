@@ -23,6 +23,25 @@ const ETAGES = [
 // de etages waar retail-boutieks op landen (eigen-merk en boerderij vullen we apart)
 const ETAGE_IDS = ETAGES.map(e => e.id).filter(id => id !== 'eigen' && id !== 'land');
 
+/* De gids "Alle leveranciers": naast de koop-etages toont de Mall elke partner,
+   gegroepeerd per genre, met een diepe link naar de plek waar je daar boekt of
+   reserveert. Alleen de gastvrije/lifestyle-genres horen in de mall-gids; de
+   hulpdiensten, zorgketen en defensie horen hier niet thuis. De volgorde is
+   bewust: eerst tafelen en verblijven, dan uitgaan en beleven, dan de rest. */
+const GIDS_GENRES = [
+  'restaurant', 'hotel', 'apartment', 'villa', 'bar', 'club', 'beachclub',
+  'koffie', 'chef', 'wellness', 'juwelier', 'galerie', 'retail', 'boerderij',
+  'activiteit', 'events', 'taxi', 'jet', 'helikopter', 'verhuur', 'tweewielers',
+  'charter', 'vastgoed', 'zorg'
+];
+// waar je een genre boekt/reserveert in de app (de diepe link vanuit de gids)
+const GENRE_PAGINA = {
+  restaurant: '/apps/foodcourt.html',
+  hotel: '/apps/hotels.html', apartment: '/apps/hotels.html', villa: '/apps/hotels.html',
+  bar: '/apps/uitgaan.html', club: '/apps/uitgaan.html', beachclub: '/apps/uitgaan.html',
+  retail: '/apps/mall.html', juwelier: '/apps/mall.html', boerderij: '/apps/mall.html'
+};
+
 function maakMall({ db, save, crypto, isRetail }) {
   const nu = () => new Date().toISOString();
   const va = (sku, kleuren, maten, v) => {
@@ -161,7 +180,7 @@ function maakMall({ db, save, crypto, isRetail }) {
     };
   }
   function farmBoutieks() {
-    return (db.data.suppliers || []).filter(s => isBoer(s)).map(farmBoutiek).filter(Boolean);
+    return (db.data.suppliers || []).filter(s => isBoer(s) && !(s.mall && s.mall.verborgen)).map(farmBoutiek).filter(Boolean);
   }
   function farmCatalogus(code) {
     const s = (db.data.suppliers || []).find(x => x.code === String(code || '') && isBoer(x));
@@ -199,9 +218,73 @@ function maakMall({ db, save, crypto, isRetail }) {
     return { ok: true, bestelling: { id: entry.id, product: entry.productNaam, aantal, prijs: entry.prijs, restVoorraad: p.voorraad } };
   }
 
+  // een leverancier die het kantoor in de Mall heeft verborgen (schakelaar in de
+  // boardroom); geldt voor zowel de koop-etages als de gids
+  function verborgen(s) { return !!(s && s.mall && s.mall.verborgen); }
+
+  /* De gids van alle leveranciers, per genre. Elk genre wijst naar de pagina waar
+     je die partner boekt of reserveert; genres zonder eigen pagina landen op de
+     leden-app. Verborgen partners en partners zonder compleet type slaan we over. */
+  function gidsen() {
+    const types = db.data.supplierTypes || {};
+    const alle = (db.data.suppliers || []).filter(s => s && !verborgen(s));
+    const genres = [];
+    for (const g of GIDS_GENRES) {
+      const def = types[g];
+      if (!def) continue;
+      const leden = alle.filter(s => s.type === g).map(s => ({
+        code: s.code, naam: s.name, stad: s.city || null,
+        tagline: (s.mall && s.mall.tagline) || null
+      }));
+      if (!leden.length) continue;
+      genres.push({
+        type: g, label: def.label || g, icon: def.icon || '•',
+        pagina: GENRE_PAGINA[g] || '/apps/app.html',
+        boekbaar: !!GENRE_PAGINA[g], leveranciers: leden, aantal: leden.length
+      });
+    }
+    return { ok: true, genres, aantal: genres.reduce((n, x) => n + x.aantal, 0) };
+  }
+
+  /* Boardroom-beheer: het kantoor ziet elke mall-partner en kan hem verbergen of
+     zijn etage, tagline en actie bijstellen. Alleen de gastvrije genres (de gids)
+     plus de retail-etages en de boerderijen; het eigen-merk beheert RTG zelf. */
+  function beheerLijst() {
+    const types = db.data.supplierTypes || {};
+    const inGids = new Set(GIDS_GENRES);
+    return (db.data.suppliers || [])
+      .filter(s => s && (inGids.has(s.type) || isRetail(s) || isBoer(s)))
+      .map(s => ({
+        code: s.code, naam: s.name, stad: s.city || null, type: s.type,
+        typeLabel: (types[s.type] || {}).label || s.type,
+        etage: (s.mall && s.mall.etage) || (isBoer(s) ? 'land' : (isRetail(s) ? 'mode' : null)),
+        tagline: (s.mall && s.mall.tagline) || '',
+        deal: (s.mall && s.mall.deal) || '',
+        verborgen: verborgen(s),
+        koopetage: isRetail(s) || isBoer(s),
+        pagina: GENRE_PAGINA[s.type] || '/apps/app.html'
+      }));
+  }
+  function beheer() {
+    seed();
+    return { ok: true, etages: ETAGES.filter(e => ETAGE_IDS.includes(e.id)), leveranciers: beheerLijst() };
+  }
+  function beheerZet(code, patch) {
+    patch = patch || {};
+    const s = (db.data.suppliers || []).find(x => x.code === String(code || ''));
+    if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
+    if (!s.mall) s.mall = {};
+    if (typeof patch.verborgen === 'boolean') s.mall.verborgen = patch.verborgen;
+    if (typeof patch.etage === 'string' && ETAGE_IDS.includes(patch.etage)) s.mall.etage = patch.etage;
+    if (typeof patch.tagline === 'string') s.mall.tagline = patch.tagline.replace(/[<>]/g, '').trim().slice(0, 140);
+    if (typeof patch.deal === 'string') s.mall.deal = patch.deal.replace(/[<>]/g, '').trim().slice(0, 120);
+    save();
+    return { ok: true, leverancier: beheerLijst().find(x => x.code === s.code) };
+  }
+
   function overzicht() {
     seed();
-    const winkels = (db.data.suppliers || []).filter(s => isRetail(s)).map(boutiek);
+    const winkels = (db.data.suppliers || []).filter(s => isRetail(s) && !verborgen(s)).map(boutiek);
     const farms = farmBoutieks();
     const etages = ETAGES.map(e => {
       let boutieks = winkels.filter(b => b.etage === e.id);
@@ -212,6 +295,7 @@ function maakMall({ db, save, crypto, isRetail }) {
     return {
       ok: true,
       etages,
+      gids: gidsen().genres,
       totaalBoutieks: winkels.length + farms.length + (eigenBoutiek() ? 1 : 0),
       valuta: 'EUR',
       opmerking: 'De enige plek waar je bij RTG koopt. Ledenprijzen in de boutique; het eigen-merk en de boerderij bestel je direct. Prijzen in euro, exclusief eventuele lokale btw.'
@@ -248,7 +332,7 @@ function maakMall({ db, save, crypto, isRetail }) {
     return { ok: true, bestelling: { id: entry.id, product: entry.productNaam, aantal, prijs: entry.prijs } };
   }
 
-  return { mall: { ETAGES, overzicht, seed, eigenCatalogus, memberBestel, farmCatalogus, memberBestelFarm } };
+  return { mall: { ETAGES, overzicht, seed, eigenCatalogus, memberBestel, farmCatalogus, memberBestelFarm, gidsen, beheer, beheerZet } };
 }
 
 module.exports = { maakMall, MALL_ETAGES: ETAGES };

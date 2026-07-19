@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Reisbureau</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:900px;margin:0 auto;}
+  .lijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.9rem;margin-top:.9rem;}
+  .reis{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.35rem;text-align:left;}
+  .reis:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .reis h3{font-size:1.2rem;}
+  .reis .meta{font-size:.74rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
+  .reis .tag{font-size:.86rem;color:var(--muted);line-height:1.55;}
+  .reis .prijs{font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums;margin-top:.15rem;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
+  .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
+  .blad.open{display:block;}
+  .blad-kop{position:sticky;top:0;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  .paneel{max-width:560px;margin:0 auto;padding:1.1rem;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;width:100%;}
+  .rij{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;}
+  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;}
+  .step{display:flex;align-items:center;gap:.5rem;}
+  .step button{width:2.2rem;height:2.2rem;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:1.1rem;cursor:pointer;}
+  .sec{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 .5rem;}
+  .inbeg{list-style:none;display:flex;flex-direction:column;gap:.35rem;}
+  .inbeg li{font-size:.86rem;color:var(--muted);padding-left:1.1rem;position:relative;}
+  .inbeg li::before{content:'✓';position:absolute;left:0;color:var(--gold);}
+  .knop{width:100%;margin-top:1.1rem;background:var(--gold);color:#000;border:none;border-radius:12px;padding:.8rem;font:inherit;font-weight:600;font-size:.95rem;cursor:pointer;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
+  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/app.html">← App</a>
+  <div><div class="ey">Samengestelde reizen</div><h1>RTG Reisbureau</h1></div>
+</header>
+<main id="main">
+  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Reizen die wij voor je samenstellen, tegen de nettoprijs zonder opslag. Je vraagt een reis aan; een RTG-reisadviseur bevestigt de datum en regelt de rest.</p>
+  <div class="lijst" id="lijst"></div>
+</main>
+
+<section class="blad" id="blad" aria-label="Reis aanvragen">
+  <div class="blad-kop">
+    <button class="terug" id="bladTerug">← Reisbureau</button>
+    <div><div class="ey" id="bladMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+  </div>
+  <div class="paneel">
+    <p id="bladTag" style="color:var(--muted);font-size:.9rem;line-height:1.6;"></p>
+    <div class="sec">Inbegrepen</div>
+    <ul class="inbeg" id="bladInbeg"></ul>
+    <div class="sec">Jouw aanvraag</div>
+    <div class="rij">
+      <div><div class="lbl">Voorkeursdatum</div><input class="veld" id="rDatum" type="date"></div>
+      <div><div class="lbl">Reizigers</div><div class="step"><button type="button" id="rMin">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus">+</button></div></div>
+    </div>
+    <div style="margin-top:.8rem;"><div class="lbl">Wensen (optioneel)</div><input class="veld" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></div>
+    <div id="rTotaal" style="margin-top:.8rem;font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums;"></div>
+    <button class="knop" id="rBoek">Reis aanvragen</button>
+  </div>
+</section>
+
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3000); }
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+if (!TOKEN) {
+  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
+    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het reisbureau is er voor leden. Open de app en log in met je RTG-account.</p>'+
+    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+} else { laad(); }
+
+let ALLE = [], AANTAL = 2, HUIDIG = null;
+async function laad(){
+  let d;
+  try { d = await api('/api/reisbureau'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  ALLE = d.reizen || [];
+  $('#lijst').innerHTML = ALLE.length ? ALLE.map(r =>
+    '<button class="reis" data-id="'+esc(r.id)+'">'+
+      '<span class="meta">'+esc(r.bestemming)+(r.dates?' · '+esc(r.dates):'')+'</span>'+
+      '<h3>'+esc(r.titel)+'</h3>'+
+      (r.omschrijving?'<span class="tag">'+esc(r.omschrijving)+'</span>':'')+
+      '<span class="prijs">Vanaf € '+esc(r.prijs)+' per persoon</span>'+
+    '</button>').join('') : '<div class="leeg">Er staan nu geen reizen klaar.</div>';
+  $('#lijst').querySelectorAll('.reis').forEach(b => b.addEventListener('click', () => openReis(b.dataset.id)));
+}
+function openReis(id){
+  HUIDIG = ALLE.find(r => r.id === id); if (!HUIDIG) return;
+  AANTAL = 2;
+  $('#bladNaam').textContent = HUIDIG.titel;
+  $('#bladMeta').textContent = HUIDIG.bestemming;
+  $('#bladTag').textContent = HUIDIG.omschrijving || '';
+  $('#bladInbeg').innerHTML = (HUIDIG.inbegrepen||[]).map(x => '<li>'+esc(x)+'</li>').join('') || '<li>Op maat samengesteld</li>';
+  $('#rAantal').textContent = AANTAL;
+  $('#rNotitie').value = '';
+  const iso = new Date().toISOString().slice(0,10);
+  $('#rDatum').min = iso; $('#rDatum').value = '';
+  herbereken();
+  $('#blad').classList.add('open');
+}
+function herbereken(){ $('#rTotaal').textContent = HUIDIG ? ('Richtprijs: € ' + (HUIDIG.prijs * AANTAL) + ' voor ' + AANTAL + ' reiziger' + (AANTAL>1?'s':'')) : ''; }
+async function boek(){
+  if (!HUIDIG) return;
+  try {
+    await api('/api/reisbureau/boek', { tripId: HUIDIG.id, personen: AANTAL, vertrek: $('#rDatum').value || undefined, notitie: $('#rNotitie').value });
+    $('#blad').classList.remove('open');
+    meld('Je reisaanvraag staat klaar. Een RTG-reisadviseur neemt contact met je op.');
+  } catch(e){ meld(e.message); }
+}
+$('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
+$('#rMin').addEventListener('click', () => { AANTAL = Math.max(1, AANTAL-1); $('#rAantal').textContent = AANTAL; herbereken(); });
+$('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $('#rAantal').textContent = AANTAL; herbereken(); });
+$('#rBoek').addEventListener('click', boek);
+</script>
+</body>
+</html>

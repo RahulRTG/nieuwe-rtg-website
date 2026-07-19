@@ -265,6 +265,12 @@
       <div id="gStand" class="stil" style="margin-top:.8rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
     </div>
 
+    <h3 class="sec">De Mall-regie: elke leverancier in de RTG Mall bijstellen</h3>
+    <div class="kaart" id="bMall">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);">Elke partner staat in de Mall: op een koop-etage of in de gids per genre. Hier verbergt u een partner, verplaatst u een boutique naar een andere etage, of stelt u de tagline en de actie bij. Het eigen-merk beheert RTG apart.</p>
+      <div id="bMallLijst" style="margin-top:.7rem;"><div class="leeg">Laden...</div></div>
+    </div>
+
     <h3 class="sec">De leveranciers-regie: welke werk-apps per genre zaken</h3>
     <div class="kaart" id="bGenreRegie">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">Standaard staat elke werk-app open voor elk genre; hier sluit u een functie gericht voor een genre (bijv. RTG Eye niet voor horeca). De vaste vak-poorten (OV-functies alleen voor OV-zaken) blijven altijd gelden.</p>
@@ -1496,6 +1502,7 @@ async function openBoard(){
   laadGeld();
   laadRahul();
   laadDoosRegie();
+  laadMallRegie();
   wereldWidget($('#bWereld'));
   api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
   $('#bAudit').innerHTML = (d.audit && d.audit.length) ? d.audit.map(a =>
@@ -1652,6 +1659,38 @@ $('#dNetwerkZet').addEventListener('click', async () => {
     meld('Netwerkrol staat klaar; de doos past hem toe bij zijn volgende melding.'); }
   catch (e) { meld(e.message); }
 });
+
+/* de Mall-regie: elke leverancier in de RTG Mall verbergen of bijstellen */
+let MALL_ETAGES = [];
+async function laadMallRegie(){
+  let d;
+  try { d = await api('mall'); } catch (e) { $('#bMallLijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  MALL_ETAGES = d.etages || [];
+  const opts = et => MALL_ETAGES.map(e => '<option value="'+esc(e.id)+'"'+(et===e.id?' selected':'')+'>'+esc(e.label)+'</option>').join('');
+  $('#bMallLijst').innerHTML = (d.leveranciers || []).map(l =>
+    '<div class="taakrij mallrij" data-code="'+esc(l.code)+'" style="flex-wrap:wrap;gap:.5rem;border-bottom:1px solid var(--line);padding:.6rem 0;">'+
+      '<span style="min-width:9rem;flex:1;"><b>'+esc(l.naam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+esc(l.typeLabel)+(l.stad?' · '+esc(l.stad):'')+'</span>'+(l.verborgen?' <span style="color:var(--burgundy);font-size:.72rem;">verborgen</span>':'')+'</span>'+
+      (l.koopetage ? '<select class="veld mEtage" style="max-width:11rem;">'+opts(l.etage)+'</select>' : '')+
+      '<input class="veld mTag" style="flex:2;min-width:12rem;" maxlength="140" placeholder="Tagline" value="'+esc(l.tagline)+'">'+
+      '<input class="veld mDeal" style="flex:1;min-width:9rem;" maxlength="120" placeholder="Actie (optioneel)" value="'+esc(l.deal)+'">'+
+      '<button class="knop stil mBewaar" type="button" style="padding:.35rem .8rem;font-size:.78rem;">Bewaar</button>'+
+      '<button class="knop stil mVerberg" type="button" style="padding:.35rem .8rem;font-size:.78rem;'+(l.verborgen?'':'border-color:var(--burgundy);')+'">'+(l.verborgen?'Toon':'Verberg')+'</button>'+
+    '</div>').join('') || '<div class="leeg">Nog geen leveranciers in de Mall.</div>';
+  $('#bMallLijst').querySelectorAll('.mallrij').forEach(rij => {
+    const code = rij.dataset.code;
+    rij.querySelector('.mBewaar').addEventListener('click', async () => {
+      const patch = { tagline: rij.querySelector('.mTag').value, deal: rij.querySelector('.mDeal').value };
+      const et = rij.querySelector('.mEtage'); if (et) patch.etage = et.value;
+      try { await api('mall/zet', { code, patch }); meld('Bijgewerkt: '+code+'.'); }
+      catch (e) { meld(e.message); }
+    });
+    rij.querySelector('.mVerberg').addEventListener('click', async () => {
+      const nu = rij.querySelector('.mVerberg').textContent === 'Verberg';
+      try { await api('mall/zet', { code, patch: { verborgen: nu } }); meld(nu?'Verborgen in de Mall.':'Weer zichtbaar.'); laadMallRegie(); }
+      catch (e) { meld(e.message); }
+    });
+  });
+}
 
 /* de identiteitskluis vanuit de boardroom (zelfde regels: alles in het auditlog) */
 $('#bKluisZoek').addEventListener('click', async () => {

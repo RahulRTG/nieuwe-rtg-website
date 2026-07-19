@@ -33,6 +33,16 @@
   .boutiek .tag{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:.15rem;}
   .boutiek .meta{font-size:.76rem;color:var(--soft);margin-top:.35rem;}
   .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
+  /* gids: alle leveranciers per genre, met een diepe link naar boeken/reserveren */
+  .gids{margin-top:2.4rem;}
+  .genres{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;}
+  .genre{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .95rem;display:flex;gap:.7rem;align-items:flex-start;text-decoration:none;color:var(--txt);transition:border-color .2s,transform .2s;}
+  .genre:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .genre .gi{font-size:1.3rem;line-height:1;}
+  .genre b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;display:block;}
+  .genre .gn{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
+  .genre .gl{font-size:.8rem;color:var(--muted);line-height:1.45;display:block;margin-top:.25rem;}
+  .genre .ga{font-size:.72rem;color:var(--gold);display:block;margin-top:.3rem;}
   /* boutiek-blad */
   .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
   .blad.open{display:block;}
@@ -62,6 +72,7 @@
 <main id="main">
   <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Alles wat je bij RTG koopt, op één plek. Het eigen-merk bestel je direct; bij de mode-boutieks gelden ledenprijzen en leg je een stuk apart of laat je een maat naar de paskamer brengen. Prijzen in euro.</p>
   <div id="etages"></div>
+  <div id="gidsWrap"></div>
 </main>
 
 <section class="blad" id="blad" aria-label="Boutique">
@@ -105,6 +116,20 @@ async function laad(){
       '</button>').join('')+'</div></div>'
   ).join('');
   $('#etages').querySelectorAll('.boutiek').forEach(b => b.addEventListener('click', () => openBoutiek(b.dataset.code, b.dataset.naam, b.dataset.stad, b.dataset.kind)));
+  tekenGids(d.gids || []);
+}
+
+function tekenGids(genres){
+  if (!genres.length){ $('#gidsWrap').innerHTML = ''; return; }
+  $('#gidsWrap').innerHTML = '<div class="gids"><div class="etage-kop"><h2>Alle leveranciers</h2><span class="n">per genre · boek en reserveer</span></div>'+
+    '<div class="genres">'+genres.map(g => {
+      const namen = g.leveranciers.map(l => l.naam).slice(0,4).join(', ') + (g.aantal>4?' e.a.':'');
+      return '<a class="genre" href="'+esc(g.pagina)+'"><span class="gi">'+g.icon+'</span>'+
+        '<div><b>'+esc(g.label)+'</b><span class="gn">'+g.aantal+' adres'+(g.aantal===1?'':'sen')+'</span>'+
+        '<span class="gl">'+esc(namen)+'</span>'+
+        (g.boekbaar?'<span class="ga">Openen →</span>':'')+
+        '</div></a>';
+    }).join('')+'</div></div>';
 }
 
 let HUIDIG = null;

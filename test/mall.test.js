@@ -16,15 +16,17 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-let srv, base, lid;
+let srv, base, lid, office;
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mall-'));
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-MALL-1' } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Shop', email: 's' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   lid = { token: reg.body.token };
+  const login = await api(base, '/api/office/login', { code: 'KANTOOR-MALL-1' });
+  office = login.body.token;
 });
 test.after(() => stop(srv && srv.child));
 
@@ -84,6 +86,52 @@ test('1c. de etage Van het land: een boerderij met producten, direct te bestelle
   // meer bestellen dan er is, kan niet (het groentepakket heeft weinig voorraad)
   const pakket = cat.body.producten.find(p => /Groentepakket/.test(p.naam));
   assert.equal((await api(base, '/api/mall/land-bestel', { code: 'HOEVE', productId: pakket.id, naam: 'Sam', email: 'sam@x.nl', aantal: pakket.voorraad + 5 }, lid.token)).status, 409);
+});
+
+test('4. de gids toont alle leveranciers per genre, met een diepe link', async () => {
+  const r = await api(base, '/api/mall', {}, lid.token);
+  assert.ok(Array.isArray(r.body.gids) && r.body.gids.length >= 5, 'de gids groepeert per genre');
+  const rest = r.body.gids.find(g => g.type === 'restaurant');
+  assert.ok(rest && rest.leveranciers.length >= 1, 'restaurants staan in de gids');
+  assert.equal(rest.pagina, '/apps/foodcourt.html', 'de gids wijst naar de Food Court');
+  assert.equal(rest.boekbaar, true, 'restaurants zijn boekbaar via een pagina');
+  const hotel = r.body.gids.find(g => g.type === 'hotel');
+  assert.equal(hotel.pagina, '/apps/hotels.html', 'hotels wijzen naar Verblijven');
+  const bar = r.body.gids.find(g => g.type === 'bar');
+  assert.equal(bar.pagina, '/apps/uitgaan.html', 'bars wijzen naar Uitgaan');
+});
+
+test('5. het kantoor kan een leverancier verbergen; die valt uit de gids', async () => {
+  assert.ok(office, 'het kantoor is ingelogd');
+  const beheer = await api(base, '/api/office/mall', {}, office);
+  assert.equal(beheer.status, 200);
+  assert.ok(beheer.body.leveranciers.length >= 3, 'het kantoor ziet de mall-partners');
+  // pak een restaurant en verberg het
+  const rst = beheer.body.leveranciers.find(l => l.type === 'restaurant');
+  assert.ok(rst, 'er is een restaurant om te verbergen');
+  const zet = await api(base, '/api/office/mall/zet', { code: rst.code, patch: { verborgen: true } }, office);
+  assert.equal(zet.status, 200);
+  assert.equal(zet.body.leverancier.verborgen, true);
+  // het lid ziet het niet meer in de gids
+  const na = await api(base, '/api/mall', {}, lid.token);
+  const rest = na.body.gids.find(g => g.type === 'restaurant');
+  assert.ok(!rest || !rest.leveranciers.some(l => l.code === rst.code), 'de verborgen partner is weg uit de gids');
+  // weer tonen
+  const terug = await api(base, '/api/office/mall/zet', { code: rst.code, patch: { verborgen: false } }, office);
+  assert.equal(terug.body.leverancier.verborgen, false);
+  // zonder office-inlog is beheer dicht
+  assert.equal((await api(base, '/api/office/mall', {}, null)).status, 401);
+});
+
+test('6. het kantoor verplaatst een retail-boutique naar een andere etage', async () => {
+  const zet = await api(base, '/api/office/mall/zet', { code: 'ORFEVRE', patch: { etage: 'wonen', tagline: 'Test tagline' } }, office);
+  assert.equal(zet.status, 200);
+  assert.equal(zet.body.leverancier.etage, 'wonen');
+  const r = await api(base, '/api/mall', {}, lid.token);
+  const wonen = r.body.etages.find(e => e.id === 'wonen');
+  assert.ok(wonen && wonen.boutieks.some(b => b.code === 'ORFEVRE'), 'de boutique staat nu op de wonen-etage');
+  // terug naar sieraden
+  await api(base, '/api/office/mall/zet', { code: 'ORFEVRE', patch: { etage: 'sieraden' } }, office);
 });
 
 test('3. verlanglijst werkt vanuit de mall-boutique', async () => {

@@ -2729,6 +2729,17 @@ Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
    tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */
 Object.assign(kern, require('./kern/foodcourt').maakFoodcourt({ db, save, crypto }));
+/* Het RTG-reisbureau (kern/reisbureau.js): een echt reisbureau in de leden-app;
+   leden bladeren door de samengestelde reizen en vragen er een aan tegen de
+   nettoprijs. De aanvraag landt bij een RTG-reisadviseur (aangevraagd, mens
+   bevestigt). */
+Object.assign(kern, require('./kern/reisbureau').maakReisbureau({ db, save, crypto }));
+/* De losse verblijf-pagina (kern/logies.js): hotels, appartementen en villa's
+   op een rij met hun vrije kamers; boeken loopt via /api/verblijf. */
+Object.assign(kern, require('./kern/logies').maakLogies({ db }));
+/* De losse uitgaan-pagina (kern/uitgaan.js): bars, clubs en beachclubs met hun
+   avonden; aanmelden loopt via /api/event/rsvp. */
+Object.assign(kern, require('./kern/uitgaan').maakUitgaan({ db, save, crypto }));
 /* De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier
    ontwerpbureaus; een idee kan als concept naar elk bureau (spin-off), dus de
    bureaus gaan als referenties mee. */

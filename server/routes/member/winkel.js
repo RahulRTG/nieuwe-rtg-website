@@ -5,7 +5,8 @@ module.exports = (kern) => {
   const { accounts, app, auth, findSupplier, liveCodename,
     notify, voorkeurVan, zetVoorkeur, retailCatalogus, wishlistToggle,
     mijnApart, mijnStyling, vraagPaskamer, retailIsRetail, PASPOORT_NIVEAUS,
-    paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn, mall, foodcourt } = kern;
+    paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn, mall, foodcourt,
+    reisbureau, logies, uitgaan } = kern;
 
 /* ---- de RTG Food Court: alle restaurants op een rij, reserveren met tijdsloten ---- */
 // het overzicht van de restaurants (keuken, prijs, ledenvoordeel)
@@ -42,6 +43,27 @@ app.post('/api/mall/land-bestel', auth, (req, res) => {
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
+
+/* ---- de losse verblijf-pagina: hotels, appartementen en villa's ---- */
+// het overzicht van de overnachters met hun vrije kamers; boeken gaat via /api/verblijf
+app.post('/api/hotels', auth, (req, res) => res.json(logies.overzicht()));
+
+/* ---- de losse uitgaan-pagina: bars, clubs en beachclubs met hun avonden ---- */
+// het overzicht van de nachtadressen met hun gepubliceerde events; aanmelden gaat via /api/event/rsvp
+app.post('/api/uitgaan', auth, (req, res) => res.json(uitgaan.overzicht()));
+
+/* ---- het RTG-reisbureau: samengestelde reizen, tegen de nettoprijs ---- */
+// het overzicht van de reizen
+app.post('/api/reisbureau', auth, (req, res) => res.json(reisbureau.overzicht()));
+// een lid vraagt een reis aan (aangevraagd; een reisadviseur bevestigt)
+app.post('/api/reisbureau/boek', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = reisbureau.boek(req.session, liveCodename(req.session), req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+// mijn reisaanvragen
+app.post('/api/reisbureau/mijn', auth, (req, res) => res.json({ aanvragen: reisbureau.mijn(req.session.key) }));
 
 /* ---- retail/mode: de catalogus van een modehuis, verlanglijst, apart en styling ---- */
 // de catalogus van een merk (collecties + artikelen met ledenprijs, drops, wishlist)

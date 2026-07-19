@@ -154,6 +154,17 @@ module.exports = (kern) => {
     try { const r = await kern.ideeen.aiUitwerken(String(req.body.id || '')); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
     catch (e) { console.error('[ideeen]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+  /* De Mall-regie: vanuit de boardroom elke leverancier in de RTG Mall bijstellen
+     of verbergen (etage, tagline, actie). Het eigen-merk beheert RTG apart. */
+  app.post('/api/office/mall', officeAuth, (req, res) => veilig(res, () => kern.mall.beheer()));
+  app.post('/api/office/mall/zet', officeAuth, (req, res) => veilig(res, () => {
+    const r = kern.mall.beheerZet(String(req.body.code || ''), req.body.patch || req.body || {});
+    if (r.ok) sseToOffice('sync', { scope: 'mall' });
+    return r;
+  }));
+  // de openstaande reisaanvragen bij het RTG-reisbureau (codenamen)
+  app.post('/api/office/reisbureau', officeAuth, (req, res) => veilig(res, () => kern.reisbureau.aanvragen()));
+
   app.post('/api/office/doos/regie', officeAuth, (req, res) => veilig(res, () => afdelingen.doosRegie()));
   app.post('/api/office/doos/update-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosUpdateZet(req.body.versie, req.body.notities, req.body.naam)));
   app.post('/api/office/doos/netwerk-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosNetwerkZet(String(req.body.doos || ''), req.body.instellingen || {}, req.body.naam)));

@@ -240,3 +240,43 @@ test('15. De AI-assistent van de rijksbalie antwoordt (backoffice-Rahul)', async
   assert.equal(d.status, 200);
   assert.ok(typeof d.body.reply === 'string' && d.body.reply.length, 'er komt een antwoord terug');
 });
+
+test('16. De rijksbalie-AI behandelt een toeslag op referentie (ken toe)', async () => {
+  // een lid vraagt een toeslag aan
+  const t = await api(base, '/api/overheid/toeslag', { soort: 'huurtoeslag', inkomen: 20000 }, lid);
+  assert.equal(t.status, 200);
+  const ref = t.body.toeslag.ref;
+  // de ambtenaar zegt tegen Rahul: ken die toe
+  const d = await api(base, '/api/supplier/ai', { q: 'ken ' + ref + ' toe' }, rijk);
+  assert.equal(d.status, 200);
+  assert.equal(d.body.did, true, 'de AI heeft daadwerkelijk gehandeld');
+  // controle: de toeslag staat nu op toegekend
+  const mijn = await api(base, '/api/overheid/toeslagen/mijn', {}, lid);
+  assert.equal(mijn.body.toeslagen.find(x => x.ref === ref).status, 'toegekend');
+  // een gewone partner mag dit niet (geen rijksambtenaar) -> geen actie
+  const p = await api(base, '/api/supplier/ai', { q: 'ken ' + ref + ' toe' }, partner);
+  assert.notEqual(p.body.did, true);
+});
+
+test('17. De rijksbalie-AI pakt "de eerste subsidie" zonder referentie', async () => {
+  const s = await api(base, '/api/supplier/overheid/subsidie', { regeling: 'innovatie', project: 'Slimme haven-sensoren', bedrag: 10000 }, partner);
+  assert.equal(s.status, 200);
+  const d = await api(base, '/api/supplier/ai', { q: 'wijs de eerste subsidie af' }, rijk);
+  assert.equal(d.body.did, true);
+  const lijst = await api(base, '/api/supplier/overheid/subsidies', {}, partner);
+  assert.ok(lijst.body.subsidies.some(x => x.status === 'afgewezen'), 'een subsidie is afgewezen door de AI');
+});
+
+test('18. De gemeentebalie-AI verleent de eerste vergunning', async () => {
+  const g = await api(base, '/api/gemeente/vergunning', { soort: 'terras', omschrijving: 'Terras voor de zaak aan het plein' }, lid);
+  assert.equal(g.status, 200);
+  // log in als gemeente-medewerker
+  const roster = await api(base, '/api/supplier/roster', { code: 'GEMEENTE' });
+  const man = roster.body.staff.find(m => m.role === 'manager');
+  const glog = await api(base, '/api/supplier/login', { code: 'GEMEENTE', staffId: man.id, pin: '1234' });
+  const gem = glog.body.token;
+  const d = await api(base, '/api/supplier/ai', { q: 'verleen de eerste vergunning' }, gem);
+  assert.equal(d.body.did, true);
+  const mijn = await api(base, '/api/gemeente/vergunningen/mijn', {}, lid);
+  assert.ok(mijn.body.vergunningen.some(v => v.status === 'verleend'), 'een vergunning is verleend door de AI');
+});

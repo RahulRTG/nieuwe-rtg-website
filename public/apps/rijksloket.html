@@ -147,14 +147,15 @@ function start(){
   $('#rahulFab').style.display = '';
 }
 // Rahul, de AI-assistent van de rijksbalie (vraagt en doet met jouw medewerker-inlog)
+const BRIEF = 'Geef me een briefing met referenties';
 const RSUG = {
-  tos: ['Hoeveel toeslagen staan open?', 'Vat de openstaande toeslagen samen'],
-  uit: ['Welke uitkeringsaanvragen wachten op mij?', 'Wat is er vandaag binnengekomen?'],
-  bez: ['Hoeveel bezwaren zijn er open?', 'Geef me een korte briefing'],
-  sub: ['Welke subsidieaanvragen liggen klaar?'],
-  wm: ['Wat zijn de urgente watermeldingen?'],
+  tos: [BRIEF, 'Ken de eerste toeslag toe'],
+  uit: [BRIEF, 'Welke uitkeringsaanvragen wachten op mij?'],
+  bez: [BRIEF, 'Verklaar het eerste bezwaar gegrond'],
+  sub: [BRIEF, 'Welke subsidieaanvragen liggen klaar?'],
+  wm: [BRIEF, 'Zet de eerste watermelding op opgelost'],
   kvk: ['Hoeveel nieuwe inschrijvingen zijn er?'],
-  stem: ['Wat is de stand van de stemming?'],
+  stem: ['Wat is de stand van de stemming?', 'Sluit de stemming'],
   bek: ['Stel een bekendmaking voor over de nieuwe tarieven']
 };
 function rahulVul(){

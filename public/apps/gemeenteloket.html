@@ -139,10 +139,11 @@ function start(){
   $('#rahulFab').style.display = '';
 }
 // Rahul, de AI-assistent van de gemeentebalie (vraagt en doet met jouw medewerker-inlog)
+const BRIEF = 'Geef me een briefing met referenties';
 const RSUG = {
-  meld: ['Welke meldingen zijn urgent?', 'Vat de open meldingen samen'],
+  meld: [BRIEF, 'Zet de eerste melding op opgelost'],
   afs: ['Wie komt er vandaag langs?', 'Zijn er verhuizingen te verwerken?'],
-  verg: ['Welke vergunningen wachten op een besluit?', 'Geef me een korte briefing'],
+  verg: [BRIEF, 'Verleen de eerste vergunning'],
   bek: ['Stel een bekendmaking voor over wegwerkzaamheden']
 };
 function rahulVul(){

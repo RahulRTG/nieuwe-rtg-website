@@ -1465,12 +1465,13 @@
     renderStation();
   }
   // het vakwerk-dashboard (zzp, chef, wellness): vandaag-bord, aanvragen, KPI's en AI
-  let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false;
+  let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false, vakUren = null;
   async function laadVakwerk(){
     if (vakBusy) return;
     vakBusy = true;
     try { vakData = await API.call('/supplier/vak/bord', {}); }
     catch(e){ vakData = { error: e.message }; }
+    try { vakUren = (await API.call('/supplier/vak/uren', {})).uren; } catch(e){ vakUren = null; }
     vakBusy = false;
     renderStation();
   }
@@ -2036,6 +2037,17 @@
         // boekingen zonder datum die nog gepland moeten worden
         if (v.zonderDatum.length) html += '<div class="tkc" style="grid-column:1/-1;"><h3>📌 '+T('vk.zonderdatum','Nog te plannen')+' ('+v.zonderDatum.length+')</h3>'+
           v.zonderDatum.map(b => rij(b, b.status==='aangevraagd' ? '<button class="obtn primary" data-vakbev="'+b.ref+'">'+T('vk.bevestig','Bevestig')+'</button>' : '')).join('')+'</div>';
+        // de beschikbaarheid: werkdagen en openingstijden waarin leden boeken
+        if (vakUren){
+          const dagNamen = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+          html += '<div class="tkc" style="grid-column:1/-1;"><h3>🗓️ '+T('vk.beschik','Beschikbaarheid')+'</h3>'+
+            '<div class="tkc-who" style="margin-top:0;">'+T('vk.beschik.s','Leden boeken alleen binnen deze werkdagen en tijden; de app biedt vrije tijdvakken aan op basis van de duur van de dienst.')+'</div>'+
+            '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin:0.5rem 0;">'+
+            dagNamen.map((d,i)=>'<button class="obtn'+(vakUren.dagen[i]?' primary':'')+'" data-vakdag="'+i+'">'+d+'</button>').join('')+'</div>'+
+            '<div class="row-gap"><label class="soft-xs" style="align-self:center;">'+T('vk.van','Van')+'</label><input class="st-in" id="vakVan" type="time" value="'+vakUren.van+'" style="flex:1;">'+
+            '<label class="soft-xs" style="align-self:center;">'+T('vk.tot','Tot')+'</label><input class="st-in" id="vakTot" type="time" value="'+vakUren.tot+'" style="flex:1;"></div>'+
+            '<button class="bigbtn" id="vakUrenSave" style="margin-top:0.4rem;">'+T('vk.urenopslaan','Beschikbaarheid opslaan')+'</button></div>';
+        }
         // de genre-bewuste AI-assistent
         html += '<div class="tkc" style="grid-column:1/-1;"><h3>🤖 '+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
           '<div class="st-form"><input class="st-in" id="vakQ" placeholder="'+T('vk.aiplace','Bijv. waar moet ik me vandaag op richten?')+'">'+
@@ -2124,7 +2136,7 @@
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
       try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = '✅ '+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }
@@ -2499,6 +2511,18 @@
     el.querySelectorAll('[data-vakaf]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = '✅ '+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
     }));
+    // vakwerk: werkdagen aan/uit tikken (lokaal, tot Opslaan)
+    el.querySelectorAll('[data-vakdag]').forEach(b => b.addEventListener('click', () => {
+      b.classList.toggle('primary');
+    }));
+    const vakUrenBtn = el.querySelector('#vakUrenSave'); if (vakUrenBtn) vakUrenBtn.addEventListener('click', async () => {
+      const dagen = [...el.querySelectorAll('[data-vakdag]')].sort((a,c)=>a.dataset.vakdag-c.dataset.vakdag).map(b => b.classList.contains('primary'));
+      try {
+        await API.call('/supplier/vak/uren-zet', { dagen, van: el.querySelector('#vakVan').value, tot: el.querySelector('#vakTot').value });
+        vakData = null; vakUren = null; kantoorMsg = '✅ '+T('vk.urenok','Beschikbaarheid opgeslagen; leden zien alleen vrije tijden.');
+        await refresh();
+      } catch(e){ toast(e.message); }
+    });
     // vakwerk: de genre-bewuste assistent om advies vragen
     const vakAiBtn = el.querySelector('#vakAi'); if (vakAiBtn) vakAiBtn.addEventListener('click', async () => {
       vakAiBusy = true; renderStation();

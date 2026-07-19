@@ -52,7 +52,7 @@
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
       try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = '✅ '+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }

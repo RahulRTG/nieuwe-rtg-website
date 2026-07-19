@@ -78,5 +78,19 @@ app.post('/api/supplier/vak/ai', supplierAuth, async (req, res) => {
     res.json(r);
   } catch (e) { console.error('[vakwerk]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
 });
+// beschikbaarheid: werkdagen en openingstijden lezen en zetten (alleen de eigenaar)
+app.post('/api/supplier/vak/uren', supplierAuth, (req, res) => {
+  const r = kern.vakwerk.uren(req.supplier.code);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/supplier/vak/uren-zet', supplierAuth, (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor de eigenaar.' });
+  const r = kern.vakwerk.urenZet(req.supplier.code, req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  logActivity(req.supplier.code, req.actor, 'paste de beschikbaarheid aan');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'settings' });
+  res.json(r);
+});
 
 };

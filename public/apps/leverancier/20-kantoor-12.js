@@ -106,6 +106,18 @@
     el.querySelectorAll('[data-vakaf]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/booking/status', { ref: b.dataset.vakaf, status: 'afgerond' }); vakData = null; kantoorMsg = '✅ '+T('vk.afok','Afgerond en genoteerd.'); await refresh(); } catch(e){ toast(e.message); }
     }));
+    // vakwerk: werkdagen aan/uit tikken (lokaal, tot Opslaan)
+    el.querySelectorAll('[data-vakdag]').forEach(b => b.addEventListener('click', () => {
+      b.classList.toggle('primary');
+    }));
+    const vakUrenBtn = el.querySelector('#vakUrenSave'); if (vakUrenBtn) vakUrenBtn.addEventListener('click', async () => {
+      const dagen = [...el.querySelectorAll('[data-vakdag]')].sort((a,c)=>a.dataset.vakdag-c.dataset.vakdag).map(b => b.classList.contains('primary'));
+      try {
+        await API.call('/supplier/vak/uren-zet', { dagen, van: el.querySelector('#vakVan').value, tot: el.querySelector('#vakTot').value });
+        vakData = null; vakUren = null; kantoorMsg = '✅ '+T('vk.urenok','Beschikbaarheid opgeslagen; leden zien alleen vrije tijden.');
+        await refresh();
+      } catch(e){ toast(e.message); }
+    });
     // vakwerk: de genre-bewuste assistent om advies vragen
     const vakAiBtn = el.querySelector('#vakAi'); if (vakAiBtn) vakAiBtn.addEventListener('click', async () => {
       vakAiBusy = true; renderStation();

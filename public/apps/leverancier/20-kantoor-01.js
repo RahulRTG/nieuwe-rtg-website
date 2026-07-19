@@ -76,12 +76,13 @@
     renderStation();
   }
   // het vakwerk-dashboard (zzp, chef, wellness): vandaag-bord, aanvragen, KPI's en AI
-  let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false;
+  let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false, vakUren = null;
   async function laadVakwerk(){
     if (vakBusy) return;
     vakBusy = true;
     try { vakData = await API.call('/supplier/vak/bord', {}); }
     catch(e){ vakData = { error: e.message }; }
+    try { vakUren = (await API.call('/supplier/vak/uren', {})).uren; } catch(e){ vakUren = null; }
     vakBusy = false;
     renderStation();
   }

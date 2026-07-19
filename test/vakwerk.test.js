@@ -91,7 +91,32 @@ test('4. de AI-assistent doet concrete, genre-bewuste voorstellen', async () => 
   assert.ok(r.body.antwoord.length > 15, 'en een leesbaar advies');
 });
 
-test('5. de grens: een niet-dienstverlenend genre krijgt geen vakwerk-bord', async () => {
+test('5. beschikbaarheid: de professional zet werkdagen en tijden, het lid krijgt vrije tijdvakken', async () => {
+  // een vaste dag ver in de toekomst die op een dinsdag valt: 2027-01-05
+  const datum = '2027-01-05';
+  // alle dagen open, 09:00-12:00: bij een dienst van 60 min horen 09:00/10:00/11:00
+  const zet = await api('/api/supplier/vak/uren-zet', { dagen: [true, true, true, true, true, true, true], van: '09:00', tot: '12:00' }, tok.SERENA);
+  assert.equal(zet.status, 200);
+  const slots = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: 'w1', date: datum }, lid);
+  assert.equal(slots.status, 200);
+  assert.deepEqual(slots.body.tijden, ['09:00', '10:00', '11:00'], 'drie vrije uren binnen de openingstijden');
+  // boek 10:00 en dat tijdvak valt weg uit de vrije tijden
+  const boek = await api('/api/booking/request', { supplierCode: 'SERENA', serviceId: 'w1', date: datum, time: '10:00' }, lid);
+  await api('/api/booking/pay', { ref: boek.body.boeking.ref }, lid);
+  const na = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: 'w1', date: datum }, lid);
+  assert.ok(!na.body.tijden.includes('10:00'), 'het geboekte tijdvak is niet meer vrij');
+  assert.ok(na.body.tijden.includes('09:00') && na.body.tijden.includes('11:00'), 'de andere tijden blijven vrij');
+});
+
+test('6. een gesloten dag levert geen tijdvakken op', async () => {
+  // zet alleen maandag open; 2027-01-05 is een dinsdag -> dicht
+  await api('/api/supplier/vak/uren-zet', { dagen: [false, true, false, false, false, false, false], van: '09:00', tot: '17:00' }, tok.SERENA);
+  const slots = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: 'w1', date: '2027-01-05' }, lid);
+  assert.equal(slots.status, 200);
+  assert.equal(slots.body.tijden.length, 0, 'op een gesloten dag zijn er geen vrije tijden');
+});
+
+test('7. de grens: een niet-dienstverlenend genre krijgt geen vakwerk-bord', async () => {
   const kik = await api('/api/supplier/login', { username: 'rahul', password: 'Imran' });
   const b = await api('/api/supplier/vak/bord', {}, kik.body.token);
   assert.equal(b.status, 403, 'een restaurant hoort niet bij de dienstverleners');

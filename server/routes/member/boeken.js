@@ -52,6 +52,15 @@ module.exports = (kern) => {
     res.json(r);
   });
 
+  // de vrije tijdvakken van een dienstverlener op een datum (voor de boekflow)
+  app.post('/api/booking/slots', auth, (req, res) => {
+    const s = findSupplier(req.body.supplierCode);
+    if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+    const r = kern.vakwerk.slots(s.code, req.body.serviceId, req.body.date);
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
+
   app.post('/api/bookings/mine', auth, async (req, res) => {
     // zelfde vensterbeleid als /api/orders/mine: vers venster, grootboek-historie
     const key = req.session.key;

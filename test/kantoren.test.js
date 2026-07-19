@@ -1,4 +1,4 @@
-/* De RTG-kantoren en de boardroom: twaalf afdelingskamers met echte cijfers,
+/* De RTG-kantoren en de boardroom: zeventien afdelingskamers met echte cijfers,
    taken per kamer, en de boardroom die alles ziet, elke platformfunctie kan
    schakelen (globaal en per doelgroep, en het werkt echt: het pad gaat dicht)
    en een verbeterkamer bijhoudt. Draai los:
@@ -32,12 +32,12 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('twaalf kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
+test('zeventien kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
   const dicht = await fetch(base + '/api/office/kamers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401);
   const d = await api('kamers');
   assert.equal(d.status, 200);
-  assert.equal(d.body.kamers.length, 12, 'twaalf afdelingen');
+  assert.equal(d.body.kamers.length, 17, 'zeventien afdelingen');
   for (const id of ['sales', 'marketing', 'pr', 'hr', 'financien', 'inkoop', 'verkoop', 'juridisch', 'creatief', 'intern', 'onderzoek', 'klantenservice']) {
     assert.ok(d.body.kamers.some(k => k.id === id), id + ' heeft een kamer');
   }
@@ -62,7 +62,7 @@ test('taken per kamer: maken, afvinken en terugzien in het grid', async () => {
 test('de boardroom ziet alles en schakelt echt: functie uit, pad dicht, weer aan', async () => {
   const b = await api('boardroom');
   assert.equal(b.status, 200);
-  assert.equal(b.body.kamers.length, 12, 'alle kamers in beeld');
+  assert.equal(b.body.kamers.length, 17, 'alle kamers in beeld');
   assert.ok(b.body.functies.length >= 5, 'het volledige schakelbord staat erop');
   assert.ok(b.body.verbeterkamer.voorstellen.length >= 1, 'de verbeterkamer heeft een dagronde');
   // pak een echte functie van het bord en zet hem uit

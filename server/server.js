@@ -2636,7 +2636,7 @@ Object.assign(kern, require('./kern/leren')({
 Object.assign(kern, require('./kern/baby')({ save, crypto, media, anthropic }));
 /* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
    boardroom die alles ziet en het functieschakelbord bedient. */
-Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic, ledenAantal }));
+Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCodenaam }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));

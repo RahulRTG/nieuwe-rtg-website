@@ -79,9 +79,22 @@ module.exports = (ctx) => {
     return { ok: true, aangemeld: dienstRij().filter(x => !x.uit).map(x => ({ id: x.id, naam: x.naam, kamer: x.kamer, waar: x.waar, sinds: x.in })) };
   }
 
+  /* ---------- de kantine: de kaart van vandaag ----------
+     De kantine-kamer mag zelf iets MAKEN: het dagmenu. Wie het zet, staat
+     erbij; de kamer toont het meteen aan iedereen. */
+  function kantineMenu() { return { ok: true, menu: d().kantineMenu || null }; }
+  function kantineMenuZet(items, door) {
+    const rij = lijst(items).map(x => String(x == null ? '' : x).replace(/[<>]/g, '').trim().slice(0, 80)).filter(Boolean).slice(0, 12);
+    if (!rij.length) return { status: 400, error: 'Wat staat er vandaag op de kaart?' };
+    d().kantineMenu = { datum: new Date().toISOString().slice(0, 10), items: rij,
+      door: String(door || 'kantine').replace(/[<>]/g, '').trim().slice(0, 30), at: nu() };
+    save();
+    return { ok: true, menu: d().kantineMenu };
+  }
+
   /* ---------- de paniekkamer ----------
      Dezelfde knoppen als de boardroom, maar met het vier-ogen-principe: een
      omgezette knop wordt een voorstel. De boardroom accepteert (dan schakelt
      hij echt), wijst af, of discussieert er eerst over. */
-  return { chatRij, chatLijst, chatStuur, HUISREGELS, ONBOARDING_EXTRA, onboarding, dienstRij, dienstIn, dienstUit, dienstNu };
+  return { chatRij, chatLijst, chatStuur, HUISREGELS, ONBOARDING_EXTRA, onboarding, dienstRij, dienstIn, dienstUit, dienstNu, kantineMenu, kantineMenuZet };
 };

@@ -35,7 +35,7 @@ module.exports = (ctx) => {
     const a = AFDELINGEN[id];
     if (!a) return { status: 404, error: 'Deze kamer bestaat niet.' };
     return {
-      ok: true, id, naam: a.naam, emoji: a.emoji, missie: a.missie,
+      ok: true, id, naam: a.naam, emoji: a.emoji, missie: a.missie, naamInzage: !!a.naamInzage,
       kpis: a.kpis().map(([label, waarde]) => ({ label, waarde })),
       lijsten: a.lijsten(), taken: taken(id).slice(0, 30)
     };

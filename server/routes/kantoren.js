@@ -46,6 +46,17 @@ module.exports = (kern) => {
     res.json({ ok: true, profiel: db.data.rahulProfiel });
   });
 
+  /* De identiteitskluis-inzage: kamers met naamInzage (en de boardroom)
+     vragen de echte naam bij een codenaam op; elke opvraging komt in het
+     auditlog, ook zonder treffer. */
+  app.post('/api/office/inzage', officeAuth, async (req, res) => {
+    try { stuur(res, await afdelingen.naamInzage(String(req.body.kamer || ''), req.body.codenaam, req.body.naam ? String(req.body.naam) : null)); }
+    catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  // de kantine: de kaart van vandaag lezen en zetten
+  app.post('/api/office/kantine/menu', officeAuth, (req, res) => veilig(res, () => afdelingen.kantineMenu()));
+  app.post('/api/office/kantine/menu-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.kantineMenuZet(req.body.items, req.body.naam)));
+
   app.post('/api/office/boardroom/fase', officeAuth, (req, res) => veilig(res, () => {
     const r = afdelingen.schakelFase(String(req.body.fase || ''), req.body.naam ? String(req.body.naam) : 'boardroom');
     if (r.ok) sseToOffice('sync', { scope: 'boardroom' });

@@ -160,6 +160,25 @@
         <button class="knop stil" id="kMaak">+</button>
       </div>
     </div>
+    <div class="kaart" id="kKluis" hidden>
+      <h4 style="margin:0 0 .4rem;">🔐 De identiteitskluis</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Deze kamer mag de echte naam bij een codenaam opvragen, omdat het werk erom vraagt. Elke opvraging komt in het auditlog van de boardroom, ook zonder treffer.</p>
+      <div class="taakrij">
+        <input class="veld" id="kKluisCode" style="flex:1;" placeholder="Codenaam van het lid" maxlength="60">
+        <button class="knop stil" id="kKluisZoek" type="button">Zoek op</button>
+      </div>
+      <div class="stil" id="kKluisUit" style="font-size:.82rem;margin-top:.5rem;" aria-live="polite"></div>
+    </div>
+    <div class="kaart" id="kKantine" hidden>
+      <h4 style="margin:0 0 .4rem;">🍲 De kaart van vandaag</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Een gerecht per regel; opslaan vervangt de kaart van vandaag en iedereen ziet hem meteen.</p>
+      <textarea id="kKantineMenu" rows="4" maxlength="1000" placeholder="Bijv. dagsoep, nasi van gisteren maar beter, vega wrap" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <div class="taakrij" style="margin-top:.5rem;">
+        <input class="veld" id="kKantineNaam" style="max-width:10rem;" placeholder="Wie zet de kaart?" maxlength="30">
+        <button class="knop stil" id="kKantineZet" type="button">Zet de kaart</button>
+        <span class="stil" id="kKantineStand" style="font-size:.78rem;color:var(--soft);"></span>
+      </div>
+    </div>
     </div>
     <div id="tabStats" hidden><div class="kpis" id="kStats"></div></div>
     <div id="tabChat" hidden></div>
@@ -277,6 +296,16 @@
       </div>
     </div>
 
+    <h3 class="sec">De identiteitskluis</h3>
+    <div class="kaart">
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">De boardroom mag de echte naam bij een codenaam opvragen. Elke opvraging komt in het auditlog hierboven, ook zonder treffer.</p>
+      <div class="taakrij">
+        <input class="veld" id="bKluisCode" style="flex:1;" placeholder="Codenaam van het lid" maxlength="60">
+        <button class="knop stil" id="bKluisZoek" type="button">Zoek op</button>
+      </div>
+      <div class="stil" id="bKluisUit" style="font-size:.82rem;margin-top:.5rem;" aria-live="polite"></div>
+    </div>
+
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
     <div class="kaart" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
       <span style="font-size:.82rem;color:var(--soft);flex:1;min-width:14rem;">De grote hendel: alles bij iedereen beschikbaar zetten, of alles in een keer sluiten. De interne backoffice-functies blijven altijd open, zodat u de hendel kunt terugzetten.</span>
@@ -355,7 +384,30 @@ async function openKamer(id){
   $('#kLijsten').innerHTML = d.lijsten.map(l =>
     '<div class="kaart lijst"><h4>'+esc(l.titel)+'</h4>'+(l.items.length ? '<ul>'+l.items.map(i => '<li>'+esc(i)+'</li>').join('')+'</ul>' : '<div class="leeg">Niets openstaand.</div>')+'</div>').join('');
   tekenTaken(d.taken);
+  // de identiteitskluis alleen voor kamers die klanten bij naam moeten kennen
+  $('#kKluis').hidden = !d.naamInzage;
+  $('#kKluisUit').textContent = '';
+  // de kantine mag de kaart van vandaag zetten
+  $('#kKantine').hidden = (id !== 'kantine');
+  if (id === 'kantine') api('kantine/menu').then(r => {
+    if (r.menu && r.menu.items) { $('#kKantineMenu').value = r.menu.items.join('\n'); $('#kKantineStand').textContent = 'Gezet door ' + r.menu.door + ' (' + r.menu.datum + ').'; }
+  }).catch(() => {});
 }
+$('#kKluisZoek').addEventListener('click', async () => {
+  const uit = $('#kKluisUit');
+  try {
+    const r = await api('inzage', { kamer: KAMER, codenaam: $('#kKluisCode').value, naam: mijnNaam });
+    uit.innerHTML = '<b>'+esc(r.inzage.naam)+'</b> · '+esc(r.inzage.codenaam)+' · '+esc(r.inzage.pas)+(r.inzage.email ? ' · '+esc(r.inzage.email) : '');
+  } catch (e) { uit.textContent = e.message; }
+});
+$('#kKluisCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('#kKluisZoek').click(); });
+$('#kKantineZet').addEventListener('click', async () => {
+  try {
+    const items = $('#kKantineMenu').value.split('\n').map(s => s.trim()).filter(Boolean);
+    const r = await api('kantine/menu-zet', { items, naam: $('#kKantineNaam').value || mijnNaam });
+    $('#kKantineStand').textContent = 'De kaart staat (' + r.menu.items.length + ' gerechten).';
+  } catch (e) { $('#kKantineStand').textContent = e.message; }
+});
 function tekenTaken(taken){
   $('#kTaken').innerHTML = taken.length ? taken.map(t =>
     '<div class="taak'+(t.af?' af':'')+'"><input type="checkbox" data-taak="'+t.id+'"'+(t.af?' checked':'')+' aria-label="Taak af"><span>'+esc(t.tekst)+'</span></div>').join('')
@@ -705,6 +757,16 @@ $('#rBewaar').addEventListener('click', async () => {
     $('#rStand').textContent = 'Bewaard; de aanvulling geldt direct in elke assistent.';
   } catch (e) { $('#rStand').textContent = e.message; }
 });
+
+/* de identiteitskluis vanuit de boardroom (zelfde regels: alles in het auditlog) */
+$('#bKluisZoek').addEventListener('click', async () => {
+  const uit = $('#bKluisUit');
+  try {
+    const r = await api('inzage', { kamer: 'boardroom', codenaam: $('#bKluisCode').value, naam: mijnNaam });
+    uit.innerHTML = '<b>'+esc(r.inzage.naam)+'</b> · '+esc(r.inzage.codenaam)+' · '+esc(r.inzage.pas)+(r.inzage.email ? ' · '+esc(r.inzage.email) : '');
+  } catch (e) { uit.textContent = e.message; }
+});
+$('#bKluisCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('#bKluisZoek').click(); });
 
 /* de leveranciers-regie: een functie per genre zaken open of dicht */
 async function lrZet(aan){

@@ -1,7 +1,8 @@
-/* Het afdelingsregister (kern/afdelingen): de twaalf kamers van het RTG-
-   kantoor als configuratie - per kamer de naam, de KPI's en de lijsten,
-   alles defensief lezend uit de datastore. Verbatim afgesplitst uit
-   kern/afdelingen.js; de helpers komen via de context binnen. */
+/* Het afdelingsregister (kern/afdelingen): de eerste twaalf kamers van het
+   RTG-kantoor als configuratie - per kamer de naam, de KPI's en de lijsten,
+   alles defensief lezend uit de datastore. De vijf jongere kamers staan in
+   register2.js; kamers met naamInzage: true mogen via de identiteitskluis
+   (afdelingen/inzage.js) de echte naam bij een codenaam opvragen. */
 module.exports = (ctx) => {
   const { d, lijst, tel, recent, ledenGeteld, functies } = ctx;
 
@@ -25,7 +26,9 @@ module.exports = (ctx) => {
         ['Salon-posts totaal', tel(d().posts)],
         ['Posts deze week', recent(d().posts, 'at', 7)],
         ['Verhalen live', tel(d().stories)],
-        ['Cadeaukaarten actief', tel(lijst(d().giftcards).filter(g => !g.verzilverd))]
+        ['Clips online', tel(d().clips)],
+        ['Podium-kanalen', tel(d().podiumKanalen)],
+        ['Theater-videos', tel(d().theaterVideos)]
       ],
       lijsten: () => [
         { titel: 'Nieuwste Salon-posts', items: lijst(d().posts).slice(0, 8).map(p => (p.author || p.codename || 'iemand') + ': ' + String(p.text || p.tekst || '').slice(0, 60)) }
@@ -50,13 +53,15 @@ module.exports = (ctx) => {
       lijsten: () => [
         { titel: 'Verse sollicitaties', items: lijst(d().applications).slice(0, 8).map(a => (a.name || a.codename || 'kandidaat') + ' op ' + (a.role || a.vacature || 'functie')) }
       ] },
-    financien: { naam: 'Financiën', emoji: '💶', missie: 'Elke euro kloppend, elke afdracht op tijd.',
+    financien: { naam: 'Financiën', emoji: '💶', missie: 'Elke euro kloppend, elke afdracht op tijd.', naamInzage: true,
       kpis: () => [
         ['Directe betalingen', tel(d().directBetalingen)],
         ['RTG Pay boekingen (24u)', recent(d().payBoekingen, 'at', 1)],
         ['Munt-ontvangsten', tel(d().muntOntvangsten)],
         ['Kassa-verkopen', tel(d().posSales)],
-        ['Boekingen totaal', tel(d().boekingen)]
+        ['Boekingen totaal', tel(d().boekingen)],
+        ['Facturen', tel(d().facturen)],
+        ['Synergie-pakketten verkocht', tel(d().synergieKopen)]
       ],
       lijsten: () => [
         { titel: 'Laatste directe betalingen', items: lijst(d().directBetalingen).slice(0, 8).map(b => '€ ' + (b.bedrag || b.amount || 0) + ' aan ' + (b.supplierCode || b.aan || '')) },
@@ -75,12 +80,15 @@ module.exports = (ctx) => {
         ['Orders totaal', tel(d().orders)],
         ['Orders deze week', recent(d().orders, 'at', 7)],
         ['Ritten totaal', tel(d().rides)],
-        ['Reserveringen', tel(d().reserveringen)]
+        ['Reserveringen', tel(d().reserveringen)],
+        ['OV-ritten', tel(d().ovRitten)],
+        ['Care-boekingen', tel(d().careBoekingen)],
+        ['Verblijven', tel(d().verblijven)]
       ],
       lijsten: () => [
         { titel: 'Nieuwste orders', items: lijst(d().orders).slice(0, 8).map(o => (o.supplier || o.supplierCode || '') + ': ' + String(o.summary || o.item || o.ref || '').slice(0, 50)) }
       ] },
-    juridisch: { naam: 'Juridisch', emoji: '⚖️', missie: 'Alles netjes: contracten, akkoorden en AVG.',
+    juridisch: { naam: 'Juridisch', emoji: '⚖️', missie: 'Alles netjes: contracten, akkoorden en AVG.', naamInzage: true,
       kpis: () => [
         ['Contracten getekend', tel(lijst(d().contracten).filter(c => c.getekend || c.status === 'getekend'))],
         ['Contracten open', tel(lijst(d().contracten).filter(c => !(c.getekend || c.status === 'getekend')))],
@@ -123,10 +131,11 @@ module.exports = (ctx) => {
         ['Leden in de gids', ledenGeteld()],
         ['Connecties gelegd', tel(Object.keys(d().connections || {}))],
         ['Orders per week', recent(d().orders, 'at', 7)],
-        ['Posts per week', recent(d().posts, 'at', 7)]
+        ['Posts per week', recent(d().posts, 'at', 7)],
+        ['Grootboekregels (14d)', recent(d().payBoekingen, 'at', 14)]
       ],
       lijsten: () => [] },
-    klantenservice: { naam: 'Klantenservice', emoji: '🎧', missie: 'Elke gast en elk gezin snel en warm geholpen.',
+    klantenservice: { naam: 'Klantenservice', emoji: '🎧', missie: 'Elke gast en elk gezin snel en warm geholpen.', naamInzage: true,
       kpis: () => [
         ['Gastgesprekken', tel(Object.keys(d().guestChats || {}))],
         ['Ledengesprekken', tel(Object.keys(d().memberChats || {}))],

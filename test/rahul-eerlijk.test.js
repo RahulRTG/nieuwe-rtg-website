@@ -50,6 +50,13 @@ test('de geschiedenis: van huis weg, de verliezen van 2024 en 2025, en de discre
   assert.match(verhaal, /nooit uit jezelf/i, 'de discretieregel in het volledige verhaal');
 });
 
+test('de werkvloer-regel: in een werkomgeving nooit persoonlijke zaken, behalve die van de vraagsteller zelf', () => {
+  const { RAHUL_LEAD } = require('../server/kern/rahul');
+  assert.match(RAHUL_LEAD, /werkomgeving.*nooit en te nimmer persoonlijke zaken/i, 'de regel staat in het gedeelde karakter');
+  assert.match(RAHUL_LEAD, /uitzondering.*over zichzelf/i, 'met de ene uitzondering: de vraagsteller zelf');
+  assert.match(RAHUL_LEAD, /buig je vriendelijk terug naar het werk/i, 'en de vriendelijke afbuiging');
+});
+
 test('de leden-AI (volledig verhaal) en het AI-stuur dragen de doctrine ook', () => {
   assert.match(lees('server/kern/ai/prompt.js'), /liever te hard dan een liegbeest/i, 'leden-AI');
   assert.match(lees('server/kern/stuur.js'), /liever te hard dan een liegbeest/i, 'tool-lus van het stuur');

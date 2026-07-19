@@ -18,9 +18,9 @@
   stijl.id = 'rtg-klok-stijl';
   stijl.textContent =
     '.rtg-klok{display:inline-flex;align-items:baseline;font-variant-numeric:tabular-nums;white-space:nowrap;}' +
-    ".rtg-klok .ku{font-family:'Bodoni Moda',serif;font-weight:600;letter-spacing:0.01em;}" +
-    ".rtg-klok .ks{font-family:'Bodoni Moda',serif;font-weight:500;font-size:0.5em;opacity:0.85;margin-left:0.1em;}" +
-    '.rtg-klok .km{font-family:Inter,system-ui,sans-serif;font-weight:500;font-size:0.26em;letter-spacing:0.08em;' +
+    ".rtg-klok .ku{font-family:'Bodoni Moda',serif;font-weight:400;letter-spacing:0.02em;}" +
+    ".rtg-klok .ks{font-family:'Bodoni Moda',serif;font-weight:400;font-size:0.5em;opacity:0.85;margin-left:0.1em;}" +
+    '.rtg-klok .km{font-family:Inter,system-ui,sans-serif;font-weight:400;font-size:0.26em;letter-spacing:0.08em;' +
       'color:var(--gold,#C9A24B);margin-left:0.22em;min-width:3.6ch;text-align:left;align-self:center;}' +
     '@media (prefers-reduced-motion: reduce){.rtg-klok .km{display:none;}}' +
     // het ring-gezicht: de rode signatuur, de dubbele haarlijn-rand en goud
@@ -30,7 +30,7 @@
     '.rtg-ring .rr-rehaut{fill:none;stroke:currentColor;stroke-opacity:0.1;stroke-width:0.7;}' +
     '.rtg-ring .rr-min{stroke:currentColor;stroke-opacity:0.16;stroke-width:0.7;}' +
     '.rtg-ring .rr-vijf{stroke:var(--gold,#C9A24B);stroke-opacity:0.7;stroke-width:1.1;}' +
-    '.rtg-ring .rr-naam{fill:var(--gold,#C9A24B);font-family:Inter,system-ui,sans-serif;font-size:5.4px;font-weight:600;}' +
+    '.rtg-ring .rr-naam{fill:var(--gold,#C9A24B);font-family:Inter,system-ui,sans-serif;font-size:5.2px;font-weight:400;}' +
     '.rtg-ring .rr-venster{fill:rgba(0,0,0,0.4);stroke:currentColor;stroke-opacity:0.25;stroke-width:0.7;}' +
     ".rtg-ring .rr-datum{fill:var(--gold,#C9A24B);font-family:'Bodoni Moda',serif;font-size:10.5px;font-variant-numeric:tabular-nums;}" +
     '.rtg-ring .rr-wijzer{fill:var(--gold,#C9A24B);filter:drop-shadow(0 0 5px color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent));}' +

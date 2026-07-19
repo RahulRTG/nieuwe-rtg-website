@@ -306,6 +306,29 @@
       <div class="stil" id="bKluisUit" style="font-size:.82rem;margin-top:.5rem;" aria-live="polite"></div>
     </div>
 
+    <h3 class="sec">De doos-regie: de vloot op afstand beheren</h3>
+    <div class="kaart">
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">De doos belt altijd zelf naar buiten; het kantoor duwt nooit iets naar binnen. Zet u hier een doelversie, dan krijgt elke doos op een oudere versie bij zijn eigen melding de update-opdracht mee. Per doos kiest u ook de netwerkrol: naast zaakserver kan het kastje accesspoint of wifi-versterker zijn, met los gastwifi.</p>
+      <div class="taakrij">
+        <input class="veld" id="dVersie" style="max-width:8rem;" placeholder="Doelversie" maxlength="20">
+        <input class="veld" id="dNotities" style="flex:1;" placeholder="Notities bij deze versie (optioneel)" maxlength="300">
+        <button class="knop stil" id="dVersieZet" type="button">Zet de doelversie</button>
+      </div>
+      <div class="taakrij" style="margin-top:.5rem;">
+        <input class="veld" id="dDoos" style="max-width:9rem;" placeholder="Doos-naam" maxlength="40">
+        <select class="veld" id="dRol" style="max-width:9rem;" aria-label="Netwerkrol">
+          <option value="accesspoint">Accesspoint</option>
+          <option value="versterker">Wifi-versterker</option>
+          <option value="uit">Alleen zaakserver</option>
+        </select>
+        <input class="veld" id="dSsid" style="max-width:9rem;" placeholder="SSID" maxlength="32">
+        <label class="stil" style="font-size:.78rem;display:flex;align-items:center;gap:.3rem;"><input type="checkbox" id="dGast"> gastwifi</label>
+        <button class="knop stil" id="dNetwerkZet" type="button">Zet de netwerkrol</button>
+      </div>
+      <div class="stil" id="dStand" style="font-size:.78rem;color:var(--soft);margin-top:.5rem;" aria-live="polite"></div>
+      <div class="stil" id="dStatussen" style="font-size:.78rem;margin-top:.5rem;line-height:1.6;"></div>
+    </div>
+
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
     <div class="kaart" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
       <span style="font-size:.82rem;color:var(--soft);flex:1;min-width:14rem;">De grote hendel: alles bij iedereen beschikbaar zetten, of alles in een keer sluiten. De interne backoffice-functies blijven altijd open, zodat u de hendel kunt terugzetten.</span>
@@ -624,6 +647,7 @@ async function openBoard(){
   toon('vBoard');
   laadGeld();
   laadRahul();
+  laadDoosRegie();
   wereldWidget($('#bWereld'));
   api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
   $('#bAudit').innerHTML = (d.audit && d.audit.length) ? d.audit.map(a =>
@@ -756,6 +780,29 @@ $('#rBewaar').addEventListener('click', async () => {
     rahulTypt = false;
     $('#rStand').textContent = 'Bewaard; de aanvulling geldt direct in elke assistent.';
   } catch (e) { $('#rStand').textContent = e.message; }
+});
+
+/* de doos-regie: doelversie en netwerkrol voor de Zaakdoos-vloot */
+async function laadDoosRegie(){
+  try {
+    const r = await api('doos/regie');
+    if (r.update && !$('#dVersie').value) { $('#dVersie').value = r.update.versie; $('#dNotities').value = r.update.notities || ''; }
+    $('#dStand').textContent = r.update ? 'Doelversie: v' + r.update.versie + ' (gezet door ' + r.update.door + ')' : 'Nog geen doelversie gezet; de vloot draait wat hij draait.';
+    $('#dStatussen').innerHTML = (r.statussen || []).slice(0, 6).map(s =>
+      '<span style="color:var(--gold);">'+esc(s.doos)+'</span> ' + (s.gelukt ? 'update gelukt' : 'update NIET gelukt') +
+      (s.naar ? ' naar v'+esc(s.naar) : '') + ': ' + esc(s.melding)).join('<br>') || '';
+  } catch (e) { $('#dStand').textContent = e.message; }
+}
+$('#dVersieZet').addEventListener('click', async () => {
+  try { await api('doos/update-zet', { versie: $('#dVersie').value, notities: $('#dNotities').value, naam: mijnNaam });
+    meld('Doelversie gezet; elke doos op een oudere versie krijgt de update-opdracht bij zijn volgende melding.'); laadDoosRegie(); }
+  catch (e) { meld(e.message); }
+});
+$('#dNetwerkZet').addEventListener('click', async () => {
+  try { await api('doos/netwerk-zet', { doos: $('#dDoos').value, naam: mijnNaam,
+    instellingen: { rol: $('#dRol').value, ssid: $('#dSsid').value, gastwifi: $('#dGast').checked, gastSsid: $('#dGast').checked ? ($('#dSsid').value + ' Gasten') : '' } });
+    meld('Netwerkrol staat klaar; de doos past hem toe bij zijn volgende melding.'); }
+  catch (e) { meld(e.message); }
 });
 
 /* de identiteitskluis vanuit de boardroom (zelfde regels: alles in het auditlog) */

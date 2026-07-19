@@ -62,7 +62,8 @@ module.exports = ({ db, save, log, dataDir }) => {
       doos: actief, modus, journaal: actief ? journaal().length : 0, laatsteKloon,
       kloonLeeftijdMin: laatsteKloon ? Math.round((nu() - laatsteKloon) / 60000) : null,
       kasStuks: kas.stuks, kasBytes: kas.bytes,
-      clouds: CLOUDS.length, actieveCloud: cloudIdx
+      clouds: CLOUDS.length, actieveCloud: cloudIdx,
+      versie: beheer.versie, wifi: beheer.wifiRol(), stroom: beheer.stroom()
     };
   }
   function naarLokaal(reden) {
@@ -239,6 +240,8 @@ module.exports = ({ db, save, log, dataDir }) => {
   const NETWERK = process.env.RTG_DOOS_NETWERK === '1';
   const DOOS_NAAM = process.env.RTG_DOOS_NAAM || 'doos';
   const MELD_MS = Math.max(1000, Number(process.env.RTG_DOOS_MELD_MS) || 60000);
+  // het beheer op afstand: software-update, netwerkrol en stroomwacht
+  const beheer = require('./zaakdoos/beheer')({ dataDir, cloud: CLOUD, sleutel: SLEUTEL, doosNaam: DOOS_NAAM });
   // de plek van de doos op de wereldkaart (met instemming van de partner)
   const PLEK = (() => {
     const m = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/.exec(process.env.RTG_DOOS_PLEK || '');
@@ -251,11 +254,14 @@ module.exports = ({ db, save, log, dataDir }) => {
     try {
       const r = await fetch(CLOUD() + '/api/doos/meting', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
-        body: JSON.stringify({ doos: DOOS_NAAM, rtt, modus, journaal: journaal().length, plek: PLEK || undefined }),
+        body: JSON.stringify({ doos: DOOS_NAAM, rtt, modus, journaal: journaal().length, plek: PLEK || undefined,
+          versie: beheer.versie, wifi: beheer.wifiRol(), stroom: beheer.stroom() || undefined }),
         signal: AbortSignal.timeout(10000)
       });
-      // het kantoor kan via het wereldbord een opdracht meegeven (reset/hulp)
+      // het kantoor kan via het wereldbord een opdracht meegeven (reset/hulp/
+      // update), en geeft de gewenste netwerkrol met de eigen melding mee terug
       const d = await r.json().catch(() => ({}));
+      if (d && d.netwerk) beheer.pasNetwerkToe(d.netwerk);
       if (d && d.opdracht) voerOpdrachtUit(d.opdracht);
     } catch (e) { /* geen lijn; de volgende tik probeert weer */ }
   }
@@ -277,6 +283,9 @@ module.exports = ({ db, save, log, dataDir }) => {
       } catch (e) {}
       laatsteMelding = 0; // en de volgende tik meldt direct opnieuw
       console.log('[doos] hulp-opdracht van het kantoor: diagnoserapport verstuurd');
+    } else if (actie === 'update') {
+      // de software-update: doelversie ophalen en de update-hook draaien
+      await beheer.doeUpdate();
     }
   }
   /* De buurtfailover: valt bij deze doos de lijn weg, dan geeft hij zijn

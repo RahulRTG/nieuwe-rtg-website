@@ -33,6 +33,15 @@ module.exports = (ctx) => {
       ],
       lijsten: () => [
         { titel: 'Storingen (zekeringen open)', items: storingen().slice(0, 8).map(f => f.naam) },
+        // het beheer op afstand: welke software draait er in het veld
+        { titel: 'Software in het veld' + ((d().doosUpdate || {}).versie ? ' (doel: v' + d().doosUpdate.versie + ')' : ''), items: (() => {
+          const per = {};
+          for (const m of lijst(d().doosMetingen)) if (!per[m.doos]) per[m.doos] = m;
+          return Object.values(per).slice(0, 10).map(m => m.doos + ': v' + (m.versie || '?')
+            + (m.wifi && m.wifi !== 'uit' ? ', wifi: ' + m.wifi : '')
+            + (m.stroom && m.stroom.bron === 'batterij' ? ', OP BATTERIJ' + (m.stroom.pct != null ? ' (' + m.stroom.pct + '%)' : '') : ''));
+        })() },
+        { titel: 'Laatste update-meldingen', items: lijst(d().doosUpdateStatus).slice(0, 6).map(s => s.doos + ': ' + (s.gelukt ? 'gelukt' : 'NIET gelukt') + (s.naar ? ' naar v' + s.naar : '') + ', ' + s.melding) },
         { titel: 'Verder kijken', items: ['Het volledige techniekbord staat op techniek.html (eigenaar-inlog); de Zaakdozen staan in de kamer Intern & IT.'] }
       ] },
     consumentenAbo: { naam: 'Consumenten-abonnementen', emoji: '💳', missie: 'Elke pas kloppend: van aanvraag en ballotage tot verlenging en afscheid.', naamInzage: true,

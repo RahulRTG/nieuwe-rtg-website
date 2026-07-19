@@ -67,12 +67,62 @@ module.exports = (kern) => {
     if (b.plek && Number.isFinite(Number(b.plek.lat)) && Number.isFinite(Number(b.plek.lon))) {
       meting.plek = { lat: Math.max(-90, Math.min(90, Number(b.plek.lat))), lon: Math.max(-180, Math.min(180, Number(b.plek.lon))) };
     }
+    // het beheer op afstand: de doos meldt zijn softwareversie, netwerkrol
+    // en stroombron mee, zodat het wereldbord en de Ingenieurs ze zien
+    if (b.versie) meting.versie = String(b.versie).replace(/[^\w.\-]/g, '').slice(0, 20);
+    if (b.wifi) meting.wifi = ['accesspoint', 'versterker', 'uit'].includes(b.wifi) ? b.wifi : 'uit';
+    if (b.stroom && (b.stroom.bron === 'net' || b.stroom.bron === 'batterij')) {
+      meting.stroom = { bron: b.stroom.bron, pct: b.stroom.pct == null ? null : Math.max(0, Math.min(100, Math.round(Number(b.stroom.pct) || 0))) };
+    }
     db.data.doosMetingen.unshift(meting);
     db.data.doosMetingen = db.data.doosMetingen.slice(0, 2000);
     save();
-    // staat er vanaf het wereldbord een opdracht klaar (reset/hulp), geef hem mee
-    const opdracht = kern.afdelingen ? kern.afdelingen.opdrachtVoorDoos(meting.doos) : null;
-    res.json(opdracht ? { ok: true, opdracht } : { ok: true });
+    // staat er vanaf het wereldbord een opdracht klaar (reset/hulp/update),
+    // geef hem mee; anders krijgt een doos op een oude versie vanzelf de
+    // update-opdracht (hooguit een keer per kwartier, tegen het spammen)
+    let opdracht = kern.afdelingen ? kern.afdelingen.opdrachtVoorDoos(meting.doos) : null;
+    const doel = db.data.doosUpdate;
+    if (!opdracht && doel && doel.versie && meting.versie && meting.versie !== doel.versie) {
+      if (!db.data.doosUpdatePogingen) db.data.doosUpdatePogingen = {};
+      const vorige = db.data.doosUpdatePogingen[meting.doos] || 0;
+      if (Date.now() - vorige > 15 * 60 * 1000) {
+        db.data.doosUpdatePogingen[meting.doos] = Date.now();
+        save();
+        opdracht = 'update';
+      }
+    }
+    // de gewenste netwerkrol reist met de eigen melding mee terug (de doos
+    // past hem alleen toe als de stand nieuwer is dan wat hij al draait)
+    const netwerk = (db.data.doosNetwerk || {})[meting.doos] || null;
+    const uit = { ok: true };
+    if (opdracht) uit.opdracht = opdracht;
+    if (netwerk) uit.netwerk = netwerk;
+    res.json(uit);
+  });
+  /* Het update-kanaal: de doos haalt hier de doelversie op (na de
+     update-opdracht) en meldt de uitslag van zijn update-hook terug.
+     Beide achter de gedeelde sleutel; de cloud duwt nooit iets naar binnen. */
+  app.get('/api/doos/update', (req, res) => {
+    if (!doosSleutelOk(req, res)) return;
+    if (!db.data.doosUpdate || !db.data.doosUpdate.versie) return res.status(404).json({ error: 'Er staat geen doelversie klaar.' });
+    res.json(db.data.doosUpdate);
+  });
+  app.post('/api/doos/update/status', (req, res) => {
+    if (!doosSleutelOk(req, res)) return;
+    if (!Array.isArray(db.data.doosUpdateStatus)) db.data.doosUpdateStatus = [];
+    const b = req.body || {};
+    const s = {
+      doos: String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40),
+      van: String(b.van || '').replace(/[^\w.\-]/g, '').slice(0, 20),
+      naar: b.naar ? String(b.naar).replace(/[^\w.\-]/g, '').slice(0, 20) : null,
+      gelukt: b.gelukt === true,
+      melding: String(b.melding || '').replace(/[<>]/g, '').slice(0, 300), at: Date.now()
+    };
+    db.data.doosUpdateStatus.unshift(s);
+    db.data.doosUpdateStatus = db.data.doosUpdateStatus.slice(0, 200);
+    save();
+    if (kern.afdelingen) kern.afdelingen.audit('meetstation', 'Doos ' + s.doos + ' meldt update ' + (s.gelukt ? 'gelukt' : 'NIET gelukt') + (s.naar ? ' naar ' + s.naar : '') + ': ' + s.melding);
+    res.json({ ok: true });
   });
   /* De buurtfailover: een buurdoos zonder eigen lijn geeft zijn melding hier
      (op een doos die de lijn nog wel heeft) af; deze doos stuurt hem door naar

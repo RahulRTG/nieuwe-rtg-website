@@ -90,15 +90,22 @@ module.exports = (ctx) => {
   function wereld() {
     const items = [];
     const per = laatstePerDoos();
+    const doel = d().doosUpdate || null;
     for (const naam of Object.keys(per)) {
       const m = per[naam];
       const stil = nu() - m.at > STIL_NA;
-      const status = m.modus === 'lokaal' ? 'rood' : (stil ? 'oranje' : 'groen');
-      const detail = m.modus === 'lokaal'
+      // op batterij draaien is geen storing, maar wel iets om te zien: oranje
+      const opBatterij = m.stroom && m.stroom.bron === 'batterij';
+      const status = m.modus === 'lokaal' ? 'rood' : (stil || opBatterij ? 'oranje' : 'groen');
+      let detail = m.modus === 'lokaal'
         ? 'lijn weg' + (m.journaal ? ', ' + m.journaal + ' in journaal' : '') + (m.via ? ', meldt zich via ' + m.via : '')
         : (stil ? 'al ' + Math.round((nu() - m.at) / 60000) + ' min stil' : m.rtt + 'ms over de lijn');
-      items.push({ id: 'doos:' + naam, naam, soort: 'doos', plek: m.plek || null, status, detail,
-        acties: status === 'groen' ? ['hulp'] : ['reset', 'hulp'] });
+      if (opBatterij) detail += ', op batterij' + (m.stroom.pct != null ? ' (' + m.stroom.pct + '%)' : '');
+      if (m.versie) detail += ', v' + m.versie + (doel && doel.versie && m.versie !== doel.versie ? ' (doel v' + doel.versie + ')' : '');
+      if (m.wifi && m.wifi !== 'uit') detail += ', wifi: ' + m.wifi;
+      const acties = status === 'groen' ? ['hulp'] : ['reset', 'hulp'];
+      if (doel && doel.versie && m.versie && m.versie !== doel.versie) acties.push('update');
+      items.push({ id: 'doos:' + naam, naam, soort: 'doos', plek: m.plek || null, status, detail, acties });
     }
     for (const g of functies.catalogus(functiesStand())) for (const f of g.functies) {
       if (f.storing) items.push({ id: 'functie:' + f.id, naam: f.naam, soort: 'functie', plek: null, status: 'rood', detail: 'storing gemeld: ' + String(f.storing).slice(0, 80), acties: ['reset'] });
@@ -110,7 +117,8 @@ module.exports = (ctx) => {
     return { ok: true, items, telling, opdrachtenOpen: opdrachtRij().filter(o => !o.klaar).length };
   }
   function wereldActie(id, actie, wie) {
-    if (actie !== 'reset' && actie !== 'hulp') return { status: 400, error: 'Kies reset of hulp.' };
+    if (!['reset', 'hulp', 'update'].includes(actie)) return { status: 400, error: 'Kies reset, hulp of update.' };
+    if (actie === 'update' && !id.startsWith('doos:')) return { status: 400, error: 'Alleen een doos kent de update-opdracht.' };
     const naam = String(wie || 'kantoor');
     if (id.startsWith('doos:')) {
       const doosNaam = id.slice(5);
@@ -137,6 +145,40 @@ module.exports = (ctx) => {
     }
     return { status: 404, error: 'Onbekend bolletje.' };
   }
+  /* ---------- de doos-regie: beheer op afstand ----------
+     Het kantoor zet EEN doelversie voor de hele vloot en per doos een
+     netwerkrol (accesspoint, wifi-versterker, gastwifi). De doos haalt
+     beide zelf op bij zijn eigen melding; de cloud duwt nooit iets naar
+     binnen. Elke wijziging komt in het auditlog. */
+  function doosUpdateZet(versie, notities, wie) {
+    const v = String(versie || '').replace(/[^\w.\-]/g, '').slice(0, 20);
+    if (!v) return { status: 400, error: 'Welke versie is het doel? Bijv. 2.4.0.' };
+    d().doosUpdate = { versie: v, notities: String(notities || '').replace(/[<>]/g, '').slice(0, 300), door: String(wie || 'boardroom').replace(/[<>]/g, '').slice(0, 30), at: nu() };
+    save();
+    audit(wie || 'boardroom', 'Doelversie voor de doos-vloot gezet: v' + v);
+    return { ok: true, update: d().doosUpdate };
+  }
+  function doosNetwerkZet(doosNaam, instellingen, wie) {
+    const naam = String(doosNaam || '').replace(/[<>]/g, '').trim().slice(0, 40);
+    if (!naam) return { status: 400, error: 'Welke doos?' };
+    if (!laatstePerDoos()[naam]) return { status: 404, error: 'Deze doos staat niet op de kaart; hij moet zich eerst zelf melden.' };
+    const i = instellingen || {};
+    if (!['accesspoint', 'versterker', 'uit'].includes(i.rol)) return { status: 400, error: 'Kies een rol: accesspoint, versterker of uit.' };
+    if (!d().doosNetwerk) d().doosNetwerk = {};
+    d().doosNetwerk[naam] = {
+      rol: i.rol, ssid: String(i.ssid || '').replace(/[<>]/g, '').slice(0, 32),
+      gastwifi: i.gastwifi === true, gastSsid: String(i.gastSsid || '').replace(/[<>]/g, '').slice(0, 32),
+      kanaal: Math.max(1, Math.min(13, Math.round(Number(i.kanaal) || 6))), at: nu()
+    };
+    save();
+    audit(wie || 'boardroom', 'Netwerkrol van doos ' + naam + ' gezet: ' + i.rol + (i.gastwifi ? ' + gastwifi' : ''));
+    return { ok: true, netwerk: d().doosNetwerk[naam] };
+  }
+  function doosRegie() {
+    return { ok: true, update: d().doosUpdate || null, netwerk: d().doosNetwerk || {},
+      statussen: lijst(d().doosUpdateStatus).slice(0, 15) };
+  }
+
   // de doos meldt zich (meetstation): staat er een opdracht klaar, geef hem mee
   function opdrachtVoorDoos(doosNaam) {
     const o = opdrachtRij().find(x => !x.klaar && x.doos === doosNaam);
@@ -148,5 +190,5 @@ module.exports = (ctx) => {
     return o.actie;
   }
 
-  return { paniekRij, paniekStel, paniekBesluit, paniekBericht, paniekLijst, auditRij, audit, laatstePerDoos, opdrachtRij, wereld, wereldActie, opdrachtVoorDoos };
+  return { paniekRij, paniekStel, paniekBesluit, paniekBericht, paniekLijst, auditRij, audit, laatstePerDoos, opdrachtRij, wereld, wereldActie, opdrachtVoorDoos, doosUpdateZet, doosNetwerkZet, doosRegie };
 };

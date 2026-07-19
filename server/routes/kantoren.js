@@ -56,6 +56,12 @@ module.exports = (kern) => {
   // de kantine: de kaart van vandaag lezen en zetten
   app.post('/api/office/kantine/menu', officeAuth, (req, res) => veilig(res, () => afdelingen.kantineMenu()));
   app.post('/api/office/kantine/menu-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.kantineMenuZet(req.body.items, req.body.naam)));
+  /* De doos-regie: beheer op afstand van de Zaakdoos-vloot. Het kantoor zet
+     de doelversie en per doos een netwerkrol; de doos haalt beide zelf op
+     bij zijn eigen melding (de cloud duwt nooit iets naar binnen). */
+  app.post('/api/office/doos/regie', officeAuth, (req, res) => veilig(res, () => afdelingen.doosRegie()));
+  app.post('/api/office/doos/update-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosUpdateZet(req.body.versie, req.body.notities, req.body.naam)));
+  app.post('/api/office/doos/netwerk-zet', officeAuth, (req, res) => veilig(res, () => afdelingen.doosNetwerkZet(String(req.body.doos || ''), req.body.instellingen || {}, req.body.naam)));
 
   app.post('/api/office/boardroom/fase', officeAuth, (req, res) => veilig(res, () => {
     const r = afdelingen.schakelFase(String(req.body.fase || ''), req.body.naam ? String(req.body.naam) : 'boardroom');

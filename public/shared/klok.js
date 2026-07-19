@@ -30,9 +30,7 @@
     '.rtg-ring .rr-rehaut{fill:none;stroke:currentColor;stroke-opacity:0.1;stroke-width:0.7;}' +
     '.rtg-ring .rr-min{stroke:currentColor;stroke-opacity:0.16;stroke-width:0.7;}' +
     '.rtg-ring .rr-vijf{stroke:var(--gold,#C9A24B);stroke-opacity:0.7;stroke-width:1.1;}' +
-    ".rtg-ring .rr-monogram{fill:var(--burgundy,#C23A5E);font-family:'Bodoni Moda',serif;font-size:21px;font-weight:600;}" +
-    '.rtg-ring .rr-lijn{stroke:var(--burgundy,#C23A5E);stroke-opacity:0.85;stroke-width:0.6;}' +
-    '.rtg-ring .rr-naam{fill:var(--burgundy,#C23A5E);font-family:Inter,system-ui,sans-serif;font-size:5px;font-weight:600;}' +
+    '.rtg-ring .rr-naam{fill:var(--gold,#C9A24B);font-family:Inter,system-ui,sans-serif;font-size:5.4px;font-weight:600;}' +
     '.rtg-ring .rr-venster{fill:rgba(0,0,0,0.4);stroke:currentColor;stroke-opacity:0.25;stroke-width:0.7;}' +
     ".rtg-ring .rr-datum{fill:var(--gold,#C9A24B);font-family:'Bodoni Moda',serif;font-size:10.5px;font-variant-numeric:tabular-nums;}" +
     '.rtg-ring .rr-wijzer{fill:var(--gold,#C9A24B);filter:drop-shadow(0 0 5px color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent));}' +
@@ -64,15 +62,14 @@
 
   /* ---- de RTG-ring: het signatuurgezicht van de klok ----
      Helemaal opnieuw getekend als een echte wijzerplaat, met de signatuur
-     voorop: RTG in het rood van het huis, met daaronder een dunne rode
-     kaderlijn en daarin RAHUL TRAVEL GROUP. De plaat zelf is diep en stil:
+     voorop: alleen RAHUL TRAVEL GROUP, voluit in het goud van het huis,
+     onder twaalf uur. De plaat zelf is diep en stil:
      een dubbele haarlijn-rand (rehaut) met daartussen de minuutbaan van
      zestig fijne streepjes en gouden accenten op de vijf minuten, een
      wijzerplaat met zachte diepte, de Bodoni-cijfers in het midden, een
      datumvenster op zes uur, en de GOUDEN secondewijzer die als een klein
      juweel over de rand zweeft (op de milliseconden; wie minder beweging
-     wil krijgt een wijzer die per seconde verspringt). Op zwart draagt het
-     rood de on-dark-tint, precies volgens de merkregels. */
+     wil krijgt een wijzer die per seconde verspringt). */
   function maakRing(el) {
     el.classList.add('rtg-ring');
     const NS = 'http://www.w3.org/2000/svg';
@@ -104,16 +101,10 @@
         class: vijf ? 'rr-vijf' : 'rr-min'
       });
     }
-    // de signatuur, EEN geheel: RTG in het rood, met daaronder de dunne rode
-    // haarlijn die zich opent voor de naam en weer sluit; alles op vaste
-    // breedtes (textLength), zodat het exact gecentreerd en in verhouding is
-    const monogram = maak('text', { x: 100, y: 35, class: 'rr-monogram', 'text-anchor': 'middle',
-      textLength: 52, lengthAdjust: 'spacing' });
-    monogram.textContent = 'RTG';
-    maak('line', { x1: 40, y1: 45, x2: 57, y2: 45, class: 'rr-lijn' });
-    maak('line', { x1: 143, y1: 45, x2: 160, y2: 45, class: 'rr-lijn' });
-    const naam = maak('text', { x: 100, y: 46.8, class: 'rr-naam', 'text-anchor': 'middle',
-      textLength: 80, lengthAdjust: 'spacing' });
+    // de signatuur: alleen de naam, in het goud van het huis, op vaste
+    // breedte (textLength) zodat hij exact gecentreerd en rustig gespreid is
+    const naam = maak('text', { x: 100, y: 45, class: 'rr-naam', 'text-anchor': 'middle',
+      textLength: 86, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
     // het datumvenster op zes uur
     maak('rect', { x: 91, y: 148, width: 18, height: 15, rx: 2, class: 'rr-venster' });

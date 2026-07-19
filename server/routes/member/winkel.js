@@ -5,7 +5,12 @@ module.exports = (kern) => {
   const { accounts, app, auth, findSupplier, liveCodename,
     notify, voorkeurVan, zetVoorkeur, retailCatalogus, wishlistToggle,
     mijnApart, mijnStyling, vraagPaskamer, retailIsRetail, PASPOORT_NIVEAUS,
-    paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn } = kern;
+    paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn, mall } = kern;
+
+/* ---- de RTG Mall: de luxe shoppingmall, een etagelijst van de boutieks ---- */
+// het overzicht van de mall: etages met boutieks; elke boutique opent haar
+// eigen catalogus via /api/retail/catalogus
+app.post('/api/mall', auth, (req, res) => res.json(mall.overzicht()));
 
 /* ---- retail/mode: de catalogus van een modehuis, verlanglijst, apart en styling ---- */
 // de catalogus van een merk (collecties + artikelen met ledenprijs, drops, wishlist)

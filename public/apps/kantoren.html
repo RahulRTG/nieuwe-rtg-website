@@ -348,6 +348,7 @@
       <h1>✂️ RTG Atelier</h1>
     </div>
     <p class="deck">Het besloten ontwerpbureau van de kantoren voor mode en alles wat je aan het lijf draagt: couture, tassen, horloges, schoenen, hoeden, haute joaillerie, eyewear en kleinlederwaren. Geef een brief, de AI tekent het concept uit met silhouet, materialen, een gedempt palet en een verhaal, levert een tech pack en de blik van de creatief directeur.</p>
+    <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">💡 Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="aKpi"></div>
     <h3 class="sec">Nieuw ontwerp briefen</h3>
     <div class="kaart">
@@ -370,6 +371,7 @@
       <h1>🏎️ RTG Ontwerpstudio</h1>
     </div>
     <p class="deck">Het ontwerpbureau van de kantoren voor alles wat je beweegt: automotive (hypercars, GT's, limousines), jachten & boten, luchtvaart en helikopters. Geef een brief, de AI tekent het concept uit met silhouet, aandrijving, materialen, een gedempt palet en een verhaal, levert een specsheet en de blik van de chef-ontwerper. <a href="/apps/studio-pda.html" style="color:var(--gold);">🏎️ Onderweg? Open de RTG Studio PDA →</a></p>
+    <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">💡 Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="sKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
@@ -401,6 +403,7 @@
       <h1>🔧 RTG Hardwarelab</h1>
     </div>
     <p class="deck">Het ontwerpbureau van de kantoren voor de eigen apparaten: PDA's en tablets, schermen en panelen, sensoren en IoT, de zaakdoos-familie (edge & servers) en accessoires. Geef een brief, de AI tekent het concept uit met behuizing, chip, materialen, een gedempt palet, poorten en een verhaal, levert een stuklijst en de blik van de chef-engineer. <a href="/apps/hardware-pda.html" style="color:var(--gold);">🔧 Onderweg? Open de RTG Hardware PDA →</a></p>
+    <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">💡 Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="hKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
@@ -432,6 +435,7 @@
       <h1>🏛️ RTG Architectenbureau</h1>
     </div>
     <p class="deck">Het ontwerpbureau van de kantoren voor het gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. Geef een brief, de AI tekent het concept uit met typologie, constructie, materialen, een gedempt palet, voorzieningen en een verhaal, levert een bouwstaat en de blik van de chef-architect. <a href="/apps/architect-pda.html" style="color:var(--gold);">🏛️ Onderweg? Open de RTG Architect PDA →</a></p>
+    <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">💡 Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="gKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
@@ -456,6 +460,24 @@
     <div id="gLijst"><div class="leeg">Nog geen concepten.</div></div>
   </section>
 
+  <!-- De Ideeenkamer: de vier ateliers bedenken samen -->
+  <section id="vIdeeen" hidden>
+    <div class="kop">
+      <button class="terug" id="iTerug">← alle kamers</button>
+      <h1>💡 De Ideeënkamer</h1>
+    </div>
+    <p class="deck">De gedeelde werkbank van de vier ontwerpbureaus. Bedenk samen een idee, kies welke ateliers meedoen, laat de AI het uitwerken tot een brief per bureau, en zet het met een klik als concept in het gekozen atelier.</p>
+    <h3 class="sec">Nieuw idee</h3>
+    <div class="kaart">
+      <input class="veld" id="iTitel" style="width:100%;" placeholder="Titel, bijv. Reislijn Meridiaan" maxlength="100">
+      <textarea id="iBrief" rows="2" maxlength="800" placeholder="Waar gaat het over? De gedachte, de sfeer, het gebruik." style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <div id="iBureaus" class="rij" style="margin-top:.5rem;gap:.5rem;"></div>
+      <button class="knop" id="iMaak" style="margin-top:.5rem;">Idee toevoegen</button>
+    </div>
+    <h3 class="sec">De ideeën</h3>
+    <div id="iLijst"><div class="leeg">Nog geen ideeën.</div></div>
+  </section>
+
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -468,7 +490,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vAtelier','vStudio','vHardware','vArchitect'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vAtelier','vStudio','vHardware','vArchitect','vIdeeen'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -493,6 +515,7 @@ async function binnen(){
     else if (start === 'studio') await openStudio();
     else if (start === 'hardware') await openHardware();
     else if (start === 'architect') await openArchitect();
+    else if (start === 'ideeen') await openIdeeen();
     else await openKamer(start);
   } catch (e) { zetKamerUrl(''); }
 }
@@ -1197,6 +1220,80 @@ async function exportPortfolio(naam){
   setTimeout(() => URL.revokeObjectURL(url), 60000);
   meld('Portfolio geopend in een nieuw tabblad.');
 }
+
+/* ---------- De Ideeenkamer: de vier ateliers bedenken samen ---------- */
+let IDEEEN = null, iKeuze = [];
+document.querySelectorAll('.ideeKnop').forEach(b => b.addEventListener('click', () => openIdeeen()));
+async function openIdeeen(){
+  const d = await api('ideeen');
+  IDEEEN = d;
+  if (!iKeuze.length) iKeuze = d.bureaus.map(b => b.id);
+  zetKamerUrl('ideeen');
+  toon('vIdeeen');
+  $('#iBureaus').innerHTML = d.bureaus.map(b =>
+    '<button class="knop stil iBureauKnop'+(iKeuze.includes(b.id)?' aan':'')+'" data-b="'+b.id+'" style="font-size:.76rem;padding:.3rem .6rem;">'+b.icon+' '+esc(b.label)+'</button>').join('');
+  $('#iBureaus').querySelectorAll('.iBureauKnop').forEach(x => x.addEventListener('click', () => {
+    const b = x.dataset.b; iKeuze = iKeuze.includes(b) ? iKeuze.filter(y => y !== b) : iKeuze.concat(b);
+    x.classList.toggle('aan', iKeuze.includes(b));
+  }));
+  renderIdeeen();
+}
+function renderIdeeen(){
+  const d = IDEEEN; if (!d) return;
+  const bureauOpts = d.bureaus;
+  $('#iLijst').innerHTML = d.ideeen.length ? d.ideeen.map(o => {
+    const spinKnoppen = bureauOpts.map(b => '<button class="knop stil iSpin" data-o="'+o.id+'" data-b="'+b.id+'" style="font-size:.72rem;padding:.2rem .5rem;">'+b.icon+' → '+esc(b.label.replace('RTG ',''))+'</button>').join(' ');
+    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
+        '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.titel)+'</h2>'+
+        '<span style="font-size:.72rem;color:var(--muted);">'+o.bureaus.map(b => b.icon+' '+esc(b.label.replace('RTG ',''))).join(' · ')+(o.door?' · '+esc(o.door):'')+'</span></div>'+
+        statusPil(o.status)+'</div>'+
+      (o.brief?'<p style="font-size:.82rem;color:var(--muted);line-height:1.6;margin:.4rem 0 0;">'+esc(o.brief)+'</p>':'')+
+      (o.uitwerking ? '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+        '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Brief per bureau</div>'+
+        Object.keys(o.uitwerking).map(k => { const b = bureauOpts.find(x => x.id === k) || { icon:'•', label:k }; return '<div style="font-size:.8rem;line-height:1.55;margin-bottom:.2rem;"><b>'+b.icon+' '+esc(b.label.replace('RTG ',''))+':</b> '+esc(o.uitwerking[k])+'</div>'; }).join('')+'</div>' : '')+
+      (o.spinoffs && o.spinoffs.length ? '<div style="font-size:.76rem;color:var(--gold);margin-top:.45rem;">Als concept: '+o.spinoffs.map(s => esc(s.bureauLabel.replace('RTG ',''))).join(', ')+'</div>' : '')+
+      (o.reacties && o.reacties.length ? '<div style="margin-top:.5rem;border-left:2px solid var(--line);padding-left:.7rem;">'+o.reacties.slice(-4).map(r => '<div style="font-size:.8rem;line-height:1.5;"><b>'+esc(r.door)+':</b> '+esc(r.tekst)+'</div>').join('')+'</div>' : '')+
+      '<div class="rij" style="margin-top:.55rem;gap:.4rem;">'+
+        '<input class="veld iReactieIn" data-o="'+o.id+'" placeholder="Reageer..." maxlength="500" style="flex:1;min-width:9rem;font-size:.78rem;padding:.3rem .5rem;">'+
+        '<button class="knop stil iReactie" data-o="'+o.id+'" style="font-size:.74rem;padding:.3rem .55rem;">Plaats</button>'+
+        '<button class="knop iUitwerk" data-o="'+o.id+'" style="font-size:.74rem;padding:.3rem .55rem;">✨ AI werkt uit</button>'+
+        '<button class="knop stil iDel" data-o="'+o.id+'" style="margin-left:auto;font-size:.74rem;padding:.3rem .55rem;color:var(--burgundy);">Verwijder</button>'+
+      '</div>'+
+      '<div class="rij" style="margin-top:.4rem;gap:.35rem;"><span style="font-size:.72rem;color:var(--soft);align-self:center;">Als concept naar:</span>'+spinKnoppen+'</div>'+
+    '</div>';
+  }).join('') : '<div class="leeg">Nog geen ideeën. Begin er een.</div>';
+  bindIdeeen();
+}
+function vervangIdee(o){ if (!o || !IDEEEN) return; const i = IDEEEN.ideeen.findIndex(x => x.id === o.id); if (i >= 0) IDEEEN.ideeen[i] = o; else IDEEEN.ideeen.unshift(o); renderIdeeen(); }
+function bindIdeeen(){
+  const el = $('#iLijst');
+  el.querySelectorAll('.iReactie').forEach(b => b.addEventListener('click', async () => {
+    const inp = el.querySelector('.iReactieIn[data-o="'+b.dataset.o+'"]'); const tekst = inp.value.trim(); if (!tekst){ meld('Schrijf een reactie.'); return; }
+    try { const r = await api('ideeen/reactie', { id: b.dataset.o, tekst, door: mijnNaam || 'Bureau' }); vervangIdee(r.idee); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.iUitwerk').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = 'AI denkt na...';
+    try { const r = await api('ideeen/uitwerken', { id: b.dataset.o }); vervangIdee(r.idee); meld('De AI heeft het uitgewerkt per bureau.'); } catch(e){ meld(e.message); b.disabled = false; }
+  }));
+  el.querySelectorAll('.iSpin').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('ideeen/spinoff', { id: b.dataset.o, bureau: b.dataset.b }); vervangIdee(r.idee); meld('Als concept naar '+b.dataset.b+' gezet.'); } catch(e){ meld(e.message); }
+  }));
+  el.querySelectorAll('.iDel').forEach(b => b.addEventListener('click', async () => {
+    try { await api('ideeen/verwijder', { id: b.dataset.o }); IDEEEN.ideeen = IDEEEN.ideeen.filter(o => o.id !== b.dataset.o); renderIdeeen(); } catch(e){ meld(e.message); }
+  }));
+}
+$('#iTerug').addEventListener('click', laadKamers);
+$('#iMaak').addEventListener('click', async () => {
+  const titel = $('#iTitel').value.trim(); if (!titel){ meld('Geef het idee een titel.'); return; }
+  if (!iKeuze.length){ meld('Kies ten minste een bureau.'); return; }
+  try {
+    const r = await api('ideeen/maak', { titel, brief: $('#iBrief').value.trim(), bureaus: iKeuze, door: mijnNaam || 'Boardroom' });
+    $('#iTitel').value = ''; $('#iBrief').value = '';
+    IDEEEN.ideeen.unshift(r.idee); renderIdeeen();
+    meld('Idee toegevoegd.');
+  } catch(e){ meld(e.message); }
+});
 
 /* ---------- platform-statistieken, chat & snap, onboarding ---------- */
 function statsHtml(d){

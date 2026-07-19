@@ -60,7 +60,7 @@ app.post('/api/fluister/profiel', auth, (req, res) => {
   const p = fluisterProfiel(req.session.key);
   // de voorspeller fluistert stil mee: alleen een rijpe gewoonte wordt een
   // seintje in "Rahul ziet", nooit een melding op het toestel
-  const vs = kern.voorspel && kern.voorspel.seintjeVoor(kern.voorspel.voorLid(liveCodename(req.session)));
+  const vs = kern.voorspel && kern.voorspel.seintjeVoor(kern.voorspel.voorLid(liveCodename(req.session), req.session.key));
   if (vs) p.seintjes = [vs].concat(p.seintjes || []).slice(0, 5);
   res.json(p);
 });

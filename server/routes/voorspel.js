@@ -7,7 +7,7 @@ module.exports = (kern) => {
   const { app, auth, supplierAuth, liveCodename, voorspel } = kern;
 
   app.post('/api/voorspel', auth, (req, res) => {
-    res.json(voorspel.voorLid(liveCodename(req.session)));
+    res.json(voorspel.voorLid(liveCodename(req.session), req.session.key));
   });
 
   app.post('/api/supplier/voorspel', supplierAuth, (req, res) => {

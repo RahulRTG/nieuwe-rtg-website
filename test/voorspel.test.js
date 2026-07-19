@@ -8,7 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
-const { gewoontenUit, seintjeVoor } = require('../server/kern/voorspel.js');
+const { gewoontenUit, seintjeVoor, ketenUit } = require('../server/kern/voorspel.js');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-voorspel-'));
 let srv, base, lid, zaak;
@@ -74,6 +74,30 @@ test('het pure leren: een rijpe weekgewoonte krijgt een hoge rijpheid', () => {
   assert.ok(g[0].rijp >= 0.9, 'bijna een week later is de gewoonte rijp (rijp=' + g[0].rijp + ')');
 });
 
+test('de reisketen vooruit: een vaste aankomst zonder tafel wordt een ketenvoorstel', () => {
+  const nu = new Date('2026-07-19T10:00:00.000Z');
+  const vb = { status: 'bevestigd', aankomst: '2026-07-22', supplierName: 'SAKURA', customerKey: 'k1' };
+  const los = ketenUit({ verblijven: [vb], reserveringen: [] }, nu);
+  assert.equal(los.length, 1);
+  assert.equal(los[0].soort, 'keten');
+  assert.match(los[0].vraag, /transfer/i);
+  assert.match(los[0].vraag, /SAKURA/);
+  assert.ok(los[0].zekerheid >= 0.9 && los[0].rijp === 1, 'een vaste boeking is zeker en rijp');
+  // staat er al een tafel op de aankomstdag, dan is de keten compleet: stil
+  const compleet = ketenUit({ verblijven: [vb],
+    reserveringen: [{ status: 'bevestigd', datum: '2026-07-22' }] }, nu);
+  assert.equal(compleet.length, 0);
+  // een aankomst ver weg (meer dan 14 dagen) blijft nog stil
+  const ver = ketenUit({ verblijven: [{ ...vb, aankomst: '2026-09-01' }], reserveringen: [] }, nu);
+  assert.equal(ver.length, 0);
+});
+
+test('het keten-seintje: een klaarstaande keten fluistert als keten', () => {
+  const s = seintjeVoor({ verwachtingen: [{ soort: 'keten', wat: 'uw aankomst bij SAKURA op 2026-07-22',
+    waarom: 'de check-in staat vast', rijp: 1, zekerheid: 0.9 }] });
+  assert.ok(s && /keten kan klaargezet/i.test(s.tekst));
+});
+
 test('lid zonder geschiedenis krijgt een eerlijk "nog te weinig"', async () => {
   const r = await api('/api/voorspel', {}, lid);
   assert.equal(r.status, 200);
@@ -108,6 +132,8 @@ test('de zaak ziet een eerlijke morgen-verwachting met vaste gasten', async () =
     assert.ok(typeof r.body.morgen.verwachtTransacties === 'number');
     assert.ok(Array.isArray(r.body.morgen.drukUren));
     assert.ok(typeof r.body.morgen.advies === 'string' && r.body.morgen.advies.length > 0, 'werkvloer-advies aanwezig');
+    if (r.body.morgen.verwachtTransacties > 0)
+      assert.match(r.body.morgen.bevoorrading, /inkoop/i, 'bevoorradingsbericht voor de keten');
     assert.ok(Array.isArray(r.body.vasteGasten));
   } else {
     assert.match(r.body.uitleg, /te weinig/i);

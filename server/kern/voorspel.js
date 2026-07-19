@@ -12,13 +12,42 @@
    stuur, en de apps tonen de beste verwachting als stille kaart. */
 const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
-/* puur: het stille seintje. Alleen als de beste gewoonte echt rijp is
-   (het gebruikelijke ritme is bijna of helemaal verstreken) fluistert de
-   voorspeller een keer mee in "Rahul ziet"; nooit een schreeuwende melding. */
+/* puur: het stille seintje. Alleen als de beste verwachting echt rijp is
+   (het gebruikelijke ritme is bijna of helemaal verstreken, of er staat een
+   keten klaar rond een vaste boeking) fluistert de voorspeller een keer mee
+   in "Rahul ziet"; nooit een schreeuwende melding. */
 function seintjeVoor(voorLidResultaat) {
   const v = voorLidResultaat && (voorLidResultaat.verwachtingen || [])[0];
   if (!v || v.rijp < 0.6 || v.zekerheid < 0.2) return null;
-  return { icoon: '\u{1F52E}', tekst: 'Rond deze tijd, als u wilt: ' + v.wat + ' (' + v.waarom + ')' };
+  return { icoon: '\u{1F52E}', tekst: (v.soort === 'keten' ? 'Uw keten kan klaargezet: ' : 'Rond deze tijd, als u wilt: ') +
+    v.wat + ' (' + v.waarom + ')' };
+}
+
+/* puur: de reisketen vooruit. Een vaste boeking (verblijf of tafel) is geen
+   gok maar een zeker feit; de voorspeller kijkt of de rest van de keten er
+   al omheen staat en stelt anders EEN samenhangend voorstel voor dat Rahul
+   met een enkel "ja" kan uitvoeren. */
+function ketenUit(bronnen, nu = new Date()) {
+  const vandaag = nu.toISOString().slice(0, 10);
+  const binnen = (datum, dagen) => datum >= vandaag &&
+    (Date.parse(datum) - Date.parse(vandaag)) / 86400000 <= dagen;
+  const keten = [];
+  const vb = (bronnen.verblijven || [])
+    .filter(v => v.status === 'bevestigd' && binnen(v.aankomst, 14))
+    .sort((a, b) => a.aankomst.localeCompare(b.aankomst))[0];
+  if (vb) {
+    const tafelStaat = (bronnen.reserveringen || []).some(r =>
+      ['aangevraagd', 'bevestigd'].includes(r.status) && r.datum === vb.aankomst);
+    if (!tafelStaat) keten.push({
+      soort: 'keten', zekerheid: 0.9, rijp: 1,
+      zaak: vb.supplierName, code: vb.supplierCode || null,
+      wat: 'uw aankomst bij ' + vb.supplierName + ' op ' + vb.aankomst,
+      waarom: 'de check-in staat vast, de rest van de keten nog niet',
+      vraag: 'Zet mijn aankomstketen voor ' + vb.aankomst + ' klaar: een transfer naar ' +
+        vb.supplierName + ' en een tafel voor die avond.'
+    });
+  }
+  return keten;
 }
 
 function modus(arr) {
@@ -63,19 +92,24 @@ function maakVoorspel({ db, findSupplier }) {
   const boek = () => Array.isArray(db.data.payBoekingen) ? db.data.payBoekingen : [];
   const naamVan = (code) => { const z = findSupplier(code); return z ? z.name : code; };
 
-  function voorLid(codenaam, nu = new Date()) {
+  function voorLid(codenaam, key, nu = new Date()) {
     const rek = 'lid:' + codenaam;
     const rijen = boek().filter(r => r.van === rek).slice(0, 400);
     const gewoonten = gewoontenUit(rijen, rek, nu);
-    const verwachtingen = gewoonten.slice(0, 3).map(g => ({
-      zaak: naamVan(g.code), code: g.code, zekerheid: g.zekerheid, rijp: g.rijp,
+    // de vaste boekingen als extra bron: een zekere aankomst gaat voorop
+    const keten = key ? ketenUit({
+      verblijven: (db.data.verblijven || []).filter(v => (v.customerKey || v.key) === key),
+      reserveringen: (db.data.reserveringen || []).filter(r => r.customerKey === key)
+    }, nu) : [];
+    const verwachtingen = keten.concat(gewoonten.map(g => ({
+      soort: 'gewoonte', zaak: naamVan(g.code), code: g.code, zekerheid: g.zekerheid, rijp: g.rijp,
       wat: naamVan(g.code) + ' rond ' + g.uur + ':00' +
         (g.tussenDagen >= 4 ? ', meestal op ' + g.dagNaam : ''),
       waarom: g.n + ' eerdere bezoeken, gemiddeld elke ' +
         (g.tussenDagen < 1 ? 'dag' : Math.round(g.tussenDagen) + ' dagen'),
       vraag: 'Zet mijn gebruikelijke bezoek aan ' + naamVan(g.code) +
         ' klaar, rond ' + g.uur + ':00.'
-    }));
+    }))).slice(0, 3);
     return {
       ok: true, verwachtingen, geleerdUit: rijen.length,
       uitleg: verwachtingen.length ? null :
@@ -106,19 +140,27 @@ function maakVoorspel({ db, findSupplier }) {
       ? 'Plan de bezetting rond ' + drukUren.map(u => u.uur + ':00').join(' en ') +
         ' en zet de voorbereiding ruim daarvoor klaar.'
       : 'Nog geen duidelijke piek op deze weekdag; het beeld groeit met elke transactie.';
+    const verwachtTransacties = Math.round(opDag.length / weken);
+    // de keten tussen zaken: dezelfde verwachting, verwoord voor de inkoop,
+    // zodat boer en groothandel stil kunnen vooruitwerken (bestellen blijft
+    // altijd een menselijke keuze)
+    const bevoorrading = verwachtTransacties > 0
+      ? 'Voor de inkoop: reken op ongeveer ' + verwachtTransacties + ' transacties ' +
+        DAGEN[morgenDag] + '; geef dit door aan uw boer of groothandel zodat de voorraad erop is ingericht.'
+      : null;
     return {
       ok: true, geleerdUit: rijen.length, weken: +weken.toFixed(1),
       morgen: {
         dagNaam: DAGEN[morgenDag],
-        verwachtTransacties: Math.round(opDag.length / weken),
+        verwachtTransacties,
         verwachtCenten: Math.round(opDag.reduce((s, r) => s + r.centen, 0) / weken),
-        drukUren, advies
+        drukUren, advies, bevoorrading
       },
       vasteGasten
     };
   }
 
-  return { voorspel: { voorLid, voorZaak, gewoontenUit, seintjeVoor } };
+  return { voorspel: { voorLid, voorZaak, gewoontenUit, seintjeVoor, ketenUit } };
 }
 
-module.exports = { maakVoorspel, gewoontenUit, seintjeVoor, DAGEN };
+module.exports = { maakVoorspel, gewoontenUit, seintjeVoor, ketenUit, DAGEN };

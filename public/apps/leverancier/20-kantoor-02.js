@@ -35,7 +35,8 @@
                   '<b>'+m.verwachtTransacties+'</b> '+T('vw.trans','transacties')+' · <b>'+eur(m.verwachtCenten)+'</b> '+T('vw.omzet','omzet')+' ('+m.dagNaam+').'+
                   (m.drukUren.length ? ' '+T('vw.druk','Drukste uren')+': '+m.drukUren.map(u => u.uur+':00').join(', ')+'.' : '')+
                   ((vwData.vasteGasten||[]).length ? ' '+T('vw.gast','Vaste gasten')+': '+vwData.vasteGasten.map(g => g.codenaam).join(', ')+'.' : '')+
-                  (m.advies ? '<br>🧭 '+m.advies : '')+'</div>'
+                  (m.advies ? '<br>🧭 '+m.advies : '')+
+                  (m.bevoorrading ? '<br>📦 '+m.bevoorrading : '')+'</div>'
               : '<div class="tkc-who">'+(vwData.uitleg||'')+'</div>')+'</div>';
         }
         // baas over uw zaak: elke functie aan of uit; alleen app-betalen heeft

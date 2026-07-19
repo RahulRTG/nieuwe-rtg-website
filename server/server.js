@@ -1377,6 +1377,8 @@ function initRealtime() {
      eenheden over land, water en door de lucht. ---- */
   const HULP_TYPES = require('./kern/hulpdienst').HULP_TYPES;
   for (const [t, def] of Object.entries(HULP_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
+  const ZORG_TYPES = require('./kern/zorgketen').ZORG_TYPES;
+  for (const [t, def] of Object.entries(ZORG_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const HULP_KORPSEN = [
     { code: 'GUARDIA', name: 'Politie Ibiza', type: 'politie', city: 'Ibiza', loc: { lat: 38.912, lng: 1.438, label: 'Ibiza-stad' }, rate: 0, menu: [],
       hulpEenheden: [['Noodhulp 11', 'land'], ['Noodhulp 12', 'land'], ['Politieheli PH-1', 'heli'], ['Vliegdienst PV-2', 'lucht'], ['Patrouillevaartuig P-9', 'water']] },
@@ -1387,7 +1389,10 @@ function initRealtime() {
     { code: 'CANMISSES', name: 'Ziekenhuis Can Misses', type: 'ziekenhuis', city: 'Ibiza', loc: { lat: 38.916, lng: 1.425, label: 'Can Misses' }, rate: 0, menu: [] },
     { code: 'CONSULTA', name: 'Huisartsen Es Vive', type: 'huisarts', city: 'Ibiza', loc: { lat: 38.9, lng: 1.44, label: 'Es Vive' }, rate: 0, menu: [] },
     { code: 'FALCO', name: 'Eenheid Falco', type: 'specials', city: 'Ibiza', loc: { lat: 38.88, lng: 1.4, label: 'besloten locatie' }, rate: 0, menu: [],
-      hulpEenheden: [['Team Alfa', 'land'], ['Team Bravo', 'land'], ['Heli Falco-1', 'heli'], ['Interventievaartuig F-3', 'water']] }
+      hulpEenheden: [['Team Alfa', 'land'], ['Team Bravo', 'land'], ['Heli Falco-1', 'heli'], ['Interventievaartuig F-3', 'water']] },
+    { code: 'FARMACIA', name: 'Farmacia del Port', type: 'apotheek', city: 'Ibiza', loc: { lat: 38.91, lng: 1.433, label: 'de haven, Ibiza-stad' }, rate: 0, menu: [] },
+    { code: 'CARDIO', name: 'Specialisten Ibiza', type: 'specialist', city: 'Ibiza', loc: { lat: 38.915, lng: 1.427, label: 'bij Can Misses' }, rate: 0, menu: [] },
+    { code: 'ESTETICA', name: 'Clinica Estetica', type: 'beautymedical', city: 'Ibiza', loc: { lat: 38.909, lng: 1.44, label: 'Marina Botafoch' }, rate: 0, menu: [] }
   ];
   for (const p of HULP_KORPSEN) {
     const { hulpEenheden, ...zaak } = p;
@@ -1437,7 +1442,10 @@ function initRealtime() {
     ambulance: 'Hulpdienst op het RTG-net: meldkamer en overdracht. Geen 112-vervanging.',
     ziekenhuis: 'Zorgpartner op het RTG-net: beddenbord en opnames.',
     huisarts: 'Zorgpartner op het RTG-net: consulten en verwijzingen.',
-    specials: 'Besloten eenheid; uitsluitend inzet via een bijstandsverzoek van de politie.'
+    specials: 'Besloten eenheid; uitsluitend inzet via een bijstandsverzoek van de politie.',
+    apotheek: 'Zorgpartner op het RTG-net: recepten klaarzetten en uitreiken.',
+    specialist: 'Zorgpartner op het RTG-net: verwijzingen en specialistische consulten.',
+    beautymedical: 'Beauty medical op afspraak; behandelen doen we nooit zonder intake.'
   };
   const salonFotoVoor = (s) => {
     const t = db.data.supplierTypes[s.type] || {};
@@ -1463,7 +1471,8 @@ function initRealtime() {
       'AYAKA', 'KAITO', 'ESVEDRA', 'MACE', 'ISLAREN', 'IBIZALIV', 'MAISON', 'MERCABIZA',
       'AZUL', 'AEGIS', 'CANFERRER', 'LUMINA',
       'VORA', 'BRISA', 'FUEGO', 'LUNARA', 'MOTOISLA', 'FESTA', 'SERENA', 'ORODOR', 'LIENZO',
-      'GUARDIA', 'BOMBERS', 'URGENCIA', 'CANMISSES', 'CONSULTA', 'FALCO'];
+      'GUARDIA', 'BOMBERS', 'URGENCIA', 'CANMISSES', 'CONSULTA', 'FALCO',
+      'FARMACIA', 'CARDIO', 'ESTETICA'];
     const voor = db.data.suppliers.length;
     db.data.suppliers = db.data.suppliers.filter(s => !DEMO_ZAKEN.includes(s.code));
     // en de bijbehorende voorbeeldposts uit De Salon (de zes geseede verhalen)
@@ -2681,6 +2690,10 @@ Object.assign(kern, require('./kern/afdelingen')({ db, save, crypto, anthropic, 
    eenheden over land, water en door de lucht, bijstand tussen korpsen en
    de zorgketen ambulance -> ziekenhuis -> huisarts. */
 Object.assign(kern, require('./kern/hulpdienst')({ db, save, crypto, anthropic, findSupplier }));
+/* De zorgketen (kern/zorgketen.js): recepten naar de apotheek, de eerste
+   hulp met triagekleuren, verwijzingen en de agenda's van de specialist en
+   beauty medical. */
+Object.assign(kern, require('./kern/zorgketen')({ db, save, crypto, findSupplier }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));

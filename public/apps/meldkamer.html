@@ -66,7 +66,7 @@
         <button class="knop" id="lIn" type="button">Meld aan</button>
       </div>
       <p class="stil" id="lFout" aria-live="polite" style="margin-top:0.5rem;"></p>
-      <p class="stil" style="margin-top:0.6rem;">Demokorpsen: GUARDIA (politie), BOMBERS (brandweer), URGENCIA (ambulance), CANMISSES (ziekenhuis), CONSULTA (huisarts), FALCO (special forces, besloten). Manager-PIN 1234.</p>
+      <p class="stil" style="margin-top:0.6rem;">Demokorpsen: GUARDIA (politie), BOMBERS (brandweer), URGENCIA (ambulance), CANMISSES (ziekenhuis), CONSULTA (huisarts), FALCO (special forces, besloten), FARMACIA (apotheek), CARDIO (specialist), ESTETICA (beauty medical). Manager-PIN 1234.</p>
     </div>
   </section>
 
@@ -81,7 +81,7 @@
       </div>
       <div id="meldingen"><p class="stil">Laden…</p></div>
     </div>
-    <div class="kaart">
+    <div class="kaart" id="kEenheden">
       <h2 style="margin-top:0;">De eenheden</h2>
       <div id="eenheden" class="stil">Laden…</div>
       <div class="rij">
@@ -118,7 +118,55 @@
       </div>
       <div id="consulten"></div>
     </div>
-    <div class="kaart">
+    <div class="kaart" id="kSeh" hidden>
+      <h2 style="margin-top:0;">De eerste hulp (triagekleuren)</h2>
+      <div class="rij">
+        <input class="veld" id="sKlacht" placeholder="Waarmee komt de patient binnen?" maxlength="200">
+        <select id="sTriage" aria-label="Triagekleur"><option value="rood">Rood</option><option value="oranje">Oranje</option><option value="geel" selected>Geel</option><option value="groen">Groen</option><option value="blauw">Blauw</option></select>
+        <select id="sVia" aria-label="Via"><option value="balie">Balie</option><option value="ambulance">Ambulance</option></select>
+        <button class="knop" id="sBinnen" type="button">Neem aan</button>
+      </div>
+      <div id="sehRij"></div>
+    </div>
+    <div class="kaart" id="kRecepten" hidden>
+      <h2 style="margin-top:0;">Recepten voor deze apotheek</h2>
+      <div id="recepten"></div>
+    </div>
+    <div class="kaart" id="kVoorschrijf" hidden>
+      <h2 style="margin-top:0;">Recept voorschrijven</h2>
+      <div class="rij">
+        <select id="rApotheek" aria-label="Apotheek"></select>
+        <input class="veld" id="rMiddel" placeholder="Middel" maxlength="120">
+        <input class="veld" id="rDosering" placeholder="Dosering" maxlength="120" style="max-width:11rem;">
+        <button class="knop" id="rSchrijf" type="button">Schrijf voor</button>
+      </div>
+      <div id="eigenRecepten" class="stil"></div>
+    </div>
+    <div class="kaart" id="kVerwijs" hidden>
+      <h2 style="margin-top:0;">Verwijzen naar een specialist</h2>
+      <div class="rij">
+        <select id="vNaar" aria-label="Naar wie"></select>
+        <input class="veld" id="vReden" placeholder="Reden van de verwijzing" maxlength="200">
+        <button class="knop" id="vStuur" type="button">Verwijs door</button>
+      </div>
+      <p class="stil" id="vUit" aria-live="polite"></p>
+    </div>
+    <div class="kaart" id="kInbox" hidden>
+      <h2 style="margin-top:0;">Verwijzingen in de inbox</h2>
+      <div id="verwijzingen"></div>
+    </div>
+    <div class="kaart" id="kAfspraken" hidden>
+      <h2 style="margin-top:0;">De agenda</h2>
+      <div class="rij">
+        <input class="veld" id="aWat" placeholder="Waarvoor is de afspraak?" maxlength="120">
+        <input class="veld" id="aWanneer" placeholder="Wanneer (bijv. di 14:30)" maxlength="40" style="max-width:11rem;">
+        <label class="stil" id="aIntakeRij" style="display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" id="aIntake"> intake gedaan of dit is de intake</label>
+        <button class="knop" id="aMaak" type="button">Plan in</button>
+      </div>
+      <p class="stil" id="aUit" aria-live="polite"></p>
+      <div id="afspraken"></div>
+    </div>
+    <div class="kaart" id="kAi">
       <h2 style="margin-top:0;">De meldkamer-AI</h2>
       <div class="chat" id="aiChat"></div>
       <div class="rij">

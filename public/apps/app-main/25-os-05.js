@@ -44,5 +44,14 @@
           if (uit.has(REGIE[sleutel]) && LINKS[sleutel]) { delete LINKS[sleutel]; anders = true; }
         if (anders) bouw();
       }).catch(() => {});
+    /* De RTG Bank-tegel bestaat pas als de boardroom de leden-bank live heeft
+       gezet: de registry-invoer ontbreekt standaard ('link:bank' in de indeling
+       blijft dan onzichtbaar) en komt er hier bij zodra de bank online meldt. */
+    fetch('/api/bank/overzicht', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (d && d.online) { LINKS.bank = { naam: 'RTG Bank', icoon: '🏦', url: '/apps/bank.html' }; bouw(); }
+      }).catch(() => {});
   })();
 })();

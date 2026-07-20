@@ -230,6 +230,15 @@
     <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.6rem;">Loop nu een ronde</button></h3>
     <div class="kaart lijst" id="bVoorstellen"></div>
 
+    <h3 class="sec">De eigen-AI-dataset: alle logs voor het trainen van een eigen model</h3>
+    <div class="kaart" id="bAidata">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);">Eén knop bewaart alles wat RTG nodig heeft om later een eigen AI te trainen: de Rahul-gesprekken, de ballotage-intakes, het auditlog, de transacties en de kantoorchat, als JSONL-bestand. Alles op codenamen; de identiteitskluis blijft dicht.</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;">
+        <button class="knop" id="bAidataKnop" type="button">💾 Bewaar de AI-dataset</button>
+        <span class="stil" id="bAidataStand" style="font-size:.78rem;color:var(--soft);"></span>
+      </div>
+    </div>
+
     <h3 class="sec">De geld-regie: pasprijzen, partnervergoeding en ledenvoordeel</h3>
     <div class="kaart" id="bGeld">
       <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">
@@ -1640,6 +1649,32 @@ function bankRenderRek(rij){
   }));
 }
 
+/* ---------- de eigen-AI-dataset (boardroom) ---------- */
+let aidataGewired = false;
+async function laadAidata(){
+  try {
+    const d = await api('aidata');
+    $('#bAidataStand').textContent = d.totaal + ' records klaar: ' + Object.entries(d.bronnen).map(([b, n]) => b + ' ' + n).join(' · ');
+  } catch (e) { $('#bAidataStand').textContent = e.message; }
+  if (aidataGewired) return;
+  aidataGewired = true;
+  $('#bAidataKnop').addEventListener('click', async () => {
+    try {
+      const r = await fetch('/api/office/aidata/export', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: '{}' });
+      if (!r.ok) { const f = await r.json().catch(() => ({})); throw new Error(f.error || 'Export mislukt.'); }
+      const blob = await r.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'rtg-ai-dataset-' + new Date().toISOString().slice(0, 10) + '.jsonl';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      meld('AI-dataset bewaard.');
+      laadAidata();
+    } catch (e) { meld(e.message); }
+  });
+}
+
 /* ---------- de boardroom ---------- */
 async function openBoard(){
   zetKamerUrl('boardroom');
@@ -1656,6 +1691,7 @@ async function openBoard(){
     '<span style="color:var(--soft);font-size:.72rem;">'+new Date(a.at).toLocaleString('nl-NL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</span></div>').join('')
     : '<div class="leeg">Nog geen handelingen gelogd.</div>';
   chatWidget($('#bChat'), 'boardroom');
+  laadAidata();
   $('#bKamers').innerHTML = d.kamers.map(k =>
     '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+k.emoji+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');
   $('#bKamers').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => openKamer(b.dataset.kamer)));

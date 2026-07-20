@@ -78,6 +78,20 @@ module.exports = (ctx) => {
     return r;
   }));
 
+  /* De eigen-AI-dataset: het bord (hoeveel records per bron) en de knop die
+     alles als JSONL-bestand bewaart. Op codenamen; de kluis blijft dicht.
+     Elke export komt in het auditlog. */
+  app.post('/api/office/aidata', officeAuth, (req, res) => veilig(res, () => kern.aidataOverzicht()));
+  app.post('/api/office/aidata/export', officeAuth, (req, res) => {
+    try {
+      const r = kern.aidataExport();
+      afdelingen.audit(req.body.naam || 'boardroom', 'AI-dataset geexporteerd: ' + r.aantal + ' records (JSONL)');
+      res.setHeader('Content-Type', 'application/jsonl; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="rtg-ai-dataset-' + new Date().toISOString().slice(0, 10) + '.jsonl"');
+      res.send(r.jsonl);
+    } catch (e) { console.error('[aidata]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   // de paniekkamer: knoppen worden voorstellen; de boardroom besluit
   app.post('/api/office/paniek', officeAuth, (req, res) => veilig(res, () => afdelingen.paniekLijst()));
   app.post('/api/office/paniek/stel', officeAuth, (req, res) => veilig(res, () => {

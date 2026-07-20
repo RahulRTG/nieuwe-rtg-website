@@ -95,7 +95,7 @@ try { $('#vNaam').value = localStorage.getItem('rtg_veld_naam') || ''; } catch (
 $('#vNaam').addEventListener('input', () => { try { localStorage.setItem('rtg_veld_naam', $('#vNaam').value); } catch (e) {} });
 const wie = () => $('#vNaam').value.trim();
 
-const KLUS_IC = { onderhoud: '🔧', lucht: '🌫️', afval: '🗑️', geluid: '🔊', energie: '⚡' };
+const KLUS_IC = { onderhoud: '🔧', lucht: '🌫️', afval: '🗑️', geluid: '🔊', energie: '⚡', water: '💧', licht: '💡', verkeer: '🚦', parkeer: '🅿️' };
 const tijd = ms => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : Math.round(m / 60) + ' u geleden'; };
 
 async function laad(){

@@ -75,7 +75,8 @@ function render(){
       '<div class="dom"><div class="l">' + esc(d.label) + '</div>' +
       '<div class="w" style="color:' + (STAND[d.stand] || '#F4F1EC') + ';">' +
         (d.waarde == null ? 'stil' : esc(String(d.waarde)) + ' <span style="font-size:.65rem;color:var(--soft);">' + esc(d.eenheid) + '</span>') + '</div>' +
-      '<div style="font-size:.72rem;color:var(--soft);margin-top:.15rem;">' + esc(d.stand) + '</div></div>').join('') + '</div>' +
+      '<div style="font-size:.72rem;color:var(--soft);margin-top:.15rem;">' + esc(d.stand) +
+        (d.ovOnderweg != null ? ' · 🚌 ' + d.ovOnderweg + ' OV onderweg' : '') + '</div></div>').join('') + '</div>' +
     '<div class="sec">Iets kapot of vol gezien? Meld het</div>' +
     '<div class="kaart"><div class="rij">' +
       '<span><label for="mZone">Waar</label><select id="mZone">' + B.zones.map(z => '<option>' + esc(z) + '</option>').join('') + '</select></span>' +

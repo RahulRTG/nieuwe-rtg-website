@@ -1728,9 +1728,13 @@ async function openStad(){
   await stadVervers();
   stadAi();
 }
+let STADWERK = 0;
 async function stadVervers(){
-  try { STAD = await api('stad'); stadRenderScenario(); stadRenderDomeinen(); stadRenderNodeAan(); stadRenderNodes(); }
-  catch (e) { meld(e.message); }
+  try {
+    const [b, w] = await Promise.all([api('stad'), api('stad/werk')]);
+    STAD = b; STADWERK = (w.klussen || []).length;
+    stadRenderScenario(); stadRenderDomeinen(); stadRenderNodeAan(); stadRenderNodes();
+  } catch (e) { meld(e.message); }
 }
 function stadRenderScenario(){
   const b = STAD;
@@ -1792,7 +1796,7 @@ function stadRenderNodeAan(){
 function stadRenderNodes(){
   const rij = STAD.nodes;
   if (!rij.length){ $('#stadNodes').innerHTML = '<div class="leeg">Nog geen Stadsdozen.</div>'; return; }
-  $('#stadNodes').innerHTML = '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + STAD.vloot.online + ' van ' + STAD.vloot.totaal + ' online</div>' + rij.map(n =>
+  $('#stadNodes').innerHTML = '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + STAD.vloot.online + ' van ' + STAD.vloot.totaal + ' online · 🧰 ' + STADWERK + ' klus(sen) open op de veld-lijst</div>' + rij.map(n =>
     '<div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;' + bkLijn + '">' +
     '<span style="width:.6rem;height:.6rem;border-radius:50%;background:' + (n.online ? 'var(--gold)' : 'var(--soft)') + ';"></span>' +
     '<span style="flex:1;min-width:13rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">demo</span>' : '') +

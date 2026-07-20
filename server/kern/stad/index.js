@@ -46,6 +46,8 @@ module.exports = (deps) => {
   const ctx = { db, save, crypto, schoon, anthropic, beveilig, nu, d,
     ONLINE_MS, MAX_METINGEN, zones, nodes, metingen, regie, seintje };
 
+  // de OV-telling ook voor de deelbestanden (o.a. het bewonersbeeld)
+  ctx.verkeerExtra = () => { if (!verkeerBron) return null; try { return verkeerBron(); } catch (e) { return null; } };
   const dom = require('./domeinen')(ctx);
   ctx.DOMEINEN = dom.DOMEINEN; ctx.standVan = dom.standVan; ctx.alerts = dom.alerts;
   const vloot = require('./nodes')(ctx);

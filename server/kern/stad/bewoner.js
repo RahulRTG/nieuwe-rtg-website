@@ -25,7 +25,11 @@ module.exports = (ctx) => {
     const s = SCENARIOS.find(x => x.naam === regie().scenario);
     return { status: 200,
       scenario: { naam: regie().scenario, label: s ? s.label : regie().scenario, uitleg: s ? s.uitleg : '' },
-      domeinen: DOMEINEN.map(x => ({ id: x.id, label: x.label, eenheid: x.eenheid, ...standVan(x.id) })),
+      domeinen: DOMEINEN.map(x => {
+        const rij = { id: x.id, label: x.label, eenheid: x.eenheid, ...standVan(x.id) };
+        if (x.id === 'verkeer') { const v = ctx.verkeerExtra && ctx.verkeerExtra(); if (v) rij.ovOnderweg = Number(v.ovOnderweg) || 0; }
+        return rij;
+      }),
       alerts: alerts(), zones: zones().slice(), soorten: SOORTEN,
       mijnMeldingen: meldingen().filter(m => m.codenaam === codenaam).slice(0, 20)
         .map(m => ({ id: m.id, zone: m.zone, soort: m.soort, tekst: m.tekst, status: m.status, at: m.at, klaarAt: m.klaarAt || null })),

@@ -118,6 +118,7 @@ test('Mijn Stad (bewoner): kijken mag, melden landt bij de veldploeg en komt kla
   assert.equal(b.status, 200);
   assert.equal(b.body.domeinen.length, 8, 'de standen staan erop');
   assert.ok(!JSON.stringify(b.body.domeinen).includes('regime'), 'geen regimeknoppen of bedrijfsvoering voor de bewoner');
+  assert.equal(typeof b.body.domeinen.find(d => d.id === 'verkeer').ovOnderweg, 'number', 'de bewoner ziet ook de OV-telling');
   assert.match(b.body.privacy, /geen mensen/);
 
   // een gast mag meekijken, maar niet melden

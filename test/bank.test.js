@@ -193,3 +193,87 @@ test('de Butler-drempel: bankpaden die geld bewegen komen eerst terug als voorst
   assert.equal(doe.status, 428, 'een bank-geldpad komt eerst terug als voorstel');
   assert.equal(doe.body.bevestigNodig, true, 'geen directe uitvoering: eerst bevestigen');
 });
+
+test('RTFoundation: in de eigen-stand gaat de 30%-afdracht door het eigen grootboek', async () => {
+  await naarPartner();
+  await naarEigen();
+  // een business-lid betaalt zijn open maandbijdrage
+  const l = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'business' }) })).json();
+  const st = (await api('state', {}, l.token)).body.state;
+  const abo = (st.invoices || []).find(i => /maandbijdrage|lidmaatschap|jaarbijdrage/i.test(i.desc || '') && i.status === 'open');
+  assert.ok(abo, 'er staat een open abonnementsfactuur klaar');
+  const voor = (await oapi('bank/gezond', {}, 'RTG')).body.foundationCenten || 0;
+  const betaald = await api('pay', { invoiceId: abo.id }, l.token);
+  assert.equal(betaald.status, 200);
+  // de afdracht staat nu als echte boeking op de foundation-tegenrekening
+  const g = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(g.foundationCenten - voor, Math.round(betaald.body.foundation * 100), 'exact het teruggemelde foundation-deel, via het eigen grootboek');
+  assert.equal(g.sluit.klopt, true, 'de sluitcontrole blijft kloppen');
+  await naarPartner();
+});
+
+let noraIban = null; // ook gebruikt door de CSV-test (eigendomscontrole)
+test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de run betaalt uit', async () => {
+  // Nora Prins (personeel bij Sal de Mar, gekoppeld aan een RTG-account) geeft
+  // akkoord en krijgt haar eigen betaalrekening
+  const nl = await (await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'nora@rtg.example', password: 'werk' }) })).json();
+  assert.ok(nl.token, 'Nora logt in met haar RTG-account');
+  await api('bank/akkoord', {}, nl.token);
+  const nOv = await api('bank/overzicht', {}, nl.token);
+  noraIban = (nOv.body.rekeningen.find(r => r.soort === 'betaal') || {}).iban;
+  assert.ok(noraIban, 'Nora heeft een betaalrekening');
+
+  // de manager boekt klokcorrecties: Nora en Mateo werkten allebei 2 uur deze
+  // maand (vergeten te klokken); bij een maandgrens klemt de test naar vandaag
+  const roster = await api('supplier/roster', { code: 'KIKUNOI' });
+  const mateo = roster.body.staff.find(x => x.role === 'manager');
+  const nora = roster.body.staff.find(x => x.name === 'Nora Prins');
+  const mgr = (await api('supplier/login', { code: 'KIKUNOI', staffId: mateo.id, pin: '1234' })).body.token;
+  const nu = new Date();
+  let inAt = new Date(nu.getTime() - 3 * 3600000);
+  const maandStart = new Date(nu.getFullYear(), nu.getMonth(), 1, 0, 1);
+  if (inAt < maandStart) inAt = maandStart;
+  const uitAt = new Date(inAt.getTime() + 2 * 3600000);
+  const c1 = await api('staff/klok/correctie', { staffId: nora.id, in: inAt.toISOString(), uit: uitAt.toISOString() }, mgr);
+  assert.equal(c1.status, 200, 'de manager boekt een klokcorrectie');
+  await api('staff/klok/correctie', { staffId: mateo.id, in: inAt.toISOString(), uit: uitAt.toISOString() }, mgr);
+  // een gewone medewerker mag dat niet
+  const staf = (await api('supplier/login', { code: 'KIKUNOI', staffId: nora.id, pin: '5678' })).body.token;
+  assert.ok((await api('staff/klok/correctie', { staffId: nora.id, in: inAt.toISOString(), uit: uitAt.toISOString() }, staf)).status >= 400, 'de klokcorrectie is manager-only');
+
+  // het voorstel: dezelfde uren en hetzelfde uurloon als het fiscale bord
+  const v = await oapi('bank/salaris/voorstel', { zaak: 'KIKUNOI' }, 'RTG');
+  assert.equal(v.status, 200);
+  const rNora = v.body.regels.find(r => r.naam === 'Nora Prins');
+  assert.ok(rNora, 'Nora staat in het voorstel');
+  assert.equal(rNora.iban, noraIban, 'gematcht op haar eigen betaalrekening (lid-koppeling)');
+  assert.ok(rNora.uren >= 2, 'de gecorrigeerde uren tellen mee');
+  assert.equal(rNora.brutoCenten, Math.round(rNora.uren * v.body.uurloon * 100), 'bruto = uren x het uurloon van de zaak');
+  assert.ok(v.body.zonderRekening.some(z => z.naam === mateo.name), 'wie geen lid-koppeling heeft staat eerlijk in het niet-uitbetaalbare lijstje');
+
+  // de run: het kantoor betaalt vanaf een gedekte zakelijke rekening (van een
+  // vers lid; de rtg-persona zit hierboven al aan zijn rekeningen-plafond)
+  const l2 = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
+  const cn = (await api('pay/overzicht', {}, l2.token)).body.codenaam;
+  const zak = await oapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk' }, 'RTG');
+  const zakIban = zak.body.rekening.iban;
+  await api('bank/storten', { iban: zakIban, centen: 100000, idem: 'sal-dek' }, l2.token);
+  const run = await oapi('bank/salaris/run', { zaak: 'KIKUNOI', vanIban: zakIban }, 'RTG');
+  assert.equal(run.status, 200);
+  assert.equal(run.body.totaalCenten, v.body.totaalCenten, 'de run betaalt exact het voorstel uit');
+  const af = await api('bank/afschrift', { iban: noraIban }, nl.token);
+  assert.ok(af.body.regels.some(r => r.soort === 'salaris' && !r.af), 'het salaris staat als bijschrijving op Nora’s afschrift');
+});
+
+test('afschrift-export: het lid downloadt zijn eigen rekening als CSV; andermans rekening blijft dicht', async () => {
+  const r = await fetch(base + '/api/bank/afschrift.csv?token=' + encodeURIComponent(lid.token) + '&iban=' + encodeURIComponent(lid.iban));
+  assert.equal(r.status, 200);
+  assert.match(r.headers.get('content-type') || '', /text\/csv/);
+  const regels = (await r.text()).trim().split('\n');
+  assert.ok(regels[0].includes('datum;af/bij;bedrag'), 'nette NL-kopregel');
+  assert.ok(regels.length >= 2, 'de boekingen staan erin');
+  // zonder token dicht, en andermans rekening dicht (eigendomscontrole)
+  assert.equal((await fetch(base + '/api/bank/afschrift.csv?iban=' + encodeURIComponent(lid.iban))).status, 401);
+  const vreemd = await fetch(base + '/api/bank/afschrift.csv?token=' + encodeURIComponent(lid.token) + '&iban=' + encodeURIComponent(noraIban));
+  assert.ok(vreemd.status === 403 || vreemd.status === 404, 'andermans afschrift is niet te downloaden');
+});

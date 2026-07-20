@@ -40,6 +40,15 @@ function maakFonds(state) {
   const log = state.log || null;
   const env = state.env || process.env;
 
+  /* De bank-naad (laat gebonden: de RTG Bank ontstaat pas na dit fonds).
+     Draait de boardroom-knop op "eigen", dan gaat de afdracht als boeking door
+     het eigen grootboek in plaats van via de externe betaal-naad. De functie
+     zelf beslist (kijkt naar de effectieve clearing) en geeft null terug als
+     de eigen rails niet aan de beurt zijn -- dan valt alles hieronder gewoon
+     terug op de bestaande betaal-naad. */
+  let bankAfdracht = null;
+  function koppelBank(fn) { if (typeof fn === 'function') bankAfdracht = fn; }
+
   function bestemming() {
     return {
       iban: (env.RTF_IBAN || '').trim(),
@@ -78,6 +87,25 @@ function maakFonds(state) {
       status: best.iban ? 'ingepland' : 'te_storten',
       at: new Date().toISOString()
     };
+
+    // In de eigen-stand loopt de afdracht over de eigen rails: een boeking van
+    // de reserve naar de foundation-tegenrekening, per direct afgewikkeld.
+    if (bankAfdracht) {
+      try {
+        const eigen = bankAfdracht({ centen, referentie: afdracht.id, oms: 'RTFoundation-afdracht ' + (invoiceId || '') });
+        if (eigen && eigen.ok) {
+          afdracht.status = 'gestort';
+          afdracht.via = 'eigen-bank';
+          afdracht.boekingId = eigen.boeking ? eigen.boeking.id : null;
+          rijen.push(afdracht);
+          if (rijen.length > 100000) rijen.splice(0, rijen.length - 100000);
+          save();
+          return afdracht;
+        }
+      } catch (e) {
+        if (log && log.warn) log.warn('rtf-afdracht: eigen-bank-boeking mislukt', { invoiceId, fout: e.message });
+      }
+    }
 
     // Met een bekend IBAN meteen als uitbetaling wegzetten via de betaal-naad.
     if (best.iban && betaal && typeof betaal.maakUitbetaling === 'function') {
@@ -130,7 +158,7 @@ function maakFonds(state) {
     };
   }
 
-  return { isAbonnement, aandeelCenten, aandeelEuro, boekAfdracht, overzicht, bestemming, AANDEEL };
+  return { isAbonnement, aandeelCenten, aandeelEuro, boekAfdracht, overzicht, bestemming, koppelBank, AANDEEL };
 }
 
 module.exports = { maakFonds, isAbonnement, aandeelCenten, aandeelEuro, AANDEEL };

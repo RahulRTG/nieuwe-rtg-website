@@ -78,6 +78,39 @@ test('fonds: met IBAN wordt de afdracht meteen ingepland als uitbetaling', async
   assert.equal(a.iban, 'NL11FOUND0000000001');
 });
 
+test('fonds: op de eigen rails (bank-naad) boekt de afdracht meteen als gestort', async () => {
+  const db = nepDb();
+  const fonds = maakFonds({ db, save: () => {}, betaal, env: { RTF_IBAN: 'NL11FOUND0000000001' } });
+  // de bank-naad zoals server.js hem koppelt: alleen als de knop effectief op
+  // "eigen" staat een boeking, anders null -> terugval op de betaal-naad
+  let eigen = false; const boekingen = [];
+  fonds.koppelBank(({ centen, referentie, oms }) => {
+    if (!eigen) return null;
+    boekingen.push({ centen, referentie, oms });
+    return { ok: true, boeking: { id: 'BB-TEST' } };
+  });
+
+  // stand partner: de naad geeft null en de betaal-naad plant gewoon in
+  const a = await fonds.boekAfdracht({ invoiceId: 'INV-3', wie: 'acc:3', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
+  assert.equal(a.status, 'ingepland', 'buiten de eigen-stand verandert er niets');
+  assert.equal(a.via, undefined);
+
+  // stand eigen: dezelfde soort factuur gaat als boeking door het eigen grootboek
+  eigen = true;
+  const b = await fonds.boekAfdracht({ invoiceId: 'INV-4', wie: 'acc:3', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
+  assert.equal(b.status, 'gestort', 'op de eigen rails is de afdracht per direct afgewikkeld');
+  assert.equal(b.via, 'eigen-bank');
+  assert.equal(b.boekingId, 'BB-TEST');
+  assert.equal(boekingen.length, 1);
+  assert.equal(boekingen[0].centen, 1950, 'exact het 30%-ex-btw-bedrag');
+  assert.equal(fonds.overzicht().gestortCenten, 1950);
+
+  // een kapotte bank-naad laat de afdracht nooit zoekraken: terugval
+  fonds.koppelBank(() => { throw new Error('bank stuk'); });
+  const c = await fonds.boekAfdracht({ invoiceId: 'INV-5', wie: 'acc:3', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
+  assert.equal(c.status, 'ingepland', 'bij een bankfout valt de afdracht terug op de betaal-naad');
+});
+
 // ---- 3. end-to-end ----
 let srv, base;
 test.before(async () => {

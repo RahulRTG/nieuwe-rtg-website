@@ -114,7 +114,8 @@ function render(){
       '<span><label for="obed">Bedrag (€)</label><input id="obed" type="number" min="0" step="0.01" style="width:7rem;"></span>' +
       '<button class="knop stil" id="odoe">Overboek</button></div></div>';
   bindBank(reks);
-  ai();
+  if (!STIL) ai();
+  STIL = false;
 }
 
 const rekSelect = id => '<select id="' + id + '">' + (OV.rekeningen||[]).map(r => '<option value="' + r.iban + '">' + esc(r.soortLabel || r.soort) + ' · ' + euro(r.saldoCenten) + '</option>').join('') + '</select>';
@@ -126,6 +127,7 @@ function rekHtml(r){
       '<button class="knop stil mini" data-pas="' + r.iban + '">Pas</button>' +
       (r.soort === 'spaar' ? '<button class="knop stil mini" data-doel="' + r.iban + '">Spaardoel</button>' : '') +
       '<button class="knop stil mini" data-afschrift="' + r.iban + '">Afschrift</button>' +
+      '<button class="knop stil mini" data-csv="' + r.iban + '" title="Download het afschrift als CSV-bestand">⬇ CSV</button>' +
     '</div><div class="afschrift" data-blad="' + r.iban + '" hidden style="flex-basis:100%;font-size:.78rem;color:var(--muted);line-height:1.7;"></div></div>';
 }
 function bindBank(reks){
@@ -149,6 +151,11 @@ function bindBank(reks){
     const euroS = prompt('Wat is je spaardoel? (euro)'); if (euroS == null) return;
     try { const r = await api('bank/spaardoel', { iban: b.dataset.doel, euro: Number(euroS) }); alert('Spaardoel gezet. Je bent op ' + r.pct + '%.'); } catch (e) { alert(e.message); }
   }));
+  // afschrift-export: het volledige afschrift als CSV-download (de server
+  // controleert het token en het eigendom van de rekening)
+  document.querySelectorAll('[data-csv]').forEach(b => b.addEventListener('click', () => {
+    location.href = '/api/bank/afschrift.csv?token=' + encodeURIComponent(TOKEN) + '&iban=' + encodeURIComponent(b.dataset.csv);
+  }));
   // het afschrift: de laatste boekingen van deze rekening, uitklapbaar
   document.querySelectorAll('[data-afschrift]').forEach(b => b.addEventListener('click', async () => {
     const blad = document.querySelector('.afschrift[data-blad="' + b.dataset.afschrift + '"]');
@@ -164,6 +171,23 @@ function bindBank(reks){
   }));
 }
 async function herlaad(){ OV = await api('bank/overzicht'); render(); }
+
+/* Live: de server stuurt een seintje (SSE, scope 'bank') bij elke boeking die
+   deze rekeninghouder raakt -- rente, een tik-dekking vanaf de bank, een
+   binnenkomende overboeking. Het scherm ververst dan vanzelf, zonder de
+   AI-bankier opnieuw aan het woord te laten (STIL) en met een korte demper
+   zodat een reeks boekingen één verversing wordt. */
+let STIL = false, ES = null, EST = null;
+function live(){
+  if (!window.EventSource || ES) return;
+  try { ES = new EventSource('/api/stream?token=' + encodeURIComponent(TOKEN)); } catch (e) { return; }
+  ES.addEventListener('sync', e => {
+    let scope = null; try { scope = JSON.parse(e.data).scope; } catch (x) {}
+    if (scope !== 'bank' || !OV) return;
+    clearTimeout(EST);
+    EST = setTimeout(() => { STIL = true; herlaad().catch(() => { STIL = false; }); }, 400);
+  });
+}
 
 /* de AI-bankier, diep geworteld: laadt bij het openen meteen een analyse, en
    antwoordt op vragen met de volle context van de eigen rekeningen. */
@@ -181,6 +205,7 @@ async function ai(vraag){
 }
 
 laad();
+live();
 </script>
 </body>
 </html>

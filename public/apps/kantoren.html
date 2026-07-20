@@ -513,6 +513,9 @@
     <h3 class="sec">Openstaande kredietaanvragen (een mens beslist)</h3>
     <div class="kaart lijst" id="bankKrediet"><div class="leeg">Geen aanvragen.</div></div>
 
+    <h3 class="sec">Salarisrun uit de klokuren</h3>
+    <div class="kaart" id="bankSalaris"></div>
+
     <h3 class="sec">Rekeningen <button class="knop stil" id="bankRenteBtn" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.4rem;">Renteronde nu</button> <button class="knop stil" id="bankIncassoBtn" style="padding:.25rem .8rem;font-size:.75rem;">Incassoronde nu</button></h3>
     <div class="kaart" id="bankRekOpen"></div>
     <div class="kaart lijst" id="bankRek"><div class="leeg">Nog geen rekeningen.</div></div>
@@ -1549,7 +1552,7 @@ async function bankVervers(){
   try {
     const [o, k] = await Promise.all([api('bank'), api('bank/krediet')]);
     bankRenderKnop(o.regie); bankRenderGezond(o.gezondheid); bankRenderInstel(o.regie);
-    bankRenderKrediet(k.aanvragen); bankRenderRekOpen(); bankRenderRek(o.rekeningen);
+    bankRenderKrediet(k.aanvragen); bankRenderSalaris(o.rekeningen); bankRenderRekOpen(); bankRenderRek(o.rekeningen);
   } catch (e) { meld(e.message); }
 }
 async function bankRonde(soort){
@@ -1601,7 +1604,7 @@ function bankRenderKnop(r){
   if ($('#bankIntrek')) $('#bankIntrek').addEventListener('click', async () => { try { await api('bank/autoriseer/annuleer', { naam: bankWie }); meld('Ingetrokken.'); bankVervers(); } catch (err) { meld(err.message); } });
 }
 function bankRenderGezond(g){
-  const tegels = [['Deposito', bkEuro(g.depositoCenten)], ['In omloop (eigen bank)', bkEuro(g.inOmloopCenten)], ['Krediet uit', bkEuro(g.kredietCenten)], ['Rente betaald', bkEuro(g.renteBetaaldCenten)], ['Reserve', bkEuro(g.reserveCenten)], ['Rekeningen', String(g.aantalRekeningen)], ['Sluitcontrole', g.sluit.klopt ? '✓ klopt' : '✗ ' + g.sluit.som]];
+  const tegels = [['Deposito', bkEuro(g.depositoCenten)], ['In omloop (eigen bank)', bkEuro(g.inOmloopCenten)], ['Krediet uit', bkEuro(g.kredietCenten)], ['Rente betaald', bkEuro(g.renteBetaaldCenten)], ['Reserve', bkEuro(g.reserveCenten)], ['Naar de foundation', bkEuro(g.foundationCenten)], ['Rekeningen', String(g.aantalRekeningen)], ['Sluitcontrole', g.sluit.klopt ? '✓ klopt' : '✗ ' + g.sluit.som]];
   $('#bankGezond').innerHTML = tegels.map(([l, v], i) =>
     '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + ((i === tegels.length - 1 && !g.sluit.klopt) ? 'border-color:var(--burgundy);' : '') + '"><div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div><div style="font-size:1.05rem;color:var(--gold);margin-top:.25rem;">' + esc(v) + '</div></div>').join('');
 }
@@ -1627,6 +1630,50 @@ function bankRenderKrediet(rij){
 }
 async function bankBesluit(id, akkoord){
   try { await api('bank/krediet/besluit', { id, akkoord }); meld(akkoord ? 'Goedgekeurd en gestort.' : 'Afgewezen.'); bankVervers(); } catch (e) { meld(e.message); }
+}
+/* De salarisrun uit de klokuren: het voorstel komt van de server (zelfde uren
+   en uurloon als het fiscale bord van de zaak, gematcht op de lid-koppeling
+   van het personeel); de boardroom kiest de bronrekening en voert de run uit.
+   Het formulier wordt maar één keer opgebouwd, zodat een live-verversing
+   (SSE) de ingevulde zaak-code en het voorstel niet wist. */
+function bankRenderSalaris(reks){
+  const doos = $('#bankSalaris');
+  if (!doos.dataset.gewired){
+    doos.dataset.gewired = '1';
+    doos.innerHTML =
+      '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Van klokuren naar loon: het voorstel rekent de geklokte maanduren van een zaak om naar loonbetalingen (zelfde uurloon als het fiscale bord) en betaalt uit op de gekoppelde betaalrekening van elk personeelslid.</p>' +
+      '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
+      '<span><label for="bankSalZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Zaak (code)</label><input id="bankSalZaak" placeholder="bijv. TOREN" style="width:9rem;"></span>' +
+      '<span><label for="bankSalVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Betaal vanaf</label><select id="bankSalVan" style="min-width:14rem;"></select></span>' +
+      '<button class="knop stil" id="bankSalMaak" type="button">Maak voorstel</button>' +
+      '<button class="knop" id="bankSalRun" type="button" hidden>Voer de run uit</button></div>' +
+      '<div id="bankSalUit" style="margin-top:.6rem;font-size:.85rem;"></div>';
+    $('#bankSalMaak').addEventListener('click', async () => {
+      try {
+        const v = await api('bank/salaris/voorstel', { zaak: $('#bankSalZaak').value });
+        $('#bankSalUit').innerHTML =
+          '<div style="color:var(--soft);margin-bottom:.35rem;">' + esc(v.zaakNaam) + ' · maand ' + esc(v.maand) + ' · uurloon € ' + v.uurloon + '</div>' +
+          v.regels.map(r => '<div style="padding:.3rem 0;' + bkLijn + '">' + esc(r.naam) + ' · ' + r.uren + ' uur · <strong>' + bkEuro(r.brutoCenten) + '</strong> ' +
+            (r.iban ? '<span style="font-size:.75rem;color:var(--soft);">→ ' + esc(r.iban) + '</span>' : '<span style="color:var(--burgundy-on-dark,#C23A5E);font-size:.78rem;">geen rekening</span>') + '</div>').join('') +
+          (v.zonderRekening.length ? '<div style="margin-top:.35rem;color:var(--soft);">Nog niet uitbetaalbaar: ' + v.zonderRekening.map(z => esc(z.naam) + ' (' + esc(z.reden) + ')').join(' · ') + '</div>' : '') +
+          '<div style="margin-top:.45rem;">Uitbetaalbaar: <strong style="color:var(--gold);">' + bkEuro(v.totaalCenten) + '</strong> van ' + bkEuro(v.brutoCenten) + ' bruto · daarbovenop ~' + v.lastenPct + '% werkgeverslasten (' + bkEuro(v.lastenCenten) + ') en vakantiegeldreserve ' + bkEuro(v.vakantiegeldCenten) + '</div>';
+        $('#bankSalRun').hidden = !v.posten.length;
+      } catch (e) { meld(e.message); }
+    });
+    $('#bankSalRun').addEventListener('click', async () => {
+      try {
+        const d = await api('bank/salaris/run', { zaak: $('#bankSalZaak').value, vanIban: $('#bankSalVan').value });
+        meld(d.geboekt + ' loonbetaling(en) geboekt: ' + bkEuro(d.totaalCenten));
+        $('#bankSalRun').hidden = true;
+        $('#bankSalUit').innerHTML = '<div style="color:var(--gold);">✓ Salarisrun ' + esc(d.maand) + ' uitgevoerd: ' + d.geboekt + ' betaling(en), ' + bkEuro(d.totaalCenten) + '.</div>';
+        bankVervers();
+      } catch (e) { meld(e.message); }
+    });
+  }
+  // de bronrekening-lijst vers houden, met behoud van de gemaakte keuze
+  const sel = $('#bankSalVan'); const keuze = sel.value;
+  sel.innerHTML = (reks || []).map(m => '<option value="' + m.iban + '">' + esc(m.codenaam) + ' · ' + esc(m.soort) + ' · ' + bkEuro(m.saldoCenten) + '</option>').join('');
+  if (keuze) sel.value = keuze;
 }
 function bankRenderRekOpen(){
   $('#bankRekOpen').innerHTML =
@@ -1905,10 +1952,25 @@ $('#bAllesUit').addEventListener('click', async () => {
 /* de boardroom ververst zichzelf zolang hij openstaat */
 setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }, 30000);
 
+/* Live: het office-kanaal (SSE). De bank-kern geeft bij elke boeking een
+   gedempt seintje (scope 'bank'); staat de bank-kamer open, dan ververst het
+   bord meteen -- rente, een storting van een lid, een salarisrun, alles
+   zonder te hoeven pollen. */
+let osse = null, osseT = null;
+function officeLive(){
+  if (!window.EventSource || osse || !TOKEN) return;
+  try { osse = new EventSource('/api/office/stream?token=' + encodeURIComponent(TOKEN)); } catch (e) { return; }
+  osse.addEventListener('sync', e => {
+    let scope = null; try { scope = JSON.parse(e.data).scope; } catch (x) {}
+    if (scope !== 'bank' || $('#vBank').hidden || document.hidden) return;
+    clearTimeout(osseT); osseT = setTimeout(bankVervers, 400);
+  });
+}
+
 /* de klok rechtsboven komt van de ene RTG-klok (/shared/klok.js) */
 (function () { const k = $('#wosKlok'); if (k) { k.setAttribute('data-rtg-klok', ''); if (window.RTGKlok) RTGKlok.alles(); } })();
 
-if (TOKEN) binnen().catch(uitgelogd);
+if (TOKEN) binnen().then(officeLive).catch(uitgelogd);
 else uitgelogd();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>

@@ -59,4 +59,31 @@ module.exports = (kern) => {
 
   // de AI-bankier (Rahul): advies over de eigen rekeningen; adviseert, beslist niet
   app.post('/api/bank/advies', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankAdvies({ codenaam: cn(req), vraag: req.body.vraag })); });
+
+  /* Afschrift-export: een net CSV-bestand van de eigen rekening om te bewaren
+     of in de boekhouding in te lezen. GET met ?token= (een downloadlink kan
+     geen Authorization-header meesturen), dezelfde gates als de rest. */
+  app.get('/api/bank/afschrift.csv', (req, res) => {
+    const sess = kern.resolveSession(String(req.query.token || ''));
+    if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
+    req.session = sess;
+    if (gate(req, res)) return;
+    const iban = String(req.query.iban || '');
+    const bezit = bank.rekeningDetail(iban, cn(req));
+    if (bezit.error) return stuur(res, bezit);
+    const esc = require('../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="rtg-afschrift-' + iban + '-' + new Date().toISOString().slice(0, 10) + '.csv"');
+    res.write('\uFEFF' + ['datum', 'af/bij', 'bedrag', 'soort', 'tegenrekening', 'omschrijving'].join(';') + '\n');
+    // het hele afschrift, in blokken langs de vaste paginagrens van de kern
+    for (let vanaf = 0; vanaf < 2000; vanaf += 200) {
+      const blok = bank.afschrift({ iban, limit: 200, offset: vanaf });
+      if (blok.error || !blok.regels.length) break;
+      for (const r of blok.regels)
+        res.write([new Date(r.at).toISOString().slice(0, 16).replace('T', ' '), r.af ? 'af' : 'bij',
+          (r.centen / 100).toFixed(2).replace('.', ','), r.soort, r.tegen, r.oms || ''].map(esc).join(';') + '\n');
+      if (blok.regels.length < 200) break;
+    }
+    res.end();
+  });
 };

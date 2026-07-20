@@ -2097,13 +2097,23 @@ Object.assign(kern, bankregie);
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, sseToCustomer, anthropic }));
+Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic }));
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */
 kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
   ? kern.bank.bankDekWallet({ codenaam, centen })
   : { status: 403, error: 'De leden-bank is niet live.' });
+/* De RTFoundation-afdracht over de eigen rails: staat de knop effectief op
+   "eigen" (en niet in nood), dan boekt de 30% als grootboekboeking van de
+   reserve naar de foundation-tegenrekening. Anders geeft de naad null terug
+   en volgt fonds.js gewoon de bestaande betaal-naad. Late binding, want het
+   fonds is eerder gemount dan de bank. */
+fonds.koppelBank(({ centen, referentie, oms }) => {
+  const c = bankregie.bankClearing();
+  if (c.modus !== 'eigen') return null;
+  return kern.bank.boek({ van: 'rtg:reserve', naar: 'extern:foundation', centen, soort: 'afdracht', oms, ref: referentie });
+});
 /* De eigen-AI-dataset (kern/aidata.js): een boardroom-knop verzamelt alle logs
    (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL om
    later een eigen model te trainen -- op codenamen, de kluis blijft dicht. */

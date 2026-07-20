@@ -19,7 +19,7 @@
    rente in ./sparen. */
 
 module.exports = (deps) => {
-  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, sseToCustomer, anthropic } = deps;
+  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic } = deps;
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -60,6 +60,7 @@ module.exports = (deps) => {
     grootboek().unshift(rij);
     if (grootboek().length > 100000) grootboek().pop();  // weergavecap; de saldi zijn de waarheid
     save();
+    bordSeintje();
     return { ok: true, boeking: rij };
   }
 
@@ -74,8 +75,18 @@ module.exports = (deps) => {
     try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'bank' }); }).catch(() => {}); } catch (e) {}
   }
 
+  /* Het office-bord live houden: elke boeking geeft een seintje naar de open
+     boardroom-schermen. Gedebounced (een korte tik na de laatste boeking),
+     zodat een bulkrun van duizenden posten niet duizenden events stuurt. */
+  let bordTimer = null;
+  function bordSeintje() {
+    if (!sseToOffice || bordTimer) return;
+    bordTimer = setTimeout(() => { bordTimer = null; try { sseToOffice('sync', { scope: 'bank' }); } catch (e) {} }, 250);
+    if (bordTimer.unref) bordTimer.unref();
+  }
+
   // de gedeelde context voor de deelbestanden
-  const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, anthropic,
+  const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
     nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, bodem, seintje };
 
   const rek = require('./rekeningen')(ctx);
@@ -108,6 +119,7 @@ module.exports = (deps) => {
     const rekN = Object.keys(rekeningen()).length;
     return { status: 200, sluit: sluitcontrole(), depositoCenten: deposito, kredietCenten: krediet,
       inOmloopCenten: emissie, reserveCenten: saldoVan('rtg:reserve'), renteBetaaldCenten: -saldoVan('rtg:rente'),
+      foundationCenten: saldoVan('extern:foundation'),
       aantalRekeningen: rekN, boekingenVandaag: grootboek().filter(b => nu() - b.at < 86400000).length };
   }
   function overzicht() {

@@ -109,6 +109,22 @@ module.exports = (ctx) => {
     return r;
   }));
 
+  /* Salarisrun gekoppeld aan de personeelskosten: het voorstel rekent de
+     geklokte maanduren van een zaak om naar posten (zelfde uurloon als het
+     fiscale bord, gematcht op de lid-koppeling van het personeel); de run
+     voert dat voorstel uit vanaf een gekozen bronrekening, door dezelfde
+     batch-voorcontrole als elke bulkbetaling. */
+  app.post('/api/office/bank/salaris/voorstel', officeAuth, (req, res) => veilig(res, () =>
+    bank.bankSalarisVoorstel({ zaak: req.body.zaak })));
+  app.post('/api/office/bank/salaris/run', officeAuth, (req, res) => veilig(res, () => {
+    const v = bank.bankSalarisVoorstel({ zaak: req.body.zaak });
+    if (v.error) return v;
+    if (!v.posten.length) return { status: 400, error: 'Geen uitbetaalbare posten: niemand met geklokte uren en een gekoppelde betaalrekening.' };
+    const r = bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten: v.posten });
+    if (r.ok) { afdelingen.audit(naam(req), 'Salarisrun ' + v.zaak + ' (' + v.maand + '): ' + r.geboekt + ' loonbetaling(en), € ' + (r.totaalCenten / 100).toFixed(2)); sync(); }
+    return r.ok ? { ...r, zaak: v.zaak, maand: v.maand, zonderRekening: v.zonderRekening } : r;
+  }));
+
   // de incassoronde: alle vaste betalingen die aan de beurt zijn uitvoeren
   app.post('/api/office/bank/incasso', officeAuth, (req, res) => veilig(res, () => {
     const r = bank.bankIncassoRonde(req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {});

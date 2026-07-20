@@ -23,6 +23,29 @@ app.post('/api/staff/klok/overzicht', supplierAuth, (req, res) => {
   res.json({ ok: true, rows });
 });
 
+/* Klokcorrectie (alleen de manager): uren bijboeken voor wie vergat te
+   klokken. Bewust begrensd -- alleen de afgelopen 31 dagen en hooguit een
+   etmaal per correctie -- zodat dit gereedschap blijft en geen achterdeur
+   wordt. De correctie draagt de naam van de manager en voedt dezelfde klok
+   als het fiscale bord en het salarisvoorstel van de bank. */
+app.post('/api/staff/klok/correctie', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const staffId = parseInt(req.body.staffId, 10);
+  const wie = accounts.listStaff(req.supplier.code).find(m => m.id === staffId);
+  if (!wie) return res.status(404).json({ error: 'Onbekend teamlid.' });
+  const inAt = new Date(req.body.in), uitAt = new Date(req.body.uit);
+  if (isNaN(inAt) || isNaN(uitAt) || uitAt <= inAt) return res.status(400).json({ error: 'Geef een geldige begin- en eindtijd.' });
+  if (uitAt - inAt > 86400000) return res.status(400).json({ error: 'Een correctie beslaat hooguit een etmaal.' });
+  if (inAt.getTime() > Date.now() || Date.now() - inAt.getTime() > 31 * 86400000) return res.status(400).json({ error: 'Een correctie kan alleen binnen de afgelopen 31 dagen.' });
+  const lijst = db.data.klok[req.supplier.code] = db.data.klok[req.supplier.code] || [];
+  lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), staffId, name: wie.name, in: inAt.toISOString(), out: uitAt.toISOString(), correctie: req.actor.name });
+  db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
+  save();
+  logActivity(req.supplier.code, req.actor, 'boekte een klokcorrectie voor ' + wie.name);
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
+  res.json({ ok: true, ...klokVan(req.supplier.code, staffId) });
+});
+
 /* Videobellen op de werkvloer (WebRTC). De server geeft alleen signalen door
    (bel, aannemen, offer/answer/ice); het beeld en geluid lopen rechtstreeks
    tussen de toestellen (peer-to-peer). 1-op-1 belt op staffId en alleen wie

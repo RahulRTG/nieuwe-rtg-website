@@ -12,11 +12,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
-let heeftPg = false;
-try { require.resolve('pg'); heeftPg = true; } catch (e) {}
+// De PostgreSQL-client is nu ingebouwd (server/pgwire), geen los pakket meer.
+// Deze test draait dus zodra er een DATABASE_URL is -- geen stille skip op een
+// afwezig 'pg'-pakket meer (dat zou een vals-groene test zijn).
 
-if (!URL || !heeftPg) {
-  test('chaos-schrijvers (overgeslagen: geen DATABASE_URL of pg-pakket)', { skip: true }, () => {});
+if (!URL) {
+  test('chaos-schrijvers (overgeslagen: geen DATABASE_URL)', { skip: true }, () => {});
 } else {
   process.env.PG_POOL_MAX = process.env.PG_POOL_MAX || '4';
   const { merge3 } = require('../server/db');

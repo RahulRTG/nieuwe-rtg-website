@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Verjaardagen &amp; wensen</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.7rem;}
+  .persoon{border:1px solid var(--lijn);border-radius:14px;padding:.9rem 1rem;margin-bottom:.9rem;}
+  .persoon.vandaag{border-color:var(--goud);}
+  .pkop{display:flex;align-items:baseline;gap:.6rem;justify-content:space-between;}
+  .pkop .nm{font-weight:600;font-size:1.05rem;}
+  .pkop .dt{font-size:.85rem;color:var(--zacht);white-space:nowrap;}
+  .telt{display:inline-block;margin-top:.15rem;font-size:.82rem;color:var(--goud2);}
+  .sect{margin-top:.7rem;}
+  .sect h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--zacht);margin-bottom:.35rem;}
+  .wens{display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--lijn);font-size:.9rem;}
+  .wens:last-child{border-bottom:0;}
+  .wens .w{flex:1;min-width:0;}
+  .wens.claimed .w{color:var(--zacht);}
+  .badge{font-size:.72rem;padding:.15rem .5rem;border-radius:999px;border:1px solid var(--lijn);color:var(--zacht);white-space:nowrap;}
+  .badge.mine{border-color:var(--goud);color:var(--goud2);}
+  .knopje{background:var(--paneel2);border:1px solid var(--lijn);border-radius:8px;color:var(--zacht);font-size:.75rem;padding:.2rem .5rem;cursor:pointer;white-space:nowrap;}
+  .knopje:hover{color:var(--tekst);border-color:var(--goud);}
+  .ikoon{background:var(--paneel2);border:1px solid var(--lijn);border-radius:8px;color:var(--zacht);width:1.7rem;height:1.7rem;font-size:.85rem;cursor:pointer;flex-shrink:0;}
+  .ikoon:hover{color:var(--tekst);border-color:var(--goud);}
+  .toevoeg{display:flex;gap:.4rem;margin-top:.5rem;}
+  .toevoeg .veld{flex:1;min-width:0;font-size:.85rem;}
+  .pot{margin-top:.5rem;font-size:.85rem;}
+  .balk{height:.4rem;background:var(--paneel2);border-radius:999px;overflow:hidden;margin:.35rem 0;}
+  .balk i{display:block;height:100%;background:var(--goud2);}
+  .rij{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
+  .kleiner{font-size:.8rem;color:var(--zacht);}
+  .nieuw{display:grid;grid-template-columns:1fr;gap:.5rem;}
+  .drie{display:flex;gap:.4rem;}
+  .drie input{min-width:0;}
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem;}
+  .chip{font-size:.78rem;padding:.3rem .6rem;border:1px solid var(--lijn);border-radius:999px;color:var(--zacht);background:transparent;cursor:pointer;}
+  .chip:hover{color:var(--tekst);border-color:var(--goud);}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🎂 Verjaardagen &amp; wensen</h1>
+  <div class="intro">Nooit meer een verjaardag vergeten. Houd wensenlijstjes bij, reserveer stiekem een cadeau zodat je niet dubbel koopt (de jarige ziet dat niet), en leg samen in het cadeaupotje.</div>
+
+  <div id="mensen"><div class="leeg">Laden…</div></div>
+
+  <div class="kaart blok">
+    <h2>Iemand toevoegen</h2>
+    <div class="nieuw">
+      <input class="veld" id="nNaam" placeholder="Naam" maxlength="40">
+      <div class="drie">
+        <input class="veld" id="nDag" type="number" min="1" max="31" placeholder="Dag">
+        <input class="veld" id="nMaand" type="number" min="1" max="12" placeholder="Maand">
+        <input class="veld" id="nJaar" type="number" min="1900" placeholder="Jaar (optioneel)">
+      </div>
+      <button class="knop" id="nDoe">In het boek zetten</button>
+      <div class="fout" id="nFout"></div>
+      <div class="chips" id="koppelbaar"></div>
+    </div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+const MAAND = ['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+function wanneer(p){
+  if (p.vandaag) return '🎉 vandaag jarig!';
+  if (p.dagenTot === 1) return 'morgen';
+  if (p.dagenTot <= 31) return 'over '+p.dagenTot+' dagen';
+  return p.dag+' '+MAAND[p.maand];
+}
+
+async function laad(){
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/verjaardagen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    if (d.error) throw new Error(d.error);
+    if (!d.mensen.length){ $('#mensen').innerHTML = '<div class="kaart blok"><div class="leeg">Nog niemand in het boek. Zet hieronder de eerste verjaardag erbij.</div></div>'; }
+    else $('#mensen').innerHTML = d.mensen.map(kaartHtml).join('');
+    d.mensen.forEach(bindPersoon);
+    // koppelbare gezinsleden
+    $('#koppelbaar').innerHTML = d.koppelbaar.map(k=>'<button class="chip" data-pid="'+k.pid+'" data-naam="'+esc(k.naam)+'">+ '+esc(k.naam)+'</button>').join('');
+    $('#koppelbaar').querySelectorAll('.chip').forEach(c=>{
+      c.onclick = ()=>{ $('#nNaam').value = c.dataset.naam; $('#nNaam').dataset.pid = c.dataset.pid; $('#nDag').focus(); };
+    });
+  }catch(e){ $('#mensen').innerHTML = '<div class="kaart blok"><div class="leeg">Kon de verjaardagen niet laden.</div></div>'; }
+}
+
+function kaartHtml(p){
+  const leeftijd = p.wordt!=null ? ' <span class="kleiner">wordt '+p.wordt+'</span>' : '';
+  let h = '<div class="kaart persoon'+(p.vandaag?' vandaag':'')+'" data-id="'+p.id+'">';
+  h += '<div class="pkop"><span class="nm">'+esc(p.naam)+leeftijd+'</span>'
+     + '<span class="dt">'+wanneer(p)+(p.kanWeg?' <button class="ikoon" data-pdel title="Uit het boek">×</button>':'')+'</span></div>';
+  if (p.dagenTot<=60 && !p.vandaag) h += '<span class="telt">🎁 '+p.dagenTot+' dagen te gaan</span>';
+  // wensen
+  h += '<div class="sect"><h3>Wensenlijst'+(p.benIkDeJarige?' (van jou)':'')+'</h3>';
+  if (!p.wensen.length) h += '<div class="leeg" style="font-size:.83rem;">Nog geen wensen.</div>';
+  else h += p.wensen.map(w=>{
+    let r = '<div class="wens'+(w.geclaimd?' claimed':'')+'" data-wid="'+w.id+'"><span class="w">'+esc(w.tekst)+'</span>';
+    if (!p.benIkDeJarige){
+      if (w.doorMijGeclaimd) r += '<span class="badge mine">jij regelt dit</span><button class="knopje" data-unclaim>vrijgeven</button>';
+      else if (w.geclaimd) r += '<span class="badge">'+esc(w.claimerNaam||'gereserveerd')+'</span>';
+      else r += '<button class="knopje" data-claim>ik regel dit</button>';
+    }
+    if (w.doorMij || p.benIkDeJarige) r += '<button class="ikoon" data-wdel title="Weg">×</button>';
+    return r + '</div>';
+  }).join('');
+  h += '<div class="toevoeg"><input class="veld wIn" placeholder="Wens erbij voor '+esc(p.naam)+'" maxlength="100"><button class="knop klein wAdd">+</button></div></div>';
+  // cadeaupotje (niet zichtbaar voor de jarige zelf)
+  if (p.pot){
+    const pct = p.pot.doel>0 ? Math.min(100, Math.round(p.pot.totaal/p.pot.doel*100)) : 0;
+    h += '<div class="sect"><h3>Cadeaupotje</h3><div class="pot">';
+    h += '<div class="rij"><b>€ '+p.pot.totaal.toFixed(2).replace('.',',')+'</b>'+(p.pot.doel>0?' <span class="kleiner">van € '+p.pot.doel+'</span>':'')+' <span class="kleiner">· '+p.pot.aantal+' bijdragen'+(p.pot.mijnInleg>0?', jij € '+p.pot.mijnInleg.toFixed(2).replace('.',','):'')+'</span></div>';
+    if (p.pot.doel>0) h += '<div class="balk"><i style="width:'+pct+'%"></i></div>';
+    h += '<div class="toevoeg"><input class="veld potIn" type="number" min="0" step="0.5" placeholder="Mijn inleg €"><button class="knop klein potAdd">Inleggen</button></div>';
+    h += '</div></div>';
+  }
+  return h + '</div>';
+}
+
+function bindPersoon(p){
+  const kaart = $('#mensen').querySelector('.persoon[data-id="'+p.id+'"]');
+  if (!kaart) return;
+  const pdel = kaart.querySelector('[data-pdel]');
+  if (pdel) pdel.onclick = ()=>{ if(confirm(p.naam+' uit het boek halen?')) doe('/gezin/verjaardag/persoon/verwijder', { persoonId:p.id }, true); };
+  // wensen
+  kaart.querySelectorAll('.wens').forEach(rij=>{
+    const wid = rij.dataset.wid;
+    const c = rij.querySelector('[data-claim]'); if (c) c.onclick = ()=> doe('/gezin/verjaardag/wens/claim', { wensId:wid, claim:true }, true);
+    const u = rij.querySelector('[data-unclaim]'); if (u) u.onclick = ()=> doe('/gezin/verjaardag/wens/claim', { wensId:wid, claim:false }, true);
+    const x = rij.querySelector('[data-wdel]'); if (x) x.onclick = ()=> doe('/gezin/verjaardag/wens/verwijder', { wensId:wid }, true);
+  });
+  const wIn = kaart.querySelector('.wIn'), wAdd = kaart.querySelector('.wAdd');
+  const voegWens = async ()=>{ const t=wIn.value.trim(); if(!t) return; await doe('/gezin/verjaardag/wens', { voorId:p.id, tekst:t }); laad(); };
+  wAdd.onclick = voegWens; wIn.addEventListener('keydown', e=>{ if(e.key==='Enter') voegWens(); });
+  // potje
+  const potIn = kaart.querySelector('.potIn'), potAdd = kaart.querySelector('.potAdd');
+  if (potAdd){
+    const leg = async ()=>{ const b=Number(potIn.value); if(!(b>0)) return; await doe('/gezin/verjaardag/potje/bijdrage', { persoonId:p.id, bedrag:b }); laad(); };
+    potAdd.onclick = leg; potIn.addEventListener('keydown', e=>{ if(e.key==='Enter') leg(); });
+  }
+}
+
+async function doe(pad, extra, herlaad){
+  try{ const r = await api(pad, Object.assign({ code:s.code, token:s.token }, extra)); if (herlaad) laad(); return r; }
+  catch(e){ alert(e.message); laad(); }
+}
+
+$('#nDoe').onclick = async ()=>{
+  $('#nFout').textContent='';
+  const naam = $('#nNaam').value.trim();
+  const dag = Number($('#nDag').value), maand = Number($('#nMaand').value), jaar = Number($('#nJaar').value)||undefined;
+  if (!naam) return $('#nFout').textContent = 'Vul een naam in.';
+  if (!(dag>=1&&dag<=31&&maand>=1&&maand<=12)) return $('#nFout').textContent = 'Vul een geldige dag en maand in.';
+  const pid = $('#nNaam').dataset.pid || '';
+  try{
+    await api('/gezin/verjaardag/persoon', { code:s.code, token:s.token, naam, dag, maand, jaar, pid });
+    $('#nNaam').value=''; $('#nDag').value=''; $('#nMaand').value=''; $('#nJaar').value=''; delete $('#nNaam').dataset.pid;
+    laad();
+  }catch(e){ $('#nFout').textContent = e.message; }
+};
+
+laad();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

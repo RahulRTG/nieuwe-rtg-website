@@ -13,5 +13,6 @@ module.exports = (ctx) => {
   Object.assign(ctx, deelLeven);
   require('./gasten/keuken')(ctx);
   require('./gasten/ochtend')(ctx);
+  require('./gasten/verjaardagen')(ctx);
   return deelKoppeling;
 };

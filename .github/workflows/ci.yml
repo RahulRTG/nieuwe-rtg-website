@@ -73,7 +73,7 @@ jobs:
         run: npm run secrets
 
   a11y:
-    name: Toegankelijkheid (axe)
+    name: Toegankelijkheid (eigen keuring)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +86,7 @@ jobs:
         run: |
           npm i --no-save playwright@^1.49.0
           npx playwright install --with-deps chromium
-      - name: Axe-scan van de vlaggenschip-schermen
+      - name: Eigen a11y-scan van de vlaggenschip-schermen
         run: node scripts/a11y.js
         env:
           A11Y_STRICT: '1'

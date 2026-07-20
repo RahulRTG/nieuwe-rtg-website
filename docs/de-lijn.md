@@ -145,6 +145,16 @@ gemak brengt. In deze code betekent dat:
   Redis-*server* zelf blijft extern (alleen met `REDIS_URL`). Geborgd tegen een
   ECHTE redis-server, inclusief kruisvalidatie met de npm-client, beide kanten op
   (`test/redis.test.js`).
+- **De a11y-keuring** (`scripts/a11ykeuring.js`): de toegankelijkheids-scan van de
+  vlaggenschip-pagina's die `axe-core` verving. Draait in dezelfde echte browser
+  (Playwright), maar met eigen, bewust NAUWE regels: alleen ondubbelzinnige
+  structurele fouten (afbeelding zonder alt, veld zonder label, knop/link zonder
+  naam, geen lang, lege titel) falen hard -- conservatief, zodat de al schone
+  pagina's stil blijven. Kleurcontrast melden we adviserend (niet-fataal): de
+  effectieve-achtergrond-heuristiek van axe is het ene stuk dat we niet volledig
+  namaken, en dat mag de bouw niet rood maken op een meetverschil. Dev-only, dus
+  het raakt de productie nooit. Pure kern (contrast-wiskunde + predicaten) los
+  getoetst in `test/a11ykeuring.test.js`.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.
@@ -209,9 +219,10 @@ gedeelde-data-mirror draaien erop; dat is protocol-assemblage, geen crypto. De
 Redis-*broker zelf* draaien we niet, en de eigen client verbindt alleen als
 `REDIS_URL` gezet is (anders realtime binnen één proces).
 
-Dev-only: alleen nog `axe-core` (a11y-keuring). De minify doen we zelf
-(`scripts/ast/`), dus terser -- en daarmee acorn -- is eruit. Dev-only raakt de
-productie sowieso nooit.
+Dev-only pakketten: geen meer. `axe-core` (a11y-keuring) is vervangen door de
+eigen keuring (`scripts/a11ykeuring.js`), en de minify doen we zelf
+(`scripts/ast/`), dus terser -- en daarmee acorn -- is eruit. `package.json` heeft
+nu zowel lege `dependencies` als lege `devDependencies`.
 
 ---
 

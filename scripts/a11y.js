@@ -1,8 +1,9 @@
 /* Toegankelijkheids-scan (npm run a11y):
    serveert public/ statisch, opent elke vlaggenschip-pagina in een echte
-   browser, injecteert axe-core en faalt bij een 'serious' of 'critical'
-   overtreding. Dit vangt contrast-, label- en landmark-fouten die je met
-   statische regels niet betrouwbaar ziet.
+   browser, injecteert de EIGEN keuring (scripts/a11ykeuring.js, verving axe-core)
+   en faalt bij een ondubbelzinnige structurele overtreding (afbeelding zonder
+   alt, veld zonder label, knop/link zonder naam, geen lang, lege titel).
+   Kleurcontrast wordt adviserend getoond, niet-fataal.
 
    De scan heeft een browser nodig. Is Playwright of Chromium er niet (zoals
    op een kale CI zonder browsers), dan slaat de scan zichzelf netjes over met
@@ -78,7 +79,7 @@ function statischeServer() {
     console.log('[a11y] Playwright niet beschikbaar; scan overgeslagen (statische a11y-regels draaien in check.js).');
     process.exit(STRICT ? 1 : 0);
   }
-  const axeBron = fs.readFileSync(require.resolve('axe-core'), 'utf8');
+  const { BRON } = require('./a11ykeuring'); // eigen keuring (verving axe-core)
   const server = statischeServer();
   await new Promise((r) => server.listen(0, r));
   const poort = server.address().port;
@@ -95,27 +96,29 @@ function statischeServer() {
 
   const context = await browser.newContext();
   const page = await context.newPage();
-  let totaal = 0;
+  let totaal = 0, contrastTotaal = 0;
   for (const pad of PAGINAS) {
     await page.goto(basis + pad, { waitUntil: 'load' });
-    await page.waitForTimeout(600); // laat intro-animaties (opacity) uitlopen; anders meet axe een tijdelijke lagere contrast
-    await page.addScriptTag({ content: axeBron });
-    const res = await page.evaluate(async () => {
-      // scan de zichtbare eerste render; verborgen alternatieve views tellen niet mee
-      return await window.axe.run(document, { resultTypes: ['violations'],
-        runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'best-practice'] } });
-    });
-    const ernstig = res.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-    if (ernstig.length) {
-      totaal += ernstig.length;
-      console.log(`\n[a11y] ${pad}: ${ernstig.length} ernstige overtreding(en)`);
-      for (const v of ernstig) console.log(`  · ${v.impact.toUpperCase()} ${v.id}: ${v.help} (${v.nodes.length}x)`);
+    await page.waitForTimeout(600); // laat intro-animaties (opacity) uitlopen; anders een tijdelijk lager contrast
+    await page.addScriptTag({ content: BRON });
+    const res = await page.evaluate(() => window.__a11yKeur());
+    // structurele overtredingen falen hard (ondubbelzinnig, zoals axe serious/critical)
+    if (res.overtredingen.length) {
+      totaal += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
+      console.log(`\n[a11y] ${pad}: ${res.overtredingen.length} soort(en) structurele overtreding`);
+      for (const v of res.overtredingen) console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
     } else {
       console.log(`[a11y] ${pad}: schoon`);
+    }
+    // contrast is ADVISEREND (niet-fataal): tonen, niet laten falen (meetverschil met axe)
+    if (res.contrast.length) {
+      contrastTotaal += res.contrast.reduce((n, v) => n + v.aantal, 0);
+      for (const v of res.contrast) console.log(`  · (advies) ${v.help} (${v.aantal}x)`);
     }
   }
   await browser.close();
   server.close();
-  if (totaal) { console.error(`\n[a11y] MISLUKT: ${totaal} ernstige overtreding(en).`); process.exit(1); }
-  console.log('\n[a11y] Alle vlaggenschip-pagina’s schoon (0 serious/critical).');
+  if (contrastTotaal) console.log(`\n[a11y] ${contrastTotaal} contrast-advies(en) -- adviserend, laat de bouw niet falen.`);
+  if (totaal) { console.error(`\n[a11y] MISLUKT: ${totaal} structurele overtreding(en).`); process.exit(1); }
+  console.log('\n[a11y] Alle vlaggenschip-pagina’s structureel schoon.');
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

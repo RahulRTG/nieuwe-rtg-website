@@ -4,62 +4,35 @@
    word onderwerp, STARTTLS-upgrade, AUTH LOGIN over TLS, en dat AUTH NOOIT over
    een onversleutelde verbinding gaat. Los: node --test test/smtp.test.js
 
-   Voor de TLS-paden staat hier een zelfondertekend testcertificaat; de client
-   valideert normaal het certificaat, dus in deze test zetten we tijdelijk
-   NODE_TLS_REJECT_UNAUTHORIZED uit (alleen om het testcert te accepteren). */
+   Voor de TLS-paden genereren we bij het opstarten een wegwerp-zelfondertekend
+   certificaat met openssl (geen sleutel in de repo -- dat zou de secret-scan
+   terecht rood maken). Is openssl er niet, dan slaan we alleen de TLS-subtests
+   over; de plaintext- en MIME-tests draaien altijd. De client valideert het
+   certificaat normaal, dus in de TLS-tests zetten we tijdelijk
+   NODE_TLS_REJECT_UNAUTHORIZED uit (alleen om dit wegwerpcert te accepteren). */
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const net = require('node:net');
 const tls = require('node:tls');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 const smtp = require('../server/smtp');
 
-const CERT = `-----BEGIN CERTIFICATE-----
-MIIDCzCCAfOgAwIBAgIUfj8BGKAK/84tF+17RNynX7DeMawwDQYJKoZIhvcNAQEL
-BQAwFDESMBAGA1UEAwwJbG9jYWxob3N0MCAXDTI2MDcyMDE1MzQyOVoYDzIxMjYw
-NjI2MTUzNDI5WjAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEB
-AQUAA4IBDwAwggEKAoIBAQC7dEwjxw3XByhgmTez+yloRPIii0gn+8WeUWmGr86o
-R7Y8MR9GSqMUmxphtEbUrIz+8J4JAGStyPIyDKskJCkOq+3ZfBB7z3/7nS+E/rx4
-fzpzdk7ABEuCwIK2Xo3rFRZ+86bbGCpKifbhdgTD2iAUaw5ku+idvUaW/dKYmOGJ
-ET8UkQsrNo8R3DE9h29wHoFXNlX6pxk/anndf7z5kzzolVJFgNRZhCOEkjIPJ7/G
-ckFWV1CH6JmijBbuHRAXSosj3SUJULRQaqQoltN7e1qZhrr3LkK9utQlDdQkxQ1q
-jlJe276Cea6Y6RTiHSG+UCUpDDotDrm+XPSno/axkHTtAgMBAAGjUzBRMB0GA1Ud
-DgQWBBSF+/V4lkMUzfqgQAJqm4w6z9HNGDAfBgNVHSMEGDAWgBSF+/V4lkMUzfqg
-QAJqm4w6z9HNGDAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQCA
-ljUPCUoi/lSZzbOssDbhCD0MtonEFlwJf3wN+PYOiDg6iQFwVEkRqONcEcGsprfs
-fKTQ0rktUPFmx/mDYmahSa3wJ6B9Xh5AkWMlqvjn360QglU8ddLDXo5IziZAZi4W
-HyWbUSOQVBEBll/nr+8GfsxTPSvxWlfJfZLozsCOgvZNoo+cV9lY3sokE09Y5Qq6
-3vgwFaqrGlMueLaLDJT8Bc6NSjZRxALj4Rqeh6dBgjNqt4O3lag6pQdbgU1qQMeN
-tdSzXjpaFuwJ7AhsV5mhM01J/zyBQ/SLBOujbmQu3HNcNyKkaA/vyeboId+wyEQf
-708r2C+4E9zymZmBFSCj
------END CERTIFICATE-----`;
-const KEY = `-----BEGIN PRIVATE KEY-----
-MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7dEwjxw3XByhg
-mTez+yloRPIii0gn+8WeUWmGr86oR7Y8MR9GSqMUmxphtEbUrIz+8J4JAGStyPIy
-DKskJCkOq+3ZfBB7z3/7nS+E/rx4fzpzdk7ABEuCwIK2Xo3rFRZ+86bbGCpKifbh
-dgTD2iAUaw5ku+idvUaW/dKYmOGJET8UkQsrNo8R3DE9h29wHoFXNlX6pxk/annd
-f7z5kzzolVJFgNRZhCOEkjIPJ7/GckFWV1CH6JmijBbuHRAXSosj3SUJULRQaqQo
-ltN7e1qZhrr3LkK9utQlDdQkxQ1qjlJe276Cea6Y6RTiHSG+UCUpDDotDrm+XPSn
-o/axkHTtAgMBAAECggEACfX/l8UbkKoSNLPfmGJHzIEhZsGE947y7NtBosUT07Bf
-2Cn6EfekW9N0Hu3/94wlv+RUWYEaWHu9lvhCXdzIC74KGQz1KUcY82tiW4xXwoVs
-Ozd1rtFrm8qUB5HVs8C+ncdfvfO2R5i2NDvbu/aKztrzfFnZ3gvxRNO/DZnOHkTj
-XzLN6Eu/32O09AmTRKhYGpnD53mkZ9AWZwY3hkHnnRzbBzpSuKHNkG7nS0smJ6QO
-o9Pmkno+SQakatUtlFWRocR8qrzRGXq+7yBj+dura5V+hMHAwLWFaej3wcHFSG7t
-GNYPLO7q6Vky0CtjJfpiQf4JnhsHJpltQFvcAvQdVwKBgQD42I0cj53i+zjsSkcm
-lJXoyWzIXhK6s8yiUAz64q1BH/1kV6Xe1sd2Nx0dUIR3rwxu0tBV4btC9V1uFJm0
-qyH2gUK3z34ll3VHb/LZs3zX/Qf7cx6sw/deuSUxOchltLGqOoEy5NjmmRSftTjL
-9rGX1fvdcs3DfJyA8JDdowJwKwKBgQDA1+sBFprBP8w559rawjNznnJxZxjq1+JW
-fy2xCXOAI0VUgbuAFMN/vtl6wzyEkbQXG4HN0RWAe++ErzNrxxR6XgJgDQ5L9AkR
-wAEkgl5+jLJYSe5SWU6Rbx16Zax9NNX3Eqm3GQIoPd1XMVyAUMAqbOGQlCC+2346
-6EgbwPSLRwKBgQCecUNn7AmbfFnCGYk0B2dr0NRyv3MtbU3eCxo4pBusW7H7MdNr
-D1Xw7yaag6nUiqBf79q21ANnntLeRD+ZyVzWl3bjkjm/ta/2zFDUTHQxEesDL0lY
-t23J4hjMPv5Zw7Nbr+STgyKXsOBwz/JZ67kn9Bdp6K8ayTzc3E9gz2m+AQKBgCtO
-EXLsHZJ5/iWewFHRvHYhRbfbnAfYtPYRlzQjWDGVOhNxEqb/gqtkMzhTMXrfsV5j
-CfIrGrYAntff9B8m1J1qEQR6yhQaWBMJV/hX4lpuw/n5mDAb5/3WwvribCqtu8LB
-CSWZ0xcwVU0oQ4p5F74vNzQdX4EcjysxUEgTO5cvAoGAA6n8eNjHwmyFQdOdR6Fq
-iD+3Fav9kfhvhDKJlZeUPOuFhFcteWre8zErFbV3SOABvUFWMbt07zaG43ObGluY
-cVS1fSnwSoDuFTpk9XgEuGfXPeHMGDieqiV/plx7ECRoRFCI0cLDld8vpwFZmYwN
-ByOfll5hbpez9ppf5B4o0AM=
------END PRIVATE KEY-----`;
+/* Wegwerp-testcert genereren (nooit committen): openssl schrijft sleutel + cert
+   naar een tijdelijke map, we lezen ze in het geheugen. Lukt dat niet, dan
+   worden de TLS-subtests overgeslagen. */
+let KEY = null, CERT = null, TLS_OK = false;
+try {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-smtp-'));
+  const k = path.join(dir, 'k.pem'), c = path.join(dir, 'c.pem');
+  execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-keyout', k,
+    '-out', c, '-days', '2', '-nodes', '-subj', '/CN=localhost'], { stdio: 'ignore' });
+  KEY = fs.readFileSync(k, 'utf8'); CERT = fs.readFileSync(c, 'utf8');
+  fs.rmSync(dir, { recursive: true, force: true });
+  TLS_OK = true;
+} catch (e) { TLS_OK = false; }
 
 /* Een nep-SMTP-server. opts: { starttls, auth, secure } -> stuurt de juiste
    capabilities en registreert wat de client stuurt. Praat het protocol zoals
@@ -142,7 +115,7 @@ test('niet-ASCII onderwerp wordt een RFC 2047 encoded-word', async () => {
   assert.equal(Buffer.from(woord, 'base64').toString('utf8'), 'Reünie café');
 });
 
-test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', async () => {
+test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', { skip: !TLS_OK }, async () => {
   const oud = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   let s;
@@ -162,7 +135,7 @@ test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', async ()
   }
 });
 
-test('implicit TLS (smtps://) met AUTH PLAIN', async () => {
+test('implicit TLS (smtps://) met AUTH PLAIN', { skip: !TLS_OK }, async () => {
   const oud = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   let s;

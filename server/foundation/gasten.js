@@ -14,5 +14,6 @@ module.exports = (ctx) => {
   require('./gasten/keuken')(ctx);
   require('./gasten/ochtend')(ctx);
   require('./gasten/verjaardagen')(ctx);
+  require('./gasten/gezondheid')(ctx);
   return deelKoppeling;
 };

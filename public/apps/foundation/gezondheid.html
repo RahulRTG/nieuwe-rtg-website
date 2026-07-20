@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Gezondheidsmaatje</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem;}
+  .allergie{border:1px solid var(--goud);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:1.1rem;background:color-mix(in srgb, var(--goud2) 8%, transparent);}
+  .allergie h2{font-size:1rem;margin-bottom:.3rem;}
+  .allergie .txt{white-space:pre-wrap;line-height:1.5;}
+  .allergie.geen{border-color:var(--lijn);background:none;color:var(--zacht);}
+  .kies{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.4rem;margin-bottom:.9rem;}
+  .kies button{white-space:nowrap;padding:.45rem .9rem;border-radius:999px;border:1px solid var(--lijn);background:var(--paneel2);color:var(--zacht);cursor:pointer;font-size:.9rem;}
+  .kies button.aan{border-color:var(--goud);color:var(--tekst);}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--lijn);}
+  .rij:last-child{border-bottom:0;}
+  .rij .vink{width:1.4rem;height:1.4rem;flex-shrink:0;accent-color:var(--goud2);}
+  .rij .mid{flex:1;min-width:0;}
+  .rij .mid b{display:block;}
+  .rij.gedaan .mid b{color:var(--zacht);}
+  .rij .meta{font-size:.78rem;color:var(--zacht);}
+  .ikoon{background:var(--paneel2);border:1px solid var(--lijn);border-radius:8px;color:var(--zacht);width:1.8rem;height:1.8rem;font-size:.85rem;cursor:pointer;flex-shrink:0;}
+  .ikoon:hover{color:var(--tekst);border-color:var(--goud);}
+  .badge{font-size:.72rem;padding:.15rem .5rem;border-radius:999px;border:1px solid var(--lijn);color:var(--zacht);white-space:nowrap;}
+  .badge.soon{border-color:var(--goud);color:var(--goud2);}
+  .toevoeg{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem;}
+  .toevoeg input{min-width:0;flex:1;}
+  .toevoeg input.sm{flex:0 0 5.5rem;}
+  .curve{display:flex;align-items:flex-end;gap:.25rem;height:4rem;margin:.6rem 0;}
+  .curve .bar{flex:1;background:var(--goud2);border-radius:3px 3px 0 0;min-height:.2rem;opacity:.85;}
+  .laatste{display:flex;gap:1.4rem;font-size:.9rem;margin-bottom:.3rem;}
+  .laatste b{font-size:1.15rem;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.88rem;padding:.3rem 0;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🩺 Gezondheidsmaatje</h1>
+  <div class="intro">Houd samen de gezondheid van het gezin bij: medicijnen (met een vinkje of het vandaag al gegeven is), afspraken bij tandarts of huisarts, de groeicurve, en de allergiekaart uit jullie zorgprofiel.</div>
+
+  <div id="allergie"></div>
+  <div class="kies" id="kies"></div>
+  <div id="paneel"><div class="kaart blok"><div class="leeg">Laden…</div></div></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+let data = null, gekozen = null;
+
+async function laad(){
+  try{
+    data = await fetch('/api/foundation/gezin/'+s.code+'/gezondheid?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    if (data.error) throw new Error(data.error);
+    // allergiekaart
+    $('#allergie').innerHTML = data.allergie
+      ? '<div class="allergie"><h2>⚠️ Allergie &amp; medisch</h2><div class="txt">'+esc(data.allergie)+'</div></div>'
+      : '<div class="allergie geen"><h2>Allergie &amp; medisch</h2><div>Nog niets vastgelegd'+(data.magZorgprofiel?' — vul het in bij het zorgprofiel (oppasinfo).':'.')+'</div></div>';
+    // persoonkeuze
+    if (!gekozen || !data.personen.some(p=>p.pid===gekozen)) gekozen = (data.personen.find(p=>p.pid===data.mijnId)||data.personen[0]||{}).pid;
+    $('#kies').innerHTML = data.personen.map(p=>'<button data-pid="'+p.pid+'" class="'+(p.pid===gekozen?'aan':'')+'">'+esc(p.naam)+(p.teGeven?' · '+p.teGeven+'💊':'')+'</button>').join('');
+    $('#kies').querySelectorAll('button').forEach(b=> b.onclick = ()=>{ gekozen = b.dataset.pid; toon(); });
+    toon();
+  }catch(e){ $('#paneel').innerHTML = '<div class="kaart blok"><div class="leeg">Kon het gezondheidsmaatje niet laden.</div></div>'; }
+}
+
+function toon(){
+  const p = data.personen.find(x=>x.pid===gekozen);
+  if (!p){ $('#paneel').innerHTML=''; return; }
+  $('#kies').querySelectorAll('button').forEach(b=> b.className = b.dataset.pid===gekozen?'aan':'');
+  let h = '';
+  // medicijnen
+  h += '<div class="kaart blok"><h2>💊 Medicijnen</h2>';
+  h += p.medicijnen.length ? p.medicijnen.map(m=>
+    '<div class="rij'+(m.gegevenVandaag?' gedaan':'')+'" data-med="'+m.id+'">'
+    + '<input type="checkbox" class="vink"'+(m.gegevenVandaag?' checked':'')+' title="Vandaag gegeven">'
+    + '<div class="mid"><b>'+esc(m.naam)+'</b><span class="meta">'+[esc(m.dosis),esc(m.tijd)].filter(Boolean).join(' · ')+(m.gegevenVandaag?' · vandaag gegeven':'')+'</span></div>'
+    + '<button class="ikoon" data-meddel title="Weg">×</button></div>'
+  ).join('') : '<div class="leeg">Nog geen medicijnen.</div>';
+  h += '<div class="toevoeg"><input id="mNaam" placeholder="Medicijn" maxlength="80"><input id="mDosis" class="sm" placeholder="Dosis"><input id="mTijd" class="sm" placeholder="Wanneer"><button class="knop klein" id="mAdd">+</button></div><div class="fout" id="mFout"></div></div>';
+  // afspraken
+  h += '<div class="kaart blok"><h2>📅 Afspraken</h2>';
+  const komend = p.afspraken.filter(a=>!a.voorbij);
+  h += komend.length ? komend.map(a=>
+    '<div class="rij" data-afs="'+a.id+'"><div class="mid"><b>'+esc(a.wat)+'</b><span class="meta">'+esc(a.datum)+(a.tijd?' '+esc(a.tijd):'')+(a.waar?' · '+esc(a.waar):'')+'</span></div>'
+    + (a.dagenTot<=7?'<span class="badge soon">'+(a.dagenTot===0?'vandaag':a.dagenTot===1?'morgen':'over '+a.dagenTot+' dgn')+'</span>':'<span class="badge">'+a.dagenTot+' dgn</span>')
+    + '<button class="ikoon" data-afsdel title="Weg">×</button></div>'
+  ).join('') : '<div class="leeg">Geen afspraken gepland.</div>';
+  h += '<div class="toevoeg"><input id="aWat" placeholder="Bijv. tandarts" maxlength="80"><input id="aDatum" type="date"><input id="aTijd" type="time" class="sm"><input id="aWaar" placeholder="Waar (optioneel)" maxlength="80"><button class="knop klein" id="aAdd">+</button></div><div class="fout" id="aFout"></div></div>';
+  // groeicurve
+  h += '<div class="kaart blok"><h2>📈 Groei</h2>';
+  const lg = p.laatsteGewicht, ll = p.laatsteLengte;
+  h += '<div class="laatste">'
+    + '<div>Gewicht<br><b>'+(lg?lg.gewicht+' kg':'—')+'</b></div>'
+    + '<div>Lengte<br><b>'+(ll?ll.lengte+' cm':'—')+'</b></div></div>';
+  const g = p.metingen.filter(m=>m.gewicht!=null);
+  if (g.length>1){
+    const max = Math.max(...g.map(m=>m.gewicht)), min = Math.min(...g.map(m=>m.gewicht));
+    h += '<div class="curve" title="gewicht in de tijd">'+g.slice(-24).map(m=>{
+      const pct = max>min ? 20+((m.gewicht-min)/(max-min))*80 : 60;
+      return '<div class="bar" style="height:'+pct+'%" title="'+m.datum+': '+m.gewicht+' kg"></div>';
+    }).join('')+'</div>';
+  }
+  h += '<div class="toevoeg"><input id="gGew" class="sm" type="number" step="0.1" placeholder="kg"><input id="gLen" class="sm" type="number" step="0.1" placeholder="cm"><input id="gDat" type="date"><button class="knop klein" id="gAdd">Meting</button></div><div class="fout" id="gFout"></div></div>';
+  $('#paneel').innerHTML = h;
+  bind(p);
+}
+
+function bind(p){
+  $('#paneel').querySelectorAll('.rij[data-med]').forEach(rij=>{
+    const id = rij.dataset.med;
+    rij.querySelector('.vink').addEventListener('change', e=> doe('/gezin/gezondheid/medicijn/gegeven', { voor:p.pid, medId:id, gegeven:e.target.checked }, true));
+    rij.querySelector('[data-meddel]').onclick = ()=> doe('/gezin/gezondheid/medicijn/verwijder', { voor:p.pid, medId:id }, true);
+  });
+  $('#mAdd').onclick = async ()=>{
+    $('#mFout').textContent='';
+    const naam = $('#mNaam').value.trim(); if(!naam) return $('#mFout').textContent='Vul een medicijn in.';
+    try{ await api('/gezin/gezondheid/medicijn', { code:s.code, token:s.token, voor:p.pid, naam, dosis:$('#mDosis').value, tijd:$('#mTijd').value }); laad(); }
+    catch(e){ $('#mFout').textContent = e.message; }
+  };
+  $('#paneel').querySelectorAll('.rij[data-afs]').forEach(rij=> rij.querySelector('[data-afsdel]').onclick = ()=> doe('/gezin/gezondheid/afspraak/verwijder', { voor:p.pid, afspraakId:rij.dataset.afs }, true));
+  $('#aAdd').onclick = async ()=>{
+    $('#aFout').textContent='';
+    const wat = $('#aWat').value.trim(), datum = $('#aDatum').value;
+    if(!wat) return $('#aFout').textContent='Wat voor afspraak?';
+    if(!datum) return $('#aFout').textContent='Kies een datum.';
+    try{ await api('/gezin/gezondheid/afspraak', { code:s.code, token:s.token, voor:p.pid, wat, datum, tijd:$('#aTijd').value, waar:$('#aWaar').value }); laad(); }
+    catch(e){ $('#aFout').textContent = e.message; }
+  };
+  $('#gAdd').onclick = async ()=>{
+    $('#gFout').textContent='';
+    const gewicht = Number($('#gGew').value)||undefined, lengte = Number($('#gLen').value)||undefined;
+    if(!gewicht && !lengte) return $('#gFout').textContent='Vul een gewicht of lengte in.';
+    try{ await api('/gezin/gezondheid/meting', { code:s.code, token:s.token, voor:p.pid, gewicht, lengte, datum:$('#gDat').value||undefined }); laad(); }
+    catch(e){ $('#gFout').textContent = e.message; }
+  };
+}
+
+async function doe(pad, extra, herlaad){
+  try{ await api(pad, Object.assign({ code:s.code, token:s.token }, extra)); if (herlaad) laad(); }
+  catch(e){ alert(e.message); laad(); }
+}
+
+laad();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

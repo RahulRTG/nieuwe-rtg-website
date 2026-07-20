@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Table · Lifestyle Pass</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
+  .ev{cursor:pointer;transition:border-color .2s;}
+  .ev:hover{border-color:var(--gold);}
+  .ev .nm{font-weight:600;font-size:1.05rem;}
+  .ev .meta{font-size:.82rem;color:var(--soft);margin-top:.2rem;}
+  .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.5rem 0 .25rem;display:block;}
+  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .rij>*{flex:1;min-width:6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.5rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .item{border-top:1px solid var(--line);padding:.5rem 0;display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;}
+  .item:first-child{border-top:0;}
+  .item .b{flex:1;min-width:0;}
+  .item .b small{color:var(--soft);}
+  .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.8rem;height:1.8rem;cursor:pointer;flex-shrink:0;}
+  .weg:hover{border-color:var(--gold);color:var(--txt);}
+  .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<header><div><div class="ey">Lifestyle Pass</div><h1>Table</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
+const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; };
+let open=null;
+async function laad(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
+  let d; try{ d=await api('table'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Table is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon Table niet laden.</div>'; return; }
+  if(open){ const e=d.events.find(x=>x.id===open); if(e) return detail(e); open=null; }
+  let h='<div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij" style="margin-top:.4rem;"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div style="margin-top:.6rem;"><button class="knop" id="nDoe">Aanmaken</button></div></div>';
+  h+= d.events.length ? d.events.map(e=>'<div class="kaart ev" data-id="'+e.id+'"><div class="nm">'+esc(e.naam)+'</div><div class="meta">'+[e.datum?dt(e.datum):'',esc(e.tijd),esc(e.locatie),e.gastenAantal+' gasten'].filter(Boolean).join(' · ')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen gelegenheden.</div></div>';
+  $('#main').innerHTML=h;
+  $('#nDoe').onclick=async()=>{ const naam=$('#nN').value.trim(); if(!naam) return meld('Geef de gelegenheid een naam.'); try{ await api('table/zet',{naam,datum:$('#nD').value,tijd:$('#nT').value,locatie:$('#nL').value}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('.ev').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
+}
+function detail(e){
+  let h='<div class="kaart"><div class="nm" style="font-size:1.2rem;font-family:Bodoni Moda,serif;">'+esc(e.naam)+'</div><div class="meta">'+[e.datum?dt(e.datum):'',esc(e.tijd),esc(e.locatie)].filter(Boolean).join(' · ')+'</div><div style="margin-top:.7rem;display:flex;gap:.5rem;"><button class="knop stil" id="terug">← alle gelegenheden</button><button class="knop stil" id="evWeg" style="color:var(--burgundy);border-color:var(--burgundy);">Verwijderen</button></div></div>';
+  h+='<div class="kaart"><h2>👥 Gasten</h2>'+((e.gasten||[]).length?e.gasten.map(g=>'<div class="item"><div class="b"><b>'+esc(g.naam)+'</b> <small>'+[g.tafel?'tafel '+esc(g.tafel):'',esc(g.dieet),esc(g.notitie)].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-gast="'+g.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen gasten.</div>')
+    +'<div class="rij" style="margin-top:.6rem;"><input class="veld" id="gN" placeholder="naam"><input class="veld" id="gT" placeholder="tafel"><input class="veld" id="gDi" placeholder="dieet"></div><div style="margin-top:.5rem;"><button class="knop stil" id="gAdd">+ gast</button></div></div>';
+  h+='<div class="kaart"><h2>🍽️ Menu</h2>'+((e.menu||[]).length?e.menu.map(m=>'<div class="item"><div class="b"><small>'+esc(m.gang)+'</small> <b>'+esc(m.gerecht)+'</b>'+(m.wijn?' <small>· '+esc(m.wijn)+'</small>':'')+'</div><button class="weg" data-menu="'+m.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen menu.</div>')
+    +'<div class="rij" style="margin-top:.6rem;"><input class="veld" id="mG" placeholder="gang"><input class="veld" id="mGe" placeholder="gerecht"><input class="veld" id="mW" placeholder="wijn"></div><div style="margin-top:.5rem;"><button class="knop stil" id="mAdd">+ gerecht</button></div></div>';
+  $('#main').innerHTML=h;
+  $('#terug').onclick=()=>{ open=null; laad(); };
+  $('#evWeg').onclick=async()=>{ if(!confirm('Deze gelegenheid verwijderen?'))return; try{ await api('table/weg',{id:e.id}); open=null; laad(); }catch(x){ meld(x.message); } };
+  $('#gAdd').onclick=async()=>{ const naam=$('#gN').value.trim(); if(!naam) return meld('Naam van de gast?'); try{ await api('table/gast',{eventId:e.id,naam,tafel:$('#gT').value,dieet:$('#gDi').value}); laad(); }catch(x){ meld(x.message); } };
+  $('#mAdd').onclick=async()=>{ const g=$('#mGe').value.trim(); if(!g) return meld('Welk gerecht?'); try{ await api('table/menu',{eventId:e.id,gang:$('#mG').value,gerecht:g,wijn:$('#mW').value}); laad(); }catch(x){ meld(x.message); } };
+  document.querySelectorAll('[data-gast]').forEach(b=> b.onclick=async()=>{ try{ await api('table/gast/weg',{eventId:e.id,gastId:b.dataset.gast}); laad(); }catch(x){ meld(x.message); } });
+  document.querySelectorAll('[data-menu]').forEach(b=> b.onclick=async()=>{ try{ await api('table/menu/weg',{eventId:e.id,itemId:b.dataset.menu}); laad(); }catch(x){ meld(x.message); } });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

@@ -51,6 +51,8 @@ module.exports = (kern) => {
   require('./member/zakelijk')(kern);
   // De Rechterhand: de premium suite van de Lifestyle Pass
   require('./member/lifestyle')(kern);
+  // Extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison
+  require('./member/rechterhand')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
   // De persoonlijke AI en de Butler/concierge-chat.

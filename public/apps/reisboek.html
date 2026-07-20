@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reisboek · Lifestyle Pass</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.08rem;margin-bottom:.5rem;}
+  .att{border:1px solid var(--gold);border-radius:12px;padding:.6rem .9rem;margin-bottom:.9rem;background:color-mix(in srgb,var(--gold) 8%,transparent);}
+  .att .r{font-size:.85rem;color:var(--gold);}
+  .reis{cursor:pointer;transition:border-color .2s;}
+  .reis:hover{border-color:var(--gold);}
+  .reis .nm{font-weight:600;font-size:1.05rem;}
+  .reis .meta{font-size:.82rem;color:var(--soft);margin-top:.2rem;}
+  .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;display:block;}
+  .veld,select.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .rij > *{flex:1;min-width:7rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.5rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .item{border-top:1px solid var(--line);padding:.5rem 0;display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;}
+  .item:first-child{border-top:0;}
+  .item .b{flex:1;min-width:0;}
+  .item .b small{color:var(--soft);}
+  .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.8rem;height:1.8rem;cursor:pointer;flex-shrink:0;}
+  .weg:hover{border-color:var(--gold);color:var(--txt);}
+  .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<header><div><div class="ey">Lifestyle Pass</div><h1>Reisboek</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
+const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]; };
+let open=null;
+
+async function laad(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;">Open de app en log in met uw RTG-account.</p></div>'; return; }
+  let d; try{ d=await api('reisboek'); }catch(e){ if(e.status===403){ gate(); return; } $('#main').innerHTML='<div class="leeg">Kon het reisboek niet laden.</div>'; return; }
+  if(open){ const r=d.reizen.find(x=>x.id===open); if(r){ return detail(r); } open=null; }
+  let h='';
+  if(d.attenties.length) h+='<div class="att"><div class="lbl" style="margin-top:0;color:var(--gold);">Documenten die aandacht vragen</div>'+d.attenties.map(a=>'<div class="r">'+(a.verlopen?'⚠ ':'• ')+esc(a.soort)+(a.houder?' ('+esc(a.houder)+')':'')+' - '+(a.verlopen?'verlopen ':'geldig tot ')+dt(a.geldigTot)+' · '+esc(a.reis)+'</div>').join('')+'</div>';
+  h+='<div class="kaart"><h2>Nieuwe reis</h2><span class="lbl">Naam</span><input class="veld" id="nNaam" placeholder="Bijv. Ibiza zomer"><div class="rij" style="margin-top:.4rem;"><div><span class="lbl">Bestemming</span><input class="veld" id="nBest"></div><div><span class="lbl">Van</span><input class="veld" id="nVan" type="date"></div><div><span class="lbl">Tot</span><input class="veld" id="nTot" type="date"></div></div><div style="margin-top:.7rem;"><button class="knop" id="nDoe">In het boek</button></div></div>';
+  h+= d.reizen.length ? d.reizen.map(r=>'<div class="kaart reis" data-id="'+r.id+'"><div class="nm">'+esc(r.naam)+'</div><div class="meta">'+esc(r.bestemming||'')+(r.van?' · '+dt(r.van)+(r.tot?' - '+dt(r.tot):''):'')+' · '+(r.legs.length)+' legs · '+(r.documenten.length)+' documenten</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen reizen. Zet hierboven uw eerste reis in het boek.</div></div>';
+  $('#main').innerHTML=h;
+  $('#nDoe').onclick=async()=>{ const naam=$('#nNaam').value.trim(); if(!naam) return meld('Geef de reis een naam.'); try{ await api('reis/zet',{naam,bestemming:$('#nBest').value,van:$('#nVan').value,tot:$('#nTot').value}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('.reis').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
+}
+function gate(){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Het Reisboek is onderdeel van de Lifestyle Pass.</p></div>'; }
+
+function detail(r){
+  const sect=(titel,lijst,items,rij)=>'<div class="kaart"><h2>'+titel+'</h2>'+(items.length?items.map(rij).join(''):'<div class="leeg">Nog niets.</div>')+form(lijst)+'</div>';
+  const forms={
+    legs:'<div class="rij"><input class="veld" data-f="van" placeholder="van"><input class="veld" data-f="naar" placeholder="naar"><input class="veld" data-f="vervoer" placeholder="vervoer"></div><div class="rij" style="margin-top:.4rem;"><input class="veld" data-f="datum" type="date"><input class="veld" data-f="tijd" type="time"></div>',
+    verblijven:'<div class="rij"><input class="veld" data-f="naam" placeholder="verblijf"><input class="veld" data-f="plaats" placeholder="plaats"></div><div class="rij" style="margin-top:.4rem;"><input class="veld" data-f="in" type="date"><input class="veld" data-f="uit" type="date"></div>',
+    documenten:'<div class="rij"><input class="veld" data-f="soort" placeholder="paspoort/visa"><input class="veld" data-f="houder" placeholder="houder"><input class="veld" data-f="geldigTot" type="date"></div>',
+    programma:'<div class="rij"><input class="veld" data-f="datum" type="date"><input class="veld" data-f="tekst" placeholder="programma"></div>'
+  };
+  function form(l){ return '<div class="sub-form" data-lijst="'+l+'">'+forms[l]+'<div style="margin-top:.5rem;"><button class="knop stil klein add">+ toevoegen</button></div></div>'; }
+  let h='<div class="kaart"><div class="nm" style="font-size:1.2rem;font-family:Bodoni Moda,serif;">'+esc(r.naam)+'</div><div class="meta">'+esc(r.bestemming||'')+(r.van?' · '+dt(r.van)+(r.tot?' - '+dt(r.tot):''):'')+'</div><div style="margin-top:.7rem;display:flex;gap:.5rem;"><button class="knop stil" id="terugLijst">← alle reizen</button><button class="knop stil" id="reisWeg" style="color:var(--burgundy);border-color:var(--burgundy);">Reis verwijderen</button></div></div>';
+  h+=sect('✈️ Legs','legs',r.legs,x=>'<div class="item"><div class="b"><b>'+esc(x.van)+' → '+esc(x.naar||'')+'</b> <small>'+[esc(x.vervoer),dt(x.datum),esc(x.tijd)].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-lijst="legs" data-item="'+x.id+'">×</button></div>');
+  h+=sect('🏨 Verblijven','verblijven',r.verblijven,x=>'<div class="item"><div class="b"><b>'+esc(x.naam)+'</b> <small>'+[esc(x.plaats),x.in?dt(x.in)+' - '+dt(x.uit):''].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-lijst="verblijven" data-item="'+x.id+'">×</button></div>');
+  h+=sect('🛂 Documenten','documenten',r.documenten,x=>'<div class="item"><div class="b"><b>'+esc(x.soort)+'</b> <small>'+[esc(x.houder),x.geldigTot?'geldig tot '+dt(x.geldigTot):''].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-lijst="documenten" data-item="'+x.id+'">×</button></div>');
+  h+=sect('📋 Programma','programma',r.programma,x=>'<div class="item"><div class="b"><small>'+dt(x.datum)+'</small> '+esc(x.tekst)+'</div><button class="weg" data-lijst="programma" data-item="'+x.id+'">×</button></div>');
+  $('#main').innerHTML=h;
+  $('#terugLijst').onclick=()=>{ open=null; laad(); };
+  $('#reisWeg').onclick=async()=>{ if(!confirm('Deze reis verwijderen?'))return; try{ await api('reis/weg',{id:r.id}); open=null; laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('.sub-form').forEach(f=>{ f.querySelector('.add').onclick=async()=>{ const body={reisId:r.id,lijst:f.dataset.lijst}; f.querySelectorAll('[data-f]').forEach(i=>body[i.dataset.f]=i.value); try{ await api('reis/item',body); laad(); }catch(e){ meld(e.message); } }; });
+  document.querySelectorAll('.weg').forEach(b=> b.onclick=async()=>{ try{ await api('reis/item/weg',{reisId:r.id,lijst:b.dataset.lijst,itemId:b.dataset.item}); laad(); }catch(e){ meld(e.message); } });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

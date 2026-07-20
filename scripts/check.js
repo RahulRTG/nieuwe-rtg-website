@@ -90,5 +90,38 @@ console.log('\n6) gebundelde app-scripts gelijk aan hun losse delen');
 try { require('./bundel').controleer(); ok('leverancier.js en app-main.js komen overeen met public/apps/<naam>/'); }
 catch (e) { fout(e.message); }
 
+/* 7) Elke letterlijke, relatieve require() moet naar een bestaande module wijzen.
+   node --check ziet dit NIET (require draait pas op runtime), dus een kapot pad
+   dat door een verplaatsing ontstaat (./rahul terwijl het ../rahul moet zijn)
+   blijft anders onopgemerkt tot precies dat pad draait -- vaak alleen met een
+   echte AI-sleutel, dus buiten de tests om. Deze scan vangt die klasse meteen. */
+console.log('\n7) alle relatieve requires (server/ + scripts/) verwijzen naar bestaande modules');
+let reqFout = 0;
+for (const map of ['server', 'scripts']) {
+  loop(path.join(ROOT, map), /\.js$/, f => {
+    const maker = require('module').createRequire(f);
+    for (const regel of fs.readFileSync(f, 'utf8').split('\n')) {
+      const t = regel.trim();
+      if (t.startsWith('//') || t.startsWith('*') || t.startsWith('/*')) continue; // commentaar overslaan
+      const re = /require\((["'])(\.[^"']*)\1\)/g; let m;
+      while ((m = re.exec(regel))) {
+        try { maker.resolve(m[2]); }
+        catch (e) { reqFout++; fout("kapotte require('" + m[2] + "') in " + path.relative(ROOT, f)); }
+      }
+    }
+  });
+}
+if (!reqFout) ok('alle relatieve requires resolven');
+
+/* 8) Geen achtergebleven .only in de tests: een enkele test.only/describe.only
+   laat de rest van de suite stilletjes NIET draaien -- dan is groen een leugen. */
+console.log('\n8) geen .only in de tests (anders draait de suite maar deels)');
+let onlyFout = 0;
+loop(path.join(ROOT, 'test'), /\.js$/, f => {
+  const m = fs.readFileSync(f, 'utf8').match(/\b(?:describe|test|it|suite)\.only\s*\(/g);
+  if (m) { onlyFout += m.length; fout(m.length + ' achtergebleven .only in ' + path.relative(ROOT, f)); }
+});
+if (!onlyFout) ok('geen .only in de tests');
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

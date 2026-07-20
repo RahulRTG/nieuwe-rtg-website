@@ -83,7 +83,7 @@ module.exports = (ctx) => {
           (seintjes.length ? 'Actuele seintjes: ' + seintjes.map(x => x.tekst).join('; ') + '.' : '');
         const response = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 300,
-          system: require('./rahul').RAHUL_LEAD + 'je bent de persoonlijke rechterhand in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. Context: ' + ctx,
+          system: require('../rahul').RAHUL_LEAD + 'je bent de persoonlijke rechterhand in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. Context: ' + ctx,
           messages: [...p.gesprek.flatMap(g => [{ role: 'user', content: g.u }, { role: 'assistant', content: g.a }]), { role: 'user', content: q }]
         });
         return klaar(response.content[0].text);

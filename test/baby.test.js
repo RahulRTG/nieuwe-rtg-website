@@ -49,6 +49,13 @@ async function profiel(code, gToken, naam, rol, groep) {
   return { code, token: kies.token };
 }
 
+test('gezinssessie: het token mag in de Authorization-header (nooit meer in een URL nodig)', async () => {
+  const { code, gToken } = await gezin();
+  const met = await fetch(BASE + '/api/foundation/gezin/' + code + '/mij', { headers: { Authorization: 'Bearer ' + gToken } });
+  assert.equal(met.status, 200, 'de header-vorm werkt (de apps zetten tokens niet meer in URLs)');
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + code + '/mij')).status, 403, 'zonder token blijft de deur dicht');
+});
+
 test('het boekje: instellen, een momentje met foto en tekst, en weer weghalen', async () => {
   const { A, code, gToken } = await gezin();
   // eerst het kindje voorstellen; zonder naam kan niet

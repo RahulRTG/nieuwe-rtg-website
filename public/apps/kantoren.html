@@ -1757,6 +1757,7 @@ function stadRenderDomeinen(){
       '<div style="font-size:1.05rem;margin:.25rem 0;color:' + (stKleur[x.stand] || '#fff') + ';">' +
         (x.waarde == null ? 'geen data' : esc(String(x.waarde)) + ' <span style="font-size:.7rem;color:var(--soft);">' + esc(x.eenheid) + '</span>') +
         ' · ' + esc(x.stand) + '</div>' +
+      (x.ovOnderweg != null ? '<div style="font-size:.72rem;color:var(--soft);margin-bottom:.25rem;">🚌 ' + x.ovOnderweg + ' OV-voertuig(en) onderweg</div>' : '') +
       '<select data-regime="' + x.id + '" style="width:100%;font-size:.78rem;">' +
         x.regimes.map(r => '<option value="' + r + '"' + (r === x.regime ? ' selected' : '') + '>regime: ' + r + '</option>').join('') +
       '</select></div>').join('');

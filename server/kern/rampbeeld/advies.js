@@ -32,6 +32,10 @@ module.exports = (ctx) => {
     for (const z of (b.ziekenhuizen || [])) if (z.beddenTotaal > 0 && z.beddenVrij === 0) adviezen.push(z.naam + ' zit vol; leid nieuwe gewonden om naar een ziekenhuis met ruimte.');
     // korpsen zonder vrije eenheden
     for (const k of (b.korpsen || [])) if (k.totaal > 0 && k.vrij === 0) adviezen.push(k.naam + ' heeft geen vrije eenheid meer; vraag bijstand of schaal op.');
+    // de stad hoort in de stand van de calamiteit: bij opgeschaald/ramp hoort
+    // het stadsscenario "nood" -- de coordinator adviseert, een mens drukt
+    if (b.stad && ['opgeschaald', 'ramp'].includes((b.ramp || {}).niveau) && b.stad.scenario !== 'nood')
+      adviezen.push('RTG Stad staat nog in scenario "' + b.stad.scenario + '"; zet de stad op "nood" (boardroom-knop), dan volgen verkeer, verlichting en de netten de hulpdiensten.');
     if (!adviezen.length) adviezen.push('Op dit moment geen knelpunten: open meldingen zijn bemand en er zijn vrije bedden. Houd het beeld in de gaten.');
     return adviezen;
   }

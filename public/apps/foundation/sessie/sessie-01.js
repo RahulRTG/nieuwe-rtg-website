@@ -34,7 +34,7 @@
     // controleer bij de server of het token nog klopt; geeft { gezin, profiel, profielen, ongelezen } of null
     ophalen: function () {
       var s = lees(); if (!s || !s.code || !s.token) return Promise.resolve(null);
-      return fetch('/api/foundation/gezin/' + s.code + '/mij?token=' + encodeURIComponent(s.token))
+      return fetch('/api/foundation/gezin/' + s.code + '/mij', { headers: { Authorization: 'Bearer ' + s.token } })
         .then(function (r) { if (!r.ok) return null; return r.json(); })
         .then(function (d) { if (d && d.profiel) { s.profiel = d.profiel; Sessie.zet(s); } return d; })
         .catch(function () { return null; });
@@ -94,7 +94,7 @@
   function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
   function telOngelezen(el) {
     var s = lees(); if (!s) return;
-    fetch('/api/foundation/gezin/' + s.code + '/mij?token=' + encodeURIComponent(s.token))
+    fetch('/api/foundation/gezin/' + s.code + '/mij', { headers: { Authorization: 'Bearer ' + s.token } })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) { if (!d) return; var t = el.querySelector('#sbTel'); if (d.ongelezen > 0) { t.textContent = d.ongelezen; t.hidden = false; } else t.hidden = true; })
       .catch(function () {});
@@ -102,7 +102,7 @@
   function laadBerichten(el) {
     var s = lees(); var box = el.querySelector('#sbBerichten');
     box.innerHTML = '<div class="sb-leeg">Berichten laden...</div>';
-    fetch('/api/foundation/gezin/' + s.code + '/berichten?token=' + encodeURIComponent(s.token))
+    fetch('/api/foundation/gezin/' + s.code + '/berichten', { headers: { Authorization: 'Bearer ' + s.token } })
       .then(function (r) { return r.json(); })
       .then(function (d) {
         var lijst = (d.berichten || []);

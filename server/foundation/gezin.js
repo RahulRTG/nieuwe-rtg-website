@@ -6,7 +6,7 @@ module.exports = (gctx) => {
   const { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, decS, teVaak, misluktePoging, goedePoging, ipVan,
     nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, schoonGroep, isBeschermd, isGast, KLEUREN,
     hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
-    socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij } = gctx;
+    socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, tokenUit } = gctx;
   const bezorgAanGasten = (g, b) => gctx.bezorgAanGasten(g, b);
 router.post('/gezin/maak', async (req, res) => {
   const bucket = 'maak:' + ipVan(req);
@@ -49,7 +49,7 @@ router.post('/gezin/profiel/kies', async (req, res) => {
 
 router.get('/gezin/:code/mij', (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
-  const p = profielVan(g, req.query.token);
+  const p = profielVan(g, tokenUit(req));
   if (!p) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
   const ongelezen = (g.berichten || []).filter(b => berichtVoorMij(b, p.id) && b.van !== p.id && !(b.gelezenDoor || []).includes(p.id)).length;
   const adult = ['beheerder', 'ouder'].includes(p.rol);
@@ -120,7 +120,7 @@ router.post('/gezin/bericht', (req, res) => {
 
 router.get('/gezin/:code/berichten', (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
-  const p = profielVan(g, req.query.token);
+  const p = profielVan(g, tokenUit(req));
   if (!p) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
   const mijn = (g.berichten || []).filter(b => berichtVoorMij(b, p.id)).map(b => ({
     id: b.id, van: b.van, vanNaam: b.vanNaam, vanAvatar: b.vanAvatar, naar: b.naar,

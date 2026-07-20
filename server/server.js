@@ -2127,6 +2127,12 @@ kern.rampbeeld.koppelStad(() => {
   const b = kern.stad.stadBeeld();
   return { scenario: b.scenario, alerts: b.alerts, vloot: b.vloot };
 });
+/* En andersom kijkt het verkeersdomein van de stad naar de eigen OV-vloot:
+   het aantal voertuigen dat NU met een verse positie onderweg is. Alleen een
+   telling -- geen routes, geen reizigers, geen personen. */
+kern.stad.stadKoppelVerkeer(() => ({
+  ovOnderweg: (db.data.ovVoertuigen || []).filter(v => Date.now() - new Date(v.at).getTime() < (kern.VOERTUIG_TTL_MS || 120000)).length
+}));
 /* De eigen-AI-dataset (kern/aidata.js): een boardroom-knop verzamelt alle logs
    (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL om
    later een eigen model te trainen -- op codenamen, de kluis blijft dicht. */

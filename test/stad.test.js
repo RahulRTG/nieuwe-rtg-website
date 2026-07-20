@@ -41,6 +41,7 @@ test('het stadsbeeld: demovloot, acht domeinen, zones en de privacy-belofte', as
   assert.ok(b.body.vloot.totaal >= 8 && b.body.vloot.online >= 1, 'de demovloot leeft');
   assert.ok(b.body.domeinen.some(d => d.waarde != null), 'er zijn verse metingen');
   assert.match(b.body.privacy, /geen mensen/, 'privacy by design staat op het bord zelf');
+  assert.equal(typeof b.body.domeinen.find(d => d.id === 'verkeer').ovOnderweg, 'number', 'het verkeersdomein telt de eigen OV-vloot mee (alleen een telling)');
 });
 
 test('de scenario-knop verzet alle regimes in een keer, met auditspoor', async () => {
@@ -136,6 +137,11 @@ test('los regime, AI-stadsregisseur, nood -> beveiligingsmelding, bewaking en da
   assert.equal(rb.status, 200);
   assert.ok(rb.body.stad && rb.body.stad.scenario && rb.body.stad.vloot, 'het rampbeeld toont de staat van de stad');
   await oapi('stad/scenario', { scenario: 'normaal' });
+  // en de coordinator adviseert het stad-nood-scenario zodra de keten opschaalt
+  await oapi('rampbeeld/schaal', { niveau: 'opgeschaald' });
+  const co = await oapi('rampbeeld/ai', {});
+  assert.ok((co.body.voorstellen || []).some(v => /zet de stad op "nood"/.test(v)), 'de coordinator wijst de boardroom op het stad-nood-scenario');
+  await oapi('rampbeeld/schaal', { niveau: 'normaal' });
   // de metingen zitten (zonder persoonsgegevens) in de eigen-AI-dataset
   const ai = (await oapi('aidata')).body;
   assert.ok(ai.bronnen.stad >= 1, 'de bron "stad" telt mee in de dataset');

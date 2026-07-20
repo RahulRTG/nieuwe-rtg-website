@@ -111,7 +111,7 @@ function gezinVan(req, res) {
 }
 function profielVan(g, token) { return Object.values(g.profielen || {}).find(p => p.token === token); }
 function beheerderVan(g, req, res) {
-  const t = (req.body && req.body.token) || req.query.token;
+  const t = ctx.tokenUit(req);
   const p = profielVan(g, t);
   if (!p || p.rol !== 'beheerder') { res.status(403).json({ error: 'Alleen de beheerder van het gezin kan dit doen.' }); return null; }
   return p;

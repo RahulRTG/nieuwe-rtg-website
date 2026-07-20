@@ -9,7 +9,7 @@
    wegschrijven en de dagelijkse back-up van de hoofdserver. */
 const ctx = require('./foundation/basis')();
 const { db, save, eigenVeld, crypto,
-  encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic,
+  encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
   router, F, nu, rid, schoon, LETTERS, DEMO, TIPS } = ctx;
 // de onderwijslaag registreert zijn routes op dezelfde router
 require('./foundation/onderwijs')(ctx);
@@ -21,7 +21,7 @@ const { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, magSolliciteren, groep
 
 /* De gezinsroutes (gezin maken/inloggen, profielen, berichten) draaien als
    submodule op een gedeelde context, een keer opgebouwd bij het opstarten. */
-const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, decS, teVaak, misluktePoging, goedePoging, ipVan,
+const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, decS, teVaak, misluktePoging, goedePoging, ipVan, tokenUit,
   nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, schoonGroep, isBeschermd, isGast, KLEUREN,
   hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
   socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
@@ -30,7 +30,7 @@ require('./foundation/gezin')(gctx);
 /* ---------- de gezinssessie: wie ben je, en mag je bij de privezaken ---------- */
 function sessieVan(req, res) {
   const g = gezinVan(req, res); if (!g) return null;
-  const p = profielVan(g, (req.body && req.body.token) || req.query.token);
+  const p = profielVan(g, tokenUit(req));
   if (!p) { res.status(403).json({ error: 'Log opnieuw in bij je gezin.' }); return null; }
   return { g, p };
 }

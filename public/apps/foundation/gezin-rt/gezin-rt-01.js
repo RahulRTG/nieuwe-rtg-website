@@ -29,8 +29,8 @@
     setLeden: function (arr) { S.leden = {}; (arr || []).forEach(function (l) { S.leden[l.id] = l; }); },
     // chat
     stuur: function (naarId, tekst) { return post('/gezin/chat', { naar: naarId, tekst: tekst }); },
-    thread: function (metId) { return fetch(S.base + '/gezin/' + S.code + '/chat/' + metId + '?token=' + encodeURIComponent(S.token)).then(function (r) { return r.json(); }); },
-    chats: function () { return fetch(S.base + '/gezin/' + S.code + '/chats?token=' + encodeURIComponent(S.token)).then(function (r) { return r.json(); }); },
+    thread: function (metId) { return fetch(S.base + '/gezin/' + S.code + '/chat/' + metId, { headers: { Authorization: 'Bearer ' + S.token } }).then(function (r) { return r.json(); }); },
+    chats: function () { return fetch(S.base + '/gezin/' + S.code + '/chats', { headers: { Authorization: 'Bearer ' + S.token } }).then(function (r) { return r.json(); }); },
     // bellen
     bel: function (naarId, video) { beginGesprek(naarId, video); },
     stop: function () { try { if (es) es.close(); } catch (e) {} eindeGesprek(false); }

@@ -123,10 +123,19 @@ module.exports = function maakBasis() {
     'Geld of spullen zeggen niets over hoe knap je bent. Doorzetten en oefenen brengen je verder dan wat dan ook.'
   ];
 
+  /* Het sessietoken uit een aanvraag: eerst de Authorization-header (een token
+     in een URL lekt via logs, proxies en de browsergeschiedenis), dan de body,
+     en pas als laatste de query -- die blijft alleen voor de SSE-streams
+     (EventSource kan geen headers sturen) en voor oudere, gecachte clients. */
+  function tokenUit(req) {
+    const h = ((req.get && req.get('authorization')) || '');
+    return (h.startsWith('Bearer ') ? h.slice(7) : '') || (req.body && req.body.token) || req.query.token;
+  }
+
   /* De context: alles wat de submodules delen. kiesBuddy/leeftijdInstr worden
      later door de gezinslaag op dit object gezet (aanroep gebeurt pas per
      aanvraag, dus die late binding is veilig). */
   return { db, save, DATA_DIR, eigenVeld, crypto,
-    encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic,
+    encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
     router, F, nu, rid, schoon, LETTERS, SYSTEM, DEMO, TIPS };
 };

@@ -36,6 +36,12 @@ module.exports = (deps) => {
 
   const seintje = () => { try { if (sseToOffice) sseToOffice('sync', { scope: 'stad' }); } catch (e) {} };
 
+  /* De verkeers-naad (laat gebonden): het verkeersdomein kijkt ook naar de
+     eigen OV-vloot -- hoeveel voertuigen zijn er NU met een verse positie
+     onderweg. Geteld, geen routes en geen personen. */
+  let verkeerBron = null;
+  function koppelVerkeer(fn) { if (typeof fn === 'function') verkeerBron = fn; }
+
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, crypto, schoon, anthropic, beveilig, nu, d,
     ONLINE_MS, MAX_METINGEN, zones, nodes, metingen, regie, seintje };
@@ -62,8 +68,12 @@ module.exports = (deps) => {
       status: 200,
       scenario: r.scenario,
       scenarios: sce.SCENARIOS.map(s => ({ naam: s.naam, label: s.label, uitleg: s.uitleg })),
-      domeinen: dom.DOMEINEN.map(x => ({ id: x.id, label: x.label, eenheid: x.eenheid,
-        regimes: x.regimes, regime: r.regimes[x.id] || x.regimes[0], ...dom.standVan(x.id) })),
+      domeinen: dom.DOMEINEN.map(x => {
+        const rij = { id: x.id, label: x.label, eenheid: x.eenheid,
+          regimes: x.regimes, regime: r.regimes[x.id] || x.regimes[0], ...dom.standVan(x.id) };
+        if (x.id === 'verkeer' && verkeerBron) { try { rij.ovOnderweg = Number(verkeerBron().ovOnderweg) || 0; } catch (e) {} }
+        return rij;
+      }),
       alerts: dom.alerts(),
       zones: zones().slice(),
       nodes: rij.map(n => ({ serial: n.serial, naam: n.naam, zone: n.zone, sensoren: n.sensoren,
@@ -74,7 +84,7 @@ module.exports = (deps) => {
     };
   }
 
-  const api = { stadBeeld: beeld };
+  const api = { stadBeeld: beeld, stadKoppelVerkeer: koppelVerkeer };
   Object.assign(api, vloot.api, dom.api, sce.api, adv, veld.api);
   return { stad: api };
 };

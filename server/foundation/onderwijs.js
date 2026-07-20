@@ -42,12 +42,12 @@ module.exports = (ctx) => {
     return les;
   }
   function docentCheck(les, req, res) {
-    const t = (req.body && req.body.token) || req.query.token;
+    const t = ctx.tokenUit(req);
     if (!t || t !== les.teacherToken) { res.status(403).json({ error: 'Alleen de begeleider kan dit doen.' }); return false; }
     return true;
   }
   function leerlingVan(les, req, res) {
-    const t = (req.body && req.body.token) || req.query.token;
+    const t = ctx.tokenUit(req);
     const l = Object.values(les.leerlingen).find(x => x.token === t);
     if (!l) { res.status(403).json({ error: 'Doe eerst mee met de les.' }); return null; }
     return l;

@@ -15,7 +15,9 @@
      rdw.js         voertuigregister, rijbewijs, vloot- en kentekencheck
      onderneming.js KVK-handelsregister + sociale zekerheid (UWV/SVB)
      regio.js       provincie (subsidies) + waterschap (belasting + meldingen)
-     bestuur.js     Berichtenbox-lezers, referendum, bezwaar, bekendmaking, regie */
+     bestuur.js     Berichtenbox-lezers, referendum, bezwaar, bekendmaking, regie
+     kantoor.js     het Belastingkantoor: inspecteurscockpit, invordering,
+                    btw-beeld (facturatiemotor + KVK) en de AI-chef-inspecteur */
 
 // inkomstenbelasting (demo, twee schijven; peiljaar volgt de klok)
 const IB = { schijf: 75000, tarief1: 0.37, tarief2: 0.495, heffingskorting: 3070 };
@@ -127,7 +129,8 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
     require('./rdw')(ctx),
     require('./onderneming')(ctx),
     require('./regio')(ctx),
-    require('./bestuur')(ctx));
+    require('./bestuur')(ctx),
+    require('./kantoor')(ctx));
   return { overheid: api };
 }
 

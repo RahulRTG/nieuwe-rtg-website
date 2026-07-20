@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Belastingkantoor (inspecteur)</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;margin-top:.05rem;}
+  header a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:.35rem .7rem;}
+  main{padding:1.1rem;max-width:880px;margin:0 auto;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.6rem;margin-bottom:1rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;}
+  .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;display:block;}
+  .kpi span{font-size:.7rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;}
+  .kpi.goud{border-color:rgba(169,143,7,.4);} .kpi.goud b{color:var(--gold);}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  section.paneel{display:none;} section.paneel.aan{display:block;}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+  .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.42rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
+  .status{display:inline-block;font-size:.7rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
+  .status.open{border-color:var(--burgundy);color:var(--burgundy);}
+  .status.ok{border-color:var(--green);color:var(--green);}
+  .status.goud{border-color:var(--gold);color:var(--gold);}
+  .sig{border-left:3px solid var(--burgundy);}
+  .sig.register{border-left-color:var(--gold);}
+  .sig.controle{border-left-color:var(--burgundy);}
+  .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
+  .login .veld{width:100%;margin-bottom:.6rem;}
+  .ai{border:1px solid rgba(169,143,7,.4);border-radius:14px;background:linear-gradient(135deg,rgba(169,143,7,.08),transparent);padding:.9rem 1rem;margin-bottom:1rem;}
+  .ai h3{font-size:1rem;margin-bottom:.4rem;}
+  .ai .uit{font-size:.86rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.5rem;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="ey">Belastingdienst · inspecteur</div><h1>Het Belastingkantoor</h1></div>
+  <a href="/apps/rijksloket.html">Rijks-loket →</a>
+</header>
+<main id="main">
+  <div class="login" id="login">
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1rem;">Het slimste kantoor van het rijk. Log in als medewerker met je persoonlijke pincode.</p>
+    <select class="veld" id="wie"><option value="">Laden…</option></select>
+    <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
+    <button class="knop" id="loginGo" style="width:100%;">Inloggen</button>
+  </div>
+
+  <div id="app" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="ai">
+      <h3>🎩 Chef-inspecteur (Rahul)</h3>
+      <div class="rij" style="margin-top:0;">
+        <input class="veld" id="aiV" style="flex:1;min-width:12rem;" placeholder="Bijv. wat pak ik vandaag als eerste op?">
+        <button class="knop" id="aiK">Vraag</button>
+      </div>
+      <div class="uit" id="aiA">Adviserend, nooit beslissend: elke herinnering, regeling of kwijtschelding blijft uw handtekening.</div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <section class="paneel" id="p-sig"></section>
+    <section class="paneel" id="p-aan">
+      <div class="rij" style="margin:0 0 .7rem;">
+        <select class="veld" id="stand"><option value="">Alle aanslagen</option><option value="open">Openstaand</option><option value="betaald">Betaald</option><option value="teruggaaf">Teruggaven</option></select>
+      </div>
+      <div id="aanLijst"></div>
+    </section>
+    <section class="paneel" id="p-btw"></section>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
+let TOKEN = null;
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+const euro = n => '€ ' + Number(n||0).toLocaleString('nl-NL');
+
+const CODE = 'RIJK';
+async function vulWie(){
+  try { const r = await api('/api/supplier/roster', { code: CODE });
+    $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
+  } catch(e){ $('#wie').innerHTML = '<option value="">Kantoor niet bereikbaar</option>'; }
+}
+vulWie();
+$('#loginGo').addEventListener('click', async () => {
+  const staffId = $('#wie').value, pin = $('#pin').value.trim();
+  if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
+  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token;
+    $('#login').hidden = true; $('#app').hidden = false; start();
+  } catch(e){ meld(e.message); }
+});
+
+const TABS = [['sig','Signalen'],['aan','Aanslagen'],['btw','Btw-beeld']];
+let HUIDIG = 'sig';
+function toon(t){
+  HUIDIG = t;
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
+  ['sig','aan','btw'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  if (t === 'sig') laadCockpit();
+  if (t === 'aan') laadAanslagen();
+  if (t === 'btw') laadBtw();
+}
+function start(){
+  $('#tabs').innerHTML = TABS.map(([t,n]) => '<button class="tab" data-t="'+t+'">'+n+'</button>').join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => toon(b.dataset.t)));
+  laadCockpit(); toon('sig');
+}
+
+async function laadCockpit(){
+  try {
+    const c = await api('/api/overheid/bd/cockpit');
+    $('#kpis').innerHTML =
+      '<div class="kpi goud"><b>'+euro(c.ontvangen)+'</b><span>Ontvangen</span></div>'+
+      '<div class="kpi"><b>'+euro(c.teOntvangen)+'</b><span>Te ontvangen · '+c.openstaand+' open</span></div>'+
+      '<div class="kpi"><b>'+euro(c.teruggaven)+'</b><span>Teruggaven</span></div>'+
+      '<div class="kpi"><b>'+euro(c.btwDitJaar)+'</b><span>Btw '+c.jaar+'</span></div>'+
+      '<div class="kpi"><b>'+c.toeslagenLopend+'</b><span>Toeslagen · '+euro(c.toeslagenPerMaand)+'/mnd</span></div>'+
+      '<div class="kpi"><b>'+c.ondernemingen+'</b><span>In het register</span></div>'+
+      '<div class="kpi"><b>'+c.regelingen+'</b><span>Regelingen</span></div>'+
+      '<div class="kpi"><b>'+c.signalen.length+'</b><span>Signalen</span></div>';
+    $('#p-sig').innerHTML = c.signalen.length ? c.signalen.map(s =>
+      '<div class="item sig '+esc(s.soort)+'"><h4>'+esc(s.soort)+' · '+esc(s.wie||'')+'</h4><div class="meta">'+esc(s.tekst)+'</div></div>').join('')
+      : '<div class="leeg">Geen signalen. Het kantoor is bij.</div>';
+  } catch(e){ meld(e.message); }
+}
+
+async function laadAanslagen(){
+  try {
+    const r = await api('/api/overheid/bd/aanslagen', { stand: $('#stand').value });
+    $('#aanLijst').innerHTML = r.aanslagen.length ? r.aanslagen.map(a => {
+      const st = a.kwijtgescholden ? '<span class="status ok">kwijtgescholden</span>'
+        : a.betaald ? '<span class="status ok">betaald</span>'
+        : a.saldo < 0 ? '<span class="status goud">teruggaaf '+euro(Math.abs(a.saldo))+'</span>'
+        : '<span class="status open">open '+euro(a.saldo)+(a.dagenOpen?' · '+a.dagenOpen+'d':'')+'</span>';
+      const reg = a.regeling ? ' <span class="status">regeling '+a.regeling.maanden+'×'+euro(a.regeling.per)+'</span>' : '';
+      const her = a.herinnerd ? ' <span class="status">herinnerd</span>' : '';
+      const acties = (!a.betaald && !a.kwijtgescholden && a.saldo > 0)
+        ? '<div class="rij"><button class="knop stil" data-her="'+a.ref+'">Herinnering</button><button class="knop stil" data-reg="'+a.ref+'">Regeling</button><button class="knop rood" data-kwijt="'+a.ref+'">Kwijtschelden</button></div>' : '';
+      return '<div class="item"><h4>'+esc(a.wie)+' · '+a.jaar+' <small style="color:var(--soft);font-family:Inter;">'+esc(a.ref)+'</small></h4>'+
+        '<div class="meta">Inkomen '+euro(a.inkomen)+' · aftrek '+euro(a.aftrek)+' · '+st+reg+her+'</div>'+acties+'</div>';
+    }).join('') : '<div class="leeg">Geen aanslagen in deze selectie.</div>';
+    $('#aanLijst').querySelectorAll('[data-her]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/overheid/bd/herinnering', { ref: b.dataset.her }); meld('Herinnering verstuurd via de Berichtenbox.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+    $('#aanLijst').querySelectorAll('[data-reg]').forEach(b => b.addEventListener('click', async () => {
+      const m = prompt('Betalingsregeling: in hoeveel maanden (2-24)?', '6'); if (!m) return;
+      try { const r = await api('/api/overheid/bd/regeling', { ref: b.dataset.reg, maanden: m }); meld('Regeling: '+r.regeling.maanden+' maanden van '+euro(r.regeling.per)+'.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+    $('#aanLijst').querySelectorAll('[data-kwijt]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Deze openstaande aanslag kwijtschelden?')) return;
+      const reden = prompt('Reden (komt in de Berichtenbox van de inwoner):', '') || '';
+      try { await api('/api/overheid/bd/kwijt', { ref: b.dataset.kwijt, reden }); meld('Kwijtgescholden.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+$('#stand').addEventListener('change', laadAanslagen);
+
+async function laadBtw(){
+  try {
+    const r = await api('/api/overheid/bd/btw');
+    $('#p-btw').innerHTML = '<div class="item"><h4>Btw-beeld '+r.jaar+'</h4><div class="meta">Rechtstreeks uit de facturatiemotor van het platform, gekoppeld aan het KVK-handelsregister: '+euro(r.totaalBtw)+' btw over '+euro(r.totaalOmzet)+' omzet.</div></div>'+
+      (r.zaken.length ? r.zaken.map(z => '<div class="item"><h4>'+esc(z.naam)+' <small style="color:var(--soft);font-family:Inter;">'+esc(z.code)+'</small></h4><div class="meta">'+z.facturen+' facturen · omzet '+euro(z.omzet)+' · btw '+euro(z.btw)+' · '+(z.ingeschreven?'<span class="status ok">KVK ingeschreven</span>':'<span class="status open">niet in het register</span>')+'</div></div>').join('')
+      : '<div class="leeg">Nog geen facturen dit jaar.</div>');
+  } catch(e){ meld(e.message); }
+}
+
+$('#aiK').addEventListener('click', async () => {
+  const v = $('#aiV').value.trim(); if (!v) return;
+  $('#aiA').textContent = 'Een ogenblik…';
+  try { const r = await api('/api/overheid/bd/ai', { vraag: v }); $('#aiA').textContent = r.antwoord; $('#aiV').value = ''; }
+  catch(e){ $('#aiA').textContent = e.message; }
+});
+$('#aiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#aiK').click(); });
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

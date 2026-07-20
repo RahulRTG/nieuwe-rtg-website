@@ -33,6 +33,18 @@ module.exports = (kern) => {
   // het handelsregister-overzicht voor de ambtenaar
   app.post('/api/overheid/kvk/lijst', supplierAuth, rijk, (req, res) => res.json(overheid.kvkLijst()));
 
+  /* ---- het Belastingkantoor: de inspecteurscockpit (kern/overheid/kantoor.js) ---- */
+  app.post('/api/overheid/bd/cockpit', supplierAuth, rijk, (req, res) => res.json(overheid.bdCockpit()));
+  app.post('/api/overheid/bd/aanslagen', supplierAuth, rijk, (req, res) => res.json(overheid.bdAanslagen(req.body || {})));
+  app.post('/api/overheid/bd/btw', supplierAuth, rijk, (req, res) => res.json(overheid.bdBtwBeeld()));
+  app.post('/api/overheid/bd/herinnering', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdHerinnering(wie(req), String(req.body.ref || ''))));
+  app.post('/api/overheid/bd/regeling', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdRegeling(wie(req), String(req.body.ref || ''), req.body.maanden)));
+  app.post('/api/overheid/bd/kwijt', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdKwijtschelding(wie(req), String(req.body.ref || ''), req.body.reden)));
+  app.post('/api/overheid/bd/ai', supplierAuth, rijk, async (req, res) => {
+    try { res.json(await overheid.bdAI(String(req.body.vraag || ''))); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   /* ---- ondernemers: inschrijven in het handelsregister als onderneming ---- */
   app.post('/api/supplier/overheid/kvk/inschrijven', supplierAuth, (req, res) =>
     stuur(res, overheid.kvkInschrijven({ supplierCode: req.supplier.code, bedrijf: req.supplier.name }, req.body || {})));

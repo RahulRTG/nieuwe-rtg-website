@@ -257,13 +257,16 @@ test('cloud-failover: valt de primaire cloud weg, dan pakt de doos de replica', 
       RTG_DOOS_SLEUTEL: SLEUTEL, RTG_DOOS_USER: 'rahul', RTG_DOOS_WACHTWOORD: 'Imran',
       RTG_DOOS_NAAM: 'failoverdoos'
     } });
-    // online op de primaire (cloud A)
-    const st0 = await wachtOp('/api/doos/status', box.base, d => d.modus === 'cloud' && d.actieveCloud === 0);
+    // online op de primaire (cloud A). Ruim wachten: op een trage CI-runner
+    // (drie processen + coverage-instrumentatie) kan het opkomen en de
+    // failover-detectie samen ruim boven de oude 24s uitkomen; polls zijn
+    // goedkoop, dus een failover-test hoort geduldig te zijn.
+    const st0 = await wachtOp('/api/doos/status', box.base, d => d.modus === 'cloud' && d.actieveCloud === 0, 300);
     assert.equal(st0.clouds, 2, 'twee clouds geconfigureerd');
     // de primaire cloud valt weg
     cloudA.kill('SIGKILL');
     // de doos springt naar de replica (cloud B) en blijft doorgeefluik (niet lokaal)
-    const st1 = await wachtOp('/api/doos/status', box.base, d => d.actieveCloud === 1, 120);
+    const st1 = await wachtOp('/api/doos/status', box.base, d => d.actieveCloud === 1, 300);
     assert.equal(st1.actieveCloud, 1, 'overgeschakeld naar de replica');
     assert.equal(st1.modus, 'cloud', 'gebleven als doorgeefluik, niet naar lokaal geschakeld');
   } finally {

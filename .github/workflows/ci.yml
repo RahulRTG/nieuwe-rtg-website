@@ -32,8 +32,12 @@ jobs:
         run: npm run check
       # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
-      - name: Unit- en integratietests (json-opslag)
-        run: npm test
+      # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/
+      # functies): zakt de in-proces-dekking onder de vloer, dan faalt de stap.
+      # De vloeren staan bewust een paar punten onder de gemeten basislijn
+      # (63/80/51) zodat normale ruis niet flaket, maar echte terugval hard opvalt.
+      - name: Unit- en integratietests + dekkingsvloer (json-opslag)
+        run: npm run test:gate
       # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
       # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
       # kv-tabel en zouden elkaar bij parallel draaien resetten.

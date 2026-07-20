@@ -28,8 +28,7 @@
     "@anthropic-ai/sdk": "^0.39.0",
     "@simplewebauthn/server": "^13.3.2",
     "express": "^4.21.0",
-    "nodemailer": "^9.0.3",
-    "web-push": "^3.6.7"
+    "nodemailer": "^9.0.3"
   },
   "optionalDependencies": {
     "@sentry/node": "^10.66.0",

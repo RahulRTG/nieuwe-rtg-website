@@ -59,6 +59,13 @@ gemak brengt. In deze code betekent dat:
   een teller, en ze op het techniekbord toont (ERR-01 + de storingslijst). Zo ziet
   de eigenaar meteen wat er stuk is zonder een externe dienst. `@sentry/node` blijft
   optioneel bovenop deze aggregatie voor wie externe tracking wil.
+- **De web-push** (`server/webpush.js`): VAPID (RFC 8292, ES256-JWT) en de payload-
+  versleuteling (RFC 8291, aes128gcm) die het pakket `web-push` verving. Let op de
+  nuance bij regel 1: we schrijven hier GEEN eigen cryptografie. We zetten alleen de
+  bekende protocolstappen op elkaar met Node's standaard-primitieven -- ECDH (P-256),
+  HKDF-SHA256, AES-128-GCM, ECDSA -- allemaal uit `node:crypto`. Dat is protocol-
+  assemblage, geen eigen crypto. De payload-versleuteling is byte-voor-byte tegen het
+  RFC 8291-testvector geijkt (`test/webpush.test.js`).
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.
@@ -91,14 +98,13 @@ regel 1 breken (eigen crypto is verboden) en zou ons bovendien tot een
 vergunningplichtige crypto-dienstverlener (CASP) maken. Door meteen naar euro om
 te zetten blijven we een handelaar die munten accepteert, geen wisselkantoor.
 
-**3. De vier runtime-fundamenten.** Bewust klein gehouden:
+**3. De drie runtime-fundamenten.** Bewust klein gehouden:
 
 | Pakket | Waarom niet zelf |
 |---|---|
 | `express` | HTTP-routing, jaren dichtgetimmerd tegen randgevallen die je niet in een middag reproduceert. |
 | `@anthropic-ai/sdk` | De AI-butler; het model draait niet bij ons. |
 | `nodemailer` | SMTP met alle protocol-eigenaardigheden. |
-| `web-push` | VAPID en de encryptie van webpush-payloads, cryptografisch werk (zie regel 1). |
 
 En vier **optionele** pakketten die alleen laden als je ze configureert —
 zonder deze draait alles gewoon door in demo/lokaal:

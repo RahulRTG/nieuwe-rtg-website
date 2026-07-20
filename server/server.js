@@ -687,8 +687,10 @@ function logInlog(kanaal, ok, wie, req) {
    - 'notify' → een notificatie voor de eigenaar van een post/betaling,
      ook als web-push wanneer het scherm dicht is. */
 
+// Onze eigen web-push (server/webpush.js): VAPID + RFC 8291-payloadversleuteling
+// op Node's crypto, i.p.v. het pakket `web-push`. Zelfde API, geen dependency.
 let webpush = null;
-try { webpush = require('web-push'); } catch (e) { /* zonder push: alleen SSE */ }
+try { webpush = require('./webpush'); } catch (e) { /* zonder push: alleen SSE */ }
 
 // welke persona hoort bij een auteursnaam (voor gerichte notificaties)
 const AUTHOR_TIER = {

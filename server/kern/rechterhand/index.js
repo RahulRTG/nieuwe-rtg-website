@@ -54,6 +54,9 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, DATA_DIR }) => {
     if (!Array.isArray(l.cellier)) l.cellier = [];
     if (!Array.isArray(l.tables)) l.tables = [];
     if (!l.maison || typeof l.maison !== 'object') l.maison = { staf: [], taken: [], logboek: [] };
+    if (!l.hangar || typeof l.hangar !== 'object') l.hangar = { toestellen: [], vluchten: [] };
+    if (!Array.isArray(l.entourage)) l.entourage = [];
+    if (!l.attenties || typeof l.attenties !== 'object') l.attenties = { relaties: [], giften: [] };
     return l;
   }
 
@@ -67,7 +70,10 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, DATA_DIR }) => {
     require('./mecenaat')(ctx),
     require('./nalatenschap')(ctx),
     require('./logboek')(ctx),
-    require('./cercle')(ctx)
+    require('./cercle')(ctx),
+    require('./hangar')(ctx),
+    require('./entourage')(ctx),
+    require('./attenties')(ctx)
   );
 
   /* Rahul als adviseur binnen elke app, in de u-vorm: reisadviseur, sommelier,
@@ -83,7 +89,10 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, DATA_DIR }) => {
     mecenaat: 'u bent de filantropie-adviseur van dit lid. Denk mee over een evenwichtige spreiding van de giften over de thema\'s, over toezeggingen die nog openstaan en over de rol van de RTFoundation, die 30% van de bijdragen naar liefdadigheid brengt. U geeft geen fiscaal of juridisch advies; daarvoor verwijst u naar een adviseur.',
     nalatenschap: 'u bent de discrete adviseur voor de nalatenschap van dit lid. Denk mee over welke documenten en vertrouwenspersonen nog ontbreken en over hoe het lid zijn wensen helder vastlegt. U bent uiterst discreet. U geeft geen juridisch advies; voor het opstellen verwijst u naar de notaris of advocaat.',
     logboek: 'u bent de vlootbeheerder van dit lid. Denk mee over het onderhoud van jacht, jet of oldtimer, over wat binnenkort aan de beurt is en over de kosten. Wijs actief op wat verloopt.',
-    cercle: 'u bent de clubsecretaris van dit lid. Denk mee over de besloten clubs en lidmaatschappen, over waar het lid als gast terecht kan via reciprociteit en over het gebruik van de gastpassen.'
+    cercle: 'u bent de clubsecretaris van dit lid. Denk mee over de besloten clubs en lidmaatschappen, over waar het lid als gast terecht kan via reciprociteit en over het gebruik van de gastpassen.',
+    hangar: 'u bent de vluchtcoordinator van dit lid. Denk mee over de toestellen, de vlieguren, de posities en de eerstvolgende vluchten. U belooft nooit een slot of vergunning die u niet zeker kunt waarmaken.',
+    entourage: 'u bent de reissecretaris van dit lid. Denk mee over wie het lid meeneemt, over hun voorkeuren en dieet en over de geldigheid van hun paspoort. Wijs actief op paspoorten die verlopen.',
+    attenties: 'u bent de relatiesecretaris van dit lid. Denk mee over de belangrijke data van hun relaties en over een passende attentie, met oog voor de giftgeschiedenis zodat u niet twee keer hetzelfde voorstelt.'
   };
   function contextVan(app, key) {
     if (app === 'reisboek') { const d = api.reizen(key); const v = d.reizen.find(r => r.komend) || d.reizen[0]; return 'Reizen in het boek: ' + d.reizen.length + (v ? '. Eerstvolgende: ' + v.naam + (v.bestemming ? ' (' + v.bestemming + ')' : '') : '') + '. Documenten die aandacht vragen: ' + d.attenties.length + '.'; }
@@ -94,6 +103,9 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, DATA_DIR }) => {
     if (app === 'nalatenschap') { const d = api.nalatenschap(key); return 'Nalatenschap: ' + d.documenten.length + ' documenten, ' + d.contacten.length + ' vertrouwenspersonen, ' + d.wensen.length + ' vastgelegde wensen. (De inhoud is versleuteld; ik ken alleen de aantallen en de titels.)'; }
     if (app === 'logboek') { const d = api.logboek(key); return 'Logboek: ' + d.objecten.length + ' objecten, ' + d.attenties.length + ' punten die aandacht vragen, onderhoudskosten ' + euro(d.totaalKosten) + '.'; }
     if (app === 'cercle') { const d = api.cercle(key); return 'Cercle: ' + d.aantal + ' clubs in ' + d.steden + ' steden, ' + d.gastpassen + ' gastpassen beschikbaar.'; }
+    if (app === 'hangar') { const d = api.hangar(key); return 'Hangar: ' + d.toestellen.length + ' toestellen, ' + d.totaalUren + ' vlieguren' + (d.komend ? '. Eerstvolgende vlucht: ' + d.komend.van + ' naar ' + d.komend.naar + (d.komend.datum ? ' op ' + d.komend.datum : '') : '') + '.'; }
+    if (app === 'entourage') { const d = api.entourage(key); return 'Reisgezelschap: ' + d.aantal + ' mensen, ' + d.attenties.length + ' paspoorten die aandacht vragen.'; }
+    if (app === 'attenties') { const d = api.attenties(key); const e = d.aankomend[0]; return 'Relatiebeheer: ' + d.relaties.length + ' relaties, ' + d.aankomend.length + ' attenties binnen 30 dagen' + (e ? ' (eerstvolgende: ' + e.naam + ', ' + e.soort + ' over ' + e.dagenTot + ' dagen)' : '') + '.'; }
     const d = api.maison(key); return 'Huishouden: ' + d.staf.length + ' personeelsleden, ' + d.openTaken + ' openstaande taken.';
   }
   async function rechterhandAI(key, app, vraag) {

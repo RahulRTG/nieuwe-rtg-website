@@ -183,16 +183,48 @@ test('Cercle: clubs geteld per stad en gastpassen opgeteld', async () => {
   assert.equal(d.gastpassen, 6);
 });
 
+test('Hangar: een toestel met een gelogde vlucht, positie volgt de aankomst', async () => {
+  const tok = await lidMet('lifestyle');
+  await rh('hangar/toestel', { naam: 'Falcon', type: 'jet', registratie: 'PH-RTG', basis: 'Rotterdam', stoelen: 12 }, tok);
+  let d = await json(await rh('hangar', {}, tok));
+  const t = d.toestellen[0];
+  assert.equal(t.positie, 'Rotterdam', 'zonder vluchten staat het op de thuishaven');
+  assert.equal((await rh('hangar/vlucht', { toestelId: t.id, van: 'Rotterdam', naar: 'Ibiza', datum: gisteren(), uren: 2.5 }, tok)).status, 200);
+  // een vlucht zonder toestel wordt geweigerd
+  assert.equal((await rh('hangar/vlucht', { toestelId: 'x', van: 'A' }, tok)).status, 404);
+  d = await json(await rh('hangar', {}, tok));
+  assert.equal(d.toestellen[0].positie, 'Ibiza', 'de positie volgt de laatste aankomst');
+  assert.equal(d.totaalUren, 2.5);
+});
+
+test('Entourage: reisgezelschap met een paspoort dat opvalt', async () => {
+  const tok = await lidMet('lifestyle');
+  await rh('entourage/persoon', { naam: 'Sofia', band: 'partner', dieet: 'vegetarisch', paspoortTot: gisteren() }, tok);
+  await rh('entourage/persoon', { naam: 'Karim', band: 'vriend' }, tok);
+  const d = await json(await rh('entourage', {}, tok));
+  assert.equal(d.aantal, 2);
+  assert.ok(d.attenties.some(a => a.naam === 'Sofia' && a.verlopen), 'het verlopen paspoort valt op');
+});
+
+test('Attenties: relatie met een naderende verjaardag en giftgeschiedenis', async () => {
+  const tok = await lidMet('lifestyle');
+  const morgen = new Date(Date.now() + 86400000);
+  const mmdd = String(morgen.getMonth() + 1).padStart(2, '0') + '-' + String(morgen.getDate()).padStart(2, '0');
+  await rh('attenties/relatie', { naam: 'Mentor', band: 'mentor', verjaardag: mmdd }, tok);
+  let d = await json(await rh('attenties', {}, tok));
+  const r = d.relaties.find(x => x.naam === 'Mentor');
+  assert.ok(r.dagenTot <= 1, 'de verjaardag is (bijna) morgen');
+  assert.ok(d.aankomend.some(a => a.naam === 'Mentor'));
+  assert.equal((await rh('attenties/gift', { relatieId: r.id, wat: 'Eerste editie', gelegenheid: 'verjaardag', bedrag: 1200 }, tok)).status, 200);
+  d = await json(await rh('attenties', {}, tok));
+  assert.equal(d.relaties.find(x => x.id === r.id).giften.length, 1);
+});
+
 test('de extra ROS-apps zijn gated op de Lifestyle Pass (RTG niet, Business wel)', async () => {
   const rtg = await lidMet('rtg');
-  assert.equal((await rh('reisboek', {}, rtg)).status, 403);
-  assert.equal((await rh('cellier', {}, rtg)).status, 403);
-  assert.equal((await rh('garderobe', {}, rtg)).status, 403);
-  assert.equal((await rh('mecenaat', {}, rtg)).status, 403);
-  assert.equal((await rh('nalatenschap', {}, rtg)).status, 403);
-  assert.equal((await rh('logboek', {}, rtg)).status, 403);
-  assert.equal((await rh('cercle', {}, rtg)).status, 403);
+  for (const p of ['reisboek', 'cellier', 'garderobe', 'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties'])
+    assert.equal((await rh(p, {}, rtg)).status, 403, p + ' hoort gated te zijn');
   const biz = await lidMet('business');
   assert.equal((await rh('maison', {}, biz)).status, 200);
-  assert.equal((await rh('cercle', {}, biz)).status, 200);
+  assert.equal((await rh('hangar', {}, biz)).status, 200);
 });

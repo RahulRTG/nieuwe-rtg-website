@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rendez-vous · Lifestyle Pass</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .tabs{display:flex;gap:.4rem;padding:.7rem 1.1rem 0;max-width:760px;margin:0 auto;}
+  .tab{flex:1;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px 10px 0 0;font:inherit;font-size:.82rem;padding:.5rem;cursor:pointer;border-bottom:none;}
+  .tab.aan{background:var(--card);color:var(--txt);border-color:var(--gold);}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
+  .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;display:block;}
+  .veld,textarea.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
+  textarea.veld{min-height:3.2rem;resize:vertical;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.55rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .schakel{display:flex;align-items:center;gap:.6rem;font-size:.92rem;}
+  .schakel input{width:1.2rem;height:1.2rem;accent-color:var(--gold);}
+  .chip{display:inline-block;font-size:.72rem;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin:.15rem .2rem 0 0;}
+  .chip.deel{border-color:var(--gold);color:var(--gold);}
+  .kand{border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin-bottom:.7rem;background:var(--card2);}
+  .kand .nm{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
+  .kand .over{font-size:.88rem;color:var(--muted);margin-top:.3rem;line-height:1.5;}
+  .kand .acts{display:flex;gap:.5rem;margin-top:.7rem;}
+  .kand .acts .knop{flex:1;}
+  .hart{background:var(--burgundy);color:#fff;border:none;}
+  .badge{display:inline-block;font-size:.66rem;padding:.12rem .5rem;border-radius:999px;background:var(--burgundy);color:#fff;margin-left:.4rem;vertical-align:middle;}
+  .match{border-color:var(--gold);}
+  .leeg{color:var(--soft);font-size:.88rem;padding:.6rem 0;text-align:center;}
+  .note{font-size:.8rem;color:var(--soft);margin-top:.4rem;line-height:1.5;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .datebox{margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);border-top:1px solid var(--line);padding-top:.6rem;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<header><div><div class="ey">Lifestyle Pass · besloten</div><h1>Rendez-vous</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
+<div class="tabs" id="tabs"></div>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
+const api=(pad,body)=>fetch('/api/member/rendezvous/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+let TAB='profiel';
+const TABS=[['profiel','Profiel'],['ontdek','Ontdek'],['matches','Matches']];
+function tekenTabs(){ $('#tabs').innerHTML=TABS.map(([k,n])=>'<button class="tab'+(TAB===k?' aan':'')+'" data-t="'+k+'">'+n+'</button>').join(''); document.querySelectorAll('[data-t]').forEach(b=> b.onclick=()=>{ TAB=b.dataset.t; laad(); }); }
+function chips(arr,deel){ deel=deel||[]; const dl=deel.map(x=>x.toLowerCase()); return (arr||[]).map(x=>'<span class="chip'+(dl.includes(x.toLowerCase())?' deel':'')+'">'+esc(x)+'</span>').join('')||'<span class="note">niets opgegeven</span>'; }
+
+async function laad(){
+  tekenTabs();
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
+  try{
+    if(TAB==='profiel') return await profiel();
+    if(TAB==='ontdek') return await ontdek();
+    return await matches();
+  }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Rendez-vous is de besloten datingdienst van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon Rendez-vous niet laden.</div>'; }
+}
+
+async function profiel(){
+  const d=await api('profiel'); const p=d.profiel;
+  let h='<div class="kaart"><div class="schakel"><input type="checkbox" id="aan"'+(p.aan?' checked':'')+'><label for="aan">Mijn profiel is zichtbaar voor andere leden</label></div><div class="note">U bent alleen zichtbaar op uw codenaam ('+esc(d.codenaam)+'). Uw echte naam blijft in de kluis.</div></div>';
+  h+='<div class="kaart"><h2>Uw profiel</h2><span class="lbl">Over u</span><textarea class="veld" id="over" placeholder="Vertel kort iets over uzelf.">'+esc(p.over)+'</textarea>'
+    +'<span class="lbl">Wat u zoekt</span><input class="veld" id="zoekt" value="'+esc(p.zoekt)+'" placeholder="Bijv. iemand die van zeilen en kunst houdt.">'
+    +'<span class="lbl">Wensen (met komma\'s)</span><input class="veld" id="wensen" value="'+esc((p.wensen||[]).join(', '))+'" placeholder="reizen, fine dining, cultuur">'
+    +'<span class="lbl">Locaties waar u openstaat voor een date (met komma\'s)</span><input class="veld" id="locaties" value="'+esc((p.locaties||[]).join(', '))+'" placeholder="Ibiza, Saint-Tropez, Gstaad">'
+    +'<div style="margin-top:.8rem;"><button class="knop" id="bewaar">Bewaren</button></div></div>';
+  h+='<div class="note">Bij een match stelt Rahul een jetset-date voor op een locatie die u beiden hebt aangegeven of voor openstaat. Rahul belooft niets; De Rechterhand regelt de date pas als u beiden akkoord bent.</div>';
+  $('#main').innerHTML=h;
+  $('#bewaar').onclick=async()=>{ try{ await api('profiel/zet',{aan:$('#aan').checked,over:$('#over').value,zoekt:$('#zoekt').value,wensen:$('#wensen').value,locaties:$('#locaties').value}); meld('Profiel bewaard.'); }catch(e){ meld(e.message); } };
+  $('#aan').onchange=async()=>{ try{ await api('profiel/zet',{aan:$('#aan').checked}); meld($('#aan').checked?'U bent nu zichtbaar.':'U bent nu verborgen.'); }catch(e){ meld(e.message); } };
+}
+
+async function ontdek(){
+  const d=await api('kandidaten');
+  let h='';
+  if(!d.profielAan) h+='<div class="kaart" style="border-color:rgba(194,58,94,.4);"><b>Uw profiel staat uit.</b><div class="note">Zet uw profiel aan bij Profiel om te kunnen liken en om zelf gevonden te worden.</div></div>';
+  if(!d.kandidaten.length){ h+='<div class="leeg">Nog geen andere leden om te ontdekken. Kom straks terug.</div>'; $('#main').innerHTML=h; return; }
+  h+=d.kandidaten.map(k=>{
+    const isMatch=k.status==='match', geliked=k.status==='geliked';
+    return '<div class="kand'+(isMatch?' match':'')+'"><div class="nm">'+esc(k.codenaam)+(isMatch?'<span class="badge">match</span>':geliked?'<span class="badge" style="background:var(--card);color:var(--gold);border:1px solid var(--gold);">geliked</span>':k.likteMij?'<span class="badge">vindt u al leuk</span>':'')+'</div>'
+      +(k.over?'<div class="over">'+esc(k.over)+'</div>':'')
+      +(k.zoekt?'<div class="note">Zoekt: '+esc(k.zoekt)+'</div>':'')
+      +'<div style="margin-top:.4rem;">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'
+      +(k.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">U staat allebei open voor: '+k.gedeeldeLocaties.map(esc).join(', ')+'</div>':'')
+      +'<div class="acts">'+(isMatch?'':'<button class="knop stil" data-pas="'+k.id+'">Overslaan</button><button class="knop hart" data-like="'+k.id+'">♥ Leuk</button>')+(isMatch?'<button class="knop" data-ga="1">Ga naar Matches</button>':'')+'</div></div>';
+  }).join('');
+  $('#main').innerHTML=h;
+  document.querySelectorAll('[data-like]').forEach(b=> b.onclick=async()=>{ try{ const r=await api('like',{id:b.dataset.like}); meld(r.match?'Het is een match! Bekijk Matches.':'Uw like is verstuurd.'); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-pas]').forEach(b=> b.onclick=async()=>{ try{ await api('pas',{id:b.dataset.pas}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-ga]').forEach(b=> b.onclick=()=>{ TAB='matches'; laad(); });
+}
+
+async function matches(){
+  const d=await api('matches');
+  if(!d.matches.length){ $('#main').innerHTML='<div class="leeg">Nog geen matches. Like iemand bij Ontdek; is het wederzijds, dan verschijnt de match hier.</div>'; return; }
+  let h=d.matches.map(m=>'<div class="kaart match"><div class="nm" style="font-family:Bodoni Moda,serif;font-size:1.15rem;">'+esc(m.codenaam)+'</div>'
+    +(m.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">Gedeelde locaties: '+m.gedeeldeLocaties.map(esc).join(', ')+'</div>':'<div class="note">Nog geen gedeelde locatie. Vul locaties aan bij Profiel.</div>')
+    +'<div style="margin-top:.7rem;"><button class="knop hart" data-date="'+m.id+'">✨ Stel een jetset-date voor</button></div>'
+    +'<div class="datebox" id="date-'+m.id+'" style="display:none;"></div></div>').join('');
+  $('#main').innerHTML=h;
+  document.querySelectorAll('[data-date]').forEach(b=> b.onclick=async()=>{ const box=$('#date-'+b.dataset.date); box.style.display='block'; box.textContent='Rahul denkt na…'; try{ const r=await api('date',{id:b.dataset.date}); box.textContent=r.antwoord; }catch(e){ box.textContent=e.message; } });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

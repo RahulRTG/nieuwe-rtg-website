@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Attenties · Lifestyle Pass</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
+  .attn{background:linear-gradient(135deg,rgba(169,143,7,.14),rgba(194,58,94,.08));border:1px solid rgba(169,143,7,.3);border-radius:16px;padding:.85rem 1.1rem;margin-bottom:.9rem;}
+  .attn h2{font-size:.95rem;margin-bottom:.4rem;color:var(--gold);}
+  .attn .r{font-size:.85rem;color:var(--muted);padding:.2rem 0;}
+  .attn .r b{color:var(--txt);}
+  .rel{cursor:pointer;transition:border-color .2s;display:flex;gap:.6rem;align-items:center;}
+  .rel:hover{border-color:var(--gold);}
+  .rel .b{flex:1;min-width:0;}
+  .rel .nm{font-weight:600;}
+  .rel .meta{font-size:.8rem;color:var(--soft);margin-top:.15rem;}
+  .tel{font-size:.72rem;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
+  .tel.snel{border-color:var(--gold);color:var(--gold);}
+  .veld,select.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
+  select.veld{appearance:none;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;}
+  .rij>*{flex:1;min-width:6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.5rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .item{border-top:1px solid var(--line);padding:.55rem 0;display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;}
+  .item:first-child{border-top:0;}
+  .item .b{flex:1;min-width:0;}
+  .item .b small{color:var(--soft);}
+  .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.8rem;height:1.8rem;cursor:pointer;flex-shrink:0;}
+  .weg:hover{border-color:var(--gold);color:var(--txt);}
+  .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<header><div><div class="ey">Lifestyle Pass</div><h1>Attenties</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
+const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const euro=c=>'€ '+Number(c||0).toLocaleString('nl-NL');
+const MND=['','januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+const md=s=>{ if(!s)return ''; const[m,dd]=s.split('-'); return Number(dd)+' '+MND[Number(m)]; };
+const tel=n=>n==null?'':n===0?'vandaag':n===1?'morgen':'over '+n+' dagen';
+const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag de relatiesecretaris</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
+let open=null;
+async function laad(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
+  let d; try{ d=await api('attenties'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Attenties is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het relatiebeheer niet laden.</div>'; return; }
+  if(open){ const r=d.relaties.find(x=>x.id===open); if(r) return detail(d,r); open=null; }
+  let h='';
+  if(d.aankomend.length){ h+='<div class="attn"><h2>🎉 Binnenkort</h2>'+d.aankomend.map(a=>'<div class="r"><b>'+esc(a.naam)+'</b> · '+esc(a.soort)+' '+tel(a.dagenTot)+'</div>').join('')+'</div>'; }
+  h+='<div class="kaart"><h2>Relatie toevoegen</h2><div class="rij"><input class="veld" id="rN" placeholder="naam"><select class="veld" id="rB">'+d.banden.map(b=>'<option>'+b+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="rV" type="date" title="verjaardag"><input class="veld" id="rJ" type="date" title="jubileum"></div><div class="rij"><input class="veld" id="rVo" placeholder="voorkeuren (bijv. houdt van boeken)"></div><div style="margin-top:.6rem;"><button class="knop" id="rAdd">+ relatie</button></div></div>';
+  h+= d.relaties.length ? d.relaties.map(r=>'<div class="kaart rel" data-id="'+r.id+'"><div class="b"><div class="nm">'+esc(r.naam)+'</div><div class="meta">'+[r.band,r.verjaardag?'jarig '+md(r.verjaardag):''].filter(Boolean).join(' · ')+'</div></div>'+(r.dagenTot!=null?'<span class="tel'+(r.dagenTot<=30?' snel':'')+'">'+r.volgendeSoort+' '+tel(r.dagenTot)+'</span>':'')+'</div>').join('') : '<div class="kaart"><div class="leeg">Nog geen relaties.</div></div>';
+  h+=AIBOX('Bijv. wat geef ik mijn mentor voor zijn jubileum?');
+  $('#main').innerHTML=h;
+  bindAi('attenties');
+  $('#rAdd').onclick=async()=>{ const naam=$('#rN').value.trim(); if(!naam) return meld('Naam?'); try{ await api('attenties/relatie',{naam,band:$('#rB').value,verjaardag:$('#rV').value,jubileum:$('#rJ').value,voorkeuren:$('#rVo').value}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('.rel').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
+}
+function detail(d,r){
+  let h='<div class="kaart"><div class="nm" style="font-weight:600;font-size:1.2rem;font-family:Bodoni Moda,serif;">'+esc(r.naam)+'</div><div class="meta" style="font-size:.82rem;color:var(--soft);margin-top:.2rem;">'+[r.band,r.verjaardag?'jarig '+md(r.verjaardag):'',r.jubileum?'jubileum '+md(r.jubileum):'',esc(r.voorkeuren)].filter(Boolean).join(' · ')+'</div><div style="margin-top:.7rem;display:flex;gap:.5rem;"><button class="knop stil" id="terug">← alle relaties</button><button class="knop stil" id="rWeg" style="color:var(--burgundy);border-color:var(--burgundy);">Verwijderen</button></div></div>';
+  h+='<div class="kaart"><h2>Gift noteren</h2><div class="rij"><input class="veld" id="gW" placeholder="wat gaf/geeft u"><input class="veld" id="gG" placeholder="gelegenheid"></div><div class="rij"><input class="veld" id="gD" type="date"><input class="veld" id="gB" type="number" placeholder="bedrag €"></div><div style="margin-top:.5rem;"><button class="knop" id="gAdd">+ gift</button></div></div>';
+  h+='<div class="kaart"><h2>🎁 Giftgeschiedenis</h2>'+(r.giften.length?r.giften.map(g=>'<div class="item"><div class="b"><b>'+esc(g.wat)+'</b> <small>'+[esc(g.gelegenheid),g.datum,g.bedrag?euro(g.bedrag):''].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-g="'+g.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen giften genoteerd.</div>')+'</div>';
+  $('#main').innerHTML=h;
+  $('#terug').onclick=()=>{ open=null; laad(); };
+  $('#rWeg').onclick=async()=>{ if(!confirm('Deze relatie en de giftgeschiedenis verwijderen?'))return; try{ await api('attenties/relatie/weg',{id:r.id}); open=null; laad(); }catch(x){ meld(x.message); } };
+  $('#gAdd').onclick=async()=>{ const wat=$('#gW').value.trim(); if(!wat) return meld('Wat gaf u?'); try{ await api('attenties/gift',{relatieId:r.id,wat,gelegenheid:$('#gG').value,datum:$('#gD').value,bedrag:$('#gB').value}); laad(); }catch(x){ meld(x.message); } };
+  document.querySelectorAll('[data-g]').forEach(b=> b.onclick=async()=>{ try{ await api('attenties/gift/weg',{id:b.dataset.g}); laad(); }catch(x){ meld(x.message); } });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

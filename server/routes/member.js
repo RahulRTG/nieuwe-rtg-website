@@ -53,6 +53,8 @@ module.exports = (kern) => {
   require('./member/lifestyle')(kern);
   // Extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison
   require('./member/rechterhand')(kern);
+  // Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass
+  require('./member/rendezvous')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
   // De persoonlijke AI en de Butler/concierge-chat.

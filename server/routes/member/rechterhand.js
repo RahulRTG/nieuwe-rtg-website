@@ -12,6 +12,9 @@ module.exports = (kern) => {
     nalatenschap, nlDoc, nlDocWeg, nlContact, nlContactWeg, nlWens, nlWensWeg,
     logboek, lbObject, lbObjectWeg, lbRegel, lbRegelWeg,
     cercle, crClub, crClubWeg,
+    hangar, hgToestel, hgToestelWeg, hgVlucht, hgVluchtWeg,
+    entourage, enPersoon, enPersoonWeg,
+    attenties, atRelatie, atRelatieWeg, atGift, atGiftWeg,
     rechterhandAI } = kern;
 
   function eis(req, res) {
@@ -86,6 +89,22 @@ module.exports = (kern) => {
   route('cercle', (k) => cercle(k));
   route('cercle/club', (k, b) => crClub(k, b));
   route('cercle/club/weg', (k, b) => crClubWeg(k, String(b.id || '')));
+  // Hangar
+  route('hangar', (k) => hangar(k));
+  route('hangar/toestel', (k, b) => hgToestel(k, b));
+  route('hangar/toestel/weg', (k, b) => hgToestelWeg(k, String(b.id || '')));
+  route('hangar/vlucht', (k, b) => hgVlucht(k, b));
+  route('hangar/vlucht/weg', (k, b) => hgVluchtWeg(k, String(b.id || '')));
+  // Entourage
+  route('entourage', (k) => entourage(k));
+  route('entourage/persoon', (k, b) => enPersoon(k, b));
+  route('entourage/persoon/weg', (k, b) => enPersoonWeg(k, String(b.id || '')));
+  // Attenties
+  route('attenties', (k) => attenties(k));
+  route('attenties/relatie', (k, b) => atRelatie(k, b));
+  route('attenties/relatie/weg', (k, b) => atRelatieWeg(k, String(b.id || '')));
+  route('attenties/gift', (k, b) => atGift(k, b));
+  route('attenties/gift/weg', (k, b) => atGiftWeg(k, String(b.id || '')));
 
   // Rahul als adviseur binnen elke app (u-vorm); async, dus een eigen handler
   app.post('/api/member/rechterhand/ai', auth, async (req, res) => {

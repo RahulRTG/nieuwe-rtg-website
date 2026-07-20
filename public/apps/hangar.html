@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hangar · Lifestyle Pass</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.7rem;margin-bottom:1rem;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
+  .stat .n{font-family:'Bodoni Moda',serif;font-size:1.4rem;}
+  .stat .l{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-top:.15rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
+  .tstl{cursor:pointer;transition:border-color .2s;}
+  .tstl:hover{border-color:var(--gold);}
+  .tstl .nm{font-weight:600;font-size:1.05rem;}
+  .tstl .meta{font-size:.82rem;color:var(--soft);margin-top:.2rem;}
+  .tstl .pos{font-size:.8rem;color:var(--gold);margin-top:.2rem;}
+  .veld,select.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
+  select.veld{appearance:none;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;}
+  .rij>*{flex:1;min-width:6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.5rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .item{border-top:1px solid var(--line);padding:.55rem 0;display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;}
+  .item:first-child{border-top:0;}
+  .item .b{flex:1;min-width:0;}
+  .item .b small{color:var(--soft);}
+  .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.8rem;height:1.8rem;cursor:pointer;flex-shrink:0;}
+  .weg:hover{border-color:var(--gold);color:var(--txt);}
+  .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<header><div><div class="ey">Lifestyle Pass</div><h1>Hangar</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
+const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]; };
+const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag de vluchtcoördinator</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
+let open=null;
+async function laad(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
+  let d; try{ d=await api('hangar'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Hangar is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon de hangar niet laden.</div>'; return; }
+  if(open){ const t=d.toestellen.find(x=>x.id===open); if(t) return detail(d,t); open=null; }
+  let h='<div class="grid"><div class="stat"><div class="n">'+d.toestellen.length+'</div><div class="l">Toestellen</div></div><div class="stat"><div class="n">'+d.totaalUren+'</div><div class="l">Vlieguren</div></div><div class="stat"><div class="n">'+(d.komend?dt(d.komend.datum):'-')+'</div><div class="l">Volgende vlucht</div></div></div>';
+  if(d.komend){ h+='<div class="kaart" style="border-color:rgba(169,143,7,.3);"><h2>✈️ Eerstvolgende vlucht</h2><div style="font-size:.92rem;color:var(--muted);">'+esc(d.komend.toestel)+': '+esc(d.komend.van)+' → '+esc(d.komend.naar)+' '+[dt(d.komend.datum),esc(d.komend.tijd)].filter(Boolean).join(' ')+'</div></div>'; }
+  h+='<div class="kaart"><h2>Toestel toevoegen</h2><div class="rij"><input class="veld" id="tN" placeholder="naam/roepnaam"><select class="veld" id="tT">'+d.types.map(x=>'<option>'+x+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="tR" placeholder="registratie"><input class="veld" id="tB" placeholder="thuishaven"><input class="veld" id="tS" type="number" placeholder="stoelen"></div><div style="margin-top:.6rem;"><button class="knop" id="tAdd">+ toestel</button></div></div>';
+  h+= d.toestellen.length ? d.toestellen.map(t=>'<div class="kaart tstl" data-id="'+t.id+'"><div class="nm">'+esc(t.naam)+'</div><div class="meta">'+[t.type,t.registratie,t.stoelen?t.stoelen+' stoelen',t.uren+' uur'].filter(Boolean).join(' · ')+'</div><div class="pos">📍 '+(esc(t.positie)||'positie onbekend')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen toestellen.</div></div>';
+  h+=AIBOX('Bijv. waar staat de jet nu?');
+  $('#main').innerHTML=h;
+  bindAi('hangar');
+  $('#tAdd').onclick=async()=>{ const naam=$('#tN').value.trim(); if(!naam) return meld('Naam?'); try{ await api('hangar/toestel',{naam,type:$('#tT').value,registratie:$('#tR').value,basis:$('#tB').value,stoelen:$('#tS').value}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('.tstl').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
+}
+function detail(d,t){
+  const vl=d.vluchten.filter(v=>v.toestelId===t.id);
+  let h='<div class="kaart"><div class="nm" style="font-size:1.2rem;font-family:Bodoni Moda,serif;">'+esc(t.naam)+'</div><div class="meta" style="font-size:.82rem;color:var(--soft);margin-top:.2rem;">'+[t.type,t.registratie,t.basis?'basis '+esc(t.basis):''].filter(Boolean).join(' · ')+'</div><div class="pos" style="font-size:.8rem;color:var(--gold);margin-top:.2rem;">📍 '+(esc(t.positie)||'positie onbekend')+' · '+t.uren+' vlieguren</div><div style="margin-top:.7rem;display:flex;gap:.5rem;"><button class="knop stil" id="terug">← alle toestellen</button><button class="knop stil" id="tWeg" style="color:var(--burgundy);border-color:var(--burgundy);">Verwijderen</button></div></div>';
+  h+='<div class="kaart"><h2>Vlucht loggen</h2><div class="rij"><input class="veld" id="vV" placeholder="van"><input class="veld" id="vN" placeholder="naar"></div><div class="rij"><input class="veld" id="vD" type="date"><input class="veld" id="vT" type="time"><input class="veld" id="vU" type="number" step="0.1" placeholder="uren"></div><div class="rij"><input class="veld" id="vB" placeholder="bemanning"></div><div style="margin-top:.5rem;"><button class="knop" id="vAdd">+ vlucht</button></div></div>';
+  h+='<div class="kaart"><h2>Vluchtlogboek</h2>'+(vl.length?vl.map(v=>'<div class="item"><div class="b"><b>'+esc(v.van)+' → '+esc(v.naar)+'</b> <small>'+[dt(v.datum),esc(v.tijd),v.uren?v.uren+' uur':'',esc(v.bemanning)].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-vl="'+v.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen vluchten.</div>')+'</div>';
+  $('#main').innerHTML=h;
+  $('#terug').onclick=()=>{ open=null; laad(); };
+  $('#tWeg').onclick=async()=>{ if(!confirm('Dit toestel en het logboek verwijderen?'))return; try{ await api('hangar/toestel/weg',{id:t.id}); open=null; laad(); }catch(x){ meld(x.message); } };
+  $('#vAdd').onclick=async()=>{ const van=$('#vV').value.trim(); if(!van) return meld('Van waar?'); try{ await api('hangar/vlucht',{toestelId:t.id,van,naar:$('#vN').value,datum:$('#vD').value,tijd:$('#vT').value,uren:$('#vU').value,bemanning:$('#vB').value}); laad(); }catch(x){ meld(x.message); } };
+  document.querySelectorAll('[data-vl]').forEach(b=> b.onclick=async()=>{ try{ await api('hangar/vlucht/weg',{id:b.dataset.vl}); laad(); }catch(x){ meld(x.message); } });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

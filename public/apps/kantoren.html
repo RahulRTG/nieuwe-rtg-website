@@ -1550,19 +1550,46 @@ async function bankRonde(soort){
     bankVervers();
   } catch (e) { meld(e.message); }
 }
+let bankWie = '';
+async function bankSchakel(pad, body){
+  try {
+    const d = await api(pad, { ...body, naam: bankWie });
+    if (d.error) meld(d.error);
+    else if (d.needsAuth) meld('Aangevraagd -- een tweede persoon moet dit bevestigen.');
+    else if (d.ongewijzigd) meld('Geen wijziging.');
+    else meld('Gedaan.');
+    bankVervers();
+  } catch (e) { meld(e.message); }
+}
 function bankRenderKnop(r){
-  const seg = r.modi.map(m => '<button class="knop' + (m === r.modus ? '' : ' stil') + '" data-modus="' + m + '"' + ((m !== 'partner' && !r.operationeel) ? ' disabled' : '') + ' style="padding:.45rem 1rem;">' + esc(BK_MODUS[m]) + '</button>').join(' ');
+  const seg = r.modi.map(m => '<button class="knop' + (m === r.modus ? '' : ' stil') + '" data-modus="' + m + '" style="padding:.45rem 1rem;">' + esc(BK_MODUS[m]) + '</button>').join(' ');
+  const nood = r.nood && r.nood.actief
+    ? '<div style="margin:.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:8px;color:var(--burgundy-on-dark,#C23A5E);">🚨 <strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:.4rem;">Herstel</button></div>'
+    : '';
+  const a = r.autorisatie;
+  const aut = a
+    ? '<div style="margin:.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:8px;">⏳ <strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:.4rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
+    : '';
   $('#bankKnop').innerHTML =
-    '<p style="margin:0 0 .7rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--gold);">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen bank is operationeel.' : 'De eigen bank staat nog uit; zet hem aan om verder te kunnen draaien.') + '</p>' +
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.6rem;">' +
+      '<span><label for="bankWie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Wie schakelt? (nodig voor de vier-ogen)</label><input id="bankWie" placeholder="je naam" value="' + esc(bankWie) + '" style="width:11rem;"></span>' +
+      '<label style="font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankLeden"' + (r.ledenAan ? ' checked' : '') + '> 🏦 Live voor leden</label>' +
+      '<button class="knop stil" id="bankNood" style="margin-left:auto;border-color:var(--burgundy);">Noodstop</button>' +
+    '</div>' + nood + aut +
+    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--gold);">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen bank is operationeel.' : 'De eigen bank staat nog uit.') + ' Opschalen vraagt een tweede persoon; afschalen (terug naar partner) mag direct.</p>' +
     '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">' + seg +
       ' <button class="knop" id="bankDraai" style="padding:.45rem 1rem;">Eén slag verder →</button>' +
       '<label style="margin-left:auto;font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankOper"' + (r.operationeel ? ' checked' : '') + '> Bank operationeel</label>' +
     '</div>';
-  $('#bankKnop').querySelectorAll('[data-modus]').forEach(b => b.addEventListener('click', async () => {
-    try { await api('bank/modus', { modus: b.dataset.modus }); meld('Bankstand: ' + BK_MODUS[b.dataset.modus]); bankVervers(); } catch (e) { meld(e.message); }
-  }));
-  $('#bankDraai').addEventListener('click', async () => { try { const d = await api('bank/draai', {}); meld(d.ongewijzigd ? 'Al op de eigen bank.' : 'Gedraaid naar ' + BK_MODUS[d.modus]); bankVervers(); } catch (e) { meld(e.message); } });
-  $('#bankOper').addEventListener('change', async e => { try { const d = await api('bank/operationeel', { aan: e.target.checked }); meld(d.teruggevallen ? 'Uit; de stand valt terug naar partner.' : (d.operationeel ? 'De bank is operationeel.' : 'De bank staat uit.')); bankVervers(); } catch (err) { meld(err.message); } });
+  $('#bankWie').addEventListener('input', e => { bankWie = e.target.value; });
+  $('#bankKnop').querySelectorAll('[data-modus]').forEach(b => b.addEventListener('click', () => bankSchakel('bank/modus', { modus: b.dataset.modus })));
+  $('#bankDraai').addEventListener('click', () => bankSchakel('bank/draai', {}));
+  $('#bankOper').addEventListener('change', e => bankSchakel('bank/operationeel', { aan: e.target.checked }));
+  $('#bankLeden').addEventListener('change', async e => { try { await api('bank/leden', { aan: e.target.checked, naam: bankWie }); meld('Leden-bank ' + (e.target.checked ? 'live' : 'gesloten')); bankVervers(); } catch (err) { meld(err.message); } });
+  $('#bankNood').addEventListener('click', async () => { try { await api('bank/nood', { reden: 'Handmatig via de boardroom', naam: bankWie }); meld('Noodstop gezet.'); bankVervers(); } catch (err) { meld(err.message); } });
+  if ($('#bankHerstel')) $('#bankHerstel').addEventListener('click', async () => { try { await api('bank/herstel', { naam: bankWie }); meld('Hersteld.'); bankVervers(); } catch (err) { meld(err.message); } });
+  if ($('#bankBevestig')) $('#bankBevestig').addEventListener('click', async () => { try { const d = await api('bank/autoriseer/bevestig', { id: a.id, naam: bankWie }); meld(d.error ? d.error : 'Bevestigd: stand ' + d.modus); bankVervers(); } catch (err) { meld(err.message); } });
+  if ($('#bankIntrek')) $('#bankIntrek').addEventListener('click', async () => { try { await api('bank/autoriseer/annuleer', { naam: bankWie }); meld('Ingetrokken.'); bankVervers(); } catch (err) { meld(err.message); } });
 }
 function bankRenderGezond(g){
   const tegels = [['Deposito', bkEuro(g.depositoCenten)], ['In omloop (eigen bank)', bkEuro(g.inOmloopCenten)], ['Krediet uit', bkEuro(g.kredietCenten)], ['Rente betaald', bkEuro(g.renteBetaaldCenten)], ['Reserve', bkEuro(g.reserveCenten)], ['Rekeningen', String(g.aantalRekeningen)], ['Sluitcontrole', g.sluit.klopt ? '✓ klopt' : '✗ ' + g.sluit.som]];

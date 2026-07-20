@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Logboek · Lifestyle Pass</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
+  .attn{background:linear-gradient(135deg,rgba(194,58,94,.12),rgba(169,143,7,.06));border:1px solid rgba(194,58,94,.3);border-radius:16px;padding:.85rem 1.1rem;margin-bottom:.9rem;}
+  .attn h2{font-size:.95rem;margin-bottom:.4rem;color:var(--burgundy);}
+  .attn .r{font-size:.85rem;color:var(--muted);padding:.2rem 0;}
+  .attn .r b{color:var(--txt);}
+  .obj{cursor:pointer;transition:border-color .2s;}
+  .obj:hover{border-color:var(--gold);}
+  .obj .nm{font-weight:600;font-size:1.05rem;}
+  .obj .meta{font-size:.82rem;color:var(--soft);margin-top:.2rem;}
+  .veld,select.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
+  select.veld{appearance:none;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;}
+  .rij>*{flex:1;min-width:6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.5rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .item{border-top:1px solid var(--line);padding:.55rem 0;display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;}
+  .item:first-child{border-top:0;}
+  .item .b{flex:1;min-width:0;}
+  .item .b small{color:var(--soft);}
+  .soort{font-size:.66rem;padding:.1rem .5rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;text-transform:capitalize;}
+  .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.8rem;height:1.8rem;cursor:pointer;flex-shrink:0;}
+  .weg:hover{border-color:var(--gold);color:var(--txt);}
+  .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<header><div><div class="ey">Lifestyle Pass</div><h1>Logboek</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
+const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const euro=c=>'€ '+Number(c||0).toLocaleString('nl-NL');
+const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; };
+const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag de vlootbeheerder</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
+let open=null;
+async function laad(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
+  let d; try{ d=await api('logboek'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Logboek is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het logboek niet laden.</div>'; return; }
+  if(open){ const o=d.objecten.find(x=>x.id===open); if(o) return detail(d,o); open=null; }
+  let h='';
+  if(d.attenties.length){ h+='<div class="attn"><h2>⏳ Vraagt aandacht</h2>'+d.attenties.map(a=>'<div class="r"><b>'+esc(a.object)+'</b> · '+esc(a.wat)+' · '+(a.verlopen?'verlopen':'vóór')+' '+dt(a.volgende)+'</div>').join('')+'</div>'; }
+  h+='<div class="kaart"><h2>Object toevoegen</h2><div class="rij"><input class="veld" id="oN" placeholder="naam"><select class="veld" id="oS">'+d.soorten.map(s=>'<option>'+s+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="oM" placeholder="merk"><input class="veld" id="oB" type="number" placeholder="bouwjaar"><input class="veld" id="oR" placeholder="registratie"></div><div style="margin-top:.6rem;"><button class="knop" id="oAdd">+ object</button></div></div>';
+  h+= d.objecten.length ? d.objecten.map(o=>'<div class="kaart obj" data-id="'+o.id+'"><div class="nm">'+esc(o.naam)+'</div><div class="meta">'+[o.soort,o.merk,o.bouwjaar,o.regelAantal+' regels',euro(o.kosten)].filter(Boolean).join(' · ')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen objecten in het logboek.</div></div>';
+  h+=AIBOX('Bijv. wat staat er dit kwartaal op de planning?');
+  $('#main').innerHTML=h;
+  bindAi('logboek');
+  $('#oAdd').onclick=async()=>{ const naam=$('#oN').value.trim(); if(!naam) return meld('Naam?'); try{ await api('logboek/object',{naam,soort:$('#oS').value,merk:$('#oM').value,bouwjaar:$('#oB').value,registratie:$('#oR').value}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('.obj').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
+}
+function detail(d,o){
+  const regels=d.regels.filter(r=>r.objectId===o.id);
+  let h='<div class="kaart"><div class="nm" style="font-size:1.2rem;font-family:Bodoni Moda,serif;">'+esc(o.naam)+'</div><div class="meta" style="font-size:.82rem;color:var(--soft);margin-top:.2rem;">'+[o.soort,o.merk,o.bouwjaar,o.registratie].filter(Boolean).join(' · ')+'</div><div style="margin-top:.7rem;display:flex;gap:.5rem;"><button class="knop stil" id="terug">← alle objecten</button><button class="knop stil" id="oWeg" style="color:var(--burgundy);border-color:var(--burgundy);">Verwijderen</button></div></div>';
+  h+='<div class="kaart"><h2>Regel toevoegen</h2><div class="rij"><input class="veld" id="rW" placeholder="wat (bijv. grote beurt)"><select class="veld" id="rS">'+d.regelsoorten.map(s=>'<option>'+s+'</option>').join('')+'</select></div><div class="rij"><input class="veld" id="rD" type="date" title="gedaan op"><input class="veld" id="rV" type="date" title="volgende keer"><input class="veld" id="rK" type="number" placeholder="kosten €"></div><div style="margin-top:.5rem;"><button class="knop" id="rAdd">+ regel</button></div><div style="font-size:.72rem;color:var(--soft);margin-top:.35rem;">Eerste datum: wanneer gedaan. Tweede datum: wanneer weer aan de beurt.</div></div>';
+  h+='<div class="kaart"><h2>Historie</h2>'+(regels.length?regels.map(r=>'<div class="item"><div class="b"><b>'+esc(r.wat)+'</b> <span class="soort">'+esc(r.soort)+'</span><small>'+[r.datum?dt(r.datum):'',r.volgende?'volgende: '+dt(r.volgende):'',r.kosten?euro(r.kosten):''].filter(Boolean).join(' · ')+'</small></div><button class="weg" data-regel="'+r.id+'">×</button></div>').join(''):'<div class="leeg">Nog geen regels.</div>')+'</div>';
+  $('#main').innerHTML=h;
+  $('#terug').onclick=()=>{ open=null; laad(); };
+  $('#oWeg').onclick=async()=>{ if(!confirm('Dit object en alle regels verwijderen?'))return; try{ await api('logboek/object/weg',{id:o.id}); open=null; laad(); }catch(x){ meld(x.message); } };
+  $('#rAdd').onclick=async()=>{ const wat=$('#rW').value.trim(); if(!wat) return meld('Wat is er gebeurd?'); try{ await api('logboek/regel',{objectId:o.id,wat,soort:$('#rS').value,datum:$('#rD').value,volgende:$('#rV').value,kosten:$('#rK').value}); laad(); }catch(x){ meld(x.message); } };
+  document.querySelectorAll('[data-regel]').forEach(b=> b.onclick=async()=>{ try{ await api('logboek/regel/weg',{id:b.dataset.regel}); laad(); }catch(x){ meld(x.message); } });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

@@ -2079,7 +2079,7 @@ Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify,
 // De Rechterhand: de premium Lifestyle Pass-suite (concierge, bezittingen, gezondheid)
 Object.assign(kern, require('./kern/lifestyle')({ db, save, crypto, anthropic, liveCodename, notify }));
 // De extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison
-Object.assign(kern, require('./kern/rechterhand')({ db, save, crypto, liveCodename, anthropic }));
+Object.assign(kern, require('./kern/rechterhand')({ db, save, crypto, liveCodename, anthropic, DATA_DIR }));
 // Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
 // dat meereist en een aparte, veilige intake-deling per aanbieder.
 Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));

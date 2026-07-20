@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mecenaat · Lifestyle Pass</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.7rem;margin-bottom:1rem;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
+  .stat .n{font-family:'Bodoni Moda',serif;font-size:1.35rem;}
+  .stat .l{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-top:.15rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
+  .found{background:linear-gradient(135deg,rgba(169,143,7,.14),rgba(194,58,94,.08));border:1px solid rgba(169,143,7,.3);border-radius:16px;padding:.9rem 1.1rem;margin-bottom:.9rem;font-size:.9rem;color:var(--muted);}
+  .found b{color:var(--gold);}
+  .veld,select.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
+  select.veld{appearance:none;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;}
+  .rij>*{flex:1;min-width:6rem;}
+  label.check{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--muted);cursor:pointer;flex:1;min-width:8rem;}
+  label.check input{width:1.1rem;height:1.1rem;accent-color:var(--gold);}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.5rem 1rem;cursor:pointer;}
+  .item{border-top:1px solid var(--line);padding:.6rem 0;display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;}
+  .item:first-child{border-top:0;}
+  .item .b{flex:1;min-width:0;}
+  .item .b small{color:var(--soft);}
+  .bedrag{font-family:'Bodoni Moda',serif;white-space:nowrap;}
+  .pil{font-size:.66rem;padding:.1rem .5rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;text-transform:capitalize;}
+  .pil.betaald{border-color:var(--gold);color:var(--gold);}
+  .pil.found{border-color:var(--burgundy);color:var(--burgundy);}
+  .mini{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;font:inherit;font-size:.72rem;padding:.22rem .5rem;cursor:pointer;}
+  .mini:hover{border-color:var(--gold);}
+  .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.8rem;height:1.8rem;cursor:pointer;flex-shrink:0;}
+  .weg:hover{border-color:var(--gold);color:var(--txt);}
+  .leeg{color:var(--soft);font-size:.86rem;padding:.4rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<header><div><div class="ey">Lifestyle Pass</div><h1>Mecenaat</h1></div><a class="terug" href="/apps/app.html?pas=lifestyle">← app</a></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
+const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const euro=c=>'€ '+Number(c||0).toLocaleString('nl-NL');
+const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag de adviseur</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
+async function laad(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
+  let d; try{ d=await api('mecenaat'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Mecenaat is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon het dossier niet laden.</div>'; return; }
+  const themaOpts=d.themas.map(t=>'<option>'+t+'</option>').join('');
+  const perOpts=d.perioden.map(p=>'<option>'+p+'</option>').join('');
+  let h='<div class="grid"><div class="stat"><div class="n">'+euro(d.betaald)+'</div><div class="l">Betaald</div></div><div class="stat"><div class="n">'+euro(d.toegezegd)+'</div><div class="l">Toegezegd</div></div><div class="stat"><div class="n">'+euro(d.viaFoundation)+'</div><div class="l">Via RTFoundation</div></div></div>';
+  h+='<div class="found">De <b>RTFoundation</b> brengt 30% van de bijdragen naar liefdadigheid. Giften die u via de foundation laat lopen, komen hier samen.</div>';
+  h+='<div class="kaart"><h2>Gift toevoegen</h2><div class="rij"><input class="veld" id="gD" placeholder="goed doel"><select class="veld" id="gT">'+themaOpts+'</select></div><div class="rij"><input class="veld" id="gB" type="number" placeholder="bedrag €"><select class="veld" id="gP">'+perOpts+'</select><input class="veld" id="gDa" type="date"></div><div class="rij"><label class="check"><input type="checkbox" id="gBet"> al betaald</label><label class="check"><input type="checkbox" id="gFound"> via RTFoundation</label></div><div style="margin-top:.6rem;"><button class="knop" id="gAdd">+ vastleggen</button></div></div>';
+  h+='<div class="kaart"><h2>Uw giften</h2><div id="lijst">'+(d.giften.length?d.giften.map(g=>'<div class="item"><div class="b"><b>'+esc(g.doel)+'</b> <small>'+[g.thema,g.periode!=='eenmalig'?'per '+g.periode:'',g.datum].filter(Boolean).join(' · ')+'</small><div style="margin-top:.25rem;display:flex;gap:.35rem;flex-wrap:wrap;"><span class="pil '+(g.betaald?'betaald':'')+'">'+(g.betaald?'betaald':'toegezegd')+'</span>'+(g.foundation?'<span class="pil found">RTFoundation</span>':'')+'</div></div><div style="text-align:right;"><div class="bedrag">'+euro(g.bedrag)+'</div><div style="margin-top:.3rem;display:flex;gap:.3rem;justify-content:flex-end;"><button class="mini" data-bet="'+g.id+'" data-nu="'+(g.betaald?'1':'0')+'">'+(g.betaald?'→ toegezegd':'→ betaald')+'</button><button class="weg" data-weg="'+g.id+'">×</button></div></div></div>').join(''):'<div class="leeg">Nog geen giften vastgelegd.</div>')+'</div></div>';
+  h+=AIBOX('Bijv. spreid ik mijn giften goed over de thema\'s?');
+  $('#main').innerHTML=h;
+  bindAi('mecenaat');
+  $('#gAdd').onclick=async()=>{ const doel=$('#gD').value.trim(); if(!doel) return meld('Welk goed doel?'); try{ await api('mecenaat/gift',{doel,thema:$('#gT').value,bedrag:$('#gB').value,periode:$('#gP').value,datum:$('#gDa').value,betaald:$('#gBet').checked,foundation:$('#gFound').checked}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('[data-bet]').forEach(b=> b.onclick=async()=>{ try{ await api('mecenaat/betaald',{id:b.dataset.bet,betaald:b.dataset.nu!=='1'}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-weg]').forEach(b=> b.onclick=async()=>{ if(!confirm('Deze gift verwijderen?'))return; try{ await api('mecenaat/gift/weg',{id:b.dataset.weg}); laad(); }catch(e){ meld(e.message); } });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

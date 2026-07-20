@@ -111,10 +111,88 @@ test('Rahul adviseert per app in de u-vorm (demo-antwoord zonder sleutel)', asyn
   assert.equal((await rh('ai', { app: 'onzin', vraag: 'hoi' }, tok)).status, 400);
 });
 
+test('Garde-robe: een stuk en een vakman, geteld per categorie', async () => {
+  const tok = await lidMet('lifestyle');
+  assert.equal((await rh('garderobe/stuk', { naam: 'Smoking', categorie: 'pak', merk: 'op maat', kleur: 'zwart', maat: '50', waar: 'Villa Ibiza' }, tok)).status, 200);
+  assert.equal((await rh('garderobe/stuk', { naam: 'Instappers', categorie: 'schoenen' }, tok)).status, 200);
+  // een leeg stuk wordt geweigerd
+  assert.equal((await rh('garderobe/stuk', { naam: '' }, tok)).status, 400);
+  assert.equal((await rh('garderobe/vakman', { naam: 'Atelier X', vak: 'kleermaker', plaats: 'Milaan' }, tok)).status, 200);
+  const d = await json(await rh('garderobe', {}, tok));
+  assert.equal(d.aantal, 2);
+  assert.equal(d.perCategorie.pak, 1);
+  assert.equal(d.vaklui.length, 1);
+});
+
+test('Mecenaat: giften, betaald vs toegezegd en het deel via de RTFoundation', async () => {
+  const tok = await lidMet('lifestyle');
+  await rh('mecenaat/gift', { doel: 'Schoolproject', thema: 'onderwijs', bedrag: 50000, betaald: true, foundation: true }, tok);
+  const open = await json(await rh('mecenaat/gift', { doel: 'Natuurfonds', thema: 'natuur', bedrag: 20000, betaald: false }, tok));
+  assert.ok(open.ok);
+  let d = await json(await rh('mecenaat', {}, tok));
+  assert.equal(d.betaald, 50000);
+  assert.equal(d.toegezegd, 20000);
+  assert.equal(d.viaFoundation, 50000);
+  // de toezegging alsnog markeren als betaald
+  assert.equal((await rh('mecenaat/betaald', { id: open.gift.id, betaald: true }, tok)).status, 200);
+  d = await json(await rh('mecenaat', {}, tok));
+  assert.equal(d.betaald, 70000);
+  assert.equal(d.toegezegd, 0);
+});
+
+test('Nalatenschap: documenten/contacten/wensen, ontsleuteld terug en versleuteld op schijf', async () => {
+  const tok = await lidMet('lifestyle');
+  const marker = 'KLUISPLEK-' + Math.random().toString(36).slice(2);
+  assert.equal((await rh('nalatenschap/doc', { titel: 'Testament', soort: 'testament', waar: marker }, tok)).status, 200);
+  assert.equal((await rh('nalatenschap/contact', { naam: 'Mr. De Vries', rol: 'notaris', telefoon: '0612345678' }, tok)).status, 200);
+  assert.equal((await rh('nalatenschap/wens', { titel: 'Uitvaart', tekst: 'In stilte' }, tok)).status, 200);
+  const d = await json(await rh('nalatenschap', {}, tok));
+  assert.equal(d.documenten[0].waar, marker, 'de plek komt ontsleuteld terug');
+  assert.equal(d.contacten[0].telefoon, '0612345678');
+  assert.equal(d.wensen[0].tekst, 'In stilte');
+  // de gevoelige plek staat NERGENS als platte tekst op schijf
+  let opSchijf = false;
+  const scan = dir => { for (const f of fs.readdirSync(dir)) { const p = path.join(dir, f); const st = fs.statSync(p); if (st.isDirectory()) scan(p); else if (fs.readFileSync(p).includes(marker)) opSchijf = true; } };
+  scan(TMP);
+  assert.equal(opSchijf, false, 'de plek mag niet leesbaar op schijf staan');
+});
+
+test('Logboek: object met een regel die verlopen is en opvalt', async () => {
+  const tok = await lidMet('lifestyle');
+  const o = await json(await rh('logboek/object', { naam: 'Riva', soort: 'jacht', merk: 'Riva', bouwjaar: 2018 }, tok));
+  assert.ok(o.ok);
+  let d = await json(await rh('logboek', {}, tok));
+  const obj = d.objecten.find(x => x.naam === 'Riva');
+  // een keuring die alweer had gemoeten -> attentiepunt
+  assert.equal((await rh('logboek/regel', { objectId: obj.id, wat: 'Grote keuring', soort: 'keuring', datum: '2025-01-01', volgende: gisteren(), kosten: 4500 }, tok)).status, 200);
+  // een regel zonder object wordt geweigerd
+  assert.equal((await rh('logboek/regel', { objectId: 'bestaatniet', wat: 'iets' }, tok)).status, 404);
+  d = await json(await rh('logboek', {}, tok));
+  assert.equal(d.totaalKosten, 4500);
+  assert.ok(d.attenties.some(a => a.object === 'Riva' && a.verlopen), 'de verlopen keuring valt op');
+});
+
+test('Cercle: clubs geteld per stad en gastpassen opgeteld', async () => {
+  const tok = await lidMet('lifestyle');
+  await rh('cercle/club', { naam: 'Annabel', stad: 'Londen', lidnummer: 'A-12', sinds: 2015, gastpassen: 4, reciprociteit: 'diverse clubs' }, tok);
+  await rh('cercle/club', { naam: 'Le Cercle', stad: 'Parijs', gastpassen: 2 }, tok);
+  await rh('cercle/club', { naam: 'The Club', stad: 'Londen', gastpassen: 0 }, tok);
+  const d = await json(await rh('cercle', {}, tok));
+  assert.equal(d.aantal, 3);
+  assert.equal(d.steden, 2);
+  assert.equal(d.gastpassen, 6);
+});
+
 test('de extra ROS-apps zijn gated op de Lifestyle Pass (RTG niet, Business wel)', async () => {
   const rtg = await lidMet('rtg');
   assert.equal((await rh('reisboek', {}, rtg)).status, 403);
   assert.equal((await rh('cellier', {}, rtg)).status, 403);
+  assert.equal((await rh('garderobe', {}, rtg)).status, 403);
+  assert.equal((await rh('mecenaat', {}, rtg)).status, 403);
+  assert.equal((await rh('nalatenschap', {}, rtg)).status, 403);
+  assert.equal((await rh('logboek', {}, rtg)).status, 403);
+  assert.equal((await rh('cercle', {}, rtg)).status, 403);
   const biz = await lidMet('business');
   assert.equal((await rh('maison', {}, biz)).status, 200);
+  assert.equal((await rh('cercle', {}, biz)).status, 200);
 });

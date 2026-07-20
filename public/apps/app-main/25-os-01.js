@@ -43,7 +43,12 @@
     reisboek:    { naam: 'Reisboek',      icoon: '🧳', url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       icoon: '🍷', url: '/apps/cellier.html' },
     table:       { naam: 'Table',         icoon: '🍽️', url: '/apps/table.html' },
-    maison:      { naam: 'Maison',        icoon: '🏛️', url: '/apps/maison.html' }
+    maison:      { naam: 'Maison',        icoon: '🏛️', url: '/apps/maison.html' },
+    garderobe:   { naam: 'Garde-robe',    icoon: '🧥', url: '/apps/garderobe.html' },
+    mecenaat:    { naam: 'Mecenaat',      icoon: '🤲', url: '/apps/mecenaat.html' },
+    nalatenschap:{ naam: 'Nalatenschap',  icoon: '🗝️', url: '/apps/nalatenschap.html' },
+    logboek:     { naam: 'Logboek',       icoon: '⚓', url: '/apps/logboek.html' },
+    cercle:      { naam: 'Cercle',        icoon: '🎟️', url: '/apps/cercle.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -86,7 +91,7 @@
   ];
   // De Rechterhand is de premium suite van de Lifestyle Pass (Business erft mee);
   // hij verschijnt alleen op het springboard van die passen, vooraan op pagina twee.
-  if (['lifestyle', 'business'].includes(pas)) INDELING[1].splice(1, 0, 'link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison');
+  if (['lifestyle', 'business'].includes(pas)) INDELING[1].splice(1, 0, 'link:rechterhand', 'link:reisboek', 'link:cellier', 'link:table', 'link:maison', 'link:garderobe', 'link:mecenaat', 'link:nalatenschap', 'link:logboek', 'link:cercle');
 
   /* ---------- mappen: eigen namen ----------
      De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus

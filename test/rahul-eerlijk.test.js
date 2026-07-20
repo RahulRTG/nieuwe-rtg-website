@@ -71,6 +71,6 @@ test('de leden-AI (volledig verhaal) en het AI-stuur dragen de doctrine ook', ()
 
 test('elke gespreks-assistent begint met het gedeelde karakter (RAHUL_LEAD)', () => {
   for (const p of ['server/routes/supplier/ai/index.js', 'server/routes/member/persoonlijk.js',
-    'server/routes/staff/dienst.js', 'server/routes/techniek/boardroom.js', 'server/kern/fluister/gesprek.js'])
+    'server/routes/staff/dienst.js', 'server/routes/techniek/boardroom/ai.js', 'server/kern/fluister/gesprek.js'])
     assert.match(lees(p), /RAHUL_LEAD/, p + ' gebruikt het gedeelde karakter');
 });

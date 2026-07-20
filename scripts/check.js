@@ -123,5 +123,15 @@ loop(path.join(ROOT, 'test'), /\.js$/, f => {
 });
 if (!onlyFout) ok('geen .only in de tests');
 
+/* 9) Geen kruis-slice variabele-referenties in opgesplitste modules. Na het opknippen
+   van een monoliet in X/index.js + zusjes woont een gedeelde top-level local nog maar in
+   EEN slice; verwijst een ander slice er kaal naar, dan is dat een ReferenceError die pas
+   op runtime knalt (vaak op een AI-pad dat de tests niet raken). node --check ziet het
+   niet. De scan zelf staat in scripts/kruisscan.js (met eigen tests). */
+console.log('\n9) geen kruis-slice variabele-referenties in opgesplitste modules');
+const kruis = require('./kruisscan').scan(path.join(ROOT, 'server'));
+for (const b of kruis) fout('kruis-slice: ' + b.bestand + " gebruikt \"" + b.naam + "\" (top-level in zuster " + b.zuster + ')');
+if (!kruis.length) ok('geen slice raakt een top-level naam van een zuster-slice kaal');
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

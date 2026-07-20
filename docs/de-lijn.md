@@ -91,6 +91,19 @@ gemak brengt. In deze code betekent dat:
   HTTP-omhulling (headers, JSON, herproberen bij 429/5xx). Zelfde vorm als het
   pakket (`new Anthropic().messages.create(...)`), dus de ~50 aanroepplekken en de
   tool-lus merken er niets van. Scheelt de grootste dependency-boom.
+- **De WebAuthn-verificatie** (`server/webauthn.js`): passkeys (registreren en
+  inloggen met vingerafdruk/gezicht/hardwaresleutel) die `@simplewebauthn/server`
+  verving. Let op dezelfde nuance bij regel 1 als bij web-push: we schrijven GEEN
+  eigen cryptografie. We zetten alleen de WebAuthn-protocolstappen op elkaar met
+  Node's standaard-primitieven -- SHA-256 en handtekeningverificatie (ECDSA P-256,
+  RSA PKCS#1v1.5, Ed25519) uit `node:crypto`. Het enige echt eigen stuk is een
+  kleine CBOR-lezer voor het attestationObject en de COSE-sleutel; dat is puur een
+  binair formaat decoderen, geen crypto. Scope: attestatie 'none' (we vragen geen
+  attestatie op -- we willen niet weten welk merk authenticator iemand gebruikt);
+  de identiteit wordt bij het inloggen bewezen via de assertion-handtekening over de
+  opgeslagen publieke sleutel. Geborgd door een synthetische ceremonie-test
+  (`test/webauthn-eigen.test.js`); tijdens de bouw byte-voor-byte gelijk bevonden
+  aan het pakket. Zelfde vorm en veldnamen, dus `kern/webauthn.js` merkt er niets van.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.

@@ -2,16 +2,17 @@
    of hardwaresleutel in plaats van een wachtwoord: phishingbestendig, en er
    valt serverzijdig niets te stelen (wij bewaren alleen PUBLIEKE sleutels).
 
-   Bewust op @simplewebauthn/server gebouwd: de cryptografische kant van
-   WebAuthn (CBOR/COSE, attestatie- en handtekeningverificatie) hoort niet
-   zelfgeschreven te zijn. Challenges leven kort en alleen in RAM; de
-   credentials (publieke sleutel + teller) staan per account in de database,
-   zonder enige echte naam erbij.
+   Draait op de eigen WebAuthn-laag (server/webauthn.js): geen eigen crypto, maar
+   de bekende protocolstappen op Node's crypto (SHA-256 + ECDSA/RSA/Ed25519-
+   verificatie) plus een kleine CBOR-lezer. Zo verdwijnt @simplewebauthn/server
+   als dependency zonder dat er ook maar iets aan crypto zelf geschreven is.
+   Challenges leven kort en alleen in RAM; de credentials (publieke sleutel +
+   teller) staan per account in de database, zonder enige echte naam erbij.
 
    maakWebauthn(state) volgt het vaste kern-patroon. */
 
 const { generateRegistrationOptions, verifyRegistrationResponse,
-  generateAuthenticationOptions, verifyAuthenticationResponse } = require('@simplewebauthn/server');
+  generateAuthenticationOptions, verifyAuthenticationResponse } = require('../webauthn');
 
 const CHALLENGE_TTL_MS = 5 * 60 * 1000;
 const SLEUTELS_MAX = 8;                 // passkeys per account

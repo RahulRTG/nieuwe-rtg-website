@@ -26,7 +26,6 @@
     "icons": "node scripts/icons.js"
   },
   "dependencies": {
-    "@simplewebauthn/server": "^13.3.2",
     "express": "^4.21.0",
     "nodemailer": "^9.0.3"
   },

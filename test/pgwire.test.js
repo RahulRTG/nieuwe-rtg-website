@@ -47,6 +47,18 @@ test('connection string wordt ontleed (host/port/user/password/database)', () =>
   assert.equal(geen._cfg.ssl, false);
 });
 
+test('int16-teller is unsigned: 0..65535 zonder RangeError (batch-insert van 5000x9 params)', () => {
+  // Het v3-protocol codeert het parameter-aantal als 16-bits teller. Postgres
+  // staat tot 65535 params toe; een batch-insert van 5000 rijen x 9 kolommen =
+  // 45000 > 32767. writeInt16BE zou daarop crashen -- dit borgt writeUInt16BE.
+  assert.deepEqual([...pg._int16(0)], [0, 0]);
+  assert.deepEqual([...pg._int16(1)], [0, 1]);
+  assert.deepEqual([...pg._int16(32767)], [0x7f, 0xff]);      // grens signed int16
+  assert.doesNotThrow(() => pg._int16(45000), 'geen RangeError meer boven 32767');
+  assert.deepEqual([...pg._int16(45000)], [0xaf, 0xc8]);       // 45000 = 0xAFC8
+  assert.deepEqual([...pg._int16(65535)], [0xff, 0xff]);       // maximum
+});
+
 test('lege pool: tellers en options kloppen (geen verbinding nodig)', () => {
   const p = new pg.Pool({ connectionString: 'postgres://u@127.0.0.1:1/d', max: 3 });
   assert.equal(p.totalCount, 0);

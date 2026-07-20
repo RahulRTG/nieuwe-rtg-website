@@ -249,7 +249,12 @@ class Client extends EventEmitter {
   einde() { this._dood = true; try { this.sock.write(bericht('X', Buffer.alloc(0))); this.sock.end(); } catch (e) { try { this.sock.destroy(); } catch (x) {} } }
 }
 
-function int16(n) { const b = Buffer.alloc(2); b.writeInt16BE(n, 0); return b; }
+// Int16 in het v3-protocol is een 16-bits teller: parameteraantal, aantal
+// resultaatkolommen, aantal formaatcodes. Postgres staat tot 65535 parameters
+// toe (een batch-insert van 5000 rijen x 9 kolommen = 45000 > 32767), dus dit
+// MOET unsigned. De bytes zijn identiek aan writeInt16BE voor 0..32767; alleen
+// de bereikcontrole verschilt. We sturen zelf nooit negatieve int16's.
+function int16(n) { const b = Buffer.alloc(2); b.writeUInt16BE(n & 0xffff, 0); return b; }
 function int32(n) { const b = Buffer.alloc(4); b.writeInt32BE(n, 0); return b; }
 function leesCstrs(buf, max) { const uit = []; let o = 0; while (o < buf.length && uit.length < max) { const eind = buf.indexOf(0, o); if (eind === -1) break; uit.push(buf.toString('utf8', o, eind)); o = eind + 1; } return uit; }
 function foutVelden(p) { const uit = {}; let o = 0; while (o < p.length && p[o] !== 0) { const code = String.fromCharCode(p[o]); const eind = p.indexOf(0, o + 1); uit[code] = p.toString('utf8', o + 1, eind); o = eind + 1; } return uit; }
@@ -348,4 +353,4 @@ function ontleedConfig(opts) {
     ssl: ssl || false, statement_timeout: opts.statement_timeout, query_timeout: opts.query_timeout };
 }
 
-module.exports = { Pool, Client, _decodeer: decodeer, _paramTekst: paramTekst };
+module.exports = { Pool, Client, _decodeer: decodeer, _paramTekst: paramTekst, _int16: int16 };

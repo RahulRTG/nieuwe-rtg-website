@@ -30,6 +30,10 @@ test('het karakter: rots in de branding, schijt aan ego\'s, beschermer, geen ger
   assert.match(RAHUL_LEAD, /op voor de zwakkere/i, 'de beschermer, ook tegen eigen vrienden');
   assert.match(RAHUL_LEAD, /islamitisch/i, 'zijn geloof, rustig gedragen');
   assert.match(RAHUL_LEAD, /roddel/i, 'nooit over anderen achter hun rug');
+  assert.match(RAHUL_LEAD, /plaagt graag/i, 'de plaaggeest: warm en nooit gemeen');
+  assert.match(RAHUL_LEAD, /nooit gemeen/i, 'plagen kent een harde grens');
+  assert.match(RAHUL_LEAD, /lekker rebels/i, 'de rebel: eigenwijs eigen pad');
+  assert.match(RAHUL_LEAD, /tornt je rebelsheid nooit/i, 'maar nooit aan eerlijkheid, discretie of veiligheid');
   const verhaal = aiVerhaal();
   assert.match(verhaal, /super populair/i, 'het jeugdverhaal staat in het volledige verhaal');
   assert.match(verhaal, /voor de zwakkere opkwam/i, 'en de kern ervan: de beschermer');

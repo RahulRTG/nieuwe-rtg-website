@@ -29,7 +29,7 @@
   const zend = (kind, extra) => API.call('/staff/call', Object.assign({ kind, video: true }, extra || {})).catch(() => {});
   async function haalIce(){
     try { ice = (await (await fetch('/api/ice')).json()).iceServers; }
-    catch (e) { ice = [{ urls: 'stun:stun.l.google.com:19302' }]; }
+    catch (e) { ice = [{ urls: 'stun:' + location.hostname + ':3478' }]; }
   }
   async function pakMedia(){
     if (stream) return stream;
@@ -108,7 +108,7 @@
 
   /* ---------- de verbindingen (mesh) ---------- */
   function maakPeer(id, naam){
-    const pc = new RTCPeerConnection({ iceServers: ice || [{ urls: 'stun:stun.l.google.com:19302' }] });
+    const pc = new RTCPeerConnection({ iceServers: ice || [{ urls: 'stun:' + location.hostname + ':3478' }] });
     const p = { pc, naam: naam || ('#' + id), queue: [], el: null };
     stream.getTracks().forEach(t => pc.addTrack(t, stream));
     pc.onicecandidate = ev => { if (ev.candidate) zend('ice', { staffId: id, payload: ev.candidate, kamer }); };

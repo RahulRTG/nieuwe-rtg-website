@@ -2442,6 +2442,10 @@ const server = app.listen(PORT, () => {
   }
   console.log(`Live updates (SSE) actief${webpush ? ', web-push actief' : ' (web-push niet geladen)'}.`);
 });
+// Eigen STUN-server (RFC 5389) voor (video)bellen: geen leun meer op de publieke
+// STUN van Google. Draait op UDP (STUN_PORT, standaard 3478); STUN_UIT=1 zet uit.
+// De socket is unref'd, dus dit houdt het afsluiten nooit tegen.
+const stunServer = require('./stun').start({ log });
 /* Satellietvriendelijk: op hoge-latency verbindingen (satelliet, traag mobiel)
    duurt een nieuwe TLS-handshake al snel seconden. Houd bestaande verbindingen
    daarom ruim open, dan wordt hij hergebruikt in plaats van opnieuw opgezet.

@@ -44,8 +44,15 @@ app.get('/api/push/key', (req, res) => {
    dan maakt de server per aanvraag KORTLEVENDE inloggegevens (1 uur geldig,
    HMAC over het verloopmoment) in plaats van een vast wachtwoord dat op
    straat kan komen. Vast TURN_USER/TURN_PASS blijft werken als terugval. */
-function iceServers() {
-  const list = [{ urls: (process.env.STUN_URL || 'stun:stun.l.google.com:19302').split(',').map(s => s.trim()) }];
+function iceServers(req) {
+  // Standaard onze EIGEN STUN-server (server/stun.js), afgeleid van de host waarop
+  // het lid de app bereikt (of STUN_PUBLIC_HOST/STUN_URL). Geen Google meer, tenzij
+  // je die expliciet als terugval aanzet met STUN_FALLBACK_GOOGLE=1.
+  const poort = process.env.STUN_PORT || 3478;
+  const host = process.env.STUN_PUBLIC_HOST || (req && req.hostname) || 'localhost';
+  const stun = process.env.STUN_URL ? process.env.STUN_URL.split(',').map(s => s.trim()) : ['stun:' + host + ':' + poort];
+  if (process.env.STUN_FALLBACK_GOOGLE === '1') stun.push('stun:stun.l.google.com:19302');
+  const list = [{ urls: stun }];
   const urls = process.env.TURN_URL ? process.env.TURN_URL.split(',').map(s => s.trim()) : null;
   if (urls && process.env.TURN_SECRET) {
     const nodeCrypto = require('crypto');
@@ -57,5 +64,5 @@ function iceServers() {
   }
   return list;
 }
-app.get('/api/ice', (req, res) => res.json({ iceServers: iceServers() }));
+app.get('/api/ice', (req, res) => res.json({ iceServers: iceServers(req) }));
 };

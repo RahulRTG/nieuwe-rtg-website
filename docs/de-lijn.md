@@ -44,6 +44,11 @@ gemak brengt. In deze code betekent dat:
 - **Sinds kort ook de lettertypen** (`public/fonts/`): zelf geserveerd, zodat er
   letterlijk geen enkele verbinding met een derde partij overblijft in de
   browser van de bezoeker.
+- **En de STUN-server voor (video)bellen** (`server/stun.js`): een eigen
+  RFC 5389-responder op UDP, zodat de verbindingsopzet niet meer langs de publieke
+  STUN van Google gaat. Het is puur het terugkaatsen van de afzender -- geen
+  cryptografie -- dus het botst niet met regel 1. De harde NAT-gevallen blijven
+  via een eigen TURN-relais (coturn) lopen.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.

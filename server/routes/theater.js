@@ -18,10 +18,10 @@ module.exports = (kern) => {
   /* Altijd-aan rem op de twee routes die de schijf raken (los van de brede
      productie-IP-rem): kijken ruim (spoelen vuurt tientallen range-verzoeken
      per minuut, dat moet gewoon kunnen), uploaden strak. */
-  const rateLimit = require('express-rate-limit');
-  const kijkRem = rateLimit({ windowMs: 60000, limit: 240, standardHeaders: false, legacyHeaders: false,
+  const rem = require('../rem');
+  const kijkRem = rem({ windowMs: 60000, limit: 240,
     handler: (req, res) => res.status(429).end() });
-  const uploadRem = rateLimit({ windowMs: 60000, limit: 12, standardHeaders: false, legacyHeaders: false,
+  const uploadRem = rem({ windowMs: 60000, limit: 12,
     handler: (req, res) => res.status(429).json({ error: 'Even rustig aan met uploaden; probeer het over een minuut opnieuw.' }) });
 
   // de zaal: chronologisch, abonnementen eerst; geen algoritme, geen autoplay

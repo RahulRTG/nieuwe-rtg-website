@@ -344,19 +344,14 @@ if (zaakdoos.actief) {
    per minuut; daarboven 429. Ruim genoeg voor elk normaal gebruik, en het
    haalt de scherpte van scripts en scrapers. De live-streams (SSE) tellen
    niet mee: dat zijn langlopende verbindingen, geen verzoeken. */
-const rateBakken = new Map();
 if (PRODUCTION || process.env.RTG_RATELIMIT === '1') {
-  app.use((req, res, next) => {
-    if (!req.path.startsWith('/api/') || req.path.endsWith('/stream')) return next();
-    const nu = Date.now();
-    const b = rateBakken.get(req.ip) || { vanaf: nu, n: 0 };
-    if (nu - b.vanaf > 60000) { b.vanaf = nu; b.n = 0; }
-    b.n += 1;
-    rateBakken.set(req.ip, b);
-    if (b.n > 300) return res.status(429).json({ error: 'Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.' });
-    next();
-  });
-  setInterval(() => { const nu = Date.now(); for (const [ip, b] of rateBakken) if (nu - b.vanaf > 120000) rateBakken.delete(ip); }, 60000).unref();
+  const rem = require('./rem');
+  app.use(rem({
+    windowMs: 60000,
+    limit: 300,
+    skip: req => !req.path.startsWith('/api/') || req.path.endsWith('/stream'),
+    handler: (req, res) => res.status(429).json({ error: 'Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.' })
+  }));
 }
 
 /* Hoofdzekering: staat de onderhouds-zekering uit (gesprongen), dan is de app in

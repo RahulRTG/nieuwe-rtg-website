@@ -49,6 +49,11 @@ gemak brengt. In deze code betekent dat:
   STUN van Google gaat. Het is puur het terugkaatsen van de afzender -- geen
   cryptografie -- dus het botst niet met regel 1. De harde NAT-gevallen blijven
   via een eigen TURN-relais (coturn) lopen.
+- **De rate-limiter** (`server/rem.js`): een kleine in-memory rem (vaste-venster-
+  telling per IP of eigen sleutel) die `express-rate-limit` verving. Het is precies
+  het telwerk dat we nodig hebben -- de brede productie-rem in `server.js` en de
+  twee Theater-remmen draaien er nu op -- en scheelt een dependency die alleen maar
+  optelde. Puur tellen, geen cryptografie, dus geen botsing met regel 1.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.

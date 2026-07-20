@@ -39,6 +39,16 @@ module.exports = (ctx) => {
     return r;
   }));
 
+  /* De veld-app (medewerkers buiten): de werklijst die de stad zelf
+     voorschrijft (offline dozen, bord-waarschuwingen) en het klaarmelden
+     van een klus, met naam in het auditlog. */
+  app.post('/api/office/stad/werk', officeAuth, (req, res) => veilig(res, () => stad.stadWerk()));
+  app.post('/api/office/stad/werk/klaar', officeAuth, (req, res) => veilig(res, () => {
+    const r = stad.stadWerkKlaar({ sleutel: req.body.sleutel, wie: naam(req), notitie: req.body.notitie });
+    if (r.ok) afdelingen.audit(r.wie, 'Stadsklus klaargemeld: ' + r.omschrijving);
+    return r;
+  }));
+
   // de AI-stadsregisseur: adviseert, beslist niet
   app.post('/api/office/stad/advies', officeAuth, async (req, res) => {
     try { const r = await stad.stadAdvies({ vraag: req.body.vraag });

@@ -83,6 +83,30 @@ test('eigen hardware: een Stadsdoos aanmelden en insturen met de apparaat-sleute
   assert.equal((await api('stad/doos/meting', { serial, sleutel, metingen: [{ sens: 'verkeer', waarde: 100 }] })).status, 401, 'uit dienst = poort dicht');
 });
 
+test('de veld-app: de werklijst schrijft zichzelf en klaarmelden dempt de klus', async () => {
+  // een verse doos die nog nooit contact maakte staat offline -> een onderhoudsklus
+  const aan = await oapi('stad/node/aanmeld', { doosNaam: 'Stadsdoos Steiger', zone: 'Marina', sensoren: ['water'] });
+  const sleutelKlus = 'doos:' + aan.body.serial;
+  const w1 = await oapi('stad/werk');
+  assert.equal(w1.status, 200);
+  const klus = w1.body.klussen.find(k => k.sleutel === sleutelKlus);
+  assert.ok(klus, 'de offline doos staat als klus op de werklijst');
+  assert.equal(klus.soort, 'onderhoud');
+  assert.match(klus.omschrijving, /offline/);
+
+  // klaarmelden (met naam) haalt hem van de lijst en komt in het auditlog
+  const klaar = await api('office/stad/werk/klaar', { sleutel: sleutelKlus, naam: 'Bram', notitie: 'voeding zat los' }, office);
+  assert.equal(klaar.status, 200);
+  const w2 = (await oapi('stad/werk')).body;
+  assert.ok(!w2.klussen.some(k => k.sleutel === sleutelKlus), 'klaargemeld = van de lijst (demper)');
+  assert.ok(w2.klaargemeld.some(k => k.sleutel === sleutelKlus && k.wie === 'Bram' && k.notitie === 'voeding zat los'), 'de klaarmelding staat erbij, op naam');
+  const board = (await oapi('boardroom')).body;
+  assert.ok((board.audit || []).some(a => a.wie === 'Bram' && /Stadsklus klaargemeld/.test(a.wat)), 'het klaarmelden staat in het auditlog');
+  // een klus die niet (meer) bestaat is netjes 404
+  assert.equal((await oapi('stad/werk/klaar', { sleutel: 'doos:SD-BESTAATNIET' })).status, 404);
+  await oapi('stad/node/stop', { serial: aan.body.serial });
+});
+
 test('los regime, AI-stadsregisseur, nood -> beveiligingsmelding, bewaking en dataset', async () => {
   // een los regime naast de knop
   assert.equal((await oapi('stad/regime', { domein: 'licht', regime: 'vol' })).body.regime, 'vol');

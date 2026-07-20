@@ -47,6 +47,7 @@ module.exports = (deps) => {
   const sce = require('./scenario')(ctx);
   ctx.SCENARIOS = sce.SCENARIOS;
   const adv = require('./advies')(ctx);
+  const veld = require('./veldwerk')(ctx);
 
   /* Het stadsbeeld: alles wat de boardroom in een oogopslag nodig heeft.
      De demovloot leeft mee (simuleer): zolang er geen echte hardware hangt,
@@ -74,6 +75,6 @@ module.exports = (deps) => {
   }
 
   const api = { stadBeeld: beeld };
-  Object.assign(api, vloot.api, dom.api, sce.api, adv);
+  Object.assign(api, vloot.api, dom.api, sce.api, adv, veld.api);
   return { stad: api };
 };

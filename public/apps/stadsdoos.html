@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Stadsdoos veld-app</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.55);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:2rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
+  select.veld{color-scheme:dark;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
+  .leeg{color:var(--muted);font-size:.85rem;padding:.6rem 0;}
+  .dot{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;flex:0 0 auto;}
+  .klus{border-bottom:1px solid var(--line);padding:.6rem 0;display:flex;gap:.6rem;align-items:flex-start;}
+  .klus:last-child{border-bottom:0;}
+  .melding{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
+</style>
+</head>
+<body>
+<header>
+  <div class="ey">RTG Stad · voor buiten</div>
+  <h1>🧰 Stadsdoos veld-app</h1>
+</header>
+<main id="main">
+  <div class="kaart">
+    <div class="sec">Wie werkt er buiten?</div>
+    <input class="veld" id="vNaam" placeholder="je naam (voor het auditlog)" maxlength="60">
+  </div>
+
+  <div class="kaart">
+    <div class="sec">Werklijst · <span id="wTel">laden</span></div>
+    <div id="wLijst"><div class="leeg">Laden...</div></div>
+    <div class="sec" style="margin-top:.7rem;">Net klaargemeld</div>
+    <div id="wKlaar" class="leeg">Nog niets.</div>
+  </div>
+
+  <div class="kaart">
+    <div class="sec">De vloot</div>
+    <div id="vLijst"><div class="leeg">Laden...</div></div>
+  </div>
+
+  <div class="kaart">
+    <div class="sec">Ter plekke: nieuwe Stadsdoos aanmelden</div>
+    <div class="rij" style="margin-bottom:.5rem;">
+      <input class="veld" id="aNaam" placeholder="bijv. Stadsdoos Brug" maxlength="60" style="flex:1;min-width:9rem;">
+      <select class="veld" id="aZone" style="flex:1;min-width:8rem;" aria-label="Zone"></select>
+    </div>
+    <input class="veld" id="aSens" placeholder="sensoren, komma (verkeer, lucht, licht)" style="margin-bottom:.5rem;">
+    <button class="knop" id="aMeld" style="width:100%;">Meld aan · sleutel verschijnt één keer</button>
+    <div id="aUit" style="margin-top:.5rem;font-size:.85rem;"></div>
+  </div>
+
+  <div class="kaart">
+    <div class="sec">Verbindingstest · praat de doos met de stad?</div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem;">Vul het serienummer en de apparaat-sleutel van de doos in; de test stuurt een echte hartslag over de hardware-poort.</p>
+    <div class="rij" style="margin-bottom:.5rem;">
+      <input class="veld" id="tSerial" placeholder="SD-XXXXXX" style="flex:1;min-width:8rem;">
+      <input class="veld" id="tSleutel" placeholder="apparaat-sleutel" style="flex:2;min-width:11rem;">
+    </div>
+    <button class="knop stil" id="tDoe" style="width:100%;">Stuur hartslag</button>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+if (!TOKEN) uitgelogd();
+const api = (pad, body) => fetch('/api/office/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2400); }
+
+// de naam reist mee tussen diensten (en gaat mee het auditlog in)
+try { $('#vNaam').value = localStorage.getItem('rtg_veld_naam') || ''; } catch (e) {}
+$('#vNaam').addEventListener('input', () => { try { localStorage.setItem('rtg_veld_naam', $('#vNaam').value); } catch (e) {} });
+const wie = () => $('#vNaam').value.trim();
+
+const KLUS_IC = { onderhoud: '🔧', lucht: '🌫️', afval: '🗑️', geluid: '🔊', energie: '⚡' };
+const tijd = ms => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : Math.round(m / 60) + ' u geleden'; };
+
+async function laad(){
+  try {
+    const [w, b] = await Promise.all([api('stad/werk'), api('stad')]);
+    // de werklijst die de stad zelf voorschrijft
+    $('#wTel').textContent = w.klussen.length + ' open';
+    $('#wLijst').innerHTML = w.klussen.length ? w.klussen.map(k =>
+      '<div class="klus"><span style="font-size:1.05rem;">' + (KLUS_IC[k.soort] || '📍') + '</span>' +
+      '<span style="flex:1;font-size:.86rem;line-height:1.45;">' + esc(k.omschrijving) + (k.zone ? '<br><span style="color:var(--soft);font-size:.75rem;">' + esc(k.zone) + '</span>' : '') + '</span>' +
+      '<button class="knop stil" data-klaar="' + esc(k.sleutel) + '" style="font-size:.78rem;">✓ Klaar</button></div>').join('')
+      : '<div class="leeg">Niets open. De stad draait.</div>';
+    $('#wKlaar').innerHTML = w.klaargemeld.length ? w.klaargemeld.map(k =>
+      '<div style="font-size:.78rem;color:var(--muted);padding:.15rem 0;">✓ ' + esc(k.sleutel) + ' · ' + esc(k.wie) + (k.notitie ? ' · ' + esc(k.notitie) : '') + ' · ' + tijd(k.at) + '</div>').join('') : 'Nog niets.';
+    $('#wLijst').querySelectorAll('[data-klaar]').forEach(btn => btn.addEventListener('click', async () => {
+      if (!wie()) return meld('Vul eerst je naam in.');
+      const notitie = prompt('Korte notitie bij het klaarmelden? (mag leeg)') || '';
+      try { await api('stad/werk/klaar', { sleutel: btn.dataset.klaar, naam: wie(), notitie }); meld('Klaargemeld.'); laad(); }
+      catch (e) { meld(e.message); }
+    }));
+    // de vloot, offline eerst (daar ligt het werk)
+    const rij = b.nodes.slice().sort((a, z) => (a.online === z.online) ? 0 : a.online ? 1 : -1);
+    $('#vLijst').innerHTML = '<div style="font-size:.78rem;color:var(--soft);margin-bottom:.35rem;">' + b.vloot.online + ' van ' + b.vloot.totaal + ' online · scenario "' + esc(b.scenario) + '"</div>' +
+      rij.map(n => '<div class="klus"><span class="dot" style="background:' + (n.online ? 'var(--green)' : 'var(--burgundy)') + ';margin-top:.35rem;"></span>' +
+        '<span style="flex:1;font-size:.84rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">demo</span>' : '') +
+        '<br><span style="color:var(--soft);font-size:.74rem;">' + esc(n.serial) + ' · ' + n.sensoren.map(esc).join(', ') + (n.laatsteContact ? ' · ' + tijd(n.laatsteContact) : ' · nooit gezien') + '</span></span></div>').join('');
+    const sel = $('#aZone');
+    if (!sel.options.length) sel.innerHTML = b.zones.map(z => '<option>' + esc(z) + '</option>').join('');
+  } catch (e) { $('#wLijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+}
+
+// ter plekke aanmelden: de sleutel verschijnt EEN keer, meteen bij de doos in te voeren
+$('#aMeld').addEventListener('click', async () => {
+  if (!wie()) return meld('Vul eerst je naam in.');
+  try {
+    const r = await api('stad/node/aanmeld', { doosNaam: $('#aNaam').value, zone: $('#aZone').value,
+      sensoren: $('#aSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: wie() });
+    $('#aUit').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;">🔑 <strong>' + esc(r.serial) + '</strong><br>sleutel: <code style="word-break:break-all;">' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+    $('#tSerial').value = r.serial; $('#tSleutel').value = r.sleutel; // klaar voor de verbindingstest
+    $('#aNaam').value = ''; $('#aSens').value = '';
+    laad();
+  } catch (e) { meld(e.message); }
+});
+
+// de verbindingstest gaat over de ECHTE hardware-poort (geen office-token)
+$('#tDoe').addEventListener('click', async () => {
+  try {
+    const r = await fetch('/api/stad/doos/hartslag', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serial: $('#tSerial').value.trim(), sleutel: $('#tSleutel').value.trim() }) });
+    const d2 = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d2.error || 'De poort weigert.');
+    meld('💓 De doos praat met de stad.');
+    laad();
+  } catch (e) { meld(e.message); }
+});
+
+/* Live: hetzelfde office-kanaal als de boardroom; bij een stad-seintje
+   ververst de lijst vanzelf (gedempt). */
+let es = null, esT = null;
+function live(){
+  if (!window.EventSource || es) return;
+  try { es = new EventSource('/api/office/stream?token=' + encodeURIComponent(TOKEN)); } catch (e) { return; }
+  es.addEventListener('sync', e => {
+    let scope = null; try { scope = JSON.parse(e.data).scope; } catch (x) {}
+    if (scope !== 'stad' || document.hidden) return;
+    clearTimeout(esT); esT = setTimeout(laad, 500);
+  });
+}
+
+laad();
+live();
+</script>
+</body>
+</html>

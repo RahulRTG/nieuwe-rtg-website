@@ -2293,8 +2293,9 @@ Object.assign(kern, require('./kern/balans').maakBalans({
 require('./kern/rahul').zetRahulBron(() => db.data.rahulProfiel || null);
 
 /* De omgangsvormen van Rahul (kern/rahul.js, rahulLeadVoor): het geslacht van
-   het lid komt uit het eigen profiel (v/m/x). Alleen bij volwassen leden;
-   minderjarig of onbekend geeft null en dan blijft Rahul neutraal. */
+   het lid komt uit het eigen profiel (v/m/x). Volwassen leden krijgen de
+   vrouw-/man-vorm; minderjarige leden (15-17) krijgen het kind-hart (het grote
+   luisterende oor); onbekend geeft null en dan blijft Rahul neutraal. */
 require('./kern/rahul').zetGeslachtBron((key) => {
   const m = /^user-(\d+)$/.exec(String(key || ''));
   if (!m) return null;
@@ -2304,7 +2305,7 @@ require('./kern/rahul').zetGeslachtBron((key) => {
   const g = new Date(md.geboren), nu2 = new Date();
   let lft = nu2.getFullYear() - g.getFullYear();
   if (nu2 < new Date(nu2.getFullYear(), g.getMonth(), g.getDate())) lft -= 1;
-  if (!(lft >= 18)) return null;
+  if (!(lft >= 18)) return 'kind';
   const gs = String(md.geslacht || '').toLowerCase();
   return (gs === 'v' || gs === 'm') ? gs : null;
 });

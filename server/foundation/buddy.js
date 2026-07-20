@@ -17,7 +17,12 @@ function buddySys(kind, g) {
 }
 function leeftijdInstr(g) {
   const l = LEEFTIJD[g];
-  return l ? ' Je praat met ' + l.wie + '. ' + l.hoe + ' Pas taal, voorbeelden en niveau daarop aan.' : '';
+  if (!l) return '';
+  // het kind-hart van Rahul (kern/rahul.js): voor kinderen en tieners is hij
+  // vooral een enorm luisterend oor dat helpt ontwikkelen, laat doorzetten,
+  // troost, en zorgt voor gezond leven met heel veel plezier
+  const hart = (g === 'mini' || g === 'kind' || g === 'tiener') ? ' ' + require('../kern/rahul').RAHUL_KIND : '';
+  return ' Je praat met ' + l.wie + '. ' + l.hoe + ' Pas taal, voorbeelden en niveau daarop aan.' + hart;
 }
 router.post('/hulp/ai', async (req, res) => {
   const s = familieVan(req, res); if (!s) return;

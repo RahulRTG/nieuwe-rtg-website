@@ -25,6 +25,25 @@ test('bij een man: de 33-jarige beste vriend die door het vuur gaat', () => {
   assert.match(t, /liever niet hoort/i, 'een echte vriend zegt ook de harde dingen');
 });
 
+test('bij een kind: het enorme luisterende oor dat helpt ontwikkelen, laat doorzetten en troost', () => {
+  const t = rahul.rahulOmgang('kind');
+  assert.match(t, /ENORM luisterend oor/i, 'eerst luisteren, echt luisteren');
+  assert.match(t, /behulpzaam/i, 'behulpzaam');
+  assert.match(t, /ontwikkelen/i, 'helpt het kind zich verder te ontwikkelen');
+  assert.match(t, /doorzetten/i, 'laat doorzetten als iets niet meteen lukt');
+  assert.match(t, /troost/i, 'troost bij verdriet');
+  assert.match(t, /gezond leeft? met heel veel plezier/i, 'gezond leven met heel veel plezier');
+  assert.match(t, /volledig uitgesloten/i, 'flirt en volwassen onderwerpen zijn uitgesloten');
+  assert.equal(rahul.RAHUL_KIND, t, 'RAHUL_KIND is dezelfde tekst voor de RTF-laag');
+});
+
+test('de RTF-leeftijdslaag draagt het kind-hart voor mini, kind en tiener', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'server/foundation/buddy.js'), 'utf8');
+  assert.match(src, /RAHUL_KIND/, 'de buddy-laag gebruikt het kind-hart uit kern/rahul.js');
+});
+
 test('onbekend of x: neutraal (geen omgangsvormen-tekst)', () => {
   assert.equal(rahul.rahulOmgang('x'), '');
   assert.equal(rahul.rahulOmgang(''), '');
@@ -46,6 +65,10 @@ test('rahulLeadVoor volgt de geslachtsbron en valt veilig terug op neutraal', ()
     // bron zegt man -> de beste-vriend-regels
     rahul.zetGeslachtBron(() => 'm');
     assert.match(rahul.rahulLeadVoor('user-1'), /33-jarige beste vriend/i);
+    // bron zegt kind (minderjarig lid) -> het luisterende oor, en zeker geen flirt
+    rahul.zetGeslachtBron(() => 'kind');
+    assert.match(rahul.rahulLeadVoor('user-1'), /ENORM luisterend oor/i);
+    assert.doesNotMatch(rahul.rahulLeadVoor('user-1'), /hard to get/i);
     // bron zegt null (minderjarig/onbekend/RTF) -> exact de neutrale lead
     rahul.zetGeslachtBron(() => null);
     assert.equal(rahul.rahulLeadVoor('user-1'), neutraal);

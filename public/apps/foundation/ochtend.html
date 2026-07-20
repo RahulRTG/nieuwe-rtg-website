@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Ochtendritme</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.2rem;}
+  .kop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.7rem;}
+  .reeks{display:inline-flex;align-items:center;gap:.3rem;font-size:.85rem;color:var(--goud2);white-space:nowrap;}
+  .reeks b{font-size:1.05rem;}
+  .stap{display:flex;align-items:center;gap:.7rem;padding:.55rem 0;border-bottom:1px solid var(--lijn);}
+  .stap:last-child{border-bottom:0;}
+  .stap .vink{width:1.5rem;height:1.5rem;flex-shrink:0;accent-color:var(--goud2);}
+  .stap .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .stap.af .t{text-decoration:line-through;color:var(--zacht);}
+  .ikoon{background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;color:var(--zacht);width:2rem;height:2rem;font-size:.95rem;cursor:pointer;}
+  .ikoon:hover{color:var(--tekst);border-color:var(--goud);}
+  .toevoeg{display:flex;gap:.5rem;margin:.8rem 0 .5rem;}
+  .toevoeg .veld{flex:1;min-width:0;}
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.3rem;}
+  .chip{font-size:.78rem;padding:.3rem .6rem;border:1px solid var(--lijn);border-radius:999px;color:var(--zacht);background:transparent;cursor:pointer;}
+  .chip:hover{color:var(--tekst);border-color:var(--goud);}
+  .klaar-vlag{margin-top:.7rem;padding:.6rem .8rem;border:1px solid var(--goud);border-radius:12px;color:var(--goud2);font-size:.9rem;text-align:center;}
+  .bordrij{display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--lijn);}
+  .bordrij:last-child{border-bottom:0;}
+  .bordrij .naam{flex:1;min-width:0;}
+  .bordrij .meta{font-size:.8rem;color:var(--zacht);}
+  .bordrij .rk{font-size:.85rem;color:var(--goud2);white-space:nowrap;}
+  .vinkje{color:var(--goud2);}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0;}
+  .kindkaart{border:1px solid var(--lijn);border-radius:12px;padding:.7rem .8rem;margin-bottom:.6rem;}
+  .kindkaart h3{font-size:.95rem;margin-bottom:.4rem;}
+  .kindstap{display:flex;align-items:center;gap:.5rem;font-size:.85rem;padding:.25rem 0;}
+  .kindstap .t{flex:1;min-width:0;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>☀️ Ochtendritme</h1>
+  <div class="intro">Een rustig ochtendlijstje dat elke dag weer op nul begint. Vink af wat je gedaan hebt; wie alles rondkrijgt houdt een reeks bij. Geen druk — gewoon een fijn begin van de dag.</div>
+
+  <div class="kaart blok">
+    <div class="kop">
+      <h2>Mijn ochtend</h2>
+      <span class="reeks" id="mijnReeks"></span>
+    </div>
+    <div id="mijnStappen"><div class="leeg">Laden…</div></div>
+    <div id="klaarVlag"></div>
+    <div class="toevoeg">
+      <input class="veld" id="sWat" placeholder="Nog een stap, bijv. tas inpakken" maxlength="60">
+      <button class="knop" id="sDoe">Erbij</button>
+    </div>
+    <div class="fout" id="sFout"></div>
+    <div class="chips" id="voorbeelden"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Het gezin vanochtend</h2>
+    <div id="bord"><div class="leeg">Laden…</div></div>
+  </div>
+
+  <div class="kaart blok" id="kinderenBlok" style="display:none;">
+    <h2>Ritme van de kinderen</h2>
+    <div class="intro" style="margin:.2rem 0 .8rem;font-size:.85rem;">Zet samen het ochtendlijstje van je kind klaar. Zij vinken zelf af op hun eigen scherm.</div>
+    <div id="kinderen"></div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+
+async function laad(){
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/ochtend?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    if (d.error) throw new Error(d.error);
+    // mijn reeks
+    $('#mijnReeks').innerHTML = d.mijn.reeks > 0
+      ? '🔥 <b>'+d.mijn.reeks+'</b> '+(d.mijn.reeks===1?'dag':'dagen')+(d.mijn.record>d.mijn.reeks?' · record '+d.mijn.record:'')
+      : '';
+    // mijn stappen
+    if (!d.mijn.stappen.length){ $('#mijnStappen').innerHTML = '<div class="leeg">Nog geen stappen. Tik hieronder een voorbeeld aan of typ je eerste stap.</div>'; }
+    else $('#mijnStappen').innerHTML = d.mijn.stappen.map(x =>
+      '<div class="stap'+(x.af?' af':'')+'" data-id="'+x.id+'">'
+      + '<input type="checkbox" class="vink"'+(x.af?' checked':'')+'>'
+      + '<span class="t">'+esc(x.tekst)+'</span>'
+      + '<button class="ikoon" data-del title="Weghalen">×</button></div>'
+    ).join('');
+    $('#mijnStappen').querySelectorAll('.stap').forEach(rij=>{
+      const id = rij.dataset.id;
+      rij.querySelector('.vink').addEventListener('change', async e=>{
+        const r = await doe('/gezin/ochtend/vink', { stapId:id, aan:e.target.checked });
+        if (r && r.netKlaar) vier();
+        laad();
+      });
+      rij.querySelector('[data-del]').onclick = ()=> doe('/gezin/ochtend/stap/verwijder', { stapId:id }, true);
+    });
+    // klaar-vlag
+    $('#klaarVlag').innerHTML = d.mijn.klaar ? '<div class="klaar-vlag">✨ Helemaal klaar voor vandaag. Fijne dag!</div>' : '';
+    // voorbeelden (alleen die nog niet in mijn ritme staan)
+    const heb = new Set(d.mijn.stappen.map(x=>x.tekst.toLowerCase()));
+    $('#voorbeelden').innerHTML = d.voorbeelden.filter(v=>!heb.has(v.toLowerCase()))
+      .map(v=>'<button class="chip" data-v="'+esc(v)+'">+ '+esc(v)+'</button>').join('');
+    $('#voorbeelden').querySelectorAll('.chip').forEach(c=>{
+      c.onclick = ()=> doe('/gezin/ochtend/stap', { tekst:c.dataset.v }, true);
+    });
+    // gezinsbord
+    $('#bord').innerHTML = d.bord.map(b =>
+      '<div class="bordrij">'
+      + '<span class="naam">'+esc(b.naam)+(b.pid===d.mijnId?' <span class="meta">(jij)</span>':'')+'</span>'
+      + '<span class="meta">'+ (b.heeftRitme ? (b.klaar ? '<span class="vinkje">✓ klaar</span>' : b.gedaan+'/'+b.totaal) : 'geen ritme') +'</span>'
+      + (b.reeks>0?'<span class="rk">🔥 '+b.reeks+'</span>':'')
+      + '</div>'
+    ).join('') || '<div class="leeg">Nog niemand met een ochtendritme.</div>';
+    // kinderen (ouder/beheerder)
+    if (d.magKinderen && d.kinderen.length){
+      $('#kinderenBlok').style.display = '';
+      $('#kinderen').innerHTML = d.kinderen.map(k =>
+        '<div class="kindkaart" data-pid="'+k.pid+'"><h3>'+esc(k.naam)+'</h3>'
+        + (k.stappen.map(x=>'<div class="kindstap"><span class="t">'+esc(x.tekst)+'</span><button class="ikoon" data-kdel="'+x.id+'" title="Weg">×</button></div>').join('') || '<div class="leeg" style="font-size:.82rem;">Nog geen stappen.</div>')
+        + '<div class="toevoeg"><input class="veld kstap" placeholder="Stap voor '+esc(k.naam)+'" maxlength="60"><button class="knop klein kadd">Erbij</button></div>'
+        + '</div>'
+      ).join('');
+      $('#kinderen').querySelectorAll('.kindkaart').forEach(kaart=>{
+        const pid = kaart.dataset.pid;
+        kaart.querySelectorAll('[data-kdel]').forEach(b=> b.onclick = ()=> doe('/gezin/ochtend/stap/verwijder', { voor:pid, stapId:b.dataset.kdel }, true));
+        const inp = kaart.querySelector('.kstap');
+        const voegToe = async ()=>{ const t = inp.value.trim(); if(!t) return; await doe('/gezin/ochtend/stap', { voor:pid, tekst:t }); laad(); };
+        kaart.querySelector('.kadd').onclick = voegToe;
+        inp.addEventListener('keydown', e=>{ if(e.key==='Enter') voegToe(); });
+      });
+    } else { $('#kinderenBlok').style.display = 'none'; }
+  }catch(e){ $('#mijnStappen').innerHTML = '<div class="leeg">Kon het ochtendritme niet laden.</div>'; }
+}
+
+async function doe(pad, extra, herlaad){
+  try{ const r = await api(pad, Object.assign({ code:s.code, token:s.token }, extra)); if (herlaad) laad(); return r; }
+  catch(e){ alert(e.message); laad(); }
+}
+function vier(){
+  try{ if (navigator.vibrate) navigator.vibrate(30); }catch(e){}
+}
+
+$('#sDoe').onclick = async ()=>{
+  $('#sFout').textContent='';
+  const wat = $('#sWat').value.trim();
+  if (!wat) return;
+  try{ await api('/gezin/ochtend/stap', { code:s.code, token:s.token, tekst:wat }); $('#sWat').value=''; laad(); }
+  catch(e){ $('#sFout').textContent = e.message; }
+};
+$('#sWat').addEventListener('keydown', e=>{ if (e.key==='Enter') $('#sDoe').click(); });
+
+laad();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

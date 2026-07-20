@@ -484,6 +484,31 @@
     <div id="iLijst"><div class="leeg">Nog geen ideeën.</div></div>
   </section>
 
+  <!-- RTG Bank -->
+  <section id="vBank" hidden>
+    <div class="kop">
+      <button class="terug" id="bankTerug">← alle kamers</button>
+      <h1>🏦 RTG Bank</h1>
+    </div>
+    <p class="deck">De eigen bank van RTG, gebouwd op het RTG Pay-grootboek met dubbele boekhouding. De knop met drie standen schakelt de clearing van de externe kaart-rails (partner), via beide naast elkaar (hybride), naar uitsluitend de eigen bank (eigen). Zo staat RTG met één druk klaar voor het eigen betaalsysteem.</p>
+
+    <h3 class="sec">De knop: van de kaart-rails naar de eigen bank</h3>
+    <div class="kaart" id="bankKnop"></div>
+
+    <h3 class="sec">Bank-gezondheid</h3>
+    <div class="kpis" id="bankGezond"></div>
+
+    <h3 class="sec">Instellingen: spaarrente en rood-staan-ruimte</h3>
+    <div class="kaart" id="bankInstel"></div>
+
+    <h3 class="sec">Openstaande kredietaanvragen (een mens beslist)</h3>
+    <div class="kaart lijst" id="bankKrediet"><div class="leeg">Geen aanvragen.</div></div>
+
+    <h3 class="sec">Rekeningen <button class="knop stil" id="bankRenteBtn" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.4rem;">Renteronde nu</button> <button class="knop stil" id="bankIncassoBtn" style="padding:.25rem .8rem;font-size:.75rem;">Incassoronde nu</button></h3>
+    <div class="kaart" id="bankRekOpen"></div>
+    <div class="kaart lijst" id="bankRek"><div class="leeg">Nog geen rekeningen.</div></div>
+  </section>
+
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -496,7 +521,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vAtelier','vStudio','vHardware','vArchitect','vIdeeen'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vAtelier','vStudio','vHardware','vArchitect','vIdeeen'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -517,6 +542,7 @@ async function binnen(){
   try {
     if (start === 'boardroom') await openBoard();
     else if (start === 'paniekkamer') await openPaniek();
+    else if (start === 'bank') await openBank();
     else if (start === 'atelier') await openAtelier();
     else if (start === 'studio') await openStudio();
     else if (start === 'hardware') await openHardware();
@@ -532,12 +558,13 @@ async function laadKamers(){
   const d = await api('kamers');
   toon('vKamers');
   const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="bank"><span class="ic">🏦</span><h2>RTG Bank</h2><p>De eigen bank op het Pay-grootboek. Eén knop van de kaart-rails naar de eigen bank.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
     '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
 }
 
 /* ---------- een kamer ---------- */
@@ -1491,6 +1518,98 @@ async function openPaniek(){
     const reden = prompt('Waarom moet "'+w.dataset.stel+'" '+(naarAan?'AAN':'UIT')+'? De boardroom leest dit bij het voorstel.') || '';
     try { await api('paniek/stel', { functie: w.dataset.stel, aan: naarAan, reden }); meld('Voorstel ligt bij de boardroom.'); openPaniek(); }
     catch (e) { meld(e.message); }
+  }));
+}
+
+/* ---------- RTG Bank ---------- */
+const bkEuro = c => '€ ' + ((Number(c) || 0) / 100).toFixed(2);
+const BK_MODUS = { partner: 'Partner · kaart-rails', hybride: 'Hybride · beide', eigen: 'Eigen bank' };
+const bkLijn = 'border-bottom:1px solid rgba(255,255,255,.08);';
+let bankGewired = false;
+async function openBank(){
+  zetKamerUrl('bank'); toon('vBank');
+  if (!bankGewired){
+    bankGewired = true;
+    $('#bankTerug').addEventListener('click', laadKamers);
+    $('#bankRenteBtn').addEventListener('click', () => bankRonde('rente'));
+    $('#bankIncassoBtn').addEventListener('click', () => bankRonde('incasso'));
+  }
+  await bankVervers();
+}
+async function bankVervers(){
+  try {
+    const [o, k] = await Promise.all([api('bank'), api('bank/krediet')]);
+    bankRenderKnop(o.regie); bankRenderGezond(o.gezondheid); bankRenderInstel(o.regie);
+    bankRenderKrediet(k.aanvragen); bankRenderRekOpen(); bankRenderRek(o.rekeningen);
+  } catch (e) { meld(e.message); }
+}
+async function bankRonde(soort){
+  try {
+    if (soort === 'rente'){ const d = await api('bank/rente', {}); meld(d.bijgeschrevenCenten > 0 ? 'Rente bijgeschreven: ' + bkEuro(d.bijgeschrevenCenten) : 'Geen nieuwe rente (0 dagen verstreken).'); }
+    else { const d = await api('bank/incasso', {}); meld(d.uitgevoerd > 0 ? d.uitgevoerd + ' vaste betaling(en): ' + bkEuro(d.bedragCenten) : 'Niets aan de beurt.'); }
+    bankVervers();
+  } catch (e) { meld(e.message); }
+}
+function bankRenderKnop(r){
+  const seg = r.modi.map(m => '<button class="knop' + (m === r.modus ? '' : ' stil') + '" data-modus="' + m + '"' + ((m !== 'partner' && !r.operationeel) ? ' disabled' : '') + ' style="padding:.45rem 1rem;">' + esc(BK_MODUS[m]) + '</button>').join(' ');
+  $('#bankKnop').innerHTML =
+    '<p style="margin:0 0 .7rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--gold);">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen bank is operationeel.' : 'De eigen bank staat nog uit; zet hem aan om verder te kunnen draaien.') + '</p>' +
+    '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">' + seg +
+      ' <button class="knop" id="bankDraai" style="padding:.45rem 1rem;">Eén slag verder →</button>' +
+      '<label style="margin-left:auto;font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankOper"' + (r.operationeel ? ' checked' : '') + '> Bank operationeel</label>' +
+    '</div>';
+  $('#bankKnop').querySelectorAll('[data-modus]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('bank/modus', { modus: b.dataset.modus }); meld('Bankstand: ' + BK_MODUS[b.dataset.modus]); bankVervers(); } catch (e) { meld(e.message); }
+  }));
+  $('#bankDraai').addEventListener('click', async () => { try { const d = await api('bank/draai', {}); meld(d.ongewijzigd ? 'Al op de eigen bank.' : 'Gedraaid naar ' + BK_MODUS[d.modus]); bankVervers(); } catch (e) { meld(e.message); } });
+  $('#bankOper').addEventListener('change', async e => { try { const d = await api('bank/operationeel', { aan: e.target.checked }); meld(d.teruggevallen ? 'Uit; de stand valt terug naar partner.' : (d.operationeel ? 'De bank is operationeel.' : 'De bank staat uit.')); bankVervers(); } catch (err) { meld(err.message); } });
+}
+function bankRenderGezond(g){
+  const tegels = [['Deposito', bkEuro(g.depositoCenten)], ['In omloop (eigen bank)', bkEuro(g.inOmloopCenten)], ['Krediet uit', bkEuro(g.kredietCenten)], ['Rente betaald', bkEuro(g.renteBetaaldCenten)], ['Reserve', bkEuro(g.reserveCenten)], ['Rekeningen', String(g.aantalRekeningen)], ['Sluitcontrole', g.sluit.klopt ? '✓ klopt' : '✗ ' + g.sluit.som]];
+  $('#bankGezond').innerHTML = tegels.map(([l, v], i) =>
+    '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + ((i === tegels.length - 1 && !g.sluit.klopt) ? 'border-color:var(--burgundy);' : '') + '"><div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div><div style="font-size:1.05rem;color:var(--gold);margin-top:.25rem;">' + esc(v) + '</div></div>').join('');
+}
+function bankRenderInstel(r){
+  $('#bankInstel').innerHTML =
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
+    '<span><label for="bankRente" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Spaarrente per jaar (%)</label><input id="bankRente" type="number" min="0" max="20" step="0.1" value="' + r.spaarrentePct + '" style="width:7rem;"></span>' +
+    '<span><label for="bankRood" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Standaard rood staan (€)</label><input id="bankRood" type="number" min="0" step="10" value="' + (r.roodLimietCenten / 100) + '" style="width:8rem;"></span>' +
+    '<button class="knop stil" id="bankInstelZet" type="button">Bewaar</button></div>';
+  $('#bankInstelZet').addEventListener('click', async () => {
+    try { await api('bank/instellingen', { spaarrenteBp: Math.round(Number($('#bankRente').value) * 100), roodLimietEuro: Number($('#bankRood').value) }); meld('Instellingen bewaard.'); bankVervers(); } catch (e) { meld(e.message); }
+  });
+}
+function bankRenderKrediet(rij){
+  if (!rij || !rij.length){ $('#bankKrediet').innerHTML = '<div class="leeg">Geen openstaande aanvragen.</div>'; return; }
+  $('#bankKrediet').innerHTML = rij.map(k =>
+    '<div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;' + bkLijn + '">' +
+    '<span style="flex:1;min-width:12rem;"><strong>' + bkEuro(k.bedragCenten) + '</strong> · ' + k.looptijdMnd + ' mnd · ' + esc(k.codenaam) + '<br><span style="font-size:.75rem;color:var(--soft);">' + esc(k.iban) + '</span></span>' +
+    '<button class="knop stil" data-akkoord="' + k.id + '">Goedkeuren</button>' +
+    '<button class="knop stil" data-afwijs="' + k.id + '" style="border-color:var(--burgundy);">Afwijzen</button></div>').join('');
+  $('#bankKrediet').querySelectorAll('[data-akkoord]').forEach(b => b.addEventListener('click', () => bankBesluit(b.dataset.akkoord, true)));
+  $('#bankKrediet').querySelectorAll('[data-afwijs]').forEach(b => b.addEventListener('click', () => bankBesluit(b.dataset.afwijs, false)));
+}
+async function bankBesluit(id, akkoord){
+  try { await api('bank/krediet/besluit', { id, akkoord }); meld(akkoord ? 'Goedgekeurd en gestort.' : 'Afgewezen.'); bankVervers(); } catch (e) { meld(e.message); }
+}
+function bankRenderRekOpen(){
+  $('#bankRekOpen').innerHTML =
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
+    '<span><label for="bankOpenCode" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Rekening openen voor codenaam</label><input id="bankOpenCode" placeholder="codenaam" style="width:11rem;"></span>' +
+    '<span><label for="bankOpenSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Soort</label><select id="bankOpenSoort"><option value="betaal">Betaalrekening</option><option value="spaar">Spaarrekening</option><option value="zakelijk">Zakelijke rekening</option></select></span>' +
+    '<button class="knop stil" id="bankOpenZet" type="button">Open rekening</button></div>';
+  $('#bankOpenZet').addEventListener('click', async () => {
+    try { const d = await api('bank/rekening/open', { codenaam: $('#bankOpenCode').value, soort: $('#bankOpenSoort').value }); meld('Geopend: ' + d.rekening.iban); $('#bankOpenCode').value = ''; bankVervers(); } catch (e) { meld(e.message); }
+  });
+}
+function bankRenderRek(rij){
+  if (!rij || !rij.length){ $('#bankRek').innerHTML = '<div class="leeg">Nog geen rekeningen.</div>'; return; }
+  $('#bankRek').innerHTML = rij.map(m =>
+    '<div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;' + bkLijn + '">' +
+    '<span style="flex:1;min-width:13rem;"><strong>' + bkEuro(m.saldoCenten) + '</strong> · ' + esc(m.soort) + ' · ' + esc(m.codenaam) + (m.bevroren ? ' · <span style="color:var(--burgundy);">bevroren</span>' : '') + '<br><span style="font-size:.75rem;color:var(--soft);">' + esc(m.iban) + '</span></span>' +
+    '<button class="knop stil" data-bevries="' + m.iban + '" data-aan="' + (m.bevroren ? '0' : '1') + '">' + (m.bevroren ? 'Ontdooi' : 'Bevries') + '</button></div>').join('');
+  $('#bankRek').querySelectorAll('[data-bevries]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('bank/rekening/bevries', { iban: b.dataset.bevries, aan: b.dataset.aan === '1' }); bankVervers(); } catch (e) { meld(e.message); }
   }));
 }
 

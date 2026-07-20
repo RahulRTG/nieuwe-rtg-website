@@ -74,7 +74,7 @@ async function laad(){
     // allergiekaart
     $('#allergie').innerHTML = data.allergie
       ? '<div class="allergie"><h2>⚠️ Allergie &amp; medisch</h2><div class="txt">'+esc(data.allergie)+'</div></div>'
-      : '<div class="allergie geen"><h2>Allergie &amp; medisch</h2><div>Nog niets vastgelegd'+(data.magZorgprofiel?' — vul het in bij het zorgprofiel (oppasinfo).':'.')+'</div></div>';
+      : '<div class="allergie geen"><h2>Allergie &amp; medisch</h2><div>Nog niets vastgelegd'+(data.magZorgprofiel?' - vul het in bij het zorgprofiel (oppasinfo).':'.')+'</div></div>';
     // persoonkeuze
     if (!gekozen || !data.personen.some(p=>p.pid===gekozen)) gekozen = (data.personen.find(p=>p.pid===data.mijnId)||data.personen[0]||{}).pid;
     $('#kies').innerHTML = data.personen.map(p=>'<button data-pid="'+p.pid+'" class="'+(p.pid===gekozen?'aan':'')+'">'+esc(p.naam)+(p.teGeven?' · '+p.teGeven+'💊':'')+'</button>').join('');
@@ -110,8 +110,8 @@ function toon(){
   h += '<div class="kaart blok"><h2>📈 Groei</h2>';
   const lg = p.laatsteGewicht, ll = p.laatsteLengte;
   h += '<div class="laatste">'
-    + '<div>Gewicht<br><b>'+(lg?lg.gewicht+' kg':'—')+'</b></div>'
-    + '<div>Lengte<br><b>'+(ll?ll.lengte+' cm':'—')+'</b></div></div>';
+    + '<div>Gewicht<br><b>'+(lg?lg.gewicht+' kg':'-')+'</b></div>'
+    + '<div>Lengte<br><b>'+(ll?ll.lengte+' cm':'-')+'</b></div></div>';
   const g = p.metingen.filter(m=>m.gewicht!=null);
   if (g.length>1){
     const max = Math.max(...g.map(m=>m.gewicht)), min = Math.min(...g.map(m=>m.gewicht));

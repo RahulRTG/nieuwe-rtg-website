@@ -1949,6 +1949,8 @@ Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 Object.assign(kern, require('./kern/spellen')({
   db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
+  // Rahul als spelmaatje: praat met een echte sleutel, valt anders terug op vaste tips
+  anthropic,
   // 18+ (voor Proost): alleen een echt account met paspoort-geboortedatum telt;
   // RTF-gezinsprofielen hebben geen geverifieerde leeftijd en doen nooit mee
   volwassen: (handle) => {

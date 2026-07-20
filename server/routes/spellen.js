@@ -3,7 +3,7 @@
    de RTG-leden-app (Bearer-token) en de RTFoundation (gezinscode + token),
    zodat alle leden tegen elkaar spelen. */
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -30,6 +30,8 @@ module.exports = (kern) => {
       return r;
     },
     opgeven: (mij, b) => spelOpgeven(mij, String(b.id || '')),
+    // Rahul als spelmaatje: een hint, een regel of een peptalk tijdens het potje
+    rahul: (mij, b) => spelRahul(mij, String(b.id || ''), b.vraag),
     'sneek-score': (mij, b) => sneekScore(mij, b.punten),
     'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
     'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),

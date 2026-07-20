@@ -86,6 +86,12 @@
   /* vingerroulette */
   .vlekzone{position:relative;height:26rem;border-radius:16px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.2);touch-action:none;overflow:hidden;}
 .merkvlak{display:inline-block;background:#7F1734;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+  /* Rahul als spelmaatje */
+  .rahulmaatje{margin:1rem 0 .4rem;padding:.7rem .8rem;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.03);}
+  .rmkop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-size:.9rem;color:var(--zacht);}
+  .rmantwoord{margin:.6rem 0 .2rem;font-size:.92rem;line-height:1.5;white-space:pre-wrap;}
+  .rmvraag{display:flex;gap:.5rem;margin-top:.6rem;}
+  .rmvraag input{flex:1;min-width:0;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 </head>
@@ -210,6 +216,11 @@
         <button class="knop grijs" id="wRuil">Ruil alles</button>
       </div>
       <div class="leeg" id="wInfo">Het woordenboek keurt elk woord.</div>
+    </div>
+    <div class="rahulmaatje" id="sRahul">
+      <div class="rmkop"><span>🤝 Rahul kijkt mee</span><button class="knop grijs mini" id="rmHint" type="button">Geef een tip</button></div>
+      <div class="rmantwoord" id="rmAntwoord" hidden></div>
+      <div class="rmvraag"><input id="rmVraag" placeholder="Vraag Rahul iets over dit potje…" maxlength="200"><button class="knop mini" id="rmVraagKnop" type="button">Vraag</button></div>
     </div>
     <div class="knoprij"><button class="knop rood" id="sOpgeven" style="flex:0 1 auto;">Opgeven</button></div>
   </section>
@@ -442,6 +453,20 @@ $('#sOpgeven').addEventListener('click', async ()=>{
   if (!huidig || !confirm('Dit potje opgeven?')) return;
   try{ await api('opgeven', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }catch(e){ meld(e.message); }
 });
+
+/* ---------- Rahul als spelmaatje: in elk potje op te roepen ---------- */
+async function vraagRahul(vraag){
+  if (!huidig) return;
+  const box = $('#rmAntwoord');
+  box.hidden = false; box.textContent = 'Rahul denkt mee…';
+  try{
+    const d = await api('rahul', { id: huidig.id, vraag: vraag || '' });
+    box.textContent = d.antwoord || 'Ik heb even niets bruikbaars, speel op je gevoel.';
+  }catch(e){ box.textContent = e.message; }
+}
+$('#rmHint').addEventListener('click', ()=> vraagRahul(''));
+$('#rmVraagKnop').addEventListener('click', ()=>{ const v = $('#rmVraag').value.trim(); if(!v) return; vraagRahul(v); $('#rmVraag').value=''; });
+$('#rmVraag').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#rmVraagKnop').click(); });
 
 /* ---------- Mens erger je niet: het bord op canvas ---------- */
 const MK = ['#E05B5B','#5B8FE0','#5FA56A','#E0B24A'];

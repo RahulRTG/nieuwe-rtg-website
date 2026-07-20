@@ -55,8 +55,14 @@ function maakAidata({ db, accounts }) {
     for (const b of d().bankBoekingen || [])
       yield { soort: 'transactie', bron: 'bank', van: b.van, naar: b.naar, srt: b.soort, centen: b.centen, at: b.at || null };
   }
+  // RTG Stad: sensormetingen per zone (per constructie zonder persoonsgegevens:
+  // de stad meet dingen, geen mensen)
+  function* stad() {
+    for (const m of d().stadMetingen || [])
+      yield { soort: 'meting', bron: 'stad', node: m.node, zone: m.zone, sens: m.sens, waarde: m.waarde, at: m.at || null };
+  }
 
-  const BRONNEN = { gesprekken, intakes, besluiten, transacties, kantoorchat, bank };
+  const BRONNEN = { gesprekken, intakes, besluiten, transacties, kantoorchat, bank, stad };
 
   // het bord: hoeveel records elke bron nu oplevert (zelfde tellers als de export)
   function overzicht() {

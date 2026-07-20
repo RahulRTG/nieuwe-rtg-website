@@ -54,8 +54,10 @@ app.post('/api/office/timeline', officeAuth, (req, res) => {
   res.json({ items: alles.slice((page - 1) * per, page * per), total: alles.length, page, pages });
 });
 
-app.get('/api/office/export.csv', (req, res) => {
-  if (!officeQueryMag(req.query.token)) return res.status(401).end();
+/* Bewust POST met het token in de Authorization-header (zelfde les als de
+   bank-export): een token in een GET-querystring lekt via logs, proxies en de
+   browsergeschiedenis. De backoffice downloadt via fetch + blob. */
+app.post('/api/office/export.csv', officeAuth, (req, res) => {
   const esc = require('../../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');

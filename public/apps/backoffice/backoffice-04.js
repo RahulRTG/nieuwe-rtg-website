@@ -84,10 +84,22 @@
     tlTimer = setTimeout(() => { tlPage = 1; laadTimeline(); }, 350);
   });
 
-  // export voor de boekhouding: de server bouwt het volledige bestand,
-  // hoe groot de historie ook is
-  $('#csvBtn').addEventListener('click', () => {
-    if (API.token) window.open('/api/office/export.csv?token=' + encodeURIComponent(API.token), '_blank');
+  // export voor de boekhouding: de server bouwt het volledige bestand, hoe
+  // groot de historie ook is. Via fetch met de Authorization-header (nooit
+  // het token in een URL) en dan een blob-download.
+  $('#csvBtn').addEventListener('click', async () => {
+    if (!API.token) return;
+    try {
+      const r = await fetch('/api/office/export.csv', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + API.token }, body: '{}'
+      });
+      if (!r.ok) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(await r.blob());
+      a.download = 'rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    } catch (e) {}
   });
 
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });

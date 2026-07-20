@@ -521,6 +521,27 @@
     <div class="kaart lijst" id="bankRek"><div class="leeg">Nog geen rekeningen.</div></div>
   </section>
 
+  <section id="vStad" hidden>
+    <div class="kop">
+      <button class="terug" id="stadTerug">← alle kamers</button>
+      <h1>🏙️ RTG Stad</h1>
+    </div>
+    <p class="deck">De hele stadsstructuur slimmer, op eigen hardware en eigen software. De Stadsdozen (dezelfde familie als de Zaakdoos) meten verkeer, lucht, geluid, energie, water, afval, licht en parkeren; één scenario-knop zet de hele stad in een stand. Privacy by design: de stad meet dingen, geen mensen.</p>
+
+    <h3 class="sec">Het scenario: één knop voor de hele stad</h3>
+    <div class="kaart" id="stadScenario"></div>
+
+    <h3 class="sec">Het stadsbeeld per domein</h3>
+    <div class="kpis" id="stadDomeinen"></div>
+
+    <h3 class="sec">De AI-stadsregisseur (adviseert, beslist niet)</h3>
+    <div class="kaart" id="stadAi"></div>
+
+    <h3 class="sec">De Stadsdoos-vloot (eigen hardware)</h3>
+    <div class="kaart" id="stadNodeAan"></div>
+    <div class="kaart lijst" id="stadNodes"><div class="leeg">Nog geen Stadsdozen.</div></div>
+  </section>
+
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -533,7 +554,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vAtelier','vStudio','vHardware','vArchitect','vIdeeen'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vAtelier','vStudio','vHardware','vArchitect','vIdeeen'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -555,6 +576,7 @@ async function binnen(){
     if (start === 'boardroom') await openBoard();
     else if (start === 'paniekkamer') await openPaniek();
     else if (start === 'bank') await openBank();
+    else if (start === 'stad') await openStad();
     else if (start === 'atelier') await openAtelier();
     else if (start === 'studio') await openStudio();
     else if (start === 'hardware') await openHardware();
@@ -571,12 +593,13 @@ async function laadKamers(){
   toon('vKamers');
   const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
     '<button class="kaart kamer board" data-kamer="bank"><span class="ic">🏦</span><h2>RTG Bank</h2><p>De eigen bank op het Pay-grootboek. Eén knop van de kaart-rails naar de eigen bank.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="stad"><span class="ic">🏙️</span><h2>RTG Stad</h2><p>De hele stad slimmer op eigen hardware en software: Stadsdozen meten, één knop zet de stand.</p><span class="kpi">De stadsinfrastructuur →</span></button>' +
     '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
 }
 
 /* ---------- een kamer ---------- */
@@ -1696,6 +1719,105 @@ function bankRenderRek(rij){
   }));
 }
 
+/* ---------- RTG Stad ---------- */
+const stKleur = { rustig: 'var(--gold)', normaal: '#FFFFFF', druk: 'var(--burgundy-on-dark, #C23A5E)', stil: 'var(--soft)' };
+let stadGewired = false, stadWie = '', STAD = null;
+async function openStad(){
+  zetKamerUrl('stad'); toon('vStad');
+  if (!stadGewired){ stadGewired = true; $('#stadTerug').addEventListener('click', laadKamers); }
+  await stadVervers();
+  stadAi();
+}
+async function stadVervers(){
+  try { STAD = await api('stad'); stadRenderScenario(); stadRenderDomeinen(); stadRenderNodeAan(); stadRenderNodes(); }
+  catch (e) { meld(e.message); }
+}
+function stadRenderScenario(){
+  const b = STAD;
+  const seg = b.scenarios.map(s => '<button class="knop' + (s.naam === b.scenario ? '' : ' stil') + '" data-scenario="' + s.naam + '" title="' + esc(s.uitleg) + '" style="padding:.45rem .9rem;">' + esc(s.label) + '</button>').join(' ');
+  const actief = b.scenarios.find(s => s.naam === b.scenario);
+  $('#stadScenario').innerHTML =
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.6rem;">' +
+      '<span><label for="stadWie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Wie schakelt? (voor het auditlog)</label><input id="stadWie" placeholder="je naam" value="' + esc(stadWie) + '" style="width:11rem;"></span>' +
+    '</div>' +
+    '<div style="display:flex;gap:.5rem;flex-wrap:wrap;">' + seg + '</div>' +
+    (actief ? '<p style="margin:.6rem 0 0;color:var(--soft);font-size:.85rem;">' + esc(actief.uitleg) + '</p>' : '') +
+    (b.alerts.length ? '<div style="margin-top:.6rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;font-size:.85rem;">' + b.alerts.map(a => '⚠️ ' + esc(a.tekst)).join('<br>') + '</div>' : '');
+  $('#stadWie').addEventListener('input', e => { stadWie = e.target.value; });
+  $('#stadScenario').querySelectorAll('[data-scenario]').forEach(k => k.addEventListener('click', async () => {
+    try { const r = await api('stad/scenario', { scenario: k.dataset.scenario, naam: stadWie });
+      meld('Scenario "' + r.scenario + '" gezet.'); stadVervers();
+    } catch (e) { meld(e.message); }
+  }));
+}
+function stadRenderDomeinen(){
+  $('#stadDomeinen').innerHTML = STAD.domeinen.map(x =>
+    '<div class="kaart" style="padding:.9rem .7rem;">' +
+      '<div style="font-size:.72rem;color:var(--soft);">' + esc(x.label) + '</div>' +
+      '<div style="font-size:1.05rem;margin:.25rem 0;color:' + (stKleur[x.stand] || '#fff') + ';">' +
+        (x.waarde == null ? 'geen data' : esc(String(x.waarde)) + ' <span style="font-size:.7rem;color:var(--soft);">' + esc(x.eenheid) + '</span>') +
+        ' · ' + esc(x.stand) + '</div>' +
+      '<select data-regime="' + x.id + '" style="width:100%;font-size:.78rem;">' +
+        x.regimes.map(r => '<option value="' + r + '"' + (r === x.regime ? ' selected' : '') + '>regime: ' + r + '</option>').join('') +
+      '</select></div>').join('');
+  $('#stadDomeinen').querySelectorAll('[data-regime]').forEach(s => s.addEventListener('change', async () => {
+    try { await api('stad/regime', { domein: s.dataset.regime, regime: s.value, naam: stadWie }); meld('Regime gezet.'); stadVervers(); }
+    catch (e) { meld(e.message); }
+  }));
+}
+/* de vloot: aanmelden bouwt maar één keer op, zodat een live-verversing het
+   formulier (en de eenmalig getoonde sleutel) niet wist */
+function stadRenderNodeAan(){
+  const doos = $('#stadNodeAan');
+  if (doos.dataset.gewired) { const sel = $('#stadZoneSel'); if (sel && !sel.options.length) sel.innerHTML = STAD.zones.map(z => '<option>' + esc(z) + '</option>').join(''); return; }
+  doos.dataset.gewired = '1';
+  doos.innerHTML =
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
+    '<span><label for="stadDoosNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe Stadsdoos</label><input id="stadDoosNaam" placeholder="bijv. Stadsdoos Brug" style="width:11rem;"></span>' +
+    '<span><label for="stadZoneSel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Zone</label><select id="stadZoneSel">' + STAD.zones.map(z => '<option>' + esc(z) + '</option>').join('') + '</select></span>' +
+    '<span><label for="stadSens" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Sensoren (komma)</label><input id="stadSens" placeholder="verkeer, lucht, licht" style="width:13rem;"></span>' +
+    '<button class="knop stil" id="stadDoosMeld" type="button">Meld aan</button></div>' +
+    '<div id="stadSleutel" style="margin-top:.6rem;font-size:.85rem;"></div>';
+  $('#stadDoosMeld').addEventListener('click', async () => {
+    try {
+      const r = await api('stad/node/aanmeld', { doosNaam: $('#stadDoosNaam').value, zone: $('#stadZoneSel').value,
+        sensoren: $('#stadSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: stadWie });
+      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;">🔑 <strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+      $('#stadDoosNaam').value = ''; $('#stadSens').value = '';
+      stadVervers();
+    } catch (e) { meld(e.message); }
+  });
+}
+function stadRenderNodes(){
+  const rij = STAD.nodes;
+  if (!rij.length){ $('#stadNodes').innerHTML = '<div class="leeg">Nog geen Stadsdozen.</div>'; return; }
+  $('#stadNodes').innerHTML = '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + STAD.vloot.online + ' van ' + STAD.vloot.totaal + ' online</div>' + rij.map(n =>
+    '<div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;' + bkLijn + '">' +
+    '<span style="width:.6rem;height:.6rem;border-radius:50%;background:' + (n.online ? 'var(--gold)' : 'var(--soft)') + ';"></span>' +
+    '<span style="flex:1;min-width:13rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">demo</span>' : '') +
+      '<br><span style="font-size:.75rem;color:var(--soft);">' + esc(n.serial) + ' · ' + n.sensoren.map(esc).join(', ') + '</span></span>' +
+    '<button class="knop stil" data-doosstop="' + n.serial + '" style="font-size:.75rem;">Uit dienst</button></div>').join('');
+  $('#stadNodes').querySelectorAll('[data-doosstop]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('stad/node/stop', { serial: b.dataset.doosstop, naam: stadWie }); stadVervers(); } catch (e) { meld(e.message); }
+  }));
+}
+async function stadAi(vraag){
+  const doos = $('#stadAi');
+  if (!doos.dataset.gewired){
+    doos.dataset.gewired = '1';
+    doos.innerHTML = '<div id="stadAiWe" style="font-size:.9rem;line-height:1.55;">Even kijken…</div><ul id="stadAiTips" style="margin:.5rem 0 0 1.1rem;font-size:.85rem;color:var(--soft);line-height:1.6;"></ul>' +
+      '<div style="display:flex;gap:.5rem;margin-top:.6rem;"><input id="stadAiV" placeholder="Vraag de stadsregisseur iets…" style="flex:1;"><button class="knop" id="stadAiB" type="button">Vraag</button></div>';
+    $('#stadAiB').addEventListener('click', () => { const q = $('#stadAiV').value.trim(); if (q) { stadAi(q); $('#stadAiV').value = ''; } });
+    $('#stadAiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#stadAiB').click(); });
+  }
+  $('#stadAiWe').textContent = 'Even kijken…';
+  try {
+    const r = await api('stad/advies', vraag ? { vraag } : {});
+    $('#stadAiWe').textContent = r.antwoord || r.samenvatting || '';
+    $('#stadAiTips').innerHTML = (r.tips || []).map(t => '<li>' + esc(t) + '</li>').join('');
+  } catch (e) { $('#stadAiWe').textContent = e.message; }
+}
+
 /* ---------- de eigen-AI-dataset (boardroom) ---------- */
 let aidataGewired = false;
 async function laadAidata(){
@@ -1953,8 +2075,8 @@ $('#bAllesUit').addEventListener('click', async () => {
 setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }, 30000);
 
 /* Live: het office-kanaal (SSE). De bank-kern geeft bij elke boeking een
-   gedempt seintje (scope 'bank'); staat de bank-kamer open, dan ververst het
-   bord meteen -- rente, een storting van een lid, een salarisrun, alles
+   gedempt seintje (scope 'bank') en de stad bij elke schakeling of meting
+   (scope 'stad'); staat die kamer open, dan ververst het bord meteen --
    zonder te hoeven pollen. */
 let osse = null, osseT = null;
 function officeLive(){
@@ -1962,8 +2084,9 @@ function officeLive(){
   try { osse = new EventSource('/api/office/stream?token=' + encodeURIComponent(TOKEN)); } catch (e) { return; }
   osse.addEventListener('sync', e => {
     let scope = null; try { scope = JSON.parse(e.data).scope; } catch (x) {}
-    if (scope !== 'bank' || $('#vBank').hidden || document.hidden) return;
-    clearTimeout(osseT); osseT = setTimeout(bankVervers, 400);
+    if (document.hidden) return;
+    if (scope === 'bank' && !$('#vBank').hidden) { clearTimeout(osseT); osseT = setTimeout(bankVervers, 400); }
+    else if (scope === 'stad' && !$('#vStad').hidden) { clearTimeout(osseT); osseT = setTimeout(stadVervers, 400); }
   });
 }
 

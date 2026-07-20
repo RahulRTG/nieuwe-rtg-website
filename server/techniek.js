@@ -72,6 +72,16 @@ const CHECKS = [
     }
   },
   {
+    id: 'stad', naam: 'RTG Stad', code: 'STAD-01', categorie: 'Integraties',
+    run: (c) => {
+      if (!c.stad) return { status: 'waarschuwing', detail: 'Stadsmodule niet gekoppeld aan de bewaking.' };
+      const b = c.stad.stadBeeld();
+      if (!b.vloot.totaal) return { status: 'waarschuwing', detail: 'Nog geen Stadsdozen aangemeld.' };
+      if (b.vloot.online * 2 < b.vloot.totaal) return { status: 'fout', detail: 'Meer dan de helft van de Stadsdozen is offline (' + b.vloot.online + '/' + b.vloot.totaal + ').' };
+      return { status: 'ok', detail: 'Scenario "' + b.scenario + '"; ' + b.vloot.online + '/' + b.vloot.totaal + ' Stadsdozen online; ' + b.alerts.length + ' waarschuwing(en) op het bord.' };
+    }
+  },
+  {
     id: 'email', naam: 'E-mail (SMTP)', code: 'MAIL-01', categorie: 'Integraties',
     run: (c) => c.mailGeconfigureerd
       ? { status: 'ok', detail: 'SMTP ingesteld; e-mail wordt echt verstuurd.' }

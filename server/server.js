@@ -2114,6 +2114,11 @@ fonds.koppelBank(({ centen, referentie, oms }) => {
   if (c.modus !== 'eigen') return null;
   return kern.bank.boek({ van: 'rtg:reserve', naar: 'extern:foundation', centen, soort: 'afdracht', oms, ref: referentie });
 });
+/* RTG Stad (kern/stad): het slimme-stad-platform op EIGEN hardware (de
+   Stadsdoos-vloot, dezelfde familie als de Zaakdoos) en eigen software --
+   domeinen met regimes, een scenario-knop in de boardroom en een
+   AI-stadsregisseur. Privacy by design: de stad meet dingen, geen mensen. */
+Object.assign(kern, require('./kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig }));
 /* De eigen-AI-dataset (kern/aidata.js): een boardroom-knop verzamelt alle logs
    (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL om
    later een eigen model te trainen -- op codenamen, de kluis blijft dicht. */

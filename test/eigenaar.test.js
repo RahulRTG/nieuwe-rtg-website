@@ -43,8 +43,9 @@ test('overal toegang: de eigenaar komt met zijn accountlogin in Backoffice en te
   // Backoffice zonder de aparte OFFICE_CODE, puur op zijn accounttoken
   assert.equal((await api('/api/office/state', {}, ownerToken)).status, 200, 'Backoffice-state');
   assert.equal((await api('/api/office/verifications', {}, ownerToken)).status, 200, 'KYC-overzicht (backoffice)');
-  const csv = await fetch(BASE + '/api/office/export.csv?token=' + ownerToken);
-  assert.equal(csv.status, 200, 'de boekhoud-export (query-token)');
+  const csv = await fetch(BASE + '/api/office/export.csv', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + ownerToken }, body: '{}' });
+  assert.equal(csv.status, 200, 'de boekhoud-export (token in de header, nooit in de URL)');
   // de technische pagina herkent hem als eigenaar
   const tech = await json(await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' }));
   assert.equal(tech.eigenaar, true);

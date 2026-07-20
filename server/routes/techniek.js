@@ -66,7 +66,9 @@ module.exports = (kern) => {
       mailGeconfigureerd: !!(process.env.SMTP_URL || process.env.SMTP_HOST),
       zekeringen: staat().zekeringen,
       // de bank in de bewaking: sluitcontrole + nood-stand horen op het bord
-      bank: kern.bank, bankRegie: kern.bankregieOverzicht
+      bank: kern.bank, bankRegie: kern.bankregieOverzicht,
+      // de stad in de bewaking: de Stadsdoos-vloot hoort erbij
+      stad: kern.stad
     };
   }
 

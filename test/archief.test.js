@@ -103,7 +103,8 @@ test('de backoffice-totalen tellen het archief mee', async () => {
 
 test('de boekhoud-export bevat gearchiveerde en levende tickets', async () => {
   const tok = await ownerToken();
-  const csv = await (await fetch(BASE + '/api/office/export.csv?token=' + tok)).text();
+  const csv = await (await fetch(BASE + '/api/office/export.csv', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })).text();
   assert.ok(csv.includes('Zilveren Valk T'), 'de export draait');
   const dagOud = DAGEN_100.slice(0, 10), dagVers = GISTEREN.slice(0, 10);
   assert.ok(csv.includes(dagOud), 'de gearchiveerde bestelling staat in de export');

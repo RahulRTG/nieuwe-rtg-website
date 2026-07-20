@@ -104,6 +104,18 @@ gemak brengt. In deze code betekent dat:
   opgeslagen publieke sleutel. Geborgd door een synthetische ceremonie-test
   (`test/webauthn-eigen.test.js`); tijdens de bouw byte-voor-byte gelijk bevonden
   aan het pakket. Zelfde vorm en veldnamen, dus `kern/webauthn.js` merkt er niets van.
+- **De SMTP-verzending** (`server/smtp.js`): het versturen van e-mail (verificatie-
+  en herstel-links, meldingen) die `nodemailer` verving. Zelfde nuance bij regel 1:
+  de versleuteling van de verbinding komt volledig uit `node:tls` (implicit TLS of
+  STARTTLS) -- geen eigen crypto. Wij zetten alleen de SMTP-protocolstappen op elkaar
+  (EHLO, STARTTLS, AUTH, MAIL/RCPT/DATA) plus een correcte MIME-opmaak. Bewust smal
+  en eerlijk: dit is een SUBMISSION-client naar een geconfigureerde smarthost
+  (`SMTP_URL` van een provider), geen volwaardige MTA -- geen MX-resolutie of eigen
+  wachtrij; dat doet de provider erachter, en zonder `SMTP_URL` valt `server/mail.js`
+  terug op de outbox. Credentials gaan NOOIT over een onversleutelde verbinding.
+  Geborgd met een test tegen een nep-SMTP-server (`test/smtp.test.js`, incl. STARTTLS
+  + AUTH LOGIN/PLAIN); tijdens de bouw naast nodemailer gelegd (zelfde commando-reeks).
+  Zelfde vorm (`createTransport(url).sendMail(...)`), dus `server/mail.js` merkt er niets van.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.
@@ -136,12 +148,16 @@ regel 1 breken (eigen crypto is verboden) en zou ons bovendien tot een
 vergunningplichtige crypto-dienstverlener (CASP) maken. Door meteen naar euro om
 te zetten blijven we een handelaar die munten accepteert, geen wisselkantoor.
 
-**3. De drie runtime-fundamenten.** Bewust klein gehouden:
+**3. Het ene runtime-fundament.** Bewust klein gehouden -- er is er nog maar één
+verplicht over:
 
 | Pakket | Waarom niet zelf |
 |---|---|
 | `express` | HTTP-routing, jaren dichtgetimmerd tegen randgevallen die je niet in een middag reproduceert. |
-| `nodemailer` | SMTP met alle protocol-eigenaardigheden. |
+
+(SMTP deden we hierboven wél zelf: `nodemailer` is eruit. De keuze om `express`
+te houden is er een van kosten/baten -- de routing- en middleware-randgevallen
+zijn talrijk en de dependency-boom is nu al klein -- niet van regel 1.)
 
 En vier **optionele** pakketten die alleen laden als je ze configureert —
 zonder deze draait alles gewoon door in demo/lokaal:

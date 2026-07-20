@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pulse · RTG</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  header .negen{margin-left:auto;font-size:.66rem;border:1px solid var(--gold);color:var(--gold);border-radius:6px;padding:.12rem .45rem;}
+  main{padding:1.1rem;max-width:640px;margin:0 auto;}
+  .schrijf{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;margin-bottom:.9rem;}
+  .schrijf textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.95rem;padding:.6rem .7rem;min-height:3.2rem;resize:vertical;}
+  .schrijf .voet{display:flex;align-items:center;gap:.6rem;margin-top:.5rem;}
+  .teller{font-size:.75rem;color:var(--soft);margin-left:auto;}
+  .teller.vol{color:var(--burgundy);}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.45rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:400;font-size:.78rem;padding:.3rem .7rem;}
+  .tabs{display:flex;gap:.4rem;margin-bottom:.8rem;}
+  .tab{flex:1;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.45rem;font-size:.84rem;color:var(--muted);cursor:pointer;text-align:center;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;}
+  .trend{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.8rem;}
+  .trend span{font-size:.74rem;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.22rem .6rem;}
+  .post{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem 1rem;margin-bottom:.7rem;}
+  .post .kop{display:flex;align-items:baseline;gap:.5rem;}
+  .post .wie{font-weight:600;font-size:.92rem;}
+  .post .tijd{font-size:.72rem;color:var(--soft);margin-left:auto;}
+  .post .tekst{font-size:.95rem;line-height:1.55;margin-top:.35rem;white-space:pre-wrap;word-break:break-word;}
+  .post .tekst .tag{color:var(--gold);}
+  .post .acts{display:flex;gap:.4rem;margin-top:.6rem;align-items:center;flex-wrap:wrap;}
+  .post .acts .aan{border-color:var(--burgundy);color:var(--burgundy);}
+  .reacties{border-top:1px solid var(--line);margin-top:.6rem;padding-top:.5rem;}
+  .reactie{font-size:.85rem;color:var(--muted);padding:.2rem 0;line-height:1.5;}
+  .reactie b{color:var(--txt);font-weight:600;}
+  .rrij{display:flex;gap:.4rem;margin-top:.4rem;}
+  .rrij input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
+  .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2rem 1rem;line-height:1.6;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+  .klaar{color:var(--soft);font-size:.8rem;text-align:center;padding:1rem 0;}
+</style>
+</head>
+<body>
+<header><div><div class="ey">RTG Pulse</div><h1>Pulse</h1></div><span class="negen">9+</span></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
+const api=(pad,body)=>fetch('/api/member/pulse/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+const tijd=iso=>{ const d=new Date(iso), s=(Date.now()-d)/1000; if(s<60)return 'nu'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'u'; return d.getDate()+'/'+(d.getMonth()+1); };
+const mooi=t=>esc(t).replace(/#([a-z0-9_]{2,30})/gi,'<span class="tag">#$1</span>');
+let SOORT='volgend';
+async function laad(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Pulse is de ledenfeed van RTG, op codenaam.</p></div>'; return; }
+  let d; try{ d=await api('feed',{soort:SOORT}); }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let h='<div class="schrijf"><textarea id="nw" maxlength="280" placeholder="Wat wil je delen? (op je codenaam, 9+)"></textarea><div class="voet"><button class="knop" id="plaats">Plaatsen</button><span class="teller" id="teller">280</span></div></div>';
+  h+='<div class="tabs"><button class="tab'+(SOORT==='volgend'?' aan':'')+'" data-s="volgend">Volgend ('+d.volgend+')</button><button class="tab'+(SOORT==='ontdek'?' aan':'')+'" data-s="ontdek">Ontdek</button></div>';
+  if(d.trending.length) h+='<div class="trend">'+d.trending.map(t=>'<span>#'+esc(t.tag)+' · '+t.n+'</span>').join('')+'</div>';
+  h+= d.feed.length ? d.feed.map(p=>{
+    const acts='<div class="acts">'+
+      '<button class="knop stil'+(p.mijnLike?' aan':'')+'" data-like="'+p.id+'">♥ '+p.likes+'</button>'+
+      '<button class="knop stil" data-open="'+p.id+'">💬 '+p.reacties.length+'</button>'+
+      (p.eigen?'<button class="knop stil" data-weg="'+p.id+'">verwijderen</button>'
+        :(SOORT==='ontdek'?'<button class="knop stil" data-volg="'+p.van+'">+ volgen</button>':'')+'<button class="knop stil" data-meld="'+p.id+'">melden</button>')+'</div>';
+    const reacties='<div class="reacties" id="re-'+p.id+'" hidden>'+p.reacties.map(r=>'<div class="reactie"><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+
+      '<div class="rrij"><input id="ri-'+p.id+'" maxlength="280" placeholder="Reageer (9+)"><button class="knop" data-re="'+p.id+'">→</button></div></div>';
+    return '<div class="post"><div class="kop"><span class="wie">'+esc(p.codenaam)+'</span><span class="tijd">'+tijd(p.at)+'</span></div><div class="tekst">'+mooi(p.tekst)+'</div>'+acts+reacties+'</div>';
+  }).join('')+'<div class="klaar">Je bent bij. Meer is er niet - en dat is precies de bedoeling.</div>'
+  : '<div class="leeg">'+(SOORT==='volgend'?'Je volgt nog niemand.<br>Kijk bij Ontdek en volg een paar codenamen.':'Nog geen berichten. Wees de eerste!')+'</div>';
+  $('#main').innerHTML=h;
+  const nw=$('#nw'), teller=$('#teller');
+  nw.addEventListener('input',()=>{ const n=280-nw.value.length; teller.textContent=n; teller.classList.toggle('vol',n<20); });
+  $('#plaats').onclick=async()=>{ const t=nw.value.trim(); if(!t) return; try{ await api('post',{tekst:t}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{ SOORT=b.dataset.s; laad(); });
+  document.querySelectorAll('[data-like]').forEach(b=> b.onclick=async()=>{ try{ await api('like',{id:b.dataset.like}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-open]').forEach(b=> b.onclick=()=>{ const el=$('#re-'+b.dataset.open); el.hidden=!el.hidden; });
+  document.querySelectorAll('[data-re]').forEach(b=> b.onclick=async()=>{ const i=$('#ri-'+b.dataset.re); const t=i.value.trim(); if(!t)return; try{ await api('reactie',{id:b.dataset.re,tekst:t}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-weg]').forEach(b=> b.onclick=async()=>{ if(!confirm('Dit bericht verwijderen?'))return; try{ await api('weg',{id:b.dataset.weg}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-volg]').forEach(b=> b.onclick=async()=>{ try{ const r=await api('volg',{key:b.dataset.volg}); meld(r.volgIk?'Je volgt deze codenaam nu.':'Ontvolgd.'); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-meld]').forEach(b=> b.onclick=async()=>{ const reden=prompt('Waarom meld je dit bericht?',''); if(reden==null)return; try{ await api('meld',{id:b.dataset.meld,reden}); meld('Gemeld. Dank je; zo blijft Pulse 9+.'); }catch(e){ meld(e.message); } });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

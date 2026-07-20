@@ -45,6 +45,9 @@ module.exports = (kern) => {
     }
     const text = String(req.body.text || '').trim().slice(0, 500);
     if (!text) return res.status(400).json({ error: 'Lege reactie.' });
+    // de 9+-poort: De Salon blijft geschikt voor iedereen vanaf 9 jaar
+    const keurR = require('../../kern/veilig').keur(text);
+    if (!keurR.ok) return res.status(400).json({ error: keurR.reden });
     // Echte leden verschijnen in De Salon onder hun codenaam, nooit hun echte naam.
     const who = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
     const clang = talen.taalVan(req.body.lang);
@@ -70,6 +73,9 @@ module.exports = (kern) => {
     }
     const text = String(req.body.text || '').trim().slice(0, 1000);
     if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
+    // de 9+-poort geldt ook voor priveberichten in De Salon
+    const keurD = require('../../kern/veilig').keur(text);
+    if (!keurD.ok) return res.status(400).json({ error: keurD.reden });
     registerContact(req.session, post);
     const fromName = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
     db.data.dms.push({

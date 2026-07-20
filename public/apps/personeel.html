@@ -285,8 +285,39 @@
       <div class="view" data-view="team">
         <h2 data-i18n="pd.v.team">Team</h2>
         <p class="sub" data-i18n="pd.v.team.sub">Interne chat en wie wat deed.</p>
-        <div id="teamWrap"></div>
+        <!-- Berichten met swipe: het werk staat voorop (pagina 1); een veeg naar
+             links toont je prive-berichten (de Berichten-app), zonder de werkvloer
+             te verlaten. Puur CSS scroll-snap; het prive-paneel laadt pas bij gebruik. -->
+        <div class="chatwissel" aria-hidden="true"><span id="cwWerk" class="aan">Werk</span><span id="cwPrive">Privé · swipe ←</span></div>
+        <div class="chatswipe" id="chatSwipe">
+          <section class="chatpaneel"><div id="teamWrap"></div></section>
+          <section class="chatpaneel"><iframe id="priveFrame" title="Privéberichten" loading="lazy" style="width:100%;height:min(70vh,560px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;background:#0C0C0B;"></iframe></section>
+        </div>
       </div>
+      <style>
+        .chatswipe{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+        .chatswipe::-webkit-scrollbar{display:none;}
+        .chatpaneel{min-width:100%;scroll-snap-align:start;scroll-snap-stop:always;}
+        .chatwissel{display:flex;gap:.5rem;margin:0 0 .6rem;font-size:.72rem;color:rgba(244,241,236,.5);}
+        .chatwissel span{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:.2rem .6rem;}
+        .chatwissel span.aan{border-color:#B99A5F;color:#B99A5F;}
+      </style>
+      <script>
+      /* het prive-paneel: laadt de Berichten-app pas bij de eerste veeg, en de
+         wissel-chips laten zien waar je bent (werk of prive) */
+      (function(){
+        const sw=document.getElementById('chatSwipe'), fr=document.getElementById('priveFrame');
+        const w=document.getElementById('cwWerk'), p=document.getElementById('cwPrive');
+        if(!sw) return;
+        let geladen=false;
+        sw.addEventListener('scroll',()=>{
+          const prive=sw.scrollLeft>sw.clientWidth/2;
+          if(prive&&!geladen){ geladen=true; fr.src='/apps/berichten.html'; }
+          w.classList.toggle('aan',!prive); p.classList.toggle('aan',prive);
+          p.textContent=prive?'Privé':'Privé · swipe ←';
+        },{passive:true});
+      })();
+      </script>
     </div>
     <div class="tabbar" id="tabbar" role="navigation" aria-label="Hoofdmenu">
       <button data-tab="vandaag" class="active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span data-i18n="pd.t.today">Vandaag</span></button>

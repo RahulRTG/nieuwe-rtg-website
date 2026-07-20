@@ -55,6 +55,10 @@ module.exports = (kern) => {
   require('./member/rechterhand')(kern);
   // Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass
   require('./member/rendezvous')(kern);
+  // RTG Pulse: het eigen 9+-microblog op codenaam
+  require('./member/pulse')(kern);
+  // De Berichten-app: alle gesprekken van het platform op een plek
+  require('./member/berichten')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
   // De persoonlijke AI en de Butler/concierge-chat.

@@ -2189,6 +2189,8 @@
     nalatenschap:{ naam: 'Nalatenschap',  icoon: '🗝️', url: '/apps/nalatenschap.html' },
     logboek:     { naam: 'Logboek',       icoon: '⚓', url: '/apps/logboek.html' },
     cercle:      { naam: 'Cercle',        icoon: '🎟️', url: '/apps/cercle.html' },
+    pulse:       { naam: 'Pulse',         icoon: '⚡', url: '/apps/pulse.html' },
+    berichten:   { naam: 'Berichten',     icoon: '✉️', url: '/apps/berichten.html' },
     hangar:      { naam: 'Hangar',        icoon: '🛩️', url: '/apps/hangar.html' },
     entourage:   { naam: 'Entourage',     icoon: '👥', url: '/apps/entourage.html' },
     attenties:   { naam: 'Attenties',     icoon: '🎁', url: '/apps/attenties.html' },
@@ -2215,7 +2217,7 @@
   const INDELING = [
     ['tab:reizen', 'tab:betalen', 'tab:bestellen', 'tab:ai', 'tab:salon', 'tab:terplaatse',
       { sleutel: 'map-diensten', naam: 'Diensten', items: ['tab:zorg', 'tab:assets', 'tab:gezin'] }],
-    [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
+    [{ sleutel: 'map-sociaal', naam: 'Sociaal', items: ['link:berichten', 'link:pulse', 'link:vrienden', 'os:bellen', 'os:videobellen', 'os:snaps', 'link:spelen'] },
       'link:bank',
       'link:ov',
       'link:stad',

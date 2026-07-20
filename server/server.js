@@ -2082,6 +2082,8 @@ Object.assign(kern, require('./kern/lifestyle')({ db, save, crypto, anthropic, l
 Object.assign(kern, require('./kern/rechterhand')({ db, save, crypto, liveCodename, anthropic, DATA_DIR }));
 // Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass (match -> jetset-date)
 Object.assign(kern, require('./kern/rendezvous')({ db, save, crypto, liveCodename, anthropic, notify }));
+// RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)
+Object.assign(kern, require('./kern/pulse')({ db, save, crypto, liveCodename, notify }));
 // Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
 // dat meereist en een aparte, veilige intake-deling per aanbieder.
 Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));

@@ -54,6 +54,8 @@ app.post('/api/member/dm/send', auth, (req, res) => {
   const c = connectieTussen(req.session.key, ander);
   if (!verbActief(c)) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
   const text = String(req.body.text || '').slice(0, 500).trim();
+  // de 9+-poort: de vriendenchat deelt de leeftijdsgrens met de rest van de socials
+  if (text) { const keur9 = require('../../kern/veilig').keur(text); if (!keur9.ok) return res.status(400).json({ error: keur9.reden }); }
   let postDeel = null;
   if (req.body.postId != null) {
     const p = db.data.posts.find(x => x.id === Number(req.body.postId));

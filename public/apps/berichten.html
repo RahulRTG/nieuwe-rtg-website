@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Berichten · RTG</title>
+<link rel="icon" href="/icons/partners.svg">
+<link rel="manifest" href="/manifests/berichten.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Berichten">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:999px;padding:.15rem .6rem;}
+  main{padding:1.1rem;max-width:640px;margin:0 auto;}
+  .rijk{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.8rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;text-decoration:none;color:inherit;}
+  .rijk:hover{border-color:var(--gold);}
+  .rijk .ic{font-size:1.4rem;width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex-shrink:0;}
+  .rijk .b{flex:1;min-width:0;}
+  .rijk .nm{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.4rem;}
+  .rijk .lt{font-size:.82rem;color:var(--soft);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rijk .tijd{font-size:.7rem;color:var(--soft);white-space:nowrap;}
+  .badge{background:var(--burgundy);color:#fff;font-size:.66rem;border-radius:999px;padding:.08rem .45rem;}
+  .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2.5rem 1rem;line-height:1.6;}
+  .inlog{text-align:center;padding:3rem 1rem;}
+  .noot{font-size:.72rem;color:var(--soft);text-align:center;margin-top:1rem;line-height:1.5;}
+</style>
+</head>
+<body>
+<header><div><div class="ey">Alles op een plek</div><h1>Berichten</h1></div><span class="tel" id="tel" hidden></span></header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(); const dag=86400000;
+  if(nu-d<dag && d.getDate()===nu.getDate()) return d.toTimeString().slice(0,5);
+  if(nu-d<7*dag) return ['zo','ma','di','wo','do','vr','za'][d.getDay()];
+  return d.getDate()+'/'+(d.getMonth()+1); };
+async function laad(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Open de RTG-app en log in; daarna staan al je gesprekken hier.</p></div>'; return; }
+  let d;
+  try{
+    const r=await fetch('/api/member/berichten',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:'{}'});
+    d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Er ging iets mis.');
+  }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  if(d.ongelezen){ $('#tel').textContent=d.ongelezen; $('#tel').hidden=false; } else $('#tel').hidden=true;
+  $('#main').innerHTML = d.kanalen.length ? d.kanalen.map(k=>
+    '<a class="rijk" href="'+esc(k.link)+'"><span class="ic">'+esc(k.icoon)+'</span><span class="b"><span class="nm">'+esc(k.titel)+(k.ongelezen?' <span class="badge">'+k.ongelezen+'</span>':'')+'</span><span class="lt">'+esc(k.laatste)+'</span></span><span class="tijd">'+tijd(k.at)+'</span></a>'
+  ).join('')+'<div class="noot">Berichten van je socials, je werk en de overheid, op een plek. Tik een gesprek om het in de bron-app te openen en te beantwoorden.</div>'
+  : '<div class="leeg">Nog geen gesprekken.<br>Start er een in De Salon, bij je vrienden of via Rahul.</div>';
+}
+laad();
+// zachtjes verversen wanneer de app weer in beeld komt (geen gepiep, geen polling-storm)
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) laad(); });
+setInterval(()=>{ if(!document.hidden) laad(); },30000);
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

@@ -2076,6 +2076,8 @@ Object.assign(kern, require('./kern/hoteldorp')({ db, save, crypto, schoon, sseT
 Object.assign(kern, require('./kern/gastzorg')({ db, save, crypto, schoon, notify, notifySupplier, sseToSupplier, sseToCustomer, findSupplier, haversine, etaMinutes }));
 // Toren 3, RTG Shared Assets: 300 tickets per object, Access en Asset
 Object.assign(kern, require('./kern/assets')({ db, save, crypto, schoon, notify, pay: kern.pay }));
+// De Rechterhand: de premium Lifestyle Pass-suite (concierge, bezittingen, gezondheid)
+Object.assign(kern, require('./kern/lifestyle')({ db, save, crypto, anthropic, liveCodename }));
 // Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
 // dat meereist en een aparte, veilige intake-deling per aanbieder.
 Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));

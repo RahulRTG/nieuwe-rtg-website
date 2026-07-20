@@ -49,6 +49,8 @@ module.exports = (kern) => {
   require('./member/boeken')(kern);
   // De zakelijke tools van de Business Pass: zzp-belastingtool en AI-boekhouder.
   require('./member/zakelijk')(kern);
+  // De Rechterhand: de premium suite van de Lifestyle Pass
+  require('./member/lifestyle')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
   // De persoonlijke AI en de Butler/concierge-chat.

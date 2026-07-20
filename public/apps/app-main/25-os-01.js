@@ -38,7 +38,8 @@
     clips:       { naam: 'Clips',        icoon: '🎥', url: '/apps/clips.html' },
     office:      { naam: 'RTG Office',   icoon: '📊', url: '/apps/office.html' },
     vonk:        { naam: 'Vonk',         icoon: '💘', url: '/apps/vonk.html' },
-    balans:      { naam: 'Balans',       icoon: '🌿', url: '/apps/balans.html' }
+    balans:      { naam: 'Balans',       icoon: '🌿', url: '/apps/balans.html' },
+    rechterhand: { naam: 'De Rechterhand', icoon: '🎩', url: '/apps/lifestyle.html' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -79,6 +80,9 @@
       'link:passkeys',
       'link:juridisch']
   ];
+  // De Rechterhand is de premium suite van de Lifestyle Pass (Business erft mee);
+  // hij verschijnt alleen op het springboard van die passen, vooraan op pagina twee.
+  if (['lifestyle', 'business'].includes(pas)) INDELING[1].splice(1, 0, 'link:rechterhand');
 
   /* ---------- mappen: eigen namen ----------
      De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus

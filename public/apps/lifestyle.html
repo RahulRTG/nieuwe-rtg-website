@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>De Rechterhand · Lifestyle Pass</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;margin-left:auto;}
+  main{padding:1.1rem;max-width:820px;margin:0 auto;}
+  .chips{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font:inherit;font-size:.85rem;color:var(--txt);cursor:pointer;}
+  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1rem;}
+  .kaart h2{font-size:1.12rem;margin-bottom:.2rem;}
+  .kaart h2 + .sub{color:var(--soft);font-size:.85rem;margin-bottom:.8rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.7rem;margin-bottom:1rem;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
+  .stat .n{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
+  .stat .l{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-top:.15rem;}
+  .veld,select.veld,textarea.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  textarea.veld{min-height:4rem;resize:vertical;}
+  .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;display:block;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.88rem;padding:.55rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .knop.klein{padding:.3rem .6rem;font-size:.78rem;}
+  .rij{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;}
+  .rij > div{flex:1;min-width:8rem;}
+  .item{border-top:1px solid var(--line);padding:.7rem 0;display:flex;gap:.7rem;align-items:flex-start;}
+  .item:first-child{border-top:0;}
+  .item .body{flex:1;min-width:0;}
+  .item .body b{display:block;}
+  .item .meta{font-size:.78rem;color:var(--soft);margin-top:.15rem;line-height:1.5;}
+  .status{font-size:.72rem;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
+  .status.aangevraagd{border-color:var(--gold);color:var(--gold);}
+  .status.ingetrokken,.status.afgerond{opacity:.6;}
+  .att{font-size:.8rem;color:var(--burgundy);}
+  .att.ok{color:var(--muted);}
+  .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.9rem;height:1.9rem;font-size:.9rem;cursor:pointer;flex-shrink:0;}
+  .weg:hover{color:var(--txt);border-color:var(--gold);}
+  .leeg{color:var(--soft);font-size:.88rem;padding:.4rem 0;}
+  .chat{margin-top:.7rem;}
+  .chatbox{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:.8rem;min-height:3rem;font-size:.92rem;line-height:1.55;white-space:pre-wrap;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .inlog{text-align:center;padding:2.5rem 1rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div><div class="ey">Lifestyle Pass</div><h1>De Rechterhand</h1></div>
+  <a class="terug" href="/apps/app.html?pas=lifestyle">← app</a>
+</header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN = localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
+const api = (pad, body) => fetch('/api/member/lifestyle/'+pad, {
+  method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+TOKEN}, body:JSON.stringify(body||{})
+}).then(async r=>{ const d=await r.json().catch(()=>({})); if(!r.ok){ const e=new Error(d.error||'Er ging iets mis.'); e.status=r.status; throw e; } return d; });
+const euro = c => '€ ' + Number(c||0).toLocaleString('nl-NL');
+const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+function datum(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; }
+
+let tab='overzicht';
+const TABS=[['overzicht','Overzicht'],['concierge','Concierge'],['bezit','Bezittingen'],['gezondheid','Gezondheid']];
+
+async function start(){
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Rechterhand is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
+  try{ await api('overzicht'); }catch(e){
+    if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Rechterhand is uw persoonlijke chef de bureau - inbegrepen bij de Lifestyle Pass. Neem contact op om uw pas te upgraden, dan zetten wij alles voor u klaar.</p></div>'; return; }
+    $('#main').innerHTML='<div class="leeg">Kon De Rechterhand niet laden.</div>'; return;
+  }
+  teken();
+}
+function teken(){
+  $('#main').innerHTML = '<div class="chips" id="chips"></div><div id="paneel"></div>';
+  $('#chips').innerHTML = TABS.map(([k,l])=>'<button class="chip'+(k===tab?' aan':'')+'" data-t="'+k+'">'+l+'</button>').join('');
+  $('#chips').querySelectorAll('.chip').forEach(b=> b.onclick=()=>{ tab=b.dataset.t; teken(); });
+  ({overzicht:vOverzicht, concierge:vConcierge, bezit:vBezit, gezondheid:vGezondheid}[tab])();
+}
+
+/* ---------- Overzicht + Rahul (u-vorm) ---------- */
+async function vOverzicht(){
+  const p=$('#paneel'); p.innerHTML='<div class="leeg">Laden…</div>';
+  const d=await api('overzicht');
+  const att=d.attenties||[];
+  p.innerHTML =
+    '<div class="grid">'
+    + stat(d.verzoekenOpen, 'Open verzoeken')
+    + stat(d.volgendeAfspraak?datum(d.volgendeAfspraak.datum):'-', 'Volgende afspraak')
+    + stat(d.bezittingen, 'Objecten')
+    + stat(euro(d.bezittingenWaarde), 'Registerwaarde')
+    + '</div>'
+    + '<div class="kaart"><h2>Attentiepunten</h2><div class="sub">Wat binnenkort uw aandacht vraagt in het bezittingenregister.</div>'
+    + (att.length ? att.map(a=>'<div class="att'+(a.verlopen?'':' ok')+'">'+(a.verlopen?'⚠ ':'• ')+esc(a.naam)+' - '+esc(a.soort)+' '+(a.verlopen?'verlopen op ':'op ')+datum(a.datum)+'</div>').join('') : '<div class="leeg">Niets dat op korte termijn uw aandacht vraagt.</div>')
+    + '</div>'
+    + '<div class="kaart"><h2>Vraag De Rechterhand</h2><div class="sub">Rahul kijkt met u mee, regelt en noteert - en bevestigt pas als iets echt rond is.</div>'
+    + '<div class="rij"><div style="flex:1;"><input class="veld" id="aiV" placeholder="Waarmee kan ik u van dienst zijn?"></div><button class="knop" id="aiK">Vraag</button></div>'
+    + '<div class="chat"><div class="chatbox" id="aiA">Tot uw dienst. Zeg mij waarmee ik u kan helpen.</div></div></div>';
+  $('#aiK').onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v) return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } };
+  $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#aiK').click(); });
+}
+const stat=(n,l)=>'<div class="stat"><div class="n">'+esc(n)+'</div><div class="l">'+esc(l)+'</div></div>';
+
+/* ---------- Concierge-bureau + voorkeuren ---------- */
+async function vConcierge(){
+  const p=$('#paneel'); p.innerHTML='<div class="leeg">Laden…</div>';
+  const [d,vk]=await Promise.all([api('concierge'), api('voorkeuren')]);
+  const cats=d.categorieen||[];
+  let h='<div class="kaart"><h2>Een verzoek indienen</h2><div class="sub">Wij noteren het en pakken het persoonlijk voor u op.</div>'
+    + '<span class="lbl">Waarmee kunnen wij u van dienst zijn?</span><input class="veld" id="cT" maxlength="100" placeholder="Bijv. een tafel voor vier, vrijdagavond">'
+    + '<span class="lbl">Categorie</span><select class="veld" id="cC">'+cats.map(c=>'<option>'+c+'</option>').join('')+'</select>'
+    + '<span class="lbl">Toelichting (optioneel)</span><textarea class="veld" id="cD" maxlength="800" placeholder="Voorkeuren, tijdstip, gelegenheid…"></textarea>'
+    + '<div style="margin-top:.7rem;"><button class="knop" id="cDoe">Indienen</button></div></div>';
+  h+='<div class="kaart"><h2>Uw verzoeken</h2><div id="cLijst"></div></div>';
+  // voorkeuren
+  const V=vk.voorkeuren||{};
+  const velden=[['dieet','Dieet & allergieën'],['restaurant','Voorkeur restaurants'],['hotelkamer','Type hotelkamer'],['stoel','Stoelvoorkeur (vlucht)'],['chauffeur','Vaste chauffeur'],['bloemen','Bloemen'],['overig','Overig']];
+  h+='<div class="kaart"><h2>Vaste voorkeuren</h2><div class="sub">Deze reizen automatisch mee bij alles wat wij voor u regelen.</div>'
+    + velden.map(([k,l])=>'<span class="lbl">'+l+'</span><input class="veld vk" data-k="'+k+'" value="'+esc(V[k]||'')+'">').join('')
+    + '<div style="margin-top:.7rem;"><button class="knop stil" id="vkDoe">Voorkeuren bewaren</button></div></div>';
+  p.innerHTML=h;
+  cLijst(d.verzoeken||[]);
+  $('#cDoe').onclick=async()=>{ const titel=$('#cT').value.trim(); if(!titel) return meld('Waarmee kunnen wij u van dienst zijn?'); try{ await api('concierge/vraag',{titel,categorie:$('#cC').value,details:$('#cD').value}); $('#cT').value='';$('#cD').value=''; meld('Genoteerd. Wij pakken het voor u op.'); vConcierge(); }catch(e){ meld(e.message); } };
+  $('#vkDoe').onclick=async()=>{ const body={}; document.querySelectorAll('.vk').forEach(i=>body[i.dataset.k]=i.value); try{ await api('voorkeuren/zet',body); meld('Uw voorkeuren zijn bewaard.'); }catch(e){ meld(e.message); } };
+}
+function cLijst(v){
+  $('#cLijst').innerHTML = v.length ? v.map(x=>
+    '<div class="item"><div class="body"><b>'+esc(x.titel)+'</b><div class="meta">'+esc(x.categorie)+(x.details?' · '+esc(x.details):'')+'<br>'+esc((x.updates&&x.updates[x.updates.length-1]||{}).notitie||'')+'</div></div>'
+    + '<span class="status '+esc(x.status)+'">'+esc(x.status)+'</span>'
+    + (x.status!=='afgerond'&&x.status!=='ingetrokken'?'<button class="weg" data-intrek="'+x.id+'" title="Intrekken">×</button>':'')+'</div>'
+  ).join('') : '<div class="leeg">U heeft nog geen lopende verzoeken.</div>';
+  $('#cLijst').querySelectorAll('[data-intrek]').forEach(b=> b.onclick=async()=>{ try{ await api('concierge/intrek',{id:b.dataset.intrek}); vConcierge(); }catch(e){ meld(e.message); } });
+}
+
+/* ---------- Bezittingenregister ---------- */
+async function vBezit(){
+  const p=$('#paneel'); p.innerHTML='<div class="leeg">Laden…</div>';
+  const d=await api('bezit');
+  const soorten=['vastgoed','voertuig','vaartuig','kunst','horloge','sieraad','overig'];
+  let h='<div class="kaart"><h2>Object toevoegen</h2>'
+    + '<div class="rij"><div><span class="lbl">Soort</span><select class="veld" id="bS">'+soorten.map(s=>'<option>'+s+'</option>').join('')+'</select></div>'
+    + '<div><span class="lbl">Naam</span><input class="veld" id="bN" maxlength="100" placeholder="Bijv. Villa Ibiza"></div>'
+    + '<div><span class="lbl">Waarde (€)</span><input class="veld" id="bW" type="number" min="0"></div></div>'
+    + '<div class="rij"><div><span class="lbl">Verzekeraar</span><input class="veld" id="bVz" maxlength="80"></div>'
+    + '<div><span class="lbl">Verzekerd tot</span><input class="veld" id="bVd" type="date"></div>'
+    + '<div><span class="lbl">Taxatie op</span><input class="veld" id="bTx" type="date"></div>'
+    + '<div><span class="lbl">Onderhoud op</span><input class="veld" id="bOh" type="date"></div></div>'
+    + '<div style="margin-top:.7rem;"><button class="knop" id="bDoe">In het register</button></div></div>';
+  h+='<div class="grid">'+stat(d.bezittingen.length,'Objecten')+stat(euro(d.totaalWaarde),'Totaalwaarde')+stat((d.attenties||[]).length,'Attentiepunten')+'</div>';
+  h+='<div class="kaart"><h2>Uw register</h2><div id="bLijst"></div></div>';
+  p.innerHTML=h;
+  bLijst(d.bezittingen||[]);
+  $('#bDoe').onclick=async()=>{ const naam=$('#bN').value.trim(); if(!naam) return meld('Geef het object een naam.');
+    try{ await api('bezit/zet',{soort:$('#bS').value,naam,waarde:$('#bW').value,verzekeraar:$('#bVz').value,verzekerdTot:$('#bVd').value,taxatieOp:$('#bTx').value,onderhoudOp:$('#bOh').value}); ['bN','bW','bVz','bVd','bTx','bOh'].forEach(i=>$('#'+i).value=''); meld('Toegevoegd aan uw register.'); vBezit(); }catch(e){ meld(e.message); } };
+}
+function bLijst(b){
+  $('#bLijst').innerHTML = b.length ? b.map(x=>{
+    const info=[x.verzekeraar?'verzekerd bij '+esc(x.verzekeraar):'', x.verzekerdTot?'tot '+datum(x.verzekerdTot):'', x.taxatieOp?'taxatie '+datum(x.taxatieOp):'', x.onderhoudOp?'onderhoud '+datum(x.onderhoudOp):''].filter(Boolean).join(' · ');
+    return '<div class="item"><div class="body"><b>'+esc(x.naam)+' <span class="status">'+esc(x.soort)+'</span></b><div class="meta">'+euro(x.waarde)+(info?' · '+info:'')+(x.notitie?'<br>'+esc(x.notitie):'')+'</div></div><button class="weg" data-weg="'+x.id+'" title="Verwijderen">×</button></div>';
+  }).join('') : '<div class="leeg">Uw register is nog leeg.</div>';
+  $('#bLijst').querySelectorAll('[data-weg]').forEach(b2=> b2.onclick=async()=>{ if(!confirm('Uit het register halen?')) return; try{ await api('bezit/weg',{id:b2.dataset.weg}); vBezit(); }catch(e){ meld(e.message); } });
+}
+
+/* ---------- Gezondheid & welzijn ---------- */
+async function vGezondheid(){
+  const p=$('#paneel'); p.innerHTML='<div class="leeg">Laden…</div>';
+  const d=await api('gezondheid');
+  let h='<div class="kaart"><h2>Afspraak toevoegen</h2>'
+    + '<div class="rij"><div><span class="lbl">Wat</span><input class="veld" id="gW" maxlength="100" placeholder="Bijv. controle cardioloog"></div>'
+    + '<div><span class="lbl">Specialist</span><input class="veld" id="gS" maxlength="80"></div></div>'
+    + '<div class="rij"><div><span class="lbl">Datum</span><input class="veld" id="gD" type="date"></div>'
+    + '<div><span class="lbl">Tijd</span><input class="veld" id="gT" type="time"></div>'
+    + '<div><span class="lbl">Waar</span><input class="veld" id="gWr" maxlength="100"></div></div>'
+    + '<div style="margin-top:.7rem;"><button class="knop" id="gDoe">Afspraak opslaan</button></div></div>';
+  h+='<div class="kaart"><h2>Uw afspraken</h2><div id="gLijst"></div></div>';
+  h+='<div class="kaart"><h2>Prive-dossier</h2><div class="sub">Voor uw eigen aantekeningen - alleen voor u zichtbaar.</div>'
+    + '<span class="lbl">Titel</span><input class="veld" id="nT" maxlength="100">'
+    + '<span class="lbl">Notitie</span><textarea class="veld" id="nX" maxlength="2000"></textarea>'
+    + '<div style="margin-top:.7rem;"><button class="knop stil" id="nDoe">Notitie bewaren</button></div>'
+    + '<div id="nLijst" style="margin-top:.6rem;"></div></div>';
+  p.innerHTML=h;
+  gLijst(d.afspraken||[]); nLijst(d.dossier||[]);
+  $('#gDoe').onclick=async()=>{ const wat=$('#gW').value.trim(); if(!wat) return meld('Wat voor afspraak betreft het?'); if(!$('#gD').value) return meld('Kies een datum.');
+    try{ await api('gezondheid/afspraak',{wat,specialist:$('#gS').value,datum:$('#gD').value,tijd:$('#gT').value,waar:$('#gWr').value}); ['gW','gS','gD','gT','gWr'].forEach(i=>$('#'+i).value=''); meld('Afspraak opgeslagen.'); vGezondheid(); }catch(e){ meld(e.message); } };
+  $('#nDoe').onclick=async()=>{ const titel=$('#nT').value.trim(); if(!titel) return meld('Geef de notitie een titel.'); try{ await api('gezondheid/dossier',{titel,tekst:$('#nX').value}); $('#nT').value='';$('#nX').value=''; vGezondheid(); }catch(e){ meld(e.message); } };
+}
+function gLijst(a){
+  const komend=a.filter(x=>!x.voorbij);
+  $('#gLijst').innerHTML = komend.length ? komend.map(x=>
+    '<div class="item"><div class="body"><b>'+esc(x.wat)+'</b><div class="meta">'+datum(x.datum)+(x.tijd?' '+esc(x.tijd):'')+(x.specialist?' · '+esc(x.specialist):'')+(x.waar?' · '+esc(x.waar):'')+'</div></div>'
+    + '<span class="status'+(x.dagenTot<=7?' aangevraagd':'')+'">'+(x.dagenTot===0?'vandaag':x.dagenTot===1?'morgen':'over '+x.dagenTot+' dgn')+'</span>'
+    + '<button class="weg" data-gweg="'+x.id+'" title="Verwijderen">×</button></div>'
+  ).join('') : '<div class="leeg">Geen afspraken gepland.</div>';
+  $('#gLijst').querySelectorAll('[data-gweg]').forEach(b=> b.onclick=async()=>{ try{ await api('gezondheid/afspraak/weg',{id:b.dataset.gweg}); vGezondheid(); }catch(e){ meld(e.message); } });
+}
+function nLijst(n){
+  $('#nLijst').innerHTML = n.length ? n.map(x=>
+    '<div class="item"><div class="body"><b>'+esc(x.titel)+'</b><div class="meta">'+esc(x.tekst)+'</div></div><button class="weg" data-nweg="'+x.id+'" title="Verwijderen">×</button></div>'
+  ).join('') : '';
+  $('#nLijst').querySelectorAll('[data-nweg]').forEach(b=> b.onclick=async()=>{ try{ await api('gezondheid/dossier/weg',{id:b.dataset.nweg}); vGezondheid(); }catch(e){ meld(e.message); } });
+}
+
+start();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

@@ -114,15 +114,23 @@ class Client extends EventEmitter {
   }
   _scramStart(p) {
     const mechs = leesCstrs(p.subarray(4), 20).filter(Boolean);
-    if (!mechs.includes('SCRAM-SHA-256')) return this._fout(new Error('pg: geen SCRAM-SHA-256'));
-    this._scram = scram.start();
+    // Channel binding (SCRAM-SHA-256-PLUS) als de verbinding TLS is en de server
+    // het aanbiedt: bind aan het servercertificaat (tls-server-end-point). Anders
+    // gewoon SCRAM-SHA-256 -- identiek gedrag als voorheen.
+    let cb = null;
+    if (this.sock.encrypted && mechs.includes('SCRAM-SHA-256-PLUS') && this.sock.getPeerCertificate) {
+      try { const cert = this.sock.getPeerCertificate(false); if (cert && cert.raw) cb = scram.kanaalBinding(cert.raw); } catch (e) {}
+    }
+    if (!cb && !mechs.includes('SCRAM-SHA-256')) return this._fout(new Error('pg: geen SCRAM-SHA-256'));
+    this._scram = scram.start(cb);
     this.sock.write(bericht('p', this._scram.body));
   }
   _scramContinue(data) {
     try {
       const { clientFinal, serverSignature } = scram.vervolg({
         password: this.cfg.password, nonce: this._scram.nonce,
-        clientFirstBare: this._scram.clientFirstBare, serverFirst: data.toString('utf8')
+        clientFirstBare: this._scram.clientFirstBare, serverFirst: data.toString('utf8'),
+        gs2: this._scram.gs2, cbindData: this._scram.cbindData
       });
       this._scram.serverSignature = serverSignature;
       this.sock.write(bericht('p', clientFinal));

@@ -59,6 +59,27 @@ test('int16-teller is unsigned: 0..65535 zonder RangeError (batch-insert van 500
   assert.deepEqual([...pg._int16(65535)], [0xff, 0xff]);       // maximum
 });
 
+test('SCRAM channel binding: PLUS bindt aan het cert, en zonder binding blijft c=biws', () => {
+  const scram = require('../server/pgwire/scram');
+  // Zonder channel binding: gewoon SCRAM-SHA-256, en c= = base64('n,,') = 'biws'.
+  const s = scram.start();
+  assert.equal(s.mech, 'SCRAM-SHA-256');
+  assert.equal(s.gs2, 'n,,');
+  const sf = 'r=' + s.nonce + 'srv,s=' + Buffer.from('zout').toString('base64') + ',i=4096';
+  const vv = scram.vervolg({ password: 'x', nonce: s.nonce, clientFirstBare: s.clientFirstBare, serverFirst: sf, gs2: s.gs2, cbindData: s.cbindData });
+  assert.equal(vv.clientFinal.toString().match(/c=([^,]+)/)[1], 'biws', 'geen binding -> biws (geen regressie)');
+  // Met channel binding: SCRAM-SHA-256-PLUS en c= = base64(gs2-header + cert-hash).
+  const cb = scram.kanaalBinding(Buffer.alloc(40, 7)); // nep-DER -> onbekende OID -> sha256
+  assert.equal(cb.header, 'p=tls-server-end-point,,');
+  assert.equal(cb.data.length, 32);                    // sha256
+  const sp = scram.start(cb);
+  assert.equal(sp.mech, 'SCRAM-SHA-256-PLUS');
+  const vp = scram.vervolg({ password: 'x', nonce: sp.nonce, clientFirstBare: sp.clientFirstBare, serverFirst: 'r=' + sp.nonce + 'srv,s=' + Buffer.from('zout').toString('base64') + ',i=4096', gs2: sp.gs2, cbindData: sp.cbindData });
+  const verwacht = Buffer.concat([Buffer.from('p=tls-server-end-point,,'), cb.data]).toString('base64');
+  assert.equal(vp.clientFinal.toString().match(/c=([^,]+)/)[1], verwacht);
+  assert.equal(scram.kanaalBinding(null), null, 'geen cert -> geen binding');
+});
+
 test('lege pool: tellers en options kloppen (geen verbinding nodig)', () => {
   const p = new pg.Pool({ connectionString: 'postgres://u@127.0.0.1:1/d', max: 3 });
   assert.equal(p.totalCount, 0);

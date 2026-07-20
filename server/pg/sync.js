@@ -49,6 +49,13 @@ module.exports = (ctx) => {
       laatsteCheck.set(k, nu); laatsteGrootte.set(k, j.length); laatsteLengte.set(k, lengteVan(dataNu[k]));
       if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
     }
+    // Klein-eerst: de kleine, gezaghebbende collecties (paySaldi, saldi -- geld!)
+    // wegschrijven vóór de grote venster-blobs (orders/boekingen, tientallen MB).
+    // Zo landt geld altijd binnen de eerste milliseconden van een flush, ook als
+    // een afsluit-flush op mega-schaal door een korte grace-window wordt afgekapt.
+    // De grote blobs zijn slechts een cache: bij een herstart vult vensterTopUp ze
+    // opnieuw uit het tx_ledger-grootboek, dus daar verliezen we niets duurzaams.
+    gewijzigd.sort((a, b) => a[1].length - b[1].length);
     for (const [k, jOns] of gewijzigd) {
       const client = await pool.connect();
       try {

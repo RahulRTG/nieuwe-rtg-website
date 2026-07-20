@@ -20,6 +20,10 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   const nu = Date.now();
   const dag = iso => String(iso || '').slice(0, 10);
   const vandaag = new Date().toISOString().slice(0, 10);
+  // Niet elke betaalde boeking heeft een genest service-object: ticket-/verblijf-
+  // boekingen (en direct gezaaide rijen) dragen alleen een `kind`. Nooit blind
+  // b.service.name lezen -- dat liet de hele backoffice crashen (500) op zulke rijen.
+  const boekNaam = b => (b && b.service && b.service.name) || (b && b.kind) || 'Boeking';
   const orders = ordersVanZaak(s.code).filter(o => o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald');
   const ritten = db.data.rides.filter(r => r.supplierCode === s.code && r.paid && r.status !== 'geweigerd');
   const boekingen = boekingenVanZaak(s.code).filter(b => b.paid && b.status !== 'geweigerd');
@@ -47,7 +51,7 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   const telItems = lijst => { for (const it of (lijst || [])) { if (!it.name) continue; const t = teller[it.name] = teller[it.name] || { naam: it.name, aantal: 0, omzet: 0 }; t.aantal += it.qty || 1; t.omzet += (it.price || 0) * (it.qty || 1); } };
   for (const o of orders) telItems(o.items);
   for (const v of kassa) telItems(v.items);
-  for (const b of boekingen) { const t2 = teller[b.service.name] = teller[b.service.name] || { naam: b.service.name, aantal: 0, omzet: 0 }; t2.aantal += 1; t2.omzet += b.price || 0; }
+  for (const b of boekingen) { const bn = boekNaam(b); const t2 = teller[bn] = teller[bn] || { naam: bn, aantal: 0, omzet: 0 }; t2.aantal += 1; t2.omzet += b.price || 0; }
   const toppers = Object.values(teller).sort((a, b) => b.omzet - a.omzet).slice(0, 8);
   // actiecentrum van de zaak
   const alerts = [];
@@ -72,8 +76,8 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   for (const b of db.data.boekingen) {
     if (b.supplierCode !== s.code || !b.paid || b.status !== 'aangevraagd') continue;
     if (minGeleden(b.paidAt || b.at) >= 30) alerts.push({ level: 'amber', text: en
-      ? 'Booking ' + b.ref + ' (' + b.service.name + ') is still waiting for your confirmation.'
-      : 'Boeking ' + b.ref + ' (' + b.service.name + ') wacht nog op uw bevestiging.' });
+      ? 'Booking ' + b.ref + ' (' + boekNaam(b) + ') is still waiting for your confirmation.'
+      : 'Boeking ' + b.ref + ' (' + boekNaam(b) + ') wacht nog op uw bevestiging.' });
   }
   const verlofN = (db.data.verlof[s.code] || []).filter(v => v.status === 'nieuw').length;
   if (verlofN) alerts.push({ level: 'amber', text: en ? verlofN + ' leave request(s) await your decision (HR & team).' : verlofN + ' verlofaanvraag/aanvragen wachten op uw besluit (HR & team).' });

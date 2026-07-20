@@ -44,9 +44,9 @@ app.post('/api/office/timeline', officeAuth, (req, res) => {
       .map(r => ({ soort: r.type === 'jet' ? 'jet' : 'taxi', at: r.at, ref: r.ref, supplierName: r.supplierName, customerCodename: r.customerCodename,
         status: r.status, paid: !!r.paid, bedrag: r.quote || 0, sub: (r.from || '') + ' → ' + (r.to || '?'), when: r.plannedFor ? r.when : null })))
     .concat(db.data.boekingen
-      .filter(b => b.status !== 'wacht-op-betaling' && past([b.supplierName, b.customerCodename, b.ref, b.service.name, b.status].join(' ')))
+      .filter(b => b.status !== 'wacht-op-betaling' && past([b.supplierName, b.customerCodename, b.ref, (b.service && b.service.name) || b.kind || '', b.status].join(' ')))
       .map(b => ({ soort: 'dienst', at: b.at, ref: b.ref, supplierName: b.supplierName, customerCodename: b.customerCodename,
-        status: b.status, paid: !!b.paid, bedrag: b.price || 0, sub: b.service.name, when: b.wanneer || null })));
+        status: b.status, paid: !!b.paid, bedrag: b.price || 0, sub: (b.service && b.service.name) || b.kind || 'Boeking', when: b.wanneer || null })));
   alles.sort((a, b) => String(b.at).localeCompare(String(a.at)));
   const per = 25;
   const pages = Math.max(1, Math.ceil(alles.length / per));

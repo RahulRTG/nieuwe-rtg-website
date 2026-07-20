@@ -2458,5 +2458,10 @@ for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
   Promise.allSettled([Promise.resolve(flushBijAfsluiten()), Promise.resolve(accounts.flushBijAfsluiten())]).finally(() => {
     server.close(() => process.exit(0));
   });
-  setTimeout(() => process.exit(0), 3000).unref();
+  // Vangnet als de flush hangt. Bij write-behind (Postgres) kan een laatste
+  // flush op grote schaal seconden duren; 3 s kapte hem af en verloor de laatste
+  // write-behind-staat. Ruimer nu, zodat een normale afsluit-flush kan afronden;
+  // de klein-eerst-volgorde (server/pg/sync.js) borgt dat geld sowieso als eerste
+  // landt, ook als dit vangnet toch nog vuurt.
+  setTimeout(() => process.exit(0), Number(process.env.RTG_STOP_GRACE_MS || 20000)).unref();
 });

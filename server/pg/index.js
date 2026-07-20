@@ -25,7 +25,7 @@
 const KANAAL = 'rtg_kv';
 
 function maakPg({ merge3, kluis, log, url }) {
-  const { Pool } = require('pg');
+  const { Pool } = require('../pgwire');
   // Pool-grootte: de kv-flush, het transactie-grootboek en de ledengids delen
   // deze pool; onder gelijktijdige last is 10 te krap (wachtrij = latentie).
   // Time-outs zijn er om te falen-en-herstellen in plaats van eeuwig te blokkeren:

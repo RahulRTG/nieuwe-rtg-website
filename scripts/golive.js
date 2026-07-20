@@ -26,7 +26,7 @@ const goed = (t) => uit.push(['✓', t, false]);
   // 2. PostgreSQL echt aanraken (niet alleen "de variabele staat er")
   if (env.DATABASE_URL) {
     try {
-      const { Client } = require('pg');
+      const { Client } = require('../server/pgwire');
       const c = new Client({ connectionString: env.DATABASE_URL, connectionTimeoutMillis: 4000 });
       const t0 = Date.now();
       await c.connect();

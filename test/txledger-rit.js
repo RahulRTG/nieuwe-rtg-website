@@ -16,7 +16,7 @@ process.env.TX_KAP = '1000';
 
 (async () => {
   // schone lei in de testdatabase: het grootboek en de kv-collecties van vorige runs
-  const { Pool } = require('pg');
+  const { Pool } = require('../server/pgwire');
   const schoonmaak = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
   await schoonmaak.query('DROP TABLE IF EXISTS tx_ledger');
   await schoonmaak.query('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT NOT NULL, ver BIGINT NOT NULL DEFAULT 0, bijgewerkt TIMESTAMPTZ NOT NULL DEFAULT now())');

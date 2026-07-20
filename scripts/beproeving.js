@@ -257,7 +257,7 @@ function stopNet(ms) {
 
 /* ---------- Postgres: 65M + activiteit zaaien (alleen mega-modus) ---------- */
 async function zaaiPostgres() {
-  const { Pool } = require('pg');
+  const { Pool } = require('../server/pgwire');
   psql('DROP INDEX IF EXISTS member_dir_codename_lower'); psql('DROP INDEX IF EXISTS member_dir_codename_trgm'); psql('TRUNCATE member_dir');
   for (let s = 1; s <= LEDEN; s += CHUNK) {
     const e = Math.min(s + CHUNK - 1, LEDEN); const tc = Date.now();

@@ -155,6 +155,24 @@ gemak brengt. In deze code betekent dat:
   namaken, en dat mag de bouw niet rood maken op een meetverschil. Dev-only, dus
   het raakt de productie nooit. Pure kern (contrast-wiskunde + predicaten) los
   getoetst in `test/a11ykeuring.test.js`.
+- **De PostgreSQL-client** (`server/pgwire.js`): het v3-wireprotocol op node:net/tls,
+  die het pakket `pg` verving -- de grootste van deze reeks, want dit is de
+  durability- en grootboek-weg. Zelfde nuance bij regel 1: de authenticatie is
+  **SCRAM-SHA-256** (RFC 5802/7677) volledig op `node:crypto` (`pbkdf2`, `hmac`,
+  `sha256`, `timingSafeEqual`) en de verbinding op `node:tls` -- geen eigen crypto.
+  Wij zetten alleen de protocolstappen op elkaar: de startup/authenticatie-flow, de
+  simpele query (`Q`) en de extended-query (Parse/Bind/Describe/Execute/Sync), het
+  decoderen van de rij-data per type-OID net als node-pg (int8 als string voor de
+  precisie, int4 als getal, bool, numeric als string, json/jsonb, timestamptz als
+  Date), plus `LISTEN`/`NOTIFY` en een connection-pool. De *database zelf* (Postgres)
+  blijft extern; de client verbindt alleen met `DATABASE_URL`, anders draait alles op
+  de embedded sqlite/JSON. Zelfde vorm en veldnamen als node-pg (`new Pool({...})`,
+  `pool.query(text, params)`, `pool.connect()` → client met `.release()`), dus
+  `server/pg/*`, `server/pgaccounts.js` en het grootboek merken er niets van. Geborgd
+  tegen een ECHTE Postgres 16 met SCRAM: alle integratietests (`*.pg.test.js`,
+  concurrency + advisory locks, LISTEN/NOTIFY, transacties, encryptie-at-rest) draaien
+  eroverheen, en de pure kern (type-decodering, parameter-codering, connection-string)
+  los in `test/pgwire.test.js`.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.
@@ -203,21 +221,25 @@ content-negotiation) staan bewust niet in `web.js`. Zou er ooit een web-randgeva
 opduiken dat dit framework mist, dan is de eerlijke stap terug: `express` er weer
 achter zetten -- de vorm is identiek, dus dat kan zonder de rest te raken.
 
-En vier **optionele** pakketten die alleen laden als je ze configureert —
-zonder deze draait alles gewoon door in demo/lokaal:
+En nog precies één **optioneel** pakket dat alleen laadt als je het configureert —
+zonder dat draait alles gewoon door in demo/lokaal:
 
 | Pakket | Rol | Zonder |
 |---|---|---|
 | `stripe` | echt geld | demo-provider (geen echt geld) |
-| `pg` | PostgreSQL, de schaalweg boven ~1,5 mln leden | embedded sqlite/JSON |
 
-Externe fout-tracking doen we niet meer met `@sentry/node`: de groepering/UI zat
-al in de eigen aggregatie (`server/log.js`, techniekbord) en de externe bezorging
-is nu de eigen `server/foutmelder.js` (webhook-POST). En de Redis-*client* is nu
-ook eigen huis (`server/redis.js`, RESP op node:net) -- de realtime-bus en de
-gedeelde-data-mirror draaien erop; dat is protocol-assemblage, geen crypto. De
-Redis-*broker zelf* draaien we niet, en de eigen client verbindt alleen als
-`REDIS_URL` gezet is (anders realtime binnen één proces).
+De *externe systemen* waar we op leunen — een Postgres-database, een Redis-broker,
+een SMTP-smarthost, een fout-webhook — blijven extern; wat we zelf bouwden zijn de
+*clients* ernaartoe (protocol-assemblage op Node-primitieven, geen crypto). Zo is
+`pg` er nu uit: de PostgreSQL-client is eigen huis (`server/pgwire.js`, v3-protocol
++ SCRAM-SHA-256 op `node:crypto`) en verbindt alleen met `DATABASE_URL` — anders
+draait alles op de embedded sqlite/JSON. Externe fout-tracking doen we niet meer met
+`@sentry/node`: de groepering/UI zat al in de eigen aggregatie (`server/log.js`,
+techniekbord) en de externe bezorging is nu de eigen `server/foutmelder.js`
+(webhook-POST). En de Redis-*client* is ook eigen huis (`server/redis.js`, RESP op
+node:net) -- de realtime-bus en de gedeelde-data-mirror draaien erop. De Redis-
+*broker zelf* draaien we niet, en de eigen client verbindt alleen als `REDIS_URL`
+gezet is (anders realtime binnen één proces).
 
 Dev-only pakketten: geen meer. `axe-core` (a11y-keuring) is vervangen door de
 eigen keuring (`scripts/a11ykeuring.js`), en de minify doen we zelf

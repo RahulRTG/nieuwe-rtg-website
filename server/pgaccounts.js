@@ -27,7 +27,7 @@ const USER_COLS = ['id', 'email_hash', 'username', 'password_hash', 'tier', 'cod
 const STAFF_COLS = ['id', 'supplier_code', 'name', 'pin_hash', 'role', 'active', 'created_at', 'func'];
 
 function maakPgAccounts({ url, log }) {
-  const { Pool } = require('pg');
+  const { Pool } = require('./pgwire');
   const pool = new Pool({ connectionString: url, max: Number(process.env.PG_POOL_MAX || 10) });
   let luisterClient = null;
 

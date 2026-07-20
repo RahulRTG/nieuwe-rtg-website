@@ -49,8 +49,14 @@ function maakAidata({ db, accounts }) {
       for (const m of Array.isArray(rij) ? rij : [])
         yield { soort: 'gesprek', bron: 'kantoorchat', kamer, wie: m.naam, tekst: m.tekst, at: m.at || null };
   }
+  // het RTG Bank-grootboek: geldstromen als gebeurtenis (rekeningen zijn al
+  // pseudoniem: IBAN's en extern:/rtg:-tegenrekeningen, geen namen)
+  function* bank() {
+    for (const b of d().bankBoekingen || [])
+      yield { soort: 'transactie', bron: 'bank', van: b.van, naar: b.naar, srt: b.soort, centen: b.centen, at: b.at || null };
+  }
 
-  const BRONNEN = { gesprekken, intakes, besluiten, transacties, kantoorchat };
+  const BRONNEN = { gesprekken, intakes, besluiten, transacties, kantoorchat, bank };
 
   // het bord: hoeveel records elke bron nu oplevert (zelfde tellers als de export)
   function overzicht() {

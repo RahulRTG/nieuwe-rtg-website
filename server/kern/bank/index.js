@@ -119,5 +119,18 @@ module.exports = (deps) => {
 
   const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht };
   Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies);
+
+  /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
+     op de klok: alleen hele verstreken dagen) en de vervallen vaste betalingen
+     afhandelt. De boardroom-knoppen blijven bestaan voor een handmatige ronde;
+     unref() zodat de timer een proces nooit wakker houdt (zelfde patroon als de
+     tx-veegronde). */
+  const RONDE_MS = Number(process.env.BANK_RONDE_MS || 3600000);
+  const rondeTimer = setInterval(() => {
+    try { api.bankRenteRonde({}); api.bankIncassoRonde({}); }
+    catch (e) { console.warn('[bank] ronde mislukt:', e.message); }
+  }, RONDE_MS);
+  if (rondeTimer.unref) rondeTimer.unref();
+
   return { bank: api };
 };

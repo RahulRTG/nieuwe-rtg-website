@@ -2098,6 +2098,12 @@ Object.assign(kern, bankregie);
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
 Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, sseToCustomer, anthropic }));
+/* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
+   wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
+   daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */
+kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
+  ? kern.bank.bankDekWallet({ codenaam, centen })
+  : { status: 403, error: 'De leden-bank is niet live.' });
 /* De eigen-AI-dataset (kern/aidata.js): een boardroom-knop verzamelt alle logs
    (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL om
    later een eigen model te trainen -- op codenamen, de kluis blijft dicht. */

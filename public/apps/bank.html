@@ -125,7 +125,8 @@ function rekHtml(r){
       '<button class="knop stil mini" data-nwallet="' + r.iban + '">Naar wallet</button>' +
       '<button class="knop stil mini" data-pas="' + r.iban + '">Pas</button>' +
       (r.soort === 'spaar' ? '<button class="knop stil mini" data-doel="' + r.iban + '">Spaardoel</button>' : '') +
-    '</div></div>';
+      '<button class="knop stil mini" data-afschrift="' + r.iban + '">Afschrift</button>' +
+    '</div><div class="afschrift" data-blad="' + r.iban + '" hidden style="flex-basis:100%;font-size:.78rem;color:var(--muted);line-height:1.7;"></div></div>';
 }
 function bindBank(reks){
   $('#nopen').addEventListener('click', async () => { try { await api('bank/rekening/open', { soort: $('#nsoort').value }); await herlaad(); } catch (e) { alert(e.message); } });
@@ -147,6 +148,19 @@ function bindBank(reks){
   document.querySelectorAll('[data-doel]').forEach(b => b.addEventListener('click', async () => {
     const euroS = prompt('Wat is je spaardoel? (euro)'); if (euroS == null) return;
     try { const r = await api('bank/spaardoel', { iban: b.dataset.doel, euro: Number(euroS) }); alert('Spaardoel gezet. Je bent op ' + r.pct + '%.'); } catch (e) { alert(e.message); }
+  }));
+  // het afschrift: de laatste boekingen van deze rekening, uitklapbaar
+  document.querySelectorAll('[data-afschrift]').forEach(b => b.addEventListener('click', async () => {
+    const blad = document.querySelector('.afschrift[data-blad="' + b.dataset.afschrift + '"]');
+    if (!blad) return;
+    if (!blad.hidden) { blad.hidden = true; return; }
+    try {
+      const r = await api('bank/afschrift', { iban: b.dataset.afschrift, limit: 15 });
+      blad.innerHTML = (r.regels && r.regels.length)
+        ? r.regels.map(x => '<div>' + (x.af ? '− ' : '+ ') + euro(x.centen) + ' · ' + esc(x.oms || x.soort) + ' <span style="color:var(--soft);">(' + esc(x.tegen) + ')</span></div>').join('')
+        : '<div>Nog geen boekingen.</div>';
+      blad.hidden = false;
+    } catch (e) { alert(e.message); }
   }));
 }
 async function herlaad(){ OV = await api('bank/overzicht'); render(); }

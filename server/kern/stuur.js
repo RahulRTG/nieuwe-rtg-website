@@ -28,8 +28,10 @@ const VERBODEN = [
   /^\/api\/office\/login$/,
   /\/doe$/                 // het stuur zelf: geen rondzingen
 ];
-// paden die over geld gaan: eerst een voorstel, dan pas doen (na bevestiging)
-const GELD = /(betaal|\/pay(\/|$)|\/tik|giftcard|verreken|refund|terugbetaal)/i;
+// paden die over geld gaan: eerst een voorstel, dan pas doen (na bevestiging).
+// De RTG Bank-paden die geld bewegen (storten, overboeken, SEPA, de wallet-brug,
+// bulk/salaris, krediet, vaste betalingen, pasacties) horen daar nadrukkelijk bij.
+const GELD = /(betaal|\/pay(\/|$)|\/tik|giftcard|verreken|refund|terugbetaal|\/bank\/(storten|overboek|sepa|naar-wallet|van-wallet|bulk|salaris|krediet|terugkerend|pas\/))/i;
 
 function maakStuur({ log, anthropic, app }) {
 

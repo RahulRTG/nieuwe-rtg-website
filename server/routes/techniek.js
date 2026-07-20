@@ -64,7 +64,9 @@ module.exports = (kern) => {
       db, accounts, anthropic, betaal, sessions, DATA_DIR, fs, path,
       STORE: dbmod.STORE, pgPing: dbmod.pgPing,
       mailGeconfigureerd: !!(process.env.SMTP_URL || process.env.SMTP_HOST),
-      zekeringen: staat().zekeringen
+      zekeringen: staat().zekeringen,
+      // de bank in de bewaking: sluitcontrole + nood-stand horen op het bord
+      bank: kern.bank, bankRegie: kern.bankregieOverzicht
     };
   }
 

@@ -93,6 +93,22 @@ module.exports = (ctx) => {
     return { ok: true, saldoCenten: saldoVan(iban) };
   }
 
+  /* De wallet-dekking: RTG Pay komt saldo tekort en vraagt de eigen bank om
+     dekking. We zoeken de eerste betaalrekening van het lid die het bedrag
+     (binnen zijn bodem, dus incl. rood-staan-ruimte) kan dragen en verhuizen
+     precies het tekort naar de wallet. Zo draait Pay op de eigen bank zodra
+     die er is, en pas daarna op de kaart-naad. */
+  function dekWallet({ codenaam, centen }) {
+    const c = String(codenaam || '').trim();
+    const bedrag = Math.round(Number(centen));
+    if (!Number.isFinite(bedrag) || bedrag < 1) return { status: 400, error: 'Dat bedrag kan niet.' };
+    const { rekeningen, bodem } = ctx;
+    const kandidaat = Object.values(rekeningen()).find(m =>
+      m.codenaam === c && m.soort === 'betaal' && !m.bevroren && saldoVan(m.iban) - bedrag >= bodem(m.iban));
+    if (!kandidaat) return { status: 402, error: 'Geen betaalrekening met genoeg ruimte.' };
+    return bankNaarWallet({ iban: kandidaat.iban, codenaam: c, centen: bedrag });
+  }
+
   /* Uitgaande SEPA naar een externe bank, achter de betaal-naad (payout). Een
      eventueel tarief (boardroom) gaat naar rtg:reserve. */
   async function sepaUit({ iban, codenaam, centen, naarIban, begunstigde, oms, idem }) {
@@ -113,5 +129,5 @@ module.exports = (ctx) => {
     });
   }
 
-  return { bankStorten: storten, bankOverboek: overboek, bankWalletNaarBank: walletNaarBank, bankBankNaarWallet: bankNaarWallet, bankSepaUit: sepaUit };
+  return { bankStorten: storten, bankOverboek: overboek, bankWalletNaarBank: walletNaarBank, bankBankNaarWallet: bankNaarWallet, bankDekWallet: dekWallet, bankSepaUit: sepaUit };
 };

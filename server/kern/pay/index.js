@@ -127,16 +127,28 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
       return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c };
     });
   }
+  /* De eigen bank als eerste dekking: is de RTG Bank live en heeft het lid
+     daar een betaalrekening met ruimte, dan komt een saldotekort DAAR vandaan
+     (eigen rails) in plaats van via de kaart-naad. De koppeling komt na het
+     opstarten binnen (de bank bouwt op pay, dus late binding). */
+  let bankDekking = null;
+  function koppelBank(dekking) { bankDekking = typeof dekking === 'function' ? dekking : null; }
+
   /* Het hart van "EEN knop": is er te weinig saldo, dan laadt de wallet zelf
-     bij (afgerond op tientjes) en betaalt door. Het lid merkt er niets van
-     behalve een regel "10 euro bijgeladen" in het overzicht. */
+     bij en betaalt door. Eerst via de eigen bank (exact het tekort), anders
+     via de kaart-naad (afgerond op tientjes). Het lid merkt er niets van
+     behalve een regel "bijgeladen" in het overzicht. */
   async function zorgSaldo({ codenaam, centen, idem }) {
     const tekort = Math.round(centen) - saldoVan(rekLid(codenaam));
     if (tekort <= 0) return { ok: true, bijgeladen: 0 };
+    if (bankDekking) {
+      try { const b = bankDekking({ codenaam, centen: tekort }); if (b && b.ok) return { ok: true, bijgeladen: tekort, via: 'bank' }; }
+      catch (e) { /* de bank kon niet dekken: gewoon door naar de kaart */ }
+    }
     const stap = Math.ceil(tekort / AUTOLAAD_STAP) * AUTOLAAD_STAP;
     const r = await laadOp({ codenaam, centen: stap, idem: idem ? idem + ':autolaad' : null, oms: 'Automatisch bijgeladen' });
     if (r.error) return r;
-    return { ok: true, bijgeladen: stap };
+    return { ok: true, bijgeladen: stap, via: 'kaart' };
   }
   async function bestaatLid(codenaam) {
     try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
@@ -149,7 +161,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     rekLid, rekPartner, saldoVan, id, metIdem, boek, zorgSaldo, seintje, bestaatLid,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, saldoVan };
+  const api = { MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, saldoVan, koppelBank };
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
   return { pay: api };

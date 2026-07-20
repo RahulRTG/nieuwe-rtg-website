@@ -61,6 +61,17 @@ const CHECKS = [
       : { status: 'waarschuwing', detail: 'Demo-betalingen: geen STRIPE_SECRET_KEY (geen echt geld).' }
   },
   {
+    id: 'bank', naam: 'RTG Bank', code: 'BANK-01', categorie: 'Integraties',
+    run: (c) => {
+      if (!c.bank) return { status: 'waarschuwing', detail: 'Bankmodule niet gekoppeld aan de bewaking.' };
+      const g = c.bank.gezondheid();
+      const r = c.bankRegie ? c.bankRegie() : null;
+      if (r && r.nood && r.nood.actief) return { status: 'fout', detail: 'NOOD actief: clearing valt terug op de kaart-rails. ' + (r.nood.reden || '') };
+      if (!g.sluit || !g.sluit.klopt) return { status: 'fout', detail: 'De sluitcontrole faalt: som ' + (g.sluit ? g.sluit.som : '?') + ' (hoort exact 0 te zijn).' };
+      return { status: 'ok', detail: 'Stand "' + (r ? r.modus : '?') + '"' + (r && r.ledenAan ? ', live voor leden' : '') + '; sluitcontrole klopt; ' + g.aantalRekeningen + ' rekening(en), ' + g.boekingenVandaag + ' boeking(en) vandaag.' };
+    }
+  },
+  {
     id: 'email', naam: 'E-mail (SMTP)', code: 'MAIL-01', categorie: 'Integraties',
     run: (c) => c.mailGeconfigureerd
       ? { status: 'ok', detail: 'SMTP ingesteld; e-mail wordt echt verstuurd.' }

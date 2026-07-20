@@ -171,3 +171,25 @@ test('de AI-bankier geeft advies over de eigen rekeningen (adviseert, beslist ni
   assert.equal(adv.status, 200);
   assert.ok(Array.isArray(adv.body.tips) && adv.body.tips.length >= 1 && adv.body.antwoord.length > 0);
 });
+
+test('Pay draait op de eigen bank: een saldotekort in de wallet komt van de betaalrekening', async () => {
+  await nieuweRekening('betaal', 20000); // ruim dekking op de bank
+  const voor = (await api('bank/overzicht', {}, lid.token)).body.totaalCenten;
+  const wallet = (await api('pay/overzicht', {}, lid.token)).body.saldo || 0;
+  // een uitgave groter dan het walletsaldo dwingt autolaad af; het tekort (3000)
+  // hoort exact van de eigen bank te komen, niet afgerond via de kaart-naad
+  const bedrag = wallet + 3000;
+  const l2 = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
+  const ontvanger = (await api('pay/overzicht', {}, l2.token)).body.codenaam;
+  const r = await api('pay/stuur', { aan: ontvanger, centen: bedrag, idem: 'bankdek1' }, lid.token);
+  assert.equal(r.status, 200, 'de betaling slaagt met autolaad');
+  assert.equal(r.body.bijgeladen, 3000, 'exact het tekort bijgeladen (de kaart-naad rondt af, de bank niet)');
+  const na = (await api('bank/overzicht', {}, lid.token)).body.totaalCenten;
+  assert.equal(voor - na, 3000, 'het tekort kwam van de eigen bankrekeningen (eigen rails)');
+});
+
+test('de Butler-drempel: bankpaden die geld bewegen komen eerst terug als voorstel (428)', async () => {
+  const doe = await api('member/doe', { pad: '/api/bank/overboek', body: { vanIban: lid.iban, naarIban: lid.iban, centen: 100 } }, lid.token);
+  assert.equal(doe.status, 428, 'een bank-geldpad komt eerst terug als voorstel');
+  assert.equal(doe.body.bevestigNodig, true, 'geen directe uitvoering: eerst bevestigen');
+});

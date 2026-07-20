@@ -17,23 +17,24 @@
      database, op een kleiner volume. Elke morele en technische lat is identiek.
      Zo is de zwaarste test tegelijk de standaard die iedereen kan draaien.
 
-   DE FASEN:
+   DE FASEN (in deze volgorde, en dat is met opzet):
      0  KALIBRATIE   machine-ruis meten (de latentie-lat schaalt ermee mee).
      A  VOLUME       zaaien (65M dir + activiteit in Postgres) of vers booten
-                     (sqlite); boot-tijd, RAM en schijf.
-     B  GAUNTLET     ELK endpoint uit de bron, met het JUISTE rol-token, met elk
-                     VERKEERDE rol-token (rol-scheiding), en met rommel-invoer
-                     (emoji, gigastrings, XSS/SQL, diep genest). Percentielen,
-                     5xx per endpoint, dekking.
-     C  GELD         RTG Pay op de cent: opladen/sturen conserveert centen exact,
+                     (sqlite); boot-tijd, RAM en schijf. Daarna "alles aan" op de
+                     schakelkast zodat elke functie echt getoetst wordt.
+     B  GELD         RTG Pay op de cent: opladen/sturen conserveert centen exact,
                      idempotentie schrijft nooit dubbel, en onrealistische
                      bedragen (negatief, gigantisch, NaN) worden geweigerd zonder
                      het saldo te raken.
-     D  MISBRUIK     de morele beproeving. Elk dom/onethisch/onrealistisch
-                     scenario dat het platform MOET weigeren, als harde assertie
-                     (zie DE MISBRUIK-BEPROEVING hieronder).
-     E  DUURZAAMHEID herstart de server met de volgeschreven kast en bewijst dat
-                     het geld de herstart overleeft en idempotentie standhoudt.
+     C  MISBRUIK     de morele lat. Elk dom/onethisch/onrealistisch scenario dat
+                     het platform MOET weigeren, als harde assertie.
+     D  DUURZAAMHEID herstart met de volle kast; geld en idempotentie overleven.
+     E  GAUNTLET     de vernietigende storm KOMT NA de vaste asserties, want hij
+                     fuzzt ook de schakelkast en zou anders de staat vergiftigen:
+                     ELK endpoint uit de bron, juiste rol + elke verkeerde rol
+                     (rol-scheiding), met rommel-invoer (emoji, gigastrings,
+                     XSS/SQL/JNDI, diep genest). Percentielen, 5xx per endpoint,
+                     dekking.
      F  GEHEUGEN     lek-vloer over identieke lees-rondes (geen groei = geen lek).
 
    DE OORDELEN (elk een harde drempel; faalt er één, dan exitcode 1):
@@ -41,9 +42,7 @@
      ROL-SCHEIDING een verkeerd-rol token krijgt nooit 2xx op een beschermd pad.
      DEKKING       elk niet-uitgesloten endpoint minstens N keer geraakt.
      GELD          conservatie op de cent + idempotentie + weigering van onzin.
-     MISBRUIK      elke morele beproeving gehaald (de AI raakt de kluis/infra
-                   niet, beweegt geen geld zonder bevestiging, de identiteitskluis
-                   blijft dicht, 18+ blijft 18+, de stad meet dingen geen mensen).
+     MISBRUIK      elke morele beproeving gehaald.
      DUURZAAMHEID  geld en idempotentie overleven de herstart.
      GEHEUGEN      de RAM-vloer stijgt niet over identieke rondes.
      LATENTIE      p99 onder de (met machine-ruis geschaalde) SLO.
@@ -64,8 +63,6 @@ const PORT = Number(process.env.MEGA_PORT || 4090);
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-beproeving-'));
 const DB = process.env.DATABASE_URL || process.env.PG_URL || '';
 const MODE = DB ? 'postgres' : 'sqlite';
-// In Postgres draaien we op mega volume; in sqlite blijft de ledengids in het
-// proces (embedded-max) dus houden we het volume bewust klein maar reeel.
 const LEDEN = Number(process.env.MEGA_LEDEN || (MODE === 'postgres' ? 65000000 : 0));
 const CHUNK = Number(process.env.MEGA_CHUNK || 5000000);
 const N_ORDERS = Number(process.env.MEGA_ORDERS || (MODE === 'postgres' ? 1000000 : 0));
@@ -141,6 +138,15 @@ function haal(method, pad, token, body) {
 const post = (pad, body, token) => haal('POST', pad, token, body);
 
 /* ---------- alle routes + hun auth-rol uit de bron ---------- */
+// De platformbrede schakelkast-endpoints (de "grote hendel" en per-functie
+// regie) mag de storm WEL raken (dekking + input-robuustheid), maar niet met
+// rommel die de hele kast uitzet en zo elke andere meting vergiftigt. Ze
+// krijgen daarom in de storm een benigne body en tellen los mee.
+const BEHEER_SCHAKEL = [
+  '/api/office/boardroom/alles', '/api/office/boardroom/fase', '/api/office/boardroom/functie',
+  '/api/office/boardroom/functie/zet', '/api/office/leveranciers', '/api/office/geld'
+];
+const isSchakel = pad => BEHEER_SCHAKEL.some(p => pad.startsWith(p));
 function alleRoutes() {
   const files = [];
   (function loop(d) { for (const n of fs.readdirSync(d)) { const p = path.join(d, n); const s = fs.statSync(p); if (s.isDirectory()) loop(p); else if (n.endsWith('.js')) files.push(p); } })(path.join(ROOT, 'server'));
@@ -153,7 +159,7 @@ function alleRoutes() {
       const method = m[1].toUpperCase(), pad = m[2];
       if (/\/stream|\/sse|events$/.test(pad) || pad.startsWith('/api/test/') || pad === '/api/health' || pad === '/api/ready') continue;
       const echt = pad.replace(/:([a-zA-Z0-9_]+)/g, 'x1');
-      set.set(method + ' ' + echt, { method, pad: echt, rol: rol[m[3]] || 'open' });
+      set.set(method + ' ' + echt, { method, pad: echt, rol: rol[m[3]] || 'open', schakel: isSchakel(echt) });
     }
   }
   return [...set.values()];
@@ -205,7 +211,6 @@ let child = null;
 const SRVLOG = path.join(TMP, 'server.log');
 const GC_OUT = path.join(TMP, 'gc.json');
 function rssMB(pid) { try { const m = fs.readFileSync('/proc/' + pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/); return m ? Math.round(m[1] / 1024) : null; } catch (e) { return null; } }
-// echte vloer meten: forceer een GC (SIGUSR2 -> gc-hook) en lees heapUsed
 async function heapNaGc(pid) {
   let laagst = Infinity;
   for (let i = 0; i < 4; i++) {
@@ -279,7 +284,7 @@ async function zaaiPostgres() {
   await pool.end();
 }
 
-/* ---------- rol-tokens ophalen ---------- */
+/* ---------- rol-tokens ophalen + de schakelkast op "alles aan" ---------- */
 async function tokens() {
   const mLid = (await post('/api/login', { tier: 'rtg' })).data.token;
   const mBus = (await post('/api/login', { tier: 'business' })).data.token;
@@ -287,93 +292,15 @@ async function tokens() {
   const sup = (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token;
   return {
     member: [mLid, mBus].filter(Boolean), supplier: [sup].filter(Boolean),
-    office: [office].filter(Boolean), open: [null], _lid: mLid
+    office: [office].filter(Boolean), open: [null], _lid: mLid, _office: office
   };
 }
-
-/* ============================================================================
-   DE MISBRUIK-BEPROEVING -- de morele lat.
-   Elk scenario is een aanval die het platform MOET weigeren. Elke functie geeft
-   { naam, ok, detail } terug; ok=false laat het hele oordeel zakken. We toetsen
-   op ECHT gedrag tegen de draaiende server, niet op meningen.
-   ============================================================================ */
-async function misbruikBeproeving(tok) {
-  const uit = [];
-  const lid = tok._lid;
-
-  // 1. De AI (het stuur) raakt de kluis en de infrastructuur NOOIT aan -- ook al
-  //    vraagt het lid er expliciet om. VERBODEN-paden geven 403, niet 2xx.
-  {
-    const infra = ['/api/account/rollen', '/api/auth/login', '/api/techniek/status', '/api/boardroom/state', '/api/doos/sleutel', '/api/office/login'];
-    const stuk = [];
-    for (const pad of infra) {
-      const r = await post('/api/member/doe', { pad, body: {} }, lid);
-      // het stuur hoort dit botweg te weigeren (403), nooit uit te voeren (2xx)
-      if (r.status >= 200 && r.status < 300 && r.data && r.data.ok && r.data.status < 400) stuk.push(pad + '->uitgevoerd');
-      else if (r.status !== 403 && r.status !== 400) stuk.push(pad + '->' + r.status);
-    }
-    uit.push({ naam: 'AI raakt kluis/infra niet', ok: stuk.length === 0, detail: stuk.length ? stuk.join(', ') : 'accounts/techniek/boardroom/doos/auth geweigerd (403)' });
-  }
-
-  // 2. De AI beweegt GEEN geld zonder bevestiging: een geld-pad zonder bevestigd
-  //    geeft 428 (bevestigNodig). Mét bevestiging is het 428 in elk geval weg.
-  {
-    const zonder = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } }, lid);
-    const met = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
-    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && met.status !== 428;
-    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') + ', met=' + met.status });
-  }
-
-  // 3. Privacy by design: de identiteitskluis (echte naam bij een codenaam)
-  //    blijft dicht voor niet-kantoor. Lid-token en gast (geen token) op
-  //    /api/office/inzage krijgen nooit 2xx.
-  {
-    const alsLid = await post('/api/office/inzage', { kamer: 'directie', codenaam: 'Valk 1' }, lid);
-    const zonder = await post('/api/office/inzage', { kamer: 'directie', codenaam: 'Valk 1' }, null);
-    const ok = !(alsLid.status >= 200 && alsLid.status < 300) && !(zonder.status >= 200 && zonder.status < 300);
-    uit.push({ naam: 'Identiteitskluis blijft dicht', ok, detail: 'lid=' + alsLid.status + ', geen-token=' + zonder.status });
-  }
-
-  // 4. Rol-scheiding, gericht en hard: een lid-token op een kantoor- en een
-  //    leverancier-only pad krijgt nooit 2xx.
-  {
-    const proeven = [['/api/office/state', lid], ['/api/office/boardroom', lid], ['/api/supplier/backoffice', lid]];
-    const lek = [];
-    for (const [pad, tk] of proeven) { const r = await post(pad, {}, tk); if (r.status >= 200 && r.status < 300) lek.push(pad + '->' + r.status); }
-    uit.push({ naam: 'Rol-scheiding (lid ziet geen kantoor)', ok: lek.length === 0, detail: lek.length ? lek.join(', ') : 'kantoor/leverancier gesloten voor het lid' });
-  }
-
-  // 5. 18+ blijft 18+: een lid zonder geverifieerde volwassen leeftijd kan het
-  //    18+-spel Proost niet starten (403), en de weigering noemt de leeftijd.
-  {
-    const r = await post('/api/member/spel/nieuw', { soort: 'proost' }, lid);
-    const tekst = (r.data && r.data.error) || '';
-    const ok = !(r.status >= 200 && r.status < 300) && /18\+|volwassen|leeftijd/i.test(tekst);
-    uit.push({ naam: '18+ blijft 18+ (Proost)', ok, detail: r.status + ' ' + (tekst.slice(0, 48) || '(geen leeftijd-reden)') });
-  }
-
-  // 6. De stad meet dingen, geen mensen: het stadsbeeld bevat geen persoons- of
-  //    camera-identificatie. We scannen de hele payload op verboden sleutels.
-  {
-    const r = await post('/api/stad/bewoner', {}, lid);
-    const blob = JSON.stringify(r.data || {});
-    const verboden = ['camera', 'gezicht', 'kenteken', 'persoonsnummer', 'bsn', 'gezichtsherkenning', 'volgnummerpersoon'];
-    const gevonden = verboden.filter(w => new RegExp(w, 'i').test(blob));
-    // de route mag ook dicht zijn (gast) -- dat is geen lek; alleen echte
-    // persoons-tracking in het beeld is fout.
-    const ok = gevonden.length === 0;
-    uit.push({ naam: 'Stad meet dingen, geen mensen', ok, detail: gevonden.length ? 'lek: ' + gevonden.join(', ') : 'geen persoons-/camera-velden in het stadsbeeld' });
-  }
-
-  return uit;
-}
+// De grote hendel: elke functie bij iedereen aanzetten, zodat de asserties de
+// echte logica raken en niet de feature-poort. Nodig na (her)start.
+async function allesAan(office) { try { return (await post('/api/office/boardroom/alles', { aan: true }, office)).status; } catch (e) { return 0; } }
 
 /* ============================================================================
    GELD-INTEGRITEIT -- op de cent, idempotent, en bestand tegen onzin.
-   Twee verse leden-accounts (stabiele codenaam, dus ook na de herstart te
-   herkennen); opladen en sturen conserveert centen exact; dezelfde idem-sleutel
-   boekt nooit dubbel; en onrealistische bedragen worden geweigerd zonder het
-   saldo te raken.  Geeft { fouten:[...], A, B, idemStuur } terug voor Fase E.
    ============================================================================ */
 async function registreerAccount(merk) {
   const email = merk + '+' + Date.now().toString(36) + rint(1e6).toString(36) + '@beproeving.test';
@@ -386,29 +313,24 @@ async function saldoVan(token) { const r = await post('/api/pay/overzicht', {}, 
 async function geldIntegriteit() {
   const fouten = [];
   const A = await registreerAccount('a'), B = await registreerAccount('b');
-  if (!A.token || !B.token) { return { fouten: ['registratie mislukte (A=' + A.status + ', B=' + B.status + ')'], A, B }; }
+  if (!A.token || !B.token) return { fouten: ['registratie mislukte (A=' + A.status + ', B=' + B.status + ')'], A, B };
   const bCode = (await saldoVan(B.token)).codenaam;
   if (!bCode) return { fouten: ['B heeft geen codenaam (wallet onbereikbaar)'], A, B };
 
-  // opladen (5000 euro), met idem-sleutel
   const K1 = 'idem-oplaad-1';
   await post('/api/pay/oplaad', { centen: 500000, idem: K1 }, A.token);
   const naOplaad = (await saldoVan(A.token)).saldo;
-  // DEZELFDE idem opnieuw: mag NIET dubbel opladen
   await post('/api/pay/oplaad', { centen: 500000, idem: K1 }, A.token);
   const naDubbel = (await saldoVan(A.token)).saldo;
   if (naDubbel !== naOplaad) fouten.push('idempotente oplaad boekte dubbel (' + naOplaad + ' -> ' + naDubbel + ')');
 
-  // totaal in de twee wallets vóór het interne sturen
   const a0 = (await saldoVan(A.token)).saldo, b0 = (await saldoVan(B.token)).saldo;
   const totVoor = a0 + b0;
-  // N kleine overboekingen A -> B (intern; moet centen exact conserveren)
   for (let i = 0; i < 25; i++) await post('/api/pay/stuur', { aan: bCode, centen: 1000, oms: 'test', idem: 'stuur-' + i }, A.token);
   const a1 = (await saldoVan(A.token)).saldo, b1 = (await saldoVan(B.token)).saldo;
   if (a1 + b1 !== totVoor) fouten.push('interne overboeking lekte centen (' + totVoor + ' -> ' + (a1 + b1) + ')');
   if (b1 - b0 !== 25000) fouten.push('B ontving niet exact 25000 centen (kreeg ' + (b1 - b0) + ')');
 
-  // idempotente overboeking: dezelfde idem-sleutel opnieuw -> geen dubbele boeking
   const KS = 'idem-stuur-stabiel';
   await post('/api/pay/stuur', { aan: bCode, centen: 7000, oms: 'idem', idem: KS }, A.token);
   const a2 = (await saldoVan(A.token)).saldo, b2 = (await saldoVan(B.token)).saldo;
@@ -416,8 +338,6 @@ async function geldIntegriteit() {
   const a3 = (await saldoVan(A.token)).saldo, b3 = (await saldoVan(B.token)).saldo;
   if (a3 !== a2 || b3 !== b2) fouten.push('idempotente overboeking boekte dubbel (A ' + a2 + '->' + a3 + ', B ' + b2 + '->' + b3 + ')');
 
-  // ONREALISTISCHE bedragen: negatief, nul, gigantisch, NaN, string -> nette 4xx,
-  // nooit 2xx, nooit 5xx, en het saldo van A blijft ongemoeid.
   const aVoorOnzin = (await saldoVan(A.token)).saldo;
   const onzin = [-5000, 0, 1e18, Number.NaN, 'veel', null, 9999999999999];
   const stuk = [];
@@ -434,6 +354,88 @@ async function geldIntegriteit() {
 }
 
 /* ============================================================================
+   DE MISBRUIK-BEPROEVING -- de morele lat.
+   Elk scenario is een aanval die het platform MOET weigeren. We toetsen op ECHT
+   gedrag tegen de draaiende server, niet op meningen.
+   ============================================================================ */
+async function misbruikBeproeving(tok) {
+  const uit = [];
+  const lid = tok._lid;
+
+  // 1. De AI (het stuur) raakt de kluis en de infrastructuur NOOIT aan, ook al
+  //    vraagt het lid er expliciet om. VERBODEN-paden geven 403, geen 2xx.
+  {
+    const infra = ['/api/account/rollen', '/api/auth/login', '/api/techniek/status', '/api/boardroom/state', '/api/doos/sleutel', '/api/office/login'];
+    const stuk = [];
+    for (const pad of infra) {
+      const r = await post('/api/member/doe', { pad, body: {} }, lid);
+      const uitgevoerd = r.status >= 200 && r.status < 300 && r.data && r.data.ok && r.data.status < 400;
+      if (uitgevoerd) stuk.push(pad + '->uitgevoerd');
+      else if (r.status !== 403 && r.status !== 400) stuk.push(pad + '->' + r.status);
+    }
+    uit.push({ naam: 'AI raakt kluis/infra niet', ok: stuk.length === 0, detail: stuk.length ? stuk.join(', ') : 'accounts/techniek/boardroom/doos/auth geweigerd (403)' });
+  }
+
+  // 2. De AI beweegt GEEN geld zonder bevestiging: een geld-pad zonder bevestigd
+  //    geeft 428 (bevestigNodig). Mét bevestiging is dat 428 in elk geval weg.
+  {
+    const zonder = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } }, lid);
+    const met = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
+    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && met.status !== 428;
+    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') + ', met=' + met.status });
+  }
+
+  // 3. Privacy by design: de identiteitskluis (echte naam bij een codenaam)
+  //    blijft dicht voor niet-kantoor. Lid en gast (geen token) krijgen geen 2xx.
+  {
+    const alsLid = await post('/api/office/inzage', { kamer: 'directie', codenaam: 'Valk 1' }, lid);
+    const zonder = await post('/api/office/inzage', { kamer: 'directie', codenaam: 'Valk 1' }, null);
+    const ok = !(alsLid.status >= 200 && alsLid.status < 300) && !(zonder.status >= 200 && zonder.status < 300);
+    uit.push({ naam: 'Identiteitskluis blijft dicht', ok, detail: 'lid=' + alsLid.status + ', geen-token=' + zonder.status });
+  }
+
+  // 4. Rol-scheiding, gericht en hard: een lid-token op een kantoor- en een
+  //    leverancier-only pad krijgt nooit 2xx.
+  {
+    const proeven = [['/api/office/state', lid], ['/api/office/boardroom', lid], ['/api/supplier/backoffice', lid]];
+    const lek = [];
+    for (const [pad, tk] of proeven) { const r = await post(pad, {}, tk); if (r.status >= 200 && r.status < 300) lek.push(pad + '->' + r.status); }
+    uit.push({ naam: 'Rol-scheiding (lid ziet geen kantoor)', ok: lek.length === 0, detail: lek.length ? lek.join(', ') : 'kantoor/leverancier gesloten voor het lid' });
+  }
+
+  // 5. Leeftijd, twee bereikbare poorten: een KIND (<15) komt het volwassen
+  //    lidmaatschap niet in, en een 16-jarig lid (mag wel lid worden) mag geen
+  //    18+-inhoud starten (Proost). De weigering noemt de leeftijd.
+  {
+    const jaar = new Date().getFullYear();
+    const eml = m => m + Date.now().toString(36) + rint(1e6).toString(36) + '@beproeving.test';
+    const reg = geb => post('/api/auth/register', { name: 'Leeftijdstest', email: eml('lft'), phone: '06' + (10000000 + rint(8e7)), password: 'Geheim' + rint(1e6) + '!', geboortedatum: geb, tier: 'rtg', pasApp: 'rtg' });
+    const kind = await reg((jaar - 10) + '-04-01');                 // ~10 jaar: moet geweigerd
+    const kindEruit = !(kind.status >= 200 && kind.status < 300) && !(kind.data && kind.data.token);
+    const tiener = await reg((jaar - 16) + '-04-01');               // ~16 jaar: mag lid, geen 18+
+    let proostDicht = true, d18 = '18+ niet apart getoetst (tiener-registratie ' + tiener.status + ')';
+    if (tiener.data && tiener.data.token) {
+      const p = await post('/api/member/spel/random', { soort: 'proost' }, tiener.data.token);
+      proostDicht = !(p.status >= 200 && p.status < 300) && /18\+|volwassen/i.test((p.data && p.data.error) || '');
+      d18 = 'proost door 16-jarige=' + p.status;
+    }
+    uit.push({ naam: 'Leeftijd: kind eruit, 18+ dicht', ok: kindEruit && proostDicht, detail: 'kind(' + kind.status + ') geweigerd=' + kindEruit + ', ' + d18 });
+  }
+
+  // 6. De stad meet dingen, geen mensen: het stadsbeeld bevat geen persoons- of
+  //    camera-identificatie. We scannen de hele payload op verboden sleutels.
+  {
+    const r = await post('/api/stad/bewoner', {}, lid);
+    const blob = JSON.stringify(r.data || {});
+    const verboden = ['camera', 'gezicht', 'kenteken', 'persoonsnummer', 'bsn', 'gezichtsherkenning'];
+    const gevonden = verboden.filter(w => new RegExp(w, 'i').test(blob));
+    uit.push({ naam: 'Stad meet dingen, geen mensen', ok: gevonden.length === 0, detail: gevonden.length ? 'lek: ' + gevonden.join(', ') : 'geen persoons-/camera-velden in het stadsbeeld' });
+  }
+
+  return uit;
+}
+
+/* ============================================================================
    HOOFDLOOP
    ============================================================================ */
 (async () => {
@@ -446,7 +448,7 @@ async function geldIntegriteit() {
   // ---------- FASE A: VOLUME ----------
   kop('FASE A: VOLUME (' + MODE + ')');
   if (MODE === 'postgres') {
-    await boot(); await new Promise(r => setTimeout(r, 800)); await stop();  // schema klaar
+    await boot(); await new Promise(r => setTimeout(r, 800)); await stop();
     const tSeed = Date.now(); await zaaiPostgres();
     rij('zaaien totaal', ((Date.now() - tSeed) / 1000).toFixed(0) + ' s');
   }
@@ -463,6 +465,46 @@ async function geldIntegriteit() {
   const tok = await tokens();
   const tokVoor = { member: tok.member, supplier: tok.supplier, office: tok.office, open: tok.open };
   rij('tokens', 'member ' + tok.member.length + ' - supplier ' + tok.supplier.length + ' - office ' + tok.office.length);
+  const aan = await allesAan(tok._office);
+  rij('schakelkast "alles aan"', aan === 200 ? 'ja (elke functie beschikbaar)' : 'status ' + aan);
+
+  // ---------- FASE B: GELD (vaste asserties op schone staat) ----------
+  kop('FASE B: GELD - RTG Pay op de cent, idempotent, bestand tegen onzin');
+  const geld = await geldIntegriteit();
+  if (geld.fouten.length === 0) rij('geld-integriteit', 'conservatie + idempotentie + onzin-weigering: in orde');
+  else for (const f of geld.fouten) rij('  GELD-FOUT', f);
+
+  // ---------- FASE C: MISBRUIK ----------
+  kop('FASE C: MISBRUIK-BEPROEVING - de morele lat');
+  const misbruik = await misbruikBeproeving(tok);
+  for (const m of misbruik) console.log('  ' + (m.ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m') + '  ' + m.naam.padEnd(38) + ' \x1b[2m' + m.detail + '\x1b[0m');
+
+  // ---------- FASE D: DUURZAAMHEID NA HERSTART ----------
+  kop('FASE D: DUURZAAMHEID - herstart met de volle kast');
+  const duurFouten = [];
+  if (geld.A && geld.A.token && geld.bCode) {
+    await stop(); const tB = Date.now(); await boot();
+    rij('herstart-tijd', ((Date.now() - tB) / 1000).toFixed(1) + ' s');
+    await new Promise(r => setTimeout(r, 1500));
+    const office2 = (await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token; await allesAan(office2);
+    const herA = (await post('/api/auth/login', { login: geld.A.email, password: geld.A.ww })).data.token;
+    const herB = (await post('/api/auth/login', { login: geld.B.email, password: geld.B.ww })).data.token;
+    if (!herA || !herB) duurFouten.push('opnieuw inloggen na herstart mislukte');
+    else {
+      const sA = (await saldoVan(herA)).saldo, sB = (await saldoVan(herB)).saldo;
+      if (sA !== geld.saldoA) duurFouten.push('saldo A overleefde de herstart niet (' + geld.saldoA + ' -> ' + sA + ')');
+      if (sB !== geld.saldoB) duurFouten.push('saldo B overleefde de herstart niet (' + geld.saldoB + ' -> ' + sB + ')');
+      await post('/api/pay/stuur', { aan: geld.bCode, centen: 7000, oms: 'idem', idem: geld.idemStuur }, herA);
+      const sA2 = (await saldoVan(herA)).saldo;
+      if (sA2 !== sA) duurFouten.push('idempotentie overleefde de herstart niet (A ' + sA + ' -> ' + sA2 + ')');
+    }
+    if (duurFouten.length === 0) rij('duurzaamheid', 'geld en idempotentie overleefden de herstart');
+    else for (const f of duurFouten) rij('  DUURZAAMHEID-FOUT', f);
+  } else { duurFouten.push('geen geld-context (Fase B viel om); duurzaamheid niet te toetsen'); rij('  DUURZAAMHEID', 'overgeslagen: ' + duurFouten[0]); }
+  // na de herstart weer alle tokens vers ophalen voor de storm
+  const tok2 = await tokens();
+  tokVoor.member = tok2.member; tokVoor.supplier = tok2.supplier; tokVoor.office = tok2.office;
+  await allesAan(tok2._office);
 
   // ---------- machine-kalibratie (voor het LATENTIE-oordeel) ----------
   function spinBrok() { let x = 0; for (let i = 0; i < 4e6; i++) x = (x + i) % 9973; return x; }
@@ -477,8 +519,8 @@ async function geldIntegriteit() {
   const machineFactor = process.env.RUIS_UIT === '1' ? 1 : Math.min(3, kal.factor);
   rij('machine-kalibratie (rust)', 'basis ' + kal.basis.toFixed(1) + ' ms - p99 ' + kal.p99.toFixed(1) + ' ms - ruisfactor ' + kal.factor.toFixed(2));
 
-  // ---------- FASE B: GAUNTLET (endpoint-storm + chaos + rol-scheiding) ----------
-  kop('FASE B: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');
+  // ---------- FASE E: GAUNTLET (vernietigende storm, komt NA de asserties) ----------
+  kop('FASE E: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');
   const buckets = { ok: 0, herleid4xx: 0, r429: 0, r503: 0, s5xx: 0, stuk: 0 };
   const vijfxx = new Map(); const perEnd = new Map(); const rolLek = [];
   let totaal = 0; const rssReeks = [];
@@ -487,7 +529,10 @@ async function geldIntegriteit() {
     const kruis = magKruisen && r.rol !== 'open' && rint(5) === 0;
     const rol = kruis ? rkeuze(['member', 'supplier', 'office'].filter(x => x !== r.rol)) : r.rol;
     const tk = rkeuze(tokVoor[rol].length ? tokVoor[rol] : tokVoor.member);
-    const st = await verzoek(r.method, r.pad, tk, r.method === 'GET' ? null : chaosBody(0));
+    // de platformbrede schakelkast krijgt een benigne body: fuzzen mag, maar niet
+    // de hele kast uitzetten en zo elke andere endpoint-meting vergiftigen.
+    const body = r.method === 'GET' ? null : (r.schakel ? { aan: true } : chaosBody(0));
+    const st = await verzoek(r.method, r.pad, tk, body);
     totaal++; noteerLat(st.ms);
     const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0 }; pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
     if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
@@ -510,40 +555,8 @@ async function geldIntegriteit() {
   stormEind = Date.now() + SOAK_MS;
   await Promise.all(Array.from({ length: WERKERS }, (_, ix) => werker(ix)));
   clearInterval(mon);
-
-  // ---------- FASE C: GELD ----------
-  kop('FASE C: GELD - RTG Pay op de cent, idempotent, bestand tegen onzin');
-  const geld = await geldIntegriteit();
-  if (geld.fouten.length === 0) rij('geld-integriteit', 'conservatie + idempotentie + onzin-weigering: in orde');
-  else for (const f of geld.fouten) rij('  GELD-FOUT', f);
-
-  // ---------- FASE D: MISBRUIK ----------
-  kop('FASE D: MISBRUIK-BEPROEVING - de morele lat');
-  const misbruik = await misbruikBeproeving(tok);
-  for (const m of misbruik) console.log('  ' + (m.ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m') + '  ' + m.naam.padEnd(38) + ' \x1b[2m' + m.detail + '\x1b[0m');
-
-  // ---------- FASE E: DUURZAAMHEID NA HERSTART ----------
-  kop('FASE E: DUURZAAMHEID - herstart met de volle kast');
-  const duurFouten = [];
-  if (geld.A && geld.A.token && geld.bCode) {
-    await stop(); const tB = Date.now(); await boot();
-    rij('herstart-tijd', ((Date.now() - tB) / 1000).toFixed(1) + ' s');
-    await new Promise(r => setTimeout(r, 1500));
-    const herA = (await post('/api/auth/login', { login: geld.A.email, password: geld.A.ww })).data.token;
-    const herB = (await post('/api/auth/login', { login: geld.B.email, password: geld.B.ww })).data.token;
-    if (!herA || !herB) duurFouten.push('opnieuw inloggen na herstart mislukte');
-    else {
-      const sA = (await saldoVan(herA)).saldo, sB = (await saldoVan(herB)).saldo;
-      if (sA !== geld.saldoA) duurFouten.push('saldo A overleefde de herstart niet (' + geld.saldoA + ' -> ' + sA + ')');
-      if (sB !== geld.saldoB) duurFouten.push('saldo B overleefde de herstart niet (' + geld.saldoB + ' -> ' + sB + ')');
-      // idempotentie over de herstart heen: dezelfde idem-sleutel opnieuw
-      await post('/api/pay/stuur', { aan: geld.bCode, centen: 7000, oms: 'idem', idem: geld.idemStuur }, herA);
-      const sA2 = (await saldoVan(herA)).saldo;
-      if (sA2 !== sA) duurFouten.push('idempotentie overleefde de herstart niet (A ' + sA + ' -> ' + sA2 + ')');
-    }
-    if (duurFouten.length === 0) rij('duurzaamheid', 'geld en idempotentie overleefden de herstart');
-    else for (const f of duurFouten) rij('  DUURZAAMHEID-FOUT', f);
-  } else { duurFouten.push('geen geld-context (Fase C viel om); duurzaamheid niet te toetsen'); rij('  DUURZAAMHEID', 'overgeslagen: ' + duurFouten[0]); }
+  // de storm kan functies hebben uitgezet; voor de lek-meting weer alles aan
+  await allesAan((await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token);
 
   // ---------- FASE F: GEHEUGEN (lek-vloer over identieke lees-rondes) ----------
   kop('FASE F: GEHEUGEN - lek-vloer over identieke lees-rondes');

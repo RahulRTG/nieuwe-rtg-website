@@ -1,6 +1,6 @@
-/* Test-only voorlaadhaakje voor de geheugenmeting van de chaos-soak.
+/* Test-only voorlaadhaakje voor de geheugenmeting van De Beproeving.
 
-   De harnas (scripts/mega65-storm.js) start de server met node -r scripts/gc-hook.js
+   De harnas (scripts/beproeving.js) start de server met node -r scripts/gc-hook.js
    en --expose-gc. Krijgt het proces SIGUSR2, dan draait het een volledige GC en
    schrijft het daarna het LEVENDE geheugen (heapUsed) naar het bestand in
    RTG_GC_OUT. Dat is de eerlijke lek-maat: RSS overschat het levende geheugen

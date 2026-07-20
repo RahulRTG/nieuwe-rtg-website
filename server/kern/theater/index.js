@@ -117,7 +117,7 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     save();
     return { status: 200, ok: true, reactie: r };
   }
-  const reacties = vid => ({ status: 200, reacties: (db.data.theaterReacties[String(vid || '')] || []).slice(-40) });
+  const reacties = vid => ({ status: 200, reacties: ((db.data.theaterReacties || {})[String(vid || '')] || []).slice(-40) });
   function meld(key, vid, reden) {
     const v = videoMet(vid); if (!v) return { status: 404, error: 'Video niet gevonden.' };
     lijsten();

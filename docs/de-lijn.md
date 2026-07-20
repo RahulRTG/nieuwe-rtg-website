@@ -38,8 +38,9 @@ gemak brengt. In deze code betekent dat:
   de directe betalingen, de ontmoetingen. Dit is waar het bedrijf zit; dit hoort
   van eigen huis te zijn.
 - **De build** (`scripts/build.js`), de checks (`scripts/check.js`), de
-  toegankelijkheidskeuring, de belastingtests (`spitsuur`, `orkaan`). Ook het
-  gereedschap is grotendeels eigen.
+  toegankelijkheidskeuring, en de belastings- en misbruik-beproeving
+  (`scripts/beproeving.js`, `npm run beproeving`). Ook het gereedschap is
+  grotendeels eigen.
 - **Sinds kort ook de lettertypen** (`public/fonts/`): zelf geserveerd, zodat er
   letterlijk geen enkele verbinding met een derde partij overblijft in de
   browser van de bezoeker.
@@ -101,14 +102,16 @@ nooit.
 
 ## De grens die we uit ervaring kennen
 
-Zelfbouw heeft een plafond, en we kennen het precies. De `orkaan`-belastingtest
-(`scripts/orkaan.js`, 10 miljoen gebruikers, alle diensten tegelijk) liet zien:
-de productlogica is orkaanbestendig — correctheid, geld en herstel blijven
-overeind onder totale overbelasting — maar de **embedded opslag** serialiseert
-bij elke `save()` de hele collectie en loopt daarop vast rond ~1,5 miljoen
-gids-leden. Daarboven is PostgreSQL de weg. Dat is geen zwakte van "zelf
-bouwen"; het is weten wáár zelfbouw ophoudt en een database-engine met dertig
-jaar opgeloste randgevallen het overneemt.
+Zelfbouw heeft een plafond, en we kennen het precies. De Beproeving
+(`scripts/beproeving.js`, tot 65 miljoen leden, alle diensten + misbruik-scenario's
+tegelijk) laat zien: de productlogica is beproevingsbestendig — correctheid, geld,
+privacy en herstel blijven overeind onder totale overbelasting. De grens zat in de
+**embedded JSON-opslag**, die bij elke `save()` de hele collectie serialiseerde en
+daarop vastliep rond ~1,5 miljoen gids-leden. Daarvoor zijn er nu twee wegen: de
+**GEHEUGEN-motor** (`RTG_STORE=geheugen`), die per collectie versleuteld en
+incrementeel wegschrijft en zo veel verder reikt zonder externe database, en
+PostgreSQL voor de echt grote, gedeelde opzet. Dat is geen zwakte van "zelf
+bouwen"; het is weten wáár welke motor het beste past.
 
 ---
 

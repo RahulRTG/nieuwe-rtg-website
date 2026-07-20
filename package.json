@@ -10,7 +10,8 @@
     "vloot": "node server/vloot.js",
     "sleutels": "node scripts/sleutels.js",
     "golive": "node scripts/golive.js",
-    "spitsuur": "node scripts/spitsuur.js",
+    "beproeving": "node --experimental-sqlite scripts/beproeving.js",
+    "beproeving:mega": "node --max-old-space-size=8192 scripts/beproeving.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
     "a11y": "node scripts/a11y.js",
@@ -21,7 +22,6 @@
     "audit": "npm audit --audit-level=high",
     "secrets": "node scripts/geheimen.js",
     "e2e": "node --experimental-sqlite --test test/*.e2e.js",
-    "chaos": "node --experimental-sqlite scripts/chaos-soak.js",
     "icons": "node scripts/icons.js"
   },
   "dependencies": {

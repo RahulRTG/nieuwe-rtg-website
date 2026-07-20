@@ -11,12 +11,18 @@ procesgeheugen — niet als een object/array in RAM dat bij elke `save()` als
 `ledenGids*`-functies in `server/db.js`). Zonder Postgres (JSON/sqlite) draait
 alles op `db.data.memberDir` zoals voorheen; dat is prima tot ~1–1,5M leden.
 
-## De meting (`scripts/mega65.js`)
+## De meting (`scripts/beproeving.js`)
 
-Draai met een echte Postgres:
+> De losse schaal- en chaos-scripts van vroeger (`mega65`, `mega65-storm`,
+> `orkaan`, `chaos-soak`, `spitsuur`, `onnozel`, de kassa-/keuken-orkanen) zijn
+> samengevoegd tot één standaard: **De Beproeving** (`scripts/beproeving.js`).
+> De cijfers hieronder komen uit die metingen en gelden nog steeds; je draait ze
+> nu met het onderstaande commando.
+
+Draai met een echte Postgres (de volle 65M-schaal):
 
 ```
-DATABASE_URL=postgres://user@host/db node scripts/mega65.js
+DATABASE_URL=postgres://user@host/db npm run beproeving:mega
 ```
 
 Knoppen: `MEGA_LEDEN` (65000000), `MEGA_CHUNK` (5000000), `MEGA_DUUR` (30000 ms).
@@ -66,27 +72,36 @@ in plaats van rechtstreeks uit `memberDir`, om dezelfde reden.
 
 # De chaos-soak: een oordeel-harnas, geen groene tabellen
 
-`scripts/mega65-storm.js` is bewust een *oordeel*-harnas: het print geen mooie
-cijfers die altijd slagen, maar toetst harde drempels (SLO's) en **eindigt met
-exitcode 1** als er een zakt. Het is deterministisch (seeded PRNG, zelfde run =
-zelfde uitkomst), zet 65M in de ledengids (buiten het RAM) plus een activiteits-
-laag in het werkgeheugen, en bestookt daarna systematisch elk endpoint uit de
-bron met (a) het juiste rol-token, (b) elk verkeerde rol-token en (c) rommel-
-invoer (emoji's, gigastrings, diep geneste JSON, verkeerde types, XSS/SQL).
+**De Beproeving** (`scripts/beproeving.js`) is bewust een *oordeel*-harnas: het
+print geen mooie cijfers die altijd slagen, maar toetst harde drempels (SLO's) en
+**eindigt met exitcode 1** als er een zakt. Het is deterministisch (seeded PRNG,
+zelfde run = zelfde uitkomst), zet 65M in de ledengids (buiten het RAM) plus een
+activiteitslaag in het werkgeheugen, doet eerst de vaste asserties (geld op de
+cent, misbruik-beproeving, duurzaamheid na herstart) op schone staat, en bestookt
+daarna systematisch elk endpoint uit de bron met (a) het juiste rol-token, (b) elk
+verkeerde rol-token en (c) rommel-invoer (emoji's, gigastrings, diep geneste JSON,
+verkeerde types, XSS/SQL/JNDI).
 
-De vijf oordelen: **ROBUUSTHEID** (nul onverwachte 5xx; een 503 voor een uitge-
+De oordelen: **ROBUUSTHEID** (nul onverwachte 5xx; een 503 voor een uitge-
 schakelde functie en een 429 rate-limit tellen expliciet niet mee), **ROL-
 SCHEIDING** (een verkeerd-rol token krijgt nooit 2xx), **DEKKING** (elk endpoint
-minstens N keer geraakt; ongeraakte endpoints worden benoemd), **GEHEUGEN** (geen
-lek: zie hieronder de eerlijke meetmethode), **LATENTIE** (p99 onder de SLO). De
-uitvoer sluit af met een blok "wat deze test NIET bewijst".
+minstens N keer geraakt), **GELD** (conservatie op de cent + idempotentie + onzin
+geweigerd), **MISBRUIK** (de AI raakt de kluis/infra niet, beweegt geen geld zonder
+bevestiging, de identiteitskluis blijft dicht, 18+ blijft 18+, de stad meet dingen
+geen mensen), **DUURZAAMHEID** (geld overleeft een herstart), **GEHEUGEN** (geen lek)
+en **LATENTIE** (p99 onder de SLO). De uitvoer sluit af met een blok "wat deze test
+NIET bewijst".
 
-Dat de drempels écht kunnen zakken is geen theorie: in dezelfde ronde vond de
-harnas een echte 500 (zie hieronder), waardoor **ROBUUSTHEID** terecht rood sloeg
-tot de fix erin zat. Een test die alleen groen kan slaan bewijst niets.
+Dat de drempels écht kunnen zakken is geen theorie: bij het bouwen vond de harnas
+een echte 500 (op `/api/theater/reacties`, een niet-geïnitialiseerde collectie op
+een verse instance), waardoor **ROBUUSTHEID** terecht rood sloeg tot de fix erin
+zat. Een test die alleen groen kan slaan bewijst niets.
 
 ```
-DATABASE_URL=postgres://... node --max-old-space-size=8192 scripts/mega65-storm.js
+# de standaard, draait overal (sqlite, geen database nodig):
+npm run beproeving
+# de volle mega-schaal (65M in Postgres):
+DATABASE_URL=postgres://... npm run beproeving:mega
 ```
 
 ## Wat de chaos vond -- en wat vals alarm was (eerlijk)

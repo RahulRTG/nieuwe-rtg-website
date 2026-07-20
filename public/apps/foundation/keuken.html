@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Gezinskeuken</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.7rem;}
+  .dag{display:flex;align-items:center;gap:.6rem;padding:.55rem 0;border-bottom:1px solid var(--lijn);}
+  .dag:last-child{border-bottom:0;}
+  .dag .dl{width:2.7rem;flex-shrink:0;text-align:center;}
+  .dag .dl b{display:block;text-transform:capitalize;font-size:.9rem;}
+  .dag .dl span{font-size:.72rem;color:var(--zacht);}
+  .dag.nu .dl b{color:var(--goud2);}
+  .dag .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:.35rem;}
+  .dag input.g{width:100%;}
+  .dag select.k{width:100%;appearance:none;font-size:.85rem;padding:.35rem .5rem;}
+  .dag .btns{display:flex;flex-direction:column;gap:.3rem;}
+  .ikoon{background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;color:var(--zacht);width:2rem;height:2rem;font-size:.95rem;cursor:pointer;}
+  .ikoon:hover{color:var(--tekst);border-color:var(--goud);}
+  .lijstrij{display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--lijn);}
+  .lijstrij:last-child{border-bottom:0;}
+  .lijstrij .vink{width:1.35rem;height:1.35rem;flex-shrink:0;accent-color:var(--goud2);}
+  .lijstrij .w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lijstrij.af .w{text-decoration:line-through;color:var(--zacht);}
+  .lijstrij small{color:var(--zacht);font-size:.72rem;}
+  .toevoeg{display:flex;gap:.5rem;margin-bottom:.8rem;}
+  .toevoeg .veld{flex:1;min-width:0;}
+  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0;}
+  .regelrij{display:flex;justify-content:flex-end;margin-top:.6rem;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🍲 Gezinskeuken</h1>
+  <div class="intro">Wat eten we deze week, en wie kookt? Zet het samen klaar, en houd één boodschappenlijst bij waar iedereen op afvinkt — waar je ook bent in de winkel.</div>
+
+  <div class="kaart blok">
+    <h2>Wat eten we deze week</h2>
+    <div id="menu"><div class="leeg">Laden…</div></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>🛒 Boodschappenlijst</h2>
+    <div class="toevoeg">
+      <input class="veld" id="bWat" placeholder="Bijv. melk, brood, appels" maxlength="60">
+      <button class="knop" id="bDoe">Zet erbij</button>
+    </div>
+    <div class="fout" id="bFout"></div>
+    <div id="lijst"><div class="leeg">Laden…</div></div>
+    <div class="regelrij"><button class="knop grijs klein" id="bOpruim" style="display:none;">Afgevinkte opruimen</button></div>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+if (!window.Sessie || !Sessie.eisProfiel()) {}
+const api = Sessie.api;
+const s = Sessie.huidig();
+Sessie.balk($('#balk'), { terug:'index.html' });
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+let koks = [];
+
+function kokOpties(gekozen){
+  return '<option value="">wie kookt?</option>' + koks.map(k=>
+    '<option value="'+k.id+'"'+(k.id===gekozen?' selected':'')+'>'+esc(k.naam)+'</option>').join('');
+}
+
+async function laad(){
+  try{
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/keuken?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    if (d.error) throw new Error(d.error);
+    koks = d.koks || [];
+    // weekmenu
+    $('#menu').innerHTML = d.dagen.map(dag =>
+      '<div class="dag'+(dag.vandaag?' nu':'')+'" data-datum="'+dag.datum+'">'
+      + '<div class="dl"><b>'+esc(dag.dag)+'</b><span>'+dag.nr+'</span></div>'
+      + '<div class="mid">'
+      +   '<input class="g veld" placeholder="nog niets gepland" maxlength="80" value="'+esc(dag.gerecht)+'">'
+      +   '<select class="k">'+kokOpties(dag.kok)+'</select>'
+      + '</div>'
+      + '<div class="btns"><button class="ikoon" data-idee title="Verras me">💡</button>'
+      +   '<button class="ikoon" data-wis title="Leegmaken">×</button></div>'
+      + '</div>'
+    ).join('');
+    $('#menu').querySelectorAll('.dag').forEach(rij=>{
+      const datum = rij.dataset.datum;
+      const g = rij.querySelector('.g'), k = rij.querySelector('.k');
+      const bewaar = ()=> g.value.trim()
+        ? doe('/gezin/keuken/menu', { datum, gerecht:g.value, kok:k.value })
+        : doe('/gezin/keuken/menu/wis', { datum });
+      g.addEventListener('change', bewaar);
+      k.addEventListener('change', ()=>{ if (g.value.trim()) doe('/gezin/keuken/menu', { datum, gerecht:g.value, kok:k.value }); });
+      rij.querySelector('[data-idee]').onclick = async ()=>{
+        try{ const r = await api('/gezin/keuken/idee', { code:s.code, token:s.token }); g.value = r.idee; await doe('/gezin/keuken/menu', { datum, gerecht:r.idee, kok:k.value }); }catch(e){}
+      };
+      rij.querySelector('[data-wis]').onclick = ()=> doe('/gezin/keuken/menu/wis', { datum }, true);
+    });
+    // boodschappenlijst
+    const box = $('#lijst');
+    if (!d.lijst.length){ box.innerHTML = '<div class="leeg">De lijst is leeg. Zet hierboven het eerste boodschapje erbij.</div>'; }
+    else box.innerHTML = d.lijst.map(it =>
+      '<div class="lijstrij'+(it.af?' af':'')+'" data-id="'+it.id+'">'
+      + '<input type="checkbox" class="vink"'+(it.af?' checked':'')+'>'
+      + '<span class="w">'+esc(it.wat)+'</span>'
+      + (it.door?'<small>'+esc(it.door)+'</small>':'')
+      + '<button class="ikoon" data-del title="Weg">×</button></div>'
+    ).join('');
+    box.querySelectorAll('.lijstrij').forEach(rij=>{
+      const id = rij.dataset.id;
+      rij.querySelector('.vink').addEventListener('change', e=> doe('/gezin/keuken/lijst/af', { itemId:id, af:e.target.checked }));
+      rij.querySelector('[data-del]').onclick = ()=> doe('/gezin/keuken/lijst/verwijder', { itemId:id }, true);
+    });
+    $('#bOpruim').style.display = d.lijst.some(x=>x.af) ? 'inline-flex' : 'none';
+  }catch(e){ $('#menu').innerHTML = '<div class="leeg">Kon de keuken niet laden.</div>'; }
+}
+
+async function doe(pad, extra, herlaad){
+  try{ await api(pad, Object.assign({ code:s.code, token:s.token }, extra)); if (herlaad) laad(); }
+  catch(e){ alert(e.message); laad(); }
+}
+
+$('#bDoe').onclick = async ()=>{
+  $('#bFout').textContent='';
+  const wat = $('#bWat').value.trim();
+  if (!wat) return;
+  try{ await api('/gezin/keuken/lijst', { code:s.code, token:s.token, wat }); $('#bWat').value=''; laad(); }
+  catch(e){ $('#bFout').textContent = e.message; }
+};
+$('#bWat').addEventListener('keydown', e=>{ if (e.key==='Enter') $('#bDoe').click(); });
+$('#bOpruim').onclick = ()=> doe('/gezin/keuken/lijst/opruim', {}, true);
+
+laad();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

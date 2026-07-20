@@ -126,7 +126,7 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
       try {
         const res = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 320,
-          system: require('./rahul').RAHUL_LEAD + 'u bent de koppelaar van Rendez-vous, de besloten datingdienst van de Lifestyle Pass. ' +
+          system: require('./rahul').rahulLeadVoor(key) + 'u bent de koppelaar van Rendez-vous, de besloten datingdienst van de Lifestyle Pass. ' +
             'Het lid heeft een match. Stel een smaakvolle jetset-date voor op een locatie die beiden hebben aangegeven of voor openstaan' +
             (locatie ? ' (bij voorkeur ' + locatie + ')' : '') + '. Spreek het lid aan met "u", warm maar ingetogen. ' +
             'Noem GEEN echte hotel- of restaurantnamen als bevestigde optie en beloof NOOIT een reservering: u schetst het idee en zegt dat De Rechterhand het regelt zodra beiden akkoord zijn. Context: ' + ctxTekst,

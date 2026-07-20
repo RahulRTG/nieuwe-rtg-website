@@ -28,7 +28,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
   /* Geeft { text, lang }: met AI antwoordt Rahul direct in de taal van het
      lid; zonder AI proberen we het demo-antwoord te vertalen en anders blijft
      het Nederlands, eerlijk gelabeld met de echte taal van de tekst. */
-  async function generateAiReply(tier, convo, lang) {
+  async function generateAiReply(tier, convo, lang, key) {
     lang = lang || 'nl';
     const history = convo
       .filter(m => m.from === 'member' || m.from === 'butler')
@@ -38,7 +38,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     const last = history.length ? history[history.length - 1].content : '';
     if (anthropic && history.length && history[history.length - 1].role === 'user') {
       try {
-        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 1024, system: aiSystemPrompt(tier, lang), messages: history });
+        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 1024, system: aiSystemPrompt(tier, lang, key), messages: history });
         const reply = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
         if (reply) return { text: reply, lang };
       } catch (e) { console.error('Claude-fout (butler):', e.message); }
@@ -61,7 +61,7 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     md.conversation.push({ from: 'member', text: String(text).slice(0, 1000), lang: lang || 'nl', at: new Date().toISOString(), channel });
     if (user.tier === 'rtg') {
       // Rahul (AI) antwoordt meteen, in de taal van het lid.
-      const reply = await generateAiReply(user.tier, md.conversation, lang);
+      const reply = await generateAiReply(user.tier, md.conversation, lang, 'user-' + user.id);
       md.conversation.push({ from: 'butler', text: reply.text, lang: reply.lang, at: new Date().toISOString(), channel: 'butler' });
       md.needsConcierge = false;
     } else {

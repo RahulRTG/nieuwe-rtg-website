@@ -159,7 +159,7 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify }) => {
       try {
         const res = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 320,
-          system: require('./rahul').RAHUL_LEAD + 'u bent De Rechterhand van dit Lifestyle Pass-lid: hun persoonlijke chef de bureau. ' +
+          system: require('./rahul').rahulLeadVoor(key) + 'u bent De Rechterhand van dit Lifestyle Pass-lid: hun persoonlijke chef de bureau. ' +
             'Spreek het lid consequent aan met "u". Voorkomend, discreet en to the point. U regelt en noteert, maar u belooft NOOIT een boeking, ' +
             'tafel, toegang of levertijd die u niet zeker kunt waarmaken: u noteert het verzoek en zegt dat een van onze mensen het persoonlijk oppakt. ' +
             'U verzint geen namen van partners of prijzen. Context (prive): ' + samenvatting,

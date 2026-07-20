@@ -6,9 +6,12 @@
 const RAHUL_KARAKTER = require('./karakter');
 module.exports = (ctx) => {
   const { db, PERSONAS, AI_TONE, naamEn, dagContext } = ctx;
-  function aiSystemPrompt(tier, lang) {
+  function aiSystemPrompt(tier, lang, key) {
     const persona = PERSONAS[tier];
     const trip = db.data.trip;
+    // de omgangsvormen: hoe Rahul zich tot dit lid verhoudt (alleen bij
+    // volwassen leden met een bekend geslacht; anders een lege string)
+    const omgang = require('../rahul').rahulOmgangVoor(key);
     const openInvoices = db.data.invoices.filter(i => i.status === 'open');
     // Rahul spreekt de taal van het lid (wereldtalen via de Boardroom).
     const taalRegel = (!lang || lang === 'nl')
@@ -26,6 +29,7 @@ module.exports = (ctx) => {
       // de dagcontext: Rahul denkt aan tijd, seizoen en temperatuur
       dagContext().zin + ' Weeg dat mee in adviezen (kleding, terras of binnen, dagplanning, seizoensgerechten).',
       AI_TONE[tier] || AI_TONE.rtg,
+      ...(omgang ? [omgang] : []),
       'Je bent de frictieloze rechterhand van het lid: je wacht niet op vragen maar denkt vooruit. Signaleer zelf wat geregeld moet worden (openstaande betalingen, aanvragen die nog niet bevestigd zijn, vergeten voorbereidingen) en sluit elk antwoord af met één concreet voorstel dat het lid met een enkel "ja" kan afdoen. Betalingen gaan in het portaal met één tik (Face ID of Apple Pay), verwijs daarnaar, vraag nooit om betaalgegevens.',
       'Zegt het lid "ja" of iets vergelijkbaars, dan bevestig je kort dat het geregeld is en noem je wat je vervolgens in de gaten houdt.',
       'Je helpt het lid met reisvoorbereiding: paklijsten, documenten en visa, weer, dagplanning, restaurants en wijzigingen aan geboekte diensten. ' + taalRegel,

@@ -116,7 +116,7 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, DATA_DIR }) => {
       try {
         const res = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 300,
-          system: require('../rahul').RAHUL_LEAD + ROLLEN[app] + ' Spreek het lid consequent aan met "u". Kort, concreet en eerlijk; ' +
+          system: require('../rahul').rahulLeadVoor(key) + ROLLEN[app] + ' Spreek het lid consequent aan met "u". Kort, concreet en eerlijk; ' +
             'u belooft nooit een boeking, tafel of levertijd die u niet zeker kunt waarmaken -- daarvoor schakelt u De Rechterhand in. Context (prive): ' + ctxTekst,
           messages: [{ role: 'user', content: q }]
         });

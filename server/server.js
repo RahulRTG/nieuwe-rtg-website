@@ -2292,6 +2292,23 @@ Object.assign(kern, require('./kern/balans').maakBalans({
    blijft in de code en wordt door de drift-tests bewaakt). */
 require('./kern/rahul').zetRahulBron(() => db.data.rahulProfiel || null);
 
+/* De omgangsvormen van Rahul (kern/rahul.js, rahulLeadVoor): het geslacht van
+   het lid komt uit het eigen profiel (v/m/x). Alleen bij volwassen leden;
+   minderjarig of onbekend geeft null en dan blijft Rahul neutraal. */
+require('./kern/rahul').zetGeslachtBron((key) => {
+  const m = /^user-(\d+)$/.exec(String(key || ''));
+  if (!m) return null;
+  let md = null;
+  try { md = accounts.getMemberState(Number(m[1])); } catch (e) { return null; }
+  if (!md || !md.geboren) return null;
+  const g = new Date(md.geboren), nu2 = new Date();
+  let lft = nu2.getFullYear() - g.getFullYear();
+  if (nu2 < new Date(nu2.getFullYear(), g.getMonth(), g.getDate())) lft -= 1;
+  if (!(lft >= 18)) return null;
+  const gs = String(md.geslacht || '').toLowerCase();
+  return (gs === 'v' || gs === 'm') ? gs : null;
+});
+
 /* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
    Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
    hercompressie) en staan als bestanden in de datamap, nooit in git. */

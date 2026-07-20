@@ -7,7 +7,7 @@
    vaste, uitlegbare tip (demo). Gedeelde context vanuit kern/spellen.js. */
 module.exports = (ctx) => {
   const { S, SOORTEN, codenaamVan, anthropic } = ctx;
-  const RAHUL_LEAD = require('../rahul').RAHUL_LEAD;
+  const { rahulLeadVoor } = require('../rahul');
 
   /* Per spel een korte uitleg + een paar eerlijke tips. Bewust regel-gebaseerd:
      werkt altijd, ook zonder AI-sleutel, en de tips kloppen gewoon. */
@@ -52,7 +52,7 @@ module.exports = (ctx) => {
           ' Stand: ' + stand + ' Antwoord in het ' + (p.taal === 'en' ? 'Engels' : 'Nederlands') + '.';
         const res = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 260,
-          system: RAHUL_LEAD + 'je bent het spelmaatje: je kijkt met een lid mee tijdens een potje ' + (SOORTEN[p.soort] || p.soort) +
+          system: rahulLeadVoor(mij) + 'je bent het spelmaatje: je kijkt met een lid mee tijdens een potje ' + (SOORTEN[p.soort] || p.soort) +
             '. Geef een korte hint, leg een regel uit, of moedig aan. Blijf eerlijk (verzin nooit een concrete winnende zet die je niet zeker weet), warm en kort. ' +
             'Je speelt niet vals en verklapt nooit iemands verborgen kaarten of stukken -- die ken je ook niet. Context: ' + context,
           messages: [{ role: 'user', content: q }]

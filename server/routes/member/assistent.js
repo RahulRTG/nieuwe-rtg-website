@@ -27,7 +27,7 @@ module.exports = (kern) => {
         const response = await anthropic.messages.create({
           model: 'claude-opus-4-8',
           max_tokens: 1024,
-          system: aiSystemPrompt(req.session.tier),
+          system: aiSystemPrompt(req.session.tier, null, req.session.key),
           messages: history
         });
         const reply = response.content

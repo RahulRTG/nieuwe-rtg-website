@@ -50,3 +50,12 @@ query-filters:
   # bescherming zit in de code, niet in deze query.
   - exclude:
       id: js/prototype-polluting-assignment
+  # Rate limiting is WEL aanwezig, maar in een eigen middleware die CodeQL niet
+  # als zodanig herkent. Deze query kent alleen een handvol bibliotheken
+  # (express-rate-limit, express-brute, express-limiter); onze eigen limiter
+  # (server/rem.js) valt daarbuiten. In productie zit ELKE /api/-route achter de
+  # brede rem in server.js (300/min per IP), en de twee schijf-rakende Theater-
+  # routes (kijk/upload) hebben daarbovenop een strakkere eigen rem. De
+  # bescherming zit dus in de code; de query ziet alleen de bibliotheeknaam niet.
+  - exclude:
+      id: js/missing-rate-limiting

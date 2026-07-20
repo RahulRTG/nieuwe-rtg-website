@@ -481,7 +481,7 @@
       <button class="terug" id="iTerug">← alle kamers</button>
       <h1>💡 De Ideeënkamer</h1>
     </div>
-    <p class="deck">De gedeelde werkbank van de vier ontwerpbureaus. Bedenk samen een idee, kies welke ateliers meedoen, laat de AI het uitwerken tot een brief per bureau, en zet het met een klik als concept in het gekozen atelier.</p>
+    <p class="deck">De gedeelde werkbank van de ontwerpbureaus en de Redactie. Bedenk samen een idee, kies welke ateliers meedoen, laat de AI het uitwerken tot een brief per bureau, en zet het met een klik als concept in het gekozen atelier -- of als verhaal op de schrijftafel van de Redactie.</p>
     <h3 class="sec">Nieuw idee</h3>
     <div class="kaart">
       <input class="veld" id="iTitel" style="width:100%;" placeholder="Titel, bijv. Reislijn Meridiaan" maxlength="100">
@@ -594,12 +594,13 @@ async function laadKamers(){
   const board = '<button class="kaart kamer board" data-kamer="boardroom"><span class="ic">🏛️</span><h2>De Boardroom</h2><p>Alles zien, alles schakelen, elke dag een verbeterronde.</p><span class="kpi">Het hele platform →</span></button>' +
     '<button class="kaart kamer board" data-kamer="bank"><span class="ic">🏦</span><h2>RTG Bank</h2><p>De eigen bank op het Pay-grootboek. Eén knop van de kaart-rails naar de eigen bank.</p><span class="kpi">De geldinfrastructuur →</span></button>' +
     '<button class="kaart kamer board" data-kamer="stad"><span class="ic">🏙️</span><h2>RTG Stad</h2><p>De hele stad slimmer op eigen hardware en software: Stadsdozen meten, één knop zet de stand.</p><span class="kpi">De stadsinfrastructuur →</span></button>' +
+    '<button class="kaart kamer board" data-kamer="redactie"><span class="ic">📰</span><h2>RTG Redactie</h2><p>Krant, magazine en drukkerij in eigen huis; de nieuwstips komen uit het hele platform.</p><span class="kpi">Naar het perskantoor →</span></button>' +
     '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">🚨</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+k.emoji+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : openKamer(b.dataset.kamer)));
 }
 
 /* ---------- een kamer ---------- */

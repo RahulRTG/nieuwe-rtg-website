@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Redactie (kantoor)</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;}
+  header a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:.35rem .7rem;}
+  main{padding:1.1rem;max-width:880px;margin:0 auto;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.6rem;margin-bottom:1rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;}
+  .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;display:block;}
+  .kpi span{font-size:.7rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  section.paneel{display:none;} section.paneel.aan{display:block;}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.02rem;}
+  .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
+  .veld,select.veld,textarea.veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
+  textarea.veld{width:100%;min-height:4rem;resize:vertical;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.42rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
+  .status{display:inline-block;font-size:.7rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
+  .status.gepubliceerd,.status.gedrukt{border-color:var(--green);color:var(--green);}
+  .status.eindredactie,.status.ter-perse{border-color:var(--gold);color:var(--gold);}
+  .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  .uit{font-size:.85rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .inlog{max-width:360px;margin:3rem auto;text-align:center;display:flex;flex-direction:column;gap:.6rem;}
+  .inlog input{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:.6rem .8rem;}
+  .tip{border-left:3px solid var(--gold);}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="ey">Krant · magazine · drukkerij</div><h1>RTG Redactie</h1></div>
+  <a href="/apps/nieuws.html">De Nieuws-app →</a>
+</header>
+<main id="main"><div class="leeg">Laden…</div></main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_office_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
+const api=(pad,body)=>fetch('/api/office/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
+function inlog(){
+  $('#main').innerHTML='<div class="inlog"><h2>Redactie-inlog</h2><input id="code" placeholder="Backoffice-code" autocomplete="off"><button class="knop" id="in">Inloggen</button></div>';
+  $('#in').onclick=async()=>{ const code=$('#code').value.trim(); if(!code)return;
+    try{ const r=await fetch('/api/office/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})}).then(x=>x.json());
+      if(!r.token) throw new Error(r.error||'Onjuiste code.'); TOKEN=r.token; try{ localStorage.setItem('rtg_office_token',TOKEN);}catch(e){} laad();
+    }catch(e){ meld(e.message); } };
+  $('#code').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#in').click(); });
+}
+let TAB='schrijf', D=null;
+async function laad(){
+  try{ D=await api('redactie'); }catch(e){ if(e.status===401){ TOKEN=null; return inlog(); } $('#main').innerHTML='<div class="leeg">Kon de redactie niet laden.</div>'; return; }
+  const ps=D.perStatus||{};
+  let h='<div class="kpis">'
+    +'<div class="kpi"><b>'+(ps.concept||0)+'</b><span>Concepten</span></div>'
+    +'<div class="kpi"><b>'+(ps.eindredactie||0)+'</b><span>Eindredactie</span></div>'
+    +'<div class="kpi"><b>'+(ps.gepubliceerd||0)+'</b><span>Gepubliceerd</span></div>'
+    +'<div class="kpi"><b>'+D.edities.length+'</b><span>Edities</span></div>'
+    +'<div class="kpi"><b>'+D.edities.filter(e=>e.status==='gedrukt').length+'</b><span>Gedrukt</span></div></div>';
+  h+='<div class="tabs">'+[['schrijf','✍️ Schrijftafel'],['druk','🖨️ Drukkerij'],['tips','💡 Nieuwstips']].map(([t,n])=>'<button class="tab'+(TAB===t?' aan':'')+'" data-t="'+t+'">'+n+'</button>').join('')+'</div>';
+  h+='<section class="paneel'+(TAB==='schrijf'?' aan':'')+'" id="p-schrijf"></section><section class="paneel'+(TAB==='druk'?' aan':'')+'" id="p-druk"></section><section class="paneel'+(TAB==='tips'?' aan':'')+'" id="p-tips"></section>';
+  $('#main').innerHTML=h;
+  document.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{ TAB=b.dataset.t; laad(); });
+  if(TAB==='schrijf') schrijftafel();
+  if(TAB==='druk') drukkerij();
+  if(TAB==='tips') tips();
+}
+function schrijftafel(){
+  const rub=D.rubrieken.map(r=>'<option>'+r+'</option>').join('');
+  let h='<div class="item"><h3>Nieuw stuk</h3><div class="rij"><input class="veld" id="nOnd" style="flex:1;min-width:12rem;" placeholder="Onderwerp of kop"><select class="veld" id="nRub">'+rub+'</select></div>'
+    +'<div class="rij"><button class="knop" id="nAi">🤖 Laat de AI-hoofdredacteur een concept schrijven</button><button class="knop stil" id="nLeeg">Leeg stuk</button></div><div class="uit" id="nUit" hidden></div></div>';
+  h+= D.artikelen.length ? D.artikelen.map(a=>{
+    const acties='<div class="rij">'
+      +(a.status==='concept'?'<button class="knop stil" data-st="eindredactie" data-id="'+a.id+'">→ eindredactie</button>':'')
+      +(a.status==='eindredactie'?'<button class="knop" data-st="gepubliceerd" data-id="'+a.id+'">Publiceren (uw besluit)</button><button class="knop stil" data-st="concept" data-id="'+a.id+'">← terug</button>':'')
+      +(a.status!=='gepubliceerd'?'<button class="knop stil" data-red="'+a.id+'">🧐 eindredacteur</button><button class="knop rood" data-weg="'+a.id+'">×</button>':'')
+      +'</div>';
+    return '<div class="item"><h4>'+esc(a.kop)+' <span class="status '+esc(a.status)+'">'+esc(a.status)+'</span></h4><div class="meta">['+esc(a.rubriek)+'] door '+esc(a.auteur)+(a.intro?' · '+esc(a.intro):'')+'</div>'+acties+'<div class="uit" id="red-'+a.id+'" hidden></div></div>';
+  }).join('') : '<div class="leeg">Nog geen artikelen.</div>';
+  $('#p-schrijf').innerHTML=h;
+  $('#nAi').onclick=async()=>{ const o=$('#nOnd').value.trim(); if(!o) return meld('Waarover?');
+    $('#nUit').hidden=false; $('#nUit').textContent='De hoofdredacteur schrijft…';
+    try{ const r=await api('redactie/ai/schrijf',{onderwerp:o,rubriek:$('#nRub').value});
+      await api('redactie/artikel/maak',{kop:r.kop,intro:r.intro,tekst:r.tekst,rubriek:$('#nRub').value,auteur:'AI-concept'});
+      meld('Concept op de schrijftafel gezet.'); laad();
+    }catch(e){ $('#nUit').textContent=e.message; } };
+  $('#nLeeg').onclick=async()=>{ const o=$('#nOnd').value.trim(); if(!o) return meld('Geef het stuk een kop.');
+    try{ await api('redactie/artikel/maak',{kop:o,rubriek:$('#nRub').value}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('[data-st]').forEach(b=> b.onclick=async()=>{ try{ await api('redactie/artikel/status',{id:b.dataset.id,status:b.dataset.st}); meld(b.dataset.st==='gepubliceerd'?'Gepubliceerd; het staat nu in de Nieuws-app.':'Status bijgewerkt.'); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-red]').forEach(b=> b.onclick=async()=>{ const box=$('#red-'+b.dataset.red); box.hidden=false; box.textContent='De eindredacteur leest…';
+    try{ const r=await api('redactie/ai/redactie',{id:b.dataset.red}); box.textContent=r.redactie; }catch(e){ box.textContent=e.message; } });
+  document.querySelectorAll('[data-weg]').forEach(b=> b.onclick=async()=>{ if(!confirm('Dit stuk verwijderen?'))return; try{ await api('redactie/artikel/verwijder',{id:b.dataset.weg}); laad(); }catch(e){ meld(e.message); } });
+}
+function drukkerij(){
+  const gepub=D.artikelen.filter(a=>a.status==='gepubliceerd');
+  let h='<div class="item"><h3>Nieuwe editie</h3><div class="rij"><input class="veld" id="eT" style="flex:1;min-width:10rem;" placeholder="Titel van de editie"><select class="veld" id="eS"><option value="krant">krant</option><option value="magazine">magazine</option></select><input class="veld" id="eO" type="number" placeholder="oplage" value="1000" style="width:7rem;"></div>'
+    +'<div class="meta" style="margin-top:.4rem;">Kies de gepubliceerde stukken:</div><div class="rij">'+(gepub.length?gepub.map(a=>'<label style="font-size:.8rem;color:var(--muted);display:flex;gap:.3rem;align-items:center;"><input type="checkbox" class="kies" value="'+a.id+'"> '+esc(a.kop)+'</label>').join(''):'<span class="leeg">Publiceer eerst een stuk op de schrijftafel.</span>')+'</div>'
+    +'<div class="rij"><button class="knop" id="eMaak">Editie samenstellen</button></div></div>';
+  h+= D.edities.length ? D.edities.map(e=>{
+    const acties='<div class="rij">'
+      +(e.status==='samenstellen'?'<button class="knop stil" data-est="ter-perse" data-id="'+e.id+'">→ ter perse</button>':'')
+      +(e.status==='ter-perse'?'<button class="knop" data-est="gedrukt" data-id="'+e.id+'">Gedrukt ✓</button>':'')
+      +'<button class="knop stil" data-proef="'+e.id+'">📄 drukproef</button></div>';
+    return '<div class="item"><h4>'+(e.soort==='magazine'?'📖':'🗞️')+' '+esc(e.titel)+' <span class="status '+esc(e.status)+'">'+esc(e.status)+'</span></h4><div class="meta">'+esc(e.soort)+' · '+e.datum+' · '+e.artikelIds.length+' stukken · oplage '+e.oplage+'</div>'+acties+'<div class="uit" id="proef-'+e.id+'" hidden></div></div>';
+  }).join('') : '<div class="leeg">Nog geen edities.</div>';
+  $('#p-druk').innerHTML=h;
+  $('#eMaak').onclick=async()=>{ const titel=$('#eT').value.trim(); if(!titel) return meld('Titel?');
+    const ids=[...document.querySelectorAll('.kies:checked')].map(x=>x.value);
+    try{ await api('redactie/editie/maak',{titel,soort:$('#eS').value,oplage:$('#eO').value,artikelIds:ids}); laad(); }catch(e){ meld(e.message); } };
+  document.querySelectorAll('[data-est]').forEach(b=> b.onclick=async()=>{ try{ await api('redactie/editie/status',{id:b.dataset.id,status:b.dataset.est}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-proef]').forEach(b=> b.onclick=async()=>{ const box=$('#proef-'+b.dataset.proef); box.hidden=!box.hidden; if(!box.hidden&&!box.textContent){ try{ const r=await api('redactie/drukproef',{id:b.dataset.proef}); box.textContent=r.blad; }catch(e){ box.textContent=e.message; } } });
+}
+async function tips(){
+  $('#p-tips').innerHTML='<div class="leeg">De nieuwstips-wand laadt…</div>';
+  try{ const r=await api('redactie/nieuwstips');
+    $('#p-tips').innerHTML='<div class="meta" style="margin-bottom:.6rem;color:var(--muted);">Verhaal-ideeen uit het hele platform: wat leeft er bij de leden (Pulse), wat kondigt het Rijk aan, en wat hebben de ontwerpbureaus uitgewerkt (de Ideeenkamer).</div>'
+      +(r.tips.length?r.tips.map(t=>'<div class="item tip"><h4>'+esc(t.icoon)+' '+esc(t.bron)+'</h4><div class="meta">'+esc(t.tip)+'</div></div>').join(''):'<div class="leeg">Nog geen tips; het platform is stil.</div>');
+  }catch(e){ $('#p-tips').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+TOKEN?laad():inlog();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

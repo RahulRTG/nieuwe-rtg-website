@@ -1,5 +1,5 @@
-/* De Ideeenkamer: de gedeelde werkbank van de vier RTG-ontwerpbureaus (Atelier,
-   Ontwerpstudio, Hardwarelab en Architectenbureau). Hier bedenken de ateliers
+/* De Ideeenkamer: de gedeelde werkbank van de RTG-bureaus (Atelier,
+   Ontwerpstudio, Hardwarelab, Architectenbureau en de Redactie). Hier bedenken de ateliers
    samen ideeen: een idee krijgt tags voor de betrokken bureaus, iedereen kan
    reageren, de AI werkt het idee uit tot een korte brief per bureau, en met
    een klik gaat het als concept naar het gekozen bureau (spin-off).
@@ -11,7 +11,8 @@ const BUREAUS = {
   atelier:   { label: 'RTG Atelier', icon: '✂️', wat: 'mode en alles wat je draagt' },
   studio:    { label: 'RTG Ontwerpstudio', icon: '🏎️', wat: 'voertuigen en vaartuigen' },
   hardware:  { label: 'RTG Hardwarelab', icon: '🔧', wat: 'apparaten en wearables' },
-  architect: { label: 'RTG Architectenbureau', icon: '🏛️', wat: 'gebouwen en huizen' }
+  architect: { label: 'RTG Architectenbureau', icon: '🏛️', wat: 'gebouwen en huizen' },
+  redactie:  { label: 'RTG Redactie', icon: '📰', wat: 'verhalen, de krant en het magazine' }
 };
 const BUREAU_IDS = Object.keys(BUREAUS);
 const STATUS = ['nieuw', 'in-uitwerking', 'uitgewerkt', 'geparkeerd'];

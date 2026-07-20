@@ -61,6 +61,8 @@ module.exports = (kern) => {
   require('./member/berichten')(kern);
   // De wauw-laag: stemming, verjaardagsglans en De Terugblik
   require('./member/wauw')(kern);
+  // RTG Nieuws: het gepubliceerde werk van RTG Redactie, met Rahul als nieuwslezer
+  require('./member/nieuws')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
   // De persoonlijke AI en de Butler/concierge-chat.

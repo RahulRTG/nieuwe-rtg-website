@@ -2033,8 +2033,12 @@ Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));
 /* De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier
    ontwerpbureaus; een idee kan als concept naar elk bureau (spin-off), dus de
    bureaus gaan als referenties mee. */
+/* RTG Redactie (kern/redactie.js): het persbureau -- krant, magazine en
+   drukkerij, met de AI-hoofdredacteur en de nieuwstips uit het hele platform.
+   Doet als volwaardig bureau mee in de Ideeenkamer hieronder. */
+Object.assign(kern, require('./kern/redactie').maakRedactie({ db, save, crypto, anthropic, schoon }));
 Object.assign(kern, require('./kern/ideeen').maakIdeeen({ db, save, crypto, anthropic, schoon,
-  bureaus: { atelier: kern.atelier, studio: kern.studio, hardware: kern.hardware, architect: kern.architect } }));
+  bureaus: { atelier: kern.atelier, studio: kern.studio, hardware: kern.hardware, architect: kern.architect, redactie: kern.redactie } }));
 /* De hulpdiensten (kern/hulpdienst.js): zes korpsen met een meldkamer,
    eenheden over land, water en door de lucht, bijstand tussen korpsen en
    de zorgketen ambulance -> ziekenhuis -> huisarts. */

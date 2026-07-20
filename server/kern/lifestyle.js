@@ -6,7 +6,7 @@
    briefing van Rahul in de u-vorm. Rahul belooft nooit een boeking of toegang die
    hij niet zeker kan waarmaken; hij noteert en verwijst eerlijk naar een mens.
    Gedeelde context (db, save, anthropic, liveCodename) vanuit server.js. */
-module.exports = ({ db, save, crypto, anthropic, liveCodename }) => {
+module.exports = ({ db, save, crypto, anthropic, liveCodename, notify }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
@@ -173,8 +173,44 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename }) => {
       antwoord: 'Tot uw dienst. ' + samenvatting + ' Zeg mij waarmee ik u kan helpen, dan noteer ik het en pakt een van onze mensen het persoonlijk op. Een boeking bevestig ik pas als die rond is.' };
   }
 
+  /* ================= De concierge-kant (RTG-kantoor) =================
+     Een echte concierge in het kantoor pakt de verzoeken op en loopt de
+     statusketen door. Elke stap zet een update in het verzoek van het lid en
+     stuurt het lid een melding -- zo bevestigt een MENS de boeking, nooit de AI. */
+  const CONCIERGE_STATUS = ['in behandeling', 'bevestigd', 'afgerond', 'afgewezen'];
+  const OPEN = s => !['afgerond', 'afgewezen', 'ingetrokken'].includes(s);
+  const STAP_NOTITIE = {
+    'in behandeling': 'Wij zijn ermee aan de slag.',
+    bevestigd: 'Het is voor u geregeld en bevestigd.',
+    afgerond: 'Afgerond. Wij wensen u een fijne ervaring.',
+    afgewezen: 'Helaas is dit niet gelukt; wij nemen persoonlijk contact met u op.'
+  };
+  function conciergeDesk() {
+    const uit = [];
+    for (const [key, l] of Object.entries(db.data.lifestyle || {})) {
+      for (const v of (l.verzoeken || [])) if (OPEN(v.status))
+        uit.push({ key, codenaam: liveCodename ? liveCodename(key) : '', id: v.id, titel: v.titel, details: v.details,
+          categorie: v.categorie, status: v.status, at: v.at, laatste: (v.updates[v.updates.length - 1] || {}).notitie || '',
+          voorkeuren: l.voorkeuren || {} });
+    }
+    uit.sort((a, b) => String(a.at).localeCompare(String(b.at)));
+    return { status: 200, verzoeken: uit, statussen: CONCIERGE_STATUS };
+  }
+  function conciergeVoortgang(key, id, status, notitie) {
+    const l = db.data.lifestyle && db.data.lifestyle[key];
+    const v = l && (l.verzoeken || []).find(x => x.id === id);
+    if (!v) return { status: 404, error: 'Dit verzoek is er niet meer.' };
+    if (!CONCIERGE_STATUS.includes(status)) return { status: 400, error: 'Onbekende status.' };
+    v.status = status;
+    v.updates.push({ status, op: nu(), notitie: schoon(notitie, 300) || STAP_NOTITIE[status] });
+    if (notify) { try { notify(key, { title: 'De Rechterhand', body: 'Uw verzoek "' + v.titel + '" is nu: ' + status + '.', scope: 'lifestyle' }); } catch (e) {} }
+    save();
+    return { status: 200, ok: true };
+  }
+
   return {
     lifestyleOverzicht: overzicht, lifestyleAI,
+    conciergeDesk, conciergeVoortgang,
     conciergeVraag, conciergeIntrek, conciergeVerzoeken: (key) => ({ status: 200, verzoeken: L(key).verzoeken, categorieen: CATEGORIEEN }),
     lifestyleVoorkeuren: (key) => ({ status: 200, voorkeuren: L(key).voorkeuren }), lifestyleVoorkeurenZet: voorkeurenZet,
     bezitZet, bezitWeg, bezittingen, BEZIT_SOORTEN: SOORTEN,

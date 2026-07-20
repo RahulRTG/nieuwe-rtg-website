@@ -20,6 +20,8 @@ const raw = (pad, body, token) => fetch(BASE + '/api' + pad, {
 });
 const json = r => r.json();
 const ls = (pad, body, token) => raw('/member/lifestyle/' + pad, body, token);
+const oc = (pad, body, token) => raw('/office/' + pad, body, token);
+const officeTok = async () => (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -101,6 +103,32 @@ test('het overzicht en Rahul spreken u aan (u-vorm), zonder een boeking te belov
   const r = await json(await ls('ai', { vraag: 'Kunt u een tafel bij een restaurant regelen?' }, tok));
   assert.ok(r.antwoord && r.antwoord.length > 10);
   assert.match(r.antwoord, /\bu\b|uw/i, 'Rahul spreekt het lid aan met u');
+});
+
+test('de concierge-kant: het kantoor ziet open verzoeken en loopt de statusketen door', async () => {
+  const tok = await lidMet('lifestyle');
+  const v = await json(await ls('concierge/vraag', { titel: 'Tafel bij een sterrenzaak', categorie: 'restaurant' }, tok));
+  const otok = await officeTok();
+  let desk = await json(await oc('concierge', {}, otok));
+  const item = desk.verzoeken.find(x => x.id === v.verzoek.id);
+  assert.ok(item && item.key, 'het verzoek staat met ledensleutel op het concierge-bureau');
+  // in behandeling nemen, dan bevestigen (een MENS bevestigt de boeking)
+  assert.equal((await oc('concierge/voortgang', { key: item.key, id: v.verzoek.id, status: 'in behandeling' }, otok)).status, 200);
+  assert.equal((await oc('concierge/voortgang', { key: item.key, id: v.verzoek.id, status: 'bevestigd', notitie: 'Tafel om 20:00 op uw naam.' }, otok)).status, 200);
+  // het lid ziet de nieuwe status en de notitie in zijn verzoek
+  const mijn = (await json(await ls('concierge', {}, tok))).verzoeken.find(x => x.id === v.verzoek.id);
+  assert.equal(mijn.status, 'bevestigd');
+  assert.ok(mijn.updates.some(u => /20:00/.test(u.notitie)));
+  // afronden haalt het verzoek van het bureau af
+  await oc('concierge/voortgang', { key: item.key, id: v.verzoek.id, status: 'afgerond' }, otok);
+  desk = await json(await oc('concierge', {}, otok));
+  assert.ok(!desk.verzoeken.some(x => x.id === v.verzoek.id), 'afgerond verzoek is van het bureau af');
+  // een onbekende status wordt geweigerd
+  assert.equal((await oc('concierge/voortgang', { key: item.key, id: v.verzoek.id, status: 'onzin' }, otok)).status, 400);
+});
+
+test('de concierge-kant is dicht zonder office-sessie', async () => {
+  assert.equal((await raw('/office/concierge', {})).status, 401);
 });
 
 test('De Rechterhand is gated: een gewoon RTG-lid komt er niet in, Business wel', async () => {

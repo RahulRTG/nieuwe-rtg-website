@@ -4,7 +4,7 @@
    de foutgeisoleerde router, de foundation-datawortel F() en de kleine helpers.
    Alles staat onder db.data.foundation, zodat het meelift op het atomische
    wegschrijven en de dagelijkse back-up van de hoofdserver. */
-const express = require('express');
+const express = require('../web');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');

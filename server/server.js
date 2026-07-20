@@ -27,7 +27,7 @@ if (!process.env.UV_THREADPOOL_SIZE) {
   process.env.UV_THREADPOOL_SIZE = String(Math.max(4, kernen));
 }
 
-const express = require('express');
+const express = require('./web');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');

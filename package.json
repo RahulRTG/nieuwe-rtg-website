@@ -25,9 +25,6 @@
     "e2e": "node --experimental-sqlite --test test/*.e2e.js",
     "icons": "node scripts/icons.js"
   },
-  "dependencies": {
-    "express": "^4.21.0"
-  },
   "optionalDependencies": {
     "@sentry/node": "^10.66.0",
     "pg": "^8.22.0",

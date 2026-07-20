@@ -15,7 +15,7 @@
    Starten:  RTG_HOOFD_URL=https://rahultravelgroup.example node server/nood.js
    Poort:    RTG_NOOD_POORT (standaard 3100)                              */
 
-const express = require('express');
+const express = require('./web');
 const http = require('http');
 const https = require('https');
 const path = require('path');

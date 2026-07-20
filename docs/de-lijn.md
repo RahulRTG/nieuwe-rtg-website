@@ -116,6 +116,20 @@ gemak brengt. In deze code betekent dat:
   Geborgd met een test tegen een nep-SMTP-server (`test/smtp.test.js`, incl. STARTTLS
   + AUTH LOGIN/PLAIN); tijdens de bouw naast nodemailer gelegd (zelfde commando-reeks).
   Zelfde vorm (`createTransport(url).sendMail(...)`), dus `server/mail.js` merkt er niets van.
+- **Het web-framework** (`server/web.js`): de HTTP-routering en middleware die
+  `express` verving -- de laatste verplichte runtime-dependency. Puur op `node:http`:
+  router met `:params` en RegExp-paden, middleware-ketens met `next(err)` en fout-
+  afhandelaars, het mounten van sub-routers (met het strippen van het mount-pad),
+  body-parsers (`web.json`/`web.raw` met limiet en type-match) en statische bestanden
+  (`web.static`) inclusief Range voor de video's, voorwaardelijke GET/304 en
+  bescherming tegen pad-traversal. Zelfde vorm en veldnamen als express
+  (`app.get/post/use`, `req.body/params/query`, `res.status().json()`), plus een
+  express-compatibele `app._router.stack` zodat de AI-routekaart (`kern/stuur.js`)
+  ongewijzigd blijft -- dus server.js, de ~1100 routes, de foundation-router en de
+  noodserver merken er niets van. Geborgd op twee niveaus: de hele testsuite draait
+  het echte systeem eroverheen (1023 tests, incl. auth, SSE en de webhooks), en een
+  eigen test toetst het framework los (`test/web.test.js`). Zie de nuance hieronder:
+  dit was een bewuste keuze om de eerder getrokken lijn te verschuiven, niet regel 1.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.
@@ -148,16 +162,21 @@ regel 1 breken (eigen crypto is verboden) en zou ons bovendien tot een
 vergunningplichtige crypto-dienstverlener (CASP) maken. Door meteen naar euro om
 te zetten blijven we een handelaar die munten accepteert, geen wisselkantoor.
 
-**3. Het ene runtime-fundament.** Bewust klein gehouden -- er is er nog maar één
-verplicht over:
+**3. De runtime-fundamenten.** Deze categorie is inmiddels leeg: er is **geen
+enkel verplicht runtime-pakket** meer. `express` was de laatste, en die is nu
+`server/web.js` (zie hierboven). `package.json` heeft dus `dependencies: {}`.
 
-| Pakket | Waarom niet zelf |
-|---|---|
-| `express` | HTTP-routing, jaren dichtgetimmerd tegen randgevallen die je niet in een middag reproduceert. |
-
-(SMTP deden we hierboven wél zelf: `nodemailer` is eruit. De keuze om `express`
-te houden is er een van kosten/baten -- de routing- en middleware-randgevallen
-zijn talrijk en de dependency-boom is nu al klein -- niet van regel 1.)
+Een eerlijke kanttekening, want dit dócument beschreef `express` eerder juist als
+een bewust behouden fundament ("jaren dichtgetimmerd tegen randgevallen"). Het
+vervangen ervan is een bewuste keuze geweest om de lijn te verschuiven, op verzoek
+van de eigenaar en in dezelfde geest als de andere zelfbouw: **niet** omdat routing
+onder regel 1 valt (dat doet het niet -- het is geen cryptografie en lekt geen geld
+of identiteit), maar omdat de gebruikte deelverzameling klein en te overzien is, en
+de volledige testsuite het echte systeem eroverheen draait als vangnet. De
+randgevallen die express wél afdekte en wij niet gebruiken (view-engines, cookies,
+content-negotiation) staan bewust niet in `web.js`. Zou er ooit een web-randgeval
+opduiken dat dit framework mist, dan is de eerlijke stap terug: `express` er weer
+achter zetten -- de vorm is identiek, dus dat kan zonder de rest te raken.
 
 En vier **optionele** pakketten die alleen laden als je ze configureert —
 zonder deze draait alles gewoon door in demo/lokaal:

@@ -60,4 +60,5 @@ module.exports = (kern) => {
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet };
   require('./bureaus')(ctx);
   require('./regie')(ctx);
+  require('./bank')(ctx);
 };

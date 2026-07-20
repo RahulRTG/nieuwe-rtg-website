@@ -2087,6 +2087,17 @@ Object.assign(kern, require('./kern/care')({ db, save, crypto, schoon, notify, z
    belofte uit de voorwaarden blijft intact). Voor lidacties gemount, want
    de betaal-seams rekenen het voordeel mee. */
 Object.assign(kern, require('./kern/geldregie').maakGeldregie({ db, save }));
+/* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
+   een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
+   RTG Bank clearet: via de externe kaart-naad, als eigen emissie, of allebei.
+   Eerst gemount zodat de bank en de kantoor-routes dezelfde regie delen. */
+const bankregie = require('./kern/bankregie').maakBankregie({ db, save });
+Object.assign(kern, bankregie);
+/* RTG Bank (kern/bank): de eigen bank, gebouwd OP het RTG Pay-grootboek en met
+   dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
+   de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
+   de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
+Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, sseToCustomer }));
 /* Lidacties (kern/lidacties.js): de transactiefuncties van het lid, als
    kern-module met expliciete afhankelijkheden. Ze bedienen de app-routes
    EN vullen de acties-registry van de Butler, volgens het contract
@@ -2272,6 +2283,7 @@ require('./routes/gemeente')(kern);
 require('./routes/overheid')(kern);
 require('./routes/drm')(kern);
 require('./routes/pay')(kern);
+require('./routes/bank')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);
 require('./routes/flits')(kern);

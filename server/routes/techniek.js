@@ -9,6 +9,7 @@ const techniek = require('../techniek');
 const functies = require('../functies');
 const eigenaar = require('../eigenaar');
 const dbmod = require('../db');
+const { log } = require('../log');
 
 module.exports = (kern) => {
   const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal, talen, onboarding,
@@ -69,7 +70,9 @@ module.exports = (kern) => {
       // met hun sluitcontrole op het bord, net als de nood-stand van de knop
       pay: kern.pay, bank: kern.bank, bankRegie: kern.bankregieOverzicht,
       // de stad in de bewaking: de Stadsdoos-vloot hoort erbij
-      stad: kern.stad
+      stad: kern.stad,
+      // onze eigen fout-aggregatie (i.p.v. een externe tracker als Sentry)
+      fouten: () => log.foutenSamenvatting()
     };
   }
 
@@ -113,6 +116,8 @@ module.exports = (kern) => {
       verzoeken: verzoeken.filter(v => v.status === 'wacht')
         .concat(verzoeken.filter(v => v.status !== 'wacht').slice(-8).reverse()),
       beveiliging: beveilig ? beveilig.samenvatting() : { open: 0, kritiek: 0, waarschuwing: 0, recent: [] },
+      // eigen fout-aggregatie: totalen + de recentste storingsgroepen
+      fouten: log.foutenSamenvatting(),
       samenvatting: {
         ok: checks.filter(c => c.status === 'ok').length,
         waarschuwing: checks.filter(c => c.status === 'waarschuwing').length,
@@ -141,6 +146,12 @@ module.exports = (kern) => {
     else return res.status(400).json({ error: 'Actie moet reset of spring zijn.' });
     save();
     res.json({ ok: true, id: req.body.id, aan: z.aan });
+  });
+
+  // De storingslijst (eigen fout-aggregatie) wissen: tellers terug naar nul.
+  app.post('/api/techniek/fouten/wis', techAuth, eigenaarAlleen, (req, res) => {
+    log.foutenReset();
+    res.json({ ok: true });
   });
 
   /* De overige domeinen draaien als submodules op dezelfde gedeelde context

@@ -108,6 +108,20 @@ const CHECKS = [
     }
   },
   {
+    id: 'fouten', naam: 'Storingen (fout-aggregatie)', code: 'ERR-01', categorie: 'Runtime',
+    run: (c) => {
+      const f = c.fouten ? c.fouten() : null;
+      if (!f) return { status: 'ok', detail: 'Geen fout-aggregatie beschikbaar.' };
+      if (!f.totaal) return { status: 'ok', detail: 'Geen storingen sinds de start.' };
+      const nu = Date.now();
+      const recentAantal = (f.recent || []).filter(g => nu - g.laatst < 15 * 60000).reduce((n, g) => n + g.aantal, 0);
+      const status = recentAantal > 20 ? 'fout' : recentAantal > 0 ? 'waarschuwing' : 'ok';
+      const top = (f.recent || [])[0];
+      const kwart = recentAantal ? ` ${recentAantal} in het laatste kwartier.` : '';
+      return { status, detail: `${f.totaal} storing(en) totaal, ${f.distinct} soort(en).${kwart}${top ? ' Laatst: ' + top.bericht : ''}` };
+    }
+  },
+  {
     id: 'backups', naam: 'Back-ups', code: 'BAK-01', categorie: 'Data',
     run: (c) => {
       try {

@@ -75,9 +75,10 @@ const { maakTalen } = require('./talen');
 const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
-/* Optionele fout-tracker (Sentry): alleen actief als SENTRY_DSN is gezet én het
-   pakket is geinstalleerd. Zonder allebei verandert er niets. Zo is productie-
-   monitoring een kwestie van configuratie, niet van codewijziging. */
+/* Fout-aggregatie zit ALTIJD aan in server/log.js (in-memory, zichtbaar op het
+   techniekbord: ERR-01 + de storingslijst). Daarbovenop kan optioneel Sentry
+   als externe tracker: alleen als SENTRY_DSN is gezet én het pakket is
+   geinstalleerd. Zonder allebei blijft de eigen aggregatie gewoon draaien. */
 if (process.env.SENTRY_DSN) {
   try {
     const Sentry = require('@sentry/node');

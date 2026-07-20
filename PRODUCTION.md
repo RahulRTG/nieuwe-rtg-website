@@ -70,7 +70,8 @@ Volledige lijst met uitleg: `.env.example`.
 
 - **Observability** — gestructureerde JSON-logs (`server/log.js`), per verzoek
   een correlatie-id (`X-Request-Id`), duur en status; centrale foutafhandeling
-  met stack; optionele Sentry-koppeling via `SENTRY_DSN`.
+  met stack; een eigen in-memory fout-aggregatie op het techniekbord (ERR-01 +
+  de storingslijst); optionele Sentry-koppeling erbovenop via `SENTRY_DSN`.
 - **Fail-fast configuratie** — `server/config.js` stopt de start bij een
   onveilige productie-instelling.
 - **Opslag** — zowel de gedeelde data als de **accounts** draaien op

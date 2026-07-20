@@ -335,6 +335,25 @@
       .catch(function(e){ toast(e.message); });
   }
   $('#bBevAf').addEventListener('click', bevAfhandelen);
+
+  /* ---------- storingen (eigen fout-aggregatie) ---------- */
+  function foutRij(g){
+    var nu = Date.now();
+    var vers = (nu - g.laatst) < 15*60000; // recent = laatste kwartier -> rood, anders oranje
+    var kop = el('div', null,
+      el('span',{class:'naam'}, g.bericht),
+      g.aantal>1 ? el('span',{class:'code'}, g.aantal+'x') : null);
+    var meta = new Date(g.laatst).toLocaleString('nl-NL') + (g.waar ? ' · ' + g.waar : '');
+    return el('div',{class:'rij'},
+      el('div',{class:'bol '+(vers?'fout':'waarschuwing')}),
+      el('div',{class:'mid'}, kop, el('div',{class:'detail'}, meta)));
+  }
+  $('#bFoutenWis').addEventListener('click', function(){
+    if (!confirm('De storingslijst wissen? De tellers beginnen weer bij nul.')) return;
+    api('/api/techniek/fouten/wis', { method:'POST', body:{} })
+      .then(function(){ toast('Storingslijst gewist.'); laad(); })
+      .catch(function(e){ toast(e.message); });
+  });
   var noodremAan = true;
   $('#bBevAuto').addEventListener('click', function(){
     if (noodremAan && !confirm('De automatische noodrem uitzetten? Bij een brute-force-aanval springen de zekeringen dan NIET meer vanzelf.')) return;
@@ -363,6 +382,12 @@
       noodremAan = bev.autoReactie !== false;
       $('#bBevAuto').hidden = !d.eigenaar;
       Util.tekst($('#bBevAuto'), noodremAan ? 'Noodrem: AAN' : 'Noodrem: UIT');
+      // storingen (eigen fout-aggregatie): tonen bij storingen, en altijd voor de eigenaar
+      var fout = d.fouten || { totaal:0, distinct:0, recent:[] };
+      $('#foutenBlok').hidden = !(d.eigenaar || fout.totaal);
+      vervang($('#fouten'), (fout.recent && fout.recent.length) ? fout.recent.map(foutRij)
+        : el('div',{class:'muted'},'Geen storingen sinds de start. Onverwachte serverfouten verschijnen hier vanzelf, gegroepeerd met een teller.'));
+      $('#bFoutenWis').hidden = !(d.eigenaar && fout.totaal);
       vervang($('#checks'), d.checks.map(checkRij));
       $('#zekeringBlok').hidden = !d.eigenaar;
       if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));

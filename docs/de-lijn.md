@@ -54,6 +54,11 @@ gemak brengt. In deze code betekent dat:
   het telwerk dat we nodig hebben -- de brede productie-rem in `server.js` en de
   twee Theater-remmen draaien er nu op -- en scheelt een dependency die alleen maar
   optelde. Puur tellen, geen cryptografie, dus geen botsing met regel 1.
+- **De fout-aggregatie** (`server/log.js`): een in-memory ring die onverwachte
+  serverfouten groepeert op een vingerafdruk (genormaliseerd bericht + plaats) met
+  een teller, en ze op het techniekbord toont (ERR-01 + de storingslijst). Zo ziet
+  de eigenaar meteen wat er stuk is zonder een externe dienst. `@sentry/node` blijft
+  optioneel bovenop deze aggregatie voor wie externe tracking wil.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.
@@ -103,7 +108,7 @@ zonder deze draait alles gewoon door in demo/lokaal:
 | `stripe` | echt geld | demo-provider (geen echt geld) |
 | `pg` | PostgreSQL, de schaalweg boven ~1,5 mln leden | embedded sqlite/JSON |
 | `redis` | realtime over losse processen | realtime binnen één proces |
-| `@sentry/node` | externe fout-tracking | eigen gestructureerde logging |
+| `@sentry/node` | externe fout-tracking (bovenop de eigen aggregatie) | eigen in-memory fout-aggregatie op het techniekbord |
 
 Dev-only: `axe-core` (a11y-keuring) en `terser` (minify). Die raken de productie
 nooit.

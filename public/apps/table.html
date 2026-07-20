@@ -53,6 +53,8 @@ function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; c
 const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
 const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; };
+const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag de maître</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 let open=null;
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
@@ -60,9 +62,11 @@ async function laad(){
   if(open){ const e=d.events.find(x=>x.id===open); if(e) return detail(e); open=null; }
   let h='<div class="kaart"><h2>Nieuwe gelegenheid</h2><span class="lbl">Naam</span><input class="veld" id="nN" placeholder="Bijv. Zomerdiner"><div class="rij" style="margin-top:.4rem;"><input class="veld" id="nD" type="date"><input class="veld" id="nT" type="time"><input class="veld" id="nL" placeholder="locatie"></div><div style="margin-top:.6rem;"><button class="knop" id="nDoe">Aanmaken</button></div></div>';
   h+= d.events.length ? d.events.map(e=>'<div class="kaart ev" data-id="'+e.id+'"><div class="nm">'+esc(e.naam)+'</div><div class="meta">'+[e.datum?dt(e.datum):'',esc(e.tijd),esc(e.locatie),e.gastenAantal+' gasten'].filter(Boolean).join(' · ')+'</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen gelegenheden.</div></div>';
+  h+=AIBOX('Bijv. stel een menu voor zes gasten voor');
   $('#main').innerHTML=h;
   $('#nDoe').onclick=async()=>{ const naam=$('#nN').value.trim(); if(!naam) return meld('Geef de gelegenheid een naam.'); try{ await api('table/zet',{naam,datum:$('#nD').value,tijd:$('#nT').value,locatie:$('#nL').value}); laad(); }catch(e){ meld(e.message); } };
   document.querySelectorAll('.ev').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
+  bindAi('table');
 }
 function detail(e){
   let h='<div class="kaart"><div class="nm" style="font-size:1.2rem;font-family:Bodoni Moda,serif;">'+esc(e.naam)+'</div><div class="meta">'+[e.datum?dt(e.datum):'',esc(e.tijd),esc(e.locatie)].filter(Boolean).join(' · ')+'</div><div style="margin-top:.7rem;display:flex;gap:.5rem;"><button class="knop stil" id="terug">← alle gelegenheden</button><button class="knop stil" id="evWeg" style="color:var(--burgundy);border-color:var(--burgundy);">Verwijderen</button></div></div>';

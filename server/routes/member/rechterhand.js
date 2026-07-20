@@ -6,7 +6,8 @@ module.exports = (kern) => {
     reizen, reisZet, reisWeg, reisItem, reisItemWeg,
     cellier, celZet, celWeg, celSchenk,
     tables, tableZet, tableWeg, tableGast, tableGastZet, tableGastWeg, tableMenu, tableMenuWeg,
-    maison, maisonStaf, maisonStafWeg, maisonTaak, maisonTaakKlaar, maisonTaakWeg, maisonLog, maisonLogWeg } = kern;
+    maison, maisonStaf, maisonStafWeg, maisonTaak, maisonTaakKlaar, maisonTaakWeg, maisonLog, maisonLogWeg,
+    rechterhandAI } = kern;
 
   function eis(req, res) {
     if (['lifestyle', 'business'].includes(req.session.tier)) return true;
@@ -51,4 +52,11 @@ module.exports = (kern) => {
   route('maison/taak/weg', (k, b) => maisonTaakWeg(k, String(b.id || '')));
   route('maison/log', (k, b) => maisonLog(k, b));
   route('maison/log/weg', (k, b) => maisonLogWeg(k, String(b.id || '')));
+
+  // Rahul als adviseur binnen elke app (u-vorm); async, dus een eigen handler
+  app.post('/api/member/rechterhand/ai', auth, async (req, res) => {
+    if (!eis(req, res)) return;
+    try { stuur(res, await rechterhandAI(req.session.key, String((req.body || {}).app || ''), (req.body || {}).vraag)); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
 };

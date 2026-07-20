@@ -56,6 +56,8 @@ function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; c
 const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
 const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 const dt=d=>{ if(!d)return ''; const[y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]; };
+const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag Rahul</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 let open=null;
 
 async function laad(){
@@ -66,9 +68,11 @@ async function laad(){
   if(d.attenties.length) h+='<div class="att"><div class="lbl" style="margin-top:0;color:var(--gold);">Documenten die aandacht vragen</div>'+d.attenties.map(a=>'<div class="r">'+(a.verlopen?'⚠ ':'• ')+esc(a.soort)+(a.houder?' ('+esc(a.houder)+')':'')+' - '+(a.verlopen?'verlopen ':'geldig tot ')+dt(a.geldigTot)+' · '+esc(a.reis)+'</div>').join('')+'</div>';
   h+='<div class="kaart"><h2>Nieuwe reis</h2><span class="lbl">Naam</span><input class="veld" id="nNaam" placeholder="Bijv. Ibiza zomer"><div class="rij" style="margin-top:.4rem;"><div><span class="lbl">Bestemming</span><input class="veld" id="nBest"></div><div><span class="lbl">Van</span><input class="veld" id="nVan" type="date"></div><div><span class="lbl">Tot</span><input class="veld" id="nTot" type="date"></div></div><div style="margin-top:.7rem;"><button class="knop" id="nDoe">In het boek</button></div></div>';
   h+= d.reizen.length ? d.reizen.map(r=>'<div class="kaart reis" data-id="'+r.id+'"><div class="nm">'+esc(r.naam)+'</div><div class="meta">'+esc(r.bestemming||'')+(r.van?' · '+dt(r.van)+(r.tot?' - '+dt(r.tot):''):'')+' · '+(r.legs.length)+' legs · '+(r.documenten.length)+' documenten</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen reizen. Zet hierboven uw eerste reis in het boek.</div></div>';
+  h+=AIBOX('Bijv. wat moet ik regelen voor deze reis?');
   $('#main').innerHTML=h;
   $('#nDoe').onclick=async()=>{ const naam=$('#nNaam').value.trim(); if(!naam) return meld('Geef de reis een naam.'); try{ await api('reis/zet',{naam,bestemming:$('#nBest').value,van:$('#nVan').value,tot:$('#nTot').value}); laad(); }catch(e){ meld(e.message); } };
   document.querySelectorAll('.reis').forEach(c=> c.onclick=()=>{ open=c.dataset.id; laad(); });
+  bindAi('reisboek');
 }
 function gate(){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Het Reisboek is onderdeel van de Lifestyle Pass.</p></div>'; }
 

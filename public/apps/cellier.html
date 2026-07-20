@@ -55,6 +55,8 @@ let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
 const api=(pad,body)=>fetch('/api/member/rechterhand/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
 const euro=c=>'€ '+Number(c||0).toLocaleString('nl-NL');
+const AIBOX=app=>'<div class="kaart"><h2>🤝 Vraag de sommelier</h2><div style="display:flex;gap:.5rem;"><input class="veld" id="aiV" style="flex:1;" placeholder="'+app+'"><button class="knop" id="aiK">Vraag</button></div><div id="aiA" style="margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);"></div></div>';
+function bindAi(app){ const k=$('#aiK'); if(!k)return; k.onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v)return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{app,vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } }; $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') k.click(); }); }
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
   let d; try{ d=await api('cellier'); }catch(e){ if(e.status===403){ $('#main').innerHTML='<div class="inlog"><h2>Alleen met de Lifestyle Pass</h2><p style="color:var(--muted);margin-top:.6rem;">Cellier is onderdeel van de Lifestyle Pass.</p></div>'; return; } $('#main').innerHTML='<div class="leeg">Kon de kelder niet laden.</div>'; return; }
@@ -62,7 +64,9 @@ async function laad(){
   let h='<div class="grid"><div class="stat"><div class="n">'+d.totaalFlessen+'</div><div class="l">Flessen</div></div><div class="stat"><div class="n">'+euro(d.kelderwaarde)+'</div><div class="l">Kelderwaarde</div></div><div class="stat"><div class="n">'+d.opDronk+'</div><div class="l">Nu op dronk</div></div></div>';
   h+='<div class="kaart"><h2>Fles toevoegen</h2><div class="rij"><input class="veld" id="cN" placeholder="Wijn"><input class="veld" id="cD" placeholder="Domein/producent"></div><div class="rij" style="margin-top:.4rem;"><select class="veld" id="cK">'+kl.map(k=>'<option>'+k+'</option>').join('')+'</select><input class="veld" id="cJ" type="number" placeholder="jaargang"><input class="veld" id="cA" type="number" placeholder="aantal" value="1"><input class="veld" id="cW" type="number" placeholder="€/fles"></div><div class="rij" style="margin-top:.4rem;"><input class="veld" id="cV" type="number" placeholder="drink vanaf"><input class="veld" id="cT" type="number" placeholder="drink tot"></div><div style="margin-top:.6rem;"><button class="knop" id="cDoe">In de kelder</button></div></div>';
   h+='<div class="kaart"><h2>Uw kelder</h2><div id="lijst"></div></div>';
+  h+=AIBOX('Bijv. welke fles schenk ik vanavond?');
   $('#main').innerHTML=h;
+  bindAi('cellier');
   $('#cDoe').onclick=async()=>{ const naam=$('#cN').value.trim(); if(!naam) return meld('Welke wijn?'); try{ await api('cellier/zet',{naam,domein:$('#cD').value,kleur:$('#cK').value,jaargang:$('#cJ').value,aantal:$('#cA').value,waarde:$('#cW').value,drinkVan:$('#cV').value,drinkTot:$('#cT').value}); laad(); }catch(e){ meld(e.message); } };
   const box=$('#lijst');
   box.innerHTML = d.flessen.length ? d.flessen.map(f=>{

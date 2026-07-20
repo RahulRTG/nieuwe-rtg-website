@@ -101,6 +101,16 @@ test('Maison: staf, een taak toewijzen en afvinken, en een logboek', async () =>
   assert.ok((await json(await rh('maison', {}, tok))).logboek.some(l => /Loodgieter/.test(l.tekst)));
 });
 
+test('Rahul adviseert per app in de u-vorm (demo-antwoord zonder sleutel)', async () => {
+  const tok = await lidMet('lifestyle');
+  await rh('cellier/zet', { naam: 'Barolo', aantal: 3, waarde: 90 }, tok);
+  const r = await json(await rh('ai', { app: 'cellier', vraag: 'Welke fles schenk ik vanavond?' }, tok));
+  assert.ok(r.ok && r.antwoord && r.antwoord.length > 10);
+  assert.match(r.antwoord, /\bu\b|uw/i, 'de sommelier spreekt u aan met u');
+  // een onbekende app wordt geweigerd
+  assert.equal((await rh('ai', { app: 'onzin', vraag: 'hoi' }, tok)).status, 400);
+});
+
 test('de extra ROS-apps zijn gated op de Lifestyle Pass (RTG niet, Business wel)', async () => {
   const rtg = await lidMet('rtg');
   assert.equal((await rh('reisboek', {}, rtg)).status, 403);

@@ -62,4 +62,20 @@ module.exports = (ctx) => {
     if (r.ok && r.bijgeschrevenCenten > 0) { afdelingen.audit(naam(req), 'Spaarrente bijgeschreven: € ' + (r.bijgeschrevenCenten / 100).toFixed(2) + ' op ' + r.rekeningen + ' rekening(en)'); sync(); }
     return r;
   }));
+
+  /* Krediet: de openstaande leningaanvragen en het besluit. Een mens beslist,
+     nooit de AI; goedkeuren stort de hoofdsom op de rekening van het lid. */
+  app.post('/api/office/bank/krediet', officeAuth, (req, res) => veilig(res, () => bank.bankKredietOpenstaand()));
+  app.post('/api/office/bank/krediet/besluit', officeAuth, (req, res) => veilig(res, () => {
+    const r = bank.bankKredietBesluit({ id: String(req.body.id || ''), akkoord: req.body.akkoord === true, wie: naam(req) });
+    if (r.ok) { afdelingen.audit(naam(req), 'Kredietaanvraag ' + r.krediet.id + ' ' + (r.krediet.status === 'afgewezen' ? 'afgewezen' : 'goedgekeurd (€ ' + (r.krediet.bedragCenten / 100).toFixed(2) + ')')); sync(); }
+    return r;
+  }));
+
+  // de incassoronde: alle vaste betalingen die aan de beurt zijn uitvoeren
+  app.post('/api/office/bank/incasso', officeAuth, (req, res) => veilig(res, () => {
+    const r = bank.bankIncassoRonde(req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {});
+    if (r.ok && r.uitgevoerd > 0) { afdelingen.audit(naam(req), 'Incassoronde: ' + r.uitgevoerd + ' vaste betaling(en), € ' + (r.bedragCenten / 100).toFixed(2)); sync(); }
+    return r;
+  }));
 };

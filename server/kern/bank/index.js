@@ -19,7 +19,7 @@
    rente in ./sparen. */
 
 module.exports = (deps) => {
-  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, sseToCustomer } = deps;
+  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, sseToCustomer, anthropic } = deps;
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -75,12 +75,17 @@ module.exports = (deps) => {
   }
 
   // de gedeelde context voor de deelbestanden
-  const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam,
+  const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, anthropic,
     nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, bodem, seintje };
 
   const rek = require('./rekeningen')(ctx);
   const over = require('./overboeken')(ctx);
   const spaar = require('./sparen')(ctx);
+  const pas = require('./passen')(ctx);
+  const krediet = require('./krediet')(ctx);
+  const incasso = require('./incasso')(ctx);
+  const zakelijk = require('./zakelijk')(ctx);
+  const advies = require('./advies')(ctx);
 
   /* ---- afschrift: de boekingen die een rekening raken, nieuwste eerst ---- */
   function afschrift({ iban, limit = 50, offset = 0 }) {
@@ -113,6 +118,6 @@ module.exports = (deps) => {
   }
 
   const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht };
-  Object.assign(api, rek, over, spaar);
+  Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies);
   return { bank: api };
 };

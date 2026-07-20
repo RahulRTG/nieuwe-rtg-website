@@ -104,3 +104,60 @@ test('het kantoor ziet de bank: overzicht met regie, gezondheid en rekeningen', 
   const dicht = await fetch(base + '/api/office/bank', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401);
 });
+
+async function nieuweRekening(soort, centen) {
+  const iban = (await api('bank/rekening/open', { soort }, lid.token)).body.rekening.iban;
+  if (centen) await api('bank/storten', { iban, centen, idem: 'f' + iban }, lid.token);
+  return iban;
+}
+
+test('passen: uitgeven, betalen binnen de daglimiet, en bevriezen blokkeert', async () => {
+  const iban = await nieuweRekening('betaal', 50000);
+  const pas = (await api('bank/pas/uitgeven', { iban, soort: 'debit' }, lid.token)).body.pas;
+  assert.ok(/•••• •••• •••• \d{4}/.test(pas.nummer), 'de pas toont alleen gemaskeerd');
+  assert.equal((await api('bank/pas/betaal', { id: pas.id, centen: 3000 }, lid.token)).body.saldoCenten, 47000);
+  await api('bank/pas/limiet', { id: pas.id, euro: 10 }, lid.token);
+  assert.equal((await api('bank/pas/betaal', { id: pas.id, centen: 2000 }, lid.token)).status, 429, 'boven de daglimiet weigert de pas');
+  await api('bank/pas/bevries', { id: pas.id, aan: true }, lid.token);
+  assert.equal((await api('bank/pas/betaal', { id: pas.id, centen: 100 }, lid.token)).status, 423, 'een bevroren pas betaalt niet');
+});
+
+test('krediet: het lid vraagt aan, het kantoor keurt goed en stort, het lid lost af', async () => {
+  const iban = await nieuweRekening('betaal', 0);
+  const aanvraag = await api('bank/krediet/aanvraag', { iban, euro: 5000, looptijdMnd: 24 }, lid.token);
+  assert.equal(aanvraag.body.krediet.status, 'aangevraagd');
+  const id = aanvraag.body.krediet.id;
+  const open = await api('office/bank/krediet', {}, office.token);
+  assert.ok(open.body.aanvragen.some(k => k.id === id), 'de aanvraag staat op het kantoorbord');
+  const besluit = await api('office/bank/krediet/besluit', { id, akkoord: true }, office.token);
+  assert.equal(besluit.body.krediet.status, 'goedgekeurd');
+  assert.equal((await api('bank/rekening', { iban }, lid.token)).body.rekening.saldoCenten, 500000, 'de hoofdsom staat op de rekening');
+  const af = await api('bank/krediet/aflossing', { id, centen: 100000 }, lid.token);
+  assert.equal(af.body.krediet.restCenten, 400000, 'de aflossing verlaagt het openstaande saldo');
+});
+
+test('terugkerende betaling + incassoronde vanuit het kantoor', async () => {
+  const van = await nieuweRekening('betaal', 50000);
+  const naar = await nieuweRekening('spaar', 0);
+  const tk = await api('bank/terugkerend/zet', { vanIban: van, naarIban: naar, centen: 10000, interval: 'maand', oms: 'Sparen' }, lid.token);
+  assert.equal(tk.status, 200);
+  const ronde = await api('office/bank/incasso', { tot: Date.now() + 35 * 86400000 }, office.token);
+  assert.ok(ronde.body.uitgevoerd >= 1, 'de incassoronde voert de vaste betaling uit');
+  assert.equal((await api('bank/rekening', { iban: naar }, lid.token)).body.rekening.saldoCenten, 10000);
+});
+
+test('zakelijk: een bulkbetaling in één opdracht', async () => {
+  const van = await nieuweRekening('zakelijk', 100000);
+  const a = await nieuweRekening('betaal', 0);
+  const b = await nieuweRekening('betaal', 0);
+  const bulk = await api('bank/bulk', { vanIban: van, posten: [{ naarIban: a, centen: 20000, oms: 'A' }, { naarIban: b, centen: 30000, oms: 'B' }] }, lid.token);
+  assert.equal(bulk.body.geboekt, 2, 'beide posten geboekt');
+  assert.equal(bulk.body.totaalCenten, 50000);
+});
+
+test('de AI-bankier geeft advies over de eigen rekeningen (adviseert, beslist niet)', async () => {
+  const adv = await api('bank/advies', { vraag: 'Hoe kan ik beter sparen?' }, lid.token);
+  assert.equal(adv.status, 200);
+  assert.ok(Array.isArray(adv.body.tips) && adv.body.tips.length >= 1, 'er komt minstens één concrete tip');
+  assert.ok(typeof adv.body.antwoord === 'string' && adv.body.antwoord.length > 0);
+});

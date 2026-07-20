@@ -2097,7 +2097,7 @@ Object.assign(kern, bankregie);
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, sseToCustomer }));
+Object.assign(kern, require('./kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, sseToCustomer, anthropic }));
 /* Lidacties (kern/lidacties.js): de transactiefuncties van het lid, als
    kern-module met expliciete afhankelijkheden. Ze bedienen de app-routes
    EN vullen de acties-registry van de Butler, volgens het contract

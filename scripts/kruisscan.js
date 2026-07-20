@@ -94,6 +94,11 @@ function bindings(s) {
   // const/let/var met een enkele naam
   re = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)/g;
   while ((m = re.exec(s))) D.add(m[1]);
+  // tweede en verdere declaratoren van een komma-lijst (let a = 0, b = 0, c = 0)
+  // en defaultparameters: elke naam die als ", naam =" voorkomt is een binding.
+  // Ruim meenemen is veilig: het onderdrukt hooguit een melding, het maakt er nooit een.
+  re = /,\s*([A-Za-z_$][\w$]*)\s*=/g;
+  while ((m = re.exec(s))) D.add(m[1]);
   // functiedeclaraties/-expressies + hun parameters
   re = /\bfunction\s*(\*?\s*[A-Za-z_$][\w$]*)?\s*\(([^)]*)\)/g;
   while ((m = re.exec(s))) { if (m[1]) add(m[1]); add(m[2]); }

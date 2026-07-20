@@ -68,4 +68,31 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, bank.bankRenteVoorbeeld(req.body.euro));
   });
+
+  /* Passen: betaalpassen en creditcards op een rekening (uitgeven, tonen,
+     bevriezen, daglimiet, betalen, sluiten). */
+  app.post('/api/bank/passen', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankPassen(cn(req))); });
+  app.post('/api/bank/pas/uitgeven', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankPasUitgeven({ iban: String(req.body.iban || ''), soort: req.body.soort, naam: req.body.naam, codenaam: cn(req) })); });
+  app.post('/api/bank/pas/bevries', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankPasBevries(String(req.body.id || ''), req.body.aan === true, cn(req))); });
+  app.post('/api/bank/pas/limiet', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankPasLimiet(String(req.body.id || ''), req.body.euro, cn(req))); });
+  app.post('/api/bank/pas/betaal', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankPasBetaal({ id: String(req.body.id || ''), centen: req.body.centen, oms: req.body.oms, codenaam: cn(req) })); });
+  app.post('/api/bank/pas/sluit', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankPasSluit(String(req.body.id || ''), cn(req))); });
+
+  /* Krediet: een lening aanvragen (het kantoor beslist), lopende leningen
+     bekijken en aflossen. */
+  app.post('/api/bank/krediet', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankKredieten(cn(req))); });
+  app.post('/api/bank/krediet/aanvraag', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankKredietAanvraag({ iban: String(req.body.iban || ''), euro: req.body.euro, looptijdMnd: req.body.looptijdMnd, codenaam: cn(req) })); });
+  app.post('/api/bank/krediet/aflossing', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankKredietAflossing({ id: String(req.body.id || ''), centen: req.body.centen, codenaam: cn(req) })); });
+
+  /* Terugkerende betalingen (incasso/vaste opdracht): zetten, tonen, stoppen. */
+  app.post('/api/bank/terugkerend', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankTerugkerend(cn(req))); });
+  app.post('/api/bank/terugkerend/zet', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankTerugkerendZet({ vanIban: String(req.body.vanIban || ''), naarIban: String(req.body.naarIban || ''), centen: req.body.centen, interval: req.body.interval, oms: req.body.oms, codenaam: cn(req) })); });
+  app.post('/api/bank/terugkerend/stop', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankTerugkerendStop({ id: String(req.body.id || ''), codenaam: cn(req) })); });
+
+  /* Zakelijk bankieren: een bulkbetaling of salarisrun in één opdracht. */
+  app.post('/api/bank/bulk', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankBulkBetaal({ vanIban: String(req.body.vanIban || ''), posten: req.body.posten, oms: req.body.oms, codenaam: cn(req) })); });
+  app.post('/api/bank/salaris', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten: req.body.posten, oms: req.body.oms, codenaam: cn(req) })); });
+
+  // de AI-bankier (Rahul): advies over de eigen rekeningen; adviseert, beslist niet
+  app.post('/api/bank/advies', auth, async (req, res) => { if (geenGast(req, res)) return; stuur(res, await bank.bankAdvies({ codenaam: cn(req), vraag: req.body.vraag })); });
 };

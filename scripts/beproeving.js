@@ -240,6 +240,20 @@ function boot() {
   });
 }
 function stop() { return new Promise(r => { if (!child) return r(); child.removeAllListeners('exit'); child.on('exit', () => r()); child.kill('SIGKILL'); child = null; }); }
+// Nette (geplande) stop: SIGTERM laat de server zijn write-behind flushen
+// (flushBijAfsluiten) voordat hij afsluit. Zo toetst de DUURZAAMHEID-fase een
+// echte HERSTART/deploy -- niet een stroomstoring. Een harde crash (SIGKILL) kan
+// bij write-behind-motoren (json en geheugen) juist bewust het laatste venster
+// verliezen; dat is een andere, zwaardere garantie die we niet als herstart tellen.
+function stopNet(ms) {
+  return new Promise(r => {
+    if (!child) return r();
+    const kind = child; child = null; kind.removeAllListeners('exit');
+    let klaar = false; const af = () => { if (!klaar) { klaar = true; r(); } };
+    kind.on('exit', af); kind.kill('SIGTERM');
+    setTimeout(() => { try { kind.kill('SIGKILL'); } catch (e) {} af(); }, ms || 8000);
+  });
+}
 
 /* ---------- Postgres: 65M + activiteit zaaien (alleen mega-modus) ---------- */
 async function zaaiPostgres() {
@@ -483,7 +497,7 @@ async function misbruikBeproeving(tok) {
   kop('FASE D: DUURZAAMHEID - herstart met de volle kast');
   const duurFouten = [];
   if (geld.A && geld.A.token && geld.bCode) {
-    await stop(); const tB = Date.now(); await boot();
+    await stopNet(); const tB = Date.now(); await boot();   // nette herstart: de server flusht zijn write-behind
     rij('herstart-tijd', ((Date.now() - tB) / 1000).toFixed(1) + ' s');
     await new Promise(r => setTimeout(r, 1500));
     const office2 = (await post('/api/office/login', { code: 'RTG-OFFICE' })).data.token; await allesAan(office2);

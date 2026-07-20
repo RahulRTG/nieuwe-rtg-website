@@ -111,6 +111,40 @@ test('de veld-app: de werklijst schrijft zichzelf en klaarmelden dempt de klus',
   await oapi('stad/node/stop', { serial: aan.body.serial });
 });
 
+test('Mijn Stad (bewoner): kijken mag, melden landt bij de veldploeg en komt klaar terug', async () => {
+  // een lid opent Mijn Stad: standen en scenario, zonder bedrijfsvoering
+  const l = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) })).json();
+  const b = await api('stad/bewoner', {}, l.token);
+  assert.equal(b.status, 200);
+  assert.equal(b.body.domeinen.length, 8, 'de standen staan erop');
+  assert.ok(!JSON.stringify(b.body.domeinen).includes('regime'), 'geen regimeknoppen of bedrijfsvoering voor de bewoner');
+  assert.match(b.body.privacy, /geen mensen/);
+
+  // een gast mag meekijken, maar niet melden
+  const g = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'guest' }) })).json();
+  assert.equal((await api('stad/bewoner', {}, g.token)).status, 200, 'meekijken mag met de gratis laag');
+  assert.equal((await api('stad/melding', { zone: 'Centrum', soort: 'licht', tekst: 'lantaarn stuk bij de brug' }, g.token)).status, 403);
+
+  // het lid meldt iets; te kort of een rare zone wordt netjes geweigerd
+  assert.equal((await api('stad/melding', { zone: 'Nergens', soort: 'licht', tekst: 'lantaarn stuk' }, l.token)).status, 400);
+  assert.equal((await api('stad/melding', { zone: 'Centrum', soort: 'licht', tekst: 'x' }, l.token)).status, 400);
+  const m = await api('stad/melding', { zone: 'Centrum', soort: 'licht', tekst: 'lantaarn stuk bij de brug' }, l.token);
+  assert.equal(m.status, 200);
+  const mid = m.body.melding.id;
+
+  // de melding staat DIRECT als klus op de werklijst van de veld-app
+  const werk = (await oapi('stad/werk')).body;
+  const klus = werk.klussen.find(k => k.sleutel === 'melding:' + mid);
+  assert.ok(klus, 'de bewonersmelding is een klus voor buiten');
+  assert.match(klus.omschrijving, /lantaarn stuk bij de brug/);
+
+  // de veldploeg meldt hem klaar -> de bewoner ziet "opgelost"
+  await oapi('stad/werk/klaar', { sleutel: 'melding:' + mid });
+  const na = (await api('stad/bewoner', {}, l.token)).body;
+  const mijn = na.mijnMeldingen.find(x => x.id === mid);
+  assert.ok(mijn && mijn.status === 'klaar', 'de melder ziet zijn melding als opgelost');
+});
+
 test('los regime, AI-stadsregisseur, nood -> beveiligingsmelding, bewaking en dataset', async () => {
   // een los regime naast de knop
   assert.equal((await oapi('stad/regime', { domein: 'licht', regime: 'vol' })).body.regime, 'vol');

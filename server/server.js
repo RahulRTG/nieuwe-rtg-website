@@ -2118,7 +2118,7 @@ fonds.koppelBank(({ centen, referentie, oms }) => {
    Stadsdoos-vloot, dezelfde familie als de Zaakdoos) en eigen software --
    domeinen met regimes, een scenario-knop in de boardroom en een
    AI-stadsregisseur. Privacy by design: de stad meet dingen, geen mensen. */
-Object.assign(kern, require('./kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig }));
+Object.assign(kern, require('./kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig, keyVanCodenaam, sseToCustomer }));
 /* De stad in het gezamenlijke rampbeeld: tijdens een calamiteit ziet de hele
    keten (korpsen, zorg, defensie, boardroom) ook het stadsscenario, de
    bord-waarschuwingen en de vloot -- operationele toestand, geen
@@ -2323,6 +2323,7 @@ require('./routes/overheid')(kern);
 require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/bank')(kern);
+require('./routes/stad')(kern);
 require('./routes/podium')(kern);
 require('./routes/ghost')(kern);
 require('./routes/flits')(kern);

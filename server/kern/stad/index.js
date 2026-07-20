@@ -16,7 +16,7 @@
    scenario-knop in ./scenario en de AI in ./advies. */
 
 module.exports = (deps) => {
-  const { db, save, crypto, schoon, anthropic, sseToOffice, beveilig } = deps;
+  const { db, save, crypto, schoon, anthropic, sseToOffice, beveilig, keyVanCodenaam, sseToCustomer } = deps;
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -52,8 +52,13 @@ module.exports = (deps) => {
   ctx.zorgBasis = vloot.zorgBasis; ctx.simuleer = vloot.simuleer;
   const sce = require('./scenario')(ctx);
   ctx.SCENARIOS = sce.SCENARIOS;
+  // een live seintje naar een bewoner (bijv. "je melding is opgepakt")
+  ctx.bewonerSeintje = (codenaam) => {
+    try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'stad' }); }).catch(() => {}); } catch (e) {}
+  };
   const adv = require('./advies')(ctx);
-  const veld = require('./veldwerk')(ctx);
+  const bew = require('./bewoner')(ctx);   // zet ctx.meldingKlaar + ctx.openMeldingKlussen
+  const veld = require('./veldwerk')(ctx); // en veldwerk neemt die klussen op
 
   /* Het stadsbeeld: alles wat de boardroom in een oogopslag nodig heeft.
      De demovloot leeft mee (simuleer): zolang er geen echte hardware hangt,
@@ -85,6 +90,6 @@ module.exports = (deps) => {
   }
 
   const api = { stadBeeld: beeld, stadKoppelVerkeer: koppelVerkeer };
-  Object.assign(api, vloot.api, dom.api, sce.api, adv, veld.api);
+  Object.assign(api, vloot.api, dom.api, sce.api, adv, bew.api, veld.api);
   return { stad: api };
 };

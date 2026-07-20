@@ -29,6 +29,8 @@ module.exports = (ctx) => {
     }
     for (const a of alerts())
       uit.push({ sleutel: 'alert:' + a.domein, soort: a.domein, zone: null, omschrijving: a.tekst });
+    // en wat de bewoners zelf melden (kern/stad/bewoner.js), meteen op de lijst
+    if (ctx.openMeldingKlussen) uit.push(...ctx.openMeldingKlussen());
     return uit;
   }
 
@@ -45,6 +47,8 @@ module.exports = (ctx) => {
     const klus = ruweKlussen().find(x => x.sleutel === k);
     if (!klus) return { status: 404, error: 'Die klus staat niet (meer) op de lijst.' };
     klaarStore()[k] = { wie: schoon(wie, 60) || 'veld', notitie: schoon(notitie, 140) || null, at: nu() };
+    // een bewonersmelding gaat dan ook echt op "klaar", met een seintje terug
+    if (k.startsWith('melding:') && ctx.meldingKlaar) { try { ctx.meldingKlaar(k.slice(8), wie); } catch (e) {} }
     save(); seintje();
     return { ok: true, sleutel: k, omschrijving: klus.omschrijving, wie: schoon(wie, 60) || 'veld' };
   }

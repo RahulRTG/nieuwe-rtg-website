@@ -52,6 +52,14 @@ gemak brengt. In deze code betekent dat:
   lijn: geen require van een pakket dat we zelf bouwen, geen eval/Function, geen
   Math.random als toevalsbron voor een geheim (regel 1), en onbereikbare code.
   Dit is aanvullend op CodeQL, niet in plaats daarvan.
+- **De minifier** (`scripts/ast/print.js` + `minify.js`, in `scripts/build.js`):
+  bouwt voort op diezelfde eigen parser en verving `terser` (en daarmee ook acorn).
+  Parse -> compact printen (commentaar/witruimte weg, haakjes alleen waar de
+  voorrang ze eist). Bewust veilig: als de geprinte code niet EXACT dezelfde boom
+  oplevert, valt hij per bestand terug op de bron -- nooit iets kapots uitgeleverd.
+  We manglen (nog) geen namen: een foute hernoeming zou stille kapotte client-code
+  opleveren, en over de lijn haalt gzip het meeste van dat verschil toch weg
+  (gemeten ~8% gezipt t.o.v. terser). Een dependency minder, geen risico erbij.
 - **Sinds kort ook de lettertypen** (`public/fonts/`): zelf geserveerd, zodat er
   letterlijk geen enkele verbinding met een derde partij overblijft in de
   browser van de bezoeker.
@@ -127,8 +135,9 @@ zonder deze draait alles gewoon door in demo/lokaal:
 | `redis` | realtime over losse processen | realtime binnen één proces |
 | `@sentry/node` | externe fout-tracking (bovenop de eigen aggregatie) | eigen in-memory fout-aggregatie op het techniekbord |
 
-Dev-only: `axe-core` (a11y-keuring) en `terser` (minify). Die raken de productie
-nooit.
+Dev-only: alleen nog `axe-core` (a11y-keuring). De minify doen we zelf
+(`scripts/ast/`), dus terser -- en daarmee acorn -- is eruit. Dev-only raakt de
+productie sowieso nooit.
 
 ---
 

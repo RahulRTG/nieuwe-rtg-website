@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { minify } = require('terser');
+const { minify } = require('./ast/minify');
 const { bundels, schrijfBundels } = require('./bundel');
 
 const ROOT = path.join(__dirname, '..');

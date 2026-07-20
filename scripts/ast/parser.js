@@ -26,7 +26,7 @@ function parse(bron, opties) {
   const piek = () => T[k];
   const piekN = (x) => T[k + x] || T[T.length - 1];
   const eind = () => T[k].type === 'eof';
-  function fout(bericht, tok) { tok = tok || piek(); const e = new Error('parsefout regel ' + tok.lijn + ': ' + bericht + ' bij ' + toon(tok)); e.lijn = tok.lijn; throw e; }
+  function fout(bericht, tok) { tok = tok || piek(); const e = new Error('parsefout regel ' + tok.lijn + ': ' + bericht + ' bij ' + toon(tok)); e.lijn = tok.lijn; e.pos = tok.start; throw e; }
   function toon(t) { return t.type === 'eof' ? '<eof>' : t.type === 'template' ? '`...`' : JSON.stringify(t.value); }
   const isLees = (v) => { const t = piek(); return t.type === 'lees' && t.value === v; };
   const isSleutel = (w) => { const t = piek(); return t.type === 'naam' && t.value === w; };

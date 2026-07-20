@@ -76,18 +76,17 @@ const { PASPOORT_NIVEAUS, maakPaspoort } = require('./kern/paspoort');
 const { maakOntmoeting } = require('./kern/ontmoeting');
 
 /* Fout-aggregatie zit ALTIJD aan in server/log.js (in-memory, zichtbaar op het
-   techniekbord: ERR-01 + de storingslijst). Daarbovenop kan optioneel Sentry
-   als externe tracker: alleen als SENTRY_DSN is gezet én het pakket is
-   geinstalleerd. Zonder allebei blijft de eigen aggregatie gewoon draaien. */
-if (process.env.SENTRY_DSN) {
+   techniekbord: ERR-01 + de storingslijst) -- dat dekt het groeperen en tonen.
+   Daarbovenop kan optioneel EXTERNE bezorging via de eigen fout-melder
+   (server/foutmelder.js): een dunne webhook-POST, aan te zetten met
+   ERR_WEBHOOK_URL. Zonder blijft de eigen aggregatie gewoon draaien. */
+if (process.env.ERR_WEBHOOK_URL) {
   try {
-    const Sentry = require('@sentry/node');
-    Sentry.init({ dsn: process.env.SENTRY_DSN, environment: process.env.NODE_ENV || 'development',
-      tracesSampleRate: Number(process.env.SENTRY_TRACES || 0) });
-    log.onError((err, ctx) => Sentry.captureException(err, { extra: ctx }));
-    log.info('Fout-tracker: Sentry actief.');
+    const melder = require('./foutmelder').maakFoutmelder({ url: process.env.ERR_WEBHOOK_URL });
+    log.onError((err, ctx) => melder.melden(err, ctx));
+    log.info('Fout-tracker: eigen webhook-melder actief.');
   } catch (e) {
-    log.warn('SENTRY_DSN gezet maar @sentry/node ontbreekt; fout-tracker uit.');
+    log.warn('ERR_WEBHOOK_URL gezet maar de fout-melder kon niet starten (' + (e && e.message) + ').');
   }
 }
 

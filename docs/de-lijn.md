@@ -76,8 +76,12 @@ gemak brengt. In deze code betekent dat:
 - **De fout-aggregatie** (`server/log.js`): een in-memory ring die onverwachte
   serverfouten groepeert op een vingerafdruk (genormaliseerd bericht + plaats) met
   een teller, en ze op het techniekbord toont (ERR-01 + de storingslijst). Zo ziet
-  de eigenaar meteen wat er stuk is zonder een externe dienst. `@sentry/node` blijft
-  optioneel bovenop deze aggregatie voor wie externe tracking wil.
+  de eigenaar meteen wat er stuk is zonder een externe dienst. Externe bezorging
+  (voor wie een melding naar buiten wil, ook als de doos plat ligt) doet de eigen
+  fout-melder (`server/foutmelder.js`): een dunne webhook-POST op Node's https,
+  getemperd op vingerafdruk, aan te zetten met `ERR_WEBHOOK_URL`. Dat verving
+  `@sentry/node` -- de groepering/UI zat al hier, alleen de bezorging kwam van het
+  pakket.
 - **De web-push** (`server/webpush.js`): VAPID (RFC 8292, ES256-JWT) en de payload-
   versleuteling (RFC 8291, aes128gcm) die het pakket `web-push` verving. Let op de
   nuance bij regel 1: we schrijven hier GEEN eigen cryptografie. We zetten alleen de
@@ -186,7 +190,15 @@ zonder deze draait alles gewoon door in demo/lokaal:
 | `stripe` | echt geld | demo-provider (geen echt geld) |
 | `pg` | PostgreSQL, de schaalweg boven ~1,5 mln leden | embedded sqlite/JSON |
 | `redis` | realtime over losse processen | realtime binnen één proces |
-| `@sentry/node` | externe fout-tracking (bovenop de eigen aggregatie) | eigen in-memory fout-aggregatie op het techniekbord |
+
+Externe fout-tracking doen we niet meer met `@sentry/node`: de groepering/UI zat
+al in de eigen aggregatie (`server/log.js`, techniekbord) en de externe bezorging
+is nu de eigen `server/foutmelder.js` (webhook-POST). `pg` en `redis` zijn *clients*
+voor een wire-protocol -- die zijn in principe zelf te bouwen (zelfde patroon als de
+eigen SMTP-client), maar blijven bewust een pakket: ze laden alleen boven ~1,5 mln
+leden of bij echt losse processen, en op precies die plek zit een fout in de driver
+dicht bij "verlies van al vastgelegde data". De *database/broker zelf* (PostgreSQL,
+Redis) bouwen we sowieso nooit -- dáár is een fout wél fataal (durability, ACID).
 
 Dev-only: alleen nog `axe-core` (a11y-keuring). De minify doen we zelf
 (`scripts/ast/`), dus terser -- en daarmee acorn -- is eruit. Dev-only raakt de

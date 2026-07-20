@@ -9,7 +9,7 @@
 // Pakketten die we bewust NIET (meer) gebruiken: zelf gebouwd (zie docs/de-lijn.md).
 // Een require hiervan betekent dat een zelfbouw-beslissing is teruggedraaid.
 const VERBODEN = new Set(['web-push', 'express-rate-limit', 'http_ece',
-  '@simplewebauthn/server', '@anthropic-ai/sdk', 'terser', 'acorn', 'nodemailer', 'express']);
+  '@simplewebauthn/server', '@anthropic-ai/sdk', 'terser', 'acorn', 'nodemailer', 'express', '@sentry/node']);
 // Namen die op een geheim wijzen: daar mag Math.random NOOIT aan ten grondslag liggen (regel 1).
 const GEHEIM = /token|secret|sleutel|geheim|wachtwoord|pincode|salt|nonce|otp|sessie|vapid/i;
 const TERMINATORS = new Set(['ReturnStatement', 'ThrowStatement', 'BreakStatement', 'ContinueStatement']);

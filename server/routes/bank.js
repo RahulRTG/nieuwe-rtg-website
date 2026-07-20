@@ -61,14 +61,13 @@ module.exports = (kern) => {
   app.post('/api/bank/advies', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.bankAdvies({ codenaam: cn(req), vraag: req.body.vraag })); });
 
   /* Afschrift-export: een net CSV-bestand van de eigen rekening om te bewaren
-     of in de boekhouding in te lezen. GET met ?token= (een downloadlink kan
-     geen Authorization-header meesturen), dezelfde gates als de rest. */
-  app.get('/api/bank/afschrift.csv', (req, res) => {
-    const sess = kern.resolveSession(String(req.query.token || ''));
-    if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
-    req.session = sess;
+     of in de boekhouding in te lezen. Bewust POST met het token in de
+     Authorization-header (zelfde patroon als de dataset-export van de
+     boardroom): een token in een GET-querystring lekt via logs, proxies en
+     de browsergeschiedenis. De app downloadt via fetch + blob. */
+  app.post('/api/bank/afschrift.csv', auth, (req, res) => {
     if (gate(req, res)) return;
-    const iban = String(req.query.iban || '');
+    const iban = String(req.body.iban || '');
     const bezit = bank.rekeningDetail(iban, cn(req));
     if (bezit.error) return stuur(res, bezit);
     const esc = require('../kern/factuur').csvCel; // csv-veilig + geen formule-injectie

@@ -151,10 +151,21 @@ function bindBank(reks){
     const euroS = prompt('Wat is je spaardoel? (euro)'); if (euroS == null) return;
     try { const r = await api('bank/spaardoel', { iban: b.dataset.doel, euro: Number(euroS) }); alert('Spaardoel gezet. Je bent op ' + r.pct + '%.'); } catch (e) { alert(e.message); }
   }));
-  // afschrift-export: het volledige afschrift als CSV-download (de server
-  // controleert het token en het eigendom van de rekening)
-  document.querySelectorAll('[data-csv]').forEach(b => b.addEventListener('click', () => {
-    location.href = '/api/bank/afschrift.csv?token=' + encodeURIComponent(TOKEN) + '&iban=' + encodeURIComponent(b.dataset.csv);
+  // afschrift-export: het volledige afschrift als CSV-download. Via fetch met
+  // de Authorization-header (nooit het token in een URL) en dan een blob.
+  document.querySelectorAll('[data-csv]').forEach(b => b.addEventListener('click', async () => {
+    try {
+      const r = await fetch('/api/bank/afschrift.csv', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+        body: JSON.stringify({ iban: b.dataset.csv })
+      });
+      if (!r.ok) { const f = await r.json().catch(() => ({})); throw new Error(f.error || 'Export mislukt.'); }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(await r.blob());
+      a.download = 'rtg-afschrift-' + b.dataset.csv + '-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    } catch (e) { alert(e.message); }
   }));
   // het afschrift: de laatste boekingen van deze rekening, uitklapbaar
   document.querySelectorAll('[data-afschrift]').forEach(b => b.addEventListener('click', async () => {

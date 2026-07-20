@@ -266,14 +266,20 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
 });
 
 test('afschrift-export: het lid downloadt zijn eigen rekening als CSV; andermans rekening blijft dicht', async () => {
-  const r = await fetch(base + '/api/bank/afschrift.csv?token=' + encodeURIComponent(lid.token) + '&iban=' + encodeURIComponent(lid.iban));
+  // POST met het token in de Authorization-header: nooit een token in een URL
+  const csv = (iban, token) => fetch(base + '/api/bank/afschrift.csv', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify({ iban })
+  });
+  const r = await csv(lid.iban, lid.token);
   assert.equal(r.status, 200);
   assert.match(r.headers.get('content-type') || '', /text\/csv/);
   const regels = (await r.text()).trim().split('\n');
   assert.ok(regels[0].includes('datum;af/bij;bedrag'), 'nette NL-kopregel');
   assert.ok(regels.length >= 2, 'de boekingen staan erin');
   // zonder token dicht, en andermans rekening dicht (eigendomscontrole)
-  assert.equal((await fetch(base + '/api/bank/afschrift.csv?iban=' + encodeURIComponent(lid.iban))).status, 401);
-  const vreemd = await fetch(base + '/api/bank/afschrift.csv?token=' + encodeURIComponent(lid.token) + '&iban=' + encodeURIComponent(noraIban));
+  assert.equal((await csv(lid.iban, null)).status, 401);
+  const vreemd = await csv(noraIban, lid.token);
   assert.ok(vreemd.status === 403 || vreemd.status === 404, 'andermans afschrift is niet te downloaden');
 });

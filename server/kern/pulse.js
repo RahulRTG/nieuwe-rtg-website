@@ -7,7 +7,7 @@
    patronen). Alles door de 9+-poort (kern/veilig.js); de meldknop verbergt
    een bericht automatisch na drie unieke melders, waarna het kantoor het
    laatste woord heeft. Gedeelde context vanuit server.js. */
-module.exports = ({ db, save, crypto, liveCodename, notify }) => {
+module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVan }) => {
   const { keur } = require('./veilig');
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(5).toString('hex');
@@ -95,7 +95,10 @@ module.exports = ({ db, save, crypto, liveCodename, notify }) => {
     return { id: x.id, codenaam: x.codenaam, van: x.key === mij ? 'ik' : x.key, tekst: x.tekst, tags: x.tags, at: x.at,
       likes: Object.keys(x.likes).length, mijnLike: !!x.likes[mij],
       reacties: x.reacties.slice(-30).map(r => ({ codenaam: r.codenaam, tekst: r.tekst, at: r.at, eigen: r.key === mij })),
-      eigen: x.key === mij };
+      eigen: x.key === mij,
+      // de wauw-laag: de dag-stemming en de verjaardagsglans naast de codenaam
+      stemming: stemmingVan ? stemmingVan(x.key) : null,
+      jarig: jarigVan ? !!jarigVan(x.key) : false };
   }
   /* de feed: 'volgend' (wie je volgt + jezelf) of 'ontdek' (iedereen), altijd
      gewoon op tijd. Paginatie met een simpele cursor (voor dit tijdstip). */
@@ -111,8 +114,13 @@ module.exports = ({ db, save, crypto, liveCodename, notify }) => {
     const tel = {};
     for (const x of p.posts) if (zichtbaar(x) && x.at > grens) for (const t of x.tags) tel[t] = (tel[t] || 0) + 1;
     const trending = Object.entries(tel).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([tag, n]) => ({ tag, n }));
+    // het Moment van de week: het meest gewaardeerde bericht van de laatste 7
+    // dagen -- een enkel lichtpunt om te vieren, bewust geen ranglijst
+    const kandidaten = p.posts.filter(x => zichtbaar(x) && x.at > grens && Object.keys(x.likes).length > 0);
+    const top = kandidaten.sort((a, b) => Object.keys(b.likes).length - Object.keys(a.likes).length)[0] || null;
     return { status: 200, feed: uit.map(x => publiek(x, key)), volgend: Object.keys(mijnVolgt).length,
-      cursor: uit.length === 40 ? uit[uit.length - 1].at : null, trending, leeftijd: '9+' };
+      cursor: uit.length === 40 ? uit[uit.length - 1].at : null, trending, leeftijd: '9+',
+      moment: top ? publiek(top, key) : null };
   }
   function pulseProfiel(key, anderKey) {
     const p = P();

@@ -5,7 +5,7 @@
    lezen/beantwoorden gebeurt in de bron-app (die houdt zelf de leesstanden bij).
    Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid } = kern;
+  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan } = kern;
 
   app.post('/api/member/berichten', auth, (req, res) => {
     const mij = req.session.key;
@@ -32,7 +32,9 @@ module.exports = (kern) => {
         const ongelezen = chat.messages.filter(m => m.from !== mij && (!gelezen || m.at > gelezen)).length;
         kanalen.push({ soort: 'dm', titel: c.codename || codenaamVan(c.key), icoon: '💬',
           laatste: String(l.text || (l.post ? 'Deelde een Salon-post' : '')).slice(0, 120),
-          at: l.at, ongelezen, link: '/apps/vrienden.html' });
+          at: l.at, ongelezen, link: '/apps/vrienden.html',
+          // de wauw-laag reist mee: de dag-stemming en verjaardagsglans van je vriend
+          stemming: stemmingVan ? stemmingVan(c.key) : null, jarig: jarigVan ? !!jarigVan(c.key) : false });
       }
     } catch (e) {}
 

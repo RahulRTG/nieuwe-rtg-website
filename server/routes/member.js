@@ -59,6 +59,8 @@ module.exports = (kern) => {
   require('./member/pulse')(kern);
   // De Berichten-app: alle gesprekken van het platform op een plek
   require('./member/berichten')(kern);
+  // De wauw-laag: stemming, verjaardagsglans en De Terugblik
+  require('./member/wauw')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
   // De persoonlijke AI en de Butler/concierge-chat.

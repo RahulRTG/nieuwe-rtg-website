@@ -55,7 +55,7 @@ async function laad(){
   }catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   if(d.ongelezen){ $('#tel').textContent=d.ongelezen; $('#tel').hidden=false; } else $('#tel').hidden=true;
   $('#main').innerHTML = d.kanalen.length ? d.kanalen.map(k=>
-    '<a class="rijk" href="'+esc(k.link)+'"><span class="ic">'+esc(k.icoon)+'</span><span class="b"><span class="nm">'+esc(k.titel)+(k.ongelezen?' <span class="badge">'+k.ongelezen+'</span>':'')+'</span><span class="lt">'+esc(k.laatste)+'</span></span><span class="tijd">'+tijd(k.at)+'</span></a>'
+    '<a class="rijk" href="'+esc(k.link)+'"><span class="ic">'+esc(k.icoon)+'</span><span class="b"><span class="nm">'+esc(k.titel)+(k.stemming?' '+esc(k.stemming):'')+(k.jarig?' 🎂':'')+(k.ongelezen?' <span class="badge">'+k.ongelezen+'</span>':'')+'</span><span class="lt">'+esc(k.laatste)+'</span></span><span class="tijd">'+tijd(k.at)+'</span></a>'
   ).join('')+'<div class="noot">Berichten van je socials, je werk en de overheid, op een plek. Tik een gesprek om het in de bron-app te openen en te beantwoorden.</div>'
   : '<div class="leeg">Nog geen gesprekken.<br>Start er een in De Salon, bij je vrienden of via Rahul.</div>';
 }

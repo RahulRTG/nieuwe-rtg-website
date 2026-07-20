@@ -2,6 +2,10 @@
 .DS_Store
 node_modules/
 server/data/
+# de sleutel en brokken van de GEHEUGEN-motor: nooit committen, ook niet als
+# RTG_DATA_DIR ergens anders wijst dan server/data
+**/geheugen.key
+**/geheugen/
 .env
 .vercel
 public/dist/

@@ -23,6 +23,7 @@ const db = state.db;
 const { merge3 } = require('./merge');
 const opslag = require('./opslag');
 const sqlite = require('./sqlite');
+const geheugen = require('./geheugen');
 const postgres = require('./postgres');
 const gidsen = require('./gidsen');
 const tx = require('./tx');
@@ -41,6 +42,16 @@ function load() {
       // db.json ligt, neemt die data mee in plaats van leeg te beginnen
       const oud = leesLokaleSnapshot();
       if (oud) console.log('[db] bestaande db.json overgenomen in de SQLite-opslag.');
+      db.data = oud || seed();
+      save();
+    }
+  } else if (STORE === 'geheugen') {
+    // De volledig in-memory runtime-engine: versleutelde, incrementele brokken.
+    db.data = geheugen.laadGeheugen();
+    if (!db.data) {
+      // migratiepad: een bestaande db.json neemt zijn data mee de GEHEUGEN-opslag in
+      const oud = leesLokaleSnapshot();
+      if (oud) console.log('[db] bestaande db.json overgenomen in de GEHEUGEN-opslag.');
       db.data = oud || seed();
       save();
     }
@@ -133,6 +144,9 @@ function save() {
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
     sqlite.saveSqlite();
+  } else if (STORE === 'geheugen') {
+    // GEHEUGEN: versleutelde, incrementele brok-per-collectie-opslag (write-behind).
+    geheugen.saveGeheugen();
   } else {
     planSnapshot();
   }
@@ -146,6 +160,7 @@ function onExternalChange(cb) { state.setExternCb(cb); }
 // Laatste flush bij het afsluiten, zodat niets in de write-behind blijft hangen.
 async function flushBijAfsluiten() {
   if (db.writable && saveVuil) { try { schrijfSnapshotNu(); } catch (e) {} }
+  geheugen.flushGeheugen();   // no-op buiten de geheugen-modus
   await postgres.flushBijAfsluiten();
 }
 

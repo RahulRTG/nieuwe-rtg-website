@@ -77,11 +77,12 @@ function mistLabel(veld) {
   if ((veld.getAttribute('aria-label') || '').trim()) return false;
   if (veld.getAttribute('aria-labelledby')) return false;
   if ((veld.getAttribute('title') || '').trim()) return false;
-  const id = veld.getAttribute('id');
-  if (id && typeof document !== 'undefined') {
-    const esc = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(id) : id.replace(/"/g, '\\"');
-    if (document.querySelector('label[for="' + esc + '"]')) return false;
-  }
+  // placeholder telt mee voor de toegankelijke naam (accname-algoritme), net als bij axe:
+  // een veld met alleen een placeholder is geen serious/critical label-overtreding.
+  if ((veld.getAttribute('placeholder') || '').trim()) return false;
+  // .labels dekt zowel <label for=id> als een omhullende <label> -- geen selector-
+  // string met de (onbekende) id nodig, dus ook geen escaping-valkuil.
+  if (veld.labels && veld.labels.length) return false;
   if (veld.closest && veld.closest('label')) return false;
   return true;
 }

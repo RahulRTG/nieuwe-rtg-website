@@ -69,15 +69,16 @@ test('mistNaam: knop/link zonder enige naam', () => {
   } finally { delete global.document; }
 });
 
-test('mistLabel: veld zonder label/aria/title (conservatief, geen vals alarm op knoppen/hidden)', () => {
-  global.document = { querySelector: () => null };
-  try {
-    assert.equal(k.mistLabel(elm('INPUT', {})), true);
-    assert.equal(k.mistLabel(elm('INPUT', { 'aria-label': 'E-mail' })), false);
-    assert.equal(k.mistLabel(elm('INPUT', { title: 'Zoek' })), false);
-    assert.equal(k.mistLabel(elm('INPUT', { type: 'hidden' })), false);
-    assert.equal(k.mistLabel(elm('INPUT', { type: 'submit' })), false);
-  } finally { delete global.document; }
+test('mistLabel: veld zonder label/aria/title/placeholder (conservatief, geen vals alarm)', () => {
+  assert.equal(k.mistLabel(elm('INPUT', {})), true);
+  assert.equal(k.mistLabel(elm('INPUT', { 'aria-label': 'E-mail' })), false);
+  assert.equal(k.mistLabel(elm('INPUT', { title: 'Zoek' })), false);
+  assert.equal(k.mistLabel(elm('INPUT', { placeholder: 'E-mail' })), false, 'placeholder telt mee, zoals axe');
+  assert.equal(k.mistLabel(elm('INPUT', { type: 'hidden' })), false);
+  assert.equal(k.mistLabel(elm('INPUT', { type: 'submit' })), false);
+  // een veld met een gekoppeld <label> (via de .labels-NodeList) is niet ongelabeld
+  const metLabel = elm('INPUT', {}); metLabel.labels = [{}];
+  assert.equal(k.mistLabel(metLabel), false);
 });
 
 test('BRON is syntactisch geldige browsercode en bevat de instap', () => {

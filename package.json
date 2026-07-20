@@ -14,6 +14,7 @@
     "beproeving:mega": "node --max-old-space-size=8192 scripts/beproeving.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
+    "ast-scan": "node scripts/ast-scan.js",
     "a11y": "node scripts/a11y.js",
     "build": "node scripts/build.js",
     "test": "node --experimental-sqlite --test test/*.test.js",

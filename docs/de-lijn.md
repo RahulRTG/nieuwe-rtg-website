@@ -41,6 +41,17 @@ gemak brengt. In deze code betekent dat:
   toegankelijkheidskeuring, en de belastings- en misbruik-beproeving
   (`scripts/beproeving.js`, `npm run beproeving`). Ook het gereedschap is
   grotendeels eigen.
+- **De AST-scanner** (`scripts/ast/` + `scripts/ast-scan.js`, `npm run ast-scan`):
+  een volledig zelfgebouwde statische analyse -- eigen lexer, eigen recursive-
+  descent parser (bouwt een echte AST), eigen walker en eigen regels -- zonder
+  ook maar een parser-dependency. Bewust veilig: code die de parser niet begrijpt
+  is een HARDE fout, geen stille overslag (een security-scanner die code mist
+  geeft valse zekerheid). De parser is geborgd doordat hij de hele boom van
+  server/ + scripts/ leest; in de test is de boom bovendien knoop-voor-knoop
+  gelijk aan een volwassen parser. De regels bewaken juist de afspraken van deze
+  lijn: geen require van een pakket dat we zelf bouwen, geen eval/Function, geen
+  Math.random als toevalsbron voor een geheim (regel 1), en onbereikbare code.
+  Dit is aanvullend op CodeQL, niet in plaats daarvan.
 - **Sinds kort ook de lettertypen** (`public/fonts/`): zelf geserveerd, zodat er
   letterlijk geen enkele verbinding met een derde partij overblijft in de
   browser van de bezoeker.

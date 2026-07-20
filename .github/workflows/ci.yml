@@ -30,6 +30,8 @@ jobs:
       - run: npm ci
       - name: Codeafspraken (check.js)
         run: npm run check
+      - name: Eigen AST-scan (statische analyse, geen dependency)
+        run: npm run ast-scan
       # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/

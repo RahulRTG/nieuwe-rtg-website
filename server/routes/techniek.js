@@ -65,8 +65,9 @@ module.exports = (kern) => {
       STORE: dbmod.STORE, pgPing: dbmod.pgPing,
       mailGeconfigureerd: !!(process.env.SMTP_URL || process.env.SMTP_HOST),
       zekeringen: staat().zekeringen,
-      // de bank in de bewaking: sluitcontrole + nood-stand horen op het bord
-      bank: kern.bank, bankRegie: kern.bankregieOverzicht,
+      // de geldlagen in de bewaking: beide grootboeken (wallet + bank) horen
+      // met hun sluitcontrole op het bord, net als de nood-stand van de knop
+      pay: kern.pay, bank: kern.bank, bankRegie: kern.bankregieOverzicht,
       // de stad in de bewaking: de Stadsdoos-vloot hoort erbij
       stad: kern.stad
     };

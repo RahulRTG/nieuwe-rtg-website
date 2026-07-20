@@ -75,6 +75,9 @@ test('eigen hardware: een Stadsdoos aanmelden en insturen met de apparaat-sleute
   assert.equal(m.status, 200);
   assert.equal(m.body.geboekt, 1, 'alleen de eigen, geldige meting telt');
   assert.equal(m.body.geweigerd, 2);
+  // de rem op de poort: direct nog een bericht is te snel (spam/kapotte doos)
+  const spam = await api('stad/doos/meting', { serial, sleutel, metingen: [{ sens: 'verkeer', waarde: 300 }] });
+  assert.equal(spam.status, 429, 'de poort remt een doos die te vaak instuurt');
   const b = (await oapi('stad')).body;
   const doos = b.nodes.find(n => n.serial === serial);
   assert.ok(doos && doos.online && !doos.demo, 'de echte doos staat online op het bord');
@@ -125,6 +128,13 @@ test('los regime, AI-stadsregisseur, nood -> beveiligingsmelding, bewaking en da
   const chk = status.checks.find(c => c.code === 'STAD-01');
   assert.ok(chk, 'STAD-01 staat in de bewaking');
   assert.equal(chk.status, 'ok', 'de vloot is gezond: ' + chk.detail);
+  // en de wallet-sluitcontrole staat er nu naast (beide grootboeken bewaakt)
+  const pay2 = status.checks.find(c => c.code === 'PAY-02');
+  assert.ok(pay2 && pay2.status === 'ok', 'PAY-02: het wallet-grootboek sluit');
+  // de stad hoort bij het gezamenlijke rampbeeld (operationeel, geen personen)
+  const rb = await oapi('rampbeeld');
+  assert.equal(rb.status, 200);
+  assert.ok(rb.body.stad && rb.body.stad.scenario && rb.body.stad.vloot, 'het rampbeeld toont de staat van de stad');
   await oapi('stad/scenario', { scenario: 'normaal' });
   // de metingen zitten (zonder persoonsgegevens) in de eigen-AI-dataset
   const ai = (await oapi('aidata')).body;

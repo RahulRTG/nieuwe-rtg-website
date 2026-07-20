@@ -61,6 +61,15 @@ const CHECKS = [
       : { status: 'waarschuwing', detail: 'Demo-betalingen: geen STRIPE_SECRET_KEY (geen echt geld).' }
   },
   {
+    id: 'wallet', naam: 'RTG Pay (wallet)', code: 'PAY-02', categorie: 'Integraties',
+    run: (c) => {
+      if (!c.pay || !c.pay.sluitcontrole) return { status: 'waarschuwing', detail: 'Wallet niet gekoppeld aan de bewaking.' };
+      const s = c.pay.sluitcontrole();
+      if (!s.klopt) return { status: 'fout', detail: 'De wallet-sluitcontrole faalt: som ' + s.som + ' (hoort exact 0 te zijn).' };
+      return { status: 'ok', detail: 'Het wallet-grootboek sluit (som 0).' };
+    }
+  },
+  {
     id: 'bank', naam: 'RTG Bank', code: 'BANK-01', categorie: 'Integraties',
     run: (c) => {
       if (!c.bank) return { status: 'waarschuwing', detail: 'Bankmodule niet gekoppeld aan de bewaking.' };

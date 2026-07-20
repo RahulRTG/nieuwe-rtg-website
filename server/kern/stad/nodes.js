@@ -11,6 +11,8 @@ module.exports = (ctx) => {
 
   const MAX_NODES = 500;
   const MAX_PER_POST = 50;
+  // een doos die vaker instuurt dan dit is stuk of kwaadwillend: de poort remt
+  const MIN_TUSSEN_MS = Number(process.env.STAD_DOOS_MIN_MS || 2000);
   const SENSOREN = Object.fromEntries(DOMEINEN.map(x => [x.sens, x]));
   const BEREIK = { verkeer: [0, 20000], licht: [0, 100], lucht: [0, 500], geluid: [20, 130],
     energie: [0, 5000], water: [0, 1000], afval: [0, 100], parkeer: [0, 5000] };
@@ -42,9 +44,12 @@ module.exports = (ctx) => {
     save();
   }
 
-  // de demovloot leeft: hooguit elke vijf minuten een nieuwe, licht verschoven meting
+  // De demovloot leeft: hooguit elke vijf minuten een nieuwe, licht verschoven
+  // meting. Alleen schrijven als er echt iets veranderde -- het stadsbeeld wordt
+  // vaak opgevraagd (bord + SSE) en elke save is een fsync naar schijf.
   function simuleer() {
     const grens = nu() - 5 * 60 * 1000;
+    let geraakt = false;
     for (const n of Object.values(nodes())) {
       if (!n.demo || !n.actief || (n.laatsteMeting || 0) > grens) continue;
       for (const s of n.sensoren) {
@@ -55,7 +60,9 @@ module.exports = (ctx) => {
         metingen().unshift({ node: n.serial, zone: n.zone, sens: s, waarde: n.waarden[s], at: nu() });
       }
       n.laatsteMeting = nu(); n.laatsteContact = nu();
+      geraakt = true;
     }
+    if (!geraakt) return;
     if (metingen().length > MAX_METINGEN) metingen().length = MAX_METINGEN;
     save();
   }
@@ -101,6 +108,10 @@ module.exports = (ctx) => {
   function meting({ serial, sleutel, metingen: rij }) {
     const n = poort(serial, sleutel);
     if (!n) return { status: 401, error: 'Onbekende doos of verkeerde sleutel.' };
+    // de rem op de poort: een kapotte (of gekaapte) doos kan de opslag niet
+    // volpompen; batchen mag, spammen niet
+    if (n.laatsteMeting && nu() - n.laatsteMeting < MIN_TUSSEN_MS)
+      return { status: 429, error: 'Rustig aan: hooguit een meetbericht per ' + Math.round(MIN_TUSSEN_MS / 1000) + ' seconde(n); bundel metingen in een bericht.' };
     if (!Array.isArray(rij) || !rij.length) return { status: 400, error: 'Stuur minstens een meting.' };
     if (rij.length > MAX_PER_POST) return { status: 400, error: 'Hooguit ' + MAX_PER_POST + ' metingen per bericht.' };
     let geboekt = 0;

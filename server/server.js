@@ -2119,6 +2119,14 @@ fonds.koppelBank(({ centen, referentie, oms }) => {
    domeinen met regimes, een scenario-knop in de boardroom en een
    AI-stadsregisseur. Privacy by design: de stad meet dingen, geen mensen. */
 Object.assign(kern, require('./kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig }));
+/* De stad in het gezamenlijke rampbeeld: tijdens een calamiteit ziet de hele
+   keten (korpsen, zorg, defensie, boardroom) ook het stadsscenario, de
+   bord-waarschuwingen en de vloot -- operationele toestand, geen
+   persoonsgegevens. Late binding, want het rampbeeld is eerder gemount. */
+kern.rampbeeld.koppelStad(() => {
+  const b = kern.stad.stadBeeld();
+  return { scenario: b.scenario, alerts: b.alerts, vloot: b.vloot };
+});
 /* De eigen-AI-dataset (kern/aidata.js): een boardroom-knop verzamelt alle logs
    (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL om
    later een eigen model te trainen -- op codenamen, de kluis blijft dicht. */

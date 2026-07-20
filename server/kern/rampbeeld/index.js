@@ -69,6 +69,14 @@ module.exports = ({ db, save, findSupplier, anthropic }) => {
     };
   }
 
+  /* De stad-naad (laat gebonden: RTG Stad wordt na dit rampbeeld gemount).
+     Tijdens een calamiteit hoort de staat van de stad -- het scenario, de
+     bord-waarschuwingen, de vloot -- bij het gezamenlijke beeld: puur
+     operationele toestand, geen persoonsgegevens (de stad meet dingen, geen
+     mensen), dus de hele keten mag hem zien. */
+  let stadFoto = null;
+  function koppelStad(fn) { if (typeof fn === 'function') stadFoto = fn; }
+
   /* Het rampbeeld voor een viewer. Een korps ziet zichzelf plus de
      keten-partners; de boardroom (viewerCode null) ziet alles. */
   function beeld(viewerCode) {
@@ -80,7 +88,9 @@ module.exports = ({ db, save, findSupplier, anthropic }) => {
       codes = [viewerCode, ...partnersVan(viewerCode)];
       if (codes.length === 1) return { status: 409, error: 'Verbind eerst met een ander korps in de keten; daarna deelt u het rampbeeld.' };
     }
-    return { ok: true, ramp: hulp().ramp || { niveau: 'normaal', sinds: null, door: null }, ...beeldVoor(codes) };
+    let stad = null;
+    if (stadFoto) { try { stad = stadFoto(); } catch (e) {} }
+    return { ok: true, ramp: hulp().ramp || { niveau: 'normaal', sinds: null, door: null }, stad, ...beeldVoor(codes) };
   }
 
   /* Het niveau op- of afschalen. Blijft bij de keten en de boardroom; wordt
@@ -103,7 +113,7 @@ module.exports = ({ db, save, findSupplier, anthropic }) => {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = { db, save, findSupplier, anthropic, nu, lijst, hulp, partnersVan, beeldVoor, beeld, NIVEAUS, KORPS_TYPES };
-  const api = { NIVEAUS, beeld, schaal };
+  const api = { NIVEAUS, beeld, schaal, koppelStad };
   Object.assign(api, require('./evaluatie')(ctx)); // vult ctx.evaluatieRaw
   Object.assign(api, require('./advies')(ctx));
   return { rampbeeld: api };

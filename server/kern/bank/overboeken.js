@@ -45,7 +45,8 @@ module.exports = (ctx) => {
       }
       const van = via === 'eigen' ? 'extern:emissie' : 'extern:kaart';
       const b = boek({ van, naar: iban, centen: c, soort: 'storting', oms: oms || 'Storting', ref });
-      if (b.error) return b;
+      if (b.error) { if (via === 'eigen') bankregie.bankClearingMislukt('emissie-boek'); return b; }
+      if (via === 'eigen') bankregie.bankClearingGelukt(); // een geslaagde eigen-clearing wist de mislukt-teller
       seintje(rekMeta(iban).codenaam);
       return { ok: true, iban, via, saldoCenten: saldoVan(iban), gestort: c };
     });

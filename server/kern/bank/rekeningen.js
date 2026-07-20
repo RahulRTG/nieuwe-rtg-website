@@ -101,9 +101,35 @@ module.exports = (ctx) => {
     return { ok: true, gesloten: iban };
   }
 
+  /* ---------- de leden-bank: alleen live als de boardroom hem aan heeft, en
+     iedereen krijgt zijn eigen rekening pas NA akkoord (opt-in). Zo geldt hetzelfde
+     voor nieuwe leden als voor bestaande leden bij live gaan: bij het eerste bezoek
+     een akkoordscherm, en op akkoord meteen een betaalrekening. ---------- */
+  function akkoordStore() { if (!db.data.bankAkkoord || typeof db.data.bankAkkoord !== 'object') db.data.bankAkkoord = {}; return db.data.bankAkkoord; }
+  function ledenOverzicht(codenaam) {
+    const c = String(codenaam || '').trim();
+    const mijn = vanLid(c);
+    return { ok: true, online: bankregie.bankLedenAan(), akkoord: !!akkoordStore()[c],
+      modus: bankregie.bankModus(), spaarrentePct: bankregie.bankSpaarrenteBp() / 100,
+      rekeningen: mijn.rekeningen, totaalCenten: mijn.totaalCenten };
+  }
+  async function ledenAkkoord(codenaam) {
+    if (!bankregie.bankLedenAan()) return { status: 403, error: 'De RTG Bank is nog niet live voor leden.' };
+    const c = String(codenaam || '').trim();
+    if (!c) return { status: 400, error: 'Onbekend lid.' };
+    const store = akkoordStore();
+    const alHad = Object.values(rekeningen()).some(m => m.codenaam === c);
+    store[c] = store[c] || nu();
+    save();
+    let rekening = null;
+    if (!alHad) { const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid' }); if (r.error) return r; rekening = r.rekening; }
+    return { ok: true, akkoord: true, rekening };
+  }
+
   return {
     genIban, ibanControle,
     rekeningOpen: open, rekeningenVanLid: vanLid, rekeningDetail: detail,
-    rekeningBevries: bevries, rekeningRoodZet: roodZet, rekeningSluit: sluit
+    rekeningBevries: bevries, rekeningRoodZet: roodZet, rekeningSluit: sluit,
+    bankLedenOverzicht: ledenOverzicht, bankLedenAkkoord: ledenAkkoord
   };
 };

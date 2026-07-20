@@ -572,12 +572,12 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 let anthropic = null;
 if (process.env.ANTHROPIC_API_KEY) {
   try {
-    const Anthropic = require('@anthropic-ai/sdk');
+    const Anthropic = require('./anthropic'); // eigen dunne client (geen SDK-dependency)
     anthropic = new Anthropic();
     i18n.setAnthropic(anthropic);
     console.log('Persoonlijke AI: Claude API actief (claude-opus-4-8).');
   } catch (e) {
-    console.warn('ANTHROPIC_API_KEY gevonden maar @anthropic-ai/sdk ontbreekt, demo-antwoorden actief.');
+    console.warn('AI-client kon niet starten (' + (e && e.message) + '); demo-antwoorden actief.');
   }
 } else {
   console.log('Persoonlijke AI: demo-antwoorden (zet ANTHROPIC_API_KEY voor echte Claude).');

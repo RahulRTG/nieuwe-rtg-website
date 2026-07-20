@@ -66,7 +66,7 @@ module.exports = function maakBasis() {
 
   let anthropic = null;
   if (process.env.ANTHROPIC_API_KEY) {
-    try { anthropic = new (require('@anthropic-ai/sdk'))({ apiKey: process.env.ANTHROPIC_API_KEY }); }
+    try { anthropic = new (require('../anthropic'))({ apiKey: process.env.ANTHROPIC_API_KEY }); }
     catch (e) { /* zonder SDK: demo-antwoorden */ }
   }
 

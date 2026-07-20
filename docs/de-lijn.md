@@ -85,6 +85,12 @@ gemak brengt. In deze code betekent dat:
   HKDF-SHA256, AES-128-GCM, ECDSA -- allemaal uit `node:crypto`. Dat is protocol-
   assemblage, geen eigen crypto. De payload-versleuteling is byte-voor-byte tegen het
   RFC 8291-testvector geijkt (`test/webpush.test.js`).
+- **De Claude-client** (`server/anthropic.js`): een dunne eigen HTTPS-client naar
+  de Messages-API die `@anthropic-ai/sdk` verving. Het MODEL blijft bij Anthropic
+  draaien -- dat kunnen en willen we niet zelf zijn -- we vervangen alleen de
+  HTTP-omhulling (headers, JSON, herproberen bij 429/5xx). Zelfde vorm als het
+  pakket (`new Anthropic().messages.create(...)`), dus de ~50 aanroepplekken en de
+  tool-lus merken er niets van. Scheelt de grootste dependency-boom.
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.
@@ -122,7 +128,6 @@ te zetten blijven we een handelaar die munten accepteert, geen wisselkantoor.
 | Pakket | Waarom niet zelf |
 |---|---|
 | `express` | HTTP-routing, jaren dichtgetimmerd tegen randgevallen die je niet in een middag reproduceert. |
-| `@anthropic-ai/sdk` | De AI-butler; het model draait niet bij ons. |
 | `nodemailer` | SMTP met alle protocol-eigenaardigheden. |
 
 En vier **optionele** pakketten die alleen laden als je ze configureert —

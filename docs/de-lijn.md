@@ -134,6 +134,17 @@ gemak brengt. In deze code betekent dat:
   het echte systeem eroverheen (1023 tests, incl. auth, SSE en de webhooks), en een
   eigen test toetst het framework los (`test/web.test.js`). Zie de nuance hieronder:
   dit was een bewuste keuze om de eerder getrokken lijn te verschuiven, niet regel 1.
+- **De fout-melder** (`server/foutmelder.js`): externe fout-bezorging via een dunne
+  webhook-POST (Node's https), die de externe-tracking-rol van `@sentry/node`
+  overnam. De groepering/UI zat al in `server/log.js`; alleen de bezorging kwam van
+  het pakket. Getemperd op vingerafdruk, fire-and-forget.
+- **De Redis-client** (`server/redis.js`): het RESP-wireprotocol op node:net/tls,
+  die het pakket `redis` verving. De realtime-bus (`server/bus.js`) en de gedeelde-
+  data-mirror (`server/db/redis.js`) draaien erop; auto-herstel + her-abonneren bij
+  een verbroken verbinding, net als het pakket. Geen crypto, alleen protocol. De
+  Redis-*server* zelf blijft extern (alleen met `REDIS_URL`). Geborgd tegen een
+  ECHTE redis-server, inclusief kruisvalidatie met de npm-client, beide kanten op
+  (`test/redis.test.js`).
 
 Winst: geen supply-chain-aanval via een pakket-update, geen dependency die
 morgen breekt of verdwijnt, geen black box om in te turen tijdens een incident.
@@ -189,16 +200,14 @@ zonder deze draait alles gewoon door in demo/lokaal:
 |---|---|---|
 | `stripe` | echt geld | demo-provider (geen echt geld) |
 | `pg` | PostgreSQL, de schaalweg boven ~1,5 mln leden | embedded sqlite/JSON |
-| `redis` | realtime over losse processen | realtime binnen één proces |
 
 Externe fout-tracking doen we niet meer met `@sentry/node`: de groepering/UI zat
 al in de eigen aggregatie (`server/log.js`, techniekbord) en de externe bezorging
-is nu de eigen `server/foutmelder.js` (webhook-POST). `pg` en `redis` zijn *clients*
-voor een wire-protocol -- die zijn in principe zelf te bouwen (zelfde patroon als de
-eigen SMTP-client), maar blijven bewust een pakket: ze laden alleen boven ~1,5 mln
-leden of bij echt losse processen, en op precies die plek zit een fout in de driver
-dicht bij "verlies van al vastgelegde data". De *database/broker zelf* (PostgreSQL,
-Redis) bouwen we sowieso nooit -- dáár is een fout wél fataal (durability, ACID).
+is nu de eigen `server/foutmelder.js` (webhook-POST). En de Redis-*client* is nu
+ook eigen huis (`server/redis.js`, RESP op node:net) -- de realtime-bus en de
+gedeelde-data-mirror draaien erop; dat is protocol-assemblage, geen crypto. De
+Redis-*broker zelf* draaien we niet, en de eigen client verbindt alleen als
+`REDIS_URL` gezet is (anders realtime binnen één proces).
 
 Dev-only: alleen nog `axe-core` (a11y-keuring). De minify doen we zelf
 (`scripts/ast/`), dus terser -- en daarmee acorn -- is eruit. Dev-only raakt de

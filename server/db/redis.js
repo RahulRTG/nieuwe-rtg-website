@@ -27,7 +27,7 @@ async function startGedeeld() {
   if (STORE === 'sqlite') return false; // SQLite deelt via de poll, niet via de Redis-mirror
   if (!REDIS_URL) return false;
   let redis;
-  try { redis = require('redis'); } catch (e) { console.warn('[db] redis ontbreekt, alleen lokale data.'); return false; }
+  try { redis = require('./redis'); } catch (e) { console.warn('[db] redis ontbreekt, alleen lokale data.'); return false; }
   rPub = redis.createClient({ url: REDIS_URL });
   rSub = redis.createClient({ url: REDIS_URL });
   rPub.on('error', e => console.warn('[db] redis:', e.message));

@@ -17,7 +17,7 @@ function maakBus() {
   const url = process.env.REDIS_URL;
   if (url) {
     try {
-      const redis = require('redis');
+      const redis = require('./redis');
       const pub = redis.createClient({ url });
       const sub = redis.createClient({ url });
       pub.on('error', e => console.warn('[bus] redis pub:', e.message));

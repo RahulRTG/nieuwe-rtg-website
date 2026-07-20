@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Bank</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem;margin-top:1rem;}
+  .sec{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:1.6rem 0 .3rem;}
+  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:11px;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop:active{transform:scale(.98);}
+  input,select{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.5rem .6rem;font:inherit;font-size:.9rem;}
+  label{font-size:.72rem;color:var(--soft);display:block;margin-bottom:.3rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:1rem 0;text-align:center;}
+  .rek{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.7rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .rek:last-child{border-bottom:none;}
+  .rek .sald{font-family:'Bodoni Moda',serif;font-size:1.3rem;color:var(--gold);}
+  .rek .iban{font-size:.72rem;color:var(--soft);letter-spacing:.04em;}
+  .rek .soort{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+  .mini{font-size:.75rem;padding:.32rem .6rem;}
+  /* AI-bankier, prominent bovenaan */
+  .ai{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--gold);border-radius:18px;padding:1.1rem;margin-top:1rem;}
+  .ai h2{font-size:1.1rem;display:flex;align-items:center;gap:.5rem;}
+  .ai .we{font-size:.8rem;color:var(--muted);line-height:1.55;margin-top:.35rem;white-space:pre-wrap;}
+  .ai .snel{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem;}
+  .ai .snel button{background:rgba(169,143,28,.14);border:1px solid var(--line);color:var(--txt);border-radius:20px;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
+  .ai .vraag{display:flex;gap:.5rem;margin-top:.7rem;}
+  .ai .vraag input{flex:1;}
+  .tips{margin-top:.6rem;font-size:.8rem;color:var(--muted);line-height:1.6;}
+  .tips li{margin-left:1rem;}
+  .banner{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.6rem;text-align:center;margin-top:2rem;}
+  .banner h2{font-size:1.3rem;margin-bottom:.5rem;}
+  .banner p{color:var(--muted);font-size:.9rem;line-height:1.6;}
+</style>
+</head>
+<body>
+<header>
+  <button class="terug" id="terug">←</button>
+  <div><div class="ey">RTG · Eigen bank</div><h1>🏦 RTG Bank</h1></div>
+</header>
+<main id="app"><div class="leeg">Laden…</div></main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const euro = c => '€ ' + ((Number(c)||0)/100).toFixed(2);
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+$('#terug').addEventListener('click', () => { location.href = '/apps/app.html'; });
+const api = (pad, body) => fetch('/api/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+let OV = null;
+async function laad(){
+  try { OV = await api('bank/overzicht'); render(); }
+  catch (e) { $('#app').innerHTML = '<div class="banner"><h2>Even niet bereikbaar</h2><p>' + esc(e.message) + '</p></div>'; }
+}
+
+function render(){
+  if (!OV.online) {
+    $('#app').innerHTML = '<div class="banner"><h2>Binnenkort</h2><p>De RTG Bank opent hier zodra RTG hem live zet. Je RTG Pay-wallet werkt gewoon door.</p></div>';
+    return;
+  }
+  if (!OV.akkoord) {
+    $('#app').innerHTML =
+      '<div class="banner"><h2>Open je RTG Bank-rekening</h2>' +
+      '<p>Je eigen bank binnen RTG: een rekening met een echt IBAN, sparen tegen ' + (OV.spaarrentePct) + '% rente, passen en meer. Gebouwd op hetzelfde grootboek als RTG Pay. Ga je akkoord, dan openen we meteen je betaalrekening.</p>' +
+      '<div style="margin-top:1rem;"><button class="knop" id="akk">Ik ga akkoord en open mijn rekening</button></div></div>';
+    $('#akk').addEventListener('click', async () => {
+      try { await api('bank/akkoord'); OV = await api('bank/overzicht'); render(); ai(); }
+      catch (e) { alert(e.message); }
+    });
+    return;
+  }
+  const reks = OV.rekeningen || [];
+  $('#app').innerHTML =
+    '<div class="ai" id="ai"><h2>🤖 De AI-bankier</h2><div class="we" id="aiWe">Ik kijk mee met je rekeningen en geef eerlijk advies. Ik adviseer; beslissen doe jij.</div>' +
+      '<div class="snel">' +
+        '<button data-q="Hoe kan ik het beste sparen?">Beter sparen?</button>' +
+        '<button data-q="Sta ik ergens rood en wat kan ik doen?">Sta ik rood?</button>' +
+        '<button data-q="Wat kost een lening bij jullie en hoe werkt het?">Lening?</button>' +
+      '</div>' +
+      '<div class="vraag"><input id="aiV" placeholder="Vraag de AI-bankier iets…"><button class="knop" id="aiB">Vraag</button></div>' +
+      '<ul class="tips" id="aiTips"></ul></div>' +
+    '<div class="sec">Mijn rekeningen · totaal ' + euro(OV.totaalCenten) + '</div>' +
+    '<div class="kaart" id="reks">' + (reks.length ? reks.map(rekHtml).join('') : '<div class="leeg">Nog geen rekeningen.</div>') + '</div>' +
+    '<div class="sec">Nieuwe rekening</div>' +
+    '<div class="kaart"><div class="rij">' +
+      '<span><label for="nsoort">Soort</label><select id="nsoort"><option value="betaal">Betaalrekening</option><option value="spaar">Spaarrekening</option><option value="zakelijk">Zakelijke rekening</option></select></span>' +
+      '<button class="knop stil" id="nopen">Open rekening</button></div></div>' +
+    '<div class="sec">Overboeken tussen mijn rekeningen</div>' +
+    '<div class="kaart"><div class="rij">' +
+      '<span><label for="ovan">Van</label>' + rekSelect('ovan') + '</span>' +
+      '<span><label for="onaar">Naar</label>' + rekSelect('onaar') + '</span>' +
+      '<span><label for="obed">Bedrag (€)</label><input id="obed" type="number" min="0" step="0.01" style="width:7rem;"></span>' +
+      '<button class="knop stil" id="odoe">Overboek</button></div></div>';
+  bindBank(reks);
+  ai();
+}
+
+const rekSelect = id => '<select id="' + id + '">' + (OV.rekeningen||[]).map(r => '<option value="' + r.iban + '">' + esc(r.soortLabel || r.soort) + ' · ' + euro(r.saldoCenten) + '</option>').join('') + '</select>';
+function rekHtml(r){
+  return '<div class="rek"><div><div class="sald">' + euro(r.saldoCenten) + '</div><div class="soort">' + esc(r.soortLabel || r.soort) + (r.bevroren ? ' · bevroren' : '') + '</div><div class="iban">' + esc(r.iban) + '</div></div>' +
+    '<div class="rij">' +
+      '<button class="knop stil mini" data-stort="' + r.iban + '">Storten</button>' +
+      '<button class="knop stil mini" data-nwallet="' + r.iban + '">Naar wallet</button>' +
+      '<button class="knop stil mini" data-pas="' + r.iban + '">Pas</button>' +
+      (r.soort === 'spaar' ? '<button class="knop stil mini" data-doel="' + r.iban + '">Spaardoel</button>' : '') +
+    '</div></div>';
+}
+function bindBank(reks){
+  $('#nopen').addEventListener('click', async () => { try { await api('bank/rekening/open', { soort: $('#nsoort').value }); await herlaad(); } catch (e) { alert(e.message); } });
+  $('#odoe').addEventListener('click', async () => {
+    const centen = Math.round(Number($('#obed').value) * 100);
+    try { await api('bank/overboek', { vanIban: $('#ovan').value, naarIban: $('#onaar').value, centen }); $('#obed').value=''; await herlaad(); } catch (e) { alert(e.message); }
+  });
+  document.querySelectorAll('[data-stort]').forEach(b => b.addEventListener('click', async () => {
+    const euroS = prompt('Hoeveel storten op deze rekening? (euro)'); if (euroS == null) return;
+    try { const r = await api('bank/storten', { iban: b.dataset.stort, centen: Math.round(Number(euroS)*100), idem: 'm'+Date.now() }); alert('Gestort via ' + r.via + '. Saldo: ' + euro(r.saldoCenten)); await herlaad(); } catch (e) { alert(e.message); }
+  }));
+  document.querySelectorAll('[data-nwallet]').forEach(b => b.addEventListener('click', async () => {
+    const euroS = prompt('Hoeveel naar je RTG Pay-wallet? (euro)'); if (euroS == null) return;
+    try { await api('bank/naar-wallet', { iban: b.dataset.nwallet, centen: Math.round(Number(euroS)*100) }); await herlaad(); } catch (e) { alert(e.message); }
+  }));
+  document.querySelectorAll('[data-pas]').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('bank/pas/uitgeven', { iban: b.dataset.pas, soort: 'debit' }); alert('Pas uitgegeven: ' + r.pas.nummer); } catch (e) { alert(e.message); }
+  }));
+  document.querySelectorAll('[data-doel]').forEach(b => b.addEventListener('click', async () => {
+    const euroS = prompt('Wat is je spaardoel? (euro)'); if (euroS == null) return;
+    try { const r = await api('bank/spaardoel', { iban: b.dataset.doel, euro: Number(euroS) }); alert('Spaardoel gezet. Je bent op ' + r.pct + '%.'); } catch (e) { alert(e.message); }
+  }));
+}
+async function herlaad(){ OV = await api('bank/overzicht'); render(); }
+
+/* de AI-bankier, diep geworteld: laadt bij het openen meteen een analyse, en
+   antwoordt op vragen met de volle context van de eigen rekeningen. */
+async function ai(vraag){
+  const we = $('#aiWe'), tips = $('#aiTips'); if (!we) return;
+  we.textContent = 'Even kijken…';
+  try {
+    const r = await api('bank/advies', vraag ? { vraag } : {});
+    we.textContent = r.antwoord || r.samenvatting || '';
+    tips.innerHTML = (r.tips || []).map(t => '<li>' + esc(t) + '</li>').join('');
+  } catch (e) { we.textContent = e.message; }
+  const vBtn = $('#aiB'), vIn = $('#aiV');
+  if (vBtn && !vBtn._b) { vBtn._b = 1; vBtn.addEventListener('click', () => { const q = vIn.value.trim(); if (q) { ai(q); vIn.value=''; } }); vIn.addEventListener('keydown', e => { if (e.key === 'Enter') vBtn.click(); }); }
+  document.querySelectorAll('.ai .snel button').forEach(b => { if (!b._b) { b._b = 1; b.addEventListener('click', () => ai(b.dataset.q)); } });
+}
+
+laad();
+</script>
+</body>
+</html>

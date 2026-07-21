@@ -179,6 +179,11 @@
         <span class="stil" id="kKantineStand" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
     </div>
+    <div class="kaart" id="kZelfzorg" hidden>
+      <h4 style="margin:0 0 .4rem;">🩺 De zelfzorg van het platform</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Deze kamer bewaakt het huis zelf: opruimen, beschermen, repareren en upgraden. Dezelfde knoppen staan in de boardroom.</p>
+      <div id="kZelfzorgVak"><div class="leeg">Laden...</div></div>
+    </div>
     </div>
     <div id="tabStats" hidden><div class="kpis" id="kStats"></div></div>
     <div id="tabChat" hidden></div>
@@ -229,6 +234,9 @@
 
     <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.6rem;">Loop nu een ronde</button></h3>
     <div class="kaart lijst" id="bVoorstellen"></div>
+
+    <h3 class="sec">De zelfzorg: de code ruimt op, beschermt, repareert en upgradet zichzelf</h3>
+    <div class="kaart" id="bZelfzorg"><div class="leeg">Laden...</div></div>
 
     <h3 class="sec">De eigen-AI-dataset: alle logs voor het trainen van een eigen model</h3>
     <div class="kaart" id="bAidata">
@@ -626,6 +634,61 @@ async function openKamer(id){
   if (id === 'kantine') api('kantine/menu').then(r => {
     if (r.menu && r.menu.items) { $('#kKantineMenu').value = r.menu.items.join('\n'); $('#kKantineStand').textContent = 'Gezet door ' + r.menu.door + ' (' + r.menu.datum + ').'; }
   }).catch(() => {});
+  // de zelfzorg hoort bij de kamers die het huis zelf draaiend houden
+  $('#kZelfzorg').hidden = (id !== 'intern' && id !== 'ingenieurs');
+  if (id === 'intern' || id === 'ingenieurs') laadZelfzorg($('#kZelfzorgVak'));
+}
+
+/* ---------- de zelfzorg: opruimen, beschermen, repareren, upgraden ----------
+   Een gedeeld paneel voor de boardroom en de kamers Intern & IT en
+   Ingenieurs. De knoppen roepen de zelfzorg-motor aan; de uitslag en het
+   journaal komen er meteen onder te staan. Adviezen (alles wat geld of
+   klantdata raakt) blijven adviezen: de mens beslist. */
+const zzTijd = t => new Date(t).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+function zelfzorgHtml(s){
+  const l = s.laatste || {};
+  return '<p class="stil" style="font-size:.82rem;color:var(--soft);margin:0 0 .6rem;">Versie '+esc(s.versie)+' · datakast op schema v'+s.schema+
+    (s.wachtend.length ? ' · <b style="color:var(--gold);">upgrade naar v'+s.doelSchema+' staat klaar</b>' : ' (bij)')+
+    ' · automaat: '+(s.automaat.aan ? 'elke '+s.automaat.elkeUren+' uur een stille opruim- en beschermronde' : 'uit')+'.</p>'+
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;">'+
+      '<button class="knop stil" data-zz="opruim" type="button">🧹 Ruim op</button>'+
+      '<button class="knop stil" data-zz="bescherm" type="button">🛡️ Beschermronde</button>'+
+      '<button class="knop stil" data-zz="herstel" type="button">🔧 Repareer</button>'+
+      '<button class="knop stil" data-zz="upgrade" type="button"'+(s.wachtend.length ? ' style="border-color:var(--gold);"' : '')+'>⬆️ Upgrade'+(s.wachtend.length ? ' naar v'+s.doelSchema : '')+'</button>'+
+    '</div>'+
+    (s.wachtend.length ? '<div class="stil" style="font-size:.78rem;color:var(--soft);margin-top:.5rem;">Klaarstaand: '+s.wachtend.map(w => 'v'+w.v+' · '+esc(w.uitleg)).join('<br>')+'</div>' : '')+
+    '<div class="stil" data-zz-uit style="font-size:.82rem;margin-top:.6rem;" aria-live="polite"></div>'+
+    '<div style="margin-top:.6rem;font-size:.78rem;color:var(--soft);line-height:1.7;">'+
+      (s.journaal.length ? s.journaal.map(r =>
+        '<div>'+zzTijd(r.at)+' · <b>'+esc(r.soort)+'</b> door '+esc(r.door)+
+        (r.acties.length ? ' · '+r.acties.map(a => esc(a.wat)+(a.aantal > 1 ? ' ('+a.aantal+')' : '')).join('; ') : ' · niets te doen')+
+        (r.adviezen && r.adviezen.length ? ' · <span style="color:var(--gold);">'+r.adviezen.length+' advies(en)</span>' : '')+'</div>').join('')
+      : '<div class="leeg">Nog geen zelfzorg-rondes gedraaid.</div>')+
+    '</div>';
+}
+function zelfzorgUitslag(soort, r){
+  const adv = a => (a && a.length) ? '<div style="margin-top:.3rem;">'+a.map(x =>
+    '<div>'+(x.ernst === 'hoog' ? '🔴' : '🟠')+' '+esc(x.tekst)+' <span style="color:var(--soft);">('+esc(x.waar)+')</span></div>').join('')+'</div>' : '';
+  if (soort === 'opruim') return r.schoon ? '✅ Alles was al schoon.' : '🧹 '+r.acties.map(a => esc(a.wat)+' ('+a.aantal+')').join('; ');
+  if (soort === 'bescherm') return (r.oordeel === 'ok' ? '🛡️ Alles staat er goed bij' : '⚠️ Er vraagt iets om aandacht')+
+    ' · checks: '+r.checks.ok+' groen, '+r.checks.waarschuwing+' oranje, '+r.checks.fout+' rood.'+adv(r.adviezen);
+  if (soort === 'herstel') return (r.gezond ? '✅ Niets kapot gevonden.' : '🔧 '+r.reparaties.map(x => esc(x.wat)).join('; '))+adv(r.adviezen);
+  if (soort === 'upgrade') return r.bijgewerkt ? '⬆️ Bijgewerkt naar schema v'+r.schema+'.' : '✅ De datakast staat al op schema v'+r.schema+'.';
+  return '';
+}
+async function laadZelfzorg(el, uitslag){
+  if (!el) return;
+  try {
+    const s = await api('zelfzorg');
+    el.innerHTML = zelfzorgHtml(s);
+    if (uitslag) el.querySelector('[data-zz-uit]').innerHTML = uitslag;
+    el.querySelectorAll('[data-zz]').forEach(b => b.addEventListener('click', async () => {
+      const uit = el.querySelector('[data-zz-uit]');
+      b.disabled = true; uit.textContent = 'Bezig...';
+      try { const r = await api('zelfzorg/'+b.dataset.zz, { naam: mijnNaam }); laadZelfzorg(el, zelfzorgUitslag(b.dataset.zz, r)); }
+      catch (e) { b.disabled = false; uit.textContent = e.message; }
+    }));
+  } catch (e) { el.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 $('#kKluisZoek').addEventListener('click', async () => {
   const uit = $('#kKluisUit');
@@ -1867,6 +1930,7 @@ async function openBoard(){
     : '<div class="leeg">Nog geen handelingen gelogd.</div>';
   chatWidget($('#bChat'), 'boardroom');
   laadAidata();
+  laadZelfzorg($('#bZelfzorg'));
   $('#bKamers').innerHTML = d.kamers.map(k =>
     '<button class="kaart kpi-tegel" data-kamer="'+k.id+'" style="cursor:pointer;text-align:left;"><b>'+esc(String(k.kpi[1]))+'</b><span>'+k.emoji+' '+esc(k.naam)+' · '+esc(k.kpi[0])+'</span></button>').join('');
   $('#bKamers').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => openKamer(b.dataset.kamer)));

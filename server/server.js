@@ -2403,6 +2403,15 @@ require('./routes/spellen')(kern);
 require('./routes/leren')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
+/* De zelfzorg (kern/zelfzorg): de code ruimt zichzelf op, beschermt zichzelf,
+   repareert zichzelf en upgradet zichzelf. De knoppen staan in de boardroom en
+   de kamers Intern & IT en Ingenieurs; de veilige delen draaien ook als stille
+   automaat. Geld en klantdata blijven altijd mensenwerk (advies, geen ingreep). */
+Object.assign(kern, require('./kern/zelfzorg')({
+  db, save, accounts, sessions: kern.sessions, beveilig, pay: kern.pay, bank: kern.bank,
+  log: logboek.log, fs, path, DATA_DIR
+}));
+kern.zelfzorg.autoStart();
 require('./routes/kantoren')(kern);
 require('./routes/gemeente')(kern);
 require('./routes/overheid')(kern);

@@ -214,5 +214,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 window.addEventListener('beforeunload', ()=>{ try{ vangHuidigeTekening(); navigator.sendBeacon && navigator.sendBeacon('/api/foundation/schrift/opslaan', new Blob([JSON.stringify({code:CODE,token:TOKEN,pages})],{type:'application/json'})); }catch(e){} });
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
+<script src="samen.js" defer></script>
 </body>
 </html>

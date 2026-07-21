@@ -2408,6 +2408,12 @@ require('./routes/leren')(kern);
    gratis via de RTFoundation, met de leeftijdspoort van het profiel. */
 Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
 require('./routes/rtfbieb')(kern);
+/* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
+   school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
+   (kern/samenrtf.js): kindveilig meekijken binnen gezin en vrienden. */
+Object.assign(kern, require('./kern/schoolbieb').maakSchoolBieb({ db, save }));
+Object.assign(kern, require('./kern/samenrtf')({ db, save, crypto, schoon, zijnVrienden: kern.zijnVrienden }));
+require('./routes/rtfschool')(kern);
 /* Samen (kern/samen.js): met vrienden meekijken en samen doen door het hele
    leden-OS; kamers op code, live seintjes via de SSE-stroom. */
 Object.assign(kern, require('./kern/samen')({ db, save, crypto, sseToCustomer, schoon }));

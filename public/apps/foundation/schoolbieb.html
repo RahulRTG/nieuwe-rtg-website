@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · School-Bibliotheek</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .zoekrij{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
+  .zoekrij .veld{flex:1;min-width:9rem;}
+  .apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.6rem;}
+  .app{padding:.8rem .9rem;}
+  .app .cat{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht);}
+  .app b{display:block;margin:.2rem 0 .1rem;}
+  .app small{color:var(--zacht);font-size:.76rem;display:block;}
+  .app .rij{display:flex;align-items:baseline;gap:.5rem;margin-top:.5rem;}
+  .app s{color:var(--zacht);font-size:.76rem;}
+  .app .gratis{color:var(--goud2);font-weight:700;font-size:.8rem;}
+  .app .knop{margin-left:auto;padding:.35rem .8rem;font-size:.8rem;}
+  .blader{display:flex;gap:.6rem;align-items:center;justify-content:center;margin-top:.9rem;color:var(--zacht);font-size:.82rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.8rem 0;}
+  .wijs{font-size:.8rem;color:var(--zacht);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .8rem;margin-bottom:.9rem;line-height:1.5;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>🏫 School-Bibliotheek</h1>
+  <p class="intro" id="sbIntro">Tienduizend school-apps per leeftijdsgroep, van kleuter tot universiteit en van vmbo tot vwo. De beste uit de winkel, hier altijd gratis.</p>
+  <div class="wijs">🌱 <b>Gezond leren:</b> korte sessies, echte leerdoelen, geen reclame en geen verslavende trucjes. Slim worden gaat het best met pauzes, buiten spelen en genoeg slaap.</div>
+
+  <div class="zoekrij">
+    <select id="sbNiveau" class="veld" aria-label="Niveau"><option value="">Alle niveaus (voor jou)</option></select>
+    <select id="sbVak" class="veld" aria-label="Vak"><option value="">Alle vakken</option></select>
+  </div>
+  <div class="zoekrij">
+    <input id="sbZoek" class="veld" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">
+    <button class="knop stil" id="sbMijn" type="button">Mijn school-apps</button>
+  </div>
+  <div class="apps" id="sbGrid"><div class="leeg">Laden...</div></div>
+  <div class="blader" id="sbBlader"></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const sess = Sessie.huidig();
+const api = (pad, body) => fetch('/api/rtf/school' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: sess.code, token: sess.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const ST = { niveau: '', vak: '', zoek: '', pagina: 1, mijn: false };
+let GROEPEN = [];
+const euro = c => 'EUR ' + (c / 100).toFixed(2).replace('.', ',');
+
+async function start(){
+  try {
+    const d = await api('');
+    GROEPEN = d.groepen;
+    $('#sbIntro').textContent = d.totaal.toLocaleString('nl-NL') + ' school-apps (' + d.perGroep.toLocaleString('nl-NL') + ' per leeftijdsgroep), van kleuter tot universiteit en van vmbo tot vwo. Winkelwaarde samen ' + euro(d.totaleWinkelwaardeCenten) + '; hier altijd gratis.';
+    $('#sbNiveau').innerHTML = '<option value="">Alle niveaus (voor jou)</option>' +
+      d.groepen.map(g => '<option value="'+g.id+'">'+g.icon+' '+esc(g.label)+'</option>').join('');
+  } catch (e) { $('#sbGrid').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  vulVakken(); teken();
+}
+function vulVakken(){
+  const g = GROEPEN.find(x => x.id === ST.niveau);
+  const vakken = g ? g.vakken : [...new Set(GROEPEN.flatMap(x => x.vakken))];
+  $('#sbVak').innerHTML = '<option value="">Alle vakken</option>' + vakken.map(v => '<option>'+esc(v)+'</option>').join('');
+}
+function kaart(a, vanMij){
+  return '<div class="kaart app">'+
+    '<span class="cat">'+a.icon+' '+esc(a.groepLabel)+' · '+esc(a.vak)+'</span>'+
+    '<b>'+esc(a.naam)+'</b>'+
+    '<small>★ '+a.sterren.toFixed(1)+' · versie '+esc(a.versie)+'</small>'+
+    '<div class="rij"><s>'+euro(a.winkelwaardeCenten)+'</s><span class="gratis">Gratis</span>'+
+    (vanMij ? '<button class="knop stil sweg" data-id="'+esc(a.id)+'">Opruimen</button>'
+            : '<button class="knop sin" data-id="'+esc(a.id)+'">Installeer</button>')+
+    '</div></div>';
+}
+async function teken(){
+  const grid = $('#sbGrid'), blader = $('#sbBlader');
+  $('#sbMijn').classList.toggle('aan', ST.mijn);
+  try {
+    const mijn = (await api('/mijn')).apps;
+    const mijnIds = mijn.map(a => a.id);
+    if (ST.mijn) {
+      grid.innerHTML = mijn.length ? mijn.map(a => kaart(a, true)).join('') : '<div class="leeg">Nog geen school-apps. Kies je niveau en vak, en druk op Installeer.</div>';
+      blader.innerHTML = '';
+    } else {
+      const d = await api('/catalogus', { niveau: ST.niveau, vak: ST.vak, zoek: ST.zoek, pagina: ST.pagina });
+      grid.innerHTML = d.items.length ? d.items.map(a => kaart(a, mijnIds.includes(a.id))).join('') : '<div class="leeg">Niets gevonden.</div>';
+      blader.innerHTML = d.paginas > 1
+        ? '<button class="knop stil" id="sbVorig"'+(d.pagina<=1?' disabled':'')+'>←</button>'+
+          '<span>pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
+          '<button class="knop stil" id="sbVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>→</button>' : '';
+      const v = $('#sbVorig'), n = $('#sbVolgend');
+      if (v) v.addEventListener('click', () => { ST.pagina--; teken(); });
+      if (n) n.addEventListener('click', () => { ST.pagina++; teken(); });
+    }
+    grid.querySelectorAll('.sin').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api('/installeer', { id: b.dataset.id }); teken(); } catch (e) { b.disabled = false; alert(e.message); }
+    }));
+    grid.querySelectorAll('.sweg').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/weg', { id: b.dataset.id }); teken(); } catch (e) { alert(e.message); }
+    }));
+  } catch (e) { grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+$('#sbNiveau').addEventListener('change', () => { ST.niveau = $('#sbNiveau').value; ST.vak = ''; ST.pagina = 1; ST.mijn = false; vulVakken(); teken(); });
+$('#sbVak').addEventListener('change', () => { ST.vak = $('#sbVak').value; ST.pagina = 1; ST.mijn = false; teken(); });
+let zt; $('#sbZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { ST.zoek = $('#sbZoek').value; ST.pagina = 1; ST.mijn = false; teken(); }, 300); });
+$('#sbMijn').addEventListener('click', () => { ST.mijn = !ST.mijn; ST.pagina = 1; teken(); });
+start();
+</script>
+<script src="samen.js" defer></script>
+</body>
+</html>

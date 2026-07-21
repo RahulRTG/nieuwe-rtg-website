@@ -1253,6 +1253,19 @@ app.post('/api/zegel/maak', auth, (req, res) => {
 app.post('/api/zegel/controleer', (req, res) => {
   res.json(zegel.controleer(String((req.body && req.body.token) || '')));
 });
+// een leverancier voert een officiele ID-/leeftijdscontrole uit met het Zegel:
+// de server verifieert opnieuw (vertrouwt de client niet) en legt de controle
+// vast in het activiteitenlog. Nooit de echte naam, alleen het bewezen feit en
+// het paarsgewijze pseudoniem; RTG staat er met de handtekening garant voor.
+app.post('/api/supplier/zegel/check', supplierAuth, (req, res) => {
+  const r = zegel.controleer(String((req.body && req.body.token) || ''));
+  const claims = r.geldig ? (r.claims || {}) : {};
+  const samenvatting = r.geldig
+    ? (Object.keys(claims).map(k => k === 'pas' ? 'pas ' + claims[k] : k).join(', ') || 'geen claims')
+    : ('afgewezen (' + (r.reden || 'ongeldig') + ')');
+  logActivity(req.supplier.code, req.actor, 'ID-/leeftijdscheck via Zegel: ' + (r.geldig ? 'geldig · ' + samenvatting : samenvatting));
+  res.json(r);
+});
 /* Het UI-woordenboek van een pagina in een keer naar een ACTIEVE wereldtaal:
    zo draait de hele app (elke pagina, elk scherm) in elke taal die de
    boardroom aanzet. Publiek maar begrensd (max 400 teksten van 300 tekens)

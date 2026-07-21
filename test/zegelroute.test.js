@@ -79,6 +79,39 @@ test('2. onkoppelbaar: hetzelfde lid krijgt per partner een ander pseudoniem', a
   }
 });
 
+test('4. leverancier doet een officiele ID-check: server verifieert en logt', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    // lid maakt een zegel voor KIKUNOI (18+, lid)
+    const lid = await registreer(base);
+    const token = (await api(base, '/api/zegel/maak', { partner: 'KIKUNOI', claims: ['leeftijd18', 'lid'] }, lid)).body.token;
+    assert.ok(token);
+
+    // de zaak logt in en controleert het zegel via de eigen ID-check
+    const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
+    const staff = roster.staff.find(x => x.role !== 'manager') || roster.staff[0];
+    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: staff.id, pin: '5678' })).body.token;
+    assert.ok(sup, 'leverancier ingelogd');
+
+    const ok = await api(base, '/api/supplier/zegel/check', { token }, sup);
+    assert.equal(ok.status, 200);
+    assert.equal(ok.body.geldig, true, 'geldig zegel');
+    assert.equal(ok.body.claims.leeftijd18, true);
+
+    // een onzin-token wordt afgewezen
+    const nee = await api(base, '/api/supplier/zegel/check', { token: 'rommel.zooi' }, sup);
+    assert.equal(nee.body.geldig, false);
+
+    // zonder leverancier-login mag het niet
+    const zonder = await api(base, '/api/supplier/zegel/check', { token }, null);
+    assert.equal(zonder.status, 401);
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('3. selectieve onthulling: een onwaar feit valt niet te bewijzen', async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });

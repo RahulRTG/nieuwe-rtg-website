@@ -46,6 +46,7 @@
           '<button class="obtn" data-tblqr style="margin-top:0.5rem;">🧾 '+T('st.tblqr','Print tafel-QR’s (scan en bestel)')+'</button>';
       }
       html += '<div class="st-sec">'+T('st.more','Meer')+'</div>'+
+        '<button class="obtn" data-idcheck style="width:100%;margin-bottom:0.5rem;">\u{1F6E1}\uFE0F '+T('st.idcheck','ID / leeftijd controleren (Zegel scannen)')+'</button>'+
         '<a class="tkc" style="text-decoration:none;align-items:flex-start;" href="/apps/personeel.html"><b style="font-size:0.95rem;">\uD83D\uDCF1 '+T('st.pda','Open de volledige PDA')+'</b><span style="font-size:0.74rem;color:var(--soft);">'+T('st.pda.s','Rooster, taken, teamchat, videobellen en SOS.')+'</span></a>';
     } else if (stationMode === 'events'){
       const evs = state.events || [];

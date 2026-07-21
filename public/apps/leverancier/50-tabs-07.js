@@ -5,6 +5,14 @@
     const clear = $('#posClear'); if (clear) clear.addEventListener('click', () => { bon = {}; renderKassa(); openTab('kassa'); });
     document.querySelectorAll('.js-pay').forEach(b => b.addEventListener('click', () => paySale(type, b.dataset.method)));
     const redeem = $('#posRedeem'); if (redeem) redeem.addEventListener('click', redeemCode);
+    // scan de ophaalcode van het lid (het oplichtende scherm toont hem als QR)
+    const posScan = $('#posScan'); if (posScan) posScan.addEventListener('click', () => {
+      if (!window.RTGScanknop){ toast(T('pos.scannietklaar','De scanner is nog niet geladen.')); return; }
+      RTGScanknop.open({ titel: T('pos.scan','Scan de ophaalcode'), hint: T('pos.scanhint','Scan de QR op het scherm van het lid.'), onCode: (c) => {
+        const el = $('#posCode'); if (el) el.value = String(c.tekst || '').trim().toUpperCase().slice(0, 4);
+        redeemCode();
+      } });
+    });
     // de vertaalknop: de kaartnamen in elke actieve wereldtaal, voor de gast
     const vt = $('#posVertaal'); if (vt) vt.addEventListener('click', async () => {
       const naar = (window.prompt(T('pos.vertaalnaar','Taalcode voor de kaart (bijv. en, es, de, fr) of nl voor terug:'), MENU_VERTAAL.naar || 'en')||'').trim().toLowerCase();

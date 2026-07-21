@@ -2,6 +2,14 @@
   function showGlow(o){
     $('#gcSup').textContent = o.supplierName;
     $('#gcCode').textContent = o.pickup;
+    // een echte, scanbare QR van de ophaalcode: de kassa scant hem, of typt de code
+    const qh = $('#gcQr');
+    if (qh){
+      qh.innerHTML = ''; qh.style.display = 'none';
+      if (window.RTGQRteken && o.pickup){
+        try { qh.appendChild(RTGQRteken.teken(String(o.pickup), { schaal: 5, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
+      }
+    }
     $('#glowCode').classList.add('open');
   }
   $('#glowCode').addEventListener('click', () => $('#glowCode').classList.remove('open'));

@@ -5507,7 +5507,7 @@
       // gast toont het oplichtende scherm; sla de code aan om de bestelling uit te geven
       '<div class="card"><div class="tt-h">'+T('pos.redeemh','RTG-ophaalcode innen')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat het oplichtende scherm zien. Sla de code aan; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven.')+'</div>'+
-      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Bijv. TBS9')+'" maxlength="4" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:0.2em;font-weight:700;"><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
+      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Bijv. TBS9')+'" maxlength="4" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:0.2em;font-weight:700;"><button id="posScan" title="'+T('pos.scan','Scan de code')+'" aria-label="'+T('pos.scan','Scan de code')+'">📷</button><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
       '<div id="posRedeemResult"></div></div>';
   }
 
@@ -5578,6 +5578,14 @@
     const clear = $('#posClear'); if (clear) clear.addEventListener('click', () => { bon = {}; renderKassa(); openTab('kassa'); });
     document.querySelectorAll('.js-pay').forEach(b => b.addEventListener('click', () => paySale(type, b.dataset.method)));
     const redeem = $('#posRedeem'); if (redeem) redeem.addEventListener('click', redeemCode);
+    // scan de ophaalcode van het lid (het oplichtende scherm toont hem als QR)
+    const posScan = $('#posScan'); if (posScan) posScan.addEventListener('click', () => {
+      if (!window.RTGScanknop){ toast(T('pos.scannietklaar','De scanner is nog niet geladen.')); return; }
+      RTGScanknop.open({ titel: T('pos.scan','Scan de ophaalcode'), hint: T('pos.scanhint','Scan de QR op het scherm van het lid.'), onCode: (c) => {
+        const el = $('#posCode'); if (el) el.value = String(c.tekst || '').trim().toUpperCase().slice(0, 4);
+        redeemCode();
+      } });
+    });
     // de vertaalknop: de kaartnamen in elke actieve wereldtaal, voor de gast
     const vt = $('#posVertaal'); if (vt) vt.addEventListener('click', async () => {
       const naar = (window.prompt(T('pos.vertaalnaar','Taalcode voor de kaart (bijv. en, es, de, fr) of nl voor terug:'), MENU_VERTAAL.naar || 'en')||'').trim().toLowerCase();

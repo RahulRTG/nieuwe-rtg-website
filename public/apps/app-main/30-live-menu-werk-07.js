@@ -73,18 +73,24 @@
     }));
   }
 
-  async function placeOrder(){
+  async function placeOrder(opts){
+    opts = opts || {};
     const items = Object.entries(menuState.qty).filter(([,q]) => q > 0).map(([id,qty]) => ({ id, qty }));
     if (!items.length) return;
     let d;
     try {
-      d = await API.call('/order', { supplierCode: menuState.supplier.code, items, table: menuState.table || '', allergyNote: menuState.note, tagSalon: menuState.tag });
+      d = await API.call('/order', { supplierCode: menuState.supplier.code, items, table: menuState.table || '', allergyNote: menuState.note, tagSalon: menuState.tag, naarKassa: !!opts.naarKassa });
     } catch (e) { toast(e.message); return; }
     $('#menu-sheet').classList.remove('open');
     $('#menu-scrim').classList.remove('open');
     if (d.order.status === 'wacht-op-betaling'){
-      // betalen-eerst: de bestelling is pas definitief na directe betaling
+      // betalen-eerst (vooraf-zaak of jeugdlid): definitief na directe betaling
       payOrder(d.order, menuState.fooi);
+    } else if (d.order.aanBalie){
+      // naar de kassa: de keuken maakt hem al; toon de code groot om aan de balie
+      // te laten scannen of tonen
+      toast('🧾 ' + T('app.naarkassaok','Naar de kassa gestuurd. Toon je code aan de balie.'));
+      showGlow(d.order);
     } else {
       // deze zaak koos betaling achteraf: de bestelling loopt al, afrekenen kan zo
       toast('🛎️ ' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalachteraf','Betalen kan achteraf via Bestellingen.'));

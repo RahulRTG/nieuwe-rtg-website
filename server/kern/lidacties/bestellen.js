@@ -38,8 +38,13 @@ function plaatsOrderVoor(session, body) {
   }
   // de zaak kiest het betaalmoment: vooraf (standaard, pas zichtbaar na
   // afrekenen) of achteraf (direct zichtbaar, betalen via de app volgt);
-  // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak
-  const vooraf = optieAan(s, 'betaalVooraf') || (lft != null && lft < 18);
+  // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak.
+  // "Naar de kassa": het lid kiest zelf om de bestelling nu te laten maken en
+  // straks aan de balie af te rekenen (met de ophaalcode); dit gaat voor op de
+  // vooraf-voorkeur van de zaak, behalve bij jeugdleden.
+  const jeugd = lft != null && lft < 18;
+  const naarKassa = !!body.naarKassa && !jeugd;
+  const vooraf = jeugd || (!naarKassa && optieAan(s, 'betaalVooraf'));
   const order = {
     ref: 'RTG-O-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
     pickup: pickupCode(),
@@ -52,6 +57,7 @@ function plaatsOrderVoor(session, body) {
     zorg: zorgVoor(session.key),
     tagSalon: !!body.tagSalon,
     betaalMoment: vooraf ? 'vooraf' : 'achteraf',
+    aanBalie: naarKassa ? true : undefined,
     leeftijdOk: metAlcohol && lft != null ? true : undefined,
     status: vooraf ? 'wacht-op-betaling' : 'nieuw', paid: false, at: new Date().toISOString()
   };
@@ -59,7 +65,8 @@ function plaatsOrderVoor(session, body) {
   openLijnVoor(s, session);
   save();
   if (!vooraf) {
-    notifySupplier(s.code, { icon: '\u{1F6CE}️', title: 'Nieuwe bestelling (betaling achteraf)', body: codename + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+    const kop = naarKassa ? 'Nieuwe bestelling (afrekenen aan de kassa)' : 'Nieuwe bestelling (betaling achteraf)';
+    notifySupplier(s.code, { icon: '\u{1F6CE}️', title: kop, body: codename + (order.table ? ' · ' + order.table : '') + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }

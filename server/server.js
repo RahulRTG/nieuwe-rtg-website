@@ -1215,6 +1215,44 @@ app.post('/api/translate', async (req, res) => {
 // verandert de sleutel en de cache is meteen ongeldig (geen staleness).
 const talenCache = require('./lib/cache').antwoordCache({ ttl: 3600000, max: 8, sleutel: () => 'talen:' + talen.handtekening() });
 app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve() }));
+
+/* ---------- RTG Zegel: bewijs zonder tonen (offline verifieerbaar) ----------
+   Een lid bewijst een FEIT aan een partner (18+, geldig lid, welke pas) zonder
+   de onderliggende data te tonen. Het zegel is een Ed25519-token dat de partner-
+   /PDA-app met alleen de publieke sleutel controleert -- dus offline. Het
+   onderwerp is een paarsgewijs pseudoniem: twee venues kunnen een lid niet
+   matchen. Zie server/lib/zegel.js. */
+const zegel = require('./lib/zegel').maakZegel({ dataDir: DATA_DIR });
+// de publieke sleutel: hiermee verifieert een partner-app een zegel zonder server.
+app.get('/api/zegel/sleutel', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=300');
+  res.json({ sleutel: zegel.publiekeSleutel(), alg: 'ed25519' });
+});
+// een lid maakt een momentbewijs voor een partner: alleen de GEVRAAGDE en WARE
+// feiten gaan mee (selectieve onthulling); ruwe gegevens komen er nooit in.
+app.post('/api/zegel/maak', auth, (req, res) => {
+  const sess = req.session;
+  const partner = typeof req.body.partner === 'string' ? req.body.partner.slice(0, 64) : null;
+  const gevraagd = Array.isArray(req.body.claims) && req.body.claims.length ? req.body.claims : ['lid'];
+  const lft = leeftijdVan(geborenVan(sess));
+  const feiten = {
+    lid: true,
+    leeftijd18: lft != null && lft >= 18,
+    leeftijd21: lft != null && lft >= 21,
+    pas: sess.tier || (sess.account && sess.account.tier) || null,
+    zakelijk: sess.tier === 'business'
+  };
+  const claims = {};
+  for (const k of gevraagd) if (Object.prototype.hasOwnProperty.call(feiten, k) && feiten[k]) claims[k] = feiten[k];
+  const seed = sess.key || (sess.account && sess.account.id) || 'onbekend';
+  const geldigMin = Math.max(1, Math.min(60, Number(req.body.geldigMin) || 5));
+  const token = zegel.zegel({ codenaam: seed, partner, claims, geldigMin });
+  res.json({ token, claims, sub: zegel.pseudoniem(seed, partner), geldigMin });
+});
+// een partner/PDA controleert een zegel (kan ook offline met de publieke sleutel).
+app.post('/api/zegel/controleer', (req, res) => {
+  res.json(zegel.controleer(String((req.body && req.body.token) || '')));
+});
 /* Het UI-woordenboek van een pagina in een keer naar een ACTIEVE wereldtaal:
    zo draait de hele app (elke pagina, elk scherm) in elke taal die de
    boardroom aanzet. Publiek maar begrensd (max 400 teksten van 300 tekens)

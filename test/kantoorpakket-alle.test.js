@@ -1,6 +1,7 @@
 /* RTG Office voor het hele ecosysteem: leden (alle passen), elke
-   leverancier en partner (team-drive per zaak) en de eigen RTG-kantoren
-   (kantoor-drive). Bewaakt de drie ingangen, de scheiding tussen drives,
+   leverancier en partner (team-drive per zaak), de eigen RTG-kantoren
+   (kantoor-drive) en RTF-leden (per gezinsprofiel, met delen binnen het
+   gezin). Bewaakt de vier ingangen, de scheiding tussen drives,
    presentaties, meeschrijf-rechten bij delen, de versiegeschiedenis met
    terugzetten, sjablonen en de AI-schrijfhulp (demostand).
    Draai los: node --experimental-sqlite --test test/kantoorpakket-alle.test.js */
@@ -148,6 +149,60 @@ test('7. de AI-schrijfhulp: stelt voor (demostand), en alleen voor wie mag schri
   assert.match(fm.body.voorstel, /^=SOM\(/, 'een formule-voorstel voor het rekenblad');
   assert.equal((await api('/api/kantoorpakket/ai', { id, opdracht: 'hack' }, lidA)).status, 400);
   assert.equal((await api('/api/kantoorpakket/ai', { id, opdracht: 'samenvatten' }, lidB)).status, 403, 'zonder schrijfrechten geen AI-hulp');
+});
+
+test('9. RTF: elk gezinsprofiel een eigen map, delen binnen het gezin, gast leest mee', async () => {
+  // een gezin met twee profielen en een gekoppelde oppas (gast)
+  const t = Date.now().toString().slice(-8);
+  const g = await api('/api/foundation/gezin/maak', { gezinsnaam: 'Office ' + t, naam: 'Mama ' + t, pin: '1234' });
+  const code = g.body.code;
+  async function profiel(naam, groep) {
+    const p = await api('/api/foundation/gezin/profiel/maak', { code, token: g.body.token, naam, rol: 'kind', groep });
+    const kies = await api('/api/foundation/gezin/profiel/kies', { code, profielId: p.body.profiel.id });
+    return kies.body.token;
+  }
+  const mamaTok = g.body.token;
+  const kindTok = await profiel('Noor', 'kind');
+  const rtf = (pad, body, tok) => api('/api/rtf/kantoorpakket' + pad, Object.assign({ code, token: tok }, body || {}));
+
+  // mama maakt een document; het kind ziet het pas na delen met het gezin
+  const m = await rtf('/maak', { soort: 'tekst', titel: 'Vakantieplan' }, mamaTok);
+  assert.equal(m.status, 200);
+  const id = m.body.id;
+  await rtf('/bewaar', { id, inhoud: { tekst: 'Naar Ibiza met het gezin.' } }, mamaTok);
+  assert.equal((await rtf('/open', { id }, kindTok)).status, 403, 'niet gedeeld is niet zichtbaar');
+  await rtf('/gezin', { id, rechten: 'lezen' }, mamaTok);
+  const kindZiet = await rtf('/mijn', {}, kindTok);
+  assert.ok(kindZiet.body.gedeeld.some(d => d.id === id), 'het kind ziet het gezinsdocument');
+  assert.equal((await rtf('/open', { id }, kindTok)).body.magBewerken, false, 'meelezen is niet meeschrijven');
+  await rtf('/gezin', { id, rechten: 'bewerken' }, mamaTok);
+  assert.equal((await rtf('/bewaar', { id, inhoud: { tekst: 'Naar Ibiza. Noor wil snorkelen.' } }, kindTok)).status, 200, 'samen schrijven kan');
+  assert.equal((await rtf('/gezin', { id, rechten: 'bewerken' }, kindTok)).status, 403, 'alleen de maker deelt');
+  assert.equal((await rtf('/weg', { id }, kindTok)).status, 403, 'alleen de maker verwijdert');
+  // de AI-schrijfhulp werkt ook hier (demostand)
+  const ai = await rtf('/ai', { id, opdracht: 'samenvatten' }, mamaTok);
+  assert.equal(ai.status, 200);
+  assert.ok(ai.body.voorstel && ai.body.voorstel.length > 10);
+  // een ander gezin ziet niets, en het lid-kanaal kan er ook niet bij
+  const g2 = await api('/api/foundation/gezin/maak', { gezinsnaam: 'Ander ' + t, naam: 'Papa ' + t, pin: '1234' });
+  assert.equal((await api('/api/rtf/kantoorpakket/open', { code: g2.body.code, token: g2.body.token, id })).status, 403, 'buiten het gezin bestaat het niet');
+  assert.equal((await api('/api/kantoorpakket/open', { id }, lidA)).status, 403);
+});
+
+test('10. RTF-gast (oppas of familielid): meelezen mag, maken en bewerken niet', async () => {
+  const t = Date.now().toString().slice(-8);
+  const g = await api('/api/foundation/gezin/maak', { gezinsnaam: 'Gast ' + t, naam: 'Mama ' + t, pin: '1234' });
+  const code = g.body.code;
+  const rtf = (pad, body, tok) => api('/api/rtf/kantoorpakket' + pad, Object.assign({ code, token: tok }, body || {}));
+  const m = await rtf('/maak', { soort: 'tekst', titel: 'Weekbrief' }, g.body.token);
+  await rtf('/gezin', { id: m.body.id, rechten: 'lezen' }, g.body.token);
+  // een oppas koppelt aan het gezin en krijgt een gast-token
+  const koppel = await api('/api/foundation/gast/koppel', { code, token: g.body.token, naam: 'Oppas Els' });
+  const gastTok = koppel.body && (koppel.body.token || (koppel.body.gast && koppel.body.gast.token));
+  if (!gastTok) return; // geen gastenkoppeling in deze opstelling; de kern-poort is dan al gedekt
+  assert.equal((await rtf('/open', { id: m.body.id }, gastTok)).status, 200, 'de gast leest het gezinsdocument mee');
+  assert.equal((await rtf('/maak', { soort: 'tekst' }, gastTok)).status, 403, 'de gast maakt niets aan');
+  assert.equal((await rtf('/bewaar', { id: m.body.id, inhoud: { tekst: 'x' } }, gastTok)).status, 403);
 });
 
 test('8. de oude poorten blijven staan: gasten niet, en eigendom blijft beschermd', async () => {

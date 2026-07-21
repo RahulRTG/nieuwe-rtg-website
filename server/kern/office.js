@@ -1,9 +1,12 @@
 /* Kern-module "office": RTG Office, het eigen kantoorpakket voor het hele
    ecosysteem. Leden (RTG, Lifestyle en Business Pass) werken op hun eigen
    account; elke leverancier en partner heeft een team-drive per zaak
-   (sleutel 'sup:CODE', het hele team werkt in dezelfde map) en de eigen
-   RTG-kantoren delen de kantoor-drive ('rtg:kantoor'). Drie soorten:
-   tekstdocument, rekenblad en presentatie.
+   (sleutel 'sup:CODE', het hele team werkt in dezelfde map); de eigen
+   RTG-kantoren delen de kantoor-drive ('rtg:kantoor'); en RTF-leden werken
+   per gezinsprofiel ('rtf:CODE:handle'), met een kring per gezin: een
+   document kan met het eigen gezin gedeeld worden (meelezen of samen
+   schrijven), nooit daarbuiten. Drie soorten: tekstdocument, rekenblad
+   en presentatie.
 
    Modern, maar privacyvast: delen gaat op codenaam (nooit op echte naam),
    met leesrechten of meeschrijf-rechten; elke wijziging bewaart een
@@ -56,17 +59,22 @@ function maakOffice({ db, save, crypto, schoon, codenaamVan, keyVanCodenaam, sse
     const k = String(key || '');
     if (k.startsWith('sup:')) return 'Team ' + k.slice(4);
     if (k === 'rtg:kantoor') return 'RTG Kantoor';
+    if (k.startsWith('rtf:')) return k.split(':')[2] || 'gezinslid';
     return codenaamVan(k);
   };
-  const magSchrijven = (d, key) => d.key === key || (d.bewerkers || []).includes(key);
-  const magLezen = (d, key) => magSchrijven(d, key) || (d.gedeeldMet || []).includes(key);
+  // de kring: een RTF-gezin deelt binnen het eigen gezin, nooit daarbuiten
+  const inKring = (d, kring) => !!(kring && d.kring === kring && d.kringDeel);
+  const magSchrijven = (d, key, kring) => d.key === key || (d.bewerkers || []).includes(key)
+    || (inKring(d, kring) && d.kringDeel === 'bewerken');
+  const magLezen = (d, key, kring) => magSchrijven(d, key, kring) || (d.gedeeldMet || []).includes(key)
+    || inKring(d, kring);
 
   /* ---- de mappenlijst: eigen documenten + wat met mij is gedeeld ---- */
-  function mijn(key) {
+  function mijn(key, kring) {
     const alle = lijsten();
     const eigen = Object.values(alle).filter(d => d.key === key)
       .sort((a, b) => String(b.gewijzigd).localeCompare(String(a.gewijzigd)));
-    const gedeeld = Object.values(alle).filter(d => d.key !== key && magLezen(d, key))
+    const gedeeld = Object.values(alle).filter(d => d.key !== key && magLezen(d, key, kring))
       .sort((a, b) => String(b.gewijzigd).localeCompare(String(a.gewijzigd)));
     const kop = d => ({ id: d.id, soort: d.soort, titel: d.titel, gewijzigd: d.gewijzigd,
       door: naamVan(d.key), gedeeld: (d.gedeeldMet || []).length + (d.bewerkers || []).length });
@@ -75,7 +83,7 @@ function maakOffice({ db, save, crypto, schoon, codenaamVan, keyVanCodenaam, sse
   }
 
   /* ---- een nieuw document (leeg of vanuit een sjabloon) ---- */
-  function maak(key, data) {
+  function maak(key, data, kring) {
     const alle = lijsten();
     const sjab = SJABLONEN[data.sjabloon] || null;
     const soort = sjab ? sjab.soort : (SOORTEN.includes(data.soort) ? data.soort : 'tekst');
@@ -88,29 +96,30 @@ function maakOffice({ db, save, crypto, schoon, codenaamVan, keyVanCodenaam, sse
       : { tekst: '' };
     const inhoud = sjab ? schoonInhoud(soort, JSON.parse(JSON.stringify(sjab.inhoud))) : leeg;
     const d = { id: id(), key, soort, titel, inhoud, gedeeldMet: [], bewerkers: [], versies: [], gemaakt: nu(), gewijzigd: nu() };
+    if (kring) { d.kring = kring; d.kringDeel = null; }
     alle[d.id] = d;
     save();
     return { status: 200, ok: true, id: d.id, soort, titel };
   }
 
   /* ---- een document openen (eigenaar, meeschrijver of meelezer) ---- */
-  function open(key, did) {
+  function open(key, did, kring) {
     const d = docMet(did);
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
-    if (!magLezen(d, key)) return { status: 403, error: 'Dit document is niet met u gedeeld.' };
+    if (!magLezen(d, key, kring)) return { status: 403, error: 'Dit document is niet met u gedeeld.' };
     const ikEigenaar = d.key === key;
     return { status: 200, id: d.id, soort: d.soort, titel: d.titel, inhoud: d.inhoud,
-      magBewerken: magSchrijven(d, key), eigenaar: ikEigenaar, door: naamVan(d.key), gewijzigd: d.gewijzigd,
-      versies: (d.versies || []).length,
+      magBewerken: magSchrijven(d, key, kring), eigenaar: ikEigenaar, door: naamVan(d.key), gewijzigd: d.gewijzigd,
+      versies: (d.versies || []).length, kringDeel: d.kring ? (d.kringDeel || null) : undefined,
       gedeeldMet: ikEigenaar ? (d.gedeeldMet || []).map(naamVan) : undefined,
       bewerkers: ikEigenaar ? (d.bewerkers || []).map(naamVan) : undefined };
   }
 
   /* ---- bewaren (autosave): eigenaar of meeschrijver; met versiegeschiedenis ---- */
-  function bewaar(key, did, data) {
+  function bewaar(key, did, data, kring) {
     const d = docMet(did);
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
-    if (!magSchrijven(d, key)) return { status: 403, error: 'U heeft geen schrijfrechten op dit document.' };
+    if (!magSchrijven(d, key, kring)) return { status: 403, error: 'U heeft geen schrijfrechten op dit document.' };
     if (typeof data.titel === 'string' && d.key === key) d.titel = schoon(data.titel, MAX_TITEL) || d.titel;
     if (data.inhoud && typeof data.inhoud === 'object') {
       const schoon2 = schoonInhoud(d.soort, data.inhoud);
@@ -158,10 +167,10 @@ function maakOffice({ db, save, crypto, schoon, codenaamVan, keyVanCodenaam, sse
   }
 
   /* ---- versiegeschiedenis: bekijken en terugzetten ---- */
-  function versies(key, did) {
+  function versies(key, did, kring) {
     const d = docMet(did);
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
-    if (!magLezen(d, key)) return { status: 403, error: 'Dit document is niet met u gedeeld.' };
+    if (!magLezen(d, key, kring)) return { status: 403, error: 'Dit document is niet met u gedeeld.' };
     return { status: 200, versies: (d.versies || []).map((v, i) => ({ nr: i, om: v.om, door: v.door })) };
   }
   function terug(key, did, nr) {
@@ -211,10 +220,10 @@ function maakOffice({ db, save, crypto, schoon, codenaamVan, keyVanCodenaam, sse
 
   /* ---- de AI-schrijfhulp: stelt alleen voor, de mens voegt in of niet ---- */
   const AI_OPDRACHTEN = ['samenvatten', 'herschrijven', 'doorschrijven', 'formule'];
-  async function aiHulp(key, did, opdracht, vraag) {
+  async function aiHulp(key, did, opdracht, vraag, kring) {
     const d = docMet(did);
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
-    if (!magSchrijven(d, key)) return { status: 403, error: 'AI-hulp is er voor wie mag schrijven.' };
+    if (!magSchrijven(d, key, kring)) return { status: 403, error: 'AI-hulp is er voor wie mag schrijven.' };
     if (!AI_OPDRACHTEN.includes(opdracht)) return { status: 400, error: 'Kies samenvatten, herschrijven, doorschrijven of formule.' };
     const kaal = d.soort === 'tekst' ? String(d.inhoud.tekst || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 6000)
       : d.soort === 'presentatie' ? (d.inhoud.dias || []).map(x => x.titel + ': ' + x.tekst).join('\n').slice(0, 6000)
@@ -243,8 +252,22 @@ function maakOffice({ db, save, crypto, schoon, codenaamVan, keyVanCodenaam, sse
     return { status: 200, opdracht, voorstel: demo[opdracht], demo: true };
   }
 
+  /* ---- delen met de eigen kring (het RTF-gezin): uit, meelezen of samen schrijven ---- */
+  function kringDeel(key, did, stand) {
+    const d = docMet(did);
+    if (!d) return { status: 404, error: 'Document niet gevonden.' };
+    if (d.key !== key) return { status: 403, error: 'Alleen de maker deelt met het gezin.' };
+    if (!d.kring) return { status: 400, error: 'Dit document hoort niet bij een gezin.' };
+    if (![null, '', 'uit', 'lezen', 'bewerken'].includes(stand)) return { status: 400, error: 'Kies uit, lezen of bewerken.' };
+    d.kringDeel = (stand === 'lezen' || stand === 'bewerken') ? stand : null;
+    d.gewijzigd = nu();
+    save();
+    return { status: 200, ok: true, kringDeel: d.kringDeel };
+  }
+
   return { officeMijn: mijn, officeMaak: maak, officeOpen: open, officeBewaar: bewaar,
-    officeDeel: deel, officeWeg: weg, officeVersies: versies, officeTerug: terug, officeAI: aiHulp };
+    officeDeel: deel, officeWeg: weg, officeVersies: versies, officeTerug: terug, officeAI: aiHulp,
+    officeKring: kringDeel };
 }
 
 module.exports = { maakOffice };

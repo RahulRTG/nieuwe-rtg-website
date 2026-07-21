@@ -147,13 +147,21 @@
 <!-- delen -->
 <div class="scrim" id="deelScrim" role="dialog" aria-label="Delen">
   <div class="paneel">
-    <h3>Delen op codenaam</h3>
-    <p class="stil">Deel dit document met een lid op codenaam; de ander ziet uw echte naam nooit. Kies alleen lezen of meeschrijven.</p>
+    <h3 id="deelKop">Delen op codenaam</h3>
+    <p class="stil" id="deelUitleg">Deel dit document met een lid op codenaam; de ander ziet uw echte naam nooit. Kies alleen lezen of meeschrijven.</p>
     <form id="deelForm">
       <input id="deelCode" maxlength="60" placeholder="Codenaam van het lid" aria-label="Codenaam">
       <select id="deelRechten" aria-label="Rechten"><option value="lezen">Alleen lezen</option><option value="bewerken">Meeschrijven</option></select>
       <button class="knop vol" type="submit">Deel</button>
     </form>
+    <div id="gezinBlok" style="display:none;">
+      <select id="gezinRechten" aria-label="Delen met het gezin">
+        <option value="uit">Alleen voor mij</option>
+        <option value="lezen">Het gezin leest mee</option>
+        <option value="bewerken">Samen schrijven met het gezin</option>
+      </select>
+      <button class="knop vol" id="gezinZet" type="button">Bewaar keuze</button>
+    </div>
     <div class="lijst" id="deelLijst"></div>
     <button class="knop" id="deelDicht" type="button" style="margin-top:0.5rem;">Sluit</button>
   </div>
@@ -194,23 +202,32 @@
   const $ = s => document.querySelector(s);
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  /* Drie ingangen op hetzelfde pakket: het lid (eigen account), de zaak
-     (?werk=zaak, de team-drive van de hele zaak) en de RTG-kantoren
-     (?werk=kantoor, de gedeelde kantoor-drive). */
+  /* Vier ingangen op hetzelfde pakket: het lid (eigen account), de zaak
+     (?werk=zaak, de team-drive van de hele zaak), de RTG-kantoren
+     (?werk=kantoor, de gedeelde kantoor-drive) en RTF-leden (?werk=rtf,
+     per gezinsprofiel, met delen binnen het eigen gezin). */
   const WERK = new URLSearchParams(location.search).get('werk') || '';
   const opzet = WERK === 'zaak'
     ? { basis: '/api/supplier/kantoorpakket/', tokenKey: 'rtg_sup_token', chip: 'Team-drive van de zaak', terug: '/apps/leverancier.html', mijnKop: 'Documenten van de zaak', leeg: 'Log eerst in op de zaak-app.' }
     : WERK === 'kantoor'
     ? { basis: '/api/office/kantoorpakket/', tokenKey: 'rtg_office_token', chip: 'RTG Kantoor-drive', terug: '/apps/kantoren.html', mijnKop: 'Documenten van het kantoor', leeg: 'Log eerst in op de backoffice.' }
+    : WERK === 'rtf'
+    ? { basis: '/api/rtf/kantoorpakket/', tokenKey: 'rtf_sessie', chip: 'RTFoundation', terug: '/apps/foundation/index.html', mijnKop: 'Mijn documenten', leeg: 'Log eerst in bij je gezin.' }
     : { basis: '/api/kantoorpakket/', tokenKey: 'rtg_member_token', chip: '', terug: '/apps/app.html', mijnKop: 'Mijn documenten', leeg: 'Log eerst in op de leden-app.' };
-  const token = (() => { try { return localStorage.getItem(opzet.tokenKey); } catch (e) { return null; } })();
+  // RTF stuurt de gezinscode en het profieltoken in de body, zoals alle
+  // RTF-routes; de andere ingangen dragen een Bearer-token.
+  const rtfSess = (() => { if (WERK !== 'rtf') return null;
+    try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null'); } catch (e) { return null; } })();
+  const token = WERK === 'rtf' ? (rtfSess && rtfSess.token)
+    : (() => { try { return localStorage.getItem(opzet.tokenKey); } catch (e) { return null; } })();
   $('#terug').href = opzet.terug;
   $('#kopMijn').textContent = opzet.mijnKop;
   if (opzet.chip) { $('#werkChip').textContent = opzet.chip; $('#werkChip').style.display = ''; }
 
   const api = (pad, body) => fetch(opzet.basis + pad, { method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+    headers: Object.assign({ 'Content-Type': 'application/json' }, WERK === 'rtf' ? {} : { Authorization: 'Bearer ' + token }),
+    body: JSON.stringify(Object.assign(WERK === 'rtf' ? { code: rtfSess && rtfSess.code, token: rtfSess && rtfSess.token } : {}, body || {}))
+  }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
 
   let open = null, magBewerken = false, bewaarT = null, vuil = false, leesT = null;
@@ -421,11 +438,23 @@
   setInterval(() => { if (vuil) bewaarNu(); }, 8000);
   window.addEventListener('beforeunload', () => { if (vuil) navigator.sendBeacon && bewaarNu(); });
 
-  /* ---------- delen: alleen lezen of meeschrijven ---------- */
+  /* ---------- delen: op codenaam, of (RTF) binnen het eigen gezin ---------- */
   $('#deelBtn').addEventListener('click', async () => { if (!open) return; await toonDeel(); $('#deelScrim').classList.add('open'); });
   $('#deelDicht').addEventListener('click', () => $('#deelScrim').classList.remove('open'));
+  if (WERK === 'rtf'){
+    $('#deelForm').style.display = 'none'; $('#gezinBlok').style.display = '';
+    $('#deelKop').textContent = 'Delen met je gezin';
+    $('#deelUitleg').textContent = 'Een document blijft van jou; je kunt je gezin laten meelezen of er samen in schrijven. Buiten het gezin deelt RTF niets.';
+  }
   async function toonDeel(){
     const r = await api('open', { id: open.id });
+    if (WERK === 'rtf'){
+      const stand = (r.body && r.body.kringDeel) || 'uit';
+      $('#gezinRechten').value = stand === null ? 'uit' : (stand || 'uit');
+      $('#deelLijst').textContent = stand === 'bewerken' ? 'Jullie schrijven hier samen in.'
+        : stand === 'lezen' ? 'Je gezin leest mee.' : 'Alleen jij ziet dit document.';
+      return;
+    }
     const lees = (r.body && r.body.gedeeldMet) || [];
     const schrijf = (r.body && r.body.bewerkers) || [];
     $('#deelLijst').innerHTML = (lees.length || schrijf.length)
@@ -433,6 +462,11 @@
         (lees.length ? 'Meelezers: ' + lees.map(esc).join(', ') : '')
       : 'Nog met niemand gedeeld.';
   }
+  $('#gezinZet').addEventListener('click', async () => {
+    const r = await api('gezin', { id: open.id, rechten: $('#gezinRechten').value });
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Bewaard.'); toonDeel();
+  });
   $('#deelForm').addEventListener('submit', async e => {
     e.preventDefault();
     const r = await api('deel', { id: open.id, codenaam: $('#deelCode').value, aan: true, rechten: $('#deelRechten').value });

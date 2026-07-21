@@ -17,7 +17,11 @@
      regio.js       provincie (subsidies) + waterschap (belasting + meldingen)
      bestuur.js     Berichtenbox-lezers, referendum, bezwaar, bekendmaking, regie
      kantoor.js     het Belastingkantoor: inspecteurscockpit, invordering,
-                    btw-beeld (facturatiemotor + KVK) en de AI-chef-inspecteur */
+                    btw-beeld (facturatiemotor + KVK) en de AI-chef-inspecteur
+     rechtbank.js   De Rechtspraak: zaken, zittingsrol, uitspraak (mens),
+                    beroep uit bezwaar en de AI-griffier
+     pda.js         de Overheids-PDA voor al het personeel van alle
+                    rijkskantoren (receptie, security, schoonmaak, bode) */
 
 // inkomstenbelasting (demo, twee schijven; peiljaar volgt de klok)
 const IB = { schijf: 75000, tarief1: 0.37, tarief2: 0.495, heffingskorting: 3070 };
@@ -64,7 +68,7 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
       db.data.supplierTypes.rijk = { label: 'Rijksoverheid', icon: '\u{1F3E2}', caps: ['rijk'] };
     for (const k of ['rijkBerichten', 'rijkAanslagen', 'rijkToeslagen', 'rijkVoertuigen', 'rijkRijbewijzen',
       'rijkKvk', 'rijkUitkeringen', 'rijkBezwaren', 'rijkStemmen', 'rijkBekend',
-      'rijkSubsidies', 'waterAanslagen', 'waterMeldingen'])
+      'rijkSubsidies', 'waterAanslagen', 'waterMeldingen', 'rijkZaken'])
       if (!Array.isArray(db.data[k])) db.data[k] = [];
     if (db.data._overheidSeed) return;
     db.data._overheidSeed = true;
@@ -130,7 +134,9 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
     require('./onderneming')(ctx),
     require('./regio')(ctx),
     require('./bestuur')(ctx),
-    require('./kantoor')(ctx));
+    require('./kantoor')(ctx),
+    require('./rechtbank')(ctx),
+    require('./pda')(ctx));
   return { overheid: api };
 }
 

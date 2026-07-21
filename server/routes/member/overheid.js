@@ -52,6 +52,9 @@ module.exports = (kern) => {
   app.post('/api/overheid/bekendmakingen', auth, (req, res) => res.json(overheid.bekendmakingen()));
   app.post('/api/overheid/bezwaar', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.bezwaarIndienen(req.session, liveCodename(req.session), req.body || {})); });
   app.post('/api/overheid/bezwaren/mijn', auth, (req, res) => res.json(overheid.mijnBezwaren(req.session.key)));
+  // de rechtbank: tegen een ongegrond bezwaar zelf in beroep, en de eigen zaken volgen
+  app.post('/api/overheid/beroep', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.beroepIndienen(req.session, String(req.body.ref || ''))); });
+  app.post('/api/overheid/zaken/mijn', auth, (req, res) => res.json(overheid.mijnZaken(req.session.key)));
 
   // pijler 7: provincie (subsidies)
   app.post('/api/overheid/subsidies', auth, (req, res) => res.json(overheid.provincieSubsidies()));

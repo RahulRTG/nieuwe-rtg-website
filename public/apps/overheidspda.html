@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Overheids-PDA</title>
+<link rel="icon" href="/icons/partners.svg">
+<link rel="manifest" href="/manifests/overheidspda.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Overheids-PDA">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4.5rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .6rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.25rem;}
+  main{padding:1rem;max-width:560px;margin:0 auto;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.5rem;margin-bottom:.9rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.6rem .7rem;}
+  .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.2rem;display:block;}
+  .kpi span{font-size:.64rem;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;}
+  .keuze{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.6rem 0 1rem;}
+  .keuze button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem .7rem;color:var(--txt);font:inherit;cursor:pointer;text-align:left;}
+  .keuze button .ic{font-size:1.3rem;display:block;margin-bottom:.3rem;}
+  .keuze button .sub{display:block;font-size:.7rem;color:var(--soft);margin-top:.15rem;line-height:1.35;}
+  .keuze button.aan{border-color:var(--gold);}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:.98rem;}
+  .item .meta{font-size:.76rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.42rem .6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
+  .status{display:inline-block;font-size:.68rem;padding:.1rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
+  .status.open{border-color:var(--burgundy);color:var(--burgundy);}
+  .status.ok{border-color:var(--green);color:var(--green);}
+  .status.goud{border-color:var(--gold);color:var(--gold);}
+  .badge{font-family:'Bodoni Moda',serif;font-size:1.5rem;color:var(--gold);letter-spacing:.08em;}
+  .leeg{color:var(--muted);font-size:.86rem;padding:.9rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .login{max-width:340px;margin:2.5rem auto;padding:0 1rem;text-align:center;}
+  .login .veld{width:100%;margin-bottom:.6rem;}
+  .ai{border:1px solid rgba(169,143,7,.4);border-radius:14px;background:linear-gradient(135deg,rgba(169,143,7,.08),transparent);padding:.8rem .9rem;margin:1rem 0;}
+  .ai .uit{font-size:.84rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.45rem;}
+  .terug{background:none;border:none;color:var(--soft);font:inherit;font-size:.8rem;cursor:pointer;padding:0 0 .6rem;}
+</style>
+</head>
+<body>
+<header><div class="ey">Rijksoverheid · personeel</div><h1 id="kop">Overheids-PDA</h1></header>
+<main id="main">
+  <div class="login" id="login">
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">De werktelefoon voor al het personeel van alle rijkskantoren: receptie, security, schoonmaak en de bode. Log in met je persoonlijke pincode.</p>
+    <select class="veld" id="wie"><option value="">Laden…</option></select>
+    <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
+    <button class="knop" id="loginGo" style="width:100%;">Inloggen</button>
+  </div>
+  <div id="app" hidden></div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
+let TOKEN = null, LOC = null, ROL = null, OVER = null;
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+const tijd = s => s ? new Date(s).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) : '';
+
+const CODE = 'RIJK';
+async function vulWie(){
+  try { const r = await api('/api/supplier/roster', { code: CODE });
+    $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
+  } catch(e){ $('#wie').innerHTML = '<option value="">Niet bereikbaar</option>'; }
+}
+vulWie();
+$('#loginGo').addEventListener('click', async () => {
+  const staffId = $('#wie').value, pin = $('#pin').value.trim();
+  if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
+  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token;
+    $('#login').hidden = true; $('#app').hidden = false; LOC = 'rechtbank'; kiesScherm();
+  } catch(e){ meld(e.message); }
+});
+
+/* ---- de keuze: locatie + rol ---- */
+async function kiesScherm(){
+  try { OVER = await api('/api/overheid/pda/overzicht', { locatie: LOC }); } catch(e){ meld(e.message); return; }
+  $('#kop').textContent = OVER.icoon + ' ' + OVER.label;
+  $('#app').innerHTML =
+    '<div class="kpis">'+
+      '<div class="kpi"><b>'+OVER.bezoekersBinnen+'</b><span>Bezoekers binnen</span></div>'+
+      '<div class="kpi"><b>'+OVER.incidentenOpen+'</b><span>Incidenten open</span></div>'+
+      '<div class="kpi"><b>'+OVER.takenOpen+'</b><span>Taken open</span></div>'+
+      '<div class="kpi"><b>'+OVER.rondesVandaag+'</b><span>Rondes vandaag</span></div>'+
+      (LOC === 'rechtbank' ? '<div class="kpi"><b>'+OVER.zittingenVandaag+'</b><span>Zittingen vandaag</span></div>' : '')+
+    '</div>'+
+    '<h3 style="font-size:.95rem;margin:.2rem 0 .1rem;">Locatie</h3>'+
+    '<div class="keuze">'+OVER.locaties.map(l => '<button data-loc="'+l.id+'" class="'+(l.id===LOC?'aan':'')+'"><span class="ic">'+l.icoon+'</span>'+esc(l.label)+'</button>').join('')+'</div>'+
+    '<h3 style="font-size:.95rem;margin:.2rem 0 .1rem;">Jouw rol</h3>'+
+    '<div class="keuze">'+OVER.rollen.map(r => '<button data-rol="'+r.id+'"><span class="ic">'+r.icoon+'</span>'+esc(r.label)+'<span class="sub">'+esc(r.wat)+'</span></button>').join('')+'</div>';
+  $('#app').querySelectorAll('[data-loc]').forEach(b => b.addEventListener('click', () => { LOC = b.dataset.loc; kiesScherm(); }));
+  $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => { ROL = b.dataset.rol; rolScherm(); }));
+}
+
+function kopStuk(titel){
+  return '<button class="terug" id="terug">← locatie en rol kiezen</button><h2 style="font-size:1.15rem;margin-bottom:.6rem;">'+titel+'</h2>';
+}
+function aiBlok(hint){
+  return '<div class="ai"><div class="rij" style="margin-top:0;"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-conciërge denkt mee; jij handelt.</div></div>';
+}
+function koppelBasis(herlaad){
+  $('#terug').addEventListener('click', kiesScherm);
+  $('#aiK').addEventListener('click', async () => {
+    const v = $('#aiV').value.trim(); if (!v) return;
+    $('#aiA').textContent = 'Een ogenblik…';
+    try { const r = await api('/api/overheid/pda/ai', { locatie: LOC, rol: ROL, vraag: v }); $('#aiA').textContent = r.antwoord; $('#aiV').value = ''; }
+    catch(e){ $('#aiA').textContent = e.message; }
+  });
+  $('#aiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#aiK').click(); });
+}
+
+async function rolScherm(){
+  if (ROL === 'receptie') return schermReceptie();
+  if (ROL === 'security') return schermSecurity();
+  if (ROL === 'schoonmaak') return schermSchoonmaak();
+  if (ROL === 'bode') return schermBode();
+  kiesScherm();
+}
+
+/* ---- receptie ---- */
+async function schermReceptie(){
+  $('#app').innerHTML = kopStuk('🛎️ Receptie')+
+    '<div class="item" style="background:var(--card2);"><h4>Bezoeker aanmelden</h4>'+
+    '<div class="rij"><input class="veld" id="bNaam" style="flex:1;min-width:8rem;" placeholder="Naam bezoeker" maxlength="60"><input class="veld" id="bVoor" style="flex:1;min-width:8rem;" placeholder="Voor (afspraak, zitting, loket)" maxlength="80"><button class="knop" id="bIn">Badge</button></div></div>'+
+    '<div id="bLijst"></div>'+aiBlok('Bijv. wat doe ik met een bezoeker zonder afspraak?');
+  koppelBasis();
+  $('#bIn').addEventListener('click', async () => {
+    try { const r = await api('/api/overheid/pda/bezoeker/in', { locatie: LOC, naam: $('#bNaam').value, voor: $('#bVoor').value });
+      meld('Badge ' + r.bezoeker.badge + ' uitgereikt.'); $('#bNaam').value = $('#bVoor').value = ''; laadBezoekers(); } catch(e){ meld(e.message); }
+  });
+  laadBezoekers();
+}
+async function laadBezoekers(){
+  try {
+    const r = await api('/api/overheid/pda/bezoekers', { locatie: LOC });
+    $('#bLijst').innerHTML = r.bezoekers.length ? r.bezoekers.map(b =>
+      '<div class="item"><h4><span class="badge">'+esc(b.badge)+'</span> · '+esc(b.naam)+'</h4>'+
+      '<div class="meta">'+esc(b.voor)+' · binnen '+tijd(b.at)+(b.uit ? ' · <span class="status ok">uit '+tijd(b.uit)+'</span>' : ' · <span class="status goud">nog binnen</span>')+'</div>'+
+      (!b.uit ? '<div class="rij"><button class="knop stil" data-uit="'+b.id+'">Uitschrijven</button></div>' : '')+'</div>').join('')
+      : '<div class="leeg">Nog geen bezoekers vandaag.</div>';
+    $('#bLijst').querySelectorAll('[data-uit]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/overheid/pda/bezoeker/uit', { id: b.dataset.uit }); meld('Uitgeschreven.'); laadBezoekers(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- security ---- */
+async function schermSecurity(){
+  $('#app').innerHTML = kopStuk('🛡️ Security')+
+    '<div class="item" style="background:var(--card2);"><h4>Ronde lopen</h4><div class="meta">Een ronde gaat langs alle ruimtes van dit gebouw. Iets gezien? Meld het als incident.</div>'+
+    '<div class="rij"><button class="knop" id="ronde">Ronde gelopen ✓</button><span class="status" id="rondeInfo"></span></div></div>'+
+    '<div class="item" style="background:var(--card2);"><h4>Incident melden</h4>'+
+    '<div class="rij"><select class="veld" id="iRuimte"></select><select class="veld" id="iSoort"></select><select class="veld" id="iErnst"><option value="1">ernst 1</option><option value="2">ernst 2</option><option value="3">ernst 3</option></select></div>'+
+    '<div class="rij"><input class="veld" id="iTekst" style="flex:1;min-width:10rem;" placeholder="Wat speelt er?" maxlength="300"><button class="knop rood" id="iMeld">Meld</button></div>'+
+    '<div class="meta">Bij echt gevaar: eerst 112, dan melden.</div></div>'+
+    '<div id="iLijst"></div>'+aiBlok('Bijv. hoe schaal ik op bij agressie aan de balie?');
+  koppelBasis();
+  $('#rondeInfo').textContent = OVER.laatsteRonde ? 'laatste ronde ' + tijd(OVER.laatsteRonde) : 'nog geen ronde vandaag';
+  $('#iRuimte').innerHTML = OVER.ruimtes.map(r => '<option>'+esc(r)+'</option>').join('');
+  $('#ronde').addEventListener('click', async () => {
+    try { const r = await api('/api/overheid/pda/ronde', { locatie: LOC });
+      meld('Ronde vastgelegd: '+r.ronde.checkpoints+' ruimtes.'); $('#rondeInfo').textContent = 'laatste ronde ' + tijd(r.ronde.at); } catch(e){ meld(e.message); }
+  });
+  $('#iMeld').addEventListener('click', async () => {
+    try { await api('/api/overheid/pda/incident', { locatie: LOC, ruimte: $('#iRuimte').value, soort: $('#iSoort').value, ernst: $('#iErnst').value, tekst: $('#iTekst').value });
+      meld('Incident gemeld.'); $('#iTekst').value = ''; laadIncidenten(); } catch(e){ meld(e.message); }
+  });
+  laadIncidenten();
+}
+async function laadIncidenten(){
+  try {
+    const r = await api('/api/overheid/pda/incidenten', { locatie: LOC });
+    if ($('#iSoort') && !$('#iSoort').options.length) $('#iSoort').innerHTML = r.soorten.map(s => '<option>'+esc(s)+'</option>').join('');
+    $('#iLijst').innerHTML = r.incidenten.length ? r.incidenten.map(i =>
+      '<div class="item"><h4>'+esc(i.soort)+' · '+esc(i.ruimte)+' <span class="status '+(i.gesloten?'ok':'open')+'">'+(i.gesloten?'gesloten':'ernst '+i.ernst)+'</span></h4>'+
+      '<div class="meta">'+esc(i.tekst)+' · '+esc(i.door)+' · '+tijd(i.at)+(i.gesloten?' · opgelost: '+esc(i.gesloten.oplossing):'')+'</div>'+
+      (!i.gesloten ? '<div class="rij"><button class="knop stil" data-sluit="'+i.id+'">Sluiten</button></div>' : '')+'</div>').join('')
+      : '<div class="leeg">Geen incidenten. Zo houden we het.</div>';
+    $('#iLijst').querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', async () => {
+      const op = prompt('Hoe is het opgelost?', '') || '';
+      try { await api('/api/overheid/pda/incident/sluit', { id: b.dataset.sluit, oplossing: op }); meld('Gesloten.'); laadIncidenten(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- schoonmaak ---- */
+async function schermSchoonmaak(){
+  $('#app').innerHTML = kopStuk('🧹 Schoonmaak')+
+    '<div class="item" style="background:var(--card2);"><h4>Extra werk doorgeven</h4>'+
+    '<div class="rij"><select class="veld" id="tRuimte"></select><input class="veld" id="tTekst" style="flex:1;min-width:9rem;" placeholder="Wat moet er gebeuren?" maxlength="200"><button class="knop stil" id="tExtra">Zet erbij</button></div></div>'+
+    '<div id="tLijst"></div>'+aiBlok('Bijv. waar begin ik vandaag?');
+  koppelBasis();
+  $('#tRuimte').innerHTML = OVER.ruimtes.map(r => '<option>'+esc(r)+'</option>').join('');
+  $('#tExtra').addEventListener('click', async () => {
+    try { await api('/api/overheid/pda/taak/extra', { locatie: LOC, ruimte: $('#tRuimte').value, tekst: $('#tTekst').value });
+      meld('Toegevoegd aan de dagtaken.'); $('#tTekst').value = ''; laadTaken(); } catch(e){ meld(e.message); }
+  });
+  laadTaken();
+}
+async function laadTaken(){
+  try {
+    const r = await api('/api/overheid/pda/taken', { locatie: LOC });
+    $('#tLijst').innerHTML = r.taken.length ? r.taken.map(t =>
+      '<div class="item"><h4>'+esc(t.ruimte)+(t.extra?' <span class="status goud">extra</span>':'')+' '+(t.klaar?'<span class="status ok">klaar '+tijd(t.klaar.at)+'</span>':'<span class="status open">open</span>')+'</h4>'+
+      '<div class="meta">'+esc(t.tekst)+'</div>'+
+      (!t.klaar ? '<div class="rij"><button class="knop" data-klaar="'+t.id+'">Klaar ✓</button></div>' : '')+'</div>').join('')
+      : '<div class="leeg">Geen taken vandaag.</div>';
+    $('#tLijst').querySelectorAll('[data-klaar]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/overheid/pda/taak/klaar', { id: b.dataset.klaar }); meld('Afgevinkt.'); laadTaken(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- bode (rechtbank) ---- */
+async function schermBode(){
+  $('#app').innerHTML = kopStuk('🔔 Bode')+
+    '<div class="item" style="background:var(--card2);"><h4>De zittingsrol</h4><div class="meta">Rechtstreeks uit het rechtbanksysteem: zet de zalen op volgorde van de rol klaar en meld ze gereed. Na elke zitting staat de zaal automatisch op de schoonmaaklijst.</div></div>'+
+    '<div id="zLijst"></div>'+aiBlok('Bijv. wat hoort er allemaal bij een zaal klaarzetten?');
+  koppelBasis();
+  laadZittingen();
+}
+async function laadZittingen(){
+  try {
+    const r = await api('/api/overheid/pda/zittingen');
+    $('#zLijst').innerHTML = r.zittingen.length ? r.zittingen.map(z =>
+      '<div class="item"><h4>'+esc(z.tijd)+' · '+esc(z.zaal)+(z.vandaag?' <span class="status goud">vandaag</span>':' <span class="status">'+esc(z.datum)+'</span>')+'</h4>'+
+      '<div class="meta">'+esc(z.titel)+' ('+esc(z.ref)+') · '+esc(z.rechter)+' · '+(z.klaargezet?'<span class="status ok">klaargezet</span>':'<span class="status open">nog klaarzetten</span>')+'</div>'+
+      (!z.klaargezet ? '<div class="rij"><button class="knop" data-klaar="'+z.ref+'">Zaal staat klaar ✓</button></div>' : '')+'</div>').join('')
+      : '<div class="leeg">Geen zittingen op de rol.</div>';
+    $('#zLijst').querySelectorAll('[data-klaar]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/overheid/pda/klaarzet', { ref: b.dataset.klaar }); meld('Gemeld: de zaal staat klaar.'); laadZittingen(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

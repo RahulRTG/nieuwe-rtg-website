@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>De Rechtspraak (griffie)</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.35rem;margin-top:.05rem;}
+  header a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:.35rem .7rem;}
+  main{padding:1.1rem;max-width:880px;margin:0 auto;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.6rem;margin-bottom:1rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;}
+  .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;display:block;}
+  .kpi span{font-size:.7rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;}
+  .kpi.goud{border-color:rgba(169,143,7,.4);} .kpi.goud b{color:var(--gold);}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;}
+  .tab{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  section.paneel{display:none;} section.paneel.aan{display:block;}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
+  .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.42rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
+  .status{display:inline-block;font-size:.7rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
+  .status.open{border-color:var(--burgundy);color:var(--burgundy);}
+  .status.ok{border-color:var(--green);color:var(--green);}
+  .status.goud{border-color:var(--gold);color:var(--gold);}
+  .sig{border-left:3px solid var(--burgundy);}
+  .sig.bode{border-left-color:var(--gold);}
+  .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
+  .login .veld{width:100%;margin-bottom:.6rem;}
+  .ai{border:1px solid rgba(169,143,7,.4);border-radius:14px;background:linear-gradient(135deg,rgba(169,143,7,.08),transparent);padding:.9rem 1rem;margin-bottom:1rem;}
+  .ai h3{font-size:1rem;margin-bottom:.4rem;}
+  .ai .uit{font-size:.86rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.5rem;}
+  .vonnis{font-style:italic;border-left:3px solid var(--gold);padding-left:.7rem;margin-top:.4rem;font-size:.82rem;color:var(--muted);line-height:1.5;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="ey">De Rechtspraak · griffie en rechters</div><h1>De Rechtbank</h1></div>
+  <a href="/apps/overheidspda.html">Overheids-PDA →</a>
+  <a href="/apps/rijksloket.html" style="margin-left:0;">Rijks-loket →</a>
+</header>
+<main id="main">
+  <div class="login" id="login">
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1rem;">Het meest complete rechtbanksysteem van het rijk. Log in als medewerker met je persoonlijke pincode. De uitspraak blijft altijd het besluit van de rechter.</p>
+    <select class="veld" id="wie"><option value="">Laden…</option></select>
+    <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
+    <button class="knop" id="loginGo" style="width:100%;">Inloggen</button>
+  </div>
+
+  <div id="app" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="ai">
+      <h3>🎩 AI-griffier (Rahul)</h3>
+      <div class="rij" style="margin-top:0;">
+        <input class="veld" id="aiV" style="flex:1;min-width:12rem;" placeholder="Bijv. hoe krijg ik de rol van deze week rond?">
+        <button class="knop" id="aiK">Vraag</button>
+      </div>
+      <div class="uit" id="aiA">Helpt met de rol, de planning en de voorbereiding. Oordeelt nooit: de rechter beslist altijd zelf.</div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+
+    <section class="paneel" id="p-rol">
+      <div class="rij" style="margin:0 0 .7rem;">
+        <input class="veld" id="rolDatum" type="date">
+        <button class="knop stil" id="rolLaad">Toon de rol</button>
+      </div>
+      <div id="rolLijst"></div>
+    </section>
+
+    <section class="paneel" id="p-zaken">
+      <div class="item" style="background:var(--card2);">
+        <h4>Nieuwe zaak aanbrengen</h4>
+        <div class="rij">
+          <select class="veld" id="zType"></select>
+          <input class="veld" id="zTitel" style="flex:1;min-width:12rem;" placeholder="Titel van de zaak" maxlength="120">
+        </div>
+        <div class="rij">
+          <input class="veld" id="zEiser" placeholder="Eiser (codenaam)" maxlength="60">
+          <input class="veld" id="zVerweerder" placeholder="Verweerder" maxlength="60">
+          <button class="knop" id="zMaak">Aanbrengen</button>
+        </div>
+        <textarea class="veld" id="zOms" rows="2" maxlength="800" placeholder="Korte omschrijving van het geschil" style="width:100%;margin-top:.5rem;resize:vertical;"></textarea>
+      </div>
+      <div class="rij" style="margin:0 0 .7rem;">
+        <select class="veld" id="zFilter"><option value="">Alle zaken</option><option value="aangebracht">Aangebracht</option><option value="gepland">Op de rol</option><option value="uitspraak">Uitspraak gedaan</option></select>
+      </div>
+      <div id="zakenLijst"></div>
+    </section>
+
+    <section class="paneel" id="p-beroep"></section>
+    <section class="paneel" id="p-sig"></section>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
+let TOKEN = null, ZALEN = [], TYPEN = {}, BESLISSINGEN = [];
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const CODE = 'RIJK';
+async function vulWie(){
+  try { const r = await api('/api/supplier/roster', { code: CODE });
+    $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
+  } catch(e){ $('#wie').innerHTML = '<option value="">Rechtbank niet bereikbaar</option>'; }
+}
+vulWie();
+$('#loginGo').addEventListener('click', async () => {
+  const staffId = $('#wie').value, pin = $('#pin').value.trim();
+  if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
+  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token;
+    $('#login').hidden = true; $('#app').hidden = false; start();
+  } catch(e){ meld(e.message); }
+});
+
+const TABS = [['rol','Zittingsrol'],['zaken','Zaken'],['beroep','Beroepen'],['sig','Signalen']];
+function toon(t){
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
+  ['rol','zaken','beroep','sig'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  if (t === 'rol') laadRol();
+  if (t === 'zaken') laadZaken();
+  if (t === 'beroep') laadBeroepen();
+  if (t === 'sig') laadCockpit();
+}
+function start(){
+  $('#tabs').innerHTML = TABS.map(([t,n]) => '<button class="tab" data-t="'+t+'">'+n+'</button>').join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => toon(b.dataset.t)));
+  $('#rolDatum').value = new Date().toISOString().slice(0,10);
+  laadCockpit(); toon('rol');
+}
+
+async function laadCockpit(){
+  try {
+    const c = await api('/api/overheid/rb/cockpit');
+    ZALEN = c.zalen; TYPEN = c.zaaktypen; BESLISSINGEN = c.beslissingen;
+    $('#zType').innerHTML = Object.entries(TYPEN).map(([k,v]) => '<option value="'+k+'">'+esc(v)+'</option>').join('');
+    $('#kpis').innerHTML =
+      '<div class="kpi goud"><b>'+c.zaken+'</b><span>Zaken totaal</span></div>'+
+      '<div class="kpi"><b>'+(c.perStatus.aangebracht||0)+'</b><span>Wacht op zitting</span></div>'+
+      '<div class="kpi"><b>'+(c.perStatus.gepland||0)+'</b><span>Op de rol</span></div>'+
+      '<div class="kpi"><b>'+(c.perStatus.uitspraak||0)+'</b><span>Uitspraak gedaan</span></div>'+
+      '<div class="kpi"><b>'+c.rolVandaag+'</b><span>Zittingen vandaag</span></div>'+
+      '<div class="kpi"><b>'+c.doorloopDagen+'d</b><span>Doorlooptijd gem.</span></div>'+
+      '<div class="kpi"><b>'+c.beroepenWachtend+'</b><span>Beroepen wachtend</span></div>'+
+      '<div class="kpi"><b>'+c.signalen.length+'</b><span>Signalen</span></div>';
+    $('#p-sig').innerHTML = c.signalen.length ? c.signalen.map(s =>
+      '<div class="item sig '+esc(s.soort)+'"><h4>'+esc(s.soort)+' · '+esc(s.ref)+'</h4><div class="meta">'+esc(s.tekst)+'</div></div>').join('')
+      : '<div class="leeg">Geen signalen. De rol loopt op schema.</div>';
+  } catch(e){ meld(e.message); }
+}
+
+function zaakKaart(z){
+  const st = z.status === 'uitspraak' ? '<span class="status ok">uitspraak: '+esc(z.uitspraak.beslissing)+'</span>'
+    : z.status === 'gepland' ? '<span class="status goud">'+esc(z.zitting.datum)+' '+esc(z.zitting.tijd)+' · '+esc(z.zitting.zaal)+(z.zitting.klaargezet?' · klaargezet':'')+'</span>'
+    : '<span class="status open">wacht op zitting · '+z.dagen+'d</span>';
+  const bron = z.bron ? ' <span class="status">uit bezwaar '+esc(z.bron.ref)+'</span>' : '';
+  const acties = z.status === 'uitspraak' ? '<div class="vonnis">'+esc(z.uitspraak.motivatie)+' <span style="color:var(--soft);">(de rechter, '+esc(z.uitspraak.rechter)+')</span></div>'
+    : '<div class="rij"><button class="knop stil" data-plan="'+z.ref+'">Zitting plannen</button>'+
+      (z.status === 'gepland' ? '<button class="knop" data-von="'+z.ref+'">Uitspraak (de rechter beslist)</button>' : '')+'</div>';
+  return '<div class="item"><h4>'+esc(z.titel)+' <small style="color:var(--soft);font-family:Inter;">'+esc(z.ref)+'</small></h4>'+
+    '<div class="meta">'+esc(z.typeLabel)+' · '+esc(z.eiser)+' tegen '+esc(z.verweerder)+' · '+st+bron+'</div>'+
+    (z.omschrijving ? '<div class="meta">'+esc(z.omschrijving)+'</div>' : '')+acties+'</div>';
+}
+function koppelZaakKnoppen(wortel){
+  wortel.querySelectorAll('[data-plan]').forEach(b => b.addEventListener('click', async () => {
+    const datum = prompt('Zittingsdatum (jjjj-mm-dd):', new Date(Date.now()+7*86400000).toISOString().slice(0,10)); if (!datum) return;
+    const tijd = prompt('Tijd (uu:mm):', '10:00') || '10:00';
+    const zaal = prompt('Zaal ('+ZALEN.join(', ')+'):', ZALEN[0]) || ZALEN[0];
+    const rechter = prompt('Rechter:', 'mr. Van der Meer') || '';
+    try { await api('/api/overheid/rb/zitting', { ref: b.dataset.plan, datum, tijd, zaal, rechter });
+      meld('Op de rol gezet; de eiser krijgt bericht in de Berichtenbox.'); laadZaken(); laadCockpit(); } catch(e){ meld(e.message); } }));
+  wortel.querySelectorAll('[data-von]').forEach(b => b.addEventListener('click', async () => {
+    const beslissing = prompt('Beslissing ('+BESLISSINGEN.join(', ')+'):', BESLISSINGEN[0]); if (!beslissing) return;
+    const motivatie = prompt('Motivatie (verplicht, komt in de Berichtenbox):', ''); if (!motivatie) return;
+    try { await api('/api/overheid/rb/uitspraak', { ref: b.dataset.von, beslissing, motivatie });
+      meld('Uitspraak vastgelegd; het dossier is gesloten.'); laadZaken(); laadCockpit(); } catch(e){ meld(e.message); } }));
+}
+
+async function laadZaken(){
+  try {
+    const r = await api('/api/overheid/rb/zaken', { status: $('#zFilter').value });
+    $('#zakenLijst').innerHTML = r.zaken.length ? r.zaken.map(zaakKaart).join('') : '<div class="leeg">Geen zaken in deze selectie.</div>';
+    koppelZaakKnoppen($('#zakenLijst'));
+  } catch(e){ meld(e.message); }
+}
+$('#zFilter').addEventListener('change', laadZaken);
+$('#zMaak').addEventListener('click', async () => {
+  try { await api('/api/overheid/rb/zaak', { type: $('#zType').value, titel: $('#zTitel').value, eiser: $('#zEiser').value, verweerder: $('#zVerweerder').value, omschrijving: $('#zOms').value });
+    meld('Zaak aangebracht.'); $('#zTitel').value = $('#zEiser').value = $('#zVerweerder').value = $('#zOms').value = '';
+    laadZaken(); laadCockpit(); } catch(e){ meld(e.message); }
+});
+
+async function laadRol(){
+  try {
+    const r = await api('/api/overheid/rb/rol', { datum: $('#rolDatum').value });
+    $('#rolLijst').innerHTML = '<div class="item" style="background:var(--card2);"><h4>De rol van '+esc(r.datum)+'</h4><div class="meta">Per zaal, op tijd. De bode ziet dezelfde rol op de Overheids-PDA en zet de zalen klaar.</div></div>'+
+      (r.rol.length ? r.rol.map(z => '<div class="item"><h4>'+esc(z.zitting.tijd)+' · '+esc(z.zitting.zaal)+'</h4>'+
+        '<div class="meta">'+esc(z.titel)+' ('+esc(z.ref)+') · '+esc(z.eiser)+' tegen '+esc(z.verweerder)+' · '+esc(z.zitting.rechter)+' · '+
+        (z.zitting.klaargezet ? '<span class="status ok">zaal klaargezet</span>' : '<span class="status open">nog klaarzetten</span>')+'</div></div>').join('')
+      : '<div class="leeg">Geen zittingen op deze dag.</div>');
+  } catch(e){ meld(e.message); }
+}
+$('#rolLaad').addEventListener('click', laadRol);
+
+async function laadBeroepen(){
+  try {
+    const r = await api('/api/overheid/bezwaren', { status: 'ongegrond' });
+    $('#p-beroep').innerHTML = '<div class="item" style="background:var(--card2);"><h4>Van bezwaar naar beroep</h4><div class="meta">Een ongegrond verklaard bezwaar kan als beroep de rechtbank in: de griffie brengt de zaak aan, de inwoner kan het ook zelf via MijnOverheid.</div></div>'+
+      (r.bezwaren.length ? r.bezwaren.map(b =>
+        '<div class="item"><h4>'+esc(b.tegen)+' <small style="color:var(--soft);font-family:Inter;">'+esc(b.ref)+'</small></h4>'+
+        '<div class="meta">'+esc(b.aanvrager||'')+' · '+esc(b.reden||'')+'</div>'+
+        '<div class="rij"><button class="knop stil" data-ber="'+b.ref+'">Als beroep aanbrengen</button></div></div>').join('')
+      : '<div class="leeg">Geen ongegronde bezwaren die wachten.</div>');
+    $('#p-beroep').querySelectorAll('[data-ber]').forEach(b => b.addEventListener('click', async () => {
+      try { const r2 = await api('/api/overheid/rb/beroep', { ref: b.dataset.ber });
+        meld('Beroep aangebracht als zaak '+r2.zaak.ref+'.'); laadBeroepen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+$('#aiK').addEventListener('click', async () => {
+  const v = $('#aiV').value.trim(); if (!v) return;
+  $('#aiA').textContent = 'Een ogenblik…';
+  try { const r = await api('/api/overheid/rb/ai', { vraag: v }); $('#aiA').textContent = r.antwoord; $('#aiV').value = ''; }
+  catch(e){ $('#aiA').textContent = e.message; }
+});
+$('#aiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#aiK').click(); });
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

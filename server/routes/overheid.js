@@ -45,6 +45,39 @@ module.exports = (kern) => {
     catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
+  /* ---- De Rechtspraak: de rechtbank (kern/overheid/rechtbank.js) ---- */
+  app.post('/api/overheid/rb/cockpit', supplierAuth, rijk, (req, res) => res.json(overheid.rbCockpit()));
+  app.post('/api/overheid/rb/zaken', supplierAuth, rijk, (req, res) => res.json(overheid.rbZaken(req.body || {})));
+  app.post('/api/overheid/rb/zaak', supplierAuth, rijk, (req, res) => stuur(res, overheid.rbZaakMaak(wie(req), req.body || {})));
+  app.post('/api/overheid/rb/beroep', supplierAuth, rijk, (req, res) => stuur(res, overheid.rbBeroep(wie(req), String(req.body.ref || ''))));
+  app.post('/api/overheid/rb/zitting', supplierAuth, rijk, (req, res) => stuur(res, overheid.rbZitting(wie(req), String(req.body.ref || ''), req.body || {})));
+  app.post('/api/overheid/rb/rol', supplierAuth, rijk, (req, res) => res.json(overheid.rbRol(String(req.body.datum || ''))));
+  app.post('/api/overheid/rb/uitspraak', supplierAuth, rijk, (req, res) => stuur(res, overheid.rbUitspraak(wie(req), String(req.body.ref || ''), req.body || {})));
+  app.post('/api/overheid/rb/ai', supplierAuth, rijk, async (req, res) => {
+    try { res.json(await overheid.rbAI(String(req.body.vraag || ''))); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
+  /* ---- de Overheids-PDA: het personeel van alle rijkskantoren (kern/overheid/pda.js) ---- */
+  const L = req => String((req.body || {}).locatie || '');
+  app.post('/api/overheid/pda/overzicht', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaOverzicht(L(req))));
+  app.post('/api/overheid/pda/bezoeker/in', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaBezoekerIn(wie(req), L(req), req.body || {})));
+  app.post('/api/overheid/pda/bezoeker/uit', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaBezoekerUit(wie(req), String(req.body.id || ''))));
+  app.post('/api/overheid/pda/bezoekers', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaBezoekers(L(req))));
+  app.post('/api/overheid/pda/ronde', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaRonde(wie(req), L(req), req.body.bevinding || null)));
+  app.post('/api/overheid/pda/incident', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaIncident(wie(req), L(req), req.body || {})));
+  app.post('/api/overheid/pda/incident/sluit', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaIncidentSluit(wie(req), String(req.body.id || ''), req.body.oplossing)));
+  app.post('/api/overheid/pda/incidenten', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaIncidenten(L(req))));
+  app.post('/api/overheid/pda/taken', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaTaken(L(req))));
+  app.post('/api/overheid/pda/taak/klaar', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaTaakKlaar(wie(req), String(req.body.id || ''))));
+  app.post('/api/overheid/pda/taak/extra', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaTaakExtra(wie(req), L(req), req.body || {})));
+  app.post('/api/overheid/pda/zittingen', supplierAuth, rijk, (req, res) => res.json(overheid.pdaZittingen()));
+  app.post('/api/overheid/pda/klaarzet', supplierAuth, rijk, (req, res) => stuur(res, overheid.pdaKlaarzet(wie(req), String(req.body.ref || ''))));
+  app.post('/api/overheid/pda/ai', supplierAuth, rijk, async (req, res) => {
+    try { stuur(res, await overheid.pdaAI(L(req), String(req.body.rol || ''), String(req.body.vraag || ''))); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   /* ---- ondernemers: inschrijven in het handelsregister als onderneming ---- */
   app.post('/api/supplier/overheid/kvk/inschrijven', supplierAuth, (req, res) =>
     stuur(res, overheid.kvkInschrijven({ supplierCode: req.supplier.code, bedrijf: req.supplier.name }, req.body || {})));

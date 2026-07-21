@@ -1,0 +1,32 @@
+{
+  "name": "Overheids-PDA, de werktelefoon van alle rijkskantoren",
+  "short_name": "Overheids-PDA",
+  "id": "/apps/overheidspda",
+  "description": "Receptie, security, schoonmaak en bode: een PDA voor al het personeel van de rechtbank, het belastingkantoor, het rijkskantoor en het gemeentehuis.",
+  "lang": "nl",
+  "start_url": "/apps/overheidspda.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "icons": [
+    {
+      "src": "/icons/pas-rtg-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pas-rtg-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pas-rtg-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

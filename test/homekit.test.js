@@ -84,3 +84,50 @@ test('3. bewaren, starten en alles-uit: de scene zet de standen echt, sloten bli
   // opruimen: scene weg
   assert.equal((await api(base, '/api/home/scene/weg', { id: b.body.id }, lid)).status, 200);
 });
+
+test('4. alle merken kunnen verbinden: koppelen, meedoen in het huis, en netjes ontkoppelen', async () => {
+  const lijst = await api(base, '/api/home/merken', {}, lid);
+  assert.ok(lijst.body.merken.length >= 10, 'tien aangesloten merken over alle categorieen');
+  assert.ok(lijst.body.merken.every(m => !m.verbonden));
+  // LUMO verbinden: de apparaten stromen de woning in
+  const v = await api(base, '/api/home/merk/verbind', { id: 'lumo' }, lid);
+  assert.equal(v.status, 200);
+  assert.equal(v.body.apparaten, 2);
+  let alle = (await api(base, '/api/home', {}, lid)).body.kamers.flatMap(k => k.apparaten);
+  const strip = alle.find(a => a.naam === 'LUMO Lichtstrip');
+  assert.ok(strip, 'het merk-apparaat staat in de woning');
+  assert.equal((await api(base, '/api/home/zet', { id: strip.id, stand: { aan: true, dim: 45 } }, lid)).status, 200, 'bedienen werkt meteen');
+  // een merk-slot volgt dezelfde vaste regel: nooit in een scene
+  await api(base, '/api/home/merk/verbind', { id: 'slotwerk' }, lid);
+  const smokkel = await api(base, '/api/home/scene/bewaar', { naam: 'Merkscene', standen: { [strip.id]: { aan: true, dim: 30 }, 'slotwerk-0': { opSlot: false } } }, lid);
+  assert.equal(smokkel.status, 200);
+  const scenes = (await api(base, '/api/home', {}, lid)).body.scenes;
+  assert.equal(scenes.find(s => s.naam === 'Merkscene').aantal, 1, 'het merk-slot is eruit gewassen, de lichtstrip bleef');
+  // ontkoppelen haalt de apparaten weg, ook uit de bewaarde scene
+  assert.equal((await api(base, '/api/home/merk/ontkoppel', { id: 'lumo' }, lid)).status, 200);
+  alle = (await api(base, '/api/home', {}, lid)).body.kamers.flatMap(k => k.apparaten);
+  assert.ok(!alle.some(a => a.naam.startsWith('LUMO')), 'de LUMO-apparaten zijn weg');
+  assert.ok(!(await api(base, '/api/home', {}, lid)).body.scenes.some(s => s.naam === 'Merkscene'), 'de leeggevallen scene is opgeruimd');
+});
+
+test('5. de open standaard: ELK partnermerk meldt zich aan en is meteen te verbinden', async () => {
+  const partner = (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+  const aanmeld = await api(base, '/api/supplier/home/merk', { naam: 'SAL DE MAR HOME', soort: 'Horeca-domotica',
+    uitleg: 'De keukenapparatuur van het restaurant, nu ook thuis.',
+    apparaten: [{ naam: 'Wijnklimaatkast', kamer: 'Keuken', soort: 'klimaat', icon: '🍷' }, { naam: 'Warmhoudlade', kamer: 'Keuken', soort: 'stekker', icon: '🍽️' }] }, partner);
+  assert.equal(aanmeld.status, 200);
+  assert.equal(aanmeld.body.apparaten, 2);
+  const lijst = await api(base, '/api/home/merken', {}, lid);
+  const nieuw = lijst.body.merken.find(m => m.naam === 'SAL DE MAR HOME');
+  assert.ok(nieuw, 'het nieuwe merk staat tussen de merken');
+  assert.ok(nieuw.partner, 'gemarkeerd als partnermerk');
+  const v = await api(base, '/api/home/merk/verbind', { id: nieuw.id }, lid);
+  assert.equal(v.status, 200);
+  const alle = (await api(base, '/api/home', {}, lid)).body.kamers.flatMap(k => k.apparaten);
+  const kast = alle.find(a => a.naam === 'SAL DE MAR HOME Wijnklimaatkast');
+  assert.ok(kast, 'het partner-apparaat staat in de keuken');
+  assert.equal(kast.kamer, 'Keuken');
+  // zonder leverancier-inlog geen aanmelding; zonder lid-inlog geen merkenlijst
+  assert.equal((await api(base, '/api/supplier/home/merk', { naam: 'X' })).status, 401);
+  assert.equal((await api(base, '/api/home/merken')).status, 401);
+});

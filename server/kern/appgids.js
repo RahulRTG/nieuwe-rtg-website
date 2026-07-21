@@ -105,7 +105,7 @@ const GIDS = {
     ['Bekijk wat er in je stad speelt', 'Regel je stadszaken digitaal', 'Meld iets aan de gemeente'],
     'Een goede melding heeft een foto en een plek; dan kan de buitendienst er direct mee aan de slag.'),
   '/apps/home.html': G('De RTG Home Kit: alle elektronica van je huis op één plek, per kamer, met scènes die je met één tik start.',
-    ['Bedien lampen, klimaat, gordijnen en audio per kamer', 'Laat Rahul een scène voorstellen (bijv. filmavond) en bewaar hem', 'Alles uit met één tik; sloten bedien je altijd zelf'],
+    ['Bedien lampen, klimaat, gordijnen en audio per kamer', 'Laat Rahul een scène voorstellen (bijv. filmavond) en bewaar hem', 'Verbind merken via de open koppelstandaard; hun apparaten doen meteen mee', 'Alles uit met één tik; sloten bedien je altijd zelf'],
     'De AI stelt scènes voor, jij beslist; en een deur van het slot halen blijft altijd jouw eigen losse tik. Dat is een vaste veiligheidsregel.'),
   '/apps/juridisch.html': G('Juridisch: de voorwaarden, privacyregels en jouw AVG-rechten, in gewone taal.',
     ['Lees de voorwaarden per onderwerp', 'Vraag je gegevens op of laat ze wissen', 'Bekijk wat partners wel en niet zien'],

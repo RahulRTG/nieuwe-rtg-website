@@ -2470,6 +2470,7 @@ require('./routes/gids')(kern);
 /* De RTG Home Kit (kern/homekit.js): alle elektronica van het lid op een
    plek, met AI-scenes; sloten blijven altijd handwerk van het lid zelf. */
 Object.assign(kern, require('./kern/homekit')({ db, save, crypto, schoon, anthropic }));
+Object.assign(kern, require('./kern/homemerken')({ db, save, schoon }));
 require('./routes/home')(kern);
 /* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
    bibliotheken en zetten die live op de klas-PDA van de kinderen. */

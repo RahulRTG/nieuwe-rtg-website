@@ -2,7 +2,7 @@
    plus scenes met AI-hulp. Alles op de eigen sessiesleutel; de AI stelt
    voor, het lid beslist, en sloten gaan nooit via een scene of de AI. */
 module.exports = (kern) => {
-  const { app, auth, homekit } = kern;
+  const { app, auth, supplierAuth, homekit, homeMerken } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
 
   app.post('/api/home', auth, (req, res) => res.json(homekit.overzicht(req.session.key)));
@@ -15,4 +15,12 @@ module.exports = (kern) => {
   app.post('/api/home/scene/bewaar', auth, (req, res) => stuur(res, homekit.sceneBewaar(req.session.key, req.body || {})));
   app.post('/api/home/scene/start', auth, (req, res) => stuur(res, homekit.sceneStart(req.session.key, req.body.id)));
   app.post('/api/home/scene/weg', auth, (req, res) => stuur(res, homekit.sceneWeg(req.session.key, req.body.id)));
+
+  /* ---- "Werkt met RTG Home Kit": de open merkenlaag ---- */
+  // de merken bekijken en verbinden (de woning staat altijd eerst klaar)
+  app.post('/api/home/merken', auth, (req, res) => { homekit.overzicht(req.session.key); res.json(homeMerken.merken(req.session.key)); });
+  app.post('/api/home/merk/verbind', auth, (req, res) => { homekit.overzicht(req.session.key); stuur(res, homeMerken.verbind(req.session.key, req.body.id)); });
+  app.post('/api/home/merk/ontkoppel', auth, (req, res) => stuur(res, homeMerken.ontkoppel(req.session.key, req.body.id)));
+  // elk partnermerk meldt zich aan via de open koppelstandaard
+  app.post('/api/supplier/home/merk', supplierAuth, (req, res) => stuur(res, homeMerken.meldAan(req.supplier, req.body || {})));
 };

@@ -65,6 +65,10 @@
     <div class="voorstel" id="voorstel" hidden></div>
   </div>
 
+  <div class="kop2"><h2>🔗 Merken</h2><span class="n">werkt met RTG Home Kit · elk merk kan aansluiten</span></div>
+  <p class="stil" style="margin-bottom:.6rem;">Verbind een merk en zijn apparaten verschijnen meteen in uw kamers en scènes. Ontkoppelen haalt ze net zo netjes weer weg. Elk RTG-partnermerk kan zich via de open koppelstandaard aanmelden.</p>
+  <div class="scenes" id="merken"><span class="stil">Laden…</span></div>
+
   <div id="kamers"><p class="stil" style="padding:1rem 0;">De woning laadt…</p></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
@@ -82,10 +86,27 @@ if (!TOKEN) {
     '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
-let HUIS = null, VOORSTEL = null;
+let HUIS = null, VOORSTEL = null, MERKEN = [];
 async function laad(){
   try { HUIS = await api('/api/home'); } catch(e){ $('#kamers').innerHTML = '<p class="stil">'+esc(e.message)+'</p>'; return; }
-  tekenScenes(); tekenKamers();
+  try { MERKEN = (await api('/api/home/merken')).merken; } catch(e){ MERKEN = []; }
+  tekenScenes(); tekenMerken(); tekenKamers();
+}
+function tekenMerken(){
+  $('#merken').innerHTML = MERKEN.length ? MERKEN.map(m =>
+    '<div class="scene"'+(m.verbonden?' style="border-color:var(--gold);"':'')+'><b>'+m.icon+' '+esc(m.naam)+
+    (m.partner?' <small style="color:var(--gold);">partner</small>':'')+'</b>'+
+    '<small>'+esc(m.soort)+' · '+m.aantal+' apparaten · '+esc(m.uitleg)+'</small>'+
+    '<div class="rij" style="margin-top:.3rem;">'+
+    (m.verbonden ? '<button class="knop stil2 mlos" data-id="'+esc(m.id)+'">Ontkoppel</button>'
+                 : '<button class="knop mvast" data-id="'+esc(m.id)+'">Verbind</button>')+'</div></div>').join('')
+    : '<span class="stil">Nog geen merken aangesloten.</span>';
+  $('#merken').querySelectorAll('.mvast').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('/api/home/merk/verbind', { id: b.dataset.id }); meld('Merk '+r.merk+' verbonden; '+r.apparaten+' apparaten toegevoegd.'); laad(); } catch(e){ meld(e.message); }
+  }));
+  $('#merken').querySelectorAll('.mlos').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/home/merk/ontkoppel', { id: b.dataset.id }); meld('Merk ontkoppeld; de apparaten zijn weggehaald.'); laad(); } catch(e){ meld(e.message); }
+  }));
 }
 function staatTekst(a){
   const s = a.stand;

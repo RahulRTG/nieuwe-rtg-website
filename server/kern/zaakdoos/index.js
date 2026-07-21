@@ -22,6 +22,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 module.exports = ({ db, save, log, dataDir }) => {
   // De doos praat met een of meer cloud-adressen (komma-lijst). Zijn het er
@@ -61,6 +62,42 @@ module.exports = ({ db, save, log, dataDir }) => {
     if (!Array.isArray(db.data.doosJournaal)) db.data.doosJournaal = [];
     return db.data.doosJournaal;
   }
+
+  /* ---------- journaal-beveiliging ----------
+     Het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de
+     doos. Dat maakt het de gevoeligste plek: een gemanipuleerd journaal op
+     schijf zou anders vervalste acties met de doos-rechten kunnen doorzetten.
+     Drie sloten:
+     1. Padbeleid: alleen zaak-schrijfacties (/api/supplier/...), nooit inloggen,
+        streams, de doos zelf, de eigenaarskast of accounts.
+     2. Integriteit: over de canonieke inhoud (seq, pad, body, res, tijd) staat
+        een HMAC-zegel met een serversleutel die alleen op de doos leeft
+        (dooszegel.key, 0600, in .gitignore). Volgnummers (seq) maken herordenen
+        of knippen zichtbaar.
+     3. Verse controle bij het naspelen: elke regel wordt timingvast geverifieerd;
+        een ongeldige of gemanipuleerde regel wordt overgeslagen, nooit gespeeld. */
+  const JOURNAAL_MAX_BODY = 64 * 1024; // een zaak-schrijfactie is nooit groter
+  const zegelPad = path.join(dataDir || '.', 'dooszegel.key');
+  let zegelKey;
+  try { zegelKey = fs.readFileSync(zegelPad); }
+  catch (e) { zegelKey = crypto.randomBytes(32); try { fs.writeFileSync(zegelPad, zegelKey, { mode: 0o600 }); } catch (e2) {} }
+
+  function journaalPadOk(pad) {
+    if (typeof pad !== 'string' || !pad.startsWith('/api/supplier/')) return false;
+    if (pad === '/api/supplier/login' || pad.startsWith('/api/supplier/stream')) return false;
+    if (pad.includes('..') || /[\s?#]/.test(pad)) return false;
+    return true;
+  }
+  function journaalZegel(e) {
+    const payload = JSON.stringify({ seq: e.seq, pad: e.pad, body: e.body || {}, res: e.res || null, at: e.at });
+    return crypto.createHmac('sha256', zegelKey).update(payload).digest('base64url');
+  }
+  function journaalGeldig(e) {
+    if (!e || !journaalPadOk(e.pad) || typeof e.seq !== 'number' || typeof e.zegel !== 'string') return false;
+    const eigen = journaalZegel(e);
+    const a = Buffer.from(String(e.zegel)); const b = Buffer.from(eigen);
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  }
   function naarLokaal(reden) {
     if (st.modus !== 'lokaal') {
       st.modus = 'lokaal';
@@ -92,7 +129,8 @@ module.exports = ({ db, save, log, dataDir }) => {
     db, save, log, fs, path, nu, st, teller, journaal, naarLokaal, beheer,
     CLOUDS, CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP,
     KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS,
-    NETWERK, DOOS_NAAM, MELD_MS, PLEK, BUREN
+    NETWERK, DOOS_NAAM, MELD_MS, PLEK, BUREN,
+    journaalPadOk, journaalZegel, journaalGeldig, JOURNAAL_MAX_BODY
   };
   // proxy levert het doorgeefluik, de kloon, het naspelen én de randcache
   const proxy = require('./proxy')(ctx);
@@ -102,7 +140,7 @@ module.exports = ({ db, save, log, dataDir }) => {
   function status() {
     const kasx = proxy.kasStats();
     return {
-      doos: actief, modus: st.modus, journaal: actief ? journaal().length : 0, laatsteKloon: st.laatsteKloon,
+      doos: actief, modus: st.modus, journaal: actief ? journaal().length : 0, journaalGeweigerd: teller.geweigerd || 0, laatsteKloon: st.laatsteKloon,
       kloonLeeftijdMin: st.laatsteKloon ? Math.round((nu() - st.laatsteKloon) / 60000) : null,
       kasStuks: kasx.stuks, kasBytes: kasx.bytes,
       clouds: CLOUDS.length, actieveCloud: st.cloudIdx,
@@ -158,6 +196,8 @@ module.exports = ({ db, save, log, dataDir }) => {
   return { doos: {
     actief, magProxy: proxy.magProxy, proxy: proxy.proxy, status, schrijfJournaal: proxy.schrijfJournaal,
     modusVan: () => st.modus, tik, speelNa: proxy.speelNa, haalKloon: proxy.haalKloon,
-    kasLees: proxy.kasLees, buurDoorgeven: netwerk.buurDoorgeven, dagrapport: netwerk.dagrapport
+    kasLees: proxy.kasLees, buurDoorgeven: netwerk.buurDoorgeven, dagrapport: netwerk.dagrapport,
+    // de journaal-beveiliging, ook los aanroepbaar (statuspaneel, tests)
+    journaalGeldig, journaalPadOk
   } };
 };

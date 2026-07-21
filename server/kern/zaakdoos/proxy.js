@@ -6,7 +6,8 @@
    aangemaakte bonnummers). Krijgt de gedeelde ctx van kern/zaakdoos/index.js. */
 module.exports = (ctx) => {
   const { db, save, fs, path, nu, st, teller, journaal, naarLokaal,
-    CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP, KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS } = ctx;
+    CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP, KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS,
+    journaalPadOk, journaalZegel, journaalGeldig, JOURNAAL_MAX_BODY } = ctx;
 
   /* ---------- de randcache: media blijft op het kastje ----------
      Elke Salon-foto die eenmaal via het doorgeefluik langskwam, bewaart de doos
@@ -142,6 +143,13 @@ module.exports = (ctx) => {
     try { token = await cloudToken(); } catch (e) { return false; }
     while (rij.length) {
       const e = rij[0];
+      // beveiliging: nooit een gemanipuleerde of buiten-beleid regel naspelen.
+      // Een ongeldige regel wordt overgeslagen (niet naar de cloud gestuurd).
+      if (!journaalGeldig(e)) {
+        console.warn('[doos] journaalregel geweigerd (zegel/pad ongeldig), overgeslagen: ' + (e && e.pad));
+        rij.shift(); teller.geweigerd = (teller.geweigerd || 0) + 1; save();
+        continue;
+      }
       let r;
       try {
         r = await fetch(CLOUD() + e.pad, {
@@ -162,10 +170,18 @@ module.exports = (ctx) => {
   }
 
   // een 2xx-schrijfactie in lokale modus komt in het journaal (aangeroepen
-  // vanuit de journaal-middleware in server.js)
+  // vanuit de journaal-middleware in server.js). Beveiligd: alleen zaak-paden,
+  // een plafond op de body, een oplopend volgnummer en een HMAC-zegel, zodat
+  // een gemanipuleerd journaal op schijf bij het naspelen wordt geweigerd.
   function schrijfJournaal(pad, body, resBody) {
+    if (!journaalPadOk(pad)) return; // alleen zaak-schrijfacties in het journaal
+    const b = body || {};
+    try { if (JSON.stringify(b).length > JOURNAAL_MAX_BODY) return; } catch (e) { return; } // geen onzin-body
     const rij = journaal();
-    rij.push({ pad, body: body || {}, res: resBody || null, at: Date.now() });
+    if (!Number.isInteger(db.data.doosSeq)) db.data.doosSeq = 0;
+    const e = { seq: ++db.data.doosSeq, pad, body: b, res: resBody || null, at: Date.now() };
+    e.zegel = journaalZegel(e);
+    rij.push(e);
     if (rij.length > 5000) rij.shift(); // vangnet; een dienst komt hier nooit
     save();
   }

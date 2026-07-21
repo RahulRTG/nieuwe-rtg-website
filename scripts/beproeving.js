@@ -11,7 +11,7 @@
    geval.
 
    TWEE SCHALEN, ZELFDE OORDEEL:
-   - Met DATABASE_URL  -> POSTGRES-modus: 65.000.000 leden in de ledengids (buiten
+   - Met DATABASE_URL  -> POSTGRES-modus: 100.000.000 leden in de ledengids (buiten
      het RAM) + een miljoenenlaag aan activiteit. De echte mega-beproeving.
    - Zonder DATABASE_URL -> SQLITE-modus: draait overal (ook in CI), zonder externe
      database, op een kleiner volume. Elke morele en technische lat is identiek.
@@ -19,7 +19,7 @@
 
    DE FASEN (in deze volgorde, en dat is met opzet):
      0  KALIBRATIE   machine-ruis meten (de latentie-lat schaalt ermee mee).
-     A  VOLUME       zaaien (65M dir + activiteit in Postgres) of vers booten
+     A  VOLUME       zaaien (100M dir + activiteit in Postgres) of vers booten
                      (sqlite); boot-tijd, RAM en schijf. Daarna "alles aan" op de
                      schakelkast zodat elke functie echt getoetst wordt.
      B  GELD         RTG Pay op de cent: opladen/sturen conserveert centen exact,
@@ -48,7 +48,7 @@
      LATENTIE      p99 onder de (met machine-ruis geschaalde) SLO.
 
    Draai (standaard, overal):   node --experimental-sqlite scripts/beproeving.js
-   Draai (mega, 65M Postgres):  DATABASE_URL=postgres://... \
+   Draai (mega, 100M Postgres):  DATABASE_URL=postgres://... \
                                 node --max-old-space-size=8192 scripts/beproeving.js
    Knoppen (env): MEGA_LEDEN, MEGA_CHUNK, SOAK_MIN, STORM_WERKERS, MEGA_SEED,
                   SLO_P99_MS (2000), SLO_DEKKING (3), SLO_VLOER_MBMIN (40),
@@ -63,7 +63,7 @@ const PORT = Number(process.env.MEGA_PORT || 4090);
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-beproeving-'));
 const DB = process.env.DATABASE_URL || process.env.PG_URL || '';
 const MODE = DB ? 'postgres' : 'sqlite';
-const LEDEN = Number(process.env.MEGA_LEDEN || (MODE === 'postgres' ? 65000000 : 0));
+const LEDEN = Number(process.env.MEGA_LEDEN || (MODE === 'postgres' ? 100000000 : 0));
 const CHUNK = Number(process.env.MEGA_CHUNK || 5000000);
 const N_ORDERS = Number(process.env.MEGA_ORDERS || (MODE === 'postgres' ? 1000000 : 0));
 const N_BOEK = Number(process.env.MEGA_BOEK || (MODE === 'postgres' ? 300000 : 0));
@@ -258,7 +258,7 @@ function stopNet(ms) {
   });
 }
 
-/* ---------- Postgres: 65M + activiteit zaaien (alleen mega-modus) ---------- */
+/* ---------- Postgres: 100M + activiteit zaaien (alleen mega-modus) ---------- */
 async function zaaiPostgres() {
   const { Pool } = require('../server/pgwire');
   psql('DROP INDEX IF EXISTS member_dir_codename_lower'); psql('DROP INDEX IF EXISTS member_dir_codename_trgm'); psql('TRUNCATE member_dir');
@@ -631,7 +631,7 @@ async function misbruikBeproeving(tok) {
     'De activiteit is rechtstreeks gezaaid, niet via de echte schrijfpaden; chaos toetst robuustheid, geen functionele juistheid.',
     'De misbruik-beproeving dekt de zwaarste morele regels af, niet elke denkbare misbruikvorm.',
     'Latentie/doorvoer gelden voor DEZE machine en dit werkpunt; geen capaciteitsgarantie.',
-    MODE === 'sqlite' ? 'Dit is de sqlite-standaard; de volle mega-schaal (65M) draai je met DATABASE_URL.' : 'Dit is de mega-schaal; de morele lat is identiek aan de sqlite-standaard.'
+    MODE === 'sqlite' ? 'Dit is de sqlite-standaard; de volle mega-schaal (100M) draai je met DATABASE_URL.' : 'Dit is de mega-schaal; de morele lat is identiek aan de sqlite-standaard.'
   ]) console.log('  \x1b[2m- ' + l + '\x1b[0m');
 
   kop('SAMENVATTING');

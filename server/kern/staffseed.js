@@ -64,6 +64,12 @@ const STAFF_SEED = {
   // het kantoorgebouw op de Zuidas: het hele huis, van receptie tot concierge
   MERIDIAAN: [['Evi van Dalen', 'manager', 'Gebouwmanager'], ['Sanne Roos', 'staff', 'Receptie'],
     ['Deniz Kaya', 'staff', 'Security'], ['Ruben Smits', 'staff', 'Facilitair'], ['Chiara de Wit', 'staff', 'Concierge & jetset']],
+  // de golfclub: de secretaris beheert, de caddiemaster en de pro's op de baan
+  SAROCA: [['Ferran Roca', 'manager', 'Club-secretaris'], ['Iker Sans', 'staff', 'Golfpro'],
+    ['Maud Verhoef', 'staff', 'Golfpro'], ['Pep Marina', 'staff', 'Caddiemaster & greenkeeping']],
+  // de fitnessclub: de clubmanager, de receptie en de trainers
+  FORTIA: [['Bo Hendriks', 'manager', 'Clubmanager'], ['Nina Faber', 'staff', 'Receptie & check-in'],
+    ['Ziggy Muller', 'staff', 'Trainer & groepslessen']],
   // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
   GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']],
   // het rijk: een behandelaar (beoordeelt toeslagen/uitkeringen/bezwaren) en een baliemedewerker

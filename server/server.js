@@ -2503,6 +2503,10 @@ require('./routes/vracht')(kern);
    receptie, zalen, badges, facilitair, valet en de luxe jetset-laag. */
 Object.assign(kern, require('./kern/gebouw')({ db, save, crypto, schoon }));
 require('./routes/gebouw')(kern);
+/* RTG Clubs (kern/clubs.js): de golf- en countryclub (teetimes, pro's,
+   maandbeker) en de sport- en fitnessclub (leden, lessen, banen, PT). */
+Object.assign(kern, require('./kern/clubs')({ db, save, crypto, schoon }));
+require('./routes/clubs')(kern);
 /* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
    bibliotheken en zetten die live op de klas-PDA van de kinderen. */
 Object.assign(kern, require('./kern/lesmaker')({ db, save, crypto, schoon, anthropic, leeftijdInstr: rtf.leeftijdInstr }));

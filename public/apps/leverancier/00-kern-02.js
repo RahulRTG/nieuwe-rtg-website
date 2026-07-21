@@ -10,6 +10,8 @@
     vastgoed: { label:'Vastgoed',  svg:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>', cap:'vastgoed' },
     vracht:   { label:'Vracht',    svg:'<path d="M4 14l8-1.5L20 14l-1.4 3.6H5.4z"/><path d="M7 12.5V8h4v4M11 10.5V6h5v6.5"/><path d="M3 20c1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0"/>', cap:'vracht' },
     gebouw:   { label:'Gebouw',    svg:'<path d="M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17"/><path d="M15 9h3a1 1 0 0 1 1 1v11"/><path d="M3 21h18"/><path d="M8 7h2M8 11h2M8 15h2M12 7h.01M12 11h.01M12 15h.01"/>', cap:'gebouw' },
+    golf:     { label:'Golfbaan',  svg:'<path d="M12 3v12"/><path d="M12 3l6 2.5-6 2.5"/><circle cx="12" cy="18.5" r="2.5"/>', cap:'golf' },
+    fitclub:  { label:'Club',      svg:'<path d="M3 12h2M19 12h2M8 12h8"/><rect x="5" y="8" width="3" height="8" rx="1"/><rect x="16" y="8" width="3" height="8" rx="1"/>', cap:'fitclub' },
     boerderij:{ label:'Boerderij', svg:'<path d="M4 10l6-4 6 4"/><path d="M6 10v9h8v-9"/><path d="M14 13h6v6h-6z"/><path d="M9 19v-4h2v4"/>', cap:'boerderij' },
     creator:  { label:'Creator',   svg:'<rect x="3" y="5" width="13" height="14" rx="2"/><path d="M16 9l5-3v12l-5-3"/>', cap:'creator' },
     samenwerking:{ label:'Samenwerken', svg:'<path d="M9 11l2 2 4-4"/><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="M7 10v4a3 3 0 0 0 3 3h4"/>' },

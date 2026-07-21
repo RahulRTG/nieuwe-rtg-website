@@ -45,7 +45,9 @@
     { code:'ORODOR',  name:'Casa d\'Oro', type:'Juwelier', icon:'💎', sub:'Juwelier & horloges · Dalt Vila' },
     { code:'LIENZO',  name:'Galeria Lienzo', type:'Galerie', icon:'🖼️', sub:'Kunst & galerie · Dalt Vila' },
     { code:'TERRAMAR', name:'TerraMar Cargo', type:'Vracht', icon:'🚢', sub:'Internationale vracht · Haven van Ibiza' },
-    { code:'MERIDIAAN', name:'Meridiaan Toren', type:'Kantoorgebouw', icon:'🏢', sub:'Kantoorgebouw · Amsterdam Zuidas' }
+    { code:'MERIDIAAN', name:'Meridiaan Toren', type:'Kantoorgebouw', icon:'🏢', sub:'Kantoorgebouw · Amsterdam Zuidas' },
+    { code:'SAROCA',  name:'Club de Golf Sa Roca', type:'Golfclub', icon:'⛳', sub:'Golf & countryclub · Roca Llisa' },
+    { code:'FORTIA',  name:'Fortia Club', type:'Fitnessclub', icon:'🏋️', sub:'Sport & fitnessclub · Marina Botafoch' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -79,6 +81,8 @@
     galerie:     { label:'RTG Kunst & Galerie', labelEn:'RTG Art & Gallery', codes:['LIENZO'], icon:'🖼️' },
     vracht:      { label:'RTG Vracht', labelEn:'RTG Freight', codes:['TERRAMAR'], icon:'🚢' },
     kantoorgebouw: { label:'RTG Zuidas', labelEn:'RTG Zuidas', codes:['MERIDIAAN'], icon:'🏢' },
+    golfclub:    { label:'RTG Golf & Countryclub', labelEn:'RTG Golf & Country Club', codes:['SAROCA'], icon:'⛳' },
+    fitnessclub: { label:'RTG Sport & Fitness', labelEn:'RTG Sports & Fitness', codes:['FORTIA'], icon:'🏋️' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }
@@ -119,6 +123,8 @@
     vastgoed: { label:'Vastgoed',  svg:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>', cap:'vastgoed' },
     vracht:   { label:'Vracht',    svg:'<path d="M4 14l8-1.5L20 14l-1.4 3.6H5.4z"/><path d="M7 12.5V8h4v4M11 10.5V6h5v6.5"/><path d="M3 20c1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0"/>', cap:'vracht' },
     gebouw:   { label:'Gebouw',    svg:'<path d="M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17"/><path d="M15 9h3a1 1 0 0 1 1 1v11"/><path d="M3 21h18"/><path d="M8 7h2M8 11h2M8 15h2M12 7h.01M12 11h.01M12 15h.01"/>', cap:'gebouw' },
+    golf:     { label:'Golfbaan',  svg:'<path d="M12 3v12"/><path d="M12 3l6 2.5-6 2.5"/><circle cx="12" cy="18.5" r="2.5"/>', cap:'golf' },
+    fitclub:  { label:'Club',      svg:'<path d="M3 12h2M19 12h2M8 12h8"/><rect x="5" y="8" width="3" height="8" rx="1"/><rect x="16" y="8" width="3" height="8" rx="1"/>', cap:'fitclub' },
     boerderij:{ label:'Boerderij', svg:'<path d="M4 10l6-4 6 4"/><path d="M6 10v9h8v-9"/><path d="M14 13h6v6h-6z"/><path d="M9 19v-4h2v4"/>', cap:'boerderij' },
     creator:  { label:'Creator',   svg:'<rect x="3" y="5" width="13" height="14" rx="2"/><path d="M16 9l5-3v12l-5-3"/>', cap:'creator' },
     samenwerking:{ label:'Samenwerken', svg:'<path d="M9 11l2 2 4-4"/><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="M7 10v4a3 3 0 0 0 3 3h4"/>' },
@@ -274,7 +280,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -289,7 +295,9 @@
     verhuur:    ['Balie','Monteur','Schoonmaak'],
     vastgoed:   ['Makelaar','Bezichtigingen','Backoffice'],
     vracht:     ['Expediteur','Planner','Douane-declarant','Loods'],
-    kantoorgebouw: ['Receptie','Security','Facilitair','Concierge & jetset']
+    kantoorgebouw: ['Receptie','Security','Facilitair','Concierge & jetset'],
+    golfclub:   ['Club-secretaris','Golfpro','Caddiemaster','Greenkeeping'],
+    fitnessclub: ['Clubmanager','Receptie & check-in','Trainer']
   };
   let pickCode = null, gateRoster = null, pendingStation = null;
   const spH2 = () => document.querySelector('#staffPick h2');
@@ -4053,6 +4061,128 @@
     doe('data-gbjb', '/supplier/gebouw/jetset/status', ds => ({ id: ds.gbjb, status: 'bevestigd' }));
     doe('data-gbja', '/supplier/gebouw/jetset/status', ds => ({ id: ds.gbja, status: 'afgerond' }));
   }
+
+  // ---- de golf- en countryclub: teetimes, pro's, wedstrijden, baanstatus ----
+  function clKnop(attr, id, tekst, goud){
+    return '<button '+attr+'="'+id+'" style="'+(goud?'background:var(--gold);color:#000;border:none;':'background:none;border:1px solid var(--line);color:var(--soft);')+'border-radius:8px;padding:0.35rem 0.7rem;font-family:inherit;font-size:0.72rem;'+(goud?'font-weight:600;':'')+'">'+tekst+'</button>';
+  }
+  async function renderGolf(){
+    const el = $('#golfWrap'); if (!el) return;
+    if (!has('golf')){ el.innerHTML = ''; return; }
+    let d; try { d = await API.call('/supplier/golf'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
+    const k = d.kpi;
+    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
+      [[k.teetimesVandaag, T('golf.k.tee','flights vandaag')],[k.spelersVandaag, T('golf.k.spelers','spelers vandaag')],[k.lessenOpen, T('golf.k.les','lessen open')],[k.inschrijvingen, T('golf.k.wed','wedstrijd-inschrijvingen')]]
+        .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+
+    // de baan zelf: status van de greenkeeper
+    h += '<div class="st-sec" style="margin-top:1rem;">'+esc(d.naam)+' · '+d.holes+' holes · par '+d.par+'</div>'+
+      '<div class="row-gap" style="align-items:center;"><span class="sub" style="flex:1;">'+T('golf.baan','Baanstatus')+': <b>'+esc(d.baanStatus)+'</b> · greenfee '+eur(d.greenfee)+' '+T('golf.pp','p.p.')+'</span>'+
+      ['open','onderhoud','gesloten'].filter(s=>s!==d.baanStatus).map(s=>clKnop('data-gfbaan', s, s)).join(' ')+'</div>';
+
+    // teetimes: een flight boeken zonder dubbele starttijden
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('golf.tee','Teetimes')+'</div>'+
+      '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
+      '<div class="row-gap"><input id="gfNaam" class="st-in" placeholder="'+T('golf.tee.naam','Naam flight')+'" maxlength="60" style="flex:2;"><select id="gfSpelers" class="st-in" style="flex:0 0 6rem;">'+[1,2,3,4].map(n=>'<option value="'+n+'"'+(n===2?' selected':'')+'>'+n+' '+(n===1?T('golf.speler','speler'):T('golf.spelers','spelers'))+'</option>').join('')+'</select></div>'+
+      '<div class="row-gap" style="margin-top:0.4rem;"><input id="gfDatum" class="st-in" type="date" style="flex:1;"><input id="gfTijd" class="st-in" type="time" style="flex:1;">'+
+      '<button id="gfBoek" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('golf.boek','Boek')+'</button></div>'+
+      ((d.teetimes||[]).length ? d.teetimes.slice(0,10).map(t=>'<div class="sub" style="margin-top:0.35rem;">'+esc(t.datum)+' '+esc(t.tijd)+' · '+esc(t.naam)+' · '+t.spelers+' '+T('golf.spelers','spelers')+' · '+eur(t.prijs)+' <button data-gfweg="'+t.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></div>').join('') : '<p class="sub" style="margin-top:0.4rem;">'+T('golf.geen','De tee sheet is nog leeg.')+'</p>')+'</div>';
+
+    // de pro's: lessen boeken
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('golf.pros','De pro\'s · lessen')+'</div>'+
+      '<div class="row-gap"><select id="gfPro" class="st-in" style="flex:2;">'+d.pros.map(p=>'<option value="'+p.id+'">'+esc(p.naam)+' · '+esc(p.les)+' · '+eur(p.prijs)+'</option>').join('')+'</select>'+
+      '<input id="gfLesNaam" class="st-in" placeholder="'+T('golf.les.naam','Voor wie')+'" maxlength="60" style="flex:2;"></div>'+
+      '<div class="row-gap" style="margin-top:0.4rem;"><input id="gfLesDatum" class="st-in" type="date" style="flex:1;"><input id="gfLesTijd" class="st-in" type="time" style="flex:1;">'+
+      '<button id="gfLes" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('golf.les.boek','Plan les')+'</button></div>';
+    h += (d.lessen||[]).map(l=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
+      '<b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+'</b><span class="sub">'+esc(l.pro)+' · '+esc(l.datum)+' '+esc(l.tijd)+' · '+eur(l.prijs)+'</span>'+clKnop('data-gflk', l.id, T('golf.les.klaar','Gegeven'), true)+'</div>').join('') || '<p class="sub">'+T('golf.les.geen','Geen lessen gepland.')+'</p>';
+
+    // wedstrijden: de maandbeker
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('golf.wed','Wedstrijden')+'</div>';
+    h += d.wedstrijden.map(w=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
+      '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(w.naam)+' · '+esc(w.datum)+'</b><span class="sub">'+esc(w.vorm)+' · '+w.inschrijvingen.length+' '+T('golf.van','van')+' '+w.max+'</span></div>'+
+      (w.inschrijvingen.length?'<div class="sub" style="margin-top:0.3rem;">'+w.inschrijvingen.slice(0,12).map(i=>esc(i.naam)+(i.handicap!=null?' (hcp '+i.handicap+')':'')).join(' · ')+'</div>':'')+
+      '<div class="row-gap" style="margin-top:0.45rem;"><input data-gfwn="'+w.id+'" class="st-in" placeholder="'+T('golf.wed.naam','Naam speler')+'" maxlength="60" style="flex:2;"><input data-gfwh="'+w.id+'" class="st-in" type="number" step="0.1" placeholder="hcp" style="flex:0 0 5rem;">'+
+      '<button data-gfwin="'+w.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('golf.wed.in','Schrijf in')+'</button></div></div>').join('');
+    el.innerHTML = h;
+
+    const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call(pad, body(b.dataset)); renderGolf(); } catch(e){ toast(e.message); }
+    }));
+    const bind4 = (id, fn) => { const b = el.querySelector('#'+id); if (b) b.addEventListener('click', fn); };
+    bind4('gfBoek', async () => { try { await API.call('/supplier/golf/tee', { naam: $('#gfNaam').value, spelers: $('#gfSpelers').value, datum: $('#gfDatum').value, tijd: $('#gfTijd').value }); toast(T('golf.geboekt','Teetime geboekt.')); renderGolf(); } catch(e){ toast(e.message); } });
+    bind4('gfLes', async () => { try { await API.call('/supplier/golf/les', { proId: $('#gfPro').value, naam: $('#gfLesNaam').value, datum: $('#gfLesDatum').value, tijd: $('#gfLesTijd').value }); renderGolf(); } catch(e){ toast(e.message); } });
+    el.querySelectorAll('[data-gfbaan]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/golf/baan', { status: b.dataset.gfbaan }); renderGolf(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-gfwin]').forEach(b => b.addEventListener('click', async () => {
+      const w = b.dataset.gfwin;
+      try { await API.call('/supplier/golf/wedstrijd/in', { wedstrijdId: w, naam: el.querySelector('[data-gfwn="'+w+'"]').value, handicap: el.querySelector('[data-gfwh="'+w+'"]').value }); renderGolf(); } catch(e){ toast(e.message); }
+    }));
+    doe('data-gfweg', '/supplier/golf/tee/weg', ds => ({ id: ds.gfweg }));
+    doe('data-gflk', '/supplier/golf/les/klaar', ds => ({ id: ds.gflk }));
+  }
+
+  // ---- de sport- en fitnessclub: leden, check-in, lessen, banen, PT ----
+  async function renderFitclub(){
+    const el = $('#fitWrap'); if (!el) return;
+    if (!has('fitclub')){ el.innerHTML = ''; return; }
+    let d; try { d = await API.call('/supplier/fitclub'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
+    const k = d.kpi;
+    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
+      [[k.leden, T('fit.k.leden','leden')],[k.binnenNu, T('fit.k.binnen','nu binnen')],[k.checkinsVandaag, T('fit.k.check','check-ins vandaag')],[k.lesplekkenVrij, T('fit.k.plek','lesplekken vrij')],[k.banenVandaag, T('fit.k.baan','banen vandaag')],[k.ptOpen, T('fit.k.pt','PT open')]]
+        .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+
+    // de receptie: leden en check-in
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('fit.leden','Leden · check-in')+'</div>'+
+      '<div class="row-gap"><input id="ftNaam" class="st-in" placeholder="'+T('fit.lid.naam','Naam nieuw lid')+'" maxlength="60" style="flex:2;"><select id="ftSoort" class="st-in" style="flex:1;">'+Object.keys(d.lidSoorten).map(s=>'<option value="'+s+'">'+s+' · '+eur(d.lidSoorten[s])+'</option>').join('')+'</select>'+
+      '<button id="ftLid" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('fit.lid.maak','Schrijf in')+'</button></div>';
+    h += (d.leden||[]).slice(0,10).map(l=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
+      '<b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+'</b><span class="sub">'+esc(l.pas)+' · '+esc(l.soort)+' · '+(l.binnen?T('fit.binnen','binnen'):T('fit.buiten','buiten'))+'</span>'+
+      (l.binnen?clKnop('data-ftuit', l.id, T('fit.uit','Check uit')):clKnop('data-ftin', l.id, T('fit.in','Check in'), true))+'</div>').join('');
+
+    // groepslessen met capaciteit
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('fit.lessen','Groepslessen vandaag')+'</div>';
+    h += d.lessen.map(l=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
+      '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+' · '+esc(l.tijd)+'</b><span class="sub">'+l.deelnemers.length+' '+T('golf.van','van')+' '+l.capaciteit+'</span></div>'+
+      (l.deelnemers.length?'<div class="sub" style="margin-top:0.3rem;">'+l.deelnemers.slice(0,12).map(esc).join(' · ')+'</div>':'')+
+      '<div class="row-gap" style="margin-top:0.45rem;"><input data-ftln="'+l.id+'" class="st-in" placeholder="'+T('fit.les.naam','Naam deelnemer')+'" maxlength="60" style="flex:2;">'+
+      '<button data-ftlin="'+l.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('fit.les.in','Meld aan')+'</button></div></div>').join('');
+
+    // padel- en tennisbanen zonder dubbele boekingen
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('fit.banen','Banen')+' · '+eur(d.baanUurprijs)+' '+T('fit.peruur','per uur')+'</div>'+
+      '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
+      '<div class="row-gap"><select id="ftBaan" class="st-in" style="flex:2;">'+d.banen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+'</option>').join('')+'</select>'+
+      '<input id="ftBNaam" class="st-in" placeholder="'+T('fit.baan.naam','Op naam van')+'" maxlength="60" style="flex:2;"></div>'+
+      '<div class="row-gap" style="margin-top:0.4rem;"><input id="ftBDatum" class="st-in" type="date" style="flex:1;"><input id="ftBVan" class="st-in" type="time" style="flex:1;"><input id="ftBTot" class="st-in" type="time" style="flex:1;">'+
+      '<button id="ftBBoek" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('golf.boek','Boek')+'</button></div>'+
+      ((d.baanboekingen||[]).length ? d.baanboekingen.slice(0,8).map(b=>'<div class="sub" style="margin-top:0.35rem;">'+esc(b.datum)+' '+esc(b.van)+' tot '+esc(b.tot)+' · '+esc(b.baan)+' · '+esc(b.naam)+' · '+eur(b.prijs)+'</div>').join('') : '<p class="sub" style="margin-top:0.4rem;">'+T('fit.baan.geen','Nog geen baanboekingen.')+'</p>')+'</div>';
+
+    // personal training: aanvragen en inplannen
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('fit.pt','Personal training')+'</div>'+
+      '<div class="row-gap"><input id="ftPtNaam" class="st-in" placeholder="'+T('fit.pt.naam','Wie wil trainen')+'" maxlength="60" style="flex:1;"><input id="ftPtDoel" class="st-in" placeholder="'+T('fit.pt.doel','Het doel (bijv. marathon in oktober)')+'" maxlength="160" style="flex:2;">'+
+      '<button id="ftPt" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('fit.pt.vraag','Vraag aan')+'</button></div>';
+    h += (d.pt||[]).map(p=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
+      '<b style="flex:1;font-size:0.85rem;">'+esc(p.naam)+'</b><span class="sub">'+esc(p.doel)+' · '+esc(p.status)+'</span>'+
+      (p.status==='aangevraagd'?clKnop('data-ftpi', p.id, T('fit.pt.plan','Ingepland'), true):p.status==='ingepland'?clKnop('data-ftpa', p.id, T('fit.pt.klaar','Afgerond')):'')+'</div>').join('');
+    el.innerHTML = h;
+
+    const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call(pad, body(b.dataset)); renderFitclub(); } catch(e){ toast(e.message); }
+    }));
+    const bind5 = (id, fn) => { const b = el.querySelector('#'+id); if (b) b.addEventListener('click', fn); };
+    bind5('ftLid', async () => { try { await API.call('/supplier/fitclub/lid', { naam: $('#ftNaam').value, soort: $('#ftSoort').value }); toast(T('fit.lid.klaar','Lid ingeschreven; de clubpas ligt klaar.')); renderFitclub(); } catch(e){ toast(e.message); } });
+    bind5('ftBBoek', async () => { try { await API.call('/supplier/fitclub/baan', { baanId: $('#ftBaan').value, naam: $('#ftBNaam').value, datum: $('#ftBDatum').value, van: $('#ftBVan').value, tot: $('#ftBTot').value }); renderFitclub(); } catch(e){ toast(e.message); } });
+    bind5('ftPt', async () => { try { await API.call('/supplier/fitclub/pt', { naam: $('#ftPtNaam').value, doel: $('#ftPtDoel').value }); renderFitclub(); } catch(e){ toast(e.message); } });
+    el.querySelectorAll('[data-ftlin]').forEach(b => b.addEventListener('click', async () => {
+      const l = b.dataset.ftlin;
+      try { await API.call('/supplier/fitclub/les/in', { lesId: l, naam: el.querySelector('[data-ftln="'+l+'"]').value }); renderFitclub(); } catch(e){ toast(e.message); }
+    }));
+    doe('data-ftin', '/supplier/fitclub/checkin', ds => ({ id: ds.ftin }));
+    doe('data-ftuit', '/supplier/fitclub/checkout', ds => ({ id: ds.ftuit }));
+    doe('data-ftpi', '/supplier/fitclub/pt/status', ds => ({ id: ds.ftpi, status: 'ingepland' }));
+    doe('data-ftpa', '/supplier/fitclub/pt/status', ds => ({ id: ds.ftpa, status: 'afgerond' }));
+  }
   // ---- de eigen mini-boardroom van de zaak: functies + HR + marketing ----
   // ---- interactieve AI-agenda in de boardroom + ballon-badge op de Meer-tab ----
   let agendaSupData = null;
@@ -4379,7 +4509,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.

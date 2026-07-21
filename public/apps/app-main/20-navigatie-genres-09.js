@@ -47,7 +47,22 @@
 
     // mijn lopende bestellingen bovenaan
     const active = myOrders.filter(o => o.status !== 'terugbetaald');
-    $('#myOrders').innerHTML = active.length
+    // "De rekening": achteraf-lopende bonnen per zaak, om na het eten in een keer
+    // te voldoen (aan-de-balie-bonnen tellen niet mee: die gaan langs de kassa)
+    const rekBij = {};
+    active.filter(o => !o.paid && o.betaalMoment === 'achteraf' && !o.aanBalie).forEach(o => {
+      const r = rekBij[o.supplierCode] = rekBij[o.supplierCode] || { naam: o.supplierName, tafel: '', n: 0, som: 0 };
+      r.n++; r.som += o.total || 0; if (o.table && !r.tafel) r.tafel = o.table;
+    });
+    const rekLijst = Object.entries(rekBij);
+    const rekHtml = rekLijst.length
+      ? '<div class="sec-label">🧾 ' + T('app.rek.k','De rekening') + '</div>' + rekLijst.map(([code, r]) =>
+          '<div class="rek-card"><div class="rek-top"><div><b>' + r.naam + '</b>' + (r.tafel ? ' · ' + r.tafel : '') +
+            '<div class="sub2">' + r.n + ' ' + T('app.rek.bonnen','bon(nen) lopen') + ' · ' + T('app.rek.napm','betaal na het eten') + '</div></div>' +
+            '<div class="amt">' + eur(r.som) + '</div></div>' +
+          '<button class="rek-pay" data-rekpay="' + code + '">🧾 ' + T('app.rek.vraag','Vraag de rekening') + '</button></div>').join('')
+      : '';
+    $('#myOrders').innerHTML = rekHtml + (active.length
       ? '<div class="sec-label">'+T('app.tp.myorders','Mijn bestellingen')+'</div>' + active.map(o => {
           const pc = o.status === 'nieuw' ? 'nieuw' : o.status === 'in bereiding' ? 'bereiding' : 'klaar';
           return '<div class="myorder" data-ref="' + o.ref + '">' +
@@ -64,7 +79,8 @@
               (o.tagSalon ? '<span style="font-size:0.68rem;color:var(--burgundy);margin-left:auto;">✦ '+T('app.taggedsalon','getagd voor Salon')+'</span>' : '') +
             '</div></div>';
         }).join('')
-      : '';
+      : '');
+    $('#myOrders').querySelectorAll('[data-rekpay]').forEach(b => b.addEventListener('click', () => vraagRekening(b.dataset.rekpay)));
     $('#myOrders').querySelectorAll('.myorder').forEach(el => {
       const o = active.find(x => x.ref === el.dataset.ref);
       const pb = el.querySelector('.js-opay');

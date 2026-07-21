@@ -594,6 +594,19 @@
   .mo-pay{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
   .mo-pay svg{width:12px;height:12px;}
   .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
+  /* De rekening (betalen na het eten) */
+  .rek-card{background:var(--card);border:1px solid var(--burgundy);border-radius:14px;padding:0.9rem 1.05rem;margin-top:0.7rem;}
+  .rek-top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.6rem;}
+  .rek-top b{font-weight:600;font-size:0.86rem;}
+  .rek-top .amt{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
+  .rek-pay{margin-top:0.75rem;width:100%;background:var(--burgundy);color:#fff;border:none;border-radius:999px;padding:0.6rem 0.9rem;font-size:0.8rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .rek-ov{position:fixed;inset:0;z-index:100000;background:rgba(12,12,11,.78);display:flex;align-items:flex-end;justify-content:center;}
+  .rek-sheet{width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;padding:1.3rem 1.2rem calc(1.3rem + env(safe-area-inset-bottom,0));color:var(--txt);max-height:82vh;overflow-y:auto;}
+  .rek-sheet h3{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.25rem;margin:0 0 0.1rem;}
+  .rek-reg{display:flex;justify-content:space-between;gap:0.8rem;padding:0.5rem 0;border-top:1px solid var(--line);font-size:0.84rem;}
+  .rek-reg .q{color:var(--soft);}
+  .rek-sub{display:flex;justify-content:space-between;gap:0.8rem;padding:0.7rem 0 0.2rem;font-weight:600;font-size:0.95rem;border-top:1px solid var(--line);}
+  .rek-fooi{width:100%;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);margin-top:0.7rem;font-family:inherit;}
 
   /* ---- Onderweg (live reis) ---- */
   .live-start{background:linear-gradient(150deg,#1a1413,#151312);border:1px solid var(--line);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;}

@@ -2319,6 +2319,8 @@ Object.assign(kern, require('./kern/lidacties')({
 }));
 kern.butlerActies = {
   plaatsOrder: kern.plaatsOrderVoor, betaalOrder: kern.betaalOrderVoor,
+  // de rekening in een keer afrekenen (betalen na het eten)
+  betaalRekening: kern.betaalRekeningVoor,
   koopTicket: kern.koopTicketVoor, betaalBoeking: kern.betaalBoekingVoor,
   vraagRit: kern.vraagRitVoor, betaalRit: kern.betaalRitVoor,
   // Toren 4: een behandeling boeken en direct afrekenen, via exact dezelfde

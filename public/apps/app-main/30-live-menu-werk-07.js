@@ -103,8 +103,9 @@
       toast('🧾 ' + T('app.naarkassaok','Naar de kassa gestuurd. Toon je code aan de balie.'));
       showGlow(d.order);
     } else {
-      // deze zaak koos betaling achteraf: de bestelling loopt al, afrekenen kan zo
-      toast('🛎️ ' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalachteraf','Betalen kan achteraf via Bestellingen.'));
+      // deze zaak koos betaling achteraf: de bestelling loopt al; na het eten
+      // vraagt u de rekening (alle bonnen in een keer) bij Mijn bestellingen
+      toast('🛎️ ' + T('app.orderok','Bestelling geplaatst.') + ' ' + T('app.betaalnaeten','Betaal na het eten: vraag de rekening bij Mijn bestellingen.'));
     }
     renderTerPlaatse();
   }

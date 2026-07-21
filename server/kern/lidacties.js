@@ -8,7 +8,7 @@
    van de zaak. */
 // De transactie-index (O(1) opzoeken op ref/klant/zaak) komt rechtstreeks uit de
 // opslaglaag: db.js is een singleton en de index hoort bij de collecties zelf.
-const { orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe } = require('../db');
+const { orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe } = require('../db');
 
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
   leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
@@ -86,9 +86,9 @@ function betaalBoekingVoor(session, body) {
     leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
-    orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor };
-  const { plaatsOrderVoor, betaalOrderVoor } = require('./lidacties/bestellen')(ctx);
+    orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor };
+  const { plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor } = require('./lidacties/bestellen')(ctx);
   const { vraagRitVoor, betaalRitVoor } = require('./lidacties/ritten')(ctx);
 
-  return { plaatsOrderVoor, betaalOrderVoor, koopTicketVoor, betaalBoekingVoor, vraagRitVoor, betaalRitVoor };
+  return { plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, koopTicketVoor, betaalBoekingVoor, vraagRitVoor, betaalRitVoor };
 };

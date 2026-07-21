@@ -7,7 +7,7 @@ module.exports = (kern) => {
   const { app, auth, db, save, crypto, findSupplier, schoon, leeftijdVan, geborenVan,
     optieAan, zorgVoor, boekingenVoegToe, boekingenVanKlant, betaalBoekingVoor,
     notifySupplier, sseToSupplier, sseToOffice, gcCode, PERSONAS, publicSupplier,
-    isFavoriet, salonZichtbaar, plaatsOrderVoor, betaalOrderVoor, ordersVanKlant,
+    isFavoriet, salonZichtbaar, plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, ordersVanKlant,
     txLedgerActief, txLedgerVanKlant, txLedgerTel } = kern;
 
   app.post('/api/booking/request', auth, (req, res) => {
@@ -111,6 +111,18 @@ module.exports = (kern) => {
   });
   app.post('/api/order/pay', auth, (req, res) => {
     const r = betaalOrderVoor(req.session, req.body);
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
+  // "De rekening" (betalen na het eten): de lopende achteraf-bonnen bij een
+  // zaak opgeteld tonen, en in een keer afrekenen met een fooi over het geheel.
+  app.post('/api/rekening', auth, (req, res) => {
+    const r = rekeningVoor(req.session, req.body);
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
+  app.post('/api/rekening/betaal', auth, (req, res) => {
+    const r = betaalRekeningVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

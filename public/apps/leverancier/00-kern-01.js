@@ -6,6 +6,8 @@
   const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded',
     'aangevraagd':'requested', 'onderweg':'on the way', 'aangekomen':'at pickup', 'rijdt':'driving', 'gearriveerd':'completed' };
   const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
+  // dynamische tekst (bon-regels, gerechten) in de moedertaal van de ingelogde medewerker
+  const MTX = t => (window.MoederTaal ? MoederTaal.tekst(t) : t);
   const TYPELABEL = { 'Hotel':'Hotel', 'Restaurant':'Restaurant', 'Bar':'Bar', 'Taxi':'Taxi', 'Privéjet':'Private jet', 'Appartement':'Apartment', 'Club':'Club' };
   const tType = s => (lang() === 'en' ? (TYPELABEL[s] || s) : s);
   const ALG = { 'vis':'fish', 'soja':'soy', 'sesam':'sesame', 'gluten':'gluten', 'noten':'nuts', 'schaaldieren':'shellfish', 'ei':'egg', 'melk':'milk', 'pinda':'peanut', 'selderij':'celery', 'mosterd':'mustard' };

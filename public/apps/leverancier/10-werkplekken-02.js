@@ -25,6 +25,8 @@
     stClockTimer = setInterval(tickClock, 20000);
     renderStation();
     startStream();
+    // de kok of barman ziet zijn scherm en zijn bonnen in zijn moedertaal
+    if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), () => { try { renderStation(); } catch(e){} });
   }
   $('#stExit').addEventListener('click', () => {
     stationMode = null;
@@ -54,7 +56,7 @@
     return '<div class="tkc'+tier+(opts.dim?' dim':'')+'">'+
       '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+a+' min</span></div>'+
       '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+(o.paid?'':' \u00b7 '+T('st.unpaid','onbetaald'))+'</div>'+
-      '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+it.name+'</span>').join('')+'</div>'+
+      '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+MTX(it.name)+'</span>').join('')+'</div>'+
       (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
       (o.leeftijdOk?'<div class="tkc-alg" style="background:rgba(45,140,80,0.14);color:#2d8c50;">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
       ((st==='keuken'||st==='bar')&&!opts.dim?(function(){

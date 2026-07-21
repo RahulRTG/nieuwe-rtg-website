@@ -153,6 +153,8 @@
     laadZorgbalie();
     laadMeldkamerPda();
     startStream();
+    // de moedertaal van dit personeelslid: het hele scherm en de taken volgen
+    if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), renderAll);
   }
   function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
 

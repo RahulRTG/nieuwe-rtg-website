@@ -6,6 +6,8 @@
   const STATUS = { 'nieuw':'new', 'in bereiding':'in preparation', 'klaar':'ready', 'geserveerd':'served', 'geweigerd':'declined', 'terugbetaald':'refunded',
     'aangevraagd':'requested', 'onderweg':'on the way', 'aangekomen':'at pickup', 'rijdt':'driving', 'gearriveerd':'completed' };
   const tStatus = s => (lang() === 'en' ? (STATUS[s] || s) : s);
+  // dynamische tekst (bon-regels, gerechten) in de moedertaal van de ingelogde medewerker
+  const MTX = t => (window.MoederTaal ? MoederTaal.tekst(t) : t);
   const TYPELABEL = { 'Hotel':'Hotel', 'Restaurant':'Restaurant', 'Bar':'Bar', 'Taxi':'Taxi', 'Privéjet':'Private jet', 'Appartement':'Apartment', 'Club':'Club' };
   const tType = s => (lang() === 'en' ? (TYPELABEL[s] || s) : s);
   const ALG = { 'vis':'fish', 'soja':'soy', 'sesam':'sesame', 'gluten':'gluten', 'noten':'nuts', 'schaaldieren':'shellfish', 'ei':'egg', 'melk':'milk', 'pinda':'peanut', 'selderij':'celery', 'mosterd':'mustard' };
@@ -484,6 +486,9 @@
     renderAll();
     startStream();
     loadNotifs();
+    // de moedertaal van de ingelogde medewerker: het hele scherm en de
+    // bonnen volgen (de keuze zelf zet hij in de personeels-app)
+    if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), () => { try { renderAll(); } catch(e){} });
   }
 
   // Blijf ingelogd: met een bewaard token direct de app in, zonder PIN.
@@ -734,7 +739,7 @@
     const l = overschotLijst();
     if (!l.length) return '';
     return '<div class="allday"><span class="ad-h">🥡 '+T('over.h','Op de pas over')+'</span>'+
-      l.map(x => '<span class="ad"><b>'+x.qty+'×</b>'+x.name+'</span>').join('')+'</div>';
+      l.map(x => '<span class="ad"><b>'+x.qty+'×</b>'+MTX(x.name)+'</span>').join('')+'</div>';
   }
   // de melder voor de pas-schermen: is over, gebruikt of afschrijven
   function overschotBlok(){
@@ -745,7 +750,7 @@
         (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
       '<input class="st-in" id="ovAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
       '<button class="tkc-start" id="ovBij" style="flex:1;border-radius:10px;">'+T('over.is','Is over')+'</button></div>'+
-      (l.length ? l.map(x => '<div class="st-row"><span><b style="color:var(--gold);">'+x.qty+'×</b> '+x.name+'<span class="sub">'+timeAgo(x.at)+' · '+(x.door||'')+'</span></span>'+
+      (l.length ? l.map(x => '<div class="st-row"><span><b style="color:var(--gold);">'+x.qty+'×</b> '+MTX(x.name)+'<span class="sub">'+timeAgo(x.at)+' · '+(x.door||'')+'</span></span>'+
         '<span class="acts"><button class="obtn primary" data-overgebruikt="'+x.id+'">'+T('over.gebruikt','Gebruikt')+'</button><button class="obtn warn" data-overweg="'+x.id+'">✕</button></span></div>').join('')
       : '<div class="tkc-who">'+T('over.leeg','Er ligt nu niets over.')+'</div>')+'</div>';
   }
@@ -777,6 +782,8 @@
     stClockTimer = setInterval(tickClock, 20000);
     renderStation();
     startStream();
+    // de kok of barman ziet zijn scherm en zijn bonnen in zijn moedertaal
+    if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), () => { try { renderStation(); } catch(e){} });
   }
   $('#stExit').addEventListener('click', () => {
     stationMode = null;
@@ -806,7 +813,7 @@
     return '<div class="tkc'+tier+(opts.dim?' dim':'')+'">'+
       '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+a+' min</span></div>'+
       '<div class="tkc-who">'+o.customerCodename+' \u00b7 '+o.ref+(o.paid?'':' \u00b7 '+T('st.unpaid','onbetaald'))+'</div>'+
-      '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+it.name+'</span>').join('')+'</div>'+
+      '<div class="tkc-items">'+items.map(it=>'<span class="rcp-item" data-rcp="'+it.id+'"><b>'+it.qty+'\u00d7</b>'+secIcon(it)+MTX(it.name)+'</span>').join('')+'</div>'+
       (o.allergyNote?'<div class="tkc-alg">\u26a0 '+o.allergyNote+'</div>':'')+
       (o.leeftijdOk?'<div class="tkc-alg" style="background:rgba(45,140,80,0.14);color:#2d8c50;">\uD83D\uDD1E '+T('st.agever','Leeftijd in de app geverifieerd (paspoort)')+'</div>':'')+
       ((st==='keuken'||st==='bar')&&!opts.dim?(function(){
@@ -913,9 +920,9 @@
         return '<div class="tkc'+pasKlasse(pa)+'">'+
           '<div class="tkc-top"><span class="tkc-code">'+(o.table?'\uD83E\uDE91 '+o.table:'\uD83D\uDCE6 '+o.pickup)+'</span><span class="tkc-age">'+pa+' '+T('pas.op','min op de pas')+'</span></div>'+
           '<div class="tkc-who">'+(o.table?T('bp.naar','breng naar de tafel'):T('bp.ophaal','ophaalbestelling, code ')+o.pickup)+' \u00b7 '+o.customerCodename+(o.spoed?' \u00b7 \u26A1 '+T('spoed.chip','Spoed'):'')+'</div>'+
-          '<div class="tkc-items">'+(o.items||[]).map(it=>'<span><b>'+it.qty+'\u00D7</b>'+it.name+'</span>').join('')+'</div>'+
+          '<div class="tkc-items">'+(o.items||[]).map(it=>'<span><b>'+it.qty+'\u00D7</b>'+MTX(it.name)+'</span>').join('')+'</div>'+
           gastRegel(o)+
-          (o.allergyNote?'<div class="tkc-alg">\u26A0 '+o.allergyNote+'</div>':'')+
+          (o.allergyNote?'<div class="tkc-alg">\u26A0 '+MTX(o.allergyNote)+'</div>':'')+
           '<div class="tkc-act"><button class="tkc-serve" data-stserve="'+o.ref+'">'+T('st.served','Geserveerd')+'</button></div></div>';
       }).join('') : '<div class="st-empty">'+T('st.noserve','Niets klaar om uit te serveren. Zodra keuken en bar klaar zijn, verschijnt de bestelling hier.')+'</div>';
       // de spoedbon: een enkel gerecht komt als gewone bon op de lijn en telt
@@ -935,7 +942,7 @@
         return '<div class="tkc">'+
           '<div class="tkc-top"><span class="tkc-code">'+o.pickup+(o.table?' <span class="txt-md">\uD83E\uDE91 '+o.table+'</span>':'')+'</span><span class="tkc-age">'+ageMin(o.at)+' min</span></div>'+
           (o.intern?'<div class="tkc-who">\u26A1 '+T('spoed.van','Spoedbon van ')+(o.spoed&&o.spoed.door?o.spoed.door:'')+'</div>':'')+
-          '<div class="tkc-items">'+(o.items||[]).map(it=>'<span>'+spoedMerk(o,it)+'<b>'+it.qty+'\u00D7</b>'+it.name+'</span>').join('')+'</div>'+
+          '<div class="tkc-items">'+(o.items||[]).map(it=>'<span>'+spoedMerk(o,it)+'<b>'+it.qty+'\u00D7</b>'+MTX(it.name)+'</span>').join('')+'</div>'+
           '<div class="st-badges">'+Object.entries(vp.plan).map(([k,p])=>vpChip(k,p)).join('')+'</div>'+
           gastRegel(o)+
           '<div class="tkc-act"><button class="tkc-start" data-settbl="'+o.ref+'" data-cur="'+(o.table||'')+'">\uD83E\uDE91 '+(o.table?o.table+' \u00b7 '+T('st.tblwissel','wijzig'):T('st.tblset','Tafel kiezen'))+'</button>'+

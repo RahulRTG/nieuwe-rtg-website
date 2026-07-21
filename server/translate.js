@@ -12,7 +12,11 @@
 
 /* De woordenboeken (seed-inhoud en woord-voor-woord terugval) staan als
    pure data in een deelmodule. */
-const { NL2EN, WORDS_NL_EN, WORDS_EN_NL, EN2NL } = require('./translate/woordenboek');
+const { NL2EN, WORDS_NL_EN, WORDS_EN_NL, EN2NL, WORDS_ES } = require('./translate/woordenboek');
+/* De woord-voor-woord terugval per DOELtaal (demo zonder AI-sleutel). De
+   Spaanse tabel dekt Nederlands en Engels als bron; andere talen vallen
+   zonder AI-sleutel terug op de oorspronkelijke tekst (nooit kapot). */
+const WORDS = { en: WORDS_NL_EN, nl: WORDS_EN_NL, es: WORDS_ES };
 
 let anthropic = null;
 function setAnthropic(a) { anthropic = a; }
@@ -40,7 +44,8 @@ function localizeList(list, lang) {
 }
 
 function wordLevel(text, to) {
-  const dict = to === 'en' ? WORDS_NL_EN : WORDS_EN_NL;
+  const dict = WORDS[to];
+  if (!dict) return null;
   let hit = false;
   const out = String(text).split(/(\s+)/).map(tok => {
     const m = tok.match(/^([\wÀ-ÿ']+)(.*)$/);
@@ -83,7 +88,7 @@ async function translate(text, to, from) {
 
   let out = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
   if (!out && anthropic) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
-  if (!out && (to === 'en' || to === 'nl')) out = wordLevel(text, to);
+  if (!out && WORDS[to]) out = wordLevel(text, to);
   const result = out || text;
   cache.set(key, result);
   return { text: result, translated: result !== text, from };

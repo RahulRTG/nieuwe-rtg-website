@@ -2,6 +2,8 @@
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  // dynamische tekst (taken, bonnen, opdrachten) in de moedertaal van de medewerker
+  const MTX = t => (window.MoederTaal ? MoederTaal.tekst(t) : t);
   const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
 
   const SECTORS = [

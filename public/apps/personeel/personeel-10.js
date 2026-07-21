@@ -48,6 +48,22 @@
         }).join('')+'</div>' : '';
       })();
 
+    // Mijn taal: de moedertaal van dit personeelslid. Het HELE werkscherm,
+    // de bonnen en de taken volgen deze keuze, in elke werk-app.
+    $('#hulpWrap').insertAdjacentHTML('beforeend',
+      '<div class="card"><div class="k">🌍 '+T('pd.taal.h','Mijn taal')+'</div>'+
+      '<div style="margin-top:0.4rem;font-size:0.74rem;color:var(--soft);">'+T('pd.taal.s','Kies uw moedertaal. Uw hele scherm, uw bonnen en uw taken verschijnen dan in die taal, hier en op elke andere werk-app waar u inlogt.')+'</div>'+
+      '<select id="mtKies" style="width:100%;margin-top:0.5rem;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);font:inherit;font-size:0.85rem;"></select></div>');
+    if (window.MoederTaal) MoederTaal.talen().then(ts => {
+      const sel = document.getElementById('mtKies'); if (!sel || !ts.length) return;
+      const nu = MoederTaal.actueel();
+      sel.innerHTML = ts.map(t2 => '<option value="'+t2.code+'"'+(t2.code === nu ? ' selected' : '')+'>'+t2.naam+'</option>').join('');
+      sel.addEventListener('change', async () => {
+        try { await MoederTaal.zet(sel.value); toast(T('pd.taal.ok','Uw taal staat ingesteld; het scherm volgt.')); }
+        catch(e){ toast(e.message); }
+      });
+    });
+
     // Fluister fluistert ook zelf: seintjes uit je eigen weetjes (datums die
     // naderen), zonder dat je iets hoeft te vragen
     API.call('/staff/fluister/profiel').then(prof => {

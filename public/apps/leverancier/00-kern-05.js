@@ -68,6 +68,9 @@
     renderAll();
     startStream();
     loadNotifs();
+    // de moedertaal van de ingelogde medewerker: het hele scherm en de
+    // bonnen volgen (de keuze zelf zet hij in de personeels-app)
+    if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), () => { try { renderAll(); } catch(e){} });
   }
 
   // Blijf ingelogd: met een bewaard token direct de app in, zonder PIN.

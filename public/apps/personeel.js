@@ -2,6 +2,8 @@
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
+  // dynamische tekst (taken, bonnen, opdrachten) in de moedertaal van de medewerker
+  const MTX = t => (window.MoederTaal ? MoederTaal.tekst(t) : t);
   const eur = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL');
 
   const SECTORS = [
@@ -384,6 +386,8 @@
     laadZorgbalie();
     laadMeldkamerPda();
     startStream();
+    // de moedertaal van dit personeelslid: het hele scherm en de taken volgen
+    if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), renderAll);
   }
   function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
 
@@ -486,7 +490,7 @@
         '<button class="abtn'+(klok.open?'':' ghost')+'" id="klokBtn">'+(klok.open?'⏹ '+T('pd.k.uit','Klok uit'):'▶ '+T('pd.k.in','Klok in'))+'</button></div>' : '')+
       '</div>'+
       '<div class="card"><div class="k">'+T('pd.tasksnow','Nu aandacht nodig')+' ('+tasks.length+')</div>'+
-      (tasks.length ? tasks.slice(0,6).map(t=>'<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(t.b)+'</b><span>'+esc(t.s)+'</span></div></div>').join('')
+      (tasks.length ? tasks.slice(0,6).map(t=>'<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--green);">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+
       (tasks.length>6?'<div style="margin-top:0.5rem;font-size:0.74rem;color:var(--soft);">+'+(tasks.length-6)+' '+T('pd.more','meer onder Taken')+'</div>':'')+'</div>'+
       (vwPda && vwPda.ok && vwPda.morgen
@@ -584,7 +588,7 @@
         ? '<button class="abtn" data-tk="'+t.id+'" data-st="bezig">'+T('pd.pickup','Oppakken')+'</button>'
         : '<button class="abtn" data-tk="'+t.id+'" data-st="klaar">'+T('pd.done','Klaar')+'</button>';
       if (t.kind==='hk') act = '<button class="abtn" data-hk="'+t.id+'">'+T('pd.clean','Schoon')+'</button>';
-      return '<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(t.b)+'</b><span>'+esc(t.s)+'</span></div>'+act+'</div>';
+      return '<div class="task"><span class="ic">'+t.icon+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div>'+act+'</div>';
     }).join('') : '<div style="font-size:0.84rem;color:var(--green);padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
     const tw = $('#takenWrap');
     // melden hoort bij iedereen: een klus doorgeven en gevonden voorwerpen registreren
@@ -1090,6 +1094,22 @@
           '</div>';
         }).join('')+'</div>' : '';
       })();
+
+    // Mijn taal: de moedertaal van dit personeelslid. Het HELE werkscherm,
+    // de bonnen en de taken volgen deze keuze, in elke werk-app.
+    $('#hulpWrap').insertAdjacentHTML('beforeend',
+      '<div class="card"><div class="k">🌍 '+T('pd.taal.h','Mijn taal')+'</div>'+
+      '<div style="margin-top:0.4rem;font-size:0.74rem;color:var(--soft);">'+T('pd.taal.s','Kies uw moedertaal. Uw hele scherm, uw bonnen en uw taken verschijnen dan in die taal, hier en op elke andere werk-app waar u inlogt.')+'</div>'+
+      '<select id="mtKies" style="width:100%;margin-top:0.5rem;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);font:inherit;font-size:0.85rem;"></select></div>');
+    if (window.MoederTaal) MoederTaal.talen().then(ts => {
+      const sel = document.getElementById('mtKies'); if (!sel || !ts.length) return;
+      const nu = MoederTaal.actueel();
+      sel.innerHTML = ts.map(t2 => '<option value="'+t2.code+'"'+(t2.code === nu ? ' selected' : '')+'>'+t2.naam+'</option>').join('');
+      sel.addEventListener('change', async () => {
+        try { await MoederTaal.zet(sel.value); toast(T('pd.taal.ok','Uw taal staat ingesteld; het scherm volgt.')); }
+        catch(e){ toast(e.message); }
+      });
+    });
 
     // Fluister fluistert ook zelf: seintjes uit je eigen weetjes (datums die
     // naderen), zonder dat je iets hoeft te vragen

@@ -16,6 +16,7 @@ module.exports = (kern) => {
 
 /* De toegang- en backofficelaag draaien als submodules op de gedeelde kern. */
 require('./supplier/toegang')(kern);
+require('./supplier/moedertaal')(kern);
 require('./supplier/backoffice')(kern);
 
 app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));

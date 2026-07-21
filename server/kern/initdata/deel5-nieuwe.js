@@ -24,7 +24,10 @@ module.exports = (ctx) => {
     beautysalon: { label: 'Beauty-salon & barbier', icon: '\u{2702}️', caps: ['beauty', 'location', 'pricing'] },
     petcare:     { label: 'Petcare & pension', icon: '\u{1F43E}', caps: ['petcare', 'location', 'pricing'] },
     kinderopvang: { label: 'Kinderopvang & nanny', icon: '\u{1F9F8}', caps: ['opvang', 'location', 'pricing'] },
-    marina:      { label: 'Marina & jachthaven', icon: '\u{2693}', caps: ['marina', 'location', 'pricing'] }
+    marina:      { label: 'Marina & jachthaven', icon: '\u{2693}', caps: ['marina', 'location', 'pricing'] },
+    weddingplanner: { label: 'Weddings & prive-events', icon: '\u{1F492}', caps: ['weddings', 'location', 'pricing'] },
+    professioneel: { label: 'Professionele diensten', icon: '\u{2696}️', caps: ['advies', 'location', 'pricing'] },
+    verzekeringen: { label: 'Verzekeringen (advies)', icon: '\u{1F6E1}️', caps: ['polis', 'location', 'pricing'] }
   };
   for (const [t, def] of Object.entries(NIEUWE_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const NIEUWE_PARTNERS = [
@@ -118,7 +121,13 @@ module.exports = (ctx) => {
     { code: 'NIDO', name: 'Nido Kinderopvang & Nanny', type: 'kinderopvang', city: 'Ibiza',
       loc: { lat: 39.005, lng: 1.437, label: 'Santa Gertrudis, Ibiza' }, rate: 0.1, menu: [], photos: [] },
     { code: 'PORTELL', name: 'Marina Portell', type: 'marina', city: 'Ibiza',
-      loc: { lat: 38.918, lng: 1.448, label: 'Marina Botafoch, Ibiza' }, rate: 0.1, menu: [], photos: [] }
+      loc: { lat: 38.918, lng: 1.448, label: 'Marina Botafoch, Ibiza' }, rate: 0.1, menu: [], photos: [] },
+    { code: 'AURELIA', name: 'Aurelia Weddings & Events', type: 'weddingplanner', city: 'Ibiza',
+      loc: { lat: 38.98, lng: 1.3, label: 'Sant Antoni, Ibiza' }, rate: 0.12, menu: [], photos: [] },
+    { code: 'LEXNOVA', name: 'LexNova Advocaten & Notarissen', type: 'professioneel', city: 'Ibiza',
+      loc: { lat: 38.909, lng: 1.432, label: 'Vara de Rey, Ibiza-stad' }, rate: 0.08, menu: [], photos: [] },
+    { code: 'SEGUR', name: 'Segur Advies', type: 'verzekeringen', city: 'Ibiza',
+      loc: { lat: 38.91, lng: 1.43, label: 'Ibiza-stad' }, rate: 0.08, menu: [], photos: [] }
   ];
   for (const p of NIEUWE_PARTNERS) if (!db.data.suppliers.find(s => s.code === p.code)) { db.data.suppliers.push(p); ensureSupplierDefaults(p); }
 };

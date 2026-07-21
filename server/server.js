@@ -2515,6 +2515,10 @@ require('./routes/verzorging')(kern);
    de brandstofsteiger, service/helling en de marina-concierge op het water. */
 Object.assign(kern, require('./kern/marina')({ db, save, crypto, schoon }));
 require('./routes/marina')(kern);
+/* RTG Planners & Advies (kern/planners.js): weddings en prive-events,
+   professionele diensten en verzekeringen; de mens houdt het laatste woord. */
+Object.assign(kern, require('./kern/planners')({ db, save, crypto, schoon }));
+require('./routes/planners')(kern);
 /* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
    bibliotheken en zetten die live op de klas-PDA van de kinderen. */
 Object.assign(kern, require('./kern/lesmaker')({ db, save, crypto, schoon, anthropic, leeftijdInstr: rtf.leeftijdInstr }));

@@ -82,6 +82,14 @@ const STAFF_SEED = {
   // de jachthaven: de havenmeester, de steiger, service en de marina-concierge
   PORTELL: [['Joan Portell', 'manager', 'Havenmeester'], ['Mireia Salas', 'staff', 'Steiger & brandstof'],
     ['Bas Wolters', 'staff', 'Service & helling'], ['Carla Duran', 'staff', 'Marina-concierge']],
+  // de weddingplanner: de planner en de dagcoordinatie
+  AURELIA: [['Aurelia Sands', 'manager', 'Weddingplanner'], ['Noa Lindt', 'staff', 'Dagcoordinatie'],
+    ['Pablo Ruz', 'staff', 'Styling & decor']],
+  // de professionele praktijk: officemanager plus de adviseurs
+  LEXNOVA: [['Renee Kalff', 'manager', 'Officemanager'], ['Mr. Ilse Verbeek', 'staff', 'Advocaat'],
+    ['Mr. Joan Ferrer', 'staff', 'Notaris'], ['Drs. Karim El Amrani', 'staff', 'Fiscalist']],
+  // verzekeringen: uitsluitend adviserend, de adviseur beslist nooit voor de klant
+  SEGUR: [['Marta Segura', 'manager', 'Adviseur'], ['Timo Veld', 'staff', 'Adviseur']],
   // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
   GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']],
   // het rijk: een behandelaar (beoordeelt toeslagen/uitkeringen/bezwaren) en een baliemedewerker

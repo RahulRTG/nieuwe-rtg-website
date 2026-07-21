@@ -51,7 +51,10 @@
     { code:'VELVET',  name:'Velvet & Blade', type:'Beauty-salon', icon:'✂️', sub:'Beauty-salon & barbier · Vara de Rey' },
     { code:'AMICS',   name:'Amics Petcare', type:'Petcare', icon:'🐾', sub:'Pension, uitlaat & trim · Sant Jordi' },
     { code:'NIDO',    name:'Nido Kinderopvang & Nanny', type:'Kinderopvang', icon:'🧸', sub:'Opvang & nanny-service · Santa Gertrudis' },
-    { code:'PORTELL', name:'Marina Portell', type:'Marina', icon:'⚓', sub:'Marina & jachthaven · Marina Botafoch' }
+    { code:'PORTELL', name:'Marina Portell', type:'Marina', icon:'⚓', sub:'Marina & jachthaven · Marina Botafoch' },
+    { code:'AURELIA', name:'Aurelia Weddings & Events', type:'Weddings', icon:'💐', sub:'Weddings & privé-events · Sant Antoni' },
+    { code:'LEXNOVA', name:'LexNova Advocaten & Notarissen', type:'Professioneel', icon:'⚖️', sub:'Advocaat, notaris, fiscalist · Vara de Rey' },
+    { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'🛡️', sub:'Verzekeringsadvies · Ibiza-stad' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -91,6 +94,9 @@
     petcare:     { label:'RTG Petcare', labelEn:'RTG Petcare', codes:['AMICS'], icon:'🐾' },
     kinderopvang: { label:'RTG Kinderopvang & Nanny', labelEn:'RTG Childcare & Nanny', codes:['NIDO'], icon:'🧸' },
     marina:      { label:'RTG Marina', labelEn:'RTG Marina', codes:['PORTELL'], icon:'⚓' },
+    weddingplanner: { label:'RTG Weddings & Events', labelEn:'RTG Weddings & Events', codes:['AURELIA'], icon:'💐' },
+    professioneel: { label:'RTG Professionele Diensten', labelEn:'RTG Professional Services', codes:['LEXNOVA'], icon:'⚖️' },
+    verzekeringen: { label:'RTG Verzekeringsadvies', labelEn:'RTG Insurance Advice', codes:['SEGUR'], icon:'🛡️' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }

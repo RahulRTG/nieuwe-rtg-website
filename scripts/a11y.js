@@ -56,6 +56,9 @@ function laadPlaywright() {
     try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); }
     catch (e) { /* volgende pad */ }
   }
+  // Geen Playwright-pakket? Val terug op onze eigen browser-driver (CDP over de
+  // pipe-transport), maar alleen als er echt een Chromium-binary staat.
+  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
   return null;
 }
 

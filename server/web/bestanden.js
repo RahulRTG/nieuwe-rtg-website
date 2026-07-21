@@ -18,6 +18,11 @@ const MIME = {
 };
 function mimeVan(fp) { return MIME[path.extname(fp).toLowerCase()] || 'application/octet-stream'; }
 function etagVan(st) { return '"' + st.size.toString(16) + '-' + Math.floor(st.mtimeMs).toString(16) + '"'; }
+// Content-gehashte build-output (scripts/build.js -> dist/<naam>.<hash>.min.js):
+// de bestandsnaam verandert zodra de inhoud verandert, dus mag de browser (en
+// een edge/CDN ervoor) hem voor altijd bewaren. Zo scheelt elk herhaalbezoek een
+// heen-en-weer over het net. De gewone (niet-gehashte) HTML blijft max-age=0.
+function onveranderlijk(fp) { return /\.[0-9a-f]{8,}\.min\.(?:js|css)$/i.test(path.basename(fp)); }
 
 function stuurBestand(req, res, fp, st, next) {
   const etag = etagVan(st);
@@ -26,7 +31,7 @@ function stuurBestand(req, res, fp, st, next) {
   res.setHeader('Accept-Ranges', 'bytes');
   res.setHeader('ETag', etag);
   res.setHeader('Last-Modified', laatst);
-  if (!res.getHeader('Cache-Control')) res.setHeader('Cache-Control', 'public, max-age=0');
+  if (!res.getHeader('Cache-Control')) res.setHeader('Cache-Control', onveranderlijk(fp) ? 'public, max-age=31536000, immutable' : 'public, max-age=0');
 
   // voorwaardelijke GET -> 304
   const inm = req.headers['if-none-match'];

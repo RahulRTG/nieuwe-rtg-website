@@ -1209,7 +1209,12 @@ app.post('/api/translate', async (req, res) => {
 /* Wereldtalen: de actieve talen voor de taalkiezers in alle apps (publiek;
    ook de inlogschermen tonen de kiezer al). De schakelaars zelf zitten in de
    RTG Boardroom (/api/boardroom/talen). */
-app.post('/api/talen', (req, res) => res.json({ talen: talen.actieve() }));
+// Publiek en voor iedereen gelijk (alleen Boardroom-schakelaars sturen het), en
+// bij elke app-boot geraakt: een response-cache haalt dit uit de staart. De
+// sleutel is de handtekening van de actieve set, dus een taal aan/uit zetten
+// verandert de sleutel en de cache is meteen ongeldig (geen staleness).
+const talenCache = require('./lib/cache').antwoordCache({ ttl: 3600000, max: 8, sleutel: () => 'talen:' + talen.handtekening() });
+app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve() }));
 /* Het UI-woordenboek van een pagina in een keer naar een ACTIEVE wereldtaal:
    zo draait de hele app (elke pagina, elk scherm) in elke taal die de
    boardroom aanzet. Publiek maar begrensd (max 400 teksten van 300 tekens)

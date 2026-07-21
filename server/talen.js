@@ -159,6 +159,10 @@ function maakTalen({ db, save }) {
     const set = new Set(actieveSet());
     return TALEN.filter(t => set.has(t.code)).map(t => ({ code: t.code, naam: t.naam, en: t.en }));
   }
+  // Een goedkope handtekening van de actieve set: verandert zodra er een taal
+  // aan- of uitgaat. Handig als cache-sleutel voor /api/talen zodat een
+  // Boardroom-schakelaar de response-cache meteen ongeldig maakt (geen staleness).
+  function handtekening() { return actieveSet().slice().sort().join(','); }
   // schakelaar; de basistalen kunnen niet uit
   function zet(code, aan) {
     code = String(code || '').toLowerCase();
@@ -177,7 +181,7 @@ function maakTalen({ db, save }) {
     const code = String(bodyLang || '').toLowerCase();
     return isActief(code) ? code : 'nl';
   }
-  return { alle, actieve, isActief, zet, taalVan };
+  return { alle, actieve, isActief, zet, taalVan, handtekening };
 }
 
 module.exports = { TALEN, BASIS, bestaat, taal, naamEn, maakTalen };

@@ -13,6 +13,17 @@ const https = require('https');
 const http = require('http');
 const { URL } = require('url');
 
+// Eigen keep-alive Agents: houd de TCP/TLS-verbinding naar dezelfde host warm
+// tussen (vaak bursty) calls, zodat een volgende call naar de AI- of betaal-
+// provider geen nieuwe handshake (1-2 rondjes over het net, en bij TLS extra)
+// hoeft te betalen. Node's globalAgent doet dit op Node 22 ook, maar ruimt een
+// stille socket al na 1s op; wij houden hem langer aan (30s) en plannen LIFO,
+// zodat de meest recent warme socket wordt hergebruikt. Uit te zetten per call
+// met opties.agent === false.
+const AGENT_OPTIES = { keepAlive: true, keepAliveMsecs: 30000, maxSockets: 64, maxFreeSockets: 16, scheduling: 'lifo', timeout: 60000 };
+const httpAgent = new http.Agent(AGENT_OPTIES);
+const httpsAgent = new https.Agent(AGENT_OPTIES);
+
 // een form-urlencoded body bouwen (voor de betaalprovider), met geneste
 // sleutels als a[b]=c, precies zoals die API's het verwachten
 function formBody(obj, voorvoegsel) {
@@ -53,9 +64,10 @@ function vraag(opties) {
     }
     if (data) headers['content-length'] = data.length;
 
+    const agent = opties.agent === false ? undefined : (opties.agent || (u.protocol === 'http:' ? httpAgent : httpsAgent));
     const req = mod.request({
       method: opties.method || (data ? 'POST' : 'GET'),
-      hostname: u.hostname, port: u.port || undefined, path: u.pathname + u.search, headers
+      hostname: u.hostname, port: u.port || undefined, path: u.pathname + u.search, headers, agent
     }, (res) => {
       const brok = [];
       res.on('data', (c) => brok.push(c));

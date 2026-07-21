@@ -77,7 +77,11 @@ function luisterOpFouten(child) {
 
 async function startEens(opts) {
   const script = opts.script || path.join(__dirname, '..', 'server', 'server.js');
-  const wachtPad = opts.wachtPad || '/api/health';
+  // Standaard wachten op /api/ready, niet alleen /api/health: sinds de
+  // opslag-poortwachter geeft de server 503 op alle API's tot de opslag echt
+  // geladen is (belangrijk in Postgres-modus), en een test die meteen na
+  // "gezond" een API aanroept zou daarop stranden.
+  const wachtPad = opts.wachtPad || '/api/ready';
   const pogingen = opts.pogingen || 150;
   const port = await vrijePoort();
   const base = 'http://127.0.0.1:' + port;

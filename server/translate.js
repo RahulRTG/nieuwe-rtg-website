@@ -21,7 +21,12 @@ const WORDS = { en: WORDS_NL_EN, nl: WORDS_EN_NL, es: WORDS_ES };
 let anthropic = null;
 function setAnthropic(a) { anthropic = a; }
 
+/* Vertaal-cache met een vaste bovengrens: bij een hit schuift de sleutel naar
+   achteren (LRU), boven de grens valt de oudste eruit. Zonder grens groeit de
+   Map met elke unieke (taal, tekst)-combinatie mee en lekt de server geheugen
+   onder vuur van willekeurige teksten. */
 const cache = new Map();
+const CACHE_MAX = 5000;
 
 /* Ruwe taalherkenning voor het geval de bron-taal niet is meegegeven. */
 function detect(text) {
@@ -84,13 +89,18 @@ async function translate(text, to, from) {
   if (from === to) return { text, translated: false, from };
 
   const key = to + '|' + text;
-  if (cache.has(key)) return { text: cache.get(key), translated: cache.get(key) !== text, from };
+  if (cache.has(key)) {
+    const hit = cache.get(key);
+    cache.delete(key); cache.set(key, hit); // vers gebruikt: naar achteren
+    return { text: hit, translated: hit !== text, from };
+  }
 
   let out = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
   if (!out && anthropic) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
   if (!out && WORDS[to]) out = wordLevel(text, to);
   const result = out || text;
   cache.set(key, result);
+  if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value);
   return { text: result, translated: result !== text, from };
 }
 

@@ -76,6 +76,15 @@ class Client extends EventEmitter {
       this.buf = this.buf.subarray(1 + len);
       try { this._verwerk(type, payload); } catch (e) { this._fout(e); return; }
     }
+    // subarray() deelt de onderliggende ArrayBuffer: na een grote respons zou de
+    // (bijna) lege restbuffer die hele allocatie in leven houden, en elke
+    // poolverbinding zou zo de grootste respons ooit blijven vasthouden. Een
+    // lege rest laten we los; een kleine rest in een grote ouder kopieren we uit.
+    if (this.buf.length === 0) {
+      if (this.buf.buffer && this.buf.buffer.byteLength > 4096) this.buf = Buffer.alloc(0);
+    } else if (this.buf.buffer && this.buf.buffer.byteLength > 65536 && this.buf.length < this.buf.buffer.byteLength / 4) {
+      this.buf = Buffer.from(this.buf);
+    }
   }
 
   _verwerk(type, p) {

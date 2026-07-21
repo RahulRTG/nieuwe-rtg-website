@@ -2404,6 +2404,10 @@ require('./routes/markt')(kern);
 require('./routes/borden')(kern);
 require('./routes/spellen')(kern);
 require('./routes/leren')(kern);
+/* De RTF App-Bibliotheek (kern/rtfbieb.js): 20.000 kind- en gezinsapps,
+   gratis via de RTFoundation, met de leeftijdspoort van het profiel. */
+Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
+require('./routes/rtfbieb')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
 /* De zelfzorg (kern/zelfzorg): de code ruimt zichzelf op, beschermt zichzelf,

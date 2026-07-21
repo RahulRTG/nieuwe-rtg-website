@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · App-Bibliotheek</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .zoekrij{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
+  .zoekrij .veld{flex:1;min-width:9rem;}
+  .apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.6rem;}
+  .app{padding:.8rem .9rem;}
+  .app .cat{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht);}
+  .app b{display:block;margin:.2rem 0 .1rem;}
+  .app small{color:var(--zacht);font-size:.76rem;display:block;}
+  .app .rij{display:flex;align-items:baseline;gap:.5rem;margin-top:.5rem;}
+  .app s{color:var(--zacht);font-size:.76rem;}
+  .app .gratis{color:var(--goud2);font-weight:700;font-size:.8rem;}
+  .app .knop{margin-left:auto;padding:.35rem .8rem;font-size:.8rem;}
+  .blader{display:flex;gap:.6rem;align-items:center;justify-content:center;margin-top:.9rem;color:var(--zacht);font-size:.82rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.8rem 0;}
+  .chiprij{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem;}
+  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.82rem;cursor:pointer;}
+  .chip.aan{border-color:var(--goud);color:var(--goud2);}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap">
+  <h1>📱 App-Bibliotheek</h1>
+  <p class="intro" id="biebIntro">Duizenden apps om te leren, spelen en ontdekken; allemaal gratis, een cadeau van de RTFoundation. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.</p>
+
+  <div class="zoekrij">
+    <select id="bCat" class="veld" aria-label="Categorie"><option value="">Alle categorieën</option></select>
+    <input id="bZoek" class="veld" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">
+    <button class="knop stil" id="bMijn" type="button">Mijn apps</button>
+  </div>
+  <div class="apps" id="bGrid"><div class="leeg">Laden...</div></div>
+  <div class="blader" id="bBlader"></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const sess = Sessie.huidig();
+const api = (pad, body) => fetch('/api/rtf/bieb' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: sess.code, token: sess.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const ST = { categorie: '', zoek: '', pagina: 1, mijn: false };
+const euro = c => 'EUR ' + (c / 100).toFixed(2).replace('.', ',');
+
+async function start(){
+  try {
+    const d = await api('');
+    $('#biebIntro').textContent = d.totaal.toLocaleString('nl-NL') + ' apps om te leren, spelen en ontdekken; allemaal gratis, een cadeau van de RTFoundation. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.';
+    $('#bCat').innerHTML = '<option value="">Alle categorieën</option>' +
+      d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('');
+  } catch (e) { $('#bGrid').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  teken();
+}
+function kaart(a, vanMij){
+  return '<div class="kaart app">'+
+    '<span class="cat">'+a.icon+' '+esc(a.categorieLabel)+'</span>'+
+    '<b>'+esc(a.naam)+'</b>'+
+    '<small>voor '+esc(a.doelgroepLabel)+' · ★ '+a.sterren.toFixed(1)+' · '+a.grootteMB+' MB</small>'+
+    '<div class="rij"><s>'+euro(a.winkelwaardeCenten)+'</s><span class="gratis">Gratis</span>'+
+    (vanMij ? '<button class="knop stil bweg" data-id="'+esc(a.id)+'">Opruimen</button>'
+            : '<button class="knop bin" data-id="'+esc(a.id)+'">Installeer</button>')+
+    '</div></div>';
+}
+async function teken(){
+  const grid = $('#bGrid'), blader = $('#bBlader');
+  $('#bMijn').classList.toggle('aan', ST.mijn);
+  try {
+    const mijn = (await api('/mijn')).apps;
+    const mijnIds = mijn.map(a => a.id);
+    if (ST.mijn) {
+      grid.innerHTML = mijn.length ? mijn.map(a => kaart(a, true)).join('') : '<div class="leeg">Nog geen apps. Blader door de bibliotheek en druk op Installeer.</div>';
+      blader.innerHTML = '';
+    } else {
+      const d = await api('/catalogus', { categorie: ST.categorie, zoek: ST.zoek, pagina: ST.pagina });
+      grid.innerHTML = d.items.length ? d.items.map(a => kaart(a, mijnIds.includes(a.id))).join('') : '<div class="leeg">Niets gevonden.</div>';
+      blader.innerHTML = d.paginas > 1
+        ? '<button class="knop stil" id="bVorig"'+(d.pagina<=1?' disabled':'')+'>←</button>'+
+          '<span>pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
+          '<button class="knop stil" id="bVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>→</button>' : '';
+      const v = $('#bVorig'), n = $('#bVolgend');
+      if (v) v.addEventListener('click', () => { ST.pagina--; teken(); });
+      if (n) n.addEventListener('click', () => { ST.pagina++; teken(); });
+    }
+    grid.querySelectorAll('.bin').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api('/installeer', { id: b.dataset.id }); teken(); } catch (e) { b.disabled = false; alert(e.message); }
+    }));
+    grid.querySelectorAll('.bweg').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/weg', { id: b.dataset.id }); teken(); } catch (e) { alert(e.message); }
+    }));
+  } catch (e) { grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+$('#bCat').addEventListener('change', () => { ST.categorie = $('#bCat').value; ST.pagina = 1; ST.mijn = false; teken(); });
+let zt; $('#bZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { ST.zoek = $('#bZoek').value; ST.pagina = 1; ST.mijn = false; teken(); }, 300); });
+$('#bMijn').addEventListener('click', () => { ST.mijn = !ST.mijn; ST.pagina = 1; teken(); });
+start();
+</script>
+</body>
+</html>

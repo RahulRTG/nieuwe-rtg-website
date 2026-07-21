@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Vluchten</title>
+<link rel="icon" href="/icons/partners.svg">
+<link rel="manifest" href="/manifests/vluchten.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vluchten">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{ --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3.5rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.5rem;}
+  main{padding:1.1rem;max-width:620px;margin:0 auto;}
+  .tabs{display:flex;gap:.4rem;padding-bottom:.8rem;}
+  .tab{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;font-size:.82rem;color:var(--txt);cursor:pointer;}
+  .tab.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  .item{border:1px solid var(--line);border-radius:14px;padding:.8rem .95rem;margin-bottom:.6rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.02rem;}
+  .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.55;}
+  .nr{font-family:'Bodoni Moda',serif;color:var(--gold);letter-spacing:.05em;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.85rem;padding:.42rem .6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.84rem;padding:.45rem 1rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .status{display:inline-block;font-size:.68rem;padding:.1rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
+  .status.open{border-color:var(--burgundy);color:var(--burgundy);}
+  .status.ok{border-color:var(--green);color:var(--green);}
+  .status.goud{border-color:var(--gold);color:var(--gold);}
+  .pass{border:1px solid rgba(169,143,7,.5);border-radius:16px;background:linear-gradient(135deg,rgba(169,143,7,.12),transparent);padding:1rem 1.1rem;margin-bottom:.7rem;}
+  .pass .code{font-family:'Bodoni Moda',serif;font-size:2rem;color:var(--gold);letter-spacing:.12em;text-align:center;margin:.5rem 0;animation:gloei 2.4s ease-in-out infinite;}
+  @keyframes gloei{0%,100%{text-shadow:0 0 6px rgba(169,143,7,.25);}50%{text-shadow:0 0 22px rgba(194,58,94,.55);}}
+  .pass .regel{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);padding:.2rem 0;}
+  .pass .regel b{color:var(--txt);font-weight:600;}
+  .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2rem 1rem;line-height:1.6;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .sec{font-size:.78rem;color:var(--muted);line-height:1.6;margin:-.2rem 0 .8rem;}
+</style>
+</head>
+<body>
+<header><div class="ey">RTG Airport</div><h1>Vluchten</h1></header>
+<main>
+  <div class="tabs" id="tabs">
+    <button class="tab aan" data-t="bord">Het bord</button>
+    <button class="tab" data-t="mijn">Mijn reizen</button>
+  </div>
+  <div id="inhoud"><div class="leeg">Laden…</div></div>
+</main>
+<div class="melding" id="melding"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
+const api=(pad,body)=>fetch('/api/member/vluchten'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
+let TAB='bord';
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x===b)); laad(); });
+
+async function laad(){
+  if(!TOKEN){ $('#inhoud').innerHTML='<div class="leeg">Log eerst in via de RTG-app; daarna boekt en checkt u hier in.</div>'; return; }
+  TAB==='bord' ? laadBord() : laadMijn();
+}
+async function laadBord(){
+  let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const sec=d.security.filter(f=>f.open).map(f=>esc(f.naam)+': '+f.wachtMinuten+' min').join(' · ');
+  let h='<div class="sec">🛂 Security nu · '+(sec||'geen filter open')+'</div>';
+  h+= d.vluchten.length ? d.vluchten.map(v=>{
+    const st = v.geannuleerd?'<span class="status open">geannuleerd</span>'
+      : v.status==='inchecken'?'<span class="status goud">inchecken open</span>'
+      : v.status==='boarding'?'<span class="status goud">boarding · gate '+esc(v.gate)+'</span>'
+      : v.status==='vertrokken'?'<span class="status ok">vertrokken</span>'
+      : v.status==='geland'||v.status==='bagage-op-band'?'<span class="status ok">'+esc(v.status)+(v.band?' · band '+v.band:'')+'</span>'
+      : '<span class="status">'+esc(v.status)+'</span>';
+    const ver=v.vertraging?' <span class="status open">+'+v.vertraging.minuten+' min</span>':'';
+    const boek=(v.soort==='vertrek'&&['gepland','inchecken'].includes(v.status))?'<div class="rij"><button class="knop stil" data-boek="'+v.id+'">Boek deze vlucht</button></div>':'';
+    return '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4><div class="meta">'+esc(v.soort)+' · '+esc(v.tijd)+' · gate '+esc(v.gate)+' · '+st+ver+'</div>'+boek+'</div>';
+  }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
+  $('#inhoud').innerHTML=h;
+  document.querySelectorAll('[data-boek]').forEach(b=>b.onclick=async()=>{
+    try{ const r=await api('/boek',{id:b.dataset.boek}); meld('Geboekt: '+r.boeking.code+'. Inchecken kan zodra het open staat.'); }catch(e){ meld(e.message); }
+  });
+}
+async function laadMijn(){
+  let d; try{ d=await api('/mijn'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  $('#inhoud').innerHTML= d.boekingen.length ? d.boekingen.map(b=>{
+    const v=b.vlucht;
+    if(b.status==='ingecheckt'){
+      return '<div class="pass"><div class="regel"><span>Vlucht</span><b>'+esc(v.nummer)+' · '+esc(v.bestemming)+'</b></div>'+
+        '<div class="regel"><span>Vertrek</span><b>'+esc(v.tijd)+' · gate '+esc(v.gate)+'</b></div>'+
+        '<div class="regel"><span>Stoel</span><b>'+esc(b.stoel)+'</b></div>'+
+        '<div class="code">'+esc(b.code)+'</div>'+
+        '<div class="regel" style="justify-content:center;color:var(--soft);font-size:.72rem;">Laat deze code zien bij security en de gate</div>'+
+        (b.koffers.length?'<div class="regel"><span>Koffers</span><b>'+b.koffers.map(k=>esc(k.tag)+' ('+esc(k.status)+(k.band?' · band '+k.band:'')+')').join('<br>')+'</b></div>':'')+
+        (v.vertraging?'<div class="regel"><span>Let op</span><b style="color:var(--burgundy);">+'+v.vertraging.minuten+' min · '+esc(v.vertraging.reden)+'</b></div>':'')+'</div>';
+    }
+    const kan=v.status==='inchecken';
+    return '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4>'+
+      '<div class="meta">'+esc(v.datum)+' · '+esc(v.tijd)+' · boeking '+esc(b.code)+' · <span class="status '+(v.geannuleerd?'open':'goud')+'">'+esc(v.geannuleerd?'geannuleerd':v.status)+'</span></div>'+
+      (kan?'<div class="rij"><select class="veld" data-kof="'+esc(b.code)+'"><option value="0">Geen koffer</option><option value="1">1 koffer</option><option value="2">2 koffers</option><option value="3">3 koffers</option></select><button class="knop" data-in="'+esc(b.code)+'">Inchecken</button></div>'
+        : v.geannuleerd?'':'<div class="meta">Inchecken kan zodra het open staat.</div>')+'</div>';
+  }).join('') : '<div class="leeg">Nog geen reizen. Boek een vlucht via Het bord.</div>';
+  document.querySelectorAll('[data-in]').forEach(b=>b.onclick=async()=>{
+    const kof=document.querySelector('[data-kof="'+b.dataset.in+'"]');
+    try{ await api('/incheck',{code:b.dataset.in,koffers:kof?kof.value:0}); meld('Ingecheckt; uw boarding pass staat klaar.'); laadMijn(); }catch(e){ meld(e.message); }
+  });
+}
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

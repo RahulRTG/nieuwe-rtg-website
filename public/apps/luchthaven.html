@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Airport (operations)</title>
+<link rel="icon" href="/icons/partners.svg">
+<link rel="manifest" href="/manifests/luchthaven.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Airport Ops">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0C0C0B; --card:#151312; --card2:#1B1817; --line:rgba(255,255,255,0.10);
+    --txt:#F4F1EC; --muted:rgba(244,241,236,0.68); --soft:rgba(244,241,236,0.5);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.25rem;}
+  header a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:.35rem .7rem;}
+  main{padding:1rem;max-width:760px;margin:0 auto;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:.5rem;margin-bottom:.9rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.6rem .7rem;}
+  .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.2rem;display:block;}
+  .kpi span{font-size:.64rem;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;}
+  .kpi.goud{border-color:rgba(169,143,7,.4);} .kpi.goud b{color:var(--gold);}
+  .keuze{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.6rem 0 1rem;}
+  .keuze button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem .7rem;color:var(--txt);font:inherit;cursor:pointer;text-align:left;}
+  .keuze button .ic{font-size:1.3rem;display:block;margin-bottom:.3rem;}
+  .keuze button .sub{display:block;font-size:.7rem;color:var(--soft);margin-top:.15rem;line-height:1.35;}
+  .item{border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card);}
+  .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:.98rem;}
+  .item .meta{font-size:.76rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.42rem .6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
+  .status{display:inline-block;font-size:.68rem;padding:.1rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
+  .status.open{border-color:var(--burgundy);color:var(--burgundy);}
+  .status.ok{border-color:var(--green);color:var(--green);}
+  .status.goud{border-color:var(--gold);color:var(--gold);}
+  .sig{border-left:3px solid var(--burgundy);}
+  .sig.security{border-left-color:var(--gold);} .sig.draai{border-left-color:var(--gold);}
+  .leeg{color:var(--muted);font-size:.86rem;padding:.9rem 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .login{max-width:340px;margin:2.5rem auto;padding:0 1rem;text-align:center;}
+  .login .veld{width:100%;margin-bottom:.6rem;}
+  .ai{border:1px solid rgba(169,143,7,.4);border-radius:14px;background:linear-gradient(135deg,rgba(169,143,7,.08),transparent);padding:.8rem .9rem;margin:1rem 0;}
+  .ai .uit{font-size:.84rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.45rem;}
+  .terug{background:none;border:none;color:var(--soft);font:inherit;font-size:.8rem;cursor:pointer;padding:0 0 .6rem;}
+  .nr{font-family:'Bodoni Moda',serif;font-size:1.1rem;color:var(--gold);letter-spacing:.05em;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="ey">RTG Airport · operations</div><h1 id="kop">De Operatie</h1></div>
+  <a href="/apps/vluchten.html">Reizigers-app →</a>
+</header>
+<main id="main">
+  <div class="login" id="login">
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">De hele luchthavenoperatie in een systeem: vluchtleiding, platform, toren, bagage en security. Log in met je persoonlijke pincode.</p>
+    <select class="veld" id="wie"><option value="">Laden…</option></select>
+    <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
+    <button class="knop" id="loginGo" style="width:100%;">Inloggen</button>
+  </div>
+  <div id="app" hidden></div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2800); }
+let TOKEN = null, C = null;
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const CODE = 'LUCHT';
+async function vulWie(){
+  try { const r = await api('/api/supplier/roster', { code: CODE });
+    $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.func||m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
+  } catch(e){ $('#wie').innerHTML = '<option value="">Luchthaven niet bereikbaar</option>'; }
+}
+vulWie();
+$('#loginGo').addEventListener('click', async () => {
+  const staffId = $('#wie').value, pin = $('#pin').value.trim();
+  if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
+  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token;
+    $('#login').hidden = true; $('#app').hidden = false; kiesScherm();
+  } catch(e){ meld(e.message); }
+});
+
+const ROLLEN = [
+  ['vluchtleiding','🛫','Vluchtleiding','het bord, statussen, gates en vertragingen'],
+  ['platform','🛠️','Platform','de draai: brandstof, catering, schoonmaak, laden'],
+  ['toren','🗼','Toren','baanklaring: zonder klaring vertrekt er niets'],
+  ['bagage','🧳','Bagagekelder','de kofferketen, vermist en gevonden'],
+  ['security','🛂','Security','de filters en de live wachttijden']
+];
+
+async function kiesScherm(){
+  try { C = await api('/api/lucht/cockpit'); } catch(e){ meld(e.message); return; }
+  $('#kop').textContent = '✈️ RTG Airport';
+  $('#app').innerHTML =
+    '<div class="kpis">'+
+      '<div class="kpi goud"><b>'+C.vluchtenVandaag+'</b><span>Vluchten vandaag</span></div>'+
+      '<div class="kpi"><b>'+C.vertrokken+'</b><span>Vertrokken</span></div>'+
+      '<div class="kpi"><b>'+C.geland+'</b><span>Geland</span></div>'+
+      '<div class="kpi"><b>'+C.vertraagd+'</b><span>Vertraagd</span></div>'+
+      '<div class="kpi"><b>'+C.ingecheckt+'</b><span>Ingecheckt</span></div>'+
+      '<div class="kpi"><b>'+C.koffersInSysteem+'</b><span>Koffers · '+C.koffersVermist+' vermist</span></div>'+
+    '</div>'+
+    (C.signalen.length ? C.signalen.map(s => '<div class="item sig '+esc(s.soort)+'"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
+    '<h3 style="font-size:.95rem;margin:.4rem 0 .1rem;">Jouw werkplek</h3>'+
+    '<div class="keuze">'+ROLLEN.map(([id,ic,naam,sub]) => '<button data-rol="'+id+'"><span class="ic">'+ic+'</span>'+naam+'<span class="sub">'+sub+'</span></button>').join('')+'</div>';
+  $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => rolScherm(b.dataset.rol)));
+}
+function kopStuk(titel){ return '<button class="terug" id="terug">← de operatie</button><h2 style="font-size:1.15rem;margin-bottom:.6rem;">'+titel+'</h2>'; }
+function aiBlok(hint){ return '<div class="ai"><div class="rij" style="margin-top:0;"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-operations adviseert; schakelen doet u zelf. Veiligheid voor snelheid.</div></div>'; }
+function koppelBasis(){
+  $('#terug').addEventListener('click', kiesScherm);
+  $('#aiK').addEventListener('click', async () => {
+    const v = $('#aiV').value.trim(); if (!v) return;
+    $('#aiA').textContent = 'Een ogenblik…';
+    try { const r = await api('/api/lucht/ai', { vraag: v }); $('#aiA').textContent = r.antwoord; $('#aiV').value = ''; }
+    catch(e){ $('#aiA').textContent = e.message; }
+  });
+  $('#aiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#aiK').click(); });
+}
+function rolScherm(rol){
+  if (rol === 'vluchtleiding') return schermVluchtleiding();
+  if (rol === 'platform') return schermPlatform();
+  if (rol === 'toren') return schermToren();
+  if (rol === 'bagage') return schermBagage();
+  if (rol === 'security') return schermSecurity();
+}
+function vertrekStap(v){
+  return v.status === 'gepland' ? 'inchecken' : v.status === 'inchecken' ? 'boarding' : v.status === 'boarding' ? 'vertrokken' : null;
+}
+function aankomstStap(v){
+  return v.status === 'onderweg' ? 'geland' : v.status === 'geland' ? 'bagage-op-band' : v.status === 'bagage-op-band' ? 'afgerond' : null;
+}
+
+/* ---- vluchtleiding ---- */
+async function schermVluchtleiding(){
+  $('#app').innerHTML = kopStuk('🛫 Vluchtleiding')+
+    '<div class="item" style="background:var(--card2);"><h4>Nieuwe vlucht op het bord</h4>'+
+    '<div class="rij"><input class="veld" id="nNr" style="width:6rem;" placeholder="RT123" maxlength="8"><select class="veld" id="nSoort"><option value="vertrek">vertrek</option><option value="aankomst">aankomst</option></select><input class="veld" id="nBest" style="flex:1;min-width:8rem;" placeholder="Bestemming / herkomst" maxlength="60"></div>'+
+    '<div class="rij"><input class="veld" id="nTijd" type="time" value="12:00"><select class="veld" id="nGate"></select><button class="knop" id="nMaak">Op het bord</button></div></div>'+
+    '<div id="vlLijst"></div>'+aiBlok('Bijv. welke kist verdient nu voorrang?');
+  koppelBasis();
+  $('#nGate').innerHTML = C.gates.map(g => '<option>'+g+'</option>').join('');
+  $('#nMaak').addEventListener('click', async () => {
+    try { await api('/api/lucht/vlucht/maak', { nummer: $('#nNr').value, soort: $('#nSoort').value, bestemming: $('#nBest').value, tijd: $('#nTijd').value, gate: $('#nGate').value });
+      meld('Op het bord.'); laadVluchten(); } catch(e){ meld(e.message); }
+  });
+  laadVluchten();
+}
+function vluchtKaart(v, acties){
+  const st = v.geannuleerd ? '<span class="status open">geannuleerd</span>'
+    : '<span class="status '+(v.status==='vertrokken'||v.status==='afgerond'?'ok':'goud')+'">'+esc(v.status)+'</span>';
+  const ver = v.vertraging ? ' <span class="status open">+'+v.vertraging.minuten+' min · '+esc(v.vertraging.reden)+'</span>' : '';
+  const kl = v.klaring ? ' <span class="status ok">klaring baan '+esc(v.klaring.baan)+'</span>' : '';
+  const band = v.band ? ' <span class="status">band '+v.band+'</span>' : '';
+  return '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+' <small style="color:var(--soft);font-family:Inter;">'+esc(v.soort)+'</small></h4>'+
+    '<div class="meta">'+esc(v.tijd)+' · gate '+esc(v.gate)+' · '+esc(v.toestel)+' · '+st+ver+kl+band+
+    (v.draai ? ' · draai '+(v.draai.klaar?'<span class="status ok">rond</span>':'<span class="status open">'+v.draai.taken.filter(t=>!t.klaar).length+' open</span>') : '')+'</div>'+(acties||'')+'</div>';
+}
+async function laadVluchten(){
+  try {
+    const r = await api('/api/lucht/bord', {});
+    $('#vlLijst').innerHTML = r.vluchten.length ? r.vluchten.map(v => {
+      const stap = v.geannuleerd ? null : (v.soort === 'vertrek' ? vertrekStap(v) : aankomstStap(v));
+      const acties = '<div class="rij">'+
+        (stap ? '<button class="knop" data-stap="'+v.id+'" data-naar="'+stap+'">→ '+stap+'</button>' : '')+
+        (!v.geannuleerd && !['vertrokken','afgerond'].includes(v.status) ? '<button class="knop stil" data-ver="'+v.id+'">Vertraging</button><button class="knop stil" data-gate="'+v.id+'">Gate</button><button class="knop rood" data-ann="'+v.id+'">Annuleer</button>' : '')+
+        '</div>';
+      return vluchtKaart(v, acties);
+    }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
+    $('#vlLijst').querySelectorAll('[data-stap]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/lucht/vlucht/status', { id: b.dataset.stap, status: b.dataset.naar }); meld('Bijgewerkt.'); laadVluchten(); } catch(e){ meld(e.message); } }));
+    $('#vlLijst').querySelectorAll('[data-ver]').forEach(b => b.addEventListener('click', async () => {
+      const m = prompt('Hoeveel minuten vertraging?', '30'); if (!m) return;
+      const reden = prompt('Reden (komt op het bord):', 'late aankomst toestel') || '';
+      try { await api('/api/lucht/vlucht/vertraag', { id: b.dataset.ver, minuten: m, reden }); meld('Vertraging op het bord.'); laadVluchten(); } catch(e){ meld(e.message); } }));
+    $('#vlLijst').querySelectorAll('[data-gate]').forEach(b => b.addEventListener('click', async () => {
+      const g = prompt('Nieuwe gate ('+C.gates.join(', ')+'):', C.gates[0]); if (!g) return;
+      try { await api('/api/lucht/vlucht/gate', { id: b.dataset.gate, gate: g }); meld('Gate gewijzigd.'); laadVluchten(); } catch(e){ meld(e.message); } }));
+    $('#vlLijst').querySelectorAll('[data-ann]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Deze vlucht annuleren?')) return;
+      try { await api('/api/lucht/vlucht/status', { id: b.dataset.ann, status: 'geannuleerd' }); meld('Geannuleerd.'); laadVluchten(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- platform: de draai ---- */
+async function schermPlatform(){
+  $('#app').innerHTML = kopStuk('🛠️ Platform · de draai')+
+    '<div class="item" style="background:var(--card2);"><div class="meta">Elke vertrekkende kist heeft zes platformtaken. Pas als de draai rond is, mag de gate het boarden starten.</div></div>'+
+    '<div id="drLijst"></div>'+aiBlok('Bijv. welke draai pak ik als eerste?');
+  koppelBasis();
+  try {
+    const r = await api('/api/lucht/bord', { soort: 'vertrek' });
+    const actief = r.vluchten.filter(v => !v.geannuleerd && !['vertrokken'].includes(v.status));
+    $('#drLijst').innerHTML = actief.length ? actief.map(v =>
+      '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+' · '+esc(v.tijd)+' '+(v.draai.klaar?'<span class="status ok">draai rond</span>':'<span class="status open">'+v.draai.taken.filter(t=>!t.klaar).length+' taken open</span>')+'</h4>'+
+      '<div class="rij">'+v.draai.taken.map(t => t.klaar ? '<span class="status ok">'+esc(t.taak)+' ✓</span>' : '<button class="knop stil" data-vl="'+v.id+'" data-taak="'+esc(t.taak)+'">'+esc(t.taak)+'</button>').join('')+'</div></div>').join('')
+      : '<div class="leeg">Geen kisten op het platform.</div>';
+    $('#drLijst').querySelectorAll('[data-taak]').forEach(b => b.addEventListener('click', async () => {
+      try { const r2 = await api('/api/lucht/draai/taak', { id: b.dataset.vl, taak: b.dataset.taak });
+        meld(r2.rond ? 'De draai is rond; de kist mag boarden.' : 'Afgevinkt.'); schermPlatform(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- toren ---- */
+async function schermToren(){
+  $('#app').innerHTML = kopStuk('🗼 Toren · verkeersleiding')+
+    '<div class="item" style="background:var(--card2);"><div class="meta">Zonder klaring van de toren vertrekt er niets. Klaring volgt pas als de kist aan het boarden is; de mens in de toren beslist. Banen: '+C.banen.join(' en ')+'.</div></div>'+
+    '<div id="toLijst"></div>'+aiBlok('Bijv. welke baan geef ik de volgende vertrekker?');
+  koppelBasis();
+  try {
+    const r = await api('/api/lucht/bord', { soort: 'vertrek' });
+    const wacht = r.vluchten.filter(v => !v.geannuleerd && v.status !== 'vertrokken');
+    $('#toLijst').innerHTML = wacht.length ? wacht.map(v =>
+      '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.tijd)+' · '+esc(v.status)+'</h4>'+
+      '<div class="meta">'+(v.klaring ? '<span class="status ok">klaring baan '+esc(v.klaring.baan)+'</span>' : v.status === 'boarding' ? '<span class="status goud">wacht op klaring</span>' : '<span class="status">nog niet aan het boarden</span>')+'</div>'+
+      (!v.klaring && v.status === 'boarding' ? '<div class="rij">'+C.banen.map(b => '<button class="knop" data-kl="'+v.id+'" data-baan="'+b+'">Klaring baan '+b+'</button>').join('')+'</div>' : '')+'</div>').join('')
+      : '<div class="leeg">Geen vertrekkers in de wacht.</div>';
+    $('#toLijst').querySelectorAll('[data-kl]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/lucht/toren/klaring', { id: b.dataset.kl, baan: b.dataset.baan }); meld('Klaring gegeven.'); schermToren(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- bagagekelder ---- */
+async function schermBagage(){
+  $('#app').innerHTML = kopStuk('🧳 Bagagekelder')+
+    '<div class="item" style="background:var(--card2);"><div class="meta">De kofferketen: ingecheckt → gesorteerd → geladen → op de band → opgehaald. Achteruit draait hij nooit; vermist kan altijd gemeld en teruggevonden.</div></div>'+
+    '<div class="rij" style="margin:0 0 .7rem;"><select class="veld" id="bgFilter"><option value="">Alle koffers</option><option>ingecheckt</option><option>gesorteerd</option><option>geladen</option><option>op-band</option><option value="vermist">vermist</option></select></div>'+
+    '<div id="bgLijst"></div>'+aiBlok('Bijv. hoe voorkom ik gemiste aansluitingen?');
+  koppelBasis();
+  $('#bgFilter').addEventListener('change', laadBagage);
+  laadBagage();
+}
+async function laadBagage(){
+  try {
+    const r = await api('/api/lucht/bagage', { status: $('#bgFilter').value });
+    const volgende = s => s === 'ingecheckt' ? 'gesorteerd' : s === 'gesorteerd' ? 'geladen' : s === 'op-band' ? 'opgehaald' : null;
+    $('#bgLijst').innerHTML = r.koffers.length ? r.koffers.map(k => {
+      const stap = volgende(k.status);
+      return '<div class="item"><h4><span class="nr">'+esc(k.tag)+'</span> · '+esc(k.vlucht)+' <span class="status '+(k.status==='vermist'?'open':k.status==='opgehaald'?'ok':'goud')+'">'+esc(k.status)+(k.band?' · band '+k.band:'')+'</span></h4>'+
+        '<div class="meta">'+esc(k.codenaam)+'</div><div class="rij">'+
+        (stap ? '<button class="knop stil" data-tag="'+esc(k.tag)+'" data-naar="'+stap+'">→ '+stap+'</button>' : '')+
+        (k.status !== 'vermist' && k.status !== 'opgehaald' ? '<button class="knop rood" data-tag="'+esc(k.tag)+'" data-naar="vermist">Vermist</button>' : '')+
+        (k.status === 'vermist' ? '<button class="knop" data-tag="'+esc(k.tag)+'" data-naar="op-band">Gevonden → band</button>' : '')+
+        '</div></div>';
+    }).join('') : '<div class="leeg">Geen koffers in deze selectie.</div>';
+    $('#bgLijst').querySelectorAll('[data-tag]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/lucht/bagage/zet', { tag: b.dataset.tag, status: b.dataset.naar }); meld('Bijgewerkt.'); laadBagage(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- security ---- */
+async function schermSecurity(){
+  $('#app').innerHTML = kopStuk('🛂 Security · de filters')+
+    '<div class="item" style="background:var(--card2);"><div class="meta">De wachttijden staan live op het bord van de reizigers. Loopt een filter vol, open er dan een extra.</div></div>'+
+    '<div id="seLijst"></div>'+aiBlok('Bijv. wanneer open ik het tweede filter?');
+  koppelBasis();
+  try {
+    const r = await api('/api/lucht/bord', {});
+    $('#seLijst').innerHTML = r.security.map(f =>
+      '<div class="item"><h4>'+esc(f.naam)+' '+(f.open?'<span class="status ok">open · '+f.wachtMinuten+' min</span>':'<span class="status open">dicht</span>')+'</h4>'+
+      '<div class="rij"><button class="knop stil" data-f="'+f.id+'" data-open="'+(!f.open)+'">'+(f.open?'Sluit':'Open')+'</button>'+
+      (f.open ? '<button class="knop stil" data-w="'+f.id+'">Wachttijd</button>' : '')+'</div></div>').join('');
+    $('#seLijst').querySelectorAll('[data-f]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/lucht/security/zet', { id: b.dataset.f, open: b.dataset.open === 'true' }); meld('Gezet.'); schermSecurity(); } catch(e){ meld(e.message); } }));
+    $('#seLijst').querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', async () => {
+      const w = prompt('Actuele wachttijd in minuten:', '10'); if (w == null) return;
+      try { await api('/api/lucht/security/zet', { id: b.dataset.w, wachtMinuten: w }); meld('Wachttijd op het bord.'); schermSecurity(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+</body>
+</html>

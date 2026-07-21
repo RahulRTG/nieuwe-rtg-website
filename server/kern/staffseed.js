@@ -62,7 +62,11 @@ const STAFF_SEED = {
   // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
   GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']],
   // het rijk: een behandelaar (beoordeelt toeslagen/uitkeringen/bezwaren) en een baliemedewerker
-  RIJK: [['Sander de Vries', 'manager', 'Behandeling & beleid'], ['Fatima El Amrani', 'staff', 'Rijksbalie']]
+  RIJK: [['Sander de Vries', 'manager', 'Behandeling & beleid'], ['Fatima El Amrani', 'staff', 'Rijksbalie']],
+  // RTG Airport: de hele operatie op een rooster (vluchtleiding, gate, platform, toren, bagage, security)
+  LUCHT: [['Eva Duarte', 'manager', 'Operations control'], ['Joan Mari', 'staff', 'Gate & boarding'],
+    ['Sofia Ledesma', 'staff', 'Platform & de draai'], ['Ruben Tosca', 'staff', 'Toren (verkeersleiding)'],
+    ['Paula Riera', 'staff', 'Bagagekelder'], ['Omar Bellver', 'staff', 'Security-filter']]
 };
 
 module.exports = { STAFF_SEED };

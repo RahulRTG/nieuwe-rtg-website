@@ -2027,6 +2027,11 @@ kern.overheid.seed();
 // de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
 // kenteken-check op een huurauto de APK-status teruggeeft
 kern.overheid.registreerVloot();
+/* RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie ·
+   vluchtleiding, passagiersketen (boeken/inchecken op codenaam), de draai op
+   het platform, de toren (baanklaring), de bagagekelder en security. */
+Object.assign(kern, require('./kern/luchthaven').maakLuchthaven({ db, save, crypto, anthropic }));
+kern.lucht.seed();
 /* RTG contentbescherming (kern/drm.js): de DRM-route (Encrypted Media
    Extensions, Clear Key door RTG zelf bediend) voor de beschermde media. */
 Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));
@@ -2352,6 +2357,7 @@ require('./routes/tiener')(kern);
 require('./routes/kantoren')(kern);
 require('./routes/gemeente')(kern);
 require('./routes/overheid')(kern);
+require('./routes/luchthaven')(kern);
 require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/bank')(kern);

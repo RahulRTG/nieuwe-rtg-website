@@ -26,6 +26,17 @@ module.exports = (kern) => {
   app.post('/api/lucht/bagage', supplierAuth, poort, (req, res) => res.json(lucht.bagage(req.body || {})));
   app.post('/api/lucht/bagage/zet', supplierAuth, poort, (req, res) => stuur(res, lucht.bagageZet(wie(req), String(req.body.tag || ''), String(req.body.status || ''))));
   app.post('/api/lucht/security/zet', supplierAuth, poort, (req, res) => stuur(res, lucht.securityZet(wie(req), String(req.body.id || ''), req.body || {})));
+  // het charterloket (privejets en helikopters): operations beslist, nooit de AI
+  app.post('/api/lucht/charters', supplierAuth, poort, (req, res) => res.json(lucht.charterLijst()));
+  app.post('/api/lucht/charter/beslis', supplierAuth, poort, (req, res) => stuur(res, lucht.charterBeslis(wie(req), String(req.body.id || ''), req.body.akkoord === true)));
+  // de Koninklijke Vleugel: vips onder protocolnaam, met het vaste protocol
+  app.post('/api/lucht/vip/lijst', supplierAuth, poort, (req, res) => res.json(lucht.vipLijst()));
+  app.post('/api/lucht/vip/maak', supplierAuth, poort, (req, res) => stuur(res, lucht.vipMaak(wie(req), req.body || {})));
+  app.post('/api/lucht/vip/taak', supplierAuth, poort, (req, res) => stuur(res, lucht.vipTaak(wie(req), String(req.body.id || ''), String(req.body.stap || ''))));
+  // de lounges: binnen op de boarding pass; royal alleen met vip-protocol
+  app.post('/api/lucht/lounge', supplierAuth, poort, (req, res) => res.json(lucht.loungeStand()));
+  app.post('/api/lucht/lounge/in', supplierAuth, poort, (req, res) => stuur(res, lucht.loungeIn(wie(req), String(req.body.lounge || ''), String(req.body.code || ''))));
+  app.post('/api/lucht/lounge/uit', supplierAuth, poort, (req, res) => stuur(res, lucht.loungeUit(wie(req), String(req.body.id || ''))));
   app.post('/api/lucht/ai', supplierAuth, poort, async (req, res) => {
     try { res.json(await lucht.luchtAI(String(req.body.vraag || ''))); }
     catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
@@ -55,4 +66,6 @@ module.exports = (kern) => {
   app.post('/api/member/vluchten/boek', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, lucht.boek(req.session, liveCodename(req.session), String(req.body.id || ''), req.body || {})); });
   app.post('/api/member/vluchten/incheck', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, lucht.incheck(req.session, String(req.body.code || ''), req.body || {})); });
   app.post('/api/member/vluchten/mijn', auth, (req, res) => res.json(lucht.mijn(req.session.key)));
+  // een charter aanvragen (privejet of helikopter); operations bevestigt of wijst af
+  app.post('/api/member/vluchten/charter', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, lucht.charterVraag(req.session, liveCodename(req.session), req.body || {})); });
 };

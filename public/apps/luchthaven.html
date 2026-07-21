@@ -98,11 +98,13 @@ $('#loginGo').addEventListener('click', async () => {
 });
 
 const ROLLEN = [
-  ['vluchtleiding','🛫','Vluchtleiding','het bord, statussen, gates en vertragingen'],
-  ['platform','🛠️','Platform','de draai: brandstof, catering, schoonmaak, laden'],
-  ['toren','🗼','Toren','baanklaring: zonder klaring vertrekt er niets'],
+  ['vluchtleiding','🛫','Vluchtleiding','het bord: lijnvluchten, privejets en helikopters'],
+  ['platform','🛠️','Platform','de draai, per categorie licht of volledig'],
+  ['toren','🗼','Toren','klaring op een baan of een helipad'],
   ['bagage','🧳','Bagagekelder','de kofferketen, vermist en gevonden'],
-  ['security','🛂','Security','de filters en de live wachttijden']
+  ['security','🛂','Security','de filters en de live wachttijden'],
+  ['vip','👑','VIP en Royal','charters bevestigen en het koninklijk protocol'],
+  ['lounge','🥂','Lounge','gasten op de boarding pass; royal alleen vip']
 ];
 
 async function kiesScherm(){
@@ -116,6 +118,9 @@ async function kiesScherm(){
       '<div class="kpi"><b>'+C.vertraagd+'</b><span>Vertraagd</span></div>'+
       '<div class="kpi"><b>'+C.ingecheckt+'</b><span>Ingecheckt</span></div>'+
       '<div class="kpi"><b>'+C.koffersInSysteem+'</b><span>Koffers · '+C.koffersVermist+' vermist</span></div>'+
+      '<div class="kpi"><b>'+C.chartersWachtend+'</b><span>Charters wachtend</span></div>'+
+      '<div class="kpi"><b>'+C.vipsActief+'</b><span>Vip-protocollen</span></div>'+
+      '<div class="kpi"><b>'+C.loungeGasten+'</b><span>In de lounges</span></div>'+
     '</div>'+
     (C.signalen.length ? C.signalen.map(s => '<div class="item sig '+esc(s.soort)+'"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
     '<h3 style="font-size:.95rem;margin:.4rem 0 .1rem;">Jouw werkplek</h3>'+
@@ -140,7 +145,10 @@ function rolScherm(rol){
   if (rol === 'toren') return schermToren();
   if (rol === 'bagage') return schermBagage();
   if (rol === 'security') return schermSecurity();
+  if (rol === 'vip') return schermVip();
+  if (rol === 'lounge') return schermLounge();
 }
+function plekkenVoor(cat){ return cat === 'helikopter' ? C.helipads : cat === 'privejet' ? C.stands : C.gates; }
 function vertrekStap(v){
   return v.status === 'gepland' ? 'inchecken' : v.status === 'inchecken' ? 'boarding' : v.status === 'boarding' ? 'vertrokken' : null;
 }
@@ -152,13 +160,15 @@ function aankomstStap(v){
 async function schermVluchtleiding(){
   $('#app').innerHTML = kopStuk('🛫 Vluchtleiding')+
     '<div class="item" style="background:var(--card2);"><h4>Nieuwe vlucht op het bord</h4>'+
-    '<div class="rij"><input class="veld" id="nNr" style="width:6rem;" placeholder="RT123" maxlength="8"><select class="veld" id="nSoort"><option value="vertrek">vertrek</option><option value="aankomst">aankomst</option></select><input class="veld" id="nBest" style="flex:1;min-width:8rem;" placeholder="Bestemming / herkomst" maxlength="60"></div>'+
+    '<div class="rij"><input class="veld" id="nNr" style="width:6rem;" placeholder="RT123" maxlength="8"><select class="veld" id="nSoort"><option value="vertrek">vertrek</option><option value="aankomst">aankomst</option></select><select class="veld" id="nCat"><option value="lijn">✈️ lijnvlucht</option><option value="privejet">🛩️ privejet</option><option value="helikopter">🚁 helikopter</option></select><input class="veld" id="nBest" style="flex:1;min-width:8rem;" placeholder="Bestemming / herkomst" maxlength="60"></div>'+
     '<div class="rij"><input class="veld" id="nTijd" type="time" value="12:00"><select class="veld" id="nGate"></select><button class="knop" id="nMaak">Op het bord</button></div></div>'+
     '<div id="vlLijst"></div>'+aiBlok('Bijv. welke kist verdient nu voorrang?');
   koppelBasis();
-  $('#nGate').innerHTML = C.gates.map(g => '<option>'+g+'</option>').join('');
+  const vulPlekken = () => { $('#nGate').innerHTML = plekkenVoor($('#nCat').value).map(g => '<option>'+g+'</option>').join(''); };
+  vulPlekken();
+  $('#nCat').addEventListener('change', vulPlekken);
   $('#nMaak').addEventListener('click', async () => {
-    try { await api('/api/lucht/vlucht/maak', { nummer: $('#nNr').value, soort: $('#nSoort').value, bestemming: $('#nBest').value, tijd: $('#nTijd').value, gate: $('#nGate').value });
+    try { await api('/api/lucht/vlucht/maak', { nummer: $('#nNr').value, soort: $('#nSoort').value, categorie: $('#nCat').value, bestemming: $('#nBest').value, tijd: $('#nTijd').value, gate: $('#nGate').value });
       meld('Op het bord.'); laadVluchten(); } catch(e){ meld(e.message); }
   });
   laadVluchten();
@@ -167,9 +177,10 @@ function vluchtKaart(v, acties){
   const st = v.geannuleerd ? '<span class="status open">geannuleerd</span>'
     : '<span class="status '+(v.status==='vertrokken'||v.status==='afgerond'?'ok':'goud')+'">'+esc(v.status)+'</span>';
   const ver = v.vertraging ? ' <span class="status open">+'+v.vertraging.minuten+' min · '+esc(v.vertraging.reden)+'</span>' : '';
-  const kl = v.klaring ? ' <span class="status ok">klaring baan '+esc(v.klaring.baan)+'</span>' : '';
+  const kl = v.klaring ? ' <span class="status ok">klaring '+esc(v.klaring.baan)+'</span>' : '';
   const band = v.band ? ' <span class="status">band '+v.band+'</span>' : '';
-  return '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+' <small style="color:var(--soft);font-family:Inter;">'+esc(v.soort)+'</small></h4>'+
+  const vip = v.vip ? ' <span class="status '+(v.vip.rond?'ok':'open')+'">👑 '+esc(v.vip.soort)+(v.vip.rond?' · gereed':' · protocol loopt')+'</span>' : '';
+  return '<div class="item"><h4>'+(v.icoon||'✈️')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+' <small style="color:var(--soft);font-family:Inter;">'+esc(v.soort)+'</small>'+vip+'</h4>'+
     '<div class="meta">'+esc(v.tijd)+' · gate '+esc(v.gate)+' · '+esc(v.toestel)+' · '+st+ver+kl+band+
     (v.draai ? ' · draai '+(v.draai.klaar?'<span class="status ok">rond</span>':'<span class="status open">'+v.draai.taken.filter(t=>!t.klaar).length+' open</span>') : '')+'</div>'+(acties||'')+'</div>';
 }
@@ -227,10 +238,12 @@ async function schermToren(){
   try {
     const r = await api('/api/lucht/bord', { soort: 'vertrek' });
     const wacht = r.vluchten.filter(v => !v.geannuleerd && v.status !== 'vertrokken');
-    $('#toLijst').innerHTML = wacht.length ? wacht.map(v =>
-      '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.tijd)+' · '+esc(v.status)+'</h4>'+
-      '<div class="meta">'+(v.klaring ? '<span class="status ok">klaring baan '+esc(v.klaring.baan)+'</span>' : v.status === 'boarding' ? '<span class="status goud">wacht op klaring</span>' : '<span class="status">nog niet aan het boarden</span>')+'</div>'+
-      (!v.klaring && v.status === 'boarding' ? '<div class="rij">'+C.banen.map(b => '<button class="knop" data-kl="'+v.id+'" data-baan="'+b+'">Klaring baan '+b+'</button>').join('')+'</div>' : '')+'</div>').join('')
+    $('#toLijst').innerHTML = wacht.length ? wacht.map(v => {
+      const keuze = v.categorie === 'helikopter' ? C.helipads : C.banen;
+      return '<div class="item"><h4>'+(v.icoon||'✈️')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.tijd)+' · '+esc(v.status)+'</h4>'+
+      '<div class="meta">'+(v.klaring ? '<span class="status ok">klaring '+esc(v.klaring.baan)+'</span>' : v.status === 'boarding' ? '<span class="status goud">wacht op klaring</span>' : '<span class="status">nog niet aan het boarden</span>')+'</div>'+
+      (!v.klaring && v.status === 'boarding' ? '<div class="rij">'+keuze.map(b => '<button class="knop" data-kl="'+v.id+'" data-baan="'+b+'">Klaring '+b+'</button>').join('')+'</div>' : '')+'</div>';
+    }).join('')
       : '<div class="leeg">Geen vertrekkers in de wacht.</div>';
     $('#toLijst').querySelectorAll('[data-kl]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/lucht/toren/klaring', { id: b.dataset.kl, baan: b.dataset.baan }); meld('Klaring gegeven.'); schermToren(); } catch(e){ meld(e.message); } }));
@@ -282,6 +295,73 @@ async function schermSecurity(){
     $('#seLijst').querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', async () => {
       const w = prompt('Actuele wachttijd in minuten:', '10'); if (w == null) return;
       try { await api('/api/lucht/security/zet', { id: b.dataset.w, wachtMinuten: w }); meld('Wachttijd op het bord.'); schermSecurity(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- VIP en Royal: het charterloket + de Koninklijke Vleugel ---- */
+async function schermVip(){
+  $('#app').innerHTML = kopStuk('👑 VIP en Royal')+
+    '<div class="item" style="background:var(--card2);"><h4>Nieuw vip-protocol</h4><div class="meta">Onder PROTOCOLNAAM, nooit de echte naam. Een vip-vlucht boardt pas als alle stappen zijn afgevinkt.</div>'+
+    '<div class="rij"><input class="veld" id="vVlucht" style="width:6rem;" placeholder="RT101" maxlength="8"><input class="veld" id="vNaam" style="flex:1;min-width:9rem;" placeholder="Protocolnaam, bijv. Valk Een" maxlength="60"><select class="veld" id="vSoort"><option value="koninklijk">koninklijk</option><option value="staatsbezoek">staatsbezoek</option><option value="vip">vip</option></select><button class="knop" id="vMaak">Start protocol</button></div></div>'+
+    '<div id="vipLijst"></div>'+
+    '<h3 style="font-size:.95rem;margin:.8rem 0 .3rem;">🛩️ Het charterloket</h3>'+
+    '<div class="item" style="background:var(--card2);"><div class="meta">Leden vragen een privejet of helikopter aan via de Vluchten-app; OPERATIONS beslist, nooit de AI. Bij bevestiging komt de vlucht direct op het bord met een vrije stand of helipad.</div></div>'+
+    '<div id="chLijst"></div>'+aiBlok('Bijv. hoe plan ik een staatsbezoek naast de middagpiek?');
+  koppelBasis();
+  $('#vMaak').addEventListener('click', async () => {
+    try { await api('/api/lucht/vip/maak', { vlucht: $('#vVlucht').value, protocolnaam: $('#vNaam').value, soort: $('#vSoort').value });
+      meld('Protocol gestart.'); $('#vVlucht').value = $('#vNaam').value = ''; laadVips(); } catch(e){ meld(e.message); }
+  });
+  laadVips(); laadCharters();
+}
+async function laadVips(){
+  try {
+    const r = await api('/api/lucht/vip/lijst');
+    $('#vipLijst').innerHTML = r.vips.length ? r.vips.map(v =>
+      '<div class="item"><h4>👑 '+esc(v.protocolnaam)+' <small style="color:var(--soft);font-family:Inter;">'+esc(v.soort)+' · '+esc(v.suite)+' · '+esc(v.vlucht)+' '+esc(v.tijd)+'</small> '+(v.rond?'<span class="status ok">gereed</span>':'<span class="status open">protocol loopt</span>')+'</h4>'+
+      '<div class="rij">'+v.protocol.map(p => p.klaar ? '<span class="status ok">'+esc(p.stap)+' ✓</span>' : '<button class="knop stil" data-vip="'+v.id+'" data-stap="'+esc(p.stap)+'">'+esc(p.stap)+'</button>').join('')+'</div></div>').join('')
+      : '<div class="leeg">Geen lopende vip-protocollen.</div>';
+    $('#vipLijst').querySelectorAll('[data-vip]').forEach(b => b.addEventListener('click', async () => {
+      try { const r2 = await api('/api/lucht/vip/taak', { id: b.dataset.vip, stap: b.dataset.stap });
+        meld(r2.rond ? 'Het protocol is rond; de Vleugel is gereed.' : 'Afgevinkt.'); laadVips(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+async function laadCharters(){
+  try {
+    const r = await api('/api/lucht/charters');
+    $('#chLijst').innerHTML = r.charters.length ? r.charters.map(c =>
+      '<div class="item"><h4>'+(c.icoon||'🛩️')+' '+esc(c.code)+' · '+esc(c.bestemming)+' <small style="color:var(--soft);font-family:Inter;">'+esc(c.van)+' · '+esc(c.datum)+' '+esc(c.tijd)+'</small> <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+'</span></h4>'+
+      (c.status === 'aangevraagd' ? '<div class="rij"><button class="knop" data-ok="'+c.id+'">Bevestig (uw besluit)</button><button class="knop rood" data-nee="'+c.id+'">Wijs af</button></div>' : '')+'</div>').join('')
+      : '<div class="leeg">Geen charteraanvragen.</div>';
+    $('#chLijst').querySelectorAll('[data-ok]').forEach(b => b.addEventListener('click', async () => {
+      try { const r2 = await api('/api/lucht/charter/beslis', { id: b.dataset.ok, akkoord: true });
+        meld('Bevestigd: '+r2.vlucht.nummer+' op '+r2.vlucht.gate+'.'); laadCharters(); } catch(e){ meld(e.message); } }));
+    $('#chLijst').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/lucht/charter/beslis', { id: b.dataset.nee, akkoord: false }); meld('Afgewezen.'); laadCharters(); } catch(e){ meld(e.message); } }));
+  } catch(e){ meld(e.message); }
+}
+
+/* ---- de lounges: binnen op de boarding pass ---- */
+async function schermLounge(){
+  $('#app').innerHTML = kopStuk('🥂 De lounges')+
+    '<div class="item" style="background:var(--card2);"><h4>Gast ontvangen</h4><div class="meta">Op vertoon van een geldige boarding pass. De Koninklijke Vleugel is uitsluitend voor gasten op een vlucht met een vip-protocol.</div>'+
+    '<div class="rij"><input class="veld" id="lgCode" style="flex:1;min-width:9rem;" placeholder="Boarding pass-code (VL-...)" maxlength="12"><select class="veld" id="lgWaar"><option value="salon">Salon Lounge</option><option value="royal">De Koninklijke Vleugel</option></select><button class="knop" id="lgIn">Welkom ✓</button></div></div>'+
+    '<div id="lgLijst"></div>'+aiBlok('Bijv. hoe druk wordt het rond de avondvertrekken?');
+  koppelBasis();
+  $('#lgIn').addEventListener('click', async () => {
+    try { const r = await api('/api/lucht/lounge/in', { lounge: $('#lgWaar').value, code: $('#lgCode').value });
+      meld('Welkom in '+r.lounge+', '+r.gast.codenaam+'.'); $('#lgCode').value = ''; laadLounge(); } catch(e){ meld(e.message); }
+  });
+  laadLounge();
+}
+async function laadLounge(){
+  try {
+    const r = await api('/api/lucht/lounge');
+    $('#lgLijst').innerHTML = r.lounges.map(l =>
+      '<div class="item"><h4>'+(l.id==='royal'?'👑 ':'🥂 ')+esc(l.naam)+' <span class="status '+(l.binnen>=l.capaciteit?'open':'goud')+'">'+l.binnen+' / '+l.capaciteit+'</span></h4>'+
+      (l.gasten.length ? l.gasten.map(g => '<div class="meta">'+esc(g.codenaam)+' · '+esc(g.vlucht)+' '+esc(g.tijd)+' <button class="knop stil" style="padding:.15rem .5rem;font-size:.7rem;" data-uit="'+g.id+'">uitchecken</button></div>').join('') : '<div class="meta">Nog geen gasten.</div>')+'</div>').join('');
+    $('#lgLijst').querySelectorAll('[data-uit]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/lucht/lounge/uit', { id: b.dataset.uit }); meld('Tot ziens.'); laadLounge(); } catch(e){ meld(e.message); } }));
   } catch(e){ meld(e.message); }
 }
 </script>

@@ -81,7 +81,7 @@ async function laadBord(){
       : '<span class="status">'+esc(v.status)+'</span>';
     const ver=v.vertraging?' <span class="status open">+'+v.vertraging.minuten+' min</span>':'';
     const boek=(v.soort==='vertrek'&&['gepland','inchecken'].includes(v.status))?'<div class="rij"><button class="knop stil" data-boek="'+v.id+'">Boek deze vlucht</button></div>':'';
-    return '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4><div class="meta">'+esc(v.soort)+' · '+esc(v.tijd)+' · gate '+esc(v.gate)+' · '+st+ver+'</div>'+boek+'</div>';
+    return '<div class="item"><h4>'+(v.icoon||'✈️')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4><div class="meta">'+esc(v.soort)+' · '+esc(v.tijd)+' · '+esc(v.gate)+' · '+st+ver+'</div>'+boek+'</div>';
   }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
   $('#inhoud').innerHTML=h;
   document.querySelectorAll('[data-boek]').forEach(b=>b.onclick=async()=>{
@@ -90,7 +90,13 @@ async function laadBord(){
 }
 async function laadMijn(){
   let d; try{ d=await api('/mijn'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  $('#inhoud').innerHTML= d.boekingen.length ? d.boekingen.map(b=>{
+  const charterBlok='<div class="item" style="border-color:rgba(169,143,7,.4);"><h4>🛩️ Charter aanvragen</h4>'+
+    '<div class="meta">Een privejet of helikopter op uw moment. Operations bevestigt persoonlijk; daarna staat de vlucht in uw reizen.</div>'+
+    '<div class="rij"><select class="veld" id="chSoort"><option value="privejet">🛩️ Privejet</option><option value="helikopter">🚁 Helikopter</option></select>'+
+    '<input class="veld" id="chBest" style="flex:1;min-width:8rem;" placeholder="Bestemming" maxlength="60"></div>'+
+    '<div class="rij"><input class="veld" id="chDatum" type="date"><input class="veld" id="chTijd" type="time" value="12:00"><button class="knop" id="chVraag">Vraag aan</button></div>'+
+    ((d.charters||[]).length?'<div style="margin-top:.5rem;">'+d.charters.map(c=>'<div class="meta">'+(c.icoon||'🛩️')+' '+esc(c.code)+' · '+esc(c.bestemming)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</div>';
+  $('#inhoud').innerHTML= charterBlok + (d.boekingen.length ? d.boekingen.map(b=>{
     const v=b.vlucht;
     if(b.status==='ingecheckt'){
       return '<div class="pass"><div class="regel"><span>Vlucht</span><b>'+esc(v.nummer)+' · '+esc(v.bestemming)+'</b></div>'+
@@ -106,11 +112,16 @@ async function laadMijn(){
       '<div class="meta">'+esc(v.datum)+' · '+esc(v.tijd)+' · boeking '+esc(b.code)+' · <span class="status '+(v.geannuleerd?'open':'goud')+'">'+esc(v.geannuleerd?'geannuleerd':v.status)+'</span></div>'+
       (kan?'<div class="rij"><select class="veld" data-kof="'+esc(b.code)+'"><option value="0">Geen koffer</option><option value="1">1 koffer</option><option value="2">2 koffers</option><option value="3">3 koffers</option></select><button class="knop" data-in="'+esc(b.code)+'">Inchecken</button></div>'
         : v.geannuleerd?'':'<div class="meta">Inchecken kan zodra het open staat.</div>')+'</div>';
-  }).join('') : '<div class="leeg">Nog geen reizen. Boek een vlucht via Het bord.</div>';
+  }).join('') : '<div class="leeg">Nog geen reizen. Boek een vlucht via Het bord, of vraag hierboven een charter aan.</div>');
   document.querySelectorAll('[data-in]').forEach(b=>b.onclick=async()=>{
     const kof=document.querySelector('[data-kof="'+b.dataset.in+'"]');
     try{ await api('/incheck',{code:b.dataset.in,koffers:kof?kof.value:0}); meld('Ingecheckt; uw boarding pass staat klaar.'); laadMijn(); }catch(e){ meld(e.message); }
   });
+  $('#chDatum').value=new Date().toISOString().slice(0,10);
+  $('#chVraag').onclick=async()=>{
+    try{ const r=await api('/charter',{soort:$('#chSoort').value,bestemming:$('#chBest').value,datum:$('#chDatum').value,tijd:$('#chTijd').value});
+      meld('Aangevraagd ('+r.charter.code+'); operations bevestigt persoonlijk.'); laadMijn(); }catch(e){ meld(e.message); }
+  };
 }
 laad();
 </script>

@@ -13,8 +13,30 @@
    Vast patroon: maakLuchthaven(state) -> { lucht: api }. */
 
 const GATES = ['A1', 'A2', 'A3', 'B1', 'B2', 'C1'];
+const STANDS = ['P1', 'P2', 'P3'];          // general aviation: de privejets
+const HELIPADS = ['H1', 'H2'];              // de helikopters landen en vertrekken hier
 const BANEN = ['06/24', '13/31'];
 const BANDEN = [1, 2, 3, 4];
+/* Drie categorieen op een veld: de lijnvluchten, de privejets (GA-stands, een
+   lichtere draai) en de helikopters (helipads, de lichtste draai; de klaring
+   van de toren is een helipad in plaats van een baan). */
+const CATEGORIEEN = { lijn: '✈️', privejet: '🛩️', helikopter: '🚁' };
+const DRAAI_LICHT = {
+  privejet: ['brandstof', 'catering', 'schoonmaak', 'pushback-gereed'],
+  helikopter: ['brandstof', 'schoonmaak', 'pushback-gereed']
+};
+/* De Koninklijke Vleugel: koninklijke gasten, staatsbezoeken en vips reizen
+   onder PROTOCOLNAAM (nooit de echte naam; privacy by design) met een vast
+   protocol. Een vip-vlucht boardt pas als het protocol rond is. */
+const VIP_SOORTEN = ['koninklijk', 'staatsbezoek', 'vip'];
+const VIP_PROTOCOL = ['suite-gereed', 'security-sweep', 'protocol-officier', 'motorcade', 'discrete-boarding'];
+/* De lounges: het eigen systeem van de gastvrijheid op het veld. Binnen op
+   vertoon van een geldige boarding pass; de Koninklijke Vleugel is uitsluitend
+   voor gasten op een vlucht met een lopend vip-protocol. */
+const LOUNGES = {
+  salon: { naam: 'Salon Lounge', capaciteit: 40 },
+  royal: { naam: 'De Koninklijke Vleugel', capaciteit: 8 }
+};
 const VERTREK_KETEN = ['gepland', 'inchecken', 'boarding', 'vertrokken'];
 const AANKOMST_KETEN = ['onderweg', 'geland', 'bagage-op-band', 'afgerond'];
 const DRAAI_TAKEN = ['brandstof', 'catering', 'schoonmaak', 'bagage-laden', 'water-en-afval', 'pushback-gereed'];
@@ -33,9 +55,9 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
 
   function L() {
     if (!db.data.luchthaven || typeof db.data.luchthaven !== 'object')
-      db.data.luchthaven = { vluchten: [], boekingen: [], koffers: [], security: [] };
+      db.data.luchthaven = { vluchten: [], boekingen: [], koffers: [], security: [], charters: [], vips: [], lounge: [] };
     const l = db.data.luchthaven;
-    for (const k of ['vluchten', 'boekingen', 'koffers', 'security']) if (!Array.isArray(l[k])) l[k] = [];
+    for (const k of ['vluchten', 'boekingen', 'koffers', 'security', 'charters', 'vips', 'lounge']) if (!Array.isArray(l[k])) l[k] = [];
     return l;
   }
 
@@ -69,22 +91,32 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
   const vind = vid => vluchten().find(v => v.id === vid || v.nummer === String(vid || '').toUpperCase());
   const actief = v => !['vertrokken', 'afgerond', 'geannuleerd'].includes(v.status);
   const keten = v => v.soort === 'aankomst' ? AANKOMST_KETEN : VERTREK_KETEN;
-  const draaiRond = v => DRAAI_TAKEN.every(t => v.draai && v.draai[t]);
+  const catVan = v => CATEGORIEEN[v.categorie] ? v.categorie : 'lijn';
+  const plekkenVoor = cat => cat === 'helikopter' ? HELIPADS : cat === 'privejet' ? STANDS : GATES;
+  const draaiTakenVoor = v => DRAAI_LICHT[catVan(v)] || DRAAI_TAKEN;
+  const draaiRond = v => draaiTakenVoor(v).every(t => v.draai && v.draai[t]);
+  const vipVan = v => L().vips.find(x => x.vluchtId === v.id);
+  const vipRond = vip => VIP_PROTOCOL.every(s => vip.protocol && vip.protocol[s]);
 
   function publiek(v) {
-    return { id: v.id, nummer: v.nummer, soort: v.soort, bestemming: v.bestemming, datum: v.datum, tijd: v.tijd,
+    const vip = vipVan(v);
+    return { id: v.id, nummer: v.nummer, soort: v.soort, categorie: catVan(v), icoon: CATEGORIEEN[catVan(v)],
+      bestemming: v.bestemming, datum: v.datum, tijd: v.tijd,
       gate: v.gate, toestel: v.toestel, status: v.status, vertraging: v.vertraging || null,
-      draai: v.soort === 'vertrek' ? { klaar: draaiRond(v), taken: DRAAI_TAKEN.map(t => ({ taak: t, klaar: !!(v.draai && v.draai[t]) })) } : null,
+      draai: v.soort === 'vertrek' ? { klaar: draaiRond(v), taken: draaiTakenVoor(v).map(t => ({ taak: t, klaar: !!(v.draai && v.draai[t]) })) } : null,
+      vip: vip ? { soort: vip.soort, suite: vip.suite, rond: vipRond(vip) } : null,
       klaring: v.klaring || null, band: v.band || null, geannuleerd: v.status === 'geannuleerd' };
   }
 
   /* ---------- vluchtleiding: het bord, gates en vertragingen ---------- */
   function _vluchtMaak(data) {
+    const categorie = CATEGORIEEN[data.categorie] ? data.categorie : 'lijn';
+    const plekken = plekkenVoor(categorie);
     const v = { id: id('vl'), nummer: schoon(data.nummer, 8).toUpperCase() || 'RT' + Math.floor(100 + Math.random() * 900),
-      soort: data.soort === 'aankomst' ? 'aankomst' : 'vertrek',
+      soort: data.soort === 'aankomst' ? 'aankomst' : 'vertrek', categorie,
       bestemming: schoon(data.bestemming, 60) || 'Onbekend', datum: /^\d{4}-\d{2}-\d{2}$/.test(String(data.datum || '')) ? data.datum : vandaag(),
       tijd: /^\d{2}:\d{2}$/.test(String(data.tijd || '')) ? data.tijd : '12:00',
-      gate: GATES.includes(data.gate) ? data.gate : GATES[0], toestel: schoon(data.toestel, 20) || 'RTG-0X',
+      gate: plekken.includes(data.gate) ? data.gate : plekken[0], toestel: schoon(data.toestel, 20) || 'RTG-0X',
       status: data.soort === 'aankomst' ? 'onderweg' : 'gepland', draai: {}, klaring: null, vertraging: null, band: null, at: nu() };
     L().vluchten.unshift(v);
     L().vluchten = L().vluchten.slice(0, 5000);
@@ -92,10 +124,12 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
   }
   function vluchtMaak(actor, data) {
     data = data || {};
-    if (data.gate && !GATES.includes(data.gate)) return { status: 400, error: 'Kies een bestaande gate (' + GATES.join(', ') + ').' };
-    const gate = GATES.includes(data.gate) ? data.gate : GATES[0];
+    const categorie = CATEGORIEEN[data.categorie] ? data.categorie : 'lijn';
+    const plekken = plekkenVoor(categorie);
+    if (data.gate && !plekken.includes(data.gate)) return { status: 400, error: 'Kies voor deze categorie een plek uit: ' + plekken.join(', ') + '.' };
+    const gate = plekken.includes(data.gate) ? data.gate : plekken[0];
     const bezet = vluchten().some(v => actief(v) && v.gate === gate && v.datum === (data.datum || vandaag()) && v.tijd === data.tijd);
-    if (bezet) return { status: 409, error: 'Gate ' + gate + ' is op dat moment al bezet.' };
+    if (bezet) return { status: 409, error: gate + ' is op dat moment al bezet.' };
     const v = _vluchtMaak(data);
     save();
     return { ok: true, vlucht: publiek(v) };
@@ -116,6 +150,8 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
     if (naar > van + 1) return { status: 409, error: 'Stap voor stap: na ' + v.status + ' komt ' + k[van + 1] + '.' };
     // de operationele grendels
     if (status === 'boarding' && !draaiRond(v)) return { status: 409, error: 'Een kist boardt pas als de draai rond is; er staan nog platformtaken open.' };
+    const vip = vipVan(v);
+    if (status === 'boarding' && vip && !vipRond(vip)) return { status: 409, error: 'De Koninklijke Vleugel is nog niet gereed; eerst het vip-protocol afronden.' };
     if (status === 'vertrokken' && !v.klaring) return { status: 409, error: 'Zonder klaring van de toren vertrekt er niets.' };
     if (status === 'geland') { v.band = BANDEN[(vluchten().filter(x => x.band).length) % BANDEN.length]; }
     if (status === 'bagage-op-band') {
@@ -205,14 +241,14 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
       uit.push({ code: b.code, status: b.status, stoel: b.stoel, vlucht: publiek(v),
         koffers: L().koffers.filter(k => k.boekingId === b.id).map(k => ({ tag: k.tag, status: k.status, band: k.band })) });
     }
-    return { ok: true, boekingen: uit };
+    return { ok: true, boekingen: uit, charters: mijnCharters(key) };
   }
 
   /* ---------- het platform: de draai per vertrekkende kist ---------- */
   function draaiTaak(actor, vid, taak) {
     const v = vind(vid);
     if (!v || v.soort !== 'vertrek') return { status: 404, error: 'Vlucht niet gevonden.' };
-    if (!DRAAI_TAKEN.includes(taak)) return { status: 400, error: 'Onbekende platformtaak.' };
+    if (!draaiTakenVoor(v).includes(taak)) return { status: 400, error: 'Deze platformtaak hoort niet bij een ' + catVan(v) + ' (' + draaiTakenVoor(v).join(', ') + ').' };
     if (!actief(v)) return { status: 409, error: 'Deze vlucht is al ' + v.status + '.' };
     if (v.draai[taak]) return { status: 409, error: 'Deze taak is al afgevinkt.' };
     v.draai[taak] = { door: actor || 'platform', at: nu() };
@@ -226,7 +262,9 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
     if (!v || v.soort !== 'vertrek') return { status: 404, error: 'Vlucht niet gevonden.' };
     if (v.klaring) return { status: 409, error: 'Deze vlucht heeft al klaring (baan ' + v.klaring.baan + ').' };
     if (v.status !== 'boarding') return { status: 409, error: 'Klaring volgt pas als de kist aan het boarden is.' };
-    if (!BANEN.includes(baan)) return { status: 400, error: 'Kies een baan (' + BANEN.join(', ') + ').' };
+    // een helikopter krijgt klaring op een helipad, al het andere op een baan
+    const keuze = catVan(v) === 'helikopter' ? HELIPADS : BANEN;
+    if (!keuze.includes(baan)) return { status: 400, error: 'Kies voor een ' + catVan(v) + ' een klaring op: ' + keuze.join(', ') + '.' };
     v.klaring = { baan, door: actor || 'toren', at: nu() };
     save();
     return { ok: true, vlucht: publiek(v) };
@@ -260,6 +298,97 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
     return { ok: true, koffer: { tag: k.tag, status: k.status } };
   }
 
+  /* ---------- het charterloket: privejets en helikopters op aanvraag ----------
+     Een lid vraagt een charter aan (privejet of helikopter, bestemming en
+     moment); OPERATIONS beslist -- nooit de AI en nooit automatisch. Bij een
+     bevestiging komt de vlucht meteen op het bord (met vrije stand of helipad)
+     en staat de aanvrager erop geboekt; inchecken gaat daarna gewoon via de
+     eigen keten. */
+  function charterVraag(sess, codenaam, data) {
+    data = data || {};
+    const soort = ['privejet', 'helikopter'].includes(data.soort) ? data.soort : null;
+    if (!soort) return { status: 400, error: 'Kies een privejet of een helikopter.' };
+    const bestemming = schoon(data.bestemming, 60);
+    if (bestemming.length < 2) return { status: 400, error: 'Waar wilt u heen?' };
+    const ch = { id: id('ch'), code: 'CH-' + crypto.randomBytes(3).toString('hex').toUpperCase(), soort, bestemming,
+      datum: /^\d{4}-\d{2}-\d{2}$/.test(String(data.datum || '')) ? data.datum : vandaag(),
+      tijd: /^\d{2}:\d{2}$/.test(String(data.tijd || '')) ? data.tijd : '12:00',
+      key: sess.key, codenaam: schoon(codenaam, 60) || 'Reiziger', status: 'aangevraagd', vluchtId: null, at: nu() };
+    L().charters.unshift(ch);
+    L().charters = L().charters.slice(0, 20000);
+    save();
+    return { ok: true, charter: { code: ch.code, soort, bestemming, datum: ch.datum, tijd: ch.tijd, status: ch.status } };
+  }
+  function charterLijst() {
+    seed();
+    return { ok: true, charters: L().charters.slice(0, 60).map(c => ({ id: c.id, code: c.code, soort: c.soort,
+      icoon: CATEGORIEEN[c.soort], bestemming: c.bestemming, datum: c.datum, tijd: c.tijd, van: c.codenaam, status: c.status })) };
+  }
+  function charterBeslis(actor, cid, akkoord) {
+    const ch = L().charters.find(x => x.id === String(cid || ''));
+    if (!ch) return { status: 404, error: 'Charteraanvraag niet gevonden.' };
+    if (ch.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + ch.status + '.' };
+    if (!akkoord) { ch.status = 'afgewezen'; save(); return { ok: true, charter: { code: ch.code, status: ch.status } }; }
+    // een vrije stand of helipad zoeken voor dat moment
+    const plekken = plekkenVoor(ch.soort);
+    const plek = plekken.find(p => !vluchten().some(v => actief(v) && v.gate === p && v.datum === ch.datum && v.tijd === ch.tijd));
+    if (!plek) return { status: 409, error: 'Geen vrije ' + (ch.soort === 'helikopter' ? 'helipad' : 'stand') + ' op dat moment; stel een andere tijd voor.' };
+    const v = _vluchtMaak({ nummer: (ch.soort === 'helikopter' ? 'RH' : 'RJ') + Math.floor(100 + Math.random() * 900),
+      soort: 'vertrek', categorie: ch.soort, bestemming: ch.bestemming, datum: ch.datum, tijd: ch.tijd, gate: plek,
+      toestel: ch.soort === 'helikopter' ? 'RTG-H1' : 'RTG-J1' });
+    v.status = 'inchecken';
+    ch.status = 'bevestigd'; ch.vluchtId = v.id; ch.door = actor || 'operations';
+    const b = { id: id('bk'), code: 'VL-' + crypto.randomBytes(3).toString('hex').toUpperCase(), vluchtId: v.id,
+      key: ch.key, codenaam: ch.codenaam, status: 'geboekt', stoel: null, koffers: 0, at: nu() };
+    L().boekingen.unshift(b);
+    save();
+    return { ok: true, charter: { code: ch.code, status: ch.status }, vlucht: publiek(v), boeking: { code: b.code } };
+  }
+  function mijnCharters(key) {
+    return L().charters.filter(c => c.key === key).slice(0, 10).map(c => {
+      const v = c.vluchtId ? vind(c.vluchtId) : null;
+      return { code: c.code, soort: c.soort, icoon: CATEGORIEEN[c.soort], bestemming: c.bestemming,
+        datum: c.datum, tijd: c.tijd, status: c.status, vlucht: v ? v.nummer : null };
+    });
+  }
+
+  /* ---------- de Koninklijke Vleugel: vips onder protocolnaam ---------- */
+  function vipMaak(actor, data) {
+    data = data || {};
+    const v = vind(String(data.vlucht || ''));
+    if (!v || v.soort !== 'vertrek') return { status: 404, error: 'Vlucht niet gevonden.' };
+    if (!actief(v)) return { status: 409, error: 'Deze vlucht is al ' + v.status + '.' };
+    if (vipVan(v)) return { status: 409, error: 'Op deze vlucht loopt al een vip-protocol.' };
+    const soort = VIP_SOORTEN.includes(data.soort) ? data.soort : 'vip';
+    const protocolnaam = schoon(data.protocolnaam, 60);
+    if (protocolnaam.length < 2) return { status: 400, error: 'Geef de gast een protocolnaam (nooit de echte naam).' };
+    const vip = { id: id('vip'), vluchtId: v.id, protocolnaam, soort,
+      suite: soort === 'vip' ? 'Suite Uno' : 'Suite Royale', protocol: {}, door: actor || 'protocol', at: nu() };
+    L().vips.unshift(vip);
+    L().vips = L().vips.slice(0, 5000);
+    save();
+    return { ok: true, vip: vipPubliek(vip) };
+  }
+  function vipPubliek(vip) {
+    const v = vind(vip.vluchtId);
+    return { id: vip.id, protocolnaam: vip.protocolnaam, soort: vip.soort, suite: vip.suite,
+      vlucht: v ? v.nummer : '?', tijd: v ? v.tijd : '', rond: vipRond(vip),
+      protocol: VIP_PROTOCOL.map(s => ({ stap: s, klaar: !!vip.protocol[s] })) };
+  }
+  function vipLijst() {
+    seed();
+    return { ok: true, soorten: VIP_SOORTEN, vips: L().vips.slice(0, 40).map(vipPubliek) };
+  }
+  function vipTaak(actor, vid2, stap) {
+    const vip = L().vips.find(x => x.id === String(vid2 || ''));
+    if (!vip) return { status: 404, error: 'Vip-protocol niet gevonden.' };
+    if (!VIP_PROTOCOL.includes(stap)) return { status: 400, error: 'Onbekende protocolstap.' };
+    if (vip.protocol[stap]) return { status: 409, error: 'Deze stap is al afgevinkt.' };
+    vip.protocol[stap] = { door: actor || 'protocol', at: nu() };
+    save();
+    return { ok: true, vip: vipPubliek(vip), rond: vipRond(vip) };
+  }
+
   /* ---------- de luchtzijde-partners: een boarding pass aan de deur ----------
      Elke zaak met de luchtzijde-stand aan (winkel, bar, lounge op de
      luchthaven) checkt hiermee de pass van de gast: geldig is ingecheckt,
@@ -275,6 +404,45 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
     if (v.status === 'vertrokken') return { ok: true, geldig: false, reden: 'Deze vlucht is al vertrokken.' };
     if (v.datum !== vandaag()) return { ok: true, geldig: false, reden: 'Deze boarding pass is niet van vandaag (' + v.datum + ').' };
     return { ok: true, geldig: true, pass: { naam: b.codenaam, vlucht: v.nummer, bestemming: v.bestemming, tijd: v.tijd, gate: v.gate, stoel: b.stoel } };
+  }
+
+  /* ---------- de lounges: gastvrijheid op vertoon van de boarding pass ---------- */
+  function loungeIn(actor, loungeId, passCode) {
+    const lounge = LOUNGES[String(loungeId || '')];
+    if (!lounge) return { status: 400, error: 'Kies een lounge (salon of royal).' };
+    const check = passCheck(passCode);
+    if (!check.geldig) return { status: 409, error: 'Geen geldige boarding pass: ' + (check.reden || 'onbekend.') };
+    const b = L().boekingen.find(x => x.code === String(passCode || '').trim().toUpperCase());
+    const v = vind(b.vluchtId);
+    if (String(loungeId) === 'royal' && !vipVan(v))
+      return { status: 403, error: 'De Koninklijke Vleugel is uitsluitend voor gasten op een vlucht met een vip-protocol.' };
+    if (L().lounge.some(g => g.boekingId === b.id && !g.uit))
+      return { status: 409, error: 'Deze gast is al binnen.' };
+    const binnen = L().lounge.filter(g => g.lounge === loungeId && !g.uit).length;
+    if (binnen >= lounge.capaciteit) return { status: 409, error: lounge.naam + ' zit vol (' + lounge.capaciteit + ' plaatsen).' };
+    const g = { id: id('lg'), lounge: String(loungeId), boekingId: b.id, codenaam: b.codenaam,
+      vlucht: v.nummer, tijd: v.tijd, door: actor || 'lounge', in: nu(), uit: null };
+    L().lounge.unshift(g);
+    L().lounge = L().lounge.slice(0, 20000);
+    save();
+    return { ok: true, gast: g, lounge: lounge.naam };
+  }
+  function loungeUit(actor, gid) {
+    const g = L().lounge.find(x => x.id === String(gid || ''));
+    if (!g) return { status: 404, error: 'Gast niet gevonden.' };
+    if (g.uit) return { status: 409, error: 'Deze gast is al uitgecheckt.' };
+    g.uit = nu(); g.uitDoor = actor || 'lounge';
+    save();
+    return { ok: true, gast: g };
+  }
+  function loungeStand() {
+    seed();
+    return { ok: true, lounges: Object.entries(LOUNGES).map(([lid2, l]) => ({
+      id: lid2, naam: l.naam, capaciteit: l.capaciteit,
+      binnen: L().lounge.filter(g => g.lounge === lid2 && !g.uit).length,
+      gasten: L().lounge.filter(g => g.lounge === lid2 && !g.uit).slice(0, 60)
+        .map(g => ({ id: g.id, codenaam: g.codenaam, vlucht: g.vlucht, tijd: g.tijd, in: g.in }))
+    })) };
   }
 
   /* ---------- security: de filters met live wachttijden ---------- */
@@ -311,6 +479,13 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
     const dichteFilters = L().security.filter(f => !f.open).length;
     const drukte = L().security.filter(f => f.open && f.wachtMinuten > 20);
     for (const f of drukte) signalen.push({ soort: 'security', vlucht: '', tekst: f.naam + ': ' + f.wachtMinuten + ' minuten wachten; overweeg een extra filter te openen.' });
+    for (const c of L().charters.filter(x => x.status === 'aangevraagd').slice(0, 5))
+      signalen.push({ soort: 'charter', vlucht: c.code, tekst: 'Charteraanvraag ' + c.code + ' (' + c.soort + ' naar ' + c.bestemming + ') wacht op een besluit van operations.' });
+    for (const vip of L().vips) {
+      const v = vind(vip.vluchtId);
+      if (v && actief(v) && ['inchecken', 'boarding'].includes(v.status) && !vipRond(vip))
+        signalen.push({ soort: 'vip', vlucht: v.nummer, tekst: v.nummer + ': het vip-protocol (' + vip.soort + ', ' + vip.suite + ') is nog niet rond.' });
+    }
     return { ok: true,
       vluchtenVandaag: vandaagV.length,
       vertrokken: vandaagV.filter(v => v.status === 'vertrokken').length,
@@ -319,8 +494,12 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
       ingecheckt: L().boekingen.filter(b => b.status === 'ingecheckt').length,
       koffersInSysteem: L().koffers.filter(k => !['opgehaald'].includes(k.status)).length,
       koffersVermist: L().koffers.filter(k => k.status === 'vermist').length,
+      chartersWachtend: L().charters.filter(x => x.status === 'aangevraagd').length,
+      vipsActief: L().vips.filter(vip => { const v = vind(vip.vluchtId); return v && actief(v); }).length,
+      loungeGasten: L().lounge.filter(g => !g.uit).length,
       dichteFilters, signalen: signalen.slice(0, 40),
-      gates: GATES, banen: BANEN, draaiTaken: DRAAI_TAKEN };
+      gates: GATES, stands: STANDS, helipads: HELIPADS, banen: BANEN,
+      categorieen: CATEGORIEEN, draaiTaken: DRAAI_TAKEN, vipProtocol: VIP_PROTOCOL, vipSoorten: VIP_SOORTEN };
   }
   async function luchtAI(vraag) {
     const c = cockpit();
@@ -347,7 +526,8 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
 
   return { lucht: { seed, isLucht, cockpit, bord, vluchtMaak, vluchtStatus, vluchtVertraag, vluchtGate,
     boek, incheck, mijn, draaiTaak, torenKlaring, bagage, bagageZet, securityZet, luchtAI, passCheck,
-    GATES, BANEN, DRAAI_TAKEN, KOFFER_KETEN } };
+    charterVraag, charterLijst, charterBeslis, vipMaak, vipLijst, vipTaak, loungeIn, loungeUit, loungeStand,
+    GATES, STANDS, HELIPADS, BANEN, DRAAI_TAKEN, KOFFER_KETEN, VIP_PROTOCOL } };
 }
 
 module.exports = { maakLuchthaven };

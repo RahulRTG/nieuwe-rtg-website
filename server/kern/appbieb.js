@@ -24,7 +24,7 @@ const CATEGORIEEN = [
   { id: 'marketing', label: 'Marketing & merk', icon: '📣', vak: ['Campagnebord', 'Huisstijlgids', 'Nieuwsbrief', 'Mediaplanner', 'Merkenmonitor'] },
   { id: 'beveiliging', label: 'Beveiliging & privacy', icon: '🛡️', vak: ['Sleutelkluis', 'Toegangslog', 'Versleutelaar', 'Auditspoor', 'Wachtwoordkluis'] },
   { id: 'onderwijs', label: 'Onderwijs & training', icon: '🎓', vak: ['Lesplanner', 'Toetsenmaker', 'Cijferlijst', 'Leerlingvolg', 'Diplomaboek'] },
-  { id: 'data', label: 'Data & rapportage', icon: '📊', vak: ['Rekenblad Pro', 'Grafiekenmaker', 'Datakoppelaar', 'Rapportstraat', 'Voorspeller'] },
+  { id: 'data', label: 'Data & rapportage', icon: '📊', vak: ['Rekenblad', 'Grafiekenmaker', 'Datakoppelaar', 'Rapportstraat', 'Voorspeller'] },
   { id: 'landbouw', label: 'Landbouw & teelt', icon: '🌾', vak: ['Perceelboek', 'Oogstplanner', 'Stalregister', 'Weerwacht', 'Veilingklok'] },
   { id: 'bouw', label: 'Bouw & installatie', icon: '🏗️', vak: ['Bestekmaker', 'Bouwplanner', 'Calculatie', 'Opleverlijst', 'Werfdagboek'] },
   { id: 'kassa', label: 'Winkel & kassa', icon: '🛒', vak: ['Kassaboek', 'Voorraadteller', 'Etikettenmaker', 'Bonnenlade', 'Schapindeling'] },

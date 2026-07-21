@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Wallet</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  button{font:inherit;cursor:pointer;}
+  header{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.8rem) 1.1rem 0.6rem;border-bottom:1px solid var(--line);}
+  header a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  header h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+  main{max-width:680px;margin:0 auto;padding:1.1rem 1.1rem 4rem;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.3rem 0 0.5rem;}
+  .stil{color:var(--soft);font-size:0.85rem;line-height:1.55;}
+  .pasje{width:100%;text-align:left;background:linear-gradient(135deg,var(--card),var(--card2));border:1px solid var(--line);
+    border-radius:16px;padding:1rem 1.2rem;margin-bottom:0.6rem;color:var(--txt);display:flex;align-items:center;gap:0.8rem;}
+  .pasje .rek{flex:1;min-width:0;}
+  .pasje b{display:block;font-size:0.95rem;}
+  .pasje small{color:var(--soft);font-size:0.75rem;}
+  .pasje .weg{background:none;border:1px solid var(--line);border-radius:8px;color:var(--rood);font-size:0.72rem;padding:0.3rem 0.6rem;}
+  .knop{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:0.85rem;padding:0.55rem 0.9rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop:focus-visible,input:focus-visible,select:focus-visible,.pasje:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
+  input,select{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:0.6rem 0.8rem;}
+  .rij{display:flex;gap:0.5rem;flex-wrap:wrap;margin:0.4rem 0;}
+  .rij>*{flex:1;min-width:7rem;}
+  /* het oplichtende codescherm: goed afleesbaar aan elke balie */
+  #toonScrim{position:fixed;inset:0;z-index:30;background:#F4F1EC;color:#0C0C0B;display:none;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:2rem;}
+  #toonScrim.aan{display:flex;}
+  #toonScrim .t{font-size:1rem;color:#4D4A45;}
+  #toonScrim .c{font-family:'Bodoni Moda',serif;font-size:clamp(2.4rem,10vw,4.5rem);letter-spacing:0.12em;margin:1rem 0;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:40;
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;opacity:0;transition:opacity .25s;}
+  .melding.zien{opacity:1;}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<header>
+  <a href="/apps/app.html" aria-label="Terug naar de leden-app">←</a>
+  <h1>RTG Wallet</h1>
+</header>
+<main>
+  <p class="stil">Alles wat u bij zich draagt, op een plek: passen, tickets, sleutels, feestmunten en klantenkaarten. Tik op een kaart voor het grote codescherm.</p>
+
+  <h2>Passen</h2><div id="lijstPas"></div>
+  <h2>Tickets</h2><div id="lijstTicket"></div>
+  <h2>Sleutels</h2><div id="lijstSleutel"></div>
+
+  <h2>Feestmunten</h2>
+  <div id="lijstMunt"></div>
+  <div class="rij">
+    <input id="muntZaak" maxlength="60" placeholder="Zaak of feest" aria-label="Zaak">
+    <input id="muntAantal" type="number" min="1" max="100" value="10" aria-label="Aantal">
+    <button class="knop vol" id="muntKoop" type="button">Koop munten</button>
+  </div>
+  <p class="stil" id="muntPrijsUit"></p>
+
+  <h2>Klantenkaarten</h2>
+  <div id="lijstKaart"></div>
+  <div class="rij">
+    <select id="voegSoort" aria-label="Soort"><option value="klantenkaart">Klantenkaart</option><option value="ticket">Ticket</option><option value="sleutel">Sleutel</option></select>
+    <input id="voegTitel" maxlength="80" placeholder="Naam (bijv. de winkel)" aria-label="Naam">
+    <input id="voegCode" maxlength="40" placeholder="Code" aria-label="Code">
+    <button class="knop vol" id="voegBtn" type="button">Voeg toe</button>
+  </div>
+</main>
+
+<div id="toonScrim" role="dialog" aria-label="Codescherm">
+  <div class="t" id="toonTitel"></div>
+  <div class="c" id="toonCode"></div>
+  <div class="t" id="toonSub"></div>
+  <button class="knop" id="toonDicht" type="button" style="margin-top:1.4rem;background:#0C0C0B;color:#F4F1EC;border-color:#0C0C0B;">Sluit</button>
+</div>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/wallet' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
+  const IC = { pas: '🪪', ticket: '🎟️', sleutel: '🔑', munt: '🪙', klantenkaart: '💳' };
+
+  function toon(item){
+    $('#toonTitel').textContent = item.titel;
+    $('#toonCode').textContent = item.code || '';
+    $('#toonSub').textContent = item.soort === 'munt' ? 'Saldo: ' + item.saldo + ' munten'
+      : item.geldigTot ? 'Geldig tot ' + item.geldigTot : '';
+    $('#toonScrim').classList.add('aan');
+  }
+  $('#toonDicht').addEventListener('click', () => $('#toonScrim').classList.remove('aan'));
+
+  function kaart(item){
+    const sub = item.soort === 'munt' ? 'saldo ' + item.saldo
+      : [item.code, item.geldigTot ? 'tot ' + item.geldigTot : ''].filter(Boolean).join(' · ');
+    return '<div class="pasje"><span aria-hidden="true" style="font-size:1.5rem;">' + IC[item.soort] + '</span>' +
+      '<button class="rek" data-toon="' + item.id + '" style="background:none;border:none;color:var(--txt);text-align:left;cursor:pointer;">' +
+      '<b>' + esc(item.titel) + '</b><small>' + esc(sub) + '</small></button>' +
+      (item.soort === 'munt' ? '<button class="knop" data-wissel="' + item.id + '">Wissel 1 in</button>' : '') +
+      '<button class="weg" data-weg="' + item.id + '" aria-label="Verwijder">weg</button></div>';
+  }
+  let items = [];
+  async function laad(){
+    const r = await api('');
+    if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
+    items = r.body.items;
+    const p = r.body.perSoort;
+    const teken = (host, rij) => { $(host).innerHTML = rij.length ? rij.map(kaart).join('') : '<p class="stil">Nog leeg.</p>'; };
+    teken('#lijstPas', p.pas); teken('#lijstTicket', p.ticket); teken('#lijstSleutel', p.sleutel);
+    teken('#lijstMunt', p.munt); teken('#lijstKaart', p.klantenkaart);
+    $('#muntPrijsUit').textContent = 'Munten kosten EUR ' + r.body.muntPrijs.toFixed(2).replace('.', ',') + ' per stuk (demo).';
+    document.querySelectorAll('[data-toon]').forEach(b => b.addEventListener('click', () => {
+      const it = items.find(x => x.id === b.dataset.toon); if (it) toon(it);
+    }));
+    document.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Uit de wallet halen?')) return;
+      const w = await api('/weg', { id: b.dataset.weg });
+      if (w.body.error) return zeg(w.body.error);
+      laad();
+    }));
+    document.querySelectorAll('[data-wissel]').forEach(b => b.addEventListener('click', async () => {
+      const w = await api('/munt/wissel', { id: b.dataset.wissel, aantal: 1 });
+      if (w.body.error) return zeg(w.body.error);
+      zeg('Munt ingewisseld; saldo ' + w.body.item.saldo + '.');
+      laad();
+    }));
+  }
+  $('#muntKoop').addEventListener('click', async () => {
+    const r = await api('/munt/koop', { zaak: $('#muntZaak').value, aantal: $('#muntAantal').value });
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Gekocht voor EUR ' + r.body.prijs.toFixed(2).replace('.', ',') + '; saldo ' + r.body.item.saldo + '.');
+    laad();
+  });
+  $('#voegBtn').addEventListener('click', async () => {
+    const r = await api('/voeg', { soort: $('#voegSoort').value, titel: $('#voegTitel').value, code: $('#voegCode').value });
+    if (r.body.error) return zeg(r.body.error);
+    $('#voegTitel').value = ''; $('#voegCode').value = '';
+    zeg('Toegevoegd.'); laad();
+  });
+
+  if (!token) zeg('Log eerst in op de leden-app.'); else laad();
+})();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

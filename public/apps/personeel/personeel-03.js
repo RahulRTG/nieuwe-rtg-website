@@ -156,7 +156,7 @@
     // de moedertaal van dit personeelslid: het hele scherm en de taken volgen
     if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), renderAll);
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderGebouwPda(); renderMarinaPda(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderGebouwPda(); renderMarinaPda(); renderPolisPda(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
 
   /* ---- Borden: hetzelfde werkbord als in de leverancier-app (shared/borden.js) ---- */
   let pdBordenUI = null;

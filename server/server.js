@@ -2485,6 +2485,12 @@ require('./routes/kantoorpakket')(kern);
    inzagelog met intrekken en herroepbare machtigingen. */
 Object.assign(kern, require('./kern/rtgid').maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam }));
 require('./routes/rtgid')(kern);
+/* RTG Wallet (kern/wallet.js) en de zorgtak van de verzekeraar
+   (kern/zorgpolis.js): de zorgpas op codenaam ligt direct in de wallet. */
+Object.assign(kern, require('./kern/wallet').maakWallet({ db, save, crypto, schoon }));
+Object.assign(kern, require('./kern/zorgpolis').maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam,
+  walletVoeg: kern.walletVoeg, walletWegBron: kern.walletWegBron }));
+require('./routes/zorgwallet')(kern);
 require('./routes/stuur')(kern);
 require('./routes/vonk')(kern);
 require('./routes/voorspel')(kern);

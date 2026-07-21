@@ -4543,6 +4543,15 @@
   // ---- kassa, per sector ----
   let bon = {};        // horeca: menu-id -> aantal
   function bonTotal(){ return (state.menu||[]).reduce((s,m)=>s+m.price*(bon[m.id]||0),0); }
+  /* Luchtzijde: staat de zaak op de luchthaven, dan toont de kassa dubbele
+     prijzen (normaal + luchthavenprijs met de toeslag van het beheer). De bon
+     gaat met NORMALE prijzen naar de server; die rekent dezelfde toeslag en
+     de gast betaalt de luchthavenprijs. De vertaalknop (🌐) zet de kaartnamen
+     in elke actieve wereldtaal, voor de gast aan de balie. */
+  const MENU_VERTAAL = { naar: null, map: {} };
+  const mNaam = x => MENU_VERTAAL.map[x.id] || x.name;
+  function luchtPct(){ const st = state.settings || {}; return st.luchtzijde ? (Number.isFinite(Number(st.luchtToeslagPct)) ? Math.round(Number(st.luchtToeslagPct)) : 15) : 0; }
+  function luchtPrijs(p){ const pct = luchtPct(); return pct ? Math.round(p * (1 + pct / 100) * 100) / 100 : p; }
   function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
   /* RTG Pay aan de kassa: tap to pay als het kan (de gast houdt zijn toestel
      hiertegen), met altijd de uitweg om de code te typen; werkt de NFC-chip
@@ -4625,10 +4634,17 @@
     const m = state.menu || [];
     if (!m.length) return '<div class="card"><div style="font-size:0.84rem;color:var(--muted);">'+T('pos.nomenu','Zet eerst gerechten op de menukaart; die worden hier uw kassaknoppen.')+'</div></div>';
     const total = bonTotal();
-    const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+x.name+'</span><span>'+eur(x.price*bon[x.id])+'</span></div>').join('');
-    return '<div class="card"><div class="tt-h">'+T('pos.newbon','Nieuwe bon')+'</div>'+
-      '<div class="pos-grid">'+m.map(x=>'<button class="pos-key" data-pos="'+x.id+'"><b>'+x.name+'</b><span>'+eur(x.price)+(bon[x.id]?' · '+bon[x.id]+'×':'')+'</span></button>').join('')+'</div>'+
-      (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+'</span></div></div>':'')+
+    const pct = luchtPct();
+    const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+mNaam(x)+'</span><span>'+eur(x.price*bon[x.id])+(pct?' · ✈ '+eur(luchtPrijs(x.price)*bon[x.id]):'')+'</span></div>').join('');
+    return '<div class="card"><div class="tt-h">'+T('pos.newbon','Nieuwe bon')+
+      (pct?' <span style="font-size:0.64rem;color:var(--gold);letter-spacing:0.08em;">✈ '+T('pos.luchtzijde','LUCHTZIJDE')+' +'+pct+'%</span>':'')+'</div>'+
+      '<div class="pos-pay" style="margin:0.4rem 0 0.2rem;">'+
+        '<button class="obtn" id="posVertaal">🌐 '+(MENU_VERTAAL.naar?MENU_VERTAAL.naar.toUpperCase():T('pos.vertaal','Vertaal de kaart'))+'</button>'+
+        (pct?'<button class="obtn" id="posPass">✈ '+T('pos.pass','Boarding pass')+'</button>':'')+
+      '</div>'+
+      '<div class="pos-grid">'+m.map(x=>'<button class="pos-key" data-pos="'+x.id+'"><b>'+mNaam(x)+'</b><span>'+eur(x.price)+(pct?' · ✈ '+eur(luchtPrijs(x.price)):'')+(bon[x.id]?' · '+bon[x.id]+'×':'')+'</span></button>').join('')+'</div>'+
+      (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+(pct?' · ✈ '+eur(luchtPrijs(total)):'')+'</span></div>'+
+        (pct?'<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">'+T('pos.luchtsub','De gast betaalt de luchthavenprijs (✈); de bon draagt beide prijzen.')+'</div>':'')+'</div>':'')+
       '<div class="pos-pay">'+
         '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
         '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
@@ -4715,6 +4731,30 @@
     const clear = $('#posClear'); if (clear) clear.addEventListener('click', () => { bon = {}; renderKassa(); openTab('kassa'); });
     document.querySelectorAll('.js-pay').forEach(b => b.addEventListener('click', () => paySale(type, b.dataset.method)));
     const redeem = $('#posRedeem'); if (redeem) redeem.addEventListener('click', redeemCode);
+    // de vertaalknop: de kaartnamen in elke actieve wereldtaal, voor de gast
+    const vt = $('#posVertaal'); if (vt) vt.addEventListener('click', async () => {
+      const naar = (window.prompt(T('pos.vertaalnaar','Taalcode voor de kaart (bijv. en, es, de, fr) of nl voor terug:'), MENU_VERTAAL.naar || 'en')||'').trim().toLowerCase();
+      if (!naar) return;
+      if (naar === 'nl'){ MENU_VERTAAL.naar = null; MENU_VERTAAL.map = {}; renderKassa(); openTab('kassa'); return; }
+      try {
+        const m = state.menu || [];
+        const r = await API.call('/supplier/vertaal', { teksten: m.map(x=>x.name), naar });
+        MENU_VERTAAL.naar = r.naar; MENU_VERTAAL.map = {};
+        m.forEach((x,i)=>{ MENU_VERTAAL.map[x.id] = r.teksten[i] || x.name; });
+        renderKassa(); openTab('kassa');
+      } catch(e){ toast(e.message); }
+    });
+    // luchtzijde: de boarding pass van de gast aan de deur of de balie checken
+    const bp = $('#posPass'); if (bp) bp.addEventListener('click', async () => {
+      const code = window.prompt(T('pos.passvraag','Boarding pass-code van de gast (bijv. VL-3F2A9C):'));
+      if (!code) return;
+      try {
+        const r = await API.call('/supplier/lucht/pass', { code });
+        toast(r.geldig
+          ? '✈ '+T('pos.passok','Geldig:')+' '+r.pass.naam+' · '+r.pass.vlucht+' '+r.pass.tijd+' · '+T('pos.stoel','stoel')+' '+r.pass.stoel+' · gate '+r.pass.gate
+          : '✗ '+(r.reden||T('pos.passnee','Niet geldig.')));
+      } catch(e){ toast(e.message); }
+    });
     const codeInp = $('#posCode'); if (codeInp) codeInp.addEventListener('keydown', e => { if (e.key==='Enter') redeemCode(); });
     document.querySelectorAll('.js-checkout').forEach(b => b.addEventListener('click', async () => {
       try {
@@ -5566,6 +5606,10 @@
     el.innerHTML = '<div class="card">'+
       row('ordersOpen', T('bh.orders','Bestellingen'), on1(st.ordersOpen), st.ordersOpen) +
       row('reservationsOpen', T('bh.res','Reserveringen'), on1(st.reservationsOpen), st.reservationsOpen) +
+      row('luchtzijde', '✈ '+T('bh.lucht','Luchtzijde'),
+        st.luchtzijde ? T('bh.luchtaan','Aan: boarding pass aan de deur, dubbele prijzen op de kassa (+')+(st.luchtToeslagPct==null?15:st.luchtToeslagPct)+'%)'
+          : T('bh.luchtuit','Uit: de zaak staat niet op een luchthaven'), !!st.luchtzijde) +
+      (st.luchtzijde ? '<div class="tt-add"><input id="bhLuchtPct" type="number" min="0" max="100" inputmode="numeric" value="'+(st.luchtToeslagPct==null?15:st.luchtToeslagPct)+'" style="width:6rem;"><button id="bhLuchtPctZet">'+T('bh.pctzet','Toeslag % opslaan')+'</button></div>' : '')+
       '<div class="note-soft">'+T('bh.note','Dicht = leden kunnen direct niet meer bestellen of reserveren; de kaart blijft zichtbaar. Alles wordt gelogd.')+'</div></div>'+
       '<div class="card"><div class="tt-h">'+T('bh.more','Verder beheren')+'</div>'+
       '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);line-height:1.7;">'+T('bh.tips','Menukaart bewerken doet u onder Menu. Tafels onder Tafels. Kamers en prijzen onder Kamers. Personeel en pincodes onder Team.')+'</div></div>';
@@ -5573,6 +5617,9 @@
     el.querySelectorAll('[data-set]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/settings', { [b.dataset.set]: b.dataset.val === 'true' }); toast(T('bh.saved','Opgeslagen, leden zien het direct.')); await refresh(); openTab('beheer'); } catch(e){ toast(e.message); }
     }));
+    const lp = $('#bhLuchtPctZet'); if (lp) lp.addEventListener('click', async () => {
+      try { await API.call('/supplier/settings', { luchtToeslagPct: Number($('#bhLuchtPct').value) }); toast(T('bh.saved','Opgeslagen, leden zien het direct.')); await refresh(); openTab('beheer'); } catch(e){ toast(e.message); }
+    });
   }
 
   // ---- klussen (onderhoud) + gevonden voorwerpen ----

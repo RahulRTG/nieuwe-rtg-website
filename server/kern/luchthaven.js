@@ -260,6 +260,23 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
     return { ok: true, koffer: { tag: k.tag, status: k.status } };
   }
 
+  /* ---------- de luchtzijde-partners: een boarding pass aan de deur ----------
+     Elke zaak met de luchtzijde-stand aan (winkel, bar, lounge op de
+     luchthaven) checkt hiermee de pass van de gast: geldig is ingecheckt,
+     voor een vlucht van vandaag die nog niet weg is. */
+  function passCheck(code) {
+    seed();
+    const b = L().boekingen.find(x => x.code === String(code || '').trim().toUpperCase());
+    if (!b) return { ok: true, geldig: false, reden: 'Deze code kennen we niet.' };
+    const v = vind(b.vluchtId);
+    if (!v) return { ok: true, geldig: false, reden: 'De vlucht bestaat niet meer.' };
+    if (b.status !== 'ingecheckt') return { ok: true, geldig: false, reden: 'Deze reiziger is nog niet ingecheckt.' };
+    if (v.status === 'geannuleerd') return { ok: true, geldig: false, reden: 'De vlucht is geannuleerd.' };
+    if (v.status === 'vertrokken') return { ok: true, geldig: false, reden: 'Deze vlucht is al vertrokken.' };
+    if (v.datum !== vandaag()) return { ok: true, geldig: false, reden: 'Deze boarding pass is niet van vandaag (' + v.datum + ').' };
+    return { ok: true, geldig: true, pass: { naam: b.codenaam, vlucht: v.nummer, bestemming: v.bestemming, tijd: v.tijd, gate: v.gate, stoel: b.stoel } };
+  }
+
   /* ---------- security: de filters met live wachttijden ---------- */
   function securityZet(actor, fid, data) {
     data = data || {};
@@ -329,7 +346,7 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
   }
 
   return { lucht: { seed, isLucht, cockpit, bord, vluchtMaak, vluchtStatus, vluchtVertraag, vluchtGate,
-    boek, incheck, mijn, draaiTaak, torenKlaring, bagage, bagageZet, securityZet, luchtAI,
+    boek, incheck, mijn, draaiTaak, torenKlaring, bagage, bagageZet, securityZet, luchtAI, passCheck,
     GATES, BANEN, DRAAI_TAKEN, KOFFER_KETEN } };
 }
 

@@ -13,15 +13,27 @@ module.exports = (kern) => {
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
     fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
 app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
-  const total = Number(req.body.total);
+  let total = Number(req.body.total);
   if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
   const method = POS_METHODS.includes(req.body.method) ? req.body.method : 'contant';
   // op de tafel zetten kan alleen op een echte tafel; afrekenen komt later
   if (method === 'tafel' && !(req.supplier.tables || []).some(t => t.name === String(req.body.room || '')))
     return res.status(400).json({ error: 'Kies een tafel om de bon op te zetten.' });
-  const items = Array.isArray(req.body.items)
+  let items = Array.isArray(req.body.items)
     ? req.body.items.slice(0, 40).map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
     : null;
+  /* Luchtzijde: de zaak staat op de luchthaven (achter security). De kassa
+     rekent dan de luchthavenprijs (normale prijs + toeslag) en de bon draagt
+     BEIDE prijzen: elke regel houdt zijn prijsNormaal naast de luchtprijs. */
+  let luchtzijde = null;
+  const stz = req.supplier.settings || {};
+  if (stz.luchtzijde) {
+    const pct = Number.isFinite(Number(stz.luchtToeslagPct)) ? Math.max(0, Math.min(100, Math.round(Number(stz.luchtToeslagPct)))) : 15;
+    const f = 1 + pct / 100;
+    luchtzijde = { pct, totaalNormaal: Math.round(total * 100) / 100 };
+    total = Math.round(total * f * 100) / 100;
+    if (items) items = items.map(i => ({ ...i, prijsNormaal: i.price, price: Math.round(i.price * f * 100) / 100 }));
+  }
   // RTG Pay: de gast toont de betaalcode uit de app; die wordt eerst geind
   // in het grootboek. Lukt dat niet, dan is er ook geen bon.
   let betaler = null;
@@ -40,7 +52,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     actor: req.actor.name,
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
-    items, total, method, betaler,
+    items, total, method, betaler, luchtzijde,
     at: new Date().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);

@@ -35,7 +35,9 @@
 </style>
 </head>
 <body>
-<header><div><div class="ey">Alles op een plek</div><h1>Berichten</h1></div><span class="tel" id="tel" hidden></span></header>
+<header><div><div class="ey">Alles op een plek</div><h1>Berichten</h1></div>
+  <select id="taalKies" hidden style="margin-left:auto;background:var(--card);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.78rem;padding:.3rem .5rem;max-width:9.5rem;" aria-label="Moedertaal"></select>
+  <span class="tel" id="tel" hidden></span></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <script>
 const $=s=>document.querySelector(s);
@@ -60,6 +62,23 @@ async function laad(){
   : '<div class="leeg">Nog geen gesprekken.<br>Start er een in De Salon, bij je vrienden of via Rahul.</div>';
 }
 laad();
+/* De moedertaal van het account: jij typt in jouw taal, de ander leest in de
+   zijne. De kiezer toont de actieve wereldtalen; de vriendenchat vertaalt
+   vanaf dat moment automatisch per lezer. */
+async function taalLaad(){
+  if(!TOKEN) return;
+  try{
+    const r=await fetch('/api/member/taal',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:'{}'});
+    const d=await r.json(); if(!r.ok) return;
+    const kies=$('#taalKies');
+    kies.innerHTML='<option value="">🌐 Moedertaal…</option>'+d.talen.map(t=>'<option value="'+t.code+'"'+(d.taal===t.code?' selected':'')+'>'+esc(t.naam)+'</option>').join('');
+    kies.hidden=false;
+    kies.onchange=async()=>{ if(!kies.value) return;
+      try{ await fetch('/api/member/taal/zet',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify({code:kies.value})}); }catch(e){}
+    };
+  }catch(e){}
+}
+taalLaad();
 // zachtjes verversen wanneer de app weer in beeld komt (geen gepiep, geen polling-storm)
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) laad(); });
 setInterval(()=>{ if(!document.hidden) laad(); },30000);

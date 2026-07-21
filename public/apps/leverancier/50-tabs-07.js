@@ -5,6 +5,30 @@
     const clear = $('#posClear'); if (clear) clear.addEventListener('click', () => { bon = {}; renderKassa(); openTab('kassa'); });
     document.querySelectorAll('.js-pay').forEach(b => b.addEventListener('click', () => paySale(type, b.dataset.method)));
     const redeem = $('#posRedeem'); if (redeem) redeem.addEventListener('click', redeemCode);
+    // de vertaalknop: de kaartnamen in elke actieve wereldtaal, voor de gast
+    const vt = $('#posVertaal'); if (vt) vt.addEventListener('click', async () => {
+      const naar = (window.prompt(T('pos.vertaalnaar','Taalcode voor de kaart (bijv. en, es, de, fr) of nl voor terug:'), MENU_VERTAAL.naar || 'en')||'').trim().toLowerCase();
+      if (!naar) return;
+      if (naar === 'nl'){ MENU_VERTAAL.naar = null; MENU_VERTAAL.map = {}; renderKassa(); openTab('kassa'); return; }
+      try {
+        const m = state.menu || [];
+        const r = await API.call('/supplier/vertaal', { teksten: m.map(x=>x.name), naar });
+        MENU_VERTAAL.naar = r.naar; MENU_VERTAAL.map = {};
+        m.forEach((x,i)=>{ MENU_VERTAAL.map[x.id] = r.teksten[i] || x.name; });
+        renderKassa(); openTab('kassa');
+      } catch(e){ toast(e.message); }
+    });
+    // luchtzijde: de boarding pass van de gast aan de deur of de balie checken
+    const bp = $('#posPass'); if (bp) bp.addEventListener('click', async () => {
+      const code = window.prompt(T('pos.passvraag','Boarding pass-code van de gast (bijv. VL-3F2A9C):'));
+      if (!code) return;
+      try {
+        const r = await API.call('/supplier/lucht/pass', { code });
+        toast(r.geldig
+          ? '✈ '+T('pos.passok','Geldig:')+' '+r.pass.naam+' · '+r.pass.vlucht+' '+r.pass.tijd+' · '+T('pos.stoel','stoel')+' '+r.pass.stoel+' · gate '+r.pass.gate
+          : '✗ '+(r.reden||T('pos.passnee','Niet geldig.')));
+      } catch(e){ toast(e.message); }
+    });
     const codeInp = $('#posCode'); if (codeInp) codeInp.addEventListener('keydown', e => { if (e.key==='Enter') redeemCode(); });
     document.querySelectorAll('.js-checkout').forEach(b => b.addEventListener('click', async () => {
       try {

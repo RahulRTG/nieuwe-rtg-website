@@ -34,8 +34,10 @@ app.post('/api/member/connections', auth, (req, res) => {
   res.json({ me: req.session.key, codename: liveCodename(req.session), connections: sc.connections, requests: sc.requests });
 });
 
-// gesprek ophalen (en als gelezen markeren)
-app.post('/api/member/dm', auth, (req, res) => {
+// gesprek ophalen (en als gelezen markeren). Moedertaal: heeft de lezer een
+// vaste taal (db.data.memberTaal), dan komen de berichten van de ander
+// vertaald binnen -- iedereen praat de eigen taal, iedereen leest de zijne.
+app.post('/api/member/dm', auth, async (req, res) => {
   if (geenGast(req, res)) return;
   const ander = String(req.body.withKey || '');
   const c = connectieTussen(req.session.key, ander);
@@ -44,7 +46,19 @@ app.post('/api/member/dm', auth, (req, res) => {
   const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
   chat.read[req.session.key] = new Date().toISOString();
   save();
-  res.json({ messages: chat.messages.slice(-80), codename: codenaamVan(ander) });
+  let uit = chat.messages.slice(-80);
+  const mijnTaal = (db.data.memberTaal || {})[req.session.key];
+  if (mijnTaal) {
+    const vertaler = require('../../translate');
+    uit = await Promise.all(uit.map(async m => {
+      if (m.from === req.session.key || !m.text) return m;
+      try {
+        const t = await vertaler.translate(m.text, mijnTaal, m.lang || undefined);
+        return t.translated ? { ...m, text: t.text, vertaaldUit: t.from } : m;
+      } catch (e) { return m; }
+    }));
+  }
+  res.json({ messages: uit, codename: codenaamVan(ander), taal: mijnTaal || null });
 });
 
 // bericht sturen; optioneel met een gedeelde Salon-post erbij
@@ -64,7 +78,10 @@ app.post('/api/member/dm/send', auth, (req, res) => {
   if (!text && !postDeel) return res.status(400).json({ error: 'Leeg bericht.' });
   const k = dmSleutel(req.session.key, ander);
   const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
-  const msg = { from: req.session.key, text, post: postDeel, at: new Date().toISOString() };
+  // het bericht draagt zijn brontaal mee (de moedertaal van de schrijver),
+  // zodat de leeskant precies weet waarvandaan te vertalen
+  const msg = { from: req.session.key, text, post: postDeel, at: new Date().toISOString(),
+    lang: (db.data.memberTaal || {})[req.session.key] || null };
   chat.messages.push(msg);
   if (chat.messages.length > 300) chat.messages = chat.messages.slice(-300);
   chat.read[req.session.key] = msg.at;

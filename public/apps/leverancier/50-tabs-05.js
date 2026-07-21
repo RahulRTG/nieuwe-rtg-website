@@ -36,6 +36,15 @@
   // ---- kassa, per sector ----
   let bon = {};        // horeca: menu-id -> aantal
   function bonTotal(){ return (state.menu||[]).reduce((s,m)=>s+m.price*(bon[m.id]||0),0); }
+  /* Luchtzijde: staat de zaak op de luchthaven, dan toont de kassa dubbele
+     prijzen (normaal + luchthavenprijs met de toeslag van het beheer). De bon
+     gaat met NORMALE prijzen naar de server; die rekent dezelfde toeslag en
+     de gast betaalt de luchthavenprijs. De vertaalknop (🌐) zet de kaartnamen
+     in elke actieve wereldtaal, voor de gast aan de balie. */
+  const MENU_VERTAAL = { naar: null, map: {} };
+  const mNaam = x => MENU_VERTAAL.map[x.id] || x.name;
+  function luchtPct(){ const st = state.settings || {}; return st.luchtzijde ? (Number.isFinite(Number(st.luchtToeslagPct)) ? Math.round(Number(st.luchtToeslagPct)) : 15) : 0; }
+  function luchtPrijs(p){ const pct = luchtPct(); return pct ? Math.round(p * (1 + pct / 100) * 100) / 100 : p; }
   function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
   /* RTG Pay aan de kassa: tap to pay als het kan (de gast houdt zijn toestel
      hiertegen), met altijd de uitweg om de code te typen; werkt de NFC-chip

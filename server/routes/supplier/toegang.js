@@ -99,6 +99,17 @@ app.post('/api/supplier/settings', supplierAuth, (req, res) => {
     const u = Number(req.body.uurloon);
     if (Number.isFinite(u) && u >= 0 && u <= 500) { st.uurloon = Math.round(u * 100) / 100; changed.push('het uurloon bij'); }
   }
+  // luchtzijde: de zaak staat op een luchthaven (achter security). De kassa
+  // toont dan dubbele prijzen (normaal + luchthaven, met deze toeslag) en de
+  // deur vraagt om een boarding pass (/api/supplier/lucht/pass).
+  if (typeof req.body.luchtzijde === 'boolean' && st.luchtzijde !== req.body.luchtzijde) {
+    st.luchtzijde = req.body.luchtzijde;
+    changed.push('de luchtzijde-stand ' + (st.luchtzijde ? 'aan' : 'uit'));
+  }
+  if (req.body.luchtToeslagPct != null) {
+    const p = Math.round(Number(req.body.luchtToeslagPct));
+    if (Number.isFinite(p) && p >= 0 && p <= 100) { st.luchtToeslagPct = p; changed.push('de luchthaventoeslag op ' + p + '%'); }
+  }
   // vervoerders: het tarief dat elke nieuwe rit direct een vaste prijs geeft
   if (req.body.tarief && typeof req.body.tarief === 'object') {
     const t = st.tarief = st.tarief || {};

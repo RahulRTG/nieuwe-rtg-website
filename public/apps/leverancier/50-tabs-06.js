@@ -2,10 +2,17 @@
     const m = state.menu || [];
     if (!m.length) return '<div class="card"><div style="font-size:0.84rem;color:var(--muted);">'+T('pos.nomenu','Zet eerst gerechten op de menukaart; die worden hier uw kassaknoppen.')+'</div></div>';
     const total = bonTotal();
-    const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+x.name+'</span><span>'+eur(x.price*bon[x.id])+'</span></div>').join('');
-    return '<div class="card"><div class="tt-h">'+T('pos.newbon','Nieuwe bon')+'</div>'+
-      '<div class="pos-grid">'+m.map(x=>'<button class="pos-key" data-pos="'+x.id+'"><b>'+x.name+'</b><span>'+eur(x.price)+(bon[x.id]?' · '+bon[x.id]+'×':'')+'</span></button>').join('')+'</div>'+
-      (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+'</span></div></div>':'')+
+    const pct = luchtPct();
+    const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+mNaam(x)+'</span><span>'+eur(x.price*bon[x.id])+(pct?' · ✈ '+eur(luchtPrijs(x.price)*bon[x.id]):'')+'</span></div>').join('');
+    return '<div class="card"><div class="tt-h">'+T('pos.newbon','Nieuwe bon')+
+      (pct?' <span style="font-size:0.64rem;color:var(--gold);letter-spacing:0.08em;">✈ '+T('pos.luchtzijde','LUCHTZIJDE')+' +'+pct+'%</span>':'')+'</div>'+
+      '<div class="pos-pay" style="margin:0.4rem 0 0.2rem;">'+
+        '<button class="obtn" id="posVertaal">🌐 '+(MENU_VERTAAL.naar?MENU_VERTAAL.naar.toUpperCase():T('pos.vertaal','Vertaal de kaart'))+'</button>'+
+        (pct?'<button class="obtn" id="posPass">✈ '+T('pos.pass','Boarding pass')+'</button>':'')+
+      '</div>'+
+      '<div class="pos-grid">'+m.map(x=>'<button class="pos-key" data-pos="'+x.id+'"><b>'+mNaam(x)+'</b><span>'+eur(x.price)+(pct?' · ✈ '+eur(luchtPrijs(x.price)):'')+(bon[x.id]?' · '+bon[x.id]+'×':'')+'</span></button>').join('')+'</div>'+
+      (lines?'<div class="pos-bon">'+lines+'<div class="pos-line total"><span>'+T('pos.total','Totaal')+'</span><span>'+eur(total)+(pct?' · ✈ '+eur(luchtPrijs(total)):'')+'</span></div>'+
+        (pct?'<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">'+T('pos.luchtsub','De gast betaalt de luchthavenprijs (✈); de bon draagt beide prijzen.')+'</div>':'')+'</div>':'')+
       '<div class="pos-pay">'+
         '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
         '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+

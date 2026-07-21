@@ -31,6 +31,21 @@ module.exports = (kern) => {
     catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
+  /* ---- de luchtzijde-partners: elke zaak op de luchthaven ----
+     De boarding pass aan de deur (de gast toont zijn code) en de vertaalknop
+     van de kassa: teksten van de bon of menukaart naar elke actieve taal. */
+  app.post('/api/supplier/lucht/pass', supplierAuth, (req, res) => stuur(res, lucht.passCheck(String(req.body.code || ''))));
+  const vertaler = require('../translate');
+  app.post('/api/supplier/vertaal', supplierAuth, async (req, res) => {
+    try {
+      const naar = kern.talen.taalVan(req.body.naar);
+      const teksten = (Array.isArray(req.body.teksten) ? req.body.teksten : []).slice(0, 60).map(t => String(t || '').slice(0, 200));
+      const uit = [];
+      for (const t of teksten) uit.push((await vertaler.translate(t, naar)).text);
+      res.json({ ok: true, naar, teksten: uit });
+    } catch (e) { res.status(500).json({ error: 'Vertalen lukte even niet. Probeer het opnieuw.' }); }
+  });
+
   /* ---- de leden: het bord, boeken, inchecken, mijn reizen ---- */
   const lid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }

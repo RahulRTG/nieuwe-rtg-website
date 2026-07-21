@@ -61,6 +61,8 @@ module.exports = (kern) => {
   require('./member/berichten')(kern);
   // De wauw-laag: stemming, verjaardagsglans en De Terugblik
   require('./member/wauw')(kern);
+  // De moedertaal van het account: iedereen praat en leest in de eigen taal
+  require('./member/taal')(kern);
   // RTG Nieuws: het gepubliceerde werk van RTG Redactie, met Rahul als nieuwslezer
   require('./member/nieuws')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.

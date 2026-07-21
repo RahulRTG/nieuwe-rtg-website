@@ -234,8 +234,11 @@ function boot() {
       { cwd: ROOT, env, stdio: ['ignore', logfd, logfd] });
     child.on('exit', c => { if (c) reject(new Error('server stopte, code ' + c)); });
     (async () => {
-      for (let i = 0; i < 300; i++) { const r = await verzoek('GET', '/api/health', null, null, 3000); if (r.status === 200) return resolve(); await new Promise(r => setTimeout(r, 250)); }
-      reject(new Error('server niet gezond'));
+      // wachten op READINESS, niet op liveness: pas als de duurzame opslag echt
+      // geladen is (Postgres: gedeelde data + RAM-venster) mag de test erin --
+      // anders toets je de verouderde lokale snapshot in plaats van de waarheid
+      for (let i = 0; i < 300; i++) { const r = await verzoek('GET', '/api/ready', null, null, 3000); if (r.status === 200) return resolve(); await new Promise(r => setTimeout(r, 250)); }
+      reject(new Error('server niet gereed (opslag laadt niet)'));
     })();
   });
 }

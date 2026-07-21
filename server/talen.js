@@ -68,6 +68,7 @@ const TALEN = [
   { code: 'tg', naam: 'Тоҷикӣ', en: 'Tajik' },
   { code: 'tk', naam: 'Türkmençe', en: 'Turkmen' },
   { code: 'mn', naam: 'Монгол', en: 'Mongolian' },
+  { code: 'tt', naam: 'Татарча', en: 'Tatar' },
   // Zuid-Azië
   { code: 'hi', naam: 'हिन्दी', en: 'Hindi' },
   { code: 'ur', naam: 'اردو', en: 'Urdu' },
@@ -83,6 +84,8 @@ const TALEN = [
   { code: 'ne', naam: 'नेपाली', en: 'Nepali' },
   { code: 'ps', naam: 'پښتو', en: 'Pashto' },
   { code: 'sd', naam: 'سنڌي', en: 'Sindhi' },
+  { code: 'or', naam: 'ଓଡ଼ିଆ', en: 'Odia' },
+  { code: 'as', naam: 'অসমীয়া', en: 'Assamese' },
   { code: 'dv', naam: 'ދިވެހި', en: 'Dhivehi' },
   { code: 'bo', naam: 'བོད་སྐད', en: 'Tibetan' },
   // Oost- & Zuidoost-Azië
@@ -92,6 +95,8 @@ const TALEN = [
   { code: 'th', naam: 'ไทย', en: 'Thai' },
   { code: 'vi', naam: 'Tiếng Việt', en: 'Vietnamese' },
   { code: 'id', naam: 'Bahasa Indonesia', en: 'Indonesian' },
+  { code: 'jv', naam: 'Basa Jawa', en: 'Javanese' },
+  { code: 'su', naam: 'Basa Sunda', en: 'Sundanese' },
   { code: 'ms', naam: 'Bahasa Melayu', en: 'Malay' },
   { code: 'tl', naam: 'Filipino', en: 'Filipino' },
   { code: 'km', naam: 'ខ្មែរ', en: 'Khmer' },

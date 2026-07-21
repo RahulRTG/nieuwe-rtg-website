@@ -54,6 +54,7 @@
       lang = /^[a-z]{2}$/.test(String(lang || '')) ? lang : 'nl';
       this.lang = lang;
       document.documentElement.setAttribute('lang', lang);
+      if (lang !== 'nl' && lang !== 'en') this.laadWereldDict(lang);
       const d = this.dict(lang);
 
       document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -87,6 +88,43 @@
     set(lang, remember) {
       if (remember !== false) { try { localStorage.setItem(STORE, lang); } catch (e) {} this.chosen = true; }
       this.apply(lang);
+    },
+
+    /* Wereldtaal-woordenboeken: voor elke taal buiten nl/en halen we het
+       UI-woordenboek van DEZE pagina live vertaald op (/api/vertaal/ui) en
+       bewaren het op het toestel. Zo draait elke pagina volledig in elke
+       actieve wereldtaal; zonder AI-sleutel valt de server terug op het
+       woordenboek en blijft de Engelse tekst staan waar hij het niet weet
+       (nooit een kapot scherm). */
+    _wereldDict: {},
+    laadWereldDict(lang) {
+      if (lang === 'nl' || lang === 'en' || this._wereldDict[lang]) return;
+      const all = window.I18N || {};
+      if (all[lang]) return; // de pagina bracht dit woordenboek zelf mee
+      const en = all.en || {};
+      const keys = Object.keys(en).slice(0, 400);
+      if (!keys.length) return;
+      this._wereldDict[lang] = true;
+      const ck = 'rtg_ui_' + lang + '_' + location.pathname.replace(/\W+/g, '') + '_' + keys.length;
+      const zet = (d) => {
+        window.I18N = window.I18N || {};
+        window.I18N[lang] = d;
+        if (this.lang === lang) this.apply(lang); // opnieuw toepassen zodra hij er is
+      };
+      let dict = null;
+      try { dict = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
+      if (dict) return zet(dict);
+      fetch('/api/vertaal/ui', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ naar: lang, teksten: keys.map(k => en[k]) }) })
+        .then(r => r.json())
+        .then(d => {
+          if (!d || d.naar !== lang || !Array.isArray(d.teksten)) return;
+          const uit = {};
+          keys.forEach((k, i) => { uit[k] = d.teksten[i] || en[k]; });
+          try { localStorage.setItem(ck, JSON.stringify(uit)); } catch (e) {}
+          zet(uit);
+        })
+        .catch(() => { this._wereldDict[lang] = false; });
     },
 
     /* ---------- taalkeuze-venster ---------- */

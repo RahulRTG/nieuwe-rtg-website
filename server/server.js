@@ -359,6 +359,24 @@ if (PRODUCTION || process.env.RTG_RATELIMIT === '1') {
    health/ready-checks, en behalve verzoeken van de eigenaar (met geldig token).
    Zo kan de eigenaar de app bewust "spanningsloos" maken en er zelf bij blijven
    om de zekering er weer in te doen. */
+/* De opslag-poortwachter: een instance die zijn duurzame staat nog niet
+   volledig geladen heeft (Postgres-herstart: de gedeelde data en het
+   RAM-venster zijn nog onderweg) mag GEEN API-verkeer beantwoorden. Anders
+   serveert hij de verouderde lokale snapshot-cache, en kan een schrijfactie
+   in dat venster (geld!) de echte Postgres-staat daarna overschrijven --
+   precies wat fase D van de beproeving op 65M-schaal ving: saldi die een
+   herstart niet 'overleefden'. Health/ready/techniek blijven bereikbaar,
+   zodat de load balancer en de eigenaar de instance gewoon kunnen zien. */
+app.use((req, res, next) => {
+  const p = req.path || '';
+  if (!p.startsWith('/api/')) return next();
+  if (p === '/api/health' || p === '/api/ready' || p.startsWith('/api/techniek') || p.startsWith('/api/cluster')) return next();
+  let klaar = true;
+  try { klaar = opslagKlaar(); } catch (e) { klaar = false; }
+  if (klaar) return next();
+  res.set('Retry-After', '2');
+  res.status(503).json({ error: 'De server laadt zijn gegevens nog; een ogenblik.' });
+});
 app.use((req, res, next) => {
   const z = db.data && db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.onderhoud;
   if (!z || z.aan !== false) return next(); // normaal: stroom staat erop
@@ -1182,6 +1200,21 @@ app.post('/api/translate', async (req, res) => {
    ook de inlogschermen tonen de kiezer al). De schakelaars zelf zitten in de
    RTG Boardroom (/api/boardroom/talen). */
 app.post('/api/talen', (req, res) => res.json({ talen: talen.actieve() }));
+/* Het UI-woordenboek van een pagina in een keer naar een ACTIEVE wereldtaal:
+   zo draait de hele app (elke pagina, elk scherm) in elke taal die de
+   boardroom aanzet. Publiek maar begrensd (max 400 teksten van 300 tekens)
+   en zwaar gecachet in de vertaallaag; met een AI-sleutel vertaalt Claude
+   volledig, zonder sleutel valt hij terug op het woordenboek (nooit kapot). */
+app.post('/api/vertaal/ui', async (req, res) => {
+  try {
+    const naar = talen.taalVan(req.body && req.body.naar);
+    const teksten = (Array.isArray(req.body && req.body.teksten) ? req.body.teksten : []).slice(0, 400)
+      .map(t => String(t == null ? '' : t).slice(0, 300));
+    const uit = [];
+    for (const t of teksten) uit.push((await i18n.translate(t, naar)).text);
+    res.json({ ok: true, naar, teksten: uit });
+  } catch (e) { res.status(500).json({ error: 'Vertalen lukte even niet. Probeer het opnieuw.' }); }
+});
 
 /* ---------- partnerkanaal: boeken zonder pas ----------
    Publieke endpoints (geen login): partner opzoeken, reizen ophalen en

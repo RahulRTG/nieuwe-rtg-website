@@ -1266,6 +1266,31 @@ app.post('/api/supplier/zegel/check', supplierAuth, (req, res) => {
   logActivity(req.supplier.code, req.actor, 'ID-/leeftijdscheck via Zegel: ' + (r.geldig ? 'geldig · ' + samenvatting : samenvatting));
   res.json(r);
 });
+/* Aanwezigheid: elke receptie/entree ziet hoeveel mensen er binnen zijn en de
+   verdeling man/vrouw. Bewust alleen GEAGGREGEERD -- nooit per persoon, nooit
+   een naam. De deur telt op en af; bij het sluiten leeg je de teller. */
+function aanwezigVan(code) { const a = db.data.aanwezig = db.data.aanwezig || {}; return a[code] = a[code] || { man: 0, vrouw: 0, onbekend: 0, updated: null }; }
+function aanwezigTel(a) { return { man: a.man || 0, vrouw: a.vrouw || 0, onbekend: a.onbekend || 0, binnen: (a.man || 0) + (a.vrouw || 0) + (a.onbekend || 0), updated: a.updated }; }
+app.post('/api/supplier/aanwezig', supplierAuth, (req, res) => res.json({ aanwezig: aanwezigTel(aanwezigVan(req.supplier.code)) }));
+app.post('/api/supplier/aanwezig/pas', supplierAuth, (req, res) => {
+  const a = aanwezigVan(req.supplier.code);
+  const groep = ['man', 'vrouw', 'onbekend'].includes(req.body.groep) ? req.body.groep : null;
+  if (!groep) return res.status(400).json({ error: 'Kies man, vrouw of onbekend.' });
+  const delta = Math.max(-1, Math.min(1, parseInt(req.body.delta, 10) || 0));
+  a[groep] = Math.max(0, (a[groep] || 0) + delta);
+  a.updated = new Date().toISOString();
+  save();
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'aanwezig' });
+  res.json({ aanwezig: aanwezigTel(a) });
+});
+app.post('/api/supplier/aanwezig/leeg', supplierAuth, (req, res) => {
+  const a = aanwezigVan(req.supplier.code);
+  a.man = 0; a.vrouw = 0; a.onbekend = 0; a.updated = new Date().toISOString();
+  save();
+  logActivity(req.supplier.code, req.actor, 'zette de aanwezigheidsteller op nul');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'aanwezig' });
+  res.json({ aanwezig: aanwezigTel(a) });
+});
 /* Het UI-woordenboek van een pagina in een keer naar een ACTIEVE wereldtaal:
    zo draait de hele app (elke pagina, elk scherm) in elke taal die de
    boardroom aanzet. Publiek maar begrensd (max 400 teksten van 300 tekens)

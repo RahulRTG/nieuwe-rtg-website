@@ -2041,6 +2041,11 @@ kern.kmar.seed();
    druk op de knop overschrijven naar oude apparatuur of een harde schijf,
    altijd achter het vier- of zes-ogenprincipe (zaak, RTG-kantoor, rijk). */
 Object.assign(kern, require('./kern/uitgifte').maakUitgifte({ db, save, crypto }));
+/* RTG Sportclub (kern/sportclub.js): het stadion met eigen plattegrond,
+   tickets met horeca en wc's, teams van jeugd tot eerste, veldbeheer,
+   trainingskampen (RTG beslist), sponsors, momenten en de financien. */
+Object.assign(kern, require('./kern/sportclub').maakSportclub({ db, save, crypto, anthropic }));
+kern.sport.seed();
 /* RTG contentbescherming (kern/drm.js): de DRM-route (Encrypted Media
    Extensions, Clear Key door RTG zelf bediend) voor de beschermde media. */
 Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));
@@ -2371,6 +2376,7 @@ require('./routes/overheid')(kern);
 require('./routes/luchthaven')(kern);
 require('./routes/marechaussee')(kern);
 require('./routes/uitgifte')(kern);
+require('./routes/sportclub')(kern);
 require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/bank')(kern);

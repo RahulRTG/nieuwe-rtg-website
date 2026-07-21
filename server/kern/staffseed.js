@@ -69,7 +69,11 @@ const STAFF_SEED = {
     ['Paula Riera', 'staff', 'Bagagekelder'], ['Omar Bellver', 'staff', 'Security-filter']],
   // de Brigade RTG Airport (Koninklijke Marechaussee): grensbalie, patrouille en incidenten
   KMAR: [['Iris Kortenaer', 'manager', 'Brigadecommandant'], ['Timo Schenk', 'staff', 'Grensbalie'],
-    ['Lena Verwey', 'staff', 'Patrouille'], ['Ruud Klaassen', 'staff', 'Doorlaatpost & incidenten']]
+    ['Lena Verwey', 'staff', 'Patrouille'], ['Ruud Klaassen', 'staff', 'Doorlaatpost & incidenten']],
+  // de sportclub: bestuur, technische staf, kantine, veldbeheer en de poort
+  FCRTG: [['Teun Roosen', 'manager', 'Clubmanager & bestuur'], ['Marco Insel', 'staff', 'Trainer & technische staf'],
+    ['Femke Aalders', 'staff', 'Kantine'], ['Jasper Kool', 'staff', 'Veldbeheer'],
+    ['Sanne Akkerman', 'staff', 'Ticketing, marketing & pr']]
 };
 
 module.exports = { STAFF_SEED };

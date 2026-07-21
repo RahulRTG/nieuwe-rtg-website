@@ -117,6 +117,7 @@
 <script>
 (() => {
   const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
   const api = (pad, body) => fetch('/api/theater/' + pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
@@ -182,9 +183,9 @@
       });
       return;
     }
-    if (m.status === 'wacht') { kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> wacht op goedkeuring door RTG-kantoor. Een mens beslist; u krijgt een seintje.</p>'; return; }
-    if (m.status === 'geweigerd') { kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> is niet goedgekeurd door RTG-kantoor.</p>'; return; }
-    kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> · ' + m.volgers + ' abonnees · ' +
+    if (m.status === 'wacht') { kaart.innerHTML = '<p class="stil"><strong>' + esc(m.naam) + '</strong> wacht op goedkeuring door RTG-kantoor. Een mens beslist; u krijgt een seintje.</p>'; return; }
+    if (m.status === 'geweigerd') { kaart.innerHTML = '<p class="stil"><strong>' + esc(m.naam) + '</strong> is niet goedgekeurd door RTG-kantoor.</p>'; return; }
+    kaart.innerHTML = '<p class="stil"><strong>' + esc(m.naam) + '</strong> · ' + m.volgers + ' abonnees · ' +
       m.gebruiktMb + ' van ' + m.maxMb + ' MB gebruikt</p>' +
       '<label for="vTitel">Titel van de nieuwe video</label><input id="vTitel" maxlength="80">' +
       '<label for="vBewaring">Waar bewaren we het origineel?</label>' +
@@ -438,5 +439,6 @@
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body>
 </html>

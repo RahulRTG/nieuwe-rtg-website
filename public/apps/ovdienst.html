@@ -64,7 +64,7 @@
     <div id="kies">
       <h2>Dienst starten</h2>
       <div class="kaart">
-        <label for="dLijn">Lijn</label><select id="dLijn"></select>
+        <label for="dLijn">Lijn</label><select id="dLijn"><option value="">De lijnen laden…</option></select>
         <label for="dNaam">Voertuig</label><input id="dNaam" maxlength="40" placeholder="Bijv. Bus 4">
         <div class="rij"><button class="knop vol" id="dStart" type="button">Start de dienst</button></div>
         <p class="stil" style="margin-top:0.5rem;">Zodra de dienst loopt deelt deze PDA de positie; leden zien uw
@@ -167,5 +167,6 @@
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body>
 </html>

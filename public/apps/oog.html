@@ -110,6 +110,7 @@
 <script>
 (() => {
   const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
   const api = (pad, body) => fetch('/api/staff/oog' + pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
@@ -228,8 +229,8 @@
     for (const s of rijen.slice(0, 12)) {
       const d = document.createElement('div'); d.className = 'r';
       d.innerHTML = '<span class="tijd">' + String(s.at).slice(11, 16) + '</span><span></span>';
-      d.lastChild.innerHTML = s.voertuigNaam + ' · ' + s.door + ' · ' +
-        (s.oordeel === 'schoon' ? '<span class="ok">schoon</span>' : '<span class="alarm">' + s.afwijkingen + ' afwijking(en)</span>');
+      d.lastChild.innerHTML = esc(s.voertuigNaam) + ' · ' + esc(s.door) + ' · ' +
+        (s.oordeel === 'schoon' ? '<span class="ok">schoon</span>' : '<span class="alarm">' + esc(s.afwijkingen) + ' afwijking(en)</span>');
       el.appendChild(d);
     }
   }
@@ -241,7 +242,7 @@
     for (const u of rijen.slice(0, 12)) {
       const d = document.createElement('div'); d.className = 'r';
       d.innerHTML = '<span class="tijd">' + String(u.at).slice(11, 16) + '</span><span></span>';
-      d.lastChild.innerHTML = u.door + ' ' + (u.richting === 'mee' ? '<span class="alarm">neemt mee</span>' : '<span class="ok">brengt terug</span>') + ': ' + u.itemNaam;
+      d.lastChild.innerHTML = esc(u.door) + ' ' + (u.richting === 'mee' ? '<span class="alarm">neemt mee</span>' : '<span class="ok">brengt terug</span>') + ': ' + esc(u.itemNaam);
       el.appendChild(d);
     }
   }
@@ -325,5 +326,6 @@
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body>
 </html>

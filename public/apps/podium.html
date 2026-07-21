@@ -155,6 +155,7 @@
 <script>
 (() => {
   const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
   const api = (pad, body) => fetch('/api/podium/' + pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
@@ -177,8 +178,8 @@
     b.type = 'button'; b.className = 'kan';
     const live = k.live ? '<span class="liveDot">Live</span> · ' + (k.kijkers || 0) + ' kijkers' :
       (k.abbCenten ? 'Abonnement ' + eur(k.abbCenten) + ' p/m' : 'Niet live');
-    b.innerHTML = '<span class="hoes" aria-hidden="true">' + (k.naam || '?').slice(0, 1).toUpperCase() + '</span>' +
-      '<span class="wie"><span class="naam"></span><span class="sub">' + live + ' · ' + k.genre + '</span></span>';
+    b.innerHTML = '<span class="hoes" aria-hidden="true">' + esc((k.naam || '?').slice(0, 1).toUpperCase()) + '</span>' +
+      '<span class="wie"><span class="naam"></span><span class="sub">' + live + ' · ' + esc(k.genre) + '</span></span>';
     b.querySelector('.naam').textContent = k.naam + ' · ' + k.codenaam;
     if (kijkbaar) b.addEventListener('click', () => kijkStart(k));
     else b.addEventListener('click', () => zeg(k.live ? 'Dit is uw eigen kanaal: open de studio.' : 'Dit kanaal is nu niet live.'));
@@ -219,10 +220,10 @@
       });
       return;
     }
-    if (m.status === 'wacht') kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> wacht op goedkeuring door RTG-kantoor. Een mens beslist; u krijgt een seintje.</p>';
-    else if (m.status === 'geweigerd') kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> is niet goedgekeurd door RTG-kantoor.</p>';
+    if (m.status === 'wacht') kaart.innerHTML = '<p class="stil"><strong>' + esc(m.naam) + '</strong> wacht op goedkeuring door RTG-kantoor. Een mens beslist; u krijgt een seintje.</p>';
+    else if (m.status === 'geweigerd') kaart.innerHTML = '<p class="stil"><strong>' + esc(m.naam) + '</strong> is niet goedgekeurd door RTG-kantoor.</p>';
     else {
-      kaart.innerHTML = '<p class="stil"><strong>' + m.naam + '</strong> · verdiend ' + eur(m.verdiend || 0) + ' · ' + (m.abonnees || 0) + ' abonnees</p>' +
+      kaart.innerHTML = '<p class="stil"><strong>' + esc(m.naam) + '</strong> · verdiend ' + eur(m.verdiend || 0) + ' · ' + (m.abonnees || 0) + ' abonnees</p>' +
         '<label for="mAbb">Abonnementsprijs per maand (euro, 0 = geen abonnement)</label><input id="mAbb" inputmode="decimal" value="' + ((m.abbCenten || 0) / 100) + '">' +
         '<div class="rij"><button class="knop" id="mZet" type="button">Bewaar</button>' +
         '<button class="knop vol" id="mStudio" type="button">Open de studio</button></div>';
@@ -423,5 +424,6 @@
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body>
 </html>

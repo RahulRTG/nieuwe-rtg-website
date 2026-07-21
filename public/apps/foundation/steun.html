@@ -34,7 +34,7 @@
 </head>
 <body>
 <div id="balk"></div>
-<div class="wrap">
+<div class="wrap" role="main">
   <h1>💚 Steun voor jou</h1>
   <div class="intro">Jij zorgt voor iedereen, maar jij telt ook. Neem hier even een moment voor jezelf: kijk hoe het met je gaat, praat je hart even leeg, en weet waar je terecht kunt.</div>
 
@@ -91,7 +91,7 @@ const REACTIES = {
 };
 function laadVerloop(){
   let log=[]; try{ log=JSON.parse(localStorage.getItem(MKEY)||'[]'); }catch(e){}
-  $('#verloop').innerHTML = log.slice(-14).map(x=>'<span title="'+x.d+'">'+EMO[x.m]+'</span>').join('');
+  $('#verloop').innerHTML = log.slice(-14).map(x=>'<span title="'+String(x.d).replace(/["<>&]/g,'')+'">'+(EMO[x.m]||'')+'</span>').join('');
   $('#privaat').textContent = log.length ? ('Je hebt de laatste tijd '+log.length+' keer ingecheckt. Alleen jij ziet dit.') : '';
 }
 $('#moods').querySelectorAll('button').forEach(b=>{
@@ -112,5 +112,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body>
 </html>

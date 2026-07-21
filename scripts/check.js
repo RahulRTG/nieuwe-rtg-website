@@ -133,5 +133,32 @@ const kruis = require('./kruisscan').scan(path.join(ROOT, 'server'));
 for (const b of kruis) fout('kruis-slice: ' + b.bestand + " gebruikt \"" + b.naam + "\" (top-level in zuster " + b.zuster + ')');
 if (!kruis.length) ok('geen slice raakt een top-level naam van een zuster-slice kaal');
 
+/* 10) De 9+-keuring: elke app-pagina (leden-OS en RTFoundation) houdt de
+   basiskwaliteit vast: taal, viewport, titel, favicon, een main-landmark en
+   de gedeelde basis-laag (offline, reduced-motion, invoerbegrenzing en de
+   uitleg-gids). De app-gids op de server dekt bovendien elke pagina met een
+   eigen uitleg, zodat het ?-knopje nooit een lege dop is. */
+console.log('\n10) de 9+-keuring op alle app-pagina\'s');
+{
+  const appgids = require('../server/kern/appgids');
+  let np = 0;
+  const paginas = [];
+  loop(path.join(ROOT, 'public/apps'), /\.html$/, f => paginas.push(f));
+  for (const f of paginas) {
+    const rel = path.relative(path.join(ROOT, 'public'), f).replace(/\\/g, '/');
+    const s = fs.readFileSync(f, 'utf8');
+    const htmlTag = s.match(/<html[^>]*>/i);
+    if (!htmlTag || !/\blang\s*=/.test(htmlTag[0])) { np++; fout('9+: geen lang op <html> in ' + rel); }
+    if (!/name="viewport"/.test(s)) { np++; fout('9+: geen viewport in ' + rel); }
+    if (!/<title>[^<]+<\/title>/.test(s)) { np++; fout('9+: lege of ontbrekende titel in ' + rel); }
+    if (!/rel="icon"/.test(s)) { np++; fout('9+: geen favicon in ' + rel); }
+    if (!/<main\b/i.test(s) && !/role="main"/.test(s)) { np++; fout('9+: geen main-landmark in ' + rel); }
+    if (!s.includes('/shared/basis.js')) { np++; fout('9+: basis-laag (shared/basis.js) ontbreekt in ' + rel); }
+    const gids = appgids.gidsVan('/' + rel);
+    if (!gids || gids.algemeen) { np++; fout('9+: geen eigen app-gids voor /' + rel + ' (vul kern/appgids.js aan)'); }
+  }
+  if (!np) ok(paginas.length + ' app-pagina\'s voldoen aan de 9+-basis (taal, viewport, titel, favicon, landmark, basis-laag, eigen gids)');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

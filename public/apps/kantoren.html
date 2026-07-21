@@ -981,6 +981,7 @@ async function exportLookbook(naam){
     secties+'</div>'+
     '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
     '<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body></html>';
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);

@@ -49,4 +49,44 @@ module.exports = (kern) => {
   app.post('/api/rtf/samen/chat', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.chat(s, req.body.kamercode, req.body.tekst)); });
   app.post('/api/rtf/samen/weg', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.weg(s, req.body.kamercode)); });
   app.post('/api/rtf/samen/staat', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.staat(s, req.body.kamercode)); });
+
+  /* ---- Rahul voor het gezin: de kindveilige vraagbaak op elke RTF-pagina.
+     Antwoordt op het niveau van de leeftijdsgroep, belooft nooit toegang of
+     aankopen, en verwijst bij zware onderwerpen naar een vertrouwde grote.
+     Zonder API-sleutel een warm demo-antwoord; met sleutel echte AI. ---- */
+  const rahulTellers = new Map(); // handle -> [timestamps], simpele uurgrens
+  app.post('/api/rtf/rahul', async (req, res) => {
+    const s = profiel(req, res); if (!s) return;
+    const q = String(req.body.q || '').trim().slice(0, 400);
+    if (!q) return res.status(400).json({ error: 'Stel eerst een vraag.' });
+    const nu = Date.now();
+    const rij = (rahulTellers.get(s.handle) || []).filter(t => nu - t < 3600000);
+    if (rij.length >= 30) return res.status(429).json({ error: 'Even pauze; over een uurtje kan Rahul weer verder met je.' });
+    rij.push(nu); rahulTellers.set(s.handle, rij);
+    if (rahulTellers.size > 5000) rahulTellers.delete(rahulTellers.keys().next().value);
+    const { anthropic } = kern;
+    if (anthropic) {
+      try {
+        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 350,
+          system: 'Je bent Rahul, de vriendelijke hulp in de RTFoundation-gezinsapp. Antwoord kort, warm en kindveilig. ' +
+            'Regels: beloof nooit toegang, aankopen of afspraken; alles in de app is gratis. Bij zware onderwerpen (verdriet, pesten, onveilig thuis) ' +
+            'wijs je liefdevol naar een vertrouwde volwassene en naar de Steun- of Veilig-pagina in de app. Geen medisch of juridisch advies. ' +
+            (rtf.leeftijdInstr ? rtf.leeftijdInstr(s.groep || 'kind') : ''),
+          messages: [{ role: 'user', content: q }] });
+        const uit = (r.content || []).map(b => b.text || '').join('').trim();
+        if (uit) return res.json({ antwoord: uit });
+      } catch (e) { /* val terug op het demo-antwoord */ }
+    }
+    // demoterugval: warm, eerlijk over wat Rahul hier wel en niet kan
+    const laag = q.toLowerCase();
+    let antwoord;
+    if (/verdriet|bang|pest|alleen|onveilig|thuis/.test(laag)) {
+      antwoord = 'Wat goed dat je dit vraagt. Dit is iets om samen met een grote te bekijken die je vertrouwt. In de app staan ook de pagina\'s Steun voor jou en Veilig thuis; daar vind je wie je altijd mag bellen.';
+    } else if (/leren|leer|school|toets|huiswerk|woordjes|rekenen|lezen|studie/.test(laag)) {
+      antwoord = 'Goede vraag! Kijk eens bij Leren of de School-Bibliotheek in de app: daar kun je oefenen op jouw niveau. En onthoud: elke dag een kwartiertje werkt beter dan één keer heel lang.';
+    } else {
+      antwoord = 'Leuk dat je het vraagt! Kijk eens bij de tegels op het startscherm; grote kans dat er een app is die je hierbij helpt. Kom je er niet uit, vraag dan een grote even mee te kijken.';
+    }
+    res.json({ antwoord, demo: true });
+  });
 };

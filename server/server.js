@@ -2457,6 +2457,10 @@ require('./routes/voorspel')(kern);
 require('./routes/synergie')(kern);
 require('./routes/balans')(kern);
 require('./routes/account')(kern);
+/* De app-gids (kern/appgids.js): de leerlaag achter het ?-knopje dat de
+   gedeelde basis-laag op elke app-pagina zet; openbare uitleg, geen data. */
+kern.appgids = require('./kern/appgids');
+require('./routes/gids')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

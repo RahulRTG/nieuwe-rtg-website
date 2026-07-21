@@ -65,7 +65,7 @@
   <div class="status"><span class="dot" id="liveDot"></span><span id="liveTxt">verbinden…</span> · <span id="bewaard">opgeslagen</span></div>
 </div>
 
-<div class="view">
+<div class="view" role="main">
   <div class="tab aan" id="tab-bord">
     <div class="boardbox"><canvas id="liveBord"></canvas><div class="wachtbord" id="wacht">Zodra de begeleider op het bord schrijft, zie je het hier live.</div></div>
     <button class="knop groen" id="bewaarFoto">📸 Bewaar dit bord in mijn schrift</button>
@@ -215,5 +215,6 @@ window.addEventListener('beforeunload', ()=>{ try{ vangHuidigeTekening(); naviga
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body>
 </html>

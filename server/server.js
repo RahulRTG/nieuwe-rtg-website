@@ -2037,6 +2037,10 @@ kern.lucht.seed();
    incidenten en de AI-wachtcommandant. */
 Object.assign(kern, require('./kern/marechaussee').maakMarechaussee({ db, save, crypto, anthropic }));
 kern.kmar.seed();
+/* De documentenuitgifte (kern/uitgifte.js): officiele documentatie met een
+   druk op de knop overschrijven naar oude apparatuur of een harde schijf,
+   altijd achter het vier- of zes-ogenprincipe (zaak, RTG-kantoor, rijk). */
+Object.assign(kern, require('./kern/uitgifte').maakUitgifte({ db, save, crypto }));
 /* RTG contentbescherming (kern/drm.js): de DRM-route (Encrypted Media
    Extensions, Clear Key door RTG zelf bediend) voor de beschermde media. */
 Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));
@@ -2364,6 +2368,7 @@ require('./routes/gemeente')(kern);
 require('./routes/overheid')(kern);
 require('./routes/luchthaven')(kern);
 require('./routes/marechaussee')(kern);
+require('./routes/uitgifte')(kern);
 require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/bank')(kern);

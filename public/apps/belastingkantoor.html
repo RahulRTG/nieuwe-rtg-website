@@ -77,6 +77,17 @@
       </div>
       <div class="uit" id="aiA">Adviserend, nooit beslissend: elke herinnering, regeling of kwijtschelding blijft uw handtekening.</div>
     </div>
+    <div class="ai" style="border-color:var(--line);background:none;">
+      <h3>🗄️ Documentenuitgifte</h3>
+      <div class="rij" style="margin-top:0;">
+        <select class="veld" id="ugBron"><option value="aanslagen">Alle belastingaanslagen</option><option value="bezwaren">Alle bezwaren</option></select>
+        <select class="veld" id="ugOgen"><option value="4">4 ogen (2 pers.)</option><option value="6">6 ogen (3 pers.)</option></select>
+        <input class="veld" id="ugDoel" placeholder="Doel, bijv. harde schijf archief" style="flex:1;min-width:9rem;">
+        <button class="knop" id="ugStart">⬇ Start</button>
+      </div>
+      <div class="uit" style="margin-top:.3rem;">Naar oude apparatuur of een harde schijf, altijd met het vier- of zes-ogenprincipe: een andere ambtenaar logt in en tekent mee. De bundel komt een keer vrij.</div>
+      <div id="ugLijst"></div>
+    </div>
     <div class="tabs" id="tabs"></div>
     <section class="paneel" id="p-sig"></section>
     <section class="paneel" id="p-aan">
@@ -128,7 +139,7 @@ function toon(t){
 function start(){
   $('#tabs').innerHTML = TABS.map(([t,n]) => '<button class="tab" data-t="'+t+'">'+n+'</button>').join('');
   $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => toon(b.dataset.t)));
-  laadCockpit(); toon('sig');
+  laadCockpit(); toon('sig'); laadUitgifte();
 }
 
 async function laadCockpit(){
@@ -193,6 +204,35 @@ $('#aiK').addEventListener('click', async () => {
   catch(e){ $('#aiA').textContent = e.message; }
 });
 $('#aiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#aiK').click(); });
+
+/* De documentenuitgifte (4/6-ogen): starten, meetekenen door een ANDERE
+   ambtenaar (log als collega in), en de bundel als download naar de schijf. */
+async function laadUitgifte(){
+  try {
+    const r = await api('/api/overheid/uitgifte');
+    $('#ugLijst').innerHTML = (r.uitgiften||[]).slice(0,5).map(u =>
+      '<div class="item" style="margin-top:.5rem;"><h4>'+esc(u.code)+' · '+esc(u.bronLabel)+' <small style="color:var(--soft);font-family:Inter;">'+u.ogen+' ogen · '+esc(u.doel)+'</small></h4>'+
+      '<div class="meta">Getekend: '+u.handtekeningen.map(h=>esc(h.door)).join(' + ')+'</div>'+
+      '<div class="rij">'+
+      (u.status==='wacht-op-ogen' ? '<button class="knop stil" data-ugt="'+u.id+'">✍ Teken mee (nog '+u.nogNodig+')</button>'
+        : u.status==='vrijgegeven' ? '<button class="knop" data-ugd="'+u.id+'">⬇ Overschrijven naar de schijf</button>'
+        : '<span class="status ok">overgeschreven</span>')+'</div></div>').join('') || '';
+    $('#ugLijst').querySelectorAll('[data-ugt]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/overheid/uitgifte/teken', { id: b.dataset.ugt }); meld('Getekend.'); laadUitgifte(); } catch(e){ meld(e.message); } }));
+    $('#ugLijst').querySelectorAll('[data-ugd]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await api('/api/overheid/uitgifte/bundel', { id: b.dataset.ugd });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([d.blad], { type: 'text/plain' }));
+        a.download = d.bestandsnaam; a.click(); URL.revokeObjectURL(a.href);
+        meld('Overgeschreven; sla het bestand op de schijf op.'); laadUitgifte();
+      } catch(e){ meld(e.message); } }));
+  } catch(e){ /* nog niet ingelogd */ }
+}
+$('#ugStart').addEventListener('click', async () => {
+  try { await api('/api/overheid/uitgifte/start', { bron: $('#ugBron').value, ogen: Number($('#ugOgen').value), doel: $('#ugDoel').value });
+    meld('Uitgifte gestart; een andere ambtenaar tekent mee.'); laadUitgifte(); } catch(e){ meld(e.message); }
+});
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 </body>

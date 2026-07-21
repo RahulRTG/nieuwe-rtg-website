@@ -87,7 +87,8 @@ function betaalBoekingVoor(session, body) {
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
     orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor };
-  const { plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor } = require('./lidacties/bestellen')(ctx);
+  const { plaatsOrderVoor, betaalOrderVoor } = require('./lidacties/bestellen')(ctx);
+  const { rekeningVoor, betaalRekeningVoor } = require('./lidacties/rekening')(ctx);
   const { vraagRitVoor, betaalRitVoor } = require('./lidacties/ritten')(ctx);
 
   return { plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, koopTicketVoor, betaalBoekingVoor, vraagRitVoor, betaalRitVoor };

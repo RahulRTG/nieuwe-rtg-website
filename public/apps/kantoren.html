@@ -980,7 +980,8 @@ async function exportLookbook(naam){
     '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
     secties+'</div>'+
     '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
-    '</body></html>';
+    '<script src="/shared/metgezel.js" defer></script>
+</body></html>';
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
@@ -1172,7 +1173,8 @@ async function exportProductblad(naam){
     '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
     secties+'</div>'+
     '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
-    '</body></html>';
+    '<script src="/shared/metgezel.js" defer></script>
+</body></html>';
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
@@ -1345,7 +1347,8 @@ async function exportPortfolio(naam){
     '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
     secties+'</div>'+
     '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
-    '</body></html>';
+    '<script src="/shared/metgezel.js" defer></script>
+</body></html>';
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
@@ -2170,5 +2173,6 @@ else uitgelogd();
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/accounts-os.js" defer></script>
 <script src="/shared/osbar.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

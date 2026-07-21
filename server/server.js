@@ -2408,6 +2408,10 @@ require('./routes/leren')(kern);
    gratis via de RTFoundation, met de leeftijdspoort van het profiel. */
 Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
 require('./routes/rtfbieb')(kern);
+/* Samen (kern/samen.js): met vrienden meekijken en samen doen door het hele
+   leden-OS; kamers op code, live seintjes via de SSE-stroom. */
+Object.assign(kern, require('./kern/samen')({ db, save, crypto, sseToCustomer, schoon }));
+require('./routes/samen')(kern);
 require('./routes/baby')(kern);
 require('./routes/tiener')(kern);
 /* De zelfzorg (kern/zelfzorg): de code ruimt zichzelf op, beschermt zichzelf,

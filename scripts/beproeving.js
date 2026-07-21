@@ -223,6 +223,17 @@ async function heapNaGc(pid) {
   }
   return laagst === Infinity ? null : laagst;
 }
+/* Poortwacht: antwoordt er AL iets op de poort voordat wij onze server starten,
+   dan is dat een achtergebleven server van een eerdere (afgebroken) run. Onze
+   eigen server crasht dan stil op de bezette poort terwijl de ready-poll het
+   antwoord van die oude, door een eerdere storm mishandelde server krijgt --
+   en dan toetst de hele beproeving de verkeerde server. Hard weigeren dus. */
+async function poortVrij() {
+  const r = await verzoek('GET', '/api/ready', null, null, 2000).catch(() => ({ status: 0 }));
+  if (r && r.status > 0) {
+    throw new Error('poort ' + PORT + ' is al bezet (waarschijnlijk een achtergebleven server van een eerdere run). Ruim die eerst op, bijv.: pkill -f "gc-hook.js"');
+  }
+}
 function boot() {
   return new Promise((resolve, reject) => {
     const logfd = fs.openSync(SRVLOG, 'a');
@@ -461,6 +472,7 @@ async function misbruikBeproeving(tok) {
   const dekking = new Map(routes.map(r => [r.method + ' ' + r.pad, 0]));
   rij('endpoints uit de bron', nl(routes.length));
   if (MODE === 'postgres') rij('psql', PSQL);
+  await poortVrij(); // nooit per ongeluk een oude, achtergebleven server toetsen
 
   // ---------- FASE A: VOLUME ----------
   kop('FASE A: VOLUME (' + MODE + ')');

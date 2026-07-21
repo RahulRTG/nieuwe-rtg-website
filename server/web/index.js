@@ -58,11 +58,13 @@ function maakApp() {
   };
 
   app.listen = function (...args) {
-    // Standaard op node:http (kern, veilig). Met RTG_EIGEN_HTTP=1 draait de app
-    // op onze eigen HTTP/1.1-motor (server/lib/http1.js) op rauwe sockets.
-    const server = process.env.RTG_EIGEN_HTTP === '1'
-      ? require('../lib/http1').maakServer(app)
-      : http.createServer(app);
+    // Standaard op node:http (kern, veilig). Opt-in motoren:
+    //   RTG_EIGEN_HTTP2=1 -> onze HTTP/2-listener (node:http2, multiplexing+HPACK)
+    //   RTG_EIGEN_HTTP=1  -> onze eigen HTTP/1.1-motor op rauwe sockets
+    let server;
+    if (process.env.RTG_EIGEN_HTTP2 === '1') server = require('../lib/http2').maakServer(app);
+    else if (process.env.RTG_EIGEN_HTTP === '1') server = require('../lib/http1').maakServer(app);
+    else server = http.createServer(app);
     return server.listen(...args);
   };
   return app;

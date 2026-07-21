@@ -14,8 +14,14 @@ function limietBytes(v) {
 }
 
 function heeftBody(req) {
-  return (req.headers['transfer-encoding'] != null) ||
-    (req.headers['content-length'] != null && req.headers['content-length'] !== '0');
+  if (req.headers['transfer-encoding'] != null) return true;
+  if (req.headers['content-length'] != null && req.headers['content-length'] !== '0') return true;
+  // HTTP/2 draagt de body in DATA-frames, zonder content-length of transfer-
+  // encoding op de header. Ga daar bij een methode die een body mag hebben uit
+  // van een mogelijke body; leesBody levert netjes leeg op als er niets komt.
+  const major = req.httpVersionMajor || (req.httpVersion ? parseInt(req.httpVersion, 10) : 1);
+  if (major >= 2) { const m = String(req.method || '').toUpperCase(); return m !== 'GET' && m !== 'HEAD'; }
+  return false;
 }
 function typeMatcht(req, type) {
   if (typeof type === 'function') return !!type(req);

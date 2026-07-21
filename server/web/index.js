@@ -7,6 +7,7 @@ const { maakRouter, padNaar } = require('./routing');
 const { verrijk } = require('./verrijk');
 const { json, raw } = require('./body');
 const { statisch } = require('./bestanden');
+const rtgjson = require('../lib/rtgjson');
 
 function maakApp() {
   const router = maakRouter();
@@ -49,7 +50,7 @@ function maakApp() {
         if (res.headersSent) return res.destroy();
         res.statusCode = (err && err.status) || 500;
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        return res.end(JSON.stringify({ error: 'Interne fout.' }));
+        return res.end(rtgjson.stringify({ error: 'Interne fout.' }));
       }
       if (res.headersSent) return;
       res.statusCode = 404; res.setHeader('Content-Type', 'text/plain; charset=utf-8'); res.end('Not Found');

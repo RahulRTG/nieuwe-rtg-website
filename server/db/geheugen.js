@@ -30,6 +30,7 @@
    praat alleen met db.data en save(), net als bij json/sqlite/postgres.
    ============================================================================ */
 const fs = require('fs');
+const rtgjson = require('../lib/rtgjson');
 const path = require('path');
 const crypto = require('crypto');
 const state = require('./state');
@@ -81,7 +82,7 @@ let generatie = 0;
 
 /* ---------- laden ---------- */
 function leesManifest(bestand) {
-  try { return JSON.parse(ontsleutel(fs.readFileSync(bestand))); }
+  try { return rtgjson.parse(ontsleutel(fs.readFileSync(bestand)), { maxDiepte: 512 }); }
   catch (e) { return null; }
 }
 // Bouw de datastore die een manifest beschrijft; elke brok wordt geverifieerd
@@ -98,7 +99,7 @@ function assembleer(man) {
       catch (e) {}
     }
     if (goed == null) return null;               // deze generatie is niet compleet
-    try { uit[key] = JSON.parse(goed); } catch (e) { return null; }
+    try { uit[key] = rtgjson.parse(goed, { maxDiepte: 512 }); } catch (e) { return null; }
   }
   return uit;
 }
@@ -112,7 +113,7 @@ function laadGeheugen() {
   console.warn('[geheugen] geen leesbare generatie gevonden; de opslag start opnieuw op.');
   return null;
 }
-function herbouwSha(man, d) { laatsteSha = {}; for (const key of Object.keys(man.keys)) { try { laatsteSha[key] = sha(JSON.stringify(d[key])); } catch (e) {} } }
+function herbouwSha(man, d) { laatsteSha = {}; for (const key of Object.keys(man.keys)) { try { laatsteSha[key] = sha(rtgjson.stringify(d[key])); } catch (e) {} } }
 
 /* ---------- schrijven ---------- */
 function schrijfBrokAtomisch(key, tekst) {
@@ -130,7 +131,7 @@ function schrijfGeheugenNu() {
   let geschreven = 0;
   for (const key of nieuweKeys) {
     let tekst;
-    try { tekst = JSON.stringify(db.data[key]); }
+    try { tekst = rtgjson.stringify(db.data[key]); }
     catch (e) {
       // een enkele collectie te groot voor één string: bewaar de vorige brok,
       // waarschuw, en ga door (de rest van de database blijft wél duurzaam).
@@ -154,7 +155,7 @@ function schrijfGeheugenNu() {
   // het manifest als LAATSTE (commit-punt); de vorige blijft als .bak voor rollback
   try { if (fs.existsSync(MANIFEST)) fs.renameSync(MANIFEST, MANIFEST + '.bak'); } catch (e) {}
   generatie++;
-  schrijfDuurzaam(MANIFEST, versleutel(JSON.stringify({ v: 1, generatie, at: Date.now(), keys: manKeys })), 0o600);
+  schrijfDuurzaam(MANIFEST, versleutel(rtgjson.stringify({ v: 1, generatie, at: Date.now(), keys: manKeys })), 0o600);
   saveDuur = Date.now() - (saveT0 || Date.now());
   saveKlaar = Date.now();
   return geschreven;

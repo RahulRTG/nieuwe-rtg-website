@@ -16,6 +16,7 @@
    index + grootboek). Hier de load/save-orchestratie, de write-behind snapshot,
    de Redis-mirror en het samenstellen van de publieke API. */
 const fs = require('fs');
+const rtgjson = require('../lib/rtgjson');
 const seed = require('../seed');
 const kluis = require('../kluis'); // versleuteling-at-rest (met RTG_ENC_KEY)
 const state = require('./state');
@@ -61,7 +62,7 @@ function load() {
     try { tekst = kluis.ontsleutel(ruw); }
     catch (e) { throw new Error('db.json kan niet ontsleuteld worden; klopt RTG_ENC_KEY? (' + e.message + ')'); }
     try {
-      db.data = JSON.parse(tekst);
+      db.data = rtgjson.parse(tekst, { maxDiepte: 512 });
     } catch (e) {
       // corrupte db.json (bijv. na een stroomstoring midden in een schrijf):
       // val terug op de nieuwste backup in plaats van met lege data te starten.
@@ -108,7 +109,7 @@ function schrijfSnapshotNu() {
   try {
     beslotenMap(DATA_DIR);
     // compact (geen pretty-print): bij grote data scheelt dat ~40% tijd en ruimte
-    const uit = kluis.AAN ? kluis.versleutel(JSON.stringify(db.data)) : JSON.stringify(db.data);
+    const uit = kluis.AAN ? kluis.versleutel(rtgjson.stringify(db.data)) : rtgjson.stringify(db.data);
     schrijfDuurzaam(DB_FILE, uit, 0o600);
     besloten(DB_FILE);
     if (STORE !== 'postgres') redis.spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis

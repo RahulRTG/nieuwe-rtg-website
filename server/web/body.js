@@ -1,6 +1,8 @@
 /* web, deel "body": de body-parsers (web.json / web.raw) met limiet en type-
-   match, plus de byte-limiet-helper. Puur op de request-stream; geen requires. */
+   match, plus de byte-limiet-helper. De JSON zelf gaat door onze eigen motor
+   (../lib/rtgjson): strikte spec-parser met diepte-grens en __proto__-schild. */
 'use strict';
+const rtgjson = require('../lib/rtgjson');
 
 function limietBytes(v) {
   if (v == null) return Infinity;
@@ -44,7 +46,7 @@ function json(opts) {
       req._body = true;
       const s = buf.toString('utf8').trim();
       if (!s) { req.body = {}; return next(); }
-      try { req.body = JSON.parse(s); } catch (e) { e.status = 400; e.type = 'entity.parse.failed'; return next(e); }
+      try { req.body = rtgjson.parse(s); } catch (e) { e.status = 400; e.type = 'entity.parse.failed'; return next(e); }
       next();
     });
   };

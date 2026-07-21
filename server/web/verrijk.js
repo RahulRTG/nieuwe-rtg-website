@@ -5,6 +5,7 @@
 const fs = require('fs');
 const { padNaar } = require('./routing');
 const { stuurBestand, MIME } = require('./bestanden');
+const rtgjson = require('../lib/rtgjson');
 
 function verrijk(req, res, instellingen) {
   const trustProxy = !!(instellingen && instellingen['trust proxy']);
@@ -41,7 +42,7 @@ function verrijk(req, res, instellingen) {
   res.type = (t) => { res.setHeader('Content-Type', t.indexOf('/') === -1 ? (MIME['.' + t.replace(/^\./, '')] || t) : t); return res; };
   res.json = function (obj) {
     if (!res.getHeader('Content-Type')) res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.end(JSON.stringify(obj));
+    res.end(rtgjson.stringify(obj));
     return res;
   };
   res.send = function (body) {

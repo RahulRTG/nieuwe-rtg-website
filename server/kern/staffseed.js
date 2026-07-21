@@ -79,6 +79,9 @@ const STAFF_SEED = {
   // de kinderopvang: de locatiemanager, de groepen en de nanny-coordinatie
   NIDO: [['Hanna Vos', 'manager', 'Locatiemanager'], ['Ines Duran', 'staff', 'Pedagogisch medewerker'],
     ['Selma Brik', 'staff', 'Nanny-coordinator']],
+  // de jachthaven: de havenmeester, de steiger, service en de marina-concierge
+  PORTELL: [['Joan Portell', 'manager', 'Havenmeester'], ['Mireia Salas', 'staff', 'Steiger & brandstof'],
+    ['Bas Wolters', 'staff', 'Service & helling'], ['Carla Duran', 'staff', 'Marina-concierge']],
   // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
   GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']],
   // het rijk: een behandelaar (beoordeelt toeslagen/uitkeringen/bezwaren) en een baliemedewerker

@@ -50,7 +50,8 @@
     { code:'FORTIA',  name:'Fortia Club', type:'Fitnessclub', icon:'🏋️', sub:'Sport & fitnessclub · Marina Botafoch' },
     { code:'VELVET',  name:'Velvet & Blade', type:'Beauty-salon', icon:'✂️', sub:'Beauty-salon & barbier · Vara de Rey' },
     { code:'AMICS',   name:'Amics Petcare', type:'Petcare', icon:'🐾', sub:'Pension, uitlaat & trim · Sant Jordi' },
-    { code:'NIDO',    name:'Nido Kinderopvang & Nanny', type:'Kinderopvang', icon:'🧸', sub:'Opvang & nanny-service · Santa Gertrudis' }
+    { code:'NIDO',    name:'Nido Kinderopvang & Nanny', type:'Kinderopvang', icon:'🧸', sub:'Opvang & nanny-service · Santa Gertrudis' },
+    { code:'PORTELL', name:'Marina Portell', type:'Marina', icon:'⚓', sub:'Marina & jachthaven · Marina Botafoch' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -89,6 +90,7 @@
     beautysalon: { label:'RTG Beauty & Barbier', labelEn:'RTG Beauty & Barber', codes:['VELVET'], icon:'✂️' },
     petcare:     { label:'RTG Petcare', labelEn:'RTG Petcare', codes:['AMICS'], icon:'🐾' },
     kinderopvang: { label:'RTG Kinderopvang & Nanny', labelEn:'RTG Childcare & Nanny', codes:['NIDO'], icon:'🧸' },
+    marina:      { label:'RTG Marina', labelEn:'RTG Marina', codes:['PORTELL'], icon:'⚓' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }

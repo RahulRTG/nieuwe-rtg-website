@@ -2511,6 +2511,10 @@ require('./routes/clubs')(kern);
    en de kinderopvang met nanny-service (mens bevestigt, alleen voornamen). */
 Object.assign(kern, require('./kern/verzorging')({ db, save, crypto, schoon }));
 require('./routes/verzorging')(kern);
+/* RTG Marina (kern/marina.js): de jachthaven met ligplaatsen, passanten,
+   de brandstofsteiger, service/helling en de marina-concierge op het water. */
+Object.assign(kern, require('./kern/marina')({ db, save, crypto, schoon }));
+require('./routes/marina')(kern);
 /* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
    bibliotheken en zetten die live op de klas-PDA van de kinderen. */
 Object.assign(kern, require('./kern/lesmaker')({ db, save, crypto, schoon, anthropic, leeftijdInstr: rtf.leeftijdInstr }));

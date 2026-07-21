@@ -21,7 +21,8 @@
     { id:'boerderij', icon:'🚜', nl:'Boerderij', en:'Farm', sub:'Land, kas, dieren en oogst', codes:['CANFERRER'] },
     { id:'creator', icon:'🎬', nl:'Creators', en:'Creators', sub:'Content, planning, samenwerkingen', codes:['LUMINA'] },
     { id:'vracht', icon:'🚢', nl:'Vracht', en:'Freight', sub:'Zendingen, douane, de loods', codes:['TERRAMAR'] },
-    { id:'gebouw', icon:'🏢', nl:'Kantoorgebouw', en:'Office tower', sub:'Receptie, facilitair, concierge (Zuidas)', codes:['MERIDIAAN'] }
+    { id:'gebouw', icon:'🏢', nl:'Kantoorgebouw', en:'Office tower', sub:'Receptie, facilitair, concierge (Zuidas)', codes:['MERIDIAAN'] },
+    { id:'marina', icon:'⚓', nl:'Marina', en:'Marina', sub:'Steiger, brandstof, service, concierge', codes:['PORTELL'] }
   ];
   const BEDRIJVEN = {
     KIKUNOI:{ name:'Sal de Mar', icon:'🍽️' }, PONTO:{ name:'Sunset Ibiza', icon:'🍸' },
@@ -44,7 +45,8 @@
     ZENITH:{ name:'Zenith Spa & Wellness', icon:'🧖' }, CLARA:{ name:'Kliniek Clara Ibiza', icon:'🩺' },
     LIENZO:{ name:'Galeria Lienzo', icon:'🖼️' },
     TERRAMAR:{ name:'TerraMar Cargo', icon:'🚢' },
-    MERIDIAAN:{ name:'Meridiaan Toren', icon:'🏢' }
+    MERIDIAAN:{ name:'Meridiaan Toren', icon:'🏢' },
+    PORTELL:{ name:'Marina Portell', icon:'⚓' }
   };
 
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
@@ -109,6 +111,57 @@
     doe('data-pgvk', ds => ({ pad: '/supplier/gebouw/valet/status', data: { id: ds.pgvk, status: 'klaar' } }));
     doe('data-pgjb', ds => ({ pad: '/supplier/gebouw/jetset/status', data: { id: ds.pgjb, status: 'bevestigd' } }));
     doe('data-pgja', ds => ({ pad: '/supplier/gebouw/jetset/status', data: { id: ds.pgja, status: 'afgerond' } }));
+  }
+
+  // ---- de marina op zak: steiger, brandstof, service en de concierge ----
+  let pdMar = null;
+  const heeftMarina = () => !!(state && state.supplier && (state.supplier.caps || []).includes('marina'));
+  async function laadMarinaPda(){
+    if (!heeftMarina()) return;
+    try { pdMar = await API.call('/supplier/marina', {}); } catch(e){ pdMar = null; }
+    renderMarinaPda();
+  }
+  function renderMarinaPda(){
+    const tabBtn = document.getElementById('tabMarina');
+    if (tabBtn) tabBtn.style.display = heeftMarina() ? '' : 'none';
+    const wrap = $('#marinaPdaWrap'); if (!wrap) return;
+    if (!heeftMarina()){ wrap.innerHTML = ''; return; }
+    if (!pdMar){ wrap.innerHTML = '<div class="card">…</div>'; laadMarinaPda(); return; }
+    const d = pdMar;
+    const SVC = { hijs: 'Hijskraan', helling: 'Hellingbaan', onderhoud: 'Onderhoud', schoonmaak: 'Schoonmaak' };
+    const CON = { tender: 'Tender', catering: 'Catering aan boord', crew: 'Crew voor een dag', 'charter-transfer': 'Charter-transfer' };
+    let html = '';
+    // de steiger: bezetting in een oogopslag
+    const vrij = (d.ligplaatsen||[]).filter(p => !p.boot);
+    html += '<div class="card"><div class="k">'+T('pd.mr.steiger','De steiger')+' ('+d.kpi.bezet+' van '+d.kpi.ligplaatsen+')</div>'+
+      '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+(vrij.length ? T('pd.mr.vrij','Vrij:')+' '+vrij.map(p=>p.id+' (tot '+p.lengteMax+' m)').join(' · ') : T('pd.mr.vol','De haven ligt vol.'))+'</div></div>';
+    // de brandstofsteiger
+    const tanken = (d.brandstof||[]).filter(b => b.status === 'gevraagd');
+    html += '<div class="card"><div class="k">'+T('pd.mr.brand','Brandstof')+' ('+tanken.length+')</div>'+
+      (tanken.length ? tanken.map(b => '<div class="task"><div class="t"><b>'+esc(b.boot)+'</b><span>'+esc(b.soort)+' · '+b.liters+' l</span></div><button class="abtn" data-pmbk="'+b.id+'">'+T('pd.mr.getankt','Getankt')+'</button></div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.mr.geenbrand','Niemand aan de pomp.')+'</div>')+'</div>';
+    // service en de helling
+    const werk = (d.service||[]).filter(s => s.status !== 'klaar');
+    html += '<div class="card"><div class="k">'+T('pd.mr.svc','Service en de helling')+' ('+werk.length+')</div>'+
+      (werk.length ? werk.map(s => '<div class="task"><div class="t"><b>'+esc(s.boot)+'</b><span>'+SVC[s.soort]+' · '+esc(s.wens)+' · '+esc(s.status)+'</span></div>'+
+        (s.status==='open' ? '<button class="abtn" data-pmsb="'+s.id+'">'+T('pd.mr.pak','Pak op')+'</button>' : '<button class="abtn" data-pmsk="'+s.id+'">'+T('pd.mr.klaar','Klaar')+'</button>')+'</div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.mr.geensvc','De werf ligt er netjes bij.')+'</div>')+'</div>';
+    // de marina-concierge
+    const con = (d.concierge||[]).filter(c => c.status !== 'afgerond');
+    html += '<div class="card"><div class="k">'+T('pd.mr.con','Marina-concierge')+' ('+con.length+')</div>'+
+      (con.length ? con.map(c => '<div class="task"><div class="t"><b>'+CON[c.soort]+' · '+esc(c.voorWie)+'</b><span>'+esc(c.wens)+' · '+esc(c.moment)+' · '+esc(c.status)+'</span></div>'+
+        (c.status==='aangevraagd' ? '<button class="abtn" data-pmcb="'+c.id+'">'+T('pd.mr.bevestig','Bevestig')+'</button>' : '<button class="abtn" data-pmca="'+c.id+'">'+T('pd.mr.afgerond','Afgerond')+'</button>')+'</div>').join('')
+        : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.mr.geencon','Geen open verzoeken.')+'</div>')+'</div>';
+    wrap.innerHTML = html;
+    const doe = (sel, body) => wrap.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
+      const { pad, data } = body(b.dataset);
+      try { await API.call(pad, data); laadMarinaPda(); } catch(e){ toast(e.message); }
+    }));
+    doe('data-pmbk', ds => ({ pad: '/supplier/marina/brandstof/klaar', data: { id: ds.pmbk } }));
+    doe('data-pmsb', ds => ({ pad: '/supplier/marina/service/status', data: { id: ds.pmsb, status: 'bezig' } }));
+    doe('data-pmsk', ds => ({ pad: '/supplier/marina/service/status', data: { id: ds.pmsk, status: 'klaar' } }));
+    doe('data-pmcb', ds => ({ pad: '/supplier/marina/concierge/status', data: { id: ds.pmcb, status: 'bevestigd' } }));
+    doe('data-pmca', ds => ({ pad: '/supplier/marina/concierge/status', data: { id: ds.pmca, status: 'afgerond' } }));
   }
 
 
@@ -448,7 +501,7 @@
     // de moedertaal van dit personeelslid: het hele scherm en de taken volgen
     if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), renderAll);
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderGebouwPda(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderGebouwPda(); renderMarinaPda(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
 
   /* ---- Borden: hetzelfde werkbord als in de leverancier-app (shared/borden.js) ---- */
   let pdBordenUI = null;

@@ -83,6 +83,26 @@
       <h2 style="font-size:1.05rem;">Het journaal van de AI</h2>
       <div class="journaal" id="journaal"><div>Laden…</div></div>
     </div>
+
+    <div class="kaart">
+      <div class="rij" style="justify-content:space-between;">
+        <h2 style="font-size:1.05rem;">De Onderzoeker · de tweede AI</h2>
+        <span class="fase meelezen" id="oFase">…</span>
+      </div>
+      <p class="stil" style="margin:.4rem 0 .6rem;">De RTG AI bouwt deze tweede AI zelf, met zijn meelees-kennis als leerstof. Af? Dan werkt de Onderzoeker agentisch: een vraag wordt een plan, het plan een reeks stappen langs de bronnen, en de reeks een rapport. Hij leest alleen en adviseert alleen; wat er met een rapport gebeurt, beslist u.</p>
+      <div class="rij">
+        <button class="knop stil2" id="oBouw">Bouwstap door de RTG AI</button>
+        <span class="stil" id="oBouwUit"></span>
+      </div>
+      <div class="rij" style="margin-top:.8rem;">
+        <input class="veld" id="oVraag" maxlength="160" placeholder="Onderzoeksvraag (bijv. hoe lopen de vrachtstromen?)" style="flex:1;min-width:12rem;">
+        <button class="knop" id="oGo" disabled>Start onderzoek</button>
+      </div>
+      <div id="oRapport" class="journaal"></div>
+      <div class="regel">Vaste regel: de Onderzoeker verandert nooit iets in het systeem. Hij verzamelt, analyseert en rapporteert; beslissen blijft mensenwerk.</div>
+      <h2 style="font-size:.95rem;margin-top:.9rem;">Eerdere rapporten en het bouwlogboek</h2>
+      <div class="journaal" id="oLog"><div>Laden…</div></div>
+    </div>
   </section>
 </main>
 <script>
@@ -95,7 +115,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, { method:'POST', headers:
 function start(){
   $('#vLogin').hidden = !!TOKEN;
   $('#vAi').hidden = !TOKEN;
-  if (TOKEN) { ververs(); }
+  if (TOKEN) { ververs(); verversO(); }
 }
 $('#lGo').addEventListener('click', async () => {
   $('#lFout').textContent = '';
@@ -127,10 +147,45 @@ async function ververs(){
   $('#journaal').innerHTML = (S.journaal || []).map(j =>
     '<div class="'+esc(j.soort)+'"><span style="color:var(--soft);">'+new Date(j.at).toLocaleTimeString('nl-NL')+'</span> · '+esc(j.tekst)+'</div>').join('') || '<div>De AI leest rustig mee; het journaal vult zich vanzelf.</div>';
 }
+/* ---- de Onderzoeker: de tweede AI, gebouwd door de eerste ---- */
+let O = null;
+async function verversO(){
+  try { O = await api('onderzoeker'); } catch(e){ return; }
+  const klaar = O.fase === 'onderzoeksklaar';
+  const f = $('#oFase');
+  f.className = 'fase ' + (klaar ? 'klaar' : 'meelezen');
+  f.textContent = klaar ? '🔍 Onderzoeksklaar' : '🛠 In ontwikkeling';
+  $('#oBouw').disabled = klaar;
+  $('#oBouwUit').textContent = klaar ? 'af: alle ' + O.bouwplan + ' bouwstappen gedaan' : 'bouwstap ' + O.bouwstappen + ' van ' + O.bouwplan;
+  $('#oGo').disabled = !klaar;
+  $('#oLog').innerHTML = (O.rapporten || []).map(r =>
+    '<div><button class="oOpen" data-id="'+esc(r.id)+'" style="background:none;border:none;color:var(--gold);cursor:pointer;font:inherit;padding:0;">'+new Date(r.gestart).toLocaleTimeString('nl-NL')+' · '+esc(r.vraag)+'</button> <span style="color:var(--soft);">('+r.stappen+' stappen)</span></div>').join('') +
+    (O.logboek || []).map(j => '<div class="'+esc(j.soort)+'"><span style="color:var(--soft);">'+new Date(j.at).toLocaleTimeString('nl-NL')+'</span> · '+esc(j.tekst)+'</div>').join('') || '<div>De Onderzoeker wacht op zijn eerste bouwstap.</div>';
+  document.querySelectorAll('.oOpen').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('onderzoeker/rapport', { id: b.dataset.id }); toonRapport(r.rapport); } catch(e){ alert(e.message); }
+  }));
+}
+function toonRapport(r){
+  $('#oRapport').innerHTML = '<div class="klaar" style="border-top:none;">Rapport · '+esc(r.vraag)+'</div>' +
+    r.stappen.filter(st => st.soort !== 'analyse').map(st => '<div><b style="color:var(--soft);">stap '+st.nr+' · '+esc(st.soort)+'</b> · '+esc(st.tekst)+'</div>').join('') +
+    '<div><b style="color:var(--soft);">de analyse</b> · '+esc(r.analyse)+'</div>' +
+    '<div class="roer">'+esc(r.advies)+'</div>';
+}
+$('#oBouw').addEventListener('click', async () => { try { await api('onderzoeker/ontwikkel'); verversO(); ververs(); } catch(e){ alert(e.message); } });
+$('#oGo').addEventListener('click', async () => {
+  const vraag = $('#oVraag').value.trim(); if (!vraag) return;
+  $('#oGo').disabled = true;
+  $('#oRapport').innerHTML = '<div>De Onderzoeker werkt zijn stappen af…</div>';
+  try { const r = await api('onderzoeker/onderzoek', { vraag }); toonRapport(r.rapport); $('#oVraag').value = ''; }
+  catch(e){ $('#oRapport').innerHTML = '<div>'+esc(e.message)+'</div>'; }
+  verversO();
+});
+
 $('#kRoer').addEventListener('click', async () => { try { await api('rtgai/roer/geef'); ververs(); } catch(e){ alert(e.message); } });
 $('#kTerug').addEventListener('click', async () => { try { await api('rtgai/roer/terug'); ververs(); } catch(e){ alert(e.message); } });
 $('#kTrain').addEventListener('click', async () => { try { await api('rtgai/train'); ververs(); } catch(e){ alert(e.message); } });
 setInterval(() => { if (TOKEN) ververs(); }, 3000);
+setInterval(() => { if (TOKEN) verversO(); }, 6000);
 start();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>

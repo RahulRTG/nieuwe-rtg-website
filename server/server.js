@@ -2454,6 +2454,9 @@ kern.zelfzorg.autoStart();
 Object.assign(kern, require('./kern/rtgai')({ db, save, zelfzorgVan: () => kern.zelfzorg }));
 rtgaiMeelezer = kern.rtgai;
 kern.rtgai.autoStart();
+/* De Onderzoeker (kern/rtgonderzoeker.js): de tweede AI van het RTG Kantoor,
+   door de RTG AI gebouwd; doet agentisch onderzoek en adviseert alleen. */
+Object.assign(kern, require('./kern/rtgonderzoeker')({ db, save, crypto, schoon, anthropic }));
 require('./routes/rtgkantoor')(kern);
 require('./routes/kantoren')(kern);
 require('./routes/gemeente')(kern);

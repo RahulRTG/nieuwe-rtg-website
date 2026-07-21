@@ -6,7 +6,12 @@ module.exports = (kern) => {
     notify, voorkeurVan, zetVoorkeur, retailCatalogus, wishlistToggle,
     mijnApart, mijnStyling, vraagPaskamer, retailIsRetail, PASPOORT_NIVEAUS,
     paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn, mall, foodcourt,
-    reisbureau, logies, uitgaan, appbieb } = kern;
+    reisbureau, logies, uitgaan, appbieb, reisbieb } = kern;
+// de bibliotheken zijn voor BETALENDE leden: de gratis gast-app blijft erbuiten
+const geenGast = (req, res) => {
+  if (req.session.tier === 'guest') { res.status(403).json({ error: 'De bibliotheken zijn voor betalende leden. Word lid en alles is inbegrepen.' }); return true; }
+  return false;
+};
 
 /* ---- de RTG Food Court: alle restaurants op een rij, reserveren met tijdsloten ---- */
 // het overzicht van de restaurants (keuken, prijs, ledenvoordeel)
@@ -44,25 +49,45 @@ app.post('/api/mall/land-bestel', auth, (req, res) => {
   res.json(r);
 });
 
-/* ---- de App-Bibliotheek: 20.000 professionele apps, inbegrepen bij de pas ---- */
+/* ---- de App-Bibliotheek: 20.000 professionele apps, inbegrepen bij de pas.
+   Alleen voor betalende leden: ook bladeren is een pas-voordeel. ---- */
 // het overzicht: categorieën, totaal en de totale winkelwaarde
-app.post('/api/mall/apps', auth, (req, res) => res.json(appbieb.overzicht()));
+app.post('/api/mall/apps', auth, (req, res) => { if (geenGast(req, res)) return; res.json(appbieb.overzicht()); });
 // bladeren en zoeken (gepagineerd; de catalogus wordt ter plekke samengesteld)
-app.post('/api/mall/apps/catalogus', auth, (req, res) => res.json(appbieb.catalogus(req.body || {})));
+app.post('/api/mall/apps/catalogus', auth, (req, res) => { if (geenGast(req, res)) return; res.json(appbieb.catalogus(req.body || {})); });
 // installeren en verwijderen: het lid beslist, de pas dekt de prijs (0)
 app.post('/api/mall/apps/installeer', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'De App-Bibliotheek is voor leden.' });
+  if (geenGast(req, res)) return;
   const r = appbieb.installeer(req.session.key, req.body.id);
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
 app.post('/api/mall/apps/weg', auth, (req, res) => {
+  if (geenGast(req, res)) return;
   const r = appbieb.verwijder(req.session.key, req.body.id);
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
 // mijn geïnstalleerde apps
-app.post('/api/mall/apps/mijn', auth, (req, res) => res.json({ apps: appbieb.mijnApps(req.session.key) }));
+app.post('/api/mall/apps/mijn', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ apps: appbieb.mijnApps(req.session.key) }); });
+
+/* ---- de Reis-Bibliotheek: een miljoen reisgidsen van Londen tot Gaza,
+   nuttig, exclusief en educatief; alleen voor betalende leden ---- */
+app.post('/api/mall/reis', auth, (req, res) => { if (geenGast(req, res)) return; res.json(reisbieb.overzicht()); });
+app.post('/api/mall/reis/catalogus', auth, (req, res) => { if (geenGast(req, res)) return; res.json(reisbieb.catalogus(req.body || {})); });
+app.post('/api/mall/reis/installeer', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const r = reisbieb.installeer(req.session.key, req.body.id);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/mall/reis/weg', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const r = reisbieb.verwijder(req.session.key, req.body.id);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/mall/reis/mijn', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ apps: reisbieb.mijnApps(req.session.key) }); });
 
 /* ---- de losse verblijf-pagina: hotels, appartementen en villa's ---- */
 // het overzicht van de overnachters met hun vrije kamers; boeken gaat via /api/verblijf

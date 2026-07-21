@@ -2030,6 +2030,9 @@ Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail
 /* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,
    elk rond de duizend euro winkelwaarde, voor leden inbegrepen bij de pas. */
 Object.assign(kern, require('./kern/appbieb').maakAppbieb({ db, save }));
+/* De Reis-Bibliotheek (kern/reisbieb): een miljoen reisgidsen van over de
+   hele wereld, van Londen tot Gaza; alleen voor betalende leden. */
+Object.assign(kern, require('./kern/reisbieb').maakReisBieb({ db, save }));
 /* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
    tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */

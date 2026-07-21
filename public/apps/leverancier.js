@@ -4815,7 +4815,8 @@
     try {
       const d = await API.call('/supplier/pos/sale', body);
       bon = {};
-      toast(T('pos.done','Afgerekend:')+' '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+'), '+T('pos.bonnr','bon')+' '+d.sale.bon);
+      toast(T('pos.done','Afgerekend:')+' '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+'), '+T('pos.bonnr','bon')+' '+d.sale.bon+
+        (d.sale.betaaldienstKosten ? ' · '+T('pos.kosten','betaaldienst')+' '+eur(d.sale.betaaldienstKosten/100)+' '+T('pos.kostendirect','direct verrekend') : ''));
       await refresh(); openTab('kassa');
     } catch(e){ toast(e.message); }
   }

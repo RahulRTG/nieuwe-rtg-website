@@ -72,6 +72,10 @@ module.exports = (ctx) => {
     if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Partnervergoeding ' + (r.code || r.genre) + ' gezet op ' + (r.rate * 100).toFixed(1) + '%');
     return r;
   }));
+  // de betaaldienst: het tarief dat per kassabetaling DIRECT met de zaak wordt verrekend
+  app.post('/api/office/geld/betaaldienst', officeAuth, (req, res) => veilig(res, () =>
+    (req.body && (req.body.vastCenten != null || req.body.pct != null))
+      ? kern.geldBetaaldienstZet(req.body) : { status: 200, ok: true, ...kern.geldBetaaldienst() }));
   app.post('/api/office/geld/korting', officeAuth, (req, res) => veilig(res, () => {
     const r = geldKortingZet(req.body || {});
     if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Ledenvoordeel ' + r.genre + ' gezet op ' + r.pct + '%');

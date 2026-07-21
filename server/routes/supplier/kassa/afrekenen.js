@@ -20,7 +20,7 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   let total = 0;
   for (const s of open) total += s.total;
   // eerst het geld (bij RTG Pay via de betaalcode), dan pas de lasten sluiten
-  let betaler = null;
+  let betaler = null, betaaldienstKosten = 0;
   if (method === 'rtgpay') {
     const p = await pay.kasInt({
       supplierCode: req.supplier.code, code: req.body.payCode,
@@ -29,6 +29,8 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
     });
     if (p.error) return res.status(p.status || 400).json({ error: p.error });
     betaler = p.van;
+    // de kosten van de betaaldienst, per transactie DIRECT verrekend met de zaak
+    betaaldienstKosten = p.kosten || 0;
   }
   for (const s of open) s.settled = true;
   const sale = {
@@ -37,6 +39,7 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
     actor: req.actor.name,
     desc: (open[0].method === 'tafel' ? 'Rekening ' : 'Check-out ') + room + ' (' + open.length + ' post(en))',
     room, items: null, total, method, betaler,
+    betaaldienstKosten: betaaldienstKosten || null,
     at: new Date().toISOString()
   };
   list.unshift(sale);

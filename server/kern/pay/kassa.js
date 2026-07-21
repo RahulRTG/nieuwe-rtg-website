@@ -4,7 +4,7 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, betaal, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
-    metIdem, boek, zorgSaldo, seintje, MIN_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
+    metIdem, boek, zorgSaldo, seintje, betaaldienstKosten, MIN_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
 
   /* ---------- de kassacode: contactloos bij de partner ---------- */
   function kasCode({ codenaam, maxCenten }) {
@@ -28,18 +28,33 @@ module.exports = (ctx) => {
       if (z.error) return z;
       const b = boek({ van: rekLid(k.codenaam), naar: rekPartner(supplierCode), centen: c, soort: 'kassa', oms: oms || 'Kassa', ref: k.code });
       if (b.error) return b;
+      /* De kosten van de betaaldienst gaan DIRECT naar de ondernemer: per
+         transactie meteen verrekend op de partnerrekening, als eigen regel in
+         het grootboek naast de ontvangst -- geen verzamelfactuur achteraf.
+         Het tarief komt uit de geld-regie; het lid merkt er niets van. */
+      let kosten = 0;
+      try { kosten = Math.max(0, Math.round(betaaldienstKosten(c) || 0)); } catch (e) { kosten = 0; }
+      if (kosten > 0) {
+        const kb = boek({ van: rekPartner(supplierCode), naar: 'rtg:betaaldienst', centen: kosten,
+          soort: 'betaaldienstkosten', oms: 'Betaaldienstkosten, direct verrekend', ref: k.code });
+        if (kb.error) kosten = 0;
+      }
       k.gebruikt = true;
       save();
       seintje(k.codenaam);
-      return { ok: true, centen: c, van: k.codenaam };
+      return { ok: true, centen: c, van: k.codenaam, kosten };
     });
   }
 
   /* ---------- de partnerkant: saldo en uitbetalen ---------- */
   function partnerOverzicht(supplierCode) {
     const rek = rekPartner(supplierCode);
+    const vandaag = new Date().toISOString().slice(0, 10);
     return {
       ok: true, saldo: saldoVan(rek),
+      // de direct verrekende betaaldienstkosten van vandaag, transparant erbij
+      kostenVandaag: grootboek().filter(r => r.van === rek && r.soort === 'betaaldienstkosten' && new Date(r.at || 0).toISOString().slice(0, 10) === vandaag)
+        .reduce((s, r) => s + r.centen, 0),
       boekingen: grootboek().filter(r => r.van === rek || r.naar === rek).slice(0, 30)
     };
   }

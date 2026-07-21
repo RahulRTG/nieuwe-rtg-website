@@ -94,12 +94,16 @@ test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de 
   const inn = await api('supplier/pay/in', { code: k.body.code, centen: 2500, oms: 'Lunch aan zee', idem: 'kas-1' }, supToken);
   assert.equal(inn.status, 200);
   assert.equal(inn.body.centen, 2500);
+  // de kosten van de betaaldienst gaan DIRECT naar de ondernemer: 10 centen
+  // vaste voet + 1% van 2500 = 35 centen, per transactie meteen verrekend
+  assert.equal(inn.body.kosten, 35, 'de kosten staan meteen op de transactie');
   // de code is eenmalig
   assert.equal((await api('supplier/pay/in', { code: k.body.code, centen: 100 }, supToken)).status, 404);
   const pot = await api('supplier/pay/overzicht', {}, supToken);
-  assert.equal(pot.body.saldo, 2500, 'de partnerpot telt de kassabetaling');
+  assert.equal(pot.body.saldo, 2465, 'de partnerpot telt de kassabetaling netto (kosten direct verrekend)');
+  assert.equal(pot.body.kostenVandaag, 35, 'en toont de betaaldienstkosten van vandaag transparant');
   const uit = await api('supplier/pay/uitbetaal', { idem: 'uit-1' }, supToken);
-  assert.equal(uit.body.uitbetaald, 2500);
+  assert.equal(uit.body.uitbetaald, 2465);
   assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 0, 'uitbetaald naar de bank');
 });
 
@@ -114,7 +118,8 @@ test('de kassabon op RTG Pay: code tonen, afrekenen, en de betaler staat op de b
   assert.equal(bon.status, 200);
   assert.equal(bon.body.sale.method, 'rtgpay');
   assert.equal(bon.body.betaler, lidA.codenaam, 'de bon weet wie er betaalde');
-  assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 2100, 'de partnerpot ving 21 euro');
+  assert.equal(bon.body.sale.betaaldienstKosten, 31, 'de bon draagt de direct verrekende betaaldienstkosten (10 + 1% van 2100)');
+  assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 2069, 'de partnerpot ving 21 euro netto');
   // een verkeerde of verlopen code betekent: geen betaling en geen bon
   const mis = await api('supplier/pos/sale', { total: 10, method: 'rtgpay', payCode: 'FFFFFF', idem: 'bon-rtgpay-2' }, supToken);
   assert.equal(mis.status, 404);

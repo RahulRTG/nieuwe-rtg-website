@@ -26,7 +26,7 @@
    de orkestrator: het grootboek, de idempotentie en het opladen wonen hier;
    de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa. */
 
-module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }) => {
+module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten }) => {
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -159,6 +159,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     db, save, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, kascodes, tikcodes,
     rekLid, rekPartner, saldoVan, id, metIdem, boek, zorgSaldo, seintje, bestaatLid,
+    betaaldienstKosten: betaaldienstKosten || (() => 0),
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
   const api = { MIN_CENTEN, MAX_CENTEN, boek, sluitcontrole, laadOp, saldoVan, koppelBank };

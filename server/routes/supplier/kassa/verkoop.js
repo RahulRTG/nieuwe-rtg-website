@@ -36,7 +36,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   }
   // RTG Pay: de gast toont de betaalcode uit de app; die wordt eerst geind
   // in het grootboek. Lukt dat niet, dan is er ook geen bon.
-  let betaler = null;
+  let betaler = null, betaaldienstKosten = 0;
   if (method === 'rtgpay') {
     const p = await pay.kasInt({
       supplierCode: req.supplier.code, code: req.body.payCode,
@@ -45,6 +45,8 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     });
     if (p.error) return res.status(p.status || 400).json({ error: p.error });
     betaler = p.van;
+    // de kosten van de betaaldienst, per transactie DIRECT verrekend met de zaak
+    betaaldienstKosten = p.kosten || 0;
   }
   const sale = {
     id: crypto.randomBytes(4).toString('hex'),
@@ -53,6 +55,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
     items, total, method, betaler, luchtzijde,
+    betaaldienstKosten: betaaldienstKosten || null,
     at: new Date().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);

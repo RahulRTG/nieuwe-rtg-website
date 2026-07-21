@@ -112,19 +112,48 @@ function maakGeldregie({ db, save }) {
     return rond(bedrag * pct / 100);
   }
 
+  /* ---- de betaaldienst: transactiekosten, DIRECT bij de ondernemer ----
+     Geen verzamelfactuur achteraf: elke kassabetaling via RTG Pay verrekent
+     de kosten van de betaaldienst meteen op de rekening van de zaak, als
+     eigen grootboekregel naast de ontvangst. RTG stelt het tarief (vaste
+     voet + percentage) vanuit de boardroom; het lid merkt er niets van. */
+  function betaaldienst() {
+    const t = d().betaaldienst || {};
+    return { vastCenten: Number.isFinite(t.vastCenten) ? t.vastCenten : 10,
+      pct: Number.isFinite(t.pct) ? t.pct : 1 };
+  }
+  function betaaldienstZet(data) {
+    const vast = Math.round(Number(data.vastCenten));
+    const pct = Number(data.pct);
+    if (!Number.isFinite(vast) || vast < 0 || vast > 1000) return { status: 400, error: 'De vaste voet is 0 tot 1000 centen.' };
+    if (!Number.isFinite(pct) || pct < 0 || pct > 5) return { status: 400, error: 'Het percentage is 0 tot 5.' };
+    d().betaaldienst = { vastCenten: vast, pct: Math.round(pct * 100) / 100 };
+    save();
+    return { status: 200, ok: true, ...d().betaaldienst };
+  }
+  // de kosten voor een kassabetaling van dit aantal centen (nooit meer dan het bedrag)
+  function betaaldienstKosten(centen) {
+    const c = Math.round(Number(centen) || 0);
+    if (c <= 0) return 0;
+    const t = betaaldienst();
+    return Math.min(c, t.vastCenten + Math.round(c * t.pct / 100));
+  }
+
   /* ---- het boardroom-overzicht: alles op een bord ---- */
   function overzicht() {
     const g = d();
     return { status: 200,
       pasprijzen: pasprijzen().passen,
       kortingen: g.kortingen,
+      betaaldienst: betaaldienst(),
       commissies: { standaard: g.commissies.standaard, perZaak: g.commissies.perZaak },
       genres: Object.entries(db.data.supplierTypes).map(([id, t]) => ({ id, label: t.label, icon: t.icon })),
       zaken: db.data.suppliers.map(s => ({ code: s.code, naam: s.name, genre: s.type, rate: commissieVoor(s) })) };
   }
 
   return { geldPasprijzen: pasprijzen, geldPasprijsZet: pasprijsZet, geldCommissieZet: commissieZet,
-    geldKortingZet: kortingZet, geldOverzicht: overzicht, ledenvoordeelVoor, commissieVoor };
+    geldKortingZet: kortingZet, geldOverzicht: overzicht, ledenvoordeelVoor, commissieVoor,
+    geldBetaaldienst: betaaldienst, geldBetaaldienstZet: betaaldienstZet, betaaldienstKosten };
 }
 
 module.exports = { maakGeldregie };

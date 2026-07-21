@@ -2079,7 +2079,9 @@ Object.assign(kern, require('./kern/rampbeeld')({ db, save, findSupplier, anthro
 Object.assign(kern, require('./kern/vakwerk').maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
-Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon }));
+Object.assign(kern, require('./kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
+  // de geld-regie bepaalt het tarief; als thunk zodat de mount-volgorde niet uitmaakt
+  betaaldienstKosten: c => (kern.betaaldienstKosten ? kern.betaaldienstKosten(c) : 0) }));
 /* Het keukenbrein (kern/keuken.js): recepten per gerecht, automatische
    voorraad-afboeking bij elke verkoop, telling/verspilling/levering met
    logboek, marges en het inkoopadvies. */

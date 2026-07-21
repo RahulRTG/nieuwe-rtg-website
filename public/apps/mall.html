@@ -73,6 +73,7 @@
 </header>
 <main id="main">
   <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Alles wat je bij RTG koopt, op één plek. Het eigen-merk bestel je direct; bij de mode-boutieks gelden ledenprijzen en leg je een stuk apart of laat je een maat naar de paskamer brengen. Prijzen in euro.</p>
+  <div id="appbieb"></div>
   <div id="etages"></div>
   <div id="gidsWrap"></div>
 </main>
@@ -101,7 +102,78 @@ if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG Mall is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
-} else { laad(); }
+} else { laad(); laadAppbieb(); }
+
+/* ---------- De App-Bibliotheek: 20.000 professionele apps, inbegrepen ----------
+   Bladeren per categorie, zoeken op naam, installeren met één knop. De
+   winkelwaarde staat er eerlijk bij; voor leden is de prijs altijd 0. */
+const AB = { categorie: '', zoek: '', pagina: 1, mijn: false, cats: [] };
+async function laadAppbieb(){
+  let d;
+  try { d = await api('/api/mall/apps'); } catch(e){ return; }
+  AB.cats = d.categorieen;
+  $('#appbieb').innerHTML =
+    '<div class="etage"><div class="etage-kop"><h2>📱 App-Bibliotheek</h2>'+
+    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' apps · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · inbegrepen bij je pas</span></div>'+
+    '<div class="rij" style="margin-bottom:.7rem;">'+
+      '<select id="abCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
+        d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+' ('+c.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
+      '<input id="abZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
+      '<button class="knop stil" id="abMijn" type="button">Mijn apps</button>'+
+    '</div>'+
+    '<div id="abGrid"></div><div class="rij" id="abBlader" style="justify-content:center;"></div></div>';
+  $('#abCat').addEventListener('change', () => { AB.categorie = $('#abCat').value; AB.pagina = 1; AB.mijn = false; tekenApps(); });
+  let zt; $('#abZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { AB.zoek = $('#abZoek').value; AB.pagina = 1; AB.mijn = false; tekenApps(); }, 300); });
+  $('#abMijn').addEventListener('click', () => { AB.mijn = !AB.mijn; AB.pagina = 1; tekenApps(); });
+  tekenApps();
+}
+function appKaart(a, geinstalleerd){
+  return '<div class="boutiek" style="cursor:default;">'+
+    '<span class="stad">'+a.icon+' '+esc(a.categorieLabel)+'</span>'+
+    '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
+    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</span>'+
+    '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
+      '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
+      '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>'+
+      (geinstalleerd
+        ? '<button class="knop stil abweg" data-id="'+esc(a.id)+'" style="margin-left:auto;">Verwijder</button>'
+        : '<button class="knop abin" data-id="'+esc(a.id)+'" style="margin-left:auto;">Installeer</button>')+
+    '</div></div>';
+}
+async function tekenApps(){
+  const grid = $('#abGrid'), blader = $('#abBlader');
+  $('#abMijn').classList.toggle('aan', AB.mijn);
+  try {
+    let mijnIds = [];
+    try { mijnIds = (await api('/api/mall/apps/mijn')).apps.map(a => a.id); } catch(e){}
+    if (AB.mijn) {
+      const mijn = (await api('/api/mall/apps/mijn')).apps;
+      grid.innerHTML = mijn.length ? '<div class="boutieks">'+mijn.map(a => appKaart(a, true)).join('')+'</div>'
+        : '<div class="leeg">Nog geen apps geïnstalleerd. Blader door de bibliotheek en druk op Installeer.</div>';
+      blader.innerHTML = '';
+    } else {
+      const d = await api('/api/mall/apps/catalogus', { categorie: AB.categorie, zoek: AB.zoek, pagina: AB.pagina });
+      grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => appKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
+        : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
+      blader.innerHTML = d.paginas > 1
+        ? '<button class="knop stil" id="abVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+          '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
+          '<button class="knop stil" id="abVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
+        : '';
+      const vorig = $('#abVorig'), volgend = $('#abVolgend');
+      if (vorig) vorig.addEventListener('click', () => { AB.pagina--; tekenApps(); });
+      if (volgend) volgend.addEventListener('click', () => { AB.pagina++; tekenApps(); });
+    }
+    grid.querySelectorAll('.abin').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await api('/api/mall/apps/installeer', { id: b.dataset.id }); meld('Geïnstalleerd: '+r.app.naam+' ('+r.aantal+' apps)'); tekenApps(); }
+      catch(e){ meld(e.message); }
+    }));
+    grid.querySelectorAll('.abweg').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/mall/apps/weg', { id: b.dataset.id }); meld('Verwijderd.'); tekenApps(); }
+      catch(e){ meld(e.message); }
+    }));
+  } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
 
 async function laad(){
   let d;

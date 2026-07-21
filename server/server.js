@@ -2027,6 +2027,9 @@ Object.assign(kern, require('./kern/architect').maakArchitect({ db, save, crypto
 /* De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app; een
    gecureerde etagelijst van de retail-partners, elk met een eigen catalogus. */
 Object.assign(kern, require('./kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail }));
+/* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,
+   elk rond de duizend euro winkelwaarde, voor leden inbegrepen bij de pas. */
+Object.assign(kern, require('./kern/appbieb').maakAppbieb({ db, save }));
 /* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
    tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */

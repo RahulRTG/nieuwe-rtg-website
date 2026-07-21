@@ -6,10 +6,13 @@ module.exports = (kern) => {
     notify, voorkeurVan, zetVoorkeur, retailCatalogus, wishlistToggle,
     mijnApart, mijnStyling, vraagPaskamer, retailIsRetail, PASPOORT_NIVEAUS,
     paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn, mall, foodcourt,
-    reisbureau, logies, uitgaan, appbieb, reisbieb } = kern;
-// de bibliotheken zijn voor BETALENDE leden: de gratis gast-app blijft erbuiten
+    reisbureau, logies, uitgaan, appbieb, reisbieb, rtfbieb } = kern;
+/* Het toegangsmodel van de echte RTG Bibliotheek: BLADEREN is voor iedereen
+   zichtbaar (ook de aangemelde gratis gast). Installeren uit de
+   App-Bibliotheek is een pas-voordeel voor betalende leden; het
+   Reis-gedeelte en de RTF-Bibliotheek zijn ook voor de gast volledig open. */
 const geenGast = (req, res) => {
-  if (req.session.tier === 'guest') { res.status(403).json({ error: 'De bibliotheken zijn voor betalende leden. Word lid en alles is inbegrepen.' }); return true; }
+  if (req.session.tier === 'guest') { res.status(403).json({ error: 'Installeren uit de App-Bibliotheek is voor betalende leden. Word lid en alles is inbegrepen; het Reis-gedeelte en de RTF-bieb zijn ook voor jou al open.' }); return true; }
   return false;
 };
 
@@ -49,12 +52,12 @@ app.post('/api/mall/land-bestel', auth, (req, res) => {
   res.json(r);
 });
 
-/* ---- de App-Bibliotheek: 20.000 professionele apps, inbegrepen bij de pas.
-   Alleen voor betalende leden: ook bladeren is een pas-voordeel. ---- */
+/* ---- de App-Bibliotheek: 20.000 professionele apps. Bladeren is voor
+   iedereen zichtbaar; installeren is het pas-voordeel van betalende leden. ---- */
 // het overzicht: categorieën, totaal en de totale winkelwaarde
-app.post('/api/mall/apps', auth, (req, res) => { if (geenGast(req, res)) return; res.json(appbieb.overzicht()); });
+app.post('/api/mall/apps', auth, (req, res) => res.json(appbieb.overzicht()));
 // bladeren en zoeken (gepagineerd; de catalogus wordt ter plekke samengesteld)
-app.post('/api/mall/apps/catalogus', auth, (req, res) => { if (geenGast(req, res)) return; res.json(appbieb.catalogus(req.body || {})); });
+app.post('/api/mall/apps/catalogus', auth, (req, res) => res.json(appbieb.catalogus(req.body || {})));
 // installeren en verwijderen: het lid beslist, de pas dekt de prijs (0)
 app.post('/api/mall/apps/installeer', auth, (req, res) => {
   if (geenGast(req, res)) return;
@@ -68,26 +71,42 @@ app.post('/api/mall/apps/weg', auth, (req, res) => {
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
-// mijn geïnstalleerde apps
-app.post('/api/mall/apps/mijn', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ apps: appbieb.mijnApps(req.session.key) }); });
+// mijn geïnstalleerde apps (voor de gast gewoon leeg)
+app.post('/api/mall/apps/mijn', auth, (req, res) => res.json({ apps: appbieb.mijnApps(req.session.key) }));
 
-/* ---- de Reis-Bibliotheek: een miljoen reisgidsen van Londen tot Gaza,
-   nuttig, exclusief en educatief; alleen voor betalende leden ---- */
-app.post('/api/mall/reis', auth, (req, res) => { if (geenGast(req, res)) return; res.json(reisbieb.overzicht()); });
-app.post('/api/mall/reis/catalogus', auth, (req, res) => { if (geenGast(req, res)) return; res.json(reisbieb.catalogus(req.body || {})); });
+/* ---- de Reis-Bibliotheek: een miljoen reisgidsen van Londen tot Gaza.
+   Volledig open voor iedereen die is aangemeld, ook de gratis gast. ---- */
+app.post('/api/mall/reis', auth, (req, res) => res.json(reisbieb.overzicht()));
+app.post('/api/mall/reis/catalogus', auth, (req, res) => res.json(reisbieb.catalogus(req.body || {})));
 app.post('/api/mall/reis/installeer', auth, (req, res) => {
-  if (geenGast(req, res)) return;
   const r = reisbieb.installeer(req.session.key, req.body.id);
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
 app.post('/api/mall/reis/weg', auth, (req, res) => {
-  if (geenGast(req, res)) return;
   const r = reisbieb.verwijder(req.session.key, req.body.id);
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
-app.post('/api/mall/reis/mijn', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ apps: reisbieb.mijnApps(req.session.key) }); });
+app.post('/api/mall/reis/mijn', auth, (req, res) => res.json({ apps: reisbieb.mijnApps(req.session.key) }));
+
+/* ---- de RTF-Bibliotheek in de Mall: dezelfde 20.000 gratis kind- en
+   gezinsapps als in de foundation, volledig open voor iedereen die is
+   aangemeld (ook de gast). Installaties staan los van de gezinsprofielen. ---- */
+const rtfSleutel = req => 'mall:' + req.session.key;
+app.post('/api/mall/rtf', auth, (req, res) => res.json(rtfbieb.overzicht('volw')));
+app.post('/api/mall/rtf/catalogus', auth, (req, res) => res.json(rtfbieb.catalogus('volw', req.body || {})));
+app.post('/api/mall/rtf/installeer', auth, (req, res) => {
+  const r = rtfbieb.installeer(rtfSleutel(req), 'volw', req.body.id);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/mall/rtf/weg', auth, (req, res) => {
+  const r = rtfbieb.verwijder(rtfSleutel(req), req.body.id);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/mall/rtf/mijn', auth, (req, res) => res.json({ apps: rtfbieb.mijnApps(rtfSleutel(req)) }));
 
 /* ---- de losse verblijf-pagina: hotels, appartementen en villa's ---- */
 // het overzicht van de overnachters met hun vrije kamers; boeken gaat via /api/verblijf

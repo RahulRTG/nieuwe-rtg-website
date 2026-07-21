@@ -39,6 +39,16 @@
   <h1>📱 App-Bibliotheek</h1>
   <p class="intro" id="biebIntro">Duizenden apps om te leren, spelen en ontdekken; allemaal gratis, een cadeau van de RTFoundation. Geen aankopen, geen reclame. Je ziet alleen wat bij jouw leeftijd past.</p>
 
+  <div class="kaart" style="padding:.8rem .9rem;margin-bottom:.9rem;">
+    <b style="font-size:.92rem;">💬 De bibliothecaris</b>
+    <p class="intro" style="margin:.25rem 0 .5rem;font-size:.84rem;">Vertel wat je wilt leren of zoekt; de bibliothecaris kijkt in de App-, School- en Beroepen-Bibliotheek en raadt echte apps aan.</p>
+    <div class="zoekrij" style="margin-bottom:0;">
+      <input id="bibVraag" class="veld" maxlength="300" placeholder="Bijv. ik wil beter leren rekenen">
+      <button class="knop" id="bibGo" type="button">✨ Vraag</button>
+    </div>
+    <div id="bibUit" style="font-size:.84rem;color:var(--zacht);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>
+  </div>
+
   <div class="zoekrij">
     <select id="bCat" class="veld" aria-label="Categorie"><option value="">Alle categorieën</option></select>
     <input id="bZoek" class="veld" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">
@@ -55,6 +65,17 @@ const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<'
 if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const sess = Sessie.huidig();
+// de bibliothecaris: kindveilig advies uit de echte catalogi
+document.getElementById('bibGo').addEventListener('click', async () => {
+  const knop = document.getElementById('bibGo'), uit = document.getElementById('bibUit');
+  knop.disabled = true; uit.textContent = 'De bibliothecaris zoekt…';
+  try {
+    const d = await api('/ai', { vraag: document.getElementById('bibVraag').value });
+    uit.innerHTML = esc(d.antwoord) + (d.aanraders && d.aanraders.length
+      ? '<ul style="margin:.4rem 0 0 1.1rem;">'+d.aanraders.map(a => '<li><b>'+esc(a.naam)+'</b> <span style="opacity:.7;">· '+esc(a.bieb)+'</span></li>').join('')+'</ul>' : '');
+  } catch(e){ uit.textContent = e.message; }
+  knop.disabled = false;
+});
 const api = (pad, body) => fetch('/api/rtf/bieb' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(Object.assign({ code: sess.code, token: sess.token }, body || {}))

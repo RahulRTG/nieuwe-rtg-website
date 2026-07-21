@@ -73,8 +73,10 @@
 </header>
 <main id="main">
   <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Alles wat je bij RTG koopt, op één plek. Het eigen-merk bestel je direct; bij de mode-boutieks gelden ledenprijzen en leg je een stuk apart of laat je een maat naar de paskamer brengen. Prijzen in euro.</p>
+  <div id="biebKop"></div>
   <div id="appbieb"></div>
   <div id="reisbieb"></div>
+  <div id="rtfbieb"></div>
   <div id="etages"></div>
   <div id="gidsWrap"></div>
 </main>
@@ -103,7 +105,110 @@ if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG Mall is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
-} else { laad(); laadAppbieb(); laadReisbieb(); }
+} else { laad(); tekenBiebKop(); laadAppbieb(); laadReisbieb(); laadRtfbieb(); }
+
+/* ---------- De echte RTG Bibliotheek: één huis met drie afdelingen en een
+   bibliothecaris. Bladeren is voor iedereen; wat je mag installeren hangt
+   van je pas af (de App-Bibliotheek is het voordeel van betalende leden;
+   het Reis-gedeelte en de RTF-bieb zijn ook voor de gratis gast open). */
+function tekenBiebKop(){
+  $('#biebKop').innerHTML =
+    '<div class="etage"><div class="etage-kop"><h2>📖 De RTG Bibliotheek</h2>'+
+    '<span class="n">drie afdelingen · bladeren voor iedereen · vraag de bibliothecaris</span></div>'+
+    '<div class="boutiek" style="cursor:default;">'+
+      '<b>💬 De bibliothecaris</b>'+
+      '<span class="tag">Vertel wat u zoekt of wilt leren; de bibliothecaris zoekt dwars door de App-, Reis- en RTF-afdeling en raadt echte titels aan.</span>'+
+      '<div class="rij" style="margin-top:.5rem;">'+
+        '<input class="veld" id="bibVraag" maxlength="300" placeholder="Bijv. ik wil leren fotograferen, of: we gaan naar Londen" style="flex:1;min-width:12rem;">'+
+        '<button class="knop" id="bibGo">✨ Vraag advies</button>'+
+      '</div>'+
+      '<div id="bibUit" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>'+
+    '</div></div>';
+  $('#bibGo').addEventListener('click', async () => {
+    $('#bibGo').disabled = true;
+    $('#bibUit').textContent = 'De bibliothecaris zoekt…';
+    try {
+      const d = await api('/api/bieb/ai', { vraag: $('#bibVraag').value });
+      $('#bibUit').innerHTML = esc(d.antwoord) + (d.aanraders && d.aanraders.length
+        ? '<ul style="margin:.4rem 0 0 1.1rem;">'+d.aanraders.map(a => '<li><b>'+esc(a.naam)+'</b> <span style="color:var(--soft);">· '+esc(a.bieb)+'</span></li>').join('')+'</ul>'
+        : '');
+    } catch(e){ $('#bibUit').textContent = e.message; }
+    $('#bibGo').disabled = false;
+  });
+}
+
+/* ---------- De RTF-afdeling: 20.000 gratis kind- en gezinsapps, open voor
+   iedereen die is aangemeld (ook de gast) ---------- */
+const RF = { categorie: '', zoek: '', pagina: 1, mijn: false };
+async function laadRtfbieb(){
+  let d;
+  try { d = await api('/api/mall/rtf'); } catch(e){ return; }
+  $('#rtfbieb').innerHTML =
+    '<div class="etage"><div class="etage-kop"><h2>🧸 RTF-Bibliotheek</h2>'+
+    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' kind- en gezinsapps · altijd gratis · ook voor gasten</span></div>'+
+    '<div class="rij" style="margin-bottom:.7rem;">'+
+      '<select id="rfCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
+        d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+'</option>').join('')+'</select>'+
+      '<input id="rfZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
+      '<button class="knop stil" id="rfMijn" type="button">Mijn RTF-apps</button>'+
+    '</div>'+
+    '<div id="rfGrid"></div><div class="rij" id="rfBlader" style="justify-content:center;"></div></div>';
+  $('#rfCat').addEventListener('change', () => { RF.categorie = $('#rfCat').value; RF.pagina = 1; RF.mijn = false; tekenRtf(); });
+  let zt; $('#rfZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { RF.zoek = $('#rfZoek').value; RF.pagina = 1; RF.mijn = false; tekenRtf(); }, 300); });
+  $('#rfMijn').addEventListener('click', () => { RF.mijn = !RF.mijn; RF.pagina = 1; tekenRtf(); });
+  tekenRtf();
+}
+function rtfKaart(a, geinstalleerd){
+  return '<div class="boutiek" style="cursor:default;">'+
+    '<span class="stad">'+a.icon+' '+esc(a.categorieLabel||a.categorie||'')+'</span>'+
+    '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
+    '<span style="font-size:.74rem;color:var(--muted);">v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</span>'+
+    '<div class="rij" style="margin-top:.45rem;align-items:baseline;">'+
+      '<s style="color:var(--muted);font-size:.76rem;">'+euro(a.winkelwaardeCenten/100)+'</s>'+
+      '<b style="color:var(--gold);font-size:.8rem;">Gratis</b>'+
+      (geinstalleerd
+        ? '<button class="knop stil rfweg" data-id="'+esc(a.id)+'" style="margin-left:auto;">Verwijder</button>'
+        : '<button class="knop rfin" data-id="'+esc(a.id)+'" style="margin-left:auto;">Installeer</button>')+
+    '</div></div>';
+}
+let rfTekenNr = 0;
+async function tekenRtf(){
+  const nr = ++rfTekenNr;
+  const grid = $('#rfGrid'), blader = $('#rfBlader');
+  $('#rfMijn').classList.toggle('aan', RF.mijn);
+  try {
+    let mijnIds = [];
+    try { mijnIds = (await api('/api/mall/rtf/mijn')).apps.map(a => a.id); } catch(e){}
+    if (RF.mijn) {
+      const mijn = (await api('/api/mall/rtf/mijn')).apps;
+      if (nr !== rfTekenNr) return;
+      grid.innerHTML = mijn.length ? '<div class="boutieks">'+mijn.map(a => rtfKaart(a, true)).join('')+'</div>'
+        : '<div class="leeg">Nog geen RTF-apps geïnstalleerd; alles hier is gratis.</div>';
+      blader.innerHTML = '';
+    } else {
+      const d = await api('/api/mall/rtf/catalogus', { categorie: RF.categorie, zoek: RF.zoek, pagina: RF.pagina });
+      if (nr !== rfTekenNr) return;
+      grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => rtfKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
+        : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
+      blader.innerHTML = d.paginas > 1
+        ? '<button class="knop stil" id="rfVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+          '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
+          '<button class="knop stil" id="rfVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
+        : '';
+      const vorig = $('#rfVorig'), volgend = $('#rfVolgend');
+      if (vorig) vorig.addEventListener('click', () => { RF.pagina--; tekenRtf(); });
+      if (volgend) volgend.addEventListener('click', () => { RF.pagina++; tekenRtf(); });
+    }
+    grid.querySelectorAll('.rfin').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await api('/api/mall/rtf/installeer', { id: b.dataset.id }); meld('Geïnstalleerd: '+r.app.naam); tekenRtf(); }
+      catch(e){ meld(e.message); }
+    }));
+    grid.querySelectorAll('.rfweg').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/mall/rtf/weg', { id: b.dataset.id }); meld('Verwijderd.'); tekenRtf(); }
+      catch(e){ meld(e.message); }
+    }));
+  } catch(e){ if (nr === rfTekenNr) grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
 
 /* ---------- De App-Bibliotheek: 20.000 professionele apps, inbegrepen ----------
    Bladeren per categorie, zoeken op naam, installeren met één knop. De
@@ -115,7 +220,7 @@ async function laadAppbieb(){
   AB.cats = d.categorieen;
   $('#appbieb').innerHTML =
     '<div class="etage"><div class="etage-kop"><h2>📱 App-Bibliotheek</h2>'+
-    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' apps · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · inbegrepen bij je pas</span></div>'+
+    '<span class="n">'+d.totaal.toLocaleString('nl-NL')+' apps · winkelwaarde '+euro(d.totaleWinkelwaardeCenten/100)+' · bladeren voor iedereen · installeren bij de pas</span></div>'+
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<select id="abCat" class="veld" style="max-width:15rem;" aria-label="Categorie"><option value="">Alle categorieën</option>'+
         d.categorieen.map(c => '<option value="'+c.id+'">'+c.icon+' '+esc(c.label)+' ('+c.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+

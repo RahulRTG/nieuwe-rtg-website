@@ -2033,6 +2033,9 @@ Object.assign(kern, require('./kern/appbieb').maakAppbieb({ db, save }));
 /* De Reis-Bibliotheek (kern/reisbieb): een miljoen reisgidsen van over de
    hele wereld, van Londen tot Gaza; alleen voor betalende leden. */
 Object.assign(kern, require('./kern/reisbieb').maakReisBieb({ db, save }));
+/* De RTF App-Bibliotheek (kern/rtfbieb.js): 20.000 kind- en gezinsapps; de
+   kern staat hier al zodat de Mall (routes/member) hem ook kan tonen. */
+Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
 /* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
    tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */
@@ -2407,9 +2410,7 @@ require('./routes/markt')(kern);
 require('./routes/borden')(kern);
 require('./routes/spellen')(kern);
 require('./routes/leren')(kern);
-/* De RTF App-Bibliotheek (kern/rtfbieb.js): 20.000 kind- en gezinsapps,
-   gratis via de RTFoundation, met de leeftijdspoort van het profiel. */
-Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
+/* De RTF-bieb-routes (de kern staat al bij de Mall-bibliotheken). */
 require('./routes/rtfbieb')(kern);
 /* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
    school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
@@ -2418,6 +2419,11 @@ Object.assign(kern, require('./kern/schoolbieb').maakSchoolBieb({ db, save }));
 /* De Beroepen-Bibliotheek (kern/beroepenbieb): twee werelden van elk een
    miljoen leer-apps (technisch/agrarisch + bedrijfsleven), altijd gratis. */
 Object.assign(kern, require('./kern/beroepenbieb').maakBeroepenBieb({ db, save }));
+/* De bibliothecaris (kern/bibliothecaris.js): de AI-assistent van de echte
+   RTG Bibliotheek; adviseert alleen apps die echt in de catalogi staan. */
+Object.assign(kern, require('./kern/bibliothecaris')({ appbieb: kern.appbieb, reisbieb: kern.reisbieb,
+  rtfbieb: kern.rtfbieb, schoolbieb: kern.schoolbieb, beroepenbieb: kern.beroepenbieb, anthropic, schoon }));
+require('./routes/bieb')(kern);
 Object.assign(kern, require('./kern/samenrtf')({ db, save, crypto, schoon, zijnVrienden: kern.zijnVrienden }));
 require('./routes/rtfschool')(kern);
 /* Samen (kern/samen.js): met vrienden meekijken en samen doen door het hele

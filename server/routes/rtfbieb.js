@@ -35,4 +35,15 @@ module.exports = (kern) => {
     const s = profiel(req, res); if (!s) return;
     res.json({ apps: rtfbieb.mijnApps(s.handle) });
   });
+
+  // de bibliothecaris, kindveilig: adviseert alleen echte apps uit de RTF-,
+  // School- en Beroepen-Bibliotheek, op de leeftijdsgroep van het profiel
+  app.post('/api/rtf/bieb/ai', async (req, res) => {
+    const s = profiel(req, res); if (!s) return;
+    try {
+      const r = await kern.bibliothecaris.adviseer(String(req.body.vraag || ''), { wereld: 'rtf', groep: s.groep });
+      const { status, ...rest } = r;
+      res.status(status || 200).json(rest);
+    } catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
 };

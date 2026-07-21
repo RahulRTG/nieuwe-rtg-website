@@ -90,15 +90,21 @@ test('5. installeren en verwijderen: idempotent, bewaard per lid, buiten de bieb
   assert.equal((await api(base, '/api/mall/reis/installeer', { id: 'reis-1000000' }, lid)).status, 404);
 });
 
-test('6. de betaalmuur: de gratis gast-app komt beide bibliotheken niet in', async () => {
-  for (const pad of ['/api/mall/apps', '/api/mall/apps/catalogus', '/api/mall/apps/installeer', '/api/mall/apps/mijn',
-    '/api/mall/reis', '/api/mall/reis/catalogus', '/api/mall/reis/installeer', '/api/mall/reis/weg', '/api/mall/reis/mijn']) {
-    const r = await api(base, pad, { id: 'reis-0' }, gast);
-    assert.equal(r.status, 403, pad + ' blijft dicht voor de gast');
-    assert.match(r.body.error, /betalende leden/, pad + ' legt uit waarom');
+test('6. het toegangsmodel: bladeren voor iedereen; de gast installeert reis wel, apps niet', async () => {
+  // de hele bibliotheek is voor iedereen ZICHTBAAR, ook voor de gast
+  for (const pad of ['/api/mall/apps', '/api/mall/apps/catalogus', '/api/mall/reis', '/api/mall/reis/catalogus']) {
+    assert.equal((await api(base, pad, {}, gast)).status, 200, pad + ' is zichtbaar voor de gast');
   }
-  // zonder token uberhaupt geen toegang; het betalende lid kan er gewoon in
+  // installeren uit de App-Bibliotheek blijft het voordeel van betalende leden
+  const dicht = await api(base, '/api/mall/apps/installeer', { id: 'app-1' }, gast);
+  assert.equal(dicht.status, 403);
+  assert.match(dicht.body.error, /betalende leden/);
+  // het Reis-gedeelte is voor de aangemelde gast volledig open, ook installeren
+  const reis = await api(base, '/api/mall/reis/installeer', { id: 'reis-7' }, gast);
+  assert.equal(reis.status, 200);
+  assert.equal((await api(base, '/api/mall/reis/mijn', {}, gast)).body.apps.length, 1);
+  assert.equal((await api(base, '/api/mall/reis/weg', { id: 'reis-7' }, gast)).status, 200);
+  // zonder aanmelding uberhaupt geen toegang; het betalende lid kan overal in
   assert.equal((await api(base, '/api/mall/reis')).status, 401);
-  assert.equal((await api(base, '/api/mall/reis', {}, lid)).status, 200);
   assert.equal((await api(base, '/api/mall/apps', {}, lid)).status, 200);
 });

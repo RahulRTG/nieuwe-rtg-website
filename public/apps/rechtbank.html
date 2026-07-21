@@ -120,9 +120,32 @@ let TOKEN = null, ZALEN = [], TYPEN = {}, BESLISSINGEN = [];
 const api = (pad, body) => fetch(pad, {
   method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
   body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+}).then(async r => { const d = await r.json().catch(() => ({})); if (r.status === 401 && TOKEN) afgemeld(); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 const CODE = 'RIJK';
+/* Altijd aangemeld op de werkvloer: de dienst blijft op dit toestel staan.
+   Verloopt de sessie, dan val je DIRECT terug op het inlogscherm; wisselen
+   van collega kan met de wissel-knop in de kop. */
+const SLEUTEL = 'rtg_werk_' + CODE.toLowerCase();
+function afgemeld(){
+  TOKEN = null;
+  try { localStorage.removeItem(SLEUTEL); } catch(e){}
+  const w = document.getElementById('wissel'); if (w) w.hidden = true;
+  $('#app').hidden = true; $('#login').hidden = false;
+}
+function wisselToon(){
+  let w = document.getElementById('wissel');
+  if (!w){
+    const h = document.querySelector('header');
+    if (!h) return;
+    w = document.createElement('button');
+    w.id = 'wissel'; w.textContent = 'Wissel';
+    w.style.cssText = 'background:none;border:1px solid rgba(255,255,255,0.10);border-radius:9px;color:rgba(244,241,236,0.68);font:inherit;font-size:.8rem;padding:.35rem .7rem;cursor:pointer;margin-left:.4rem;';
+    w.addEventListener('click', () => { afgemeld(); meld('Afgemeld; kies wie je bent.'); });
+    h.appendChild(w);
+  }
+  w.hidden = false;
+}
 async function vulWie(){
   try { const r = await api('/api/supplier/roster', { code: CODE });
     $('#wie').innerHTML = (r.staff || []).map(m => '<option value="'+m.id+'">'+esc(m.name)+' ('+esc(m.role)+')</option>').join('') || '<option value="">Geen medewerkers</option>';
@@ -132,8 +155,8 @@ vulWie();
 $('#loginGo').addEventListener('click', async () => {
   const staffId = $('#wie').value, pin = $('#pin').value.trim();
   if (!staffId || !pin){ meld('Kies wie je bent en vul je pincode in.'); return; }
-  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token;
-    $('#login').hidden = true; $('#app').hidden = false; start();
+  try { const r = await api('/api/supplier/login', { code: CODE, staffId: Number(staffId), pin }); TOKEN = r.token; try { localStorage.setItem(SLEUTEL, TOKEN); } catch(e){}
+    $('#login').hidden = true; $('#app').hidden = false; wisselToon(); start();
   } catch(e){ meld(e.message); }
 });
 
@@ -248,6 +271,10 @@ $('#aiK').addEventListener('click', async () => {
   catch(e){ $('#aiA').textContent = e.message; }
 });
 $('#aiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#aiK').click(); });
+
+// de bewaarde dienst van dit toestel: meteen naar binnen, nooit onaangemeld blijven hangen
+try { TOKEN = localStorage.getItem(SLEUTEL); } catch(e){}
+if (TOKEN){ $('#login').hidden = true; $('#app').hidden = false; wisselToon(); start(); }
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 </body>

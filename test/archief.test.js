@@ -33,9 +33,13 @@ function boot() {
     stdio: ['ignore', 'ignore', 'inherit']
   });
   return (async () => {
-    for (let i = 0; i < 100; i++) {
+    // ruim geduld: op een drukke CI-runner (weinig kernen, dekkings-
+    // instrumentatie, veel parallelle servers) kan een boot tientallen
+    // seconden duren; hetzelfde geduld als test/helper.js dus
+    for (let i = 0; i < 300; i++) {
+      if (child.exitCode != null) throw new Error('server stopte tijdens opstarten (exit ' + child.exitCode + ')');
       try { const r = await fetch(BASE + '/api/health'); if (r.ok) return; } catch (e) {}
-      await new Promise(r => setTimeout(r, 100));
+      await new Promise(r => setTimeout(r, 200));
     }
     throw new Error('server komt niet op');
   })();

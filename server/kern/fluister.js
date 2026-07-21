@@ -123,6 +123,13 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     nu, wieBen, lijsten, van, topFocus, MAANDEN, vandaag, datumUit, dagenTot, plusDagen, wanneer, eur, datumInZin };
   const { teSnel, maakSeintjesIndex, bronnenVoor, fluisterSeintjes, fluisterPush, fluisterPushAlle, fluisterProfiel, standVan } = require('./fluister/seintjes')(ctx);
 
+  /* Sparren (kern/fluister/sparren.js): Rahul denkt mee om het idee beter te
+     maken (niet om zijn gelijk te halen), en komt op een geparkeerde gedachte
+     terug als je rustig thuis bent met een lege agenda. */
+  const sparren = require('./fluister/sparren')({ db, save, schoon, notify, van, nu });
+  ctx.sparHouding = sparren.sparHouding;
+  ctx.sparParkeer = sparren.parkeer;
+
   /* Een bevestigd voorstel echt uitvoeren; het antwoord zegt eerlijk wat er
      is gebeurd, ook als het alsnog misgaat. */
 
@@ -139,7 +146,9 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
-    butlerExtra, voerReisUit, voerKledingUit });
+    butlerExtra, voerReisUit, voerKledingUit, sparHouding: sparren.sparHouding, sparParkeer: sparren.parkeer });
 
-  return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle };
+  return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle,
+    sparParkeer: sparren.parkeer, sparLijst: sparren.lijst, sparStatus: sparren.status,
+    sparHouding: sparren.sparHouding, sparRustMoment: sparren.rustMoment, sparSweepVoor: sparren.sweepVoor, sparSweepAlle: sparren.sweepAlle };
 };

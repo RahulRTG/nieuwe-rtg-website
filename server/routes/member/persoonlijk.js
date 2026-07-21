@@ -6,6 +6,7 @@ module.exports = (kern) => {
   const { app, auth, liveCodename, verdienPunten,
     zorgVan, zorgZet, locDeel, locStopKlant, locMijn,
     fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, stuurLus,
+    sparLijst, sparParkeer, sparStatus,
     assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap,
     careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, careIntakeDeel, careIntakeStop,
     carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn } = kern;
@@ -78,6 +79,23 @@ app.post('/api/fluister/vergeet', auth, (req, res) => {
 });
 // de inklap-laag deelt (alleen) tellers van schermgebruik, zodat Fluister leert
 app.post('/api/fluister/focus', auth, (req, res) => res.json(fluisterFocus(req.session.key, req.body.scores)));
+
+/* ---- Sparren (kern/fluister/sparren.js): Rahul denkt mee om het idee beter te
+   maken, en parkeert een gedachte die je noemt op een druk moment. Op een
+   rustig moment (thuis, lege agenda) kaart hij hem uit zichzelf weer aan. */
+app.post('/api/spar/lijst', auth, (req, res) => res.json(sparLijst(req.session.key)));
+app.post('/api/spar/parkeer', auth, (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = sparParkeer(req.session.key, req.body.tekst, 'app');
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/spar/status', auth, (req, res) => {
+  const st = req.body.status === 'weg' ? 'weg' : 'besproken';
+  const r = sparStatus(req.session.key, String(req.body.id || ''), st);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
 
 /* ---- Toren 3: RTG Shared Assets (kern/assets.js) ----
    Altijd 300 tickets per object; een ticket is 24 uur per jaar, tien jaar

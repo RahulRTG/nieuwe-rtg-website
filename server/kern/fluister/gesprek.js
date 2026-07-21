@@ -6,7 +6,9 @@ module.exports = (ctx) => {
   const { db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
-    butlerExtra, voerReisUit, voerKledingUit, voerUit } = ctx;
+    butlerExtra, voerReisUit, voerKledingUit, voerUit, sparHouding, sparParkeer } = ctx;
+  // sparren: waaraan Rahul herkent dat je wil meedenken over een idee
+  const SPAR = /\b(spar(ren)?|brainstorm|denk (even )?met me mee|wat vind je van (mijn |het )?idee|help me (na)?denken)\b/i;
   const intent = require('./intent')(ctx);
   /* Het gesprek. Eerst de eigen commando's (onthouden, opvragen, vergeten);
      daarna Claude met het volledige persoonlijke beeld, of de eigen regels. */
@@ -52,6 +54,16 @@ module.exports = (ctx) => {
       if (!sess) return { ok: true, antwoord: basis + ' Vraag me gerust naar de actuele stand van uw dienst.', pakte: true };
       return { ok: true, antwoord: basis + ' En ik regel het ook: zoeken door het hele aanbod ("zoek sushi"), uw dag plannen ("plan mijn dag"), een tafel reserveren of annuleren, bestellen en afrekenen ("bestel 2 sangria bij Sunset Ibiza"), tickets boeken ("boek 2 tickets voor de sunset cruise morgen"), een behandeling in de spa of kliniek boeken ("boek een massage bij Zenith morgen om 15:00"), een taxi of transfer regelen, uw 24-uursblok plannen, uw saldo opvragen, een Tik sturen, en betaalverzoeken maken, tonen en betalen. Alles met geld of een poolclaim vraagt altijd eerst uw "ja".', pakte: true };
     }
+    /* Sparren: Rahul denkt mee om het idee samen beter te maken, niet om zijn
+       gelijk te halen. De gedachte wordt geparkeerd, zodat hij er op een rustig
+       moment (thuis, lege agenda) uit zichzelf op terug kan komen. */
+    let sparModus = false;
+    if (SPAR.test(q)) {
+      sparModus = true;
+      const idee = q.replace(SPAR, '').replace(/^\s*(kun je|wil je|kunnen we|laten we|even|met me|over)\b/gi, '').replace(/\s+/g, ' ').trim().slice(0, 200);
+      if (sparParkeer && idee) try { sparParkeer(key, idee, 'gesprek'); } catch (e) {}
+      if (!anthropic) return klaar('Goed, laten we samen sparren. Ik denk mee om het beter te maken, niet om mijn gelijk te halen. Wat wil je met dit idee bereiken, en waar zit nu je grootste twijfel? Dan noem ik een kans en een risico. Ben je nu druk? Ik heb het geparkeerd en kom er op een rustig moment op terug.');
+    }
     /* De reislaag (kern/fluister/reis.js): een hele reis op een vraag,
        kleding en voorspellen voor leden, en de servicedag voor zaak en
        personeel (zonder sessie). "ja"/"nee" matcht hier bewust niet, dus
@@ -64,10 +76,11 @@ module.exports = (ctx) => {
        (sess reist alleen mee op de leden-route, nooit voor personeel).
        Boven de drempel (geld, of een claim op een gedeeld object) eerst
        een voorstel; pas op "ja" gebeurt het echt. ---- */
-    if (sess) {
+    if (sess && !sparModus) {
       // de doe-laag (kern/fluister/intent.js): loopt de intent-handlers langs
       // en voert uit (met de bevestigingsdrempel voor geld/poolclaims); geeft
-      // null terug als geen handler pakt, dan valt dit door naar de AI hieronder
+      // null terug als geen handler pakt, dan valt dit door naar de AI hieronder.
+      // In sparmodus slaan we dit over: dan wil je meedenken, niet iets doen.
       const gedaan = await intent.doeActie({ q, p, klaar, key, codenaam, sess });
       if (gedaan) return gedaan;
     }
@@ -83,7 +96,7 @@ module.exports = (ctx) => {
           (seintjes.length ? 'Actuele seintjes: ' + seintjes.map(x => x.tekst).join('; ') + '.' : '');
         const response = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 300,
-          system: require('../rahul').rahulLeadVoor(key) + 'je bent de persoonlijke rechterhand in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. Context: ' + ctx,
+          system: require('../rahul').rahulLeadVoor(key) + 'je bent de persoonlijke rechterhand in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. ' + (sparHouding ? sparHouding() + ' ' : '') + 'Context: ' + ctx,
           messages: [...p.gesprek.flatMap(g => [{ role: 'user', content: g.u }, { role: 'assistant', content: g.a }]), { role: 'user', content: q }]
         });
         return klaar(response.content[0].text);

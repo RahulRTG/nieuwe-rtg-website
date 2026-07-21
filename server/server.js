@@ -2344,7 +2344,7 @@ Object.assign(kern, require('./kern/fluister')({
 // nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
 // elk half uur, bouwt een index (een datapass voor alle gebruikers) en
 // fluisterPush zelf zorgt dat niets twee keer piept
-setInterval(() => { try { kern.fluisterPushAlle(); } catch (e) {} }, 30 * 60 * 1000).unref();
+setInterval(() => { try { kern.fluisterPushAlle(); } catch (e) {} try { kern.sparSweepAlle && kern.sparSweepAlle(); } catch (e) {} }, 30 * 60 * 1000).unref();
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('./kern/tiener')({ save, crypto }));

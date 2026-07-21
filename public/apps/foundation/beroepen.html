@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Beroepen-Bibliotheek</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .werelden{display:flex;gap:.5rem;margin-bottom:.9rem;}
+  .wereld{flex:1;background:var(--paneel,#151312);border:2px solid var(--lijn,#333);border-radius:14px;color:inherit;font:600 .95rem Inter,sans-serif;padding:.8rem;cursor:pointer;text-align:center;}
+  .wereld.aan{border-color:var(--goud,#857007);}
+  .wereld small{display:block;font-weight:400;color:var(--zacht);font-size:.74rem;margin-top:.2rem;}
+  .zoekrij{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
+  .zoekrij .veld{flex:1;min-width:9rem;}
+  .apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.6rem;}
+  .app{padding:.8rem .9rem;}
+  .app .cat{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht);}
+  .app b{display:block;margin:.2rem 0 .1rem;}
+  .app small{color:var(--zacht);font-size:.76rem;display:block;}
+  .app .rij{display:flex;align-items:baseline;gap:.5rem;margin-top:.5rem;}
+  .app s{color:var(--zacht);font-size:.76rem;}
+  .app .gratis{color:var(--goud2,#c7ab2b);font-weight:700;font-size:.8rem;}
+  .app .knop{margin-left:auto;padding:.35rem .8rem;font-size:.8rem;}
+  .blader{display:flex;gap:.6rem;align-items:center;justify-content:center;margin-top:.9rem;color:var(--zacht);font-size:.82rem;}
+  .leeg{color:var(--zacht);font-size:.9rem;padding:.8rem 0;}
+  .wijs{font-size:.8rem;color:var(--zacht);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .8rem;margin-bottom:.9rem;line-height:1.5;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body>
+<div id="balk"></div>
+<div class="wrap" role="main">
+  <h1>🧰 Beroepen-Bibliotheek</h1>
+  <p class="intro">Twee miljoen leer-apps over echte beroepen: een miljoen voor technische en agrarische vakken en een miljoen voor het bedrijfsleven. Van verkenner tot grootmeester, en hier altijd gratis.</p>
+  <div class="wijs">🌱 <b>Een vak leren is goud waard:</b> kies een beroep dat je leuk lijkt en begin gewoon bij het leerpad. Met je handen of met je hoofd; allebei is even knap.</div>
+
+  <div class="werelden" role="group" aria-label="Kies een wereld">
+    <button class="wereld aan" data-w="techniek" type="button">🛠️ Technisch &amp; agrarisch<small>1.000.000 apps · 100 beroepen</small></button>
+    <button class="wereld" data-w="zaken" type="button">💼 Bedrijfsleven<small>1.000.000 apps · 100 beroepen</small></button>
+  </div>
+  <div class="zoekrij">
+    <select id="bbBeroep" class="veld" aria-label="Beroep"><option value="">Alle beroepen</option></select>
+    <select id="bbSoort" class="veld" aria-label="App-soort"><option value="">Alle app-soorten</option></select>
+  </div>
+  <div class="zoekrij">
+    <input id="bbZoek" class="veld" placeholder="Zoek een beroep of app-soort" maxlength="60" aria-label="Zoeken">
+    <button class="knop stil" id="bbMijn" type="button">Mijn beroeps-apps</button>
+  </div>
+  <div class="apps" id="bbGrid"><div class="leeg">Laden...</div></div>
+  <div class="blader" id="bbBlader"></div>
+</div>
+
+<script src="sessie.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+Sessie.balk($('#balk'), { terug: 'index.html' });
+const sess = Sessie.huidig();
+const api = (pad, body) => fetch('/api/rtf/beroepen' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: sess.code, token: sess.token }, body || {}))
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const ST = { wereld: 'techniek', beroep: '', soort: '', zoek: '', pagina: 1, mijn: false };
+let OVERZICHT = null;
+
+async function start(){
+  OVERZICHT = await api('');
+  vulFilters();
+  teken();
+}
+function vulFilters(){
+  const w = OVERZICHT.werelden.find(x => x.id === ST.wereld);
+  $('#bbBeroep').innerHTML = '<option value="">Alle beroepen</option>' + w.beroepen.map(b => '<option value="'+esc(b)+'">'+esc(b)+'</option>').join('');
+  $('#bbSoort').innerHTML = '<option value="">Alle app-soorten</option>' + w.soorten.map(s => '<option value="'+esc(s)+'">'+esc(s)+'</option>').join('');
+}
+document.querySelectorAll('.wereld').forEach(k => k.addEventListener('click', () => {
+  ST.wereld = k.dataset.w; ST.beroep = ''; ST.soort = ''; ST.zoek = ''; ST.pagina = 1; ST.mijn = false;
+  $('#bbZoek').value = '';
+  document.querySelectorAll('.wereld').forEach(x => x.classList.toggle('aan', x === k));
+  vulFilters(); teken();
+}));
+$('#bbBeroep').addEventListener('change', () => { ST.beroep = $('#bbBeroep').value; ST.pagina = 1; ST.mijn = false; teken(); });
+$('#bbSoort').addEventListener('change', () => { ST.soort = $('#bbSoort').value; ST.pagina = 1; ST.mijn = false; teken(); });
+let zt; $('#bbZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { ST.zoek = $('#bbZoek').value; ST.pagina = 1; ST.mijn = false; teken(); }, 300); });
+$('#bbMijn').addEventListener('click', () => { ST.mijn = !ST.mijn; ST.pagina = 1; teken(); });
+
+function kaart(a, heeft){
+  return '<div class="kaart app"><span class="cat">'+a.icon+' '+esc(a.beroep)+' · '+esc(a.niveau)+'</span>'+
+    '<b>'+esc(a.naam)+'</b>'+
+    '<small>'+esc(a.soort)+' · v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+'</small>'+
+    '<div class="rij"><s>€ '+(a.winkelwaardeCenten/100).toFixed(2).replace('.',',')+'</s><span class="gratis">Gratis</span>'+
+    (heeft ? '<button class="knop stil bweg" data-id="'+esc(a.id)+'">Weg</button>'
+           : '<button class="knop bin" data-id="'+esc(a.id)+'">Installeer</button>')+'</div></div>';
+}
+let tekenNr = 0; // twee overlappende teken()-beurten: alleen de nieuwste mag het scherm schrijven
+async function teken(){
+  const mijnNr = ++tekenNr;
+  const grid = $('#bbGrid'), blader = $('#bbBlader');
+  $('#bbMijn').classList.toggle('aan', ST.mijn);
+  try {
+    let mijnIds = [];
+    try { mijnIds = ((await api('/mijn')).apps || []).map(a => a.id); } catch(e){}
+    if (ST.mijn){
+      const mijn = (await api('/mijn')).apps || [];
+      if (mijnNr !== tekenNr) return;
+      grid.innerHTML = mijn.length ? mijn.map(a => kaart(a, true)).join('') : '<div class="leeg">Nog geen beroeps-apps. Kies een beroep en druk op Installeer.</div>';
+      blader.innerHTML = '';
+    } else {
+      const d = await api('/catalogus', { wereld: ST.wereld, beroep: ST.beroep, soort: ST.soort, zoek: ST.zoek, pagina: ST.pagina });
+      if (mijnNr !== tekenNr) return;
+      grid.innerHTML = d.items.length ? d.items.map(a => kaart(a, mijnIds.includes(a.id))).join('')
+        : '<div class="leeg">'+esc(d.hint || 'Niets gevonden.')+'</div>';
+      blader.innerHTML = d.paginas > 1
+        ? '<button class="knop stil" id="bbVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+          '<span>pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
+          '<button class="knop stil" id="bbVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>' : '';
+      const vo = $('#bbVorig'), vl = $('#bbVolgend');
+      if (vo) vo.addEventListener('click', () => { ST.pagina--; teken(); });
+      if (vl) vl.addEventListener('click', () => { ST.pagina++; teken(); });
+    }
+    grid.querySelectorAll('.bin').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api('/installeer', { id: b.dataset.id }); teken(); } catch(e){ b.disabled = false; alert(e.message); }
+    }));
+    grid.querySelectorAll('.bweg').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/weg', { id: b.dataset.id }); teken(); } catch(e){ alert(e.message); }
+    }));
+  } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+start().catch(e => { $('#bbGrid').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; });
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

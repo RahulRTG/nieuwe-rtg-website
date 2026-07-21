@@ -3,7 +3,7 @@
    leeftijdsgroep van het profiel is de poort. Gasten kijken mee in de
    bibliotheek maar installeren niet, en doen niet mee met Samen. */
 module.exports = (kern) => {
-  const { app, rtf, schoolbieb, samenRtf } = kern;
+  const { app, rtf, schoolbieb, samenRtf, beroepenbieb } = kern;
 
   function profiel(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -35,6 +35,34 @@ module.exports = (kern) => {
   app.post('/api/rtf/school/mijn', (req, res) => {
     const s = profiel(req, res); if (!s) return;
     res.json({ apps: schoolbieb.mijnApps(s.handle) });
+  });
+
+  /* ---- de Beroepen-Bibliotheek: twee werelden van een miljoen leer-apps
+     (technisch/agrarisch en het bedrijfsleven), altijd gratis. Iedereen in
+     het gezin mag kijken; installeren doet het gezin zelf (geen gasten). ---- */
+  app.post('/api/rtf/beroepen', (req, res) => {
+    const s = profiel(req, res); if (!s) return;
+    res.json(beroepenbieb.overzicht());
+  });
+  app.post('/api/rtf/beroepen/catalogus', (req, res) => {
+    const s = profiel(req, res); if (!s) return;
+    const r = beroepenbieb.catalogus(String(req.body.wereld || ''), req.body || {});
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
+  app.post('/api/rtf/beroepen/installeer', (req, res) => {
+    const s = profiel(req, res); if (!s) return;
+    if (s.gast) return res.status(403).json({ error: 'Als oppas of familielid kijk je mee; installeren doet het gezin zelf.' });
+    stuur(res, beroepenbieb.installeer(s.handle, req.body.id));
+  });
+  app.post('/api/rtf/beroepen/weg', (req, res) => {
+    const s = profiel(req, res); if (!s) return;
+    if (s.gast) return res.status(403).json({ error: 'Als oppas of familielid kijk je mee; installeren doet het gezin zelf.' });
+    stuur(res, beroepenbieb.verwijder(s.handle, req.body.id));
+  });
+  app.post('/api/rtf/beroepen/mijn', (req, res) => {
+    const s = profiel(req, res); if (!s) return;
+    res.json({ apps: beroepenbieb.mijnApps(s.handle) });
   });
 
   /* ---- Samen door de gezinsapps ---- */

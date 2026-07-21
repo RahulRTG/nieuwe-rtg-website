@@ -2415,6 +2415,9 @@ require('./routes/rtfbieb')(kern);
    school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
    (kern/samenrtf.js): kindveilig meekijken binnen gezin en vrienden. */
 Object.assign(kern, require('./kern/schoolbieb').maakSchoolBieb({ db, save }));
+/* De Beroepen-Bibliotheek (kern/beroepenbieb): twee werelden van elk een
+   miljoen leer-apps (technisch/agrarisch + bedrijfsleven), altijd gratis. */
+Object.assign(kern, require('./kern/beroepenbieb').maakBeroepenBieb({ db, save }));
 Object.assign(kern, require('./kern/samenrtf')({ db, save, crypto, schoon, zijnVrienden: kern.zijnVrienden }));
 require('./routes/rtfschool')(kern);
 /* Samen (kern/samen.js): met vrienden meekijken en samen doen door het hele

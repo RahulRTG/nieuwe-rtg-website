@@ -27,7 +27,8 @@ module.exports = (ctx) => {
     marina:      { label: 'Marina & jachthaven', icon: '\u{2693}', caps: ['marina', 'location', 'pricing'] },
     weddingplanner: { label: 'Weddings & prive-events', icon: '\u{1F492}', caps: ['weddings', 'location', 'pricing'] },
     professioneel: { label: 'Professionele diensten', icon: '\u{2696}️', caps: ['advies', 'location', 'pricing'] },
-    verzekeringen: { label: 'Verzekeringen (advies)', icon: '\u{1F6E1}️', caps: ['polis', 'location', 'pricing'] }
+    verzekeringen: { label: 'Verzekeringen (advies)', icon: '\u{1F6E1}️', caps: ['polis', 'location', 'pricing'] },
+    wintersport: { label: 'Wintersport & seizoensresort', icon: '\u{26F7}️', caps: ['alpine', 'location', 'pricing'] }
   };
   for (const [t, def] of Object.entries(NIEUWE_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const NIEUWE_PARTNERS = [
@@ -127,7 +128,9 @@ module.exports = (ctx) => {
     { code: 'LEXNOVA', name: 'LexNova Advocaten & Notarissen', type: 'professioneel', city: 'Ibiza',
       loc: { lat: 38.909, lng: 1.432, label: 'Vara de Rey, Ibiza-stad' }, rate: 0.08, menu: [], photos: [] },
     { code: 'SEGUR', name: 'Segur Advies', type: 'verzekeringen', city: 'Ibiza',
-      loc: { lat: 38.91, lng: 1.43, label: 'Ibiza-stad' }, rate: 0.08, menu: [], photos: [] }
+      loc: { lat: 38.91, lng: 1.43, label: 'Ibiza-stad' }, rate: 0.08, menu: [], photos: [] },
+    { code: 'VALAURA', name: "Val d'Aurora Resort", type: 'wintersport', city: "Val d'Aurora (Alpen)",
+      loc: { lat: 42.57, lng: 1.65, label: "Val d'Aurora, de Pyreneeen" }, rate: 0.12, menu: [], photos: [] }
   ];
   for (const p of NIEUWE_PARTNERS) if (!db.data.suppliers.find(s => s.code === p.code)) { db.data.suppliers.push(p); ensureSupplierDefaults(p); }
 };

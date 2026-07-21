@@ -101,7 +101,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub', VELVET:'beautysalon', AMICS:'petcare', NIDO:'kinderopvang', PORTELL:'marina', AURELIA:'weddingplanner', LEXNOVA:'professioneel', SEGUR:'verzekeringen' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub', VELVET:'beautysalon', AMICS:'petcare', NIDO:'kinderopvang', PORTELL:'marina', AURELIA:'weddingplanner', LEXNOVA:'professioneel', SEGUR:'verzekeringen', VALAURA:'wintersport' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -125,7 +125,8 @@
     marina:     ['Havenmeester','Steiger & brandstof','Service & helling','Marina-concierge'],
     weddingplanner: ['Weddingplanner','Dagcoordinatie','Styling & decor'],
     professioneel: ['Officemanager','Advocaat','Notaris','Fiscalist'],
-    verzekeringen: ['Adviseur']
+    verzekeringen: ['Adviseur'],
+    wintersport: ['Resortmanager','Skischool','Liften & pistes','Verhuur','Berggids & lawinedienst']
   };
   let pickCode = null, gateRoster = null, pendingStation = null;
   const spH2 = () => document.querySelector('#staffPick h2');

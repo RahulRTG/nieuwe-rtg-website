@@ -90,6 +90,10 @@ const STAFF_SEED = {
     ['Mr. Joan Ferrer', 'staff', 'Notaris'], ['Drs. Karim El Amrani', 'staff', 'Fiscalist']],
   // verzekeringen: uitsluitend adviserend, de adviseur beslist nooit voor de klant
   SEGUR: [['Marta Segura', 'manager', 'Adviseur'], ['Timo Veld', 'staff', 'Adviseur']],
+  // het wintersportresort: de manager, de skischool, de liften en de berggids
+  VALAURA: [['Elias Brandt', 'manager', 'Resortmanager'], ['Mattia Rossi', 'staff', 'Skischool'],
+    ['Lena Obrist', 'staff', 'Skischool'], ['Pau Vidal', 'staff', 'Liften & pistes'],
+    ['Franka Steiner', 'staff', 'Berggids & lawinedienst']],
   // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
   GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']],
   // het rijk: een behandelaar (beoordeelt toeslagen/uitkeringen/bezwaren) en een baliemedewerker

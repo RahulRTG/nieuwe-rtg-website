@@ -54,7 +54,8 @@
     { code:'PORTELL', name:'Marina Portell', type:'Marina', icon:'⚓', sub:'Marina & jachthaven · Marina Botafoch' },
     { code:'AURELIA', name:'Aurelia Weddings & Events', type:'Weddings', icon:'💐', sub:'Weddings & privé-events · Sant Antoni' },
     { code:'LEXNOVA', name:'LexNova Advocaten & Notarissen', type:'Professioneel', icon:'⚖️', sub:'Advocaat, notaris, fiscalist · Vara de Rey' },
-    { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'🛡️', sub:'Verzekeringsadvies · Ibiza-stad' }
+    { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'🛡️', sub:'Verzekeringsadvies · Ibiza-stad' },
+    { code:'VALAURA', name:"Val d'Aurora Resort", type:'Wintersport', icon:'⛷️', sub:"Wintersport & seizoensresort · Val d'Aurora" }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -97,6 +98,7 @@
     weddingplanner: { label:'RTG Weddings & Events', labelEn:'RTG Weddings & Events', codes:['AURELIA'], icon:'💐' },
     professioneel: { label:'RTG Professionele Diensten', labelEn:'RTG Professional Services', codes:['LEXNOVA'], icon:'⚖️' },
     verzekeringen: { label:'RTG Verzekeringsadvies', labelEn:'RTG Insurance Advice', codes:['SEGUR'], icon:'🛡️' },
+    wintersport: { label:'RTG Alpine', labelEn:'RTG Alpine', codes:['VALAURA'], icon:'⛷️' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }

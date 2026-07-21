@@ -54,7 +54,8 @@
     { code:'PORTELL', name:'Marina Portell', type:'Marina', icon:'⚓', sub:'Marina & jachthaven · Marina Botafoch' },
     { code:'AURELIA', name:'Aurelia Weddings & Events', type:'Weddings', icon:'💐', sub:'Weddings & privé-events · Sant Antoni' },
     { code:'LEXNOVA', name:'LexNova Advocaten & Notarissen', type:'Professioneel', icon:'⚖️', sub:'Advocaat, notaris, fiscalist · Vara de Rey' },
-    { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'🛡️', sub:'Verzekeringsadvies · Ibiza-stad' }
+    { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'🛡️', sub:'Verzekeringsadvies · Ibiza-stad' },
+    { code:'VALAURA', name:"Val d'Aurora Resort", type:'Wintersport', icon:'⛷️', sub:"Wintersport & seizoensresort · Val d'Aurora" }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -97,6 +98,7 @@
     weddingplanner: { label:'RTG Weddings & Events', labelEn:'RTG Weddings & Events', codes:['AURELIA'], icon:'💐' },
     professioneel: { label:'RTG Professionele Diensten', labelEn:'RTG Professional Services', codes:['LEXNOVA'], icon:'⚖️' },
     verzekeringen: { label:'RTG Verzekeringsadvies', labelEn:'RTG Insurance Advice', codes:['SEGUR'], icon:'🛡️' },
+    wintersport: { label:'RTG Alpine', labelEn:'RTG Alpine', codes:['VALAURA'], icon:'⛷️' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }
@@ -139,6 +141,7 @@
     gebouw:   { label:'Gebouw',    svg:'<path d="M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17"/><path d="M15 9h3a1 1 0 0 1 1 1v11"/><path d="M3 21h18"/><path d="M8 7h2M8 11h2M8 15h2M12 7h.01M12 11h.01M12 15h.01"/>', cap:'gebouw' },
     golf:     { label:'Golfbaan',  svg:'<path d="M12 3v12"/><path d="M12 3l6 2.5-6 2.5"/><circle cx="12" cy="18.5" r="2.5"/>', cap:'golf' },
     fitclub:  { label:'Club',      svg:'<path d="M3 12h2M19 12h2M8 12h8"/><rect x="5" y="8" width="3" height="8" rx="1"/><rect x="16" y="8" width="3" height="8" rx="1"/>', cap:'fitclub' },
+    alpine:   { label:'Resort',    svg:'<path d="M3 20L10 6l4 8 3-5 4 11z"/><path d="M8 20l2-4"/><path d="M14.5 4.5h.01"/>', cap:'alpine' },
     weddings: { label:'Draaiboek', svg:'<path d="M12 8c-1.5-2.5-5-2.5-6 0-0.8 2 0.8 4 6 8 5.2-4 6.8-6 6-8-1-2.5-4.5-2.5-6 0z"/><path d="M12 3v2M7 4.5l1 1.5M17 4.5l-1 1.5"/>', cap:'weddings' },
     advies:   { label:'Praktijk',  svg:'<path d="M12 4v16M6 20h12"/><path d="M12 6h6l-2.5 5a3 3 0 0 0 5 0L18 6M12 6H6l2.5 5a3 3 0 0 1-5 0L6 6"/>', cap:'advies' },
     polis:    { label:'Advies',    svg:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12h6M12 9v6"/>', cap:'polis' },
@@ -301,7 +304,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub', VELVET:'beautysalon', AMICS:'petcare', NIDO:'kinderopvang', PORTELL:'marina', AURELIA:'weddingplanner', LEXNOVA:'professioneel', SEGUR:'verzekeringen' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub', VELVET:'beautysalon', AMICS:'petcare', NIDO:'kinderopvang', PORTELL:'marina', AURELIA:'weddingplanner', LEXNOVA:'professioneel', SEGUR:'verzekeringen', VALAURA:'wintersport' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -325,7 +328,8 @@
     marina:     ['Havenmeester','Steiger & brandstof','Service & helling','Marina-concierge'],
     weddingplanner: ['Weddingplanner','Dagcoordinatie','Styling & decor'],
     professioneel: ['Officemanager','Advocaat','Notaris','Fiscalist'],
-    verzekeringen: ['Adviseur']
+    verzekeringen: ['Adviseur'],
+    wintersport: ['Resortmanager','Skischool','Liften & pistes','Verhuur','Berggids & lawinedienst']
   };
   let pickCode = null, gateRoster = null, pendingStation = null;
   const spH2 = () => document.querySelector('#staffPick h2');
@@ -4545,6 +4549,82 @@
     doe('data-sgak', '/supplier/polis/zet', ds => ({ id: ds.sgak, status: 'advies-klaar', advies: (el.querySelector('[data-sgat="'+ds.sgak+'"]')||{}).value }));
     doe('data-sgdw', '/supplier/polis/zet', ds => ({ id: ds.sgdw, status: 'doorverwezen' }));
   }
+
+  // ---- RTG Alpine: de berg op een scherm ----
+  async function renderAlpine(){
+    const el = $('#alpWrap'); if (!el) return;
+    if (!has('alpine')){ el.innerHTML = ''; return; }
+    let d; try { d = await API.call('/supplier/alpine'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
+    const k = d.kpi;
+    const goud = 'background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;';
+    const knop = (attr, id, tekst, vol) => '<button '+attr+'="'+id+'" style="'+(vol?'background:var(--gold);color:#000;border:none;':'background:none;border:1px solid var(--line);color:var(--soft);')+'border-radius:8px;padding:0.35rem 0.7rem;font-family:inherit;font-size:0.72rem;'+(vol?'font-weight:600;':'')+'">'+tekst+'</button>';
+    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
+      [[k.pistesOpen+' van '+k.pistes, T('al.k.pistes','pistes open')],[k.liftenOpen, T('al.k.liften','liften open')],['niveau '+k.lawine, T('al.k.lawine','lawine')],[k.passenActief, T('al.k.passen','passen actief')],[k.verhuurLopend, T('al.k.huur','verhuur lopend')],[k.chaletsBezet, T('al.k.chalets','chalets bezet')]]
+        .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+
+    // de berg: pistes, liften en het lawineniveau van de berggids
+    h += '<div class="st-sec" style="margin-top:1rem;">'+esc(d.naam)+' · '+esc(d.hoogte)+'</div>';
+    h += d.pistes.map(p=>'<div style="display:flex;gap:0.6rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
+      '<span class="sub" style="flex:0 0 4.2rem;">'+esc(p.kleur)+'</span><b style="flex:1;font-size:0.85rem;">'+esc(p.naam)+'</b><span class="sub">'+esc(p.status)+'</span>'+
+      knop('data-alp', p.id+':'+(p.status==='open'?'dicht':'open'), p.status==='open'?T('al.dicht','Sluit'):T('al.open','Open'), p.status!=='open')+'</div>').join('');
+    h += d.liften.map(l=>'<div style="display:flex;gap:0.6rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
+      '<span class="sub" style="flex:0 0 4.2rem;">'+esc(l.soort)+'</span><b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+'</b><span class="sub">'+esc(l.status)+'</span>'+
+      knop('data-all', l.id+':'+(l.status==='open'?'dicht':'open'), l.status==='open'?T('al.dicht','Sluit'):T('al.open','Open'), l.status!=='open')+'</div>').join('');
+    h += '<div class="row-gap" style="margin-top:0.5rem;align-items:center;"><span class="sub" style="flex:1;">'+T('al.lawine','Lawineniveau (zet de berggids)')+': <b>'+k.lawine+'</b></span>'+
+      [1,2,3,4,5].filter(n=>n!==k.lawine).map(n=>knop('data-alw', String(n), String(n))).join(' ')+'</div>';
+
+    // skipassen
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('al.passen','Skipassen')+' · '+eur(d.dagpas)+' '+T('al.perdag','per dag')+'</div>'+
+      '<div class="row-gap"><input id="alPNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" style="flex:2;"><input id="alPDagen" class="st-in" type="number" min="1" max="14" value="6" style="flex:0 0 4.5rem;">'+
+      '<button id="alPas" style="flex:1;'+goud+'">'+T('al.pas','Maak pas')+'</button></div>';
+    h += (d.passen||[]).slice(0,6).map(p=>'<div class="sub" style="padding:0.3rem 0;">'+esc(p.id)+' · '+esc(p.naam)+' · '+p.dagen+' '+T('al.dagen','dagen')+' · tot '+esc(p.tot)+' · '+eur(p.prijs)+'</div>').join('');
+
+    // materiaalverhuur
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('al.verhuur','Materiaalverhuur')+'</div>'+
+      '<div class="row-gap" style="flex-wrap:wrap;">'+d.materiaal.map(m=>'<label class="sub" style="display:flex;gap:0.3rem;align-items:center;"><input type="checkbox" data-alhm="'+m.id+'">'+esc(m.naam)+' · '+eur(m.dagprijs)+'/d</label>').join('')+'</div>'+
+      '<div class="row-gap" style="margin-top:0.4rem;"><input id="alHNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" style="flex:2;"><input id="alHDagen" class="st-in" type="number" min="1" max="21" value="6" style="flex:0 0 4.5rem;">'+
+      '<button id="alHuur" style="flex:1;'+goud+'">'+T('al.huur','Verhuur')+'</button></div>';
+    h += (d.verhuur||[]).map(v=>'<div class="sub" style="padding:0.3rem 0;">'+esc(v.naam)+' · '+v.items.map(esc).join(' + ')+' · '+v.dagen+' d · '+eur(v.prijs)+' '+knop('data-alhi', v.id, T('al.inleveren','Ingeleverd'), true)+'</div>').join('');
+
+    // de skischool
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('al.school','De skischool')+'</div>';
+    h += d.groepslessen.map(l=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
+      '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(l.naam)+' · '+esc(l.tijd)+'</b><span class="sub">'+l.deelnemers.length+' van '+l.capaciteit+'</span></div>'+
+      (l.deelnemers.length?'<div class="sub" style="margin-top:0.3rem;">'+l.deelnemers.slice(0,10).map(esc).join(' · ')+'</div>':'')+
+      '<div class="row-gap" style="margin-top:0.45rem;"><input data-algn="'+l.id+'" class="st-in" placeholder="'+T('al.deelnemer','Naam deelnemer')+'" maxlength="60" style="flex:2;">'+knop('data-algi', l.id, T('al.meld','Meld aan'), true)+'</div></div>').join('');
+    h += '<div class="row-gap" style="margin-top:0.5rem;"><select id="alIns" class="st-in" style="flex:2;">'+d.instructeurs.map(i=>'<option value="'+i.id+'">'+esc(i.naam)+' · priveles '+eur(i.prijs)+'</option>').join('')+'</select>'+
+      '<input id="alLNaam" class="st-in" placeholder="'+T('al.voorwie','Voor wie')+'" maxlength="60" style="flex:1;"><input id="alLDatum" class="st-in" type="date" style="flex:1;"><input id="alLTijd" class="st-in" type="time" style="flex:1;">'+
+      '<button id="alPrive" style="flex:1;'+goud+'">'+T('al.plan','Plan')+'</button></div>';
+    h += (d.privelessen||[]).map(l=>'<div class="sub" style="padding:0.3rem 0;">'+esc(l.datum)+' '+esc(l.tijd)+' · '+esc(l.instructeur)+' · '+esc(l.naam)+' '+knop('data-allk', l.id, T('al.gegeven','Gegeven'), true)+'</div>').join('');
+
+    // de chalets
+    h += '<div class="st-sec" style="margin-top:1rem;">'+T('al.chalets','De chalets')+'</div>'+
+      '<div class="row-gap"><select id="alCh" class="st-in" style="flex:2;">'+d.chalets.map(c=>'<option value="'+c.id+'">'+esc(c.naam)+' · '+c.bedden+' bedden · '+eur(c.nachtprijs)+'/n</option>').join('')+'</select>'+
+      '<input id="alCNaam" class="st-in" placeholder="'+T('al.naam','Op naam van')+'" maxlength="60" style="flex:1;"><input id="alCVan" class="st-in" type="date" style="flex:1;"><input id="alCNachten" class="st-in" type="number" min="1" max="28" value="7" style="flex:0 0 4.5rem;">'+
+      '<button id="alChalet" style="flex:1;'+goud+'">'+T('al.boek','Boek')+'</button></div>';
+    h += (d.chaletBoekingen||[]).map(b=>'<div class="sub" style="padding:0.3rem 0;">'+esc(b.chalet)+' · '+esc(b.naam)+' · '+esc(b.van)+' tot '+esc(b.tot)+' · '+eur(b.prijs)+'</div>').join('');
+    h += '<p class="sub" style="margin-top:0.5rem;">'+esc(d.regel||'')+'</p>';
+    el.innerHTML = h;
+
+    const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call(pad, body(b.dataset)); renderAlpine(); } catch(e){ toast(e.message); }
+    }));
+    const ba = (id, fn) => { const b = el.querySelector('#'+id); if (b) b.addEventListener('click', fn); };
+    ba('alPas', async () => { try { await API.call('/supplier/alpine/pas', { naam: $('#alPNaam').value, dagen: $('#alPDagen').value }); renderAlpine(); } catch(e){ toast(e.message); } });
+    ba('alHuur', async () => { try {
+      const items = [...el.querySelectorAll('[data-alhm]:checked')].map(x => x.dataset.alhm);
+      await API.call('/supplier/alpine/huur', { naam: $('#alHNaam').value, dagen: $('#alHDagen').value, items });
+      renderAlpine();
+    } catch(e){ toast(e.message); } });
+    ba('alPrive', async () => { try { await API.call('/supplier/alpine/prive', { instructeurId: $('#alIns').value, naam: $('#alLNaam').value, datum: $('#alLDatum').value, tijd: $('#alLTijd').value }); renderAlpine(); } catch(e){ toast(e.message); } });
+    ba('alChalet', async () => { try { await API.call('/supplier/alpine/chalet', { chaletId: $('#alCh').value, naam: $('#alCNaam').value, van: $('#alCVan').value, nachten: $('#alCNachten').value }); renderAlpine(); } catch(e){ toast(e.message); } });
+    doe('data-alp', '/supplier/alpine/piste', ds => { const [id, status] = ds.alp.split(':'); return { id, status }; });
+    doe('data-all', '/supplier/alpine/lift', ds => { const [id, status] = ds.all.split(':'); return { id, status }; });
+    doe('data-alw', '/supplier/alpine/lawine', ds => ({ niveau: ds.alw }));
+    doe('data-alhi', '/supplier/alpine/huur/in', ds => ({ id: ds.alhi }));
+    doe('data-algi', '/supplier/alpine/groep/in', ds => ({ lesId: ds.algi, naam: (el.querySelector('[data-algn="'+ds.algi+'"]')||{}).value }));
+    doe('data-allk', '/supplier/alpine/prive/klaar', ds => ({ id: ds.allk }));
+  }
   // ---- de eigen mini-boardroom van de zaak: functies + HR + marketing ----
   // ---- interactieve AI-agenda in de boardroom + ballon-badge op de Meer-tab ----
   let agendaSupData = null;
@@ -4871,7 +4951,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderAlpine(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.

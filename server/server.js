@@ -2519,6 +2519,10 @@ require('./routes/marina')(kern);
    professionele diensten en verzekeringen; de mens houdt het laatste woord. */
 Object.assign(kern, require('./kern/planners')({ db, save, crypto, schoon }));
 require('./routes/planners')(kern);
+/* RTG Alpine (kern/alpine.js): het wintersport- en seizoensresort met
+   pistes, liften, het lawineniveau van de berggids, skischool en chalets. */
+Object.assign(kern, require('./kern/alpine')({ db, save, crypto, schoon }));
+require('./routes/alpine')(kern);
 /* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
    bibliotheken en zetten die live op de klas-PDA van de kinderen. */
 Object.assign(kern, require('./kern/lesmaker')({ db, save, crypto, schoon, anthropic, leeftijdInstr: rtf.leeftijdInstr }));

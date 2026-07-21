@@ -12,6 +12,7 @@
     gebouw:   { label:'Gebouw',    svg:'<path d="M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17"/><path d="M15 9h3a1 1 0 0 1 1 1v11"/><path d="M3 21h18"/><path d="M8 7h2M8 11h2M8 15h2M12 7h.01M12 11h.01M12 15h.01"/>', cap:'gebouw' },
     golf:     { label:'Golfbaan',  svg:'<path d="M12 3v12"/><path d="M12 3l6 2.5-6 2.5"/><circle cx="12" cy="18.5" r="2.5"/>', cap:'golf' },
     fitclub:  { label:'Club',      svg:'<path d="M3 12h2M19 12h2M8 12h8"/><rect x="5" y="8" width="3" height="8" rx="1"/><rect x="16" y="8" width="3" height="8" rx="1"/>', cap:'fitclub' },
+    alpine:   { label:'Resort',    svg:'<path d="M3 20L10 6l4 8 3-5 4 11z"/><path d="M8 20l2-4"/><path d="M14.5 4.5h.01"/>', cap:'alpine' },
     weddings: { label:'Draaiboek', svg:'<path d="M12 8c-1.5-2.5-5-2.5-6 0-0.8 2 0.8 4 6 8 5.2-4 6.8-6 6-8-1-2.5-4.5-2.5-6 0z"/><path d="M12 3v2M7 4.5l1 1.5M17 4.5l-1 1.5"/>', cap:'weddings' },
     advies:   { label:'Praktijk',  svg:'<path d="M12 4v16M6 20h12"/><path d="M12 6h6l-2.5 5a3 3 0 0 0 5 0L18 6M12 6H6l2.5 5a3 3 0 0 1-5 0L6 6"/>', cap:'advies' },
     polis:    { label:'Advies',    svg:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12h6M12 9v6"/>', cap:'polis' },

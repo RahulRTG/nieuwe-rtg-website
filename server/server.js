@@ -595,17 +595,19 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 /* ---------- Claude API (optioneel) ---------- */
 
 let anthropic = null;
-if (process.env.ANTHROPIC_API_KEY) {
-  try {
-    const Anthropic = require('./anthropic'); // eigen dunne client (geen SDK-dependency)
-    anthropic = new Anthropic();
+try {
+  // De AI-uitwijk (server/ai.js): Claude eerst, dan OpenAI, dan Gemini; valt
+  // een aanbieder uit (storing/429/5xx), dan neemt de volgende het over. Alleen
+  // aanbieders met een sleutel doen mee; zonder enige sleutel blijft het demo.
+  anthropic = require('./ai').maakAI({ log });
+  if (anthropic) {
     i18n.setAnthropic(anthropic);
-    console.log('Persoonlijke AI: Claude API actief (claude-opus-4-8).');
-  } catch (e) {
-    console.warn('AI-client kon niet starten (' + (e && e.message) + '); demo-antwoorden actief.');
+    console.log('Persoonlijke AI actief; aanbieders (op volgorde): ' + anthropic.aanbieders.join(', ') + '.');
+  } else {
+    console.log('Persoonlijke AI: demo-antwoorden (zet ANTHROPIC_API_KEY, OPENAI_API_KEY of GEMINI_API_KEY voor echte AI).');
   }
-} else {
-  console.log('Persoonlijke AI: demo-antwoorden (zet ANTHROPIC_API_KEY voor echte Claude).');
+} catch (e) {
+  console.warn('AI-client kon niet starten (' + (e && e.message) + '); demo-antwoorden actief.');
 }
 
 /* ---------- personas & sessies ---------- */

@@ -21,8 +21,8 @@ const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 
 let stripe = null;
 if (STRIPE_KEY) {
-  try { stripe = require('stripe')(STRIPE_KEY); }
-  catch (e) { /* pakket ontbreekt: val terug op demo */ }
+  try { stripe = require('./stripe')(STRIPE_KEY); } // eigen dunne client (geen dependency)
+  catch (e) { /* kan niet starten: val terug op demo */ }
 }
 const AANBIEDER = stripe ? 'stripe' : 'demo';
 

@@ -2467,6 +2467,10 @@ require('./routes/account')(kern);
    gedeelde basis-laag op elke app-pagina zet; openbare uitleg, geen data. */
 kern.appgids = require('./kern/appgids');
 require('./routes/gids')(kern);
+/* De RTG Home Kit (kern/homekit.js): alle elektronica van het lid op een
+   plek, met AI-scenes; sloten blijven altijd handwerk van het lid zelf. */
+Object.assign(kern, require('./kern/homekit')({ db, save, crypto, schoon, anthropic }));
+require('./routes/home')(kern);
 /* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
    bibliotheken en zetten die live op de klas-PDA van de kinderen. */
 Object.assign(kern, require('./kern/lesmaker')({ db, save, crypto, schoon, anthropic, leeftijdInstr: rtf.leeftijdInstr }));

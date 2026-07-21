@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Home Kit</title>
+<link rel="icon" href="/icons/pas-rtg.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,.1);--txt:#F4F1EC;--muted:rgba(244,241,236,.68);--soft:rgba(244,241,236,.5);--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;text-decoration:none;}
+  main{padding:1.1rem;max-width:920px;margin:0 auto;}
+  .stil{color:var(--muted);font-size:.88rem;line-height:1.6;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.55rem 1rem;font:600 .88rem Inter,sans-serif;cursor:pointer;}
+  .knop.stil2{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .veld{background:#0C0C0B;border:1px solid #333;border-radius:10px;color:var(--txt);font:inherit;font-size:.92rem;padding:.55rem .75rem;}
+  .kop2{display:flex;align-items:baseline;gap:.6rem;border-bottom:1px solid var(--line);padding-bottom:.4rem;margin:1.4rem 0 .8rem;}
+  .kop2 h2{font-size:1.1rem;}
+  .kop2 .n{font-size:.72rem;color:var(--soft);letter-spacing:.1em;text-transform:uppercase;}
+  .apparaten{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.7rem;}
+  .ap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.8rem .9rem;display:flex;flex-direction:column;gap:.45rem;}
+  .ap.actief{border-color:var(--gold);}
+  .ap .naam{display:flex;align-items:center;gap:.5rem;font-weight:600;font-size:.92rem;}
+  .ap .staat{font-size:.76rem;color:var(--soft);}
+  .schuif{width:100%;accent-color:var(--gold);}
+  .wissel{margin-left:auto;background:#333;border:none;border-radius:999px;width:2.6rem;height:1.4rem;position:relative;cursor:pointer;}
+  .wissel::after{content:'';position:absolute;top:.15rem;left:.15rem;width:1.1rem;height:1.1rem;border-radius:50%;background:#999;transition:left .15s,background .15s;}
+  .wissel.aan{background:var(--gold);}
+  .wissel.aan::after{left:1.35rem;background:#000;}
+  .scenes{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .scene{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.7rem .9rem;display:flex;flex-direction:column;gap:.3rem;min-width:12rem;}
+  .scene b{font-size:.92rem;}
+  .scene small{color:var(--soft);font-size:.76rem;line-height:1.4;}
+  .maker{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-top:.6rem;}
+  .voorstel{border:1px solid var(--gold);border-radius:12px;padding:.8rem .9rem;margin-top:.7rem;}
+  .voorstel ul{margin:.4rem 0 0 1.1rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .inlog{max-width:420px;margin:4rem auto;text-align:center;}
+  .inlog a{color:var(--gold);}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/index.html">← Apps</a>
+  <div><div class="ey">Uw huis, één bediening</div><h1 style="font-size:1.35rem;">RTG Home Kit</h1></div>
+</header>
+<main id="main" role="main">
+  <p class="stil">Alle elektronica op één plek: lampen, klimaat, gordijnen, audio en meer, per kamer. Maak met Rahul complete scènes ("filmavond") en start ze met één tik. Sloten bedient u altijd zelf, los van scènes; dat is een vaste veiligheidsregel.</p>
+
+  <div class="kop2"><h2>✨ Scènes</h2><span class="n">één tik, heel het huis</span><button class="knop stil2" id="allesUit" style="margin-left:auto;">Alles uit</button></div>
+  <div class="scenes" id="scenes"><span class="stil">Laden…</span></div>
+  <div class="maker">
+    <b style="font-size:.95rem;">Nieuwe scène met Rahul</b>
+    <p class="stil" style="margin:.3rem 0 .6rem;">Vertel het moment; Rahul stelt de standen voor. U bekijkt, bewaart en start zelf.</p>
+    <div class="rij">
+      <input class="veld" id="wens" maxlength="200" placeholder="Bijv. filmavond, rustige ochtend, iedereen weg…" style="flex:1;min-width:12rem;">
+      <button class="knop" id="maak">✨ Stel voor</button>
+    </div>
+    <div class="voorstel" id="voorstel" hidden></div>
+  </div>
+
+  <div id="kamers"><p class="stil" style="padding:1rem 0;">De woning laadt…</p></div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch(e){}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2400); }
+const api = (pad, body) => fetch(pad, { method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+TOKEN}, body: JSON.stringify(body||{}) })
+  .then(async r => { const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; });
+
+if (!TOKEN) {
+  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
+    '<p class="stil" style="margin-top:.6rem;">De Home Kit hoort bij je RTG-account. Open de app en log in.</p>'+
+    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+} else { laad(); }
+
+let HUIS = null, VOORSTEL = null;
+async function laad(){
+  try { HUIS = await api('/api/home'); } catch(e){ $('#kamers').innerHTML = '<p class="stil">'+esc(e.message)+'</p>'; return; }
+  tekenScenes(); tekenKamers();
+}
+function staatTekst(a){
+  const s = a.stand;
+  if (a.soort === 'slot') return s.opSlot ? 'Op slot' : 'OPEN';
+  if ('open' in s) return s.open ? 'Open' : 'Dicht';
+  const delen = [];
+  delen.push(s.aan ? 'Aan' : 'Uit');
+  if (s.aan && 'dim' in s) delen.push(s.dim + '%');
+  if (s.aan && 'volume' in s) delen.push('vol ' + s.volume);
+  if ('temp' in s) delen.push(s.temp + '°');
+  return delen.join(' · ');
+}
+function tekenKamers(){
+  $('#kamers').innerHTML = HUIS.kamers.map(k =>
+    '<div class="kop2"><h2>'+esc(k.kamer)+'</h2><span class="n">'+k.apparaten.length+' apparaten</span></div>'+
+    '<div class="apparaten">'+k.apparaten.map(a => {
+      const s = a.stand, actief = a.soort === 'slot' ? !s.opSlot : (('open' in s) ? !!s.open : !!s.aan);
+      let extra = '';
+      if (a.soort !== 'slot' && 'dim' in s) extra = '<input type="range" class="schuif" min="1" max="100" value="'+s.dim+'" data-id="'+esc(a.id)+'" data-v="dim" aria-label="Dimmen '+esc(a.naam)+'">';
+      if ('volume' in s) extra = '<input type="range" class="schuif" min="0" max="100" value="'+s.volume+'" data-id="'+esc(a.id)+'" data-v="volume" aria-label="Volume '+esc(a.naam)+'">';
+      if ('temp' in s) extra = '<input type="range" class="schuif" min="5" max="30" value="'+s.temp+'" data-id="'+esc(a.id)+'" data-v="temp" aria-label="Temperatuur '+esc(a.naam)+'">';
+      let knop;
+      if (a.soort === 'slot') knop = '<button class="wissel'+(s.opSlot?'':' aan')+'" data-id="'+esc(a.id)+'" data-slot="1" aria-label="'+(s.opSlot?'Slot openen':'Op slot doen')+'" role="switch" aria-checked="'+(!s.opSlot)+'"></button>';
+      else if ('open' in s) knop = '<button class="wissel'+(s.open?' aan':'')+'" data-id="'+esc(a.id)+'" data-open="1" aria-label="'+esc(a.naam)+' openen of sluiten" role="switch" aria-checked="'+s.open+'"></button>';
+      else knop = '<button class="wissel'+(s.aan?' aan':'')+'" data-id="'+esc(a.id)+'" aria-label="'+esc(a.naam)+' aan of uit" role="switch" aria-checked="'+!!s.aan+'"></button>';
+      return '<div class="ap'+(actief?' actief':'')+'"><span class="naam">'+a.icon+' '+esc(a.naam)+knop+'</span>'+
+        '<span class="staat">'+staatTekst(a)+'</span>'+extra+'</div>';
+    }).join('')+'</div>').join('');
+  $('#kamers').querySelectorAll('.wissel').forEach(b => b.addEventListener('click', async () => {
+    const ap = HUIS.kamers.flatMap(k => k.apparaten).find(x => x.id === b.dataset.id);
+    try {
+      let stand;
+      if (b.dataset.slot) stand = { opSlot: !ap.stand.opSlot };
+      else if (b.dataset.open) stand = { open: !ap.stand.open };
+      else stand = { aan: !ap.stand.aan };
+      const r = await api('/api/home/zet', { id: ap.id, stand });
+      ap.stand = r.apparaat.stand; tekenKamers();
+      if (b.dataset.slot) meld(ap.stand.opSlot ? '🔒 Op slot.' : '🔓 Open; vergeet niet weer af te sluiten.');
+    } catch(e){ meld(e.message); }
+  }));
+  $('#kamers').querySelectorAll('.schuif').forEach(sl => sl.addEventListener('change', async () => {
+    try {
+      const stand = {}; stand[sl.dataset.v] = Number(sl.value);
+      const r = await api('/api/home/zet', { id: sl.dataset.id, stand });
+      const ap = HUIS.kamers.flatMap(k => k.apparaten).find(x => x.id === sl.dataset.id);
+      ap.stand = r.apparaat.stand; tekenKamers();
+    } catch(e){ meld(e.message); }
+  }));
+}
+function tekenScenes(){
+  $('#scenes').innerHTML = HUIS.scenes.length ? HUIS.scenes.map(s =>
+    '<div class="scene"><b>'+esc(s.naam)+'</b><small>'+esc(s.uitleg||'')+' ('+s.aantal+' apparaten)</small>'+
+    '<div class="rij" style="margin-top:.3rem;"><button class="knop scstart" data-id="'+esc(s.id)+'">Start</button>'+
+    '<button class="knop stil2 scweg" data-id="'+esc(s.id)+'">Weg</button></div></div>').join('')
+    : '<span class="stil">Nog geen scènes. Laat Rahul er hieronder een voorstellen.</span>';
+  $('#scenes').querySelectorAll('.scstart').forEach(b => b.addEventListener('click', async () => {
+    try { const r = await api('/api/home/scene/start', { id: b.dataset.id }); meld('Scène "'+r.naam+'" gestart ('+r.gezet+' apparaten).'); laad(); } catch(e){ meld(e.message); }
+  }));
+  $('#scenes').querySelectorAll('.scweg').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/home/scene/weg', { id: b.dataset.id }); laad(); } catch(e){ meld(e.message); }
+  }));
+}
+$('#allesUit').addEventListener('click', async () => {
+  try { const r = await api('/api/home/alles-uit'); meld(r.uitgezet + ' apparaten uitgezet; sloten en de laadpaal bleven met rust.'); laad(); } catch(e){ meld(e.message); }
+});
+$('#maak').addEventListener('click', async () => {
+  $('#maak').disabled = true;
+  try {
+    const r = await api('/api/home/scene/ai', { wens: $('#wens').value });
+    VOORSTEL = r.voorstel;
+    const alle = HUIS.kamers.flatMap(k => k.apparaten);
+    $('#voorstel').hidden = false;
+    $('#voorstel').innerHTML = '<b>✨ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(demo-voorstel; met AI-sleutel bouwt Rahul hem zelf)</small>':'')+
+      '<p class="stil" style="margin-top:.2rem;">'+esc(VOORSTEL.uitleg)+'</p>'+
+      '<ul>'+Object.entries(VOORSTEL.standen).map(([id,s]) => { const a = alle.find(x => x.id === id); return '<li>'+esc(a?a.naam:id)+': '+esc(JSON.stringify(s).replace(/[{}"]/g,'').replace(/,/g,', ').replace(/aan:true/,'aan').replace(/aan:false/,'uit'))+'</li>'; }).join('')+'</ul>'+
+      '<div class="rij" style="margin-top:.6rem;"><button class="knop" id="vBewaar">Bewaar als scène</button><span class="stil">Sloten doet u altijd zelf; die zitten er nooit in.</span></div>';
+    $('#vBewaar').addEventListener('click', async () => {
+      try { await api('/api/home/scene/bewaar', VOORSTEL); $('#voorstel').hidden = true; $('#wens').value = ''; meld('Scène bewaard.'); laad(); } catch(e){ meld(e.message); }
+    });
+  } catch(e){ meld(e.message); }
+  $('#maak').disabled = false;
+});
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

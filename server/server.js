@@ -2312,7 +2312,7 @@ Object.assign(kern, require('./kern/clips').maakClips({
    (tekstdocument of rekenblad) op het account, alleen-lezen te delen op
    codenaam. Na sociaal gemount (codenamen en de codenaam-opzoeker). */
 Object.assign(kern, require('./kern/office').maakOffice({
-  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, keyVanCodenaam, sseToCustomer
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, keyVanCodenaam, sseToCustomer, anthropic
 }));
 /* Het AI-stuur (kern/stuur.js): Rahul voert acties uit op elk toegestaan
    API-pad, als interne aanroep met de eigen inlog van de gebruiker. Een

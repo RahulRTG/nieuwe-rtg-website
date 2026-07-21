@@ -53,10 +53,14 @@
     // werkplek toont (keuken, bar, uit te serveren, kassa, gasten) of het
     // hoofdscherm spiegelt. Werkt op elke zaak; opent een eigen venster.
     const scherm = '<button class="meer-btn" data-scherm="1"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 20h8M12 17v3"/></svg><b>'+T('tab.scherm','Tweede scherm')+'</b></button>';
+    // RTG Office hoort bij elke zaak: de team-drive met documenten,
+    // rekenbladen en presentaties (zelfde zaak-inlog, eigen pagina)
+    const office = '<button class="meer-btn" data-office="1"><svg viewBox="0 0 24 24"><path d="M6 2h9l3 3v17H6z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><b>RTG Office</b></button>';
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
-    ).join('') + ghost + scherm + '</div>';
+    ).join('') + office + ghost + scherm + '</div>';
     el.querySelectorAll('[data-goto2]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto2)));
+    el.querySelectorAll('[data-office]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/office.html?werk=zaak'; }));
     el.querySelectorAll('[data-ghost]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/ghost.html'; }));
     el.querySelectorAll('[data-scherm]').forEach(b => b.addEventListener('click', () => {
       window.open('/apps/scherm.html', 'rtg-scherm', 'width=1280,height=800');

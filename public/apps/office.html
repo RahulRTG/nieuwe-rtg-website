@@ -18,16 +18,18 @@
   .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.8rem) 1.1rem 0.6rem;border-bottom:1px solid var(--line);}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+  .kop .werk{font-size:0.72rem;color:var(--gold);border:1px solid rgba(201,162,75,0.5);border-radius:999px;padding:0.15rem 0.55rem;}
   .kop .rek{flex:1;}
   .kop .staat{font-size:0.75rem;color:var(--soft);}
   .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:0.82rem;padding:0.5rem 0.85rem;}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
   .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
-  .knop:focus-visible,input:focus-visible,[contenteditable]:focus-visible,td:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
+  .knop:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[contenteditable]:focus-visible,td:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
   main{flex:1;min-height:0;overflow-y:auto;}
   /* de mappenlijst */
   #lijst{padding:1.1rem;max-width:820px;margin:0 auto;}
-  .rijk{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+  .rijk{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
+  .rijk select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.82rem;padding:0.5rem 0.6rem;}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1rem 0 0.5rem;}
   .doc{display:flex;align-items:center;gap:0.8rem;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);
     border-radius:12px;color:var(--txt);padding:0.85rem 1rem;margin-bottom:0.5rem;}
@@ -56,13 +58,28 @@
   #blad td[data-berekend]{color:var(--gold);}
   #blad td:focus{background:rgba(201,162,75,0.12);}
   #blad td.rijkop{background:var(--card2);color:var(--soft);text-align:center;font-weight:600;position:sticky;left:0;}
-  .deel-scrim{position:fixed;inset:0;z-index:20;background:rgba(12,12,11,0.85);display:none;align-items:center;justify-content:center;padding:1rem;}
-  .deel-scrim.open{display:flex;}
-  .deel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;width:min(440px,100%);}
-  .deel h3{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin-bottom:0.6rem;}
-  .deel input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:0.6rem 0.8rem;margin:0.5rem 0;}
-  .deel .lijst{font-size:0.85rem;color:var(--soft);margin:0.5rem 0;}
-  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:30;
+  /* presentatie: de dia-lijst en de presenteermodus */
+  #presWrap{max-width:820px;margin:0 auto;}
+  .dia{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.2rem;margin-bottom:0.7rem;}
+  .dia .nr{font-size:0.72rem;color:var(--soft);letter-spacing:0.12em;text-transform:uppercase;display:flex;align-items:center;gap:0.5rem;}
+  .dia .nr .rek{flex:1;}
+  .dia input{width:100%;background:none;border:none;color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.25rem;outline:none;margin:0.35rem 0;}
+  .dia textarea{width:100%;min-height:4.5rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.92rem;line-height:1.6;padding:0.6rem 0.8rem;resize:vertical;}
+  #toonDia{position:fixed;inset:0;z-index:40;background:#0C0C0B;display:none;flex-direction:column;justify-content:center;padding:6vw;}
+  #toonDia.aan{display:flex;}
+  #toonDia h3{font-family:'Bodoni Moda',serif;font-size:clamp(2rem,6vw,4rem);margin-bottom:1.2rem;}
+  #toonDia p{font-size:clamp(1.05rem,2.6vw,1.6rem);line-height:1.6;color:var(--soft);white-space:pre-wrap;}
+  #toonDia .voet{position:fixed;left:0;right:0;bottom:1.2rem;display:flex;justify-content:center;gap:0.6rem;align-items:center;color:var(--soft);font-size:0.8rem;}
+  /* modals */
+  .scrim{position:fixed;inset:0;z-index:20;background:rgba(12,12,11,0.85);display:none;align-items:center;justify-content:center;padding:1rem;}
+  .scrim.open{display:flex;}
+  .paneel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;width:min(480px,100%);max-height:85dvh;overflow:auto;}
+  .paneel h3{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin-bottom:0.6rem;}
+  .paneel input,.paneel select,.paneel textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:0.6rem 0.8rem;margin:0.5rem 0;}
+  .paneel .lijst{font-size:0.85rem;color:var(--soft);margin:0.5rem 0;}
+  .paneel .vitem{display:flex;align-items:center;gap:0.6rem;border-bottom:1px solid var(--line);padding:0.45rem 0;font-size:0.85rem;}
+  .paneel .vitem .rek{flex:1;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:50;
     background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;opacity:0;transition:opacity .25s;}
   .melding.zien{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
@@ -70,8 +87,9 @@
 </head>
 <body>
 <header class="kop">
-  <a href="/apps/app.html" id="terug" aria-label="Terug naar de leden-app">←</a>
+  <a href="/apps/app.html" id="terug" aria-label="Terug">←</a>
   <h1>RTG Office</h1>
+  <span class="werk" id="werkChip" style="display:none;"></span>
   <span class="rek"></span>
   <span class="staat" id="staat"></span>
 </header>
@@ -79,10 +97,12 @@
   <!-- de mappenlijst -->
   <section id="lijst">
     <div class="rijk">
-      <button class="knop vol" id="nieuwTekst" type="button">📄 Nieuw document</button>
-      <button class="knop vol" id="nieuwBlad" type="button">📊 Nieuw rekenblad</button>
+      <button class="knop vol" id="nieuwTekst" type="button">📄 Document</button>
+      <button class="knop vol" id="nieuwBlad" type="button">📊 Rekenblad</button>
+      <button class="knop vol" id="nieuwPres" type="button">🖥️ Presentatie</button>
+      <select id="sjabloonKeuze" aria-label="Sjabloon kiezen"><option value="">Sjabloon…</option></select>
     </div>
-    <h2>Mijn documenten</h2>
+    <h2 id="kopMijn">Mijn documenten</h2>
     <div id="mijnDocs"></div>
     <h2>Met mij gedeeld</h2>
     <div id="gedeeldDocs"></div>
@@ -100,23 +120,72 @@
         <button class="tb" data-cmd="insertUnorderedList" title="Opsomming" type="button">•</button>
       </span>
       <span class="rek"></span>
+      <button class="knop" id="presBtn" type="button" style="display:none;">▶ Presenteer</button>
+      <button class="knop" id="aiBtn" type="button">✨ AI-hulp</button>
+      <button class="knop" id="versiesBtn" type="button">🕘 Versies</button>
       <button class="knop" id="deelBtn" type="button">🔗 Delen</button>
       <button class="knop" id="exportBtn" type="button">⬇ Export</button>
     </div>
     <div class="vlak">
       <div id="tekst" contenteditable="true" data-leeg="Begin te typen…" role="textbox" aria-multiline="true" aria-label="Documenttekst"></div>
       <div id="bladWrap" style="display:none;overflow:auto;"><table id="blad"></table></div>
+      <div id="presWrap" style="display:none;">
+        <div id="diaLijst"></div>
+        <button class="knop" id="diaErbij" type="button">+ Dia erbij</button>
+      </div>
     </div>
   </section>
 </main>
 
-<div class="deel-scrim" id="deelScrim" role="dialog" aria-label="Delen">
-  <div class="deel">
-    <h3>Delen (alleen lezen)</h3>
-    <p class="stil">Deel dit document alleen-lezen met een ander lid op codenaam. De ander ziet uw echte naam nooit.</p>
-    <form id="deelForm"><input id="deelCode" maxlength="60" placeholder="Codenaam van het lid" aria-label="Codenaam"><button class="knop vol" type="submit">Deel</button></form>
+<!-- presenteermodus -->
+<div id="toonDia" role="dialog" aria-label="Presentatie">
+  <h3 id="tdTitel"></h3>
+  <p id="tdTekst"></p>
+  <div class="voet"><button class="knop" id="tdVorige" type="button">← vorige</button><span id="tdTeller"></span><button class="knop" id="tdVolgende" type="button">volgende →</button><button class="knop" id="tdDicht" type="button">sluit</button></div>
+</div>
+
+<!-- delen -->
+<div class="scrim" id="deelScrim" role="dialog" aria-label="Delen">
+  <div class="paneel">
+    <h3>Delen op codenaam</h3>
+    <p class="stil">Deel dit document met een lid op codenaam; de ander ziet uw echte naam nooit. Kies alleen lezen of meeschrijven.</p>
+    <form id="deelForm">
+      <input id="deelCode" maxlength="60" placeholder="Codenaam van het lid" aria-label="Codenaam">
+      <select id="deelRechten" aria-label="Rechten"><option value="lezen">Alleen lezen</option><option value="bewerken">Meeschrijven</option></select>
+      <button class="knop vol" type="submit">Deel</button>
+    </form>
     <div class="lijst" id="deelLijst"></div>
     <button class="knop" id="deelDicht" type="button" style="margin-top:0.5rem;">Sluit</button>
+  </div>
+</div>
+
+<!-- versiegeschiedenis -->
+<div class="scrim" id="versieScrim" role="dialog" aria-label="Versiegeschiedenis">
+  <div class="paneel">
+    <h3>Versiegeschiedenis</h3>
+    <p class="stil">Elke wijziging bewaart de vorige stand; de eigenaar kan terugzetten.</p>
+    <div id="versieLijst"></div>
+    <button class="knop" id="versieDicht" type="button" style="margin-top:0.5rem;">Sluit</button>
+  </div>
+</div>
+
+<!-- de AI-schrijfhulp: stelt voor, u beslist -->
+<div class="scrim" id="aiScrim" role="dialog" aria-label="AI-hulp">
+  <div class="paneel">
+    <h3>AI-hulp</h3>
+    <p class="stil">De AI stelt alleen voor; u kiest zelf of het in het document komt.</p>
+    <select id="aiOpdracht" aria-label="Opdracht">
+      <option value="samenvatten">Samenvatten</option>
+      <option value="herschrijven">Zakelijk herschrijven</option>
+      <option value="doorschrijven">Doorschrijven</option>
+    </select>
+    <input id="aiVraag" maxlength="300" placeholder="Extra wens (mag leeg)" aria-label="Wens">
+    <button class="knop vol" id="aiVraagBtn" type="button">Vraag voorstel</button>
+    <textarea id="aiUit" rows="6" readonly aria-label="Voorstel"></textarea>
+    <div style="display:flex;gap:0.5rem;">
+      <button class="knop vol" id="aiToepas" type="button" style="display:none;">Voeg toe aan het document</button>
+      <button class="knop" id="aiDicht" type="button">Sluit</button>
+    </div>
   </div>
 </div>
 <div class="melding" id="melding" role="status"></div>
@@ -124,25 +193,43 @@
 (() => {
   const $ = s => document.querySelector(s);
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/kantoorpakket/' + pad, { method: 'POST',
+
+  /* Drie ingangen op hetzelfde pakket: het lid (eigen account), de zaak
+     (?werk=zaak, de team-drive van de hele zaak) en de RTG-kantoren
+     (?werk=kantoor, de gedeelde kantoor-drive). */
+  const WERK = new URLSearchParams(location.search).get('werk') || '';
+  const opzet = WERK === 'zaak'
+    ? { basis: '/api/supplier/kantoorpakket/', tokenKey: 'rtg_sup_token', chip: 'Team-drive van de zaak', terug: '/apps/leverancier.html', mijnKop: 'Documenten van de zaak', leeg: 'Log eerst in op de zaak-app.' }
+    : WERK === 'kantoor'
+    ? { basis: '/api/office/kantoorpakket/', tokenKey: 'rtg_office_token', chip: 'RTG Kantoor-drive', terug: '/apps/kantoren.html', mijnKop: 'Documenten van het kantoor', leeg: 'Log eerst in op de backoffice.' }
+    : { basis: '/api/kantoorpakket/', tokenKey: 'rtg_member_token', chip: '', terug: '/apps/app.html', mijnKop: 'Mijn documenten', leeg: 'Log eerst in op de leden-app.' };
+  const token = (() => { try { return localStorage.getItem(opzet.tokenKey); } catch (e) { return null; } })();
+  $('#terug').href = opzet.terug;
+  $('#kopMijn').textContent = opzet.mijnKop;
+  if (opzet.chip) { $('#werkChip').textContent = opzet.chip; $('#werkChip').style.display = ''; }
+
+  const api = (pad, body) => fetch(opzet.basis + pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
 
-  let open = null, magBewerken = false, bewaarT = null, vuil = false;
+  let open = null, magBewerken = false, bewaarT = null, vuil = false, leesT = null;
 
   /* ---------- de mappenlijst ---------- */
   async function laadLijst(){
     const r = await api('mijn');
-    if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
-    const teken = (rij, leegtekst) => rij.length ? rij.map(d =>
-      '<div class="doc"><span class="ic">'+(d.soort==='blad'?'📊':'📄')+'</span>'+
+    if (r.status !== 200) { zeg(r.body.error || opzet.leeg); return; }
+    const ic = s => s === 'blad' ? '📊' : s === 'presentatie' ? '🖥️' : '📄';
+    const teken = (rij, eigen) => rij.length ? rij.map(d =>
+      '<div class="doc"><span class="ic">'+ic(d.soort)+'</span>'+
       '<button class="rek" data-open="'+d.id+'" style="background:none;border:none;color:var(--txt);text-align:left;">'+
         '<b>'+esc(d.titel)+'</b><small>'+esc(d.door)+' · '+new Date(d.gewijzigd).toLocaleDateString('nl-NL')+(d.gedeeld?' · gedeeld met '+d.gedeeld:'')+'</small></button>'+
-      (leegtekst==='eigen'?'<button class="weg" data-weg="'+d.id+'">weg</button>':'')+'</div>').join('') : '<p class="stil">Nog niets hier.</p>';
-    $('#mijnDocs').innerHTML = teken(r.body.docs, 'eigen');
-    $('#gedeeldDocs').innerHTML = teken(r.body.gedeeld, 'gedeeld');
+      (eigen?'<button class="weg" data-weg="'+d.id+'">weg</button>':'')+'</div>').join('') : '<p class="stil">Nog niets hier.</p>';
+    $('#mijnDocs').innerHTML = teken(r.body.docs, true);
+    $('#gedeeldDocs').innerHTML = teken(r.body.gedeeld, false);
+    const sj = $('#sjabloonKeuze');
+    sj.innerHTML = '<option value="">Sjabloon…</option>' + (r.body.sjablonen || []).map(s =>
+      '<option value="'+s.id+'">'+esc(s.titel)+' ('+(s.soort==='blad'?'rekenblad':s.soort)+')</option>').join('');
     document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openen(b.dataset.open)));
     document.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
       if (!confirm('Dit document verwijderen?')) return;
@@ -150,33 +237,53 @@
       zeg('Verwijderd.'); laadLijst();
     }));
   }
-  async function nieuw(soort){
-    const r = await api('maak', { soort });
+  async function nieuw(soort, sjabloon){
+    const r = await api('maak', sjabloon ? { sjabloon } : { soort });
     if (r.body.error) return zeg(r.body.error);
     openen(r.body.id);
   }
   $('#nieuwTekst').addEventListener('click', () => nieuw('tekst'));
   $('#nieuwBlad').addEventListener('click', () => nieuw('blad'));
+  $('#nieuwPres').addEventListener('click', () => nieuw('presentatie'));
+  $('#sjabloonKeuze').addEventListener('change', () => { const v = $('#sjabloonKeuze').value; if (v){ $('#sjabloonKeuze').value=''; nieuw(null, v); } });
 
   /* ---------- een document openen ---------- */
   async function openen(id){
     const r = await api('open', { id });
     if (r.status !== 200) return zeg(r.body.error || 'Kon niet openen.');
     open = r.body; magBewerken = !!r.body.magBewerken; vuil = false;
-    $('#titel').value = r.body.titel; $('#titel').disabled = !magBewerken;
-    $('#staat').textContent = magBewerken ? '' : 'alleen lezen · van ' + r.body.door;
-    $('#deelBtn').style.display = magBewerken ? '' : 'none';
-    if (r.body.soort === 'blad') { toonBlad(r.body.inhoud); }
-    else { toonTekst(r.body.inhoud); }
+    $('#titel').value = r.body.titel; $('#titel').disabled = !r.body.eigenaar;
+    $('#staat').textContent = magBewerken ? (r.body.eigenaar ? '' : 'meeschrijven · van ' + r.body.door) : 'alleen lezen · van ' + r.body.door;
+    $('#deelBtn').style.display = r.body.eigenaar ? '' : 'none';
+    $('#aiBtn').style.display = (magBewerken && r.body.soort !== 'blad') ? '' : 'none';
+    $('#presBtn').style.display = r.body.soort === 'presentatie' ? '' : 'none';
+    if (r.body.soort === 'blad') toonBlad(r.body.inhoud);
+    else if (r.body.soort === 'presentatie') toonPres(r.body.inhoud);
+    else toonTekst(r.body.inhoud);
     $('#lijst').style.display = 'none'; $('#editor').classList.add('aan');
+    // live meelezen: wie niet zelf aan het typen is, ziet wijzigingen van
+    // de eigenaar of meeschrijvers vanzelf verschijnen
+    clearInterval(leesT);
+    leesT = setInterval(async () => {
+      if (!open || vuil) return;
+      const v = await api('open', { id: open.id });
+      if (v.status === 200 && v.body.gewijzigd !== open.gewijzigd){
+        open.gewijzigd = v.body.gewijzigd; open.inhoud = v.body.inhoud;
+        if (document.activeElement && ['tekst'].includes(document.activeElement.id)) return;
+        if (open.soort === 'blad') toonBlad(v.body.inhoud);
+        else if (open.soort === 'presentatie') toonPres(v.body.inhoud);
+        else toonTekst(v.body.inhoud);
+        zeg('Bijgewerkt door ' + (v.body.door || 'een ander'));
+      }
+    }, 5000);
   }
-  function sluitEditor(){ $('#editor').classList.remove('aan'); $('#lijst').style.display = ''; open = null; laadLijst(); }
+  function sluitEditor(){ clearInterval(leesT); $('#editor').classList.remove('aan'); $('#lijst').style.display = ''; open = null; laadLijst(); }
   $('#editTerug').addEventListener('click', () => { if (vuil) bewaarNu(); sluitEditor(); });
 
   /* ---------- tekstdocument ---------- */
   function toonTekst(inhoud){
     $('#tekstTools').style.display = magBewerken ? 'flex' : 'none';
-    $('#tekst').style.display = ''; $('#bladWrap').style.display = 'none';
+    $('#tekst').style.display = ''; $('#bladWrap').style.display = 'none'; $('#presWrap').style.display = 'none';
     $('#tekst').innerHTML = inhoud && inhoud.tekst || '';
     $('#tekst').contentEditable = magBewerken ? 'true' : 'false';
   }
@@ -192,7 +299,7 @@
     bladData = { cellen: Object.assign({}, (inhoud && inhoud.cellen) || {}),
       rijen: (inhoud && inhoud.rijen) || 20, kolommen: (inhoud && inhoud.kolommen) || 8 };
     $('#tekstTools').style.display = 'none';
-    $('#tekst').style.display = 'none'; $('#bladWrap').style.display = '';
+    $('#tekst').style.display = 'none'; $('#presWrap').style.display = 'none'; $('#bladWrap').style.display = '';
     tekenBlad();
   }
   function tekenBlad(){
@@ -258,33 +365,119 @@
     } catch (e) { return '#FOUT'; }
   }
 
+  /* ---------- presentatie: dia's bewerken en presenteren ---------- */
+  let presData = null, diaNr = 0;
+  function toonPres(inhoud){
+    presData = { dias: ((inhoud && inhoud.dias) || [{ titel: 'Titelblad', tekst: '' }]).map(d => ({ titel: d.titel || '', tekst: d.tekst || '' })) };
+    $('#tekstTools').style.display = 'none';
+    $('#tekst').style.display = 'none'; $('#bladWrap').style.display = 'none'; $('#presWrap').style.display = '';
+    $('#diaErbij').style.display = magBewerken ? '' : 'none';
+    tekenPres();
+  }
+  function tekenPres(){
+    $('#diaLijst').innerHTML = presData.dias.map((d, i) =>
+      '<div class="dia"><div class="nr">Dia '+(i+1)+'<span class="rek"></span>'+
+      (magBewerken && presData.dias.length > 1 ? '<button class="weg" data-diaweg="'+i+'">weg</button>' : '')+'</div>'+
+      '<input data-diat="'+i+'" value="'+esc(d.titel)+'" maxlength="120" placeholder="Titel van de dia"'+(magBewerken?'':' disabled')+'>'+
+      '<textarea data-diax="'+i+'" maxlength="4000" placeholder="De tekst; een regel per punt."'+(magBewerken?'':' disabled')+'>'+esc(d.tekst)+'</textarea></div>').join('');
+    const w = $('#diaLijst');
+    w.querySelectorAll('[data-diat]').forEach(el => el.addEventListener('input', () => { presData.dias[+el.dataset.diat].titel = el.value; markeer(); }));
+    w.querySelectorAll('[data-diax]').forEach(el => el.addEventListener('input', () => { presData.dias[+el.dataset.diax].tekst = el.value; markeer(); }));
+    w.querySelectorAll('[data-diaweg]').forEach(el => el.addEventListener('click', () => { presData.dias.splice(+el.dataset.diaweg, 1); markeer(); tekenPres(); }));
+  }
+  $('#diaErbij').addEventListener('click', () => { if (presData.dias.length >= 60) return zeg('Maximaal 60 dia\'s.'); presData.dias.push({ titel: '', tekst: '' }); markeer(); tekenPres(); });
+  function toonDia(){
+    const d = presData.dias[diaNr] || { titel: '', tekst: '' };
+    $('#tdTitel').textContent = d.titel || '(zonder titel)';
+    $('#tdTekst').textContent = d.tekst;
+    $('#tdTeller').textContent = (diaNr + 1) + ' van ' + presData.dias.length;
+  }
+  $('#presBtn').addEventListener('click', () => { diaNr = 0; toonDia(); $('#toonDia').classList.add('aan');
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); });
+  const diaStap = n => { diaNr = Math.min(presData.dias.length - 1, Math.max(0, diaNr + n)); toonDia(); };
+  $('#tdVorige').addEventListener('click', () => diaStap(-1));
+  $('#tdVolgende').addEventListener('click', () => diaStap(1));
+  $('#tdDicht').addEventListener('click', () => { $('#toonDia').classList.remove('aan'); if (document.exitFullscreen) document.exitFullscreen().catch(() => {}); });
+  document.addEventListener('keydown', e => {
+    if (!$('#toonDia').classList.contains('aan')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') diaStap(1);
+    else if (e.key === 'ArrowLeft') diaStap(-1);
+    else if (e.key === 'Escape') $('#tdDicht').click();
+  });
+
   /* ---------- autosave ---------- */
   function markeer(){ vuil = true; $('#staat').textContent = 'Opslaan…'; clearTimeout(bewaarT); bewaarT = setTimeout(bewaarNu, 900); }
   async function bewaarNu(){
     if (!open || !magBewerken || !vuil) return;
     const inhoud = open.soort === 'blad' ? { cellen: bladData.cellen, rijen: bladData.rijen, kolommen: bladData.kolommen }
+      : open.soort === 'presentatie' ? { dias: presData.dias }
       : { tekst: $('#tekst').innerHTML.slice(0, 500000) };
     const r = await api('bewaar', { id: open.id, titel: $('#titel').value, inhoud });
     if (r.body.error) { $('#staat').textContent = ''; return zeg(r.body.error); }
-    vuil = false; $('#staat').textContent = 'Bewaard ' + new Date().toLocaleTimeString('nl-NL').slice(0,5);
+    vuil = false; open.gewijzigd = r.body.gewijzigd; open.inhoud = inhoud;
+    $('#staat').textContent = 'Bewaard ' + new Date().toLocaleTimeString('nl-NL').slice(0,5);
   }
   $('#titel').addEventListener('input', markeer);
   setInterval(() => { if (vuil) bewaarNu(); }, 8000);
   window.addEventListener('beforeunload', () => { if (vuil) navigator.sendBeacon && bewaarNu(); });
 
-  /* ---------- delen ---------- */
+  /* ---------- delen: alleen lezen of meeschrijven ---------- */
   $('#deelBtn').addEventListener('click', async () => { if (!open) return; await toonDeel(); $('#deelScrim').classList.add('open'); });
   $('#deelDicht').addEventListener('click', () => $('#deelScrim').classList.remove('open'));
   async function toonDeel(){
     const r = await api('open', { id: open.id });
-    const met = (r.body && r.body.gedeeldMet) || [];
-    $('#deelLijst').innerHTML = met.length ? 'Gedeeld met: ' + met.map(esc).join(', ') : 'Nog met niemand gedeeld.';
+    const lees = (r.body && r.body.gedeeldMet) || [];
+    const schrijf = (r.body && r.body.bewerkers) || [];
+    $('#deelLijst').innerHTML = (lees.length || schrijf.length)
+      ? (schrijf.length ? 'Meeschrijvers: ' + schrijf.map(esc).join(', ') + '<br>' : '') +
+        (lees.length ? 'Meelezers: ' + lees.map(esc).join(', ') : '')
+      : 'Nog met niemand gedeeld.';
   }
   $('#deelForm').addEventListener('submit', async e => {
     e.preventDefault();
-    const r = await api('deel', { id: open.id, codenaam: $('#deelCode').value, aan: true });
+    const r = await api('deel', { id: open.id, codenaam: $('#deelCode').value, aan: true, rechten: $('#deelRechten').value });
     if (r.body.error) return zeg(r.body.error);
     $('#deelCode').value = ''; zeg('Gedeeld.'); toonDeel();
+  });
+
+  /* ---------- versiegeschiedenis ---------- */
+  $('#versiesBtn').addEventListener('click', async () => {
+    if (!open) return;
+    const r = await api('versies', { id: open.id });
+    if (r.body.error) return zeg(r.body.error);
+    $('#versieLijst').innerHTML = (r.body.versies || []).length ? r.body.versies.map(v =>
+      '<div class="vitem"><span class="rek">'+new Date(v.om).toLocaleString('nl-NL')+' · '+esc(v.door||'')+'</span>'+
+      (open.eigenaar ? '<button class="knop" data-terug="'+v.nr+'">Zet terug</button>' : '')+'</div>').join('')
+      : '<p class="stil">Nog geen eerdere versies.</p>';
+    $('#versieScrim').classList.add('open');
+    $('#versieLijst').querySelectorAll('[data-terug]').forEach(b => b.addEventListener('click', async () => {
+      const t = await api('terug', { id: open.id, nr: b.dataset.terug });
+      if (t.body.error) return zeg(t.body.error);
+      open.gewijzigd = t.body.gewijzigd; open.inhoud = t.body.inhoud; vuil = false;
+      if (open.soort === 'blad') toonBlad(t.body.inhoud);
+      else if (open.soort === 'presentatie') toonPres(t.body.inhoud);
+      else toonTekst(t.body.inhoud);
+      $('#versieScrim').classList.remove('open'); zeg('Versie teruggezet.');
+    }));
+  });
+  $('#versieDicht').addEventListener('click', () => $('#versieScrim').classList.remove('open'));
+
+  /* ---------- de AI-schrijfhulp ---------- */
+  $('#aiBtn').addEventListener('click', () => { if (!open) return; $('#aiUit').value = ''; $('#aiToepas').style.display = 'none'; $('#aiScrim').classList.add('open'); });
+  $('#aiDicht').addEventListener('click', () => $('#aiScrim').classList.remove('open'));
+  $('#aiVraagBtn').addEventListener('click', async () => {
+    if (vuil) await bewaarNu();
+    $('#aiUit').value = 'Even denken…';
+    const r = await api('ai', { id: open.id, opdracht: $('#aiOpdracht').value, vraag: $('#aiVraag').value });
+    if (r.body.error) { $('#aiUit').value = ''; return zeg(r.body.error); }
+    $('#aiUit').value = r.body.voorstel + (r.body.demo ? '\n\n(demostand: zet een AI-sleutel voor echte voorstellen)' : '');
+    $('#aiToepas').style.display = '';
+  });
+  $('#aiToepas').addEventListener('click', () => {
+    const stuk = $('#aiUit').value.split('\n\n(demostand')[0];
+    if (open.soort === 'presentatie'){ presData.dias.push({ titel: 'AI-voorstel', tekst: stuk }); tekenPres(); }
+    else { $('#tekst').innerHTML += '<p>' + esc(stuk) + '</p>'; }
+    markeer(); $('#aiScrim').classList.remove('open'); zeg('Toegevoegd; u kunt het gewoon bewerken.');
   });
 
   /* ---------- export ---------- */
@@ -300,16 +493,19 @@
         rijen.push(cel.join(','));
       }
       data = rijen.join('\n'); naam = ($('#titel').value || 'rekenblad') + '.csv'; type = 'text/csv';
+    } else if (open.soort === 'presentatie'){
+      data = presData.dias.map((d, i) => 'Dia ' + (i+1) + ': ' + d.titel + '\n' + d.tekst).join('\n\n');
+      naam = ($('#titel').value || 'presentatie') + '.txt'; type = 'text/plain';
     } else {
-      const div = document.createElement('div'); div.innerHTML = $('#tekst').innerHTML;
-      data = div.innerText; naam = ($('#titel').value || 'document') + '.txt'; type = 'text/plain';
+      data = '<!doctype html><meta charset="utf-8"><title>' + esc($('#titel').value) + '</title><body style="font-family:Georgia,serif;max-width:42em;margin:3em auto;line-height:1.7;">' + $('#tekst').innerHTML;
+      naam = ($('#titel').value || 'document') + '.html'; type = 'text/html';
     }
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: type + ';charset=utf-8' }));
     a.download = naam; a.click(); URL.revokeObjectURL(a.href);
     zeg('Geëxporteerd: ' + naam);
   });
 
-  if (!token) zeg('Log eerst in op de leden-app.'); else laadLijst();
+  if (!token) zeg(opzet.leeg); else laadLijst();
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>

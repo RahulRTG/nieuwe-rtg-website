@@ -55,7 +55,6 @@
     try { d = await API.call('/vastgoed/aanbod'); } catch(e){}
     const el = $('#vgMijn'); if (!el) return;
     if (!d.panden.length && !d.bezichtigingen.length && !d.biedingen.length){ el.innerHTML = ''; return; }
-    const bodBij = pid => d.biedingen.filter(b => true); // biedingen zijn per pand niet gelinkt in de lijst; toon apart
     let html = '';
     // lopende bezichtigingen met keyless
     for (const b of d.bezichtigingen){

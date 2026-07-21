@@ -5,6 +5,9 @@
     try { data = await API.call('/supplier/menu/get', { code }); }
     catch (e) { toast(e.message); return; }
     menuState = { supplier: data.supplier, menu: data.menu, alcohol: data.alcohol || null, qty: {}, note: '', tag: false, table: '', retail: null, retailMijn: null };
+    // het eigen allergieprofiel: gerechten met een botsend allergeen worden in de
+    // kaart meteen gemarkeerd (en de server keurt ze af bij het bestellen)
+    try { menuState.allergenen = (((await API.call('/zorgprofiel', {})).zorg || {}).allergenen || []).map(a => String(a).toLowerCase()); } catch(e){ menuState.allergenen = []; }
     $('#msName').textContent = data.supplier.name;
     $('#msMeta').textContent = tType(data.supplier.typeLabel) + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
     // mode-/retailpartner: haal de catalogus en de eigen apart/styling erbij

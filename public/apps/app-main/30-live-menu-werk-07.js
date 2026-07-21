@@ -79,8 +79,19 @@
     if (!items.length) return;
     let d;
     try {
-      d = await API.call('/order', { supplierCode: menuState.supplier.code, items, table: menuState.table || '', allergyNote: menuState.note, tagSalon: menuState.tag, naarKassa: !!opts.naarKassa });
-    } catch (e) { toast(e.message); return; }
+      d = await API.call('/order', { supplierCode: menuState.supplier.code, items, table: menuState.table || '', allergyNote: menuState.note, tagSalon: menuState.tag, naarKassa: !!opts.naarKassa, allergieAkkoord: !!opts.allergieAkkoord });
+    } catch (e) {
+      // allergieveiligheid: de server houdt een botsend gerecht tegen. Vraag het
+      // lid het bewust te bevestigen; pas dan sturen we het met allergieAkkoord door.
+      const bots = e.status === 409 && e.data && e.data.allergieBotsing;
+      if (bots && !opts.allergieAkkoord){
+        const namen = bots.map(b => b.naam + ' (' + b.allergenen.map(a => tAlg(a)).join(', ') + ')').join('; ');
+        if (confirm('⚠️ ' + T('menu.allergiebevestig','Dit botst met je allergieprofiel') + ': ' + namen + '.\n\n' + T('menu.allergietochbestel','Weet je zeker dat je dit toch wilt bestellen?')))
+          return placeOrder(Object.assign({}, opts, { allergieAkkoord: true }));
+        return;
+      }
+      toast(e.message); return;
+    }
     $('#menu-sheet').classList.remove('open');
     $('#menu-scrim').classList.remove('open');
     if (d.order.status === 'wacht-op-betaling'){

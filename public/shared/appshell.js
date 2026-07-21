@@ -24,7 +24,7 @@
         });
         var data = await res.json().catch(function () { return {}; });
         // de HTTP-status gaat mee op de fout, zodat aanroepers erop kunnen sturen.
-        if (!res.ok) throw Object.assign(new Error(data.error || foutTekst), { status: res.status });
+        if (!res.ok) throw Object.assign(new Error(data.error || foutTekst), { status: res.status, data: data });
         return data;
       }
     };

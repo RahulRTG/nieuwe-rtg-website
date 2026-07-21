@@ -104,7 +104,9 @@ module.exports = (kern) => {
 
   app.post('/api/order', auth, (req, res) => {
     const r = plaatsOrderVoor(req.session, req.body);
-    if (r.error) return res.status(r.status).json({ error: r.error });
+    // bij een allergiebotsing reizen de botsende gerechten mee, zodat de app
+    // bewust kan laten bevestigen (allergieAkkoord) in plaats van blind te falen
+    if (r.error) return res.status(r.status).json(r.allergieBotsing ? { error: r.error, allergieBotsing: r.allergieBotsing } : { error: r.error });
     res.json(r);
   });
   app.post('/api/order/pay', auth, (req, res) => {

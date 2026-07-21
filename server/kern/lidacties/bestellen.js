@@ -36,6 +36,26 @@ function plaatsOrderVoor(session, body) {
     const a = alcoholGrensVan(s);
     if (lft < a.grens) return { status: 403, error: 'Alcohol is in ' + a.land + ' vanaf ' + a.grens + ' jaar; je leeftijd is via je paspoort geverifieerd. Kies iets zonder alcohol.' };
   }
+  // zorg-/allergieveiligheid: keur gerechten af die botsen met het allergieprofiel
+  // van het lid (een allergeen van het gerecht staat in de eigen allergenenlijst),
+  // tenzij het lid bewust doorzet. De menukaart, de kassa EN Rahul roepen dezelfde
+  // /api/order, dus ze weigeren dit allemaal automatisch. Dieet en medische
+  // aandachtspunten reizen als context mee naar de keuken.
+  const zorg = zorgVoor(session.key);
+  if (zorg && (zorg.allergenen || []).length && !body.allergieAkkoord) {
+    const eigen = zorg.allergenen.map(a => String(a).toLowerCase());
+    const botsers = [];
+    for (const it of items) {
+      const m = (s.menu || []).find(x => x.id === it.id);
+      const raak = ((m && m.allergens) || []).filter(a => eigen.includes(String(a).toLowerCase()));
+      if (raak.length) botsers.push({ id: it.id, naam: it.name, allergenen: raak });
+    }
+    if (botsers.length) return {
+      status: 409,
+      error: 'Dit botst met je allergieprofiel: ' + botsers.map(b => b.naam + ' (' + b.allergenen.join(', ') + ')').join('; ') + '. Kies iets anders, of bevestig bewust dat je het toch wilt.',
+      allergieBotsing: botsers
+    };
+  }
   // de zaak kiest het betaalmoment: vooraf (standaard, pas zichtbaar na
   // afrekenen) of achteraf (direct zichtbaar, betalen via de app volgt);
   // jeugdleden (15-17) betalen altijd vooraf, ook bij een achteraf-zaak.
@@ -54,7 +74,8 @@ function plaatsOrderVoor(session, body) {
     table: schoon(body.table, 24),
     allergyNote: schoon(body.allergyNote, 200),
     // het zorgprofiel reist automatisch mee naar de keuken (alleen met toestemming)
-    zorg: zorgVoor(session.key),
+    zorg: zorg,
+    allergieAkkoord: body.allergieAkkoord ? true : undefined,
     tagSalon: !!body.tagSalon,
     betaalMoment: vooraf ? 'vooraf' : 'achteraf',
     aanBalie: naarKassa ? true : undefined,

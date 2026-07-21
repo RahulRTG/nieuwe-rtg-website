@@ -3412,6 +3412,9 @@
     try { data = await API.call('/supplier/menu/get', { code }); }
     catch (e) { toast(e.message); return; }
     menuState = { supplier: data.supplier, menu: data.menu, alcohol: data.alcohol || null, qty: {}, note: '', tag: false, table: '', retail: null, retailMijn: null };
+    // het eigen allergieprofiel: gerechten met een botsend allergeen worden in de
+    // kaart meteen gemarkeerd (en de server keurt ze af bij het bestellen)
+    try { menuState.allergenen = (((await API.call('/zorgprofiel', {})).zorg || {}).allergenen || []).map(a => String(a).toLowerCase()); } catch(e){ menuState.allergenen = []; }
     $('#msName').textContent = data.supplier.name;
     $('#msMeta').textContent = tType(data.supplier.typeLabel) + ' · ' + data.supplier.city + (data.supplier.loc ? ' · ' + data.supplier.loc.label : '');
     // mode-/retailpartner: haal de catalogus en de eigen apart/styling erbij
@@ -3494,9 +3497,12 @@
         const slot = x.station === 'bar' && menuState.alcohol && menuState.alcohol.mag === false;
         // 86 van het keukenscherm: uitverkocht, dus even niet te bestellen
         const op86 = !!x.uitverkocht;
-        return '<div class="ms-item" data-id="' + x.id + '"' + (op86 ? ' style="opacity:0.5;"' : '') + '>' +
+        // allergie: welke allergenen van dit gerecht staan in jouw profiel?
+        const botst = ((menuState.allergenen || []).length && (x.allergens || []).filter(a => menuState.allergenen.includes(String(a).toLowerCase()))) || [];
+        return '<div class="ms-item' + (botst.length ? ' ms-allergie' : '') + '" data-id="' + x.id + '"' + (op86 ? ' style="opacity:0.5;"' : '') + '>' +
           '<div class="info"><div class="nm">' + x.name + '</div>' +
             (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
+            (botst.length ? '<div class="alg-waarschuwing">⚠️ ' + T('menu.jouwallergie','jouw allergie') + ': ' + botst.map(a => tAlg(a)).join(', ') + '</div>' : '') +
             (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + tAlg(a) + '</span>').join('') + '</div>' : '') +
           '</div>' +
           '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +
@@ -3693,8 +3699,19 @@
     if (!items.length) return;
     let d;
     try {
-      d = await API.call('/order', { supplierCode: menuState.supplier.code, items, table: menuState.table || '', allergyNote: menuState.note, tagSalon: menuState.tag, naarKassa: !!opts.naarKassa });
-    } catch (e) { toast(e.message); return; }
+      d = await API.call('/order', { supplierCode: menuState.supplier.code, items, table: menuState.table || '', allergyNote: menuState.note, tagSalon: menuState.tag, naarKassa: !!opts.naarKassa, allergieAkkoord: !!opts.allergieAkkoord });
+    } catch (e) {
+      // allergieveiligheid: de server houdt een botsend gerecht tegen. Vraag het
+      // lid het bewust te bevestigen; pas dan sturen we het met allergieAkkoord door.
+      const bots = e.status === 409 && e.data && e.data.allergieBotsing;
+      if (bots && !opts.allergieAkkoord){
+        const namen = bots.map(b => b.naam + ' (' + b.allergenen.map(a => tAlg(a)).join(', ') + ')').join('; ');
+        if (confirm('⚠️ ' + T('menu.allergiebevestig','Dit botst met je allergieprofiel') + ': ' + namen + '.\n\n' + T('menu.allergietochbestel','Weet je zeker dat je dit toch wilt bestellen?')))
+          return placeOrder(Object.assign({}, opts, { allergieAkkoord: true }));
+        return;
+      }
+      toast(e.message); return;
+    }
     $('#menu-sheet').classList.remove('open');
     $('#menu-scrim').classList.remove('open');
     if (d.order.status === 'wacht-op-betaling'){

@@ -6,9 +6,12 @@
         const slot = x.station === 'bar' && menuState.alcohol && menuState.alcohol.mag === false;
         // 86 van het keukenscherm: uitverkocht, dus even niet te bestellen
         const op86 = !!x.uitverkocht;
-        return '<div class="ms-item" data-id="' + x.id + '"' + (op86 ? ' style="opacity:0.5;"' : '') + '>' +
+        // allergie: welke allergenen van dit gerecht staan in jouw profiel?
+        const botst = ((menuState.allergenen || []).length && (x.allergens || []).filter(a => menuState.allergenen.includes(String(a).toLowerCase()))) || [];
+        return '<div class="ms-item' + (botst.length ? ' ms-allergie' : '') + '" data-id="' + x.id + '"' + (op86 ? ' style="opacity:0.5;"' : '') + '>' +
           '<div class="info"><div class="nm">' + x.name + '</div>' +
             (x.desc ? '<div class="ds">' + x.desc + '</div>' : '') +
+            (botst.length ? '<div class="alg-waarschuwing">⚠️ ' + T('menu.jouwallergie','jouw allergie') + ': ' + botst.map(a => tAlg(a)).join(', ') + '</div>' : '') +
             (x.allergens && x.allergens.length ? '<div class="alg">' + x.allergens.map(a => '<span>' + tAlg(a) + '</span>').join('') + '</div>' : '') +
           '</div>' +
           '<div class="side"><div class="pr">' + eur(x.price) + '</div>' +

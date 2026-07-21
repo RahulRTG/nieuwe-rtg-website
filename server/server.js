@@ -2492,6 +2492,10 @@ require('./routes/gids')(kern);
 Object.assign(kern, require('./kern/homekit')({ db, save, crypto, schoon, anthropic }));
 Object.assign(kern, require('./kern/homemerken')({ db, save, schoon }));
 require('./routes/home')(kern);
+/* RTG Vracht (kern/vracht.js): internationale vracht voor expediteurs, over
+   lucht, water en land; publiek volgen op volgcode zonder klantgegevens. */
+Object.assign(kern, require('./kern/vracht')({ db, save, crypto, schoon }));
+require('./routes/vracht')(kern);
 /* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
    bibliotheken en zetten die live op de klas-PDA van de kinderen. */
 Object.assign(kern, require('./kern/lesmaker')({ db, save, crypto, schoon, anthropic, leeftijdInstr: rtf.leeftijdInstr }));

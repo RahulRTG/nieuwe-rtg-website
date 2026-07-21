@@ -16,7 +16,8 @@ module.exports = (ctx) => {
     events:      { label: 'Events & festivals', icon: '\u{1F3AA}', caps: ['tickets', 'rides', 'location', 'pricing'] },
     wellness:    { label: 'Wellness & spa', icon: '\u{1F9D6}', caps: ['services', 'bookings', 'location', 'pricing'] },
     juwelier:    { label: 'Juwelier & horloges', icon: '\u{1F48E}', caps: ['retail', 'services', 'location', 'pricing'] },
-    galerie:     { label: 'Kunst & galerie', icon: '\u{1F5BC}️', caps: ['tickets', 'retail', 'location', 'pricing'] }
+    galerie:     { label: 'Kunst & galerie', icon: '\u{1F5BC}️', caps: ['tickets', 'retail', 'location', 'pricing'] },
+    vracht:      { label: 'Vracht & expeditie', icon: '\u{1F6A2}', caps: ['vracht', 'location', 'pricing'] }
   };
   for (const [t, def] of Object.entries(NIEUWE_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const NIEUWE_PARTNERS = [
@@ -94,7 +95,9 @@ module.exports = (ctx) => {
       activiteiten: [
         { id: 'g1', name: 'Expositie-entree', desc: 'Hedendaagse eilandkunst, wisselende collectie.', prijs: 10, capaciteit: 60, duur: 'vrij bezoek', tijden: ['11:00', '14:00', '17:00'] },
         { id: 'g2', name: 'Vernissage met de kunstenaar', desc: 'Besloten avond, cava en rondleiding.', prijs: 35, capaciteit: 30, duur: '2 uur', tijden: ['19:00'] }
-      ] }
+      ] },
+    { code: 'TERRAMAR', name: 'TerraMar Cargo', type: 'vracht', city: 'Ibiza',
+      loc: { lat: 38.912, lng: 1.448, label: 'Haven van Ibiza' }, rate: 0.08, menu: [], photos: [] }
   ];
   for (const p of NIEUWE_PARTNERS) if (!db.data.suppliers.find(s => s.code === p.code)) { db.data.suppliers.push(p); ensureSupplierDefaults(p); }
 };

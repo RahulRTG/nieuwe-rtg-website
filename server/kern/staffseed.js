@@ -59,6 +59,8 @@ const STAFF_SEED = {
   CLARA: [['Elena Ruiz', 'manager', 'Huisarts'], ['Tomas Blad', 'staff', 'Fysiotherapeut']],
   ORODOR: [['Esteban Oro', 'manager', 'Meester-juwelier'], ['Lia Costa', 'staff', 'Salon & taxatie']],
   LIENZO: [['Valeria Pinto', 'manager', 'Galeriehouder'], ['Hugo Ram', 'staff', 'Exposities & entree']],
+  // vracht & expeditie: de expediteur plant, de declarant klaart in, de loods laadt
+  TERRAMAR: [['Marc Torres', 'manager', 'Expediteur'], ['Aina Salom', 'staff', 'Douane-declarant'], ['Pau Ribas', 'staff', 'Loods & laden']],
   // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
   GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']],
   // het rijk: een behandelaar (beoordeelt toeslagen/uitkeringen/bezwaren) en een baliemedewerker

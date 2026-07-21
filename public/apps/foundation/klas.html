@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Klas-PDA</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--paneel:#151312;--line:rgba(255,255,255,.1);--txt:#F4F1EC;--zacht:rgba(244,241,236,.66);--goud:#A98F1C;--groen:#3E7A4E;--rood:#8A3038;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .topnav{display:flex;align-items:center;gap:.7rem;padding:1rem 1.1rem;border-bottom:1px solid var(--line);}
+  .topnav .brand{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
+  .topnav a{color:var(--zacht);text-decoration:none;font-size:.85rem;margin-left:auto;}
+  .wrap{max-width:640px;margin:0 auto;padding:1.2rem;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.5rem;}
+  .stil{color:var(--zacht);font-size:.9rem;line-height:1.6;}
+  .veld{width:100%;background:var(--paneel);border:1px solid #333;border-radius:14px;color:var(--txt);font:inherit;font-size:1.15rem;padding:.85rem 1rem;margin-top:.6rem;}
+  #vCode .veld{text-transform:uppercase;letter-spacing:.3em;text-align:center;font-family:ui-monospace,monospace;}
+  .knop{width:100%;margin-top:.8rem;background:var(--goud);color:#000;border:none;border-radius:14px;padding:1rem;font:700 1.1rem Inter,sans-serif;cursor:pointer;}
+  .kaart{background:var(--paneel);border:1px solid var(--line);border-radius:18px;padding:1.1rem 1.2rem;margin-top:1rem;}
+  .opties{display:grid;gap:.7rem;margin-top:1rem;}
+  @media(min-width:520px){.opties{grid-template-columns:1fr 1fr;}}
+  .optie{background:var(--paneel);border:2px solid var(--line);border-radius:16px;color:var(--txt);font:600 1.05rem Inter,sans-serif;padding:1.2rem 1rem;text-align:left;cursor:pointer;min-height:4.2rem;}
+  .optie .ltr{display:inline-block;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--goud);color:#000;text-align:center;line-height:1.7rem;margin-right:.6rem;font-size:.95rem;}
+  .optie:disabled{opacity:.55;}
+  .optie.gekozen{border-color:var(--goud);}
+  .groot{font-family:'Bodoni Moda',serif;font-size:1.8rem;text-align:center;padding:1.4rem 0;}
+  .goed{color:#9CCB9C;} .fout{color:#E39AA2;}
+  .score{position:sticky;top:0;background:var(--bg);padding:.6rem 0;display:flex;justify-content:space-between;font-size:.9rem;color:var(--zacht);}
+  .score b{color:var(--goud);font-size:1.05rem;}
+  .stand{margin-top:.8rem;font-size:1rem;line-height:2;}
+  .stand .ik{color:var(--goud);font-weight:700;}
+  .stap{display:none;} .stap.aan{display:block;}
+</style>
+</head>
+<body>
+<div class="topnav"><span class="brand">RT<b>Foundation</b></span><a href="index.html">← Alle hulp</a></div>
+<div class="wrap" role="main">
+  <!-- meedoen -->
+  <section class="stap aan" id="vCode">
+    <h1>🏫 De klas-PDA</h1>
+    <p class="stil">Doe mee met de les van je juf of meester. Typ de klascode van het bord en je voornaam; meer heb je niet nodig.</p>
+    <input class="veld" id="cCode" maxlength="6" autocomplete="off" placeholder="KLASCODE" aria-label="Klascode">
+    <input class="veld" id="cNaam" maxlength="24" autocomplete="off" placeholder="Je voornaam" aria-label="Je voornaam" style="text-transform:none;letter-spacing:normal;text-align:left;font-family:inherit;">
+    <button class="knop" id="cGo">Doe mee!</button>
+    <p class="stil" id="cFout" role="alert" style="color:#E39AA2;margin-top:.6rem;"></p>
+  </section>
+
+  <!-- de les -->
+  <section class="stap" id="vLes">
+    <div class="score"><span id="sNaam"></span><span>score <b id="sScore">0</b></span></div>
+    <div class="kaart" id="kInhoud"><p class="stil">Even wachten…</p></div>
+    <div class="opties" id="kOpties"></div>
+  </section>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const api = (pad, body) => fetch(pad, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{}) })
+  .then(async r => { const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; });
+
+let CODE=null, NAAM=null, TOKEN=null, LES=null, laatsteVraag=-2, gekozen=null;
+
+$('#cGo').addEventListener('click', async () => {
+  $('#cFout').textContent = '';
+  try {
+    const d = await api('/api/les/mee', { code: $('#cCode').value.trim().toUpperCase(), naam: $('#cNaam').value });
+    CODE = $('#cCode').value.trim().toUpperCase(); NAAM = d.naam; TOKEN = d.deelnemerToken; LES = d.les;
+    $('#vCode').classList.remove('aan'); $('#vLes').classList.add('aan');
+    $('#sNaam').textContent = '👋 ' + NAAM;
+    teken(); setInterval(kijk, 2500);
+  } catch(e){ $('#cFout').textContent = e.message; }
+});
+
+async function kijk(){
+  try { LES = (await api('/api/les/kijk', { code: CODE, naam: NAAM, deelnemerToken: TOKEN })).les; teken(); } catch(e){}
+}
+function teken(){
+  $('#sScore').textContent = LES.score;
+  const inhoud = $('#kInhoud'), opties = $('#kOpties');
+  if (LES.fase === 'lobby'){
+    inhoud.innerHTML = '<h1 style="font-size:1.25rem;">'+esc(LES.titel)+'</h1><p class="stil" style="margin-top:.6rem;">'+esc(LES.uitleg||'')+'</p>'+
+      '<p class="stil" style="margin-top:.8rem;">⏳ De juf of meester start zo de eerste vraag. Lees de uitleg alvast rustig door.</p>';
+    opties.innerHTML = ''; laatsteVraag = -2; return;
+  }
+  if (LES.fase === 'klaar'){
+    const stand = LES.stand || [];
+    inhoud.innerHTML = '<div class="groot">🏆</div><h1 style="font-size:1.25rem;text-align:center;">De les is klaar!</h1>'+
+      '<p class="stil" style="text-align:center;margin-top:.4rem;">Jouw score: <b style="color:var(--goud);">'+LES.score+'</b> punten</p>'+
+      '<div class="stand">'+stand.map((x,i) => '<div class="'+(x.naam===NAAM?'ik':'')+'">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'.')+' '+esc(x.naam)+' · '+x.score+'</div>').join('')+'</div>';
+    opties.innerHTML = ''; return;
+  }
+  if (LES.fase === 'vraag' && LES.vraag){
+    if (LES.vraagIx !== laatsteVraag){ gekozen = null; laatsteVraag = LES.vraagIx; }
+    if (LES.beantwoord){
+      inhoud.innerHTML = '<div class="groot '+(LES.goedFout?'goed':'fout')+'">'+(LES.goedFout?'✔ Goed!':'✘ Helaas')+'</div>'+
+        '<p class="stil" style="text-align:center;">Wacht op de volgende vraag…</p>';
+      opties.innerHTML = ''; return;
+    }
+    inhoud.innerHTML = '<span class="stil">Vraag '+(LES.vraagIx+1)+' van '+LES.totaalVragen+'</span>'+
+      '<h1 style="font-size:1.2rem;margin-top:.4rem;">'+esc(LES.vraag.v)+'</h1>';
+    opties.innerHTML = LES.vraag.opties.map((o,i) =>
+      '<button class="optie" data-k="'+i+'"><span class="ltr">'+'ABCD'[i]+'</span>'+esc(o)+'</button>').join('');
+    opties.querySelectorAll('.optie').forEach(b => b.addEventListener('click', async () => {
+      if (gekozen != null) return; gekozen = Number(b.dataset.k);
+      b.classList.add('gekozen');
+      opties.querySelectorAll('.optie').forEach(x => x.disabled = true);
+      try {
+        const r = await api('/api/les/antwoord', { code: CODE, naam: NAAM, deelnemerToken: TOKEN, keuze: gekozen });
+        $('#sScore').textContent = r.score;
+        $('#kInhoud').innerHTML = '<div class="groot '+(r.goed?'goed':'fout')+'">'+(r.goed?'✔ Goed! +'+r.punten:'✘ Helaas')+'</div>'+
+          '<p class="stil" style="text-align:center;">Wacht op de volgende vraag…</p>';
+        opties.innerHTML = '';
+      } catch(e){ gekozen = null; opties.querySelectorAll('.optie').forEach(x => x.disabled = false); }
+    }));
+  }
+}
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

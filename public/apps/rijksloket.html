@@ -68,6 +68,7 @@
     <section class="paneel" id="p-wm"></section>
     <section class="paneel" id="p-kvk"></section>
     <section class="paneel" id="p-stem"></section>
+    <section class="paneel" id="p-bieb"></section>
     <section class="paneel" id="p-bek">
       <div class="item">
         <h3>Nieuwe rijksbekendmaking</h3>
@@ -151,12 +152,12 @@ $('#loginGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
 });
 
-const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['sub','Subsidies'],['wm','Watermeldingen'],['kvk','Handelsregister'],['stem','Stemming'],['bek','Bekendmakingen']];
+const TABS = [['tos','Toeslagen'],['uit','Uitkeringen'],['bez','Bezwaren'],['sub','Subsidies'],['wm','Watermeldingen'],['kvk','Handelsregister'],['stem','Stemming'],['bek','Bekendmakingen'],['bieb','📚 Bibliotheek']];
 let HUIDIG = 'tos';
 function toon(t){
   HUIDIG = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
-  ['tos','uit','bez','sub','wm','kvk','stem','bek'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  ['tos','uit','bez','sub','wm','kvk','stem','bek','bieb'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'tos') laadToeslagen();
   if (t === 'uit') laadUitkeringen();
   if (t === 'bez') laadBezwaren();
@@ -165,6 +166,65 @@ function toon(t){
   if (t === 'kvk') laadKvk();
   if (t === 'stem') laadStem();
   if (t === 'bek') laadBekend();
+  if (t === 'bieb') laadBieb();
+}
+
+/* ---- de Rijks-Bibliotheek: 10.000 werk-apps per afdeling, inbegrepen ---- */
+const RB = { afdeling: '', zoek: '', pagina: 1, mijn: false, klaar: false };
+async function laadBieb(){
+  let d; try { d = await api('/api/overheid/bieb'); } catch(e){ $('#p-bieb').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  if (!RB.klaar){
+    $('#p-bieb').innerHTML =
+      '<p class="meta" style="margin:.2rem 0 .6rem;">'+d.totaal.toLocaleString('nl-NL')+' werk-apps · 10.000 per afdeling · voor rijksambtenaren inbegrepen</p>'+
+      '<div class="rij" style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;">'+
+        '<select class="veld" id="rbAfd" aria-label="Afdeling" style="max-width:15rem;"><option value="">Alle afdelingen</option>'+
+          d.afdelingen.map(a => '<option value="'+esc(a.id)+'">'+a.icon+' '+esc(a.label)+' ('+a.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
+        '<input class="veld" id="rbZoek" maxlength="60" placeholder="Zoek een taak (bijv. dossierscan)" aria-label="Zoeken" style="flex:1;min-width:10rem;">'+
+        '<button class="tab" id="rbMijn" type="button">Mijn werk-apps</button>'+
+      '</div><div id="rbGrid"></div><div id="rbBlader" style="display:flex;gap:.5rem;justify-content:center;align-items:center;padding:.6rem 0;"></div>';
+    $('#rbAfd').addEventListener('change', () => { RB.afdeling = $('#rbAfd').value; RB.pagina = 1; RB.mijn = false; tekenBieb(); });
+    let zt; $('#rbZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { RB.zoek = $('#rbZoek').value; RB.pagina = 1; RB.mijn = false; tekenBieb(); }, 300); });
+    $('#rbMijn').addEventListener('click', () => { RB.mijn = !RB.mijn; RB.pagina = 1; tekenBieb(); });
+    RB.klaar = true;
+  }
+  tekenBieb();
+}
+function biebKaart(a, heeft){
+  return '<div class="item"><h4>'+a.icon+' '+esc(a.naam)+'</h4>'+
+    '<div class="meta">'+esc(a.afdelingLabel)+' · '+esc(a.taak)+' · v'+esc(a.versie)+' · '+a.grootteMB+' MB · ★ '+a.sterren.toFixed(1)+
+    ' · <s>€ '+(a.winkelwaardeCenten/100).toLocaleString('nl-NL')+'</s> <b style="color:var(--gold);">inbegrepen</b></div>'+
+    (heeft ? '<button class="tab rbweg" data-id="'+esc(a.id)+'">Verwijder</button>'
+           : '<button class="tab aan rbin" data-id="'+esc(a.id)+'">Installeer</button>')+'</div>';
+}
+async function tekenBieb(){
+  const grid = $('#rbGrid'), blader = $('#rbBlader');
+  $('#rbMijn').classList.toggle('aan', RB.mijn);
+  try {
+    let mijnIds = [];
+    try { mijnIds = ((await api('/api/overheid/bieb/mijn')).apps || []).map(a => a.id); } catch(e){}
+    if (RB.mijn){
+      const mijn = (await api('/api/overheid/bieb/mijn')).apps || [];
+      grid.innerHTML = mijn.length ? mijn.map(a => biebKaart(a, true)).join('') : '<div class="leeg">Nog geen werk-apps geïnstalleerd.</div>';
+      blader.innerHTML = '';
+    } else {
+      const d = await api('/api/overheid/bieb/catalogus', { afdeling: RB.afdeling, zoek: RB.zoek, pagina: RB.pagina });
+      grid.innerHTML = d.items.length ? d.items.map(a => biebKaart(a, mijnIds.includes(a.id))).join('')
+        : '<div class="leeg">'+esc(d.hint || 'Niets gevonden.')+'</div>';
+      blader.innerHTML = d.paginas > 1
+        ? '<button class="tab" id="rbVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+          '<span class="meta">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
+          '<button class="tab" id="rbVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>' : '';
+      const vo = $('#rbVorig'), vl = $('#rbVolgend');
+      if (vo) vo.addEventListener('click', () => { RB.pagina--; tekenBieb(); });
+      if (vl) vl.addEventListener('click', () => { RB.pagina++; tekenBieb(); });
+    }
+    grid.querySelectorAll('.rbin').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/overheid/bieb/installeer', { id: b.dataset.id }); tekenBieb(); } catch(e){ alert(e.message); }
+    }));
+    grid.querySelectorAll('.rbweg').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/overheid/bieb/weg', { id: b.dataset.id }); tekenBieb(); } catch(e){ alert(e.message); }
+    }));
+  } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 function start(){
   $('#tabs').innerHTML = TABS.map(([t,l]) => '<button class="tab" data-t="'+t+'">'+esc(l)+'</button>').join('');

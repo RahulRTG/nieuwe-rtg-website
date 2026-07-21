@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Lesmaker</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,.1);--txt:#F4F1EC;--muted:rgba(244,241,236,.68);--soft:rgba(244,241,236,.5);--gold:#A98F1C;--groen:#3E7A4E;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;text-decoration:none;}
+  main{padding:1.1rem;max-width:860px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-top:1rem;}
+  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;}
+  .veld{width:100%;background:#0C0C0B;border:1px solid #333;border-radius:10px;color:var(--txt);font:inherit;font-size:.92rem;padding:.55rem .75rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.6rem 1.1rem;font:600 .9rem Inter,sans-serif;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop:disabled{opacity:.5;cursor:default;}
+  .stil2{color:var(--muted);font-size:.86rem;line-height:1.6;}
+  .code{font-family:ui-monospace,monospace;font-size:2.2rem;letter-spacing:.35em;color:var(--gold);text-align:center;padding:.4rem 0;}
+  .appkeus{display:flex;flex-direction:column;gap:.3rem;margin-top:.3rem;}
+  .appkeus button{text-align:left;background:#0C0C0B;border:1px solid #333;border-radius:10px;color:var(--txt);font:inherit;font-size:.85rem;padding:.5rem .7rem;cursor:pointer;}
+  .appkeus button.aan{border-color:var(--gold);}
+  .vraagkaart{border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;margin-top:.6rem;}
+  .vraagkaart b{display:block;margin-bottom:.4rem;}
+  .optie{display:flex;gap:.5rem;align-items:center;font-size:.86rem;color:var(--muted);padding:.15rem 0;}
+  .optie.juist{color:#9CCB9C;}
+  .balken{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.6rem;}
+  .balk{background:#0C0C0B;border:1px solid #333;border-radius:10px;padding:.5rem;text-align:center;font-size:.82rem;}
+  .balk b{display:block;font-size:1.3rem;font-family:'Bodoni Moda',serif;}
+  .stand{margin-top:.6rem;font-size:.88rem;line-height:1.8;}
+  .stand span{color:var(--gold);font-weight:600;}
+  .leeg{color:var(--muted);text-align:center;padding:1.4rem 0;}
+  .stap{display:none;} .stap.aan{display:block;}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/index.html">← Apps</a>
+  <div><div class="ey">Voor leraren</div><h1 style="font-size:1.35rem;">De Lesmaker</h1></div>
+</header>
+<main role="main">
+  <!-- stap 1: de les maken -->
+  <section class="stap aan" id="sMaak">
+    <p class="stil2">Maak in een paar tikken een complete les: kies een onderwerp (of hang de les aan een app uit de bibliotheken), en de AI schrijft de lesstof met een interactieve quiz. Daarna zetten de kinderen hun eigen scherm (telefoon of iPad) op de klas-PDA en doen ze live mee. U houdt de regie: u start elke vraag zelf.</p>
+    <div class="kaart">
+      <div class="lbl">Onderwerp van de les</div>
+      <input class="veld" id="mOnderwerp" maxlength="120" placeholder="Bijv. de tafels van 7, de Romeinen, veilig internet…">
+      <div class="lbl">Niveau</div>
+      <select class="veld" id="mNiveau">
+        <option value="mini">Kleuters</option><option value="kind" selected>Basisschool</option>
+        <option value="tiener">Middelbare school</option><option value="jong">MBO/HBO/universiteit</option><option value="volw">Volwassenen</option>
+      </select>
+      <div class="lbl">Ophangen aan een app uit de bibliotheken (optioneel)</div>
+      <input class="veld" id="mAppZoek" maxlength="60" placeholder="Zoek in de School-, App- en Reis-Bibliotheek…">
+      <div class="appkeus" id="mApps"></div>
+      <div class="rij" style="margin-top:.9rem;">
+        <button class="knop" id="mGo">✨ Maak de les</button>
+        <span class="stil2" id="mStatus"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- stap 2: de regie tijdens de les -->
+  <section class="stap" id="sLes">
+    <div class="kaart">
+      <div class="lbl">Klascode · laat dit op het bord zien; kinderen gaan naar <b>klas-PDA</b> in de RTFoundation-app</div>
+      <div class="code" id="lCode"></div>
+      <h2 id="lTitel" style="font-size:1.2rem;margin:.4rem 0;"></h2>
+      <p class="stil2" id="lUitleg"></p>
+      <p class="stil2" id="lDemo" hidden>Dit is de demo-les (zonder AI-sleutel); met een sleutel schrijft de AI de stof over uw onderwerp zelf.</p>
+    </div>
+    <div class="kaart">
+      <div class="rij">
+        <span class="stil2"><b id="lAantal">0</b> kinderen in de klas</span>
+        <span style="flex:1;"></span>
+        <button class="knop" id="lVolgende">Start vraag 1 →</button>
+        <button class="knop stil" id="lSluit">Les afsluiten</button>
+      </div>
+      <div id="lVraag" class="vraagkaart" hidden></div>
+      <div class="balken" id="lBalken" hidden></div>
+      <div class="stand" id="lStand"></div>
+    </div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const api = (pad, body) => fetch(pad, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{}) })
+  .then(async r => { const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; });
+
+let CODE = null, TOKEN = null, LES = null, gekozenApp = '';
+
+/* app-zoeker over de bibliotheken */
+let zt; $('#mAppZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(async () => {
+  const zoek = $('#mAppZoek').value.trim();
+  if (!zoek){ $('#mApps').innerHTML=''; gekozenApp=''; return; }
+  try {
+    const d = await api('/api/les/apps', { zoek, niveau: $('#mNiveau').value });
+    $('#mApps').innerHTML = (d.apps||[]).map(a => '<button type="button" data-n="'+esc(a.naam)+'">'+esc(a.naam)+' <span style="color:var(--soft);">· '+esc(a.bieb)+'</span></button>').join('') || '<span class="stil2">Niets gevonden; de les kan ook zonder app.</span>';
+    $('#mApps').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      gekozenApp = b.dataset.n;
+      $('#mApps').querySelectorAll('button').forEach(x => x.classList.toggle('aan', x === b));
+      if (!$('#mOnderwerp').value.trim()) $('#mOnderwerp').value = b.dataset.n;
+    }));
+  } catch(e){}
+}, 300); });
+
+$('#mGo').addEventListener('click', async () => {
+  $('#mGo').disabled = true; $('#mStatus').textContent = 'De AI schrijft uw les…';
+  try {
+    const d = await api('/api/les/maak', { onderwerp: $('#mOnderwerp').value, niveau: $('#mNiveau').value, app: gekozenApp });
+    CODE = d.code; TOKEN = d.leraarToken; LES = d.les;
+    $('#sMaak').classList.remove('aan'); $('#sLes').classList.add('aan');
+    $('#lCode').textContent = CODE;
+    $('#lTitel').textContent = LES.titel;
+    $('#lUitleg').textContent = LES.uitleg;
+    $('#lDemo').hidden = !LES.demo;
+    teken();
+    setInterval(ververs, 2500);
+  } catch(e){ $('#mStatus').textContent = e.message; }
+  $('#mGo').disabled = false;
+});
+
+async function ververs(){
+  if (!CODE) return;
+  try { LES = (await api('/api/les/leraar', { code: CODE, leraarToken: TOKEN })).les; teken(); } catch(e){}
+}
+function teken(){
+  $('#lAantal').textContent = LES.aantal;
+  const klaar = LES.fase === 'klaar';
+  const volgendeIx = LES.vraagIx + 1;
+  $('#lVolgende').textContent = klaar ? 'De les is klaar' : (LES.fase === 'lobby' ? 'Start vraag 1 →' : (volgendeIx >= LES.vragen.length ? 'Afronden en podium →' : 'Volgende vraag ('+(volgendeIx+1)+'/'+LES.vragen.length+') →'));
+  $('#lVolgende').disabled = klaar;
+  if (LES.fase === 'vraag' && LES.vraagIx >= 0){
+    const v = LES.vragen[LES.vraagIx];
+    $('#lVraag').hidden = false;
+    $('#lVraag').innerHTML = '<b>Vraag '+(LES.vraagIx+1)+' van '+LES.vragen.length+': '+esc(v.v)+'</b>'+
+      v.opties.map((o,i) => '<div class="optie'+(i===v.juist?' juist':'')+'">'+'ABCD'[i]+'. '+esc(o)+(i===v.juist?' ✓':'')+'</div>').join('');
+    $('#lBalken').hidden = false;
+    $('#lBalken').innerHTML = (LES.keuzes||[0,0,0,0]).map((n,i) => '<div class="balk"><b>'+n+'</b>'+'ABCD'[i]+'</div>').join('');
+  } else { $('#lVraag').hidden = true; $('#lBalken').hidden = true; }
+  const s = LES.stand || [];
+  $('#lStand').innerHTML = s.length
+    ? (klaar ? '<h3 style="margin:.4rem 0;">🏆 Het podium</h3>' : '<div class="lbl">Tussenstand</div>')+
+      s.slice(0,10).map((x,i) => (i+1)+'. '+esc(x.naam)+' · <span>'+x.score+'</span> punten').join('<br>')
+    : '<p class="leeg">Nog geen kinderen; deel de klascode.</p>';
+}
+$('#lVolgende').addEventListener('click', async () => {
+  try { LES = (await api('/api/les/volgende', { code: CODE, leraarToken: TOKEN })).les; teken(); } catch(e){ alert(e.message); }
+});
+$('#lSluit').addEventListener('click', async () => {
+  try { LES = (await api('/api/les/sluit', { code: CODE, leraarToken: TOKEN })).les; teken(); } catch(e){}
+});
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

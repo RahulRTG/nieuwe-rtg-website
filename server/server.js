@@ -2434,6 +2434,9 @@ Object.assign(kern, require('./kern/zelfzorg')({
 kern.zelfzorg.autoStart();
 require('./routes/kantoren')(kern);
 require('./routes/gemeente')(kern);
+/* De Rijks-Bibliotheek (kern/rijksbieb.js): 10.000 werk-apps voor elke
+   overheidsafdeling, inbegrepen voor rijksambtenaren; routes in overheid. */
+Object.assign(kern, require('./kern/rijksbieb').maakRijksBieb({ db, save }));
 require('./routes/overheid')(kern);
 require('./routes/luchthaven')(kern);
 require('./routes/marechaussee')(kern);
@@ -2461,6 +2464,10 @@ require('./routes/account')(kern);
    gedeelde basis-laag op elke app-pagina zet; openbare uitleg, geen data. */
 kern.appgids = require('./kern/appgids');
 require('./routes/gids')(kern);
+/* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
+   bibliotheken en zetten die live op de klas-PDA van de kinderen. */
+Object.assign(kern, require('./kern/lesmaker')({ db, save, crypto, schoon, anthropic, leeftijdInstr: rtf.leeftijdInstr }));
+require('./routes/lesmaker')(kern);
 // De Zaakdoos-vloot (satelliet-ping + /api/doos/*); altijd-aan, achter de
 // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
 require('./routes/doos')(kern);

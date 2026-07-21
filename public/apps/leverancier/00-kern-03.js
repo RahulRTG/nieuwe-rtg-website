@@ -101,7 +101,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw', SAROCA:'golfclub', FORTIA:'fitnessclub', VELVET:'beautysalon', AMICS:'petcare', NIDO:'kinderopvang' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -118,7 +118,10 @@
     vracht:     ['Expediteur','Planner','Douane-declarant','Loods'],
     kantoorgebouw: ['Receptie','Security','Facilitair','Concierge & jetset'],
     golfclub:   ['Club-secretaris','Golfpro','Caddiemaster','Greenkeeping'],
-    fitnessclub: ['Clubmanager','Receptie & check-in','Trainer']
+    fitnessclub: ['Clubmanager','Receptie & check-in','Trainer'],
+    beautysalon: ['Salonmanager','Barbier','Stylist','Nagelstudio'],
+    petcare:    ['Eigenaar','Dierverzorging','Uitlaatservice','Trimsalon'],
+    kinderopvang: ['Locatiemanager','Pedagogisch medewerker','Nanny-coordinator']
   };
   let pickCode = null, gateRoster = null, pendingStation = null;
   const spH2 = () => document.querySelector('#staffPick h2');

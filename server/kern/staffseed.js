@@ -70,6 +70,15 @@ const STAFF_SEED = {
   // de fitnessclub: de clubmanager, de receptie en de trainers
   FORTIA: [['Bo Hendriks', 'manager', 'Clubmanager'], ['Nina Faber', 'staff', 'Receptie & check-in'],
     ['Ziggy Muller', 'staff', 'Trainer & groepslessen']],
+  // de beauty-salon en barbier: de salonmanager en de mensen op de stoelen
+  VELVET: [['Romy Falk', 'manager', 'Salonmanager'], ['Aitor Blanes', 'staff', 'Barbier'],
+    ['Julie Mercier', 'staff', 'Stylist'], ['Dana Kroes', 'staff', 'Nagelstudio']],
+  // petcare: de eigenaar, de dierverzorger en de uitlaatservice
+  AMICS: [['Pau Amics', 'manager', 'Eigenaar'], ['Vera Lopes', 'staff', 'Dierverzorging & pension'],
+    ['Timo Groot', 'staff', 'Uitlaatservice & trim']],
+  // de kinderopvang: de locatiemanager, de groepen en de nanny-coordinatie
+  NIDO: [['Hanna Vos', 'manager', 'Locatiemanager'], ['Ines Duran', 'staff', 'Pedagogisch medewerker'],
+    ['Selma Brik', 'staff', 'Nanny-coordinator']],
   // gemeente: een baliecoordinator (backoffice) en de buitendienst voor de PDA
   GEMEENTE: [['Nuria Prats', 'manager', 'Gemeentebalie'], ['Hugo Serra', 'staff', 'Buitendienst']],
   // het rijk: een behandelaar (beoordeelt toeslagen/uitkeringen/bezwaren) en een baliemedewerker

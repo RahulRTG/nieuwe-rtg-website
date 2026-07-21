@@ -20,7 +20,10 @@ module.exports = (ctx) => {
     vracht:      { label: 'Vracht & expeditie', icon: '\u{1F6A2}', caps: ['vracht', 'location', 'pricing'] },
     kantoorgebouw: { label: 'Kantoorgebouw (Zuidas)', icon: '\u{1F3E2}', caps: ['gebouw', 'location', 'pricing'] },
     golfclub:    { label: 'Golf & countryclub', icon: '\u{26F3}', caps: ['golf', 'location', 'pricing'] },
-    fitnessclub: { label: 'Sport & fitnessclub', icon: '\u{1F3CB}️', caps: ['fitclub', 'location', 'pricing'] }
+    fitnessclub: { label: 'Sport & fitnessclub', icon: '\u{1F3CB}️', caps: ['fitclub', 'location', 'pricing'] },
+    beautysalon: { label: 'Beauty-salon & barbier', icon: '\u{2702}️', caps: ['beauty', 'location', 'pricing'] },
+    petcare:     { label: 'Petcare & pension', icon: '\u{1F43E}', caps: ['petcare', 'location', 'pricing'] },
+    kinderopvang: { label: 'Kinderopvang & nanny', icon: '\u{1F9F8}', caps: ['opvang', 'location', 'pricing'] }
   };
   for (const [t, def] of Object.entries(NIEUWE_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const NIEUWE_PARTNERS = [
@@ -106,7 +109,13 @@ module.exports = (ctx) => {
     { code: 'SAROCA', name: 'Club de Golf Sa Roca', type: 'golfclub', city: 'Ibiza',
       loc: { lat: 38.965, lng: 1.395, label: 'Roca Llisa, Ibiza' }, rate: 0.1, menu: [], photos: [] },
     { code: 'FORTIA', name: 'Fortia Club', type: 'fitnessclub', city: 'Ibiza',
-      loc: { lat: 38.915, lng: 1.445, label: 'Marina Botafoch, Ibiza' }, rate: 0.12, menu: [], photos: [] }
+      loc: { lat: 38.915, lng: 1.445, label: 'Marina Botafoch, Ibiza' }, rate: 0.12, menu: [], photos: [] },
+    { code: 'VELVET', name: 'Velvet & Blade', type: 'beautysalon', city: 'Ibiza',
+      loc: { lat: 38.908, lng: 1.433, label: 'Vara de Rey, Ibiza-stad' }, rate: 0.12, menu: [], photos: [] },
+    { code: 'AMICS', name: 'Amics Petcare', type: 'petcare', city: 'Ibiza',
+      loc: { lat: 38.888, lng: 1.395, label: 'Sant Jordi, Ibiza' }, rate: 0.1, menu: [], photos: [] },
+    { code: 'NIDO', name: 'Nido Kinderopvang & Nanny', type: 'kinderopvang', city: 'Ibiza',
+      loc: { lat: 39.005, lng: 1.437, label: 'Santa Gertrudis, Ibiza' }, rate: 0.1, menu: [], photos: [] }
   ];
   for (const p of NIEUWE_PARTNERS) if (!db.data.suppliers.find(s => s.code === p.code)) { db.data.suppliers.push(p); ensureSupplierDefaults(p); }
 };

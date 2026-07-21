@@ -2507,6 +2507,10 @@ require('./routes/gebouw')(kern);
    maandbeker) en de sport- en fitnessclub (leden, lessen, banen, PT). */
 Object.assign(kern, require('./kern/clubs')({ db, save, crypto, schoon }));
 require('./routes/clubs')(kern);
+/* RTG Verzorging (kern/verzorging.js): de beauty-salon en barbier, petcare
+   en de kinderopvang met nanny-service (mens bevestigt, alleen voornamen). */
+Object.assign(kern, require('./kern/verzorging')({ db, save, crypto, schoon }));
+require('./routes/verzorging')(kern);
 /* De Lesmaker (kern/lesmaker.js): leraren maken met AI lesstof uit de
    bibliotheken en zetten die live op de klas-PDA van de kinderen. */
 Object.assign(kern, require('./kern/lesmaker')({ db, save, crypto, schoon, anthropic, leeftijdInstr: rtf.leeftijdInstr }));

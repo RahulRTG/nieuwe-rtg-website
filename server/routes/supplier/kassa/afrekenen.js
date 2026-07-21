@@ -10,7 +10,7 @@ module.exports = (kern) => {
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
-    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
+    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak, tafelticket } = kern;
 app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   const room = String(req.body.room || '').slice(0, 60);
   const method = ['rtgpay', 'contant'].includes(req.body.method) ? req.body.method : 'contant';
@@ -68,6 +68,54 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
     else gesplitst = { vrienden: splitsMet.length, perPersoon: v.perPersoon };
   }
   res.json({ ok: true, sale, betaler, gesplitst, splitsFout });
+});
+
+/* Tafelticket: alle openstaande bonnen van dezelfde tafel op EEN ticket. De AI
+   (Rahul) en de kassa lopen over deze route, dus met de inlog en de controles
+   van de zaak zelf. De beveiliging zit in de kern (HMAC-zegel + verse controle). */
+app.post('/api/supplier/tafelticket', supplierAuth, (req, res) => {
+  const r = tafelticket.bouwTicket(req.supplier, req.body.table);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+
+// het tafelticket in EEN keer afrekenen. Het meegestuurde zegel (uit /tafelticket)
+// wordt vers gecontroleerd: is de rekening intussen gewijzigd of gemanipuleerd,
+// dan weigert de kern en moet het ticket opnieuw worden opgehaald. Zo nooit
+// afrekenen op een oud of aangepast totaal, en nooit dubbel.
+app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
+  const chk = tafelticket.afrekenCheck(req.supplier, req.body.table, req.body.zegel, req.body.at);
+  if (chk.error) return res.status(chk.status).json({ error: chk.error });
+  const method = ['rtgpay', 'contant', 'rtg'].includes(req.body.method) ? req.body.method : 'contant';
+  const codenames = [];
+  for (const o of chk.bonnen) {
+    o.paid = true;
+    o.paidAt = new Date().toISOString();
+    if (o.status === 'wacht-op-betaling' || o.status === 'nieuw') o.status = 'geserveerd';
+    o.rekeningVoldaan = true;
+    if (!codenames.includes(o.customerCodename)) codenames.push(o.customerCodename);
+    sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
+    notify(o.customerKey || o.customerTier, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
+  }
+  // een gebundelde kassabon voor het hele tafelticket
+  const sale = {
+    id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
+    desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
+    room: chk.table, items: null, total: chk.subtotaal, method,
+    at: new Date().toISOString()
+  };
+  const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
+  list.unshift(sale);
+  db.data.posSales[req.supplier.code] = list.slice(0, 300);
+  // de tafel staat na afrekenen weer vrij voor de volgende gasten
+  const tf = (req.supplier.tables || []).find(t => t.name === chk.table);
+  if (tf) tf.status = 'vrij';
+  save();
+  logActivity(req.supplier.code, req.actor, 'rekende tafelticket ' + chk.table + ' af: € ' + chk.subtotaal + ' (' + chk.bonnen.length + ' bon(nen), ' + method + ')');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
+  sseToOffice('sync', { scope: 'orders' });
+  res.json({ ok: true, sale, table: chk.table, aantalBonnen: chk.bonnen.length, subtotaal: chk.subtotaal, gasten: codenames.length });
 });
 
 app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {

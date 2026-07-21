@@ -2068,6 +2068,10 @@ const kern = {
   paspoortPartner, paspoortIncidenten
 };
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
+/* Tafelticket (kern/tafelticket.js): de bonnen van dezelfde tafel op een
+   gezegeld ticket (HMAC), met verse controle bij het afrekenen. De AI en de
+   kassa lopen over dezelfde /api/supplier/tafelticket-route. */
+Object.assign(kern, { tafelticket: require('./kern/tafelticket')({ crypto, dataDir: DATA_DIR, findSupplier, ordersVanZaak }) });
 /* Spellen (kern/spellen.js): mens-erger-je-niet, schaken, woordduel en het
    Sneek-scorebord op de vriendenlaag; RTF- en RTG-leden spelen tegen elkaar. */
 Object.assign(kern, require('./kern/spellen')({

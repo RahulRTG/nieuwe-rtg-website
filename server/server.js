@@ -260,6 +260,14 @@ app.use((req, res, next) => {
   next();
 });
 
+/* De meelees-laag van de RTG AI (kern/rtgai.js): telt alleen mee met het
+   verkeer en doet verder niets; de kern wordt verderop aangesloten. */
+let rtgaiMeelezer = null;
+app.use((req, res, next) => {
+  res.on('finish', () => { try { if (rtgaiMeelezer) rtgaiMeelezer.lees(req.method, req.path, res.statusCode); } catch (e) {} });
+  next();
+});
+
 /* Betaal-webhook: de provider (Stripe) bevestigt hier een betaling. Dit MOET
    vóór de JSON-parser staan én de ruwe body houden, want de handtekening wordt
    over de onbewerkte bytes berekend. Een ongeldige handtekening -> 400. */
@@ -2441,6 +2449,12 @@ Object.assign(kern, require('./kern/zelfzorg')({
   log: logboek.log, fs, path, DATA_DIR
 }));
 kern.zelfzorg.autoStart();
+/* De RTG AI van het RTG Kantoor (kern/rtgai.js): leest mee, traint zichzelf
+   en meldt wanneer hij klaar is; het roer geven blijft een menselijke knop. */
+Object.assign(kern, require('./kern/rtgai')({ db, save, zelfzorgVan: () => kern.zelfzorg }));
+rtgaiMeelezer = kern.rtgai;
+kern.rtgai.autoStart();
+require('./routes/rtgkantoor')(kern);
 require('./routes/kantoren')(kern);
 require('./routes/gemeente')(kern);
 /* De Rijks-Bibliotheek (kern/rijksbieb.js): 10.000 werk-apps voor elke

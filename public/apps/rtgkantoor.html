@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Het RTG Kantoor · de RTG AI</title>
+<link rel="icon" href="/icons/backoffice.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,.1);--txt:#F4F1EC;--muted:rgba(244,241,236,.68);--soft:rgba(244,241,236,.5);--gold:#A98F1C;--groen:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;text-decoration:none;}
+  main{padding:1.1rem;max-width:860px;margin:0 auto;}
+  .stil{color:var(--muted);font-size:.88rem;line-height:1.6;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-top:1rem;}
+  .veld{background:#0C0C0B;border:1px solid #333;border-radius:10px;color:var(--txt);font:inherit;font-size:.92rem;padding:.55rem .75rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:12px;padding:.7rem 1.2rem;font:700 .95rem Inter,sans-serif;cursor:pointer;}
+  .knop:disabled{opacity:.45;cursor:default;}
+  .knop.stil2{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .fase{display:inline-block;border-radius:999px;padding:.3rem .8rem;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+  .fase.meelezen{background:#333;color:#ddd;}
+  .fase.klaar{background:var(--gold);color:#000;}
+  .fase.roer{background:var(--groen);color:#fff;}
+  .meter{height:.65rem;background:#262321;border-radius:999px;overflow:hidden;margin:.4rem 0 .2rem;}
+  .meter i{display:block;height:100%;background:var(--gold);transition:width .4s;}
+  .tellers{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.6rem;margin-top:.8rem;}
+  .tel{background:#0C0C0B;border:1px solid #333;border-radius:12px;padding:.6rem .7rem;text-align:center;}
+  .tel b{display:block;font-family:'Bodoni Moda',serif;font-size:1.4rem;}
+  .tel span{font-size:.72rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
+  .journaal{margin-top:.6rem;font-size:.84rem;line-height:1.7;}
+  .journaal div{border-top:1px solid rgba(255,255,255,.06);padding:.4rem 0;color:var(--muted);}
+  .journaal .klaar{color:var(--gold);}
+  .journaal .roer{color:#9CCB9C;}
+  .regel{font-size:.8rem;color:var(--soft);border-left:2px solid var(--gold);padding-left:.7rem;line-height:1.6;margin-top:.8rem;}
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/apps/index.html">← Apps</a>
+  <div><div class="ey">Het RTG Kantoor</div><h1 style="font-size:1.35rem;">De RTG AI</h1></div>
+</header>
+<main id="main" role="main">
+  <section id="vLogin" class="kaart" hidden>
+    <h2 style="font-size:1.05rem;">Kantoor-inlog</h2>
+    <p class="stil" style="margin:.4rem 0 .6rem;">Het RTG Kantoor is alleen voor het kantoor zelf.</p>
+    <div class="rij"><input class="veld" id="lCode" maxlength="40" placeholder="Kantoorcode" style="flex:1;min-width:10rem;"><button class="knop" id="lGo">Binnen</button></div>
+    <p class="stil" id="lFout" role="alert" style="color:#E39AA2;margin-top:.5rem;"></p>
+  </section>
+
+  <section id="vAi" hidden>
+    <p class="stil">Dit is de eigen RTG AI: hij doet eerst niets, hij leest alleen mee met alles wat er in het systeem gebeurt en traint zichzelf. Vindt hij zichzelf er klaar voor, dan meldt hij dat hier en vraagt hij om het roer. <b>Overnemen doet hij nooit zelf</b>: de AI adviseert, u drukt op de knop. Daarna draait hij het routinewerk automatisch en vlekkeloos door, tot u het roer terugneemt.</p>
+
+    <div class="kaart">
+      <div class="rij" style="justify-content:space-between;">
+        <span class="fase meelezen" id="fase">…</span>
+        <span class="stil" id="sinds"></span>
+      </div>
+      <div style="margin-top:.8rem;">
+        <div class="rij" style="justify-content:space-between;"><b style="font-size:.9rem;">Gereedheid</b><b id="pct" style="color:var(--gold);"></b></div>
+        <div class="meter"><i id="meter" style="width:0%;"></i></div>
+        <span class="stil" id="meterUit"></span>
+      </div>
+      <div class="tellers">
+        <div class="tel"><b id="tWaar">0</b><span>meegelezen</span></div>
+        <div class="tel"><b id="tDom">0</b><span>domeinen</span></div>
+        <div class="tel"><b id="tRondes">0</b><span>trainingsrondes</span></div>
+        <div class="tel"><b id="tRoer">0</b><span>roer-rondes</span></div>
+      </div>
+      <div class="rij" style="margin-top:1rem;">
+        <button class="knop" id="kRoer" disabled>☸️ Geef het roer</button>
+        <button class="knop stil2" id="kTerug" hidden>Roer terug naar het kantoor</button>
+        <button class="knop stil2" id="kTrain">Trainingsronde nu</button>
+      </div>
+      <p class="regel">Vaste regel: de RTG AI kan het roer alleen via deze knop krijgen, doet aan het roer uitsluitend het veilige routinewerk (opruimen, bescherm-scan) en blijft meelezen. Upgrades, reparaties en alles met geld blijven altijd menselijke knoppen.</p>
+    </div>
+
+    <div class="kaart">
+      <h2 style="font-size:1.05rem;">Het journaal van de AI</h2>
+      <div class="journaal" id="journaal"><div>Laden…</div></div>
+    </div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch(e){}
+const api = (pad, body) => fetch('/api/office/' + pad, { method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+TOKEN}, body: JSON.stringify(body||{}) })
+  .then(async r => { const d = await r.json().catch(()=>({})); if(!r.ok){ if(r.status===401){ TOKEN=null; start(); } throw new Error(d.error||'Er ging iets mis.'); } return d; });
+
+function start(){
+  $('#vLogin').hidden = !!TOKEN;
+  $('#vAi').hidden = !TOKEN;
+  if (TOKEN) { ververs(); }
+}
+$('#lGo').addEventListener('click', async () => {
+  $('#lFout').textContent = '';
+  try {
+    const r = await fetch('/api/office/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code: $('#lCode').value.trim() }) }).then(x => x.json());
+    if (!r.token) throw new Error(r.error || 'Onbekende kantoorcode.');
+    TOKEN = r.token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch(e){}
+    start();
+  } catch(e){ $('#lFout').textContent = e.message; }
+});
+
+let S = null;
+async function ververs(){
+  try { S = await api('rtgai'); } catch(e){ return; }
+  const f = $('#fase');
+  f.className = 'fase ' + (S.fase === 'aan-het-roer' ? 'roer' : S.fase === 'klaar-voor-roer' ? 'klaar' : 'meelezen');
+  f.textContent = S.fase === 'aan-het-roer' ? '☸️ Aan het roer' : S.fase === 'klaar-voor-roer' ? '✋ Klaar voor het roer' : '👁 Leest mee';
+  $('#sinds').textContent = S.roerSinds ? 'aan het roer sinds ' + new Date(S.roerSinds).toLocaleTimeString('nl-NL') : 'traint sinds ' + new Date(S.gestart).toLocaleDateString('nl-NL');
+  $('#pct').textContent = S.gereedheid.procent + '%';
+  $('#meter').style.width = S.gereedheid.procent + '%';
+  $('#meterUit').textContent = 'dekking ' + Math.round(S.gereedheid.dekking*100) + '% (' + S.domeinen + ' van ' + S.drempels.domeinen + ' domeinen) · ervaring ' + Math.round(S.gereedheid.ervaring*100) + '% (' + S.waarnemingen + ' van ' + S.drempels.waarnemingen + ')';
+  $('#tWaar').textContent = S.waarnemingen.toLocaleString('nl-NL');
+  $('#tDom').textContent = S.domeinen;
+  $('#tRondes').textContent = S.rondes;
+  $('#tRoer').textContent = S.roerRondes;
+  $('#kRoer').disabled = S.fase !== 'klaar-voor-roer';
+  $('#kRoer').hidden = S.fase === 'aan-het-roer';
+  $('#kTerug').hidden = S.fase !== 'aan-het-roer';
+  $('#journaal').innerHTML = (S.journaal || []).map(j =>
+    '<div class="'+esc(j.soort)+'"><span style="color:var(--soft);">'+new Date(j.at).toLocaleTimeString('nl-NL')+'</span> · '+esc(j.tekst)+'</div>').join('') || '<div>De AI leest rustig mee; het journaal vult zich vanzelf.</div>';
+}
+$('#kRoer').addEventListener('click', async () => { try { await api('rtgai/roer/geef'); ververs(); } catch(e){ alert(e.message); } });
+$('#kTerug').addEventListener('click', async () => { try { await api('rtgai/roer/terug'); ververs(); } catch(e){ alert(e.message); } });
+$('#kTrain').addEventListener('click', async () => { try { await api('rtgai/train'); ververs(); } catch(e){ alert(e.message); } });
+setInterval(() => { if (TOKEN) ververs(); }, 3000);
+start();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

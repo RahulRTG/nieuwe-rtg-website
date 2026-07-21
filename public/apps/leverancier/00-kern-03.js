@@ -101,7 +101,7 @@
 
   // Functies per genre: zo kiest personeel direct de eigen rol,
   // en solliciteert een kandidaat overal op dezelfde manier.
-  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht' };
+  const TYPEOF = { KIKUNOI:'restaurant', PONTO:'bar', HOSHI:'hotel', SAKURA:'apartment', MKKX:'taxi', JETAG:'jet', IBIZAIR:'helikopter', AYAKA:'zzp', KAITO:'zzp', ESVEDRA:'activiteit', MACE:'activiteit', ISLAREN:'verhuur', IBIZALIV:'vastgoed', MAISON:'retail', AZUL:'charter', LUNARA:'villa', TERRAMAR:'vracht', MERIDIAAN:'kantoorgebouw' };
   const FUNCS = {
     restaurant: ['Bediening','Keuken','Gastheer/gastvrouw','Afwas'],
     bar:        ['Bediening','Bar','Keuken','Security'],
@@ -115,7 +115,8 @@
     activiteit: ['Gids','Security','Ticketbalie'],
     verhuur:    ['Balie','Monteur','Schoonmaak'],
     vastgoed:   ['Makelaar','Bezichtigingen','Backoffice'],
-    vracht:     ['Expediteur','Planner','Douane-declarant','Loods']
+    vracht:     ['Expediteur','Planner','Douane-declarant','Loods'],
+    kantoorgebouw: ['Receptie','Security','Facilitair','Concierge & jetset']
   };
   let pickCode = null, gateRoster = null, pendingStation = null;
   const spH2 = () => document.querySelector('#staffPick h2');

@@ -44,7 +44,8 @@
     { code:'CLARA',   name:'Kliniek Clara Ibiza', type:'Zorg', icon:'🩺', sub:'Privékliniek & herstel · Vila' },
     { code:'ORODOR',  name:'Casa d\'Oro', type:'Juwelier', icon:'💎', sub:'Juwelier & horloges · Dalt Vila' },
     { code:'LIENZO',  name:'Galeria Lienzo', type:'Galerie', icon:'🖼️', sub:'Kunst & galerie · Dalt Vila' },
-    { code:'TERRAMAR', name:'TerraMar Cargo', type:'Vracht', icon:'🚢', sub:'Internationale vracht · Haven van Ibiza' }
+    { code:'TERRAMAR', name:'TerraMar Cargo', type:'Vracht', icon:'🚢', sub:'Internationale vracht · Haven van Ibiza' },
+    { code:'MERIDIAAN', name:'Meridiaan Toren', type:'Kantoorgebouw', icon:'🏢', sub:'Kantoorgebouw · Amsterdam Zuidas' }
   ];
 
   // Eigen app per sector: dezelfde motor, een eigen ingang, naam en kassa.
@@ -77,6 +78,7 @@
     juwelier:    { label:'RTG Juwelier', labelEn:'RTG Jeweller', codes:['ORODOR'], icon:'💎' },
     galerie:     { label:'RTG Kunst & Galerie', labelEn:'RTG Art & Gallery', codes:['LIENZO'], icon:'🖼️' },
     vracht:      { label:'RTG Vracht', labelEn:'RTG Freight', codes:['TERRAMAR'], icon:'🚢' },
+    kantoorgebouw: { label:'RTG Zuidas', labelEn:'RTG Zuidas', codes:['MERIDIAAN'], icon:'🏢' },
     horeca:  { label:'RTG Horeca',   labelEn:'RTG Hospitality', codes:['KIKUNOI','PONTO'], icon:'🍽️', legacy:true },
     verblijf:{ label:'RTG Verblijf', labelEn:'RTG Stays',       codes:['HOSHI','SAKURA'],  icon:'🏨', legacy:true },
     vervoer: { label:'RTG Vervoer',  labelEn:'RTG Transport',   codes:['MKKX','JETAG','IBIZAIR'], icon:'🚘', legacy:true }

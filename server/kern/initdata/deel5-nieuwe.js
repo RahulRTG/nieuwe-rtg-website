@@ -17,7 +17,8 @@ module.exports = (ctx) => {
     wellness:    { label: 'Wellness & spa', icon: '\u{1F9D6}', caps: ['services', 'bookings', 'location', 'pricing'] },
     juwelier:    { label: 'Juwelier & horloges', icon: '\u{1F48E}', caps: ['retail', 'services', 'location', 'pricing'] },
     galerie:     { label: 'Kunst & galerie', icon: '\u{1F5BC}️', caps: ['tickets', 'retail', 'location', 'pricing'] },
-    vracht:      { label: 'Vracht & expeditie', icon: '\u{1F6A2}', caps: ['vracht', 'location', 'pricing'] }
+    vracht:      { label: 'Vracht & expeditie', icon: '\u{1F6A2}', caps: ['vracht', 'location', 'pricing'] },
+    kantoorgebouw: { label: 'Kantoorgebouw (Zuidas)', icon: '\u{1F3E2}', caps: ['gebouw', 'location', 'pricing'] }
   };
   for (const [t, def] of Object.entries(NIEUWE_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const NIEUWE_PARTNERS = [
@@ -97,7 +98,9 @@ module.exports = (ctx) => {
         { id: 'g2', name: 'Vernissage met de kunstenaar', desc: 'Besloten avond, cava en rondleiding.', prijs: 35, capaciteit: 30, duur: '2 uur', tijden: ['19:00'] }
       ] },
     { code: 'TERRAMAR', name: 'TerraMar Cargo', type: 'vracht', city: 'Ibiza',
-      loc: { lat: 38.912, lng: 1.448, label: 'Haven van Ibiza' }, rate: 0.08, menu: [], photos: [] }
+      loc: { lat: 38.912, lng: 1.448, label: 'Haven van Ibiza' }, rate: 0.08, menu: [], photos: [] },
+    { code: 'MERIDIAAN', name: 'Meridiaan Toren', type: 'kantoorgebouw', city: 'Amsterdam Zuidas',
+      loc: { lat: 52.338, lng: 4.873, label: 'Zuidas, Amsterdam' }, rate: 0.1, menu: [], photos: [] }
   ];
   for (const p of NIEUWE_PARTNERS) if (!db.data.suppliers.find(s => s.code === p.code)) { db.data.suppliers.push(p); ensureSupplierDefaults(p); }
 };

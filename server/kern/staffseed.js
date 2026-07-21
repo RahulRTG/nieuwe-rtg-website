@@ -66,7 +66,10 @@ const STAFF_SEED = {
   // RTG Airport: de hele operatie op een rooster (vluchtleiding, gate, platform, toren, bagage, security)
   LUCHT: [['Eva Duarte', 'manager', 'Operations control'], ['Joan Mari', 'staff', 'Gate & boarding'],
     ['Sofia Ledesma', 'staff', 'Platform & de draai'], ['Ruben Tosca', 'staff', 'Toren (verkeersleiding)'],
-    ['Paula Riera', 'staff', 'Bagagekelder'], ['Omar Bellver', 'staff', 'Security-filter']]
+    ['Paula Riera', 'staff', 'Bagagekelder'], ['Omar Bellver', 'staff', 'Security-filter']],
+  // de Brigade RTG Airport (Koninklijke Marechaussee): grensbalie, patrouille en incidenten
+  KMAR: [['Iris Kortenaer', 'manager', 'Brigadecommandant'], ['Timo Schenk', 'staff', 'Grensbalie'],
+    ['Lena Verwey', 'staff', 'Patrouille'], ['Ruud Klaassen', 'staff', 'Doorlaatpost & incidenten']]
 };
 
 module.exports = { STAFF_SEED };

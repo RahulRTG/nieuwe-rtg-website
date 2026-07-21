@@ -2032,6 +2032,11 @@ kern.overheid.registreerVloot();
    het platform, de toren (baanklaring), de bagagekelder en security. */
 Object.assign(kern, require('./kern/luchthaven').maakLuchthaven({ db, save, crypto, anthropic }));
 kern.lucht.seed();
+/* De Brigade RTG Airport (kern/marechaussee.js): de Koninklijke Marechaussee
+   op het veld · grensbalie (passagierslijst op codenaam), patrouilles,
+   incidenten en de AI-wachtcommandant. */
+Object.assign(kern, require('./kern/marechaussee').maakMarechaussee({ db, save, crypto, anthropic }));
+kern.kmar.seed();
 /* RTG contentbescherming (kern/drm.js): de DRM-route (Encrypted Media
    Extensions, Clear Key door RTG zelf bediend) voor de beschermde media. */
 Object.assign(kern, require('./kern/drm').maakDrm({ db, save, crypto }));
@@ -2358,6 +2363,7 @@ require('./routes/kantoren')(kern);
 require('./routes/gemeente')(kern);
 require('./routes/overheid')(kern);
 require('./routes/luchthaven')(kern);
+require('./routes/marechaussee')(kern);
 require('./routes/drm')(kern);
 require('./routes/pay')(kern);
 require('./routes/bank')(kern);

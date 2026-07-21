@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG iD</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--card2:#1B1817;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
+    --soft:rgba(244,241,236,0.62);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  button{font:inherit;cursor:pointer;}
+  header{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.8rem) 1.1rem 0.6rem;border-bottom:1px solid var(--line);}
+  header a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  header h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
+  main{max-width:720px;margin:0 auto;padding:1.1rem 1.1rem 4rem;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 0.5rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:0.7rem;}
+  .kaart b.groot{font-family:'Bodoni Moda',serif;font-size:1.15rem;font-weight:600;display:block;}
+  .stil{color:var(--soft);font-size:0.85rem;line-height:1.55;}
+  input,select{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:0.6rem 0.8rem;margin:0.4rem 0;}
+  .rij{display:flex;gap:0.5rem;flex-wrap:wrap;}
+  .rij>*{flex:1;min-width:8rem;}
+  .knop{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:0.85rem;padding:0.55rem 0.9rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
+  .item{display:flex;gap:0.6rem;align-items:center;border-bottom:1px solid var(--line);padding:0.5rem 0;font-size:0.85rem;}
+  .item .rek{flex:1;min-width:0;}
+  .item small{color:var(--soft);display:block;}
+  .chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0.1rem 0.55rem;font-size:0.72rem;color:var(--soft);margin:0.1rem 0.2rem 0.1rem 0;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);z-index:30;
+    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;opacity:0;transition:opacity .25s;}
+  .melding.zien{opacity:1;}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<header>
+  <a href="/apps/app.html" aria-label="Terug naar de leden-app">←</a>
+  <h1>RTG iD</h1>
+</header>
+<main>
+  <p class="stil">Uw digitale identiteit, op de kluis van RTG. U logt bij diensten in met een tik, deelt nooit meer gegevens dan gevraagd, en ziet hier precies wie wat over u opvroeg.</p>
+
+  <h2>Inloggen bij een dienst</h2>
+  <div class="kaart">
+    <p class="stil">Staat er een koppelcode op het scherm van een dienst? Voer die hier in. U ziet eerst welke dienst het is en welke gegevens die vraagt; pas na uw bevestiging gebeurt er iets.</p>
+    <form id="codeForm" class="rij">
+      <input id="codeIn" maxlength="12" placeholder="Koppelcode (ID-XXXXX)" aria-label="Koppelcode" style="flex:2;text-transform:uppercase;">
+      <button class="knop vol" type="submit">Zoek op</button>
+    </form>
+    <div id="koppelKaart" style="display:none;margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">
+      <b class="groot" id="kDienst"></b>
+      <div id="kAttr" style="margin:0.4rem 0;"></div>
+      <select id="kNamens" style="display:none;" aria-label="Inloggen als"></select>
+      <div class="rij" style="margin-top:0.4rem;">
+        <button class="knop vol" id="kBevestig" type="button">Bevestig inlog</button>
+        <button class="knop rood" id="kWeiger" type="button">Weiger</button>
+      </div>
+    </div>
+  </div>
+
+  <h2>Actieve toegang</h2>
+  <div class="kaart"><div id="sessies" class="stil">…</div></div>
+
+  <h2>Machtigingen</h2>
+  <div class="kaart">
+    <p class="stil">Laat iemand tijdelijk namens u inloggen bij een dienst (bijvoorbeeld mantelzorg). Op codenaam, per dienst, en op elk moment in te trekken; elke inlog namens u staat in uw log.</p>
+    <div class="rij">
+      <input id="mCode" maxlength="60" placeholder="Codenaam" aria-label="Codenaam">
+      <input id="mDienst" maxlength="60" placeholder="Dienst (bijv. MijnOverheid)" aria-label="Dienst">
+      <input id="mDagen" type="number" min="1" max="90" value="30" aria-label="Dagen">
+      <button class="knop vol" id="mGeef" type="button">Machtig</button>
+    </div>
+    <div id="machtigingen" style="margin-top:0.5rem;"></div>
+  </div>
+
+  <h2>Inzagelog</h2>
+  <div class="kaart"><div id="log" class="stil">…</div></div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/rtgid/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT; const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien'); clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3000); };
+  const ATTR_TEKST = { codenaam: 'uw codenaam', '18plus': 'bewijs 18 of ouder (zonder geboortedatum)',
+    leeftijd: 'uw leeftijd', nationaliteit: 'uw nationaliteit', naam: 'uw volledige naam' };
+
+  /* ---- de koppelflow: code opzoeken, dienst tonen, bevestigen of weigeren ---- */
+  let koppel = null;
+  $('#codeForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const r = await api('koppel', { code: $('#codeIn').value });
+    if (r.status !== 200) return zeg(r.body.error || 'Niet gevonden.');
+    koppel = r.body;
+    $('#kDienst').textContent = r.body.dienst + ' vraagt een inlog';
+    $('#kAttr').innerHTML = 'Gevraagde gegevens: ' + r.body.attributen.map(a => '<span class="chip">' + esc(ATTR_TEKST[a] || a) + '</span>').join('');
+    const m = r.body.machtigingen || [];
+    const sel = $('#kNamens');
+    if (m.length){
+      sel.style.display = '';
+      sel.innerHTML = '<option value="">Als mijzelf</option>' + m.map(x => '<option value="' + x.id + '">Namens ' + esc(x.van) + '</option>').join('');
+    } else sel.style.display = 'none';
+    $('#koppelKaart').style.display = '';
+  });
+  $('#kBevestig').addEventListener('click', async () => {
+    if (!koppel) return;
+    const r = await api('bevestig', { koppelId: koppel.koppelId, machtigingId: $('#kNamens').value || undefined });
+    if (r.status !== 200) return zeg(r.body.error || 'Bevestigen lukte niet.');
+    zeg('Ingelogd bij ' + r.body.dienst + (r.body.namens ? ' (namens een ander)' : '') + '.');
+    $('#koppelKaart').style.display = 'none'; $('#codeIn').value = ''; koppel = null;
+    laad();
+  });
+  $('#kWeiger').addEventListener('click', async () => {
+    if (!koppel) return;
+    await api('weiger', { koppelId: koppel.koppelId });
+    zeg('Geweigerd; er is niets gedeeld.');
+    $('#koppelKaart').style.display = 'none'; $('#codeIn').value = ''; koppel = null;
+  });
+
+  /* ---- inzage: log, actieve sessies met intrekken, machtigingen ---- */
+  async function laad(){
+    const r = await api('inzage');
+    if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
+    const d = r.body;
+    $('#sessies').innerHTML = d.sessies.length ? d.sessies.map(s =>
+      '<div class="item"><span class="rek">' + esc(s.dienst) + (s.namens ? ' <small>via gemachtigde ' + esc(s.namens) + '</small>' : '') +
+      '<small>tot ' + new Date(s.verloopt).toLocaleTimeString('nl-NL').slice(0,5) + ' · ' + s.attributen.map(esc).join(', ') + '</small></span>' +
+      '<button class="knop rood" data-intrek="' + esc(s.dienst) + '">Trek in</button></div>').join('')
+      : 'Geen dienst heeft nu toegang.';
+    $('#machtigingen').innerHTML = d.machtigingen.length ? d.machtigingen.map(m =>
+      '<div class="item"><span class="rek">' + (m.ik === 'geef' ? esc(m.naar) + ' mag namens u' : 'U mag namens ' + esc(m.van)) +
+      '<small>' + esc(m.dienst) + ' · tot ' + new Date(m.tot).toLocaleDateString('nl-NL') + '</small></span>' +
+      '<button class="knop rood" data-mweg="' + m.id + '">Trek in</button></div>').join('')
+      : '<p class="stil">Geen machtigingen.</p>';
+    $('#log').innerHTML = d.log.length ? d.log.map(l =>
+      '<div class="item"><span class="rek">' + esc(l.dienst) + ' · ' + esc(l.soort) +
+      '<small>' + new Date(l.om).toLocaleString('nl-NL') + (l.attributen.length ? ' · ' + l.attributen.map(esc).join(', ') : '') + '</small></span></div>').join('')
+      : 'Nog niets gedeeld; zo hoort het log te beginnen.';
+    document.querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
+      await api('intrek', { dienst: b.dataset.intrek }); zeg('Toegang ingetrokken.'); laad();
+    }));
+    document.querySelectorAll('[data-mweg]').forEach(b => b.addEventListener('click', async () => {
+      await api('machtig/intrek', { id: b.dataset.mweg }); zeg('Machtiging ingetrokken.'); laad();
+    }));
+  }
+  $('#mGeef').addEventListener('click', async () => {
+    const r = await api('machtig', { codenaam: $('#mCode').value, dienst: $('#mDienst').value, dagen: $('#mDagen').value });
+    if (r.status !== 200) return zeg(r.body.error || 'Machtigen lukte niet.');
+    zeg('Gemachtigd: ' + r.body.machtiging.naar + ' bij ' + r.body.machtiging.dienst + '.');
+    $('#mCode').value = ''; laad();
+  });
+
+  if (!token) zeg('Log eerst in op de leden-app.'); else laad();
+})();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

@@ -217,9 +217,45 @@ const api = (pad, body) => fetch(pad, {
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">MijnOverheid werkt met je RTG-account. Open de app en log in.</p>'+
-    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+  // Inloggen met RTG iD: de dienst toont een koppelcode; het lid bevestigt
+  // in de eigen app (die ziet daar de dienstnaam en de gevraagde gegevens).
+  // Phishing-bestendig: de code leeft twee minuten en werkt maar een keer.
+  $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Inloggen met RTG iD</h2>'+
+    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Geen wachtwoord, geen sms. MijnOverheid vraagt alleen uw codenaam en een bewijs 18-plus; meer krijgt het loket niet.</p>'+
+    '<p style="margin-top:1rem;"><button id="idStart" style="background:var(--goud,#C9A24B);color:#0C0C0B;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:600;cursor:pointer;">Toon koppelcode</button></p>'+
+    '<div id="idFlow" style="display:none;margin-top:1rem;">'+
+      '<div style="font-family:\'Bodoni Moda\',serif;font-size:2rem;letter-spacing:.15em;" id="idCode"></div>'+
+      '<p style="color:var(--muted);margin-top:.5rem;line-height:1.6;">Open <b>RTG iD</b> in de leden-app en voer deze code in; u ziet daar dat <b>MijnOverheid</b> de aanvrager is. De code leeft twee minuten.</p>'+
+      '<p id="idStand" style="margin-top:.6rem;">Wacht op bevestiging…</p></div>'+
+    '<div id="idKlaar" style="display:none;margin-top:1rem;"></div>'+
+    '<p style="margin-top:1rem;color:var(--muted);">Of <a href="/apps/app.html">log in via de leden-app</a>.</p></div>';
+  const idApi = (pad, body) => fetch('/api/rtgid/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body || {}) }).then(r => r.json());
+  let idPoll = null;
+  $('#idStart').addEventListener('click', async () => {
+    const s = await idApi('start', { dienst: 'MijnOverheid', attributen: ['codenaam', '18plus'] });
+    if (s.error) return meld(s.error);
+    $('#idFlow').style.display = ''; $('#idKlaar').style.display = 'none';
+    $('#idCode').textContent = s.code; $('#idStand').textContent = 'Wacht op bevestiging…';
+    clearInterval(idPoll);
+    idPoll = setInterval(async () => {
+      const st = await idApi('status', { koppelId: s.koppelId });
+      if (st.stand === 'wacht') return;
+      clearInterval(idPoll);
+      if (st.stand === 'bevestigd' && st.idToken) {
+        const wie = await idApi('wie', { idToken: st.idToken });
+        const a = wie.attributen || {};
+        $('#idFlow').style.display = 'none';
+        $('#idKlaar').style.display = '';
+        $('#idKlaar').innerHTML = '<p><b>Ingelogd met RTG iD</b>'+(wie.namens?' (via gemachtigde '+esc(wie.namens)+')':'')+'</p>'+
+          '<p style="color:var(--muted);margin-top:.4rem;line-height:1.6;">Gedeeld met dit loket: codenaam <b>'+esc(a.codenaam||'')+'</b> en bewijs 18-plus: <b>'+(a['18plus']===true?'ja':a['18plus']===false?'nee':'onbekend')+'</b>. Uw geboortedatum en naam zijn niet gedeeld; dit staat in uw inzagelog.</p>'+
+          '<p style="margin-top:.8rem;"><a href="/apps/app.html">Open het loket via de leden-app →</a></p>';
+      } else {
+        $('#idStand').textContent = st.stand === 'geweigerd' ? 'U heeft de inlog geweigerd; er is niets gedeeld.'
+          : 'De code is verlopen; vraag een nieuwe.';
+      }
+    }, 1500);
+  });
 } else { start(); }
 
 const TABS = [['box','Berichtenbox'],['belasting','Belasting'],['rdw','RDW'],['kvk','Onderneming'],['sociaal','Sociaal'],['prov','Provincie'],['water','Waterschap'],['stem','Stemmen']];

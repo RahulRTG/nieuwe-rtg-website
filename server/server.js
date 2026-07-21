@@ -2480,6 +2480,11 @@ require('./routes/wbw')(kern);
 require('./routes/ov')(kern);
 require('./routes/clips')(kern);
 require('./routes/kantoorpakket')(kern);
+/* RTG iD (kern/rtgid.js): de DigiD-vervanger op de eigen identiteitskluis;
+   koppelcode-inlog met bevestiging in de app, selectieve gegevensdeling,
+   inzagelog met intrekken en herroepbare machtigingen. */
+Object.assign(kern, require('./kern/rtgid').maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam }));
+require('./routes/rtgid')(kern);
 require('./routes/stuur')(kern);
 require('./routes/vonk')(kern);
 require('./routes/voorspel')(kern);

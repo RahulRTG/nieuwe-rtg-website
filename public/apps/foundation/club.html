@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clubportaal · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;--muted:rgba(244,241,236,0.68);--soft:rgba(244,241,236,0.55);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:2rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.25rem;}
+  main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.actief{color:var(--green);border-color:var(--green);}
+  .item{padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.86rem;}
+  .item.af{opacity:.5;text-decoration:line-through;}
+  .log{font-size:.84rem;line-height:1.5;padding:.35rem 0;border-bottom:1px solid var(--line);}
+  .log b{color:var(--burgundy);} .log.rtf b{color:var(--gold);}
+  .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;}
+</style>
+</head>
+<body>
+<header>
+  <div class="ey">RTFoundation · samen met uw club</div>
+  <h1>🏟️ Clubportaal</h1>
+</header>
+<main id="main">
+  <div class="kaart" id="inlog">
+    <div class="sec">Aanmelden met uw clubcode</div>
+    <p class="leeg" style="margin-bottom:.5rem;">De RTFoundation werkt met grote clubs in elke stad aan de jeugd en de buurt. Hier ziet u alleen het dossier van uw eigen club: de programma's, de afspraken en het gedeelde logboek met het RTF-team.</p>
+    <div class="rij">
+      <input class="veld" id="code" placeholder="CLUB-XXXXXX" maxlength="14" autocomplete="off">
+      <button class="knop" id="open">Open</button>
+    </div>
+    <div class="leeg" id="fout"></div>
+  </div>
+  <div id="portaal" hidden>
+    <div class="kaart">
+      <div class="rij" style="justify-content:space-between;"><h2 id="pNaam" style="font-size:1.1rem;"></h2><span class="pil" id="pStatus"></span></div>
+      <div class="leeg" id="pMeta"></div>
+      <div class="sec" style="margin-top:.4rem;">Uw vaste RTF-team</div>
+      <div id="pTeam" class="leeg"></div>
+    </div>
+    <div class="kaart" style="margin-top:.7rem;"><div class="sec">Programma's die we samen draaien</div><div id="pProg"></div></div>
+    <div class="kaart" style="margin-top:.7rem;"><div class="sec">Afspraken</div><div id="pAfs"></div></div>
+    <div class="kaart" style="margin-top:.7rem;">
+      <div class="sec">Samenwerkingslog</div>
+      <div id="pLog"></div>
+      <div class="rij" style="margin-top:.5rem;">
+        <input class="veld" id="bNaam" placeholder="Uw naam" maxlength="60" style="max-width:9rem;">
+        <input class="veld" id="bTekst" placeholder="Bericht aan het RTF-team" maxlength="300">
+        <button class="knop" id="bStuur">Stuur</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const api = (pad, body) => fetch('/api/rtf/club/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
+  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+let CODE = '';
+try { CODE = localStorage.getItem('rtf_club_code') || ''; } catch (e) {}
+function toon(c){
+  $('#inlog').hidden = true; $('#portaal').hidden = false;
+  $('#pNaam').textContent = c.naam;
+  $('#pStatus').textContent = c.status; $('#pStatus').className = 'pil' + (c.status === 'actief' ? ' actief' : '');
+  $('#pMeta').textContent = c.sport + ' · ' + c.stad;
+  $('#pTeam').textContent = c.team.length ? c.team.join(', ') : 'Wordt nog aan u voorgesteld.';
+  $('#pProg').innerHTML = c.programmas.length ? c.programmas.map(p => '<div class="item' + (p.af ? ' af' : '') + '">' + esc(p.naam) + (p.doel ? ' · ' + esc(p.doel) : '') + '</div>').join('') : '<div class="leeg">De eerste programma\'s worden samen met u gekozen.</div>';
+  $('#pAfs').innerHTML = c.afspraken.length ? c.afspraken.map(a => '<div class="item' + (a.af ? ' af' : '') + '">' + esc(a.tekst) + '</div>').join('') : '<div class="leeg">Nog geen afspraken vastgelegd.</div>';
+  $('#pLog').innerHTML = c.log.length ? c.log.map(m => '<div class="log ' + esc(m.wie) + '"><b>' + esc(m.naam) + '</b>: ' + esc(m.tekst) + '</div>').join('') : '<div class="leeg">Nog stil hier; stuur gerust het eerste bericht.</div>';
+}
+async function open(code){
+  try {
+    const r = await api('portaal', { code });
+    CODE = code; try { localStorage.setItem('rtf_club_code', code); } catch (e) {}
+    toon(r.club);
+  } catch (e) { $('#fout').textContent = e.message; }
+}
+$('#open').addEventListener('click', () => open($('#code').value.trim().toUpperCase()));
+$('#bStuur').addEventListener('click', async () => {
+  try {
+    const r = await api('bericht', { code: CODE, naam: $('#bNaam').value, tekst: $('#bTekst').value });
+    $('#bTekst').value = ''; toon(r.club);
+  } catch (e) { alert(e.message); }
+});
+if (CODE) open(CODE);
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

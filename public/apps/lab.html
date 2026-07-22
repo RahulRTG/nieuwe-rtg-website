@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Onderzoekslab</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.10);--txt:#F4F1EC;--muted:rgba(244,241,236,0.68);--soft:rgba(244,241,236,0.55);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:2rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.25rem;}
+  header a{margin-left:auto;color:var(--muted);font-size:.78rem;text-decoration:none;}
+  main{padding:1rem;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
+  select.veld{color-scheme:dark;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .chips{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem;}
+  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
+  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.ok{color:var(--green);border-color:var(--green);} .pil.wacht{color:var(--gold);border-color:var(--gold);}
+  .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;}
+  .log{font-size:.8rem;color:var(--muted);line-height:1.5;padding:.2rem 0;border-bottom:1px solid var(--line);}
+  .ai{border-left:2px solid var(--gold);padding-left:.6rem;font-size:.84rem;line-height:1.55;margin-top:.4rem;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="ey">RTG + RTFoundation</div><h1>🔬 Onderzoekslab</h1></div>
+  <a href="/apps/foundation/kantoor.html">RTF-kantoor</a>
+  <a href="/apps/kantoren.html">RTG-kantoren</a>
+</header>
+<main id="main">
+  <div class="kaart">
+    <div class="sec">Nieuw project</div>
+    <div class="rij">
+      <select class="veld" id="pVeld" style="max-width:13rem;" aria-label="Onderzoeksveld"></select>
+      <select class="veld" id="pWie" style="max-width:8rem;" aria-label="Voor wie"><option value="samen">samen</option><option value="rtg">RTG</option><option value="rtf">RTF</option></select>
+      <input class="veld" id="pTitel" placeholder="Titel (bijv. Zonne-waterpomp voor een dorp)" maxlength="100">
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="pDoel" placeholder="Doel: wat willen we leren of bouwen?" maxlength="400">
+      <button class="knop" id="pMaak">+ Start</button>
+    </div>
+    <div class="leeg">Vaste keten: idee → onderzoek → prototype → proef → uitrol. Voor proef en uitrol tekent altijd een mens de veiligheids- en ethiektoets; de kennisbank vergeet nooit iets.</div>
+  </div>
+  <div class="kaart">
+    <div class="sec">Vraag de onderzoekscoach (Rahul)</div>
+    <div class="rij"><input class="veld" id="aiVraag" placeholder="Bijv. hoe zet ik een eerlijke nulmeting op?" maxlength="400"><button class="knop stil" id="aiStuur">Vraag</button></div>
+    <div class="ai" id="aiUit" hidden></div>
+  </div>
+  <div class="chips" id="filters"></div>
+  <div id="lijst"><div class="leeg">Laden...</div></div>
+  <div class="kaart"><div class="sec">Kennisbank (<span id="kbTel">0</span> bevindingen, ook uit het archief)</div><div id="kb"></div></div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+function uitgelogd(){ location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname)); }
+if (!TOKEN) uitgelogd();
+const api = (pad, body) => fetch('/api/lab/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
+  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+let D = null, filter = '';
+async function laad(){
+  D = await api('overzicht');
+  const kb = await api('kennisbank');
+  if (!$('#pVeld').options.length) $('#pVeld').innerHTML = D.velden.map(v => '<option value="' + v.veld + '">' + v.emoji + ' ' + esc(v.naam) + '</option>').join('');
+  $('#filters').innerHTML = '<button class="chip' + (filter === '' ? ' aan' : '') + '" data-f="">Alle</button>' +
+    D.velden.map(v => '<button class="chip' + (filter === v.veld ? ' aan' : '') + '" data-f="' + v.veld + '">' + v.emoji + ' ' + esc(v.naam) + (v.aantal ? ' (' + v.aantal + ')' : '') + '</button>').join('');
+  document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; render(); }));
+  $('#kbTel').textContent = kb.totaal;
+  $('#kb').innerHTML = kb.bevindingen.slice(0, 12).map(b => '<div class="log"><b>' + esc(b.titel) + '</b> · ' + esc(b.project) + ' (' + esc(b.veld) + ')' + (b.tekst ? '<br>' + esc(b.tekst) : '') + '</div>').join('') || '<div class="leeg">De eerste bevinding moet nog geschreven worden.</div>';
+  render();
+}
+function render(){
+  const lijst = D.projecten.filter(p => !filter || p.veld === filter);
+  $('#lijst').innerHTML = lijst.length ? lijst.map(p => {
+    const v = p.veiligheid || {};
+    const fasen = D.fasen; const ix = fasen.indexOf(p.fase); const nx = ix >= 0 && ix < fasen.length - 1 ? fasen[ix + 1] : null;
+    return '<div class="kaart" style="margin-bottom:.7rem;" data-p="' + p.id + '">' +
+      '<div class="rij" style="justify-content:space-between;"><h2 style="font-size:1.02rem;">' + esc(p.titel) + '</h2>' +
+      '<span class="pil">' + esc(p.fase) + '</span></div>' +
+      '<div class="leeg">' + esc(p.veldNaam) + ' · voor ' + esc(p.voorWie) + (p.doel ? ' · ' + esc(p.doel) : '') + '</div>' +
+      '<div class="rij" style="margin:.35rem 0;">' +
+        '<span class="pil ' + (v.status === 'akkoord' ? 'ok' : (v.status === 'open' ? 'wacht' : '')) + '">toets: ' + esc(v.status) + (v.door ? ' door ' + esc(v.door) : '') + '</span>' +
+        (v.status !== 'akkoord' ? '<input class="veld" data-door placeholder="Uw naam (mens tekent)" style="max-width:11rem;"><button class="knop stil" data-toets>Toets akkoord</button>' : '') +
+        (nx ? '<button class="knop" data-fase="' + nx + '" style="margin-left:auto;">→ ' + nx + '</button>' : '') + '</div>' +
+      (p.logboek || []).slice(0, 3).map(l => '<div class="log">' + esc(l.tekst) + '</div>').join('') +
+      '<div class="rij" style="margin-top:.4rem;"><input class="veld" data-log placeholder="Logboek-regel"><button class="knop stil" data-logmaak>Log</button>' +
+      '<input class="veld" data-bev placeholder="Bevinding (titel)"><button class="knop stil" data-bevmaak>Bevinding</button></div>' +
+      '</div>';
+  }).join('') : '<div class="leeg">Geen projecten in dit veld; start het eerste hierboven.</div>';
+  bind();
+}
+function bind(){
+  document.querySelectorAll('[data-p]').forEach(k => {
+    const id = k.dataset.p;
+    const doe = w => w.then(laad).catch(e => alert(e.message));
+    const toets = k.querySelector('[data-toets]');
+    if (toets) toets.addEventListener('click', () => doe(api('project/veiligheid', { id, status: 'akkoord', door: k.querySelector('[data-door]').value })));
+    const fase = k.querySelector('[data-fase]');
+    if (fase) fase.addEventListener('click', () => doe(api('project/fase', { id, fase: fase.dataset.fase })));
+    k.querySelector('[data-logmaak]').addEventListener('click', () => doe(api('project/log', { id, tekst: k.querySelector('[data-log]').value })));
+    k.querySelector('[data-bevmaak]').addEventListener('click', () => doe(api('project/bevinding', { id, titel: k.querySelector('[data-bev]').value })));
+  });
+}
+$('#pMaak').addEventListener('click', async () => {
+  try { await api('project/maak', { titel: $('#pTitel').value, veld: $('#pVeld').value, voorWie: $('#pWie').value, doel: $('#pDoel').value });
+    $('#pTitel').value = ''; $('#pDoel').value = ''; laad();
+  } catch (e) { alert(e.message); }
+});
+$('#aiStuur').addEventListener('click', async () => {
+  const q = $('#aiVraag').value.trim(); if (!q) return;
+  $('#aiUit').hidden = false; $('#aiUit').textContent = 'Rahul denkt mee...';
+  try { $('#aiUit').textContent = (await api('ai', { q })).antwoord; } catch (e) { $('#aiUit').textContent = e.message; }
+});
+laad().catch(e => { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

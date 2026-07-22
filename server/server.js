@@ -2137,6 +2137,14 @@ Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
    apps over alle religies en levensbeschouwingen, als gelijken naast elkaar,
    respectvol en gratis; met dezelfde leeftijdspoort als de app-bibliotheek. */
 Object.assign(kern, require('./kern/geloofbieb').maakGeloofBieb({ db, save }));
+/* Het RTF-kantoor (kern/rtfkantoor.js): het eigen kantoor van de stichting,
+   een spiegel van de RTG-kantoorstructuur; met de Clubs & steden-afdeling
+   (kern/rtfclubs.js: samenwerking met grote (sport)clubs per stad) en het
+   RTG Onderzoekslab (kern/onderzoekslab.js: hardware, software, dorpshulp,
+   landbouw en onderzoek naar onderzoek, met een menselijke veiligheidstoets). */
+Object.assign(kern, require('./kern/rtfkantoor')({ db, save, crypto }));
+Object.assign(kern, require('./kern/rtfclubs')({ db, save, crypto }));
+Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropic }));
 /* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
    tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */
@@ -2541,6 +2549,8 @@ require('./routes/leren')(kern);
 require('./routes/rtfbieb')(kern);
 /* De Geloof & Wijsheid-Bibliotheek-routes (kern staat al hierboven). */
 require('./routes/geloofbieb')(kern);
+/* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
+require('./routes/rtfkantoor')(kern);
 /* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
    school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
    (kern/samenrtf.js): kindveilig meekijken binnen gezin en vrienden. */

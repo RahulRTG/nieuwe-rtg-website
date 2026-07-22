@@ -42,6 +42,13 @@
     // datum: hetzelfde levende goud, hetzelfde Bodoni-gezicht en dezelfde maat
     ".rtg-ring .rr-dag{fill:var(--klok-goud,var(--gold,#C9A24B));font-family:'Bodoni Moda',serif;font-size:8.6px;}" +
     '.rtg-ring .rr-wijzer{fill:var(--klok-goud,var(--gold,#C9A24B));filter:drop-shadow(0 0 5px color-mix(in srgb, var(--klok-goud,var(--gold,#C9A24B)) 70%, transparent));}' +
+    // het binnenwerk: radertjes, onrust en echappement, als door een geskeletteerde
+    // plaat heen; gedempt goud, zodat het beweegt zonder de cijfers te storen
+    '.rtg-ring .rr-rad{fill:var(--klok-goud,var(--gold,#C9A24B));fill-opacity:0.16;stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.5;stroke-width:0.5;}' +
+    '.rtg-ring .rr-spaak{stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.45;stroke-width:0.7;}' +
+    '.rtg-ring .rr-as{fill:var(--klok-goud,var(--gold,#C9A24B));fill-opacity:0.75;}' +
+    '.rtg-ring .rr-onrust{fill:none;stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.6;stroke-width:1.1;}' +
+    '.rtg-ring .rr-spiraal{fill:none;stroke:var(--klok-goud,var(--gold,#C9A24B));stroke-opacity:0.45;stroke-width:0.35;}' +
     // de cijfers exact in het midden: naam en datumvenster staan er
     // symmetrisch omheen, zodat alles even ver van elkaar en de rand staat.
     // Het goud-accent van de milliseconden telt NIET mee voor het centreren
@@ -121,6 +128,74 @@
         class: vijf ? 'rr-vijf' : 'rr-min'
       });
     }
+    /* ---- het binnenwerk: hier is echt tijd aan gespild ----
+       Linksonder een raderwerk van drie in elkaar grijpende tandwielen; het
+       grote wiel is het secondewiel (een omwenteling per minuut, gelijk met
+       de gouden veger), de volgende draaien tegengesteld en sneller, precies
+       volgens hun tandverhouding, zoals in een echt uurwerk. Rechtsonder het
+       kloppende hart: de onrust die heen en weer slaat (3 Hz) op een
+       spiraalveer, met daarnaast het echappementswiel dat per halve slag een
+       tand doorklikt. Alles rekent op de kloktijd zelf, dus het loopt nooit
+       uit de pas; wie minder beweging wil, ziet het binnenwerk stilstaan. */
+    const P2 = Math.PI * 2;
+    const pt = (r, a) => (r * Math.sin(a)).toFixed(2) + ' ' + (-r * Math.cos(a)).toFixed(2);
+    function tandPad(r, tanden, punt) {
+      const ri = r * (punt ? 0.68 : 0.8);
+      let p = '';
+      for (let i = 0; i < tanden; i++) {
+        const a0 = (i / tanden) * P2, stap = P2 / tanden;
+        p += (i ? 'L' : 'M') + pt(ri, a0) + 'L' + pt(ri, a0 + stap * 0.22) +
+          'L' + pt(r, a0 + stap * (punt ? 0.44 : 0.32)) + 'L' + pt(r, a0 + stap * (punt ? 0.5 : 0.68)) +
+          'L' + pt(ri, a0 + stap * 0.78);
+      }
+      return p + 'Z';
+    }
+    function rad(cx, cy, r, tanden, punt) {
+      const g = maak('g', { transform: 'translate(' + cx + ' ' + cy + ')' });
+      const pad = document.createElementNS(NS, 'path');
+      pad.setAttribute('d', tandPad(r, tanden, punt));
+      pad.setAttribute('class', 'rr-rad');
+      g.appendChild(pad);
+      for (let s = 0; s < 3; s++) {
+        const a = s * P2 / 3, l = document.createElementNS(NS, 'line');
+        const b = pt(r * 0.62, a).split(' ');
+        l.setAttribute('x1', 0); l.setAttribute('y1', 0); l.setAttribute('x2', b[0]); l.setAttribute('y2', b[1]);
+        l.setAttribute('class', 'rr-spaak');
+        g.appendChild(l);
+      }
+      const as = document.createElementNS(NS, 'circle');
+      as.setAttribute('r', Math.max(1, r * 0.12)); as.setAttribute('class', 'rr-as');
+      g.appendChild(as);
+      return { g, cx, cy };
+    }
+    // het raderwerk linksonder: 18, 12 en 8 tanden, netjes in elkaar grijpend
+    const rad1 = rad(52, 122, 13, 18);
+    const rad2 = rad(71.5, 133, 8.6, 12);
+    const rad3 = rad(84.5, 141.5, 5.8, 8);
+    // de onrust rechtsonder: balansring met dubbele spaak en de spiraalveer
+    const onrust = maak('g', { transform: 'translate(147 123)' });
+    const balans = document.createElementNS(NS, 'g');
+    const ring = document.createElementNS(NS, 'circle');
+    ring.setAttribute('r', 10.5); ring.setAttribute('class', 'rr-onrust');
+    balans.appendChild(ring);
+    for (const a of [0, Math.PI / 2]) {
+      const l = document.createElementNS(NS, 'line');
+      const p1 = pt(10.5, a).split(' '), p2 = pt(10.5, a + Math.PI).split(' ');
+      l.setAttribute('x1', p1[0]); l.setAttribute('y1', p1[1]); l.setAttribute('x2', p2[0]); l.setAttribute('y2', p2[1]);
+      l.setAttribute('class', 'rr-spaak');
+      balans.appendChild(l);
+    }
+    const spiraal = document.createElementNS(NS, 'path');
+    let sp = 'M0 0';
+    for (let i = 1; i <= 96; i++) { const a = i / 96 * P2 * 3.5, r = 0.6 + 6.2 * i / 96; sp += 'L' + pt(r, a); }
+    spiraal.setAttribute('d', sp); spiraal.setAttribute('class', 'rr-spiraal');
+    balans.appendChild(spiraal);
+    const nav = document.createElementNS(NS, 'circle');
+    nav.setAttribute('r', 1.3); nav.setAttribute('class', 'rr-as');
+    balans.appendChild(nav);
+    onrust.appendChild(balans);
+    // het echappementswiel tussen de onrust en het raderwerk, met puntige tanden
+    const echap = rad(131.5, 138.5, 6.2, 15, true);
     // de signatuur: alleen de naam, in het goud van het huis, op vaste
     // breedte (textLength) exact gecentreerd
     const naam = maak('text', { x: 100, y: 41.5, class: 'rr-naam', 'text-anchor': 'middle',
@@ -250,6 +325,19 @@
       vorigeKalenderdag = kalenderdag;
       const sec = d.getSeconds() + (RUSTIG ? 0 : d.getMilliseconds() / 1000);
       wijzer.setAttribute('transform', 'rotate(' + (sec * 6) + ' 100 100)');
+      /* het binnenwerk draait mee op de kloktijd: het secondewiel loopt
+         gelijk met de veger, de volgende raderen tegengesteld op hun
+         tandverhouding (18:12:8), de onrust slaat op 3 Hz en het
+         echappement klikt zes tanden per seconde door */
+      if (!RUSTIG) {
+        const tt = d.getTime() / 1000;
+        const a1 = sec * 6;
+        rad1.g.setAttribute('transform', 'translate(' + rad1.cx + ' ' + rad1.cy + ') rotate(' + a1.toFixed(2) + ')');
+        rad2.g.setAttribute('transform', 'translate(' + rad2.cx + ' ' + rad2.cy + ') rotate(' + (-a1 * 1.5).toFixed(2) + ')');
+        rad3.g.setAttribute('transform', 'translate(' + rad3.cx + ' ' + rad3.cy + ') rotate(' + (a1 * 2.25).toFixed(2) + ')');
+        balans.setAttribute('transform', 'rotate(' + (42 * Math.sin(tt * P2 * 3)).toFixed(2) + ')');
+        echap.g.setAttribute('transform', 'translate(' + echap.cx + ' ' + echap.cy + ') rotate(' + ((Math.floor(tt * 6) % 15) * -24) + ')');
+      }
     };
   }
 

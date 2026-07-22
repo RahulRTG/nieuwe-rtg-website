@@ -197,6 +197,18 @@ een generale repetitie (`test/golive.test.js`) die de server echt in
 productiestand start en bewijst: onveilige start geweigerd, demo dicht, geen
 dev-lekken, registratie/eigenaar/backoffice werken.
 
+**De snelste route (een avond werk):**
+
+1. `npm run sleutels -- --schrijf` — genereert ALLE geheimen (inclusief het
+   2FA-secret met scanbare otpauth-regel) en zet ze in `.env.productie`
+   (rechten 600, staat in `.gitignore`).
+2. Vul in `.env.productie` de HANDMATIG-regels in: `RTG_OWNER_EMAIL`,
+   `APP_URL`, `DATABASE_URL`, `REDIS_URL`, `SMTP_URL`.
+3. `npm run golive` — leest `.env.productie` vanzelf mee, raakt PostgreSQL
+   echt aan en keurt; exitcode 0 = de configuratie is klaar.
+4. Zet de reverse proxy (TLS) en de DNS-rand (Cloudflare) ervoor, laad
+   `.env.productie` als omgeving en start met `NODE_ENV=production`.
+
 - [ ] `npm run golive` geeft exitcode 0 op de productiemachine
 - [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar (verplicht; het voorbeeldadres blokkeert de start)
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet

@@ -157,6 +157,15 @@
         } else {
           const d = await API.call('/aanmeld/zeg', { id: gesprek, tekst });
           zeg('rahul', d.tekst);
+          // ingelogd via de sleutelwoorden: de server heeft server-side
+          // geverifieerd en een echte token gemunt; wij bewaren hem en
+          // herstellen de sessie precies zoals na een gewone inlog
+          if (d.ingelogd && d.token){
+            try { API.token = d.token; localStorage.setItem('rtg_member_token', d.token); } catch(e2){}
+            bezig = false;
+            if (typeof restoreSession === 'function') await restoreSession();
+            return;
+          }
           // wachtwoord vergeten: Rahul belooft de herstel-link, de app vraagt
           // hem stil aan op de bestaande route (die nooit een bestaan lekt)
           if (d.vergeten && d.vergeten.u){

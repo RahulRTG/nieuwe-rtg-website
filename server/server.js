@@ -2423,7 +2423,11 @@ Object.assign(kern, require('./kern/wbw').maakWbw({
    aanmeldformulier met een menselijk gesprek dat de velden voor de ene
    registratieroute oplevert (en op "waarom?" eerlijk uitlegt waarvoor iets
    dient). */
-Object.assign(kern, require('./kern/aanmeldgesprek').maakAanmeldgesprek({ db, schoon, leeftijdVan }));
+/* Sleutelwoorden (kern/sleutelwoorden.js): inloggen door een gesprek met
+   Rahul en vier onthouden woorden, drie per keer (roterend, scrypt, met een
+   slot). Moet VOOR het aanmeldgesprek staan, want dat gebruikt swStart/swZeg. */
+Object.assign(kern, require('./kern/sleutelwoorden').maakSleutelwoorden({ db, save, crypto, accounts }));
+Object.assign(kern, require('./kern/aanmeldgesprek').maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart: kern.swStart, swZeg: kern.swZeg }));
 /* De algemene pin (kern/algpin.js): een pincode van het lid die de
    privacygevoelige apps op het OS beschermt en waarmee de werk-apps openen
    (het ene account = bevoegdheid, de pin = bewijs). */
@@ -2520,6 +2524,7 @@ for (const naam of gekozenDomeinen) {
 require('./routes/onboarding')(kern);
 require('./routes/aanmeldgesprek')(kern);
 require('./routes/algpin')(kern);
+require('./routes/sleutelwoorden')(kern);
 require('./routes/agenda')(kern);
 require('./routes/facturatie')(kern);
 require('./routes/markt')(kern);

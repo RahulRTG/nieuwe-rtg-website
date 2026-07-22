@@ -31,9 +31,12 @@ const MAX_GESPREKKEN = 500;
 const MAX_BEURTEN = 60;
 const TTL_MS = 30 * 60 * 1000;
 
-function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
+function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
   const gesprekken = new Map(); // id -> { stap, velden, warmte, beurten, at, werkgever }
   const nu = () => Date.now();
+  const ord = i => ['eerste', 'tweede', 'derde', 'vierde'][i] || (i + 1) + 'e';
+  // korte, eerlijke uitleg voor wie eerst wil weten wat RTG is (het uitleg-pad)
+  const UITLEG = 'RTG is een membership-reisbureau: je pas opent reizen, verblijven, uitgaan en meer, met een persoonlijke AI (dat ben ik) die alles voor je regelt. Er zijn drie passen: de RTG Pass als instap, en de Lifestyle en Business Pass op uitnodiging. Wil je lid worden, dan meld ik je hier gewoon aan; ben je al lid, dan log ik je in. Zeg het maar: aanmelden, inloggen, of nog een vraag?';
 
   function opruimen() {
     if (gesprekken.size < MAX_GESPREKKEN) return;
@@ -81,8 +84,10 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
 
   /* op elke "waarom?" een eerlijk antwoord, per stap */
   const WAAROM = {
-    doel: 'Ik vraag het alleen om je meteen goed te helpen: terugkerende leden log ik in, nieuwe gasten meld ik aan. Meer zit er niet achter.',
+    doel: 'Ik vraag het alleen om je meteen goed te helpen: terugkerende leden log ik in, nieuwe gasten meld ik aan, en wie eerst wil weten wat RTG is, leg ik het uit. Meer zit er niet achter.',
     'login-naam': 'Je e-mailadres of gebruikersnaam is hoe de kluis jouw account terugvindt; zonder kan ik je niet inloggen.',
+    'sw-open': 'We loggen je in met je vier sleutelwoorden in plaats van een wachtwoord: ik vraag er telkens drie, in een andere volgorde. Zo staat er nergens een vast wachtwoord op de lijn en geeft een keer meekijken nooit al je woorden prijs. Liever toch je wachtwoord? Zeg "wachtwoord".',
+    'sw-sluit': 'Nog een laatste sleutelwoord en je bent binnen. Je woorden zijn versleuteld opgeslagen; ik kan ze zelf niet teruglezen.',
     'login-af': 'Je wachtwoord typ je hieronder in een apart veld: het gaat rechtstreeks en versleuteld naar de inlogcontrole, niet door dit gesprek. Zo leest niemand het mee, ik ook niet.',
     woonplaats: 'Je woonplaats helpt me met reistijden, aanraders in de buurt en de regels van je land. Alleen de plaatsnaam; je volledige adres vraag ik pas als er echt iets bezorgd moet worden, en overslaan is ook gewoon goed.',
     naam: 'Eerlijk antwoord: je naam staat straks op je pas en in de kluis met je echte gegevens; in de app zelf werk je onder een codenaam, zodat zaken en personeel je echte naam nooit hoeven te zien.',
@@ -93,12 +98,29 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
   };
   const isWaarom = t => /\b(waarom|hoezo|waarvoor|wat moet je daarmee|wat doe je daarmee)\b/i.test(t);
 
+  /* het inlog-pad opent standaard de sleutelwoorden-uitdaging (veiliger, en
+     "inloggen is een gesprek met de AI"); wie liever het wachtwoord tikt, kan
+     dat altijd zeggen. Zonder sleutelwoorden-motor valt alles terug op het
+     wachtwoord, zodat bestaande accounts nooit vastlopen. */
+  function naarWoordInlog(g, u) {
+    g.login = { u };
+    if (typeof swStart !== 'function') {
+      g.stap = 'login-af';
+      return { tekst: 'Welkom terug. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.', login: g.login };
+    }
+    const r = swStart(u);
+    if (r && r.error) { g.stap = 'login-naam'; return { tekst: r.error }; }
+    g.sw = { id: r.id };
+    g.stap = 'sw-open';
+    return { tekst: 'Fijn, welkom terug. We doen het veilig met je sleutelwoorden: verweef je ' + ord(r.posA) + ' en je ' + ord(r.posB) + ' sleutelwoord losjes in een zin. (Liever met je wachtwoord? Zeg "wachtwoord".)' };
+  }
+
   function intakeStart() {
     opruimen();
     const id = 'ag' + nu().toString(36) + Math.random().toString(36).slice(2, 8);
     const g = { stap: 'doel', velden: {}, warmte: 0, beurten: 0, at: nu(), werkgever: null };
     gesprekken.set(id, g);
-    return { id, tekst: 'Hallo, ik ben Rahul. Geen formulieren hier; vertel gewoon. Ken ik je al, of is dit je eerste keer bij RTG?' };
+    return { id, tekst: 'Hi, ik ben Rahul.. wat kan ik voor je doen? Ik kan je aanmelden, inloggen, of eerst even uitleggen wat RTG is.' };
   }
 
   function intakeZeg(id, ruwTekst) {
@@ -109,17 +131,21 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
     const tekst = schoon(String(ruwTekst || ''), 280);
     if (!tekst) return { tekst: 'Zeg maar gewoon wat je denkt; ik luister.' };
     g.warmte = warmteVan(tekst, g.warmte);
-    pikWoonplaats(g, tekst); pikWerkgever(g, tekst); pikPasInteresse(g, tekst);
+    // de opportunistische pikkers horen bij het aanmeld-pad; tijdens inloggen en
+    // de sleutelwoorden laten we ze rusten (een sleutelwoord is geen woonplaats)
+    if (!/^(login|sw-|vergeten)/.test(g.stap)) { pikWoonplaats(g, tekst); pikWerkgever(g, tekst); pikPasInteresse(g, tekst); }
     if (isWaarom(tekst) && WAAROM[g.stap]) return { tekst: WAAROM[g.stap] };
 
     switch (g.stap) {
       case 'doel': {
-        // Rahul ontdekt zelf of iemand komt inloggen of aanmelden
+        // Rahul ontdekt zelf of iemand komt inloggen, aanmelden, of uitleg wil
+        const wilUitleg = /\b(uitleg|leg .*uit|wat is (dit|rtg)|wat doen jullie|vertel (me )?meer|meer weten|hoe werkt|wat kan (ik|je)|informatie|wat voor)\b/i.test(tekst);
         const wilIn = /\b(inloggen|log in|al lid|al een account|ik ben lid|ken(t|nen)? (je )?m(e|ij)|welkom terug|terugkerend|bestaand account|weer hier)\b/i.test(tekst);
         const wilNieuw = /\b(eerste keer|voor het eerst|nieuw|aanmelden|lid worden|registreren|nog geen|account maken|nog niet)\b/i.test(tekst);
         const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
+        if (wilUitleg && !wilIn && !wilNieuw) return { tekst: UITLEG };
         if (wilIn && !wilNieuw) {
-          if (mail) { g.stap = 'login-af'; g.login = { u: mail[0].toLowerCase() }; return { tekst: 'Kijk, daar ben je weer. Nog even je wachtwoord hieronder en je bent binnen; dat gaat rechtstreeks de kluis in, niet door dit gesprek.', login: g.login }; }
+          if (mail) return naarWoordInlog(g, mail[0].toLowerCase());
           g.stap = 'login-naam';
           return { tekst: 'Ha, welkom terug. Even kijken: welk e-mailadres of welke gebruikersnaam gebruik je hier?' };
         }
@@ -128,8 +154,8 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
           return { tekst: toon(g, 'Leuk je te ontmoeten; dan regelen wij je aanmelding gewoon in dit gesprek. ', 'Wat leuk! Dan regelen we het hier samen. ') + 'Maar eerst: hoe gaat het vandaag?' };
         }
         // een los e-mailadres als eerste zin = vrijwel zeker een terugkerend lid
-        if (mail) { g.stap = 'login-af'; g.login = { u: mail[0].toLowerCase() }; return { tekst: 'Dat adres ken ik vast; typ je wachtwoord in het veld hieronder, dan kijken we meteen.', login: g.login }; }
-        return { tekst: 'Allebei goed hoor. Zeg het maar: kom je inloggen, of word je vandaag lid?' };
+        if (mail) return naarWoordInlog(g, mail[0].toLowerCase());
+        return { tekst: 'Allebei goed hoor. Zeg het maar: kom je inloggen, word je vandaag lid, of wil je eerst uitleg?' };
       }
       case 'login-naam': {
         if (/\bvergeten\b/i.test(tekst)) {
@@ -139,9 +165,24 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
         const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
         const u = mail ? mail[0].toLowerCase() : schoon(tekst.replace(/^(met\s+|mijn\s+(e-?mail(adres)?|gebruikersnaam|naam)\s+is\s+|het\s+is\s+)/i, ''), 80);
         if (!u || u.length < 2) return { tekst: 'Welk e-mailadres of welke gebruikersnaam gebruik je hier? Typ hem even voluit.' };
-        g.login = { u };
-        g.stap = 'login-af';
-        return { tekst: 'Top. Nog even je wachtwoord hieronder en je bent binnen; dat gaat rechtstreeks en versleuteld de kluis in, niet door dit gesprek.', login: g.login };
+        return naarWoordInlog(g, u);
+      }
+      case 'sw-open': {
+        if (/\bwachtwoord\b/i.test(tekst)) { g.stap = 'login-af'; g.sw = null; return { tekst: 'Ook goed. Typ je wachtwoord hieronder; het gaat rechtstreeks de kluis in, niet door dit gesprek.', login: g.login || null }; }
+        if (/\bopnieuw\b/i.test(tekst)) { g.stap = 'doel'; g.login = null; g.sw = null; return { tekst: 'Prima, we beginnen opnieuw. Inloggen, aanmelden, of wil je uitleg?' }; }
+        const r = swZeg((g.sw || {}).id || '', tekst);
+        if (r.error) { g.stap = 'login-naam'; g.sw = null; return { tekst: r.error + ' Met welk e-mailadres of welke gebruikersnaam ken ik je? (Of zeg "wachtwoord".)' }; }
+        g.stap = 'sw-sluit';
+        const echo = r.echo ? ' Ik hoor je "' + r.echo + '" terug.' : '';
+        return { tekst: 'Dank je.' + echo + ' Sluit nu af met je ' + ord(r.posSluit) + ' sleutelwoord.' };
+      }
+      case 'sw-sluit': {
+        if (/\bwachtwoord\b/i.test(tekst)) { g.stap = 'login-af'; g.sw = null; return { tekst: 'Ook goed. Typ je wachtwoord hieronder.', login: g.login || null }; }
+        const r = swZeg((g.sw || {}).id || '', tekst);
+        g.sw = null;
+        if (r.ok) { gesprekken.delete(id); return { inlog: { userId: r.userId }, tekst: 'Daar ben je weer. Welkom terug.' }; }
+        g.stap = 'login-naam';
+        return { tekst: (r.error || 'Dat klopte net niet helemaal.') + ' Zullen we het opnieuw proberen? Met welk e-mailadres of welke gebruikersnaam ken ik je? (Of zeg "wachtwoord".)' };
       }
       case 'login-af': {
         // wachtwoord kwijt: Rahul regelt de herstel-link zelf (de app vraagt

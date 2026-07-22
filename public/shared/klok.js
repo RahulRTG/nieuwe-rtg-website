@@ -35,10 +35,14 @@
     ".rtg-ring .rr-datum{fill:var(--gold,#C9A24B);font-family:'Bodoni Moda',serif;font-size:8.6px;font-variant-numeric:tabular-nums;}" +
     '.rtg-ring .rr-wijzer{fill:var(--gold,#C9A24B);filter:drop-shadow(0 0 5px color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent));}' +
     // de cijfers exact in het midden: naam en datumvenster staan er
-    // symmetrisch omheen, zodat alles even ver van elkaar en de rand staat
+    // symmetrisch omheen, zodat alles even ver van elkaar en de rand staat.
+    // Het goud-accent van de milliseconden telt NIET mee voor het centreren
+    // (het staat absoluut, rechts van de seconden), zodat HH:MM:SS precies op
+    // dezelfde as staat als RAHUL TRAVEL GROUP en de datum, en niet naar links
+    // verschuift door de breedte van het accent.
     '.rtg-ring .rr-kern{position:relative;text-align:center;}' +
-    '.rtg-ring .rr-kern .rtg-klok{font-size:2.05rem;justify-content:center;}' +
-    '.rtg-ring .rr-kern .km{align-self:baseline;}';
+    '.rtg-ring .rr-kern .rtg-klok{font-size:2.05rem;justify-content:center;position:relative;}' +
+    '.rtg-ring .rr-kern .km{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:0.22em;align-self:auto;}';
   document.head.appendChild(stijl);
 
   const twee = n => String(n).padStart(2, '0');

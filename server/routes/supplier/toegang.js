@@ -11,7 +11,8 @@ module.exports = (kern) => {
     zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
     dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
     tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
-    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
+    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak,
+    werkvensterVan, zetWerkvenster, magWerken, werkAdvies } = kern;
 
 
 app.post('/api/supplier/zaak/board', supplierAuth, (req, res) => {
@@ -42,6 +43,13 @@ app.post('/api/supplier/login', async (req, res) => {
       return res.status(401).json({ error: 'Onjuiste PIN.' });
     }
     pinFails.delete(fk);
+    // het werkvenster van de werkgever: buiten het venster geen sessie
+    // (de manager valt er nooit onder; vrijstellingen stelt de zaak zelf in)
+    const wv = magWerken(s, { staffId: staff.id, manager: staff.role === 'manager' });
+    if (!wv.ok) {
+      logInlog('zaak', false, s.code + ' · ' + staff.name + ' (werkvenster)', req);
+      return res.status(403).json({ error: wv.error, venster: wv.venster || null });
+    }
     logInlog('zaak', true, s.code + ' · ' + staff.name, req);
     actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
   } else if (hasCred(req.body)) {
@@ -66,6 +74,28 @@ app.post('/api/supplier/login', async (req, res) => {
   rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager });
   logActivity(s.code, actor, actor.name + ' logde in');
   res.json({ token, state: supplierState(s, actor) });
+});
+
+/* Het werkvenster: lezen mag elk personeelslid (zodat de PDA kan tonen
+   wanneer je terecht kunt); zetten is aan de manager. De afdwinging zelf zit
+   bij de ingangen (login hierboven en het ene RTG-account), niet hier. */
+app.post('/api/supplier/werkvenster', supplierAuth, (req, res) => {
+  const b = req.body || {};
+  const wilZetten = typeof b.aan === 'boolean' || (b.dagen && typeof b.dagen === 'object') || Array.isArray(b.vrijgesteld);
+  if (wilZetten) {
+    if (!managerOnly(req, res)) return;
+    zetWerkvenster(req.supplier, b);
+    logActivity(req.supplier.code, req.actor, 'stelde het werkvenster bij');
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'settings' });
+  }
+  res.json({ ok: true, werkvenster: werkvensterVan(req.supplier) });
+});
+
+/* Rahuls werkadvies: kijkt naar geklokte uren en (alleen bij een sessie via
+   het ene RTG-account) de eigen agenda en het eigen zorgprofiel. Advies is
+   een zin of null; het blokkeert nooit iets. */
+app.post('/api/supplier/werkadvies', supplierAuth, (req, res) => {
+  res.json({ advies: werkAdvies({ code: req.supplier.code, staffId: req.actor.staffId, lidKey: req.actor.lidKey || null }) });
 });
 
 app.post('/api/supplier/roster', (req, res) => {

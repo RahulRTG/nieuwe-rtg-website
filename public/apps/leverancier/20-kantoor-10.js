@@ -43,6 +43,7 @@
     });
     // schakelaars van de zaak: elke functie aan of uit, direct doorgevoerd
     wireFuncBlok(el);
+    bindWerkvenster(el);
     el.querySelectorAll('[data-kopt]').forEach(b => b.addEventListener('click', async () => {
       const k = b.dataset.kopt, v = b.dataset.val === '1';
       b.disabled = true;

@@ -90,6 +90,7 @@
           funcBlok(T('sw.blok','Schakelaars'), rijen.map(r => ({ aan: r[3] })), swRows)+
           '<div class="st-row"><span>'+T('sw.apppay','Betalen via de app')+'<span class="sub">'+T('sw.apppay.s','Vast onderdeel van elk RTG-partnerschap')+'</span></span>'+
           '<span class="pill klaar">'+T('sw.altijd','Altijd aan')+'</span></div></div>';
+        html += werkvensterBlokHtml(inst);
         const maxD = Math.max.apply(null, b.week.map(d => d.omzet).concat([1]));
         html += '<div class="tkc"><h3>📈 '+T('bz.weekh','Omzet per dag')+'</h3>'+
           '<div style="display:flex;align-items:flex-end;gap:0.45rem;height:120px;margin-top:0.4rem;">'+

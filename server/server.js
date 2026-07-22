@@ -1381,7 +1381,7 @@ function supplierAuth(req, res, next) {
   req.supplier = findSupplier(sess.code);
   if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
   // Wie is er aan het werk (voor toeschrijving van activiteiten).
-  req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, lid: sess.lid || null };
+  req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, lid: sess.lid || null, lidKey: sess.lidKey || null };
   next();
 }
 
@@ -2419,6 +2419,13 @@ Object.assign(kern, require('./kern/wbw').maakWbw({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan,
   connectieTussen: kern.connectieTussen, verbActief: kern.verbActief, pay: kern.pay, notify
 }));
+/* Het werkvenster (kern/werkvenster.js): de werkgever bepaalt wanneer
+   personeel op de werkpagina en de PDA mag; de server dwingt dat af bij elke
+   ingang naar een personeelssessie. Rahul adviseert los daarvan (agenda,
+   uren, zorgprofiel) maar blokkeert nooit. */
+Object.assign(kern, require('./kern/werkvenster').maakWerkvenster({
+  db, save, klokVan, zorgVan: kern.zorgVan
+}));
 /* Een account voor alles (kern/eenaccount.js): mensen registreren zich een
    keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene
    account (na bewijs van de werk-inlog), en accStart munt exact dezelfde
@@ -2427,7 +2434,7 @@ Object.assign(kern, require('./kern/eenaccount').maakEenAccount({
   db, save, crypto, accounts, findSupplier, checkCred: kern.checkCred, hasCred: kern.hasCred,
   DEMO: kern.DEMO, DEMO_SUPPLIER: kern.DEMO_SUPPLIER, OFFICE_CODE: kern.OFFICE_CODE,
   veiligGelijk: kern.veiligGelijk, totpOk: kern.totpOk, rememberSession, logInlog: kern.logInlog,
-  logActivity, supplierState, officeState: kern.officeState
+  logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken
 }));
 /* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
    (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een

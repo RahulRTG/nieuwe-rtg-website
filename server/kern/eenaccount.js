@@ -18,7 +18,7 @@ const MAX_POGING = 5; // koppel-pogingen per account per minuut
 
 function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, hasCred, DEMO,
   DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, rememberSession, logInlog, logActivity,
-  supplierState, officeState }) {
+  supplierState, officeState, magWerken }) {
   const nu = () => new Date().toISOString();
   function lijst(key) {
     if (!db.data.accountRollen || typeof db.data.accountRollen !== 'object') db.data.accountRollen = {};
@@ -121,8 +121,16 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     } else {
       actor = { name: 'Beheer', role: 'manager', manager: true };
     }
+    // het ene account is geen achterdeur: het werkvenster van de werkgever
+    // geldt hier precies zo als bij de losse personeelslogin
+    if (magWerken) {
+      const w = magWerken(s, { staffId: actor.staffId, manager: actor.manager });
+      if (!w.ok) return { status: 403, error: w.error, venster: w.venster || null };
+    }
     const token = crypto.randomBytes(24).toString('hex');
-    rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager });
+    // lidKey reist mee zodat Rahuls werkadvies (alleen lezend) naar de eigen
+    // agenda van dit lid kan kijken; nooit naar die van iemand anders
+    rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, lidKey: key });
     logInlog('zaak', true, s.code + ' · ' + actor.name + ' via RTG-account', req);
     logActivity(s.code, actor, actor.name + ' logde in met het RTG-account');
     return { status: 200, ok: true, rol: r.rol, token, state: supplierState(s, actor) };

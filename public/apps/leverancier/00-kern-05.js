@@ -150,6 +150,8 @@
         API.token = s.j.token;
         try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
         applyState(s.j.state);
+        // Rahul denkt mee (agenda, uren, zorgprofiel): advies, nooit een slot
+        API.call('/supplier/werkadvies', {}).then(a => { if (a && a.advies) toast('💭 ' + a.advies.tekst); }).catch(()=>{});
         if (naarEigenSector(S)) return;
         enterApp();
       }));

@@ -389,6 +389,8 @@
         try { localStorage.setItem('rtg_pda_token', API.token); localStorage.setItem('rtg_pda_code', code); } catch(e2){}
         week = await API.call('/supplier/schedule', {}).catch(()=>null);
         enter();
+        // Rahul denkt mee (agenda, uren, zorgprofiel): een advies, nooit een slot
+        API.call('/supplier/werkadvies', {}).then(a => { if (a && a.advies) toast('💭 ' + a.advies.tekst); }).catch(()=>{});
       } catch(e){ toast(e.message || T('pd.badpin','Onjuiste pincode.')); }
     };
     $('#pinGo').addEventListener('click', go);

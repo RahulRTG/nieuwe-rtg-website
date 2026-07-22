@@ -126,12 +126,50 @@
     const naam = maak('text', { x: 100, y: 41.5, class: 'rr-naam', 'text-anchor': 'middle',
       textLength: 86, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
+    /* De dag- en datumschijf draaien als bij een echt horloge OM: om 00:00
+       rolt het oude cijfer omhoog het venster uit en komt het nieuwe eronder
+       vandaan. Daarvoor krijgen beide een eigen kijkgat (clipPath), zodat de
+       rollende schijf buiten het venster onzichtbaar blijft. */
+    const klokNr = (maakRing.nr = (maakRing.nr || 0) + 1);
+    const clipDag = maak('clipPath', { id: 'rr-kd' + klokNr });
+    const clipDagRect = document.createElementNS(NS, 'rect');
+    for (const [k, v] of Object.entries({ x: 40, y: 48, width: 120, height: 12 })) clipDagRect.setAttribute(k, v);
+    clipDag.appendChild(clipDagRect);
     // de weekdag: tussen de naam en de tijd, natuurlijk gecentreerd (net als de
     // datum, geen opgelegde breedte), in de taal van de pagina (verf vult hem)
-    const dag = maak('text', { x: 100, y: 55, class: 'rr-dag', 'text-anchor': 'middle' });
+    const dagGroep = maak('g', { 'clip-path': 'url(#rr-kd' + klokNr + ')' });
+    const dag = document.createElementNS(NS, 'text');
+    for (const [k, v] of Object.entries({ x: 100, y: 55, class: 'rr-dag', 'text-anchor': 'middle' })) dag.setAttribute(k, v);
+    dagGroep.appendChild(dag);
     // het datumvenster op zes uur: breder dan hoog, zoals bij een echt horloge
     const venster = maak('rect', { x: 91.5, y: 150, width: 17, height: 11, rx: 1.5, class: 'rr-venster' });
-    const datumTekst = maak('text', { x: 100, y: 158.6, class: 'rr-datum', 'text-anchor': 'middle' });
+    const clipDatum = maak('clipPath', { id: 'rr-kv' + klokNr });
+    const clipDatumRect = document.createElementNS(NS, 'rect');
+    for (const [k, v] of Object.entries({ x: 91.5, y: 150, width: 17, height: 11, rx: 1.5 })) clipDatumRect.setAttribute(k, v);
+    clipDatum.appendChild(clipDatumRect);
+    const datumGroep = maak('g', { 'clip-path': 'url(#rr-kv' + klokNr + ')' });
+    const datumTekst = document.createElementNS(NS, 'text');
+    for (const [k, v] of Object.entries({ x: 100, y: 158.6, class: 'rr-datum', 'text-anchor': 'middle' })) datumTekst.setAttribute(k, v);
+    datumGroep.appendChild(datumTekst);
+    /* De omslag zelf: het oude cijfer schuift omhoog het kijkgat uit, het
+       nieuwe komt van onderen mee, met een korte demping aan het eind, zoals
+       een datumschijf die op zijn plek valt. Wie minder beweging wil
+       (prefers-reduced-motion) ziet een directe wissel, ook precies om 00:00. */
+    function slaOm(tekstEl, nieuw, hoogte) {
+      if (RUSTIG || !tekstEl.isConnected) { tekstEl.textContent = nieuw; return; }
+      const oud = tekstEl.cloneNode(true);
+      tekstEl.parentNode.appendChild(oud);
+      tekstEl.textContent = nieuw;
+      const start = performance.now(), duur = 520;
+      (function rol(t) {
+        const p = Math.min(1, (t - start) / duur);
+        const e = 1 - Math.pow(1 - p, 3);
+        oud.setAttribute('transform', 'translate(0 ' + (-hoogte * e).toFixed(2) + ')');
+        tekstEl.setAttribute('transform', 'translate(0 ' + (hoogte * (1 - e)).toFixed(2) + ')');
+        if (p < 1) requestAnimationFrame(rol);
+        else { oud.remove(); tekstEl.removeAttribute('transform'); }
+      })(start);
+    }
     // de gouden veger: een klein juweel, exact in het midden van de streepband
     const wijzer = maak('circle', { cx: 100, cy: 8, r: 2.2, class: 'rr-wijzer' });
     const kern = document.createElement('div');
@@ -161,9 +199,12 @@
         // de naam: bovenkant exact een luchtmaat onder de rehaut
         const naamTop = (100 - REHAUT) + lucht;
         naam.setAttribute('y', (Number(naam.getAttribute('y')) + (naamTop - bbN.y)).toFixed(2));
-        // de weekdag: exact een luchtmaat onder de naam
+        // de weekdag: exact een luchtmaat onder de naam; het kijkgat van de
+        // dagschijf schuift mee, strak om de tekstband heen
         const dagTop = naamTop + bbN.height + lucht;
         dag.setAttribute('y', (Number(dag.getAttribute('y')) + (dagTop - bbD.y)).toFixed(2));
+        clipDagRect.setAttribute('y', (dagTop - 0.8).toFixed(2));
+        clipDagRect.setAttribute('height', (bbD.height + 1.6).toFixed(2));
         // de cijfers: exact een luchtmaat onder de weekdag
         const wilKTop = dagTop + bbD.height + lucht;
         const kTop = (bbK.top - rr.top) * schaal; // inclusief de huidige verschuiving
@@ -173,6 +214,7 @@
         // exact een luchtmaat boven de onderrand)
         const vTop = wilKTop + kH + lucht;
         venster.setAttribute('y', vTop.toFixed(2));
+        clipDatumRect.setAttribute('y', vTop.toFixed(2));
         datumTekst.setAttribute('y', (vTop + vH / 2 + 3.1).toFixed(2));
       } catch (e) { /* meten mag nooit de klok breken */ }
     }
@@ -181,16 +223,31 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(passenwerk));
     setTimeout(passenwerk, 1200);
     const cijfers = maakCijfers(tijd);
-    let vorigeDag = '';
+    let vorigeDag = '', vorigeDatum = '', vorigeKalenderdag = '';
     return d => {
       cijfers(d);
-      datumTekst.textContent = String(d.getDate());
-      // de weekdag in de taal van de pagina, met een hoofdletter; alleen
-      // bijwerken als hij verandert (dagovergang of taalwissel)
+      /* De datum verspringt niet stilletjes: precies om 00:00 slaat de schijf
+         om, met de rol door het venster. De allereerste keer (en na een
+         taalwissel) staat hij er direct, zonder theater. */
+      const dagNr = String(d.getDate());
+      if (dagNr !== vorigeDatum) {
+        if (vorigeDatum === '') datumTekst.textContent = dagNr;
+        else slaOm(datumTekst, dagNr, 12);
+        vorigeDatum = dagNr;
+      }
+      // de weekdag in de taal van de pagina, met een hoofdletter; bij de
+      // dagovergang rolt hij mee met de datumschijf, bij een taalwissel
+      // wisselt hij direct
       const taal = document.documentElement.lang || 'nl';
       let wd; try { wd = d.toLocaleDateString(taal, { weekday: 'long' }); } catch (e) { wd = d.toLocaleDateString(undefined, { weekday: 'long' }); }
       const cap = wd ? wd.charAt(0).toUpperCase() + wd.slice(1) : '';
-      if (cap !== vorigeDag) { dag.textContent = cap; vorigeDag = cap; }
+      const kalenderdag = d.toDateString();
+      if (cap !== vorigeDag) {
+        if (vorigeDag && kalenderdag !== vorigeKalenderdag) slaOm(dag, cap, 11);
+        else dag.textContent = cap;
+        vorigeDag = cap;
+      }
+      vorigeKalenderdag = kalenderdag;
       const sec = d.getSeconds() + (RUSTIG ? 0 : d.getMilliseconds() / 1000);
       wijzer.setAttribute('transform', 'rotate(' + (sec * 6) + ' 100 100)');
     };
@@ -217,7 +274,16 @@
       catch (e) { el.textContent = new Date().toLocaleDateString(); }
     };
     verf();
-    setInterval(verf, 30000);
+    /* De lange datum slaat ECHT om 00:00 om: de timer mikt precies op
+       middernacht en zet zichzelf daarna opnieuw voor de volgende nacht.
+       Komt het tabblad terug uit de slaap (de timer kan dan gemist zijn),
+       dan zet visibilitychange de datum meteen recht. */
+    (function plan() {
+      const nu = new Date();
+      const middernacht = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + 1, 0, 0, 0, 200);
+      setTimeout(() => { verf(); plan(); }, Math.max(500, middernacht - nu));
+    })();
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) verf(); });
     // volgt de taalkiezer: zodra de pagina van taal wisselt (rtglang), staat de
     // lange datum meteen in de nieuwe taal, niet pas bij de volgende ronde
     window.addEventListener('rtglang', verf);

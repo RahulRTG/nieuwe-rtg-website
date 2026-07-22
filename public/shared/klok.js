@@ -32,7 +32,7 @@
     '.rtg-ring .rr-vijf{stroke:var(--gold,#C9A24B);stroke-opacity:0.7;stroke-width:1.1;}' +
     '.rtg-ring .rr-naam{fill:var(--gold,#C9A24B);font-family:Inter,system-ui,sans-serif;font-size:5.2px;font-weight:400;}' +
     '.rtg-ring .rr-venster{fill:rgba(0,0,0,0.4);stroke:currentColor;stroke-opacity:0.25;stroke-width:0.7;}' +
-    ".rtg-ring .rr-datum{fill:var(--gold,#C9A24B);font-family:'Bodoni Moda',serif;font-size:10.5px;font-variant-numeric:tabular-nums;}" +
+    ".rtg-ring .rr-datum{fill:var(--gold,#C9A24B);font-family:'Bodoni Moda',serif;font-size:8.6px;font-variant-numeric:tabular-nums;}" +
     '.rtg-ring .rr-wijzer{fill:var(--gold,#C9A24B);filter:drop-shadow(0 0 5px color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent));}' +
     // de cijfers exact in het midden: naam en datumvenster staan er
     // symmetrisch omheen, zodat alles even ver van elkaar en de rand staat
@@ -91,12 +91,15 @@
       '<stop offset="100%" stop-color="#0C0C0B"/></radialGradient>';
     svg.appendChild(defs);
     maak('circle', { cx: 100, cy: 100, r: 97, fill: 'url(#rr-plaat)' });
-    // de dubbele haarlijn-rand (rehaut) met de minuutbaan ertussen
+    // een maatsysteem als bij een echt horloge, alles op vaste afstanden:
+    // rand r=97, streepband 94.5 tot 89.5 (minuut precies 2.5, vijf precies
+    // het dubbele: 5.0), rehaut r=87.5 (2.0 onder de vijf-streep), en de
+    // veger exact in het midden van de band (r=92.0)
     maak('circle', { cx: 100, cy: 100, r: 97, class: 'rr-rand' });
-    maak('circle', { cx: 100, cy: 100, r: 88.5, class: 'rr-rehaut' });
+    maak('circle', { cx: 100, cy: 100, r: 87.5, class: 'rr-rehaut' });
     for (let m = 0; m < 60; m++) {
       const rad = m * 6 * Math.PI / 180, vijf = m % 5 === 0;
-      const r1 = vijf ? 90.5 : 92.8, r2 = 95.4;
+      const r1 = vijf ? 89.5 : 92.0, r2 = 94.5;
       maak('line', {
         x1: (100 + Math.sin(rad) * r1).toFixed(2), y1: (100 - Math.cos(rad) * r1).toFixed(2),
         x2: (100 + Math.sin(rad) * r2).toFixed(2), y2: (100 - Math.cos(rad) * r2).toFixed(2),
@@ -111,11 +114,12 @@
     const naam = maak('text', { x: 100, y: 46.3, class: 'rr-naam', 'text-anchor': 'middle',
       textLength: 86, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
-    // het datumvenster op zes uur
-    maak('rect', { x: 91, y: 148, width: 18, height: 15, rx: 2, class: 'rr-venster' });
-    const datumTekst = maak('text', { x: 100, y: 159.2, class: 'rr-datum', 'text-anchor': 'middle' });
-    // de gouden veger: een klein juweel op de rand
-    const wijzer = maak('circle', { cx: 100, cy: 7, r: 2.6, class: 'rr-wijzer' });
+    // het datumvenster op zes uur: breder dan hoog, zoals bij een echt
+    // horloge, met het midden exact op 155.5 (de spiegel van de naam op 44.5)
+    maak('rect', { x: 91.5, y: 150, width: 17, height: 11, rx: 1.5, class: 'rr-venster' });
+    const datumTekst = maak('text', { x: 100, y: 158.6, class: 'rr-datum', 'text-anchor': 'middle' });
+    // de gouden veger: een klein juweel, exact in het midden van de streepband
+    const wijzer = maak('circle', { cx: 100, cy: 8, r: 2.2, class: 'rr-wijzer' });
     const kern = document.createElement('div');
     kern.className = 'rr-kern';
     const tijd = document.createElement('div');

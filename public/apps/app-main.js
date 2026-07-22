@@ -448,8 +448,8 @@
      heeft en legt op "waarom?" uit waarvoor iets dient. Beide paden eindigen
      op de bestaande routes: aanmelden via login() -> /auth/register, inloggen
      via login() -> /auth/login; het wachtwoord van een terugkerend lid gaat
-     NOOIT door het gesprek maar rechtstreeks naar de inlogroute. Boven het
-     gesprek beweegt de AI-mond (goud, bordeaux, zwart, wit) als Rahul praat.
+     NOOIT door het gesprek maar rechtstreeks naar de inlogroute. Kaal en
+     stil: alleen de klok, Rahuls zin en de ene regel van de gebruiker.
      Er is geen klassieke keuze: Rahul is de poort; de formulieren bestaan
      alleen nog als vangnet voor wachtwoord-herstel. Deelt de
      IIFE-scope met 00-kern-03.js (toReg, toForgot, login, API, T). */
@@ -478,39 +478,12 @@
       '.ag-rij input::placeholder{color:var(--soft);}' +
       '.ag-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;' +
         'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
-      '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
-      // de AI-mond als moderne lijnkunst: geen vlakken, alleen vloeiende
-      // lijnen in goud, bordeaux en wit die samen een mond vormen; de
-      // middellijn loopt door tot voorbij de mondhoeken. Praat mee op het
-      // ritme van Rahul en respecteert wie minder beweging wil.
-      '.ag-mond{display:flex;justify-content:center;margin:0.1rem 0 0.35rem;}' +
-      '.ag-mond svg{width:190px;height:78px;filter:drop-shadow(0 4px 18px rgba(127,22,52,0.35));}' +
-      '.ag-mond path{fill:none;stroke-linecap:round;}' +
-      '.ag-mond .am-onder,.ag-mond .am-echo-o{transform-box:fill-box;transform-origin:center top;}' +
-      '.ag-mond.praat .am-onder{animation:agKaak 0.38s ease-in-out infinite;}' +
-      '.ag-mond.praat .am-echo-o{animation:agKaak 0.38s ease-in-out infinite 0.06s;}' +
-      '@keyframes agKaak{50%{transform:translateY(5px);}}' +
-      '.ag-mond .am-lijn{animation:agAdem 6s ease-in-out infinite;}' +
-      '@keyframes agAdem{0%,100%{opacity:0.9;}50%{opacity:0.45;}}' +
-      '@media (prefers-reduced-motion: reduce){.ag-mond .am-onder,.ag-mond .am-echo-o,.ag-mond .am-lijn{animation:none !important;}}';
+      '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}';
     document.head.appendChild(st);
 
     const doos = document.createElement('div');
     doos.className = 'ag-doos';
     doos.innerHTML =
-      '<div class="ag-mond" id="agMond" aria-hidden="true"><svg viewBox="0 0 220 100">' +
-      '<defs><linearGradient id="agGoud" x1="0" y1="0" x2="1" y2="0">' +
-      '<stop offset="0" stop-color="#C9A24B" stop-opacity="0"/><stop offset="0.5" stop-color="#C9A24B"/><stop offset="1" stop-color="#C9A24B" stop-opacity="0"/>' +
-      '</linearGradient></defs>' +
-      // de doorlopende gouden middellijn, met de cupidoboog in het midden
-      '<path class="am-lijn" d="M12 52 C56 50 82 50 99 46 C104 42 106 42 111 46 C128 50 154 50 208 52" stroke="url(#agGoud)" stroke-width="1.5"/>' +
-      // de bovenlip: twee echo-lijnen in bordeaux en wit
-      '<path class="am-boven" d="M50 50 C72 26 97 21 104 34 C107 30 112 30 115 34 C122 21 147 26 169 50" stroke="#9E1C40" stroke-width="2.4"/>' +
-      '<path class="am-echo-b" d="M68 47 C84 34 101 31 106 39 C108 36 111 36 113 39 C118 31 135 34 151 47" stroke="#FFFFFF" stroke-width="1" opacity="0.45"/>' +
-      // de onderlip: bordeaux met een witte echo; deze twee praten mee
-      '<path class="am-onder" d="M50 54 C76 82 143 82 169 54" stroke="#9E1C40" stroke-width="2.4"/>' +
-      '<path class="am-echo-o" d="M68 57 C88 72 131 72 151 57" stroke="#FFFFFF" stroke-width="1" opacity="0.35"/>' +
-      '</svg></div>' +
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
       '<div class="ag-rij"><input id="agIn" autocomplete="off" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Zeg het gewoon...') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>';
@@ -521,14 +494,8 @@
 
     const zin = doos.querySelector('#agZin');
     const inp = doos.querySelector('#agIn');
-    const mond = doos.querySelector('#agMond');
-    let gesprek = null, bezig = false, loginU = null, praatTimer = null;
+    let gesprek = null, bezig = false, loginU = null;
 
-    function praat(aan, duurMs){
-      clearTimeout(praatTimer);
-      mond.classList.toggle('praat', aan);
-      if (aan && duurMs) praatTimer = setTimeout(() => mond.classList.remove('praat'), duurMs);
-    }
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
@@ -536,7 +503,6 @@
       void zin.offsetWidth; // de fade opnieuw laten lopen
       zin.style.animation = '';
       zin.textContent = tekst;
-      praat(true, Math.min(2600, 500 + tekst.length * 28));
     }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';
@@ -559,7 +525,6 @@
       inp.value = '';
       inp.closest('.ag-rij').classList.remove('vol');
       bezig = true;
-      praat(true);
       try {
         // "opnieuw" en "wachtwoord vergeten" zijn commando's voor het gesprek,
         // ook midden in het wachtwoordstadium; al het andere is daar een
@@ -602,7 +567,6 @@
       // de app volgt door het wachtwoordveld weer een tekstveld te maken
       if (loginU && /\bopnieuw\b/i.test(tekst)){ loginU = null; tekstVeld(); }
       bezig = false;
-      praat(false);
       inp.focus();
     }
     // er is GEEN klassieke keuze meer: Rahul is de poort. De formulieren

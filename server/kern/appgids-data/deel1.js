@@ -4,14 +4,14 @@ const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
   /* ---- het leden-OS en de leden-apps (RTG-toon: ingetogen, je/jij) ---- */
-  '/apps/index.html': G('De verzamelplek van alle RTG-apps: elke ingang die bij jouw pas hoort staat hier.',
-    ['Kies een app; je inlog reist automatisch mee', 'Installeer een app als eigen icoon via je browsermenu', 'Kom hier terug met de terug-knop in elke app'],
-    'Elke app werkt ook los als eigen schermpje op je telefoon; installeren kost niets.'),
+  '/apps/index.html': G('Het RTG OS-bureaublad: alle apps van het platform als iconen, met de klok en je accounts.',
+    ['Tik een tegel; de app opent schermvullend en de terug-knop brengt je hier terug', 'Wissel rechtsboven tussen je accounts', 'Op telefoon en groot scherm hetzelfde bureaublad, passend geschaald'],
+    'Dit is ook de voordeur van de website; installeren als eigen app kost niets.'),
   '/apps/app.html': G('Jouw leden-app: reserveren, boeken, bestellen, chatten en betalen, alles op codenaam.',
     ['Open een genre en reserveer of boek direct', 'Vraag Rahul wat je maar wilt; hij regelt het met jouw inlog', 'Bekijk je codes, tickets en bestellingen onder je profiel'],
     'Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.'),
-  '/apps/bureau.html': G('Het RTG OS-bureaublad: al je apps als iconen op een groot scherm.',
-    ['Open apps in vensters naast elkaar', 'Sleep en schik zoals je wilt', 'Gebruik de klok en de menubalk zoals op een echte computer'],
+  '/apps/bureau.html': G('Het RTG OS-bureaublad (zelfde als de voordeur): alle apps als iconen op elk scherm.',
+    ['Tik een tegel; de app opent schermvullend', 'Wissel rechtsboven tussen je accounts', 'Deze oude ingang toont hetzelfde bureaublad als de voordeur'],
     'Handig op een tablet of tweede scherm: alles van RTG op één werkblad.'),
   '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],

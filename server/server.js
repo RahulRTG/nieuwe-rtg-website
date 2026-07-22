@@ -505,7 +505,12 @@ rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch 
    serveren het bureaublad rechtstreeks (interne rewrite), zodat de nonce-/CSP-
    laag hieronder er gewoon overheen gaat en er geen 302-sprong in de weg zit.
    De losse apps regelen hun eigen inlog zodra je er een opent. */
-app.get('/', (req, res, next) => { req.url = '/apps/bureau.html'; next(); });
+/* De voordeur: de site-root IS het RTG OS-bureaublad, zonder omleiding (een
+   interne herschrijving, zodat de nonce-laag gewoon meedraait). Web en mobiel
+   krijgen exact dezelfde pagina; de tegels schalen mee met het formaat. De
+   oude bureau-URL blijft werken en serveert hetzelfde bureaublad. */
+app.get('/', (req, res, next) => { req.url = '/apps/index.html'; next(); });
+app.get('/apps/bureau.html', (req, res, next) => { req.url = '/apps/index.html'; next(); });
 
 /* Strengere CSP voor de app-pagina's: geen 'unsafe-inline' voor scripts, maar
    een per-antwoord nonce. We lezen het .html-bestand, geven elke <script> die

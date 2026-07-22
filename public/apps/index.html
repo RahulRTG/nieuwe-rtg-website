@@ -2,186 +2,242 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
+<meta name="description" content="Het RTG OS-bureaublad: alle apps van het platform als iconen, met klok, datum en je accounts binnen handbereik. Op elk scherm hetzelfde, passend bij het formaat.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0C0C0B">
-<title>RTG Apps</title>
+<title>RTG OS, het bureaublad</title>
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/apps/rtg-onthul.css" rel="stylesheet">
-<script src="/apps/rtg-onthul.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/seizoen.css" rel="stylesheet">
+<link href="/shared/uitleg.css" rel="stylesheet">
+<link href="/shared/osmenu.css" rel="stylesheet">
 <style>
   :root{
-    --bg:#0C0C0B; --card:#151312; --line:rgba(255,255,255,0.09);
-    --txt:#F4F1EC; --soft:rgba(244,241,236,0.55); --gold:#A98F1C;
+    --grond:#0C0C0B; --paneel:#151312; --inkt:#F4F1EC; --lijn:rgba(255,255,255,0.09);
+    --grijs:rgba(244,241,236,0.72); --grijs-zacht:rgba(244,241,236,0.50);
+    --bordeaux:#C23A5E; --goud:#A98F1C;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
   body{
-    background:
-      radial-gradient(120% 55% at 50% -10%, rgba(169,143,28,0.10), transparent 60%),
-      radial-gradient(130% 65% at 50% 112%, rgba(127,23,52,0.10), transparent 62%),
-      var(--bg);
-    font-family:'Inter',sans-serif;color:var(--txt);-webkit-font-smoothing:antialiased;
+    background:var(--grond); color:var(--inkt);
+    font-family:'Inter',sans-serif; line-height:1.5; min-height:100vh; -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(1200px 700px at 78% -8%, color-mix(in srgb, var(--dag-kleur, #C23A5E) 11%, transparent), transparent 60%),
+      radial-gradient(900px 600px at 8% 108%, color-mix(in srgb, var(--dag-kleur, #A98F1C) 8%, transparent), transparent 60%);
   }
-  .wrap{max-width:820px;margin:0 auto;padding:2.4rem 1.4rem 3.4rem;}
-  @media(min-width:1000px){.wrap{max-width:1100px;}}
-  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.7rem;line-height:1;}
-  h2{font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);font-weight:600;margin:1.9rem 0 0.7rem;}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.55rem;}
-  a.app{background:linear-gradient(160deg, color-mix(in srgb, var(--card) 90%, #fff), color-mix(in srgb, var(--card) 93%, #000));border:1px solid var(--line);border-radius:12px;padding:0.9rem;text-decoration:none;color:var(--txt);display:flex;align-items:center;gap:0.7rem;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
-    transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), transform 0.13s cubic-bezier(0.22,0.7,0.3,1), box-shadow 0.13s cubic-bezier(0.22,0.7,0.3,1);}
-  a.app:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08), 0 10px 22px rgba(0,0,0,0.4);}
-  a.app:active{transform:scale(0.97);}
-  a.app .ic{font-size:1.35rem;flex-shrink:0;}
-  a.app b{font-size:0.86rem;font-weight:600;}
-  .foot{display:flex;gap:1.3rem;flex-wrap:wrap;margin-top:2.4rem;}
-  .foot a{font-size:0.78rem;color:var(--soft);text-decoration:none;}
-  .foot a:hover{color:var(--gold);}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;
-    border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
-  .skip:focus{top:0;}
-  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .demo{display:flex;align-items:center;gap:0.7rem;background:var(--card);border:1px solid var(--line);
-    border-left:3px solid var(--gold);border-radius:12px;padding:0.85rem 1rem;margin:0.9rem 0 0.3rem;}
-  .demo .dot{width:0.55rem;height:0.55rem;border-radius:50%;background:var(--gold);flex-shrink:0;
-    box-shadow:0 0 0 4px rgba(169,143,28,0.18);}
-  .demo p{font-size:0.82rem;line-height:1.45;color:var(--soft);}
-  .demo b{color:var(--txt);font-weight:600;}
-  .lead{color:var(--soft);font-size:0.9rem;margin-top:0.4rem;}
-/* Het RTG Apps-logoblok beweegt mee in de RTG-kleurenroulatie: de wijnrode
-   verankering blijft, maar mengt met de levende dagkleur die met zon en seizoen
-   meedraait, dus het vlak ademt subtiel met de rest van de pagina mee. */
-.merkvlak{display:inline-block;background:color-mix(in srgb, var(--dag-kleur,#9E1C40) 42%, #7F1734);color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;transition:background 1.2s ease;}
-@media (prefers-reduced-motion: reduce){.merkvlak{background:#7F1734;transition:none;}}
+  .skip{position:absolute; left:-999px; top:0; background:var(--paneel); color:var(--inkt); padding:0.6rem 1rem; border:1px solid var(--lijn); z-index:50;}
+  .skip:focus{left:0.6rem; top:0.6rem;}
+  .bar{
+    display:flex; align-items:center; gap:1rem; padding:0.8rem clamp(1rem,4vw,2.6rem);
+    border-bottom:1px solid var(--lijn); position:sticky; top:0; z-index:20;
+    background:rgba(12,12,11,0.72); backdrop-filter:blur(14px);
+  }
+  .merk{font-family:'Bodoni Moda',serif; font-size:1.15rem; letter-spacing:0.04em;}
+  .merk span{color:var(--goud); font-style:italic;}
+  .klok{margin-inline:auto; text-align:center; line-height:1.15;
+    --klok-goud:color-mix(in srgb, var(--dag-kleur, var(--goud,#A98F1C)) 55%, var(--goud,#A98F1C));}
+  .klok time{display:block; font-family:'Bodoni Moda',serif; font-size:1.4rem; font-variant-numeric:tabular-nums; letter-spacing:0.02em;}
+  .klok .datum{font-size:0.68rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--grijs-zacht);}
+  .account{display:flex; flex-wrap:wrap; gap:0.4rem; justify-content:flex-end; max-width:46%; position:relative;}
+  .chip{display:inline-flex; align-items:center; gap:0.4rem; border:1px solid var(--lijn); border-radius:999px;
+    padding:0.32rem 0.72rem; font-size:0.72rem; color:var(--grijs); background:linear-gradient(155deg,#211E1B,#161311);}
+  .chip.leeg{color:var(--grijs-zacht);}
+  .chip b{color:var(--inkt); font-weight:600;}
+  .chip .stip{width:0.5rem; height:0.5rem; border-radius:50%; background:var(--goud);}
+  button.chip{cursor:pointer; font-family:inherit;}
+  button.chip:hover{border-color:color-mix(in srgb, var(--goud) 50%, transparent);}
+  button.chip .pijl{color:var(--grijs-zacht); font-size:0.6rem;}
+  .menu{position:absolute; top:calc(100% + 0.6rem); right:0; z-index:30; min-width:16rem; max-width:22rem; padding:0.5rem;
+    background:rgba(20,18,17,0.96); backdrop-filter:blur(16px); border:1px solid var(--lijn); border-radius:14px;
+    box-shadow:0 18px 44px rgba(0,0,0,0.5); display:none; text-align:left;}
+  .menu.open{display:block;}
+  .menu h3{font-size:0.64rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--grijs-zacht); margin:0.3rem 0.5rem 0.5rem; font-weight:600;}
+  .rij{display:flex; align-items:center; gap:0.5rem; padding:0.5rem; border-radius:9px; text-decoration:none; color:var(--inkt);
+    width:100%; border:none; background:none; font:inherit; text-align:left; cursor:pointer;}
+  .rij:hover{background:rgba(255,255,255,0.05);}
+  .rij .naam2{flex:1; font-size:0.84rem;}
+  .rij .rol{font-size:0.68rem; color:var(--grijs-zacht);}
+  .rij.actief .naam2::after{content:' \2713'; color:var(--goud);}
+  .rij .venster{border:1px solid var(--lijn); border-radius:7px; background:none; color:var(--grijs); padding:0.15rem 0.45rem; font-size:0.7rem; cursor:pointer;}
+  .rij .venster:hover{border-color:color-mix(in srgb, var(--goud) 55%, transparent); color:var(--inkt);}
+  .menu .scheiding{height:1px; background:var(--lijn); margin:0.4rem 0;}
+  .menu .toevoeg{color:var(--grijs); font-size:0.8rem;}
+  .menu .toevoeg:hover{color:var(--inkt);}
+
+  main{padding:clamp(1.2rem,3.5vw,2.6rem) clamp(1rem,4vw,2.6rem) 4rem; max-width:1180px; margin:0 auto;}
+  .demo{display:flex; align-items:center; gap:0.7rem; background:var(--paneel); border:1px solid var(--lijn);
+    border-left:3px solid var(--goud); border-radius:12px; padding:0.75rem 1rem; margin:0 0 0.6rem;}
+  .demo .dot{width:0.55rem; height:0.55rem; border-radius:50%; background:var(--goud); flex-shrink:0; box-shadow:0 0 0 4px rgba(169,143,28,0.18);}
+  .demo p{font-size:0.8rem; line-height:1.45; color:var(--grijs-zacht);}
+  .demo b{color:var(--inkt); font-weight:600;}
+  .sectiekop{font-size:0.72rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--grijs-zacht); margin:2rem 0 1rem;}
+  /* de tegels: op de telefoon compact, op een groot scherm ruimer; zo krijgt
+     elk formaat hetzelfde bureaublad, alleen passend geschaald */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:1.2rem 0.5rem;}
+  @media (min-width:700px){.grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:1.7rem 0.8rem;}}
+  .app{display:flex; flex-direction:column; align-items:center; gap:0.5rem; text-decoration:none; color:var(--inkt);
+    transition:transform 0.14s cubic-bezier(0.22,0.7,0.3,1);}
+  .app:hover{transform:translateY(-3px);}
+  .app:focus-visible{outline:2px solid var(--goud); outline-offset:6px; border-radius:22px;}
+  .tegel{width:70px; height:70px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.8rem;
+    background:linear-gradient(155deg,#23201C 0%,#171412 62%,#131110 100%); border:1px solid var(--lijn);
+    box-shadow:0 10px 26px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.07);}
+  @media (min-width:700px){.tegel{width:88px; height:88px; border-radius:22px; font-size:2.2rem;}}
+  .app:hover .tegel{border-color:color-mix(in srgb, var(--goud) 50%, transparent);}
+  .naam{font-size:0.74rem; text-align:center; color:var(--grijs); letter-spacing:0.01em;}
+  .foot{display:flex; gap:1.3rem; flex-wrap:wrap; margin-top:2.6rem;}
+  .foot a{font-size:0.78rem; color:var(--grijs-zacht); text-decoration:none;}
+  .foot a:hover{color:var(--goud);}
+  .appvenster{position:fixed; inset:0; z-index:2147482000; background:var(--grond); display:none;}
+  .appvenster.open{display:block;}
+  .appvenster iframe{position:absolute; inset:0; width:100%; height:100%; border:none; background:var(--grond);}
+  .appterug{position:fixed; top:calc(env(safe-area-inset-top,0px) + 0.7rem); left:calc(env(safe-area-inset-left,0px) + 0.7rem);
+    z-index:2147482100; display:none; align-items:center; gap:0.4rem; background:rgba(18,16,15,0.82); backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.14); border-radius:999px; color:var(--inkt);
+    padding:0.42rem 0.9rem 0.42rem 0.72rem; font-family:inherit; font-size:0.76rem; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.42);}
+  .appterug.open{display:inline-flex;}
+  .appterug:hover{border-color:color-mix(in srgb, var(--goud) 55%, transparent);}
+  .appterug svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
 </style>
 </head>
 <body>
-<a class="skip" href="#hoofd">Naar de inhoud</a>
-<main class="wrap" id="hoofd" tabindex="-1">
-  <div style="text-align:center;margin:0.6rem 0 1.1rem;"><div data-rtg-klok="ring">--:--</div></div>
-  <h1><span class="merkvlak">RTG Apps</span></h1>
-  <p class="lead" data-i18n="hub.lead">Loop door het hele platform. Kies een app en probeer alles.</p>
+<a href="#hoofd" class="skip">Naar het bureaublad</a>
 
+<header class="bar">
+  <div class="merk">RTG <span>OS</span></div>
+  <div class="klok">
+    <time id="tijd" aria-label="Huidige tijd" data-rtg-klok>--:--</time>
+    <span class="datum" id="datum" data-rtg-datum></span>
+  </div>
+  <div class="account" id="account" aria-live="polite" aria-label="Accounts op dit toestel">
+    <span class="chip leeg">Accounts laden…</span>
+  </div>
+</header>
+
+<main id="hoofd">
   <div class="demo" role="note">
     <span class="dot" aria-hidden="true"></span>
     <p data-i18n-html="hub.demo"><b>Demo.</b> Alle functies werken. Alleen echt betalen, echte bestellingen en de RTG Boardroom zijn uit. Wissel linksonder tussen licht en donker.</p>
   </div>
 
-  <h2 data-i18n="hub.members">Leden</h2>
-  <div class="grid">
-    <a class="app" href="/apps/pay.html"><span class="ic">💳</span><b>RTG Pay</b></a>
-    <a class="app" href="/apps/mall.html"><span class="ic">🛍️</span><b>RTG Mall</b></a>
-    <a class="app" href="/apps/foodcourt.html"><span class="ic">🍽️</span><b>RTG Food Court</b></a>
-    <a class="app" href="/apps/hotels.html"><span class="ic">🏨</span><b>RTG Verblijven</b></a>
-    <a class="app" href="/apps/home.html"><span class="ic">🏠</span><b>RTG Home Kit</b></a>
-    <a class="app" href="/apps/uitgaan.html"><span class="ic">🍸</span><b>RTG Uitgaan</b></a>
-    <a class="app" href="/apps/reisbureau.html"><span class="ic">🧭</span><b>RTG Reisbureau</b></a>
-    <a class="app" href="/apps/gemeente.html"><span class="ic">🏛️</span><b>RTG Gemeente</b></a>
-    <a class="app" href="/apps/overheid.html"><span class="ic">🏢</span><b>De Overheid</b></a>
-    <a class="app" href="/apps/app.html?pas=rtg"><span class="ic">🎫</span><b>RTG Pass</b></a>
-    <a class="app" href="/apps/app.html?pas=lifestyle"><span class="ic">🌙</span><b>Lifestyle Pass</b></a>
-    <a class="app" href="/apps/app.html?pas=business"><span class="ic">💼</span><b>Business Pass</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-leden" data-i18n="hub.members">Leden</h2>
+  <nav class="grid" aria-labelledby="k-leden">
+    <a class="app" href="/apps/app.html?pas=rtg"><span class="tegel" aria-hidden="true">🎫</span><span class="naam">RTG Pass</span></a>
+    <a class="app" href="/apps/app.html?pas=lifestyle"><span class="tegel" aria-hidden="true">🌙</span><span class="naam">Lifestyle Pass</span></a>
+    <a class="app" href="/apps/app.html?pas=business"><span class="tegel" aria-hidden="true">💼</span><span class="naam">Business Pass</span></a>
+    <a class="app" href="/apps/pay.html"><span class="tegel" aria-hidden="true">💳</span><span class="naam">RTG Pay</span></a>
+    <a class="app" href="/apps/mall.html"><span class="tegel" aria-hidden="true">🛍️</span><span class="naam">RTG Mall</span></a>
+    <a class="app" href="/apps/foodcourt.html"><span class="tegel" aria-hidden="true">🍽️</span><span class="naam">Food Court</span></a>
+    <a class="app" href="/apps/hotels.html"><span class="tegel" aria-hidden="true">🏨</span><span class="naam">Verblijven</span></a>
+    <a class="app" href="/apps/home.html"><span class="tegel" aria-hidden="true">🏠</span><span class="naam">Home Kit</span></a>
+    <a class="app" href="/apps/uitgaan.html"><span class="tegel" aria-hidden="true">🍸</span><span class="naam">Uitgaan</span></a>
+    <a class="app" href="/apps/reisbureau.html"><span class="tegel" aria-hidden="true">🧭</span><span class="naam">Reisbureau</span></a>
+    <a class="app" href="/apps/spelen.html"><span class="tegel" aria-hidden="true">♟️</span><span class="naam">Spelen</span></a>
+    <a class="app" href="/apps/gemeente.html"><span class="tegel" aria-hidden="true">🏛️</span><span class="naam">RTG Gemeente</span></a>
+    <a class="app" href="/apps/overheid.html"><span class="tegel" aria-hidden="true">🏢</span><span class="naam">De Overheid</span></a>
+  </nav>
 
-  <h2 data-i18n="hub.rtf">RTFoundation</h2>
-  <div class="grid">
-    <!-- de leeftijd-apps zijn geen losse downloads meer: ze staan als map
-         in het RTG OS en de hub zet de juiste bril op via ?groep= -->
-    <a class="app" href="/apps/foundation/"><span class="ic">📚</span><b>RTFoundation</b></a>
-    <a class="app" href="/apps/foundation/school.html"><span class="ic">🏫</span><b>RTF School</b></a>
-    <a class="app" href="/apps/foundation/vrienden.html"><span class="ic">👋</span><b>RTF Vrienden</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-rtf" data-i18n="hub.rtf">RTFoundation</h2>
+  <nav class="grid" aria-labelledby="k-rtf">
+    <a class="app" href="/apps/foundation/"><span class="tegel" aria-hidden="true">📚</span><span class="naam">RTFoundation</span></a>
+    <a class="app" href="/apps/foundation/school.html"><span class="tegel" aria-hidden="true">🏫</span><span class="naam">RTF School</span></a>
+    <a class="app" href="/apps/foundation/vrienden.html"><span class="tegel" aria-hidden="true">👋</span><span class="naam">RTF Vrienden</span></a>
+  </nav>
 
-  <h2 data-i18n="hub.staff">Personeel &amp; werkgevers</h2>
-  <div class="grid">
-    <a class="app" href="/apps/personeel.html"><span class="ic">👤</span><b data-i18n="hub.pd">Personeel (alle PDA's)</b></a>
-    <a class="app" href="/apps/leverancier.html"><span class="ic">🤝</span><b data-i18n="hub.partners">Partner</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=zzp"><span class="ic">🧑‍🔧</span><b>Zelfstandigen</b></a>
-    <a class="app" href="/apps/gemeenteloket.html"><span class="ic">🏛️</span><b>Gemeente-loket</b></a>
-    <a class="app" href="/apps/gemeentepda.html"><span class="ic">🚧</span><b>Gemeente-PDA</b></a>
-    <a class="app" href="/apps/rijksloket.html"><span class="ic">🏢</span><b>Rijks-loket</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-staf" data-i18n="hub.staff">Personeel &amp; werkgevers</h2>
+  <nav class="grid" aria-labelledby="k-staf">
+    <a class="app" href="/apps/personeel.html"><span class="tegel" aria-hidden="true">👤</span><span class="naam" data-i18n="hub.pd">Personeel (alle PDA's)</span></a>
+    <a class="app" href="/apps/leverancier.html"><span class="tegel" aria-hidden="true">🤝</span><span class="naam" data-i18n="hub.partners">Partner</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=zzp"><span class="tegel" aria-hidden="true">🧑‍🔧</span><span class="naam">Zelfstandigen</span></a>
+    <a class="app" href="/apps/gemeenteloket.html"><span class="tegel" aria-hidden="true">🏛️</span><span class="naam">Gemeente-loket</span></a>
+    <a class="app" href="/apps/gemeentepda.html"><span class="tegel" aria-hidden="true">🚧</span><span class="naam">Gemeente-PDA</span></a>
+    <a class="app" href="/apps/rijksloket.html"><span class="tegel" aria-hidden="true">🏢</span><span class="naam">Rijks-loket</span></a>
+  </nav>
 
-  <h2 data-i18n="hub.g.eten">Eten &amp; drinken</h2>
-  <div class="grid">
-    <a class="app" href="/apps/leverancier.html?sector=restaurant"><span class="ic">🍽️</span><b>Restaurant</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=bar"><span class="ic">🍸</span><b>Bar &amp; Club</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=beachclub"><span class="ic">🏖️</span><b>Beachclub</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=chef"><span class="ic">👨‍🍳</span><b>Privéchef &amp; catering</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=koffie"><span class="ic">☕</span><b>Koffie &amp; patisserie</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-eten" data-i18n="hub.g.eten">Eten &amp; drinken</h2>
+  <nav class="grid" aria-labelledby="k-eten">
+    <a class="app" href="/apps/leverancier.html?sector=restaurant"><span class="tegel" aria-hidden="true">🍽️</span><span class="naam">Restaurant</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=bar"><span class="tegel" aria-hidden="true">🍸</span><span class="naam">Bar &amp; Club</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=beachclub"><span class="tegel" aria-hidden="true">🏖️</span><span class="naam">Beachclub</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=chef"><span class="tegel" aria-hidden="true">👨‍🍳</span><span class="naam">Privéchef</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=koffie"><span class="tegel" aria-hidden="true">☕</span><span class="naam">Koffie &amp; patisserie</span></a>
+  </nav>
 
-  <h2 data-i18n="hub.g.verblijf">Verblijf</h2>
-  <div class="grid">
-    <a class="app" href="/apps/leverancier.html?sector=hotel"><span class="ic">🏨</span><b>Hotel</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=appartement"><span class="ic">🏡</span><b>Appartement</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=villa"><span class="ic">🌴</span><b>Villa's &amp; fincas</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=vastgoed"><span class="ic">🗝️</span><b>Vastgoed</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-verblijf" data-i18n="hub.g.verblijf">Verblijf</h2>
+  <nav class="grid" aria-labelledby="k-verblijf">
+    <a class="app" href="/apps/leverancier.html?sector=hotel"><span class="tegel" aria-hidden="true">🏨</span><span class="naam">Hotel</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=appartement"><span class="tegel" aria-hidden="true">🏡</span><span class="naam">Appartement</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=villa"><span class="tegel" aria-hidden="true">🌴</span><span class="naam">Villa's &amp; fincas</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=vastgoed"><span class="tegel" aria-hidden="true">🗝️</span><span class="naam">Vastgoed</span></a>
+  </nav>
 
-  <h2 data-i18n="hub.g.vervoer">Vervoer</h2>
-  <div class="grid">
-    <a class="app" href="/apps/leverancier.html?sector=taxi"><span class="ic">🚘</span><b>Taxi</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=privejet"><span class="ic">✈️</span><b>Privéjet</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=helikopter"><span class="ic">🚁</span><b>Helikopter</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=charter"><span class="ic">⛵</span><b>Charter</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=autoverhuur"><span class="ic">🚗</span><b>Autoverhuur</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=tweewielers"><span class="ic">🛵</span><b>Tweewielers &amp; quads</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-vervoer" data-i18n="hub.g.vervoer">Vervoer</h2>
+  <nav class="grid" aria-labelledby="k-vervoer">
+    <a class="app" href="/apps/leverancier.html?sector=taxi"><span class="tegel" aria-hidden="true">🚘</span><span class="naam">Taxi</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=privejet"><span class="tegel" aria-hidden="true">✈️</span><span class="naam">Privéjet</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=helikopter"><span class="tegel" aria-hidden="true">🚁</span><span class="naam">Helikopter</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=charter"><span class="tegel" aria-hidden="true">⛵</span><span class="naam">Charter</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=autoverhuur"><span class="tegel" aria-hidden="true">🚗</span><span class="naam">Autoverhuur</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=tweewielers"><span class="tegel" aria-hidden="true">🛵</span><span class="naam">Tweewielers</span></a>
+  </nav>
 
-  <h2 data-i18n="hub.g.beleven">Beleven</h2>
-  <div class="grid">
-    <a class="app" href="/apps/leverancier.html?sector=activiteiten"><span class="ic">🎟️</span><b>Activiteiten</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=events"><span class="ic">🎪</span><b>Events &amp; festivals</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=wellness"><span class="ic">🧖</span><b>Wellness &amp; spa</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=creator"><span class="ic">🎬</span><b>Creators</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-beleven" data-i18n="hub.g.beleven">Beleven</h2>
+  <nav class="grid" aria-labelledby="k-beleven">
+    <a class="app" href="/apps/leverancier.html?sector=activiteiten"><span class="tegel" aria-hidden="true">🎟️</span><span class="naam">Activiteiten</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=events"><span class="tegel" aria-hidden="true">🎪</span><span class="naam">Events &amp; festivals</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=wellness"><span class="tegel" aria-hidden="true">🧖</span><span class="naam">Wellness &amp; spa</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=creator"><span class="tegel" aria-hidden="true">🎬</span><span class="naam">Creators</span></a>
+  </nav>
 
-  <h2>Hulpdiensten &amp; zorg</h2>
-  <div class="grid">
-    <a class="app" href="/apps/meldkamer.html"><span class="ic">🚨</span><b>Meldkamer (alle korpsen)</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=politie"><span class="ic">🚔</span><b>Politie</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=brandweer"><span class="ic">🚒</span><b>Brandweer</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=ambulance"><span class="ic">🚑</span><b>Ambulance</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=ziekenhuis"><span class="ic">🏥</span><b>Ziekenhuis</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=huisarts"><span class="ic">🩺</span><b>Huisarts</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=apotheek"><span class="ic">💊</span><b>Apotheek</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=specialist"><span class="ic">🫀</span><b>Medisch specialist</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=beautymedical"><span class="ic">✨</span><b>Beauty medical</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=specials"><span class="ic">🦅</span><b>Special Forces</b></a>
-    <a class="app" href="/apps/defensie.html"><span class="ic">🎖️</span><b>Defensie (logistiek)</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-zorg">Hulpdiensten &amp; zorg</h2>
+  <nav class="grid" aria-labelledby="k-zorg">
+    <a class="app" href="/apps/meldkamer.html"><span class="tegel" aria-hidden="true">🚨</span><span class="naam">Meldkamer</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=politie"><span class="tegel" aria-hidden="true">🚔</span><span class="naam">Politie</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=brandweer"><span class="tegel" aria-hidden="true">🚒</span><span class="naam">Brandweer</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=ambulance"><span class="tegel" aria-hidden="true">🚑</span><span class="naam">Ambulance</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=ziekenhuis"><span class="tegel" aria-hidden="true">🏥</span><span class="naam">Ziekenhuis</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=huisarts"><span class="tegel" aria-hidden="true">🩺</span><span class="naam">Huisarts</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=apotheek"><span class="tegel" aria-hidden="true">💊</span><span class="naam">Apotheek</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=specialist"><span class="tegel" aria-hidden="true">🫀</span><span class="naam">Specialist</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=beautymedical"><span class="tegel" aria-hidden="true">✨</span><span class="naam">Beauty medical</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=specials"><span class="tegel" aria-hidden="true">🦅</span><span class="naam">Special Forces</span></a>
+    <a class="app" href="/apps/defensie.html"><span class="tegel" aria-hidden="true">🎖️</span><span class="naam">Defensie</span></a>
+  </nav>
 
-  <h2 data-i18n="hub.g.handel">Winkel &amp; handel</h2>
-  <div class="grid">
-    <a class="app" href="/apps/leverancier.html?sector=retail"><span class="ic">🛍️</span><b>Mode</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=juwelier"><span class="ic">💎</span><b>Juwelier &amp; horloges</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=galerie"><span class="ic">🖼️</span><b>Kunst &amp; galerie</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=groothandel"><span class="ic">📦</span><b>Groothandel</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=boerderij"><span class="ic">🚜</span><b>Boerderij</b></a>
-    <a class="app" href="/apps/leverancier.html?sector=beveiliging"><span class="ic">🛡️</span><b>Beveiliging</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-handel" data-i18n="hub.g.handel">Winkel &amp; handel</h2>
+  <nav class="grid" aria-labelledby="k-handel">
+    <a class="app" href="/apps/leverancier.html?sector=retail"><span class="tegel" aria-hidden="true">🛍️</span><span class="naam">Mode</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=juwelier"><span class="tegel" aria-hidden="true">💎</span><span class="naam">Juwelier</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=galerie"><span class="tegel" aria-hidden="true">🖼️</span><span class="naam">Kunst &amp; galerie</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=groothandel"><span class="tegel" aria-hidden="true">📦</span><span class="naam">Groothandel</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=boerderij"><span class="tegel" aria-hidden="true">🚜</span><span class="naam">Boerderij</span></a>
+    <a class="app" href="/apps/leverancier.html?sector=beveiliging"><span class="tegel" aria-hidden="true">🛡️</span><span class="naam">Beveiliging</span></a>
+  </nav>
 
-  <h2 data-i18n="hub.rtg">RTG</h2>
-  <div class="grid">
-    <a class="app" href="/apps/rtgid.html"><span class="ic">🪪</span><b>RTG iD</b></a>
-    <a class="app" href="/apps/wallet.html"><span class="ic">👛</span><b>RTG Wallet</b></a>
-    <a class="app" href="/apps/backoffice.html"><span class="ic">🗝️</span><b data-i18n="hub.bo">Backoffice</b></a>
-    <a class="app" href="/apps/personeel.html?kantoor=1"><span class="ic">📟</span><b>RTG Kantoor PDA</b></a>
-    <a class="app" href="/apps/studio-pda.html"><span class="ic">🏎️</span><b>RTG Studio PDA</b></a>
-    <a class="app" href="/apps/hardware-pda.html"><span class="ic">🔧</span><b>RTG Hardware PDA</b></a>
-    <a class="app" href="/apps/architect-pda.html"><span class="ic">🏛️</span><b>RTG Architect PDA</b></a>
-    <a class="app" href="/apps/techniek.html"><span class="ic">🛡️</span><b data-i18n="hub.tech">Techniek</b></a>
-  </div>
+  <h2 class="sectiekop" id="k-rtg" data-i18n="hub.rtg">RTG</h2>
+  <nav class="grid" aria-labelledby="k-rtg">
+    <a class="app" href="/apps/rtgid.html"><span class="tegel" aria-hidden="true">🪪</span><span class="naam">RTG iD</span></a>
+    <a class="app" href="/apps/wallet.html"><span class="tegel" aria-hidden="true">👛</span><span class="naam">RTG Wallet</span></a>
+    <a class="app" href="/apps/backoffice.html"><span class="tegel" aria-hidden="true">🗝️</span><span class="naam" data-i18n="hub.bo">Backoffice</span></a>
+    <a class="app" href="/apps/kantoren.html"><span class="tegel" aria-hidden="true">🗂️</span><span class="naam">Kantoren</span></a>
+    <a class="app" href="/apps/boardroom.html"><span class="tegel" aria-hidden="true">🎛️</span><span class="naam">Boardroom</span></a>
+    <a class="app" href="/apps/lab.html"><span class="tegel" aria-hidden="true">🔬</span><span class="naam">Onderzoekslab</span></a>
+    <a class="app" href="/apps/personeel.html?kantoor=1"><span class="tegel" aria-hidden="true">📟</span><span class="naam">Kantoor PDA</span></a>
+    <a class="app" href="/apps/studio-pda.html"><span class="tegel" aria-hidden="true">🏎️</span><span class="naam">Studio PDA</span></a>
+    <a class="app" href="/apps/hardware-pda.html"><span class="tegel" aria-hidden="true">🔧</span><span class="naam">Hardware PDA</span></a>
+    <a class="app" href="/apps/architect-pda.html"><span class="tegel" aria-hidden="true">🏛️</span><span class="naam">Architect PDA</span></a>
+    <a class="app" href="/apps/techniek.html"><span class="tegel" aria-hidden="true">🛡️</span><span class="naam" data-i18n="hub.tech">Techniek</span></a>
+  </nav>
 
   <div class="foot">
     <a href="/apps/juridisch.html" data-i18n="hub.juridisch">Juridisch</a>
     <a href="/apps/juridisch/privacy.html" data-i18n="hub.privacy">Privacy</a>
   </div>
 </main>
+
 <script>
 window.I18N = { en: {
   'hub.members':'Members', 'hub.rtf':'RTFoundation', 'hub.staff':'Staff & employers',
@@ -190,16 +246,157 @@ window.I18N = { en: {
   'hub.g.beleven':'Experiences', 'hub.g.handel':'Retail & trade',
   'hub.bo':'Back office', 'hub.tech':'Tech',
   'hub.juridisch':'Legal', 'hub.privacy':'Privacy',
-  'hub.lead':'Walk through the whole platform. Pick an app and try everything.',
   'hub.demo':'<b>Demo.</b> Every function works. Only real payments, real orders and the RTG Boardroom are switched off. Toggle light and dark at the bottom left.'
 } };
 </script>
+<script src="/shared/accounts-os.js"></script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/klok.js" defer></script>
 <script src="/shared/thema.js"></script>
 <script src="/shared/verbinding.js"></script>
 <script src="/shared/seizoen.js" defer></script>
+<script src="/shared/uitleg.js" defer></script>
+<script src="/shared/osmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  // ---- de accountwisselaar (zelfde als het bureaublad: per wereld een chip) ----
+  function lees(sleutel) { try { return localStorage.getItem(sleutel); } catch (e) { return null; } }
+  function ontsnap(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var vak = document.getElementById('account');
+  var kluis = window.RTGAccounts ? window.RTGAccounts.maak() : null;
+  var werelden = kluis ? kluis.WERELDEN : {};
+  var openMenu = null;
+  function sluit() { if (openMenu) { openMenu.classList.remove('open'); openMenu = null; } }
+  document.addEventListener('click', function (e) { if (openMenu && !openMenu.parentNode.contains(e.target)) sluit(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
+  function ingang(w) { return '/' + werelden[w].ingang; }
+
+  function bouwChip(w) {
+    var info = werelden[w];
+    var actief = kluis ? kluis.actief(w) : null;
+    var label = actief && actief.label ? actief.label : info.naam;
+    var wrap = document.createElement('div'); wrap.style.position = 'relative';
+    var knop = document.createElement('button');
+    knop.className = 'chip'; knop.type = 'button';
+    knop.setAttribute('aria-haspopup', 'true'); knop.setAttribute('aria-expanded', 'false');
+    knop.innerHTML = '<span class="stip"></span>' + ontsnap(info.naam) +
+      (label !== info.naam ? ' &middot; <b>' + ontsnap(label) + '</b>' : '') + ' <span class="pijl">▾</span>';
+    var menu = document.createElement('div'); menu.className = 'menu';
+    var h = document.createElement('h3'); h.textContent = info.naam; menu.appendChild(h);
+    var lijst = kluis ? kluis.lijst(w) : [];
+    lijst.forEach(function (a) {
+      var rij = document.createElement('button'); rij.type = 'button';
+      rij.className = 'rij' + (actief && a.id === actief.id ? ' actief' : '');
+      var nm = document.createElement('span'); nm.className = 'naam2'; nm.textContent = a.label; rij.appendChild(nm);
+      var venster = document.createElement('span'); venster.className = 'venster'; venster.textContent = '↗ venster';
+      venster.title = 'Open dit account in een nieuw venster, naast je huidige';
+      venster.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var u = kluis.vensterURL(w, a.id);
+        if (u) window.open('/' + u, '_blank', 'noopener');
+        sluit();
+      });
+      rij.appendChild(venster);
+      rij.addEventListener('click', function () { kluis.wissel(w, a.id); kluis.pasToe(w); location.href = ingang(w); });
+      menu.appendChild(rij);
+    });
+    if (!lijst.length) {
+      var leeg = document.createElement('div'); leeg.className = 'rol'; leeg.style.padding = '0.2rem 0.5rem 0.5rem';
+      leeg.textContent = 'Je bent aangemeld. Zodra je in de app (opnieuw) inlogt, verschijnen hier je accounts om tussen te wisselen.';
+      menu.appendChild(leeg);
+    }
+    var sep = document.createElement('div'); sep.className = 'scheiding'; menu.appendChild(sep);
+    var toevoeg = document.createElement('a'); toevoeg.className = 'rij toevoeg'; toevoeg.href = ingang(w);
+    toevoeg.textContent = '+  Nog een account toevoegen'; menu.appendChild(toevoeg);
+    knop.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var wasOpen = menu.classList.contains('open');
+      sluit();
+      if (!wasOpen) { menu.classList.add('open'); knop.setAttribute('aria-expanded', 'true'); openMenu = menu; }
+      else { knop.setAttribute('aria-expanded', 'false'); }
+    });
+    wrap.appendChild(knop); wrap.appendChild(menu);
+    return wrap;
+  }
+
+  function toonAccounts() {
+    vak.innerHTML = '';
+    var enige = false;
+    Object.keys(werelden).forEach(function (w) {
+      var info = werelden[w];
+      if (!((kluis && kluis.actief(w)) || lees(info.sleutel))) return;
+      enige = true;
+      vak.appendChild(bouwChip(w));
+    });
+    if (!enige) {
+      var chip = document.createElement('span'); chip.className = 'chip leeg';
+      chip.textContent = 'Nog niet aangemeld'; vak.appendChild(chip);
+    }
+  }
+  toonAccounts();
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  // Een tegel opent de app SCHERMVULLEND in een iframe (het bureaublad-gedrag);
+  // de <a href> blijft als terugval werken zonder JavaScript.
+  var overlay = document.createElement('div');
+  overlay.className = 'appvenster';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-label', 'Geopende app');
+  var frame = document.createElement('iframe');
+  frame.setAttribute('allow', 'fullscreen; geolocation; camera; microphone; clipboard-write');
+  frame.title = 'RTG-app';
+  overlay.appendChild(frame);
+
+  var terug = document.createElement('button');
+  terug.type = 'button';
+  terug.className = 'appterug';
+  terug.setAttribute('aria-label', 'Terug naar het bureaublad');
+  terug.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Bureaublad</span>';
+
+  function volledig() {
+    var e = document.documentElement;
+    var f = e.requestFullscreen || e.webkitRequestFullscreen;
+    if (f && !(document.fullscreenElement || document.webkitFullscreenElement)) { try { f.call(e); } catch (x) {} }
+  }
+  function open(url, naam) {
+    frame.src = url;
+    frame.title = naam || 'RTG-app';
+    overlay.classList.add('open');
+    terug.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    volledig();
+  }
+  function sluit() {
+    overlay.classList.remove('open');
+    terug.classList.remove('open');
+    frame.src = 'about:blank';
+    document.body.style.overflow = '';
+    var d = document;
+    if (d.fullscreenElement || d.webkitFullscreenElement) { (d.exitFullscreen || d.webkitExitFullscreen || function () {}).call(d); }
+  }
+  terug.addEventListener('click', sluit);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay.classList.contains('open')) sluit(); });
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(terug);
+
+  Array.prototype.forEach.call(document.querySelectorAll('main .app'), function (a) {
+    a.addEventListener('click', function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+      var href = a.getAttribute('href');
+      if (!href) return;
+      e.preventDefault();
+      var n = a.querySelector('.naam');
+      open(href, n ? n.textContent : '');
+    });
+  });
+})();
+</script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/cookie.js" defer></script>

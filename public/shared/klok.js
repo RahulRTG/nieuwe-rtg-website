@@ -109,9 +109,9 @@
     // de signatuur: alleen de naam, in het goud van het huis, op vaste
     // breedte (textLength) exact gecentreerd, en verticaal precies in het
     // midden tussen de binnenrand van de plaat en de bovenkant van de cijfers
-    // de naam en het datumvenster spiegelen elkaar rond het midden (100):
-    // venster-midden op 155.5, dus de naam op 44.5; gelijke maat overal
-    const naam = maak('text', { x: 100, y: 46.3, class: 'rr-naam', 'text-anchor': 'middle',
+    // de naam optisch precies tussen de rand en de cijfers: evenveel lucht
+    // erboven als eronder (gemeten op het beeld, niet alleen op de wiskunde)
+    const naam = maak('text', { x: 100, y: 41.5, class: 'rr-naam', 'text-anchor': 'middle',
       textLength: 86, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
     // het datumvenster op zes uur: breder dan hoog, zoals bij een echt

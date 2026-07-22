@@ -3,8 +3,9 @@
      heeft en legt op "waarom?" uit waarvoor iets dient. Beide paden eindigen
      op de bestaande routes: aanmelden via login() -> /auth/register, inloggen
      via login() -> /auth/login; het wachtwoord van een terugkerend lid gaat
-     NOOIT door het gesprek maar rechtstreeks naar de inlogroute. Kaal en
-     stil: alleen de klok, Rahuls zin en de ene regel van de gebruiker.
+     NOOIT door het gesprek maar rechtstreeks naar de inlogroute. In beeld:
+     de klok, de RTG-signatuurmond van bewegende lichtpuntjes, Rahuls zin
+     en de ene regel van de gebruiker.
      Er is geen klassieke keuze: Rahul is de poort; de formulieren bestaan
      alleen nog als vangnet voor wachtwoord-herstel. Deelt de
      IIFE-scope met 00-kern-03.js (toReg, toForgot, login, API, T). */
@@ -33,12 +34,14 @@
       '.ag-rij input::placeholder{color:var(--soft);}' +
       '.ag-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;' +
         'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
-      '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}';
+      '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
+      '.ag-mond{display:block;margin:0.15rem auto 0.3rem;width:220px;height:100px;}';
     document.head.appendChild(st);
 
     const doos = document.createElement('div');
     doos.className = 'ag-doos';
     doos.innerHTML =
+      '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
       '<div class="ag-rij"><input id="agIn" autocomplete="off" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Zeg het gewoon...') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>';
@@ -51,6 +54,64 @@
     const inp = doos.querySelector('#agIn');
     let gesprek = null, bezig = false, loginU = null;
 
+    /* De RTG-signatuur: de mond bestaat uit duizenden bewegende lichtpuntjes
+       (eigen canvas, geen extern beeld). Bordeaux als basis, goud erdoorheen
+       geweven, een enkel wit puntje als glinstering, en een gouden lichtgolf
+       die om de paar seconden door de lippen trekt. De onderlip beweegt mee
+       als Rahul praat. Wie minder beweging wil, krijgt een stilstaand beeld. */
+    const mond = doos.querySelector('#agMond');
+    const mctx = mond.getContext('2d');
+    const RUSTIG = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const PUNTEN = [];
+    (function zaai(){
+      // de lipvormen als functies: de middellijn met cupidoboog, de boog van
+      // de bovenlip en de boog van de onderlip (mondhoeken op x=50 en x=170)
+      const midden = x => 52 - 6 * Math.exp(-Math.pow(x - 110, 2) / 98);
+      const boven = x => { const t = (x - 110) / 60; return 52 - 24 * Math.pow(Math.max(0, 1 - t * t), 0.8) + 7 * Math.exp(-Math.pow(x - 110, 2) / 72); };
+      const onder = x => { const t = (x - 110) / 60; return 52 + 27 * Math.pow(Math.max(0, 1 - t * t), 0.9); };
+      for (let i = 0; i < 2400; i++){
+        const lip = Math.random() < 0.45 ? 'b' : 'o';
+        const x = 50 + Math.random() * 120;
+        const y1 = lip === 'b' ? boven(x) : midden(x), y2 = lip === 'b' ? midden(x) : onder(x);
+        if (y2 - y1 < 0.8) continue;
+        const r = Math.random();
+        PUNTEN.push({ x, y: y1 + Math.random() * (y2 - y1), lip,
+          fase: Math.random() * Math.PI * 2, maat: 0.5 + Math.random() * 0.9,
+          kleur: r < 0.62 ? '#9E1C40' : (r < 0.9 ? '#C9A24B' : '#FFFFFF'),
+          diep: (y2 - y1) > 0 ? ((y1 + (y2 - y1) / 2) - y1) / (y2 - y1) : 0 });
+      }
+      // de gouden middellijn loopt door tot voorbij de mondhoeken en vervaagt
+      for (let i = 0; i < 420; i++){
+        const x = 14 + Math.random() * 192;
+        PUNTEN.push({ x, y: midden(Math.min(170, Math.max(50, x))) + (Math.random() - 0.5) * 1.6,
+          lip: 'm', fase: Math.random() * Math.PI * 2, maat: 0.4 + Math.random() * 0.7,
+          kleur: '#C9A24B', rand: Math.min(1, Math.min(x - 14, 206 - x) / 55), diep: 0 });
+      }
+    })();
+    let praatTot = 0;
+    const praat = ms => { praatTot = performance.now() + ms; };
+    function verfMond(t){
+      mctx.clearRect(0, 0, 440, 200);
+      mctx.save();
+      mctx.scale(2, 2);
+      const golf = ((t / 4200) % 1) * 260 - 20; // de lichtshow: een gouden golf
+      const spreek = t < praatTot ? Math.sin(t / 1000 * Math.PI * 4.4) : 0;
+      for (const p of PUNTEN){
+        const gloed = Math.exp(-Math.pow(p.x - golf, 2) / 420);
+        const twinkel = 0.45 + 0.4 * Math.sin(p.fase + t / 700);
+        mctx.globalAlpha = Math.min(1, twinkel * (p.rand == null ? 1 : p.rand) + gloed * 0.9);
+        mctx.fillStyle = gloed > 0.45 ? '#F5E6B8' : p.kleur;
+        mctx.fillRect(p.x, p.lip === 'o' ? p.y + spreek * 4 * p.diep : p.y, p.maat, p.maat);
+      }
+      mctx.restore();
+    }
+    if (RUSTIG) verfMond(0);
+    else (function lus(){
+      // alleen verven zolang de poort in beeld is; daarna zuinig wachten
+      if (mond.offsetParent) { verfMond(performance.now()); requestAnimationFrame(lus); }
+      else setTimeout(lus, 600);
+    })();
+
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
@@ -58,6 +119,7 @@
       void zin.offsetWidth; // de fade opnieuw laten lopen
       zin.style.animation = '';
       zin.textContent = tekst;
+      praat(Math.min(2600, 500 + tekst.length * 28));
     }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';

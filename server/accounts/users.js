@@ -57,6 +57,15 @@ function findByLogin(login) {
 }
 function count() { return S.db.prepare('SELECT COUNT(*) AS c FROM users').get().c; }
 
+/* Naamswijziging door het huis zelf (opstart-seed van het eigenaarsaccount):
+   inlognaam en echte naam in een keer, de kluis blijft de bron. */
+function renameUser(id, { username, realName }) {
+  S.db.prepare('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
+    .run(username, kluis.enc(realName), id);
+  mirror.markUser(id);
+  return getUserById(id);
+}
+
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
 function realNameOf(u) { return u ? (kluis.dec(u.enc_name) || u.username || 'Lid') : null; }
 function emailOf(u) { return u ? kluis.dec(u.enc_email) : null; }

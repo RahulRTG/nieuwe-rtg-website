@@ -29,7 +29,8 @@ test.before(async () => {
   const roster = await api(base, '/api/supplier/roster', { code: 'LUCHT' });
   const man = roster.body.staff.find(m => m.role === 'manager');
   zaak = (await api(base, '/api/supplier/login', { code: 'LUCHT', staffId: man.id, pin: '1234' })).body.token;
-  office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  office = (await api(base, '/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
 });
 test.after(() => stop(srv && srv.child));
 

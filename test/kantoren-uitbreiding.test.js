@@ -24,7 +24,8 @@ function api(pad, body, token) {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  office = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   const u = Date.now().toString().slice(-8);
   const reg = await api('/api/auth/register', { name: 'Kluis Testlid', email: 'kluis' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1991-03-03', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });

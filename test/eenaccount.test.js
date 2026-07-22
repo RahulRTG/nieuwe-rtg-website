@@ -71,8 +71,9 @@ test('4. de zaak en het kantoor koppelen met hun eigen inlog, en starten', async
   const k = await api('/api/account/koppel', { soort: 'kantoor', code: 'RTG-OFFICE' }, lid);
   assert.equal(k.status, 200, 'de backoffice-code bewijst de kantoor-rol');
   const ks = await api('/api/account/start', { rol: 'kantoor' }, lid);
-  const bord = await api('/api/office/boardroom', {}, ks.body.token);
-  assert.equal(bord.status, 200, 'de kantoor-sessie werkt op de boardroom');
+  assert.equal((await api('/api/office/kamers', {}, ks.body.token)).status, 200, 'de kantoor-sessie werkt op het kantoor');
+  // de boardroom is de kamer van de eigenaar: een gekoppelde kantoor-rol opent hem NIET vanzelf
+  assert.equal((await api('/api/office/boardroom', {}, ks.body.token)).status, 403, 'de boardroom-poort blijft dicht');
 });
 
 test('5. ontkoppelen sluit de deur weer, en de AI-stuur blijft van de sleutelbos af', async () => {

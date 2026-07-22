@@ -1,6 +1,6 @@
 /* De eigenaar van het RTG-platform: één bron van waarheid.
 
-   De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen:
+   De eigenaar (Rahul Imran Ismail) heeft overal toegang tot de BEHEER-omgevingen:
    - de technische pagina (zekeringen, functieschakelaars, beveiliging);
    - de RTG-Backoffice (met zijn eigen accountlogin, zonder aparte code);
    - alle openbare/geaggregeerde bedrijfsdata.

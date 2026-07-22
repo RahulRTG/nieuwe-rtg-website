@@ -112,8 +112,8 @@ test('de buurtfailover: een buurdoos zonder lijn meldt zich via deze doos', asyn
   const d = await r.json();
   assert.ok(d.ok && d.doorgegeven, 'de melding is doorgegeven aan de cloud');
   // en de vlootkaart in de Intern & IT-kamer toont hem, met via-stempel
-  const login = await fetch(cloudBase() + '/api/office/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'DOOS-KANTOOR-1' })
+  const login = await fetch(cloudBase() + '/api/auth/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
   });
   const token = (await login.json()).token;
   const kamer = await fetch(cloudBase() + '/api/office/kamer', {
@@ -126,8 +126,8 @@ test('de buurtfailover: een buurdoos zonder lijn meldt zich via deze doos', asyn
 
 test('de wereldknop bereikt een echte doos: hulp-opdracht, diagnoserapport terug', async () => {
   // het kantoor drukt op Help bij testdoos (die staat op de kaart via zijn meldingen)
-  const login = await fetch(cloudBase() + '/api/office/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'DOOS-KANTOOR-1' })
+  const login = await fetch(cloudBase() + '/api/auth/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
   });
   const token = (await login.json()).token;
   const office = (pad, body) => fetch(cloudBase() + '/api/office/' + pad, {

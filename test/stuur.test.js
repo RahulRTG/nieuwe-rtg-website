@@ -28,7 +28,8 @@ test.before(async () => {
   lid = (await api('/api/auth/register', { name: 'Stuurlid', email: 'stuur' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
   zaak = (await api('/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
-  office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  office = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   assert.ok(lid && zaak && office, 'lid, zaak en backoffice zijn ingelogd');
 });
 test.after(() => {

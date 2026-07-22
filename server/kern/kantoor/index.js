@@ -25,6 +25,45 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     return res.status(401).json({ error: 'Geen backoffice-sessie.' });
   }
 
+  /* ---- de boardroom-poort: de kamer van de eigenaar ----
+     De boardroom is van de eigenaar (Rahul Imran Ismail) alleen; hij kan
+     anderen toegang geven en die ook weer intrekken. Toegang vraagt dus een
+     IDENTITEIT: het eigen RTG-account (direct, of als kantoor-rol via het
+     ene account). Een anonieme backoffice-code heeft geen identiteit en
+     komt er daarom nooit in; de rest van het kantoor blijft gewoon open. */
+  function boardroomLijst() {
+    if (!Array.isArray(db.data.boardroomToegang)) db.data.boardroomToegang = [];
+    return db.data.boardroomToegang;
+  }
+  function boardroomWie(req) {
+    const header = req.get('authorization') || '';
+    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+    if (!token) return null;
+    const sess = sessionFor(token);
+    if (sess && sess.role === 'office') return sess.lidKey || null;
+    try { const u = accounts.verifyToken(token); if (u) return 'user-' + u.id; } catch (e) {}
+    return null;
+  }
+  function boardroomBaas(key) {
+    if (!key || !String(key).startsWith('user-')) return false;
+    const u = accounts.getUserById(Number(String(key).slice(5)));
+    return eigenaar.isEigenaar(accounts, u);
+  }
+  function magBoardroom(key) {
+    return boardroomBaas(key) || (!!key && boardroomLijst().some(t => t.key === key));
+  }
+  function boardroomAuth(req, res, next) {
+    officeAuth(req, res, () => {
+      const key = boardroomWie(req);
+      if (!magBoardroom(key)) {
+        return res.status(403).json({ error: 'De boardroom is gesloten: alleen de eigenaar komt binnen, of wie van hem toegang heeft gekregen. Log in met het eigen RTG-account.' });
+      }
+      req.boardroomKey = key;
+      req.boardroomBaas = boardroomBaas(key);
+      next();
+    });
+  }
+
   function officeState() {
     // live overzicht: welke leden zijn nu onderweg, waarheen en met welke partners
     const live = Object.keys(db.data.live || {}).map(key => {
@@ -91,7 +130,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     }));
   }
 
-  return { officeAuth, officeState, pendingVerifications };
+  return { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, pendingVerifications };
 }
 
 module.exports = { maakKantoor };

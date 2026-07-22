@@ -110,7 +110,9 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     }
     if (r.rol === 'kantoor') {
       const token = crypto.randomBytes(24).toString('hex');
-      rememberSession(token, { role: 'office' });
+      // lidKey reist mee: zo weet de boardroom-poort WIE er door de
+      // kantoordeur kwam (de eigenaar of iemand met gegeven toegang)
+      rememberSession(token, { role: 'office', lidKey: key });
       logInlog('office', true, 'backoffice via RTG-account', req);
       return { status: 200, ok: true, rol: 'kantoor', token, state: officeState() };
     }

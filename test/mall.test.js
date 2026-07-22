@@ -25,7 +25,8 @@ test.before(async () => {
   const reg = await api(base, '/api/auth/register', { name: 'Shop', email: 's' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   lid = { token: reg.body.token };
-  const login = await api(base, '/api/office/login', { code: 'KANTOOR-MALL-1' });
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  const login = await api(base, '/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
   office = login.body.token;
 });
 test.after(() => stop(srv && srv.child));

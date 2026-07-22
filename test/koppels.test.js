@@ -30,7 +30,8 @@ async function standVan(id) {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  office = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   assert.ok(office, 'de backoffice is ingelogd');
 });
 test.after(() => {

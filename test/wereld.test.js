@@ -27,8 +27,9 @@ const meet = (body, sleutel) => fetch(base + '/api/doos/meting', {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'WERELD-KEURING-1', RTG_DOOS_SLEUTEL: SLEUTEL } });
   base = srv.base;
-  const login = await fetch(base + '/api/office/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'WERELD-KEURING-1' })
+  // wereld-acties zijn boardroom-besluiten: de eigenaar logt in met zijn account
+  const login = await fetch(base + '/api/auth/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
   });
   token = (await login.json()).token;
   assert.ok(token, 'het kantoor logt in');

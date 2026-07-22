@@ -27,7 +27,8 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   lid = (await api('/api/auth/register', { name: 'Regielid', email: 'regie' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
-  office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  office = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   assert.ok(lid && office, 'lid en backoffice zijn ingelogd');
 });
 test.after(() => {

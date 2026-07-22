@@ -216,6 +216,25 @@
     </div>
     <p class="deck">Alles van elke afdeling in een oogopslag, het volledige schakelbord van het platform, en de verbeterkamer die elke dag de cijfers naloopt. Instellingen schakelt de boardroom zelf; codeverbeteringen gaan als voorstel naar de ontwikkelstraat.</p>
 
+    <!-- de deur: de boardroom is de kamer van de eigenaar -->
+    <div id="bDicht" hidden>
+      <div class="kaart" style="border-color:var(--burgundy);max-width:34rem;">
+        <h4 style="margin:0 0 .5rem;">🔒 De deur is dicht</h4>
+        <p class="stil" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin:0;" id="bDichtTekst">De boardroom is de kamer van de eigenaar.</p>
+        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:.6rem 0 0;">Ben jij de eigenaar? Log dan in met je eigen RTG-account (via de personeels-app, knop "Verder met uw RTG-account"); de anonieme kantoorcode opent deze kamer niet.</p>
+      </div>
+    </div>
+
+    <h3 class="sec" id="bToegangKop" hidden>De sleutel van de kamer</h3>
+    <div class="kaart" id="bToegang" hidden>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">De boardroom is van jou alleen. Hier geef je iemand anders de sleutel (op codenaam) en trek je hem ook weer in; elke wijziging komt in het logboek.</p>
+      <div class="taakrij">
+        <input class="veld" id="bToegangCode" style="flex:1;" placeholder="Codenaam van het lid" maxlength="60">
+        <button class="knop stil" id="bToegangGeef" type="button">Geef toegang</button>
+      </div>
+      <div id="bToegangLijst" style="margin-top:.6rem;font-size:.82rem;"></div>
+    </div>
+
     <h3 class="sec">De wereld (groen = oke, oranje = uit, rood = storing)</h3>
     <div id="bWereld"></div>
 
@@ -980,10 +999,7 @@ async function exportLookbook(naam){
     '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
     secties+'</div>'+
     '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
-    '<script src="/shared/metgezel.js" defer></script>
-<script src="/shared/basis.js" defer></script>
-<script src="/shared/cookie.js" defer></script>
-</body></html>';
+    '</body></html>';
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
@@ -1175,8 +1191,7 @@ async function exportProductblad(naam){
     '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
     secties+'</div>'+
     '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
-    '<script src="/shared/metgezel.js" defer></script>
-</body></html>';
+    '</body></html>';
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
@@ -1349,8 +1364,7 @@ async function exportPortfolio(naam){
     '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
     secties+'</div>'+
     '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script>'+
-    '<script src="/shared/metgezel.js" defer></script>
-</body></html>';
+    '</body></html>';
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
@@ -1919,10 +1933,47 @@ async function laadAidata(){
 }
 
 /* ---------- de boardroom ---------- */
+/* De deur: de boardroom is de kamer van de eigenaar. Komt er een 403 terug,
+   dan tonen we de gesloten deur en verder niets; de rest van het kantoor
+   blijft gewoon werken. */
+function boardDeur(dicht, tekst){
+  Array.from($('#vBoard').children).forEach(el => {
+    if (el.classList && el.classList.contains('kop')) return;
+    if (el.id === 'bDicht') el.hidden = !dicht;
+    else el.hidden = dicht;
+  });
+  if (dicht) $('#bDichtTekst').textContent = tekst || 'De boardroom is de kamer van de eigenaar.';
+}
+/* De sleutel van de kamer: alleen de eigenaar ziet en beheert de lijst. */
+async function laadToegang(baas){
+  $('#bToegangKop').hidden = $('#bToegang').hidden = !baas;
+  if (!baas) return;
+  try {
+    const r = await api('boardroom/toegang');
+    $('#bToegangLijst').innerHTML = r.lijst.length ? r.lijst.map(t =>
+      '<div class="taakrij"><span style="flex:1;">'+esc(t.codenaam)+'</span>'+
+      '<button class="knop stil" data-toegangweg="'+esc(t.codenaam)+'" type="button" style="padding:.25rem .8rem;font-size:.75rem;">Trek in</button></div>').join('')
+      : '<div class="leeg">Alleen jij kunt de boardroom in.</div>';
+    $('#bToegangLijst').querySelectorAll('[data-toegangweg]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('boardroom/toegang/weg', { codenaam: b.dataset.toegangweg }); meld('Toegang ingetrokken.'); laadToegang(true); }
+      catch (e) { meld(e.message); }
+    }));
+  } catch (e) {}
+}
+$('#bToegangGeef').addEventListener('click', async () => {
+  const c = $('#bToegangCode').value.trim();
+  if (!c) return;
+  try { await api('boardroom/toegang/geef', { codenaam: c }); $('#bToegangCode').value = ''; meld('Toegang gegeven.'); laadToegang(true); }
+  catch (e) { meld(e.message); }
+});
 async function openBoard(){
   zetKamerUrl('boardroom');
-  const d = await api('boardroom');
+  let d;
+  try { d = await api('boardroom'); }
+  catch (e) { toon('vBoard'); boardDeur(true, e.message); return; }
   toon('vBoard');
+  boardDeur(false);
+  laadToegang(!!d.baas);
   laadGeld();
   laadRahul();
   laadDoosRegie();
@@ -2176,5 +2227,7 @@ else uitgelogd();
 <script src="/shared/accounts-os.js" defer></script>
 <script src="/shared/osbar.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
 </body>
 </html>

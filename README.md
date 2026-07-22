@@ -26,7 +26,7 @@ public/            alles wat de browser laadt (de webroot die de server serveert
 server/            Node.js/Express-backend + data (db.json, rtg.db, sleutels, uploads)
 ```
 
-Er is geen losse marketingsite meer: `/` stuurt meteen door naar het RTG-OS-inlogscherm (`/apps/app.html`). Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
+Er is geen losse marketingsite meer: `/` toont direct het RTG OS-bureaublad (`/apps/index.html`); wie nog niet is aangemeld ziet daar de welkomstkaart (het gratis RTG-abonnement is de minimale ingang). Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
 
 ### Modulebeleid: behapbare bestanden van ~5-10KB
 
@@ -46,7 +46,7 @@ npm install
 npm start
 ```
 
-Open daarna **http://localhost:3000** — dat brengt je meteen op het RTG-OS-inlogscherm van de leden-app.
+Open daarna **http://localhost:3000** — dat toont direct het RTG OS-bureaublad; aanmelden gaat via de welkomstkaart (Rahul).
 
 Met de backend actief lopen inloggen, betalingen, likes, reacties, DM's en de AI via de echte API:
 
@@ -163,6 +163,20 @@ RTG-account" en munt `/api/account/start` exact dezelfde sessie als de losse
 inlog (zelfde `rememberSession`, zelfde logs). Endpoints:
 `/api/account/{rollen,koppel,start,ontkoppel}` (kern/eenaccount.js); het
 AI-stuur blijft bewust van deze sleutelbos af.
+
+### Het eigenaarsaccount en de boardroom-poort
+
+In de demo bestaat één eigenaarsaccount: **Rahul Imran Ismail** (inlog
+`Rahul` of het eigenaars-e-mailadres, wachtwoord `Imran`, instelbaar met
+`DEMO_PASS`; het e-mailadres met `RTG_OWNER_EMAIL`). De kantoor- en zaak-rol
+hangen er standaard aan, dus na de leden-inlog is elke werkplek een rolkeuze.
+**De boardroom is de kamer van de eigenaar:** alle boardroom-besluiten
+(schakelkast, geld-, mall- en AI-regie, paniek-besluiten, wereld-acties,
+AI-dataset-export) lopen door de boardroom-poort en openen alleen voor de
+eigenaar, of voor wie hij op codenaam toegang heeft gegeven
+(`/api/office/boardroom/toegang{,/geef,/weg}`). De anonieme backoffice-code
+heeft geen identiteit en komt er dus nooit in; de rest van het kantoor blijft
+gewoon op de office-inlog werken.
 
 ## Privacy & security
 

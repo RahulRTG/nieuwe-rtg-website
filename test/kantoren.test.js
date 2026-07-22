@@ -21,8 +21,9 @@ const api = (pad, body) => fetch(base + '/api/office/' + pad, {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-KEURING-1' } });
   base = srv.base;
-  const login = await fetch(base + '/api/office/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'KANTOOR-KEURING-1' })
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  const login = await fetch(base + '/api/auth/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
   });
   token = (await login.json()).token;
   assert.ok(token, 'het kantoor logt in');

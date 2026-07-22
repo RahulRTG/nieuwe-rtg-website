@@ -24,7 +24,8 @@ test.before(async () => {
   base = srv.base;
   const l = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) })).json();
   lid = { token: l.token };
-  const o = await (await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'KANTOOR-AIDATA-1' }) })).json();
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  const o = await (await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' }) })).json();
   office = { token: o.token };
   assert.ok(lid.token && office.token, 'lid en kantoor loggen in');
   // een echt kantoorchat-bericht zodat de export gegarandeerd inhoud heeft

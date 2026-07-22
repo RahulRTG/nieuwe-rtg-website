@@ -26,7 +26,8 @@ const oapi = (pad, body) => api('office/' + pad, { ...(body || {}), naam: 'Aïsh
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-STAD-1' } });
   base = srv.base;
-  const o = await (await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'KANTOOR-STAD-1' }) })).json();
+  // scenario- en regimeknoppen zijn boardroom-besluiten: de eigenaar logt in met zijn account
+  const o = await (await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' }) })).json();
   office = o.token;
   assert.ok(office, 'het kantoor logt in');
 });

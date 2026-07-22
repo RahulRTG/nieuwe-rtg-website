@@ -121,13 +121,35 @@ accounts.init();
 // Demo-modus: alleen buiten productie, of expliciet met RTG_DEMO=1. Zo staan de
 // demo-inlog en het demo-account (Rahul/Imran) nooit per ongeluk open op productie.
 const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
-// Demo-account zodat Rahul/Imran ook via de echte accountlogin werkt.
+// Het eigenaarsaccount (Rahul Imran Ismail), zodat Rahul/Imran ook via de
+// echte accountlogin werkt. Bestaat het account al (een oudere lokale
+// database), dan krijgt het hier de juiste naam; de kluis blijft de bron.
 // Sync-varianten: de seed draait voor 'listen', dus blokkeren kan geen kwaad
 // en zodra de poort opengaat bestaan de accounts gegarandeerd (geen race in tests).
-if (DEMO && accounts.count() === 0) {
-  const u = accounts.createUserSync({ username: 'Roellie', email: require('./eigenaar').OWNER_EMAIL, password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Roellie I', phone: '+31612345678' });
-  accounts.saveMemberState(u.id, memberTemplate());
-  accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
+if (DEMO) {
+  let u = accounts.findByLogin(require('./eigenaar').OWNER_EMAIL);
+  if (!u && accounts.count() === 0) {
+    u = accounts.createUserSync({ username: 'Rahul', email: require('./eigenaar').OWNER_EMAIL, password: process.env.DEMO_PASS || 'Imran', tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
+    accounts.saveMemberState(u.id, memberTemplate());
+    accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
+  } else if (u && accounts.realNameOf(u) !== 'Rahul Imran Ismail') {
+    u = accounts.renameUser(u.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
+  }
+  /* De sleutelbos van de eigenaar: alles zien en alles doen met het ene
+     account. De kantoor- en zaak-rol staan er standaard aan gekoppeld, dus
+     na de leden-inlog is elke werkplek een rolkeuze, geen tweede inlog. */
+  if (u) {
+    if (!db.data.accountRollen || typeof db.data.accountRollen !== 'object') db.data.accountRollen = {};
+    const sleutelbos = db.data.accountRollen['user-' + u.id] =
+      Array.isArray(db.data.accountRollen['user-' + u.id]) ? db.data.accountRollen['user-' + u.id] : [];
+    if (!sleutelbos.some(r => r.rol === 'kantoor')) sleutelbos.push({ rol: 'kantoor', at: new Date().toISOString() });
+    if (!sleutelbos.some(r => r.rol === 'zaak')) {
+      const zc = (process.env.DEMO_SUPPLIER || 'KIKUNOI').toUpperCase();
+      const zaak = (db.data.suppliers || []).find(s => s.code === zc);
+      sleutelbos.push({ rol: 'zaak', code: zc, zaakNaam: zaak ? zaak.name : zc, naam: 'Beheer', at: new Date().toISOString() });
+    }
+    save();
+  }
 }
 
 /* Het demopersoneel per leverancier staat als pure data in een kern-module. */
@@ -1981,7 +2003,7 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, conci
   maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, officeState, pendingVerifications } = maakKantoor({
+const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, pendingVerifications } = maakKantoor({
   db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
@@ -2015,7 +2037,7 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, memberTemplate, myApplications, nextSseId, onboarding, boerderij, creator, samenwerking, agenda, facturatie, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, officeState, openVacatures, optieAan,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinFails, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sendPush,

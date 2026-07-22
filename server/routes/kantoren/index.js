@@ -56,7 +56,8 @@ module.exports = (kern) => {
   app.post('/api/office/onboarding', officeAuth, (req, res) => veilig(res, () => afdelingen.onboarding(String(req.body.kamer || ''))));
 
   // de vier ontwerpbureaus + de Ideeenkamer, en de platformbrede regie
-  const ctx = { app, officeAuth, veilig, stuur, afdelingen, sseToOffice, db, save, kern,
+  const ctx = { app, officeAuth, boardroomAuth: kern.boardroomAuth, boardroomLijst: kern.boardroomLijst,
+    keyVanCodenaam: kern.keyVanCodenaam, veilig, stuur, afdelingen, sseToOffice, db, save, kern,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet };
   require('./bureaus')(ctx);
   require('./regie')(ctx);

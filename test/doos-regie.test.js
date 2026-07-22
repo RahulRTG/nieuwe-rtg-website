@@ -32,7 +32,8 @@ function doosApi(pad, body, methode) {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DOOS_SLEUTEL: SLEUTEL } });
   base = srv.base;
-  office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  office = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   assert.ok(office, 'het kantoor is ingelogd');
 });
 test.after(() => {

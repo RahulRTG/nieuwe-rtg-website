@@ -21,8 +21,11 @@ test.before(async () => {
   TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zelfzorg-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  office = (await api(base, 'login', { code: 'RTG-OFFICE' })).body.token;
-  assert.ok(office, 'kantoor-login geeft een token');
+  // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
+  const login = await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' }) }).then(r => r.json());
+  office = login.token;
+  assert.ok(office, 'de eigenaar logt in met zijn account');
 });
 test.after(() => stop(srv && srv.child));
 

@@ -121,10 +121,11 @@
   <div class="demo" role="note">
     <span class="dot" aria-hidden="true"></span>
     <p data-i18n-html="hub.demo"><b>Demo.</b> Alle functies werken. Alleen echt betalen, echte bestellingen en de RTG Boardroom zijn uit. Wissel linksonder tussen licht en donker.</p>
+    <button class="chip" id="allesKnop" type="button" style="margin-left:auto;flex-shrink:0;">Toon alles</button>
   </div>
 
-  <h2 class="sectiekop" id="k-leden" data-i18n="hub.members">Leden</h2>
-  <nav class="grid" aria-labelledby="k-leden">
+  <h2 class="sectiekop" id="k-leden" data-wie="lid" data-i18n="hub.members">Leden</h2>
+  <nav class="grid" aria-labelledby="k-leden" data-wie="lid">
     <a class="app" href="/apps/app.html?pas=rtg"><span class="tegel" aria-hidden="true">🎫</span><span class="naam">RTG Pass</span></a>
     <a class="app" href="/apps/app.html?pas=lifestyle"><span class="tegel" aria-hidden="true">🌙</span><span class="naam">Lifestyle Pass</span></a>
     <a class="app" href="/apps/app.html?pas=business"><span class="tegel" aria-hidden="true">💼</span><span class="naam">Business Pass</span></a>
@@ -140,15 +141,15 @@
     <a class="app" href="/apps/overheid.html"><span class="tegel" aria-hidden="true">🏢</span><span class="naam">De Overheid</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-rtf" data-i18n="hub.rtf">RTFoundation</h2>
-  <nav class="grid" aria-labelledby="k-rtf">
+  <h2 class="sectiekop" id="k-rtf" data-wie="rtf" data-i18n="hub.rtf">RTFoundation</h2>
+  <nav class="grid" aria-labelledby="k-rtf" data-wie="rtf">
     <a class="app" href="/apps/foundation/"><span class="tegel" aria-hidden="true">📚</span><span class="naam">RTFoundation</span></a>
     <a class="app" href="/apps/foundation/school.html"><span class="tegel" aria-hidden="true">🏫</span><span class="naam">RTF School</span></a>
     <a class="app" href="/apps/foundation/vrienden.html"><span class="tegel" aria-hidden="true">👋</span><span class="naam">RTF Vrienden</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-staf" data-i18n="hub.staff">Personeel &amp; werkgevers</h2>
-  <nav class="grid" aria-labelledby="k-staf">
+  <h2 class="sectiekop" id="k-staf" data-wie="poort" data-i18n="hub.staff">Personeel &amp; werkgevers</h2>
+  <nav class="grid" aria-labelledby="k-staf" data-wie="poort">
     <a class="app" href="/apps/personeel.html"><span class="tegel" aria-hidden="true">👤</span><span class="naam" data-i18n="hub.pd">Personeel (alle PDA's)</span></a>
     <a class="app" href="/apps/leverancier.html"><span class="tegel" aria-hidden="true">🤝</span><span class="naam" data-i18n="hub.partners">Partner</span></a>
     <a class="app" href="/apps/leverancier.html?sector=zzp"><span class="tegel" aria-hidden="true">🧑‍🔧</span><span class="naam">Zelfstandigen</span></a>
@@ -157,8 +158,8 @@
     <a class="app" href="/apps/rijksloket.html"><span class="tegel" aria-hidden="true">🏢</span><span class="naam">Rijks-loket</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-eten" data-i18n="hub.g.eten">Eten &amp; drinken</h2>
-  <nav class="grid" aria-labelledby="k-eten">
+  <h2 class="sectiekop" id="k-eten" data-wie="zaak" data-i18n="hub.g.eten">Eten &amp; drinken</h2>
+  <nav class="grid" aria-labelledby="k-eten" data-wie="zaak">
     <a class="app" href="/apps/leverancier.html?sector=restaurant"><span class="tegel" aria-hidden="true">🍽️</span><span class="naam">Restaurant</span></a>
     <a class="app" href="/apps/leverancier.html?sector=bar"><span class="tegel" aria-hidden="true">🍸</span><span class="naam">Bar &amp; Club</span></a>
     <a class="app" href="/apps/leverancier.html?sector=beachclub"><span class="tegel" aria-hidden="true">🏖️</span><span class="naam">Beachclub</span></a>
@@ -166,16 +167,16 @@
     <a class="app" href="/apps/leverancier.html?sector=koffie"><span class="tegel" aria-hidden="true">☕</span><span class="naam">Koffie &amp; patisserie</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-verblijf" data-i18n="hub.g.verblijf">Verblijf</h2>
-  <nav class="grid" aria-labelledby="k-verblijf">
+  <h2 class="sectiekop" id="k-verblijf" data-wie="zaak" data-i18n="hub.g.verblijf">Verblijf</h2>
+  <nav class="grid" aria-labelledby="k-verblijf" data-wie="zaak">
     <a class="app" href="/apps/leverancier.html?sector=hotel"><span class="tegel" aria-hidden="true">🏨</span><span class="naam">Hotel</span></a>
     <a class="app" href="/apps/leverancier.html?sector=appartement"><span class="tegel" aria-hidden="true">🏡</span><span class="naam">Appartement</span></a>
     <a class="app" href="/apps/leverancier.html?sector=villa"><span class="tegel" aria-hidden="true">🌴</span><span class="naam">Villa's &amp; fincas</span></a>
     <a class="app" href="/apps/leverancier.html?sector=vastgoed"><span class="tegel" aria-hidden="true">🗝️</span><span class="naam">Vastgoed</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-vervoer" data-i18n="hub.g.vervoer">Vervoer</h2>
-  <nav class="grid" aria-labelledby="k-vervoer">
+  <h2 class="sectiekop" id="k-vervoer" data-wie="zaak" data-i18n="hub.g.vervoer">Vervoer</h2>
+  <nav class="grid" aria-labelledby="k-vervoer" data-wie="zaak">
     <a class="app" href="/apps/leverancier.html?sector=taxi"><span class="tegel" aria-hidden="true">🚘</span><span class="naam">Taxi</span></a>
     <a class="app" href="/apps/leverancier.html?sector=privejet"><span class="tegel" aria-hidden="true">✈️</span><span class="naam">Privéjet</span></a>
     <a class="app" href="/apps/leverancier.html?sector=helikopter"><span class="tegel" aria-hidden="true">🚁</span><span class="naam">Helikopter</span></a>
@@ -184,16 +185,16 @@
     <a class="app" href="/apps/leverancier.html?sector=tweewielers"><span class="tegel" aria-hidden="true">🛵</span><span class="naam">Tweewielers</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-beleven" data-i18n="hub.g.beleven">Beleven</h2>
-  <nav class="grid" aria-labelledby="k-beleven">
+  <h2 class="sectiekop" id="k-beleven" data-wie="zaak" data-i18n="hub.g.beleven">Beleven</h2>
+  <nav class="grid" aria-labelledby="k-beleven" data-wie="zaak">
     <a class="app" href="/apps/leverancier.html?sector=activiteiten"><span class="tegel" aria-hidden="true">🎟️</span><span class="naam">Activiteiten</span></a>
     <a class="app" href="/apps/leverancier.html?sector=events"><span class="tegel" aria-hidden="true">🎪</span><span class="naam">Events &amp; festivals</span></a>
     <a class="app" href="/apps/leverancier.html?sector=wellness"><span class="tegel" aria-hidden="true">🧖</span><span class="naam">Wellness &amp; spa</span></a>
     <a class="app" href="/apps/leverancier.html?sector=creator"><span class="tegel" aria-hidden="true">🎬</span><span class="naam">Creators</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-zorg">Hulpdiensten &amp; zorg</h2>
-  <nav class="grid" aria-labelledby="k-zorg">
+  <h2 class="sectiekop" id="k-zorg" data-wie="zaak">Hulpdiensten &amp; zorg</h2>
+  <nav class="grid" aria-labelledby="k-zorg" data-wie="zaak">
     <a class="app" href="/apps/meldkamer.html"><span class="tegel" aria-hidden="true">🚨</span><span class="naam">Meldkamer</span></a>
     <a class="app" href="/apps/leverancier.html?sector=politie"><span class="tegel" aria-hidden="true">🚔</span><span class="naam">Politie</span></a>
     <a class="app" href="/apps/leverancier.html?sector=brandweer"><span class="tegel" aria-hidden="true">🚒</span><span class="naam">Brandweer</span></a>
@@ -207,8 +208,8 @@
     <a class="app" href="/apps/defensie.html"><span class="tegel" aria-hidden="true">🎖️</span><span class="naam">Defensie</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-handel" data-i18n="hub.g.handel">Winkel &amp; handel</h2>
-  <nav class="grid" aria-labelledby="k-handel">
+  <h2 class="sectiekop" id="k-handel" data-wie="zaak" data-i18n="hub.g.handel">Winkel &amp; handel</h2>
+  <nav class="grid" aria-labelledby="k-handel" data-wie="zaak">
     <a class="app" href="/apps/leverancier.html?sector=retail"><span class="tegel" aria-hidden="true">🛍️</span><span class="naam">Mode</span></a>
     <a class="app" href="/apps/leverancier.html?sector=juwelier"><span class="tegel" aria-hidden="true">💎</span><span class="naam">Juwelier</span></a>
     <a class="app" href="/apps/leverancier.html?sector=galerie"><span class="tegel" aria-hidden="true">🖼️</span><span class="naam">Kunst &amp; galerie</span></a>
@@ -217,8 +218,8 @@
     <a class="app" href="/apps/leverancier.html?sector=beveiliging"><span class="tegel" aria-hidden="true">🛡️</span><span class="naam">Beveiliging</span></a>
   </nav>
 
-  <h2 class="sectiekop" id="k-rtg" data-i18n="hub.rtg">RTG</h2>
-  <nav class="grid" aria-labelledby="k-rtg">
+  <h2 class="sectiekop" id="k-rtg" data-wie="werk" data-i18n="hub.rtg">RTG</h2>
+  <nav class="grid" aria-labelledby="k-rtg" data-wie="werk">
     <a class="app" href="/apps/rtgid.html"><span class="tegel" aria-hidden="true">🪪</span><span class="naam">RTG iD</span></a>
     <a class="app" href="/apps/wallet.html"><span class="tegel" aria-hidden="true">👛</span><span class="naam">RTG Wallet</span></a>
     <a class="app" href="/apps/backoffice.html"><span class="tegel" aria-hidden="true">🗝️</span><span class="naam" data-i18n="hub.bo">Backoffice</span></a>
@@ -248,6 +249,44 @@ window.I18N = { en: {
   'hub.juridisch':'Legal', 'hub.privacy':'Privacy',
   'hub.demo':'<b>Demo.</b> Every function works. Only real payments, real orders and the RTG Boardroom are switched off. Toggle light and dark at the bottom left.'
 } };
+</script>
+<script>
+(function () {
+  'use strict';
+  /* De bril van het bureaublad: leden en personeel zien alleen hun eigen
+     dingen. De secties dragen data-wie (lid, rtf, poort, zaak, werk) en de
+     aanwezige inlogs bepalen wat er staat; meerdere inlogs = de optelsom.
+     Zonder inlog toont het bureaublad de voordeuren (lid worden, RTF, de
+     werk-ingangen). "Toon alles" blijft er voor de demo; die keuze onthoudt
+     het toestel. De pagina's zelf blijven gewoon achter hun eigen inlog. */
+  function lees(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  var heeft = {
+    lid: !!lees('rtg_member_token'), zaak: !!lees('rtg_sup_token'),
+    kantoor: !!lees('rtg_office_token'), pda: !!lees('rtg_pda_token'), rtf: !!lees('rtf_sessie')
+  };
+  var gast = !heeft.lid && !heeft.zaak && !heeft.kantoor && !heeft.pda && !heeft.rtf;
+  var toon = {
+    lid: gast || heeft.lid,
+    rtf: gast || heeft.lid || heeft.rtf,
+    poort: gast || heeft.zaak || heeft.kantoor || heeft.pda,
+    zaak: heeft.zaak,
+    werk: heeft.kantoor
+  };
+  var alles = lees('rtg_bureau_alles') === '1';
+  var knop = document.getElementById('allesKnop');
+  function pas() {
+    document.querySelectorAll('[data-wie]').forEach(function (el) {
+      el.hidden = !alles && !toon[el.dataset.wie];
+    });
+    if (knop) knop.textContent = alles ? 'Toon mijn bureaublad' : 'Toon alles';
+  }
+  if (knop) knop.addEventListener('click', function () {
+    alles = !alles;
+    try { localStorage.setItem('rtg_bureau_alles', alles ? '1' : '0'); } catch (e) {}
+    pas();
+  });
+  pas();
+})();
 </script>
 <script src="/shared/accounts-os.js"></script>
 <script src="/shared/i18n.js"></script>

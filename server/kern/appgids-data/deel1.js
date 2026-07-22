@@ -5,8 +5,8 @@ const G = (wat, doe, tip) => ({ wat, doe, tip });
 module.exports = {
   /* ---- het leden-OS en de leden-apps (RTG-toon: ingetogen, je/jij) ---- */
   '/apps/index.html': G('Het RTG OS-bureaublad: alle apps van het platform als iconen, met de klok en je accounts.',
-    ['Tik een tegel; de app opent schermvullend en de terug-knop brengt je hier terug', 'Wissel rechtsboven tussen je accounts', 'Op telefoon en groot scherm hetzelfde bureaublad, passend geschaald'],
-    'Dit is ook de voordeur van de website; installeren als eigen app kost niets.'),
+    ['Tik een tegel; de app opent schermvullend en de terug-knop brengt je hier terug', 'Wissel rechtsboven tussen je accounts', 'Je ziet alleen de tegels van jouw wereld; met Toon alles zie je alles'],
+    'Dit is ook de voordeur van de website; op telefoon en groot scherm hetzelfde, passend geschaald.'),
   '/apps/app.html': G('Jouw leden-app: reserveren, boeken, bestellen, chatten en betalen, alles op codenaam.',
     ['Open een genre en reserveer of boek direct', 'Vraag Rahul wat je maar wilt; hij regelt het met jouw inlog', 'Bekijk je codes, tickets en bestellingen onder je profiel'],
     'Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.'),

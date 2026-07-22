@@ -577,7 +577,7 @@
     async function start(){
       if (gesprek || bezig) return;
       bezig = true;
-      try { const d = await API.call('/aanmeld/start', {}); gesprek = d.id; zeg('rahul', d.tekst); }
+      try { const d = await API.call('/aanmeld/start', { lang: document.documentElement.lang || 'nl' }); gesprek = d.id; zeg('rahul', d.tekst); }
       catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; de formulieren werken altijd.')); klassiek(); }
       bezig = false;
     }
@@ -600,7 +600,7 @@
             zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.wwmis','Probeer het nog eens, zeg "opnieuw", of zeg "wachtwoord vergeten" en dan regel ik een herstel-link.'));
           }
         } else {
-          const d = await API.call('/aanmeld/zeg', { id: gesprek, tekst });
+          const d = await API.call('/aanmeld/zeg', { id: gesprek, tekst, lang: document.documentElement.lang || 'nl' });
           zeg('rahul', d.tekst);
           // ingelogd via de sleutelwoorden: de server heeft server-side
           // geverifieerd en een echte token gemunt; wij bewaren hem en

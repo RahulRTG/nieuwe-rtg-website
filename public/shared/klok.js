@@ -38,6 +38,9 @@
     '.rtg-ring .rr-naam{fill:var(--klok-goud,var(--gold,#C9A24B));font-family:Inter,system-ui,sans-serif;font-size:5.2px;font-weight:400;}' +
     '.rtg-ring .rr-venster{fill:rgba(0,0,0,0.4);stroke:currentColor;stroke-opacity:0.25;stroke-width:0.7;}' +
     ".rtg-ring .rr-datum{fill:var(--klok-goud,var(--gold,#C9A24B));font-family:'Bodoni Moda',serif;font-size:8.6px;font-variant-numeric:tabular-nums;}" +
+    // de weekdag, tussen de naam en de tijd, in EXACT dezelfde stijl als de
+    // datum: hetzelfde levende goud, hetzelfde Bodoni-gezicht en dezelfde maat
+    ".rtg-ring .rr-dag{fill:var(--klok-goud,var(--gold,#C9A24B));font-family:'Bodoni Moda',serif;font-size:8.6px;}" +
     '.rtg-ring .rr-wijzer{fill:var(--klok-goud,var(--gold,#C9A24B));filter:drop-shadow(0 0 5px color-mix(in srgb, var(--klok-goud,var(--gold,#C9A24B)) 70%, transparent));}' +
     // de cijfers exact in het midden: naam en datumvenster staan er
     // symmetrisch omheen, zodat alles even ver van elkaar en de rand staat.
@@ -45,7 +48,10 @@
     // (het staat absoluut, rechts van de seconden), zodat HH:MM:SS precies op
     // dezelfde as staat als RAHUL TRAVEL GROUP en de datum, en niet naar links
     // verschuift door de breedte van het accent.
-    '.rtg-ring .rr-kern{position:relative;text-align:center;}' +
+    // de wijzerplaat is altijd donker, dus de cijfers krijgen een vaste heldere
+    // inkt (niet de paginakleur, die overdag donker wordt en zou wegvallen);
+    // het goud-accent van de milliseconden houdt zijn eigen levende goud
+    '.rtg-ring .rr-kern{position:relative;text-align:center;color:#F4F1EC;}' +
     '.rtg-ring .rr-kern .rtg-klok{font-size:2.05rem;justify-content:center;position:relative;}' +
     '.rtg-ring .rr-kern .km{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:0.22em;align-self:auto;}';
   document.head.appendChild(stijl);
@@ -120,6 +126,9 @@
     const naam = maak('text', { x: 100, y: 41.5, class: 'rr-naam', 'text-anchor': 'middle',
       textLength: 86, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
+    // de weekdag: tussen de naam en de tijd, natuurlijk gecentreerd (net als de
+    // datum, geen opgelegde breedte), in de taal van de pagina (verf vult hem)
+    const dag = maak('text', { x: 100, y: 55, class: 'rr-dag', 'text-anchor': 'middle' });
     // het datumvenster op zes uur: breder dan hoog, zoals bij een echt horloge
     const venster = maak('rect', { x: 91.5, y: 150, width: 17, height: 11, rx: 1.5, class: 'rr-venster' });
     const datumTekst = maak('text', { x: 100, y: 158.6, class: 'rr-datum', 'text-anchor': 'middle' });
@@ -131,11 +140,11 @@
     kern.append(tijd);
     el.textContent = '';
     el.append(svg, kern);
-    /* Het passwerk: de plaat meet zichzelf op en zet de VIER luchtruimtes
-       exact gelijk (rehaut -> naam -> cijfers -> venster -> rehaut), met de
-       echte tekstmaten van dit toestel (getBBox/getBoundingClientRect), niet
-       met aannames. Zo klopt het op elke schermdichtheid en elk font, zoals
-       bij een echt horloge waar alles is opgemeten. */
+    /* Het passwerk: de plaat meet zichzelf op en zet de VIJF luchtruimtes
+       exact gelijk (rehaut -> naam -> weekdag -> cijfers -> venster -> rehaut),
+       met de echte tekstmaten van dit toestel (getBBox/getBoundingClientRect),
+       niet met aannames. Zo klopt het op elke schermdichtheid en elk font,
+       zoals bij een echt horloge waar alles is opgemeten. */
     const REHAUT = 87.5;
     let kernSchuif = 0; // opgeteld, zodat een tweede meetronde bijstelt in plaats van overschrijft
     function passenwerk() {
@@ -144,15 +153,19 @@
         if (!rr.height) return; // nog niet in beeld; de volgende poging komt
         const schaal = 200 / rr.height;                    // px -> plaatmaat
         const bbN = naam.getBBox();
+        const bbD = dag.getBBox();
         const bbK = kern.getBoundingClientRect();
         const kH = bbK.height * schaal;
         const vH = 11;
-        const lucht = (2 * REHAUT - bbN.height - kH - vH) / 4;
+        const lucht = (2 * REHAUT - bbN.height - bbD.height - kH - vH) / 5;
         // de naam: bovenkant exact een luchtmaat onder de rehaut
-        const naamY = Number(naam.getAttribute('y')) + ((100 - REHAUT + lucht) - bbN.y);
-        naam.setAttribute('y', naamY.toFixed(2));
-        // de cijfers: exact een luchtmaat onder de naam
-        const wilKTop = (100 - REHAUT) + lucht + bbN.height + lucht;
+        const naamTop = (100 - REHAUT) + lucht;
+        naam.setAttribute('y', (Number(naam.getAttribute('y')) + (naamTop - bbN.y)).toFixed(2));
+        // de weekdag: exact een luchtmaat onder de naam
+        const dagTop = naamTop + bbN.height + lucht;
+        dag.setAttribute('y', (Number(dag.getAttribute('y')) + (dagTop - bbD.y)).toFixed(2));
+        // de cijfers: exact een luchtmaat onder de weekdag
+        const wilKTop = dagTop + bbD.height + lucht;
         const kTop = (bbK.top - rr.top) * schaal; // inclusief de huidige verschuiving
         kernSchuif += (wilKTop - kTop) / schaal;
         kern.style.transform = 'translateY(' + kernSchuif.toFixed(2) + 'px)';
@@ -168,9 +181,16 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(passenwerk));
     setTimeout(passenwerk, 1200);
     const cijfers = maakCijfers(tijd);
+    let vorigeDag = '';
     return d => {
       cijfers(d);
       datumTekst.textContent = String(d.getDate());
+      // de weekdag in de taal van de pagina, met een hoofdletter; alleen
+      // bijwerken als hij verandert (dagovergang of taalwissel)
+      const taal = document.documentElement.lang || 'nl';
+      let wd; try { wd = d.toLocaleDateString(taal, { weekday: 'long' }); } catch (e) { wd = d.toLocaleDateString(undefined, { weekday: 'long' }); }
+      const cap = wd ? wd.charAt(0).toUpperCase() + wd.slice(1) : '';
+      if (cap !== vorigeDag) { dag.textContent = cap; vorigeDag = cap; }
       const sec = d.getSeconds() + (RUSTIG ? 0 : d.getMilliseconds() / 1000);
       wijzer.setAttribute('transform', 'rotate(' + (sec * 6) + ' 100 100)');
     };

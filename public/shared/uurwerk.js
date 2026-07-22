@@ -54,6 +54,33 @@
   document.addEventListener('touchend', function () { opKroon = false; }, true);
   document.addEventListener('touchcancel', function () { opKroon = false; }, true);
 
+  /* ---- de horlogetaal: de taal van de klok als stille laag op ELKE pagina.
+     Geen herbouw per app, maar vaste kleine details: tekstselectie in het
+     gedempte goud, dunne haarlijn-scrollbalken, echte tabelcijfers voor alle
+     getallen (niets danst meer), elke hr als haarlijn, en een minuutbaan-klasse
+     (rtg-minuutbaan) die een kop de streepband van de wijzerplaat geeft. ---- */
+  function bouwTaal() {
+    if (document.getElementById('rtg-horlogetaal')) return;
+    var st = document.createElement('style');
+    st.id = 'rtg-horlogetaal';
+    st.textContent =
+      '::selection{background:color-mix(in srgb, var(--gold,#C9A24B) 32%, transparent);}' +
+      'body{font-variant-numeric:tabular-nums;}' +
+      'hr{border:none;height:1px;background:color-mix(in srgb, var(--gold,#C9A24B) 25%, transparent);}' +
+      '*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb, var(--gold,#C9A24B) 40%, transparent) transparent;}' +
+      '::-webkit-scrollbar{width:6px;height:6px;}' +
+      '::-webkit-scrollbar-track{background:transparent;}' +
+      '::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--gold,#C9A24B) 38%, transparent);border-radius:999px;}' +
+      // de minuutbaan: zestig fijne strepen met een gouden accent op de vijf,
+      // zoals de streepband van de RTG-klok; voor sectiekoppen en scheidingen
+      '.rtg-minuutbaan{position:relative;padding-bottom:0.55rem;}' +
+      '.rtg-minuutbaan::after{content:"";position:absolute;left:0;bottom:0;width:7.5rem;max-width:60%;height:5px;' +
+      'background-image:repeating-linear-gradient(90deg, color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent) 0 1px, transparent 1px 25px),' +
+      'repeating-linear-gradient(90deg, color-mix(in srgb, var(--gold,#C9A24B) 30%, transparent) 0 1px, transparent 1px 5px);' +
+      'background-size:100% 5px, 100% 3px;background-position:left bottom, left bottom;background-repeat:no-repeat;}';
+    document.head.appendChild(st);
+  }
+
   /* ---- het haarlijntje: alleen op pagina's zonder het horloge zelf ---- */
   var lijn = null, punt = null;
   function bouwLijn() {
@@ -98,6 +125,7 @@
     requestAnimationFrame(gang);
   }
   function start() {
+    bouwTaal();
     bouwLijn();
     requestAnimationFrame(function (t) { vorige = t; requestAnimationFrame(gang); });
   }

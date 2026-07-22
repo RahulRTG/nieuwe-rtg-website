@@ -73,6 +73,7 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     return { status: 200, ok: true, geaccepteerd, ttlS: AANWEZIG_TTL_MS / 1000 };
   }
   function signaal(key, cid, kind, doelKey, payload) {
+    lijsten();
     const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
     if (!SIGNALEN.includes(kind)) return { status: 400, error: 'Onbekend signaal.' };
     const ikMaker = c.key === key;
@@ -122,7 +123,7 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     save();
     return { status: 200, ok: true, reactie: r };
   }
-  const reacties = cid => ({ status: 200, reacties: (db.data.clipsReacties[String(cid || '')] || []).slice(-40) });
+  const reacties = cid => { lijsten(); return { status: 200, reacties: (db.data.clipsReacties[String(cid || '')] || []).slice(-40) }; };
   function meld(key, cid, reden) {
     lijsten();
     const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };

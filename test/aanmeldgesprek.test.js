@@ -93,6 +93,10 @@ test('de poort is van Rahul: aanmelden en inloggen als gesprek', async () => {
     assert.match(l.tekst, /niet door dit gesprek/i, 'en hij zegt eerlijk dat het wachtwoord buiten het gesprek blijft');
     l = await zeg3('hallo?');
     assert.match(l.tekst, /wachtwoordveld|opnieuw/i, 'op het inlogpad wijst hij naar het veld');
+    // wachtwoord kwijt: Rahul regelt het herstel zelf, er is geen knop meer
+    l = await zeg3('ik ben mijn wachtwoord vergeten');
+    assert.ok(l.vergeten && l.vergeten.u === 'gesprek@test.nl', 'Rahul levert het adres voor de herstel-route');
+    assert.match(l.tekst, /herstel-link/i, 'en zegt wat er gebeurt');
     l = await zeg3('opnieuw');
     assert.match(l.tekst, /inloggen, of word je lid/i, 'met "opnieuw" terug naar het begin');
 

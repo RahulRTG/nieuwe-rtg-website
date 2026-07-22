@@ -132,6 +132,10 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
         return { tekst: 'Allebei goed hoor. Zeg het maar: kom je inloggen, of word je vandaag lid?' };
       }
       case 'login-naam': {
+        if (/\bvergeten\b/i.test(tekst)) {
+          g.stap = 'vergeten-mail';
+          return { tekst: 'Geen zorgen, dat regelen we zo. Welk e-mailadres gebruik je hier? Dan zorg ik voor een herstel-link.' };
+        }
         const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
         const u = mail ? mail[0].toLowerCase() : schoon(tekst.replace(/^(met\s+|mijn\s+(e-?mail(adres)?|gebruikersnaam|naam)\s+is\s+|het\s+is\s+)/i, ''), 80);
         if (!u || u.length < 2) return { tekst: 'Welk e-mailadres of welke gebruikersnaam gebruik je hier? Typ hem even voluit.' };
@@ -140,11 +144,25 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan }) {
         return { tekst: 'Top. Nog even je wachtwoord hieronder en je bent binnen; dat gaat rechtstreeks en versleuteld de kluis in, niet door dit gesprek.', login: g.login };
       }
       case 'login-af': {
+        // wachtwoord kwijt: Rahul regelt de herstel-link zelf (de app vraagt
+        // hem stil aan; of het adres bestaat, verklapt niemand)
+        if (/\bvergeten\b/i.test(tekst)) {
+          const u = g.login && /@/.test(g.login.u) ? g.login.u : null;
+          if (u) return { tekst: 'Geen zorgen. Als ik ' + u + ' ken, ligt er zo een herstel-link in je mail; volg die even en kom terug, dan ben ik hier.', vergeten: { u } };
+          g.stap = 'vergeten-mail';
+          return { tekst: 'Geen zorgen, dat regelen we zo. Welk e-mailadres gebruik je hier? Dan zorg ik voor een herstel-link.' };
+        }
         if (/\b(opnieuw|ander (adres|account)|verkeerde?|toch (aanmelden|lid|nieuw))\b/i.test(tekst)) {
           g.stap = 'doel'; g.login = null;
           return { tekst: 'Geen punt, we beginnen gewoon opnieuw. Kom je inloggen, of word je lid?' };
         }
-        return { tekst: 'Typ je wachtwoord gewoon hieronder, dan ben je zo binnen. Kom je er niet uit: zeg "opnieuw" of pak "Wachtwoord vergeten?".', login: g.login || null };
+        return { tekst: 'Typ je wachtwoord gewoon hieronder, dan ben je zo binnen. Kom je er niet uit: zeg "opnieuw" of "wachtwoord vergeten".', login: g.login || null };
+      }
+      case 'vergeten-mail': {
+        const mail = /[^@\s]+@[^@\s]+\.[^@\s]+/.exec(tekst);
+        if (!mail) return { tekst: 'Typ je e-mailadres even voluit (met @), dan zorg ik voor de herstel-link.' };
+        g.stap = 'doel'; g.login = null;
+        return { tekst: 'Als ik ' + mail[0].toLowerCase() + ' ken, ligt de herstel-link nu in je mail. Volg hem even; daarna log ik je hier zo weer in.', vergeten: { u: mail[0].toLowerCase() } };
       }
       case 'hallo': {
         g.stap = 'naam';

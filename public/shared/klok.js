@@ -34,12 +34,11 @@
     '.rtg-ring .rr-venster{fill:rgba(0,0,0,0.4);stroke:currentColor;stroke-opacity:0.25;stroke-width:0.7;}' +
     ".rtg-ring .rr-datum{fill:var(--gold,#C9A24B);font-family:'Bodoni Moda',serif;font-size:10.5px;font-variant-numeric:tabular-nums;}" +
     '.rtg-ring .rr-wijzer{fill:var(--gold,#C9A24B);filter:drop-shadow(0 0 5px color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent));}' +
-    '.rtg-ring .rr-kern{position:relative;text-align:center;margin-top:0.9rem;}' +
+    // de cijfers exact in het midden: naam en datumvenster staan er
+    // symmetrisch omheen, zodat alles even ver van elkaar en de rand staat
+    '.rtg-ring .rr-kern{position:relative;text-align:center;}' +
     '.rtg-ring .rr-kern .rtg-klok{font-size:2.05rem;justify-content:center;}' +
-    '.rtg-ring .rr-kern .km{align-self:baseline;}' +
-    // de voluit geschreven datum, midden op de plaat onder de cijfers
-    '.rtg-ring .rr-lange-datum{font-family:Inter,system-ui,sans-serif;font-size:0.72rem;letter-spacing:0.04em;' +
-      'opacity:0.65;margin-top:0.2rem;}';
+    '.rtg-ring .rr-kern .km{align-self:baseline;}';
   document.head.appendChild(stijl);
 
   const twee = n => String(n).padStart(2, '0');
@@ -107,7 +106,9 @@
     // de signatuur: alleen de naam, in het goud van het huis, op vaste
     // breedte (textLength) exact gecentreerd, en verticaal precies in het
     // midden tussen de binnenrand van de plaat en de bovenkant van de cijfers
-    const naam = maak('text', { x: 100, y: 55.4, class: 'rr-naam', 'text-anchor': 'middle',
+    // de naam en het datumvenster spiegelen elkaar rond het midden (100):
+    // venster-midden op 155.5, dus de naam op 44.5; gelijke maat overal
+    const naam = maak('text', { x: 100, y: 46.3, class: 'rr-naam', 'text-anchor': 'middle',
       textLength: 86, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
     // het datumvenster op zes uur
@@ -118,25 +119,13 @@
     const kern = document.createElement('div');
     kern.className = 'rr-kern';
     const tijd = document.createElement('div');
-    // de voluit geschreven datum hoort bij de plaat zelf: midden in de klok,
-    // direct onder de cijfers, in de taal van de pagina
-    const lange = document.createElement('div');
-    lange.className = 'rr-lange-datum';
-    kern.append(tijd, lange);
+    kern.append(tijd);
     el.textContent = '';
     el.append(svg, kern);
     const cijfers = maakCijfers(tijd);
-    let vorigeDag = '';
     return d => {
       cijfers(d);
-      const dag = String(d.getDate());
-      datumTekst.textContent = dag;
-      if (dag !== vorigeDag) {
-        vorigeDag = dag;
-        const taal = document.documentElement.lang || 'nl';
-        try { lange.textContent = d.toLocaleDateString(taal, { weekday: 'long', day: 'numeric', month: 'long' }); }
-        catch (e) { lange.textContent = d.toLocaleDateString(); }
-      }
+      datumTekst.textContent = String(d.getDate());
       const sec = d.getSeconds() + (RUSTIG ? 0 : d.getMilliseconds() / 1000);
       wijzer.setAttribute('transform', 'rotate(' + (sec * 6) + ' 100 100)');
     };

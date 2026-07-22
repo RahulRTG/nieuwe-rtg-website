@@ -107,16 +107,12 @@
       });
     }
     // de signatuur: alleen de naam, in het goud van het huis, op vaste
-    // breedte (textLength) exact gecentreerd, en verticaal precies in het
-    // midden tussen de binnenrand van de plaat en de bovenkant van de cijfers
-    // de naam optisch precies tussen de rand en de cijfers: evenveel lucht
-    // erboven als eronder (gemeten op het beeld, niet alleen op de wiskunde)
+    // breedte (textLength) exact gecentreerd
     const naam = maak('text', { x: 100, y: 41.5, class: 'rr-naam', 'text-anchor': 'middle',
       textLength: 86, lengthAdjust: 'spacing' });
     naam.textContent = 'RAHUL TRAVEL GROUP';
-    // het datumvenster op zes uur: breder dan hoog, zoals bij een echt
-    // horloge, met het midden exact op 155.5 (de spiegel van de naam op 44.5)
-    maak('rect', { x: 91.5, y: 150, width: 17, height: 11, rx: 1.5, class: 'rr-venster' });
+    // het datumvenster op zes uur: breder dan hoog, zoals bij een echt horloge
+    const venster = maak('rect', { x: 91.5, y: 150, width: 17, height: 11, rx: 1.5, class: 'rr-venster' });
     const datumTekst = maak('text', { x: 100, y: 158.6, class: 'rr-datum', 'text-anchor': 'middle' });
     // de gouden veger: een klein juweel, exact in het midden van de streepband
     const wijzer = maak('circle', { cx: 100, cy: 8, r: 2.2, class: 'rr-wijzer' });
@@ -126,6 +122,42 @@
     kern.append(tijd);
     el.textContent = '';
     el.append(svg, kern);
+    /* Het passwerk: de plaat meet zichzelf op en zet de VIER luchtruimtes
+       exact gelijk (rehaut -> naam -> cijfers -> venster -> rehaut), met de
+       echte tekstmaten van dit toestel (getBBox/getBoundingClientRect), niet
+       met aannames. Zo klopt het op elke schermdichtheid en elk font, zoals
+       bij een echt horloge waar alles is opgemeten. */
+    const REHAUT = 87.5;
+    let kernSchuif = 0; // opgeteld, zodat een tweede meetronde bijstelt in plaats van overschrijft
+    function passenwerk() {
+      try {
+        const rr = el.getBoundingClientRect();
+        if (!rr.height) return; // nog niet in beeld; de volgende poging komt
+        const schaal = 200 / rr.height;                    // px -> plaatmaat
+        const bbN = naam.getBBox();
+        const bbK = kern.getBoundingClientRect();
+        const kH = bbK.height * schaal;
+        const vH = 11;
+        const lucht = (2 * REHAUT - bbN.height - kH - vH) / 4;
+        // de naam: bovenkant exact een luchtmaat onder de rehaut
+        const naamY = Number(naam.getAttribute('y')) + ((100 - REHAUT + lucht) - bbN.y);
+        naam.setAttribute('y', naamY.toFixed(2));
+        // de cijfers: exact een luchtmaat onder de naam
+        const wilKTop = (100 - REHAUT) + lucht + bbN.height + lucht;
+        const kTop = (bbK.top - rr.top) * schaal; // inclusief de huidige verschuiving
+        kernSchuif += (wilKTop - kTop) / schaal;
+        kern.style.transform = 'translateY(' + kernSchuif.toFixed(2) + 'px)';
+        // het venster: exact een luchtmaat onder de cijfers (en dus ook
+        // exact een luchtmaat boven de onderrand)
+        const vTop = wilKTop + kH + lucht;
+        venster.setAttribute('y', vTop.toFixed(2));
+        datumTekst.setAttribute('y', (vTop + vH / 2 + 3.1).toFixed(2));
+      } catch (e) { /* meten mag nooit de klok breken */ }
+    }
+    // meten zodra de fonts er echt zijn (Bodoni laadt asynchroon), en een
+    // keer daarna voor het geval de plaat pas later in beeld kwam
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(passenwerk));
+    setTimeout(passenwerk, 1200);
     const cijfers = maakCijfers(tijd);
     return d => {
       cijfers(d);

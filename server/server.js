@@ -2133,6 +2133,10 @@ Object.assign(kern, require('./kern/reisbieb').maakReisBieb({ db, save }));
 /* De RTF App-Bibliotheek (kern/rtfbieb.js): 20.000 kind- en gezinsapps; de
    kern staat hier al zodat de Mall (routes/member) hem ook kan tonen. */
 Object.assign(kern, require('./kern/rtfbieb').maakRtfBieb({ db, save }));
+/* De Geloof & Wijsheid-Bibliotheek (kern/geloofbieb.js): een miljoen boeken en
+   apps over alle religies en levensbeschouwingen, als gelijken naast elkaar,
+   respectvol en gratis; met dezelfde leeftijdspoort als de app-bibliotheek. */
+Object.assign(kern, require('./kern/geloofbieb').maakGeloofBieb({ db, save }));
 /* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
    tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */
@@ -2535,6 +2539,8 @@ require('./routes/spellen')(kern);
 require('./routes/leren')(kern);
 /* De RTF-bieb-routes (de kern staat al bij de Mall-bibliotheken). */
 require('./routes/rtfbieb')(kern);
+/* De Geloof & Wijsheid-Bibliotheek-routes (kern staat al hierboven). */
+require('./routes/geloofbieb')(kern);
 /* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
    school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps
    (kern/samenrtf.js): kindveilig meekijken binnen gezin en vrienden. */
@@ -2545,7 +2551,7 @@ Object.assign(kern, require('./kern/beroepenbieb').maakBeroepenBieb({ db, save }
 /* De bibliothecaris (kern/bibliothecaris.js): de AI-assistent van de echte
    RTG Bibliotheek; adviseert alleen apps die echt in de catalogi staan. */
 Object.assign(kern, require('./kern/bibliothecaris')({ appbieb: kern.appbieb, reisbieb: kern.reisbieb,
-  rtfbieb: kern.rtfbieb, schoolbieb: kern.schoolbieb, beroepenbieb: kern.beroepenbieb, anthropic, schoon }));
+  rtfbieb: kern.rtfbieb, schoolbieb: kern.schoolbieb, beroepenbieb: kern.beroepenbieb, geloofbieb: kern.geloofbieb, anthropic, schoon }));
 require('./routes/bieb')(kern);
 Object.assign(kern, require('./kern/samenrtf')({ db, save, crypto, schoon, zijnVrienden: kern.zijnVrienden }));
 require('./routes/rtfschool')(kern);

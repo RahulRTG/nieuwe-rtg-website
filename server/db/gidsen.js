@@ -18,6 +18,12 @@ const grootCache = new Map();      // code -> zaak-object of null (niet gevonden
 let grootN = 0, grootNAt = 0;
 let ledenPool = null;
 const ledenCache = new Map();      // key -> { codename, tier } of null (niet gevonden)
+// Omgekeerde cache: kleine-letter-codenaam -> { key, codename, tier }. Wordt
+// synchroon gevuld door ledenGidsZet, zodat een NET actief lid meteen op
+// codenaam vindbaar is, ook al is de rij nog onderweg naar Postgres (de
+// upsert is fire-and-forget). Zonder deze cache kan een p2p-betaling naar een
+// zojuist geregistreerd lid "codenaam onbekend" krijgen tot de schrijf landt.
+const ledenRev = new Map();        // codename_lower -> { key, codename, tier }
 let ledenN = 0, ledenNAt = 0;
 
 async function ververGrootN() {
@@ -81,6 +87,9 @@ function ledenGidsAantal() {
 async function ledenGidsZet(key, codename, tier) {
   if (!ledenPool) return;
   ledenCache.set(key, { codename, tier });
+  // meteen omgekeerd vindbaar op codenaam (synchroon), nog voor Postgres klaar is
+  if (ledenRev.size > 100000) ledenRev.clear();
+  ledenRev.set(String(codename || '').trim().toLowerCase(), { key, codename, tier });
   try {
     const r = await ledenPool.query(
       'INSERT INTO member_dir(key, codename, tier, codename_lower) VALUES($1,$2,$3,$4) ' +
@@ -104,8 +113,19 @@ async function ledenGidsZoek(qLower, limit) {
     // of bellen) moet die synchroon terugvinden, niet op een koude cache stuiten.
     if (ledenCache.size > 100000) ledenCache.clear();
     for (const row of r.rows) ledenCache.set(row.key, { codename: row.codename, tier: row.tier });
-    return r.rows.map(row => ({ key: row.key, codename: row.codename, tier: row.tier }));
-  } catch (e) { return []; }
+    const uit = r.rows.map(row => ({ key: row.key, codename: row.codename, tier: row.tier }));
+    // Vangnet tegen de schrijf-vertraging: is er een EXACTE codenaam-treffer in
+    // de synchrone omgekeerde cache die Postgres nog niet teruggaf (de upsert is
+    // net gebeurd), voeg die dan toe. Zo vindt een exacte opzoeking (p2p-betaling,
+    // uitnodiging, bellen) een zojuist actief lid meteen, zonder op de index te
+    // wachten. Substring-zoeken over miljoenen blijft volledig Postgres-gedekt.
+    const rev = ledenRev.get(String(qLower || '').trim());
+    if (rev && !uit.some(x => x.key === rev.key)) uit.push({ key: rev.key, codename: rev.codename, tier: rev.tier });
+    return uit;
+  } catch (e) {
+    const rev = ledenRev.get(String(qLower || '').trim());
+    return rev ? [{ key: rev.key, codename: rev.codename, tier: rev.tier }] : [];
+  }
 }
 
 /* Installeer de pools en zet de tabellen/indexen klaar (aangeroepen door de

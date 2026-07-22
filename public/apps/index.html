@@ -121,8 +121,22 @@
   <div class="demo" role="note">
     <span class="dot" aria-hidden="true"></span>
     <p data-i18n-html="hub.demo"><b>Demo.</b> Alle functies werken. Alleen echt betalen, echte bestellingen en de RTG Boardroom zijn uit. Wissel linksonder tussen licht en donker.</p>
-    <button class="chip" id="allesKnop" type="button" style="margin-left:auto;flex-shrink:0;">Toon alles</button>
+    <button class="chip" id="allesKnop" type="button" style="margin-left:auto;flex-shrink:0;" hidden>Toon alles</button>
   </div>
+
+  <!-- de gesloten voordeur: zonder aanmelding zijn er geen apps te zien;
+       het gratis RTG-abonnement is de minimale ingang, Rahul regelt het -->
+  <section class="kaartpoort" id="poortKaart" hidden aria-label="Aanmelden bij RTG">
+    <div style="background:var(--paneel);border:1px solid var(--lijn);border-radius:16px;padding:2rem clamp(1.2rem,4vw,2.6rem);max-width:34rem;margin:2.5rem auto 0;text-align:center;">
+      <h2 style="font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.5rem;">Welkom bij Rahul Travel Group</h2>
+      <p style="color:var(--grijs);font-size:0.9rem;line-height:1.6;margin:0.8rem 0 1.2rem;">Het RTG OS opent pas na je aanmelding. Het gratis RTG-abonnement is de minimale ingang: even aanmelden bij Rahul en het hele bureaublad is van jou.</p>
+      <a href="/apps/app.html" style="display:inline-block;background:var(--inkt);color:#000;border-radius:12px;padding:0.7rem 1.4rem;font-weight:600;font-size:0.9rem;text-decoration:none;">Meld je gratis aan</a>
+      <p style="color:var(--grijs-zacht);font-size:0.78rem;margin-top:1rem;">Al een account? Dezelfde deur: Rahul herkent je en logt je in.</p>
+      <p style="color:var(--grijs-zacht);font-size:0.74rem;margin-top:1.2rem;">Werk je bij of met RTG?
+        <a href="/apps/personeel.html" style="color:var(--grijs);">Personeel</a> ·
+        <a href="/apps/leverancier.html" style="color:var(--grijs);">Partner</a></p>
+    </div>
+  </section>
 
   <h2 class="sectiekop" id="k-leden" data-wie="lid" data-i18n="hub.members">Leden</h2>
   <nav class="grid" aria-labelledby="k-leden" data-wie="lid">
@@ -254,11 +268,12 @@ window.I18N = { en: {
 (function () {
   'use strict';
   /* De bril van het bureaublad: leden en personeel zien alleen hun eigen
-     dingen. De secties dragen data-wie (lid, rtf, poort, zaak, werk) en de
+     dingen, en ZONDER aanmelding zie je helemaal niets; het gratis
+     RTG-abonnement is de minimale ingang (de poortkaart wijst de weg).
+     De secties dragen data-wie (lid, rtf, poort, zaak, werk) en de
      aanwezige inlogs bepalen wat er staat; meerdere inlogs = de optelsom.
-     Zonder inlog toont het bureaublad de voordeuren (lid worden, RTF, de
-     werk-ingangen). "Toon alles" blijft er voor de demo; die keuze onthoudt
-     het toestel. De pagina's zelf blijven gewoon achter hun eigen inlog. */
+     "Toon alles" bestaat alleen voor wie is aangemeld (demo); de pagina's
+     zelf blijven gewoon achter hun eigen inlog. */
   function lees(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   var heeft = {
     lid: !!lees('rtg_member_token'), zaak: !!lees('rtg_sup_token'),
@@ -266,19 +281,21 @@ window.I18N = { en: {
   };
   var gast = !heeft.lid && !heeft.zaak && !heeft.kantoor && !heeft.pda && !heeft.rtf;
   var toon = {
-    lid: gast || heeft.lid,
-    rtf: gast || heeft.lid || heeft.rtf,
-    poort: gast || heeft.zaak || heeft.kantoor || heeft.pda,
+    lid: heeft.lid,
+    rtf: heeft.lid || heeft.rtf,
+    poort: heeft.zaak || heeft.kantoor || heeft.pda,
     zaak: heeft.zaak,
     werk: heeft.kantoor
   };
-  var alles = lees('rtg_bureau_alles') === '1';
+  var alles = !gast && lees('rtg_bureau_alles') === '1';
   var knop = document.getElementById('allesKnop');
+  var kaart = document.getElementById('poortKaart');
   function pas() {
     document.querySelectorAll('[data-wie]').forEach(function (el) {
-      el.hidden = !alles && !toon[el.dataset.wie];
+      el.hidden = gast || (!alles && !toon[el.dataset.wie]);
     });
-    if (knop) knop.textContent = alles ? 'Toon mijn bureaublad' : 'Toon alles';
+    if (kaart) kaart.hidden = !gast;
+    if (knop) { knop.hidden = gast; knop.textContent = alles ? 'Toon mijn bureaublad' : 'Toon alles'; }
   }
   if (knop) knop.addEventListener('click', function () {
     alles = !alles;

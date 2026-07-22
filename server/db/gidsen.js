@@ -98,10 +98,24 @@ async function ledenGidsZet(key, codename, tier) {
     if (r.rows[0] && r.rows[0].nieuw) ledenN++;
   } catch (e) {}
 }
-// Omgekeerd opzoeken (codenaam -> sleutel), geindexeerd i.p.v. een scan.
-async function ledenGidsKeyVanCodenaam(codename) {
+// Exact opzoeken (codenaam -> { sleutel, codenaam, pas }), op de btree-index
+// (codename_lower), NIET op de trigram-scan. Eerst de synchrone omgekeerde
+// cache (net actief lid), dan een O(log n)-btree-treffer in Postgres. Dit is
+// het HETE pad voor p2p-betalen, uitnodigen en bellen: een exacte opzoeking
+// mag nooit een deelzoek-scan over 100M rijen worden.
+async function ledenGidsExact(codename) {
   if (!ledenPool) return null;
-  try { const r = await ledenPool.query('SELECT key FROM member_dir WHERE codename_lower = $1 LIMIT 1', [String(codename || '').trim().toLowerCase()]); return r.rows[0] ? r.rows[0].key : null; } catch (e) { return null; }
+  const lower = String(codename || '').trim().toLowerCase();
+  if (!lower) return null;
+  const rev = ledenRev.get(lower);
+  if (rev) return { key: rev.key, codename: rev.codename, tier: rev.tier };
+  try {
+    const r = await ledenPool.query('SELECT key, codename, tier FROM member_dir WHERE codename_lower = $1 LIMIT 1', [lower]);
+    if (!r.rows[0]) return null;
+    // meteen in de per-sleutel cache warmen voor een volgende lezing
+    ledenCache.set(r.rows[0].key, { codename: r.rows[0].codename, tier: r.rows[0].tier });
+    return { key: r.rows[0].key, codename: r.rows[0].codename, tier: r.rows[0].tier };
+  } catch (e) { return null; }
 }
 // Zoeken op (deel van) een codenaam, geindexeerd en begrensd.
 async function ledenGidsZoek(qLower, limit) {
@@ -156,5 +170,5 @@ async function init(pool, log) {
 
 module.exports = {
   init, grootSupplierSync, grootAantal,
-  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsKeyVanCodenaam, ledenGidsZoek
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsExact, ledenGidsZoek
 };

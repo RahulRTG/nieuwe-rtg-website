@@ -4,7 +4,7 @@
    rijen buiten het geheugen (ledenGids* uit db.js); zonder Postgres draait
    alles op db.data.memberDir zoals voorheen. De lezers merken het verschil
    niet: gidsHaal/gidsZoekCodenaam/keyVanCodenaam blijven hetzelfde. */
-module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsZoek, ledenGidsAantal }) => {
+module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsExact, ledenGidsZoek, ledenGidsAantal }) => {
   // de demo-persona's die bij het opstarten in de gids komen; geen echte leden
   const GIDS_SEED_TIERS = ['rtg', 'lifestyle', 'business'];
 
@@ -62,8 +62,19 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
     const ql = String(q || '').trim().toLowerCase();
     if (!ql) return [];
     if (ledenGidsActief()) {
-      const rows = await ledenGidsZoek(ql, 50);
-      return exact ? rows.filter(r => String(r.codename || '').toLowerCase() === ql) : rows;
+      // Exact opzoeken (het hete pad: p2p-betalen, uitnodigen, bellen) loopt over
+      // de btree-index (codename_lower = $1) plus de synchrone omgekeerde cache,
+      // niet over de trigram-scan. O(log n) i.p.v. een deelzoek over 100M rijen.
+      if (exact) {
+        const hit = ledenGidsExact ? await ledenGidsExact(ql) : null;
+        return hit ? [{ key: hit.key, codename: hit.codename, tier: hit.tier }] : [];
+      }
+      // Deelzoeken ("vind een vriend") vraagt minstens 3 tekens: de trigram-index
+      // werkt op drietallen, dus onder de drie tekens zou Postgres alle rijen
+      // scannen (bij 100M leden seconden per zoekopdracht, en een makkelijke
+      // manier om de server te laten zwoegen). Kort/rommelig -> leeg, geen scan.
+      if (ql.length < 3) return [];
+      return await ledenGidsZoek(ql, 50);
     }
     const out = [];
     for (const [key, m] of Object.entries(db.data.memberDir || {})) {

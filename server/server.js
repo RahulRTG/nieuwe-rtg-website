@@ -33,7 +33,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const { db, load, save, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
-  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsZoek,
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsExact, ledenGidsZoek,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal } = require('./db');
@@ -783,7 +783,7 @@ const { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveState
 /* De ledengids (sleutel -> codenaam + pas) staat in server/kern/gids.js:
    dirTouch, ledental, opzoeken en zoeken op codenaam, met of zonder Postgres. */
 const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam } =
-  require('./kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsZoek, ledenGidsAantal });
+  require('./kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsExact, ledenGidsZoek, ledenGidsAantal });
 // Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
 // vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
 onExternalChange(() => {
